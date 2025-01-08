@@ -42,23 +42,30 @@ export const Contributors = () => {
   return (
     <div className="space-y-8">
       <div>
-        <h2 className="text-2xl font-bold mb-4">Contributors Over Time</h2>
-        <div className="bg-white dark:bg-gray-800 rounded-lg p-4 h-[400px]">
+        <h2 className="text-2xl font-bold mb-4 text-cyan-400">Contributors Over Time</h2>
+        <div className="bg-gray-900/80 backdrop-blur-md rounded-lg p-4 h-[400px] border border-gray-800 shadow-xl">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={chartData}>
               <XAxis
                 dataKey="timestamp"
                 tickFormatter={(timestamp) => new Date(timestamp).toLocaleDateString()}
+                stroke="#94a3b8"
               />
-              <YAxis />
+              <YAxis stroke="#94a3b8" />
               <Tooltip
                 labelFormatter={(timestamp) => new Date(timestamp).toLocaleString()}
                 formatter={(value) => [value, 'Contributors']}
+                contentStyle={{
+                  backgroundColor: 'rgba(17, 24, 39, 0.95)',
+                  border: '1px solid rgba(75, 85, 99, 0.3)',
+                  borderRadius: '0.5rem',
+                  color: '#e2e8f0'
+                }}
               />
               <Line
                 type="monotone"
                 dataKey="contributors"
-                stroke="#6366f1"
+                stroke="#22d3ee"
                 strokeWidth={2}
                 dot={false}
               />
@@ -68,32 +75,32 @@ export const Contributors = () => {
       </div>
 
       <div>
-        <h2 className="text-2xl font-bold mb-4">Top Client Versions</h2>
-        <div className="bg-white dark:bg-gray-800 rounded-lg overflow-hidden">
-          <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-            <thead className="bg-gray-50 dark:bg-gray-900">
+        <h2 className="text-2xl font-bold mb-4 text-cyan-400">Top Client Versions</h2>
+        <div className="bg-gray-900/80 backdrop-blur-md rounded-lg overflow-hidden border border-gray-800 shadow-xl">
+          <table className="min-w-full divide-y divide-gray-800">
+            <thead>
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-cyan-400 uppercase tracking-wider bg-gray-900/50">
                   Client
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-cyan-400 uppercase tracking-wider bg-gray-900/50">
                   Version
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-cyan-400 uppercase tracking-wider bg-gray-900/50">
                   Count
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+            <tbody className="divide-y divide-gray-800">
               {data.top_client_versions.map((client, index) => (
-                <tr key={index}>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                <tr key={index} className="hover:bg-cyan-500/10 transition-colors">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-100">
                     {client.client}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
                     {client.version}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
                     {client.count}
                   </td>
                 </tr>
@@ -104,21 +111,21 @@ export const Contributors = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="bg-white dark:bg-gray-800 rounded-lg p-6">
-          <h3 className="text-lg font-medium mb-2">Total Contributors</h3>
-          <p className="text-3xl font-bold text-indigo-600 dark:text-indigo-400">
+        <div className="bg-gray-900/80 backdrop-blur-md rounded-lg p-6 border border-gray-800 shadow-xl">
+          <h3 className="text-lg font-medium mb-2 text-gray-200">Total Contributors</h3>
+          <p className="text-3xl font-bold bg-gradient-to-r from-cyan-400 to-purple-500 text-transparent bg-clip-text">
             {data.total_contributors.toLocaleString()}
           </p>
         </div>
-        <div className="bg-white dark:bg-gray-800 rounded-lg p-6">
-          <h3 className="text-lg font-medium mb-2">Unique Clients</h3>
-          <p className="text-3xl font-bold text-indigo-600 dark:text-indigo-400">
+        <div className="bg-gray-900/80 backdrop-blur-md rounded-lg p-6 border border-gray-800 shadow-xl">
+          <h3 className="text-lg font-medium mb-2 text-gray-200">Unique Clients</h3>
+          <p className="text-3xl font-bold bg-gradient-to-r from-cyan-400 to-purple-500 text-transparent bg-clip-text">
             {data.unique_clients.toLocaleString()}
           </p>
         </div>
       </div>
 
-      <div className="text-sm text-gray-500 dark:text-gray-400">
+      <div className="text-sm text-gray-400">
         Last updated: {new Date(data.last_updated).toLocaleString()}
       </div>
     </div>

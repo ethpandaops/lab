@@ -1,4 +1,6 @@
-import { Users, BarChart2, X, Home, Info } from 'lucide-react'
+import { Fragment } from 'react'
+import { Dialog, Transition } from '@headlessui/react'
+import { X } from 'lucide-react'
 import { Link, useLocation } from 'react-router-dom'
 
 interface SidebarProps {
@@ -6,114 +8,147 @@ interface SidebarProps {
   onClose: () => void
 }
 
-interface NavSection {
+interface SidebarItem {
   name: string
   items: {
     name: string
-    href: string
-    icon: React.ComponentType<{ className?: string }>
+    path: string
+    items?: {
+      name: string
+      path: string
+    }[]
   }[]
 }
 
-const navigation: NavSection[] = [
+const sidebarItems: SidebarItem[] = [
   {
-    name: 'General',
+    name: 'Experiments',
     items: [
-      {
-        name: 'Home',
-        href: '/',
-        icon: Home
-      },
-      {
-        name: 'About',
-        href: '/about',
-        icon: Info
+      { 
+        name: 'Xatu',
+        path: '/experiments/xatu',
+        items: [
+          { name: 'Contributors', path: '/experiments/xatu/contributors' },
+          { name: 'Client Versions', path: '/experiments/xatu/client-versions' },
+        ]
       }
-    ]
+    ],
   },
-  {
-    name: 'Xatu',
-    items: [
-      {
-        name: 'Contributors',
-        href: '/xatu/contributors',
-        icon: Users
-      },
-      {
-        name: 'Client Versions',
-        href: '/xatu/client-versions',
-        icon: BarChart2
-      }
-    ]
-  }
 ]
 
 export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
   const location = useLocation()
+  const showSidebar = location.pathname.startsWith('/experiments')
+
+  if (!showSidebar) {
+    return null
+  }
 
   return (
     <>
-      {/* Mobile backdrop */}
-      <div
-        className={`fixed inset-0 bg-gray-900/80 lg:hidden ${
-          isOpen ? 'block' : 'hidden'
-        }`}
-        onClick={onClose}
-      />
-
-      {/* Sidebar */}
-      <div
-        className={`fixed inset-y-0 left-0 z-50 flex w-72 flex-col bg-white dark:bg-gray-800 lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col transform transition-transform duration-300 ease-in-out ${
-          isOpen ? 'translate-x-0' : '-translate-x-full'
-        } lg:translate-x-0`}
-      >
-        <div className="flex h-16 items-center justify-between px-6 lg:hidden">
-          <span className="text-xl font-semibold">Menu</span>
-          <button
-            type="button"
-            className="text-gray-500 hover:text-gray-600"
-            onClick={onClose}
+      {/* Mobile Sidebar */}
+      <Transition.Root show={isOpen} as={Fragment}>
+        <Dialog as="div" className="relative z-50 lg:hidden" onClose={onClose}>
+          <Transition.Child
+            as={Fragment}
+            enter="transition-opacity ease-linear duration-300"
+            enterFrom="opacity-0"
+            enterTo="opacity-100"
+            leave="transition-opacity ease-linear duration-300"
+            leaveFrom="opacity-100"
+            leaveTo="opacity-0"
           >
-            <span className="sr-only">Close sidebar</span>
-            <X className="h-6 w-6" />
-          </button>
-        </div>
+            <div className="fixed inset-0 bg-black/80" />
+          </Transition.Child>
 
-        <nav className="flex-1 space-y-8 px-4 py-4">
-          {navigation.map((section) => (
-            <div key={section.name}>
-              <h3 className="px-3 text-sm font-medium text-gray-500 dark:text-gray-400">
-                {section.name}
-              </h3>
-              <div className="mt-2 space-y-1">
-                {section.items.map((item) => {
-                  const isActive = location.pathname === item.href
-                  return (
-                    <Link
-                      key={item.name}
-                      to={item.href}
-                      className={`flex items-center px-4 py-2 text-sm font-medium rounded-md ${
-                        isActive
-                          ? 'bg-gray-100 text-gray-900 dark:bg-gray-700 dark:text-white'
-                          : 'text-gray-600 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-700'
-                      }`}
-                    >
-                      <item.icon
-                        className={`mr-3 h-5 w-5 ${
-                          isActive
-                            ? 'text-gray-900 dark:text-white'
-                            : 'text-gray-400 dark:text-gray-300'
-                        }`}
-                      />
-                      {item.name}
-                    </Link>
-                  )
-                })}
-              </div>
-            </div>
-          ))}
-        </nav>
+          <div className="fixed inset-0 flex">
+            <Transition.Child
+              as={Fragment}
+              enter="transition ease-in-out duration-300 transform"
+              enterFrom="-translate-x-full"
+              enterTo="translate-x-0"
+              leave="transition ease-in-out duration-300 transform"
+              leaveFrom="translate-x-0"
+              leaveTo="-translate-x-full"
+            >
+              <Dialog.Panel className="relative mr-16 flex w-full max-w-xs flex-1">
+                <div className="absolute right-0 top-0 -mr-16 flex pt-4 pr-2">
+                  <button
+                    type="button"
+                    className="relative ml-1 flex h-10 w-10 items-center justify-center rounded-md text-gray-300 focus:outline-none"
+                    onClick={onClose}
+                  >
+                    <span className="absolute -inset-2.5" />
+                    <span className="sr-only">Close sidebar</span>
+                    <X className="h-6 w-6" aria-hidden="true" />
+                  </button>
+                </div>
+                <SidebarContent />
+              </Dialog.Panel>
+            </Transition.Child>
+          </div>
+        </Dialog>
+      </Transition.Root>
+
+      {/* Desktop Sidebar */}
+      <div className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72">
+        <SidebarContent />
       </div>
     </>
+  )
+}
+
+const SidebarContent = () => {
+  const location = useLocation()
+
+  return (
+    <div className="flex grow flex-col gap-y-5 bg-black/40 backdrop-blur-md border-r border-white/5 px-6 pb-4">
+      <div className="flex h-16 shrink-0 items-center border-b border-white/5">
+        <img className="h-8 w-auto" src="/ethpandaops.png" alt="Logo" />
+      </div>
+      <nav className="flex flex-1 flex-col">
+        <ul role="list" className="flex flex-1 flex-col gap-y-7">
+          {sidebarItems.map((section) => (
+            <li key={section.name}>
+              <div className="text-xs font-semibold leading-6 text-cyan-400">{section.name}</div>
+              <ul role="list" className="mt-2 space-y-1">
+                {section.items.map((group) => (
+                  <li key={group.name}>
+                    <Link
+                      to={group.path}
+                      className={`block text-sm font-medium text-gray-400 px-2 py-1.5 hover:text-cyan-400 transition-colors
+                        ${location.pathname.startsWith(group.path) ? 'text-cyan-400' : ''}`}
+                    >
+                      {group.name}
+                    </Link>
+                    {group.items && (
+                      <ul className="ml-3 space-y-1">
+                        {group.items.map((item) => {
+                          const isActive = location.pathname === item.path
+                          return (
+                            <li key={item.name}>
+                              <Link
+                                to={item.path}
+                                className={`group flex gap-x-3 rounded-md p-2 text-sm leading-6 transition-all
+                                  ${isActive
+                                    ? 'text-cyan-400 bg-cyan-500/10 border border-cyan-500/50'
+                                    : 'text-gray-300 hover:text-cyan-400 hover:bg-cyan-500/10'
+                                  }`}
+                              >
+                                {item.name}
+                              </Link>
+                            </li>
+                          )
+                        })}
+                      </ul>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </li>
+          ))}
+        </ul>
+      </nav>
+    </div>
   )
 } 
