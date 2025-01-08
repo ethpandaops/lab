@@ -24,7 +24,7 @@ export const Xatu = () => {
               to="/experiments/xatu/contributors"
               className="inline-flex items-center px-6 py-3 text-base font-medium text-white bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/50 rounded-lg transition-all hover:scale-105"
             >
-              Explore Data
+              Explore Xatu
               <ArrowRight className="ml-2 h-5 w-5" />
             </Link>
             <a
