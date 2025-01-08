@@ -1,41 +1,35 @@
-import { useState } from 'react'
+import { Outlet, useLocation } from 'react-router-dom'
 import { Navigation } from './Navigation'
 import { Sidebar } from './Sidebar'
-import { useLocation } from 'react-router-dom'
 
-export const Layout = ({ children }: { children: React.ReactNode }) => {
-  const [sidebarOpen, setSidebarOpen] = useState(false)
+export const Layout = () => {
   const location = useLocation()
-  const isHomePage = location.pathname === '/'
+  const showSidebar = location.pathname.startsWith('/experiments')
 
   return (
-    <div className="relative min-h-screen bg-gray-950">
+    <div className="relative min-h-screen bg-black">
       {/* Animated Background */}
       <div className="fixed inset-0 z-0">
         <div className="relative w-full h-full">
-          <div className="absolute inset-0 bg-gradient-to-br from-purple-900/30 via-gray-950 to-cyan-900/30 animate-gradient" />
-          <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-30" />
-          <div className="absolute inset-0 bg-gradient-to-t from-gray-950 via-transparent to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-br from-purple-900/20 via-black to-cyan-900/20 animate-gradient" />
+          <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-20" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent" />
         </div>
       </div>
 
       {/* Neon Lines */}
-      <div className="fixed inset-0 z-1 pointer-events-none">
-        <div className="absolute top-0 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-cyan-500 to-transparent opacity-70" />
-        <div className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-purple-500 to-transparent opacity-70" />
+      <div className="fixed inset-0 z-10 pointer-events-none">
+        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-cyan-500 to-transparent opacity-50" />
+        <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-purple-500 to-transparent opacity-50" />
       </div>
 
       {/* Content */}
-      <div className="relative z-10">
-        {!isHomePage && (
-          <>
-            <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-            <Navigation onToggleSidebar={() => setSidebarOpen(true)} showMenuButton={true} />
-          </>
-        )}
-        <div className={!isHomePage ? 'lg:pl-72' : ''}>
-          <main className={!isHomePage ? 'py-8 px-4 sm:px-6 lg:px-8' : ''}>
-            {children}
+      <div className="relative z-20">
+        <Navigation onToggleSidebar={() => {}} showMenuButton={true} />
+        <div className="pt-16">
+          <Sidebar isOpen={false} onClose={() => {}} />
+          <main className={`py-8 px-4 sm:px-6 lg:px-8 ${showSidebar ? 'lg:pl-80' : ''}`}>
+            <Outlet />
           </main>
         </div>
       </div>

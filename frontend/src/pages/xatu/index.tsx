@@ -9,7 +9,7 @@ export const Xatu = () => {
         <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 via-transparent to-purple-500/10" />
         <div className="relative p-8 md:p-12">
           <div className="flex flex-col md:flex-row items-center gap-8 mb-8">
-            <div className="w-32 h-32 flex items-center justify-center rounded-2xl bg-white/10 p-2">
+            <div className="w-32 h-32 flex items-center justify-center rounded-2xl bg-white/30 p-2">
               <img src="/xatu.png" alt="Xatu" className="w-auto h-auto max-w-full max-h-full object-contain" />
             </div>
             <div>
@@ -35,6 +35,15 @@ export const Xatu = () => {
             >
               <Github className="mr-2 h-5 w-5" />
               View on GitHub
+            </a>
+            <a
+              href="https://ethpandaops.io/data/xatu"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center px-6 py-3 text-base font-medium text-gray-300 hover:text-white bg-gray-800/50 hover:bg-gray-800 border border-gray-700 rounded-lg transition-all hover:scale-105"
+            >
+              <Database className="mr-2 h-5 w-5" />
+              Get the Data
             </a>
           </div>
         </div>

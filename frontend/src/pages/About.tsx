@@ -2,7 +2,7 @@ import { Github, ExternalLink } from 'lucide-react'
 
 export const About = () => {
   return (
-    <div className="space-y-8 max-w-4xl">
+    <div className="space-y-8 max-w-6xl mx-auto">
       <h2 className="text-2xl font-bold text-white">About The Lab</h2>
 
       <div className="prose prose-invert max-w-none">
@@ -22,7 +22,7 @@ export const About = () => {
           href="https://ethpandaops.io"
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center justify-center px-6 py-3 text-base font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg transition-colors"
+          className="inline-flex items-center justify-center px-6 py-3 text-base font-medium text-white bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/50 rounded-lg transition-all hover:scale-105"
         >
           <ExternalLink className="h-5 w-5 mr-2" />
           Visit EthPandaOps
@@ -31,7 +31,7 @@ export const About = () => {
           href="https://github.com/ethpandaops"
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center justify-center px-6 py-3 text-base font-medium text-indigo-600 bg-indigo-100 hover:bg-indigo-200 dark:text-white dark:bg-indigo-900 dark:hover:bg-indigo-800 rounded-lg transition-colors"
+          className="inline-flex items-center justify-center px-6 py-3 text-base font-medium text-gray-300 hover:text-white bg-gray-800/50 hover:bg-gray-800 border border-gray-700 rounded-lg transition-all hover:scale-105"
         >
           <Github className="h-5 w-5 mr-2" />
           View Our Projects

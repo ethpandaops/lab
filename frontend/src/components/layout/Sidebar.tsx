@@ -91,7 +91,7 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
       </Transition.Root>
 
       {/* Desktop Sidebar */}
-      <div className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72">
+      <div className="hidden lg:fixed lg:top-20 lg:inset-y-0 lg:z-20 lg:flex lg:w-72">
         <SidebarContent />
       </div>
     </>
@@ -102,11 +102,8 @@ const SidebarContent = () => {
   const location = useLocation()
 
   return (
-    <div className="flex grow flex-col gap-y-5 bg-black/40 backdrop-blur-md border-r border-white/5 px-6 pb-4">
-      <div className="flex h-16 shrink-0 items-center border-b border-white/5">
-        <img className="h-8 w-auto" src="/ethpandaops.png" alt="Logo" />
-      </div>
-      <nav className="flex flex-1 flex-col">
+    <div className="flex grow flex-col gap-y-5 bg-gray-900/90 backdrop-blur-md border-r border-white/5 px-6 pb-4">
+      <nav className="flex flex-1 flex-col pt-4">
         <ul role="list" className="flex flex-1 flex-col gap-y-7">
           {sidebarItems.map((section) => (
             <li key={section.name}>
