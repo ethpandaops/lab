@@ -1,0 +1,5 @@
+notebooks:
+  xatu-public-contributors:
+    enabled: true
+    schedule_hours: 6
+    description: "Analyzes public Xatu contributor data and client versions"

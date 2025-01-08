@@ -1,0 +1,42 @@
+{
+  "contributors_over_time": {
+    "timestamps": [
+      "2024-01-01T00:00:00Z",
+      "2024-01-02T00:00:00Z",
+      "2024-01-03T00:00:00Z",
+      "2024-01-04T00:00:00Z",
+      "2024-01-05T00:00:00Z"
+    ],
+    "counts": [150, 165, 158, 172, 180]
+  },
+  "top_client_versions": [
+    {
+      "client": "Lighthouse",
+      "version": "v4.5.0",
+      "count": 450
+    },
+    {
+      "client": "Prysm",
+      "version": "v4.0.7",
+      "count": 380
+    },
+    {
+      "client": "Teku",
+      "version": "v23.12.1",
+      "count": 320
+    },
+    {
+      "client": "Nimbus",
+      "version": "v23.12.0",
+      "count": 280
+    },
+    {
+      "client": "Lodestar",
+      "version": "v1.11.3",
+      "count": 120
+    }
+  ],
+  "total_contributors": 1550,
+  "unique_clients": 5,
+  "last_updated": "2024-01-05T12:00:00Z"
+} 
