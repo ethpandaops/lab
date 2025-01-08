@@ -39,7 +39,7 @@ export const Header = ({ onToggleSidebar }: HeaderProps) => {
             </button>
             <Link to="/" className="flex items-center space-x-3">
               <img
-                src="/ethpandaops-logo.svg"
+                src="/ethpandaops.png"
                 alt="EthPandaOps Logo"
                 className="h-8 w-8"
               />
