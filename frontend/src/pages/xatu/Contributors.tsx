@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useDataFetch } from '../../utils/data'
 import { LoadingState } from '../../components/common/LoadingState'
 import { ErrorState } from '../../components/common/ErrorState'
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
@@ -19,29 +19,7 @@ interface ContributorsData {
 }
 
 export const Contributors = () => {
-  const [data, setData] = useState<ContributorsData | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<Error | null>(null)
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true)
-        const response = await fetch('/api/data/xatu/contributors.json')
-        if (!response.ok) {
-          throw new Error('Failed to fetch data')
-        }
-        const jsonData = await response.json()
-        setData(jsonData)
-      } catch (err) {
-        setError(err instanceof Error ? err : new Error('Unknown error occurred'))
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    fetchData()
-  }, [])
+  const { data, loading, error } = useDataFetch<ContributorsData>('xatu/contributors.json')
 
   if (loading) {
     return <LoadingState message="Loading contributor data..." />

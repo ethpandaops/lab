@@ -1,4 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useDataFetch } from '../../utils/data'
+import { LoadingState } from '../../components/common/LoadingState'
+import { ErrorState } from '../../components/common/ErrorState'
 import {
   BarChart,
   Bar,
@@ -31,24 +33,11 @@ const COLORS = [
 ]
 
 export const ClientVersions = () => {
-  const [data, setData] = useState<ClientVersion[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const { data, loading, error } = useDataFetch<ClientVersion[]>('xatu-public-contributors/top_client_versions.json')
 
-  useEffect(() => {
-    fetch('/api/data/xatu-public-contributors/top_client_versions.json')
-      .then((res) => {
-        if (!res.ok) throw new Error('Failed to fetch data')
-        return res.json()
-      })
-      .then(setData)
-      .catch((err) => setError(err.message))
-      .finally(() => setLoading(false))
-  }, [])
-
-  if (loading) return <div>Loading...</div>
-  if (error) return <div>Error: {error}</div>
-  if (!data.length) return <div>No data available</div>
+  if (loading) return <LoadingState message="Loading client version data..." />
+  if (error) return <ErrorState message="Failed to load client version data" error={error} />
+  if (!data?.length) return <ErrorState message="No data available" />
 
   // Calculate total nodes
   const totalNodes = data.reduce((sum, item) => sum + item.count, 0)
