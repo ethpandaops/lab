@@ -2,6 +2,7 @@ import { useDataFetch } from '../../utils/data'
 import { LoadingState } from '../../components/common/LoadingState'
 import { ErrorState } from '../../components/common/ErrorState'
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
+import { XatuCallToAction } from '../../components/xatu/XatuCallToAction'
 
 interface ContributorsData {
   contributors_over_time: {
@@ -41,6 +42,7 @@ export const Contributors = () => {
 
   return (
     <div className="space-y-8">
+      <XatuCallToAction />
       <div>
         <h2 className="text-2xl font-bold mb-4 text-cyan-400">Contributors Over Time</h2>
         <div className="bg-gray-900/80 backdrop-blur-md rounded-lg p-4 h-[400px] border border-gray-800 shadow-xl">

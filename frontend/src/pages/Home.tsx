@@ -12,11 +12,11 @@ export const Home = () => {
         <div className="absolute inset-0 bg-black/75" />
         <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/30 via-transparent to-purple-500/30" />
         <div className="relative p-6 md:p-12">
-          <div className="text-center md:text-left">
+          <div className="text-center md:text-left max-w-6xl mx-auto">
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-3 md:mb-4">The Lab</h1>
             <p className="text-lg md:text-xl text-gray-300 max-w-3xl mb-4">
               The Lab is our experimental platform for exploring Ethereum data. We collect data from various sources 
-              and present it in a way that is easy to understand and visualize.
+              and present it in a way that is easy to understand.
             </p>
             <p className="text-2xl font-mono text-cyan-400 italic opacity-75">&quot;Let the pandas cook 🐼👨‍🍳&quot;</p>
           </div>
@@ -50,7 +50,7 @@ export const Home = () => {
           </div>
           <h3 className="text-lg font-semibold text-white mb-2">Experimental Platform</h3>
           <p className="text-gray-300">
-            A space for testing new ideas, visualizing data, and exploring the Ethereum network in novel ways.
+            A space for testing new ideas, visualizing data, and exploring the Ethereum network in new ways.
           </p>
         </div>
 
@@ -59,9 +59,9 @@ export const Home = () => {
           <div className="w-12 h-12 rounded-lg bg-cyan-500/10 flex items-center justify-center mb-4">
             <Activity className="h-6 w-6 text-cyan-400" />
           </div>
-          <h3 className="text-lg font-semibold text-white mb-2">Network Insights</h3>
+          <h3 className="text-lg font-semibold text-white mb-2">Network Analytics</h3>
           <p className="text-gray-300">
-            Providing valuable insights into network health, client diversity, and blockchain metrics through interactive visualizations.
+            Explore network health and performance through dynamic data visualizations.
           </p>
         </div>
       </div>
@@ -77,7 +77,7 @@ export const Home = () => {
             <div>
               <h3 className="text-lg font-semibold text-white mt-0">Xatu</h3>
               <p className="text-gray-300 mt-2">
-                A comprehensive dataset containing detailed information about the Ethereum network, including beacon chain events, mempool activity, and canonical chain events. Xatu helps monitor network health, track client diversity, and provide insights into network behavior.
+                A comprehensive dataset containing detailed information about the Ethereum network, including beacon chain events, mempool activity, and canonical chain events. Xatu helps monitor network health, and provide insights into network behavior.
               </p>
               <Link
                 to="/experiments/xatu"

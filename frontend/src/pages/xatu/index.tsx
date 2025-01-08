@@ -1,9 +1,12 @@
 import { Link } from 'react-router-dom'
 import { ArrowRight, Database, Server, Activity, Github } from 'lucide-react'
+import { XatuCallToAction } from '../../components/xatu/XatuCallToAction'
 
 export const Xatu = () => {
   return (
-    <div className="space-y-12 max-w-6xl mx-auto">
+    <div className="space-y-8">
+      <XatuCallToAction />
+      
       {/* Hero Section */}
       <div className="relative rounded-2xl overflow-hidden bg-gray-900/80 backdrop-blur-md border border-gray-800">
         <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 via-transparent to-purple-500/10" />

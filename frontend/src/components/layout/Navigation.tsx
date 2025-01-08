@@ -43,7 +43,7 @@ export const Navigation = ({ onToggleSidebar, showMenuButton }: NavigationProps)
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-gray-900/80 backdrop-blur-md border-b border-gray-800">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center">
             {showMenuButton && (
@@ -58,9 +58,12 @@ export const Navigation = ({ onToggleSidebar, showMenuButton }: NavigationProps)
             )}
             <Link to="/" className="flex items-center gap-x-3">
               <img src="/ethpandaops.png" alt="Logo" className="h-8 w-auto" />
-              <span className="text-xl font-semibold bg-gradient-to-r from-cyan-400 to-purple-500 text-transparent bg-clip-text">
-                The Lab
-              </span>
+              <div className="flex flex-col">
+                <span className="text-xl font-semibold bg-gradient-to-r from-cyan-400 to-purple-500 text-transparent bg-clip-text">
+                  The Lab
+                </span>
+                <span className="text-[10px] text-gray-400 -mt-1">by EthPandaOps</span>
+              </div>
             </Link>
           </div>
 

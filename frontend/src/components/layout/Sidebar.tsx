@@ -10,6 +10,7 @@ interface SidebarProps {
 
 interface SidebarItem {
   name: string
+  path: string
   items: {
     name: string
     path: string
@@ -23,6 +24,7 @@ interface SidebarItem {
 const sidebarItems: SidebarItem[] = [
   {
     name: 'Experiments',
+    path: '/experiments',
     items: [
       { 
         name: 'Xatu',
@@ -91,7 +93,7 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
       </Transition.Root>
 
       {/* Desktop Sidebar */}
-      <div className="hidden lg:fixed lg:top-20 lg:inset-y-0 lg:z-20 lg:flex lg:w-72">
+      <div className="hidden lg:fixed lg:top-16 lg:inset-y-0 lg:z-20 lg:flex lg:w-72">
         <SidebarContent />
       </div>
     </>
@@ -107,7 +109,9 @@ const SidebarContent = () => {
         <ul role="list" className="flex flex-1 flex-col gap-y-7">
           {sidebarItems.map((section) => (
             <li key={section.name}>
-              <div className="text-xs font-semibold leading-6 text-cyan-400">{section.name}</div>
+              <Link to={section.path} className="block">
+                <div className="text-xs font-semibold leading-6 text-cyan-400 hover:text-cyan-300 transition-colors">{section.name}</div>
+              </Link>
               <ul role="list" className="mt-2 space-y-1">
                 {section.items.map((group) => (
                   <li key={group.name}>
