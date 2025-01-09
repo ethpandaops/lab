@@ -4,6 +4,7 @@ import { XatuCallToAction } from '../../components/xatu/XatuCallToAction'
 import { GlobeViz } from '../../components/xatu/GlobeViz'
 import { useDataFetch } from '../../utils/data'
 import { useRef, useState, useEffect } from 'react'
+import { formatDistanceToNow } from 'date-fns'
 
 interface ConsensusImplementation {
   total_nodes: number
@@ -33,7 +34,12 @@ interface NetworkData {
 }
 
 interface Summary {
-  [key: string]: NetworkData
+  updated_at: number
+  networks: {
+    mainnet: NetworkData
+    sepolia: NetworkData
+    holesky: NetworkData
+  }
 }
 
 const GLOBE_WIDTH_RATIO = 0.66
@@ -104,15 +110,15 @@ export const Xatu = (): JSX.Element => {
   // Transform summary data for the globe - use mainnet data for the globe
   const globeData = [{
     time: Date.now() / 1000,
-    countries: Object.entries(summaryData.mainnet.countries).map(([name, data]) => ({
+    countries: Object.entries(summaryData.networks.mainnet.countries).map(([name, data]) => ({
       name,
       value: data.total_nodes
     }))
   }]
 
   // Calculate total nodes across all networks
-  const totalNodes = Object.values(summaryData).reduce((acc, network) => acc + network.total_nodes, 0)
-  const totalPublicNodes = Object.values(summaryData).reduce((acc, network) => acc + network.total_public_nodes, 0)
+  const totalNodes = Object.values(summaryData.networks).reduce((acc, network) => acc + network.total_nodes, 0)
+  const totalPublicNodes = Object.values(summaryData.networks).reduce((acc, network) => acc + network.total_public_nodes, 0)
   const totalethPandaOpsNodes = totalNodes - totalPublicNodes
 
   return (
@@ -130,7 +136,15 @@ export const Xatu = (): JSX.Element => {
       <div className="bg-gray-900/80 backdrop-blur-md rounded-lg p-6 border border-gray-800 shadow-xl mb-8">
         <div className="flex flex-col mb-6">
           <h2 className="text-2xl font-bold text-cyan-400">Overview</h2>
-          <span className="text-gray-400 text-sm">Last 24h</span>
+          <span className="text-gray-400 text-sm">
+            Last 24h · Updated{' '}
+            <span 
+              title={new Date(summaryData.updated_at * 1000).toString()}
+              className="cursor-help border-b border-dotted border-gray-500"
+            >
+              {formatDistanceToNow(new Date(summaryData.updated_at * 1000), { addSuffix: true })}
+            </span>
+          </span>
         </div>
         
         {/* Globe and Summary Stats */}
@@ -157,35 +171,35 @@ export const Xatu = (): JSX.Element => {
               <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700 flex flex-col h-28">
                 <div className="text-gray-400 text-xs uppercase tracking-wider text-left">Networks</div>
                 <div className="text-3xl font-bold text-cyan-400 mt-2 text-center flex-grow flex items-center justify-center">
-                  {Object.keys(summaryData).length}
+                  {Object.keys(summaryData.networks).length}
                 </div>
               </div>
 
               <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700 flex flex-col h-28">
                 <div className="text-gray-400 text-xs uppercase tracking-wider text-left">Consensus Clients</div>
                 <div className="text-3xl font-bold text-cyan-400 mt-2 text-center flex-grow flex items-center justify-center">
-                  {Object.keys(summaryData.mainnet.consensus_implementations).length}
+                  {Object.keys(summaryData.networks.mainnet.consensus_implementations).length}
                 </div>
               </div>
 
               <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700 flex flex-col h-28">
                 <div className="text-gray-400 text-xs uppercase tracking-wider text-left">Countries</div>
                 <div className="text-3xl font-bold text-cyan-400 mt-2 text-center flex-grow flex items-center justify-center">
-                  {Object.keys(summaryData.mainnet.countries).length}
+                  {Object.keys(summaryData.networks.mainnet.countries).length}
                 </div>
               </div>
 
               <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700 flex flex-col h-28">
                 <div className="text-gray-400 text-xs uppercase tracking-wider text-left">Cities</div>
                 <div className="text-3xl font-bold text-cyan-400 mt-2 text-center flex-grow flex items-center justify-center">
-                  {Object.entries(summaryData.mainnet.cities).filter(([name]) => name !== '').length}
+                  {Object.entries(summaryData.networks.mainnet.cities).filter(([name]) => name !== '').length}
                 </div>
               </div>
 
               <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700 flex flex-col h-28">
                 <div className="text-gray-400 text-xs uppercase tracking-wider text-left">Continents</div>
                 <div className="text-3xl font-bold text-cyan-400 mt-2 text-center flex-grow flex items-center justify-center">
-                  {Object.keys(summaryData.mainnet.continents).length}
+                  {Object.keys(summaryData.networks.mainnet.continents).length}
                 </div>
               </div>
             </div>
@@ -197,7 +211,7 @@ export const Xatu = (): JSX.Element => {
           <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700">
             <div className="text-gray-400 text-sm mb-2">Top Continents</div>
             <div className="space-y-2">
-              {Object.entries(summaryData.mainnet.continents)
+              {Object.entries(summaryData.networks.mainnet.continents)
                 .sort((a, b) => b[1].total_nodes - a[1].total_nodes)
                 .slice(0, 3)
                 .map(([code, data]) => {
@@ -225,7 +239,7 @@ export const Xatu = (): JSX.Element => {
           <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700">
             <div className="text-gray-400 text-sm mb-2">Top Cities</div>
             <div className="space-y-2">
-              {Object.entries(summaryData.mainnet.cities)
+              {Object.entries(summaryData.networks.mainnet.cities)
                 .filter(([name]) => name !== '') // Filter out empty city names
                 .sort((a, b) => b[1].total_nodes - a[1].total_nodes)
                 .slice(0, 3) // Show top 3 cities
@@ -261,22 +275,11 @@ export const Xatu = (): JSX.Element => {
 
         {/* Network Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {Object.entries(summaryData).map(([name, data]) => {
+          {Object.entries(summaryData.networks).map(([name, data]) => {
             const metadata = NETWORK_METADATA[name as keyof typeof NETWORK_METADATA] || {
               name: name.charAt(0).toUpperCase() + name.slice(1),
               icon: '🔥',
               color: '#627EEA'
-            }
-
-            const formatClientName = (name: string) => {
-              const specialNames: { [key: string]: string } = {
-                'prysm': 'Prysm',
-                'teku': 'Teku',
-                'lighthouse': 'Lighthouse',
-                'lodestar': 'Lodestar',
-                'nimbus': 'Nimbus'
-              }
-              return specialNames[name] || name.charAt(0).toUpperCase() + name.slice(1)
             }
 
             return (
@@ -301,7 +304,7 @@ export const Xatu = (): JSX.Element => {
 
                 <div className="space-y-2">
                   <div className="text-sm font-medium text-gray-300 mb-2">Consensus Clients</div>
-                  {Object.entries(data.consensus_implementations)
+                  {(Object.entries(data.consensus_implementations) as [string, ConsensusImplementation][])
                     .sort((a, b) => b[1].total_nodes - a[1].total_nodes)
                     .map(([client, stats]) => {
                       const clientMeta = CLIENT_METADATA[client] || { name: client }

@@ -251,12 +251,17 @@ export const GlobeViz = ({ data, width = 600, height = 400 }: Props) => {
     countryNodes.forEach((value, countryName) => {
       const coords = COUNTRY_COORDS[countryName]
       if (coords) {
+        // Hash the country name to get a consistent hue value between 0 and 360
+        const hash = countryName.split('').reduce((acc, char) => char.charCodeAt(0) + ((acc << 5) - acc), 0)
+        const hue = Math.abs(hash % 360)
+        const color = `hsla(${hue}, 70%, 50%, 0.8)`
+
         // Add point for the country
         points.push({
           lat: coords[0],
           lng: coords[1],
           size: Math.max(2, Math.min(10, Math.sqrt(value) * 1.2)),
-          color: 'rgba(34, 211, 238, 0.8)',
+          color: color,
           name: countryName,
           nodes: value
         })
@@ -268,7 +273,7 @@ export const GlobeViz = ({ data, width = 600, height = 400 }: Props) => {
             startLng: coords[1],
             endLat: TARGET_COORDS.lat,
             endLng: TARGET_COORDS.lng,
-            color: `rgba(34, 211, 238, ${Math.random() * 0.3 + 0.7})`
+            color: `hsla(${hue}, 70%, 50%, ${Math.random() * 0.3 + 0.7})`
           })
         }
       }
@@ -290,9 +295,9 @@ export const GlobeViz = ({ data, width = 600, height = 400 }: Props) => {
       .globeImageUrl('//unpkg.com/three-globe/example/img/earth-blue-marble.jpg')
       .backgroundColor('rgba(0,0,0,0)')
       .arcColor('color')
-      .arcDashLength(0.4)
-      .arcDashGap(0.2)
-      .arcDashAnimateTime(1500)
+      .arcDashLength(0.25)
+      .arcDashGap(0.5)
+      .arcDashAnimateTime(4000)
       .arcStroke(1)
       .atmosphereColor('#1f2937')
       .atmosphereAltitude(0.1)
