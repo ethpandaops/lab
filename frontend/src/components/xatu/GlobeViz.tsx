@@ -301,7 +301,7 @@ export const GlobeViz = ({ data, width = 600, height = 400 }: Props) => {
       .arcStroke(1)
       .atmosphereColor('#1f2937')
       .atmosphereAltitude(0.1)
-      .width(width)
+      .width(containerRef.current.clientWidth)
       .height(height)
       .arcsData(arcs)
       .pointsData(points)
@@ -321,39 +321,48 @@ export const GlobeViz = ({ data, width = 600, height = 400 }: Props) => {
     controls.autoRotateSpeed = 0.7
     controls.enableZoom = true
     controls.enablePan = true
-    controls.minDistance = 200
-    controls.maxDistance = 400
+    controls.minDistance = 180
+    controls.maxDistance = 300
 
     // Set initial camera position
     globe.pointOfView({
       lat: 30,
       lng: 10,
-      altitude: 2.5
+      altitude: 2
     })
 
+    // Handle resize
+    const handleResize = () => {
+      if (containerRef.current) {
+        globe.width(containerRef.current.clientWidth)
+      }
+    }
+    window.addEventListener('resize', handleResize)
+
     return () => {
+      window.removeEventListener('resize', handleResize)
       if (globeRef.current) {
         globeRef.current._destructor()
       }
     }
   }, [])
 
-  // Update globe dimensions and data
+  // Update globe data
   useEffect(() => {
-    if (!globeRef.current) return
+    if (!globeRef.current || !containerRef.current) return
 
     globeRef.current
-      .width(width)
+      .width(containerRef.current.clientWidth)
       .height(height)
       .arcsData(arcs)
       .pointsData(points)
-  }, [width, height, arcs, points])
+  }, [height, arcs, points])
 
   return (
     <div 
       ref={containerRef} 
-      style={{ width, height }} 
-      className="relative overflow-hidden" 
+      style={{ width: '100%', height }} 
+      className="relative overflow-hidden flex items-center justify-center" 
     />
   )
 } 

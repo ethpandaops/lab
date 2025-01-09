@@ -127,7 +127,7 @@ export const Xatu = (): JSX.Element => {
       <div className="bg-gray-900/80 backdrop-blur-md rounded-lg p-6 border border-gray-800 shadow-xl mb-8">
         <h2 className="text-xl font-semibold text-cyan-400 mb-2">About This Data</h2>
         <p className="text-gray-300">
-          This data provides a sumamry of the nodes that are sending the ethPandaOps team data from their nodes.
+          This data provides a summary of the nodes that are sending the ethPandaOps team data from their nodes.
           While the ethPandaOps team runs our own nodes, the data from community nodes is far more valuable.
         </p>
       </div>
