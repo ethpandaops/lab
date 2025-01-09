@@ -4,7 +4,7 @@ data:
 notebooks:
   xatu-public-contributors:
     enabled: true
-    schedule_hours: 6
+    schedule_hours: 3
     description: "Analyzes public Xatu contributor data and client versions"
     networks:
       - mainnet
@@ -23,6 +23,10 @@ notebooks:
         step: "1h" 
         label: "Last 1d"
         range: "-1d"
+      - file: "last_180_days"
+        step: "14d" 
+        label: "Last 180d"
+        range: "-180d"
       # - file: "next_week"
       #   step: "1d"
       #   label: "+7d"

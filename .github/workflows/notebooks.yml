@@ -3,7 +3,7 @@ name: Run Notebooks
 
 on:
   schedule:
-    - cron: '0 */6 * * *'  # Every 6 hours
+    - cron: '0 */1 * * *'  # Every hour
   workflow_dispatch:  # Manual trigger
   
 jobs:
@@ -21,23 +21,16 @@ jobs:
           
       - name: Install dependencies
         run: |
+          cd notebooks
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          pip install papermill pyyaml
-          
       - name: Run notebooks
         env:
           # Add any required environment variables here
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PANDAOPS_CLICKHOUSE_URL: ${{ secrets.PANDAOPS_CLICKHOUSE_URL }}
         run: |
-          cd notebooks
-          for notebook in *.ipynb; do
-            if [ -f "$notebook" ]; then
-              echo "Running $notebook"
-              python ../notebook_runner.py "$notebook"
-            fi
-          done
-          
+          ./run_notebook.sh
       - name: Configure Git
         run: |
           git config --global user.name 'github-actions[bot]'
@@ -46,7 +39,7 @@ jobs:
       - name: Commit and push changes
         run: |
           if [[ -n $(git status --porcelain) ]]; then
-            git add data/ ui/data/
+            git add data/ notebooks/data/
             git commit -m "chore: update notebook data [skip ci]"
             
             # Try to push, if fails due to remote changes, rebase and try again
