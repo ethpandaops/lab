@@ -1,6 +1,6 @@
-# EthPandaOps Lab UI
+# ethPandaOps Lab UI
 
-The EthPandaOps Lab is an experimental platform for exploring and visualizing Ethereum network data. This UI component provides interactive visualizations and insights from various data sources.
+The ethPandaOps Lab is an experimental platform for exploring and visualizing Ethereum network data. This UI component provides interactive visualizations and insights from various data sources.
 
 ## Structure
 
@@ -69,4 +69,4 @@ The frontend is deployed on Cloudflare Pages, providing:
 
 ## Contributing
 
-The Lab is part of EthPandaOps' suite of tools for Ethereum network operations. Contributions are welcome! Please check our [GitHub repository](https://github.com/ethpandaops) for more information. 
+The Lab is part of ethPandaOps' suite of tools for Ethereum network operations. Contributions are welcome! Please check our [GitHub repository](https://github.com/ethpandaops) for more information. 

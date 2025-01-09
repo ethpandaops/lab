@@ -113,7 +113,7 @@ export const Xatu = (): JSX.Element => {
   // Calculate total nodes across all networks
   const totalNodes = Object.values(summaryData).reduce((acc, network) => acc + network.total_nodes, 0)
   const totalPublicNodes = Object.values(summaryData).reduce((acc, network) => acc + network.total_public_nodes, 0)
-  const totalEthPandaOpsNodes = totalNodes - totalPublicNodes
+  const totalethPandaOpsNodes = totalNodes - totalPublicNodes
 
   return (
     <div className="space-y-8" ref={containerReference}>
@@ -295,7 +295,7 @@ export const Xatu = (): JSX.Element => {
                   </div>
                   <div className="text-right text-sm text-gray-400">
                     <div>{data.total_public_nodes} community</div>
-                    <div>{data.total_nodes - data.total_public_nodes} EthPandaOps</div>
+                    <div>{data.total_nodes - data.total_public_nodes} ethPandaOps</div>
                   </div>
                 </div>
 
@@ -325,7 +325,7 @@ export const Xatu = (): JSX.Element => {
                             </span>
                           </div>
                           <div className="text-xs text-gray-400 mt-1">
-                            {stats.public_nodes} community · {stats.total_nodes - stats.public_nodes} EthPandaOps
+                            {stats.public_nodes} community · {stats.total_nodes - stats.public_nodes} ethPandaOps
                           </div>
                         </div>
                       )

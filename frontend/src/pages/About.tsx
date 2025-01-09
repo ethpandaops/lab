@@ -12,7 +12,7 @@ export const About = () => {
         </p>
       </div>
 
-      <h2 className="mt-8 text-white">About EthPandaOps</h2>
+      <h2 className="mt-8 text-white">About ethPandaOps</h2>
       <p className="text-gray-300">
         Check out our main website for more information:
       </p>
@@ -25,7 +25,7 @@ export const About = () => {
           className="inline-flex items-center justify-center px-6 py-3 text-base font-medium text-white bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/50 rounded-lg transition-all hover:scale-105"
         >
           <ExternalLink className="h-5 w-5 mr-2" />
-          Visit EthPandaOps
+          Visit ethPandaOps
         </a>
         <a
           href="https://github.com/ethpandaops"

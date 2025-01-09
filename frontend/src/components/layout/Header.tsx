@@ -40,12 +40,12 @@ export const Header = ({ onToggleSidebar }: HeaderProps) => {
             <Link to="/" className="flex items-center space-x-3">
               <img
                 src="/ethpandaops.png"
-                alt="EthPandaOps Logo"
+                alt="ethPandaOps Logo"
                 className="h-8 w-8"
               />
               <div className="hidden lg:block">
                 <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-                  EthPandaOps Lab
+                  ethPandaOps Lab
                 </h1>
               </div>
             </Link>

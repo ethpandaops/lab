@@ -91,12 +91,12 @@ export const Home = () => {
         </div>
       </div>
 
-      {/* About EthPandaOps */}
+      {/* About ethPandaOps */}
       <div className="bg-gray-900/80 backdrop-blur-md rounded-lg p-8 border border-gray-800">
-        <h2 className="text-2xl font-bold text-white mb-6">About EthPandaOps</h2>
+        <h2 className="text-2xl font-bold text-white mb-6">About ethPandaOps</h2>
         <div className="prose prose-invert max-w-none">
           <p className="text-gray-300">
-            EthPandaOps is dedicated to supporting and improving the Ethereum ecosystem through tooling, monitoring, and data analysis. The Lab is one of our initiatives to make network data more accessible and understandable to the community.
+            ethPandaOps is dedicated to supporting and improving the Ethereum ecosystem through tooling, monitoring, and data analysis. The Lab is one of our initiatives to make network data more accessible and understandable to the community.
           </p>
           <div className="flex flex-wrap gap-4 mt-6">
             <a
@@ -105,7 +105,7 @@ export const Home = () => {
               rel="noopener noreferrer"
               className="inline-flex items-center px-6 py-3 text-base font-medium text-gray-300 hover:text-white bg-gray-800/50 hover:bg-gray-800 border border-gray-700 rounded-lg transition-all hover:scale-105"
             >
-              Visit EthPandaOps
+              Visit ethPandaOps
               <ArrowRight className="ml-2 h-5 w-5" />
             </a>
           </div>

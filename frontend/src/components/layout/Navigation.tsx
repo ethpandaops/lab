@@ -63,7 +63,7 @@ export const Navigation = ({ onToggleSidebar, showMenuButton }: NavigationProps)
                 <span className="text-xl font-semibold bg-gradient-to-r from-cyan-400 to-purple-500 text-transparent bg-clip-text">
                   The Lab
                 </span>
-                <span className="text-[10px] text-gray-400 -mt-1">by EthPandaOps</span>
+                <span className="text-[10px] text-gray-400 -mt-1">by ethPandaOps</span>
               </div>
             </Link>
           </div>
