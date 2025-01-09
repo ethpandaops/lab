@@ -27,10 +27,10 @@ const sidebarItems: SidebarItem[] = [
     path: '/experiments',
     items: [
       { 
-        name: 'Xatu',
-        path: '/experiments/xatu',
+        name: 'Xatu Contributors',
+        path: '/experiments/xatu-contributors',
         items: [
-          { name: 'Contributors', path: '/experiments/xatu/contributors' },
+          { name: 'Community Nodes', path: '/experiments/xatu/community-nodes' },
           { name: 'Client Versions', path: '/experiments/xatu/client-versions' },
         ]
       }

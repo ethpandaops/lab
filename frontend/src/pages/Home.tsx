@@ -75,15 +75,15 @@ export const Home = () => {
               <Server className="h-4 w-4 text-cyan-400" />
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-white mt-0">Xatu</h3>
+              <h3 className="text-lg font-semibold text-white mt-0">Xatu Community Nodes</h3>
               <p className="text-gray-300 mt-2">
                 A comprehensive dataset containing detailed information about the Ethereum network, including beacon chain events, mempool activity, and canonical chain events. Xatu helps monitor network health, and provide insights into network behavior.
               </p>
               <Link
-                to="/experiments/xatu"
+                to="/experiments/xatu-community-nodes"
                 className="inline-flex items-center mt-2 text-cyan-400 hover:text-cyan-300"
               >
-                Learn more about Xatu
+                Learn more about Xatu Community Nodes
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </div>

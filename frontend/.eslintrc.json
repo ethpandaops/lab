@@ -19,8 +19,8 @@
 		"airbnb/hooks",
 		"plugin:react/jsx-runtime",
 		"plugin:unicorn/all",
-		"plugin:react-prefer-function-component/recommended",
-		"prettier"
+		// "plugin:react-prefer-function-component/recommended",
+		// "prettier"
 	],
 	"rules": {
 		"no-dupe-else-if": "error",
