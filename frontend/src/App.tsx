@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import { Layout } from './components/layout/Layout'
 import { Home } from './pages/Home'
 import { About } from './pages/About'
@@ -9,15 +9,16 @@ import { CommunityNodes } from './pages/xatu/CommunityNodes'
 export const App = () => {
 	return (
 		<Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-			<Layout>
-				<Routes>
-					<Route path="/" element={<Home />} />
-					<Route path="/about" element={<About />} />
-					<Route path="/experiments" element={<Experiments />} />
-					<Route path="/experiments/xatu-contributors" element={<Xatu />} />
-					<Route path="/experiments/xatu-contributors/community-nodes" element={<CommunityNodes />} />
-				</Routes>
-			</Layout>
+			<Routes>
+				<Route element={<Layout />}>
+					<Route index element={<Home />} />
+					<Route path="about" element={<About />} />
+					<Route path="experiments" element={<Experiments />} />
+					<Route path="experiments/xatu-contributors" element={<Xatu />} />
+					<Route path="experiments/xatu-contributors/community-nodes" element={<CommunityNodes />} />
+					<Route path="*" element={<Navigate to="/" replace />} />
+				</Route>
+			</Routes>
 		</Router>
 	)
 }

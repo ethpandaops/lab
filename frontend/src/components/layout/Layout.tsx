@@ -1,13 +1,8 @@
-import { useLocation } from 'react-router-dom'
+import { useLocation, Outlet } from 'react-router-dom'
 import { Navigation } from './Navigation'
 import { Sidebar } from './Sidebar'
-import { ReactNode } from 'react'
 
-interface LayoutProps {
-  children: ReactNode
-}
-
-export const Layout = ({ children }: LayoutProps) => {
+export const Layout = () => {
   const location = useLocation()
   const showSidebar = location.pathname.startsWith('/experiments')
 
@@ -34,7 +29,7 @@ export const Layout = ({ children }: LayoutProps) => {
         <div className="pt-16">
           <Sidebar isOpen={false} onClose={() => {}} />
           <main className={`py-8 px-4 sm:px-6 lg:px-8 ${showSidebar ? 'lg:pl-80' : ''}`}>
-            {children}
+            <Outlet />
           </main>
         </div>
       </div>
