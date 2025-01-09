@@ -255,7 +255,7 @@ export const GlobeViz = ({ data, width = 600, height = 400 }: Props) => {
         points.push({
           lat: coords[0],
           lng: coords[1],
-          size: Math.max(4, Math.min(20, Math.sqrt(value) * 2)),
+          size: Math.max(2, Math.min(10, Math.sqrt(value) * 1.2)),
           color: 'rgba(34, 211, 238, 0.8)',
           name: countryName,
           nodes: value
