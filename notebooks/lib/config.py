@@ -19,6 +19,7 @@ class TimeWindow:
         - "-1d": Last day
         - "-30d": Last 30 days
         - "-2w": Last 2 weeks
+        - "-1h": Last hour
         - "+7d": Next 7 days
         - "2024-01-01/2024-03-31": Specific date range
         """
@@ -34,6 +35,8 @@ class TimeWindow:
                 delta = timedelta(days=amount)
             elif unit == 'w':
                 delta = timedelta(weeks=amount)
+            elif unit == 'h':
+                delta = timedelta(hours=amount)
             else:
                 raise ValueError(f"Unsupported time unit: {unit}")
 
@@ -52,15 +55,17 @@ class TimeWindow:
         raise ValueError(f"Invalid range format: {self.range}")
 
     def get_step_seconds(self) -> int:
-        """Convert step string (e.g., '1h', '1d', '3d') to seconds"""
-        match = re.match(r"(\d+)([hd])", self.step)
+        """Convert step string (e.g., '1h', '1d', '3d', '5m') to seconds"""
+        match = re.match(r"(\d+)([mhd])", self.step)
         if not match:
             raise ValueError(f"Invalid step format: {self.step}")
         
         amount = int(match.group(1))
         unit = match.group(2)
         
-        if unit == 'h':
+        if unit == 'm':
+            return amount * 60
+        elif unit == 'h':
             return amount * 3600
         elif unit == 'd':
             return amount * 86400
