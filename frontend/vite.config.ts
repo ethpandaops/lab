@@ -64,6 +64,20 @@ export default defineConfig(({ mode }) => {
 									}
 									next()
 								})
+							},
+							buildStart() {
+								if (mode === 'production') {
+									try {
+										const configPath = path.resolve(process.cwd(), '../config.yaml')
+										const configContent = fs.readFileSync(configPath, 'utf8')
+										fs.writeFileSync(
+											path.resolve(process.cwd(), 'public/config.yaml'),
+											configContent
+										)
+									} catch (error) {
+										console.error('❌ Failed to copy config during build:', error)
+									}
+								}
 							}
 						}
 				  ])
