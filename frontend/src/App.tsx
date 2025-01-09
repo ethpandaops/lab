@@ -9,15 +9,15 @@ import { CommunityNodes } from './pages/xatu/CommunityNodes'
 export const App = () => {
 	return (
 		<Router>
-			<Routes>
-				<Route path="/" element={<Layout />}>
-					<Route index element={<Home />} />
+			<Layout>
+				<Routes>
+					<Route path="/" element={<Home />} />
 					<Route path="/about" element={<About />} />
 					<Route path="/experiments" element={<Experiments />} />
 					<Route path="/experiments/xatu-contributors" element={<Xatu />} />
 					<Route path="/experiments/xatu-contributors/community-nodes" element={<CommunityNodes />} />
-				</Route>
-			</Routes>
+				</Routes>
+			</Layout>
 		</Router>
 	)
 }
