@@ -94,7 +94,7 @@ export default defineConfig(({ mode }) => {
 		build: {
 			rollupOptions: {
 				input: {
-					main: resolve(__dirname, 'index.html'),
+					main: path.resolve(__dirname, 'index.html'),
 				},
 			},
 			copyPublicDir: true,
