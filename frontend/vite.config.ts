@@ -6,6 +6,7 @@ import { VitePWA } from 'vite-plugin-pwa'
 import tsconfigPaths from 'vite-tsconfig-paths'
 import fs from 'fs'
 import path from 'path'
+import yaml from 'js-yaml'
 
 export default defineConfig(({ mode }) => ({
 	test: {
@@ -60,7 +61,52 @@ export default defineConfig(({ mode }) => ({
 							]
 						}
 					})
-			  ])
+			  ]),
+		{
+			name: 'config-handler',
+			configureServer(server) {
+				// Serve config.yaml in dev mode
+				server.middlewares.use((req, res, next) => {
+					if (req.url === '/config.yaml') {
+						try {
+							const configPath = path.resolve(__dirname, '../config.yaml')
+							const configContent = fs.readFileSync(configPath, 'utf8')
+							const parsedConfig = yaml.load(configContent)
+							res.setHeader('Content-Type', 'application/json')
+							res.end(JSON.stringify(parsedConfig))
+							console.log('🔧 Config loaded (dev):', parsedConfig)
+						} catch (error) {
+							console.error('Error serving config:', error)
+							res.statusCode = 500
+							res.end('Error loading config')
+						}
+					} else {
+						next()
+					}
+				})
+			},
+			transform(code, id) {
+				// Replace config import with actual config in production
+				if (id.endsWith('utils/config.ts')) {
+					try {
+						const configPath = path.resolve(__dirname, '../config.yaml')
+						const configContent = fs.readFileSync(configPath, 'utf8')
+						const parsedConfig = yaml.load(configContent)
+						
+						return {
+							code: code.replace(
+								'let config: Config | null = null',
+								`let config: Config = ${JSON.stringify(parsedConfig)};\nconsole.log('🔧 Config loaded (production):', config)`
+							),
+							map: null
+						}
+					} catch (error) {
+						console.error('Error transforming config:', error)
+						return null
+					}
+				}
+			}
+		}
 	],
 	server: {
 		proxy: {

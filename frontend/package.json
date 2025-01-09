@@ -25,11 +25,16 @@
 	"dependencies": {
 		"@headlessui/react": "^2.2.0",
 		"@tanstack/react-query": "5.29.2",
+		"@types/d3": "^7.4.3",
+		"@types/topojson-client": "^3.1.5",
+		"d3": "^7.9.0",
+		"globe.gl": "^2.34.6",
 		"lucide-react": "^0.469.0",
 		"react": "18.2.0",
 		"react-dom": "18.2.0",
 		"react-router-dom": "^6.22.3",
-		"recharts": "^2.15.0"
+		"recharts": "^2.15.0",
+		"topojson-client": "^3.1.0"
 	},
 	"devDependencies": {
 		"@nabla/vite-plugin-eslint": "2.0.2",
@@ -40,6 +45,7 @@
 		"@testing-library/react": "15.0.1",
 		"@testing-library/user-event": "14.5.2",
 		"@types/css-mediaquery": "0.1.4",
+		"@types/js-yaml": "^4.0.9",
 		"@types/react": "18.2.76",
 		"@types/react-dom": "18.2.25",
 		"@types/react-router-dom": "^5.3.3",
@@ -66,6 +72,7 @@
 		"eslint-plugin-testing-library": "6.2.0",
 		"eslint-plugin-unicorn": "52.0.0",
 		"husky": "9.0.11",
+		"js-yaml": "^4.1.0",
 		"jsdom": "24.0.0",
 		"lint-staged": "15.2.2",
 		"msw": "2.2.3",

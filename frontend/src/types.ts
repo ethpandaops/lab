@@ -1,15 +1,20 @@
-export interface IFruit {
-	name: string
-	image: {
-		author: {
-			name: string
-			url: string
+export interface Config {
+	notebooks: {
+		'xatu-public-contributors': {
+			enabled: boolean
+			schedule_hours: number
+			description: string
+			networks: string[]
+			time_windows: {
+				file: string
+				step: string
+				label: string
+				range: string
+			}[]
 		}
-		color: string
-		url: string
 	}
-	metadata: {
-		name: string
-		value: string
-	}[]
+	data: {
+		type: string
+		path: string
+	}
 }

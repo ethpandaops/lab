@@ -1,5 +1,37 @@
+data:
+  type: fs
+  path: ../data # pwd is ./notebooks
 notebooks:
   xatu-public-contributors:
     enabled: true
     schedule_hours: 6
     description: "Analyzes public Xatu contributor data and client versions"
+    networks:
+      - mainnet
+      - sepolia
+      - holesky
+    time_windows:
+      - file: "last_30_days" 
+        step: "1d"
+        label: "Last 30d"
+        range: "-30d"
+      - file: "last_1_day"
+        step: "1h" 
+        label: "Last 1d"
+        range: "-1d"
+      - file: "last_90_days"
+        step: "3d"
+        label: "Last 90d" 
+        range: "-90d"
+      # - file: "next_week"
+      #   step: "1d"
+      #   label: "+7d"
+      #   range: "+7d"
+      # - file: "2024_q1"
+      #   step: "1d"
+      #   label: "Q1 2024"
+      #   range: "2024-01-01/2024-03-31"
+      # - file: "last_2_weeks"
+      #   step: "6h"
+      #   label: "2w"
+      #   range: "-2w"
