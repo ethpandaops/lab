@@ -15,6 +15,15 @@ interface Arc {
   color: string
 }
 
+interface Point {
+  lat: number
+  lng: number
+  size: number
+  color: string
+  name: string
+  nodes: number
+}
+
 // Mapping of some countries to their coordinates
 const COUNTRY_COORDS: Record<string, [number, number]> = {
   'Afghanistan': [33.9391, 67.7100],
@@ -225,11 +234,12 @@ export const GlobeViz = ({ data, width = 600, height = 400 }: Props) => {
   const containerRef = useRef<HTMLDivElement>(null)
   const globeRef = useRef<any>(null)
 
-  const arcs = useMemo(() => {
-    if (!data || data.length === 0) return []
+  const { arcs, points } = useMemo(() => {
+    if (!data || data.length === 0) return { arcs: [], points: [] }
 
     const latestData = data[data.length - 1]
     const arcs: Arc[] = []
+    const points: Point[] = []
 
     // Count nodes per country
     const countryNodes = new Map<string, number>()
@@ -237,11 +247,21 @@ export const GlobeViz = ({ data, width = 600, height = 400 }: Props) => {
       countryNodes.set(country.name, country.value)
     })
 
-    // Create arcs for each country
+    // Create points and arcs for each country
     countryNodes.forEach((value, countryName) => {
       const coords = COUNTRY_COORDS[countryName]
       if (coords) {
-        // Create one arc per node
+        // Add point for the country
+        points.push({
+          lat: coords[0],
+          lng: coords[1],
+          size: Math.max(4, Math.min(20, Math.sqrt(value) * 2)),
+          color: 'rgba(34, 211, 238, 0.8)',
+          name: countryName,
+          nodes: value
+        })
+
+        // Create arcs for each node
         for (let i = 0; i < value; i++) {
           arcs.push({
             startLat: coords[0],
@@ -254,7 +274,7 @@ export const GlobeViz = ({ data, width = 600, height = 400 }: Props) => {
       }
     })
 
-    return arcs
+    return { arcs, points }
   }, [data])
 
   // Initialize globe
@@ -279,6 +299,16 @@ export const GlobeViz = ({ data, width = 600, height = 400 }: Props) => {
       .width(width)
       .height(height)
       .arcsData(arcs)
+      .pointsData(points)
+      .pointColor('color')
+      .pointAltitude(0.01)
+      .pointRadius('size')
+      .pointLabel(point => `
+        <div class="bg-gray-900/95 backdrop-blur-sm px-3 py-2 rounded-lg border border-gray-700 shadow-xl">
+          <div class="text-cyan-400 font-medium">${(point as Point).name}</div>
+          <div class="text-gray-300">${(point as Point).nodes} nodes</div>
+        </div>
+      `)
 
     // Configure controls
     const controls = globe.controls()
@@ -311,7 +341,8 @@ export const GlobeViz = ({ data, width = 600, height = 400 }: Props) => {
       .width(width)
       .height(height)
       .arcsData(arcs)
-  }, [width, height, arcs])
+      .pointsData(points)
+  }, [width, height, arcs, points])
 
   return (
     <div 
