@@ -30,6 +30,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PANDAOPS_CLICKHOUSE_URL: ${{ secrets.PANDAOPS_CLICKHOUSE_URL }}
         run: |
+          cd notebooks
           ./run_notebook.sh
       - name: Configure Git
         run: |
