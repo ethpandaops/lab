@@ -36,11 +36,11 @@ const NETWORK_METADATA = {
 } as const
 
 export const NetworkSelector = ({ selectedNetwork, onNetworkChange }: Props) => {
-  const [config, setConfig] = useState<Config | null>(null)
+  const [config, setConfig] = useState<Config>()
   const [isOpen, setIsOpen] = useState(false)
 
   useEffect(() => {
-    getConfig().then(setConfig).catch(console.error)
+    getConfig().then(setConfig)
   }, [])
 
   const networks = config?.notebooks['xatu-public-contributors'].networks || ['mainnet']
