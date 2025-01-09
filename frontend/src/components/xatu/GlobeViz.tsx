@@ -4,12 +4,12 @@ import Globe from 'globe.gl'
 interface Props {
   data: any
   width?: number
-  height?: number
+  height?: number 
 }
 
 interface Arc {
   startLat: number
-  startLng: number
+  startLng: number 
   endLat: number
   endLng: number
   color: string

@@ -1,0 +1,11 @@
+version: '3'
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:80"
+    volumes:
+      - ./config.yaml:/usr/share/nginx/html/config.yaml:ro
+      - ./data:/usr/share/nginx/html/data:ro 

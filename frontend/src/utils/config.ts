@@ -1,50 +1,36 @@
 import type { Config } from '../types'
+import yaml from 'js-yaml'
 
-// In production, this will be replaced with the actual config at build time
-let config: Config | null = null
-
-// Load config immediately in development
-if (import.meta.env.DEV) {
-  fetch('/config.yaml')
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('Failed to load config')
-      }
-      return response.json()
-    })
-    .then(data => {
-      config = data as Config
-      console.log('🔧 Config loaded:', config)
-    })
-    .catch(error => {
-      console.error('❌ Failed to load config:', error)
-    })
-}
+// Cache the config once loaded
+let loadedConfig: Config | undefined
 
 export const getConfig = async (): Promise<Config> => {
-  if (config) {
-    return config
+  // Return cached config if available
+  if (loadedConfig) {
+    return loadedConfig
   }
 
-  // In development, fetch the config from the dev server
-  if (import.meta.env.DEV) {
+  // Fetch config from the appropriate location
+  try {
     const response = await fetch('/config.yaml')
     if (!response.ok) {
-      throw new Error('Failed to load config')
+      throw new Error(`Failed to load config: ${response.statusText}`)
     }
-    const data = await response.json()
-    config = data as Config
-    return config
+    
+    const text = await response.text()
+    const data = yaml.load(text) as Config
+    loadedConfig = data
+    return loadedConfig
+  } catch (error) {
+    console.error('❌ Failed to load config:', error)
+    throw error
   }
-
-  throw new Error('Config not loaded')
 }
 
 // Helper to get networks without async/await
 export const getNetworks = (): string[] => {
-  if (!config) {
-    console.log('⚠️ Using default networks as config is not loaded')
-    return ['mainnet', 'sepolia', 'holesky'] // Default fallback
+  if (!loadedConfig) {
+    throw new Error('Config not loaded - call getConfig() first')
   }
-  return config.notebooks['xatu-public-contributors'].networks
+  return loadedConfig.notebooks['xatu-public-contributors'].networks
 } 
