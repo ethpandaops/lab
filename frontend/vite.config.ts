@@ -110,6 +110,11 @@ export default defineConfig(({ mode }) => {
 				input: {
 					main: path.resolve(__dirname, 'index.html'),
 				},
+				output: {
+					assetFileNames: 'assets/[name].[hash].[ext]',
+					chunkFileNames: 'assets/[name].[hash].js',
+					entryFileNames: 'assets/[name].[hash].js',
+				}
 			},
 			copyPublicDir: true,
 		}
