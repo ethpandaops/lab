@@ -10,8 +10,8 @@ interface ExperimentGroup {
 
 const experimentGroups: ExperimentGroup[] = [
   {
-    name: 'Xatu Community Nodes',
-    description: 'Explore the Xatu network and its nodes.',
+    name: 'Xatu Contributors',
+    description: 'Explore the Xatu dataset and its contributors',
     path: '/experiments/xatu-contributors',
     icon: <img src="/xatu.png" alt="" className="w-6 h-6 rounded-full bg-white/10 p-0.5" />
   },

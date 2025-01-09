@@ -117,6 +117,13 @@ export default defineConfig(({ mode }) => {
 				}
 			},
 			copyPublicDir: true,
-		}
+		},
+		preview: {
+			port: 5173,
+			strictPort: true,
+			host: true,
+			cors: true
+		},
+		base: '/'
 	}
 })
