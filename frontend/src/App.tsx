@@ -8,7 +8,7 @@ import { CommunityNodes } from './pages/xatu/CommunityNodes'
 
 export const App = () => {
 	return (
-		<Router>
+		<Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
 			<Layout>
 				<Routes>
 					<Route path="/" element={<Home />} />
