@@ -30,9 +30,7 @@ const navItems: NavItem[] = [
         name: 'Xatu Contributors',
         path: '/experiments/xatu-contributors',
         items: [
-          { name: 'Contributors', path: '/experiments/xatu/contributors' },
-          { name: 'Client Versions', path: '/experiments/xatu/client-versions' },
-          { name: 'Community Nodes', path: '/experiments/xatu/community-nodes' },
+          { name: 'Community Nodes', path: '/experiments/xatu-contributors/community-nodes' },
         ]
       }
     ]

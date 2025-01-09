@@ -4,7 +4,6 @@ import { Home } from './pages/Home'
 import { About } from './pages/About'
 import { Experiments } from './pages/Experiments'
 import { Xatu } from './pages/xatu'
-import { ClientVersions } from './pages/xatu/ClientVersions'
 import { CommunityNodes } from './pages/xatu/CommunityNodes'
 
 export const App = () => {
@@ -16,8 +15,7 @@ export const App = () => {
 					<Route path="/about" element={<About />} />
 					<Route path="/experiments" element={<Experiments />} />
 					<Route path="/experiments/xatu-contributors" element={<Xatu />} />
-					<Route path="/experiments/xatu/client-versions" element={<ClientVersions />} />
-					<Route path="/experiments/xatu/community-nodes" element={<CommunityNodes />} />
+					<Route path="/experiments/xatu-contributors/community-nodes" element={<CommunityNodes />} />
 				</Route>
 			</Routes>
 		</Router>
