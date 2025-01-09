@@ -1,13 +1,19 @@
 from pathlib import Path
-from dotenv import load_dotenv
+from dotenv import load_dotenv, find_dotenv
 import os
 
 class Environment:
     def __init__(self):
-        # Try to load .env from current and parent directory
-        load_dotenv()
-        load_dotenv(Path(__file__).parent.parent / '.env')
-        load_dotenv(Path(__file__).parent.parent.parent / '.env')
+        # Try to load .env from multiple directories
+        env_paths = [
+            Path.cwd() / '.env',
+            Path(__file__).parent.parent / '.env',
+            Path(__file__).parent.parent.parent / '.env'
+        ]
+        
+        for path in env_paths:
+            if path.exists():
+                load_dotenv(path)
         
         self._pandaops_clickhouse_url = os.getenv('PANDAOPS_CLICKHOUSE_URL')
 

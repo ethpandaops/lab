@@ -5,4 +5,4 @@ papermill>=2.4.0
 ipykernel>=6.0.0
 clickhouse-sqlalchemy>=0.2.4
 pyyaml>=6.0.0
-dotenv>=1.0.0
+python-dotenv>=1.0.0
