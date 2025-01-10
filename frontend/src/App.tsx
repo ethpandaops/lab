@@ -5,8 +5,11 @@ import { About } from './pages/About'
 import { Experiments } from './pages/Experiments'
 import { Xatu } from './pages/xatu'
 import { CommunityNodes } from './pages/xatu/CommunityNodes'
+import ContributorsList from './pages/xatu/ContributorsList'
+import ContributorDetail from './pages/xatu/ContributorDetail'
+import Networks from './pages/xatu/networks'
 
-export const App = () => {
+function App(): JSX.Element {
 	return (
 		<Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
 			<Routes>
@@ -16,9 +19,14 @@ export const App = () => {
 					<Route path="experiments" element={<Experiments />} />
 					<Route path="experiments/xatu-contributors" element={<Xatu />} />
 					<Route path="experiments/xatu-contributors/community-nodes" element={<CommunityNodes />} />
+					<Route path="experiments/xatu-contributors/networks" element={<Networks />} />
+					<Route path="experiments/xatu-contributors/contributors" element={<ContributorsList />} />
+					<Route path="experiments/xatu-contributors/contributors/:name" element={<ContributorDetail />} />
 					<Route path="*" element={<Navigate to="/" replace />} />
 				</Route>
 			</Routes>
 		</Router>
 	)
 }
+
+export default App

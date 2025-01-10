@@ -123,15 +123,6 @@ export const Xatu = (): JSX.Element => {
 
   return (
     <div className="space-y-8" ref={containerReference}>
-      {/* About This Data */}
-      <div className="bg-gray-900/80 backdrop-blur-md rounded-lg p-6 border border-gray-800 shadow-xl mb-8">
-        <h2 className="text-xl font-semibold text-cyan-400 mb-2">About This Data</h2>
-        <p className="text-gray-300">
-          This data provides a summary of the nodes that are sending the ethPandaOps team data from their nodes.
-          While the ethPandaOps team runs our own nodes, the data from community nodes is far more valuable.
-        </p>
-      </div>
-
       {/* Overview Section */}
       <div className="bg-gray-900/80 backdrop-blur-md rounded-lg p-6 border border-gray-800 shadow-xl mb-8">
         <div className="flex flex-col mb-6">
@@ -145,6 +136,10 @@ export const Xatu = (): JSX.Element => {
               {formatDistanceToNow(new Date(summaryData.updated_at * 1000), { addSuffix: true })}
             </span>
           </span>
+          <p className="text-gray-300 mt-4">
+            This data provides a summary of the nodes that are sending the ethPandaOps team data from their nodes.
+            While the ethPandaOps team runs our own nodes, the data from community nodes is far more valuable.
+          </p>
         </div>
         
         {/* Globe and Summary Stats */}
@@ -206,137 +201,49 @@ export const Xatu = (): JSX.Element => {
           </div>
         </div>
 
-        {/* Geographic Distribution */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
-          <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700">
-            <div className="text-gray-400 text-sm mb-2">Top Continents</div>
-            <div className="space-y-2">
-              {Object.entries(summaryData.networks.mainnet.continents)
-                .sort((a, b) => b[1].total_nodes - a[1].total_nodes)
-                .slice(0, 3)
-                .map(([code, data]) => {
-                  const continentNames: { [key: string]: string } = {
-                    'NA': 'North America',
-                    'SA': 'South America',
-                    'EU': 'Europe',
-                    'AS': 'Asia',
-                    'AF': 'Africa',
-                    'OC': 'Oceania',
-                    'AN': 'Antarctica'
-                  }
-                  return (
-                    <div key={code} className="flex justify-between text-sm">
-                      <span className="text-gray-300">{continentNames[code] || code}</span>
-                      <span className="text-gray-400">
-                        {data.total_nodes} nodes ({data.public_nodes} community)
-                      </span>
-                    </div>
-                  )
-                })}
-            </div>
-          </div>
-
-          <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700">
-            <div className="text-gray-400 text-sm mb-2">Top Cities</div>
-            <div className="space-y-2">
-              {Object.entries(summaryData.networks.mainnet.cities)
-                .filter(([name]) => name !== '') // Filter out empty city names
-                .sort((a, b) => b[1].total_nodes - a[1].total_nodes)
-                .slice(0, 3) // Show top 3 cities
-                .map(([name, data]) => (
-                  <div key={name} className="flex justify-between text-sm">
-                    <span className="text-gray-300">{name}</span>
-                    <span className="text-gray-400">
-                      {data.total_nodes} nodes ({data.public_nodes} community)
-                    </span>
-                  </div>
-                ))}
-            </div>
-          </div>
-
-          <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700">
-            <div className="text-gray-400 text-sm mb-2">Geographic Stats</div>
-            <div className="space-y-2">
-              <div className="flex justify-between text-sm">
-                <span className="text-gray-300">Most Nodes</span>
-                <span className="text-gray-400">Australia (10)</span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-gray-300">Most Community</span>
-                <span className="text-gray-400">Canada (4)</span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-gray-300">Top City</span>
-                <span className="text-gray-400">Melbourne (6)</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Network Cards */}
+        {/* Navigation Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {Object.entries(summaryData.networks).map(([name, data]) => {
-            const metadata = NETWORK_METADATA[name as keyof typeof NETWORK_METADATA] || {
-              name: name.charAt(0).toUpperCase() + name.slice(1),
-              icon: '🔥',
-              color: '#627EEA'
-            }
-
-            return (
-              <div key={name} className="bg-gray-800/50 rounded-lg p-4 border border-gray-700">
-                <div className="flex justify-between items-center mb-4">
-                  <div className="flex items-center gap-2">
-                    <span className="w-5 h-5 flex items-center justify-center">
-                      {metadata.icon}
-                    </span>
-                    <div>
-                      <div className="text-xl font-bold text-cyan-400">{metadata.name}</div>
-                      <div className="text-sm text-gray-400">
-                        {data.total_nodes} total nodes
-                      </div>
-                    </div>
-                  </div>
-                  <div className="text-right text-sm text-gray-400">
-                    <div>{data.total_public_nodes} community</div>
-                    <div>{data.total_nodes - data.total_public_nodes} ethPandaOps</div>
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <div className="text-sm font-medium text-gray-300 mb-2">Consensus Clients</div>
-                  {(Object.entries(data.consensus_implementations) as [string, ConsensusImplementation][])
-                    .sort((a, b) => b[1].total_nodes - a[1].total_nodes)
-                    .map(([client, stats]) => {
-                      const clientMeta = CLIENT_METADATA[client] || { name: client }
-                      return (
-                        <div key={client} className="bg-gray-900/50 rounded-lg p-2 border border-gray-700">
-                          <div className="flex justify-between items-center">
-                            <div className="flex items-center gap-2">
-                              <img 
-                                src={`/clients/${client}.png`} 
-                                alt={`${clientMeta.name} logo`}
-                                className="w-5 h-5 object-contain"
-                                onError={(e) => {
-                                  // If image fails to load, remove it
-                                  e.currentTarget.style.display = 'none'
-                                }}
-                              />
-                              <span className="text-gray-300">{clientMeta.name}</span>
-                            </div>
-                            <span className="text-gray-400 text-sm">
-                              {stats.total_nodes} nodes
-                            </span>
-                          </div>
-                          <div className="text-xs text-gray-400 mt-1">
-                            {stats.public_nodes} community · {stats.total_nodes - stats.public_nodes} ethPandaOps
-                          </div>
-                        </div>
-                      )
-                    })}
-                </div>
+          <Link to="contributors" className="group bg-gray-800/50 rounded-lg p-6 border border-gray-700 hover:bg-gray-700/50 hover:border-cyan-500/50 transition-all">
+            <div className="flex gap-6 items-start">
+              <div className="flex-shrink-0 text-4xl text-gray-200 mt-0.5">👥</div>
+              <div className="flex flex-col flex-grow">
+                <h3 className="text-xl font-semibold text-cyan-400 mb-2">Contributors</h3>
+                <p className="text-gray-300 text-sm">View information about the individual contributors to the Xatu dataset</p>
               </div>
-            )
-          })}
+            </div>
+            <button type="button" className="mt-6 w-full py-3 px-4 bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/20 hover:border-cyan-500/30 rounded-lg text-cyan-400 font-medium transition-all flex items-center justify-center gap-2 group-hover:bg-cyan-500/20">
+              View Details
+              <ArrowRight className="w-5 h-5" />
+            </button>
+          </Link>
+
+          <Link to="networks" className="group bg-gray-800/50 rounded-lg p-6 border border-gray-700 hover:bg-gray-700/50 hover:border-cyan-500/50 transition-all">
+            <div className="flex gap-6 items-start">
+              <div className="flex-shrink-0 text-4xl text-gray-200 mt-0.5">🌐</div>
+              <div className="flex flex-col flex-grow">
+                <h3 className="text-xl font-semibold text-cyan-400 mb-2">Networks</h3>
+                <p className="text-gray-300 text-sm">Explore the networks that are in the Xatu dataset</p>
+              </div>
+            </div>
+            <button type="button" className="mt-6 w-full py-3 px-4 bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/20 hover:border-cyan-500/30 rounded-lg text-cyan-400 font-medium transition-all flex items-center justify-center gap-2 group-hover:bg-cyan-500/20">
+              View Details
+              <ArrowRight className="w-5 h-5" />
+            </button>
+          </Link>
+
+          <Link to="community-nodes" className="group bg-gray-800/50 rounded-lg p-6 border border-gray-700 hover:bg-gray-700/50 hover:border-cyan-500/50 transition-all">
+            <div className="flex gap-6 items-start">
+              <div className="flex-shrink-0 text-4xl text-gray-200 mt-0.5">🖥️</div>
+              <div className="flex flex-col flex-grow">
+                <h3 className="text-xl font-semibold text-cyan-400 mb-2">Community Nodes</h3>
+                <p className="text-gray-300 text-sm">Explore the community nodes contributing to the Xatu dataset</p>
+              </div>
+            </div>
+            <button type="button" className="mt-6 w-full py-3 px-4 bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/20 hover:border-cyan-500/30 rounded-lg text-cyan-400 font-medium transition-all flex items-center justify-center gap-2 group-hover:bg-cyan-500/20">
+              View Details
+              <ArrowRight className="w-5 h-5" />
+            </button>
+          </Link>
         </div>
       </div>
     </div>

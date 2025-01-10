@@ -53,6 +53,11 @@ class Lab:
         namespaced_filename = f"{self.notebook_name}/{filename}"
         self.writer.write_json(namespaced_filename, data)
 
+    def delete_directory(self, directory: str):
+        """Delete a directory in the notebook's namespace"""
+        namespaced_directory = f"{self.notebook_name}/{directory}"
+        self.writer.delete_directory(namespaced_directory)
+
     def get_pandaops_clickhouse_client(self):
         """Get clickhouse client"""
         return self.pandaops_clickhouse_client

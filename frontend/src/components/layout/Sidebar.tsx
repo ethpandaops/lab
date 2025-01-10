@@ -31,6 +31,7 @@ const sidebarItems: SidebarItem[] = [
         path: '/experiments/xatu-contributors',
         items: [
           { name: 'Community Nodes', path: '/experiments/xatu-contributors/community-nodes' },
+          { name: 'Contributors', path: '/experiments/xatu-contributors/contributors' },
         ]
       }
     ],

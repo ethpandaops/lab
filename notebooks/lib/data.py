@@ -41,6 +41,12 @@ class FSDataWriter:
         with open(full_path, 'w') as f:
             for item in data:
                 f.write(json.dumps(item) + '\n')
+    def delete_directory(self, path: str) -> None:
+        """Delete a directory and all its contents"""
+        import shutil
+        full_path = self.base_path / path
+        if full_path.exists():
+            shutil.rmtree(full_path)
 
 def get_data_writer(config: DataConfig) -> DataWriter:
     """Get data writer based on config type"""
