@@ -89,7 +89,26 @@ class XatuPublicContributors:
             data_dir=str(Path(data_config.path) / "xatu-public-contributors"),
             networks=data.get("networks", [])
         )
-
+@dataclass
+class MevRelays:
+    networks: List[str]
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]) -> "MevRelays":
+        return cls(
+            networks=data.get("networks", [])
+        )
+@dataclass
+class BeaconChainTimings:
+    time_windows: List[TimeWindow]
+    networks: List[str]
+    data_dir: str
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any], data_config: DataConfig) -> "BeaconChainTimings":
+        return cls(
+            time_windows=[TimeWindow(**w) for w in data.get("time_windows", [])],
+            networks=data.get("networks", []),
+            data_dir=str(Path(data_config.path) / "beacon-chain-timings")
+        )
 @dataclass
 class NotebookConfig:
     enabled: bool
@@ -105,6 +124,20 @@ class NotebookConfig:
             return XatuPublicContributors.from_dict(self.config, self.data_config)
         except Exception as e:
             print(f"Failed to parse XatuPublicContributors config: {e}")
+            return None
+    def as_mev_relays(self) -> Optional[MevRelays]:
+        """Convert config to MevRelays if valid"""
+        try:
+            return MevRelays.from_dict(self.config)
+        except Exception as e:
+            print(f"Failed to parse MevRelays config: {e}")
+            return None
+    def as_beacon_chain_timings(self) -> Optional[BeaconChainTimings]:
+        """Convert config to BeaconChainTimings if valid"""
+        try:
+            return BeaconChainTimings.from_dict(self.config, self.data_config)
+        except Exception as e:
+            print(f"Failed to parse BeaconChainTimings config: {e}")
             return None
 
 @dataclass

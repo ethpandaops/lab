@@ -23,6 +23,13 @@ export const breadcrumbs = [
       }
     ],
   },
+  {
+    name: 'Beacon Chain',
+    path: '/beacon-chain-timings',
+    children: [
+      { name: 'Blocks', path: '/beacon-chain-timings/blocks' },
+    ],
+  },
 ];
 
 function findActivePath(pathname: string, items: NavItem[]): NavItem[] {

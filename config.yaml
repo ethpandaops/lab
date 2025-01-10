@@ -4,7 +4,7 @@ data:
 notebooks:
   xatu-public-contributors:
     enabled: true
-    schedule_hours: 3
+    schedule_hours: 1
     description: "Analyzes public Xatu contributor data and client versions"
     networks:
       - mainnet
@@ -27,15 +27,34 @@ notebooks:
         step: "5m" 
         label: "Last 6h"
         range: "-6h"
-      # - file: "next_week"
-      #   step: "1d"
-      #   label: "+7d"
-      #   range: "+7d"
-      # - file: "2024_q1"
-      #   step: "1d"
-      #   label: "Q1 2024"
-      #   range: "2024-01-01/2024-03-31"
-      # - file: "last_2_weeks"
-      #   step: "6h"
-      #   label: "2w"
-      #   range: "-2w"
+  # mev-relays:
+  #   enabled: false
+  #   schedule_hours: 1
+  #   description: "Analyzes MEV relays"
+  #   networks:
+  #     - mainnet
+  beacon-chain-timings:
+    enabled: true
+    schedule_hours: 1
+    description: "Analyzes beacon chain timings"
+    networks:
+      - mainnet
+      - sepolia
+      - holesky
+    time_windows:
+      - file: "last_30_days" 
+        step: "6h"
+        label: "Last 30d"
+        range: "-30d"
+      - file: "last_90_days"
+        step: "1d"
+        label: "Last 90d" 
+        range: "-90d"
+      # - file: "last_1_day"
+      #   step: "5m" 
+      #   label: "Last 1d"
+      #   range: "-1d"
+      # - file: "last_year"
+      #   step: "1d" 
+      #   label: "Last 1y"
+      #   range: "-365d"

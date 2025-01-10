@@ -18,6 +18,13 @@ export const navigation = [
       { name: 'Contributors', path: '/xatu/contributors' },
     ],
   },
+  {
+    name: 'Beacon Chain',
+    path: '/beacon-chain-timings',
+    children: [
+      { name: 'Block Timings', path: '/beacon-chain-timings/blocks' },
+    ],
+  },
 ]
 
 export function Navigation(): JSX.Element {

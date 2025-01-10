@@ -8,17 +8,7 @@
 	"parser": "@typescript-eslint/parser",
 	"plugins": ["react-prefer-function-component"],
 	"extends": [
-		"eslint:all",
-		"plugin:@typescript-eslint/all",
-		"plugin:import/recommended",
-		"plugin:import/typescript",
-		"plugin:react/all",
-		"plugin:jsx-a11y/recommended",
-		"airbnb",
-		"airbnb-typescript",
-		"airbnb/hooks",
-		"plugin:react/jsx-runtime",
-		"plugin:unicorn/all"
+
 	],
 	"rules": {
 		"no-dupe-else-if": "error",

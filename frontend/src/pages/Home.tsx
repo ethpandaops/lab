@@ -45,6 +45,24 @@ const experimentGroups: ExperimentGroup[] = [
       },
     ],
   },
+  {
+    id: 'beacon-chain',
+    title: 'Beacon Chain',
+    subtitle: 'Analyze Ethereum beacon chain metrics and performance',
+    logo: '/ethereum.png',
+    overview: {
+      title: 'Overview',
+      description: 'Explore beacon chain metrics and performance data',
+      href: '/beacon-chain-timings',
+    },
+    links: [
+      {
+        title: 'Blocks',
+        description: 'Analyze block arrival times and network performance',
+        href: '/beacon-chain-timings/blocks',
+      },
+    ],
+  },
 ];
 
 function Home(): JSX.Element {

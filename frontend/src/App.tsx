@@ -7,6 +7,8 @@ import Networks from './pages/xatu/networks';
 import ContributorsList from './pages/xatu/ContributorsList';
 import ContributorDetail from './pages/xatu/ContributorDetail';
 import Layout from './components/layout/Layout';
+import { BeaconChainTimings } from './pages/beacon-chain-timings';
+import { BlockTimings } from './pages/beacon-chain-timings/blocks';
 
 function App(): JSX.Element {
 	return (
@@ -19,6 +21,9 @@ function App(): JSX.Element {
 					<Route path="networks" element={<Networks />} />
 					<Route path="contributors" element={<ContributorsList />} />
 					<Route path="contributors/:name" element={<ContributorDetail />} />
+				</Route>
+				<Route path="beacon-chain-timings" element={<BeaconChainTimings />}>
+					<Route path="blocks" element={<BlockTimings />} />
 				</Route>
 				<Route path="*" element={<Navigate to="/" replace />} />
 			</Route>
