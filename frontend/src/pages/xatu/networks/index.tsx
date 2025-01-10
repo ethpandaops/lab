@@ -1,5 +1,6 @@
 import { useDataFetch } from '../../../utils/data';
 import { formatDistanceToNow } from 'date-fns';
+import { XatuCallToAction } from '../../../components/xatu/XatuCallToAction';
 
 interface ConsensusImplementation {
   total_nodes: number;
@@ -76,83 +77,115 @@ export default function Networks(): JSX.Element {
 
   return (
     <div className="space-y-8">
-      <div className="bg-gray-900/80 backdrop-blur-md rounded-lg p-6 border border-gray-800 shadow-xl">
-        <div className="flex flex-col mb-6">
-          <h2 className="text-2xl font-bold text-cyan-400">Networks</h2>
-          <span className="text-gray-400 text-sm">
-            Last 24h · Updated{' '}
-            <span 
-              title={new Date(summaryData.updated_at * 1000).toString()}
-              className="cursor-help border-b border-dotted border-gray-500"
-            >
-              {formatDistanceToNow(new Date(summaryData.updated_at * 1000), { addSuffix: true })}
-            </span>
+
+      <XatuCallToAction />
+      <div className="flex flex-col mb-6">
+        <h2 className="text-2xl font-bold text-cyan-400">Networks</h2>
+        <span className="text-gray-400 text-sm">
+          Last 24h · Updated{' '}
+          <span 
+            title={new Date(summaryData.updated_at * 1000).toString()}
+            className="cursor-help border-b border-dotted border-gray-500"
+          >
+            {formatDistanceToNow(new Date(summaryData.updated_at * 1000), { addSuffix: true })}
           </span>
+        </span>
+        <div className="mt-4 p-4 bg-gray-800/50 rounded-lg border border-yellow-700/50 shadow-[0_0_15px_rgba(234,179,8,0.15)]">
+          <div className="space-y-2">
+            <p className="text-yellow-500 font-medium">Important Notice</p>
+            <p className="text-gray-300">
+              This data represents only the nodes that are actively sending data to the Xatu project. 
+              It is not representative of the total number of nodes in each network or the overall client diversity.
+            </p>
+          </div>
         </div>
+      </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {Object.entries(summaryData.networks).map(([name, data]) => {
-            const metadata = NETWORK_METADATA[name as keyof typeof NETWORK_METADATA] || {
-              name: name.charAt(0).toUpperCase() + name.slice(1),
-              icon: '🔥',
-              color: '#627EEA',
-            };
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {Object.entries(summaryData.networks).map(([name, data]) => {
+          const metadata = NETWORK_METADATA[name as keyof typeof NETWORK_METADATA] || {
+            name: name.charAt(0).toUpperCase() + name.slice(1),
+            icon: '🔥',
+            color: '#627EEA',
+          };
 
-            return (
-              <div key={name} className="bg-gray-800/50 rounded-lg p-4 border border-gray-700">
-                <div className="flex justify-between items-center mb-4">
-                  <div className="flex items-center gap-2">
-                    <span className="w-5 h-5 flex items-center justify-center">
-                      {metadata.icon}
-                    </span>
-                    <div>
-                      <div className="text-xl font-bold text-cyan-400">{metadata.name}</div>
-                      <div className="text-sm text-gray-400">
-                        {data.total_nodes} total nodes
-                      </div>
+          // Calculate client distribution for this network
+          const clientDistribution = Object.entries(data.consensus_implementations)
+            .map(([client, clientData]) => ({
+              name: CLIENT_METADATA[client]?.name || client,
+              value: clientData.total_nodes,
+              publicValue: clientData.public_nodes,
+            }))
+            .sort((a, b) => b.value - a.value);
+
+          return (
+            <div key={name} className="bg-gray-800/50 rounded-lg p-4 border border-gray-700">
+              <div className="flex justify-between items-center mb-4">
+                <div className="flex items-center gap-2">
+                  <span className="w-5 h-5 flex items-center justify-center">
+                    {metadata.icon}
+                  </span>
+                  <div>
+                    <div className="text-xl font-bold text-cyan-400">{metadata.name}</div>
+                    <div className="text-sm text-gray-400">
+                      {data.total_nodes} total nodes
                     </div>
                   </div>
-                  <div className="text-right text-sm text-gray-400">
-                    <div>{data.total_public_nodes} community</div>
-                    <div>{data.total_nodes - data.total_public_nodes} ethPandaOps</div>
-                  </div>
                 </div>
-
-                <div className="space-y-2">
-                  <div className="text-sm font-medium text-gray-300 mb-2">Consensus Clients</div>
-                  {Object.entries(data.consensus_implementations)
-                    .sort((a, b) => b[1].total_nodes - a[1].total_nodes)
-                    .map(([client, stats]) => {
-                      const clientMeta = CLIENT_METADATA[client] || { name: client };
-                      return (
-                        <div key={client} className="bg-gray-900/50 rounded-lg p-2 border border-gray-700">
-                          <div className="flex justify-between items-center">
-                            <div className="flex items-center gap-2">
-                              <img 
-                                src={`/clients/${client}.png`} 
-                                alt={`${clientMeta.name} logo`}
-                                className="w-5 h-5 object-contain"
-                                onError={(event) => {
-                                  event.currentTarget.style.display = 'none';
-                                }}
-                              />
-                              <span className="text-gray-300">{clientMeta.name}</span>
-                            </div>
-                            <span className="text-gray-400 text-sm">
-                              {stats.total_nodes} nodes
-                            </span>
-                          </div>
-                          <div className="text-xs text-gray-400 mt-1">
-                            {stats.public_nodes} community · {stats.total_nodes - stats.public_nodes} ethPandaOps
-                          </div>
-                        </div>
-                      );
-                    })}
+                <div className="text-right text-sm text-gray-400">
+                  <div>{data.total_public_nodes} community</div>
+                  <div>{data.total_nodes - data.total_public_nodes} ethPandaOps</div>
                 </div>
               </div>
-            );
-          })}
-        </div>
+
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-400">Countries</span>
+                  <span className="text-gray-300">{Object.keys(data.countries).length}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-400">Cities</span>
+                  <span className="text-gray-300">{Object.keys(data.cities).length}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-400">Continents</span>
+                  <span className="text-gray-300">{Object.keys(data.continents).length}</span>
+                </div>
+              </div>
+
+              {/* Client Distribution */}
+              <div className="mt-4 pt-4 border-t border-gray-700">
+                <h4 className="text-sm font-medium text-gray-300 mb-3">Client Distribution</h4>
+                <div className="space-y-2">
+                  {clientDistribution.map((client) => (
+                    <div key={client.name} className="flex items-center gap-3">
+                      <img
+                        src={`/clients/${client.name.toLowerCase()}.png`}
+                        alt={`${client.name} logo`}
+                        className="w-5 h-5 object-contain"
+                        onError={(event) => {
+                          const target = event.currentTarget;
+                          target.style.display = 'none';
+                        }}
+                      />
+                      <div className="flex-1 flex items-center justify-between">
+                        <span className="text-gray-200 text-sm">{client.name}</span>
+                        <div className="text-right">
+                          <span className="text-cyan-400 text-sm font-medium">
+                            {((client.value / data.total_nodes) * 100).toFixed(1)}%
+                          </span>
+                          <div className="text-xs text-gray-400">
+                            {client.value} nodes ({client.publicValue} public)
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );

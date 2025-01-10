@@ -6,22 +6,16 @@ interface NavItem {
   items?: NavItem[]
 }
 
-const navItems: NavItem[] = [
+export const navigation = [
   { name: 'Home', path: '/' },
   { name: 'About', path: '/about' },
-  { 
-    name: 'Experiments', 
-    path: '/experiments',
-    items: [
-      { 
-        name: 'Xatu Contributors',
-        path: '/experiments/xatu-contributors',
-        items: [
-          { name: 'Community Nodes', path: '/experiments/xatu-contributors/community-nodes' },
-          { name: 'Networks', path: '/experiments/xatu-contributors/networks' },
-          { name: 'Contributors', path: '/experiments/xatu-contributors/contributors' },
-        ],
-      },
+  {
+    name: 'Xatu',
+    path: '/xatu',
+    children: [
+      { name: 'Community Nodes', path: '/xatu/community-nodes' },
+      { name: 'Networks', path: '/xatu/networks' },
+      { name: 'Contributors', path: '/xatu/contributors' },
     ],
   },
 ]
@@ -45,7 +39,7 @@ export function Navigation(): JSX.Element {
 
           {/* Top-level Navigation */}
           <div className="hidden md:flex items-center space-x-4">
-            {navItems.map((item) => {
+            {navigation.map((item) => {
               const isActive = item.path === '/' 
                 ? location.pathname === '/'
                 : location.pathname.startsWith(item.path)

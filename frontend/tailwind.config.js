@@ -14,6 +14,7 @@ const config = {
 				'gradient': 'gradient 15s ease infinite',
 				'glitch': 'glitch 0.2s ease-in-out',
 				'pulse': 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+				'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
 			},
 			keyframes: {
 				'text-shine': {

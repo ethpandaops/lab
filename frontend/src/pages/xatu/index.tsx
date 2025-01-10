@@ -1,10 +1,10 @@
-import { Link } from 'react-router-dom'
-import { ArrowRight, Database, Github } from 'lucide-react'
-import { XatuCallToAction } from '../../components/xatu/XatuCallToAction'
-import { GlobeViz } from '../../components/xatu/GlobeViz'
+import { Link, Outlet, useLocation } from 'react-router-dom'
+import { ArrowRight } from 'lucide-react'
 import { useDataFetch } from '../../utils/data'
-import { useRef, useState, useEffect } from 'react'
 import { formatDistanceToNow } from 'date-fns'
+import { useRef, useState, useEffect } from 'react'
+import { GlobeViz } from '../../components/xatu/GlobeViz'
+import { XatuCallToAction } from '../../components/xatu/XatuCallToAction'
 
 interface ConsensusImplementation {
   total_nodes: number
@@ -19,18 +19,10 @@ interface Country {
 interface NetworkData {
   total_nodes: number
   total_public_nodes: number
-  countries: {
-    [key: string]: Country
-  }
-  continents: {
-    [key: string]: Country
-  }
-  cities: {
-    [key: string]: Country
-  }
-  consensus_implementations: {
-    [key: string]: ConsensusImplementation
-  }
+  countries: Record<string, Country>
+  continents: Record<string, Country>
+  cities: Record<string, Country>
+  consensus_implementations: Record<string, ConsensusImplementation>
 }
 
 interface Summary {
@@ -42,52 +34,29 @@ interface Summary {
   }
 }
 
-const GLOBE_WIDTH_RATIO = 0.66
+const GLOBE_MIN_WIDTH = 600
 const GLOBE_PADDING = 48
-const MIN_GLOBE_WIDTH = 600
+const GLOBE_WIDTH_SCALE = 0.66
+const MS_PER_SECOND = 1000
 
-const NETWORK_METADATA = {
-  mainnet: {
-    name: 'Mainnet',
-    icon: (
-      <svg width="20" height="20" viewBox="0 0 784 784" fill="none">
-        <circle cx="392" cy="392" r="392" fill="#627EEA" fillOpacity="0.1"/>
-        <path d="M392.07 92.5L387.9 105.667V525.477L392.07 529.647L586.477 413.42L392.07 92.5Z" fill="#627EEA"/>
-        <path d="M392.07 92.5L197.666 413.42L392.07 529.647V324.921V92.5Z" fill="#627EEA"/>
-        <path d="M392.07 572.834L389.706 575.668V726.831L392.07 733.5L586.607 456.679L392.07 572.834Z" fill="#627EEA"/>
-        <path d="M392.07 733.5V572.834L197.666 456.679L392.07 733.5Z" fill="#627EEA"/>
-        <path d="M392.07 529.647L586.477 413.42L392.07 324.921V529.647Z" fill="#627EEA"/>
-        <path d="M197.666 413.42L392.07 529.647V324.921L197.666 413.42Z" fill="#627EEA"/>
-      </svg>
-    ),
-    color: '#627EEA'
-  },
-  sepolia: {
-    name: 'Sepolia',
-    icon: '🐬',
-    color: '#CFB5F0'
-  },
-  holesky: {
-    name: 'Holesky',
-    icon: '🐱',
-    color: '#A4E887'
-  }
-} as const
-
-const CLIENT_METADATA: { [key: string]: { name: string } } = {
+const CLIENT_METADATA: Record<string, { name: string }> = {
   prysm: { name: 'Prysm' },
   teku: { name: 'Teku' },
   lighthouse: { name: 'Lighthouse' },
   lodestar: { name: 'Lodestar' },
-  nimbus: { name: 'Nimbus' }
-}
+  nimbus: { name: 'Nimbus' },
+};
 
-export const Xatu = (): JSX.Element => {
+function Xatu(): JSX.Element {
+  const location = useLocation()
   const containerReference = useRef<HTMLDivElement>(null)
   const [containerWidth, setContainerWidth] = useState(0)
+  const { data: summaryData } = useDataFetch<Summary>('xatu-public-contributors/summary.json')
 
   useEffect(() => {
-    if (!containerReference.current) return
+    if (!containerReference.current) {
+      return
+    }
 
     setContainerWidth(containerReference.current.offsetWidth)
 
@@ -99,9 +68,16 @@ export const Xatu = (): JSX.Element => {
     return () => observer.disconnect()
   }, [])
 
-  const { data: summaryData } = useDataFetch<Summary>(
-    'xatu-public-contributors/summary.json'
-  )
+  // If we're on a nested route, render the child route
+  if (location.pathname !== '/xatu') {
+    return (
+      <div className="space-y-8">
+        <div className="bg-gray-900/80 backdrop-blur-md rounded-lg p-6 border border-gray-800 shadow-xl">
+          <Outlet />
+        </div>
+      </div>
+    )
+  }
 
   if (!summaryData) {
     return <div>Loading...</div>
@@ -109,20 +85,33 @@ export const Xatu = (): JSX.Element => {
 
   // Transform summary data for the globe - use mainnet data for the globe
   const globeData = [{
-    time: Date.now() / 1000,
+    time: Date.now() / MS_PER_SECOND,
     countries: Object.entries(summaryData.networks.mainnet.countries).map(([name, data]) => ({
       name,
       value: data.total_nodes
-    }))
+    })),
   }]
 
   // Calculate total nodes across all networks
-  const totalNodes = Object.values(summaryData.networks).reduce((acc, network) => acc + network.total_nodes, 0)
-  const totalPublicNodes = Object.values(summaryData.networks).reduce((acc, network) => acc + network.total_public_nodes, 0)
-  const totalethPandaOpsNodes = totalNodes - totalPublicNodes
+  const totalNodes = Object.values(summaryData.networks).reduce((accumulator, network) => accumulator + network.total_nodes, 0)
+  const totalPublicNodes = Object.values(summaryData.networks).reduce((accumulator, network) => accumulator + network.total_public_nodes, 0)
+
+  // Calculate client distribution for mainnet
+  const clientDistribution = Object.entries(summaryData.networks.mainnet.consensus_implementations)
+    .map(([client, data]) => ({
+      name: CLIENT_METADATA[client]?.name || client,
+      value: data.total_nodes,
+      publicValue: data.public_nodes,
+    }))
+    .sort((a, b) => b.value - a.value);
+
+  const totalMainnetNodes = summaryData.networks.mainnet.total_nodes;
 
   return (
     <div className="space-y-8" ref={containerReference}>
+      <div className="mt-8">
+        <XatuCallToAction />
+      </div>
       {/* Overview Section */}
       <div className="bg-gray-900/80 backdrop-blur-md rounded-lg p-6 border border-gray-800 shadow-xl mb-8">
         <div className="flex flex-col mb-6">
@@ -130,15 +119,14 @@ export const Xatu = (): JSX.Element => {
           <span className="text-gray-400 text-sm">
             Last 24h · Updated{' '}
             <span 
-              title={new Date(summaryData.updated_at * 1000).toString()}
+              title={new Date(summaryData.updated_at * MS_PER_SECOND).toString()}
               className="cursor-help border-b border-dotted border-gray-500"
             >
-              {formatDistanceToNow(new Date(summaryData.updated_at * 1000), { addSuffix: true })}
+              {formatDistanceToNow(new Date(summaryData.updated_at * MS_PER_SECOND), { addSuffix: true })}
             </span>
           </span>
           <p className="text-gray-300 mt-4">
-            This data provides a summary of the nodes that are sending the ethPandaOps team data from their nodes.
-            While the ethPandaOps team runs our own nodes, the data from community nodes is far more valuable.
+            This data shows nodes sending data to ethPandaOps. While we run our own nodes, community-contributed data is most valuable.
           </p>
         </div>
         
@@ -148,7 +136,7 @@ export const Xatu = (): JSX.Element => {
           <div className="lg:col-span-2">
             <GlobeViz 
               data={globeData} 
-              width={Math.max((containerWidth * 0.66) - GLOBE_PADDING, MIN_GLOBE_WIDTH)} 
+              width={Math.max((containerWidth * GLOBE_WIDTH_SCALE) - GLOBE_PADDING, GLOBE_MIN_WIDTH)} 
               height={400} 
             />
           </div>
@@ -171,9 +159,9 @@ export const Xatu = (): JSX.Element => {
               </div>
 
               <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700 flex flex-col h-28">
-                <div className="text-gray-400 text-xs uppercase tracking-wider text-left">Consensus Clients</div>
+                <div className="text-gray-400 text-xs uppercase tracking-wider text-left">Public Nodes</div>
                 <div className="text-3xl font-bold text-cyan-400 mt-2 text-center flex-grow flex items-center justify-center">
-                  {Object.keys(summaryData.networks.mainnet.consensus_implementations).length}
+                  {totalPublicNodes.toLocaleString()}
                 </div>
               </div>
 
@@ -183,23 +171,10 @@ export const Xatu = (): JSX.Element => {
                   {Object.keys(summaryData.networks.mainnet.countries).length}
                 </div>
               </div>
-
-              <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700 flex flex-col h-28">
-                <div className="text-gray-400 text-xs uppercase tracking-wider text-left">Cities</div>
-                <div className="text-3xl font-bold text-cyan-400 mt-2 text-center flex-grow flex items-center justify-center">
-                  {Object.entries(summaryData.networks.mainnet.cities).filter(([name]) => name !== '').length}
-                </div>
-              </div>
-
-              <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700 flex flex-col h-28">
-                <div className="text-gray-400 text-xs uppercase tracking-wider text-left">Continents</div>
-                <div className="text-3xl font-bold text-cyan-400 mt-2 text-center flex-grow flex items-center justify-center">
-                  {Object.keys(summaryData.networks.mainnet.continents).length}
-                </div>
-              </div>
             </div>
           </div>
         </div>
+
 
         {/* Navigation Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -208,7 +183,7 @@ export const Xatu = (): JSX.Element => {
               <div className="flex-shrink-0 text-4xl text-gray-200 mt-0.5">👥</div>
               <div className="flex flex-col flex-grow">
                 <h3 className="text-xl font-semibold text-cyan-400 mb-2">Contributors</h3>
-                <p className="text-gray-300 text-sm">View information about the individual contributors to the Xatu dataset</p>
+                <p className="text-gray-300 text-sm">View information about the individual contributors</p>
               </div>
             </div>
             <button type="button" className="mt-6 w-full py-3 px-4 bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/20 hover:border-cyan-500/30 rounded-lg text-cyan-400 font-medium transition-all flex items-center justify-center gap-2 group-hover:bg-cyan-500/20">
@@ -222,7 +197,7 @@ export const Xatu = (): JSX.Element => {
               <div className="flex-shrink-0 text-4xl text-gray-200 mt-0.5">🌐</div>
               <div className="flex flex-col flex-grow">
                 <h3 className="text-xl font-semibold text-cyan-400 mb-2">Networks</h3>
-                <p className="text-gray-300 text-sm">Explore the networks that are in the Xatu dataset</p>
+                <p className="text-gray-300 text-sm">Explore the networks in the Xatu dataset</p>
               </div>
             </div>
             <button type="button" className="mt-6 w-full py-3 px-4 bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/20 hover:border-cyan-500/30 rounded-lg text-cyan-400 font-medium transition-all flex items-center justify-center gap-2 group-hover:bg-cyan-500/20">
@@ -236,7 +211,7 @@ export const Xatu = (): JSX.Element => {
               <div className="flex-shrink-0 text-4xl text-gray-200 mt-0.5">🖥️</div>
               <div className="flex flex-col flex-grow">
                 <h3 className="text-xl font-semibold text-cyan-400 mb-2">Community Nodes</h3>
-                <p className="text-gray-300 text-sm">Explore the community nodes contributing to the Xatu dataset</p>
+                <p className="text-gray-300 text-sm">Explore the community nodes in the dataset</p>
               </div>
             </div>
             <button type="button" className="mt-6 w-full py-3 px-4 bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/20 hover:border-cyan-500/30 rounded-lg text-cyan-400 font-medium transition-all flex items-center justify-center gap-2 group-hover:bg-cyan-500/20">
@@ -247,5 +222,7 @@ export const Xatu = (): JSX.Element => {
         </div>
       </div>
     </div>
-  )
-} 
+  );
+}
+
+export default Xatu; 

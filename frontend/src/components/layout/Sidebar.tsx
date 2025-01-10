@@ -21,26 +21,22 @@ interface SidebarItem {
   }[]
 }
 
-const sidebarItems: SidebarItem[] = [
+export const sidebarItems = [
+  { name: 'Home', path: '/' },
+  { name: 'About', path: '/about' },
   {
-    name: 'Experiments',
-    path: '/experiments',
-    items: [
-      { 
-        name: 'Xatu Contributors',
-        path: '/experiments/xatu-contributors',
-        items: [
-          { name: 'Community Nodes', path: '/experiments/xatu-contributors/community-nodes' },
-          { name: 'Contributors', path: '/experiments/xatu-contributors/contributors' },
-        ]
-      }
+    name: 'Xatu Contributors',
+    path: '/xatu-contributors',
+    children: [
+      { name: 'Community Nodes', path: '/xatu-contributors/community-nodes' },
+      { name: 'Contributors', path: '/xatu-contributors/contributors' },
     ],
   },
 ]
 
 export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
   const location = useLocation()
-  const showSidebar = location.pathname.startsWith('/experiments')
+  const showSidebar = location.pathname.startsWith('/xatu-contributors')
 
   if (!showSidebar) {
     return null

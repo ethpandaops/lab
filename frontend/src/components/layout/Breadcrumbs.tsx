@@ -4,31 +4,23 @@ import { ChevronRight } from 'lucide-react';
 interface NavItem {
   name: string;
   path: string;
-  items?: NavItem[];
+  children?: NavItem[];
 }
 
-const navItems: NavItem[] = [
+export const breadcrumbs = [
   { name: 'Home', path: '/' },
   { name: 'About', path: '/about' },
-  { 
-    name: 'Experiments', 
-    path: '/experiments',
-    items: [
-      { 
-        name: 'Xatu Contributors',
-        path: '/experiments/xatu-contributors',
-        items: [
-          { name: 'Community Nodes', path: '/experiments/xatu-contributors/community-nodes' },
-          { name: 'Networks', path: '/experiments/xatu-contributors/networks' },
-          { 
-            name: 'Contributors', 
-            path: '/experiments/xatu-contributors/contributors',
-            items: [
-              { name: ':name', path: '/experiments/xatu-contributors/contributors/:name' }
-            ]
-          },
-        ],
-      },
+  {
+    name: 'Xatu',
+    path: '/xatu',
+    children: [
+      { name: 'Community Nodes', path: '/xatu/community-nodes' },
+      { name: 'Networks', path: '/xatu/networks' },
+      { name: 'Contributors', path: '/xatu/contributors',
+        children: [
+          { name: ':name', path: '/xatu/contributors/:name' }
+        ]
+      }
     ],
   },
 ];
@@ -62,8 +54,8 @@ function findActivePath(pathname: string, items: NavItem[]): NavItem[] {
     // Check for parent routes
     const isParentRoute = pathname.startsWith(item.path + '/');
     
-    if (isParentRoute && item.items) {
-      const childPath = findActivePath(pathname, item.items);
+    if (isParentRoute && item.children) {
+      const childPath = findActivePath(pathname, item.children);
       if (childPath.length > 0) {
         return [item, ...childPath];
       }
@@ -75,39 +67,43 @@ function findActivePath(pathname: string, items: NavItem[]): NavItem[] {
 export function Breadcrumbs(): JSX.Element {
   const location = useLocation();
   const params = useParams();
-  const activePath = findActivePath(location.pathname, navItems);
-  const home = navItems.find(item => item.path === '/');
+  const activePath = findActivePath(location.pathname, breadcrumbs);
+
+  // Replace dynamic parameters with actual values
+  const processedPath = activePath.map(item => {
+    if (item.name.startsWith(':')) {
+      const paramName = item.name.slice(1);
+      return { ...item, name: params[paramName] || item.name };
+    }
+    return item;
+  });
+
+  // Always include home unless we're already on the home page
+  const finalPath = location.pathname === '/' 
+    ? processedPath 
+    : [breadcrumbs[0], ...processedPath];
 
   return (
-    <div className="flex items-center gap-2 text-sm mb-6">
-      <div className="flex items-center">
-        <Link
-          to="/"
-          className={`transition-colors ${
-            location.pathname === '/'
-              ? 'text-cyan-400'
-              : 'text-gray-400 hover:text-gray-300'
-          }`}
-        >
-          Home
-        </Link>
-      </div>
-
-      {activePath.filter(item => item.path !== '/').map((item, index) => (
-        <div key={item.path} className="flex items-center">
-          <ChevronRight className="w-4 h-4 mx-2 text-gray-600" />
-          <Link
-            to={item.path.includes(':') ? item.path.replace(':name', params.name || '') : item.path}
-            className={`transition-colors ${
-              index === activePath.filter(i => i.path !== '/').length - 1
-                ? 'text-cyan-400'
-                : 'text-gray-400 hover:text-gray-300'
-            }`}
-          >
-            {item.path.includes(':') ? params.name : item.name}
-          </Link>
-        </div>
-      ))}
-    </div>
+    <nav className="flex" aria-label="Breadcrumb">
+      <ol className="flex items-center space-x-2">
+        {finalPath.map((item, index) => (
+          <li key={item.path} className="flex items-center">
+            {index > 0 && (
+              <ChevronRight className="w-4 h-4 text-gray-500 mx-2" />
+            )}
+            <Link
+              to={item.path}
+              className={`text-sm font-medium hover:text-cyan-400 transition-colors ${
+                index === finalPath.length - 1
+                  ? 'text-cyan-400'
+                  : 'text-gray-400'
+              }`}
+            >
+              {item.name}
+            </Link>
+          </li>
+        ))}
+      </ol>
+    </nav>
   );
 } 

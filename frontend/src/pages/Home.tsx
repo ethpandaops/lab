@@ -1,116 +1,143 @@
 import { Link } from 'react-router-dom'
-import { ArrowRight, Beaker, Database, Server, Activity } from 'lucide-react'
+import { Beaker, ArrowRight } from 'lucide-react'
 
-export const Home = () => {
+interface ExperimentLink {
+  title: string;
+  description: string;
+  href: string;
+}
+
+interface ExperimentGroup {
+  id: string;
+  title: string;
+  subtitle: string;
+  logo: string;
+  overview: ExperimentLink;
+  links: ExperimentLink[];
+}
+
+const experimentGroups: ExperimentGroup[] = [
+  {
+    id: 'xatu',
+    title: 'Xatu',
+    subtitle: 'Check out the data that the Xatu project is collecting',
+    logo: '/xatu.png',
+    overview: {
+      title: 'Overview',
+      description: 'Explore the Xatu project and its data',
+      href: '/xatu',
+    },
+    links: [
+      {
+        title: 'Community Nodes',
+        description: 'Explore the nodes run by the community',
+        href: '/xatu/community-nodes',
+      },
+      {
+        title: 'Networks',
+        description: 'Check out the networks that Xatu is monitoring',
+        href: '/xatu/networks',
+      },
+      {
+        title: 'Contributors',
+        description: 'Learn more about those who are contributing to the Xatu project',
+        href: '/xatu/contributors',
+      },
+    ],
+  },
+];
+
+function Home(): JSX.Element {
   return (
-    <div className="space-y-12 max-w-6xl mx-auto">
+    <div className="space-y-8">
       {/* Hero Section */}
       <div className="relative rounded-2xl overflow-hidden bg-gray-900/80 backdrop-blur-md border border-gray-800">
         <div className="absolute inset-0">
-          <img src="/header.png" alt="Header" className="w-full h-full object-cover" />
+          <img src="/header.png" alt="Header" className="w-full h-full object-cover opacity-50" />
         </div>
-        <div className="absolute inset-0 bg-black/75" />
         <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/30 via-transparent to-purple-500/30" />
         <div className="relative p-6 md:p-12">
-          <div className="text-center md:text-left max-w-6xl mx-auto">
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-3 md:mb-4">The Lab</h1>
-            <p className="text-lg md:text-xl text-gray-300 max-w-3xl mb-4">
-              The Lab is our experimental platform for exploring Ethereum data. We collect data from various sources 
-              and present it in a way that is easy to understand.
+          <div className="text-center md:text-left max-w-4xl">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6">The Lab</h1>
+            <p className="text-xl md:text-2xl font-mono text-cyan-400 italic">
+              &quot;Let the pandas cook 🐼👨‍🍳&quot;
             </p>
-            <p className="text-2xl font-mono text-cyan-400 italic opacity-75">&quot;Let the pandas cook 🐼👨‍🍳&quot;</p>
-          </div>
-          <div className="flex flex-wrap justify-center md:justify-start gap-4 mt-6">
-            <Link
-              to="/experiments"
-              className="inline-flex items-center px-6 py-3 text-base font-medium text-white bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/50 rounded-lg transition-all hover:scale-105"
-            >
-              View Experiments
-              <ArrowRight className="ml-2 h-5 w-5" />
-            </Link>
           </div>
         </div>
       </div>
 
-      {/* Features Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-gray-900/80 backdrop-blur-md rounded-lg p-6 border border-gray-800">
-          <div className="w-12 h-12 rounded-lg bg-cyan-500/10 flex items-center justify-center mb-4">
-            <Database className="h-6 w-6 text-cyan-400" />
+      {/* Experiments Section */}
+      <div className="bg-gray-900/80 backdrop-blur-md rounded-xl p-4 md:p-6 border border-gray-800">
+        <div className="flex items-center gap-4 mb-8">
+          <div className="w-12 h-12 rounded-lg bg-cyan-500/10 flex items-center justify-center flex-shrink-0">
+            <Beaker className="w-6 h-6 text-cyan-400" />
           </div>
-          <h3 className="text-lg font-semibold text-white mb-2">Observability</h3>
-          <p className="text-gray-300">
-            The Lab provides observability into the networks we're running. From devnet-0 to mainnet, we've got you covered.
-          </p>
+          <div>
+            <h3 className="text-lg font-semibold text-white">Experiments</h3>
+            <p className="text-gray-400 text-sm">Explore our experimental features and projects</p>
+          </div>
         </div>
 
-        <div className="bg-gray-900/80 backdrop-blur-md rounded-lg p-6 border border-gray-800">
-          <div className="w-12 h-12 rounded-lg bg-cyan-500/10 flex items-center justify-center mb-4">
-            <Beaker className="h-6 w-6 text-cyan-400" />
-          </div>
-          <h3 className="text-lg font-semibold text-white mb-2">Experimental Platform</h3>
-          <p className="text-gray-300">
-            A space for testing new ideas, visualizing data, and exploring the Ethereum network in new ways.
-          </p>
-        </div>
+        <div className="space-y-12">
+          {experimentGroups.map((group) => (
+            <div key={group.id} className="space-y-6">
+              {/* Group Header */}
+              <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
+                <div className="w-40 h-40 rounded-2xl bg-gray-900/50 flex items-center justify-center flex-shrink-0 relative group/logo">
+                  <div className="relative">
+                    <div className="absolute inset-0 w-32 h-32 animate-pulse-slow">
+                      <img 
+                        src={group.logo} 
+                        alt="" 
+                        className="w-full h-full object-contain opacity-50 blur-md brightness-200"
+                        style={{ filter: 'brightness(2) drop-shadow(0 0 8px rgb(6 182 212 / 1))' }}
+                      />
+                    </div>
+                    <img 
+                      src={group.logo} 
+                      alt="" 
+                      className="relative w-32 h-32 object-contain transition-transform duration-300 group-hover/logo:scale-110"
+                      style={{ filter: 'drop-shadow(0 0 4px rgb(6 182 212 / 0.7))' }}
+                    />
+                  </div>
+                </div>
+                <div className="flex-1 min-w-0 space-y-4 text-center md:text-left">
+                  <div>
+                    <h3 className="text-3xl md:text-4xl font-black text-white tracking-tight">{group.title}</h3>
+                    <p className="text-gray-400 mt-2 text-base md:text-lg">{group.subtitle}</p>
+                  </div>
+                  <Link
+                    to={group.overview.href}
+                    className="group inline-flex items-center gap-3 px-6 py-3 bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/20 hover:border-cyan-500/30 rounded-lg text-cyan-400 font-medium transition-all"
+                  >
+                    <span>View {group.title}</span>
+                    <ArrowRight className="w-5 h-5 group-hover:translate-x-0.5 transition-transform" />
+                  </Link>
+                </div>
+              </div>
 
-
-        <div className="bg-gray-900/80 backdrop-blur-md rounded-lg p-6 border border-gray-800">
-          <div className="w-12 h-12 rounded-lg bg-cyan-500/10 flex items-center justify-center mb-4">
-            <Activity className="h-6 w-6 text-cyan-400" />
-          </div>
-          <h3 className="text-lg font-semibold text-white mb-2">Network Analytics</h3>
-          <p className="text-gray-300">
-            Explore network health and performance through dynamic data visualizations.
-          </p>
-        </div>
-      </div>
-
-      {/* Current Experiments */}
-      <div className="bg-gray-900/80 backdrop-blur-md rounded-lg p-8 border border-gray-800">
-        <h2 className="text-2xl font-bold text-white mb-6">Current Experiments</h2>
-        <div className="prose prose-invert max-w-none">
-          <div className="flex items-start gap-4 mb-6">
-            <div className="w-8 h-8 rounded-lg bg-cyan-500/10 flex items-center justify-center flex-shrink-0 mt-1">
-              <Server className="h-4 w-4 text-cyan-400" />
+              {/* Group Links */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+                {group.links.map((link) => (
+                  <Link
+                    key={link.href}
+                    to={link.href}
+                    className="group relative bg-gray-800/50 rounded-lg p-4 md:p-6 border border-gray-700 hover:border-cyan-500/50 transition-all"
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 via-purple-500/10 to-cyan-500/10 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <div className="relative">
+                      <h3 className="text-lg font-semibold text-cyan-400 mb-2">{link.title}</h3>
+                      <p className="text-gray-300">{link.description}</p>
+                    </div>
+                  </Link>
+                ))}
+              </div>
             </div>
-            <div>
-              <h3 className="text-lg font-semibold text-white mt-0">Xatu Community Nodes</h3>
-              <p className="text-gray-300 mt-2">
-                A comprehensive dataset containing detailed information about the Ethereum network, including beacon chain events, mempool activity, and canonical chain events. Xatu helps monitor network health, and provide insights into network behavior.
-              </p>
-              <Link
-                to="/experiments/xatu-community-nodes"
-                className="inline-flex items-center mt-2 text-cyan-400 hover:text-cyan-300"
-              >
-                Learn more about Xatu Community Nodes
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Link>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* About ethPandaOps */}
-      <div className="bg-gray-900/80 backdrop-blur-md rounded-lg p-8 border border-gray-800">
-        <h2 className="text-2xl font-bold text-white mb-6">About ethPandaOps</h2>
-        <div className="prose prose-invert max-w-none">
-          <p className="text-gray-300">
-            ethPandaOps is dedicated to supporting and improving the Ethereum ecosystem through tooling, monitoring, and data analysis. The Lab is one of our initiatives to make network data more accessible and understandable to the community.
-          </p>
-          <div className="flex flex-wrap gap-4 mt-6">
-            <a
-              href="https://ethpandaops.io"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center px-6 py-3 text-base font-medium text-gray-300 hover:text-white bg-gray-800/50 hover:bg-gray-800 border border-gray-700 rounded-lg transition-all hover:scale-105"
-            >
-              Visit ethPandaOps
-              <ArrowRight className="ml-2 h-5 w-5" />
-            </a>
-          </div>
+          ))}
         </div>
       </div>
     </div>
-  )
-} 
+  );
+}
+
+export default Home; 

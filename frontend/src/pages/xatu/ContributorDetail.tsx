@@ -2,6 +2,8 @@ import { useParams } from 'react-router-dom';
 import { useDataFetch } from '../../utils/data';
 import { LoadingState } from '../../components/common/LoadingState';
 import { ErrorState } from '../../components/common/ErrorState';
+import { formatDistanceToNow } from 'date-fns';
+import { XatuCallToAction } from '../../components/xatu/XatuCallToAction';
 
 interface ContributorNode {
   network: string;
@@ -18,6 +20,7 @@ interface ContributorNode {
 interface ContributorData {
   name: string;
   nodes: ContributorNode[];
+  updated_at: number;
 }
 
 type NetworkNodes = Record<string, ContributorNode[]>;
@@ -53,6 +56,27 @@ const NETWORK_METADATA = {
   },
 } as const;
 
+// Function to generate a deterministic color from a string
+const stringToColor = (str: string) => {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = str.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  const hue = hash % 360;
+  return `hsl(${hue}, 70%, 60%)`;
+};
+
+// Function to generate initials from a string
+const getInitials = (name: string) => {
+  return name
+    .split(/[^a-zA-Z0-9]/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map(word => word[0])
+    .join('')
+    .toUpperCase();
+};
+
 function getShortNodeName(fullName: string): string {
   const parts = fullName.split('/');
   const lastPart = parts.at(-1) ?? '';
@@ -68,9 +92,8 @@ function capitalizeWords(input: string): string {
   )).join(' ');
 }
 
-function isNodeOffline(node: ContributorNode): boolean {
-  const now = Math.floor(Date.now() / 1000);
-  return now - node.latest_slot_start_date_time > OFFLINE_THRESHOLD;
+function isNodeOffline(node: ContributorNode, updatedAt: number): boolean {
+  return updatedAt - node.latest_slot_start_date_time > OFFLINE_THRESHOLD;
 }
 
 function ContributorDetail(): JSX.Element {
@@ -110,86 +133,118 @@ function ContributorDetail(): JSX.Element {
     return aIndex - bIndex;
   });
 
+  const avatarColor = stringToColor(contributor.name);
+  const initials = getInitials(contributor.name);
+
   return (
     <div className="space-y-8">
-      <div className="bg-gray-900/80 backdrop-blur-md rounded-lg p-6 border border-gray-800 shadow-xl">
-        <h2 className="text-xl font-semibold text-cyan-400 mb-2">{contributor.name}</h2>
-        <p className="text-gray-300 mb-6">
-          Details about the nodes operated by this contributor.
-        </p>
+      <XatuCallToAction />
 
-        <div className="space-y-8">
-          {sortedNetworks.map(([network, nodes]) => {
-            const metadata = NETWORK_METADATA[network as keyof typeof NETWORK_METADATA] || {
-              name: network,
-              icon: '🔥',
-              color: '#627EEA',
-            };
-            return (
-              <div key={network}>
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-6 h-6 flex items-center justify-center">
+      <div className="flex items-start gap-6 mb-8">
+        <div 
+          className="w-20 h-20 rounded-2xl flex items-center justify-center text-2xl font-bold text-white"
+          style={{ 
+            backgroundColor: avatarColor,
+            boxShadow: `0 0 20px ${avatarColor}33`,
+          }}
+        >
+          {initials}
+        </div>
+        <div>
+          <h2 className="text-2xl font-bold text-white mb-2">{contributor.name}</h2>
+          <div className="text-sm text-gray-400 mb-3">
+            Updated {formatDistanceToNow(new Date(contributor.updated_at * 1000), { addSuffix: true })}
+          </div>
+          <div className="flex flex-wrap gap-3">
+            {sortedNetworks.map(([network, nodes]) => {
+              const metadata = NETWORK_METADATA[network as keyof typeof NETWORK_METADATA] || {
+                name: network.charAt(0).toUpperCase() + network.slice(1),
+                icon: '🔥',
+              };
+              return (
+                <div key={network} className="flex items-center gap-2 bg-gray-800/50 rounded-lg px-3 py-1.5 text-sm">
+                  <span className="w-5 h-5 flex items-center justify-center">
                     {metadata.icon}
-                  </div>
-                  <h3 className="text-lg font-medium text-gray-200 capitalize">
-                    {metadata.name}
-                  </h3>
+                  </span>
+                  <span className="text-gray-300">{metadata.name}</span>
+                  <span className="text-cyan-400 font-medium">{nodes.length} nodes</span>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {nodes.map((node) => {
-                    const offline = isNodeOffline(node);
-                    const shortName = getShortNodeName(node.client_name);
-                    return (
-                      <div
-                        key={node.client_name}
-                        className={`bg-gray-800/50 rounded-lg p-4 border transition-colors ${
-                          offline ? 'border-red-900/50' : 'border-gray-700 hover:border-gray-600'
-                        }`}
-                      >
-                        <div className="flex items-center gap-3 mb-3">
-                          <img
-                            src={`/clients/${node.consensus_client}.png`}
-                            alt={`${node.consensus_client} logo`}
-                            className="w-6 h-6 object-contain"
-                            onError={(e) => {
-                              const target = e.currentTarget;
-                              target.style.display = 'none';
-                            }}
-                          />
-                          <div className="min-w-0">
-                            <div className="font-medium text-gray-200 truncate">
-                              {shortName}
-                            </div>
-                            <div className="text-sm text-gray-400">
-                              {capitalizeWords(node.consensus_client)}
-                              {' '}
-                              ({node.consensus_version})
-                            </div>
-                          </div>
-                        </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
 
-                        <div className="space-y-2 text-sm">
-                          <div className="flex justify-between">
-                            <span className="text-gray-400">Status</span>
-                            <span className={offline ? 'text-red-400' : 'text-emerald-400'}>
-                              {offline ? 'Offline' : 'Online'}
-                            </span>
+      <div className="space-y-8">
+        {sortedNetworks.map(([network, nodes]) => {
+          const metadata = NETWORK_METADATA[network as keyof typeof NETWORK_METADATA] || {
+            name: network.charAt(0).toUpperCase() + network.slice(1),
+            icon: '🔥',
+          };
+          return (
+            <div key={network}>
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-6 h-6 flex items-center justify-center">
+                  {metadata.icon}
+                </div>
+                <h3 className="text-lg font-medium text-gray-200">
+                  {metadata.name}
+                </h3>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {nodes.map((node) => {
+                  const offline = isNodeOffline(node, contributor.updated_at);
+                  const shortName = getShortNodeName(node.client_name);
+                  return (
+                    <div
+                      key={node.client_name}
+                      className={`bg-gray-800/50 rounded-lg p-4 border transition-colors ${
+                        offline ? 'border-red-900/50' : 'border-gray-700 hover:border-gray-600'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3 mb-3">
+                        <img
+                          src={`/clients/${node.consensus_client}.png`}
+                          alt={`${node.consensus_client} logo`}
+                          className="w-6 h-6 object-contain"
+                          onError={(e) => {
+                            const target = e.currentTarget;
+                            target.style.display = 'none';
+                          }}
+                        />
+                        <div className="min-w-0">
+                          <div className="font-medium text-gray-200 truncate">
+                            {shortName}
                           </div>
-                          <div className="flex justify-between">
-                            <span className="text-gray-400">Location</span>
-                            <span className="text-gray-200">
-                              {[node.city, node.country, node.continent].filter(Boolean).join(', ')}
-                            </span>
+                          <div className="text-sm text-gray-400">
+                            {capitalizeWords(node.consensus_client)}
+                            {' '}
+                            ({node.consensus_version})
                           </div>
                         </div>
                       </div>
-                    );
-                  })}
-                </div>
+
+                      <div className="space-y-2 text-sm">
+                        <div className="flex justify-between">
+                          <span className="text-gray-400">Status</span>
+                          <span className={offline ? 'text-red-400' : 'text-emerald-400'}>
+                            {offline ? 'Offline' : 'Online'}
+                          </span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-400">Location</span>
+                          <span className="text-gray-200">
+                            {[node.city, node.country, node.continent].filter(Boolean).join(', ')}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
-            );
-          })}
-        </div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
