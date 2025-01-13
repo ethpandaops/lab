@@ -15,6 +15,8 @@ interface ContributorNode {
   continent: string;
   latest_slot: number;
   latest_slot_start_date_time: number;
+  client_implementation: string;
+  client_version: string;
 }
 
 interface ContributorData {
@@ -235,6 +237,12 @@ function ContributorDetail(): JSX.Element {
                           <span className="text-gray-400">Location</span>
                           <span className="text-gray-200">
                             {[node.city, node.country, node.continent].filter(Boolean).join(', ')}
+                          </span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-400">Implementation</span>
+                          <span className="text-gray-200">
+                            {node.client_implementation} ({node.client_version})
                           </span>
                         </div>
                       </div>
