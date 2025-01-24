@@ -135,17 +135,17 @@ function Home(): JSX.Element {
               </div>
 
               {/* Group Links */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                 {group.links.map((link) => (
                   <Link
                     key={link.href}
                     to={link.href}
-                    className="group relative bg-gray-800/50 rounded-lg p-4 md:p-6 border border-gray-700 hover:border-cyan-500/50 transition-all"
+                    className="group relative bg-gray-800/50 rounded-lg p-3 sm:p-4 border border-gray-700 hover:border-cyan-500/50 transition-all"
                   >
                     <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 via-purple-500/10 to-cyan-500/10 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity" />
                     <div className="relative">
-                      <h3 className="text-lg font-semibold text-cyan-400 mb-2">{link.title}</h3>
-                      <p className="text-gray-300">{link.description}</p>
+                      <h3 className="text-base sm:text-lg font-semibold text-cyan-400 mb-1">{link.title}</h3>
+                      <p className="text-sm sm:text-base text-gray-300">{link.description}</p>
                     </div>
                   </Link>
                 ))}

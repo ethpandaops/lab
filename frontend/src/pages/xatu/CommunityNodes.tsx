@@ -331,7 +331,7 @@ export const CommunityNodes = () => {
         </div>
 
         {/* Nodes by Country Chart */}
-        <div className="bg-gray-900/80 backdrop-blur-md rounded-lg p-4 h-[500px] border border-gray-800 shadow-xl">
+        <div className="bg-gray-900/80 backdrop-blur-md rounded-lg p-4 border border-gray-800 shadow-xl flex flex-col">
           <div className="h-[400px]">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={chartData}>
@@ -367,58 +367,60 @@ export const CommunityNodes = () => {
               </LineChart>
             </ResponsiveContainer>
           </div>
-          <div className="mt-6 flex flex-wrap gap-2">
-            {topCountries.map((country) => (
-              <button
-                key={country}
-                onClick={() => {
-                  setHiddenCountries(prev => {
-                    const next = new Set(prev)
-                    const isOnlyVisible = !next.has(country) && next.size === topCountries.length - 1
-                    const isHidden = next.has(country)
+          <div className="mt-6 overflow-y-auto" style={{ maxHeight: '6rem' }}>
+            <div className="flex flex-wrap gap-2 pb-2 pr-2">
+              {topCountries.map((country) => (
+                <button
+                  key={country}
+                  onClick={() => {
+                    setHiddenCountries(prev => {
+                      const next = new Set(prev)
+                      const isOnlyVisible = !next.has(country) && next.size === topCountries.length - 1
+                      const isHidden = next.has(country)
 
-                    // If this is the only visible country and we click it, show all
-                    if (isOnlyVisible) {
-                      next.clear()
-                    }
-                    // If the country is currently hidden, unhide it
-                    else if (isHidden) {
-                      next.delete(country)
-                    }
-                    // If we're showing all countries, hide all except this one
-                    else if (next.size === 0) {
-                      topCountries.forEach(c => {
-                        if (c !== country) next.add(c)
-                      })
-                    }
-                    // Otherwise, toggle this country's visibility
-                    else {
-                      next.add(country)
-                    }
-                    
-                    return next
-                  })
-                }}
-                className={`px-3 py-1 rounded-full text-sm flex items-center gap-2 transition-colors ${
-                  hiddenCountries.has(country)
-                    ? 'bg-gray-800 text-gray-400 hover:bg-gray-700'
-                    : 'text-gray-200 hover:text-white'
-                }`}
-                style={{
-                  backgroundColor: hiddenCountries.has(country) 
-                    ? undefined 
-                    : `${stringToColor(country)}33`,
-                  borderColor: stringToColor(country),
-                  borderWidth: 1
-                }}
-              >
-                <span
-                  className="w-2 h-2 rounded-full"
-                  style={{ backgroundColor: stringToColor(country) }}
-                />
-                {country}
-              </button>
-            ))}
+                      // If this is the only visible country and we click it, show all
+                      if (isOnlyVisible) {
+                        next.clear()
+                      }
+                      // If the country is currently hidden, unhide it
+                      else if (isHidden) {
+                        next.delete(country)
+                      }
+                      // If we're showing all countries, hide all except this one
+                      else if (next.size === 0) {
+                        topCountries.forEach(c => {
+                          if (c !== country) next.add(c)
+                        })
+                      }
+                      // Otherwise, toggle this country's visibility
+                      else {
+                        next.add(country)
+                      }
+                      
+                      return next
+                    })
+                  }}
+                  className={`px-3 py-1 rounded-full text-sm flex items-center gap-2 transition-colors ${
+                    hiddenCountries.has(country)
+                      ? 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+                      : 'text-gray-200 hover:text-white'
+                  }`}
+                  style={{
+                    backgroundColor: hiddenCountries.has(country) 
+                      ? undefined 
+                      : `${stringToColor(country)}33`,
+                    borderColor: stringToColor(country),
+                    borderWidth: 1
+                  }}
+                >
+                  <span
+                    className="w-2 h-2 rounded-full"
+                    style={{ backgroundColor: stringToColor(country) }}
+                  />
+                  {country}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
 
@@ -516,10 +518,6 @@ export const CommunityNodes = () => {
             </div>
           </div>
         </div>
-      </div>
-
-      <div className="text-sm text-gray-400">
-        Last updated: {new Date(countriesData[0].time * 1000).toLocaleString()}
       </div>
     </div>
   )

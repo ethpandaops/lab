@@ -248,18 +248,18 @@ export const BlockTimings: React.FC = () => {
       <div className="space-y-8">
         {/* Block Arrival Timing Chart */}
         <div>
-          <div className="bg-gray-900/80 backdrop-blur-md rounded-lg p-4 border border-gray-800 shadow-xl">
+          <div className="bg-gray-900/80 backdrop-blur-md rounded-lg p-4 border border-gray-800 shadow-xl flex flex-col">
             <div className="mb-4">
               <h2 className="text-2xl font-bold text-cyan-400">Block Arrival Time</h2>
               <div className="text-sm text-gray-400 mt-1">
                 Last updated: {timingData?.updated_at ? formatDistanceToNow(new Date(timingData.updated_at * TIMESTAMP_MULTIPLIER), { addSuffix: true }) : 'No data available'}
               </div>
             </div>
-            <div className="flex-grow h-[600px]">
+            <div className="flex-grow h-[500px] sm:h-[700px] pb-10">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart 
                   data={chartData}
-                  margin={{ top: 20, right: 30, left: 30, bottom: 60 }}
+                  margin={{ top: 20, right: 10, left: 10, bottom: 20 }}
                 >
                   <XAxis 
                     dataKey="time" 
@@ -269,6 +269,8 @@ export const BlockTimings: React.FC = () => {
                     angle={-45}
                     textAnchor="end"
                     height={80}
+                    interval="preserveStartEnd"
+                    tick={{ fontSize: 12 }}
                   />
                   <YAxis 
                     stroke="#94a3b8" 
@@ -292,66 +294,68 @@ export const BlockTimings: React.FC = () => {
                     formatter={(value: number) => [`${value.toFixed(DECIMAL_PLACES)}s`, '']}
                   />
                   <Legend 
-                    verticalAlign="top" 
+                    verticalAlign="bottom"
                     height={36}
                     content={({ payload }) => (
-                      <div className="flex flex-wrap gap-4 justify-center items-center text-sm">
-                        {/* Attestation Deadline */}
-                        <div className="flex items-center gap-2">
-                          <div className="w-4 h-0.5 bg-orange-500" />
-                          <span className="text-orange-500 font-semibold">Attestation Deadline (4s)</span>
-                        </div>
-                        {/* Regular legend items */}
-                        {payload?.map((entry) => (
-                          <button
-                            key={entry.value}
-                            type="button"
-                            onClick={() => {
-                              setHiddenLines(prev => {
-                                const next = new Set(prev)
-                                const allLines = ['95th Percentile', 'Median', '5th Percentile', 'Minimum']
-                                const isOnlyVisible = !next.has(entry.value) && next.size === allLines.length - 1
-                                const isHidden = next.has(entry.value)
+                      <div className="mt-2 overflow-y-auto max-h-24">
+                        <div className="flex flex-wrap gap-2 justify-start items-center text-xs pb-1">
+                          {/* Attestation Deadline */}
+                          <div className="flex items-center gap-1.5 shrink-0">
+                            <div className="w-3 h-0.5 bg-orange-500" />
+                            <span className="text-orange-500 font-semibold">Attestation Deadline (4s)</span>
+                          </div>
+                          {/* Regular legend items */}
+                          {payload?.map((entry) => (
+                            <button
+                              key={entry.value}
+                              type="button"
+                              onClick={() => {
+                                setHiddenLines(prev => {
+                                  const next = new Set(prev)
+                                  const allLines = ['95th Percentile', 'Median', '5th Percentile', 'Minimum']
+                                  const isOnlyVisible = !next.has(entry.value) && next.size === allLines.length - 1
+                                  const isHidden = next.has(entry.value)
 
-                                // If this is the only visible line and we click it, show all
-                                if (isOnlyVisible) {
-                                  next.clear()
-                                }
-                                // If the line is currently hidden, unhide it
-                                else if (isHidden) {
-                                  next.delete(entry.value)
-                                }
-                                // If we're showing all lines, hide all except this one
-                                else if (next.size === 0) {
-                                  allLines.forEach(line => {
-                                    if (line !== entry.value) next.add(line)
-                                  })
-                                }
-                                // Otherwise, toggle this line's visibility
-                                else {
-                                  next.add(entry.value)
-                                }
-                                
-                                return next
-                              })
-                            }}
-                            className={`flex items-center gap-2 px-3 py-1 rounded-full text-sm transition-colors ${
-                              hiddenLines.has(entry.value)
-                                ? 'bg-gray-800 text-gray-400 hover:bg-gray-700'
-                                : 'text-gray-200 hover:text-white'
-                            }`}
-                            style={{
-                              backgroundColor: hiddenLines.has(entry.value) 
-                                ? undefined 
-                                : `${entry.color}33`,
-                              borderColor: entry.color,
-                              borderWidth: 1
-                            }}
-                          >
-                            <div className="w-4 h-0.5" style={{ background: entry.color }} />
-                            <span>{entry.value}</span>
-                          </button>
-                        ))}
+                                  // If this is the only visible line and we click it, show all
+                                  if (isOnlyVisible) {
+                                    next.clear()
+                                  }
+                                  // If the line is currently hidden, unhide it
+                                  else if (isHidden) {
+                                    next.delete(entry.value)
+                                  }
+                                  // If we're showing all lines, hide all except this one
+                                  else if (next.size === 0) {
+                                    allLines.forEach(line => {
+                                      if (line !== entry.value) next.add(line)
+                                    })
+                                  }
+                                  // Otherwise, toggle this line's visibility
+                                  else {
+                                    next.add(entry.value)
+                                  }
+                                  
+                                  return next
+                                })
+                              }}
+                              className={`flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs transition-colors ${
+                                hiddenLines.has(entry.value)
+                                  ? 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+                                  : 'text-gray-200 hover:text-white'
+                              }`}
+                              style={{
+                                backgroundColor: hiddenLines.has(entry.value) 
+                                  ? undefined 
+                                  : `${entry.color}33`,
+                                borderColor: entry.color,
+                                borderWidth: 1
+                              }}
+                            >
+                              <div className="w-4 h-0.5" style={{ background: entry.color }} />
+                              <span>{entry.value}</span>
+                            </button>
+                          ))}
+                        </div>
                       </div>
                     )}
                   />
@@ -417,134 +421,139 @@ export const BlockTimings: React.FC = () => {
                 Last updated: {cdfData?.updated_at ? formatDistanceToNow(new Date(cdfData.updated_at * TIMESTAMP_MULTIPLIER), { addSuffix: true }) : 'No data available'}
               </div>
             </div>
-            <div className="flex-grow h-[600px]">
+            <div className="flex-grow h-[500px] sm:h-[700px] pb-10">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart
-                  margin={{ top: 20, right: 30, left: 30, bottom: 60 }}
+                  margin={{ top: 20, right: 10, left: 10, bottom: 100 }}
                 >
-                  <Legend 
-                    verticalAlign="top" 
-                    height={36}
-                    content={({ payload }) => (
-                      <div className="flex flex-wrap gap-4 justify-center items-center text-sm">
-                        {/* Attestation Deadline */}
-                        <div className="flex items-center gap-2">
-                          <div className="w-4 h-0.5 bg-orange-500" />
-                          <span className="text-orange-500 font-semibold">Attestation Deadline (4s)</span>
-                        </div>
-                        {/* Block Types */}
-                        <div className="flex items-center gap-4">
-                          <button
-                            onClick={() => setHiddenLines(prev => {
-                              const next = new Set(prev)
-                              if (next.has('all')) {
-                                next.delete('all')
-                              } else {
-                                next.add('all')
-                              }
-                              return next
-                            })}
-                            className={`flex items-center gap-2 px-3 py-1 rounded-full text-sm transition-colors ${
-                              hiddenLines.has('all')
-                                ? 'bg-gray-800 text-gray-400 hover:bg-gray-700'
-                                : 'text-gray-200 hover:text-white'
-                            }`}
-                          >
-                            <div className="w-4 h-0.5" style={{ background: '#22d3ee' }} />
-                            <span className="text-gray-300">All Blocks</span>
-                          </button>
-                          <button
-                            onClick={() => setHiddenLines(prev => {
-                              const next = new Set(prev)
-                              if (next.has('mev')) {
-                                next.delete('mev')
-                              } else {
-                                next.add('mev')
-                              }
-                              return next
-                            })}
-                            className={`flex items-center gap-2 px-3 py-1 rounded-full text-sm transition-colors ${
-                              hiddenLines.has('mev')
-                                ? 'bg-gray-800 text-gray-400 hover:bg-gray-700'
-                                : 'text-gray-200 hover:text-white'
-                            }`}
-                          >
-                            <div className="w-4 h-0.5" style={{ background: '#ef4444' }} />
-                            <span className="text-gray-300">MEV Blocks</span>
-                          </button>
-                          <button
-                            onClick={() => setHiddenLines(prev => {
-                              const next = new Set(prev)
-                              if (next.has('non_mev')) {
-                                next.delete('non_mev')
-                              } else {
-                                next.add('non_mev')
-                              }
-                              return next
-                            })}
-                            className={`flex items-center gap-2 px-3 py-1 rounded-full text-sm transition-colors ${
-                              hiddenLines.has('non_mev')
-                                ? 'bg-gray-800 text-gray-400 hover:bg-gray-700'
-                                : 'text-gray-200 hover:text-white'
-                            }`}
-                          >
-                            <div className="w-4 h-0.5" style={{ background: '#22c55e' }} />
-                            <span className="text-gray-300">Non-MEV Blocks</span>
-                          </button>
-                          <button
-                            onClick={() => setHiddenLines(prev => {
-                              const next = new Set(prev)
-                              if (next.has('solo_mev')) {
-                                next.delete('solo_mev')
-                              } else {
-                                next.add('solo_mev')
-                              }
-                              return next
-                            })}
-                            className={`flex items-center gap-2 px-3 py-1 rounded-full text-sm transition-colors ${
-                              hiddenLines.has('solo_mev')
-                                ? 'bg-gray-800 text-gray-400 hover:bg-gray-700'
-                                : 'text-gray-200 hover:text-white'
-                            }`}
-                          >
-                            <div className="w-4 h-0.5" style={{ background: '#f472b6' }} />
-                            <span className="text-gray-300">Solo MEV</span>
-                          </button>
-                          <button
-                            onClick={() => setHiddenLines(prev => {
-                              const next = new Set(prev)
-                              if (next.has('solo_non_mev')) {
-                                next.delete('solo_non_mev')
-                              } else {
-                                next.add('solo_non_mev')
-                              }
-                              return next
-                            })}
-                            className={`flex items-center gap-2 px-3 py-1 rounded-full text-sm transition-colors ${
-                              hiddenLines.has('solo_non_mev')
-                                ? 'bg-gray-800 text-gray-400 hover:bg-gray-700'
-                                : 'text-gray-200 hover:text-white'
-                            }`}
-                          >
-                            <div className="w-4 h-0.5" style={{ background: '#fbbf24' }} />
-                            <span className="text-gray-300">Solo Non-MEV</span>
-                          </button>
-                        </div>
-                      </div>
-                    )}
-                  />
                   <XAxis 
                     dataKey="size" 
                     stroke="#94a3b8"
                     label={{ 
                       value: 'Combined Block+Blob Size (KB)', 
-                      position: 'bottom',
-                      offset: 20,
+                      position: 'insideBottom',
+                      offset: -60,
                       style: { fill: '#94a3b8' }
                     }}
                     type="number"
                     domain={[0, 1536]}
                     tickFormatter={(value) => value.toFixed(0)}
+                  />
+                  <Legend 
+                    verticalAlign="bottom"
+                    height={80}
+                    wrapperStyle={{
+                      bottom: -80
+                    }}
+                    content={({ payload }) => (
+                      <div className="mt-8 overflow-y-auto max-h-24">
+                        <div className="flex flex-wrap gap-1.5 justify-start items-center text-xs">
+                          {/* Attestation Deadline */}
+                          <div className="flex items-center gap-1.5 shrink-0">
+                            <div className="w-3 h-0.5 bg-orange-500" />
+                            <span className="text-orange-500 font-semibold">Attestation Deadline (4s)</span>
+                          </div>
+                          {/* Block Types */}
+                          <div className="flex flex-wrap items-center gap-2 shrink-0">
+                            <button
+                              onClick={() => setHiddenLines(prev => {
+                                const next = new Set(prev)
+                                if (next.has('all')) {
+                                  next.delete('all')
+                                } else {
+                                  next.add('all')
+                                }
+                                return next
+                              })}
+                              className={`flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs transition-colors ${
+                                hiddenLines.has('all')
+                                  ? 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+                                  : 'text-gray-200 hover:text-white'
+                              }`}
+                            >
+                              <div className="w-4 h-0.5" style={{ background: '#22d3ee' }} />
+                              <span className="text-gray-300">All Blocks</span>
+                            </button>
+                            <button
+                              onClick={() => setHiddenLines(prev => {
+                                const next = new Set(prev)
+                                if (next.has('mev')) {
+                                  next.delete('mev')
+                                } else {
+                                  next.add('mev')
+                                }
+                                return next
+                              })}
+                              className={`flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs transition-colors ${
+                                hiddenLines.has('mev')
+                                  ? 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+                                  : 'text-gray-200 hover:text-white'
+                              }`}
+                            >
+                              <div className="w-4 h-0.5" style={{ background: '#ef4444' }} />
+                              <span className="text-gray-300">MEV Blocks</span>
+                            </button>
+                            <button
+                              onClick={() => setHiddenLines(prev => {
+                                const next = new Set(prev)
+                                if (next.has('non_mev')) {
+                                  next.delete('non_mev')
+                                } else {
+                                  next.add('non_mev')
+                                }
+                                return next
+                              })}
+                              className={`flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs transition-colors ${
+                                hiddenLines.has('non_mev')
+                                  ? 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+                                  : 'text-gray-200 hover:text-white'
+                              }`}
+                            >
+                              <div className="w-4 h-0.5" style={{ background: '#22c55e' }} />
+                              <span className="text-gray-300">Non-MEV Blocks</span>
+                            </button>
+                            <button
+                              onClick={() => setHiddenLines(prev => {
+                                const next = new Set(prev)
+                                if (next.has('solo_mev')) {
+                                  next.delete('solo_mev')
+                                } else {
+                                  next.add('solo_mev')
+                                }
+                                return next
+                              })}
+                              className={`flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs transition-colors ${
+                                hiddenLines.has('solo_mev')
+                                  ? 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+                                  : 'text-gray-200 hover:text-white'
+                              }`}
+                            >
+                              <div className="w-4 h-0.5" style={{ background: '#f472b6' }} />
+                              <span className="text-gray-300">Solo MEV</span>
+                            </button>
+                            <button
+                              onClick={() => setHiddenLines(prev => {
+                                const next = new Set(prev)
+                                if (next.has('solo_non_mev')) {
+                                  next.delete('solo_non_mev')
+                                } else {
+                                  next.add('solo_non_mev')
+                                }
+                                return next
+                              })}
+                              className={`flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs transition-colors ${
+                                hiddenLines.has('solo_non_mev')
+                                  ? 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+                                  : 'text-gray-200 hover:text-white'
+                              }`}
+                            >
+                              <div className="w-4 h-0.5" style={{ background: '#fbbf24' }} />
+                              <span className="text-gray-300">Solo Non-MEV</span>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   />
                   <YAxis 
                     dataKey="arrival_time"
