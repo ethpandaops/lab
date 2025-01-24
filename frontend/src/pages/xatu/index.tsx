@@ -72,7 +72,7 @@ function Xatu(): JSX.Element {
   if (location.pathname !== '/xatu') {
     return (
       <div>
-        <div className="bg-gray-900/80 backdrop-blur-md rounded-lg p-6 border border-gray-800 shadow-xl">
+        <div>
           <Outlet />
         </div>
       </div>
