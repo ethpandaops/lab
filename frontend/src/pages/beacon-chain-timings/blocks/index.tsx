@@ -186,10 +186,10 @@ export const BlockTimings: React.FC = () => {
   }
 
   return (
-    <div className="space-y-8">
-      <div className="bg-gray-900/80 backdrop-blur-md rounded-lg p-6 border border-gray-800 shadow-xl mb-8">
-        <h2 className="text-xl font-semibold text-cyan-400 mb-2">About This Data</h2>
-        <p className="text-gray-300">
+    <>
+      <div className="bg-gray-900/80 backdrop-blur-md rounded-lg p-3 border border-gray-800 shadow-xl">
+        <h2 className="text-lg md:text-xl font-semibold text-cyan-400 mb-1">About This Data</h2>
+        <p className="text-sm md:text-base text-gray-300">
           This data shows timing data for blocks on the beacon chain. The data is updated hourly and aggregated in {timeWindows.map((w, i) => (
             <span key={w.file}>
               {w.step} intervals for the {w.label} view{i < timeWindows.length - 1 ? ', and ' : ''}
@@ -198,33 +198,36 @@ export const BlockTimings: React.FC = () => {
         </p>
       </div>
 
-      <div className="flex justify-end gap-4 mb-8">
-        <NetworkSelector
-          selectedNetwork={network}
-          onNetworkChange={setNetwork}
-        />
-        <div className="relative">
-          <button
-            type="button"
-            onClick={() => setIsTimeWindowOpen(!isTimeWindowOpen)}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-800 text-gray-300 border border-gray-700 hover:border-gray-600 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <span>{currentWindow?.label || 'Select Time'}</span>
-            <svg 
-              className={`w-4 h-4 transition-transform ${isTimeWindowOpen ? 'rotate-180' : ''}`} 
-              fill="none" 
-              stroke="currentColor" 
-              viewBox="0 0 24 24"
+      <div className="bg-gray-900/80 backdrop-blur-md rounded-lg p-3 border border-gray-800 shadow-xl space-y-4 mt-4">
+        <div className="flex flex-col md:flex-row justify-between gap-3 mb-4">
+          <NetworkSelector
+            selectedNetwork={network}
+            onNetworkChange={setNetwork}
+            className="w-full md:w-auto"
+          />
+          <div className="w-full md:w-auto">
+            <button
+              type="button"
+              onClick={() => setIsTimeWindowOpen(!isTimeWindowOpen)}
+              className="w-full flex items-center justify-between gap-2 px-4 py-2 rounded-lg bg-gray-800 text-gray-300 border border-gray-700 hover:border-gray-600 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
             >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-            </svg>
-          </button>
+              <div className="flex items-center gap-2">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span>{currentWindow?.label || 'Select Time'}</span>
+              </div>
+              <svg 
+                className={`w-4 h-4 transition-transform ${isTimeWindowOpen ? 'rotate-180' : ''}`} 
+                fill="none" 
+                stroke="currentColor" 
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
 
-          {isTimeWindowOpen && (
-            <div className="absolute z-10 right-0 mt-2 w-48 rounded-lg bg-gray-800 border border-gray-700 shadow-xl">
+            <div className={`${isTimeWindowOpen ? 'block' : 'hidden'} mt-2 w-full rounded-lg bg-gray-800 border border-gray-700 shadow-xl`}>
               {timeWindows.map((window) => (
                 <button
                   key={window.file}
@@ -241,428 +244,309 @@ export const BlockTimings: React.FC = () => {
                 </button>
               ))}
             </div>
-          )}
+          </div>
         </div>
-      </div>
 
-      <div className="space-y-8">
         {/* Block Arrival Timing Chart */}
         <div>
-          <div className="bg-gray-900/80 backdrop-blur-md rounded-lg p-4 border border-gray-800 shadow-xl flex flex-col">
-            <div className="mb-4">
-              <h2 className="text-2xl font-bold text-cyan-400">Block Arrival Time</h2>
-              <div className="text-sm text-gray-400 mt-1">
-                Last updated: {timingData?.updated_at ? formatDistanceToNow(new Date(timingData.updated_at * TIMESTAMP_MULTIPLIER), { addSuffix: true }) : 'No data available'}
-              </div>
+          <div className="mb-2">
+            <h2 className="text-xl md:text-2xl font-bold text-cyan-400">Block Arrival Time</h2>
+            <div className="text-sm text-gray-400 mt-0.5">
+              {/* Last updated: {timingData?.updated_at ? formatDistanceToNow(new Date(timingData.updated_at * TIMESTAMP_MULTIPLIER), { addSuffix: true }) : 'No data available'} */}
             </div>
-            <div className="flex-grow h-[500px] sm:h-[700px] pb-10">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart 
-                  data={chartData}
-                  margin={{ top: 20, right: 10, left: 10, bottom: 20 }}
-                >
-                  <XAxis 
-                    dataKey="time" 
-                    stroke="#94a3b8"
-                    tickFormatter={formatTime}
-                    ticks={xAxisTicks}
-                    angle={-45}
-                    textAnchor="end"
-                    height={80}
-                    interval="preserveStartEnd"
-                    tick={{ fontSize: 12 }}
-                  />
-                  <YAxis 
-                    stroke="#94a3b8" 
-                    label={{ 
-                      value: 'Slot time (s)', 
-                      angle: -90, 
-                      position: 'insideLeft',
-                      offset: -10,
-                      style: { fill: '#94a3b8' }
-                    }}
-                    domain={[0, 6]}
-                  />
-                  <Tooltip 
-                    contentStyle={{
-                      backgroundColor: 'rgba(17, 24, 39, 0.95)',
-                      border: '1px solid rgba(75, 85, 99, 0.3)',
-                      borderRadius: '0.5rem',
-                      color: '#e2e8f0',
-                    }}
-                    labelFormatter={(time) => new Date(time * TIMESTAMP_MULTIPLIER).toLocaleString()}
-                    formatter={(value: number) => [`${value.toFixed(DECIMAL_PLACES)}s`, '']}
-                  />
-                  <Legend 
-                    verticalAlign="bottom"
-                    height={36}
-                    content={({ payload }) => (
-                      <div className="mt-2 overflow-y-auto max-h-24">
-                        <div className="flex flex-wrap gap-2 justify-start items-center text-xs pb-1">
-                          {/* Attestation Deadline */}
-                          <div className="flex items-center gap-1.5 shrink-0">
-                            <div className="w-3 h-0.5 bg-orange-500" />
-                            <span className="text-orange-500 font-semibold">Attestation Deadline (4s)</span>
-                          </div>
-                          {/* Regular legend items */}
-                          {payload?.map((entry) => (
-                            <button
-                              key={entry.value}
-                              type="button"
-                              onClick={() => {
-                                setHiddenLines(prev => {
-                                  const next = new Set(prev)
-                                  const allLines = ['95th Percentile', 'Median', '5th Percentile', 'Minimum']
-                                  const isOnlyVisible = !next.has(entry.value) && next.size === allLines.length - 1
-                                  const isHidden = next.has(entry.value)
-
-                                  // If this is the only visible line and we click it, show all
-                                  if (isOnlyVisible) {
-                                    next.clear()
-                                  }
-                                  // If the line is currently hidden, unhide it
-                                  else if (isHidden) {
-                                    next.delete(entry.value)
-                                  }
-                                  // If we're showing all lines, hide all except this one
-                                  else if (next.size === 0) {
-                                    allLines.forEach(line => {
-                                      if (line !== entry.value) next.add(line)
-                                    })
-                                  }
-                                  // Otherwise, toggle this line's visibility
-                                  else {
-                                    next.add(entry.value)
-                                  }
-                                  
-                                  return next
-                                })
-                              }}
-                              className={`flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs transition-colors ${
-                                hiddenLines.has(entry.value)
-                                  ? 'bg-gray-800 text-gray-400 hover:bg-gray-700'
-                                  : 'text-gray-200 hover:text-white'
-                              }`}
-                              style={{
-                                backgroundColor: hiddenLines.has(entry.value) 
-                                  ? undefined 
-                                  : `${entry.color}33`,
-                                borderColor: entry.color,
-                                borderWidth: 1
-                              }}
-                            >
-                              <div className="w-4 h-0.5" style={{ background: entry.color }} />
-                              <span>{entry.value}</span>
-                            </button>
-                          ))}
+          </div>
+          <div className="flex-grow h-[250px] sm:h-[350px] md:h-[450px] pb-2">
+            <ResponsiveContainer width="100%" height="100%" minWidth={200} minHeight={200}>
+              <LineChart 
+                data={chartData}
+                margin={{ top: 20, right: 10, left: 10, bottom: 30 }}
+              >
+                <XAxis 
+                  dataKey="time" 
+                  stroke="#94a3b8"
+                  tickFormatter={formatTime}
+                  ticks={xAxisTicks}
+                  angle={-45}
+                  textAnchor="end"
+                  height={40}
+                  interval="preserveStartEnd"
+                  tick={{ fontSize: 10 }}
+                />
+                <YAxis 
+                  stroke="#94a3b8" 
+                  label={{ 
+                    value: 'Slot time (s)', 
+                    angle: -90, 
+                    position: 'insideLeft',
+                    offset: 10,
+                    style: { fill: '#94a3b8', fontSize: 10 }
+                  }}
+                  domain={[0, 6]}
+                  tick={{ fontSize: 10 }}
+                />
+                <Tooltip 
+                  contentStyle={{
+                    backgroundColor: 'rgba(17, 24, 39, 0.95)',
+                    border: '1px solid rgba(75, 85, 99, 0.3)',
+                    borderRadius: '0.5rem',
+                    color: '#e2e8f0',
+                  }}
+                  labelFormatter={(time) => new Date(time * TIMESTAMP_MULTIPLIER).toLocaleString()}
+                  formatter={(value: number) => [`${value.toFixed(DECIMAL_PLACES)}s`, '']}
+                />
+                <Legend 
+                  verticalAlign="bottom"
+                  height={36}
+                  content={({ payload }) => (
+                    <div className="mt-4 overflow-y-auto max-h-24">
+                      <div className="flex flex-wrap gap-2 justify-start items-center text-xs pb-1">
+                        {/* Attestation Deadline */}
+                        <div className="flex items-center gap-1.5 shrink-0">
+                          <div className="w-3 h-0.5 bg-orange-500" />
+                          <span className="text-orange-500 font-semibold">Attestation Deadline (4s)</span>
                         </div>
+                        {/* Regular legend items */}
+                        {payload?.map((entry) => (
+                          <button
+                            key={entry.value}
+                            type="button"
+                            onClick={() => {
+                              setHiddenLines(prev => {
+                                const next = new Set(prev)
+                                const allLines = ['95th Percentile', 'Median', '5th Percentile', 'Minimum']
+                                const isOnlyVisible = !next.has(entry.value) && next.size === allLines.length - 1
+                                const isHidden = next.has(entry.value)
+
+                                // If this is the only visible line and we click it, show all
+                                if (isOnlyVisible) {
+                                  next.clear()
+                                }
+                                // If the line is currently hidden, unhide it
+                                else if (isHidden) {
+                                  next.delete(entry.value)
+                                }
+                                // If we're showing all lines, hide all except this one
+                                else if (next.size === 0) {
+                                  allLines.forEach(line => {
+                                    if (line !== entry.value) next.add(line)
+                                  })
+                                }
+                                // Otherwise, toggle this line's visibility
+                                else {
+                                  next.add(entry.value)
+                                }
+                                
+                                return next
+                              })
+                            }}
+                            className={`flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs transition-colors ${
+                              hiddenLines.has(entry.value)
+                                ? 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+                                : 'text-gray-200 hover:text-white'
+                            }`}
+                            style={{
+                              backgroundColor: hiddenLines.has(entry.value) 
+                                ? undefined 
+                                : `${entry.color}33`,
+                              borderColor: entry.color,
+                              borderWidth: 1
+                            }}
+                          >
+                            <div className="w-4 h-0.5" style={{ background: entry.color }} />
+                            <span>{entry.value}</span>
+                          </button>
+                        ))}
                       </div>
-                    )}
-                  />
-                  {/* Attestation Deadline Reference Line */}
-                  <ReferenceLine 
-                    y={4} 
-                    stroke="#f97316" 
+                    </div>
+                  )}
+                />
+                {/* Attestation Deadline Reference Line */}
+                <ReferenceLine 
+                  y={4} 
+                  stroke="#f97316" 
+                  strokeWidth={2}
+                  strokeDasharray="5 2"
+                />
+                {!hiddenLines.has('95th Percentile') && (
+                  <Line
+                    type="monotone"
+                    dataKey="p95"
+                    name="95th Percentile"
+                    stroke="#ef4444"
                     strokeWidth={2}
-                    strokeDasharray="5 2"
+                    dot={false}
                   />
-                  {!hiddenLines.has('95th Percentile') && (
-                    <Line
-                      type="monotone"
-                      dataKey="p95"
-                      name="95th Percentile"
-                      stroke="#ef4444"
-                      strokeWidth={2}
-                      dot={false}
-                    />
-                  )}
-                  {!hiddenLines.has('Median') && (
-                    <Line
-                      type="monotone"
-                      dataKey="p50"
-                      name="Median"
-                      stroke="#22d3ee"
-                      strokeWidth={2}
-                      dot={false}
-                    />
-                  )}
-                  {!hiddenLines.has('5th Percentile') && (
-                    <Line
-                      type="monotone"
-                      dataKey="p05"
-                      name="5th Percentile"
-                      stroke="#22c55e"
-                      strokeWidth={2}
-                      dot={false}
-                    />
-                  )}
-                  {!hiddenLines.has('Minimum') && (
-                    <Line
-                      type="monotone"
-                      dataKey="min"
-                      name="Minimum"
-                      stroke="#a855f7"
-                      strokeWidth={2}
-                      dot={false}
-                    />
-                  )}
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
+                )}
+                {!hiddenLines.has('Median') && (
+                  <Line
+                    type="monotone"
+                    dataKey="p50"
+                    name="Median"
+                    stroke="#22d3ee"
+                    strokeWidth={2}
+                    dot={false}
+                  />
+                )}
+                {!hiddenLines.has('5th Percentile') && (
+                  <Line
+                    type="monotone"
+                    dataKey="p05"
+                    name="5th Percentile"
+                    stroke="#22c55e"
+                    strokeWidth={2}
+                    dot={false}
+                  />
+                )}
+                {!hiddenLines.has('Minimum') && (
+                  <Line
+                    type="monotone"
+                    dataKey="min"
+                    name="Minimum"
+                    stroke="#a855f7"
+                    strokeWidth={2}
+                    dot={false}
+                  />
+                )}
+              </LineChart>
+            </ResponsiveContainer>
           </div>
         </div>
 
         {/* Block Size vs Arrival Time */}
         <div>
-          <div className="bg-gray-900/80 backdrop-blur-md rounded-lg p-4 border border-gray-800 shadow-xl flex flex-col">
-            <div className="mb-4">
-              <h2 className="text-2xl font-bold text-cyan-400">Block Size vs Arrival Time</h2>
-              <div className="text-sm text-gray-400 mt-1">
-                Last updated: {cdfData?.updated_at ? formatDistanceToNow(new Date(cdfData.updated_at * TIMESTAMP_MULTIPLIER), { addSuffix: true }) : 'No data available'}
-              </div>
+          <div className="mb-2">
+            <h2 className="text-xl md:text-2xl font-bold text-cyan-400">Block Size vs Arrival Time</h2>
+            <div className="text-sm text-gray-400 mt-0.5">
+              {/* Last updated: {cdfData?.updated_at ? formatDistanceToNow(new Date(cdfData.updated_at * TIMESTAMP_MULTIPLIER), { addSuffix: true }) : 'No data available'} */}
             </div>
-            <div className="flex-grow h-[500px] sm:h-[700px] pb-10">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart
-                  margin={{ top: 20, right: 10, left: 10, bottom: 100 }}
-                >
-                  <XAxis 
-                    dataKey="size" 
-                    stroke="#94a3b8"
-                    label={{ 
-                      value: 'Combined Block+Blob Size (KB)', 
-                      position: 'insideBottom',
-                      offset: -60,
-                      style: { fill: '#94a3b8' }
-                    }}
-                    type="number"
-                    domain={[0, 1536]}
-                    tickFormatter={(value) => value.toFixed(0)}
-                  />
-                  <Legend 
-                    verticalAlign="bottom"
-                    height={80}
-                    wrapperStyle={{
-                      bottom: -80
-                    }}
-                    content={({ payload }) => (
-                      <div className="mt-8 overflow-y-auto max-h-24">
-                        <div className="flex flex-wrap gap-1.5 justify-start items-center text-xs">
-                          {/* Attestation Deadline */}
-                          <div className="flex items-center gap-1.5 shrink-0">
-                            <div className="w-3 h-0.5 bg-orange-500" />
-                            <span className="text-orange-500 font-semibold">Attestation Deadline (4s)</span>
-                          </div>
-                          {/* Block Types */}
-                          <div className="flex flex-wrap items-center gap-2 shrink-0">
-                            <button
-                              onClick={() => setHiddenLines(prev => {
-                                const next = new Set(prev)
-                                if (next.has('all')) {
-                                  next.delete('all')
-                                } else {
-                                  next.add('all')
-                                }
-                                return next
-                              })}
-                              className={`flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs transition-colors ${
-                                hiddenLines.has('all')
-                                  ? 'bg-gray-800 text-gray-400 hover:bg-gray-700'
-                                  : 'text-gray-200 hover:text-white'
-                              }`}
-                            >
-                              <div className="w-4 h-0.5" style={{ background: '#22d3ee' }} />
-                              <span className="text-gray-300">All Blocks</span>
-                            </button>
-                            <button
-                              onClick={() => setHiddenLines(prev => {
-                                const next = new Set(prev)
-                                if (next.has('mev')) {
-                                  next.delete('mev')
-                                } else {
-                                  next.add('mev')
-                                }
-                                return next
-                              })}
-                              className={`flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs transition-colors ${
-                                hiddenLines.has('mev')
-                                  ? 'bg-gray-800 text-gray-400 hover:bg-gray-700'
-                                  : 'text-gray-200 hover:text-white'
-                              }`}
-                            >
-                              <div className="w-4 h-0.5" style={{ background: '#ef4444' }} />
-                              <span className="text-gray-300">MEV Blocks</span>
-                            </button>
-                            <button
-                              onClick={() => setHiddenLines(prev => {
-                                const next = new Set(prev)
-                                if (next.has('non_mev')) {
-                                  next.delete('non_mev')
-                                } else {
-                                  next.add('non_mev')
-                                }
-                                return next
-                              })}
-                              className={`flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs transition-colors ${
-                                hiddenLines.has('non_mev')
-                                  ? 'bg-gray-800 text-gray-400 hover:bg-gray-700'
-                                  : 'text-gray-200 hover:text-white'
-                              }`}
-                            >
-                              <div className="w-4 h-0.5" style={{ background: '#22c55e' }} />
-                              <span className="text-gray-300">Non-MEV Blocks</span>
-                            </button>
-                            <button
-                              onClick={() => setHiddenLines(prev => {
-                                const next = new Set(prev)
-                                if (next.has('solo_mev')) {
-                                  next.delete('solo_mev')
-                                } else {
-                                  next.add('solo_mev')
-                                }
-                                return next
-                              })}
-                              className={`flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs transition-colors ${
-                                hiddenLines.has('solo_mev')
-                                  ? 'bg-gray-800 text-gray-400 hover:bg-gray-700'
-                                  : 'text-gray-200 hover:text-white'
-                              }`}
-                            >
-                              <div className="w-4 h-0.5" style={{ background: '#f472b6' }} />
-                              <span className="text-gray-300">Solo MEV</span>
-                            </button>
-                            <button
-                              onClick={() => setHiddenLines(prev => {
-                                const next = new Set(prev)
-                                if (next.has('solo_non_mev')) {
-                                  next.delete('solo_non_mev')
-                                } else {
-                                  next.add('solo_non_mev')
-                                }
-                                return next
-                              })}
-                              className={`flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs transition-colors ${
-                                hiddenLines.has('solo_non_mev')
-                                  ? 'bg-gray-800 text-gray-400 hover:bg-gray-700'
-                                  : 'text-gray-200 hover:text-white'
-                              }`}
-                            >
-                              <div className="w-4 h-0.5" style={{ background: '#fbbf24' }} />
-                              <span className="text-gray-300">Solo Non-MEV</span>
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                  />
-                  <YAxis 
+          </div>
+          <div className="flex-grow h-[250px] sm:h-[350px] md:h-[450px] pb-2">
+            <ResponsiveContainer width="100%" height="100%" minWidth={200} minHeight={200}>
+              <LineChart
+                margin={{ top: 20, right: 10, left: 10, bottom: 50 }}
+              >
+                <XAxis 
+                  dataKey="size" 
+                  stroke="#94a3b8"
+                  label={{ 
+                    value: 'Combined Block+Blob Size (KB)', 
+                    position: 'insideBottom',
+                    offset: -20,
+                    style: { fill: '#94a3b8', fontSize: 10 }
+                  }}
+                  type="number"
+                  domain={[0, 1536]}
+                  tickFormatter={(value) => value.toFixed(0)}
+                  tick={{ fontSize: 10 }}
+                />
+                <YAxis 
+                  dataKey="arrival_time"
+                  stroke="#94a3b8" 
+                  label={{ 
+                    value: 'Arrival Time (s)', 
+                    angle: -90, 
+                    position: 'insideLeft',
+                    offset: 10,
+                    style: { fill: '#94a3b8', fontSize: 10 }
+                  }}
+                  domain={[0, 6]}
+                  tick={{ fontSize: 10 }}
+                />
+                <Tooltip 
+                  contentStyle={{
+                    backgroundColor: 'rgba(17, 24, 39, 0.95)',
+                    border: '1px solid rgba(75, 85, 99, 0.3)',
+                    borderRadius: '0.5rem',
+                    color: '#e2e8f0',
+                  }}
+                  labelStyle={{
+                    color: '#e2e8f0'
+                  }}
+                  itemStyle={{
+                    color: '#e2e8f0'
+                  }}
+                  formatter={(value: number, key: string) => [
+                    key === 'arrival_time' ? `${value.toFixed(DECIMAL_PLACES)}s` : `${value.toFixed(1)} KB (Block+Blob)`,
+                    key === 'arrival_time' ? 'Arrival Time' : 'Combined Size'
+                  ]}
+                />
+                {/* Attestation Deadline Reference Line */}
+                <ReferenceLine 
+                  y={4} 
+                  stroke="#f97316" 
+                  strokeWidth={2}
+                  strokeDasharray="5 2"
+                />
+                {!hiddenLines.has('all') && (
+                  <Line
+                    type="monotone"
+                    data={scatterData.filter(d => d.type === 'all')}
                     dataKey="arrival_time"
-                    stroke="#94a3b8" 
-                    label={{ 
-                      value: 'Arrival Time (s)', 
-                      angle: -90, 
-                      position: 'insideLeft',
-                      offset: -10,
-                      style: { fill: '#94a3b8' }
-                    }}
-                    domain={[0, 6]}
-                  />
-                  <Tooltip 
-                    contentStyle={{
-                      backgroundColor: 'rgba(17, 24, 39, 0.95)',
-                      border: '1px solid rgba(75, 85, 99, 0.3)',
-                      borderRadius: '0.5rem',
-                      color: '#e2e8f0',
-                    }}
-                    labelStyle={{
-                      color: '#e2e8f0'
-                    }}
-                    itemStyle={{
-                      color: '#e2e8f0'
-                    }}
-                    formatter={(value: number, key: string) => [
-                      key === 'arrival_time' ? `${value.toFixed(DECIMAL_PLACES)}s` : `${value.toFixed(1)} KB (Block+Blob)`,
-                      key === 'arrival_time' ? 'Arrival Time' : 'Combined Size'
-                    ]}
-                  />
-                  {/* Attestation Deadline Reference Line */}
-                  <ReferenceLine 
-                    y={4} 
-                    stroke="#f97316" 
+                    name="All Blocks"
+                    stroke="#22d3ee"
                     strokeWidth={2}
-                    strokeDasharray="5 2"
+                    dot={false}
                   />
-                  {!hiddenLines.has('all') && (
-                    <Line
-                      type="monotone"
-                      data={scatterData.filter(d => d.type === 'all')}
-                      dataKey="arrival_time"
-                      name="All Blocks"
-                      stroke="#22d3ee"
-                      strokeWidth={2}
-                      dot={false}
-                    />
-                  )}
-                  {!hiddenLines.has('mev') && (
-                    <Line
-                      type="monotone"
-                      data={scatterData.filter(d => d.type === 'mev')}
-                      dataKey="arrival_time"
-                      name="MEV Blocks"
-                      stroke="#ef4444"
-                      strokeWidth={2}
-                      dot={false}
-                    />
-                  )}
-                  {!hiddenLines.has('non_mev') && (
-                    <Line
-                      type="monotone"
-                      data={scatterData.filter(d => d.type === 'non_mev')}
-                      dataKey="arrival_time"
-                      name="Non-MEV Blocks"
-                      stroke="#22c55e"
-                      strokeWidth={2}
-                      dot={false}
-                    />
-                  )}
-                  {!hiddenLines.has('solo_mev') && (
-                    <Line
-                      type="monotone"
-                      data={scatterData.filter(d => d.type === 'solo_mev')}
-                      dataKey="arrival_time"
-                      name="Solo MEV Blocks"
-                      stroke="#f472b6"
-                      strokeWidth={2}
-                      dot={false}
-                    />
-                  )}
-                  {!hiddenLines.has('solo_non_mev') && (
-                    <Line
-                      type="monotone"
-                      data={scatterData.filter(d => d.type === 'solo_non_mev')}
-                      dataKey="arrival_time"
-                      name="Solo Non-MEV Blocks"
-                      stroke="#fbbf24"
-                      strokeWidth={2}
-                      dot={false}
-                    />
-                  )}
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
-            <div className="mt-4 text-gray-300 flex-shrink-0">
-              <h3 className="text-lg font-semibold text-cyan-400 mb-2">Notes</h3>
-              <ul className="list-disc list-inside space-y-2 text-sm">
-                <li><span className="text-cyan-400">All Blocks</span>: Shows the average arrival time for all blocks, regardless of their source.</li>
-                <li><span className="text-red-400">MEV Blocks</span>: Blocks that were built by MEV-Boost relays, which may have different arrival characteristics due to their specialized construction.</li>
-                <li><span className="text-green-400">Non-MEV Blocks</span>: Regular blocks built by validators without using MEV-Boost relays.</li>
-                <li><span className="text-pink-400">Solo MEV</span>: Blocks built by solo stakers using MEV-Boost relays.</li>
-                <li><span className="text-amber-400">Solo Non-MEV</span>: Blocks built by solo stakers without using MEV-Boost relays.</li>
-              </ul>
-            </div>
+                )}
+                {!hiddenLines.has('mev') && (
+                  <Line
+                    type="monotone"
+                    data={scatterData.filter(d => d.type === 'mev')}
+                    dataKey="arrival_time"
+                    name="MEV Blocks"
+                    stroke="#ef4444"
+                    strokeWidth={2}
+                    dot={false}
+                  />
+                )}
+                {!hiddenLines.has('non_mev') && (
+                  <Line
+                    type="monotone"
+                    data={scatterData.filter(d => d.type === 'non_mev')}
+                    dataKey="arrival_time"
+                    name="Non-MEV Blocks"
+                    stroke="#22c55e"
+                    strokeWidth={2}
+                    dot={false}
+                  />
+                )}
+                {!hiddenLines.has('solo_mev') && (
+                  <Line
+                    type="monotone"
+                    data={scatterData.filter(d => d.type === 'solo_mev')}
+                    dataKey="arrival_time"
+                    name="Solo MEV Blocks"
+                    stroke="#f472b6"
+                    strokeWidth={2}
+                    dot={false}
+                  />
+                )}
+                {!hiddenLines.has('solo_non_mev') && (
+                  <Line
+                    type="monotone"
+                    data={scatterData.filter(d => d.type === 'solo_non_mev')}
+                    dataKey="arrival_time"
+                    name="Solo Non-MEV Blocks"
+                    stroke="#fbbf24"
+                    strokeWidth={2}
+                    dot={false}
+                  />
+                )}
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+          <div className="mt-4 text-gray-300 flex-shrink-0">
+            <h3 className="text-lg font-semibold text-cyan-400 mb-2">Notes</h3>
+            <ul className="list-disc list-inside space-y-2 text-sm">
+              <li><span className="text-cyan-400">All Blocks</span>: Shows the average arrival time for all blocks, regardless of their source.</li>
+              <li><span className="text-red-400">MEV Blocks</span>: Blocks that were built by MEV-Boost relays, which may have different arrival characteristics due to their specialized construction.</li>
+              <li><span className="text-green-400">Non-MEV Blocks</span>: Regular blocks built by validators without using MEV-Boost relays.</li>
+              <li><span className="text-pink-400">Solo MEV</span>: Blocks built by solo stakers using MEV-Boost relays.</li>
+              <li><span className="text-amber-400">Solo Non-MEV</span>: Blocks built by solo stakers without using MEV-Boost relays.</li>
+            </ul>
           </div>
         </div>
       </div>
-    </div>
+    </>
   )
 } 

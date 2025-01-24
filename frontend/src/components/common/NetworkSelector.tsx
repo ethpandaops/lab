@@ -5,6 +5,7 @@ import type { Config } from '../../types'
 interface Props {
   selectedNetwork: string
   onNetworkChange: (network: string) => void
+  className?: string
 }
 
 const NETWORK_METADATA = {
@@ -35,7 +36,7 @@ const NETWORK_METADATA = {
   }
 } as const
 
-export const NetworkSelector = ({ selectedNetwork, onNetworkChange }: Props) => {
+export const NetworkSelector = ({ selectedNetwork, onNetworkChange, className }: Props) => {
   const [config, setConfig] = useState<Config>()
   const [isOpen, setIsOpen] = useState(false)
 
@@ -52,7 +53,7 @@ export const NetworkSelector = ({ selectedNetwork, onNetworkChange }: Props) => 
   }
 
   return (
-    <div className="relative">
+    <div className={`relative ${className}`}>
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-800 text-gray-300 border border-gray-700 hover:border-gray-600 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent"

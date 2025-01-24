@@ -71,7 +71,7 @@ function Xatu(): JSX.Element {
   // If we're on a nested route, render the child route
   if (location.pathname !== '/xatu') {
     return (
-      <div className="space-y-8">
+      <div>
         <div className="bg-gray-900/80 backdrop-blur-md rounded-lg p-6 border border-gray-800 shadow-xl">
           <Outlet />
         </div>
