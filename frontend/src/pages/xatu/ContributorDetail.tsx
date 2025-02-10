@@ -144,7 +144,7 @@ function ContributorDetail(): JSX.Element {
 
       <div className="flex items-start gap-6 mb-8">
         <div 
-          className="w-20 h-20 rounded-2xl flex items-center justify-center text-2xl font-bold text-white"
+          className="w-20 h-20 rounded-2xl flex items-center justify-center text-2xl font-bold text-primary"
           style={{ 
             backgroundColor: avatarColor,
             boxShadow: `0 0 20px ${avatarColor}33`,
@@ -153,8 +153,8 @@ function ContributorDetail(): JSX.Element {
           {initials}
         </div>
         <div>
-          <h2 className="text-2xl font-bold text-white mb-2">{contributor.name}</h2>
-          <div className="text-sm text-gray-400 mb-3">
+          <h2 className="text-2xl font-bold text-primary mb-2">{contributor.name}</h2>
+          <div className="text-sm text-secondary mb-3">
             Updated {formatDistanceToNow(new Date(contributor.updated_at * 1000), { addSuffix: true })}
           </div>
           <div className="flex flex-wrap gap-3">
@@ -168,8 +168,8 @@ function ContributorDetail(): JSX.Element {
                   <span className="w-5 h-5 flex items-center justify-center">
                     {metadata.icon}
                   </span>
-                  <span className="text-gray-300">{metadata.name}</span>
-                  <span className="text-cyan-400 font-medium">{nodes.length} nodes</span>
+                  <span className="text-primary">{metadata.name}</span>
+                  <span className="text-accent font-medium">{nodes.length} nodes</span>
                 </div>
               );
             })}
@@ -189,7 +189,7 @@ function ContributorDetail(): JSX.Element {
                 <div className="w-6 h-6 flex items-center justify-center">
                   {metadata.icon}
                 </div>
-                <h3 className="text-lg font-medium text-gray-200">
+                <h3 className="text-lg font-medium text-primary">
                   {metadata.name}
                 </h3>
               </div>
@@ -215,10 +215,10 @@ function ContributorDetail(): JSX.Element {
                           }}
                         />
                         <div className="min-w-0">
-                          <div className="font-medium text-gray-200 truncate">
+                          <div className="font-medium text-primary truncate">
                             {shortName}
                           </div>
-                          <div className="text-sm text-gray-400">
+                          <div className="text-sm text-secondary">
                             {capitalizeWords(node.consensus_client)}
                             {' '}
                             ({node.consensus_version})
@@ -228,20 +228,20 @@ function ContributorDetail(): JSX.Element {
 
                       <div className="space-y-2 text-sm">
                         <div className="flex justify-between">
-                          <span className="text-gray-400">Status</span>
+                          <span className="text-secondary">Status</span>
                           <span className={offline ? 'text-red-400' : 'text-emerald-400'}>
                             {offline ? 'Offline' : 'Online'}
                           </span>
                         </div>
                         <div className="flex justify-between">
-                          <span className="text-gray-400">Location</span>
-                          <span className="text-gray-200">
+                          <span className="text-secondary">Location</span>
+                          <span className="text-primary">
                             {[node.city, node.country, node.continent].filter(Boolean).join(', ')}
                           </span>
                         </div>
                         <div className="flex justify-between">
-                          <span className="text-gray-400">Implementation</span>
-                          <span className="text-gray-200">
+                          <span className="text-secondary">Implementation</span>
+                          <span className="text-primary">
                             {node.client_implementation} ({node.client_version})
                           </span>
                         </div>

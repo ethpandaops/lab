@@ -4,7 +4,10 @@ import { Breadcrumbs } from './Breadcrumbs'
 
 function Layout(): JSX.Element {
   return (
-    <div className="relative min-h-screen text-gray-100">
+    <div className="relative min-h-screen bg-cyber-darker text-cyber-neon font-mono">
+      {/* Cyber Grid Background */}
+      <div className="absolute inset-0 bg-cyber-grid bg-cyber opacity-5" />
+      
       {/* Content */}
       <div className="relative z-20">
         <Navigation />
@@ -17,7 +20,7 @@ function Layout(): JSX.Element {
             {/* Content Area */}
             <div className="relative">
               {/* Main content */}
-              <div className="relative">
+              <div className="relative backdrop-blur-sm bg-cyber-darker/90 rounded-lg border border-cyber-neon/10 p-6">
                 <Outlet />
               </div>
             </div>

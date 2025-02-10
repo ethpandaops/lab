@@ -187,9 +187,9 @@ export const BlockTimings: React.FC = () => {
 
   return (
     <>
-      <div className="bg-gray-900/80 backdrop-blur-md rounded-lg p-3 border border-gray-800 shadow-xl">
-        <h2 className="text-lg md:text-xl font-semibold text-cyan-400 mb-1">About This Data</h2>
-        <p className="text-sm md:text-base text-gray-300">
+      <div className="backdrop-blur-md rounded-lg p-3 shadow-xl">
+        <h2 className="text-lg md:text-xl font-semibold text-accent mb-1">About This Data</h2>
+        <p className="text-sm md:text-base text-primary">
           This data shows timing data for blocks on the beacon chain. The data is updated hourly and aggregated in {timeWindows.map((w, i) => (
             <span key={w.file}>
               {w.step} intervals for the {w.label} view{i < timeWindows.length - 1 ? ', and ' : ''}
@@ -198,7 +198,7 @@ export const BlockTimings: React.FC = () => {
         </p>
       </div>
 
-      <div className="bg-gray-900/80 backdrop-blur-md rounded-lg p-3 border border-gray-800 shadow-xl space-y-4 mt-4">
+      <div className="backdrop-blur-md rounded-lg p-3 shadow-xl space-y-4 mt-4">
         <div className="flex flex-col md:flex-row justify-between gap-3 mb-4">
           <NetworkSelector
             selectedNetwork={network}
@@ -209,7 +209,7 @@ export const BlockTimings: React.FC = () => {
             <button
               type="button"
               onClick={() => setIsTimeWindowOpen(!isTimeWindowOpen)}
-              className="w-full flex items-center justify-between gap-2 px-4 py-2 rounded-lg bg-gray-800 text-gray-300 border border-gray-700 hover:border-gray-600 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
+              className="w-full flex items-center justify-between gap-2 px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
             >
               <div className="flex items-center gap-2">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -227,7 +227,7 @@ export const BlockTimings: React.FC = () => {
               </svg>
             </button>
 
-            <div className={`${isTimeWindowOpen ? 'block' : 'hidden'} mt-2 w-full rounded-lg bg-gray-800 border border-gray-700 shadow-xl`}>
+            <div className={`${isTimeWindowOpen ? 'block' : 'hidden'} mt-2 w-full rounded-lg border`}>
               {timeWindows.map((window) => (
                 <button
                   key={window.file}
@@ -236,7 +236,7 @@ export const BlockTimings: React.FC = () => {
                     setTimeWindow(window.file)
                     setIsTimeWindowOpen(false)
                   }}
-                  className={`w-full flex items-center gap-2 px-4 py-2 hover:bg-gray-700 first:rounded-t-lg last:rounded-b-lg text-gray-300 ${
+                  className={`w-full flex items-center gap-2 px-4 py-2 border first:rounded-t-lg last:rounded-b-lg ${
                     window.file === timeWindow ? 'bg-gray-700' : ''
                   }`}
                 >
@@ -250,8 +250,8 @@ export const BlockTimings: React.FC = () => {
         {/* Block Arrival Timing Chart */}
         <div>
           <div className="mb-2">
-            <h2 className="text-xl md:text-2xl font-bold text-cyan-400">Block Arrival Time</h2>
-            <div className="text-sm text-gray-400 mt-0.5">
+            <h2 className="text-xl md:text-2xl font-bold text-accent">Block Arrival Time</h2>
+            <div className="text-sm text-secondary mt-0.5">
               {/* Last updated: {timingData?.updated_at ? formatDistanceToNow(new Date(timingData.updated_at * TIMESTAMP_MULTIPLIER), { addSuffix: true }) : 'No data available'} */}
             </div>
           </div>
@@ -341,8 +341,6 @@ export const BlockTimings: React.FC = () => {
                             }}
                             className={`flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs transition-colors ${
                               hiddenLines.has(entry.value)
-                                ? 'bg-gray-800 text-gray-400 hover:bg-gray-700'
-                                : 'text-gray-200 hover:text-white'
                             }`}
                             style={{
                               backgroundColor: hiddenLines.has(entry.value) 
@@ -415,8 +413,8 @@ export const BlockTimings: React.FC = () => {
         {/* Block Size vs Arrival Time */}
         <div>
           <div className="mb-2">
-            <h2 className="text-xl md:text-2xl font-bold text-cyan-400">Block Size vs Arrival Time</h2>
-            <div className="text-sm text-gray-400 mt-0.5">
+            <h2 className="text-xl md:text-2xl font-bold text-accent">Block Size vs Arrival Time</h2>
+            <div className="text-sm text-secondary mt-0.5">
               {/* Last updated: {cdfData?.updated_at ? formatDistanceToNow(new Date(cdfData.updated_at * TIMESTAMP_MULTIPLIER), { addSuffix: true }) : 'No data available'} */}
             </div>
           </div>
@@ -535,10 +533,10 @@ export const BlockTimings: React.FC = () => {
               </LineChart>
             </ResponsiveContainer>
           </div>
-          <div className="mt-4 text-gray-300 flex-shrink-0">
-            <h3 className="text-lg font-semibold text-cyan-400 mb-2">Notes</h3>
+          <div className="mt-4 text-primary flex-shrink-0">
+            <h3 className="text-lg font-semibold text-accent mb-2">Notes</h3>
             <ul className="list-disc list-inside space-y-2 text-sm">
-              <li><span className="text-cyan-400">All Blocks</span>: Shows the average arrival time for all blocks, regardless of their source.</li>
+              <li><span className="text-accent">All Blocks</span>: Shows the average arrival time for all blocks, regardless of their source.</li>
               <li><span className="text-red-400">MEV Blocks</span>: Blocks that were built by MEV-Boost relays, which may have different arrival characteristics due to their specialized construction.</li>
               <li><span className="text-green-400">Non-MEV Blocks</span>: Regular blocks built by validators without using MEV-Boost relays.</li>
               <li><span className="text-pink-400">Solo MEV</span>: Blocks built by solo stakers using MEV-Boost relays.</li>

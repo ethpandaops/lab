@@ -1,0 +1,97 @@
+# UI System Rules
+
+## Color System
+- Primary colors are defined in `cyber` theme in tailwind.config.js
+- Never use raw color values in components
+- Use semantic color classes:
+  - text-primary: Main text (cyber-neon)
+  - text-secondary: Less important text (cyber-neon @ 70%)
+  - text-tertiary: Least important text (cyber-neon @ 50%)
+  - text-accent: Call to action/highlights (cyber-pink)
+  - text-accent-secondary: Secondary highlights (cyber-blue)
+  - text-accent-tertiary: Tertiary highlights (cyber-purple)
+  - text-success: Success states (cyber-neon)
+  - text-warning: Warning states (cyber-yellow)
+  - text-error: Error states (cyber-pink)
+  - text-muted: Muted text (50% opacity)
+
+## Layout Components
+- Use `backdrop-blur-sm` with `bg-cyber-darker/90` for card backgrounds
+- Use `border border-cyber-neon/10` for subtle borders
+- Use `hover:border-cyber-neon/20` for hover states
+- Use `rounded-lg` for consistent corner radius
+
+## Typography
+- Use `font-sans` (Orbitron) for headings and brand elements
+- Use `font-mono` (JetBrains Mono) for body text and data
+- Font sizes:
+  - text-xs: Small labels
+  - text-sm: Body text
+  - text-base: Default size
+  - text-lg/text-xl: Section headers
+  - text-2xl+: Page headers
+
+## Animations
+- Use predefined animations from tailwind.config.js:
+  - animate-text-shine: Text shine effect
+  - animate-gradient: Gradient movement
+  - animate-glitch: Glitch effect
+  - animate-pulse/animate-pulse-slow: Pulsing
+  - animate-float: Floating effect
+  - animate-glow: Neon glow
+  - animate-scanline: Scanline effect
+
+## Shadows
+- Use predefined shadows:
+  - shadow-neon: Standard neon glow
+  - shadow-neon-strong: Strong neon glow
+  - shadow-pink: Pink glow
+  - shadow-blue: Blue glow
+
+## Component Guidelines
+1. Cards/Containers:
+```tsx
+<div className="backdrop-blur-sm rounded-lg p-4 border border-cyber-neon/10 hover:border-cyber-neon/20">
+```
+
+2. Buttons:
+```tsx
+<button className="px-4 py-2 rounded-lg border border-cyber-neon/10 hover:border-cyber-neon/20 hover:bg-cyber-neon/5">
+```
+
+3. Text Hierarchy:
+```tsx
+<h2 className="text-xl font-bold text-primary mb-2">Title</h2>
+<p className="text-secondary">Important content</p>
+<span className="text-tertiary">Less important content</span>
+```
+
+4. Interactive Elements:
+```tsx
+<Link className="text-accent hover:opacity-80 transition-opacity">
+```
+
+## Best Practices
+1. Always use semantic color classes instead of raw colors
+2. Maintain consistent spacing with Tailwind's spacing scale
+3. Use the predefined animations for interactive elements
+4. Leverage the cyber theme colors for all UI elements
+5. Use opacity variants for creating depth
+6. Apply consistent blur effects for layering
+7. Maintain text hierarchy using semantic classes
+
+## Component Architecture
+1. Base layer: Use theme defaults from tailwind.config.js
+2. Component layer: Build on base styles with semantic classes
+3. Variant layer: Use modifiers for different states/variants
+
+## Responsive Design
+- Use Tailwind's responsive prefixes consistently
+- Maintain readable text sizes across devices
+- Ensure touch targets are accessible on mobile
+
+## Accessibility
+- Maintain WCAG 2.1 compliant contrast ratios
+- Use semantic HTML elements
+- Ensure interactive elements have proper focus states
+- Provide hover/focus transitions for better UX 

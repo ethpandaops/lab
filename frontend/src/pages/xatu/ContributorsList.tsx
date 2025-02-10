@@ -45,22 +45,22 @@ const ContributorsList = (): JSX.Element => {
 
   return (
     <div className="space-y-4">
-      <div className="bg-gray-900/80 backdrop-blur-md rounded-lg p-4 border border-gray-800 shadow-xl">
-        <h2 className="text-xl font-semibold text-cyan-400 mb-2">Xatu Contributors</h2>
-        <p className="text-gray-300 text-sm">
+      <div className="backdrop-blur-sm rounded-lg p-4 border">
+        <h2 className="text-xl font-semibold mb-2">Xatu Contributors</h2>
+        <p className="text-sm">
           These are the amazing contributors who are helping us monitor the Ethereum network.
           All data is anonymized and no personally identifiable information is collected.
         </p>
       </div>
 
-      <div className="bg-gray-900/80 backdrop-blur-md rounded-lg p-4 border border-gray-800 shadow-xl">
+      <div className="backdrop-blur-sm rounded-lg p-4 border">
         <div className="overflow-x-auto -mx-2">
           <table className="w-full min-w-[300px]">
             <thead>
-              <tr className="border-b border-gray-800">
-                <th className="text-left py-2 px-2 text-gray-400 text-sm w-[60%]">Contributor</th>
-                <th className="text-right py-2 px-2 text-gray-400 text-sm w-[20%]">Nodes</th>
-                <th className="text-right py-2 px-2 text-gray-400 text-sm hidden sm:table-cell w-[20%]">Last Update</th>
+              <tr className="border-b">
+                <th className="text-left py-2 px-2 text-sm w-[60%]">Contributor</th>
+                <th className="text-right py-2 px-2 text-sm w-[20%]">Nodes</th>
+                <th className="text-right py-2 px-2 text-sm hidden sm:table-cell w-[20%]">Last Update</th>
               </tr>
             </thead>
             <tbody>
@@ -71,15 +71,15 @@ const ContributorsList = (): JSX.Element => {
                   return (
                     <tr
                       key={contributor.name}
-                      className="border-b border-gray-800 hover:bg-gray-800/50 transition-colors"
+                      className="border-b hover:bg-cyber-neon/5 transition-colors"
                     >
                       <td className="py-2 px-2 w-[60%]">
                         <Link
                           to={`/xatu/contributors/${contributor.name}`}
-                          className="flex items-center gap-2 text-cyan-400 hover:text-cyan-300 transition-colors"
+                          className="flex items-center gap-2 hover:opacity-80 transition-opacity"
                         >
                           <div
-                            className="w-6 h-6 rounded-lg flex items-center justify-center text-xs font-bold text-white"
+                            className="w-6 h-6 rounded-lg flex items-center justify-center text-xs font-bold text-primary"
                             style={{ 
                               backgroundColor: avatarColor,
                               boxShadow: `0 0 10px ${avatarColor}33`,
@@ -90,10 +90,10 @@ const ContributorsList = (): JSX.Element => {
                           <span className="text-sm truncate">{contributor.name}</span>
                         </Link>
                       </td>
-                      <td className="text-right py-2 px-2 text-gray-300 text-sm w-[20%]">
+                      <td className="text-right py-2 px-2 text-sm w-[20%]">
                         {contributor.node_count}
                       </td>
-                      <td className="text-right py-2 px-2 text-gray-300 text-sm hidden sm:table-cell w-[20%]">
+                      <td className="text-right py-2 px-2 text-sm hidden sm:table-cell w-[20%]">
                         {formatDistanceToNow(new Date(contributor.updated_at * 1000), { addSuffix: true })}
                       </td>
                     </tr>

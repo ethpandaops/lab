@@ -113,10 +113,10 @@ function Xatu(): JSX.Element {
         <XatuCallToAction />
       </div>
       {/* Overview Section */}
-      <div className="bg-gray-900/80 backdrop-blur-md rounded-lg p-6 border border-gray-800 shadow-xl mb-8">
+      <div className="backdrop-blur-md rounded-lg p-6 border shadow-xl mb-8">
         <div className="flex flex-col mb-6">
-          <h2 className="text-2xl font-bold text-cyan-400">Overview</h2>
-          <span className="text-gray-400 text-sm">
+          <h2 className="text-2xl font-bold">Overview</h2>
+          <span className="text-secondary text-sm">
             Last 24h · Updated{' '}
             <span 
               title={new Date(summaryData.updated_at * MS_PER_SECOND).toString()}
@@ -125,7 +125,7 @@ function Xatu(): JSX.Element {
               {formatDistanceToNow(new Date(summaryData.updated_at * MS_PER_SECOND), { addSuffix: true })}
             </span>
           </span>
-          <p className="text-gray-300 mt-4">
+          <p className="text-primary mt-4">
             This data shows nodes sending data to ethPandaOps. While we run our own nodes, community-contributed data is most valuable.
           </p>
         </div>
@@ -144,30 +144,30 @@ function Xatu(): JSX.Element {
           {/* Summary Stats */}
           <div className="flex items-center justify-center">
             <div className="grid grid-cols-2 gap-4 w-full max-w-lg">
-              <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700 flex flex-col h-28">
-                <div className="text-gray-400 text-xs uppercase tracking-wider text-left">Total Nodes</div>
-                <div className="text-3xl font-bold text-cyan-400 mt-2 text-center flex-grow flex items-center justify-center">
+              <div className="backdrop-blur-md rounded-lg p-4 border flex flex-col h-28">
+                <div className="text-secondary text-xs uppercase tracking-wider text-left">Total Nodes</div>
+                <div className="text-3xl font-bold text-accent mt-2 text-center flex-grow flex items-center justify-center">
                   {totalNodes.toLocaleString()}
                 </div>
               </div>
 
-              <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700 flex flex-col h-28">
-                <div className="text-gray-400 text-xs uppercase tracking-wider text-left">Networks</div>
-                <div className="text-3xl font-bold text-cyan-400 mt-2 text-center flex-grow flex items-center justify-center">
+              <div className="backdrop-blur-md rounded-lg p-4 border flex flex-col h-28">
+                <div className="text-secondary text-xs uppercase tracking-wider text-left">Networks</div>
+                <div className="text-3xl font-bold text-accent mt-2 text-center flex-grow flex items-center justify-center">
                   {Object.keys(summaryData.networks).length}
                 </div>
               </div>
 
-              <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700 flex flex-col h-28">
-                <div className="text-gray-400 text-xs uppercase tracking-wider text-left">Public Nodes</div>
-                <div className="text-3xl font-bold text-cyan-400 mt-2 text-center flex-grow flex items-center justify-center">
+              <div className="backdrop-blur-md rounded-lg p-4 border flex flex-col h-28">
+                <div className="text-secondary text-xs uppercase tracking-wider text-left">Public Nodes</div>
+                <div className="text-3xl font-bold text-accent mt-2 text-center flex-grow flex items-center justify-center">
                   {totalPublicNodes.toLocaleString()}
                 </div>
               </div>
 
-              <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700 flex flex-col h-28">
-                <div className="text-gray-400 text-xs uppercase tracking-wider text-left">Countries</div>
-                <div className="text-3xl font-bold text-cyan-400 mt-2 text-center flex-grow flex items-center justify-center">
+              <div className="backdrop-blur-md rounded-lg p-4 border flex flex-col h-28">
+                <div className="text-secondary text-xs uppercase tracking-wider text-left">Countries</div>
+                <div className="text-3xl font-bold text-accent mt-2 text-center flex-grow flex items-center justify-center">
                   {Object.keys(summaryData.networks.mainnet.countries).length}
                 </div>
               </div>
@@ -178,43 +178,43 @@ function Xatu(): JSX.Element {
 
         {/* Navigation Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <Link to="contributors" className="group bg-gray-800/50 rounded-lg p-6 border border-gray-700 hover:bg-gray-700/50 hover:border-cyan-500/50 transition-all">
+          <Link to="contributors" className="group rounded-lg p-6 border border-gray-700 hover:bg-gray-700/50 hover:border-cyan-500/50 transition-all">
             <div className="flex gap-6 items-start">
-              <div className="flex-shrink-0 text-4xl text-gray-200 mt-0.5">👥</div>
+              <div className="flex-shrink-0 text-4xl text-primary mt-0.5">👥</div>
               <div className="flex flex-col flex-grow">
-                <h3 className="text-xl font-semibold text-cyan-400 mb-2">Contributors</h3>
-                <p className="text-gray-300 text-sm">View information about the individual contributors</p>
+                <h3 className="text-xl font-semibold text-accent mb-2">Contributors</h3>
+                <p className="text-primary text-sm">View information about the individual contributors</p>
               </div>
             </div>
-            <button type="button" className="mt-6 w-full py-3 px-4 bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/20 hover:border-cyan-500/30 rounded-lg text-cyan-400 font-medium transition-all flex items-center justify-center gap-2 group-hover:bg-cyan-500/20">
+            <button type="button" className="mt-6 w-full py-3 px-4 bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/20 hover:border-cyan-500/30 rounded-lg text-accent font-medium transition-all flex items-center justify-center gap-2 group-hover:bg-cyan-500/20">
               View Details
               <ArrowRight className="w-5 h-5" />
             </button>
           </Link>
 
-          <Link to="networks" className="group bg-gray-800/50 rounded-lg p-6 border border-gray-700 hover:bg-gray-700/50 hover:border-cyan-500/50 transition-all">
+          <Link to="networks" className="group rounded-lg p-6 border border-gray-700 hover:bg-gray-700/50 hover:border-cyan-500/50 transition-all">
             <div className="flex gap-6 items-start">
-              <div className="flex-shrink-0 text-4xl text-gray-200 mt-0.5">🌐</div>
+              <div className="flex-shrink-0 text-4xl text-primary mt-0.5">🌐</div>
               <div className="flex flex-col flex-grow">
-                <h3 className="text-xl font-semibold text-cyan-400 mb-2">Networks</h3>
-                <p className="text-gray-300 text-sm">Explore the networks in the Xatu dataset</p>
+                <h3 className="text-xl font-semibold text-accent mb-2">Networks</h3>
+                <p className="text-primary text-sm">Explore the networks in the Xatu dataset</p>
               </div>
             </div>
-            <button type="button" className="mt-6 w-full py-3 px-4 bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/20 hover:border-cyan-500/30 rounded-lg text-cyan-400 font-medium transition-all flex items-center justify-center gap-2 group-hover:bg-cyan-500/20">
+            <button type="button" className="mt-6 w-full py-3 px-4 bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/20 hover:border-cyan-500/30 rounded-lg text-accent font-medium transition-all flex items-center justify-center gap-2 group-hover:bg-cyan-500/20">
               View Details
               <ArrowRight className="w-5 h-5" />
             </button>
           </Link>
 
-          <Link to="community-nodes" className="group bg-gray-800/50 rounded-lg p-6 border border-gray-700 hover:bg-gray-700/50 hover:border-cyan-500/50 transition-all">
+          <Link to="community-nodes" className="group rounded-lg p-6 border  hover:border-cyan-500/50 transition-all">
             <div className="flex gap-6 items-start">
-              <div className="flex-shrink-0 text-4xl text-gray-200 mt-0.5">🖥️</div>
+              <div className="flex-shrink-0 text-4xl text-primary mt-0.5">🖥️</div>
               <div className="flex flex-col flex-grow">
-                <h3 className="text-xl font-semibold text-cyan-400 mb-2">Community Nodes</h3>
-                <p className="text-gray-300 text-sm">Explore the community nodes in the dataset</p>
+                <h3 className="text-xl font-semibold text-accent mb-2">Community Nodes</h3>
+                <p className="text-primary text-sm">Explore the community nodes in the dataset</p>
               </div>
             </div>
-            <button type="button" className="mt-6 w-full py-3 px-4 bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/20 hover:border-cyan-500/30 rounded-lg text-cyan-400 font-medium transition-all flex items-center justify-center gap-2 group-hover:bg-cyan-500/20">
+            <button type="button" className="mt-6 w-full py-3 px-4 rounded-lgfont-medium transition-all flex items-center justify-center gap-2">
               View Details
               <ArrowRight className="w-5 h-5" />
             </button>

@@ -235,9 +235,9 @@ export const CommunityNodes = () => {
     <div className="space-y-8" ref={containerRef}>
       <XatuCallToAction />
 
-      <div className="bg-gray-900/80 backdrop-blur-md rounded-lg p-6 border border-gray-800 shadow-xl mb-8">
-        <h2 className="text-xl font-semibold text-cyan-400 mb-2">About This Data</h2>
-        <p className="text-gray-300">
+      <div className="backdrop-blur-sm rounded-lg p-6 border mb-8">
+        <h2 className="text-xl font-semibold mb-2">About This Data</h2>
+        <p>
           This data represents nodes from the Ethereum community that have opted in to share their node information with us. 
           The data helps us understand the geographical distribution of nodes and monitor the health of the network.
           All data is anonymized and no personally identifiable information is collected.
@@ -252,24 +252,19 @@ export const CommunityNodes = () => {
         <div className="relative">
           <button
             onClick={() => setIsTimeWindowOpen(!isTimeWindowOpen)}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-800 text-gray-300 border border-gray-700 hover:border-gray-600 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
+            className="flex items-center gap-2 px-4 py-2 rounded-lg border"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             <span>{currentWindow?.label || 'Select Time'}</span>
-            <svg 
-              className={`w-4 h-4 transition-transform ${isTimeWindowOpen ? 'rotate-180' : ''}`} 
-              fill="none" 
-              stroke="currentColor" 
-              viewBox="0 0 24 24"
-            >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
             </svg>
           </button>
 
           {isTimeWindowOpen && (
-            <div className="absolute z-10 right-0 mt-2 w-48 rounded-lg bg-gray-800 border border-gray-700 shadow-xl">
+            <div className="absolute z-10 right-0 mt-2 w-48 rounded-lg border">
               {timeWindows.map((window) => (
                 <button
                   key={window.file}
@@ -277,8 +272,8 @@ export const CommunityNodes = () => {
                     setTimeWindow(window.file)
                     setIsTimeWindowOpen(false)
                   }}
-                  className={`w-full flex items-center gap-2 px-4 py-2 hover:bg-gray-700 first:rounded-t-lg last:rounded-b-lg text-gray-300 ${
-                    window.file === timeWindow ? 'bg-gray-700' : ''
+                  className={`w-full flex items-center gap-2 px-4 py-2 first:rounded-t-lg last:rounded-b-lg ${
+                    window.file === timeWindow ? 'bg-cyber-neon/10' : ''
                   }`}
                 >
                   <span>{window.label}</span>
@@ -293,26 +288,26 @@ export const CommunityNodes = () => {
         {/* Total Nodes Chart */}
         <div ref={totalNodesRef}>
           <h2 
-            className="text-2xl font-bold text-cyan-400 mb-4 cursor-pointer hover:text-cyan-300"
+            className="text-2xl font-bold mb-4 cursor-pointer hover:opacity-80"
             onClick={() => handleSectionClick(SECTIONS['total-nodes'])}
           >
             Total Nodes
           </h2>
-          <div className="bg-gray-900/80 backdrop-blur-md rounded-lg p-4 h-[400px] border border-gray-800 shadow-xl">
+          <div className="backdrop-blur-sm rounded-lg p-4 h-[400px] border">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={totalNodesData}>
                 <XAxis 
                   dataKey="time" 
-                  stroke="#94a3b8"
+                  stroke="currentColor"
                   tickFormatter={formatTime}
                 />
-                <YAxis stroke="#94a3b8" />
+                <YAxis stroke="currentColor" />
                 <Tooltip 
                   contentStyle={{
-                    backgroundColor: 'rgba(17, 24, 39, 0.95)',
-                    border: '1px solid rgba(75, 85, 99, 0.3)',
+                    backgroundColor: 'rgba(5, 5, 7, 0.95)',
+                    border: '1px solid rgba(0, 255, 159, 0.3)',
                     borderRadius: '0.5rem',
-                    color: '#e2e8f0'
+                    color: 'rgb(0, 255, 159)'
                   }}
                   labelFormatter={(time) => new Date(time * 1000).toLocaleString()}
                   formatter={(value) => [value, 'Nodes']}
@@ -321,7 +316,7 @@ export const CommunityNodes = () => {
                   type="monotone"
                   dataKey="total"
                   name="Total Nodes"
-                  stroke="#22d3ee"
+                  stroke="rgb(0, 255, 159)"
                   strokeWidth={2}
                   dot={false}
                 />
@@ -331,22 +326,22 @@ export const CommunityNodes = () => {
         </div>
 
         {/* Nodes by Country Chart */}
-        <div className="bg-gray-900/80 backdrop-blur-md rounded-lg p-4 border border-gray-800 shadow-xl flex flex-col">
+        <div className="backdrop-blur-sm rounded-lg p-4 border flex flex-col">
           <div className="h-[400px]">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={chartData}>
                 <XAxis 
                   dataKey="time" 
-                  stroke="#94a3b8"
+                  stroke="currentColor"
                   tickFormatter={formatTime}
                 />
-                <YAxis stroke="#94a3b8" />
+                <YAxis stroke="currentColor" />
                 <Tooltip 
                   contentStyle={{
-                    backgroundColor: 'rgba(17, 24, 39, 0.95)',
-                    border: '1px solid rgba(75, 85, 99, 0.3)',
+                    backgroundColor: 'rgba(5, 5, 7, 0.95)',
+                    border: '1px solid rgba(0, 255, 159, 0.3)',
                     borderRadius: '0.5rem',
-                    color: '#e2e8f0'
+                    color: 'rgb(0, 255, 159)'
                   }}
                   labelFormatter={(time) => new Date(time * 1000).toLocaleString()}
                   formatter={(value, name) => [value, name]}
@@ -402,8 +397,8 @@ export const CommunityNodes = () => {
                   }}
                   className={`px-3 py-1 rounded-full text-sm flex items-center gap-2 transition-colors ${
                     hiddenCountries.has(country)
-                      ? 'bg-gray-800 text-gray-400 hover:bg-gray-700'
-                      : 'text-gray-200 hover:text-white'
+                      ? 'bg-cyber-darker opacity-50 hover:opacity-70'
+                      : 'hover:opacity-80'
                   }`}
                   style={{
                     backgroundColor: hiddenCountries.has(country) 
@@ -425,8 +420,8 @@ export const CommunityNodes = () => {
         </div>
 
         {/* Nodes by User Chart */}
-        <div className="bg-gray-900/80 backdrop-blur-md rounded-lg p-4 border border-gray-800 shadow-xl flex flex-col">
-          <h2 className="text-2xl font-bold text-cyan-400 mb-4">Nodes per User</h2>
+        <div className="backdrop-blur-md rounded-lg p-4 border flex flex-col">
+          <h2 className="text-2xl font-bold mb-4">Nodes per User</h2>
           <div className="h-[400px] mb-4">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={userChartData}>
@@ -497,8 +492,8 @@ export const CommunityNodes = () => {
                   }}
                   className={`px-3 py-1 rounded-full text-sm flex items-center gap-2 transition-colors shrink-0 ${
                     hiddenUsers.has(user)
-                      ? 'bg-gray-800 text-gray-400 hover:bg-gray-700'
-                      : 'text-gray-200 hover:text-white'
+                      ? 'bg-gray-800 text-secondary hover:bg-gray-700'
+                      : 'text-primary hover:text-primary'
                   }`}
                   style={{
                     backgroundColor: hiddenUsers.has(user) 

@@ -52,11 +52,11 @@ export const NetworkSelector = ({ selectedNetwork, onNetworkChange, className }:
     color: '#627EEA'
   }
 
-  return (
+  return ( 
     <div className={`relative ${className}`}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-800 text-gray-300 border border-gray-700 hover:border-gray-600 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
+        className="flex items-center gap-2 px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
       >
         <span className="w-5 h-5 flex items-center justify-center">
           {selectedMetadata.icon}
@@ -73,7 +73,7 @@ export const NetworkSelector = ({ selectedNetwork, onNetworkChange, className }:
       </button>
 
       {isOpen && (
-        <div className="absolute z-10 mt-2 w-full rounded-lg bg-gray-800 border border-gray-700 shadow-xl">
+        <div className="absolute z-10 mt-2 w-full rounded-lg border">
           {networks.map((network) => {
             const metadata = NETWORK_METADATA[network as keyof typeof NETWORK_METADATA] || {
               name: network.charAt(0).toUpperCase() + network.slice(1),
@@ -88,7 +88,7 @@ export const NetworkSelector = ({ selectedNetwork, onNetworkChange, className }:
                   onNetworkChange(network)
                   setIsOpen(false)
                 }}
-                className={`w-full flex items-center gap-2 px-4 py-2 hover:bg-gray-700 first:rounded-t-lg last:rounded-b-lg text-gray-300 ${
+                className={`w-full flex items-center gap-2 px-4 py-2 hover:bg-gray-700 first:rounded-t-lg last:rounded-b-lg text-primary ${
                   network === selectedNetwork ? 'bg-gray-700' : ''
                 }`}
               >

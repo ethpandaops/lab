@@ -80,20 +80,20 @@ export default function Networks(): JSX.Element {
 
       <XatuCallToAction />
       <div className="flex flex-col mb-6">
-        <h2 className="text-2xl font-bold text-cyan-400">Networks</h2>
-        <span className="text-gray-400 text-sm">
+        <h2 className="text-2xl font-bold">Networks</h2>
+        <span className="text-sm">
           Last 24h · Updated{' '}
           <span 
             title={new Date(summaryData.updated_at * 1000).toString()}
-            className="cursor-help border-b border-dotted border-gray-500"
+            className="cursor-help border-b border-dotted"
           >
             {formatDistanceToNow(new Date(summaryData.updated_at * 1000), { addSuffix: true })}
           </span>
         </span>
-        <div className="mt-4 p-4 bg-gray-800/50 rounded-lg border border-yellow-700/50 shadow-[0_0_15px_rgba(234,179,8,0.15)]">
+        <div className="mt-4 p-4 rounded-lg border">
           <div className="space-y-2">
-            <p className="text-yellow-500 font-medium">Important Notice</p>
-            <p className="text-gray-300">
+            <p className="font-medium">Important Notice</p>
+            <p>
               This data represents only the nodes that are actively sending data to the Xatu project. 
               It is not representative of the total number of nodes in each network or the overall client diversity.
             </p>
@@ -119,20 +119,20 @@ export default function Networks(): JSX.Element {
             .sort((a, b) => b.value - a.value);
 
           return (
-            <div key={name} className="bg-gray-800/50 rounded-lg p-4 border border-gray-700">
+            <div key={name} className="backdrop-blur-sm rounded-lg p-4 border">
               <div className="flex justify-between items-center mb-4">
                 <div className="flex items-center gap-2">
                   <span className="w-5 h-5 flex items-center justify-center">
                     {metadata.icon}
                   </span>
                   <div>
-                    <div className="text-xl font-bold text-cyan-400">{metadata.name}</div>
-                    <div className="text-sm text-gray-400">
+                    <div className="text-xl font-bold">{metadata.name}</div>
+                    <div className="text-sm opacity-70">
                       {data.total_nodes} total nodes
                     </div>
                   </div>
                 </div>
-                <div className="text-right text-sm text-gray-400">
+                <div className="text-right text-sm opacity-70">
                   <div>{data.total_public_nodes} community</div>
                   <div>{data.total_nodes - data.total_public_nodes} ethPandaOps</div>
                 </div>
@@ -140,22 +140,22 @@ export default function Networks(): JSX.Element {
 
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-400">Countries</span>
-                  <span className="text-gray-300">{Object.keys(data.countries).length}</span>
+                  <span className="opacity-70">Countries</span>
+                  <span>{Object.keys(data.countries).length}</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-400">Cities</span>
-                  <span className="text-gray-300">{Object.keys(data.cities).length}</span>
+                  <span className="opacity-70">Cities</span>
+                  <span>{Object.keys(data.cities).length}</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-400">Continents</span>
-                  <span className="text-gray-300">{Object.keys(data.continents).length}</span>
+                  <span className="opacity-70">Continents</span>
+                  <span>{Object.keys(data.continents).length}</span>
                 </div>
               </div>
 
               {/* Client Distribution */}
-              <div className="mt-4 pt-4 border-t border-gray-700">
-                <h4 className="text-sm font-medium text-gray-300 mb-3">Client Distribution</h4>
+              <div className="mt-4 pt-4 border-t">
+                <h4 className="text-sm font-medium mb-3">Client Distribution</h4>
                 <div className="space-y-2">
                   {clientDistribution.map((client) => (
                     <div key={client.name} className="flex items-center gap-3">
@@ -169,12 +169,12 @@ export default function Networks(): JSX.Element {
                         }}
                       />
                       <div className="flex-1 flex items-center justify-between">
-                        <span className="text-gray-200 text-sm">{client.name}</span>
+                        <span className="text-sm">{client.name}</span>
                         <div className="text-right">
-                          <span className="text-cyan-400 text-sm font-medium">
+                          <span className="text-sm font-medium">
                             {((client.value / data.total_nodes) * 100).toFixed(1)}%
                           </span>
-                          <div className="text-xs text-gray-400">
+                          <div className="text-xs opacity-70">
                             {client.value} nodes ({client.publicValue} public)
                           </div>
                         </div>

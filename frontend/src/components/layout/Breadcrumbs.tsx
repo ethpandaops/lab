@@ -96,14 +96,14 @@ export function Breadcrumbs(): JSX.Element {
         {finalPath.map((item, index) => (
           <li key={item.path} className="flex items-center">
             {index > 0 && (
-              <ChevronRight className="w-4 h-4 text-gray-500 mx-2" />
+              <ChevronRight className="w-4 h-4 text-tertiary mx-2" />
             )}
             <Link
               to={item.path}
-              className={`text-sm font-medium hover:text-cyan-400 transition-colors ${
+              className={`text-sm font-medium hover:text-accent transition-colors ${
                 index === finalPath.length - 1
-                  ? 'text-cyan-400'
-                  : 'text-gray-400'
+                  ? 'text-accent'
+                  : 'text-secondary'
               }`}
             >
               {item.name}

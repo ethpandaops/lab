@@ -73,7 +73,7 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
                 <div className="absolute right-0 top-0 -mr-16 flex pt-4 pr-2">
                   <button
                     type="button"
-                    className="relative ml-1 flex h-10 w-10 items-center justify-center rounded-md text-gray-300 focus:outline-none"
+                    className="relative ml-1 flex h-10 w-10 items-center justify-center rounded-md text-primary focus:outline-none"
                     onClick={onClose}
                   >
                     <span className="absolute -inset-2.5" />
@@ -100,21 +100,21 @@ const SidebarContent = () => {
   const location = useLocation()
 
   return (
-    <div className="flex grow flex-col gap-y-5 bg-gray-900/90 backdrop-blur-md border-r border-white/5 px-6 pb-4">
+    <div className="flex grow flex-col gap-y-5 backdrop-blur-md border-r border-white/5 px-6 pb-4">
       <nav className="flex flex-1 flex-col pt-4">
         <ul role="list" className="flex flex-1 flex-col gap-y-7">
           {sidebarItems.map((section) => (
             <li key={section.name}>
               <Link to={section.path} className="block">
-                <div className="text-xs font-semibold leading-6 text-cyan-400 hover:text-cyan-300 transition-colors">{section.name}</div>
+                <div className="text-xs font-semibold leading-6 text-accent hover:text-accent-secondary transition-colors">{section.name}</div>
               </Link>
               <ul role="list" className="mt-2 space-y-1">
                 {section.items.map((group) => (
                   <li key={group.name}>
                     <Link
                       to={group.path}
-                      className={`block text-sm font-medium text-gray-400 px-2 py-1.5 hover:text-cyan-400 transition-colors
-                        ${location.pathname.startsWith(group.path) ? 'text-cyan-400' : ''}`}
+                      className={`block text-sm font-medium text-secondary px-2 py-1.5 hover:text-accent transition-colors
+                        ${location.pathname.startsWith(group.path) ? 'text-accent' : ''}`}
                     >
                       {group.name}
                     </Link>
@@ -128,8 +128,8 @@ const SidebarContent = () => {
                                 to={item.path}
                                 className={`group flex gap-x-3 rounded-md p-2 text-sm leading-6 transition-all
                                   ${isActive
-                                    ? 'text-cyan-400 bg-cyan-500/10 border border-cyan-500/50'
-                                    : 'text-gray-300 hover:text-cyan-400 hover:bg-cyan-500/10'
+                                    ? 'text-accent bg-cyan-500/10 border border-cyan-500/50'
+                                    : 'text-primary hover:text-accent hover:bg-cyan-500/10'
                                   }`}
                               >
                                 {item.name}

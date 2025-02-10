@@ -67,89 +67,145 @@ const experimentGroups: ExperimentGroup[] = [
 
 function Home(): JSX.Element {
   return (
-    <div className="space-y-8">
+    <div className="relative space-y-12 overflow-hidden">
+      {/* Background Effects */}
+      <div className="fixed inset-0 bg-cyber-grid bg-cyber opacity-5" />
+      <div className="fixed inset-0">
+        <div className="absolute inset-0 bg-gradient-to-b from-cyber-darker via-cyber-darker/50 to-cyber-darker" />
+      </div>
+
       {/* Hero Section */}
-      <div className="relative rounded-2xl overflow-hidden bg-gray-900/80 backdrop-blur-md border border-gray-800">
-        <div className="absolute inset-0">
-          <img src="/header.png" alt="Header" className="w-full h-full object-cover opacity-50" />
-        </div>
-        <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/30 via-transparent to-purple-500/30" />
-        <div className="relative p-6 md:p-12">
-          <div className="text-center md:text-left max-w-4xl">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6">The Lab</h1>
-            <p className="text-xl md:text-2xl font-mono text-cyan-400 italic">
-              &quot;Let the pandas cook 🐼👨‍🍳&quot;
-            </p>
+      <div className="relative -mx-4 sm:-mx-6 lg:-mx-8 -mt-8 flex flex-col items-center justify-center min-h-[40vh] py-16">
+        <div className="relative w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="relative flex flex-col items-center text-center">
+            {/* Decorative elements */}
+            <div className="absolute -left-4 top-0 w-px h-32 bg-gradient-to-b from-transparent via-cyber-neon/30 to-transparent" />
+            <div className="absolute -right-4 top-0 w-px h-32 bg-gradient-to-b from-transparent via-cyber-blue/30 to-transparent" />
+            
+            <div className="relative inline-flex flex-col items-center">
+              <h1 className="text-6xl md:text-7xl lg:text-8xl font-sans font-black mb-8">
+                <span className="inline-block bg-gradient-to-r from-cyber-neon via-cyber-blue to-cyber-neon bg-300% bg-clip-text text-transparent">
+                  The Lab
+                </span>
+              </h1>
+              
+              <div className="group relative">
+                <div className="absolute -inset-1 bg-gradient-to-r from-cyber-neon via-cyber-blue to-cyber-neon opacity-10 blur-sm group-hover:opacity-20 transition-opacity duration-500" />
+                <p className="relative text-2xl md:text-3xl lg:text-4xl font-mono text-secondary italic px-6 py-2 border border-cyber-neon/20 rounded-lg backdrop-blur-sm group-hover:border-cyber-neon/40 transition-colors duration-500">
+                  <span className="group-hover:text-primary transition-colors duration-500">
+                    &quot;Let the pandas cook 🐼👨‍🍳&quot;
+                  </span>
+                </p>
+              </div>
+            </div>
           </div>
+        </div>
+
+        {/* Bottom border effect */}
+        <div className="absolute bottom-0 left-0 right-0">
+          <div className="h-px bg-gradient-to-r from-transparent via-cyber-neon/10 to-transparent" />
+          <div className="h-8 bg-gradient-to-b from-cyber-neon/5 to-transparent" />
         </div>
       </div>
 
       {/* Experiments Section */}
-      <div className="bg-gray-900/80 backdrop-blur-md rounded-xl p-4 md:p-6 border border-gray-800">
-        <div className="flex items-center gap-4 mb-8">
-          <div className="w-12 h-12 rounded-lg bg-cyan-500/10 flex items-center justify-center flex-shrink-0">
-            <Beaker className="w-6 h-6 text-cyan-400" />
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Section header */}
+        <div className="relative flex items-center gap-6 mb-16">
+          <div className="relative w-16 h-16">
+            <div className="absolute inset-0 bg-cyber-neon/10 rounded-lg blur-sm" />
+            <div className="relative w-16 h-16 rounded-lg bg-cyber-darker/80 border border-cyber-neon/20 flex items-center justify-center">
+              <Beaker className="w-8 h-8 text-cyber-neon" />
+            </div>
           </div>
           <div>
-            <h3 className="text-lg font-semibold text-white">Experiments</h3>
-            <p className="text-gray-400 text-sm">Explore our experimental features and projects</p>
+            <h2 className="text-3xl font-sans font-bold text-primary">
+              <span className="relative">
+                Experiments
+                <span className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-cyber-neon/20 to-transparent" />
+              </span>
+            </h2>
+            <p className="text-lg text-secondary font-mono mt-1">Explore our experimental features and projects</p>
           </div>
         </div>
 
-        <div className="space-y-12">
-          {experimentGroups.map((group) => (
-            <div key={group.id} className="space-y-6">
-              {/* Group Header */}
-              <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
-                <div className="w-40 h-40 rounded-2xl bg-gray-900/50 flex items-center justify-center flex-shrink-0 relative group/logo">
-                  <div className="relative">
-                    <div className="absolute inset-0 w-32 h-32 animate-pulse-slow">
+        {/* New Experiment Layout */}
+        <div className="relative">
+          {experimentGroups.map((group, index) => (
+            <div key={group.id} className="relative mb-24 last:mb-0">
+              {/* Project Header Card */}
+              <div className="relative backdrop-blur-sm bg-cyber-darker/90 rounded-xl border border-cyber-neon/20 overflow-hidden">
+                {/* Background Gradient */}
+                <div className="absolute inset-0 bg-gradient-to-br from-cyber-darker via-cyber-darker to-transparent" />
+                
+                <div className="relative p-8 flex flex-col md:flex-row gap-8 items-center">
+                  {/* Logo Section */}
+                  <div className="relative shrink-0">
+                    <div className="relative w-40 h-40 flex items-center justify-center">
+                      {/* Logo Glow Effect */}
+                      <div className="absolute inset-0 opacity-50 blur-xl">
+                        <img 
+                          src={group.logo} 
+                          alt="" 
+                          className="w-full h-full object-contain"
+                          style={{ filter: 'brightness(1.5)' }}
+                        />
+                      </div>
                       <img 
                         src={group.logo} 
                         alt="" 
-                        className="w-full h-full object-contain opacity-50 blur-md brightness-200"
-                        style={{ filter: 'brightness(2) drop-shadow(0 0 8px rgb(6 182 212 / 1))' }}
+                        className="relative w-32 h-32 object-contain"
+                        style={{ filter: 'drop-shadow(0 0 20px rgba(0, 255, 159, 0.5))' }}
                       />
                     </div>
-                    <img 
-                      src={group.logo} 
-                      alt="" 
-                      className="relative w-32 h-32 object-contain transition-transform duration-300 group-hover/logo:scale-110"
-                      style={{ filter: 'drop-shadow(0 0 4px rgb(6 182 212 / 0.7))' }}
-                    />
                   </div>
-                </div>
-                <div className="flex-1 min-w-0 space-y-4 text-center md:text-left">
-                  <div>
-                    <h3 className="text-3xl md:text-4xl font-black text-white tracking-tight">{group.title}</h3>
-                    <p className="text-gray-400 mt-2 text-base md:text-lg">{group.subtitle}</p>
+
+                  {/* Content Section */}
+                  <div className="flex-1 min-w-0 text-center md:text-left">
+                    <h3 className="text-4xl font-sans font-black tracking-tight mb-4">
+                      <span className="bg-gradient-to-r from-cyber-neon to-cyber-blue bg-clip-text text-transparent">
+                        {group.title}
+                      </span>
+                    </h3>
+                    <p className="text-xl text-secondary font-mono mb-6">{group.subtitle}</p>
+                    <Link
+                      to={group.overview.href}
+                      className="inline-flex items-center gap-2 px-6 py-3 bg-cyber-darker/80 border border-cyber-neon/20 hover:border-cyber-neon/40 rounded-lg text-primary hover:text-accent font-medium transition-all duration-300"
+                    >
+                      <span>View {group.title}</span>
+                      <ArrowRight className="w-5 h-5 transition-transform duration-300 group-hover:translate-x-1" />
+                    </Link>
                   </div>
-                  <Link
-                    to={group.overview.href}
-                    className="group inline-flex items-center gap-3 px-6 py-3 bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/20 hover:border-cyan-500/30 rounded-lg text-cyan-400 font-medium transition-all"
-                  >
-                    <span>View {group.title}</span>
-                    <ArrowRight className="w-5 h-5 group-hover:translate-x-0.5 transition-transform" />
-                  </Link>
                 </div>
               </div>
 
-              {/* Group Links */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {/* Features Grid */}
+              <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {group.links.map((link) => (
                   <Link
                     key={link.href}
                     to={link.href}
-                    className="group relative bg-gray-800/50 rounded-lg p-3 sm:p-4 border border-gray-700 hover:border-cyan-500/50 transition-all"
+                    className="group relative p-6 backdrop-blur-sm bg-cyber-darker/50 hover:bg-cyber-darker/80 border border-cyber-neon/10 hover:border-cyber-neon/30 rounded-lg transition-all duration-300"
                   >
-                    <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 via-purple-500/10 to-cyan-500/10 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity" />
+                    {/* Feature Card Content */}
                     <div className="relative">
-                      <h3 className="text-base sm:text-lg font-semibold text-cyan-400 mb-1">{link.title}</h3>
-                      <p className="text-sm sm:text-base text-gray-300">{link.description}</p>
+                      <h4 className="text-xl font-sans font-semibold text-accent mb-2 group-hover:text-primary transition-colors duration-300">
+                        {link.title}
+                      </h4>
+                      <p className="text-secondary font-mono text-sm group-hover:text-primary/90 transition-colors duration-300">
+                        {link.description}
+                      </p>
                     </div>
                   </Link>
                 ))}
               </div>
+
+              {/* Section Divider (except for last item) */}
+              {index !== experimentGroups.length - 1 && (
+                <div className="absolute -bottom-12 left-1/2 transform -translate-x-1/2 w-1/2">
+                  <div className="h-px bg-gradient-to-r from-transparent via-cyber-neon/20 to-transparent" />
+                </div>
+              )}
             </div>
           ))}
         </div>
