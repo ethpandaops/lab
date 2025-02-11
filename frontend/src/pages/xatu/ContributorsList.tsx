@@ -44,40 +44,23 @@ const ContributorsList = (): JSX.Element => {
   }
 
   return (
-    <div className="space-y-8">
-      <XatuCallToAction />
-
-      {/* Page Header */}
-      <div className="relative">
-        <div className="absolute inset-0 flex items-center">
-          <div className="w-full h-px bg-gradient-to-r from-transparent via-cyber-neon/20 to-transparent" />
-        </div>
-        <div className="relative flex justify-center">
-          <div className="px-4 bg-cyber-darker">
-            <h1 className="text-3xl md:text-4xl font-sans font-black bg-gradient-to-r from-cyber-neon via-cyber-blue to-cyber-pink bg-clip-text text-transparent animate-text-shine">
-              Contributors
-            </h1>
-          </div>
-        </div>
-      </div>
-
-      {/* About Section */}
-      <div className="backdrop-blur-sm rounded-lg p-6 border border-cyber-neon/10 hover:border-cyber-neon/20 transition-all">
-        <p className="text-sm font-mono text-cyber-neon/70">
+    <div className="space-y-4">
+      <div className="backdrop-blur-sm rounded-lg p-4 border">
+        <h2 className="text-xl font-semibold mb-2">Xatu Contributors</h2>
+        <p className="text-sm">
           These are the amazing contributors who are helping us monitor the Ethereum network.
           All data is anonymized and no personally identifiable information is collected.
         </p>
       </div>
 
-      {/* Contributors Table */}
-      <div className="backdrop-blur-sm rounded-lg border border-cyber-neon/10">
-        <div className="overflow-x-auto">
+      <div className="backdrop-blur-sm rounded-lg p-4 border">
+        <div className="overflow-x-auto -mx-2">
           <table className="w-full min-w-[300px]">
             <thead>
-              <tr className="border-b border-cyber-neon/10">
-                <th className="text-left py-4 px-6 text-sm font-mono font-medium text-cyber-neon/90 w-[60%]">Contributor</th>
-                <th className="text-right py-4 px-6 text-sm font-mono font-medium text-cyber-neon/90 w-[20%]">Nodes</th>
-                <th className="text-right py-4 px-6 text-sm font-mono font-medium text-cyber-neon/90 hidden sm:table-cell w-[20%]">Last Update</th>
+              <tr className="border-b">
+                <th className="text-left py-2 px-2 text-sm w-[60%]">Contributor</th>
+                <th className="text-right py-2 px-2 text-sm w-[20%]">Nodes</th>
+                <th className="text-right py-2 px-2 text-sm hidden sm:table-cell w-[20%]">Last Update</th>
               </tr>
             </thead>
             <tbody>
@@ -88,29 +71,29 @@ const ContributorsList = (): JSX.Element => {
                   return (
                     <tr
                       key={contributor.name}
-                      className="border-b border-cyber-neon/10 hover:bg-cyber-neon/5 transition-all"
+                      className="border-b hover:bg-cyber-neon/5 transition-colors"
                     >
-                      <td className="py-4 px-6 w-[60%]">
+                      <td className="py-2 px-2 w-[60%]">
                         <Link
                           to={`/xatu/contributors/${contributor.name}`}
-                          className="flex items-center gap-3 hover:opacity-80 transition-all group"
+                          className="flex items-center gap-2 hover:opacity-80 transition-opacity"
                         >
                           <div
-                            className="w-8 h-8 rounded-lg flex items-center justify-center text-sm font-mono font-bold text-cyber-darker group-hover:scale-105 transition-transform"
+                            className="w-6 h-6 rounded-lg flex items-center justify-center text-xs font-bold text-primary"
                             style={{ 
                               backgroundColor: avatarColor,
-                              boxShadow: `0 0 15px ${avatarColor}33`,
+                              boxShadow: `0 0 10px ${avatarColor}33`,
                             }}
                           >
                             {initials}
                           </div>
-                          <span className="text-sm font-mono text-cyber-neon/90 truncate">{contributor.name}</span>
+                          <span className="text-sm truncate">{contributor.name}</span>
                         </Link>
                       </td>
-                      <td className="text-right py-4 px-6 text-sm font-mono font-medium text-cyber-neon w-[20%]">
-                        {contributor.node_count.toLocaleString()}
+                      <td className="text-right py-2 px-2 text-sm w-[20%]">
+                        {contributor.node_count}
                       </td>
-                      <td className="text-right py-4 px-6 text-sm font-mono text-cyber-neon/70 hidden sm:table-cell w-[20%]">
+                      <td className="text-right py-2 px-2 text-sm hidden sm:table-cell w-[20%]">
                         {formatDistanceToNow(new Date(contributor.updated_at * 1000), { addSuffix: true })}
                       </td>
                     </tr>

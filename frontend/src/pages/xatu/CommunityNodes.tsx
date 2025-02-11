@@ -85,12 +85,35 @@ export const CommunityNodes = () => {
     [config]
   )
 
-  const [timeWindow, setTimeWindow] = useState<TimeWindow>(() => 
-    searchParams.get('timeWindow') || defaultTimeWindow
-  )
-  const [network, setNetwork] = useState<string>(() => 
-    searchParams.get('network') || defaultNetwork
-  )
+  // Get initial values from URL or defaults
+  const initialNetwork = searchParams.get('network') || defaultNetwork
+  const initialTimeWindow = searchParams.get('timeWindow') || defaultTimeWindow
+
+  const [network, setNetwork] = useState(initialNetwork)
+  const [timeWindow, setTimeWindow] = useState(initialTimeWindow)
+
+  // Handle network/timeWindow changes
+  const handleNetworkChange = (newNetwork: string) => {
+    setNetwork(newNetwork)
+    const newParams = new URLSearchParams(searchParams)
+    if (newNetwork !== defaultNetwork) {
+      newParams.set('network', newNetwork)
+    } else {
+      newParams.delete('network')
+    }
+    setSearchParams(newParams, { replace: true })
+  }
+
+  const handleTimeWindowChange = (newTimeWindow: TimeWindow) => {
+    setTimeWindow(newTimeWindow)
+    const newParams = new URLSearchParams(searchParams)
+    if (newTimeWindow !== defaultTimeWindow) {
+      newParams.set('timeWindow', newTimeWindow)
+    } else {
+      newParams.delete('timeWindow')
+    }
+    setSearchParams(newParams, { replace: true })
+  }
 
   // Refs for section scrolling
   const totalNodesRef = useRef<HTMLDivElement>(null)
@@ -99,14 +122,6 @@ export const CommunityNodes = () => {
   useEffect(() => {
     getConfig().then(setConfig).catch(console.error)
   }, [])
-
-  // Update URL when network/timeWindow changes
-  useEffect(() => {
-    const newParams = new URLSearchParams(searchParams)
-    newParams.set('network', network)
-    newParams.set('timeWindow', timeWindow)
-    setSearchParams(newParams)
-  }, [network, timeWindow, setSearchParams])
 
   // Handle section scrolling
   useEffect(() => {
@@ -258,7 +273,7 @@ export const CommunityNodes = () => {
         top: offsetPosition,
         behavior: 'smooth'
       });
-      window.history.pushState({}, '', `#${id}`);
+      navigate({ hash: id });
     }
   };
 
@@ -350,7 +365,7 @@ export const CommunityNodes = () => {
         <div className="flex flex-col md:flex-row justify-end gap-4">
           <NetworkSelector
             selectedNetwork={network}
-            onNetworkChange={setNetwork}
+            onNetworkChange={handleNetworkChange}
           />
           <div className="relative" ref={timeWindowRef}>
             <button
@@ -380,7 +395,7 @@ export const CommunityNodes = () => {
                   <button
                     key={window.file}
                     onClick={() => {
-                      setTimeWindow(window.file)
+                      handleTimeWindowChange(window.file)
                       setIsTimeWindowOpen(false)
                     }}
                     className={`w-full flex items-center gap-2 px-4 py-2 hover:bg-cyber-neon/5 first:rounded-t-lg last:rounded-b-lg text-cyber-neon ${
