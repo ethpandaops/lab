@@ -3,7 +3,7 @@ import { LoadingState } from '../../../components/common/LoadingState'
 import { ErrorState } from '../../../components/common/ErrorState'
 import { NetworkSelector } from '../../../components/common/NetworkSelector'
 import { AboutThisData } from '../../../components/common/AboutThisData'
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useRef } from 'react'
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend, ReferenceLine, ScatterChart, Scatter, ZAxis } from 'recharts'
 import { getConfig } from '../../../utils/config'
 import type { Config } from '../../../types'
@@ -74,6 +74,7 @@ export const BlockTimings: React.FC = () => {
   const [isTimeWindowOpen, setIsTimeWindowOpen] = useState(false)
   const [hiddenArrivalLines, setHiddenArrivalLines] = useState<Set<string>>(new Set())
   const [hiddenSizeLines, setHiddenSizeLines] = useState<Set<string>>(new Set())
+  const timeWindowRef = useRef<HTMLDivElement>(null)
 
   const timeWindows = useMemo<TimeWindowConfig[]>(() => {
     const notebookConfig = config?.notebooks?.['beacon-chain-timings']
@@ -281,6 +282,17 @@ export const BlockTimings: React.FC = () => {
 
   const lineNames = Object.keys(dataKeyMap) as PercentileKey[]
 
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (timeWindowRef.current && !timeWindowRef.current.contains(event.target as Node)) {
+        setIsTimeWindowOpen(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
+
   if (configLoading || loading) {
     return <LoadingState message="Loading data..." />
   }
@@ -331,11 +343,11 @@ export const BlockTimings: React.FC = () => {
             onNetworkChange={setNetwork}
             className="w-full md:w-auto"
           />
-          <div className="relative w-full md:w-auto">
+          <div className="relative w-full md:w-auto" ref={timeWindowRef}>
             <button
               type="button"
               onClick={() => setIsTimeWindowOpen(!isTimeWindowOpen)}
-              className="w-full flex items-center justify-between gap-2 px-4 py-2 rounded-lg border border-cyber-neon/20 hover:border-cyber-neon/30 hover:bg-cyber-neon/5 transition-all duration-300"
+              className="w-full flex items-center justify-between gap-2 px-4 py-2 rounded-lg bg-cyber-darker border border-cyber-neon/20 hover:border-cyber-neon/30 hover:bg-cyber-neon/5 transition-all duration-300"
             >
               <div className="flex items-center gap-2">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -354,7 +366,7 @@ export const BlockTimings: React.FC = () => {
             </button>
 
             {isTimeWindowOpen && (
-              <div className="absolute z-10 mt-2 w-full rounded-lg backdrop-blur-md border border-cyber-neon/20 bg-cyber-dark/95 shadow-xl">
+              <div className="absolute z-[9999] mt-2 w-full rounded-lg bg-cyber-darker border border-cyber-neon/20">
                 <div className="py-1">
                   {timeWindows.map((window) => (
                     <button
@@ -363,7 +375,7 @@ export const BlockTimings: React.FC = () => {
                         setTimeWindow(window.file)
                         setIsTimeWindowOpen(false)
                       }}
-                      className="w-full px-4 py-2 text-left font-mono text-cyber-neon/70 hover:text-cyber-neon hover:bg-cyber-neon/5 transition-colors"
+                      className="w-full px-4 py-2 text-left font-mono text-cyber-neon hover:text-cyber-neon hover:bg-cyber-neon/5 active:bg-cyber-neon/10 transition-colors"
                     >
                       {window.label}
                     </button>
@@ -383,10 +395,11 @@ export const BlockTimings: React.FC = () => {
       </div>
 
       {/* Charts Section */}
-      <section className="space-y-6">
+      <section className="space-y-12">
         {/* Block Arrival Times */}
         <ChartWithStats
-          title="Block Arrival Time"
+          title="Block Arrival Time Distribution"
+          description="This chart tracks block arrival times across the network, showing how quickly blocks propagate to nodes. The data is collected by nodes run by the ethPandaOps team and contributed by the community, showing aggregated results."
           chart={
             <ResponsiveContainer width="100%" height="100%">
               <LineChart 
@@ -422,7 +435,7 @@ export const BlockTimings: React.FC = () => {
                     angle: -90, 
                     position: 'insideLeft',
                     style: { fill: 'currentColor', fontSize: 12 },
-                    offset: 10
+                    offset: -10
                   }}
                   domain={[0, 6]}
                   tick={{ fontSize: 10 }}
@@ -449,33 +462,6 @@ export const BlockTimings: React.FC = () => {
                   strokeWidth={2}
                   strokeDasharray="5 2"
                 />
-                {/* Legend Box */}
-                <g className="recharts-legend" transform="translate(500, 10)">
-                  <g className="recharts-legend-item">
-                    <rect
-                      x="0"
-                      y="0"
-                      width="180"
-                      height="24"
-                      fill="rgba(10, 10, 15, 0.95)"
-                      stroke="rgba(0, 255, 159, 0.3)"
-                      strokeWidth="1"
-                      rx="4"
-                    />
-                    <line 
-                      x1="8" 
-                      y1="12" 
-                      x2="28" 
-                      y2="12" 
-                      stroke={ATTESTATION_DEADLINE_COLOR} 
-                      strokeWidth={2} 
-                      strokeDasharray="5 2" 
-                    />
-                    <text x="36" y="16" fill="currentColor" style={{ fontSize: '12px' }}>
-                      Attestation Deadline
-                    </text>
-                  </g>
-                </g>
                 {lineNames.map((name) => (
                   <Line
                     key={name}
@@ -516,16 +502,10 @@ export const BlockTimings: React.FC = () => {
           })}
         />
 
-        {/* Chart Separator */}
-        <div className="relative my-12">
-          <div className="absolute inset-0 flex items-center">
-            <div className="w-full h-px bg-gradient-to-r from-transparent via-cyber-neon/20 to-transparent" />
-          </div>
-        </div>
-
         {/* Block Size vs Arrival Time */}
         <ChartWithStats
           title="Block Size vs Arrival Time"
+          description="This chart analyzes the relationship between block size and network propagation time, helping identify how block size impacts network performance. The data is collected by nodes run by the ethPandaOps team and contributed by the community, showing aggregated results."
           chart={
             <ResponsiveContainer width="100%" height="100%">
               <LineChart margin={{ 

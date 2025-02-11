@@ -15,16 +15,22 @@ interface SeriesStats {
 
 interface ChartWithStatsProps {
   title: string
+  description?: string
   chart: ReactNode
   series: SeriesStats[]
   className?: string
   notes?: ReactNode
 }
 
-export const ChartWithStats = ({ title, chart, series, className = '', notes }: ChartWithStatsProps) => {
+export const ChartWithStats = ({ title, description, chart, series, className = '', notes }: ChartWithStatsProps) => {
   return (
     <div className={`space-y-6 ${className}`}>
-      <h2 className="text-2xl font-sans font-bold text-cyber-neon">{title}</h2>
+      <div className="space-y-2">
+        <h2 className="text-2xl font-sans font-bold text-cyber-neon">{title}</h2>
+        {description && (
+          <p className="text-sm font-mono text-cyber-neon/70">{description}</p>
+        )}
+      </div>
       
       {/* Desktop: Chart (75%) + Stats (25%) with notes underneath */}
       <div className="flex flex-col gap-6">

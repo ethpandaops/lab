@@ -1,5 +1,5 @@
 import { getConfig } from '../../utils/config'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import type { Config } from '../../types'
 
 interface Props {
@@ -39,9 +39,21 @@ const NETWORK_METADATA = {
 export const NetworkSelector = ({ selectedNetwork, onNetworkChange, className }: Props) => {
   const [config, setConfig] = useState<Config>()
   const [isOpen, setIsOpen] = useState(false)
+  const dropdownRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     getConfig().then(setConfig)
+  }, [])
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsOpen(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
   const networks = config?.notebooks['xatu-public-contributors'].networks || ['mainnet']
@@ -53,17 +65,17 @@ export const NetworkSelector = ({ selectedNetwork, onNetworkChange, className }:
   }
 
   return ( 
-    <div className={`relative ${className}`}>
+    <div className={`relative ${className}`} ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
+        className="flex items-center gap-2 px-4 py-2 rounded-lg backdrop-blur-sm border border-cyber-neon/10 hover:border-cyber-neon/30 hover:bg-cyber-neon/5 transition-all duration-300 bg-cyber-dark/90"
       >
         <span className="w-5 h-5 flex items-center justify-center">
           {selectedMetadata.icon}
         </span>
-        <span>{selectedMetadata.name}</span>
+        <span className="font-mono">{selectedMetadata.name}</span>
         <svg 
-          className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''}`} 
+          className={`w-4 h-4 transition-transform text-cyber-neon/70 ${isOpen ? 'rotate-180' : ''}`} 
           fill="none" 
           stroke="currentColor" 
           viewBox="0 0 24 24"
@@ -73,7 +85,7 @@ export const NetworkSelector = ({ selectedNetwork, onNetworkChange, className }:
       </button>
 
       {isOpen && (
-        <div className="absolute z-10 mt-2 w-full rounded-lg border">
+        <div className="absolute z-[9999] mt-2 w-full rounded-lg border border-cyber-neon/20 bg-cyber-darker">
           {networks.map((network) => {
             const metadata = NETWORK_METADATA[network as keyof typeof NETWORK_METADATA] || {
               name: network.charAt(0).toUpperCase() + network.slice(1),
@@ -88,8 +100,8 @@ export const NetworkSelector = ({ selectedNetwork, onNetworkChange, className }:
                   onNetworkChange(network)
                   setIsOpen(false)
                 }}
-                className={`w-full flex items-center gap-2 px-4 py-2 hover:bg-gray-700 first:rounded-t-lg last:rounded-b-lg text-primary ${
-                  network === selectedNetwork ? 'bg-gray-700' : ''
+                className={`w-full flex items-center gap-2 px-4 py-2 bg-cyber-darker hover:bg-cyber-neon/5 first:rounded-t-lg last:rounded-b-lg font-mono text-cyber-neon hover:text-cyber-neon transition-colors ${
+                  network === selectedNetwork ? 'text-cyber-neon bg-cyber-neon/10' : ''
                 }`}
               >
                 <span className="w-5 h-5 flex items-center justify-center">
