@@ -58,3 +58,9 @@ notebooks:
       #   step: "1d" 
       #   label: "Last 1y"
       #   range: "-365d"
+  beacon-chain-overview:
+    enabled: true
+    schedule_hours: 1
+    description: "Gets the latest beacon chain overview data"
+    networks:
+      - mainnet

@@ -110,6 +110,16 @@ class BeaconChainTimings:
             data_dir=str(Path(data_config.path) / "beacon-chain-timings")
         )
 @dataclass
+class BeaconChainOverview:
+    networks: List[str]
+    data_dir: str
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any], data_config: DataConfig) -> "BeaconChainOverview":
+        return cls(
+            networks=data.get("networks", []),
+            data_dir=str(Path(data_config.path) / "beacon-chain-overview")
+        )
+@dataclass
 class NotebookConfig:
     enabled: bool
     schedule_hours: int
@@ -138,6 +148,13 @@ class NotebookConfig:
             return BeaconChainTimings.from_dict(self.config, self.data_config)
         except Exception as e:
             print(f"Failed to parse BeaconChainTimings config: {e}")
+            return None
+    def as_beacon_chain_overview(self) -> Optional[BeaconChainOverview]:
+        """Convert config to BeaconChainOverview if valid"""
+        try:
+            return BeaconChainOverview.from_dict(self.config, self.data_config)
+        except Exception as e:
+            print(f"Failed to parse BeaconChainOverview config: {e}")
             return None
 
 @dataclass
