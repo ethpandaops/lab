@@ -14,7 +14,7 @@ interface SeriesStats {
 }
 
 interface ChartWithStatsProps {
-  title: string
+  title: ReactNode
   description?: string
   chart: ReactNode
   series: SeriesStats[]
@@ -45,33 +45,35 @@ export const ChartWithStats = ({ title, description, chart, series, className = 
 
           {/* Stats Table */}
           <div className="w-full lg:w-1/4">
-            <div className="text-xs font-mono text-cyber-neon/70 mb-2 flex justify-between px-2">
-              <div>Series Name</div>
-              <div>Last</div>
-            </div>
-            <div className="space-y-1">
-              {series.map((item) => (
-                <button
-                  key={item.name}
-                  onClick={item.onClick}
-                  className={`group w-full px-2 py-1.5 rounded hover:bg-cyber-neon/5 transition-colors ${
-                    item.isHidden ? 'opacity-50' : ''
-                  } ${item.isHighlighted ? 'ring-1 ring-cyber-neon' : ''}`}
-                  title={`Min: ${typeof item.min === 'number' ? item.min.toFixed(2) : item.min}${item.unit || ''}
+            <div className="flex flex-col h-[350px]">
+              <div className="text-xs font-mono text-cyber-neon/70 mb-2 flex justify-between px-2 sticky top-0 bg-cyber-darker z-10">
+                <div>Series Name</div>
+                <div>Last</div>
+              </div>
+              <div className="space-y-1 overflow-y-scroll cyber-scrollbar">
+                {series.map((item) => (
+                  <button
+                    key={item.name}
+                    onClick={item.onClick}
+                    className={`group w-full px-2 py-1.5 rounded hover:bg-cyber-neon/5 transition-colors ${
+                      item.isHidden ? 'opacity-50' : ''
+                    } ${item.isHighlighted ? 'ring-1 ring-cyber-neon' : ''}`}
+                    title={`Min: ${typeof item.min === 'number' ? item.min.toFixed(2) : item.min}${item.unit || ''}
 Avg: ${typeof item.avg === 'number' ? item.avg.toFixed(2) : item.avg}${item.unit || ''}
 Max: ${typeof item.max === 'number' ? item.max.toFixed(2) : item.max}${item.unit || ''}`}
-                >
-                  <div className="flex items-center justify-between gap-2">
-                    <div className="flex items-center gap-2 min-w-0">
-                      <div className="w-2 h-2 flex-shrink-0" style={{ backgroundColor: item.color }} />
-                      <span className="text-xs font-mono truncate">{item.name}</span>
+                  >
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <div className="w-2 h-2 flex-shrink-0" style={{ backgroundColor: item.color }} />
+                        <span className="text-xs font-mono truncate">{item.name}</span>
+                      </div>
+                      <div className="text-xs font-mono font-medium whitespace-nowrap">
+                        {typeof item.last === 'number' ? `${item.last.toFixed(2)}${item.unit || ''}` : item.last}
+                      </div>
                     </div>
-                    <div className="text-xs font-mono font-medium whitespace-nowrap">
-                      {typeof item.last === 'number' ? `${item.last.toFixed(2)}${item.unit || ''}` : item.last}
-                    </div>
-                  </div>
-                </button>
-              ))}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
         </div>
