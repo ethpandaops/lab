@@ -1,4 +1,4 @@
-import { Link, useLocation, useParams } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { ChevronRight } from 'lucide-react';
 
 interface NavItem {
@@ -73,44 +73,39 @@ function findActivePath(pathname: string, items: NavItem[]): NavItem[] {
 
 export function Breadcrumbs(): JSX.Element {
   const location = useLocation();
-  const params = useParams();
-  const activePath = findActivePath(location.pathname, breadcrumbs);
-
-  // Replace dynamic parameters with actual values
-  const processedPath = activePath.map(item => {
-    if (item.name.startsWith(':')) {
-      const paramName = item.name.slice(1);
-      return { ...item, name: params[paramName] || item.name };
-    }
-    return item;
-  });
-
-  // Always include home unless we're already on the home page
-  const finalPath = location.pathname === '/' 
-    ? processedPath 
-    : [breadcrumbs[0], ...processedPath];
+  const pathnames = location.pathname.split('/').filter(Boolean);
 
   return (
-    <nav className="flex" aria-label="Breadcrumb">
-      <ol className="flex items-center space-x-2">
-        {finalPath.map((item, index) => (
-          <li key={item.path} className="flex items-center">
-            {index > 0 && (
-              <ChevronRight className="w-4 h-4 text-tertiary mx-2" />
+    <nav className="flex items-center gap-2 text-sm font-mono">
+      <Link
+        to="/"
+        className="text-cyber-neon/70 hover:text-cyber-neon transition-colors"
+      >
+        Home
+      </Link>
+
+      {pathnames.map((name, index) => {
+        const routeTo = `/${pathnames.slice(0, index + 1).join('/')}`;
+        const isLast = index === pathnames.length - 1;
+
+        return (
+          <div key={routeTo} className="flex items-center gap-2">
+            <ChevronRight className="w-4 h-4 text-cyber-neon/50" />
+            {isLast ? (
+              <span className="text-cyber-neon">
+                {name.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
+              </span>
+            ) : (
+              <Link
+                to={routeTo}
+                className="text-cyber-neon/70 hover:text-cyber-neon transition-colors"
+              >
+                {name.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
+              </Link>
             )}
-            <Link
-              to={item.path}
-              className={`text-sm font-medium hover:text-accent transition-colors ${
-                index === finalPath.length - 1
-                  ? 'text-accent'
-                  : 'text-secondary'
-              }`}
-            >
-              {item.name}
-            </Link>
-          </li>
-        ))}
-      </ol>
+          </div>
+        );
+      })}
     </nav>
   );
 } 

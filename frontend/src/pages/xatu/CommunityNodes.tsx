@@ -9,6 +9,7 @@ import { getConfig } from '../../utils/config'
 import type { Config } from '../../types'
 import { useSearchParams, useLocation, useNavigate } from 'react-router-dom'
 import { GlobeViz } from '../../components/xatu/GlobeViz'
+import { AboutThisData } from '../../components/common/AboutThisData'
 
 interface CountryData {
   time: number
@@ -232,68 +233,41 @@ export const CommunityNodes = () => {
   }
 
   return (
-    <div className="space-y-8" ref={containerRef}>
+    <div className="space-y-6" ref={containerRef}>
       <XatuCallToAction />
 
-      <div className="backdrop-blur-sm rounded-lg p-6 border mb-8">
-        <h2 className="text-xl font-semibold mb-2">About This Data</h2>
-        <p>
-          This data represents nodes from the Ethereum community that have opted in to share their node information with us. 
-          The data helps us understand the geographical distribution of nodes and monitor the health of the network.
-          All data is anonymized and no personally identifiable information is collected.
-        </p>
-      </div>
-
-      <div className="flex justify-end gap-4 mb-8">
-        <NetworkSelector
-          selectedNetwork={network}
-          onNetworkChange={setNetwork}
-        />
-        <div className="relative">
-          <button
-            onClick={() => setIsTimeWindowOpen(!isTimeWindowOpen)}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg border"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <span>{currentWindow?.label || 'Select Time'}</span>
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-            </svg>
-          </button>
-
-          {isTimeWindowOpen && (
-            <div className="absolute z-10 right-0 mt-2 w-48 rounded-lg border">
-              {timeWindows.map((window) => (
-                <button
-                  key={window.file}
-                  onClick={() => {
-                    setTimeWindow(window.file)
-                    setIsTimeWindowOpen(false)
-                  }}
-                  className={`w-full flex items-center gap-2 px-4 py-2 first:rounded-t-lg last:rounded-b-lg ${
-                    window.file === timeWindow ? 'bg-cyber-neon/10' : ''
-                  }`}
-                >
-                  <span>{window.label}</span>
-                </button>
-              ))}
-            </div>
-          )}
+      {/* Page Header */}
+      <div className="relative">
+        <div className="absolute inset-0 flex items-center">
+          <div className="w-full h-px bg-gradient-to-r from-transparent via-cyber-neon/20 to-transparent" />
+        </div>
+        <div className="relative flex justify-center">
+          <div className="px-4 bg-cyber-darker">
+            <h1 className="text-3xl md:text-4xl font-sans font-black bg-gradient-to-r from-cyber-neon via-cyber-blue to-cyber-pink bg-clip-text text-transparent animate-text-shine">
+              Community Nodes
+            </h1>
+          </div>
         </div>
       </div>
 
-      <div className="space-y-8">
+      <div className="space-y-6">
+        <AboutThisData>
+          <p>
+          This data represents nodes from the Ethereum community that have opted in to share their node information with us. 
+          The data helps us understand the geographical distribution of nodes and monitor the health of the network.
+          All data is anonymized and no personally identifiable information is collected.
+          </p>
+        </AboutThisData>
+
         {/* Total Nodes Chart */}
-        <div ref={totalNodesRef}>
+        <div ref={totalNodesRef} className="backdrop-blur-sm rounded-lg border border-cyber-neon/10 hover:border-cyber-neon/20 p-6">
           <h2 
-            className="text-2xl font-bold mb-4 cursor-pointer hover:opacity-80"
+            className="text-2xl font-sans font-bold text-primary mb-4 cursor-pointer hover:text-cyber-neon transition-colors"
             onClick={() => handleSectionClick(SECTIONS['total-nodes'])}
           >
             Total Nodes
           </h2>
-          <div className="backdrop-blur-sm rounded-lg p-4 h-[400px] border">
+          <div className="h-[400px]">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={totalNodesData}>
                 <XAxis 
@@ -304,10 +278,10 @@ export const CommunityNodes = () => {
                 <YAxis stroke="currentColor" />
                 <Tooltip 
                   contentStyle={{
-                    backgroundColor: 'rgba(5, 5, 7, 0.95)',
+                    backgroundColor: 'rgba(10, 10, 15, 0.95)',
                     border: '1px solid rgba(0, 255, 159, 0.3)',
                     borderRadius: '0.5rem',
-                    color: 'rgb(0, 255, 159)'
+                    color: '#00ff9f'
                   }}
                   labelFormatter={(time) => new Date(time * 1000).toLocaleString()}
                   formatter={(value) => [value, 'Nodes']}
@@ -316,7 +290,7 @@ export const CommunityNodes = () => {
                   type="monotone"
                   dataKey="total"
                   name="Total Nodes"
-                  stroke="rgb(0, 255, 159)"
+                  stroke="#00ffff"
                   strokeWidth={2}
                   dot={false}
                 />
@@ -326,7 +300,13 @@ export const CommunityNodes = () => {
         </div>
 
         {/* Nodes by Country Chart */}
-        <div className="backdrop-blur-sm rounded-lg p-4 border flex flex-col">
+        <div className="backdrop-blur-sm rounded-lg border border-cyber-neon/10 hover:border-cyber-neon/20 p-6">
+          <h2 
+            className="text-2xl font-sans font-bold text-primary mb-4 cursor-pointer hover:text-cyber-neon transition-colors"
+            onClick={() => handleSectionClick(SECTIONS['nodes-by-country'])}
+          >
+            Nodes by Country
+          </h2>
           <div className="h-[400px]">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={chartData}>
@@ -338,10 +318,10 @@ export const CommunityNodes = () => {
                 <YAxis stroke="currentColor" />
                 <Tooltip 
                   contentStyle={{
-                    backgroundColor: 'rgba(5, 5, 7, 0.95)',
+                    backgroundColor: 'rgba(10, 10, 15, 0.95)',
                     border: '1px solid rgba(0, 255, 159, 0.3)',
                     borderRadius: '0.5rem',
-                    color: 'rgb(0, 255, 159)'
+                    color: '#00ff9f'
                   }}
                   labelFormatter={(time) => new Date(time * 1000).toLocaleString()}
                   formatter={(value, name) => [value, name]}
@@ -362,7 +342,7 @@ export const CommunityNodes = () => {
               </LineChart>
             </ResponsiveContainer>
           </div>
-          <div className="mt-6 overflow-y-auto" style={{ maxHeight: '6rem' }}>
+          <div className="mt-6 overflow-y-auto max-h-24">
             <div className="flex flex-wrap gap-2 pb-2 pr-2">
               {topCountries.map((country) => (
                 <button
@@ -373,21 +353,17 @@ export const CommunityNodes = () => {
                       const isOnlyVisible = !next.has(country) && next.size === topCountries.length - 1
                       const isHidden = next.has(country)
 
-                      // If this is the only visible country and we click it, show all
                       if (isOnlyVisible) {
                         next.clear()
                       }
-                      // If the country is currently hidden, unhide it
                       else if (isHidden) {
                         next.delete(country)
                       }
-                      // If we're showing all countries, hide all except this one
                       else if (next.size === 0) {
                         topCountries.forEach(c => {
                           if (c !== country) next.add(c)
                         })
                       }
-                      // Otherwise, toggle this country's visibility
                       else {
                         next.add(country)
                       }
@@ -395,9 +371,9 @@ export const CommunityNodes = () => {
                       return next
                     })
                   }}
-                  className={`px-3 py-1 rounded-full text-sm flex items-center gap-2 transition-colors ${
+                  className={`px-3 py-1 rounded-full text-sm font-mono flex items-center gap-2 transition-colors ${
                     hiddenCountries.has(country)
-                      ? 'bg-cyber-darker opacity-50 hover:opacity-70'
+                      ? 'bg-cyber-darker/50 opacity-50 hover:opacity-70'
                       : 'hover:opacity-80'
                   }`}
                   style={{
@@ -420,23 +396,23 @@ export const CommunityNodes = () => {
         </div>
 
         {/* Nodes by User Chart */}
-        <div className="backdrop-blur-md rounded-lg p-4 border flex flex-col">
-          <h2 className="text-2xl font-bold mb-4">Nodes per User</h2>
-          <div className="h-[400px] mb-4">
+        <div className="backdrop-blur-sm rounded-lg border border-cyber-neon/10 hover:border-cyber-neon/20 p-6">
+          <h2 className="text-2xl font-sans font-bold text-primary mb-4">Nodes per User</h2>
+          <div className="h-[400px]">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={userChartData}>
                 <XAxis 
                   dataKey="time" 
-                  stroke="#94a3b8"
+                  stroke="currentColor"
                   tickFormatter={formatTime}
                 />
-                <YAxis stroke="#94a3b8" />
+                <YAxis stroke="currentColor" />
                 <Tooltip 
                   contentStyle={{
-                    backgroundColor: 'rgba(17, 24, 39, 0.95)',
-                    border: '1px solid rgba(75, 85, 99, 0.3)',
+                    backgroundColor: 'rgba(10, 10, 15, 0.95)',
+                    border: '1px solid rgba(0, 255, 159, 0.3)',
                     borderRadius: '0.5rem',
-                    color: '#e2e8f0'
+                    color: '#00ff9f'
                   }}
                   labelFormatter={(time) => new Date(time * 1000).toLocaleString()}
                   formatter={(value, name) => [value, name]}
@@ -457,7 +433,7 @@ export const CommunityNodes = () => {
               </LineChart>
             </ResponsiveContainer>
           </div>
-          <div className="overflow-y-auto" style={{ maxHeight: '6rem' }}>
+          <div className="mt-6 overflow-y-auto max-h-24">
             <div className="flex flex-wrap gap-2 pb-2 pr-2">
               {topUsers.map((user) => (
                 <button
@@ -468,21 +444,17 @@ export const CommunityNodes = () => {
                       const isOnlyVisible = !next.has(user) && next.size === topUsers.length - 1
                       const isHidden = next.has(user)
 
-                      // If this is the only visible user and we click it, show all
                       if (isOnlyVisible) {
                         next.clear()
                       }
-                      // If the user is currently hidden, unhide it
                       else if (isHidden) {
                         next.delete(user)
                       }
-                      // If we're showing all users, hide all except this one
                       else if (next.size === 0) {
                         topUsers.forEach(u => {
                           if (u !== user) next.add(u)
                         })
                       }
-                      // Otherwise, toggle this user's visibility
                       else {
                         next.add(user)
                       }
@@ -490,10 +462,10 @@ export const CommunityNodes = () => {
                       return next
                     })
                   }}
-                  className={`px-3 py-1 rounded-full text-sm flex items-center gap-2 transition-colors shrink-0 ${
+                  className={`px-3 py-1 rounded-full text-sm font-mono flex items-center gap-2 transition-colors ${
                     hiddenUsers.has(user)
-                      ? 'bg-gray-800 text-secondary hover:bg-gray-700'
-                      : 'text-primary hover:text-primary'
+                      ? 'bg-cyber-darker/50 opacity-50 hover:opacity-70'
+                      : 'hover:opacity-80'
                   }`}
                   style={{
                     backgroundColor: hiddenUsers.has(user) 

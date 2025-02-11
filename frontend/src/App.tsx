@@ -9,6 +9,7 @@ import ContributorDetail from './pages/xatu/ContributorDetail';
 import Layout from './components/layout/Layout';
 import { BeaconChainTimings } from './pages/beacon-chain-timings';
 import { BlockTimings } from './pages/beacon-chain-timings/blocks';
+import Experiments from './pages/Experiments';
 
 function App(): JSX.Element {
 	return (
@@ -16,6 +17,7 @@ function App(): JSX.Element {
 			<Route element={<Layout />}>
 				<Route path="/" element={<Home />} />
 				<Route path="about" element={<About />} />
+				<Route path="experiments" element={<Experiments />} />
 				<Route path="xatu" element={<Xatu />}>
 					<Route path="community-nodes" element={<CommunityNodes />} />
 					<Route path="networks" element={<Networks />} />

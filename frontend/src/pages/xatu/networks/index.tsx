@@ -1,6 +1,7 @@
 import { useDataFetch } from '../../../utils/data';
 import { formatDistanceToNow } from 'date-fns';
 import { XatuCallToAction } from '../../../components/xatu/XatuCallToAction';
+import { AboutThisData } from '../../../components/common/AboutThisData';
 
 interface ConsensusImplementation {
   total_nodes: number;
@@ -90,15 +91,12 @@ export default function Networks(): JSX.Element {
             {formatDistanceToNow(new Date(summaryData.updated_at * 1000), { addSuffix: true })}
           </span>
         </span>
-        <div className="mt-4 p-4 rounded-lg border">
-          <div className="space-y-2">
-            <p className="font-medium">Important Notice</p>
-            <p>
-              This data represents only the nodes that are actively sending data to the Xatu project. 
-              It is not representative of the total number of nodes in each network or the overall client diversity.
-            </p>
-          </div>
-        </div>
+        <AboutThisData>
+          <p>
+            This data represents only the nodes that are actively sending data to the Xatu project. 
+            It is not representative of the total number of nodes in each network or the overall client diversity.
+          </p>
+        </AboutThisData>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

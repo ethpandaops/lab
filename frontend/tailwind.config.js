@@ -14,7 +14,7 @@ const config = {
 			colors: {
 				'cyber': {
 					'neon': '#00ff9f',
-					'pink': '#0099ff',
+					'pink': '#ff2b92',
 					'blue': '#00ffff',
 					'purple': '#2563eb',
 					'yellow': '#ffff00',
@@ -134,24 +134,25 @@ const config = {
 				},
 				// Cards and containers
 				'.card': {
-					backgroundColor: 'rgba(5, 5, 7, 0.5)',
+					backgroundColor: 'rgba(10, 10, 15, 0.8)',
 					backdropFilter: 'blur(8px)',
-					border: '1px solid rgba(0, 255, 159, 0.1)',
+					border: '1px solid rgba(0, 255, 159, 0.15)',
 					borderRadius: theme('borderRadius.lg'),
 					transition: 'all 0.2s ease-in-out',
 					'&:hover': {
-						borderColor: 'rgba(0, 255, 159, 0.2)',
+						borderColor: 'rgba(0, 255, 159, 0.3)',
+						backgroundColor: 'rgba(0, 255, 159, 0.05)',
 					},
 				},
 				// Buttons
 				'button:not([class*="bg-"]), [type="button"]:not([class*="bg-"])': {
-					backgroundColor: 'transparent',
-					border: '1px solid rgba(0, 255, 159, 0.1)',
+					backgroundColor: 'rgba(10, 10, 15, 0.8)',
+					border: '1px solid rgba(0, 255, 159, 0.15)',
 					borderRadius: theme('borderRadius.lg'),
 					padding: `${theme('spacing.2')} ${theme('spacing.4')}`,
 					transition: 'all 0.2s ease-in-out',
 					'&:hover': {
-						borderColor: 'rgba(0, 255, 159, 0.2)',
+						borderColor: 'rgba(0, 255, 159, 0.3)',
 						backgroundColor: 'rgba(0, 255, 159, 0.05)',
 					},
 				},
@@ -166,11 +167,11 @@ const config = {
 				},
 				'.text-secondary': {
 					color: theme('colors.cyber.neon'),
-					opacity: 0.7,
+					opacity: 0.85,
 				},
 				'.text-tertiary': {
 					color: theme('colors.cyber.neon'),
-					opacity: 0.5,
+					opacity: 0.7,
 				},
 				'.text-accent': {
 					color: theme('colors.cyber.pink'),
