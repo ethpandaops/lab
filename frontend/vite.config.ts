@@ -57,24 +57,31 @@ export default defineConfig(({ mode }) => {
 		],
 		server: {
 			proxy: {
-				'/api/data': {
-					target: 'http://localhost',
+				'/lab-data': {
+					target: 'http://localhost:9000',
+					changeOrigin: true,
+					secure: false,
 					configure: (proxy) => {
-							proxy.on('proxyReq', (_proxyRequest, request, response) => {
-								const urlPath = request.url.replace('/api/data/', '') || ''
-								const filePath = path.resolve(process.cwd(), '../data', urlPath)
-
-								if (!fs.existsSync(filePath)) {
-									response.statusCode = 404
-									response.end('File not found')
-									return
-								}
-
-								const fileStream = fs.createReadStream(filePath)
-								response.setHeader('Content-Type', 'application/json')
-								fileStream.pipe(response)
-							})
-					}
+						proxy.on('proxyReq', (proxyReq, req) => {
+							// Add bucket name to path
+							const newPath = `/lab-data/${proxyReq.path.replace('/lab-data/', '')}`;
+							console.log(`Proxying request: ${req.url} -> ${newPath}`);
+							proxyReq.path = newPath;
+						});
+						proxy.on('error', (err, req, res) => {
+							console.error('Proxy error:', err);
+							res.writeHead(500, {
+								'Content-Type': 'text/plain',
+							});
+							res.end('Proxy error: ' + err);
+						});
+						proxy.on('proxyRes', (proxyRes, req) => {
+							console.log(`Proxy response: ${req.url} -> ${proxyRes.statusCode}`);
+						});
+					},
+					headers: {
+						'Access-Control-Allow-Origin': '*',
+					},
 				}
 			}
 		},

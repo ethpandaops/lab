@@ -77,13 +77,13 @@ export const BlockTimings: React.FC = () => {
   const timeWindowRef = useRef<HTMLDivElement>(null)
 
   const timeWindows = useMemo<TimeWindowConfig[]>(() => {
-    const notebookConfig = config?.notebooks?.['beacon-chain-timings']
+    const notebookConfig = config?.notebooks?.['beacon_chain_timings']
     return notebookConfig?.time_windows || DEFAULT_TIME_WINDOWS
   }, [config])
 
   const defaultTimeWindow = useMemo(() => timeWindows[0]?.file || 'last_30_days', [timeWindows])
   const defaultNetwork = useMemo(() => {
-    const notebookConfig = config?.notebooks?.['beacon-chain-timings']
+    const notebookConfig = config?.notebooks?.['beacon_chain_timings']
     return notebookConfig?.networks?.[0] || 'mainnet'
   }, [config])
 
@@ -111,11 +111,11 @@ export const BlockTimings: React.FC = () => {
   }, [network, timeWindow, setSearchParams, searchParams])
 
   const { data: timingData, loading, error } = useDataFetch<TimingData>(
-    `beacon-chain-timings/block_timings/${network}/${timeWindow}.json`
+    `beacon_chain_timings/block_timings/${network}/${timeWindow}.json`
   )
 
   const { data: cdfData, loading: cdfLoading, error: cdfError } = useDataFetch<CDFData>(
-    `beacon-chain-timings/size_cdf/${network}/${timeWindow}.json`
+    `beacon_chain_timings/size_cdf/${network}/${timeWindow}.json`
   )
 
   const currentWindow = useMemo(() => 

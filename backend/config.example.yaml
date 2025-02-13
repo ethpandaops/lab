@@ -1,0 +1,32 @@
+storage:
+  s3:
+    endpoint: "https://s3.example.com"
+    region: "us-east-1"
+    bucket: "lab-data"
+    access_key_id: "your-access-key"
+    secret_access_key: "your-secret-key"
+
+clickhouse:
+  url: "http://localhost:8123"
+  database: "default"
+  username: "default"
+  password: ""
+  debug: false
+
+modules:
+  beacon_chain_timings:
+    enabled: true
+    networks:
+      - mainnet
+      - sepolia
+      - holesky
+    time_windows:
+      - file: last_30_days
+        step: 6h
+        label: Last 30d
+        range: -720h # 30 days
+      - file: last_90_days
+        step: 24h
+        label: Last 90d
+        range: -2160h # 90 days
+    interval: 1h 

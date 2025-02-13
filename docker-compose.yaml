@@ -1,0 +1,75 @@
+version: '3.8'
+
+services:
+  minio:
+    image: minio/minio:latest
+    profiles:
+    - minio
+    - '*'
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    command: server /data --console-address ":9001"
+    volumes:
+      - minio_data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+
+  createbuckets:
+    image: minio/mc:latest
+    profiles:
+    - minio
+    - '*'
+    depends_on:
+      - minio
+    entrypoint: >
+      /bin/sh -c "
+      sleep 5;
+      /usr/bin/mc config host add myminio http://minio:9000 minioadmin minioadmin;
+      /usr/bin/mc mb myminio/lab-data;
+      /usr/bin/mc anonymous set download myminio/lab-data;
+      exit 0;
+      "
+
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    profiles:
+    - backend
+    - '*'
+    depends_on:
+      - minio
+    volumes:
+      - ./backend/config.yaml:/app/config.yaml
+    environment:
+      - CONFIG_FILE=/app/config.yaml
+
+  frontend:
+    build:
+      context: frontend
+      dockerfile: Dockerfile
+    profiles:
+    - frontend
+    - '*'
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:3000/api
+      - VITE_S3_ENDPOINT=http://minio:9000
+      - VITE_S3_BUCKET=lab-data
+      - VITE_S3_ACCESS_KEY=minioadmin
+      - VITE_S3_SECRET_KEY=minioadmin
+      - VITE_S3_REGION=us-east-1
+    depends_on:
+      - backend
+      - minio
+
+volumes:
+  minio_data:
