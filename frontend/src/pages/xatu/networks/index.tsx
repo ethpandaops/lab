@@ -2,6 +2,8 @@ import { useDataFetch } from '../../../utils/data';
 import { formatDistanceToNow } from 'date-fns';
 import { XatuCallToAction } from '../../../components/xatu/XatuCallToAction';
 import { AboutThisData } from '../../../components/common/AboutThisData';
+import { useContext } from 'react';
+import { ConfigContext } from '../../../App';
 
 interface ConsensusImplementation {
   total_nodes: number;
@@ -68,9 +70,12 @@ const CLIENT_METADATA: Record<string, { name: string }> = {
 };
 
 export default function Networks(): JSX.Element {
-  const { data: summaryData } = useDataFetch<Summary>(
-    'xatu-public-contributors/summary.json',
-  );
+  const config = useContext(ConfigContext)
+  const summaryPath = config?.modules?.['xatu_public_contributors']?.path_prefix 
+    ? `${config.modules['xatu_public_contributors'].path_prefix}/summary.json`
+    : null;
+
+  const { data: summaryData, loading, error } = useDataFetch<Summary>(summaryPath)
 
   if (!summaryData) {
     return <div>Loading...</div>;

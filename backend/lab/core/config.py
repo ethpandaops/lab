@@ -1,5 +1,5 @@
 """Configuration models for the Lab backend."""
-from typing import List, Optional, Tuple
+from typing import List, Optional, Tuple, Dict, Any
 from datetime import timedelta
 from urllib.parse import urlparse, parse_qs
 
@@ -64,12 +64,36 @@ class TimeWindowConfig(BaseModel):
             case 'd': return timedelta(days=value)
             case _: raise ValueError(f"Invalid duration unit: {unit}")
 
-class BeaconChainTimingsConfig(BaseModel):
-    """Beacon chain timings module configuration."""
+class ModuleConfig(BaseModel):
+    """Base module configuration."""
     enabled: bool = False
     networks: List[str]
     time_windows: List[TimeWindowConfig]
+    description: str = ""
+    path_prefix: str = ""
+
+    def get_frontend_config(self) -> Dict[str, Any]:
+        """Get frontend-friendly config."""
+        return {
+            "enabled": self.enabled,
+            "networks": self.networks,
+            "time_windows": [
+                {
+                    "file": w.file,
+                    "step": w.step,
+                    "label": w.label,
+                    "range": w.range
+                } for w in self.time_windows
+            ],
+            "description": self.description,
+            "path_prefix": self.path_prefix
+        }
+
+class BeaconChainTimingsConfig(ModuleConfig):
+    """Beacon chain timings module configuration."""
     interval: str
+    description: str = "Beacon chain block timing metrics"
+    path_prefix: str = "beacon_chain_timings"
 
     @field_validator("interval")
     @classmethod
@@ -90,15 +114,54 @@ class BeaconChainTimingsConfig(BaseModel):
             case 'd': return timedelta(days=value)
             case _: raise ValueError(f"Invalid duration unit: {unit}")
 
+class XatuPublicContributorsConfig(ModuleConfig):
+    """Xatu Public Contributors module configuration."""
+    schedule_hours: int
+    description: str = "Xatu public contributor metrics"
+    path_prefix: str = "xatu_public_contributors"
+
+    def get_interval_timedelta(self) -> timedelta:
+        """Get the processing interval."""
+        return timedelta(hours=self.schedule_hours)
+
+    def get_window_timedelta(self) -> timedelta:
+        """Get the maximum time window."""
+        max_range = max(w.get_range_timedelta() for w in self.time_windows)
+        return abs(max_range)  # Convert negative range to positive duration
+
 class ModulesConfig(BaseModel):
     """Modules configuration."""
     beacon_chain_timings: Optional[BeaconChainTimingsConfig] = None
+    xatu_public_contributors: Optional[XatuPublicContributorsConfig] = None
 
 class Config(BaseSettings):
     """Main configuration."""
     storage: StorageConfig
     clickhouse: ClickHouseConfig
     modules: ModulesConfig
+
+    def get_frontend_config(self) -> Dict[str, Any]:
+        """Generate frontend-friendly config."""
+        frontend_config = {
+            "modules": {},
+            "data": {
+                "type": "local",  # This could be configurable if needed
+                "path": "/lab-data"  # This could be configurable if needed
+            }
+        }
+
+        # Add module configs
+        if self.modules.beacon_chain_timings:
+            frontend_config["modules"]["beacon_chain_timings"] = (
+                self.modules.beacon_chain_timings.get_frontend_config()
+            )
+        
+        if self.modules.xatu_public_contributors:
+            frontend_config["modules"]["xatu_public_contributors"] = (
+                self.modules.xatu_public_contributors.get_frontend_config()
+            )
+
+        return frontend_config
 
     @classmethod
     def from_yaml(cls, path: str) -> "Config":

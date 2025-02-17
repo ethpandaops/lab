@@ -2,9 +2,11 @@ import { Link, Outlet, useLocation } from 'react-router-dom'
 import { ArrowRight } from 'lucide-react'
 import { useDataFetch } from '../../utils/data'
 import { formatDistanceToNow } from 'date-fns'
-import { useRef, useState, useEffect } from 'react'
+import { useRef, useState, useEffect, useContext } from 'react'
 import { GlobeViz } from '../../components/xatu/GlobeViz'
 import { XatuCallToAction } from '../../components/xatu/XatuCallToAction'
+import { ConfigContext } from '../../App'
+import type { Config } from '../../types'
 
 interface ConsensusImplementation {
   total_nodes: number
@@ -51,7 +53,14 @@ function Xatu(): JSX.Element {
   const location = useLocation()
   const containerReference = useRef<HTMLDivElement>(null)
   const [containerWidth, setContainerWidth] = useState(0)
-  const { data: summaryData } = useDataFetch<Summary>('xatu-public-contributors/summary.json')
+  const config = useContext(ConfigContext)
+
+  // Skip data fetching if config isn't loaded
+  const summaryPath = config?.modules?.['xatu_public_contributors']?.path_prefix 
+    ? `${config.modules['xatu_public_contributors'].path_prefix}/summary.json`
+    : null;
+
+  const { data: summaryData } = useDataFetch<Summary>(summaryPath)
 
   useEffect(() => {
     if (!containerReference.current) {

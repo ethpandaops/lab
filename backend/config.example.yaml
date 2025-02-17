@@ -15,7 +15,9 @@ clickhouse:
 
 modules:
   beacon_chain_timings:
-    enabled: true
+    enabled: false
+    description: "Beacon chain block timing metrics and analysis"
+    path_prefix: "beacon_chain_timings"
     networks:
       - mainnet
       - sepolia
@@ -25,8 +27,38 @@ modules:
         step: 6h
         label: Last 30d
         range: -720h # 30 days
+      - file: last_60_days
+        step: 6h
+        label: Last 60d
+        range: -1440h # 60 days
       - file: last_90_days
         step: 24h
         label: Last 90d
         range: -2160h # 90 days
     interval: 1h 
+  xatu_public_contributors:
+    enabled: true
+    description: "Xatu public contributor metrics and analysis"
+    path_prefix: "xatu_public_contributors"
+    schedule_hours: 1
+    networks:
+      - mainnet
+      - sepolia
+      - holesky
+    time_windows:
+      - file: "last_90_days"
+        step: "3d"
+        label: "Last 90d" 
+        range: "-90d"
+      - file: "last_30_days" 
+        step: "1d"
+        label: "Last 30d"
+        range: "-30d"
+      - file: "last_1_day"
+        step: "1h" 
+        label: "Last 1d"
+        range: "-1d"
+      - file: "last_6h"
+        step: "5m" 
+        label: "Last 6h"
+        range: "-6h"

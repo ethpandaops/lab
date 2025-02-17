@@ -4,6 +4,8 @@ import { ErrorState } from '../../components/common/ErrorState'
 import { Link } from 'react-router-dom'
 import { XatuCallToAction } from '../../components/xatu/XatuCallToAction'
 import { formatDistanceToNow } from 'date-fns'
+import { useContext } from 'react'
+import { ConfigContext } from '../../App'
 
 interface Contributor {
   name: string
@@ -31,9 +33,12 @@ const getInitials = (name: string): string => name
   .toUpperCase()
 
 const ContributorsList = (): JSX.Element => {
-  const { data: contributors, loading, error } = useDataFetch<Contributor[]>(
-    'xatu-public-contributors/user-summaries/summary.json'
-  )
+  const config = useContext(ConfigContext)
+  const summaryPath = config?.modules?.['xatu_public_contributors']?.path_prefix 
+    ? `${config.modules['xatu_public_contributors'].path_prefix}/user-summaries/summary.json`
+    : null;
+
+  const { data: summaryData, loading, error } = useDataFetch<Summary>(summaryPath)
 
   if (loading) {
     return <LoadingState />
@@ -64,7 +69,7 @@ const ContributorsList = (): JSX.Element => {
               </tr>
             </thead>
             <tbody>
-              {contributors?.sort((a, b) => b.node_count - a.node_count)
+              {summaryData?.contributors?.sort((a, b) => b.node_count - a.node_count)
                 .map((contributor) => {
                   const avatarColor = stringToColor(contributor.name)
                   const initials = getInitials(contributor.name)

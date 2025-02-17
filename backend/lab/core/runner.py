@@ -1,8 +1,10 @@
 """Runner implementation for the Lab backend."""
 import asyncio
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, Type
 import signal
 import sys
+import json
+import io
 
 from lab.core import logger
 
@@ -12,6 +14,7 @@ from lab.core.storage import S3Storage, Storage
 from lab.core.state import StateManager
 from lab.core.module import Module, ModuleContext
 from lab.modules.beacon_chain_timings import BeaconChainTimingsModule
+from lab.modules.xatu_public_contributors import XatuPublicContributorsModule
 
 logger = logger.get_logger()
 
@@ -40,6 +43,9 @@ class Runner:
         logger.debug("Initializing ClickHouse")
         self.clickhouse = ClickHouseClient(self.config.clickhouse)
         await self.clickhouse.start()
+
+        # Write frontend config
+        await self._write_frontend_config()
 
         # Register and start modules
         logger.debug("Starting module registration")
@@ -119,15 +125,16 @@ class Runner:
 
         # Check beacon chain timings module config
         logger.debug("Checking beacon chain timings module configuration")
-        if self.config.modules.beacon_chain_timings is None:
-            logger.info("Beacon chain timings module not configured")
-            return
-        
-        if not self.config.modules.beacon_chain_timings.enabled:
-            logger.info("Beacon chain timings module disabled")
-            return
+        if self.config.modules.beacon_chain_timings is not None and self.config.modules.beacon_chain_timings.enabled:
+            await self._register_beacon_chain_timings_module()
 
-        # Register beacon chain timings module
+        # Check xatu public contributors module config
+        logger.debug("Checking xatu public contributors module configuration")
+        if self.config.modules.xatu_public_contributors is not None and self.config.modules.xatu_public_contributors.enabled:
+            await self._register_xatu_public_contributors_module()
+
+    async def _register_beacon_chain_timings_module(self) -> None:
+        """Register beacon chain timings module."""
         try:
             logger.info("Registering beacon chain timings module")
             
@@ -155,6 +162,36 @@ class Runner:
             logger.info("Successfully registered beacon chain timings module")
         except Exception as e:
             logger.error("Failed to register beacon chain timings module", error=str(e))
+            raise
+
+    async def _register_xatu_public_contributors_module(self) -> None:
+        """Register xatu public contributors module."""
+        try:
+            logger.info("Registering xatu public contributors module")
+            
+            # Create state manager
+            logger.debug("Creating state manager")
+            state = StateManager("xatu_public_contributors", self.storage)
+            await state.start()  # Initialize and test S3 access
+
+            # Create module context
+            logger.debug("Creating module context", 
+                        networks=self.config.modules.xatu_public_contributors.networks)
+            ctx = ModuleContext(
+                name="xatu_public_contributors",
+                config=self.config.modules.xatu_public_contributors,
+                storage=self.storage,
+                clickhouse=self.clickhouse,
+                state=state,
+            )
+
+            # Create and register module
+            logger.debug("Creating module instance")
+            module = XatuPublicContributorsModule(ctx)
+            self.modules[module.name] = module
+            logger.info("Successfully registered xatu public contributors module")
+        except Exception as e:
+            logger.error("Failed to register xatu public contributors module", error=str(e))
             raise
 
     async def _start_modules(self) -> None:
@@ -199,3 +236,22 @@ class Runner:
                            error=str(e),
                            error_type=type(e).__name__)
                 continue 
+
+    async def _write_frontend_config(self) -> None:
+        """Write frontend config to storage."""
+        logger.info("Writing frontend config")
+        try:
+            # Generate frontend config
+            frontend_config = self.config.get_frontend_config()
+            
+            # Convert to JSON and store
+            json_data = json.dumps(frontend_config, indent=2).encode()
+            await self.storage.store_atomic(
+                "config.json",
+                io.BytesIO(json_data),
+                content_type="application/json"
+            )
+            logger.info("Successfully wrote frontend config")
+        except Exception as e:
+            logger.error("Failed to write frontend config", error=str(e))
+            raise 

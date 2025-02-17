@@ -1,41 +1,23 @@
 import type { Config } from '../types'
-import yaml from 'js-yaml'
 
-// Cache the config once loaded
-let loadedConfig: Config | undefined
+let configPromise: Promise<Config> | null = null
 
 export const getConfig = async (): Promise<Config> => {
-  // Return cached config if available
-  if (loadedConfig) {
-    return loadedConfig
+  if (configPromise) {
+    return configPromise
   }
 
-  // Fetch config from the appropriate location
-  try {
-    const response = await fetch('/config.yaml')
-    if (!response.ok) {
-      throw new Error(`Failed to load config: ${response.statusText}`)
-    }
-    
-    // In production, we get raw YAML
-    // In dev, we get JSON from our middleware
-    const text = await response.text()
-    const data = import.meta.env.PROD 
-      ? yaml.load(text) as Config
-      : JSON.parse(text) as Config
-    
-    loadedConfig = data
-    return loadedConfig
-  } catch (error) {
-    console.error('❌ Failed to load config:', error)
-    throw error
-  }
+  configPromise = fetch('/lab-data/config.json')
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`Failed to load config: ${response.statusText}`)
+      }
+      return response.json()
+    })
+    .catch(error => {
+      configPromise = null // Reset on error so we can try again
+      throw error
+    })
+
+  return configPromise
 }
-
-// Helper to get networks without async/await
-export const getNetworks = (): string[] => {
-  if (!loadedConfig) {
-    throw new Error('Config not loaded - call getConfig() first')
-  }
-  return loadedConfig.notebooks['xatu-public-contributors'].networks
-} 

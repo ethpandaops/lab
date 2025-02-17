@@ -9,10 +9,16 @@ export const fetchData = async <T>(path: string): Promise<T> => {
   return response.json()
 }
 
-export const useDataFetch = <T>(path: string) => {
+export const useDataFetch = <T>(path: string | null) => {
   const { data, isLoading: loading, error } = useQuery<T, Error>({
     queryKey: ['data', path],
-    queryFn: () => fetchData<T>(path),
+    queryFn: () => {
+      if (!path) {
+        throw new Error('No path provided')
+      }
+      return fetchData<T>(path)
+    },
+    enabled: !!path,
   })
 
   return { data, loading, error }

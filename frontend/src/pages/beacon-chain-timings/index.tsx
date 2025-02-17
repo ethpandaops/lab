@@ -130,20 +130,6 @@ function BeaconChainTimings(): JSX.Element {
           </Link>
         </div>
       </div>
-
-      <div>
-        {networks.map(network => (
-          <div key={network}>
-            <h2>{network}</h2>
-            {timeWindows.map(window => (
-              <div key={window}>
-                <h3>{window}</h3>
-                {/* Add your chart components here using data[network][window] */}
-              </div>
-            ))}
-          </div>
-        ))}
-      </div>
     </div>
   )
 }

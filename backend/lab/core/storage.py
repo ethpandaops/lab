@@ -20,7 +20,7 @@ class Storage(Protocol):
         """Store data at the given key."""
         ...
 
-    async def store_atomic(self, key: str, data: BinaryIO) -> None:
+    async def store_atomic(self, key: str, data: BinaryIO, content_type: Optional[str] = None) -> None:
         """Store data at the given key atomically."""
         ...
 
@@ -64,14 +64,14 @@ class S3Storage:
             logger.error("Failed to store object", key=key, error=str(e))
             raise
 
-    async def store_atomic(self, key: str, data: BinaryIO) -> None:
+    async def store_atomic(self, key: str, data: BinaryIO, content_type: Optional[str] = None) -> None:
         """Store data at the given key atomically."""
         temp_key = f"temp/{key}"
         logger.debug("Starting atomic store", key=key, temp_key=temp_key)
         try:
             # Upload to temp location
             logger.debug("Uploading to temp location", temp_key=temp_key)
-            await self._upload(temp_key, data)
+            await self._upload(temp_key, data, content_type)
 
             # Copy to final location
             logger.debug("Copying to final location", src=temp_key, dst=key)
@@ -90,7 +90,6 @@ class S3Storage:
                 await self.delete(temp_key)
             except Exception as cleanup_e:
                 logger.warning("Failed to clean up temp file", temp_key=temp_key, error=str(cleanup_e))
-                pass
             raise
 
     async def get(self, key: str) -> AsyncIterator[bytes]:
@@ -121,7 +120,7 @@ class S3Storage:
             logger.error("Failed to delete object", key=key, error=str(e))
             raise
 
-    async def _upload(self, key: str, data: BinaryIO) -> None:
+    async def _upload(self, key: str, data: BinaryIO, content_type: Optional[str] = None) -> None:
         """Upload data to S3."""
         logger.debug("Uploading data", key=key)
         
@@ -129,8 +128,9 @@ class S3Storage:
         raw_data = data.read()
         compressed_data = gzip.compress(raw_data)
         
-        # Determine content type based on file extension
-        content_type = 'application/json' if key.endswith('.json') else 'application/octet-stream'
+        # Determine content type based on file extension or passed parameter
+        if content_type is None:
+            content_type = 'application/json' if key.endswith('.json') else 'application/octet-stream'
         
         # Upload with content type and compression
         self.client.upload_fileobj(

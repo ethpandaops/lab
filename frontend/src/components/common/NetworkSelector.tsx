@@ -56,7 +56,7 @@ export const NetworkSelector = ({ selectedNetwork, onNetworkChange, className }:
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
-  const networks = config?.notebooks['xatu-public-contributors'].networks || ['mainnet']
+  const networks = config?.modules['xatu_public_contributors']?.networks || ['mainnet']
 
   const selectedMetadata = NETWORK_METADATA[selectedNetwork as keyof typeof NETWORK_METADATA] || {
     name: selectedNetwork.charAt(0).toUpperCase() + selectedNetwork.slice(1),

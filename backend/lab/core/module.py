@@ -3,13 +3,11 @@ import asyncio
 from abc import ABC, abstractmethod
 from typing import Any, Dict, Optional, Protocol
 
-from lab.core import logger
+from lab.core import logger as lab_logger
 from lab.core.logger import LabLogger
 from lab.core.clickhouse import ClickHouseClient
 from lab.core.storage import Storage
 from lab.core.state import StateManager
-
-logger = logger.get_logger()
 
 class ModuleContext:
     """Context provided to modules."""
@@ -28,7 +26,10 @@ class ModuleContext:
         self.storage = storage
         self.clickhouse = clickhouse
         self.state = state
-        self.logger = logger.get_logger()
+        # Create a new logger instance with module name
+        self.logger = lab_logger.get_logger()
+        if isinstance(self.logger, LabLogger):
+            self.logger.set_module(name)
 
     def storage_key(self, *parts: str) -> str:
         """Get a storage key prefixed with the module name."""
@@ -40,10 +41,8 @@ class Module(ABC):
     def __init__(self, ctx: ModuleContext):
         """Initialize module."""
         self.ctx = ctx
+        self.logger = ctx.logger
         self._stop_event = asyncio.Event()
-        # Set module name in logger
-        if isinstance(self.ctx.logger, LabLogger):
-            self.ctx.logger.set_module(self.name)
 
     @property
     @abstractmethod
