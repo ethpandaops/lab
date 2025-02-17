@@ -10,6 +10,10 @@ from lab.core.storage import Storage
 
 logger = logger.get_logger()
 
+def get_state_file_name(name: str) -> str:
+    """Get the state file name for a given module."""
+    return f"state/modules/{name}.json"
+
 class StateManager:
     """State manager implementation using S3."""
 
@@ -30,18 +34,15 @@ class StateManager:
         
         # Try to load existing state
         try:
-            # Load existing state
-            async for chunk in self.storage.get("state.json"):
-                full_state = json.loads(chunk.decode())
-                self._state = full_state.get(self.name, {})
+            # Load existing state from module-specific file
+            async for chunk in self.storage.get(get_state_file_name(self.name)):
+                self._state = json.loads(chunk.decode())
                 logger.info("Loaded existing state", name=self.name)
                 break
         except Exception as e:
             if "NoSuchKey" in str(e):
                 logger.info("No existing state found, creating empty state file")
-                empty_state = {self.name: {}}
-                state_json = json.dumps(empty_state).encode()
-                await self.storage.store_atomic("state.json", io.BytesIO(state_json))
+                await self.storage.store_atomic(get_state_file_name(self.name), io.BytesIO(json.dumps({}).encode()))
             else:
                 logger.error("Failed to initialize state - cannot continue", error=str(e))
                 raise
@@ -75,22 +76,9 @@ class StateManager:
 
     async def _write_state_to_s3(self) -> None:
         """Write state to S3 atomically."""
-        # Load existing state first
-        try:
-            full_state = {}
-            async for chunk in self.storage.get("state.json"):
-                full_state = json.loads(chunk.decode())
-                break
-        except Exception:
-            logger.debug("No existing state found, creating new state file")
-            full_state = {}
-
-        # Update with our module's state
-        full_state[self.name] = self._state
-
-        # Write back
-        state_json = json.dumps(full_state).encode()
-        await self.storage.store_atomic("state.json", io.BytesIO(state_json))
+        # Write state directly to module-specific file
+        state_json = json.dumps(self._state).encode()
+        await self.storage.store_atomic(get_state_file_name(self.name), io.BytesIO(state_json))
 
     async def _flush_loop(self) -> None:
         """Periodically flush state to S3."""
