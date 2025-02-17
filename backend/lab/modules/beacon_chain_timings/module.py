@@ -13,31 +13,35 @@ from tenacity import retry, stop_after_attempt, wait_exponential
 
 from lab.core.module import Module, ModuleContext
 from lab.core import config
-from .models import TimingData, SizeCDFData, ModuleState, DataTypeState
+from .models import TimingData, SizeCDFData
 
 logger = logger.get_logger()
 
 class DataProcessor:
     """Base class for data processors."""
 
-    def __init__(self, ctx: ModuleContext, state_key: str):
+    def __init__(self, ctx: ModuleContext, name: str):
         """Initialize processor."""
         self.ctx = ctx
-        self.state_key = state_key
+        self.name = name
         self.logger = ctx.logger
 
-    async def get_state(self) -> DataTypeState:
-        """Get state for this processor."""
-        state_data = await self.ctx.state.get("state")
-        state = ModuleState.model_validate(state_data)
-        return getattr(state, self.state_key)
-
-    async def save_state(self, state: DataTypeState) -> None:
-        """Save state for this processor."""
-        state_data = await self.ctx.state.get("state")
-        full_state = ModuleState.model_validate(state_data)
-        setattr(full_state, self.state_key, state)
-        await self.ctx.state.set("state", full_state.dict())
+    async def _get_processor_state(self) -> Dict[str, str]:
+        """Get processor state from state manager."""
+        try:
+            state = await self.ctx.state.get(self.name)
+        except KeyError:
+            # Initialize state if it doesn't exist
+            state = {
+                "last_processed": {}  # network/window -> timestamp
+            }
+            await self.ctx.state.set(self.name, state)
+        
+        # Ensure state has the correct format
+        if not isinstance(state.get("last_processed"), dict):
+            state["last_processed"] = {}
+        
+        return state
 
     def _get_time_range(self, window: config.TimeWindowConfig) -> Tuple[datetime, datetime]:
         """Get time range for a window."""
@@ -48,19 +52,19 @@ class DataProcessor:
 
     async def should_process(self, network: str, window: config.TimeWindowConfig) -> bool:
         """Check if this network/window needs processing."""
-        state = await self.get_state()
+        state = await self._get_processor_state()
         now = datetime.now(timezone.utc)
         state_key = f"{network}/{window.file}"
 
         try:
             # Parse last_processed with timezone
             last_processed = datetime.fromisoformat(
-                state.last_processed.get(state_key, "1970-01-01T00:00:00+00:00")
+                state["last_processed"].get(state_key, "1970-01-01T00:00:00+00:00")
             )
             if last_processed.tzinfo is None:
                 last_processed = last_processed.replace(tzinfo=timezone.utc)
         except ValueError:
-            # If timezone parsing fails, assume UTC
+            # If timezone parsing fails, assume epoch
             self.logger.warning(f"Invalid timestamp in state for {state_key}, using epoch")
             last_processed = datetime(1970, 1, 1, tzinfo=timezone.utc)
 
@@ -68,14 +72,14 @@ class DataProcessor:
         interval = self.ctx.config.get_interval_timedelta()
 
         if time_since_last >= interval:
-            self.logger.debug(f"Time to process {self.state_key}", 
+            self.logger.debug(f"Time to process {self.name}", 
                           network=network,
                           window=window.file,
                           time_since_last=time_since_last.total_seconds(),
                           interval=interval.total_seconds())
             return True
 
-        self.logger.debug(f"Skipping {self.state_key}, not enough time passed",
+        self.logger.debug(f"Skipping {self.name}, not enough time passed",
                        network=network,
                        window=window.file,
                        time_since_last=time_since_last.total_seconds(),
@@ -84,11 +88,11 @@ class DataProcessor:
 
     async def update_state(self, network: str, window: config.TimeWindowConfig) -> None:
         """Update state after successful processing."""
-        state = await self.get_state()
+        state = await self._get_processor_state()
         state_key = f"{network}/{window.file}"
-        state.last_processed[state_key] = datetime.now(timezone.utc).isoformat()
-        await self.save_state(state)
-        self.logger.debug(f"Updated state for {self.state_key}", network=network, window=window.file)
+        state["last_processed"][state_key] = datetime.now(timezone.utc).isoformat()
+        await self.ctx.state.set(self.name, state)
+        self.logger.debug(f"Updated state for {self.name}", network=network, window=window.file)
 
     async def process_network_window(self, network: str, window: config.TimeWindowConfig) -> None:
         """Process a specific network and time window."""
@@ -96,29 +100,29 @@ class DataProcessor:
 
     async def process_all(self) -> None:
         """Process all networks and time windows."""
-        self.logger.info(f"Processing {self.state_key} for all networks and time windows", 
+        self.logger.info(f"Processing {self.name} for all networks and time windows", 
                       networks=self.ctx.config.networks)
 
         for network in self.ctx.config.networks:
-            self.logger.debug(f"Processing {self.state_key} for network", network=network)
+            self.logger.debug(f"Processing {self.name} for network", network=network)
             for window in self.ctx.config.time_windows:
                 try:
                     if not await self.should_process(network, window):
                         continue
 
-                    self.logger.info(f"Processing {self.state_key}", 
+                    self.logger.info(f"Processing {self.name}", 
                                  network=network, 
                                  window=window.file)
                     
                     await self.process_network_window(network, window)
                     await self.update_state(network, window)
                     
-                    self.logger.info(f"Successfully processed {self.state_key}", 
+                    self.logger.info(f"Successfully processed {self.name}", 
                                  network=network, 
                                  window=window.file)
                 except Exception as e:
                     self.logger.error(
-                        f"Processing {self.state_key} failed",
+                        f"Processing {self.name} failed",
                         network=network,
                         window=window.file,
                         error=str(e)
@@ -407,13 +411,6 @@ class BeaconChainTimingsModule(Module):
     async def start(self) -> None:
         """Start the module."""
         logger.info("Starting beacon chain timings module")
-        # Initialize state if not exists
-        try:
-            await self.ctx.state.get("state")
-            logger.debug("Found existing state")
-        except KeyError:
-            logger.info("No existing state found, initializing new state")
-            await self.ctx.state.set("state", ModuleState().dict())
 
         # Start processing tasks
         for name, processor in self._processors.items():

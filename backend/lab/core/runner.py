@@ -235,23 +235,10 @@ class Runner:
                            module=name, 
                            error=str(e),
                            error_type=type(e).__name__)
-                continue 
+                continue
 
     async def _write_frontend_config(self) -> None:
         """Write frontend config to storage."""
-        logger.info("Writing frontend config")
-        try:
-            # Generate frontend config
-            frontend_config = self.config.get_frontend_config()
-            
-            # Convert to JSON and store
-            json_data = json.dumps(frontend_config, indent=2).encode()
-            await self.storage.store_atomic(
-                "config.json",
-                io.BytesIO(json_data),
-                content_type="application/json"
-            )
-            logger.info("Successfully wrote frontend config")
-        except Exception as e:
-            logger.error("Failed to write frontend config", error=str(e))
-            raise 
+        logger.debug("Writing frontend config")
+        config_json = json.dumps(self.config.get_frontend_config()).encode()
+        await self.storage.store_atomic("config.json", io.BytesIO(config_json)) 

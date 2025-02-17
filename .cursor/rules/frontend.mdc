@@ -1,3 +1,7 @@
+---
+description: Frontend UI System Rules
+globs: *frontend*
+---
 # UI System Rules
 
 # Important Note

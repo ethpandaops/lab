@@ -32,14 +32,6 @@ class XatuPublicContributorsModule(Module):
     async def start(self) -> None:
         """Start module."""
         self.logger.info("Starting Xatu Public Contributors module")
-        
-        # Initialize state if not exists
-        try:
-            await self.ctx.state.get("state")
-            self.logger.debug("Found existing state")
-        except KeyError:
-            self.logger.info("No existing state found, initializing new state")
-            await self.ctx.state.set("state", {})
 
         # Start processing tasks
         for name, processor in self._processors.items():

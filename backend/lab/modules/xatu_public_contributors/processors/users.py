@@ -9,20 +9,28 @@ from sqlalchemy import text
 from lab.core import logger as lab_logger
 from lab.core.module import ModuleContext
 from lab.core.config import TimeWindowConfig
+from .base import BaseProcessor
 
-class UsersProcessor:
+class UsersProcessor(BaseProcessor):
     """Users processor for Xatu Public Contributors module."""
 
     def __init__(self, ctx: ModuleContext):
         """Initialize users processor."""
-        self.ctx = ctx
-        self.logger = lab_logger.get_logger(f"{ctx.name}.users")
+        super().__init__(ctx, "users")
 
     async def process(self) -> None:
         """Process users data."""
+        if not await self.should_process():
+            self.logger.debug("Skipping processing - interval not reached")
+            return
+
         self.logger.info("Processing users data")
 
         for window in self.ctx.config.time_windows:
+            if not await self.should_process_window(window):
+                self.logger.debug(f"Skipping window {window.file} - step interval not reached")
+                continue
+
             # Convert window range to time range
             end_date = datetime.now(timezone.utc)
             range_delta = window.get_range_timedelta()
@@ -110,4 +118,10 @@ class UsersProcessor:
                     key,
                     io.BytesIO(json.dumps(final_data).encode()),
                     content_type="application/json"
-                ) 
+                )
+
+            # Update window last processed time
+            await self.update_window_last_processed(window)
+
+        # Update last processed time
+        await self.update_last_processed() 

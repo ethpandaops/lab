@@ -8,17 +8,21 @@ from sqlalchemy import text
 
 from lab.core import logger as lab_logger
 from lab.core.module import ModuleContext
+from .base import BaseProcessor
 
-class UserSummariesProcessor:
+class UserSummariesProcessor(BaseProcessor):
     """User summaries processor for Xatu Public Contributors module."""
 
     def __init__(self, ctx: ModuleContext):
         """Initialize user summaries processor."""
-        self.ctx = ctx
-        self.logger = lab_logger.get_logger(f"{ctx.name}.user_summaries")
+        super().__init__(ctx, "user_summaries")
 
     async def process(self) -> None:
         """Process user summaries data."""
+        if not await self.should_process():
+            self.logger.debug("Skipping processing - interval not reached")
+            return
+
         self.logger.info("Processing user summaries data")
 
         query = text("""
@@ -129,4 +133,7 @@ class UserSummariesProcessor:
             content_type="application/json"
         )
 
-        self.logger.info(f"Wrote summary data for {len(users_by_name)} users") 
+        self.logger.info(f"Wrote summary data for {len(users_by_name)} users")
+
+        # Update last processed time
+        await self.update_last_processed() 

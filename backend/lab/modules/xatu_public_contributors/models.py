@@ -1,8 +1,8 @@
 """Models for Xatu Public Contributors module."""
 from datetime import datetime, timedelta
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, Any, Union
 
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator, model_validator
 
 class NodeCount(BaseModel):
     """Node count model."""
@@ -23,13 +23,45 @@ class SummaryData(BaseModel):
     updated_at: int
     networks: Dict[str, NetworkStats] = {}
 
-class DataTypeState(BaseModel):
-    """State for a data type."""
-    last_processed: Dict[str, str] = {}
+class ProcessorState(BaseModel):
+    """State for a processor."""
+    last_processed: int = 0  # Unix timestamp
+    last_processed_windows: Dict[str, int] = {}  # window_file -> Unix timestamp
+
+    @model_validator(mode='before')
+    @classmethod
+    def handle_legacy_format(cls, data: Any) -> Dict[str, Any]:
+        """Handle legacy format where data was a dict of strings."""
+        if isinstance(data, dict) and "last_processed" not in data:
+            # Convert legacy format to new format
+            return {
+                "last_processed": 0,
+                "last_processed_windows": {}
+            }
+        return data
 
 class ModuleState(BaseModel):
     """Module state model."""
-    summary: DataTypeState = DataTypeState()
+    summary: ProcessorState = ProcessorState()
+    countries: ProcessorState = ProcessorState()
+    users: ProcessorState = ProcessorState()
+    user_summaries: ProcessorState = ProcessorState()
+
+    @model_validator(mode='before')
+    @classmethod
+    def handle_legacy_format(cls, data: Any) -> Dict[str, Any]:
+        """Handle legacy format where only summary existed."""
+        if isinstance(data, dict):
+            # Ensure all required fields exist
+            if "summary" not in data:
+                data["summary"] = {}
+            if "countries" not in data:
+                data["countries"] = {}
+            if "users" not in data:
+                data["users"] = {}
+            if "user_summaries" not in data:
+                data["user_summaries"] = {}
+        return data
 
 class TimeWindow(BaseModel):
     """Time window configuration."""

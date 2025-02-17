@@ -3,6 +3,7 @@ import asyncio
 import io
 import json
 from typing import Any, Dict, Optional
+from dataclasses import asdict, is_dataclass
 
 from lab.core import logger
 from lab.core.storage import Storage
@@ -41,7 +42,6 @@ class StateManager:
                 empty_state = {self.name: {}}
                 state_json = json.dumps(empty_state).encode()
                 await self.storage.store_atomic("state.json", io.BytesIO(state_json))
-                self._state = {}
             else:
                 logger.error("Failed to initialize state - cannot continue", error=str(e))
                 raise
@@ -63,12 +63,17 @@ class StateManager:
 
         # Final flush
         try:
-            await self._write_state_to_s3(self._state)
+            await self.flush()
             logger.info("Final state flush complete", name=self.name)
         except Exception as e:
             logger.error("Failed to flush state on shutdown", error=str(e))
 
-    async def _write_state_to_s3(self, state: Dict[str, Any]) -> None:
+    async def flush(self) -> None:
+        """Force a flush of state to S3."""
+        async with self._lock:
+            await self._write_state_to_s3()
+
+    async def _write_state_to_s3(self) -> None:
         """Write state to S3 atomically."""
         # Load existing state first
         try:
@@ -81,7 +86,7 @@ class StateManager:
             full_state = {}
 
         # Update with our module's state
-        full_state[self.name] = state
+        full_state[self.name] = self._state
 
         # Write back
         state_json = json.dumps(full_state).encode()
@@ -89,13 +94,12 @@ class StateManager:
 
     async def _flush_loop(self) -> None:
         """Periodically flush state to S3."""
-        logger.debug("Starting flush loop", interval=self.flush_interval)
+        logger.debug("Starting flush loop", interval=60)
         while not self._stop_event.is_set():
             try:
-                await asyncio.sleep(self.flush_interval)
-                async with self._lock:
-                    await self._write_state_to_s3(self._state)
-                    logger.debug("Flushed state to S3")
+                await asyncio.sleep(60)
+                await self.flush()
+                logger.debug("Flushed state to S3")
             except asyncio.CancelledError:
                 break
             except Exception as e:

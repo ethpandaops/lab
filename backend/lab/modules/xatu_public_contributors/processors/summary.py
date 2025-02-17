@@ -11,17 +11,21 @@ from lab.core import logger as lab_logger
 from lab.core.module import ModuleContext
 
 from ..models import SummaryData, NetworkStats, NodeCount
+from .base import BaseProcessor
 
-class SummaryProcessor:
+class SummaryProcessor(BaseProcessor):
     """Summary processor for Xatu Public Contributors module."""
 
     def __init__(self, ctx: ModuleContext):
         """Initialize summary processor."""
-        self.ctx = ctx
-        self.logger = lab_logger.get_logger(f"{ctx.name}.summary")
+        super().__init__(ctx, "summary")
 
     async def process(self) -> None:
         """Process summary data."""
+        if not await self.should_process():
+            self.logger.debug("Skipping processing - interval not reached")
+            return
+
         self.logger.info("Processing summary data")
         
         # Get last 1h window
@@ -120,4 +124,7 @@ class SummaryProcessor:
             key,
             io.BytesIO(json.dumps(summary.dict()).encode()),
             content_type="application/json"
-        ) 
+        )
+
+        # Update last processed time
+        await self.update_last_processed() 
