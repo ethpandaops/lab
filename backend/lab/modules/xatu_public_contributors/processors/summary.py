@@ -7,6 +7,7 @@ import json
 
 from sqlalchemy import text
 
+from lab.core import logger as lab_logger
 from lab.core.module import ModuleContext
 
 from ..models import SummaryData, NetworkStats, NodeCount
@@ -17,7 +18,7 @@ class SummaryProcessor:
     def __init__(self, ctx: ModuleContext):
         """Initialize summary processor."""
         self.ctx = ctx
-        self.logger = ctx.logger
+        self.logger = lab_logger.get_logger(f"{ctx.name}.summary")
 
     async def process(self) -> None:
         """Process summary data."""

@@ -4,6 +4,8 @@ import { LoadingState } from '../../components/common/LoadingState';
 import { ErrorState } from '../../components/common/ErrorState';
 import { formatDistanceToNow } from 'date-fns';
 import { XatuCallToAction } from '../../components/xatu/XatuCallToAction';
+import { useContext } from 'react';
+import { ConfigContext } from '../../App';
 
 interface ContributorNode {
   network: string;
@@ -100,9 +102,12 @@ function isNodeOffline(node: ContributorNode, updatedAt: number): boolean {
 
 function ContributorDetail(): JSX.Element {
   const { name } = useParams<{ name: string }>();
-  const { data: contributor, loading, error } = useDataFetch<ContributorData>(
-    `xatu-public-contributors/user-summaries/users/${name}.json`,
-  );
+  const config = useContext(ConfigContext);
+  const userPath = config?.modules?.['xatu_public_contributors']?.path_prefix 
+    ? `${config.modules['xatu_public_contributors'].path_prefix}/user-summaries/users/${name}.json`
+    : null;
+
+  const { data: contributor, loading, error } = useDataFetch<ContributorData>(userPath);
 
   if (loading) {
     return <LoadingState />;
@@ -163,7 +168,7 @@ function ContributorDetail(): JSX.Element {
             className="w-20 h-20 rounded-lg flex items-center justify-center text-2xl font-mono font-bold text-cyber-darker shadow-neon transition-transform hover:scale-105"
             style={{ 
               backgroundColor: avatarColor,
-              boxShadow: `0 0 20px ${avatarColor}33`,
+              boxShadow: `0 0 20px ${avatarColor}10`,
             }}
           >
             {initials}

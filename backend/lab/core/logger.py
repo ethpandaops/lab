@@ -11,11 +11,6 @@ class LabLogger(logging.Logger):
     def __init__(self, name: str, level: int = logging.NOTSET):
         """Initialize logger."""
         super().__init__(name, level)
-        self.module_name = None
-
-    def set_module(self, module_name: str) -> None:
-        """Set module name for context."""
-        self.module_name = module_name
 
     def _format_value(self, value: Any) -> str:
         """Format a value for logging."""
@@ -31,20 +26,10 @@ class LabLogger(logging.Logger):
             extra = {}
         if kwargs:
             extra.update(kwargs)
-        
-        # Add module name if set
-        if self.module_name:
-            msg = f"[{self.module_name}] {msg}"
 
         if extra:
             msg = f"{msg} {' '.join(f'{k}={self._format_value(v)}' for k, v in extra.items())}"
         super()._log(level, msg, args, exc_info, extra=None)
-
-    def get_logger(self, name: Optional[str] = None) -> logging.Logger:
-        """Get a logger instance."""
-        if name is None:
-            return self
-        return logging.getLogger(name)
 
 def configure_logging(debug: bool = False) -> None:
     """Configure logging for the application."""
@@ -66,7 +51,7 @@ def configure_logging(debug: bool = False) -> None:
     # Add stdout handler with simple format
     handler = logging.StreamHandler(sys.stdout)
     formatter = logging.Formatter(
-        fmt='%(asctime)s [%(levelname)-8s] %(message)s',
+        fmt='%(asctime)s [%(levelname)-8s] [%(name)s] %(message)s',
         datefmt='%Y-%m-%d %H:%M:%S'
     )
     handler.setFormatter(formatter)

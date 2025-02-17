@@ -5,6 +5,9 @@ from typing import Dict
 
 from lab.core.module import Module, ModuleContext
 from lab.modules.xatu_public_contributors.processors.summary import SummaryProcessor
+from lab.modules.xatu_public_contributors.processors.countries import CountriesProcessor
+from lab.modules.xatu_public_contributors.processors.users import UsersProcessor
+from lab.modules.xatu_public_contributors.processors.user_summaries import UserSummariesProcessor
 
 class XatuPublicContributorsModule(Module):
     """Xatu Public Contributors module."""
@@ -18,7 +21,10 @@ class XatuPublicContributorsModule(Module):
         """Initialize module."""
         super().__init__(ctx)
         self._processors = {
-            "summary": SummaryProcessor(ctx)
+            "summary": SummaryProcessor(ctx),
+            "countries": CountriesProcessor(ctx),
+            "users": UsersProcessor(ctx),
+            "user_summaries": UserSummariesProcessor(ctx)
         }
         self._tasks: Dict[str, asyncio.Task] = {}
         self.logger.info("Initialized Xatu Public Contributors module")

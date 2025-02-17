@@ -27,9 +27,7 @@ class ModuleContext:
         self.clickhouse = clickhouse
         self.state = state
         # Create a new logger instance with module name
-        self.logger = lab_logger.get_logger()
-        if isinstance(self.logger, LabLogger):
-            self.logger.set_module(name)
+        self.logger = lab_logger.get_logger(name)
 
     def storage_key(self, *parts: str) -> str:
         """Get a storage key prefixed with the module name."""
