@@ -114,7 +114,7 @@ const ContributorsList = (): JSX.Element => {
         <div className="flex flex-col mb-4">
           <h2 className="text-xl font-sans font-bold text-cyber-neon mb-2">Contributors</h2>
           <p className="text-base font-mono text-cyber-neon/85">
-            {summaryData.length} active contributors across all networks
+            {summaryData.contributors.length} active contributors across all networks
           </p>
         </div>
 
@@ -128,7 +128,7 @@ const ContributorsList = (): JSX.Element => {
               </tr>
             </thead>
             <tbody>
-              {summaryData.sort((a, b) => b.node_count - a.node_count)
+              {summaryData.contributors.sort((a, b) => b.node_count - a.node_count)
                 .map((contributor) => {
                   const avatarColor = stringToColor(contributor.name)
                   const initials = getInitials(contributor.name)
