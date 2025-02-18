@@ -23,6 +23,8 @@ export const ConfigContext = createContext<Config | null>(null)
 
 const queryClient = new QueryClient()
 
+const showMaintenance = true;
+
 function App() {
 	const [config, setConfig] = useState<Config | null>(null)
 	const [configError, setConfigError] = useState<Error | null>(null)
@@ -32,6 +34,10 @@ function App() {
 			.then(setConfig)
 			.catch(setConfigError)
 	}, [])
+
+	if (showMaintenance) {
+		return <MaintenanceOverlay />
+	}
 
 	if (configError) {
 		return <ErrorState message="Failed to load configuration" error={configError} />
@@ -43,7 +49,6 @@ function App() {
 
 	return (
 		<QueryClientProvider client={queryClient}>
-			<MaintenanceOverlay />
 			<ConfigContext.Provider value={config}>
 				<Routes>
 					<Route path="/" element={<Layout />}>
