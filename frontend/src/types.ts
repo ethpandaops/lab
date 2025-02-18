@@ -1,29 +1,21 @@
+export interface TimeWindowConfig {
+	file: string
+	step: string
+	label: string
+	range: string
+}
+
+export interface ModuleConfig {
+	enabled: boolean
+	description: string
+	path_prefix: string
+	networks: string[]
+	time_windows: TimeWindowConfig[]
+}
+
 export interface Config {
-	notebooks: {
-		'xatu-public-contributors': {
-			enabled: boolean
-			schedule_hours: number
-			description: string
-			networks: string[]
-			time_windows: {
-				file: string
-				step: string
-				label: string
-				range: string
-			}[]
-		}
-		'beacon-chain-timings': {
-			enabled: boolean
-			schedule_hours: number
-			description: string
-			networks: string[]
-			time_windows: {
-				file: string
-				step: string
-				label: string
-				range: string
-			}[]
-		}
+	modules: {
+		[key: string]: ModuleConfig
 	}
 	data: {
 		type: string

@@ -9,6 +9,8 @@ import { getConfig } from '../../utils/config'
 import type { Config } from '../../types'
 import { useSearchParams, useLocation, useNavigate } from 'react-router-dom'
 import { GlobeViz } from '../../components/xatu/GlobeViz'
+import { useContext } from 'react'
+import { ConfigContext } from '../../contexts/ConfigContext'
 
 interface CountryData {
   time: number
@@ -55,6 +57,9 @@ export const CommunityNodes = () => {
   const containerRef = useRef<HTMLDivElement>(null)
   const [containerWidth, setContainerWidth] = useState(0)
 
+  const configContext = useContext(ConfigContext)
+  const pathPrefix = configContext?.modules?.['xatu_public_contributors']?.path_prefix
+
   // Update container width on mount and resize
   useEffect(() => {
     const updateWidth = () => {
@@ -69,7 +74,7 @@ export const CommunityNodes = () => {
   }, [])
 
   const timeWindows = useMemo(() => 
-    config?.notebooks['xatu-public-contributors'].time_windows || [
+    config?.modules['xatu_public_contributors'].time_windows || [
       { file: 'last_30_days', step: '1d', label: '30d', range: '-30d' },
       { file: 'last_1_day', step: '1h', label: '1d', range: '-1d' }
     ],
@@ -78,7 +83,7 @@ export const CommunityNodes = () => {
 
   const defaultTimeWindow = useMemo(() => timeWindows[0]?.file || 'last_30_days', [timeWindows])
   const defaultNetwork = useMemo(() => 
-    config?.notebooks['xatu-public-contributors'].networks?.[0] || 'mainnet',
+    config?.modules['xatu_public_contributors'].networks?.[0] || 'mainnet',
     [config]
   )
 
@@ -125,13 +130,11 @@ export const CommunityNodes = () => {
     navigate({ hash: section })
   }
 
-  const { data: countriesData, loading: countriesLoading, error: countriesError } = useDataFetch<CountryData[]>(
-    `xatu-public-contributors/countries/${network}/${timeWindow}.json`
-  )
+  const countriesPath = pathPrefix ? `${pathPrefix}/countries/${network}/${timeWindow}.json` : null
+  const usersPath = pathPrefix ? `${pathPrefix}/users/${network}/${timeWindow}.json` : null
 
-  const { data: usersData, loading: usersLoading, error: usersError } = useDataFetch<UserData[]>(
-    `xatu-public-contributors/users/${network}/${timeWindow}.json`
-  )
+  const { data: countriesData, loading: countriesLoading, error: countriesError } = useDataFetch<CountryData[]>(countriesPath)
+  const { data: usersData, loading: usersLoading, error: usersError } = useDataFetch<UserData[]>(usersPath)
 
   const currentWindow = useMemo(() => 
     timeWindows.find(w => w.file === timeWindow),

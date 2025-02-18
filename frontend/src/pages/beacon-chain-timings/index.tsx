@@ -1,13 +1,82 @@
 import { Link, Outlet, useLocation } from 'react-router-dom'
 import { ArrowRight } from 'lucide-react'
 import { AboutThisData } from '../../components/common/AboutThisData'
+import { useEffect, useState } from 'react'
+import { fetchData, getBeaconChainTimingsPath } from '@/lib/data'
+
+interface TimingData {
+  timestamps: number[];
+  mins: number[];
+  maxs: number[];
+  avgs: number[];
+  p05s: number[];
+  p50s: number[];
+  p95s: number[];
+  blocks: number[];
+}
+
+interface NetworkData {
+  [timeWindow: string]: TimingData;
+}
+
+interface AllData {
+  [network: string]: NetworkData;
+}
+
+const networks = ['mainnet', 'sepolia', 'holesky']
+const timeWindows = ['last_30_days', 'last_90_days']
 
 function BeaconChainTimings(): JSX.Element {
   const location = useLocation()
+  const [data, setData] = useState<AllData | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    async function loadData() {
+      try {
+        const allData: AllData = {}
+
+        for (const network of networks) {
+          allData[network] = {}
+          for (const window of timeWindows) {
+            const path = getBeaconChainTimingsPath(network, window, 'block_timings')
+            const timingData = await fetchData<TimingData>(path)
+            allData[network][window] = timingData
+          }
+        }
+
+        setData(allData)
+        setError(null)
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to load data')
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    loadData()
+
+    // Refresh every minute
+    const interval = setInterval(loadData, 60000)
+    return () => clearInterval(interval)
+  }, [])
 
   // If we're on a nested route, render the child route
   if (location.pathname !== '/beacon-chain-timings') {
     return <Outlet />
+  }
+
+  if (loading) {
+    return <div>Loading...</div>
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>
+  }
+
+  if (!data) {
+    return <div>No data available</div>
   }
 
   return (
