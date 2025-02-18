@@ -173,29 +173,57 @@ class S3Storage:
         logger.debug("Copying object", src=src_key, dst=dst_key)
         copy_source = {'Bucket': self.bucket, 'Key': src_key}
         
-        # Get metadata from source object
-        src_obj = await asyncio.to_thread(
-            self.client.head_object,
-            Bucket=self.bucket,
-            Key=src_key
-        )
-        metadata = {
-            'ContentType': src_obj.get('ContentType', 'application/octet-stream'),
-            'ContentEncoding': src_obj.get('ContentEncoding', 'gzip'),
-        }
+        max_retries = 5
+        base_delay = 1  # Start with 1 second
         
-        if 'CacheControl' in src_obj:
-            metadata['CacheControl'] = src_obj['CacheControl']
-        
-        # Copy with metadata
-        await asyncio.to_thread(
-            self.client.copy,
-            copy_source,
-            self.bucket,
-            dst_key,
-            ExtraArgs=metadata
-        )
-        logger.debug("Successfully copied object", src=src_key, dst=dst_key)
+        for attempt in range(max_retries):
+            try:
+                # Get metadata from source object
+                src_obj = await asyncio.to_thread(
+                    self.client.head_object,
+                    Bucket=self.bucket,
+                    Key=src_key
+                )
+                metadata = {
+                    'ContentType': src_obj.get('ContentType', 'application/octet-stream'),
+                    'ContentEncoding': src_obj.get('ContentEncoding', 'gzip'),
+                }
+                
+                if 'CacheControl' in src_obj:
+                    metadata['CacheControl'] = src_obj['CacheControl']
+                
+                # Copy with metadata
+                await asyncio.to_thread(
+                    self.client.copy,
+                    copy_source,
+                    self.bucket,
+                    dst_key,
+                    ExtraArgs=metadata
+                )
+                logger.debug("Successfully copied object", src=src_key, dst=dst_key)
+                return
+            except Exception as e:
+                delay = base_delay * (2 ** attempt)  # Exponential backoff
+                if attempt < max_retries - 1:
+                    logger.warning(
+                        "Copy failed, retrying",
+                        src=src_key,
+                        dst=dst_key,
+                        attempt=attempt + 1,
+                        max_retries=max_retries,
+                        delay=delay,
+                        error=str(e)
+                    )
+                    await asyncio.sleep(delay)
+                else:
+                    logger.error(
+                        "Copy failed after all retries",
+                        src=src_key,
+                        dst=dst_key,
+                        attempts=max_retries,
+                        error=str(e)
+                    )
+                    raise
 
     async def _stream_response(self, body: BinaryIO, chunk_size: int = 8192) -> AsyncIterator[bytes]:
         """Stream S3 response body."""
