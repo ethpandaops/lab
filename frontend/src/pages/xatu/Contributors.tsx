@@ -5,12 +5,12 @@ import { XatuCallToAction } from '../../components/xatu/XatuCallToAction'
 import { NetworkSelector } from '../../components/common/NetworkSelector'
 import { useState, useEffect, useMemo, useRef } from 'react'
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from 'recharts'
-import { getConfig } from '../../utils/config'
+import { getConfig } from '../../config'
 import type { Config } from '../../types'
 import { useSearchParams, useLocation, useNavigate } from 'react-router-dom'
 import { GlobeViz } from '../../components/xatu/GlobeViz'
 import { useContext } from 'react'
-import { ConfigContext } from '../../contexts/ConfigContext'
+import { ConfigContext } from '../../App'
 
 interface CountryData {
   time: number

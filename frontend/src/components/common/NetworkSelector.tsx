@@ -1,4 +1,4 @@
-import { getConfig } from '../../utils/config'
+import { getConfig } from '../../config'
 import { useEffect, useState, useRef } from 'react'
 import type { Config } from '../../types'
 

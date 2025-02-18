@@ -1,7 +1,7 @@
 import { Routes, Route } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { createContext, useEffect, useState } from 'react'
-import { getConfig } from './utils/config'
+import { getConfig } from './config'
 import type { Config } from './types'
 import { LoadingState } from './components/common/LoadingState'
 import { ErrorState } from './components/common/ErrorState'
@@ -23,8 +23,6 @@ export const ConfigContext = createContext<Config | null>(null)
 
 const queryClient = new QueryClient()
 
-const showMaintenance = true;
-
 function App() {
 	const [config, setConfig] = useState<Config | null>(null)
 	const [configError, setConfigError] = useState<Error | null>(null)
@@ -34,10 +32,6 @@ function App() {
 			.then(setConfig)
 			.catch(setConfigError)
 	}, [])
-
-	if (showMaintenance) {
-		return <MaintenanceOverlay />
-	}
 
 	if (configError) {
 		return <ErrorState message="Failed to load configuration" error={configError} />
