@@ -24,16 +24,16 @@ COPY nginx.conf /etc/nginx/conf.d/default.conf
 # Copy built assets from builder stage
 COPY --from=builder /app/dist /usr/share/nginx/html
 
-# Create script to replace bootstrap config
-RUN echo '#!/bin/sh\n\
-if [ -n "$BOOTSTRAP_CONFIG" ]; then\n\
-  echo "Using provided bootstrap config"\n\
-  export BOOTSTRAP_CONFIG=$(echo $BOOTSTRAP_CONFIG | sed "s/\"/\\\\\"/g")\n\
-else\n\
-  echo "No bootstrap config provided, using default"\n\
-  export BOOTSTRAP_CONFIG="{\"backend\":{\"url\":\"\"}"\n\
-fi\n\
-exec nginx -g "daemon off;"' > /docker-entrypoint.sh && \
-chmod +x /docker-entrypoint.sh
+# Create entrypoint script with proper line endings
+RUN echo '#!/bin/sh' > /docker-entrypoint.sh && \
+    echo 'if [ -n "$BOOTSTRAP_CONFIG" ]; then' >> /docker-entrypoint.sh && \
+    echo '    echo "Using provided bootstrap config"' >> /docker-entrypoint.sh && \
+    echo '    export BOOTSTRAP_CONFIG=$(echo $BOOTSTRAP_CONFIG | sed "s/\"/\\\\\"/g")' >> /docker-entrypoint.sh && \
+    echo 'else' >> /docker-entrypoint.sh && \
+    echo '    echo "No bootstrap config provided, using default"' >> /docker-entrypoint.sh && \
+    echo '    export BOOTSTRAP_CONFIG="{\"backend\":{\"url\":\"\"}}"' >> /docker-entrypoint.sh && \
+    echo 'fi' >> /docker-entrypoint.sh && \
+    echo 'exec nginx -g "daemon off;"' >> /docker-entrypoint.sh && \
+    chmod +x /docker-entrypoint.sh
 
 ENTRYPOINT ["/docker-entrypoint.sh"] 
