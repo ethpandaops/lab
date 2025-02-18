@@ -1,6 +1,7 @@
 import { Config } from './types'
 
 const isDev = import.meta.env.DEV
+const backendOverride = import.meta.env.VITE_BACKEND_URL
 
 interface BootstrapConfig {
   backend: {
@@ -9,6 +10,16 @@ interface BootstrapConfig {
 }
 
 async function loadBootstrapConfig(): Promise<BootstrapConfig> {
+  // Allow overriding backend URL in dev mode
+  if (isDev && backendOverride) {
+    console.log('Using backend override:', backendOverride)
+    return {
+      backend: {
+        url: backendOverride
+      }
+    }
+  }
+
   if (isDev) {
     // In dev, use vite proxy
     return {
