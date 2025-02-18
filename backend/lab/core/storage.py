@@ -109,13 +109,17 @@ class S3Storage:
                 Bucket=self.bucket,
                 Key=key
             )
-            logger.debug("Successfully got object", key=key, size=response['ContentLength'])
+            logger.debug("Successfully got object", key=key, size=response.get('ContentLength', 0))
             
             # Handle gzipped content
             if response.get('ContentEncoding') == 'gzip':
-                decompressed = await asyncio.to_thread(
-                    lambda: gzip.decompress(response['Body'].read())
-                )
+                body = await asyncio.to_thread(response['Body'].read)
+                if not body:
+                    logger.warning("Empty response body", key=key)
+                    yield b""
+                    return
+                
+                decompressed = await asyncio.to_thread(gzip.decompress, body)
                 yield decompressed
             else:
                 async for chunk in self._stream_response(response['Body']):
