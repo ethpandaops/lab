@@ -134,11 +134,23 @@ class ModulesConfig(BaseModel):
     beacon_chain_timings: Optional[BeaconChainTimingsConfig] = None
     xatu_public_contributors: Optional[XatuPublicContributorsConfig] = None
 
+class EthereumNetworkConfig(BaseModel):
+    """Configuration for an Ethereum network."""
+    config_url: str = Field(description="URL to the network's beacon chain config.yaml")
+
+class EthereumConfig(BaseModel):
+    """Configuration for Ethereum networks."""
+    networks: Dict[str, EthereumNetworkConfig] = Field(
+        default_factory=dict,
+        description="Map of network name to network configuration"
+    )
+
 class Config(BaseSettings):
     """Main configuration."""
     storage: StorageConfig
     clickhouse: ClickHouseConfig
     modules: ModulesConfig
+    ethereum: EthereumConfig = Field(default_factory=EthereumConfig)
 
     def get_frontend_config(self) -> Dict[str, Any]:
         """Generate frontend-friendly config."""
