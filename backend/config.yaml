@@ -1,13 +1,22 @@
 storage:
+#   s3:
+#     endpoint: "http://localhost:9000"
+#     region: "us-east-1"
+#     bucket: "lab-data"
+#     access_key_id: "minioadmin"
+#     secret_access_key: "minioadmin"
   s3:
-    endpoint: "http://localhost:9000"
-    region: "us-east-1"
-    bucket: "lab-data"
-    access_key_id: "minioadmin"
-    secret_access_key: "minioadmin"
+    access_key_id: 59c82054d65cf2376eeac913570cd1f9
+    bucket: "ethpandaops-platform-staging-lab-data"
+    endpoint: https://539bc53131934672bf85e7260ec0b218.r2.cloudflarestorage.com
+    region: eeur
+    secret_access_key: 171c4fae06b80555e3187d3ace8d2c38a3889b1c613294dff2d95a95102eebf9
 
+# clickhouse:
+#   url: "clickhouse+http://pandaops:89de7199-392d-4000-a96f-bd4e712d303a@clickhouse.xatu.ethpandaops.io:443/default?protocol=https"
 clickhouse:
-  url: "clickhouse+http://pandaops:89de7199-392d-4000-a96f-bd4e712d303a@clickhouse.xatu.ethpandaops.io:443/default?protocol=https"
+  url: clickhouse+http://lab:86e30815-488b-4e22-b203-5eec220b7b80@chproxy.analytics.staging.platform.ethpandaops.io:443/default?protocol=https
+
 
 modules:
   beacon_chain_timings:

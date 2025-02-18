@@ -184,21 +184,22 @@ class S3Storage:
                     Bucket=self.bucket,
                     Key=src_key
                 )
-                metadata = {
-                    'ContentType': src_obj.get('ContentType', 'application/octet-stream'),
-                    'ContentEncoding': src_obj.get('ContentEncoding', 'gzip'),
-                }
                 
-                if 'CacheControl' in src_obj:
-                    metadata['CacheControl'] = src_obj['CacheControl']
+                # Determine content type if not in source
+                content_type = src_obj.get('ContentType')
+                if content_type is None:
+                    content_type = 'application/json' if dst_key.endswith('.json') else 'application/octet-stream'
                 
                 # Copy with metadata
                 await asyncio.to_thread(
-                    self.client.copy,
-                    copy_source,
-                    self.bucket,
-                    dst_key,
-                    ExtraArgs=metadata
+                    self.client.copy_object,
+                    CopySource=copy_source,
+                    Bucket=self.bucket,
+                    Key=dst_key,
+                    ContentType=content_type,
+                    ContentEncoding='gzip',  # We know we always gzip in _upload
+                    CacheControl=src_obj.get('CacheControl', ''),
+                    MetadataDirective='REPLACE'  # We're explicitly setting the headers
                 )
                 logger.debug("Successfully copied object", src=src_key, dst=dst_key)
                 return
