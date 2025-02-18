@@ -64,6 +64,7 @@ jobs:
             type=ref,event=branch,prefix=${{ matrix.component }}-
             type=semver,pattern=${{ matrix.component }}-{{version}}
             type=semver,pattern=${{ matrix.component }}-{{major}}.{{minor}}
+            type=sha,prefix=${{ matrix.component }}-,format=short
           flavor: |
             latest=false
 

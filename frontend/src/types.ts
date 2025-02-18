@@ -21,4 +21,19 @@ export interface Config {
 		type: string
 		path: string
 	}
+	dataSource: {
+		type: 'local' | 'github'
+		githubRepo?: string
+		githubBranch?: string
+		githubPath?: string
+		localPath?: string
+	}
+	s3: {
+		endpoint: string
+		bucket: string
+		region: string
+		accessKey: string
+		secretKey: string
+	}
+	apiEndpoint?: string
 }

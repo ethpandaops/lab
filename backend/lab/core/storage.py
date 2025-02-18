@@ -3,6 +3,7 @@ import io
 import os
 import gzip
 from abc import ABC, abstractmethod
+import time
 from typing import AsyncIterator, BinaryIO, Optional, Protocol
 
 import boto3
@@ -75,6 +76,9 @@ class S3Storage:
             # Upload to temp location
             logger.debug("Uploading to temp location", temp_key=temp_key)
             await self._upload(temp_key, data, content_type, cache_control=cache_control or self.DEFAULT_ATOMIC_CACHE)
+
+            # Sleep for 1 second to ensure temp file is visible
+            await time.sleep(1)
 
             # Copy to final location
             logger.debug("Copying to final location", src=temp_key, dst=key)
