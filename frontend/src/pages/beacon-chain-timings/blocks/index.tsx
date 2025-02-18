@@ -96,11 +96,11 @@ export const BlockTimings: React.FC = () => {
 
   useEffect(() => {
     setConfigLoading(true)
-    getConfig(network, timeWindow)
+    getConfig()
       .then(setConfig)
       .catch(setConfigError)
       .finally(() => setConfigLoading(false))
-  }, [network, timeWindow])
+  })
 
   // Update URL when network/timeWindow changes
   useEffect(() => {
