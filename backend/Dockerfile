@@ -2,15 +2,16 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-# Install Poetry
-RUN pip install poetry
+# Install build dependencies
+RUN apt-get update && apt-get install -y \
+    gcc \
+    && rm -rf /var/lib/apt/lists/*
 
-# Copy Poetry files
-COPY pyproject.toml poetry.lock ./
+# Copy requirements
+COPY requirements.txt ./
 
 # Install dependencies
-RUN poetry config virtualenvs.create false \
-    && poetry install --no-dev --no-interaction --no-ansi
+RUN pip install -r requirements.txt
 
 # Copy source code and config
 COPY lab/ ./lab/
