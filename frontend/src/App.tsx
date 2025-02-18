@@ -16,6 +16,7 @@ import Layout from './components/layout/Layout';
 import { BeaconChainTimings } from './pages/beacon-chain-timings';
 import { BlockTimings } from './pages/beacon-chain-timings/blocks';
 import Experiments from './pages/Experiments';
+import MaintenanceOverlay from './components/common/MaintenanceOverlay';
 
 // Create config context
 export const ConfigContext = createContext<Config | null>(null)
@@ -42,6 +43,7 @@ function App() {
 
 	return (
 		<QueryClientProvider client={queryClient}>
+			<MaintenanceOverlay />
 			<ConfigContext.Provider value={config}>
 				<Routes>
 					<Route path="/" element={<Layout />}>
