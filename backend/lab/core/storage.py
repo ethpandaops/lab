@@ -2,6 +2,7 @@
 import io
 import os
 import gzip
+import asyncio
 from abc import ABC, abstractmethod
 import time
 from typing import AsyncIterator, BinaryIO, Optional, Protocol
@@ -78,7 +79,7 @@ class S3Storage:
             await self._upload(temp_key, data, content_type, cache_control=cache_control or self.DEFAULT_ATOMIC_CACHE)
 
             # Sleep for 1 second to ensure temp file is visible
-            await time.sleep(1)
+            await asyncio.sleep(1)
 
             # Copy to final location
             logger.debug("Copying to final location", src=temp_key, dst=key)
@@ -103,12 +104,18 @@ class S3Storage:
         """Get data from the given key."""
         logger.debug("Getting object", key=key)
         try:
-            response = self.client.get_object(Bucket=self.bucket, Key=key)
+            response = await asyncio.to_thread(
+                self.client.get_object,
+                Bucket=self.bucket,
+                Key=key
+            )
             logger.debug("Successfully got object", key=key, size=response['ContentLength'])
             
             # Handle gzipped content
             if response.get('ContentEncoding') == 'gzip':
-                decompressed = gzip.decompress(response['Body'].read())
+                decompressed = await asyncio.to_thread(
+                    lambda: gzip.decompress(response['Body'].read())
+                )
                 yield decompressed
             else:
                 async for chunk in self._stream_response(response['Body']):
@@ -121,7 +128,11 @@ class S3Storage:
         """Delete data at the given key."""
         logger.debug("Deleting object", key=key)
         try:
-            self.client.delete_object(Bucket=self.bucket, Key=key)
+            await asyncio.to_thread(
+                self.client.delete_object,
+                Bucket=self.bucket,
+                Key=key
+            )
             logger.debug("Successfully deleted object", key=key)
         except Exception as e:
             logger.error("Failed to delete object", key=key, error=str(e))
@@ -148,7 +159,8 @@ class S3Storage:
         if cache_control:
             extra_args['CacheControl'] = cache_control
         
-        self.client.upload_fileobj(
+        await asyncio.to_thread(
+            self.client.upload_fileobj,
             io.BytesIO(compressed_data),
             self.bucket,
             key,
@@ -162,7 +174,11 @@ class S3Storage:
         copy_source = {'Bucket': self.bucket, 'Key': src_key}
         
         # Get metadata from source object
-        src_obj = self.client.head_object(Bucket=self.bucket, Key=src_key)
+        src_obj = await asyncio.to_thread(
+            self.client.head_object,
+            Bucket=self.bucket,
+            Key=src_key
+        )
         metadata = {
             'ContentType': src_obj.get('ContentType', 'application/octet-stream'),
             'ContentEncoding': src_obj.get('ContentEncoding', 'gzip'),
@@ -172,7 +188,8 @@ class S3Storage:
             metadata['CacheControl'] = src_obj['CacheControl']
         
         # Copy with metadata
-        self.client.copy(
+        await asyncio.to_thread(
+            self.client.copy,
             copy_source,
             self.bucket,
             dst_key,
@@ -184,7 +201,7 @@ class S3Storage:
         """Stream S3 response body."""
         total_bytes = 0
         while True:
-            chunk = body.read(chunk_size)
+            chunk = await asyncio.to_thread(body.read, chunk_size)
             if not chunk:
                 logger.debug("Finished streaming response", total_bytes=total_bytes)
                 break
