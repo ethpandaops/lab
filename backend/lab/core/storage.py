@@ -16,11 +16,11 @@ logger = logger.get_logger()
 class Storage(Protocol):
     """Storage interface."""
     
-    async def store(self, key: str, data: BinaryIO) -> None:
+    async def store(self, key: str, data: BinaryIO, cache_control: Optional[str] = None) -> None:
         """Store data at the given key."""
         ...
 
-    async def store_atomic(self, key: str, data: BinaryIO, content_type: Optional[str] = None) -> None:
+    async def store_atomic(self, key: str, data: BinaryIO, content_type: Optional[str] = None, cache_control: Optional[str] = None) -> None:
         """Store data at the given key atomically."""
         ...
 
@@ -34,6 +34,9 @@ class Storage(Protocol):
 
 class S3Storage:
     """S3 storage implementation."""
+
+    DEFAULT_STORE_CACHE = "max-age=10800"  # 3 hours
+    DEFAULT_ATOMIC_CACHE = "max-age=3600"  # 1 hour
 
     def __init__(self, config: S3Config):
         """Initialize S3 storage."""
@@ -54,24 +57,24 @@ class S3Storage:
         self.bucket = config.bucket
         logger.info("S3 storage initialized")
 
-    async def store(self, key: str, data: BinaryIO) -> None:
+    async def store(self, key: str, data: BinaryIO, cache_control: Optional[str] = None) -> None:
         """Store data at the given key."""
         logger.debug("Storing object", key=key)
         try:
-            await self._upload(key, data)
+            await self._upload(key, data, cache_control=cache_control or self.DEFAULT_STORE_CACHE)
             logger.debug("Successfully stored object", key=key)
         except Exception as e:
             logger.error("Failed to store object", key=key, error=str(e))
             raise
 
-    async def store_atomic(self, key: str, data: BinaryIO, content_type: Optional[str] = None) -> None:
+    async def store_atomic(self, key: str, data: BinaryIO, content_type: Optional[str] = None, cache_control: Optional[str] = None) -> None:
         """Store data at the given key atomically."""
         temp_key = f"temp/{key}"
         logger.debug("Starting atomic store", key=key, temp_key=temp_key)
         try:
             # Upload to temp location
             logger.debug("Uploading to temp location", temp_key=temp_key)
-            await self._upload(temp_key, data, content_type)
+            await self._upload(temp_key, data, content_type, cache_control=cache_control or self.DEFAULT_ATOMIC_CACHE)
 
             # Copy to final location
             logger.debug("Copying to final location", src=temp_key, dst=key)
@@ -120,7 +123,7 @@ class S3Storage:
             logger.error("Failed to delete object", key=key, error=str(e))
             raise
 
-    async def _upload(self, key: str, data: BinaryIO, content_type: Optional[str] = None) -> None:
+    async def _upload(self, key: str, data: BinaryIO, content_type: Optional[str] = None, cache_control: Optional[str] = None) -> None:
         """Upload data to S3."""
         logger.debug("Uploading data", key=key)
         
@@ -133,14 +136,19 @@ class S3Storage:
             content_type = 'application/json' if key.endswith('.json') else 'application/octet-stream'
         
         # Upload with content type and compression
+        extra_args = {
+            'ContentType': content_type,
+            'ContentEncoding': 'gzip',
+        }
+        
+        if cache_control:
+            extra_args['CacheControl'] = cache_control
+        
         self.client.upload_fileobj(
             io.BytesIO(compressed_data),
             self.bucket,
             key,
-            ExtraArgs={
-                'ContentType': content_type,
-                'ContentEncoding': 'gzip',
-            }
+            ExtraArgs=extra_args
         )
         logger.debug("Successfully uploaded data", key=key)
 
@@ -155,6 +163,9 @@ class S3Storage:
             'ContentType': src_obj.get('ContentType', 'application/octet-stream'),
             'ContentEncoding': src_obj.get('ContentEncoding', 'gzip'),
         }
+        
+        if 'CacheControl' in src_obj:
+            metadata['CacheControl'] = src_obj['CacheControl']
         
         # Copy with metadata
         self.client.copy(
