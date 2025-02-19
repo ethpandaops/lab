@@ -5,6 +5,7 @@ import { getConfig } from './config'
 import type { Config } from './types'
 import { LoadingState } from './components/common/LoadingState'
 import { ErrorState } from './components/common/ErrorState'
+import { BeaconClockManager } from './utils/beacon'
 import Home from './pages/Home';
 import { About } from './pages/About';
 import Xatu from './pages/xatu';
@@ -15,6 +16,9 @@ import ContributorDetail from './pages/xatu/ContributorDetail';
 import Layout from './components/layout/Layout';
 import { BeaconChainTimings } from './pages/beacon-chain-timings';
 import { BlockTimings } from './pages/beacon-chain-timings/blocks';
+import { Beacon } from './pages/beacon';
+import { BeaconLive } from './pages/beacon/live';
+import { BeaconSlot } from './pages/beacon/slot';
 import Experiments from './pages/Experiments';
 import MaintenanceOverlay from './components/common/MaintenanceOverlay';
 
@@ -29,7 +33,11 @@ function App() {
 
 	useEffect(() => {
 		getConfig()
-			.then(setConfig)
+			.then(config => {
+				// Initialize BeaconClockManager with config
+				BeaconClockManager.getInstance().initialize(config)
+				setConfig(config)
+			})
 			.catch(setConfigError)
 	}, [])
 
@@ -57,6 +65,10 @@ function App() {
 						</Route>
 						<Route path="beacon-chain-timings" element={<BeaconChainTimings />}>
 							<Route path="blocks" element={<BlockTimings />} />
+						</Route>
+						<Route path="beacon" element={<Beacon />}>
+							<Route path="live" element={<BeaconLive />} />
+							<Route path=":slot" element={<BeaconSlot />} />
 						</Route>
 					</Route>
 				</Routes>

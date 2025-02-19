@@ -28,6 +28,13 @@ export const navigation = [
           { name: 'Block Timings', path: '/beacon-chain-timings/blocks' },
         ],
       },
+      {
+        name: 'Beacon',
+        path: '/beacon',
+        children: [
+          { name: 'Live View', path: '/beacon/live' },
+        ],
+      },
     ],
   },
   { name: 'About', path: '/about' },

@@ -2,6 +2,7 @@
 from ast import Tuple
 import asyncio
 from datetime import datetime, timezone, timedelta
+import math
 from typing import Optional, Dict, Any, List, Tuple
 import json
 import io
@@ -190,6 +191,7 @@ class OptimizedSlotData(BaseModel):
     
     # Attestation data
     attestation_windows: List[AttestationWindow]
+    maximum_attestation_votes: int
 
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -208,7 +210,8 @@ class OptimizedSlotData(BaseModel):
                 "blob_first_seen_p2p": self.blob_first_seen_p2p_times,
             },
             "attestations": {
-                "windows": [w.to_dict() for w in self.attestation_windows]
+                "windows": [w.to_dict() for w in self.attestation_windows],
+                "maximum_votes": self.maximum_attestation_votes
             }
         }
 
@@ -481,7 +484,7 @@ class SlotProcessor(BaseProcessor):
                 # Small sleep to prevent tight loop
                 # Sleep until next slot
                 start_time, end_time = self.network.clock.get_slot_window(current_slot)
-                time_to_next_slot = (end_time - datetime.now(timezone.utc)).total_seconds()
+                time_to_next_slot = abs((end_time - datetime.now(timezone.utc)).total_seconds())
                 self.logger.info(f"Sleeping for {time_to_next_slot} seconds until next slot")
                 await asyncio.sleep(max(0, time_to_next_slot))
             except Exception as e:

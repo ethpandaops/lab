@@ -30,6 +30,14 @@ export const breadcrumbs = [
       { name: 'Blocks', path: '/beacon-chain-timings/blocks' },
     ],
   },
+  {
+    name: 'Beacon',
+    path: '/beacon',
+    children: [
+      { name: 'Live View', path: '/beacon/live' },
+      { name: 'Slot :slot', path: '/beacon/:slot' },
+    ],
+  },
 ];
 
 function findActivePath(pathname: string, items: NavItem[]): NavItem[] {

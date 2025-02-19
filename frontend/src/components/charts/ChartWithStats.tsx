@@ -20,13 +20,28 @@ interface ChartWithStatsProps {
   series: SeriesStats[]
   className?: string
   notes?: ReactNode
+  showSeriesTable?: boolean
+  headerSize?: 'small' | 'large'
+  xTicks?: number[]
+  yTicks?: number[]
+  height?: number
 }
 
-export const ChartWithStats = ({ title, description, chart, series, className = '', notes }: ChartWithStatsProps) => {
+export const ChartWithStats = ({ 
+  title, 
+  description, 
+  chart, 
+  series, 
+  className = '', 
+  notes,
+  showSeriesTable = true,
+  headerSize = 'large',
+  height = 400,
+}: ChartWithStatsProps) => {
   return (
     <div className={`space-y-6 ${className}`}>
       <div className="space-y-2">
-        <h2 className="text-2xl font-sans font-bold text-cyber-neon">{title}</h2>
+        <h2 className={`font-sans font-bold text-cyber-neon ${headerSize === 'large' ? 'text-2xl' : 'text-lg'}`}>{title}</h2>
         {description && (
           <p className="text-sm font-mono text-cyber-neon/70">{description}</p>
         )}
@@ -36,46 +51,48 @@ export const ChartWithStats = ({ title, description, chart, series, className = 
       <div className="flex flex-col gap-6">
         {/* Chart Area */}
         <div className="flex flex-col lg:flex-row gap-6">
-          <div className="w-full lg:w-3/4">
+          <div className={`w-full ${showSeriesTable ? 'lg:w-3/4' : ''}`}>
             {/* Chart container with responsive padding */}
-            <div className="h-[400px] -mx-4 sm:mx-0 sm:px-4 lg:px-0">
+            <div className="-mx-4 sm:mx-0 sm:px-4 lg:px-0" style={{ height: `${height}px` }}>
               {chart}
             </div>
           </div>
 
           {/* Stats Table */}
-          <div className="w-full lg:w-1/4">
-            <div className="flex flex-col h-[350px]">
-              <div className="text-xs font-mono text-cyber-neon/70 mb-2 flex justify-between px-2 sticky top-0 bg-cyber-darker z-10">
-                <div>Series Name</div>
-                <div>Last</div>
-              </div>
-              <div className="space-y-1 overflow-y-scroll cyber-scrollbar">
-                {series.map((item) => (
-                  <button
-                    key={item.name}
-                    onClick={item.onClick}
-                    className={`group w-full px-2 py-1.5 rounded hover:bg-cyber-neon/5 transition-colors ${
-                      item.isHidden ? 'opacity-50' : ''
-                    } ${item.isHighlighted ? 'ring-1 ring-cyber-neon' : ''}`}
-                    title={`Min: ${typeof item.min === 'number' ? item.min.toFixed(2) : item.min}${item.unit || ''}
+          {showSeriesTable && (
+            <div className="w-full lg:w-1/4">
+              <div className="flex flex-col" style={{ height: `${height - 50}px` }}>
+                <div className="text-xs font-mono text-cyber-neon/70 mb-2 flex justify-between px-2 sticky top-0 bg-cyber-darker z-10">
+                  <div>Series Name</div>
+                  <div>Last</div>
+                </div>
+                <div className="space-y-1 overflow-y-scroll cyber-scrollbar">
+                  {series.map((item) => (
+                    <button
+                      key={item.name}
+                      onClick={item.onClick}
+                      className={`group w-full px-2 py-1.5 rounded hover:bg-cyber-neon/5 transition-colors ${
+                        item.isHidden ? 'opacity-50' : ''
+                      } ${item.isHighlighted ? 'ring-1 ring-cyber-neon' : ''}`}
+                      title={`Min: ${typeof item.min === 'number' ? item.min.toFixed(2) : item.min}${item.unit || ''}
 Avg: ${typeof item.avg === 'number' ? item.avg.toFixed(2) : item.avg}${item.unit || ''}
 Max: ${typeof item.max === 'number' ? item.max.toFixed(2) : item.max}${item.unit || ''}`}
-                  >
-                    <div className="flex items-center justify-between gap-2">
-                      <div className="flex items-center gap-2 min-w-0">
-                        <div className="w-2 h-2 flex-shrink-0" style={{ backgroundColor: item.color }} />
-                        <span className="text-xs font-mono truncate">{item.name}</span>
+                    >
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <div className="w-2 h-2 flex-shrink-0" style={{ backgroundColor: item.color }} />
+                          <span className="text-xs font-mono truncate">{item.name}</span>
+                        </div>
+                        <div className="text-xs font-mono font-medium whitespace-nowrap">
+                          {typeof item.last === 'number' ? `${item.last.toFixed(2)}${item.unit || ''}` : item.last}
+                        </div>
                       </div>
-                      <div className="text-xs font-mono font-medium whitespace-nowrap">
-                        {typeof item.last === 'number' ? `${item.last.toFixed(2)}${item.unit || ''}` : item.last}
-                      </div>
-                    </div>
-                  </button>
-                ))}
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
-          </div>
+          )}
         </div>
 
         {/* Notes Section */}
