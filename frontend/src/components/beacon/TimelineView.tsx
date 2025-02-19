@@ -20,6 +20,8 @@ interface TimelineViewProps {
   isPlaying: boolean
   currentTime: number
   firstBlockSeen: BlockEvent | null
+  firstApiBlockSeen?: BlockEvent | null
+  firstP2pBlockSeen?: BlockEvent | null
   attestationWindows?: Array<{
     start_ms: number
     end_ms: number
@@ -43,6 +45,8 @@ export function TimelineView({
   isPlaying,
   currentTime,
   firstBlockSeen,
+  firstApiBlockSeen,
+  firstP2pBlockSeen,
   attestationWindows,
   attestationProgress,
   ATTESTATION_THRESHOLD,
@@ -127,20 +131,33 @@ export function TimelineView({
 
           {/* Event markers container */}
           <div className="absolute inset-x-0 bottom-6 h-10">
-            {/* Block seen marker - now with tooltip */}
-            {!loading && !isMissing && firstBlockSeen && (
+            {/* Block seen marker (API) */}
+            {!loading && !isMissing && firstApiBlockSeen && (
               <div
                 className="absolute bottom-0 flex flex-col items-center group"
-                style={{ left: `${(firstBlockSeen.time / 12000) * 100}%` }}
+                style={{ left: `${(firstApiBlockSeen.time / 12000) * 100}%` }}
                 data-tooltip-id="timeline-tooltip"
-                data-tooltip-content={`Block Seen at ${(firstBlockSeen.time / 1000).toFixed(2)}s`}
+                data-tooltip-content={`Block Seen (API) at ${(firstApiBlockSeen.time / 1000).toFixed(2)}s`}
               >
                 <div className="w-px h-full bg-cyber-blue" />
                 <div className="absolute bottom-0 -mb-1.5 w-2 h-2 rounded-full bg-cyber-blue ring-4 ring-cyber-blue/20" />
               </div>
             )}
 
-            {/* First attestation marker - now with tooltip */}
+            {/* Block seen marker (P2P) */}
+            {!loading && !isMissing && firstP2pBlockSeen && (
+              <div
+                className="absolute bottom-0 flex flex-col items-center group"
+                style={{ left: `${(firstP2pBlockSeen.time / 12000) * 100}%` }}
+                data-tooltip-id="timeline-tooltip"
+                data-tooltip-content={`Block Seen (P2P) at ${(firstP2pBlockSeen.time / 1000).toFixed(2)}s`}
+              >
+                <div className="w-px h-full bg-yellow-400" />
+                <div className="absolute bottom-0 -mb-1.5 w-2 h-2 rounded-full bg-yellow-400 ring-4 ring-yellow-400/20" />
+              </div>
+            )}
+
+            {/* First attestation marker */}
             {!loading && !isMissing && attestationWindows && attestationWindows.length > 0 && (
               <div
                 className="absolute bottom-0 flex flex-col items-center group"
@@ -175,7 +192,11 @@ export function TimelineView({
         <div className="flex flex-wrap gap-4 text-xs font-mono">
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 rounded-full bg-cyber-blue ring-4 ring-cyber-blue/20" />
-            <span className="text-cyber-blue/80">Block Seen</span>
+            <span className="text-cyber-blue/80">Block Seen (API)</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-2 h-2 rounded-full bg-yellow-400 ring-4 ring-yellow-400/20" />
+            <span className="text-yellow-400/80">Block Seen (P2P)</span>
           </div>
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 rounded-full bg-cyber-pink ring-4 ring-cyber-pink/20" />

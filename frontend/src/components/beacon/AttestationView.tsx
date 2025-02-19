@@ -165,7 +165,7 @@ export function AttestationView({
             <div>
               <h4 className="text-xs font-mono text-cyber-neon/70 mb-1">66% Threshold Reached</h4>
               <p className="text-sm font-mono text-cyber-neon">
-                {(attestationProgress.find(p => p.totalValidators >= ATTESTATION_THRESHOLD) || { time: 0 }).time.toFixed(1)}s
+                {((attestationProgress.find(p => p.totalValidators >= ATTESTATION_THRESHOLD) || { time: 0 }).time / 1000).toFixed(2)}s
               </p>
             </div>
             <div>

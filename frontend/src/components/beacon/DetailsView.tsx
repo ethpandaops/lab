@@ -31,35 +31,44 @@ interface DetailsViewProps {
 }
 
 export function DetailsView({ loading, isMissing, slotData }: DetailsViewProps): JSX.Element {
-  // Find the first node that saw the block
-  const firstSeenLocation = useMemo(() => {
-    if (!slotData?.timings.block_seen || !slotData?.nodes) return null;
+  // Find the first node that saw the block (both API and P2P)
+  const firstSeenLocations = useMemo(() => {
+    if (!slotData?.timings || !slotData?.nodes) return { api: null, p2p: null };
 
-    let firstNode = null;
-    let firstTime = Infinity;
+    let firstApiNode = null;
+    let firstP2pNode = null;
+    let firstApiTime = Infinity;
+    let firstP2pTime = Infinity;
 
-    // Check both P2P and API events
+    // Check API events
     Object.entries(slotData.timings.block_seen || {}).forEach(([node, time]) => {
-      if (time < firstTime) {
-        firstTime = time;
-        firstNode = node;
+      if (time < firstApiTime) {
+        firstApiTime = time;
+        firstApiNode = node;
       }
     });
+
+    // Check P2P events
     Object.entries(slotData.timings.block_first_seen_p2p || {}).forEach(([node, time]) => {
-      if (time < firstTime) {
-        firstTime = time;
-        firstNode = node;
+      if (time < firstP2pTime) {
+        firstP2pTime = time;
+        firstP2pNode = node;
       }
     });
 
-    if (!firstNode || !slotData.nodes[firstNode]) return null;
-
-    const nodeInfo = slotData.nodes[firstNode];
     return {
-      city: nodeInfo.geo.city,
-      country: nodeInfo.geo.country,
-      continent: nodeInfo.geo.continent,
-      time: firstTime
+      api: firstApiNode && slotData.nodes[firstApiNode] ? {
+        city: slotData.nodes[firstApiNode].geo.city,
+        country: slotData.nodes[firstApiNode].geo.country,
+        continent: slotData.nodes[firstApiNode].geo.continent,
+        time: firstApiTime
+      } : null,
+      p2p: firstP2pNode && slotData.nodes[firstP2pNode] ? {
+        city: slotData.nodes[firstP2pNode].geo.city,
+        country: slotData.nodes[firstP2pNode].geo.country,
+        continent: slotData.nodes[firstP2pNode].geo.continent,
+        time: firstP2pTime
+      } : null
     };
   }, [slotData]);
 
@@ -151,16 +160,30 @@ export function DetailsView({ loading, isMissing, slotData }: DetailsViewProps):
             </div>
             <div className="col-span-2">
               <h4 className="text-xs font-mono text-cyber-neon/70">First Seen</h4>
-              <p className="text-sm font-mono font-medium text-cyber-neon">
-                {firstSeenLocation ? (
-                  <>
-                    {firstSeenLocation.city}, {firstSeenLocation.country}
-                    <span className="text-cyber-neon/70 ml-2">
-                      ({firstSeenLocation.continent}) at {(firstSeenLocation.time / 1000).toFixed(2)}s
-                    </span>
-                  </>
-                ) : 'Unknown'}
-              </p>
+              <div className="space-y-1">
+                <p className="text-sm font-mono font-medium text-cyber-neon">
+                  {firstSeenLocations.api ? (
+                    <>
+                      <span className="text-cyber-blue">API: </span>
+                      {firstSeenLocations.api.country}
+                      <span className="text-cyber-neon/70 ml-2">
+                        ({firstSeenLocations.api.continent}) at {(firstSeenLocations.api.time / 1000).toFixed(2)}s
+                      </span>
+                    </>
+                  ) : 'Unknown'}
+                </p>
+                <p className="text-sm font-mono font-medium text-cyber-neon">
+                  {firstSeenLocations.p2p ? (
+                    <>
+                      <span className="text-cyber-green">P2P: </span>
+                      {firstSeenLocations.p2p.country}
+                      <span className="text-cyber-neon/70 ml-2">
+                        ({firstSeenLocations.p2p.continent}) at {(firstSeenLocations.p2p.time / 1000).toFixed(2)}s
+                      </span>
+                    </>
+                  ) : 'Unknown'}
+                </p>
+              </div>
             </div>
           </>
         )}

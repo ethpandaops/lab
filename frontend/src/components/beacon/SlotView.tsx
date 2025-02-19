@@ -3,7 +3,7 @@ import { useDataFetch } from '../../utils/data'
 import { LoadingState } from '../common/LoadingState'
 import { ErrorState } from '../common/ErrorState'
 import { AttestationView } from './AttestationView'
-import { AnalysisView } from './AnalysisView'
+import { GlobalMap } from './GlobalMap'
 import { DetailsView } from './DetailsView'
 import { TimelineView } from './TimelineView'
 
@@ -21,6 +21,15 @@ interface SlotData {
     proposer_validator_index: number
   }
   entity?: string
+  nodes: Record<string, {
+    name: string
+    username: string
+    geo: {
+      city: string
+      country: string
+      continent: string
+    }
+  }>
   timings: {
     block_seen?: Record<string, number>
     block_first_seen_p2p?: Record<string, number>
@@ -129,37 +138,52 @@ export function SlotView({ slot, network = 'mainnet', isLive = false, onSlotComp
   const totalValidators = slotData?.attestations?.maximum_votes || 0
   const attestationThreshold = Math.ceil(totalValidators * 0.66)
 
-  const { firstBlockSeen, attestationProgress } = useMemo(() => {
-    if (!slotData) return { firstBlockSeen: null, attestationProgress: [] }
+  const { firstBlockSeen, firstApiBlockSeen, firstP2pBlockSeen, attestationProgress } = useMemo(() => {
+    if (!slotData) return { firstBlockSeen: null, firstApiBlockSeen: null, firstP2pBlockSeen: null, attestationProgress: [] }
 
     // Find first block seen event
     let firstBlock: BlockEvent | null = null
+    let firstApiBlock: BlockEvent | null = null
+    let firstP2pBlock: BlockEvent | null = null
     
     // Check P2P events
     const p2pEvents = slotData.timings.block_first_seen_p2p || {}
-    Object.entries(p2pEvents).forEach(([node, time]) => {
-      if (!firstBlock || time < firstBlock.time) {
-        firstBlock = {
-          type: 'block_seen',
-          time,
-          node,
-          source: 'p2p'
-        }
-      }
-    })
+    const p2pTimes = Object.values(p2pEvents)
+    const firstP2pTime = p2pTimes.length > 0 ? Math.min(...p2pTimes) : Infinity
+    const firstP2pNode = Object.entries(p2pEvents).find(([_, time]) => time === firstP2pTime)?.[0]
 
     // Check API events
     const apiEvents = slotData.timings.block_seen || {}
-    Object.entries(apiEvents).forEach(([node, time]) => {
-      if (!firstBlock || time < firstBlock.time) {
-        firstBlock = {
-          type: 'block_seen',
-          time,
-          node,
-          source: 'api'
-        }
+    const apiTimes = Object.values(apiEvents)
+    const firstApiTime = apiTimes.length > 0 ? Math.min(...apiTimes) : Infinity
+    const firstApiNode = Object.entries(apiEvents).find(([_, time]) => time === firstApiTime)?.[0]
+
+    // Set first API block if exists
+    if (firstApiNode) {
+      firstApiBlock = {
+        type: 'block_seen',
+        time: firstApiTime,
+        node: firstApiNode,
+        source: 'api'
       }
-    })
+    }
+
+    // Set first P2P block if exists
+    if (firstP2pNode) {
+      firstP2pBlock = {
+        type: 'block_seen',
+        time: firstP2pTime,
+        node: firstP2pNode,
+        source: 'p2p'
+      }
+    }
+
+    // Use API event if it's first, otherwise use P2P event for the combined firstBlockSeen
+    if (firstApiNode && (!firstP2pNode || firstApiTime < firstP2pTime)) {
+      firstBlock = firstApiBlock
+    } else if (firstP2pNode) {
+      firstBlock = firstP2pBlock
+    }
 
     // Process attestations into cumulative progress
     const attestations: AttestationPoint[] = []
@@ -202,38 +226,31 @@ export function SlotView({ slot, network = 'mainnet', isLive = false, onSlotComp
 
     return {
       firstBlockSeen: firstBlock,
+      firstApiBlockSeen: firstApiBlock,
+      firstP2pBlockSeen: firstP2pBlock,
       attestationProgress: attestations
     }
   }, [slotData])
 
-  const events = useMemo(() => {
+  const blockEvents = useMemo(() => {
     if (!slotData) return []
 
     return [
       // Block seen events
       ...Object.entries(slotData.timings.block_seen || {}).map(([node, time]) => ({
-        type: 'block_seen',
+        type: 'block_seen' as const,
         node,
         time,
+        source: 'api' as const
       })),
       // Block P2P events
       ...Object.entries(slotData.timings.block_first_seen_p2p || {}).map(([node, time]) => ({
-        type: 'block_p2p',
+        type: 'block_seen' as const,
         node,
         time,
-      })),
-      // Attestation events
-      ...(slotData.attestations?.windows || []).flatMap((window: AttestationWindow) => ({
-        type: 'attestation',
-        start: window.start_ms,
-        end: window.end_ms,
-        validators: window.validator_indices,
-      })),
-    ].sort((a, b) => {
-      const timeA = 'time' in a ? a.time : a.start
-      const timeB = 'time' in b ? b.time : b.start
-      return timeA - timeB
-    })
+        source: 'p2p' as const
+      }))
+    ].sort((a, b) => a.time - b.time)
   }, [slotData])
 
   // Calculate what to show based on data availability
@@ -253,6 +270,8 @@ export function SlotView({ slot, network = 'mainnet', isLive = false, onSlotComp
         isPlaying={isPlaying}
         currentTime={currentTime}
         firstBlockSeen={firstBlockSeen}
+        firstApiBlockSeen={firstApiBlockSeen}
+        firstP2pBlockSeen={firstP2pBlockSeen}
         attestationWindows={slotData?.attestations?.windows}
         attestationProgress={attestationProgress}
         ATTESTATION_THRESHOLD={attestationThreshold}
@@ -266,7 +285,13 @@ export function SlotView({ slot, network = 'mainnet', isLive = false, onSlotComp
 
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        <AnalysisView loading={isLoading} isMissing={isMissingData} />
+        <GlobalMap
+          nodes={slotData?.nodes || {}}
+          currentTime={currentTime}
+          blockEvents={blockEvents}
+          loading={isLoading}
+          isMissing={isMissingData}
+        />
         <DetailsView loading={isLoading} isMissing={isMissingData} slotData={slotData} />
         <AttestationView
           loading={isLoading}
