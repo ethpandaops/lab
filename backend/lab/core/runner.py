@@ -7,7 +7,6 @@ import json
 import io
 
 from lab.core import logger
-
 from lab.core.config import Config
 from lab.core.clickhouse import ClickHouseClient
 from lab.core.storage import S3Storage, Storage
@@ -15,6 +14,8 @@ from lab.core.state import StateManager
 from lab.core.module import Module, ModuleContext
 from lab.modules.beacon_chain_timings import BeaconChainTimingsModule
 from lab.modules.xatu_public_contributors import XatuPublicContributorsModule
+from lab.modules.beacon import BeaconModule
+from lab.ethereum import NetworkManager
 
 logger = logger.get_logger()
 
@@ -26,89 +27,121 @@ class Runner:
         self.config = config
         self.storage: Optional[Storage] = None
         self.clickhouse: Optional[ClickHouseClient] = None
+        self.networks: Optional[NetworkManager] = None
         self.modules: Dict[str, Module] = {}
         self._stop_event = asyncio.Event()
         self._original_sigint_handler = None
+        
+        # Set up signal handlers immediately
+        self._setup_signal_handlers()
+        
         logger.info("Runner initialized")
 
     async def start(self) -> None:
         """Start the runner and all modules."""
         logger.info("Starting runner")
 
-        # Initialize storage
-        logger.debug("Initializing storage")
-        self.storage = S3Storage(self.config.storage.s3)
-
-        # Initialize ClickHouse
-        logger.debug("Initializing ClickHouse")
-        self.clickhouse = ClickHouseClient(self.config.clickhouse)
-        await self.clickhouse.start()
-
-        # Write frontend config
-        await self._write_frontend_config()
-
-        # Register and start modules
-        logger.debug("Starting module registration")
-        await self._register_modules()
-        logger.debug("Module registration complete, starting modules")
-        await self._start_modules()
-
-        # Setup signal handlers
-        logger.debug("Setting up signal handlers")
-        self._setup_signal_handlers()
-
-        logger.info("Runner started successfully")
-
-        # Wait for stop signal
-        logger.debug("Waiting for stop signal")
         try:
-            await self._stop_event.wait()
-        except asyncio.CancelledError:
-            logger.info("Received cancellation")
-            self._stop_event.set()
+            # Initialize storage
+            logger.debug("Initializing storage")
+            self.storage = S3Storage(self.config.storage.s3)
 
-        # Stop everything
-        logger.info("Stop signal received")
-        await self.stop()
+            # Initialize ClickHouse
+            logger.debug("Initializing ClickHouse")
+            self.clickhouse = ClickHouseClient(self.config.clickhouse)
+            await self.clickhouse.start()
+
+            # Initialize networks
+            logger.debug("Initializing Ethereum networks")
+            self.networks = NetworkManager(self.config, logger)
+            await self.networks.initialize()
+            logger.info("Ethereum networks initialized")
+
+            # Write frontend config
+            await self._write_frontend_config()
+
+            # Register and start modules
+            logger.debug("Starting module registration")
+            await self._register_modules()
+            logger.debug("Module registration complete, starting modules")
+            await self._start_modules()
+
+            logger.info("Runner started successfully")
+
+            # Wait for stop signal
+            logger.debug("Waiting for stop signal")
+            try:
+                await self._stop_event.wait()
+            except asyncio.CancelledError:
+                logger.info("Received cancellation")
+                self._stop_event.set()
+
+        except Exception as e:
+            logger.error(f"Error during runner startup: {str(e)}")
+            self._stop_event.set()
+            raise
+        finally:
+            # Stop everything
+            logger.info("Stop signal received")
+            await self.stop()
 
     async def stop(self) -> None:
         """Stop the runner and all modules."""
         logger.info("Stopping runner")
 
-        # Stop modules
-        logger.debug("Stopping modules")
-        await self._stop_modules()
+        try:
+            # Stop modules
+            logger.debug("Stopping modules")
+            await self._stop_modules()
 
-        # Stop ClickHouse
-        if self.clickhouse is not None:
-            logger.debug("Stopping ClickHouse")
-            await self.clickhouse.stop()
+            # Stop ClickHouse
+            if self.clickhouse is not None:
+                logger.debug("Stopping ClickHouse")
+                await self.clickhouse.stop()
+        except Exception as e:
+            logger.error(f"Error during shutdown: {str(e)}")
+        finally:
+            # Clear stop event
+            self._stop_event.clear()
 
-        # Clear stop event
-        self._stop_event.clear()
+            # Restore original signal handler
+            if self._original_sigint_handler:
+                try:
+                    signal.signal(signal.SIGINT, self._original_sigint_handler)
+                except Exception as e:
+                    logger.error(f"Failed to restore original signal handler: {str(e)}")
 
-        # Restore original signal handler
-        if self._original_sigint_handler:
-            signal.signal(signal.SIGINT, self._original_sigint_handler)
-
-        logger.info("Runner stopped")
+            logger.info("Runner stopped")
 
     def _setup_signal_handlers(self) -> None:
         """Setup signal handlers."""
         logger.debug("Setting up signal handlers")
-        loop = asyncio.get_running_loop()
 
         def handle_signal(sig: int) -> None:
             logger.info(f"Received signal {sig}")
             # Set the stop event in a thread-safe way
-            loop.call_soon_threadsafe(self._stop_event.set)
+            if asyncio.get_event_loop().is_running():
+                asyncio.get_event_loop().call_soon_threadsafe(self._stop_event.set)
+            else:
+                # If loop isn't running yet, just set the event directly
+                self._stop_event.set()
 
         # Save original SIGINT handler
         self._original_sigint_handler = signal.getsignal(signal.SIGINT)
 
-        # Set up new handlers
+        # Set up new handlers for both SIGINT and SIGTERM
         for sig in (signal.SIGTERM, signal.SIGINT):
-            loop.add_signal_handler(sig, lambda s=sig: handle_signal(s))
+            try:
+                if asyncio.get_event_loop().is_running():
+                    asyncio.get_event_loop().add_signal_handler(
+                        sig, 
+                        lambda s=sig: handle_signal(s)
+                    )
+                else:
+                    # If loop isn't running, use basic signal handler
+                    signal.signal(sig, lambda s, f: handle_signal(s))
+            except Exception as e:
+                logger.error(f"Failed to set up signal handler for signal {sig}: {str(e)}")
 
         logger.debug("Signal handlers setup complete")
 
@@ -133,6 +166,11 @@ class Runner:
         if self.config.modules.xatu_public_contributors is not None and self.config.modules.xatu_public_contributors.enabled:
             await self._register_xatu_public_contributors_module()
 
+        # Check beacon module config
+        logger.debug("Checking beacon module configuration")
+        if self.config.modules.beacon is not None and self.config.modules.beacon.enabled:
+            await self._register_beacon_module()
+
     async def _register_beacon_chain_timings_module(self) -> None:
         """Register beacon chain timings module."""
         try:
@@ -153,6 +191,8 @@ class Runner:
                 storage=self.storage,
                 clickhouse=self.clickhouse,
                 state=state,
+                networks=self.networks,
+                root_config=self.config,
             )
 
             # Create and register module
@@ -192,6 +232,38 @@ class Runner:
             logger.info("Successfully registered xatu public contributors module")
         except Exception as e:
             logger.error("Failed to register xatu public contributors module", error=str(e))
+            raise
+
+    async def _register_beacon_module(self) -> None:
+        """Register beacon module."""
+        try:            
+            logger.info("Registering beacon module")
+            
+            # Create state manager
+            logger.debug("Creating state manager")
+            state = StateManager("beacon", self.storage)
+            await state.start()  # Initialize and test S3 access
+
+            # Create module context
+            logger.debug("Creating module context", 
+                        networks=self.config.modules.beacon.networks)
+            ctx = ModuleContext(
+                name="beacon",
+                config=self.config.modules.beacon,
+                storage=self.storage,
+                clickhouse=self.clickhouse,
+                state=state,
+                networks=self.networks,
+                root_config=self.config,
+            )
+
+            # Create and register module
+            logger.debug("Creating module instance")
+            module = BeaconModule(ctx)
+            self.modules[module.name] = module
+            logger.info("Successfully registered beacon module")
+        except Exception as e:
+            logger.error("Failed to register beacon module", error=str(e))
             raise
 
     async def _start_modules(self) -> None:

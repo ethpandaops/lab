@@ -67,8 +67,6 @@ class TimeWindowConfig(BaseModel):
 class ModuleConfig(BaseModel):
     """Base module configuration."""
     enabled: bool = False
-    networks: List[str]
-    time_windows: List[TimeWindowConfig]
     description: str = ""
     path_prefix: str = ""
 
@@ -76,21 +74,14 @@ class ModuleConfig(BaseModel):
         """Get frontend-friendly config."""
         return {
             "enabled": self.enabled,
-            "networks": self.networks,
-            "time_windows": [
-                {
-                    "file": w.file,
-                    "step": w.step,
-                    "label": w.label,
-                    "range": w.range
-                } for w in self.time_windows
-            ],
             "description": self.description,
             "path_prefix": self.path_prefix
         }
 
 class BeaconChainTimingsConfig(ModuleConfig):
     """Beacon chain timings module configuration."""
+    networks: List[str]
+    time_windows: List[TimeWindowConfig]
     interval: str
     description: str = "Beacon chain block timing metrics"
     path_prefix: str = "beacon_chain_timings"
@@ -114,8 +105,26 @@ class BeaconChainTimingsConfig(ModuleConfig):
             case 'd': return timedelta(days=value)
             case _: raise ValueError(f"Invalid duration unit: {unit}")
 
+    def get_frontend_config(self) -> Dict[str, Any]:
+        """Get frontend-friendly config."""
+        config = super().get_frontend_config()
+        config.update({
+            "networks": self.networks,
+            "time_windows": [
+                {
+                    "file": w.file,
+                    "step": w.step,
+                    "label": w.label,
+                    "range": w.range
+                } for w in self.time_windows
+            ]
+        })
+        return config
+
 class XatuPublicContributorsConfig(ModuleConfig):
     """Xatu Public Contributors module configuration."""
+    networks: List[str]
+    time_windows: List[TimeWindowConfig]
     schedule_hours: int
     description: str = "Xatu public contributor metrics"
     path_prefix: str = "xatu_public_contributors"
@@ -129,14 +138,83 @@ class XatuPublicContributorsConfig(ModuleConfig):
         max_range = max(w.get_range_timedelta() for w in self.time_windows)
         return abs(max_range)  # Convert negative range to positive duration
 
+    def get_frontend_config(self) -> Dict[str, Any]:
+        """Get frontend-friendly config."""
+        config = super().get_frontend_config()
+        config.update({
+            "networks": self.networks,
+            "time_windows": [
+                {
+                    "file": w.file,
+                    "step": w.step,
+                    "label": w.label,
+                    "range": w.range
+                } for w in self.time_windows
+            ]
+        })
+        return config
+
+class BeaconNetworkConfig(BaseModel):
+    """Configuration for a specific network in the Beacon module."""
+    head_lag_slots: Optional[int] = Field(
+        default=2,
+        description="Number of slots to lag behind head for processing (default: 2)"
+    )
+    backlog_days: Optional[int] = Field(
+        default=3,
+        description="Number of days to backfill (default: 3)"
+    )
+
+class BeaconConfig(ModuleConfig):
+    """Beacon module configuration."""
+    networks: Optional[Dict[str, BeaconNetworkConfig]] = Field(
+        default=None,
+        description="Network-specific configuration for the beacon module. If not provided, uses root-level networks."
+    )
+    description: str = "Beacon chain metrics"
+    path_prefix: str = "beacon"
+
+    def get_network_config(self, root_config: "Config") -> Dict[str, BeaconNetworkConfig]:
+        """Get merged network configuration.
+        
+        Uses root-level network list as base, and overlays any module-specific network configs.
+        """
+        # Start with default config for all root networks
+        merged = {
+            network_name: BeaconNetworkConfig()
+            for network_name in root_config.ethereum.networks.keys()
+        }
+
+        # Overlay any module-specific network configs
+        if self.networks:
+            for network_name, network_config in self.networks.items():
+                if network_name in merged:
+                    merged[network_name] = network_config
+                else:
+                    # Allow adding networks that aren't in root config
+                    merged[network_name] = network_config
+
+        return merged
+
+    def get_frontend_config(self) -> Dict[str, Any]:
+        """Get frontend-friendly config."""
+        config = super().get_frontend_config()
+        if self.networks:
+            config.update({
+                "networks": list(self.networks.keys())
+            })
+        return config
+
 class ModulesConfig(BaseModel):
     """Modules configuration."""
     beacon_chain_timings: Optional[BeaconChainTimingsConfig] = None
     xatu_public_contributors: Optional[XatuPublicContributorsConfig] = None
+    beacon: Optional[BeaconConfig] = None
 
 class EthereumNetworkConfig(BaseModel):
     """Configuration for an Ethereum network."""
     config_url: str = Field(description="URL to the network's beacon chain config.yaml")
+    genesis_time: int = Field(description="Unix timestamp of the network's genesis")
 
 class EthereumConfig(BaseModel):
     """Configuration for Ethereum networks."""

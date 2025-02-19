@@ -8,9 +8,11 @@ from lab.core.logger import LabLogger
 from lab.core.clickhouse import ClickHouseClient
 from lab.core.storage import Storage
 from lab.core.state import StateManager
+from lab.core.config import Config
+from lab.ethereum import NetworkManager
 
 class ModuleContext:
-    """Context provided to modules."""
+    """Context passed to modules on initialization."""
 
     def __init__(
         self,
@@ -19,6 +21,8 @@ class ModuleContext:
         storage: Storage,
         clickhouse: ClickHouseClient,
         state: StateManager,
+        networks: Optional[NetworkManager] = None,
+        root_config: Optional[Config] = None,
     ):
         """Initialize module context."""
         self.name = name
@@ -26,6 +30,8 @@ class ModuleContext:
         self.storage = storage
         self.clickhouse = clickhouse
         self.state = state
+        self.networks = networks
+        self.root_config = root_config
         # Create a new logger instance with module name
         self.logger = lab_logger.get_logger(name)
 
