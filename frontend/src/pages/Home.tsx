@@ -40,13 +40,13 @@ function Home(): JSX.Element {
           </div>
           <div className="relative px-4">
             <Link 
-              to="/xatu/community-nodes" 
+              to="/beacon/slot/live" 
               className="relative block w-full bg-surface/80 backdrop-blur-sm border border-accent/20 hover:border-accent p-6 group transition-all duration-300 hover:bg-surface/90 cursor-pointer rounded-lg hover:shadow-lg hover:shadow-accent/5"
             >
               <div className="flex items-center gap-6">
                 <div className="relative w-16 h-16 shrink-0">
                   <img 
-                    src="/xatu.png" 
+                    src="/ethereum.png" 
                     alt="" 
                     className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-300"
                   />
@@ -54,10 +54,10 @@ function Home(): JSX.Element {
                 </div>
                 <div className="flex-1 min-w-0">
                   <h3 className="text-xl font-sans font-bold text-accent group-hover:text-accent transition-colors mb-2">
-                    Xatu Community Nodes
+                    Live Slot Visualizer
                   </h3>
                   <p className="text-sm font-mono text-secondary group-hover:text-primary/80 transition-colors">
-                    Help improve Ethereum by contributing your node's data to our research
+                    Watch Ethereum slots in real-time with detailed metrics and visualizations
                   </p>
                 </div>
                 <ArrowRight className="w-6 h-6 text-accent/50 group-hover:text-accent group-hover:translate-x-2 transition-all duration-300" />

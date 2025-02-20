@@ -187,49 +187,91 @@ function Xatu(): JSX.Element {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <Link 
             to="contributors" 
-            className="group backdrop-blur-md   -default bg-surface/90 hover:-prominent hover:bg-hover p-6 transition-all duration-300"
+            className="group relative backdrop-blur-md bg-surface/80 border border-subtle hover:border-accent rounded-lg overflow-hidden transition-all duration-300"
           >
-            <div className="flex gap-6 items-start">
-              <div className="flex-shrink-0 text-4xl mt-0.5">👥</div>
-              <div className="flex flex-col flex-grow">
-                <h3 className="text-xl font-sans font-bold text-primary group-hover:text-accent transition-colors">Contributors</h3>
-                <p className="text-sm font-mono text-secondary">View information about the individual contributors</p>
+            <div className="absolute inset-0 bg-gradient-to-br from-accent/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+            
+            <div className="relative p-6">
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center flex-shrink-0">
+                  <span className="text-2xl">👥</span>
+                </div>
+
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-lg font-sans font-bold text-primary group-hover:text-accent transition-colors mb-1">
+                    Contributors
+                  </h3>
+                  <p className="text-sm font-mono text-tertiary truncate">
+                    View contributor information
+                  </p>
+                </div>
+
+                <ArrowRight className="w-5 h-5 text-accent/50 group-hover:text-accent group-hover:translate-x-1 transition-all duration-300" />
               </div>
-            </div>
-            <div className="mt-6 flex justify-end">
-              <ArrowRight className="w-6 h-6 text-muted group-hover:text-accent group-hover:translate-x-1 transition-all duration-300" />
+
+              <p className="text-sm font-mono text-secondary group-hover:text-primary/90 transition-colors mt-4">
+                Explore detailed information about individual contributors and their nodes
+              </p>
             </div>
           </Link>
 
           <Link 
             to="networks" 
-            className="group backdrop-blur-md   -default bg-surface/90 hover:-prominent hover:bg-hover p-6 transition-all duration-300"
+            className="group relative backdrop-blur-md bg-surface/80 border border-subtle hover:border-accent rounded-lg overflow-hidden transition-all duration-300"
           >
-            <div className="flex gap-6 items-start">
-              <div className="flex-shrink-0 text-4xl mt-0.5">🌐</div>
-              <div className="flex flex-col flex-grow">
-                <h3 className="text-xl font-sans font-bold text-primary group-hover:text-accent transition-colors">Networks</h3>
-                <p className="text-sm font-mono text-secondary">Explore the networks in the Xatu dataset</p>
+            <div className="absolute inset-0 bg-gradient-to-br from-accent/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+            
+            <div className="relative p-6">
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center flex-shrink-0">
+                  <span className="text-2xl">🌐</span>
+                </div>
+
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-lg font-sans font-bold text-primary group-hover:text-accent transition-colors mb-1">
+                    Networks
+                  </h3>
+                  <p className="text-sm font-mono text-tertiary truncate">
+                    Network statistics
+                  </p>
+                </div>
+
+                <ArrowRight className="w-5 h-5 text-accent/50 group-hover:text-accent group-hover:translate-x-1 transition-all duration-300" />
               </div>
-            </div>
-            <div className="mt-6 flex justify-end">
-              <ArrowRight className="w-6 h-6 text-muted group-hover:text-accent group-hover:translate-x-1 transition-all duration-300" />
+
+              <p className="text-sm font-mono text-secondary group-hover:text-primary/90 transition-colors mt-4">
+                Explore metrics and data across different Ethereum networks
+              </p>
             </div>
           </Link>
 
           <Link 
             to="community-nodes" 
-            className="group backdrop-blur-md   -default bg-surface/90 hover:-prominent hover:bg-hover p-6 transition-all duration-300"
+            className="group relative backdrop-blur-md bg-surface/80 border border-subtle hover:border-accent rounded-lg overflow-hidden transition-all duration-300"
           >
-            <div className="flex gap-6 items-start">
-              <div className="flex-shrink-0 text-4xl mt-0.5">🖥️</div>
-              <div className="flex flex-col flex-grow">
-                <h3 className="text-xl font-sans font-bold text-primary group-hover:text-accent transition-colors">Community Nodes</h3>
-                <p className="text-sm font-mono text-secondary">Explore the community nodes in the dataset</p>
+            <div className="absolute inset-0 bg-gradient-to-br from-accent/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+            
+            <div className="relative p-6">
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center flex-shrink-0">
+                  <span className="text-2xl">🖥️</span>
+                </div>
+
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-lg font-sans font-bold text-primary group-hover:text-accent transition-colors mb-1">
+                    Community Nodes
+                  </h3>
+                  <p className="text-sm font-mono text-tertiary truncate">
+                    Node distribution data
+                  </p>
+                </div>
+
+                <ArrowRight className="w-5 h-5 text-accent/50 group-hover:text-accent group-hover:translate-x-1 transition-all duration-300" />
               </div>
-            </div>
-            <div className="mt-6 flex justify-end">
-              <ArrowRight className="w-6 h-6 text-muted group-hover:text-accent group-hover:translate-x-1 transition-all duration-300" />
+
+              <p className="text-sm font-mono text-secondary group-hover:text-primary/90 transition-colors mt-4">
+                View detailed information about community-contributed nodes
+              </p>
             </div>
           </Link>
         </div>
