@@ -58,7 +58,10 @@ class S3Storage:
             aws_access_key_id=config.access_key_id,
             aws_secret_access_key=config.secret_access_key,
             region_name=config.region,
-            config=Config(s3={'addressing_style': 'path'})
+            config=Config(
+                s3={'addressing_style': 'path'},
+                max_pool_connections=25  # Increase from default 10
+            )
         )
         self.bucket = config.bucket
         logger.info("S3 storage initialized")
@@ -176,8 +179,7 @@ class S3Storage:
         # Upload with content type and compression
         extra_args = {
             'ContentType': content_type,
-            'ContentEncoding': 'gzip',
-            'ContentLength': len(compressed_data)
+            'ContentEncoding': 'gzip'
         }
         
         if cache_control:
