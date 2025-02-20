@@ -7,7 +7,7 @@ class BeaconNetworkConfig(BaseModel):
     """Configuration for a specific network in the Beacon module."""
     head_lag_slots: Optional[int] = Field(
         default=None,
-        description="Number of slots to lag behind head for processing (default: 2)"
+        description="Number of slots to lag behind head for processing (default: 3)"
     )
     backlog_days: Optional[int] = Field(
         default=None,

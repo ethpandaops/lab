@@ -311,7 +311,6 @@ class SlotProcessor(BaseProcessor):
     """Processor for beacon chain slots."""
 
     DEFAULT_BACKLOG_DAYS = 3
-    DEFAULT_HEAD_LAG_SLOTS = 3
     BACKLOG_SLEEP_MS = 500  # Sleep between backlog slot processing
 
     def __init__(self, ctx: ModuleContext, network_name: str, network: EthereumNetwork, network_config: BeaconNetworkConfig):
@@ -472,8 +471,6 @@ class SlotProcessor(BaseProcessor):
                 
                 target_slot = current_slot - self.head_lag_slots
 
-                self.logger.info(f"Current slot: {current_slot}, target slot: {target_slot}, state.current_slot: {state.current_slot}")
-
                 # Process head if needed
                 if state.current_slot is None or state.current_slot < target_slot:
                     await self.process_head_slot(target_slot)
@@ -482,11 +479,7 @@ class SlotProcessor(BaseProcessor):
                     await self._save_processor_state(state)
 
                 # Small sleep to prevent tight loop
-                # Sleep until next slot
-                start_time, end_time = self.network.clock.get_slot_window(current_slot)
-                time_to_next_slot = abs((end_time - datetime.now(timezone.utc)).total_seconds())
-                self.logger.info(f"Sleeping for {time_to_next_slot} seconds until next slot")
-                await asyncio.sleep(max(0, time_to_next_slot))
+                await asyncio.sleep(0.05)
             except Exception as e:
                 self.logger.error(f"Error in head processor: {str(e)}")
                 await asyncio.sleep(1)  # Sleep longer on error
@@ -978,7 +971,7 @@ class SlotProcessor(BaseProcessor):
 
         query = text("""
             SELECT 
-                MAX(committee_size * CAST(committee_index AS UInt32)) as max_attestations
+                MAX(committee_size * (CAST(committee_index AS UInt32) + 1)) as max_attestations
             FROM (
                 SELECT
                     length(validators) as committee_size,
@@ -1008,8 +1001,8 @@ class SlotProcessor(BaseProcessor):
 
     async def get_attestation_votes(self, slot: int, beacon_block_root: str) -> Dict[int, int]:
         """Get attestation votes for a given slot and block root."""
-        # Get start and end dates for the slot +- 2 minutes
-        start_time, end_time = self.get_slot_window(slot)
+        # Get start and end dates for the slot without any grace period
+        start_time, end_time = self.network.clock.get_slot_window(slot)
 
         # Convert to ClickHouse format
         start_str = start_time.strftime('%Y-%m-%d %H:%M:%S')

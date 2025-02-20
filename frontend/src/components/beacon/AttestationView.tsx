@@ -105,7 +105,7 @@ export function AttestationView({
     const counts = arrivalData.map(d => d.count)
     return [{
       name: "Attestation Count",
-      color: "rgb(236, 64, 122)",
+      color: "rgb(34, 197, 94)",
       min: Math.min(...counts),
       max: Math.max(...counts),
       avg: counts.reduce((a, b) => a + b, 0) / counts.length,
@@ -120,7 +120,7 @@ export function AttestationView({
     const percentages = cdfData.map(d => d.percentage)
     return [{
       name: "Cumulative %",
-      color: "rgb(236, 64, 122)",
+      color: "rgb(34, 197, 94)",
       min: Math.min(...percentages),
       max: Math.max(...percentages),
       avg: percentages.reduce((a, b) => a + b, 0) / percentages.length,
@@ -129,36 +129,60 @@ export function AttestationView({
     }]
   }, [cdfData, loading, isMissing])
 
+  // Calculate max Y value for arrivals chart based on bin size
+  const maxArrivalsPerBin = useMemo(() => {
+    if (!attestationWindows?.length) return 0;
+    
+    // Group attestations into 50ms bins
+    const bins = new Map<number, number>();
+    attestationWindows.forEach(window => {
+      const binIndex = Math.floor(window.start_ms / 50);
+      bins.set(binIndex, (bins.get(binIndex) || 0) + window.validator_indices.length);
+    });
+    
+    // Get max bin size and add 20% buffer
+    const maxBin = Math.max(...bins.values());
+    return Math.ceil(maxBin * 1.2);
+  }, [attestationWindows]);
+
   return (
-    <div className="lg:col-span-12 backdrop-blur-md   -default p-6 bg-surface/80">
+    <div className="lg:col-span-12 backdrop-blur-md default p-2 bg-surface/80">
       <div className="flex flex-col space-y-6">
         <h3 className="text-lg font-sans font-bold text-primary">Attestations</h3>
 
         {/* Attestation Progress Bar */}
-        <div className="relative h-8   overflow-hidden">
-          {/* Background gradient */}
-          <div className="absolute inset-0 bg-gradient-to-r from-base via-base/50 to-base" />
-          
-          {/* Progress bar */}
-          <div 
-            className="absolute inset-y-0 left-0 bg-gradient-to-r from-error/30 to-error/20 transition-all duration-100"
-            style={{ width: `${(currentAttestationCount / TOTAL_VALIDATORS) * 100}%` }}
-          />
-          
-          {/* Progress bar highlight */}
-          <div 
-            className="absolute inset-y-0 left-0 w-[2px] bg-error transition-all duration-100"
-            style={{ left: `${(currentAttestationCount / TOTAL_VALIDATORS) * 100}%` }}
-          />
-
-          {/* Content */}
-          <div className="absolute inset-0 flex items-center justify-between px-4 text-xs font-mono">
-            <span className="text-error/70">0%</span>
-            <div className="text-center">
-              <span className="text-error font-medium">{currentAttestationCount.toLocaleString()}</span>
-              <span className="text-error/70 ml-1">votes</span>
+        <div className="flex flex-col space-y-2">
+          {/* Progress stats */}
+          <div className="flex items-center justify-between text-xs font-mono">
+            <div className="flex items-baseline gap-1.5">
+              <span className="text-lg font-medium text-success/90">{currentAttestationCount.toLocaleString()}</span>
+              <span className="text-tertiary">of {TOTAL_VALIDATORS.toLocaleString()} validators</span>
             </div>
-            <span className="text-error/70">100%</span>
+            <div className="text-tertiary">
+              {Math.round((currentAttestationCount / TOTAL_VALIDATORS) * 100)}%
+            </div>
+          </div>
+
+          {/* Bar container */}
+          <div className="relative h-1.5 rounded-full overflow-hidden bg-base">
+            {/* Progress fill */}
+            <div 
+              className={`absolute inset-y-0 left-0 transition-all duration-100 ${
+                currentAttestationCount >= ATTESTATION_THRESHOLD 
+                  ? 'bg-success/80' 
+                  : 'bg-success/40'
+              }`}
+              style={{ width: `${(currentAttestationCount / TOTAL_VALIDATORS) * 100}%` }}
+            >
+              {/* Subtle shine effect */}
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -skew-x-12 animate-[shine_3s_ease-in-out_infinite]" />
+            </div>
+          </div>
+
+          {/* Simple indicators */}
+          <div className="flex justify-between items-center text-[10px] font-mono text-tertiary/50">
+            <span></span>
+            <span>Maximum</span>
           </div>
         </div>
 
@@ -170,7 +194,15 @@ export function AttestationView({
               <p className="text-sm font-mono text-primary">
                 {(attestationWindows[0].start_ms / 1000).toFixed(1)}s
                 <span className="text-tertiary ml-2">
-                  by validator {attestationWindows[0].validator_indices[0]}
+                  by validator{' '}
+                  <a
+                    href={`https://beaconcha.in/validator/${attestationWindows[0].validator_indices[0]}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-accent hover:opacity-80 transition-opacity"
+                  >
+                    {attestationWindows[0].validator_indices[0]}
+                  </a>
                 </span>
               </p>
             </div>
@@ -212,6 +244,9 @@ export function AttestationView({
                       stroke="currentColor"
                       tick={{ fontSize: 12 }}
                       ticks={[0, 2, 4, 6, 8, 10, 12]}
+                      domain={[0, 12]}
+                      type="number"
+                      allowDataOverflow
                       label={{
                         value: "Time (s)",
                         position: "insideBottom",
@@ -222,6 +257,9 @@ export function AttestationView({
                     <YAxis
                       stroke="currentColor"
                       tick={{ fontSize: 12 }}
+                      domain={[0, maxArrivalsPerBin]}
+                      ticks={Array.from({ length: 6 }, (_, i) => Math.floor(maxArrivalsPerBin * i / 5))}
+                      allowDataOverflow
                       label={{
                         value: "Count",
                         angle: -90,
@@ -232,9 +270,10 @@ export function AttestationView({
                     <Line
                       type="monotone"
                       dataKey="count"
-                      stroke="rgb(236, 64, 122)"
+                      stroke="rgb(34, 197, 94)"
                       strokeWidth={2}
                       dot={false}
+                      isAnimationActive={false}
                     />
                   </LineChart>
                 </ResponsiveContainer>
@@ -263,6 +302,9 @@ export function AttestationView({
                       stroke="currentColor"
                       tick={{ fontSize: 12 }}
                       ticks={[0, 2, 4, 6, 8, 10, 12]}
+                      domain={[0, 12]}
+                      type="number"
+                      allowDataOverflow
                       label={{
                         value: "Time (s)",
                         position: "insideBottom",
@@ -273,6 +315,9 @@ export function AttestationView({
                     <YAxis
                       stroke="currentColor"
                       tick={{ fontSize: 12 }}
+                      domain={[0, 100]}
+                      ticks={[0, 20, 40, 60, 80, 100]}
+                      allowDataOverflow
                       label={{
                         value: "Percentage",
                         angle: -90,
@@ -282,21 +327,22 @@ export function AttestationView({
                     />
                     <ReferenceLine
                       y={66}
-                      stroke="rgb(236, 64, 122)"
+                      stroke="rgb(34, 197, 94)"
                       strokeDasharray="3 3"
                       label={{
                         value: "66%",
                         position: "right",
-                        fill: "rgb(236, 64, 122)",
+                        fill: "rgb(34, 197, 94)",
                         fontSize: 12
                       }}
                     />
                     <Line
                       type="monotone"
                       dataKey="percentage"
-                      stroke="rgb(236, 64, 122)"
+                      stroke="rgb(34, 197, 94)"
                       strokeWidth={2}
                       dot={false}
+                      isAnimationActive={false}
                     />
                   </LineChart>
                 </ResponsiveContainer>

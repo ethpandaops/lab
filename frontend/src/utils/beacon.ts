@@ -168,7 +168,7 @@ export class BeaconClockManager {
    * Get head lag slots for a network
    */
   getHeadLagSlots(network: string): number {
-    return this.config?.modules?.beacon?.networks?.[network]?.head_lag_slots ?? 2
+    return this.config?.modules?.beacon?.networks?.[network]?.head_lag_slots ?? 4
   }
 
   /**

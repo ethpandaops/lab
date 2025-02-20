@@ -16,6 +16,7 @@ interface SlotData {
     execution_payload_base_fee_per_gas?: number
     execution_payload_gas_used?: number
     execution_payload_gas_limit?: number
+    execution_payload_block_number?: number
   }
   proposer: {
     proposer_validator_index: number
@@ -281,6 +282,7 @@ export function SlotView({ slot, network = 'mainnet', isLive = false, onSlotComp
         onPlayPauseClick={() => setIsPlaying(!isPlaying)}
         proposerIndex={slotData?.proposer.proposer_validator_index}
         entity={slotData?.entity}
+        executionBlockNumber={slotData?.block.execution_payload_block_number}
       />
 
       {/* Main Content Grid */}

@@ -11,6 +11,10 @@ interface DetailsViewProps {
       execution_payload_gas_used?: number
       execution_payload_gas_limit?: number
     }
+    proposer: {
+      proposer_validator_index: number
+    }
+    entity?: string
     timings: {
       block_seen?: Record<string, number>
       block_first_seen_p2p?: Record<string, number>
@@ -73,13 +77,13 @@ export function DetailsView({ loading, isMissing, slotData }: DetailsViewProps):
   }, [slotData]);
 
   return (
-    <div className="lg:col-span-3 backdrop-blur-md   -default p-6 bg-surface/80">
+    <div className="lg:col-span-4 backdrop-blur-md bg-surface/80">
       <h3 className="text-lg font-sans font-bold text-primary mb-4">Details</h3>
-      <div className="grid grid-cols-2 gap-x-4 gap-y-3">
+      <div className="grid grid-cols-2 gap-x-6 gap-y-4">
         {loading ? (
           <>
-            {Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className={i === 4 || i === 5 ? 'col-span-2' : ''}>
+            {Array.from({ length: 7 }).map((_, i) => (
+              <div key={i} className={i >= 4 ? 'col-span-2' : ''}>
                 <div className="h-3 w-16 bg-active rounded mb-2 animate-pulse" />
                 <div className="h-4 w-24 bg-active rounded animate-pulse" />
               </div>
@@ -87,6 +91,10 @@ export function DetailsView({ loading, isMissing, slotData }: DetailsViewProps):
           </>
         ) : isMissing ? (
           <>
+            <div>
+              <h4 className="text-xs font-mono text-tertiary">Proposer</h4>
+              <p className="text-sm font-mono font-medium text-muted">-</p>
+            </div>
             <div>
               <h4 className="text-xs font-mono text-tertiary">Txns</h4>
               <p className="text-sm font-mono font-medium text-muted">-</p>
@@ -108,14 +116,27 @@ export function DetailsView({ loading, isMissing, slotData }: DetailsViewProps):
               <p className="text-sm font-mono font-medium text-muted">-</p>
             </div>
             <div className="col-span-2">
-              <h4 className="text-xs font-mono text-tertiary">First Seen</h4>
+              <h4 className="text-xs font-mono text-tertiary">Block First Seen</h4>
               <p className="text-sm font-mono font-medium text-muted">-</p>
             </div>
           </>
         ) : (
           <>
+            <div className="col-span-2 mb-2">
+              <h4 className="text-xs font-mono text-tertiary">Proposer</h4>
+              <p className="text-sm font-mono font-medium text-primary">
+                <a
+                  href={`https://beaconcha.in/validator/${slotData?.proposer.proposer_validator_index}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-accent transition-colors"
+                >
+                  {slotData?.proposer.proposer_validator_index}
+                </a>
+              </p>
+            </div>
             <div>
-              <h4 className="text-xs font-mono text-tertiary">Txns</h4>
+              <h4 className="text-xs font-mono text-tertiary">Transactions</h4>
               <p className="text-sm font-mono font-medium text-primary">
                 {slotData?.block.execution_payload_transactions_count?.toLocaleString() || 0}
               </p>
@@ -159,8 +180,19 @@ export function DetailsView({ loading, isMissing, slotData }: DetailsViewProps):
               </p>
             </div>
             <div className="col-span-2">
-              <h4 className="text-xs font-mono text-tertiary">First Seen</h4>
+              <h4 className="text-xs font-mono text-tertiary">Block First Seen</h4>
               <div className="space-y-1">
+                <p className="text-sm font-mono font-medium text-primary">
+                  {firstSeenLocations.p2p ? (
+                    <>
+                      <span className="text-purple-500">P2P: </span>
+                      {firstSeenLocations.p2p.country}
+                      <span className="text-tertiary ml-2">
+                        ({firstSeenLocations.p2p.continent}) at {(firstSeenLocations.p2p.time / 1000).toFixed(2)}s
+                      </span>
+                    </>
+                  ) : 'Unknown'}
+                </p>
                 <p className="text-sm font-mono font-medium text-primary">
                   {firstSeenLocations.api ? (
                     <>
@@ -168,17 +200,6 @@ export function DetailsView({ loading, isMissing, slotData }: DetailsViewProps):
                       {firstSeenLocations.api.country}
                       <span className="text-tertiary ml-2">
                         ({firstSeenLocations.api.continent}) at {(firstSeenLocations.api.time / 1000).toFixed(2)}s
-                      </span>
-                    </>
-                  ) : 'Unknown'}
-                </p>
-                <p className="text-sm font-mono font-medium text-primary">
-                  {firstSeenLocations.p2p ? (
-                    <>
-                      <span className="text-success">P2P: </span>
-                      {firstSeenLocations.p2p.country}
-                      <span className="text-tertiary ml-2">
-                        ({firstSeenLocations.p2p.continent}) at {(firstSeenLocations.p2p.time / 1000).toFixed(2)}s
                       </span>
                     </>
                   ) : 'Unknown'}

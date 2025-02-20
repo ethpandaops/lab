@@ -153,16 +153,16 @@ export function GlobalMap({ nodes, currentTime, blockEvents, loading, isMissing 
   }, [nodes, blockEvents, currentTime])
 
   if (loading || isMissing) {
-    return <div className="lg:col-span-9 h-96   animate-pulse backdrop-blur-md  -default" />
+    return <div className="lg:col-span-8 h-[500px] animate-pulse backdrop-blur-md" />
   }
 
   return (
-    <div className="lg:col-span-9 h-96   overflow-hidden backdrop-blur-md  -default">
+    <div className="lg:col-span-8 h-[500px] overflow-hidden backdrop-blur-md">
       <ComposableMap
         projection="geoMercator"
         projectionConfig={{
-          scale: 160,
-          center: [15, 35]
+          scale: 180, // Reduced zoom to show more of the map
+          center: [30, 20] // Adjusted center to better show all continents
         }}
         style={{
           background: 'transparent',
@@ -178,7 +178,7 @@ export function GlobalMap({ nodes, currentTime, blockEvents, loading, isMissing 
                 geography={geo}
                 fill="#1F2937"
                 stroke="#374151"
-                strokeWidth={0.5}
+                strokeWidth={0.3}
                 style={{
                   default: { outline: 'none' },
                   hover: { outline: 'none' },
@@ -195,6 +195,11 @@ export function GlobalMap({ nodes, currentTime, blockEvents, loading, isMissing 
           const latestApiEvent = nodeEvents.find(e => e.source === 'api')
           const latestP2pEvent = nodeEvents.find(e => e.source === 'p2p')
 
+          // Skip rendering if node hasn't seen the block
+          if (!latestApiEvent && !latestP2pEvent) {
+            return null
+          }
+
           // Check if this is the first node to see the block (for either API or P2P)
           const firstApiTime = Math.min(...blockEvents.filter(e => e.source === 'api' && e.time <= currentTime).map(e => e.time))
           const firstP2pTime = Math.min(...blockEvents.filter(e => e.source === 'p2p' && e.time <= currentTime).map(e => e.time))
@@ -202,15 +207,15 @@ export function GlobalMap({ nodes, currentTime, blockEvents, loading, isMissing 
           const isFirstP2pNode = latestP2pEvent && latestP2pEvent.time === firstP2pTime
 
           // Determine marker color based on seen status
-          let markerColor = '#6B7280' // Default gray
+          let markerColor = ''
           if (isFirstApiNode) {
-            markerColor = 'rgb(59, 130, 246)' // Blue for first API node
+            markerColor = 'rgb(96, 165, 250)' // Brighter blue
           } else if (isFirstP2pNode) {
-            markerColor = 'rgb(234, 179, 8)' // Yellow for first P2P node
+            markerColor = 'rgb(168, 85, 247)' // Purple-500
           } else if (latestApiEvent) {
-            markerColor = 'rgb(59, 130, 246)' // Blue for API seen
+            markerColor = 'rgb(96, 165, 250)' // Brighter blue
           } else if (latestP2pEvent) {
-            markerColor = 'rgb(234, 179, 8)' // Yellow for P2P seen
+            markerColor = 'rgb(168, 85, 247)' // Purple-500
           }
           
           return (
@@ -218,25 +223,53 @@ export function GlobalMap({ nodes, currentTime, blockEvents, loading, isMissing 
               {/* Base marker */}
               <Marker coordinates={coordinates as [number, number]}>
                 <circle
-                  r={4}
+                  r={6}
                   fill={markerColor}
-                  stroke="#374151"
+                  stroke="#000"
                   strokeWidth={1}
+                  className="drop-shadow-sm"
                 />
               </Marker>
 
-              {/* Animated ping effect when block is seen */}
+              {/* Single quick ping animation when block is seen */}
               {(latestApiEvent || latestP2pEvent) && (
                 <Marker coordinates={coordinates as [number, number]}>
                   <motion.circle
-                    r={4}
+                    r={6}
                     fill={markerColor}
-                    initial={{ scale: 1, opacity: 0.8 }}
-                    animate={{ scale: 3, opacity: 0 }}
+                    initial={{ scale: 1, opacity: 0.8, filter: 'drop-shadow(0 0 8px ' + markerColor + ')' }}
+                    animate={{ 
+                      scale: 6, 
+                      opacity: 0,
+                      filter: 'drop-shadow(0 0 0px ' + markerColor + ')'
+                    }}
                     transition={{
-                      duration: 2,
+                      duration: 0.8,
                       ease: "easeOut",
-                      repeat: 0
+                    }}
+                  />
+                </Marker>
+              )}
+
+              {/* Quick flash animation when node first becomes active */}
+              {(isFirstApiNode || isFirstP2pNode) && (
+                <Marker coordinates={coordinates as [number, number]}>
+                  <motion.circle
+                    r={6}
+                    fill="white"
+                    initial={{ 
+                      scale: 1, 
+                      opacity: 1,
+                      filter: 'drop-shadow(0 0 12px white)'
+                    }}
+                    animate={{ 
+                      scale: 10, 
+                      opacity: 0,
+                      filter: 'drop-shadow(0 0 0px white)'
+                    }}
+                    transition={{
+                      duration: 0.6,
+                      ease: "easeOut",
                     }}
                   />
                 </Marker>

@@ -18,12 +18,6 @@ function BeaconSlot(): JSX.Element {
 
   return (
     <div className="space-y-6">
-      <AboutThisData>
-        <p>
-          View detailed information about slot {slot}, including block propagation, attestations, and network performance metrics.
-        </p>
-      </AboutThisData>
-
       {/* Slot View */}
       <SlotView
         slot={slot ? parseInt(slot, 10) : undefined}

@@ -26,7 +26,7 @@ function BeaconLive(): JSX.Element {
 
     // Calculate current slot with head lag plus one extra slot for processing
     const currentClockSlot = clock.getCurrentSlot()
-    const slot = currentClockSlot - (headLagSlots + 1) // Add extra slot of lag
+    const slot = currentClockSlot - (headLagSlots + 2) // Add extra slot of lag
     setCurrentSlot(slot)
 
     // Calculate when this slot ends
