@@ -238,7 +238,7 @@ export const CommunityNodes = () => {
     <div className="space-y-8" ref={containerRef}>
       <XatuCallToAction />
 
-      <div className="backdrop-blur-md rounded-lg p-6 border shadow-xl mb-8">
+      <div className="backdrop-blur-md  p-6  shadow-xl mb-8">
         <h2 className="text-xl font-semibold text-accent mb-2">About This Data</h2>
         <p className="text-primary">
           This data represents nodes from the Ethereum community that have opted in to share their node information with us. 
@@ -255,7 +255,7 @@ export const CommunityNodes = () => {
         <div className="relative">
           <button
             onClick={() => setIsTimeWindowOpen(!isTimeWindowOpen)}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
+            className="flex items-center gap-2 px-4 py-2  focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:-transparent"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -272,7 +272,7 @@ export const CommunityNodes = () => {
           </button>
 
           {isTimeWindowOpen && (
-            <div className="absolute z-10 right-0 mt-2 w-48 rounded-lg border">
+            <div className="absolute z-10 right-0 mt-2 w-48  ">
               {timeWindows.map((window) => (
                 <button
                   key={window.file}
@@ -301,7 +301,7 @@ export const CommunityNodes = () => {
           >
             Total Nodes
           </h2>
-          <div className="backdrop-blur-md rounded-lg p-4 h-[400px] border shadow-xl">
+          <div className="backdrop-blur-md  p-4 h-[400px]  shadow-xl">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={totalNodesData}>
                 <XAxis 
@@ -313,8 +313,8 @@ export const CommunityNodes = () => {
                 <Tooltip 
                   contentStyle={{
                     backgroundColor: 'rgba(17, 24, 39, 0.95)',
-                    border: '1px solid rgba(75, 85, 99, 0.3)',
-                    borderRadius: '0.5rem',
+                    : '1px solid rgba(75, 85, 99, 0.3)',
+                    Radius: '0.5rem',
                     color: '#e2e8f0'
                   }}
                   labelFormatter={(time) => new Date(time * 1000).toLocaleString()}
@@ -334,7 +334,7 @@ export const CommunityNodes = () => {
         </div>
 
         {/* Nodes by Country Chart */}
-        <div className="backdrop-blur-md rounded-lg p-4 h-[500px] border shadow-xl">
+        <div className="backdrop-blur-md  p-4 h-[500px]  shadow-xl">
           <div className="h-[400px]">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={chartData}>
@@ -347,8 +347,8 @@ export const CommunityNodes = () => {
                 <Tooltip 
                   contentStyle={{
                     backgroundColor: 'rgba(17, 24, 39, 0.95)',
-                    border: '1px solid rgba(75, 85, 99, 0.3)',
-                    borderRadius: '0.5rem',
+                    : '1px solid rgba(75, 85, 99, 0.3)',
+                    Radius: '0.5rem',
                     color: '#e2e8f0'
                   }}
                   labelFormatter={(time) => new Date(time * 1000).toLocaleString()}
@@ -411,8 +411,8 @@ export const CommunityNodes = () => {
                   backgroundColor: hiddenCountries.has(country) 
                     ? undefined 
                     : `${stringToColor(country)}33`,
-                  borderColor: stringToColor(country),
-                  borderWidth: 1
+                  Color: stringToColor(country),
+                  Width: 1
                 }}
               >
                 <span
@@ -426,7 +426,7 @@ export const CommunityNodes = () => {
         </div>
 
         {/* Nodes by User Chart */}
-        <div className="backdrop-blur-md rounded-lg p-4 border shadow-xl flex flex-col">
+        <div className="backdrop-blur-md  p-4  shadow-xl flex flex-col">
           <h2 className="text-2xl font-bold text-accent mb-4">Nodes per User</h2>
           <div className="h-[400px] mb-4">
             <ResponsiveContainer width="100%" height="100%">
@@ -440,8 +440,8 @@ export const CommunityNodes = () => {
                 <Tooltip 
                   contentStyle={{
                     backgroundColor: 'rgba(17, 24, 39, 0.95)',
-                    border: '1px solid rgba(75, 85, 99, 0.3)',
-                    borderRadius: '0.5rem',
+                    : '1px solid rgba(75, 85, 99, 0.3)',
+                    Radius: '0.5rem',
                     color: '#e2e8f0'
                   }}
                   labelFormatter={(time) => new Date(time * 1000).toLocaleString()}
@@ -505,8 +505,8 @@ export const CommunityNodes = () => {
                     backgroundColor: hiddenUsers.has(user) 
                       ? undefined 
                       : `${stringToColor(user)}33`,
-                    borderColor: stringToColor(user),
-                    borderWidth: 1
+                    Color: stringToColor(user),
+                    Width: 1
                   }}
                 >
                   <span

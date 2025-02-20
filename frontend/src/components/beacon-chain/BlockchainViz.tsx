@@ -52,16 +52,16 @@ export function BlockchainViz(): JSX.Element {
               className="relative flex-shrink-0"
             >
               {/* Block */}
-              <div className="w-24 h-24 backdrop-blur-md rounded-lg border border-cyber-neon/20 bg-cyber-dark/80 flex flex-col items-center justify-center">
-                <div className="text-2xl font-mono font-bold text-cyber-neon">
+              <div className="w-24 h-24 backdrop-blur-md   -default bg-surface/80 flex flex-col items-center justify-center">
+                <div className="text-2xl font-mono font-bold text-primary">
                   #{block.id}
                 </div>
               </div>
 
               {/* Connection line to next block */}
               <div className="absolute right-0 top-1/2 -translate-y-1/2" style={{ transform: 'translateX(100%)' }}>
-                <div className="w-8 h-1 bg-gradient-to-r from-cyber-neon to-cyber-neon/20" />
-                <div className="absolute top-1/2 right-0 w-0 h-0 -translate-y-1/2 border-t-[6px] border-t-transparent border-b-[6px] border-b-transparent border-l-[8px] border-l-cyber-neon/20" />
+                <div className="w-8 h-1 bg-gradient-to-r from-primary to-primary/20" />
+                <div className="absolute top-1/2 right-0 w-0 h-0 -translate-y-1/2 -t-[6px] -t-transparent -b-[6px] -b-transparent -l-[8px] -l-primary/20" />
               </div>
             </motion.div>
           ))}
@@ -73,8 +73,8 @@ export function BlockchainViz(): JSX.Element {
             animate={{ opacity: 1 }}
             className="relative flex-shrink-0"
           >
-            <div className="w-24 h-24 rounded-lg border border-dashed border-cyber-neon/10 flex items-center justify-center">
-              <div className="text-2xl font-mono font-bold text-cyber-neon/20">
+            <div className="w-24 h-24   -dashed -subtle flex items-center justify-center">
+              <div className="text-2xl font-mono font-bold text-primary/20">
                 #{nextBlockId}
               </div>
             </div>

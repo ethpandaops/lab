@@ -82,31 +82,17 @@ export default function Networks(): JSX.Element {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       <XatuCallToAction />
 
-      {/* Page Header */}
-      <div className="relative">
-        <div className="absolute inset-0 flex items-center">
-          <div className="w-full h-px bg-gradient-to-r from-transparent via-cyber-neon/20 to-transparent" />
-        </div>
-        <div className="relative flex justify-center">
-          <div className="px-4 bg-cyber-darker">
-            <h1 className="text-3xl md:text-4xl font-sans font-black bg-gradient-to-r from-cyber-neon via-cyber-blue to-cyber-pink bg-clip-text text-transparent animate-text-shine">
-              Networks
-            </h1>
-          </div>
-        </div>
-      </div>
-
       <AboutThisData>
-        <p className="text-sm font-mono text-cyber-neon/70">
+        <p className="text-sm font-mono text-tertiary">
           This data represents only the nodes that are actively sending data to the Xatu project. 
           It is not representative of the total number of nodes in each network or the overall client diversity.
           Last updated{' '}
           <span 
             title={new Date(summaryData.updated_at * 1000).toString()}
-            className="text-cyber-neon cursor-help border-b border-cyber-neon/30"
+            className="text-primary cursor-help -b -prominent"
           >
             {formatDistanceToNow(new Date(summaryData.updated_at * 1000), { addSuffix: true })}
           </span>
@@ -131,21 +117,21 @@ export default function Networks(): JSX.Element {
             .sort((a, b) => b.value - a.value);
 
           return (
-            <div key={name} className="backdrop-blur-sm rounded-lg p-6 border border-cyber-neon/10 hover:border-cyber-neon/20 hover:bg-cyber-neon/5 transition-all duration-300">
+            <div key={name} className="backdrop-blur-sm  p-6  -subtle hover:-default hover:bg-hover transition-all duration-300">
               <div className="flex justify-between items-start mb-6">
                 <div className="flex items-start gap-3">
                   <span className="w-8 h-8 flex items-center justify-center text-2xl">
                     {metadata.icon}
                   </span>
                   <div>
-                    <h3 className="text-xl font-sans font-bold text-cyber-neon mb-1">{metadata.name}</h3>
-                    <div className="text-sm font-mono text-cyber-neon/70">
+                    <h3 className="text-xl font-sans font-bold text-primary mb-1">{metadata.name}</h3>
+                    <div className="text-sm font-mono text-tertiary">
                       {data.total_nodes.toLocaleString()} total nodes
                     </div>
                   </div>
                 </div>
                 <div className="text-right">
-                  <div className="text-sm font-mono text-cyber-neon/70">
+                  <div className="text-sm font-mono text-tertiary">
                     <div>{data.total_public_nodes.toLocaleString()} community</div>
                     <div>{(data.total_nodes - data.total_public_nodes).toLocaleString()} ethPandaOps</div>
                   </div>
@@ -154,22 +140,22 @@ export default function Networks(): JSX.Element {
 
               <div className="space-y-2 mb-6">
                 <div className="flex justify-between text-sm font-mono">
-                  <span className="text-cyber-neon/70">Countries</span>
-                  <span className="text-cyber-neon">{Object.keys(data.countries).length}</span>
+                  <span className="text-tertiary">Countries</span>
+                  <span className="text-primary">{Object.keys(data.countries).length}</span>
                 </div>
                 <div className="flex justify-between text-sm font-mono">
-                  <span className="text-cyber-neon/70">Cities</span>
-                  <span className="text-cyber-neon">{Object.keys(data.cities).length}</span>
+                  <span className="text-tertiary">Cities</span>
+                  <span className="text-primary">{Object.keys(data.cities).length}</span>
                 </div>
                 <div className="flex justify-between text-sm font-mono">
-                  <span className="text-cyber-neon/70">Continents</span>
-                  <span className="text-cyber-neon">{Object.keys(data.continents).length}</span>
+                  <span className="text-tertiary">Continents</span>
+                  <span className="text-primary">{Object.keys(data.continents).length}</span>
                 </div>
               </div>
 
               {/* Client Distribution */}
-              <div className="pt-6 border-t border-cyber-neon/10">
-                <h4 className="text-sm font-sans font-bold text-cyber-neon/90 mb-4">Client Distribution</h4>
+              <div className="pt-6 -t -subtle">
+                <h4 className="text-sm font-sans font-bold text-primary/90 mb-4">Client Distribution</h4>
                 <div className="space-y-3">
                   {clientDistribution.map((client) => (
                     <div key={client.name} className="flex items-center gap-3">
@@ -183,12 +169,12 @@ export default function Networks(): JSX.Element {
                         }}
                       />
                       <div className="flex-1 flex items-center justify-between">
-                        <span className="text-sm font-mono text-cyber-neon/90">{client.name}</span>
+                        <span className="text-sm font-mono text-primary/90">{client.name}</span>
                         <div className="text-right">
-                          <span className="text-sm font-mono font-medium text-cyber-neon">
+                          <span className="text-sm font-mono font-medium text-primary">
                             {((client.value / data.total_nodes) * 100).toFixed(1)}%
                           </span>
-                          <div className="text-xs font-mono text-cyber-neon/70">
+                          <div className="text-xs font-mono text-tertiary">
                             {client.value.toLocaleString()} nodes ({client.publicValue.toLocaleString()} public)
                           </div>
                         </div>

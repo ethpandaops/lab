@@ -87,7 +87,7 @@ export function Breadcrumbs(): JSX.Element {
     <nav className="flex items-center gap-2 text-sm font-mono">
       <Link
         to="/"
-        className="text-cyber-neon/70 hover:text-cyber-neon transition-colors"
+        className="text-tertiary hover:text-primary transition-colors"
       >
         Home
       </Link>
@@ -98,15 +98,15 @@ export function Breadcrumbs(): JSX.Element {
 
         return (
           <div key={routeTo} className="flex items-center gap-2">
-            <ChevronRight className="w-4 h-4 text-cyber-neon/50" />
+            <ChevronRight className="w-4 h-4 text-muted" />
             {isLast ? (
-              <span className="text-cyber-neon">
+              <span className="text-primary">
                 {name.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
               </span>
             ) : (
               <Link
                 to={routeTo}
-                className="text-cyber-neon/70 hover:text-cyber-neon transition-colors"
+                className="text-tertiary hover:text-primary transition-colors"
               >
                 {name.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
               </Link>

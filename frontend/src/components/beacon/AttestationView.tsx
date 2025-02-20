@@ -130,35 +130,35 @@ export function AttestationView({
   }, [cdfData, loading, isMissing])
 
   return (
-    <div className="lg:col-span-12 backdrop-blur-md rounded-lg border border-cyber-neon/20 p-6 bg-cyber-dark/80">
+    <div className="lg:col-span-12 backdrop-blur-md   -default p-6 bg-surface/80">
       <div className="flex flex-col space-y-6">
-        <h3 className="text-lg font-sans font-bold text-cyber-neon">Attestations</h3>
+        <h3 className="text-lg font-sans font-bold text-primary">Attestations</h3>
 
         {/* Attestation Progress Bar */}
-        <div className="relative h-8 bg-cyber-darker rounded-lg overflow-hidden">
+        <div className="relative h-8   overflow-hidden">
           {/* Background gradient */}
-          <div className="absolute inset-0 bg-gradient-to-r from-cyber-darker via-cyber-darker/50 to-cyber-darker" />
+          <div className="absolute inset-0 bg-gradient-to-r from-base via-base/50 to-base" />
           
           {/* Progress bar */}
           <div 
-            className="absolute inset-y-0 left-0 bg-gradient-to-r from-cyber-pink/30 to-cyber-pink/20 transition-all duration-100"
+            className="absolute inset-y-0 left-0 bg-gradient-to-r from-error/30 to-error/20 transition-all duration-100"
             style={{ width: `${(currentAttestationCount / TOTAL_VALIDATORS) * 100}%` }}
           />
           
           {/* Progress bar highlight */}
           <div 
-            className="absolute inset-y-0 left-0 w-[2px] bg-cyber-pink transition-all duration-100"
+            className="absolute inset-y-0 left-0 w-[2px] bg-error transition-all duration-100"
             style={{ left: `${(currentAttestationCount / TOTAL_VALIDATORS) * 100}%` }}
           />
 
           {/* Content */}
           <div className="absolute inset-0 flex items-center justify-between px-4 text-xs font-mono">
-            <span className="text-cyber-pink/70">0%</span>
+            <span className="text-error/70">0%</span>
             <div className="text-center">
-              <span className="text-cyber-pink font-medium">{currentAttestationCount.toLocaleString()}</span>
-              <span className="text-cyber-pink/70 ml-1">votes</span>
+              <span className="text-error font-medium">{currentAttestationCount.toLocaleString()}</span>
+              <span className="text-error/70 ml-1">votes</span>
             </div>
-            <span className="text-cyber-pink/70">100%</span>
+            <span className="text-error/70">100%</span>
           </div>
         </div>
 
@@ -166,25 +166,25 @@ export function AttestationView({
         {!loading && !isMissing && attestationWindows && attestationWindows.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <h4 className="text-xs font-mono text-cyber-neon/70 mb-1">First Attestation</h4>
-              <p className="text-sm font-mono text-cyber-neon">
+              <h4 className="text-xs font-mono text-tertiary mb-1">First Attestation</h4>
+              <p className="text-sm font-mono text-primary">
                 {(attestationWindows[0].start_ms / 1000).toFixed(1)}s
-                <span className="text-cyber-neon/70 ml-2">
+                <span className="text-tertiary ml-2">
                   by validator {attestationWindows[0].validator_indices[0]}
                 </span>
               </p>
             </div>
             <div>
-              <h4 className="text-xs font-mono text-cyber-neon/70 mb-1">66% Threshold Reached</h4>
-              <p className="text-sm font-mono text-cyber-neon">
+              <h4 className="text-xs font-mono text-tertiary mb-1">66% Threshold Reached</h4>
+              <p className="text-sm font-mono text-primary">
                 {((attestationProgress.find(p => p.totalValidators >= ATTESTATION_THRESHOLD) || { time: 0 }).time / 1000).toFixed(2)}s
               </p>
             </div>
             <div>
-              <h4 className="text-xs font-mono text-cyber-neon/70 mb-1">Total Attestations</h4>
-              <p className="text-sm font-mono text-cyber-neon">
+              <h4 className="text-xs font-mono text-tertiary mb-1">Total Attestations</h4>
+              <p className="text-sm font-mono text-primary">
                 {attestationProgress.slice(-1)[0]?.totalValidators.toLocaleString() || 0}
-                <span className="text-cyber-neon/70 ml-2">
+                <span className="text-tertiary ml-2">
                   ({Math.round((attestationProgress.slice(-1)[0]?.totalValidators || 0) / TOTAL_VALIDATORS * 100)}% of target)
                 </span>
               </p>

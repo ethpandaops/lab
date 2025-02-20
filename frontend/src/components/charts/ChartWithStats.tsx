@@ -1,4 +1,5 @@
 import { ReactNode } from 'react'
+import clsx from 'clsx'
 
 interface SeriesStats {
   name: string
@@ -41,9 +42,9 @@ export const ChartWithStats = ({
   return (
     <div className={`space-y-6 ${className}`}>
       <div className="space-y-2">
-        <h2 className={`font-sans font-bold text-cyber-neon ${headerSize === 'large' ? 'text-2xl' : 'text-lg'}`}>{title}</h2>
+        <h2 className={`font-sans font-bold text-primary ${headerSize === 'large' ? 'text-2xl' : 'text-lg'}`}>{title}</h2>
         {description && (
-          <p className="text-sm font-mono text-cyber-neon/70">{description}</p>
+          <p className="text-sm font-mono text-tertiary">{description}</p>
         )}
       </div>
       
@@ -62,18 +63,21 @@ export const ChartWithStats = ({
           {showSeriesTable && (
             <div className="w-full lg:w-1/4">
               <div className="flex flex-col" style={{ height: `${height - 50}px` }}>
-                <div className="text-xs font-mono text-cyber-neon/70 mb-2 flex justify-between px-2 sticky top-0 bg-cyber-darker z-10">
-                  <div>Series Name</div>
-                  <div>Last</div>
+                <div className="text-xs font-mono text-tertiary mb-2 flex justify-between px-2 sticky top-0  z-10">
+                  <span>Series</span>
+                  <span>Last Value</span>
                 </div>
                 <div className="space-y-1 overflow-y-scroll cyber-scrollbar">
                   {series.map((item) => (
                     <button
                       key={item.name}
                       onClick={item.onClick}
-                      className={`group w-full px-2 py-1.5 rounded hover:bg-cyber-neon/5 transition-colors ${
-                        item.isHidden ? 'opacity-50' : ''
-                      } ${item.isHighlighted ? 'ring-1 ring-cyber-neon' : ''}`}
+                      className={clsx(
+                        'group w-full px-2 py-1.5 rounded transition-colors',
+                        item.isHidden ? 'opacity-50' : '',
+                        item.isHighlighted ? ' -prominent' : '',
+                        'hover:bg-hover'
+                      )}
                       title={`Min: ${typeof item.min === 'number' ? item.min.toFixed(2) : item.min}${item.unit || ''}
 Avg: ${typeof item.avg === 'number' ? item.avg.toFixed(2) : item.avg}${item.unit || ''}
 Max: ${typeof item.max === 'number' ? item.max.toFixed(2) : item.max}${item.unit || ''}`}
@@ -81,9 +85,9 @@ Max: ${typeof item.max === 'number' ? item.max.toFixed(2) : item.max}${item.unit
                       <div className="flex items-center justify-between gap-2">
                         <div className="flex items-center gap-2 min-w-0">
                           <div className="w-2 h-2 flex-shrink-0" style={{ backgroundColor: item.color }} />
-                          <span className="text-xs font-mono truncate">{item.name}</span>
+                          <span className="text-xs font-mono text-primary truncate">{item.name}</span>
                         </div>
-                        <div className="text-xs font-mono font-medium whitespace-nowrap">
+                        <div className="text-xs font-mono font-medium text-secondary whitespace-nowrap">
                           {typeof item.last === 'number' ? `${item.last.toFixed(2)}${item.unit || ''}` : item.last}
                         </div>
                       </div>
@@ -97,7 +101,7 @@ Max: ${typeof item.max === 'number' ? item.max.toFixed(2) : item.max}${item.unit
 
         {/* Notes Section */}
         {notes && (
-          <div className="text-sm font-mono text-cyber-neon/85 border-t border-cyber-neon/10 pt-4">
+          <div className="text-sm font-mono text-tertiary -t -subtle pt-4">
             {notes}
           </div>
         )}

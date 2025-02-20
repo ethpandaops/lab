@@ -4,7 +4,6 @@ const formsPlugin = require('@tailwindcss/forms')
 /** @type {import('tailwindcss/types').Config} */
 const config = {
 	content: ['index.html', 'src/**/*.tsx'],
-	darkMode: 'class',
 	theme: {
 		fontFamily: {
 			sans: ['Orbitron', 'Inter', ...defaultConfig.theme.fontFamily.sans],
@@ -13,14 +12,49 @@ const config = {
 		extend: {
 			colors: {
 				'cyber': {
+					'black': '#000614',
+					'deep': '#000B27',
+					'darker': '#001238',
+					'dark': '#001952',
 					'neon': '#00ff9f',
-					'pink': '#ff2b92',
-					'blue': '#00ffff',
-					'purple': '#2563eb',
-					'yellow': '#ffff00',
-					'dark': '#0a0a0f',
-					'darker': '#050507',
-					'light': '#1a1a2f'
+					'cyan': '#00f2ff',
+					'blue': '#0066ff',
+					'pink': '#ff0066',
+					'yellow': '#ffd600'
+				},
+				// Base semantic colors that change with theme
+				text: {
+					DEFAULT: 'rgb(var(--text-primary) / <alpha-value>)',
+					primary: 'rgb(var(--text-primary) / <alpha-value>)',
+					secondary: 'rgb(var(--text-secondary) / <alpha-value>)',
+					tertiary: 'rgb(var(--text-tertiary) / <alpha-value>)',
+					muted: 'rgb(var(--text-muted) / <alpha-value>)',
+				},
+				bg: {
+					DEFAULT: 'rgb(var(--bg-base) / <alpha-value>)',
+					surface: 'rgb(var(--bg-surface) / <alpha-value>)',
+					'surface-raised': 'rgb(var(--bg-surface-raised) / <alpha-value>)',
+					hover: 'rgb(var(--bg-hover) / <alpha-value>)',
+					active: 'rgb(var(--bg-active) / <alpha-value>)',
+					card: 'rgb(var(--bg-card) / <alpha-value>)',
+				},
+				border: {
+					DEFAULT: 'rgb(var(--border-subtle) / 0.5)',
+					prominent: 'rgb(var(--border-default) / 0.5)',
+					accent: 'rgb(var(--border-prominent) / 0.5)',
+				},
+				accent: {
+					DEFAULT: 'rgb(var(--accent) / <alpha-value>)',
+					muted: 'rgb(var(--accent-muted) / <alpha-value>)',
+				},
+				success: {
+					DEFAULT: 'rgb(var(--success) / <alpha-value>)',
+				},
+				warning: {
+					DEFAULT: 'rgb(var(--warning) / <alpha-value>)',
+				},
+				error: {
+					DEFAULT: 'rgb(var(--error) / <alpha-value>)',
 				}
 			},
 			animation: {
@@ -114,88 +148,48 @@ const config = {
 	experimental: { optimizeUniversalDefaults: true },
 	plugins: [
 		formsPlugin,
-		function({ addBase, theme }) {
+		function({ addBase }) {
 			addBase({
-				// Default styles for all elements
-				'body': {
-					color: theme('colors.cyber.neon'),
-					backgroundColor: theme('colors.cyber.darker'),
-				},
-				// Base text styles
-				'p, span, div': {
-					color: 'inherit',
-				},
-				// Links
-				'a': {
-					color: 'inherit',
-					'&:hover': {
-						opacity: 0.8,
-					},
-				},
-				// Cards and containers
-				'.card': {
-					backgroundColor: 'rgba(10, 10, 15, 0.8)',
-					backdropFilter: 'blur(8px)',
-					border: '1px solid rgba(0, 255, 159, 0.15)',
-					borderRadius: theme('borderRadius.lg'),
-					transition: 'all 0.2s ease-in-out',
-					'&:hover': {
-						borderColor: 'rgba(0, 255, 159, 0.3)',
-						backgroundColor: 'rgba(0, 255, 159, 0.05)',
-					},
-				},
-				// Buttons
-				'button:not([class*="bg-"]), [type="button"]:not([class*="bg-"])': {
-					backgroundColor: 'rgba(10, 10, 15, 0.8)',
-					border: '1px solid rgba(0, 255, 159, 0.15)',
-					borderRadius: theme('borderRadius.lg'),
-					padding: `${theme('spacing.2')} ${theme('spacing.4')}`,
-					transition: 'all 0.2s ease-in-out',
-					'&:hover': {
-						borderColor: 'rgba(0, 255, 159, 0.3)',
-						backgroundColor: 'rgba(0, 255, 159, 0.05)',
-					},
-				},
-				// Headings
-				'h1, h2, h3, h4, h5, h6': {
-					color: theme('colors.cyber.neon'),
-					fontWeight: theme('fontWeight.bold'),
-				},
-				// Text variants
-				'.text-primary': {
-					color: theme('colors.cyber.neon'),
-				},
-				'.text-secondary': {
-					color: theme('colors.cyber.neon'),
-					opacity: 0.85,
-				},
-				'.text-tertiary': {
-					color: theme('colors.cyber.neon'),
-					opacity: 0.7,
-				},
-				'.text-accent': {
-					color: theme('colors.cyber.pink'),
-				},
-				'.text-accent-secondary': {
-					color: theme('colors.cyber.blue'),
-				},
-				'.text-accent-tertiary': {
-					color: theme('colors.cyber.purple'),
-				},
-				'.text-success': {
-					color: theme('colors.cyber.neon'),
-				},
-				'.text-warning': {
-					color: theme('colors.cyber.yellow'),
-				},
-				'.text-error': {
-					color: theme('colors.cyber.pink'),
-				},
-				'.text-muted': {
-					opacity: 0.5,
-				},
+				':root': {
+					// Text colors - Space theme
+					'--text-primary': '255 255 255', // Pure white (#FFFFFF)
+					'--text-secondary': '226 232 240', // Slate 200 (#E2E8F0)
+					'--text-tertiary': '148 163 184', // Slate 400 (#94A3B8)
+					'--text-muted': '100 116 139', // Slate 500 (#64748B)
+
+					// Background colors - Deep space gradient
+					'--bg-base': '2 6 23', // Darker than navy (#02061A)
+					'--bg-surface': '15 23 42', // Slate 950 (#0F172A)
+					'--bg-surface-raised': '30 41 59', // Slate 800 (#1E293B)
+					'--bg-hover': '51 65 85', // Slate 700 (#334155)
+					'--bg-active': '71 85 105', // Slate 600 (#475569)
+					'--bg-card': '15 23 42', // Slate 950 (#0F172A)
+
+					// Borders - Deep space with cyan accents
+					'--border-subtle': '30 41 59', // Slate 800 (#1E293B)
+					'--border-default': '45 212 191', // Cyan (#2DD4BF)
+					'--border-prominent': '34 211 238', // Bright cyan (#22D3EE)
+
+					// Accent colors - Bright cyan primary
+					'--accent': '34 211 238', // Bright cyan (#22D3EE)
+					'--accent-muted': '45 212 191', // Teal (#2DD4BF)
+
+					// Status colors - Space theme
+					'--success': '52 211 153', // Emerald (#34D399)
+					'--warning': '245 158 11', // Amber (#F59E0B)
+					'--error': '239 68 68', // Rose (#EF4444)
+
+					// Data visualization colors - Space theme
+					'--data-blue-1': '59 130 246', // Blue (#3B82F6)
+					'--data-blue-2': '99 102 241', // Indigo (#6366F1)
+					'--data-green-1': '52 211 153', // Emerald (#34D399)
+					'--data-green-2': '16 185 129', // Emerald (#10B981)
+					'--data-yellow': '245 158 11', // Amber (#F59E0B)
+					'--data-orange': '249 115 22', // Orange (#F97316)
+				}
 			})
 		}
 	]
 }
+
 module.exports = config

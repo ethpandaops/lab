@@ -11,7 +11,7 @@ import { useSearchParams, useLocation, useNavigate } from 'react-router-dom'
 import { GlobeViz } from '../../components/xatu/GlobeViz'
 import { AboutThisData } from '../../components/common/AboutThisData'
 import { ChartWithStats } from '../../components/charts/ChartWithStats'
-import { ConfigContext } from '../../App'
+import { ConfigContext, NetworkContext } from '../../App'
 import { useContext } from 'react'
 
 interface CountryData {
@@ -63,6 +63,15 @@ export const CommunityNodes = () => {
   const configContext = useContext(ConfigContext)
   const pathPrefix = configContext?.modules?.['xatu_public_contributors']?.path_prefix
 
+  const { selectedNetwork, setSelectedNetwork } = useContext(NetworkContext)
+  const [currentWindow, setCurrentWindow] = useState<TimeWindow | null>(null)
+  const [countryData, setCountryData] = useState<CountryData[]>([])
+  const [userData, setUserData] = useState<UserData[]>([])
+  const [activeSection, setActiveSection] = useState<SectionId>('map')
+  const [hiddenUsers, setHiddenUsers] = useState<Set<string>>(new Set())
+  const [mapWidth, setMapWidth] = useState(0)
+  const mapRef = useRef<HTMLDivElement>(null)
+
   // Update container width on mount and resize
   useEffect(() => {
     const updateWidth = () => {
@@ -94,23 +103,17 @@ export const CommunityNodes = () => {
   const initialNetwork = searchParams.get('network') || defaultNetwork
   const initialTimeWindow = searchParams.get('timeWindow') || defaultTimeWindow
 
-  const [network, setNetwork] = useState(initialNetwork)
-  const [timeWindow, setTimeWindow] = useState(initialTimeWindow)
-
-  // Handle network/timeWindow changes
+  // Update handleNetworkChange to use setSelectedNetwork
   const handleNetworkChange = (newNetwork: string) => {
-    setNetwork(newNetwork)
-    const newParams = new URLSearchParams(searchParams)
-    if (newNetwork !== defaultNetwork) {
-      newParams.set('network', newNetwork)
-    } else {
-      newParams.delete('network')
-    }
-    setSearchParams(newParams, { replace: true })
+    setSelectedNetwork(newNetwork)
+    // Reset data when network changes
+    setCountryData([])
+    setUserData([])
+    setCurrentWindow(null)
   }
 
   const handleTimeWindowChange = (newTimeWindow: TimeWindow) => {
-    setTimeWindow(newTimeWindow)
+    setCurrentWindow(newTimeWindow)
     const newParams = new URLSearchParams(searchParams)
     if (newTimeWindow !== defaultTimeWindow) {
       newParams.set('timeWindow', newTimeWindow)
@@ -148,23 +151,11 @@ export const CommunityNodes = () => {
     navigate({ hash: section })
   }
 
-  const countriesPath = pathPrefix ? `${pathPrefix}/countries/${network}/${timeWindow}.json` : null
-  const usersPath = pathPrefix ? `${pathPrefix}/users/${network}/${timeWindow}.json` : null
+  const countriesPath = pathPrefix ? `${pathPrefix}/countries/${selectedNetwork}/${currentWindow}.json` : null
+  const usersPath = pathPrefix ? `${pathPrefix}/users/${selectedNetwork}/${currentWindow}.json` : null
 
   const { data: countriesData, loading: countriesLoading, error: countriesError } = useDataFetch<CountryData[]>(countriesPath)
   const { data: usersData, loading: usersLoading, error: usersError } = useDataFetch<UserData[]>(usersPath)
-
-  const currentWindow = useMemo(() => 
-    timeWindows.find(w => w.file === timeWindow),
-    [timeWindows, timeWindow]
-  )
-
-  const formatTime = useMemo(() => (time: number) => {
-    const date = new Date(time * 1000);
-    return currentWindow?.step === '1h'
-      ? date.toLocaleTimeString() 
-      : date.toLocaleDateString();
-  }, [currentWindow])
 
   const { chartData, totalNodesData, topCountries } = useMemo(() => {
     if (!countriesData) {
@@ -237,8 +228,6 @@ export const CommunityNodes = () => {
     return { userChartData: chartData, topUsers }
   }, [usersData])
 
-  const [hiddenUsers, setHiddenUsers] = useState<Set<string>>(new Set())
-
   const handleLegendClick = (e: React.MouseEvent<HTMLButtonElement>, item: { value: string; type: string }) => {
     const setHiddenItems = item.type === 'country' ? setHiddenCountries : setHiddenUsers
     const hiddenItems = item.type === 'country' ? hiddenCountries : hiddenUsers
@@ -307,12 +296,12 @@ export const CommunityNodes = () => {
         
         .cyber-scrollbar::-webkit-scrollbar-track {
           background: rgba(0, 0, 0, 0.2);
-          border-radius: 3px;
+          -radius: 3px;
         }
         
         .cyber-scrollbar::-webkit-scrollbar-thumb {
           background: rgba(0, 255, 159, 0.3);
-          border-radius: 3px;
+          -radius: 3px;
           transition: background 0.2s ease;
         }
         
@@ -340,20 +329,6 @@ export const CommunityNodes = () => {
       `}</style>
       <XatuCallToAction />
 
-      {/* Page Header */}
-      <div className="relative">
-        <div className="absolute inset-0 flex items-center">
-          <div className="w-full h-px bg-gradient-to-r from-transparent via-cyber-neon/20 to-transparent" />
-        </div>
-        <div className="relative flex justify-center">
-          <div className="px-4 bg-cyber-darker">
-            <h1 className="text-3xl md:text-4xl font-sans font-black bg-gradient-to-r from-cyber-neon via-cyber-blue to-cyber-pink bg-clip-text text-transparent animate-text-shine">
-              Community Nodes
-            </h1>
-          </div>
-        </div>
-      </div>
-
       <div className="space-y-6">
         <AboutThisData>
           <p>
@@ -367,14 +342,14 @@ export const CommunityNodes = () => {
         {/* Time and Network Selectors */}
         <div className="flex flex-col md:flex-row justify-end gap-4">
           <NetworkSelector
-            selectedNetwork={network}
+            selectedNetwork={selectedNetwork}
             onNetworkChange={handleNetworkChange}
           />
           <div className="relative" ref={timeWindowRef}>
             <button
               type="button"
               onClick={() => setIsTimeWindowOpen(!isTimeWindowOpen)}
-              className="w-full flex items-center justify-between gap-2 px-4 py-2 rounded-lg bg-cyber-darker border border-cyber-neon/20 hover:border-cyber-neon/30 hover:bg-cyber-neon/5 transition-all duration-300"
+              className="w-full flex items-center justify-between gap-2 px-4 py-2 border border-default hover:border-prominent hover:bg-hover transition-all duration-300"
             >
               <div className="flex items-center gap-2">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -393,7 +368,7 @@ export const CommunityNodes = () => {
             </button>
 
             {isTimeWindowOpen && (
-              <div className="absolute z-10 right-0 mt-2 w-48 rounded-lg border border-cyber-neon/20 bg-cyber-darker">
+              <div className="absolute z-10 right-0 mt-2 w-48 border border-default">
                 {timeWindows.map((window) => (
                   <button
                     key={window.file}
@@ -401,8 +376,8 @@ export const CommunityNodes = () => {
                       handleTimeWindowChange(window.file)
                       setIsTimeWindowOpen(false)
                     }}
-                    className={`w-full flex items-center gap-2 px-4 py-2 hover:bg-cyber-neon/5 first:rounded-t-lg last:rounded-b-lg text-cyber-neon ${
-                      window.file === timeWindow ? 'bg-cyber-neon/10' : ''
+                    className={`w-full flex items-center gap-2 px-4 py-2 hover:bg-hover first:rounded-t-lg last:rounded-b-lg text-primary ${
+                      window.file === currentWindow ? 'bg-active' : ''
                     }`}
                   >
                     <span className="font-mono">{window.label}</span>
@@ -438,7 +413,12 @@ export const CommunityNodes = () => {
                 <XAxis 
                   dataKey="time" 
                   stroke="currentColor"
-                  tickFormatter={formatTime}
+                  tickFormatter={(str) => {
+                    const date = new Date(str * 1000);
+                    return currentWindow?.step === '1h'
+                      ? date.toLocaleTimeString() 
+                      : date.toLocaleDateString();
+                  }}
                   angle={-45}
                   textAnchor="end"
                   height={60}
@@ -471,7 +451,7 @@ export const CommunityNodes = () => {
                     color: '#00ff9f',
                     fontSize: '12px'
                   }}
-                  labelFormatter={(time) => new Date(time * 1000).toLocaleString()}
+                  labelFormatter={(value) => new Date(value * 1000).toLocaleString()}
                   formatter={(value: number) => [value, 'Nodes']}
                 />
                 <Line
@@ -521,7 +501,12 @@ export const CommunityNodes = () => {
                 <XAxis 
                   dataKey="time" 
                   stroke="currentColor"
-                  tickFormatter={formatTime}
+                  tickFormatter={(str) => {
+                    const date = new Date(str * 1000);
+                    return currentWindow?.step === '1h'
+                      ? date.toLocaleTimeString() 
+                      : date.toLocaleDateString();
+                  }}
                   angle={-45}
                   textAnchor="end"
                   height={60}
@@ -554,7 +539,7 @@ export const CommunityNodes = () => {
                     color: '#00ff9f',
                     fontSize: '12px'
                   }}
-                  labelFormatter={(time) => new Date(time * 1000).toLocaleString()}
+                  labelFormatter={(value) => new Date(value * 1000).toLocaleString()}
                   formatter={(value: number, name: string) => [value, name]}
                 />
                 {topCountries
@@ -623,7 +608,12 @@ export const CommunityNodes = () => {
                 <XAxis 
                   dataKey="time" 
                   stroke="currentColor"
-                  tickFormatter={formatTime}
+                  tickFormatter={(str) => {
+                    const date = new Date(str * 1000);
+                    return currentWindow?.step === '1h'
+                      ? date.toLocaleTimeString() 
+                      : date.toLocaleDateString();
+                  }}
                   angle={-45}
                   textAnchor="end"
                   height={60}
@@ -656,7 +646,7 @@ export const CommunityNodes = () => {
                     color: '#00ff9f',
                     fontSize: '12px'
                   }}
-                  labelFormatter={(time) => new Date(time * 1000).toLocaleString()}
+                  labelFormatter={(value) => new Date(value * 1000).toLocaleString()}
                   formatter={(value: number, name: string) => [value, name]}
                 />
                 {topUsers
@@ -725,7 +715,12 @@ export const CommunityNodes = () => {
                 <XAxis 
                   dataKey="time" 
                   stroke="currentColor"
-                  tickFormatter={formatTime}
+                  tickFormatter={(str) => {
+                    const date = new Date(str * 1000);
+                    return currentWindow?.step === '1h'
+                      ? date.toLocaleTimeString() 
+                      : date.toLocaleDateString();
+                  }}
                   angle={-45}
                   textAnchor="end"
                   height={60}
@@ -758,7 +753,7 @@ export const CommunityNodes = () => {
                     color: '#00ff9f',
                     fontSize: '12px'
                   }}
-                  labelFormatter={(time) => new Date(time * 1000).toLocaleString()}
+                  labelFormatter={(value) => new Date(value * 1000).toLocaleString()}
                   formatter={(value: number) => [value, 'Users']}
                 />
                 <Line

@@ -1,10 +1,15 @@
+import { Fragment } from 'react'
+import { Listbox, Transition } from '@headlessui/react'
+import { ChevronUpDownIcon } from '@heroicons/react/24/outline'
+import clsx from 'clsx'
 import { getConfig } from '../../config'
 import { useEffect, useState, useRef } from 'react'
 import type { Config } from '../../types'
 
-interface Props {
+interface NetworkSelectorProps {
   selectedNetwork: string
   onNetworkChange: (network: string) => void
+  availableNetworks?: string[]
   className?: string
 }
 
@@ -36,7 +41,12 @@ const NETWORK_METADATA = {
   }
 } as const
 
-export const NetworkSelector = ({ selectedNetwork, onNetworkChange, className }: Props) => {
+export function NetworkSelector({
+  selectedNetwork,
+  onNetworkChange,
+  availableNetworks = [],
+  className = ''
+}: NetworkSelectorProps): JSX.Element {
   const [config, setConfig] = useState<Config>()
   const [isOpen, setIsOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
@@ -64,55 +74,62 @@ export const NetworkSelector = ({ selectedNetwork, onNetworkChange, className }:
     color: '#627EEA'
   }
 
-  return ( 
-    <div className={`relative ${className}`} ref={dropdownRef}>
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-4 py-2 rounded-lg backdrop-blur-sm border border-cyber-neon/10 hover:border-cyber-neon/30 hover:bg-cyber-neon/5 transition-all duration-300 bg-cyber-dark/90"
-      >
-        <span className="w-5 h-5 flex items-center justify-center">
-          {selectedMetadata.icon}
-        </span>
-        <span className="font-mono">{selectedMetadata.name}</span>
-        <svg 
-          className={`w-4 h-4 transition-transform text-cyber-neon/70 ${isOpen ? 'rotate-180' : ''}`} 
-          fill="none" 
-          stroke="currentColor" 
-          viewBox="0 0 24 24"
-        >
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-        </svg>
-      </button>
-
-      {isOpen && (
-        <div className="absolute z-[9999] mt-2 w-full rounded-lg border border-cyber-neon/20 bg-cyber-darker">
-          {networks.map((network) => {
-            const metadata = NETWORK_METADATA[network as keyof typeof NETWORK_METADATA] || {
-              name: network.charAt(0).toUpperCase() + network.slice(1),
-              icon: '🔥',
-              color: '#627EEA'
-            }
-
-            return (
-              <button
-                key={network}
-                onClick={() => {
-                  onNetworkChange(network)
-                  setIsOpen(false)
-                }}
-                className={`w-full flex items-center gap-2 px-4 py-2 bg-cyber-darker hover:bg-cyber-neon/5 first:rounded-t-lg last:rounded-b-lg font-mono text-cyber-neon hover:text-cyber-neon transition-colors ${
-                  network === selectedNetwork ? 'text-cyber-neon bg-cyber-neon/10' : ''
-                }`}
-              >
-                <span className="w-5 h-5 flex items-center justify-center">
-                  {metadata.icon}
-                </span>
-                <span>{metadata.name}</span>
-              </button>
-            )
-          })}
+  return (
+    <div className={clsx('relative', className)}>
+      <Listbox value={selectedNetwork} onChange={onNetworkChange}>
+        <div className="relative">
+          <Listbox.Button className="relative w-full cursor-pointer rounded-lg bg-surface/30 backdrop-blur-sm py-2 pl-3 pr-10 text-left shadow-sm border border-subtle hover:bg-surface/50 transition-colors">
+            <span className="flex items-center gap-2">
+              <span className="w-5 h-5 flex items-center justify-center">
+                {selectedMetadata.icon}
+              </span>
+              <span className="block truncate font-mono">{selectedMetadata.name}</span>
+            </span>
+            <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+              <ChevronUpDownIcon className="h-5 w-5 text-tertiary" aria-hidden="true" />
+            </span>
+          </Listbox.Button>
+          <Transition
+            as={Fragment}
+            leave="transition ease-in duration-100"
+            leaveFrom="opacity-100"
+            leaveTo="opacity-0"
+          >
+            <Listbox.Options className="absolute z-[9999] mt-1 max-h-60 w-full overflow-auto rounded-lg bg-surface py-1 shadow-lg border border-subtle">
+              {networks.map((network) => {
+                const metadata = NETWORK_METADATA[network as keyof typeof NETWORK_METADATA] || {
+                  name: network.charAt(0).toUpperCase() + network.slice(1),
+                  icon: '🔥',
+                  color: '#627EEA'
+                }
+                return (
+                  <Listbox.Option
+                    key={network}
+                    className={({ active }) =>
+                      clsx(
+                        'relative cursor-pointer select-none py-2 pl-3 pr-9 font-mono bg-surface',
+                        active ? 'bg-hover text-accent' : 'text-primary'
+                      )
+                    }
+                    value={network}
+                  >
+                    {({ selected }) => (
+                      <span className="flex items-center gap-2">
+                        <span className="w-5 h-5 flex items-center justify-center">
+                          {metadata.icon}
+                        </span>
+                        <span className={clsx('block truncate', selected && 'text-accent')}>
+                          {metadata.name}
+                        </span>
+                      </span>
+                    )}
+                  </Listbox.Option>
+                )
+              })}
+            </Listbox.Options>
+          </Transition>
         </div>
-      )}
+      </Listbox>
     </div>
   )
 } 

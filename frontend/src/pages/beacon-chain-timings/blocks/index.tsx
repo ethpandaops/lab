@@ -3,7 +3,7 @@ import { LoadingState } from '../../../components/common/LoadingState'
 import { ErrorState } from '../../../components/common/ErrorState'
 import { NetworkSelector } from '../../../components/common/NetworkSelector'
 import { AboutThisData } from '../../../components/common/AboutThisData'
-import { useState, useEffect, useMemo, useRef } from 'react'
+import { useState, useEffect, useMemo, useRef, useContext } from 'react'
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend, ReferenceLine, ScatterChart, Scatter, ZAxis } from 'recharts'
 import { getConfig } from '../../../config'
 import type { Config } from '../../../types'
@@ -11,6 +11,7 @@ import { useSearchParams } from 'react-router-dom'
 import { formatDistanceToNow } from 'date-fns'
 import { PERCENTILE_COLORS, PERCENTILE_LABELS, PERCENTILE_KEYS, type PercentileKey } from '../../../constants/percentiles'
 import { ChartWithStats } from '../../../components/charts/ChartWithStats'
+import { NetworkContext } from '../../../App'
 
 interface TimingData {
   timestamps: number[]
@@ -67,6 +68,7 @@ const BLOCK_TYPE_COLORS = {
 } as const;
 
 export const BlockTimings: React.FC = () => {
+  const { selectedNetwork, setSelectedNetwork } = useContext(NetworkContext)
   const [searchParams, setSearchParams] = useSearchParams()
   const [config, setConfig] = useState<Config | null>(null)
   const [configLoading, setConfigLoading] = useState(true)
@@ -75,6 +77,7 @@ export const BlockTimings: React.FC = () => {
   const [hiddenArrivalLines, setHiddenArrivalLines] = useState<Set<string>>(new Set())
   const [hiddenSizeLines, setHiddenSizeLines] = useState<Set<string>>(new Set())
   const timeWindowRef = useRef<HTMLDivElement>(null)
+  const [currentWindow, setCurrentWindow] = useState<TimeWindowConfig | null>(null)
 
   const timeWindows = useMemo<TimeWindowConfig[]>(() => {
     const moduleConfig = config?.modules?.['beacon_chain_timings']
@@ -125,11 +128,6 @@ export const BlockTimings: React.FC = () => {
 
   const { data: cdfData, loading: cdfLoading, error: cdfError } = useDataFetch<CDFData>(
     cdfPath
-  )
-
-  const currentWindow = useMemo(() => 
-    timeWindows.find((w: TimeWindowConfig) => w.file === timeWindow),
-    [timeWindows, timeWindow]
   )
 
   const formatTime = useMemo(() => (time: number) => {
@@ -259,8 +257,8 @@ export const BlockTimings: React.FC = () => {
             <button
               key={line}
               onClick={(event) => handleLegendClick(event, { value: line, color, type })}
-              className={`flex items-center gap-2 w-full px-2 py-1.5 rounded text-xs transition-all hover:bg-cyber-neon/5 ${
-                isHidden ? 'opacity-50 hover:opacity-70' : isOnlyVisible ? 'ring-1 ring-cyber-neon' : ''
+              className={`flex items-center gap-2 w-full px-2 py-1.5 rounded text-xs transition-all hover:bg-hover ${
+                isHidden ? 'opacity-50 hover:opacity-70' : isOnlyVisible ? 'ring-1 ring-primary' : ''
               }`}
             >
               <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: color }} />
@@ -302,6 +300,13 @@ export const BlockTimings: React.FC = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
+  // Update network handling
+  const handleNetworkChange = (newNetwork: string) => {
+    setSelectedNetwork(newNetwork)
+    // Reset data when network changes
+    setCurrentWindow(null)
+  }
+
   if (configLoading || loading) {
     return <LoadingState message="Loading data..." />
   }
@@ -320,43 +325,20 @@ export const BlockTimings: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Page Header */}
-      <div className="relative mb-12">
-        <div className="absolute inset-0 flex items-center">
-          <div className="w-full h-px bg-gradient-to-r from-transparent via-cyber-neon/20 to-transparent" />
-        </div>
-        <div className="relative flex justify-center">
-          <div className="px-4 bg-cyber-darker">
-            <h1 className="text-3xl md:text-4xl font-sans font-black bg-gradient-to-r from-cyber-neon via-cyber-blue to-cyber-pink bg-clip-text text-transparent animate-text-shine">
-              Block Timings
-            </h1>
-          </div>
-        </div>
-      </div>
-
       <AboutThisData>
         <p>
-          This data shows timing data for blocks on the beacon chain. The data is updated hourly and aggregated in {timeWindows.map((w, i) => (
-            <span key={w.file}>
-              {w.step} intervals for the {w.label} view{i < timeWindows.length - 1 ? ', and ' : ''}
-            </span>
-          ))}.
+          View block propagation timing metrics across the network. This data helps us understand how quickly blocks are propagating through the network and identify potential bottlenecks.
         </p>
       </AboutThisData>
 
       {/* Controls Section */}
-      <div className="backdrop-blur-md rounded-lg border border-cyber-neon/20 p-6 bg-cyber-dark/80">
+      <div className="backdrop-blur-md border-default p-6 bg-surface/80">
         <div className="flex flex-col md:flex-row justify-between gap-4">
-          <NetworkSelector
-            selectedNetwork={network}
-            onNetworkChange={setNetwork}
-            className="w-full md:w-auto"
-          />
           <div className="relative w-full md:w-auto" ref={timeWindowRef}>
             <button
               type="button"
               onClick={() => setIsTimeWindowOpen(!isTimeWindowOpen)}
-              className="w-full flex items-center justify-between gap-2 px-4 py-2 rounded-lg bg-cyber-darker border border-cyber-neon/20 hover:border-cyber-neon/30 hover:bg-cyber-neon/5 transition-all duration-300"
+              className="w-full flex items-center justify-between gap-2 px-4 py-2 border border-default hover:border-prominent hover:bg-hover transition-all duration-300"
             >
               <div className="flex items-center gap-2">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -375,7 +357,7 @@ export const BlockTimings: React.FC = () => {
             </button>
 
             {isTimeWindowOpen && (
-              <div className="absolute z-[9999] mt-2 w-full rounded-lg bg-cyber-darker border border-cyber-neon/20">
+              <div className="absolute z-[9999] mt-2 w-full border border-default">
                 <div className="py-1">
                   {timeWindows.map((window) => (
                     <button
@@ -384,7 +366,7 @@ export const BlockTimings: React.FC = () => {
                         setTimeWindow(window.file)
                         setIsTimeWindowOpen(false)
                       }}
-                      className="w-full px-4 py-2 text-left font-mono text-cyber-neon hover:text-cyber-neon hover:bg-cyber-neon/5 active:bg-cyber-neon/10 transition-colors"
+                      className="w-full px-4 py-2 text-left font-mono text-primary hover:text-primary hover:bg-hover active:bg-active transition-colors"
                     >
                       {window.label}
                     </button>
@@ -399,7 +381,7 @@ export const BlockTimings: React.FC = () => {
       {/* Chart Separator */}
       <div className="relative my-12">
         <div className="absolute inset-0 flex items-center">
-          <div className="w-full h-px bg-gradient-to-r from-transparent via-cyber-neon/20 to-transparent" />
+          <div className="w-full h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
         </div>
       </div>
 
@@ -632,13 +614,13 @@ export const BlockTimings: React.FC = () => {
           }
           notes={
             <>
-              <h3 className="text-xl font-sans font-bold text-cyber-neon mb-4">Notes</h3>
+              <h3 className="text-xl font-sans font-bold text-primary mb-4">Notes</h3>
               <ul className="list-disc list-inside space-y-2">
-                <li><span className="text-cyber-blue">All Blocks</span>: Shows the average arrival time for all blocks, regardless of their source.</li>
-                <li><span className="text-cyber-pink">MEV Blocks</span>: Blocks that were built by MEV-Boost relays, which may have different arrival characteristics due to their specialized construction.</li>
-                <li><span className="text-cyber-neon">Non-MEV Blocks</span>: Regular blocks built by validators without using MEV-Boost relays.</li>
-                <li><span className="text-cyber-purple">Solo MEV</span>: Blocks built by solo stakers using MEV-Boost relays.</li>
-                <li><span className="text-cyber-yellow">Solo Non-MEV</span>: Blocks built by solo stakers without using MEV-Boost relays.</li>
+                <li><span className="text-accent">All Blocks</span>: Shows the average arrival time for all blocks, regardless of their source.</li>
+                <li><span className="text-error">MEV Blocks</span>: Blocks that were built by MEV-Boost relays, which may have different arrival characteristics due to their specialized construction.</li>
+                <li><span className="text-primary">Non-MEV Blocks</span>: Regular blocks built by validators without using MEV-Boost relays.</li>
+                <li><span className="text-accent-secondary">Solo MEV</span>: Blocks built by solo stakers using MEV-Boost relays.</li>
+                <li><span className="text-warning">Solo Non-MEV</span>: Blocks built by solo stakers without using MEV-Boost relays.</li>
               </ul>
             </>
           }

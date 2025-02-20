@@ -58,66 +58,66 @@ export function TimelineView({
   entity,
 }: TimelineViewProps): JSX.Element {
   return (
-    <div className="backdrop-blur-md rounded-lg border border-cyber-neon/20 p-6 bg-cyber-dark/80">
+    <div className="backdrop-blur-md   p-6 bg-surface/80">
       <div className="flex flex-col space-y-6">
         {/* Header with controls and info */}
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-4">
             <button
               onClick={onPlayPauseClick}
-              className="px-4 py-2 rounded-lg border border-cyber-neon/20 hover:border-cyber-neon/30 hover:bg-cyber-neon/5 transition-all"
+              className="px-4 py-2  hover:-prominent hover:bg-hover transition-all border border-text-muted"
             >
               {isPlaying ? 'Pause' : 'Play'}
             </button>
 
             <div className="flex items-center gap-4 text-sm font-mono">
               <div>
-                <span className="text-cyber-neon/70">Slot </span>
-                <span className="text-cyber-neon">{slot}</span>
-                <span className="text-cyber-neon/70 mx-2">·</span>
-                <span className="text-cyber-neon/70">Epoch </span>
-                <span className="text-cyber-neon">{Math.floor(slot! / 32)}</span>
+                <span className="text-tertiary">Slot </span>
+                <span className="text-primary">{slot}</span>
+                <span className="text-tertiary mx-2">·</span>
+                <span className="text-tertiary">Epoch </span>
+                <span className="text-primary">{Math.floor(slot! / 32)}</span>
                 {isMissing && (
-                  <span className="ml-2 text-cyber-pink/70">(Data Missing)</span>
+                  <span className="ml-2 text-error/70">(Data Missing)</span>
                 )}
               </div>
               <div>
-                <span className="text-cyber-neon/70">by </span>
+                <span className="text-tertiary">by </span>
                 {loading ? (
-                  <span className="inline-block w-32 h-4 bg-cyber-neon/10 rounded animate-pulse" />
+                  <span className="inline-block w-32 h-4 bg-active rounded animate-pulse" />
                 ) : isMissing ? (
-                  <span className="text-cyber-neon/50">Unknown</span>
+                  <span className="text-muted">Unknown</span>
                 ) : (
-                  <span className="text-cyber-neon">
+                  <span className="text-primary">
                     {proposerIndex}
-                    <span className="text-cyber-neon/70 ml-1">({entity || 'Unknown'})</span>
+                    <span className="text-tertiary ml-1">({entity || 'Unknown'})</span>
                   </span>
                 )}
               </div>
             </div>
           </div>
 
-          <span className="font-mono text-cyber-neon">
+          <span className="font-mono text-primary">
             {(currentTime / 1000).toFixed(1)}s
           </span>
         </div>
 
         {/* Timeline */}
-        <div className="relative h-16 bg-cyber-darker rounded-lg">
+        <div className="relative h-16">
           {/* Phase sections with improved headers */}
           <div className="absolute inset-0 flex">
-            <div className="w-1/3 h-full bg-cyber-blue/5 flex flex-col">
-              <div className="text-xs font-mono text-cyber-blue/80 font-medium p-1.5 bg-cyber-darker/50 rounded-tl-lg backdrop-blur-sm">
+            <div className="w-1/3 h-full bg-accent/5 flex flex-col">
+              <div className="text-xs font-mono text-accent/80 font-medium p-1.5 /50 rounded-tl-lg backdrop-blur-sm">
                 Block Proposal
               </div>
             </div>
-            <div className="w-1/3 h-full bg-cyber-pink/5 flex flex-col">
-              <div className="text-xs font-mono text-cyber-pink/80 font-medium p-1.5 bg-cyber-darker/50 backdrop-blur-sm">
+            <div className="w-1/3 h-full bg-error/5 flex flex-col">
+              <div className="text-xs font-mono text-error/80 font-medium p-1.5 /50 backdrop-blur-sm">
                 Attestation
               </div>
             </div>
-            <div className="w-1/3 h-full bg-cyber-neon/5 flex flex-col">
-              <div className="text-xs font-mono text-cyber-neon/80 font-medium p-1.5 bg-cyber-darker/50 rounded-tr-lg backdrop-blur-sm">
+            <div className="w-1/3 h-full bg-hover flex flex-col">
+              <div className="text-xs font-mono text-primary/80 font-medium p-1.5 /50 rounded-tr-lg backdrop-blur-sm">
                 Aggregation
               </div>
             </div>
@@ -125,7 +125,7 @@ export function TimelineView({
 
           {/* Progress bar */}
           <div 
-            className="absolute top-0 left-0 h-full bg-cyber-neon/10 transition-all duration-100"
+            className="absolute top-0 left-0 h-full bg-active transition-all duration-100"
             style={{ width: `${(currentTime / 12000) * 100}%` }}
           />
 
@@ -139,8 +139,8 @@ export function TimelineView({
                 data-tooltip-id="timeline-tooltip"
                 data-tooltip-content={`Block Seen (API) at ${(firstApiBlockSeen.time / 1000).toFixed(2)}s`}
               >
-                <div className="w-px h-full bg-cyber-blue" />
-                <div className="absolute bottom-0 -mb-1.5 w-2 h-2 rounded-full bg-cyber-blue ring-4 ring-cyber-blue/20" />
+                <div className="w-px h-full bg-accent" />
+                <div className="absolute bottom-0 -mb-1.5 w-2 h-2 rounded-full bg-accent ring-4 ring-accent/20" />
               </div>
             )}
 
@@ -165,8 +165,8 @@ export function TimelineView({
                 data-tooltip-id="timeline-tooltip"
                 data-tooltip-content={`First Attestation at ${(attestationWindows[0].start_ms / 1000).toFixed(2)}s by validator ${attestationWindows[0].validator_indices[0]}`}
               >
-                <div className="w-px h-full bg-cyber-pink" />
-                <div className="absolute bottom-0 -mb-1.5 w-2 h-2 rounded-full bg-cyber-pink ring-4 ring-cyber-pink/20" />
+                <div className="w-px h-full bg-error" />
+                <div className="absolute bottom-0 -mb-1.5 w-2 h-2 rounded-full bg-error ring-4 ring-error/20" />
               </div>
             )}
           </div>
@@ -179,8 +179,8 @@ export function TimelineView({
                 className="absolute bottom-0 flex flex-col items-center"
                 style={{ left: `${(i / 12) * 100}%` }}
               >
-                <div className="w-px h-1.5 bg-cyber-neon/20" />
-                <span className="mt-1 text-[10px] font-mono text-cyber-neon/50">
+                <div className="w-px h-1.5 bg-primary/20" />
+                <span className="mt-1 text-[10px] font-mono text-muted">
                   {i}s
                 </span>
               </div>
@@ -191,16 +191,16 @@ export function TimelineView({
         {/* Legend */}
         <div className="flex flex-wrap gap-4 text-xs font-mono">
           <div className="flex items-center gap-2">
-            <div className="w-2 h-2 rounded-full bg-cyber-blue ring-4 ring-cyber-blue/20" />
-            <span className="text-cyber-blue/80">Block Seen (API)</span>
+            <div className="w-2 h-2 rounded-full bg-accent ring-4 ring-accent/20" />
+            <span className="text-accent/80">Block Seen (API)</span>
           </div>
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 rounded-full bg-yellow-400 ring-4 ring-yellow-400/20" />
             <span className="text-yellow-400/80">Block Seen (P2P)</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-2 h-2 rounded-full bg-cyber-pink ring-4 ring-cyber-pink/20" />
-            <span className="text-cyber-pink/80">First Attestation</span>
+            <div className="w-2 h-2 rounded-full bg-error ring-4 ring-error/20" />
+            <span className="text-error/80">First Attestation</span>
           </div>
         </div>
       </div>
@@ -208,7 +208,7 @@ export function TimelineView({
       {/* Tooltip */}
       <Tooltip
         id="timeline-tooltip"
-        className="z-50 max-w-xs !bg-cyber-darker !border !border-cyber-neon/20 !text-cyber-neon !font-mono !text-xs !px-2 !py-1"
+        className="z-50 max-w-xs ! ! !-default !text-primary !font-mono !text-xs !px-2 !py-1"
       />
     </div>
   )

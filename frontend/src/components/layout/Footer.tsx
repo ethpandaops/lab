@@ -2,7 +2,7 @@ import { Github } from 'lucide-react'
 
 export const Footer = () => {
   return (
-    <footer className="bg-white border-t border-gray-200">
+    <footer className="bg-white -t -gray-200">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="py-4 flex items-center justify-between">
           <p className="text-sm text-tertiary dark:text-secondary">

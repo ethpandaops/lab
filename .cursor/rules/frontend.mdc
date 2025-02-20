@@ -4,33 +4,50 @@ globs: *frontend*
 ---
 # UI System Rules
 
-# Important Note
+## Important Note
 - When implementing new reusable patterns, design principles, or best practices, add them to this file
 - This file should evolve organically as we discover better ways to do things
 - Document any decisions that would be useful for future implementations
 
 ## Color System
-- Primary colors are defined in `cyber` theme in tailwind.config.js
-- Never use raw color values in components
-- Use semantic color classes:
-  - text-primary: Main text (cyber-neon)
-  - text-secondary: Less important text (cyber-neon @ 70%)
-  - text-tertiary: Least important text (cyber-neon @ 50%)
-  - text-accent: Call to action/highlights (cyber-pink)
-  - text-accent-secondary: Secondary highlights (cyber-blue)
-  - text-accent-tertiary: Tertiary highlights (cyber-purple)
-  - text-success: Success states (cyber-neon)
-  - text-warning: Warning states (cyber-yellow)
-  - text-error: Error states (cyber-pink)
-  - text-muted: Muted text (50% opacity)
+- Colors are defined in semantic layers:
+  1. Text hierarchy:
+    - text-primary: Main text content
+    - text-secondary: Supporting text
+    - text-tertiary: Less important text
+    - text-muted: Subdued text
+  
+  2. Interactive/State colors:
+    - text-accent: Primary call to action/highlights
+    - text-accent-secondary: Secondary highlights
+    - text-accent-tertiary: Tertiary highlights
+    - text-success: Success states
+    - text-warning: Warning/caution states
+    - text-error: Error/danger states
+  
+  3. Background colors:
+    - bg-base: Main application background
+    - bg-surface: Card/container background
+    - bg-surface-raised: Elevated surface
+    - bg-hover: Hover state background
+    - bg-active: Active/pressed state background
+  
+  4. Border colors:
+    - border-subtle: Subtle separators
+    - border-default: Standard borders
+    - border-prominent: Emphasized borders
 
-## Layout Components
-- Use `backdrop-blur-sm` with `bg-cyber-darker/90` for card backgrounds
-- Use `border border-cyber-neon/10` for subtle borders
-- Use `hover:border-cyber-neon/20` for hover states
-- Use `rounded-lg` for consistent corner radius
-- Keep backgrounds in the root layout for consistency
-- Use fixed positioning for full-screen overlays and backgrounds
+- Never use raw color values in components
+- Always use semantic color classes
+- Maintain consistent opacity values:
+  - 100%: Full opacity
+  - 85%: Secondary text
+  - 70%: Tertiary text
+  - 50%: Muted text
+  - 30%: Prominent borders
+  - 20%: Default borders
+  - 10%: Subtle borders
+  - 5%: Hover backgrounds
 
 ## Typography
 - Font families:
@@ -45,173 +62,103 @@ globs: *frontend*
   - text-base: Default size (16px)
   - text-lg/text-xl: Section headers (18px/20px)
   - text-2xl+: Page headers (24px+)
-- Common combinations:
-  ```tsx
-  // Page header
-  <h1 className="text-3xl md:text-4xl font-sans font-black">Title</h1>
-  
-  // Section header
-  <h2 className="text-2xl font-sans font-bold">Section</h2>
-  
-  // Subsection header
-  <h3 className="text-xl font-sans font-bold">Subsection</h3>
-  
-  // Body text
-  <p className="text-sm font-mono">Content</p>
-  
-  // Navigation
-  <Link className="text-sm font-mono">Link</Link>
-  
-  // Data/metrics
-  <span className="text-base font-mono font-medium">123.45</span>
-  ```
 
-## Animations
-- Use predefined animations from tailwind.config.js:
-  - animate-text-shine: Text shine effect
-  - animate-gradient: Gradient movement
-  - animate-glitch: Glitch effect
-  - animate-pulse/animate-pulse-slow: Pulsing
-  - animate-float: Floating effect
-  - animate-glow: Neon glow
-  - animate-scanline: Scanline effect
-- Use transition-all for smooth state changes
-- Add transform-gpu for hardware acceleration on animations
+## Common Patterns
 
-## Shadows
-- Use predefined shadows:
-  - shadow-neon: Standard neon glow
-  - shadow-neon-strong: Strong neon glow
-  - shadow-pink: Pink glow
-  - shadow-blue: Blue glow
-
-## Component Guidelines
-1. Cards/Containers:
+### Section Types
+1. Page Header:
 ```tsx
-<div className="backdrop-blur-sm rounded-lg p-4 border border-cyber-neon/10 hover:border-cyber-neon/20">
-```
-
-2. Buttons:
-```tsx
-<button className="px-4 py-2 rounded-lg border border-cyber-neon/10 hover:border-cyber-neon/20 hover:bg-cyber-neon/5">
-```
-
-3. Text Hierarchy:
-```tsx
-<h2 className="text-xl font-bold text-primary mb-2">Title</h2>
-<p className="text-secondary">Important content</p>
-<span className="text-tertiary">Less important content</span>
-```
-
-4. Interactive Elements:
-```tsx
-<Link className="text-accent hover:opacity-80 transition-opacity">
-```
-
-5. Mobile Navigation:
-```tsx
-{/* Mobile Menu Button */}
-<button className="md:hidden p-2 rounded-lg border border-cyber-neon/10 hover:border-cyber-neon/30">
-  <Menu className="w-6 h-6 text-cyber-neon" />
-</button>
-
-{/* Mobile Menu Overlay */}
-<div className="fixed inset-0 bg-cyber-darker/90 backdrop-blur-md transition-opacity">
-  {/* Content */}
-</div>
-
-{/* Mobile Slide-out Menu */}
-<div className="fixed inset-y-0 right-0 w-64 bg-cyber-darker border-l border-cyber-neon/20 transform transition-transform">
-  {/* Content */}
+<div className="relative mb-12">
+  <div className="absolute inset-0 flex items-center">
+    <div className="w-full h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
+  </div>
+  <div className="relative flex justify-center">
+    <div className="px-4 bg-base">
+      <h1 className="text-3xl md:text-4xl font-sans font-black text-primary animate-text-shine">
+        Page Title
+      </h1>
+    </div>
+  </div>
 </div>
 ```
 
-## Best Practices
-1. Always use semantic color classes instead of raw colors
-2. Maintain consistent spacing with Tailwind's spacing scale
-3. Use the predefined animations for interactive elements
-4. Leverage the cyber theme colors for all UI elements
-5. Use opacity variants for creating depth
-6. Apply consistent blur effects for layering
-7. Maintain text hierarchy using semantic classes
-8. Keep backgrounds in the root layout for consistency
-9. Use proper mobile navigation patterns with overlays
-10. Ensure smooth transitions between states
+2. Major Section:
+```tsx
+<section className="mb-16">
+  <h2 className="text-2xl font-sans font-bold text-primary mb-6">
+    Section Title
+  </h2>
+  <div className="space-y-4">
+    {/* Content */}
+  </div>
+</section>
+```
 
-## Component Architecture
-1. Base layer: Use theme defaults from tailwind.config.js
-2. Component layer: Build on base styles with semantic classes
-3. Variant layer: Use modifiers for different states/variants
-
-## Responsive Design
-- Use Tailwind's responsive prefixes consistently
-- Maintain readable text sizes across devices
-- Ensure touch targets are accessible on mobile
-- Use slide-out navigation for mobile menus
-- Add proper overlays for mobile interactions
-
-## Accessibility
-- Maintain WCAG 2.1 compliant contrast ratios
-- Use semantic HTML elements
-- Ensure interactive elements have proper focus states
-- Provide hover/focus transitions for better UX
-- Ensure mobile menus are keyboard accessible
-
-## Visual Hierarchy & Content Structure
-- Use semantic headings (h1-h6) to establish content hierarchy
-- Avoid nesting cards within cards - use alternative visual separation:
-  - Use gradient lines for major section breaks
-  - Use spacing and typography for subsection separation
-  - Use opacity and font weights for content hierarchy
-- Section types and styling:
-  1. Page Header:
-    ```tsx
-    <div className="relative mb-12">
-      <div className="absolute inset-0 flex items-center">
-        <div className="w-full h-px bg-gradient-to-r from-transparent via-cyber-neon/20 to-transparent" />
-      </div>
-      <div className="relative flex justify-center">
-        <div className="px-4 bg-cyber-darker">
-          <h1 className="text-3xl md:text-4xl font-sans font-black bg-gradient-to-r from-cyber-neon via-cyber-blue to-cyber-pink bg-clip-text text-transparent animate-text-shine">
-            Page Title
-          </h1>
-        </div>
-      </div>
+3. Content Groups:
+```tsx
+{/* Parent Container */}
+<div className="backdrop-blur-sm rounded-lg border border-subtle p-6">
+  {/* Content Groups */}
+  <div className="space-y-6">
+    {/* Group 1 */}
+    <div className="pb-6 border-b border-subtle">
+      <h3 className="text-xl font-sans font-bold mb-4 text-primary">Group 1</h3>
+      <p className="text-base font-mono text-tertiary">Content</p>
     </div>
-    ```
-  2. Major Section:
-    ```tsx
-    <section className="mb-16">
-      <h2 className="text-2xl font-sans font-bold text-cyber-neon mb-6">
-        Section Title
-      </h2>
-      <div className="space-y-4">
-        {/* Content */}
-      </div>
-    </section>
-    ```
-  3. Subsection:
-    ```tsx
-    <div className="mb-8">
-      <h3 className="text-xl font-sans font-bold text-cyber-neon/90 mb-4">
-        Subsection Title
-      </h3>
-      <div className="space-y-3">
-        {/* Content */}
-      </div>
+    {/* Group 2 */}
+    <div>
+      <h3 className="text-xl font-sans font-bold mb-4 text-primary">Group 2</h3>
+      <p className="text-base font-mono text-tertiary">Content</p>
     </div>
-    ```
-  4. Content Block:
-    ```tsx
-    <div className="space-y-2">
-      <h4 className="text-lg font-sans font-semibold text-cyber-neon/80">
-        Content Title
-      </h4>
-      <p className="text-base font-mono text-cyber-neon/70">
-        Content text
-      </p>
-    </div>
-    ```
+  </div>
+</div>
+```
+
+### Chart Standards
+1. Axes:
+- Font size: 12px for ticks, 14px for labels
+- Labels: Inside axes
+- X-axis: Bottom-aligned, -45° angle for dates
+- Y-axis: Left-aligned, vertical text
+- Left margin: 60px minimum to accommodate Y-axis label
+
+2. Series Table:
+- Position: Right side of chart (25% width)
+- Shows series name and last value only
+- Min/avg/max values shown in tooltip on hover
+- Compact layout with small text (text-xs)
+- Small color indicators (2x2px)
+
+3. Chart Interactions:
+- Click legend item: Toggle between showing only that item or showing all
+- Shift+click: Toggle individual items while keeping others unchanged
+- Hidden items: Remain visible at 20% opacity
+- Hover states on all interactive elements
+
+4. Chart Styling:
+- Lines:
+  - Type: monotone
+  - Stroke width: 2px
+  - No dots
+  - Full opacity (1) when active
+  - 20% opacity when hidden
+- Tooltip:
+  - Use bg-surface for background
+  - Use border-default for border
+  - Rounded corners (rounded-lg)
+- Reference Lines:
+  - Dashed style (5 2)
+  - 2px width
+
+5. Chart Percentiles:
+- Use semantic colors for percentiles:
+  - Maximum: text-error
+  - P95: text-warning
+  - P75: text-accent-secondary
+  - P50/Median: text-primary
+  - P25: text-accent-tertiary
+  - P05: text-muted
+  - Minimum: text-tertiary
 
 ## Content Spacing
 - Use consistent spacing scale:
@@ -223,228 +170,16 @@ globs: *frontend*
   - mb-16: Maximum separation (e.g., between major sections)
 - Use space-y-{n} for consistent vertical spacing between children
 
-## Cards and Containers
-- Reserve cards for interactive elements or highlighted content
-- Use subtle backgrounds (bg-cyber-dark/50) instead of cards for content grouping
-- Limit card nesting to one level maximum
-- Use alternative visual separation for nested content:
-  ```tsx
-  {/* Parent Container */}
-  <div className="backdrop-blur-sm rounded-lg border border-cyber-neon/10 p-6">
-    {/* Content Groups */}
-    <div className="space-y-6">
-      {/* Group 1 */}
-      <div className="pb-6 border-b border-cyber-neon/10">
-        <h3 className="text-xl font-sans font-bold mb-4">Group 1</h3>
-        <p className="text-base font-mono text-cyber-neon/70">Content</p>
-      </div>
-      {/* Group 2 */}
-      <div>
-        <h3 className="text-xl font-sans font-bold mb-4">Group 2</h3>
-        <p className="text-base font-mono text-cyber-neon/70">Content</p>
-      </div>
-    </div>
-  </div>
-  ``` 
-
-## Chart Standards
-1. Layout:
-  ```tsx
-  <ChartWithStats
-    title="Chart Title"
-    chart={
-      <ResponsiveContainer width="100%" height="100%">
-        <LineChart margin={{ top: 20, right: 20, left: 60, bottom: 40 }}>
-          {/* Chart content */}
-        </LineChart>
-      </ResponsiveContainer>
-    }
-    series={[
-      {
-        name: "Series Name",
-        color: "#color",
-        min: value,
-        avg: value,
-        max: value,
-        last: value,
-        unit: "s",
-        isHidden: false,
-        isHighlighted: false,
-        onClick: handleClick
-      }
-    ]}
-  />
-  ```
-
-2. Axes:
-  - Font size: 12px for ticks, 14px for labels
-  - Labels: Inside axes
-  - X-axis: Bottom-aligned, -45° angle for dates
-  - Y-axis: Left-aligned, vertical text
-  - Left margin: 60px minimum to accommodate Y-axis label
-  ```tsx
-  <XAxis 
-    stroke="currentColor"
-    tick={{ fontSize: 12 }}
-    label={{ 
-      value: "Label",
-      position: "insideBottom",
-      offset: -10,
-      style: { fill: "currentColor", fontSize: 14 }
-    }}
-  />
-  <YAxis 
-    stroke="currentColor"
-    tick={{ fontSize: 12 }}
-    label={{ 
-      value: "Label",
-      angle: -90,
-      position: "insideLeft",
-      style: { fill: "currentColor", fontSize: 14 }
-    }}
-  />
-  ```
-
-3. Series Table:
-  - Position: Right side of chart (25% width)
-  - Shows series name and last value only
-  - Min/avg/max values shown in tooltip on hover
-  - Compact layout with small text (text-xs)
-  - Small color indicators (2x2px)
-  - Interactive states:
-    - Normal: Transparent background
-    - Hidden: 50% opacity
-    - Solo visible: Neon ring
-    - Hover: Light background
-  ```tsx
-  <button
-    className={`group w-full px-2 py-1.5 rounded hover:bg-cyber-neon/5 transition-colors ${
-      isHidden ? 'opacity-50' : ''
-    } ${isHighlighted ? 'ring-1 ring-cyber-neon' : ''}`}
-    title={`Min: ${min}${unit}
-Avg: ${avg}${unit}
-Max: ${max}${unit}`}
-  >
-    <div className="flex items-center justify-between gap-2">
-      <div className="flex items-center gap-2 min-w-0">
-        <div className="w-2 h-2 flex-shrink-0" style={{ backgroundColor: color }} />
-        <span className="text-xs font-mono truncate">{name}</span>
-      </div>
-      <div className="text-xs font-mono font-medium whitespace-nowrap">
-        {last}${unit}
-      </div>
-    </div>
-  </button>
-  ```
-
-4. Mobile Responsiveness:
-  - Stack chart and series table vertically on mobile
-  - Maintain readability of axis labels with sufficient margins
-  - Ensure touch targets are large enough (min 32px)
-  - Preserve tooltip functionality for additional data
-
-5. Legend:
-  - Position: Bottom
-  - Height: 60px
-  - Padding: 20px top
-  - Interactive items with hover states
-  ```tsx
-  <Legend 
-    verticalAlign="bottom"
-    height={60}
-    content={renderLegend}
-    wrapperStyle={{ paddingTop: "20px" }}
-  />
-  ```
-
-6. Legend Items:
-  - Rounded pill style
-  - Color indicator line
-  - Interactive states:
-    - Normal: Solid with 33% opacity background
-    - Hidden: 50% opacity, hover to 70%
-    - Solo visible: Neon ring
-  ```tsx
-  <button
-    className={`flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs transition-all ${
-      isHidden ? "opacity-50 hover:opacity-70" : isOnlyVisible ? "ring-1 ring-cyber-neon" : ""
-    }`}
-    style={{
-      backgroundColor: isHidden ? undefined : `${color}33`,
-      borderColor: color,
-      borderWidth: 1
-    }}
-  >
-    <div className="w-4 h-0.5" style={{ background: color }} />
-    <span>{label}</span>
-  </button>
-  ```
-
-7. Interaction Behavior:
-  - Click legend item: Toggle between showing only that item or showing all
-  - Shift+click: Toggle individual items while keeping others unchanged
-  - Hidden items: Remain visible at 20% opacity
-  - Hover states on all interactive elements
-
-8. Lines:
-  - Type: monotone
-  - Stroke width: 2px
-  - No dots
-  - Full opacity (1) when active
-  - 20% opacity when hidden
-  ```tsx
-  <Line
-    type="monotone"
-    strokeWidth={2}
-    dot={false}
-    opacity={isHidden ? 0.2 : 1}
-  />
-  ```
-
-9. Tooltip:
-  - Dark background with neon border
-  - Rounded corners
-  - Consistent formatting
-  ```tsx
-  <Tooltip 
-    contentStyle={{
-      backgroundColor: "rgba(10, 10, 15, 0.95)",
-      border: "1px solid rgba(0, 255, 159, 0.3)",
-      borderRadius: "0.5rem",
-      color: "#00ff9f"
-    }}
-  />
-  ```
-
-10. Reference Lines:
-  - Dashed style (5 2)
-  - 2px width
-  ```tsx
-  <ReferenceLine 
-    strokeWidth={2}
-    strokeDasharray="5 2"
-  />
-  ```
-
-11. Colors:
-  - Use semantic colors from the cyber theme
-  - Maintain consistent color mapping across charts
-  - Use opacity for state changes rather than different colors
-
-12. Percentile Colors:
-  - Maximum/P100: #ff4444 (Warm Red)
-  - P95: #ff8800 (Orange)
-  - P75: #ffcc00 (Yellow)
-  - P50/Median: #00ff9f (Cyber Neon)
-  - P25: #00ffff (Cyber Blue)
-  - P05: #2563eb (Cyber Purple)
-  - Minimum: #9333ea (Deep Purple)
-
-13. Percentile Labels:
-  - Maximum: "Maximum"
-  - P95: "95th Percentile"
-  - P75: "75th Percentile"
-  - P50: "Median"
-  - P25: "25th Percentile"
-  - P05: "5th Percentile"
-  - Minimum: "Minimum" 
+## Best Practices
+1. Always use semantic color classes instead of raw colors
+2. Maintain consistent spacing with Tailwind's spacing scale
+3. Use the predefined animations for interactive elements
+4. Use opacity variants for creating depth
+5. Apply consistent blur effects for layering
+6. Maintain text hierarchy using semantic classes
+7. Keep backgrounds in the root layout for consistency
+8. Use proper mobile navigation patterns with overlays
+9. Ensure smooth transitions between states
+10. Use semantic HTML elements
+11. Ensure interactive elements have proper focus states
+12. Maintain WCAG 2.1 compliant contrast ratios

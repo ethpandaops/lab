@@ -1,26 +1,24 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useContext } from 'react'
 import { SlotView } from '../../components/beacon/SlotView'
-import { NetworkSelector } from '../../components/common/NetworkSelector'
 import { useSearchParams } from 'react-router-dom'
 import { BeaconClockManager } from '../../utils/beacon'
+import { NetworkContext } from '../../App'
 
 function BeaconLive(): JSX.Element {
   const [searchParams, setSearchParams] = useSearchParams()
-  const [network, setNetwork] = useState<string>(() => 
-    searchParams.get('network') || 'mainnet'
-  )
+  const { selectedNetwork, setSelectedNetwork } = useContext(NetworkContext)
   const [currentSlot, setCurrentSlot] = useState<number>()
 
   // Get the BeaconClock for the current network
-  const clock = BeaconClockManager.getInstance().getBeaconClock(network)
-  const headLagSlots = BeaconClockManager.getInstance().getHeadLagSlots(network)
+  const clock = BeaconClockManager.getInstance().getBeaconClock(selectedNetwork)
+  const headLagSlots = BeaconClockManager.getInstance().getHeadLagSlots(selectedNetwork)
 
   // Update URL when network changes
   useEffect(() => {
     const params = new URLSearchParams(searchParams)
-    params.set('network', network)
+    params.set('network', selectedNetwork)
     setSearchParams(params)
-  }, [network, setSearchParams, searchParams])
+  }, [selectedNetwork, setSearchParams, searchParams])
 
   // Initialize and update current slot
   useEffect(() => {
@@ -51,40 +49,16 @@ function BeaconLive(): JSX.Element {
     }
   }
 
-  if (!clock) {
-    return <div>No beacon clock available for network {network}</div>
-  }
-
   return (
     <div className="space-y-6">
-      {/* Page Header */}
-      <div className="relative mb-6">
-        <div className="absolute inset-0 flex items-center">
-          <div className="w-full h-px bg-gradient-to-r from-transparent via-cyber-neon/20 to-transparent" />
-        </div>
-        <div className="relative flex justify-between items-center">
-          <div className="px-4 bg-cyber-darker">
-            <h1 className="text-3xl md:text-4xl font-sans font-black bg-gradient-to-r from-cyber-neon via-cyber-blue to-cyber-pink bg-clip-text text-transparent animate-text-shine">
-              Live Slot View
-            </h1>
-          </div>
-          <div className="px-4 bg-cyber-darker">
-            <NetworkSelector
-              selectedNetwork={network}
-              onNetworkChange={setNetwork}
-              className="w-48"
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* Slot View */}
-      <SlotView
-        slot={currentSlot}
-        network={network}
-        isLive={true}
-        onSlotComplete={handleSlotComplete}
-      />
+      {currentSlot !== undefined && (
+        <SlotView
+          slot={currentSlot}
+          network={selectedNetwork}
+          isLive={true}
+          onSlotComplete={handleSlotComplete}
+        />
+      )}
     </div>
   )
 }

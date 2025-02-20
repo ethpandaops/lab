@@ -100,7 +100,7 @@ const SidebarContent = () => {
   const location = useLocation()
 
   return (
-    <div className="flex grow flex-col gap-y-5 backdrop-blur-md border-r border-white/5 px-6 pb-4">
+    <div className="flex grow flex-col gap-y-5 backdrop-blur-md -r -white/5 px-6 pb-4">
       <nav className="flex flex-1 flex-col pt-4">
         <ul role="list" className="flex flex-1 flex-col gap-y-7">
           {sidebarItems.map((section) => (
@@ -128,7 +128,7 @@ const SidebarContent = () => {
                                 to={item.path}
                                 className={`group flex gap-x-3 rounded-md p-2 text-sm leading-6 transition-all
                                   ${isActive
-                                    ? 'text-accent bg-cyan-500/10 border border-cyan-500/50'
+                                    ? 'text-accent bg-cyan-500/10  -cyan-500/50'
                                     : 'text-primary hover:text-accent hover:bg-cyan-500/10'
                                   }`}
                               >
