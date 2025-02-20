@@ -5,13 +5,19 @@ WORKDIR /app
 # Install build dependencies
 RUN apt-get update && apt-get install -y \
     gcc \
+    python3-dev \
+    python3-setuptools \
+    python3-wheel \
+    python3-pip \
+    build-essential \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy requirements
 COPY requirements.txt ./
 
-# Install dependencies
-RUN pip install -r requirements.txt
+# Install dependencies with forced source build for clickhouse-driver
+RUN pip install --upgrade pip && \
+    pip install --no-binary clickhouse-driver -r requirements.txt
 
 # Copy source code and config
 COPY lab/ ./lab/

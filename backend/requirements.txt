@@ -9,8 +9,8 @@ tenacity==8.2.3
 tinydb==4.8.0
 pandas==2.2.0
 numpy==1.26.3
-sqlalchemy==2.0.25
-clickhouse-driver==0.2.0
+sqlalchemy==1.4.50
+clickhouse-driver==0.2.6
 clickhouse-sqlalchemy==0.2.4
 
 # Dev dependencies
