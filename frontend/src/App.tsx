@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, Outlet } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { createContext, useEffect, useState } from 'react'
 import { getConfig } from './config'
@@ -14,13 +14,14 @@ import Networks from './pages/xatu/networks';
 import ContributorsList from './pages/xatu/ContributorsList';
 import ContributorDetail from './pages/xatu/ContributorDetail';
 import Layout from './components/layout/Layout';
-import { BeaconChainTimings } from './pages/beacon-chain-timings';
-import { BlockTimings } from './pages/beacon-chain-timings/blocks';
+import { BeaconChainTimings } from './pages/beacon/timings';
+import { BlockTimings } from './pages/beacon/timings/blocks';
 import { Beacon } from './pages/beacon';
 import { BeaconLive } from './pages/beacon/live';
 import { BeaconSlot } from './pages/beacon/slot';
 import Experiments from './pages/Experiments';
 import MaintenanceOverlay from './components/common/MaintenanceOverlay';
+import { SlotLookup } from './pages/beacon/slot/index';
 
 // Create contexts
 export const ConfigContext = createContext<Config | null>(null)
@@ -90,12 +91,15 @@ function App() {
 								<Route path="contributors" element={<ContributorsList />} />
 								<Route path="contributors/:name" element={<ContributorDetail />} />
 							</Route>
-							<Route path="beacon-chain-timings" element={<BeaconChainTimings />}>
-								<Route path="blocks" element={<BlockTimings />} />
-							</Route>
 							<Route path="beacon" element={<Beacon />}>
-								<Route path="live" element={<BeaconLive />} />
-								<Route path=":slot" element={<BeaconSlot />} />
+								<Route path="slot" element={<Outlet />}>
+									<Route index element={<SlotLookup />} />
+									<Route path="live" element={<BeaconLive />} />
+									<Route path=":slot" element={<BeaconSlot />} />
+								</Route>
+								<Route path="timings" element={<BeaconChainTimings />}>
+									<Route path="blocks" element={<BlockTimings />} />
+								</Route>
 							</Route>
 						</Route>
 					</Routes>

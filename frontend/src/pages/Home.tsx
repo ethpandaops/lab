@@ -14,10 +14,8 @@ function Home(): JSX.Element {
               <div className="absolute -inset-1 bg-accent/10 blur-2xl rounded-full" />
             </span>
           </h1>
-          <p className="text-2xl md:text-3xl font-mono text-primary/90">
+          <p className="text-l md:text-3xl font-mono text-primary/90 italic">
             Let the pandas cook{' '}
-            <span className="inline-block animate-bounce">🐼</span>
-            <span className="inline-block animate-pulse">👨‍🍳</span>
           </p>
           
           {/* CTA Button */}
@@ -40,7 +38,7 @@ function Home(): JSX.Element {
               <h2 className="text-xl font-sans font-bold text-tertiary">Featured Experiment</h2>
             </div>
           </div>
-          <div className="relative">
+          <div className="relative px-4">
             <Link 
               to="/xatu/community-nodes" 
               className="relative block w-full bg-surface/80 backdrop-blur-sm border border-accent/20 hover:border-accent p-6 group transition-all duration-300 hover:bg-surface/90 cursor-pointer rounded-lg hover:shadow-lg hover:shadow-accent/5"

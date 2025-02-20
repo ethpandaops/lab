@@ -1,6 +1,6 @@
 import { Link, Outlet, useLocation } from 'react-router-dom'
 import { ArrowRight } from 'lucide-react'
-import { AboutThisData } from '../../components/common/AboutThisData'
+import { AboutThisData } from '../../../components/common/AboutThisData'
 
 function BeaconChainTimings(): JSX.Element {
   const location = useLocation()

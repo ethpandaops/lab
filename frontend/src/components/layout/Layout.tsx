@@ -24,6 +24,11 @@ function Layout(): JSX.Element {
     color: '#627EEA'
   }
 
+  // Close mobile menu on route change
+  useEffect(() => {
+    setIsMobileMenuOpen(false)
+  }, [location])
+
   // Update slot and epoch every second
   useEffect(() => {
     const clock = BeaconClockManager.getInstance().getBeaconClock(selectedNetwork)
@@ -93,11 +98,11 @@ function Layout(): JSX.Element {
 
             {/* Mobile Network Display */}
             <div className="lg:hidden flex flex-col items-end">
-              <div className="flex items-center gap-2">
-                <span className="flex items-center justify-center">
+              <div className="flex flex-col items-center gap-1">
+                <span className="flex items-center justify-center w-8 h-8">
                   {selectedMetadata.icon}
                 </span>
-                <span className="text-[10px] font-medium text-tertiary">{selectedMetadata.name}</span>
+                <span className="text-xs font-medium text-tertiary">{selectedMetadata.name}</span>
               </div>
             </div>
           </div>

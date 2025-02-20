@@ -24,18 +24,20 @@ export const breadcrumbs = [
     ],
   },
   {
-    name: 'Beacon Chain',
-    path: '/beacon-chain-timings',
-    children: [
-      { name: 'Blocks', path: '/beacon-chain-timings/blocks' },
-    ],
-  },
-  {
     name: 'Beacon',
     path: '/beacon',
     children: [
-      { name: 'Live View', path: '/beacon/live' },
-      { name: 'Slot :slot', path: '/beacon/:slot' },
+      { name: 'Slot', path: '/beacon/slot',
+        children: [
+          { name: 'Live View', path: '/beacon/slot/live' },
+          { name: ':slot', path: '/beacon/slot/:slot' }
+        ]
+      },
+      { name: 'Timings', path: '/beacon/timings',
+        children: [
+          { name: 'Blocks', path: '/beacon/timings/blocks' }
+        ]
+      }
     ],
   },
 ];
