@@ -6,13 +6,23 @@ import { useContext, useEffect, useState } from 'react'
 import { NetworkContext } from '../../App'
 import { Logo } from './Logo'
 import { BeaconClockManager } from '../../utils/beacon'
+import { Menu, X } from 'lucide-react'
+import { NETWORK_METADATA, type NetworkKey } from '../../constants/networks'
 
 function Layout(): JSX.Element {
   const location = useLocation()
   const isHome = location.pathname === '/'
-  const { selectedNetwork, setSelectedNetwork, availableNetworks } = useContext(NetworkContext)
+  const { selectedNetwork, setSelectedNetwork } = useContext(NetworkContext)
   const [currentSlot, setCurrentSlot] = useState<number | null>(null)
   const [currentEpoch, setCurrentEpoch] = useState<number | null>(null)
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+
+  // Get network metadata
+  const selectedMetadata = NETWORK_METADATA[selectedNetwork as NetworkKey] || {
+    name: selectedNetwork.charAt(0).toUpperCase() + selectedNetwork.slice(1),
+    icon: '🔥',
+    color: '#627EEA'
+  }
 
   // Update slot and epoch every second
   useEffect(() => {
@@ -46,14 +56,21 @@ function Layout(): JSX.Element {
         {/* Header Section */}
         <header className="sticky top-0 z-50 backdrop-blur-md bg-nav/80 border-b border-subtle">
           {/* Top Bar */}
-          <div className="container mx-auto px-4 py-2 2xl:px-0 flex items-center">
-            {/* Left */}
-            <div className="w-1/3">
+          <div className="container mx-auto px-4 py-2 2xl:px-0 flex items-center justify-between">
+            {/* Left - Logo and Mobile Menu */}
+            <div className="flex items-center gap-4">
+              <button
+                type="button"
+                className="lg:hidden text-primary hover:text-accent"
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              >
+                <Menu className="h-6 w-6" />
+              </button>
               <Logo />
             </div>
             
-            {/* Center */}
-            <div className="w-1/3 flex justify-center">
+            {/* Center - Network Selector (hidden on mobile) */}
+            <div className="hidden lg:flex justify-center">
               <NetworkSelector
                 selectedNetwork={selectedNetwork}
                 onNetworkChange={setSelectedNetwork}
@@ -61,8 +78,8 @@ function Layout(): JSX.Element {
               />
             </div>
 
-            {/* Right */}
-            <div className="w-1/3 flex justify-end">
+            {/* Right - Slot/Epoch Info (hidden on mobile) */}
+            <div className="hidden lg:flex justify-end">
               {currentSlot !== null && currentEpoch !== null && (
                 <div className="text-sm font-mono">
                   <span className="text-tertiary">Slot </span>
@@ -73,16 +90,91 @@ function Layout(): JSX.Element {
                 </div>
               )}
             </div>
+
+            {/* Mobile Network Display */}
+            <div className="lg:hidden flex flex-col items-end">
+              <div className="flex items-center gap-2">
+                <span className="flex items-center justify-center">
+                  {selectedMetadata.icon}
+                </span>
+                <span className="text-[10px] font-medium text-tertiary">{selectedMetadata.name}</span>
+              </div>
+            </div>
           </div>
 
-          {/* Navigation Bar */}
+          {/* Navigation Bar (desktop only) */}
           {!isHome && (
-            <div className="container mx-auto px-4 py-2 2xl:px-0 flex items-center justify-between border-t border-subtle">
-              <Breadcrumbs />
-              <Navigation />
+            <div className="hidden lg:block container mx-auto px-4 py-2 2xl:px-0 border-t border-subtle">
+              <div className="flex items-center justify-between">
+                <Breadcrumbs />
+                <Navigation />
+              </div>
             </div>
           )}
         </header>
+
+        {/* Mobile Navigation Sidebar */}
+        <div
+          className={`fixed inset-0 z-40 lg:hidden transition-opacity duration-300 ${
+            isMobileMenuOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
+          }`}
+          style={{ top: '56px' }}
+        >
+          {/* Backdrop */}
+          <div
+            className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+            onClick={() => setIsMobileMenuOpen(false)}
+          />
+          
+          {/* Sidebar */}
+          <div
+            className={`absolute top-0 left-0 w-72 h-[calc(100vh-56px)] bg-nav/95 backdrop-blur-md border-r border-subtle transform transition-transform duration-300 ${
+              isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
+            }`}
+          >
+            <div className="flex flex-col h-full">
+              {/* Network Selector */}
+              <div className="p-4 border-b border-subtle">
+                <NetworkSelector
+                  selectedNetwork={selectedNetwork}
+                  onNetworkChange={setSelectedNetwork}
+                  className="w-full"
+                />
+              </div>
+
+              {/* Mobile Navigation Content */}
+              <div className="flex-1 overflow-y-auto">
+                <div className="px-4 space-y-6 py-4">
+                  {/* Breadcrumbs */}
+                  {!isHome && (
+                    <div className="pb-4 border-b border-subtle">
+                      <Breadcrumbs className="text-xs" />
+                    </div>
+                  )}
+
+                  {/* Navigation */}
+                  <Navigation showLinks={true} />
+                </div>
+              </div>
+
+              {/* Footer Info */}
+              {currentSlot !== null && currentEpoch !== null && (
+                <div className="mt-auto p-4 border-t border-subtle bg-surface/50">
+                  <div className="text-sm font-mono space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-tertiary">Slot</span>
+                      <span className="text-primary font-medium">{currentSlot}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-tertiary">Epoch</span>
+                      <span className="text-primary font-medium">{currentEpoch}</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
 
         {/* Main Content */}
         <main className={`flex-1 ${isHome ? '' : 'container mx-auto py-6 px-4 2xl:px-0'}`}>

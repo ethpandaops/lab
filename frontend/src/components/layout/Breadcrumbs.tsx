@@ -79,12 +79,16 @@ function findActivePath(pathname: string, items: NavItem[]): NavItem[] {
   return [];
 }
 
-export function Breadcrumbs(): JSX.Element {
+interface BreadcrumbsProps {
+  className?: string;
+}
+
+export function Breadcrumbs({ className = '' }: BreadcrumbsProps): JSX.Element {
   const location = useLocation();
   const pathnames = location.pathname.split('/').filter(Boolean);
 
   return (
-    <nav className="flex items-center gap-2 text-sm font-mono">
+    <nav className={`flex flex-wrap items-center gap-2 text-sm font-mono ${className}`}>
       <Link
         to="/"
         className="text-tertiary hover:text-primary transition-colors"

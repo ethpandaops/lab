@@ -11,7 +11,7 @@ export function Navigation({ showLinks = true }: NavigationProps): JSX.Element {
 
   const linkClasses = (path: string) => {
     const isActive = location.pathname === path
-    return `flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+    return `flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors w-full ${
       isActive
         ? 'bg-active text-accent'
         : 'hover:bg-hover text-primary hover:text-accent'
@@ -23,7 +23,7 @@ export function Navigation({ showLinks = true }: NavigationProps): JSX.Element {
   }
 
   return (
-    <nav className="flex items-center gap-4">
+    <nav className="flex lg:flex-row flex-col lg:items-center gap-2">
       <Link to="/" className={linkClasses('/')}>
         <HomeIcon className="w-4 h-4" />
         Home
