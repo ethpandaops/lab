@@ -6,6 +6,7 @@ import { formatDistanceToNow } from 'date-fns';
 import { XatuCallToAction } from '../../components/xatu/XatuCallToAction';
 import { useContext } from 'react';
 import { ConfigContext } from '../../App';
+import { NETWORK_METADATA, type NetworkKey } from '../../constants/networks';
 
 interface ContributorNode {
   network: string;
@@ -31,34 +32,6 @@ type NetworkNodes = Record<string, ContributorNode[]>;
 
 const NETWORK_ORDER = ['mainnet', 'holesky', 'sepolia'];
 const OFFLINE_THRESHOLD = 3600; // 1 hour in seconds
-
-const NETWORK_METADATA = {
-  mainnet: {
-    name: 'Mainnet',
-    icon: (
-      <svg width="20" height="20" viewBox="0 0 784 784" fill="none">
-        <circle cx="392" cy="392" r="392" fill="#627EEA" fillOpacity="0.1" />
-        <path d="M392.07 92.5L387.9 105.667V525.477L392.07 529.647L586.477 413.42L392.07 92.5Z" fill="#627EEA" />
-        <path d="M392.07 92.5L197.666 413.42L392.07 529.647V324.921V92.5Z" fill="#627EEA" />
-        <path d="M392.07 572.834L389.706 575.668V726.831L392.07 733.5L586.607 456.679L392.07 572.834Z" fill="#627EEA" />
-        <path d="M392.07 733.5V572.834L197.666 456.679L392.07 733.5Z" fill="#627EEA" />
-        <path d="M392.07 529.647L586.477 413.42L392.07 324.921V529.647Z" fill="#627EEA" />
-        <path d="M197.666 413.42L392.07 529.647V324.921L197.666 413.42Z" fill="#627EEA" />
-      </svg>
-    ),
-    color: '#627EEA',
-  },
-  sepolia: {
-    name: 'Sepolia',
-    icon: '🐬',
-    color: '#CFB5F0',
-  },
-  holesky: {
-    name: 'Holesky',
-    icon: '🐱',
-    color: '#A4E887',
-  },
-} as const;
 
 // Function to generate a deterministic color from a string
 const stringToColor = (str: string) => {
@@ -147,25 +120,11 @@ function ContributorDetail(): JSX.Element {
     <div className="space-y-8">
       <XatuCallToAction />
 
-      {/* Page Header */}
-      <div className="relative">
-        <div className="absolute inset-0 flex items-center">
-          <div className="w-full h-px bg-gradient-to-r from-transparent via-cyber-neon/20 to-transparent" />
-        </div>
-        <div className="relative flex justify-center">
-          <div className="px-4 bg-cyber-darker">
-            <h1 className="text-3xl md:text-4xl font-sans font-black bg-gradient-to-r from-cyber-neon via-cyber-blue to-cyber-pink bg-clip-text text-transparent animate-text-shine">
-              {contributor.name}
-            </h1>
-          </div>
-        </div>
-      </div>
-
       {/* Contributor Overview */}
-      <div className="backdrop-blur-sm rounded-lg border border-cyber-neon/10 hover:border-cyber-neon/20 p-6 transition-all">
+      <div className="backdrop-blur-sm border border-subtle hover:border-default p-6 transition-all">
         <div className="flex items-start gap-6">
           <div 
-            className="w-20 h-20 rounded-lg flex items-center justify-center text-2xl font-mono font-bold text-cyber-darker shadow-neon transition-transform hover:scale-105"
+            className="w-20 h-20  flex items-center justify-center text-2xl font-mono font-bold text-base shadow-neon transition-transform hover:scale-105"
             style={{ 
               backgroundColor: avatarColor,
               boxShadow: `0 0 20px ${avatarColor}10`,
@@ -174,31 +133,31 @@ function ContributorDetail(): JSX.Element {
             {initials}
           </div>
           <div className="flex-1">
-            <div className="text-sm font-mono text-cyber-neon/70 mb-4">
+            <div className="text-sm font-mono text-tertiary mb-4">
               Last updated{' '}
               <span 
                 title={new Date(contributor.updated_at * 1000).toString()}
-                className="text-cyber-neon cursor-help border-b border-cyber-neon/30"
+                className="text-primary cursor-help -b -prominent"
               >
                 {formatDistanceToNow(new Date(contributor.updated_at * 1000), { addSuffix: true })}
               </span>
             </div>
             <div className="flex flex-wrap gap-3">
               {sortedNetworks.map(([network, nodes]) => {
-                const metadata = NETWORK_METADATA[network as keyof typeof NETWORK_METADATA] || {
+                const metadata = NETWORK_METADATA[network as NetworkKey] || {
                   name: network.charAt(0).toUpperCase() + network.slice(1),
                   icon: '🔥',
                 };
                 return (
                   <div 
                     key={network} 
-                    className="flex items-center gap-2 backdrop-blur-sm rounded-lg border border-cyber-neon/10 px-3 py-1.5 text-sm font-mono hover:border-cyber-neon/20 transition-all"
+                    className="flex items-center gap-2 backdrop-blur-sm   -subtle px-3 py-1.5 text-sm font-mono hover:-default transition-all"
                   >
                     <span className="w-5 h-5 flex items-center justify-center">
                       {metadata.icon}
                     </span>
-                    <span className="text-cyber-neon/90">{metadata.name}</span>
-                    <span className="text-cyber-blue font-medium">{nodes.length} nodes</span>
+                    <span className="text-primary/90">{metadata.name}</span>
+                    <span className="text-accent font-medium">{nodes.length} nodes</span>
                   </div>
                 );
               })}
@@ -210,7 +169,7 @@ function ContributorDetail(): JSX.Element {
       {/* Network Sections */}
       <div className="space-y-8">
         {sortedNetworks.map(([network, nodes]) => {
-          const metadata = NETWORK_METADATA[network as keyof typeof NETWORK_METADATA] || {
+          const metadata = NETWORK_METADATA[network as NetworkKey] || {
             name: network.charAt(0).toUpperCase() + network.slice(1),
             icon: '🔥',
           };
@@ -220,7 +179,7 @@ function ContributorDetail(): JSX.Element {
                 <div className="w-6 h-6 flex items-center justify-center">
                   {metadata.icon}
                 </div>
-                <h2 className="text-xl font-sans font-bold text-cyber-neon">
+                <h2 className="text-xl font-sans font-bold text-primary">
                   {metadata.name}
                 </h2>
               </div>
@@ -231,10 +190,10 @@ function ContributorDetail(): JSX.Element {
                   return (
                     <div
                       key={node.client_name}
-                      className={`backdrop-blur-sm rounded-lg border p-4 transition-all ${
+                      className={`backdrop-blur-sm border p-4 transition-all ${
                         offline 
-                          ? 'border-cyber-pink/30 hover:border-cyber-pink/50' 
-                          : 'border-cyber-neon/10 hover:border-cyber-neon/30 hover:bg-cyber-neon/5'
+                          ? 'border-error/30 hover:border-error/50' 
+                          : 'border-subtle hover:border-prominent hover:bg-hover'
                       }`}
                     >
                       <div className="flex items-center gap-3 mb-4">
@@ -248,10 +207,10 @@ function ContributorDetail(): JSX.Element {
                           }}
                         />
                         <div className="min-w-0">
-                          <div className="font-mono font-medium text-cyber-neon truncate">
+                          <div className="font-mono font-medium text-primary truncate">
                             {shortName}
                           </div>
-                          <div className="text-sm font-mono text-cyber-neon/70">
+                          <div className="text-sm font-mono text-tertiary">
                             {capitalizeWords(node.consensus_client)}
                             {' '}
                             ({node.consensus_version})
@@ -261,20 +220,20 @@ function ContributorDetail(): JSX.Element {
 
                       <div className="space-y-2 text-sm font-mono">
                         <div className="flex justify-between">
-                          <span className="text-cyber-neon/70">Status</span>
-                          <span className={offline ? 'text-cyber-pink' : 'text-cyber-neon'}>
+                          <span className="text-tertiary">Status</span>
+                          <span className={offline ? 'text-error' : 'text-primary'}>
                             {offline ? 'Offline' : 'Online'}
                           </span>
                         </div>
                         <div className="flex justify-between">
-                          <span className="text-cyber-neon/70">Location</span>
-                          <span className="text-cyber-neon/90">
+                          <span className="text-tertiary">Location</span>
+                          <span className="text-primary/90">
                             {[node.city, node.country, node.continent].filter(Boolean).join(', ')}
                           </span>
                         </div>
                         <div className="flex justify-between">
-                          <span className="text-cyber-neon/70">Implementation</span>
-                          <span className="text-cyber-neon/90">
+                          <span className="text-tertiary">Implementation</span>
+                          <span className="text-primary/90">
                             {node.client_implementation} ({node.client_version})
                           </span>
                         </div>

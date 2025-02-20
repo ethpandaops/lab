@@ -25,7 +25,7 @@ const socialLinks = [
 
 export const Header = ({ onToggleSidebar }: HeaderProps) => {
   return (
-    <header className="bg-white border-b border-gray-200">
+    <header className="bg-white -b -gray-200">
       <div className="h-16 px-4 sm:px-6 lg:px-8">
         <div className="flex h-full items-center justify-between">
           <div className="flex items-center">

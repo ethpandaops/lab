@@ -23,7 +23,7 @@ export const ErrorState = ({
       {retry && (
         <button
           onClick={retry}
-          className="mt-4 px-4 py-2 text-sm font-medium text-primary bg-indigo-600 hover:bg-indigo-700 rounded-lg transition-colors"
+          className="mt-4 px-4 py-2 text-sm font-medium text-primary bg-indigo-600 hover:bg-indigo-700  transition-colors"
         >
           Try Again
         </button>

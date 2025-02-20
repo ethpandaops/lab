@@ -120,34 +120,20 @@ function Xatu(): JSX.Element {
     <div className="space-y-6" ref={containerReference}>
       <XatuCallToAction />
 
-      {/* Page Header */}
-      <div className="relative">
-        <div className="absolute inset-0 flex items-center">
-          <div className="w-full h-px bg-gradient-to-r from-transparent via-cyber-neon/20 to-transparent" />
-        </div>
-        <div className="relative flex justify-center">
-          <div className="px-4 bg-cyber-darker">
-            <h1 className="text-3xl md:text-4xl font-sans font-black bg-gradient-to-r from-cyber-neon via-cyber-blue to-cyber-pink bg-clip-text text-transparent animate-text-shine">
-              Xatu
-            </h1>
-          </div>
-        </div>
-      </div>
-
       {/* Overview Section */}
-      <div className="backdrop-blur-md rounded-lg border border-cyber-neon/20 p-6 bg-cyber-dark/80">
+      <div className="backdrop-blur-md   -default p-6 bg-surface/80">
         <div className="flex flex-col mb-6">
-          <h2 className="text-2xl font-sans font-bold text-cyber-neon mb-2">Overview</h2>
-          <span className="text-sm font-mono text-cyber-neon/85">
+          <h2 className="text-2xl font-sans font-bold text-primary mb-2">Overview</h2>
+          <span className="text-sm font-mono text-secondary">
             Last 24h · Updated{' '}
             <span 
               title={new Date(summaryData.updated_at * MS_PER_SECOND).toString()}
-              className="cursor-help border-b border-dotted border-cyber-neon/50 hover:border-cyber-neon/70 transition-colors"
+              className="cursor-help -b -dotted -primary/50 hover:-primary/70 transition-colors"
             >
               {formatDistanceToNow(new Date(summaryData.updated_at * MS_PER_SECOND), { addSuffix: true })}
             </span>
           </span>
-          <p className="text-base font-mono text-cyber-neon/85 mt-4">
+          <p className="text-base font-mono text-secondary mt-4">
             This data shows nodes sending data to ethPandaOps. While we run our own nodes, community-contributed data is most valuable.
           </p>
         </div>
@@ -155,7 +141,7 @@ function Xatu(): JSX.Element {
         {/* Globe and Summary Stats */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
           {/* Globe */}
-          <div className="lg:col-span-2 backdrop-blur-md rounded-lg border border-cyber-neon/20 bg-cyber-dark/90 p-4">
+          <div className="lg:col-span-2 backdrop-blur-md   -default bg-surface/90 p-4">
             <GlobeViz 
               data={globeData} 
               width={Math.max((containerWidth * GLOBE_WIDTH_SCALE) - GLOBE_PADDING, GLOBE_MIN_WIDTH)} 
@@ -166,30 +152,30 @@ function Xatu(): JSX.Element {
           {/* Summary Stats */}
           <div className="flex items-center justify-center">
             <div className="grid grid-cols-2 gap-4 w-full max-w-lg">
-              <div className="backdrop-blur-md rounded-lg border border-cyber-neon/20 bg-cyber-dark/90 hover:border-cyber-neon/30 hover:bg-cyber-neon/5 p-4 flex flex-col h-28 transition-all duration-300">
-                <div className="text-cyber-neon/70 text-xs font-mono uppercase tracking-wider text-left">Total Nodes</div>
-                <div className="text-3xl font-mono font-bold text-cyber-neon mt-2 text-center flex-grow flex items-center justify-center">
+              <div className="backdrop-blur-md   -default bg-surface/90 hover:-prominent hover:bg-hover p-4 flex flex-col h-28 transition-all duration-300">
+                <div className="text-tertiary text-xs font-mono uppercase tracking-wider text-left">Total Nodes</div>
+                <div className="text-3xl font-mono font-bold text-primary mt-2 text-center flex-grow flex items-center justify-center">
                   {totalNodes.toLocaleString()}
                 </div>
               </div>
 
-              <div className="backdrop-blur-md rounded-lg border border-cyber-neon/20 bg-cyber-dark/90 hover:border-cyber-neon/30 hover:bg-cyber-neon/5 p-4 flex flex-col h-28 transition-all duration-300">
-                <div className="text-cyber-neon/70 text-xs font-mono uppercase tracking-wider text-left">Networks</div>
-                <div className="text-3xl font-mono font-bold text-cyber-neon mt-2 text-center flex-grow flex items-center justify-center">
+              <div className="backdrop-blur-md   -default bg-surface/90 hover:-prominent hover:bg-hover p-4 flex flex-col h-28 transition-all duration-300">
+                <div className="text-tertiary text-xs font-mono uppercase tracking-wider text-left">Networks</div>
+                <div className="text-3xl font-mono font-bold text-primary mt-2 text-center flex-grow flex items-center justify-center">
                   {Object.keys(summaryData.networks).length}
                 </div>
               </div>
 
-              <div className="backdrop-blur-md rounded-lg border border-cyber-neon/20 bg-cyber-dark/90 hover:border-cyber-neon/30 hover:bg-cyber-neon/5 p-4 flex flex-col h-28 transition-all duration-300">
-                <div className="text-cyber-neon/70 text-xs font-mono uppercase tracking-wider text-left">Public Nodes</div>
-                <div className="text-3xl font-mono font-bold text-cyber-neon mt-2 text-center flex-grow flex items-center justify-center">
+              <div className="backdrop-blur-md   -default bg-surface/90 hover:-prominent hover:bg-hover p-4 flex flex-col h-28 transition-all duration-300">
+                <div className="text-tertiary text-xs font-mono uppercase tracking-wider text-left">Public Nodes</div>
+                <div className="text-3xl font-mono font-bold text-primary mt-2 text-center flex-grow flex items-center justify-center">
                   {totalPublicNodes.toLocaleString()}
                 </div>
               </div>
 
-              <div className="backdrop-blur-md rounded-lg border border-cyber-neon/20 bg-cyber-dark/90 hover:border-cyber-neon/30 hover:bg-cyber-neon/5 p-4 flex flex-col h-28 transition-all duration-300">
-                <div className="text-cyber-neon/70 text-xs font-mono uppercase tracking-wider text-left">Countries</div>
-                <div className="text-3xl font-mono font-bold text-cyber-neon mt-2 text-center flex-grow flex items-center justify-center">
+              <div className="backdrop-blur-md   -default bg-surface/90 hover:-prominent hover:bg-hover p-4 flex flex-col h-28 transition-all duration-300">
+                <div className="text-tertiary text-xs font-mono uppercase tracking-wider text-left">Countries</div>
+                <div className="text-3xl font-mono font-bold text-primary mt-2 text-center flex-grow flex items-center justify-center">
                   {Object.keys(summaryData.networks.mainnet.countries).length}
                 </div>
               </div>
@@ -201,49 +187,91 @@ function Xatu(): JSX.Element {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <Link 
             to="contributors" 
-            className="group backdrop-blur-md rounded-lg border border-cyber-neon/20 bg-cyber-dark/90 hover:border-cyber-neon/30 hover:bg-cyber-neon/5 p-6 transition-all duration-300"
+            className="group relative backdrop-blur-md bg-surface/80 border border-subtle hover:border-accent rounded-lg overflow-hidden transition-all duration-300"
           >
-            <div className="flex gap-6 items-start">
-              <div className="flex-shrink-0 text-4xl mt-0.5">👥</div>
-              <div className="flex flex-col flex-grow">
-                <h3 className="text-xl font-sans font-bold text-cyber-neon group-hover:text-cyber-blue transition-colors">Contributors</h3>
-                <p className="text-sm font-mono text-cyber-neon/85">View information about the individual contributors</p>
+            <div className="absolute inset-0 bg-gradient-to-br from-accent/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+            
+            <div className="relative p-6">
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center flex-shrink-0">
+                  <span className="text-2xl">👥</span>
+                </div>
+
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-lg font-sans font-bold text-primary group-hover:text-accent transition-colors mb-1">
+                    Contributors
+                  </h3>
+                  <p className="text-sm font-mono text-tertiary truncate">
+                    View contributor information
+                  </p>
+                </div>
+
+                <ArrowRight className="w-5 h-5 text-accent/50 group-hover:text-accent group-hover:translate-x-1 transition-all duration-300" />
               </div>
-            </div>
-            <div className="mt-6 flex justify-end">
-              <ArrowRight className="w-6 h-6 text-cyber-neon/50 group-hover:text-cyber-blue group-hover:translate-x-1 transition-all duration-300" />
+
+              <p className="text-sm font-mono text-secondary group-hover:text-primary/90 transition-colors mt-4">
+                Explore detailed information about individual contributors and their nodes
+              </p>
             </div>
           </Link>
 
           <Link 
             to="networks" 
-            className="group backdrop-blur-md rounded-lg border border-cyber-neon/20 bg-cyber-dark/90 hover:border-cyber-neon/30 hover:bg-cyber-neon/5 p-6 transition-all duration-300"
+            className="group relative backdrop-blur-md bg-surface/80 border border-subtle hover:border-accent rounded-lg overflow-hidden transition-all duration-300"
           >
-            <div className="flex gap-6 items-start">
-              <div className="flex-shrink-0 text-4xl mt-0.5">🌐</div>
-              <div className="flex flex-col flex-grow">
-                <h3 className="text-xl font-sans font-bold text-cyber-neon group-hover:text-cyber-blue transition-colors">Networks</h3>
-                <p className="text-sm font-mono text-cyber-neon/85">Explore the networks in the Xatu dataset</p>
+            <div className="absolute inset-0 bg-gradient-to-br from-accent/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+            
+            <div className="relative p-6">
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center flex-shrink-0">
+                  <span className="text-2xl">🌐</span>
+                </div>
+
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-lg font-sans font-bold text-primary group-hover:text-accent transition-colors mb-1">
+                    Networks
+                  </h3>
+                  <p className="text-sm font-mono text-tertiary truncate">
+                    Network statistics
+                  </p>
+                </div>
+
+                <ArrowRight className="w-5 h-5 text-accent/50 group-hover:text-accent group-hover:translate-x-1 transition-all duration-300" />
               </div>
-            </div>
-            <div className="mt-6 flex justify-end">
-              <ArrowRight className="w-6 h-6 text-cyber-neon/50 group-hover:text-cyber-blue group-hover:translate-x-1 transition-all duration-300" />
+
+              <p className="text-sm font-mono text-secondary group-hover:text-primary/90 transition-colors mt-4">
+                Explore metrics and data across different Ethereum networks
+              </p>
             </div>
           </Link>
 
           <Link 
             to="community-nodes" 
-            className="group backdrop-blur-md rounded-lg border border-cyber-neon/20 bg-cyber-dark/90 hover:border-cyber-neon/30 hover:bg-cyber-neon/5 p-6 transition-all duration-300"
+            className="group relative backdrop-blur-md bg-surface/80 border border-subtle hover:border-accent rounded-lg overflow-hidden transition-all duration-300"
           >
-            <div className="flex gap-6 items-start">
-              <div className="flex-shrink-0 text-4xl mt-0.5">🖥️</div>
-              <div className="flex flex-col flex-grow">
-                <h3 className="text-xl font-sans font-bold text-cyber-neon group-hover:text-cyber-blue transition-colors">Community Nodes</h3>
-                <p className="text-sm font-mono text-cyber-neon/85">Explore the community nodes in the dataset</p>
+            <div className="absolute inset-0 bg-gradient-to-br from-accent/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+            
+            <div className="relative p-6">
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center flex-shrink-0">
+                  <span className="text-2xl">🖥️</span>
+                </div>
+
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-lg font-sans font-bold text-primary group-hover:text-accent transition-colors mb-1">
+                    Community Nodes
+                  </h3>
+                  <p className="text-sm font-mono text-tertiary truncate">
+                    Node distribution data
+                  </p>
+                </div>
+
+                <ArrowRight className="w-5 h-5 text-accent/50 group-hover:text-accent group-hover:translate-x-1 transition-all duration-300" />
               </div>
-            </div>
-            <div className="mt-6 flex justify-end">
-              <ArrowRight className="w-6 h-6 text-cyber-neon/50 group-hover:text-cyber-blue group-hover:translate-x-1 transition-all duration-300" />
+
+              <p className="text-sm font-mono text-secondary group-hover:text-primary/90 transition-colors mt-4">
+                View detailed information about community-contributed nodes
+              </p>
             </div>
           </Link>
         </div>

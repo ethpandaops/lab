@@ -1,6 +1,7 @@
 # State files
 state/
 backend/state/
+config.yaml
 
 # Python
 __pycache__/

@@ -24,10 +24,20 @@ export const breadcrumbs = [
     ],
   },
   {
-    name: 'Beacon Chain',
-    path: '/beacon-chain-timings',
+    name: 'Beacon',
+    path: '/beacon',
     children: [
-      { name: 'Blocks', path: '/beacon-chain-timings/blocks' },
+      { name: 'Slot', path: '/beacon/slot',
+        children: [
+          { name: 'Live View', path: '/beacon/slot/live' },
+          { name: ':slot', path: '/beacon/slot/:slot' }
+        ]
+      },
+      { name: 'Timings', path: '/beacon/timings',
+        children: [
+          { name: 'Blocks', path: '/beacon/timings/blocks' }
+        ]
+      }
     ],
   },
 ];
@@ -71,15 +81,19 @@ function findActivePath(pathname: string, items: NavItem[]): NavItem[] {
   return [];
 }
 
-export function Breadcrumbs(): JSX.Element {
+interface BreadcrumbsProps {
+  className?: string;
+}
+
+export function Breadcrumbs({ className = '' }: BreadcrumbsProps): JSX.Element {
   const location = useLocation();
   const pathnames = location.pathname.split('/').filter(Boolean);
 
   return (
-    <nav className="flex items-center gap-2 text-sm font-mono">
+    <nav className={`flex flex-wrap items-center gap-2 text-sm font-mono ${className}`}>
       <Link
         to="/"
-        className="text-cyber-neon/70 hover:text-cyber-neon transition-colors"
+        className="text-tertiary hover:text-primary transition-colors"
       >
         Home
       </Link>
@@ -90,15 +104,15 @@ export function Breadcrumbs(): JSX.Element {
 
         return (
           <div key={routeTo} className="flex items-center gap-2">
-            <ChevronRight className="w-4 h-4 text-cyber-neon/50" />
+            <ChevronRight className="w-4 h-4 text-muted" />
             {isLast ? (
-              <span className="text-cyber-neon">
+              <span className="text-primary">
                 {name.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
               </span>
             ) : (
               <Link
                 to={routeTo}
-                className="text-cyber-neon/70 hover:text-cyber-neon transition-colors"
+                className="text-tertiary hover:text-primary transition-colors"
               >
                 {name.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
               </Link>

@@ -34,6 +34,10 @@ class Storage(Protocol):
         """Delete data at the given key."""
         ...
 
+    async def exists(self, key: str) -> bool:
+        """Check if a key exists."""
+        ...
+
 class S3Storage:
     """S3 storage implementation."""
 
@@ -141,6 +145,21 @@ class S3Storage:
         except Exception as e:
             logger.error("Failed to delete object", key=key, error=str(e))
             raise
+
+    async def exists(self, key: str) -> bool:
+        """Check if a key exists using head_object."""
+        logger.debug("Checking if object exists", key=key)
+        try:
+            await asyncio.to_thread(
+                self.client.head_object,
+                Bucket=self.bucket,
+                Key=key
+            )
+            logger.debug("Object exists", key=key)
+            return True
+        except Exception as e:
+            logger.debug("Object does not exist", key=key, error=str(e))
+            return False
 
     async def _upload(self, key: str, data: BinaryIO, content_type: Optional[str] = None, cache_control: Optional[str] = None) -> None:
         """Upload data to S3."""

@@ -309,7 +309,7 @@ export const GlobeViz = ({ data, width = 600, height = 400 }: Props) => {
       .pointAltitude(0.01)
       .pointRadius('size')
       .pointLabel(point => `
-        <div class="backdrop-blur-sm px-3 py-2 rounded-lg border border-gray-700 shadow-xl">
+        <div class="backdrop-blur-sm px-3 py-2   -gray-700 shadow-xl">
           <div class="text-accent font-medium">${(point as Point).name}</div>
           <div class="text-primary">${(point as Point).nodes} nodes</div>
         </div>

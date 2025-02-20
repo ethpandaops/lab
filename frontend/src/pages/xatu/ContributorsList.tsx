@@ -75,33 +75,19 @@ const ContributorsList = (): JSX.Element => {
     <div className="space-y-8">
       <XatuCallToAction />
 
-      {/* Page Header */}
-      <div className="relative">
-        <div className="absolute inset-0 flex items-center">
-          <div className="w-full h-px bg-gradient-to-r from-transparent via-cyber-neon/20 to-transparent" />
-        </div>
-        <div className="relative flex justify-center">
-          <div className="px-4 bg-cyber-darker">
-            <h1 className="text-3xl md:text-4xl font-sans font-black bg-gradient-to-r from-cyber-neon via-cyber-blue to-cyber-pink bg-clip-text text-transparent animate-text-shine">
-              Xatu Contributors
-            </h1>
-          </div>
-        </div>
-      </div>
-
       {/* About Section */}
-      <div className="backdrop-blur-sm rounded-lg border border-cyber-neon/10 hover:border-cyber-neon/20 p-6 transition-all">
+      <div className="backdrop-blur-sm   -subtle hover:-default p-6 transition-all">
         <div className="flex flex-col">
-          <h2 className="text-xl font-sans font-bold text-cyber-neon mb-2">About</h2>
-          <p className="text-base font-mono text-cyber-neon/85">
+          <h2 className="text-xl font-sans font-bold text-primary mb-2">About</h2>
+          <p className="text-base font-mono text-secondary">
             These are the amazing contributors who are helping us monitor the Ethereum network.
             All data is anonymized and no personally identifiable information is collected.
           </p>
-          <div className="text-sm font-mono text-cyber-neon/70 mt-4">
+          <div className="text-sm font-mono text-tertiary mt-4">
             Last updated{' '}
             <span 
               title={new Date(summaryData.updated_at * 1000).toString()}
-              className="text-cyber-neon cursor-help border-b border-cyber-neon/30"
+              className="text-primary cursor-help -b -prominent"
             >
               {formatTimestamp(summaryData.updated_at)}
             </span>
@@ -110,10 +96,10 @@ const ContributorsList = (): JSX.Element => {
       </div>
 
       {/* Contributors List */}
-      <div className="backdrop-blur-sm rounded-lg border border-cyber-neon/10 hover:border-cyber-neon/20 p-6 transition-all">
+      <div className="backdrop-blur-sm   -subtle hover:-default p-6 transition-all">
         <div className="flex flex-col mb-4">
-          <h2 className="text-xl font-sans font-bold text-cyber-neon mb-2">Contributors</h2>
-          <p className="text-base font-mono text-cyber-neon/85">
+          <h2 className="text-xl font-sans font-bold text-primary mb-2">Contributors</h2>
+          <p className="text-base font-mono text-secondary">
             {summaryData.contributors.length} active contributors across all networks
           </p>
         </div>
@@ -121,10 +107,10 @@ const ContributorsList = (): JSX.Element => {
         <div className="overflow-x-auto -mx-2">
           <table className="w-full min-w-[300px]">
             <thead>
-              <tr className="border-b border-cyber-neon/10">
-                <th className="text-left py-2 px-2 text-sm font-mono text-cyber-neon/70 w-[60%]">Contributor</th>
-                <th className="text-right py-2 px-2 text-sm font-mono text-cyber-neon/70 w-[20%]">Nodes</th>
-                <th className="text-right py-2 px-2 text-sm font-mono text-cyber-neon/70 hidden sm:table-cell w-[20%]">Last Update</th>
+              <tr className="-b -subtle">
+                <th className="text-left py-2 px-2 text-sm font-mono text-tertiary w-[60%]">Contributor</th>
+                <th className="text-right py-2 px-2 text-sm font-mono text-tertiary w-[20%]">Nodes</th>
+                <th className="text-right py-2 px-2 text-sm font-mono text-tertiary hidden sm:table-cell w-[20%]">Last Update</th>
               </tr>
             </thead>
             <tbody>
@@ -135,7 +121,7 @@ const ContributorsList = (): JSX.Element => {
                   return (
                     <tr
                       key={contributor.name}
-                      className="border-b border-cyber-neon/10 hover:bg-cyber-neon/5 transition-colors"
+                      className="-b -subtle hover:bg-hover transition-colors"
                     >
                       <td className="py-2 px-2 w-[60%]">
                         <Link
@@ -143,7 +129,7 @@ const ContributorsList = (): JSX.Element => {
                           className="flex items-center gap-2 hover:opacity-80 transition-opacity"
                         >
                           <div
-                            className="w-6 h-6 rounded-lg flex items-center justify-center text-xs font-mono font-bold text-cyber-darker shadow-neon transition-transform hover:scale-105"
+                            className="w-6 h-6  flex items-center justify-center text-xs font-mono font-bold text-base shadow-neon transition-transform hover:scale-105"
                             style={{ 
                               backgroundColor: avatarColor,
                               boxShadow: `0 0 10px ${avatarColor}05`,
@@ -151,13 +137,13 @@ const ContributorsList = (): JSX.Element => {
                           >
                             {initials}
                           </div>
-                          <span className="text-sm font-mono text-cyber-neon truncate">{contributor.name}</span>
+                          <span className="text-sm font-mono text-primary truncate">{contributor.name}</span>
                         </Link>
                       </td>
-                      <td className="text-right py-2 px-2 text-sm font-mono text-cyber-neon w-[20%]">
+                      <td className="text-right py-2 px-2 text-sm font-mono text-primary w-[20%]">
                         {contributor.node_count}
                       </td>
-                      <td className="text-right py-2 px-2 text-sm font-mono text-cyber-neon/70 hidden sm:table-cell w-[20%]">
+                      <td className="text-right py-2 px-2 text-sm font-mono text-tertiary hidden sm:table-cell w-[20%]">
                         {formatTimestamp(contributor.updated_at)}
                       </td>
                     </tr>

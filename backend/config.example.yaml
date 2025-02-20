@@ -13,6 +13,18 @@ clickhouse:
   password: ""
   debug: false
 
+ethereum:
+  networks:
+    mainnet:
+      config_url: "https://raw.githubusercontent.com/eth-clients/mainnet/refs/heads/main/metadata/config.yaml"
+      genesis_time: 1606824023  # Dec 1, 2020 12:00:23 PM UTC
+    sepolia:
+      config_url: "https://raw.githubusercontent.com/eth-clients/sepolia/refs/heads/main/metadata/config.yaml"
+      genesis_time: 1655733600  # Jun 20, 2022 12:00:00 PM UTC
+    holesky:
+      config_url: "https://raw.githubusercontent.com/eth-clients/holesky/refs/heads/main/metadata/config.yaml"
+      genesis_time: 1695902400  # Sep 28, 2023 12:00:00 PM UTC
+
 modules:
   beacon_chain_timings:
     enabled: false
