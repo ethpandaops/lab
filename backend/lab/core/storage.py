@@ -177,6 +177,7 @@ class S3Storage:
         extra_args = {
             'ContentType': content_type,
             'ContentEncoding': 'gzip',
+            'ContentLength': len(compressed_data)
         }
         
         if cache_control:

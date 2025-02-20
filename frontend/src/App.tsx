@@ -1,4 +1,4 @@
-import { Routes, Route, Outlet } from 'react-router-dom'
+import { Routes, Route, Outlet, useSearchParams } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { createContext, useEffect, useState } from 'react'
 import { getConfig } from './config'
@@ -44,6 +44,18 @@ function App() {
 	const [config, setConfig] = useState<Config | null>(null)
 	const [configError, setConfigError] = useState<Error | null>(null)
 	const [selectedNetwork, setSelectedNetwork] = useState('mainnet')
+	const [searchParams, setSearchParams] = useSearchParams()
+
+	// Update URL when network changes (but only if it's not the default)
+	useEffect(() => {
+		const newParams = new URLSearchParams(searchParams)
+		if (selectedNetwork === 'mainnet') {
+			newParams.delete('network')
+		} else {
+			newParams.set('network', selectedNetwork)
+		}
+		setSearchParams(newParams, { replace: true })
+	}, [selectedNetwork])
 
 	useEffect(() => {
 		getConfig()
@@ -51,12 +63,16 @@ function App() {
 				// Initialize BeaconClockManager with config
 				BeaconClockManager.getInstance().initialize(config)
 				setConfig(config)
-				// Set initial network from available networks
-				if (config.ethereum?.networks) {
-					const networks = Object.keys(config.ethereum.networks)
-					if (networks.length > 0) {
-						setSelectedNetwork(networks[0])
-					}
+				
+				// Get network from URL or use mainnet as default
+				const networkFromUrl = searchParams.get('network')
+				const availableNetworks = Object.keys(config.ethereum?.networks || {})
+				
+				if (networkFromUrl && availableNetworks.includes(networkFromUrl)) {
+					setSelectedNetwork(networkFromUrl)
+				} else if (availableNetworks.length > 0 && !availableNetworks.includes(selectedNetwork)) {
+					// If current network is not in available networks, switch to first available
+					setSelectedNetwork(availableNetworks[0])
 				}
 			})
 			.catch(setConfigError)

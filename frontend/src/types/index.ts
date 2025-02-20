@@ -91,4 +91,18 @@ export interface SlotData {
     }>;
     maximum_votes: number;  // Maximum possible attestation votes for this slot
   };
+}
+
+export interface Config {
+  modules: {
+    [key: string]: any;
+  };
+  ethereum?: {
+    networks: {
+      [key: string]: {
+        config_url: string;
+        genesis_time: number;
+      };
+    };
+  };
 } 
