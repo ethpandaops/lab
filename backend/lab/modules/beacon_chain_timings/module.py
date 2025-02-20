@@ -400,7 +400,6 @@ class BeaconChainTimingsModule(Module):
             "block_timings": BlockTimingsProcessor(ctx),
             "size_cdf": SizeCDFProcessor(ctx)
         }
-        self._tasks: Dict[str, asyncio.Task] = {}
         logger.info("Initialized beacon chain timings module")
 
     @property
@@ -414,24 +413,15 @@ class BeaconChainTimingsModule(Module):
 
         # Start processing tasks
         for name, processor in self._processors.items():
-            self._tasks[name] = asyncio.create_task(self._run_processor(name, processor))
+            self._create_task(self._run_processor(name, processor))
             logger.info(f"Started {name} processor")
 
     async def stop(self) -> None:
         """Stop the module."""
         logger.info("Stopping beacon chain timings module")
-        await super().stop()
         
-        # Cancel all tasks
-        for name, task in self._tasks.items():
-            logger.debug(f"Cancelling {name} processor")
-            task.cancel()
-            try:
-                await task
-                logger.info(f"Successfully cancelled {name} processor")
-            except asyncio.CancelledError:
-                logger.info(f"Cancelled {name} processor")
-                pass
+        # Let base class handle task cleanup
+        await super().stop()
 
     async def _run_processor(self, name: str, processor: DataProcessor) -> None:
         """Run a processor in a loop."""

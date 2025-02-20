@@ -98,6 +98,15 @@ class Runner:
             if self.clickhouse is not None:
                 logger.debug("Stopping ClickHouse")
                 await self.clickhouse.stop()
+
+            # Cancel all remaining tasks
+            for task in asyncio.all_tasks():
+                if task is not asyncio.current_task():
+                    task.cancel()
+                    try:
+                        await task
+                    except asyncio.CancelledError:
+                        pass
         except Exception as e:
             logger.error(f"Error during shutdown: {str(e)}")
         finally:
@@ -117,14 +126,27 @@ class Runner:
         """Setup signal handlers."""
         logger.debug("Setting up signal handlers")
 
-        def handle_signal(sig: int) -> None:
+        def handle_signal(sig: int, frame=None) -> None:
+            """Handle signal by setting stop event and cancelling all tasks."""
             logger.info(f"Received signal {sig}")
-            # Set the stop event in a thread-safe way
-            if asyncio.get_event_loop().is_running():
-                asyncio.get_event_loop().call_soon_threadsafe(self._stop_event.set)
+            
+            # Get the current event loop
+            try:
+                loop = asyncio.get_event_loop()
+            except RuntimeError:
+                logger.error("No event loop running")
+                return
+
+            # Set the stop event
+            if loop.is_running():
+                loop.call_soon_threadsafe(self._stop_event.set)
             else:
-                # If loop isn't running yet, just set the event directly
                 self._stop_event.set()
+
+            # Cancel all tasks except the current one
+            for task in asyncio.all_tasks(loop):
+                if task is not asyncio.current_task(loop):
+                    task.cancel()
 
         # Save original SIGINT handler
         self._original_sigint_handler = signal.getsignal(signal.SIGINT)
@@ -132,14 +154,7 @@ class Runner:
         # Set up new handlers for both SIGINT and SIGTERM
         for sig in (signal.SIGTERM, signal.SIGINT):
             try:
-                if asyncio.get_event_loop().is_running():
-                    asyncio.get_event_loop().add_signal_handler(
-                        sig, 
-                        lambda s=sig: handle_signal(s)
-                    )
-                else:
-                    # If loop isn't running, use basic signal handler
-                    signal.signal(sig, lambda s, f: handle_signal(s))
+                signal.signal(sig, handle_signal)
             except Exception as e:
                 logger.error(f"Failed to set up signal handler for signal {sig}: {str(e)}")
 

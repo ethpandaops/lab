@@ -47,6 +47,14 @@ class Module(ABC):
         self.ctx = ctx
         self.logger = ctx.logger
         self._stop_event = asyncio.Event()
+        self._tasks = set()
+
+    def _create_task(self, coro) -> asyncio.Task:
+        """Create a task and store it for cleanup."""
+        task = asyncio.create_task(coro)
+        self._tasks.add(task)
+        task.add_done_callback(self._tasks.discard)
+        return task
 
     @property
     @abstractmethod
@@ -59,10 +67,24 @@ class Module(ABC):
         """Start the module."""
         ...
 
-    @abstractmethod
     async def stop(self) -> None:
         """Stop the module."""
+        self.logger.debug(f"Stopping module {self.name}")
         self._stop_event.set()
+
+        # Cancel all tasks
+        for task in self._tasks:
+            task.cancel()
+
+        # Wait for all tasks to complete
+        if self._tasks:
+            try:
+                await asyncio.gather(*self._tasks, return_exceptions=True)
+            except asyncio.CancelledError:
+                pass
+
+        self._tasks.clear()
+        self.logger.debug(f"Module {self.name} stopped")
 
 class ModuleFactory(Protocol):
     """Module factory protocol."""

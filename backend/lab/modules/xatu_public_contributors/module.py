@@ -26,7 +26,6 @@ class XatuPublicContributorsModule(Module):
             "users": UsersProcessor(ctx),
             "user_summaries": UserSummariesProcessor(ctx)
         }
-        self._tasks: Dict[str, asyncio.Task] = {}
         self.logger.info("Initialized Xatu Public Contributors module")
 
     async def start(self) -> None:
@@ -35,24 +34,15 @@ class XatuPublicContributorsModule(Module):
 
         # Start processing tasks
         for name, processor in self._processors.items():
-            self._tasks[name] = asyncio.create_task(self._run_processor(name, processor))
+            self._create_task(self._run_processor(name, processor))
             self.logger.info(f"Started {name} processor")
 
     async def stop(self) -> None:
         """Stop module."""
         self.logger.info("Stopping Xatu Public Contributors module")
-        await super().stop()
         
-        # Cancel all tasks
-        for name, task in self._tasks.items():
-            self.logger.debug(f"Cancelling {name} processor")
-            task.cancel()
-            try:
-                await task
-                self.logger.info(f"Successfully cancelled {name} processor")
-            except asyncio.CancelledError:
-                self.logger.info(f"Cancelled {name} processor")
-                pass
+        # Let base class handle task cleanup
+        await super().stop()
 
     async def _run_processor(self, name: str, processor: SummaryProcessor) -> None:
         """Run processor in a loop."""

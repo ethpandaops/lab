@@ -73,100 +73,106 @@ export function TimelineView({
     <div className="backdrop-blur-md p-2 bg-surface/80">
       <div className="flex flex-col space-y-6">
         {/* Header with info */}
-        <div className="flex items-center justify-between">
-          {/* Left side - Slot info */}
-          <div>
-            <div className="flex items-baseline gap-3 mb-1">
+        <div className="flex flex-col space-y-4">
+          {/* Top row - Slot number and controls */}
+          <div className="flex flex-row items-start justify-between">
+            {/* Left side - Slot and entity */}
+            <div className="flex flex-col space-y-2 max-w-[60%]">
               <div className="text-4xl font-mono font-bold text-primary">
                 {slot}
               </div>
-              {entity && (
-                <>
-                  <span className="text-tertiary/50 text-lg">by</span>
+              <div className="flex items-baseline gap-2">
+                <span className="text-tertiary/50 text-lg">by</span>
+                {entity ? (
                   <a 
                     href={`https://ethseer.io/entity/${entity}?network=${selectedNetwork}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-2xl font-mono font-medium text-accent flex items-baseline gap-2 hover:opacity-80 transition-opacity group"
+                    className="text-2xl font-mono font-medium text-accent flex items-baseline gap-2 hover:opacity-80 transition-opacity group truncate"
                   >
-                    {formatEntityName(entity).name}
-                    {formatEntityName(entity).type && (
-                      <span className="text-sm text-tertiary/40 font-normal">
-                        [{formatEntityName(entity).type}]
-                      </span>
-                    )}
-                    <FaExternalLinkAlt className="w-3 h-3 text-tertiary/40 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <span className="truncate">
+                      {formatEntityName(entity).name}
+                      {formatEntityName(entity).type && (
+                        <span className="text-sm text-tertiary/40 font-normal">
+                          [{formatEntityName(entity).type}]
+                        </span>
+                      )}
+                    </span>
+                    <FaExternalLinkAlt className="w-3 h-3 text-tertiary/40 opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
                   </a>
-                </>
-              )}
+                ) : (
+                  <span className="text-2xl font-mono font-medium text-accent">Unknown</span>
+                )}
+              </div>
             </div>
-            <div className="flex items-center gap-2 text-sm font-mono text-tertiary">
-              <span>Slot {slotInEpoch} of Epoch {epoch}</span>
-              <span className="text-tertiary/50">·</span>
-              <div className="flex items-center gap-4">
-                <div className="flex items-center gap-1.5">
-                  <FaEthereum className="w-3.5 h-3.5 text-accent" />
-                  <span className="capitalize">{selectedNetwork}</span>
-                </div>
 
-                {/* External Links */}
-                <div className="flex items-center gap-2">
-                  <a
-                    href={`https://ethseer.io/slot/${slot}?network=${selectedNetwork}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-tertiary/50 hover:text-accent transition-colors"
-                    data-tooltip-id="timeline-tooltip"
-                    data-tooltip-content="View on Ethseer"
-                  >
-                    <img src="/ethseer.png" alt="Ethseer" className="w-4 h-4" />
-                  </a>
-                  <a
-                    href={`https://beaconcha.in/slot/${slot}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-tertiary/50 hover:text-accent transition-colors rounded-full overflow-hidden bg-surface/50"
-                    data-tooltip-id="timeline-tooltip"
-                    data-tooltip-content="View on Beaconcha.in"
-                  >
-                    <img src="/beaconchain.svg" alt="Beaconcha.in" className="w-4 h-4" />
-                  </a>
-                  {executionBlockNumber && (
-                    <a
-                      href={`https://etherscan.io/block/${executionBlockNumber}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-tertiary/50 hover:text-accent transition-colors rounded-full overflow-hidden bg-surface/50"
-                      data-tooltip-id="timeline-tooltip"
-                      data-tooltip-content="View on Etherscan"
-                    >
-                      <img src="/etherscan-logo-light.svg" alt="Etherscan" className="w-4 h-4" />
-                    </a>
-                  )}
-                </div>
+            {/* Right side - Controls */}
+            <div className="flex flex-col items-center gap-2">
+              <button
+                onClick={onPlayPauseClick}
+                className="w-14 h-14 sm:w-12 sm:h-12 rounded-full flex items-center justify-center bg-surface hover:bg-hover transition-all border border-text-muted"
+              >
+                {isPlaying ? <FaPause className="w-6 h-6 sm:w-5 sm:h-5" /> : <FaPlay className="w-6 h-6 sm:w-5 sm:h-5 ml-0.5" />}
+              </button>
+              <div className="text-center">
+                <span className="font-mono text-lg sm:text-xl text-primary">
+                  {(currentTime / 1000).toFixed(1)}s
+                </span>
               </div>
             </div>
           </div>
 
-          {/* Right side - Controls */}
-          <div className="flex items-center gap-6">
-            <div className="w-[4.5rem] text-right">
-              <span className="font-mono text-xl text-primary">
-                {(currentTime / 1000).toFixed(1)}s
-              </span>
-            </div>
+          {/* Bottom row - Additional info */}
+          <div className="flex flex-col sm:flex-row sm:items-center gap-2 text-sm font-mono text-tertiary">
+            <span>Slot {slotInEpoch} of Epoch {epoch}</span>
+            <span className="hidden sm:inline text-tertiary/50">·</span>
+            <div className="flex flex-wrap items-center gap-4">
+              <div className="flex items-center gap-1.5">
+                <FaEthereum className="w-3.5 h-3.5 text-accent" />
+                <span className="capitalize">{selectedNetwork}</span>
+              </div>
 
-            <button
-              onClick={onPlayPauseClick}
-              className="w-12 h-12 rounded-full flex items-center justify-center bg-surface hover:bg-hover transition-all border border-text-muted"
-            >
-              {isPlaying ? <FaPause className="w-5 h-5" /> : <FaPlay className="w-5 h-5 ml-0.5" />}
-            </button>
+              {/* External Links */}
+              <div className="flex items-center gap-2">
+                <a
+                  href={`https://ethseer.io/slot/${slot}?network=${selectedNetwork}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-tertiary/50 hover:text-accent transition-colors"
+                  data-tooltip-id="timeline-tooltip"
+                  data-tooltip-content="View on Ethseer"
+                >
+                  <img src="/ethseer.png" alt="Ethseer" className="w-4 h-4" />
+                </a>
+                <a
+                  href={`https://beaconcha.in/slot/${slot}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-tertiary/50 hover:text-accent transition-colors rounded-full overflow-hidden bg-surface/50"
+                  data-tooltip-id="timeline-tooltip"
+                  data-tooltip-content="View on Beaconcha.in"
+                >
+                  <img src="/beaconchain.svg" alt="Beaconcha.in" className="w-4 h-4" />
+                </a>
+                {executionBlockNumber && (
+                  <a
+                    href={`https://etherscan.io/block/${executionBlockNumber}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-tertiary/50 hover:text-accent transition-colors rounded-full overflow-hidden bg-surface/50"
+                    data-tooltip-id="timeline-tooltip"
+                    data-tooltip-content="View on Etherscan"
+                  >
+                    <img src="/etherscan-logo-light.svg" alt="Etherscan" className="w-4 h-4" />
+                  </a>
+                )}
+              </div>
+            </div>
           </div>
         </div>
 
         {/* Timeline */}
-        <div className="relative h-16">
+        <div className="relative h-20 sm:h-16">
           {/* Background sections */}
           <div className="absolute inset-0 flex">
             <div className="w-1/3 h-full bg-accent/5" />
@@ -178,17 +184,17 @@ export function TimelineView({
           <div className="absolute inset-0">
             <div className="flex h-7">
               <div className="w-1/3">
-                <div className="text-xs font-mono text-accent/80 font-medium p-1.5 rounded-tl-lg backdrop-blur-sm">
+                <div className="text-[10px] sm:text-xs font-mono text-accent/80 font-medium p-1.5 rounded-tl-lg backdrop-blur-sm">
                   Block Proposal
                 </div>
               </div>
               <div className="w-1/3">
-                <div className="text-xs font-mono text-success/90 font-semibold p-1.5 backdrop-blur-sm">
+                <div className="text-[10px] sm:text-xs font-mono text-success/90 font-semibold p-1.5 backdrop-blur-sm">
                   Attestation
                 </div>
               </div>
               <div className="w-1/3">
-                <div className="text-xs font-mono text-yellow-400/80 font-medium p-1.5 rounded-tr-lg backdrop-blur-sm">
+                <div className="text-[10px] sm:text-xs font-mono text-yellow-400/80 font-medium p-1.5 rounded-tr-lg backdrop-blur-sm">
                   Aggregation
                 </div>
               </div>
@@ -268,7 +274,7 @@ export function TimelineView({
         </div>
 
         {/* Legend */}
-        <div className="flex flex-wrap gap-4 text-xs font-mono">
+        <div className="flex flex-wrap gap-4 text-[10px] sm:text-xs font-mono">
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 rounded-full bg-accent ring-4 ring-accent/20" />
             <span className="text-accent/80">Block Seen (API)</span>

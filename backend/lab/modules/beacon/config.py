@@ -1,5 +1,5 @@
 """Configuration for Beacon module."""
-from typing import Dict, Optional
+from typing import Dict, Optional, Any
 
 from pydantic import BaseModel, Field
 
@@ -8,10 +8,6 @@ class BeaconNetworkConfig(BaseModel):
     head_lag_slots: Optional[int] = Field(
         default=None,
         description="Number of slots to lag behind head for processing (default: 3)"
-    )
-    backlog_days: Optional[int] = Field(
-        default=None,
-        description="Number of days to backfill (default: 3)"
     )
 
 class BeaconConfig(BaseModel):

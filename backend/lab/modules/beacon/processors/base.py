@@ -2,6 +2,7 @@
 from abc import ABC, abstractmethod
 from datetime import datetime, timezone
 from typing import Dict, Any
+import asyncio
 
 from lab.core import logger as lab_logger
 from lab.core.module import ModuleContext
@@ -13,7 +14,23 @@ class BaseProcessor(ABC):
         """Initialize base processor."""
         self.ctx = ctx
         self.name = name
+        self._tasks = set()
         self.logger = lab_logger.get_logger(f"{ctx.name}.{name}")
+
+    def _create_task(self, coro) -> asyncio.Task:
+        """Create a task and store it for cleanup."""
+        task = asyncio.create_task(coro)
+        self._tasks.add(task)
+        task.add_done_callback(self._tasks.discard)
+        return task
+
+    async def stop(self) -> None:
+        """Stop the processor."""
+        for task in self._tasks:
+            task.cancel()
+        if self._tasks:
+            await asyncio.gather(*self._tasks, return_exceptions=True)
+        self._tasks.clear()
 
     async def _get_processor_state(self) -> Dict[str, Any]:
         """Get processor state from state manager."""

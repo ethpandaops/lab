@@ -2,6 +2,7 @@ import { Link, Outlet, useLocation } from 'react-router-dom'
 import { ArrowRight, Activity, Search, Clock } from 'lucide-react'
 import { useContext } from 'react'
 import { NetworkContext } from '../../App'
+import { FaEthereum } from 'react-icons/fa'
 
 function Beacon(): JSX.Element {
   const location = useLocation()
@@ -16,13 +17,16 @@ function Beacon(): JSX.Element {
       {/* Hero Section */}
       <div className="relative backdrop-blur-md bg-surface/80 border border-subtle rounded-lg p-6 md:p-8 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-accent/5 via-transparent to-transparent" />
-        <div className="relative">
-          <h1 className="text-3xl md:text-4xl font-sans font-bold text-primary mb-3">
-            Beacon Chain Explorer
-          </h1>
-          <p className="text-base md:text-lg font-mono text-secondary max-w-3xl">
-            Explore detailed information about individual slots on the Ethereum beacon chain, including timing data, attestations, and network propagation metrics.
-          </p>
+        <div className="relative flex items-center gap-8">
+          <div className="flex-1">
+            <h1 className="text-3xl md:text-4xl font-sans font-bold text-primary mb-3">
+              Beacon Chain Explorer
+            </h1>
+            <p className="text-base md:text-lg font-mono text-secondary max-w-3xl">
+              Explore detailed information about individual slots on the Ethereum beacon chain, including timing data, attestations, and network propagation metrics.
+            </p>
+          </div>
+          <FaEthereum className="w-24 h-24 text-accent/20" />
         </div>
       </div>
 
@@ -99,7 +103,7 @@ function Beacon(): JSX.Element {
         {/* Timing Analysis Section */}
         <div>
           <h2 className="text-xl font-sans font-bold text-primary mb-4 px-1">Timing Analysis</h2>
-          <div className="max-w-4xl">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-4xl">
             {/* Block Timings Card */}
             <Link 
               to="timings/blocks" 

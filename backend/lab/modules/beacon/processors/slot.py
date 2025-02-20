@@ -7,9 +7,10 @@ from typing import Optional, Dict, Any, List, Tuple
 import json
 import io
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from sqlalchemy import text
 
+from lab.core import logger
 from lab.core.module import ModuleContext
 from lab.ethereum import EthereumNetwork
 from lab.core.config import BeaconNetworkConfig
@@ -21,13 +22,15 @@ class SlotProcessorState:
         self.target_slot: Optional[int] = state.get("target_slot")
         self.current_slot: Optional[int] = state.get("current_slot")
         self.direction: str = state.get("direction", "forward")  # forward or backward
+        self.last_processed_slot: Optional[int] = state.get("last_processed_slot")
 
     def to_dict(self) -> Dict[str, Any]:
         """Convert state to dictionary for storage."""
         return {
             "target_slot": self.target_slot,
             "current_slot": self.current_slot,
-            "direction": self.direction
+            "direction": self.direction,
+            "last_processed_slot": self.last_processed_slot
         }
 
 class ProposerData(BaseModel):
@@ -215,6 +218,19 @@ class OptimizedSlotData(BaseModel):
             }
         }
 
+class BacklogConfig(BaseModel):
+    """Configuration for backlog processing.
+    Only one of fork_name, target_date, or target_slot should be set.
+    """
+    fork_name: Optional[str] = None
+    target_date: Optional[datetime] = None
+    target_slot: Optional[int] = None
+
+    def __init__(self, **data):
+        super().__init__(**data)
+        if sum(x is not None for x in [self.fork_name, self.target_date, self.target_slot]) > 1:
+            raise ValueError("Only one of fork_name, target_date, or target_slot should be set")
+
 def transform_slot_data_for_storage(
     slot: int,
     network: str,
@@ -310,23 +326,50 @@ def transform_slot_data_for_storage(
 class SlotProcessor(BaseProcessor):
     """Processor for beacon chain slots."""
 
-    DEFAULT_BACKLOG_DAYS = 3
     BACKLOG_SLEEP_MS = 500  # Sleep between backlog slot processing
 
     def __init__(self, ctx: ModuleContext, network_name: str, network: EthereumNetwork, network_config: BeaconNetworkConfig):
         """Initialize slot processor."""
         super().__init__(ctx, f"slot_{network_name}")
-        self.network_name = network_name
         self.network = network
+        self.network_config = network_config
         
         # Get network-specific config
         self.head_lag_slots = network_config.head_lag_slots
-        self.backlog_days = network_config.backlog_days
+        
+        # Set default backlog config to Deneb fork
+        self.backlog_config = BacklogConfig(fork_name="deneb")
         
         # Tasks
-        self._head_task: Optional[asyncio.Task] = None
-        self._backlog_task: Optional[asyncio.Task] = None
+        self._head_task = None
+        self._middle_task = None
+        self._backlog_task = None
         self._stop_event = asyncio.Event()
+        self.logger = self.logger.bind(network=network_name)
+
+    def _calculate_target_backlog_slot(self) -> int:
+        """Calculate target slot based on backlog config."""
+        current_slot = self.network.clock.get_current_slot()
+
+        if self.backlog_config.fork_name:
+            # Get the epoch for the specified fork
+            fork_epoch = self.network.get_fork_epoch(self.backlog_config.fork_name)
+            if fork_epoch is None:
+                raise ValueError(f"Unknown fork name: {self.backlog_config.fork_name}")
+            return fork_epoch * 32  # Convert epoch to slot
+
+        if self.backlog_config.target_date:
+            # Calculate slot from target date
+            target_timestamp = int(self.backlog_config.target_date.timestamp())
+            genesis_timestamp = self.network.genesis_time
+            seconds_per_slot = self.network.config.seconds_per_slot
+            return (target_timestamp - genesis_timestamp) // seconds_per_slot
+
+        if self.backlog_config.target_slot is not None:
+            return self.backlog_config.target_slot
+
+        # Default to 1 day ago
+        return current_slot - 1 * 24 * 60 * 60 // self.network.config.seconds_per_slot
 
     async def _get_processor_state(self, direction: str) -> SlotProcessorState:
         """Get processor state from state manager."""
@@ -338,17 +381,30 @@ class SlotProcessor(BaseProcessor):
         
         if not state:
             # Initialize with current state based on network
-            current_slot = self.network.clock.get_current_slot()
+            wallclock_slot = self.network.clock.get_current_slot()
+            
+            head_target_slot = wallclock_slot - self.head_lag_slots
+
             if direction == "forward":
                 state = {
-                    "target_slot": current_slot,
-                    "current_slot": current_slot - self.head_lag_slots - 1,  # Start one behind
+                    "target_slot": head_target_slot,
+                    "current_slot": head_target_slot - 1,  # Start one behind
+                    "direction": direction
+                }
+            elif direction == "middle":
+                # For middle processor, start from 1 hour ago (assuming 12s slots = 300 slots)
+                target_slot = head_target_slot - 300
+                start_slot = max(0, target_slot - 300)
+                state = {
+                    "target_slot": target_slot,
+                    "last_processed_slot": start_slot,
                     "direction": direction
                 }
             else:  # backward
+                target_slot = self._calculate_target_backlog_slot()
                 state = {
-                    "target_slot": max(0, current_slot - (self.backlog_days * 24 * 60 * 60 // self.network.config.seconds_per_slot)),
-                    "current_slot": current_slot,
+                    "target_slot": target_slot,
+                    "current_slot": head_target_slot,
                     "direction": direction
                 }
             # Save initial state
@@ -360,11 +416,9 @@ class SlotProcessor(BaseProcessor):
         """Save processor state to state manager."""
         await self.ctx.state.set(f"{self.name}_{state.direction}", state.to_dict())
 
-    def _get_initial_backlog_slot(self) -> int:
-        """Calculate initial backlog slot (current - 3 days)."""
-        current_slot = self.network.clock.get_current_slot()
-        slots_per_day = 24 * 60 * 60 // self.network.config.seconds_per_slot
-        return max(0, current_slot - (slots_per_day * self.backlog_days))
+    def _get_storage_key(self, slot: int) -> str:
+        """Get storage key for a given slot."""
+        return self.ctx.storage_key(f"slots", self.network.name, f"{slot}.json")
 
     async def process_slot(self, slot: int) -> bool:
         """Process a single slot.
@@ -376,9 +430,14 @@ class SlotProcessor(BaseProcessor):
             bool: True if processing was successful
         """
         try:
+            # Check if we've already processed this slot
+            if await self.ctx.storage.exists(self._get_storage_key(slot)):
+                self.logger.debug(f"Slot {slot} already processed, skipping")
+                return True
+
             started_at = datetime.now(timezone.utc)
 
-            self.logger.debug(f"Processing slot {slot} for network {self.network_name}")
+            self.logger.debug(f"Processing slot {slot} for network {self.name}")
 
             logger = self.logger.getChild(f"slot_{slot}")
 
@@ -410,7 +469,7 @@ class SlotProcessor(BaseProcessor):
             try:
                 data = transform_slot_data_for_storage(
                     slot=slot,
-                    network=self.network_name,
+                    network=self.name,
                     processed_at=datetime.now(timezone.utc).isoformat(),
                     processing_time_ms=int((datetime.now(timezone.utc) - started_at).total_seconds() * 1000),
                     block_data=block_data.to_dict(),
@@ -424,9 +483,8 @@ class SlotProcessor(BaseProcessor):
                     maximum_attestation_votes=maximum_attestation_votes
                 ).to_dict()
                 
-                key = self.ctx.storage_key(f"slots", self.network_name, f"{slot}.json")
                 await self.ctx.storage.store(
-                    key,
+                    self._get_storage_key(slot),
                     io.BytesIO(json.dumps(data).encode()),
                     cache_control="public,max-age=86400,s-maxage=86400"
                 )
@@ -441,94 +499,208 @@ class SlotProcessor(BaseProcessor):
 
     async def process_head_slot(self, slot: int) -> None:
         """Process a single head slot."""
-        self.logger.info(f"Processing head slot {slot} for network {self.network_name}")
+        self.logger.info(f"Processing head slot {slot} for network {self.name}")
         success = await self.process_slot(slot)
         if success:
-            self.logger.info(f"Successfully processed head slot {slot} for network {self.network_name}")
+            self.logger.info(f"Successfully processed head slot {slot} for network {self.name}")
         else:
-            self.logger.error(f"Failed to process head slot {slot} for network {self.network_name}")
+            self.logger.error(f"Failed to process head slot {slot} for network {self.name}")
 
     async def process_backlog_slot(self, slot: int) -> None:
         """Process a single backlog slot."""
-        self.logger.info(f"Processing backlog slot {slot} for network {self.network_name}")
+        self.logger.info(f"Processing backlog slot {slot} for network {self.name}")
         try:
             await self.process_slot(slot)
-            self.logger.info(f"Successfully processed backlog slot {slot} for network {self.network_name}")
+            self.logger.info(f"Successfully processed backlog slot {slot} for network {self.name}")
         except Exception as e:
-            self.logger.error(f"Failed to process backlog slot {slot} for network {self.network_name}: {str(e)}")
+            self.logger.error(f"Failed to process backlog slot {slot} for network {self.name}: {str(e)}")
             raise e
 
     async def _run_head_processor(self) -> None:
         """Run the head slot processor loop."""
-        self.logger.info(f"Starting head processor for network {self.network_name}")
+        self.logger.info(f"Starting head processor for network {self.name}")
         
-        state = await self._get_processor_state("forward")
-        
-        while not self._stop_event.is_set():
-            try:
-                # Get current slot minus lag
-                current_slot = self.network.clock.get_current_slot()
-                
-                target_slot = current_slot - self.head_lag_slots
+        try:
+            while not self._stop_event.is_set():
+                try:
+                    # Get current slot minus lag
+                    current_slot = self.network.clock.get_current_slot()
+                    target_slot = current_slot - self.head_lag_slots
 
-                # Process head if needed
-                if state.current_slot is None or state.current_slot < target_slot:
+                    # Always process head slot to ensure live data
                     await self.process_head_slot(target_slot)
-                    state.current_slot = target_slot
-                    state.target_slot = current_slot
-                    await self._save_processor_state(state)
 
-                # Small sleep to prevent tight loop
-                await asyncio.sleep(0.05)
-            except Exception as e:
-                self.logger.error(f"Error in head processor: {str(e)}")
-                await asyncio.sleep(1)  # Sleep longer on error
+                    # Small sleep to prevent tight loop
+                    try:
+                        await asyncio.wait_for(self._stop_event.wait(), timeout=0.05)
+                        break
+                    except asyncio.TimeoutError:
+                        continue
+                except asyncio.CancelledError:
+                    break
+                except Exception as e:
+                    self.logger.error(f"Error in head processor: {str(e)}")
+                    try:
+                        await asyncio.wait_for(self._stop_event.wait(), timeout=1)
+                        break
+                    except asyncio.TimeoutError:
+                        continue
+        except asyncio.CancelledError:
+            pass
+        finally:
+            self.logger.info(f"Head processor stopped for network {self.name}")
 
     async def _run_backlog_processor(self) -> None:
-        """Run the backlog slot processor loop."""
-        self.logger.info(f"Starting backlog processor for network {self.network_name}")
+        """Run the backlog processor loop."""
+        target_slot = self._calculate_target_backlog_slot()
+        self.logger.info(f"Starting backlog processor for network {self.name}. Target slot: {target_slot}")
         
-        state = await self._get_processor_state("backward")
+        try:
+            state = await self._get_processor_state("backward")
 
-        while not self._stop_event.is_set():
-            try:
-                if state.current_slot > state.target_slot:
-                    await self.process_backlog_slot(state.current_slot)
-                    state.current_slot -= 1
-                    await self._save_processor_state(state)
-                    
-                    # Sleep between backlog slots to prevent flooding
-                    await asyncio.sleep(self.BACKLOG_SLEEP_MS / 1000)
-                else:
-                    # No backlog to process, sleep longer
-                    await asyncio.sleep(1)
-            except Exception as e:
-                self.logger.error(f"Error in backlog processor: {str(e)}")
-                await asyncio.sleep(1)  # Sleep longer on error
+            while not self._stop_event.is_set():
+                try:
+                    if state.current_slot > target_slot:
+                        await self.process_backlog_slot(state.current_slot)
+                        state.current_slot -= 1
+                        await self._save_processor_state(state)
+                        
+                        # Sleep between backlog slots to prevent flooding
+                        try:
+                            await asyncio.wait_for(self._stop_event.wait(), timeout=self.BACKLOG_SLEEP_MS / 1000)
+                            break
+                        except asyncio.TimeoutError:
+                            continue
+                    else:
+                        # No backlog to process, sleep longer
+                        try:
+                            await asyncio.wait_for(self._stop_event.wait(), timeout=1)
+                            break
+                        except asyncio.TimeoutError:
+                            continue
+                except asyncio.CancelledError:
+                    break
+                except Exception as e:
+                    self.logger.error(f"Error in backlog processor: {str(e)}")
+                    try:
+                        await asyncio.wait_for(self._stop_event.wait(), timeout=1)
+                        break
+                    except asyncio.TimeoutError:
+                        continue
+        except asyncio.CancelledError:
+            pass
+        finally:
+            self.logger.info(f"Backlog processor stopped for network {self.name}")
 
     async def start(self) -> None:
         """Start the processor."""
-        
-        self._head_task = asyncio.create_task(self._run_head_processor())
-        # self._backlog_task = asyncio.create_task(self._run_backlog_processor())
+        self.logger.info(f"Starting processor for network {self.name}")
+
+        # Start head processor
+        self._head_task = self._create_task(self._run_head_processor())
+
+        # Start middle processor and wait for it to complete
+        self._middle_task = self._create_task(self._run_middle_processor())
+        try:
+            await self._middle_task
+            self.logger.info(f"Middle processor completed for network {self.name}")
+        except asyncio.CancelledError:
+            self.logger.info(f"Middle processor cancelled for network {self.name}")
+            return
+        except Exception as e:
+            self.logger.error(f"Middle processor failed for network {self.name}: {str(e)}")
+            return
+
+        # Start backlog processor only after middle processor completes
+        self._backlog_task = self._create_task(self._run_backlog_processor())
 
     async def stop(self) -> None:
         """Stop the processor."""
+        self.logger.info(f"Stopping processor for network {self.name}")
         self._stop_event.set()
+
+        tasks = []
         
+        # Cancel and collect tasks
         if self._head_task:
             self._head_task.cancel()
-            try:
-                await self._head_task
-            except asyncio.CancelledError:
-                pass
-        
+            tasks.append(self._head_task)
+            
+        if self._middle_task:
+            self._middle_task.cancel()
+            tasks.append(self._middle_task)
+            
         if self._backlog_task:
             self._backlog_task.cancel()
+            tasks.append(self._backlog_task)
+
+        # Wait for all tasks to complete
+        if tasks:
             try:
-                await self._backlog_task
+                await asyncio.gather(*tasks, return_exceptions=True)
             except asyncio.CancelledError:
                 pass
+
+        # Clear task references
+        self._head_task = None
+        self._middle_task = None
+        self._backlog_task = None
+
+        self.logger.info(f"Processor stopped for network {self.name}")
+
+    async def _run_middle_processor(self) -> None:
+        """Run the middle processor loop."""
+        self.logger.info(f"Starting middle processor for network {self.name}")
+
+        try:
+            # Get current state
+            state = await self._get_processor_state("middle")
+            if state.last_processed_slot is None:
+                raise ValueError("Middle processor state missing last_processed_slot")
+
+            current_slot = state.last_processed_slot
+            target_slot = state.target_slot
+
+            # Process slots until we catch up
+            while not self._stop_event.is_set() and current_slot < target_slot:
+                try:
+                    # Process the slot
+                    success = await self.process_slot(current_slot)
+                    if success:
+                        self.logger.info(f"Successfully processed middle slot {current_slot} for network {self.name}")
+                        current_slot += 1
+                        # Save state with direction preserved
+                        await self._save_processor_state(SlotProcessorState({
+                            "last_processed_slot": current_slot,
+                            "target_slot": target_slot,
+                            "direction": "middle"
+                        }))
+                    else:
+                        self.logger.error(f"Failed to process middle slot {current_slot} for network {self.name}")
+                        current_slot += 1  # Skip failed slot
+
+                    # Small sleep to prevent tight loop
+                    try:
+                        await asyncio.wait_for(self._stop_event.wait(), timeout=0.05)
+                        break
+                    except asyncio.TimeoutError:
+                        continue
+
+                except asyncio.CancelledError:
+                    raise
+                except Exception as e:
+                    self.logger.error(f"Error in middle processor: {str(e)}")
+                    current_slot += 1  # Skip errored slot
+                    continue
+
+            self.logger.info(f"Middle processor caught up for network {self.name}")
+
+        except asyncio.CancelledError:
+            self.logger.info(f"Middle processor cancelled for network {self.name}")
+            raise
+        except Exception as e:
+            self.logger.error(f"Middle processor failed for network {self.name}: {str(e)}")
+            raise
 
     def get_slot_window(self, slot: int) -> Tuple[datetime, datetime]:
         start_time, end_time = self.network.clock.get_slot_window(slot)
@@ -568,7 +740,7 @@ class SlotProcessor(BaseProcessor):
                 "slot": slot,
                 "start_date": start_str,
                 "end_date": end_str,
-                "network": self.network_name
+                "network": self.network.name
             }
         )
         
@@ -606,7 +778,7 @@ class SlotProcessor(BaseProcessor):
             entity_query,
             {   
                 "index": index,
-                "network": self.network_name
+                "network": self.network.name
             }
         )
         entity_rows = entity_result.fetchall()
@@ -669,7 +841,7 @@ class SlotProcessor(BaseProcessor):
                 "slot": slot,
                 "start_date": start_str,
                 "end_date": end_str,
-                "network": self.network_name
+                "network": self.network.name
             }
         )
         block_rows = block_result.fetchall()
@@ -768,7 +940,7 @@ class SlotProcessor(BaseProcessor):
             query,
             {   
                 "slot": slot,
-                "network": self.network_name,
+                "network": self.network.name,
                 "start_date": start_str,
                 "end_date": end_str
             }
@@ -823,7 +995,7 @@ class SlotProcessor(BaseProcessor):
             query,
             {   
                 "slot": slot,
-                "network": self.network_name,
+                "network": self.network.name,
                 "start_date": start_str,
                 "end_date": end_str
             }
@@ -878,7 +1050,7 @@ class SlotProcessor(BaseProcessor):
             query,
             {   
                 "slot": slot,
-                "network": self.network_name,
+                "network": self.network.name,
                 "start_date": start_str,
                 "end_date": end_str
             }
@@ -936,7 +1108,7 @@ class SlotProcessor(BaseProcessor):
             query,
             {   
                 "slot": slot,
-                "network": self.network_name,
+                "network": self.network.name,
                 "start_date": start_str,
                 "end_date": end_str
             }
@@ -988,7 +1160,7 @@ class SlotProcessor(BaseProcessor):
             query,
             {   
                 "slot": slot,
-                "network": self.network_name,
+                "network": self.network.name,
                 "start_date": start_str,
                 "end_date": end_str
             }
@@ -1037,7 +1209,7 @@ class SlotProcessor(BaseProcessor):
             query,
             {   
                 "slot": slot,
-                "network": self.network_name,
+                "network": self.network.name,
                 "start_date": start_str,
                 "end_date": end_str,
                 "block_root": beacon_block_root
@@ -1053,3 +1225,17 @@ class SlotProcessor(BaseProcessor):
     async def process(self) -> None:
         """Process slot data."""
         return
+
+    def get_frontend_config(self, root_config: Optional["Config"] = None) -> Dict[str, Any]:
+        """Get frontend-friendly config."""
+        config = super().get_frontend_config()
+        networks = {}
+        for network_name, network_config in self.get_network_config(root_config).items():
+            networks[network_name] = {
+                "head_lag_slots": network_config.head_lag_slots
+            }
+        config.update({
+            "networks": networks
+        })
+        
+        return config

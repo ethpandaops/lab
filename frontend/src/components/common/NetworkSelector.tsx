@@ -52,7 +52,7 @@ export function NetworkSelector({
       <Listbox value={selectedNetwork} onChange={onNetworkChange}>
         <div className="relative">
           <Listbox.Button className="relative w-full cursor-pointer rounded-lg bg-surface/30 backdrop-blur-sm py-2 pl-3 pr-10 text-left shadow-sm border border-subtle hover:bg-surface/50 transition-colors">
-            <span className="flex items-center gap-2">
+            <span className="flex items-center justify-center gap-2">
               <span className="w-5 h-5 flex items-center justify-center">
                 {selectedMetadata.icon}
               </span>

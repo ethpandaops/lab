@@ -30,7 +30,20 @@ interface UserData {
   }[]
 }
 
-type TimeWindow = string
+interface TimeWindow {
+  file: string
+  step: string
+  label: string
+  range: string
+}
+
+type SectionId = 'total-nodes' | 'nodes-by-country' | 'map';
+
+const SECTIONS: Record<SectionId, string> = {
+  'total-nodes': 'total-nodes',
+  'nodes-by-country': 'nodes-by-country',
+  'map': 'map'
+};
 
 // Generate a deterministic color based on string
 const stringToColor = (str: string) => {
@@ -41,13 +54,6 @@ const stringToColor = (str: string) => {
   const hue = hash % 360;
   return `hsl(${hue}, 70%, 60%)`;
 };
-
-const SECTIONS = {
-  'total-nodes': 'total-nodes',
-  'nodes-by-country': 'nodes-by-country'
-} as const
-
-type SectionId = keyof typeof SECTIONS
 
 export const CommunityNodes = () => {
   const [searchParams, setSearchParams] = useSearchParams()
@@ -67,7 +73,7 @@ export const CommunityNodes = () => {
   const [currentWindow, setCurrentWindow] = useState<TimeWindow | null>(null)
   const [countryData, setCountryData] = useState<CountryData[]>([])
   const [userData, setUserData] = useState<UserData[]>([])
-  const [activeSection, setActiveSection] = useState<SectionId>('map')
+  const [activeSection, setActiveSection] = useState<SectionId>('total-nodes')
   const [hiddenUsers, setHiddenUsers] = useState<Set<string>>(new Set())
   const [mapWidth, setMapWidth] = useState(0)
   const mapRef = useRef<HTMLDivElement>(null)
@@ -115,8 +121,8 @@ export const CommunityNodes = () => {
   const handleTimeWindowChange = (newTimeWindow: TimeWindow) => {
     setCurrentWindow(newTimeWindow)
     const newParams = new URLSearchParams(searchParams)
-    if (newTimeWindow !== defaultTimeWindow) {
-      newParams.set('timeWindow', newTimeWindow)
+    if (newTimeWindow.file !== defaultTimeWindow) {
+      newParams.set('timeWindow', newTimeWindow.file)
     } else {
       newParams.delete('timeWindow')
     }
@@ -133,7 +139,7 @@ export const CommunityNodes = () => {
 
   // Handle section scrolling
   useEffect(() => {
-    const hash = location.hash.slice(1)
+    const hash = location.hash.slice(1) as SectionId
     if (!hash) return
 
     const refs = {
@@ -141,18 +147,26 @@ export const CommunityNodes = () => {
       [SECTIONS['nodes-by-country']]: countriesRef
     }
 
-    const ref = refs[hash as SectionId]
+    const ref = refs[hash]
     if (ref?.current) {
       ref.current.scrollIntoView({ behavior: 'smooth' })
     }
   }, [location.hash])
 
   const handleSectionClick = (section: SectionId) => {
-    navigate({ hash: section })
+    navigate({ hash: SECTIONS[section] })
   }
 
-  const countriesPath = pathPrefix ? `${pathPrefix}/countries/${selectedNetwork}/${currentWindow}.json` : null
-  const usersPath = pathPrefix ? `${pathPrefix}/users/${selectedNetwork}/${currentWindow}.json` : null
+  // Set initial time window when config loads
+  useEffect(() => {
+    if (timeWindows.length > 0) {
+      const initialWindow = timeWindows.find(w => w.file === initialTimeWindow) || timeWindows[0]
+      setCurrentWindow(initialWindow)
+    }
+  }, [timeWindows, initialTimeWindow])
+
+  const countriesPath = pathPrefix ? `${pathPrefix}/countries/${selectedNetwork}/${currentWindow?.file || defaultTimeWindow}.json` : null
+  const usersPath = pathPrefix ? `${pathPrefix}/users/${selectedNetwork}/${currentWindow?.file || defaultTimeWindow}.json` : null
 
   const { data: countriesData, loading: countriesLoading, error: countriesError } = useDataFetch<CountryData[]>(countriesPath)
   const { data: usersData, loading: usersLoading, error: usersError } = useDataFetch<UserData[]>(usersPath)
@@ -373,11 +387,11 @@ export const CommunityNodes = () => {
                   <button
                     key={window.file}
                     onClick={() => {
-                      handleTimeWindowChange(window.file)
+                      handleTimeWindowChange(window)
                       setIsTimeWindowOpen(false)
                     }}
                     className={`w-full flex items-center gap-2 px-4 py-2 hover:bg-hover first:rounded-t-lg last:rounded-b-lg text-primary ${
-                      window.file === currentWindow ? 'bg-active' : ''
+                      window.file === currentWindow?.file ? 'bg-active' : ''
                     }`}
                   >
                     <span className="font-mono">{window.label}</span>

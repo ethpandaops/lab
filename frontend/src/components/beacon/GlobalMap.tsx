@@ -153,15 +153,15 @@ export function GlobalMap({ nodes, currentTime, blockEvents, loading, isMissing 
   }, [nodes, blockEvents, currentTime])
 
   if (loading || isMissing) {
-    return <div className="lg:col-span-8 h-[500px] animate-pulse backdrop-blur-md" />
+    return <div className="lg:col-span-8 h-[300px] sm:h-[500px] animate-pulse backdrop-blur-md" />
   }
 
   return (
-    <div className="lg:col-span-8 h-[500px] overflow-hidden backdrop-blur-md">
+    <div className="lg:col-span-8 h-[300px] sm:h-[500px] overflow-hidden backdrop-blur-md">
       <ComposableMap
         projection="geoMercator"
         projectionConfig={{
-          scale: 180, // Reduced zoom to show more of the map
+          scale: 140, // Reduced zoom to show more of the map
           center: [30, 20] // Adjusted center to better show all continents
         }}
         style={{

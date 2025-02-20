@@ -48,15 +48,17 @@ class BeaconModule(Module):
         # Start all processors
         for name, processor in self._processors.items():
             self.logger.info(f"Starting {name} processor")
-            await processor.start()
+            self._create_task(processor.start())
 
     async def stop(self) -> None:
         """Stop module."""
         self.logger.info("Stopping Beacon module")
-        await super().stop()
         
         # Stop all processors
         for name, processor in self._processors.items():
             self.logger.debug(f"Stopping {name} processor")
             await processor.stop()
-            self.logger.info(f"Stopped {name} processor") 
+            self.logger.info(f"Stopped {name} processor")
+
+        # Let base class handle task cleanup
+        await super().stop() 

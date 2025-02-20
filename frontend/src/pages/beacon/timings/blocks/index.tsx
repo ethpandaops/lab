@@ -113,6 +113,17 @@ export const BlockTimings: React.FC = () => {
     setSearchParams(params)
   }, [network, timeWindow, setSearchParams, searchParams])
 
+  // Set current window when time windows are loaded
+  useEffect(() => {
+    const window = timeWindows.find(w => w.file === timeWindow)
+    if (window) {
+      setCurrentWindow(window)
+    } else if (timeWindows.length > 0) {
+      setCurrentWindow(timeWindows[0])
+      setTimeWindow(timeWindows[0].file)
+    }
+  }, [timeWindows, timeWindow])
+
   // Skip data fetching if config isn't loaded
   const timingsPath = config?.modules?.['beacon_chain_timings']?.path_prefix 
     ? `${config.modules['beacon_chain_timings'].path_prefix}/block_timings/${network}/${timeWindow}.json`
@@ -357,16 +368,21 @@ export const BlockTimings: React.FC = () => {
             </button>
 
             {isTimeWindowOpen && (
-              <div className="absolute z-[9999] mt-2 w-full border border-default">
+              <div className="absolute z-[9999] mt-2 w-full border border-default bg-surface">
                 <div className="py-1">
                   {timeWindows.map((window) => (
                     <button
                       key={window.file}
                       onClick={() => {
                         setTimeWindow(window.file)
+                        setCurrentWindow(window)
                         setIsTimeWindowOpen(false)
                       }}
-                      className="w-full px-4 py-2 text-left font-mono text-primary hover:text-primary hover:bg-hover active:bg-active transition-colors"
+                      className={`w-full px-4 py-2 text-left font-mono transition-colors ${
+                        window.file === timeWindow 
+                          ? 'text-primary bg-active'
+                          : 'text-primary hover:text-primary hover:bg-hover active:bg-active'
+                      }`}
                     >
                       {window.label}
                     </button>

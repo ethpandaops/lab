@@ -11,6 +11,7 @@ class LabLogger(logging.Logger):
     def __init__(self, name: str, level: int = logging.NOTSET):
         """Initialize logger."""
         super().__init__(name, level)
+        self._bound_fields = {}
 
     def _format_value(self, value: Any) -> str:
         """Format a value for logging."""
@@ -26,10 +27,18 @@ class LabLogger(logging.Logger):
             extra = {}
         if kwargs:
             extra.update(kwargs)
+        if self._bound_fields:
+            extra.update(self._bound_fields)
 
         if extra:
             msg = f"{msg} {' '.join(f'{k}={self._format_value(v)}' for k, v in extra.items())}"
         super()._log(level, msg, args, exc_info, extra=None)
+
+    def bind(self, **kwargs: Any) -> 'LabLogger':
+        """Create a new logger with bound fields."""
+        new_logger = LabLogger(self.name, self.level)
+        new_logger._bound_fields = {**self._bound_fields, **kwargs}
+        return new_logger
 
 def configure_logging(debug: bool = False) -> None:
     """Configure logging for the application."""

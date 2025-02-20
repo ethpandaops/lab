@@ -105,7 +105,7 @@ export function AttestationView({
     const counts = arrivalData.map(d => d.count)
     return [{
       name: "Attestation Count",
-      color: "rgb(34, 197, 94)",
+      color: "currentColor",
       min: Math.min(...counts),
       max: Math.max(...counts),
       avg: counts.reduce((a, b) => a + b, 0) / counts.length,
@@ -120,7 +120,7 @@ export function AttestationView({
     const percentages = cdfData.map(d => d.percentage)
     return [{
       name: "Cumulative %",
-      color: "rgb(34, 197, 94)",
+      color: "currentColor",
       min: Math.min(...percentages),
       max: Math.max(...percentages),
       avg: percentages.reduce((a, b) => a + b, 0) / percentages.length,
@@ -155,7 +155,7 @@ export function AttestationView({
           {/* Progress stats */}
           <div className="flex items-center justify-between text-xs font-mono">
             <div className="flex items-baseline gap-1.5">
-              <span className="text-lg font-medium text-success/90">{currentAttestationCount.toLocaleString()}</span>
+              <span className="text-lg font-medium text-success">{currentAttestationCount.toLocaleString()}</span>
               <span className="text-tertiary">of {TOTAL_VALIDATORS.toLocaleString()} validators</span>
             </div>
             <div className="text-tertiary">
@@ -169,7 +169,7 @@ export function AttestationView({
             <div 
               className={`absolute inset-y-0 left-0 transition-all duration-100 ${
                 currentAttestationCount >= ATTESTATION_THRESHOLD 
-                  ? 'bg-success/80' 
+                  ? 'bg-success' 
                   : 'bg-success/40'
               }`}
               style={{ width: `${(currentAttestationCount / TOTAL_VALIDATORS) * 100}%` }}
@@ -270,7 +270,8 @@ export function AttestationView({
                     <Line
                       type="monotone"
                       dataKey="count"
-                      stroke="rgb(34, 197, 94)"
+                      className="text-success"
+                      stroke="currentColor"
                       strokeWidth={2}
                       dot={false}
                       isAnimationActive={false}
@@ -327,19 +328,22 @@ export function AttestationView({
                     />
                     <ReferenceLine
                       y={66}
-                      stroke="rgb(34, 197, 94)"
+                      className="text-success"
+                      stroke="currentColor"
                       strokeDasharray="3 3"
                       label={{
                         value: "66%",
                         position: "right",
-                        fill: "rgb(34, 197, 94)",
+                        className: "text-success",
+                        fill: "currentColor",
                         fontSize: 12
                       }}
                     />
                     <Line
                       type="monotone"
                       dataKey="percentage"
-                      stroke="rgb(34, 197, 94)"
+                      className="text-success"
+                      stroke="currentColor"
                       strokeWidth={2}
                       dot={false}
                       isAnimationActive={false}
