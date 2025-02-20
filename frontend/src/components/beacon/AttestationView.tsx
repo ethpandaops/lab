@@ -136,10 +136,22 @@ export function AttestationView({
 
         {/* Attestation Progress Bar */}
         <div className="relative h-8 bg-cyber-darker rounded-lg overflow-hidden">
+          {/* Background gradient */}
+          <div className="absolute inset-0 bg-gradient-to-r from-cyber-darker via-cyber-darker/50 to-cyber-darker" />
+          
+          {/* Progress bar */}
           <div 
-            className="absolute inset-y-0 left-0 bg-cyber-pink/20 transition-all duration-100"
+            className="absolute inset-y-0 left-0 bg-gradient-to-r from-cyber-pink/30 to-cyber-pink/20 transition-all duration-100"
             style={{ width: `${(currentAttestationCount / TOTAL_VALIDATORS) * 100}%` }}
           />
+          
+          {/* Progress bar highlight */}
+          <div 
+            className="absolute inset-y-0 left-0 w-[2px] bg-cyber-pink transition-all duration-100"
+            style={{ left: `${(currentAttestationCount / TOTAL_VALIDATORS) * 100}%` }}
+          />
+
+          {/* Content */}
           <div className="absolute inset-0 flex items-center justify-between px-4 text-xs font-mono">
             <span className="text-cyber-pink/70">0%</span>
             <div className="text-center">
