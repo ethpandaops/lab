@@ -28,6 +28,7 @@ class NetworkConfig(BaseModel):
     bellatrix_fork_epoch: int = Field(alias="BELLATRIX_FORK_EPOCH")
     capella_fork_epoch: int = Field(alias="CAPELLA_FORK_EPOCH")
     deneb_fork_epoch: int = Field(alias="DENEB_FORK_EPOCH")
+    electra_fork_epoch: Optional[int] = Field(None, alias="ELECTRA_FORK_EPOCH")
 
     # Time parameters
     seconds_per_slot: int = Field(alias="SECONDS_PER_SLOT")
@@ -94,8 +95,14 @@ class EthereumNetwork:
             ),
             "deneb": ForkVersion(
                 epoch=self.config.deneb_fork_epoch
-            )
+            ),
         }
+
+        # Add electra fork if it exists
+        if self.config.electra_fork_epoch is not None:
+            self._forks["electra"] = ForkVersion(
+                epoch=self.config.electra_fork_epoch
+            )
 
     def get_current_fork(self, slot: Optional[int] = None) -> str:
         """Get the current fork name based on slot number or current time."""
@@ -109,6 +116,8 @@ class EthereumNetwork:
         epoch = slot // self.clock.SLOTS_PER_EPOCH
 
         # Check forks in reverse chronological order
+        if self.config.electra_fork_epoch is not None and epoch >= self.config.electra_fork_epoch:
+            return "electra"
         if epoch >= self.config.deneb_fork_epoch:
             return "deneb"
         if epoch >= self.config.capella_fork_epoch:
@@ -134,3 +143,6 @@ class EthereumNetwork:
         
         fork = self._forks.get(fork_name)
         return fork.epoch if fork else None 
+    def get_forks(self) -> Dict[str, ForkVersion]:
+        """Get all forks."""
+        return self._forks

@@ -122,7 +122,8 @@ class UserSummariesProcessor(BaseProcessor):
             summary["contributors"].append({
                 "name": username,
                 "node_count": len(user_data["nodes"]),
-                "updated_at": int(datetime.now(timezone.utc).timestamp())
+                "updated_at": int(datetime.now(timezone.utc).timestamp()),
+                "nodes": user_data["nodes"]
             })
 
         # Write summary file

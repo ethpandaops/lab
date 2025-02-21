@@ -274,6 +274,36 @@ function Xatu(): JSX.Element {
               </p>
             </div>
           </Link>
+
+          <Link 
+            to="fork-readiness" 
+            className="group relative backdrop-blur-md bg-surface/80 border border-subtle hover:border-accent rounded-lg overflow-hidden transition-all duration-300"
+          >
+            <div className="absolute inset-0 bg-gradient-to-br from-accent/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+            
+            <div className="relative p-6">
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center flex-shrink-0">
+                  <span className="text-2xl">🔄</span>
+                </div>
+
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-lg font-sans font-bold text-primary group-hover:text-accent transition-colors mb-1">
+                    Fork Readiness
+                  </h3>
+                  <p className="text-sm font-mono text-tertiary truncate">
+                    Client version readiness
+                  </p>
+                </div>
+
+                <ArrowRight className="w-5 h-5 text-accent/50 group-hover:text-accent group-hover:translate-x-1 transition-all duration-300" />
+              </div>
+
+              <p className="text-sm font-mono text-secondary group-hover:text-primary/90 transition-colors mt-4">
+                Track client version readiness for upcoming network forks
+              </p>
+            </div>
+          </Link>
         </div>
       </div>
     </div>

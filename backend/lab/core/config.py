@@ -3,7 +3,7 @@ from typing import List, Optional, Tuple, Dict, Any
 from datetime import timedelta
 from urllib.parse import urlparse, parse_qs
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, field_validator, RootModel
 from pydantic_settings import BaseSettings
 
 class S3Config(BaseModel):
@@ -225,10 +225,41 @@ class ModulesConfig(BaseModel):
     xatu_public_contributors: Optional[XatuPublicContributorsConfig] = None
     beacon: Optional[BeaconConfig] = None
 
+class MinClientVersions(BaseModel):
+    """Minimum client versions required for a fork."""
+    grandine: Optional[str] = Field(default=None, description="Minimum Grandine version")
+    lighthouse: Optional[str] = Field(default=None, description="Minimum Lighthouse version") 
+    lodestar: Optional[str] = Field(default=None, description="Minimum Lodestar version")
+    nimbus: Optional[str] = Field(default=None, description="Minimum Nimbus version")
+    prysm: Optional[str] = Field(default=None, description="Minimum Prysm version")
+    teku: Optional[str] = Field(default=None, description="Minimum Teku version")
+
+class ConsensusFork(BaseModel):
+    """Configuration for a consensus fork."""
+    min_client_versions: MinClientVersions = Field(
+        default_factory=MinClientVersions,
+        description="Minimum client versions required for this fork"
+    )
+
+class ConsensusForks(RootModel):
+    """Configuration for consensus layer forks."""
+    root: Dict[str, ConsensusFork] = Field(
+        default_factory=dict,
+        description="Map of fork name to fork configuration"
+    )
+
+class Forks(BaseModel):
+    """Fork configurations."""
+    consensus: ConsensusForks = Field(
+        default_factory=ConsensusForks,
+        description="Consensus layer fork configurations"
+    )
+
 class EthereumNetworkConfig(BaseModel):
     """Configuration for an Ethereum network."""
     config_url: str = Field(description="URL to the network's beacon chain config.yaml")
     genesis_time: int = Field(description="Unix timestamp of the network's genesis")
+    forks: Optional[Forks] = Field(default=None, description="Fork configurations")
 
 class EthereumConfig(BaseModel):
     """Configuration for Ethereum networks."""
@@ -244,12 +275,21 @@ class Config(BaseSettings):
     modules: ModulesConfig
     ethereum: EthereumConfig = Field(default_factory=EthereumConfig)
 
-    def get_frontend_config(self) -> Dict[str, Any]:
+    def get_frontend_config(self, networks_manager = None) -> Dict[str, Any]:
         """Generate frontend-friendly config."""
         ethereum_config = {
             "networks": {
                 network_name: {
-                    "genesis_time": network_config.genesis_time
+                    "genesis_time": network_config.genesis_time,
+                    "forks": {
+                        "consensus": {
+                            fork_name: {
+                                **fork.model_dump(),
+                                "epoch": networks_manager.get_network(network_name).get_forks()[fork_name].epoch if networks_manager else None
+                            }
+                            for fork_name, fork in network_config.forks.consensus.root.items()
+                        } if network_config.forks else {}
+                    } if network_config.forks else None,
                 }
                 for network_name, network_config in self.ethereum.networks.items()
             }

@@ -327,5 +327,5 @@ class Runner:
     async def _write_frontend_config(self) -> None:
         """Write frontend config to storage."""
         logger.debug("Writing frontend config")
-        config_json = json.dumps(self.config.get_frontend_config()).encode()
+        config_json = json.dumps(self.config.get_frontend_config(networks_manager=self.networks)).encode()
         await self.storage.store_atomic("config.json", io.BytesIO(config_json)) 

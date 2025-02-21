@@ -18,14 +18,40 @@ ethereum:
     mainnet:
       config_url: "https://raw.githubusercontent.com/eth-clients/mainnet/refs/heads/main/metadata/config.yaml"
       genesis_time: 1606824023  # Dec 1, 2020 12:00:23 PM UTC
+      forks:
+        consensus:
+          electra:
+            min_client_versions: {}
     sepolia:
       config_url: "https://raw.githubusercontent.com/eth-clients/sepolia/refs/heads/main/metadata/config.yaml"
       genesis_time: 1655733600  # Jun 20, 2022 12:00:00 PM UTC
+      forks:
+        consensus:
+          electra:
+            min_client_versions:
+              grandine: "1.0.0"
+              lighthouse: "7.0.0-beta.0"
+              lodestar: "1.27.0"
+              nimbus: "25.2.0"
+              prysm: "5.3.0"
+              teku: "25.2.0"
     holesky:
       config_url: "https://raw.githubusercontent.com/eth-clients/holesky/refs/heads/main/metadata/config.yaml"
       genesis_time: 1695902400  # Sep 28, 2023 12:00:00 PM UTC
+      forks:
+        consensus:
+          electra:
+            min_client_versions:
+              grandine: "1.0.0"
+              lighthouse: "7.0.0-beta.0"
+              lodestar: "1.27.0"
+              nimbus: "25.2.0"
+              prysm: "5.3.0"
+              teku: "25.2.0"
 
 modules:
+  beacon:
+    enabled: true
   beacon_chain_timings:
     enabled: false
     description: "Beacon chain block timing metrics and analysis"

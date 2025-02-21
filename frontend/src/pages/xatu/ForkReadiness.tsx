@@ -1,0 +1,342 @@
+import { useContext, useMemo, useState, useEffect } from 'react'
+import { useDataFetch } from '../../utils/data'
+import { ConfigContext, NetworkContext } from '../../App'
+import type { Config, XatuSummary, EthereumNetwork } from '../../types'
+import { formatDistanceToNow } from 'date-fns'
+import { ChevronDown, ChevronUp } from 'lucide-react'
+import { Select } from '@/components/common/Select'
+import { BeaconClockManager } from '../../utils/beacon'
+import { formatNodeName } from '../../utils/format'
+
+const MS_PER_SECOND = 1000
+const SLOTS_PER_EPOCH = 32
+
+const CLIENT_METADATA: Record<string, { name: string }> = {
+  prysm: { name: 'Prysm' },
+  teku: { name: 'Teku' },
+  lighthouse: { name: 'Lighthouse' },
+  lodestar: { name: 'Lodestar' },
+  nimbus: { name: 'Nimbus' },
+  grandine: { name: 'Grandine' },
+}
+
+interface ClientReadiness {
+  name: string
+  totalNodes: number
+  readyNodes: number
+  readyPercentage: number
+  minVersion: string
+  nodes: {
+    name: string
+    version: string
+    isReady: boolean
+  }[]
+}
+
+interface NetworkReadiness {
+  name: string
+  totalNodes: number
+  readyNodes: number
+  readyPercentage: number
+  clients: ClientReadiness[]
+}
+
+function ForkReadiness(): JSX.Element {
+  const config = useContext<Config | null>(ConfigContext)
+  const { selectedNetwork, availableNetworks } = useContext(NetworkContext)
+  const [expandedClient, setExpandedClient] = useState<string | null>(null)
+  const [selectedUser, setSelectedUser] = useState<string>('all')
+  
+  const summaryPath = config?.modules?.['xatu_public_contributors']?.path_prefix 
+    ? `${config.modules['xatu_public_contributors'].path_prefix}/user-summaries/summary.json`
+    : null
+
+  const { data: summaryData } = useDataFetch<XatuSummary>(summaryPath)
+
+  const users = useMemo(() => {
+    if (!summaryData) return []
+    
+    // Get users who have at least one node in the selected network
+    const usersWithNodes = summaryData.contributors
+      .filter(c => c.nodes.some(n => n.network === selectedNetwork))
+      .map(c => c.name)
+    
+    return ['all', ...usersWithNodes]
+  }, [summaryData, selectedNetwork])
+
+  const networks = useMemo(() => {
+    if (!config) return []
+    return availableNetworks
+      .filter(name => config.ethereum.networks[name]?.forks?.consensus?.electra)
+      .sort((a, b) => {
+        if (a === 'mainnet') return -1
+        if (b === 'mainnet') return 1
+        return a.localeCompare(b)
+      })
+  }, [config, availableNetworks])
+
+  const readinessData = useMemo(() => {
+    if (!summaryData || !config) {
+      console.log('No summary data or config:', { summaryData: !!summaryData, config: !!config })
+      return []
+    }
+
+    console.log('Selected Network:', selectedNetwork)
+    console.log('Network Config:', config.ethereum.networks[selectedNetwork])
+    console.log('Has Electra:', config.ethereum.networks[selectedNetwork]?.forks?.consensus?.electra)
+
+    if (!config.ethereum.networks[selectedNetwork]?.forks?.consensus?.electra) {
+      console.log('No Electra fork config for network')
+      return []
+    }
+
+    const network = config.ethereum.networks[selectedNetwork]
+    const nodes = summaryData.contributors
+      .filter(c => selectedUser === 'all' || c.name === selectedUser)
+      .flatMap(c => c.nodes)
+      .filter(n => n.network === selectedNetwork)
+
+    console.log('Filtered Nodes:', nodes.length)
+    console.log('Min Client Versions:', network.forks?.consensus?.electra?.min_client_versions)
+
+    const clientReadiness = Object.entries(network.forks?.consensus?.electra?.min_client_versions || {})
+      .map(([clientName, minVersion]) => {
+        const clientNodes = nodes.filter(n => n.consensus_client === clientName)
+        const readyNodes = clientNodes.filter(n => {
+          const currentVersion = n.consensus_version.replace('v', '')
+          const minVersionParts = minVersion.split('.')
+          const currentVersionParts = currentVersion.split('.')
+          
+          // Compare major version
+          if (parseInt(currentVersionParts[0]) > parseInt(minVersionParts[0])) return true
+          if (parseInt(currentVersionParts[0]) < parseInt(minVersionParts[0])) return false
+          
+          // Compare minor version
+          if (parseInt(currentVersionParts[1]) > parseInt(minVersionParts[1])) return true
+          if (parseInt(currentVersionParts[1]) < parseInt(minVersionParts[1])) return false
+          
+          // Compare patch version
+          return parseInt(currentVersionParts[2]) >= parseInt(minVersionParts[2])
+        })
+
+        return {
+          name: clientName,
+          totalNodes: clientNodes.length,
+          readyNodes: readyNodes.length,
+          readyPercentage: clientNodes.length === 0 ? 100 : (readyNodes.length / clientNodes.length) * 100,
+          minVersion,
+          nodes: clientNodes.map(n => ({
+            name: n.client_name,
+            version: n.consensus_version,
+            isReady: readyNodes.includes(n)
+          }))
+        }
+      })
+      .filter(client => client.totalNodes > 0) // Only show clients with nodes
+      .sort((a, b) => b.totalNodes - a.totalNodes)
+
+    const totalNodes = clientReadiness.reduce((acc, client) => acc + client.totalNodes, 0)
+    const readyNodes = clientReadiness.reduce((acc, client) => acc + client.readyNodes, 0)
+
+    // Calculate time until fork
+    const clock = BeaconClockManager.getInstance().getBeaconClock(selectedNetwork)
+    const electraEpoch = network.forks?.consensus?.electra?.epoch || 0
+    const currentEpoch = clock?.getCurrentEpoch() || 0
+    const epochsUntilFork = electraEpoch - currentEpoch
+    const timeUntilFork = epochsUntilFork * SLOTS_PER_EPOCH * 12 // 12 seconds per slot
+
+    return [{
+      name: selectedNetwork,
+      totalNodes,
+      readyNodes,
+      readyPercentage: totalNodes === 0 ? 100 : (readyNodes / totalNodes) * 100,
+      clients: clientReadiness,
+      forkEpoch: electraEpoch,
+      timeUntilFork,
+      currentEpoch
+    }]
+  }, [summaryData, config, selectedUser, selectedNetwork])
+
+  if (!summaryData || !config) {
+    return <div>Loading...</div>
+  }
+
+  if (!config.ethereum.networks[selectedNetwork]?.forks?.consensus?.electra) {
+    return (
+      <div className="space-y-6">
+        <div className="backdrop-blur-md border border-default p-6 bg-surface/80">
+          <div className="flex flex-col items-center justify-center py-12 text-center">
+            <div className="text-4xl mb-4">🎉</div>
+            <h2 className="text-2xl font-sans font-bold text-primary mb-2">No Upcoming Forks</h2>
+            <p className="text-sm font-mono text-secondary max-w-lg">
+              There are no upcoming forks configured for {selectedNetwork}. Check back later for updates on future network upgrades.
+            </p>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="space-y-6">
+      <section className="backdrop-blur-sm rounded-lg p-6">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <div className="flex items-baseline space-x-3 mb-1">
+              <h2 className="text-2xl font-sans font-bold text-primary">Fork Readiness</h2>
+              <span className="text-lg font-mono text-accent">Electra</span>
+            </div>
+            <span className="text-sm font-mono text-secondary">
+              Last updated{' '}
+              <span 
+                title={new Date(summaryData.contributors[0]?.updated_at * MS_PER_SECOND).toString()}
+                className="cursor-help border-b border-dotted border-primary/50 hover:border-primary/70 transition-colors"
+              >
+                {formatDistanceToNow(new Date(summaryData.contributors[0]?.updated_at * MS_PER_SECOND), { addSuffix: true })}
+              </span>
+            </span>
+          </div>
+          <div className="w-64">
+            <Select
+              value={selectedUser}
+              onChange={(value: string) => setSelectedUser(value)}
+              options={users.map(user => ({
+                label: user === 'all' ? 'All Users' : user,
+                value: user
+              }))}
+              label="Filter by User"
+            />
+          </div>
+        </div>
+
+        <div className="space-y-8">
+          {readinessData.map(network => (
+            <div key={network.name} className="space-y-4">
+              <div className="w-full rounded-lg bg-surface/80">
+                {/* Network Header */}
+                <div className="p-6 border-b border-subtle/30">
+                  <div className="flex items-center justify-between mb-6">
+                    <div className="flex items-center space-x-4">
+                      <div>
+                        <h3 className="text-2xl font-sans font-bold text-primary mb-1">{network.name}</h3>
+                        <div className="text-sm font-mono">
+                          <span className="text-secondary">Overall readiness: </span>
+                          <span className="text-primary font-bold">{network.readyPercentage.toFixed(1)}%</span>
+                          <span className="text-tertiary"> ({network.readyNodes}/{network.totalNodes} nodes)</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="text-sm font-mono text-secondary">
+                      {network.timeUntilFork > 0 ? (
+                        <div className="text-right">
+                          <div className="text-accent text-lg font-medium mb-1">
+                            {formatDistanceToNow(new Date(Date.now() + network.timeUntilFork * 1000))}
+                          </div>
+                          <div className="text-tertiary">until fork (epoch {network.forkEpoch})</div>
+                        </div>
+                      ) : (
+                        <div className="text-success text-lg font-medium">Fork activated</div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="relative h-3 bg-surface/30 rounded-full overflow-hidden">
+                    <div 
+                      className="absolute inset-y-0 left-0 bg-gradient-to-r from-accent to-accent/70 transition-all duration-500"
+                      style={{ width: `${network.readyPercentage}%` }}
+                    />
+                  </div>
+                </div>
+
+                {/* Client Grid */}
+                <div className="p-6 bg-surface/40">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    {network.clients.map(client => (
+                      <div key={client.name} className="bg-surface/30 backdrop-blur-sm rounded-lg p-4 border border-subtle/10">
+                        <div className="flex items-center justify-between mb-4">
+                          <div className="flex items-center space-x-3">
+                            <img 
+                              src={`/clients/${client.name}.png`}
+                              alt={`${client.name} logo`}
+                              className="w-6 h-6 object-contain opacity-90"
+                              onError={(e) => {
+                                const target = e.currentTarget;
+                                target.style.display = 'none';
+                              }}
+                            />
+                            <div>
+                              <div className="font-mono font-medium text-primary">
+                                {CLIENT_METADATA[client.name]?.name || client.name}
+                              </div>
+                              <div className="text-xs font-mono text-tertiary mt-0.5">
+                                min v{client.minVersion} · {client.readyPercentage.toFixed(1)}% ready ({client.readyNodes}/{client.totalNodes})
+                              </div>
+                            </div>
+                          </div>
+                          <div className="relative w-8 h-8">
+                            <svg className="w-8 h-8 transform -rotate-90">
+                              <circle
+                                className="text-accent/20"
+                                strokeWidth="4"
+                                stroke="currentColor"
+                                fill="transparent"
+                                r="14"
+                                cx="16"
+                                cy="16"
+                              />
+                              <circle
+                                className="text-accent transition-all duration-500"
+                                strokeWidth="4"
+                                strokeDasharray={87.96}  // 2 * pi * r
+                                strokeDashoffset={87.96 - (87.96 * client.readyPercentage) / 100}
+                                strokeLinecap="round"
+                                stroke="currentColor"
+                                fill="transparent"
+                                r="14"
+                                cx="16"
+                                cy="16"
+                              />
+                            </svg>
+                          </div>
+                        </div>
+
+                        {client.nodes.length > 0 && (
+                          <div className="mt-2 space-y-1">
+                            {client.nodes.map((node, idx) => {
+                              const { user, node: nodeName } = formatNodeName(node.name)
+                              return (
+                                <div 
+                                  key={idx}
+                                  className="flex items-center justify-between text-xs font-mono py-1 px-2 rounded hover:bg-surface/40"
+                                >
+                                  <div className="flex items-center space-x-3 min-w-0">
+                                    <span className="text-tertiary truncate">{user}</span>
+                                    <span className="text-primary truncate" title={nodeName}>
+                                      {nodeName}
+                                    </span>
+                                  </div>
+                                  <span 
+                                    className={`flex-shrink-0 ${node.isReady ? 'text-success' : 'text-error'}`}
+                                    title={node.isReady ? 'Ready for fork' : 'Needs update'}
+                                  >
+                                    {node.version}
+                                  </span>
+                                </div>
+                              )
+                            })}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+    </div>
+  )
+}
+
+export default ForkReadiness 
