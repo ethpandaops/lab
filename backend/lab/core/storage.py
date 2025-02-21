@@ -41,8 +41,8 @@ class Storage(Protocol):
 class S3Storage:
     """S3 storage implementation."""
 
-    DEFAULT_STORE_CACHE = "max-age=3600"  # 1 hour
-    DEFAULT_ATOMIC_CACHE = "max-age=3600"  # 1 hour
+    DEFAULT_STORE_CACHE = "max-age=3600,must-revalidate"  # 1 hour
+    DEFAULT_ATOMIC_CACHE = "max-age=3600,must-revalidate"  # 1 hour
 
     def __init__(self, config: S3Config):
         """Initialize S3 storage."""

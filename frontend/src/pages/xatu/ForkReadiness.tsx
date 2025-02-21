@@ -178,15 +178,15 @@ function ForkReadiness(): JSX.Element {
   }
 
   return (
-    <div className="space-y-6">
-      <section className="backdrop-blur-sm rounded-lg p-6">
-        <div className="flex items-center justify-between mb-6">
+    <div className="space-y-2">
+      <section className="backdrop-blur-sm rounded-lg p-2">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-2">
           <div>
-            <div className="flex items-baseline space-x-3 mb-1">
-              <h2 className="text-2xl font-sans font-bold text-primary">Fork Readiness</h2>
-              <span className="text-lg font-mono text-accent">Electra</span>
+            <div className="flex items-baseline space-x-2 mb-0.5">
+              <h2 className="text-xl sm:text-2xl font-sans font-bold text-primary">Fork Readiness</h2>
+              <span className="text-base sm:text-lg font-mono text-accent">Electra</span>
             </div>
-            <span className="text-sm font-mono text-secondary">
+            <span className="text-xs sm:text-sm font-mono text-secondary">
               Last updated{' '}
               <span 
                 title={new Date(summaryData.contributors[0]?.updated_at * MS_PER_SECOND).toString()}
@@ -196,7 +196,7 @@ function ForkReadiness(): JSX.Element {
               </span>
             </span>
           </div>
-          <div className="w-64">
+          <div className="w-full sm:w-64">
             <Select
               value={selectedUser}
               onChange={(value: string) => setSelectedUser(value)}
@@ -209,38 +209,36 @@ function ForkReadiness(): JSX.Element {
           </div>
         </div>
 
-        <div className="space-y-8">
+        <div className="space-y-4">
           {readinessData.map(network => (
-            <div key={network.name} className="space-y-4">
+            <div key={network.name} className="space-y-2">
               <div className="w-full rounded-lg bg-surface/80">
                 {/* Network Header */}
-                <div className="p-6 border-b border-subtle/30">
-                  <div className="flex items-center justify-between mb-6">
-                    <div className="flex items-center space-x-4">
-                      <div>
-                        <h3 className="text-2xl font-sans font-bold text-primary mb-1">{network.name}</h3>
-                        <div className="text-sm font-mono">
-                          <span className="text-secondary">Overall readiness: </span>
-                          <span className="text-primary font-bold">{network.readyPercentage.toFixed(1)}%</span>
-                          <span className="text-tertiary"> ({network.readyNodes}/{network.totalNodes} nodes)</span>
-                        </div>
+                <div className="p-2 border-b border-subtle/30">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-2">
+                    <div>
+                      <h3 className="text-xl sm:text-2xl font-sans font-bold text-primary mb-0.5">{network.name}</h3>
+                      <div className="text-xs sm:text-sm font-mono">
+                        <span className="text-secondary">Overall readiness: </span>
+                        <span className="text-primary font-bold">{network.readyPercentage.toFixed(1)}%</span>
+                        <span className="text-tertiary"> ({network.readyNodes}/{network.totalNodes} nodes)</span>
                       </div>
                     </div>
                     <div className="text-sm font-mono text-secondary">
                       {network.timeUntilFork > 0 ? (
                         <div className="text-right">
-                          <div className="text-accent text-lg font-medium mb-1">
+                          <div className="text-accent text-base sm:text-lg font-medium mb-0.5">
                             {formatDistanceToNow(new Date(Date.now() + network.timeUntilFork * 1000))}
                           </div>
-                          <div className="text-tertiary">until fork (epoch {network.forkEpoch})</div>
+                          <div className="text-tertiary text-xs sm:text-sm">until fork (epoch {network.forkEpoch})</div>
                         </div>
                       ) : (
-                        <div className="text-success text-lg font-medium">Fork activated</div>
+                        <div className="text-success text-base sm:text-lg font-medium">Fork activated</div>
                       )}
                     </div>
                   </div>
 
-                  <div className="relative h-3 bg-surface/30 rounded-full overflow-hidden">
+                  <div className="relative h-2 sm:h-3 bg-surface/30 rounded-full overflow-hidden">
                     <div 
                       className="absolute inset-y-0 left-0 bg-gradient-to-r from-accent to-accent/70 transition-all duration-500"
                       style={{ width: `${network.readyPercentage}%` }}
@@ -249,23 +247,23 @@ function ForkReadiness(): JSX.Element {
                 </div>
 
                 {/* Client Grid */}
-                <div className="p-6 bg-surface/40">
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div className="p-2 bg-surface/40">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                     {network.clients.map(client => (
-                      <div key={client.name} className="bg-surface/30 backdrop-blur-sm rounded-lg p-4 border border-subtle/10">
-                        <div className="flex items-center justify-between mb-4">
-                          <div className="flex items-center space-x-3">
+                      <div key={client.name} className="bg-surface/30 backdrop-blur-sm rounded-lg p-2 border border-subtle/10">
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="flex items-center space-x-2">
                             <img 
                               src={`/clients/${client.name}.png`}
                               alt={`${client.name} logo`}
-                              className="w-6 h-6 object-contain opacity-90"
+                              className="w-5 h-5 sm:w-6 sm:h-6 object-contain opacity-90"
                               onError={(e) => {
                                 const target = e.currentTarget;
                                 target.style.display = 'none';
                               }}
                             />
                             <div>
-                              <div className="font-mono font-medium text-primary">
+                              <div className="font-mono font-medium text-primary text-sm sm:text-base">
                                 {CLIENT_METADATA[client.name]?.name || client.name}
                               </div>
                               <div className="text-xs font-mono text-tertiary mt-0.5">
@@ -273,43 +271,43 @@ function ForkReadiness(): JSX.Element {
                               </div>
                             </div>
                           </div>
-                          <div className="relative w-8 h-8">
-                            <svg className="w-8 h-8 transform -rotate-90">
+                          <div className="relative w-6 h-6 sm:w-8 sm:h-8">
+                            <svg className="w-6 h-6 sm:w-8 sm:h-8 transform -rotate-90">
                               <circle
                                 className="text-accent/20"
                                 strokeWidth="4"
                                 stroke="currentColor"
                                 fill="transparent"
-                                r="14"
-                                cx="16"
-                                cy="16"
+                                r="10"
+                                cx="12"
+                                cy="12"
                               />
                               <circle
                                 className="text-accent transition-all duration-500"
                                 strokeWidth="4"
-                                strokeDasharray={87.96}  // 2 * pi * r
-                                strokeDashoffset={87.96 - (87.96 * client.readyPercentage) / 100}
+                                strokeDasharray={62.83}  // 2 * pi * r
+                                strokeDashoffset={62.83 - (62.83 * client.readyPercentage) / 100}
                                 strokeLinecap="round"
                                 stroke="currentColor"
                                 fill="transparent"
-                                r="14"
-                                cx="16"
-                                cy="16"
+                                r="10"
+                                cx="12"
+                                cy="12"
                               />
                             </svg>
                           </div>
                         </div>
 
                         {client.nodes.length > 0 && (
-                          <div className="mt-2 space-y-1">
+                          <div className="mt-1 space-y-0.5">
                             {client.nodes.map((node, idx) => {
                               const { user, node: nodeName } = formatNodeName(node.name)
                               return (
                                 <div 
                                   key={idx}
-                                  className="flex items-center justify-between text-xs font-mono py-1 px-2 rounded hover:bg-surface/40"
+                                  className="flex items-center justify-between text-xs font-mono py-0.5 px-1.5 rounded hover:bg-surface/40"
                                 >
-                                  <div className="flex items-center space-x-3 min-w-0">
+                                  <div className="flex items-center space-x-2 min-w-0">
                                     <span className="text-tertiary truncate">{user}</span>
                                     <span className="text-primary truncate" title={nodeName}>
                                       {nodeName}
