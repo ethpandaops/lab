@@ -328,4 +328,9 @@ class Runner:
         """Write frontend config to storage."""
         logger.debug("Writing frontend config")
         config_json = json.dumps(self.config.get_frontend_config(networks_manager=self.networks)).encode()
-        await self.storage.store_atomic("config.json", io.BytesIO(config_json)) 
+        await self.storage.store_atomic(
+            "config.json", 
+            io.BytesIO(config_json), 
+            content_type="application/json",
+            cache_control="no-store, no-cache, must-revalidate"
+        ) 
