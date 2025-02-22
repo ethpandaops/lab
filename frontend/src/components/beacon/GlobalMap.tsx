@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useEffect } from 'react'
 import { ComposableMap, Geographies, Geography, Marker } from 'react-simple-maps'
 import { motion } from 'framer-motion'
 import { feature } from 'topojson-client'
@@ -6,6 +6,7 @@ import { FeatureCollection, Geometry } from 'geojson'
 import * as worldAtlas from 'world-atlas/countries-110m.json'
 import lookup from 'country-code-lookup'
 import { BlockDetailsOverlay } from './BlockDetailsOverlay'
+import { formatNodeName } from '../../utils/format'
 
 // Convert TopoJSON to GeoJSON
 const geoData = feature(worldAtlas as any, (worldAtlas as any).objects.countries) as unknown as FeatureCollection<Geometry>
@@ -126,13 +127,29 @@ interface GlobalMapProps {
   hideDetails?: boolean
 }
 
+// Add a glowing line effect between first nodes
+const GlowingLine = ({ start, end, color }: { start: [number, number], end: [number, number], color: string }) => (
+  <motion.line
+    x1={start[0]}
+    y1={start[1]}
+    x2={end[0]}
+    y2={end[1]}
+    stroke={color}
+    strokeWidth={0.5}
+    className="animate-glowing-line"
+    initial={{ pathLength: 0, opacity: 0 }}
+    animate={{ pathLength: 1, opacity: 1 }}
+    transition={{ duration: 1.5, ease: "easeInOut" }}
+  />
+);
+
 export function GlobalMap({ 
   nodes, 
   currentTime, 
   blockEvents, 
   loading, 
   isMissing,
-  slot,
+  slot = 0,
   proposer = 'Unknown',
   proposerIndex,
   txCount = 0,
@@ -144,11 +161,57 @@ export function GlobalMap({
   hideDetails = false
 }: GlobalMapProps): JSX.Element {
   const [isDetailsCollapsed, setIsDetailsCollapsed] = useState(false)
+  const [hoveredNode, setHoveredNode] = useState<{
+    id: string;
+    name: string;
+    username: string;
+    location: string;
+    time: number;
+    source: 'p2p' | 'api';
+    x: number;
+    y: number;
+  } | null>(null)
+
+  // Filter block events to only include block_seen events
+  const filteredBlockEvents = useMemo(() => 
+    blockEvents.filter(event => 
+      event.type === 'block_seen' && 
+      (event.source === 'api' || event.source === 'p2p')
+    ), [blockEvents]
+  )
+
+  // Reset tooltip when currentTime changes or if the hovered node is no longer visible
+  useEffect(() => {
+    if (hoveredNode) {
+      const nodeEvents = filteredBlockEvents.filter(e => e.node === hoveredNode.id)
+      const latestEvent = nodeEvents.length > 0 ? nodeEvents[nodeEvents.length - 1] : null
+      const hasSeenBlock = latestEvent && latestEvent.time <= currentTime
+
+      if (!hasSeenBlock) {
+        setHoveredNode(null)
+      }
+    }
+  }, [currentTime, filteredBlockEvents, hoveredNode])
+
+  const handlePointerEnter = (e: React.PointerEvent<SVGCircleElement>, data: {
+    id: string;
+    name: string;
+    username: string;
+    location: string;
+    time: number;
+    source: 'p2p' | 'api';
+  }) => {
+    setHoveredNode({
+      ...data,
+      x: 0, // These aren't needed anymore but keeping for type compatibility
+      y: 0
+    });
+  };
 
   const markers = useMemo(() => {
     return Object.entries(nodes).map(([id, node]) => {
       // Find the latest block event for this node
-      const nodeEvents = blockEvents.filter(event => event.node === id)
+      const nodeEvents = filteredBlockEvents.filter(event => event.node === id)
       const latestEvent = nodeEvents.length > 0 ? nodeEvents[nodeEvents.length - 1] : null
       const hasSeenBlock = latestEvent && latestEvent.time <= currentTime
 
@@ -168,18 +231,48 @@ export function GlobalMap({
         coordinates = countryCoords[node.geo.country]
       }
       // 4. Fall back to continent coordinates
-      else {
-        coordinates = continentCoords[node.geo.continent] || [0, 0]
+      else if (node.geo.continent && continentCoords[node.geo.continent]) {
+        coordinates = continentCoords[node.geo.continent]
+      }
+
+      // Skip nodes with unknown locations or invalid coordinates
+      if (!coordinates || !Array.isArray(coordinates) || coordinates.some(c => !isFinite(c))) {
+        return null
       }
 
       return {
         id,
         coordinates,
         hasSeenBlock,
-        time: latestEvent?.time || 0
+        time: latestEvent?.time || 0,
+        source: latestEvent?.source
       }
-    })
-  }, [nodes, blockEvents, currentTime])
+    }).filter((marker): marker is NonNullable<typeof marker> => marker !== null)
+  }, [nodes, filteredBlockEvents, currentTime])
+
+  // Tooltip component
+  const TooltipComponent = ({ data }: { data: NonNullable<typeof hoveredNode> }) => (
+    <div 
+      style={{
+        position: 'absolute',
+        left: '50%',
+        top: '20px',
+        zIndex: 1000,
+        transform: 'translateX(-50%)',
+        pointerEvents: 'none'
+      }}
+      className="backdrop-blur-md bg-surface/90 border border-subtle rounded-lg p-3 shadow-xl"
+    >
+      <div className="text-sm font-mono">
+        <div className="font-bold text-accent">{data.name}</div>
+        <div className="text-secondary">{data.username}</div>
+        <div className="text-tertiary mt-1">{data.location}</div>
+        <div className="text-tertiary mt-1">
+          Saw block via {data.source} at {(data.time/1000).toFixed(2)}s
+        </div>
+      </div>
+    </div>
+  );
 
   if (loading || isMissing) {
     return (
@@ -196,113 +289,171 @@ export function GlobalMap({
       <ComposableMap
         className="h-full w-full"
         projectionConfig={{
-          scale: 147,
-          center: [0, 0]
+          scale: 180,
+          center: [10, 15],
         }}
       >
+        <defs>
+          <radialGradient id="map-gradient" cx="50%" cy="50%" r="80%" fx="50%" fy="50%">
+            <stop offset="0%" stopColor="rgba(96, 165, 250, 0.05)" />
+            <stop offset="50%" stopColor="rgba(168, 85, 247, 0.03)" />
+            <stop offset="100%" stopColor="rgba(0, 0, 0, 0)" />
+          </radialGradient>
+        </defs>
+
+        {/* Gradient background */}
+        <rect x="-1000" y="-1000" width="2000" height="2000" fill="url(#map-gradient)" />
+
         <Geographies geography={geoData.features}>
           {({ geographies }) =>
             geographies.map((geo) => (
               <Geography
                 key={geo.rsmKey}
                 geography={geo}
-                fill="rgba(255, 255, 255, 0.05)"
-                stroke="rgba(255, 255, 255, 0.2)"
-                strokeWidth={0.5}
+                fill="rgba(255, 255, 255, 0.03)"
+                stroke="rgba(96, 165, 250, 0.3)"
+                strokeWidth={0.3}
+                style={{
+                  default: { outline: 'none' },
+                  hover: { outline: 'none' },
+                  pressed: { outline: 'none' },
+                }}
               />
             ))
           }
         </Geographies>
 
-        {markers.map(({ id, coordinates, hasSeenBlock, time }) => {
-          // Find the latest events for this node
-          const nodeEvents = blockEvents.filter(e => e.node === id && e.time <= currentTime)
-          const latestApiEvent = nodeEvents.find(e => e.source === 'api')
-          const latestP2pEvent = nodeEvents.find(e => e.source === 'p2p')
+        {/* Draw glowing lines between first nodes */}
+        {markers.map(({ id: fromId, coordinates: fromCoords, source: fromSource }) => {
+          if (!fromCoords || !fromSource) return null
 
-          // Skip rendering if node hasn't seen the block
-          if (!latestApiEvent && !latestP2pEvent) {
+          // Find nodes that were first to see the block via their respective source (API/P2P)
+          const nodeEvents = filteredBlockEvents.filter(e => 
+            e.node === fromId && 
+            e.time <= currentTime && 
+            e.time > 0 && 
+            e.source === fromSource
+          )
+          
+          // Skip if no events
+          if (nodeEvents.length === 0) return null
+
+          // Get all events for this source
+          const allEventsForSource = filteredBlockEvents.filter(be => 
+            be.source === fromSource && 
+            be.time <= currentTime && 
+            be.time > 0
+          )
+
+          // Skip if no events for this source
+          if (allEventsForSource.length === 0) return null
+
+          const firstTime = Math.min(...allEventsForSource.map(e => e.time))
+          const isFirstNode = nodeEvents.some(e => e.time === firstTime)
+
+          if (!isFirstNode) return null
+
+          // Find other first nodes to connect to
+          return markers
+            .filter(({ id: toId, coordinates: toCoords, source: toSource }) => {
+              // Basic validation
+              if (!toCoords || !toSource || toId === fromId || toSource !== fromSource) return false
+
+              const toEvents = filteredBlockEvents.filter(e => 
+                e.node === toId && 
+                e.time <= currentTime && 
+                e.time > 0 &&
+                e.source === toSource
+              )
+
+              // Skip if no events
+              if (toEvents.length === 0) return false
+
+              return toEvents.some(e => e.time === firstTime)
+            })
+            .map(({ id: toId, coordinates: toCoords }) => (
+              <GlowingLine
+                key={`${fromId}-${toId}`}
+                start={fromCoords}
+                end={toCoords as [number, number]}
+                color="rgba(96, 165, 250, 0.4)"
+              />
+            ))
+        })}
+
+        {markers.map(({ id, coordinates, hasSeenBlock, time, source }) => {
+          // Skip rendering if node hasn't seen the block or has invalid data
+          if (!hasSeenBlock || !coordinates || !source) {
             return null
           }
 
-          // Check if this is the first node to see the block (for either API or P2P)
-          const firstApiTime = Math.min(...blockEvents.filter(e => e.source === 'api' && e.time <= currentTime).map(e => e.time))
-          const firstP2pTime = Math.min(...blockEvents.filter(e => e.source === 'p2p' && e.time <= currentTime).map(e => e.time))
-          const isFirstApiNode = latestApiEvent && latestApiEvent.time === firstApiTime
-          const isFirstP2pNode = latestP2pEvent && latestP2pEvent.time === firstP2pTime
+          const nodeEvents = filteredBlockEvents.filter(e => 
+            e.node === id && 
+            e.time <= currentTime && 
+            e.time > 0 &&
+            e.source === source
+          )
 
-          // Determine marker color based on seen status
-          let markerColor = ''
-          if (isFirstApiNode) {
-            markerColor = 'rgb(96, 165, 250)' // Brighter blue
-          } else if (isFirstP2pNode) {
-            markerColor = 'rgb(168, 85, 247)' // Purple-500
-          } else if (latestApiEvent) {
-            markerColor = 'rgb(96, 165, 250)' // Brighter blue
-          } else if (latestP2pEvent) {
-            markerColor = 'rgb(168, 85, 247)' // Purple-500
-          }
+          // Get all events for this source
+          const allEventsForSource = filteredBlockEvents.filter(be => 
+            be.source === source && 
+            be.time <= currentTime && 
+            be.time > 0
+          )
+
+          const firstTime = allEventsForSource.length > 0 ? Math.min(...allEventsForSource.map(e => e.time)) : null
+          const isFirstNode = firstTime !== null && nodeEvents.some(e => e.time === firstTime)
+
+          const nodeData = nodes[id]
+          const { user, node } = formatNodeName(nodeData.name)
+          const location = [
+            nodeData.geo.city,
+            nodeData.geo.country,
+            nodeData.geo.continent
+          ].filter(Boolean).join(', ')
           
           return (
             <g key={id}>
-              {/* Base marker */}
+              {/* Base marker with glow */}
               <Marker coordinates={coordinates as [number, number]}>
+                {isFirstNode && (
+                  <circle
+                    r={6}
+                    fill="transparent"
+                    stroke={source === 'api' ? 'rgba(96, 165, 250, 0.3)' : 'rgba(168, 85, 247, 0.3)'}
+                    strokeWidth={1}
+                    className="animate-pulse-slow"
+                  />
+                )}
                 <circle
-                  r={6}
-                  fill={markerColor}
+                  r={hoveredNode?.id === id ? 4.5 : 3}
+                  fill={source === 'api' ? 'rgb(96, 165, 250)' : 'rgb(168, 85, 247)'}
                   stroke="rgb(var(--bg-base))"
                   strokeWidth={1}
-                  className="drop-shadow-md"
+                  className="drop-shadow-md cursor-pointer transition-all duration-150"
+                  style={{
+                    filter: `drop-shadow(0 0 ${isFirstNode ? '8px' : '4px'} ${source === 'api' ? 'rgb(96, 165, 250)' : 'rgb(168, 85, 247)'})`
+                  }}
+                  onPointerEnter={(e) => handlePointerEnter(e, {
+                    id,
+                    name: node,
+                    username: user,
+                    location,
+                    time,
+                    source: source || 'api'
+                  })}
+                  onPointerLeave={() => setHoveredNode(null)}
                 />
               </Marker>
-
-              {/* Single quick ping animation when block is seen */}
-              {(latestApiEvent || latestP2pEvent) && (
-                <Marker coordinates={coordinates as [number, number]}>
-                  <motion.circle
-                    r={6}
-                    fill={markerColor}
-                    initial={{ scale: 1, opacity: 0.8, filter: 'drop-shadow(0 0 8px ' + markerColor + ')' }}
-                    animate={{ 
-                      scale: 6, 
-                      opacity: 0,
-                      filter: 'drop-shadow(0 0 0px ' + markerColor + ')'
-                    }}
-                    transition={{
-                      duration: 0.8,
-                      ease: "easeOut",
-                    }}
-                  />
-                </Marker>
-              )}
-
-              {/* Continuous pulse animation for first nodes */}
-              {(isFirstApiNode || isFirstP2pNode) && (
-                <Marker coordinates={coordinates as [number, number]}>
-                  <motion.circle
-                    r={6}
-                    fill={markerColor}
-                    initial={{ scale: 1, opacity: 0.5 }}
-                    animate={{ 
-                      scale: [1, 2, 1],
-                      opacity: [0.5, 0.2, 0.5],
-                    }}
-                    transition={{
-                      duration: 2,
-                      ease: "easeInOut",
-                      repeat: Infinity,
-                    }}
-                  />
-                </Marker>
-              )}
             </g>
           )
         })}
       </ComposableMap>
-
-      {/* Only show details if not hidden */}
+      {hoveredNode && <TooltipComponent data={hoveredNode} />}
       {!hideDetails && (
         <BlockDetailsOverlay
+          isCollapsed={isDetailsCollapsed}
+          onToggleCollapse={() => setIsDetailsCollapsed(!isDetailsCollapsed)}
           slot={slot}
           proposer={proposer}
           proposerIndex={proposerIndex}
@@ -312,8 +463,6 @@ export function GlobalMap({
           gasUsed={gasUsed}
           gasLimit={gasLimit}
           executionBlockNumber={executionBlockNumber}
-          isCollapsed={isDetailsCollapsed}
-          onToggleCollapse={() => setIsDetailsCollapsed(!isDetailsCollapsed)}
         />
       )}
     </div>

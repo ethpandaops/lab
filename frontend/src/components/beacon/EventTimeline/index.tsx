@@ -84,21 +84,21 @@ function EventItem({ event, currentTime }: { event: Event; currentTime: number }
 
   return (
     <div className={clsx(
-      'px-1.5 py-0.5 rounded bg-surface/40 text-[10px]',
+      'rounded bg-surface/40 text-[10px]',
       !isActive && 'opacity-50'
     )}>
-      <div className="flex items-center gap-1.5 truncate">
+      <div className="px-2 py-1 flex items-center gap-1.5 truncate">
         {getEventIcon()}
         <span className="font-medium truncate">
-          <span className={clsx(getEventColor(), !isActive && "opacity-50")}>{getEventText(event)}</span>
+          <span className={getEventColor()}>{getEventText(event)}</span>
           {event.type !== 'Attestation' && (
             <>
-              <span className={clsx("text-tertiary", !isActive && "opacity-50")}> in </span>
-              <span className={clsx("text-primary", !isActive && "opacity-50")}>{event.location}</span>
+              <span className="text-tertiary"> in </span>
+              <span className="text-primary">{event.location}</span>
             </>
           )}
         </span>
-        <span className={clsx("text-tertiary ml-auto shrink-0", !isActive && "opacity-50")}>
+        <span className="text-tertiary ml-auto shrink-0">
           {eventTime.toFixed(1)}s
         </span>
       </div>
@@ -440,161 +440,147 @@ export function EventTimeline({
 
   return (
     <div className={clsx(
-      'h-full flex-shrink-0 transition-all duration-300',
+      'h-full flex-shrink-0',
       'backdrop-blur-lg bg-surface/40 ring-1 ring-inset ring-white/5',
       'flex flex-col max-h-[calc(100vh-128px)]',
-      isCollapsed ? 'w-12' : className || 'w-100'
+      'w-[400px]'
     )}>
       {/* Header */}
-      <div className="flex-none flex flex-col gap-2 p-4 border-b border-subtle">
+      <div className="flex-none flex flex-col gap-2 p-4 pr-8 border-b border-subtle">
         <div className="flex items-center justify-between">
-          {!isCollapsed && (
-            <div className="flex items-center gap-2">
-              <h2 className="text-sm font-medium">Slot Timeline</h2>
-              <button
-                onClick={handleOpenConfig}
-                className="p-1 hover:bg-hover rounded-lg transition-colors"
-              >
-                <Settings className="w-4 h-4" />
-              </button>
-            </div>
-          )}
-          <button
-            onClick={onToggleCollapse}
-            className="p-1 hover:bg-hover rounded-lg transition-colors"
-          >
-            {isCollapsed ? <ChevronLeft className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
-          </button>
+          <div className="flex items-center gap-2">
+            <h2 className="text-sm font-medium">Timeline</h2>
+            <button
+              onClick={handleOpenConfig}
+              className="p-1 hover:bg-hover rounded-lg transition-colors"
+            >
+              <Settings className="w-4 h-4" />
+            </button>
+          </div>
+          <div className="flex flex-col items-end">
+            <span className="font-mono text-2xl font-bold text-primary">
+              {currentTime.toFixed(1)}
+            </span>
+            <span className="font-mono text-xs text-tertiary -mt-1">seconds</span>
+          </div>
         </div>
 
-        {!isCollapsed && (
-          <>
-            {/* Navigation and Play Controls */}
-            <div className="flex items-center justify-between gap-2">
-              <div className="flex items-center gap-1">
-                <button
-                  onClick={onPreviousSlot}
-                  className="w-8 h-8 rounded flex items-center justify-center bg-surface hover:bg-hover transition-all border border-text-muted touch-manipulation"
-                >
-                  <ChevronLeft className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={onNextSlot}
-                  disabled={isLive}
-                  className={clsx(
-                    'w-8 h-8 rounded flex items-center justify-center transition-all border touch-manipulation',
-                    isLive 
-                      ? 'opacity-50 cursor-not-allowed bg-surface/50 border-text-muted/50' 
-                      : 'bg-surface hover:bg-hover border-text-muted'
-                  )}
-                >
-                  <ChevronRight className="w-4 h-4" />
-                </button>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <span className="font-mono text-xs text-primary">
-                  {currentTime.toFixed(1)}s
-                </span>
-                <button
-                  onClick={onPlayPauseClick}
-                  className="w-8 h-8 rounded-full flex items-center justify-center bg-surface hover:bg-hover transition-all border border-text-muted touch-manipulation"
-                >
-                  {isPlaying ? <FaPause className="w-3 h-3" /> : <FaPlay className="w-3 h-3 ml-0.5" />}
-                </button>
-              </div>
-            </div>
-
-            {/* Filter Info */}
-            <div className="px-1 py-0.5 text-[10px] font-mono text-tertiary">
-              {filters.node ? (
-                <span>Events from {formatNodeName(filters.node).user}'s {formatNodeName(filters.node).node}</span>
-              ) : filters.username ? (
-                <span>Events from {filters.username}'s nodes ({nodeCount})</span>
-              ) : (
-                <span>Events from all nodes ({nodeCount})</span>
+        {/* Navigation Controls */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-1">
+            <button
+              onClick={onPreviousSlot}
+              className="w-8 h-8 rounded flex items-center justify-center bg-surface hover:bg-hover transition-all border border-text-muted touch-manipulation"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+            <button
+              onClick={onPlayPauseClick}
+              className="w-8 h-8 rounded-full flex items-center justify-center bg-surface hover:bg-hover transition-all border border-text-muted touch-manipulation"
+            >
+              {isPlaying ? <FaPause className="w-3 h-3" /> : <FaPlay className="w-3 h-3 ml-0.5" />}
+            </button>
+            <button
+              onClick={onNextSlot}
+              disabled={isLive}
+              className={clsx(
+                'w-8 h-8 rounded flex items-center justify-center transition-all border touch-manipulation',
+                isLive 
+                  ? 'opacity-50 cursor-not-allowed bg-surface/50 border-text-muted/50' 
+                  : 'bg-surface hover:bg-hover border-text-muted'
               )}
-            </div>
+            >
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
 
-            {/* Horizontal Timeline */}
-            <div className="relative h-8">
-              {/* Section backgrounds */}
-              <div className="absolute inset-0 flex rounded-sm overflow-hidden">
-                <div className="w-1/3 bg-accent/5" />
-                <div className="w-1/3 bg-success/5" />
-                <div className="w-1/3 bg-yellow-400/5" />
-              </div>
-
-              {/* Section labels */}
-              <div className="absolute inset-0">
-                <div className="flex h-full">
-                  <div className="w-1/3 flex items-center justify-center -mx-px">
-                    <span className="text-xs font-mono text-accent/80">Block</span>
-                  </div>
-                  <div className="w-1/3 flex items-center justify-center -mx-px">
-                    <span className="text-xs font-mono text-success/80">Attestation</span>
-                  </div>
-                  <div className="w-1/3 flex items-center justify-center -mx-px">
-                    <span className="text-xs font-mono text-yellow-400/80">Aggregation</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Progress bar */}
-              <div className="absolute inset-0 pointer-events-none z-10">
-                <div 
-                  className="absolute inset-y-0 bg-active transition-all duration-100"
-                  style={{ 
-                    left: `${(currentTime / 12) * 100}%`,
-                    width: '1px'
-                  }}
-                />
-              </div>
-
-              {/* Time markers */}
-              <div className="absolute inset-x-0 bottom-0 flex justify-between px-1">
-                {[0, 4, 8, 12].map(time => (
-                  <div key={time} className="text-[8px] font-mono text-tertiary/50">
-                    {time}s
-                  </div>
-                ))}
-              </div>
-            </div>
-          </>
-        )}
-      </div>
-
-      {/* Event List */}
-      {!isCollapsed && (
-        <div ref={timelineRef} className="flex-1 min-h-0 overflow-y-auto">
-          <div className="p-1 space-y-0.5">
-            {loading ? (
-              <div className="space-y-0.5">
-                {[...Array(4)].map((_, i) => (
-                  <div 
-                    key={i}
-                    className="px-1.5 py-0.5 rounded bg-surface/40 animate-pulse"
-                  >
-                    <div className="h-2 bg-surface/50 rounded w-full" />
-                  </div>
-                ))}
-              </div>
-            ) : sortedEvents.length === 0 ? (
-              <div className="text-[10px] text-tertiary px-1.5">No events</div>
+          {/* Filter Info */}
+          <div className="text-[10px] font-mono text-tertiary">
+            {filters.node ? (
+              <span>Events from {formatNodeName(filters.node).user}'s {formatNodeName(filters.node).node}</span>
+            ) : filters.username ? (
+              <span>Events from {filters.username}'s nodes ({nodeCount})</span>
             ) : (
-              sortedEvents.map((event, index) => (
-                <div 
-                  key={event.id} 
-                  data-event-id={event.id}
-                  ref={index === sortedEvents.length - 1 ? lastEventRef : null}
-                >
-                  <EventItem event={event} currentTime={currentTime} />
-                </div>
-              ))
+              <span>Events from all nodes ({nodeCount})</span>
             )}
           </div>
         </div>
-      )}
+
+        {/* Horizontal Timeline */}
+        <div className="relative h-8">
+          {/* Section backgrounds */}
+          <div className="absolute inset-0 flex rounded-sm overflow-hidden">
+            <div className="w-1/3 bg-accent/5" />
+            <div className="w-1/3 bg-success/5" />
+            <div className="w-1/3 bg-yellow-400/5" />
+          </div>
+
+          {/* Section labels */}
+          <div className="absolute inset-0">
+            <div className="flex h-full">
+              <div className="w-1/3 flex items-center justify-center -mx-px">
+                <span className="text-xs font-mono text-accent/80">Block</span>
+              </div>
+              <div className="w-1/3 flex items-center justify-center -mx-px">
+                <span className="text-xs font-mono text-success/80">Attestation</span>
+              </div>
+              <div className="w-1/3 flex items-center justify-center -mx-px">
+                <span className="text-xs font-mono text-yellow-400/80">Aggregation</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Progress bar */}
+          <div className="absolute inset-0 pointer-events-none z-10">
+            <div 
+              className="absolute inset-y-0 bg-active transition-all duration-100"
+              style={{ 
+                left: `${(currentTime / 12) * 100}%`,
+                width: '3px'
+              }}
+            />
+          </div>
+
+          {/* Time markers */}
+          <div className="absolute inset-x-0 bottom-0 flex justify-between px-1">
+            {[0, 4, 8, 12].map(time => (
+              <div key={time} className="font-mono text-[10px] text-tertiary/50">
+                {time}s
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Event List */}
+      <div ref={timelineRef} className="flex-1 min-h-0 overflow-y-auto scrollbar-hide">
+        <div className="p-4 space-y-0.5">
+          {loading ? (
+            <div className="space-y-1">
+              {[...Array(4)].map((_, i) => (
+                <div 
+                  key={i}
+                  className="rounded bg-surface/40 animate-pulse"
+                >
+                  <div className="h-2 bg-surface/50 rounded w-full" />
+                </div>
+              ))}
+            </div>
+          ) : sortedEvents.length === 0 ? (
+            <div className="text-[10px] text-tertiary">No events</div>
+          ) : (
+            sortedEvents.map((event, index) => (
+              <div 
+                key={event.id} 
+                data-event-id={event.id}
+                ref={index === sortedEvents.length - 1 ? lastEventRef : null}
+              >
+                <EventItem event={event} currentTime={currentTime} />
+              </div>
+            ))
+          )}
+        </div>
+      </div>
     </div>
   )
 } 

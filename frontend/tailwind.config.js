@@ -1,5 +1,6 @@
 const defaultConfig = require('tailwindcss/defaultConfig')
 const formsPlugin = require('@tailwindcss/forms')
+const scrollbarPlugin = require('tailwind-scrollbar')
 
 /** @type {import('tailwindcss/types').Config} */
 const config = {
@@ -73,6 +74,7 @@ const config = {
 				'float': 'float 6s ease-in-out infinite',
 				'glow': 'glow 2s ease-in-out infinite alternate',
 				'scanline': 'scanline 6s linear infinite',
+				'glowing-line': 'glowing-line 2s ease-in-out infinite alternate'
 			},
 			backgroundImage: {
 				'cyber-grid': 'linear-gradient(0deg, transparent 24%, rgba(0, 255, 159, .05) 25%, rgba(0, 255, 159, .05) 26%, transparent 27%, transparent 74%, rgba(0, 255, 159, .05) 75%, rgba(0, 255, 159, .05) 76%, transparent 77%, transparent), linear-gradient(90deg, transparent 24%, rgba(0, 255, 159, .05) 25%, rgba(0, 255, 159, .05) 26%, transparent 27%, transparent 74%, rgba(0, 255, 159, .05) 75%, rgba(0, 255, 159, .05) 76%, transparent 77%, transparent)',
@@ -140,6 +142,18 @@ const config = {
 						transform: 'translateY(100%)',
 					},
 				},
+				'glowing-line': {
+					'0%': {
+						'stroke-width': '2px',
+						'stroke-opacity': '0.5',
+						'filter': 'drop-shadow(0 0 2px rgba(0, 255, 159, 0.5))'
+					},
+					'100%': {
+						'stroke-width': '3px',
+						'stroke-opacity': '1',
+						'filter': 'drop-shadow(0 0 8px rgba(0, 255, 159, 0.8)) drop-shadow(0 0 12px rgba(0, 242, 255, 0.5))'
+					}
+				},
 			},
 			boxShadow: {
 				'neon': '0 0 5px theme(colors.cyber.neon), 0 0 20px theme(colors.cyber.neon)',
@@ -155,6 +169,7 @@ const config = {
 	experimental: { optimizeUniversalDefaults: true },
 	plugins: [
 		formsPlugin,
+		scrollbarPlugin({ nocompatible: true }),
 		function({ addBase }) {
 			addBase({
 				':root': {

@@ -16,6 +16,7 @@ interface BottomPanelProps {
   currentTime: number
   loading: boolean
   isMissing: boolean
+  maxPossibleValidators: number
   attestationWindows?: Array<{
     start_ms: number
     end_ms: number
@@ -30,6 +31,7 @@ export function BottomPanel({
   currentTime,
   loading,
   isMissing,
+  maxPossibleValidators,
   attestationWindows
 }: BottomPanelProps): JSX.Element {
   const { showModal } = useModal()
@@ -91,10 +93,10 @@ export function BottomPanel({
       
       return {
         time: timePoint,
-        percentage: lastPoint ? (lastPoint.totalValidators / totalValidators) * 100 : 0
+        percentage: lastPoint ? (lastPoint.totalValidators / maxPossibleValidators) * 100 : 0
       }
     })
-  }, [attestationProgress, loading, isMissing, totalValidators, Math.floor(currentTime / 100) * 100])
+  }, [attestationProgress, loading, isMissing, maxPossibleValidators, Math.floor(currentTime / 100) * 100])
 
   // Stats for arrival count chart
   const arrivalStats = useMemo(() => {
@@ -178,9 +180,9 @@ export function BottomPanel({
           <div className="flex items-center gap-4">
             <div className="flex items-baseline gap-1 font-mono">
               <span className="text-sm font-medium text-success">{currentAttestationCount.toLocaleString()}</span>
-              <span className="text-tertiary/70 text-[9px]">/ {totalValidators.toLocaleString()}</span>
+              <span className="text-tertiary/70 text-[9px]">/ {maxPossibleValidators.toLocaleString()}</span>
               <span className="text-tertiary/70 text-[9px] ml-1">
-                ({Math.round((currentAttestationCount / totalValidators) * 100)}%)
+                ({Math.round((currentAttestationCount / maxPossibleValidators) * 100)}%)
               </span>
             </div>
 
@@ -193,7 +195,7 @@ export function BottomPanel({
                     ? 'bg-success' 
                     : 'bg-success/40'
                 }`}
-                style={{ width: `${(currentAttestationCount / totalValidators) * 100}%` }}
+                style={{ width: `${(currentAttestationCount / maxPossibleValidators) * 100}%` }}
               >
                 {/* Subtle shine effect */}
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -skew-x-12 animate-[shine_3s_ease-in-out_infinite]" />
@@ -324,4 +326,4 @@ export function BottomPanel({
       </div>
     </div>
   )
-} 
+}

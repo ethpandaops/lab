@@ -49,7 +49,7 @@ export function BlockDetailsOverlay({
       'backdrop-blur-lg bg-surface/40 ring-1 ring-inset ring-white/5 rounded-lg overflow-hidden'
     )}>
       {/* Header */}
-      <div className="flex items-center justify-between p-3">
+      <div className="flex items-center justify-between p-4">
         <div className="flex items-center gap-2">
           <FaEthereum className="w-4 h-4 text-accent" />
           <span className="font-mono text-sm">Slot</span>

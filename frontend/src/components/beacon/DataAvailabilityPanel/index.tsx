@@ -157,8 +157,6 @@ export function DataAvailabilityPanel({
     ]
     const blockTime = blockTimes.length > 0 ? Math.min(...blockTimes) / 1000 : null // Convert to seconds if we have times
 
-    console.log('Block times:', blockTimes)
-    console.log('First block seen at:', blockTime)
 
     // Process data for each continent
     const continentalData = Object.entries(continentBlobTimes).map(([continent, blobs]) => {
@@ -233,7 +231,6 @@ export function DataAvailabilityPanel({
       ...Object.keys(blobTimings.blob_first_seen_p2p || {})
     ])
 
-    console.log('Total nodes:', allNodes.size)
 
     let nodesWithBlock = 0
     let nodesWithBlobs = 0
@@ -279,15 +276,9 @@ export function DataAvailabilityPanel({
       }
     })
 
-    console.log('Nodes with block:', nodesWithBlock)
-    console.log('Nodes with blobs:', nodesWithBlobs)
-    console.log('Current time:', currentTime)
-    console.log('Block bins with data:', blockBins.filter(b => b > 0).length)
-    console.log('Blob bins with data:', blobBins.filter(b => b > 0).length)
 
     // Convert to chart data format - only up to current time
     const currentBinIndex = Math.floor(currentTime / 50)
-    console.log('Current bin index:', currentBinIndex)
 
     const arrivalData = Array.from({ length: currentBinIndex + 1 }, (_, i) => ({
       time: i * 0.05, // Convert bin index to seconds
@@ -295,8 +286,6 @@ export function DataAvailabilityPanel({
       blobs: blobBins[i]
     }))
 
-    console.log('Arrival data points:', arrivalData.length)
-    console.log('Sample arrival data:', arrivalData.slice(0, 5))
 
     return {
       firstSeenData: data,

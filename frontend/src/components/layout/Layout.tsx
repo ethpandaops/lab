@@ -186,7 +186,7 @@ function Layout(): JSX.Element {
 
         {/* Main Content */}
         <main className="flex-1 relative">
-          <div className="h-[calc(100vh-theme(spacing.32))] w-full px-1 md:px-2">
+          <div className="h-[calc(100vh-theme(spacing.32))] w-full">
             <div className={clsx(
               'relative h-full',
               !isHome && [
