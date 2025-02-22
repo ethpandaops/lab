@@ -121,61 +121,61 @@ function Xatu(): JSX.Element {
       <XatuCallToAction />
 
       {/* Overview Section */}
-      <div className="backdrop-blur-md   -default p-6 bg-surface/80">
-        <div className="flex flex-col mb-6">
+      <div className="backdrop-blur-md bg-surface/80 p-4 md:p-6">
+        <div className="flex flex-col mb-4">
           <h2 className="text-2xl font-sans font-bold text-primary mb-2">Overview</h2>
           <span className="text-sm font-mono text-secondary">
             Last 24h · Updated{' '}
             <span 
               title={new Date(summaryData.updated_at * MS_PER_SECOND).toString()}
-              className="cursor-help -b -dotted -primary/50 hover:-primary/70 transition-colors"
+              className="cursor-help border-b border-dotted border-primary/50 hover:border-primary/70 transition-colors"
             >
               {formatDistanceToNow(new Date(summaryData.updated_at * MS_PER_SECOND), { addSuffix: true })}
             </span>
           </span>
-          <p className="text-base font-mono text-secondary mt-4">
+          <p className="text-base font-mono text-secondary mt-2">
             This data shows nodes sending data to ethPandaOps. While we run our own nodes, community-contributed data is most valuable.
           </p>
         </div>
         
         {/* Globe and Summary Stats */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
           {/* Globe */}
-          <div className="lg:col-span-2 backdrop-blur-md   -default bg-surface/90 p-4">
+          <div className="lg:col-span-2 backdrop-blur-md bg-surface/90 p-3">
             <GlobeViz 
               data={globeData} 
               width={Math.max((containerWidth * GLOBE_WIDTH_SCALE) - GLOBE_PADDING, GLOBE_MIN_WIDTH)} 
-              height={400} 
+              height={350} 
             />
           </div>
 
           {/* Summary Stats */}
           <div className="flex items-center justify-center">
-            <div className="grid grid-cols-2 gap-4 w-full max-w-lg">
-              <div className="backdrop-blur-md   -default bg-surface/90 hover:-prominent hover:bg-hover p-4 flex flex-col h-28 transition-all duration-300">
+            <div className="grid grid-cols-2 gap-3 w-full max-w-lg">
+              <div className="backdrop-blur-md bg-surface/90 hover:border-prominent hover:bg-hover p-3 flex flex-col h-24 transition-all duration-300">
                 <div className="text-tertiary text-xs font-mono uppercase tracking-wider text-left">Total Nodes</div>
-                <div className="text-3xl font-mono font-bold text-primary mt-2 text-center flex-grow flex items-center justify-center">
+                <div className="text-2xl font-mono font-bold text-primary mt-2 text-center flex-grow flex items-center justify-center">
                   {totalNodes.toLocaleString()}
                 </div>
               </div>
 
-              <div className="backdrop-blur-md   -default bg-surface/90 hover:-prominent hover:bg-hover p-4 flex flex-col h-28 transition-all duration-300">
+              <div className="backdrop-blur-md bg-surface/90 hover:border-prominent hover:bg-hover p-3 flex flex-col h-24 transition-all duration-300">
                 <div className="text-tertiary text-xs font-mono uppercase tracking-wider text-left">Networks</div>
-                <div className="text-3xl font-mono font-bold text-primary mt-2 text-center flex-grow flex items-center justify-center">
+                <div className="text-2xl font-mono font-bold text-primary mt-2 text-center flex-grow flex items-center justify-center">
                   {Object.keys(summaryData.networks).length}
                 </div>
               </div>
 
-              <div className="backdrop-blur-md   -default bg-surface/90 hover:-prominent hover:bg-hover p-4 flex flex-col h-28 transition-all duration-300">
+              <div className="backdrop-blur-md bg-surface/90 hover:border-prominent hover:bg-hover p-3 flex flex-col h-24 transition-all duration-300">
                 <div className="text-tertiary text-xs font-mono uppercase tracking-wider text-left">Public Nodes</div>
-                <div className="text-3xl font-mono font-bold text-primary mt-2 text-center flex-grow flex items-center justify-center">
+                <div className="text-2xl font-mono font-bold text-primary mt-2 text-center flex-grow flex items-center justify-center">
                   {totalPublicNodes.toLocaleString()}
                 </div>
               </div>
 
-              <div className="backdrop-blur-md   -default bg-surface/90 hover:-prominent hover:bg-hover p-4 flex flex-col h-28 transition-all duration-300">
+              <div className="backdrop-blur-md bg-surface/90 hover:border-prominent hover:bg-hover p-3 flex flex-col h-24 transition-all duration-300">
                 <div className="text-tertiary text-xs font-mono uppercase tracking-wider text-left">Countries</div>
-                <div className="text-3xl font-mono font-bold text-primary mt-2 text-center flex-grow flex items-center justify-center">
+                <div className="text-2xl font-mono font-bold text-primary mt-2 text-center flex-grow flex items-center justify-center">
                   {Object.keys(summaryData.networks.mainnet.countries).length}
                 </div>
               </div>
@@ -184,17 +184,17 @@ function Xatu(): JSX.Element {
         </div>
 
         {/* Navigation Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <Link 
             to="contributors" 
             className="group relative backdrop-blur-md bg-surface/80 border border-subtle hover:border-accent rounded-lg overflow-hidden transition-all duration-300"
           >
             <div className="absolute inset-0 bg-gradient-to-br from-accent/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
             
-            <div className="relative p-6">
-              <div className="flex items-start gap-4">
-                <div className="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center flex-shrink-0">
-                  <span className="text-2xl">👥</span>
+            <div className="relative p-4">
+              <div className="flex items-start gap-3">
+                <div className="w-8 h-8 rounded-lg bg-accent/10 flex items-center justify-center flex-shrink-0">
+                  <span className="text-xl">👥</span>
                 </div>
 
                 <div className="flex-1 min-w-0">
@@ -209,7 +209,7 @@ function Xatu(): JSX.Element {
                 <ArrowRight className="w-5 h-5 text-accent/50 group-hover:text-accent group-hover:translate-x-1 transition-all duration-300" />
               </div>
 
-              <p className="text-sm font-mono text-secondary group-hover:text-primary/90 transition-colors mt-4">
+              <p className="text-sm font-mono text-secondary group-hover:text-primary/90 transition-colors mt-3">
                 Explore detailed information about individual contributors and their nodes
               </p>
             </div>
@@ -221,10 +221,10 @@ function Xatu(): JSX.Element {
           >
             <div className="absolute inset-0 bg-gradient-to-br from-accent/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
             
-            <div className="relative p-6">
-              <div className="flex items-start gap-4">
-                <div className="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center flex-shrink-0">
-                  <span className="text-2xl">🌐</span>
+            <div className="relative p-4">
+              <div className="flex items-start gap-3">
+                <div className="w-8 h-8 rounded-lg bg-accent/10 flex items-center justify-center flex-shrink-0">
+                  <span className="text-xl">🌐</span>
                 </div>
 
                 <div className="flex-1 min-w-0">
@@ -239,7 +239,7 @@ function Xatu(): JSX.Element {
                 <ArrowRight className="w-5 h-5 text-accent/50 group-hover:text-accent group-hover:translate-x-1 transition-all duration-300" />
               </div>
 
-              <p className="text-sm font-mono text-secondary group-hover:text-primary/90 transition-colors mt-4">
+              <p className="text-sm font-mono text-secondary group-hover:text-primary/90 transition-colors mt-3">
                 Explore metrics and data across different Ethereum networks
               </p>
             </div>
@@ -251,10 +251,10 @@ function Xatu(): JSX.Element {
           >
             <div className="absolute inset-0 bg-gradient-to-br from-accent/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
             
-            <div className="relative p-6">
-              <div className="flex items-start gap-4">
-                <div className="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center flex-shrink-0">
-                  <span className="text-2xl">🖥️</span>
+            <div className="relative p-4">
+              <div className="flex items-start gap-3">
+                <div className="w-8 h-8 rounded-lg bg-accent/10 flex items-center justify-center flex-shrink-0">
+                  <span className="text-xl">🖥️</span>
                 </div>
 
                 <div className="flex-1 min-w-0">
@@ -269,7 +269,7 @@ function Xatu(): JSX.Element {
                 <ArrowRight className="w-5 h-5 text-accent/50 group-hover:text-accent group-hover:translate-x-1 transition-all duration-300" />
               </div>
 
-              <p className="text-sm font-mono text-secondary group-hover:text-primary/90 transition-colors mt-4">
+              <p className="text-sm font-mono text-secondary group-hover:text-primary/90 transition-colors mt-3">
                 View detailed information about community-contributed nodes
               </p>
             </div>
@@ -281,10 +281,10 @@ function Xatu(): JSX.Element {
           >
             <div className="absolute inset-0 bg-gradient-to-br from-accent/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
             
-            <div className="relative p-6">
-              <div className="flex items-start gap-4">
-                <div className="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center flex-shrink-0">
-                  <span className="text-2xl">🔄</span>
+            <div className="relative p-4">
+              <div className="flex items-start gap-3">
+                <div className="w-8 h-8 rounded-lg bg-accent/10 flex items-center justify-center flex-shrink-0">
+                  <span className="text-xl">🔄</span>
                 </div>
 
                 <div className="flex-1 min-w-0">
@@ -299,7 +299,7 @@ function Xatu(): JSX.Element {
                 <ArrowRight className="w-5 h-5 text-accent/50 group-hover:text-accent group-hover:translate-x-1 transition-all duration-300" />
               </div>
 
-              <p className="text-sm font-mono text-secondary group-hover:text-primary/90 transition-colors mt-4">
+              <p className="text-sm font-mono text-secondary group-hover:text-primary/90 transition-colors mt-3">
                 Track client version readiness for upcoming network forks
               </p>
             </div>

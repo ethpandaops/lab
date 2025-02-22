@@ -465,6 +465,11 @@ export function GlobalMap({
           executionBlockNumber={executionBlockNumber}
         />
       )}
+      
+      {/* Disclaimer */}
+      <div className="absolute bottom-1 left-1 backdrop-blur-sm bg-surface/60 rounded px-1.5 py-0.5">
+        <p className="text-[9px] font-mono text-tertiary">Data from nodes contributing to Xatu • Not representative of actual Ethereum network distribution</p>
+      </div>
     </div>
   )
 } 
