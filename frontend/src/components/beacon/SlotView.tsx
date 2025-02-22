@@ -121,7 +121,7 @@ export function SlotView({ slot, network = 'mainnet', isLive = false, onSlotComp
   // Optimistically fetch next slot data when we're close to the end
   const { data: nextSlotData } = useDataFetch<SlotData>(
     currentTime >= 11000 ? nextSlotPath : null, 
-    { silentFail: true } as any // TODO: Update useDataFetch to accept options
+    { silentFail: true }
   )
 
   // Timer effect for playback

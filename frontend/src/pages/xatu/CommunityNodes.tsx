@@ -296,7 +296,7 @@ export const CommunityNodes = () => {
   }
 
   return (
-    <div className="space-y-6" ref={containerRef}>
+    <div className="p-4" ref={containerRef}>
       <style>{`
         .cyber-scrollbar {
           scrollbar-width: thin;

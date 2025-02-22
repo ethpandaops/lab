@@ -30,9 +30,6 @@ function Home(): JSX.Element {
 
         {/* Showcase */}
         <div className="relative w-full max-w-2xl">
-          <div className="absolute inset-0 flex items-center">
-            <div className="w-full h-px bg-gradient-to-r from-transparent via-accent/30 to-transparent" />
-          </div>
           <div className="relative flex justify-center mb-6">
             <div className="px-6 py-2 bg-nav/80 backdrop-blur-sm border border-subtle rounded-full">
               <h2 className="text-xl font-sans font-bold text-tertiary">Featured Experiment</h2>

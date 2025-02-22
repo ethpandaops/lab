@@ -10,7 +10,10 @@ const queryClient = new QueryClient({
 	defaultOptions: {
 		queries: {
 			staleTime: Number.POSITIVE_INFINITY,
-			retry: MAX_RETRIES
+			retry: MAX_RETRIES,
+			gcTime: 1000 * 60 * 60, // Keep unused data in cache for 1 hour
+			refetchOnWindowFocus: false, // Don't refetch when window regains focus
+			refetchOnReconnect: false // Don't refetch when reconnecting
 		}
 	}
 })

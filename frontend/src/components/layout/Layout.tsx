@@ -186,14 +186,22 @@ function Layout(): JSX.Element {
 
         {/* Main Content */}
         <main className="flex-1 relative">
-          <div className="h-[calc(100vh-theme(spacing.32))] w-full">
+          <div className={clsx(
+            'w-full',
+            (location.pathname === '/beacon/slot/live' || /^\/beacon\/slot\/\d+$/.test(location.pathname))
+              ? 'h-[calc(100vh-3.5rem)]'
+              : ['min-h-0', 'p-4 md:p-6 lg:p-8 xl:p-12 2xl:p-16']
+          )}>
             <div className={clsx(
-              'relative h-full',
-              !isHome && [
-                'backdrop-blur-sm',
-                'bg-surface/40',
-                'ring-1 ring-inset ring-white/5'
-              ]
+              'relative',
+              (location.pathname === '/beacon/slot/live' || /^\/beacon\/slot\/\d+$/.test(location.pathname))
+                ? 'h-full'
+                : [
+                    'backdrop-blur-sm',
+                    'bg-surface/40',
+                    'ring-1 ring-inset ring-white/5',
+                    'container mx-auto max-w-7xl'
+                  ]
             )}>
               <Outlet />
             </div>
