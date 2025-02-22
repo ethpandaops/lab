@@ -418,12 +418,14 @@ export function EventTimeline({
 
   const handleOpenConfig = () => {
     showModal(
-      <ConfigPanel
-        filters={filters}
-        setFilters={setFilters}
-        events={events}
-        onClose={hideModal}
-      />
+      <div className="flex flex-col h-[80vh] overflow-y-auto">
+        <ConfigPanel
+          filters={filters}
+          setFilters={setFilters}
+          events={events}
+          onClose={hideModal}
+        />
+      </div>
     )
   }
 
@@ -443,7 +445,7 @@ export function EventTimeline({
       'h-full flex-shrink-0',
       'backdrop-blur-lg bg-surface/40 ring-1 ring-inset ring-white/5',
       'flex flex-col max-h-[calc(100vh-128px)]',
-      'w-[400px]'
+      'w-full md:w-[400px]'
     )}>
       {/* Header */}
       <div className="flex-none flex flex-col gap-2 p-4 pr-8 border-b border-subtle">
@@ -553,7 +555,7 @@ export function EventTimeline({
       </div>
 
       {/* Event List */}
-      <div ref={timelineRef} className="flex-1 min-h-0 overflow-y-auto scrollbar-hide">
+      <div ref={timelineRef} className="flex-1 min-h-0 md:max-h-none max-h-[30vh] overflow-y-auto scrollbar-hide w-full">
         <div className="p-4 space-y-0.5">
           {loading ? (
             <div className="space-y-1">

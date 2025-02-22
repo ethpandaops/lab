@@ -165,7 +165,7 @@ export function BottomPanel({
   return (
     <div className="w-full h-full">
       <div className="flex flex-col h-full">
-        <div className="flex items-center justify-between mb-2">
+        <div className="flex flex-col md:flex-row md:items-center justify-between mb-2">
           <div className="flex items-center gap-2">
             <h3 className="text-lg font-sans font-bold text-primary">Attestations</h3>
             <button 
@@ -177,7 +177,7 @@ export function BottomPanel({
           </div>
           
           {/* Attestation Progress */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 mt-2 md:mt-0">
             <div className="flex items-baseline gap-1 font-mono">
               <span className="text-sm font-medium text-success">{currentAttestationCount.toLocaleString()}</span>
               <span className="text-tertiary/70 text-[9px]">/ {maxPossibleValidators.toLocaleString()}</span>
@@ -205,7 +205,7 @@ export function BottomPanel({
         </div>
 
         {/* Distribution Charts */}
-        <div className="grid grid-cols-2 gap-1 flex-1 min-h-0">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-1 flex-1 min-h-0">
           {/* Arrival Count Chart */}
           <div className="w-full h-full">
             <ChartWithStats

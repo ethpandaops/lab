@@ -306,7 +306,7 @@ export function DataAvailabilityPanel({
   return (
     <div className="w-full h-full">
       <div className="flex flex-col h-full">
-        <div className="flex items-center justify-between mb-2">
+        <div className="flex flex-col md:flex-row md:items-center justify-between mb-2">
           <div className="flex items-center gap-2">
             <h3 className="text-lg font-sans font-bold text-primary">Data Availability</h3>
             <button 
@@ -316,7 +316,9 @@ export function DataAvailabilityPanel({
               <HelpCircle className="w-4 h-4" />
             </button>
           </div>
-          <div className="flex items-center gap-4">
+
+          {/* Stats Row */}
+          <div className="flex items-center gap-4 mt-2 md:mt-0">
             <div className="flex items-center gap-2 text-sm">
               <span className="text-tertiary">Blobs:</span>
               <span className="font-mono text-primary">{blobCount}</span>
@@ -339,7 +341,7 @@ export function DataAvailabilityPanel({
         </div>
 
         {/* Charts Grid */}
-        <div className="grid grid-cols-3 gap-1 flex-1 min-h-0">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-1 flex-1 min-h-0">
           {/* Blob First Seen Chart */}
           <div className="w-full h-full">
             <ChartWithStats
