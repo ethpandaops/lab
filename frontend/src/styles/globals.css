@@ -1,0 +1,8 @@
+:root {
+  /* Cyberpunk theme colors */
+  --cyber-cyan: 0, 255, 255;     /* #00FFFF - Bright cyan */
+  --cyber-pink: 255, 0, 255;     /* #FF00FF - Hot pink */
+  --cyber-neon: 0, 255, 128;     /* #00FF80 - Neon green */
+  --cyber-blue: 0, 128, 255;     /* #0080FF - Electric blue */
+  --cyber-yellow: 255, 255, 0;   /* #FFFF00 - Neon yellow */
+} 

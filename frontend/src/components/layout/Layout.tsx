@@ -8,6 +8,7 @@ import { Logo } from './Logo'
 import { BeaconClockManager } from '../../utils/beacon'
 import { Menu, X } from 'lucide-react'
 import { NETWORK_METADATA, type NetworkKey } from '../../constants/networks'
+import clsx from 'clsx'
 
 function Layout(): JSX.Element {
   const location = useLocation()
@@ -61,7 +62,7 @@ function Layout(): JSX.Element {
         {/* Header Section */}
         <header className="sticky top-0 z-50 backdrop-blur-md bg-nav/80 border-b border-subtle">
           {/* Top Bar */}
-          <div className="container mx-auto px-4 py-2 2xl:px-0 flex items-center justify-between">
+          <div className="w-full px-4 md:px-6 lg:px-8 xl:px-12 2xl:px-16 py-2 flex items-center justify-between">
             {/* Left - Logo and Mobile Menu */}
             <div className="flex items-center gap-4">
               <button
@@ -109,7 +110,7 @@ function Layout(): JSX.Element {
 
           {/* Navigation Bar (desktop only) */}
           {!isHome && (
-            <div className="hidden lg:block container mx-auto px-4 py-2 2xl:px-0 border-t border-subtle">
+            <div className="hidden lg:block w-full px-4 md:px-6 lg:px-8 xl:px-12 2xl:px-16 py-2 border-t border-subtle">
               <div className="flex items-center justify-between">
                 <Breadcrumbs />
                 <Navigation />
@@ -120,9 +121,10 @@ function Layout(): JSX.Element {
 
         {/* Mobile Navigation Sidebar */}
         <div
-          className={`fixed inset-0 z-40 lg:hidden transition-opacity duration-300 ${
+          className={clsx(
+            'fixed inset-0 z-40 lg:hidden transition-opacity duration-300',
             isMobileMenuOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
-          }`}
+          )}
           style={{ top: '56px' }}
         >
           {/* Backdrop */}
@@ -133,9 +135,10 @@ function Layout(): JSX.Element {
           
           {/* Sidebar */}
           <div
-            className={`absolute top-0 left-0 w-72 h-[calc(100vh-56px)] bg-nav/95 backdrop-blur-md border-r border-subtle transform transition-transform duration-300 ${
+            className={clsx(
+              'absolute top-0 left-0 w-72 h-[calc(100vh-56px)] bg-nav/95 backdrop-blur-md border-r border-subtle transform transition-transform duration-300',
               isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
-            }`}
+            )}
           >
             <div className="flex flex-col h-full">
               {/* Network Selector */}
@@ -182,9 +185,16 @@ function Layout(): JSX.Element {
         </div>
 
         {/* Main Content */}
-        <main className={`flex-1 ${isHome ? '' : 'container mx-auto py-6 px-4 2xl:px-0'}`}>
-          <div className="relative h-full">
-            <div className={isHome ? 'h-full' : 'relative backdrop-blur-md bg-surface/90 border border-subtle rounded-lg shadow-lg p-4 md:p-6'}>
+        <main className="flex-1 relative">
+          <div className="h-[calc(100vh-theme(spacing.32))] w-full px-1 md:px-2">
+            <div className={clsx(
+              'relative h-full',
+              !isHome && [
+                'backdrop-blur-sm',
+                'bg-surface/40',
+                'ring-1 ring-inset ring-white/5'
+              ]
+            )}>
               <Outlet />
             </div>
           </div>

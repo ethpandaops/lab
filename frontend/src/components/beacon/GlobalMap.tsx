@@ -1,10 +1,11 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { ComposableMap, Geographies, Geography, Marker } from 'react-simple-maps'
 import { motion } from 'framer-motion'
 import { feature } from 'topojson-client'
 import { FeatureCollection, Geometry } from 'geojson'
 import * as worldAtlas from 'world-atlas/countries-110m.json'
 import lookup from 'country-code-lookup'
+import { BlockDetailsOverlay } from './BlockDetailsOverlay'
 
 // Convert TopoJSON to GeoJSON
 const geoData = feature(worldAtlas as any, (worldAtlas as any).objects.countries) as unknown as FeatureCollection<Geometry>
@@ -113,9 +114,37 @@ interface GlobalMapProps {
   blockEvents: BlockEvent[]
   loading?: boolean
   isMissing?: boolean
+  slot?: number
+  proposer?: string
+  proposerIndex?: number
+  txCount?: number
+  blockSize?: number
+  baseFee?: number
+  gasUsed?: number
+  gasLimit?: number
+  executionBlockNumber?: number
+  hideDetails?: boolean
 }
 
-export function GlobalMap({ nodes, currentTime, blockEvents, loading, isMissing }: GlobalMapProps): JSX.Element {
+export function GlobalMap({ 
+  nodes, 
+  currentTime, 
+  blockEvents, 
+  loading, 
+  isMissing,
+  slot,
+  proposer = 'Unknown',
+  proposerIndex,
+  txCount = 0,
+  blockSize,
+  baseFee,
+  gasUsed,
+  gasLimit,
+  executionBlockNumber,
+  hideDetails = false
+}: GlobalMapProps): JSX.Element {
+  const [isDetailsCollapsed, setIsDetailsCollapsed] = useState(false)
+
   const markers = useMemo(() => {
     return Object.entries(nodes).map(([id, node]) => {
       // Find the latest block event for this node
@@ -153,21 +182,22 @@ export function GlobalMap({ nodes, currentTime, blockEvents, loading, isMissing 
   }, [nodes, blockEvents, currentTime])
 
   if (loading || isMissing) {
-    return <div className="lg:col-span-8 h-[300px] sm:h-[500px] animate-pulse backdrop-blur-md" />
+    return (
+      <div className="h-full relative">
+        <div className="absolute inset-0 backdrop-blur-lg bg-surface/40 ring-1 ring-inset ring-white/5 rounded-lg animate-pulse">
+          <div className="absolute inset-0 bg-gradient-to-r from-surface/0 via-surface/20 to-surface/0" />
+        </div>
+      </div>
+    )
   }
 
   return (
-    <div className="lg:col-span-8 h-[300px] sm:h-[500px] overflow-hidden backdrop-blur-md">
+    <div className="h-full relative">
       <ComposableMap
-        projection="geoMercator"
+        className="h-full w-full"
         projectionConfig={{
-          scale: 140, // Reduced zoom to show more of the map
-          center: [30, 20] // Adjusted center to better show all continents
-        }}
-        style={{
-          background: 'transparent',
-          width: '100%',
-          height: '100%'
+          scale: 147,
+          center: [0, 0]
         }}
       >
         <Geographies geography={geoData.features}>
@@ -176,14 +206,9 @@ export function GlobalMap({ nodes, currentTime, blockEvents, loading, isMissing 
               <Geography
                 key={geo.rsmKey}
                 geography={geo}
-                fill="#1F2937"
-                stroke="#374151"
-                strokeWidth={0.3}
-                style={{
-                  default: { outline: 'none' },
-                  hover: { outline: 'none' },
-                  pressed: { outline: 'none' },
-                }}
+                fill="rgba(255, 255, 255, 0.05)"
+                stroke="rgba(255, 255, 255, 0.2)"
+                strokeWidth={0.5}
               />
             ))
           }
@@ -225,9 +250,9 @@ export function GlobalMap({ nodes, currentTime, blockEvents, loading, isMissing 
                 <circle
                   r={6}
                   fill={markerColor}
-                  stroke="#000"
+                  stroke="rgb(var(--bg-base))"
                   strokeWidth={1}
-                  className="drop-shadow-sm"
+                  className="drop-shadow-md"
                 />
               </Marker>
 
@@ -251,25 +276,21 @@ export function GlobalMap({ nodes, currentTime, blockEvents, loading, isMissing 
                 </Marker>
               )}
 
-              {/* Quick flash animation when node first becomes active */}
+              {/* Continuous pulse animation for first nodes */}
               {(isFirstApiNode || isFirstP2pNode) && (
                 <Marker coordinates={coordinates as [number, number]}>
                   <motion.circle
                     r={6}
-                    fill="white"
-                    initial={{ 
-                      scale: 1, 
-                      opacity: 1,
-                      filter: 'drop-shadow(0 0 12px white)'
-                    }}
+                    fill={markerColor}
+                    initial={{ scale: 1, opacity: 0.5 }}
                     animate={{ 
-                      scale: 10, 
-                      opacity: 0,
-                      filter: 'drop-shadow(0 0 0px white)'
+                      scale: [1, 2, 1],
+                      opacity: [0.5, 0.2, 0.5],
                     }}
                     transition={{
-                      duration: 0.6,
-                      ease: "easeOut",
+                      duration: 2,
+                      ease: "easeInOut",
+                      repeat: Infinity,
                     }}
                   />
                 </Marker>
@@ -278,6 +299,23 @@ export function GlobalMap({ nodes, currentTime, blockEvents, loading, isMissing 
           )
         })}
       </ComposableMap>
+
+      {/* Only show details if not hidden */}
+      {!hideDetails && (
+        <BlockDetailsOverlay
+          slot={slot}
+          proposer={proposer}
+          proposerIndex={proposerIndex}
+          txCount={txCount}
+          blockSize={blockSize}
+          baseFee={baseFee}
+          gasUsed={gasUsed}
+          gasLimit={gasLimit}
+          executionBlockNumber={executionBlockNumber}
+          isCollapsed={isDetailsCollapsed}
+          onToggleCollapse={() => setIsDetailsCollapsed(!isDetailsCollapsed)}
+        />
+      )}
     </div>
   )
 } 

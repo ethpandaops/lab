@@ -23,6 +23,7 @@ import { BeaconSlot } from './pages/beacon/slot';
 import Experiments from './pages/Experiments';
 import MaintenanceOverlay from './components/common/MaintenanceOverlay';
 import { SlotLookup } from './pages/beacon/slot/index';
+import { ModalProvider } from './contexts/ModalContext'
 
 // Create contexts
 export const ConfigContext = createContext<Config | null>(null)
@@ -90,40 +91,42 @@ function App() {
 	const availableNetworks = Object.keys(config.ethereum?.networks || {})
 
 	return (
-		<QueryClientProvider client={queryClient}>
-			<ConfigContext.Provider value={config}>
-				<NetworkContext.Provider value={{
-					selectedNetwork,
-					setSelectedNetwork,
-					availableNetworks
-				}}>
-					<Routes>
-						<Route path="/" element={<Layout />}>
-							<Route index element={<Home />} />
-							<Route path="about" element={<About />} />
-							<Route path="experiments" element={<Experiments />} />
-							<Route path="xatu" element={<Xatu />}>
-								<Route path="community-nodes" element={<CommunityNodes />} />
-								<Route path="networks" element={<Networks />} />
-								<Route path="contributors" element={<ContributorsList />} />
-								<Route path="contributors/:name" element={<ContributorDetail />} />
-								<Route path="fork-readiness" element={<ForkReadiness />} />
-							</Route>
-							<Route path="beacon" element={<Beacon />}>
-								<Route path="slot" element={<Outlet />}>
-									<Route index element={<SlotLookup />} />
-									<Route path="live" element={<BeaconLive />} />
-									<Route path=":slot" element={<BeaconSlot />} />
+		<ModalProvider>
+			<QueryClientProvider client={queryClient}>
+				<ConfigContext.Provider value={config}>
+					<NetworkContext.Provider value={{
+						selectedNetwork,
+						setSelectedNetwork,
+						availableNetworks
+					}}>
+						<Routes>
+							<Route path="/" element={<Layout />}>
+								<Route index element={<Home />} />
+								<Route path="about" element={<About />} />
+								<Route path="experiments" element={<Experiments />} />
+								<Route path="xatu" element={<Xatu />}>
+									<Route path="community-nodes" element={<CommunityNodes />} />
+									<Route path="networks" element={<Networks />} />
+									<Route path="contributors" element={<ContributorsList />} />
+									<Route path="contributors/:name" element={<ContributorDetail />} />
+									<Route path="fork-readiness" element={<ForkReadiness />} />
 								</Route>
-								<Route path="timings" element={<BeaconChainTimings />}>
-									<Route path="blocks" element={<BlockTimings />} />
+								<Route path="beacon" element={<Beacon />}>
+									<Route path="slot" element={<Outlet />}>
+										<Route index element={<SlotLookup />} />
+										<Route path="live" element={<BeaconLive />} />
+										<Route path=":slot" element={<BeaconSlot />} />
+									</Route>
+									<Route path="timings" element={<BeaconChainTimings />}>
+										<Route path="blocks" element={<BlockTimings />} />
+									</Route>
 								</Route>
 							</Route>
-						</Route>
-					</Routes>
-				</NetworkContext.Provider>
-			</ConfigContext.Provider>
-		</QueryClientProvider>
+						</Routes>
+					</NetworkContext.Provider>
+				</ConfigContext.Provider>
+			</QueryClientProvider>
+		</ModalProvider>
 	)
 }
 

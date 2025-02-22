@@ -1,11 +1,12 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useDataFetch } from '../../utils/data'
-import { LoadingState } from '../common/LoadingState'
 import { ErrorState } from '../common/ErrorState'
-import { AttestationView } from './AttestationView'
 import { GlobalMap } from './GlobalMap'
-import { DetailsView } from './DetailsView'
-import { TimelineView } from './TimelineView'
+import { EventTimeline } from './EventTimeline'
+import { BottomPanel } from './BottomPanel'
+import { DataAvailabilityPanel } from './DataAvailabilityPanel'
+import { useNavigate } from 'react-router-dom'
+import clsx from 'clsx'
 
 interface SlotData {
   slot: number
@@ -95,9 +96,20 @@ interface AttestationPoint {
   totalValidators: number;
 }
 
+interface Event {
+  id: string
+  timestamp: number
+  type: string
+  node: string
+  location: string
+  data: any
+}
+
 export function SlotView({ slot, network = 'mainnet', isLive = false, onSlotComplete }: SlotViewProps): JSX.Element {
   const [currentTime, setCurrentTime] = useState<number>(0)
   const [isPlaying, setIsPlaying] = useState<boolean>(isLive)
+  const [isTimelineCollapsed, setIsTimelineCollapsed] = useState(false)
+  const navigate = useNavigate()
 
   // Skip data fetching if no slot is provided
   const slotPath = slot ? `beacon/slots/${network}/${slot}.json` : null
@@ -254,6 +266,86 @@ export function SlotView({ slot, network = 'mainnet', isLive = false, onSlotComp
     ].sort((a, b) => a.time - b.time)
   }, [slotData])
 
+  // Convert block events to timeline events
+  const timelineEvents = useMemo(() => {
+    if (!slotData) return []
+
+    const events: Event[] = []
+
+    // Helper to get location string
+    const getLocationString = (node: string) => {
+      const nodeData = slotData.nodes[node]
+      if (!nodeData?.geo) return 'Unknown Location'
+      return nodeData.geo.country || nodeData.geo.continent || 'Unknown Location'
+    }
+
+    // Add block seen events
+    Object.entries(slotData.timings.block_seen || {}).forEach(([node, time]) => {
+      events.push({
+        id: `block-seen-api-${node}-${time}`,
+        timestamp: time,
+        type: 'Block Seen (API)',
+        node,
+        location: getLocationString(node),
+        data: { time }
+      })
+    })
+
+    // Add P2P block events
+    Object.entries(slotData.timings.block_first_seen_p2p || {}).forEach(([node, time]) => {
+      events.push({
+        id: `block-seen-p2p-${node}-${time}`,
+        timestamp: time,
+        type: 'Block Seen (P2P)',
+        node,
+        location: getLocationString(node),
+        data: { time }
+      })
+    })
+
+    // Add blob seen events
+    Object.entries(slotData.timings.blob_seen || {}).forEach(([node, blobData]) => {
+      Object.entries(blobData).forEach(([index, time]) => {
+        events.push({
+          id: `blob-seen-api-${node}-${index}-${time}`,
+          timestamp: time,
+          type: 'Blob Seen (API)',
+          node,
+          location: getLocationString(node),
+          data: { time, index: parseInt(index) }
+        })
+      })
+    })
+
+    // Add P2P blob events
+    Object.entries(slotData.timings.blob_first_seen_p2p || {}).forEach(([node, blobData]) => {
+      Object.entries(blobData).forEach(([index, time]) => {
+        events.push({
+          id: `blob-seen-p2p-${node}-${index}-${time}`,
+          timestamp: time,
+          type: 'Blob Seen (P2P)',
+          node,
+          location: getLocationString(node),
+          data: { time, index: parseInt(index) }
+        })
+      })
+    })
+
+    // Add attestation events
+    slotData.attestations?.windows?.forEach((window, i) => {
+      events.push({
+        id: `attestation-${i}-${window.start_ms}`,
+        timestamp: window.start_ms,
+        type: 'Attestation',
+        node: `${window.validator_indices.length} validators`,
+        location: '',
+        data: { time: window.start_ms }
+      })
+    })
+
+    return events.sort((a, b) => a.timestamp - b.timestamp)
+  }, [slotData])
+
   // Calculate what to show based on data availability
   const showData = slotData || (isLive && slot)
   const isMissingData = !slotData && isLive && slot !== undefined
@@ -264,46 +356,140 @@ export function SlotView({ slot, network = 'mainnet', isLive = false, onSlotComp
   }
 
   return (
-    <div className="space-y-6">
-      {/* Slot Timeline + Controls */}
-      <TimelineView
-        slot={slot}
-        isPlaying={isPlaying}
-        currentTime={currentTime}
-        firstBlockSeen={firstBlockSeen}
-        firstApiBlockSeen={firstApiBlockSeen}
-        firstP2pBlockSeen={firstP2pBlockSeen}
-        attestationWindows={slotData?.attestations?.windows}
-        attestationProgress={attestationProgress}
-        ATTESTATION_THRESHOLD={attestationThreshold}
-        TOTAL_VALIDATORS={totalValidators}
-        loading={isLoading}
-        isMissing={isMissingData}
-        onPlayPauseClick={() => setIsPlaying(!isPlaying)}
-        proposerIndex={slotData?.proposer.proposer_validator_index}
-        entity={slotData?.entity}
-        executionBlockNumber={slotData?.block.execution_payload_block_number}
-      />
+    <div className="h-full w-full max-h-[calc(100vh-theme(spacing.32))] flex flex-col overflow-hidden -mb-1">
+      {/* Top Row - 60vh */}
+      <div className="h-[68vh] flex w-full">
+        {/* Left Sidebar - Slot Details */}
+        <div className="w-[20%] bg-surface/90 backdrop-blur-md border-r border-subtle p-4 overflow-y-auto">
+          <div className="flex flex-col h-full">
+            <h2 className="text-lg font-sans font-bold text-primary mb-4">Slot {slot}</h2>
+            
+            {/* Slot Info */}
+            <div className="space-y-4 text-sm font-mono">
+              <div>
+                <div className="text-tertiary">Proposer</div>
+                <div className="text-primary">{slotData?.entity || 'Unknown'}</div>
+              </div>
+              
+              <div>
+                <div className="text-tertiary">Validator Index</div>
+                <div className="text-primary">{slotData?.proposer?.proposer_validator_index || 'Unknown'}</div>
+              </div>
 
-      {/* Main Content Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        <GlobalMap
-          nodes={slotData?.nodes || {}}
-          currentTime={currentTime}
-          blockEvents={blockEvents}
-          loading={isLoading}
-          isMissing={isMissingData}
-        />
-        <DetailsView loading={isLoading} isMissing={isMissingData} slotData={slotData} />
-        <AttestationView
-          loading={isLoading}
-          isMissing={isMissingData}
-          attestationWindows={slotData?.attestations?.windows}
-          attestationProgress={attestationProgress}
-          TOTAL_VALIDATORS={totalValidators}
-          ATTESTATION_THRESHOLD={attestationThreshold}
-          currentTime={currentTime}
-        />
+              <div>
+                <div className="text-tertiary">Transactions</div>
+                <div className="text-primary">{slotData?.block?.execution_payload_transactions_count?.toLocaleString() || '0'}</div>
+              </div>
+
+              {slotData?.block?.block_total_bytes && (
+                <div>
+                  <div className="text-tertiary">Block Size</div>
+                  <div className="text-primary">{(slotData.block.block_total_bytes / 1024).toFixed(2)} KB</div>
+                </div>
+              )}
+
+              {slotData?.block?.execution_payload_gas_used && (
+                <div>
+                  <div className="text-tertiary">Gas Used</div>
+                  <div className="text-primary">{slotData.block.execution_payload_gas_used.toLocaleString()}</div>
+                </div>
+              )}
+
+              {slotData?.block?.execution_payload_gas_limit && (
+                <div>
+                  <div className="text-tertiary">Gas Limit</div>
+                  <div className="text-primary">{slotData.block.execution_payload_gas_limit.toLocaleString()}</div>
+                </div>
+              )}
+
+              {slotData?.block?.execution_payload_base_fee_per_gas && (
+                <div>
+                  <div className="text-tertiary">Base Fee</div>
+                  <div className="text-primary">{(slotData.block.execution_payload_base_fee_per_gas / 1e9).toFixed(2)} Gwei</div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Center - Map */}
+        <div className="w-[60%] border-r border-subtle">
+          <GlobalMap
+            nodes={slotData?.nodes || {}}
+            currentTime={currentTime}
+            blockEvents={blockEvents}
+            loading={isLoading}
+            slot={slotData?.slot}
+            proposer={slotData?.entity || 'Unknown'}
+            proposerIndex={slotData?.proposer?.proposer_validator_index}
+            txCount={slotData?.block?.execution_payload_transactions_count || 0}
+            blockSize={slotData?.block?.block_total_bytes}
+            baseFee={slotData?.block?.execution_payload_base_fee_per_gas}
+            gasUsed={slotData?.block?.execution_payload_gas_used}
+            gasLimit={slotData?.block?.execution_payload_gas_limit}
+            executionBlockNumber={slotData?.block?.execution_payload_block_number}
+            hideDetails={true}
+          />
+        </div>
+
+        {/* Right Sidebar - Timeline */}
+        <div className="w-[20%]">
+          <EventTimeline
+            events={timelineEvents}
+            loading={isLoading}
+            isCollapsed={isTimelineCollapsed}
+            onToggleCollapse={() => setIsTimelineCollapsed(!isTimelineCollapsed)}
+            currentTime={currentTime / 1000}
+            isPlaying={isPlaying}
+            onPlayPauseClick={() => setIsPlaying(!isPlaying)}
+            slot={slot}
+            onPreviousSlot={() => {
+              if (slot) {
+                navigate(`/beacon/slot/${slot - 1}?network=${network}`)
+              }
+            }}
+            onNextSlot={() => {
+              if (slot && !isLive) {
+                navigate(`/beacon/slot/${slot + 1}?network=${network}`)
+              }
+            }}
+            isLive={isLive}
+          />
+        </div>
+      </div>
+
+      {/* Bottom Row - Multi Chart Section */}
+      <div className="h-[20vh] bg-surface/90 backdrop-blur-md border-t border-subtle">
+        <div className="h-full w-full grid grid-cols-3">
+          {/* Data Availability Section */}
+          <div className="col-span-2 p-4 border-r border-subtle">
+            <DataAvailabilityPanel
+              blobTimings={{
+                blob_seen: slotData?.timings?.blob_seen,
+                blob_first_seen_p2p: slotData?.timings?.blob_first_seen_p2p,
+                block_seen: slotData?.timings?.block_seen,
+                block_first_seen_p2p: slotData?.timings?.block_first_seen_p2p
+              }}
+              currentTime={currentTime}
+              loading={isLoading}
+              isMissing={isMissingData}
+              nodes={slotData?.nodes}
+            />
+          </div>
+
+          {/* Attestation Section */}
+          <div className="p-4">
+            <BottomPanel
+              attestationProgress={attestationProgress}
+              totalValidators={totalValidators}
+              attestationThreshold={attestationThreshold}
+              currentTime={currentTime}
+              loading={isLoading}
+              isMissing={isMissingData}
+              attestationWindows={slotData?.attestations?.windows}
+            />
+          </div>
+        </div>
       </div>
     </div>
   )
