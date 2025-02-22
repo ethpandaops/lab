@@ -448,37 +448,41 @@ export function EventTimeline({
       'w-full md:w-[400px]'
     )}>
       {/* Header */}
-      <div className="flex-none flex flex-col gap-2 p-4 pr-8 border-b border-subtle">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
+      <div className="flex-none border-b border-subtle">
+        {/* Top Bar */}
+        <div className="flex items-center justify-between p-3 pb-2">
+          <div className="flex items-center gap-3">
             <h2 className="text-sm font-medium">Timeline</h2>
-            <button
-              onClick={handleOpenConfig}
-              className="p-1 hover:bg-hover rounded-lg transition-colors"
-            >
-              <Settings className="w-4 h-4" />
-            </button>
+            <div className="text-[10px] font-mono text-tertiary">
+              {filters.node ? (
+                <span>Events from {formatNodeName(filters.node).user}'s {formatNodeName(filters.node).node}</span>
+              ) : filters.username ? (
+                <span>Events from {filters.username}'s nodes ({nodeCount})</span>
+              ) : (
+                <span>Events from all nodes ({nodeCount})</span>
+              )}
+            </div>
           </div>
-          <div className="flex flex-col items-end">
-            <span className="font-mono text-2xl font-bold text-primary">
-              {currentTime.toFixed(1)}
-            </span>
-            <span className="font-mono text-xs text-tertiary -mt-1">seconds</span>
-          </div>
+          <button
+            onClick={handleOpenConfig}
+            className="p-1.5 hover:bg-hover rounded-lg transition-colors"
+          >
+            <Settings className="w-4 h-4 text-tertiary" />
+          </button>
         </div>
 
-        {/* Navigation Controls */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-1">
+        {/* Controls & Time */}
+        <div className="px-3 pb-3 flex items-center justify-between">
+          <div className="flex items-center gap-1.5">
             <button
               onClick={onPreviousSlot}
-              className="w-8 h-8 rounded flex items-center justify-center bg-surface hover:bg-hover transition-all border border-text-muted touch-manipulation"
+              className="w-7 h-7 rounded-lg flex items-center justify-center bg-surface hover:bg-hover transition-all border border-text-muted touch-manipulation"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
             <button
               onClick={onPlayPauseClick}
-              className="w-8 h-8 rounded-full flex items-center justify-center bg-surface hover:bg-hover transition-all border border-text-muted touch-manipulation"
+              className="w-7 h-7 rounded-lg flex items-center justify-center bg-surface hover:bg-hover transition-all border border-text-muted touch-manipulation"
             >
               {isPlaying ? <FaPause className="w-3 h-3" /> : <FaPlay className="w-3 h-3 ml-0.5" />}
             </button>
@@ -486,7 +490,7 @@ export function EventTimeline({
               onClick={onNextSlot}
               disabled={isLive}
               className={clsx(
-                'w-8 h-8 rounded flex items-center justify-center transition-all border touch-manipulation',
+                'w-7 h-7 rounded-lg flex items-center justify-center transition-all border touch-manipulation',
                 isLive 
                   ? 'opacity-50 cursor-not-allowed bg-surface/50 border-text-muted/50' 
                   : 'bg-surface hover:bg-hover border-text-muted'
@@ -495,76 +499,85 @@ export function EventTimeline({
               <ChevronRight className="w-4 h-4" />
             </button>
           </div>
-
-          {/* Filter Info */}
-          <div className="text-[10px] font-mono text-tertiary">
-            {filters.node ? (
-              <span>Events from {formatNodeName(filters.node).user}'s {formatNodeName(filters.node).node}</span>
-            ) : filters.username ? (
-              <span>Events from {filters.username}'s nodes ({nodeCount})</span>
-            ) : (
-              <span>Events from all nodes ({nodeCount})</span>
-            )}
+          <div className="flex items-baseline gap-1.5">
+            <span className="font-mono text-2xl font-medium text-primary">{currentTime.toFixed(1)}</span>
+            <span className="font-mono text-xs text-tertiary">sec</span>
           </div>
         </div>
 
-        {/* Horizontal Timeline */}
-        <div className="relative h-8">
-          {/* Section backgrounds */}
-          <div className="absolute inset-0 flex rounded-sm overflow-hidden">
-            <div className="w-1/3 bg-accent/5" />
-            <div className="w-1/3 bg-success/5" />
-            <div className="w-1/3 bg-yellow-400/5" />
-          </div>
-
-          {/* Section labels */}
-          <div className="absolute inset-0">
-            <div className="flex h-full">
-              <div className="w-1/3 flex items-center justify-center -mx-px">
-                <span className="text-xs font-mono text-accent/80">Block</span>
-              </div>
-              <div className="w-1/3 flex items-center justify-center -mx-px">
-                <span className="text-xs font-mono text-success/80">Attestation</span>
-              </div>
-              <div className="w-1/3 flex items-center justify-center -mx-px">
-                <span className="text-xs font-mono text-yellow-400/80">Aggregation</span>
-              </div>
+        {/* Timeline Bar */}
+        <div className="px-3 pb-3">
+          {/* Timeline sections */}
+          <div className="relative h-12">
+            {/* Background sections */}
+            <div className="absolute inset-0 flex rounded-lg overflow-hidden">
+              <div className="w-1/3 bg-accent/10 border-r border-white/5" />
+              <div className="w-1/3 bg-success/10 border-r border-white/5" />
+              <div className="w-1/3 bg-yellow-400/10" />
             </div>
-          </div>
 
-          {/* Progress bar */}
-          <div className="absolute inset-0 pointer-events-none z-10">
+            {/* Progress Overlay */}
             <div 
-              className="absolute inset-y-0 bg-active transition-all duration-100"
+              className="absolute inset-y-0 bg-active/10 transition-all duration-100 rounded-l-lg"
               style={{ 
-                left: `${(currentTime / 12) * 100}%`,
-                width: '3px'
+                width: `${(currentTime / 12) * 100}%`,
               }}
             />
-          </div>
 
-          {/* Time markers */}
-          <div className="absolute inset-x-0 bottom-0 flex justify-between px-1">
-            {[0, 4, 8, 12].map(time => (
-              <div key={time} className="font-mono text-[10px] text-tertiary/50">
-                {time}s
+            {/* Section labels */}
+            <div className="absolute inset-0 flex">
+              <div className="w-1/3 flex items-center justify-center">
+                <span className="text-[11px] font-mono font-medium text-accent">Block</span>
               </div>
-            ))}
+              <div className="w-1/3 flex items-center justify-center">
+                <span className="text-[11px] font-mono font-medium text-success">Attestation</span>
+              </div>
+              <div className="w-1/3 flex items-center justify-center">
+                <span className="text-[11px] font-mono font-medium text-yellow-400">Aggregation</span>
+              </div>
+            </div>
+
+            {/* Progress line */}
+            <div className="absolute inset-0 pointer-events-none">
+              <div 
+                className="absolute inset-y-0 bg-active transition-all duration-100"
+                style={{ 
+                  left: `${(currentTime / 12) * 100}%`,
+                  width: '2px',
+                }}
+              />
+            </div>
+
+            {/* Time markers */}
+            <div className="absolute inset-x-0 bottom-1 flex justify-between px-2">
+              {[0, 4, 8, 12].map(time => (
+                <div key={time} className="flex flex-col items-center">
+                  <div className="w-px h-1 bg-white/10 mb-0.5" />
+                  <span className="font-mono text-[10px] text-white/40">{time}s</span>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
 
       {/* Event List */}
       <div ref={timelineRef} className="flex-1 min-h-0 md:max-h-none max-h-[30vh] overflow-y-auto scrollbar-hide w-full">
-        <div className="p-4 space-y-0.5">
+        <div className="p-2 space-y-0.5">
           {loading ? (
-            <div className="space-y-1">
-              {[...Array(4)].map((_, i) => (
+            <div className="space-y-1.5">
+              {[...Array(6)].map((_, i) => (
                 <div 
                   key={i}
-                  className="rounded bg-surface/40 animate-pulse"
+                  className="rounded bg-surface/40 p-2"
                 >
-                  <div className="h-2 bg-surface/50 rounded w-full" />
+                  <div className="flex items-center gap-1.5">
+                    <div className="w-3 h-3 rounded-full bg-surface/50" />
+                    <div className="flex-1 flex items-center justify-between">
+                      <div className="w-24 h-3 bg-surface/50 rounded" />
+                      <div className="w-8 h-3 bg-surface/50 rounded" />
+                    </div>
+                  </div>
                 </div>
               ))}
             </div>

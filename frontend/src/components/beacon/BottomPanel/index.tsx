@@ -177,31 +177,41 @@ export function BottomPanel({
           </div>
           
           {/* Attestation Progress */}
-          <div className="flex items-center gap-4 mt-2 md:mt-0">
-            <div className="flex items-baseline gap-1 font-mono">
-              <span className="text-sm font-medium text-success">{currentAttestationCount.toLocaleString()}</span>
-              <span className="text-tertiary/70 text-[9px]">/ {maxPossibleValidators.toLocaleString()}</span>
-              <span className="text-tertiary/70 text-[9px] ml-1">
-                ({Math.round((currentAttestationCount / maxPossibleValidators) * 100)}%)
-              </span>
+          {loading ? (
+            <div className="flex items-center gap-4 mt-2 md:mt-0">
+              <div className="flex items-baseline gap-1 font-mono">
+                <div className="h-4 w-16 bg-surface/50 rounded" />
+                <div className="h-3 w-24 bg-surface/50 rounded" />
+              </div>
+              <div className="h-1 w-32 bg-surface/50 rounded-full" />
             </div>
+          ) : (
+            <div className="flex items-center gap-4 mt-2 md:mt-0">
+              <div className="flex items-baseline gap-1 font-mono">
+                <span className="text-sm font-medium text-success">{currentAttestationCount.toLocaleString()}</span>
+                <span className="text-tertiary/70 text-[9px]">/ {maxPossibleValidators.toLocaleString()}</span>
+                <span className="text-tertiary/70 text-[9px] ml-1">
+                  ({Math.round((currentAttestationCount / maxPossibleValidators) * 100)}%)
+                </span>
+              </div>
 
-            {/* Progress bar */}
-            <div className="relative h-1 w-32 rounded-full overflow-hidden bg-base/20 ring-1 ring-inset ring-white/5">
-              {/* Progress fill */}
-              <div 
-                className={`absolute inset-y-0 left-0 transition-all duration-100 ${
-                  currentAttestationCount >= attestationThreshold 
-                    ? 'bg-success' 
-                    : 'bg-success/40'
-                }`}
-                style={{ width: `${(currentAttestationCount / maxPossibleValidators) * 100}%` }}
-              >
-                {/* Subtle shine effect */}
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -skew-x-12 animate-[shine_3s_ease-in-out_infinite]" />
+              {/* Progress bar */}
+              <div className="relative h-1 w-32 rounded-full overflow-hidden bg-base/20 ring-1 ring-inset ring-white/5">
+                {/* Progress fill */}
+                <div 
+                  className={`absolute inset-y-0 left-0 transition-all duration-100 ${
+                    currentAttestationCount >= attestationThreshold 
+                      ? 'bg-success' 
+                      : 'bg-success/40'
+                  }`}
+                  style={{ width: `${(currentAttestationCount / maxPossibleValidators) * 100}%` }}
+                >
+                  {/* Subtle shine effect */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -skew-x-12 animate-[shine_3s_ease-in-out_infinite]" />
+                </div>
               </div>
             </div>
-          </div>
+          )}
         </div>
 
         {/* Distribution Charts */}
@@ -212,7 +222,9 @@ export function BottomPanel({
               title={<div className="text-[8px] font-medium text-primary/50 uppercase tracking-wider">Arrivals</div>}
               height={140}
               titlePlacement="inside"
-              chart={
+              chart={loading ? (
+                <div className="w-full h-[140px] bg-surface/50 rounded animate-pulse" />
+              ) : (
                 <ResponsiveContainer width="100%" height={140}>
                   <LineChart
                     data={arrivalData}
@@ -251,10 +263,9 @@ export function BottomPanel({
                     />
                   </LineChart>
                 </ResponsiveContainer>
-              }
+              )}
               series={arrivalStats}
               showSeriesTable={false}
-              xTicks={[0, 4, 8, 12]}
             />
           </div>
 
@@ -264,11 +275,13 @@ export function BottomPanel({
               title={<div className="text-[8px] font-medium text-primary/50 uppercase tracking-wider">Cumulative Distribution</div>}
               height={140}
               titlePlacement="inside"
-              chart={
+              chart={loading ? (
+                <div className="w-full h-[140px] bg-surface/50 rounded animate-pulse" />
+              ) : (
                 <ResponsiveContainer width="100%" height={140}>
                   <LineChart
                     data={cdfData}
-                    margin={{ top: 16, right: 24, left: 0, bottom: 4 }}
+                    margin={{ top: 16, right: 8, left: 0, bottom: 4 }}
                   >
                     <XAxis
                       dataKey="time"
@@ -285,7 +298,7 @@ export function BottomPanel({
                       stroke="currentColor"
                       tick={{ fontSize: 8 }}
                       domain={[0, 100]}
-                      ticks={[0, 50, 100]}
+                      ticks={[0, 33, 66, 100]}
                       allowDataOverflow
                       tickSize={2}
                       width={25}
@@ -293,17 +306,9 @@ export function BottomPanel({
                     />
                     <ReferenceLine
                       y={66}
-                      className="text-success"
                       stroke="currentColor"
                       strokeDasharray="3 3"
-                      strokeWidth={1}
-                      label={{
-                        value: "66%",
-                        position: "right",
-                        className: "text-success",
-                        fill: "currentColor",
-                        fontSize: 8
-                      }}
+                      strokeOpacity={0.3}
                     />
                     <Line
                       type="monotone"
@@ -316,10 +321,9 @@ export function BottomPanel({
                     />
                   </LineChart>
                 </ResponsiveContainer>
-              }
+              )}
               series={cdfStats}
               showSeriesTable={false}
-              xTicks={[0, 4, 8, 12]}
             />
           </div>
         </div>

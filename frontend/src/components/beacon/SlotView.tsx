@@ -956,7 +956,7 @@ export function SlotView({ slot, network = 'mainnet', isLive = false, onSlotComp
           </div>
 
           {/* Right Sidebar - Timeline */}
-          <div className="w-[20%] h-[calc(80vh-theme(spacing.32))] overflow-hidden">
+          <div className="w-100% h-[calc(80vh-theme(spacing.32))] overflow-hidden">
             <EventTimeline
               events={timelineEvents}
               loading={isLoading}
