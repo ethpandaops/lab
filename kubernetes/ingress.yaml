@@ -1,0 +1,16 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: dashboard-frontend
+  annotations:
+    kubernetes.io/ingress.global-static-ip-name: dashboard-frontend
+    networking.gke.io/managed-certificates: dashboard-frontend
+  labels:
+    app: dashboard-frontend
+spec:
+  defaultBackend:
+    service:
+      name: dashboard-frontend-service
+      port:
+        number: 3000
