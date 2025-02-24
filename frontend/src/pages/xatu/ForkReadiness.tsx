@@ -77,16 +77,10 @@ function ForkReadiness(): JSX.Element {
 
   const readinessData = useMemo(() => {
     if (!summaryData || !config) {
-      console.log('No summary data or config:', { summaryData: !!summaryData, config: !!config })
       return []
     }
 
-    console.log('Selected Network:', selectedNetwork)
-    console.log('Network Config:', config.ethereum.networks[selectedNetwork])
-    console.log('Has Electra:', config.ethereum.networks[selectedNetwork]?.forks?.consensus?.electra)
-
     if (!config.ethereum.networks[selectedNetwork]?.forks?.consensus?.electra) {
-      console.log('No Electra fork config for network')
       return []
     }
 
@@ -95,9 +89,6 @@ function ForkReadiness(): JSX.Element {
       .filter(c => selectedUser === 'all' || c.name === selectedUser)
       .flatMap(c => c.nodes)
       .filter(n => n.network === selectedNetwork)
-
-    console.log('Filtered Nodes:', nodes.length)
-    console.log('Min Client Versions:', network.forks?.consensus?.electra?.min_client_versions)
 
     const clientReadiness = Object.entries(network.forks?.consensus?.electra?.min_client_versions || {})
       .map(([clientName, minVersion]) => {

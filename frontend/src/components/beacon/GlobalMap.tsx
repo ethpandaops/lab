@@ -150,18 +150,6 @@ export function GlobalMap({
   executionBlockNumber,
   hideDetails = false
 }: GlobalMapProps): JSX.Element {
-  // Debug log initial props
-  console.debug('GlobalMap received props:', {
-    nodeCount: Object.keys(nodes).length,
-    nodes: Object.values(nodes).map(n => ({
-      name: n.name,
-      city: n.geo.city,
-      country: n.geo.country,
-      hasCoords: Boolean(n.geo.latitude && n.geo.longitude)
-    })),
-    blockEventCount: blockEvents.length
-  })
-
   const [isDetailsCollapsed, setIsDetailsCollapsed] = useState(false)
   const [hoveredNode, setHoveredNode] = useState<{
     id: string;
