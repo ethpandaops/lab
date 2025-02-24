@@ -12,6 +12,7 @@ numpy==1.26.3
 sqlalchemy==1.4.50
 clickhouse-driver==0.2.6
 clickhouse-sqlalchemy==0.2.4
+geonamescache==2.0.0
 
 # Dev dependencies
 pytest==8.0.0
