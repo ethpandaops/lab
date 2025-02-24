@@ -21,7 +21,6 @@ RUN pip install --upgrade pip && \
 
 # Copy source code and config
 COPY lab/ ./lab/
-COPY config.example.yaml /app/config.yaml
 
 # Create state directory
 RUN mkdir -p /app/state/modules && chmod -R 777 /app/state

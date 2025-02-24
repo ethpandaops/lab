@@ -2,9 +2,8 @@ declare module 'cities.json' {
   interface City {
     country: string
     name: string
-    lat: number
-    lng: number
-    population: number
+    lat: string
+    lng: string
   }
 
   const cities: City[]
