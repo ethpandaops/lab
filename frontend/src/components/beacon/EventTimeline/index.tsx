@@ -444,8 +444,8 @@ export function EventTimeline({
     <div className={clsx(
       'h-full flex-shrink-0',
       'backdrop-blur-lg bg-surface/40 ring-1 ring-inset ring-white/5',
-      'flex flex-col max-h-[calc(100vh-128px)]',
-      'w-full md:w-[400px]'
+      'flex flex-col',
+      'w-full'
     )}>
       {/* Header */}
       <div className="flex-none border-b border-subtle">
@@ -562,7 +562,7 @@ export function EventTimeline({
       </div>
 
       {/* Event List */}
-      <div ref={timelineRef} className="flex-1 min-h-0 md:max-h-none max-h-[30vh] overflow-y-auto scrollbar-hide w-full">
+      <div ref={timelineRef} className="flex-1 min-h-0 overflow-y-auto scrollbar-hide w-full">
         <div className="p-2 space-y-0.5">
           {loading ? (
             <div className="space-y-1.5">

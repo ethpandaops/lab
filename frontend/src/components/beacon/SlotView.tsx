@@ -19,6 +19,7 @@ interface SlotData {
     execution_payload_gas_used?: number
     execution_payload_gas_limit?: number
     execution_payload_block_number?: number
+    block_version?: string
   }
   proposer: {
     proposer_validator_index: number
@@ -360,9 +361,9 @@ export function SlotView({ slot, network = 'mainnet', isLive = false, onSlotComp
   }
 
   return (
-    <div className="h-full w-full flex flex-col">
+    <div className="w-full flex flex-col">
       {/* Main Content */}
-      <div className="flex-1 min-h-0 flex flex-col md:flex-row">
+      <div className="h-[calc(85vh-theme(spacing.48))] flex flex-col md:flex-row">
         {/* Mobile Layout */}
         <div className="md:hidden flex flex-col h-full">
           {/* Map Section - 25vh */}
@@ -605,10 +606,10 @@ export function SlotView({ slot, network = 'mainnet', isLive = false, onSlotComp
           </div>
         </div>
 
-        {/* Desktop Layout - Unchanged */}
-        <div className="hidden md:flex flex-1 min-h-0 flex-row">
+        {/* Desktop Layout */}
+        <div className="hidden md:flex flex-1 flex-row">
           {/* Left Sidebar - Details */}
-          <div className="w-[20%] border-r border-subtle md:h-[calc(80vh-theme(spacing.32))]">
+          <div className="w-[20%] border-r border-subtle h-full">
             <div className="h-full overflow-y-auto">
               <div className="p-4 space-y-4">
                 {/* Slot Header */}
@@ -620,7 +621,7 @@ export function SlotView({ slot, network = 'mainnet', isLive = false, onSlotComp
                       rel="noopener noreferrer"
                       className="hover:text-accent transition-colors"
                     >
-                      Slot {slot}
+                      {slot}
                     </a>
                   </div>
                   <div className="text-sm font-mono">
@@ -637,6 +638,13 @@ export function SlotView({ slot, network = 'mainnet', isLive = false, onSlotComp
                       <span className="text-accent">{slotData?.entity || 'Unknown'}</span>
                     )}</span>
                   </div>
+                  {slotData?.block?.block_version && (
+                    <div className="mt-2">
+                      <div className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-mono font-medium bg-cyber-dark border border-cyber-neon text-cyber-neon">
+                        {slotData.block.block_version.toUpperCase()}
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Analysis Section */}
@@ -805,18 +813,35 @@ export function SlotView({ slot, network = 'mainnet', isLive = false, onSlotComp
                           </a>
                         </div>
                       </div>
-                      <div className="col-span-2">
-                        <div className="text-tertiary">Validator</div>
-                        <div className="text-primary">
-                          <a
-                            href={`https://beaconcha.in/validator/${slotData?.proposer?.proposer_validator_index}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="hover:text-accent transition-colors"
-                          >
-                            {slotData?.proposer?.proposer_validator_index || 'Unknown'}
-                          </a>
+                      <div className="col-span-2 grid grid-cols-2 gap-x-4">
+                        <div>
+                          <div className="text-tertiary">Validator</div>
+                          <div className="text-primary">
+                            <a
+                              href={`https://beaconcha.in/validator/${slotData?.proposer?.proposer_validator_index}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="hover:text-accent transition-colors"
+                            >
+                              {slotData?.proposer?.proposer_validator_index || 'Unknown'}
+                            </a>
+                          </div>
                         </div>
+                        {slotData?.block?.execution_payload_block_number && (
+                          <div>
+                            <div className="text-tertiary">Block</div>
+                            <div className="text-primary">
+                              <a
+                                href={`https://etherscan.io/block/${slotData.block.execution_payload_block_number}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="hover:text-accent transition-colors"
+                              >
+                                {slotData.block.execution_payload_block_number}
+                              </a>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -837,34 +862,19 @@ export function SlotView({ slot, network = 'mainnet', isLive = false, onSlotComp
                       )}
 
                       {slotData?.block?.execution_payload_gas_used && (
-                        <div className="col-span-2">
-                          <div className="text-tertiary">Gas</div>
-                          <div className="text-primary">
-                            {(slotData.block.execution_payload_gas_used / 1e6).toFixed(1)}M / {(slotData.block.execution_payload_gas_limit! / 1e6).toFixed(1)}M
+                        <div className="col-span-2 grid grid-cols-2 gap-x-4">
+                          <div>
+                            <div className="text-tertiary">Gas</div>
+                            <div className="text-primary">
+                              {(slotData.block.execution_payload_gas_used / 1e6).toFixed(1)}M / {(slotData.block.execution_payload_gas_limit! / 1e6).toFixed(1)}M
+                            </div>
                           </div>
-                        </div>
-                      )}
-
-                      {slotData?.block?.execution_payload_base_fee_per_gas && (
-                        <div className="col-span-2">
-                          <div className="text-tertiary">Base Fee</div>
-                          <div className="text-primary">{(slotData.block.execution_payload_base_fee_per_gas / 1e9).toFixed(2)} Gwei</div>
-                        </div>
-                      )}
-
-                      {slotData?.block?.execution_payload_block_number && (
-                        <div className="col-span-2">
-                          <div className="text-tertiary">Block Number</div>
-                          <div className="text-primary">
-                            <a
-                              href={`https://etherscan.io/block/${slotData.block.execution_payload_block_number}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="hover:text-accent transition-colors"
-                            >
-                              {slotData.block.execution_payload_block_number}
-                            </a>
-                          </div>
+                          {slotData?.block?.execution_payload_base_fee_per_gas && (
+                            <div>
+                              <div className="text-tertiary">Base Fee</div>
+                              <div className="text-primary">{(slotData.block.execution_payload_base_fee_per_gas / 1e9).toFixed(2)} Gwei</div>
+                            </div>
+                          )}
                         </div>
                       )}
                     </div>
@@ -936,7 +946,7 @@ export function SlotView({ slot, network = 'mainnet', isLive = false, onSlotComp
           </div>
 
           {/* Center - Map */}
-          <div className="w-[60%] h-[calc(80vh-theme(spacing.32))] border-r border-subtle">
+          <div className="w-[60%] h-full border-r border-subtle">
             <GlobalMap
               nodes={slotData?.nodes || {}}
               currentTime={currentTime}
@@ -956,7 +966,7 @@ export function SlotView({ slot, network = 'mainnet', isLive = false, onSlotComp
           </div>
 
           {/* Right Sidebar - Timeline */}
-          <div className="w-100% h-[calc(80vh-theme(spacing.32))] overflow-hidden">
+          <div className="w-[20%] h-full flex flex-col">
             <EventTimeline
               events={timelineEvents}
               loading={isLoading}
@@ -977,15 +987,15 @@ export function SlotView({ slot, network = 'mainnet', isLive = false, onSlotComp
                 }
               }}
               isLive={isLive}
-              className="max-h-[30vh]"
+              className="flex-1 overflow-y-auto"
             />
           </div>
         </div>
       </div>
 
       {/* Bottom Section - Desktop Only */}
-      <div className="hidden md:flex flex-col">
-        <div className="h-[20vh] bg-surface/90 backdrop-blur-md border-t border-subtle">
+      <div className="hidden md:flex flex-col h-[calc(15vh-theme(spacing.32))]">
+        <div className="h-full bg-surface/90 backdrop-blur-md border-t border-subtle">
           <div className="h-full w-full grid grid-cols-3">
             {/* Data Availability Section */}
             <div className="col-span-2 p-4 border-r border-subtle">
