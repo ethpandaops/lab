@@ -299,7 +299,7 @@ class OptimizedSlotData(BaseModel):
     def to_dict(self) -> Dict[str, Any]:
         return {
             "slot": self.slot,
-            "network": self.network_name,
+            "network": self.network,
             "processed_at": self.processed_at,
             "processing_time_ms": self.processing_time_ms,
             "block": self.block,
