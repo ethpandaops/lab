@@ -9,6 +9,8 @@ import io
 
 from pydantic import BaseModel, Field
 from sqlalchemy import text
+from geonamescache import GeonamesCache
+from functools import lru_cache
 
 from lab.core import logger
 from lab.core.module import ModuleContext
@@ -128,6 +130,8 @@ class Node(BaseModel):
     geo_city: str
     geo_country: str
     geo_continent_code: str
+    geo_latitude: Optional[float] = None
+    geo_longitude: Optional[float] = None
 
     @classmethod
     def extract_username(cls, name: str) -> str:
@@ -141,10 +145,104 @@ class Node(BaseModel):
         
         return parts[1]
 
+    @staticmethod
+    @lru_cache(maxsize=1024)  # Cache up to 1024 locations
+    def get_coordinates(city: str | None, country: str | None, continent: str | None) -> Optional[Tuple[float, float]]:
+        """Get coordinates for a location with fallbacks.
+        
+        Args:
+            city: City name (optional)
+            country: Country name (optional)
+            continent: Continent code (optional)
+            
+        Returns:
+            Tuple of (latitude, longitude) or None if no location could be determined
+            
+        Fallback order:
+        1. Exact city match (if city and country provided)
+        2. Most populous city match (if only city provided)
+        3. Country capital (if country provided)
+        4. Continent center (if continent provided)
+        5. None
+        """
+        try:
+            gc = GeonamesCache()
+            
+            # Try city-level match first if we have both city and country
+            if city and country:
+                cities = gc.get_cities()
+                city_search = city.lower().strip()
+                country_search = country.lower().strip()
+                
+                # First try exact match with both city and country
+                for city_data in cities.values():
+                    if (city_data['name'].lower() == city_search and 
+                        city_data['countrycode'].lower() == country_search):
+                        return (float(city_data['latitude']), float(city_data['longitude']))
+                
+                # If no exact match, try just matching city name (taking the most populous)
+                matching_cities = []
+                for city_data in cities.values():
+                    if city_data['name'].lower() == city_search:
+                        matching_cities.append(city_data)
+                
+                if matching_cities:
+                    # Sort by population and take the largest
+                    largest_city = max(matching_cities, key=lambda x: x['population'])
+                    return (float(largest_city['latitude']), float(largest_city['longitude']))
+            
+            # Try country-level match if we have a country
+            if country:
+                countries = gc.get_countries()
+                country_search = country.lower().strip()
+                
+                # Find the country
+                for country_data in countries.values():
+                    if country_data['name'].lower() == country_search:
+                        # Get the capital city
+                        capital = country_data.get('capital')
+                        if capital:
+                            # Search for the capital in cities
+                            cities = gc.get_cities()
+                            for city_data in cities.values():
+                                if (city_data['name'].lower() == capital.lower() and 
+                                    city_data['countrycode'].lower() == country_data['iso'].lower()):
+                                    return (float(city_data['latitude']), float(city_data['longitude']))
+            
+            # Fall back to continent center points if we have a continent
+            if continent:
+                continent_coords = {
+                    'NA': (-100, 40),    # North America
+                    'SA': (-58, -20),    # South America
+                    'EU': (15, 50),      # Europe
+                    'AF': (20, 0),       # Africa
+                    'AS': (100, 35),     # Asia
+                    'OC': (135, -25),    # Oceania
+                    'AN': (0, -90),      # Antarctica
+                }
+                if continent.upper() in continent_coords:
+                    return continent_coords[continent.upper()]
+                
+        except Exception:
+            pass
+        
+        return None
+
     def __init__(self, **data):
-        """Initialize node with extracted username."""
+        """Initialize node with extracted username and geocoded coordinates."""
         if "username" not in data:
             data["username"] = self.extract_username(data["name"])
+
+        # Add coordinates if we don't have them
+        if data.get("geo_latitude") is None and data.get("geo_longitude") is None:
+            coords = self.get_coordinates(
+                data.get("geo_city"),
+                data.get("geo_country"),
+                data.get("geo_continent_code")
+            )
+            if coords:
+                data["geo_latitude"], data["geo_longitude"] = coords
+
         super().__init__(**data)
 
     def to_dict(self) -> Dict[str, Any]:
@@ -154,7 +252,9 @@ class Node(BaseModel):
             "geo": {
                 "city": self.geo_city,
                 "country": self.geo_country,
-                "continent": self.geo_continent_code
+                "continent": self.geo_continent_code,
+                "latitude": self.geo_latitude,
+                "longitude": self.geo_longitude
             }
         }
 
@@ -199,7 +299,7 @@ class OptimizedSlotData(BaseModel):
     def to_dict(self) -> Dict[str, Any]:
         return {
             "slot": self.slot,
-            "network": self.network,
+            "network": self.network_name,
             "processed_at": self.processed_at,
             "processing_time_ms": self.processing_time_ms,
             "block": self.block,
@@ -333,6 +433,7 @@ class SlotProcessor(BaseProcessor):
         super().__init__(ctx, f"slot_{network_name}")
         self.network = network
         self.network_config = network_config
+        self.network_name = network_name
         
         # Get network-specific config
         self.head_lag_slots = network_config.head_lag_slots

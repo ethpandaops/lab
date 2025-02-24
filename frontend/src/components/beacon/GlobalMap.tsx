@@ -71,22 +71,15 @@ const useNodeCoordinates = (nodes: Record<string, Node>) => {
     const coords = new Map<string, [number, number]>()
     
     Object.entries(nodes).forEach(([id, node]) => {
-      let coordinates: [number, number] | undefined
+      const coordinates = getNodeCoordinates(
+        node.geo.city,
+        node.geo.country,
+        node.geo.continent,
+        node.geo.latitude,
+        node.geo.longitude
+      )
 
-      // 1. Try exact coordinates if available
-      if (node.geo.latitude && node.geo.longitude) {
-        coordinates = [node.geo.longitude, node.geo.latitude]
-      }
-      // 2. Try city/country coordinates
-      else {
-        coordinates = getNodeCoordinates(node.geo.city, node.geo.country)
-      }
-      // 3. Fall back to continent coordinates
-      if (!coordinates && node.geo.continent) {
-        coordinates = continentCoords[node.geo.continent]
-      }
-
-      if (coordinates && Array.isArray(coordinates) && !coordinates.some(c => !isFinite(c))) {
+      if (coordinates && !coordinates.some(c => !isFinite(c))) {
         coords.set(id, coordinates)
       }
     })
