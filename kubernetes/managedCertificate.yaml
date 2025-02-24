@@ -1,0 +1,9 @@
+---
+apiVersion: networking.gke.io/v1
+kind: ManagedCertificate
+metadata:
+  name: dashboard-frontend
+  namespace: default
+spec:
+  domains:
+    - dashboard.interstate.so
