@@ -74,8 +74,13 @@ const stringToColor = (str: string) => {
 };
 
 // Get country emoji flag
-const getCountryEmoji = (countryCode: string) => {
-  const codePoints = countryCode
+const getCountryEmoji = (countryName: string) => {
+  // Split on space and get first char of each word, or first 2 chars if single word
+  const code = countryName.includes(' ') 
+    ? countryName.split(' ').map(word => word[0]).join('')
+    : countryName.substring(0, 2);
+    
+  const codePoints = code
     .toUpperCase()
     .split('')
     .map(char => 127397 + char.charCodeAt(0));
@@ -445,7 +450,7 @@ const GeographicalChecklist = () => {
                               <tr key={name} className="hover:bg-surface/40 transition-colors duration-200">
                                 <td className="px-4 py-3">
                                   <div className="flex items-center gap-2">
-                                    <span className="text-lg">{getCountryEmoji(name.substring(0, 2))}</span>
+                                    <span className="text-lg">{getCountryEmoji(name)}</span>
                                     <span className="font-mono text-primary">{name}</span>
                                   </div>
                                 </td>
