@@ -49,22 +49,6 @@ interface GlobalMapProps {
   hideDetails?: boolean
 }
 
-// Add a glowing line effect between first nodes
-const GlowingLine = ({ start, end, color }: { start: [number, number], end: [number, number], color: string }) => (
-  <motion.line
-    x1={start[0]}
-    y1={start[1]}
-    x2={end[0]}
-    y2={end[1]}
-    stroke={color}
-    strokeWidth={0.5}
-    className="animate-glowing-line"
-    initial={{ pathLength: 0, opacity: 0 }}
-    animate={{ pathLength: 1, opacity: 1 }}
-    transition={{ duration: 1.5, ease: "easeInOut" }}
-  />
-);
-
 // Memoize node coordinate lookup
 const useNodeCoordinates = (nodes: Record<string, Node>) => {
   return useMemo(() => {
@@ -101,7 +85,8 @@ const useFilteredBlockEvents = (blockEvents: BlockEvent[]) => {
 // Memoize markers
 const useMarkers = (nodes: Record<string, Node>, nodeCoordinates: Map<string, [number, number]>, filteredBlockEvents: BlockEvent[], currentTime: number) => {
   return useMemo(() => {
-    return Object.entries(nodes).map(([id, node]) => {
+    // First, create individual markers
+    const individualMarkers = Object.entries(nodes).map(([id, node]) => {
       // Find the latest block event for this node
       const nodeEvents = filteredBlockEvents.filter(event => event.node === id)
       const latestEvent = nodeEvents.length > 0 ? nodeEvents[nodeEvents.length - 1] : null
@@ -110,19 +95,62 @@ const useMarkers = (nodes: Record<string, Node>, nodeCoordinates: Map<string, [n
       // Get pre-computed coordinates
       const coordinates = nodeCoordinates.get(id)
 
-      // Skip nodes with unknown locations
-      if (!coordinates) {
+      // Skip nodes with unknown locations or invalid coordinates
+      if (!coordinates || coordinates.some(c => !isFinite(c))) {
         return null
       }
 
       return {
         id,
         coordinates,
-        hasSeenBlock,
+        hasSeenBlock: hasSeenBlock || false, // Ensure hasSeenBlock is always boolean
         time: latestEvent?.time || 0,
         source: latestEvent?.source
       }
     }).filter((marker): marker is NonNullable<typeof marker> => marker !== null)
+
+    // Group markers by coordinates
+    const groupedMarkers = new Map<string, Array<{
+      id: string;
+      coordinates: [number, number];
+      hasSeenBlock: boolean;
+      time: number;
+      source: 'p2p' | 'api' | undefined;
+    }>>()
+
+    individualMarkers.forEach(marker => {
+      const coordKey = marker.coordinates.join(',')
+      if (!groupedMarkers.has(coordKey)) {
+        groupedMarkers.set(coordKey, [])
+      }
+      groupedMarkers.get(coordKey)?.push(marker)
+    })
+
+    // Convert grouped markers to final format
+    return Array.from(groupedMarkers.entries()).map(([coordKey, markers]) => {
+      const coordinates = markers[0].coordinates
+      const hasMultipleNodes = markers.length > 1
+      
+      // Filter to only nodes that have seen the block
+      const visibleMarkers = markers.filter(m => m.hasSeenBlock)
+      
+      return {
+        coordinates,
+        hasMultipleNodes,
+        nodeCount: markers.length,
+        visibleNodeCount: visibleMarkers.length,
+        hasVisibleNodes: visibleMarkers.length > 0,
+        // For first node detection
+        nodeIds: markers.map(m => m.id),
+        // For tooltip
+        nodes: markers.map(m => ({
+          id: m.id,
+          hasSeenBlock: m.hasSeenBlock,
+          time: m.time,
+          source: m.source
+        }))
+      }
+    })
   }, [nodes, nodeCoordinates, filteredBlockEvents, currentTime])
 }
 
@@ -145,12 +173,16 @@ export function GlobalMap({
 }: GlobalMapProps): JSX.Element {
   const [isDetailsCollapsed, setIsDetailsCollapsed] = useState(false)
   const [hoveredNode, setHoveredNode] = useState<{
-    id: string;
-    name: string;
-    username: string;
-    location: string;
-    time: number;
-    source: 'p2p' | 'api';
+    nodeIds: string[];
+    nodeDetails: Array<{
+      id: string;
+      name: string;
+      username: string;
+      location: string;
+      time: number;
+      source: 'p2p' | 'api' | undefined;
+      hasSeenBlock: boolean;
+    }>;
     x: number;
     y: number;
   } | null>(null)
@@ -160,58 +192,112 @@ export function GlobalMap({
   const filteredBlockEvents = useFilteredBlockEvents(blockEvents)
   const markers = useMarkers(nodes, nodeCoordinates, filteredBlockEvents, currentTime)
 
-  // Reset tooltip when currentTime changes or if the hovered node is no longer visible
+  // Reset tooltip when currentTime changes
   useEffect(() => {
     if (hoveredNode) {
-      const nodeEvents = filteredBlockEvents.filter(e => e.node === hoveredNode.id)
-      const latestEvent = nodeEvents.length > 0 ? nodeEvents[nodeEvents.length - 1] : null
-      const hasSeenBlock = latestEvent && latestEvent.time <= currentTime
+      // Check if any of the hovered nodes are still visible
+      const anyVisible = hoveredNode.nodeDetails.some(node => {
+        const nodeEvents = filteredBlockEvents.filter(e => e.node === node.id)
+        const latestEvent = nodeEvents.length > 0 ? nodeEvents[nodeEvents.length - 1] : null
+        return latestEvent && latestEvent.time <= currentTime
+      })
 
-      if (!hasSeenBlock) {
+      if (!anyVisible) {
         setHoveredNode(null)
       }
     }
   }, [currentTime, filteredBlockEvents, hoveredNode])
 
   // Memoize pointer event handler
-  const handlePointerEnter = useCallback((e: React.PointerEvent<SVGCircleElement>, data: {
-    id: string;
-    name: string;
-    username: string;
-    location: string;
-    time: number;
-    source: 'p2p' | 'api';
-  }) => {
+  const handlePointerEnter = useCallback((e: React.PointerEvent<SVGCircleElement | SVGGElement>, nodeIds: string[]) => {
+    const nodeDetails = nodeIds.map(id => {
+      const nodeData = nodes[id]
+      const { user, node } = formatNodeName(nodeData.name)
+      const location = [
+        nodeData.geo.city,
+        nodeData.geo.country,
+        nodeData.geo.continent
+      ].filter(Boolean).join(', ')
+
+      // Find the latest block event for this node
+      const nodeEvents = filteredBlockEvents.filter(event => event.node === id)
+      const latestEvent = nodeEvents.length > 0 ? nodeEvents[nodeEvents.length - 1] : null
+      const hasSeenBlock = latestEvent && latestEvent.time <= currentTime
+
+      return {
+        id,
+        name: node,
+        username: user,
+        location,
+        time: latestEvent?.time || 0,
+        source: latestEvent?.source,
+        hasSeenBlock: hasSeenBlock || false // Ensure hasSeenBlock is always boolean
+      }
+    })
+
     setHoveredNode({
-      ...data,
+      nodeIds,
+      nodeDetails,
       x: 0,
       y: 0
-    });
-  }, [])
+    })
+  }, [nodes, filteredBlockEvents, currentTime])
 
   // Tooltip component
-  const TooltipComponent = ({ data }: { data: NonNullable<typeof hoveredNode> }) => (
-    <div 
-      style={{
-        position: 'absolute',
-        left: '50%',
-        top: '20px',
-        zIndex: 1000,
-        transform: 'translateX(-50%)',
-        pointerEvents: 'none'
-      }}
-      className="backdrop-blur-md bg-surface/90 border border-subtle rounded-lg p-3 shadow-xl"
-    >
-      <div className="text-sm font-mono">
-        <div className="font-bold text-accent">{data.name}</div>
-        <div className="text-secondary">{data.username}</div>
-        <div className="text-tertiary mt-1">{data.location}</div>
-        <div className="text-tertiary mt-1">
-          Saw block via {data.source} at {(data.time/1000).toFixed(2)}s
+  const TooltipComponent = ({ data }: { data: NonNullable<typeof hoveredNode> }) => {
+    // Filter to only nodes that have seen the block
+    const visibleNodes = data.nodeDetails.filter(node => node.hasSeenBlock)
+    
+    // Get location from first node (all nodes at same location have same location string)
+    const location = visibleNodes.length > 0 ? visibleNodes[0].location : ''
+    
+    return (
+      <div 
+        style={{
+          position: 'absolute',
+          left: '50%',
+          top: '20px',
+          zIndex: 1000,
+          transform: 'translateX(-50%)',
+          pointerEvents: 'none'
+        }}
+        className="backdrop-blur-md bg-surface/90 border border-subtle rounded-lg p-2 shadow-xl max-w-xs"
+      >
+        <div className="text-xs font-mono">
+          {visibleNodes.length === 0 ? (
+            <div className="text-tertiary">No nodes have seen the block yet</div>
+          ) : (
+            <>
+              {/* Location header */}
+              <div className="font-bold text-accent border-b border-subtle pb-1 mb-1">
+                {location} 
+                <span className="text-primary ml-1">({visibleNodes.length} {visibleNodes.length === 1 ? 'node' : 'nodes'})</span>
+              </div>
+              
+              {/* Nodes list */}
+              <div className="max-h-40 overflow-y-auto pr-1">
+                <table className="w-full text-left">
+                  <tbody>
+                    {visibleNodes.map((node) => (
+                      <tr key={node.id} className="border-b border-subtle/30 last:border-0">
+                        <td className="py-1 pr-1">
+                          <div className="font-medium text-primary">{node.username}</div>
+                          <div className="text-tertiary text-[10px]">{node.name}</div>
+                        </td>
+                        <td className="py-1 pr-1 text-tertiary whitespace-nowrap text-right align-top">
+                          {node.source} <span className="text-secondary">{(node.time/1000).toFixed(1)}s</span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </>
+          )}
         </div>
       </div>
-    </div>
-  );
+    )
+  };
 
   if (loading || isMissing) {
     return (
@@ -267,127 +353,103 @@ export function GlobalMap({
           }
         </Geographies>
 
-        {/* Draw glowing lines between first nodes */}
-        {markers.map(({ id: fromId, coordinates: fromCoords, source: fromSource }) => {
-          if (!fromCoords || !fromSource) return null
-
-          // Find nodes that were first to see the block via their respective source (API/P2P)
-          const nodeEvents = filteredBlockEvents.filter(e => 
-            e.node === fromId && 
-            e.time <= currentTime && 
-            e.time > 0 && 
-            e.source === fromSource
-          )
-          
-          // Skip if no events
-          if (nodeEvents.length === 0) return null
-
-          // Get all events for this source
-          const allEventsForSource = filteredBlockEvents.filter(be => 
-            be.source === fromSource && 
-            be.time <= currentTime && 
-            be.time > 0
-          )
-
-          // Skip if no events for this source
-          if (allEventsForSource.length === 0) return null
-
-          const firstTime = Math.min(...allEventsForSource.map(e => e.time))
-          const isFirstNode = nodeEvents.some(e => e.time === firstTime)
-
-          if (!isFirstNode) return null
-
-          // Find other first nodes to connect to
-          return markers
-            .filter(({ id: toId, coordinates: toCoords, source: toSource }) => {
-              // Basic validation
-              if (!toCoords || !toSource || toId === fromId || toSource !== fromSource) return false
-
-              const toEvents = filteredBlockEvents.filter(e => 
-                e.node === toId && 
-                e.time <= currentTime && 
-                e.time > 0 &&
-                e.source === toSource
-              )
-
-              // Skip if no events
-              if (toEvents.length === 0) return false
-
-              return toEvents.some(e => e.time === firstTime)
-            })
-            .map(({ id: toId, coordinates: toCoords }) => (
-              <GlowingLine
-                key={`${fromId}-${toId}`}
-                start={fromCoords}
-                end={toCoords as [number, number]}
-                color="rgba(96, 165, 250, 0.4)"
-              />
-            ))
-        })}
-
-        {markers.map(({ id, coordinates, hasSeenBlock, time, source }) => {
-          // Skip rendering if node hasn't seen the block or has invalid data
-          if (!hasSeenBlock || !coordinates || !source) {
+        {markers.map(({ coordinates, hasMultipleNodes, nodeCount, visibleNodeCount, hasVisibleNodes, nodeIds, nodes: nodeData }) => {
+          // Skip rendering if no nodes have seen the block
+          if (!hasVisibleNodes) {
             return null
           }
 
-          const nodeEvents = filteredBlockEvents.filter(e => 
-            e.node === id && 
-            e.time <= currentTime && 
-            e.time > 0 &&
-            e.source === source
-          )
+          // Determine if any node at this location was first to see the block
+          const isFirstLocation = nodeIds.some(nodeId => {
+            const nodeEvents = filteredBlockEvents.filter(e => 
+              e.node === nodeId && 
+              e.time <= currentTime && 
+              e.time > 0
+            )
+            
+            if (nodeEvents.length === 0) return false
+            
+            // Get source of first event for this node
+            const firstNodeEvent = nodeEvents.reduce((min, e) => e.time < min.time ? e : min, nodeEvents[0])
+            const source = firstNodeEvent.source
+            
+            // Get all events for this source
+            const allEventsForSource = filteredBlockEvents.filter(be => 
+              be.source === source && 
+              be.time <= currentTime && 
+              be.time > 0
+            )
+            
+            if (allEventsForSource.length === 0) return false
 
-          // Get all events for this source
-          const allEventsForSource = filteredBlockEvents.filter(be => 
-            be.source === source && 
-            be.time <= currentTime && 
-            be.time > 0
-          )
+            const firstTime = Math.min(...allEventsForSource.map(e => e.time))
+            return firstNodeEvent.time === firstTime
+          })
 
-          const firstTime = allEventsForSource.length > 0 ? Math.min(...allEventsForSource.map(e => e.time)) : null
-          const isFirstNode = firstTime !== null && nodeEvents.some(e => e.time === firstTime)
-
-          const nodeData = nodes[id]
-          const { user, node } = formatNodeName(nodeData.name)
-          const location = [
-            nodeData.geo.city,
-            nodeData.geo.country,
-            nodeData.geo.continent
-          ].filter(Boolean).join(', ')
+          // Determine the dominant source (api or p2p) for visible nodes
+          const apiCount = nodeData.filter(n => n.hasSeenBlock && n.source === 'api').length
+          const p2pCount = nodeData.filter(n => n.hasSeenBlock && n.source === 'p2p').length
+          const dominantSource = apiCount >= p2pCount ? 'api' : 'p2p'
+          const color = dominantSource === 'api' ? 'rgb(96, 165, 250)' : 'rgb(168, 85, 247)'
+          const glowColor = dominantSource === 'api' ? 'rgba(96, 165, 250, 0.3)' : 'rgba(168, 85, 247, 0.3)'
+          
+          const isHovered = hoveredNode?.nodeIds.some(id => nodeIds.includes(id)) || false
+          
+          // Calculate size and opacity based on node count
+          // Scale size from 3 to 6 based on node count (capped at 10 nodes)
+          const baseSize = 3
+          const maxSizeIncrease = 3
+          const sizeScale = Math.min(nodeCount, 10) / 10
+          const size = baseSize + (maxSizeIncrease * sizeScale)
+          
+          // Scale opacity from 0.7 to 1 based on node count
+          const minOpacity = 0.7
+          const maxOpacity = 1
+          const opacity = minOpacity + ((maxOpacity - minOpacity) * sizeScale)
+          
+          // Increase glow intensity based on node count
+          const glowIntensity = isFirstLocation ? 8 + (nodeCount * 0.5) : 4 + (nodeCount * 0.3)
           
           return (
-            <g key={id}>
-              {/* Base marker with glow */}
-              <Marker coordinates={coordinates as [number, number]}>
-                {isFirstNode && (
+            <g key={coordinates.join(',')}>
+              <Marker coordinates={coordinates}>
+                {/* Outer glow for first nodes */}
+                {isFirstLocation && (
                   <circle
-                    r={6}
+                    r={size + 3}
                     fill="transparent"
-                    stroke={source === 'api' ? 'rgba(96, 165, 250, 0.3)' : 'rgba(168, 85, 247, 0.3)'}
+                    stroke={glowColor}
                     strokeWidth={1}
                     className="animate-pulse-slow"
                   />
                 )}
+                
+                {/* Main marker */}
                 <circle
-                  r={hoveredNode?.id === id ? 4.5 : 3}
-                  fill={source === 'api' ? 'rgb(96, 165, 250)' : 'rgb(168, 85, 247)'}
+                  r={isHovered ? size + 1.5 : size}
+                  fill={color}
+                  fillOpacity={opacity}
                   stroke="rgb(var(--bg-base))"
                   strokeWidth={1}
                   className="drop-shadow-md cursor-pointer transition-all duration-150"
                   style={{
-                    filter: `drop-shadow(0 0 ${isFirstNode ? '8px' : '4px'} ${source === 'api' ? 'rgb(96, 165, 250)' : 'rgb(168, 85, 247)'})`
+                    filter: `drop-shadow(0 0 ${glowIntensity}px ${color})`
                   }}
-                  onPointerEnter={(e) => handlePointerEnter(e, {
-                    id,
-                    name: node,
-                    username: user,
-                    location,
-                    time,
-                    source: source || 'api'
-                  })}
+                  onPointerEnter={(e) => handlePointerEnter(e, nodeIds)}
                   onPointerLeave={() => setHoveredNode(null)}
                 />
+                
+                {/* Subtle ring to indicate multiple nodes */}
+                {hasMultipleNodes && (
+                  <circle
+                    r={size + 1}
+                    fill="transparent"
+                    stroke={color}
+                    strokeWidth={0.5}
+                    strokeOpacity={0.4}
+                    className="pointer-events-none"
+                  />
+                )}
               </Marker>
             </g>
           )

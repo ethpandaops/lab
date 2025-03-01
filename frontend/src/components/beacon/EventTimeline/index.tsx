@@ -84,10 +84,10 @@ function EventItem({ event, currentTime }: { event: Event; currentTime: number }
 
   return (
     <div className={clsx(
-      'rounded bg-surface/40 text-[10px]',
+      'rounded bg-surface/40 text-[9px] md:text-[10px]',
       !isActive && 'opacity-50'
     )}>
-      <div className="px-2 py-1 flex items-center gap-1.5 truncate">
+      <div className="px-1.5 md:px-2 py-0.5 md:py-1 flex items-center gap-1 md:gap-1.5 truncate">
         {getEventIcon()}
         <span className="font-medium truncate">
           <span className={getEventColor()}>{getEventText(event)}</span>
@@ -369,7 +369,7 @@ export function EventTimeline({
       window.clearTimeout(scrollTimeoutRef.current)
     }
     
-    // Find the last active event element
+    // Find active events (events that have occurred before or at the current time)
     const activeEvents = sortedEvents.filter(event => currentTime >= event.timestamp / 1000)
     
     // Debounce scroll updates
@@ -377,25 +377,50 @@ export function EventTimeline({
       if (!timelineRef.current) return
 
       if (activeEvents.length > 0) {
-        const lastActiveEventId = activeEvents[activeEvents.length - 1].id
-        const lastActiveElement = timelineRef.current.querySelector(`[data-event-id="${lastActiveEventId}"]`)
+        // Find the event closest to the current time
+        // This ensures we're always focusing on the most relevant event
+        let targetEventId
         
-        if (lastActiveElement) {
+        // If we're at the beginning, use the first event
+        if (currentTime < 1) {
+          targetEventId = activeEvents[0].id
+        } 
+        // If we're at the end, use the last event
+        else if (currentTime >= 11) {
+          targetEventId = activeEvents[activeEvents.length - 1].id
+        } 
+        // Otherwise, find the event closest to the current time
+        else {
+          // Find the event with timestamp closest to current time
+          const closestEvent = activeEvents.reduce((prev, curr) => {
+            const prevDiff = Math.abs((prev.timestamp / 1000) - currentTime)
+            const currDiff = Math.abs((curr.timestamp / 1000) - currentTime)
+            return currDiff < prevDiff ? curr : prev
+          })
+          targetEventId = closestEvent.id
+        }
+        
+        const targetElement = timelineRef.current.querySelector(`[data-event-id="${targetEventId}"]`)
+        
+        if (targetElement) {
           // Get the container's height
           const containerHeight = timelineRef.current.clientHeight
-          // Calculate offset to show some upcoming events (about 1/3 of the container height)
-          const offset = containerHeight / 3
+          
+          // Position the active event at 50% of the container height
+          // This ensures we can see both previous and upcoming events
+          const offset = containerHeight * 0.5
           
           // Get the element's position relative to the container
-          const elementTop = lastActiveElement.getBoundingClientRect().top - timelineRef.current.getBoundingClientRect().top
+          const elementTop = targetElement.getBoundingClientRect().top - timelineRef.current.getBoundingClientRect().top
           
           // Calculate the target scroll position
           const targetScroll = timelineRef.current.scrollTop + elementTop - offset
           
-          // Smooth scroll to position
+          // Smooth scroll to position - use 'auto' for mobile to ensure it works reliably
+          const isMobile = window.innerWidth < 768
           timelineRef.current.scrollTo({
             top: targetScroll,
-            behavior: isPlaying ? 'auto' : 'smooth'
+            behavior: isMobile ? 'auto' : (isPlaying ? 'auto' : 'smooth')
           })
         }
       } else {
@@ -445,15 +470,16 @@ export function EventTimeline({
       'h-full flex-shrink-0',
       'backdrop-blur-lg bg-surface/40 ring-1 ring-inset ring-white/5',
       'flex flex-col',
-      'w-full'
+      'w-full',
+      className
     )}>
       {/* Header */}
       <div className="flex-none border-b border-subtle">
         {/* Top Bar */}
-        <div className="flex items-center justify-between p-3 pb-2">
-          <div className="flex items-center gap-3">
+        <div className="flex items-center justify-between p-1.5 md:p-3 pb-1 md:pb-2">
+          <div className="flex items-center gap-2 md:gap-3">
             <h2 className="text-sm font-medium">Timeline</h2>
-            <div className="text-[10px] font-mono text-tertiary">
+            <div className="text-[10px] font-mono text-tertiary hidden md:block">
               {filters.node ? (
                 <span>Events from {formatNodeName(filters.node).user}'s {formatNodeName(filters.node).node}</span>
               ) : filters.username ? (
@@ -465,50 +491,50 @@ export function EventTimeline({
           </div>
           <button
             onClick={handleOpenConfig}
-            className="p-1.5 hover:bg-hover rounded-lg transition-colors"
+            className="p-1 md:p-1.5 hover:bg-hover rounded-lg transition-colors"
           >
-            <Settings className="w-4 h-4 text-tertiary" />
+            <Settings className="w-3 h-3 md:w-4 md:h-4 text-tertiary" />
           </button>
         </div>
 
         {/* Controls & Time */}
-        <div className="px-3 pb-3 flex items-center justify-between">
-          <div className="flex items-center gap-1.5">
+        <div className="px-2 md:px-3 pb-1.5 md:pb-3 flex items-center justify-between">
+          <div className="flex items-center gap-1 md:gap-1.5">
             <button
               onClick={onPreviousSlot}
-              className="w-7 h-7 rounded-lg flex items-center justify-center bg-surface hover:bg-hover transition-all border border-text-muted touch-manipulation"
+              className="w-6 h-6 md:w-7 md:h-7 rounded-lg flex items-center justify-center bg-surface hover:bg-hover transition-all border border-text-muted touch-manipulation"
             >
-              <ChevronLeft className="w-4 h-4" />
+              <ChevronLeft className="w-3 h-3 md:w-4 md:h-4" />
             </button>
             <button
               onClick={onPlayPauseClick}
-              className="w-7 h-7 rounded-lg flex items-center justify-center bg-surface hover:bg-hover transition-all border border-text-muted touch-manipulation"
+              className="w-6 h-6 md:w-7 md:h-7 rounded-lg flex items-center justify-center bg-surface hover:bg-hover transition-all border border-text-muted touch-manipulation"
             >
-              {isPlaying ? <FaPause className="w-3 h-3" /> : <FaPlay className="w-3 h-3 ml-0.5" />}
+              {isPlaying ? <FaPause className="w-2 h-2 md:w-3 md:h-3" /> : <FaPlay className="w-2 h-2 md:w-3 md:h-3 ml-0.5" />}
             </button>
             <button
               onClick={onNextSlot}
               disabled={isLive}
               className={clsx(
-                'w-7 h-7 rounded-lg flex items-center justify-center transition-all border touch-manipulation',
+                'w-6 h-6 md:w-7 md:h-7 rounded-lg flex items-center justify-center transition-all border touch-manipulation',
                 isLive 
                   ? 'opacity-50 cursor-not-allowed bg-surface/50 border-text-muted/50' 
                   : 'bg-surface hover:bg-hover border-text-muted'
               )}
             >
-              <ChevronRight className="w-4 h-4" />
+              <ChevronRight className="w-3 h-3 md:w-4 md:h-4" />
             </button>
           </div>
-          <div className="flex items-baseline gap-1.5">
-            <span className="font-mono text-2xl font-medium text-primary">{currentTime.toFixed(1)}</span>
+          <div className="flex items-baseline gap-1 md:gap-1.5">
+            <span className="font-mono text-xl md:text-2xl font-medium text-primary">{currentTime.toFixed(1)}</span>
             <span className="font-mono text-xs text-tertiary">sec</span>
           </div>
         </div>
 
         {/* Timeline Bar */}
-        <div className="px-3 pb-3">
+        <div className="px-2 md:px-3 pb-1.5 md:pb-3">
           {/* Timeline sections */}
-          <div className="relative h-12">
+          <div className="relative h-6 md:h-12">
             {/* Background sections */}
             <div className="absolute inset-0 flex rounded-lg overflow-hidden">
               <div className="w-1/3 bg-accent/10 border-r border-white/5" />
@@ -562,8 +588,8 @@ export function EventTimeline({
       </div>
 
       {/* Event List */}
-      <div ref={timelineRef} className="flex-1 min-h-0 overflow-y-auto scrollbar-hide w-full">
-        <div className="p-2 space-y-0.5">
+      <div ref={timelineRef} className="flex-1 min-h-0 overflow-y-auto scrollbar-hide w-full overscroll-contain">
+        <div className="p-0.5 md:p-2 space-y-0.5 pb-16">
           {loading ? (
             <div className="space-y-1.5">
               {[...Array(6)].map((_, i) => (

@@ -363,11 +363,11 @@ export function SlotView({ slot, network = 'mainnet', isLive = false, onSlotComp
   return (
     <div className="w-full flex flex-col">
       {/* Main Content */}
-      <div className="h-[calc(85vh-theme(spacing.48))] flex flex-col md:flex-row">
+      <div className="h-[calc(100vh-theme(spacing.16))] md:h-[calc(85vh-theme(spacing.36))] flex flex-col md:flex-row">
         {/* Mobile Layout */}
         <div className="md:hidden flex flex-col h-full">
-          {/* Map Section - 25vh */}
-          <div className="h-[25vh] border-b border-subtle">
+          {/* Map Section - Reduced height on mobile */}
+          <div className="h-[30vh] border-b border-subtle">
             <GlobalMap
               nodes={slotData?.nodes || {}}
               currentTime={currentTime}
@@ -386,18 +386,18 @@ export function SlotView({ slot, network = 'mainnet', isLive = false, onSlotComp
             />
           </div>
 
-          {/* Compact Slot Details */}
+          {/* Compact Slot Details - More compact on mobile */}
           <div className="border-b border-subtle">
-            <div className="p-4">
+            <div className="p-1.5">
               {/* Slot Header - Compact */}
-              <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center justify-between mb-1">
                 <div>
-                  <div className="text-2xl font-sans font-black text-primary">
+                  <div className="text-xl font-sans font-black text-primary">
                     <a href={`https://beaconcha.in/slot/${slot}`} target="_blank" rel="noopener noreferrer" className="hover:text-accent transition-colors">
                       Slot {slot}
                     </a>
                   </div>
-                  <div className="text-xs font-mono text-tertiary">
+                  <div className="text-[10px] font-mono text-tertiary">
                     by {slotData?.entity && ['mainnet', 'holesky', 'sepolia'].includes(network) ? (
                       <a href={`https://ethseer.io/entity/${slotData.entity}?network=${network}`} target="_blank" rel="noopener noreferrer" className="text-accent hover:text-accent/80 transition-colors">
                         {slotData.entity}
@@ -438,7 +438,7 @@ export function SlotView({ slot, network = 'mainnet', isLive = false, onSlotComp
                       </div>
                     )
                   }}
-                  className="bg-accent text-black font-medium px-3 py-1.5 text-sm rounded-full shadow-lg hover:bg-accent/90 transition-colors"
+                  className="bg-accent text-black font-medium px-2 py-1 text-xs rounded-full shadow-lg hover:bg-accent/90 transition-colors"
                 >
                   View Stats
                 </button>
@@ -446,7 +446,7 @@ export function SlotView({ slot, network = 'mainnet', isLive = false, onSlotComp
 
               {/* Analysis Section - Always visible on mobile */}
               {slotData && (
-                <div className="bg-surface/30 rounded text-xs font-mono space-y-1">
+                <div className="bg-surface/30 rounded text-xs font-mono space-y-0.5">
                   {(() => {
                     // Get first block seen time
                     const blockSeenTimes = [
@@ -485,14 +485,14 @@ export function SlotView({ slot, network = 'mainnet', isLive = false, onSlotComp
                       <>
                         {/* Block Timing */}
                         <div className={clsx(
-                          "grid grid-cols-[20px_1fr] items-start gap-1",
+                          "grid grid-cols-[16px_1fr] items-start gap-1",
                           firstBlockTime === null && "text-tertiary",
                           firstBlockTime !== null && firstBlockTime <= 2000 && "text-success",
                           firstBlockTime !== null && firstBlockTime > 2000 && firstBlockTime <= 3000 && "text-warning",
                           firstBlockTime !== null && firstBlockTime > 3000 && "text-error"
                         )}>
                           <div className="flex justify-center">{firstBlockTime === null ? "○" : firstBlockTime > 3000 ? "⚠️" : firstBlockTime > 2000 ? "⚡" : "✓"}</div>
-                          <div>
+                          <div className="text-[10px]">
                             {firstBlockTime === null ? (
                               "Block timing unknown"
                             ) : firstBlockTime > 3000 ? (
@@ -507,14 +507,14 @@ export function SlotView({ slot, network = 'mainnet', isLive = false, onSlotComp
 
                         {/* Blob Timing */}
                         <div className={clsx(
-                          "grid grid-cols-[20px_1fr] items-start gap-1",
+                          "grid grid-cols-[16px_1fr] items-start gap-1",
                           (!firstBlobTime || !firstBlockTime || blobIndices.size === 0) && "text-tertiary",
                           blobIndices.size > 0 && firstBlobTime && firstBlockTime && (firstBlobTime - firstBlockTime) <= 500 && "text-success",
                           blobIndices.size > 0 && firstBlobTime && firstBlockTime && (firstBlobTime - firstBlockTime) > 500 && (firstBlobTime - firstBlockTime) <= 1000 && "text-warning",
                           blobIndices.size > 0 && firstBlobTime && firstBlockTime && (firstBlobTime - firstBlockTime) > 1000 && "text-error"
                         )}>
                           <div className="flex justify-center">{blobIndices.size === 0 ? "○" : !firstBlobTime || !firstBlockTime ? "○" : (firstBlobTime - firstBlockTime) > 1000 ? "⚠️" : (firstBlobTime - firstBlockTime) > 500 ? "⚡" : "✓"}</div>
-                          <div>
+                          <div className="text-[10px]">
                             {blobIndices.size === 0 ? (
                               "No blobs in block"
                             ) : !firstBlobTime || !firstBlockTime ? (
@@ -531,13 +531,13 @@ export function SlotView({ slot, network = 'mainnet', isLive = false, onSlotComp
 
                         {/* Gas Usage */}
                         <div className={clsx(
-                          "grid grid-cols-[20px_1fr] items-start gap-1",
+                          "grid grid-cols-[16px_1fr] items-start gap-1",
                           !gasUsagePercent && "text-tertiary",
                           gasUsagePercent && gasUsagePercent <= 80 && "text-success",
                           gasUsagePercent && gasUsagePercent > 80 && "text-warning"
                         )}>
                           <div className="flex justify-center">{!gasUsagePercent ? "○" : gasUsagePercent > 95 ? "⚡" : gasUsagePercent > 80 ? "⚡" : "✓"}</div>
-                          <div>
+                          <div className="text-[10px]">
                             {!gasUsagePercent ? (
                               "Gas usage unknown"
                             ) : gasUsagePercent > 95 ? (
@@ -552,14 +552,14 @@ export function SlotView({ slot, network = 'mainnet', isLive = false, onSlotComp
 
                         {/* Participation */}
                         <div className={clsx(
-                          "grid grid-cols-[20px_1fr] items-start gap-1",
+                          "grid grid-cols-[16px_1fr] items-start gap-1",
                           !participation && "text-tertiary",
                           participation && participation >= 80 && "text-success",
                           participation && participation >= 66 && participation < 80 && "text-warning",
                           participation && participation < 66 && "text-error"
                         )}>
                           <div className="flex justify-center">{!participation ? "○" : participation < 66 ? "⚠️" : participation < 80 ? "⚡" : "✓"}</div>
-                          <div>
+                          <div className="text-[10px]">
                             {!participation ? (
                               "Participation unknown"
                             ) : participation < 66 ? (
@@ -580,7 +580,7 @@ export function SlotView({ slot, network = 'mainnet', isLive = false, onSlotComp
           </div>
 
           {/* Timeline and Events - Fill remaining space */}
-          <div className="flex-1 min-h-0 flex flex-col">
+          <div className="flex-1 min-h-0 flex flex-col overflow-hidden">
             <EventTimeline
               events={timelineEvents}
               loading={isLoading}
@@ -601,7 +601,7 @@ export function SlotView({ slot, network = 'mainnet', isLive = false, onSlotComp
                 }
               }}
               isLive={isLive}
-              className="max-h-[30vh] overflow-y-auto"
+              className="h-full pb-4"
             />
           </div>
         </div>
@@ -649,7 +649,7 @@ export function SlotView({ slot, network = 'mainnet', isLive = false, onSlotComp
 
                 {/* Analysis Section */}
                 {slotData && (
-                  <div className="mb-3 p-2 bg-surface/30 rounded text-xs font-mono space-y-1">
+                  <div className="mb-3 p-2 bg-surface/30 rounded text-xs font-mono space-y-0.5">
                     {(() => {
                       // Get first block seen time
                       const blockSeenTimes = [
@@ -690,14 +690,14 @@ export function SlotView({ slot, network = 'mainnet', isLive = false, onSlotComp
                         <>
                           {/* Block Timing */}
                           <div className={clsx(
-                            "grid grid-cols-[20px_1fr] items-start gap-1",
+                            "grid grid-cols-[16px_1fr] items-start gap-1",
                             firstBlockTime === null && "text-tertiary",
                             firstBlockTime !== null && firstBlockTime <= 2000 && "text-success",
                             firstBlockTime !== null && firstBlockTime > 2000 && firstBlockTime <= 3000 && "text-warning",
                             firstBlockTime !== null && firstBlockTime > 3000 && "text-error"
                           )}>
                             <div className="flex justify-center">{firstBlockTime === null ? "○" : firstBlockTime > 3000 ? "⚠️" : firstBlockTime > 2000 ? "⚡" : "✓"}</div>
-                            <div>
+                            <div className="text-[10px]">
                               {firstBlockTime === null ? (
                                 "Block timing unknown"
                               ) : firstBlockTime > 3000 ? (
@@ -712,14 +712,14 @@ export function SlotView({ slot, network = 'mainnet', isLive = false, onSlotComp
 
                           {/* Blob Timing */}
                           <div className={clsx(
-                            "grid grid-cols-[20px_1fr] items-start gap-1",
+                            "grid grid-cols-[16px_1fr] items-start gap-1",
                             (!firstBlobTime || !firstBlockTime || blobIndices.size === 0) && "text-tertiary",
                             blobIndices.size > 0 && firstBlobTime && firstBlockTime && (firstBlobTime - firstBlockTime) <= 500 && "text-success",
                             blobIndices.size > 0 && firstBlobTime && firstBlockTime && (firstBlobTime - firstBlockTime) > 500 && (firstBlobTime - firstBlockTime) <= 1000 && "text-warning",
                             blobIndices.size > 0 && firstBlobTime && firstBlockTime && (firstBlobTime - firstBlockTime) > 1000 && "text-error"
                           )}>
                             <div className="flex justify-center">{blobIndices.size === 0 ? "○" : !firstBlobTime || !firstBlockTime ? "○" : (firstBlobTime - firstBlockTime) > 1000 ? "⚠️" : (firstBlobTime - firstBlockTime) > 500 ? "⚡" : "✓"}</div>
-                            <div>
+                            <div className="text-[10px]">
                               {blobIndices.size === 0 ? (
                                 "No blobs in block"
                               ) : !firstBlobTime || !firstBlockTime ? (
@@ -736,13 +736,13 @@ export function SlotView({ slot, network = 'mainnet', isLive = false, onSlotComp
 
                           {/* Gas Usage */}
                           <div className={clsx(
-                            "grid grid-cols-[20px_1fr] items-start gap-1",
+                            "grid grid-cols-[16px_1fr] items-start gap-1",
                             !gasUsagePercent && "text-tertiary",
                             gasUsagePercent && gasUsagePercent <= 80 && "text-success",
                             gasUsagePercent && gasUsagePercent > 80 && "text-warning"
                           )}>
                             <div className="flex justify-center">{!gasUsagePercent ? "○" : gasUsagePercent > 95 ? "⚡" : gasUsagePercent > 80 ? "⚡" : "✓"}</div>
-                            <div>
+                            <div className="text-[10px]">
                               {!gasUsagePercent ? (
                                 "Gas usage unknown"
                               ) : gasUsagePercent > 95 ? (
@@ -757,14 +757,14 @@ export function SlotView({ slot, network = 'mainnet', isLive = false, onSlotComp
 
                           {/* Participation */}
                           <div className={clsx(
-                            "grid grid-cols-[20px_1fr] items-start gap-1",
+                            "grid grid-cols-[16px_1fr] items-start gap-1",
                             !participation && "text-tertiary",
                             participation && participation >= 80 && "text-success",
                             participation && participation >= 66 && participation < 80 && "text-warning",
                             participation && participation < 66 && "text-error"
                           )}>
                             <div className="flex justify-center">{!participation ? "○" : participation < 66 ? "⚠️" : participation < 80 ? "⚡" : "✓"}</div>
-                            <div>
+                            <div className="text-[10px]">
                               {!participation ? (
                                 "Participation unknown"
                               ) : participation < 66 ? (

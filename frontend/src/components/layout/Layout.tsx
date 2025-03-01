@@ -189,7 +189,7 @@ function Layout(): JSX.Element {
           <div className={clsx(
             'w-full',
             (location.pathname === '/beacon/slot/live' || /^\/beacon\/slot\/\d+$/.test(location.pathname))
-              ? 'h-[calc(100vh-3.5rem)]'
+              ? 'h-[calc(100vh-7rem)]'
               : ['min-h-0', 'p-2 md:p-4 lg:p-6']
           )}>
             <div className={clsx(
