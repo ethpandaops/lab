@@ -287,6 +287,34 @@ function Xatu(): JSX.Element {
             </Link>
 
             <Link 
+              to="geographical-checklist" 
+              className="group bg-surface/60 rounded-lg overflow-hidden hover:bg-surface/80 transition-colors duration-300"
+            >
+              <div className="p-4">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center flex-shrink-0">
+                    <span className="text-xl">🗺️</span>
+                  </div>
+
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-lg font-sans font-bold text-primary group-hover:text-accent transition-colors mb-1">
+                      Geographical Checklist
+                    </h3>
+                    <p className="text-sm font-mono text-tertiary truncate">
+                      Global coverage map
+                    </p>
+                  </div>
+
+                  <ArrowRight className="w-5 h-5 text-accent/50 group-hover:text-accent group-hover:translate-x-1 transition-all duration-300" />
+                </div>
+
+                <p className="text-sm font-mono text-secondary group-hover:text-primary/90 transition-colors mt-3">
+                  See which regions need more node contributions and help fill the gaps
+                </p>
+              </div>
+            </Link>
+
+            <Link 
               to="community-nodes" 
               className="group bg-surface/60 rounded-lg overflow-hidden hover:bg-surface/80 transition-colors duration-300"
             >

@@ -11,6 +11,11 @@
 		@apply bg-bg text-text-primary min-h-screen;
 	}
 
+	/* Input elements should inherit text color by default */
+	input, textarea, select {
+		color: black
+	}
+
 	/* Text colors */
 	.text-primary {
 		color: rgb(var(--text-primary) / 1);

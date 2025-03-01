@@ -14,6 +14,7 @@ import Networks from './pages/xatu/networks';
 import ContributorsList from './pages/xatu/ContributorsList';
 import ContributorDetail from './pages/xatu/ContributorDetail';
 import ForkReadiness from './pages/xatu/ForkReadiness';
+import GeographicalChecklist from './pages/xatu/GeographicalChecklist';
 import Layout from './components/layout/Layout';
 import { BeaconChainTimings } from './pages/beacon/timings';
 import { BlockTimings } from './pages/beacon/timings/blocks';
@@ -110,6 +111,7 @@ function App() {
 									<Route path="contributors" element={<ContributorsList />} />
 									<Route path="contributors/:name" element={<ContributorDetail />} />
 									<Route path="fork-readiness" element={<ForkReadiness />} />
+									<Route path="geographical-checklist" element={<GeographicalChecklist />} />
 								</Route>
 								<Route path="beacon" element={<Beacon />}>
 									<Route path="slot" element={<Outlet />}>
