@@ -115,195 +115,233 @@ function Xatu(): JSX.Element {
     .sort((a, b) => b.value - a.value);
 
   const totalMainnetNodes = summaryData.networks.mainnet.total_nodes;
+  
+  // Calculate additional stats
+  const totalCities = Object.keys(summaryData.networks.mainnet.cities).length;
+  const totalContinents = Object.keys(summaryData.networks.mainnet.continents).length;
 
   return (
     <div className="space-y-6" ref={containerReference}>
       <XatuCallToAction />
 
       {/* Overview Section */}
-      <div className="backdrop-blur-md bg-surface/80 p-4 md:p-6">
-        <div className="flex flex-col mb-4">
+      <div className="backdrop-blur-md bg-surface/80 rounded-lg overflow-hidden shadow-md">
+        <div className="p-6">
           <h2 className="text-2xl font-sans font-bold text-primary mb-2">Overview</h2>
           <span className="text-sm font-mono text-secondary">
             Last 24h · Updated{' '}
             <span 
               title={new Date(summaryData.updated_at * MS_PER_SECOND).toString()}
-              className="cursor-help border-b border-dotted border-primary/50 hover:border-primary/70 transition-colors"
+              className="cursor-help text-accent hover:underline"
             >
               {formatDistanceToNow(new Date(summaryData.updated_at * MS_PER_SECOND), { addSuffix: true })}
             </span>
           </span>
-          <p className="text-base font-mono text-secondary mt-2">
+          <p className="text-base font-mono text-secondary mt-2 max-w-3xl">
             This data shows nodes sending data to ethPandaOps. While we run our own nodes, community-contributed data is most valuable.
           </p>
         </div>
         
         {/* Globe and Summary Stats */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
-          {/* Globe */}
-          <div className="lg:col-span-2 backdrop-blur-md bg-surface/90 p-3">
-            <GlobeViz 
-              data={globeData} 
-              width={Math.max((containerWidth * GLOBE_WIDTH_SCALE) - GLOBE_PADDING, GLOBE_MIN_WIDTH)} 
-              height={350} 
-            />
-          </div>
-
-          {/* Summary Stats */}
-          <div className="flex items-center justify-center">
-            <div className="grid grid-cols-2 gap-3 w-full max-w-lg">
-              <div className="backdrop-blur-md bg-surface/90 hover:border-prominent hover:bg-hover p-3 flex flex-col h-24 transition-all duration-300">
-                <div className="text-tertiary text-xs font-mono uppercase tracking-wider text-left">Total Nodes</div>
-                <div className="text-2xl font-mono font-bold text-primary mt-2 text-center flex-grow flex items-center justify-center">
-                  {totalNodes.toLocaleString()}
-                </div>
+        <div className="px-6 pb-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+            {/* Globe */}
+            <div className="lg:col-span-2 bg-surface/60 rounded-lg overflow-hidden">
+              <div className="p-4">
+                <GlobeViz 
+                  data={globeData} 
+                  width={Math.max((containerWidth * GLOBE_WIDTH_SCALE) - GLOBE_PADDING, GLOBE_MIN_WIDTH)} 
+                  height={350} 
+                />
               </div>
+            </div>
 
-              <div className="backdrop-blur-md bg-surface/90 hover:border-prominent hover:bg-hover p-3 flex flex-col h-24 transition-all duration-300">
-                <div className="text-tertiary text-xs font-mono uppercase tracking-wider text-left">Networks</div>
-                <div className="text-2xl font-mono font-bold text-primary mt-2 text-center flex-grow flex items-center justify-center">
-                  {Object.keys(summaryData.networks).length}
+            {/* Summary Stats */}
+            <div className="flex items-center justify-center">
+              <div className="grid grid-cols-2 gap-4 w-full">
+                <div className="bg-surface/60 rounded-lg overflow-hidden">
+                  <div className="p-3 border-b border-subtle">
+                    <div className="text-tertiary text-xs font-mono uppercase tracking-wider">Total Nodes</div>
+                  </div>
+                  <div className="p-3 flex items-center justify-center">
+                    <div className="text-2xl font-mono font-bold text-primary">
+                      {totalNodes.toLocaleString()}
+                    </div>
+                  </div>
                 </div>
-              </div>
 
-              <div className="backdrop-blur-md bg-surface/90 hover:border-prominent hover:bg-hover p-3 flex flex-col h-24 transition-all duration-300">
-                <div className="text-tertiary text-xs font-mono uppercase tracking-wider text-left">Public Nodes</div>
-                <div className="text-2xl font-mono font-bold text-primary mt-2 text-center flex-grow flex items-center justify-center">
-                  {totalPublicNodes.toLocaleString()}
+                <div className="bg-surface/60 rounded-lg overflow-hidden">
+                  <div className="p-3 border-b border-subtle">
+                    <div className="text-tertiary text-xs font-mono uppercase tracking-wider">Public Nodes</div>
+                  </div>
+                  <div className="p-3 flex items-center justify-center">
+                    <div className="text-2xl font-mono font-bold text-accent">
+                      {totalPublicNodes.toLocaleString()}
+                    </div>
+                  </div>
                 </div>
-              </div>
 
-              <div className="backdrop-blur-md bg-surface/90 hover:border-prominent hover:bg-hover p-3 flex flex-col h-24 transition-all duration-300">
-                <div className="text-tertiary text-xs font-mono uppercase tracking-wider text-left">Countries</div>
-                <div className="text-2xl font-mono font-bold text-primary mt-2 text-center flex-grow flex items-center justify-center">
-                  {Object.keys(summaryData.networks.mainnet.countries).length}
+                <div className="bg-surface/60 rounded-lg overflow-hidden">
+                  <div className="p-3 border-b border-subtle">
+                    <div className="text-tertiary text-xs font-mono uppercase tracking-wider">Networks</div>
+                  </div>
+                  <div className="p-3 flex items-center justify-center">
+                    <div className="text-2xl font-mono font-bold text-primary">
+                      {Object.keys(summaryData.networks).length}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-surface/60 rounded-lg overflow-hidden">
+                  <div className="p-3 border-b border-subtle">
+                    <div className="text-tertiary text-xs font-mono uppercase tracking-wider">Countries</div>
+                  </div>
+                  <div className="p-3 flex items-center justify-center">
+                    <div className="text-2xl font-mono font-bold text-primary">
+                      {Object.keys(summaryData.networks.mainnet.countries).length}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-surface/60 rounded-lg overflow-hidden">
+                  <div className="p-3 border-b border-subtle">
+                    <div className="text-tertiary text-xs font-mono uppercase tracking-wider">Cities</div>
+                  </div>
+                  <div className="p-3 flex items-center justify-center">
+                    <div className="text-2xl font-mono font-bold text-primary">
+                      {totalCities}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-surface/60 rounded-lg overflow-hidden">
+                  <div className="p-3 border-b border-subtle">
+                    <div className="text-tertiary text-xs font-mono uppercase tracking-wider">Continents</div>
+                  </div>
+                  <div className="p-3 flex items-center justify-center">
+                    <div className="text-2xl font-mono font-bold text-primary">
+                      {totalContinents}
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
 
-        {/* Navigation Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <Link 
-            to="contributors" 
-            className="group relative backdrop-blur-md bg-surface/80 border border-subtle hover:border-accent rounded-lg overflow-hidden transition-all duration-300"
-          >
-            <div className="absolute inset-0 bg-gradient-to-br from-accent/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-            
-            <div className="relative p-4">
-              <div className="flex items-start gap-3">
-                <div className="w-8 h-8 rounded-lg bg-accent/10 flex items-center justify-center flex-shrink-0">
-                  <span className="text-xl">👥</span>
+          {/* Navigation Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <Link 
+              to="contributors" 
+              className="group bg-surface/60 rounded-lg overflow-hidden hover:bg-surface/80 transition-colors duration-300"
+            >
+              <div className="p-4">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center flex-shrink-0">
+                    <span className="text-xl">👥</span>
+                  </div>
+
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-lg font-sans font-bold text-primary group-hover:text-accent transition-colors mb-1">
+                      Contributors
+                    </h3>
+                    <p className="text-sm font-mono text-tertiary truncate">
+                      View contributor information
+                    </p>
+                  </div>
+
+                  <ArrowRight className="w-5 h-5 text-accent/50 group-hover:text-accent group-hover:translate-x-1 transition-all duration-300" />
                 </div>
 
-                <div className="flex-1 min-w-0">
-                  <h3 className="text-lg font-sans font-bold text-primary group-hover:text-accent transition-colors mb-1">
-                    Contributors
-                  </h3>
-                  <p className="text-sm font-mono text-tertiary truncate">
-                    View contributor information
-                  </p>
-                </div>
-
-                <ArrowRight className="w-5 h-5 text-accent/50 group-hover:text-accent group-hover:translate-x-1 transition-all duration-300" />
+                <p className="text-sm font-mono text-secondary group-hover:text-primary/90 transition-colors mt-3">
+                  Explore detailed information about individual contributors and their nodes
+                </p>
               </div>
+            </Link>
 
-              <p className="text-sm font-mono text-secondary group-hover:text-primary/90 transition-colors mt-3">
-                Explore detailed information about individual contributors and their nodes
-              </p>
-            </div>
-          </Link>
+            <Link 
+              to="networks" 
+              className="group bg-surface/60 rounded-lg overflow-hidden hover:bg-surface/80 transition-colors duration-300"
+            >
+              <div className="p-4">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center flex-shrink-0">
+                    <span className="text-xl">🌐</span>
+                  </div>
 
-          <Link 
-            to="networks" 
-            className="group relative backdrop-blur-md bg-surface/80 border border-subtle hover:border-accent rounded-lg overflow-hidden transition-all duration-300"
-          >
-            <div className="absolute inset-0 bg-gradient-to-br from-accent/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-            
-            <div className="relative p-4">
-              <div className="flex items-start gap-3">
-                <div className="w-8 h-8 rounded-lg bg-accent/10 flex items-center justify-center flex-shrink-0">
-                  <span className="text-xl">🌐</span>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-lg font-sans font-bold text-primary group-hover:text-accent transition-colors mb-1">
+                      Networks
+                    </h3>
+                    <p className="text-sm font-mono text-tertiary truncate">
+                      Network statistics
+                    </p>
+                  </div>
+
+                  <ArrowRight className="w-5 h-5 text-accent/50 group-hover:text-accent group-hover:translate-x-1 transition-all duration-300" />
                 </div>
 
-                <div className="flex-1 min-w-0">
-                  <h3 className="text-lg font-sans font-bold text-primary group-hover:text-accent transition-colors mb-1">
-                    Networks
-                  </h3>
-                  <p className="text-sm font-mono text-tertiary truncate">
-                    Network statistics
-                  </p>
-                </div>
-
-                <ArrowRight className="w-5 h-5 text-accent/50 group-hover:text-accent group-hover:translate-x-1 transition-all duration-300" />
+                <p className="text-sm font-mono text-secondary group-hover:text-primary/90 transition-colors mt-3">
+                  Explore metrics and data across different Ethereum networks
+                </p>
               </div>
+            </Link>
 
-              <p className="text-sm font-mono text-secondary group-hover:text-primary/90 transition-colors mt-3">
-                Explore metrics and data across different Ethereum networks
-              </p>
-            </div>
-          </Link>
+            <Link 
+              to="community-nodes" 
+              className="group bg-surface/60 rounded-lg overflow-hidden hover:bg-surface/80 transition-colors duration-300"
+            >
+              <div className="p-4">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center flex-shrink-0">
+                    <span className="text-xl">🖥️</span>
+                  </div>
 
-          <Link 
-            to="community-nodes" 
-            className="group relative backdrop-blur-md bg-surface/80 border border-subtle hover:border-accent rounded-lg overflow-hidden transition-all duration-300"
-          >
-            <div className="absolute inset-0 bg-gradient-to-br from-accent/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-            
-            <div className="relative p-4">
-              <div className="flex items-start gap-3">
-                <div className="w-8 h-8 rounded-lg bg-accent/10 flex items-center justify-center flex-shrink-0">
-                  <span className="text-xl">🖥️</span>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-lg font-sans font-bold text-primary group-hover:text-accent transition-colors mb-1">
+                      Community Nodes
+                    </h3>
+                    <p className="text-sm font-mono text-tertiary truncate">
+                      Node distribution data
+                    </p>
+                  </div>
+
+                  <ArrowRight className="w-5 h-5 text-accent/50 group-hover:text-accent group-hover:translate-x-1 transition-all duration-300" />
                 </div>
 
-                <div className="flex-1 min-w-0">
-                  <h3 className="text-lg font-sans font-bold text-primary group-hover:text-accent transition-colors mb-1">
-                    Community Nodes
-                  </h3>
-                  <p className="text-sm font-mono text-tertiary truncate">
-                    Node distribution data
-                  </p>
-                </div>
-
-                <ArrowRight className="w-5 h-5 text-accent/50 group-hover:text-accent group-hover:translate-x-1 transition-all duration-300" />
+                <p className="text-sm font-mono text-secondary group-hover:text-primary/90 transition-colors mt-3">
+                  View detailed information about community-contributed nodes
+                </p>
               </div>
+            </Link>
 
-              <p className="text-sm font-mono text-secondary group-hover:text-primary/90 transition-colors mt-3">
-                View detailed information about community-contributed nodes
-              </p>
-            </div>
-          </Link>
+            <Link 
+              to="fork-readiness" 
+              className="group bg-surface/60 rounded-lg overflow-hidden hover:bg-surface/80 transition-colors duration-300"
+            >
+              <div className="p-4">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center flex-shrink-0">
+                    <span className="text-xl">🔄</span>
+                  </div>
 
-          <Link 
-            to="fork-readiness" 
-            className="group relative backdrop-blur-md bg-surface/80 border border-subtle hover:border-accent rounded-lg overflow-hidden transition-all duration-300"
-          >
-            <div className="absolute inset-0 bg-gradient-to-br from-accent/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-            
-            <div className="relative p-4">
-              <div className="flex items-start gap-3">
-                <div className="w-8 h-8 rounded-lg bg-accent/10 flex items-center justify-center flex-shrink-0">
-                  <span className="text-xl">🔄</span>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-lg font-sans font-bold text-primary group-hover:text-accent transition-colors mb-1">
+                      Fork Readiness
+                    </h3>
+                    <p className="text-sm font-mono text-tertiary truncate">
+                      Client version readiness
+                    </p>
+                  </div>
+
+                  <ArrowRight className="w-5 h-5 text-accent/50 group-hover:text-accent group-hover:translate-x-1 transition-all duration-300" />
                 </div>
 
-                <div className="flex-1 min-w-0">
-                  <h3 className="text-lg font-sans font-bold text-primary group-hover:text-accent transition-colors mb-1">
-                    Fork Readiness
-                  </h3>
-                  <p className="text-sm font-mono text-tertiary truncate">
-                    Client version readiness
-                  </p>
-                </div>
-
-                <ArrowRight className="w-5 h-5 text-accent/50 group-hover:text-accent group-hover:translate-x-1 transition-all duration-300" />
+                <p className="text-sm font-mono text-secondary group-hover:text-primary/90 transition-colors mt-3">
+                  Track client version readiness for upcoming network forks
+                </p>
               </div>
-
-              <p className="text-sm font-mono text-secondary group-hover:text-primary/90 transition-colors mt-3">
-                Track client version readiness for upcoming network forks
-              </p>
-            </div>
-          </Link>
+            </Link>
+          </div>
         </div>
       </div>
     </div>

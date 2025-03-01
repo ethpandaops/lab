@@ -72,7 +72,7 @@ function Beacon(): JSX.Element {
               to="slot" 
               className="group relative backdrop-blur-md bg-surface/80 border border-subtle hover:border-accent rounded-lg overflow-hidden transition-all duration-300"
             >
-              <div className="absolute inset-0 bg-gradient-to-br from-accent/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+              <div className="absolute inset-0 bg-gradient-to-br from-accent/5 via-transparent to-transparent bg-opacity-0 group-hover:bg-opacity-100 transition-colors duration-300" />
               
               <div className="relative p-6">
                 <div className="flex items-start gap-4">

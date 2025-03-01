@@ -200,7 +200,8 @@ function Layout(): JSX.Element {
                     'backdrop-blur-sm',
                     'bg-surface/40',
                     'ring-1 ring-inset ring-white/5',
-                    'container mx-auto max-w-7xl'
+                    'container mx-auto max-w-7xl',
+                    'p-4 md:p-6 lg:p-8'
                   ]
             )}>
               <Outlet />

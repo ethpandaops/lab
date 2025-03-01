@@ -65,7 +65,7 @@ export default function Networks(): JSX.Element {
           Last updated{' '}
           <span 
             title={new Date(summaryData.updated_at * 1000).toString()}
-            className="text-primary cursor-help -b -prominent"
+            className="text-primary cursor-help border-b border-prominent"
           >
             {formatDistanceToNow(new Date(summaryData.updated_at * 1000), { addSuffix: true })}
           </span>
@@ -90,61 +90,74 @@ export default function Networks(): JSX.Element {
             .sort((a, b) => b.value - a.value);
 
           return (
-            <div key={name} className="backdrop-blur-sm  p-6  -subtle hover:-default hover:bg-hover transition-all duration-300">
-              <div className="flex justify-between items-start mb-6">
-                <div className="flex items-start gap-3">
-                  <span className="w-8 h-8 flex items-center justify-center text-2xl">
-                    {metadata.icon}
-                  </span>
-                  <div>
-                    <h3 className="text-xl font-sans font-bold text-primary mb-1">{metadata.name}</h3>
-                    <div className="text-sm font-mono text-tertiary">
-                      {data.total_nodes.toLocaleString()} total nodes
+            <div 
+              key={name} 
+              className="backdrop-blur-md bg-surface/80 border border-subtle hover:border-accent rounded-lg overflow-hidden transition-all duration-300"
+              style={{
+                background: `linear-gradient(135deg, rgba(var(--bg-surface)/0.8) 0%, rgba(var(--bg-surface)/0.9) 100%)`,
+                boxShadow: `0 0 20px 0 rgba(0, 0, 0, 0.1), inset 0 0 0 1px rgba(255, 255, 255, 0.05)`
+              }}
+            >
+              {/* Network Header */}
+              <div className="p-6 border-b border-subtle bg-gradient-to-r from-accent/5 via-transparent to-transparent">
+                <div className="flex justify-between items-start">
+                  <div className="flex items-start gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center text-2xl">
+                      {metadata.icon}
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-sans font-bold text-primary mb-1">{metadata.name}</h3>
+                      <div className="text-sm font-mono text-tertiary">
+                        {data.total_nodes.toLocaleString()} total nodes
+                      </div>
                     </div>
                   </div>
-                </div>
-                <div className="text-right">
-                  <div className="text-sm font-mono text-tertiary">
-                    <div>{data.total_public_nodes.toLocaleString()} community</div>
-                    <div>{(data.total_nodes - data.total_public_nodes).toLocaleString()} ethPandaOps</div>
+                  <div className="text-right">
+                    <div className="text-sm font-mono text-tertiary">
+                      <div className="text-accent font-medium">{data.total_public_nodes.toLocaleString()} community</div>
+                      <div>{(data.total_nodes - data.total_public_nodes).toLocaleString()} ethPandaOps</div>
+                    </div>
                   </div>
                 </div>
               </div>
 
-              <div className="space-y-2 mb-6">
+              {/* Network Stats */}
+              <div className="p-6 space-y-3">
                 <div className="flex justify-between text-sm font-mono">
                   <span className="text-tertiary">Countries</span>
-                  <span className="text-primary">{Object.keys(data.countries).length}</span>
+                  <span className="text-primary font-medium">{Object.keys(data.countries).length}</span>
                 </div>
                 <div className="flex justify-between text-sm font-mono">
                   <span className="text-tertiary">Cities</span>
-                  <span className="text-primary">{Object.keys(data.cities).length}</span>
+                  <span className="text-primary font-medium">{Object.keys(data.cities).length}</span>
                 </div>
                 <div className="flex justify-between text-sm font-mono">
                   <span className="text-tertiary">Continents</span>
-                  <span className="text-primary">{Object.keys(data.continents).length}</span>
+                  <span className="text-primary font-medium">{Object.keys(data.continents).length}</span>
                 </div>
               </div>
 
               {/* Client Distribution */}
-              <div className="pt-6 -t -subtle">
-                <h4 className="text-sm font-sans font-bold text-primary/90 mb-4">Client Distribution</h4>
-                <div className="space-y-3">
+              <div className="p-6 border-t border-subtle bg-gradient-to-b from-accent/5 via-transparent to-transparent">
+                <h4 className="text-sm font-sans font-bold text-primary mb-4">Client Distribution</h4>
+                <div className="space-y-4">
                   {clientDistribution.map((client) => (
                     <div key={client.name} className="flex items-center gap-3">
-                      <img
-                        src={`/clients/${client.name.toLowerCase()}.png`}
-                        alt={`${client.name} logo`}
-                        className="w-6 h-6 object-contain opacity-90"
-                        onError={(event) => {
-                          const target = event.currentTarget;
-                          target.style.display = 'none';
-                        }}
-                      />
+                      <div className="w-8 h-8 rounded-lg bg-surface/60 flex items-center justify-center p-1">
+                        <img
+                          src={`/clients/${client.name.toLowerCase()}.png`}
+                          alt={`${client.name} logo`}
+                          className="w-6 h-6 object-contain"
+                          onError={(event) => {
+                            const target = event.currentTarget;
+                            target.style.display = 'none';
+                          }}
+                        />
+                      </div>
                       <div className="flex-1 flex items-center justify-between">
-                        <span className="text-sm font-mono text-primary/90">{client.name}</span>
+                        <span className="text-sm font-mono text-primary">{client.name}</span>
                         <div className="text-right">
-                          <span className="text-sm font-mono font-medium text-primary">
+                          <span className="text-sm font-mono font-medium text-accent">
                             {((client.value / data.total_nodes) * 100).toFixed(1)}%
                           </span>
                           <div className="text-xs font-mono text-tertiary">
