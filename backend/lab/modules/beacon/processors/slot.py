@@ -38,14 +38,12 @@ class SlotProcessorState:
 class ProposerData(BaseModel):
     """Proposer data model."""
     slot: int
-    proposer_pubkey: str
     proposer_validator_index: int
 
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary."""
         return {
             "slot": self.slot,
-            "proposer_pubkey": self.proposer_pubkey,
             "proposer_validator_index": self.proposer_validator_index
         }
 
@@ -543,10 +541,10 @@ class SlotProcessor(BaseProcessor):
             logger = self.logger.getChild(f"slot_{slot}")
 
             ## Get the block data
-            block_data, proposer_data = await asyncio.gather(
-                self.get_block_data(slot),
-                self.get_proposer_data(slot)
+            block_data = await asyncio.gather(
+                self.get_block_data(slot)
             )
+            block_data = block_data[0]  # Unwrap from gather result
  
             ## Get everything else
             logger.debug("Fetching slot data...")
@@ -554,7 +552,7 @@ class SlotProcessor(BaseProcessor):
                 # Run all timing data fetches concurrently
                 maximum_attestation_votes, entity, block_seen_at_slot_time_data, blob_seen_at_slot_time_data, block_first_seen_in_p2p_slot_time_data, blob_first_seen_in_p2p_slot_time_data, attestation_votes = await asyncio.gather(
                     self.get_maximum_attestation_votes(slot),
-                    self.get_proposer_entity(proposer_data.proposer_validator_index),
+                    self.get_proposer_entity(block_data.proposer_index),
                     self.get_block_seen_at_slot_time(slot),
                     self.get_blob_seen_at_slot_time(slot),
                     self.get_block_first_seen_in_p2p_slot_time(slot),
@@ -564,6 +562,12 @@ class SlotProcessor(BaseProcessor):
             except Exception as e:
                 logger.error(f"Failed to get timing data: {str(e)}")
                 raise
+
+            # Make a proposer_data dict from the block_data
+            proposer_data = ProposerData(
+                slot=slot,
+                proposer_validator_index=block_data.proposer_index
+            )
 
             # Store slot data with 24h TTL
             logger.debug("Storing slot data...")
@@ -811,57 +815,6 @@ class SlotProcessor(BaseProcessor):
         end_time = end_time + timedelta(minutes=15)
 
         return start_time, end_time
-
-    async def get_proposer_data(self, slot: int) -> ProposerData:
-        """Get proposer data for a given slot."""
-        # Get start and end dates for the slot +- 15 minutes
-        start_time, end_time = self.get_slot_window(slot)
-
-        # Convert to ClickHouse format
-        start_str = start_time.strftime('%Y-%m-%d %H:%M:%S')
-        end_str = end_time.strftime('%Y-%m-%d %H:%M:%S')
-
-        proposer_query = text("""
-            SELECT
-                slot,
-                proposer_pubkey,
-                proposer_validator_index
-            FROM default.beacon_api_eth_v1_proposer_duty FINAL
-            WHERE
-                slot = :slot
-                AND slot_start_date_time BETWEEN toDateTime(:start_date) AND toDateTime(:end_date)
-                AND meta_network_name = :network
-            GROUP BY slot, proposer_pubkey, proposer_validator_index
-            LIMIT 1
-        """)
-        
-        proposer_result = self.ctx.clickhouse.execute(
-            proposer_query,
-            {
-                "slot": slot,
-                "start_date": start_str,
-                "end_date": end_str,
-                "network": self.network.name
-            }
-        )
-        
-        proposer_rows = proposer_result.fetchall()
-        self.logger.debug(f"Got {len(proposer_rows)} proposer rows for slot {slot}")
-        if not proposer_rows:
-            raise Exception(f"No proposer data found for slot {slot}")
-            
-        row = proposer_rows[0]  # We're using LIMIT 1 so there's only one row
-        self.logger.debug(f"Processing proposer row for slot {slot}: {row}")
-        
-        try:
-            return ProposerData(
-                slot=row[0],
-                proposer_pubkey=row[1],
-                proposer_validator_index=row[2]
-            )
-        except Exception as e:
-            self.logger.error(f"Failed to create ProposerData for slot {slot} from row {row}: {str(e)}")
-            raise
 
     async def get_proposer_entity(self, index: int) -> str:
         """Get entity for a given validator index."""
