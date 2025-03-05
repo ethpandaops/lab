@@ -818,6 +818,12 @@ class SlotProcessor(BaseProcessor):
 
     async def get_proposer_entity(self, index: int) -> str:
         """Get entity for a given validator index."""
+        # First check if this is a known validator
+        known_entity = self.network.get_validator_entity(index)
+        if known_entity is not None:
+            return known_entity
+
+        # Fall back to ClickHouse lookup if not found in known validators
         entity_query = text("""
             SELECT
                 entity

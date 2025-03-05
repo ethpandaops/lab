@@ -255,11 +255,22 @@ class Forks(BaseModel):
         description="Consensus layer fork configurations"
     )
 
+class ValidatorSetConfig(BaseModel):
+    """Configuration for validator set."""
+    known_validators: Dict[str, str] = Field(
+        default_factory=dict,
+        description="Map of validator index ranges to entity names"
+    )
+
 class EthereumNetworkConfig(BaseModel):
     """Configuration for an Ethereum network."""
     config_url: str = Field(description="URL to the network's beacon chain config.yaml")
     genesis_time: int = Field(description="Unix timestamp of the network's genesis")
     forks: Optional[Forks] = Field(default=None, description="Fork configurations")
+    validator_set: Optional[ValidatorSetConfig] = Field(
+        default=None,
+        description="Configuration for known validator sets"
+    )
 
 class EthereumConfig(BaseModel):
     """Configuration for Ethereum networks."""

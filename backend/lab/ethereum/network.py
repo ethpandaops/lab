@@ -36,7 +36,7 @@ class NetworkConfig(BaseModel):
 class EthereumNetwork:
     """Represents an Ethereum network and its configuration."""
 
-    def __init__(self, name: str, config_url: str, logger: Logger, genesis_time: int):
+    def __init__(self, name: str, config_url: str, logger: Logger, genesis_time: int, validator_set: Optional[Dict[str, str]] = None):
         """Initialize network."""
         self.name = name
         self.config_url = config_url
@@ -45,6 +45,7 @@ class EthereumNetwork:
         self.clock: Optional[WallClock] = None
         self.logger = logger
         self._genesis_time = genesis_time
+        self._validator_set = validator_set or {}
 
     @property
     def genesis_time(self) -> int:
@@ -143,6 +144,35 @@ class EthereumNetwork:
         
         fork = self._forks.get(fork_name)
         return fork.epoch if fork else None 
+
     def get_forks(self) -> Dict[str, ForkVersion]:
         """Get all forks."""
         return self._forks
+
+    def get_validator_entity(self, validator_index: int) -> Optional[str]:
+        """Get the entity name for a validator index if it is known.
+        
+        Args:
+            validator_index: The validator index to check
+            
+        Returns:
+            Optional[str]: The entity name if the validator is known, None otherwise
+        """
+        if not self._validator_set:
+            return None
+            
+        for range_str, entity in self._validator_set.items():
+            try:
+                if "-" in range_str:
+                    start, end = map(int, range_str.split("-"))
+                    if start <= validator_index <= end:
+                        return entity
+                else:
+                    # Single validator index
+                    if int(range_str) == validator_index:
+                        return entity
+            except (ValueError, TypeError):
+                self.logger.warning(f"Invalid validator range format: {range_str}")
+                continue
+                
+        return None
