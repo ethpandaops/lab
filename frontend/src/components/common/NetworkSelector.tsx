@@ -14,6 +14,49 @@ interface NetworkSelectorProps {
   className?: string
 }
 
+// Function to generate metadata for networks not defined in NETWORK_METADATA
+const getNetworkMetadata = (network: string) => {
+  if (network in NETWORK_METADATA) {
+    return NETWORK_METADATA[network as NetworkKey]
+  }
+  
+  // Generate metadata for unknown networks
+  return {
+    name: network.charAt(0).toUpperCase() + network.slice(1),
+    icon: '🔥',
+    color: '#627EEA'
+  }
+}
+
+// Network order priority (lower index = higher priority)
+const NETWORK_ORDER = ['mainnet', 'sepolia', 'holesky', 'hoodi']
+
+// Sort networks based on predefined order
+const sortNetworks = (networks: string[]): string[] => {
+  return [...networks].sort((a, b) => {
+    const aIndex = NETWORK_ORDER.indexOf(a)
+    const bIndex = NETWORK_ORDER.indexOf(b)
+    
+    // If both networks are in the priority list, sort by their index
+    if (aIndex !== -1 && bIndex !== -1) {
+      return aIndex - bIndex
+    }
+    
+    // If only a is in the priority list, it comes first
+    if (aIndex !== -1) {
+      return -1
+    }
+    
+    // If only b is in the priority list, it comes first
+    if (bIndex !== -1) {
+      return 1
+    }
+    
+    // If neither is in the priority list, sort alphabetically
+    return a.localeCompare(b)
+  })
+}
+
 export function NetworkSelector({
   selectedNetwork,
   onNetworkChange,
@@ -39,16 +82,18 @@ export function NetworkSelector({
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
-  const networks = config?.modules['xatu_public_contributors']?.networks || ['mainnet']
+  // Get available networks from props or config
+  const unsortedNetworks: string[] = availableNetworks.length > 0 
+    ? availableNetworks 
+    : config?.ethereum?.networks ? Object.keys(config.ethereum.networks) : ['mainnet']
+  
+  // Sort networks according to the specified order
+  const networks = sortNetworks(unsortedNetworks)
 
-  const selectedMetadata = NETWORK_METADATA[selectedNetwork as NetworkKey] || {
-    name: selectedNetwork.charAt(0).toUpperCase() + selectedNetwork.slice(1),
-    icon: '🔥',
-    color: '#627EEA'
-  }
+  const selectedMetadata = getNetworkMetadata(selectedNetwork)
 
   return (
-    <div className={clsx('relative', className)}>
+    <div className={clsx('relative', className)} ref={dropdownRef}>
       <Listbox value={selectedNetwork} onChange={onNetworkChange}>
         <div className="relative">
           <Listbox.Button className="relative w-full cursor-pointer rounded-lg bg-surface/30 backdrop-blur-sm py-2 pl-3 pr-10 text-left shadow-sm border border-subtle hover:bg-surface/50 transition-colors">
@@ -70,11 +115,7 @@ export function NetworkSelector({
           >
             <Listbox.Options className="absolute z-[9999] mt-1 max-h-60 w-full overflow-auto rounded-lg bg-surface py-1 shadow-lg border border-subtle">
               {networks.map((network) => {
-                const metadata = NETWORK_METADATA[network as NetworkKey] || {
-                  name: network.charAt(0).toUpperCase() + network.slice(1),
-                  icon: '🔥',
-                  color: '#627EEA'
-                }
+                const metadata = getNetworkMetadata(network)
                 return (
                   <Listbox.Option
                     key={network}

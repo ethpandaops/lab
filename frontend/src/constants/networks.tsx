@@ -15,6 +15,11 @@ export const NETWORK_METADATA = {
     name: 'Holesky',
     icon: '🐱',
     color: '#A4E887'
+  },
+  hoodi: {
+    name: 'Hoodi',
+    icon: '🦊',
+    color: '#FF9E2C'
   }
 } as const
 
