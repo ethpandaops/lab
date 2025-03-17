@@ -9,7 +9,7 @@ export const fetchData = async <T>(path: string): Promise<T> => {
   return response.json()
 }
 
-export const useDataFetch = <T>(path: string | null) => {
+export const useDataFetch = <T>(path: string | null, options?: { silentFail?: boolean }) => {
   const { data, isLoading: loading, error } = useQuery<T, Error>({
     queryKey: ['data', path],
     queryFn: () => {
@@ -19,6 +19,7 @@ export const useDataFetch = <T>(path: string | null) => {
       return fetchData<T>(path)
     },
     enabled: !!path,
+    retry: options?.silentFail ? false : 3,
   })
 
   return { data, loading, error }

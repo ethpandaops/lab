@@ -1,4 +1,5 @@
 import { Info } from 'lucide-react'
+import { Card, CardBody } from './Card'
 
 interface AboutThisDataProps {
   children: React.ReactNode
@@ -6,12 +7,12 @@ interface AboutThisDataProps {
 
 export const AboutThisData = ({ children }: AboutThisDataProps) => {
   return (
-    <div className="relative backdrop-blur-md border border-subtle bg-surface/80 p-6 rounded-lg overflow-hidden">
+    <Card isPrimary className="relative">
       {/* Glow Effect */}
       <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-accent/5 to-error/5 rounded-lg animate-pulse-slow" />
       
       {/* Content */}
-      <div className="relative flex items-start gap-4">
+      <CardBody className="relative flex items-start gap-4">
         <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center mt-0.5">
           <Info className="w-5 h-5 text-accent" />
         </div>
@@ -21,7 +22,7 @@ export const AboutThisData = ({ children }: AboutThisDataProps) => {
             {children}
           </div>
         </div>
-      </div>
-    </div>
+      </CardBody>
+    </Card>
   )
 } 

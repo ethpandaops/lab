@@ -198,7 +198,7 @@ function Layout(): JSX.Element {
                 ? 'h-full'
                 : [
                     'backdrop-blur-sm',
-                    'bg-surface/40',
+                    'bg-gradient-page',
                     'ring-1 ring-inset ring-white/5',
                     'container mx-auto max-w-7xl',
                     'p-4 md:p-6 lg:p-8'

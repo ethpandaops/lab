@@ -5,6 +5,7 @@ import { AboutThisData } from '../../../components/common/AboutThisData';
 import { useContext } from 'react';
 import { ConfigContext } from '../../../App';
 import { NETWORK_METADATA, type NetworkKey } from '../../../constants/networks';
+import { Card, CardHeader, CardBody } from '../../../components/common/Card';
 
 interface ConsensusImplementation {
   total_nodes: number;
@@ -90,16 +91,13 @@ export default function Networks(): JSX.Element {
             .sort((a, b) => b.value - a.value);
 
           return (
-            <div 
+            <Card 
               key={name} 
-              className="backdrop-blur-md bg-surface/80 border border-subtle hover:border-accent rounded-lg overflow-hidden transition-all duration-300"
-              style={{
-                background: `linear-gradient(135deg, rgba(var(--bg-surface)/0.8) 0%, rgba(var(--bg-surface)/0.9) 100%)`,
-                boxShadow: `0 0 20px 0 rgba(0, 0, 0, 0.1), inset 0 0 0 1px rgba(255, 255, 255, 0.05)`
-              }}
+              isPrimary
+              className="border border-subtle hover:border-accent transition-all duration-300 shadow-lg"
             >
               {/* Network Header */}
-              <div className="p-6 border-b border-subtle bg-gradient-to-r from-accent/5 via-transparent to-transparent">
+              <CardHeader className="border-b border-subtle bg-gradient-to-r from-accent/5 via-transparent to-transparent">
                 <div className="flex justify-between items-start">
                   <div className="flex items-start gap-3">
                     <div className="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center text-2xl">
@@ -119,10 +117,10 @@ export default function Networks(): JSX.Element {
                     </div>
                   </div>
                 </div>
-              </div>
+              </CardHeader>
 
               {/* Network Stats */}
-              <div className="p-6 space-y-3">
+              <CardBody className="space-y-3">
                 <div className="flex justify-between text-sm font-mono">
                   <span className="text-tertiary">Countries</span>
                   <span className="text-primary font-medium">{Object.keys(data.countries).length}</span>
@@ -135,10 +133,10 @@ export default function Networks(): JSX.Element {
                   <span className="text-tertiary">Continents</span>
                   <span className="text-primary font-medium">{Object.keys(data.continents).length}</span>
                 </div>
-              </div>
+              </CardBody>
 
               {/* Client Distribution */}
-              <div className="p-6 border-t border-subtle bg-gradient-to-b from-accent/5 via-transparent to-transparent">
+              <CardBody className="border-t border-subtle bg-gradient-to-b from-accent/5 via-transparent to-transparent">
                 <h4 className="text-sm font-sans font-bold text-primary mb-4">Client Distribution</h4>
                 <div className="space-y-4">
                   {clientDistribution.map((client) => (
@@ -168,8 +166,8 @@ export default function Networks(): JSX.Element {
                     </div>
                   ))}
                 </div>
-              </div>
-            </div>
+              </CardBody>
+            </Card>
           );
         })}
       </div>

@@ -6,6 +6,7 @@ import { useRef, useState, useEffect, useContext } from 'react'
 import { GlobeViz } from '../../components/xatu/GlobeViz'
 import { XatuCallToAction } from '../../components/xatu/XatuCallToAction'
 import { ConfigContext } from '../../App'
+import { CardBody } from '../../components/common/Card'
 import type { Config } from '../../types'
 
 interface ConsensusImplementation {
@@ -125,8 +126,8 @@ function Xatu(): JSX.Element {
       <XatuCallToAction />
 
       {/* Overview Section */}
-      <div className="backdrop-blur-md bg-surface/80 rounded-lg overflow-hidden shadow-md">
-        <div className="p-6">
+      <div className="card card-primary">
+        <div className="card-header">
           <h2 className="text-2xl font-sans font-bold text-primary mb-2">Overview</h2>
           <span className="text-sm font-mono text-secondary">
             Last 24h · Updated{' '}
@@ -146,7 +147,7 @@ function Xatu(): JSX.Element {
         <div className="px-6 pb-6">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
             {/* Globe */}
-            <div className="lg:col-span-2 bg-surface/60 rounded-lg overflow-hidden">
+            <div className="lg:col-span-2 card card-secondary">
               <div className="p-4">
                 <GlobeViz 
                   data={globeData} 
@@ -159,66 +160,66 @@ function Xatu(): JSX.Element {
             {/* Summary Stats */}
             <div className="flex items-center justify-center">
               <div className="grid grid-cols-2 gap-4 w-full">
-                <div className="bg-surface/60 rounded-lg overflow-hidden">
-                  <div className="p-3 border-b border-subtle">
+                <div className="card-stat">
+                  <div className="card-stat-header">
                     <div className="text-tertiary text-xs font-mono uppercase tracking-wider">Total Nodes</div>
                   </div>
-                  <div className="p-3 flex items-center justify-center">
+                  <div className="card-stat-body">
                     <div className="text-2xl font-mono font-bold text-primary">
                       {totalNodes.toLocaleString()}
                     </div>
                   </div>
                 </div>
 
-                <div className="bg-surface/60 rounded-lg overflow-hidden">
-                  <div className="p-3 border-b border-subtle">
+                <div className="card-stat">
+                  <div className="card-stat-header">
                     <div className="text-tertiary text-xs font-mono uppercase tracking-wider">Public Nodes</div>
                   </div>
-                  <div className="p-3 flex items-center justify-center">
+                  <div className="card-stat-body">
                     <div className="text-2xl font-mono font-bold text-accent">
                       {totalPublicNodes.toLocaleString()}
                     </div>
                   </div>
                 </div>
 
-                <div className="bg-surface/60 rounded-lg overflow-hidden">
-                  <div className="p-3 border-b border-subtle">
+                <div className="card-stat">
+                  <div className="card-stat-header">
                     <div className="text-tertiary text-xs font-mono uppercase tracking-wider">Networks</div>
                   </div>
-                  <div className="p-3 flex items-center justify-center">
+                  <div className="card-stat-body">
                     <div className="text-2xl font-mono font-bold text-primary">
                       {Object.keys(summaryData.networks).length}
                     </div>
                   </div>
                 </div>
 
-                <div className="bg-surface/60 rounded-lg overflow-hidden">
-                  <div className="p-3 border-b border-subtle">
+                <div className="card-stat">
+                  <div className="card-stat-header">
                     <div className="text-tertiary text-xs font-mono uppercase tracking-wider">Countries</div>
                   </div>
-                  <div className="p-3 flex items-center justify-center">
+                  <div className="card-stat-body">
                     <div className="text-2xl font-mono font-bold text-primary">
                       {Object.keys(summaryData.networks.mainnet.countries).length}
                     </div>
                   </div>
                 </div>
 
-                <div className="bg-surface/60 rounded-lg overflow-hidden">
-                  <div className="p-3 border-b border-subtle">
+                <div className="card-stat">
+                  <div className="card-stat-header">
                     <div className="text-tertiary text-xs font-mono uppercase tracking-wider">Cities</div>
                   </div>
-                  <div className="p-3 flex items-center justify-center">
+                  <div className="card-stat-body">
                     <div className="text-2xl font-mono font-bold text-primary">
                       {totalCities}
                     </div>
                   </div>
                 </div>
 
-                <div className="bg-surface/60 rounded-lg overflow-hidden">
-                  <div className="p-3 border-b border-subtle">
+                <div className="card-stat">
+                  <div className="card-stat-header">
                     <div className="text-tertiary text-xs font-mono uppercase tracking-wider">Continents</div>
                   </div>
-                  <div className="p-3 flex items-center justify-center">
+                  <div className="card-stat-body">
                     <div className="text-2xl font-mono font-bold text-primary">
                       {totalContinents}
                     </div>
@@ -232,9 +233,9 @@ function Xatu(): JSX.Element {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <Link 
               to="contributors" 
-              className="group bg-surface/60 rounded-lg overflow-hidden hover:bg-surface/80 transition-colors duration-300"
+              className="card card-secondary card-interactive"
             >
-              <div className="p-4">
+              <CardBody>
                 <div className="flex items-start gap-3">
                   <div className="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center flex-shrink-0">
                     <span className="text-xl">👥</span>
@@ -255,14 +256,14 @@ function Xatu(): JSX.Element {
                 <p className="text-sm font-mono text-secondary group-hover:text-primary/90 transition-colors mt-3">
                   Explore detailed information about individual contributors and their nodes
                 </p>
-              </div>
+              </CardBody>
             </Link>
 
             <Link 
               to="networks" 
-              className="group bg-surface/60 rounded-lg overflow-hidden hover:bg-surface/80 transition-colors duration-300"
+              className="card card-secondary card-interactive"
             >
-              <div className="p-4">
+              <CardBody>
                 <div className="flex items-start gap-3">
                   <div className="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center flex-shrink-0">
                     <span className="text-xl">🌐</span>
@@ -281,16 +282,16 @@ function Xatu(): JSX.Element {
                 </div>
 
                 <p className="text-sm font-mono text-secondary group-hover:text-primary/90 transition-colors mt-3">
-                  Explore metrics and data across different Ethereum networks
+                  Compare statistics across different Ethereum networks
                 </p>
-              </div>
+              </CardBody>
             </Link>
 
             <Link 
               to="geographical-checklist" 
-              className="group bg-surface/60 rounded-lg overflow-hidden hover:bg-surface/80 transition-colors duration-300"
+              className="card card-secondary card-interactive"
             >
-              <div className="p-4">
+              <CardBody>
                 <div className="flex items-start gap-3">
                   <div className="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center flex-shrink-0">
                     <span className="text-xl">🗺️</span>
@@ -301,7 +302,7 @@ function Xatu(): JSX.Element {
                       Geographical Checklist
                     </h3>
                     <p className="text-sm font-mono text-tertiary truncate">
-                      Global coverage map
+                      Geographic distribution
                     </p>
                   </div>
 
@@ -309,47 +310,19 @@ function Xatu(): JSX.Element {
                 </div>
 
                 <p className="text-sm font-mono text-secondary group-hover:text-primary/90 transition-colors mt-3">
-                  See which regions need more node contributions and help fill the gaps
+                  View node distribution across countries and continents
                 </p>
-              </div>
-            </Link>
-
-            <Link 
-              to="community-nodes" 
-              className="group bg-surface/60 rounded-lg overflow-hidden hover:bg-surface/80 transition-colors duration-300"
-            >
-              <div className="p-4">
-                <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center flex-shrink-0">
-                    <span className="text-xl">🖥️</span>
-                  </div>
-
-                  <div className="flex-1 min-w-0">
-                    <h3 className="text-lg font-sans font-bold text-primary group-hover:text-accent transition-colors mb-1">
-                      Community Nodes
-                    </h3>
-                    <p className="text-sm font-mono text-tertiary truncate">
-                      Node distribution data
-                    </p>
-                  </div>
-
-                  <ArrowRight className="w-5 h-5 text-accent/50 group-hover:text-accent group-hover:translate-x-1 transition-all duration-300" />
-                </div>
-
-                <p className="text-sm font-mono text-secondary group-hover:text-primary/90 transition-colors mt-3">
-                  View detailed information about community-contributed nodes
-                </p>
-              </div>
+              </CardBody>
             </Link>
 
             <Link 
               to="fork-readiness" 
-              className="group bg-surface/60 rounded-lg overflow-hidden hover:bg-surface/80 transition-colors duration-300"
+              className="card card-secondary card-interactive"
             >
-              <div className="p-4">
+              <CardBody>
                 <div className="flex items-start gap-3">
                   <div className="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center flex-shrink-0">
-                    <span className="text-xl">🔄</span>
+                    <span className="text-xl">🍴</span>
                   </div>
 
                   <div className="flex-1 min-w-0">
@@ -357,7 +330,7 @@ function Xatu(): JSX.Element {
                       Fork Readiness
                     </h3>
                     <p className="text-sm font-mono text-tertiary truncate">
-                      Client version readiness
+                      Client upgrade status
                     </p>
                   </div>
 
@@ -365,9 +338,9 @@ function Xatu(): JSX.Element {
                 </div>
 
                 <p className="text-sm font-mono text-secondary group-hover:text-primary/90 transition-colors mt-3">
-                  Track client version readiness for upcoming network forks
+                  Track client upgrade status for upcoming network forks
                 </p>
-              </div>
+              </CardBody>
             </Link>
           </div>
         </div>

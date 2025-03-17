@@ -357,7 +357,25 @@ export function SlotView({ slot, network = 'mainnet', isLive = false, onSlotComp
 
   // Only show error if not live view
   if (error && !isLive) {
-    return <ErrorState message="Failed to load slot data" error={error} />
+    return (
+      <div className="w-full flex flex-col">
+        <div className="h-[calc(100vh-theme(spacing.16))] md:h-[calc(85vh-theme(spacing.36))] flex flex-col md:flex-row">
+          <div className="w-full h-full">
+            <GlobalMap
+              nodes={{}}
+              currentTime={0}
+              blockEvents={[]}
+              loading={false}
+              isMissing={true}
+              hideDetails={true}
+            />
+          </div>
+        </div>
+        <div className="absolute inset-0 flex items-center justify-center">
+          <ErrorState message="Failed to load slot data" error={error} />
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -372,7 +390,8 @@ export function SlotView({ slot, network = 'mainnet', isLive = false, onSlotComp
               nodes={slotData?.nodes || {}}
               currentTime={currentTime}
               blockEvents={blockEvents}
-              loading={isLoading}
+              loading={isLoading && !slotData}
+              isMissing={isMissingData}
               slot={slotData?.slot}
               proposer={slotData?.entity || 'Unknown'}
               proposerIndex={slotData?.proposer?.proposer_validator_index}
@@ -951,7 +970,8 @@ export function SlotView({ slot, network = 'mainnet', isLive = false, onSlotComp
               nodes={slotData?.nodes || {}}
               currentTime={currentTime}
               blockEvents={blockEvents}
-              loading={isLoading}
+              loading={isLoading && !slotData}
+              isMissing={isMissingData}
               slot={slotData?.slot}
               proposer={slotData?.entity || 'Unknown'}
               proposerIndex={slotData?.proposer?.proposer_validator_index}

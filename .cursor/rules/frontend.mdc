@@ -1,6 +1,7 @@
 ---
 description: Frontend UI System Rules
 globs: *frontend*
+alwaysApply: false
 ---
 # UI System Rules
 

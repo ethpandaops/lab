@@ -1,5 +1,6 @@
 import { ArrowRight, Share2 } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import { Card, CardBody } from './common/Card'
 
 interface CallToActionProps {
   title: string
@@ -10,8 +11,8 @@ interface CallToActionProps {
 
 export const CallToAction = ({ title, description, buttonText, buttonLink }: CallToActionProps) => {
   return (
-    <div className="relative overflow-hidden border bg-bg-secondary">
-      <div className="relative p-4 sm:p-6">
+    <Card className="relative overflow-hidden">
+      <CardBody>
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
           <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-xl bg-accent/10 p-2 sm:p-2.5 flex items-center justify-center">
             <Share2 className="h-5 w-5 sm:h-6 sm:w-6 text-accent" />
@@ -28,7 +29,7 @@ export const CallToAction = ({ title, description, buttonText, buttonLink }: Cal
             <ArrowRight className="ml-2 h-4 w-4" />
           </Link>
         </div>
-      </div>
-    </div>
+      </CardBody>
+    </Card>
   )
 }

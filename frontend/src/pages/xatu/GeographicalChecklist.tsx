@@ -8,6 +8,7 @@ import { formatDistanceToNow } from 'date-fns'
 import { NetworkSelector } from '../../components/common/NetworkSelector'
 import { Search, ChevronDown, ChevronUp, Check, X } from 'lucide-react'
 import CONTINENT_TO_COUNTRIES from '../../constants/countries'
+import { Card, CardHeader, CardBody } from '../../components/common/Card'
 
 // Types
 interface Country {
@@ -240,8 +241,8 @@ const GeographicalChecklist = () => {
       <XatuCallToAction />
       
       {/* Header Section */}
-      <div className="backdrop-blur-md bg-surface/80 rounded-lg overflow-hidden shadow-md">
-        <div className="p-6">
+      <Card isPrimary>
+        <CardHeader>
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
             <div>
               <h2 className="text-2xl font-sans font-bold text-primary mb-2">Geographical Checklist</h2>
@@ -261,71 +262,75 @@ const GeographicalChecklist = () => {
             This checklist shows geographical coverage of Ethereum nodes contributing data to ethPandaOps. 
             Help us fill in the gaps by contributing data from underrepresented regions.
           </p>
-        </div>
+        </CardHeader>
         
         {/* Coverage Stats */}
-        <div className="px-6 pb-6">
+        <CardBody>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-            <div className="bg-surface/60 rounded-lg overflow-hidden">
-              <div className="p-3 border-b border-subtle">
+            <div className="card-stat">
+              <div className="card-stat-header">
                 <div className="text-tertiary text-xs font-mono uppercase tracking-wider">Continent Coverage</div>
               </div>
-              <div className="p-3">
-                <div className="flex items-center justify-between">
-                  <div className="text-2xl font-mono font-bold text-primary">
-                    {coveredContinents}/{totalContinents}
+              <div className="card-stat-body">
+                <div className="w-full">
+                  <div className="flex items-center justify-between">
+                    <div className="text-2xl font-mono font-bold text-primary">
+                      {coveredContinents}/{totalContinents}
+                    </div>
+                    <div className="text-lg font-mono text-accent">
+                      {continentCoverage.toFixed(1)}%
+                    </div>
                   </div>
-                  <div className="text-lg font-mono text-accent">
-                    {continentCoverage.toFixed(1)}%
+                  <div className="mt-2 bg-surface/40 rounded-full h-2 overflow-hidden">
+                    <div 
+                      className="bg-accent h-full rounded-full" 
+                      style={{ width: `${continentCoverage}%` }}
+                    />
                   </div>
-                </div>
-                <div className="mt-2 bg-surface/40 rounded-full h-2 overflow-hidden">
-                  <div 
-                    className="bg-accent h-full rounded-full" 
-                    style={{ width: `${continentCoverage}%` }}
-                  />
                 </div>
               </div>
             </div>
             
-            <div className="bg-surface/60 rounded-lg overflow-hidden">
-              <div className="p-3 border-b border-subtle">
+            <div className="card-stat">
+              <div className="card-stat-header">
                 <div className="text-tertiary text-xs font-mono uppercase tracking-wider">Country Coverage</div>
               </div>
-              <div className="p-3">
-                <div className="flex items-center justify-between">
-                  <div className="text-2xl font-mono font-bold text-primary">
-                    {coveredCountries}/{totalCountries}
+              <div className="card-stat-body">
+                <div className="w-full">
+                  <div className="flex items-center justify-between">
+                    <div className="text-2xl font-mono font-bold text-primary">
+                      {coveredCountries}/{totalCountries}
+                    </div>
+                    <div className="text-lg font-mono text-accent">
+                      {countryCoverage.toFixed(1)}%
+                    </div>
                   </div>
-                  <div className="text-lg font-mono text-accent">
-                    {countryCoverage.toFixed(1)}%
+                  <div className="mt-2 bg-surface/40 rounded-full h-2 overflow-hidden">
+                    <div 
+                      className="bg-accent h-full rounded-full" 
+                      style={{ width: `${countryCoverage}%` }}
+                    />
                   </div>
-                </div>
-                <div className="mt-2 bg-surface/40 rounded-full h-2 overflow-hidden">
-                  <div 
-                    className="bg-accent h-full rounded-full" 
-                    style={{ width: `${countryCoverage}%` }}
-                  />
                 </div>
               </div>
             </div>
             
-            <div className="bg-surface/60 rounded-lg overflow-hidden">
-              <div className="p-3 border-b border-subtle">
+            <div className="card-stat">
+              <div className="card-stat-header">
                 <div className="text-tertiary text-xs font-mono uppercase tracking-wider">Total Nodes</div>
               </div>
-              <div className="p-3 flex items-center justify-center">
+              <div className="card-stat-body">
                 <div className="text-2xl font-mono font-bold text-primary">
                   {networkData.total_nodes.toLocaleString()}
                 </div>
               </div>
             </div>
             
-            <div className="bg-surface/60 rounded-lg overflow-hidden">
-              <div className="p-3 border-b border-subtle">
+            <div className="card-stat">
+              <div className="card-stat-header">
                 <div className="text-tertiary text-xs font-mono uppercase tracking-wider">Public Nodes</div>
               </div>
-              <div className="p-3 flex items-center justify-center">
+              <div className="card-stat-body">
                 <div className="text-2xl font-mono font-bold text-accent">
                   {networkData.total_public_nodes.toLocaleString()}
                 </div>
@@ -381,7 +386,7 @@ const GeographicalChecklist = () => {
               }
               
               return (
-                <div key={continent} className="bg-surface/60 rounded-lg overflow-hidden border-l-4" style={{ borderLeftColor: continentMeta.color }}>
+                <Card key={continent} className="border-l-4" style={{ borderLeftColor: continentMeta.color }}>
                   {/* Continent Header */}
                   <button 
                     className="w-full p-4 flex items-center justify-between hover:bg-surface/80 transition-colors duration-200"
@@ -480,25 +485,26 @@ const GeographicalChecklist = () => {
                       </div>
                     </div>
                   )}
-                </div>
+                </Card>
               )
             })}
             
             {filteredContinents.length === 0 && (
-              <div className="bg-surface/60 rounded-lg p-8 text-center">
-                <p className="text-lg font-mono text-tertiary">No results found for "{searchTerm}"</p>
-                <button 
-                  className="mt-4 px-4 py-2 bg-accent text-white rounded-md hover:bg-accent/80 transition-colors"
-                  onClick={() => setSearchTerm('')}
-                >
-                  Clear Search
-                </button>
-              </div>
+              <Card>
+                <CardBody className="p-8 text-center">
+                  <p className="text-lg font-mono text-tertiary">No results found for "{searchTerm}"</p>
+                  <button 
+                    className="mt-4 px-4 py-2 bg-accent text-white rounded-md hover:bg-accent/80 transition-colors"
+                    onClick={() => setSearchTerm('')}
+                  >
+                    Clear Search
+                  </button>
+                </CardBody>
+              </Card>
             )}
           </div>
-          
-        </div>
-      </div>
+        </CardBody>
+      </Card>
     </div>
   )
 }

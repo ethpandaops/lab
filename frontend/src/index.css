@@ -189,6 +189,66 @@
 		@apply px-3 py-1.5 text-sm;
 	}
 
+	/* Card styles */
+	.card {
+		@apply rounded-lg overflow-hidden;
+		border: none !important;
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+	}
+	.card-primary {
+		@apply backdrop-blur-md;
+		background-color: #0f172a;
+		border: none !important;
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+	}
+	.card-secondary {
+		@apply backdrop-blur-sm;
+		background-color: #1e293b;
+		border: none !important;
+		box-shadow: 0 3px 10px rgba(0, 0, 0, 0.12);
+	}
+	.card-interactive {
+		@apply transition-all duration-200 cursor-pointer;
+		&:hover {
+			border: none !important;
+			box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+			background-color: #1e293b;
+			transform: translateY(-1px);
+		}
+	}
+	.card-header {
+		@apply p-4 md:p-6;
+		border: none !important;
+		border-bottom: none !important;
+		background-color: #0f172a;
+	}
+	.card-body {
+		@apply p-4 md:p-6;
+		border: none !important;
+	}
+	.card-footer {
+		@apply p-4 md:p-6;
+		border: none !important;
+		border-top: none !important;
+		background-color: #0f172a;
+	}
+	.card-stat {
+		@apply rounded-lg overflow-hidden;
+		border: none !important;
+		background-color: #1e293b;
+		box-shadow: 0 3px 10px rgba(0, 0, 0, 0.12);
+	}
+	.card-stat-header {
+		@apply p-3;
+		border: none !important;
+		border-bottom: none !important;
+		background-color: #0f172a;
+	}
+	.card-stat-body {
+		@apply p-3 flex items-center justify-center;
+		border: none !important;
+	}
+
 	/* Cyberpunk grid background */
 	body::before {
 		content: '';
@@ -290,5 +350,8 @@
 	}
 	.bg-content {
 		background-color: rgb(var(--bg-surface) / 0.95);
+	}
+	.bg-gradient-page {
+		background-image: linear-gradient(to bottom, rgb(var(--bg-base) / 0.95), rgb(var(--bg-base) / 0.85));
 	}
 }

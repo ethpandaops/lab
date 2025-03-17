@@ -8,6 +8,7 @@ import { BlockDetailsOverlay } from './BlockDetailsOverlay'
 import { formatNodeName } from '../../utils/format'
 import { continentCoords, getNodeCoordinates } from '../../utils/coordinates'
 import { geoEquirectangular } from 'd3-geo'
+import { Card } from '../common/Card'
 
 // Convert TopoJSON to GeoJSON
 const geoData = feature(worldAtlas as any, (worldAtlas as any).objects.countries) as unknown as FeatureCollection<Geometry>
@@ -261,9 +262,9 @@ export function GlobalMap({
           transform: 'translateX(-50%)',
           pointerEvents: 'none'
         }}
-        className="backdrop-blur-md bg-surface/90 border border-subtle rounded-lg p-2 shadow-xl max-w-xs"
+        className="card card-secondary"
       >
-        <div className="text-xs font-mono">
+        <div className="p-2 text-xs font-mono">
           {visibleNodes.length === 0 ? (
             <div className="text-tertiary">No nodes have seen the block yet</div>
           ) : (
@@ -302,9 +303,60 @@ export function GlobalMap({
   if (loading || isMissing) {
     return (
       <div className="h-full relative">
-        <div className="absolute inset-0 backdrop-blur-lg bg-surface/40 ring-1 ring-inset ring-white/5 rounded-lg animate-pulse">
-          <div className="absolute inset-0 bg-gradient-to-r from-surface/0 via-surface/20 to-surface/0" />
+        <ComposableMap
+          className="h-full w-full"
+          projection="geoEquirectangular"
+          projectionConfig={{
+            scale: 150,
+            center: [0, 30],
+          }}
+          style={{
+            width: "100%",
+            height: "100%"
+          }}
+        >
+          <defs>
+            <radialGradient id="map-gradient" cx="50%" cy="50%" r="80%" fx="50%" fy="50%">
+              <stop offset="0%" stopColor="rgba(96, 165, 250, 0.05)" />
+              <stop offset="50%" stopColor="rgba(168, 85, 247, 0.03)" />
+              <stop offset="100%" stopColor="rgba(0, 0, 0, 0)" />
+            </radialGradient>
+          </defs>
+
+          {/* Gradient background */}
+          <rect x="-1000" y="-1000" width="2000" height="2000" fill="url(#map-gradient)" />
+
+          <Geographies geography={geoData.features}>
+            {({ geographies }) =>
+              geographies.map((geo) => (
+                <Geography
+                  key={geo.rsmKey}
+                  geography={geo}
+                  fill="rgba(255, 255, 255, 0.03)"
+                  stroke="rgba(96, 165, 250, 0.3)"
+                  strokeWidth={0.3}
+                  style={{
+                    default: { outline: 'none' },
+                    hover: { outline: 'none' },
+                    pressed: { outline: 'none' },
+                  }}
+                />
+              ))
+            }
+          </Geographies>
+        </ComposableMap>
+        
+        {/* Loading overlay */}
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute inset-0 backdrop-blur-sm bg-surface/10 ring-1 ring-inset ring-white/5 rounded-lg animate-pulse">
+            <div className="absolute inset-0 bg-gradient-to-r from-surface/0 via-surface/10 to-surface/0" />
+          </div>
         </div>
+        
+        {/* Disclaimer */}
+        <Card className="absolute bottom-1 left-1 px-1.5 py-0.5">
+          <p className="text-[9px] font-mono text-tertiary">Data from nodes contributing to Xatu • Not representative of actual Ethereum network distribution</p>
+        </Card>
       </div>
     )
   }
@@ -473,9 +525,9 @@ export function GlobalMap({
       )}
       
       {/* Disclaimer */}
-      <div className="absolute bottom-1 left-1 backdrop-blur-sm bg-surface/60 rounded px-1.5 py-0.5">
+      <Card className="absolute bottom-1 left-1 px-1.5 py-0.5">
         <p className="text-[9px] font-mono text-tertiary">Data from nodes contributing to Xatu • Not representative of actual Ethereum network distribution</p>
-      </div>
+      </Card>
     </div>
   )
 } 

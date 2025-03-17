@@ -7,6 +7,7 @@ import { XatuCallToAction } from '../../components/xatu/XatuCallToAction';
 import { useContext } from 'react';
 import { ConfigContext } from '../../App';
 import { NETWORK_METADATA, type NetworkKey } from '../../constants/networks';
+import { Card } from '../../components/common/Card';
 
 interface ContributorNode {
   network: string;
@@ -121,50 +122,52 @@ function ContributorDetail(): JSX.Element {
       <XatuCallToAction />
 
       {/* Contributor Overview */}
-      <div className="backdrop-blur-sm border border-subtle hover:border-default p-6 transition-all">
-        <div className="flex items-start gap-6">
-          <div 
-            className="w-20 h-20  flex items-center justify-center text-2xl font-mono font-bold text-base shadow-neon transition-transform hover:scale-105"
-            style={{ 
-              backgroundColor: avatarColor,
-              boxShadow: `0 0 20px ${avatarColor}10`,
-            }}
-          >
-            {initials}
-          </div>
-          <div className="flex-1">
-            <div className="text-sm font-mono text-tertiary mb-4">
-              Last updated{' '}
-              <span 
-                title={new Date(contributor.updated_at * 1000).toString()}
-                className="text-primary cursor-help -b -prominent"
-              >
-                {formatDistanceToNow(new Date(contributor.updated_at * 1000), { addSuffix: true })}
-              </span>
+      <Card className="card-primary">
+        <div className="card-body">
+          <div className="flex items-start gap-6">
+            <div 
+              className="w-20 h-20 flex items-center justify-center text-2xl font-mono font-bold text-base shadow-neon transition-transform hover:scale-105"
+              style={{ 
+                backgroundColor: avatarColor,
+                boxShadow: `0 0 20px ${avatarColor}10`,
+              }}
+            >
+              {initials}
             </div>
-            <div className="flex flex-wrap gap-3">
-              {sortedNetworks.map(([network, nodes]) => {
-                const metadata = NETWORK_METADATA[network as NetworkKey] || {
-                  name: network.charAt(0).toUpperCase() + network.slice(1),
-                  icon: '🔥',
-                };
-                return (
-                  <div 
-                    key={network} 
-                    className="flex items-center gap-2 backdrop-blur-sm   -subtle px-3 py-1.5 text-sm font-mono hover:-default transition-all"
-                  >
-                    <span className="w-5 h-5 flex items-center justify-center">
-                      {metadata.icon}
-                    </span>
-                    <span className="text-primary/90">{metadata.name}</span>
-                    <span className="text-accent font-medium">{nodes.length} nodes</span>
-                  </div>
-                );
-              })}
+            <div className="flex-1">
+              <div className="text-sm font-mono text-tertiary mb-4">
+                Last updated{' '}
+                <span 
+                  title={new Date(contributor.updated_at * 1000).toString()}
+                  className="text-primary cursor-help -b -prominent"
+                >
+                  {formatDistanceToNow(new Date(contributor.updated_at * 1000), { addSuffix: true })}
+                </span>
+              </div>
+              <div className="flex flex-wrap gap-3">
+                {sortedNetworks.map(([network, nodes]) => {
+                  const metadata = NETWORK_METADATA[network as NetworkKey] || {
+                    name: network.charAt(0).toUpperCase() + network.slice(1),
+                    icon: '🔥',
+                  };
+                  return (
+                    <div 
+                      key={network} 
+                      className="flex items-center gap-2 card-secondary px-3 py-1.5 text-sm font-mono"
+                    >
+                      <span className="w-5 h-5 flex items-center justify-center">
+                        {metadata.icon}
+                      </span>
+                      <span className="text-primary/90">{metadata.name}</span>
+                      <span className="text-accent font-medium">{nodes.length} nodes</span>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      </Card>
 
       {/* Network Sections */}
       <div className="space-y-8">
@@ -188,57 +191,59 @@ function ContributorDetail(): JSX.Element {
                   const offline = isNodeOffline(node, contributor.updated_at);
                   const shortName = getShortNodeName(node.client_name);
                   return (
-                    <div
+                    <Card
                       key={node.client_name}
-                      className={`backdrop-blur-sm border p-4 transition-all ${
+                      className={`card-secondary ${
                         offline 
                           ? 'border-error/30 hover:border-error/50' 
-                          : 'border-subtle hover:border-prominent hover:bg-hover'
+                          : ''
                       }`}
                     >
-                      <div className="flex items-center gap-3 mb-4">
-                        <img
-                          src={`/clients/${node.consensus_client}.png`}
-                          alt={`${node.consensus_client} logo`}
-                          className="w-6 h-6 object-contain opacity-90"
-                          onError={(e) => {
-                            const target = e.currentTarget;
-                            target.style.display = 'none';
-                          }}
-                        />
-                        <div className="min-w-0">
-                          <div className="font-mono font-medium text-primary truncate">
-                            {shortName}
-                          </div>
-                          <div className="text-sm font-mono text-tertiary">
-                            {capitalizeWords(node.consensus_client)}
-                            {' '}
-                            ({node.consensus_version})
+                      <div className="card-body">
+                        <div className="flex items-center gap-3 mb-4">
+                          <img
+                            src={`/clients/${node.consensus_client}.png`}
+                            alt={`${node.consensus_client} logo`}
+                            className="w-6 h-6 object-contain opacity-90"
+                            onError={(e) => {
+                              const target = e.currentTarget;
+                              target.style.display = 'none';
+                            }}
+                          />
+                          <div className="min-w-0">
+                            <div className="font-mono font-medium text-primary truncate">
+                              {shortName}
+                            </div>
+                            <div className="text-sm font-mono text-tertiary">
+                              {capitalizeWords(node.consensus_client)}
+                              {' '}
+                              ({node.consensus_version})
+                            </div>
                           </div>
                         </div>
-                      </div>
 
-                      <div className="space-y-2 text-sm font-mono">
-                        <div className="flex justify-between">
-                          <span className="text-tertiary">Status</span>
-                          <span className={offline ? 'text-error' : 'text-primary'}>
-                            {offline ? 'Offline' : 'Online'}
-                          </span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-tertiary">Location</span>
-                          <span className="text-primary/90">
-                            {[node.city, node.country, node.continent].filter(Boolean).join(', ')}
-                          </span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-tertiary">Implementation</span>
-                          <span className="text-primary/90">
-                            {node.client_implementation} ({node.client_version})
-                          </span>
+                        <div className="space-y-2 text-sm font-mono">
+                          <div className="flex justify-between">
+                            <span className="text-tertiary">Status</span>
+                            <span className={offline ? 'text-error' : 'text-primary'}>
+                              {offline ? 'Offline' : 'Online'}
+                            </span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-tertiary">Location</span>
+                            <span className="text-primary/90">
+                              {[node.city, node.country, node.continent].filter(Boolean).join(', ')}
+                            </span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-tertiary">Implementation</span>
+                            <span className="text-primary/90">
+                              {node.client_implementation} ({node.client_version})
+                            </span>
+                          </div>
                         </div>
                       </div>
-                    </div>
+                    </Card>
                   );
                 })}
               </div>

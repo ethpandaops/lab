@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { AlertTriangle, Search } from 'lucide-react'
 import { NetworkContext } from '../../../App'
 import { BeaconClockManager } from '../../../utils/beacon'
+import { Card, CardBody } from '../../../components/common/Card'
 
 function SlotLookup(): JSX.Element {
   const navigate = useNavigate()
@@ -20,11 +21,11 @@ function SlotLookup(): JSX.Element {
   return (
     <div className="space-y-6">
       {/* Hero Section */}
-      <div className="relative backdrop-blur-md bg-surface/80 border border-subtle rounded-lg overflow-hidden">
+      <Card isPrimary className="relative">
         {/* Background Gradient */}
         <div className="absolute inset-0 bg-gradient-to-br from-accent/5 via-transparent to-transparent" />
         
-        <div className="relative p-6 md:p-8">
+        <CardBody className="relative">
           <div className="flex items-center gap-4 mb-6">
             <div className="w-12 h-12 rounded-lg bg-accent/10 flex items-center justify-center flex-shrink-0">
               <Search className="w-6 h-6 text-accent" />
@@ -80,21 +81,21 @@ function SlotLookup(): JSX.Element {
               <span className="text-primary">{currentSlot.toLocaleString()}</span>
             </button>
           </div>
-        </div>
-      </div>
+        </CardBody>
+      </Card>
 
       {/* Warning Section */}
-      <div className="relative backdrop-blur-md bg-surface/80 border border-warning/20 rounded-lg overflow-hidden">
+      <Card className="relative border border-warning/20">
         <div className="absolute inset-0 bg-gradient-to-br from-warning/5 via-transparent to-transparent" />
-        <div className="relative p-4 flex items-start gap-3">
+        <CardBody className="relative flex items-start gap-3">
           <div className="flex-shrink-0 mt-0.5">
             <AlertTriangle className="w-4 h-4 text-warning" />
           </div>
           <p className="text-sm font-mono text-secondary">
             This is an experimental feature. Historical slot data is only available for the past few days.
           </p>
-        </div>
-      </div>
+        </CardBody>
+      </Card>
     </div>
   )
 }
