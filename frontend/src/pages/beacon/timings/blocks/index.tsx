@@ -1,14 +1,10 @@
 import { useDataFetch } from '../../../../utils/data'
 import { LoadingState } from '../../../../components/common/LoadingState'
 import { ErrorState } from '../../../../components/common/ErrorState'
-import { NetworkSelector } from '../../../../components/common/NetworkSelector'
 import { AboutThisData } from '../../../../components/common/AboutThisData'
-import { useState, useEffect, useMemo, useRef, useContext } from 'react'
-import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend, ReferenceLine, ScatterChart, Scatter, ZAxis } from 'recharts'
-import { formatDistanceToNow } from 'date-fns'
+import { useState, useEffect, useMemo, useRef } from 'react'
 import { PERCENTILE_COLORS, PERCENTILE_LABELS, PERCENTILE_KEYS, type PercentileKey } from '../../../../constants/percentiles'
-import { ChartWithStats } from '../../../../components/charts/ChartWithStats'
-import { NetworkContext, ConfigContext } from '../../../../App'
+import { NivoLineChart } from '../../../../components/charts'
 import { useSearchParams } from 'react-router-dom'
 import { getConfig } from '../../../../config'
 import type { Config } from '../../../../types'
@@ -49,7 +45,6 @@ const DEFAULT_TIME_WINDOWS: TimeWindowConfig[] = [
 ]
 
 const TIMESTAMP_MULTIPLIER = 1000
-const DECIMAL_PLACES = 3
 const ATTESTATION_DEADLINE_COLOR = '#ef4444' // Using a red color
 
 interface LegendItem {
@@ -67,8 +62,16 @@ const BLOCK_TYPE_COLORS = {
   'Solo Non-MEV Blocks': '#ffff00', // cyber-yellow
 } as const;
 
+// Add this new constant for block type descriptions
+const BLOCK_TYPE_DESCRIPTIONS = {
+  'All Blocks': 'Shows the average arrival time for all blocks, regardless of their source.',
+  'MEV Blocks': 'Blocks that were built by MEV-Boost relays, which may have different arrival characteristics due to their specialized construction.',
+  'Non-MEV Blocks': 'Regular blocks built by validators without using MEV-Boost relays.',
+  'Solo MEV Blocks': 'Blocks built by solo stakers using MEV-Boost relays.',
+  'Solo Non-MEV Blocks': 'Blocks built by solo stakers without using MEV-Boost relays.'
+};
+
 export const BlockTimings: React.FC = () => {
-  const { selectedNetwork, setSelectedNetwork } = useContext(NetworkContext)
   const [searchParams, setSearchParams] = useSearchParams()
   const [config, setConfig] = useState<Config | null>(null)
   const [configLoading, setConfigLoading] = useState(true)
@@ -87,13 +90,15 @@ export const BlockTimings: React.FC = () => {
   const defaultTimeWindow = useMemo(() => timeWindows[0]?.file || 'last_30_days', [timeWindows])
   const defaultNetwork = useMemo(() => {
     const moduleConfig = config?.modules?.['beacon_chain_timings']
-    return moduleConfig?.networks?.[0] || 'mainnet'
+    return moduleConfig?.networks && Array.isArray(moduleConfig.networks) && moduleConfig.networks.length > 0
+      ? moduleConfig.networks[0]
+      : 'mainnet'
   }, [config])
 
   const [timeWindow, setTimeWindow] = useState<string>(() => 
     searchParams.get('timeWindow') || defaultTimeWindow
   )
-  const [network, setNetwork] = useState<string>(() => 
+  const [network] = useState<string>(() => 
     searchParams.get('network') || defaultNetwork
   )
 
@@ -103,7 +108,7 @@ export const BlockTimings: React.FC = () => {
       .then(setConfig)
       .catch(setConfigError)
       .finally(() => setConfigLoading(false))
-  })
+  }, [])
 
   // Update URL when network/timeWindow changes
   useEffect(() => {
@@ -137,7 +142,7 @@ export const BlockTimings: React.FC = () => {
     timingsPath
   )
 
-  const { data: cdfData, loading: cdfLoading, error: cdfError } = useDataFetch<CDFData>(
+  const { data: cdfData } = useDataFetch<CDFData>(
     cdfPath
   )
 
@@ -159,16 +164,6 @@ export const BlockTimings: React.FC = () => {
       p95: timingData.p95s[index] / 1000,
       blocks: timingData.blocks[index]
     }))
-  }, [timingData])
-
-  const xAxisTicks = useMemo(() => {
-    if (!timingData?.timestamps.length) return []
-    const timestamps = timingData.timestamps
-    const count = 6 // Show 6 ticks
-    const step = Math.floor(timestamps.length / (count - 1))
-    return Array.from({ length: count }, (_, i) => 
-      i === count - 1 ? timestamps[timestamps.length - 1] : timestamps[i * step]
-    )
   }, [timingData])
 
   const scatterData = useMemo(() => {
@@ -210,7 +205,6 @@ export const BlockTimings: React.FC = () => {
 
   const handleLegendClick = (event: React.MouseEvent<HTMLButtonElement>, item: LegendItem) => {
     const setHiddenLines = item.type === 'arrival' ? setHiddenArrivalLines : setHiddenSizeLines
-    const hiddenLines = item.type === 'arrival' ? hiddenArrivalLines : hiddenSizeLines
     const availableLines = getAvailableLines(item.type)
 
     setHiddenLines(prev => {
@@ -252,45 +246,6 @@ export const BlockTimings: React.FC = () => {
     return ['All Blocks', 'MEV Blocks', 'Non-MEV Blocks', 'Solo MEV Blocks', 'Solo Non-MEV Blocks']
   }
 
-  const renderLegend = (props: any, type: string) => {
-    const hiddenLines = type === 'arrival' ? hiddenArrivalLines : hiddenSizeLines
-    const availableLines = getAvailableLines(type)
-
-    return (
-      <div className="absolute top-0 right-0 w-48 p-4 space-y-2">
-        {availableLines.map((line) => {
-          const color = getLineColor(line)
-          const isHidden = hiddenLines.has(line)
-          const isOnlyVisible = !isHidden && hiddenLines.size === availableLines.length - 1
-          const label = type === 'arrival' ? PERCENTILE_LABELS[line as PercentileKey] : line
-
-          return (
-            <button
-              key={line}
-              onClick={(event) => handleLegendClick(event, { value: line, color, type })}
-              className={`flex items-center gap-2 w-full px-2 py-1.5 rounded text-xs transition-all hover:bg-hover ${
-                isHidden ? 'opacity-50 hover:opacity-70' : isOnlyVisible ? 'ring-1 ring-primary' : ''
-              }`}
-            >
-              <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: color }} />
-              <span className="flex-1 text-left truncate">{label}</span>
-            </button>
-          )
-        })}
-      </div>
-    )
-  }
-
-  const getLineColor = (line: string) => {
-    // For percentile lines
-    if (line in PERCENTILE_LABELS) {
-      const key = Object.entries(PERCENTILE_LABELS).find(([_, label]) => label === line)?.[0] as PercentileKey;
-      return key ? PERCENTILE_COLORS[key] : '#00ff9f';
-    }
-    // For block type lines
-    return BLOCK_TYPE_COLORS[line as keyof typeof BLOCK_TYPE_COLORS] || '#00ff9f';
-  }
-
   const dataKeyMap: Record<string, string> = {
     [PERCENTILE_KEYS.p95]: 'p95',
     [PERCENTILE_KEYS.p50]: 'p50',
@@ -311,12 +266,57 @@ export const BlockTimings: React.FC = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
-  // Update network handling
-  const handleNetworkChange = (newNetwork: string) => {
-    setSelectedNetwork(newNetwork)
-    // Reset data when network changes
-    setCurrentWindow(null)
-  }
+  // Transform chart data for Nivo format
+  const nivoChartData = useMemo(() => {
+    if (!chartData.length) return []
+
+    // Create a data series for each percentile
+    return lineNames.map(name => {
+      const dataKey = dataKeyMap[name]
+      return {
+        id: PERCENTILE_LABELS[name],
+        data: chartData.map(d => ({
+          x: d.time,
+          y: d[dataKey as keyof typeof d] as number
+        })),
+        color: PERCENTILE_COLORS[name]
+      }
+    }).filter(series => {
+      const key = Object.entries(PERCENTILE_LABELS).find(([, label]) => label === series.id)?.[0] as PercentileKey;
+      return key ? !hiddenArrivalLines.has(key) : true;
+    })
+  }, [chartData, lineNames, dataKeyMap, hiddenArrivalLines])
+
+  // Transform scatter data for Nivo format
+  const nivoScatterData = useMemo(() => {
+    if (!scatterData.length) return []
+
+    // Group by block type
+    const blockTypes = ['All Blocks', 'MEV Blocks', 'Non-MEV Blocks', 'Solo MEV Blocks', 'Solo Non-MEV Blocks']
+    const typeMap: Record<string, string> = {
+      'All Blocks': 'all',
+      'MEV Blocks': 'mev',
+      'Non-MEV Blocks': 'non_mev',
+      'Solo MEV Blocks': 'solo_mev',
+      'Solo Non-MEV Blocks': 'solo_non_mev'
+    }
+
+    return blockTypes
+      .filter(type => !hiddenSizeLines.has(type))
+      .map(type => {
+        const typeKey = typeMap[type]
+        return {
+          id: type,
+          data: scatterData
+            .filter(d => d.type === typeKey)
+            .map(d => ({
+              x: d.size,
+              y: d.arrival_time
+            })),
+          color: BLOCK_TYPE_COLORS[type as keyof typeof BLOCK_TYPE_COLORS]
+        }
+      })
+  }, [scatterData, hiddenSizeLines])
 
   if (configLoading || loading) {
     return <LoadingState message="Loading data..." />
@@ -404,274 +404,311 @@ export const BlockTimings: React.FC = () => {
       {/* Charts Section */}
       <section className="space-y-12">
         {/* Block Arrival Times */}
-        <ChartWithStats
-          title="Block Arrival Time Distribution"
-          description="This chart tracks block arrival times across the network, showing how quickly blocks propagate to nodes. The data is collected by nodes run by the ethPandaOps team and contributed by the community, showing aggregated results."
-          chart={
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart 
-                data={chartData}
-                margin={{ 
-                  top: 20, 
-                  right: 10, 
-                  left: 25,
-                  bottom: 40 
-                }}
-              >
-                <XAxis 
-                  dataKey="time" 
-                  stroke="currentColor"
-                  tickFormatter={formatTime}
-                  ticks={xAxisTicks}
-                  angle={-45}
-                  textAnchor="end"
-                  height={60}
-                  interval="preserveStartEnd"
-                  tick={{ fontSize: 10 }}
-                  label={{ 
-                    value: "Time",
-                    position: "insideBottom",
-                    offset: -10,
-                    style: { fill: "currentColor", fontSize: 12 }
-                  }}
-                />
-                <YAxis 
-                  stroke="currentColor"
-                  label={{ 
-                    value: 'Slot time (s)', 
-                    angle: -90, 
-                    position: 'insideLeft',
-                    style: { fill: 'currentColor', fontSize: 12 },
-                    offset: -10
-                  }}
-                  domain={[0, 6]}
-                  tick={{ fontSize: 10 }}
-                  tickFormatter={(value) => value.toFixed(1)}
-                  width={35}
-                />
-                <Tooltip 
-                  contentStyle={{
-                    backgroundColor: 'rgba(10, 10, 15, 0.95)',
-                    border: '1px solid rgba(0, 255, 159, 0.3)',
+        <div className="space-y-6">
+          <div>
+            <h2 className="text-2xl font-sans font-bold text-primary">Block Arrival Time Distribution</h2>
+            <p className="text-sm font-mono text-tertiary mt-1">
+              This chart tracks block arrival times across the network, showing how quickly blocks propagate to nodes. The data is collected by nodes run by the ethPandaOps team and contributed by the community, showing aggregated results.
+            </p>
+          </div>
+          
+          <div className="h-[500px] w-full">
+            <NivoLineChart
+              data={nivoChartData}
+              height="100%"
+              width="100%"
+              margin={{ top: 30, right: 140, left: 70, bottom: 120 }}
+              xScale={{
+                type: 'linear',
+                min: 'auto',
+                max: 'auto'
+              }}
+              yScale={{
+                type: 'linear',
+                min: 0,
+                max: 6
+              }}
+              axisBottom={{
+                tickSize: 5,
+                tickPadding: 20,
+                tickRotation: -65,
+                format: (value) => formatTime(value),
+                legend: 'Time',
+                legendOffset: 90,
+                legendPosition: 'middle'
+              }}
+              axisLeft={{
+                tickSize: 5,
+                tickPadding: 5,
+                tickRotation: 0,
+                format: (value) => value.toFixed(1),
+                legend: 'Slot time (s)',
+                legendOffset: -50,
+                legendPosition: 'middle'
+              }}
+              colors={({ id }) => {
+                const key = Object.entries(PERCENTILE_LABELS).find(([, label]) => label === id)?.[0] as PercentileKey
+                return key ? PERCENTILE_COLORS[key] : '#00ff9f'
+              }}
+              lineWidth={2}
+              pointSize={0}
+              enableSlices="x"
+              enableGridX={true}
+              enableGridY={true}
+              markers={[
+                {
+                  axis: 'y',
+                  value: 4,
+                  lineStyle: { stroke: ATTESTATION_DEADLINE_COLOR, strokeWidth: 2, strokeDasharray: '5,2' },
+                  legend: 'Attestation Deadline',
+                  legendPosition: 'top-right'
+                }
+              ]}
+              tooltip={({ point }) => {
+                const xValue = typeof point.data.x === 'number' ? point.data.x : parseFloat(point.data.x as string);
+                const yValue = typeof point.data.y === 'number' ? point.data.y : parseFloat(point.data.y as string);
+                
+                return (
+                  <div style={{ 
+                    background: '#0a0a0f', 
+                    color: '#00ff9f', 
+                    padding: '9px 12px', 
+                    border: '1px solid rgba(0, 255, 159, 0.3)', 
                     borderRadius: '0.5rem',
-                    color: '#00ff9f',
                     fontSize: '12px'
-                  }}
-                  labelFormatter={(time) => new Date(time * TIMESTAMP_MULTIPLIER).toLocaleString()}
-                  formatter={(value: number, name: string) => [
-                    `${value.toFixed(DECIMAL_PLACES)}s`,
-                    PERCENTILE_LABELS[name as PercentileKey] || name
-                  ]}
-                />
-                <ReferenceLine 
-                  y={4} 
-                  stroke={ATTESTATION_DEADLINE_COLOR}
-                  strokeWidth={2}
-                  strokeDasharray="5 2"
-                />
-                {lineNames.map((name) => (
-                  <Line
-                    key={name}
-                    type="monotone"
-                    dataKey={dataKeyMap[name]}
-                    name={PERCENTILE_LABELS[name]}
-                    stroke={PERCENTILE_COLORS[name]}
-                    strokeWidth={2}
-                    dot={false}
-                    opacity={hiddenArrivalLines.has(name) ? 0.2 : 1}
-                  />
-                ))}
-              </LineChart>
-            </ResponsiveContainer>
-          }
-          series={getAvailableLines('arrival').map((line) => {
-            const isHidden = hiddenArrivalLines.has(line)
-            const isOnlyVisible = !isHidden && hiddenArrivalLines.size === getAvailableLines('arrival').length - 1
-            const color = PERCENTILE_COLORS[line as PercentileKey]
-            const values = chartData.map(d => d[dataKeyMap[line as PercentileKey] as keyof typeof d]).filter(Boolean)
-            const latestValue = values[values.length - 1] || 0
-            const avg = values.length ? values.reduce((a, b) => a + b, 0) / values.length : 0
-            const min = values.length ? Math.min(...values) : 0
-            const max = values.length ? Math.max(...values) : 0
-
-            return {
-              name: PERCENTILE_LABELS[line as PercentileKey],
-              color,
-              min,
-              avg,
-              max,
-              last: latestValue,
-              isHidden,
-              isHighlighted: isOnlyVisible,
-              unit: 's',
-              onClick: (e) => handleLegendClick(e, { value: line, color, type: 'arrival' })
-            }
-          })}
-        />
+                  }}>
+                    <div>{new Date(xValue * TIMESTAMP_MULTIPLIER).toLocaleString()}</div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <div style={{ width: '12px', height: '12px', backgroundColor: point.serieColor, borderRadius: '2px' }}></div>
+                      <strong>{point.serieId}:</strong> {yValue.toFixed(3)}s
+                    </div>
+                  </div>
+                );
+              }}
+              legends={[
+                {
+                  anchor: 'right',
+                  direction: 'column',
+                  justify: false,
+                  translateX: 120,
+                  translateY: 0,
+                  itemsSpacing: 0,
+                  itemDirection: 'left-to-right',
+                  itemWidth: 80,
+                  itemHeight: 20,
+                  itemOpacity: 0.75,
+                  symbolSize: 12,
+                  symbolShape: 'square',
+                  symbolBorderColor: 'rgba(0, 0, 0, .5)',
+                  effects: [
+                    {
+                      on: 'hover',
+                      style: {
+                        itemBackground: 'rgba(0, 0, 0, .03)',
+                        itemOpacity: 1
+                      }
+                    }
+                  ],
+                  onClick: (data, event) => {
+                    const key = Object.entries(PERCENTILE_LABELS).find(([, label]) => label === data.id)?.[0] as PercentileKey;
+                    if (key) {
+                      handleLegendClick(
+                        event as unknown as React.MouseEvent<HTMLButtonElement>, 
+                        { value: key, color: data.color as string, type: 'arrival' }
+                      );
+                    }
+                  }
+                }
+              ]}
+            />
+          </div>
+          
+          {/* Custom Stats Display */}
+          <div className="overflow-x-auto">
+            <table className="min-w-full text-xs">
+              <thead>
+                <tr className="border-b border-default">
+                  <th className="py-2 px-3 text-left">Percentile</th>
+                  <th className="py-2 px-3 text-right">Min</th>
+                  <th className="py-2 px-3 text-right">Avg</th>
+                  <th className="py-2 px-3 text-right">Max</th>
+                  <th className="py-2 px-3 text-right">Last</th>
+                </tr>
+              </thead>
+              <tbody>
+                {getAvailableLines('arrival').map((line) => {
+                  const isHidden = hiddenArrivalLines.has(line);
+                  if (isHidden) return null;
+                  
+                  const values = chartData.map(d => d[dataKeyMap[line as PercentileKey] as keyof typeof d]).filter(Boolean) as number[];
+                  const latestValue = values[values.length - 1] || 0;
+                  const avg = values.length ? values.reduce((a, b) => a + b, 0) / values.length : 0;
+                  const min = values.length ? Math.min(...values) : 0;
+                  const max = values.length ? Math.max(...values) : 0;
+                  
+                  return (
+                    <tr key={line} className="border-b border-default hover:bg-hover">
+                      <td className="py-2 px-3 flex items-center gap-2">
+                        <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: PERCENTILE_COLORS[line as PercentileKey] }} />
+                        <span>{PERCENTILE_LABELS[line as PercentileKey]}</span>
+                      </td>
+                      <td className="py-2 px-3 text-right">{min.toFixed(3)}s</td>
+                      <td className="py-2 px-3 text-right">{avg.toFixed(3)}s</td>
+                      <td className="py-2 px-3 text-right">{max.toFixed(3)}s</td>
+                      <td className="py-2 px-3 text-right">{latestValue.toFixed(3)}s</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
 
         {/* Block Size vs Arrival Time */}
-        <ChartWithStats
-          title="Block Size vs Arrival Time"
-          description="This chart analyzes the relationship between block size and network propagation time, helping identify how block size impacts network performance. The data is collected by nodes run by the ethPandaOps team and contributed by the community, showing aggregated results."
-          chart={
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart margin={{ 
-                top: 20, 
-                right: 10, 
-                left: 25,
-                bottom: 40 
-              }}>
-                <XAxis 
-                  dataKey="size" 
-                  stroke="currentColor"
-                  label={{ 
-                    value: 'Block+Blob Size (KB)',
-                    position: 'insideBottom',
-                    offset: -10,
-                    style: { fill: 'currentColor', fontSize: 12 }
-                  }}
-                  type="number"
-                  domain={[0, 1536]}
-                  tickFormatter={(value) => value.toFixed(0)}
-                  tick={{ fontSize: 10 }}
-                  width={35}
-                />
-                <YAxis 
-                  dataKey="arrival_time"
-                  stroke="currentColor"
-                  label={{ 
-                    value: 'Time (s)',
-                    angle: -90, 
-                    position: 'insideLeft',
-                    style: { fill: 'currentColor', fontSize: 12 },
-                    offset: -10
-                  }}
-                  domain={[0, 6]}
-                  tick={{ fontSize: 10 }}
-                  tickFormatter={(value) => Math.round(value).toString()}
-                  width={35}
-                />
-                <Tooltip 
-                  contentStyle={{
-                    backgroundColor: 'rgba(10, 10, 15, 0.95)',
-                    border: '1px solid rgba(0, 255, 159, 0.3)',
+        <div className="space-y-6">
+          <div>
+            <h2 className="text-2xl font-sans font-bold text-primary">Block Size vs Arrival Time</h2>
+            <p className="text-sm font-mono text-tertiary mt-1">
+              This chart analyzes the relationship between block size and network propagation time, helping identify how block size impacts network performance. The data is collected by nodes run by the ethPandaOps team and contributed by the community, showing aggregated results.
+            </p>
+          </div>
+          
+          <div className="h-[500px] w-full" style={{ cursor: 'pointer' }}>
+            <NivoLineChart
+              data={nivoScatterData}
+              height="100%"
+              width="100%"
+              margin={{ top: 30, right: 140, left: 70, bottom: 80 }}
+              xScale={{
+                type: 'linear',
+                min: 0,
+                max: 1536
+              }}
+              yScale={{
+                type: 'linear',
+                min: 0,
+                max: 6
+              }}
+              axisBottom={{
+                tickSize: 5,
+                tickPadding: 15,
+                tickRotation: 0,
+                format: (value) => value.toFixed(0),
+                legend: 'Block+Blob Size (KB)',
+                legendOffset: 60,
+                legendPosition: 'middle'
+              }}
+              axisLeft={{
+                tickSize: 5,
+                tickPadding: 5,
+                tickRotation: 0,
+                format: (value) => Math.round(value).toString(),
+                legend: 'Time (s)',
+                legendOffset: -50,
+                legendPosition: 'middle'
+              }}
+              colors={({ id }) => BLOCK_TYPE_COLORS[id as keyof typeof BLOCK_TYPE_COLORS] || '#00ff9f'}
+              lineWidth={2}
+              pointSize={0}
+              enableSlices="x"
+              enableGridX={true}
+              enableGridY={true}
+              markers={[
+                {
+                  axis: 'y',
+                  value: 4,
+                  lineStyle: { stroke: ATTESTATION_DEADLINE_COLOR, strokeWidth: 2, strokeDasharray: '5,2' },
+                  legend: 'Attestation Deadline',
+                  legendPosition: 'top-right'
+                }
+              ]}
+              tooltip={({ point }) => {
+                const xValue = typeof point.data.x === 'number' ? point.data.x : parseFloat(point.data.x as string);
+                const yValue = typeof point.data.y === 'number' ? point.data.y : parseFloat(point.data.y as string);
+                const blockType = point.serieId as keyof typeof BLOCK_TYPE_DESCRIPTIONS;
+                const description = BLOCK_TYPE_DESCRIPTIONS[blockType];
+                
+                return (
+                  <div style={{ 
+                    background: '#0a0a0f', 
+                    color: '#00ff9f', 
+                    padding: '9px 12px', 
+                    border: '1px solid rgba(0, 255, 159, 0.3)', 
                     borderRadius: '0.5rem',
-                    color: '#00ff9f',
-                    fontSize: '12px'
-                  }}
-                  labelFormatter={(value) => `Block+Blob Size: ${value.toFixed(1)} KB`}
-                  formatter={(value: number, name: string) => {
-                    const blockType = name.replace('arrival_time', '').trim();
-                    const label = blockType || 'Arrival Time';
-                    return [`${value.toFixed(DECIMAL_PLACES)}s`, label];
-                  }}
-                  separator=": "
-                />
-                <ReferenceLine
-                  y={4}
-                  stroke={ATTESTATION_DEADLINE_COLOR}
-                  strokeWidth={2}
-                  strokeDasharray="5 2"
-                  segment={[{ x: 0, y: 4 }, { x: '15%', y: 4 }, { x: '40%', y: 4 }, { x: '100%', y: 4 }]}
-                />
-
-                {/* Legend Box */}
-                <g className="recharts-legend" transform="translate(500, 10)">
-                  <g className="recharts-legend-item">
-                    <rect
-                      x="0"
-                      y="0"
-                      width="180"
-                      height="24"
-                      fill="rgba(10, 10, 15, 0.95)"
-                      stroke="rgba(0, 255, 159, 0.3)"
-                      strokeWidth="1"
-                      rx="4"
-                    />
-                    <line 
-                      x1="8" 
-                      y1="12" 
-                      x2="28" 
-                      y2="12" 
-                      stroke={ATTESTATION_DEADLINE_COLOR} 
-                      strokeWidth={2} 
-                      strokeDasharray="5 2" 
-                    />
-                    <text x="36" y="16" fill="currentColor" style={{ fontSize: '12px' }}>
-                      Attestation Deadline
-                    </text>
-                  </g>
-                </g>
-
-                {getAvailableLines('size').map((name) => {
-                  const typeMap: Record<string, string> = {
-                    'All Blocks': 'all',
-                    'MEV Blocks': 'mev',
-                    'Non-MEV Blocks': 'non_mev',
-                    'Solo MEV Blocks': 'solo_mev',
-                    'Solo Non-MEV Blocks': 'solo_non_mev'
+                    fontSize: '12px',
+                    maxWidth: '300px'
+                  }}>
+                    <div>Block+Blob Size: {xValue.toFixed(1)} KB</div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+                      <div style={{ width: '12px', height: '12px', backgroundColor: point.serieColor, borderRadius: '2px' }}></div>
+                      <strong>{point.serieId}:</strong> {yValue.toFixed(3)}s
+                    </div>
+                    <div style={{ borderTop: '1px solid rgba(0, 255, 159, 0.2)', paddingTop: '6px', fontSize: '11px', opacity: 0.9 }}>
+                      {description}
+                    </div>
+                  </div>
+                );
+              }}
+              legends={[
+                {
+                  anchor: 'right',
+                  direction: 'column',
+                  justify: false,
+                  translateX: 120,
+                  translateY: 0,
+                  itemsSpacing: 2,
+                  itemDirection: 'left-to-right',
+                  itemWidth: 100,
+                  itemHeight: 20,
+                  itemOpacity: 0.75,
+                  symbolSize: 12,
+                  symbolShape: 'square',
+                  symbolBorderColor: 'rgba(0, 0, 0, .5)',
+                  effects: [
+                    {
+                      on: 'hover',
+                      style: {
+                        itemBackground: 'rgba(0, 0, 0, .03)',
+                        itemOpacity: 1
+                      }
+                    }
+                  ],
+                  onClick: (data, event) => {
+                    handleLegendClick(
+                      event as unknown as React.MouseEvent<HTMLButtonElement>, 
+                      { value: data.id as string, color: data.color as string, type: 'size' }
+                    );
                   }
-                  return (
-                    <Line
-                      key={name}
-                      type="monotone"
-                      data={scatterData.filter(d => d.type === typeMap[name])}
-                      dataKey="arrival_time"
-                      name={name}
-                      stroke={BLOCK_TYPE_COLORS[name as keyof typeof BLOCK_TYPE_COLORS]}
-                      strokeWidth={2}
-                      dot={false}
-                      opacity={hiddenSizeLines.has(name) ? 0.2 : 1}
-                    />
-                  )
-                })}
-              </LineChart>
-            </ResponsiveContainer>
-          }
-          notes={
-            <>
-              <h3 className="text-xl font-sans font-bold text-primary mb-4">Notes</h3>
-              <ul className="list-disc list-inside space-y-2">
-                <li><span className="text-accent">All Blocks</span>: Shows the average arrival time for all blocks, regardless of their source.</li>
-                <li><span className="text-error">MEV Blocks</span>: Blocks that were built by MEV-Boost relays, which may have different arrival characteristics due to their specialized construction.</li>
-                <li><span className="text-primary">Non-MEV Blocks</span>: Regular blocks built by validators without using MEV-Boost relays.</li>
-                <li><span className="text-accent-secondary">Solo MEV</span>: Blocks built by solo stakers using MEV-Boost relays.</li>
-                <li><span className="text-warning">Solo Non-MEV</span>: Blocks built by solo stakers without using MEV-Boost relays.</li>
-              </ul>
-            </>
-          }
-          series={getAvailableLines('size').map((name) => {
-            const typeMap: Record<string, string> = {
-              'All Blocks': 'all',
-              'MEV Blocks': 'mev',
-              'Non-MEV Blocks': 'non_mev',
-              'Solo MEV Blocks': 'solo_mev',
-              'Solo Non-MEV Blocks': 'solo_non_mev'
-            }
-            const type = typeMap[name]
-            const data = scatterData.filter(d => d.type === type).map(d => d.arrival_time)
-            const isHidden = hiddenSizeLines.has(name)
-            const isOnlyVisible = !isHidden && hiddenSizeLines.size === getAvailableLines('size').length - 1
-            const color = BLOCK_TYPE_COLORS[name as keyof typeof BLOCK_TYPE_COLORS]
-            const latestValue = data[data.length - 1] || 0
-            const avg = data.length ? data.reduce((a, b) => a + b, 0) / data.length : 0
-            const min = data.length ? Math.min(...data) : 0
-            const max = data.length ? Math.max(...data) : 0
-
-            return {
-              name,
-              color,
-              min,
-              avg,
-              max,
-              last: latestValue,
-              isHidden,
-              isHighlighted: isOnlyVisible,
-              unit: 's',
-              onClick: (e) => handleLegendClick(e, { value: name, color, type: 'size' })
-            }
-          })}
-        />
+                }
+              ]}
+            />
+          </div>
+          
+          {/* Block Type Descriptions Table */}
+          <div className="mt-6 overflow-x-auto">
+            <table className="min-w-full text-xs">
+              <thead>
+                <tr className="border-b border-default">
+                  <th className="py-2 px-3 text-left">Block Type</th>
+                  <th className="py-2 px-3 text-left">Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                {Object.entries(BLOCK_TYPE_COLORS).map(([type, color]) => (
+                  <tr key={type} className="border-b border-default hover:bg-hover">
+                    <td className="py-2 px-3 flex items-center gap-2 whitespace-nowrap">
+                      <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: color }} />
+                      <span>{type}</span>
+                    </td>
+                    <td className="py-2 px-3">
+                      {BLOCK_TYPE_DESCRIPTIONS[type as keyof typeof BLOCK_TYPE_DESCRIPTIONS]}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
       </section>
     </div>
   )

@@ -64,7 +64,6 @@ export function NetworkSelector({
   className = ''
 }: NetworkSelectorProps): JSX.Element {
   const [config, setConfig] = useState<Config>()
-  const [isOpen, setIsOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -74,7 +73,7 @@ export function NetworkSelector({
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsOpen(false)
+        // Close dropdown logic if needed
       }
     }
 

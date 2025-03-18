@@ -10,7 +10,7 @@ import type { Config } from '../../types'
 import { useSearchParams, useLocation, useNavigate } from 'react-router-dom'
 import { GlobeViz } from '../../components/xatu/GlobeViz'
 import { AboutThisData } from '../../components/common/AboutThisData'
-import { ChartWithStats } from '../../components/charts/ChartWithStats'
+import { ChartWithStats, NivoLineChart } from '../../components/charts'
 import { ConfigContext, NetworkContext } from '../../App'
 import { useContext } from 'react'
 
@@ -178,7 +178,7 @@ export const CommunityNodes = () => {
 
     // Convert the new format to chart data
     const chartData = countriesData.map(timePoint => {
-      const dataPoint: Record<string, any> = { time: timePoint.time };
+      const dataPoint: Record<string, number | string> = { time: timePoint.time };
       timePoint.countries.forEach(country => {
         dataPoint[country.name] = country.value;
       });
@@ -217,7 +217,7 @@ export const CommunityNodes = () => {
 
     // Convert the new format to chart data
     const chartData = usersData.map(timePoint => {
-      const dataPoint: Record<string, any> = { time: timePoint.time };
+      const dataPoint: Record<string, number | string> = { time: timePoint.time };
       timePoint.users.forEach(user => {
         dataPoint[user.name] = user.nodes;
       });
@@ -244,7 +244,6 @@ export const CommunityNodes = () => {
 
   const handleLegendClick = (e: React.MouseEvent<HTMLButtonElement>, item: { value: string; type: string }) => {
     const setHiddenItems = item.type === 'country' ? setHiddenCountries : setHiddenUsers
-    const hiddenItems = item.type === 'country' ? hiddenCountries : hiddenUsers
     const availableItems = item.type === 'country' ? topCountries : topUsers
 
     setHiddenItems(prev => {
@@ -414,80 +413,64 @@ export const CommunityNodes = () => {
           }
           description="Total number of Xatu nodes over time."
           chart={
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart 
-                data={totalNodesData}
-                margin={{ 
-                  top: 20, 
-                  right: 10, 
-                  left: 25,
-                  bottom: 40 
-                }}
-              >
-                <XAxis 
-                  dataKey="time" 
-                  stroke="currentColor"
-                  tickFormatter={(str) => {
-                    const date = new Date(str * 1000);
-                    return currentWindow?.step === '1h'
-                      ? date.toLocaleTimeString() 
-                      : date.toLocaleDateString();
-                  }}
-                  angle={-45}
-                  textAnchor="end"
-                  height={60}
-                  interval="preserveStartEnd"
-                  tick={{ fontSize: 10 }}
-                  label={{ 
-                    value: "Time",
-                    position: "insideBottom",
-                    offset: -10,
-                    style: { fill: "currentColor", fontSize: 12 }
-                  }}
-                />
-                <YAxis 
-                  stroke="currentColor"
-                  label={{ 
-                    value: 'Number of Nodes', 
-                    angle: -90, 
-                    position: 'insideLeft',
-                    style: { fill: 'currentColor', fontSize: 12 },
-                    offset: -10
-                  }}
-                  tick={{ fontSize: 10 }}
-                  width={35}
-                />
-                <Tooltip 
-                  contentStyle={{
-                    backgroundColor: 'rgba(10, 10, 15, 0.95)',
-                    border: '1px solid rgba(0, 255, 159, 0.3)',
-                    borderRadius: '0.5rem',
-                    color: '#00ff9f',
-                    fontSize: '12px'
-                  }}
-                  labelFormatter={(value) => new Date(value * 1000).toLocaleString()}
-                  formatter={(value: number) => [value, 'Nodes']}
-                />
-                <Line
-                  type="monotone"
-                  dataKey="total"
-                  name="Total Nodes"
-                  stroke="#00ffff"
-                  strokeWidth={2}
-                  dot={false}
-                />
-              </LineChart>
-            </ResponsiveContainer>
+            <NivoLineChart
+              data={[
+                {
+                  id: 'total',
+                  data: totalNodesData.map(d => ({ 
+                    x: d.time, 
+                    y: d.total 
+                  }))
+                }
+              ]}
+              margin={{ 
+                top: 20, 
+                right: 10, 
+                left: 25,
+                bottom: 40 
+              }}
+              xScale={{
+                type: 'time',
+                format: 'native',
+                precision: 'second'
+              }}
+              yScale={{
+                type: 'linear',
+                min: 0,
+                max: 'auto'
+              }}
+              axisBottom={{
+                format: (value) => {
+                  const date = new Date(value * 1000);
+                  return currentWindow?.step === '1h'
+                    ? date.toLocaleTimeString() 
+                    : date.toLocaleDateString();
+                },
+                tickRotation: -45,
+                legend: "Time",
+                legendOffset: 36,
+                legendPosition: "middle"
+              }}
+              axisLeft={{
+                legend: "Number of Nodes",
+                legendOffset: -40,
+                legendPosition: "middle"
+              }}
+              colors={['currentColor']}
+              pointSize={0}
+              enableSlices="x"
+            />
           }
-          series={[{
-            name: 'Total Nodes',
-            color: '#00ffff',
-            min: Math.min(...totalNodesData.map(d => d.total)),
-            avg: totalNodesData.reduce((sum, d) => sum + d.total, 0) / totalNodesData.length,
-            max: Math.max(...totalNodesData.map(d => d.total)),
-            last: totalNodesData[totalNodesData.length - 1]?.total || 0,
-            unit: ''
-          }]}
+          series={[
+            {
+              name: "Total Nodes",
+              color: "currentColor",
+              min: Math.min(...totalNodesData.map(d => d.total)),
+              max: Math.max(...totalNodesData.map(d => d.total)),
+              avg: totalNodesData.reduce((sum, d) => sum + d.total, 0) / totalNodesData.length,
+              last: totalNodesData[totalNodesData.length - 1].total
+            }
+          ]}
         />
 
         {/* Nodes by Country Chart */}

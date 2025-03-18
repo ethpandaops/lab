@@ -1,15 +1,9 @@
 import { useMemo } from 'react'
-import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Scatter, ScatterChart, ReferenceArea, ReferenceLine } from 'recharts'
-import { ChartWithStats } from '../../charts/ChartWithStats'
+import { ChartWithStats, NivoLineChart, NivoScatterChart } from '../../charts'
 import { CheckCircle2, XCircle, HelpCircle } from 'lucide-react'
 import { useModal } from '../../../contexts/ModalContext'
 
-interface BlobTimingData {
-  [node: string]: {
-    [index: string]: number
-  }
-}
-
+// Interface for DataAvailabilityPanelProps
 interface DataAvailabilityPanelProps {
   blobTimings: {
     blob_seen?: Record<string, Record<string, number>>
@@ -18,8 +12,6 @@ interface DataAvailabilityPanelProps {
     block_first_seen_p2p?: Record<string, number>
   }
   currentTime: number
-  loading: boolean
-  isMissing: boolean
   nodes?: Record<string, { geo?: { continent?: string } }>
 }
 
@@ -57,11 +49,93 @@ const BLOB_COLORS = [
   'rgb(128, 255, 0)',   // Lime
 ]
 
+// Custom component for labeled scatter plot
+const LabeledScatterPlot = ({ 
+  data, 
+  blockTime, 
+  blobCount 
+}: { 
+  data: { index: number; time: number }[]; 
+  blockTime: number | null; 
+  blobCount: number 
+}) => {
+  // Calculate appropriate tick values based on blob count
+  const getYAxisTicks = () => {
+    if (blobCount <= 10) {
+      return [-0.5, ...Array.from({ length: Math.min(blobCount, 5) }, (_, i) => i)];
+    } else if (blobCount <= 20) {
+      return [-0.5, 0, 5, 10, 15, blobCount - 1];
+    } else {
+      // For large numbers of blobs (up to 72)
+      const step = Math.ceil(blobCount / 5);
+      return [-0.5, 0, step, 2 * step, 3 * step, 4 * step, blobCount - 1].filter(
+        (v, i, a) => a.indexOf(v) === i && v < blobCount
+      );
+    }
+  };
+
+  return (
+    <div className="w-full h-full">
+      <NivoScatterChart
+        data={[
+          {
+            id: 'blobs',
+            data: data.map(d => ({ x: d.time, y: d.index }))
+          },
+          ...(blockTime !== null ? [{
+            id: 'block',
+            data: [{ x: blockTime, y: -0.5 }]
+          }] : [])
+        ]}
+        margin={{ top: 16, right: 8, left: 30, bottom: 24 }}
+        xScale={{
+          type: 'linear',
+          min: 0,
+          max: 12
+        }}
+        yScale={{
+          type: 'linear',
+          min: -1,
+          max: Math.max(blobCount - 1, 0) + 1 // Add some padding
+        }}
+        axisBottom={{
+          tickSize: 2,
+          tickPadding: 5,
+          tickRotation: 0,
+          tickValues: [0, 4, 8, 12],
+          format: (value) => value.toString(),
+          legend: 'Time (s)',
+          legendOffset: 20,
+          legendPosition: 'middle'
+        }}
+        axisLeft={{
+          tickSize: 2,
+          tickPadding: 5,
+          tickRotation: 0,
+          tickValues: getYAxisTicks(),
+          format: (value) => value === -0.5 ? 'B' : value.toString(),
+          legend: '',
+          legendOffset: -20,
+          legendPosition: 'middle'
+        }}
+        colors={({ serieId }) => {
+          // For block series, use blue
+          if (serieId === 'block') return 'rgb(0, 128, 255)'
+          
+          // For blob series, use the first color from our palette
+          return BLOB_COLORS[0];
+        }}
+        nodeSize={4}
+        enableGridX={true}
+        enableGridY={true}
+      />
+    </div>
+  );
+};
+
 export function DataAvailabilityPanel({
   blobTimings,
   currentTime,
-  loading,
-  isMissing,
   nodes
 }: DataAvailabilityPanelProps): JSX.Element {
   const { showModal } = useModal()
@@ -171,7 +245,7 @@ export function DataAvailabilityPanel({
         .sort((a, b) => a[1] - b[1])
       
       // Add a point for each blob seen
-      blobTimes.forEach(([_, time], index) => {
+      blobTimes.forEach(([, time], index) => {
         points.push({
           time: time / 1000,
           percentage: ((index + 1) / seenBlobs.size) * 100
@@ -231,9 +305,6 @@ export function DataAvailabilityPanel({
       ...Object.keys(blobTimings.blob_first_seen_p2p || {})
     ])
 
-
-    let nodesWithBlock = 0
-    let nodesWithBlobs = 0
     allNodes.forEach(node => {
       // Process block arrivals
       const blockTime = Math.min(
@@ -252,13 +323,11 @@ export function DataAvailabilityPanel({
         const binIndex = Math.floor(blockTime / 50)
         if (binIndex >= 0 && binIndex < blockBins.length) {
           blockBins[binIndex]++
-          nodesWithBlock++
 
           // If there are no blobs, also increment blob bins at the same time
           // since the block is all that's needed for data availability
           if (seenBlobs.size === 0) {
             blobBins[binIndex]++
-            nodesWithBlobs++
           }
         }
       }
@@ -270,7 +339,6 @@ export function DataAvailabilityPanel({
           const binIndex = Math.floor(lastBlobTime / 50)
           if (binIndex >= 0 && binIndex < blobBins.length) {
             blobBins[binIndex]++
-            nodesWithBlobs++
           }
         }
       }
@@ -348,46 +416,13 @@ export function DataAvailabilityPanel({
               title={<div className="text-[8px] font-medium text-primary/50 uppercase tracking-wider">First Seen</div>}
               height={140}
               titlePlacement="inside"
+              valueHeader="Time"
               chart={
-                <ResponsiveContainer width="100%" height={140}>
-                  <ScatterChart
-                    margin={{ top: 16, right: 8, left: 0, bottom: 4 }}
-                  >
-                    <XAxis
-                      dataKey="time"
-                      stroke="currentColor"
-                      tick={{ fontSize: 8 }}
-                      ticks={[0, 4, 8, 12]}
-                      domain={[0, 12]}
-                      type="number"
-                      allowDataOverflow
-                      tickSize={2}
-                      strokeWidth={1}
-                    />
-                    <YAxis
-                      dataKey="index"
-                      stroke="currentColor"
-                      tick={false}
-                      tickSize={0}
-                      width={16}
-                      strokeWidth={1}
-                      domain={[0, Math.max(blobCount - 1, 0)]}
-                    />
-                    {blockTime !== null && (
-                      <Scatter
-                        data={[{ time: blockTime, index: -0.5 }]}
-                        fill="rgb(0, 128, 255)"
-                      />
-                    )}
-                    {firstSeenData.map((d, i) => (
-                      <Scatter
-                        key={d.index}
-                        data={[d]}
-                        fill={BLOB_COLORS[i % BLOB_COLORS.length]}
-                      />
-                    ))}
-                  </ScatterChart>
-                </ResponsiveContainer>
+                <LabeledScatterPlot 
+                  data={firstSeenData} 
+                  blockTime={blockTime} 
+                  blobCount={blobCount} 
+                />
               }
               series={[
                 {
@@ -419,50 +454,57 @@ export function DataAvailabilityPanel({
               title={<div className="text-[8px] font-medium text-primary/50 uppercase tracking-wider">Data Is Available Rate</div>}
               height={140}
               titlePlacement="inside"
+              valueHeader="Count"
               chart={
-                <ResponsiveContainer width="100%" height={140}>
-                  <LineChart
-                    data={arrivalData}
-                    margin={{ top: 16, right: 8, left: 0, bottom: 4 }}
-                  >
-                    <XAxis
-                      dataKey="time"
-                      stroke="currentColor"
-                      tick={{ fontSize: 8 }}
-                      ticks={[0, 4, 8, 12]}
-                      domain={[0, 12]}
-                      type="number"
-                      allowDataOverflow
-                      tickSize={2}
-                      strokeWidth={1}
-                    />
-                    <YAxis
-                      stroke="currentColor"
-                      tick={{ fontSize: 8 }}
-                      tickSize={2}
-                      width={25}
-                      strokeWidth={1}
-                    />
-                    <Line
-                      type="monotone"
-                      dataKey="blocks"
-                      name="Block Arrivals"
-                      stroke="rgb(var(--cyber-cyan))"
-                      strokeWidth={1}
-                      dot={false}
-                      isAnimationActive={false}
-                    />
-                    <Line
-                      type="monotone"
-                      dataKey="blobs"
-                      name="Blob Arrivals"
-                      stroke="rgb(var(--success))"
-                      strokeWidth={1}
-                      dot={false}
-                      isAnimationActive={false}
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
+                <NivoLineChart
+                  data={[
+                    {
+                      id: 'Block Arrivals',
+                      data: arrivalData.map(d => ({ x: d.time, y: d.blocks }))
+                    },
+                    {
+                      id: 'Blob Arrivals',
+                      data: arrivalData.map(d => ({ x: d.time, y: d.blobs }))
+                    }
+                  ]}
+                  margin={{ top: 16, right: 8, left: 36, bottom: 24 }}
+                  xScale={{
+                    type: 'linear',
+                    min: 0,
+                    max: 12
+                  }}
+                  yScale={{
+                    type: 'linear',
+                    min: 0,
+                    max: 'auto'
+                  }}
+                  axisBottom={{
+                    tickSize: 2,
+                    tickPadding: 5,
+                    tickRotation: 0,
+                    tickValues: [0, 4, 8, 12],
+                    format: (value) => value.toString(),
+                    legend: 'Time (s)',
+                    legendOffset: 20,
+                    legendPosition: 'middle'
+                  }}
+                  axisLeft={{
+                    tickSize: 2,
+                    tickPadding: 5,
+                    tickRotation: 0,
+                    legend: 'Nodes',
+                    legendOffset: -30,
+                    legendPosition: 'middle'
+                  }}
+                  colors={[
+                    'rgb(var(--cyber-cyan))',
+                    'rgb(var(--success))'
+                  ]}
+                  pointSize={0}
+                  enableGridX={true}
+                  enableGridY={true}
+                  lineWidth={1}
+                />
               }
               series={[
                 {
@@ -495,48 +537,54 @@ export function DataAvailabilityPanel({
               height={140}
               titlePlacement="inside"
               showHeader={true}
+              compactSeries={true}
+              valueHeader="Time"
               chart={
-                <ResponsiveContainer width="100%" height={140}>
-                  <LineChart
-                    margin={{ top: 16, right: 8, left: 0, bottom: 4 }}
-                  >
-                    <XAxis
-                      dataKey="time"
-                      stroke="currentColor"
-                      tick={{ fontSize: 8 }}
-                      domain={[timeWindow.min, timeWindow.max]}
-                      ticks={timeWindow.ticks}
-                      type="number"
-                      allowDataOverflow
-                      tickSize={2}
-                      strokeWidth={1}
-                    />
-                    <YAxis
-                      stroke="currentColor"
-                      tick={{ fontSize: 8 }}
-                      tickSize={2}
-                      width={25}
-                      strokeWidth={1}
-                      domain={[0, 120]}
-                      ticks={[0, 25, 50, 75, 100]}
-                      tickFormatter={(value) => `${value}%`}
-                    />
-                    {continentalData.map((continent, i) => (
-                      <Line
-                        key={continent.continent}
-                        data={continent.points}
-                        type="stepAfter"
-                        dataKey="percentage"
-                        name={CONTINENT_NAMES[continent.continent] || continent.continent}
-                        stroke={CONTINENT_COLORS[continent.continent] || 'rgb(var(--success))'}
-                        dot={false}
-                        isAnimationActive={false}
-                      />
-                    ))}
-                  </LineChart>
-                </ResponsiveContainer>
+                <NivoLineChart
+                  data={continentalData.map(continent => ({
+                    id: CONTINENT_NAMES[continent.continent] || continent.continent,
+                    data: continent.points.map(p => ({ x: p.time, y: p.percentage }))
+                  }))}
+                  margin={{ top: 16, right: 8, left: 36, bottom: 24 }}
+                  xScale={{
+                    type: 'linear',
+                    min: timeWindow.min,
+                    max: timeWindow.max
+                  }}
+                  yScale={{
+                    type: 'linear',
+                    min: 0,
+                    max: 120
+                  }}
+                  axisBottom={{
+                    tickSize: 2,
+                    tickPadding: 5,
+                    tickRotation: 0,
+                    tickValues: timeWindow.ticks,
+                    format: (value) => value.toString(),
+                    legend: 'Time (s)',
+                    legendOffset: 20,
+                    legendPosition: 'middle'
+                  }}
+                  axisLeft={{
+                    tickSize: 2,
+                    tickPadding: 5,
+                    tickRotation: 0,
+                    tickValues: [0, 25, 50, 75, 100],
+                    format: (value) => `${value}%`,
+                    legend: 'Complete',
+                    legendOffset: -30,
+                    legendPosition: 'middle'
+                  }}
+                  colors={(d) => CONTINENT_COLORS[d.id] || 'rgb(var(--success))'}
+                  pointSize={0}
+                  enableGridX={true}
+                  enableGridY={true}
+                  lineWidth={1}
+                  curve="stepAfter"
+                />
               }
-              series={continentalData.map((continent, i) => {
+              series={continentalData.map(continent => {
                 // Find the time when this continent saw all blobs
                 const completionTime = continent.points.find(p => p.percentage === 100)?.time || 12
                 return {
@@ -546,7 +594,7 @@ export function DataAvailabilityPanel({
                   max: 100,
                   avg: continent.points[continent.points.length - 1].percentage,
                   last: completionTime,
-                  unit: '%'
+                  unit: 's'
                 }
               })}
               showSeriesTable={true}

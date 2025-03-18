@@ -49,7 +49,7 @@ export default function Networks(): JSX.Element {
     ? `${config.modules['xatu_public_contributors'].path_prefix}/summary.json`
     : null;
 
-  const { data: summaryData, loading, error } = useDataFetch<Summary>(summaryPath)
+  const { data: summaryData } = useDataFetch<Summary>(summaryPath)
 
   if (!summaryData) {
     return <div>Loading...</div>;

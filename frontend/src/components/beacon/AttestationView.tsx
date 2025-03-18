@@ -1,13 +1,6 @@
 import { useMemo } from 'react'
-import { Tooltip } from 'react-tooltip'
-import { ChartWithStats } from '../charts/ChartWithStats'
-import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, ReferenceLine } from 'recharts'
+import { ChartWithStats, NivoLineChart } from '../charts'
 
-interface AttestationWindow {
-  start_ms: number
-  end_ms: number
-  validator_indices: number[]
-}
 
 interface AttestationPoint {
   time: number
@@ -234,50 +227,46 @@ export function AttestationView({
               description='When an attestation was first seen'
               height={250}
               chart={
-                <ResponsiveContainer width="100%" height={250}>
-                  <LineChart
-                    data={arrivalData}
-                    margin={{ top: 20, right: 20, left: 60, bottom: 40 }}
-                  >
-                    <XAxis
-                      dataKey="time"
-                      stroke="currentColor"
-                      tick={{ fontSize: 12 }}
-                      ticks={[0, 2, 4, 6, 8, 10, 12]}
-                      domain={[0, 12]}
-                      type="number"
-                      allowDataOverflow
-                      label={{
-                        value: "Time (s)",
-                        position: "insideBottom",
-                        offset: -10,
-                        style: { fill: "currentColor", fontSize: 14 }
-                      }}
-                    />
-                    <YAxis
-                      stroke="currentColor"
-                      tick={{ fontSize: 12 }}
-                      domain={[0, maxArrivalsPerBin]}
-                      ticks={Array.from({ length: 6 }, (_, i) => Math.floor(maxArrivalsPerBin * i / 5))}
-                      allowDataOverflow
-                      label={{
-                        value: "Count",
-                        angle: -90,
-                        position: "insideLeft",
-                        style: { fill: "currentColor", fontSize: 14 }
-                      }}
-                    />
-                    <Line
-                      type="monotone"
-                      dataKey="count"
-                      className="text-success"
-                      stroke="currentColor"
-                      strokeWidth={2}
-                      dot={false}
-                      isAnimationActive={false}
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
+                <NivoLineChart
+                  data={[
+                    {
+                      id: 'count',
+                      data: arrivalData.map(d => ({ x: d.time, y: d.count }))
+                    }
+                  ]}
+                  margin={{ top: 20, right: 20, left: 60, bottom: 40 }}
+                  xScale={{
+                    type: 'linear',
+                    min: 0,
+                    max: 12
+                  }}
+                  yScale={{
+                    type: 'linear',
+                    min: 0,
+                    max: maxArrivalsPerBin
+                  }}
+                  axisBottom={{
+                    tickSize: 5,
+                    tickPadding: 5,
+                    tickRotation: 0,
+                    tickValues: [0, 2, 4, 6, 8, 10, 12],
+                    legend: "Time (s)",
+                    legendOffset: 36,
+                    legendPosition: "middle"
+                  }}
+                  axisLeft={{
+                    tickSize: 5,
+                    tickPadding: 5,
+                    tickRotation: 0,
+                    tickValues: Array.from({ length: 6 }, (_, i) => Math.floor(maxArrivalsPerBin * i / 5)),
+                    legend: "Count",
+                    legendOffset: -40,
+                    legendPosition: "middle"
+                  }}
+                  colors={['currentColor']}
+                  pointSize={0}
+                  enableSlices="x"
+                />
               }
               series={arrivalStats}
               showSeriesTable={false}
@@ -293,63 +282,57 @@ export function AttestationView({
               description='The percentage of attestations for the block at a given time'
               height={250}
               chart={
-                <ResponsiveContainer width="100%" height={250}>
-                  <LineChart
-                    data={cdfData}
-                    margin={{ top: 20, right: 20, left: 60, bottom: 40 }}
-                  >
-                    <XAxis
-                      dataKey="time"
-                      stroke="currentColor"
-                      tick={{ fontSize: 12 }}
-                      ticks={[0, 2, 4, 6, 8, 10, 12]}
-                      domain={[0, 12]}
-                      type="number"
-                      allowDataOverflow
-                      label={{
-                        value: "Time (s)",
-                        position: "insideBottom",
-                        offset: -10,
-                        style: { fill: "currentColor", fontSize: 14 }
-                      }}
-                    />
-                    <YAxis
-                      stroke="currentColor"
-                      tick={{ fontSize: 12 }}
-                      domain={[0, 100]}
-                      ticks={[0, 20, 40, 60, 80, 100]}
-                      allowDataOverflow
-                      label={{
-                        value: "Percentage",
-                        angle: -90,
-                        position: "insideLeft",
-                        style: { fill: "currentColor", fontSize: 14 }
-                      }}
-                    />
-                    <ReferenceLine
-                      y={66}
-                      className="text-success"
-                      stroke="currentColor"
-                      strokeDasharray="3 3"
-                      label={{
-                        value: "66%",
-                        position: "right",
-                        className: "text-success",
-                        fill: "currentColor",
-                        fontSize: 12
-                      }}
-                    />
-                    <Line
-                      type="monotone"
-                      dataKey="percentage"
-                      className="text-success"
-                      stroke="currentColor"
-                      strokeWidth={2}
-                      dot={false}
-                      isAnimationActive={false}
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
+                <NivoLineChart
+                  data={[
+                    {
+                      id: 'percentage',
+                      data: cdfData.map(d => ({ x: d.time, y: d.percentage }))
+                    }
+                  ]}
+                  margin={{ top: 20, right: 20, left: 60, bottom: 40 }}
+                  xScale={{
+                    type: 'linear',
+                    min: 0,
+                    max: 12
+                  }}
+                  yScale={{
+                    type: 'linear',
+                    min: 0,
+                    max: 100
+                  }}
+                  axisBottom={{
+                    tickSize: 5,
+                    tickPadding: 5,
+                    tickRotation: 0,
+                    tickValues: [0, 2, 4, 6, 8, 10, 12],
+                    legend: "Time (s)",
+                    legendOffset: 36,
+                    legendPosition: "middle"
+                  }}
+                  axisLeft={{
+                    tickSize: 5,
+                    tickPadding: 5,
+                    tickRotation: 0,
+                    tickValues: [0, 20, 40, 60, 80, 100],
+                    legend: "Percentage",
+                    legendOffset: -40,
+                    legendPosition: "middle"
+                  }}
+                  colors={['currentColor']}
+                  pointSize={0}
+                  enableSlices="x"
+                  markers={[
+                    {
+                      axis: 'y',
+                      value: 66,
+                      lineStyle: { stroke: 'currentColor', strokeDasharray: '3 3' },
+                      legend: '66%',
+                      legendPosition: 'right',
+                      legendOrientation: 'vertical',
+                      textStyle: { fill: 'currentColor', fontSize: 12 }
+                    }
+                  ]}
+                />
               }
               series={cdfStats}
               showSeriesTable={false}
