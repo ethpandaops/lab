@@ -1,149 +1,26 @@
 ---
 description: Whenever touching the backend
 globs: *backend*
+alwaysApply: false
 ---
-# Backend Architecture Overview
+# Golang Best Pracices
 
-## Core Components
+When developing the Go codebase, you must adhere to industry standard/best practices for backend and Golang. 
 
-### Runner
-- Main orchestrator that manages module lifecycle
-- Initializes storage (S3) and database (ClickHouse)
-- Registers and starts all enabled modules
-- Handles graceful shutdown via signal handlers
+## Libraries
+Use the following libraries:
+- sirupsen/logrus for logging
 
-### StateManager
-- Generic key-value store for module/processor state
-- Persists state to S3 as JSON
-- Each module/processor manages its own state format
-- Periodic flushing to S3 with configurable interval
-- No type constraints - values must be JSON-serializable
-
-### Module System
-1. Module
-   - Top-level component that groups related processors
-   - Has its own configuration section
-   - Manages processor lifecycles
-   - Example modules: beacon_chain_timings, xatu_public_contributors
-
-2. Processor
-   - Handles specific data processing tasks
-   - Manages its own state under its name
-   - Updates state to prevent reprocessing
-
-## Adding New Functionality
-
-### Creating a New Module
-1. Create module directory: `backend/lab/modules/your_module_name/`
-2. Create files:
-   - `__init__.py` - Exports module class
-   - `module.py` - Module implementation
-   - `config.py` - Module configuration
-   - `models.py` - Data models
-   - `processors/` - Directory for processors
-
-3. Module Configuration (config.py):
-```python
-from pydantic import BaseModel, Field
-
-class YourModuleConfig(BaseModel):
-    enabled: bool = Field(default=True)
-    networks: List[str] = Field(default=["mainnet"])
-    # Add your module-specific configuration here
-```
-
-4. Module Implementation (module.py):
-```python
-from lab.core.module import Module, ModuleContext
-
-class YourModule(Module):
-    def __init__(self, ctx: ModuleContext):
-        super().__init__(ctx)
-        self._processors = {
-            "processor_name": YourProcessor(ctx)
-        }
-        self._tasks: Dict[str, asyncio.Task] = {}
-
-    @property
-    def name(self) -> str:
-        return "your_module_name"
-
-    async def start(self) -> None:
-        for name, processor in self._processors.items():
-            self._tasks[name] = asyncio.create_task(
-                self._run_processor(name, processor)
-            )
-
-    async def stop(self) -> None:
-        await super().stop()
-        for task in self._tasks.values():
-            task.cancel()
-```
-
-### Creating a New Processor
-1. Create processor file: `processors/your_processor.py`
-2. Implement processor:
-```python
-from .base import BaseProcessor
-
-class YourProcessor(BaseProcessor):
-    def __init__(self, ctx: ModuleContext):
-        super().__init__(ctx, "processor_name")
-
-    async def process(self) -> None:
-        if not await self.should_process():
-            return
-
-        # Your processing logic here
-        await self.update_last_processed()
-```
-
-### State Management
-- Each processor gets its own state key in the state store
-- Basic state format:
-```json
-{
-    "last_processed": 0  // Unix timestamp
-}
-```
-- State is automatically initialized if not exists
-- Use `should_process()` to check processing needs
-- Always update state after successful processing
-
-### Best Practices
-1. Error Handling
-   - Catch and log exceptions at processor level
-   - Continue processing on error
-   - Use descriptive error messages
-
-2. Logging
-   - Use structured logging with context
-   - Log at appropriate levels (debug/info/warning/error)
-   - Include relevant metrics (counts, durations)
-
-3. State Management
-   - Keep state minimal and JSON-serializable
-   - Update state after successful processing
-   - Validate state format on load
-
-4. Performance
-   - Implement efficient database queries
-   - Process only what's needed using state checks
-
-5. Configuration
-   - Use type hints and validation
-   - Provide sensible defaults
-   - Document configuration options
-
-## Example Module Structure
-```
-backend/lab/modules/your_module/
-├── __init__.py
-├── config.py
-├── models.py
-├── module.py
-└── processors/
-    ├── __init__.py
-    ├── base.py
-    └── your_processor.py
-``` 
+## Structure
+- Only use interfaces when absolutely required, or if they're beneficial for testing purposes. Structs should have a clearly defined 
+seperation of concerns, and be small and testable. 
+- When you create a new struct, interface, or feature, you should create tests in an equivalent side file.
+  - E.g. if you create 'store.go', also create 'store_test.go'
+- It is VERY important to not stutter in your package and structure naming. For example:
+  - 'service/store/store.go.Store' - BAD
+  - 'service/store.go.Store' - GOOD
+- NEVER create packages that hold abstract contents. Definitions should live close to their related structs.
+  - 'package/config/store.go' - DOGSHIT
+  - 'package/store/{store.go, config.go}' - GOOD
+  - 'utils/' - DOGSHIT. NEVER do this.
+  - 'types/' - DOGSHIT. NEVER do this.
