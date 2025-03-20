@@ -1,0 +1,177 @@
+---
+description: frontend charts or data display
+globs: 
+alwaysApply: false
+---
+# Chart System with Nivo
+
+The frontend/src/components/charts directory contains the chart components for the frontend, using [Nivo](https://nivo.rocks/) as the charting library.
+
+## Overview
+
+The chart system consists of:
+
+1. **ChartWithStats** - A wrapper component that displays a chart with statistics
+2. **NivoTheme** - A consistent theme for all Nivo charts
+3. **NivoProvider** - A provider component and HOC for applying the theme
+4. **Chart Components** - Specific chart implementations (NivoLineChart, NivoBarChart, etc.)
+
+## Usage
+
+### Basic Usage
+
+```tsx
+import { ChartWithStats, NivoLineChart } from '../components/charts'
+
+// Example data for line chart
+const lineData = [
+  {
+    id: 'series1',
+    data: [
+      { x: 0, y: 10 },
+      { x: 1, y: 15 },
+      { x: 2, y: 8 },
+    ]
+  }
+]
+
+// Example series stats
+const seriesStats = [
+  {
+    name: 'Series 1',
+    color: '#0088FE',
+    min: 8,
+    avg: 13,
+    max: 20,
+    last: 8
+  }
+]
+
+// In your component
+return (
+  <ChartWithStats
+    title="My Chart"
+    description="Description of the chart"
+    chart={
+      <NivoLineChart
+        data={lineData}
+        axisBottom={{
+          legend: 'X Axis',
+          legendOffset: 36
+        }}
+        axisLeft={{
+          legend: 'Y Axis',
+          legendOffset: -40
+        }}
+      />
+    }
+    series={seriesStats}
+  />
+)
+```
+
+### Creating a New Chart Type
+
+To add a new chart type:
+
+1. Install the required Nivo package:
+   ```bash
+   npm install @nivo/[chart-type]
+   ```
+
+2. Create a new component file (e.g., `NivoScatterChart.tsx`):
+   ```tsx
+   import { ResponsiveScatter, ScatterPlotDatum } from '@nivo/scatter'
+   import { withNivoTheme } from './NivoProvider'
+   import { defaultNivoTheme } from './NivoTheme'
+
+   // Create a themed version
+   export const ThemedResponsiveScatter = withNivoTheme(ResponsiveScatter)
+
+   export interface NivoScatterChartProps {
+     // Define your props here
+     height?: number | string
+     width?: number | string
+     // ...other props
+   }
+
+   export const NivoScatterChart = ({
+     height = '100%',
+     width = '100%',
+     // ...default props
+   }: NivoScatterChartProps) => {
+     return (
+       <div style={{ height, width }}>
+         <ThemedResponsiveScatter
+           // Pass props here
+         />
+       </div>
+     )
+   }
+   ```
+
+3. Export the component in `index.ts`:
+   ```tsx
+   export * from './NivoScatterChart'
+   ```
+
+## Guidelines
+
+### Data Formatting
+
+Each Nivo chart type requires data in a specific format. Refer to the [Nivo documentation](https://nivo.rocks/) for details.
+
+### Theming
+
+Always use the provided theme system:
+
+```tsx
+// Apply theme using the HOC
+const ThemedComponent = withNivoTheme(NivoComponent)
+
+// Or use the theme directly
+<NivoComponent theme={defaultNivoTheme} />
+```
+
+### Responsive Design
+
+All chart components should be responsive. Use the `ResponsiveXXX` components from Nivo.
+
+### Accessibility
+
+Ensure charts have proper labels, legends, and color contrast.
+
+## ChartWithStats Props
+
+| Prop | Type | Description |
+|------|------|-------------|
+| title | ReactNode | Chart title |
+| description | string | Optional description |
+| chart | ReactNode | The chart component |
+| series | SeriesStats[] | Statistics for each data series |
+| className | string | Additional CSS classes |
+| notes | ReactNode | Optional notes to display below the chart |
+| showSeriesTable | boolean | Whether to show the series stats table |
+| showHeader | boolean | Whether to show the header |
+| headerSize | 'small' \| 'large' | Size of the header |
+| height | number | Height of the chart in pixels |
+| titleClassName | string | Additional CSS classes for the title |
+| descriptionClassName | string | Additional CSS classes for the description |
+| titlePlacement | 'above' \| 'inside' | Where to place the title |
+
+## SeriesStats Interface
+
+```tsx
+interface SeriesStats {
+  name: string
+  color: string
+  min: number | string
+  avg: number | string
+  max: number | string
+  last: number | string
+  isHidden?: boolean
+  isHighlighted?: boolean
+  unit?: string
+  onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void
+}
+``` 
