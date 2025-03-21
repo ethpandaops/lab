@@ -7,20 +7,20 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/ethpandaops/lab/pkg/broker"
-	"github.com/ethpandaops/lab/pkg/clickhouse"
-	"github.com/ethpandaops/lab/pkg/logger"
-	"github.com/ethpandaops/lab/pkg/storage"
-	"github.com/ethpandaops/lab/pkg/temporal"
+	"github.com/ethpandaops/lab/pkg/internal/lab"
+	"github.com/ethpandaops/lab/pkg/internal/lab/broker"
+	"github.com/ethpandaops/lab/pkg/internal/lab/clickhouse"
+	"github.com/ethpandaops/lab/pkg/internal/lab/storage"
+	"github.com/ethpandaops/lab/pkg/internal/lab/temporal"
 )
 
 // Config contains the configuration for the srv service
 type Config struct {
-	Server     ServerConfig     `yaml:"server"`
-	ClickHouse ClickHouseConfig `yaml:"clickhouse"`
-	S3         S3Config         `yaml:"s3"`
-	Temporal   TemporalConfig   `yaml:"temporal"`
-	Broker     BrokerConfig     `yaml:"broker"` // Renamed from NATS
+	Server   *ServerConfig      `yaml:"server"`
+	Xatu     *clickhouse.Config `yaml:"xatu"`
+	Storage  *storage.Config    `yaml:"storage"`
+	Temporal *temporal.Config   `yaml:"temporal"`
+	Broker   *broker.Config     `yaml:"broker"`
 }
 
 // ServerConfig contains the configuration for the gRPC server
@@ -29,76 +29,45 @@ type ServerConfig struct {
 	Port int    `yaml:"port"`
 }
 
-// ClickHouseConfig contains the configuration for ClickHouse
-type ClickHouseConfig struct {
-	Host     string `yaml:"host"`
-	Port     int    `yaml:"port"`
-	Database string `yaml:"database"`
-	Username string `yaml:"username"`
-	Password string `yaml:"password"`
-	Secure   bool   `yaml:"secure"`
-}
-
-// S3Config contains the configuration for S3
-type S3Config struct {
-	Endpoint        string `yaml:"endpoint"`
-	Region          string `yaml:"region"`
-	Bucket          string `yaml:"bucket"`
-	AccessKeyID     string `yaml:"access_key_id"`
-	SecretAccessKey string `yaml:"secret_access_key"`
-	UseSSL          bool   `yaml:"use_ssl"`
-	UsePathStyle    bool   `yaml:"use_path_style"`
-}
-
-// TemporalConfig contains the configuration for Temporal
-type TemporalConfig struct {
-	Address     string `yaml:"address"`
-	Namespace   string `yaml:"namespace"`
-	TaskQueue   string `yaml:"task_queue"`
-	WorkerCount int    `yaml:"worker_count"`
-}
-
-// BrokerConfig contains the configuration for the message broker
-type BrokerConfig struct {
-	URL     string `yaml:"url"`
-	Subject string `yaml:"subject"`
-}
-
 // Service represents the srv service
 type Service struct {
-	config     Config
-	log        *logger.Logger
-	ctx        context.Context
-	cancel     context.CancelFunc
-	clickhouse *clickhouse.Client
-	storage    *storage.S3Storage
-	temporal   *temporal.Client
-	broker     broker.Broker
+	ctx    context.Context
+	config *Config
+	lab    *lab.Lab
 }
 
 // New creates a new srv service
-func New(cfg Config, log *logger.Logger) (*Service, error) {
-	ctx, cancel := context.WithCancel(context.Background())
+func New(config *Config, logLevel string) (*Service, error) {
+	// Create lab instance
+	labInst, err := lab.New(lab.Config{
+		LogLevel: logLevel,
+	}, "lab.ethpandaops.io.srv")
+	if err != nil {
+		return nil, fmt.Errorf("failed to create lab instance: %w", err)
+	}
 
 	return &Service{
-		config: cfg,
-		log:    log,
-		ctx:    ctx,
-		cancel: cancel,
+		config: config,
+		lab:    labInst,
 	}, nil
 }
 
 // Start starts the srv service
-func (s *Service) Start() error {
-	s.log.Info("Starting srv service")
+func (s *Service) Start(ctx context.Context) error {
+	s.lab.Log().Info("Starting srv service")
+
+	s.ctx = ctx
 
 	// Set up signal handling
 	sigCh := make(chan os.Signal, 1)
+
 	signal.Notify(sigCh, syscall.SIGINT, syscall.SIGTERM)
 	go func() {
 		sig := <-sigCh
-		s.log.WithField("signal", sig.String()).Info("Received signal, shutting down")
-		s.cancel()
+
+		s.lab.Log().WithField("signal", sig.String()).Info("Received signal, shutting down")
+
+		s.ctx.Done()
 	}()
 
 	// Initialize services
@@ -108,12 +77,15 @@ func (s *Service) Start() error {
 
 	// Block until context is canceled
 	<-s.ctx.Done()
-	s.log.Info("Context canceled, cleaning up")
+	s.lab.Log().Info("Context canceled, shutting down")
+
+	// Shut down all the lab services
+	s.lab.Stop()
 
 	// Clean up resources
-	s.cleanup()
+	s.stop()
 
-	s.log.Info("Srv service stopped")
+	s.lab.Log().Info("Srv service stopped")
 	return nil
 }
 
@@ -121,62 +93,36 @@ func (s *Service) Start() error {
 func (s *Service) initializeServices() error {
 	var err error
 
-	// Initialize ClickHouse
-	s.log.Info("Initializing ClickHouse client")
-	s.clickhouse, err = clickhouse.NewClient(
-		s.config.ClickHouse.Host,
-		s.config.ClickHouse.Port,
-		s.config.ClickHouse.Database,
-		s.config.ClickHouse.Username,
-		s.config.ClickHouse.Password,
-		s.config.ClickHouse.Secure,
-		s.log,
-	)
+	// Initialize XatuClickhouse
+	s.lab.Log().Info("Initializing ClickHouse client")
+	err = s.lab.InitXatu(s.config.Xatu)
 	if err != nil {
-		return fmt.Errorf("failed to initialize ClickHouse client: %w", err)
+		return fmt.Errorf("failed to initialize Xatu ClickHouse client: %w", err)
 	}
 
 	// Initialize S3 Storage
-	s.log.Info("Initializing S3 storage")
-	s.storage, err = storage.NewS3Storage(
-		s.config.S3.Endpoint,
-		s.config.S3.Region,
-		s.config.S3.Bucket,
-		s.config.S3.AccessKeyID,
-		s.config.S3.SecretAccessKey,
-		s.config.S3.UseSSL,
-		s.config.S3.UsePathStyle,
-		s.log,
-	)
+	s.lab.Log().Info("Initializing S3 storage")
+	err = s.lab.InitStorage(s.config.Storage)
 	if err != nil {
 		return fmt.Errorf("failed to initialize S3 storage: %w", err)
 	}
 
 	// Initialize Temporal client
-	s.log.Info("Initializing Temporal client")
-	s.temporal, err = temporal.NewClient(
-		s.config.Temporal.Address,
-		s.config.Temporal.Namespace,
-		s.config.Temporal.TaskQueue,
-		s.log,
-	)
+	s.lab.Log().Info("Initializing Temporal client")
+	err = s.lab.InitTemporal(s.config.Temporal)
 	if err != nil {
 		return fmt.Errorf("failed to initialize Temporal client: %w", err)
 	}
 
 	// Start Temporal worker
-	s.log.Info("Starting Temporal worker")
-	if err := s.temporal.StartWorker(s.ctx); err != nil {
+	s.lab.Log().Info("Starting Temporal worker")
+	if err := s.lab.Temporal().StartWorker(); err != nil {
 		return fmt.Errorf("failed to start Temporal worker: %w", err)
 	}
 
 	// Initialize broker client
-	s.log.Info("Initializing broker client")
-	brokerConfig := broker.Config{
-		URL:     s.config.Broker.URL,
-		Subject: s.config.Broker.Subject,
-	}
-	s.broker, err = broker.New(brokerConfig, s.log)
+	s.lab.Log().Info("Initializing broker client")
+	err = s.lab.InitBroker(s.config.Broker)
 	if err != nil {
 		return fmt.Errorf("failed to initialize broker: %w", err)
 	}
@@ -184,27 +130,6 @@ func (s *Service) initializeServices() error {
 	return nil
 }
 
-// cleanup cleans up resources
-func (s *Service) cleanup() {
-	// Close ClickHouse connection
-	if s.clickhouse != nil {
-		s.log.Info("Closing ClickHouse connection")
-		if err := s.clickhouse.Close(); err != nil {
-			s.log.WithError(err).Error("Failed to close ClickHouse connection")
-		}
-	}
-
-	// Close Temporal client
-	if s.temporal != nil {
-		s.log.Info("Closing Temporal client")
-		s.temporal.Close()
-	}
-
-	// Close broker client
-	if s.broker != nil {
-		s.log.Info("Closing broker client")
-		if err := s.broker.Close(); err != nil {
-			s.log.WithError(err).Error("Failed to close broker client")
-		}
-	}
+// stop stops the srv service
+func (s *Service) stop() {
 }

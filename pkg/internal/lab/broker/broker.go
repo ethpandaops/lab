@@ -2,78 +2,158 @@ package broker
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 
-	"github.com/ethpandaops/lab/pkg/broker"
-	"github.com/ethpandaops/lab/pkg/logger"
+	"github.com/nats-io/nats.go"
+	"github.com/sirupsen/logrus"
 )
 
-// Client represents a broker client
-type Client struct {
-	broker broker.Broker
-	log    *logger.Logger
-	ctx    context.Context
+// Config contains the configuration for the message broker
+type Config struct {
+	URL     string `yaml:"url"`
+	Subject string `yaml:"subject"`
 }
 
-// New creates a new broker client
-func New(ctx context.Context, url string, subject string, log *logger.Logger) (*Client, error) {
-	if ctx == nil {
-		return nil, fmt.Errorf("context cannot be nil")
-	}
+// Client represents a message broker
+type Client interface {
+	// Start starts the broker
+	Start(ctx context.Context) error
 
-	if log == nil {
-		return nil, fmt.Errorf("logger cannot be nil")
-	}
+	// Publish publishes a message to the given subject
+	Publish(subject string, data interface{}) error
 
-	if url == "" {
-		return nil, fmt.Errorf("broker URL cannot be empty")
-	}
+	// Subscribe subscribes to the given subject
+	Subscribe(subject string, handler func([]byte)) (Subscription, error)
 
-	if subject == "" {
-		return nil, fmt.Errorf("broker subject cannot be empty")
-	}
+	// QueueSubscribe subscribes to the given subject with a queue group
+	QueueSubscribe(subject string, queue string, handler func([]byte)) (Subscription, error)
 
-	log.WithField("url", url).WithField("subject", subject).Info("Initializing broker")
+	// Stop stops the broker
+	Stop() error
+}
 
-	// Create broker client
-	brokerConfig := broker.Config{
-		URL:     url,
-		Subject: subject,
-	}
+// Subscription represents a subscription to a subject
+type Subscription interface {
+	// Unsubscribe unsubscribes from the subject
+	Unsubscribe() error
+}
 
-	brokerClient, err := broker.New(brokerConfig, log)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create broker client: %w", err)
-	}
+// broker implements the Broker interface
+type broker struct {
+	config *Config
+	conn   *nats.Conn
+	js     nats.JetStreamContext
+	log    logrus.FieldLogger
+	subs   []*nats.Subscription
+}
 
-	return &Client{
-		broker: brokerClient,
-		log:    log,
-		ctx:    ctx,
+// subscription implements the Subscription interface
+type subscription struct {
+	sub *nats.Subscription
+}
+
+// New creates a new broker
+func New(config *Config, log logrus.FieldLogger) (Client, error) {
+	return &broker{
+		config: config,
+		log:    log.WithField("module", "broker"),
+		subs:   make([]*nats.Subscription, 0),
 	}, nil
 }
 
-// Broker returns the underlying broker
-func (c *Client) Broker() broker.Broker {
-	return c.broker
+func (b *broker) Start(ctx context.Context) error {
+	b.log.Info("Starting broker")
+
+	// Connect to NATS
+	conn, err := nats.Connect(b.config.URL)
+	if err != nil {
+		return fmt.Errorf("failed to connect to NATS: %w", err)
+	}
+
+	// Create JetStream context
+	js, err := conn.JetStream()
+	if err != nil {
+		return fmt.Errorf("failed to create JetStream context: %w", err)
+	}
+
+	b.conn = conn
+	b.js = js
+
+	b.log.Info("Broker started")
+
+	return nil
 }
 
-// Publish publishes a message to the broker
-func (c *Client) Publish(topic string, data []byte) error {
-	return c.broker.Publish(topic, data)
+// Publish publishes a message to the given subject
+func (b *broker) Publish(subject string, data interface{}) error {
+	// Marshal data to JSON
+	jsonData, err := json.Marshal(data)
+	if err != nil {
+		return fmt.Errorf("failed to marshal data: %w", err)
+	}
+
+	// Publish message
+	if err := b.conn.Publish(subject, jsonData); err != nil {
+		return fmt.Errorf("failed to publish message: %w", err)
+	}
+
+	return nil
 }
 
-// Subscribe subscribes to a topic
-func (c *Client) Subscribe(topic string, handler func([]byte)) (broker.Subscription, error) {
-	return c.broker.Subscribe(topic, handler)
+// Subscribe subscribes to the given subject
+func (b *broker) Subscribe(subject string, handler func([]byte)) (Subscription, error) {
+	// Create a handler wrapper that converts NATS message to bytes
+	natsHandler := func(msg *nats.Msg) {
+		handler(msg.Data)
+	}
+
+	// Subscribe to subject
+	sub, err := b.conn.Subscribe(subject, natsHandler)
+	if err != nil {
+		return nil, fmt.Errorf("failed to subscribe to subject: %w", err)
+	}
+
+	// Add subscription to list
+	b.subs = append(b.subs, sub)
+
+	return &subscription{sub: sub}, nil
 }
 
-// QueueSubscribe subscribes to a topic with a queue group
-func (c *Client) QueueSubscribe(topic string, queue string, handler func([]byte)) (broker.Subscription, error) {
-	return c.broker.QueueSubscribe(topic, queue, handler)
+// QueueSubscribe subscribes to the given subject with a queue group
+func (b *broker) QueueSubscribe(subject string, queue string, handler func([]byte)) (Subscription, error) {
+	// Create a handler wrapper that converts NATS message to bytes
+	natsHandler := func(msg *nats.Msg) {
+		handler(msg.Data)
+	}
+
+	// Subscribe to subject with queue group
+	sub, err := b.conn.QueueSubscribe(subject, queue, natsHandler)
+	if err != nil {
+		return nil, fmt.Errorf("failed to queue subscribe to subject: %w", err)
+	}
+
+	// Add subscription to list
+	b.subs = append(b.subs, sub)
+
+	return &subscription{sub: sub}, nil
 }
 
-// Close closes the broker connection
-func (c *Client) Close() error {
-	return c.broker.Close()
+// Stop gracefully stops the broker
+func (b *broker) Stop() error {
+	// Unsubscribe from all subscriptions
+	for _, sub := range b.subs {
+		if err := sub.Unsubscribe(); err != nil {
+			b.log.WithError(err).Warn("Failed to unsubscribe from subject")
+		}
+	}
+
+	// Close connection
+	b.conn.Close()
+	return nil
+}
+
+// Unsubscribe unsubscribes from the subject
+func (s *subscription) Unsubscribe() error {
+	return s.sub.Unsubscribe()
 }

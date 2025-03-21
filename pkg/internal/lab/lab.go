@@ -2,105 +2,232 @@ package lab
 
 import (
 	"context"
-	"errors"
 	"fmt"
 
 	"github.com/ethpandaops/lab/pkg/internal/lab/broker"
+	"github.com/ethpandaops/lab/pkg/internal/lab/cache"
+	"github.com/ethpandaops/lab/pkg/internal/lab/clickhouse"
 	"github.com/ethpandaops/lab/pkg/internal/lab/discovery"
+	"github.com/ethpandaops/lab/pkg/internal/lab/logger"
+	"github.com/ethpandaops/lab/pkg/internal/lab/storage"
 	"github.com/ethpandaops/lab/pkg/internal/lab/temporal"
-	"github.com/ethpandaops/lab/pkg/internal/lab/xatuclickhouse"
-	"github.com/ethpandaops/lab/pkg/logger"
+	"github.com/sirupsen/logrus"
 )
 
-// Lab represents the central entity managing shared functionality
-type Lab struct {
-	serviceName string
-	log         *logger.Logger
-	ctx         context.Context
+// Config contains configuration for the lab
+type Config struct {
+	LogLevel string `yaml:"logLevel"`
 }
 
-// New creates a new Lab instance
-func New(ctx context.Context, serviceName string) (*Lab, error) {
+// Lab represents the main lab application
+type Lab struct {
+	ctx         context.Context
+	serviceName string
+	log         logrus.FieldLogger
+	discovery   discovery.Client
+	broker      broker.Client
+	xatu        clickhouse.Client
+	storage     storage.Client
+	temporal    temporal.Client
+	cache       cache.Client
+}
+
+// New creates a new lab instance
+func New(config Config, serviceName string) (*Lab, error) {
 	if serviceName == "" {
-		return nil, errors.New("service name cannot be empty")
+		return nil, fmt.Errorf("service name cannot be empty")
 	}
 
-	if ctx == nil {
-		return nil, errors.New("context cannot be nil")
-	}
+	// Create logger
+	var log logrus.FieldLogger
+	var err error
 
-	// Create logger with default level - can be updated later
-	log, err := logger.New("info")
+	log, err = logger.New(config.LogLevel, serviceName)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create logger: %w", err)
 	}
 
-	lab := &Lab{
+	log.WithField("service", serviceName).Info("Initializing lab")
+
+	l := &Lab{
 		serviceName: serviceName,
 		log:         log,
-		ctx:         ctx,
 	}
 
-	return lab, nil
-}
-
-// WithLogLevel sets the log level and returns the lab instance
-func (l *Lab) WithLogLevel(level string) (*Lab, error) {
-	newLog, err := logger.New(level)
-	if err != nil {
-		return l, fmt.Errorf("failed to update logger: %w", err)
-	}
-	l.log = newLog
 	return l, nil
 }
 
-// Context returns the lab's context
-func (l *Lab) Context() context.Context {
-	return l.ctx
+func (l *Lab) Start(ctx context.Context) error {
+	l.ctx = ctx
+
+	l.log.Info("Starting lab")
+
+	return nil
 }
 
-// Logger returns the lab's logger
-func (l *Lab) Logger() *logger.Logger {
+// Log returns the log
+func (l *Lab) Log() logrus.FieldLogger {
 	return l.log
 }
 
-// ServiceName returns the service name
-func (l *Lab) ServiceName() string {
-	return l.serviceName
-}
+// InitBroker initializes the broker
+func (l *Lab) InitBroker(config *broker.Config) error {
+	if l.broker != nil {
+		return nil
+	}
 
-// NewBroker creates a new broker client
-func (l *Lab) NewBroker(url string, subject string) (*broker.Client, error) {
-	return broker.New(l.ctx, url, subject, l.log)
-}
-
-// NewXatuClickhouse creates a new XatuClickhouse client
-func (l *Lab) NewXatuClickhouse(
-	host string,
-	port int,
-	database string,
-	username string,
-	password string,
-	secure bool,
-) (*xatuclickhouse.Client, error) {
-	return xatuclickhouse.New(
-		l.ctx,
-		host,
-		port,
-		database,
-		username,
-		password,
-		secure,
+	brkr, err := broker.New(
+		config,
 		l.log,
 	)
+	if err != nil {
+		return fmt.Errorf("failed to create broker: %w", err)
+	}
+
+	if err := brkr.Start(l.ctx); err != nil {
+		return fmt.Errorf("failed to start broker: %w", err)
+	}
+
+	l.broker = brkr
+
+	return nil
 }
 
-// NewTemporal creates a new Temporal client
-func (l *Lab) NewTemporal(address string, namespace string, taskQueue string) (*temporal.Client, error) {
-	return temporal.New(l.ctx, address, namespace, taskQueue, l.log)
+// GetBroker returns the broker
+func (l *Lab) Broker() broker.Client {
+	return l.broker
 }
 
-// NewDiscovery creates a new service discovery client
-func (l *Lab) NewDiscovery() (*discovery.Client, error) {
-	return discovery.New(l.log)
+// InitXatu initializes Xatu
+func (l *Lab) InitXatu(config *clickhouse.Config) error {
+	if l.xatu != nil {
+		return nil
+	}
+
+	l.log.WithField("host", config.Host).Info("Initializing ClickHouse")
+
+	ch, err := clickhouse.New(
+		config,
+		l.log,
+	)
+	if err != nil {
+		return fmt.Errorf("failed to create ClickHouse client: %w", err)
+	}
+
+	l.xatu = ch
+
+	return nil
+}
+
+// GetXatu returns the Xatu client
+func (l *Lab) Xatu() clickhouse.Client {
+	return l.xatu
+}
+
+// InitStorage initializes storage
+func (l *Lab) InitStorage(cfg *storage.Config) error {
+	l.log.
+		WithField("endpoint", cfg.Endpoint).
+		WithField("bucket", cfg.Bucket).
+		Info("Initializing storage")
+
+	s, err := storage.New(
+		cfg,
+		l.log,
+	)
+	if err != nil {
+		return fmt.Errorf("failed to create storage client: %w", err)
+	}
+
+	l.storage = s
+
+	return nil
+}
+
+// GetStorage returns the storage client
+func (l *Lab) Storage() storage.Client {
+	return l.storage
+}
+
+// InitTemporal initializes Temporal
+func (l *Lab) InitTemporal(cfg *temporal.Config) error {
+	t, err := temporal.New(
+		cfg,
+		l.log,
+	)
+	if err != nil {
+		return fmt.Errorf("failed to create Temporal client: %w", err)
+	}
+
+	l.temporal = t
+
+	return nil
+}
+
+// GetTemporal returns the Temporal client
+func (l *Lab) Temporal() temporal.Client {
+	return l.temporal
+}
+
+// InitCache initializes the cache
+func (l *Lab) InitCache(cfg *cache.Config) error {
+	l.log.WithField("type", cfg.Type).Info("Initializing cache")
+
+	cacheOptions := map[string]interface{}{}
+	if cfg.Config != nil {
+		cacheOptions = cfg.Config
+	}
+
+	c, err := cache.New(
+		cache.Config{
+			Type:   cache.CacheType(cfg.Type),
+			Config: cacheOptions,
+		},
+	)
+	if err != nil {
+		return fmt.Errorf("failed to create cache client: %w", err)
+	}
+
+	l.cache = c
+
+	return nil
+}
+
+// GetCache returns the cache client
+func (l *Lab) Cache() cache.Client {
+	return l.cache
+}
+
+// GetDiscovery returns the discovery client
+func (l *Lab) Discovery() discovery.Client {
+	return l.discovery
+}
+
+// Stop gracefully stops all the components
+func (l *Lab) Stop() {
+	if l.broker != nil {
+		l.broker.Stop()
+	}
+
+	if l.xatu != nil {
+		if err := l.xatu.Stop(); err != nil {
+			l.log.WithError(err).Error("Failed to stop ClickHouse client")
+		}
+	}
+
+	if l.storage != nil {
+		// Storage doesn't have a close method
+	}
+
+	if l.temporal != nil {
+		l.temporal.Stop()
+	}
+
+	if l.cache != nil {
+		if err := l.cache.Stop(); err != nil {
+			l.log.WithError(err).Error("Failed to stop cache client")
+		}
+	}
+
+	l.log.Info("Lab stopped")
 }
