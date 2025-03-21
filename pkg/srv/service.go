@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	"github.com/ethpandaops/lab/pkg/internal/lab"
 	"github.com/ethpandaops/lab/pkg/internal/lab/broker"
@@ -18,11 +19,29 @@ import (
 
 // Config contains the configuration for the srv service
 type Config struct {
-	Server   *ServerConfig      `yaml:"server"`
-	Xatu     *clickhouse.Config `yaml:"xatu"`
-	Storage  *storage.Config    `yaml:"storage"`
-	Temporal *temporal.Config   `yaml:"temporal"`
-	Broker   *broker.Config     `yaml:"broker"`
+	Server   *ServerConfig             `yaml:"server"`
+	Ethereum *EthereumConfig           `yaml:"ethereum"`
+	Xatu     *clickhouse.Config        `yaml:"xatu"`     // Global Xatu config
+	Networks map[string]*NetworkConfig `yaml:"networks"` // Per-network configurations
+	Storage  *storage.Config           `yaml:"storage"`
+	Temporal *temporal.Config          `yaml:"temporal"`
+	Broker   *broker.Config            `yaml:"broker"`
+}
+
+// NetworkConfig contains the configuration for a specific network
+type NetworkConfig struct {
+	Name     string             `yaml:"name"`
+	Ethereum *EthereumConfig    `yaml:"ethereum"`
+	Xatu     *clickhouse.Config `yaml:"xatu"` // Network-specific Xatu config
+}
+
+type EthereumConfig struct {
+	GenesisTime time.Time `yaml:"genesisTime"`
+	Features    Features  `yaml:"features"`
+}
+
+type Features struct {
+	Timings bool `yaml:"timings"`
 }
 
 // ServerConfig contains the configuration for the gRPC server
@@ -98,11 +117,22 @@ func (s *Service) Start(ctx context.Context) error {
 func (s *Service) initializeServices() error {
 	var err error
 
-	// Initialize XatuClickhouse
-	s.lab.Log().Info("Initializing ClickHouse client")
+	// Initialize global XatuClickhouse
+	s.lab.Log().Info("Initializing global ClickHouse client")
 	err = s.lab.InitXatu(s.config.Xatu)
 	if err != nil {
-		return fmt.Errorf("failed to initialize Xatu ClickHouse client: %w", err)
+		return fmt.Errorf("failed to initialize global Xatu ClickHouse client: %w", err)
+	}
+
+	// Initialize per-network XatuClickhouse instances
+	for networkName, networkConfig := range s.config.Networks {
+		if networkConfig.Xatu != nil {
+			s.lab.Log().WithField("network", networkName).Info("Initializing network-specific ClickHouse client")
+			err = s.lab.InitXatuForNetwork(networkName, networkConfig.Xatu)
+			if err != nil {
+				return fmt.Errorf("failed to initialize Xatu ClickHouse client for network %s: %w", networkName, err)
+			}
+		}
 	}
 
 	// Initialize S3 Storage
@@ -166,8 +196,7 @@ func (s *Service) registerWorkflows() {
 	// Create timings activity implementations
 	timingsActivities := timings.NewActivities(
 		s.lab.Log().WithField("component", "timings"),
-		s.lab.Xatu(),
-		s.lab.Storage(),
+		s.lab,
 		"timings",
 	)
 

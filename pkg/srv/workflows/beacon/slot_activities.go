@@ -35,7 +35,8 @@ func (a *ActivityImplementations) GetCurrentSlot(ctx context.Context, params Get
 		WHERE network = $1
 	`
 
-	result, err := a.lab.Xatu().QueryRow(query, params.NetworkName)
+	// Use the network-specific Xatu client if available
+	result, err := a.lab.Xatu(params.NetworkName).QueryRow(query, params.NetworkName)
 	if err != nil {
 		return 0, fmt.Errorf("failed to get current slot: %w", err)
 	}
@@ -151,7 +152,7 @@ func (a *ActivityImplementations) getBlockData(ctx context.Context, networkName 
 		LIMIT 1
 	`
 
-	result, err := a.lab.Xatu().QueryRow(query, networkName, slot)
+	result, err := a.lab.Xatu(networkName).QueryRow(query, networkName, slot)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get block data: %w", err)
 	}
@@ -197,7 +198,7 @@ func (a *ActivityImplementations) getProposerData(ctx context.Context, networkNa
 		LIMIT 1
 	`
 
-	result, err := a.lab.Xatu().QueryRow(query, networkName, slot)
+	result, err := a.lab.Xatu(networkName).QueryRow(query, networkName, slot)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get proposer data: %w", err)
 	}

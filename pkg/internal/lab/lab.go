@@ -3,6 +3,7 @@ package lab
 import (
 	"context"
 	"fmt"
+	"sync"
 
 	"github.com/ethpandaops/lab/pkg/internal/lab/broker"
 	"github.com/ethpandaops/lab/pkg/internal/lab/cache"
@@ -21,15 +22,17 @@ type Config struct {
 
 // Lab represents the main lab application
 type Lab struct {
-	ctx         context.Context
-	serviceName string
-	log         logrus.FieldLogger
-	discovery   discovery.Client
-	broker      broker.Client
-	xatu        clickhouse.Client
-	storage     storage.Client
-	temporal    temporal.Client
-	cache       cache.Client
+	ctx             context.Context
+	serviceName     string
+	log             logrus.FieldLogger
+	discovery       discovery.Client
+	broker          broker.Client
+	xatu            clickhouse.Client            // Default/global Xatu client
+	xatuNetworks    map[string]clickhouse.Client // Per-network Xatu clients
+	xatuNetworksMux sync.RWMutex                 // Mutex for thread-safe access to xatuNetworks
+	storage         storage.Client
+	temporal        temporal.Client
+	cache           cache.Client
 }
 
 // New creates a new lab instance
@@ -50,8 +53,9 @@ func New(config Config, serviceName string) (*Lab, error) {
 	log.WithField("service", serviceName).Info("Initializing lab")
 
 	l := &Lab{
-		serviceName: serviceName,
-		log:         log,
+		serviceName:  serviceName,
+		log:          log,
+		xatuNetworks: make(map[string]clickhouse.Client),
 	}
 
 	return l, nil
@@ -98,13 +102,13 @@ func (l *Lab) Broker() broker.Client {
 	return l.broker
 }
 
-// InitXatu initializes Xatu
+// InitXatu initializes the global Xatu client
 func (l *Lab) InitXatu(config *clickhouse.Config) error {
 	if l.xatu != nil {
 		return nil
 	}
 
-	l.log.WithField("host", config.Host).Info("Initializing ClickHouse")
+	l.log.WithField("host", config.Host).Info("Initializing global ClickHouse client")
 
 	ch, err := clickhouse.New(
 		config,
@@ -119,9 +123,57 @@ func (l *Lab) InitXatu(config *clickhouse.Config) error {
 	return nil
 }
 
-// GetXatu returns the Xatu client
-func (l *Lab) Xatu() clickhouse.Client {
+// InitXatuForNetwork initializes a network-specific Xatu client
+func (l *Lab) InitXatuForNetwork(network string, config *clickhouse.Config) error {
+	l.xatuNetworksMux.Lock()
+	defer l.xatuNetworksMux.Unlock()
+
+	if client, exists := l.xatuNetworks[network]; exists && client != nil {
+		return nil
+	}
+
+	l.log.WithField("host", config.Host).WithField("network", network).Info("Initializing network-specific ClickHouse client")
+
+	ch, err := clickhouse.New(
+		config,
+		l.log.WithField("network", network),
+	)
+	if err != nil {
+		return fmt.Errorf("failed to create ClickHouse client for network %s: %w", network, err)
+	}
+
+	l.xatuNetworks[network] = ch
+
+	return nil
+}
+
+// Xatu returns the Xatu client for the specified network, or the global one if no network is specified
+func (l *Lab) Xatu(network ...string) clickhouse.Client {
+	// If no network is specified or the network is empty, return the global client
+	if len(network) == 0 || network[0] == "" {
+		return l.xatu
+	}
+
+	// Otherwise, try to get the network-specific client
+	l.xatuNetworksMux.RLock()
+	defer l.xatuNetworksMux.RUnlock()
+
+	if client, exists := l.xatuNetworks[network[0]]; exists && client != nil {
+		return client
+	}
+
+	// Fall back to the global client if the network-specific one doesn't exist
+	l.log.WithField("network", network[0]).Warn("Network-specific Xatu client not found, falling back to global client")
 	return l.xatu
+}
+
+// HasXatuForNetwork checks if a network-specific Xatu client exists
+func (l *Lab) HasXatuForNetwork(network string) bool {
+	l.xatuNetworksMux.RLock()
+	defer l.xatuNetworksMux.RUnlock()
+
+	client, exists := l.xatuNetworks[network]
+	return exists && client != nil
 }
 
 // InitStorage initializes storage
@@ -211,9 +263,20 @@ func (l *Lab) Stop() {
 
 	if l.xatu != nil {
 		if err := l.xatu.Stop(); err != nil {
-			l.log.WithError(err).Error("Failed to stop ClickHouse client")
+			l.log.WithError(err).Error("Failed to stop global ClickHouse client")
 		}
 	}
+
+	// Stop all network-specific Xatu clients
+	l.xatuNetworksMux.Lock()
+	for network, client := range l.xatuNetworks {
+		if client != nil {
+			if err := client.Stop(); err != nil {
+				l.log.WithError(err).WithField("network", network).Error("Failed to stop network-specific ClickHouse client")
+			}
+		}
+	}
+	l.xatuNetworksMux.Unlock()
 
 	if l.storage != nil {
 		// Storage doesn't have a close method
