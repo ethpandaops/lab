@@ -12,6 +12,8 @@ import (
 	"github.com/ethpandaops/lab/pkg/internal/lab/clickhouse"
 	"github.com/ethpandaops/lab/pkg/internal/lab/storage"
 	"github.com/ethpandaops/lab/pkg/internal/lab/temporal"
+	"github.com/ethpandaops/lab/pkg/srv/workflows/beacon"
+	"github.com/ethpandaops/lab/pkg/srv/workflows/timings"
 )
 
 // Config contains the configuration for the srv service
@@ -75,6 +77,9 @@ func (s *Service) Start(ctx context.Context) error {
 		return fmt.Errorf("failed to initialize services: %w", err)
 	}
 
+	// Register workflows and activities
+	s.registerWorkflows()
+
 	// Block until context is canceled
 	<-s.ctx.Done()
 	s.lab.Log().Info("Context canceled, shutting down")
@@ -128,6 +133,49 @@ func (s *Service) initializeServices() error {
 	}
 
 	return nil
+}
+
+// registerWorkflows registers all workflows and activities with Temporal
+func (s *Service) registerWorkflows() {
+	s.lab.Log().Info("Registering workflows and activities")
+
+	// Register beacon workflows
+	s.lab.Temporal().RegisterWorkflow(beacon.SlotProcessWorkflow)
+	s.lab.Temporal().RegisterWorkflow(beacon.ProcessHeadSlotWorkflow)
+	s.lab.Temporal().RegisterWorkflow(beacon.ProcessBacklogWorkflow)
+	s.lab.Temporal().RegisterWorkflow(beacon.ProcessMiddleWorkflow)
+
+	// Create beacon activity implementations
+	beaconActivities := beacon.NewActivityImplementations(s.lab)
+
+	// Register beacon activities
+	s.lab.Temporal().RegisterActivity(beaconActivities.GetCurrentSlot)
+	s.lab.Temporal().RegisterActivity(beaconActivities.ProcessSlot)
+	s.lab.Temporal().RegisterActivity(beaconActivities.GetProcessorState)
+	s.lab.Temporal().RegisterActivity(beaconActivities.SaveProcessorState)
+	s.lab.Temporal().RegisterActivity(beaconActivities.CalculateTargetBacklogSlot)
+	s.lab.Temporal().RegisterActivity(beaconActivities.ProcessMissingSlots)
+
+	// Import timings module
+
+	// Register timings workflows
+	s.lab.Temporal().RegisterWorkflow(timings.TimingsModuleWorkflow)
+	s.lab.Temporal().RegisterWorkflow(timings.BlockTimingsProcessorWorkflow)
+	s.lab.Temporal().RegisterWorkflow(timings.SizeCDFProcessorWorkflow)
+
+	// Create timings activity implementations
+	timingsActivities := timings.NewActivities(
+		s.lab.Log().WithField("component", "timings"),
+		s.lab.Xatu(),
+		s.lab.Storage(),
+		"timings",
+	)
+
+	// Register timings activities
+	s.lab.Temporal().RegisterActivity(timingsActivities.ShouldProcessActivity)
+	s.lab.Temporal().RegisterActivity(timingsActivities.ProcessBlockTimingsActivity)
+	s.lab.Temporal().RegisterActivity(timingsActivities.ProcessSizeCDFActivity)
+	s.lab.Temporal().RegisterActivity(timingsActivities.UpdateProcessorStateActivity)
 }
 
 // stop stops the srv service

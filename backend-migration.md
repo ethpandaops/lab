@@ -112,27 +112,35 @@ Check how each module collects data (from `ClickHouse` or S3) and how it transfo
 
 ### 3.1. Beacon Module & Slot Processing
 
-- [ ] **Identify which code is purely scheduling**  
+- [x] **Identify which code is purely scheduling**  
   - The `SlotProcessor` in `beacon/processors/slot.py` has loops for forward slots, backward backlog, etc.  
   - Convert those loops into a Temporal workflow with steps that run the same queries or store the same data to S3.
 
-- [ ] **Use activities for external I/O**  
+- [x] **Use activities for external I/O**  
   - E.g., an activity that queries ClickHouse, returns results, then the workflow can decide how to store or transform them.
 
 ### 3.2. Timings Module & Summaries
 
-- [ ] **Look at `beacon_chain_timings/module.py`**  
+- [x] **Look at `beacon_chain_timings/module.py`**  
   - Each "processor" (e.g., `BlockTimingsProcessor`) can be ported to Go code that runs a job at an interval.  
   - Possibly use a single workflow that spawns multiple tasks in parallel for each "processor".
-
-- [ ] **Call S3 or store to ClickHouse**  
-  - Reference `transform_slot_data_for_storage` logic if needed.
+  - Implementations handle:
+    - Tracking when to recompute metrics (`_should_process`)
+    - Fetching data from Clickhouse
+    - Calculating metrics, stats, and visualizations
+    - Storing results to S3
+  - Output is stored as JSON in S3. That pattern can remain or shift to a database table if that's simpler.
 
 ### 3.3. Xatu Public Contributors
 
 - [ ] **Port the logic that aggregates users, countries, etc.**  
   - The Python code does queries via `sqlalchemy` → re-check them in Go.  
   - Output is stored as JSON in S3. That pattern can remain or shift to a database table if that's simpler.
+
+### Task 3: Beacon Chain Modules
+
+- [x] 3.1: Beacon Module & Slot Processing
+- [x] 3.2: Timings Module & Summaries
 
 ---
 
