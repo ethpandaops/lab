@@ -1,4 +1,4 @@
-.PHONY: build proto run-srv run-api clean
+.PHONY: build proto run-srv run-api clean create-proto
 
 # Build all
 build: proto build-binary
@@ -11,9 +11,15 @@ build-binary:
 # Generate protobuf
 proto:
 	@echo "Generating protobuf code..."
-	protoc --go_out=. --go_opt=paths=source_relative \
-		--go-grpc_out=. --go-grpc_opt=paths=source_relative \
-		proto/metrics/metrics.proto
+	buf generate --path pkg/proto/beacon_chain_timings
+	buf generate --path pkg/proto/lab
+
+# Create a new proto file
+create-proto:
+	@echo "Usage: make create-proto PROTO_NAME=<name>"
+	@if [ -n "$(PROTO_NAME)" ]; then \
+		./scripts/create_proto.sh $(PROTO_NAME); \
+	fi
 
 # Run srv service
 run-srv:
@@ -29,4 +35,5 @@ run-api:
 clean:
 	@echo "Cleaning..."
 	rm -rf bin
-	rm -rf proto/metrics/*.go 
+	rm -rf pkg/srv/proto/*/*.pb.go
+	rm -rf pkg/srv/proto/*/*_grpc.pb.go 

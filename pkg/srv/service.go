@@ -13,13 +13,14 @@ import (
 	"github.com/ethpandaops/lab/pkg/internal/lab/clickhouse"
 	"github.com/ethpandaops/lab/pkg/internal/lab/storage"
 	"github.com/ethpandaops/lab/pkg/internal/lab/temporal"
+	"github.com/ethpandaops/lab/pkg/srv/grpc"
 	"github.com/ethpandaops/lab/pkg/srv/workflows/beacon"
-	"github.com/ethpandaops/lab/pkg/srv/workflows/timings"
+	timings "github.com/ethpandaops/lab/pkg/srv/workflows/beacon_chain_timings"
 )
 
 // Config contains the configuration for the srv service
 type Config struct {
-	Server   *ServerConfig             `yaml:"server"`
+	Server   *grpc.ServerConfig        `yaml:"server"`
 	Ethereum *EthereumConfig           `yaml:"ethereum"`
 	Xatu     *clickhouse.Config        `yaml:"xatu"`     // Global Xatu config
 	Networks map[string]*NetworkConfig `yaml:"networks"` // Per-network configurations
@@ -44,17 +45,12 @@ type Features struct {
 	Timings bool `yaml:"timings"`
 }
 
-// ServerConfig contains the configuration for the gRPC server
-type ServerConfig struct {
-	Host string `yaml:"host"`
-	Port int    `yaml:"port"`
-}
-
 // Service represents the srv service
 type Service struct {
-	ctx    context.Context
-	config *Config
-	lab    *lab.Lab
+	ctx        context.Context
+	config     *Config
+	lab        *lab.Lab
+	grpcServer *grpc.Server
 }
 
 // New creates a new srv service
@@ -98,6 +94,11 @@ func (s *Service) Start(ctx context.Context) error {
 
 	// Register workflows and activities
 	s.registerWorkflows()
+
+	// Start gRPC server
+	if err := s.startGRPCServer(); err != nil {
+		return fmt.Errorf("failed to start gRPC server: %w", err)
+	}
 
 	// Block until context is canceled
 	<-s.ctx.Done()
@@ -165,6 +166,27 @@ func (s *Service) initializeServices() error {
 	return nil
 }
 
+// startGRPCServer initializes and starts the gRPC server
+func (s *Service) startGRPCServer() error {
+	s.lab.Log().Info("Starting gRPC server")
+
+	// Create gRPC server
+	s.grpcServer = grpc.NewServer(
+		s.lab.Log().WithField("component", "grpc_server"),
+		s.lab,
+		s.config.Server,
+	)
+
+	// Start gRPC server in a goroutine
+	go func() {
+		if err := s.grpcServer.Start(s.ctx, fmt.Sprintf("%s:%d", s.config.Server.Host, s.config.Server.Port)); err != nil {
+			s.lab.Log().WithError(err).Error("Failed to start gRPC server")
+		}
+	}()
+
+	return nil
+}
+
 // registerWorkflows registers all workflows and activities with Temporal
 func (s *Service) registerWorkflows() {
 	s.lab.Log().Info("Registering workflows and activities")
@@ -209,4 +231,8 @@ func (s *Service) registerWorkflows() {
 
 // stop stops the srv service
 func (s *Service) stop() {
+	// Stop gRPC server
+	if s.grpcServer != nil {
+		s.grpcServer.Stop()
+	}
 }
