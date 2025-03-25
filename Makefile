@@ -11,8 +11,8 @@ build-binary:
 # Generate protobuf
 proto:
 	@echo "Generating protobuf code..."
-	buf generate --path pkg/proto/beacon_chain_timings
-	buf generate --path pkg/proto/lab
+	buf generate --path pkg/srv/proto/beacon_chain_timings
+	buf generate --path pkg/srv/proto/lab
 
 # Create a new proto file
 create-proto:

@@ -93,14 +93,14 @@ func (s *Service) Start(ctx context.Context) error {
 
 // initializeServices initializes all services
 func (s *Service) initializeServices() error {
-	var err error
+	// var err error
 
 	// Initialize broker client
-	s.lab.Log().Info("Initializing broker client")
-	err = s.lab.InitBroker(s.config.Broker)
-	if err != nil {
-		return fmt.Errorf("failed to initialize broker: %w", err)
-	}
+	// s.lab.Log().Info("Initializing broker client")
+	// err = s.lab.InitBroker(s.config.Broker)
+	// if err != nil {
+	// 	return fmt.Errorf("failed to initialize broker: %w", err)
+	// }
 
 	// // Initialize cache
 	// s.lab.Log().Info("Initializing cache")

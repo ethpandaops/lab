@@ -6,51 +6,28 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
-	"time"
 
 	"github.com/ethpandaops/lab/pkg/internal/lab"
-	"github.com/ethpandaops/lab/pkg/internal/lab/broker"
 	"github.com/ethpandaops/lab/pkg/internal/lab/clickhouse"
 	"github.com/ethpandaops/lab/pkg/internal/lab/storage"
 	"github.com/ethpandaops/lab/pkg/internal/lab/temporal"
-	"github.com/ethpandaops/lab/pkg/srv/grpc"
-	"github.com/ethpandaops/lab/pkg/srv/workflows/beacon"
-	timings "github.com/ethpandaops/lab/pkg/srv/workflows/beacon_chain_timings"
+	"github.com/ethpandaops/lab/pkg/internal/lab/xatu"
+	"github.com/ethpandaops/lab/pkg/srv/proto"
+	bctpb "github.com/ethpandaops/lab/pkg/srv/proto/beacon_chain_timings"
+	labpb "github.com/ethpandaops/lab/pkg/srv/proto/lab"
 )
-
-// Config contains the configuration for the srv service
-type Config struct {
-	Server   *grpc.ServerConfig        `yaml:"server"`
-	Ethereum *EthereumConfig           `yaml:"ethereum"`
-	Xatu     *clickhouse.Config        `yaml:"xatu"`     // Global Xatu config
-	Networks map[string]*NetworkConfig `yaml:"networks"` // Per-network configurations
-	Storage  *storage.Config           `yaml:"storage"`
-	Temporal *temporal.Config          `yaml:"temporal"`
-	Broker   *broker.Config            `yaml:"broker"`
-}
-
-// NetworkConfig contains the configuration for a specific network
-type NetworkConfig struct {
-	Name     string             `yaml:"name"`
-	Ethereum *EthereumConfig    `yaml:"ethereum"`
-	Xatu     *clickhouse.Config `yaml:"xatu"` // Network-specific Xatu config
-}
-
-type EthereumConfig struct {
-	GenesisTime time.Time `yaml:"genesisTime"`
-	Features    Features  `yaml:"features"`
-}
-
-type Features struct {
-	Timings bool `yaml:"timings"`
-}
 
 // Service represents the srv service
 type Service struct {
 	ctx        context.Context
 	config     *Config
 	lab        *lab.Lab
-	grpcServer *grpc.Server
+	grpcServer *GRPCServer
+
+	// Clients
+	xatuClient     *xatu.Client
+	storageClient  storage.Client
+	temporalClient temporal.Client
 }
 
 // New creates a new srv service
@@ -58,7 +35,7 @@ func New(config *Config, logLevel string) (*Service, error) {
 	// Create lab instance
 	labInst, err := lab.New(lab.Config{
 		LogLevel: logLevel,
-	}, "lab.ethpandaops.io.srv")
+	}, QualifiedName)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create lab instance: %w", err)
 	}
@@ -93,11 +70,26 @@ func (s *Service) Start(ctx context.Context) error {
 	}
 
 	// Register workflows and activities
-	s.registerWorkflows()
+	// s.registerWorkflows()
+
+	services := []proto.Service{
+		labpb.NewService(s.lab),
+		bctpb.NewService(s.lab.Log(), s.xatuClient, s.storageClient, s.temporalClient),
+	}
+
+	// Create gRPC server
+	s.grpcServer = NewGRPCServer(
+		s.lab.Log().WithField("component", "grpc_server"),
+		s.config.Server,
+	)
 
 	// Start gRPC server
-	if err := s.startGRPCServer(); err != nil {
-		return fmt.Errorf("failed to start gRPC server: %w", err)
+	if err := s.grpcServer.Start(
+		s.ctx,
+		fmt.Sprintf("%s:%d", s.config.Server.Host, s.config.Server.Port),
+		services,
+	); err != nil {
+		s.lab.Log().WithError(err).Fatal("Failed to start gRPC server")
 	}
 
 	// Block until context is canceled
@@ -111,123 +103,109 @@ func (s *Service) Start(ctx context.Context) error {
 	s.stop()
 
 	s.lab.Log().Info("Srv service stopped")
+
 	return nil
 }
 
-// initializeServices initializes all services
+// initializeServices initializes all of the dependancies to run the srv service
 func (s *Service) initializeServices() error {
-	var err error
-
 	// Initialize global XatuClickhouse
-	s.lab.Log().Info("Initializing global ClickHouse client")
-	err = s.lab.InitXatu(s.config.Xatu)
+	s.lab.Log().Info("Initializing per-network Xatu ClickHouse clients")
+	xatuConfig := make(map[string]*clickhouse.Config)
+	for networkName, networkConfig := range s.config.Networks {
+		if networkConfig.Xatu != nil {
+			xatuConfig[networkName] = networkConfig.Xatu
+		}
+	}
+
+	xatuClient, err := s.lab.NewXatu(xatuConfig)
 	if err != nil {
 		return fmt.Errorf("failed to initialize global Xatu ClickHouse client: %w", err)
 	}
 
-	// Initialize per-network XatuClickhouse instances
-	for networkName, networkConfig := range s.config.Networks {
-		if networkConfig.Xatu != nil {
-			s.lab.Log().WithField("network", networkName).Info("Initializing network-specific ClickHouse client")
-			err = s.lab.InitXatuForNetwork(networkName, networkConfig.Xatu)
-			if err != nil {
-				return fmt.Errorf("failed to initialize Xatu ClickHouse client for network %s: %w", networkName, err)
-			}
-		}
+	// Start the Xatu client
+	if err := xatuClient.Start(s.ctx); err != nil {
+		return fmt.Errorf("failed to start Xatu client: %w", err)
 	}
 
 	// Initialize S3 Storage
 	s.lab.Log().Info("Initializing S3 storage")
-	err = s.lab.InitStorage(s.config.Storage)
+	storageClient, err := s.lab.NewStorage(s.config.Storage)
 	if err != nil {
 		return fmt.Errorf("failed to initialize S3 storage: %w", err)
 	}
 
+	// Start the storage client
+	if err := storageClient.Start(s.ctx); err != nil {
+		return fmt.Errorf("failed to start S3 storage client: %w", err)
+	}
+
 	// Initialize Temporal client
 	s.lab.Log().Info("Initializing Temporal client")
-	err = s.lab.InitTemporal(s.config.Temporal)
+	temporalClient, err := s.lab.NewTemporal(s.config.Temporal)
 	if err != nil {
 		return fmt.Errorf("failed to initialize Temporal client: %w", err)
 	}
 
+	// Start the temporal client
+	if err := temporalClient.Start(s.ctx); err != nil {
+		return fmt.Errorf("failed to start Temporal client: %w", err)
+	}
+
 	// Start Temporal worker
 	s.lab.Log().Info("Starting Temporal worker")
-	if err := s.lab.Temporal().StartWorker(); err != nil {
+	if err := temporalClient.StartWorker(); err != nil {
 		return fmt.Errorf("failed to start Temporal worker: %w", err)
 	}
 
-	// Initialize broker client
-	s.lab.Log().Info("Initializing broker client")
-	err = s.lab.InitBroker(s.config.Broker)
-	if err != nil {
-		return fmt.Errorf("failed to initialize broker: %w", err)
-	}
+	s.xatuClient = xatuClient
+	s.storageClient = storageClient
+	s.temporalClient = temporalClient
 
 	return nil
 }
 
-// startGRPCServer initializes and starts the gRPC server
-func (s *Service) startGRPCServer() error {
-	s.lab.Log().Info("Starting gRPC server")
+// // registerWorkflows registers all workflows and activities with Temporal
+// func (s *Service) registerWorkflows() {
+// 	s.lab.Log().Info("Registering workflows and activities")
 
-	// Create gRPC server
-	s.grpcServer = grpc.NewServer(
-		s.lab.Log().WithField("component", "grpc_server"),
-		s.lab,
-		s.config.Server,
-	)
+// 	// Register beacon workflows
+// 	s.lab.Temporal().RegisterWorkflow(beacon.SlotProcessWorkflow)
+// 	s.lab.Temporal().RegisterWorkflow(beacon.ProcessHeadSlotWorkflow)
+// 	s.lab.Temporal().RegisterWorkflow(beacon.ProcessBacklogWorkflow)
+// 	s.lab.Temporal().RegisterWorkflow(beacon.ProcessMiddleWorkflow)
 
-	// Start gRPC server in a goroutine
-	go func() {
-		if err := s.grpcServer.Start(s.ctx, fmt.Sprintf("%s:%d", s.config.Server.Host, s.config.Server.Port)); err != nil {
-			s.lab.Log().WithError(err).Error("Failed to start gRPC server")
-		}
-	}()
+// 	// Create beacon activity implementations
+// 	beaconActivities := beacon.NewActivityImplementations(s.lab)
 
-	return nil
-}
+// 	// Register beacon activities
+// 	s.lab.Temporal().RegisterActivity(beaconActivities.GetCurrentSlot)
+// 	s.lab.Temporal().RegisterActivity(beaconActivities.ProcessSlot)
+// 	s.lab.Temporal().RegisterActivity(beaconActivities.GetProcessorState)
+// 	s.lab.Temporal().RegisterActivity(beaconActivities.SaveProcessorState)
+// 	s.lab.Temporal().RegisterActivity(beaconActivities.CalculateTargetBacklogSlot)
+// 	s.lab.Temporal().RegisterActivity(beaconActivities.ProcessMissingSlots)
 
-// registerWorkflows registers all workflows and activities with Temporal
-func (s *Service) registerWorkflows() {
-	s.lab.Log().Info("Registering workflows and activities")
+// 	// Import timings module
 
-	// Register beacon workflows
-	s.lab.Temporal().RegisterWorkflow(beacon.SlotProcessWorkflow)
-	s.lab.Temporal().RegisterWorkflow(beacon.ProcessHeadSlotWorkflow)
-	s.lab.Temporal().RegisterWorkflow(beacon.ProcessBacklogWorkflow)
-	s.lab.Temporal().RegisterWorkflow(beacon.ProcessMiddleWorkflow)
+// 	// Register timings workflows
+// 	s.lab.Temporal().RegisterWorkflow(timings.TimingsModuleWorkflow)
+// 	s.lab.Temporal().RegisterWorkflow(timings.BlockTimingsProcessorWorkflow)
+// 	s.lab.Temporal().RegisterWorkflow(timings.SizeCDFProcessorWorkflow)
 
-	// Create beacon activity implementations
-	beaconActivities := beacon.NewActivityImplementations(s.lab)
+// 	// Create timings activity implementations
+// 	timingsActivities := timings.NewActivities(
+// 		s.lab.Log().WithField("component", "timings"),
+// 		s.lab,
+// 		"timings",
+// 	)
 
-	// Register beacon activities
-	s.lab.Temporal().RegisterActivity(beaconActivities.GetCurrentSlot)
-	s.lab.Temporal().RegisterActivity(beaconActivities.ProcessSlot)
-	s.lab.Temporal().RegisterActivity(beaconActivities.GetProcessorState)
-	s.lab.Temporal().RegisterActivity(beaconActivities.SaveProcessorState)
-	s.lab.Temporal().RegisterActivity(beaconActivities.CalculateTargetBacklogSlot)
-	s.lab.Temporal().RegisterActivity(beaconActivities.ProcessMissingSlots)
-
-	// Import timings module
-
-	// Register timings workflows
-	s.lab.Temporal().RegisterWorkflow(timings.TimingsModuleWorkflow)
-	s.lab.Temporal().RegisterWorkflow(timings.BlockTimingsProcessorWorkflow)
-	s.lab.Temporal().RegisterWorkflow(timings.SizeCDFProcessorWorkflow)
-
-	// Create timings activity implementations
-	timingsActivities := timings.NewActivities(
-		s.lab.Log().WithField("component", "timings"),
-		s.lab,
-		"timings",
-	)
-
-	// Register timings activities
-	s.lab.Temporal().RegisterActivity(timingsActivities.ShouldProcessActivity)
-	s.lab.Temporal().RegisterActivity(timingsActivities.ProcessBlockTimingsActivity)
-	s.lab.Temporal().RegisterActivity(timingsActivities.ProcessSizeCDFActivity)
-	s.lab.Temporal().RegisterActivity(timingsActivities.UpdateProcessorStateActivity)
-}
+// 	// Register timings activities
+// 	s.lab.Temporal().RegisterActivity(timingsActivities.ShouldProcessActivity)
+// 	s.lab.Temporal().RegisterActivity(timingsActivities.ProcessBlockTimingsActivity)
+// 	s.lab.Temporal().RegisterActivity(timingsActivities.ProcessSizeCDFActivity)
+// 	s.lab.Temporal().RegisterActivity(timingsActivities.UpdateProcessorStateActivity)
+// }
 
 // stop stops the srv service
 func (s *Service) stop() {
