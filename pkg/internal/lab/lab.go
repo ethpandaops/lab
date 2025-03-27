@@ -7,6 +7,7 @@ import (
 	"github.com/ethpandaops/lab/pkg/internal/lab/broker"
 	"github.com/ethpandaops/lab/pkg/internal/lab/cache"
 	"github.com/ethpandaops/lab/pkg/internal/lab/clickhouse"
+	"github.com/ethpandaops/lab/pkg/internal/lab/locker"
 	"github.com/ethpandaops/lab/pkg/internal/lab/logger"
 	"github.com/ethpandaops/lab/pkg/internal/lab/storage"
 	"github.com/ethpandaops/lab/pkg/internal/lab/xatu"
@@ -132,6 +133,13 @@ func (l *Lab) NewCache(cfg *cache.Config) (cache.Client, error) {
 	}
 
 	return c, nil
+}
+
+// NewLocker creates a new locker
+func (l *Lab) NewLocker(cache cache.Client) (locker.Locker, error) {
+	l.log.Info("Initializing locker")
+
+	return locker.NewLocker(l.log, cache), nil
 }
 
 // Stop gracefully stops all the components

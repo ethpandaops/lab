@@ -48,7 +48,15 @@ const (
 // Config contains configuration for caches
 type Config struct {
 	Type   CacheType `yaml:"type"` // "redis" or "memory"
-	Config map[string]interface{}
+	Config map[string]any
+}
+
+func (c *Config) Validate() error {
+	if c.Type == "" {
+		return fmt.Errorf("cache type is required")
+	}
+
+	return nil
 }
 
 // New creates a new cache based on the config
@@ -57,9 +65,8 @@ func New(config Config) (Client, error) {
 	case CacheTypeRedis:
 		redisConfig := &RedisConfig{}
 		if config.Config != nil {
-			// Attempt to parse the config
 			if err := mapstructure.Decode(config.Config, redisConfig); err != nil {
-				return nil, err
+				return nil, fmt.Errorf("failed to decode redis config: %w", err)
 			}
 		}
 
@@ -68,7 +75,7 @@ func New(config Config) (Client, error) {
 		memoryConfig := &MemoryConfig{}
 		if config.Config != nil {
 			if err := mapstructure.Decode(config.Config, memoryConfig); err != nil {
-				return nil, err
+				return nil, fmt.Errorf("failed to decode memory config: %w", err)
 			}
 		}
 

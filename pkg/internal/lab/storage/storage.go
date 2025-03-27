@@ -20,6 +20,8 @@ type Client interface {
 	Store(key string, data []byte) error
 	StoreAtomic(key string, data []byte) error
 	Get(key string) ([]byte, error)
+	GetEncoded(key string, v any, format CodecName) error
+	StoreEncoded(key string, v any, format CodecName) (string, error)
 	Delete(key string) error
 	List(prefix string) ([]string, error)
 	Stop() error
@@ -27,10 +29,11 @@ type Client interface {
 
 // Client represents an S3 storage client
 type client struct {
-	client *s3.Client
-	config *Config
-	log    logrus.FieldLogger
-	ctx    context.Context
+	client   *s3.Client
+	config   *Config
+	log      logrus.FieldLogger
+	ctx      context.Context
+	encoders *Registry
 }
 
 // New creates a new S3 storage client
@@ -43,8 +46,9 @@ func New(
 	}
 
 	return &client{
-		log:    log.WithField("module", "storage"),
-		config: config,
+		log:      log.WithField("module", "storage"),
+		config:   config,
+		encoders: NewRegistry(),
 	}, nil
 }
 
@@ -165,6 +169,44 @@ func (c *client) List(prefix string) ([]string, error) {
 	}
 
 	return keys, nil
+}
+
+// GetEncoded retrieves data from storage and decodes it into a struct
+func (c *client) GetEncoded(key string, v any, format CodecName) error {
+	data, err := c.Get(key)
+	if err != nil {
+		return fmt.Errorf("failed to get object: %w", err)
+	}
+
+	codec, err := c.encoders.Get(format)
+	if err != nil {
+		return err
+	}
+
+	return codec.Decode(data, v)
+}
+
+// StoreEncoded stores data in storage after encoding it
+func (c *client) StoreEncoded(key string, v any, format CodecName) (string, error) {
+	codec, err := c.encoders.Get(format)
+	if err != nil {
+		return "", err
+	}
+
+	data, err := codec.Encode(v)
+	if err != nil {
+		return "", fmt.Errorf("failed to encode object: %w", err)
+	}
+
+	// Add the appropriate file extension
+	key = key + "." + codec.FileExtension()
+
+	err = c.Store(key, data)
+	if err != nil {
+		return "", fmt.Errorf("failed to store object: %w", err)
+	}
+
+	return key, nil
 }
 
 // store is a helper function for storing data

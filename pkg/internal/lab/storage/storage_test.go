@@ -484,6 +484,14 @@ type MockStorage struct {
 	StopFn        func() error
 	GetClientFn   func() *s3.Client
 	GetBucketFn   func() string
+	encoders      *Registry
+}
+
+// NewMockStorage creates a new MockStorage with standard encoders
+func NewMockStorage() *MockStorage {
+	return &MockStorage{
+		encoders: NewRegistry(),
+	}
 }
 
 // Ensure MockStorage implements Client interface
@@ -491,6 +499,45 @@ var _ Client = (*MockStorage)(nil)
 
 func (m *MockStorage) Get(key string) ([]byte, error) {
 	return m.GetFn(key)
+}
+
+func (m *MockStorage) GetEncoded(key string, v any, format CodecName) error {
+	data, err := m.GetFn(key)
+	if err != nil {
+		return fmt.Errorf("failed to get object: %w", err)
+	}
+
+	// Initialize encoders if not set
+	if m.encoders == nil {
+		m.encoders = NewRegistry()
+	}
+
+	codec, err := m.encoders.Get(format)
+	if err != nil {
+		return err
+	}
+
+	return codec.Decode(data, v)
+}
+
+func (m *MockStorage) StoreEncoded(key string, v any, format CodecName) (string, error) {
+	// Initialize encoders if not set
+	if m.encoders == nil {
+		m.encoders = NewRegistry()
+	}
+
+	codec, err := m.encoders.Get(format)
+	if err != nil {
+		return "", err
+	}
+
+	data, err := codec.Encode(v)
+	if err != nil {
+		return "", fmt.Errorf("failed to encode object: %w", err)
+	}
+
+	key = key + "." + codec.FileExtension()
+	return key, m.StoreFn(key, data)
 }
 
 func (m *MockStorage) Store(key string, data []byte) error {
@@ -876,4 +923,54 @@ func TestListWithContents(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Len(t, keys, 3)
 	assert.Equal(t, []string{"key1", "key2", "key3"}, keys)
+}
+
+// Add test for GetEncoded and StoreEncoded methods
+func TestEncodedMethods(t *testing.T) {
+	client, cleanup := createStorageClient(t)
+	defer cleanup()
+
+	// Test structure with tags for both JSON and YAML
+	type TestData struct {
+		Name  string `json:"name" yaml:"name"`
+		Value int    `json:"value" yaml:"value"`
+	}
+
+	// Test data
+	testData := TestData{
+		Name:  "test",
+		Value: 42,
+	}
+
+	// Test JSON encoding
+	jsonKey := "test-json-encoded"
+	storedJsonKey, err := client.StoreEncoded(jsonKey, testData, CodecNameJSON)
+	assert.NoError(t, err)
+	assert.Equal(t, jsonKey+".json", storedJsonKey)
+
+	var retrievedJsonData TestData
+	err = client.GetEncoded(storedJsonKey, &retrievedJsonData, CodecNameJSON)
+	assert.NoError(t, err)
+	assert.Equal(t, testData, retrievedJsonData)
+
+	// Test YAML encoding
+	yamlKey := "test-yaml-encoded"
+	storedYamlKey, err := client.StoreEncoded(yamlKey, testData, CodecNameYAML)
+	assert.NoError(t, err)
+	assert.Equal(t, yamlKey+".yaml", storedYamlKey)
+
+	var retrievedYamlData TestData
+	err = client.GetEncoded(storedYamlKey, &retrievedYamlData, CodecNameYAML)
+	assert.NoError(t, err)
+	assert.Equal(t, testData, retrievedYamlData)
+
+	// Test unsupported encoding format for StoreEncoded
+	_, err = client.StoreEncoded("test-bad-encoding", testData, CodecName("bad_format"))
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "unknown encoding format")
+
+	// Test unsupported encoding format for GetEncoded
+	err = client.GetEncoded(storedJsonKey, &retrievedJsonData, CodecName("bad_format"))
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "unknown encoding format")
 }

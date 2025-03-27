@@ -9,8 +9,8 @@ import (
 
 	"github.com/ethpandaops/lab/pkg/internal/lab"
 	"github.com/ethpandaops/lab/pkg/internal/lab/clickhouse"
+	"github.com/ethpandaops/lab/pkg/internal/lab/locker"
 	"github.com/ethpandaops/lab/pkg/internal/lab/storage"
-	"github.com/ethpandaops/lab/pkg/internal/lab/temporal"
 	"github.com/ethpandaops/lab/pkg/internal/lab/xatu"
 	"github.com/ethpandaops/lab/pkg/server/internal/grpc"
 	"github.com/ethpandaops/lab/pkg/server/internal/service"
@@ -30,9 +30,9 @@ type Service struct {
 	services []service.Service
 
 	// Clients
-	xatuClient     *xatu.Client
-	storageClient  storage.Client
-	temporalClient temporal.Client
+	xatuClient    *xatu.Client
+	storageClient storage.Client
+	lockerClient  locker.Locker
 }
 
 // New creates a new srv service
@@ -134,10 +134,11 @@ func (s *Service) initializeServices(ctx context.Context) error {
 		service.NewLab(
 			s.lab.Log(),
 		),
-		service.NewBeaconChainTimings(
+		beacon_chain_timings.New(
 			s.lab.Log(),
 			s.xatuClient,
 			s.storageClient,
+			s.lockerClient,
 		),
 		service.NewXatuPublicContributors(
 			s.lab.Log(),
@@ -182,27 +183,8 @@ func (s *Service) initializeDependencies() error {
 		return fmt.Errorf("failed to start S3 storage client: %w", err)
 	}
 
-	// Initialize Temporal client
-	s.lab.Log().Info("Initializing Temporal client")
-	temporalClient, err := s.lab.NewTemporal(s.config.Temporal)
-	if err != nil {
-		return fmt.Errorf("failed to initialize Temporal client: %w", err)
-	}
-
-	// Start the temporal client
-	if err := temporalClient.Start(s.ctx); err != nil {
-		return fmt.Errorf("failed to start Temporal client: %w", err)
-	}
-
-	// Start Temporal worker
-	s.lab.Log().Info("Starting Temporal worker")
-	if err := temporalClient.StartWorker(); err != nil {
-		return fmt.Errorf("failed to start Temporal worker: %w", err)
-	}
-
 	s.xatuClient = xatuClient
 	s.storageClient = storageClient
-	s.temporalClient = temporalClient
 
 	return nil
 }

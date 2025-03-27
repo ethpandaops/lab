@@ -58,21 +58,7 @@ message SizeCDFData {
   map<string, DoubleList> arrival_times_ms = 9;
 }
 
-// DataProcessorParams are the parameters for data processor workflows
-message DataProcessorParams {
-  string network_name = 1;
-  string window_name = 2;
-}
 
-// BlockTimingsProcessorParams are the parameters for the block timings processor
-message BlockTimingsProcessorParams {
-  string network_name = 1;
-}
-
-// SizeCDFProcessorParams are the parameters for the size CDF processor
-message SizeCDFProcessorParams {
-  string network_name = 1;
-}
 
 // Service definitions
 service BeaconChainTimingsService {
