@@ -12,11 +12,81 @@ import (
 	"github.com/ethpandaops/lab/pkg/internal/lab/storage"
 	"github.com/ethpandaops/lab/pkg/internal/lab/xatu"
 	"github.com/sirupsen/logrus"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 const (
 	BeaconChainTimingsServiceName = "beacon_chain_timings"
 )
+
+// DefaultTimeWindows defines time window configurations for processing
+var DefaultTimeWindows = []TimeWindowConfig{
+	{
+		File:    "1h",
+		Label:   "Last hour",
+		RangeMs: 60 * 60 * 1000, // 1 hour in milliseconds
+	},
+	{
+		File:    "4h",
+		Label:   "Last 4 hours",
+		RangeMs: 4 * 60 * 60 * 1000, // 4 hours in milliseconds
+	},
+	{
+		File:    "24h",
+		Label:   "Last 24 hours",
+		RangeMs: 24 * 60 * 60 * 1000, // 24 hours in milliseconds
+	},
+	{
+		File:    "7d",
+		Label:   "Last 7 days",
+		RangeMs: 7 * 24 * 60 * 60 * 1000, // 7 days in milliseconds
+	},
+}
+
+// TimeWindowConfig represents configuration for a time window
+type TimeWindowConfig struct {
+	File    string
+	Label   string
+	RangeMs int64
+}
+
+// Data structures for processing
+type TimingData struct {
+	Network    string
+	Timestamp  *timestamppb.Timestamp
+	Validators map[string]*TimingData_ValidatorCategory
+}
+
+type TimingData_ValidatorCategory struct {
+	Categories map[string]int32
+}
+
+type SizeCDFData struct {
+	Network        string
+	Timestamp      *timestamppb.Timestamp
+	SizesKb        []int64
+	ArrivalTimesMs map[string]*SizeCDFData_DoubleList
+	Mev            map[string]float64
+	NonMev         map[string]float64
+	SoloMev        map[string]float64
+	SoloNonMev     map[string]float64
+	All            map[string]float64
+}
+
+type SizeCDFData_DoubleList struct {
+	Values []float64
+}
+
+type ProcessorState struct {
+	Network       string
+	LastProcessed *timestamppb.Timestamp
+}
+
+// DataProcessorParams holds parameters for data processing
+type DataProcessorParams struct {
+	NetworkName string
+	WindowName  string
+}
 
 func GetStoragePath(key string) string {
 	return fmt.Sprintf("%s/%s", BeaconChainTimingsServiceName, key)
@@ -37,6 +107,9 @@ type BeaconChainTimings struct {
 
 	processCtx       context.Context
 	processCtxCancel context.CancelFunc
+
+	// Base directory for storage
+	baseDir string
 }
 
 func New(
@@ -56,6 +129,8 @@ func New(
 		storageClient:  storageClient,
 		cacheClient:    cacheClient,
 		lockerClient:   lockerClient,
+
+		baseDir: BeaconChainTimingsServiceName,
 
 		processCtx:       nil,
 		processCtxCancel: nil,
@@ -127,30 +202,89 @@ func (b *BeaconChainTimings) Name() string {
 
 func (b *BeaconChainTimings) process() {
 	// Fetch the latest state from storage
-	state := &State{}
+	state := &State{
+		BlockTimings: DataTypeState{
+			LastProcessed: make(map[string]time.Time),
+		},
+		Cdf: DataTypeState{
+			LastProcessed: make(map[string]time.Time),
+		},
+	}
 
 	err := b.storageClient.GetEncoded(GetStoragePath(GetStateKey()), state, storage.CodecNameJSON)
 	if err != nil {
 		b.log.Errorf("failed to get state: %v", err)
-
-		return
 	}
 
+	// Process each network
 	for _, network := range b.ethereumConfig.Networks {
+		// Initialize if not exists
 		if _, ok := state.BlockTimings.LastProcessed[network.Name]; !ok {
 			state.BlockTimings.LastProcessed[network.Name] = time.Time{}
 		}
-
-		lastProcessed := state.BlockTimings.LastProcessed[network.Name]
-
-		if lastProcessed.IsZero() {
-			b.log.Infof("No last processed block for network: %s", network.Name)
-
-			continue
+		if _, ok := state.Cdf.LastProcessed[network.Name]; !ok {
+			state.Cdf.LastProcessed[network.Name] = time.Time{}
 		}
 
+		// Check if it's time to process
+		for _, window := range b.config.TimeWindows {
+			// Process block timings
+			shouldProcess, err := b.shouldProcess(network.Name, window.File, state.BlockTimings.LastProcessed[network.Name])
+			if err != nil {
+				b.log.WithError(err).Errorf("failed to check if should process block timings for network %s, window %s", network.Name, window.File)
+				continue
+			}
+
+			if shouldProcess {
+				if err := b.processBlockTimings(network, window.File); err != nil {
+					b.log.WithError(err).Errorf("failed to process block timings for network %s, window %s", network.Name, window.File)
+				} else {
+					// Update state
+					state.BlockTimings.LastProcessed[network.Name] = time.Now().UTC()
+				}
+			}
+
+			// Process CDF data
+			shouldProcess, err = b.shouldProcess(network.Name, window.File, state.Cdf.LastProcessed[network.Name])
+			if err != nil {
+				b.log.WithError(err).Errorf("failed to check if should process CDF for network %s, window %s", network.Name, window.File)
+				continue
+			}
+
+			if shouldProcess {
+				if err := b.processSizeCDF(network, window.File); err != nil {
+					b.log.WithError(err).Errorf("failed to process size CDF for network %s, window %s", network.Name, window.File)
+				} else {
+					// Update state
+					state.Cdf.LastProcessed[network.Name] = time.Now().UTC()
+				}
+			}
+		}
+	}
+
+	// Save the updated state
+	if _, err := b.storageClient.StoreEncoded(GetStoragePath(GetStateKey()), state, storage.CodecNameJSON); err != nil {
+		b.log.WithError(err).Error("failed to store state")
 	}
 }
 
-func (b *BeaconChainTimings) processBlockTimings(network *ethereum.Network) error {
+// shouldProcess determines if a network/window should be processed based on last processing time
+func (b *BeaconChainTimings) shouldProcess(network, window string, lastProcessed time.Time) (bool, error) {
+	b.log.WithFields(logrus.Fields{
+		"network": network,
+		"window":  window,
+	}).Debug("Checking if should process")
+
+	// If we don't have state yet or it's been long enough since the last update, process
+	if lastProcessed.IsZero() {
+		return true, nil
+	}
+
+	// Check if it's been long enough since the last update (15 minutes)
+	timeSinceLastUpdate := time.Since(lastProcessed)
+	if timeSinceLastUpdate > b.config.GetIntervalDuration() {
+		return true, nil
+	}
+
+	return false, nil
 }
