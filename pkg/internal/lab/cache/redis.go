@@ -2,81 +2,90 @@ package cache
 
 import (
 	"context"
-	"errors"
+	"fmt"
 	"time"
 
-	"github.com/redis/go-redis/v9"
+	"github.com/go-redis/redis/v8"
 )
 
+// RedisConfig contains configuration for Redis cache
 type RedisConfig struct {
-	URL        string        `yaml:"url"`
-	DefaultTTL time.Duration `yaml:"defaultTTL"`
+	URL        string        `yaml:"url"`        // Redis connection URL
+	DefaultTTL time.Duration `yaml:"defaultTTL"` // Default TTL for cache items
 }
 
-// RedisCache implements the Cache interface using Redis
-type RedisCache struct {
+// Redis is a Redis-backed cache implementation
+type Redis struct {
 	client     *redis.Client
 	ctx        context.Context
 	defaultTTL time.Duration
 }
 
 // NewRedis creates a new Redis cache
-func NewRedis(config RedisConfig) (*RedisCache, error) {
+func NewRedis(config RedisConfig) (*Redis, error) {
+	// Parse the Redis connection URL
 	opts, err := redis.ParseURL(config.URL)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("invalid Redis URL: %w", err)
 	}
 
+	// Create Redis client
 	client := redis.NewClient(opts)
-	ctx := context.Background()
 
-	// Test the connection
+	// Test connection
+	ctx := context.Background()
 	if err := client.Ping(ctx).Err(); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to connect to Redis: %w", err)
 	}
 
-	return &RedisCache{
+	return &Redis{
 		client:     client,
 		ctx:        ctx,
 		defaultTTL: config.DefaultTTL,
 	}, nil
 }
 
-// Get gets a value from the cache
-func (c *RedisCache) Get(key string) ([]byte, error) {
-	val, err := c.client.Get(c.ctx, key).Bytes()
+// Get retrieves a value from Redis
+func (r *Redis) Get(key string) ([]byte, error) {
+	// Get value from Redis
+	value, err := r.client.Get(r.ctx, key).Result()
 	if err != nil {
 		if err == redis.Nil {
-			return nil, errors.New("key not found")
+			return nil, ErrCacheMiss
 		}
-		return nil, err
+		return nil, fmt.Errorf("redis get error: %w", err)
 	}
-	return val, nil
+
+	return []byte(value), nil
 }
 
-// Set sets a value in the cache
-func (c *RedisCache) Set(key string, value []byte, ttl time.Duration) error {
+// Set stores a value in Redis with TTL
+func (r *Redis) Set(key string, value []byte, ttl time.Duration) error {
 	// Use default TTL if not specified
 	if ttl == 0 {
-		ttl = c.defaultTTL
+		ttl = r.defaultTTL
 	}
 
-	return c.client.Set(c.ctx, key, value, ttl).Err()
-}
-
-// Delete deletes a value from the cache
-func (c *RedisCache) Delete(key string) error {
-	result, err := c.client.Del(c.ctx, key).Result()
+	// Set value in Redis with TTL
+	err := r.client.Set(r.ctx, key, value, ttl).Err()
 	if err != nil {
-		return err
+		return fmt.Errorf("redis set error: %w", err)
 	}
-	if result == 0 {
-		return errors.New("key not found")
-	}
+
 	return nil
 }
 
-// Close closes the cache connection
-func (c *RedisCache) Stop() error {
-	return c.client.Close()
+// Delete removes a value from Redis
+func (r *Redis) Delete(key string) error {
+	err := r.client.Del(r.ctx, key).Err()
+	if err != nil {
+		return fmt.Errorf("redis delete error: %w", err)
+	}
+
+	return nil
+}
+
+// Stop closes the Redis connection
+func (r *Redis) Stop() error {
+	return r.client.Close()
 }

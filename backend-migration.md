@@ -133,7 +133,7 @@ Check how each module collects data (from `ClickHouse` or S3) and how it transfo
 
 ### 3.3. Xatu Public Contributors
 
-- [ ] **Port the logic that aggregates users, countries, etc.**  
+- [x] **Port the logic that aggregates users, countries, etc.**  
   - The Python code does queries via `sqlalchemy` → re-check them in Go.  
   - Output is stored as JSON in S3. That pattern can remain or shift to a database table if that's simpler.
 
@@ -141,6 +141,7 @@ Check how each module collects data (from `ClickHouse` or S3) and how it transfo
 
 - [x] 3.1: Beacon Module & Slot Processing
 - [x] 3.2: Timings Module & Summaries
+- [x] 3.3: Xatu Public Contributors
 
 ---
 

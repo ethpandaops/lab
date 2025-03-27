@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"github.com/ethpandaops/lab/pkg/api"
-	"github.com/ethpandaops/lab/pkg/srv"
+	srv "github.com/ethpandaops/lab/pkg/server"
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v3"
 )

@@ -1,11 +1,27 @@
 package cache
 
 import (
+	"crypto/rand"
+	"encoding/hex"
+	"errors"
 	"fmt"
 	"time"
 
 	"github.com/mitchellh/mapstructure"
 )
+
+// Error returned when a key is not found in the cache
+var ErrCacheMiss = errors.New("key not found in cache")
+
+// GenerateToken generates a random token for lock identification
+func GenerateToken() (string, error) {
+	b := make([]byte, 16)
+	_, err := rand.Read(b)
+	if err != nil {
+		return "", err
+	}
+	return hex.EncodeToString(b), nil
+}
 
 // Client is a cache client
 type Client interface {

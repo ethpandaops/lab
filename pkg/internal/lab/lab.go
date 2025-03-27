@@ -9,7 +9,6 @@ import (
 	"github.com/ethpandaops/lab/pkg/internal/lab/clickhouse"
 	"github.com/ethpandaops/lab/pkg/internal/lab/logger"
 	"github.com/ethpandaops/lab/pkg/internal/lab/storage"
-	"github.com/ethpandaops/lab/pkg/internal/lab/temporal"
 	"github.com/ethpandaops/lab/pkg/internal/lab/xatu"
 	"github.com/sirupsen/logrus"
 )
@@ -111,19 +110,6 @@ func (l *Lab) NewStorage(cfg *storage.Config) (storage.Client, error) {
 	}
 
 	return s, nil
-}
-
-// NewTemporal creates a new Temporal client
-func (l *Lab) NewTemporal(cfg *temporal.Config) (temporal.Client, error) {
-	t, err := temporal.New(
-		cfg,
-		l.log,
-	)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create Temporal client: %w", err)
-	}
-
-	return t, nil
 }
 
 // NewCache creates a new cache client

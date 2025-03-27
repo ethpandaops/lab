@@ -13,6 +13,7 @@ proto:
 	@echo "Generating protobuf code..."
 	buf generate --path pkg/srv/proto/beacon_chain_timings
 	buf generate --path pkg/srv/proto/lab
+	buf generate --path pkg/srv/proto/xatu_public_contributors
 
 # Create a new proto file
 create-proto:
