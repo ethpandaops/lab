@@ -1,0 +1,43 @@
+log_level: "info"
+
+api:
+  server:
+    host: "0.0.0.0"
+    port: 8080
+  srv_client:
+    address: "localhost:9090"
+  broker:
+    url: "nats://localhost:4222"
+    subject: "lab"
+  cache:
+    type: "memory"
+    ttl: 60
+    redis_url: "redis://localhost:6379/0"
+
+srv:
+  server:
+    host: "0.0.0.0"
+    port: 9090
+  clickhouse:
+    host: "localhost"
+    port: 9000
+    database: "lab"
+    username: "default"
+    password: ""
+    secure: false
+  s3:
+    endpoint: "localhost:9000"
+    region: "us-east-1"
+    bucket: "lab"
+    access_key_id: "minioadmin"
+    secret_access_key: "minioadmin"
+    use_ssl: false
+    use_path_style: true
+  temporal:
+    address: "localhost:7233"
+    namespace: "lab"
+    task_queue: "lab-tasks"
+    worker_count: 5
+  broker:
+    url: "nats://localhost:4222"
+    subject: "lab" 

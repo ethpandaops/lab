@@ -1,0 +1,158 @@
+syntax = "proto3";
+
+package xatu_public_contributors;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/ethpandaops/lab/pkg/proto/xatu_public_contributors";
+
+// TimeWindow represents a time window configuration
+message TimeWindow {
+  string file = 1;
+  string step = 2;
+  string label = 3;
+  string range = 4;
+}
+
+// ProcessorState tracks the processing state for a specific processor
+message ProcessorState {
+  string network = 1;
+  string processor = 2;
+  google.protobuf.Timestamp last_processed = 3;
+  map<string, google.protobuf.Timestamp> last_processed_windows = 4;
+}
+
+// NodeCount represents a count of nodes, differentiated between total and public
+message NodeCount {
+  int32 total_nodes = 1;
+  int32 public_nodes = 2;
+}
+
+// NetworkStats represents statistics for a specific network
+message NetworkStats {
+  int32 total_nodes = 1;
+  int32 total_public_nodes = 2;
+  map<string, NodeCount> countries = 3;
+  map<string, NodeCount> continents = 4;
+  map<string, NodeCount> cities = 5;
+  map<string, NodeCount> consensus_implementations = 6;
+}
+
+// SummaryData represents the summary data for all networks
+message SummaryData {
+  int64 updated_at = 1; // Unix timestamp
+  map<string, NetworkStats> networks = 2;
+}
+
+// CountryDataPoint represents a country with its node count
+message CountryDataPoint {
+  string name = 1;
+  int32 value = 2;
+}
+
+// CountriesTimePoint represents countries data for a specific time
+message CountriesTimePoint {
+  int64 time = 1; // Unix timestamp
+  repeated CountryDataPoint countries = 2;
+}
+
+// UserDataPoint represents a user with its node count
+message UserDataPoint {
+  string name = 1;
+  int32 value = 2;
+}
+
+// UsersTimePoint represents users data for a specific time
+message UsersTimePoint {
+  int64 time = 1; // Unix timestamp
+  repeated UserDataPoint users = 2;
+}
+
+// UserSummary represents a summary for a specific user
+message UserSummary {
+  string user = 1;
+  map<string, int32> networks = 2;
+  map<string, int32> countries = 3;
+  map<string, int32> continents = 4;
+  map<string, int32> cities = 5;
+  map<string, int32> clients = 6;
+  int64 first_seen = 7; // Unix timestamp
+  int64 last_seen = 8; // Unix timestamp
+  int32 total_nodes = 9;
+}
+
+// Workflow and activity parameters
+message ProcessorParams {
+  string network_name = 1;
+  string window_name = 2;
+}
+
+message SummaryProcessorParams {
+  string network_name = 1;
+}
+
+message CountriesProcessorParams {
+  string network_name = 1;
+}
+
+message UsersProcessorParams {
+  string network_name = 1;
+}
+
+message UserSummariesProcessorParams {
+  string network_name = 1;
+}
+
+// Service definitions
+service XatuPublicContributorsService {
+  // Get summary data for networks
+  rpc GetSummary(GetSummaryRequest) returns (GetSummaryResponse);
+  
+  // Get countries data for a specific network and time window
+  rpc GetCountriesData(GetCountriesDataRequest) returns (GetCountriesDataResponse);
+  
+  // Get users data for a specific network and time window
+  rpc GetUsersData(GetUsersDataRequest) returns (GetUsersDataResponse);
+  
+  // Get user summary data for a specific user
+  rpc GetUserSummary(GetUserSummaryRequest) returns (GetUserSummaryResponse);
+}
+
+// Request and response messages for the service methods
+message GetSummaryRequest {
+  string network = 1;
+}
+
+message GetSummaryResponse {
+  SummaryData data = 1;
+}
+
+message GetCountriesDataRequest {
+  string network = 1;
+  string window_name = 2;
+  google.protobuf.Timestamp start_time = 3;
+  google.protobuf.Timestamp end_time = 4;
+}
+
+message GetCountriesDataResponse {
+  repeated CountriesTimePoint data = 1;
+}
+
+message GetUsersDataRequest {
+  string network = 1;
+  string window_name = 2;
+  google.protobuf.Timestamp start_time = 3;
+  google.protobuf.Timestamp end_time = 4;
+}
+
+message GetUsersDataResponse {
+  repeated UsersTimePoint data = 1;
+}
+
+message GetUserSummaryRequest {
+  string user = 1;
+}
+
+message GetUserSummaryResponse {
+  UserSummary data = 1;
+} 
