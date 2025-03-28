@@ -83,7 +83,7 @@ func (l *Lab) NewBroker(config *broker.Config) (broker.Client, error) {
 
 // NewXatu creates a new Xatu client
 func (l *Lab) NewXatu(networks map[string]*clickhouse.Config) (*xatu.Client, error) {
-	xatuNetworks := make(map[string]*clickhouse.Client)
+	xatuNetworks := make(map[string]clickhouse.Client)
 
 	for network, config := range networks {
 		ch, err := clickhouse.New(
@@ -94,7 +94,7 @@ func (l *Lab) NewXatu(networks map[string]*clickhouse.Config) (*xatu.Client, err
 			return nil, fmt.Errorf("failed to create ClickHouse client: %w", err)
 		}
 
-		xatuNetworks[network] = &ch
+		xatuNetworks[network] = ch
 	}
 
 	return xatu.NewClient(xatuNetworks)
