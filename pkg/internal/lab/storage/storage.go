@@ -3,6 +3,7 @@ package storage
 import (
 	"bytes"
 	"context"
+	"errors"
 	"fmt"
 	"io"
 
@@ -10,6 +11,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/credentials"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
+	"github.com/aws/smithy-go"
 	"github.com/sirupsen/logrus"
 )
 
@@ -26,6 +28,10 @@ type Client interface {
 	List(prefix string) ([]string, error)
 	Stop() error
 }
+
+var (
+	ErrNotFound = errors.New("not found")
+)
 
 // Client represents an S3 storage client
 type client struct {
@@ -134,6 +140,12 @@ func (c *client) Get(key string) ([]byte, error) {
 
 	result, err := c.client.GetObject(c.ctx, getObjectInput)
 	if err != nil {
+		var apiErr smithy.APIError
+		if errors.As(err, &apiErr) {
+			if apiErr.ErrorCode() == "NoSuchKey" || apiErr.ErrorCode() == "NotFound" {
+				return nil, ErrNotFound
+			}
+		}
 		return nil, fmt.Errorf("failed to get object: %w", err)
 	}
 	defer result.Body.Close()

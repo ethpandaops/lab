@@ -65,44 +65,6 @@ func (c *Config) Validate() error {
 	return nil
 }
 
-// UnmarshalYAML sets defaults when unmarshaling from YAML
-func (c *Config) UnmarshalYAML(unmarshal func(interface{}) error) error {
-	// Define defaults
-	type ConfigDefaults struct {
-		Enabled     bool         `yaml:"enabled"`
-		Networks    []string     `yaml:"networks"`
-		Interval    string       `yaml:"interval"`
-		TimeWindows []TimeWindow `yaml:"time_windows"`
-	}
-
-	defaults := ConfigDefaults{
-		Enabled:  true,
-		Networks: []string{"mainnet"},
-		Interval: "5m",
-		TimeWindows: []TimeWindow{
-			{File: "last_90_days", Step: "3d", Label: "Last 90d", Range: "-90d"},
-			{File: "last_30_days", Step: "1d", Label: "Last 30d", Range: "-30d"},
-			{File: "last_1_day", Step: "1h", Label: "Last 1d", Range: "-1d"},
-			{File: "last_6h", Step: "5m", Label: "Last 6h", Range: "-6h"},
-		},
-	}
-
-	// Apply defaults and then unmarshal
-	type alias Config
-	if err := unmarshal((*alias)(&defaults)); err != nil {
-		return err
-	}
-
-	*c = Config{
-		Enabled:     defaults.Enabled,
-		Networks:    defaults.Networks,
-		Interval:    defaults.Interval,
-		TimeWindows: defaults.TimeWindows,
-	}
-
-	return nil
-}
-
 // GetInterval returns the parsed interval
 func (c *Config) GetInterval() time.Duration {
 	return c.interval
@@ -138,17 +100,4 @@ func (w *TimeWindow) GetTimeRange(now time.Time) (time.Time, time.Time) {
 // GetStepDuration returns the step duration
 func (w *TimeWindow) GetStepDuration() (time.Duration, error) {
 	return time.ParseDuration(w.Step)
-}
-
-// Default creates a default configuration
-func Default() *Config {
-	config := &Config{}
-	config.UnmarshalYAML(func(interface{}) error { return nil })
-	return config
-}
-
-// RegisterWorkflowConfig registers the workflow config
-// This will be called by the service during initialization
-func RegisterWorkflowConfig() *Config {
-	return Default()
 }
