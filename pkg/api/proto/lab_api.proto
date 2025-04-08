@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package api;
+
+option go_package = "github.com/ethpandaops/lab/pkg/api/proto;apipb";
+
+
+service LabAPI {
+  // Example RPC to get status
+  rpc GetStatus(GetStatusRequest) returns (GetStatusResponse);
+
+  // Example RPC to get summary
+  rpc GetSummary(GetSummaryRequest) returns (GetSummaryResponse);
+}
+
+message GetStatusRequest {}
+
+message GetStatusResponse {
+  string status = 1;
+  string version = 2;
+}
+
+message GetSummaryRequest {}
+
+message GetSummaryResponse {
+  string summary = 1;
+}
