@@ -11,21 +11,25 @@ import (
 	"time"
 
 	"github.com/ethpandaops/lab/pkg/internal/lab"
+	"github.com/ethpandaops/lab/pkg/internal/lab/cache"
+	"github.com/ethpandaops/lab/pkg/internal/lab/storage"
 	"github.com/gorilla/mux"
 	"google.golang.org/grpc"
 )
 
 // Service represents the api service
 type Service struct {
-	config       *Config
-	ctx          context.Context
-	cancel       context.CancelFunc
-	router       *mux.Router
-	server       *http.Server
-	grpcServer   *grpc.Server
-	grpcListener net.Listener
-	restServer   *http.Server
-	lab          *lab.Lab
+	config        *Config
+	ctx           context.Context
+	cancel        context.CancelFunc
+	router        *mux.Router
+	server        *http.Server
+	grpcServer    *grpc.Server
+	grpcListener  net.Listener
+	restServer    *http.Server
+	lab           *lab.Lab
+	cacheClient   cache.Client
+	storageClient storage.Client
 }
 
 // New creates a new api service
@@ -40,12 +44,26 @@ func New(config *Config, logLevel string) (*Service, error) {
 		return nil, fmt.Errorf("failed to create lab instance: %w", err)
 	}
 
+	cacheClient, err := labInst.NewCache(config.Cache)
+	if err != nil {
+		cancel()
+		return nil, fmt.Errorf("failed to create cache client: %w", err)
+	}
+
+	storageClient, err := labInst.NewStorage(nil)
+	if err != nil {
+		cancel()
+		return nil, fmt.Errorf("failed to create storage client: %w", err)
+	}
+
 	return &Service{
-		config: config,
-		ctx:    ctx,
-		cancel: cancel,
-		router: mux.NewRouter(),
-		lab:    labInst,
+		config:        config,
+		ctx:           ctx,
+		cancel:        cancel,
+		router:        mux.NewRouter(),
+		lab:           labInst,
+		cacheClient:   cacheClient,
+		storageClient: storageClient,
 	}, nil
 }
 

@@ -4,11 +4,13 @@
 // 	protoc        (unknown)
 // source: pkg/api/proto/lab_api.proto
 
-package apipb
+package proto
 
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
+	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 	reflect "reflect"
 	sync "sync"
 )
@@ -20,14 +22,16 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-type GetStatusRequest struct {
+type GetDataRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
+
+	Path string `protobuf:"bytes,1,opt,name=path,proto3" json:"path,omitempty"`
 }
 
-func (x *GetStatusRequest) Reset() {
-	*x = GetStatusRequest{}
+func (x *GetDataRequest) Reset() {
+	*x = GetDataRequest{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_pkg_api_proto_lab_api_proto_msgTypes[0]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -35,13 +39,13 @@ func (x *GetStatusRequest) Reset() {
 	}
 }
 
-func (x *GetStatusRequest) String() string {
+func (x *GetDataRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*GetStatusRequest) ProtoMessage() {}
+func (*GetDataRequest) ProtoMessage() {}
 
-func (x *GetStatusRequest) ProtoReflect() protoreflect.Message {
+func (x *GetDataRequest) ProtoReflect() protoreflect.Message {
 	mi := &file_pkg_api_proto_lab_api_proto_msgTypes[0]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -53,22 +57,30 @@ func (x *GetStatusRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetStatusRequest.ProtoReflect.Descriptor instead.
-func (*GetStatusRequest) Descriptor() ([]byte, []int) {
+// Deprecated: Use GetDataRequest.ProtoReflect.Descriptor instead.
+func (*GetDataRequest) Descriptor() ([]byte, []int) {
 	return file_pkg_api_proto_lab_api_proto_rawDescGZIP(), []int{0}
 }
 
-type GetStatusResponse struct {
+func (x *GetDataRequest) GetPath() string {
+	if x != nil {
+		return x.Path
+	}
+	return ""
+}
+
+type FrontendConfigResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Status  string `protobuf:"bytes,1,opt,name=status,proto3" json:"status,omitempty"`
-	Version string `protobuf:"bytes,2,opt,name=version,proto3" json:"version,omitempty"`
+	NetworkName string            `protobuf:"bytes,1,opt,name=network_name,json=networkName,proto3" json:"network_name,omitempty"`
+	Environment string            `protobuf:"bytes,2,opt,name=environment,proto3" json:"environment,omitempty"`
+	Settings    map[string]string `protobuf:"bytes,3,rep,name=settings,proto3" json:"settings,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 }
 
-func (x *GetStatusResponse) Reset() {
-	*x = GetStatusResponse{}
+func (x *FrontendConfigResponse) Reset() {
+	*x = FrontendConfigResponse{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_pkg_api_proto_lab_api_proto_msgTypes[1]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -76,13 +88,13 @@ func (x *GetStatusResponse) Reset() {
 	}
 }
 
-func (x *GetStatusResponse) String() string {
+func (x *FrontendConfigResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*GetStatusResponse) ProtoMessage() {}
+func (*FrontendConfigResponse) ProtoMessage() {}
 
-func (x *GetStatusResponse) ProtoReflect() protoreflect.Message {
+func (x *FrontendConfigResponse) ProtoReflect() protoreflect.Message {
 	mi := &file_pkg_api_proto_lab_api_proto_msgTypes[1]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -94,33 +106,43 @@ func (x *GetStatusResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetStatusResponse.ProtoReflect.Descriptor instead.
-func (*GetStatusResponse) Descriptor() ([]byte, []int) {
+// Deprecated: Use FrontendConfigResponse.ProtoReflect.Descriptor instead.
+func (*FrontendConfigResponse) Descriptor() ([]byte, []int) {
 	return file_pkg_api_proto_lab_api_proto_rawDescGZIP(), []int{1}
 }
 
-func (x *GetStatusResponse) GetStatus() string {
+func (x *FrontendConfigResponse) GetNetworkName() string {
 	if x != nil {
-		return x.Status
+		return x.NetworkName
 	}
 	return ""
 }
 
-func (x *GetStatusResponse) GetVersion() string {
+func (x *FrontendConfigResponse) GetEnvironment() string {
 	if x != nil {
-		return x.Version
+		return x.Environment
 	}
 	return ""
 }
 
-type GetSummaryRequest struct {
+func (x *FrontendConfigResponse) GetSettings() map[string]string {
+	if x != nil {
+		return x.Settings
+	}
+	return nil
+}
+
+type GetBeaconSlotDataRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
+
+	Network string `protobuf:"bytes,1,opt,name=network,proto3" json:"network,omitempty"`
+	Slot    uint64 `protobuf:"varint,2,opt,name=slot,proto3" json:"slot,omitempty"`
 }
 
-func (x *GetSummaryRequest) Reset() {
-	*x = GetSummaryRequest{}
+func (x *GetBeaconSlotDataRequest) Reset() {
+	*x = GetBeaconSlotDataRequest{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_pkg_api_proto_lab_api_proto_msgTypes[2]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -128,13 +150,13 @@ func (x *GetSummaryRequest) Reset() {
 	}
 }
 
-func (x *GetSummaryRequest) String() string {
+func (x *GetBeaconSlotDataRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*GetSummaryRequest) ProtoMessage() {}
+func (*GetBeaconSlotDataRequest) ProtoMessage() {}
 
-func (x *GetSummaryRequest) ProtoReflect() protoreflect.Message {
+func (x *GetBeaconSlotDataRequest) ProtoReflect() protoreflect.Message {
 	mi := &file_pkg_api_proto_lab_api_proto_msgTypes[2]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -146,21 +168,37 @@ func (x *GetSummaryRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetSummaryRequest.ProtoReflect.Descriptor instead.
-func (*GetSummaryRequest) Descriptor() ([]byte, []int) {
+// Deprecated: Use GetBeaconSlotDataRequest.ProtoReflect.Descriptor instead.
+func (*GetBeaconSlotDataRequest) Descriptor() ([]byte, []int) {
 	return file_pkg_api_proto_lab_api_proto_rawDescGZIP(), []int{2}
 }
 
-type GetSummaryResponse struct {
+func (x *GetBeaconSlotDataRequest) GetNetwork() string {
+	if x != nil {
+		return x.Network
+	}
+	return ""
+}
+
+func (x *GetBeaconSlotDataRequest) GetSlot() uint64 {
+	if x != nil {
+		return x.Slot
+	}
+	return 0
+}
+
+type BeaconSlotDataResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Summary string `protobuf:"bytes,1,opt,name=summary,proto3" json:"summary,omitempty"`
+	Network string `protobuf:"bytes,1,opt,name=network,proto3" json:"network,omitempty"`
+	Slot    uint64 `protobuf:"varint,2,opt,name=slot,proto3" json:"slot,omitempty"`
+	Data    []byte `protobuf:"bytes,3,opt,name=data,proto3" json:"data,omitempty"`
 }
 
-func (x *GetSummaryResponse) Reset() {
-	*x = GetSummaryResponse{}
+func (x *BeaconSlotDataResponse) Reset() {
+	*x = BeaconSlotDataResponse{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_pkg_api_proto_lab_api_proto_msgTypes[3]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -168,13 +206,13 @@ func (x *GetSummaryResponse) Reset() {
 	}
 }
 
-func (x *GetSummaryResponse) String() string {
+func (x *BeaconSlotDataResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*GetSummaryResponse) ProtoMessage() {}
+func (*BeaconSlotDataResponse) ProtoMessage() {}
 
-func (x *GetSummaryResponse) ProtoReflect() protoreflect.Message {
+func (x *BeaconSlotDataResponse) ProtoReflect() protoreflect.Message {
 	mi := &file_pkg_api_proto_lab_api_proto_msgTypes[3]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -186,14 +224,901 @@ func (x *GetSummaryResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetSummaryResponse.ProtoReflect.Descriptor instead.
-func (*GetSummaryResponse) Descriptor() ([]byte, []int) {
+// Deprecated: Use BeaconSlotDataResponse.ProtoReflect.Descriptor instead.
+func (*BeaconSlotDataResponse) Descriptor() ([]byte, []int) {
 	return file_pkg_api_proto_lab_api_proto_rawDescGZIP(), []int{3}
 }
 
-func (x *GetSummaryResponse) GetSummary() string {
+func (x *BeaconSlotDataResponse) GetNetwork() string {
 	if x != nil {
-		return x.Summary
+		return x.Network
+	}
+	return ""
+}
+
+func (x *BeaconSlotDataResponse) GetSlot() uint64 {
+	if x != nil {
+		return x.Slot
+	}
+	return 0
+}
+
+func (x *BeaconSlotDataResponse) GetData() []byte {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+type GetBeaconSlotRangeRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Network string `protobuf:"bytes,1,opt,name=network,proto3" json:"network,omitempty"`
+	Start   uint64 `protobuf:"varint,2,opt,name=start,proto3" json:"start,omitempty"`
+	End     uint64 `protobuf:"varint,3,opt,name=end,proto3" json:"end,omitempty"`
+}
+
+func (x *GetBeaconSlotRangeRequest) Reset() {
+	*x = GetBeaconSlotRangeRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_pkg_api_proto_lab_api_proto_msgTypes[4]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetBeaconSlotRangeRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetBeaconSlotRangeRequest) ProtoMessage() {}
+
+func (x *GetBeaconSlotRangeRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_pkg_api_proto_lab_api_proto_msgTypes[4]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetBeaconSlotRangeRequest.ProtoReflect.Descriptor instead.
+func (*GetBeaconSlotRangeRequest) Descriptor() ([]byte, []int) {
+	return file_pkg_api_proto_lab_api_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *GetBeaconSlotRangeRequest) GetNetwork() string {
+	if x != nil {
+		return x.Network
+	}
+	return ""
+}
+
+func (x *GetBeaconSlotRangeRequest) GetStart() uint64 {
+	if x != nil {
+		return x.Start
+	}
+	return 0
+}
+
+func (x *GetBeaconSlotRangeRequest) GetEnd() uint64 {
+	if x != nil {
+		return x.End
+	}
+	return 0
+}
+
+type BeaconSlotRangeResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Network string                    `protobuf:"bytes,1,opt,name=network,proto3" json:"network,omitempty"`
+	Slots   []*BeaconSlotDataResponse `protobuf:"bytes,2,rep,name=slots,proto3" json:"slots,omitempty"`
+}
+
+func (x *BeaconSlotRangeResponse) Reset() {
+	*x = BeaconSlotRangeResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_pkg_api_proto_lab_api_proto_msgTypes[5]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *BeaconSlotRangeResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BeaconSlotRangeResponse) ProtoMessage() {}
+
+func (x *BeaconSlotRangeResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_pkg_api_proto_lab_api_proto_msgTypes[5]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BeaconSlotRangeResponse.ProtoReflect.Descriptor instead.
+func (*BeaconSlotRangeResponse) Descriptor() ([]byte, []int) {
+	return file_pkg_api_proto_lab_api_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *BeaconSlotRangeResponse) GetNetwork() string {
+	if x != nil {
+		return x.Network
+	}
+	return ""
+}
+
+func (x *BeaconSlotRangeResponse) GetSlots() []*BeaconSlotDataResponse {
+	if x != nil {
+		return x.Slots
+	}
+	return nil
+}
+
+type GetBeaconNodesRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Network string `protobuf:"bytes,1,opt,name=network,proto3" json:"network,omitempty"`
+}
+
+func (x *GetBeaconNodesRequest) Reset() {
+	*x = GetBeaconNodesRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_pkg_api_proto_lab_api_proto_msgTypes[6]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetBeaconNodesRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetBeaconNodesRequest) ProtoMessage() {}
+
+func (x *GetBeaconNodesRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_pkg_api_proto_lab_api_proto_msgTypes[6]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetBeaconNodesRequest.ProtoReflect.Descriptor instead.
+func (*GetBeaconNodesRequest) Descriptor() ([]byte, []int) {
+	return file_pkg_api_proto_lab_api_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *GetBeaconNodesRequest) GetNetwork() string {
+	if x != nil {
+		return x.Network
+	}
+	return ""
+}
+
+type BeaconNodesResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Network string        `protobuf:"bytes,1,opt,name=network,proto3" json:"network,omitempty"`
+	Nodes   []*BeaconNode `protobuf:"bytes,2,rep,name=nodes,proto3" json:"nodes,omitempty"`
+}
+
+func (x *BeaconNodesResponse) Reset() {
+	*x = BeaconNodesResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_pkg_api_proto_lab_api_proto_msgTypes[7]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *BeaconNodesResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BeaconNodesResponse) ProtoMessage() {}
+
+func (x *BeaconNodesResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_pkg_api_proto_lab_api_proto_msgTypes[7]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BeaconNodesResponse.ProtoReflect.Descriptor instead.
+func (*BeaconNodesResponse) Descriptor() ([]byte, []int) {
+	return file_pkg_api_proto_lab_api_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *BeaconNodesResponse) GetNetwork() string {
+	if x != nil {
+		return x.Network
+	}
+	return ""
+}
+
+func (x *BeaconNodesResponse) GetNodes() []*BeaconNode {
+	if x != nil {
+		return x.Nodes
+	}
+	return nil
+}
+
+type BeaconNode struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Name   string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	Enode  string `protobuf:"bytes,2,opt,name=enode,proto3" json:"enode,omitempty"`
+	Client string `protobuf:"bytes,3,opt,name=client,proto3" json:"client,omitempty"`
+	Status string `protobuf:"bytes,4,opt,name=status,proto3" json:"status,omitempty"`
+}
+
+func (x *BeaconNode) Reset() {
+	*x = BeaconNode{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_pkg_api_proto_lab_api_proto_msgTypes[8]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *BeaconNode) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BeaconNode) ProtoMessage() {}
+
+func (x *BeaconNode) ProtoReflect() protoreflect.Message {
+	mi := &file_pkg_api_proto_lab_api_proto_msgTypes[8]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BeaconNode.ProtoReflect.Descriptor instead.
+func (*BeaconNode) Descriptor() ([]byte, []int) {
+	return file_pkg_api_proto_lab_api_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *BeaconNode) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *BeaconNode) GetEnode() string {
+	if x != nil {
+		return x.Enode
+	}
+	return ""
+}
+
+func (x *BeaconNode) GetClient() string {
+	if x != nil {
+		return x.Client
+	}
+	return ""
+}
+
+func (x *BeaconNode) GetStatus() string {
+	if x != nil {
+		return x.Status
+	}
+	return ""
+}
+
+type GetTimingDataRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Network    string `protobuf:"bytes,1,opt,name=network,proto3" json:"network,omitempty"`
+	WindowName string `protobuf:"bytes,2,opt,name=window_name,json=windowName,proto3" json:"window_name,omitempty"`
+	Start      uint64 `protobuf:"varint,3,opt,name=start,proto3" json:"start,omitempty"`
+	End        uint64 `protobuf:"varint,4,opt,name=end,proto3" json:"end,omitempty"`
+}
+
+func (x *GetTimingDataRequest) Reset() {
+	*x = GetTimingDataRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_pkg_api_proto_lab_api_proto_msgTypes[9]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetTimingDataRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetTimingDataRequest) ProtoMessage() {}
+
+func (x *GetTimingDataRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_pkg_api_proto_lab_api_proto_msgTypes[9]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetTimingDataRequest.ProtoReflect.Descriptor instead.
+func (*GetTimingDataRequest) Descriptor() ([]byte, []int) {
+	return file_pkg_api_proto_lab_api_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *GetTimingDataRequest) GetNetwork() string {
+	if x != nil {
+		return x.Network
+	}
+	return ""
+}
+
+func (x *GetTimingDataRequest) GetWindowName() string {
+	if x != nil {
+		return x.WindowName
+	}
+	return ""
+}
+
+func (x *GetTimingDataRequest) GetStart() uint64 {
+	if x != nil {
+		return x.Start
+	}
+	return 0
+}
+
+func (x *GetTimingDataRequest) GetEnd() uint64 {
+	if x != nil {
+		return x.End
+	}
+	return 0
+}
+
+type TimingDataResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Network    string             `protobuf:"bytes,1,opt,name=network,proto3" json:"network,omitempty"`
+	DataPoints []*TimingDataPoint `protobuf:"bytes,2,rep,name=data_points,json=dataPoints,proto3" json:"data_points,omitempty"`
+}
+
+func (x *TimingDataResponse) Reset() {
+	*x = TimingDataResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_pkg_api_proto_lab_api_proto_msgTypes[10]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *TimingDataResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TimingDataResponse) ProtoMessage() {}
+
+func (x *TimingDataResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_pkg_api_proto_lab_api_proto_msgTypes[10]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TimingDataResponse.ProtoReflect.Descriptor instead.
+func (*TimingDataResponse) Descriptor() ([]byte, []int) {
+	return file_pkg_api_proto_lab_api_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *TimingDataResponse) GetNetwork() string {
+	if x != nil {
+		return x.Network
+	}
+	return ""
+}
+
+func (x *TimingDataResponse) GetDataPoints() []*TimingDataPoint {
+	if x != nil {
+		return x.DataPoints
+	}
+	return nil
+}
+
+type TimingDataPoint struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Slot      uint64                 `protobuf:"varint,1,opt,name=slot,proto3" json:"slot,omitempty"`
+	Timestamp *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
+	Value     float64                `protobuf:"fixed64,3,opt,name=value,proto3" json:"value,omitempty"`
+}
+
+func (x *TimingDataPoint) Reset() {
+	*x = TimingDataPoint{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_pkg_api_proto_lab_api_proto_msgTypes[11]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *TimingDataPoint) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TimingDataPoint) ProtoMessage() {}
+
+func (x *TimingDataPoint) ProtoReflect() protoreflect.Message {
+	mi := &file_pkg_api_proto_lab_api_proto_msgTypes[11]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TimingDataPoint.ProtoReflect.Descriptor instead.
+func (*TimingDataPoint) Descriptor() ([]byte, []int) {
+	return file_pkg_api_proto_lab_api_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *TimingDataPoint) GetSlot() uint64 {
+	if x != nil {
+		return x.Slot
+	}
+	return 0
+}
+
+func (x *TimingDataPoint) GetTimestamp() *timestamppb.Timestamp {
+	if x != nil {
+		return x.Timestamp
+	}
+	return nil
+}
+
+func (x *TimingDataPoint) GetValue() float64 {
+	if x != nil {
+		return x.Value
+	}
+	return 0
+}
+
+type GetSizeCDFDataRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Network string `protobuf:"bytes,1,opt,name=network,proto3" json:"network,omitempty"`
+	Start   uint64 `protobuf:"varint,2,opt,name=start,proto3" json:"start,omitempty"`
+	End     uint64 `protobuf:"varint,3,opt,name=end,proto3" json:"end,omitempty"`
+}
+
+func (x *GetSizeCDFDataRequest) Reset() {
+	*x = GetSizeCDFDataRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_pkg_api_proto_lab_api_proto_msgTypes[12]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetSizeCDFDataRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetSizeCDFDataRequest) ProtoMessage() {}
+
+func (x *GetSizeCDFDataRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_pkg_api_proto_lab_api_proto_msgTypes[12]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetSizeCDFDataRequest.ProtoReflect.Descriptor instead.
+func (*GetSizeCDFDataRequest) Descriptor() ([]byte, []int) {
+	return file_pkg_api_proto_lab_api_proto_rawDescGZIP(), []int{12}
+}
+
+func (x *GetSizeCDFDataRequest) GetNetwork() string {
+	if x != nil {
+		return x.Network
+	}
+	return ""
+}
+
+func (x *GetSizeCDFDataRequest) GetStart() uint64 {
+	if x != nil {
+		return x.Start
+	}
+	return 0
+}
+
+func (x *GetSizeCDFDataRequest) GetEnd() uint64 {
+	if x != nil {
+		return x.End
+	}
+	return 0
+}
+
+type SizeCDFDataResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Network string          `protobuf:"bytes,1,opt,name=network,proto3" json:"network,omitempty"`
+	Points  []*SizeCDFPoint `protobuf:"bytes,2,rep,name=points,proto3" json:"points,omitempty"`
+}
+
+func (x *SizeCDFDataResponse) Reset() {
+	*x = SizeCDFDataResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_pkg_api_proto_lab_api_proto_msgTypes[13]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *SizeCDFDataResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SizeCDFDataResponse) ProtoMessage() {}
+
+func (x *SizeCDFDataResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_pkg_api_proto_lab_api_proto_msgTypes[13]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SizeCDFDataResponse.ProtoReflect.Descriptor instead.
+func (*SizeCDFDataResponse) Descriptor() ([]byte, []int) {
+	return file_pkg_api_proto_lab_api_proto_rawDescGZIP(), []int{13}
+}
+
+func (x *SizeCDFDataResponse) GetNetwork() string {
+	if x != nil {
+		return x.Network
+	}
+	return ""
+}
+
+func (x *SizeCDFDataResponse) GetPoints() []*SizeCDFPoint {
+	if x != nil {
+		return x.Points
+	}
+	return nil
+}
+
+type SizeCDFPoint struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Slot          uint64  `protobuf:"varint,1,opt,name=slot,proto3" json:"slot,omitempty"`
+	Percentile_50 float64 `protobuf:"fixed64,2,opt,name=percentile_50,json=percentile50,proto3" json:"percentile_50,omitempty"`
+	Percentile_90 float64 `protobuf:"fixed64,3,opt,name=percentile_90,json=percentile90,proto3" json:"percentile_90,omitempty"`
+	Percentile_99 float64 `protobuf:"fixed64,4,opt,name=percentile_99,json=percentile99,proto3" json:"percentile_99,omitempty"`
+}
+
+func (x *SizeCDFPoint) Reset() {
+	*x = SizeCDFPoint{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_pkg_api_proto_lab_api_proto_msgTypes[14]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *SizeCDFPoint) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SizeCDFPoint) ProtoMessage() {}
+
+func (x *SizeCDFPoint) ProtoReflect() protoreflect.Message {
+	mi := &file_pkg_api_proto_lab_api_proto_msgTypes[14]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SizeCDFPoint.ProtoReflect.Descriptor instead.
+func (*SizeCDFPoint) Descriptor() ([]byte, []int) {
+	return file_pkg_api_proto_lab_api_proto_rawDescGZIP(), []int{14}
+}
+
+func (x *SizeCDFPoint) GetSlot() uint64 {
+	if x != nil {
+		return x.Slot
+	}
+	return 0
+}
+
+func (x *SizeCDFPoint) GetPercentile_50() float64 {
+	if x != nil {
+		return x.Percentile_50
+	}
+	return 0
+}
+
+func (x *SizeCDFPoint) GetPercentile_90() float64 {
+	if x != nil {
+		return x.Percentile_90
+	}
+	return 0
+}
+
+func (x *SizeCDFPoint) GetPercentile_99() float64 {
+	if x != nil {
+		return x.Percentile_99
+	}
+	return 0
+}
+
+type GetBeaconStateFileRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Network string `protobuf:"bytes,1,opt,name=network,proto3" json:"network,omitempty"`
+}
+
+func (x *GetBeaconStateFileRequest) Reset() {
+	*x = GetBeaconStateFileRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_pkg_api_proto_lab_api_proto_msgTypes[15]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetBeaconStateFileRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetBeaconStateFileRequest) ProtoMessage() {}
+
+func (x *GetBeaconStateFileRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_pkg_api_proto_lab_api_proto_msgTypes[15]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetBeaconStateFileRequest.ProtoReflect.Descriptor instead.
+func (*GetBeaconStateFileRequest) Descriptor() ([]byte, []int) {
+	return file_pkg_api_proto_lab_api_proto_rawDescGZIP(), []int{15}
+}
+
+func (x *GetBeaconStateFileRequest) GetNetwork() string {
+	if x != nil {
+		return x.Network
+	}
+	return ""
+}
+
+type GetBeaconSlotFileRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Network string `protobuf:"bytes,1,opt,name=network,proto3" json:"network,omitempty"`
+	Slot    uint64 `protobuf:"varint,2,opt,name=slot,proto3" json:"slot,omitempty"`
+}
+
+func (x *GetBeaconSlotFileRequest) Reset() {
+	*x = GetBeaconSlotFileRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_pkg_api_proto_lab_api_proto_msgTypes[16]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetBeaconSlotFileRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetBeaconSlotFileRequest) ProtoMessage() {}
+
+func (x *GetBeaconSlotFileRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_pkg_api_proto_lab_api_proto_msgTypes[16]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetBeaconSlotFileRequest.ProtoReflect.Descriptor instead.
+func (*GetBeaconSlotFileRequest) Descriptor() ([]byte, []int) {
+	return file_pkg_api_proto_lab_api_proto_rawDescGZIP(), []int{16}
+}
+
+func (x *GetBeaconSlotFileRequest) GetNetwork() string {
+	if x != nil {
+		return x.Network
+	}
+	return ""
+}
+
+func (x *GetBeaconSlotFileRequest) GetSlot() uint64 {
+	if x != nil {
+		return x.Slot
+	}
+	return 0
+}
+
+type DataFileChunk struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Content []byte `protobuf:"bytes,1,opt,name=content,proto3" json:"content,omitempty"`
+}
+
+func (x *DataFileChunk) Reset() {
+	*x = DataFileChunk{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_pkg_api_proto_lab_api_proto_msgTypes[17]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *DataFileChunk) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DataFileChunk) ProtoMessage() {}
+
+func (x *DataFileChunk) ProtoReflect() protoreflect.Message {
+	mi := &file_pkg_api_proto_lab_api_proto_msgTypes[17]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DataFileChunk.ProtoReflect.Descriptor instead.
+func (*DataFileChunk) Descriptor() ([]byte, []int) {
+	return file_pkg_api_proto_lab_api_proto_rawDescGZIP(), []int{17}
+}
+
+func (x *DataFileChunk) GetContent() []byte {
+	if x != nil {
+		return x.Content
+	}
+	return nil
+}
+
+type StatusResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Status  string `protobuf:"bytes,1,opt,name=status,proto3" json:"status,omitempty"`
+	Version string `protobuf:"bytes,2,opt,name=version,proto3" json:"version,omitempty"`
+}
+
+func (x *StatusResponse) Reset() {
+	*x = StatusResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_pkg_api_proto_lab_api_proto_msgTypes[18]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *StatusResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*StatusResponse) ProtoMessage() {}
+
+func (x *StatusResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_pkg_api_proto_lab_api_proto_msgTypes[18]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use StatusResponse.ProtoReflect.Descriptor instead.
+func (*StatusResponse) Descriptor() ([]byte, []int) {
+	return file_pkg_api_proto_lab_api_proto_rawDescGZIP(), []int{18}
+}
+
+func (x *StatusResponse) GetStatus() string {
+	if x != nil {
+		return x.Status
+	}
+	return ""
+}
+
+func (x *StatusResponse) GetVersion() string {
+	if x != nil {
+		return x.Version
 	}
 	return ""
 }
@@ -202,30 +1127,174 @@ var File_pkg_api_proto_lab_api_proto protoreflect.FileDescriptor
 
 var file_pkg_api_proto_lab_api_proto_rawDesc = []byte{
 	0x0a, 0x1b, 0x70, 0x6b, 0x67, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f,
-	0x6c, 0x61, 0x62, 0x5f, 0x61, 0x70, 0x69, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x12, 0x03, 0x61,
-	0x70, 0x69, 0x22, 0x12, 0x0a, 0x10, 0x47, 0x65, 0x74, 0x53, 0x74, 0x61, 0x74, 0x75, 0x73, 0x52,
-	0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x22, 0x45, 0x0a, 0x11, 0x47, 0x65, 0x74, 0x53, 0x74, 0x61,
-	0x74, 0x75, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x16, 0x0a, 0x06, 0x73,
-	0x74, 0x61, 0x74, 0x75, 0x73, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x73, 0x74, 0x61,
-	0x74, 0x75, 0x73, 0x12, 0x18, 0x0a, 0x07, 0x76, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x18, 0x02,
-	0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x76, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x22, 0x13, 0x0a,
-	0x11, 0x47, 0x65, 0x74, 0x53, 0x75, 0x6d, 0x6d, 0x61, 0x72, 0x79, 0x52, 0x65, 0x71, 0x75, 0x65,
-	0x73, 0x74, 0x22, 0x2e, 0x0a, 0x12, 0x47, 0x65, 0x74, 0x53, 0x75, 0x6d, 0x6d, 0x61, 0x72, 0x79,
-	0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x18, 0x0a, 0x07, 0x73, 0x75, 0x6d, 0x6d,
-	0x61, 0x72, 0x79, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x73, 0x75, 0x6d, 0x6d, 0x61,
-	0x72, 0x79, 0x32, 0x83, 0x01, 0x0a, 0x06, 0x4c, 0x61, 0x62, 0x41, 0x50, 0x49, 0x12, 0x3a, 0x0a,
-	0x09, 0x47, 0x65, 0x74, 0x53, 0x74, 0x61, 0x74, 0x75, 0x73, 0x12, 0x15, 0x2e, 0x61, 0x70, 0x69,
-	0x2e, 0x47, 0x65, 0x74, 0x53, 0x74, 0x61, 0x74, 0x75, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73,
-	0x74, 0x1a, 0x16, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x47, 0x65, 0x74, 0x53, 0x74, 0x61, 0x74, 0x75,
-	0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x3d, 0x0a, 0x0a, 0x47, 0x65, 0x74,
-	0x53, 0x75, 0x6d, 0x6d, 0x61, 0x72, 0x79, 0x12, 0x16, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x47, 0x65,
-	0x74, 0x53, 0x75, 0x6d, 0x6d, 0x61, 0x72, 0x79, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a,
-	0x17, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x47, 0x65, 0x74, 0x53, 0x75, 0x6d, 0x6d, 0x61, 0x72, 0x79,
-	0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x42, 0x30, 0x5a, 0x2e, 0x67, 0x69, 0x74, 0x68,
-	0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x65, 0x74, 0x68, 0x70, 0x61, 0x6e, 0x64, 0x61, 0x6f,
-	0x70, 0x73, 0x2f, 0x6c, 0x61, 0x62, 0x2f, 0x70, 0x6b, 0x67, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x70,
-	0x72, 0x6f, 0x74, 0x6f, 0x3b, 0x61, 0x70, 0x69, 0x70, 0x62, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74,
-	0x6f, 0x33,
+	0x6c, 0x61, 0x62, 0x5f, 0x61, 0x70, 0x69, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x12, 0x06, 0x6c,
+	0x61, 0x62, 0x61, 0x70, 0x69, 0x1a, 0x1b, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2f, 0x70, 0x72,
+	0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2f, 0x65, 0x6d, 0x70, 0x74, 0x79, 0x2e, 0x70, 0x72, 0x6f,
+	0x74, 0x6f, 0x1a, 0x1f, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f,
+	0x62, 0x75, 0x66, 0x2f, 0x74, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x2e, 0x70, 0x72,
+	0x6f, 0x74, 0x6f, 0x22, 0x24, 0x0a, 0x0e, 0x47, 0x65, 0x74, 0x44, 0x61, 0x74, 0x61, 0x52, 0x65,
+	0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x12, 0x0a, 0x04, 0x70, 0x61, 0x74, 0x68, 0x18, 0x01, 0x20,
+	0x01, 0x28, 0x09, 0x52, 0x04, 0x70, 0x61, 0x74, 0x68, 0x22, 0xe4, 0x01, 0x0a, 0x16, 0x46, 0x72,
+	0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x64, 0x43, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x52, 0x65, 0x73, 0x70,
+	0x6f, 0x6e, 0x73, 0x65, 0x12, 0x21, 0x0a, 0x0c, 0x6e, 0x65, 0x74, 0x77, 0x6f, 0x72, 0x6b, 0x5f,
+	0x6e, 0x61, 0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0b, 0x6e, 0x65, 0x74, 0x77,
+	0x6f, 0x72, 0x6b, 0x4e, 0x61, 0x6d, 0x65, 0x12, 0x20, 0x0a, 0x0b, 0x65, 0x6e, 0x76, 0x69, 0x72,
+	0x6f, 0x6e, 0x6d, 0x65, 0x6e, 0x74, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0b, 0x65, 0x6e,
+	0x76, 0x69, 0x72, 0x6f, 0x6e, 0x6d, 0x65, 0x6e, 0x74, 0x12, 0x48, 0x0a, 0x08, 0x73, 0x65, 0x74,
+	0x74, 0x69, 0x6e, 0x67, 0x73, 0x18, 0x03, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x2c, 0x2e, 0x6c, 0x61,
+	0x62, 0x61, 0x70, 0x69, 0x2e, 0x46, 0x72, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x64, 0x43, 0x6f, 0x6e,
+	0x66, 0x69, 0x67, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x2e, 0x53, 0x65, 0x74, 0x74,
+	0x69, 0x6e, 0x67, 0x73, 0x45, 0x6e, 0x74, 0x72, 0x79, 0x52, 0x08, 0x73, 0x65, 0x74, 0x74, 0x69,
+	0x6e, 0x67, 0x73, 0x1a, 0x3b, 0x0a, 0x0d, 0x53, 0x65, 0x74, 0x74, 0x69, 0x6e, 0x67, 0x73, 0x45,
+	0x6e, 0x74, 0x72, 0x79, 0x12, 0x10, 0x0a, 0x03, 0x6b, 0x65, 0x79, 0x18, 0x01, 0x20, 0x01, 0x28,
+	0x09, 0x52, 0x03, 0x6b, 0x65, 0x79, 0x12, 0x14, 0x0a, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x18,
+	0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x3a, 0x02, 0x38, 0x01,
+	0x22, 0x48, 0x0a, 0x18, 0x47, 0x65, 0x74, 0x42, 0x65, 0x61, 0x63, 0x6f, 0x6e, 0x53, 0x6c, 0x6f,
+	0x74, 0x44, 0x61, 0x74, 0x61, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x18, 0x0a, 0x07,
+	0x6e, 0x65, 0x74, 0x77, 0x6f, 0x72, 0x6b, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x6e,
+	0x65, 0x74, 0x77, 0x6f, 0x72, 0x6b, 0x12, 0x12, 0x0a, 0x04, 0x73, 0x6c, 0x6f, 0x74, 0x18, 0x02,
+	0x20, 0x01, 0x28, 0x04, 0x52, 0x04, 0x73, 0x6c, 0x6f, 0x74, 0x22, 0x5a, 0x0a, 0x16, 0x42, 0x65,
+	0x61, 0x63, 0x6f, 0x6e, 0x53, 0x6c, 0x6f, 0x74, 0x44, 0x61, 0x74, 0x61, 0x52, 0x65, 0x73, 0x70,
+	0x6f, 0x6e, 0x73, 0x65, 0x12, 0x18, 0x0a, 0x07, 0x6e, 0x65, 0x74, 0x77, 0x6f, 0x72, 0x6b, 0x18,
+	0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x6e, 0x65, 0x74, 0x77, 0x6f, 0x72, 0x6b, 0x12, 0x12,
+	0x0a, 0x04, 0x73, 0x6c, 0x6f, 0x74, 0x18, 0x02, 0x20, 0x01, 0x28, 0x04, 0x52, 0x04, 0x73, 0x6c,
+	0x6f, 0x74, 0x12, 0x12, 0x0a, 0x04, 0x64, 0x61, 0x74, 0x61, 0x18, 0x03, 0x20, 0x01, 0x28, 0x0c,
+	0x52, 0x04, 0x64, 0x61, 0x74, 0x61, 0x22, 0x5d, 0x0a, 0x19, 0x47, 0x65, 0x74, 0x42, 0x65, 0x61,
+	0x63, 0x6f, 0x6e, 0x53, 0x6c, 0x6f, 0x74, 0x52, 0x61, 0x6e, 0x67, 0x65, 0x52, 0x65, 0x71, 0x75,
+	0x65, 0x73, 0x74, 0x12, 0x18, 0x0a, 0x07, 0x6e, 0x65, 0x74, 0x77, 0x6f, 0x72, 0x6b, 0x18, 0x01,
+	0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x6e, 0x65, 0x74, 0x77, 0x6f, 0x72, 0x6b, 0x12, 0x14, 0x0a,
+	0x05, 0x73, 0x74, 0x61, 0x72, 0x74, 0x18, 0x02, 0x20, 0x01, 0x28, 0x04, 0x52, 0x05, 0x73, 0x74,
+	0x61, 0x72, 0x74, 0x12, 0x10, 0x0a, 0x03, 0x65, 0x6e, 0x64, 0x18, 0x03, 0x20, 0x01, 0x28, 0x04,
+	0x52, 0x03, 0x65, 0x6e, 0x64, 0x22, 0x69, 0x0a, 0x17, 0x42, 0x65, 0x61, 0x63, 0x6f, 0x6e, 0x53,
+	0x6c, 0x6f, 0x74, 0x52, 0x61, 0x6e, 0x67, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65,
+	0x12, 0x18, 0x0a, 0x07, 0x6e, 0x65, 0x74, 0x77, 0x6f, 0x72, 0x6b, 0x18, 0x01, 0x20, 0x01, 0x28,
+	0x09, 0x52, 0x07, 0x6e, 0x65, 0x74, 0x77, 0x6f, 0x72, 0x6b, 0x12, 0x34, 0x0a, 0x05, 0x73, 0x6c,
+	0x6f, 0x74, 0x73, 0x18, 0x02, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x1e, 0x2e, 0x6c, 0x61, 0x62, 0x61,
+	0x70, 0x69, 0x2e, 0x42, 0x65, 0x61, 0x63, 0x6f, 0x6e, 0x53, 0x6c, 0x6f, 0x74, 0x44, 0x61, 0x74,
+	0x61, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x52, 0x05, 0x73, 0x6c, 0x6f, 0x74, 0x73,
+	0x22, 0x31, 0x0a, 0x15, 0x47, 0x65, 0x74, 0x42, 0x65, 0x61, 0x63, 0x6f, 0x6e, 0x4e, 0x6f, 0x64,
+	0x65, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x18, 0x0a, 0x07, 0x6e, 0x65, 0x74,
+	0x77, 0x6f, 0x72, 0x6b, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x6e, 0x65, 0x74, 0x77,
+	0x6f, 0x72, 0x6b, 0x22, 0x59, 0x0a, 0x13, 0x42, 0x65, 0x61, 0x63, 0x6f, 0x6e, 0x4e, 0x6f, 0x64,
+	0x65, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x18, 0x0a, 0x07, 0x6e, 0x65,
+	0x74, 0x77, 0x6f, 0x72, 0x6b, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x6e, 0x65, 0x74,
+	0x77, 0x6f, 0x72, 0x6b, 0x12, 0x28, 0x0a, 0x05, 0x6e, 0x6f, 0x64, 0x65, 0x73, 0x18, 0x02, 0x20,
+	0x03, 0x28, 0x0b, 0x32, 0x12, 0x2e, 0x6c, 0x61, 0x62, 0x61, 0x70, 0x69, 0x2e, 0x42, 0x65, 0x61,
+	0x63, 0x6f, 0x6e, 0x4e, 0x6f, 0x64, 0x65, 0x52, 0x05, 0x6e, 0x6f, 0x64, 0x65, 0x73, 0x22, 0x66,
+	0x0a, 0x0a, 0x42, 0x65, 0x61, 0x63, 0x6f, 0x6e, 0x4e, 0x6f, 0x64, 0x65, 0x12, 0x12, 0x0a, 0x04,
+	0x6e, 0x61, 0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x6e, 0x61, 0x6d, 0x65,
+	0x12, 0x14, 0x0a, 0x05, 0x65, 0x6e, 0x6f, 0x64, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52,
+	0x05, 0x65, 0x6e, 0x6f, 0x64, 0x65, 0x12, 0x16, 0x0a, 0x06, 0x63, 0x6c, 0x69, 0x65, 0x6e, 0x74,
+	0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x63, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x12, 0x16,
+	0x0a, 0x06, 0x73, 0x74, 0x61, 0x74, 0x75, 0x73, 0x18, 0x04, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06,
+	0x73, 0x74, 0x61, 0x74, 0x75, 0x73, 0x22, 0x79, 0x0a, 0x14, 0x47, 0x65, 0x74, 0x54, 0x69, 0x6d,
+	0x69, 0x6e, 0x67, 0x44, 0x61, 0x74, 0x61, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x18,
+	0x0a, 0x07, 0x6e, 0x65, 0x74, 0x77, 0x6f, 0x72, 0x6b, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52,
+	0x07, 0x6e, 0x65, 0x74, 0x77, 0x6f, 0x72, 0x6b, 0x12, 0x1f, 0x0a, 0x0b, 0x77, 0x69, 0x6e, 0x64,
+	0x6f, 0x77, 0x5f, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0a, 0x77,
+	0x69, 0x6e, 0x64, 0x6f, 0x77, 0x4e, 0x61, 0x6d, 0x65, 0x12, 0x14, 0x0a, 0x05, 0x73, 0x74, 0x61,
+	0x72, 0x74, 0x18, 0x03, 0x20, 0x01, 0x28, 0x04, 0x52, 0x05, 0x73, 0x74, 0x61, 0x72, 0x74, 0x12,
+	0x10, 0x0a, 0x03, 0x65, 0x6e, 0x64, 0x18, 0x04, 0x20, 0x01, 0x28, 0x04, 0x52, 0x03, 0x65, 0x6e,
+	0x64, 0x22, 0x68, 0x0a, 0x12, 0x54, 0x69, 0x6d, 0x69, 0x6e, 0x67, 0x44, 0x61, 0x74, 0x61, 0x52,
+	0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x18, 0x0a, 0x07, 0x6e, 0x65, 0x74, 0x77, 0x6f,
+	0x72, 0x6b, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x6e, 0x65, 0x74, 0x77, 0x6f, 0x72,
+	0x6b, 0x12, 0x38, 0x0a, 0x0b, 0x64, 0x61, 0x74, 0x61, 0x5f, 0x70, 0x6f, 0x69, 0x6e, 0x74, 0x73,
+	0x18, 0x02, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x17, 0x2e, 0x6c, 0x61, 0x62, 0x61, 0x70, 0x69, 0x2e,
+	0x54, 0x69, 0x6d, 0x69, 0x6e, 0x67, 0x44, 0x61, 0x74, 0x61, 0x50, 0x6f, 0x69, 0x6e, 0x74, 0x52,
+	0x0a, 0x64, 0x61, 0x74, 0x61, 0x50, 0x6f, 0x69, 0x6e, 0x74, 0x73, 0x22, 0x75, 0x0a, 0x0f, 0x54,
+	0x69, 0x6d, 0x69, 0x6e, 0x67, 0x44, 0x61, 0x74, 0x61, 0x50, 0x6f, 0x69, 0x6e, 0x74, 0x12, 0x12,
+	0x0a, 0x04, 0x73, 0x6c, 0x6f, 0x74, 0x18, 0x01, 0x20, 0x01, 0x28, 0x04, 0x52, 0x04, 0x73, 0x6c,
+	0x6f, 0x74, 0x12, 0x38, 0x0a, 0x09, 0x74, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x18,
+	0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70,
+	0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d,
+	0x70, 0x52, 0x09, 0x74, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x12, 0x14, 0x0a, 0x05,
+	0x76, 0x61, 0x6c, 0x75, 0x65, 0x18, 0x03, 0x20, 0x01, 0x28, 0x01, 0x52, 0x05, 0x76, 0x61, 0x6c,
+	0x75, 0x65, 0x22, 0x59, 0x0a, 0x15, 0x47, 0x65, 0x74, 0x53, 0x69, 0x7a, 0x65, 0x43, 0x44, 0x46,
+	0x44, 0x61, 0x74, 0x61, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x18, 0x0a, 0x07, 0x6e,
+	0x65, 0x74, 0x77, 0x6f, 0x72, 0x6b, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x6e, 0x65,
+	0x74, 0x77, 0x6f, 0x72, 0x6b, 0x12, 0x14, 0x0a, 0x05, 0x73, 0x74, 0x61, 0x72, 0x74, 0x18, 0x02,
+	0x20, 0x01, 0x28, 0x04, 0x52, 0x05, 0x73, 0x74, 0x61, 0x72, 0x74, 0x12, 0x10, 0x0a, 0x03, 0x65,
+	0x6e, 0x64, 0x18, 0x03, 0x20, 0x01, 0x28, 0x04, 0x52, 0x03, 0x65, 0x6e, 0x64, 0x22, 0x5d, 0x0a,
+	0x13, 0x53, 0x69, 0x7a, 0x65, 0x43, 0x44, 0x46, 0x44, 0x61, 0x74, 0x61, 0x52, 0x65, 0x73, 0x70,
+	0x6f, 0x6e, 0x73, 0x65, 0x12, 0x18, 0x0a, 0x07, 0x6e, 0x65, 0x74, 0x77, 0x6f, 0x72, 0x6b, 0x18,
+	0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x6e, 0x65, 0x74, 0x77, 0x6f, 0x72, 0x6b, 0x12, 0x2c,
+	0x0a, 0x06, 0x70, 0x6f, 0x69, 0x6e, 0x74, 0x73, 0x18, 0x02, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x14,
+	0x2e, 0x6c, 0x61, 0x62, 0x61, 0x70, 0x69, 0x2e, 0x53, 0x69, 0x7a, 0x65, 0x43, 0x44, 0x46, 0x50,
+	0x6f, 0x69, 0x6e, 0x74, 0x52, 0x06, 0x70, 0x6f, 0x69, 0x6e, 0x74, 0x73, 0x22, 0x91, 0x01, 0x0a,
+	0x0c, 0x53, 0x69, 0x7a, 0x65, 0x43, 0x44, 0x46, 0x50, 0x6f, 0x69, 0x6e, 0x74, 0x12, 0x12, 0x0a,
+	0x04, 0x73, 0x6c, 0x6f, 0x74, 0x18, 0x01, 0x20, 0x01, 0x28, 0x04, 0x52, 0x04, 0x73, 0x6c, 0x6f,
+	0x74, 0x12, 0x23, 0x0a, 0x0d, 0x70, 0x65, 0x72, 0x63, 0x65, 0x6e, 0x74, 0x69, 0x6c, 0x65, 0x5f,
+	0x35, 0x30, 0x18, 0x02, 0x20, 0x01, 0x28, 0x01, 0x52, 0x0c, 0x70, 0x65, 0x72, 0x63, 0x65, 0x6e,
+	0x74, 0x69, 0x6c, 0x65, 0x35, 0x30, 0x12, 0x23, 0x0a, 0x0d, 0x70, 0x65, 0x72, 0x63, 0x65, 0x6e,
+	0x74, 0x69, 0x6c, 0x65, 0x5f, 0x39, 0x30, 0x18, 0x03, 0x20, 0x01, 0x28, 0x01, 0x52, 0x0c, 0x70,
+	0x65, 0x72, 0x63, 0x65, 0x6e, 0x74, 0x69, 0x6c, 0x65, 0x39, 0x30, 0x12, 0x23, 0x0a, 0x0d, 0x70,
+	0x65, 0x72, 0x63, 0x65, 0x6e, 0x74, 0x69, 0x6c, 0x65, 0x5f, 0x39, 0x39, 0x18, 0x04, 0x20, 0x01,
+	0x28, 0x01, 0x52, 0x0c, 0x70, 0x65, 0x72, 0x63, 0x65, 0x6e, 0x74, 0x69, 0x6c, 0x65, 0x39, 0x39,
+	0x22, 0x35, 0x0a, 0x19, 0x47, 0x65, 0x74, 0x42, 0x65, 0x61, 0x63, 0x6f, 0x6e, 0x53, 0x74, 0x61,
+	0x74, 0x65, 0x46, 0x69, 0x6c, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x18, 0x0a,
+	0x07, 0x6e, 0x65, 0x74, 0x77, 0x6f, 0x72, 0x6b, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07,
+	0x6e, 0x65, 0x74, 0x77, 0x6f, 0x72, 0x6b, 0x22, 0x48, 0x0a, 0x18, 0x47, 0x65, 0x74, 0x42, 0x65,
+	0x61, 0x63, 0x6f, 0x6e, 0x53, 0x6c, 0x6f, 0x74, 0x46, 0x69, 0x6c, 0x65, 0x52, 0x65, 0x71, 0x75,
+	0x65, 0x73, 0x74, 0x12, 0x18, 0x0a, 0x07, 0x6e, 0x65, 0x74, 0x77, 0x6f, 0x72, 0x6b, 0x18, 0x01,
+	0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x6e, 0x65, 0x74, 0x77, 0x6f, 0x72, 0x6b, 0x12, 0x12, 0x0a,
+	0x04, 0x73, 0x6c, 0x6f, 0x74, 0x18, 0x02, 0x20, 0x01, 0x28, 0x04, 0x52, 0x04, 0x73, 0x6c, 0x6f,
+	0x74, 0x22, 0x29, 0x0a, 0x0d, 0x44, 0x61, 0x74, 0x61, 0x46, 0x69, 0x6c, 0x65, 0x43, 0x68, 0x75,
+	0x6e, 0x6b, 0x12, 0x18, 0x0a, 0x07, 0x63, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74, 0x18, 0x01, 0x20,
+	0x01, 0x28, 0x0c, 0x52, 0x07, 0x63, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74, 0x22, 0x42, 0x0a, 0x0e,
+	0x53, 0x74, 0x61, 0x74, 0x75, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x16,
+	0x0a, 0x06, 0x73, 0x74, 0x61, 0x74, 0x75, 0x73, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06,
+	0x73, 0x74, 0x61, 0x74, 0x75, 0x73, 0x12, 0x18, 0x0a, 0x07, 0x76, 0x65, 0x72, 0x73, 0x69, 0x6f,
+	0x6e, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x76, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e,
+	0x32, 0xda, 0x05, 0x0a, 0x06, 0x4c, 0x61, 0x62, 0x41, 0x50, 0x49, 0x12, 0x3d, 0x0a, 0x09, 0x47,
+	0x65, 0x74, 0x53, 0x74, 0x61, 0x74, 0x75, 0x73, 0x12, 0x16, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c,
+	0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x45, 0x6d, 0x70, 0x74, 0x79,
+	0x1a, 0x16, 0x2e, 0x6c, 0x61, 0x62, 0x61, 0x70, 0x69, 0x2e, 0x53, 0x74, 0x61, 0x74, 0x75, 0x73,
+	0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x4d, 0x0a, 0x11, 0x47, 0x65,
+	0x74, 0x46, 0x72, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x64, 0x43, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x12,
+	0x16, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75,
+	0x66, 0x2e, 0x45, 0x6d, 0x70, 0x74, 0x79, 0x1a, 0x1e, 0x2e, 0x6c, 0x61, 0x62, 0x61, 0x70, 0x69,
+	0x2e, 0x46, 0x72, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x64, 0x43, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x52,
+	0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x57, 0x0a, 0x11, 0x47, 0x65, 0x74,
+	0x42, 0x65, 0x61, 0x63, 0x6f, 0x6e, 0x53, 0x6c, 0x6f, 0x74, 0x44, 0x61, 0x74, 0x61, 0x12, 0x20,
+	0x2e, 0x6c, 0x61, 0x62, 0x61, 0x70, 0x69, 0x2e, 0x47, 0x65, 0x74, 0x42, 0x65, 0x61, 0x63, 0x6f,
+	0x6e, 0x53, 0x6c, 0x6f, 0x74, 0x44, 0x61, 0x74, 0x61, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74,
+	0x1a, 0x1e, 0x2e, 0x6c, 0x61, 0x62, 0x61, 0x70, 0x69, 0x2e, 0x42, 0x65, 0x61, 0x63, 0x6f, 0x6e,
+	0x53, 0x6c, 0x6f, 0x74, 0x44, 0x61, 0x74, 0x61, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65,
+	0x22, 0x00, 0x12, 0x5a, 0x0a, 0x12, 0x47, 0x65, 0x74, 0x42, 0x65, 0x61, 0x63, 0x6f, 0x6e, 0x53,
+	0x6c, 0x6f, 0x74, 0x52, 0x61, 0x6e, 0x67, 0x65, 0x12, 0x21, 0x2e, 0x6c, 0x61, 0x62, 0x61, 0x70,
+	0x69, 0x2e, 0x47, 0x65, 0x74, 0x42, 0x65, 0x61, 0x63, 0x6f, 0x6e, 0x53, 0x6c, 0x6f, 0x74, 0x52,
+	0x61, 0x6e, 0x67, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x1f, 0x2e, 0x6c, 0x61,
+	0x62, 0x61, 0x70, 0x69, 0x2e, 0x42, 0x65, 0x61, 0x63, 0x6f, 0x6e, 0x53, 0x6c, 0x6f, 0x74, 0x52,
+	0x61, 0x6e, 0x67, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x4e,
+	0x0a, 0x0e, 0x47, 0x65, 0x74, 0x42, 0x65, 0x61, 0x63, 0x6f, 0x6e, 0x4e, 0x6f, 0x64, 0x65, 0x73,
+	0x12, 0x1d, 0x2e, 0x6c, 0x61, 0x62, 0x61, 0x70, 0x69, 0x2e, 0x47, 0x65, 0x74, 0x42, 0x65, 0x61,
+	0x63, 0x6f, 0x6e, 0x4e, 0x6f, 0x64, 0x65, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a,
+	0x1b, 0x2e, 0x6c, 0x61, 0x62, 0x61, 0x70, 0x69, 0x2e, 0x42, 0x65, 0x61, 0x63, 0x6f, 0x6e, 0x4e,
+	0x6f, 0x64, 0x65, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x4b,
+	0x0a, 0x0d, 0x47, 0x65, 0x74, 0x54, 0x69, 0x6d, 0x69, 0x6e, 0x67, 0x44, 0x61, 0x74, 0x61, 0x12,
+	0x1c, 0x2e, 0x6c, 0x61, 0x62, 0x61, 0x70, 0x69, 0x2e, 0x47, 0x65, 0x74, 0x54, 0x69, 0x6d, 0x69,
+	0x6e, 0x67, 0x44, 0x61, 0x74, 0x61, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x1a, 0x2e,
+	0x6c, 0x61, 0x62, 0x61, 0x70, 0x69, 0x2e, 0x54, 0x69, 0x6d, 0x69, 0x6e, 0x67, 0x44, 0x61, 0x74,
+	0x61, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x4e, 0x0a, 0x0e, 0x47,
+	0x65, 0x74, 0x53, 0x69, 0x7a, 0x65, 0x43, 0x44, 0x46, 0x44, 0x61, 0x74, 0x61, 0x12, 0x1d, 0x2e,
+	0x6c, 0x61, 0x62, 0x61, 0x70, 0x69, 0x2e, 0x47, 0x65, 0x74, 0x53, 0x69, 0x7a, 0x65, 0x43, 0x44,
+	0x46, 0x44, 0x61, 0x74, 0x61, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x1b, 0x2e, 0x6c,
+	0x61, 0x62, 0x61, 0x70, 0x69, 0x2e, 0x53, 0x69, 0x7a, 0x65, 0x43, 0x44, 0x46, 0x44, 0x61, 0x74,
+	0x61, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x50, 0x0a, 0x12, 0x47,
+	0x65, 0x74, 0x42, 0x65, 0x61, 0x63, 0x6f, 0x6e, 0x53, 0x74, 0x61, 0x74, 0x65, 0x46, 0x69, 0x6c,
+	0x65, 0x12, 0x21, 0x2e, 0x6c, 0x61, 0x62, 0x61, 0x70, 0x69, 0x2e, 0x47, 0x65, 0x74, 0x42, 0x65,
+	0x61, 0x63, 0x6f, 0x6e, 0x53, 0x74, 0x61, 0x74, 0x65, 0x46, 0x69, 0x6c, 0x65, 0x52, 0x65, 0x71,
+	0x75, 0x65, 0x73, 0x74, 0x1a, 0x15, 0x2e, 0x6c, 0x61, 0x62, 0x61, 0x70, 0x69, 0x2e, 0x44, 0x61,
+	0x74, 0x61, 0x46, 0x69, 0x6c, 0x65, 0x43, 0x68, 0x75, 0x6e, 0x6b, 0x22, 0x00, 0x12, 0x4e, 0x0a,
+	0x11, 0x47, 0x65, 0x74, 0x42, 0x65, 0x61, 0x63, 0x6f, 0x6e, 0x53, 0x6c, 0x6f, 0x74, 0x46, 0x69,
+	0x6c, 0x65, 0x12, 0x20, 0x2e, 0x6c, 0x61, 0x62, 0x61, 0x70, 0x69, 0x2e, 0x47, 0x65, 0x74, 0x42,
+	0x65, 0x61, 0x63, 0x6f, 0x6e, 0x53, 0x6c, 0x6f, 0x74, 0x46, 0x69, 0x6c, 0x65, 0x52, 0x65, 0x71,
+	0x75, 0x65, 0x73, 0x74, 0x1a, 0x15, 0x2e, 0x6c, 0x61, 0x62, 0x61, 0x70, 0x69, 0x2e, 0x44, 0x61,
+	0x74, 0x61, 0x46, 0x69, 0x6c, 0x65, 0x43, 0x68, 0x75, 0x6e, 0x6b, 0x22, 0x00, 0x42, 0x2a, 0x5a,
+	0x28, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x65, 0x74, 0x68, 0x70,
+	0x61, 0x6e, 0x64, 0x61, 0x6f, 0x70, 0x73, 0x2f, 0x6c, 0x61, 0x62, 0x2f, 0x70, 0x6b, 0x67, 0x2f,
+	0x61, 0x70, 0x69, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f,
+	0x33,
 }
 
 var (
@@ -240,23 +1309,61 @@ func file_pkg_api_proto_lab_api_proto_rawDescGZIP() []byte {
 	return file_pkg_api_proto_lab_api_proto_rawDescData
 }
 
-var file_pkg_api_proto_lab_api_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
+var file_pkg_api_proto_lab_api_proto_msgTypes = make([]protoimpl.MessageInfo, 20)
 var file_pkg_api_proto_lab_api_proto_goTypes = []any{
-	(*GetStatusRequest)(nil),   // 0: api.GetStatusRequest
-	(*GetStatusResponse)(nil),  // 1: api.GetStatusResponse
-	(*GetSummaryRequest)(nil),  // 2: api.GetSummaryRequest
-	(*GetSummaryResponse)(nil), // 3: api.GetSummaryResponse
+	(*GetDataRequest)(nil),            // 0: labapi.GetDataRequest
+	(*FrontendConfigResponse)(nil),    // 1: labapi.FrontendConfigResponse
+	(*GetBeaconSlotDataRequest)(nil),  // 2: labapi.GetBeaconSlotDataRequest
+	(*BeaconSlotDataResponse)(nil),    // 3: labapi.BeaconSlotDataResponse
+	(*GetBeaconSlotRangeRequest)(nil), // 4: labapi.GetBeaconSlotRangeRequest
+	(*BeaconSlotRangeResponse)(nil),   // 5: labapi.BeaconSlotRangeResponse
+	(*GetBeaconNodesRequest)(nil),     // 6: labapi.GetBeaconNodesRequest
+	(*BeaconNodesResponse)(nil),       // 7: labapi.BeaconNodesResponse
+	(*BeaconNode)(nil),                // 8: labapi.BeaconNode
+	(*GetTimingDataRequest)(nil),      // 9: labapi.GetTimingDataRequest
+	(*TimingDataResponse)(nil),        // 10: labapi.TimingDataResponse
+	(*TimingDataPoint)(nil),           // 11: labapi.TimingDataPoint
+	(*GetSizeCDFDataRequest)(nil),     // 12: labapi.GetSizeCDFDataRequest
+	(*SizeCDFDataResponse)(nil),       // 13: labapi.SizeCDFDataResponse
+	(*SizeCDFPoint)(nil),              // 14: labapi.SizeCDFPoint
+	(*GetBeaconStateFileRequest)(nil), // 15: labapi.GetBeaconStateFileRequest
+	(*GetBeaconSlotFileRequest)(nil),  // 16: labapi.GetBeaconSlotFileRequest
+	(*DataFileChunk)(nil),             // 17: labapi.DataFileChunk
+	(*StatusResponse)(nil),            // 18: labapi.StatusResponse
+	nil,                               // 19: labapi.FrontendConfigResponse.SettingsEntry
+	(*timestamppb.Timestamp)(nil),     // 20: google.protobuf.Timestamp
+	(*emptypb.Empty)(nil),             // 21: google.protobuf.Empty
 }
 var file_pkg_api_proto_lab_api_proto_depIdxs = []int32{
-	0, // 0: api.LabAPI.GetStatus:input_type -> api.GetStatusRequest
-	2, // 1: api.LabAPI.GetSummary:input_type -> api.GetSummaryRequest
-	1, // 2: api.LabAPI.GetStatus:output_type -> api.GetStatusResponse
-	3, // 3: api.LabAPI.GetSummary:output_type -> api.GetSummaryResponse
-	2, // [2:4] is the sub-list for method output_type
-	0, // [0:2] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	19, // 0: labapi.FrontendConfigResponse.settings:type_name -> labapi.FrontendConfigResponse.SettingsEntry
+	3,  // 1: labapi.BeaconSlotRangeResponse.slots:type_name -> labapi.BeaconSlotDataResponse
+	8,  // 2: labapi.BeaconNodesResponse.nodes:type_name -> labapi.BeaconNode
+	11, // 3: labapi.TimingDataResponse.data_points:type_name -> labapi.TimingDataPoint
+	20, // 4: labapi.TimingDataPoint.timestamp:type_name -> google.protobuf.Timestamp
+	14, // 5: labapi.SizeCDFDataResponse.points:type_name -> labapi.SizeCDFPoint
+	21, // 6: labapi.LabAPI.GetStatus:input_type -> google.protobuf.Empty
+	21, // 7: labapi.LabAPI.GetFrontendConfig:input_type -> google.protobuf.Empty
+	2,  // 8: labapi.LabAPI.GetBeaconSlotData:input_type -> labapi.GetBeaconSlotDataRequest
+	4,  // 9: labapi.LabAPI.GetBeaconSlotRange:input_type -> labapi.GetBeaconSlotRangeRequest
+	6,  // 10: labapi.LabAPI.GetBeaconNodes:input_type -> labapi.GetBeaconNodesRequest
+	9,  // 11: labapi.LabAPI.GetTimingData:input_type -> labapi.GetTimingDataRequest
+	12, // 12: labapi.LabAPI.GetSizeCDFData:input_type -> labapi.GetSizeCDFDataRequest
+	15, // 13: labapi.LabAPI.GetBeaconStateFile:input_type -> labapi.GetBeaconStateFileRequest
+	16, // 14: labapi.LabAPI.GetBeaconSlotFile:input_type -> labapi.GetBeaconSlotFileRequest
+	18, // 15: labapi.LabAPI.GetStatus:output_type -> labapi.StatusResponse
+	1,  // 16: labapi.LabAPI.GetFrontendConfig:output_type -> labapi.FrontendConfigResponse
+	3,  // 17: labapi.LabAPI.GetBeaconSlotData:output_type -> labapi.BeaconSlotDataResponse
+	5,  // 18: labapi.LabAPI.GetBeaconSlotRange:output_type -> labapi.BeaconSlotRangeResponse
+	7,  // 19: labapi.LabAPI.GetBeaconNodes:output_type -> labapi.BeaconNodesResponse
+	10, // 20: labapi.LabAPI.GetTimingData:output_type -> labapi.TimingDataResponse
+	13, // 21: labapi.LabAPI.GetSizeCDFData:output_type -> labapi.SizeCDFDataResponse
+	17, // 22: labapi.LabAPI.GetBeaconStateFile:output_type -> labapi.DataFileChunk
+	17, // 23: labapi.LabAPI.GetBeaconSlotFile:output_type -> labapi.DataFileChunk
+	15, // [15:24] is the sub-list for method output_type
+	6,  // [6:15] is the sub-list for method input_type
+	6,  // [6:6] is the sub-list for extension type_name
+	6,  // [6:6] is the sub-list for extension extendee
+	0,  // [0:6] is the sub-list for field type_name
 }
 
 func init() { file_pkg_api_proto_lab_api_proto_init() }
@@ -266,7 +1373,7 @@ func file_pkg_api_proto_lab_api_proto_init() {
 	}
 	if !protoimpl.UnsafeEnabled {
 		file_pkg_api_proto_lab_api_proto_msgTypes[0].Exporter = func(v any, i int) any {
-			switch v := v.(*GetStatusRequest); i {
+			switch v := v.(*GetDataRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -278,7 +1385,7 @@ func file_pkg_api_proto_lab_api_proto_init() {
 			}
 		}
 		file_pkg_api_proto_lab_api_proto_msgTypes[1].Exporter = func(v any, i int) any {
-			switch v := v.(*GetStatusResponse); i {
+			switch v := v.(*FrontendConfigResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -290,7 +1397,7 @@ func file_pkg_api_proto_lab_api_proto_init() {
 			}
 		}
 		file_pkg_api_proto_lab_api_proto_msgTypes[2].Exporter = func(v any, i int) any {
-			switch v := v.(*GetSummaryRequest); i {
+			switch v := v.(*GetBeaconSlotDataRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -302,7 +1409,187 @@ func file_pkg_api_proto_lab_api_proto_init() {
 			}
 		}
 		file_pkg_api_proto_lab_api_proto_msgTypes[3].Exporter = func(v any, i int) any {
-			switch v := v.(*GetSummaryResponse); i {
+			switch v := v.(*BeaconSlotDataResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_pkg_api_proto_lab_api_proto_msgTypes[4].Exporter = func(v any, i int) any {
+			switch v := v.(*GetBeaconSlotRangeRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_pkg_api_proto_lab_api_proto_msgTypes[5].Exporter = func(v any, i int) any {
+			switch v := v.(*BeaconSlotRangeResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_pkg_api_proto_lab_api_proto_msgTypes[6].Exporter = func(v any, i int) any {
+			switch v := v.(*GetBeaconNodesRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_pkg_api_proto_lab_api_proto_msgTypes[7].Exporter = func(v any, i int) any {
+			switch v := v.(*BeaconNodesResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_pkg_api_proto_lab_api_proto_msgTypes[8].Exporter = func(v any, i int) any {
+			switch v := v.(*BeaconNode); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_pkg_api_proto_lab_api_proto_msgTypes[9].Exporter = func(v any, i int) any {
+			switch v := v.(*GetTimingDataRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_pkg_api_proto_lab_api_proto_msgTypes[10].Exporter = func(v any, i int) any {
+			switch v := v.(*TimingDataResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_pkg_api_proto_lab_api_proto_msgTypes[11].Exporter = func(v any, i int) any {
+			switch v := v.(*TimingDataPoint); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_pkg_api_proto_lab_api_proto_msgTypes[12].Exporter = func(v any, i int) any {
+			switch v := v.(*GetSizeCDFDataRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_pkg_api_proto_lab_api_proto_msgTypes[13].Exporter = func(v any, i int) any {
+			switch v := v.(*SizeCDFDataResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_pkg_api_proto_lab_api_proto_msgTypes[14].Exporter = func(v any, i int) any {
+			switch v := v.(*SizeCDFPoint); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_pkg_api_proto_lab_api_proto_msgTypes[15].Exporter = func(v any, i int) any {
+			switch v := v.(*GetBeaconStateFileRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_pkg_api_proto_lab_api_proto_msgTypes[16].Exporter = func(v any, i int) any {
+			switch v := v.(*GetBeaconSlotFileRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_pkg_api_proto_lab_api_proto_msgTypes[17].Exporter = func(v any, i int) any {
+			switch v := v.(*DataFileChunk); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_pkg_api_proto_lab_api_proto_msgTypes[18].Exporter = func(v any, i int) any {
+			switch v := v.(*StatusResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -320,7 +1607,7 @@ func file_pkg_api_proto_lab_api_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_pkg_api_proto_lab_api_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   4,
+			NumMessages:   20,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

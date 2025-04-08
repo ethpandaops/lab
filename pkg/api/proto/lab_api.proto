@@ -1,27 +1,139 @@
 syntax = "proto3";
 
-package api;
+package labapi;
 
-option go_package = "github.com/ethpandaops/lab/pkg/api/proto;apipb";
+option go_package = "github.com/ethpandaops/lab/pkg/api/proto";
 
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
 
 service LabAPI {
-  // Example RPC to get status
-  rpc GetStatus(GetStatusRequest) returns (GetStatusResponse);
+  rpc GetStatus(google.protobuf.Empty) returns (StatusResponse) {
+  }
 
-  // Example RPC to get summary
-  rpc GetSummary(GetSummaryRequest) returns (GetSummaryResponse);
+  rpc GetFrontendConfig(google.protobuf.Empty) returns (FrontendConfigResponse) {
+  }
+
+  rpc GetBeaconSlotData(GetBeaconSlotDataRequest) returns (BeaconSlotDataResponse) {
+  }
+
+  rpc GetBeaconSlotRange(GetBeaconSlotRangeRequest) returns (BeaconSlotRangeResponse) {
+  }
+
+  rpc GetBeaconNodes(GetBeaconNodesRequest) returns (BeaconNodesResponse) {
+  }
+
+  rpc GetTimingData(GetTimingDataRequest) returns (TimingDataResponse) {
+  }
+
+  rpc GetSizeCDFData(GetSizeCDFDataRequest) returns (SizeCDFDataResponse) {
+  }
+
+  rpc GetBeaconStateFile(GetBeaconStateFileRequest) returns (DataFileChunk) {
+  }
+
+  rpc GetBeaconSlotFile(GetBeaconSlotFileRequest) returns (DataFileChunk) {
+  }
 }
 
-message GetStatusRequest {}
+message GetDataRequest {
+  string path = 1;
+}
 
-message GetStatusResponse {
+message FrontendConfigResponse {
+  string network_name = 1;
+  string environment = 2;
+  map<string, string> settings = 3;
+}
+
+message GetBeaconSlotDataRequest {
+  string network = 1;
+  uint64 slot = 2;
+}
+
+message BeaconSlotDataResponse {
+  string network = 1;
+  uint64 slot = 2;
+  bytes data = 3;
+}
+
+message GetBeaconSlotRangeRequest {
+  string network = 1;
+  uint64 start = 2;
+  uint64 end = 3;
+}
+
+message BeaconSlotRangeResponse {
+  string network = 1;
+  repeated BeaconSlotDataResponse slots = 2;
+}
+
+message GetBeaconNodesRequest {
+  string network = 1;
+}
+
+message BeaconNodesResponse {
+  string network = 1;
+  repeated BeaconNode nodes = 2;
+}
+
+message BeaconNode {
+  string name = 1;
+  string enode = 2;
+  string client = 3;
+  string status = 4;
+}
+
+message GetTimingDataRequest {
+  string network = 1;
+  string window_name = 2;
+  uint64 start = 3;
+  uint64 end = 4;
+}
+
+message TimingDataResponse {
+  string network = 1;
+  repeated TimingDataPoint data_points = 2;
+}
+
+message TimingDataPoint {
+  uint64 slot = 1;
+  google.protobuf.Timestamp timestamp = 2;
+  double value = 3;
+}
+
+message GetSizeCDFDataRequest {
+  string network = 1;
+  uint64 start = 2;
+  uint64 end = 3;
+}
+
+message SizeCDFDataResponse {
+  string network = 1;
+  repeated SizeCDFPoint points = 2;
+}
+
+message SizeCDFPoint {
+  uint64 slot = 1;
+  double percentile_50 = 2;
+  double percentile_90 = 3;
+  double percentile_99 = 4;
+}
+
+message GetBeaconStateFileRequest {
+  string network = 1;
+}
+
+message GetBeaconSlotFileRequest {
+  string network = 1;
+  uint64 slot = 2;
+}
+
+message DataFileChunk {
+  bytes content = 1;
+}
+
+message StatusResponse {
   string status = 1;
   string version = 2;
-}
-
-message GetSummaryRequest {}
-
-message GetSummaryResponse {
-  string summary = 1;
 }

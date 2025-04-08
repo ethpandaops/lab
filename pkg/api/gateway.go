@@ -36,7 +36,7 @@ func (s *Service) StartGateway(ctx context.Context) error {
 	grpcServer := grpc.NewServer()
 
 	// Register LabAPI gRPC service
-	labAPIServer := NewLabAPIServer()
+	labAPIServer := NewLabAPIServer(s.cacheClient, s.storageClient)
 	apipb.RegisterLabAPIServer(grpcServer, labAPIServer)
 
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", grpcPort))

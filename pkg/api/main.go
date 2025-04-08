@@ -20,7 +20,7 @@ func StartGateway(ctx context.Context) error {
 	grpcServer := grpc.NewServer()
 
 	// Register LabAPI gRPC service
-	labAPIServer := NewLabAPIServer()
+	labAPIServer := NewLabAPIServer(nil, nil)
 	apipb.RegisterLabAPIServer(grpcServer, labAPIServer)
 
 	lis, err := net.Listen("tcp", ":9090")

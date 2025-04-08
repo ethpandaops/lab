@@ -6,7 +6,7 @@ build: proto build-binary
 # Build binary
 build-binary:
 	@echo "Building binary..."
-	go build -o bin/lab cmd/main.go
+	go build -o bin/lab pkg/cmd/main.go
 
 # Generate protobuf
 proto:

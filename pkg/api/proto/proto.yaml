@@ -3,5 +3,29 @@ config_version: 3
 
 http:
   rules:
-    - selector: "api.LabAPI.GetStatus"
+    - selector: "labapi.LabAPI.GetStatus"
       get: "/v1/status"
+
+    - selector: "labapi.LabAPI.GetFrontendConfig"
+      get: "/api/config"
+
+    - selector: "labapi.LabAPI.GetBeaconSlotData"
+      get: "/api/beacon/slots/{network}/{slot}"
+
+    - selector: "labapi.LabAPI.GetBeaconSlotRange"
+      get: "/api/beacon/slots/{network}/range"
+
+    - selector: "labapi.LabAPI.GetBeaconNodes"
+      get: "/api/beacon/nodes/{network}"
+
+    - selector: "labapi.LabAPI.GetTimingData"
+      get: "/api/beacon/timings/{network}"
+
+    - selector: "labapi.LabAPI.GetSizeCDFData"
+      get: "/api/beacon/sizecdf/{network}"
+
+    - selector: "labapi.LabAPI.GetBeaconStateFile"
+      get: "/api/beacon/state/{network}"
+
+    - selector: "labapi.LabAPI.GetBeaconSlotFile"
+      get: "/api/beacon/slots/file/{network}/{slot}"
