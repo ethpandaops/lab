@@ -9,13 +9,14 @@ import (
 
 	"github.com/ethpandaops/lab/pkg/internal/lab"
 	"github.com/ethpandaops/lab/pkg/internal/lab/clickhouse"
+	"github.com/ethpandaops/lab/pkg/internal/lab/ethereum"
 	"github.com/ethpandaops/lab/pkg/internal/lab/locker"
 	"github.com/ethpandaops/lab/pkg/internal/lab/storage"
 	"github.com/ethpandaops/lab/pkg/internal/lab/xatu"
 	"github.com/ethpandaops/lab/pkg/server/internal/grpc"
 	"github.com/ethpandaops/lab/pkg/server/internal/service"
-	"github.com/ethpandaops/lab/pkg/server/internal/service/beacon_chain_timings"
-	"github.com/ethpandaops/lab/pkg/server/internal/service/xatu_public_contributors"
+	beacon_chain_timings "github.com/ethpandaops/lab/pkg/server/internal/service/beacon_chain_timings"
+	xatu_public_contributors "github.com/ethpandaops/lab/pkg/server/internal/service/xatu_public_contributors"
 )
 
 // Service represents the srv service. It glues together all the sub-services and the gRPC server.
@@ -95,7 +96,7 @@ func (s *Service) Start(ctx context.Context) error {
 		),
 		grpc.NewXatuPublicContributors(
 			s.lab.Log(),
-			s.getService(service.XatuPublicContributorsServiceName).(*service.XatuPublicContributors),
+			s.getService(xatu_public_contributors.XatuPublicContributorsServiceName).(*xatu_public_contributors.XatuPublicContributors),
 		),
 	}
 
@@ -131,24 +132,35 @@ func (s *Service) Start(ctx context.Context) error {
 
 func (s *Service) initializeServices(ctx context.Context) error {
 	// Initialize all our services
+	// Extract an *ethereum.Config from the first network (or nil if none)
+	var ethConfig *ethereum.Config
+	for _, netCfg := range s.config.Networks {
+		if netCfg.NetworkConfig != nil {
+			ethConfig = netCfg.NetworkConfig
+			break
+		}
+	}
+
 	bct, err := beacon_chain_timings.New(
 		s.lab.Log(),
 		s.config.Modules["beacon_chain_timings"].BeaconChainTimings,
 		s.xatuClient,
-		s.config.Networks,
+		ethConfig,
 		s.storageClient,
+		nil, // cache client placeholder
 		s.lockerClient,
 	)
 	if err != nil {
 		return fmt.Errorf("failed to initialize beacon chain timings service: %w", err)
 	}
 
-	xatu_public_contributors.New(
+	xpc, err := xatu_public_contributors.New(
 		s.lab.Log(),
 		s.config.Modules["xatu_public_contributors"].XatuPublicContributors,
-		s.config.Ethereum,
+		ethConfig,
+		s.xatuClient,
 		s.storageClient,
-		s.cacheClient,
+		nil, // cache client placeholder
 		s.lockerClient,
 	)
 	if err != nil {
@@ -160,6 +172,7 @@ func (s *Service) initializeServices(ctx context.Context) error {
 			s.lab.Log(),
 		),
 		bct,
+		xpc,
 	}
 
 	return nil

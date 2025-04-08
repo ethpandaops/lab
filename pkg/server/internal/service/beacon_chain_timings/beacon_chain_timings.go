@@ -11,6 +11,7 @@ import (
 	"github.com/ethpandaops/lab/pkg/internal/lab/locker"
 	"github.com/ethpandaops/lab/pkg/internal/lab/storage"
 	"github.com/ethpandaops/lab/pkg/internal/lab/xatu"
+	pb "github.com/ethpandaops/lab/pkg/server/proto/beacon_chain_timings"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
@@ -181,19 +182,32 @@ func (b *BeaconChainTimings) Stop() {
 }
 
 func (b *BeaconChainTimings) processLoop() {
+	// Use a ticker for regular checks
+	interval := b.config.GetIntervalDuration()
+	if interval <= 0 {
+		interval = 15 * time.Second
+	}
+	ticker := time.NewTicker(interval)
+	defer ticker.Stop()
+
+	// Initial processing run immediately if leader
+	if b.leaderClient.IsLeader() {
+		b.process()
+	}
+
 	for {
 		select {
 		case <-b.processCtx.Done():
-			b.log.Info("Context cancelled, stopping BeaconChainTimings")
-
+			b.log.Info("Context cancelled, stopping BeaconChainTimings processing loop")
 			return
-		case <-time.After(5 * time.Second):
+		case <-ticker.C:
 			if b.leaderClient.IsLeader() {
 				b.process()
+			} else {
+				b.log.Debug("Not leader, skipping processing cycle")
 			}
 		}
 	}
-
 }
 
 func (b *BeaconChainTimings) Name() string {
@@ -253,7 +267,10 @@ func (b *BeaconChainTimings) process() {
 			}
 
 			if shouldProcess {
-				if err := b.processSizeCDF(network, window.File); err != nil {
+				if err := b.processSizeCDF(network, &pb.TimeWindowConfig{
+					Name: window.File,
+					File: window.File,
+				}); err != nil {
 					b.log.WithError(err).Errorf("failed to process size CDF for network %s, window %s", network.Name, window.File)
 				} else {
 					// Update state

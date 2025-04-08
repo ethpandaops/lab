@@ -10,30 +10,31 @@ import (
 
 	"github.com/ethpandaops/lab/pkg/internal/lab/ethereum"
 	"github.com/ethpandaops/lab/pkg/internal/lab/storage"
+	pb "github.com/ethpandaops/lab/pkg/server/proto/beacon_chain_timings"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
-func (b *BeaconChainTimings) processSizeCDF(network *ethereum.Network, windowName string) error {
+func (b *BeaconChainTimings) processSizeCDF(network *ethereum.Network, window *pb.TimeWindowConfig) error {
 	b.log.WithFields(logrus.Fields{
 		"network": network.Name,
-		"window":  windowName,
+		"window":  window.Name,
 	}).Info("Processing size CDF data")
 
 	// Get time range for the window
-	timeRange, err := b.getTimeRange(windowName)
+	timeRange, err := b.getTimeRange(window)
 	if err != nil {
 		return fmt.Errorf("failed to get time range: %w", err)
 	}
 
 	// Process size CDF data
-	sizeCDFData, err := b.processSizeCDFData(network.Name, timeRange)
+	sizeCDFData, err := b.GetSizeCDFData(network.Name, timeRange)
 	if err != nil {
 		return fmt.Errorf("failed to process size CDF data: %w", err)
 	}
 
 	// Store the results
-	if err := b.storeSizeCDFData(network.Name, windowName, sizeCDFData); err != nil {
+	if err := b.storeSizeCDFData(network.Name, window.Name, sizeCDFData); err != nil {
 		return fmt.Errorf("failed to store size CDF data: %w", err)
 	}
 
@@ -41,7 +42,7 @@ func (b *BeaconChainTimings) processSizeCDF(network *ethereum.Network, windowNam
 }
 
 // processSizeCDFData processes size CDF data for a network and time range
-func (b *BeaconChainTimings) processSizeCDFData(network string, timeRange struct{ Start, End time.Time }) (*SizeCDFData, error) {
+func (b *BeaconChainTimings) GetSizeCDFData(network string, timeRange struct{ Start, End time.Time }) (*SizeCDFData, error) {
 	b.log.WithFields(logrus.Fields{
 		"network":    network,
 		"time_range": fmt.Sprintf("%s - %s", timeRange.Start.Format(time.RFC3339), timeRange.End.Format(time.RFC3339)),

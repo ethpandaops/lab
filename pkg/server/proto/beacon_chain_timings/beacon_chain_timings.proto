@@ -14,6 +14,21 @@ message TimeWindowConfig {
   int64 step_ms = 4;  // Duration in milliseconds
 }
 
+message DataProcessorParams {
+  string network = 1;
+  string window_name = 2;
+}
+
+message BlockTimingsProcessorParams {
+  string network = 1;
+  string window_name = 2;
+}
+
+message SizeCDFProcessorParams {
+  string network = 1;
+  string window_name = 2;
+}
+
 // ProcessorState tracks the processing state for a specific processor
 message ProcessorState {
   string network = 1;

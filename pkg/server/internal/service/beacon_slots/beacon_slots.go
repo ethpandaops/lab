@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/codingsince1985/geo-golang/openstreetmap"
 	"github.com/ethpandaops/lab/pkg/internal/lab/leader"
 	"github.com/ethpandaops/lab/pkg/internal/lab/locker"
 	"github.com/ethpandaops/lab/pkg/internal/lab/storage"
@@ -22,6 +23,7 @@ var (
 	ForwardProcessorName  = "forward"
 	BackwardProcessorName = "backward"
 	MissingProcessorName  = "missing"
+	MiddleProcessorName   = "middle" // Processor for the initial recent window
 )
 
 // BlockData represents a beacon block
@@ -160,7 +162,12 @@ func (b *BeaconSlots) Start(ctx context.Context) error {
 			ctx, cancel := context.WithCancel(context.Background())
 			b.processCtx = ctx
 			b.processCtxCancel = cancel
-			go b.processLoop()
+
+			// Run initial processing (head and middle window) before starting the loop
+			go func() {
+				b.runInitialProcessing()
+				b.processLoop()
+			}()
 		},
 		OnRevoked: func() {
 			b.log.Info("Lost leadership")
@@ -204,12 +211,7 @@ func (b *BeaconSlots) processLoop() {
 	defer backlogTicker.Stop()
 	defer missingTicker.Stop()
 
-	// Initial processing run immediately if leader
-	if b.leaderClient.IsLeader() {
-		for _, network := range b.config.Networks {
-			b.processHead(network)
-		}
-	}
+	// Initial processing is now handled in runInitialProcessing called from OnElected
 
 	for {
 		select {
@@ -287,7 +289,16 @@ func (b *BeaconSlots) shouldProcess(processorName string, lastProcessed time.Tim
 	if lastProcessed.IsZero() {
 		return true // Never processed before
 	}
-	return time.Since(lastProcessed) > b.config.GetInterval()
+	// Use a shorter interval check for head processing to be more responsive
+	if processorName == ForwardProcessorName {
+		return time.Since(lastProcessed) > (12 * time.Second) // Check more frequently for head
+	}
+	// Use configured interval for others, or a default if not set
+	interval := b.config.GetInterval()
+	if interval == 0 {
+		interval = 15 * time.Minute // Default interval if not configured
+	}
+	return time.Since(lastProcessed) > interval
 }
 
 // processHead processes the latest slot for a network
@@ -490,8 +501,47 @@ func (b *BeaconSlots) processMissing(networkName string) {
 		WithField("endSlot", endSlot).
 		Debug("Checking for missing slots")
 
-	// TODO: Implement check for missing slots by querying ClickHouse
+	// Get the ClickHouse client for this network
+	ch := b.xatuClient.GetClickhouseClientForNetwork(networkName)
+	if ch == nil {
+		b.log.WithField("network", networkName).Error("No ClickHouse client available for network")
+		return
+	}
 
+	query := `
+		WITH range(toInt64($1), toInt64($2)) AS all_slots
+		SELECT slot_candidate
+		FROM (
+			SELECT arrayJoin(all_slots) AS slot_candidate
+		) AS slots
+		LEFT JOIN xatu.beacon_api_eth_v1_events_block AS blocks
+			ON blocks.slot = slot_candidate AND blocks.network = $3
+		WHERE blocks.slot IS NULL
+	`
+
+	rows, err := ch.Query(query, startSlot, endSlot+1, networkName)
+	if err != nil {
+		b.log.WithField("network", networkName).WithError(err).Error("Failed to query missing slots from ClickHouse")
+		return
+	}
+
+	missingSlots := make([]int64, 0)
+	for _, row := range rows {
+		val, ok := row["slot_candidate"]
+		if !ok || val == nil {
+			continue
+		}
+		slotInt, err := strconv.ParseInt(fmt.Sprintf("%v", val), 10, 64)
+		if err != nil {
+			b.log.WithError(err).Warn("Failed to parse missing slot value")
+			continue
+		}
+		missingSlots = append(missingSlots, slotInt)
+	}
+
+	b.log.WithField("network", networkName).
+		WithField("missingSlotsCount", len(missingSlots)).
+		Debug("Missing slots identified")
 	// Update last processed time
 	processorState.LastProcessed = time.Now()
 
@@ -920,7 +970,14 @@ func (b *BeaconSlots) transformSlotDataForStorage(
 				GeoCity:          city,
 				GeoCountry:       country,
 				GeoContinentCode: continent,
-				// Would add coordinates here with geo lookup if needed
+			}
+			// Perform geo lookup
+			lat, lon := b.lookupGeoCoordinates(city, country)
+			if lat != nil && lon != nil {
+				node := nodes[name] // Get the node again to modify
+				node.GeoLatitude = lat
+				node.GeoLongitude = lon
+				nodes[name] = node // Put the modified node back
 			}
 		}
 	}
@@ -1371,4 +1428,154 @@ func getStringOrEmpty(value interface{}) string {
 		return ""
 	}
 	return fmt.Sprintf("%v", value)
+}
+
+// runInitialProcessing performs the initial head and middle window processing.
+func (b *BeaconSlots) runInitialProcessing() {
+	if !b.leaderClient.IsLeader() {
+		return // Should not happen if called from OnElected, but safety check
+	}
+	b.log.Info("Running initial processing...")
+	for _, network := range b.config.Networks {
+		b.processHead(network) // Process the absolute latest slot first
+		if b.config.Backfill.MiddleProcessorEnable {
+			b.processMiddleWindow(network) // Then process the recent window if enabled
+		}
+	}
+	b.log.Info("Initial processing finished.")
+}
+
+// processMiddleWindow processes a recent window of slots on startup.
+func (b *BeaconSlots) processMiddleWindow(networkName string) {
+	b.log.WithField("network", networkName).Info("Processing middle window")
+
+	// Get state
+	state, err := b.loadState(networkName)
+	if err != nil {
+		b.log.WithField("network", networkName).WithError(err).Error("Failed to load state for middle window")
+		return
+	}
+
+	// Get processor state for middle
+	processorState := state.GetProcessorState(MiddleProcessorName)
+
+	// Check if middle processing is enabled and hasn't run yet for this leadership term
+	if !b.config.Backfill.MiddleProcessorEnable {
+		b.log.WithField("network", networkName).Debug("Middle window processing disabled in config")
+		return
+	}
+	// Check if already processed in this leadership term (using LastProcessed time)
+	// We only want this to run once per election.
+	if !processorState.LastProcessed.IsZero() {
+		b.log.WithField("network", networkName).Debug("Middle window already processed in this term")
+		return
+	}
+
+	// Get the current slot
+	currentSlot, err := b.getCurrentSlot(networkName)
+	if err != nil {
+		b.log.WithField("network", networkName).WithError(err).Error("Failed to get current slot for middle window")
+		return
+	}
+
+	// Calculate the start slot for the middle window
+	duration := b.config.Backfill.MiddleProcessorDuration
+	slotsInDuration := int64(duration.Seconds() / 12) // Assuming 12s slot time
+	startSlot := currentSlot - slotsInDuration
+	if startSlot < 0 {
+		startSlot = 0
+	}
+	endSlot := currentSlot // Process up to the current slot
+
+	b.log.WithField("network", networkName).
+		WithField("startSlot", startSlot).
+		WithField("endSlot", endSlot).
+		WithField("duration", duration).
+		Info("Calculated middle window range")
+
+	// Process slots in the window
+	processedCount := 0
+	failedCount := 0
+	for slot := startSlot; slot <= endSlot; slot++ {
+		processed, err := b.processSlot(networkName, slot)
+		if err != nil {
+			b.log.WithField("network", networkName).
+				WithField("slot", slot).
+				WithError(err).Warn("Failed to process slot in middle window")
+			failedCount++
+			continue // Continue to next slot even if one fails
+		}
+		if processed {
+			processedCount++
+		}
+		// Add a small delay or check context cancellation if needed for long windows
+		select {
+		case <-b.processCtx.Done():
+			b.log.WithField("network", networkName).Info("Context cancelled during middle window processing")
+			return
+		default:
+			// Continue processing
+		}
+	}
+
+	b.log.WithField("network", networkName).
+		WithField("processedCount", processedCount).
+		WithField("failedCount", failedCount).
+		Info("Finished processing middle window")
+
+	// Update last processed time to prevent re-running in this term
+	processorState.LastProcessed = time.Now()
+	processorState.CurrentSlot = &currentSlot // Store the slot context when it ran
+	processorState.TargetSlot = &startSlot    // Store the start slot for reference
+
+	// Update state
+	state.UpdateProcessorState(MiddleProcessorName, processorState)
+	if err := b.saveState(networkName, state); err != nil {
+		b.log.WithField("network", networkName).WithError(err).Error("Failed to save state after middle window processing")
+	}
+}
+
+// lookupGeoCoordinates performs a geo lookup for given city/country.
+// Placeholder implementation.
+func (b *BeaconSlots) lookupGeoCoordinates(city, country string) (*float64, *float64) {
+	geocoder := openstreetmap.Geocoder()
+	location, err := geocoder.Geocode(city + ", " + country)
+	if err != nil {
+		b.log.WithError(err).WithFields(logrus.Fields{
+			"city":    city,
+			"country": country,
+		}).Warn("Geocoding lookup failed")
+		return nil, nil
+	}
+	if location == nil {
+		return nil, nil
+	}
+	return &location.Lat, &location.Lng
+}
+
+// --- Configuration Getters ---
+
+// IsEnabled returns true if the service is enabled in the config.
+func (b *BeaconSlots) IsEnabled() bool {
+	return b.config.Enabled
+}
+
+// GetNetworks returns the list of configured networks.
+func (b *BeaconSlots) GetNetworks() []string {
+	return b.config.Networks
+}
+
+// GetBackfillSlotsAgo returns the configured number of slots to backfill.
+func (b *BeaconSlots) GetBackfillSlotsAgo() int64 {
+	return b.config.Backfill.SlotsAgo
+}
+
+// GetMiddleProcessorDuration returns the configured duration for the middle processor.
+func (b *BeaconSlots) GetMiddleProcessorDuration() time.Duration {
+	return b.config.Backfill.MiddleProcessorDuration
+}
+
+// GetMiddleProcessorEnabled returns true if the middle processor is enabled.
+func (b *BeaconSlots) GetMiddleProcessorEnabled() bool {
+	return b.config.Backfill.MiddleProcessorEnable
 }

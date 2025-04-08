@@ -8,10 +8,12 @@ import (
 
 // Config contains the configuration for the API service
 type Config struct {
-	HttpServer HttpServerConfig  `yaml:"httpServer"`
-	Discovery  *discovery.Config `yaml:"discovery"`
-	Broker     *broker.Config    `yaml:"broker"` // Renamed from NATS
-	Cache      *cache.Config     `yaml:"cache"`
+	HttpServer        HttpServerConfig  `yaml:"httpServer"`
+	Discovery         *discovery.Config `yaml:"discovery"`
+	Broker            *broker.Config    `yaml:"broker"` // Renamed from NATS
+	Cache             *cache.Config     `yaml:"cache"`
+	EnableGRPCGateway bool              `yaml:"enableGRPCGateway"`
+	Gateway           *GatewayConfig    `yaml:"gateway"`
 }
 
 // HttpServerConfig contains the configuration for the HTTP server

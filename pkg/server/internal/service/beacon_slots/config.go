@@ -14,10 +14,12 @@ type Config struct {
 	Backfill BackfillConfig `yaml:"backfill"`
 }
 
-// BackfillConfig represents configuration for backlog processing
+// BackfillConfig represents configuration for backlog and middle processing
 type BackfillConfig struct {
-	Enabled  bool  `yaml:"enabled"`
-	SlotsAgo int64 `yaml:"slots_ago"`
+	Enabled                 bool          `yaml:"enabled"`
+	SlotsAgo                int64         `yaml:"slots_ago"`
+	MiddleProcessorEnable   bool          `yaml:"middle_processor_enable"`   // Enable processing recent window on startup
+	MiddleProcessorDuration time.Duration `yaml:"middle_processor_duration"` // Duration for the middle processor (e.g., "1h")
 }
 
 // Validate validates the configuration
@@ -28,6 +30,10 @@ func (c *Config) Validate() error {
 
 	if len(c.Networks) == 0 {
 		return fmt.Errorf("no networks specified")
+	}
+
+	if c.Backfill.MiddleProcessorEnable && c.Backfill.MiddleProcessorDuration <= 0 {
+		return fmt.Errorf("middle_processor_duration must be positive if middle_processor_enable is true")
 	}
 
 	return nil
@@ -44,8 +50,10 @@ func (c *Config) ToProtoConfig() *pb.Config {
 		Enabled:  c.Enabled,
 		Networks: c.Networks,
 		Backfill: &pb.BackfillConfig{
-			Enabled:  c.Backfill.Enabled,
-			SlotsAgo: c.Backfill.SlotsAgo,
+			Enabled:                 c.Backfill.Enabled,
+			SlotsAgo:                c.Backfill.SlotsAgo,
+			MiddleProcessorEnable:   c.Backfill.MiddleProcessorEnable,
+			MiddleProcessorDuration: c.Backfill.MiddleProcessorDuration.String(), // Store duration as string in proto
 		},
 	}
 }
@@ -56,11 +64,28 @@ func FromProtoConfig(pbConfig *pb.Config) *Config {
 		Enabled:  pbConfig.Enabled,
 		Networks: pbConfig.Networks,
 		Backfill: BackfillConfig{
-			Enabled:  pbConfig.Backfill.Enabled,
-			SlotsAgo: pbConfig.Backfill.SlotsAgo,
+			Enabled:               pbConfig.Backfill.Enabled,
+			SlotsAgo:              pbConfig.Backfill.SlotsAgo,
+			MiddleProcessorEnable: pbConfig.Backfill.MiddleProcessorEnable,
+			// Parse duration from string, handle potential error
+			MiddleProcessorDuration: parseDurationDef(pbConfig.Backfill.MiddleProcessorDuration, 1*time.Hour),
 		},
 	}
 }
 
 // Note: ToProtoConfig and FromProtoConfig will be implemented after
 // the proto package is generated correctly
+
+// parseDurationDef parses a duration string with a default value
+func parseDurationDef(durationStr string, defaultVal time.Duration) time.Duration {
+	if durationStr == "" {
+		return defaultVal
+	}
+	d, err := time.ParseDuration(durationStr)
+	if err != nil {
+		// Log error or handle appropriately, return default for now
+		fmt.Printf("Error parsing duration '%s': %v. Using default: %v\n", durationStr, err, defaultVal)
+		return defaultVal
+	}
+	return d
+}

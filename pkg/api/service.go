@@ -3,6 +3,7 @@ package api
 import (
 	"context"
 	"fmt"
+	"net"
 	"net/http"
 	"os"
 	"os/signal"
@@ -11,16 +12,20 @@ import (
 
 	"github.com/ethpandaops/lab/pkg/internal/lab"
 	"github.com/gorilla/mux"
+	"google.golang.org/grpc"
 )
 
 // Service represents the api service
 type Service struct {
-	config *Config
-	ctx    context.Context
-	cancel context.CancelFunc
-	router *mux.Router
-	server *http.Server
-	lab    *lab.Lab
+	config       *Config
+	ctx          context.Context
+	cancel       context.CancelFunc
+	router       *mux.Router
+	server       *http.Server
+	grpcServer   *grpc.Server
+	grpcListener net.Listener
+	restServer   *http.Server
+	lab          *lab.Lab
 }
 
 // New creates a new api service
@@ -79,6 +84,17 @@ func (s *Service) Start(ctx context.Context) error {
 			s.cancel()
 		}
 	}()
+
+	// Start gRPC gateway if enabled
+	if s.config.EnableGRPCGateway {
+		go func() {
+			s.lab.Log().Info("Starting gRPC gateway")
+			if err := s.StartGateway(ctx); err != nil {
+				s.lab.Log().WithError(err).Error("gRPC gateway error")
+				s.cancel()
+			}
+		}()
+	}
 
 	// Block until context is canceled
 	<-s.ctx.Done()
@@ -147,6 +163,25 @@ func (s *Service) cleanup() {
 		defer cancel()
 		if err := s.server.Shutdown(ctx); err != nil {
 			s.lab.Log().WithError(err).Error("Failed to shut down HTTP server")
+		}
+	}
+
+	// Shutdown REST server for gRPC gateway
+	if s.restServer != nil {
+		s.lab.Log().Info("Shutting down REST gateway server")
+		ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
+		defer cancel()
+		if err := s.restServer.Shutdown(ctx); err != nil {
+			s.lab.Log().WithError(err).Error("Failed to shut down REST gateway server")
+		}
+	}
+
+	// Shutdown gRPC server
+	if s.grpcServer != nil {
+		s.lab.Log().Info("Shutting down gRPC server")
+		s.grpcServer.GracefulStop()
+		if s.grpcListener != nil {
+			s.grpcListener.Close()
 		}
 	}
 

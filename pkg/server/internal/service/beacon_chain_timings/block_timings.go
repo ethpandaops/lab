@@ -3,11 +3,14 @@ package beacon_chain_timings
 import (
 	"fmt"
 	"path/filepath"
-	"strconv"
+
+	// Removed strconv as it's no longer needed for validator processing
 	"time"
 
+	// Removed unused imports: context, clickhouse-go/v2
 	"github.com/ethpandaops/lab/pkg/internal/lab/ethereum"
 	"github.com/ethpandaops/lab/pkg/internal/lab/storage"
+	pb "github.com/ethpandaops/lab/pkg/server/proto/beacon_chain_timings" // Import generated proto types
 	"github.com/sirupsen/logrus"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
@@ -18,14 +21,20 @@ func (b *BeaconChainTimings) processBlockTimings(network *ethereum.Network, wind
 		"window":  windowName,
 	}).Info("Processing block timings")
 
+	// Get time window config
+	timeWindow, err := b.GetTimeWindowConfig(windowName)
+	if err != nil {
+		return fmt.Errorf("failed to get time window config: %w", err)
+	}
+
 	// Get time range for the window
-	timeRange, err := b.getTimeRange(windowName)
+	timeRange, err := b.getTimeRange(timeWindow) // Pass config instead of name
 	if err != nil {
 		return fmt.Errorf("failed to get time range: %w", err)
 	}
 
 	// Process block timings
-	timingData, err := b.processBlockTimingsData(network.Name, timeRange)
+	timingData, err := b.GetTimingData(network.Name, timeRange, timeWindow) // Pass config
 	if err != nil {
 		return fmt.Errorf("failed to process block timings: %w", err)
 	}
@@ -38,26 +47,32 @@ func (b *BeaconChainTimings) processBlockTimings(network *ethereum.Network, wind
 	return nil
 }
 
-// getTimeRange returns the start and end time for a window
-func (b *BeaconChainTimings) getTimeRange(window string) (struct{ Start, End time.Time }, error) {
+// getTimeWindowConfig finds the TimeWindowConfig by name
+func (b *BeaconChainTimings) GetTimeWindowConfig(windowName string) (*pb.TimeWindowConfig, error) {
+	for i := range b.config.TimeWindows { // Assuming config holds the windows
+		localTW := b.config.TimeWindows[i]
+		if localTW.File == windowName {
+			// Explicitly create and return a pointer to a pb.TimeWindowConfig
+			// using the correct fields and helper methods from the local config struct
+			pbTW := &pb.TimeWindowConfig{
+				Name:    localTW.Label, // Map Label to Name
+				File:    localTW.File,
+				RangeMs: localTW.GetRangeDuration().Milliseconds(), // Use helper and convert to ms
+				StepMs:  localTW.GetStepDuration().Milliseconds(),  // Use helper and convert to ms
+			}
+			return pbTW, nil
+		}
+	}
+	return nil, fmt.Errorf("unknown window: %s", windowName)
+}
+
+// getTimeRange returns the start and end time for a window config
+func (b *BeaconChainTimings) getTimeRange(timeWindow *pb.TimeWindowConfig) (struct{ Start, End time.Time }, error) {
 	result := struct {
 		Start time.Time
 		End   time.Time
 	}{
 		End: time.Now().UTC(),
-	}
-
-	// Find the time window config
-	var timeWindow *TimeWindowConfig
-	for _, tw := range DefaultTimeWindows {
-		if tw.File == window {
-			timeWindow = &tw
-			break
-		}
-	}
-
-	if timeWindow == nil {
-		return result, fmt.Errorf("unknown window: %s", window)
 	}
 
 	// Calculate the start time
@@ -66,106 +81,200 @@ func (b *BeaconChainTimings) getTimeRange(window string) (struct{ Start, End tim
 	return result, nil
 }
 
-// processBlockTimingsData processes block timings data for a network and time range
-func (b *BeaconChainTimings) processBlockTimingsData(network string, timeRange struct{ Start, End time.Time }) (*TimingData, error) {
+// processBlockTimingsData processes block timings data for a network, time range, and window config
+func (b *BeaconChainTimings) GetTimingData(network string, timeRange struct{ Start, End time.Time }, timeWindow *pb.TimeWindowConfig) (*pb.TimingData, error) {
+	stepSeconds := timeWindow.StepMs / 1000
+	if stepSeconds <= 0 {
+		return nil, fmt.Errorf("invalid step duration in window config: %d ms", timeWindow.StepMs)
+	}
+
 	b.log.WithFields(logrus.Fields{
-		"network":    network,
-		"time_range": fmt.Sprintf("%s - %s", timeRange.Start.Format(time.RFC3339), timeRange.End.Format(time.RFC3339)),
+		"network":      network,
+		"time_range":   fmt.Sprintf("%s - %s", timeRange.Start.Format(time.RFC3339), timeRange.End.Format(time.RFC3339)),
+		"step_seconds": stepSeconds,
 	}).Info("Processing block timings data")
 
 	// Format time range for the query
 	startStr := timeRange.Start.Format("2006-01-02 15:04:05")
 	endStr := timeRange.End.Format("2006-01-02 15:04:05")
 
-	// Query the database for block timing information
+	// Query the database for block timing information (matches Python logic)
 	query := `
-		WITH block_events AS (
+		WITH time_slots AS (
 			SELECT
-				proposer_index,
-				COUNT(*) as block_count,
-				AVG(propagation_slot_start_diff) as avg_slot_diff,
-				MIN(propagation_slot_start_diff) as min_slot_diff,
-				MAX(propagation_slot_start_diff) as max_slot_diff,
-				quantile(0.5)(propagation_slot_start_diff) as median_slot_diff,
-				quantile(0.9)(propagation_slot_start_diff) as p90_slot_diff,
-				quantile(0.99)(propagation_slot_start_diff) as p99_slot_diff
-			FROM beacon_api_eth_v1_events_block
-			WHERE 
-				meta_network_name = $1
-				AND event_date_time BETWEEN $2 AND $3
-			GROUP BY proposer_index
+				toStartOfInterval(slot_start_date_time, INTERVAL {step_seconds:UInt64} second) as time_slot,
+				meta_network_name,
+				min(propagation_slot_start_diff) as min_arrival,
+				max(propagation_slot_start_diff) as max_arrival,
+				avg(propagation_slot_start_diff) as avg_arrival,
+				quantile(0.05)(propagation_slot_start_diff) as p05_arrival,
+				quantile(0.50)(propagation_slot_start_diff) as p50_arrival,
+				quantile(0.95)(propagation_slot_start_diff) as p95_arrival,
+				count(*) as total_blocks
+			FROM beacon_api_eth_v1_events_block FINAL
+			WHERE
+				slot_start_date_time BETWEEN {start_date:DateTime} AND {end_date:DateTime}
+				AND meta_network_name = {network:String}
+				AND propagation_slot_start_diff < 6000
+			GROUP BY time_slot, meta_network_name
 		)
-		SELECT 
-			proposer_index,
-			toInt32(block_count) as block_count,
-			toInt32(avg_slot_diff) as avg_slot_diff,
-			toInt32(min_slot_diff) as min_slot_diff,
-			toInt32(max_slot_diff) as max_slot_diff,
-			toInt32(median_slot_diff) as median_slot_diff,
-			toInt32(p90_slot_diff) as p90_slot_diff,
-			toInt32(p99_slot_diff) as p99_slot_diff
-		FROM block_events
-		ORDER BY block_count DESC
+		SELECT
+			time_slot,
+			min_arrival,
+			max_arrival,
+			avg_arrival,
+			p05_arrival,
+			p50_arrival,
+			p95_arrival,
+			total_blocks
+		FROM time_slots
+		ORDER BY time_slot ASC
 	`
 
-	rows, err := b.xatuClient.GetClickhouseClientForNetwork(network).Query(query, network, startStr, endStr)
+	conn := b.xatuClient.GetClickhouseClientForNetwork(network) // Assuming this returns a *sql.DB or similar
+	if conn == nil {
+		return nil, fmt.Errorf("no clickhouse client found for network: %s", network)
+	}
+
+	// Revert to the client's specific Query method signature, assuming it returns []map[string]interface{}
+	// and handles named parameters in the query string directly.
+	// Remove context and clickhouse.Named parameters.
+	rowsData, err := conn.Query(query, // Pass query string directly
+		// Pass parameters positionally or rely on client handling named params in string
+		// Let's assume the client handles the {name:Type} syntax in the query string
+		// and doesn't need explicit parameters here if they are embedded.
+		// If positional needed: network, startStr, endStr, stepSeconds
+		// Let's try without explicit params first, matching the named syntax in the query.
+		// Update: The original code passed params positionally, let's stick to that pattern
+		// if the named syntax doesn't work implicitly.
+		// Update 2: The python code used named params. Let's assume the Go client
+		// also supports named params via the map interface if not via clickhouse.Named.
+		// Trying with a map for named parameters. Check client docs if this fails.
+		map[string]interface{}{
+			"step_seconds": stepSeconds,
+			"start_date":   startStr,
+			"end_date":     endStr,
+			"network":      network,
+		},
+	)
+
 	if err != nil {
 		return nil, fmt.Errorf("failed to query block timing data: %w", err)
 	}
 
+	// Directly use rowsData, as it's already []map[string]interface{}
+	rows := rowsData
+
 	// Process the results
-	result := &TimingData{
+	result := &pb.TimingData{
 		Network:    network,
 		Timestamp:  timestamppb.New(time.Now().UTC()),
-		Validators: make(map[string]*TimingData_ValidatorCategory),
+		Timestamps: make([]int64, 0),
+		Mins:       make([]float64, 0),
+		Maxs:       make([]float64, 0),
+		Avgs:       make([]float64, 0),
+		P05S:       make([]float64, 0), // Corrected case
+		P50S:       make([]float64, 0), // Corrected case
+		P95S:       make([]float64, 0), // Corrected case
+		Blocks:     make([]int64, 0),
+		// Intentionally not populating the 'validators' map
 	}
 
+	// Process results from the slice of maps
 	for _, row := range rows {
-		proposerIndex := fmt.Sprintf("%v", row["proposer_index"])
-
-		// Create a validator entry if it doesn't exist
-		if _, exists := result.Validators[proposerIndex]; !exists {
-			result.Validators[proposerIndex] = &TimingData_ValidatorCategory{
-				Categories: make(map[string]int32),
+		// Extract and assert types for each field from the map
+		timeSlot, ok := row["time_slot"].(time.Time)
+		if !ok {
+			b.log.WithField("value", row["time_slot"]).Error("Failed to assert time_slot as time.Time")
+			continue // Or return error
+		}
+		minArrival, ok := row["min_arrival"].(float64)
+		if !ok {
+			// Handle potential integer types from DB if necessary
+			if intVal, okInt := row["min_arrival"].(int64); okInt {
+				minArrival = float64(intVal)
+				ok = true
+			} else if int32Val, okInt32 := row["min_arrival"].(int32); okInt32 {
+				minArrival = float64(int32Val)
+				ok = true
+			} else {
+				b.log.WithField("value", row["min_arrival"]).Error("Failed to assert min_arrival as float64")
+				continue
+			}
+		}
+		maxArrival, ok := row["max_arrival"].(float64)
+		if !ok {
+			if intVal, okInt := row["max_arrival"].(int64); okInt {
+				maxArrival = float64(intVal)
+				ok = true
+			} else if int32Val, okInt32 := row["max_arrival"].(int32); okInt32 {
+				maxArrival = float64(int32Val)
+				ok = true
+			} else {
+				b.log.WithField("value", row["max_arrival"]).Error("Failed to assert max_arrival as float64")
+				continue
+			}
+		}
+		avgArrival, ok := row["avg_arrival"].(float64)
+		if !ok {
+			b.log.WithField("value", row["avg_arrival"]).Error("Failed to assert avg_arrival as float64")
+			continue
+		}
+		p05Arrival, ok := row["p05_arrival"].(float64)
+		if !ok {
+			b.log.WithField("value", row["p05_arrival"]).Error("Failed to assert p05_arrival as float64")
+			continue
+		}
+		p50Arrival, ok := row["p50_arrival"].(float64)
+		if !ok {
+			b.log.WithField("value", row["p50_arrival"]).Error("Failed to assert p50_arrival as float64")
+			continue
+		}
+		p95Arrival, ok := row["p95_arrival"].(float64)
+		if !ok {
+			b.log.WithField("value", row["p95_arrival"]).Error("Failed to assert p95_arrival as float64")
+			continue
+		}
+		totalBlocks, ok := row["total_blocks"].(int64) // Assuming ClickHouse count returns Int64
+		if !ok {
+			// Handle potential uint64 if count returns that
+			if uintVal, okUint := row["total_blocks"].(uint64); okUint {
+				totalBlocks = int64(uintVal)
+				ok = true
+			} else {
+				b.log.WithField("value", row["total_blocks"]).Error("Failed to assert total_blocks as int64")
+				continue
 			}
 		}
 
-		// Add metrics for this validator
-		for metric, value := range row {
-			if metric != "proposer_index" {
-				// Convert to int
-				intValue, ok := value.(int32)
-				if !ok {
-					// Try to parse it from string
-					if strValue, ok := value.(string); ok {
-						parsedValue, err := strconv.Atoi(strValue)
-						if err != nil {
-							b.log.WithError(err).Warn("Failed to parse metric value to int")
-							continue
-						}
-						intValue = int32(parsedValue)
-					} else {
-						b.log.Warn("Failed to convert metric value to int")
-						continue
-					}
-				}
-				result.Validators[proposerIndex].Categories[metric] = int32(intValue)
-			}
-		}
+		result.Timestamps = append(result.Timestamps, timeSlot.Unix())
+		result.Mins = append(result.Mins, minArrival)
+		result.Maxs = append(result.Maxs, maxArrival)
+		result.Avgs = append(result.Avgs, avgArrival)
+		result.P05S = append(result.P05S, p05Arrival) // Corrected case
+		result.P50S = append(result.P50S, p50Arrival) // Corrected case
+		result.P95S = append(result.P95S, p95Arrival) // Corrected case
+		result.Blocks = append(result.Blocks, totalBlocks)
 	}
+
+	// No rows.Err() equivalent needed for slice iteration
 
 	return result, nil
 }
 
 // storeTimingData stores timing data
-func (b *BeaconChainTimings) storeTimingData(network, window string, data *TimingData) error {
+func (b *BeaconChainTimings) storeTimingData(network, window string, data *pb.TimingData) error { // Use pb.TimingData
 	// Create path for the data file
-	dataPath := filepath.Join(b.baseDir, "block_timings", network, fmt.Sprintf("%s.json", window))
+	// Ensure GetStoragePath is defined elsewhere or implement it here
+	dataPath := GetStoragePath(filepath.Join(b.baseDir, "block_timings", network, fmt.Sprintf("%s.json", window)))
 
 	// Store the data file
-	if _, err := b.storageClient.StoreEncoded(GetStoragePath(dataPath), data, storage.CodecNameJSON); err != nil {
+	if _, err := b.storageClient.StoreEncoded(dataPath, data, storage.CodecNameJSON); err != nil {
 		return fmt.Errorf("failed to store data file: %w", err)
 	}
 
+	b.log.WithField("path", dataPath).Info("Stored block timings data")
 	return nil
 }
+
+// Removed duplicate GetStoragePath helper function

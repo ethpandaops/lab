@@ -17,6 +17,8 @@ message Config {
 message BackfillConfig {
   bool enabled = 1;
   int64 slots_ago = 2;
+  bool middle_processor_enable = 3; // Enable processing recent window on startup
+  string middle_processor_duration = 4; // Duration for the middle processor (e.g., "1h")
 }
 
 // The state of the processor
