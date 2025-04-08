@@ -216,6 +216,8 @@ func (b *BeaconChainTimings) process() {
 		b.log.Errorf("failed to get state: %v", err)
 	}
 
+	needStorageUpdate := false
+
 	// Process each network
 	for _, network := range b.ethereumConfig.Networks {
 		// Initialize if not exists
@@ -232,7 +234,6 @@ func (b *BeaconChainTimings) process() {
 			shouldProcess, err := b.shouldProcess(network.Name, window.File, state.BlockTimings.LastProcessed[network.Name])
 			if err != nil {
 				b.log.WithError(err).Errorf("failed to check if should process block timings for network %s, window %s", network.Name, window.File)
-				continue
 			}
 
 			if shouldProcess {
@@ -241,6 +242,7 @@ func (b *BeaconChainTimings) process() {
 				} else {
 					// Update state
 					state.BlockTimings.LastProcessed[network.Name] = time.Now().UTC()
+					needStorageUpdate = true
 				}
 			}
 
@@ -248,7 +250,6 @@ func (b *BeaconChainTimings) process() {
 			shouldProcess, err = b.shouldProcess(network.Name, window.File, state.Cdf.LastProcessed[network.Name])
 			if err != nil {
 				b.log.WithError(err).Errorf("failed to check if should process CDF for network %s, window %s", network.Name, window.File)
-				continue
 			}
 
 			if shouldProcess {
@@ -257,14 +258,17 @@ func (b *BeaconChainTimings) process() {
 				} else {
 					// Update state
 					state.Cdf.LastProcessed[network.Name] = time.Now().UTC()
+					needStorageUpdate = true
 				}
 			}
 		}
 	}
 
-	// Save the updated state
-	if _, err := b.storageClient.StoreEncoded(GetStoragePath(GetStateKey()), state, storage.CodecNameJSON); err != nil {
-		b.log.WithError(err).Error("failed to store state")
+	if needStorageUpdate {
+		// Save the updated state
+		if _, err := b.storageClient.StoreEncoded(GetStoragePath(GetStateKey()), state, storage.CodecNameJSON); err != nil {
+			b.log.WithError(err).Error("failed to store state")
+		}
 	}
 }
 

@@ -11,13 +11,13 @@ build-binary:
 # Generate protobuf
 proto:
 	@echo "Generating protobuf code..."
-	buf generate --path pkg/srv/proto/beacon_chain_timings
-	buf generate --path pkg/srv/proto/lab
-	buf generate --path pkg/srv/proto/xatu_public_contributors
-
+	buf generate --path pkg/server/proto/beacon_chain_timings
+	buf generate --path pkg/server/proto/lab
+	buf generate --path pkg/server/proto/xatu_public_contributors
+	buf generate --path pkg/server/proto/beacon_slots
 # Create a new proto file
 create-proto:
-	@echo "Usage: make create-proto PROTO_NAME=<name>"
+	@echo "Usage: make create-proto PROTO_NAME=<n>"
 	@if [ -n "$(PROTO_NAME)" ]; then \
 		./scripts/create_proto.sh $(PROTO_NAME); \
 	fi
@@ -37,4 +37,6 @@ clean:
 	@echo "Cleaning..."
 	rm -rf bin
 	rm -rf pkg/srv/proto/*/*.pb.go
-	rm -rf pkg/srv/proto/*/*_grpc.pb.go 
+	rm -rf pkg/srv/proto/*/*_grpc.pb.go
+	rm -rf pkg/proto/*/*.pb.go
+	rm -rf pkg/proto/*/*_grpc.pb.go 

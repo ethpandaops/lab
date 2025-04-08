@@ -15,6 +15,7 @@ import (
 	"github.com/ethpandaops/lab/pkg/server/internal/grpc"
 	"github.com/ethpandaops/lab/pkg/server/internal/service"
 	"github.com/ethpandaops/lab/pkg/server/internal/service/beacon_chain_timings"
+	"github.com/ethpandaops/lab/pkg/server/internal/service/xatu_public_contributors"
 )
 
 // Service represents the srv service. It glues together all the sub-services and the gRPC server.
@@ -130,21 +131,35 @@ func (s *Service) Start(ctx context.Context) error {
 
 func (s *Service) initializeServices(ctx context.Context) error {
 	// Initialize all our services
+	bct, err := beacon_chain_timings.New(
+		s.lab.Log(),
+		s.config.Modules["beacon_chain_timings"].BeaconChainTimings,
+		s.xatuClient,
+		s.config.Networks,
+		s.storageClient,
+		s.lockerClient,
+	)
+	if err != nil {
+		return fmt.Errorf("failed to initialize beacon chain timings service: %w", err)
+	}
+
+	xatu_public_contributors.New(
+		s.lab.Log(),
+		s.config.Modules["xatu_public_contributors"].XatuPublicContributors,
+		s.config.Ethereum,
+		s.storageClient,
+		s.cacheClient,
+		s.lockerClient,
+	)
+	if err != nil {
+		return fmt.Errorf("failed to initialize xatu public contributors service: %w", err)
+	}
+
 	s.services = []service.Service{
 		service.NewLab(
 			s.lab.Log(),
 		),
-		beacon_chain_timings.New(
-			s.lab.Log(),
-			s.xatuClient,
-			s.storageClient,
-			s.lockerClient,
-		),
-		service.NewXatuPublicContributors(
-			s.lab.Log(),
-			s.xatuClient,
-			s.storageClient,
-		),
+		bct,
 	}
 
 	return nil

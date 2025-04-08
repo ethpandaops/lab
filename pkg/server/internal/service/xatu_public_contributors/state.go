@@ -1,6 +1,8 @@
 package xatu_public_contributors
 
-import "time"
+import (
+	"time"
+)
 
 // ProcessorState holds the last processed time for a processor and its windows.
 type ProcessorState struct {
@@ -45,3 +47,6 @@ func (s *State) UpdateProcessorState(processorName string, state ProcessorState)
 	}
 	s.Processors[processorName] = state
 }
+
+// Note: ToProtoState and FromProtoState will be implemented after
+// the proto package is generated correctly

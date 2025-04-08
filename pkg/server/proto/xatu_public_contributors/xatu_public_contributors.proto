@@ -6,153 +6,125 @@ import "google/protobuf/timestamp.proto";
 
 option go_package = "github.com/ethpandaops/lab/pkg/proto/xatu_public_contributors";
 
-// TimeWindow represents a time window configuration
-message TimeWindow {
-  string file = 1;
-  string step = 2;
-  string label = 3;
-  string range = 4;
+// Configuration for the xatu_public_contributors service
+message Config {
+  bool enabled = 1;
+  string redis_key_prefix = 2;
+  repeated string networks = 3;
+  int64 backfill_hours = 4;
 }
 
-// ProcessorState tracks the processing state for a specific processor
-message ProcessorState {
+// State tracking for contributors service
+message ContributorsState {
   string network = 1;
-  string processor = 2;
-  google.protobuf.Timestamp last_processed = 3;
-  map<string, google.protobuf.Timestamp> last_processed_windows = 4;
+  map<string, ProcessorState> processors = 2;
 }
 
-// NodeCount represents a count of nodes, differentiated between total and public
+// State for a specific processor
+message ProcessorState {
+  google.protobuf.Timestamp last_processed = 1;
+  map<string, google.protobuf.Timestamp> last_processed_windows = 2;
+}
+
+// Count of nodes for a specific country
 message NodeCount {
-  int32 total_nodes = 1;
-  int32 public_nodes = 2;
+  string country = 1;
+  int32 count = 2;
 }
 
-// NetworkStats represents statistics for a specific network
+// Network statistics
 message NetworkStats {
-  int32 total_nodes = 1;
-  int32 total_public_nodes = 2;
-  map<string, NodeCount> countries = 3;
-  map<string, NodeCount> continents = 4;
-  map<string, NodeCount> cities = 5;
-  map<string, NodeCount> consensus_implementations = 6;
+  string network = 1;
+  repeated NodeCount node_counts = 2;
+  int32 total_nodes = 3;
+  int32 total_countries = 4;
 }
 
-// SummaryData represents the summary data for all networks
+// Summary data for dashboard
 message SummaryData {
-  int64 updated_at = 1; // Unix timestamp
-  map<string, NetworkStats> networks = 2;
+  repeated NetworkStats networks = 1;
+  int32 total_nodes = 2;
+  int32 total_countries = 3;
 }
 
-// CountryDataPoint represents a country with its node count
+// Data point for a country
 message CountryDataPoint {
-  string name = 1;
-  int32 value = 2;
+  google.protobuf.Timestamp timestamp = 1;
+  repeated NodeCount node_counts = 2;
+  int32 total_nodes = 3;
+  int32 total_countries = 4;
 }
 
-// CountriesTimePoint represents countries data for a specific time
-message CountriesTimePoint {
-  int64 time = 1; // Unix timestamp
-  repeated CountryDataPoint countries = 2;
-}
-
-// UserDataPoint represents a user with its node count
+// Data point for a user
 message UserDataPoint {
-  string name = 1;
-  int32 value = 2;
+  google.protobuf.Timestamp timestamp = 1;
+  int32 user_count = 2;
 }
 
-// UsersTimePoint represents users data for a specific time
-message UsersTimePoint {
-  int64 time = 1; // Unix timestamp
-  repeated UserDataPoint users = 2;
-}
-
-// UserSummary represents a summary for a specific user
+// User summary data
 message UserSummary {
-  string user = 1;
-  map<string, int32> networks = 2;
-  map<string, int32> countries = 3;
-  map<string, int32> continents = 4;
-  map<string, int32> cities = 5;
-  map<string, int32> clients = 6;
-  int64 first_seen = 7; // Unix timestamp
-  int64 last_seen = 8; // Unix timestamp
-  int32 total_nodes = 9;
+  int32 current_user_count = 1;
+  repeated UserDataPoint data_points = 2;
 }
 
-// Workflow and activity parameters
-message ProcessorParams {
-  string network_name = 1;
-  string window_name = 2;
+// Top networks by node count
+message TopNetworks {
+  repeated NetworkStats networks = 1;
 }
 
-message SummaryProcessorParams {
-  string network_name = 1;
-}
-
-message CountriesProcessorParams {
-  string network_name = 1;
-}
-
-message UsersProcessorParams {
-  string network_name = 1;
-}
-
-message UserSummariesProcessorParams {
-  string network_name = 1;
-}
-
-// Service definitions
-service XatuPublicContributorsService {
-  // Get summary data for networks
-  rpc GetSummary(GetSummaryRequest) returns (GetSummaryResponse);
-  
-  // Get countries data for a specific network and time window
-  rpc GetCountriesData(GetCountriesDataRequest) returns (GetCountriesDataResponse);
-  
-  // Get users data for a specific network and time window
-  rpc GetUsersData(GetUsersDataRequest) returns (GetUsersDataResponse);
-  
-  // Get user summary data for a specific user
-  rpc GetUserSummary(GetUserSummaryRequest) returns (GetUserSummaryResponse);
-}
-
-// Request and response messages for the service methods
+// Request to get summary data
 message GetSummaryRequest {
   string network = 1;
 }
 
+// Response containing summary data
 message GetSummaryResponse {
-  SummaryData data = 1;
+  SummaryData summary = 1;
 }
 
-message GetCountriesDataRequest {
+// Request to get country data
+message GetCountryDataRequest {
   string network = 1;
-  string window_name = 2;
-  google.protobuf.Timestamp start_time = 3;
-  google.protobuf.Timestamp end_time = 4;
+  // Optional time range parameters could be added here
 }
 
-message GetCountriesDataResponse {
-  repeated CountriesTimePoint data = 1;
+// Response containing country data
+message GetCountryDataResponse {
+  repeated CountryDataPoint data_points = 1;
 }
 
-message GetUsersDataRequest {
+// Request to get user data
+message GetUserDataRequest {
   string network = 1;
-  string window_name = 2;
-  google.protobuf.Timestamp start_time = 3;
-  google.protobuf.Timestamp end_time = 4;
+  // Optional time range parameters could be added here
 }
 
-message GetUsersDataResponse {
-  repeated UsersTimePoint data = 1;
+// Response containing user data
+message GetUserDataResponse {
+  UserSummary user_summary = 1;
 }
 
-message GetUserSummaryRequest {
-  string user = 1;
+// Request to get top networks
+message GetTopNetworksRequest {
+  int32 limit = 1; // Number of top networks to return
 }
 
-message GetUserSummaryResponse {
-  UserSummary data = 1;
+// Response containing top networks
+message GetTopNetworksResponse {
+  TopNetworks top_networks = 1;
+}
+
+// The xatu_public_contributors service definition
+service XatuPublicContributorsService {
+  // Get summary data
+  rpc GetSummary(GetSummaryRequest) returns (GetSummaryResponse) {}
+  
+  // Get country data
+  rpc GetCountryData(GetCountryDataRequest) returns (GetCountryDataResponse) {}
+  
+  // Get user data
+  rpc GetUserData(GetUserDataRequest) returns (GetUserDataResponse) {}
+  
+  // Get top networks
+  rpc GetTopNetworks(GetTopNetworksRequest) returns (GetTopNetworksResponse) {}
 } 

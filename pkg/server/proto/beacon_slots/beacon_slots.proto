@@ -1,0 +1,173 @@
+syntax = "proto3";
+
+package beacon_slots;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/ethpandaops/lab/pkg/proto/beacon_slots";
+
+// Configuration for the beacon_slots service
+message Config {
+  bool enabled = 1;
+  repeated string networks = 2;
+  BackfillConfig backfill = 3;
+}
+
+// Backfill configuration
+message BackfillConfig {
+  bool enabled = 1;
+  int64 slots_ago = 2;
+}
+
+// The state of the processor
+message ProcessorState {
+  google.protobuf.Timestamp last_processed = 1;
+  optional int64 last_processed_slot = 2;
+  optional int64 current_slot = 3;
+  optional int64 target_slot = 4;
+  string direction = 5;  // "forward" or "backward"
+}
+
+// The state of all processors
+message BeaconSlotsState {
+  string network = 1;
+  map<string, ProcessorState> processors = 2;
+}
+
+// Node information
+message Node {
+  string id = 1;
+  string consensus_client = 2;
+  string execution_client = 3;
+  string location = 4;
+}
+
+// Proposer data
+message ProposerData {
+  int64 slot = 1;
+  google.protobuf.Timestamp timestamp = 2;
+  string proposer_index = 3;
+  uint64 votes = 4;
+  repeated string graffiti = 5;
+  int64 missed_slots = 6;
+  int64 orphaned_slots = 7;
+}
+
+// Block data
+message BlockData {
+  int64 slot = 1;
+  google.protobuf.Timestamp timestamp = 2;
+  string block_hash = 3;
+  string parent_hash = 4;
+  string proposer_index = 5;
+  int64 attestations = 6;
+  int64 deposits = 7;
+  int64 exits = 8;
+  int64 proposer_slashings = 9;
+  int64 attester_slashings = 10;
+  int64 sync_aggregate_bits = 11;
+  int32 sync_committee_size = 12;
+  int32 blob_count = 13;
+  int64 execution_payload_size = 14;
+  int64 capella_deposits = 15;
+  int64 capella_withdrawals = 16;
+  int64 deneb_blob_gas_used = 17;
+  int64 deneb_blob_gas_limit = 18;
+  repeated string seen_by = 19;
+}
+
+// Seen at slot time data
+message SeenAtSlotTimeData {
+  int64 slot = 1;
+  google.protobuf.Timestamp timestamp = 2;
+  string node_id = 3;
+  string block_hash = 4;
+  int64 delay_ms = 5;
+}
+
+// Blob seen at slot time data
+message BlobSeenAtSlotTimeData {
+  int64 slot = 1;
+  google.protobuf.Timestamp timestamp = 2;
+  string node_id = 3;
+  string block_hash = 4;
+  int64 blob_index = 5;
+  int64 delay_ms = 6;
+}
+
+// Attestation window
+message AttestationWindow {
+  int64 epoch = 1;
+  int64 committee_index = 2;
+  int64 slot = 3;
+  int64 validator_count = 4;
+}
+
+// Optimized slot data
+message OptimizedSlotData {
+  int64 slot = 1;
+  google.protobuf.Timestamp timestamp = 2;
+  ProposerData proposer_data = 3;
+  BlockData block_data = 4;
+  repeated SeenAtSlotTimeData seen_at_slot_time_data = 5;
+  repeated BlobSeenAtSlotTimeData blob_seen_at_slot_time_data = 6;
+  repeated AttestationWindow attestation_windows = 7;
+}
+
+// Request to get processor state
+message GetProcessorStateRequest {
+  string network = 1;
+}
+
+// Response containing processor state
+message GetProcessorStateResponse {
+  ProcessorState state = 1;
+}
+
+// Request to get slot data
+message GetSlotDataRequest {
+  string network = 1;
+  int64 slot = 2;
+}
+
+// Response containing slot data
+message GetSlotDataResponse {
+  OptimizedSlotData slot_data = 1;
+}
+
+// Request to get slot range data
+message GetSlotRangeDataRequest {
+  string network = 1;
+  int64 start_slot = 2;
+  int64 end_slot = 3;
+}
+
+// Response containing slot range data
+message GetSlotRangeDataResponse {
+  repeated OptimizedSlotData slot_data = 1;
+}
+
+// Request to get node list
+message GetNodesRequest {
+  string network = 1;
+}
+
+// Response containing node list
+message GetNodesResponse {
+  repeated Node nodes = 1;
+}
+
+// The beacon_slots service definition
+service BeaconSlotsService {
+  // Get processor state
+  rpc GetProcessorState(GetProcessorStateRequest) returns (GetProcessorStateResponse) {}
+  
+  // Get slot data
+  rpc GetSlotData(GetSlotDataRequest) returns (GetSlotDataResponse) {}
+  
+  // Get slot range data
+  rpc GetSlotRangeData(GetSlotRangeDataRequest) returns (GetSlotRangeDataResponse) {}
+  
+  // Get node list
+  rpc GetNodes(GetNodesRequest) returns (GetNodesResponse) {}
+} 

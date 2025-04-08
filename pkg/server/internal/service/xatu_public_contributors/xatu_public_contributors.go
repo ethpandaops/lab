@@ -13,7 +13,7 @@ import (
 	"github.com/ethpandaops/lab/pkg/internal/lab/locker"
 	"github.com/ethpandaops/lab/pkg/internal/lab/storage"
 	"github.com/ethpandaops/lab/pkg/internal/lab/xatu"
-	pb "github.com/ethpandaops/lab/pkg/server/proto/xatu_public_contributors" // Keep proto for data structures if needed
+	pb "github.com/ethpandaops/lab/pkg/server/proto/xatu_public_contributors"
 	"github.com/sirupsen/logrus"
 )
 
@@ -128,7 +128,7 @@ func (b *XatuPublicContributors) Name() string {
 }
 
 func (b *XatuPublicContributors) processLoop() {
-	ticker := time.NewTicker(b.config.GetInterval()) // Use configured interval
+	ticker := time.NewTicker(time.Second * 15)
 	defer ticker.Stop()
 
 	// Initial processing run immediately if leader
@@ -199,7 +199,7 @@ func (b *XatuPublicContributors) shouldProcess(processorName string, lastProcess
 }
 
 // shouldProcessWindow checks if a specific window within a processor should run.
-func (b *XatuPublicContributors) shouldProcessWindow(windowConfig TimeWindow, lastProcessedWindow time.Time) (bool, error) {
+func (b *XatuPublicContributors) shouldProcessWindow(windowConfig pb.TimeWindow, lastProcessedWindow time.Time) (bool, error) {
 	if lastProcessedWindow.IsZero() {
 		return true, nil // Never processed before
 	}

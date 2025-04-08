@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.5.1
 // - protoc             (unknown)
-// source: pkg/srv/proto/beacon_chain_timings/beacon_chain_timings.proto
+// source: pkg/server/proto/beacon_chain_timings/beacon_chain_timings.proto
 
 package beacon_chain_timings
 
@@ -164,5 +164,5 @@ var BeaconChainTimingsService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "pkg/srv/proto/beacon_chain_timings/beacon_chain_timings.proto",
+	Metadata: "pkg/server/proto/beacon_chain_timings/beacon_chain_timings.proto",
 }

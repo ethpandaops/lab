@@ -4,8 +4,11 @@ import (
 	"time"
 
 	"github.com/ethpandaops/lab/pkg/internal/lab/clickhouse"
+	"github.com/ethpandaops/lab/pkg/internal/lab/ethereum"
 	"github.com/ethpandaops/lab/pkg/internal/lab/storage"
 	"github.com/ethpandaops/lab/pkg/server/internal/grpc"
+	"github.com/ethpandaops/lab/pkg/server/internal/service/beacon_chain_timings"
+	"github.com/ethpandaops/lab/pkg/server/internal/service/xatu_public_contributors"
 )
 
 // Config contains the configuration for the srv service
@@ -19,7 +22,8 @@ type Config struct {
 
 // ModuleConfig contains the configuration for a specific module
 type ModuleConfig struct {
-	BeaconChainTimings *BeaconChainTimingsConfig `yaml:"beacon_chain_timings"`
+	BeaconChainTimings     *beacon_chain_timings.Config     `yaml:"beacon_chain_timings"`
+	XatuPublicContributors *xatu_public_contributors.Config `yaml:"xatu_public_contributors"`
 }
 
 // BeaconChainTimingsConfig contains the configuration for the Beacon Chain Timings module
@@ -34,11 +38,12 @@ type EthereumConfig struct {
 
 // NetworkConfig contains the configuration for a specific Ethereum network
 type NetworkConfig struct {
-	Xatu      *clickhouse.Config `yaml:"xatu"`      // Per-network Xatu config
-	ConfigURL string             `yaml:"configURL"` // URL to the network's config
-	Genesis   time.Time          `yaml:"genesis"`   // Genesis time
-	Validator ValidatorSet       `yaml:"validator"` // Validator set
-	Forks     EthereumForkConfig `yaml:"forks"`     // Forks
+	NetworkConfig *ethereum.Config
+	Xatu          *clickhouse.Config `yaml:"xatu"`      // Per-network Xatu config
+	ConfigURL     string             `yaml:"configURL"` // URL to the network's config
+	Genesis       time.Time          `yaml:"genesis"`   // Genesis time
+	Validator     ValidatorSet       `yaml:"validator"` // Validator set
+	Forks         EthereumForkConfig `yaml:"forks"`     // Forks
 }
 
 // ValidatorSet contains the configuration for the validator set

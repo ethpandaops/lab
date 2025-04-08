@@ -1,87 +1,54 @@
 package xatu_public_contributors
 
-import "time"
+import (
+	"time"
+)
 
-// NodeCount represents a count of nodes, differentiated between total and public
+// NodeCount represents a count of nodes for a specific country
 type NodeCount struct {
-	TotalNodes  int `json:"total_nodes"`
-	PublicNodes int `json:"public_nodes"`
+	Country string `json:"country"`
+	Count   int32  `json:"count"`
 }
 
-// NetworkStats represents statistics for a specific network
+// NetworkStats represents statistics for a network
 type NetworkStats struct {
-	TotalNodes               int                  `json:"total_nodes"`
-	TotalPublicNodes         int                  `json:"total_public_nodes"`
-	Countries                map[string]NodeCount `json:"countries"`
-	Continents               map[string]NodeCount `json:"continents"`
-	Cities                   map[string]NodeCount `json:"cities"`
-	ConsensusImplementations map[string]NodeCount `json:"consensus_implementations"`
+	Network        string      `json:"network"`
+	NodeCounts     []NodeCount `json:"node_counts"`
+	TotalNodes     int32       `json:"total_nodes"`
+	TotalCountries int32       `json:"total_countries"`
 }
 
-// SummaryData represents the summary data for all networks
+// SummaryData represents summary data for the dashboard
 type SummaryData struct {
-	UpdatedAt int64                   `json:"updated_at"` // Unix timestamp
-	Networks  map[string]NetworkStats `json:"networks"`
+	Networks       []NetworkStats `json:"networks"`
+	TotalNodes     int32          `json:"total_nodes"`
+	TotalCountries int32          `json:"total_countries"`
 }
 
-// NewSummaryData creates a new SummaryData instance with initialized fields
-func NewSummaryData(networks []string) *SummaryData {
-	summary := &SummaryData{
-		UpdatedAt: time.Now().UTC().Unix(),
-		Networks:  make(map[string]NetworkStats),
-	}
-
-	// Initialize network stats for each network
-	for _, network := range networks {
-		summary.Networks[network] = NetworkStats{
-			Countries:                make(map[string]NodeCount),
-			Continents:               make(map[string]NodeCount),
-			Cities:                   make(map[string]NodeCount),
-			ConsensusImplementations: make(map[string]NodeCount),
-		}
-	}
-
-	return summary
-}
-
-// TimeSeriesDataPoint represents a single data point in a time series
-type TimeSeriesDataPoint struct {
-	Time int64 `json:"time"` // Unix timestamp
-}
-
-// CountryDataPoint represents a country with its node count
+// CountryDataPoint represents a data point for country statistics
 type CountryDataPoint struct {
-	Name  string `json:"name"`
-	Value int    `json:"value"`
+	Timestamp      time.Time   `json:"timestamp"`
+	NodeCounts     []NodeCount `json:"node_counts"`
+	TotalNodes     int32       `json:"total_nodes"`
+	TotalCountries int32       `json:"total_countries"`
 }
 
-// CountriesTimePoint represents countries data for a specific time
-type CountriesTimePoint struct {
-	Time      int64              `json:"time"` // Unix timestamp
-	Countries []CountryDataPoint `json:"countries"`
-}
-
-// UserDataPoint represents a user with its node count
+// UserDataPoint represents a data point for user statistics
 type UserDataPoint struct {
-	Name  string `json:"name"`
-	Value int    `json:"value"`
+	Timestamp time.Time `json:"timestamp"`
+	UserCount int32     `json:"user_count"`
 }
 
-// UsersTimePoint represents users data for a specific time
-type UsersTimePoint struct {
-	Time  int64           `json:"time"` // Unix timestamp
-	Users []UserDataPoint `json:"users"`
-}
-
-// UserSummary represents a summary for a specific user
+// UserSummary represents summary data for users
 type UserSummary struct {
-	User       string         `json:"user"`
-	Networks   map[string]int `json:"networks"`
-	Countries  map[string]int `json:"countries"`
-	Continents map[string]int `json:"continents"`
-	Cities     map[string]int `json:"cities"`
-	Clients    map[string]int `json:"clients"`
-	FirstSeen  int64          `json:"first_seen"` // Unix timestamp
-	LastSeen   int64          `json:"last_seen"`  // Unix timestamp
-	TotalNodes int            `json:"total_nodes"`
+	CurrentUserCount int32           `json:"current_user_count"`
+	DataPoints       []UserDataPoint `json:"data_points"`
 }
+
+// TopNetworks represents the top networks by node count
+type TopNetworks struct {
+	Networks []NetworkStats `json:"networks"`
+}
+
+// Note: ToProto and FromProto methods will be implemented after
+// the proto package is generated correctly
