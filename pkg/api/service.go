@@ -2,19 +2,25 @@ package api
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net"
 	"net/http"
 	"os"
 	"os/signal"
+	"strconv"
 	"syscall"
 	"time"
 
 	"github.com/ethpandaops/lab/pkg/internal/lab"
 	"github.com/ethpandaops/lab/pkg/internal/lab/cache"
+	"github.com/ethpandaops/lab/pkg/internal/lab/discovery"
 	"github.com/ethpandaops/lab/pkg/internal/lab/storage"
 	"github.com/gorilla/mux"
 	"google.golang.org/grpc"
+	"google.golang.org/protobuf/types/known/emptypb"
+
+	apipb "github.com/ethpandaops/lab/pkg/api/proto"
 )
 
 // Service represents the api service
@@ -30,13 +36,15 @@ type Service struct {
 	lab           *lab.Lab
 	cacheClient   cache.Client
 	storageClient storage.Client
+	discovery     discovery.Discovery
+
+	// gRPC connection to srv service
+	srvConn   *grpc.ClientConn
+	srvClient apipb.LabAPIClient
 }
 
 // New creates a new api service
-func New(config *Config, logLevel string) (*Service, error) {
-	ctx, cancel := context.WithCancel(context.Background())
-
-	// Create lab instance
+func New(config *Config, logLevel string, serviceMap map[string]string) (*Service, error) {
 	labInst, err := lab.New(lab.Config{
 		LogLevel: logLevel,
 	}, "lab.ethpandaops.io.api")
@@ -46,24 +54,23 @@ func New(config *Config, logLevel string) (*Service, error) {
 
 	cacheClient, err := labInst.NewCache(config.Cache)
 	if err != nil {
-		cancel()
 		return nil, fmt.Errorf("failed to create cache client: %w", err)
 	}
 
 	storageClient, err := labInst.NewStorage(nil)
 	if err != nil {
-		cancel()
 		return nil, fmt.Errorf("failed to create storage client: %w", err)
 	}
 
+	disc := discovery.NewStaticDiscovery(serviceMap)
+
 	return &Service{
 		config:        config,
-		ctx:           ctx,
-		cancel:        cancel,
 		router:        mux.NewRouter(),
 		lab:           labInst,
 		cacheClient:   cacheClient,
 		storageClient: storageClient,
+		discovery:     disc,
 	}, nil
 }
 
@@ -71,7 +78,8 @@ func New(config *Config, logLevel string) (*Service, error) {
 func (s *Service) Start(ctx context.Context) error {
 	s.lab.Log().Info("Starting api service")
 
-	// Set up signal handling
+	s.ctx, s.cancel = context.WithCancel(ctx)
+
 	sigCh := make(chan os.Signal, 1)
 	signal.Notify(sigCh, syscall.SIGINT, syscall.SIGTERM)
 	go func() {
@@ -80,21 +88,17 @@ func (s *Service) Start(ctx context.Context) error {
 		s.cancel()
 	}()
 
-	// Initialize services
 	if err := s.initializeServices(); err != nil {
 		return fmt.Errorf("failed to initialize services: %w", err)
 	}
 
-	// Set up HTTP routes
 	s.setupRoutes()
 
-	// Create HTTP server
 	s.server = &http.Server{
 		Addr:    fmt.Sprintf("%s:%d", s.config.HttpServer.Host, s.config.HttpServer.Port),
 		Handler: s.router,
 	}
 
-	// Start HTTP server
 	go func() {
 		s.lab.Log().WithField("addr", s.server.Addr).Info("Starting HTTP server")
 		if err := s.server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
@@ -103,7 +107,6 @@ func (s *Service) Start(ctx context.Context) error {
 		}
 	}()
 
-	// Start gRPC gateway if enabled
 	if s.config.EnableGRPCGateway {
 		go func() {
 			s.lab.Log().Info("Starting gRPC gateway")
@@ -114,95 +117,205 @@ func (s *Service) Start(ctx context.Context) error {
 		}()
 	}
 
-	// Block until context is canceled
 	<-s.ctx.Done()
 	s.lab.Log().Info("Context canceled, cleaning up")
 
-	// Clean up resources
 	s.cleanup()
 
 	s.lab.Log().Info("Api service stopped")
 	return nil
 }
 
-// initializeServices initializes all services
 func (s *Service) initializeServices() error {
-	// var err error
+	srvAddr, err := s.discovery.GetServiceURL("srv")
+	if err != nil {
+		return fmt.Errorf("failed to discover srv service URL: %w", err)
+	}
+	s.config.SrvClient.Address = srvAddr
 
-	// Initialize broker client
-	// s.lab.Log().Info("Initializing broker client")
-	// err = s.lab.InitBroker(s.config.Broker)
-	// if err != nil {
-	// 	return fmt.Errorf("failed to initialize broker: %w", err)
-	// }
-
-	// // Initialize cache
-	// s.lab.Log().Info("Initializing cache")
-	// err = s.lab.InitCache(s.config.Cache)
-	// if err != nil {
-	// 	return fmt.Errorf("failed to initialize cache: %w", err)
-	// }
-
-	// // Initialize discovery to get SRV gRPC address
-	// err = s.lab.InitDiscovery(s.config.Discovery)
-	// if err != nil {
-	// 	return fmt.Errorf("failed to initialize discovery: %w", err)
-	// }
-
-	// // Get SRV gRPC address if not configured
-	// srvAddr, err := s.lab.Discovery().
-	// if err != nil {
-	// 	return fmt.Errorf("failed to get SRV gRPC address: %w", err)
-	// }
-	// s.config.SrvClient.Address = srvAddr
-
-	// TODO: Initialize gRPC client to srv service
+	conn, err := grpc.Dial(srvAddr, grpc.WithInsecure())
+	if err != nil {
+		return fmt.Errorf("failed to dial srv service at %s: %w", srvAddr, err)
+	}
+	s.srvConn = conn
+	s.srvClient = apipb.NewLabAPIClient(conn)
 
 	return nil
 }
 
-// setupRoutes sets up HTTP routes
 func (s *Service) setupRoutes() {
-	// Add health check endpoint
 	s.router.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte("OK"))
 	})
 
-	// TODO: Add API endpoints
+	s.router.HandleFunc("/status", func(w http.ResponseWriter, r *http.Request) {
+		resp, err := s.srvClient.GetStatus(r.Context(), &emptypb.Empty{})
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		writeJSON(w, resp)
+	})
+
+	s.router.HandleFunc("/frontend-config", func(w http.ResponseWriter, r *http.Request) {
+		resp, err := s.srvClient.GetFrontendConfig(r.Context(), &emptypb.Empty{})
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		writeJSON(w, resp)
+	})
+
+	s.router.HandleFunc("/beacon-slot-data", func(w http.ResponseWriter, r *http.Request) {
+		network := r.URL.Query().Get("network")
+		slotStr := r.URL.Query().Get("slot")
+		slot, _ := strconv.ParseUint(slotStr, 10, 64)
+		req := &apipb.GetBeaconSlotDataRequest{
+			Network: network,
+			Slot:    slot,
+		}
+		resp, err := s.srvClient.GetBeaconSlotData(r.Context(), req)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		writeJSON(w, resp)
+	})
+
+	s.router.HandleFunc("/beacon-slot-range", func(w http.ResponseWriter, r *http.Request) {
+		network := r.URL.Query().Get("network")
+		startStr := r.URL.Query().Get("start")
+		endStr := r.URL.Query().Get("end")
+		start, _ := strconv.ParseUint(startStr, 10, 64)
+		end, _ := strconv.ParseUint(endStr, 10, 64)
+		req := &apipb.GetBeaconSlotRangeRequest{
+			Network: network,
+			Start:   start,
+			End:     end,
+		}
+		resp, err := s.srvClient.GetBeaconSlotRange(r.Context(), req)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		writeJSON(w, resp)
+	})
+
+	s.router.HandleFunc("/beacon-nodes", func(w http.ResponseWriter, r *http.Request) {
+		network := r.URL.Query().Get("network")
+		req := &apipb.GetBeaconNodesRequest{
+			Network: network,
+		}
+		resp, err := s.srvClient.GetBeaconNodes(r.Context(), req)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		writeJSON(w, resp)
+	})
+
+	s.router.HandleFunc("/timing-data", func(w http.ResponseWriter, r *http.Request) {
+		network := r.URL.Query().Get("network")
+		windowName := r.URL.Query().Get("window_name")
+		startStr := r.URL.Query().Get("start")
+		endStr := r.URL.Query().Get("end")
+		start, _ := strconv.ParseUint(startStr, 10, 64)
+		end, _ := strconv.ParseUint(endStr, 10, 64)
+		req := &apipb.GetTimingDataRequest{
+			Network:    network,
+			WindowName: windowName,
+			Start:      start,
+			End:        end,
+		}
+		resp, err := s.srvClient.GetTimingData(r.Context(), req)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		writeJSON(w, resp)
+	})
+
+	s.router.HandleFunc("/size-cdf-data", func(w http.ResponseWriter, r *http.Request) {
+		network := r.URL.Query().Get("network")
+		startStr := r.URL.Query().Get("start")
+		endStr := r.URL.Query().Get("end")
+		start, _ := strconv.ParseUint(startStr, 10, 64)
+		end, _ := strconv.ParseUint(endStr, 10, 64)
+		req := &apipb.GetSizeCDFDataRequest{
+			Network: network,
+			Start:   start,
+			End:     end,
+		}
+		resp, err := s.srvClient.GetSizeCDFData(r.Context(), req)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		writeJSON(w, resp)
+	})
+
+	s.router.HandleFunc("/beacon-state-file", func(w http.ResponseWriter, r *http.Request) {
+		network := r.URL.Query().Get("network")
+		req := &apipb.GetBeaconStateFileRequest{
+			Network: network,
+		}
+		resp, err := s.srvClient.GetBeaconStateFile(r.Context(), req)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		writeJSON(w, resp)
+	})
+
+	s.router.HandleFunc("/beacon-slot-file", func(w http.ResponseWriter, r *http.Request) {
+		network := r.URL.Query().Get("network")
+		slotStr := r.URL.Query().Get("slot")
+		slot, _ := strconv.ParseUint(slotStr, 10, 64)
+		req := &apipb.GetBeaconSlotFileRequest{
+			Network: network,
+			Slot:    slot,
+		}
+		resp, err := s.srvClient.GetBeaconSlotFile(r.Context(), req)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		writeJSON(w, resp)
+	})
 }
 
-// cleanup cleans up resources
 func (s *Service) cleanup() {
-	// Shutdown HTTP server
 	if s.server != nil {
 		s.lab.Log().Info("Shutting down HTTP server")
-		ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancel()
 		if err := s.server.Shutdown(ctx); err != nil {
 			s.lab.Log().WithError(err).Error("Failed to shut down HTTP server")
 		}
 	}
 
-	// Shutdown REST server for gRPC gateway
 	if s.restServer != nil {
 		s.lab.Log().Info("Shutting down REST gateway server")
-		ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancel()
 		if err := s.restServer.Shutdown(ctx); err != nil {
 			s.lab.Log().WithError(err).Error("Failed to shut down REST gateway server")
 		}
 	}
 
-	// Shutdown gRPC server
 	if s.grpcServer != nil {
-		s.lab.Log().Info("Shutting down gRPC server")
+		s.lab.Log().Info("Stopping gRPC server")
 		s.grpcServer.GracefulStop()
-		if s.grpcListener != nil {
-			s.grpcListener.Close()
-		}
 	}
 
-	// Close lab instance
-	s.lab.Stop()
+	if s.srvConn != nil {
+		s.lab.Log().Info("Closing gRPC client connection")
+		_ = s.srvConn.Close()
+	}
+}
+
+func writeJSON(w http.ResponseWriter, v interface{}) {
+	w.Header().Set("Content-Type", "application/json")
+	_ = json.NewEncoder(w).Encode(v)
 }

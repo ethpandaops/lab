@@ -8,6 +8,9 @@ import (
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"google.golang.org/grpc"
+
+	api "github.com/ethpandaops/lab/pkg/api"
+	apipb "github.com/ethpandaops/lab/pkg/api/proto"
 )
 
 func main() {
@@ -17,8 +20,9 @@ func main() {
 
 	grpcServer := grpc.NewServer()
 
-	// TODO: Register LabAPI gRPC service here
-	// pb.RegisterLabAPIServer(grpcServer, &labAPIServer{})
+	// Register LabAPI gRPC service here
+	labAPIServer := &api.LabAPIServerImpl{}
+	apipb.RegisterLabAPIServer(grpcServer, labAPIServer)
 
 	lis, err := net.Listen("tcp", ":9090")
 	if err != nil {
@@ -34,11 +38,11 @@ func main() {
 
 	mux := runtime.NewServeMux()
 
-	// TODO: Register gRPC-Gateway handlers here
-	// err = pb.RegisterLabAPIHandlerFromEndpoint(ctx, mux, ":9090", []grpc.DialOption{grpc.WithInsecure()})
-	// if err != nil {
-	// 	log.Fatalf("failed to register gateway: %v", err)
-	// }
+	// Register gRPC-Gateway handlers here
+	err = apipb.RegisterLabAPIHandlerFromEndpoint(ctx, mux, ":9090", []grpc.DialOption{grpc.WithInsecure()})
+	if err != nil {
+		log.Fatalf("failed to register gateway: %v", err)
+	}
 
 	log.Println("Starting HTTP REST gateway on :8080")
 	if err := http.ListenAndServe(":8080", addCacheControl(mux)); err != nil {

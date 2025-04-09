@@ -61,7 +61,11 @@ func toGRPCError(log logrus.FieldLogger, err error) error {
 		// Return NotFound code, but potentially a user-friendly message
 		return status.Error(codes.NotFound, "requested data not found")
 	}
-	// TODO: Add mapping for validation errors if the service layer implements them
+	// Placeholder for validation error mapping if validation package is added
+	// if errors.Is(err, validation.ErrInvalidArgument) {
+	// 	log.WithError(err).Warn("Invalid argument")
+	// 	return status.Error(codes.InvalidArgument, err.Error())
+	// }
 	// if errors.Is(err, xpc.ErrInvalidArgument) { // Example
 	// 	log.WithError(err).Warn("Invalid argument")
 	// 	return status.Error(codes.InvalidArgument, err.Error())
@@ -135,8 +139,8 @@ func (x *XatuPublicContributors) GetCountryData(ctx context.Context, req *pb.Get
 	log.Debug("Request received")
 
 	// Determine which window file to read. Defaulting to "24h" for now.
-	// TODO: Consider making the window configurable via the request if needed.
 	windowFile := "24h"
+	// Placeholder: make window configurable if proto adds a window field
 
 	// Read the pre-processed country time series data from storage
 	serviceDataPoints, err := x.service.ReadCountryDataWindow(ctx, req.Network, windowFile)

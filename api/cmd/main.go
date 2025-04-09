@@ -6,6 +6,7 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/ethpandaops/lab/pkg/api"
 	"github.com/sirupsen/logrus"
 )
 
@@ -27,21 +28,30 @@ func main() {
 		cancel()
 	}()
 
-	// TODO: Initialize services
-	// - Config
-	// - gRPC client to srv service
-	// - Cache
-	// - NATS connection for events
-	// - HTTP/REST server
-	// - Websocket server
+	// Example static service map
+	serviceMap := map[string]string{
+		"srv": "localhost:9090",
+	}
+
+	// Example config with empty/default values
+	cfg := &api.Config{
+		SrvClient: &api.SrvClientConfig{},
+	}
+
+	// Create API service with discovery
+	apiService, err := api.New(cfg, "info", serviceMap)
+	if err != nil {
+		log.Fatalf("Failed to create API service: %v", err)
+	}
+
+	// Start API service
+	if err := apiService.Start(ctx); err != nil {
+		log.Fatalf("Failed to start API service: %v", err)
+	}
 
 	// Block until context is canceled
 	<-ctx.Done()
 	log.Info("Context canceled, cleaning up...")
-
-	// TODO: Clean up resources
-	// - Close connections
-	// - Shutdown HTTP server
 
 	log.Info("Api service stopped")
 }

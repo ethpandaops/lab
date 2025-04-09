@@ -33,10 +33,6 @@ func New(
 	config *Config,
 	log logrus.FieldLogger,
 ) (Client, error) {
-	if log == nil {
-		return nil, fmt.Errorf("logger cannot be nil")
-	}
-
 	if err := config.Validate(); err != nil {
 		return nil, fmt.Errorf("invalid config: %w", err)
 	}

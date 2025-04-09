@@ -47,10 +47,6 @@ func New(
 	config *Config,
 	log logrus.FieldLogger,
 ) (Client, error) {
-	if log == nil {
-		return nil, fmt.Errorf("logger cannot be nil")
-	}
-
 	return &client{
 		log:      log.WithField("module", "storage"),
 		config:   config,

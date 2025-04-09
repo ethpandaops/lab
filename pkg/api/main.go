@@ -2,11 +2,13 @@ package api
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net"
 	"net/http"
 
 	apipb "github.com/ethpandaops/lab/pkg/api/proto"
+	"github.com/ethpandaops/lab/pkg/internal/lab"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -19,8 +21,25 @@ func StartGateway(ctx context.Context) error {
 
 	grpcServer := grpc.NewServer()
 
-	// Register LabAPI gRPC service
-	labAPIServer := NewLabAPIServer(nil, nil)
+	// Initialize lab instance and dependencies
+	labInst, err := lab.New(lab.Config{
+		LogLevel: "info",
+	}, "lab.ethpandaops.io.gateway")
+	if err != nil {
+		return fmt.Errorf("failed to create lab instance: %w", err)
+	}
+
+	cacheClient, err := labInst.NewCache(nil)
+	if err != nil {
+		return fmt.Errorf("failed to create cache client: %w", err)
+	}
+
+	storageClient, err := labInst.NewStorage(nil)
+	if err != nil {
+		return fmt.Errorf("failed to create storage client: %w", err)
+	}
+
+	labAPIServer := NewLabAPIServer(cacheClient, storageClient)
 	apipb.RegisterLabAPIServer(grpcServer, labAPIServer)
 
 	lis, err := net.Listen("tcp", ":9090")
