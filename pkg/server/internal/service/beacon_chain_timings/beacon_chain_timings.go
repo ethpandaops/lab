@@ -3,6 +3,7 @@ package beacon_chain_timings
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/ethpandaops/lab/pkg/internal/lab/cache"
@@ -143,7 +144,7 @@ func (b *BeaconChainTimings) Start(ctx context.Context) error {
 
 	leader := leader.New(b.log, b.lockerClient, leader.Config{
 		Resource:        BeaconChainTimingsServiceName + "/batch_processing",
-		TTL:             15 * time.Minute,
+		TTL:             30 * time.Second,
 		RefreshInterval: 5 * time.Second,
 
 		OnElected: func() {
@@ -166,7 +167,11 @@ func (b *BeaconChainTimings) Start(ctx context.Context) error {
 		},
 		OnRevoked: func() {
 			b.log.Info("Lost leadership")
-			b.processCtxCancel()
+			if b.processCtxCancel != nil {
+				b.processCtxCancel()
+				b.processCtx = nil
+				b.processCtxCancel = nil
+			}
 		},
 	})
 
@@ -185,7 +190,7 @@ func (b *BeaconChainTimings) processLoop() {
 	// Use a ticker for regular checks
 	interval := b.config.GetIntervalDuration()
 	if interval <= 0 {
-		interval = 15 * time.Second
+		interval = 5 * time.Second
 	}
 	ticker := time.NewTicker(interval)
 	defer ticker.Stop()
@@ -215,7 +220,7 @@ func (b *BeaconChainTimings) Name() string {
 }
 
 func (b *BeaconChainTimings) process() {
-	// Fetch the latest state from storage
+	// Create a new state with initialized data structures to ensure sane defaults
 	state := &State{
 		BlockTimings: DataTypeState{
 			LastProcessed: make(map[string]time.Time),
@@ -225,16 +230,51 @@ func (b *BeaconChainTimings) process() {
 		},
 	}
 
+	// Pre-initialize state for all networks to ensure they exist
+	if b.ethereumConfig != nil && len(b.ethereumConfig.Networks) > 0 {
+		for _, network := range b.ethereumConfig.Networks {
+			if network != nil {
+				state.BlockTimings.LastProcessed[network.Name] = time.Time{} // Zero time
+				state.Cdf.LastProcessed[network.Name] = time.Time{}          // Zero time
+			}
+		}
+	}
+
+	// Try to load existing state
 	err := b.storageClient.GetEncoded(GetStoragePath(GetStateKey()), state, storage.CodecNameJSON)
 	if err != nil {
-		b.log.Errorf("failed to get state: %v", err)
+		if err != storage.ErrNotFound && !strings.Contains(err.Error(), "not found") {
+			b.log.WithError(err).Error("Failed to get state, using initialized default state")
+		} else {
+			// Not found is fine for first run, just log at debug level
+			b.log.Debug("No existing state found, using initialized default state")
+		}
+		// Continue with the empty state initialized above
+	}
+
+	// Verify we have valid networks to process
+	if b.ethereumConfig == nil || len(b.ethereumConfig.Networks) == 0 {
+		b.log.Warn("No networks configured to process, skipping")
+		return
+	}
+
+	// Verify we have valid time windows to process
+	if b.config == nil || len(b.config.TimeWindows) == 0 {
+		b.log.Warn("No time windows configured to process, skipping")
+		return
 	}
 
 	needStorageUpdate := false
 
 	// Process each network
 	for _, network := range b.ethereumConfig.Networks {
-		// Initialize if not exists
+		// Skip nil networks (shouldn't happen, but defensive)
+		if network == nil {
+			b.log.Warn("Encountered nil network, skipping")
+			continue
+		}
+
+		// Ensure maps are initialized for this network
 		if _, ok := state.BlockTimings.LastProcessed[network.Name]; !ok {
 			state.BlockTimings.LastProcessed[network.Name] = time.Time{}
 		}
@@ -244,14 +284,21 @@ func (b *BeaconChainTimings) process() {
 
 		// Check if it's time to process
 		for _, window := range b.config.TimeWindows {
+			// Skip empty window configurations
+			if window.File == "" {
+				b.log.Warn("Encountered empty window file name, skipping")
+				continue
+			}
+
 			// Process block timings
 			shouldProcess, err := b.shouldProcess(network.Name, window.File, state.BlockTimings.LastProcessed[network.Name])
 			if err != nil {
 				b.log.WithError(err).Errorf("failed to check if should process block timings for network %s, window %s", network.Name, window.File)
+				continue
 			}
 
 			if shouldProcess {
-				if err := b.processBlockTimings(network, window.File); err != nil {
+				if err := b.processBlockTimings(b.processCtx, network, window.File); err != nil {
 					b.log.WithError(err).Errorf("failed to process block timings for network %s, window %s", network.Name, window.File)
 				} else {
 					// Update state
@@ -264,10 +311,11 @@ func (b *BeaconChainTimings) process() {
 			shouldProcess, err = b.shouldProcess(network.Name, window.File, state.Cdf.LastProcessed[network.Name])
 			if err != nil {
 				b.log.WithError(err).Errorf("failed to check if should process CDF for network %s, window %s", network.Name, window.File)
+				continue
 			}
 
 			if shouldProcess {
-				if err := b.processSizeCDF(network, &pb.TimeWindowConfig{
+				if err := b.processSizeCDF(b.processCtx, network, &pb.TimeWindowConfig{
 					Name: window.File,
 					File: window.File,
 				}); err != nil {
@@ -283,8 +331,12 @@ func (b *BeaconChainTimings) process() {
 
 	if needStorageUpdate {
 		// Save the updated state
-		if _, err := b.storageClient.StoreEncoded(GetStoragePath(GetStateKey()), state, storage.CodecNameJSON); err != nil {
+		_, err := b.storageClient.StoreEncoded(GetStoragePath(GetStateKey()), state, storage.CodecNameJSON)
+		if err != nil {
 			b.log.WithError(err).Error("failed to store state")
+			// Don't return, as we've already done processing work
+		} else {
+			b.log.Debug("Successfully stored updated state")
 		}
 	}
 }

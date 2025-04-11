@@ -19,7 +19,7 @@ The leader package provides leader election functionality for distributed system
 cacheClient := cache.NewMemory(cache.MemoryConfig{DefaultTTL: time.Minute})
 
 // Create a locker
-lock := locker.NewLocker(cacheClient)
+lock := locker.New(cacheClient)
 
 // Configure leader election
 config := leader.Config{
@@ -71,7 +71,7 @@ if err != nil {
 }
 
 // Create a locker with Redis backend
-lock := locker.NewLocker(cacheClient)
+lock := locker.New(cacheClient)
 
 // Configure and use leader election as in the previous example
 // This will now work across multiple processes

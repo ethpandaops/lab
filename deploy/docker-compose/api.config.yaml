@@ -1,0 +1,30 @@
+# API service configuration
+
+# Log level
+logLevel: "info"
+
+# HTTP server configuration
+httpServer:
+  host: "0.0.0.0"
+  port: 8080
+
+# SRV client configuration
+srvClient:
+  address: "127.0.0.1:6666"
+
+# Cache configuration
+cache:
+  type: "redis"
+  config:
+    url: "redis://redis:6379"
+    defaultTTL: 60
+
+# Storage configuration
+storage:
+  endpoint: "minio:9000"
+  region: "us-east-1"
+  bucket: "lab"
+  accessKey: "minioadmin"
+  secretKey: "minioadmin"
+  secure: false
+  usePathStyle: true

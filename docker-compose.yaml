@@ -1,75 +1,82 @@
 version: '3.8'
 
 services:
+  redis:
+    image: redis:7
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
   minio:
-    image: minio/minio:latest
-    profiles:
-    - minio
-    - '*'
+    image: minio/minio
+    command: server /data --console-address ":9001"
     ports:
       - "9000:9000"
       - "9001:9001"
     environment:
       MINIO_ROOT_USER: minioadmin
       MINIO_ROOT_PASSWORD: minioadmin
-    command: server /data --console-address ":9001"
     volumes:
       - minio_data:/data
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
-      interval: 30s
-      timeout: 20s
-      retries: 3
 
+  # Create the lab bucket in MinIO
   createbuckets:
-    image: minio/mc:latest
-    profiles:
-    - minio
-    - '*'
+    image: minio/mc
     depends_on:
       - minio
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
     entrypoint: >
       /bin/sh -c "
       sleep 5;
       /usr/bin/mc config host add myminio http://minio:9000 minioadmin minioadmin;
-      /usr/bin/mc mb myminio/lab-data;
-      /usr/bin/mc anonymous set download myminio/lab-data;
+      /usr/bin/mc mb myminio/lab;
+      /usr/bin/mc policy set public myminio/lab;
       exit 0;
       "
 
-  backend:
+  server:
     build:
       context: .
-      dockerfile: backend/Dockerfile
-    profiles:
-    - backend
-    - '*'
+      dockerfile: Dockerfile.golang
+    command: ["srv", "--srv-config", "/app/config/service.config.yaml"]
+    environment:
+      - XATU_CLICKHOUSE_USERNAME=${XATU_CLICKHOUSE_USERNAME}
+      - XATU_CLICKHOUSE_PASSWORD=${XATU_CLICKHOUSE_PASSWORD}
+    ports:
+      - "6666:6666"
     depends_on:
       - minio
+      - createbuckets
     volumes:
-      - ./backend/config.yaml:/app/config.yaml
-    environment:
-      - CONFIG_FILE=/app/config.yaml
+      - ./deploy/docker-compose/service.config.yaml:/app/config/service.config.yaml
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.golang
+    command: ["api", "--api-config", "/app/config/api.config.yaml"]
+    ports:
+      - "8080:8080"
+    depends_on:
+      - redis
+      - server
+    volumes:
+      - ./deploy/docker-compose/api.config.yaml:/app/config/api.config.yaml
 
   frontend:
     build:
-      context: frontend
+      context: ./frontend
       dockerfile: Dockerfile
-    profiles:
-    - frontend
-    - '*'
     ports:
       - "3000:3000"
-    environment:
-      - NEXT_PUBLIC_API_URL=http://localhost:3000/api
-      - VITE_S3_ENDPOINT=http://minio:9000
-      - VITE_S3_BUCKET=lab-data
-      - VITE_S3_ACCESS_KEY=minioadmin
-      - VITE_S3_SECRET_KEY=minioadmin
-      - VITE_S3_REGION=us-east-1
     depends_on:
-      - backend
-      - minio
+      - api
+    environment:
+      VITE_BACKEND_URL: http://api:8080
 
 volumes:
   minio_data:
+  redis_data:

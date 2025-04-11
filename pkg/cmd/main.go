@@ -64,7 +64,9 @@ func loadConfig(path string, as interface{}) (interface{}, error) {
 		return nil, fmt.Errorf("error reading config file: %w", err)
 	}
 
-	err = yaml.Unmarshal(configFile, as)
+	expanded := os.ExpandEnv(string(configFile))
+
+	err = yaml.Unmarshal([]byte(expanded), as)
 	if err != nil {
 		return nil, fmt.Errorf("error parsing config file: %w", err)
 	}

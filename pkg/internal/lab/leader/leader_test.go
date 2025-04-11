@@ -22,7 +22,7 @@ func NewMemoryLocker() locker.Locker {
 		DefaultTTL: 5 * time.Minute,
 	})
 
-	locker := locker.NewLocker(logrus.New(), cache)
+	locker := locker.New(logrus.New(), cache)
 
 	return locker
 }
@@ -196,7 +196,7 @@ func TestLeaderElectionWithRedis(t *testing.T) {
 	defer redisCache.Stop()
 
 	// Create Redis-backed locker
-	redisLocker := locker.NewLocker(logrus.New(), redisCache)
+	redisLocker := locker.New(logrus.New(), redisCache)
 
 	// Test with two leaders
 	var leader1Elected, leader1Revoked bool

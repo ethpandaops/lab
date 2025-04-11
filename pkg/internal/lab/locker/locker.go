@@ -31,8 +31,8 @@ type locker struct {
 	cache cache.Client
 }
 
-// NewLocker creates a new distributed lock implementation using the provided cache
-func NewLocker(log logrus.FieldLogger, cache cache.Client) Locker {
+// New creates a new distributed lock implementation using the provided cache
+func New(log logrus.FieldLogger, cache cache.Client) Locker {
 	return &locker{
 		log:   log.WithField("component", "lab/locker"),
 		cache: cache,

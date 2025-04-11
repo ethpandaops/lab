@@ -3,29 +3,29 @@ config_version: 3
 
 http:
   rules:
-    - selector: "labapi.LabAPI.GetStatus"
-      get: "/v1/status"
 
-    - selector: "labapi.LabAPI.GetFrontendConfig"
-      get: "/api/config"
 
-    - selector: "labapi.LabAPI.GetBeaconSlotData"
-      get: "/api/beacon/slots/{network}/{slot}"
+    - selector: "labapi.LabAPI.GetBlockTimings"
+      get: "/api/beacon_chain_timings/block_timings/{network}/{window_file}.json"
 
-    - selector: "labapi.LabAPI.GetBeaconSlotRange"
-      get: "/api/beacon/slots/{network}/range"
+    - selector: "labapi.LabAPI.GetSizeCDFWindow"
+      get: "/api/beacon_chain_timings/size_cdf/{network}/{window_file}.json"
 
-    - selector: "labapi.LabAPI.GetBeaconNodes"
-      get: "/api/beacon/nodes/{network}"
 
-    - selector: "labapi.LabAPI.GetTimingData"
-      get: "/api/beacon/timings/{network}"
+    - selector: "labapi.LabAPI.GetXatuSummary"
+      get: "/api/xatu_public_contributors/summary.json"
+      
+    - selector: "labapi.LabAPI.GetBeaconSlot"
+      get: "/api/slots/{network}/{slot}.json"
 
-    - selector: "labapi.LabAPI.GetSizeCDFData"
-      get: "/api/beacon/sizecdf/{network}"
+    - selector: "labapi.LabAPI.GetXatuUserSummary"
+      get: "/api/xatu_public_contributors/user-summaries/summary.json"
 
-    - selector: "labapi.LabAPI.GetBeaconStateFile"
-      get: "/api/beacon/state/{network}"
+    - selector: "labapi.LabAPI.GetXatuUser"
+      get: "/api/xatu_public_contributors/user-summaries/users/{username}.json"
 
-    - selector: "labapi.LabAPI.GetBeaconSlotFile"
-      get: "/api/beacon/slots/file/{network}/{slot}"
+    - selector: "labapi.LabAPI.GetXatuUsersWindow"
+      get: "/api/xatu_public_contributors/users/{network}/{window_file}.json"
+
+    - selector: "labapi.LabAPI.GetXatuCountriesWindow"
+      get: "/api/xatu_public_contributors/countries/{network}/{window_file}.json"

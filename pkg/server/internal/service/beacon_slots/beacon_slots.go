@@ -221,19 +221,19 @@ func (b *BeaconSlots) processLoop() {
 		case <-headTicker.C:
 			if b.leaderClient.IsLeader() {
 				for _, network := range b.config.Networks {
-					b.processHead(network)
+					b.processHead(b.processCtx, network)
 				}
 			}
 		case <-backlogTicker.C:
 			if b.leaderClient.IsLeader() {
 				for _, network := range b.config.Networks {
-					b.processBacklog(network)
+					b.processBacklog(b.processCtx, network)
 				}
 			}
 		case <-missingTicker.C:
 			if b.leaderClient.IsLeader() {
 				for _, network := range b.config.Networks {
-					b.processMissing(network)
+					b.processMissing(b.processCtx, network)
 				}
 			}
 		}
@@ -302,7 +302,7 @@ func (b *BeaconSlots) shouldProcess(processorName string, lastProcessed time.Tim
 }
 
 // processHead processes the latest slot for a network
-func (b *BeaconSlots) processHead(networkName string) {
+func (b *BeaconSlots) processHead(ctx context.Context, networkName string) {
 	b.log.WithField("network", networkName).Debug("Processing head slot")
 
 	// Get state
@@ -322,7 +322,7 @@ func (b *BeaconSlots) processHead(networkName string) {
 	}
 
 	// Get the current slot
-	currentSlot, err := b.getCurrentSlot(networkName)
+	currentSlot, err := b.getCurrentSlot(ctx, networkName)
 	if err != nil {
 		b.log.WithField("network", networkName).WithError(err).Error("Failed to get current slot")
 		return
@@ -348,7 +348,7 @@ func (b *BeaconSlots) processHead(networkName string) {
 	}
 
 	// Process the slot
-	processed, err := b.processSlot(networkName, currentSlot)
+	processed, err := b.processSlot(ctx, networkName, currentSlot)
 	if err != nil {
 		b.log.WithField("network", networkName).
 			WithField("slot", currentSlot).
@@ -370,7 +370,7 @@ func (b *BeaconSlots) processHead(networkName string) {
 }
 
 // processBacklog processes historical slots
-func (b *BeaconSlots) processBacklog(networkName string) {
+func (b *BeaconSlots) processBacklog(ctx context.Context, networkName string) {
 	b.log.WithField("network", networkName).Debug("Processing backlog slots")
 
 	// Get state
@@ -392,7 +392,7 @@ func (b *BeaconSlots) processBacklog(networkName string) {
 	// If we don't have a target or current slot, calculate the target backlog slot
 	if processorState.TargetSlot == nil || processorState.CurrentSlot == nil {
 		// Get the current slot first
-		currentSlot, err := b.getCurrentSlot(networkName)
+		currentSlot, err := b.getCurrentSlot(ctx, networkName)
 		if err != nil {
 			b.log.WithField("network", networkName).WithError(err).Error("Failed to get current slot")
 			return
@@ -433,7 +433,7 @@ func (b *BeaconSlots) processBacklog(networkName string) {
 
 	// Process the next slot (moving backward)
 	slotToProcess := *processorState.LastProcessedSlot - 1
-	processed, err := b.processSlot(networkName, slotToProcess)
+	processed, err := b.processSlot(ctx, networkName, slotToProcess)
 	if err != nil {
 		b.log.WithField("network", networkName).
 			WithField("slot", slotToProcess).
@@ -455,7 +455,7 @@ func (b *BeaconSlots) processBacklog(networkName string) {
 }
 
 // processMissing checks for and processes any slots that might have been missed
-func (b *BeaconSlots) processMissing(networkName string) {
+func (b *BeaconSlots) processMissing(ctx context.Context, networkName string) {
 	b.log.WithField("network", networkName).Debug("Processing missing slots")
 
 	// Get state
@@ -479,7 +479,7 @@ func (b *BeaconSlots) processMissing(networkName string) {
 	backwardState := state.GetProcessorState(BackwardProcessorName)
 
 	// Get the current slot
-	currentSlot, err := b.getCurrentSlot(networkName)
+	currentSlot, err := b.getCurrentSlot(ctx, networkName)
 	if err != nil {
 		b.log.WithField("network", networkName).WithError(err).Error("Failed to get current slot")
 		return
@@ -519,7 +519,7 @@ func (b *BeaconSlots) processMissing(networkName string) {
 		WHERE blocks.slot IS NULL
 	`
 
-	rows, err := ch.Query(query, startSlot, endSlot+1, networkName)
+	rows, err := ch.Query(ctx, query, startSlot, endSlot+1, networkName)
 	if err != nil {
 		b.log.WithField("network", networkName).WithError(err).Error("Failed to query missing slots from ClickHouse")
 		return
@@ -553,7 +553,7 @@ func (b *BeaconSlots) processMissing(networkName string) {
 }
 
 // getCurrentSlot returns the current slot for a network
-func (b *BeaconSlots) getCurrentSlot(networkName string) (int64, error) {
+func (b *BeaconSlots) getCurrentSlot(ctx context.Context, networkName string) (int64, error) {
 	b.log.WithField("network", networkName).Debug("Getting current slot")
 
 	// Query ClickHouse for the current slot
@@ -570,7 +570,7 @@ func (b *BeaconSlots) getCurrentSlot(networkName string) (int64, error) {
 	}
 
 	// Execute the query
-	result, err := ch.QueryRow(query, networkName)
+	result, err := ch.QueryRow(ctx, query, networkName)
 	if err != nil {
 		return 0, fmt.Errorf("failed to get current slot: %w", err)
 	}
@@ -589,7 +589,7 @@ func (b *BeaconSlots) getCurrentSlot(networkName string) (int64, error) {
 }
 
 // processSlot processes a single slot
-func (b *BeaconSlots) processSlot(networkName string, slot int64) (bool, error) {
+func (b *BeaconSlots) processSlot(ctx context.Context, networkName string, slot int64) (bool, error) {
 	startTime := time.Now()
 
 	b.log.WithField("network", networkName).
@@ -597,7 +597,7 @@ func (b *BeaconSlots) processSlot(networkName string, slot int64) (bool, error) 
 		Debug("Processing slot")
 
 	// 1. Get block data
-	blockData, err := b.getBlockData(networkName, slot)
+	blockData, err := b.getBlockData(ctx, networkName, slot)
 	if err != nil {
 		return false, fmt.Errorf("failed to get block data: %w", err)
 	}
@@ -609,51 +609,51 @@ func (b *BeaconSlots) processSlot(networkName string, slot int64) (bool, error) 
 	}
 
 	// 2. Get proposer data
-	proposerData, err := b.getProposerData(networkName, slot)
+	proposerData, err := b.getProposerData(ctx, networkName, slot)
 	if err != nil {
 		return false, fmt.Errorf("failed to get proposer data: %w", err)
 	}
 
 	// Get the entity for the proposer
-	entity, err := b.getProposerEntity(networkName, blockData.ProposerIndex)
+	entity, err := b.getProposerEntity(ctx, networkName, blockData.ProposerIndex)
 	if err != nil {
 		b.log.WithField("slot", slot).WithError(err).Warning("Failed to get proposer entity, continuing without it")
 	}
 
 	// 3. Get various timing data
 	b.log.WithField("slot", slot).Debug("Fetching timing data...")
-	blockSeenAtSlotTime, err := b.getBlockSeenAtSlotTime(networkName, slot)
+	blockSeenAtSlotTime, err := b.getBlockSeenAtSlotTime(ctx, networkName, slot)
 	if err != nil {
 		b.log.WithField("slot", slot).WithError(err).Warning("Failed to get block seen times, continuing with empty data")
 		blockSeenAtSlotTime = []SeenAtSlotTimeData{}
 	}
 
-	blobSeenAtSlotTime, err := b.getBlobSeenAtSlotTime(networkName, slot)
+	blobSeenAtSlotTime, err := b.getBlobSeenAtSlotTime(ctx, networkName, slot)
 	if err != nil {
 		b.log.WithField("slot", slot).WithError(err).Warning("Failed to get blob seen times, continuing with empty data")
 		blobSeenAtSlotTime = []BlobSeenAtSlotTimeData{}
 	}
 
-	blockFirstSeenInP2PSlotTime, err := b.getBlockFirstSeenInP2PSlotTime(networkName, slot)
+	blockFirstSeenInP2PSlotTime, err := b.getBlockFirstSeenInP2PSlotTime(ctx, networkName, slot)
 	if err != nil {
 		b.log.WithField("slot", slot).WithError(err).Warning("Failed to get block first seen in P2P times, continuing with empty data")
 		blockFirstSeenInP2PSlotTime = []SeenAtSlotTimeData{}
 	}
 
-	blobFirstSeenInP2PSlotTime, err := b.getBlobFirstSeenInP2PSlotTime(networkName, slot)
+	blobFirstSeenInP2PSlotTime, err := b.getBlobFirstSeenInP2PSlotTime(ctx, networkName, slot)
 	if err != nil {
 		b.log.WithField("slot", slot).WithError(err).Warning("Failed to get blob first seen in P2P times, continuing with empty data")
 		blobFirstSeenInP2PSlotTime = []BlobSeenAtSlotTimeData{}
 	}
 
 	// 4. Get attestation data
-	maxAttestationVotes, err := b.getMaximumAttestationVotes(networkName, slot)
+	maxAttestationVotes, err := b.getMaximumAttestationVotes(ctx, networkName, slot)
 	if err != nil {
 		b.log.WithField("slot", slot).WithError(err).Warning("Failed to get maximum attestation votes, continuing with default")
 		maxAttestationVotes = 0
 	}
 
-	attestationVotes, err := b.getAttestationVotes(networkName, slot, blockData.BlockRoot)
+	attestationVotes, err := b.getAttestationVotes(ctx, networkName, slot, blockData.BlockRoot)
 	if err != nil {
 		b.log.WithField("slot", slot).WithError(err).Warning("Failed to get attestation votes, continuing with empty data")
 		attestationVotes = make(map[int64]int64)
@@ -719,7 +719,7 @@ func (b *BeaconSlots) calculateTargetBacklogSlot(networkName string, currentSlot
 }
 
 // getBlockData gets block data from ClickHouse
-func (b *BeaconSlots) getBlockData(networkName string, slot int64) (*BlockData, error) {
+func (b *BeaconSlots) getBlockData(ctx context.Context, networkName string, slot int64) (*BlockData, error) {
 	// This is a simplified implementation
 	// The actual implementation would need to query ClickHouse for detailed block data
 
@@ -743,7 +743,7 @@ func (b *BeaconSlots) getBlockData(networkName string, slot int64) (*BlockData, 
 		return nil, fmt.Errorf("failed to get ClickHouse client for network %s: %w", networkName, err)
 	}
 
-	result, err := ch.QueryRow(query, networkName, slot)
+	result, err := ch.QueryRow(ctx, query, networkName, slot)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get block data: %w", err)
 	}
@@ -776,7 +776,7 @@ func (b *BeaconSlots) getBlockData(networkName string, slot int64) (*BlockData, 
 }
 
 // getProposerData gets proposer data from ClickHouse
-func (b *BeaconSlots) getProposerData(networkName string, slot int64) (*ProposerData, error) {
+func (b *BeaconSlots) getProposerData(ctx context.Context, networkName string, slot int64) (*ProposerData, error) {
 	// This is a simplified implementation
 	// The actual implementation would need to query ClickHouse for proposer data
 
@@ -795,7 +795,7 @@ func (b *BeaconSlots) getProposerData(networkName string, slot int64) (*Proposer
 		return nil, fmt.Errorf("failed to get ClickHouse client for network %s: %w", networkName, err)
 	}
 
-	result, err := ch.QueryRow(query, networkName, slot)
+	result, err := ch.QueryRow(ctx, query, networkName, slot)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get proposer data: %w", err)
 	}
@@ -817,7 +817,7 @@ func (b *BeaconSlots) getProposerData(networkName string, slot int64) (*Proposer
 }
 
 // getSlotWindow returns the start and end times for a slot with a 15 minute grace period
-func (b *BeaconSlots) getSlotWindow(networkName string, slot int64) (time.Time, time.Time) {
+func (b *BeaconSlots) getSlotWindow(ctx context.Context, networkName string, slot int64) (time.Time, time.Time) {
 	// This is a simplified implementation - in practice would calculate from genesis
 	// Following the Python implementation with 15 minutes added on either side
 
@@ -831,9 +831,9 @@ func (b *BeaconSlots) getSlotWindow(networkName string, slot int64) (time.Time, 
 }
 
 // getMaximumAttestationVotes gets the maximum attestation votes for a slot
-func (b *BeaconSlots) getMaximumAttestationVotes(networkName string, slot int64) (int64, error) {
+func (b *BeaconSlots) getMaximumAttestationVotes(ctx context.Context, networkName string, slot int64) (int64, error) {
 	// Get start and end dates for the slot with grace period
-	startTime, endTime := b.getSlotWindow(networkName, slot)
+	startTime, endTime := b.getSlotWindow(ctx, networkName, slot)
 
 	// Convert to ClickHouse format
 	startStr := startTime.Format("2006-01-02 15:04:05")
@@ -861,7 +861,7 @@ func (b *BeaconSlots) getMaximumAttestationVotes(networkName string, slot int64)
 	}
 
 	// Execute the query
-	result, err := ch.QueryRow(query, slot, networkName, startStr, endStr)
+	result, err := ch.QueryRow(ctx, query, slot, networkName, startStr, endStr)
 	if err != nil {
 		return 0, fmt.Errorf("failed to get maximum attestation votes: %w", err)
 	}
@@ -880,9 +880,9 @@ func (b *BeaconSlots) getMaximumAttestationVotes(networkName string, slot int64)
 }
 
 // getAttestationVotes gets attestation votes for a slot and block root
-func (b *BeaconSlots) getAttestationVotes(networkName string, slot int64, blockRoot string) (map[int64]int64, error) {
+func (b *BeaconSlots) getAttestationVotes(ctx context.Context, networkName string, slot int64, blockRoot string) (map[int64]int64, error) {
 	// Get start and end dates for the slot without any grace period
-	startTime, endTime := b.getSlotWindow(networkName, slot)
+	startTime, endTime := b.getSlotWindow(ctx, networkName, slot)
 
 	// Convert to ClickHouse format
 	startStr := startTime.Format("2006-01-02 15:04:05")
@@ -921,7 +921,7 @@ func (b *BeaconSlots) getAttestationVotes(networkName string, slot int64, blockR
 	}
 
 	// Execute the query
-	result, err := ch.Query(query, slot, networkName, startStr, endStr, blockRoot)
+	result, err := ch.Query(ctx, query, slot, networkName, startStr, endStr, blockRoot)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get attestation votes: %w", err)
 	}
@@ -1099,7 +1099,7 @@ func extractUsername(name string) string {
 }
 
 // getProposerEntity gets entity for a given validator index
-func (b *BeaconSlots) getProposerEntity(networkName string, index int64) (*string, error) {
+func (b *BeaconSlots) getProposerEntity(ctx context.Context, networkName string, index int64) (*string, error) {
 	// This implementation is simplified - in the actual application,
 	// we would need to check validator_entity lookup first
 
@@ -1122,7 +1122,7 @@ func (b *BeaconSlots) getProposerEntity(networkName string, index int64) (*strin
 	}
 
 	// Execute the query
-	result, err := ch.QueryRow(query, index, networkName)
+	result, err := ch.QueryRow(ctx, query, index, networkName)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get entity: %w", err)
 	}
@@ -1136,9 +1136,9 @@ func (b *BeaconSlots) getProposerEntity(networkName string, index int64) (*strin
 }
 
 // getBlockSeenAtSlotTime gets seen at slot time data for a given slot
-func (b *BeaconSlots) getBlockSeenAtSlotTime(networkName string, slot int64) ([]SeenAtSlotTimeData, error) {
+func (b *BeaconSlots) getBlockSeenAtSlotTime(ctx context.Context, networkName string, slot int64) ([]SeenAtSlotTimeData, error) {
 	// Get start and end dates for the slot +- 15 minutes
-	startTime, endTime := b.getSlotWindow(networkName, slot)
+	startTime, endTime := b.getSlotWindow(ctx, networkName, slot)
 
 	// Convert to ClickHouse format
 	startStr := startTime.Format("2006-01-02 15:04:05")
@@ -1200,7 +1200,7 @@ func (b *BeaconSlots) getBlockSeenAtSlotTime(networkName string, slot int64) ([]
 	}
 
 	// Execute the query
-	result, err := ch.Query(query, slot, networkName, startStr, endStr)
+	result, err := ch.Query(ctx, query, slot, networkName, startStr, endStr)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get block seen at slot time: %w", err)
 	}
@@ -1226,9 +1226,9 @@ func (b *BeaconSlots) getBlockSeenAtSlotTime(networkName string, slot int64) ([]
 }
 
 // getBlobSeenAtSlotTime gets seen at slot time data for blobs in a given slot
-func (b *BeaconSlots) getBlobSeenAtSlotTime(networkName string, slot int64) ([]BlobSeenAtSlotTimeData, error) {
+func (b *BeaconSlots) getBlobSeenAtSlotTime(ctx context.Context, networkName string, slot int64) ([]BlobSeenAtSlotTimeData, error) {
 	// Get start and end dates for the slot +- 15 minutes
-	startTime, endTime := b.getSlotWindow(networkName, slot)
+	startTime, endTime := b.getSlotWindow(ctx, networkName, slot)
 
 	// Convert to ClickHouse format
 	startStr := startTime.Format("2006-01-02 15:04:05")
@@ -1262,7 +1262,7 @@ func (b *BeaconSlots) getBlobSeenAtSlotTime(networkName string, slot int64) ([]B
 	}
 
 	// Execute the query
-	result, err := ch.Query(query, slot, networkName, startStr, endStr)
+	result, err := ch.Query(ctx, query, slot, networkName, startStr, endStr)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get blob seen at slot time: %w", err)
 	}
@@ -1294,9 +1294,9 @@ func (b *BeaconSlots) getBlobSeenAtSlotTime(networkName string, slot int64) ([]B
 }
 
 // getBlockFirstSeenInP2PSlotTime gets first seen in P2P slot time data for a given slot
-func (b *BeaconSlots) getBlockFirstSeenInP2PSlotTime(networkName string, slot int64) ([]SeenAtSlotTimeData, error) {
+func (b *BeaconSlots) getBlockFirstSeenInP2PSlotTime(ctx context.Context, networkName string, slot int64) ([]SeenAtSlotTimeData, error) {
 	// Get start and end dates for the slot +- 15 minutes
-	startTime, endTime := b.getSlotWindow(networkName, slot)
+	startTime, endTime := b.getSlotWindow(ctx, networkName, slot)
 
 	// Convert to ClickHouse format
 	startStr := startTime.Format("2006-01-02 15:04:05")
@@ -1329,7 +1329,7 @@ func (b *BeaconSlots) getBlockFirstSeenInP2PSlotTime(networkName string, slot in
 	}
 
 	// Execute the query
-	result, err := ch.Query(query, slot, networkName, startStr, endStr)
+	result, err := ch.Query(ctx, query, slot, networkName, startStr, endStr)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get block first seen in P2P data: %w", err)
 	}
@@ -1355,9 +1355,9 @@ func (b *BeaconSlots) getBlockFirstSeenInP2PSlotTime(networkName string, slot in
 }
 
 // getBlobFirstSeenInP2PSlotTime gets first seen in P2P slot time data for blobs in a given slot
-func (b *BeaconSlots) getBlobFirstSeenInP2PSlotTime(networkName string, slot int64) ([]BlobSeenAtSlotTimeData, error) {
+func (b *BeaconSlots) getBlobFirstSeenInP2PSlotTime(ctx context.Context, networkName string, slot int64) ([]BlobSeenAtSlotTimeData, error) {
 	// Get start and end dates for the slot +- 15 minutes
-	startTime, endTime := b.getSlotWindow(networkName, slot)
+	startTime, endTime := b.getSlotWindow(ctx, networkName, slot)
 
 	// Convert to ClickHouse format
 	startStr := startTime.Format("2006-01-02 15:04:05")
@@ -1391,7 +1391,7 @@ func (b *BeaconSlots) getBlobFirstSeenInP2PSlotTime(networkName string, slot int
 	}
 
 	// Execute the query
-	result, err := ch.Query(query, slot, networkName, startStr, endStr)
+	result, err := ch.Query(ctx, query, slot, networkName, startStr, endStr)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get blob first seen in P2P data: %w", err)
 	}
@@ -1437,16 +1437,16 @@ func (b *BeaconSlots) runInitialProcessing() {
 	}
 	b.log.Info("Running initial processing...")
 	for _, network := range b.config.Networks {
-		b.processHead(network) // Process the absolute latest slot first
+		b.processHead(b.processCtx, network) // Process the absolute latest slot first
 		if b.config.Backfill.MiddleProcessorEnable {
-			b.processMiddleWindow(network) // Then process the recent window if enabled
+			b.processMiddleWindow(b.processCtx, network) // Then process the recent window if enabled
 		}
 	}
 	b.log.Info("Initial processing finished.")
 }
 
 // processMiddleWindow processes a recent window of slots on startup.
-func (b *BeaconSlots) processMiddleWindow(networkName string) {
+func (b *BeaconSlots) processMiddleWindow(ctx context.Context, networkName string) {
 	b.log.WithField("network", networkName).Info("Processing middle window")
 
 	// Get state
@@ -1472,7 +1472,7 @@ func (b *BeaconSlots) processMiddleWindow(networkName string) {
 	}
 
 	// Get the current slot
-	currentSlot, err := b.getCurrentSlot(networkName)
+	currentSlot, err := b.getCurrentSlot(ctx, networkName)
 	if err != nil {
 		b.log.WithField("network", networkName).WithError(err).Error("Failed to get current slot for middle window")
 		return
@@ -1497,7 +1497,7 @@ func (b *BeaconSlots) processMiddleWindow(networkName string) {
 	processedCount := 0
 	failedCount := 0
 	for slot := startSlot; slot <= endSlot; slot++ {
-		processed, err := b.processSlot(networkName, slot)
+		processed, err := b.processSlot(b.processCtx, networkName, slot)
 		if err != nil {
 			b.log.WithField("network", networkName).
 				WithField("slot", slot).

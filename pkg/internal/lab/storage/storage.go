@@ -2,10 +2,13 @@ package storage
 
 import (
 	"bytes"
+	"compress/gzip"
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
+	"strings"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
@@ -57,10 +60,25 @@ func New(
 func (c *client) Start(ctx context.Context) error {
 	c.log.Info("Starting S3 storage client")
 
+	// Ensure endpoint has a protocol
+	endpoint := c.config.Endpoint
+	if !strings.HasPrefix(endpoint, "http://") && !strings.HasPrefix(endpoint, "https://") {
+		// Add http:// by default, or https:// if Secure is true
+		if c.config.Secure {
+			endpoint = "https://" + endpoint
+		} else {
+			endpoint = "http://" + endpoint
+		}
+		c.log.WithFields(logrus.Fields{
+			"original": c.config.Endpoint,
+			"modified": endpoint,
+		}).Debug("Added protocol scheme to endpoint URL")
+	}
+
 	// Create custom resolver for S3 compatible storage
 	customResolver := aws.EndpointResolverWithOptionsFunc(func(service, region string, options ...interface{}) (aws.Endpoint, error) {
 		return aws.Endpoint{
-			URL: c.config.Endpoint,
+			URL: endpoint,
 			// UsePathStyle converts URLs from virtual-host style to path style,
 			// e.g. https://bucket.minio.localhost/ to https://minio.localhost/bucket
 			SigningRegion:     c.config.Region,
@@ -84,6 +102,19 @@ func (c *client) Start(ctx context.Context) error {
 
 	// Create S3 client
 	c.client = s3.NewFromConfig(cfg)
+	c.ctx = ctx // Save the context for later use in S3 operations
+
+	// Check if the bucket exists, create it if it doesn't
+	exists, err := c.bucketExists(c.config.Bucket)
+	if err != nil {
+		c.log.WithError(err).Warnf("Failed to check if bucket %s exists", c.config.Bucket)
+	} else if !exists {
+		c.log.Infof("Bucket %s does not exist, creating it", c.config.Bucket)
+		if err := c.createBucket(c.config.Bucket); err != nil {
+			return fmt.Errorf("failed to create bucket %s: %w", c.config.Bucket, err)
+		}
+		c.log.Infof("Successfully created bucket %s", c.config.Bucket)
+	}
 
 	c.log.Info("S3 storage client started")
 
@@ -252,6 +283,30 @@ func (c *client) copy(sourceKey, destinationKey string) error {
 	return nil
 }
 
+func (c *client) GetGzippedJSON(key string, v any) error {
+	data, err := c.Get(key)
+	if err != nil {
+		return fmt.Errorf("failed to get gzipped object: %w", err)
+	}
+
+	reader, err := gzip.NewReader(bytes.NewReader(data))
+	if err != nil {
+		return fmt.Errorf("failed to create gzip reader: %w", err)
+	}
+	defer reader.Close()
+
+	decompressed, err := io.ReadAll(reader)
+	if err != nil {
+		return fmt.Errorf("failed to decompress gzip data: %w", err)
+	}
+
+	if err := json.Unmarshal(decompressed, v); err != nil {
+		return fmt.Errorf("failed to unmarshal json: %w", err)
+	}
+
+	return nil
+}
+
 // delete is a helper function for deleting data
 func (c *client) delete(key string) error {
 	deleteObjectInput := &s3.DeleteObjectInput{
@@ -270,5 +325,33 @@ func (c *client) delete(key string) error {
 // Stop gracefully stops the S3 storage client
 func (c *client) Stop() error {
 	// No graceful shutdown required: all uploads are synchronous and complete before return
+	return nil
+}
+
+// bucketExists checks if a bucket exists
+func (c *client) bucketExists(bucketName string) (bool, error) {
+	_, err := c.client.HeadBucket(c.ctx, &s3.HeadBucketInput{
+		Bucket: aws.String(bucketName),
+	})
+	if err != nil {
+		var apiErr smithy.APIError
+		if errors.As(err, &apiErr) {
+			if apiErr.ErrorCode() == "NotFound" {
+				return false, nil
+			}
+		}
+		return false, fmt.Errorf("failed to check if bucket exists: %w", err)
+	}
+	return true, nil
+}
+
+// createBucket creates a new bucket
+func (c *client) createBucket(bucketName string) error {
+	_, err := c.client.CreateBucket(c.ctx, &s3.CreateBucketInput{
+		Bucket: aws.String(bucketName),
+	})
+	if err != nil {
+		return fmt.Errorf("failed to create bucket: %w", err)
+	}
 	return nil
 }

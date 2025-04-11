@@ -1,0 +1,75 @@
+# Server (SRV) service configuration
+
+# GRPC server configuration
+grpc:
+  host: "0.0.0.0"
+  port: 6666
+
+# S3 storage configuration
+storage:
+  endpoint: "minio:9000"
+  region: "us-east-1"
+  bucket: "lab"
+  accessKey: "minioadmin"
+  secretKey: "minioadmin"
+  secure: false
+  usePathStyle: true
+
+
+# Networks configuration
+networks:
+  mainnet:
+    configURL: ""
+    genesis: "2020-12-01T12:00:23Z"
+    xatu:
+      dsn: "clickhouse+http://${XATU_CLICKHOUSE_USERNAME}:${XATU_CLICKHOUSE_PASSWORD}@clickhouse.xatu.ethpandaops.io:443/default?protocol=https"
+      protocol: "native"
+
+# Cache configuration
+cache:
+  type: "redis"
+  config:
+    url: "redis://redis:6379"
+    defaultTTL: 60
+
+# Modules configuration
+modules:
+  beacon_chain_timings:
+    beacon_chain_timings:
+      enabled: true
+      interval: "1h"
+      time_windows:
+        - file: "1h.json"
+          step: "5m"
+          label: "Last hour"
+          range: "-1h"
+        - file: "24h.json"
+          step: "30m"
+          label: "Last 24 hours"
+          range: "-24h"
+        - file: "7d.json"
+          step: "6h"
+          label: "Last 7 days"
+          range: "-168h"
+  xatu_public_contributors:
+    xatu_public_contributors:
+      enabled: true
+      networks: ["mainnet"]
+      redis_key_prefix: "lab_xatu_public_contributors"
+      interval: "1h"
+      time_windows:
+        - name: "1d"
+          duration: "24h"
+          file: "1d.json"
+          step: "1h"
+          range: "-24h"
+        - name: "7d"
+          duration: "168h"
+          file: "7d.json"
+          step: "1h"
+          range: "-168h"
+        - name: "30d"
+          duration: "720h"
+          file: "30d.json"
+          step: "1h"
+          range: "-720h" 

@@ -10,7 +10,7 @@ import (
 
 func TestMemoryLocker(t *testing.T) {
 	memCache := cache.NewMemory(cache.MemoryConfig{DefaultTTL: time.Minute})
-	locker := NewLocker(logrus.New(), memCache)
+	locker := New(logrus.New(), memCache)
 
 	// Test acquiring a lock
 	lockName := "test-lock"
@@ -55,7 +55,7 @@ func TestMemoryLocker(t *testing.T) {
 
 func TestLockerWithInvalidToken(t *testing.T) {
 	memCache := cache.NewMemory(cache.MemoryConfig{DefaultTTL: time.Minute})
-	locker := NewLocker(logrus.New(), memCache)
+	locker := New(logrus.New(), memCache)
 
 	// Acquire a lock
 	lockName := "test-lock"
@@ -88,7 +88,7 @@ func TestLockerWithInvalidToken(t *testing.T) {
 
 func TestLockerExpiration(t *testing.T) {
 	memCache := cache.NewMemory(cache.MemoryConfig{DefaultTTL: time.Minute})
-	locker := NewLocker(logrus.New(), memCache)
+	locker := New(logrus.New(), memCache)
 
 	// Acquire a lock with very short TTL
 	lockName := "expiring-lock"

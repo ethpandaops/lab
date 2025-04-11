@@ -1,6 +1,7 @@
 package beacon_chain_timings
 
 import (
+	"context"
 	"fmt"
 	"math"
 	"path/filepath"
@@ -15,7 +16,7 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
-func (b *BeaconChainTimings) processSizeCDF(network *ethereum.Network, window *pb.TimeWindowConfig) error {
+func (b *BeaconChainTimings) processSizeCDF(ctx context.Context, network *ethereum.Network, window *pb.TimeWindowConfig) error {
 	b.log.WithFields(logrus.Fields{
 		"network": network.Name,
 		"window":  window.Name,
@@ -28,7 +29,7 @@ func (b *BeaconChainTimings) processSizeCDF(network *ethereum.Network, window *p
 	}
 
 	// Process size CDF data
-	sizeCDFData, err := b.GetSizeCDFData(network.Name, timeRange)
+	sizeCDFData, err := b.GetSizeCDFData(ctx, network.Name, timeRange)
 	if err != nil {
 		return fmt.Errorf("failed to process size CDF data: %w", err)
 	}
@@ -42,7 +43,7 @@ func (b *BeaconChainTimings) processSizeCDF(network *ethereum.Network, window *p
 }
 
 // processSizeCDFData processes size CDF data for a network and time range
-func (b *BeaconChainTimings) GetSizeCDFData(network string, timeRange struct{ Start, End time.Time }) (*SizeCDFData, error) {
+func (b *BeaconChainTimings) GetSizeCDFData(ctx context.Context, network string, timeRange struct{ Start, End time.Time }) (*SizeCDFData, error) {
 	b.log.WithFields(logrus.Fields{
 		"network":    network,
 		"time_range": fmt.Sprintf("%s - %s", timeRange.Start.Format(time.RFC3339), timeRange.End.Format(time.RFC3339)),
@@ -70,7 +71,7 @@ func (b *BeaconChainTimings) GetSizeCDFData(network string, timeRange struct{ St
 		return nil, fmt.Errorf("failed to get ClickHouse client for network: %w", err)
 	}
 
-	blobRows, err := ch.Query(blobQuery, startStr, endStr, network)
+	blobRows, err := ch.Query(ctx, blobQuery, startStr, endStr, network)
 	if err != nil {
 		return nil, fmt.Errorf("failed to query blob data: %w", err)
 	}
@@ -132,7 +133,7 @@ func (b *BeaconChainTimings) GetSizeCDFData(network string, timeRange struct{ St
 			AND meta_network_name = $3
 	`
 
-	mevRows, err := ch.Query(mevQuery, startStr, endStr, network)
+	mevRows, err := ch.Query(ctx, mevQuery, startStr, endStr, network)
 	if err != nil {
 		return nil, fmt.Errorf("failed to query MEV relay data: %w", err)
 	}
@@ -179,7 +180,7 @@ func (b *BeaconChainTimings) GetSizeCDFData(network string, timeRange struct{ St
 		GROUP BY slot, meta_network_name
 	`
 
-	arrivalRows, err := ch.Query(arrivalQuery, startStr, endStr, network)
+	arrivalRows, err := ch.Query(ctx, arrivalQuery, startStr, endStr, network)
 	if err != nil {
 		return nil, fmt.Errorf("failed to query block arrival data: %w", err)
 	}
@@ -246,7 +247,7 @@ func (b *BeaconChainTimings) GetSizeCDFData(network string, timeRange struct{ St
 			AND meta_network_name = $3
 	`
 
-	sizeRows, err := ch.Query(sizeQuery, startStr, endStr, network)
+	sizeRows, err := ch.Query(ctx, sizeQuery, startStr, endStr, network)
 	if err != nil {
 		return nil, fmt.Errorf("failed to query block size data: %w", err)
 	}
@@ -261,7 +262,7 @@ func (b *BeaconChainTimings) GetSizeCDFData(network string, timeRange struct{ St
 		WHERE meta_network_name = $1
 	`
 
-	proposerRows, err := ch.Query(proposerQuery, network)
+	proposerRows, err := ch.Query(ctx, proposerQuery, network)
 	if err != nil {
 		return nil, fmt.Errorf("failed to query proposer entities: %w", err)
 	}

@@ -18,7 +18,7 @@ The locker package provides distributed locking functionality. It uses a cache i
 cacheClient := cache.NewMemory(cache.MemoryConfig{DefaultTTL: time.Minute})
 
 // Create a locker
-lock := locker.NewLocker(cacheClient)
+lock := locker.New(cacheClient)
 
 // Try to acquire a lock
 lockName := "my-critical-resource"
@@ -63,7 +63,7 @@ if err != nil {
 }
 
 // Create a locker with Redis backend
-lock := locker.NewLocker(cacheClient)
+lock := locker.New(cacheClient)
 
 // Use the lock as in the previous example
 // This will now work across multiple processes

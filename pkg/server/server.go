@@ -7,6 +7,7 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/ethpandaops/lab/pkg/internal/lab/cache"
 	"github.com/ethpandaops/lab/pkg/internal/lab/ethereum"
 	"github.com/ethpandaops/lab/pkg/internal/lab/locker"
 	"github.com/ethpandaops/lab/pkg/internal/lab/logger"
@@ -35,13 +36,14 @@ type Service struct {
 	// Clients
 	xatuClient    *xatu.Client
 	storageClient storage.Client
+	cacheClient   cache.Client
 	lockerClient  locker.Locker
 }
 
 // New creates a new srv service
 func New(config *Config, logLevel string) (*Service, error) {
 	// Create lab instance
-	log, err := logger.New(logLevel, QualifiedName)
+	log, err := logger.New(logLevel, ServiceName)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create logger: %w", err)
 	}
@@ -146,7 +148,7 @@ func (s *Service) initializeServices(ctx context.Context) error {
 		s.xatuClient,
 		ethConfig,
 		s.storageClient,
-		nil, // cache client placeholder
+		s.cacheClient,
 		s.lockerClient,
 	)
 	if err != nil {
@@ -159,7 +161,7 @@ func (s *Service) initializeServices(ctx context.Context) error {
 		ethConfig,
 		s.xatuClient,
 		s.storageClient,
-		nil, // cache client placeholder
+		s.cacheClient,
 		s.lockerClient,
 	)
 	if err != nil {
@@ -182,7 +184,7 @@ func (s *Service) initializeDependencies() error {
 	// Initialize global XatuClickhouse
 	s.log.Info("Initializing per-network Xatu ClickHouse clients")
 
-	xatuClient, err := xatu.NewClient(s.config.GetXatuConfig())
+	xatuClient, err := xatu.NewClient(s.log, s.config.GetXatuConfig())
 	if err != nil {
 		return fmt.Errorf("failed to initialize global Xatu ClickHouse client: %w", err)
 	}
@@ -204,8 +206,24 @@ func (s *Service) initializeDependencies() error {
 		return fmt.Errorf("failed to start S3 storage client: %w", err)
 	}
 
+	// Initialize cache client
+	s.log.Info("Initializing cache client")
+	cacheClient, err := cache.New(s.config.Cache)
+	if err != nil {
+		return fmt.Errorf("failed to initialize cache client: %w", err)
+	}
+
+	// Initialize locker client
+	s.log.Info("Initializing locker client")
+	lockerClient := locker.New(s.log, cacheClient)
+	if err != nil {
+		return fmt.Errorf("failed to initialize locker client: %w", err)
+	}
+
 	s.xatuClient = xatuClient
 	s.storageClient = storageClient
+	s.cacheClient = cacheClient
+	s.lockerClient = lockerClient
 
 	return nil
 }

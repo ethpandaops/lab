@@ -3,6 +3,7 @@ package srv
 import (
 	"time"
 
+	"github.com/ethpandaops/lab/pkg/internal/lab/cache"
 	"github.com/ethpandaops/lab/pkg/internal/lab/clickhouse"
 	"github.com/ethpandaops/lab/pkg/internal/lab/ethereum"
 	"github.com/ethpandaops/lab/pkg/internal/lab/storage"
@@ -17,7 +18,7 @@ type Config struct {
 	Networks map[string]*NetworkConfig `yaml:"networks"` // Per-network configurations
 	Storage  *storage.Config           `yaml:"storage"`
 	Modules  map[string]*ModuleConfig  `yaml:"modules"` // Per-module configurations
-	// Broker   *broker.Config            `yaml:"broker"` // Broker is not used yet
+	Cache    *cache.Config             `yaml:"cache"`
 }
 
 // ModuleConfig contains the configuration for a specific module

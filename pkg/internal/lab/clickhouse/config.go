@@ -3,17 +3,18 @@ package clickhouse
 import "fmt"
 
 type Config struct {
-	Host     string `yaml:"host"`
-	Port     int    `yaml:"port"`
-	Database string `yaml:"database"`
-	Username string `yaml:"username"`
-	Password string `yaml:"password"`
-	Secure   bool   `yaml:"secure"`
+	// DSN is the data source name for ClickHouse in the format:
+	// clickhouse+http://username:password@host:port/database?protocol=https
+	DSN string `yaml:"dsn"`
+	// InsecureSkipVerify allows skipping TLS certificate verification. Use with caution.
+	InsecureSkipVerify bool `yaml:"insecure_skip_verify,omitempty"`
+	// Protocol specifies the connection protocol ("native" or "http"). Overrides DSN scheme if set.
+	Protocol string `yaml:"protocol,omitempty"`
 }
 
 func (c *Config) Validate() error {
-	if c.Host == "" {
-		return fmt.Errorf("host is required")
+	if c.DSN == "" {
+		return fmt.Errorf("dsn is required")
 	}
 
 	return nil

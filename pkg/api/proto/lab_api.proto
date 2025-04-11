@@ -8,32 +8,22 @@ import "google/protobuf/empty.proto";
 import "google/protobuf/timestamp.proto";
 
 service LabAPI {
-  rpc GetStatus(google.protobuf.Empty) returns (StatusResponse) {
-  }
 
-  rpc GetFrontendConfig(google.protobuf.Empty) returns (FrontendConfigResponse) {
-  }
+  rpc GetXatuSummary(google.protobuf.Empty) returns (DataFileChunk) {}
 
-  rpc GetBeaconSlotData(GetBeaconSlotDataRequest) returns (BeaconSlotDataResponse) {
-  }
+  rpc GetXatuUserSummary(google.protobuf.Empty) returns (DataFileChunk) {}
 
-  rpc GetBeaconSlotRange(GetBeaconSlotRangeRequest) returns (BeaconSlotRangeResponse) {
-  }
+  rpc GetXatuUser(google.protobuf.Empty) returns (DataFileChunk) {}
 
-  rpc GetBeaconNodes(GetBeaconNodesRequest) returns (BeaconNodesResponse) {
-  }
+  rpc GetXatuUsersWindow(google.protobuf.Empty) returns (DataFileChunk) {}
 
-  rpc GetTimingData(GetTimingDataRequest) returns (TimingDataResponse) {
-  }
+  rpc GetXatuCountriesWindow(google.protobuf.Empty) returns (DataFileChunk) {}
 
-  rpc GetSizeCDFData(GetSizeCDFDataRequest) returns (SizeCDFDataResponse) {
-  }
+  rpc GetBlockTimings(google.protobuf.Empty) returns (DataFileChunk) {}
 
-  rpc GetBeaconStateFile(GetBeaconStateFileRequest) returns (DataFileChunk) {
-  }
+  rpc GetSizeCDFWindow(google.protobuf.Empty) returns (DataFileChunk) {}
 
-  rpc GetBeaconSlotFile(GetBeaconSlotFileRequest) returns (DataFileChunk) {
-  }
+  rpc GetBeaconSlot(google.protobuf.Empty) returns (DataFileChunk) {}
 }
 
 message GetDataRequest {

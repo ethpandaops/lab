@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"context"
-	"strings"
 
 	"github.com/ethpandaops/lab/pkg/server/internal/service/beacon_chain_timings"
 	"google.golang.org/grpc/codes"
@@ -46,11 +45,6 @@ func (b *BeaconChainTimings) Start(ctx context.Context, grpcServer *grpc.Server)
 	return nil
 }
 
-// containsIgnoreCase returns true if substr is in s, case-insensitive
-func containsIgnoreCase(s, substr string) bool {
-	return strings.Contains(strings.ToLower(s), strings.ToLower(substr))
-}
-
 // GetTimingData gets timing data for a specific network and time window
 func (b *BeaconChainTimings) GetTimingData(ctx context.Context, req *pb.GetTimingDataRequest) (*pb.GetTimingDataResponse, error) {
 	b.log.WithFields(logrus.Fields{
@@ -68,7 +62,7 @@ func (b *BeaconChainTimings) GetTimingData(ctx context.Context, req *pb.GetTimin
 	startTime := req.StartTime.AsTime()
 	endTime := req.EndTime.AsTime()
 
-	data, err := b.service.GetTimingData(req.Network, struct{ Start, End time.Time }{Start: startTime, End: endTime}, timeWindow)
+	data, err := b.service.GetTimingData(ctx, req.Network, struct{ Start, End time.Time }{Start: startTime, End: endTime}, timeWindow)
 	if err != nil {
 		if err.Error() == "not found" {
 			return nil, status.Error(codes.NotFound, err.Error())
@@ -92,7 +86,7 @@ func (b *BeaconChainTimings) GetSizeCDFData(ctx context.Context, req *pb.GetSize
 	startTime := req.StartTime.AsTime()
 	endTime := req.EndTime.AsTime()
 
-	internalData, err := b.service.GetSizeCDFData(req.Network, struct{ Start, End time.Time }{Start: startTime, End: endTime})
+	internalData, err := b.service.GetSizeCDFData(ctx, req.Network, struct{ Start, End time.Time }{Start: startTime, End: endTime})
 	if err != nil {
 		if err.Error() == "not found" {
 			return nil, status.Error(codes.NotFound, err.Error())

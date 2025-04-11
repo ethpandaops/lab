@@ -2,27 +2,30 @@ package clickhouse
 
 import (
 	"context"
-	"crypto/tls"
+	"database/sql"
 	"fmt"
+	"net/url"
+	"strings"
 	"time"
 
-	"github.com/ClickHouse/clickhouse-go/v2"
-	"github.com/ClickHouse/clickhouse-go/v2/lib/driver"
+	// Import the v1 driver (_ "github.com/ClickHouse/clickhouse-go")
+	// The blank identifier is used because we only need its side effects (registering the driver).
+	_ "github.com/mailru/go-clickhouse/v2" // Import mailru driver for chhttp
 	"github.com/sirupsen/logrus"
 )
 
 // Client represents a ClickHouse client
 type Client interface {
 	Start(ctx context.Context) error
-	Query(query string, args ...interface{}) ([]map[string]interface{}, error)
-	QueryRow(query string, args ...interface{}) (map[string]interface{}, error)
-	Exec(query string, args ...interface{}) error
+	Query(ctx context.Context, query string, args ...interface{}) ([]map[string]interface{}, error)
+	QueryRow(ctx context.Context, query string, args ...interface{}) (map[string]interface{}, error)
+	Exec(ctx context.Context, query string, args ...interface{}) error
 	Stop() error
 }
 
 // client is an implementation of the Client interface
 type client struct {
-	conn   driver.Conn
+	conn   *sql.DB // Use standard database/sql connection pool
 	log    logrus.FieldLogger
 	ctx    context.Context
 	config *Config
@@ -37,8 +40,7 @@ func New(
 		return nil, fmt.Errorf("invalid config: %w", err)
 	}
 
-	log.WithField("host", config.Host).WithField("port", config.Port).
-		WithField("database", config.Database).Info("Initializing ClickHouse client")
+	log.WithField("dsn", config.DSN).Info("Initializing ClickHouse client")
 
 	return &client{
 		log:    log.WithField("module", "clickhouse"),
@@ -47,60 +49,109 @@ func New(
 }
 
 func (c *client) Start(ctx context.Context) error {
-	c.log.Info("Starting ClickHouse client")
+	c.log.Info("Starting ClickHouse client using database/sql driver (v1)")
 
-	options := &clickhouse.Options{
-		Addr: []string{fmt.Sprintf("%s:%d", c.config.Host, c.config.Port)},
-		Auth: clickhouse.Auth{
-			Database: c.config.Database,
-			Username: c.config.Username,
-			Password: c.config.Password,
-		},
-		Settings: clickhouse.Settings{
-			"max_execution_time": 60,
-		},
-		DialTimeout:     time.Second * 10,
-		MaxOpenConns:    10,
-		MaxIdleConns:    5,
-		ConnMaxLifetime: time.Hour,
-	}
+	// Store the context (can be used for PingContext, etc.)
+	c.ctx = ctx
 
-	if c.config.Secure {
-		options.TLS = &tls.Config{
-			InsecureSkipVerify: true,
+	// Prepare DSN: Convert custom "clickhouse+" prefix to standard http/https scheme.
+	dsn := c.config.DSN
+	originalDSN := dsn // Keep original for logging/reference
+	if strings.HasPrefix(dsn, "clickhouse+https://") {
+		dsn = strings.TrimPrefix(dsn, "clickhouse+") // Becomes https://...
+		c.log.Info("Converted 'clickhouse+https://' prefix to standard 'https://'.")
+	} else if strings.HasPrefix(dsn, "clickhouse+http://") {
+		// Check if port or params indicate HTTPS despite the http prefix
+		if strings.Contains(originalDSN, ":443") || strings.Contains(originalDSN, "protocol=https") {
+			dsn = "https" + strings.TrimPrefix(dsn, "clickhouse+http") // Becomes https://...
+			c.log.Info("Converted 'clickhouse+http://' prefix with port 443/protocol=https to standard 'https://'.")
+		} else {
+			dsn = strings.TrimPrefix(dsn, "clickhouse+") // Becomes http://...
+			c.log.Info("Converted 'clickhouse+http://' prefix to standard 'http://'.")
 		}
 	}
 
-	conn, err := clickhouse.Open(options)
+	// Append common parameters like timeouts.
+	// Note: tls_skip_verify might need to be handled differently with this driver if needed.
+	// Check mailru/go-clickhouse/v2 docs for DSN options.
+	dsnParams := url.Values{}
+	dsnParams.Add("read_timeout", "30s")  // Add 's' unit
+	dsnParams.Add("write_timeout", "30s") // Add 's' unit
+
+	if c.config.InsecureSkipVerify {
+		// Attempt to add standard param, but verify if driver supports it.
+		dsnParams.Add("tls_skip_verify", "true")
+		c.log.Warn("Attempting to configure InsecureSkipVerify via DSN parameter (tls_skip_verify=true)")
+	}
+
+	// Append parameters to DSN
+	paramStr := dsnParams.Encode()
+	if paramStr != "" {
+		if strings.Contains(dsn, "?") {
+			dsn += "&" + paramStr
+		} else {
+			dsn += "?" + paramStr
+		}
+	}
+
+	c.log.WithFields(logrus.Fields{
+		"original_dsn":  originalDSN,
+		"processed_dsn": dsn,
+	}).Info("Attempting to connect using mailru/chhttp driver")
+
+	// Open connection pool using database/sql
+	conn, err := sql.Open("chhttp", dsn) // Use "chhttp" driver name
 	if err != nil {
-		return fmt.Errorf("failed to create ClickHouse connection: %w", err)
+		// Mask password in error log if present
+		loggedDSN := dsn
+		if u, parseErr := url.Parse(dsn); parseErr == nil {
+			if _, pwdSet := u.User.Password(); pwdSet {
+				u.User = url.User(u.User.Username()) // Remove password
+				loggedDSN = u.String()
+			}
+		}
+		// Log the original DSN in case of error for easier debugging
+		return fmt.Errorf("failed to open mailru/chhttp connection pool for original DSN '%s' (processed as '%s'): %w", originalDSN, loggedDSN, err)
+	}
+
+	// Configure connection pool settings
+	conn.SetMaxOpenConns(10)
+	conn.SetMaxIdleConns(5)
+	conn.SetConnMaxLifetime(time.Hour)
+
+	// Test connection with a ping
+	pingCtx, cancel := context.WithTimeout(ctx, 10*time.Second) // Add timeout to ping
+	defer cancel()
+	if err := conn.PingContext(pingCtx); err != nil {
+		conn.Close() // Close pool if ping fails
+		return fmt.Errorf("failed to ping ClickHouse: %w", err)
 	}
 
 	c.conn = conn
-
-	c.log.Info("ClickHouse client started")
-
+	c.log.Info("ClickHouse client started successfully (mailru/chhttp driver)")
 	return nil
 }
 
-// GetClient returns the underlying ClickHouse connection
-func (c *client) GetClient() driver.Conn {
-	return c.conn
-}
+// GetClient method removed as it returned v2 specific driver.Conn
 
 // Query executes a query and returns all rows
-func (c *client) Query(query string, args ...interface{}) ([]map[string]interface{}, error) {
-	rows, err := c.conn.Query(c.ctx, query, args...)
+func (c *client) Query(ctx context.Context, query string, args ...interface{}) ([]map[string]interface{}, error) {
+	// Verify connection is set
+	if c.conn == nil {
+		return nil, fmt.Errorf("clickhouse connection is nil, client may not be properly initialized")
+	}
+
+	// Use QueryContext from database/sql
+	rows, err := c.conn.QueryContext(ctx, query, args...)
 	if err != nil {
 		return nil, fmt.Errorf("failed to execute query: %w", err)
 	}
-	defer rows.Close()
+	defer rows.Close() // Ensure rows are closed
 
-	// Get column names
-	columnTypes := rows.ColumnTypes()
-	columnNames := make([]string, len(columnTypes))
-	for i, col := range columnTypes {
-		columnNames[i] = col.Name()
+	// Get column names using standard sql.Rows.Columns()
+	columnNames, err := rows.Columns()
+	if err != nil {
+		return nil, fmt.Errorf("failed to get column names: %w", err)
 	}
 
 	// Prepare result
@@ -118,6 +169,7 @@ func (c *client) Query(query string, args ...interface{}) ([]map[string]interfac
 		}
 
 		// Scan the row into the slice
+		// Scan using standard sql.Rows.Scan()
 		if err := rows.Scan(valuePointers...); err != nil {
 			return nil, fmt.Errorf("failed to scan row: %w", err)
 		}
@@ -132,7 +184,7 @@ func (c *client) Query(query string, args ...interface{}) ([]map[string]interfac
 		result = append(result, row)
 	}
 
-	// Check for errors after iteration
+	// Check for errors after iteration using standard sql.Rows.Err()
 	if err := rows.Err(); err != nil {
 		return nil, fmt.Errorf("error iterating rows: %w", err)
 	}
@@ -141,8 +193,8 @@ func (c *client) Query(query string, args ...interface{}) ([]map[string]interfac
 }
 
 // QueryRow executes a query and returns a single row
-func (c *client) QueryRow(query string, args ...interface{}) (map[string]interface{}, error) {
-	rows, err := c.Query(query, args...)
+func (c *client) QueryRow(ctx context.Context, query string, args ...interface{}) (map[string]interface{}, error) {
+	rows, err := c.Query(ctx, query, args...)
 	if err != nil {
 		return nil, err
 	}
@@ -155,11 +207,26 @@ func (c *client) QueryRow(query string, args ...interface{}) (map[string]interfa
 }
 
 // Exec executes a query without returning rows
-func (c *client) Exec(query string, args ...interface{}) error {
-	return c.conn.Exec(c.ctx, query, args...)
+func (c *client) Exec(ctx context.Context, query string, args ...interface{}) error {
+	// Verify connection is set
+	if c.conn == nil {
+		return fmt.Errorf("clickhouse connection is nil, client may not be properly initialized")
+	}
+
+	// Use ExecContext from database/sql
+	_, err := c.conn.ExecContext(ctx, query, args...)
+	return err // Return the error directly
 }
 
 // Stop gracefully stops the ClickHouse client
 func (c *client) Stop() error {
+	if c.conn == nil {
+		c.log.Warn("Attempted to stop ClickHouse client but connection was nil")
+		return nil
+	}
+
+	c.log.Info("Stopping ClickHouse client")
+
+	// Close the connection pool using standard sql.DB.Close()
 	return c.conn.Close()
 }

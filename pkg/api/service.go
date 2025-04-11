@@ -2,7 +2,6 @@ package api
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"net"
 	"net/http"
@@ -12,12 +11,12 @@ import (
 	"time"
 
 	"github.com/ethpandaops/lab/pkg/internal/lab/cache"
-	"github.com/ethpandaops/lab/pkg/internal/lab/discovery"
 	"github.com/ethpandaops/lab/pkg/internal/lab/logger"
 	"github.com/ethpandaops/lab/pkg/internal/lab/storage"
 	"github.com/gorilla/mux"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 
 	apipb "github.com/ethpandaops/lab/pkg/api/proto"
 )
@@ -35,7 +34,6 @@ type Service struct {
 	restServer    *http.Server
 	cacheClient   cache.Client
 	storageClient storage.Client
-	discovery     discovery.Discovery
 
 	// gRPC connection to srv service
 	srvConn   *grpc.ClientConn
@@ -44,7 +42,7 @@ type Service struct {
 
 // New creates a new api service
 func New(config *Config) (*Service, error) {
-	log, err := logger.New(config.LogLevel, "lab.ethpandaops.io.api")
+	log, err := logger.New(config.LogLevel, "api")
 	if err != nil {
 		return nil, fmt.Errorf("failed to create logger: %w", err)
 	}
@@ -59,21 +57,12 @@ func New(config *Config) (*Service, error) {
 		return nil, fmt.Errorf("failed to create storage client: %w", err)
 	}
 
-	var disc discovery.Discovery
-	switch config.Discovery.Type {
-	case "", "static":
-		disc = discovery.NewStaticDiscovery(config.Discovery.Static)
-	default:
-		return nil, fmt.Errorf("unsupported discovery type: %s", config.Discovery.Type)
-	}
-
 	return &Service{
 		log:           log,
 		config:        config,
 		router:        mux.NewRouter(),
 		cacheClient:   cacheClient,
 		storageClient: storageClient,
-		discovery:     disc,
 	}, nil
 }
 
@@ -118,15 +107,21 @@ func (s *Service) Start(ctx context.Context) error {
 }
 
 func (s *Service) initializeServices() error {
-	srvAddr, err := s.discovery.GetServiceURL("srv")
-	if err != nil {
-		return fmt.Errorf("failed to discover srv service URL: %w", err)
-	}
-	s.config.SrvClient.Address = srvAddr
+	srvAddr := s.config.SrvClient.Address
 
-	conn, err := grpc.Dial(srvAddr, grpc.WithInsecure())
-	if err != nil {
-		return fmt.Errorf("failed to dial srv service at %s: %w", srvAddr, err)
+	var conn *grpc.ClientConn
+	var err error
+
+	if s.config.SrvClient.TLS {
+		conn, err = grpc.Dial(srvAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+		if err != nil {
+			return fmt.Errorf("failed to dial srv service at %s: %w", srvAddr, err)
+		}
+	} else {
+		conn, err = grpc.Dial(srvAddr, grpc.WithInsecure())
+		if err != nil {
+			return fmt.Errorf("failed to dial srv service at %s: %w", srvAddr, err)
+		}
 	}
 	s.srvConn = conn
 	s.srvClient = apipb.NewLabAPIClient(conn)
@@ -162,9 +157,4 @@ func (s *Service) cleanup() {
 		s.log.Info("Closing gRPC client connection")
 		_ = s.srvConn.Close()
 	}
-}
-
-func writeJSON(w http.ResponseWriter, v interface{}) {
-	w.Header().Set("Content-Type", "application/json")
-	_ = json.NewEncoder(w).Encode(v)
 }

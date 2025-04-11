@@ -97,7 +97,7 @@ func TestDistributedLockInterfaces(t *testing.T) {
 			cache, cleanup := tc.createFunc(t)
 			defer cleanup()
 
-			locker := locker.NewLocker(logrus.New(), cache)
+			locker := locker.New(logrus.New(), cache)
 			if locker == nil {
 				t.Fatal("Failed to create locker")
 			}
@@ -302,7 +302,7 @@ func TestLockErrorScenarios(t *testing.T) {
 		// Create mock with error on get but not ErrCacheMiss
 		mockClient := mock.NewStandardCache().WithGetError(fmt.Errorf("forced get error"))
 
-		testLocker := locker.NewLocker(logrus.New(), mockClient)
+		testLocker := locker.New(logrus.New(), mockClient)
 
 		// Should return the error from Get
 		_, success, err := testLocker.Lock("test-lock", time.Second)
@@ -318,7 +318,7 @@ func TestLockErrorScenarios(t *testing.T) {
 		// Create mock with error on set
 		mockClient := mock.NewStandardCache().WithSetError(fmt.Errorf("forced set error"))
 
-		testLocker := locker.NewLocker(logrus.New(), mockClient)
+		testLocker := locker.New(logrus.New(), mockClient)
 
 		// Should return the error from Set
 		_, success, err := testLocker.Lock("test-lock", time.Second)
@@ -354,7 +354,7 @@ func TestUnlockErrorScenarios(t *testing.T) {
 		// Create mock with error on get but not ErrCacheMiss
 		mockClient := mock.NewStandardCache().WithGetError(fmt.Errorf("forced get error"))
 
-		testLocker := locker.NewLocker(logrus.New(), mockClient)
+		testLocker := locker.New(logrus.New(), mockClient)
 
 		// Should return the error from Get
 		success, err := testLocker.Unlock("test-lock", "token")
@@ -370,7 +370,7 @@ func TestUnlockErrorScenarios(t *testing.T) {
 		// Create mock with ErrCacheMiss on get
 		mockClient := mock.NewStandardCache().WithGetError(cache.ErrCacheMiss)
 
-		testLocker := locker.NewLocker(logrus.New(), mockClient)
+		testLocker := locker.New(logrus.New(), mockClient)
 
 		// Should not return an error, but success should be false
 		success, err := testLocker.Unlock("test-lock", "token")
@@ -392,7 +392,7 @@ func TestUnlockErrorScenarios(t *testing.T) {
 			t.Fatalf("Failed to set up test: %v", err)
 		}
 
-		testLocker := locker.NewLocker(logrus.New(), mockClient)
+		testLocker := locker.New(logrus.New(), mockClient)
 
 		// Should return the error from Delete
 		success, err := testLocker.Unlock("test-lock", "token")

@@ -17,7 +17,7 @@ func ExampleLocker_Lock() {
 	})
 
 	// Get the locker
-	locker := NewLocker(logrus.New(), cache)
+	locker := New(logrus.New(), cache)
 
 	// Acquire a lock for 30 seconds
 	token, success, err := locker.Lock("my-resource", 30*time.Second)
@@ -56,7 +56,7 @@ func TestDistributedLock(t *testing.T) {
 	})
 
 	// Get the locker
-	locker := NewLocker(logrus.New(), cache)
+	locker := New(logrus.New(), cache)
 
 	// Test that a lock can be acquired and released
 	token, success, err := locker.Lock("test-lock", 10*time.Second)
@@ -102,7 +102,7 @@ func TestConcurrentLocking(t *testing.T) {
 	})
 
 	// Get the locker
-	locker := NewLocker(logrus.New(), cache)
+	locker := New(logrus.New(), cache)
 
 	// Keep track of how many goroutines acquired the lock
 	var lockAcquired int

@@ -1,6 +1,7 @@
 package beacon_chain_timings
 
 import (
+	"context"
 	"fmt"
 	"path/filepath"
 
@@ -15,7 +16,7 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
-func (b *BeaconChainTimings) processBlockTimings(network *ethereum.Network, windowName string) error {
+func (b *BeaconChainTimings) processBlockTimings(ctx context.Context, network *ethereum.Network, windowName string) error {
 	b.log.WithFields(logrus.Fields{
 		"network": network.Name,
 		"window":  windowName,
@@ -34,7 +35,7 @@ func (b *BeaconChainTimings) processBlockTimings(network *ethereum.Network, wind
 	}
 
 	// Process block timings
-	timingData, err := b.GetTimingData(network.Name, timeRange, timeWindow) // Pass config
+	timingData, err := b.GetTimingData(ctx, network.Name, timeRange, timeWindow) // Pass config
 	if err != nil {
 		return fmt.Errorf("failed to process block timings: %w", err)
 	}
@@ -82,7 +83,7 @@ func (b *BeaconChainTimings) getTimeRange(timeWindow *pb.TimeWindowConfig) (stru
 }
 
 // processBlockTimingsData processes block timings data for a network, time range, and window config
-func (b *BeaconChainTimings) GetTimingData(network string, timeRange struct{ Start, End time.Time }, timeWindow *pb.TimeWindowConfig) (*pb.TimingData, error) {
+func (b *BeaconChainTimings) GetTimingData(ctx context.Context, network string, timeRange struct{ Start, End time.Time }, timeWindow *pb.TimeWindowConfig) (*pb.TimingData, error) {
 	stepSeconds := timeWindow.StepMs / 1000
 	if stepSeconds <= 0 {
 		return nil, fmt.Errorf("invalid step duration in window config: %d ms", timeWindow.StepMs)
@@ -139,7 +140,7 @@ func (b *BeaconChainTimings) GetTimingData(network string, timeRange struct{ Sta
 	// Revert to the client's specific Query method signature, assuming it returns []map[string]interface{}
 	// and handles named parameters in the query string directly.
 	// Remove context and clickhouse.Named parameters.
-	rowsData, err := ch.Query(query, // Pass query string directly
+	rowsData, err := ch.Query(ctx, query, // Pass query string directly
 		// Pass parameters positionally or rely on client handling named params in string
 		// Let's assume the client handles the {name:Type} syntax in the query string
 		// and doesn't need explicit parameters here if they are embedded.
@@ -276,5 +277,3 @@ func (b *BeaconChainTimings) storeTimingData(network, window string, data *pb.Ti
 	b.log.WithField("path", dataPath).Info("Stored block timings data")
 	return nil
 }
-
-// Removed duplicate GetStoragePath helper function

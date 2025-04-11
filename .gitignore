@@ -44,3 +44,6 @@ Thumbs.db
 
 node_modules
 config.yaml
+docker-compose.override.yaml
+
+deploy/local
