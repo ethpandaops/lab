@@ -7,23 +7,24 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/ethpandaops/lab/pkg/internal/lab"
-	"github.com/ethpandaops/lab/pkg/internal/lab/clickhouse"
 	"github.com/ethpandaops/lab/pkg/internal/lab/ethereum"
 	"github.com/ethpandaops/lab/pkg/internal/lab/locker"
+	"github.com/ethpandaops/lab/pkg/internal/lab/logger"
 	"github.com/ethpandaops/lab/pkg/internal/lab/storage"
 	"github.com/ethpandaops/lab/pkg/internal/lab/xatu"
 	"github.com/ethpandaops/lab/pkg/server/internal/grpc"
 	"github.com/ethpandaops/lab/pkg/server/internal/service"
 	beacon_chain_timings "github.com/ethpandaops/lab/pkg/server/internal/service/beacon_chain_timings"
 	xatu_public_contributors "github.com/ethpandaops/lab/pkg/server/internal/service/xatu_public_contributors"
+	"github.com/sirupsen/logrus"
 )
 
 // Service represents the srv service. It glues together all the sub-services and the gRPC server.
 type Service struct {
 	ctx    context.Context
 	config *Config
-	lab    *lab.Lab
+
+	log logrus.FieldLogger
 
 	// GRPC server
 	grpcServer *grpc.Server
@@ -40,22 +41,20 @@ type Service struct {
 // New creates a new srv service
 func New(config *Config, logLevel string) (*Service, error) {
 	// Create lab instance
-	labInst, err := lab.New(lab.Config{
-		LogLevel: logLevel,
-	}, QualifiedName)
+	log, err := logger.New(logLevel, QualifiedName)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create lab instance: %w", err)
+		return nil, fmt.Errorf("failed to create logger: %w", err)
 	}
 
 	return &Service{
 		config: config,
-		lab:    labInst,
+		log:    log,
 	}, nil
 }
 
 // Start starts the srv service
 func (s *Service) Start(ctx context.Context) error {
-	s.lab.Log().Info("Starting srv service")
+	s.log.Info("Starting srv service")
 
 	s.ctx = ctx
 
@@ -66,7 +65,7 @@ func (s *Service) Start(ctx context.Context) error {
 	go func() {
 		sig := <-sigCh
 
-		s.lab.Log().WithField("signal", sig.String()).Info("Received signal, shutting down")
+		s.log.WithField("signal", sig.String()).Info("Received signal, shutting down")
 
 		s.ctx.Done()
 	}()
@@ -89,20 +88,20 @@ func (s *Service) Start(ctx context.Context) error {
 	}
 
 	services := []grpc.Service{
-		grpc.NewLab(s.lab.Log()),
+		grpc.NewLab(s.log),
 		grpc.NewBeaconChainTimings(
-			s.lab.Log(),
+			s.log,
 			s.getService(beacon_chain_timings.BeaconChainTimingsServiceName).(*beacon_chain_timings.BeaconChainTimings),
 		),
 		grpc.NewXatuPublicContributors(
-			s.lab.Log(),
+			s.log,
 			s.getService(xatu_public_contributors.XatuPublicContributorsServiceName).(*xatu_public_contributors.XatuPublicContributors),
 		),
 	}
 
 	// Create gRPC server
 	s.grpcServer = grpc.NewServer(
-		s.lab.Log().WithField("component", "grpc_server"),
+		s.log.WithField("component", "grpc_server"),
 		s.config.Server,
 	)
 
@@ -112,20 +111,20 @@ func (s *Service) Start(ctx context.Context) error {
 		fmt.Sprintf("%s:%d", s.config.Server.Host, s.config.Server.Port),
 		services,
 	); err != nil {
-		s.lab.Log().WithError(err).Fatal("Failed to start gRPC server")
+		s.log.WithError(err).Fatal("Failed to start gRPC server")
 	}
 
 	// Block until context is canceled
 	<-s.ctx.Done()
-	s.lab.Log().Info("Context canceled, shutting down")
+	s.log.Info("Context canceled, shutting down")
 
 	// Shut down all the lab services
-	s.lab.Stop()
+	s.stop()
 
 	// Clean up resources
 	s.stop()
 
-	s.lab.Log().Info("Srv service stopped")
+	s.log.Info("Srv service stopped")
 
 	return nil
 }
@@ -142,7 +141,7 @@ func (s *Service) initializeServices(ctx context.Context) error {
 	}
 
 	bct, err := beacon_chain_timings.New(
-		s.lab.Log(),
+		s.log,
 		s.config.Modules["beacon_chain_timings"].BeaconChainTimings,
 		s.xatuClient,
 		ethConfig,
@@ -155,7 +154,7 @@ func (s *Service) initializeServices(ctx context.Context) error {
 	}
 
 	xpc, err := xatu_public_contributors.New(
-		s.lab.Log(),
+		s.log,
 		s.config.Modules["xatu_public_contributors"].XatuPublicContributors,
 		ethConfig,
 		s.xatuClient,
@@ -169,7 +168,7 @@ func (s *Service) initializeServices(ctx context.Context) error {
 
 	s.services = []service.Service{
 		service.NewLab(
-			s.lab.Log(),
+			s.log,
 		),
 		bct,
 		xpc,
@@ -181,15 +180,9 @@ func (s *Service) initializeServices(ctx context.Context) error {
 // initializeDependencies initializes all of the dependancies to run the srv service
 func (s *Service) initializeDependencies() error {
 	// Initialize global XatuClickhouse
-	s.lab.Log().Info("Initializing per-network Xatu ClickHouse clients")
-	xatuConfig := make(map[string]*clickhouse.Config)
-	for networkName, networkConfig := range s.config.Networks {
-		if networkConfig.Xatu != nil {
-			xatuConfig[networkName] = networkConfig.Xatu
-		}
-	}
+	s.log.Info("Initializing per-network Xatu ClickHouse clients")
 
-	xatuClient, err := s.lab.NewXatu(xatuConfig)
+	xatuClient, err := xatu.NewClient(s.config.GetXatuConfig())
 	if err != nil {
 		return fmt.Errorf("failed to initialize global Xatu ClickHouse client: %w", err)
 	}
@@ -200,8 +193,8 @@ func (s *Service) initializeDependencies() error {
 	}
 
 	// Initialize S3 Storage
-	s.lab.Log().Info("Initializing S3 storage")
-	storageClient, err := s.lab.NewStorage(s.config.Storage)
+	s.log.Info("Initializing S3 storage")
+	storageClient, err := storage.New(s.config.Storage, s.log)
 	if err != nil {
 		return fmt.Errorf("failed to initialize S3 storage: %w", err)
 	}
@@ -216,48 +209,6 @@ func (s *Service) initializeDependencies() error {
 
 	return nil
 }
-
-// // registerWorkflows registers all workflows and activities with Temporal
-// func (s *Service) registerWorkflows() {
-// 	s.lab.Log().Info("Registering workflows and activities")
-
-// 	// Register beacon workflows
-// 	s.lab.Temporal().RegisterWorkflow(beacon.SlotProcessWorkflow)
-// 	s.lab.Temporal().RegisterWorkflow(beacon.ProcessHeadSlotWorkflow)
-// 	s.lab.Temporal().RegisterWorkflow(beacon.ProcessBacklogWorkflow)
-// 	s.lab.Temporal().RegisterWorkflow(beacon.ProcessMiddleWorkflow)
-
-// 	// Create beacon activity implementations
-// 	beaconActivities := beacon.NewActivityImplementations(s.lab)
-
-// 	// Register beacon activities
-// 	s.lab.Temporal().RegisterActivity(beaconActivities.GetCurrentSlot)
-// 	s.lab.Temporal().RegisterActivity(beaconActivities.ProcessSlot)
-// 	s.lab.Temporal().RegisterActivity(beaconActivities.GetProcessorState)
-// 	s.lab.Temporal().RegisterActivity(beaconActivities.SaveProcessorState)
-// 	s.lab.Temporal().RegisterActivity(beaconActivities.CalculateTargetBacklogSlot)
-// 	s.lab.Temporal().RegisterActivity(beaconActivities.ProcessMissingSlots)
-
-// 	// Import timings module
-
-// 	// Register timings workflows
-// 	s.lab.Temporal().RegisterWorkflow(timings.TimingsModuleWorkflow)
-// 	s.lab.Temporal().RegisterWorkflow(timings.BlockTimingsProcessorWorkflow)
-// 	s.lab.Temporal().RegisterWorkflow(timings.SizeCDFProcessorWorkflow)
-
-// 	// Create timings activity implementations
-// 	timingsActivities := timings.NewActivities(
-// 		s.lab.Log().WithField("component", "timings"),
-// 		s.lab,
-// 		"timings",
-// 	)
-
-// 	// Register timings activities
-// 	s.lab.Temporal().RegisterActivity(timingsActivities.ShouldProcessActivity)
-// 	s.lab.Temporal().RegisterActivity(timingsActivities.ProcessBlockTimingsActivity)
-// 	s.lab.Temporal().RegisterActivity(timingsActivities.ProcessSizeCDFActivity)
-// 	s.lab.Temporal().RegisterActivity(timingsActivities.UpdateProcessorStateActivity)
-// }
 
 func (s *Service) getService(name string) service.Service {
 	for _, service := range s.services {

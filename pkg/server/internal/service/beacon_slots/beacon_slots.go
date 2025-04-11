@@ -502,9 +502,9 @@ func (b *BeaconSlots) processMissing(networkName string) {
 		Debug("Checking for missing slots")
 
 	// Get the ClickHouse client for this network
-	ch := b.xatuClient.GetClickhouseClientForNetwork(networkName)
-	if ch == nil {
-		b.log.WithField("network", networkName).Error("No ClickHouse client available for network")
+	ch, err := b.xatuClient.GetClickhouseClientForNetwork(networkName)
+	if err != nil {
+		b.log.WithField("network", networkName).WithError(err).Error("Failed to get ClickHouse client for network")
 		return
 	}
 
@@ -564,9 +564,9 @@ func (b *BeaconSlots) getCurrentSlot(networkName string) (int64, error) {
 	`
 
 	// Get the Clickhouse client for this network
-	ch := b.xatuClient.GetClickhouseClientForNetwork(networkName)
-	if ch == nil {
-		return 0, fmt.Errorf("no clickhouse client for network %s", networkName)
+	ch, err := b.xatuClient.GetClickhouseClientForNetwork(networkName)
+	if err != nil {
+		return 0, fmt.Errorf("failed to get ClickHouse client for network %s: %w", networkName, err)
 	}
 
 	// Execute the query
@@ -738,9 +738,9 @@ func (b *BeaconSlots) getBlockData(networkName string, slot int64) (*BlockData, 
 	`
 
 	// Get the Clickhouse client for this network
-	ch := b.xatuClient.GetClickhouseClientForNetwork(networkName)
-	if ch == nil {
-		return nil, fmt.Errorf("no clickhouse client for network %s", networkName)
+	ch, err := b.xatuClient.GetClickhouseClientForNetwork(networkName)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get ClickHouse client for network %s: %w", networkName, err)
 	}
 
 	result, err := ch.QueryRow(query, networkName, slot)
@@ -790,9 +790,9 @@ func (b *BeaconSlots) getProposerData(networkName string, slot int64) (*Proposer
 	`
 
 	// Get the Clickhouse client for this network
-	ch := b.xatuClient.GetClickhouseClientForNetwork(networkName)
-	if ch == nil {
-		return nil, fmt.Errorf("no clickhouse client for network %s", networkName)
+	ch, err := b.xatuClient.GetClickhouseClientForNetwork(networkName)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get ClickHouse client for network %s: %w", networkName, err)
 	}
 
 	result, err := ch.QueryRow(query, networkName, slot)
@@ -855,9 +855,9 @@ func (b *BeaconSlots) getMaximumAttestationVotes(networkName string, slot int64)
 	`
 
 	// Get the Clickhouse client for this network
-	ch := b.xatuClient.GetClickhouseClientForNetwork(networkName)
-	if ch == nil {
-		return 0, fmt.Errorf("no clickhouse client for network %s", networkName)
+	ch, err := b.xatuClient.GetClickhouseClientForNetwork(networkName)
+	if err != nil {
+		return 0, fmt.Errorf("failed to get ClickHouse client for network %s: %w", networkName, err)
 	}
 
 	// Execute the query
@@ -915,9 +915,9 @@ func (b *BeaconSlots) getAttestationVotes(networkName string, slot int64, blockR
 	`
 
 	// Get the Clickhouse client for this network
-	ch := b.xatuClient.GetClickhouseClientForNetwork(networkName)
-	if ch == nil {
-		return nil, fmt.Errorf("no clickhouse client for network %s", networkName)
+	ch, err := b.xatuClient.GetClickhouseClientForNetwork(networkName)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get ClickHouse client for network %s: %w", networkName, err)
 	}
 
 	// Execute the query
@@ -1116,9 +1116,9 @@ func (b *BeaconSlots) getProposerEntity(networkName string, index int64) (*strin
 	`
 
 	// Get the Clickhouse client for this network
-	ch := b.xatuClient.GetClickhouseClientForNetwork(networkName)
-	if ch == nil {
-		return nil, fmt.Errorf("no clickhouse client for network %s", networkName)
+	ch, err := b.xatuClient.GetClickhouseClientForNetwork(networkName)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get ClickHouse client for network %s: %w", networkName, err)
 	}
 
 	// Execute the query
@@ -1194,9 +1194,9 @@ func (b *BeaconSlots) getBlockSeenAtSlotTime(networkName string, slot int64) ([]
 	`
 
 	// Get the Clickhouse client for this network
-	ch := b.xatuClient.GetClickhouseClientForNetwork(networkName)
-	if ch == nil {
-		return nil, fmt.Errorf("no clickhouse client for network %s", networkName)
+	ch, err := b.xatuClient.GetClickhouseClientForNetwork(networkName)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get ClickHouse client for network %s: %w", networkName, err)
 	}
 
 	// Execute the query
@@ -1256,9 +1256,9 @@ func (b *BeaconSlots) getBlobSeenAtSlotTime(networkName string, slot int64) ([]B
 	`
 
 	// Get the Clickhouse client for this network
-	ch := b.xatuClient.GetClickhouseClientForNetwork(networkName)
-	if ch == nil {
-		return nil, fmt.Errorf("no clickhouse client for network %s", networkName)
+	ch, err := b.xatuClient.GetClickhouseClientForNetwork(networkName)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get ClickHouse client for network %s: %w", networkName, err)
 	}
 
 	// Execute the query
@@ -1323,9 +1323,9 @@ func (b *BeaconSlots) getBlockFirstSeenInP2PSlotTime(networkName string, slot in
 	`
 
 	// Get the Clickhouse client for this network
-	ch := b.xatuClient.GetClickhouseClientForNetwork(networkName)
-	if ch == nil {
-		return nil, fmt.Errorf("no clickhouse client for network %s", networkName)
+	ch, err := b.xatuClient.GetClickhouseClientForNetwork(networkName)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get ClickHouse client for network %s: %w", networkName, err)
 	}
 
 	// Execute the query
@@ -1385,9 +1385,9 @@ func (b *BeaconSlots) getBlobFirstSeenInP2PSlotTime(networkName string, slot int
 	`
 
 	// Get the Clickhouse client for this network
-	ch := b.xatuClient.GetClickhouseClientForNetwork(networkName)
-	if ch == nil {
-		return nil, fmt.Errorf("no clickhouse client for network %s", networkName)
+	ch, err := b.xatuClient.GetClickhouseClientForNetwork(networkName)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get ClickHouse client for network %s: %w", networkName, err)
 	}
 
 	// Execute the query

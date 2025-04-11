@@ -493,14 +493,14 @@ func (b *XatuPublicContributors) processSummary(networks []string) error {
 
 	for _, networkName := range networks {
 		networkLog := log.WithField("query_network", networkName)
-		clickhouseClient := b.xatuClient.GetClickhouseClientForNetwork(networkName)
-		if clickhouseClient == nil {
-			networkLog.Warnf("Clickhouse client not available for network, skipping summary contribution")
+		ch, err := b.xatuClient.GetClickhouseClientForNetwork(networkName)
+		if err != nil {
+			networkLog.WithError(err).Warnf("Clickhouse client not available for network, skipping summary contribution")
 			continue
 		}
 
 		networkLog.Debug("Querying network for summary data")
-		rows, err := clickhouseClient.Query(query, startTime, now, networkName)
+		rows, err := ch.Query(query, startTime, now, networkName)
 		if err != nil {
 			networkLog.WithError(err).Errorf("Failed to query clickhouse for summary data")
 			continue // Skip this network's contribution on error
@@ -641,7 +641,12 @@ func (b *XatuPublicContributors) processCountriesWindow(networkName string, wind
 		ORDER BY time_slot
 	`
 
-	rows, err := b.xatuClient.GetClickhouseClientForNetwork(networkName).Query(query, stepSeconds, startTime, endTime, networkName)
+	ch, err := b.xatuClient.GetClickhouseClientForNetwork(networkName)
+	if err != nil {
+		return fmt.Errorf("failed to get ClickHouse client for network %s: %w", networkName, err)
+	}
+
+	rows, err := ch.Query(query, stepSeconds, startTime, endTime, networkName)
 	if err != nil {
 		return fmt.Errorf("failed to query clickhouse for countries window: %w", err)
 	}
@@ -737,7 +742,12 @@ func (b *XatuPublicContributors) processUsersWindow(networkName string, window T
 		ORDER BY time_slot
 	`
 
-	rows, err := b.xatuClient.GetClickhouseClientForNetwork(networkName).Query(query, stepSeconds, startTime, endTime, networkName)
+	ch, err := b.xatuClient.GetClickhouseClientForNetwork(networkName)
+	if err != nil {
+		return fmt.Errorf("failed to get ClickHouse client for network %s: %w", networkName, err)
+	}
+
+	rows, err := ch.Query(query, stepSeconds, startTime, endTime, networkName)
 	if err != nil {
 		return fmt.Errorf("failed to query clickhouse for users window: %w", err)
 	}
@@ -855,9 +865,9 @@ func (b *XatuPublicContributors) processUserSummaries(networks []string) error {
 
 	for _, networkName := range networks {
 		networkLog := log.WithField("query_network", networkName)
-		clickhouseClient := b.xatuClient.GetClickhouseClientForNetwork(networkName)
-		if clickhouseClient == nil {
-			networkLog.Warnf("Clickhouse client not available for network, skipping")
+		clickhouseClient, err := b.xatuClient.GetClickhouseClientForNetwork(networkName)
+		if err != nil {
+			networkLog.WithError(err).Warnf("Clickhouse client not available for network, skipping")
 			continue
 		}
 

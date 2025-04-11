@@ -76,11 +76,6 @@ func (c *client) Start(ctx context.Context) error {
 		return fmt.Errorf("failed to create ClickHouse connection: %w", err)
 	}
 
-	// Ping the database to verify connection
-	if err := conn.Ping(ctx); err != nil {
-		return fmt.Errorf("failed to ping ClickHouse: %w", err)
-	}
-
 	c.conn = conn
 
 	c.log.Info("ClickHouse client started")

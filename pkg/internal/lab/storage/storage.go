@@ -269,7 +269,6 @@ func (c *client) delete(key string) error {
 
 // Stop gracefully stops the S3 storage client
 func (c *client) Stop() error {
-	// Nothing to clean up for S3 client
-	// Todo: Check if there is a way to wait for all the objects to be uploaded
+	// No graceful shutdown required: all uploads are synchronous and complete before return
 	return nil
 }

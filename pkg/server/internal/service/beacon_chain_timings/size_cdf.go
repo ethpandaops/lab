@@ -65,7 +65,12 @@ func (b *BeaconChainTimings) GetSizeCDFData(network string, timeRange struct{ St
 		GROUP BY slot
 	`
 
-	blobRows, err := b.xatuClient.GetClickhouseClientForNetwork(network).Query(blobQuery, startStr, endStr, network)
+	ch, err := b.xatuClient.GetClickhouseClientForNetwork(network)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get ClickHouse client for network: %w", err)
+	}
+
+	blobRows, err := ch.Query(blobQuery, startStr, endStr, network)
 	if err != nil {
 		return nil, fmt.Errorf("failed to query blob data: %w", err)
 	}
@@ -127,7 +132,7 @@ func (b *BeaconChainTimings) GetSizeCDFData(network string, timeRange struct{ St
 			AND meta_network_name = $3
 	`
 
-	mevRows, err := b.xatuClient.GetClickhouseClientForNetwork(network).Query(mevQuery, startStr, endStr, network)
+	mevRows, err := ch.Query(mevQuery, startStr, endStr, network)
 	if err != nil {
 		return nil, fmt.Errorf("failed to query MEV relay data: %w", err)
 	}
@@ -174,7 +179,7 @@ func (b *BeaconChainTimings) GetSizeCDFData(network string, timeRange struct{ St
 		GROUP BY slot, meta_network_name
 	`
 
-	arrivalRows, err := b.xatuClient.GetClickhouseClientForNetwork(network).Query(arrivalQuery, startStr, endStr, network)
+	arrivalRows, err := ch.Query(arrivalQuery, startStr, endStr, network)
 	if err != nil {
 		return nil, fmt.Errorf("failed to query block arrival data: %w", err)
 	}
@@ -241,7 +246,7 @@ func (b *BeaconChainTimings) GetSizeCDFData(network string, timeRange struct{ St
 			AND meta_network_name = $3
 	`
 
-	sizeRows, err := b.xatuClient.GetClickhouseClientForNetwork(network).Query(sizeQuery, startStr, endStr, network)
+	sizeRows, err := ch.Query(sizeQuery, startStr, endStr, network)
 	if err != nil {
 		return nil, fmt.Errorf("failed to query block size data: %w", err)
 	}
@@ -256,7 +261,7 @@ func (b *BeaconChainTimings) GetSizeCDFData(network string, timeRange struct{ St
 		WHERE meta_network_name = $1
 	`
 
-	proposerRows, err := b.xatuClient.GetClickhouseClientForNetwork(network).Query(proposerQuery, network)
+	proposerRows, err := ch.Query(proposerQuery, network)
 	if err != nil {
 		return nil, fmt.Errorf("failed to query proposer entities: %w", err)
 	}

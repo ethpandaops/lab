@@ -131,15 +131,15 @@ func (b *BeaconChainTimings) GetTimingData(network string, timeRange struct{ Sta
 		ORDER BY time_slot ASC
 	`
 
-	conn := b.xatuClient.GetClickhouseClientForNetwork(network) // Assuming this returns a *sql.DB or similar
-	if conn == nil {
-		return nil, fmt.Errorf("no clickhouse client found for network: %s", network)
+	ch, err := b.xatuClient.GetClickhouseClientForNetwork(network) // Assuming this returns a *sql.DB or similar
+	if err != nil {
+		return nil, fmt.Errorf("failed to get ClickHouse client for network: %s", network)
 	}
 
 	// Revert to the client's specific Query method signature, assuming it returns []map[string]interface{}
 	// and handles named parameters in the query string directly.
 	// Remove context and clickhouse.Named parameters.
-	rowsData, err := conn.Query(query, // Pass query string directly
+	rowsData, err := ch.Query(query, // Pass query string directly
 		// Pass parameters positionally or rely on client handling named params in string
 		// Let's assume the client handles the {name:Type} syntax in the query string
 		// and doesn't need explicit parameters here if they are embedded.

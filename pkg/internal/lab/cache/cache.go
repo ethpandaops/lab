@@ -60,7 +60,7 @@ func (c *Config) Validate() error {
 }
 
 // New creates a new cache based on the config
-func New(config Config) (Client, error) {
+func New(config *Config) (Client, error) {
 	switch config.Type {
 	case CacheTypeRedis:
 		redisConfig := &RedisConfig{}

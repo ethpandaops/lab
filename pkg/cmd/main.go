@@ -114,7 +114,7 @@ func createAPICommand() *cobra.Command {
 			}
 
 			// Create and start the api service
-			service, err := api.New(cfg, logLevel)
+			service, err := api.New(cfg)
 			if err != nil {
 				return fmt.Errorf("failed to create api service: %w", err)
 			}
