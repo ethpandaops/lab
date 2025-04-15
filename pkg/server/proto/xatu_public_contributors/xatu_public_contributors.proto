@@ -36,31 +36,33 @@ message ProcessorState {
   map<string, google.protobuf.Timestamp> last_processed_windows = 2;
 }
 
-// Count of nodes for a specific country
-message NodeCount {
-  string country = 1;
-  int32 count = 2;
+// Count of nodes with total and public node counts
+message NodeCountStats {
+  int32 total_nodes = 1; 
+  int32 public_nodes = 2;
 }
 
 // Network statistics
 message NetworkStats {
   string network = 1;
-  repeated NodeCount node_counts = 2;
-  int32 total_nodes = 3;
-  int32 total_countries = 4;
+  int32 total_nodes = 2;
+  int32 total_public_nodes = 3; 
+  map<string, NodeCountStats> countries = 4;
+  map<string, NodeCountStats> continents = 5;
+  map<string, NodeCountStats> cities = 6;
+  map<string, NodeCountStats> consensus_implementations = 7;
 }
 
 // Summary data for dashboard
 message SummaryData {
-  repeated NetworkStats networks = 1;
-  int32 total_nodes = 2;
-  int32 total_countries = 3;
+  int64 updated_at = 1;
+  map<string, NetworkStats> networks = 2;
 }
 
 // Data point for a country
 message CountryDataPoint {
   google.protobuf.Timestamp timestamp = 1;
-  repeated NodeCount node_counts = 2;
+  repeated NodeCountStats node_counts = 2;
   int32 total_nodes = 3;
   int32 total_countries = 4;
 }

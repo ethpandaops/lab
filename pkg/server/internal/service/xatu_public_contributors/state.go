@@ -47,6 +47,3 @@ func (s *State) UpdateProcessorState(processorName string, state ProcessorState)
 	}
 	s.Processors[processorName] = state
 }
-
-// Note: ToProtoState and FromProtoState will be implemented after
-// the proto package is generated correctly

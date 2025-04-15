@@ -80,7 +80,7 @@ func (s *Service) Start(ctx context.Context) error {
 		s.cancel()
 	}()
 
-	if err := s.initializeServices(); err != nil {
+	if err := s.initializeServices(ctx); err != nil {
 		return fmt.Errorf("failed to initialize services: %w", err)
 	}
 
@@ -106,7 +106,7 @@ func (s *Service) Start(ctx context.Context) error {
 	return nil
 }
 
-func (s *Service) initializeServices() error {
+func (s *Service) initializeServices(ctx context.Context) error {
 	srvAddr := s.config.SrvClient.Address
 
 	var conn *grpc.ClientConn
@@ -126,7 +126,119 @@ func (s *Service) initializeServices() error {
 	s.srvConn = conn
 	s.srvClient = apipb.NewLabAPIClient(conn)
 
+	if err := s.storageClient.Start(ctx); err != nil {
+		return fmt.Errorf("failed to start storage client: %w", err)
+	}
+
+	// Register custom HTTP handlers for backward compatibility
+	s.registerLegacyHandlers()
+
 	return nil
+}
+
+// registerLegacyHandlers registers HTTP handlers for backward compatibility with .json paths
+func (s *Service) registerLegacyHandlers() {
+	// Block timings
+	s.router.HandleFunc("/api/beacon_chain_timings/block_timings/{network}/{window_file}.json", s.handleBlockTimings).Methods("GET")
+
+	// Size CDF
+	s.router.HandleFunc("/api/beacon_chain_timings/size_cdf/{network}/{window_file}.json", s.handleSizeCDF).Methods("GET")
+
+	// Xatu Summary
+	s.router.HandleFunc("/api/xatu_public_contributors/summary.json", s.handleXatuSummary).Methods("GET")
+
+	// Beacon Slot
+	s.router.HandleFunc("/api/slots/{network}/{slot}.json", s.handleBeaconSlot).Methods("GET")
+
+	// Xatu User Summary
+	s.router.HandleFunc("/api/xatu_public_contributors/user-summaries/summary.json", s.handleXatuUserSummary).Methods("GET")
+
+	// Xatu User
+	s.router.HandleFunc("/api/xatu_public_contributors/user-summaries/users/{username}.json", s.handleXatuUser).Methods("GET")
+
+	// Xatu Users Window
+	s.router.HandleFunc("/api/xatu_public_contributors/users/{network}/{window_file}.json", s.handleXatuUsersWindow).Methods("GET")
+
+	// Xatu Countries Window
+	s.router.HandleFunc("/api/xatu_public_contributors/countries/{network}/{window_file}.json", s.handleXatuCountriesWindow).Methods("GET")
+}
+
+// Generic handler for S3 passthroughs
+func (s *Service) handleS3Passthrough(w http.ResponseWriter, r *http.Request, key string) {
+	ctx := r.Context()
+
+	data, err := s.storageClient.Get(ctx, key)
+	if err != nil {
+		if err == storage.ErrNotFound {
+			http.Error(w, "Not found", http.StatusNotFound)
+		} else {
+			s.log.WithError(err).WithField("key", key).Error("Failed to get object from storage")
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
+		}
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Cache-Control", "max-age=3600")
+	w.Write(data)
+}
+
+// Handler implementations
+func (s *Service) handleBlockTimings(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	network := vars["network"]
+	windowFile := vars["window_file"]
+	key := "beacon_chain_timings/block_timings/" + network + "/" + windowFile + ".json"
+	s.handleS3Passthrough(w, r, key)
+}
+
+func (s *Service) handleSizeCDF(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	network := vars["network"]
+	windowFile := vars["window_file"]
+	key := "beacon_chain_timings/size_cdf/" + network + "/" + windowFile + ".json"
+	s.handleS3Passthrough(w, r, key)
+}
+
+func (s *Service) handleXatuSummary(w http.ResponseWriter, r *http.Request) {
+	key := "xatu_public_contributors/summary.json"
+	s.handleS3Passthrough(w, r, key)
+}
+
+func (s *Service) handleBeaconSlot(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	network := vars["network"]
+	slot := vars["slot"]
+	key := "slots/" + network + "/" + slot + ".json"
+	s.handleS3Passthrough(w, r, key)
+}
+
+func (s *Service) handleXatuUserSummary(w http.ResponseWriter, r *http.Request) {
+	key := "xatu_public_contributors/user-summaries/summary.json"
+	s.handleS3Passthrough(w, r, key)
+}
+
+func (s *Service) handleXatuUser(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	username := vars["username"]
+	key := "xatu_public_contributors/user-summaries/users/" + username + ".json"
+	s.handleS3Passthrough(w, r, key)
+}
+
+func (s *Service) handleXatuUsersWindow(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	network := vars["network"]
+	windowFile := vars["window_file"]
+	key := "xatu_public_contributors/users/" + network + "/" + windowFile + ".json"
+	s.handleS3Passthrough(w, r, key)
+}
+
+func (s *Service) handleXatuCountriesWindow(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	network := vars["network"]
+	windowFile := vars["window_file"]
+	key := "xatu_public_contributors/countries/" + network + "/" + windowFile + ".json"
+	s.handleS3Passthrough(w, r, key)
 }
 
 func (s *Service) cleanup() {

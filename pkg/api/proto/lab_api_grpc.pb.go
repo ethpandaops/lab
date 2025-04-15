@@ -20,30 +20,28 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	LabAPI_GetStatus_FullMethodName          = "/labapi.LabAPI/GetStatus"
-	LabAPI_GetFrontendConfig_FullMethodName  = "/labapi.LabAPI/GetFrontendConfig"
-	LabAPI_GetBeaconSlotData_FullMethodName  = "/labapi.LabAPI/GetBeaconSlotData"
-	LabAPI_GetBeaconSlotRange_FullMethodName = "/labapi.LabAPI/GetBeaconSlotRange"
-	LabAPI_GetBeaconNodes_FullMethodName     = "/labapi.LabAPI/GetBeaconNodes"
-	LabAPI_GetTimingData_FullMethodName      = "/labapi.LabAPI/GetTimingData"
-	LabAPI_GetSizeCDFData_FullMethodName     = "/labapi.LabAPI/GetSizeCDFData"
-	LabAPI_GetBeaconStateFile_FullMethodName = "/labapi.LabAPI/GetBeaconStateFile"
-	LabAPI_GetBeaconSlotFile_FullMethodName  = "/labapi.LabAPI/GetBeaconSlotFile"
+	LabAPI_GetXatuSummary_FullMethodName         = "/labapi.LabAPI/GetXatuSummary"
+	LabAPI_GetXatuUserSummary_FullMethodName     = "/labapi.LabAPI/GetXatuUserSummary"
+	LabAPI_GetXatuUser_FullMethodName            = "/labapi.LabAPI/GetXatuUser"
+	LabAPI_GetXatuUsersWindow_FullMethodName     = "/labapi.LabAPI/GetXatuUsersWindow"
+	LabAPI_GetXatuCountriesWindow_FullMethodName = "/labapi.LabAPI/GetXatuCountriesWindow"
+	LabAPI_GetBlockTimings_FullMethodName        = "/labapi.LabAPI/GetBlockTimings"
+	LabAPI_GetSizeCDFWindow_FullMethodName       = "/labapi.LabAPI/GetSizeCDFWindow"
+	LabAPI_GetBeaconSlot_FullMethodName          = "/labapi.LabAPI/GetBeaconSlot"
 )
 
 // LabAPIClient is the client API for LabAPI service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type LabAPIClient interface {
-	GetStatus(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*StatusResponse, error)
-	GetFrontendConfig(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*FrontendConfigResponse, error)
-	GetBeaconSlotData(ctx context.Context, in *GetBeaconSlotDataRequest, opts ...grpc.CallOption) (*BeaconSlotDataResponse, error)
-	GetBeaconSlotRange(ctx context.Context, in *GetBeaconSlotRangeRequest, opts ...grpc.CallOption) (*BeaconSlotRangeResponse, error)
-	GetBeaconNodes(ctx context.Context, in *GetBeaconNodesRequest, opts ...grpc.CallOption) (*BeaconNodesResponse, error)
-	GetTimingData(ctx context.Context, in *GetTimingDataRequest, opts ...grpc.CallOption) (*TimingDataResponse, error)
-	GetSizeCDFData(ctx context.Context, in *GetSizeCDFDataRequest, opts ...grpc.CallOption) (*SizeCDFDataResponse, error)
-	GetBeaconStateFile(ctx context.Context, in *GetBeaconStateFileRequest, opts ...grpc.CallOption) (*DataFileChunk, error)
-	GetBeaconSlotFile(ctx context.Context, in *GetBeaconSlotFileRequest, opts ...grpc.CallOption) (*DataFileChunk, error)
+	GetXatuSummary(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*DataFileChunk, error)
+	GetXatuUserSummary(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*DataFileChunk, error)
+	GetXatuUser(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*DataFileChunk, error)
+	GetXatuUsersWindow(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*DataFileChunk, error)
+	GetXatuCountriesWindow(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*DataFileChunk, error)
+	GetBlockTimings(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*DataFileChunk, error)
+	GetSizeCDFWindow(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*DataFileChunk, error)
+	GetBeaconSlot(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*DataFileChunk, error)
 }
 
 type labAPIClient struct {
@@ -54,90 +52,80 @@ func NewLabAPIClient(cc grpc.ClientConnInterface) LabAPIClient {
 	return &labAPIClient{cc}
 }
 
-func (c *labAPIClient) GetStatus(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*StatusResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(StatusResponse)
-	err := c.cc.Invoke(ctx, LabAPI_GetStatus_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *labAPIClient) GetFrontendConfig(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*FrontendConfigResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(FrontendConfigResponse)
-	err := c.cc.Invoke(ctx, LabAPI_GetFrontendConfig_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *labAPIClient) GetBeaconSlotData(ctx context.Context, in *GetBeaconSlotDataRequest, opts ...grpc.CallOption) (*BeaconSlotDataResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(BeaconSlotDataResponse)
-	err := c.cc.Invoke(ctx, LabAPI_GetBeaconSlotData_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *labAPIClient) GetBeaconSlotRange(ctx context.Context, in *GetBeaconSlotRangeRequest, opts ...grpc.CallOption) (*BeaconSlotRangeResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(BeaconSlotRangeResponse)
-	err := c.cc.Invoke(ctx, LabAPI_GetBeaconSlotRange_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *labAPIClient) GetBeaconNodes(ctx context.Context, in *GetBeaconNodesRequest, opts ...grpc.CallOption) (*BeaconNodesResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(BeaconNodesResponse)
-	err := c.cc.Invoke(ctx, LabAPI_GetBeaconNodes_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *labAPIClient) GetTimingData(ctx context.Context, in *GetTimingDataRequest, opts ...grpc.CallOption) (*TimingDataResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(TimingDataResponse)
-	err := c.cc.Invoke(ctx, LabAPI_GetTimingData_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *labAPIClient) GetSizeCDFData(ctx context.Context, in *GetSizeCDFDataRequest, opts ...grpc.CallOption) (*SizeCDFDataResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(SizeCDFDataResponse)
-	err := c.cc.Invoke(ctx, LabAPI_GetSizeCDFData_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *labAPIClient) GetBeaconStateFile(ctx context.Context, in *GetBeaconStateFileRequest, opts ...grpc.CallOption) (*DataFileChunk, error) {
+func (c *labAPIClient) GetXatuSummary(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*DataFileChunk, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(DataFileChunk)
-	err := c.cc.Invoke(ctx, LabAPI_GetBeaconStateFile_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, LabAPI_GetXatuSummary_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *labAPIClient) GetBeaconSlotFile(ctx context.Context, in *GetBeaconSlotFileRequest, opts ...grpc.CallOption) (*DataFileChunk, error) {
+func (c *labAPIClient) GetXatuUserSummary(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*DataFileChunk, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(DataFileChunk)
-	err := c.cc.Invoke(ctx, LabAPI_GetBeaconSlotFile_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, LabAPI_GetXatuUserSummary_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *labAPIClient) GetXatuUser(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*DataFileChunk, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(DataFileChunk)
+	err := c.cc.Invoke(ctx, LabAPI_GetXatuUser_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *labAPIClient) GetXatuUsersWindow(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*DataFileChunk, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(DataFileChunk)
+	err := c.cc.Invoke(ctx, LabAPI_GetXatuUsersWindow_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *labAPIClient) GetXatuCountriesWindow(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*DataFileChunk, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(DataFileChunk)
+	err := c.cc.Invoke(ctx, LabAPI_GetXatuCountriesWindow_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *labAPIClient) GetBlockTimings(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*DataFileChunk, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(DataFileChunk)
+	err := c.cc.Invoke(ctx, LabAPI_GetBlockTimings_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *labAPIClient) GetSizeCDFWindow(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*DataFileChunk, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(DataFileChunk)
+	err := c.cc.Invoke(ctx, LabAPI_GetSizeCDFWindow_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *labAPIClient) GetBeaconSlot(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*DataFileChunk, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(DataFileChunk)
+	err := c.cc.Invoke(ctx, LabAPI_GetBeaconSlot_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -148,15 +136,14 @@ func (c *labAPIClient) GetBeaconSlotFile(ctx context.Context, in *GetBeaconSlotF
 // All implementations must embed UnimplementedLabAPIServer
 // for forward compatibility.
 type LabAPIServer interface {
-	GetStatus(context.Context, *emptypb.Empty) (*StatusResponse, error)
-	GetFrontendConfig(context.Context, *emptypb.Empty) (*FrontendConfigResponse, error)
-	GetBeaconSlotData(context.Context, *GetBeaconSlotDataRequest) (*BeaconSlotDataResponse, error)
-	GetBeaconSlotRange(context.Context, *GetBeaconSlotRangeRequest) (*BeaconSlotRangeResponse, error)
-	GetBeaconNodes(context.Context, *GetBeaconNodesRequest) (*BeaconNodesResponse, error)
-	GetTimingData(context.Context, *GetTimingDataRequest) (*TimingDataResponse, error)
-	GetSizeCDFData(context.Context, *GetSizeCDFDataRequest) (*SizeCDFDataResponse, error)
-	GetBeaconStateFile(context.Context, *GetBeaconStateFileRequest) (*DataFileChunk, error)
-	GetBeaconSlotFile(context.Context, *GetBeaconSlotFileRequest) (*DataFileChunk, error)
+	GetXatuSummary(context.Context, *emptypb.Empty) (*DataFileChunk, error)
+	GetXatuUserSummary(context.Context, *emptypb.Empty) (*DataFileChunk, error)
+	GetXatuUser(context.Context, *emptypb.Empty) (*DataFileChunk, error)
+	GetXatuUsersWindow(context.Context, *emptypb.Empty) (*DataFileChunk, error)
+	GetXatuCountriesWindow(context.Context, *emptypb.Empty) (*DataFileChunk, error)
+	GetBlockTimings(context.Context, *emptypb.Empty) (*DataFileChunk, error)
+	GetSizeCDFWindow(context.Context, *emptypb.Empty) (*DataFileChunk, error)
+	GetBeaconSlot(context.Context, *emptypb.Empty) (*DataFileChunk, error)
 	mustEmbedUnimplementedLabAPIServer()
 }
 
@@ -167,32 +154,29 @@ type LabAPIServer interface {
 // pointer dereference when methods are called.
 type UnimplementedLabAPIServer struct{}
 
-func (UnimplementedLabAPIServer) GetStatus(context.Context, *emptypb.Empty) (*StatusResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetStatus not implemented")
+func (UnimplementedLabAPIServer) GetXatuSummary(context.Context, *emptypb.Empty) (*DataFileChunk, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetXatuSummary not implemented")
 }
-func (UnimplementedLabAPIServer) GetFrontendConfig(context.Context, *emptypb.Empty) (*FrontendConfigResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetFrontendConfig not implemented")
+func (UnimplementedLabAPIServer) GetXatuUserSummary(context.Context, *emptypb.Empty) (*DataFileChunk, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetXatuUserSummary not implemented")
 }
-func (UnimplementedLabAPIServer) GetBeaconSlotData(context.Context, *GetBeaconSlotDataRequest) (*BeaconSlotDataResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetBeaconSlotData not implemented")
+func (UnimplementedLabAPIServer) GetXatuUser(context.Context, *emptypb.Empty) (*DataFileChunk, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetXatuUser not implemented")
 }
-func (UnimplementedLabAPIServer) GetBeaconSlotRange(context.Context, *GetBeaconSlotRangeRequest) (*BeaconSlotRangeResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetBeaconSlotRange not implemented")
+func (UnimplementedLabAPIServer) GetXatuUsersWindow(context.Context, *emptypb.Empty) (*DataFileChunk, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetXatuUsersWindow not implemented")
 }
-func (UnimplementedLabAPIServer) GetBeaconNodes(context.Context, *GetBeaconNodesRequest) (*BeaconNodesResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetBeaconNodes not implemented")
+func (UnimplementedLabAPIServer) GetXatuCountriesWindow(context.Context, *emptypb.Empty) (*DataFileChunk, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetXatuCountriesWindow not implemented")
 }
-func (UnimplementedLabAPIServer) GetTimingData(context.Context, *GetTimingDataRequest) (*TimingDataResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetTimingData not implemented")
+func (UnimplementedLabAPIServer) GetBlockTimings(context.Context, *emptypb.Empty) (*DataFileChunk, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetBlockTimings not implemented")
 }
-func (UnimplementedLabAPIServer) GetSizeCDFData(context.Context, *GetSizeCDFDataRequest) (*SizeCDFDataResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetSizeCDFData not implemented")
+func (UnimplementedLabAPIServer) GetSizeCDFWindow(context.Context, *emptypb.Empty) (*DataFileChunk, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetSizeCDFWindow not implemented")
 }
-func (UnimplementedLabAPIServer) GetBeaconStateFile(context.Context, *GetBeaconStateFileRequest) (*DataFileChunk, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetBeaconStateFile not implemented")
-}
-func (UnimplementedLabAPIServer) GetBeaconSlotFile(context.Context, *GetBeaconSlotFileRequest) (*DataFileChunk, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetBeaconSlotFile not implemented")
+func (UnimplementedLabAPIServer) GetBeaconSlot(context.Context, *emptypb.Empty) (*DataFileChunk, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetBeaconSlot not implemented")
 }
 func (UnimplementedLabAPIServer) mustEmbedUnimplementedLabAPIServer() {}
 func (UnimplementedLabAPIServer) testEmbeddedByValue()                {}
@@ -215,164 +199,146 @@ func RegisterLabAPIServer(s grpc.ServiceRegistrar, srv LabAPIServer) {
 	s.RegisterService(&LabAPI_ServiceDesc, srv)
 }
 
-func _LabAPI_GetStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _LabAPI_GetXatuSummary_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(emptypb.Empty)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(LabAPIServer).GetStatus(ctx, in)
+		return srv.(LabAPIServer).GetXatuSummary(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: LabAPI_GetStatus_FullMethodName,
+		FullMethod: LabAPI_GetXatuSummary_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(LabAPIServer).GetStatus(ctx, req.(*emptypb.Empty))
+		return srv.(LabAPIServer).GetXatuSummary(ctx, req.(*emptypb.Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _LabAPI_GetFrontendConfig_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _LabAPI_GetXatuUserSummary_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(emptypb.Empty)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(LabAPIServer).GetFrontendConfig(ctx, in)
+		return srv.(LabAPIServer).GetXatuUserSummary(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: LabAPI_GetFrontendConfig_FullMethodName,
+		FullMethod: LabAPI_GetXatuUserSummary_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(LabAPIServer).GetFrontendConfig(ctx, req.(*emptypb.Empty))
+		return srv.(LabAPIServer).GetXatuUserSummary(ctx, req.(*emptypb.Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _LabAPI_GetBeaconSlotData_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetBeaconSlotDataRequest)
+func _LabAPI_GetXatuUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(emptypb.Empty)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(LabAPIServer).GetBeaconSlotData(ctx, in)
+		return srv.(LabAPIServer).GetXatuUser(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: LabAPI_GetBeaconSlotData_FullMethodName,
+		FullMethod: LabAPI_GetXatuUser_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(LabAPIServer).GetBeaconSlotData(ctx, req.(*GetBeaconSlotDataRequest))
+		return srv.(LabAPIServer).GetXatuUser(ctx, req.(*emptypb.Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _LabAPI_GetBeaconSlotRange_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetBeaconSlotRangeRequest)
+func _LabAPI_GetXatuUsersWindow_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(emptypb.Empty)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(LabAPIServer).GetBeaconSlotRange(ctx, in)
+		return srv.(LabAPIServer).GetXatuUsersWindow(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: LabAPI_GetBeaconSlotRange_FullMethodName,
+		FullMethod: LabAPI_GetXatuUsersWindow_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(LabAPIServer).GetBeaconSlotRange(ctx, req.(*GetBeaconSlotRangeRequest))
+		return srv.(LabAPIServer).GetXatuUsersWindow(ctx, req.(*emptypb.Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _LabAPI_GetBeaconNodes_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetBeaconNodesRequest)
+func _LabAPI_GetXatuCountriesWindow_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(emptypb.Empty)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(LabAPIServer).GetBeaconNodes(ctx, in)
+		return srv.(LabAPIServer).GetXatuCountriesWindow(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: LabAPI_GetBeaconNodes_FullMethodName,
+		FullMethod: LabAPI_GetXatuCountriesWindow_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(LabAPIServer).GetBeaconNodes(ctx, req.(*GetBeaconNodesRequest))
+		return srv.(LabAPIServer).GetXatuCountriesWindow(ctx, req.(*emptypb.Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _LabAPI_GetTimingData_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetTimingDataRequest)
+func _LabAPI_GetBlockTimings_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(emptypb.Empty)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(LabAPIServer).GetTimingData(ctx, in)
+		return srv.(LabAPIServer).GetBlockTimings(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: LabAPI_GetTimingData_FullMethodName,
+		FullMethod: LabAPI_GetBlockTimings_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(LabAPIServer).GetTimingData(ctx, req.(*GetTimingDataRequest))
+		return srv.(LabAPIServer).GetBlockTimings(ctx, req.(*emptypb.Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _LabAPI_GetSizeCDFData_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetSizeCDFDataRequest)
+func _LabAPI_GetSizeCDFWindow_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(emptypb.Empty)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(LabAPIServer).GetSizeCDFData(ctx, in)
+		return srv.(LabAPIServer).GetSizeCDFWindow(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: LabAPI_GetSizeCDFData_FullMethodName,
+		FullMethod: LabAPI_GetSizeCDFWindow_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(LabAPIServer).GetSizeCDFData(ctx, req.(*GetSizeCDFDataRequest))
+		return srv.(LabAPIServer).GetSizeCDFWindow(ctx, req.(*emptypb.Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _LabAPI_GetBeaconStateFile_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetBeaconStateFileRequest)
+func _LabAPI_GetBeaconSlot_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(emptypb.Empty)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(LabAPIServer).GetBeaconStateFile(ctx, in)
+		return srv.(LabAPIServer).GetBeaconSlot(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: LabAPI_GetBeaconStateFile_FullMethodName,
+		FullMethod: LabAPI_GetBeaconSlot_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(LabAPIServer).GetBeaconStateFile(ctx, req.(*GetBeaconStateFileRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _LabAPI_GetBeaconSlotFile_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetBeaconSlotFileRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(LabAPIServer).GetBeaconSlotFile(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: LabAPI_GetBeaconSlotFile_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(LabAPIServer).GetBeaconSlotFile(ctx, req.(*GetBeaconSlotFileRequest))
+		return srv.(LabAPIServer).GetBeaconSlot(ctx, req.(*emptypb.Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -385,40 +351,36 @@ var LabAPI_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*LabAPIServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "GetStatus",
-			Handler:    _LabAPI_GetStatus_Handler,
+			MethodName: "GetXatuSummary",
+			Handler:    _LabAPI_GetXatuSummary_Handler,
 		},
 		{
-			MethodName: "GetFrontendConfig",
-			Handler:    _LabAPI_GetFrontendConfig_Handler,
+			MethodName: "GetXatuUserSummary",
+			Handler:    _LabAPI_GetXatuUserSummary_Handler,
 		},
 		{
-			MethodName: "GetBeaconSlotData",
-			Handler:    _LabAPI_GetBeaconSlotData_Handler,
+			MethodName: "GetXatuUser",
+			Handler:    _LabAPI_GetXatuUser_Handler,
 		},
 		{
-			MethodName: "GetBeaconSlotRange",
-			Handler:    _LabAPI_GetBeaconSlotRange_Handler,
+			MethodName: "GetXatuUsersWindow",
+			Handler:    _LabAPI_GetXatuUsersWindow_Handler,
 		},
 		{
-			MethodName: "GetBeaconNodes",
-			Handler:    _LabAPI_GetBeaconNodes_Handler,
+			MethodName: "GetXatuCountriesWindow",
+			Handler:    _LabAPI_GetXatuCountriesWindow_Handler,
 		},
 		{
-			MethodName: "GetTimingData",
-			Handler:    _LabAPI_GetTimingData_Handler,
+			MethodName: "GetBlockTimings",
+			Handler:    _LabAPI_GetBlockTimings_Handler,
 		},
 		{
-			MethodName: "GetSizeCDFData",
-			Handler:    _LabAPI_GetSizeCDFData_Handler,
+			MethodName: "GetSizeCDFWindow",
+			Handler:    _LabAPI_GetSizeCDFWindow_Handler,
 		},
 		{
-			MethodName: "GetBeaconStateFile",
-			Handler:    _LabAPI_GetBeaconStateFile_Handler,
-		},
-		{
-			MethodName: "GetBeaconSlotFile",
-			Handler:    _LabAPI_GetBeaconSlotFile_Handler,
+			MethodName: "GetBeaconSlot",
+			Handler:    _LabAPI_GetBeaconSlot_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

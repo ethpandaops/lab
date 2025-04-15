@@ -37,7 +37,7 @@ modules:
   beacon_chain_timings:
     beacon_chain_timings:
       enabled: true
-      interval: "1h"
+      interval: "2m"
       time_windows:
         - file: "1h.json"
           step: "5m"
@@ -56,7 +56,7 @@ modules:
       enabled: true
       networks: ["mainnet"]
       redis_key_prefix: "lab_xatu_public_contributors"
-      interval: "1h"
+      interval: "2m"
       time_windows:
         - name: "1d"
           duration: "24h"

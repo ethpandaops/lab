@@ -2,7 +2,6 @@ package grpc
 
 import (
 	"context"
-	"time"
 
 	"errors" // Needed for error checking
 
@@ -14,7 +13,6 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 // Service implements the Xatu Public Contributors gRPC service
@@ -79,54 +77,37 @@ func toGRPCError(log logrus.FieldLogger, err error) error {
 // GetSummary gets summary data for networks
 func (x *XatuPublicContributors) GetSummary(ctx context.Context, req *pb.GetSummaryRequest) (*pb.GetSummaryResponse, error) {
 	log := x.log.WithFields(logrus.Fields{
-		// Note: The request has a network field, but the underlying data is global.
-		// We ignore req.Network for now as ReadSummaryData reads the global file.
-		// If network-specific summaries were needed, the service/storage layer would need changes.
 		"method": "GetSummary",
 	})
 	log.Debug("Request received")
 
-	// Read the pre-processed global summary data from storage via the service method
+	// Read the pre-processed summary data directly from storage via the service method
 	summaryData, err := x.service.ReadSummaryData(ctx)
 	if err != nil {
 		// Handle ErrNotFound specifically
 		if errors.Is(err, storage.ErrNotFound) {
-			log.Warn("Global summary data not found, returning empty response")
+			log.Warn("Summary data not found, returning empty response")
 			// Return an empty summary as per proto definition
-			return &pb.GetSummaryResponse{Summary: &pb.SummaryData{}}, nil
+			return &pb.GetSummaryResponse{
+				Summary: &pb.SummaryData{
+					Networks: make(map[string]*pb.NetworkStats),
+				},
+			}, nil
 		}
 		return nil, toGRPCError(log, err) // Handle other errors
 	}
 	if summaryData == nil {
 		log.Warn("Service returned nil summary without error, returning empty response")
-		return &pb.GetSummaryResponse{Summary: &pb.SummaryData{}}, nil
+		return &pb.GetSummaryResponse{
+			Summary: &pb.SummaryData{
+				Networks: make(map[string]*pb.NetworkStats),
+			},
+		}, nil
 	}
 
-	// Map the service.GlobalSummary struct to pb.SummaryData
-	pbSummary := &pb.SummaryData{
-		Networks:       make([]*pb.NetworkStats, 0, len(summaryData.Networks)),
-		TotalNodes:     int32(summaryData.Totals.Nodes.Public), // Use public count from totals
-		TotalCountries: int32(len(summaryData.Totals.Countries)),
-	}
-
-	for netName, netAgg := range summaryData.Networks {
-		networkStats := &pb.NetworkStats{
-			Network:        netName,
-			NodeCounts:     make([]*pb.NodeCount, 0, len(netAgg.Countries)),
-			TotalNodes:     int32(netAgg.Nodes.Public), // Use public count for the network
-			TotalCountries: int32(len(netAgg.Countries)),
-		}
-		for countryCode, countryCount := range netAgg.Countries {
-			networkStats.NodeCounts = append(networkStats.NodeCounts, &pb.NodeCount{
-				Country: countryCode,
-				Count:   int32(countryCount.Public), // Use public count per country
-			})
-		}
-		pbSummary.Networks = append(pbSummary.Networks, networkStats)
-	}
-
+	// Data is already in the correct proto format
 	return &pb.GetSummaryResponse{
-		Summary: pbSummary,
+		Summary: summaryData,
 	}, nil
 }
 
@@ -143,7 +124,7 @@ func (x *XatuPublicContributors) GetCountryData(ctx context.Context, req *pb.Get
 	// Placeholder: make window configurable if proto adds a window field
 
 	// Read the pre-processed country time series data from storage
-	serviceDataPoints, err := x.service.ReadCountryDataWindow(ctx, req.Network, windowFile)
+	dataPoints, err := x.service.ReadCountryDataWindow(ctx, req.Network, windowFile)
 	if err != nil {
 		if errors.Is(err, storage.ErrNotFound) {
 			log.Warnf("Country data not found for network %s, window %s", req.Network, windowFile)
@@ -152,40 +133,9 @@ func (x *XatuPublicContributors) GetCountryData(ctx context.Context, req *pb.Get
 		return nil, toGRPCError(log, err)
 	}
 
-	// Map the service []*xpc.CountryTimePoint to pb []*pb.CountryDataPoint
-	pbDataPoints := make([]*pb.CountryDataPoint, 0, len(serviceDataPoints))
-	for _, dp := range serviceDataPoints {
-		if dp == nil {
-			log.Warn("Service returned a nil CountryTimePoint in the list")
-			continue
-		}
-
-		pbPoint := &pb.CountryDataPoint{
-			Timestamp:  timestamppb.New(time.Unix(dp.Time, 0)), // Convert int64 timestamp
-			NodeCounts: make([]*pb.NodeCount, 0, len(dp.Countries)),
-			// TotalNodes and TotalCountries calculated below
-		}
-
-		var totalNodes int32 = 0
-		var totalCountries int32 = 0
-		for countryCode, count := range dp.Countries {
-			if count > 0 { // Only include countries with nodes
-				pbPoint.NodeCounts = append(pbPoint.NodeCounts, &pb.NodeCount{
-					Country: countryCode,
-					Count:   count,
-				})
-				totalNodes += count
-				totalCountries++
-			}
-		}
-		pbPoint.TotalNodes = totalNodes
-		pbPoint.TotalCountries = totalCountries
-
-		pbDataPoints = append(pbDataPoints, pbPoint)
-	}
-
+	// Data is already in the correct proto format
 	return &pb.GetCountryDataResponse{
-		DataPoints: pbDataPoints,
+		DataPoints: dataPoints,
 	}, nil
 }
 

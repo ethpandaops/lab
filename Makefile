@@ -1,13 +1,5 @@
 .PHONY: build proto run-srv run-api clean create-proto
 
-# Build all
-build: proto build-binary
-
-# Build binary
-build-binary:
-	@echo "Building binary..."
-	go build -o bin/lab pkg/cmd/main.go
-
 # Generate protobuf
 proto:
 	@echo "Generating protobuf code..."

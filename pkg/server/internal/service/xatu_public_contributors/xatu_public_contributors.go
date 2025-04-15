@@ -18,6 +18,7 @@ import (
 
 	// Needed for state and config conversion
 	pb "github.com/ethpandaops/lab/pkg/server/proto/xatu_public_contributors"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 const (
@@ -29,37 +30,6 @@ const (
 )
 
 // --- Data Structures for Processors ---
-
-// Count holds total and public node counts.
-type Count struct {
-	Total  int `json:"total"`
-	Public int `json:"public"`
-}
-
-// SummaryAggregation holds aggregated counts for various dimensions.
-type SummaryAggregation struct {
-	Nodes        Count            `json:"nodes"`
-	Countries    map[string]Count `json:"countries"`
-	Continents   map[string]Count `json:"continents"`
-	Cities       map[string]Count `json:"cities"`
-	ConsensusImp map[string]Count `json:"consensus_implementations"`
-}
-
-// GlobalSummary holds the overall summary data.
-type GlobalSummary struct {
-	UpdatedAt int64                         `json:"updated_at"`
-	Totals    SummaryAggregation            `json:"totals"`   // Aggregated across all networks
-	Networks  map[string]SummaryAggregation `json:"networks"` // Per-network breakdown
-}
-
-// CountryTimePoint represents node counts per country at a specific time.
-type CountryTimePoint struct {
-	Time      int64            `json:"time"`      // Unix timestamp
-	Countries map[string]int32 `json:"countries"` // Map country code to public node count
-}
-
-// CountryTimeSeriesData is a slice of CountryTimePoint, representing data for one file (e.g., countries/mainnet/24h).
-type CountryTimeSeriesData []*CountryTimePoint
 
 type XatuPublicContributors struct {
 	log logrus.FieldLogger
@@ -487,16 +457,10 @@ func (b *XatuPublicContributors) processSummary(ctx context.Context, networks []
 	now := time.Now().UTC()
 	startTime := now.Add(-1 * time.Hour) // Summary is always for the last hour
 
-	// Initialize result structure
-	summary := &GlobalSummary{
+	// Initialize result structure using protobuf types
+	summary := &pb.SummaryData{
 		UpdatedAt: now.Unix(),
-		Totals: SummaryAggregation{
-			Countries:    make(map[string]Count),
-			Continents:   make(map[string]Count),
-			Cities:       make(map[string]Count),
-			ConsensusImp: make(map[string]Count),
-		},
-		Networks: make(map[string]SummaryAggregation),
+		Networks:  make(map[string]*pb.NetworkStats),
 	}
 
 	// Query to get counts per dimension for the last hour
@@ -508,8 +472,8 @@ func (b *XatuPublicContributors) processSummary(ctx context.Context, networks []
 			meta_client_geo_continent_code AS continent,
 			meta_client_geo_city AS city,
 			meta_consensus_implementation AS consensus_impl,
-			count() AS total_count,
-			countIf(meta_client_name NOT LIKE 'ethpandaops%') AS public_count
+			count(DISTINCT meta_client_name) AS total_count,
+			countIf(DISTINCT meta_client_name, meta_client_name NOT LIKE 'ethpandaops%') AS public_count
 		FROM beacon_api_eth_v1_events_block FINAL
 		WHERE
 			slot_start_date_time BETWEEN ? AND ?
@@ -535,12 +499,15 @@ func (b *XatuPublicContributors) processSummary(ctx context.Context, networks []
 		}
 		networkLog.Debugf("Got %d aggregation rows from network", len(rows))
 
-		// Initialize network-specific aggregation
-		networkSummary := SummaryAggregation{
-			Countries:    make(map[string]Count),
-			Continents:   make(map[string]Count),
-			Cities:       make(map[string]Count),
-			ConsensusImp: make(map[string]Count),
+		// Initialize network-specific stats
+		networkStats := &pb.NetworkStats{
+			Network:                  networkName,
+			TotalNodes:               0,
+			TotalPublicNodes:         0,
+			Countries:                make(map[string]*pb.NodeCountStats),
+			Continents:               make(map[string]*pb.NodeCountStats),
+			Cities:                   make(map[string]*pb.NodeCountStats),
+			ConsensusImplementations: make(map[string]*pb.NodeCountStats),
 		}
 
 		// Process rows for this network
@@ -556,73 +523,66 @@ func (b *XatuPublicContributors) processSummary(ctx context.Context, networks []
 				networkLog.Warnf("Could not parse counts from row: %v", row)
 				continue
 			}
-			count := Count{Total: int(totalCount), Public: int(publicCount)}
 
 			// Aggregate totals for the network
-			networkSummary.Nodes.Total += count.Total
-			networkSummary.Nodes.Public += count.Public
+			networkStats.TotalNodes += int32(totalCount)
+			networkStats.TotalPublicNodes += int32(publicCount)
 
 			// Aggregate by dimension for the network
 			if country != "" {
-				current := networkSummary.Countries[country]
-				current.Total += count.Total
-				current.Public += count.Public
-				networkSummary.Countries[country] = current
+				if _, exists := networkStats.Countries[country]; !exists {
+					networkStats.Countries[country] = &pb.NodeCountStats{
+						TotalNodes:  0,
+						PublicNodes: 0,
+					}
+				}
+				current := networkStats.Countries[country]
+				current.TotalNodes += int32(totalCount)
+				current.PublicNodes += int32(publicCount)
 			}
+
 			if continent != "" {
-				current := networkSummary.Continents[continent]
-				current.Total += count.Total
-				current.Public += count.Public
-				networkSummary.Continents[continent] = current
+				if _, exists := networkStats.Continents[continent]; !exists {
+					networkStats.Continents[continent] = &pb.NodeCountStats{
+						TotalNodes:  0,
+						PublicNodes: 0,
+					}
+				}
+				current := networkStats.Continents[continent]
+				current.TotalNodes += int32(totalCount)
+				current.PublicNodes += int32(publicCount)
 			}
+
 			if city != "" {
-				current := networkSummary.Cities[city]
-				current.Total += count.Total
-				current.Public += count.Public
-				networkSummary.Cities[city] = current
+				if _, exists := networkStats.Cities[city]; !exists {
+					networkStats.Cities[city] = &pb.NodeCountStats{
+						TotalNodes:  0,
+						PublicNodes: 0,
+					}
+				}
+				current := networkStats.Cities[city]
+				current.TotalNodes += int32(totalCount)
+				current.PublicNodes += int32(publicCount)
 			}
+
 			if consensusImpl != "" {
-				current := networkSummary.ConsensusImp[consensusImpl]
-				current.Total += count.Total
-				current.Public += count.Public
-				networkSummary.ConsensusImp[consensusImpl] = current
+				if _, exists := networkStats.ConsensusImplementations[consensusImpl]; !exists {
+					networkStats.ConsensusImplementations[consensusImpl] = &pb.NodeCountStats{
+						TotalNodes:  0,
+						PublicNodes: 0,
+					}
+				}
+				current := networkStats.ConsensusImplementations[consensusImpl]
+				current.TotalNodes += int32(totalCount)
+				current.PublicNodes += int32(publicCount)
 			}
 		}
 
 		// Add network summary to global summary
-		summary.Networks[networkName] = networkSummary
-
-		// Add network totals to global totals
-		summary.Totals.Nodes.Total += networkSummary.Nodes.Total
-		summary.Totals.Nodes.Public += networkSummary.Nodes.Public
-		for k, v := range networkSummary.Countries {
-			current := summary.Totals.Countries[k]
-			current.Total += v.Total
-			current.Public += v.Public
-			summary.Totals.Countries[k] = current
-		}
-		for k, v := range networkSummary.Continents {
-			current := summary.Totals.Continents[k]
-			current.Total += v.Total
-			current.Public += v.Public
-			summary.Totals.Continents[k] = current
-		}
-		for k, v := range networkSummary.Cities {
-			current := summary.Totals.Cities[k]
-			current.Total += v.Total
-			current.Public += v.Public
-			summary.Totals.Cities[k] = current
-		}
-		for k, v := range networkSummary.ConsensusImp {
-			current := summary.Totals.ConsensusImp[k]
-			current.Total += v.Total
-			current.Public += v.Public
-			summary.Totals.ConsensusImp[k] = current
-		}
+		summary.Networks[networkName] = networkStats
 	}
 
-	// Store the global summary
-	// Use getStoragePath to ensure it's within the service's base directory
+	// Store the summary
 	key := "summary"
 	if err := b.storageClient.Store(ctx, storage.StoreParams{
 		Key:         b.getStoragePath(key),
@@ -630,10 +590,10 @@ func (b *XatuPublicContributors) processSummary(ctx context.Context, networks []
 		Format:      storage.CodecNameJSON,
 		Compression: storage.Gzip,
 	}); err != nil {
-		return fmt.Errorf("failed to store global summary data: %w", err)
+		return fmt.Errorf("failed to store summary data: %w", err)
 	}
 
-	log.Info("Successfully processed and stored global summary")
+	log.Info("Successfully processed and stored summary")
 	return nil
 }
 
@@ -684,7 +644,8 @@ func (b *XatuPublicContributors) processCountriesWindow(ctx context.Context, net
 	}
 
 	// Process results: group by time_slot
-	timePoints := make(map[int64]*CountryTimePoint)
+	// Map timestamp to data point
+	timePointsMap := make(map[int64]*pb.CountryDataPoint)
 
 	for _, row := range rows {
 		timestamp, okT := row["time_slot"].(time.Time)
@@ -698,35 +659,49 @@ func (b *XatuPublicContributors) processCountriesWindow(ctx context.Context, net
 
 		unixTime := timestamp.Unix()
 
-		if _, ok := timePoints[unixTime]; !ok {
-			timePoints[unixTime] = &CountryTimePoint{
-				Time:      unixTime,
-				Countries: make(map[string]int32),
+		// Get or create data point for this timestamp
+		dataPoint, exists := timePointsMap[unixTime]
+		if !exists {
+			// Create new timestamp using protobuf timestamp
+			pbTimestamp := timestamppb.New(timestamp)
+			dataPoint = &pb.CountryDataPoint{
+				Timestamp:      pbTimestamp,
+				NodeCounts:     []*pb.NodeCountStats{},
+				TotalNodes:     0,
+				TotalCountries: 0,
 			}
+			timePointsMap[unixTime] = dataPoint
 		}
 
-		// Add country count for this timestamp
-		timePoints[unixTime].Countries[country] = int32(nodeCount)
+		// Add country count to data point
+		dataPoint.NodeCounts = append(dataPoint.NodeCounts, &pb.NodeCountStats{
+			TotalNodes:  int32(nodeCount),
+			PublicNodes: int32(nodeCount), // Public count is the same here
+		})
+		dataPoint.TotalNodes += int32(nodeCount)
 	}
 
-	// Convert map to slice (CountryTimeSeriesData) and sort by time
-	var timePointsList CountryTimeSeriesData
-	for _, point := range timePoints {
-		timePointsList = append(timePointsList, point)
+	// Convert map to sorted array and set total countries
+	var dataPoints []*pb.CountryDataPoint
+	for _, dataPoint := range timePointsMap {
+		dataPoint.TotalCountries = int32(len(dataPoint.NodeCounts))
+		dataPoints = append(dataPoints, dataPoint)
 	}
-	sort.Slice(timePointsList, func(i, j int) bool {
-		return timePointsList[i].Time < timePointsList[j].Time
+
+	// Sort by timestamp
+	sort.Slice(dataPoints, func(i, j int) bool {
+		return dataPoints[i].Timestamp.AsTime().Before(dataPoints[j].Timestamp.AsTime())
 	})
 
-	// Store data using the path structure: countries/<network>/<window>
-	key := filepath.Join("countries", networkName, window.File)
+	// Store data
+	key := fmt.Sprintf("countries/%s/%s", networkName, window.File)
 	if err := b.storageClient.Store(ctx, storage.StoreParams{
 		Key:         b.getStoragePath(key),
-		Data:        timePointsList,
+		Data:        dataPoints,
 		Format:      storage.CodecNameJSON,
 		Compression: storage.Gzip,
 	}); err != nil {
-		return fmt.Errorf("failed to store countries data for window %s: %w", window.File, err)
+		return fmt.Errorf("failed to store countries window data: %w", err)
 	}
 
 	log.Info("Successfully processed and stored countries window")
@@ -956,6 +931,7 @@ func (b *XatuPublicContributors) processUserSummaries(ctx context.Context, netwo
 		username := ExtractUsername(metaClientName)
 		if username == "" {
 			log.Debugf("Skipping row with empty extracted username for meta_client_name: %s", metaClientName)
+
 			continue
 		}
 
@@ -1035,28 +1011,28 @@ func (b *XatuPublicContributors) processUserSummaries(ctx context.Context, netwo
 }
 
 // ReadSummaryData reads the global summary data from storage.
-func (b *XatuPublicContributors) ReadSummaryData(ctx context.Context) (*GlobalSummary, error) {
+func (b *XatuPublicContributors) ReadSummaryData(ctx context.Context) (*pb.SummaryData, error) {
 	log := b.log.WithField("method", "ReadSummaryData")
 	key := "summary" // Global summary file
 	storagePath := b.getStoragePath(key)
-	summary := &GlobalSummary{}
+	summary := &pb.SummaryData{}
 
-	log.WithField("path", storagePath).Debug("Attempting to read global summary data")
+	log.WithField("path", storagePath).Debug("Attempting to read summary data")
 	err := b.storageClient.GetEncoded(ctx, storagePath, summary, storage.CodecNameJSON)
 	if err != nil {
 		if err == storage.ErrNotFound {
-			log.Warn("Global summary data not found in storage")
+			log.Warn("Summary data not found in storage")
 			return nil, storage.ErrNotFound // Return specific error for gRPC mapping
 		}
-		log.WithError(err).Error("Failed to get global summary data from storage")
-		return nil, fmt.Errorf("failed to get global summary data: %w", err)
+		log.WithError(err).Error("Failed to get summary data from storage")
+		return nil, fmt.Errorf("failed to get summary data: %w", err)
 	}
-	log.Debug("Successfully read global summary data")
+	log.Debug("Successfully read summary data")
 	return summary, nil
 }
 
 // ReadCountryDataWindow reads the time-series country data for a specific network and window file from storage.
-func (b *XatuPublicContributors) ReadCountryDataWindow(ctx context.Context, networkName string, windowFile string) (CountryTimeSeriesData, error) {
+func (b *XatuPublicContributors) ReadCountryDataWindow(ctx context.Context, networkName string, windowFile string) ([]*pb.CountryDataPoint, error) {
 	log := b.log.WithFields(logrus.Fields{
 		"method":  "ReadCountryDataWindow",
 		"network": networkName,
@@ -1065,7 +1041,7 @@ func (b *XatuPublicContributors) ReadCountryDataWindow(ctx context.Context, netw
 	// Construct path: countries/<network>/<windowFile>
 	key := filepath.Join("countries", networkName, windowFile+"")
 	storagePath := b.getStoragePath(key)
-	var dataPoints CountryTimeSeriesData // This is []*CountryTimePoint
+	var dataPoints []*pb.CountryDataPoint
 
 	log.WithField("path", storagePath).Debug("Attempting to read country data window")
 	err := b.storageClient.GetEncoded(ctx, storagePath, &dataPoints, storage.CodecNameJSON)
