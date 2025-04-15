@@ -41,7 +41,7 @@ func (b *BeaconChainTimings) processBlockTimings(ctx context.Context, network *e
 	}
 
 	// Store the results
-	if err := b.storeTimingData(network.Name, windowName, timingData); err != nil {
+	if err := b.storeTimingData(ctx, network.Name, windowName, timingData); err != nil {
 		return fmt.Errorf("failed to store timing data: %w", err)
 	}
 
@@ -264,13 +264,17 @@ func (b *BeaconChainTimings) GetTimingData(ctx context.Context, network string, 
 }
 
 // storeTimingData stores timing data
-func (b *BeaconChainTimings) storeTimingData(network, window string, data *pb.TimingData) error { // Use pb.TimingData
+func (b *BeaconChainTimings) storeTimingData(ctx context.Context, network, window string, data *pb.TimingData) error { // Use pb.TimingData
 	// Create path for the data file
 	// Ensure GetStoragePath is defined elsewhere or implement it here
 	dataPath := GetStoragePath(filepath.Join(b.baseDir, "block_timings", network, window))
 
 	// Store the data file
-	if _, err := b.storageClient.StoreEncoded(dataPath, data, storage.CodecNameJSON); err != nil {
+	if err := b.storageClient.Store(ctx, storage.StoreParams{
+		Key:    dataPath,
+		Data:   data,
+		Format: storage.CodecNameJSON,
+	}); err != nil {
 		return fmt.Errorf("failed to store data file: %w", err)
 	}
 

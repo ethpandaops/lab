@@ -197,7 +197,7 @@ func (b *BeaconChainTimings) processLoop() {
 
 	// Initial processing run immediately if leader
 	if b.leaderClient.IsLeader() {
-		b.process()
+		b.process(b.processCtx)
 	}
 
 	for {
@@ -207,7 +207,7 @@ func (b *BeaconChainTimings) processLoop() {
 			return
 		case <-ticker.C:
 			if b.leaderClient.IsLeader() {
-				b.process()
+				b.process(b.processCtx)
 			} else {
 				b.log.Debug("Not leader, skipping processing cycle")
 			}
@@ -219,7 +219,7 @@ func (b *BeaconChainTimings) Name() string {
 	return BeaconChainTimingsServiceName
 }
 
-func (b *BeaconChainTimings) process() {
+func (b *BeaconChainTimings) process(ctx context.Context) {
 	// Create a new state with initialized data structures to ensure sane defaults
 	state := &State{
 		BlockTimings: DataTypeState{
@@ -241,7 +241,7 @@ func (b *BeaconChainTimings) process() {
 	}
 
 	// Try to load existing state
-	err := b.storageClient.GetEncoded(GetStoragePath(GetStateKey()), state, storage.CodecNameJSON)
+	err := b.storageClient.GetEncoded(ctx, GetStoragePath(GetStateKey()), state, storage.CodecNameJSON)
 	if err != nil {
 		if err != storage.ErrNotFound && !strings.Contains(err.Error(), "not found") {
 			b.log.WithError(err).Error("Failed to get state, using initialized default state")
@@ -331,8 +331,12 @@ func (b *BeaconChainTimings) process() {
 
 	if needStorageUpdate {
 		// Save the updated state
-		_, err := b.storageClient.StoreEncoded(GetStoragePath(GetStateKey()), state, storage.CodecNameJSON)
-		if err != nil {
+		if err := b.storageClient.Store(ctx, storage.StoreParams{
+			Key:         GetStoragePath(GetStateKey()),
+			Data:        state,
+			Format:      storage.CodecNameJSON,
+			Compression: storage.Gzip,
+		}); err != nil {
 			b.log.WithError(err).Error("failed to store state")
 			// Don't return, as we've already done processing work
 		} else {

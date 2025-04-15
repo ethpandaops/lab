@@ -246,12 +246,12 @@ func (b *BeaconSlots) getStoragePath(key string) string {
 }
 
 // loadState loads the state for a given network.
-func (b *BeaconSlots) loadState(network string) (*State, error) {
+func (b *BeaconSlots) loadState(ctx context.Context, network string) (*State, error) {
 	state := &State{
 		Processors: make(map[string]ProcessorState),
 	}
 	key := GetStateKey(network)
-	data, err := b.storageClient.Get(b.getStoragePath(key))
+	data, err := b.storageClient.Get(ctx, b.getStoragePath(key))
 	if err != nil {
 		if err == storage.ErrNotFound {
 			b.log.WithField("network", network).Info("No previous state found, starting fresh.")
@@ -268,7 +268,7 @@ func (b *BeaconSlots) loadState(network string) (*State, error) {
 }
 
 // saveState saves the state for a given network.
-func (b *BeaconSlots) saveState(network string, state *State) error {
+func (b *BeaconSlots) saveState(ctx context.Context, network string, state *State) error {
 	key := GetStateKey(network)
 
 	jsonData, err := ToJSON(state)
@@ -276,7 +276,10 @@ func (b *BeaconSlots) saveState(network string, state *State) error {
 		return fmt.Errorf("failed to marshal state for network %s: %w", network, err)
 	}
 
-	err = b.storageClient.Store(b.getStoragePath(key), []byte(jsonData))
+	err = b.storageClient.Store(ctx, storage.StoreParams{
+		Key:  b.getStoragePath(key),
+		Data: []byte(jsonData),
+	})
 	if err != nil {
 		return fmt.Errorf("failed to store state for network %s: %w", network, err)
 	}
@@ -306,7 +309,7 @@ func (b *BeaconSlots) processHead(ctx context.Context, networkName string) {
 	b.log.WithField("network", networkName).Debug("Processing head slot")
 
 	// Get state
-	state, err := b.loadState(networkName)
+	state, err := b.loadState(ctx, networkName)
 	if err != nil {
 		b.log.WithField("network", networkName).WithError(err).Error("Failed to load state")
 		return
@@ -363,7 +366,7 @@ func (b *BeaconSlots) processHead(ctx context.Context, networkName string) {
 
 		// Update state
 		state.UpdateProcessorState(ForwardProcessorName, processorState)
-		if err := b.saveState(networkName, state); err != nil {
+		if err := b.saveState(ctx, networkName, state); err != nil {
 			b.log.WithField("network", networkName).WithError(err).Error("Failed to save state")
 		}
 	}
@@ -374,7 +377,7 @@ func (b *BeaconSlots) processBacklog(ctx context.Context, networkName string) {
 	b.log.WithField("network", networkName).Debug("Processing backlog slots")
 
 	// Get state
-	state, err := b.loadState(networkName)
+	state, err := b.loadState(ctx, networkName)
 	if err != nil {
 		b.log.WithField("network", networkName).WithError(err).Error("Failed to load state")
 		return
@@ -448,7 +451,7 @@ func (b *BeaconSlots) processBacklog(ctx context.Context, networkName string) {
 
 		// Update state
 		state.UpdateProcessorState(BackwardProcessorName, processorState)
-		if err := b.saveState(networkName, state); err != nil {
+		if err := b.saveState(ctx, networkName, state); err != nil {
 			b.log.WithField("network", networkName).WithError(err).Error("Failed to save state")
 		}
 	}
@@ -459,7 +462,7 @@ func (b *BeaconSlots) processMissing(ctx context.Context, networkName string) {
 	b.log.WithField("network", networkName).Debug("Processing missing slots")
 
 	// Get state
-	state, err := b.loadState(networkName)
+	state, err := b.loadState(ctx, networkName)
 	if err != nil {
 		b.log.WithField("network", networkName).WithError(err).Error("Failed to load state")
 		return
@@ -547,7 +550,7 @@ func (b *BeaconSlots) processMissing(ctx context.Context, networkName string) {
 
 	// Update state
 	state.UpdateProcessorState(MissingProcessorName, processorState)
-	if err := b.saveState(networkName, state); err != nil {
+	if err := b.saveState(ctx, networkName, state); err != nil {
 		b.log.WithField("network", networkName).WithError(err).Error("Failed to save state")
 	}
 }
@@ -688,7 +691,10 @@ func (b *BeaconSlots) processSlot(ctx context.Context, networkName string, slot 
 		return false, fmt.Errorf("failed to marshal optimized data: %w", err)
 	}
 
-	err = b.storageClient.Store(b.getStoragePath(storageKey), []byte(jsonData))
+	err = b.storageClient.Store(ctx, storage.StoreParams{
+		Key:  b.getStoragePath(storageKey),
+		Data: []byte(jsonData),
+	})
 	if err != nil {
 		return false, fmt.Errorf("failed to store slot data: %w", err)
 	}
@@ -1452,7 +1458,7 @@ func (b *BeaconSlots) processMiddleWindow(ctx context.Context, networkName strin
 	b.log.WithField("network", networkName).Info("Processing middle window")
 
 	// Get state
-	state, err := b.loadState(networkName)
+	state, err := b.loadState(ctx, networkName)
 	if err != nil {
 		b.log.WithField("network", networkName).WithError(err).Error("Failed to load state for middle window")
 		return
@@ -1532,7 +1538,7 @@ func (b *BeaconSlots) processMiddleWindow(ctx context.Context, networkName strin
 
 	// Update state
 	state.UpdateProcessorState(MiddleProcessorName, processorState)
-	if err := b.saveState(networkName, state); err != nil {
+	if err := b.saveState(ctx, networkName, state); err != nil {
 		b.log.WithField("network", networkName).WithError(err).Error("Failed to save state after middle window processing")
 	}
 }

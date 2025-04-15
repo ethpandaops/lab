@@ -74,13 +74,18 @@ func (c *Compressor) Compress(data []byte, algorithm *CompressionAlgorithm) ([]b
 
 // Decompress decompresses the input data using algorithm determined from filename
 func (c *Compressor) Decompress(data []byte, filename string) ([]byte, error) {
-	var r io.ReadCloser
-	var err error
-
 	algo, err := GetCompressionAlgorithm(filename)
 	if err != nil {
 		return nil, err
 	}
+
+	return c.DecompressWithAlgorithm(data, algo)
+}
+
+// DecompressWithAlgorithm decompresses data using the specified algorithm
+func (c *Compressor) DecompressWithAlgorithm(data []byte, algo *CompressionAlgorithm) ([]byte, error) {
+	var r io.ReadCloser
+	var err error
 
 	switch algo.Name {
 	case Gzip.Name:

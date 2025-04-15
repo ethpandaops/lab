@@ -35,7 +35,7 @@ func (b *BeaconChainTimings) processSizeCDF(ctx context.Context, network *ethere
 	}
 
 	// Store the results
-	if err := b.storeSizeCDFData(network.Name, window.Name, sizeCDFData); err != nil {
+	if err := b.storeSizeCDFData(ctx, network.Name, window.Name, sizeCDFData); err != nil {
 		return fmt.Errorf("failed to store size CDF data: %w", err)
 	}
 
@@ -557,12 +557,17 @@ func (b *BeaconChainTimings) GetSizeCDFData(ctx context.Context, network string,
 }
 
 // storeSizeCDFData stores size CDF data
-func (b *BeaconChainTimings) storeSizeCDFData(network, window string, data *SizeCDFData) error {
+func (b *BeaconChainTimings) storeSizeCDFData(ctx context.Context, network, window string, data *SizeCDFData) error {
 	// Create path for the data file
 	dataPath := filepath.Join(b.baseDir, "size_cdf", network, fmt.Sprintf("%s", window))
 
 	// Store the data file
-	if _, err := b.storageClient.StoreEncoded(GetStoragePath(dataPath), data, storage.CodecNameJSON); err != nil {
+	if err := b.storageClient.Store(ctx, storage.StoreParams{
+		Key:         GetStoragePath(dataPath),
+		Data:        data,
+		Format:      storage.CodecNameJSON,
+		Compression: storage.Gzip,
+	}); err != nil {
 		return fmt.Errorf("failed to store data file: %w", err)
 	}
 

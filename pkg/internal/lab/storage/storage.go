@@ -173,11 +173,7 @@ func (c *client) Start(ctx context.Context) error {
 	if err != nil {
 		c.log.WithError(err).Warnf("Failed to check if bucket %s exists", c.config.Bucket)
 	} else if !exists {
-		c.log.Infof("Bucket %s does not exist, creating it", c.config.Bucket)
-		if err := c.createBucket(ctx, c.config.Bucket); err != nil {
-			return fmt.Errorf("failed to create bucket %s: %w", c.config.Bucket, err)
-		}
-		c.log.Infof("Successfully created bucket %s", c.config.Bucket)
+		return fmt.Errorf("bucket %s does not exist", c.config.Bucket)
 	}
 
 	c.log.Info("S3 storage client started")
@@ -193,38 +189,6 @@ func (c *client) GetClient() *s3.Client {
 // GetBucket returns the bucket name
 func (c *client) GetBucket() string {
 	return c.config.Bucket
-}
-
-// getContentType determines the content type based on file extension or codec
-func (c *client) getContentType(key string, format CodecName) (string, error) {
-	// If format is provided, use the codec's content type
-	if format != "" {
-		if codec, err := c.encoders.Get(format); err == nil {
-			return codec.GetContentType(), nil
-		} else {
-			return "", fmt.Errorf("unknown encoding format: %s", format)
-		}
-	}
-
-	// Format not provided, try to determine from file extension
-	if strings.HasSuffix(key, ".json") {
-		return "application/json", nil
-	} else if strings.HasSuffix(key, ".yaml") || strings.HasSuffix(key, ".yml") {
-		return "application/yaml", nil
-	} else if strings.HasSuffix(key, ".txt") {
-		return "text/plain", nil
-	} else if strings.HasSuffix(key, ".html") || strings.HasSuffix(key, ".htm") {
-		return "text/html", nil
-	} else if strings.HasSuffix(key, ".css") {
-		return "text/css", nil
-	} else if strings.HasSuffix(key, ".js") {
-		return "application/javascript", nil
-	} else if strings.HasSuffix(key, ".csv") {
-		return "text/csv", nil
-	}
-
-	// Default to binary format if unknown
-	return "application/octet-stream", nil
 }
 
 // Store stores data based on the provided parameters.
@@ -279,21 +243,20 @@ func (c *client) Store(ctx context.Context, params StoreParams) error {
 		}
 		dataBytes = compressed
 
-		// Add compression extension
-		finalKey = AddExtension(finalKey, params.Compression)
-
 		// Add Content-Encoding to metadata
 		if params.Metadata == nil {
 			params.Metadata = make(map[string]string)
 		}
-		params.Metadata["Content-Encoding"] = params.Compression.ContentEncoding
+		params.Metadata["content-encoding"] = params.Compression.ContentEncoding
 	}
 
 	// 3. Determine Content Type
-	contentType, err := c.getContentType(finalKey, params.Format)
+	codec, err := c.encoders.Get(params.Format)
 	if err != nil {
-		return fmt.Errorf("failed to get content type: %w", err)
+		return fmt.Errorf("failed to get codec '%s': %w", params.Format, err)
 	}
+
+	contentType := codec.GetContentType()
 
 	// 4. Handle Atomicity
 	if params.Atomic {
@@ -352,25 +315,25 @@ func (c *client) Get(ctx context.Context, key string) ([]byte, error) {
 	}
 
 	// Check for Content-Encoding header to handle compression
-	if contentEncoding, ok := result.Metadata["content-encoding"]; ok && contentEncoding != "" {
+	contentEncoding := ""
+	// Check for content-encoding with case-insensitivity
+	for k, v := range result.Metadata {
+		if strings.EqualFold(k, "content-encoding") && v != "" {
+			contentEncoding = v
+			break
+		}
+	}
+
+	if contentEncoding != "" {
 		// Try to decompress
 		algo, err := GetCompressionAlgorithmFromContentEncoding(contentEncoding)
 		if err == nil && algo != None {
-			decompressed, err := c.compressor.Decompress(data, key)
+			decompressed, err := c.compressor.DecompressWithAlgorithm(data, algo)
 			if err != nil {
 				return nil, fmt.Errorf("failed to decompress data: %w", err)
 			}
 			return decompressed, nil
 		}
-	}
-
-	// Also check filename for compression extension
-	if HasAnyCompressionExtension(key) {
-		decompressed, err := c.compressor.Decompress(data, key)
-		if err != nil {
-			return nil, fmt.Errorf("failed to decompress data: %w", err)
-		}
-		return decompressed, nil
 	}
 
 	return data, nil
@@ -515,15 +478,4 @@ func (c *client) bucketExists(ctx context.Context, bucketName string) (bool, err
 		return false, fmt.Errorf("failed to check if bucket exists: %w", err)
 	}
 	return true, nil
-}
-
-// createBucket creates a new bucket
-func (c *client) createBucket(ctx context.Context, bucketName string) error {
-	_, err := c.client.CreateBucket(ctx, &s3.CreateBucketInput{
-		Bucket: aws.String(bucketName),
-	})
-	if err != nil {
-		return fmt.Errorf("failed to create bucket: %w", err)
-	}
-	return nil
 }

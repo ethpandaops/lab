@@ -193,7 +193,7 @@ func (b *XatuPublicContributors) getStoragePath(key string) string {
 }
 
 // loadState loads the state for a given network.
-func (b *XatuPublicContributors) loadState(network string) (*State, error) {
+func (b *XatuPublicContributors) loadState(ctx context.Context, network string) (*State, error) {
 	// Create a new state with initialized processors to ensure sane defaults
 	state := &State{
 		Processors: make(map[string]ProcessorState),
@@ -207,7 +207,7 @@ func (b *XatuPublicContributors) loadState(network string) (*State, error) {
 
 	// Try to load existing state
 	key := GetStateKey(network)
-	err := b.storageClient.GetEncoded(b.getStoragePath(key), state, storage.CodecNameJSON)
+	err := b.storageClient.GetEncoded(ctx, b.getStoragePath(key), state, storage.CodecNameJSON)
 	if err != nil {
 		// Check for any kind of "not found" error, not just the specific storage.ErrNotFound
 		if err == storage.ErrNotFound || strings.Contains(err.Error(), "not found") {
@@ -237,10 +237,14 @@ func (b *XatuPublicContributors) loadState(network string) (*State, error) {
 }
 
 // saveState saves the state for a given network.
-func (b *XatuPublicContributors) saveState(network string, state *State) error {
+func (b *XatuPublicContributors) saveState(ctx context.Context, network string, state *State) error {
 	key := GetStateKey(network)
-	_, err := b.storageClient.StoreEncoded(b.getStoragePath(key), state, storage.CodecNameJSON)
-	if err != nil {
+	if err := b.storageClient.Store(ctx, storage.StoreParams{
+		Key:         b.getStoragePath(key),
+		Data:        state,
+		Format:      storage.CodecNameJSON,
+		Compression: storage.Gzip,
+	}); err != nil {
 		return fmt.Errorf("failed to store state for network %s: %w", network, err)
 	}
 	return nil
@@ -294,7 +298,7 @@ func (b *XatuPublicContributors) process(ctx context.Context) {
 		log.Info("Processing network")
 
 		// Load state for the network
-		state, err := b.loadState(networkName)
+		state, err := b.loadState(ctx, networkName)
 		if err != nil {
 			// This shouldn't happen for normal "not found" cases - loadState returns a default state for those
 			// This indicates a more serious error like connectivity issues with storage
@@ -395,7 +399,7 @@ func (b *XatuPublicContributors) process(ctx context.Context) {
 
 		// Save state if changed
 		if networkNeedsSave {
-			if err := b.saveState(networkName, state); err != nil {
+			if err := b.saveState(ctx, networkName, state); err != nil {
 				log.WithError(err).Error("Failed to save state")
 			} else {
 				log.Debug("Successfully saved state")
@@ -405,7 +409,7 @@ func (b *XatuPublicContributors) process(ctx context.Context) {
 
 	// --- Process Global Summaries (Summary, UserSummaries) ---
 	globalStateKey := "global"
-	globalState, err := b.loadState(globalStateKey)
+	globalState, err := b.loadState(ctx, globalStateKey)
 	if err != nil {
 		// This shouldn't happen for normal "not found" cases - loadState returns a default state for those
 		// This indicates a more serious error like connectivity issues with storage
@@ -461,7 +465,7 @@ func (b *XatuPublicContributors) process(ctx context.Context) {
 
 		// Save global state if changed
 		if globalNeedsSave {
-			if err := b.saveState(globalStateKey, globalState); err != nil {
+			if err := b.saveState(ctx, globalStateKey, globalState); err != nil {
 				b.log.WithError(err).Error("Failed to save global state")
 				// Continue with processing, don't return
 			} else {
@@ -472,8 +476,6 @@ func (b *XatuPublicContributors) process(ctx context.Context) {
 
 	b.log.WithField("duration", time.Since(startTime)).Info("Finished processing cycle")
 }
-
-// --- Processing Logic (Moved from Activities) ---
 
 // processSummary generates the global summary file.
 func (b *XatuPublicContributors) processSummary(ctx context.Context, networks []string) error {
@@ -622,8 +624,12 @@ func (b *XatuPublicContributors) processSummary(ctx context.Context, networks []
 	// Store the global summary
 	// Use getStoragePath to ensure it's within the service's base directory
 	key := "summary"
-	_, err := b.storageClient.StoreEncoded(b.getStoragePath(key), summary, storage.CodecNameJSON)
-	if err != nil {
+	if err := b.storageClient.Store(ctx, storage.StoreParams{
+		Key:         b.getStoragePath(key),
+		Data:        summary,
+		Format:      storage.CodecNameJSON,
+		Compression: storage.Gzip,
+	}); err != nil {
 		return fmt.Errorf("failed to store global summary data: %w", err)
 	}
 
@@ -713,9 +719,13 @@ func (b *XatuPublicContributors) processCountriesWindow(ctx context.Context, net
 	})
 
 	// Store data using the path structure: countries/<network>/<window>
-	key := filepath.Join("countries", networkName, window.File+"")
-	_, err = b.storageClient.StoreEncoded(b.getStoragePath(key), timePointsList, storage.CodecNameJSON)
-	if err != nil {
+	key := filepath.Join("countries", networkName, window.File)
+	if err := b.storageClient.Store(ctx, storage.StoreParams{
+		Key:         b.getStoragePath(key),
+		Data:        timePointsList,
+		Format:      storage.CodecNameJSON,
+		Compression: storage.Gzip,
+	}); err != nil {
 		return fmt.Errorf("failed to store countries data for window %s: %w", window.File, err)
 	}
 
@@ -826,10 +836,13 @@ func (b *XatuPublicContributors) processUsersWindow(ctx context.Context, network
 		return timePointsList[i].Time < timePointsList[j].Time
 	})
 
-	// Store data using the same path structure as Python
-	key := filepath.Join("users", networkName, window.File+"")
-	_, err = b.storageClient.StoreEncoded(b.getStoragePath(key), timePointsList, storage.CodecNameJSON)
-	if err != nil {
+	key := filepath.Join("users", networkName, window.File)
+	if err := b.storageClient.Store(ctx, storage.StoreParams{
+		Key:         b.getStoragePath(key),
+		Data:        timePointsList,
+		Format:      storage.CodecNameJSON,
+		Compression: storage.Gzip,
+	}); err != nil {
 		return fmt.Errorf("failed to store users data for window %s: %w", window.File, err)
 	}
 
@@ -929,7 +942,7 @@ func (b *XatuPublicContributors) processUserSummaries(ctx context.Context, netwo
 		country, _ := row["country"].(string)
 		city, _ := row["city"].(string)
 		continent, _ := row["continent"].(string)
-		latestSlot, okSlot := row["latest_slot"].(uint64) // Slots are uint64
+		latestSlot, okSlot := row["latest_slot"].(uint32)
 		latestSlotTime, okTime := row["latest_slot_start_date_time"].(time.Time)
 		clientImpl, _ := row["client_implementation"].(string)
 		clientVersion, _ := row["client_version"].(string)
@@ -966,7 +979,7 @@ func (b *XatuPublicContributors) processUserSummaries(ctx context.Context, netwo
 			Country:                 country,
 			City:                    city,
 			Continent:               continent,
-			LatestSlot:              int64(latestSlot), // Convert uint64 to int64 for proto
+			LatestSlot:              int64(latestSlot),
 			LatestSlotStartDateTime: latestSlotTime.Unix(),
 			ClientImplementation:    clientImpl,
 			ClientVersion:           clientVersion,
@@ -986,8 +999,12 @@ func (b *XatuPublicContributors) processUserSummaries(ctx context.Context, netwo
 		userKey := filepath.Join(storageBaseDir, "users", username)
 		// Use StoreEncoded directly, assuming storage client handles base pathing if needed, or adjust key.
 		// Using getStoragePath might prepend the service name, which we don't want here.
-		_, err := b.storageClient.StoreEncoded(userKey, userSummaryData, storage.CodecNameJSON)
-		if err != nil {
+		if err := b.storageClient.Store(ctx, storage.StoreParams{
+			Key:         userKey,
+			Data:        userSummaryData,
+			Format:      storage.CodecNameJSON,
+			Compression: storage.Gzip,
+		}); err != nil {
 			log.WithError(err).Errorf("Failed to store user summary for user %s", username)
 			// Continue processing other users
 		}
@@ -1004,9 +1021,12 @@ func (b *XatuPublicContributors) processUserSummaries(ctx context.Context, netwo
 	// Store global summary file
 	summaryKey := filepath.Join(storageBaseDir, "summary")
 
-	var err error
-	_, err = b.storageClient.StoreEncoded(summaryKey, globalSummary, storage.CodecNameJSON)
-	if err != nil {
+	if err := b.storageClient.Store(ctx, storage.StoreParams{
+		Key:         summaryKey,
+		Data:        globalSummary,
+		Format:      storage.CodecNameJSON,
+		Compression: storage.Gzip,
+	}); err != nil {
 		return fmt.Errorf("failed to store global user summary: %w", err)
 	}
 
@@ -1022,7 +1042,7 @@ func (b *XatuPublicContributors) ReadSummaryData(ctx context.Context) (*GlobalSu
 	summary := &GlobalSummary{}
 
 	log.WithField("path", storagePath).Debug("Attempting to read global summary data")
-	err := b.storageClient.GetEncoded(storagePath, summary, storage.CodecNameJSON)
+	err := b.storageClient.GetEncoded(ctx, storagePath, summary, storage.CodecNameJSON)
 	if err != nil {
 		if err == storage.ErrNotFound {
 			log.Warn("Global summary data not found in storage")
@@ -1048,7 +1068,7 @@ func (b *XatuPublicContributors) ReadCountryDataWindow(ctx context.Context, netw
 	var dataPoints CountryTimeSeriesData // This is []*CountryTimePoint
 
 	log.WithField("path", storagePath).Debug("Attempting to read country data window")
-	err := b.storageClient.GetEncoded(storagePath, &dataPoints, storage.CodecNameJSON)
+	err := b.storageClient.GetEncoded(ctx, storagePath, &dataPoints, storage.CodecNameJSON)
 	if err != nil {
 		if err == storage.ErrNotFound {
 			log.Warn("Country data window not found in storage")
@@ -1075,7 +1095,7 @@ func (b *XatuPublicContributors) ReadUsersDataWindow(ctx context.Context, networ
 	var dataPoints []*pb.UsersTimePoint // Directly use the proto type as stored
 
 	log.WithField("path", storagePath).Debug("Attempting to read users data window")
-	err := b.storageClient.GetEncoded(storagePath, &dataPoints, storage.CodecNameJSON)
+	err := b.storageClient.GetEncoded(ctx, storagePath, &dataPoints, storage.CodecNameJSON)
 	if err != nil {
 		if err == storage.ErrNotFound {
 			log.Warn("Users data window not found in storage")
@@ -1103,7 +1123,7 @@ func (b *XatuPublicContributors) ReadUserSummary(ctx context.Context, username s
 	userSummary := &pb.UserSummary{} // Directly use the proto type as stored
 
 	log.WithField("path", storagePath).Debug("Attempting to read user summary")
-	err := b.storageClient.GetEncoded(storagePath, userSummary, storage.CodecNameJSON)
+	err := b.storageClient.GetEncoded(ctx, storagePath, userSummary, storage.CodecNameJSON)
 	if err != nil {
 		if err == storage.ErrNotFound {
 			log.Warn("User summary not found in storage")

@@ -57,7 +57,7 @@ func (s *LabAPIServerImpl) GetFrontendConfig(ctx context.Context, _ *emptypb.Emp
 
 func (s *LabAPIServerImpl) GetBeaconSlotData(ctx context.Context, req *apipb.GetBeaconSlotDataRequest) (*apipb.BeaconSlotDataResponse, error) {
 	key := "slots/" + req.Network + "/" + strconv.FormatUint(req.Slot, 10) + ".json"
-	content, err := s.storage.Get(key)
+	content, err := s.storage.Get(ctx, key)
 	if err != nil {
 		return nil, err
 	}
@@ -70,7 +70,7 @@ func (s *LabAPIServerImpl) GetBeaconSlotData(ctx context.Context, req *apipb.Get
 
 func (s *LabAPIServerImpl) GetBeaconSlotRange(ctx context.Context, req *apipb.GetBeaconSlotRangeRequest) (*apipb.BeaconSlotRangeResponse, error) {
 	key := "slots/" + req.Network + "/range.json"
-	_, err := s.storage.Get(key)
+	_, err := s.storage.Get(ctx, key)
 	if err != nil {
 		return nil, err
 	}
@@ -83,7 +83,7 @@ func (s *LabAPIServerImpl) GetBeaconSlotRange(ctx context.Context, req *apipb.Ge
 
 func (s *LabAPIServerImpl) GetBeaconNodes(ctx context.Context, req *apipb.GetBeaconNodesRequest) (*apipb.BeaconNodesResponse, error) {
 	key := "nodes/" + req.Network + ".json"
-	_, err := s.storage.Get(key)
+	_, err := s.storage.Get(ctx, key)
 	if err != nil {
 		return nil, err
 	}
@@ -96,7 +96,7 @@ func (s *LabAPIServerImpl) GetBeaconNodes(ctx context.Context, req *apipb.GetBea
 
 func (s *LabAPIServerImpl) GetTimingData(ctx context.Context, req *apipb.GetTimingDataRequest) (*apipb.TimingDataResponse, error) {
 	key := "block_timings/" + req.Network + "/" + req.WindowName + ".json"
-	_, err := s.storage.Get(key)
+	_, err := s.storage.Get(ctx, key)
 	if err != nil {
 		return nil, err
 	}
@@ -109,7 +109,7 @@ func (s *LabAPIServerImpl) GetTimingData(ctx context.Context, req *apipb.GetTimi
 
 func (s *LabAPIServerImpl) GetSizeCDFData(ctx context.Context, req *apipb.GetSizeCDFDataRequest) (*apipb.SizeCDFDataResponse, error) {
 	key := "size_cdf/" + req.Network + "/" + strconv.FormatUint(req.Start, 10) + "_" + strconv.FormatUint(req.End, 10) + ".json"
-	_, err := s.storage.Get(key)
+	_, err := s.storage.Get(ctx, key)
 	if err != nil {
 		return nil, err
 	}
@@ -122,7 +122,7 @@ func (s *LabAPIServerImpl) GetSizeCDFData(ctx context.Context, req *apipb.GetSiz
 
 func (s *LabAPIServerImpl) GetBeaconStateFile(ctx context.Context, req *apipb.GetBeaconStateFileRequest) (*apipb.DataFileChunk, error) {
 	key := "state/modules/" + req.Network + ".json"
-	content, err := s.storage.Get(key)
+	content, err := s.storage.Get(ctx, key)
 	if err != nil {
 		return nil, err
 	}
@@ -135,7 +135,7 @@ func (s *LabAPIServerImpl) GetBeaconStateFile(ctx context.Context, req *apipb.Ge
 
 func (s *LabAPIServerImpl) GetBeaconSlotFile(ctx context.Context, req *apipb.GetBeaconSlotFileRequest) (*apipb.DataFileChunk, error) {
 	key := "slots/" + req.Network + "/" + strconv.FormatUint(req.Slot, 10) + ".json"
-	content, err := s.storage.Get(key)
+	content, err := s.storage.Get(ctx, key)
 	if err != nil {
 		return nil, err
 	}
