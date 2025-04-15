@@ -3,8 +3,6 @@ package beacon_slots
 import (
 	"fmt"
 	"time"
-
-	pb "github.com/ethpandaops/lab/pkg/server/proto/beacon_slots"
 )
 
 // Config represents the configuration for the beacon_slots module
@@ -42,50 +40,4 @@ func (c *Config) Validate() error {
 // GetInterval returns the interval for processing
 func (c *Config) GetInterval() time.Duration {
 	return 15 * time.Minute // default interval
-}
-
-// ToProtoConfig converts the internal config to proto config
-func (c *Config) ToProtoConfig() *pb.Config {
-	return &pb.Config{
-		Enabled:  c.Enabled,
-		Networks: c.Networks,
-		Backfill: &pb.BackfillConfig{
-			Enabled:                 c.Backfill.Enabled,
-			SlotsAgo:                c.Backfill.SlotsAgo,
-			MiddleProcessorEnable:   c.Backfill.MiddleProcessorEnable,
-			MiddleProcessorDuration: c.Backfill.MiddleProcessorDuration.String(), // Store duration as string in proto
-		},
-	}
-}
-
-// FromProtoConfig creates an internal config from a proto config
-func FromProtoConfig(pbConfig *pb.Config) *Config {
-	return &Config{
-		Enabled:  pbConfig.Enabled,
-		Networks: pbConfig.Networks,
-		Backfill: BackfillConfig{
-			Enabled:               pbConfig.Backfill.Enabled,
-			SlotsAgo:              pbConfig.Backfill.SlotsAgo,
-			MiddleProcessorEnable: pbConfig.Backfill.MiddleProcessorEnable,
-			// Parse duration from string, handle potential error
-			MiddleProcessorDuration: parseDurationDef(pbConfig.Backfill.MiddleProcessorDuration, 1*time.Hour),
-		},
-	}
-}
-
-// Note: ToProtoConfig and FromProtoConfig will be implemented after
-// the proto package is generated correctly
-
-// parseDurationDef parses a duration string with a default value
-func parseDurationDef(durationStr string, defaultVal time.Duration) time.Duration {
-	if durationStr == "" {
-		return defaultVal
-	}
-	d, err := time.ParseDuration(durationStr)
-	if err != nil {
-		// Log error or handle appropriately, return default for now
-		fmt.Printf("Error parsing duration '%s': %v. Using default: %v\n", durationStr, err, defaultVal)
-		return defaultVal
-	}
-	return d
 }

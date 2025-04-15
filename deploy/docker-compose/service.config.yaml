@@ -1,4 +1,5 @@
 # Server (SRV) service configuration
+logLevel: "debug"
 
 # GRPC server configuration
 grpc:
@@ -15,15 +16,16 @@ storage:
   secure: false
   usePathStyle: true
 
-
-# Networks configuration
-networks:
-  mainnet:
-    configURL: ""
-    genesis: "2020-12-01T12:00:23Z"
-    xatu:
-      dsn: "${XATU_CLICKHOUSE_URL}"
-      protocol: "native"
+# Ethereum configuration
+ethereum:
+  networks:
+    mainnet:
+      name: "mainnet"
+      configURL: ""
+      genesis: "2020-12-01T12:00:23Z"
+      xatu:
+        dsn: "${XATU_CLICKHOUSE_URL}"
+        protocol: "native"
 
 # Cache configuration
 cache:
@@ -37,23 +39,28 @@ modules:
   beacon_chain_timings:
     beacon_chain_timings:
       enabled: true
-      interval: "2m"
+      networks: ["mainnet"]
+      interval: "1m"
       time_windows:
-        - file: "1h.json"
+        - file: "last_1_hour.json"
           step: "5m"
           label: "Last hour"
           range: "-1h"
-        - file: "24h.json"
+        - file: "last_1_day.json"
           step: "30m"
           label: "Last 24 hours"
           range: "-24h"
-        - file: "7d.json"
+        - file: "last_7_days.json"
           step: "6h"
           label: "Last 7 days"
           range: "-168h"
+        - file: "last_30_days.json"
+          step: "24h"
+          label: "Last 30 days"
+          range: "-720h"
   xatu_public_contributors:
     xatu_public_contributors:
-      enabled: true
+      enabled: false
       networks: ["mainnet"]
       redis_key_prefix: "lab_xatu_public_contributors"
       interval: "2m"

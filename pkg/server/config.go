@@ -1,7 +1,7 @@
 package srv
 
 import (
-	"time"
+	"fmt"
 
 	"github.com/ethpandaops/lab/pkg/internal/lab/cache"
 	"github.com/ethpandaops/lab/pkg/internal/lab/clickhouse"
@@ -14,11 +14,12 @@ import (
 
 // Config contains the configuration for the srv service
 type Config struct {
-	Server   *grpc.Config              `yaml:"grpc"`
-	Networks map[string]*NetworkConfig `yaml:"networks"` // Per-network configurations
-	Storage  *storage.Config           `yaml:"storage"`
-	Modules  map[string]*ModuleConfig  `yaml:"modules"` // Per-module configurations
-	Cache    *cache.Config             `yaml:"cache"`
+	LogLevel string                   `yaml:"logLevel" default:"info"`
+	Server   *grpc.Config             `yaml:"grpc"`
+	Ethereum *ethereum.Config         `yaml:"ethereum"`
+	Storage  *storage.Config          `yaml:"storage"`
+	Modules  map[string]*ModuleConfig `yaml:"modules"` // Per-module configurations
+	Cache    *cache.Config            `yaml:"cache"`
 }
 
 // ModuleConfig contains the configuration for a specific module
@@ -32,45 +33,21 @@ type BeaconChainTimingsConfig struct {
 	Enabled bool `yaml:"enabled"`
 }
 
-// EthereumConfig contains the configuration for the Ethereum service
-type EthereumConfig struct {
-	Networks map[string]*NetworkConfig `yaml:"networks"` // Per-network configurations
-}
-
-// NetworkConfig contains the configuration for a specific Ethereum network
-type NetworkConfig struct {
-	NetworkConfig *ethereum.Config
-	Xatu          *clickhouse.Config `yaml:"xatu"`      // Per-network Xatu config
-	ConfigURL     string             `yaml:"configURL"` // URL to the network's config
-	Genesis       time.Time          `yaml:"genesis"`   // Genesis time
-	Validator     ValidatorSet       `yaml:"validator"` // Validator set
-	Forks         EthereumForkConfig `yaml:"forks"`     // Forks
-}
-
-// ValidatorSet contains the configuration for the validator set
-type ValidatorSet struct {
-	// KnownValidatorRanges contains the known validator ranges for the network
-	// This is usually the genesis validator set for testnets.
-	KnownValidatorRanges map[string]string `yaml:"knownValidatorRanges"`
-}
-
-// EthereumForkConfig contains the configuration for the Ethereum fork
-type EthereumForkConfig struct {
-	Consensus map[string]ConsensusLayerForkConfig `yaml:"consensus"`
-}
-
-// ConsensusLayerForkConfig contains the configuration for a consensus layer fork
-type ConsensusLayerForkConfig struct {
-	MinClientVersions map[string]string `yaml:"min_client_versions"`
-}
-
 func (x *Config) Validate() error {
+	if x.Ethereum == nil {
+		return fmt.Errorf("ethereum config is required")
+	}
+
+	if err := x.Ethereum.Validate(); err != nil {
+		return fmt.Errorf("ethereum config is invalid: %w", err)
+	}
+
 	return nil
 }
 
 func (x *Config) GetXatuConfig() map[string]*clickhouse.Config {
 	xatuConfig := make(map[string]*clickhouse.Config)
-	for networkName, networkConfig := range x.Networks {
+	for networkName, networkConfig := range x.Ethereum.Networks {
 		if networkConfig.Xatu != nil {
 			xatuConfig[networkName] = networkConfig.Xatu
 		}

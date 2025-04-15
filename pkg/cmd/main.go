@@ -89,7 +89,7 @@ func createSrvCommand() *cobra.Command {
 			}
 
 			// Create and start the srv service
-			service, err := srv.New(cfg, logLevel)
+			service, err := srv.New(cfg)
 			if err != nil {
 				return fmt.Errorf("failed to create srv service: %w", err)
 			}

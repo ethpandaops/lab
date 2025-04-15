@@ -1,16 +1,41 @@
 package beacon_chain_timings
 
-import "time"
+import (
+	"time"
 
-type DataTypeState struct {
-	LastProcessed map[string]time.Time `json:"last_processed"`
-}
+	pb "github.com/ethpandaops/lab/pkg/server/proto/beacon_chain_timings"
+	"google.golang.org/protobuf/types/known/timestamppb"
+)
 
-type State struct {
-	BlockTimings DataTypeState `json:"block_timings"`
-	Cdf          DataTypeState `json:"cdf"`
-}
-
+// GetStateKey returns the key used for storing state in storage
 func GetStateKey() string {
 	return "state"
+}
+
+// NewState creates a new State with proper initialization
+func NewState() *pb.State {
+	return &pb.State{
+		BlockTimings: &pb.DataTypeState{
+			LastProcessed: make(map[string]*timestamppb.Timestamp),
+		},
+		Cdf: &pb.DataTypeState{
+			LastProcessed: make(map[string]*timestamppb.Timestamp),
+		},
+	}
+}
+
+// TimestampFromTime converts a time.Time to a proto timestamp
+func TimestampFromTime(t time.Time) *timestamppb.Timestamp {
+	if t.IsZero() {
+		return &timestamppb.Timestamp{}
+	}
+	return timestamppb.New(t)
+}
+
+// TimeFromTimestamp safely converts a proto timestamp to time.Time
+func TimeFromTimestamp(ts *timestamppb.Timestamp) time.Time {
+	if ts == nil || !ts.IsValid() {
+		return time.Time{}
+	}
+	return ts.AsTime()
 }

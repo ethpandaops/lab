@@ -73,8 +73,6 @@ message SizeCDFData {
   map<string, DoubleList> arrival_times_ms = 9;
 }
 
-
-
 // Service definitions
 service BeaconChainTimingsService {
   // Get timing data for a specific network and time window
@@ -104,4 +102,16 @@ message GetSizeCDFDataRequest {
 
 message GetSizeCDFDataResponse {
   repeated SizeCDFData data = 1;
+}
+
+// State tracks processing state for all data types
+message State {
+  DataTypeState block_timings = 1;
+  DataTypeState cdf = 2;
+}
+
+// DataTypeState tracks processing state for a specific data type
+// The key in last_processed is a combined network+window key like "network_name/window_file"
+message DataTypeState {
+  map<string, google.protobuf.Timestamp> last_processed = 1;
 }

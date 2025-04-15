@@ -80,10 +80,11 @@ func New(
 }
 
 func (b *XatuPublicContributors) Start(ctx context.Context) error {
-	if !b.config.Enabled {
+	if b.config != nil && b.config.Enabled != nil && !*b.config.Enabled {
 		b.log.Info("XatuPublicContributors service disabled")
 		return nil
 	}
+
 	b.log.Info("Starting XatuPublicContributors service")
 
 	leader := leader.New(b.log, b.lockerClient, leader.Config{

@@ -4,16 +4,12 @@ import (
 	"errors"
 	"fmt"
 	"time"
-
-	"github.com/hako/durafmt"
-
-	pb "github.com/ethpandaops/lab/pkg/server/proto/xatu_public_contributors"
 )
 
 // Config is the configuration for the xatu_public_contributors service
 type Config struct {
 	// Enable the xatu_public_contributors module
-	Enabled bool `yaml:"enabled" json:"enabled"`
+	Enabled *bool `yaml:"enabled" json:"enabled"`
 	// Redis key prefix
 	RedisKeyPrefix string `yaml:"redis_key_prefix" json:"redis_key_prefix"`
 	// Networks to target
@@ -72,7 +68,7 @@ func (tw *TimeWindow) GetTimeRange(now time.Time) (time.Time, time.Time, error) 
 
 // Validate validates the configuration
 func (c *Config) Validate() error {
-	if !c.Enabled {
+	if c.Enabled != nil && !*c.Enabled {
 		return nil
 	}
 
@@ -107,57 +103,4 @@ func (c *Config) GetInterval() (time.Duration, error) {
 		return 15 * time.Minute, nil
 	}
 	return time.ParseDuration(c.Interval)
-}
-
-// ToProtoConfig converts the internal Config struct to its protobuf representation.
-func (c *Config) ToProtoConfig() (*pb.Config, error) {
-	protoWindows := make([]*pb.TimeWindow, len(c.TimeWindows))
-	for i, w := range c.TimeWindows {
-		protoWindows[i] = &pb.TimeWindow{
-			File:  w.File,
-			Step:  w.Step,
-			Range: w.Range,
-			Label: w.Label,
-		}
-	}
-
-	return &pb.Config{
-		Enabled:        c.Enabled,
-		RedisKeyPrefix: c.RedisKeyPrefix,
-		Networks:       c.Networks,
-		BackfillHours:  c.BackfillHours,
-		TimeWindows:    protoWindows,
-		Interval:       c.Interval,
-	}, nil
-}
-
-// FromProtoConfig converts a protobuf Config message to the internal Config struct.
-func FromProtoConfig(protoCfg *pb.Config) (*Config, error) {
-	if protoCfg == nil {
-		return nil, errors.New("protobuf config is nil")
-	}
-
-	internalWindows := make([]TimeWindow, len(protoCfg.TimeWindows))
-	for i, pw := range protoCfg.TimeWindows {
-		internalWindows[i] = TimeWindow{
-			File:  pw.File,
-			Step:  pw.Step,
-			Range: pw.Range,
-			Label: pw.Label,
-		}
-	}
-
-	return &Config{
-		Enabled:        protoCfg.Enabled,
-		RedisKeyPrefix: protoCfg.RedisKeyPrefix,
-		Networks:       protoCfg.Networks,
-		BackfillHours:  protoCfg.BackfillHours,
-		TimeWindows:    internalWindows,
-		Interval:       protoCfg.Interval,
-	}, nil
-}
-
-// Helper to format duration for logging/display
-func formatDuration(d time.Duration) string {
-	return durafmt.Parse(d).LimitFirstN(2).String()
 }

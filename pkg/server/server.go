@@ -8,7 +8,6 @@ import (
 	"syscall"
 
 	"github.com/ethpandaops/lab/pkg/internal/lab/cache"
-	"github.com/ethpandaops/lab/pkg/internal/lab/ethereum"
 	"github.com/ethpandaops/lab/pkg/internal/lab/locker"
 	"github.com/ethpandaops/lab/pkg/internal/lab/logger"
 	"github.com/ethpandaops/lab/pkg/internal/lab/storage"
@@ -41,11 +40,15 @@ type Service struct {
 }
 
 // New creates a new srv service
-func New(config *Config, logLevel string) (*Service, error) {
+func New(config *Config) (*Service, error) {
 	// Create lab instance
-	log, err := logger.New(logLevel, ServiceName)
+	log, err := logger.New(config.LogLevel, ServiceName)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create logger: %w", err)
+	}
+
+	if err := config.Validate(); err != nil {
+		return nil, fmt.Errorf("config is invalid: %w", err)
 	}
 
 	return &Service{
@@ -133,20 +136,11 @@ func (s *Service) Start(ctx context.Context) error {
 
 func (s *Service) initializeServices(ctx context.Context) error {
 	// Initialize all our services
-	// Extract an *ethereum.Config from the first network (or nil if none)
-	var ethConfig *ethereum.Config
-	for _, netCfg := range s.config.Networks {
-		if netCfg.NetworkConfig != nil {
-			ethConfig = netCfg.NetworkConfig
-			break
-		}
-	}
-
 	bct, err := beacon_chain_timings.New(
 		s.log,
 		s.config.Modules["beacon_chain_timings"].BeaconChainTimings,
 		s.xatuClient,
-		ethConfig,
+		s.config.Ethereum,
 		s.storageClient,
 		s.cacheClient,
 		s.lockerClient,
@@ -158,7 +152,7 @@ func (s *Service) initializeServices(ctx context.Context) error {
 	xpc, err := xatu_public_contributors.New(
 		s.log,
 		s.config.Modules["xatu_public_contributors"].XatuPublicContributors,
-		ethConfig,
+		s.config.Ethereum,
 		s.xatuClient,
 		s.storageClient,
 		s.cacheClient,

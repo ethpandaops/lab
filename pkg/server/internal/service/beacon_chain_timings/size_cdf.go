@@ -18,8 +18,11 @@ import (
 
 func (b *BeaconChainTimings) processSizeCDF(ctx context.Context, network *ethereum.Network, window *pb.TimeWindowConfig) error {
 	b.log.WithFields(logrus.Fields{
-		"network": network.Name,
-		"window":  window.Name,
+		"network":  network.Name,
+		"window":   window.Name,
+		"file":     window.File,
+		"range_ms": window.RangeMs,
+		"step_ms":  window.StepMs,
 	}).Info("Processing size CDF data")
 
 	// Get time range for the window
@@ -28,6 +31,11 @@ func (b *BeaconChainTimings) processSizeCDF(ctx context.Context, network *ethere
 		return fmt.Errorf("failed to get time range: %w", err)
 	}
 
+	b.log.WithFields(logrus.Fields{
+		"time_range_start": timeRange.Start.Format(time.RFC3339),
+		"time_range_end":   timeRange.End.Format(time.RFC3339),
+	}).Info("Time range for window")
+
 	// Process size CDF data
 	sizeCDFData, err := b.GetSizeCDFData(ctx, network.Name, timeRange)
 	if err != nil {
@@ -35,15 +43,21 @@ func (b *BeaconChainTimings) processSizeCDF(ctx context.Context, network *ethere
 	}
 
 	// Store the results
-	if err := b.storeSizeCDFData(ctx, network.Name, window.Name, sizeCDFData); err != nil {
+	if err := b.storeSizeCDFData(ctx, network.Name, window.File, sizeCDFData); err != nil {
 		return fmt.Errorf("failed to store size CDF data: %w", err)
 	}
+
+	b.log.WithFields(logrus.Fields{
+		"network": network.Name,
+		"window":  window.Name,
+		"file":    window.File,
+	}).Info("Successfully processed and stored size CDF data")
 
 	return nil
 }
 
 // processSizeCDFData processes size CDF data for a network and time range
-func (b *BeaconChainTimings) GetSizeCDFData(ctx context.Context, network string, timeRange struct{ Start, End time.Time }) (*SizeCDFData, error) {
+func (b *BeaconChainTimings) GetSizeCDFData(ctx context.Context, network string, timeRange struct{ Start, End time.Time }) (*pb.SizeCDFData, error) {
 	b.log.WithFields(logrus.Fields{
 		"network":    network,
 		"time_range": fmt.Sprintf("%s - %s", timeRange.Start.Format(time.RFC3339), timeRange.End.Format(time.RFC3339)),
@@ -87,16 +101,18 @@ func (b *BeaconChainTimings) GetSizeCDFData(ctx context.Context, network string,
 			slot = int64(v)
 		case int:
 			slot = int64(v)
+		case uint32:
+			slot = int64(v)
 		case float64:
 			slot = int64(v)
 		case string:
 			parsed, err := strconv.ParseInt(v, 10, 64)
 			if err != nil {
-				continue
+				return nil, fmt.Errorf("failed to parse slot: %w", err)
 			}
 			slot = parsed
 		default:
-			continue
+			return nil, fmt.Errorf("invalid slot type: %T", row["slot"])
 		}
 
 		blobBytes := int64(0)
@@ -107,16 +123,18 @@ func (b *BeaconChainTimings) GetSizeCDFData(ctx context.Context, network string,
 			blobBytes = int64(v)
 		case int:
 			blobBytes = int64(v)
+		case uint64:
+			blobBytes = int64(v) // Convert uint64 to int64
 		case float64:
 			blobBytes = int64(v)
 		case string:
 			parsed, err := strconv.ParseInt(v, 10, 64)
 			if err != nil {
-				continue
+				return nil, fmt.Errorf("failed to parse blob bytes: %w", err)
 			}
 			blobBytes = parsed
 		default:
-			continue
+			return nil, fmt.Errorf("invalid blob bytes type: %T", row["total_blob_bytes"])
 		}
 
 		blobData[slot] = blobBytes
@@ -149,16 +167,18 @@ func (b *BeaconChainTimings) GetSizeCDFData(ctx context.Context, network string,
 			slot = int64(v)
 		case int:
 			slot = int64(v)
+		case uint32:
+			slot = int64(v)
 		case float64:
 			slot = int64(v)
 		case string:
 			parsed, err := strconv.ParseInt(v, 10, 64)
 			if err != nil {
-				continue
+				return nil, fmt.Errorf("failed to parse slot: %w", err)
 			}
 			slot = parsed
 		default:
-			continue
+			return nil, fmt.Errorf("invalid slot type: %T", row["slot"])
 		}
 
 		mevSlots[slot] = true
@@ -196,16 +216,18 @@ func (b *BeaconChainTimings) GetSizeCDFData(ctx context.Context, network string,
 			slot = int64(v)
 		case int:
 			slot = int64(v)
+		case uint32:
+			slot = int64(v)
 		case float64:
 			slot = int64(v)
 		case string:
 			parsed, err := strconv.ParseInt(v, 10, 64)
 			if err != nil {
-				continue
+				return nil, fmt.Errorf("failed to parse slot: %w", err)
 			}
 			slot = parsed
 		default:
-			continue
+			return nil, fmt.Errorf("invalid slot type: %T", row["slot"])
 		}
 
 		arrivalTime := float64(0)
@@ -218,16 +240,18 @@ func (b *BeaconChainTimings) GetSizeCDFData(ctx context.Context, network string,
 			arrivalTime = float64(v)
 		case int32:
 			arrivalTime = float64(v)
+		case uint32: // Added for comprehensive fix
+			arrivalTime = float64(v)
 		case int:
 			arrivalTime = float64(v)
 		case string:
 			parsed, err := strconv.ParseFloat(v, 64)
 			if err != nil {
-				continue
+				return nil, fmt.Errorf("failed to parse arrival time: %w", err)
 			}
 			arrivalTime = parsed
 		default:
-			continue
+			return nil, fmt.Errorf("invalid arrival time type: %T", row["arrival_time"])
 		}
 
 		arrivalData[slot] = arrivalTime
@@ -251,6 +275,11 @@ func (b *BeaconChainTimings) GetSizeCDFData(ctx context.Context, network string,
 	if err != nil {
 		return nil, fmt.Errorf("failed to query block size data: %w", err)
 	}
+	count := 0
+	for range sizeRows {
+		count++
+	}
+	b.log.WithField("sizeRows_count", count).Info("Number of rows returned from block size query")
 
 	// 5. Get proposer entities
 	b.log.Debug("Getting proposer entities")
@@ -278,16 +307,20 @@ func (b *BeaconChainTimings) GetSizeCDFData(ctx context.Context, network string,
 			proposerIndex = int64(v)
 		case int:
 			proposerIndex = int64(v)
+		case uint32:
+			proposerIndex = int64(v)
+		case uint64:
+			proposerIndex = int64(v)
 		case float64:
 			proposerIndex = int64(v)
 		case string:
 			parsed, err := strconv.ParseInt(v, 10, 64)
 			if err != nil {
-				continue
+				return nil, fmt.Errorf("failed to parse proposer index: %w", err)
 			}
 			proposerIndex = parsed
 		default:
-			continue
+			return nil, fmt.Errorf("invalid proposer index type: %T", row["proposer_index"])
 		}
 
 		entity := fmt.Sprintf("%v", row["entity"])
@@ -316,16 +349,18 @@ func (b *BeaconChainTimings) GetSizeCDFData(ctx context.Context, network string,
 			slot = int64(v)
 		case int:
 			slot = int64(v)
+		case uint32:
+			slot = int64(v)
 		case float64:
 			slot = int64(v)
 		case string:
 			parsed, err := strconv.ParseInt(v, 10, 64)
 			if err != nil {
-				continue
+				return nil, fmt.Errorf("failed to parse slot: %w", err)
 			}
 			slot = parsed
 		default:
-			continue
+			return nil, fmt.Errorf("invalid slot type: %T", row["slot"])
 		}
 
 		proposerIndex := int64(0)
@@ -336,16 +371,20 @@ func (b *BeaconChainTimings) GetSizeCDFData(ctx context.Context, network string,
 			proposerIndex = int64(v)
 		case int:
 			proposerIndex = int64(v)
+		case uint32:
+			proposerIndex = int64(v)
+		case uint64:
+			proposerIndex = int64(v)
 		case float64:
 			proposerIndex = int64(v)
 		case string:
 			parsed, err := strconv.ParseInt(v, 10, 64)
 			if err != nil {
-				continue
+				return nil, fmt.Errorf("failed to parse proposer index: %w", err)
 			}
 			proposerIndex = parsed
 		default:
-			continue
+			return nil, fmt.Errorf("invalid proposer index type: %T", row["proposer_index"])
 		}
 
 		blockSize := int64(0)
@@ -356,16 +395,20 @@ func (b *BeaconChainTimings) GetSizeCDFData(ctx context.Context, network string,
 			blockSize = int64(v)
 		case int:
 			blockSize = int64(v)
+		case uint32:
+			blockSize = int64(v)
+		case uint64:
+			blockSize = int64(v)
 		case float64:
 			blockSize = int64(v)
 		case string:
 			parsed, err := strconv.ParseInt(v, 10, 64)
 			if err != nil {
-				continue
+				return nil, fmt.Errorf("failed to parse block size: %w", err)
 			}
 			blockSize = parsed
 		default:
-			continue
+			return nil, fmt.Errorf("invalid block size type: %T", row["block_total_bytes_compressed"])
 		}
 
 		// Add blob size and ensure minimum of 1 byte
@@ -535,11 +578,11 @@ func (b *BeaconChainTimings) GetSizeCDFData(ctx context.Context, network string,
 	}
 
 	// Create the final result
-	result := &SizeCDFData{
+	result := &pb.SizeCDFData{
 		Network:   network,
 		Timestamp: timestamppb.New(time.Now().UTC()),
 		SizesKb:   sizesKB,
-		ArrivalTimesMs: map[string]*SizeCDFData_DoubleList{
+		ArrivalTimesMs: map[string]*pb.SizeCDFData_DoubleList{
 			"all":          {Values: allArrivalTimes},
 			"mev":          {Values: mevArrivalTimes},
 			"non_mev":      {Values: nonMevArrivalTimes},
@@ -557,9 +600,9 @@ func (b *BeaconChainTimings) GetSizeCDFData(ctx context.Context, network string,
 }
 
 // storeSizeCDFData stores size CDF data
-func (b *BeaconChainTimings) storeSizeCDFData(ctx context.Context, network, window string, data *SizeCDFData) error {
+func (b *BeaconChainTimings) storeSizeCDFData(ctx context.Context, network, window string, data *pb.SizeCDFData) error {
 	// Create path for the data file
-	dataPath := filepath.Join(b.baseDir, "size_cdf", network, fmt.Sprintf("%s", window))
+	dataPath := filepath.Join("size_cdf", network, window)
 
 	// Store the data file
 	if err := b.storageClient.Store(ctx, storage.StoreParams{

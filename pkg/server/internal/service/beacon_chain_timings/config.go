@@ -6,6 +6,7 @@ import (
 )
 
 type Config struct {
+	Enabled     *bool        `yaml:"enabled" default:"true"`
 	TimeWindows []TimeWindow `yaml:"time_windows"`
 	Interval    string       `yaml:"interval"`
 }

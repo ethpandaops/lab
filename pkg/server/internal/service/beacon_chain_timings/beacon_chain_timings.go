@@ -52,44 +52,6 @@ type TimeWindowConfig struct {
 	RangeMs int64
 }
 
-// Data structures for processing
-type TimingData struct {
-	Network    string
-	Timestamp  *timestamppb.Timestamp
-	Validators map[string]*TimingData_ValidatorCategory
-}
-
-type TimingData_ValidatorCategory struct {
-	Categories map[string]int32
-}
-
-type SizeCDFData struct {
-	Network        string
-	Timestamp      *timestamppb.Timestamp
-	SizesKb        []int64
-	ArrivalTimesMs map[string]*SizeCDFData_DoubleList
-	Mev            map[string]float64
-	NonMev         map[string]float64
-	SoloMev        map[string]float64
-	SoloNonMev     map[string]float64
-	All            map[string]float64
-}
-
-type SizeCDFData_DoubleList struct {
-	Values []float64
-}
-
-type ProcessorState struct {
-	Network       string
-	LastProcessed *timestamppb.Timestamp
-}
-
-// DataProcessorParams holds parameters for data processing
-type DataProcessorParams struct {
-	NetworkName string
-	WindowName  string
-}
-
 func GetStoragePath(key string) string {
 	return fmt.Sprintf("%s/%s", BeaconChainTimingsServiceName, key)
 }
@@ -140,6 +102,11 @@ func New(
 }
 
 func (b *BeaconChainTimings) Start(ctx context.Context) error {
+	if b.config != nil && b.config.Enabled != nil && !*b.config.Enabled {
+		b.log.Info("BeaconChainTimings service is disabled, skipping")
+		return nil
+	}
+
 	b.log.Info("Starting BeaconChainTimings service")
 
 	leader := leader.New(b.log, b.lockerClient, leader.Config{
@@ -221,24 +188,7 @@ func (b *BeaconChainTimings) Name() string {
 
 func (b *BeaconChainTimings) process(ctx context.Context) {
 	// Create a new state with initialized data structures to ensure sane defaults
-	state := &State{
-		BlockTimings: DataTypeState{
-			LastProcessed: make(map[string]time.Time),
-		},
-		Cdf: DataTypeState{
-			LastProcessed: make(map[string]time.Time),
-		},
-	}
-
-	// Pre-initialize state for all networks to ensure they exist
-	if b.ethereumConfig != nil && len(b.ethereumConfig.Networks) > 0 {
-		for _, network := range b.ethereumConfig.Networks {
-			if network != nil {
-				state.BlockTimings.LastProcessed[network.Name] = time.Time{} // Zero time
-				state.Cdf.LastProcessed[network.Name] = time.Time{}          // Zero time
-			}
-		}
-	}
+	state := NewState()
 
 	// Try to load existing state
 	err := b.storageClient.GetEncoded(ctx, GetStoragePath(GetStateKey()), state, storage.CodecNameJSON)
@@ -274,14 +224,6 @@ func (b *BeaconChainTimings) process(ctx context.Context) {
 			continue
 		}
 
-		// Ensure maps are initialized for this network
-		if _, ok := state.BlockTimings.LastProcessed[network.Name]; !ok {
-			state.BlockTimings.LastProcessed[network.Name] = time.Time{}
-		}
-		if _, ok := state.Cdf.LastProcessed[network.Name]; !ok {
-			state.Cdf.LastProcessed[network.Name] = time.Time{}
-		}
-
 		// Check if it's time to process
 		for _, window := range b.config.TimeWindows {
 			// Skip empty window configurations
@@ -290,8 +232,16 @@ func (b *BeaconChainTimings) process(ctx context.Context) {
 				continue
 			}
 
+			// Create a unique state key for this network+window combination
+			stateKey := network.Name + "/" + window.File
+
 			// Process block timings
-			shouldProcess, err := b.shouldProcess(network.Name, window.File, state.BlockTimings.LastProcessed[network.Name])
+			lastProcessedTime := time.Time{}
+			if ts, ok := state.BlockTimings.LastProcessed[stateKey]; ok {
+				lastProcessedTime = TimeFromTimestamp(ts)
+			}
+
+			shouldProcess, err := b.shouldProcess(network.Name, window.File, lastProcessedTime)
 			if err != nil {
 				b.log.WithError(err).Errorf("failed to check if should process block timings for network %s, window %s", network.Name, window.File)
 				continue
@@ -302,13 +252,18 @@ func (b *BeaconChainTimings) process(ctx context.Context) {
 					b.log.WithError(err).Errorf("failed to process block timings for network %s, window %s", network.Name, window.File)
 				} else {
 					// Update state
-					state.BlockTimings.LastProcessed[network.Name] = time.Now().UTC()
+					state.BlockTimings.LastProcessed[stateKey] = timestamppb.Now()
 					needStorageUpdate = true
 				}
 			}
 
 			// Process CDF data
-			shouldProcess, err = b.shouldProcess(network.Name, window.File, state.Cdf.LastProcessed[network.Name])
+			lastProcessedTime = time.Time{}
+			if ts, ok := state.Cdf.LastProcessed[stateKey]; ok {
+				lastProcessedTime = TimeFromTimestamp(ts)
+			}
+
+			shouldProcess, err = b.shouldProcess(network.Name, window.File, lastProcessedTime)
 			if err != nil {
 				b.log.WithError(err).Errorf("failed to check if should process CDF for network %s, window %s", network.Name, window.File)
 				continue
@@ -316,13 +271,15 @@ func (b *BeaconChainTimings) process(ctx context.Context) {
 
 			if shouldProcess {
 				if err := b.processSizeCDF(b.processCtx, network, &pb.TimeWindowConfig{
-					Name: window.File,
-					File: window.File,
+					Name:    window.Label,
+					File:    window.File,
+					RangeMs: window.GetRangeDuration().Milliseconds(),
+					StepMs:  window.GetStepDuration().Milliseconds(),
 				}); err != nil {
 					b.log.WithError(err).Errorf("failed to process size CDF for network %s, window %s", network.Name, window.File)
 				} else {
 					// Update state
-					state.Cdf.LastProcessed[network.Name] = time.Now().UTC()
+					state.Cdf.LastProcessed[stateKey] = timestamppb.Now()
 					needStorageUpdate = true
 				}
 			}

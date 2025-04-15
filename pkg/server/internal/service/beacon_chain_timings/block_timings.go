@@ -5,13 +5,11 @@ import (
 	"fmt"
 	"path/filepath"
 
-	// Removed strconv as it's no longer needed for validator processing
 	"time"
 
-	// Removed unused imports: context, clickhouse-go/v2
 	"github.com/ethpandaops/lab/pkg/internal/lab/ethereum"
 	"github.com/ethpandaops/lab/pkg/internal/lab/storage"
-	pb "github.com/ethpandaops/lab/pkg/server/proto/beacon_chain_timings" // Import generated proto types
+	pb "github.com/ethpandaops/lab/pkg/server/proto/beacon_chain_timings"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
@@ -41,7 +39,7 @@ func (b *BeaconChainTimings) processBlockTimings(ctx context.Context, network *e
 	}
 
 	// Store the results
-	if err := b.storeTimingData(ctx, network.Name, windowName, timingData); err != nil {
+	if err := b.storeTimingData(ctx, network.Name, timeWindow.File, timingData); err != nil {
 		return fmt.Errorf("failed to store timing data: %w", err)
 	}
 
@@ -72,12 +70,16 @@ func (b *BeaconChainTimings) getTimeRange(timeWindow *pb.TimeWindowConfig) (stru
 	result := struct {
 		Start time.Time
 		End   time.Time
-	}{
-		End: time.Now().UTC(),
-	}
+	}{}
 
-	// Calculate the start time
-	result.Start = result.End.Add(-time.Duration(timeWindow.RangeMs) * time.Millisecond)
+	now := time.Now().UTC()
+	if timeWindow.RangeMs >= 0 {
+		result.Start = now
+		result.End = now.Add(time.Duration(timeWindow.RangeMs) * time.Millisecond)
+	} else {
+		result.Start = now.Add(time.Duration(timeWindow.RangeMs) * time.Millisecond)
+		result.End = now
+	}
 
 	return result, nil
 }
@@ -103,7 +105,7 @@ func (b *BeaconChainTimings) GetTimingData(ctx context.Context, network string, 
 	query := `
 		WITH time_slots AS (
 			SELECT
-				toStartOfInterval(slot_start_date_time, INTERVAL {step_seconds:UInt64} second) as time_slot,
+				toStartOfInterval(slot_start_date_time, INTERVAL ? second) as time_slot,
 				meta_network_name,
 				min(propagation_slot_start_diff) as min_arrival,
 				max(propagation_slot_start_diff) as max_arrival,
@@ -114,8 +116,8 @@ func (b *BeaconChainTimings) GetTimingData(ctx context.Context, network string, 
 				count(*) as total_blocks
 			FROM beacon_api_eth_v1_events_block FINAL
 			WHERE
-				slot_start_date_time BETWEEN {start_date:DateTime} AND {end_date:DateTime}
-				AND meta_network_name = {network:String}
+				slot_start_date_time BETWEEN ? AND ?
+				AND meta_network_name = ?
 				AND propagation_slot_start_diff < 6000
 			GROUP BY time_slot, meta_network_name
 		)
@@ -137,28 +139,7 @@ func (b *BeaconChainTimings) GetTimingData(ctx context.Context, network string, 
 		return nil, fmt.Errorf("failed to get ClickHouse client for network: %s", network)
 	}
 
-	// Revert to the client's specific Query method signature, assuming it returns []map[string]interface{}
-	// and handles named parameters in the query string directly.
-	// Remove context and clickhouse.Named parameters.
-	rowsData, err := ch.Query(ctx, query, // Pass query string directly
-		// Pass parameters positionally or rely on client handling named params in string
-		// Let's assume the client handles the {name:Type} syntax in the query string
-		// and doesn't need explicit parameters here if they are embedded.
-		// If positional needed: network, startStr, endStr, stepSeconds
-		// Let's try without explicit params first, matching the named syntax in the query.
-		// Update: The original code passed params positionally, let's stick to that pattern
-		// if the named syntax doesn't work implicitly.
-		// Update 2: The python code used named params. Let's assume the Go client
-		// also supports named params via the map interface if not via clickhouse.Named.
-		// Trying with a map for named parameters. Check client docs if this fails.
-		map[string]interface{}{
-			"step_seconds": stepSeconds,
-			"start_date":   startStr,
-			"end_date":     endStr,
-			"network":      network,
-		},
-	)
-
+	rowsData, err := ch.Query(ctx, query, stepSeconds, startStr, endStr, network)
 	if err != nil {
 		return nil, fmt.Errorf("failed to query block timing data: %w", err)
 	}
@@ -267,7 +248,7 @@ func (b *BeaconChainTimings) GetTimingData(ctx context.Context, network string, 
 func (b *BeaconChainTimings) storeTimingData(ctx context.Context, network, window string, data *pb.TimingData) error { // Use pb.TimingData
 	// Create path for the data file
 	// Ensure GetStoragePath is defined elsewhere or implement it here
-	dataPath := GetStoragePath(filepath.Join(b.baseDir, "block_timings", network, window))
+	dataPath := GetStoragePath(filepath.Join("block_timings", network, window))
 
 	// Store the data file
 	if err := b.storageClient.Store(ctx, storage.StoreParams{
