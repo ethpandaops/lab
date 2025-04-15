@@ -18,7 +18,6 @@ import (
 
 	// Needed for state and config conversion
 	pb "github.com/ethpandaops/lab/pkg/server/proto/xatu_public_contributors"
-	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 const (
@@ -159,7 +158,7 @@ func (b *XatuPublicContributors) processLoop() {
 
 // getStoragePath constructs the full storage path.
 func (b *XatuPublicContributors) getStoragePath(key string) string {
-	return fmt.Sprintf("%s/%s", b.baseDir, key)
+	return filepath.Join(b.baseDir, key)
 }
 
 // loadState loads the state for a given network.
@@ -365,8 +364,6 @@ func (b *XatuPublicContributors) process(ctx context.Context) {
 			log.Debug("Skipping users processing (interval not met)")
 		}
 
-		// --- Process User Summaries (Now handled globally after network loop) ---
-
 		// Save state if changed
 		if networkNeedsSave {
 			if err := b.saveState(ctx, networkName, state); err != nil {
@@ -375,7 +372,7 @@ func (b *XatuPublicContributors) process(ctx context.Context) {
 				log.Debug("Successfully saved state")
 			}
 		}
-	} // End of network loop
+	}
 
 	// --- Process Global Summaries (Summary, UserSummaries) ---
 	globalStateKey := "global"
@@ -663,38 +660,35 @@ func (b *XatuPublicContributors) processCountriesWindow(ctx context.Context, net
 		dataPoint, exists := timePointsMap[unixTime]
 		if !exists {
 			// Create new timestamp using protobuf timestamp
-			pbTimestamp := timestamppb.New(timestamp)
 			dataPoint = &pb.CountryDataPoint{
-				Timestamp:      pbTimestamp,
-				NodeCounts:     []*pb.NodeCountStats{},
-				TotalNodes:     0,
-				TotalCountries: 0,
+				Time:      timestamp.Unix(),
+				Countries: []*pb.CountryCount{},
 			}
 			timePointsMap[unixTime] = dataPoint
 		}
 
 		// Add country count to data point
-		dataPoint.NodeCounts = append(dataPoint.NodeCounts, &pb.NodeCountStats{
-			TotalNodes:  int32(nodeCount),
-			PublicNodes: int32(nodeCount), // Public count is the same here
+		dataPoint.Countries = append(dataPoint.Countries, &pb.CountryCount{
+			Name:  country,
+			Value: int32(nodeCount),
 		})
-		dataPoint.TotalNodes += int32(nodeCount)
 	}
 
-	// Convert map to sorted array and set total countries
+	// Convert map to sorted array
 	var dataPoints []*pb.CountryDataPoint
 	for _, dataPoint := range timePointsMap {
-		dataPoint.TotalCountries = int32(len(dataPoint.NodeCounts))
 		dataPoints = append(dataPoints, dataPoint)
 	}
 
 	// Sort by timestamp
 	sort.Slice(dataPoints, func(i, j int) bool {
-		return dataPoints[i].Timestamp.AsTime().Before(dataPoints[j].Timestamp.AsTime())
+		return dataPoints[i].Time < dataPoints[j].Time
 	})
 
-	// Store data
-	key := fmt.Sprintf("countries/%s/%s", networkName, window.File)
+	// Convert short file name to long format for storage
+	fileName := window.File
+
+	key := filepath.Join("countries", networkName, fileName)
 	if err := b.storageClient.Store(ctx, storage.StoreParams{
 		Key:         b.getStoragePath(key),
 		Data:        dataPoints,
@@ -811,7 +805,10 @@ func (b *XatuPublicContributors) processUsersWindow(ctx context.Context, network
 		return timePointsList[i].Time < timePointsList[j].Time
 	})
 
-	key := filepath.Join("users", networkName, window.File)
+	// Convert short file name to long format for storage
+	fileName := window.File
+
+	key := filepath.Join("users", networkName, fileName)
 	if err := b.storageClient.Store(ctx, storage.StoreParams{
 		Key:         b.getStoragePath(key),
 		Data:        timePointsList,
@@ -969,8 +966,11 @@ func (b *XatuPublicContributors) processUserSummaries(ctx context.Context, netwo
 	}
 
 	// Store individual user summaries and build global summary
-	storageBaseDir := "user-summaries" // Global base directory like Python
+	storageBaseDir := b.getStoragePath("user-summaries") // Global base directory like Python
 	for username, userSummaryData := range usersByName {
+		// Set the node_count field to the number of nodes
+		userSummaryData.NodeCount = int32(len(userSummaryData.Nodes))
+
 		// Store individual user file
 		userKey := filepath.Join(storageBaseDir, "users", username)
 		// Use StoreEncoded directly, assuming storage client handles base pathing if needed, or adjust key.
@@ -995,7 +995,7 @@ func (b *XatuPublicContributors) processUserSummaries(ctx context.Context, netwo
 	})
 
 	// Store global summary file
-	summaryKey := filepath.Join(storageBaseDir, "summary")
+	summaryKey := b.getStoragePath("user-summaries/summary")
 
 	if err := b.storageClient.Store(ctx, storage.StoreParams{
 		Key:         summaryKey,
@@ -1108,6 +1108,13 @@ func (b *XatuPublicContributors) ReadUserSummary(ctx context.Context, username s
 		log.WithError(err).Error("Failed to get user summary from storage")
 		return nil, fmt.Errorf("failed to get user summary for %s: %w", username, err)
 	}
+
+	// Ensure the node_count field is set
+	if userSummary.NodeCount == 0 && len(userSummary.Nodes) > 0 {
+		userSummary.NodeCount = int32(len(userSummary.Nodes))
+		log.Debug("Updated node_count field that was missing")
+	}
+
 	log.Debug("Successfully read user summary")
 	return userSummary, nil
 }

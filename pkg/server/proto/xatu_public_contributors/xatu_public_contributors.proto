@@ -61,10 +61,14 @@ message SummaryData {
 
 // Data point for a country
 message CountryDataPoint {
-  google.protobuf.Timestamp timestamp = 1;
-  repeated NodeCountStats node_counts = 2;
-  int32 total_nodes = 3;
-  int32 total_countries = 4;
+  int64 time = 1;  // Unix timestamp
+  repeated CountryCount countries = 2;
+}
+
+// Country with node count
+message CountryCount {
+  string name = 1;  // Country name
+  int32 value = 2;  // Node count
 }
 
 // Data point representing a user's node count at a specific time (for Users processor)
@@ -97,8 +101,9 @@ message NodeDetail {
 // Summary data for a single user (for User Summaries processor)
 message UserSummary {
   string name = 1; // Extracted username
-  repeated NodeDetail nodes = 2;
-  int64 updated_at = 3; // Unix timestamp of when the summary was generated
+  int32 node_count = 2;
+  repeated NodeDetail nodes = 3;
+  int64 updated_at = 4; // Unix timestamp of when the summary was generated
 }
 
 // Global summary listing all contributors (for User Summaries processor)
