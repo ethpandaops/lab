@@ -2,17 +2,23 @@ package beacon_slots
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strconv"
 	"strings"
 	"time"
 
 	"github.com/codingsince1985/geo-golang/openstreetmap"
+	"github.com/ethpandaops/lab/pkg/internal/lab/ethereum"
 	"github.com/ethpandaops/lab/pkg/internal/lab/leader"
 	"github.com/ethpandaops/lab/pkg/internal/lab/locker"
 	"github.com/ethpandaops/lab/pkg/internal/lab/storage"
 	"github.com/ethpandaops/lab/pkg/internal/lab/xatu"
 	"github.com/sirupsen/logrus"
+
+	pb "github.com/ethpandaops/lab/pkg/server/proto/beacon_slots"
+	"google.golang.org/protobuf/types/known/timestamppb"
+	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
 // Service name constant
@@ -26,87 +32,12 @@ var (
 	MiddleProcessorName   = "middle" // Processor for the initial recent window
 )
 
-// BlockData represents a beacon block
-type BlockData struct {
-	Slot               int64     `json:"slot"`
-	SlotStartDateTime  time.Time `json:"slotStartDateTime"`
-	Epoch              int64     `json:"epoch"`
-	EpochStartDateTime time.Time `json:"epochStartDateTime"`
-	BlockRoot          string    `json:"blockRoot"`
-	BlockVersion       string    `json:"blockVersion"`
-	BlockTotalBytes    *int64    `json:"blockTotalBytes,omitempty"`
-	ParentRoot         string    `json:"parentRoot"`
-	StateRoot          string    `json:"stateRoot"`
-	ProposerIndex      int64     `json:"proposerIndex"`
-	// Add other fields as needed based on the Python implementation
-}
-
-// ProposerData represents proposer information
-type ProposerData struct {
-	Slot                   int64 `json:"slot"`
-	ProposerValidatorIndex int64 `json:"proposerValidatorIndex"`
-}
-
-// SeenAtSlotTimeData represents timing data for when a block was seen
-type SeenAtSlotTimeData struct {
-	SlotTimeMs             int64  `json:"slotTimeMs"`
-	MetaClientName         string `json:"metaClientName"`
-	MetaClientGeoCity      string `json:"metaClientGeoCity"`
-	MetaClientGeoCountry   string `json:"metaClientGeoCountry"`
-	MetaClientGeoContinent string `json:"metaClientGeoContinent"`
-}
-
-// BlobSeenAtSlotTimeData represents timing data for when a blob was seen
-type BlobSeenAtSlotTimeData struct {
-	SlotTimeMs             int64  `json:"slotTimeMs"`
-	BlobIndex              int64  `json:"blobIndex"`
-	MetaClientName         string `json:"metaClientName"`
-	MetaClientGeoCity      string `json:"metaClientGeoCity"`
-	MetaClientGeoCountry   string `json:"metaClientGeoCountry"`
-	MetaClientGeoContinent string `json:"metaClientGeoContinent"`
-}
-
-// Node represents a client with geo data
-type Node struct {
-	Name             string   `json:"name"`
-	Username         string   `json:"username"`
-	GeoCity          string   `json:"geoCity"`
-	GeoCountry       string   `json:"geoCountry"`
-	GeoContinentCode string   `json:"geoContinentCode"`
-	GeoLatitude      *float64 `json:"geoLatitude,omitempty"`
-	GeoLongitude     *float64 `json:"geoLongitude,omitempty"`
-}
-
-// AttestationWindow represents a window of attestations
-type AttestationWindow struct {
-	StartMs          int64   `json:"startMs"`
-	EndMs            int64   `json:"endMs"`
-	ValidatorIndices []int64 `json:"validatorIndices"`
-}
-
-// OptimizedSlotData represents optimized slot data for storage
-type OptimizedSlotData struct {
-	Slot                    int64                      `json:"slot"`
-	Network                 string                     `json:"network"`
-	ProcessedAt             string                     `json:"processedAt"`
-	ProcessingTimeMs        int64                      `json:"processingTimeMs"`
-	Block                   map[string]interface{}     `json:"block"`
-	Proposer                map[string]interface{}     `json:"proposer"`
-	Entity                  *string                    `json:"entity,omitempty"`
-	Nodes                   map[string]Node            `json:"nodes"`
-	BlockSeenTimes          map[string]int64           `json:"blockSeenTimes"`
-	BlobSeenTimes           map[string]map[int64]int64 `json:"blobSeenTimes"`
-	BlockFirstSeenP2PTimes  map[string]int64           `json:"blockFirstSeenP2PTimes"`
-	BlobFirstSeenP2PTimes   map[string]map[int64]int64 `json:"blobFirstSeenP2PTimes"`
-	AttestationWindows      []AttestationWindow        `json:"attestationWindows"`
-	MaximumAttestationVotes int64                      `json:"maximumAttestationVotes"`
-}
-
 type BeaconSlots struct {
 	log logrus.FieldLogger
 
 	config *Config
 
+	ethereum      *ethereum.Config
 	xatuClient    *xatu.Client
 	storageClient storage.Client
 	leaderClient  leader.Client
@@ -123,6 +54,7 @@ func New(
 	log logrus.FieldLogger,
 	config *Config,
 	xatuClient *xatu.Client,
+	ethereum *ethereum.Config,
 	storageClient storage.Client,
 	lockerClient locker.Locker,
 ) (*BeaconSlots, error) {
@@ -133,6 +65,7 @@ func New(
 	return &BeaconSlots{
 		log:           log.WithField("component", "service/"+ServiceName),
 		config:        config,
+		ethereum:      ethereum,
 		xatuClient:    xatuClient,
 		storageClient: storageClient,
 		lockerClient:  lockerClient,
@@ -251,17 +184,14 @@ func (b *BeaconSlots) loadState(ctx context.Context, network string) (*State, er
 		Processors: make(map[string]ProcessorState),
 	}
 	key := GetStateKey(network)
-	data, err := b.storageClient.Get(ctx, b.getStoragePath(key))
+
+	err := b.storageClient.GetEncoded(ctx, b.getStoragePath(key), state, storage.CodecNameJSON)
 	if err != nil {
 		if err == storage.ErrNotFound {
 			b.log.WithField("network", network).Info("No previous state found, starting fresh.")
 			return state, nil // Return empty state if not found
 		}
 		return nil, fmt.Errorf("failed to get state for network %s: %w", network, err)
-	}
-
-	if err := FromJSON(string(data), state); err != nil {
-		return nil, fmt.Errorf("failed to unmarshal state for network %s: %w", network, err)
 	}
 
 	return state, nil
@@ -271,14 +201,10 @@ func (b *BeaconSlots) loadState(ctx context.Context, network string) (*State, er
 func (b *BeaconSlots) saveState(ctx context.Context, network string, state *State) error {
 	key := GetStateKey(network)
 
-	jsonData, err := ToJSON(state)
-	if err != nil {
-		return fmt.Errorf("failed to marshal state for network %s: %w", network, err)
-	}
-
-	err = b.storageClient.Store(ctx, storage.StoreParams{
-		Key:  b.getStoragePath(key),
-		Data: []byte(jsonData),
+	err := b.storageClient.Store(ctx, storage.StoreParams{
+		Key:    b.getStoragePath(key),
+		Format: storage.CodecNameJSON,
+		Data:   state,
 	})
 	if err != nil {
 		return fmt.Errorf("failed to store state for network %s: %w", network, err)
@@ -599,73 +525,59 @@ func (b *BeaconSlots) processSlot(ctx context.Context, networkName string, slot 
 		WithField("slot", slot).
 		Debug("Processing slot")
 
-	// 1. Get block data
+	// 1. Get block data (should return *pb.BlockData)
 	blockData, err := b.getBlockData(ctx, networkName, slot)
 	if err != nil {
 		return false, fmt.Errorf("failed to get block data: %w", err)
 	}
-
-	// If no block data was found, this slot might not have a block
 	if blockData == nil {
 		b.log.WithField("slot", slot).Debug("No block data found for slot")
 		return false, nil
 	}
 
-	// 2. Get proposer data
+	// 2. Get proposer data (should return *pb.Proposer)
 	proposerData, err := b.getProposerData(ctx, networkName, slot)
 	if err != nil {
 		return false, fmt.Errorf("failed to get proposer data: %w", err)
 	}
 
-	// Get the entity for the proposer
+	// 3. Get entity
 	entity, err := b.getProposerEntity(ctx, networkName, blockData.ProposerIndex)
 	if err != nil {
 		b.log.WithField("slot", slot).WithError(err).Warning("Failed to get proposer entity, continuing without it")
 	}
 
-	// 3. Get various timing data
-	b.log.WithField("slot", slot).Debug("Fetching timing data...")
+	// 4. Get timing data (should return []*pb.Timing, map[string]*pb.BlobTimingMap, etc.)
 	blockSeenAtSlotTime, err := b.getBlockSeenAtSlotTime(ctx, networkName, slot)
 	if err != nil {
-		b.log.WithField("slot", slot).WithError(err).Warning("Failed to get block seen times, continuing with empty data")
-		blockSeenAtSlotTime = []SeenAtSlotTimeData{}
+		blockSeenAtSlotTime = map[string]time.Duration{}
 	}
-
 	blobSeenAtSlotTime, err := b.getBlobSeenAtSlotTime(ctx, networkName, slot)
 	if err != nil {
-		b.log.WithField("slot", slot).WithError(err).Warning("Failed to get blob seen times, continuing with empty data")
-		blobSeenAtSlotTime = []BlobSeenAtSlotTimeData{}
+		blobSeenAtSlotTime = map[string]*pb.BlobTimingMap{}
 	}
-
 	blockFirstSeenInP2PSlotTime, err := b.getBlockFirstSeenInP2PSlotTime(ctx, networkName, slot)
 	if err != nil {
-		b.log.WithField("slot", slot).WithError(err).Warning("Failed to get block first seen in P2P times, continuing with empty data")
-		blockFirstSeenInP2PSlotTime = []SeenAtSlotTimeData{}
+		blockFirstSeenInP2PSlotTime = map[string]time.Duration{}
 	}
-
 	blobFirstSeenInP2PSlotTime, err := b.getBlobFirstSeenInP2PSlotTime(ctx, networkName, slot)
 	if err != nil {
-		b.log.WithField("slot", slot).WithError(err).Warning("Failed to get blob first seen in P2P times, continuing with empty data")
-		blobFirstSeenInP2PSlotTime = []BlobSeenAtSlotTimeData{}
+		blobFirstSeenInP2PSlotTime = map[string]*pb.BlobTimingMap{}
 	}
 
-	// 4. Get attestation data
+	// 5. Get attestation data
 	maxAttestationVotes, err := b.getMaximumAttestationVotes(ctx, networkName, slot)
 	if err != nil {
-		b.log.WithField("slot", slot).WithError(err).Warning("Failed to get maximum attestation votes, continuing with default")
 		maxAttestationVotes = 0
 	}
-
 	attestationVotes, err := b.getAttestationVotes(ctx, networkName, slot, blockData.BlockRoot)
 	if err != nil {
-		b.log.WithField("slot", slot).WithError(err).Warning("Failed to get attestation votes, continuing with empty data")
 		attestationVotes = make(map[int64]int64)
 	}
 
-	// 5. Transform the data for storage
+	// 6. Transform the data for storage
 	processingTime := time.Since(startTime).Milliseconds()
-
-	optimizedData, err := b.transformSlotDataForStorage(
+	slotData, err := b.transformSlotDataForStorage(
 		slot,
 		networkName,
 		time.Now().UTC().Format(time.RFC3339),
@@ -684,11 +596,11 @@ func (b *BeaconSlots) processSlot(ctx context.Context, networkName string, slot 
 		return false, fmt.Errorf("failed to transform slot data: %w", err)
 	}
 
-	// 6. Store the data to storage
+	// 7. Store the data to storage
 	storageKey := fmt.Sprintf("slots/%s/%d", networkName, slot)
-	jsonData, err := ToJSON(optimizedData)
+	jsonData, err := ToJSON(slotData)
 	if err != nil {
-		return false, fmt.Errorf("failed to marshal optimized data: %w", err)
+		return false, fmt.Errorf("failed to marshal slot data: %w", err)
 	}
 
 	err = b.storageClient.Store(ctx, storage.StoreParams{
@@ -725,10 +637,8 @@ func (b *BeaconSlots) calculateTargetBacklogSlot(networkName string, currentSlot
 }
 
 // getBlockData gets block data from ClickHouse
-func (b *BeaconSlots) getBlockData(ctx context.Context, networkName string, slot int64) (*BlockData, error) {
-	// This is a simplified implementation
-	// The actual implementation would need to query ClickHouse for detailed block data
-
+func (b *BeaconSlots) getBlockData(ctx context.Context, networkName string, slot int64) (*pb.BlockData, error) {
+	// Query ClickHouse for detailed block data
 	query := `
 		SELECT
 			slot,
@@ -737,7 +647,24 @@ func (b *BeaconSlots) getBlockData(ctx context.Context, networkName string, slot
 			state_root,
 			proposer_index,
 			block_version,
-			signature
+			signature,
+			eth1_data_block_hash,
+			eth1_data_deposit_root,
+			execution_payload_block_hash,
+			execution_payload_block_number,
+			execution_payload_fee_recipient,
+			execution_payload_base_fee_per_gas,
+			execution_payload_blob_gas_used,
+			execution_payload_excess_blob_gas,
+			execution_payload_gas_limit,
+			execution_payload_gas_used,
+			execution_payload_state_root,
+			execution_payload_parent_hash,
+			execution_payload_transactions_count,
+			execution_payload_transactions_total_bytes,
+			execution_payload_transactions_total_bytes_compressed,
+			block_total_bytes,
+			block_total_bytes_compressed
 		FROM xatu.beacon_api_eth_v1_events_block
 		WHERE network = $1 AND slot = $2
 		LIMIT 1
@@ -758,34 +685,105 @@ func (b *BeaconSlots) getBlockData(ctx context.Context, networkName string, slot
 		return nil, nil
 	}
 
-	// Create a BlockData object
-	slotTime := time.Now()  // Placeholder, would calculate from slot and genesis time
-	epochTime := time.Now() // Placeholder, would calculate from epoch and genesis time
+	// Calculate slot and epoch times
+	// In a real implementation, these would be calculated from genesis time
+	slotTime := time.Now()  // Placeholder
+	epochTime := time.Now() // Placeholder
+	epoch := slot / 32      // 32 slots per epoch in Ethereum
 
-	blockData := &BlockData{
-		Slot:               slot,
-		SlotStartDateTime:  slotTime,
-		Epoch:              slot / 32, // 32 slots per epoch in Ethereum
-		EpochStartDateTime: epochTime,
-		BlockRoot:          fmt.Sprintf("%v", result["block_root"]),
-		BlockVersion:       fmt.Sprintf("%v", result["block_version"]),
-		ParentRoot:         fmt.Sprintf("%v", result["parent_root"]),
-		StateRoot:          fmt.Sprintf("%v", result["state_root"]),
+	// Create a new BlockData object with all fields
+	blockData := &pb.BlockData{
+		Slot:                         slot,
+		SlotStartDateTime:            timestamppb.New(slotTime),
+		Epoch:                        epoch,
+		EpochStartDateTime:           timestamppb.New(epochTime),
+		BlockRoot:                    getStringOrEmpty(result["block_root"]),
+		BlockVersion:                 getStringOrEmpty(result["block_version"]),
+		ParentRoot:                   getStringOrEmpty(result["parent_root"]),
+		StateRoot:                    getStringOrEmpty(result["state_root"]),
+		Eth1DataBlockHash:            getStringOrEmpty(result["eth1_data_block_hash"]),
+		Eth1DataDepositRoot:          getStringOrEmpty(result["eth1_data_deposit_root"]),
+		ExecutionPayloadBlockHash:    getStringOrEmpty(result["execution_payload_block_hash"]),
+		ExecutionPayloadFeeRecipient: getStringOrEmpty(result["execution_payload_fee_recipient"]),
+		ExecutionPayloadStateRoot:    getStringOrEmpty(result["execution_payload_state_root"]),
+		ExecutionPayloadParentHash:   getStringOrEmpty(result["execution_payload_parent_hash"]),
 	}
 
-	// Parse proposer_index
+	// Parse numeric fields
 	if proposerIndex, err := strconv.ParseInt(fmt.Sprintf("%v", result["proposer_index"]), 10, 64); err == nil {
 		blockData.ProposerIndex = proposerIndex
+	}
+
+	if execBlockNumber, err := strconv.ParseInt(fmt.Sprintf("%v", result["execution_payload_block_number"]), 10, 64); err == nil {
+		blockData.ExecutionPayloadBlockNumber = execBlockNumber
+	}
+
+	// Parse nullable numeric fields using wrapper types
+	if val := result["block_total_bytes"]; val != nil {
+		if num, err := strconv.ParseInt(fmt.Sprintf("%v", val), 10, 64); err == nil {
+			blockData.BlockTotalBytes = wrapperspb.Int64(num)
+		}
+	}
+
+	if val := result["block_total_bytes_compressed"]; val != nil {
+		if num, err := strconv.ParseInt(fmt.Sprintf("%v", val), 10, 64); err == nil {
+			blockData.BlockTotalBytesCompressed = wrapperspb.Int64(num)
+		}
+	}
+
+	if val := result["execution_payload_base_fee_per_gas"]; val != nil {
+		if num, err := strconv.ParseInt(fmt.Sprintf("%v", val), 10, 64); err == nil {
+			blockData.ExecutionPayloadBaseFeePerGas = wrapperspb.Int64(num)
+		}
+	}
+
+	if val := result["execution_payload_blob_gas_used"]; val != nil {
+		if num, err := strconv.ParseInt(fmt.Sprintf("%v", val), 10, 64); err == nil {
+			blockData.ExecutionPayloadBlobGasUsed = wrapperspb.Int64(num)
+		}
+	}
+
+	if val := result["execution_payload_excess_blob_gas"]; val != nil {
+		if num, err := strconv.ParseInt(fmt.Sprintf("%v", val), 10, 64); err == nil {
+			blockData.ExecutionPayloadExcessBlobGas = wrapperspb.Int64(num)
+		}
+	}
+
+	if val := result["execution_payload_gas_limit"]; val != nil {
+		if num, err := strconv.ParseInt(fmt.Sprintf("%v", val), 10, 64); err == nil {
+			blockData.ExecutionPayloadGasLimit = wrapperspb.Int64(num)
+		}
+	}
+
+	if val := result["execution_payload_gas_used"]; val != nil {
+		if num, err := strconv.ParseInt(fmt.Sprintf("%v", val), 10, 64); err == nil {
+			blockData.ExecutionPayloadGasUsed = wrapperspb.Int64(num)
+		}
+	}
+
+	if val := result["execution_payload_transactions_count"]; val != nil {
+		if num, err := strconv.ParseInt(fmt.Sprintf("%v", val), 10, 64); err == nil {
+			blockData.ExecutionPayloadTransactionsCount = wrapperspb.Int64(num)
+		}
+	}
+
+	if val := result["execution_payload_transactions_total_bytes"]; val != nil {
+		if num, err := strconv.ParseInt(fmt.Sprintf("%v", val), 10, 64); err == nil {
+			blockData.ExecutionPayloadTransactionsTotalBytes = wrapperspb.Int64(num)
+		}
+	}
+
+	if val := result["execution_payload_transactions_total_bytes_compressed"]; val != nil {
+		if num, err := strconv.ParseInt(fmt.Sprintf("%v", val), 10, 64); err == nil {
+			blockData.ExecutionPayloadTransactionsTotalBytesCompressed = wrapperspb.Int64(num)
+		}
 	}
 
 	return blockData, nil
 }
 
 // getProposerData gets proposer data from ClickHouse
-func (b *BeaconSlots) getProposerData(ctx context.Context, networkName string, slot int64) (*ProposerData, error) {
-	// This is a simplified implementation
-	// The actual implementation would need to query ClickHouse for proposer data
-
+func (b *BeaconSlots) getProposerData(ctx context.Context, networkName string, slot int64) (*pb.Proposer, error) {
 	query := `
 		SELECT
 			slot,
@@ -795,7 +793,6 @@ func (b *BeaconSlots) getProposerData(ctx context.Context, networkName string, s
 		LIMIT 1
 	`
 
-	// Get the Clickhouse client for this network
 	ch, err := b.xatuClient.GetClickhouseClientForNetwork(networkName)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get ClickHouse client for network %s: %w", networkName, err)
@@ -810,13 +807,12 @@ func (b *BeaconSlots) getProposerData(ctx context.Context, networkName string, s
 		return nil, fmt.Errorf("no proposer data found for slot %d", slot)
 	}
 
-	// Parse proposer_index
 	proposerIndex, err := strconv.ParseInt(fmt.Sprintf("%v", result["proposer_index"]), 10, 64)
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse proposer index: %w", err)
 	}
 
-	return &ProposerData{
+	return &pb.Proposer{
 		Slot:                   slot,
 		ProposerValidatorIndex: proposerIndex,
 	}, nil
@@ -949,102 +945,65 @@ func (b *BeaconSlots) getAttestationVotes(ctx context.Context, networkName strin
 }
 
 // transformSlotDataForStorage transforms slot data into optimized format for storage
+
 func (b *BeaconSlots) transformSlotDataForStorage(
 	slot int64,
 	network string,
 	processedAt string,
 	processingTimeMs int64,
-	blockData *BlockData,
-	proposerData *ProposerData,
+	blockData *pb.BlockData,
+	proposerData *pb.Proposer,
 	maximumAttestationVotes int64,
 	entity *string,
-	blockSeenAtSlotTime []SeenAtSlotTimeData,
-	blobSeenAtSlotTime []BlobSeenAtSlotTimeData,
-	blockFirstSeenInP2PSlotTime []SeenAtSlotTimeData,
-	blobFirstSeenInP2PSlotTime []BlobSeenAtSlotTimeData,
+	blockSeenAtSlotTime []*pb.Timing,
+	blobSeenAtSlotTime map[string]*pb.BlobTimingMap,
+	blockFirstSeenInP2PSlotTime []*pb.Timing,
+	blobFirstSeenInP2PSlotTime map[string]*pb.BlobTimingMap,
 	attestationVotes map[int64]int64,
-) (*OptimizedSlotData, error) {
-	// Create nodes map
-	nodes := make(map[string]Node)
+) (*pb.BeaconSlotData, error) {
+	nodes := make(map[string]*pb.Node)
 
 	// Helper to add node
-	addNode := func(name, city, country, continent string) {
+	addNode := func(name, username, city, country, continent string, lat, lon *float64) {
 		if _, exists := nodes[name]; !exists {
-			nodes[name] = Node{
-				Name:             name,
-				Username:         extractUsername(name),
-				GeoCity:          city,
-				GeoCountry:       country,
-				GeoContinentCode: continent,
+			geo := &pb.Geo{
+				City:      city,
+				Country:   country,
+				Continent: continent,
 			}
-			// Perform geo lookup
-			lat, lon := b.lookupGeoCoordinates(city, country)
-			if lat != nil && lon != nil {
-				node := nodes[name] // Get the node again to modify
-				node.GeoLatitude = lat
-				node.GeoLongitude = lon
-				nodes[name] = node // Put the modified node back
+			if lat != nil {
+				geo.Latitude = wrapperspb.Double(*lat)
+			}
+			if lon != nil {
+				geo.Longitude = wrapperspb.Double(*lon)
+			}
+			nodes[name] = &pb.Node{
+				Name:     name,
+				Username: username,
+				Geo:      geo,
 			}
 		}
 	}
 
-	// Process all node data to build nodes map
-	for _, d := range blockSeenAtSlotTime {
-		addNode(d.MetaClientName, d.MetaClientGeoCity, d.MetaClientGeoCountry, d.MetaClientGeoContinent)
+	// Build nodes from blockSeenAtSlotTime and blockFirstSeenInP2PSlotTime
+	for _, t := range blockSeenAtSlotTime {
+		lat, lon := b.lookupGeoCoordinates(t.Geo.City, t.Geo.Country)
+		addNode(t.MetaClientName, t.MetaClientUsername, t.Geo.City, t.Geo.Country, t.Geo.Continent, lat, lon)
 	}
-	for _, d := range blobSeenAtSlotTime {
-		addNode(d.MetaClientName, d.MetaClientGeoCity, d.MetaClientGeoCountry, d.MetaClientGeoContinent)
-	}
-	for _, d := range blockFirstSeenInP2PSlotTime {
-		addNode(d.MetaClientName, d.MetaClientGeoCity, d.MetaClientGeoCountry, d.MetaClientGeoContinent)
-	}
-	for _, d := range blobFirstSeenInP2PSlotTime {
-		addNode(d.MetaClientName, d.MetaClientGeoCity, d.MetaClientGeoCountry, d.MetaClientGeoContinent)
+	for _, t := range blockFirstSeenInP2PSlotTime {
+		lat, lon := b.lookupGeoCoordinates(t.Geo.City, t.Geo.Country)
+		addNode(t.MetaClientName, t.MetaClientUsername, t.Geo.City, t.Geo.Country, t.Geo.Continent, lat, lon)
 	}
 
-	// Build timing dictionaries
-	blockSeenTimes := make(map[string]int64)
-	for _, d := range blockSeenAtSlotTime {
-		blockSeenTimes[d.MetaClientName] = d.SlotTimeMs
-	}
-
-	blockFirstSeenP2PTimes := make(map[string]int64)
-	for _, d := range blockFirstSeenInP2PSlotTime {
-		blockFirstSeenP2PTimes[d.MetaClientName] = d.SlotTimeMs
-	}
-
-	// Build blob timing dictionaries
-	blobSeenTimes := make(map[string]map[int64]int64)
-	for _, d := range blobSeenAtSlotTime {
-		if _, ok := blobSeenTimes[d.MetaClientName]; !ok {
-			blobSeenTimes[d.MetaClientName] = make(map[int64]int64)
-		}
-		blobSeenTimes[d.MetaClientName][d.BlobIndex] = d.SlotTimeMs
-	}
-
-	blobFirstSeenP2PTimes := make(map[string]map[int64]int64)
-	for _, d := range blobFirstSeenInP2PSlotTime {
-		if _, ok := blobFirstSeenP2PTimes[d.MetaClientName]; !ok {
-			blobFirstSeenP2PTimes[d.MetaClientName] = make(map[int64]int64)
-		}
-		blobFirstSeenP2PTimes[d.MetaClientName][d.BlobIndex] = d.SlotTimeMs
-	}
-
-	// Transform attestation votes into windows
-	// Group attestations by time windows (50ms buckets)
+	// Attestation windows
 	attestationBuckets := make(map[int64][]int64)
 	for validatorIndex, timeMs := range attestationVotes {
-		bucket := timeMs - (timeMs % 50) // Round down to nearest 50ms
-		if _, ok := attestationBuckets[bucket]; !ok {
-			attestationBuckets[bucket] = make([]int64, 0)
-		}
+		bucket := timeMs - (timeMs % 50)
 		attestationBuckets[bucket] = append(attestationBuckets[bucket], validatorIndex)
 	}
-
-	// Create attestation windows from buckets
-	attestationWindows := make([]AttestationWindow, 0, len(attestationBuckets))
+	attestationWindows := make([]*pb.AttestationWindow, 0, len(attestationBuckets))
 	for startMs, indices := range attestationBuckets {
-		window := AttestationWindow{
+		window := &pb.AttestationWindow{
 			StartMs:          startMs,
 			EndMs:            startMs + 50,
 			ValidatorIndices: indices,
@@ -1052,41 +1011,44 @@ func (b *BeaconSlots) transformSlotDataForStorage(
 		attestationWindows = append(attestationWindows, window)
 	}
 
-	// Convert block data and proposer data to maps
-	blockDataMap := make(map[string]interface{})
-	blockJSON, err := ToJSON(blockData)
-	if err != nil {
-		return nil, fmt.Errorf("failed to marshal block data: %w", err)
-	}
-	if err := FromJSON(blockJSON, &blockDataMap); err != nil {
-		return nil, fmt.Errorf("failed to unmarshal block data: %w", err)
+	attestations := &pb.AttestationsData{
+		Windows:      attestationWindows,
+		MaximumVotes: maximumAttestationVotes,
 	}
 
-	proposerDataMap := make(map[string]interface{})
-	proposerJSON, err := ToJSON(proposerData)
-	if err != nil {
-		return nil, fmt.Errorf("failed to marshal proposer data: %w", err)
+	// Timings
+	timings := &pb.Timings{
+		BlockSeen:         make(map[string]int64),
+		BlobSeen:          blobSeenAtSlotTime,
+		BlockFirstSeenP2P: make(map[string]int64),
+		BlobFirstSeenP2P:  blobFirstSeenInP2PSlotTime,
 	}
-	if err := FromJSON(proposerJSON, &proposerDataMap); err != nil {
-		return nil, fmt.Errorf("failed to unmarshal proposer data: %w", err)
+	for _, t := range blockSeenAtSlotTime {
+		timings.BlockSeen[t.MetaClientName] = t.Ms
+	}
+	for _, t := range blockFirstSeenInP2PSlotTime {
+		timings.BlockFirstSeenP2P[t.MetaClientName] = t.Ms
 	}
 
-	return &OptimizedSlotData{
-		Slot:                    slot,
-		Network:                 network,
-		ProcessedAt:             processedAt,
-		ProcessingTimeMs:        processingTimeMs,
-		Block:                   blockDataMap,
-		Proposer:                proposerDataMap,
-		Entity:                  entity,
-		Nodes:                   nodes,
-		BlockSeenTimes:          blockSeenTimes,
-		BlobSeenTimes:           blobSeenTimes,
-		BlockFirstSeenP2PTimes:  blockFirstSeenP2PTimes,
-		BlobFirstSeenP2PTimes:   blobFirstSeenP2PTimes,
-		AttestationWindows:      attestationWindows,
-		MaximumAttestationVotes: maximumAttestationVotes,
+	return &pb.BeaconSlotData{
+		Slot:             slot,
+		Network:          network,
+		ProcessedAt:      processedAt,
+		ProcessingTimeMs: processingTimeMs,
+		Block:            blockData,
+		Proposer:         proposerData,
+		Entity:           wrapperspb.String(getStringOrNil(entity)),
+		Nodes:            nodes,
+		Timings:          timings,
+		Attestations:     attestations,
 	}, nil
+}
+
+func getStringOrNil(s *string) string {
+	if s == nil {
+		return ""
+	}
+	return *s
 }
 
 // Helper function to extract username from client name
@@ -1142,7 +1104,7 @@ func (b *BeaconSlots) getProposerEntity(ctx context.Context, networkName string,
 }
 
 // getBlockSeenAtSlotTime gets seen at slot time data for a given slot
-func (b *BeaconSlots) getBlockSeenAtSlotTime(ctx context.Context, networkName string, slot int64) ([]SeenAtSlotTimeData, error) {
+func (b *BeaconSlots) getBlockSeenAtSlotTime(ctx context.Context, networkName string, slot int64) (map[string]time.Duration, error) {
 	// Get start and end dates for the slot +- 15 minutes
 	startTime, endTime := b.getSlotWindow(ctx, networkName, slot)
 
@@ -1154,11 +1116,7 @@ func (b *BeaconSlots) getBlockSeenAtSlotTime(ctx context.Context, networkName st
 		WITH api_events AS (
 			SELECT
 				propagation_slot_start_diff as slot_time,
-				meta_client_name,
-				meta_client_geo_city, 
-				meta_client_geo_country,
-				meta_client_geo_continent_code,
-				event_date_time
+				meta_client_name
 			FROM xatu.beacon_api_eth_v1_events_block FINAL
 			WHERE
 				slot = ?
@@ -1166,13 +1124,9 @@ func (b *BeaconSlots) getBlockSeenAtSlotTime(ctx context.Context, networkName st
 				AND slot_start_date_time BETWEEN ? AND ?
 		),
 		head_events AS (
-			SELECT 
+			SELECT
 				propagation_slot_start_diff as slot_time,
-				meta_client_name,
-				meta_client_geo_city,
-				meta_client_geo_country, 
-				meta_client_geo_continent_code,
-				event_date_time
+				meta_client_name
 			FROM xatu.beacon_api_eth_v1_events_block FINAL
 			WHERE
 				slot = ?
@@ -1213,28 +1167,30 @@ func (b *BeaconSlots) getBlockSeenAtSlotTime(ctx context.Context, networkName st
 		return nil, fmt.Errorf("failed to get block seen at slot time: %w", err)
 	}
 
-	seenAtSlotTimeData := make([]SeenAtSlotTimeData, 0, len(result))
+	if len(result) == 0 {
+		return nil, errors.New("no block seen at slot time data found")
+	}
+
+	blockSeenAtSlotTime := make(map[string]time.Duration)
 	for _, row := range result {
 		slotTime, err := strconv.ParseInt(fmt.Sprintf("%v", row["slot_time"]), 10, 64)
 		if err != nil {
-			continue // Skip invalid data
+			return nil, fmt.Errorf("failed to parse slot time: %w", err)
 		}
 
-		d := SeenAtSlotTimeData{
-			SlotTimeMs:             slotTime,
-			MetaClientName:         fmt.Sprintf("%v", row["meta_client_name"]),
-			MetaClientGeoCity:      getStringOrEmpty(row["meta_client_geo_city"]),
-			MetaClientGeoCountry:   getStringOrEmpty(row["meta_client_geo_country"]),
-			MetaClientGeoContinent: getStringOrEmpty(row["meta_client_geo_continent_code"]),
-		}
-		seenAtSlotTimeData = append(seenAtSlotTimeData, d)
+		clientName := fmt.Sprintf("%v", row["meta_client_name"])
+
+		// Convert to time.Duration
+		duration := time.Duration(slotTime) * time.Millisecond
+
+		blockSeenAtSlotTime[clientName] = duration
 	}
 
-	return seenAtSlotTimeData, nil
+	return blockSeenAtSlotTime, nil
 }
 
 // getBlobSeenAtSlotTime gets seen at slot time data for blobs in a given slot
-func (b *BeaconSlots) getBlobSeenAtSlotTime(ctx context.Context, networkName string, slot int64) ([]BlobSeenAtSlotTimeData, error) {
+func (b *BeaconSlots) getBlobSeenAtSlotTime(ctx context.Context, networkName string, slot int64) (map[string]*pb.BlobTimingMap, error) {
 	// Get start and end dates for the slot +- 15 minutes
 	startTime, endTime := b.getSlotWindow(ctx, networkName, slot)
 
@@ -1246,9 +1202,6 @@ func (b *BeaconSlots) getBlobSeenAtSlotTime(ctx context.Context, networkName str
 		SELECT
 			propagation_slot_start_diff as slot_time,
 			meta_client_name,
-			meta_client_geo_city,
-			meta_client_geo_country,
-			meta_client_geo_continent_code,
 			blob_index
 		FROM (
 			SELECT *,
@@ -1263,46 +1216,38 @@ func (b *BeaconSlots) getBlobSeenAtSlotTime(ctx context.Context, networkName str
 		ORDER BY event_date_time ASC
 	`
 
-	// Get the Clickhouse client for this network
 	ch, err := b.xatuClient.GetClickhouseClientForNetwork(networkName)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get ClickHouse client for network %s: %w", networkName, err)
 	}
 
-	// Execute the query
 	result, err := ch.Query(ctx, query, slot, networkName, startStr, endStr)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get blob seen at slot time: %w", err)
 	}
 
-	blobSeenAtSlotTimeData := make([]BlobSeenAtSlotTimeData, 0, len(result))
+	blobSeenTimes := make(map[string]*pb.BlobTimingMap)
 	for _, row := range result {
+		clientName := fmt.Sprintf("%v", row["meta_client_name"])
 		slotTime, err := strconv.ParseInt(fmt.Sprintf("%v", row["slot_time"]), 10, 64)
 		if err != nil {
-			continue // Skip invalid data
+			continue
 		}
-
 		blobIndex, err := strconv.ParseInt(fmt.Sprintf("%v", row["blob_index"]), 10, 64)
 		if err != nil {
-			continue // Skip invalid data
+			continue
 		}
-
-		d := BlobSeenAtSlotTimeData{
-			SlotTimeMs:             slotTime,
-			BlobIndex:              blobIndex,
-			MetaClientName:         fmt.Sprintf("%v", row["meta_client_name"]),
-			MetaClientGeoCity:      getStringOrEmpty(row["meta_client_geo_city"]),
-			MetaClientGeoCountry:   getStringOrEmpty(row["meta_client_geo_country"]),
-			MetaClientGeoContinent: getStringOrEmpty(row["meta_client_geo_continent_code"]),
+		if _, ok := blobSeenTimes[clientName]; !ok {
+			blobSeenTimes[clientName] = &pb.BlobTimingMap{Timings: make(map[int64]int64)}
 		}
-		blobSeenAtSlotTimeData = append(blobSeenAtSlotTimeData, d)
+		blobSeenTimes[clientName].Timings[blobIndex] = slotTime
 	}
 
-	return blobSeenAtSlotTimeData, nil
+	return blobSeenTimes, nil
 }
 
 // getBlockFirstSeenInP2PSlotTime gets first seen in P2P slot time data for a given slot
-func (b *BeaconSlots) getBlockFirstSeenInP2PSlotTime(ctx context.Context, networkName string, slot int64) ([]SeenAtSlotTimeData, error) {
+func (b *BeaconSlots) getBlockFirstSeenInP2PSlotTime(ctx context.Context, networkName string, slot int64) ([]*pb.Timing, error) {
 	// Get start and end dates for the slot +- 15 minutes
 	startTime, endTime := b.getSlotWindow(ctx, networkName, slot)
 
@@ -1342,28 +1287,36 @@ func (b *BeaconSlots) getBlockFirstSeenInP2PSlotTime(ctx context.Context, networ
 		return nil, fmt.Errorf("failed to get block first seen in P2P data: %w", err)
 	}
 
-	seenAtSlotTimeData := make([]SeenAtSlotTimeData, 0, len(result))
+	timings := make([]*pb.Timing, 0, len(result))
 	for _, row := range result {
 		slotTime, err := strconv.ParseInt(fmt.Sprintf("%v", row["slot_time"]), 10, 64)
 		if err != nil {
 			continue // Skip invalid data
 		}
 
-		d := SeenAtSlotTimeData{
-			SlotTimeMs:             slotTime,
-			MetaClientName:         fmt.Sprintf("%v", row["meta_client_name"]),
-			MetaClientGeoCity:      getStringOrEmpty(row["meta_client_geo_city"]),
-			MetaClientGeoCountry:   getStringOrEmpty(row["meta_client_geo_country"]),
-			MetaClientGeoContinent: getStringOrEmpty(row["meta_client_geo_continent_code"]),
+		city := getStringOrEmpty(row["meta_client_geo_city"])
+		country := getStringOrEmpty(row["meta_client_geo_country"])
+		continent := getStringOrEmpty(row["meta_client_geo_continent_code"])
+		clientName := fmt.Sprintf("%v", row["meta_client_name"])
+
+		timing := &pb.Timing{
+			Ms:                 slotTime,
+			MetaClientName:     clientName,
+			MetaClientUsername: extractUsername(clientName),
+			Geo: &pb.Geo{
+				City:      city,
+				Country:   country,
+				Continent: continent,
+			},
 		}
-		seenAtSlotTimeData = append(seenAtSlotTimeData, d)
+		timings = append(timings, timing)
 	}
 
-	return seenAtSlotTimeData, nil
+	return timings, nil
 }
 
 // getBlobFirstSeenInP2PSlotTime gets first seen in P2P slot time data for blobs in a given slot
-func (b *BeaconSlots) getBlobFirstSeenInP2PSlotTime(ctx context.Context, networkName string, slot int64) ([]BlobSeenAtSlotTimeData, error) {
+func (b *BeaconSlots) getBlobFirstSeenInP2PSlotTime(ctx context.Context, networkName string, slot int64) (map[string]*pb.BlobTimingMap, error) {
 	// Get start and end dates for the slot +- 15 minutes
 	startTime, endTime := b.getSlotWindow(ctx, networkName, slot)
 
@@ -1404,7 +1357,7 @@ func (b *BeaconSlots) getBlobFirstSeenInP2PSlotTime(ctx context.Context, network
 		return nil, fmt.Errorf("failed to get blob first seen in P2P data: %w", err)
 	}
 
-	blobSeenAtSlotTimeData := make([]BlobSeenAtSlotTimeData, 0, len(result))
+	blobTimings := make(map[string]*pb.BlobTimingMap)
 	for _, row := range result {
 		slotTime, err := strconv.ParseInt(fmt.Sprintf("%v", row["slot_time"]), 10, 64)
 		if err != nil {
@@ -1416,18 +1369,18 @@ func (b *BeaconSlots) getBlobFirstSeenInP2PSlotTime(ctx context.Context, network
 			continue // Skip invalid data
 		}
 
-		d := BlobSeenAtSlotTimeData{
-			SlotTimeMs:             slotTime,
-			BlobIndex:              blobIndex,
-			MetaClientName:         fmt.Sprintf("%v", row["meta_client_name"]),
-			MetaClientGeoCity:      getStringOrEmpty(row["meta_client_geo_city"]),
-			MetaClientGeoCountry:   getStringOrEmpty(row["meta_client_geo_country"]),
-			MetaClientGeoContinent: getStringOrEmpty(row["meta_client_geo_continent_code"]),
+		clientName := fmt.Sprintf("%v", row["meta_client_name"])
+
+		if _, exists := blobTimings[clientName]; !exists {
+			blobTimings[clientName] = &pb.BlobTimingMap{
+				Timings: make(map[int64]int64),
+			}
 		}
-		blobSeenAtSlotTimeData = append(blobSeenAtSlotTimeData, d)
+
+		blobTimings[clientName].Timings[blobIndex] = slotTime
 	}
 
-	return blobSeenAtSlotTimeData, nil
+	return blobTimings, nil
 }
 
 // Helper function to get string or empty string if nil

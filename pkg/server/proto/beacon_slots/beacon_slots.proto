@@ -3,173 +3,98 @@ syntax = "proto3";
 package beacon_slots;
 
 import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
 
 option go_package = "github.com/ethpandaops/lab/pkg/proto/beacon_slots";
 
-// Configuration for the beacon_slots service
-message Config {
-  bool enabled = 1;
-  repeated string networks = 2;
-  BackfillConfig backfill = 3;
+// Geo location information for a node
+message Geo {
+  string city = 1;
+  string country = 2;
+  string continent = 3;
+  google.protobuf.DoubleValue latitude = 4;
+  google.protobuf.DoubleValue longitude = 5;
 }
 
-// Backfill configuration
-message BackfillConfig {
-  bool enabled = 1;
-  int64 slots_ago = 2;
-  bool middle_processor_enable = 3; // Enable processing recent window on startup
-  string middle_processor_duration = 4; // Duration for the middle processor (e.g., "1h")
-}
-
-// The state of the processor
-message ProcessorState {
-  google.protobuf.Timestamp last_processed = 1;
-  optional int64 last_processed_slot = 2;
-  optional int64 current_slot = 3;
-  optional int64 target_slot = 4;
-  string direction = 5;  // "forward" or "backward"
-}
-
-// The state of all processors
-message BeaconSlotsState {
-  string network = 1;
-  map<string, ProcessorState> processors = 2;
-}
-
-// Node information
+// Node information, keyed by meta_client_name
 message Node {
-  string id = 1;
-  string consensus_client = 2;
-  string execution_client = 3;
-  string location = 4;
+  string name = 1;
+  string username = 2;
+  Geo geo = 3;
 }
 
-// Proposer data
-message ProposerData {
+// Proposer information (only slot and proposer_validator_index)
+message Proposer {
   int64 slot = 1;
-  google.protobuf.Timestamp timestamp = 2;
-  string proposer_index = 3;
-  uint64 votes = 4;
-  repeated string graffiti = 5;
-  int64 missed_slots = 6;
-  int64 orphaned_slots = 7;
+  int64 proposer_validator_index = 2;
 }
 
-// Block data
+// Block data, matching the target JSON structure precisely
 message BlockData {
   int64 slot = 1;
-  google.protobuf.Timestamp timestamp = 2;
-  string block_hash = 3;
-  string parent_hash = 4;
-  string proposer_index = 5;
-  int64 attestations = 6;
-  int64 deposits = 7;
-  int64 exits = 8;
-  int64 proposer_slashings = 9;
-  int64 attester_slashings = 10;
-  int64 sync_aggregate_bits = 11;
-  int32 sync_committee_size = 12;
-  int32 blob_count = 13;
-  int64 execution_payload_size = 14;
-  int64 capella_deposits = 15;
-  int64 capella_withdrawals = 16;
-  int64 deneb_blob_gas_used = 17;
-  int64 deneb_blob_gas_limit = 18;
-  repeated string seen_by = 19;
-}
-
-// Seen at slot time data
-message SeenAtSlotTimeData {
-  int64 slot = 1;
-  google.protobuf.Timestamp timestamp = 2;
-  string node_id = 3;
-  string block_hash = 4;
-  int64 delay_ms = 5;
-}
-
-// Blob seen at slot time data
-message BlobSeenAtSlotTimeData {
-  int64 slot = 1;
-  google.protobuf.Timestamp timestamp = 2;
-  string node_id = 3;
-  string block_hash = 4;
-  int64 blob_index = 5;
-  int64 delay_ms = 6;
+  google.protobuf.Timestamp slot_start_date_time = 2;
+  int64 epoch = 3;
+  google.protobuf.Timestamp epoch_start_date_time = 4;
+  string block_root = 5;
+  string block_version = 6;
+  google.protobuf.Int64Value block_total_bytes = 7;
+  google.protobuf.Int64Value block_total_bytes_compressed = 8;
+  string parent_root = 9;
+  string state_root = 10;
+  int64 proposer_index = 11;
+  string eth1_data_block_hash = 12;
+  string eth1_data_deposit_root = 13;
+  string execution_payload_block_hash = 14;
+  int64 execution_payload_block_number = 15;
+  string execution_payload_fee_recipient = 16;
+  google.protobuf.Int64Value execution_payload_base_fee_per_gas = 17;
+  google.protobuf.Int64Value execution_payload_blob_gas_used = 18;
+  google.protobuf.Int64Value execution_payload_excess_blob_gas = 19;
+  google.protobuf.Int64Value execution_payload_gas_limit = 20;
+  google.protobuf.Int64Value execution_payload_gas_used = 21;
+  string execution_payload_state_root = 22;
+  string execution_payload_parent_hash = 23;
+  google.protobuf.Int64Value execution_payload_transactions_count = 24;
+  google.protobuf.Int64Value execution_payload_transactions_total_bytes = 25;
+  google.protobuf.Int64Value execution_payload_transactions_total_bytes_compressed = 26;
 }
 
 // Attestation window
 message AttestationWindow {
-  int64 epoch = 1;
-  int64 committee_index = 2;
-  int64 slot = 3;
-  int64 validator_count = 4;
+  int64 start_ms = 1;
+  int64 end_ms = 2;
+  repeated int64 validator_indices = 3;
 }
 
-// Optimized slot data
-message OptimizedSlotData {
+// Attestations data
+message AttestationsData {
+  repeated AttestationWindow windows = 1;
+  int64 maximum_votes = 2;
+}
+
+// Intermediate message for nested blob timing maps
+message BlobTimingMap {
+  map<int64, int64> timings = 1; // map blob_index -> ms
+}
+
+// Timings data
+message Timings {
+  map<string, int64> block_seen = 1; // map meta_client -> ms
+  map<string, BlobTimingMap> blob_seen = 2; // map meta_client -> BlobTimingMap
+  map<string, int64> block_first_seen_p2p = 3; // map meta_client -> ms
+  map<string, BlobTimingMap> blob_first_seen_p2p = 4; // map meta_client -> BlobTimingMap
+}
+
+// Top-level beacon slot data message
+message BeaconSlotData {
   int64 slot = 1;
-  google.protobuf.Timestamp timestamp = 2;
-  ProposerData proposer_data = 3;
-  BlockData block_data = 4;
-  repeated SeenAtSlotTimeData seen_at_slot_time_data = 5;
-  repeated BlobSeenAtSlotTimeData blob_seen_at_slot_time_data = 6;
-  repeated AttestationWindow attestation_windows = 7;
+  string network = 2;
+  google.protobuf.Timestamp processed_at = 3;
+  int64 processing_time_ms = 4;
+  BlockData block = 5;
+  Proposer proposer = 6;
+  google.protobuf.StringValue entity = 7;
+  map<string, Node> nodes = 8;
+  Timings timings = 9;
+  AttestationsData attestations = 10;
 }
-
-// Request to get processor state
-message GetProcessorStateRequest {
-  string network = 1;
-}
-
-// Response containing processor state
-message GetProcessorStateResponse {
-  ProcessorState state = 1;
-}
-
-// Request to get slot data
-message GetSlotDataRequest {
-  string network = 1;
-  int64 slot = 2;
-}
-
-// Response containing slot data
-message GetSlotDataResponse {
-  OptimizedSlotData slot_data = 1;
-}
-
-// Request to get slot range data
-message GetSlotRangeDataRequest {
-  string network = 1;
-  int64 start_slot = 2;
-  int64 end_slot = 3;
-}
-
-// Response containing slot range data
-message GetSlotRangeDataResponse {
-  repeated OptimizedSlotData slot_data = 1;
-}
-
-// Request to get node list
-message GetNodesRequest {
-  string network = 1;
-}
-
-// Response containing node list
-message GetNodesResponse {
-  repeated Node nodes = 1;
-}
-
-// The beacon_slots service definition
-service BeaconSlotsService {
-  // Get processor state
-  rpc GetProcessorState(GetProcessorStateRequest) returns (GetProcessorStateResponse) {}
-  
-  // Get slot data
-  rpc GetSlotData(GetSlotDataRequest) returns (GetSlotDataResponse) {}
-  
-  // Get slot range data
-  rpc GetSlotRangeData(GetSlotRangeDataRequest) returns (GetSlotRangeDataResponse) {}
-  
-  // Get node list
-  rpc GetNodes(GetNodesRequest) returns (GetNodesResponse) {}
-} 
