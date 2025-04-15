@@ -267,7 +267,7 @@ func (b *BeaconChainTimings) GetTimingData(ctx context.Context, network string, 
 func (b *BeaconChainTimings) storeTimingData(network, window string, data *pb.TimingData) error { // Use pb.TimingData
 	// Create path for the data file
 	// Ensure GetStoragePath is defined elsewhere or implement it here
-	dataPath := GetStoragePath(filepath.Join(b.baseDir, "block_timings", network, fmt.Sprintf("%s.json", window)))
+	dataPath := GetStoragePath(filepath.Join(b.baseDir, "block_timings", network, window))
 
 	// Store the data file
 	if _, err := b.storageClient.StoreEncoded(dataPath, data, storage.CodecNameJSON); err != nil {

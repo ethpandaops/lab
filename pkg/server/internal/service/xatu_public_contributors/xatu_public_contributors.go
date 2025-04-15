@@ -58,7 +58,7 @@ type CountryTimePoint struct {
 	Countries map[string]int32 `json:"countries"` // Map country code to public node count
 }
 
-// CountryTimeSeriesData is a slice of CountryTimePoint, representing data for one file (e.g., countries/mainnet/24h.json).
+// CountryTimeSeriesData is a slice of CountryTimePoint, representing data for one file (e.g., countries/mainnet/24h).
 type CountryTimeSeriesData []*CountryTimePoint
 
 type XatuPublicContributors struct {
@@ -475,7 +475,7 @@ func (b *XatuPublicContributors) process(ctx context.Context) {
 
 // --- Processing Logic (Moved from Activities) ---
 
-// processSummary generates the global summary.json file.
+// processSummary generates the global summary file.
 func (b *XatuPublicContributors) processSummary(ctx context.Context, networks []string) error {
 	log := b.log.WithFields(logrus.Fields{
 		"processor": SummaryProcessorName,
@@ -510,8 +510,8 @@ func (b *XatuPublicContributors) processSummary(ctx context.Context, networks []
 			countIf(meta_client_name NOT LIKE 'ethpandaops%') AS public_count
 		FROM beacon_api_eth_v1_events_block FINAL
 		WHERE
-			slot_start_date_time BETWEEN $1 AND $2
-			AND meta_network_name = $3 -- Filter by network in the loop
+			slot_start_date_time BETWEEN ? AND ?
+			AND meta_network_name = ?
 			AND meta_client_name != '' AND meta_client_name IS NOT NULL
 		GROUP BY
 			meta_network_name, country, continent, city, consensus_impl
@@ -621,7 +621,7 @@ func (b *XatuPublicContributors) processSummary(ctx context.Context, networks []
 
 	// Store the global summary
 	// Use getStoragePath to ensure it's within the service's base directory
-	key := "summary.json"
+	key := "summary"
 	_, err := b.storageClient.StoreEncoded(b.getStoragePath(key), summary, storage.CodecNameJSON)
 	if err != nil {
 		return fmt.Errorf("failed to store global summary data: %w", err)
@@ -653,13 +653,13 @@ func (b *XatuPublicContributors) processCountriesWindow(ctx context.Context, net
 	// Query to get public node count per country over time intervals
 	query := `
 		SELECT
-			toStartOfInterval(slot_start_date_time, INTERVAL $1 second) as time_slot,
+			toStartOfInterval(slot_start_date_time, INTERVAL ? second) as time_slot,
 			meta_client_geo_country AS country,
 			count(distinct meta_client_name) AS public_node_count
 		FROM beacon_api_eth_v1_events_block FINAL
 		WHERE
-			slot_start_date_time BETWEEN $2 AND $3
-			AND meta_network_name = $4
+			slot_start_date_time BETWEEN ? AND ?
+			AND meta_network_name = ?
 			AND meta_client_name NOT LIKE 'ethpandaops%' -- Only public nodes
 			AND meta_client_name != '' AND meta_client_name IS NOT NULL
 			AND country != '' AND country IS NOT NULL
@@ -712,8 +712,8 @@ func (b *XatuPublicContributors) processCountriesWindow(ctx context.Context, net
 		return timePointsList[i].Time < timePointsList[j].Time
 	})
 
-	// Store data using the path structure: countries/<network>/<window>.json
-	key := filepath.Join("countries", networkName, window.File+".json")
+	// Store data using the path structure: countries/<network>/<window>
+	key := filepath.Join("countries", networkName, window.File+"")
 	_, err = b.storageClient.StoreEncoded(b.getStoragePath(key), timePointsList, storage.CodecNameJSON)
 	if err != nil {
 		return fmt.Errorf("failed to store countries data for window %s: %w", window.File, err)
@@ -746,15 +746,15 @@ func (b *XatuPublicContributors) processUsersWindow(ctx context.Context, network
 	query := `
 		WITH time_slots AS (
 			SELECT
-				toStartOfInterval(slot_start_date_time, INTERVAL $1 second) as time_slot,
+				toStartOfInterval(slot_start_date_time, INTERVAL ? second) as time_slot,
 				extractAll(meta_client_name, '/([^/]+)/[^/]+$')[1] as username,
 				meta_network_name,
 				count(distinct meta_client_name) AS node_count
 			FROM beacon_api_eth_v1_events_block FINAL
 			WHERE
-				slot_start_date_time BETWEEN $2 AND $3
+				slot_start_date_time BETWEEN ? AND ?
 				AND meta_client_name NOT LIKE 'ethpandaops%'
-				AND meta_network_name = $4
+				AND meta_network_name = ?
 				AND meta_client_name != ''
 				AND meta_client_name IS NOT NULL
 			GROUP BY time_slot, username, meta_network_name
@@ -789,7 +789,7 @@ func (b *XatuPublicContributors) processUsersWindow(ctx context.Context, network
 		}
 		username, _ := row["username"].(string)
 		// network, _ := row["meta_network_name"].(string) // Already known (networkName)
-		nodeCount, ok := row["node_count"].(int) // Assuming int
+		nodeCount, ok := row["node_count"].(uint64) // Assuming int
 		if !ok {
 			log.Warnf("Could not parse node_count from row: %v", row)
 			continue
@@ -827,7 +827,7 @@ func (b *XatuPublicContributors) processUsersWindow(ctx context.Context, network
 	})
 
 	// Store data using the same path structure as Python
-	key := filepath.Join("users", networkName, window.File+".json")
+	key := filepath.Join("users", networkName, window.File+"")
 	_, err = b.storageClient.StoreEncoded(b.getStoragePath(key), timePointsList, storage.CodecNameJSON)
 	if err != nil {
 		return fmt.Errorf("failed to store users data for window %s: %w", window.File, err)
@@ -864,13 +864,11 @@ func (b *XatuPublicContributors) processUserSummaries(ctx context.Context, netwo
 			FROM beacon_api_eth_v1_events_block FINAL
 			WHERE
 				slot_start_date_time >= now() - INTERVAL 24 HOUR
-				AND meta_network_name IN (?) -- Use ? placeholder for slice argument
+				AND meta_network_name = ?
 				AND meta_client_name != ''
 				AND meta_client_name IS NOT NULL
 		)
 		SELECT
-			-- Use Go function ExtractUsername equivalent logic here if possible,
-			-- otherwise replicate CASE statement. For simplicity, we'll use Go side processing.
 			meta_client_name, // Fetch full name, process in Go
 			meta_network_name,
 			meta_consensus_implementation as consensus_client,
@@ -985,7 +983,7 @@ func (b *XatuPublicContributors) processUserSummaries(ctx context.Context, netwo
 	storageBaseDir := "user-summaries" // Global base directory like Python
 	for username, userSummaryData := range usersByName {
 		// Store individual user file
-		userKey := filepath.Join(storageBaseDir, "users", username+".json")
+		userKey := filepath.Join(storageBaseDir, "users", username)
 		// Use StoreEncoded directly, assuming storage client handles base pathing if needed, or adjust key.
 		// Using getStoragePath might prepend the service name, which we don't want here.
 		_, err := b.storageClient.StoreEncoded(userKey, userSummaryData, storage.CodecNameJSON)
@@ -1004,8 +1002,8 @@ func (b *XatuPublicContributors) processUserSummaries(ctx context.Context, netwo
 	})
 
 	// Store global summary file
-	summaryKey := filepath.Join(storageBaseDir, "summary.json")
-	// Declare err here
+	summaryKey := filepath.Join(storageBaseDir, "summary")
+
 	var err error
 	_, err = b.storageClient.StoreEncoded(summaryKey, globalSummary, storage.CodecNameJSON)
 	if err != nil {
@@ -1016,25 +1014,10 @@ func (b *XatuPublicContributors) processUserSummaries(ctx context.Context, netwo
 	return nil
 }
 
-// --- Helper Functions ---
-
-// (Removed outdated proto conversion functions)
-
-// convertToInt32Map converts a map[string]int to map[string]int32 (Kept as it might be useful)
-func convertToInt32Map(intMap map[string]int) map[string]int32 {
-	result := make(map[string]int32, len(intMap))
-	for k, v := range intMap {
-		result[k] = int32(v)
-	}
-	return result
-}
-
-// --- Data Reading Methods for gRPC ---
-
 // ReadSummaryData reads the global summary data from storage.
 func (b *XatuPublicContributors) ReadSummaryData(ctx context.Context) (*GlobalSummary, error) {
 	log := b.log.WithField("method", "ReadSummaryData")
-	key := "summary.json" // Global summary file
+	key := "summary" // Global summary file
 	storagePath := b.getStoragePath(key)
 	summary := &GlobalSummary{}
 
@@ -1059,8 +1042,8 @@ func (b *XatuPublicContributors) ReadCountryDataWindow(ctx context.Context, netw
 		"network": networkName,
 		"window":  windowFile,
 	})
-	// Construct path: countries/<network>/<windowFile>.json
-	key := filepath.Join("countries", networkName, windowFile+".json")
+	// Construct path: countries/<network>/<windowFile>
+	key := filepath.Join("countries", networkName, windowFile+"")
 	storagePath := b.getStoragePath(key)
 	var dataPoints CountryTimeSeriesData // This is []*CountryTimePoint
 
@@ -1086,8 +1069,8 @@ func (b *XatuPublicContributors) ReadUsersDataWindow(ctx context.Context, networ
 		"network": networkName,
 		"window":  windowFile,
 	})
-	// Construct path: users/<network>/<windowFile>.json
-	key := filepath.Join("users", networkName, windowFile+".json")
+	// Construct path: users/<network>/<windowFile>
+	key := filepath.Join("users", networkName, windowFile+"")
 	storagePath := b.getStoragePath(key)
 	var dataPoints []*pb.UsersTimePoint // Directly use the proto type as stored
 
@@ -1113,10 +1096,10 @@ func (b *XatuPublicContributors) ReadUserSummary(ctx context.Context, username s
 		"method":   "ReadUserSummary",
 		"username": username,
 	})
-	// Construct path: user-summaries/users/<username>.json
+	// Construct path: user-summaries/users/<username>
 	// IMPORTANT: This uses a different base directory than getStoragePath typically uses.
 	// We construct the path relative to the storage root directly.
-	storagePath := filepath.Join("user-summaries", "users", username+".json")
+	storagePath := filepath.Join("user-summaries", "users", username+"")
 	userSummary := &pb.UserSummary{} // Directly use the proto type as stored
 
 	log.WithField("path", storagePath).Debug("Attempting to read user summary")

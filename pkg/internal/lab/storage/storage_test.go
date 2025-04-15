@@ -9,6 +9,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/docker/go-connections/nat"
 	"github.com/sirupsen/logrus"
@@ -69,7 +70,7 @@ func setupMinioContainer(t *testing.T) (string, string, string, string, func()) 
 			"MC_HOST_minio": fmt.Sprintf("http://%s:%s@%s", accessKey, secretKey, endpoint),
 		},
 		Cmd:         []string{"mb", "minio/test-bucket"},
-		NetworkMode: "host",
+		NetworkMode: "host", // Use host network to easily reach minio container
 		WaitingFor:  wait.ForLog("Bucket created successfully").WithStartupTimeout(time.Second * 30),
 	}
 
@@ -79,22 +80,23 @@ func setupMinioContainer(t *testing.T) (string, string, string, string, func()) 
 	})
 	if err != nil {
 		// If bucket creation fails, terminate the Minio container
-		container.Terminate(ctx)
-		t.Fatalf("failed to create bucket: %v", err)
+		_ = container.Terminate(ctx)
+		t.Fatalf("failed to create bucket using mc container: %v", err)
+	}
+	// Terminate the mc container as soon as the bucket is created
+	if err := mcContainer.Terminate(ctx); err != nil {
+		t.Logf("failed to terminate mc container: %v", err)
 	}
 
 	// Return the Minio details and a cleanup function
 	return endpoint, bucketName, accessKey, secretKey, func() {
-		if err := mcContainer.Terminate(ctx); err != nil {
-			t.Logf("failed to terminate mc container: %v", err)
-		}
 		if err := container.Terminate(ctx); err != nil {
 			t.Fatalf("failed to terminate minio container: %v", err)
 		}
 	}
 }
 
-func createStorageClient(t *testing.T) (Client, func()) {
+func createStorageClient(t *testing.T) (context.Context, Client, func()) {
 	// Skip integration tests if running in CI or short testing mode
 	if testing.Short() {
 		t.Skip("skipping integration test in short mode")
@@ -111,7 +113,7 @@ func createStorageClient(t *testing.T) (Client, func()) {
 		SecretKey:    secretKey,
 		Bucket:       bucketName,
 		Secure:       false,
-		UsePathStyle: true,
+		UsePathStyle: true, // Important for Minio
 	}
 
 	// Create logger
@@ -129,13 +131,7 @@ func createStorageClient(t *testing.T) (Client, func()) {
 	err = storageClient.Start(ctx)
 	require.NoError(t, err)
 
-	// Set the context in the client for subsequent operations
-	// Type assertion to the concrete client type (lowercase 'client')
-	if concreteClient, ok := storageClient.(*client); ok {
-		concreteClient.ctx = ctx
-	}
-
-	return storageClient, cleanup
+	return ctx, storageClient, cleanup
 }
 
 func TestNew(t *testing.T) {
@@ -148,7 +144,7 @@ func TestNew(t *testing.T) {
 		Bucket:    "test",
 	}
 	client, err := New(config, nil)
-	assert.Error(t, err)
+	assert.Error(t, err) // logrus is required
 	assert.Nil(t, client)
 
 	// Test with valid logger
@@ -159,15 +155,19 @@ func TestNew(t *testing.T) {
 }
 
 func TestStart(t *testing.T) {
-	client, cleanup := createStorageClient(t)
+	ctx, client, cleanup := createStorageClient(t)
 	defer cleanup()
 
-	// Test that the client was started successfully by calling GetClient
+	// Test that the client was started successfully (already checked in createStorageClient)
 	assert.NotNil(t, client.GetClient())
+	// Add a basic check after start, like listing (should be empty)
+	keys, err := client.List(ctx, "start-test-")
+	assert.NoError(t, err)
+	assert.Empty(t, keys)
 }
 
 func TestGetClient(t *testing.T) {
-	client, cleanup := createStorageClient(t)
+	_, client, cleanup := createStorageClient(t)
 	defer cleanup()
 
 	// Test that we can get the underlying S3 client
@@ -176,7 +176,7 @@ func TestGetClient(t *testing.T) {
 }
 
 func TestGetBucket(t *testing.T) {
-	client, cleanup := createStorageClient(t)
+	_, client, cleanup := createStorageClient(t)
 	defer cleanup()
 
 	// Test that we can get the bucket name
@@ -184,164 +184,211 @@ func TestGetBucket(t *testing.T) {
 	assert.Equal(t, "test-bucket", bucket)
 }
 
-func TestStore(t *testing.T) {
-	client, cleanup := createStorageClient(t)
+// TestUnifiedStore covers Store, StoreAtomic, and StoreEncoded scenarios
+func TestUnifiedStore(t *testing.T) {
+	ctx, client, cleanup := createStorageClient(t)
 	defer cleanup()
 
-	// Test storing data
-	key := "test-store-key"
-	data := []byte("test data")
-	err := client.Store(key, data)
+	// 1. Test simple non-atomic store (like old Store)
+	key1 := "test-store-key"
+	data1 := []byte("test data")
+	params1 := StoreParams{Key: key1, Data: data1}
+	err := client.Store(ctx, params1)
 	assert.NoError(t, err)
 
 	// Verify data was stored
-	retrieved, err := client.Get(key)
+	retrieved1, err := client.Get(ctx, key1)
 	assert.NoError(t, err)
-	assert.Equal(t, data, retrieved)
-}
+	assert.Equal(t, data1, retrieved1)
 
-func TestStoreAtomic(t *testing.T) {
-	client, cleanup := createStorageClient(t)
-	defer cleanup()
-
-	// Test storing data atomically
-	key := "test-atomic-key"
-	data := []byte("test atomic data")
-	err := client.StoreAtomic(key, data)
+	// 2. Test atomic store (like old StoreAtomic)
+	key2 := "test-atomic-key"
+	data2 := []byte("test atomic data")
+	params2 := StoreParams{Key: key2, Data: data2, Atomic: true}
+	err = client.Store(ctx, params2)
 	assert.NoError(t, err)
 
 	// Verify data was stored
-	retrieved, err := client.Get(key)
+	retrieved2, err := client.Get(ctx, key2)
 	assert.NoError(t, err)
-	assert.Equal(t, data, retrieved)
+	assert.Equal(t, data2, retrieved2)
 
-	// Verify temporary file was deleted
-	tempKey := fmt.Sprintf("%s.tmp", key)
-	_, err = client.Get(tempKey)
-	assert.Error(t, err) // Should get an error because temp file should be deleted
+	// Verify temporary file was deleted (best effort check)
+	keys, err := client.List(ctx, key2+".")
+	assert.NoError(t, err)
+	foundTemp := false
+	for _, k := range keys {
+		if strings.HasSuffix(k, ".tmp") {
+			foundTemp = true
+			break
+		}
+	}
+	assert.False(t, foundTemp, "Temporary file should have been deleted")
+
+	// 3. Test encoded store (like old StoreEncoded)
+	type TestData struct {
+		Name  string `json:"name" yaml:"name"`
+		Value int    `json:"value" yaml:"value"`
+	}
+	testData := TestData{Name: "encoded", Value: 123}
+	key3 := "test-encoded-key"
+	params3 := StoreParams{
+		Key:      key3,
+		Data:     testData,
+		Format:   CodecNameJSON,
+		Metadata: map[string]string{"Custom-Meta": "test-value"},
+	}
+	err = client.Store(ctx, params3)
+	assert.NoError(t, err)
+
+	finalKey3 := key3 + ".json"
+	var retrievedData3 TestData
+	err = client.GetEncoded(ctx, finalKey3, &retrievedData3, CodecNameJSON)
+	assert.NoError(t, err)
+	assert.Equal(t, testData, retrievedData3)
+
+	// Verify metadata
+	s3Client := client.GetClient()
+	headRes, err := s3Client.HeadObject(ctx, &s3.HeadObjectInput{
+		Bucket: aws.String(client.GetBucket()),
+		Key:    aws.String(finalKey3),
+	})
+	assert.NoError(t, err)
+	assert.Equal(t, "application/json", *headRes.ContentType)
+	assert.Equal(t, "test-value", headRes.Metadata["custom-meta"])
+	assert.Equal(t, string(CodecNameJSON), headRes.Metadata["encoding-format"])
+
+	// 4. Test encoded store with atomic
+	key4 := "test-atomic-encoded-key"
+	params4 := StoreParams{
+		Key:    key4,
+		Data:   testData,
+		Format: CodecNameYAML,
+		Atomic: true,
+	}
+	err = client.Store(ctx, params4)
+	assert.NoError(t, err)
+
+	finalKey4 := key4 + ".yaml"
+	var retrievedData4 TestData
+	err = client.GetEncoded(ctx, finalKey4, &retrievedData4, CodecNameYAML)
+	assert.NoError(t, err)
+	assert.Equal(t, testData, retrievedData4)
+
+	// Verify content type
+	headRes4, err := s3Client.HeadObject(ctx, &s3.HeadObjectInput{
+		Bucket: aws.String(client.GetBucket()),
+		Key:    aws.String(finalKey4),
+	})
+	assert.NoError(t, err)
+	assert.Equal(t, "application/yaml", *headRes4.ContentType)
+	assert.Equal(t, string(CodecNameYAML), headRes4.Metadata["encoding-format"])
+
+	// 5. Test storing non-[]byte without format (should fail)
+	key5 := "test-invalid-data"
+	params5 := StoreParams{Key: key5, Data: testData} // No format
+	err = client.Store(ctx, params5)
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "invalid data type")
 }
 
 func TestGet(t *testing.T) {
-	client, cleanup := createStorageClient(t)
+	ctx, client, cleanup := createStorageClient(t)
 	defer cleanup()
 
 	// Test getting data that doesn't exist
 	nonExistentKey := "non-existent"
-	_, err := client.Get(nonExistentKey)
-	assert.Error(t, err)
+	_, err := client.Get(ctx, nonExistentKey)
+	assert.ErrorIs(t, err, ErrNotFound)
 
 	// Test storing and getting data
 	key := "test-get-key"
 	data := []byte("test get data")
-	err = client.Store(key, data)
+	err = client.Store(ctx, StoreParams{Key: key, Data: data})
 	assert.NoError(t, err)
 
-	retrieved, err := client.Get(key)
+	retrieved, err := client.Get(ctx, key)
 	assert.NoError(t, err)
 	assert.Equal(t, data, retrieved)
 }
 
 func TestDelete(t *testing.T) {
-	client, cleanup := createStorageClient(t)
+	ctx, client, cleanup := createStorageClient(t)
 	defer cleanup()
 
 	// Test deleting data that doesn't exist
-	nonExistentKey := "non-existent"
-	err := client.Delete(nonExistentKey)
-	assert.NoError(t, err) // S3 Delete is idempotent
+	nonExistentKey := "non-existent-delete"
+	err := client.Delete(ctx, nonExistentKey)
+	assert.NoError(t, err) // Delete is idempotent
 
 	// Test storing, deleting, and getting data
 	key := "test-delete-key"
 	data := []byte("test delete data")
-	err = client.Store(key, data)
+	err = client.Store(ctx, StoreParams{Key: key, Data: data})
 	assert.NoError(t, err)
 
-	err = client.Delete(key)
+	err = client.Delete(ctx, key)
 	assert.NoError(t, err)
 
 	// Verify data was deleted
-	_, err = client.Get(key)
-	assert.Error(t, err)
+	_, err = client.Get(ctx, key)
+	assert.ErrorIs(t, err, ErrNotFound)
 }
 
 func TestList(t *testing.T) {
-	client, cleanup := createStorageClient(t)
+	ctx, client, cleanup := createStorageClient(t)
 	defer cleanup()
 
 	// Test listing with a prefix that doesn't exist
 	nonExistentPrefix := "non-existent-prefix-"
-	keys, err := client.List(nonExistentPrefix)
+	keys, err := client.List(ctx, nonExistentPrefix)
 	assert.NoError(t, err)
 	assert.Empty(t, keys)
 
 	// Create a bunch of objects with different prefixes
-	prefix1 := "prefix1-"
-	prefix2 := "prefix2-"
+	prefix1 := "list/prefix1-"
+	prefix2 := "list/prefix2-"
 
 	// Store objects with prefix1
 	for i := 0; i < 3; i++ {
 		key := fmt.Sprintf("%s%d", prefix1, i)
 		data := []byte(fmt.Sprintf("data for %s", key))
-		err := client.Store(key, data)
+		err := client.Store(ctx, StoreParams{Key: key, Data: data})
 		assert.NoError(t, err)
 	}
 
 	// Store objects with prefix2
 	for i := 0; i < 2; i++ {
-		key := fmt.Sprintf("%s%d", prefix2, i)
-		data := []byte(fmt.Sprintf("data for %s", key))
-		err := client.Store(key, data)
+		key := fmt.Sprintf("%s%d.json", prefix2, i) // Add extension
+		data := map[string]int{"val": i}
+		err := client.Store(ctx, StoreParams{Key: key, Data: data, Format: CodecNameJSON})
 		assert.NoError(t, err)
 	}
 
 	// List objects with prefix1
-	keys1, err := client.List(prefix1)
+	keys1, err := client.List(ctx, prefix1)
 	assert.NoError(t, err)
 	assert.Len(t, keys1, 3)
 	for _, key := range keys1 {
-		assert.Contains(t, key, prefix1)
+		assert.True(t, strings.HasPrefix(key, prefix1))
 	}
 
 	// List objects with prefix2
-	keys2, err := client.List(prefix2)
+	keys2, err := client.List(ctx, prefix2)
 	assert.NoError(t, err)
 	assert.Len(t, keys2, 2)
 	for _, key := range keys2 {
-		assert.Contains(t, key, prefix2)
+		assert.True(t, strings.HasPrefix(key, prefix2))
 	}
-}
 
-func TestCopy(t *testing.T) {
-	storage, cleanup := createStorageClient(t)
-	defer cleanup()
-
-	// Setup: store a file
-	sourceKey := "source-key"
-	destinationKey := "destination-key"
-	data := []byte("test copy data")
-	err := storage.Store(sourceKey, data)
+	// List with broader prefix
+	allKeys, err := client.List(ctx, "list/")
 	assert.NoError(t, err)
-
-	// Use type assertion to get access to the concrete client type
-	concreteClient, ok := storage.(*client)
-	require.True(t, ok, "storage should be of type *client")
-
-	// Now we can call the internal copy method
-	err = concreteClient.copy(sourceKey, destinationKey)
-	assert.NoError(t, err)
-
-	// Verify the copy worked
-	retrieved, err := storage.Get(destinationKey)
-	assert.NoError(t, err)
-	assert.Equal(t, data, retrieved)
-
-	// Test copy with non-existent source
-	err = concreteClient.copy("non-existent", "new-destination")
-	assert.Error(t, err)
+	assert.Len(t, allKeys, 5)
 }
 
 func TestStop(t *testing.T) {
-	client, cleanup := createStorageClient(t)
+	_, client, cleanup := createStorageClient(t)
 	defer cleanup()
 
 	// Stop should succeed
@@ -350,7 +397,7 @@ func TestStop(t *testing.T) {
 }
 
 func TestStoreLargeFile(t *testing.T) {
-	client, cleanup := createStorageClient(t)
+	ctx, client, cleanup := createStorageClient(t)
 	defer cleanup()
 
 	// Create a large file (5MB)
@@ -362,44 +409,44 @@ func TestStoreLargeFile(t *testing.T) {
 
 	// Store the large file
 	key := "large-file"
-	err := client.Store(key, data)
+	err := client.Store(ctx, StoreParams{Key: key, Data: data})
 	assert.NoError(t, err)
 
 	// Retrieve and verify
-	retrieved, err := client.Get(key)
+	retrieved, err := client.Get(ctx, key)
 	assert.NoError(t, err)
 	assert.Equal(t, size, len(retrieved))
 	assert.True(t, bytes.Equal(data, retrieved))
 }
 
 func TestStoreNilData(t *testing.T) {
-	client, cleanup := createStorageClient(t)
+	ctx, client, cleanup := createStorageClient(t)
 	defer cleanup()
 
-	// Test storing nil data
+	// Test storing nil data (should result in empty object)
 	key := "nil-data"
 	var data []byte = nil
-	err := client.Store(key, data)
+	err := client.Store(ctx, StoreParams{Key: key, Data: data})
 	assert.NoError(t, err)
 
 	// Verify empty data was stored
-	retrieved, err := client.Get(key)
+	retrieved, err := client.Get(ctx, key)
 	assert.NoError(t, err)
 	assert.Empty(t, retrieved)
 }
 
 func TestStoreEmptyData(t *testing.T) {
-	client, cleanup := createStorageClient(t)
+	ctx, client, cleanup := createStorageClient(t)
 	defer cleanup()
 
 	// Test storing empty data
 	key := "empty-data"
 	data := []byte{}
-	err := client.Store(key, data)
+	err := client.Store(ctx, StoreParams{Key: key, Data: data})
 	assert.NoError(t, err)
 
 	// Verify empty data was stored
-	retrieved, err := client.Get(key)
+	retrieved, err := client.Get(ctx, key)
 	assert.NoError(t, err)
 	assert.Empty(t, retrieved)
 }
@@ -411,10 +458,10 @@ func TestStartWithInvalidEndpoint(t *testing.T) {
 	log.SetOutput(&logBuffer)
 	log.SetLevel(logrus.ErrorLevel)
 
-	// Test with valid but non-responsive endpoint
+	// This will now fail validation due to empty region
 	invalidConfig := &Config{
-		Endpoint:     "http://non-existent-endpoint:12345",
-		Region:       "us-east-1",
+		Endpoint:     "http://localhost:9000",
+		Region:       "", // Empty region should fail validation
 		AccessKey:    "test",
 		SecretKey:    "test",
 		Bucket:       "test-bucket",
@@ -429,165 +476,201 @@ func TestStartWithInvalidEndpoint(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
 
-	// Start should eventually fail with an invalid endpoint
-	// But we don't want to wait for AWS SDK's default timeouts
+	// Start should fail with invalid configuration due to empty region
 	err = client.Start(ctx)
-
-	// We don't assert on specific error because AWS SDK might handle this differently
-	// on different platforms or environments
-}
-
-func TestMockStorage(t *testing.T) {
-	// This test demonstrates how to create a mock implementation of Client
-	// This is useful for unit testing components that depend on storage
-
-	// Create a mock client
-	mockClient := &MockStorage{
-		GetFn: func(key string) ([]byte, error) {
-			if key == "existing-key" {
-				return []byte("mock data"), nil
-			}
-			return nil, fmt.Errorf("key not found")
-		},
-		StoreFn: func(key string, data []byte) error {
-			return nil
-		},
-		DeleteFn: func(key string) error {
-			return nil
-		},
-		ListFn: func(prefix string) ([]string, error) {
-			return []string{"key1", "key2"}, nil
-		},
-	}
-
-	// Test the mock implementation
-	data, err := mockClient.Get("existing-key")
-	assert.NoError(t, err)
-	assert.Equal(t, []byte("mock data"), data)
-
-	_, err = mockClient.Get("non-existent-key")
 	assert.Error(t, err)
-
-	keys, err := mockClient.List("prefix")
-	assert.NoError(t, err)
-	assert.Equal(t, []string{"key1", "key2"}, keys)
+	assert.Contains(t, err.Error(), "region is required")
 }
 
-// MockStorage is a mock implementation of the Client interface
+// --- Mock Storage Tests ---
+
+// MockStorage updated for new interface
 type MockStorage struct {
-	GetFn         func(key string) ([]byte, error)
-	StoreFn       func(key string, data []byte) error
-	StoreAtomicFn func(key string, data []byte) error
-	DeleteFn      func(key string) error
-	ListFn        func(prefix string) ([]string, error)
-	StartFn       func(ctx context.Context) error
-	StopFn        func() error
-	GetClientFn   func() *s3.Client
-	GetBucketFn   func() string
-	encoders      *Registry
+	StoreFn      func(ctx context.Context, params StoreParams) error
+	GetFn        func(ctx context.Context, key string) ([]byte, error)
+	GetEncodedFn func(ctx context.Context, key string, v any, format CodecName) error
+	DeleteFn     func(ctx context.Context, key string) error
+	ListFn       func(ctx context.Context, prefix string) ([]string, error)
+	StartFn      func(ctx context.Context) error
+	StopFn       func() error
+	GetClientFn  func() *s3.Client
+	GetBucketFn  func() string
+	encoders     *Registry   // Keep encoders for GetEncoded mock if needed
+	compressor   *Compressor // Add compressor for compression/decompression
 }
 
 // NewMockStorage creates a new MockStorage with standard encoders
 func NewMockStorage() *MockStorage {
 	return &MockStorage{
-		encoders: NewRegistry(),
+		encoders:   NewRegistry(),   // Initialize encoders
+		compressor: NewCompressor(), // Initialize compressor
 	}
 }
 
 // Ensure MockStorage implements Client interface
 var _ Client = (*MockStorage)(nil)
 
-func (m *MockStorage) Get(key string) ([]byte, error) {
-	return m.GetFn(key)
+func (m *MockStorage) Store(ctx context.Context, params StoreParams) error {
+	if m.StoreFn != nil {
+		return m.StoreFn(ctx, params)
+	}
+	return fmt.Errorf("StoreFn not implemented")
 }
 
-func (m *MockStorage) GetEncoded(key string, v any, format CodecName) error {
-	data, err := m.GetFn(key)
+func (m *MockStorage) Get(ctx context.Context, key string) ([]byte, error) {
+	if m.GetFn != nil {
+		return m.GetFn(ctx, key)
+	}
+	return nil, fmt.Errorf("GetFn not implemented")
+}
+
+// GetEncoded mock implementation (can delegate or be specific)
+func (m *MockStorage) GetEncoded(ctx context.Context, key string, v any, format CodecName) error {
+	if m.GetEncodedFn != nil {
+		return m.GetEncodedFn(ctx, key, v, format)
+	}
+	// Default implementation: Use GetFn and local decoder
+	data, err := m.Get(ctx, key)
 	if err != nil {
-		return fmt.Errorf("failed to get object: %w", err)
+		return fmt.Errorf("mock GetEncoded failed during Get: %w", err)
 	}
-
-	// Initialize encoders if not set
-	if m.encoders == nil {
-		m.encoders = NewRegistry()
-	}
-
 	codec, err := m.encoders.Get(format)
 	if err != nil {
-		return err
+		return fmt.Errorf("mock GetEncoded failed getting codec: %w", err)
 	}
-
 	return codec.Decode(data, v)
 }
 
-func (m *MockStorage) StoreEncoded(key string, v any, format CodecName) (string, error) {
-	// Initialize encoders if not set
-	if m.encoders == nil {
-		m.encoders = NewRegistry()
+func (m *MockStorage) Delete(ctx context.Context, key string) error {
+	if m.DeleteFn != nil {
+		return m.DeleteFn(ctx, key)
 	}
-
-	codec, err := m.encoders.Get(format)
-	if err != nil {
-		return "", err
-	}
-
-	data, err := codec.Encode(v)
-	if err != nil {
-		return "", fmt.Errorf("failed to encode object: %w", err)
-	}
-
-	key = key + "." + codec.FileExtension()
-	return key, m.StoreFn(key, data)
+	return fmt.Errorf("DeleteFn not implemented")
 }
 
-func (m *MockStorage) Store(key string, data []byte) error {
-	return m.StoreFn(key, data)
-}
-
-func (m *MockStorage) StoreAtomic(key string, data []byte) error {
-	if m.StoreAtomicFn != nil {
-		return m.StoreAtomicFn(key, data)
+func (m *MockStorage) List(ctx context.Context, prefix string) ([]string, error) {
+	if m.ListFn != nil {
+		return m.ListFn(ctx, prefix)
 	}
-	return m.StoreFn(key, data)
-}
-
-func (m *MockStorage) Delete(key string) error {
-	return m.DeleteFn(key)
-}
-
-func (m *MockStorage) List(prefix string) ([]string, error) {
-	return m.ListFn(prefix)
+	return nil, fmt.Errorf("ListFn not implemented")
 }
 
 func (m *MockStorage) Start(ctx context.Context) error {
 	if m.StartFn != nil {
 		return m.StartFn(ctx)
 	}
-	return nil
+	return nil // Default mock Start does nothing
 }
 
 func (m *MockStorage) Stop() error {
 	if m.StopFn != nil {
 		return m.StopFn()
 	}
-	return nil
+	return nil // Default mock Stop does nothing
 }
 
 func (m *MockStorage) GetClient() *s3.Client {
 	if m.GetClientFn != nil {
 		return m.GetClientFn()
 	}
-	return nil
+	return nil // Default mock returns nil client
 }
 
 func (m *MockStorage) GetBucket() string {
 	if m.GetBucketFn != nil {
 		return m.GetBucketFn()
 	}
-	return "mock-bucket"
+	return "mock-bucket" // Default mock bucket
 }
 
-// Add TestConfigValidate function
+func TestMockStorage(t *testing.T) {
+	ctx := context.Background()
+	mockData := make(map[string][]byte)
+	storedParams := make(map[string]StoreParams) // Store params for verification
+
+	mockClient := NewMockStorage()
+	mockClient.StoreFn = func(ctx context.Context, params StoreParams) error {
+		// Store params for potential verification later
+		storedParams[params.Key] = params
+		// Simple mock store just puts raw data in map if no format
+		if params.Format != "" {
+			// Basic simulation of encoding for testing GetEncoded
+			codec, err := mockClient.encoders.Get(params.Format)
+			if err != nil {
+				return err
+			}
+			b, err := codec.Encode(params.Data)
+			if err != nil {
+				return err
+			}
+			mockData[params.Key+"."+string(params.Format)] = b // Store with extension
+			return nil
+		}
+		b, ok := params.Data.([]byte)
+		if !ok {
+			return fmt.Errorf("mock expects []byte when format is empty")
+		}
+		mockData[params.Key] = b
+		return nil
+	}
+	mockClient.GetFn = func(ctx context.Context, key string) ([]byte, error) {
+		if data, ok := mockData[key]; ok {
+			return data, nil
+		}
+		return nil, ErrNotFound
+	}
+	mockClient.ListFn = func(ctx context.Context, prefix string) ([]string, error) {
+		keys := []string{}
+		for k := range mockData {
+			if strings.HasPrefix(k, prefix) {
+				keys = append(keys, k)
+			}
+		}
+		return keys, nil
+	}
+	mockClient.DeleteFn = func(ctx context.Context, key string) error {
+		delete(mockData, key)
+		delete(storedParams, key)
+		return nil
+	}
+
+	// Test the mock implementation: Simple Store/Get/List/Delete
+	key := "mock-key"
+	data := []byte("mock data")
+	err := mockClient.Store(ctx, StoreParams{Key: key, Data: data})
+	assert.NoError(t, err)
+
+	retrieved, err := mockClient.Get(ctx, key)
+	assert.NoError(t, err)
+	assert.Equal(t, data, retrieved)
+
+	_, err = mockClient.Get(ctx, "non-existent-key")
+	assert.ErrorIs(t, err, ErrNotFound)
+
+	keys, err := mockClient.List(ctx, "mock-")
+	assert.NoError(t, err)
+	assert.Equal(t, []string{key}, keys)
+
+	err = mockClient.Delete(ctx, key)
+	assert.NoError(t, err)
+	_, err = mockClient.Get(ctx, key)
+	assert.ErrorIs(t, err, ErrNotFound)
+
+	// Test mock with encoding
+	type MockEncData struct{ Val string }
+	encKey := "mock-enc-key"
+	encData := MockEncData{Val: "encoded!"}
+	err = mockClient.Store(ctx, StoreParams{Key: encKey, Data: encData, Format: CodecNameJSON})
+	assert.NoError(t, err)
+
+	finalEncKey := encKey + ".json"
+	var retrievedEnc MockEncData
+	err = mockClient.GetEncoded(ctx, finalEncKey, &retrievedEnc, CodecNameJSON)
+	assert.NoError(t, err)
+	assert.Equal(t, encData, retrievedEnc)
+}
+
+// ... TestConfigValidate remains the same ...
 func TestConfigValidate(t *testing.T) {
 	// Test valid config
 	validConfig := &Config{
@@ -617,175 +700,237 @@ func TestConfigValidate(t *testing.T) {
 	assert.Contains(t, err.Error(), "bucket is required")
 }
 
-// Enhanced TestStoreAtomic to test the error paths using a mock
-func TestStoreAtomicErrors(t *testing.T) {
-	// Create mock with store error
-	storeErrorMock := &MockStorage{
-		StoreFn: func(key string, data []byte) error {
-			return fmt.Errorf("mock store error")
-		},
+// TestStoreError adapted for new Store method
+func TestStoreError(t *testing.T) {
+	ctx := context.Background()
+	mockErr := fmt.Errorf("mock store error")
+
+	// Test 1: Basic store failure
+	mockClient := NewMockStorage()
+	mockClient.StoreFn = func(ctx context.Context, params StoreParams) error {
+		return mockErr
 	}
 
-	// Test store failure
-	err := storeErrorMock.StoreAtomic("test-key", []byte("test-data"))
+	err := mockClient.Store(ctx, StoreParams{Key: "test-key", Data: []byte("test-data")})
+	assert.ErrorIs(t, err, mockErr)
+
+	// Test 2: Encoding error
+	mockEncodeClient := NewMockStorage()
+	// Make a custom StoreFn that passes through to real implementation
+	mockEncodeClient.StoreFn = func(ctx context.Context, params StoreParams) error {
+		if params.Format == CodecNameJSON {
+			// This will trigger the encoding error
+			_, err := mockEncodeClient.encoders.codecs[CodecNameJSON].Encode(params.Data)
+			return err
+		}
+		return nil
+	}
+	// Replace encoder with our error encoder
+	badEncodeErr := fmt.Errorf("bad encode")
+	mockEncodeClient.encoders.codecs[CodecNameJSON] = &errorCodec{encodeErr: badEncodeErr}
+
+	err = mockEncodeClient.Store(ctx, StoreParams{Key: "encode-err", Data: "data", Format: CodecNameJSON})
 	assert.Error(t, err)
-	assert.Contains(t, err.Error(), "mock store error")
+	assert.ErrorIs(t, err, badEncodeErr)
 
-	// Create mock with copy error (StoreAtomic calls Store then ListObjects)
-	mockWithCustomAtomic := &MockStorage{
-		StoreFn: func(key string, data []byte) error {
-			return nil
-		},
-		StoreAtomicFn: func(key string, data []byte) error {
-			// Just log that we calculated the tempKey for code coverage
-			tempKey := fmt.Sprintf("%s.tmp", key)
-			t.Logf("Would use temporary key: %s", tempKey)
-
-			// Simulate successful store but failed copy
-			if strings.HasSuffix(key, "copy-error") {
-				return fmt.Errorf("mock copy error")
+	// Test 3: Invalid data type error
+	mockTypeClient := NewMockStorage()
+	mockTypeClient.StoreFn = func(ctx context.Context, params StoreParams) error {
+		// Just implementing the data type check like in the real client
+		if params.Format == "" {
+			_, ok := params.Data.([]byte)
+			if !ok {
+				return fmt.Errorf("invalid data type: expected []byte when Format is not specified, got %T", params.Data)
 			}
-			// Simulate successful store but failed delete of temp
-			if strings.HasSuffix(key, "delete-error") {
-				// This actually succeeds but would log a warning
-				return nil
-			}
-			return nil
-		},
+		}
+		return nil
 	}
 
-	// Test copy failure
-	err = mockWithCustomAtomic.StoreAtomic("test-copy-error", []byte("test-data"))
+	err = mockTypeClient.Store(ctx, StoreParams{Key: "bad-type", Data: 123}) // No format, expecting []byte
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "invalid data type")
+}
+
+// TestStoreValidation tests that Store method properly validates parameters before proceeding
+func TestStoreValidation(t *testing.T) {
+	ctx, client, cleanup := createStorageClient(t)
+	defer cleanup()
+
+	// Test with an invalid format
+	err := client.Store(ctx, StoreParams{Key: "test-invalid-format", Data: []byte("test data"), Format: "invalid-format"})
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "invalid store parameters")
+
+	// Test with nil data
+	err = client.Store(ctx, StoreParams{Key: "test-nil-data"})
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "invalid store parameters")
+
+	// Test with empty key
+	err = client.Store(ctx, StoreParams{Data: []byte("test data")})
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "invalid store parameters")
+
+	// Test with non-byte data and no format
+	err = client.Store(ctx, StoreParams{Key: "test-wrong-type", Data: "string data"})
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "invalid store parameters")
+}
+
+// TestStoreAtomicErrors tests scenarios where atomic store operations might fail
+func TestStoreAtomicErrors(t *testing.T) {
+	ctx := context.Background()
+
+	// 1. Test temp write failure
+	mockTempWriteErr := NewMockStorage()
+	mockTempWriteErr.StoreFn = func(ctx context.Context, params StoreParams) error {
+		if params.Atomic {
+			return fmt.Errorf("mock temp write error")
+		}
+		return nil
+	}
+
+	err := mockTempWriteErr.Store(ctx, StoreParams{Key: "atomic-key", Data: []byte("d"), Atomic: true})
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "mock temp write error")
+
+	// 2. Test copy failure - fully mock the storage implementation for atomic
+	mockCopyErr := NewMockStorage()
+	// Implementing a minimal version of the client.Store method logic for atomic operations
+	mockCopyErr.StoreFn = func(ctx context.Context, params StoreParams) error {
+		if !params.Atomic {
+			return nil
+		}
+
+		// For atomic storage, we simulate only the key "atomic-copy-fail" failing during "copy"
+		// but after the temporary object is created
+		if params.Key == "atomic-copy-fail" {
+			return fmt.Errorf("mock copy error")
+		}
+
+		return nil
+	}
+
+	err = mockCopyErr.Store(ctx, StoreParams{Key: "atomic-copy-fail", Data: []byte("d"), Atomic: true})
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "mock copy error")
 
-	// Test delete failure (should still succeed)
-	err = mockWithCustomAtomic.StoreAtomic("test-delete-error", []byte("test-data"))
+	// 3. Test the scenario where deleting the temp file fails (should only log warning)
+	// Here we only test that the operation succeeds despite the delete error
+	mockDeleteErr := NewMockStorage()
+	// In real implementation this would log a warning but still return success
+	mockDeleteErr.StoreFn = func(ctx context.Context, params StoreParams) error {
+		// All operations succeed, even if temp delete would fail
+		return nil
+	}
+
+	// This should succeed even though internally there would be a warning about temp file deletion
+	err = mockDeleteErr.Store(ctx, StoreParams{Key: "atomic-delete-fail", Data: []byte("d"), Atomic: true})
 	assert.NoError(t, err)
 }
 
-// Add test for List method error handling
+// ... TestListError, TestGetErrors, TestDeleteError remain similar, just pass context ...
 func TestListError(t *testing.T) {
-	// Create a mock client that will fail on List
-	mockClient := &MockStorage{
-		ListFn: func(prefix string) ([]string, error) {
-			return nil, fmt.Errorf("mock list error")
-		},
+	ctx := context.Background()
+	mockErr := fmt.Errorf("mock list error")
+	mockClient := NewMockStorage()
+	mockClient.ListFn = func(ctx context.Context, prefix string) ([]string, error) {
+		return nil, mockErr
 	}
-
-	// Test failure in List
-	_, err := mockClient.List("test-prefix")
-	assert.Error(t, err)
-	assert.Contains(t, err.Error(), "mock list error")
+	_, err := mockClient.List(ctx, "test-prefix")
+	assert.ErrorIs(t, err, mockErr)
 }
 
-// Add test for Get method error handling
 func TestGetErrors(t *testing.T) {
-	// Create a mock client that will fail on Get
-	mockClient := &MockStorage{
-		GetFn: func(key string) ([]byte, error) {
-			return nil, fmt.Errorf("mock get error")
-		},
+	ctx := context.Background()
+	mockErr := fmt.Errorf("mock get error")
+	mockClient := NewMockStorage()
+	mockClient.GetFn = func(ctx context.Context, key string) ([]byte, error) {
+		return nil, mockErr
 	}
+	_, err := mockClient.Get(ctx, "test-key")
+	assert.ErrorIs(t, err, mockErr)
 
-	// Test failure in Get
-	_, err := mockClient.Get("test-key")
-	assert.Error(t, err)
-	assert.Contains(t, err.Error(), "mock get error")
+	// Test not found error
+	mockClient.GetFn = func(ctx context.Context, key string) ([]byte, error) {
+		return nil, ErrNotFound
+	}
+	_, err = mockClient.Get(ctx, "not-found")
+	assert.ErrorIs(t, err, ErrNotFound)
+}
 
-	// Now test a real client with a scenario that will cause an error
-	client, cleanup := createStorageClient(t)
+func TestDeleteError(t *testing.T) {
+	ctx := context.Background()
+	mockErr := fmt.Errorf("mock delete error")
+	mockClient := NewMockStorage()
+	mockClient.DeleteFn = func(ctx context.Context, key string) error {
+		return mockErr
+	}
+	err := mockClient.Delete(ctx, "test-key")
+	assert.ErrorIs(t, err, mockErr)
+}
+
+// TestGetReadError adapted for new Get signature
+func TestGetReadError(t *testing.T) {
+	ctx := context.Background()
+	readError := fmt.Errorf("simulated read error")
+	// Need a real client to test this path accurately
+	_, client, cleanup := createStorageClient(t)
 	defer cleanup()
 
-	// This test will attempt to get a file that doesn't exist
-	_, err = client.Get("non-existent-file-that-will-cause-error")
-	assert.Error(t, err)
-}
+	// Store a valid object first
+	key := "read-error-test"
+	data := []byte("some data")
+	err := client.Store(ctx, StoreParams{Key: key, Data: data})
+	require.NoError(t, err)
 
-// Add test for error handling in store method
-func TestStoreError(t *testing.T) {
-	// Create a mock client that will fail on store
-	mockClient := &MockStorage{
-		StoreFn: func(key string, data []byte) error {
-			return fmt.Errorf("mock store error")
-		},
+	// --- How to simulate ReadAll error? ---
+	// This is hard to test directly without mocking the http client underlying S3
+	// or injecting an errorReader. For now, we assume io.ReadAll works correctly
+	// and focus on the S3 client errors.
+	// Skipping the direct simulation of io.ReadAll error.
+	t.Log("Skipping direct io.ReadAll error simulation in TestGetReadError")
+
+	// We can test the wrapper error though
+	mockClient := NewMockStorage()
+	mockClient.GetFn = func(ctx context.Context, key string) ([]byte, error) {
+		// Simulate the error *after* GetObject succeeds but before ReadAll finishes
+		// This is closer to the structure of the original Get function
+		return nil, fmt.Errorf("failed to read object body: %w", readError)
 	}
-
-	// Test failure in store
-	err := mockClient.Store("test-key", []byte("test-data"))
-	assert.Error(t, err)
-	assert.Contains(t, err.Error(), "mock store error")
-}
-
-// Add test for error handling in delete method
-func TestDeleteError(t *testing.T) {
-	// Create a mock client that will fail on delete
-	mockClient := &MockStorage{
-		DeleteFn: func(key string) error {
-			return fmt.Errorf("mock delete error")
-		},
-	}
-
-	// Test failure in delete
-	err := mockClient.Delete("test-key")
-	assert.Error(t, err)
-	assert.Contains(t, err.Error(), "mock delete error")
-}
-
-// Add test for io.ReadAll error in Get
-func TestGetReadError(t *testing.T) {
-	// Create a mock client that simulates an error reading the body
-	mockClient := &MockStorage{
-		GetFn: func(key string) ([]byte, error) {
-			// Create a custom error for ReadAll
-			readError := fmt.Errorf("simulated read error")
-
-			// Create a mockReader that returns an error but never used directly
-			// This just demonstrates how this would work with real code
-			_ = &errorReadCloser{err: readError}
-
-			// Return our error when trying to read the body
-			return nil, fmt.Errorf("failed to read object body: %w", readError)
-		},
-	}
-
-	// Call Get which should fail with our read error
-	_, err := mockClient.Get("test-key")
+	_, err = mockClient.Get(ctx, "test-key")
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "failed to read object body")
+	assert.ErrorIs(t, err, readError)
 }
 
-// Add additional testing for List to cover more error cases
+// ... TestListWithEmptyResult adapted ...
 func TestListWithEmptyResult(t *testing.T) {
-	// Test with a mock that returns an empty result (no objects)
-	mockClient := &MockStorage{
-		ListFn: func(prefix string) ([]string, error) {
-			// Simulate empty results but successful API call
-			return []string{}, nil
-		},
+	ctx := context.Background()
+	mockClient := NewMockStorage()
+	mockClient.ListFn = func(ctx context.Context, prefix string) ([]string, error) {
+		return []string{}, nil
 	}
-
-	// Should return empty slice but no error
-	keys, err := mockClient.List("empty-prefix")
+	keys, err := mockClient.List(ctx, "empty-prefix")
 	assert.NoError(t, err)
 	assert.Empty(t, keys)
 }
 
-// Add test for store error with nil data
+// TestStoreWithNilClient adapted
 func TestStoreWithNilClient(t *testing.T) {
-	// Set up a mock with a nil s3 client
-	mockClient := &MockStorage{
-		StoreFn: func(key string, data []byte) error {
-			return fmt.Errorf("client is nil")
-		},
+	ctx := context.Background()
+	// Create a mock client that simulates the case where internal S3 client is nil
+	mockClient := NewMockStorage()
+	mockClient.StoreFn = func(ctx context.Context, params StoreParams) error {
+		return fmt.Errorf("S3 client not initialized, call Start() first")
 	}
 
-	// Try to store something
-	err := mockClient.Store("test-key", []byte("test data"))
+	err := mockClient.Store(ctx, StoreParams{Key: "k", Data: []byte("d")})
 	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "S3 client not initialized")
 }
 
-// errorReadCloser implements io.ReadCloser but always returns an error on Read
+// ... errorReadCloser remains the same ...
 type errorReadCloser struct {
 	err error
 }
@@ -798,179 +943,250 @@ func (r *errorReadCloser) Close() error {
 	return nil
 }
 
-// Add a test for Start method with invalid configuration
+// TestStartWithEmptyRegion adapted
 func TestStartWithEmptyRegion(t *testing.T) {
-	// Create a client with an invalid config
 	log := logrus.New()
-	log.SetOutput(io.Discard) // Suppress log output during test
+	log.SetOutput(io.Discard)
 
 	config := &Config{
-		Endpoint:  "http://localhost:9000",
-		Region:    "",  // Invalid region (empty)
-		AccessKey: "x", // Some value to avoid nil pointers
-		SecretKey: "x", // Some value to avoid nil pointers
+		Endpoint:  "http://localhost:9000", // Needs a valid endpoint structure
+		Region:    "",                      // Invalid region
+		AccessKey: "x",
+		SecretKey: "x",
 		Bucket:    "test-bucket",
 	}
 
 	client, err := New(config, log)
 	require.NoError(t, err)
 
-	// This should produce an error since the config is invalid
-	err = client.Start(context.Background())
+	// Context with timeout
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
 
-	// Some environments might still accept empty region, so we don't assert on the error
-	// but if there is one, it should be about invalid configuration
-	if err != nil {
-		assert.Contains(t, err.Error(), "config")
-	}
+	err = client.Start(ctx)
+	assert.Error(t, err)                                     // AWS SDK should reject empty region
+	assert.Contains(t, err.Error(), "invalid configuration") // Expect config error
 }
 
-// Add a better test for StoreAtomic error paths
-func TestStoreAtomicWithMockStore(t *testing.T) {
-	// Create a mock that fails when Store is called
-	mockStoreError := &MockStorage{
-		StoreFn: func(key string, data []byte) error {
-			// We'll fail for any key that contains "error"
-			if strings.Contains(key, "error") {
-				return fmt.Errorf("store failed: %s", key)
-			}
-			return nil
-		},
-	}
+// --- Helper error codec for testing ---
+type errorCodec struct {
+	encodeErr error
+	decodeErr error
+}
 
-	// Test failure in store phase
-	err := mockStoreError.StoreAtomic("error-key", []byte("test-data"))
+func (c *errorCodec) Encode(v any) ([]byte, error) {
+	if c.encodeErr != nil {
+		return nil, c.encodeErr
+	}
+	return []byte("encoded"), nil
+}
+
+func (c *errorCodec) Decode(data []byte, v any) error {
+	if c.decodeErr != nil {
+		return c.decodeErr
+	}
+	// Simple decode for testing purposes
+	if sv, ok := v.(*string); ok {
+		*sv = string(data)
+	}
+	return nil
+}
+
+func (c *errorCodec) FileExtension() string {
+	return "err"
+}
+
+func (c *errorCodec) GetContentType() string {
+	return "application/octet-stream"
+}
+
+// TestGetEncodedError adapted
+func TestGetEncodedError(t *testing.T) {
+	ctx := context.Background()
+	mockClient := NewMockStorage()
+
+	// Test Get failure path
+	mockClient.GetFn = func(ctx context.Context, key string) ([]byte, error) {
+		return nil, fmt.Errorf("get failed")
+	}
+	var data string
+	err := mockClient.GetEncoded(ctx, "key1", &data, CodecNameJSON)
 	assert.Error(t, err)
-	assert.Contains(t, err.Error(), "store failed")
+	assert.Contains(t, err.Error(), "get failed")
 
-	// Now create a mock with a custom StoreAtomic implementation that tests the copy error path
-	mockCopyError := &MockStorage{
-		StoreFn: func(key string, data []byte) error {
-			return nil // Store succeeds
-		},
-		StoreAtomicFn: func(key string, data []byte) error {
-			// We simulate successful temp store but failed copy
-			tempKey := fmt.Sprintf("%s.tmp", key)
-			t.Logf("Using temporary key: %s", tempKey)
-			return fmt.Errorf("failed to copy temporary object: simulated error")
-		},
+	// Test Codec Get failure path
+	mockClient.GetFn = func(ctx context.Context, key string) ([]byte, error) {
+		return []byte("abc"), nil // Get succeeds
 	}
-
-	// Test the copy failure
-	err = mockCopyError.StoreAtomic("test-key", []byte("test-data"))
+	err = mockClient.GetEncoded(ctx, "key2", &data, CodecName("unknown"))
 	assert.Error(t, err)
-	assert.Contains(t, err.Error(), "failed to copy temporary object")
+	assert.Contains(t, err.Error(), "unknown encoding format")
 
-	// Now test the delete warning path (we can't easily test logging, but we can ensure it doesn't error)
-	mockDeleteWarning := &MockStorage{
-		StoreFn: func(key string, data []byte) error {
-			return nil // Store succeeds
-		},
-		StoreAtomicFn: func(key string, data []byte) error {
-			// Simulate successful copy but failed delete
-			// This would normally log a warning but still return nil
-			return nil
-		},
-	}
-
-	// This should succeed even if there would be a delete warning
-	err = mockDeleteWarning.StoreAtomic("test-key", []byte("test-data"))
-	assert.NoError(t, err)
-}
-
-// Add a test for Get error paths
-func TestGetObjectError(t *testing.T) {
-	// Create a test mock that simulates GetObject failure
-	mockGetObjectError := &MockStorage{
-		GetFn: func(key string) ([]byte, error) {
-			return nil, fmt.Errorf("failed to get object: simulated error")
-		},
-	}
-
-	// This should fail with our simulated error
-	_, err := mockGetObjectError.Get("test-key")
+	// Test Decode failure path
+	mockClient.encoders = NewRegistry() // Reset registry before adding error codec
+	mockClient.encoders.Register(CodecName("errcodec"), &errorCodec{decodeErr: fmt.Errorf("decode failed")})
+	err = mockClient.GetEncoded(ctx, "key3", &data, CodecName("errcodec"))
 	assert.Error(t, err)
-	assert.Contains(t, err.Error(), "failed to get object")
+	assert.Contains(t, err.Error(), "decode failed")
 }
 
-// Add a test for List error paths
-func TestListObjectsError(t *testing.T) {
-	// Create a test mock that simulates ListObjectsV2 failure
-	mockListError := &MockStorage{
-		ListFn: func(prefix string) ([]string, error) {
-			return nil, fmt.Errorf("failed to list objects: simulated error")
-		},
+// TestCompression test for our new compression functionality
+func TestCompression(t *testing.T) {
+	// Skip in short mode
+	if testing.Short() {
+		t.Skip("skipping integration test in short mode")
 	}
 
-	// This should fail with our simulated error
-	_, err := mockListError.List("test-prefix")
-	assert.Error(t, err)
-	assert.Contains(t, err.Error(), "failed to list objects")
-}
-
-// Additional test to improve coverage of content iteration in List
-func TestListWithContents(t *testing.T) {
-	// Create a test mock with non-nil contents
-	mockWithContents := &MockStorage{
-		ListFn: func(prefix string) ([]string, error) {
-			// Return some keys to simulate successful listing
-			return []string{"key1", "key2", "key3"}, nil
-		},
-	}
-
-	// This should succeed and return our predefined keys
-	keys, err := mockWithContents.List("test-prefix")
-	assert.NoError(t, err)
-	assert.Len(t, keys, 3)
-	assert.Equal(t, []string{"key1", "key2", "key3"}, keys)
-}
-
-// Add test for GetEncoded and StoreEncoded methods
-func TestEncodedMethods(t *testing.T) {
-	client, cleanup := createStorageClient(t)
+	ctx, client, cleanup := createStorageClient(t)
 	defer cleanup()
 
-	// Test structure with tags for both JSON and YAML
 	type TestData struct {
-		Name  string `json:"name" yaml:"name"`
-		Value int    `json:"value" yaml:"value"`
+		Message string `json:"message"`
+	}
+	testData := TestData{Message: "Hello Compressed!"}
+
+	// 1. Test storing and retrieving JSON with GZIP compression
+	key := "compressed-json-test"
+	params := StoreParams{
+		Key:         key,
+		Data:        testData,
+		Format:      CodecNameJSON,
+		Compression: Gzip,
 	}
 
-	// Test data
-	testData := TestData{
-		Name:  "test",
-		Value: 42,
+	err := client.Store(ctx, params)
+	require.NoError(t, err)
+
+	// The key should have both .json and .gz extensions
+	expectedKey := key + ".json.gz"
+
+	// List objects to confirm the file exists with correct extension
+	keys, err := client.List(ctx, key)
+	assert.NoError(t, err)
+	assert.Contains(t, keys, expectedKey)
+
+	// Verify we can retrieve and decode the compressed data
+	var retrievedData TestData
+	err = client.GetEncoded(ctx, expectedKey, &retrievedData, CodecNameJSON)
+	assert.NoError(t, err)
+	assert.Equal(t, testData, retrievedData)
+
+	// 2. Test non-existent file
+	_, err = client.Get(ctx, "non-existent-compressed-file.gz")
+	assert.ErrorIs(t, err, ErrNotFound)
+
+	// 3. Test with invalid gzip data
+	invalidGzipKey := "invalid-gzip-data.gz"
+	err = client.Store(ctx, StoreParams{Key: invalidGzipKey, Data: []byte("not gzipped data")})
+	require.NoError(t, err)
+
+	_, err = client.Get(ctx, invalidGzipKey)
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "failed to decompress data")
+}
+
+// --- Helper functions for mock storage ---
+
+// Helper to get internal putObject method from mock storage if needed for complex tests
+func (m *MockStorage) putObject(ctx context.Context, key string, data []byte, contentType string, metadata map[string]string) error {
+	// This simulates the internal behavior for testing purposes
+	return m.Store(ctx, StoreParams{Key: key, Data: data, Metadata: metadata})
+}
+
+// Helper to get internal copyObject method from mock storage
+func (m *MockStorage) copyObject(ctx context.Context, sourceKey, destinationKey, contentType string, metadata map[string]string) error {
+	// This is harder to mock accurately without more state. Returning error for now.
+	return fmt.Errorf("mock copyObject not implemented")
+}
+
+// Helper to get internal deleteObject method from mock storage
+func (m *MockStorage) deleteObject(ctx context.Context, key string) error {
+	return m.Delete(ctx, key)
+}
+
+// Helper to get content type from mock storage
+func (m *MockStorage) getContentType(key string, format CodecName) string {
+	// Simplified version for mock
+	if format == CodecNameJSON || strings.HasSuffix(key, ".json") {
+		return "application/json"
+	}
+	if format == CodecNameYAML || strings.HasSuffix(key, ".yaml") || strings.HasSuffix(key, ".yml") {
+		return "application/yaml"
+	}
+	return "application/octet-stream"
+}
+
+// TestStoreParamsValidate tests the validation of StoreParams
+func TestStoreParamsValidate(t *testing.T) {
+	tests := []struct {
+		name    string
+		params  StoreParams
+		wantErr bool
+		errMsg  string
+	}{
+		{
+			name:    "empty key",
+			params:  StoreParams{Key: "", Data: []byte("data")},
+			wantErr: true,
+			errMsg:  "key is required",
+		},
+		{
+			name:    "nil data",
+			params:  StoreParams{Key: "test-key", Data: nil},
+			wantErr: true,
+			errMsg:  "data is required",
+		},
+		{
+			name:    "invalid format",
+			params:  StoreParams{Key: "test-key", Data: struct{}{}, Format: "invalid"},
+			wantErr: true,
+			errMsg:  "unsupported format: invalid",
+		},
+		{
+			name:    "non-byte data without format",
+			params:  StoreParams{Key: "test-key", Data: struct{}{}},
+			wantErr: true,
+			errMsg:  "data must be []byte when no format is specified",
+		},
+		{
+			name:    "unsupported compression",
+			params:  StoreParams{Key: "test-key", Data: []byte("data"), Compression: &CompressionAlgorithm{Name: "unsupported"}},
+			wantErr: true,
+			errMsg:  "unsupported compression algorithm: unsupported",
+		},
+		{
+			name:    "valid params with byte data",
+			params:  StoreParams{Key: "test-key", Data: []byte("data")},
+			wantErr: false,
+		},
+		{
+			name:    "valid params with struct and JSON format",
+			params:  StoreParams{Key: "test-key", Data: struct{}{}, Format: CodecNameJSON},
+			wantErr: false,
+		},
+		{
+			name:    "valid params with struct and YAML format",
+			params:  StoreParams{Key: "test-key", Data: struct{}{}, Format: CodecNameYAML},
+			wantErr: false,
+		},
+		{
+			name:    "valid params with compression",
+			params:  StoreParams{Key: "test-key", Data: []byte("data"), Compression: Gzip},
+			wantErr: false,
+		},
 	}
 
-	// Test JSON encoding
-	jsonKey := "test-json-encoded"
-	storedJsonKey, err := client.StoreEncoded(jsonKey, testData, CodecNameJSON)
-	assert.NoError(t, err)
-	assert.Equal(t, jsonKey+".json", storedJsonKey)
-
-	var retrievedJsonData TestData
-	err = client.GetEncoded(storedJsonKey, &retrievedJsonData, CodecNameJSON)
-	assert.NoError(t, err)
-	assert.Equal(t, testData, retrievedJsonData)
-
-	// Test YAML encoding
-	yamlKey := "test-yaml-encoded"
-	storedYamlKey, err := client.StoreEncoded(yamlKey, testData, CodecNameYAML)
-	assert.NoError(t, err)
-	assert.Equal(t, yamlKey+".yaml", storedYamlKey)
-
-	var retrievedYamlData TestData
-	err = client.GetEncoded(storedYamlKey, &retrievedYamlData, CodecNameYAML)
-	assert.NoError(t, err)
-	assert.Equal(t, testData, retrievedYamlData)
-
-	// Test unsupported encoding format for StoreEncoded
-	_, err = client.StoreEncoded("test-bad-encoding", testData, CodecName("bad_format"))
-	assert.Error(t, err)
-	assert.Contains(t, err.Error(), "unknown encoding format")
-
-	// Test unsupported encoding format for GetEncoded
-	err = client.GetEncoded(storedJsonKey, &retrievedJsonData, CodecName("bad_format"))
-	assert.Error(t, err)
-	assert.Contains(t, err.Error(), "unknown encoding format")
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := tt.params.Validate()
+			if tt.wantErr {
+				assert.Error(t, err)
+				if tt.errMsg != "" {
+					assert.Contains(t, err.Error(), tt.errMsg)
+				}
+			} else {
+				assert.NoError(t, err)
+			}
+		})
+	}
 }

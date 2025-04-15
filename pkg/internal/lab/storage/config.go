@@ -22,5 +22,9 @@ func (c *Config) Validate() error {
 		return fmt.Errorf("bucket is required")
 	}
 
+	if c.Region == "" {
+		return fmt.Errorf("region is required")
+	}
+
 	return nil
 }

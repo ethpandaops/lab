@@ -112,3 +112,7 @@ func (c *customTestCodec) Decode(data []byte, v any) error {
 func (c *customTestCodec) FileExtension() string {
 	return "custom"
 }
+
+func (c *customTestCodec) GetContentType() string {
+	return "application/custom"
+}

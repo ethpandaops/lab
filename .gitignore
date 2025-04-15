@@ -37,6 +37,7 @@ ENV/
 *.swp
 *.swo
 *~
+*debug_bin*
 
 # OS
 .DS_Store

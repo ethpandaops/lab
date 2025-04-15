@@ -7,10 +7,13 @@ services:
       - "6379:6379"
     volumes:
       - redis_data:/data
+    profiles: 
+      - '*'
+      - infra
 
   minio:
     image: minio/minio
-    command: server /data --console-address ":9001"
+    command: server /data --console-address ":9001" --anonymous
     ports:
       - "9000:9000"
       - "9001:9001"
@@ -19,6 +22,9 @@ services:
       MINIO_ROOT_PASSWORD: minioadmin
     volumes:
       - minio_data:/data
+    profiles: 
+      - '*'
+      - infra
 
   # Create the lab bucket in MinIO
   createbuckets:
@@ -36,6 +42,9 @@ services:
       /usr/bin/mc policy set public myminio/lab;
       exit 0;
       "
+    profiles: 
+      - '*'
+      - infra
 
   server:
     build:
@@ -47,11 +56,10 @@ services:
       - XATU_CLICKHOUSE_PASSWORD=${XATU_CLICKHOUSE_PASSWORD}
     ports:
       - "6666:6666"
-    depends_on:
-      - minio
-      - createbuckets
     volumes:
       - ./deploy/docker-compose/service.config.yaml:/app/config/service.config.yaml
+    profiles: 
+      - 'backend'
 
   api:
     build:
@@ -60,11 +68,10 @@ services:
     command: ["api", "--api-config", "/app/config/api.config.yaml"]
     ports:
       - "8080:8080"
-    depends_on:
-      - redis
-      - server
     volumes:
       - ./deploy/docker-compose/api.config.yaml:/app/config/api.config.yaml
+    profiles: 
+      - 'backend'
 
   frontend:
     build:
@@ -72,10 +79,10 @@ services:
       dockerfile: Dockerfile
     ports:
       - "3000:3000"
-    depends_on:
-      - api
     environment:
       VITE_BACKEND_URL: http://api:8080
+    profiles: 
+      - 'frontend'
 
 volumes:
   minio_data:

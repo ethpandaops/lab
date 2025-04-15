@@ -61,8 +61,8 @@ func (b *BeaconChainTimings) GetSizeCDFData(ctx context.Context, network string,
 			COUNT(*) * 131072 as total_blob_bytes -- 128KB per blob
 		FROM canonical_beacon_blob_sidecar FINAL
 		WHERE
-			slot_start_date_time BETWEEN $1 AND $2
-			AND meta_network_name = $3
+			slot_start_date_time BETWEEN ? AND ?
+			AND meta_network_name = ?
 		GROUP BY slot
 	`
 
@@ -129,8 +129,8 @@ func (b *BeaconChainTimings) GetSizeCDFData(ctx context.Context, network string,
 			slot
 		FROM mev_relay_proposer_payload_delivered FINAL
 		WHERE
-			slot_start_date_time BETWEEN $1 AND $2
-			AND meta_network_name = $3
+			slot_start_date_time BETWEEN ? AND ?
+			AND meta_network_name = ?
 	`
 
 	mevRows, err := ch.Query(ctx, mevQuery, startStr, endStr, network)
@@ -175,8 +175,8 @@ func (b *BeaconChainTimings) GetSizeCDFData(ctx context.Context, network string,
 			min(propagation_slot_start_diff) as arrival_time
 		FROM beacon_api_eth_v1_events_block FINAL
 		WHERE
-			slot_start_date_time BETWEEN $1 AND $2
-			AND meta_network_name = $3
+			slot_start_date_time BETWEEN ? AND ?
+			AND meta_network_name = ?
 		GROUP BY slot, meta_network_name
 	`
 
@@ -243,8 +243,8 @@ func (b *BeaconChainTimings) GetSizeCDFData(ctx context.Context, network string,
 			block_total_bytes_compressed
 		FROM canonical_beacon_block FINAL
 		WHERE
-			slot_start_date_time BETWEEN $1 AND $2
-			AND meta_network_name = $3
+			slot_start_date_time BETWEEN ? AND ?
+			AND meta_network_name = ?
 	`
 
 	sizeRows, err := ch.Query(ctx, sizeQuery, startStr, endStr, network)
@@ -259,7 +259,7 @@ func (b *BeaconChainTimings) GetSizeCDFData(ctx context.Context, network string,
 			"index" as proposer_index,
 			entity
 		FROM ethseer_validator_entity FINAL
-		WHERE meta_network_name = $1
+		WHERE meta_network_name = ?
 	`
 
 	proposerRows, err := ch.Query(ctx, proposerQuery, network)
@@ -559,7 +559,7 @@ func (b *BeaconChainTimings) GetSizeCDFData(ctx context.Context, network string,
 // storeSizeCDFData stores size CDF data
 func (b *BeaconChainTimings) storeSizeCDFData(network, window string, data *SizeCDFData) error {
 	// Create path for the data file
-	dataPath := filepath.Join(b.baseDir, "size_cdf", network, fmt.Sprintf("%s.json", window))
+	dataPath := filepath.Join(b.baseDir, "size_cdf", network, fmt.Sprintf("%s", window))
 
 	// Store the data file
 	if _, err := b.storageClient.StoreEncoded(GetStoragePath(dataPath), data, storage.CodecNameJSON); err != nil {

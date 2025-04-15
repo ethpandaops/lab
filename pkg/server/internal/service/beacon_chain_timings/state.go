@@ -12,5 +12,5 @@ type State struct {
 }
 
 func GetStateKey() string {
-	return "state.json"
+	return "state"
 }

@@ -509,13 +509,13 @@ func (b *BeaconSlots) processMissing(ctx context.Context, networkName string) {
 	}
 
 	query := `
-		WITH range(toInt64($1), toInt64($2)) AS all_slots
+		WITH range(toInt64(?), toInt64(?)) AS all_slots
 		SELECT slot_candidate
 		FROM (
 			SELECT arrayJoin(all_slots) AS slot_candidate
 		) AS slots
 		LEFT JOIN xatu.beacon_api_eth_v1_events_block AS blocks
-			ON blocks.slot = slot_candidate AND blocks.network = $3
+			ON blocks.slot = slot_candidate AND blocks.network = ?
 		WHERE blocks.slot IS NULL
 	`
 
@@ -682,7 +682,7 @@ func (b *BeaconSlots) processSlot(ctx context.Context, networkName string, slot 
 	}
 
 	// 6. Store the data to storage
-	storageKey := fmt.Sprintf("slots/%s/%d.json", networkName, slot)
+	storageKey := fmt.Sprintf("slots/%s/%d", networkName, slot)
 	jsonData, err := ToJSON(optimizedData)
 	if err != nil {
 		return false, fmt.Errorf("failed to marshal optimized data: %w", err)
@@ -1155,9 +1155,9 @@ func (b *BeaconSlots) getBlockSeenAtSlotTime(ctx context.Context, networkName st
 				event_date_time
 			FROM xatu.beacon_api_eth_v1_events_block FINAL
 			WHERE
-				slot = $1
-				AND meta_network_name = $2
-				AND slot_start_date_time BETWEEN $3 AND $4
+				slot = ?
+				AND meta_network_name = ?
+				AND slot_start_date_time BETWEEN ? AND ?
 		),
 		head_events AS (
 			SELECT 
@@ -1169,9 +1169,9 @@ func (b *BeaconSlots) getBlockSeenAtSlotTime(ctx context.Context, networkName st
 				event_date_time
 			FROM xatu.beacon_api_eth_v1_events_block FINAL
 			WHERE
-				slot = $1
-				AND meta_network_name = $2
-				AND slot_start_date_time BETWEEN $3 AND $4
+				slot = ?
+				AND meta_network_name = ?
+				AND slot_start_date_time BETWEEN ? AND ?
 		),
 		combined_events AS (
 			SELECT * FROM api_events
@@ -1199,8 +1199,10 @@ func (b *BeaconSlots) getBlockSeenAtSlotTime(ctx context.Context, networkName st
 		return nil, fmt.Errorf("failed to get ClickHouse client for network %s: %w", networkName, err)
 	}
 
+	args := []interface{}{slot, networkName, startStr, endStr, slot, networkName, startStr, endStr}
+
 	// Execute the query
-	result, err := ch.Query(ctx, query, slot, networkName, startStr, endStr)
+	result, err := ch.Query(ctx, query, args...)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get block seen at slot time: %w", err)
 	}
@@ -1247,9 +1249,9 @@ func (b *BeaconSlots) getBlobSeenAtSlotTime(ctx context.Context, networkName str
 				ROW_NUMBER() OVER (PARTITION BY meta_client_name, blob_index ORDER BY event_date_time ASC) as rn
 			FROM xatu.beacon_api_eth_v1_events_blob_sidecar FINAL
 			WHERE
-				slot = $1
-				AND meta_network_name = $2
-				AND slot_start_date_time BETWEEN $3 AND $4
+				slot = ?
+				AND meta_network_name = ?
+				AND slot_start_date_time BETWEEN ? AND ?
 		) t
 		WHERE rn = 1
 		ORDER BY event_date_time ASC
@@ -1314,9 +1316,9 @@ func (b *BeaconSlots) getBlockFirstSeenInP2PSlotTime(ctx context.Context, networ
 				ROW_NUMBER() OVER (PARTITION BY meta_client_name ORDER BY event_date_time ASC) as rn
 			FROM xatu.libp2p_gossipsub_beacon_block FINAL
 			WHERE
-				slot = $1
-				AND meta_network_name = $2
-				AND slot_start_date_time BETWEEN $3 AND $4
+				slot = ?
+				AND meta_network_name = ?
+				AND slot_start_date_time BETWEEN ? AND ?
 		) t
 		WHERE rn = 1
 		ORDER BY event_date_time ASC
@@ -1376,9 +1378,9 @@ func (b *BeaconSlots) getBlobFirstSeenInP2PSlotTime(ctx context.Context, network
 				ROW_NUMBER() OVER (PARTITION BY meta_client_name, blob_index ORDER BY event_date_time ASC) as rn
 			FROM xatu.libp2p_gossipsub_blob_sidecar FINAL
 			WHERE
-				slot = $1
-				AND meta_network_name = $2
-				AND slot_start_date_time BETWEEN $3 AND $4
+				slot = ?
+				AND meta_network_name = ?
+				AND slot_start_date_time BETWEEN ? AND ?
 		) t
 		WHERE rn = 1
 		ORDER BY event_date_time ASC

@@ -2,33 +2,80 @@ package storage
 
 import (
 	"bytes"
-	"compress/gzip"
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
+	"net/url"
 	"strings"
+	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/credentials"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
+	"github.com/aws/aws-sdk-go-v2/service/s3/types"
 	"github.com/aws/smithy-go"
 	"github.com/sirupsen/logrus"
 )
+
+// StoreParams defines the parameters for the Store operation
+type StoreParams struct {
+	Key         string
+	Data        interface{}           // Can be []byte or a struct if Format is provided
+	Format      CodecName             // Optional: If set, Data will be encoded using this format
+	Atomic      bool                  // Optional: If true, uses atomic write pattern (defaults false)
+	Metadata    map[string]string     // Optional: Additional metadata for the S3 object
+	Compression *CompressionAlgorithm // Optional: If set, data will be compressed
+}
+
+// Validate checks if the StoreParams are valid for a storage operation
+func (p *StoreParams) Validate() error {
+	if p.Key == "" {
+		return fmt.Errorf("key is required")
+	}
+
+	if p.Data == nil {
+		return fmt.Errorf("data is required")
+	}
+
+	// If Format is specified, verify it's a supported format
+	if p.Format != "" {
+		switch p.Format {
+		case CodecNameJSON, CodecNameYAML:
+			// Valid formats
+		default:
+			return fmt.Errorf("unsupported format: %s", p.Format)
+		}
+	} else {
+		// If no Format is provided, Data must be []byte
+		if _, ok := p.Data.([]byte); !ok {
+			return fmt.Errorf("data must be []byte when no format is specified, got %T", p.Data)
+		}
+	}
+
+	// If Compression is specified, verify it's a supported algorithm
+	if p.Compression != nil && p.Compression != None {
+		switch p.Compression.Name {
+		case Gzip.Name:
+			// Supported compression algorithm
+		default:
+			return fmt.Errorf("unsupported compression algorithm: %s", p.Compression.Name)
+		}
+	}
+
+	return nil
+}
 
 type Client interface {
 	Start(ctx context.Context) error
 	GetClient() *s3.Client
 	GetBucket() string
-	Store(key string, data []byte) error
-	StoreAtomic(key string, data []byte) error
-	Get(key string) ([]byte, error)
-	GetEncoded(key string, v any, format CodecName) error
-	StoreEncoded(key string, v any, format CodecName) (string, error)
-	Delete(key string) error
-	List(prefix string) ([]string, error)
+	Store(ctx context.Context, params StoreParams) error // Unified Store method
+	Get(ctx context.Context, key string) ([]byte, error)
+	GetEncoded(ctx context.Context, key string, v any, format CodecName) error
+	Delete(ctx context.Context, key string) error
+	List(ctx context.Context, prefix string) ([]string, error)
 	Stop() error
 }
 
@@ -38,11 +85,12 @@ var (
 
 // Client represents an S3 storage client
 type client struct {
-	client   *s3.Client
-	config   *Config
-	log      logrus.FieldLogger
-	ctx      context.Context
-	encoders *Registry
+	client     *s3.Client
+	config     *Config
+	log        logrus.FieldLogger
+	ctx        context.Context
+	encoders   *Registry
+	compressor *Compressor
 }
 
 // New creates a new S3 storage client
@@ -50,15 +98,25 @@ func New(
 	config *Config,
 	log logrus.FieldLogger,
 ) (Client, error) {
+	if log == nil {
+		return nil, fmt.Errorf("logger is required")
+	}
+
 	return &client{
-		log:      log.WithField("module", "storage"),
-		config:   config,
-		encoders: NewRegistry(),
+		log:        log.WithField("module", "storage"),
+		config:     config,
+		encoders:   NewRegistry(),
+		compressor: NewCompressor(),
 	}, nil
 }
 
 func (c *client) Start(ctx context.Context) error {
 	c.log.Info("Starting S3 storage client")
+
+	// Call Validate to ensure basic requirements are met
+	if err := c.config.Validate(); err != nil {
+		return fmt.Errorf("invalid configuration: %w", err)
+	}
 
 	// Ensure endpoint has a protocol
 	endpoint := c.config.Endpoint
@@ -73,6 +131,12 @@ func (c *client) Start(ctx context.Context) error {
 			"original": c.config.Endpoint,
 			"modified": endpoint,
 		}).Debug("Added protocol scheme to endpoint URL")
+	}
+
+	// Validate that the endpoint URL is valid
+	_, err := url.Parse(endpoint)
+	if err != nil {
+		return fmt.Errorf("invalid endpoint URL: %w", err)
 	}
 
 	// Create custom resolver for S3 compatible storage
@@ -105,12 +169,12 @@ func (c *client) Start(ctx context.Context) error {
 	c.ctx = ctx // Save the context for later use in S3 operations
 
 	// Check if the bucket exists, create it if it doesn't
-	exists, err := c.bucketExists(c.config.Bucket)
+	exists, err := c.bucketExists(ctx, c.config.Bucket)
 	if err != nil {
 		c.log.WithError(err).Warnf("Failed to check if bucket %s exists", c.config.Bucket)
 	} else if !exists {
 		c.log.Infof("Bucket %s does not exist, creating it", c.config.Bucket)
-		if err := c.createBucket(c.config.Bucket); err != nil {
+		if err := c.createBucket(ctx, c.config.Bucket); err != nil {
 			return fmt.Errorf("failed to create bucket %s: %w", c.config.Bucket, err)
 		}
 		c.log.Infof("Successfully created bucket %s", c.config.Bucket)
@@ -131,41 +195,146 @@ func (c *client) GetBucket() string {
 	return c.config.Bucket
 }
 
-// Store stores data directly (non-atomic)
-func (c *client) Store(key string, data []byte) error {
-	return c.store(key, data)
+// getContentType determines the content type based on file extension or codec
+func (c *client) getContentType(key string, format CodecName) (string, error) {
+	// If format is provided, use the codec's content type
+	if format != "" {
+		if codec, err := c.encoders.Get(format); err == nil {
+			return codec.GetContentType(), nil
+		} else {
+			return "", fmt.Errorf("unknown encoding format: %s", format)
+		}
+	}
+
+	// Format not provided, try to determine from file extension
+	if strings.HasSuffix(key, ".json") {
+		return "application/json", nil
+	} else if strings.HasSuffix(key, ".yaml") || strings.HasSuffix(key, ".yml") {
+		return "application/yaml", nil
+	} else if strings.HasSuffix(key, ".txt") {
+		return "text/plain", nil
+	} else if strings.HasSuffix(key, ".html") || strings.HasSuffix(key, ".htm") {
+		return "text/html", nil
+	} else if strings.HasSuffix(key, ".css") {
+		return "text/css", nil
+	} else if strings.HasSuffix(key, ".js") {
+		return "application/javascript", nil
+	} else if strings.HasSuffix(key, ".csv") {
+		return "text/csv", nil
+	}
+
+	// Default to binary format if unknown
+	return "application/octet-stream", nil
 }
 
-// StoreAtomic stores data atomically using a temporary file pattern
-func (c *client) StoreAtomic(key string, data []byte) error {
-	tempKey := fmt.Sprintf("%s.tmp", key)
-
-	// Store the data in a temporary location
-	if err := c.store(tempKey, data); err != nil {
-		return fmt.Errorf("failed to store temporary object: %w", err)
+// Store stores data based on the provided parameters.
+// It handles encoding, compression, atomicity, content type, and metadata.
+func (c *client) Store(ctx context.Context, params StoreParams) error {
+	// Validate params before proceeding
+	if err := params.Validate(); err != nil {
+		return fmt.Errorf("invalid store parameters: %w", err)
 	}
 
-	// Copy the temporary object to the final location
-	if err := c.copy(tempKey, key); err != nil {
-		return fmt.Errorf("failed to copy temporary object: %w", err)
+	var dataBytes []byte
+	finalKey := params.Key
+
+	// 1. Handle Encoding if Format is specified
+	if params.Format != "" {
+		codec, err := c.encoders.Get(params.Format)
+		if err != nil {
+			return fmt.Errorf("failed to get codec '%s': %w", params.Format, err)
+		}
+
+		dataBytes, err = codec.Encode(params.Data)
+		if err != nil {
+			return fmt.Errorf("failed to encode object with format '%s': %w", params.Format, err)
+		}
+
+		// Ensure key has the correct file extension
+		if !strings.HasSuffix(finalKey, "."+codec.FileExtension()) {
+			finalKey = finalKey + "." + codec.FileExtension()
+		}
+
+		// Add encoding format to metadata if not already present
+		if params.Metadata == nil {
+			params.Metadata = make(map[string]string)
+		}
+		if _, exists := params.Metadata["Encoding-Format"]; !exists {
+			params.Metadata["Encoding-Format"] = string(params.Format)
+		}
+	} else {
+		// Assume Data is []byte if Format is not specified
+		var ok bool
+		dataBytes, ok = params.Data.([]byte)
+		if !ok {
+			return fmt.Errorf("invalid data type: expected []byte when Format is not specified, got %T", params.Data)
+		}
 	}
 
-	// Delete the temporary object
-	if err := c.delete(tempKey); err != nil {
-		c.log.WithField("key", tempKey).Warn("Failed to delete temporary object")
+	// 2. Handle Compression if specified
+	if params.Compression != nil && params.Compression != None {
+		compressed, err := c.compressor.Compress(dataBytes, params.Compression)
+		if err != nil {
+			return fmt.Errorf("failed to compress data: %w", err)
+		}
+		dataBytes = compressed
+
+		// Add compression extension
+		finalKey = AddExtension(finalKey, params.Compression)
+
+		// Add Content-Encoding to metadata
+		if params.Metadata == nil {
+			params.Metadata = make(map[string]string)
+		}
+		params.Metadata["Content-Encoding"] = params.Compression.ContentEncoding
 	}
 
-	return nil
+	// 3. Determine Content Type
+	contentType, err := c.getContentType(finalKey, params.Format)
+	if err != nil {
+		return fmt.Errorf("failed to get content type: %w", err)
+	}
+
+	// 4. Handle Atomicity
+	if params.Atomic {
+		tempKey := fmt.Sprintf("%s.%d.tmp", finalKey, time.Now().UnixNano())
+
+		// Store the data in a temporary location
+		if err := c.putObject(ctx, tempKey, dataBytes, contentType, params.Metadata); err != nil {
+			return fmt.Errorf("atomic store failed (temp write): %w", err)
+		}
+
+		// Copy the temporary object to the final location
+		if err := c.copyObject(ctx, tempKey, finalKey, contentType, params.Metadata); err != nil {
+			// Attempt cleanup on copy failure
+			_ = c.deleteObject(ctx, tempKey) // Best effort delete
+			return fmt.Errorf("atomic store failed (copy): %w", err)
+		}
+
+		// Delete the temporary object
+		if err := c.deleteObject(ctx, tempKey); err != nil {
+			// Log warning, but proceed as the main operation succeeded
+			c.log.WithFields(logrus.Fields{"key": tempKey, "error": err}).Warn("Failed to delete temporary object after atomic store")
+		}
+		return nil // Atomic store successful
+	} else {
+		// Non-atomic store: write directly to the final key
+		return c.putObject(ctx, finalKey, dataBytes, contentType, params.Metadata)
+	}
 }
 
 // Get retrieves data from storage
-func (c *client) Get(key string) ([]byte, error) {
+func (c *client) Get(ctx context.Context, key string) ([]byte, error) {
+	if c.client == nil {
+		return nil, fmt.Errorf("S3 client not initialized, call Start() first")
+	}
+
 	getObjectInput := &s3.GetObjectInput{
 		Bucket: aws.String(c.config.Bucket),
 		Key:    aws.String(key),
 	}
 
-	result, err := c.client.GetObject(c.ctx, getObjectInput)
+	result, err := c.client.GetObject(ctx, getObjectInput)
 	if err != nil {
 		var apiErr smithy.APIError
 		if errors.As(err, &apiErr) {
@@ -182,22 +351,48 @@ func (c *client) Get(key string) ([]byte, error) {
 		return nil, fmt.Errorf("failed to read object body: %w", err)
 	}
 
+	// Check for Content-Encoding header to handle compression
+	if contentEncoding, ok := result.Metadata["content-encoding"]; ok && contentEncoding != "" {
+		// Try to decompress
+		algo, err := GetCompressionAlgorithmFromContentEncoding(contentEncoding)
+		if err == nil && algo != None {
+			decompressed, err := c.compressor.Decompress(data, key)
+			if err != nil {
+				return nil, fmt.Errorf("failed to decompress data: %w", err)
+			}
+			return decompressed, nil
+		}
+	}
+
+	// Also check filename for compression extension
+	if HasAnyCompressionExtension(key) {
+		decompressed, err := c.compressor.Decompress(data, key)
+		if err != nil {
+			return nil, fmt.Errorf("failed to decompress data: %w", err)
+		}
+		return decompressed, nil
+	}
+
 	return data, nil
 }
 
 // Delete removes data from storage
-func (c *client) Delete(key string) error {
-	return c.delete(key)
+func (c *client) Delete(ctx context.Context, key string) error {
+	return c.deleteObject(ctx, key)
 }
 
 // List lists objects with the given prefix
-func (c *client) List(prefix string) ([]string, error) {
+func (c *client) List(ctx context.Context, prefix string) ([]string, error) {
+	if c.client == nil {
+		return nil, fmt.Errorf("S3 client not initialized, call Start() first")
+	}
+
 	listObjectsInput := &s3.ListObjectsV2Input{
 		Bucket: aws.String(c.config.Bucket),
 		Prefix: aws.String(prefix),
 	}
 
-	result, err := c.client.ListObjectsV2(c.ctx, listObjectsInput)
+	result, err := c.client.ListObjectsV2(ctx, listObjectsInput)
 	if err != nil {
 		return nil, fmt.Errorf("failed to list objects: %w", err)
 	}
@@ -211,114 +406,91 @@ func (c *client) List(prefix string) ([]string, error) {
 }
 
 // GetEncoded retrieves data from storage and decodes it into a struct
-func (c *client) GetEncoded(key string, v any, format CodecName) error {
-	data, err := c.Get(key)
+func (c *client) GetEncoded(ctx context.Context, key string, v any, format CodecName) error {
+	data, err := c.Get(ctx, key)
 	if err != nil {
-		return fmt.Errorf("failed to get object: %w", err)
+		return fmt.Errorf("GetEncoded failed: %w", err)
 	}
 
 	codec, err := c.encoders.Get(format)
 	if err != nil {
-		return err
+		return fmt.Errorf("GetEncoded failed: %w", err)
 	}
 
-	return codec.Decode(data, v)
-}
-
-// StoreEncoded stores data in storage after encoding it
-func (c *client) StoreEncoded(key string, v any, format CodecName) (string, error) {
-	codec, err := c.encoders.Get(format)
-	if err != nil {
-		return "", err
-	}
-
-	data, err := codec.Encode(v)
-	if err != nil {
-		return "", fmt.Errorf("failed to encode object: %w", err)
-	}
-
-	// Add the appropriate file extension
-	key = key + "." + codec.FileExtension()
-
-	err = c.Store(key, data)
-	if err != nil {
-		return "", fmt.Errorf("failed to store object: %w", err)
-	}
-
-	return key, nil
-}
-
-// store is a helper function for storing data
-func (c *client) store(key string, data []byte) error {
-	putObjectInput := &s3.PutObjectInput{
-		Bucket: aws.String(c.config.Bucket),
-		Key:    aws.String(key),
-		Body:   bytes.NewReader(data),
-	}
-
-	_, err := c.client.PutObject(c.ctx, putObjectInput)
-	if err != nil {
-		return fmt.Errorf("failed to put object: %w", err)
+	if err := codec.Decode(data, v); err != nil {
+		return fmt.Errorf("GetEncoded failed: %w", err)
 	}
 
 	return nil
 }
 
-// copy is a helper function for copying data
-func (c *client) copy(sourceKey, destinationKey string) error {
-	// Build the copy source
+// --- Internal Helper Functions ---
+
+// putObject uploads data to S3 with specified content type and metadata
+func (c *client) putObject(ctx context.Context, key string, data []byte, contentType string, metadata map[string]string) error {
+	if c.client == nil {
+		return fmt.Errorf("S3 client not initialized, call Start() first")
+	}
+
+	putObjectInput := &s3.PutObjectInput{
+		Bucket:      aws.String(c.config.Bucket),
+		Key:         aws.String(key),
+		Body:        bytes.NewReader(data),
+		ContentType: aws.String(contentType),
+		Metadata:    metadata,
+	}
+
+	_, err := c.client.PutObject(ctx, putObjectInput)
+	if err != nil {
+		return fmt.Errorf("failed to put object '%s': %w", key, err)
+	}
+	return nil
+}
+
+// copyObject copies an S3 object, setting content type and metadata
+func (c *client) copyObject(ctx context.Context, sourceKey, destinationKey, contentType string, metadata map[string]string) error {
+	if c.client == nil {
+		return fmt.Errorf("S3 client not initialized, call Start() first")
+	}
+
 	copySource := fmt.Sprintf("%s/%s", c.config.Bucket, sourceKey)
 
 	copyObjectInput := &s3.CopyObjectInput{
-		Bucket:     aws.String(c.config.Bucket),
-		CopySource: aws.String(copySource),
-		Key:        aws.String(destinationKey),
+		Bucket:            aws.String(c.config.Bucket),
+		CopySource:        aws.String(copySource),
+		Key:               aws.String(destinationKey),
+		ContentType:       aws.String(contentType),
+		Metadata:          metadata,
+		MetadataDirective: types.MetadataDirectiveReplace, // Ensure new metadata is applied
 	}
 
-	_, err := c.client.CopyObject(c.ctx, copyObjectInput)
+	_, err := c.client.CopyObject(ctx, copyObjectInput)
 	if err != nil {
-		return fmt.Errorf("failed to copy object: %w", err)
+		return fmt.Errorf("failed to copy object from '%s' to '%s': %w", sourceKey, destinationKey, err)
 	}
-
 	return nil
 }
 
-func (c *client) GetGzippedJSON(key string, v any) error {
-	data, err := c.Get(key)
-	if err != nil {
-		return fmt.Errorf("failed to get gzipped object: %w", err)
+// deleteObject deletes an object from S3
+func (c *client) deleteObject(ctx context.Context, key string) error {
+	if c.client == nil {
+		return fmt.Errorf("S3 client not initialized, call Start() first")
 	}
 
-	reader, err := gzip.NewReader(bytes.NewReader(data))
-	if err != nil {
-		return fmt.Errorf("failed to create gzip reader: %w", err)
-	}
-	defer reader.Close()
-
-	decompressed, err := io.ReadAll(reader)
-	if err != nil {
-		return fmt.Errorf("failed to decompress gzip data: %w", err)
-	}
-
-	if err := json.Unmarshal(decompressed, v); err != nil {
-		return fmt.Errorf("failed to unmarshal json: %w", err)
-	}
-
-	return nil
-}
-
-// delete is a helper function for deleting data
-func (c *client) delete(key string) error {
 	deleteObjectInput := &s3.DeleteObjectInput{
 		Bucket: aws.String(c.config.Bucket),
 		Key:    aws.String(key),
 	}
 
-	_, err := c.client.DeleteObject(c.ctx, deleteObjectInput)
+	_, err := c.client.DeleteObject(ctx, deleteObjectInput)
 	if err != nil {
-		return fmt.Errorf("failed to delete object: %w", err)
+		// Don't wrap not found errors for deletes, often expected
+		var apiErr smithy.APIError
+		if errors.As(err, &apiErr) && (apiErr.ErrorCode() == "NoSuchKey" || apiErr.ErrorCode() == "NotFound") {
+			return nil
+		}
+		return fmt.Errorf("failed to delete object '%s': %w", key, err)
 	}
-
 	return nil
 }
 
@@ -329,8 +501,8 @@ func (c *client) Stop() error {
 }
 
 // bucketExists checks if a bucket exists
-func (c *client) bucketExists(bucketName string) (bool, error) {
-	_, err := c.client.HeadBucket(c.ctx, &s3.HeadBucketInput{
+func (c *client) bucketExists(ctx context.Context, bucketName string) (bool, error) {
+	_, err := c.client.HeadBucket(ctx, &s3.HeadBucketInput{
 		Bucket: aws.String(bucketName),
 	})
 	if err != nil {
@@ -346,8 +518,8 @@ func (c *client) bucketExists(bucketName string) (bool, error) {
 }
 
 // createBucket creates a new bucket
-func (c *client) createBucket(bucketName string) error {
-	_, err := c.client.CreateBucket(c.ctx, &s3.CreateBucketInput{
+func (c *client) createBucket(ctx context.Context, bucketName string) error {
+	_, err := c.client.CreateBucket(ctx, &s3.CreateBucketInput{
 		Bucket: aws.String(bucketName),
 	})
 	if err != nil {

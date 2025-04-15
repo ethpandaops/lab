@@ -236,7 +236,7 @@ func (l *client) refreshLock() bool {
 	// Approach 1: Try to extend the existing lock by reacquiring it
 	newToken, success, err := l.locker.Lock(l.config.Resource, l.config.TTL)
 	if err == nil && success {
-		l.log.Info("Successfully refreshed lock")
+		l.log.Debug("Successfully refreshed lock")
 
 		// Successfully refreshed, update token
 		l.mu.Lock()
@@ -266,7 +266,7 @@ func (l *client) refreshLock() bool {
 		return false
 	}
 
-	l.log.Info("Successfully refreshed lock")
+	l.log.Debug("Successfully refreshed lock")
 
 	// Successfully refreshed with approach 2
 	l.mu.Lock()

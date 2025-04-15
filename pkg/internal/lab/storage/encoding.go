@@ -13,6 +13,8 @@ type Encoder interface {
 	Encode(v any) ([]byte, error)
 	// FileExtension returns the file extension for this encoder
 	FileExtension() string
+	// GetContentType returns the content type for this encoder
+	GetContentType() string
 }
 
 // Decoder is an interface for decoding data
@@ -81,6 +83,10 @@ func (c *JSONCodec) FileExtension() string {
 	return string(CodecNameJSON)
 }
 
+func (c *JSONCodec) GetContentType() string {
+	return "application/json"
+}
+
 // YAMLCodec implements Codec for YAML encoding
 type YAMLCodec struct{}
 
@@ -94,4 +100,8 @@ func (c *YAMLCodec) Decode(data []byte, v any) error {
 
 func (c *YAMLCodec) FileExtension() string {
 	return string(CodecNameYAML)
+}
+
+func (c *YAMLCodec) GetContentType() string {
+	return "application/yaml"
 }
