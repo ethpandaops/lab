@@ -10,6 +10,7 @@ import (
 	"github.com/ethpandaops/lab/pkg/server/internal/grpc"
 	"github.com/ethpandaops/lab/pkg/server/internal/service/beacon_chain_timings"
 	"github.com/ethpandaops/lab/pkg/server/internal/service/xatu_public_contributors"
+	"github.com/ethpandaops/lab/pkg/server/proto/beacon_slots"
 )
 
 // Config contains the configuration for the srv service
@@ -26,11 +27,7 @@ type Config struct {
 type ModuleConfig struct {
 	BeaconChainTimings     *beacon_chain_timings.Config     `yaml:"beacon_chain_timings"`
 	XatuPublicContributors *xatu_public_contributors.Config `yaml:"xatu_public_contributors"`
-}
-
-// BeaconChainTimingsConfig contains the configuration for the Beacon Chain Timings module
-type BeaconChainTimingsConfig struct {
-	Enabled bool `yaml:"enabled"`
+	BeaconSlots            *beacon_slots.Config             `yaml:"beacon_slots"`
 }
 
 func (x *Config) Validate() error {
@@ -40,6 +37,10 @@ func (x *Config) Validate() error {
 
 	if err := x.Ethereum.Validate(); err != nil {
 		return fmt.Errorf("ethereum config is invalid: %w", err)
+	}
+
+	if x.Modules == nil {
+		return fmt.Errorf("modules config is required")
 	}
 
 	return nil

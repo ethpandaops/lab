@@ -36,9 +36,17 @@ cache:
 
 # Modules configuration
 modules:
+  beacon_slots:
+    beacon_slots:
+      enabled: true
+      networks: ["mainnet"]
+      backfill:
+        slots_ago: 1000000
+        middle_processor_enable: true
+        middle_processor_duration: "1h"
   beacon_chain_timings:
     beacon_chain_timings:
-      enabled: true
+      enabled: false
       networks: ["mainnet"]
       interval: "1m"
       time_windows:

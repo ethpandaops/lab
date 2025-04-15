@@ -143,7 +143,7 @@ func (s *Service) registerLegacyHandlers() {
 	// Block timings
 	s.router.HandleFunc("/api/beacon_chain_timings/block_timings/{network}/{window_file}.json", s.handleBlockTimings).Methods("GET")
 
-	// Size CDF
+	// Size CDF - OK
 	s.router.HandleFunc("/api/beacon_chain_timings/size_cdf/{network}/{window_file}.json", s.handleSizeCDF).Methods("GET")
 
 	// Xatu Summary - OK

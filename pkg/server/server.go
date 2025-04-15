@@ -8,6 +8,7 @@ import (
 	"syscall"
 
 	"github.com/ethpandaops/lab/pkg/internal/lab/cache"
+	// "github.com/ethpandaops/lab/pkg/internal/lab/ethereum" // Removed unused import
 	"github.com/ethpandaops/lab/pkg/internal/lab/locker"
 	"github.com/ethpandaops/lab/pkg/internal/lab/logger"
 	"github.com/ethpandaops/lab/pkg/internal/lab/storage"
@@ -15,6 +16,7 @@ import (
 	"github.com/ethpandaops/lab/pkg/server/internal/grpc"
 	"github.com/ethpandaops/lab/pkg/server/internal/service"
 	beacon_chain_timings "github.com/ethpandaops/lab/pkg/server/internal/service/beacon_chain_timings"
+	beacon_slots "github.com/ethpandaops/lab/pkg/server/internal/service/beacon_slots"
 	xatu_public_contributors "github.com/ethpandaops/lab/pkg/server/internal/service/xatu_public_contributors"
 	"github.com/sirupsen/logrus"
 )
@@ -57,7 +59,7 @@ func New(config *Config) (*Service, error) {
 	}, nil
 }
 
-// Start starts the srv service
+// Start starts the sRPC server
 func (s *Service) Start(ctx context.Context) error {
 	s.log.Info("Starting srv service")
 
@@ -92,16 +94,17 @@ func (s *Service) Start(ctx context.Context) error {
 		}
 	}
 
-	services := []grpc.Service{
+	// Retrieve instantiated services for handlers
+	bctService := s.getService(beacon_chain_timings.BeaconChainTimingsServiceName).(*beacon_chain_timings.BeaconChainTimings)
+	xpcService := s.getService(xatu_public_contributors.XatuPublicContributorsServiceName).(*xatu_public_contributors.XatuPublicContributors)
+	bsService := s.getService(beacon_slots.ServiceName).(*beacon_slots.BeaconSlots) // Use ServiceName constant
+
+	// Instantiate gRPC handlers
+	grpcServices := []grpc.Service{
 		grpc.NewLab(s.log),
-		grpc.NewBeaconChainTimings(
-			s.log,
-			s.getService(beacon_chain_timings.BeaconChainTimingsServiceName).(*beacon_chain_timings.BeaconChainTimings),
-		),
-		grpc.NewXatuPublicContributors(
-			s.log,
-			s.getService(xatu_public_contributors.XatuPublicContributorsServiceName).(*xatu_public_contributors.XatuPublicContributors),
-		),
+		grpc.NewBeaconChainTimings(s.log, bctService),
+		grpc.NewXatuPublicContributors(s.log, xpcService),
+		grpc.NewBeaconSlotsHandler(s.log, bsService), // Use correct constructor and pass service
 	}
 
 	// Create gRPC server
@@ -114,7 +117,7 @@ func (s *Service) Start(ctx context.Context) error {
 	if err := s.grpcServer.Start(
 		s.ctx,
 		fmt.Sprintf("%s:%d", s.config.Server.Host, s.config.Server.Port),
-		services,
+		grpcServices, // Pass the instantiated handlers
 	); err != nil {
 		s.log.WithError(err).Fatal("Failed to start gRPC server")
 	}
@@ -162,12 +165,40 @@ func (s *Service) initializeServices(ctx context.Context) error {
 		return fmt.Errorf("failed to initialize xatu public contributors service: %w", err)
 	}
 
+	// Convert proto config to service config - Assuming direct mapping for Enabled
+	// TODO: Ensure all necessary fields from proto config are mapped to service config
+	beaconSlotsProtoConfig := s.config.Modules["beacon_slots"].BeaconSlots
+	if beaconSlotsProtoConfig == nil {
+		return fmt.Errorf("beacon_slots module configuration not found")
+	}
+	beaconSlotsConfig := &beacon_slots.Config{
+		Enabled: beaconSlotsProtoConfig.Enabled,
+		// Add other config fields mapping here if needed
+		// Example: BacklogSlots: beaconSlotsProtoConfig.BacklogSlots,
+	}
+	if err := beaconSlotsConfig.Validate(); err != nil { // Validate after mapping
+		return fmt.Errorf("invalid beacon_slots config after mapping: %w", err)
+	}
+
+	beaconSlotsService, err := beacon_slots.New(
+		s.log,
+		beaconSlotsConfig, // Pass the mapped service config
+		s.config.Ethereum, // Pass the overall Ethereum config
+		s.xatuClient,
+		s.storageClient,
+		s.lockerClient,
+	)
+	if err != nil {
+		return fmt.Errorf("failed to initialize beacon slots service: %w", err)
+	}
+
 	s.services = []service.Service{
 		service.NewLab(
 			s.log,
 		),
 		bct,
 		xpc,
+		beaconSlotsService,
 	}
 
 	return nil
@@ -210,9 +241,10 @@ func (s *Service) initializeDependencies() error {
 	// Initialize locker client
 	s.log.Info("Initializing locker client")
 	lockerClient := locker.New(s.log, cacheClient)
-	if err != nil {
-		return fmt.Errorf("failed to initialize locker client: %w", err)
-	}
+	// Note: The original code had an 'if err != nil' check here, but locker.New doesn't return an error.
+	// if err != nil {
+	// 	return fmt.Errorf("failed to initialize locker client: %w", err)
+	// }
 
 	s.xatuClient = xatuClient
 	s.storageClient = storageClient
@@ -223,13 +255,13 @@ func (s *Service) initializeDependencies() error {
 }
 
 func (s *Service) getService(name string) service.Service {
-	for _, service := range s.services {
-		if service.Name() == name {
-			return service
+	for _, svc := range s.services { // Renamed loop variable for clarity
+		if svc.Name() == name {
+			return svc
 		}
 	}
-
-	return nil
+	s.log.WithField("service_name", name).Error("Requested service not found during handler initialization")
+	return nil // Explicitly return nil if not found
 }
 
 // stop stops the srv service
@@ -238,4 +270,5 @@ func (s *Service) stop() {
 	if s.grpcServer != nil {
 		s.grpcServer.Stop()
 	}
+	// TODO: Add logic to stop individual services if needed
 }
