@@ -9,6 +9,7 @@ import (
 
 	"github.com/ethpandaops/lab/pkg/internal/lab/cache"
 	"github.com/ethpandaops/lab/pkg/internal/lab/ethereum"
+	"github.com/ethpandaops/lab/pkg/internal/lab/geolocation"
 
 	// "github.com/ethpandaops/lab/pkg/internal/lab/ethereum" // Removed unused import
 	"github.com/ethpandaops/lab/pkg/internal/lab/locker"
@@ -37,11 +38,12 @@ type Service struct {
 	services []service.Service
 
 	// Clients
-	ethereumClient *ethereum.Client
-	xatuClient     *xatu.Client
-	storageClient  storage.Client
-	cacheClient    cache.Client
-	lockerClient   locker.Locker
+	ethereumClient    *ethereum.Client
+	xatuClient        *xatu.Client
+	storageClient     storage.Client
+	cacheClient       cache.Client
+	lockerClient      locker.Locker
+	geolocationClient *geolocation.Client
 }
 
 // New creates a new srv service
@@ -174,7 +176,9 @@ func (s *Service) initializeServices(ctx context.Context) error {
 		s.xatuClient,
 		s.ethereumClient,
 		s.storageClient,
+		s.cacheClient,
 		s.lockerClient,
+		s.geolocationClient,
 	)
 	if err != nil {
 		return fmt.Errorf("failed to initialize beacon slots service: %w", err)
@@ -237,15 +241,24 @@ func (s *Service) initializeDependencies() error {
 	// Initialize locker client
 	s.log.Info("Initializing locker client")
 	lockerClient := locker.New(s.log, cacheClient)
-	// Note: The original code had an 'if err != nil' check here, but locker.New doesn't return an error.
-	// if err != nil {
-	// 	return fmt.Errorf("failed to initialize locker client: %w", err)
-	// }
+
+	// Initialize geolocation client
+	s.log.Info("Initializing geolocation client")
+	geolocationClient, err := geolocation.New(s.log, s.config.Geolocation)
+	if err != nil {
+		return fmt.Errorf("failed to initialize geolocation client: %w", err)
+	}
+
+	// Start the geolocation client
+	if err := geolocationClient.Start(s.ctx); err != nil {
+		return fmt.Errorf("failed to start geolocation client: %w", err)
+	}
 
 	s.xatuClient = xatuClient
 	s.storageClient = storageClient
 	s.cacheClient = cacheClient
 	s.lockerClient = lockerClient
+	s.geolocationClient = geolocationClient
 
 	return nil
 }

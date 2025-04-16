@@ -6,6 +6,7 @@ import (
 	"github.com/ethpandaops/lab/pkg/internal/lab/cache"
 	"github.com/ethpandaops/lab/pkg/internal/lab/clickhouse"
 	"github.com/ethpandaops/lab/pkg/internal/lab/ethereum"
+	"github.com/ethpandaops/lab/pkg/internal/lab/geolocation"
 	"github.com/ethpandaops/lab/pkg/internal/lab/storage"
 	"github.com/ethpandaops/lab/pkg/server/internal/grpc"
 	"github.com/ethpandaops/lab/pkg/server/internal/service/beacon_chain_timings"
@@ -15,12 +16,13 @@ import (
 
 // Config contains the configuration for the srv service
 type Config struct {
-	LogLevel string                   `yaml:"logLevel" default:"info"`
-	Server   *grpc.Config             `yaml:"grpc"`
-	Ethereum *ethereum.Config         `yaml:"ethereum"`
-	Storage  *storage.Config          `yaml:"storage"`
-	Modules  map[string]*ModuleConfig `yaml:"modules"`
-	Cache    *cache.Config            `yaml:"cache"`
+	LogLevel    string                   `yaml:"logLevel" default:"info"`
+	Server      *grpc.Config             `yaml:"grpc"`
+	Ethereum    *ethereum.Config         `yaml:"ethereum"`
+	Storage     *storage.Config          `yaml:"storage"`
+	Modules     map[string]*ModuleConfig `yaml:"modules"`
+	Cache       *cache.Config            `yaml:"cache"`
+	Geolocation *geolocation.Config      `yaml:"geolocation"`
 }
 
 // ModuleConfig contains the configuration for a specific module
@@ -41,6 +43,10 @@ func (x *Config) Validate() error {
 
 	if x.Modules == nil {
 		return fmt.Errorf("modules config is required")
+	}
+
+	if x.Geolocation == nil {
+		return fmt.Errorf("geolocation config is required")
 	}
 
 	return nil

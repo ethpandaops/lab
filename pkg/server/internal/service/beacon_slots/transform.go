@@ -1,14 +1,14 @@
 package beacon_slots
 
 import (
+	"sort"
+	"strings"
 	"time"
 
 	"github.com/attestantio/go-eth2-client/spec/phase0"
-	"github.com/codingsince1985/geo-golang/openstreetmap"
+	"github.com/ethpandaops/lab/pkg/internal/lab/geolocation"
 	pb "github.com/ethpandaops/lab/pkg/server/proto/beacon_slots"
-	"github.com/sirupsen/logrus"
 	"google.golang.org/protobuf/types/known/timestamppb"
-	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
 // parseTimestamp parses ISO8601 strings to timestamps
@@ -18,6 +18,14 @@ func parseTimestamp(ts string) (*timestamppb.Timestamp, error) {
 		return nil, err
 	}
 	return timestamppb.New(t), nil
+}
+
+// formatTimestampString formats a timestamp for usage in the blockData
+func formatTimestampString(ts *timestamppb.Timestamp) string {
+	if ts == nil {
+		return ""
+	}
+	return ts.AsTime().Format(time.RFC3339)
 }
 
 // transformSlotDataForStorage transforms slot data into optimized format for storage
@@ -39,23 +47,48 @@ func (b *BeaconSlots) transformSlotDataForStorage(
 	addNode := func(name, username, city, country, continent string, lat, lon *float64) {
 		// Only add node if it doesn't exist
 		if _, exists := nodes[name]; !exists {
+			// Extract username from the client name (first part before first slash)
+			extractedUsername := name
+			if parts := strings.Split(name, "/"); len(parts) > 0 {
+				extractedUsername = parts[0]
+			}
+
+			// Ensure we use empty strings for nil values
+			sanitizeField := func(s string) string {
+				if s == "<nil>" || s == "nil" {
+					return ""
+				}
+				return s
+			}
+
+			params := geolocation.LookupParams{
+				Country: sanitizeField(country),
+				City:    sanitizeField(city),
+			}
+
+			location, found := b.geolocationClient.LookupCity(params)
+			if found {
+				lat = &location.Lat
+				lon = &location.Lon
+			}
+
 			geo := &pb.Geo{
-				City:      city,
-				Country:   country,
-				Continent: continent,
+				City:      sanitizeField(city),
+				Country:   sanitizeField(country),
+				Continent: sanitizeField(continent),
 			}
 
 			if lat != nil {
-				geo.Latitude = wrapperspb.Double(*lat)
+				geo.Latitude = *lat
 			}
 
 			if lon != nil {
-				geo.Longitude = wrapperspb.Double(*lon)
+				geo.Longitude = *lon
 			}
 
 			nodes[name] = &pb.Node{
 				Name:     name,
-				Username: username,
+				Username: extractedUsername,
 				Geo:      geo,
 			}
 		}
@@ -102,13 +135,25 @@ func (b *BeaconSlots) transformSlotDataForStorage(
 		attestationWindows = append(attestationWindows, window)
 	}
 
+	// Sort attestation windows by start time
+	sort.Slice(attestationWindows, func(i, j int) bool {
+		return attestationWindows[i].StartMs < attestationWindows[j].StartMs
+	})
+
 	attestations := &pb.AttestationsData{
 		Windows:      attestationWindows,
 		MaximumVotes: maximumAttestationVotes,
 	}
 
 	// Convert to SlimTimings so we drop the redundant data.
-	timings := &pb.SlimTimings{}
+	timings := &pb.SlimTimings{
+		// Initialize all maps to prevent nil map panics
+		BlockSeen:         make(map[string]int64),
+		BlockFirstSeenP2P: make(map[string]int64),
+		BlobSeen:          make(map[string]*pb.BlobTimingMap),
+		BlobFirstSeenP2P:  make(map[string]*pb.BlobTimingMap),
+	}
+
 	// Convert blocks
 	for clientName, blockArrivalTime := range arrivalTimes.BlockSeen {
 		timings.BlockSeen[clientName] = blockArrivalTime.SlotTime
@@ -140,11 +185,11 @@ func (b *BeaconSlots) transformSlotDataForStorage(
 	return &pb.BeaconSlotData{
 		Slot:             int64(slot),
 		Network:          network,
-		ProcessedAt:      timestamppb.New(time.Now()),
+		ProcessedAt:      time.Now().UTC().Format(time.RFC3339),
 		ProcessingTimeMs: processingTimeMs,
 		Block:            blockData,
 		Proposer:         proposerData,
-		Entity:           wrapperspb.String(getStringOrNil(entity)),
+		Entity:           getStringOrNil(entity),
 		Nodes:            nodes,
 		Timings:          timings,
 		Attestations:     attestations,
@@ -152,21 +197,20 @@ func (b *BeaconSlots) transformSlotDataForStorage(
 }
 
 // lookupGeoCoordinates performs a geo lookup for given city/country.
-// Placeholder implementation.
 func (b *BeaconSlots) lookupGeoCoordinates(city, country string) (*float64, *float64) {
-	geocoder := openstreetmap.Geocoder()
-	location, err := geocoder.Geocode(city + ", " + country)
-
-	if err != nil {
-		b.log.WithError(err).WithFields(logrus.Fields{
-			"city":    city,
-			"country": country,
-		}).Warn("Geocoding lookup failed")
+	// Skip lookup if either city or country is empty
+	if city == "" || country == "" || city == "<nil>" || country == "<nil>" {
 		return nil, nil
 	}
 
-	if location == nil {
+	location, found := b.geolocationClient.LookupCity(geolocation.LookupParams{
+		City:    city,
+		Country: country,
+	})
+
+	if !found {
 		return nil, nil
 	}
-	return &location.Lat, &location.Lng
+
+	return &location.Lat, &location.Lon
 }

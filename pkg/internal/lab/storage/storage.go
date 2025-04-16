@@ -50,7 +50,7 @@ func (p *StoreParams) Validate() error {
 	} else {
 		// If no Format is provided, Data must be []byte
 		if _, ok := p.Data.([]byte); !ok {
-			return fmt.Errorf("data must be []byte when no format is specified, got %T", p.Data)
+			return fmt.Errorf("invalid data type: data must be []byte when no format is specified, got %T", p.Data)
 		}
 	}
 
@@ -275,12 +275,17 @@ func (c *client) Store(ctx context.Context, params StoreParams) error {
 	}
 
 	// 3. Determine Content Type
-	codec, err := c.encoders.Get(params.Format)
-	if err != nil {
-		return fmt.Errorf("failed to get codec '%s': %w", params.Format, err)
+	var contentType string
+	if params.Format != "" {
+		codec, err := c.encoders.Get(params.Format)
+		if err != nil {
+			return fmt.Errorf("failed to get codec '%s': %w", params.Format, err)
+		}
+		contentType = codec.GetContentType()
+	} else {
+		// Use default content type for raw bytes
+		contentType = "application/octet-stream"
 	}
-
-	contentType := codec.GetContentType()
 
 	// 4. Handle Atomicity
 	if params.Atomic {

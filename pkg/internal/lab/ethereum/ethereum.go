@@ -21,6 +21,15 @@ func NewClient(config *Config) *Client {
 	}
 }
 
+func (c *Client) Networks() []*Network {
+	networks := make([]*Network, 0, len(c.networks))
+	for _, network := range c.networks {
+		networks = append(networks, network)
+	}
+
+	return networks
+}
+
 func (c *Client) GetNetwork(name string) *Network {
 	return c.networks[name]
 }

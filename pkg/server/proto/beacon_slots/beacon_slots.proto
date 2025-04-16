@@ -2,9 +2,6 @@ syntax = "proto3";
 
 package beacon_slots;
 
-import "google/protobuf/timestamp.proto";
-import "google/protobuf/wrappers.proto";
-
 option go_package = "github.com/ethpandaops/lab/pkg/proto/beacon_slots";
 
 service BeaconSlots {
@@ -15,8 +12,8 @@ message Geo {
   string city = 1;
   string country = 2;
   string continent = 3;
-  google.protobuf.DoubleValue latitude = 4;
-  google.protobuf.DoubleValue longitude = 5;
+  double latitude = 4;
+  double longitude = 5;
 }
 
 // Node information, keyed by meta_client_name
@@ -35,13 +32,13 @@ message Proposer {
 // Block data, matching the target JSON structure precisely
 message BlockData {
   int64 slot = 1;
-  google.protobuf.Timestamp slot_start_date_time = 2;
+  string slot_start_date_time = 2;
   int64 epoch = 3;
-  google.protobuf.Timestamp epoch_start_date_time = 4;
+  string epoch_start_date_time = 4;
   string block_root = 5;
   string block_version = 6;
-  google.protobuf.Int64Value block_total_bytes = 7;
-  google.protobuf.Int64Value block_total_bytes_compressed = 8;
+  int64 block_total_bytes = 7;
+  int64 block_total_bytes_compressed = 8;
   string parent_root = 9;
   string state_root = 10;
   int64 proposer_index = 11;
@@ -50,16 +47,16 @@ message BlockData {
   string execution_payload_block_hash = 14;
   int64 execution_payload_block_number = 15;
   string execution_payload_fee_recipient = 16;
-  google.protobuf.Int64Value execution_payload_base_fee_per_gas = 17;
-  google.protobuf.Int64Value execution_payload_blob_gas_used = 18;
-  google.protobuf.Int64Value execution_payload_excess_blob_gas = 19;
-  google.protobuf.Int64Value execution_payload_gas_limit = 20;
-  google.protobuf.Int64Value execution_payload_gas_used = 21;
+  int64 execution_payload_base_fee_per_gas = 17;
+  int64 execution_payload_blob_gas_used = 18;
+  int64 execution_payload_excess_blob_gas = 19;
+  int64 execution_payload_gas_limit = 20;
+  int64 execution_payload_gas_used = 21;
   string execution_payload_state_root = 22;
   string execution_payload_parent_hash = 23;
-  google.protobuf.Int64Value execution_payload_transactions_count = 24;
-  google.protobuf.Int64Value execution_payload_transactions_total_bytes = 25;
-  google.protobuf.Int64Value execution_payload_transactions_total_bytes_compressed = 26;
+  int64 execution_payload_transactions_count = 24;
+  int64 execution_payload_transactions_total_bytes = 25;
+  int64 execution_payload_transactions_total_bytes_compressed = 26;
 }
 
 // Attestation window
@@ -122,11 +119,11 @@ message SlimTimings {
 message BeaconSlotData {
   int64 slot = 1;
   string network = 2;
-  google.protobuf.Timestamp processed_at = 3;
+  string processed_at = 3;
   int64 processing_time_ms = 4;
   BlockData block = 5;
   Proposer proposer = 6;
-  google.protobuf.StringValue entity = 7;
+  string entity = 7;
   map<string, Node> nodes = 8;
   SlimTimings timings = 9;
   AttestationsData attestations = 10;

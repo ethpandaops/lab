@@ -150,7 +150,7 @@ func (s *Service) registerLegacyHandlers() {
 	s.router.HandleFunc("/api/xatu_public_contributors/summary.json", s.handleXatuSummary).Methods("GET")
 
 	// Beacon Slot
-	s.router.HandleFunc("/api/slots/{network}/{slot}.json", s.handleBeaconSlot).Methods("GET")
+	s.router.HandleFunc("/api/beacon/slots/{network}/{slot}.json", s.handleBeaconSlot).Methods("GET")
 
 	// Xatu User Summary - OK
 	s.router.HandleFunc("/api/xatu_public_contributors/user-summaries/summary.json", s.handleXatuUserSummary).Methods("GET")
@@ -211,7 +211,7 @@ func (s *Service) handleBeaconSlot(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	network := vars["network"]
 	slot := vars["slot"]
-	key := "slots/" + network + "/" + slot + ".json"
+	key := "beacon_slots/slots/" + network + "/" + slot + ".json"
 	s.handleS3Passthrough(w, r, key)
 }
 

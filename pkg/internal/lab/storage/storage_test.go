@@ -3,6 +3,7 @@ package storage
 import (
 	"bytes"
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"strings"
@@ -495,16 +496,105 @@ type MockStorage struct {
 	StopFn       func() error
 	GetClientFn  func() *s3.Client
 	GetBucketFn  func() string
-	encoders     *Registry   // Keep encoders for GetEncoded mock if needed
-	compressor   *Compressor // Add compressor for compression/decompression
+	ExistsFn     func(ctx context.Context, key string) (bool, error)
+	encoders     *Registry         // Keep encoders for GetEncoded mock if needed
+	compressor   *Compressor       // Add compressor for compression/decompression
+	mockData     map[string][]byte // Add mockData to store data in memory
 }
 
 // NewMockStorage creates a new MockStorage with standard encoders
 func NewMockStorage() *MockStorage {
-	return &MockStorage{
-		encoders:   NewRegistry(),   // Initialize encoders
-		compressor: NewCompressor(), // Initialize compressor
+	mock := &MockStorage{
+		encoders:   NewRegistry(),           // Initialize encoders
+		compressor: NewCompressor(),         // Initialize compressor
+		mockData:   make(map[string][]byte), // Initialize mockData
 	}
+
+	// Default implementations
+	mock.StoreFn = func(ctx context.Context, params StoreParams) error {
+		if err := params.Validate(); err != nil {
+			return err
+		}
+
+		finalKey := params.Key
+		var dataBytes []byte
+
+		// Handle encoding if Format is specified
+		if params.Format != "" {
+			codec, err := mock.encoders.Get(params.Format)
+			if err != nil {
+				return err
+			}
+
+			dataBytes, err = codec.Encode(params.Data)
+			if err != nil {
+				return err
+			}
+
+			// Add file extension if not present
+			if !strings.HasSuffix(finalKey, "."+codec.FileExtension()) {
+				finalKey = finalKey + "." + codec.FileExtension()
+			}
+		} else {
+			// When no format is specified, data must be []byte
+			bytes, ok := params.Data.([]byte)
+			if !ok {
+				return fmt.Errorf("invalid data type: expected []byte when Format is not specified, got %T", params.Data)
+			}
+			dataBytes = bytes
+		}
+
+		// Handle compression if specified
+		if params.Compression != nil && params.Compression != None {
+			// Implement compression if needed for tests
+			// For now, just append .gz to simulate compression
+			finalKey = finalKey + ".gz"
+		}
+
+		// Handle atomic write if specified
+		if params.Atomic {
+			tempKey := finalKey + ".tmp"
+			mock.mockData[tempKey] = dataBytes
+
+			// Simulate atomic move
+			mock.mockData[finalKey] = dataBytes
+			delete(mock.mockData, tempKey)
+		} else {
+			// Regular write
+			mock.mockData[finalKey] = dataBytes
+		}
+
+		return nil
+	}
+
+	mock.GetFn = func(ctx context.Context, key string) ([]byte, error) {
+		if data, ok := mock.mockData[key]; ok {
+			return data, nil
+		}
+		return nil, ErrNotFound
+	}
+
+	mock.DeleteFn = func(ctx context.Context, key string) error {
+		delete(mock.mockData, key)
+		return nil
+	}
+
+	mock.ListFn = func(ctx context.Context, prefix string) ([]string, error) {
+		keys := []string{}
+		for k := range mock.mockData {
+			if strings.HasPrefix(k, prefix) {
+				keys = append(keys, k)
+			}
+		}
+		return keys, nil
+	}
+
+	mock.ExistsFn = func(ctx context.Context, key string) (bool, error) {
+		_, ok := mock.mockData[key]
+		return ok, nil
+	}
+
+	return mock
 }
 
 // Ensure MockStorage implements Client interface
@@ -583,56 +673,24 @@ func (m *MockStorage) GetBucket() string {
 	return "mock-bucket" // Default mock bucket
 }
 
+func (m *MockStorage) Exists(ctx context.Context, key string) (bool, error) {
+	if m.ExistsFn != nil {
+		return m.ExistsFn(ctx, key)
+	}
+	// Default implementation: Check if the key exists in the mock data
+	_, err := m.Get(ctx, key)
+	if err != nil {
+		if errors.Is(err, ErrNotFound) {
+			return false, nil
+		}
+		return false, fmt.Errorf("mock Exists failed: %w", err)
+	}
+	return true, nil
+}
+
 func TestMockStorage(t *testing.T) {
 	ctx := context.Background()
-	mockData := make(map[string][]byte)
-	storedParams := make(map[string]StoreParams) // Store params for verification
-
 	mockClient := NewMockStorage()
-	mockClient.StoreFn = func(ctx context.Context, params StoreParams) error {
-		// Store params for potential verification later
-		storedParams[params.Key] = params
-		// Simple mock store just puts raw data in map if no format
-		if params.Format != "" {
-			// Basic simulation of encoding for testing GetEncoded
-			codec, err := mockClient.encoders.Get(params.Format)
-			if err != nil {
-				return err
-			}
-			b, err := codec.Encode(params.Data)
-			if err != nil {
-				return err
-			}
-			mockData[params.Key+"."+string(params.Format)] = b // Store with extension
-			return nil
-		}
-		b, ok := params.Data.([]byte)
-		if !ok {
-			return fmt.Errorf("mock expects []byte when format is empty")
-		}
-		mockData[params.Key] = b
-		return nil
-	}
-	mockClient.GetFn = func(ctx context.Context, key string) ([]byte, error) {
-		if data, ok := mockData[key]; ok {
-			return data, nil
-		}
-		return nil, ErrNotFound
-	}
-	mockClient.ListFn = func(ctx context.Context, prefix string) ([]string, error) {
-		keys := []string{}
-		for k := range mockData {
-			if strings.HasPrefix(k, prefix) {
-				keys = append(keys, k)
-			}
-		}
-		return keys, nil
-	}
-	mockClient.DeleteFn = func(ctx context.Context, key string) error {
-		delete(mockData, key)
-		delete(storedParams, key)
-		return nil
-	}
 
 	// Test the mock implementation: Simple Store/Get/List/Delete
 	key := "mock-key"

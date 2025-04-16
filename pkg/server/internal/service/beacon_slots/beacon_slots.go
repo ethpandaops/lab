@@ -3,15 +3,16 @@ package beacon_slots
 import (
 	"context"
 	"fmt"
-	"strconv"
-	"strings"
+	"sync"
 	"time"
 
 	"github.com/attestantio/go-eth2-client/spec/phase0"
-	"github.com/ethpandaops/ethwallclock"
+	"github.com/ethpandaops/lab/pkg/internal/lab/cache"
 	"github.com/ethpandaops/lab/pkg/internal/lab/ethereum"
+	"github.com/ethpandaops/lab/pkg/internal/lab/geolocation"
 	"github.com/ethpandaops/lab/pkg/internal/lab/leader"
 	"github.com/ethpandaops/lab/pkg/internal/lab/locker"
+	"github.com/ethpandaops/lab/pkg/internal/lab/state"
 	"github.com/ethpandaops/lab/pkg/internal/lab/storage"
 	"github.com/ethpandaops/lab/pkg/internal/lab/xatu"
 	"github.com/sirupsen/logrus"
@@ -21,10 +22,10 @@ import (
 const ServiceName = "beacon_slots"
 
 // Constants for processor names
-var (
-	ForwardProcessorName  = "forward"
-	BackwardProcessorName = "backward"
-	MiddleProcessorName   = "middle" // Processor for the initial recent window
+const (
+	HeadProcessorName     = "head"
+	TrailingProcessorName = "trailing"
+	BackfillProcessorName = "backfill"
 )
 
 type BeaconSlots struct {
@@ -32,14 +33,17 @@ type BeaconSlots struct {
 
 	config *Config
 
-	ethereum      *ethereum.Client
-	xatuClient    *xatu.Client
-	storageClient storage.Client
-	leaderClients map[string]leader.Client // Map to store multiple leader clients
-	lockerClient  locker.Locker
+	ethereum          *ethereum.Client
+	xatuClient        *xatu.Client
+	storageClient     storage.Client
+	cacheClient       cache.Client
+	lockerClient      locker.Locker
+	leaderClient      leader.Client
+	geolocationClient *geolocation.Client
 
-	serviceCtx       context.Context
-	serviceCtxCancel context.CancelFunc
+	processCtx       context.Context
+	processCtxCancel context.CancelFunc
+	processWaitGroup sync.WaitGroup
 
 	// Base directory for storage
 	baseDir string
@@ -51,121 +55,104 @@ func New(
 	xatuClient *xatu.Client,
 	ethereum *ethereum.Client,
 	storageClient storage.Client,
+	cacheClient cache.Client,
 	lockerClient locker.Locker,
+	geolocationClient *geolocation.Client,
 ) (*BeaconSlots, error) {
 	if err := config.Validate(); err != nil {
 		return nil, fmt.Errorf("invalid beacon_slots config: %w", err)
 	}
 
 	return &BeaconSlots{
-		log:           log.WithField("component", "service/"+ServiceName),
-		config:        config,
-		ethereum:      ethereum,
-		xatuClient:    xatuClient,
-		storageClient: storageClient,
-		lockerClient:  lockerClient,
-		leaderClients: make(map[string]leader.Client),
-		baseDir:       "beacon",
-		serviceCtx:    nil,
+		log:               log.WithField("component", "service/"+ServiceName),
+		config:            config,
+		ethereum:          ethereum,
+		xatuClient:        xatuClient,
+		storageClient:     storageClient,
+		cacheClient:       cacheClient,
+		lockerClient:      lockerClient,
+		baseDir:           ServiceName,
+		processCtx:        nil,
+		geolocationClient: geolocationClient,
 	}, nil
 }
 
 func (b *BeaconSlots) Start(ctx context.Context) error {
 	if !b.config.Enabled {
 		b.log.Info("BeaconSlots service disabled")
-
 		return nil
 	}
 
 	b.log.Info("Starting BeaconSlots service")
 
-	// Watch for slot changes on all our networks
-	for _, network := range b.config.Networks {
-		net := network
-
-		b.ethereum.GetNetwork(network).GetWallclock().OnSlotChanged(func(slot ethwallclock.Slot) {
-			b.log.WithField("network", net).WithField("slot", slot).Info("Slot changed")
-
-			// First check if we are the leader
-		})
-	}
-
-	// Create a unified context for all processors
-	ctx, cancel := context.WithCancel(ctx)
-	b.serviceCtx = ctx
-	b.serviceCtxCancel = cancel
-
-	// Create a separate leader election for each network and processor combination
-	processors := []string{ForwardProcessorName, BackwardProcessorName, MissingProcessorName}
-
-	for _, network := range b.config.Networks {
-		for _, processor := range processors {
-			leaderID := b.getLeaderElectionKey(network, processor)
-
-			b.startLeaderForProcessor(network, processor, leaderID)
-		}
-	}
-
-	return nil
-}
-
-type LeaderElectionParams struct {
-	Network   string
-	Processor string
-}
-
-func (b *BeaconSlots) getLeaderElectionKey(params LeaderElectionParams) string {
-	return fmt.Sprintf("%s/%s/%s", ServiceName, params.Network, params.Processor)
-}
-
-// startLeaderForProcessor starts a leader election for a specific network-processor combination
-func (b *BeaconSlots) startLeaderForProcessor(params LeaderElectionParams) {
-	l := leader.New(b.log, b.lockerClient, leader.Config{
-		Resource:        b.getLeaderElectionKey(params),
+	// Create a single leader election for the entire service
+	leaderClient := leader.New(b.log, b.lockerClient, leader.Config{
+		Resource:        ServiceName + "/processing",
 		TTL:             5 * time.Second,
 		RefreshInterval: 1 * time.Second,
 
 		OnElected: func() {
-			b.log.WithFields(logrus.Fields{
-				"network":   params.Network,
-				"processor": params.Processor,
-			}).Info("Became leader for processor")
+			b.log.Info("Became leader for BeaconSlots service")
 
-			// For the Forward processor only, run the middle window processing
-			// if configured to do so
-			if processor == ForwardProcessorName && b.config.Backfill.MiddleProcessorEnable {
-				go func() {
-					b.processMiddleWindow(b.processCtx, network)
-				}()
+			if b.processCtx != nil {
+				// We are already processing, so we don't need to start a new one
+				b.log.Info("Already processing, skipping")
+				return
 			}
 
-			// Start the appropriate processor for this combination
-			go b.runProcessor(b.processCtx, network, processor)
+			// Create a new context for the process
+			ctx, cancel := context.WithCancel(context.Background())
+
+			b.processCtx = ctx
+			b.processCtxCancel = cancel
+
+			// Start all processors in a single goroutine
+			go b.startProcessors(ctx)
 		},
 		OnRevoked: func() {
-			b.log.WithFields(logrus.Fields{
-				"network":   network,
-				"processor": processor,
-			}).Info("Lost leadership for processor")
+			b.log.Info("Lost leadership for BeaconSlots service")
+			b.stopProcessors()
 		},
 	})
 
-	l.Start()
-	// Store the leader client with a unique key
-	b.leaderClients[leaderID] = l
+	leaderClient.Start()
+	b.leaderClient = leaderClient
+
+	return nil
 }
 
 func (b *BeaconSlots) Stop() {
 	b.log.Info("Stopping BeaconSlots service")
 
-	// Stop all leader clients
-	for id, client := range b.leaderClients {
-		b.log.WithField("leaderID", id).Debug("Stopping leader client")
-		client.Stop()
+	if b.leaderClient != nil {
+		b.leaderClient.Stop()
 	}
 
+	b.stopProcessors()
+}
+
+// stopProcessors safely stops all running processors
+func (b *BeaconSlots) stopProcessors() {
 	if b.processCtxCancel != nil {
+		b.log.Info("Stopping all processors")
 		b.processCtxCancel()
+
+		// Wait for all processors to stop with a timeout
+		done := make(chan struct{})
+		go func() {
+			b.processWaitGroup.Wait()
+			close(done)
+		}()
+
+		select {
+		case <-done:
+			b.log.Info("All processors have stopped cleanly")
+		case <-time.After(5 * time.Second):
+			b.log.Warn("Timeout waiting for processors to stop, some may still be running")
+		}
+
+		b.processCtx = nil
+		b.processCtxCancel = nil
 	}
 }
 
@@ -173,72 +160,40 @@ func (b *BeaconSlots) Name() string {
 	return ServiceName
 }
 
-// isLeaderForProcessor checks if this instance is the leader for a specific network-processor
-func (b *BeaconSlots) isLeaderForProcessor(network, processor string) bool {
-	leaderID := fmt.Sprintf("%s/%s/%s", ServiceName, network, processor)
-	client, ok := b.leaderClients[leaderID]
-	if !ok {
-		return false
+// startProcessors launches all processor goroutines
+func (b *BeaconSlots) startProcessors(ctx context.Context) {
+	b.log.Info("Starting all processors")
+
+	// Process each network
+	for _, network := range b.ethereum.Networks() {
+		// Process head (latest slots)
+		b.processWaitGroup.Add(1)
+		go func(network string) {
+			defer b.processWaitGroup.Done()
+			b.processHead(ctx, network)
+		}(network.Name)
+
+		// Process trailing slots
+		b.processWaitGroup.Add(1)
+		go func(network string) {
+			defer b.processWaitGroup.Done()
+			b.processTrailing(ctx, network)
+		}(network.Name)
+
+		// Process backfill (historical slots)
+		b.processWaitGroup.Add(1)
+		go func(network string) {
+			defer b.processWaitGroup.Done()
+			b.processBackfill(ctx, network)
+		}(network.Name)
 	}
-	return client.IsLeader()
+
+	// Wait for context cancellation
+	<-ctx.Done()
+	b.log.Info("Context cancelled, all processors will stop")
 }
 
-// runProcessor runs the appropriate processor based on the processor name
-func (b *BeaconSlots) runProcessor(ctx context.Context, network, processor string) {
-	b.log.WithFields(logrus.Fields{
-		"network":   network,
-		"processor": processor,
-	}).Info("Starting processor")
-
-	var ticker *time.Ticker
-
-	// Set up ticker based on processor type
-	switch processor {
-	case ForwardProcessorName:
-		ticker = time.NewTicker(time.Second * 12) // Slot time
-	case BackwardProcessorName:
-		ticker = time.NewTicker(time.Second * 12 * 5) // Less frequent
-	case MissingProcessorName:
-		ticker = time.NewTicker(time.Hour) // Check once per hour
-	default:
-		b.log.WithField("processor", processor).Error("Unknown processor type")
-		return
-	}
-
-	defer ticker.Stop()
-
-	// Run the processor immediately once
-	b.processForNetworkAndType(ctx, network, processor)
-
-	// Then run on ticker
-	for {
-		select {
-		case <-ctx.Done():
-			b.log.WithFields(logrus.Fields{
-				"network":   network,
-				"processor": processor,
-			}).Info("Context cancelled, stopping processor")
-			return
-		case <-ticker.C:
-			if b.isLeaderForProcessor(network, processor) {
-				b.processForNetworkAndType(ctx, network, processor)
-			}
-		}
-	}
-}
-
-// processForNetworkAndType runs the appropriate processor function based on the type
-func (b *BeaconSlots) processForNetworkAndType(ctx context.Context, network, processor string) {
-	switch processor {
-	case ForwardProcessorName:
-		b.processHead(ctx, network)
-	case BackwardProcessorName:
-		b.processBacklog(ctx, network)
-	case MissingProcessorName:
-		b.processMissing(ctx, network)
-	}
-}
-
+// getSlotStoragePath constructs the storage path for a slot
 func (b *BeaconSlots) getSlotStoragePath(network string, slot phase0.Slot) string {
 	return b.getStoragePath(fmt.Sprintf("%s/%d", network, slot))
 }
@@ -246,41 +201,6 @@ func (b *BeaconSlots) getSlotStoragePath(network string, slot phase0.Slot) strin
 // getStoragePath constructs the full storage path.
 func (b *BeaconSlots) getStoragePath(key string) string {
 	return fmt.Sprintf("%s/%s", b.baseDir, key)
-}
-
-// loadState loads the state for a given network.
-func (b *BeaconSlots) loadState(ctx context.Context, network string) (*State, error) {
-	state := &State{
-		Processors: make(map[string]ProcessorState),
-	}
-	key := GetStateKey(network)
-
-	err := b.storageClient.GetEncoded(ctx, b.getStoragePath(key), state, storage.CodecNameJSON)
-	if err != nil {
-		if err == storage.ErrNotFound {
-			b.log.WithField("network", network).Info("No previous state found, starting fresh.")
-			return state, nil // Return empty state if not found
-		}
-		return nil, fmt.Errorf("failed to get state for network %s: %w", network, err)
-	}
-
-	return state, nil
-}
-
-// saveState saves the state for a given network.
-func (b *BeaconSlots) saveState(ctx context.Context, network string, state *State) error {
-	key := GetStateKey(network)
-
-	err := b.storageClient.Store(ctx, storage.StoreParams{
-		Key:    b.getStoragePath(key),
-		Format: storage.CodecNameJSON,
-		Data:   state,
-	})
-	if err != nil {
-		return fmt.Errorf("failed to store state for network %s: %w", network, err)
-	}
-
-	return nil
 }
 
 // slotHasBeenProcessed checks if a slot has been processed for a given network.
@@ -294,292 +214,325 @@ func (b *BeaconSlots) slotHasBeenProcessed(ctx context.Context, network string, 
 	return exists, nil
 }
 
-func (b *BeaconSlots) targetHeadSlot(networkName string, currentSlot phase0.Slot) phase0.Slot {
-	return currentSlot + b.config.HeadDelaySlots
+// sleepUntilNextSlot sleeps until the next slot for a network
+func (b *BeaconSlots) sleepUntilNextSlot(ctx context.Context, network string) {
+	slot, _, err := b.ethereum.GetNetwork(network).GetWallclock().Now()
+	if err != nil {
+		b.log.WithError(err).Warn("Failed to get current slot")
+
+		return
+	}
+
+	// Use a timer with context to allow cancellation
+	timer := time.NewTimer(time.Until(slot.TimeWindow().End()))
+	defer timer.Stop()
+
+	select {
+	case <-timer.C:
+		return
+	case <-ctx.Done():
+		return
+	}
 }
 
 // processHead processes the latest slot for a network
 func (b *BeaconSlots) processHead(ctx context.Context, networkName string) {
-	logCtx := b.log.WithField("network", networkName).WithField("processor", ForwardProcessorName)
+	logCtx := b.log.WithField("network", networkName).WithField("processor", HeadProcessorName)
+	logCtx.Info("Starting up")
 
-	logCtx.Info("We are now the leader for this processor")
-
-	// Get the current wallclock slot
-	currentSlot, err := b.getCurrentSlot(ctx, networkName)
-	if err != nil {
-		logCtx.WithError(err).Error("Failed to get current slot")
-	} else {
-		logCtx.WithField("current_slot", currentSlot).Info("Current slot")
-
-		// Add on our lag offset
-		targetSlot := b.targetHeadSlot(networkName, currentSlot)
-
-		logCtx.WithField("target_slot", targetSlot).Info("Calculated target slot")
-
-		// Immediately check if the slot has already been processed before we start our "normality" loop
-		processed, err := b.slotHasBeenProcessed(ctx, networkName, targetSlot)
-		if err != nil {
-			logCtx.WithError(err).Error("Failed to check if slot has been processed")
-		}
-
-		if !processed {
-			logCtx.WithField("target_slot", targetSlot).Info("Slot has not been processed, processing")
-
-			// Process the slot
-			_, err := b.processSlot(ctx, networkName, targetSlot)
-			if err != nil {
-				logCtx.WithError(err).Error("Failed to process slot")\
-			}
-		}
-	}
-
-	lastProcessedSlot := slot
-	// Start our "normality" loop
+	// Create a state client for the network
+	stateClient := state.New[*ProcessorState](b.log, b.cacheClient, &state.Config{
+		Namespace: ServiceName,
+		TTL:       31 * 24 * time.Hour,
+	}, networkName+"/head")
 
 	for {
-		// Get the target slot
-		targetSlot := b.targetHeadSlot(networkName, currentSlot)
+		select {
+		case <-ctx.Done():
+			logCtx.Info("Context cancelled, stopping processor")
+			return
+		default:
+			// Continue processing
+		}
 
-		// Check if the slot has already been processed
-		processed, err := b.slotHasBeenProcessed(ctx, networkName, targetSlot)
+		var slotState *ProcessorState
+
+		slotState, err := stateClient.Get(ctx)
 		if err != nil {
-			b.log.WithField("network", networkName).WithError(err).Error("Failed to get current slot")
+			if err == state.ErrNotFound {
+				slotState = &ProcessorState{
+					LastProcessedSlot: 0,
+				}
+			} else {
+				logCtx.WithError(err).Warn("Failed to get state")
+				select {
+				case <-time.After(1 * time.Second):
+					continue
+				case <-ctx.Done():
+					return
+				}
+			}
+		}
 
+		// Get the current target slot
+		currentSlot, err := b.getCurrentSlot(ctx, networkName)
+		if err != nil {
+			logCtx.WithError(err).Warn("Failed to get current slot")
+			select {
+			case <-time.After(1 * time.Second):
+				continue
+			case <-ctx.Done():
+				return
+			}
+		}
+
+		targetSlot := currentSlot - phase0.Slot(b.config.HeadDelaySlots)
+
+		if slotState.LastProcessedSlot == targetSlot {
+			b.sleepUntilNextSlot(ctx, networkName)
 			continue
+		}
+
+		startTime := time.Now()
+
+		// Process the slot
+		processed, err := b.processSlot(ctx, networkName, targetSlot)
+		if err != nil {
+			logCtx.WithError(err).WithField("slot", targetSlot).Error("Failed to process slot")
+			select {
+			case <-time.After(1 * time.Second):
+				continue
+			case <-ctx.Done():
+				return
+			}
 		}
 
 		if processed {
-			b.log.WithField("network", networkName).WithField("slot", currentSlot).Debug("Slot has already been processed, skipping")
-			return
+			// Update state with the processed slot
+			slotState.LastProcessedSlot = targetSlot
+
+			if err := stateClient.Set(ctx, slotState); err != nil {
+				logCtx.WithError(err).Error("Failed to update state after processing")
+			}
+
+			logCtx.WithField("slot", targetSlot).WithField("processing_time", time.Since(startTime)).Info("Successfully processed head slot")
 		}
 
-
-		
+		// Sleep until the next slot
+		b.sleepUntilNextSlot(ctx, networkName)
 	}
 }
 
-// processBacklog processes historical slots
-func (b *BeaconSlots) processBacklog(ctx context.Context, networkName string) {
-	b.log.WithField("network", networkName).Debug("Processing backlog slots")
+// processTrailing processes trailing slots for a network
+func (b *BeaconSlots) processTrailing(ctx context.Context, networkName string) {
+	logCtx := b.log.WithField("network", networkName).WithField("processor", TrailingProcessorName)
+	logCtx.Info("Starting up")
 
-	// Get state
-	state, err := b.loadState(ctx, networkName)
-	if err != nil {
-		b.log.WithField("network", networkName).WithError(err).Error("Failed to load state")
-		return
-	}
+	// Create a state client for the network
+	stateClient := state.New[*ProcessorState](b.log, b.cacheClient, &state.Config{
+		Namespace: ServiceName,
+		TTL:       31 * 24 * time.Hour,
+	}, networkName+"/trailing")
 
-	// Get processor state for backward
-	processorState := state.GetProcessorState(BackwardProcessorName)
+	for {
+		select {
+		case <-ctx.Done():
+			logCtx.Info("Context cancelled, stopping processor")
+			return
+		default:
+			// Continue processing
+		}
 
-	// Check if we should process backlog based on time
-	if !b.shouldProcess(BackwardProcessorName, processorState.LastProcessed) {
-		b.log.WithField("network", networkName).Debug("Skipping backlog processing, not time yet")
-		return
-	}
+		var slotState *ProcessorState
 
-	// If we don't have a target or current slot, calculate the target backlog slot
-	if processorState.TargetSlot == nil || processorState.CurrentSlot == nil {
-		// Get the current slot first
+		slotState, err := stateClient.Get(ctx)
+		if err != nil {
+			if err == state.ErrNotFound {
+				slotState = &ProcessorState{
+					LastProcessedSlot: 0,
+				}
+			} else {
+				logCtx.WithError(err).Warn("Failed to get state")
+				select {
+				case <-time.After(1 * time.Second):
+					continue
+				case <-ctx.Done():
+					return
+				}
+			}
+		}
+
+		// Get the current target slot
 		currentSlot, err := b.getCurrentSlot(ctx, networkName)
 		if err != nil {
-			b.log.WithField("network", networkName).WithError(err).Error("Failed to get current slot")
-			return
+			logCtx.WithError(err).Error("Failed to get current slot")
+			select {
+			case <-time.After(1 * time.Second):
+				continue
+			case <-ctx.Done():
+				return
+			}
 		}
 
-		// Set current slot
-		processorState.CurrentSlot = &currentSlot
+		targetSlot := currentSlot - phase0.Slot(500)
 
-		// Calculate target slot based on backfill settings
-		targetSlot, err := b.calculateTargetBacklogSlot(networkName, currentSlot)
+		if slotState.LastProcessedSlot == targetSlot || targetSlot < 1 {
+			// Nothing to do, we are already at the target slot!
+			b.sleepUntilNextSlot(ctx, networkName)
+			continue
+		}
+
+		nextSlot := slotState.LastProcessedSlot + 1
+		// Process the slot
+		processed, err := b.processSlot(ctx, networkName, nextSlot)
 		if err != nil {
-			b.log.WithField("network", networkName).WithError(err).Error("Failed to calculate target slot")
-			return
+			logCtx.WithError(err).WithField("slot", nextSlot).Error("Failed to process slot")
+			select {
+			case <-time.After(5 * time.Second):
+				continue
+			case <-ctx.Done():
+				return
+			}
 		}
 
-		processorState.TargetSlot = &targetSlot
+		if processed {
+			// Update state with the processed slot
+			slotState.LastProcessedSlot = nextSlot
 
-		// If this is the first run, initialize LastProcessedSlot to current
-		if processorState.LastProcessedSlot == nil {
-			processorState.LastProcessedSlot = &currentSlot
+			if err := stateClient.Set(ctx, slotState); err != nil {
+				logCtx.WithError(err).Error("Failed to update state after processing")
+			}
+
+			logCtx.WithField("slot", nextSlot).Info("Successfully processed trailing slot")
 		}
-	}
 
-	// Make sure we have all the required slot info
-	if processorState.LastProcessedSlot == nil || processorState.TargetSlot == nil {
-		b.log.WithField("network", networkName).Error("Missing slot information for backlog processing")
-		return
-	}
-
-	// If we've reached or gone beyond the target slot, we're done
-	if *processorState.LastProcessedSlot <= *processorState.TargetSlot {
-		b.log.WithField("network", networkName).
-			WithField("lastProcessedSlot", *processorState.LastProcessedSlot).
-			WithField("targetSlot", *processorState.TargetSlot).
-			Debug("Reached target slot, backlog complete")
-		return
-	}
-
-	// Process the next slot (moving backward)
-	slotToProcess := *processorState.LastProcessedSlot - 1
-	processed, err := b.processSlot(ctx, networkName, slotToProcess)
-	if err != nil {
-		b.log.WithField("network", networkName).
-			WithField("slot", slotToProcess).
-			WithError(err).Error("Failed to process backlog slot")
-		return
-	}
-
-	if processed {
-		// Update last processed slot and time
-		processorState.LastProcessedSlot = &slotToProcess
-		processorState.LastProcessed = time.Now()
-
-		// Update state
-		state.UpdateProcessorState(BackwardProcessorName, processorState)
-		if err := b.saveState(ctx, networkName, state); err != nil {
-			b.log.WithField("network", networkName).WithError(err).Error("Failed to save state")
-		}
+		// Sleep until the next slot
+		b.sleepUntilNextSlot(ctx, networkName)
 	}
 }
 
-// processMissing checks for and processes any slots that might have been missed
-func (b *BeaconSlots) processMissing(ctx context.Context, networkName string) {
-	b.log.WithField("network", networkName).Debug("Processing missing slots")
+// processBackfill processes historical slots for a network
+func (b *BeaconSlots) processBackfill(ctx context.Context, networkName string) {
+	logCtx := b.log.WithField("network", networkName).WithField("processor", BackfillProcessorName)
+	logCtx.Info("Starting up")
 
-	// Get state
-	state, err := b.loadState(ctx, networkName)
-	if err != nil {
-		b.log.WithField("network", networkName).WithError(err).Error("Failed to load state")
-		return
-	}
+	// Create a state client for the network
+	stateClient := state.New[*ProcessorState](b.log, b.cacheClient, &state.Config{
+		Namespace: ServiceName,
+		TTL:       31 * 24 * time.Hour,
+	}, networkName+"/backfill")
 
-	// Get processor state for missing
-	processorState := state.GetProcessorState(MissingProcessorName)
-
-	// Check if we should process based on time
-	if !b.shouldProcess(MissingProcessorName, processorState.LastProcessed) {
-		b.log.WithField("network", networkName).Debug("Skipping missing slot processing, not time yet")
-		return
-	}
-
-	// Get the forward and backward processor states
-	forwardState := state.GetProcessorState(ForwardProcessorName)
-	backwardState := state.GetProcessorState(BackwardProcessorName)
-
-	// Get the current slot
-	currentSlot, err := b.getCurrentSlot(ctx, networkName)
-	if err != nil {
-		b.log.WithField("network", networkName).WithError(err).Error("Failed to get current slot")
-		return
-	}
-
-	// Calculate the range of slots to check
-	startSlot := int64(0)
-	if backwardState.LastProcessedSlot != nil {
-		startSlot = *backwardState.LastProcessedSlot
-	}
-
-	endSlot := currentSlot
-	if forwardState.LastProcessedSlot != nil {
-		endSlot = *forwardState.LastProcessedSlot
-	}
-
-	b.log.WithField("network", networkName).
-		WithField("startSlot", startSlot).
-		WithField("endSlot", endSlot).
-		Debug("Checking for missing slots")
-
-	// Get the ClickHouse client for this network
-	ch, err := b.xatuClient.GetClickhouseClientForNetwork(networkName)
-	if err != nil {
-		b.log.WithField("network", networkName).WithError(err).Error("Failed to get ClickHouse client for network")
-		return
-	}
-
-	query := `
-		WITH range(toInt64(?), toInt64(?)) AS all_slots
-		SELECT slot_candidate
-		FROM (
-			SELECT arrayJoin(all_slots) AS slot_candidate
-		) AS slots
-		LEFT JOIN xatu.beacon_api_eth_v1_events_block AS blocks
-			ON blocks.slot = slot_candidate AND blocks.network = ?
-		WHERE blocks.slot IS NULL
-	`
-
-	rows, err := ch.Query(ctx, query, startSlot, endSlot+1, networkName)
-	if err != nil {
-		b.log.WithField("network", networkName).WithError(err).Error("Failed to query missing slots from ClickHouse")
-		return
-	}
-
-	missingSlots := make([]int64, 0)
-	for _, row := range rows {
-		val, ok := row["slot_candidate"]
-		if !ok || val == nil {
-			continue
+	for {
+		select {
+		case <-ctx.Done():
+			logCtx.Info("Context cancelled, stopping processor")
+			return
+		default:
+			// Continue processing
 		}
-		slotInt, err := strconv.ParseInt(fmt.Sprintf("%v", val), 10, 64)
+
+		var slotState *ProcessorState
+
+		slotState, err := stateClient.Get(ctx)
 		if err != nil {
-			b.log.WithError(err).Warn("Failed to parse missing slot value")
+			if err == state.ErrNotFound {
+				slotState = &ProcessorState{
+					LastProcessedSlot: 0,
+				}
+			} else {
+				logCtx.WithError(err).Warn("Failed to get state")
+				select {
+				case <-time.After(1 * time.Second):
+					continue
+				case <-ctx.Done():
+					return
+				}
+			}
+		}
+
+		// Get the current target slot
+		currentSlot, err := b.getCurrentSlot(ctx, networkName)
+		if err != nil {
+			logCtx.WithError(err).Warn("Failed to get current slot")
+			select {
+			case <-time.After(1 * time.Second):
+				continue
+			case <-ctx.Done():
+				return
+			}
+		}
+
+		targetSlot := currentSlot - phase0.Slot(b.config.Backfill.Slots)
+
+		if slotState.LastProcessedSlot == targetSlot || targetSlot < 1 {
+			// Nothing to do, we are already at the target slot!
+			b.sleepUntilNextSlot(ctx, networkName)
 			continue
 		}
-		missingSlots = append(missingSlots, slotInt)
-	}
 
-	b.log.WithField("network", networkName).
-		WithField("missingSlotsCount", len(missingSlots)).
-		Debug("Missing slots identified")
-	// Update last processed time
-	processorState.LastProcessed = time.Now()
+		nextSlot := slotState.LastProcessedSlot - 1
 
-	// Update state
-	state.UpdateProcessorState(MissingProcessorName, processorState)
-	if err := b.saveState(ctx, networkName, state); err != nil {
-		b.log.WithField("network", networkName).WithError(err).Error("Failed to save state")
+		// Check if somehow we've processed this slot already
+		processed, err := b.slotHasBeenProcessed(ctx, networkName, nextSlot)
+		if err != nil {
+			logCtx.WithError(err).WithField("slot", nextSlot).Error("Failed to check if slot has been processed")
+			select {
+			case <-time.After(1 * time.Second):
+				continue
+			case <-ctx.Done():
+				return
+			}
+		}
+
+		didProcess := false
+
+		if !processed {
+			// Process the slot
+			processed, err := b.processSlot(ctx, networkName, nextSlot)
+			if err != nil {
+				logCtx.WithError(err).WithField("slot", nextSlot).Error("Failed to process slot")
+				select {
+				case <-time.After(5 * time.Second):
+					continue
+				case <-ctx.Done():
+					return
+				}
+			}
+
+			if processed {
+				didProcess = true
+			}
+		}
+
+		if didProcess {
+			// Update state with the processed slot
+			slotState.LastProcessedSlot = nextSlot
+
+			if err := stateClient.Set(ctx, slotState); err != nil {
+				logCtx.WithError(err).Error("Failed to update state after processing")
+			}
+
+			logCtx.WithField("slot", nextSlot).Info("Successfully processed backfill slot")
+		}
+
+		// Small sleep so we don't hammer clickhouse
+		select {
+		case <-time.After(5 * time.Second):
+			// Continue
+		case <-ctx.Done():
+			return
+		}
 	}
 }
 
 // getCurrentSlot returns the current slot for a network
 func (b *BeaconSlots) getCurrentSlot(ctx context.Context, networkName string) (phase0.Slot, error) {
-	network := b.ethereum.GetNetwork(networkName)
-	if network == nil {
-		return 0, fmt.Errorf("network %s not found", networkName)
+	slot, _, err := b.ethereum.GetNetwork(networkName).GetWallclock().Now()
+	if err != nil {
+		return 0, fmt.Errorf("failed to get current slot: %w", err)
 	}
 
-	if network.GetWallclock() != nil {
-		slot, err := network.GetWallclock().CurrentSlot()
-		if err != nil {
-			return 0, fmt.Errorf("failed to get current slot: %w", err)
-		}
-
-		return slot, nil
-	}
-
-	return 0, fmt.Errorf("no wallclock found for network %s", networkName)
-}
-
-// calculateTargetBacklogSlot calculates the target backlog slot
-func (b *BeaconSlots) calculateTargetBacklogSlot(networkName string, currentSlot int64) (int64, error) {
-	b.log.WithField("network", networkName).Debug("Calculating target backlog slot")
-
-	// If slots ago is set, calculate target slot based on that
-	if b.config.Backfill.SlotsAgo > 0 {
-		targetSlot := currentSlot - b.config.Backfill.SlotsAgo
-		if targetSlot < 0 {
-			targetSlot = 0
-		}
-		return targetSlot, nil
-	}
-
-	// Default to a week ago (approximately 50400 slots with 12s slot time)
-	targetSlot := currentSlot - 50400
-	if targetSlot < 0 {
-		targetSlot = 0
-	}
-
-	return targetSlot, nil
+	return phase0.Slot(slot.Number()), nil
 }
 
 func getStringOrNil(s *string) string {
@@ -589,24 +542,16 @@ func getStringOrNil(s *string) string {
 	return *s
 }
 
-// Helper function to extract username from client name
-func extractUsername(name string) string {
-	parts := strings.Split(name, "/")
-	if len(parts) < 2 {
-		return ""
-	}
-
-	if strings.Contains(name, "ethpandaops") {
-		return "ethpandaops"
-	}
-
-	return parts[1]
-}
-
 // Helper function to get string or empty string if nil
 func getStringOrEmpty(value interface{}) string {
 	if value == nil {
 		return ""
 	}
-	return fmt.Sprintf("%v", value)
+
+	str := fmt.Sprintf("%v", value)
+	if str == "<nil>" || str == "nil" {
+		return ""
+	}
+
+	return str
 }

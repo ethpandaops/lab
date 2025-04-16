@@ -9,23 +9,18 @@ import (
 
 	"github.com/attestantio/go-eth2-client/spec/phase0"
 	pb "github.com/ethpandaops/lab/pkg/server/proto/beacon_slots"
-	"google.golang.org/protobuf/types/known/timestamppb"
-	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
 // getProposerEntity gets entity for a given validator index
 func (b *BeaconSlots) getProposerEntity(ctx context.Context, networkName string, index int64) (*string, error) {
-	// This implementation is simplified - in the actual application,
-	// we would need to check validator_entity lookup first
-
 	// Query ClickHouse for the entity
 	query := `
 		SELECT
 			entity
-		FROM xatu.ethseer_validator_entity FINAL
+		FROM default.ethseer_validator_entity FINAL
 		WHERE
-			index = $1
-			AND meta_network_name = $2
+			index = ?
+			AND meta_network_name = ?
 		GROUP BY entity
 		LIMIT 1
 	`
@@ -47,6 +42,7 @@ func (b *BeaconSlots) getProposerEntity(ctx context.Context, networkName string,
 	}
 
 	entity := fmt.Sprintf("%v", result["entity"])
+
 	return &entity, nil
 }
 
@@ -64,7 +60,7 @@ func (b *BeaconSlots) getBlockSeenAtSlotTime(ctx context.Context, networkName st
 			SELECT
 				propagation_slot_start_diff as slot_time,
 				meta_client_name
-			FROM xatu.beacon_api_eth_v1_events_block FINAL
+			FROM default.beacon_api_eth_v1_events_block FINAL
 			WHERE
 				slot = ?
 				AND meta_network_name = ?
@@ -74,7 +70,7 @@ func (b *BeaconSlots) getBlockSeenAtSlotTime(ctx context.Context, networkName st
 			SELECT
 				propagation_slot_start_diff as slot_time,
 				meta_client_name
-			FROM xatu.beacon_api_eth_v1_events_block FINAL
+			FROM default.beacon_api_eth_v1_events_block FINAL
 			WHERE
 				slot = ?
 				AND meta_network_name = ?
@@ -162,7 +158,7 @@ func (b *BeaconSlots) getBlobSeenAtSlotTime(ctx context.Context, networkName str
 		FROM (
 			SELECT *,
 				ROW_NUMBER() OVER (PARTITION BY meta_client_name, blob_index ORDER BY event_date_time ASC) as rn
-			FROM xatu.beacon_api_eth_v1_events_blob_sidecar FINAL
+			FROM default.beacon_api_eth_v1_events_blob_sidecar FINAL
 			WHERE
 				slot = ?
 				AND meta_network_name = ?
@@ -230,11 +226,14 @@ func (b *BeaconSlots) getBlockFirstSeenInP2PSlotTime(ctx context.Context, networ
 	query := `
 		SELECT
 			propagation_slot_start_diff as slot_time,
-			meta_client_name
+			meta_client_name,
+			meta_client_geo_city,
+			meta_client_geo_country,
+			meta_client_geo_continent_code
 		FROM (
 			SELECT *,
 				ROW_NUMBER() OVER (PARTITION BY meta_client_name ORDER BY event_date_time ASC) as rn
-			FROM xatu.libp2p_gossipsub_beacon_block FINAL
+			FROM default.libp2p_gossipsub_beacon_block FINAL
 			WHERE
 				slot = ?
 				AND meta_network_name = ?
@@ -302,7 +301,7 @@ func (b *BeaconSlots) getBlobFirstSeenInP2PSlotTime(ctx context.Context, network
 		FROM (
 			SELECT *,
 				ROW_NUMBER() OVER (PARTITION BY meta_client_name, blob_index ORDER BY event_date_time ASC) as rn
-			FROM xatu.libp2p_gossipsub_blob_sidecar FINAL
+			FROM default.libp2p_gossipsub_blob_sidecar FINAL
 			WHERE
 				slot = ?
 				AND meta_network_name = ?
@@ -376,11 +375,11 @@ func (b *BeaconSlots) getMaximumAttestationVotes(ctx context.Context, networkNam
 			SELECT
 				length(validators) as committee_size,
 				committee_index
-			FROM xatu.beacon_api_eth_v1_beacon_committee
+			FROM default.beacon_api_eth_v1_beacon_committee
 			WHERE
-				slot = $1
-				AND network = $2
-				AND slot_start_date_time BETWEEN $3 AND $4
+				slot = ?
+				AND meta_network_name = ?
+				AND slot_start_date_time BETWEEN ? AND ?
 		)
 	`
 
@@ -424,12 +423,12 @@ func (b *BeaconSlots) getAttestationVotes(ctx context.Context, networkName strin
 			SELECT 
 				attesting_validator_index,
 				MIN(propagation_slot_start_diff) as min_propagation_time
-			FROM xatu.beacon_api_eth_v1_events_attestation
+			FROM default.beacon_api_eth_v1_events_attestation
 			WHERE
-				slot = $1
-				AND meta_network_name = $2
-				AND slot_start_date_time BETWEEN $3 AND $4
-				AND beacon_block_root = $5
+				slot = ?
+				AND meta_network_name = ?
+				AND slot_start_date_time BETWEEN ? AND ?
+				AND beacon_block_root = ?
 				AND attesting_validator_index IS NOT NULL
 				AND propagation_slot_start_diff <= 12000
 			GROUP BY attesting_validator_index
@@ -483,13 +482,12 @@ func (b *BeaconSlots) getBlockData(ctx context.Context, networkName string, slot
 			state_root,
 			proposer_index,
 			block_version,
-			signature,
 			eth1_data_block_hash,
 			eth1_data_deposit_root,
 			execution_payload_block_hash,
 			execution_payload_block_number,
 			execution_payload_fee_recipient,
-			execution_payload_base_fee_per_gas,
+			CAST(COALESCE(execution_payload_base_fee_per_gas, 0) AS UInt64) as execution_payload_base_fee_per_gas,
 			execution_payload_blob_gas_used,
 			execution_payload_excess_blob_gas,
 			execution_payload_gas_limit,
@@ -501,8 +499,8 @@ func (b *BeaconSlots) getBlockData(ctx context.Context, networkName string, slot
 			execution_payload_transactions_total_bytes_compressed,
 			block_total_bytes,
 			block_total_bytes_compressed
-		FROM xatu.beacon_api_eth_v1_events_block
-		WHERE network = $1 AND slot = $2
+		FROM default.beacon_api_eth_v2_beacon_block
+		WHERE meta_network_name = ? AND slot = ?
 		LIMIT 1
 	`
 
@@ -517,22 +515,20 @@ func (b *BeaconSlots) getBlockData(ctx context.Context, networkName string, slot
 		return nil, fmt.Errorf("failed to get block data: %w", err)
 	}
 
-	if result == nil || len(result) == 0 {
+	if len(result) == 0 {
 		return nil, nil
 	}
 
 	// Calculate slot and epoch times
-	// In a real implementation, these would be calculated from genesis time
-	slotTime := time.Now()  // Placeholder
-	epochTime := time.Now() // Placeholder
-	epoch := slot / 32      // 32 slots per epoch in Ethereum
+	epoch := b.ethereum.GetNetwork(networkName).GetWallclock().Epochs().FromSlot(uint64(slot))
+	slotDetail := b.ethereum.GetNetwork(networkName).GetWallclock().Slots().FromNumber(uint64(slot))
 
 	// Create a new BlockData object with all fields
 	blockData := &pb.BlockData{
 		Slot:                         int64(slot),
-		SlotStartDateTime:            timestamppb.New(slotTime),
-		Epoch:                        int64(epoch),
-		EpochStartDateTime:           timestamppb.New(epochTime),
+		SlotStartDateTime:            slotDetail.TimeWindow().Start().Format(time.RFC3339),
+		Epoch:                        int64(epoch.Number()),
+		EpochStartDateTime:           epoch.TimeWindow().Start().Format(time.RFC3339),
 		BlockRoot:                    getStringOrEmpty(result["block_root"]),
 		BlockVersion:                 getStringOrEmpty(result["block_version"]),
 		ParentRoot:                   getStringOrEmpty(result["parent_root"]),
@@ -554,65 +550,86 @@ func (b *BeaconSlots) getBlockData(ctx context.Context, networkName string, slot
 		blockData.ExecutionPayloadBlockNumber = execBlockNumber
 	}
 
-	// Parse nullable numeric fields using wrapper types
+	// Parse nullable numeric fields - set to 0 by default to ensure the field exists
 	if val := result["block_total_bytes"]; val != nil {
 		if num, err := strconv.ParseInt(fmt.Sprintf("%v", val), 10, 64); err == nil {
-			blockData.BlockTotalBytes = wrapperspb.Int64(num)
+			blockData.BlockTotalBytes = num
 		}
+	} else {
+		blockData.BlockTotalBytes = 0
 	}
 
 	if val := result["block_total_bytes_compressed"]; val != nil {
 		if num, err := strconv.ParseInt(fmt.Sprintf("%v", val), 10, 64); err == nil {
-			blockData.BlockTotalBytesCompressed = wrapperspb.Int64(num)
+			blockData.BlockTotalBytesCompressed = num
 		}
+	} else {
+		blockData.BlockTotalBytesCompressed = 0
 	}
 
 	if val := result["execution_payload_base_fee_per_gas"]; val != nil {
 		if num, err := strconv.ParseInt(fmt.Sprintf("%v", val), 10, 64); err == nil {
-			blockData.ExecutionPayloadBaseFeePerGas = wrapperspb.Int64(num)
+			blockData.ExecutionPayloadBaseFeePerGas = num
 		}
+	} else {
+		blockData.ExecutionPayloadBaseFeePerGas = 0
 	}
 
+	// Always set these fields to ensure they exist in the output, even if zero
 	if val := result["execution_payload_blob_gas_used"]; val != nil {
 		if num, err := strconv.ParseInt(fmt.Sprintf("%v", val), 10, 64); err == nil {
-			blockData.ExecutionPayloadBlobGasUsed = wrapperspb.Int64(num)
+			blockData.ExecutionPayloadBlobGasUsed = num
 		}
+	} else {
+		blockData.ExecutionPayloadBlobGasUsed = 0
 	}
 
 	if val := result["execution_payload_excess_blob_gas"]; val != nil {
 		if num, err := strconv.ParseInt(fmt.Sprintf("%v", val), 10, 64); err == nil {
-			blockData.ExecutionPayloadExcessBlobGas = wrapperspb.Int64(num)
+			blockData.ExecutionPayloadExcessBlobGas = num
 		}
+	} else {
+		blockData.ExecutionPayloadExcessBlobGas = 0
 	}
 
 	if val := result["execution_payload_gas_limit"]; val != nil {
 		if num, err := strconv.ParseInt(fmt.Sprintf("%v", val), 10, 64); err == nil {
-			blockData.ExecutionPayloadGasLimit = wrapperspb.Int64(num)
+			blockData.ExecutionPayloadGasLimit = num
 		}
+	} else {
+		blockData.ExecutionPayloadGasLimit = 0
 	}
 
 	if val := result["execution_payload_gas_used"]; val != nil {
 		if num, err := strconv.ParseInt(fmt.Sprintf("%v", val), 10, 64); err == nil {
-			blockData.ExecutionPayloadGasUsed = wrapperspb.Int64(num)
+			blockData.ExecutionPayloadGasUsed = num
 		}
+	} else {
+		blockData.ExecutionPayloadGasUsed = 0
 	}
 
 	if val := result["execution_payload_transactions_count"]; val != nil {
 		if num, err := strconv.ParseInt(fmt.Sprintf("%v", val), 10, 64); err == nil {
-			blockData.ExecutionPayloadTransactionsCount = wrapperspb.Int64(num)
+			blockData.ExecutionPayloadTransactionsCount = num
 		}
+	} else {
+		blockData.ExecutionPayloadTransactionsCount = 0
 	}
 
 	if val := result["execution_payload_transactions_total_bytes"]; val != nil {
 		if num, err := strconv.ParseInt(fmt.Sprintf("%v", val), 10, 64); err == nil {
-			blockData.ExecutionPayloadTransactionsTotalBytes = wrapperspb.Int64(num)
+			blockData.ExecutionPayloadTransactionsTotalBytes = num
 		}
+	} else {
+		blockData.ExecutionPayloadTransactionsTotalBytes = 0
 	}
 
 	if val := result["execution_payload_transactions_total_bytes_compressed"]; val != nil {
 		if num, err := strconv.ParseInt(fmt.Sprintf("%v", val), 10, 64); err == nil {
-			blockData.ExecutionPayloadTransactionsTotalBytesCompressed = wrapperspb.Int64(num)
+			blockData.ExecutionPayloadTransactionsTotalBytesCompressed = num
 		}
+	} else {
+		blockData.ExecutionPayloadTransactionsTotalBytesCompressed = 0
 	}
 
 	return blockData, nil
@@ -624,8 +641,8 @@ func (b *BeaconSlots) getProposerData(ctx context.Context, networkName string, s
 		SELECT
 			slot,
 			proposer_index
-		FROM xatu.beacon_api_eth_v1_events_block
-		WHERE network = $1 AND slot = $2
+		FROM default.beacon_api_eth_v2_beacon_block
+		WHERE meta_network_name = ? AND slot = ?
 		LIMIT 1
 	`
 
@@ -639,7 +656,7 @@ func (b *BeaconSlots) getProposerData(ctx context.Context, networkName string, s
 		return nil, fmt.Errorf("failed to get proposer data: %w", err)
 	}
 
-	if result == nil || len(result) == 0 {
+	if len(result) == 0 {
 		return nil, fmt.Errorf("no proposer data found for slot %d", slot)
 	}
 
@@ -654,16 +671,12 @@ func (b *BeaconSlots) getProposerData(ctx context.Context, networkName string, s
 	}, nil
 }
 
-// getSlotWindow returns the start and end times for a slot with a 15 minute grace period
+// getSlotWindow returns the start and end times for a slot with a 5 minute grace period
 func (b *BeaconSlots) getSlotWindow(ctx context.Context, networkName string, slot phase0.Slot) (time.Time, time.Time) {
-	// This is a simplified implementation - in practice would calculate from genesis
-	// Following the Python implementation with 15 minutes added on either side
+	slotDetail := b.ethereum.GetNetwork(networkName).GetWallclock().Slots().FromNumber(uint64(slot))
 
-	// For simplicity, for now we'll just return a window around the current time
-	// In a full implementation, this would calculate properly from slot and genesis time
-	now := time.Now().UTC()
-	startTime := now.Add(-15 * time.Minute)
-	endTime := now.Add(15 * time.Minute)
+	startTime := slotDetail.TimeWindow().Start().Add(-5 * time.Minute)
+	endTime := slotDetail.TimeWindow().End().Add(5 * time.Minute)
 
 	return startTime, endTime
 }
