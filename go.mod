@@ -14,6 +14,8 @@ require (
 	gopkg.in/yaml.v3 v3.0.1
 )
 
+require golang.org/x/sync v0.13.0 // indirect
+
 require (
 	github.com/emicklei/dot v1.6.4 // indirect
 	github.com/ethpandaops/ethwallclock v0.3.0

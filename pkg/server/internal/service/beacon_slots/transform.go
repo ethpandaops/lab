@@ -53,35 +53,15 @@ func (b *BeaconSlots) transformSlotDataForStorage(
 				extractedUsername = parts[0]
 			}
 
-			// Ensure we use empty strings for nil values
-			sanitizeField := func(s string) string {
-				if s == "<nil>" || s == "nil" {
-					return ""
-				}
-				return s
-			}
-
-			params := geolocation.LookupParams{
-				Country: sanitizeField(country),
-				City:    sanitizeField(city),
-			}
-
-			location, found := b.geolocationClient.LookupCity(params)
-			if found {
-				lat = &location.Lat
-				lon = &location.Lon
-			}
-
 			geo := &pb.Geo{
-				City:      sanitizeField(city),
-				Country:   sanitizeField(country),
-				Continent: sanitizeField(continent),
+				City:      city,
+				Country:   country,
+				Continent: continent,
 			}
 
 			if lat != nil {
 				geo.Latitude = *lat
 			}
-
 			if lon != nil {
 				geo.Longitude = *lon
 			}
@@ -198,11 +178,6 @@ func (b *BeaconSlots) transformSlotDataForStorage(
 
 // lookupGeoCoordinates performs a geo lookup for given city/country.
 func (b *BeaconSlots) lookupGeoCoordinates(city, country string) (*float64, *float64) {
-	// Skip lookup if either city or country is empty
-	if city == "" || country == "" || city == "<nil>" || country == "<nil>" {
-		return nil, nil
-	}
-
 	location, found := b.geolocationClient.LookupCity(geolocation.LookupParams{
 		City:    city,
 		Country: country,

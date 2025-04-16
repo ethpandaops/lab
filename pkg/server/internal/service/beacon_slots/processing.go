@@ -8,6 +8,7 @@ import (
 	"github.com/attestantio/go-eth2-client/spec/phase0"
 	"github.com/ethpandaops/lab/pkg/internal/lab/storage"
 	pb "github.com/ethpandaops/lab/pkg/server/proto/beacon_slots"
+	"golang.org/x/sync/errgroup"
 )
 
 // processSlot processes a single slot
@@ -27,51 +28,121 @@ func (b *BeaconSlots) processSlot(ctx context.Context, networkName string, slot 
 		return false, nil
 	}
 
-	// 2. Get proposer data (should return *pb.Proposer)
-	proposerData, err := b.getProposerData(ctx, networkName, slot)
-	if err != nil {
-		return false, fmt.Errorf("failed to get proposer data: %w", err)
+	// Create an error group for parallel execution
+	group, groupCtx := errgroup.WithContext(ctx)
+
+	// Define variables to hold results
+	var (
+		proposerData                   *pb.Proposer
+		entity                         *string
+		blockSeenAtSlotTime            map[string]*pb.BlockArrivalTime
+		blobSeenAtSlotTime             map[string]*pb.BlobArrivalTimes
+		blockFirstSeenInP2PSlotTime    map[string]*pb.BlockArrivalTime
+		blobFirstSeenInP2PSlotTime     map[string]*pb.BlobArrivalTimes
+		maxAttestationVotes            int64
+		attestationVotes               map[int64]int64
+		proposerErr, maxAttestationErr error
+	)
+
+	// Initialize empty maps
+	blockSeenAtSlotTime = map[string]*pb.BlockArrivalTime{}
+	blobSeenAtSlotTime = map[string]*pb.BlobArrivalTimes{}
+	blockFirstSeenInP2PSlotTime = map[string]*pb.BlockArrivalTime{}
+	blobFirstSeenInP2PSlotTime = map[string]*pb.BlobArrivalTimes{}
+	attestationVotes = make(map[int64]int64)
+
+	// 2. Get proposer data - can run in parallel
+	group.Go(func() error {
+		var err error
+		proposerData, err = b.getProposerData(groupCtx, networkName, slot)
+		proposerErr = err
+		return nil // We collect the error but don't fail the group
+	})
+
+	// 3. Get entity - depends on blockData, can run in parallel
+	group.Go(func() error {
+		var err error
+		entity, err = b.getProposerEntity(groupCtx, networkName, blockData.ProposerIndex)
+		if err != nil {
+			b.log.WithField("slot", slot).WithError(err).Error("Failed to get proposer entity, continuing without it")
+		}
+		return nil // We collect the error but don't fail the group
+	})
+
+	// 4. Get timing data - can all run in parallel
+	group.Go(func() error {
+		var err error
+		blockSeenTimes, err := b.getBlockSeenAtSlotTime(groupCtx, networkName, slot)
+		if err == nil && blockSeenTimes != nil {
+			blockSeenAtSlotTime = blockSeenTimes
+		}
+		return nil
+	})
+
+	group.Go(func() error {
+		var err error
+		blobSeenTimes, err := b.getBlobSeenAtSlotTime(groupCtx, networkName, slot)
+		if err == nil && blobSeenTimes != nil {
+			blobSeenAtSlotTime = blobSeenTimes
+		}
+		return nil
+	})
+
+	group.Go(func() error {
+		var err error
+		blockFirstSeenTimes, err := b.getBlockFirstSeenInP2PSlotTime(groupCtx, networkName, slot)
+		if err == nil && blockFirstSeenTimes != nil {
+			blockFirstSeenInP2PSlotTime = blockFirstSeenTimes
+		}
+		return nil
+	})
+
+	group.Go(func() error {
+		var err error
+		blobFirstSeenTimes, err := b.getBlobFirstSeenInP2PSlotTime(groupCtx, networkName, slot)
+		if err == nil && blobFirstSeenTimes != nil {
+			blobFirstSeenInP2PSlotTime = blobFirstSeenTimes
+		}
+		return nil
+	})
+
+	// 5. Get attestation data - max can run in parallel, votes depends on blockData
+	group.Go(func() error {
+		var err error
+		maxAttestationVotes, err = b.getMaximumAttestationVotes(groupCtx, networkName, slot)
+		maxAttestationErr = err
+		return nil // We collect the error but don't fail the group
+	})
+
+	group.Go(func() error {
+		var err error
+		votes, err := b.getAttestationVotes(groupCtx, networkName, slot, blockData.BlockRoot)
+		if err == nil && votes != nil {
+			attestationVotes = votes
+		}
+		return nil // We collect the error but don't fail the group
+	})
+
+	// Wait for all goroutines to complete
+	if err := group.Wait(); err != nil {
+		return false, fmt.Errorf("parallel processing error: %w", err)
 	}
 
-	// 3. Get entity
-	entity, err := b.getProposerEntity(ctx, networkName, blockData.ProposerIndex)
-	if err != nil {
-		b.log.WithField("slot", slot).WithError(err).Error("Failed to get proposer entity, continuing without it")
+	// Check errors from critical operations
+	if proposerErr != nil {
+		return false, fmt.Errorf("failed to get proposer data: %w", proposerErr)
 	}
 
-	// 4. Get timing data (should return []*pb.Timing, map[string]*pb.BlobTimingMap, etc.)
-	blockSeenAtSlotTime, err := b.getBlockSeenAtSlotTime(ctx, networkName, slot)
-	if err != nil {
-		blockSeenAtSlotTime = map[string]*pb.BlockArrivalTime{}
-	}
-	blobSeenAtSlotTime, err := b.getBlobSeenAtSlotTime(ctx, networkName, slot)
-	if err != nil {
-		blobSeenAtSlotTime = map[string]*pb.BlobArrivalTimes{}
-	}
-	blockFirstSeenInP2PSlotTime, err := b.getBlockFirstSeenInP2PSlotTime(ctx, networkName, slot)
-	if err != nil {
-		blockFirstSeenInP2PSlotTime = map[string]*pb.BlockArrivalTime{}
-	}
-	blobFirstSeenInP2PSlotTime, err := b.getBlobFirstSeenInP2PSlotTime(ctx, networkName, slot)
-	if err != nil {
-		blobFirstSeenInP2PSlotTime = map[string]*pb.BlobArrivalTimes{}
+	if maxAttestationErr != nil {
+		return false, fmt.Errorf("failed to get maximum attestation votes: %w", maxAttestationErr)
 	}
 
+	// Create the full timings structure
 	fullTimings := &pb.FullTimings{
 		BlockSeen:         blockSeenAtSlotTime,
 		BlobSeen:          blobSeenAtSlotTime,
 		BlockFirstSeenP2P: blockFirstSeenInP2PSlotTime,
 		BlobFirstSeenP2P:  blobFirstSeenInP2PSlotTime,
-	}
-
-	// 5. Get attestation data
-	maxAttestationVotes, err := b.getMaximumAttestationVotes(ctx, networkName, slot)
-	if err != nil {
-		return false, fmt.Errorf("failed to get maximum attestation votes: %w", err)
-	}
-	attestationVotes, err := b.getAttestationVotes(ctx, networkName, slot, blockData.BlockRoot)
-	if err != nil {
-		attestationVotes = make(map[int64]int64)
 	}
 
 	// 6. Transform the data for storage
