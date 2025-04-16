@@ -376,7 +376,7 @@ func (b *BeaconSlots) processTrailing(ctx context.Context, networkName string) {
 
 		targetSlot := currentSlot - phase0.Slot(500)
 
-		if slotState.LastProcessedSlot == targetSlot || targetSlot < 1 {
+		if slotState.LastProcessedSlot == targetSlot || targetSlot < 1 || slotState.LastProcessedSlot == 0 {
 			// Nothing to do, we are already at the target slot!
 			b.sleepUntilNextSlot(ctx, networkName)
 			continue
@@ -464,7 +464,7 @@ func (b *BeaconSlots) processBackfill(ctx context.Context, networkName string) {
 
 		targetSlot := currentSlot - phase0.Slot(b.config.Backfill.Slots)
 
-		if slotState.LastProcessedSlot == targetSlot || targetSlot < 1 {
+		if slotState.LastProcessedSlot == targetSlot || targetSlot < 1 || slotState.LastProcessedSlot == 0 {
 			// Nothing to do, we are already at the target slot!
 			b.sleepUntilNextSlot(ctx, networkName)
 			continue

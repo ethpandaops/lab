@@ -6,6 +6,12 @@ import "google/protobuf/timestamp.proto";
 
 option go_package = "github.com/ethpandaops/lab/pkg/proto/xatu_public_contributors";
 
+
+// The xatu_public_contributors service definition
+service XatuPublicContributorsService {
+
+} 
+
 // Time window configuration (mirrors Python config structure)
 message TimeWindow {
   string file = 1;  // e.g., "1h", "24h"
@@ -176,24 +182,3 @@ message GetTopNetworksRequest {
 message GetTopNetworksResponse {
   TopNetworks top_networks = 1;
 }
-
-// The xatu_public_contributors service definition
-service XatuPublicContributorsService {
-  // Get summary data
-  rpc GetSummary(GetSummaryRequest) returns (GetSummaryResponse) {}
-  
-  // Get country data
-  rpc GetCountryData(GetCountryDataRequest) returns (GetCountryDataResponse) {}
-  
-  // Get user time series data (from Users processor)
-  rpc GetUsersData(GetUsersDataRequest) returns (GetUsersDataResponse) {}
-
-  // Get summary for a specific user (from User Summaries processor)
-  rpc GetUserSummary(GetUserSummaryRequest) returns (GetUserSummaryResponse) {}
-
-  // Get the global list of user summaries (from User Summaries processor)
-  rpc GetGlobalUserSummary(GetGlobalUserSummaryRequest) returns (GetGlobalUserSummaryResponse) {}
-  
-  // Get top networks
-  rpc GetTopNetworks(GetTopNetworksRequest) returns (GetTopNetworksResponse) {}
-} 

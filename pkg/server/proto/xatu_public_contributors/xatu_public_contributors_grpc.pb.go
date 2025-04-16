@@ -7,10 +7,7 @@
 package xatu_public_contributors
 
 import (
-	context "context"
 	grpc "google.golang.org/grpc"
-	codes "google.golang.org/grpc/codes"
-	status "google.golang.org/grpc/status"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -18,33 +15,12 @@ import (
 // Requires gRPC-Go v1.64.0 or later.
 const _ = grpc.SupportPackageIsVersion9
 
-const (
-	XatuPublicContributorsService_GetSummary_FullMethodName           = "/xatu_public_contributors.XatuPublicContributorsService/GetSummary"
-	XatuPublicContributorsService_GetCountryData_FullMethodName       = "/xatu_public_contributors.XatuPublicContributorsService/GetCountryData"
-	XatuPublicContributorsService_GetUsersData_FullMethodName         = "/xatu_public_contributors.XatuPublicContributorsService/GetUsersData"
-	XatuPublicContributorsService_GetUserSummary_FullMethodName       = "/xatu_public_contributors.XatuPublicContributorsService/GetUserSummary"
-	XatuPublicContributorsService_GetGlobalUserSummary_FullMethodName = "/xatu_public_contributors.XatuPublicContributorsService/GetGlobalUserSummary"
-	XatuPublicContributorsService_GetTopNetworks_FullMethodName       = "/xatu_public_contributors.XatuPublicContributorsService/GetTopNetworks"
-)
-
 // XatuPublicContributorsServiceClient is the client API for XatuPublicContributorsService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
 // The xatu_public_contributors service definition
 type XatuPublicContributorsServiceClient interface {
-	// Get summary data
-	GetSummary(ctx context.Context, in *GetSummaryRequest, opts ...grpc.CallOption) (*GetSummaryResponse, error)
-	// Get country data
-	GetCountryData(ctx context.Context, in *GetCountryDataRequest, opts ...grpc.CallOption) (*GetCountryDataResponse, error)
-	// Get user time series data (from Users processor)
-	GetUsersData(ctx context.Context, in *GetUsersDataRequest, opts ...grpc.CallOption) (*GetUsersDataResponse, error)
-	// Get summary for a specific user (from User Summaries processor)
-	GetUserSummary(ctx context.Context, in *GetUserSummaryRequest, opts ...grpc.CallOption) (*GetUserSummaryResponse, error)
-	// Get the global list of user summaries (from User Summaries processor)
-	GetGlobalUserSummary(ctx context.Context, in *GetGlobalUserSummaryRequest, opts ...grpc.CallOption) (*GetGlobalUserSummaryResponse, error)
-	// Get top networks
-	GetTopNetworks(ctx context.Context, in *GetTopNetworksRequest, opts ...grpc.CallOption) (*GetTopNetworksResponse, error)
 }
 
 type xatuPublicContributorsServiceClient struct {
@@ -55,84 +31,12 @@ func NewXatuPublicContributorsServiceClient(cc grpc.ClientConnInterface) XatuPub
 	return &xatuPublicContributorsServiceClient{cc}
 }
 
-func (c *xatuPublicContributorsServiceClient) GetSummary(ctx context.Context, in *GetSummaryRequest, opts ...grpc.CallOption) (*GetSummaryResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(GetSummaryResponse)
-	err := c.cc.Invoke(ctx, XatuPublicContributorsService_GetSummary_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *xatuPublicContributorsServiceClient) GetCountryData(ctx context.Context, in *GetCountryDataRequest, opts ...grpc.CallOption) (*GetCountryDataResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(GetCountryDataResponse)
-	err := c.cc.Invoke(ctx, XatuPublicContributorsService_GetCountryData_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *xatuPublicContributorsServiceClient) GetUsersData(ctx context.Context, in *GetUsersDataRequest, opts ...grpc.CallOption) (*GetUsersDataResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(GetUsersDataResponse)
-	err := c.cc.Invoke(ctx, XatuPublicContributorsService_GetUsersData_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *xatuPublicContributorsServiceClient) GetUserSummary(ctx context.Context, in *GetUserSummaryRequest, opts ...grpc.CallOption) (*GetUserSummaryResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(GetUserSummaryResponse)
-	err := c.cc.Invoke(ctx, XatuPublicContributorsService_GetUserSummary_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *xatuPublicContributorsServiceClient) GetGlobalUserSummary(ctx context.Context, in *GetGlobalUserSummaryRequest, opts ...grpc.CallOption) (*GetGlobalUserSummaryResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(GetGlobalUserSummaryResponse)
-	err := c.cc.Invoke(ctx, XatuPublicContributorsService_GetGlobalUserSummary_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *xatuPublicContributorsServiceClient) GetTopNetworks(ctx context.Context, in *GetTopNetworksRequest, opts ...grpc.CallOption) (*GetTopNetworksResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(GetTopNetworksResponse)
-	err := c.cc.Invoke(ctx, XatuPublicContributorsService_GetTopNetworks_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 // XatuPublicContributorsServiceServer is the server API for XatuPublicContributorsService service.
 // All implementations must embed UnimplementedXatuPublicContributorsServiceServer
 // for forward compatibility.
 //
 // The xatu_public_contributors service definition
 type XatuPublicContributorsServiceServer interface {
-	// Get summary data
-	GetSummary(context.Context, *GetSummaryRequest) (*GetSummaryResponse, error)
-	// Get country data
-	GetCountryData(context.Context, *GetCountryDataRequest) (*GetCountryDataResponse, error)
-	// Get user time series data (from Users processor)
-	GetUsersData(context.Context, *GetUsersDataRequest) (*GetUsersDataResponse, error)
-	// Get summary for a specific user (from User Summaries processor)
-	GetUserSummary(context.Context, *GetUserSummaryRequest) (*GetUserSummaryResponse, error)
-	// Get the global list of user summaries (from User Summaries processor)
-	GetGlobalUserSummary(context.Context, *GetGlobalUserSummaryRequest) (*GetGlobalUserSummaryResponse, error)
-	// Get top networks
-	GetTopNetworks(context.Context, *GetTopNetworksRequest) (*GetTopNetworksResponse, error)
 	mustEmbedUnimplementedXatuPublicContributorsServiceServer()
 }
 
@@ -143,24 +47,6 @@ type XatuPublicContributorsServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedXatuPublicContributorsServiceServer struct{}
 
-func (UnimplementedXatuPublicContributorsServiceServer) GetSummary(context.Context, *GetSummaryRequest) (*GetSummaryResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetSummary not implemented")
-}
-func (UnimplementedXatuPublicContributorsServiceServer) GetCountryData(context.Context, *GetCountryDataRequest) (*GetCountryDataResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetCountryData not implemented")
-}
-func (UnimplementedXatuPublicContributorsServiceServer) GetUsersData(context.Context, *GetUsersDataRequest) (*GetUsersDataResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetUsersData not implemented")
-}
-func (UnimplementedXatuPublicContributorsServiceServer) GetUserSummary(context.Context, *GetUserSummaryRequest) (*GetUserSummaryResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetUserSummary not implemented")
-}
-func (UnimplementedXatuPublicContributorsServiceServer) GetGlobalUserSummary(context.Context, *GetGlobalUserSummaryRequest) (*GetGlobalUserSummaryResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetGlobalUserSummary not implemented")
-}
-func (UnimplementedXatuPublicContributorsServiceServer) GetTopNetworks(context.Context, *GetTopNetworksRequest) (*GetTopNetworksResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetTopNetworks not implemented")
-}
 func (UnimplementedXatuPublicContributorsServiceServer) mustEmbedUnimplementedXatuPublicContributorsServiceServer() {
 }
 func (UnimplementedXatuPublicContributorsServiceServer) testEmbeddedByValue() {}
@@ -183,146 +69,13 @@ func RegisterXatuPublicContributorsServiceServer(s grpc.ServiceRegistrar, srv Xa
 	s.RegisterService(&XatuPublicContributorsService_ServiceDesc, srv)
 }
 
-func _XatuPublicContributorsService_GetSummary_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetSummaryRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(XatuPublicContributorsServiceServer).GetSummary(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: XatuPublicContributorsService_GetSummary_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(XatuPublicContributorsServiceServer).GetSummary(ctx, req.(*GetSummaryRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _XatuPublicContributorsService_GetCountryData_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetCountryDataRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(XatuPublicContributorsServiceServer).GetCountryData(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: XatuPublicContributorsService_GetCountryData_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(XatuPublicContributorsServiceServer).GetCountryData(ctx, req.(*GetCountryDataRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _XatuPublicContributorsService_GetUsersData_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetUsersDataRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(XatuPublicContributorsServiceServer).GetUsersData(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: XatuPublicContributorsService_GetUsersData_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(XatuPublicContributorsServiceServer).GetUsersData(ctx, req.(*GetUsersDataRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _XatuPublicContributorsService_GetUserSummary_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetUserSummaryRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(XatuPublicContributorsServiceServer).GetUserSummary(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: XatuPublicContributorsService_GetUserSummary_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(XatuPublicContributorsServiceServer).GetUserSummary(ctx, req.(*GetUserSummaryRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _XatuPublicContributorsService_GetGlobalUserSummary_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetGlobalUserSummaryRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(XatuPublicContributorsServiceServer).GetGlobalUserSummary(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: XatuPublicContributorsService_GetGlobalUserSummary_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(XatuPublicContributorsServiceServer).GetGlobalUserSummary(ctx, req.(*GetGlobalUserSummaryRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _XatuPublicContributorsService_GetTopNetworks_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetTopNetworksRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(XatuPublicContributorsServiceServer).GetTopNetworks(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: XatuPublicContributorsService_GetTopNetworks_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(XatuPublicContributorsServiceServer).GetTopNetworks(ctx, req.(*GetTopNetworksRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 // XatuPublicContributorsService_ServiceDesc is the grpc.ServiceDesc for XatuPublicContributorsService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var XatuPublicContributorsService_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "xatu_public_contributors.XatuPublicContributorsService",
 	HandlerType: (*XatuPublicContributorsServiceServer)(nil),
-	Methods: []grpc.MethodDesc{
-		{
-			MethodName: "GetSummary",
-			Handler:    _XatuPublicContributorsService_GetSummary_Handler,
-		},
-		{
-			MethodName: "GetCountryData",
-			Handler:    _XatuPublicContributorsService_GetCountryData_Handler,
-		},
-		{
-			MethodName: "GetUsersData",
-			Handler:    _XatuPublicContributorsService_GetUsersData_Handler,
-		},
-		{
-			MethodName: "GetUserSummary",
-			Handler:    _XatuPublicContributorsService_GetUserSummary_Handler,
-		},
-		{
-			MethodName: "GetGlobalUserSummary",
-			Handler:    _XatuPublicContributorsService_GetGlobalUserSummary_Handler,
-		},
-		{
-			MethodName: "GetTopNetworks",
-			Handler:    _XatuPublicContributorsService_GetTopNetworks_Handler,
-		},
-	},
-	Streams:  []grpc.StreamDesc{},
-	Metadata: "pkg/server/proto/xatu_public_contributors/xatu_public_contributors.proto",
+	Methods:     []grpc.MethodDesc{},
+	Streams:     []grpc.StreamDesc{},
+	Metadata:    "pkg/server/proto/xatu_public_contributors/xatu_public_contributors.proto",
 }

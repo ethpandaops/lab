@@ -3,6 +3,7 @@ package beacon_slots
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/attestantio/go-eth2-client/spec/phase0"
@@ -21,6 +22,12 @@ func (b *BeaconSlots) processSlot(ctx context.Context, networkName string, slot 
 	// 1. Get block data (should return *pb.BlockData)
 	blockData, err := b.getBlockData(ctx, networkName, slot)
 	if err != nil {
+		if strings.Contains(err.Error(), "no rows returned") {
+			b.log.WithField("slot", slot).Debug("No block data found for slot")
+
+			return true, nil
+		}
+
 		return false, fmt.Errorf("failed to get block data: %w", err)
 	}
 	if blockData == nil {
@@ -61,12 +68,8 @@ func (b *BeaconSlots) processSlot(ctx context.Context, networkName string, slot 
 
 	// 3. Get entity - depends on blockData, can run in parallel
 	group.Go(func() error {
-		var err error
-		entity, err = b.getProposerEntity(groupCtx, networkName, blockData.ProposerIndex)
-		if err != nil {
-			b.log.WithField("slot", slot).WithError(err).Error("Failed to get proposer entity, continuing without it")
-		}
-		return nil // We collect the error but don't fail the group
+		entity, _ = b.getProposerEntity(groupCtx, networkName, blockData.ProposerIndex)
+		return nil // We won't always have an entity.
 	})
 
 	// 4. Get timing data - can all run in parallel

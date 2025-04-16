@@ -3,16 +3,13 @@ package grpc
 import (
 	"context"
 
-	"errors" // Needed for error checking
+	// Needed for error checking
 
-	"github.com/ethpandaops/lab/pkg/internal/lab/storage"
 	xpc "github.com/ethpandaops/lab/pkg/server/internal/service/xatu_public_contributors"
 
 	pb "github.com/ethpandaops/lab/pkg/server/proto/xatu_public_contributors"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
 // Service implements the Xatu Public Contributors gRPC service
@@ -44,165 +41,4 @@ func (x *XatuPublicContributors) Start(ctx context.Context, grpcServer *grpc.Ser
 	x.log.Info("XatuPublicContributors GRPC service started")
 
 	return nil
-}
-
-// toGRPCError converts a standard Go error into a gRPC status error.
-// It maps common error types to appropriate gRPC codes.
-func toGRPCError(log logrus.FieldLogger, err error) error {
-	if err == nil {
-		return nil
-	}
-
-	// Map specific known errors
-	if errors.Is(err, storage.ErrNotFound) {
-		log.WithError(err).Warn("Resource not found")
-		// Return NotFound code, but potentially a user-friendly message
-		return status.Error(codes.NotFound, "requested data not found")
-	}
-	// Placeholder for validation error mapping if validation package is added
-	// if errors.Is(err, validation.ErrInvalidArgument) {
-	// 	log.WithError(err).Warn("Invalid argument")
-	// 	return status.Error(codes.InvalidArgument, err.Error())
-	// }
-	// if errors.Is(err, xpc.ErrInvalidArgument) { // Example
-	// 	log.WithError(err).Warn("Invalid argument")
-	// 	return status.Error(codes.InvalidArgument, err.Error())
-	// }
-
-	log.WithError(err).Error("Internal server error occurred")
-	// Default to Internal error for unhandled cases
-	return status.Error(codes.Internal, "internal server error") // Avoid leaking internal details
-}
-
-// GetSummary gets summary data for networks
-func (x *XatuPublicContributors) GetSummary(ctx context.Context, req *pb.GetSummaryRequest) (*pb.GetSummaryResponse, error) {
-	log := x.log.WithFields(logrus.Fields{
-		"method": "GetSummary",
-	})
-	log.Debug("Request received")
-
-	// Read the pre-processed summary data directly from storage via the service method
-	summaryData, err := x.service.ReadSummaryData(ctx)
-	if err != nil {
-		// Handle ErrNotFound specifically
-		if errors.Is(err, storage.ErrNotFound) {
-			log.Warn("Summary data not found, returning empty response")
-			// Return an empty summary as per proto definition
-			return &pb.GetSummaryResponse{
-				Summary: &pb.SummaryData{
-					Networks: make(map[string]*pb.NetworkStats),
-				},
-			}, nil
-		}
-		return nil, toGRPCError(log, err) // Handle other errors
-	}
-	if summaryData == nil {
-		log.Warn("Service returned nil summary without error, returning empty response")
-		return &pb.GetSummaryResponse{
-			Summary: &pb.SummaryData{
-				Networks: make(map[string]*pb.NetworkStats),
-			},
-		}, nil
-	}
-
-	// Data is already in the correct proto format
-	return &pb.GetSummaryResponse{
-		Summary: summaryData,
-	}, nil
-}
-
-// GetCountriesData gets countries data for a specific network and time window
-func (x *XatuPublicContributors) GetCountryData(ctx context.Context, req *pb.GetCountryDataRequest) (*pb.GetCountryDataResponse, error) {
-	log := x.log.WithFields(logrus.Fields{
-		"network": req.Network,
-		"method":  "GetCountryData",
-	})
-	log.Debug("Request received")
-
-	// Determine which window file to read. Defaulting to "24h" for now.
-	windowFile := "24h"
-	// Placeholder: make window configurable if proto adds a window field
-
-	// Read the pre-processed country time series data from storage
-	dataPoints, err := x.service.ReadCountryDataWindow(ctx, req.Network, windowFile)
-	if err != nil {
-		if errors.Is(err, storage.ErrNotFound) {
-			log.Warnf("Country data not found for network %s, window %s", req.Network, windowFile)
-			return &pb.GetCountryDataResponse{DataPoints: []*pb.CountryDataPoint{}}, nil // Return empty list
-		}
-		return nil, toGRPCError(log, err)
-	}
-
-	// Data is already in the correct proto format
-	return &pb.GetCountryDataResponse{
-		DataPoints: dataPoints,
-	}, nil
-}
-
-// GetUsersData gets users data for a specific network and time window
-func (x *XatuPublicContributors) GetUsersData(ctx context.Context, req *pb.GetUsersDataRequest) (*pb.GetUsersDataResponse, error) {
-	log := x.log.WithFields(logrus.Fields{
-		"network": req.Network,
-		"window":  req.Window,
-		"method":  "GetUsersData",
-	})
-	log.Debug("Request received")
-
-	// Validate window input? For now, assume it's valid (e.g., "1h", "24h")
-	if req.Window == "" {
-		log.Warn("Window parameter is missing")
-		return nil, status.Error(codes.InvalidArgument, "window parameter is required")
-	}
-
-	// Read the pre-processed users time series data from storage
-	// The service method already returns the correct proto type []*pb.UsersTimePoint
-	dataPoints, err := x.service.ReadUsersDataWindow(ctx, req.Network, req.Window)
-	if err != nil {
-		if errors.Is(err, storage.ErrNotFound) {
-			log.Warnf("Users data not found for network %s, window %s", req.Network, req.Window)
-			return &pb.GetUsersDataResponse{DataPoints: []*pb.UsersTimePoint{}}, nil // Return empty list
-		}
-		return nil, toGRPCError(log, err)
-	}
-
-	// Data is already in the correct format
-	return &pb.GetUsersDataResponse{
-		DataPoints: dataPoints,
-	}, nil
-}
-
-// GetUserSummary gets user summary data for a specific user
-func (x *XatuPublicContributors) GetUserSummary(ctx context.Context, req *pb.GetUserSummaryRequest) (*pb.GetUserSummaryResponse, error) {
-	log := x.log.WithFields(logrus.Fields{
-		"user":   req.Username,
-		"method": "GetUserSummary",
-	})
-	log.Debug("Request received")
-
-	if req.Username == "" {
-		log.Warn("Username parameter is missing")
-		return nil, status.Error(codes.InvalidArgument, "username parameter is required")
-	}
-
-	// Read the pre-processed user summary data from storage
-	// The service method already returns the correct proto type *pb.UserSummary
-	userSummary, err := x.service.ReadUserSummary(ctx, req.Username)
-	if err != nil {
-		if errors.Is(err, storage.ErrNotFound) {
-			log.Warnf("User summary not found for user %s", req.Username)
-			// Return NotFound as per gRPC best practices for a missing resource
-			return nil, status.Error(codes.NotFound, "user summary not found")
-		}
-		return nil, toGRPCError(log, err)
-	}
-	if userSummary == nil {
-		// Should be handled by ErrNotFound check above, but as a safeguard:
-		log.Warn("Service returned nil user summary without error")
-		return nil, status.Error(codes.NotFound, "user summary not found")
-	}
-
-	// Data is already in the correct format
-	return &pb.GetUserSummaryResponse{
-		UserSummary: userSummary,
-	}, nil
 }
