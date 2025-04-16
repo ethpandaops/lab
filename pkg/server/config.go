@@ -9,8 +9,8 @@ import (
 	"github.com/ethpandaops/lab/pkg/internal/lab/storage"
 	"github.com/ethpandaops/lab/pkg/server/internal/grpc"
 	"github.com/ethpandaops/lab/pkg/server/internal/service/beacon_chain_timings"
+	"github.com/ethpandaops/lab/pkg/server/internal/service/beacon_slots"
 	"github.com/ethpandaops/lab/pkg/server/internal/service/xatu_public_contributors"
-	"github.com/ethpandaops/lab/pkg/server/proto/beacon_slots"
 )
 
 // Config contains the configuration for the srv service
@@ -19,7 +19,7 @@ type Config struct {
 	Server   *grpc.Config             `yaml:"grpc"`
 	Ethereum *ethereum.Config         `yaml:"ethereum"`
 	Storage  *storage.Config          `yaml:"storage"`
-	Modules  map[string]*ModuleConfig `yaml:"modules"` // Per-module configurations
+	Modules  map[string]*ModuleConfig `yaml:"modules"`
 	Cache    *cache.Config            `yaml:"cache"`
 }
 

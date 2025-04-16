@@ -7,6 +7,9 @@ import "google/protobuf/wrappers.proto";
 
 option go_package = "github.com/ethpandaops/lab/pkg/proto/beacon_slots";
 
+service BeaconSlots {
+}
+
 // Geo location information for a node
 message Geo {
   string city = 1;
@@ -77,8 +80,38 @@ message BlobTimingMap {
   map<int64, int64> timings = 1; // map blob_index -> ms
 }
 
-// Timings data
-message Timings {
+message BlockArrivalTime {
+  int64 slot_time = 1;
+  string meta_client_name = 2;
+  string meta_client_geo_city = 3;
+  string meta_client_geo_country = 4;
+  string meta_client_geo_continent_code = 5;
+}
+
+
+message BlobArrivalTime {
+  int64 slot_time = 1;
+  string meta_client_name = 2;
+  string meta_client_geo_city = 3;
+  string meta_client_geo_country = 4;
+  string meta_client_geo_continent_code = 5;
+  int64 blob_index = 6;
+}
+
+message BlobArrivalTimes {
+  repeated BlobArrivalTime arrival_times = 1;
+}
+
+// FullTimings data includes timing data with metadata and geo location
+message FullTimings {
+  map<string, BlockArrivalTime> block_seen = 1; // map meta_client -> BlockArrivalTime
+  map<string, BlobArrivalTimes> blob_seen = 2; // map meta_client -> BlobArrivalTimes
+  map<string, BlockArrivalTime> block_first_seen_p2p = 3; // map meta_client -> BlockArrivalTime
+  map<string, BlobArrivalTimes> blob_first_seen_p2p = 4; // map meta_client -> BlobArrivalTimes
+}
+
+// SlimTimings data is a slimmed down version of FullTimings that drops the metadata and geo location
+message SlimTimings {
   map<string, int64> block_seen = 1; // map meta_client -> ms
   map<string, BlobTimingMap> blob_seen = 2; // map meta_client -> BlobTimingMap
   map<string, int64> block_first_seen_p2p = 3; // map meta_client -> ms
@@ -95,6 +128,6 @@ message BeaconSlotData {
   Proposer proposer = 6;
   google.protobuf.StringValue entity = 7;
   map<string, Node> nodes = 8;
-  Timings timings = 9;
+  SlimTimings timings = 9;
   AttestationsData attestations = 10;
 }

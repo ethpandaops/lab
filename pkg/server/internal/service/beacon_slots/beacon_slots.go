@@ -2,7 +2,6 @@ package beacon_slots
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"strconv"
 	"strings"
@@ -83,8 +82,8 @@ func (b *BeaconSlots) Start(ctx context.Context) error {
 
 	leader := leader.New(b.log, b.lockerClient, leader.Config{
 		Resource:        ServiceName + "/slots_processing",
-		TTL:             15 * time.Minute,
-		RefreshInterval: 5 * time.Second,
+		TTL:             5 * time.Second,
+		RefreshInterval: 1 * time.Second,
 
 		OnElected: func() {
 			b.log.Info("Became leader")
@@ -550,19 +549,26 @@ func (b *BeaconSlots) processSlot(ctx context.Context, networkName string, slot 
 	// 4. Get timing data (should return []*pb.Timing, map[string]*pb.BlobTimingMap, etc.)
 	blockSeenAtSlotTime, err := b.getBlockSeenAtSlotTime(ctx, networkName, slot)
 	if err != nil {
-		blockSeenAtSlotTime = map[string]time.Duration{}
+		blockSeenAtSlotTime = map[string]*pb.BlockArrivalTime{}
 	}
 	blobSeenAtSlotTime, err := b.getBlobSeenAtSlotTime(ctx, networkName, slot)
 	if err != nil {
-		blobSeenAtSlotTime = map[string]*pb.BlobTimingMap{}
+		blobSeenAtSlotTime = map[string]*pb.BlobArrivalTimes{}
 	}
 	blockFirstSeenInP2PSlotTime, err := b.getBlockFirstSeenInP2PSlotTime(ctx, networkName, slot)
 	if err != nil {
-		blockFirstSeenInP2PSlotTime = map[string]time.Duration{}
+		blockFirstSeenInP2PSlotTime = map[string]*pb.BlockArrivalTime{}
 	}
 	blobFirstSeenInP2PSlotTime, err := b.getBlobFirstSeenInP2PSlotTime(ctx, networkName, slot)
 	if err != nil {
-		blobFirstSeenInP2PSlotTime = map[string]*pb.BlobTimingMap{}
+		blobFirstSeenInP2PSlotTime = map[string]*pb.BlobArrivalTimes{}
+	}
+
+	fullTimings := &pb.FullTimings{
+		BlockSeen:         blockSeenAtSlotTime,
+		BlobSeen:          blobSeenAtSlotTime,
+		BlockFirstSeenP2P: blockFirstSeenInP2PSlotTime,
+		BlobFirstSeenP2P:  blobFirstSeenInP2PSlotTime,
 	}
 
 	// 5. Get attestation data
@@ -586,10 +592,7 @@ func (b *BeaconSlots) processSlot(ctx context.Context, networkName string, slot 
 		proposerData,
 		maxAttestationVotes,
 		entity,
-		blockSeenAtSlotTime,
-		blobSeenAtSlotTime,
-		blockFirstSeenInP2PSlotTime,
-		blobFirstSeenInP2PSlotTime,
+		fullTimings,
 		attestationVotes,
 	)
 	if err != nil {
@@ -598,14 +601,12 @@ func (b *BeaconSlots) processSlot(ctx context.Context, networkName string, slot 
 
 	// 7. Store the data to storage
 	storageKey := fmt.Sprintf("slots/%s/%d", networkName, slot)
-	jsonData, err := ToJSON(slotData)
-	if err != nil {
-		return false, fmt.Errorf("failed to marshal slot data: %w", err)
-	}
 
 	err = b.storageClient.Store(ctx, storage.StoreParams{
-		Key:  b.getStoragePath(storageKey),
-		Data: []byte(jsonData),
+		Key:         b.getStoragePath(storageKey),
+		Data:        slotData,
+		Format:      storage.CodecNameJSON,
+		Compression: storage.Gzip,
 	})
 	if err != nil {
 		return false, fmt.Errorf("failed to store slot data: %w", err)
@@ -832,218 +833,6 @@ func (b *BeaconSlots) getSlotWindow(ctx context.Context, networkName string, slo
 	return startTime, endTime
 }
 
-// getMaximumAttestationVotes gets the maximum attestation votes for a slot
-func (b *BeaconSlots) getMaximumAttestationVotes(ctx context.Context, networkName string, slot int64) (int64, error) {
-	// Get start and end dates for the slot with grace period
-	startTime, endTime := b.getSlotWindow(ctx, networkName, slot)
-
-	// Convert to ClickHouse format
-	startStr := startTime.Format("2006-01-02 15:04:05")
-	endStr := endTime.Format("2006-01-02 15:04:05")
-
-	query := `
-		SELECT 
-			MAX(committee_size * (CAST(committee_index AS UInt32) + 1)) as max_attestations
-		FROM (
-			SELECT
-				length(validators) as committee_size,
-				committee_index
-			FROM xatu.beacon_api_eth_v1_beacon_committee
-			WHERE
-				slot = $1
-				AND network = $2
-				AND slot_start_date_time BETWEEN $3 AND $4
-		)
-	`
-
-	// Get the Clickhouse client for this network
-	ch, err := b.xatuClient.GetClickhouseClientForNetwork(networkName)
-	if err != nil {
-		return 0, fmt.Errorf("failed to get ClickHouse client for network %s: %w", networkName, err)
-	}
-
-	// Execute the query
-	result, err := ch.QueryRow(ctx, query, slot, networkName, startStr, endStr)
-	if err != nil {
-		return 0, fmt.Errorf("failed to get maximum attestation votes: %w", err)
-	}
-
-	if result["max_attestations"] == nil {
-		return 0, nil
-	}
-
-	// Convert the result to int64
-	maxVotes, err := strconv.ParseInt(fmt.Sprintf("%v", result["max_attestations"]), 10, 64)
-	if err != nil {
-		return 0, fmt.Errorf("failed to parse max attestations: %w", err)
-	}
-
-	return maxVotes, nil
-}
-
-// getAttestationVotes gets attestation votes for a slot and block root
-func (b *BeaconSlots) getAttestationVotes(ctx context.Context, networkName string, slot int64, blockRoot string) (map[int64]int64, error) {
-	// Get start and end dates for the slot without any grace period
-	startTime, endTime := b.getSlotWindow(ctx, networkName, slot)
-
-	// Convert to ClickHouse format
-	startStr := startTime.Format("2006-01-02 15:04:05")
-	endStr := endTime.Format("2006-01-02 15:04:05")
-
-	query := `
-		WITH 
-		raw_data AS (
-			SELECT 
-				attesting_validator_index,
-				MIN(propagation_slot_start_diff) as min_propagation_time
-			FROM xatu.beacon_api_eth_v1_events_attestation
-			WHERE
-				slot = $1
-				AND meta_network_name = $2
-				AND slot_start_date_time BETWEEN $3 AND $4
-				AND beacon_block_root = $5
-				AND attesting_validator_index IS NOT NULL
-				AND propagation_slot_start_diff <= 12000
-			GROUP BY attesting_validator_index
-		),
-		floor_time AS (
-			SELECT MIN(min_propagation_time) as floor_time
-			FROM raw_data
-		)
-		SELECT
-			attesting_validator_index,
-			FLOOR((min_propagation_time - floor_time) / 50) * 50 + floor_time as min_propagation_time
-		FROM raw_data, floor_time
-	`
-
-	// Get the Clickhouse client for this network
-	ch, err := b.xatuClient.GetClickhouseClientForNetwork(networkName)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get ClickHouse client for network %s: %w", networkName, err)
-	}
-
-	// Execute the query
-	result, err := ch.Query(ctx, query, slot, networkName, startStr, endStr, blockRoot)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get attestation votes: %w", err)
-	}
-
-	attestationTimes := make(map[int64]int64)
-	for _, row := range result {
-		validatorIndex, err := strconv.ParseInt(fmt.Sprintf("%v", row["attesting_validator_index"]), 10, 64)
-		if err != nil {
-			continue // Skip invalid data
-		}
-		minTime, err := strconv.ParseInt(fmt.Sprintf("%v", row["min_propagation_time"]), 10, 64)
-		if err != nil {
-			continue // Skip invalid data
-		}
-		attestationTimes[validatorIndex] = minTime
-	}
-
-	return attestationTimes, nil
-}
-
-// transformSlotDataForStorage transforms slot data into optimized format for storage
-
-func (b *BeaconSlots) transformSlotDataForStorage(
-	slot int64,
-	network string,
-	processedAt string,
-	processingTimeMs int64,
-	blockData *pb.BlockData,
-	proposerData *pb.Proposer,
-	maximumAttestationVotes int64,
-	entity *string,
-	blockSeenAtSlotTime []*pb.Timing,
-	blobSeenAtSlotTime map[string]*pb.BlobTimingMap,
-	blockFirstSeenInP2PSlotTime []*pb.Timing,
-	blobFirstSeenInP2PSlotTime map[string]*pb.BlobTimingMap,
-	attestationVotes map[int64]int64,
-) (*pb.BeaconSlotData, error) {
-	nodes := make(map[string]*pb.Node)
-
-	// Helper to add node
-	addNode := func(name, username, city, country, continent string, lat, lon *float64) {
-		if _, exists := nodes[name]; !exists {
-			geo := &pb.Geo{
-				City:      city,
-				Country:   country,
-				Continent: continent,
-			}
-			if lat != nil {
-				geo.Latitude = wrapperspb.Double(*lat)
-			}
-			if lon != nil {
-				geo.Longitude = wrapperspb.Double(*lon)
-			}
-			nodes[name] = &pb.Node{
-				Name:     name,
-				Username: username,
-				Geo:      geo,
-			}
-		}
-	}
-
-	// Build nodes from blockSeenAtSlotTime and blockFirstSeenInP2PSlotTime
-	for _, t := range blockSeenAtSlotTime {
-		lat, lon := b.lookupGeoCoordinates(t.Geo.City, t.Geo.Country)
-		addNode(t.MetaClientName, t.MetaClientUsername, t.Geo.City, t.Geo.Country, t.Geo.Continent, lat, lon)
-	}
-	for _, t := range blockFirstSeenInP2PSlotTime {
-		lat, lon := b.lookupGeoCoordinates(t.Geo.City, t.Geo.Country)
-		addNode(t.MetaClientName, t.MetaClientUsername, t.Geo.City, t.Geo.Country, t.Geo.Continent, lat, lon)
-	}
-
-	// Attestation windows
-	attestationBuckets := make(map[int64][]int64)
-	for validatorIndex, timeMs := range attestationVotes {
-		bucket := timeMs - (timeMs % 50)
-		attestationBuckets[bucket] = append(attestationBuckets[bucket], validatorIndex)
-	}
-	attestationWindows := make([]*pb.AttestationWindow, 0, len(attestationBuckets))
-	for startMs, indices := range attestationBuckets {
-		window := &pb.AttestationWindow{
-			StartMs:          startMs,
-			EndMs:            startMs + 50,
-			ValidatorIndices: indices,
-		}
-		attestationWindows = append(attestationWindows, window)
-	}
-
-	attestations := &pb.AttestationsData{
-		Windows:      attestationWindows,
-		MaximumVotes: maximumAttestationVotes,
-	}
-
-	// Timings
-	timings := &pb.Timings{
-		BlockSeen:         make(map[string]int64),
-		BlobSeen:          blobSeenAtSlotTime,
-		BlockFirstSeenP2P: make(map[string]int64),
-		BlobFirstSeenP2P:  blobFirstSeenInP2PSlotTime,
-	}
-	for _, t := range blockSeenAtSlotTime {
-		timings.BlockSeen[t.MetaClientName] = t.Ms
-	}
-	for _, t := range blockFirstSeenInP2PSlotTime {
-		timings.BlockFirstSeenP2P[t.MetaClientName] = t.Ms
-	}
-
-	return &pb.BeaconSlotData{
-		Slot:             slot,
-		Network:          network,
-		ProcessedAt:      processedAt,
-		ProcessingTimeMs: processingTimeMs,
-		Block:            blockData,
-		Proposer:         proposerData,
-		Entity:           wrapperspb.String(getStringOrNil(entity)),
-		Nodes:            nodes,
-		Timings:          timings,
-		Attestations:     attestations,
-	}, nil
-}
-
 func getStringOrNil(s *string) string {
 	if s == nil {
 		return ""
@@ -1066,434 +855,12 @@ func extractUsername(name string) string {
 	return parts[1]
 }
 
-// getProposerEntity gets entity for a given validator index
-func (b *BeaconSlots) getProposerEntity(ctx context.Context, networkName string, index int64) (*string, error) {
-	// This implementation is simplified - in the actual application,
-	// we would need to check validator_entity lookup first
-
-	// Query ClickHouse for the entity
-	query := `
-		SELECT
-			entity
-		FROM xatu.ethseer_validator_entity FINAL
-		WHERE
-			index = $1
-			AND meta_network_name = $2
-		GROUP BY entity
-		LIMIT 1
-	`
-
-	// Get the Clickhouse client for this network
-	ch, err := b.xatuClient.GetClickhouseClientForNetwork(networkName)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get ClickHouse client for network %s: %w", networkName, err)
-	}
-
-	// Execute the query
-	result, err := ch.QueryRow(ctx, query, index, networkName)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get entity: %w", err)
-	}
-
-	if result == nil || result["entity"] == nil {
-		return nil, nil // No entity found
-	}
-
-	entity := fmt.Sprintf("%v", result["entity"])
-	return &entity, nil
-}
-
-// getBlockSeenAtSlotTime gets seen at slot time data for a given slot
-func (b *BeaconSlots) getBlockSeenAtSlotTime(ctx context.Context, networkName string, slot int64) (map[string]time.Duration, error) {
-	// Get start and end dates for the slot +- 15 minutes
-	startTime, endTime := b.getSlotWindow(ctx, networkName, slot)
-
-	// Convert to ClickHouse format
-	startStr := startTime.Format("2006-01-02 15:04:05")
-	endStr := endTime.Format("2006-01-02 15:04:05")
-
-	query := `
-		WITH api_events AS (
-			SELECT
-				propagation_slot_start_diff as slot_time,
-				meta_client_name
-			FROM xatu.beacon_api_eth_v1_events_block FINAL
-			WHERE
-				slot = ?
-				AND meta_network_name = ?
-				AND slot_start_date_time BETWEEN ? AND ?
-		),
-		head_events AS (
-			SELECT
-				propagation_slot_start_diff as slot_time,
-				meta_client_name
-			FROM xatu.beacon_api_eth_v1_events_block FINAL
-			WHERE
-				slot = ?
-				AND meta_network_name = ?
-				AND slot_start_date_time BETWEEN ? AND ?
-		),
-		combined_events AS (
-			SELECT * FROM api_events
-			UNION ALL
-			SELECT * FROM head_events
-		)
-		SELECT
-			slot_time,
-			meta_client_name,
-			meta_client_geo_city,
-			meta_client_geo_country,
-			meta_client_geo_continent_code
-		FROM (
-			SELECT *,
-				ROW_NUMBER() OVER (PARTITION BY meta_client_name ORDER BY event_date_time ASC) as rn
-			FROM combined_events
-		) t
-		WHERE rn = 1
-		ORDER BY event_date_time ASC
-	`
-
-	// Get the Clickhouse client for this network
-	ch, err := b.xatuClient.GetClickhouseClientForNetwork(networkName)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get ClickHouse client for network %s: %w", networkName, err)
-	}
-
-	args := []interface{}{slot, networkName, startStr, endStr, slot, networkName, startStr, endStr}
-
-	// Execute the query
-	result, err := ch.Query(ctx, query, args...)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get block seen at slot time: %w", err)
-	}
-
-	if len(result) == 0 {
-		return nil, errors.New("no block seen at slot time data found")
-	}
-
-	blockSeenAtSlotTime := make(map[string]time.Duration)
-	for _, row := range result {
-		slotTime, err := strconv.ParseInt(fmt.Sprintf("%v", row["slot_time"]), 10, 64)
-		if err != nil {
-			return nil, fmt.Errorf("failed to parse slot time: %w", err)
-		}
-
-		clientName := fmt.Sprintf("%v", row["meta_client_name"])
-
-		// Convert to time.Duration
-		duration := time.Duration(slotTime) * time.Millisecond
-
-		blockSeenAtSlotTime[clientName] = duration
-	}
-
-	return blockSeenAtSlotTime, nil
-}
-
-// getBlobSeenAtSlotTime gets seen at slot time data for blobs in a given slot
-func (b *BeaconSlots) getBlobSeenAtSlotTime(ctx context.Context, networkName string, slot int64) (map[string]*pb.BlobTimingMap, error) {
-	// Get start and end dates for the slot +- 15 minutes
-	startTime, endTime := b.getSlotWindow(ctx, networkName, slot)
-
-	// Convert to ClickHouse format
-	startStr := startTime.Format("2006-01-02 15:04:05")
-	endStr := endTime.Format("2006-01-02 15:04:05")
-
-	query := `
-		SELECT
-			propagation_slot_start_diff as slot_time,
-			meta_client_name,
-			blob_index
-		FROM (
-			SELECT *,
-				ROW_NUMBER() OVER (PARTITION BY meta_client_name, blob_index ORDER BY event_date_time ASC) as rn
-			FROM xatu.beacon_api_eth_v1_events_blob_sidecar FINAL
-			WHERE
-				slot = ?
-				AND meta_network_name = ?
-				AND slot_start_date_time BETWEEN ? AND ?
-		) t
-		WHERE rn = 1
-		ORDER BY event_date_time ASC
-	`
-
-	ch, err := b.xatuClient.GetClickhouseClientForNetwork(networkName)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get ClickHouse client for network %s: %w", networkName, err)
-	}
-
-	result, err := ch.Query(ctx, query, slot, networkName, startStr, endStr)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get blob seen at slot time: %w", err)
-	}
-
-	blobSeenTimes := make(map[string]*pb.BlobTimingMap)
-	for _, row := range result {
-		clientName := fmt.Sprintf("%v", row["meta_client_name"])
-		slotTime, err := strconv.ParseInt(fmt.Sprintf("%v", row["slot_time"]), 10, 64)
-		if err != nil {
-			continue
-		}
-		blobIndex, err := strconv.ParseInt(fmt.Sprintf("%v", row["blob_index"]), 10, 64)
-		if err != nil {
-			continue
-		}
-		if _, ok := blobSeenTimes[clientName]; !ok {
-			blobSeenTimes[clientName] = &pb.BlobTimingMap{Timings: make(map[int64]int64)}
-		}
-		blobSeenTimes[clientName].Timings[blobIndex] = slotTime
-	}
-
-	return blobSeenTimes, nil
-}
-
-// getBlockFirstSeenInP2PSlotTime gets first seen in P2P slot time data for a given slot
-func (b *BeaconSlots) getBlockFirstSeenInP2PSlotTime(ctx context.Context, networkName string, slot int64) ([]*pb.Timing, error) {
-	// Get start and end dates for the slot +- 15 minutes
-	startTime, endTime := b.getSlotWindow(ctx, networkName, slot)
-
-	// Convert to ClickHouse format
-	startStr := startTime.Format("2006-01-02 15:04:05")
-	endStr := endTime.Format("2006-01-02 15:04:05")
-
-	query := `
-		SELECT
-			propagation_slot_start_diff as slot_time,
-			meta_client_name,
-			meta_client_geo_city,
-			meta_client_geo_country,
-			meta_client_geo_continent_code
-		FROM (
-			SELECT *,
-				ROW_NUMBER() OVER (PARTITION BY meta_client_name ORDER BY event_date_time ASC) as rn
-			FROM xatu.libp2p_gossipsub_beacon_block FINAL
-			WHERE
-				slot = ?
-				AND meta_network_name = ?
-				AND slot_start_date_time BETWEEN ? AND ?
-		) t
-		WHERE rn = 1
-		ORDER BY event_date_time ASC
-	`
-
-	// Get the Clickhouse client for this network
-	ch, err := b.xatuClient.GetClickhouseClientForNetwork(networkName)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get ClickHouse client for network %s: %w", networkName, err)
-	}
-
-	// Execute the query
-	result, err := ch.Query(ctx, query, slot, networkName, startStr, endStr)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get block first seen in P2P data: %w", err)
-	}
-
-	timings := make([]*pb.Timing, 0, len(result))
-	for _, row := range result {
-		slotTime, err := strconv.ParseInt(fmt.Sprintf("%v", row["slot_time"]), 10, 64)
-		if err != nil {
-			continue // Skip invalid data
-		}
-
-		city := getStringOrEmpty(row["meta_client_geo_city"])
-		country := getStringOrEmpty(row["meta_client_geo_country"])
-		continent := getStringOrEmpty(row["meta_client_geo_continent_code"])
-		clientName := fmt.Sprintf("%v", row["meta_client_name"])
-
-		timing := &pb.Timing{
-			Ms:                 slotTime,
-			MetaClientName:     clientName,
-			MetaClientUsername: extractUsername(clientName),
-			Geo: &pb.Geo{
-				City:      city,
-				Country:   country,
-				Continent: continent,
-			},
-		}
-		timings = append(timings, timing)
-	}
-
-	return timings, nil
-}
-
-// getBlobFirstSeenInP2PSlotTime gets first seen in P2P slot time data for blobs in a given slot
-func (b *BeaconSlots) getBlobFirstSeenInP2PSlotTime(ctx context.Context, networkName string, slot int64) (map[string]*pb.BlobTimingMap, error) {
-	// Get start and end dates for the slot +- 15 minutes
-	startTime, endTime := b.getSlotWindow(ctx, networkName, slot)
-
-	// Convert to ClickHouse format
-	startStr := startTime.Format("2006-01-02 15:04:05")
-	endStr := endTime.Format("2006-01-02 15:04:05")
-
-	query := `
-		SELECT
-			propagation_slot_start_diff as slot_time,
-			meta_client_name,
-			meta_client_geo_city,
-			meta_client_geo_country,
-			meta_client_geo_continent_code,
-			blob_index
-		FROM (
-			SELECT *,
-				ROW_NUMBER() OVER (PARTITION BY meta_client_name, blob_index ORDER BY event_date_time ASC) as rn
-			FROM xatu.libp2p_gossipsub_blob_sidecar FINAL
-			WHERE
-				slot = ?
-				AND meta_network_name = ?
-				AND slot_start_date_time BETWEEN ? AND ?
-		) t
-		WHERE rn = 1
-		ORDER BY event_date_time ASC
-	`
-
-	// Get the Clickhouse client for this network
-	ch, err := b.xatuClient.GetClickhouseClientForNetwork(networkName)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get ClickHouse client for network %s: %w", networkName, err)
-	}
-
-	// Execute the query
-	result, err := ch.Query(ctx, query, slot, networkName, startStr, endStr)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get blob first seen in P2P data: %w", err)
-	}
-
-	blobTimings := make(map[string]*pb.BlobTimingMap)
-	for _, row := range result {
-		slotTime, err := strconv.ParseInt(fmt.Sprintf("%v", row["slot_time"]), 10, 64)
-		if err != nil {
-			continue // Skip invalid data
-		}
-
-		blobIndex, err := strconv.ParseInt(fmt.Sprintf("%v", row["blob_index"]), 10, 64)
-		if err != nil {
-			continue // Skip invalid data
-		}
-
-		clientName := fmt.Sprintf("%v", row["meta_client_name"])
-
-		if _, exists := blobTimings[clientName]; !exists {
-			blobTimings[clientName] = &pb.BlobTimingMap{
-				Timings: make(map[int64]int64),
-			}
-		}
-
-		blobTimings[clientName].Timings[blobIndex] = slotTime
-	}
-
-	return blobTimings, nil
-}
-
 // Helper function to get string or empty string if nil
 func getStringOrEmpty(value interface{}) string {
 	if value == nil {
 		return ""
 	}
 	return fmt.Sprintf("%v", value)
-}
-
-// runInitialProcessing performs the initial head and middle window processing.
-func (b *BeaconSlots) runInitialProcessing() {
-	if !b.leaderClient.IsLeader() {
-		return // Should not happen if called from OnElected, but safety check
-	}
-	b.log.Info("Running initial processing...")
-	for _, network := range b.config.Networks {
-		b.processHead(b.processCtx, network) // Process the absolute latest slot first
-		if b.config.Backfill.MiddleProcessorEnable {
-			b.processMiddleWindow(b.processCtx, network) // Then process the recent window if enabled
-		}
-	}
-	b.log.Info("Initial processing finished.")
-}
-
-// processMiddleWindow processes a recent window of slots on startup.
-func (b *BeaconSlots) processMiddleWindow(ctx context.Context, networkName string) {
-	b.log.WithField("network", networkName).Info("Processing middle window")
-
-	// Get state
-	state, err := b.loadState(ctx, networkName)
-	if err != nil {
-		b.log.WithField("network", networkName).WithError(err).Error("Failed to load state for middle window")
-		return
-	}
-
-	// Get processor state for middle
-	processorState := state.GetProcessorState(MiddleProcessorName)
-
-	// Check if middle processing is enabled and hasn't run yet for this leadership term
-	if !b.config.Backfill.MiddleProcessorEnable {
-		b.log.WithField("network", networkName).Debug("Middle window processing disabled in config")
-		return
-	}
-	// Check if already processed in this leadership term (using LastProcessed time)
-	// We only want this to run once per election.
-	if !processorState.LastProcessed.IsZero() {
-		b.log.WithField("network", networkName).Debug("Middle window already processed in this term")
-		return
-	}
-
-	// Get the current slot
-	currentSlot, err := b.getCurrentSlot(ctx, networkName)
-	if err != nil {
-		b.log.WithField("network", networkName).WithError(err).Error("Failed to get current slot for middle window")
-		return
-	}
-
-	// Calculate the start slot for the middle window
-	duration := b.config.Backfill.MiddleProcessorDuration
-	slotsInDuration := int64(duration.Seconds() / 12) // Assuming 12s slot time
-	startSlot := currentSlot - slotsInDuration
-	if startSlot < 0 {
-		startSlot = 0
-	}
-	endSlot := currentSlot // Process up to the current slot
-
-	b.log.WithField("network", networkName).
-		WithField("startSlot", startSlot).
-		WithField("endSlot", endSlot).
-		WithField("duration", duration).
-		Info("Calculated middle window range")
-
-	// Process slots in the window
-	processedCount := 0
-	failedCount := 0
-	for slot := startSlot; slot <= endSlot; slot++ {
-		processed, err := b.processSlot(b.processCtx, networkName, slot)
-		if err != nil {
-			b.log.WithField("network", networkName).
-				WithField("slot", slot).
-				WithError(err).Warn("Failed to process slot in middle window")
-			failedCount++
-			continue // Continue to next slot even if one fails
-		}
-		if processed {
-			processedCount++
-		}
-		// Add a small delay or check context cancellation if needed for long windows
-		select {
-		case <-b.processCtx.Done():
-			b.log.WithField("network", networkName).Info("Context cancelled during middle window processing")
-			return
-		default:
-			// Continue processing
-		}
-	}
-
-	b.log.WithField("network", networkName).
-		WithField("processedCount", processedCount).
-		WithField("failedCount", failedCount).
-		Info("Finished processing middle window")
-
-	// Update last processed time to prevent re-running in this term
-	processorState.LastProcessed = time.Now()
-	processorState.CurrentSlot = &currentSlot // Store the slot context when it ran
-	processorState.TargetSlot = &startSlot    // Store the start slot for reference
-
-	// Update state
-	state.UpdateProcessorState(MiddleProcessorName, processorState)
-	if err := b.saveState(ctx, networkName, state); err != nil {
-		b.log.WithField("network", networkName).WithError(err).Error("Failed to save state after middle window processing")
-	}
 }
 
 // lookupGeoCoordinates performs a geo lookup for given city/country.
@@ -1512,31 +879,4 @@ func (b *BeaconSlots) lookupGeoCoordinates(city, country string) (*float64, *flo
 		return nil, nil
 	}
 	return &location.Lat, &location.Lng
-}
-
-// --- Configuration Getters ---
-
-// IsEnabled returns true if the service is enabled in the config.
-func (b *BeaconSlots) IsEnabled() bool {
-	return b.config.Enabled
-}
-
-// GetNetworks returns the list of configured networks.
-func (b *BeaconSlots) GetNetworks() []string {
-	return b.config.Networks
-}
-
-// GetBackfillSlotsAgo returns the configured number of slots to backfill.
-func (b *BeaconSlots) GetBackfillSlotsAgo() int64 {
-	return b.config.Backfill.SlotsAgo
-}
-
-// GetMiddleProcessorDuration returns the configured duration for the middle processor.
-func (b *BeaconSlots) GetMiddleProcessorDuration() time.Duration {
-	return b.config.Backfill.MiddleProcessorDuration
-}
-
-// GetMiddleProcessorEnabled returns true if the middle processor is enabled.
-func (b *BeaconSlots) GetMiddleProcessorEnabled() bool {
-	return b.config.Backfill.MiddleProcessorEnable
 }

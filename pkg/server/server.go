@@ -165,26 +165,11 @@ func (s *Service) initializeServices(ctx context.Context) error {
 		return fmt.Errorf("failed to initialize xatu public contributors service: %w", err)
 	}
 
-	// Convert proto config to service config - Assuming direct mapping for Enabled
-	// TODO: Ensure all necessary fields from proto config are mapped to service config
-	beaconSlotsProtoConfig := s.config.Modules["beacon_slots"].BeaconSlots
-	if beaconSlotsProtoConfig == nil {
-		return fmt.Errorf("beacon_slots module configuration not found")
-	}
-	beaconSlotsConfig := &beacon_slots.Config{
-		Enabled: beaconSlotsProtoConfig.Enabled,
-		// Add other config fields mapping here if needed
-		// Example: BacklogSlots: beaconSlotsProtoConfig.BacklogSlots,
-	}
-	if err := beaconSlotsConfig.Validate(); err != nil { // Validate after mapping
-		return fmt.Errorf("invalid beacon_slots config after mapping: %w", err)
-	}
-
 	beaconSlotsService, err := beacon_slots.New(
 		s.log,
-		beaconSlotsConfig, // Pass the mapped service config
-		s.config.Ethereum, // Pass the overall Ethereum config
+		s.config.Modules["beacon_slots"].BeaconSlots,
 		s.xatuClient,
+		s.config.Ethereum,
 		s.storageClient,
 		s.lockerClient,
 	)
