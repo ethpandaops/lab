@@ -4,7 +4,7 @@ The ethPandaOps Lab is a comprehensive platform for exploring, analyzing, and vi
 
 ## Features
 
-- **Multi-Network Support**: Data visualization for Mainnet, Sepolia, Holesky, and other Ethereum networks
+- **Multi-Network Support**: Data collection and analytics for Mainnet, Sepolia, Holesky, and other Ethereum networks
 - **Xatu Integration**: Insights from Xatu, a beacon chain event collector and metrics exporter
 - **Beacon Chain Analytics**: Detailed metrics on block timings, slot performance, and network health
 - **Community Node Tracking**: Visualization of community-run nodes and their geographical distribution
@@ -16,37 +16,51 @@ The ethPandaOps Lab is a comprehensive platform for exploring, analyzing, and vi
 The application consists of:
 
 ```
-├── backend/           # Python-based data processing and API backend
-├── frontend/          # React-based user interface
-├── public/            # Static assets
-└── docker-compose.yaml # Container orchestration for local development
+├── pkg/                    # Go implementation (main codebase)
+│   ├── api/                # API service (client-facing)
+│   ├── server/             # SRV service (business logic, data processing)
+│   │   ├── internal/       # Internal server components
+│   │   │   ├── grpc/       # gRPC server implementation
+│   │   │   └── service/    # Service implementations (beacon_slots, beacon_chain_timings, xatu_public_contributors, etc.)
+│   │   └── proto/          # Protocol buffer definitions
+│   └── xatuclickhouse/     # ClickHouse integration for Xatu
+├── frontend/               # React frontend (see frontend/README.md)
+├── scripts/                # Utility scripts
+├── deploy/                 # Deployment configurations
+└── backend/                # Deprecated Python implementation
 ```
 
-### Backend
+### Backend (Go)
 
-The backend is built with Python and provides:
-- Data processing modules for different data sources
-- Integration with Clickhouse for data querying
-- S3-compatible storage for processed data
-- Configuration for multiple Ethereum networks
+The backend is implemented in Go as a single binary with two main components:
 
-### Frontend
+- **SRV Service**: Handles business logic, data processing, scheduled tasks, and storage. Collects and processes data from Ethereum networks and Xatu, stores processed data in S3-compatible storage, and exposes gRPC endpoints for internal communication. Implements leader election for distributed processing.
+- **API Service**: Client-facing service providing HTTP/REST endpoints, retrieving data from S3 storage, implementing caching, and serving data to the frontend. Communicates with the SRV service via gRPC.
 
-The frontend is built with:
-- React 18
-- TypeScript
-- Tailwind CSS
-- React Query for data fetching
-- Recharts and D3 for data visualization
-- React Router for navigation
+#### Key Backend Modules
+
+- **beacon_slots**: Processes beacon chain slots in three modes (head, trailing, backfill)
+- **beacon_chain_timings**: Provides timing statistics and size distribution metrics
+- **xatu_public_contributors**: Tracks contributor data with time window processing
+- **lab**: Central configuration service for frontend
+
+#### Technologies
+
+- **Go 1.24+**
+- **ClickHouse**: Analytics database for storing and querying large volumes of data
+- **MinIO (S3)**: Object storage for processed data
+- **Redis**: Caching, distributed locking, and temporary state storage
+- **gRPC & Protocol Buffers**: Internal and external APIs
+- **Makefile**: For build and development tasks
+- **Docker Compose**: For local development and orchestration
 
 ## Setup and Installation
 
 ### Prerequisites
 
+- Go 1.24+ (for backend development)
 - Docker and Docker Compose
-- Node.js 18+ (for local frontend development)
-- Python 3.10+ (for local backend development)
+- Node.js 18+ (for local frontend development, see frontend/README.md)
 
 ### Using Docker Compose
 
@@ -68,54 +82,46 @@ The frontend is built with:
 
 The application will be available at http://localhost:3000.
 
-## Development
+## Backend Development
 
-### Backend Development
-
-1. Set up a Python virtual environment:
-   ```bash
-   cd backend
-   python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
-   pip install -r requirements.txt
-   ```
-
-2. Create a configuration file:
+1. Create a configuration file:
    ```bash
    cp config.example.yaml config.yaml
    ```
 
-3. Run the backend:
+2. Start required services for development:
    ```bash
-   python -m lab
+   docker-compose up -d
    ```
 
-### Frontend Development
-
-1. Install dependencies:
+3. Run the SRV service:
    ```bash
-   cd frontend
-   npm install
+   make run-srv
    ```
 
-2. Create environment file:
+4. Run the API service (in a separate terminal):
    ```bash
-   cp .env.example .env
+   make run-api
    ```
 
-3. Start the development server:
+5. To build the backend binary:
    ```bash
-   npm run dev
+   make build
    ```
 
-The frontend development server will be available at http://localhost:5173.
+6. To generate protobuf code:
+   ```bash
+   make proto
+   ```
 
 ## Deployment
 
-The application can be deployed using Docker Compose for production environments, or the frontend and backend can be deployed separately:
+For production deployment, build the binary and deploy it with the required configuration:
 
-- Frontend: Can be deployed to static hosting services like Cloudflare Pages, Vercel, or Netlify
-- Backend: Can be deployed as a containerized service on cloud platforms
+```bash
+make build
+./bin/lab [srv|api] --config=/path/to/config.yaml
+```
 
 ## Contributing
 
@@ -123,4 +129,4 @@ Contributions to the ethPandaOps Lab are welcome! Please feel free to submit iss
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details. 
+This project is licensed under the MIT License - see the LICENSE file for details.
