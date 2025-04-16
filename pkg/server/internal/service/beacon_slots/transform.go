@@ -3,7 +3,10 @@ package beacon_slots
 import (
 	"time"
 
+	"github.com/attestantio/go-eth2-client/spec/phase0"
+	"github.com/codingsince1985/geo-golang/openstreetmap"
 	pb "github.com/ethpandaops/lab/pkg/server/proto/beacon_slots"
+	"github.com/sirupsen/logrus"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 )
@@ -19,7 +22,7 @@ func parseTimestamp(ts string) (*timestamppb.Timestamp, error) {
 
 // transformSlotDataForStorage transforms slot data into optimized format for storage
 func (b *BeaconSlots) transformSlotDataForStorage(
-	slot int64,
+	slot phase0.Slot,
 	network string,
 	processedAt string,
 	processingTimeMs int64,
@@ -135,7 +138,7 @@ func (b *BeaconSlots) transformSlotDataForStorage(
 	}
 
 	return &pb.BeaconSlotData{
-		Slot:             slot,
+		Slot:             int64(slot),
 		Network:          network,
 		ProcessedAt:      timestamppb.New(time.Now()),
 		ProcessingTimeMs: processingTimeMs,
@@ -146,4 +149,24 @@ func (b *BeaconSlots) transformSlotDataForStorage(
 		Timings:          timings,
 		Attestations:     attestations,
 	}, nil
+}
+
+// lookupGeoCoordinates performs a geo lookup for given city/country.
+// Placeholder implementation.
+func (b *BeaconSlots) lookupGeoCoordinates(city, country string) (*float64, *float64) {
+	geocoder := openstreetmap.Geocoder()
+	location, err := geocoder.Geocode(city + ", " + country)
+
+	if err != nil {
+		b.log.WithError(err).WithFields(logrus.Fields{
+			"city":    city,
+			"country": country,
+		}).Warn("Geocoding lookup failed")
+		return nil, nil
+	}
+
+	if location == nil {
+		return nil, nil
+	}
+	return &location.Lat, &location.Lng
 }

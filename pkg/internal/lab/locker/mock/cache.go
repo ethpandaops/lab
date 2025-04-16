@@ -75,6 +75,11 @@ func (m *StandardCache) Get(key string) ([]byte, error) {
 	return value, nil
 }
 
+// GetDataMap returns the underlying data map for testing purposes
+func (m *StandardCache) GetDataMap() map[string][]byte {
+	return m.data
+}
+
 // Set implements cache.Client
 func (m *StandardCache) Set(key string, value []byte, ttl time.Duration) error {
 	if m.setErr != nil {

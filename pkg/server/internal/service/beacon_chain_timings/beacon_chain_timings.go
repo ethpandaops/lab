@@ -3,13 +3,13 @@ package beacon_chain_timings
 import (
 	"context"
 	"fmt"
-	"strings"
 	"time"
 
 	"github.com/ethpandaops/lab/pkg/internal/lab/cache"
 	"github.com/ethpandaops/lab/pkg/internal/lab/ethereum"
 	"github.com/ethpandaops/lab/pkg/internal/lab/leader"
 	"github.com/ethpandaops/lab/pkg/internal/lab/locker"
+	"github.com/ethpandaops/lab/pkg/internal/lab/state"
 	"github.com/ethpandaops/lab/pkg/internal/lab/storage"
 	"github.com/ethpandaops/lab/pkg/internal/lab/xatu"
 	pb "github.com/ethpandaops/lab/pkg/server/proto/beacon_chain_timings"
@@ -20,30 +20,6 @@ import (
 const (
 	BeaconChainTimingsServiceName = "beacon_chain_timings"
 )
-
-// DefaultTimeWindows defines time window configurations for processing
-var DefaultTimeWindows = []TimeWindowConfig{
-	{
-		File:    "1h",
-		Label:   "Last hour",
-		RangeMs: 60 * 60 * 1000, // 1 hour in milliseconds
-	},
-	{
-		File:    "4h",
-		Label:   "Last 4 hours",
-		RangeMs: 4 * 60 * 60 * 1000, // 4 hours in milliseconds
-	},
-	{
-		File:    "24h",
-		Label:   "Last 24 hours",
-		RangeMs: 24 * 60 * 60 * 1000, // 24 hours in milliseconds
-	},
-	{
-		File:    "7d",
-		Label:   "Last 7 days",
-		RangeMs: 7 * 24 * 60 * 60 * 1000, // 7 days in milliseconds
-	},
-}
 
 // TimeWindowConfig represents configuration for a time window
 type TimeWindowConfig struct {
@@ -66,6 +42,7 @@ type BeaconChainTimings struct {
 	storageClient  storage.Client
 	cacheClient    cache.Client
 	lockerClient   locker.Locker
+	stateClient    state.Client[*pb.State]
 
 	leaderClient leader.Client
 
@@ -76,6 +53,7 @@ type BeaconChainTimings struct {
 	baseDir string
 }
 
+// New creates a new BeaconChainTimings service
 func New(
 	log logrus.FieldLogger,
 	config *Config,
@@ -93,6 +71,10 @@ func New(
 		storageClient:  storageClient,
 		cacheClient:    cacheClient,
 		lockerClient:   lockerClient,
+		stateClient: state.New[*pb.State](log, cacheClient, &state.Config{
+			Namespace: BeaconChainTimingsServiceName,
+			TTL:       31 * 24 * time.Hour,
+		}, "state"),
 
 		baseDir: BeaconChainTimingsServiceName,
 
@@ -187,19 +169,20 @@ func (b *BeaconChainTimings) Name() string {
 }
 
 func (b *BeaconChainTimings) process(ctx context.Context) {
-	// Create a new state with initialized data structures to ensure sane defaults
-	state := NewState()
+	// Get the current state
+	var st *pb.State
 
-	// Try to load existing state
-	err := b.storageClient.GetEncoded(ctx, GetStoragePath(GetStateKey()), state, storage.CodecNameJSON)
+	st, err := b.stateClient.Get(ctx)
 	if err != nil {
-		if err != storage.ErrNotFound && !strings.Contains(err.Error(), "not found") {
-			b.log.WithError(err).Error("Failed to get state, using initialized default state")
+		if err == state.ErrNotFound {
+			b.log.Debug("No existing state found, using initialized default state!")
+
+			st = NewState()
 		} else {
-			// Not found is fine for first run, just log at debug level
-			b.log.Debug("No existing state found, using initialized default state")
+			b.log.WithError(err).Error("Failed to get state, using initialized default state")
+
+			return
 		}
-		// Continue with the empty state initialized above
 	}
 
 	// Verify we have valid networks to process
@@ -213,8 +196,6 @@ func (b *BeaconChainTimings) process(ctx context.Context) {
 		b.log.Warn("No time windows configured to process, skipping")
 		return
 	}
-
-	needStorageUpdate := false
 
 	// Process each network
 	for _, network := range b.ethereumConfig.Networks {
@@ -237,7 +218,7 @@ func (b *BeaconChainTimings) process(ctx context.Context) {
 
 			// Process block timings
 			lastProcessedTime := time.Time{}
-			if ts, ok := state.BlockTimings.LastProcessed[stateKey]; ok {
+			if ts, ok := st.BlockTimings.LastProcessed[stateKey]; ok {
 				lastProcessedTime = TimeFromTimestamp(ts)
 			}
 
@@ -252,14 +233,13 @@ func (b *BeaconChainTimings) process(ctx context.Context) {
 					b.log.WithError(err).Errorf("failed to process block timings for network %s, window %s", network.Name, window.File)
 				} else {
 					// Update state
-					state.BlockTimings.LastProcessed[stateKey] = timestamppb.Now()
-					needStorageUpdate = true
+					st.BlockTimings.LastProcessed[stateKey] = timestamppb.Now()
 				}
 			}
 
 			// Process CDF data
 			lastProcessedTime = time.Time{}
-			if ts, ok := state.Cdf.LastProcessed[stateKey]; ok {
+			if ts, ok := st.Cdf.LastProcessed[stateKey]; ok {
 				lastProcessedTime = TimeFromTimestamp(ts)
 			}
 
@@ -279,26 +259,15 @@ func (b *BeaconChainTimings) process(ctx context.Context) {
 					b.log.WithError(err).Errorf("failed to process size CDF for network %s, window %s", network.Name, window.File)
 				} else {
 					// Update state
-					state.Cdf.LastProcessed[stateKey] = timestamppb.Now()
-					needStorageUpdate = true
+					st.Cdf.LastProcessed[stateKey] = timestamppb.Now()
 				}
 			}
 		}
 	}
 
-	if needStorageUpdate {
-		// Save the updated state
-		if err := b.storageClient.Store(ctx, storage.StoreParams{
-			Key:         GetStoragePath(GetStateKey()),
-			Data:        state,
-			Format:      storage.CodecNameJSON,
-			Compression: storage.Gzip,
-		}); err != nil {
-			b.log.WithError(err).Error("failed to store state")
-			// Don't return, as we've already done processing work
-		} else {
-			b.log.Debug("Successfully stored updated state")
-		}
+	// Update the state
+	if err := b.stateClient.Set(ctx, st); err != nil {
+		b.log.WithError(err).Error("failed to store state")
 	}
 }
 

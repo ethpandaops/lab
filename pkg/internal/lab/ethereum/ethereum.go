@@ -1,52 +1,34 @@
 package ethereum
 
-import (
-	"fmt"
-	"time"
+import "context"
 
-	"github.com/ethpandaops/lab/pkg/internal/lab/clickhouse"
-)
-
-// Config contains the configuration for the Ethereum service
-type Config struct {
-	Networks map[string]*Network `yaml:"networks"` // Per-network configurations
+type Client struct {
+	networks map[string]*Network
 }
 
-// NetworkConfig contains the configuration for a specific Ethereum network
-type Network struct {
-	Name      string             `yaml:"name"`      // Network name
-	Xatu      *clickhouse.Config `yaml:"xatu"`      // Per-network Xatu config
-	ConfigURL string             `yaml:"configURL"` // URL to the network's config
-	Genesis   time.Time          `yaml:"genesis"`   // Genesis time
-	Validator ValidatorSet       `yaml:"validator"` // Validator set
-	Forks     EthereumForkConfig `yaml:"forks"`     // Forks
+func NewClient(config *Config) *Client {
+	networks := make(map[string]*Network)
+
+	for name, network := range config.Networks {
+		networks[name] = &Network{
+			Name:   name,
+			Config: network,
+		}
+	}
+
+	return &Client{
+		networks: networks,
+	}
 }
 
-// ValidatorSet contains the configuration for the validator set
-type ValidatorSet struct {
-	// KnownValidatorRanges contains the known validator ranges for the network
-	// This is usually the genesis validator set for testnets.
-	KnownValidatorRanges map[string]string `yaml:"knownValidatorRanges"`
+func (c *Client) GetNetwork(name string) *Network {
+	return c.networks[name]
 }
 
-// EthereumForkConfig contains the configuration for the Ethereum fork
-type EthereumForkConfig struct {
-	Consensus map[string]ConsensusLayerForkConfig `yaml:"consensus"`
-}
-
-// ConsensusLayerForkConfig contains the configuration for a consensus layer fork
-type ConsensusLayerForkConfig struct {
-	MinClientVersions map[string]string `yaml:"min_client_versions"`
-}
-
-func (c *Config) GetNetwork(name string) *Network {
-	return c.Networks[name]
-}
-
-func (c *Config) Validate() error {
-	for _, network := range c.Networks {
-		if network.Name == "" {
-			return fmt.Errorf("network name is required")
+func (c *Client) Start(ctx context.Context) error {
+	for _, network := range c.networks {
+		if err := network.Start(ctx); err != nil {
+			return err
 		}
 	}
 

@@ -3,13 +3,16 @@ package beacon_slots
 import (
 	"fmt"
 	"time"
+
+	"github.com/attestantio/go-eth2-client/spec/phase0"
 )
 
 // Config represents the configuration for the beacon_slots module
 type Config struct {
-	Enabled  bool           `yaml:"enabled"`
-	Networks []string       `yaml:"networks"`
-	Backfill BackfillConfig `yaml:"backfill"`
+	Enabled        bool           `yaml:"enabled"`
+	Networks       []string       `yaml:"networks"`
+	Backfill       BackfillConfig `yaml:"backfill"`
+	HeadDelaySlots phase0.Slot    `yaml:"head_delay_slots"`
 }
 
 // BackfillConfig represents configuration for backlog and middle processing

@@ -4,6 +4,7 @@ go 1.24.1
 
 require (
 	github.com/ClickHouse/clickhouse-go/v2 v2.34.0
+	github.com/attestantio/go-eth2-client v0.25.0
 	github.com/aws/aws-sdk-go-v2 v1.36.3
 	github.com/aws/aws-sdk-go-v2/config v1.29.9
 	github.com/aws/aws-sdk-go-v2/credentials v1.17.62
@@ -14,10 +15,24 @@ require (
 )
 
 require (
+	github.com/emicklei/dot v1.6.4 // indirect
+	github.com/ethpandaops/ethwallclock v0.3.0
+	github.com/fatih/color v1.10.0 // indirect
+	github.com/ferranbt/fastssz v0.1.4 // indirect
+	github.com/goccy/go-yaml v1.9.2 // indirect
+	github.com/klauspost/cpuid/v2 v2.2.9 // indirect
+	github.com/mattn/go-colorable v0.1.14 // indirect
+	github.com/mattn/go-isatty v0.0.20 // indirect
+	github.com/minio/sha256-simd v1.0.1 // indirect
+	github.com/prysmaticlabs/go-bitfield v0.0.0-20240618144021-706c95b2dd15 // indirect
+	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
+	gopkg.in/yaml.v2 v2.4.0 // indirect
+)
+
+require (
 	github.com/codingsince1985/geo-golang v1.8.5
 	github.com/docker/go-connections v0.5.0
 	github.com/go-redis/redis/v8 v8.11.5
-	github.com/hako/durafmt v0.0.0-20210608085754-5c1018a4e16b
 	github.com/mailru/go-clickhouse/v2 v2.5.0 // Use mailru fork for HTTP support (Corrected version)
 	github.com/testcontainers/testcontainers-go v0.35.0
 )

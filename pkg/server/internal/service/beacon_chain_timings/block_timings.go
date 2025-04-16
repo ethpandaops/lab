@@ -14,7 +14,7 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
-func (b *BeaconChainTimings) processBlockTimings(ctx context.Context, network *ethereum.Network, windowName string) error {
+func (b *BeaconChainTimings) processBlockTimings(ctx context.Context, network *ethereum.NetworkConfig, windowName string) error {
 	b.log.WithFields(logrus.Fields{
 		"network": network.Name,
 		"window":  windowName,

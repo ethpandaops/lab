@@ -16,7 +16,7 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
-func (b *BeaconChainTimings) processSizeCDF(ctx context.Context, network *ethereum.Network, window *pb.TimeWindowConfig) error {
+func (b *BeaconChainTimings) processSizeCDF(ctx context.Context, network *ethereum.NetworkConfig, window *pb.TimeWindowConfig) error {
 	b.log.WithFields(logrus.Fields{
 		"network":  network.Name,
 		"window":   window.Name,

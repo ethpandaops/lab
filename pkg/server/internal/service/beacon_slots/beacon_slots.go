@@ -7,17 +7,14 @@ import (
 	"strings"
 	"time"
 
-	"github.com/codingsince1985/geo-golang/openstreetmap"
+	"github.com/attestantio/go-eth2-client/spec/phase0"
+	"github.com/ethpandaops/ethwallclock"
 	"github.com/ethpandaops/lab/pkg/internal/lab/ethereum"
 	"github.com/ethpandaops/lab/pkg/internal/lab/leader"
 	"github.com/ethpandaops/lab/pkg/internal/lab/locker"
 	"github.com/ethpandaops/lab/pkg/internal/lab/storage"
 	"github.com/ethpandaops/lab/pkg/internal/lab/xatu"
 	"github.com/sirupsen/logrus"
-
-	pb "github.com/ethpandaops/lab/pkg/server/proto/beacon_slots"
-	"google.golang.org/protobuf/types/known/timestamppb"
-	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
 // Service name constant
@@ -27,7 +24,6 @@ const ServiceName = "beacon_slots"
 var (
 	ForwardProcessorName  = "forward"
 	BackwardProcessorName = "backward"
-	MissingProcessorName  = "missing"
 	MiddleProcessorName   = "middle" // Processor for the initial recent window
 )
 
@@ -36,14 +32,14 @@ type BeaconSlots struct {
 
 	config *Config
 
-	ethereum      *ethereum.Config
+	ethereum      *ethereum.Client
 	xatuClient    *xatu.Client
 	storageClient storage.Client
-	leaderClient  leader.Client
+	leaderClients map[string]leader.Client // Map to store multiple leader clients
 	lockerClient  locker.Locker
 
-	processCtx       context.Context
-	processCtxCancel context.CancelFunc
+	serviceCtx       context.Context
+	serviceCtxCancel context.CancelFunc
 
 	// Base directory for storage
 	baseDir string
@@ -53,7 +49,7 @@ func New(
 	log logrus.FieldLogger,
 	config *Config,
 	xatuClient *xatu.Client,
-	ethereum *ethereum.Config,
+	ethereum *ethereum.Client,
 	storageClient storage.Client,
 	lockerClient locker.Locker,
 ) (*BeaconSlots, error) {
@@ -68,60 +64,106 @@ func New(
 		xatuClient:    xatuClient,
 		storageClient: storageClient,
 		lockerClient:  lockerClient,
+		leaderClients: make(map[string]leader.Client),
 		baseDir:       "beacon",
-		processCtx:    nil,
+		serviceCtx:    nil,
 	}, nil
 }
 
 func (b *BeaconSlots) Start(ctx context.Context) error {
 	if !b.config.Enabled {
 		b.log.Info("BeaconSlots service disabled")
+
 		return nil
 	}
+
 	b.log.Info("Starting BeaconSlots service")
 
-	leader := leader.New(b.log, b.lockerClient, leader.Config{
-		Resource:        ServiceName + "/slots_processing",
-		TTL:             5 * time.Second,
-		RefreshInterval: 1 * time.Second,
+	// Watch for slot changes on all our networks
+	for _, network := range b.config.Networks {
+		net := network
 
-		OnElected: func() {
-			b.log.Info("Became leader")
-			if b.processCtx != nil {
-				b.log.Info("Already processing, skipping start")
-				return
-			}
-			ctx, cancel := context.WithCancel(context.Background())
-			b.processCtx = ctx
-			b.processCtxCancel = cancel
+		b.ethereum.GetNetwork(network).GetWallclock().OnSlotChanged(func(slot ethwallclock.Slot) {
+			b.log.WithField("network", net).WithField("slot", slot).Info("Slot changed")
 
-			// Run initial processing (head and middle window) before starting the loop
-			go func() {
-				b.runInitialProcessing()
-				b.processLoop()
-			}()
-		},
-		OnRevoked: func() {
-			b.log.Info("Lost leadership")
-			if b.processCtxCancel != nil {
-				b.processCtxCancel()
-				b.processCtx = nil
-				b.processCtxCancel = nil
-			}
-		},
-	})
+			// First check if we are the leader
+		})
+	}
 
-	leader.Start()
-	b.leaderClient = leader
+	// Create a unified context for all processors
+	ctx, cancel := context.WithCancel(ctx)
+	b.serviceCtx = ctx
+	b.serviceCtxCancel = cancel
+
+	// Create a separate leader election for each network and processor combination
+	processors := []string{ForwardProcessorName, BackwardProcessorName, MissingProcessorName}
+
+	for _, network := range b.config.Networks {
+		for _, processor := range processors {
+			leaderID := b.getLeaderElectionKey(network, processor)
+
+			b.startLeaderForProcessor(network, processor, leaderID)
+		}
+	}
 
 	return nil
 }
 
+type LeaderElectionParams struct {
+	Network   string
+	Processor string
+}
+
+func (b *BeaconSlots) getLeaderElectionKey(params LeaderElectionParams) string {
+	return fmt.Sprintf("%s/%s/%s", ServiceName, params.Network, params.Processor)
+}
+
+// startLeaderForProcessor starts a leader election for a specific network-processor combination
+func (b *BeaconSlots) startLeaderForProcessor(params LeaderElectionParams) {
+	l := leader.New(b.log, b.lockerClient, leader.Config{
+		Resource:        b.getLeaderElectionKey(params),
+		TTL:             5 * time.Second,
+		RefreshInterval: 1 * time.Second,
+
+		OnElected: func() {
+			b.log.WithFields(logrus.Fields{
+				"network":   params.Network,
+				"processor": params.Processor,
+			}).Info("Became leader for processor")
+
+			// For the Forward processor only, run the middle window processing
+			// if configured to do so
+			if processor == ForwardProcessorName && b.config.Backfill.MiddleProcessorEnable {
+				go func() {
+					b.processMiddleWindow(b.processCtx, network)
+				}()
+			}
+
+			// Start the appropriate processor for this combination
+			go b.runProcessor(b.processCtx, network, processor)
+		},
+		OnRevoked: func() {
+			b.log.WithFields(logrus.Fields{
+				"network":   network,
+				"processor": processor,
+			}).Info("Lost leadership for processor")
+		},
+	})
+
+	l.Start()
+	// Store the leader client with a unique key
+	b.leaderClients[leaderID] = l
+}
+
 func (b *BeaconSlots) Stop() {
 	b.log.Info("Stopping BeaconSlots service")
-	if b.leaderClient != nil {
-		b.leaderClient.Stop()
+
+	// Stop all leader clients
+	for id, client := range b.leaderClients {
+		b.log.WithField("leaderID", id).Debug("Stopping leader client")
+		client.Stop()
 	}
+
 	if b.processCtxCancel != nil {
 		b.processCtxCancel()
 	}
@@ -131,45 +173,74 @@ func (b *BeaconSlots) Name() string {
 	return ServiceName
 }
 
-func (b *BeaconSlots) processLoop() {
-	processingInterval := time.Second * 12 // Slot time
+// isLeaderForProcessor checks if this instance is the leader for a specific network-processor
+func (b *BeaconSlots) isLeaderForProcessor(network, processor string) bool {
+	leaderID := fmt.Sprintf("%s/%s/%s", ServiceName, network, processor)
+	client, ok := b.leaderClients[leaderID]
+	if !ok {
+		return false
+	}
+	return client.IsLeader()
+}
 
-	// Set up tickers for different processor types
-	headTicker := time.NewTicker(processingInterval)
-	backlogTicker := time.NewTicker(processingInterval * 5) // Run backlog less frequently
-	missingTicker := time.NewTicker(time.Hour)              // Check for missing slots once per hour
+// runProcessor runs the appropriate processor based on the processor name
+func (b *BeaconSlots) runProcessor(ctx context.Context, network, processor string) {
+	b.log.WithFields(logrus.Fields{
+		"network":   network,
+		"processor": processor,
+	}).Info("Starting processor")
 
-	defer headTicker.Stop()
-	defer backlogTicker.Stop()
-	defer missingTicker.Stop()
+	var ticker *time.Ticker
 
-	// Initial processing is now handled in runInitialProcessing called from OnElected
+	// Set up ticker based on processor type
+	switch processor {
+	case ForwardProcessorName:
+		ticker = time.NewTicker(time.Second * 12) // Slot time
+	case BackwardProcessorName:
+		ticker = time.NewTicker(time.Second * 12 * 5) // Less frequent
+	case MissingProcessorName:
+		ticker = time.NewTicker(time.Hour) // Check once per hour
+	default:
+		b.log.WithField("processor", processor).Error("Unknown processor type")
+		return
+	}
 
+	defer ticker.Stop()
+
+	// Run the processor immediately once
+	b.processForNetworkAndType(ctx, network, processor)
+
+	// Then run on ticker
 	for {
 		select {
-		case <-b.processCtx.Done():
-			b.log.Info("Context cancelled, stopping processing loop")
+		case <-ctx.Done():
+			b.log.WithFields(logrus.Fields{
+				"network":   network,
+				"processor": processor,
+			}).Info("Context cancelled, stopping processor")
 			return
-		case <-headTicker.C:
-			if b.leaderClient.IsLeader() {
-				for _, network := range b.config.Networks {
-					b.processHead(b.processCtx, network)
-				}
-			}
-		case <-backlogTicker.C:
-			if b.leaderClient.IsLeader() {
-				for _, network := range b.config.Networks {
-					b.processBacklog(b.processCtx, network)
-				}
-			}
-		case <-missingTicker.C:
-			if b.leaderClient.IsLeader() {
-				for _, network := range b.config.Networks {
-					b.processMissing(b.processCtx, network)
-				}
+		case <-ticker.C:
+			if b.isLeaderForProcessor(network, processor) {
+				b.processForNetworkAndType(ctx, network, processor)
 			}
 		}
 	}
+}
+
+// processForNetworkAndType runs the appropriate processor function based on the type
+func (b *BeaconSlots) processForNetworkAndType(ctx context.Context, network, processor string) {
+	switch processor {
+	case ForwardProcessorName:
+		b.processHead(ctx, network)
+	case BackwardProcessorName:
+		b.processBacklog(ctx, network)
+	case MissingProcessorName:
+		b.processMissing(ctx, network)
+	}
+}
+
+func (b *BeaconSlots) getSlotStoragePath(network string, slot phase0.Slot) string {
+	return b.getStoragePath(fmt.Sprintf("%s/%d", network, slot))
 }
 
 // getStoragePath constructs the full storage path.
@@ -212,88 +283,78 @@ func (b *BeaconSlots) saveState(ctx context.Context, network string, state *Stat
 	return nil
 }
 
-// shouldProcess checks if a processor should run based on the last run time and interval.
-func (b *BeaconSlots) shouldProcess(processorName string, lastProcessed time.Time) bool {
-	if lastProcessed.IsZero() {
-		return true // Never processed before
+// slotHasBeenProcessed checks if a slot has been processed for a given network.
+func (b *BeaconSlots) slotHasBeenProcessed(ctx context.Context, network string, slot phase0.Slot) (bool, error) {
+	// Just check if the file exists in storage
+	exists, err := b.storageClient.Exists(ctx, b.getSlotStoragePath(network, slot))
+	if err != nil {
+		return false, fmt.Errorf("failed to check if slot %d has been processed for network %s: %w", slot, network, err)
 	}
-	// Use a shorter interval check for head processing to be more responsive
-	if processorName == ForwardProcessorName {
-		return time.Since(lastProcessed) > (12 * time.Second) // Check more frequently for head
-	}
-	// Use configured interval for others, or a default if not set
-	interval := b.config.GetInterval()
-	if interval == 0 {
-		interval = 15 * time.Minute // Default interval if not configured
-	}
-	return time.Since(lastProcessed) > interval
+
+	return exists, nil
+}
+
+func (b *BeaconSlots) targetHeadSlot(networkName string, currentSlot phase0.Slot) phase0.Slot {
+	return currentSlot + b.config.HeadDelaySlots
 }
 
 // processHead processes the latest slot for a network
 func (b *BeaconSlots) processHead(ctx context.Context, networkName string) {
-	b.log.WithField("network", networkName).Debug("Processing head slot")
+	logCtx := b.log.WithField("network", networkName).WithField("processor", ForwardProcessorName)
 
-	// Get state
-	state, err := b.loadState(ctx, networkName)
-	if err != nil {
-		b.log.WithField("network", networkName).WithError(err).Error("Failed to load state")
-		return
-	}
+	logCtx.Info("We are now the leader for this processor")
 
-	// Get processor state for forward
-	processorState := state.GetProcessorState(ForwardProcessorName)
-
-	// Check if we should process this slot based on time
-	if !b.shouldProcess(ForwardProcessorName, processorState.LastProcessed) {
-		b.log.WithField("network", networkName).Debug("Skipping head slot processing, not time yet")
-		return
-	}
-
-	// Get the current slot
+	// Get the current wallclock slot
 	currentSlot, err := b.getCurrentSlot(ctx, networkName)
 	if err != nil {
-		b.log.WithField("network", networkName).WithError(err).Error("Failed to get current slot")
-		return
-	}
+		logCtx.WithError(err).Error("Failed to get current slot")
+	} else {
+		logCtx.WithField("current_slot", currentSlot).Info("Current slot")
 
-	// Update current slot in state
-	processorState.CurrentSlot = &currentSlot
+		// Add on our lag offset
+		targetSlot := b.targetHeadSlot(networkName, currentSlot)
 
-	// If this is the first run, initialize LastProcessedSlot
-	if processorState.LastProcessedSlot == nil {
-		// Start at current slot - 1 so we process the current slot
-		prev := currentSlot - 1
-		processorState.LastProcessedSlot = &prev
-	}
+		logCtx.WithField("target_slot", targetSlot).Info("Calculated target slot")
 
-	// If the slot hasn't changed, skip processing
-	if processorState.LastProcessedSlot != nil && *processorState.LastProcessedSlot >= currentSlot {
-		b.log.WithField("network", networkName).
-			WithField("lastProcessedSlot", *processorState.LastProcessedSlot).
-			WithField("currentSlot", currentSlot).
-			Debug("Already processed this slot or newer, skipping")
-		return
-	}
-
-	// Process the slot
-	processed, err := b.processSlot(ctx, networkName, currentSlot)
-	if err != nil {
-		b.log.WithField("network", networkName).
-			WithField("slot", currentSlot).
-			WithError(err).Error("Failed to process slot")
-		return
-	}
-
-	if processed {
-		// Update last processed slot and time
-		processorState.LastProcessedSlot = &currentSlot
-		processorState.LastProcessed = time.Now()
-
-		// Update state
-		state.UpdateProcessorState(ForwardProcessorName, processorState)
-		if err := b.saveState(ctx, networkName, state); err != nil {
-			b.log.WithField("network", networkName).WithError(err).Error("Failed to save state")
+		// Immediately check if the slot has already been processed before we start our "normality" loop
+		processed, err := b.slotHasBeenProcessed(ctx, networkName, targetSlot)
+		if err != nil {
+			logCtx.WithError(err).Error("Failed to check if slot has been processed")
 		}
+
+		if !processed {
+			logCtx.WithField("target_slot", targetSlot).Info("Slot has not been processed, processing")
+
+			// Process the slot
+			_, err := b.processSlot(ctx, networkName, targetSlot)
+			if err != nil {
+				logCtx.WithError(err).Error("Failed to process slot")\
+			}
+		}
+	}
+
+	lastProcessedSlot := slot
+	// Start our "normality" loop
+
+	for {
+		// Get the target slot
+		targetSlot := b.targetHeadSlot(networkName, currentSlot)
+
+		// Check if the slot has already been processed
+		processed, err := b.slotHasBeenProcessed(ctx, networkName, targetSlot)
+		if err != nil {
+			b.log.WithField("network", networkName).WithError(err).Error("Failed to get current slot")
+
+			continue
+		}
+
+		if processed {
+			b.log.WithField("network", networkName).WithField("slot", currentSlot).Debug("Slot has already been processed, skipping")
+			return
+		}
+
+
+		
 	}
 }
 
@@ -481,138 +542,22 @@ func (b *BeaconSlots) processMissing(ctx context.Context, networkName string) {
 }
 
 // getCurrentSlot returns the current slot for a network
-func (b *BeaconSlots) getCurrentSlot(ctx context.Context, networkName string) (int64, error) {
-	b.log.WithField("network", networkName).Debug("Getting current slot")
-
-	// Query ClickHouse for the current slot
-	query := `
-		SELECT MAX(slot) AS slot
-		FROM xatu.beacon_api_eth_v1_events_block
-		WHERE network = $1
-	`
-
-	// Get the Clickhouse client for this network
-	ch, err := b.xatuClient.GetClickhouseClientForNetwork(networkName)
-	if err != nil {
-		return 0, fmt.Errorf("failed to get ClickHouse client for network %s: %w", networkName, err)
+func (b *BeaconSlots) getCurrentSlot(ctx context.Context, networkName string) (phase0.Slot, error) {
+	network := b.ethereum.GetNetwork(networkName)
+	if network == nil {
+		return 0, fmt.Errorf("network %s not found", networkName)
 	}
 
-	// Execute the query
-	result, err := ch.QueryRow(ctx, query, networkName)
-	if err != nil {
-		return 0, fmt.Errorf("failed to get current slot: %w", err)
+	if network.GetWallclock() != nil {
+		slot, err := network.GetWallclock().CurrentSlot()
+		if err != nil {
+			return 0, fmt.Errorf("failed to get current slot: %w", err)
+		}
+
+		return slot, nil
 	}
 
-	if result["slot"] == nil {
-		return 0, fmt.Errorf("no slots found for network %s", networkName)
-	}
-
-	// Convert the result to int64
-	slot, err := strconv.ParseInt(fmt.Sprintf("%v", result["slot"]), 10, 64)
-	if err != nil {
-		return 0, fmt.Errorf("failed to parse slot: %w", err)
-	}
-
-	return slot, nil
-}
-
-// processSlot processes a single slot
-func (b *BeaconSlots) processSlot(ctx context.Context, networkName string, slot int64) (bool, error) {
-	startTime := time.Now()
-
-	b.log.WithField("network", networkName).
-		WithField("slot", slot).
-		Debug("Processing slot")
-
-	// 1. Get block data (should return *pb.BlockData)
-	blockData, err := b.getBlockData(ctx, networkName, slot)
-	if err != nil {
-		return false, fmt.Errorf("failed to get block data: %w", err)
-	}
-	if blockData == nil {
-		b.log.WithField("slot", slot).Debug("No block data found for slot")
-		return false, nil
-	}
-
-	// 2. Get proposer data (should return *pb.Proposer)
-	proposerData, err := b.getProposerData(ctx, networkName, slot)
-	if err != nil {
-		return false, fmt.Errorf("failed to get proposer data: %w", err)
-	}
-
-	// 3. Get entity
-	entity, err := b.getProposerEntity(ctx, networkName, blockData.ProposerIndex)
-	if err != nil {
-		b.log.WithField("slot", slot).WithError(err).Warning("Failed to get proposer entity, continuing without it")
-	}
-
-	// 4. Get timing data (should return []*pb.Timing, map[string]*pb.BlobTimingMap, etc.)
-	blockSeenAtSlotTime, err := b.getBlockSeenAtSlotTime(ctx, networkName, slot)
-	if err != nil {
-		blockSeenAtSlotTime = map[string]*pb.BlockArrivalTime{}
-	}
-	blobSeenAtSlotTime, err := b.getBlobSeenAtSlotTime(ctx, networkName, slot)
-	if err != nil {
-		blobSeenAtSlotTime = map[string]*pb.BlobArrivalTimes{}
-	}
-	blockFirstSeenInP2PSlotTime, err := b.getBlockFirstSeenInP2PSlotTime(ctx, networkName, slot)
-	if err != nil {
-		blockFirstSeenInP2PSlotTime = map[string]*pb.BlockArrivalTime{}
-	}
-	blobFirstSeenInP2PSlotTime, err := b.getBlobFirstSeenInP2PSlotTime(ctx, networkName, slot)
-	if err != nil {
-		blobFirstSeenInP2PSlotTime = map[string]*pb.BlobArrivalTimes{}
-	}
-
-	fullTimings := &pb.FullTimings{
-		BlockSeen:         blockSeenAtSlotTime,
-		BlobSeen:          blobSeenAtSlotTime,
-		BlockFirstSeenP2P: blockFirstSeenInP2PSlotTime,
-		BlobFirstSeenP2P:  blobFirstSeenInP2PSlotTime,
-	}
-
-	// 5. Get attestation data
-	maxAttestationVotes, err := b.getMaximumAttestationVotes(ctx, networkName, slot)
-	if err != nil {
-		maxAttestationVotes = 0
-	}
-	attestationVotes, err := b.getAttestationVotes(ctx, networkName, slot, blockData.BlockRoot)
-	if err != nil {
-		attestationVotes = make(map[int64]int64)
-	}
-
-	// 6. Transform the data for storage
-	processingTime := time.Since(startTime).Milliseconds()
-	slotData, err := b.transformSlotDataForStorage(
-		slot,
-		networkName,
-		time.Now().UTC().Format(time.RFC3339),
-		processingTime,
-		blockData,
-		proposerData,
-		maxAttestationVotes,
-		entity,
-		fullTimings,
-		attestationVotes,
-	)
-	if err != nil {
-		return false, fmt.Errorf("failed to transform slot data: %w", err)
-	}
-
-	// 7. Store the data to storage
-	storageKey := fmt.Sprintf("slots/%s/%d", networkName, slot)
-
-	err = b.storageClient.Store(ctx, storage.StoreParams{
-		Key:         b.getStoragePath(storageKey),
-		Data:        slotData,
-		Format:      storage.CodecNameJSON,
-		Compression: storage.Gzip,
-	})
-	if err != nil {
-		return false, fmt.Errorf("failed to store slot data: %w", err)
-	}
-
-	return true, nil
+	return 0, fmt.Errorf("no wallclock found for network %s", networkName)
 }
 
 // calculateTargetBacklogSlot calculates the target backlog slot
@@ -637,202 +582,6 @@ func (b *BeaconSlots) calculateTargetBacklogSlot(networkName string, currentSlot
 	return targetSlot, nil
 }
 
-// getBlockData gets block data from ClickHouse
-func (b *BeaconSlots) getBlockData(ctx context.Context, networkName string, slot int64) (*pb.BlockData, error) {
-	// Query ClickHouse for detailed block data
-	query := `
-		SELECT
-			slot,
-			block_root,
-			parent_root,
-			state_root,
-			proposer_index,
-			block_version,
-			signature,
-			eth1_data_block_hash,
-			eth1_data_deposit_root,
-			execution_payload_block_hash,
-			execution_payload_block_number,
-			execution_payload_fee_recipient,
-			execution_payload_base_fee_per_gas,
-			execution_payload_blob_gas_used,
-			execution_payload_excess_blob_gas,
-			execution_payload_gas_limit,
-			execution_payload_gas_used,
-			execution_payload_state_root,
-			execution_payload_parent_hash,
-			execution_payload_transactions_count,
-			execution_payload_transactions_total_bytes,
-			execution_payload_transactions_total_bytes_compressed,
-			block_total_bytes,
-			block_total_bytes_compressed
-		FROM xatu.beacon_api_eth_v1_events_block
-		WHERE network = $1 AND slot = $2
-		LIMIT 1
-	`
-
-	// Get the Clickhouse client for this network
-	ch, err := b.xatuClient.GetClickhouseClientForNetwork(networkName)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get ClickHouse client for network %s: %w", networkName, err)
-	}
-
-	result, err := ch.QueryRow(ctx, query, networkName, slot)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get block data: %w", err)
-	}
-
-	if result == nil || len(result) == 0 {
-		return nil, nil
-	}
-
-	// Calculate slot and epoch times
-	// In a real implementation, these would be calculated from genesis time
-	slotTime := time.Now()  // Placeholder
-	epochTime := time.Now() // Placeholder
-	epoch := slot / 32      // 32 slots per epoch in Ethereum
-
-	// Create a new BlockData object with all fields
-	blockData := &pb.BlockData{
-		Slot:                         slot,
-		SlotStartDateTime:            timestamppb.New(slotTime),
-		Epoch:                        epoch,
-		EpochStartDateTime:           timestamppb.New(epochTime),
-		BlockRoot:                    getStringOrEmpty(result["block_root"]),
-		BlockVersion:                 getStringOrEmpty(result["block_version"]),
-		ParentRoot:                   getStringOrEmpty(result["parent_root"]),
-		StateRoot:                    getStringOrEmpty(result["state_root"]),
-		Eth1DataBlockHash:            getStringOrEmpty(result["eth1_data_block_hash"]),
-		Eth1DataDepositRoot:          getStringOrEmpty(result["eth1_data_deposit_root"]),
-		ExecutionPayloadBlockHash:    getStringOrEmpty(result["execution_payload_block_hash"]),
-		ExecutionPayloadFeeRecipient: getStringOrEmpty(result["execution_payload_fee_recipient"]),
-		ExecutionPayloadStateRoot:    getStringOrEmpty(result["execution_payload_state_root"]),
-		ExecutionPayloadParentHash:   getStringOrEmpty(result["execution_payload_parent_hash"]),
-	}
-
-	// Parse numeric fields
-	if proposerIndex, err := strconv.ParseInt(fmt.Sprintf("%v", result["proposer_index"]), 10, 64); err == nil {
-		blockData.ProposerIndex = proposerIndex
-	}
-
-	if execBlockNumber, err := strconv.ParseInt(fmt.Sprintf("%v", result["execution_payload_block_number"]), 10, 64); err == nil {
-		blockData.ExecutionPayloadBlockNumber = execBlockNumber
-	}
-
-	// Parse nullable numeric fields using wrapper types
-	if val := result["block_total_bytes"]; val != nil {
-		if num, err := strconv.ParseInt(fmt.Sprintf("%v", val), 10, 64); err == nil {
-			blockData.BlockTotalBytes = wrapperspb.Int64(num)
-		}
-	}
-
-	if val := result["block_total_bytes_compressed"]; val != nil {
-		if num, err := strconv.ParseInt(fmt.Sprintf("%v", val), 10, 64); err == nil {
-			blockData.BlockTotalBytesCompressed = wrapperspb.Int64(num)
-		}
-	}
-
-	if val := result["execution_payload_base_fee_per_gas"]; val != nil {
-		if num, err := strconv.ParseInt(fmt.Sprintf("%v", val), 10, 64); err == nil {
-			blockData.ExecutionPayloadBaseFeePerGas = wrapperspb.Int64(num)
-		}
-	}
-
-	if val := result["execution_payload_blob_gas_used"]; val != nil {
-		if num, err := strconv.ParseInt(fmt.Sprintf("%v", val), 10, 64); err == nil {
-			blockData.ExecutionPayloadBlobGasUsed = wrapperspb.Int64(num)
-		}
-	}
-
-	if val := result["execution_payload_excess_blob_gas"]; val != nil {
-		if num, err := strconv.ParseInt(fmt.Sprintf("%v", val), 10, 64); err == nil {
-			blockData.ExecutionPayloadExcessBlobGas = wrapperspb.Int64(num)
-		}
-	}
-
-	if val := result["execution_payload_gas_limit"]; val != nil {
-		if num, err := strconv.ParseInt(fmt.Sprintf("%v", val), 10, 64); err == nil {
-			blockData.ExecutionPayloadGasLimit = wrapperspb.Int64(num)
-		}
-	}
-
-	if val := result["execution_payload_gas_used"]; val != nil {
-		if num, err := strconv.ParseInt(fmt.Sprintf("%v", val), 10, 64); err == nil {
-			blockData.ExecutionPayloadGasUsed = wrapperspb.Int64(num)
-		}
-	}
-
-	if val := result["execution_payload_transactions_count"]; val != nil {
-		if num, err := strconv.ParseInt(fmt.Sprintf("%v", val), 10, 64); err == nil {
-			blockData.ExecutionPayloadTransactionsCount = wrapperspb.Int64(num)
-		}
-	}
-
-	if val := result["execution_payload_transactions_total_bytes"]; val != nil {
-		if num, err := strconv.ParseInt(fmt.Sprintf("%v", val), 10, 64); err == nil {
-			blockData.ExecutionPayloadTransactionsTotalBytes = wrapperspb.Int64(num)
-		}
-	}
-
-	if val := result["execution_payload_transactions_total_bytes_compressed"]; val != nil {
-		if num, err := strconv.ParseInt(fmt.Sprintf("%v", val), 10, 64); err == nil {
-			blockData.ExecutionPayloadTransactionsTotalBytesCompressed = wrapperspb.Int64(num)
-		}
-	}
-
-	return blockData, nil
-}
-
-// getProposerData gets proposer data from ClickHouse
-func (b *BeaconSlots) getProposerData(ctx context.Context, networkName string, slot int64) (*pb.Proposer, error) {
-	query := `
-		SELECT
-			slot,
-			proposer_index
-		FROM xatu.beacon_api_eth_v1_events_block
-		WHERE network = $1 AND slot = $2
-		LIMIT 1
-	`
-
-	ch, err := b.xatuClient.GetClickhouseClientForNetwork(networkName)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get ClickHouse client for network %s: %w", networkName, err)
-	}
-
-	result, err := ch.QueryRow(ctx, query, networkName, slot)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get proposer data: %w", err)
-	}
-
-	if result == nil || len(result) == 0 {
-		return nil, fmt.Errorf("no proposer data found for slot %d", slot)
-	}
-
-	proposerIndex, err := strconv.ParseInt(fmt.Sprintf("%v", result["proposer_index"]), 10, 64)
-	if err != nil {
-		return nil, fmt.Errorf("failed to parse proposer index: %w", err)
-	}
-
-	return &pb.Proposer{
-		Slot:                   slot,
-		ProposerValidatorIndex: proposerIndex,
-	}, nil
-}
-
-// getSlotWindow returns the start and end times for a slot with a 15 minute grace period
-func (b *BeaconSlots) getSlotWindow(ctx context.Context, networkName string, slot int64) (time.Time, time.Time) {
-	// This is a simplified implementation - in practice would calculate from genesis
-	// Following the Python implementation with 15 minutes added on either side
-
-	// For simplicity, for now we'll just return a window around the current time
-	// In a full implementation, this would calculate properly from slot and genesis time
-	now := time.Now().UTC()
-	startTime := now.Add(-15 * time.Minute)
-	endTime := now.Add(15 * time.Minute)
-
-	return startTime, endTime
-}
-
 func getStringOrNil(s *string) string {
 	if s == nil {
 		return ""
@@ -842,7 +591,6 @@ func getStringOrNil(s *string) string {
 
 // Helper function to extract username from client name
 func extractUsername(name string) string {
-	// This implementation follows the Python Node.extract_username method
 	parts := strings.Split(name, "/")
 	if len(parts) < 2 {
 		return ""
@@ -861,22 +609,4 @@ func getStringOrEmpty(value interface{}) string {
 		return ""
 	}
 	return fmt.Sprintf("%v", value)
-}
-
-// lookupGeoCoordinates performs a geo lookup for given city/country.
-// Placeholder implementation.
-func (b *BeaconSlots) lookupGeoCoordinates(city, country string) (*float64, *float64) {
-	geocoder := openstreetmap.Geocoder()
-	location, err := geocoder.Geocode(city + ", " + country)
-	if err != nil {
-		b.log.WithError(err).WithFields(logrus.Fields{
-			"city":    city,
-			"country": country,
-		}).Warn("Geocoding lookup failed")
-		return nil, nil
-	}
-	if location == nil {
-		return nil, nil
-	}
-	return &location.Lat, &location.Lng
 }

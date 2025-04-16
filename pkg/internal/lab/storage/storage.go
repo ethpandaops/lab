@@ -73,6 +73,7 @@ type Client interface {
 	GetBucket() string
 	Store(ctx context.Context, params StoreParams) error // Unified Store method
 	Get(ctx context.Context, key string) ([]byte, error)
+	Exists(ctx context.Context, key string) (bool, error)
 	GetEncoded(ctx context.Context, key string, v any, format CodecName) error
 	Delete(ctx context.Context, key string) error
 	List(ctx context.Context, prefix string) ([]string, error)
@@ -189,6 +190,29 @@ func (c *client) GetClient() *s3.Client {
 // GetBucket returns the bucket name
 func (c *client) GetBucket() string {
 	return c.config.Bucket
+}
+
+// Exists checks if a key exists in storage
+func (c *client) Exists(ctx context.Context, key string) (bool, error) {
+	rsp, err := c.client.HeadObject(ctx, &s3.HeadObjectInput{
+		Bucket: aws.String(c.config.Bucket),
+		Key:    aws.String(key),
+	})
+	if err != nil {
+		// Check for NoSuchKey error using APIError type
+		var apiErr smithy.APIError
+		if errors.As(err, &apiErr) && (apiErr.ErrorCode() == "NoSuchKey" || apiErr.ErrorCode() == "NotFound") {
+			return false, nil
+		}
+
+		return false, fmt.Errorf("failed to check if object exists: %w", err)
+	}
+
+	if rsp == nil {
+		return false, nil
+	}
+
+	return true, nil
 }
 
 // Store stores data based on the provided parameters.

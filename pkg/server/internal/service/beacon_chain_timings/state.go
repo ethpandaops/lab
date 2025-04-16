@@ -7,12 +7,12 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
-// GetStateKey returns the key used for storing state in storage
+// GetStateKey returns the state key for the beacon chain timings
 func GetStateKey() string {
 	return "state"
 }
 
-// NewState creates a new State with proper initialization
+// NewState creates a new, initialized state object
 func NewState() *pb.State {
 	return &pb.State{
 		BlockTimings: &pb.DataTypeState{

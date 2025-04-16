@@ -8,6 +8,8 @@ import (
 	"syscall"
 
 	"github.com/ethpandaops/lab/pkg/internal/lab/cache"
+	"github.com/ethpandaops/lab/pkg/internal/lab/ethereum"
+
 	// "github.com/ethpandaops/lab/pkg/internal/lab/ethereum" // Removed unused import
 	"github.com/ethpandaops/lab/pkg/internal/lab/locker"
 	"github.com/ethpandaops/lab/pkg/internal/lab/logger"
@@ -35,10 +37,11 @@ type Service struct {
 	services []service.Service
 
 	// Clients
-	xatuClient    *xatu.Client
-	storageClient storage.Client
-	cacheClient   cache.Client
-	lockerClient  locker.Locker
+	ethereumClient *ethereum.Client
+	xatuClient     *xatu.Client
+	storageClient  storage.Client
+	cacheClient    cache.Client
+	lockerClient   locker.Locker
 }
 
 // New creates a new srv service
@@ -169,7 +172,7 @@ func (s *Service) initializeServices(ctx context.Context) error {
 		s.log,
 		s.config.Modules["beacon_slots"].BeaconSlots,
 		s.xatuClient,
-		s.config.Ethereum,
+		s.ethereumClient,
 		s.storageClient,
 		s.lockerClient,
 	)
@@ -191,6 +194,14 @@ func (s *Service) initializeServices(ctx context.Context) error {
 
 // initializeDependencies initializes all of the dependancies to run the srv service
 func (s *Service) initializeDependencies() error {
+	// Initialize Ethereum client
+	s.log.Info("Initializing Ethereum client")
+	ethereumClient := ethereum.NewClient(s.config.Ethereum)
+	if err := ethereumClient.Start(s.ctx); err != nil {
+		return fmt.Errorf("failed to start Ethereum client: %w", err)
+	}
+	s.ethereumClient = ethereumClient
+
 	// Initialize global XatuClickhouse
 	s.log.Info("Initializing per-network Xatu ClickHouse clients")
 
