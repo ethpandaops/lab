@@ -49,6 +49,7 @@ type BeaconChainTimings struct {
 
 	processCtx       context.Context
 	processCtxCancel context.CancelFunc
+	parentCtx        context.Context
 
 	// Base directory for storage
 	baseDir string
@@ -91,6 +92,7 @@ func (b *BeaconChainTimings) Start(ctx context.Context) error {
 	}
 
 	b.log.Info("Starting BeaconChainTimings service")
+	b.parentCtx = ctx // Store the parent context
 
 	leader := leader.New(b.log, b.lockerClient, leader.Config{
 		Resource:        BeaconChainTimingsServiceName + "/batch_processing",
@@ -107,10 +109,10 @@ func (b *BeaconChainTimings) Start(ctx context.Context) error {
 				return
 			}
 
-			// Create a new context for the process
-			ctx, cancel := context.WithCancel(context.Background())
+			// Create a new context for the process, derived from the Start context
+			processCtx, cancel := context.WithCancel(b.parentCtx)
 
-			b.processCtx = ctx
+			b.processCtx = processCtx
 			b.processCtxCancel = cancel
 
 			go b.processLoop()

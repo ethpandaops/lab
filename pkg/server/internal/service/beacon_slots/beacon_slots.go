@@ -42,6 +42,7 @@ type BeaconSlots struct {
 	leaderClient      leader.Client
 	geolocationClient *geolocation.Client
 
+	parentCtx        context.Context // Context passed from Start
 	processCtx       context.Context
 	processCtxCancel context.CancelFunc
 	processWaitGroup sync.WaitGroup
@@ -79,6 +80,8 @@ func New(
 }
 
 func (b *BeaconSlots) Start(ctx context.Context) error {
+	b.parentCtx = ctx // Store the parent context
+
 	if !b.config.Enabled {
 		b.log.Info("BeaconSlots service disabled")
 		return nil
@@ -101,11 +104,11 @@ func (b *BeaconSlots) Start(ctx context.Context) error {
 				return
 			}
 
-			// Create a new context for the process
-			ctx, cancel := context.WithCancel(context.Background())
+			// Create a new context for the process, derived from the parent context
+			processCtx, processCancel := context.WithCancel(b.parentCtx)
 
-			b.processCtx = ctx
-			b.processCtxCancel = cancel
+			b.processCtx = processCtx
+			b.processCtxCancel = processCancel
 
 			// Start all processors in a single goroutine
 			go b.startProcessors(ctx)
