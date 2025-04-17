@@ -6,6 +6,7 @@ option go_package = "github.com/ethpandaops/lab/pkg/api/proto";
 
 import "google/protobuf/empty.proto";
 import "google/protobuf/timestamp.proto";
+import "google/protobuf/struct.proto";
 
 service LabAPI {
 
@@ -24,6 +25,8 @@ service LabAPI {
   rpc GetSizeCDFWindow(google.protobuf.Empty) returns (DataFileChunk) {}
 
   rpc GetBeaconSlot(google.protobuf.Empty) returns (DataFileChunk) {}
+  
+  rpc GetFrontendConfig(google.protobuf.Empty) returns (FrontendConfigResponse) {}
 }
 
 message GetDataRequest {
@@ -126,4 +129,35 @@ message DataFileChunk {
 message StatusResponse {
   string status = 1;
   string version = 2;
+}
+message ConfigResponse {
+  map<string, ModuleConfig> modules = 1 [json_name="modules"];
+  EthereumConfig ethereum = 2 [json_name="ethereum"];
+}
+message ModuleConfig {
+  bool enabled = 1;
+  string description = 2;
+  string path_prefix = 3 [json_name="path_prefix"];
+  google.protobuf.Struct networks = 4 [json_name="networks"];
+  repeated TimeWindow time_windows = 5 [json_name="time_windows"];
+}
+message TimeWindow {
+  string file = 1;
+  string step = 2;
+  string label = 3;
+  string range = 4;
+}
+message EthereumConfig {
+  map<string, EthNetworkConfig> networks = 1 [json_name="networks"];
+}
+message EthNetworkConfig {
+  int64 genesis_time = 1 [json_name="genesis_time"];
+  Forks forks = 2 [json_name="forks"];
+}
+message Forks {
+  map<string, ForkDetail> consensus = 1;
+}
+message ForkDetail {
+  map<string, string> min_client_versions = 1 [json_name="min_client_versions"];
+  int64 epoch = 2;
 }

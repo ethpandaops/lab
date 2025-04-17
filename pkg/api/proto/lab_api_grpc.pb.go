@@ -28,6 +28,7 @@ const (
 	LabAPI_GetBlockTimings_FullMethodName        = "/labapi.LabAPI/GetBlockTimings"
 	LabAPI_GetSizeCDFWindow_FullMethodName       = "/labapi.LabAPI/GetSizeCDFWindow"
 	LabAPI_GetBeaconSlot_FullMethodName          = "/labapi.LabAPI/GetBeaconSlot"
+	LabAPI_GetFrontendConfig_FullMethodName      = "/labapi.LabAPI/GetFrontendConfig"
 )
 
 // LabAPIClient is the client API for LabAPI service.
@@ -42,6 +43,7 @@ type LabAPIClient interface {
 	GetBlockTimings(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*DataFileChunk, error)
 	GetSizeCDFWindow(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*DataFileChunk, error)
 	GetBeaconSlot(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*DataFileChunk, error)
+	GetFrontendConfig(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*FrontendConfigResponse, error)
 }
 
 type labAPIClient struct {
@@ -132,6 +134,16 @@ func (c *labAPIClient) GetBeaconSlot(ctx context.Context, in *emptypb.Empty, opt
 	return out, nil
 }
 
+func (c *labAPIClient) GetFrontendConfig(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*FrontendConfigResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(FrontendConfigResponse)
+	err := c.cc.Invoke(ctx, LabAPI_GetFrontendConfig_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // LabAPIServer is the server API for LabAPI service.
 // All implementations must embed UnimplementedLabAPIServer
 // for forward compatibility.
@@ -144,6 +156,7 @@ type LabAPIServer interface {
 	GetBlockTimings(context.Context, *emptypb.Empty) (*DataFileChunk, error)
 	GetSizeCDFWindow(context.Context, *emptypb.Empty) (*DataFileChunk, error)
 	GetBeaconSlot(context.Context, *emptypb.Empty) (*DataFileChunk, error)
+	GetFrontendConfig(context.Context, *emptypb.Empty) (*FrontendConfigResponse, error)
 	mustEmbedUnimplementedLabAPIServer()
 }
 
@@ -177,6 +190,9 @@ func (UnimplementedLabAPIServer) GetSizeCDFWindow(context.Context, *emptypb.Empt
 }
 func (UnimplementedLabAPIServer) GetBeaconSlot(context.Context, *emptypb.Empty) (*DataFileChunk, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetBeaconSlot not implemented")
+}
+func (UnimplementedLabAPIServer) GetFrontendConfig(context.Context, *emptypb.Empty) (*FrontendConfigResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetFrontendConfig not implemented")
 }
 func (UnimplementedLabAPIServer) mustEmbedUnimplementedLabAPIServer() {}
 func (UnimplementedLabAPIServer) testEmbeddedByValue()                {}
@@ -343,6 +359,24 @@ func _LabAPI_GetBeaconSlot_Handler(srv interface{}, ctx context.Context, dec fun
 	return interceptor(ctx, in, info, handler)
 }
 
+func _LabAPI_GetFrontendConfig_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(emptypb.Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LabAPIServer).GetFrontendConfig(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: LabAPI_GetFrontendConfig_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LabAPIServer).GetFrontendConfig(ctx, req.(*emptypb.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // LabAPI_ServiceDesc is the grpc.ServiceDesc for LabAPI service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -381,6 +415,10 @@ var LabAPI_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetBeaconSlot",
 			Handler:    _LabAPI_GetBeaconSlot_Handler,
+		},
+		{
+			MethodName: "GetFrontendConfig",
+			Handler:    _LabAPI_GetFrontendConfig_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -3,6 +3,7 @@ package grpc
 import (
 	"context"
 
+	"github.com/ethpandaops/lab/pkg/server/internal/service/lab"
 	pb "github.com/ethpandaops/lab/pkg/server/proto/lab"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
@@ -10,17 +11,20 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-// Service implements the LabService gRPC service
 type Lab struct {
 	pb.UnimplementedLabServiceServer
-	log            logrus.FieldLogger
-	frontendConfig *pb.FrontendConfig
+	log logrus.FieldLogger
+
+	labService *lab.Lab
 }
 
 // NewLab creates a new Lab implementation
-func NewLab(log logrus.FieldLogger) *Lab {
+func NewLab(log logrus.FieldLogger,
+	labService *lab.Lab,
+) *Lab {
 	return &Lab{
-		log: log.WithField("component", "grpc/lab"),
+		log:        log.WithField("component", "grpc/lab"),
+		labService: labService,
 	}
 }
 
@@ -30,9 +34,6 @@ func (l *Lab) Name() string {
 }
 
 func (l *Lab) Start(ctx context.Context, grpcServer *grpc.Server) error {
-	// Generate the frontend config directly in this service
-	// s.frontendConfig = s.lab.AsFrontendConfig()
-
 	pb.RegisterLabServiceServer(grpcServer, l)
 
 	l.log.Info("Lab GRPC service started")
@@ -42,13 +43,10 @@ func (l *Lab) Start(ctx context.Context, grpcServer *grpc.Server) error {
 
 // GetFrontendConfig implements the GetFrontendConfig RPC
 func (l *Lab) GetFrontendConfig(ctx context.Context, req *pb.GetFrontendConfigRequest) (*pb.GetFrontendConfigResponse, error) {
-	if l.frontendConfig == nil {
-		return nil, status.Errorf(codes.Unavailable, "frontend config not available")
+	cfg, err := l.labService.GetFrontendConfig()
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to get frontend config: %v", err)
 	}
 
-	l.log.Debug("GetFrontendConfig request received")
-
-	return &pb.GetFrontendConfigResponse{
-		Config: l.frontendConfig,
-	}, nil
+	return &pb.GetFrontendConfigResponse{Config: cfg}, nil
 }

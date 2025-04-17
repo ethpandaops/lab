@@ -15,6 +15,7 @@ import (
 	"github.com/ethpandaops/lab/pkg/internal/lab/state"
 	"github.com/ethpandaops/lab/pkg/internal/lab/storage"
 	"github.com/ethpandaops/lab/pkg/internal/lab/xatu"
+	pb "github.com/ethpandaops/lab/pkg/server/proto/lab"
 	"github.com/sirupsen/logrus"
 )
 
@@ -124,17 +125,22 @@ func (b *BeaconSlots) Start(ctx context.Context) error {
 func (b *BeaconSlots) Stop() {
 	b.log.Info("Stopping BeaconSlots service")
 
+	b.log.Info("Stopping leader client")
 	if b.leaderClient != nil {
 		b.leaderClient.Stop()
 	}
 
+	b.log.Info("Stopping processors")
 	b.stopProcessors()
+
+	b.log.Info("BeaconSlots service stopped")
 }
 
 // stopProcessors safely stops all running processors
 func (b *BeaconSlots) stopProcessors() {
+	b.log.Info("Stopping all processors")
+
 	if b.processCtxCancel != nil {
-		b.log.Info("Stopping all processors")
 		b.processCtxCancel()
 
 		// Wait for all processors to stop with a timeout
@@ -198,6 +204,10 @@ func (b *BeaconSlots) getSlotStoragePath(network string, slot phase0.Slot) strin
 	return b.getStoragePath(fmt.Sprintf("%s/%d", network, slot))
 }
 
+func (b *BeaconSlots) BaseDirectory() string {
+	return b.baseDir
+}
+
 // getStoragePath constructs the full storage path.
 func (b *BeaconSlots) getStoragePath(key string) string {
 	return fmt.Sprintf("%s/%s", b.baseDir, key)
@@ -212,6 +222,23 @@ func (b *BeaconSlots) slotHasBeenProcessed(ctx context.Context, network string, 
 	}
 
 	return exists, nil
+}
+
+func (b *BeaconSlots) FrontendModuleConfig() *pb.FrontendConfig_BeaconModule {
+	networks := make(map[string]*pb.FrontendConfig_BeaconNetworkConfig)
+	for _, network := range b.ethereum.Networks() {
+		networks[network.Name] = &pb.FrontendConfig_BeaconNetworkConfig{
+			HeadLagSlots: int32(b.config.HeadDelaySlots),
+			BacklogDays:  int32(b.config.Backfill.Slots),
+		}
+	}
+
+	return &pb.FrontendConfig_BeaconModule{
+		Enabled:     b.config.Enabled,
+		Description: "Beacon Slots",
+		PathPrefix:  b.baseDir,
+		Networks:    networks,
+	}
 }
 
 // sleepUntilNextSlot sleeps until the next slot for a network

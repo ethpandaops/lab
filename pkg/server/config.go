@@ -14,7 +14,6 @@ import (
 	"github.com/ethpandaops/lab/pkg/server/internal/service/xatu_public_contributors"
 )
 
-// Config contains the configuration for the srv service
 type Config struct {
 	LogLevel    string                   `yaml:"logLevel" default:"info"`
 	Server      *grpc.Config             `yaml:"grpc"`
@@ -25,7 +24,6 @@ type Config struct {
 	Geolocation *geolocation.Config      `yaml:"geolocation"`
 }
 
-// ModuleConfig contains the configuration for a specific module
 type ModuleConfig struct {
 	BeaconChainTimings     *beacon_chain_timings.Config     `yaml:"beacon_chain_timings"`
 	XatuPublicContributors *xatu_public_contributors.Config `yaml:"xatu_public_contributors"`
@@ -59,6 +57,5 @@ func (x *Config) GetXatuConfig() map[string]*clickhouse.Config {
 			xatuConfig[networkName] = networkConfig.Xatu
 		}
 	}
-
 	return xatuConfig
 }

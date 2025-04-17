@@ -6,12 +6,12 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	"github.com/ethpandaops/lab/pkg/internal/lab/cache"
 	"github.com/ethpandaops/lab/pkg/internal/lab/ethereum"
 	"github.com/ethpandaops/lab/pkg/internal/lab/geolocation"
 
-	// "github.com/ethpandaops/lab/pkg/internal/lab/ethereum" // Removed unused import
 	"github.com/ethpandaops/lab/pkg/internal/lab/locker"
 	"github.com/ethpandaops/lab/pkg/internal/lab/logger"
 	"github.com/ethpandaops/lab/pkg/internal/lab/storage"
@@ -20,6 +20,7 @@ import (
 	"github.com/ethpandaops/lab/pkg/server/internal/service"
 	beacon_chain_timings "github.com/ethpandaops/lab/pkg/server/internal/service/beacon_chain_timings"
 	beacon_slots "github.com/ethpandaops/lab/pkg/server/internal/service/beacon_slots"
+	lab "github.com/ethpandaops/lab/pkg/server/internal/service/lab"
 	xatu_public_contributors "github.com/ethpandaops/lab/pkg/server/internal/service/xatu_public_contributors"
 	"github.com/sirupsen/logrus"
 )
@@ -79,6 +80,8 @@ func (s *Service) Start(ctx context.Context) error {
 
 		s.log.WithField("signal", sig.String()).Info("Received signal, shutting down")
 
+		s.stop()
+
 		s.ctx.Done()
 	}()
 
@@ -102,14 +105,15 @@ func (s *Service) Start(ctx context.Context) error {
 	// Retrieve instantiated services for handlers
 	bctService := s.getService(beacon_chain_timings.BeaconChainTimingsServiceName).(*beacon_chain_timings.BeaconChainTimings)
 	xpcService := s.getService(xatu_public_contributors.XatuPublicContributorsServiceName).(*xatu_public_contributors.XatuPublicContributors)
-	bsService := s.getService(beacon_slots.ServiceName).(*beacon_slots.BeaconSlots) // Use ServiceName constant
+	bsService := s.getService(beacon_slots.ServiceName).(*beacon_slots.BeaconSlots)
+	labService := s.getService(lab.ServiceName).(*lab.Lab)
 
 	// Instantiate gRPC handlers
 	grpcServices := []grpc.Service{
-		grpc.NewLab(s.log),
+		grpc.NewLab(s.log, labService),
 		grpc.NewBeaconChainTimings(s.log, bctService),
 		grpc.NewXatuPublicContributors(s.log, xpcService),
-		grpc.NewBeaconSlotsHandler(s.log, bsService), // Use correct constructor and pass service
+		grpc.NewBeaconSlotsHandler(s.log, bsService),
 	}
 
 	// Create gRPC server
@@ -130,12 +134,6 @@ func (s *Service) Start(ctx context.Context) error {
 	// Block until context is canceled
 	<-s.ctx.Done()
 	s.log.Info("Context canceled, shutting down")
-
-	// Shut down all the lab services
-	s.stop()
-
-	// Clean up resources
-	s.stop()
 
 	s.log.Info("Srv service stopped")
 
@@ -184,10 +182,20 @@ func (s *Service) initializeServices(ctx context.Context) error {
 		return fmt.Errorf("failed to initialize beacon slots service: %w", err)
 	}
 
+	labService, err := lab.New(
+		s.log,
+		s.ethereumClient,
+		s.cacheClient,
+		bct,
+		xpc,
+		beaconSlotsService,
+	)
+	if err != nil {
+		return fmt.Errorf("failed to initialize lab service: %w", err)
+	}
+
 	s.services = []service.Service{
-		service.NewLab(
-			s.log,
-		),
+		labService,
 		bct,
 		xpc,
 		beaconSlotsService,
@@ -275,9 +283,43 @@ func (s *Service) getService(name string) service.Service {
 
 // stop stops the srv service
 func (s *Service) stop() {
+	s.log.Info("Stopping srv service")
+
 	// Stop gRPC server
+	s.log.Info("Stopping gRPC server")
 	if s.grpcServer != nil {
 		s.grpcServer.Stop()
+
+		// Create a timeout context
+		ctx, cancel := context.WithTimeout(context.Background(), 29*time.Second)
+		defer cancel()
+
+		// Wait for the server to stop or timeout
+		done := make(chan struct{})
+		go func() {
+			s.log.Info("Stopping gRPC server")
+
+			s.grpcServer.Stop()
+
+			s.log.Info("gRPC server stopped")
+
+			// Stop all our services
+			s.log.Info("Stopping services")
+			for _, service := range s.services {
+				s.log.WithField("service_name", service.Name()).Info("Stopping service")
+
+				service.Stop()
+			}
+
+			close(done)
+		}()
+
+		select {
+		case <-done:
+			s.log.Info("Stopped gracefully")
+		case <-ctx.Done():
+			s.log.Warn("Stop timed out after 29s, forcing stop")
+		}
 	}
-	// TODO: Add logic to stop individual services if needed
+
 }

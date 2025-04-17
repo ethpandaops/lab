@@ -20,7 +20,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 
-	apipb "github.com/ethpandaops/lab/pkg/api/proto"
+	labpb "github.com/ethpandaops/lab/pkg/server/proto/lab"
 )
 
 // Service represents the api service
@@ -39,7 +39,7 @@ type Service struct {
 
 	// gRPC connection to srv service
 	srvConn   *grpc.ClientConn
-	srvClient apipb.LabAPIClient
+	labClient labpb.LabServiceClient
 }
 
 // New creates a new api service
@@ -126,7 +126,7 @@ func (s *Service) initializeServices(ctx context.Context) error {
 		}
 	}
 	s.srvConn = conn
-	s.srvClient = apipb.NewLabAPIClient(conn)
+	s.labClient = labpb.NewLabServiceClient(conn)
 
 	if err := s.storageClient.Start(ctx); err != nil {
 		return fmt.Errorf("failed to start storage client: %w", err)
@@ -141,28 +141,48 @@ func (s *Service) initializeServices(ctx context.Context) error {
 // registerLegacyHandlers registers HTTP handlers for backward compatibility with .json paths
 func (s *Service) registerLegacyHandlers() {
 	// Block timings
-	s.router.HandleFunc("/api/beacon_chain_timings/block_timings/{network}/{window_file}.json", s.handleBlockTimings).Methods("GET")
+	s.router.HandleFunc("/beacon_chain_timings/block_timings/{network}/{window_file}.json", s.handleBlockTimings).Methods("GET")
 
 	// Size CDF - OK
-	s.router.HandleFunc("/api/beacon_chain_timings/size_cdf/{network}/{window_file}.json", s.handleSizeCDF).Methods("GET")
+	s.router.HandleFunc("/beacon_chain_timings/size_cdf/{network}/{window_file}.json", s.handleSizeCDF).Methods("GET")
 
 	// Xatu Summary - OK
-	s.router.HandleFunc("/api/xatu_public_contributors/summary.json", s.handleXatuSummary).Methods("GET")
+	s.router.HandleFunc("/xatu_public_contributors/summary.json", s.handleXatuSummary).Methods("GET")
 
 	// Beacon Slot
-	s.router.HandleFunc("/api/beacon/slots/{network}/{slot}.json", s.handleBeaconSlot).Methods("GET")
+	s.router.HandleFunc("/beacon/slots/{network}/{slot}.json", s.handleBeaconSlot).Methods("GET")
 
 	// Xatu User Summary - OK
-	s.router.HandleFunc("/api/xatu_public_contributors/user-summaries/summary.json", s.handleXatuUserSummary).Methods("GET")
+	s.router.HandleFunc("/xatu_public_contributors/user-summaries/summary.json", s.handleXatuUserSummary).Methods("GET")
 
 	// Xatu User - OK
-	s.router.HandleFunc("/api/xatu_public_contributors/user-summaries/users/{username}.json", s.handleXatuUser).Methods("GET")
+	s.router.HandleFunc("/xatu_public_contributors/user-summaries/users/{username}.json", s.handleXatuUser).Methods("GET")
 
 	// Xatu Users Window - OK
-	s.router.HandleFunc("/api/xatu_public_contributors/users/{network}/{window_file}.json", s.handleXatuUsersWindow).Methods("GET")
+	s.router.HandleFunc("/xatu_public_contributors/users/{network}/{window_file}.json", s.handleXatuUsersWindow).Methods("GET")
 
 	// Xatu Countries Window - OK
-	s.router.HandleFunc("/api/xatu_public_contributors/countries/{network}/{window_file}.json", s.handleXatuCountriesWindow).Methods("GET")
+	s.router.HandleFunc("/xatu_public_contributors/countries/{network}/{window_file}.json", s.handleXatuCountriesWindow).Methods("GET")
+
+	s.router.HandleFunc("/config.json", s.handleFrontendConfig).Methods("GET")
+}
+
+func (s *Service) handleFrontendConfig(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	resp, err := s.labClient.GetFrontendConfig(ctx, &labpb.GetFrontendConfigRequest{})
+	if err != nil {
+		s.log.WithError(err).Error("failed to fetch config")
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
+	data, err := json.Marshal(resp.Config.Config)
+	if err != nil {
+		s.log.WithError(err).Error("failed to marshal config response")
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(data)
 }
 
 // Generic handler for S3 passthroughs

@@ -7,4 +7,5 @@ import "context"
 type Service interface {
 	Start(ctx context.Context) error
 	Name() string
+	Stop()
 }

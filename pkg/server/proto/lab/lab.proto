@@ -4,7 +4,6 @@ package lab;
 
 option go_package = "github.com/ethpandaops/lab/pkg/proto/lab";
 
-
 // Service definitions
 service LabService {
   // Get configuration for a specific network
@@ -23,7 +22,7 @@ message GetFrontendConfigResponse {
 }
 
 // FrontendConfig is the frontend configuration for the lab. Data here is used to populate the frontend UI,
-// and is exposed publically. NOTE: this should maybe live in the api package.
+// and is exposed publically.
 message FrontendConfig {
   // Config is the configuration for the lab
   message Config {
@@ -42,12 +41,20 @@ message FrontendConfig {
   message BeaconChainTimingsModule {
     repeated string networks = 1;
     repeated TimeWindow time_windows = 2;
+
+    string path_prefix = 3;
+
+    bool enabled = 4;
   }
 
   // XatuPublicContributorsModule represents the Xatu public contributors module configuration
   message XatuPublicContributorsModule {
     repeated string networks = 1;
     repeated TimeWindow time_windows = 2;
+
+    string path_prefix = 3;
+
+    bool enabled = 4;
   }
 
   // BeaconModule represents the beacon module configuration
@@ -100,4 +107,16 @@ message FrontendConfig {
   }
 
   Config config = 1;
+}
+
+message GetConfigResponse {
+  message ModuleConfig {
+    bool enabled = 1;
+    string description = 2;
+    string path_prefix = 3;
+    repeated string networks = 4;
+    repeated FrontendConfig.TimeWindow time_windows = 5;
+  }
+  map<string, ModuleConfig> modules = 1;
+  FrontendConfig.EthereumConfig ethereum = 2;
 }

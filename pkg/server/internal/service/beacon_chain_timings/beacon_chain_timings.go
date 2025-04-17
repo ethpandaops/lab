@@ -13,6 +13,7 @@ import (
 	"github.com/ethpandaops/lab/pkg/internal/lab/storage"
 	"github.com/ethpandaops/lab/pkg/internal/lab/xatu"
 	pb "github.com/ethpandaops/lab/pkg/server/proto/beacon_chain_timings"
+	pb_lab "github.com/ethpandaops/lab/pkg/server/proto/lab"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
@@ -132,7 +133,43 @@ func (b *BeaconChainTimings) Start(ctx context.Context) error {
 }
 
 func (b *BeaconChainTimings) Stop() {
-	b.leaderClient.Stop()
+	b.log.Info("Stopping BeaconChainTimings service")
+
+	b.log.Info("Stopping leader client")
+	if b.leaderClient != nil {
+		b.leaderClient.Stop()
+	}
+
+	b.log.Info("Waiting for process loop to finish")
+	if b.processCtxCancel != nil {
+		b.processCtxCancel()
+	}
+
+	b.log.Info("BeaconChainTimings service stopped")
+}
+
+func (b *BeaconChainTimings) FrontendModuleConfig() *pb_lab.FrontendConfig_BeaconChainTimingsModule {
+	networks := make([]string, 0, len(b.ethereumConfig.Networks))
+	for network := range b.ethereumConfig.Networks {
+		networks = append(networks, network)
+	}
+
+	timeWindows := make([]*pb_lab.FrontendConfig_TimeWindow, 0, len(b.config.TimeWindows))
+	for _, window := range b.config.TimeWindows {
+		timeWindows = append(timeWindows, &pb_lab.FrontendConfig_TimeWindow{
+			File:  window.File,
+			Label: window.Label,
+			Range: window.Range,
+			Step:  window.Step,
+		})
+	}
+
+	return &pb_lab.FrontendConfig_BeaconChainTimingsModule{
+		Enabled:     b.config.Enabled != nil && *b.config.Enabled,
+		Networks:    networks,
+		PathPrefix:  b.baseDir,
+		TimeWindows: timeWindows,
+	}
 }
 
 func (b *BeaconChainTimings) processLoop() {
@@ -166,6 +203,14 @@ func (b *BeaconChainTimings) processLoop() {
 
 func (b *BeaconChainTimings) Name() string {
 	return BeaconChainTimingsServiceName
+}
+
+func (b *BeaconChainTimings) BaseDirectory() string {
+	return b.baseDir
+}
+
+func (b *BeaconChainTimings) GetTimeWindows() []TimeWindow {
+	return b.config.TimeWindows
 }
 
 func (b *BeaconChainTimings) process(ctx context.Context) {

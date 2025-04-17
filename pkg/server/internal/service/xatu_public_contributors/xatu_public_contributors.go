@@ -17,6 +17,7 @@ import (
 	"github.com/sirupsen/logrus"
 
 	// Needed for state and config conversion
+	pb_lab "github.com/ethpandaops/lab/pkg/server/proto/lab"
 	pb "github.com/ethpandaops/lab/pkg/server/proto/xatu_public_contributors"
 )
 
@@ -28,8 +29,6 @@ const (
 	UserSummariesProcessorName        = "user_summaries"
 )
 
-// --- Data Structures for Processors ---
-
 type XatuPublicContributors struct {
 	log logrus.FieldLogger
 
@@ -38,7 +37,7 @@ type XatuPublicContributors struct {
 	ethereumConfig *ethereum.Config
 	xatuClient     *xatu.Client
 	storageClient  storage.Client
-	cacheClient    cache.Client // Keep cache client if needed later, though not used currently
+	cacheClient    cache.Client
 	lockerClient   locker.Locker
 
 	leaderClient leader.Client
@@ -77,6 +76,10 @@ func New(
 		processCtx:       nil,
 		processCtxCancel: nil,
 	}, nil
+}
+
+func (b *XatuPublicContributors) BaseDirectory() string {
+	return b.baseDir
 }
 
 func (b *XatuPublicContributors) Start(ctx context.Context) error {
@@ -124,9 +127,13 @@ func (b *XatuPublicContributors) Stop() {
 	if b.leaderClient != nil {
 		b.leaderClient.Stop()
 	}
+
+	b.log.Info("Waiting for process loop to finish")
 	if b.processCtxCancel != nil {
 		b.processCtxCancel()
 	}
+
+	b.log.Info("Service stopped")
 }
 
 func (b *XatuPublicContributors) Name() string {
@@ -160,6 +167,29 @@ func (b *XatuPublicContributors) processLoop() {
 // getStoragePath constructs the full storage path.
 func (b *XatuPublicContributors) getStoragePath(key string) string {
 	return filepath.Join(b.baseDir, key)
+}
+
+func (b *XatuPublicContributors) GetTimeWindows() []TimeWindow {
+	return b.config.TimeWindows
+}
+
+func (b *XatuPublicContributors) FrontendModuleConfig() *pb_lab.FrontendConfig_XatuPublicContributorsModule {
+	timeWindows := make([]*pb_lab.FrontendConfig_TimeWindow, 0, len(b.config.TimeWindows))
+	for _, window := range b.config.TimeWindows {
+		timeWindows = append(timeWindows, &pb_lab.FrontendConfig_TimeWindow{
+			File:  window.File,
+			Label: window.Label,
+			Range: window.Range,
+			Step:  window.Step,
+		})
+	}
+
+	return &pb_lab.FrontendConfig_XatuPublicContributorsModule{
+		Networks:    b.config.Networks,
+		TimeWindows: timeWindows,
+		PathPrefix:  b.baseDir,
+		Enabled:     b.config.Enabled != nil && *b.config.Enabled,
+	}
 }
 
 // loadState loads the state for a given network.
