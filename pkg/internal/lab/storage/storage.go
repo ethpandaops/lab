@@ -16,6 +16,8 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/service/s3/types"
 	"github.com/aws/smithy-go"
+	"github.com/ethpandaops/lab/pkg/internal/lab/metrics"
+	"github.com/prometheus/client_golang/prometheus"
 	"github.com/sirupsen/logrus"
 )
 
@@ -86,29 +88,86 @@ var (
 
 // Client represents an S3 storage client
 type client struct {
-	client     *s3.Client
-	config     *Config
-	log        logrus.FieldLogger
-	ctx        context.Context
-	encoders   *Registry
-	compressor *Compressor
+	client            *s3.Client
+	config            *Config
+	log               logrus.FieldLogger
+	ctx               context.Context
+	encoders          *Registry
+	compressor        *Compressor
+	metricsCollector  *metrics.Collector
+	operationsTotal   *prometheus.CounterVec
+	operationDuration *prometheus.HistogramVec
+	bytesProcessed    *prometheus.CounterVec
+	errorsTotal       *prometheus.CounterVec
 }
 
 // New creates a new S3 storage client
 func New(
 	config *Config,
 	log logrus.FieldLogger,
+	metricsSvc *metrics.Metrics,
 ) (Client, error) {
 	if log == nil {
 		return nil, fmt.Errorf("logger is required")
 	}
 
-	return &client{
+	c := &client{
 		log:        log.WithField("module", "storage"),
 		config:     config,
 		encoders:   NewRegistry(),
 		compressor: NewCompressor(),
-	}, nil
+	}
+
+	// Initialize metrics if provided
+	if metricsSvc != nil {
+		collector := metricsSvc.NewCollector("storage")
+		c.metricsCollector = collector
+
+		var err error
+
+		// Operations counter (put/get/delete/list/exists)
+		c.operationsTotal, err = collector.NewCounterVec(
+			"operations_total",
+			"Total number of storage operations",
+			[]string{"operation", "status"},
+		)
+		if err != nil {
+			log.WithError(err).Warn("Failed to create storage_operations_total metric")
+		}
+
+		// Operation duration histogram
+		c.operationDuration, err = collector.NewHistogramVec(
+			"operation_duration_seconds",
+			"Duration of storage operations in seconds",
+			[]string{"operation"},
+			nil, // Use default buckets
+		)
+		if err != nil {
+			log.WithError(err).Warn("Failed to create storage_operation_duration_seconds metric")
+		}
+
+		// Bytes processed counter (read/write)
+		c.bytesProcessed, err = collector.NewCounterVec(
+			"bytes_processed_total",
+			"Total number of bytes processed by storage operations",
+			[]string{"operation"},
+		)
+		if err != nil {
+			log.WithError(err).Warn("Failed to create storage_bytes_processed_total metric")
+		}
+
+		// Errors counter
+		c.errorsTotal, err = collector.NewCounterVec(
+			"errors_total",
+			"Total number of storage operation errors",
+			[]string{"operation"},
+		)
+		if err != nil {
+			log.WithError(err).Warn("Failed to create storage_errors_total metric")
+		}
+	}
+
+	return c, nil
 }
 
 func (c *client) Start(ctx context.Context) error {
@@ -194,6 +253,24 @@ func (c *client) GetBucket() string {
 
 // Exists checks if a key exists in storage
 func (c *client) Exists(ctx context.Context, key string) (bool, error) {
+	start := time.Now()
+	var status string = "success"
+	var exists bool
+
+	defer func() {
+		if c.operationsTotal != nil {
+			c.operationsTotal.With(prometheus.Labels{
+				"operation": "exists",
+				"status":    status,
+			}).Inc()
+		}
+		if c.operationDuration != nil {
+			c.operationDuration.With(prometheus.Labels{
+				"operation": "exists",
+			}).Observe(time.Since(start).Seconds())
+		}
+	}()
+
 	rsp, err := c.client.HeadObject(ctx, &s3.HeadObjectInput{
 		Bucket: aws.String(c.config.Bucket),
 		Key:    aws.String(key),
@@ -202,24 +279,52 @@ func (c *client) Exists(ctx context.Context, key string) (bool, error) {
 		// Check for NoSuchKey error using APIError type
 		var apiErr smithy.APIError
 		if errors.As(err, &apiErr) && (apiErr.ErrorCode() == "NoSuchKey" || apiErr.ErrorCode() == "NotFound") {
-			return false, nil
+			exists = false
+			return exists, nil
 		}
 
+		status = "error"
+		if c.errorsTotal != nil {
+			c.errorsTotal.With(prometheus.Labels{"operation": "exists"}).Inc()
+		}
 		return false, fmt.Errorf("failed to check if object exists: %w", err)
 	}
 
 	if rsp == nil {
-		return false, nil
+		exists = false
+		return exists, nil
 	}
 
-	return true, nil
+	exists = true
+	return exists, nil
 }
 
 // Store stores data based on the provided parameters.
 // It handles encoding, compression, atomicity, content type, and metadata.
 func (c *client) Store(ctx context.Context, params StoreParams) error {
+	start := time.Now()
+	var status string = "success"
+
+	defer func() {
+		if c.operationsTotal != nil {
+			c.operationsTotal.With(prometheus.Labels{
+				"operation": "store",
+				"status":    status,
+			}).Inc()
+		}
+		if c.operationDuration != nil {
+			c.operationDuration.With(prometheus.Labels{
+				"operation": "store",
+			}).Observe(time.Since(start).Seconds())
+		}
+	}()
+
 	// Validate params before proceeding
 	if err := params.Validate(); err != nil {
+		status = "error"
+		if c.errorsTotal != nil {
+			c.errorsTotal.With(prometheus.Labels{"operation": "store"}).Inc()
+		}
 		return fmt.Errorf("invalid store parameters: %w", err)
 	}
 
@@ -230,11 +335,19 @@ func (c *client) Store(ctx context.Context, params StoreParams) error {
 	if params.Format != "" {
 		codec, err := c.encoders.Get(params.Format)
 		if err != nil {
+			status = "error"
+			if c.errorsTotal != nil {
+				c.errorsTotal.With(prometheus.Labels{"operation": "store"}).Inc()
+			}
 			return fmt.Errorf("failed to get codec '%s': %w", params.Format, err)
 		}
 
 		dataBytes, err = codec.Encode(params.Data)
 		if err != nil {
+			status = "error"
+			if c.errorsTotal != nil {
+				c.errorsTotal.With(prometheus.Labels{"operation": "store"}).Inc()
+			}
 			return fmt.Errorf("failed to encode object with format '%s': %w", params.Format, err)
 		}
 
@@ -255,6 +368,10 @@ func (c *client) Store(ctx context.Context, params StoreParams) error {
 		var ok bool
 		dataBytes, ok = params.Data.([]byte)
 		if !ok {
+			status = "error"
+			if c.errorsTotal != nil {
+				c.errorsTotal.With(prometheus.Labels{"operation": "store"}).Inc()
+			}
 			return fmt.Errorf("invalid data type: expected []byte when Format is not specified, got %T", params.Data)
 		}
 	}
@@ -263,6 +380,10 @@ func (c *client) Store(ctx context.Context, params StoreParams) error {
 	if params.Compression != nil && params.Compression != None {
 		compressed, err := c.compressor.Compress(dataBytes, params.Compression)
 		if err != nil {
+			status = "error"
+			if c.errorsTotal != nil {
+				c.errorsTotal.With(prometheus.Labels{"operation": "store"}).Inc()
+			}
 			return fmt.Errorf("failed to compress data: %w", err)
 		}
 		dataBytes = compressed
@@ -279,6 +400,10 @@ func (c *client) Store(ctx context.Context, params StoreParams) error {
 	if params.Format != "" {
 		codec, err := c.encoders.Get(params.Format)
 		if err != nil {
+			status = "error"
+			if c.errorsTotal != nil {
+				c.errorsTotal.With(prometheus.Labels{"operation": "store"}).Inc()
+			}
 			return fmt.Errorf("failed to get codec '%s': %w", params.Format, err)
 		}
 		contentType = codec.GetContentType()
@@ -287,12 +412,21 @@ func (c *client) Store(ctx context.Context, params StoreParams) error {
 		contentType = "application/octet-stream"
 	}
 
+	// Track bytes written
+	if c.bytesProcessed != nil {
+		c.bytesProcessed.With(prometheus.Labels{"operation": "write"}).Add(float64(len(dataBytes)))
+	}
+
 	// 4. Handle Atomicity
 	if params.Atomic {
 		tempKey := fmt.Sprintf("%s.%d.tmp", finalKey, time.Now().UnixNano())
 
 		// Store the data in a temporary location
 		if err := c.putObject(ctx, tempKey, dataBytes, contentType, params.Metadata); err != nil {
+			status = "error"
+			if c.errorsTotal != nil {
+				c.errorsTotal.With(prometheus.Labels{"operation": "store"}).Inc()
+			}
 			return fmt.Errorf("atomic store failed (temp write): %w", err)
 		}
 
@@ -300,6 +434,10 @@ func (c *client) Store(ctx context.Context, params StoreParams) error {
 		if err := c.copyObject(ctx, tempKey, finalKey, contentType, params.Metadata); err != nil {
 			// Attempt cleanup on copy failure
 			_ = c.deleteObject(ctx, tempKey) // Best effort delete
+			status = "error"
+			if c.errorsTotal != nil {
+				c.errorsTotal.With(prometheus.Labels{"operation": "store"}).Inc()
+			}
 			return fmt.Errorf("atomic store failed (copy): %w", err)
 		}
 
@@ -311,13 +449,45 @@ func (c *client) Store(ctx context.Context, params StoreParams) error {
 		return nil // Atomic store successful
 	} else {
 		// Non-atomic store: write directly to the final key
-		return c.putObject(ctx, finalKey, dataBytes, contentType, params.Metadata)
+		err := c.putObject(ctx, finalKey, dataBytes, contentType, params.Metadata)
+		if err != nil {
+			status = "error"
+			if c.errorsTotal != nil {
+				c.errorsTotal.With(prometheus.Labels{"operation": "store"}).Inc()
+			}
+		}
+		return err
 	}
 }
 
 // Get retrieves data from storage
 func (c *client) Get(ctx context.Context, key string) ([]byte, error) {
+	start := time.Now()
+	var status string = "success"
+	var data []byte
+
+	defer func() {
+		if c.operationsTotal != nil {
+			c.operationsTotal.With(prometheus.Labels{
+				"operation": "get",
+				"status":    status,
+			}).Inc()
+		}
+		if c.operationDuration != nil {
+			c.operationDuration.With(prometheus.Labels{
+				"operation": "get",
+			}).Observe(time.Since(start).Seconds())
+		}
+		if data != nil && c.bytesProcessed != nil {
+			c.bytesProcessed.With(prometheus.Labels{"operation": "read"}).Add(float64(len(data)))
+		}
+	}()
+
 	if c.client == nil {
+		status = "error"
+		if c.errorsTotal != nil {
+			c.errorsTotal.With(prometheus.Labels{"operation": "get"}).Inc()
+		}
 		return nil, fmt.Errorf("S3 client not initialized, call Start() first")
 	}
 
@@ -331,15 +501,24 @@ func (c *client) Get(ctx context.Context, key string) ([]byte, error) {
 		var apiErr smithy.APIError
 		if errors.As(err, &apiErr) {
 			if apiErr.ErrorCode() == "NoSuchKey" || apiErr.ErrorCode() == "NotFound" {
+				status = "not_found"
 				return nil, ErrNotFound
 			}
+		}
+		status = "error"
+		if c.errorsTotal != nil {
+			c.errorsTotal.With(prometheus.Labels{"operation": "get"}).Inc()
 		}
 		return nil, fmt.Errorf("failed to get object: %w", err)
 	}
 	defer result.Body.Close()
 
-	data, err := io.ReadAll(result.Body)
+	data, err = io.ReadAll(result.Body)
 	if err != nil {
+		status = "error"
+		if c.errorsTotal != nil {
+			c.errorsTotal.With(prometheus.Labels{"operation": "get"}).Inc()
+		}
 		return nil, fmt.Errorf("failed to read object body: %w", err)
 	}
 
@@ -359,9 +538,13 @@ func (c *client) Get(ctx context.Context, key string) ([]byte, error) {
 		if err == nil && algo != None {
 			decompressed, err := c.compressor.DecompressWithAlgorithm(data, algo)
 			if err != nil {
+				status = "error"
+				if c.errorsTotal != nil {
+					c.errorsTotal.With(prometheus.Labels{"operation": "get"}).Inc()
+				}
 				return nil, fmt.Errorf("failed to decompress data: %w", err)
 			}
-			return decompressed, nil
+			data = decompressed
 		}
 	}
 
@@ -370,12 +553,58 @@ func (c *client) Get(ctx context.Context, key string) ([]byte, error) {
 
 // Delete removes data from storage
 func (c *client) Delete(ctx context.Context, key string) error {
-	return c.deleteObject(ctx, key)
+	start := time.Now()
+	var status string = "success"
+
+	defer func() {
+		if c.operationsTotal != nil {
+			c.operationsTotal.With(prometheus.Labels{
+				"operation": "delete",
+				"status":    status,
+			}).Inc()
+		}
+		if c.operationDuration != nil {
+			c.operationDuration.With(prometheus.Labels{
+				"operation": "delete",
+			}).Observe(time.Since(start).Seconds())
+		}
+	}()
+
+	err := c.deleteObject(ctx, key)
+	if err != nil {
+		status = "error"
+		if c.errorsTotal != nil {
+			c.errorsTotal.With(prometheus.Labels{"operation": "delete"}).Inc()
+		}
+	}
+	return err
 }
 
 // List lists objects with the given prefix
 func (c *client) List(ctx context.Context, prefix string) ([]string, error) {
+	start := time.Now()
+	var status string = "success"
+	var keys []string
+
+	defer func() {
+		if c.operationsTotal != nil {
+			c.operationsTotal.With(prometheus.Labels{
+				"operation": "list",
+				"status":    status,
+			}).Inc()
+		}
+		if c.operationDuration != nil {
+			c.operationDuration.With(prometheus.Labels{
+				"operation": "list",
+			}).Observe(time.Since(start).Seconds())
+		}
+	}()
+
 	if c.client == nil {
+		status = "error"
+		if c.errorsTotal != nil {
+			c.errorsTotal.With(prometheus.Labels{"operation": "list"}).Inc()
+		}
 		return nil, fmt.Errorf("S3 client not initialized, call Start() first")
 	}
 
@@ -386,10 +615,14 @@ func (c *client) List(ctx context.Context, prefix string) ([]string, error) {
 
 	result, err := c.client.ListObjectsV2(ctx, listObjectsInput)
 	if err != nil {
+		status = "error"
+		if c.errorsTotal != nil {
+			c.errorsTotal.With(prometheus.Labels{"operation": "list"}).Inc()
+		}
 		return nil, fmt.Errorf("failed to list objects: %w", err)
 	}
 
-	keys := make([]string, 0, len(result.Contents))
+	keys = make([]string, 0, len(result.Contents))
 	for _, object := range result.Contents {
 		keys = append(keys, *object.Key)
 	}
@@ -399,17 +632,46 @@ func (c *client) List(ctx context.Context, prefix string) ([]string, error) {
 
 // GetEncoded retrieves data from storage and decodes it into a struct
 func (c *client) GetEncoded(ctx context.Context, key string, v any, format CodecName) error {
+	start := time.Now()
+	var status string = "success"
+
+	defer func() {
+		if c.operationsTotal != nil {
+			c.operationsTotal.With(prometheus.Labels{
+				"operation": "get_encoded",
+				"status":    status,
+			}).Inc()
+		}
+		if c.operationDuration != nil {
+			c.operationDuration.With(prometheus.Labels{
+				"operation": "get_encoded",
+			}).Observe(time.Since(start).Seconds())
+		}
+	}()
+
 	data, err := c.Get(ctx, key)
 	if err != nil {
+		status = "error"
+		if c.errorsTotal != nil {
+			c.errorsTotal.With(prometheus.Labels{"operation": "get_encoded"}).Inc()
+		}
 		return fmt.Errorf("GetEncoded failed: %w", err)
 	}
 
 	codec, err := c.encoders.Get(format)
 	if err != nil {
+		status = "error"
+		if c.errorsTotal != nil {
+			c.errorsTotal.With(prometheus.Labels{"operation": "get_encoded"}).Inc()
+		}
 		return fmt.Errorf("GetEncoded failed: %w", err)
 	}
 
 	if err := codec.Decode(data, v); err != nil {
+		status = "error"
+		if c.errorsTotal != nil {
+			c.errorsTotal.With(prometheus.Labels{"operation": "get_encoded"}).Inc()
+		}
 		return fmt.Errorf("GetEncoded failed: %w", err)
 	}
 

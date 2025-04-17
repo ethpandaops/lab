@@ -7,17 +7,21 @@ import (
 	"time"
 
 	"github.com/ethpandaops/lab/pkg/internal/lab/cache"
+	"github.com/ethpandaops/lab/pkg/internal/lab/metrics"
 	"github.com/sirupsen/logrus"
 )
 
 func ExampleLocker_Lock() {
+	// Create a new metrics service
+	metricsSvc := metrics.NewMetricsService("lab", logrus.New())
+
 	// Create a new memory cache
 	cache := cache.NewMemory(cache.MemoryConfig{
 		DefaultTTL: 5 * time.Minute,
-	})
+	}, metricsSvc)
 
 	// Get the locker
-	locker := New(logrus.New(), cache)
+	locker := New(logrus.New(), cache, metricsSvc)
 
 	// Acquire a lock for 30 seconds
 	token, success, err := locker.Lock("my-resource", 30*time.Second)
@@ -50,13 +54,16 @@ func ExampleLocker_Lock() {
 }
 
 func TestDistributedLock(t *testing.T) {
+	// Create a new metrics service
+	metricsSvc := metrics.NewMetricsService("lab", logrus.New())
+
 	// Create a new memory cache
 	cache := cache.NewMemory(cache.MemoryConfig{
 		DefaultTTL: 5 * time.Minute,
-	})
+	}, metricsSvc)
 
 	// Get the locker
-	locker := New(logrus.New(), cache)
+	locker := New(logrus.New(), cache, metricsSvc)
 
 	// Test that a lock can be acquired and released
 	token, success, err := locker.Lock("test-lock", 10*time.Second)
@@ -96,13 +103,16 @@ func TestDistributedLock(t *testing.T) {
 }
 
 func TestConcurrentLocking(t *testing.T) {
+	// Create a new metrics service
+	metricsSvc := metrics.NewMetricsService("lab", logrus.New())
+
 	// Create a new memory cache
 	cache := cache.NewMemory(cache.MemoryConfig{
 		DefaultTTL: 5 * time.Minute,
-	})
+	}, metricsSvc)
 
 	// Get the locker
-	locker := New(logrus.New(), cache)
+	locker := New(logrus.New(), cache, metricsSvc)
 
 	// Keep track of how many goroutines acquired the lock
 	var lockAcquired int

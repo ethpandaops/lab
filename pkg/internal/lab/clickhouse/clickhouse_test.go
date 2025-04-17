@@ -8,6 +8,7 @@ import (
 
 	"github.com/docker/go-connections/nat"
 	"github.com/ethpandaops/lab/pkg/internal/lab/clickhouse"
+	"github.com/ethpandaops/lab/pkg/internal/lab/metrics"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -76,6 +77,10 @@ func TestClickHouseIntegration(t *testing.T) {
 
 	t.Run("TestDSNVariations", func(t *testing.T) {
 		testDSNVariations(t, ctx, host, port.Port(), logger)
+	})
+
+	t.Run("TestWithMetrics", func(t *testing.T) {
+		testWithMetrics(t, ctx, config, logger)
 	})
 
 	// Initialize client for subsequent tests
@@ -483,4 +488,56 @@ func testDataTypes(t *testing.T, ctx context.Context, client clickhouse.Client) 
 	// Clean up
 	err = client.Exec(ctx, "DROP TABLE test_data_types")
 	assert.NoError(t, err, "Should drop table without error")
+}
+
+// testWithMetrics tests the client with metrics instrumentation
+func testWithMetrics(t *testing.T, ctx context.Context, config *clickhouse.Config, logger logrus.FieldLogger) {
+	// Create a metrics service
+	metricsSvc := metrics.NewMetricsService("test", logger)
+	require.NotNil(t, metricsSvc, "Metrics service should not be nil")
+
+	// Create client with metrics
+	client, err := clickhouse.New(config, logger, metricsSvc)
+	require.NoError(t, err, "Should create client with metrics")
+	require.NotNil(t, client, "Client should not be nil")
+
+	// Start the client
+	err = client.Start(ctx)
+	require.NoError(t, err, "Should start client with metrics")
+
+	// Create a test table for insert operations
+	err = client.Exec(ctx, `
+		CREATE TABLE IF NOT EXISTS test_metrics (
+			id UInt32,
+			name String
+		) ENGINE = Memory
+	`)
+	assert.NoError(t, err, "Should create table without error")
+
+	// Execute some operations to generate metrics
+	err = client.Exec(ctx, "SELECT 1")
+	assert.NoError(t, err, "Should execute query with metrics")
+
+	_, err = client.Query(ctx, "SELECT 1")
+	assert.NoError(t, err, "Should query with metrics")
+
+	_, err = client.QueryRow(ctx, "SELECT 1")
+	assert.NoError(t, err, "Should query row with metrics")
+
+	// Test insert operation to trigger insert-specific metrics
+	err = client.Exec(ctx, "INSERT INTO test_metrics (id, name) VALUES (?, ?)", uint32(1), "test_metrics")
+	assert.NoError(t, err, "Should execute insert with metrics")
+
+	// Test batch insert operation
+	err = client.Exec(ctx, "INSERT INTO test_metrics (id, name) VALUES (?, ?), (?, ?)",
+		uint32(2), "test_batch1", uint32(3), "test_batch2")
+	assert.NoError(t, err, "Should execute batch insert with metrics")
+
+	// Clean up
+	err = client.Exec(ctx, "DROP TABLE test_metrics")
+	assert.NoError(t, err, "Should drop table without error")
+
+	// Stop the client
+	err = client.Stop()
+	assert.NoError(t, err, "Should stop client with metrics")
 }

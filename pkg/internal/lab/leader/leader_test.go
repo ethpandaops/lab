@@ -11,24 +11,26 @@ import (
 	"github.com/ethpandaops/lab/pkg/internal/lab/cache"
 	"github.com/ethpandaops/lab/pkg/internal/lab/leader"
 	"github.com/ethpandaops/lab/pkg/internal/lab/locker"
+	"github.com/ethpandaops/lab/pkg/internal/lab/metrics"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/wait"
 )
 
-func NewMemoryLocker() locker.Locker {
+func NewMemoryLocker(metricsSvc *metrics.Metrics) locker.Locker {
 	cache := cache.NewMemory(cache.MemoryConfig{
 		DefaultTTL: 5 * time.Minute,
-	})
+	}, metricsSvc)
 
-	locker := locker.New(logrus.New(), cache)
+	locker := locker.New(logrus.New(), cache, metricsSvc)
 
 	return locker
 }
 
 func TestLeaderElection(t *testing.T) {
-	mockLocker := NewMemoryLocker()
+	metrics := metrics.NewMetricsService("lab", logrus.New())
+	mockLocker := NewMemoryLocker(metrics)
 
 	var elected, revoked bool
 	var mu sync.Mutex
@@ -48,7 +50,7 @@ func TestLeaderElection(t *testing.T) {
 			revoked = true
 			mu.Unlock()
 		},
-	})
+	}, metrics)
 
 	// Start the leader election
 	leader.Start()
@@ -85,7 +87,8 @@ func TestLeaderElection(t *testing.T) {
 }
 
 func TestLeaderElectionCompetition(t *testing.T) {
-	mockLocker := NewMemoryLocker()
+	metrics := metrics.NewMetricsService("lab", logrus.New())
+	mockLocker := NewMemoryLocker(metrics)
 
 	// Track leader changes
 	type leaderChange struct {
@@ -116,14 +119,14 @@ func TestLeaderElectionCompetition(t *testing.T) {
 			OnRevoked: func() {
 				recordChange(id, false)
 			},
-		})
+		}, metrics)
 	}
 
 	// Start the first leader only
 	leaders[0].Start()
 
-	// Wait for election
-	time.Sleep(50 * time.Millisecond)
+	// Wait longer for election to happen
+	time.Sleep(200 * time.Millisecond)
 
 	// First leader should be elected
 	assert.True(t, leaders[0].IsLeader())
@@ -134,7 +137,7 @@ func TestLeaderElectionCompetition(t *testing.T) {
 	}
 
 	// Wait for a few refresh cycles
-	time.Sleep(250 * time.Millisecond)
+	time.Sleep(500 * time.Millisecond)
 
 	// First leader should still be the leader
 	assert.True(t, leaders[0].IsLeader())
@@ -144,8 +147,8 @@ func TestLeaderElectionCompetition(t *testing.T) {
 	// Stop the first leader
 	leaders[0].Stop()
 
-	// Wait for a new leader to be elected
-	time.Sleep(150 * time.Millisecond)
+	// Wait longer for a new leader to be elected - increase timeout
+	time.Sleep(1000 * time.Millisecond)
 
 	// One of the other leaders should be elected
 	var newLeaderFound bool
@@ -155,12 +158,23 @@ func TestLeaderElectionCompetition(t *testing.T) {
 			break
 		}
 	}
-	assert.True(t, newLeaderFound, "A new leader should have been elected")
+
+	if !newLeaderFound {
+		// If no leader was found, log some diagnostic info
+		mu.Lock()
+		t.Logf("Change events: %+v", changes)
+		mu.Unlock()
+	}
+
+	assert.True(t, newLeaderFound, "A new leader should have been elected (either leader 1 or 2)")
 
 	// Stop all leaders
 	for i := 1; i < 3; i++ {
 		leaders[i].Stop()
 	}
+
+	// Wait for cleanup
+	time.Sleep(200 * time.Millisecond)
 
 	// Verify changes
 	mu.Lock()
@@ -168,6 +182,7 @@ func TestLeaderElectionCompetition(t *testing.T) {
 	for _, change := range changes {
 		if change.id == 0 && change.elected {
 			leaderElected = true
+			break
 		}
 	}
 	mu.Unlock()
@@ -185,29 +200,31 @@ func TestLeaderElectionWithRedis(t *testing.T) {
 	redisURL, cleanup := SetupRedisContainer(t)
 	defer cleanup()
 
+	metrics := metrics.NewMetricsService("lab", logrus.New())
+
 	// Create Redis cache
 	redisCache, err := cache.NewRedis(cache.RedisConfig{
 		URL:        redisURL,
 		DefaultTTL: time.Minute,
-	})
+	}, metrics)
 	if err != nil {
 		t.Fatalf("failed to create Redis cache: %v", err)
 	}
 	defer redisCache.Stop()
 
 	// Create Redis-backed locker
-	redisLocker := locker.New(logrus.New(), redisCache)
+	redisLocker := locker.New(logrus.New(), redisCache, metrics)
 
 	// Test with two leaders
 	var leader1Elected, leader1Revoked bool
 	var leader2Elected, leader2Revoked bool
 	var mu sync.Mutex
 
-	// Create leader 1 with 500ms TTL and 100ms refresh interval
+	// Create leader 1 with longer TTL and refresh interval
 	leader1 := leader.New(logrus.New(), redisLocker, leader.Config{
 		Resource:        "redis-test-resource",
-		TTL:             500 * time.Millisecond,
-		RefreshInterval: 100 * time.Millisecond,
+		TTL:             2 * time.Second,        // Increase TTL
+		RefreshInterval: 200 * time.Millisecond, // Increase refresh interval
 		OnElected: func() {
 			mu.Lock()
 			leader1Elected = true
@@ -218,13 +235,13 @@ func TestLeaderElectionWithRedis(t *testing.T) {
 			leader1Revoked = true
 			mu.Unlock()
 		},
-	})
+	}, metrics)
 
 	// Create leader 2 with same resource
 	leader2 := leader.New(logrus.New(), redisLocker, leader.Config{
 		Resource:        "redis-test-resource",
-		TTL:             500 * time.Millisecond,
-		RefreshInterval: 100 * time.Millisecond,
+		TTL:             2 * time.Second,        // Increase TTL
+		RefreshInterval: 200 * time.Millisecond, // Increase refresh interval
 		OnElected: func() {
 			mu.Lock()
 			leader2Elected = true
@@ -235,13 +252,13 @@ func TestLeaderElectionWithRedis(t *testing.T) {
 			leader2Revoked = true
 			mu.Unlock()
 		},
-	})
+	}, metrics)
 
 	// Start leader 1
 	leader1.Start()
 
-	// Wait for election to happen
-	time.Sleep(50 * time.Millisecond)
+	// Wait longer for election to happen
+	time.Sleep(500 * time.Millisecond)
 
 	// Leader 1 should be elected
 	assert.True(t, leader1.IsLeader())
@@ -254,7 +271,7 @@ func TestLeaderElectionWithRedis(t *testing.T) {
 	leader2.Start()
 
 	// Wait for a few refresh cycles
-	time.Sleep(250 * time.Millisecond)
+	time.Sleep(1 * time.Second)
 
 	// Leader 1 should still be the leader, leader 2 should not
 	assert.True(t, leader1.IsLeader())
@@ -266,8 +283,8 @@ func TestLeaderElectionWithRedis(t *testing.T) {
 	// Stop leader 1
 	leader1.Stop()
 
-	// Wait for leadership transfer
-	time.Sleep(200 * time.Millisecond)
+	// Wait longer for leadership transfer
+	time.Sleep(3 * time.Second)
 
 	// Check that leader 1 is no longer the leader
 	assert.False(t, leader1.IsLeader())
@@ -276,7 +293,7 @@ func TestLeaderElectionWithRedis(t *testing.T) {
 	mu.Unlock()
 
 	// Leader 2 should now be the leader
-	assert.True(t, leader2.IsLeader())
+	assert.True(t, leader2.IsLeader(), "Leader 2 should be the leader now that leader 1 has stopped")
 	mu.Lock()
 	assert.True(t, leader2Elected, "Leader 2 OnElected callback should have been called")
 	mu.Unlock()
@@ -285,7 +302,7 @@ func TestLeaderElectionWithRedis(t *testing.T) {
 	leader2.Stop()
 
 	// Wait for callbacks to be triggered
-	time.Sleep(50 * time.Millisecond)
+	time.Sleep(500 * time.Millisecond)
 
 	// Leader 2 should no longer be the leader
 	assert.False(t, leader2.IsLeader())

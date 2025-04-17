@@ -6,6 +6,8 @@ import (
 	"time"
 
 	"github.com/ethpandaops/lab/pkg/internal/lab/locker"
+	"github.com/ethpandaops/lab/pkg/internal/lab/metrics"
+	"github.com/prometheus/client_golang/prometheus"
 	"github.com/sirupsen/logrus"
 )
 
@@ -50,17 +52,25 @@ type client struct {
 	cancel  context.CancelFunc
 	started bool
 	stopped bool
+
+	// Metrics
+	metrics                *metrics.Metrics
+	collector              *metrics.Collector
+	isLeaderGauge          *prometheus.GaugeVec
+	electionAttemptsTotal  *prometheus.CounterVec
+	leadershipChangesTotal *prometheus.CounterVec
+	errorsTotal            *prometheus.CounterVec
 }
 
 // New creates a new Client election controller
-func New(log logrus.FieldLogger, locker locker.Locker, config Config) *client {
+func New(log logrus.FieldLogger, locker locker.Locker, config Config, metricsSvc *metrics.Metrics) *client {
 	if config.RefreshInterval == 0 {
 		config.RefreshInterval = config.TTL / 3
 	}
 
 	ctx, cancel := context.WithCancel(context.Background())
 
-	return &client{
+	c := &client{
 		log:      log.WithField("component", "lab/leader").WithField("resource", config.Resource),
 		config:   config,
 		locker:   locker,
@@ -70,6 +80,62 @@ func New(log logrus.FieldLogger, locker locker.Locker, config Config) *client {
 		token:    "",
 		started:  false,
 		stopped:  false,
+		metrics:  metricsSvc,
+	}
+
+	c.initMetrics()
+
+	return c
+}
+
+// initMetrics initializes Prometheus metrics for the leader
+func (l *client) initMetrics() {
+	// Create a collector for the leader subsystem
+	l.collector = l.metrics.NewCollector("leader")
+
+	// Register metrics
+	var err error
+
+	// Gauge to indicate if this instance is the leader
+	l.isLeaderGauge, err = l.collector.NewGaugeVec(
+		"is_leader",
+		"Indicates if this instance is currently the leader (1) or not (0)",
+		[]string{},
+	)
+	if err != nil {
+		l.log.WithError(err).Warn("Failed to create is_leader metric")
+	}
+	// Initialize to 0 (not leader)
+	l.isLeaderGauge.WithLabelValues().Set(0)
+
+	// Counter for leader election attempts
+	l.electionAttemptsTotal, err = l.collector.NewCounterVec(
+		"election_attempts_total",
+		"Total number of leader election attempts",
+		[]string{"status"},
+	)
+	if err != nil {
+		l.log.WithError(err).Warn("Failed to create election_attempts_total metric")
+	}
+
+	// Counter for leadership changes
+	l.leadershipChangesTotal, err = l.collector.NewCounterVec(
+		"leadership_changes_total",
+		"Total number of leadership changes",
+		[]string{"change"},
+	)
+	if err != nil {
+		l.log.WithError(err).Warn("Failed to create leadership_changes_total metric")
+	}
+
+	// Counter for errors
+	l.errorsTotal, err = l.collector.NewCounterVec(
+		"errors_total",
+		"Total number of errors during leader election",
+		[]string{"operation"},
+	)
+	if err != nil {
+		l.log.WithError(err).Warn("Failed to create errors_total metric")
 	}
 }
 
@@ -124,6 +190,10 @@ func (l *client) Stop() {
 		l.isLeader = false
 		l.token = ""
 
+		// Update metrics
+		l.isLeaderGauge.WithLabelValues().Set(0)
+		l.leadershipChangesTotal.WithLabelValues("lost").Inc()
+
 		if l.config.OnRevoked != nil {
 			// Call callback outside of lock
 			go l.config.OnRevoked()
@@ -161,6 +231,12 @@ func (l *client) run() {
 					l.token = ""
 					l.mu.Unlock()
 
+					// Update metrics
+					l.isLeaderGauge.WithLabelValues().Set(0)
+					if wasLeader {
+						l.leadershipChangesTotal.WithLabelValues("lost").Inc()
+					}
+
 					if wasLeader && l.config.OnRevoked != nil {
 						l.config.OnRevoked()
 					}
@@ -196,17 +272,32 @@ func (l *client) tryAcquireLeadership() bool {
 	}
 
 	token, success, err := l.locker.Lock(l.config.Resource, l.config.TTL)
-	if err != nil || !success {
+
+	// Track attempt in metrics
+	if err != nil {
+		l.electionAttemptsTotal.WithLabelValues("error").Inc()
+		l.errorsTotal.WithLabelValues("acquire").Inc()
+		return false
+	} else if !success {
+		l.electionAttemptsTotal.WithLabelValues("failure").Inc()
 		return false
 	}
 
 	l.log.Info("Successfully acquired leadership")
+	l.electionAttemptsTotal.WithLabelValues("success").Inc()
 
 	// Successfully acquired lock
 	l.mu.Lock()
+	wasLeader := l.isLeader
 	l.isLeader = true
 	l.token = token
 	l.mu.Unlock()
+
+	// Update metrics
+	l.isLeaderGauge.WithLabelValues().Set(1)
+	if !wasLeader {
+		l.leadershipChangesTotal.WithLabelValues("gained").Inc()
+	}
 
 	return true
 }
@@ -253,6 +344,7 @@ func (l *client) refreshLock() bool {
 	released, _ := l.locker.Unlock(l.config.Resource, token)
 	if !released {
 		l.log.Error("Failed to release our own lock, something is wrong")
+		l.errorsTotal.WithLabelValues("release").Inc()
 
 		// We couldn't release our own lock, something is wrong
 		return false
@@ -262,6 +354,7 @@ func (l *client) refreshLock() bool {
 	newToken, success, err = l.locker.Lock(l.config.Resource, l.config.TTL)
 	if err != nil || !success {
 		l.log.Error("Failed to reacquire lock, something is wrong")
+		l.errorsTotal.WithLabelValues("reacquire").Inc()
 
 		return false
 	}

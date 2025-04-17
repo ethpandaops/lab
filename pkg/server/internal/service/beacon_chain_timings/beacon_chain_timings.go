@@ -9,6 +9,7 @@ import (
 	"github.com/ethpandaops/lab/pkg/internal/lab/ethereum"
 	"github.com/ethpandaops/lab/pkg/internal/lab/leader"
 	"github.com/ethpandaops/lab/pkg/internal/lab/locker"
+	"github.com/ethpandaops/lab/pkg/internal/lab/metrics"
 	"github.com/ethpandaops/lab/pkg/internal/lab/state"
 	"github.com/ethpandaops/lab/pkg/internal/lab/storage"
 	"github.com/ethpandaops/lab/pkg/internal/lab/xatu"
@@ -38,12 +39,14 @@ type BeaconChainTimings struct {
 
 	config *Config
 
-	ethereumConfig *ethereum.Config
-	xatuClient     *xatu.Client
-	storageClient  storage.Client
-	cacheClient    cache.Client
-	lockerClient   locker.Locker
-	stateClient    state.Client[*pb.State]
+	ethereumConfig   *ethereum.Config
+	xatuClient       *xatu.Client
+	storageClient    storage.Client
+	cacheClient      cache.Client
+	lockerClient     locker.Locker
+	stateClient      state.Client[*pb.State]
+	metrics          *metrics.Metrics
+	metricsCollector *metrics.Collector
 
 	leaderClient leader.Client
 
@@ -64,19 +67,30 @@ func New(
 	storageClient storage.Client,
 	cacheClient cache.Client,
 	lockerClient locker.Locker,
+	metricsSvc *metrics.Metrics,
 ) (*BeaconChainTimings, error) {
+	serviceLog := log.WithField("component", "service/beacon_chain_timings")
+
+	var metricsCollector *metrics.Collector
+	if metricsSvc != nil {
+		metricsCollector = metricsSvc.NewCollector("beacon_chain_timings")
+		serviceLog.Debug("Created metrics collector for beacon_chain_timings service")
+	}
+
 	return &BeaconChainTimings{
-		log:            log.WithField("component", "service/beacon_chain_timings"),
-		config:         config,
-		ethereumConfig: ethereumConfig,
-		xatuClient:     xatuClient,
-		storageClient:  storageClient,
-		cacheClient:    cacheClient,
-		lockerClient:   lockerClient,
+		log:              serviceLog,
+		config:           config,
+		ethereumConfig:   ethereumConfig,
+		xatuClient:       xatuClient,
+		storageClient:    storageClient,
+		cacheClient:      cacheClient,
+		lockerClient:     lockerClient,
+		metrics:          metricsSvc,
+		metricsCollector: metricsCollector,
 		stateClient: state.New[*pb.State](log, cacheClient, &state.Config{
 			Namespace: BeaconChainTimingsServiceName,
 			TTL:       31 * 24 * time.Hour,
-		}, "state"),
+		}, "state", metricsSvc),
 
 		baseDir: BeaconChainTimingsServiceName,
 
@@ -94,6 +108,11 @@ func (b *BeaconChainTimings) Start(ctx context.Context) error {
 	b.log.Info("Starting BeaconChainTimings service")
 	b.parentCtx = ctx // Store the parent context
 
+	// Initialize metrics if collector is available
+	if b.metricsCollector != nil {
+		b.initializeMetrics()
+	}
+
 	leader := leader.New(b.log, b.lockerClient, leader.Config{
 		Resource:        BeaconChainTimingsServiceName + "/batch_processing",
 		TTL:             30 * time.Second,
@@ -101,6 +120,11 @@ func (b *BeaconChainTimings) Start(ctx context.Context) error {
 
 		OnElected: func() {
 			b.log.Info("Became leader")
+
+			// Update leadership status metric if available
+			if b.metricsCollector != nil {
+				b.updateLeadershipMetric(true)
+			}
 
 			if b.processCtx != nil {
 				// We are already processing, so we don't need to start a new one
@@ -119,19 +143,105 @@ func (b *BeaconChainTimings) Start(ctx context.Context) error {
 		},
 		OnRevoked: func() {
 			b.log.Info("Lost leadership")
+
+			// Update leadership status metric if available
+			if b.metricsCollector != nil {
+				b.updateLeadershipMetric(false)
+			}
+
 			if b.processCtxCancel != nil {
 				b.processCtxCancel()
 				b.processCtx = nil
 				b.processCtxCancel = nil
 			}
 		},
-	})
+	}, b.metrics)
 
 	leader.Start()
 
 	b.leaderClient = leader
 
 	return nil
+}
+
+// initializeMetrics creates and registers all metrics for the beacon_chain_timings service
+func (b *BeaconChainTimings) initializeMetrics() {
+	var err error
+
+	// Processing duration metrics (histograms)
+	_, err = b.metricsCollector.NewHistogramVec(
+		"processing_duration_seconds",
+		"Duration of processing operations in seconds",
+		[]string{"operation", "network", "window"},
+		[]float64{0.1, 0.5, 1, 2, 5, 10, 30, 60, 120, 300},
+	)
+	if err != nil {
+		b.log.WithError(err).Warn("Failed to create processing_duration_seconds metric")
+	}
+
+	// Error count metrics (counter)
+	_, err = b.metricsCollector.NewCounterVec(
+		"processing_errors_total",
+		"Total number of processing errors",
+		[]string{"operation", "network", "window"},
+	)
+	if err != nil {
+		b.log.WithError(err).Warn("Failed to create processing_errors_total metric")
+	}
+
+	// Processing count metrics (counter)
+	_, err = b.metricsCollector.NewCounterVec(
+		"processing_operations_total",
+		"Total number of processing operations",
+		[]string{"operation", "network", "window"},
+	)
+	if err != nil {
+		b.log.WithError(err).Warn("Failed to create processing_operations_total metric")
+	}
+
+	// Processing decisions metrics (counter)
+	_, err = b.metricsCollector.NewCounterVec(
+		"processing_decisions_total",
+		"Total number of processing decisions",
+		[]string{"decision", "reason", "network", "window"},
+	)
+	if err != nil {
+		b.log.WithError(err).Warn("Failed to create processing_decisions_total metric")
+	}
+
+	// Leadership status metric (gauge)
+	_, err = b.metricsCollector.NewGaugeVec(
+		"is_leader",
+		"Indicates whether this instance is currently the leader (1) or not (0)",
+		[]string{},
+	)
+	if err != nil {
+		b.log.WithError(err).Warn("Failed to create is_leader metric")
+	}
+}
+
+// updateLeadershipMetric updates the leadership status metric
+func (b *BeaconChainTimings) updateLeadershipMetric(isLeader bool) {
+	if b.metricsCollector == nil {
+		return
+	}
+
+	leaderMetric, err := b.metricsCollector.NewGaugeVec(
+		"is_leader",
+		"Indicates whether this instance is currently the leader (1) or not (0)",
+		[]string{},
+	)
+	if err != nil {
+		b.log.WithError(err).Warn("Failed to get is_leader metric")
+		return
+	}
+
+	value := 0.0
+	if isLeader {
+		value = 1.0
+	}
+
+	leaderMetric.WithLabelValues().Set(value)
 }
 
 func (b *BeaconChainTimings) Stop() {
@@ -216,6 +326,20 @@ func (b *BeaconChainTimings) GetTimeWindows() []TimeWindow {
 }
 
 func (b *BeaconChainTimings) process(ctx context.Context) {
+	startTime := time.Now()
+
+	// Track overall processing cycle if metrics are available
+	if b.metricsCollector != nil {
+		counter, err := b.metricsCollector.NewCounterVec(
+			"processing_operations_total",
+			"Total number of processing operations",
+			[]string{"operation", "network", "window"},
+		)
+		if err == nil {
+			counter.WithLabelValues("process_cycle", "all", "all").Inc()
+		}
+	}
+
 	// Get the current state
 	var st *pb.State
 
@@ -227,6 +351,18 @@ func (b *BeaconChainTimings) process(ctx context.Context) {
 			st = NewState()
 		} else {
 			b.log.WithError(err).Error("Failed to get state, using initialized default state")
+
+			// Record error metric if available
+			if b.metricsCollector != nil {
+				errorCounter, metricErr := b.metricsCollector.NewCounterVec(
+					"processing_errors_total",
+					"Total number of processing errors",
+					[]string{"operation", "network", "window"},
+				)
+				if metricErr == nil {
+					errorCounter.WithLabelValues("process_cycle", "all", "all").Inc()
+				}
+			}
 
 			return
 		}
@@ -315,6 +451,32 @@ func (b *BeaconChainTimings) process(ctx context.Context) {
 	// Update the state
 	if err := b.stateClient.Set(ctx, st); err != nil {
 		b.log.WithError(err).Error("failed to store state")
+
+		// Record error metric if available
+		if b.metricsCollector != nil {
+			errorCounter, metricErr := b.metricsCollector.NewCounterVec(
+				"processing_errors_total",
+				"Total number of processing errors",
+				[]string{"operation", "network", "window"},
+			)
+			if metricErr == nil {
+				errorCounter.WithLabelValues("state_update", "all", "all").Inc()
+			}
+		}
+	}
+
+	// Record duration metric for the entire processing cycle if available
+	if b.metricsCollector != nil {
+		duration := time.Since(startTime).Seconds()
+		histogram, err := b.metricsCollector.NewHistogramVec(
+			"processing_duration_seconds",
+			"Duration of processing operations in seconds",
+			[]string{"operation", "network", "window"},
+			nil,
+		)
+		if err == nil {
+			histogram.WithLabelValues("process_cycle", "all", "all").Observe(duration)
+		}
 	}
 }
 
@@ -327,13 +489,47 @@ func (b *BeaconChainTimings) shouldProcess(network, window string, lastProcessed
 
 	// If we don't have state yet or it's been long enough since the last update, process
 	if lastProcessed.IsZero() {
+		// Track decision if metrics are available
+		if b.metricsCollector != nil {
+			counter, err := b.metricsCollector.NewCounterVec(
+				"processing_decisions_total",
+				"Total number of processing decisions",
+				[]string{"decision", "reason", "network", "window"},
+			)
+			if err == nil {
+				counter.WithLabelValues("process", "no_previous_state", network, window).Inc()
+			}
+		}
 		return true, nil
 	}
 
-	// Check if it's been long enough since the last update (15 minutes)
+	// Check if it's been long enough since the last update
 	timeSinceLastUpdate := time.Since(lastProcessed)
 	if timeSinceLastUpdate > b.config.GetIntervalDuration() {
+		// Track decision if metrics are available
+		if b.metricsCollector != nil {
+			counter, err := b.metricsCollector.NewCounterVec(
+				"processing_decisions_total",
+				"Total number of processing decisions",
+				[]string{"decision", "reason", "network", "window"},
+			)
+			if err == nil {
+				counter.WithLabelValues("process", "interval_elapsed", network, window).Inc()
+			}
+		}
 		return true, nil
+	}
+
+	// Track decision to skip if metrics are available
+	if b.metricsCollector != nil {
+		counter, err := b.metricsCollector.NewCounterVec(
+			"processing_decisions_total",
+			"Total number of processing decisions",
+			[]string{"decision", "reason", "network", "window"},
+		)
+		if err == nil {
+			counter.WithLabelValues("skip", "recent_update", network, window).Inc()
+		}
 	}
 
 	return false, nil

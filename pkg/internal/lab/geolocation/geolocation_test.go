@@ -12,15 +12,15 @@ import (
 func TestNew(t *testing.T) {
 	log := logrus.New()
 
-	// Test with nil config
-	client, err := New(log, nil)
+	// Test with nil config and nil metrics
+	client, err := New(log, nil, nil)
 	require.NoError(t, err)
 	assert.NotNil(t, client)
 	assert.Equal(t, defaultURL, client.databaseLocation)
 
-	// Test with custom config
+	// Test with custom config and nil metrics
 	customURL := "https://example.com/custom.zip"
-	client, err = New(log, &Config{DatabaseLocation: customURL})
+	client, err = New(log, &Config{DatabaseLocation: customURL}, nil)
 	require.NoError(t, err)
 	assert.NotNil(t, client)
 	assert.Equal(t, customURL, client.databaseLocation)
@@ -51,7 +51,7 @@ func TestIndexOf(t *testing.T) {
 func TestLocationDBStructure(t *testing.T) {
 	log := logrus.New()
 
-	client, err := New(log, nil)
+	client, err := New(log, nil, nil)
 	require.NoError(t, err)
 
 	// Manually add some test data
@@ -112,7 +112,7 @@ func TestLocationDBStructure(t *testing.T) {
 func TestLoadCSVWithMockData(t *testing.T) {
 	log := logrus.New()
 
-	client, err := New(log, nil)
+	client, err := New(log, nil, nil)
 	require.NoError(t, err)
 
 	// Create mock CSV data in memory
@@ -203,7 +203,7 @@ func TestInitialize(t *testing.T) {
 
 	log := logrus.New()
 
-	client, err := New(log, nil)
+	client, err := New(log, nil, nil)
 	require.NoError(t, err)
 
 	err = client.Start(context.Background())

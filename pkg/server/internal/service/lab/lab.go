@@ -2,9 +2,11 @@ package lab
 
 import (
 	"context"
+	"time"
 
 	"github.com/ethpandaops/lab/pkg/internal/lab/cache"
 	"github.com/ethpandaops/lab/pkg/internal/lab/ethereum"
+	"github.com/ethpandaops/lab/pkg/internal/lab/metrics"
 	"github.com/ethpandaops/lab/pkg/server/internal/service/beacon_chain_timings"
 	"github.com/ethpandaops/lab/pkg/server/internal/service/beacon_slots"
 	"github.com/ethpandaops/lab/pkg/server/internal/service/xatu_public_contributors"
@@ -23,6 +25,9 @@ type Lab struct {
 	bctService *beacon_chain_timings.BeaconChainTimings
 	xpcService *xatu_public_contributors.XatuPublicContributors
 	bsService  *beacon_slots.BeaconSlots
+
+	metrics          *metrics.Metrics
+	metricsCollector *metrics.Collector
 }
 
 func New(
@@ -32,13 +37,22 @@ func New(
 	bctService *beacon_chain_timings.BeaconChainTimings,
 	xpcService *xatu_public_contributors.XatuPublicContributors,
 	bsService *beacon_slots.BeaconSlots,
+	metricsSvc *metrics.Metrics,
 ) (*Lab, error) {
+	var metricsCollector *metrics.Collector
+	if metricsSvc != nil {
+		metricsCollector = metricsSvc.NewCollector("api")
+		log.WithField("component", "service/"+ServiceName).Debug("Created metrics collector for lab service")
+	}
+
 	return &Lab{
-		log:        log.WithField("component", "service/"+ServiceName),
-		ethereum:   ethereum,
-		bctService: bctService,
-		xpcService: xpcService,
-		bsService:  bsService,
+		log:              log.WithField("component", "service/"+ServiceName),
+		ethereum:         ethereum,
+		bctService:       bctService,
+		xpcService:       xpcService,
+		bsService:        bsService,
+		metrics:          metricsSvc,
+		metricsCollector: metricsCollector,
 	}, nil
 }
 
@@ -47,8 +61,38 @@ func (l *Lab) Name() string {
 }
 
 func (l *Lab) Start(ctx context.Context) error {
+	// Initialize metrics
+	l.initializeMetrics()
 
 	return nil
+}
+
+// initializeMetrics initializes all metrics for the lab service
+func (l *Lab) initializeMetrics() {
+	if l.metricsCollector == nil {
+		return
+	}
+
+	// API requests counter
+	_, err := l.metricsCollector.NewCounterVec(
+		"requests_total",
+		"Total number of API requests",
+		[]string{"method", "status_code"},
+	)
+	if err != nil {
+		l.log.WithError(err).Warn("Failed to create requests_total metric")
+	}
+
+	// API request duration histogram
+	_, err = l.metricsCollector.NewHistogramVec(
+		"request_duration_seconds",
+		"Duration of API requests in seconds",
+		[]string{"method"},
+		nil, // Use default buckets
+	)
+	if err != nil {
+		l.log.WithError(err).Warn("Failed to create request_duration_seconds metric")
+	}
 }
 
 func (l *Lab) Stop() {
@@ -56,6 +100,36 @@ func (l *Lab) Stop() {
 }
 
 func (l *Lab) GetFrontendConfig() (*pb.FrontendConfig, error) {
+	startTime := time.Now()
+	var err error
+	statusCode := "success"
+
+	// Record metrics when the function completes
+	defer func() {
+		if l.metricsCollector != nil {
+			// Record request count
+			counter, metricErr := l.metricsCollector.NewCounterVec(
+				"requests_total",
+				"Total number of API requests",
+				[]string{"method", "status_code"},
+			)
+			if metricErr == nil {
+				counter.WithLabelValues("GetFrontendConfig", statusCode).Inc()
+			}
+
+			// Record request duration
+			histogram, metricErr := l.metricsCollector.NewHistogramVec(
+				"request_duration_seconds",
+				"Duration of API requests in seconds",
+				[]string{"method"},
+				nil, // Use default buckets
+			)
+			if metricErr == nil {
+				histogram.WithLabelValues("GetFrontendConfig").Observe(time.Since(startTime).Seconds())
+			}
+		}
+	}()
+
 	networksConfig := make(map[string]*pb.FrontendConfig_Network)
 	networks := []string{}
 
@@ -79,6 +153,10 @@ func (l *Lab) GetFrontendConfig() (*pb.FrontendConfig, error) {
 				Beacon:                 l.bsService.FrontendModuleConfig(),
 			},
 		},
+	}
+
+	if err != nil {
+		statusCode = "error"
 	}
 
 	return config, nil

@@ -5,12 +5,14 @@ import (
 	"time"
 
 	"github.com/ethpandaops/lab/pkg/internal/lab/cache"
+	"github.com/ethpandaops/lab/pkg/internal/lab/metrics"
 	"github.com/sirupsen/logrus"
 )
 
 func TestMemoryLocker(t *testing.T) {
-	memCache := cache.NewMemory(cache.MemoryConfig{DefaultTTL: time.Minute})
-	locker := New(logrus.New(), memCache)
+	metricsSvc := metrics.NewMetricsService("test", logrus.New())
+	memCache := cache.NewMemory(cache.MemoryConfig{DefaultTTL: time.Minute}, metricsSvc)
+	locker := New(logrus.New(), memCache, metricsSvc)
 
 	// Test acquiring a lock
 	lockName := "test-lock"
@@ -54,8 +56,9 @@ func TestMemoryLocker(t *testing.T) {
 }
 
 func TestLockerWithInvalidToken(t *testing.T) {
-	memCache := cache.NewMemory(cache.MemoryConfig{DefaultTTL: time.Minute})
-	locker := New(logrus.New(), memCache)
+	metricsSvc := metrics.NewMetricsService("test", logrus.New())
+	memCache := cache.NewMemory(cache.MemoryConfig{DefaultTTL: time.Minute}, metricsSvc)
+	locker := New(logrus.New(), memCache, metricsSvc)
 
 	// Acquire a lock
 	lockName := "test-lock"
@@ -87,8 +90,9 @@ func TestLockerWithInvalidToken(t *testing.T) {
 }
 
 func TestLockerExpiration(t *testing.T) {
-	memCache := cache.NewMemory(cache.MemoryConfig{DefaultTTL: time.Minute})
-	locker := New(logrus.New(), memCache)
+	metricsSvc := metrics.NewMetricsService("test", logrus.New())
+	memCache := cache.NewMemory(cache.MemoryConfig{DefaultTTL: time.Minute}, metricsSvc)
+	locker := New(logrus.New(), memCache, metricsSvc)
 
 	// Acquire a lock with very short TTL
 	lockName := "expiring-lock"

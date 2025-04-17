@@ -10,6 +10,8 @@ import (
 	"time"
 
 	"github.com/ethpandaops/lab/pkg/internal/lab/cache"
+	"github.com/ethpandaops/lab/pkg/internal/lab/metrics"
+	"github.com/sirupsen/logrus"
 )
 
 // testMemoryCache is a custom wrapper around Memory that exposes internal methods
@@ -19,8 +21,11 @@ type testMemoryCache struct {
 
 // exposeMemory uses reflection to get access to the Memory struct
 func exposeMemory(t *testing.T) *testMemoryCache {
+	// Create a metrics service
+	metricsSvc := metrics.NewMetricsService("test", logrus.New())
+
 	// Create a real memory cache
-	memCache := cache.NewMemory(cache.MemoryConfig{DefaultTTL: time.Second})
+	memCache := cache.NewMemory(cache.MemoryConfig{DefaultTTL: time.Second}, metricsSvc)
 
 	// Create our test wrapper
 	testCache := &testMemoryCache{Memory: memCache}
@@ -38,7 +43,10 @@ func (t *testMemoryCache) deleteExpired() {
 }
 
 func TestMemoryCacheGet(t *testing.T) {
-	memCache := cache.NewMemory(cache.MemoryConfig{DefaultTTL: time.Second})
+	// Create a metrics service
+	metricsSvc := metrics.NewMetricsService("test", logrus.New())
+
+	memCache := cache.NewMemory(cache.MemoryConfig{DefaultTTL: time.Second}, metricsSvc)
 
 	// Test getting non-existent key
 	_, err := memCache.Get("non-existent")
@@ -79,8 +87,11 @@ func TestMemoryCacheGet(t *testing.T) {
 
 // TestMemoryCacheGetExpiredWithDeleteError tests the case where a key has expired and Delete returns an error
 func TestMemoryCacheGetExpiredWithDeleteError(t *testing.T) {
+	// Create a metrics service
+	metricsSvc := metrics.NewMetricsService("test", logrus.New())
+
 	// Instead of trying to mock the Delete method, we'll test the expiration logic more directly
-	memCache := cache.NewMemory(cache.MemoryConfig{DefaultTTL: time.Second})
+	memCache := cache.NewMemory(cache.MemoryConfig{DefaultTTL: time.Second}, metricsSvc)
 
 	// Set a key with a minimal expiration time
 	err := memCache.Set("expiring-key", []byte("will-expire"), 1*time.Millisecond)
@@ -116,7 +127,10 @@ func TestMemoryCacheGetExpiredWithDeleteError(t *testing.T) {
 }
 
 func TestMemoryCacheSet(t *testing.T) {
-	memCache := cache.NewMemory(cache.MemoryConfig{DefaultTTL: time.Second})
+	// Create a metrics service
+	metricsSvc := metrics.NewMetricsService("test", logrus.New())
+
+	memCache := cache.NewMemory(cache.MemoryConfig{DefaultTTL: time.Second}, metricsSvc)
 
 	// Test setting with default TTL
 	err := memCache.Set("default-ttl", []byte("value"), 0)
@@ -160,7 +174,10 @@ func TestMemoryCacheSet(t *testing.T) {
 }
 
 func TestMemoryCacheDelete(t *testing.T) {
-	memCache := cache.NewMemory(cache.MemoryConfig{DefaultTTL: time.Second})
+	// Create a metrics service
+	metricsSvc := metrics.NewMetricsService("test", logrus.New())
+
+	memCache := cache.NewMemory(cache.MemoryConfig{DefaultTTL: time.Second}, metricsSvc)
 
 	// Test deleting non-existent key
 	err := memCache.Delete("non-existent")
@@ -188,7 +205,10 @@ func TestMemoryCacheDelete(t *testing.T) {
 }
 
 func TestMemoryCacheGC(t *testing.T) {
-	c := cache.NewMemory(cache.MemoryConfig{DefaultTTL: time.Second})
+	// Create a metrics service
+	metricsSvc := metrics.NewMetricsService("test", logrus.New())
+
+	c := cache.NewMemory(cache.MemoryConfig{DefaultTTL: time.Second}, metricsSvc)
 
 	// Add items with very short expiration
 	for i := 0; i < 10; i++ {
@@ -262,7 +282,10 @@ func TestMemoryCacheDeleteExpired(t *testing.T) {
 
 // TestMemoryCacheConcurrentAccess tests concurrent access to the memory cache
 func TestMemoryCacheConcurrentAccess(t *testing.T) {
-	memCache := cache.NewMemory(cache.MemoryConfig{DefaultTTL: time.Second})
+	// Create a metrics service
+	metricsSvc := metrics.NewMetricsService("test", logrus.New())
+
+	memCache := cache.NewMemory(cache.MemoryConfig{DefaultTTL: time.Second}, metricsSvc)
 
 	// Number of concurrent goroutines
 	const concurrency = 100
@@ -349,7 +372,10 @@ func TestMemoryWithCustomGC(t *testing.T) {
 }
 
 func TestMemoryCacheStop(t *testing.T) {
-	cache := cache.NewMemory(cache.MemoryConfig{DefaultTTL: time.Second})
+	// Create a metrics service
+	metricsSvc := metrics.NewMetricsService("test", logrus.New())
+
+	cache := cache.NewMemory(cache.MemoryConfig{DefaultTTL: time.Second}, metricsSvc)
 
 	// Stop should always succeed for memory cache
 	err := cache.Stop()
@@ -362,13 +388,20 @@ func TestMemoryCacheStop(t *testing.T) {
 func newTestMemoryCacheWithCustomGC(t *testing.T, gcInterval time.Duration) *cache.Memory {
 	// For our test purposes, we're assuming the standard Memory implementation
 	// is sufficient since we just need it to run GC more frequently
-	return cache.NewMemory(cache.MemoryConfig{DefaultTTL: time.Second})
+
+	// Create a metrics service
+	metricsSvc := metrics.NewMetricsService("test", logrus.New())
+
+	return cache.NewMemory(cache.MemoryConfig{DefaultTTL: time.Second}, metricsSvc)
 }
 
 // TestMemoryCacheDeleteError tests what happens when accessing a key during deletion
 func TestMemoryCacheDeleteError(t *testing.T) {
 	// Create a memory cache
-	memCache := cache.NewMemory(cache.MemoryConfig{DefaultTTL: time.Second})
+	// Create a metrics service
+	metricsSvc := metrics.NewMetricsService("test", logrus.New())
+
+	memCache := cache.NewMemory(cache.MemoryConfig{DefaultTTL: time.Second}, metricsSvc)
 
 	// Set a key
 	key := "test-delete-error"
@@ -408,7 +441,10 @@ func TestMemoryCacheDeleteError(t *testing.T) {
 // TestMemoryGetErrorPath tests the error path in Get when Delete returns an error
 func TestMemoryGetErrorPath(t *testing.T) {
 	// Create a memory cache
-	memCache := cache.NewMemory(cache.MemoryConfig{DefaultTTL: time.Second})
+	// Create a metrics service
+	metricsSvc := metrics.NewMetricsService("test", logrus.New())
+
+	memCache := cache.NewMemory(cache.MemoryConfig{DefaultTTL: time.Second}, metricsSvc)
 
 	// Set a key that will expire quickly
 	err := memCache.Set("error-test", []byte("test"), 1*time.Millisecond)
@@ -435,7 +471,10 @@ func TestMemoryGetErrorPath(t *testing.T) {
 // TestMemoryStartGCAndStop tests the startGC method and Stop to ensure proper cleanup
 func TestMemoryStartGCAndStop(t *testing.T) {
 	// Create a memory cache with a custom GC interval if we can access internal fields
-	memCache := cache.NewMemory(cache.MemoryConfig{DefaultTTL: time.Second})
+	// Create a metrics service
+	metricsSvc := metrics.NewMetricsService("test", logrus.New())
+
+	memCache := cache.NewMemory(cache.MemoryConfig{DefaultTTL: time.Second}, metricsSvc)
 
 	// Set keys with very short expiration
 	for i := 0; i < 10; i++ {
@@ -480,7 +519,10 @@ func TestMemoryStartGCAndStop(t *testing.T) {
 
 // TestMemoryCacheZeroExpiry tests setting keys with zero/negative expiry (no expiration)
 func TestMemoryCacheZeroExpiry(t *testing.T) {
-	memCache := cache.NewMemory(cache.MemoryConfig{DefaultTTL: time.Second})
+	// Create a metrics service
+	metricsSvc := metrics.NewMetricsService("test", logrus.New())
+
+	memCache := cache.NewMemory(cache.MemoryConfig{DefaultTTL: time.Second}, metricsSvc)
 
 	// Test with negative TTL (should be treated as no expiration)
 	err := memCache.Set("no-expiry", []byte("permanent"), -1)
@@ -504,7 +546,10 @@ func TestMemoryCacheZeroExpiry(t *testing.T) {
 
 // TestMemoryConcurrentDeleteExpired tests concurrent access during deleteExpired operation
 func TestMemoryConcurrentDeleteExpired(t *testing.T) {
-	memCache := cache.NewMemory(cache.MemoryConfig{DefaultTTL: time.Second})
+	// Create a metrics service
+	metricsSvc := metrics.NewMetricsService("test", logrus.New())
+
+	memCache := cache.NewMemory(cache.MemoryConfig{DefaultTTL: time.Second}, metricsSvc)
 
 	// Add a lot of keys with mixed expiration times
 	const keyCount = 1000
@@ -569,7 +614,10 @@ func TestMemoryConcurrentDeleteExpired(t *testing.T) {
 // TestMemoryGetCompleteCoverage tests all branches of the Get method
 func TestMemoryGetCompleteCoverage(t *testing.T) {
 	// Create a memory cache
-	memCache := cache.NewMemory(cache.MemoryConfig{DefaultTTL: time.Second})
+	// Create a metrics service
+	metricsSvc := metrics.NewMetricsService("test", logrus.New())
+
+	memCache := cache.NewMemory(cache.MemoryConfig{DefaultTTL: time.Second}, metricsSvc)
 
 	// Test 1: Get a non-existent key - should return ErrCacheMiss
 	_, err := memCache.Get("non-existent")

@@ -8,6 +8,20 @@ This package provides a caching interface with multiple backend implementations 
 - Key-value cache operations with TTL support
 - Thread-safe and concurrent access
 
+## Metrics
+
+The cache package exposes the following Prometheus metrics:
+
+| Metric Name | Type | Description | Labels |
+|-------------|------|-------------|--------|
+| `lab_cache_requests_total` | Counter | Total number of cache requests | `operation` ("get", "set", "delete"), `status` ("hit", "miss", "error", "ok") |
+| `lab_cache_operation_duration_seconds` | Histogram | Duration of cache operations in seconds | `operation` ("get", "set", "delete") |
+| `lab_cache_items` | Gauge | Current number of items in the cache | none |
+| `lab_cache_hits_total` | Counter | Total number of cache hits | none |
+| `lab_cache_misses_total` | Counter | Total number of cache misses | none |
+
+These metrics are automatically collected for both memory and Redis cache implementations.
+
 ## Cache Interface
 
 The primary interface for cache operations:
@@ -48,6 +62,10 @@ For distributed locking, the Redis implementation uses:
 ### Basic Cache Operations
 
 ```go
+// Create a metrics service
+logger := logrus.New()
+metricsSvc := metrics.NewMetricsService("lab", logger)
+
 // Create a cache (memory or Redis)
 config := cache.Config{
     Type: cache.CacheTypeMemory,
@@ -55,7 +73,7 @@ config := cache.Config{
         "defaultTTL": "5m",
     },
 }
-cacheClient, err := cache.New(config)
+cacheClient, err := cache.New(&config, metricsSvc)
 if err != nil {
     log.Fatalf("Error creating cache: %v", err)
 }

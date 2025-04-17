@@ -28,7 +28,7 @@ func TestStateManager(t *testing.T) {
 	}
 
 	// Create a typed client for better type safety, with the state key
-	stateClient := state.New[*pb.State](logger, mockCache, stateConfig, GetStateKey())
+	stateClient := state.New[*pb.State](logger, mockCache, stateConfig, GetStateKey(), nil)
 
 	// Create the state manager
 	stateManager := NewStateManager(logger, stateClient)
@@ -45,8 +45,8 @@ func TestStateManager(t *testing.T) {
 	assert.NotNil(t, stateObj.BlockTimings)
 	assert.NotNil(t, stateObj.Cdf)
 
-	// Modify the state
-	timestamp := time.Now()
+	// Modify the state - use UTC time to avoid timezone issues
+	timestamp := time.Now().UTC()
 	stateObj.BlockTimings.LastProcessed["test/1h"] = TimestampFromTime(timestamp)
 
 	// Test SaveState
@@ -66,7 +66,7 @@ func TestStateManager(t *testing.T) {
 	lastProcessedTime := retrievedState.BlockTimings.LastProcessed["test/1h"]
 	require.NotNil(t, lastProcessedTime)
 
-	// Convert and compare timestamps
-	retrievedTime := TimeFromTimestamp(lastProcessedTime)
+	// Convert and compare timestamps - ensure both are in UTC
+	retrievedTime := TimeFromTimestamp(lastProcessedTime).UTC()
 	assert.Equal(t, timestamp.Truncate(time.Microsecond), retrievedTime.Truncate(time.Microsecond))
 }

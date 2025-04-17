@@ -10,7 +10,9 @@ import (
 
 	// Import the v1 driver (_ "github.com/ClickHouse/clickhouse-go")
 	// The blank identifier is used because we only need its side effects (registering the driver).
+	"github.com/ethpandaops/lab/pkg/internal/lab/metrics"
 	_ "github.com/mailru/go-clickhouse/v2" // Import mailru driver for chhttp
+	"github.com/prometheus/client_golang/prometheus"
 	"github.com/sirupsen/logrus"
 )
 
@@ -29,12 +31,21 @@ type client struct {
 	log    logrus.FieldLogger
 	ctx    context.Context
 	config *Config
+
+	// Metrics
+	metrics           *metrics.Metrics
+	collector         *metrics.Collector
+	queriesTotal      *prometheus.CounterVec
+	queryDuration     *prometheus.HistogramVec
+	connectionStatus  *prometheus.GaugeVec
+	connectionsActive *prometheus.GaugeVec
 }
 
 // New creates a new ClickHouse client
 func New(
 	config *Config,
 	log logrus.FieldLogger,
+	metricsSvc ...*metrics.Metrics,
 ) (Client, error) {
 	if err := config.Validate(); err != nil {
 		return nil, fmt.Errorf("invalid config: %w", err)
@@ -42,10 +53,65 @@ func New(
 
 	log.WithField("dsn", config.DSN).Info("Initializing ClickHouse client")
 
-	return &client{
+	client := &client{
 		log:    log.WithField("module", "clickhouse"),
 		config: config,
-	}, nil
+	}
+
+	// Handle optional metrics service parameter
+	if len(metricsSvc) > 0 && metricsSvc[0] != nil {
+		client.metrics = metricsSvc[0]
+		client.initMetrics()
+	}
+
+	return client, nil
+}
+
+// initMetrics initializes Prometheus metrics for the ClickHouse client
+func (c *client) initMetrics() error {
+	// Create a collector for the clickhouse subsystem
+	var err error
+	c.collector = c.metrics.NewCollector("clickhouse")
+
+	// Register metrics
+	c.queriesTotal, err = c.collector.NewCounterVec(
+		"queries_total",
+		"Total number of ClickHouse queries executed",
+		[]string{"query_type", "status"},
+	)
+	if err != nil {
+		return fmt.Errorf("failed to create queries_total metric: %w", err)
+	}
+
+	c.queryDuration, err = c.collector.NewHistogramVec(
+		"query_duration_seconds",
+		"Duration of ClickHouse queries in seconds",
+		[]string{"query_type"},
+		prometheus.DefBuckets,
+	)
+	if err != nil {
+		return fmt.Errorf("failed to create query_duration_seconds metric: %w", err)
+	}
+
+	c.connectionStatus, err = c.collector.NewGaugeVec(
+		"connection_status",
+		"Status of ClickHouse connection (1=connected, 0=disconnected)",
+		[]string{"status"},
+	)
+	if err != nil {
+		return fmt.Errorf("failed to create connection_status metric: %w", err)
+	}
+
+	c.connectionsActive, err = c.collector.NewGaugeVec(
+		"connections_active",
+		"Number of active ClickHouse connections",
+		[]string{},
+	)
+	if err != nil {
+		return fmt.Errorf("failed to create connections_active metric: %w", err)
+	}
+
+	return nil
 }
 
 func (c *client) Start(ctx context.Context) error {
@@ -124,26 +190,48 @@ func (c *client) Start(ctx context.Context) error {
 	defer cancel()
 	if err := conn.PingContext(pingCtx); err != nil {
 		conn.Close() // Close pool if ping fails
+
 		return fmt.Errorf("failed to ping ClickHouse: %w", err)
 	}
 
 	c.conn = conn
 	c.log.Info("ClickHouse client started successfully (mailru/chhttp driver)")
+
+	// Update connection metrics
+	c.connectionStatus.WithLabelValues("active").Set(1)
+	c.connectionStatus.WithLabelValues("error").Set(0)
+
+	// Set initial active connections based on pool settings
+	c.connectionsActive.WithLabelValues().Set(float64(5)) // Using MaxIdleConns as initial value
+
 	return nil
 }
 
-// GetClient method removed as it returned v2 specific driver.Conn
-
 // Query executes a query and returns all rows
 func (c *client) Query(ctx context.Context, query string, args ...interface{}) ([]map[string]interface{}, error) {
+	startTime := time.Now()
+	var status string = "success"
+
+	defer func() {
+		// Record metrics
+		c.queriesTotal.WithLabelValues("query", status).Inc()
+
+		duration := time.Since(startTime).Seconds()
+		c.queryDuration.WithLabelValues("query").Observe(duration)
+	}()
+
 	// Verify connection is set
 	if c.conn == nil {
+		status = "error"
+
 		return nil, fmt.Errorf("clickhouse connection is nil, client may not be properly initialized")
 	}
 
 	// Use QueryContext from database/sql
 	rows, err := c.conn.QueryContext(ctx, query, args...)
 	if err != nil {
+		status = "error"
+
 		return nil, fmt.Errorf("failed to execute query: %w", err)
 	}
 	defer rows.Close() // Ensure rows are closed
@@ -151,6 +239,7 @@ func (c *client) Query(ctx context.Context, query string, args ...interface{}) (
 	// Get column names using standard sql.Rows.Columns()
 	columnNames, err := rows.Columns()
 	if err != nil {
+		status = "error"
 		return nil, fmt.Errorf("failed to get column names: %w", err)
 	}
 
@@ -171,6 +260,8 @@ func (c *client) Query(ctx context.Context, query string, args ...interface{}) (
 		// Scan the row into the slice
 		// Scan using standard sql.Rows.Scan()
 		if err := rows.Scan(valuePointers...); err != nil {
+			status = "error"
+
 			return nil, fmt.Errorf("failed to scan row: %w", err)
 		}
 
@@ -186,6 +277,8 @@ func (c *client) Query(ctx context.Context, query string, args ...interface{}) (
 
 	// Check for errors after iteration using standard sql.Rows.Err()
 	if err := rows.Err(); err != nil {
+		status = "error"
+
 		return nil, fmt.Errorf("error iterating rows: %w", err)
 	}
 
@@ -194,12 +287,25 @@ func (c *client) Query(ctx context.Context, query string, args ...interface{}) (
 
 // QueryRow executes a query and returns a single row
 func (c *client) QueryRow(ctx context.Context, query string, args ...interface{}) (map[string]interface{}, error) {
+	startTime := time.Now()
+	var status string = "success"
+
+	defer func() {
+		// Record metrics
+		c.queriesTotal.WithLabelValues("query_row", status).Inc()
+
+		duration := time.Since(startTime).Seconds()
+		c.queryDuration.WithLabelValues("query_row").Observe(duration)
+	}()
+
 	rows, err := c.Query(ctx, query, args...)
 	if err != nil {
+		status = "error"
 		return nil, err
 	}
 
 	if len(rows) == 0 {
+		status = "error"
 		return nil, fmt.Errorf("no rows returned")
 	}
 
@@ -208,13 +314,27 @@ func (c *client) QueryRow(ctx context.Context, query string, args ...interface{}
 
 // Exec executes a query without returning rows
 func (c *client) Exec(ctx context.Context, query string, args ...interface{}) error {
+	startTime := time.Now()
+	var status string = "success"
+
+	defer func() {
+		c.queriesTotal.WithLabelValues("exec", status).Inc()
+
+		duration := time.Since(startTime).Seconds()
+		c.queryDuration.WithLabelValues("exec").Observe(duration)
+	}()
+
 	// Verify connection is set
 	if c.conn == nil {
+		status = "error"
 		return fmt.Errorf("clickhouse connection is nil, client may not be properly initialized")
 	}
 
 	// Use ExecContext from database/sql
 	_, err := c.conn.ExecContext(ctx, query, args...)
+	if err != nil {
+		status = "error"
+	}
 	return err // Return the error directly
 }
 
@@ -222,10 +342,16 @@ func (c *client) Exec(ctx context.Context, query string, args ...interface{}) er
 func (c *client) Stop() error {
 	if c.conn == nil {
 		c.log.Warn("Attempted to stop ClickHouse client but connection was nil")
+
 		return nil
 	}
 
 	c.log.Info("Stopping ClickHouse client")
+
+	// Update connection metrics
+	c.connectionStatus.WithLabelValues("active").Set(0)
+	c.connectionStatus.WithLabelValues("error").Set(0)
+	c.connectionsActive.WithLabelValues().Set(0)
 
 	// Close the connection pool using standard sql.DB.Close()
 	return c.conn.Close()

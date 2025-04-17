@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/ethpandaops/lab/pkg/internal/lab/metrics"
 	"github.com/mitchellh/mapstructure"
 )
 
@@ -60,7 +61,11 @@ func (c *Config) Validate() error {
 }
 
 // New creates a new cache based on the config
-func New(config *Config) (Client, error) {
+func New(config *Config, metricsSvc *metrics.Metrics) (Client, error) {
+	if metricsSvc == nil {
+		return nil, fmt.Errorf("metrics service is required")
+	}
+
 	switch config.Type {
 	case CacheTypeRedis:
 		redisConfig := &RedisConfig{}
@@ -70,7 +75,8 @@ func New(config *Config) (Client, error) {
 			}
 		}
 
-		return NewRedis(*redisConfig)
+		// Pass metricsSvc, even though Redis instrumentation is not done yet
+		return NewRedis(*redisConfig, metricsSvc)
 	case CacheTypeMemory:
 		memoryConfig := &MemoryConfig{}
 		if config.Config != nil {
@@ -79,7 +85,7 @@ func New(config *Config) (Client, error) {
 			}
 		}
 
-		return NewMemory(*memoryConfig), nil
+		return NewMemory(*memoryConfig, metricsSvc), nil
 	default:
 		return nil, fmt.Errorf("invalid cache type: %s", config.Type)
 	}

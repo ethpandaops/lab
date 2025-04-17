@@ -14,6 +14,7 @@ import (
 
 	"github.com/ethpandaops/lab/pkg/internal/lab/cache"
 	"github.com/ethpandaops/lab/pkg/internal/lab/logger"
+	"github.com/ethpandaops/lab/pkg/internal/lab/metrics"
 	"github.com/ethpandaops/lab/pkg/internal/lab/storage"
 	"github.com/gorilla/mux"
 	"github.com/sirupsen/logrus"
@@ -49,12 +50,14 @@ func New(config *Config) (*Service, error) {
 		return nil, fmt.Errorf("failed to create logger: %w", err)
 	}
 
-	cacheClient, err := cache.New(config.Cache)
+	metrics := metrics.NewMetricsService("lab", log, "api")
+
+	cacheClient, err := cache.New(config.Cache, metrics)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create cache client: %w", err)
 	}
 
-	storageClient, err := storage.New(config.Storage, log)
+	storageClient, err := storage.New(config.Storage, log, metrics)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create storage client: %w", err)
 	}

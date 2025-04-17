@@ -20,27 +20,99 @@ func (b *BeaconChainTimings) processBlockTimings(ctx context.Context, network *e
 		"window":  windowName,
 	}).Info("Processing block timings")
 
+	startTime := time.Now()
+
+	// Increment processing counter if metrics are available
+	if b.metricsCollector != nil {
+		counter, err := b.metricsCollector.NewCounterVec(
+			"processing_operations_total",
+			"Total number of processing operations",
+			[]string{"operation", "network", "window"},
+		)
+		if err == nil {
+			counter.WithLabelValues("block_timings", network.Name, windowName).Inc()
+		}
+	}
+
 	// Get time window config
 	timeWindow, err := b.GetTimeWindowConfig(windowName)
 	if err != nil {
+		// Record error metric if available
+		if b.metricsCollector != nil {
+			errorCounter, metricErr := b.metricsCollector.NewCounterVec(
+				"processing_errors_total",
+				"Total number of processing errors",
+				[]string{"operation", "network", "window"},
+			)
+			if metricErr == nil {
+				errorCounter.WithLabelValues("block_timings", network.Name, windowName).Inc()
+			}
+		}
 		return fmt.Errorf("failed to get time window config: %w", err)
 	}
 
 	// Get time range for the window
 	timeRange, err := b.getTimeRange(timeWindow) // Pass config instead of name
 	if err != nil {
+		// Record error metric if available
+		if b.metricsCollector != nil {
+			errorCounter, metricErr := b.metricsCollector.NewCounterVec(
+				"processing_errors_total",
+				"Total number of processing errors",
+				[]string{"operation", "network", "window"},
+			)
+			if metricErr == nil {
+				errorCounter.WithLabelValues("block_timings", network.Name, windowName).Inc()
+			}
+		}
 		return fmt.Errorf("failed to get time range: %w", err)
 	}
 
 	// Process block timings
 	timingData, err := b.GetTimingData(ctx, network.Name, timeRange, timeWindow) // Pass config
 	if err != nil {
+		// Record error metric if available
+		if b.metricsCollector != nil {
+			errorCounter, metricErr := b.metricsCollector.NewCounterVec(
+				"processing_errors_total",
+				"Total number of processing errors",
+				[]string{"operation", "network", "window"},
+			)
+			if metricErr == nil {
+				errorCounter.WithLabelValues("block_timings", network.Name, windowName).Inc()
+			}
+		}
 		return fmt.Errorf("failed to process block timings: %w", err)
 	}
 
 	// Store the results
 	if err := b.storeTimingData(ctx, network.Name, timeWindow.File, timingData); err != nil {
+		// Record error metric if available
+		if b.metricsCollector != nil {
+			errorCounter, metricErr := b.metricsCollector.NewCounterVec(
+				"processing_errors_total",
+				"Total number of processing errors",
+				[]string{"operation", "network", "window"},
+			)
+			if metricErr == nil {
+				errorCounter.WithLabelValues("block_timings", network.Name, windowName).Inc()
+			}
+		}
 		return fmt.Errorf("failed to store timing data: %w", err)
+	}
+
+	// Record duration metric if available
+	if b.metricsCollector != nil {
+		duration := time.Since(startTime).Seconds()
+		histogram, err := b.metricsCollector.NewHistogramVec(
+			"processing_duration_seconds",
+			"Duration of processing operations in seconds",
+			[]string{"operation", "network", "window"},
+			nil,
+		)
+		if err == nil {
+			histogram.WithLabelValues("block_timings", network.Name, windowName).Observe(duration)
+		}
 	}
 
 	return nil

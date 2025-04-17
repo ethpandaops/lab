@@ -69,7 +69,7 @@ func TestRedisCache(t *testing.T) {
 	cache, err := cache.NewRedis(cache.RedisConfig{
 		URL:        redisURL,
 		DefaultTTL: time.Second,
-	})
+	}, nil)
 	if err != nil {
 		t.Fatalf("failed to create Redis cache: %v", err)
 	}
@@ -121,7 +121,7 @@ func TestRedisExpiration(t *testing.T) {
 	cache, err := cache.NewRedis(cache.RedisConfig{
 		URL:        redisURL,
 		DefaultTTL: time.Second,
-	})
+	}, nil)
 	if err != nil {
 		t.Fatalf("failed to create Redis cache: %v", err)
 	}
@@ -156,7 +156,7 @@ func TestRedisInvalidURL(t *testing.T) {
 	_, err := cache.NewRedis(cache.RedisConfig{
 		URL:        "invalid-url",
 		DefaultTTL: time.Second,
-	})
+	}, nil)
 	if err == nil {
 		t.Fatal("expected error when creating Redis cache with invalid URL")
 	}
@@ -167,7 +167,7 @@ func TestRedisConnectionFailure(t *testing.T) {
 	_, err := cache.NewRedis(cache.RedisConfig{
 		URL:        "redis://localhost:54321", // Using a port that's likely not running Redis
 		DefaultTTL: time.Second,
-	})
+	}, nil)
 	if err == nil {
 		t.Fatal("expected error when connecting to non-existent Redis server")
 	}
@@ -187,7 +187,7 @@ func TestRedisCacheGetNonExistent(t *testing.T) {
 	cache, err := cache.NewRedis(cache.RedisConfig{
 		URL:        redisURL,
 		DefaultTTL: time.Second,
-	})
+	}, nil)
 	if err != nil {
 		t.Fatalf("failed to create Redis cache: %v", err)
 	}
@@ -218,7 +218,7 @@ func TestRedisCacheSetCustomTTL(t *testing.T) {
 	cache, err := cache.NewRedis(cache.RedisConfig{
 		URL:        redisURL,
 		DefaultTTL: 1 * time.Hour, // Long default TTL
-	})
+	}, nil)
 	if err != nil {
 		t.Fatalf("failed to create Redis cache: %v", err)
 	}
@@ -264,7 +264,7 @@ func TestRedisCacheOverwrite(t *testing.T) {
 	cache, err := cache.NewRedis(cache.RedisConfig{
 		URL:        redisURL,
 		DefaultTTL: time.Second,
-	})
+	}, nil)
 	if err != nil {
 		t.Fatalf("failed to create Redis cache: %v", err)
 	}
@@ -307,7 +307,7 @@ func TestRedisCacheDeleteNonExistent(t *testing.T) {
 	cache, err := cache.NewRedis(cache.RedisConfig{
 		URL:        redisURL,
 		DefaultTTL: time.Second,
-	})
+	}, nil)
 	if err != nil {
 		t.Fatalf("failed to create Redis cache: %v", err)
 	}
@@ -334,7 +334,7 @@ func TestRedisStop(t *testing.T) {
 	cache, err := cache.NewRedis(cache.RedisConfig{
 		URL:        redisURL,
 		DefaultTTL: time.Second,
-	})
+	}, nil)
 	if err != nil {
 		t.Fatalf("failed to create Redis cache: %v", err)
 	}
@@ -366,7 +366,7 @@ func TestRedisCacheGetError(t *testing.T) {
 	cache, err := cache.NewRedis(cache.RedisConfig{
 		URL:        redisURL,
 		DefaultTTL: time.Second,
-	})
+	}, nil)
 	if err != nil {
 		t.Fatalf("failed to create Redis cache: %v", err)
 	}
@@ -399,7 +399,7 @@ func TestRedisCacheDeleteError(t *testing.T) {
 	cache, err := cache.NewRedis(cache.RedisConfig{
 		URL:        redisURL,
 		DefaultTTL: time.Second,
-	})
+	}, nil)
 	if err != nil {
 		t.Fatalf("failed to create Redis cache: %v", err)
 	}
@@ -428,7 +428,7 @@ func TestRedisSetError(t *testing.T) {
 	cache, err := cache.NewRedis(cache.RedisConfig{
 		URL:        redisURL,
 		DefaultTTL: time.Second,
-	})
+	}, nil)
 	if err != nil {
 		t.Fatalf("failed to create Redis cache: %v", err)
 	}

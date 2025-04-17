@@ -3,6 +3,7 @@ package srv
 import (
 	"context"
 	"fmt"
+	"net/http"
 	"os"
 	"os/signal"
 	"sync"
@@ -15,6 +16,7 @@ import (
 
 	"github.com/ethpandaops/lab/pkg/internal/lab/locker"
 	"github.com/ethpandaops/lab/pkg/internal/lab/logger"
+	"github.com/ethpandaops/lab/pkg/internal/lab/metrics"
 	"github.com/ethpandaops/lab/pkg/internal/lab/storage"
 	"github.com/ethpandaops/lab/pkg/internal/lab/xatu"
 	"github.com/ethpandaops/lab/pkg/server/internal/grpc"
@@ -36,6 +38,9 @@ type Service struct {
 	// GRPC server
 	grpcServer *grpc.Server
 
+	// HTTP server for metrics
+	httpServer *http.Server
+
 	// Services
 	services []service.Service
 
@@ -46,6 +51,7 @@ type Service struct {
 	cacheClient       cache.Client
 	lockerClient      locker.Locker
 	geolocationClient *geolocation.Client
+	metrics           *metrics.Metrics
 }
 
 // New creates a new srv service
@@ -92,6 +98,12 @@ func (s *Service) Start(ctx context.Context) error {
 	if err := s.initializeServices(s.ctx); err != nil {
 		cancel() // Ensure context is canceled on initialization error
 		return fmt.Errorf("failed to initialize services: %w", err)
+	}
+
+	// Start HTTP server for metrics
+	if err := s.startMetricsServer(); err != nil {
+		cancel() // Ensure context is canceled on initialization error
+		return fmt.Errorf("failed to start HTTP server for metrics: %w", err)
 	}
 
 	// Start all our services
@@ -160,6 +172,7 @@ func (s *Service) initializeServices(ctx context.Context) error { // ctx is alre
 		s.storageClient,
 		s.cacheClient,
 		s.lockerClient,
+		s.metrics,
 	)
 	if err != nil {
 		return fmt.Errorf("failed to initialize beacon chain timings service: %w", err)
@@ -173,6 +186,7 @@ func (s *Service) initializeServices(ctx context.Context) error { // ctx is alre
 		s.storageClient,
 		s.cacheClient,
 		s.lockerClient,
+		s.metrics,
 	)
 	if err != nil {
 		return fmt.Errorf("failed to initialize xatu public contributors service: %w", err)
@@ -187,6 +201,7 @@ func (s *Service) initializeServices(ctx context.Context) error { // ctx is alre
 		s.cacheClient,
 		s.lockerClient,
 		s.geolocationClient,
+		s.metrics,
 	)
 	if err != nil {
 		return fmt.Errorf("failed to initialize beacon slots service: %w", err)
@@ -199,6 +214,7 @@ func (s *Service) initializeServices(ctx context.Context) error { // ctx is alre
 		bct,
 		xpc,
 		beaconSlotsService,
+		s.metrics,
 	)
 	if err != nil {
 		return fmt.Errorf("failed to initialize lab service: %w", err)
@@ -216,9 +232,13 @@ func (s *Service) initializeServices(ctx context.Context) error { // ctx is alre
 
 // initializeDependencies initializes all dependencies, passing the main service context.
 func (s *Service) initializeDependencies(ctx context.Context) error {
+	// Initialize metrics service
+	s.log.Info("Initializing metrics service")
+	s.metrics = metrics.NewMetricsService("lab", s.log)
+
 	// Initialize Ethereum client
 	s.log.Info("Initializing Ethereum client")
-	ethereumClient := ethereum.NewClient(s.config.Ethereum)
+	ethereumClient := ethereum.NewClient(s.config.Ethereum, s.metrics)
 	if err := ethereumClient.Start(ctx); err != nil {
 		return fmt.Errorf("failed to start Ethereum client: %w", err)
 	}
@@ -227,7 +247,7 @@ func (s *Service) initializeDependencies(ctx context.Context) error {
 	// Initialize global XatuClickhouse
 	s.log.Info("Initializing per-network Xatu ClickHouse clients")
 
-	xatuClient, err := xatu.NewClient(s.log, s.config.GetXatuConfig())
+	xatuClient, err := xatu.NewClient(s.log, s.config.GetXatuConfig(), s.metrics)
 	if err != nil {
 		return fmt.Errorf("failed to initialize global Xatu ClickHouse client: %w", err)
 	}
@@ -239,7 +259,7 @@ func (s *Service) initializeDependencies(ctx context.Context) error {
 
 	// Initialize S3 Storage
 	s.log.Info("Initializing S3 storage")
-	storageClient, err := storage.New(s.config.Storage, s.log)
+	storageClient, err := storage.New(s.config.Storage, s.log, s.metrics)
 	if err != nil {
 		return fmt.Errorf("failed to initialize S3 storage: %w", err)
 	}
@@ -251,18 +271,18 @@ func (s *Service) initializeDependencies(ctx context.Context) error {
 
 	// Initialize cache client
 	s.log.Info("Initializing cache client")
-	cacheClient, err := cache.New(s.config.Cache)
+	cacheClient, err := cache.New(s.config.Cache, s.metrics)
 	if err != nil {
 		return fmt.Errorf("failed to initialize cache client: %w", err)
 	}
 
 	// Initialize locker client
 	s.log.Info("Initializing locker client")
-	lockerClient := locker.New(s.log, cacheClient)
+	lockerClient := locker.New(s.log, cacheClient, s.metrics)
 
 	// Initialize geolocation client
 	s.log.Info("Initializing geolocation client")
-	geolocationClient, err := geolocation.New(s.log, s.config.Geolocation)
+	geolocationClient, err := geolocation.New(s.log, s.config.Geolocation, s.metrics)
 	if err != nil {
 		return fmt.Errorf("failed to initialize geolocation client: %w", err)
 	}
@@ -311,6 +331,20 @@ func (s *Service) stop() {
 			s.log.Info("Stopping gRPC server...")
 			s.grpcServer.Stop()
 			s.log.Info("gRPC server stopped.")
+		}()
+	}
+
+	// Stop HTTP server gracefully
+	if s.httpServer != nil {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			s.log.Info("Stopping HTTP server...")
+			if err := s.httpServer.Shutdown(shutdownCtx); err != nil {
+				s.log.WithError(err).Warn("Error shutting down HTTP server")
+			} else {
+				s.log.Info("HTTP server stopped.")
+			}
 		}()
 	}
 
@@ -371,4 +405,31 @@ func (s *Service) stop() {
 	case <-shutdownCtx.Done():
 		s.log.Warn("Shutdown timed out after 30s. Some components may not have stopped cleanly.")
 	}
+}
+
+// startMetricsServer starts an HTTP server to expose Prometheus metrics
+func (s *Service) startMetricsServer() error {
+	s.log.Info("Starting HTTP server for metrics")
+
+	// Create a new HTTP server
+	mux := http.NewServeMux()
+
+	// Register the metrics handler
+	mux.Handle("/metrics", s.metrics.Handler())
+
+	// Create the HTTP server
+	s.httpServer = &http.Server{
+		Addr:    ":9090", // Default metrics port
+		Handler: mux,
+	}
+
+	// Start the HTTP server in a goroutine
+	go func() {
+		s.log.WithField("address", s.httpServer.Addr).Info("HTTP server for metrics listening")
+		if err := s.httpServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			s.log.WithError(err).Error("HTTP server for metrics failed to serve")
+		}
+	}()
+
+	return nil
 }

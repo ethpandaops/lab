@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/ethpandaops/lab/pkg/internal/lab/cache"
+	"github.com/sirupsen/logrus"
 )
 
 // mockTokenErrorCache is a test-local implementation that allows testing token generation errors
@@ -35,7 +36,9 @@ func (m *mockTokenErrorCache) Stop() error {
 func TestTokenGenerationError(t *testing.T) {
 	// Set up a test locker that uses our mock
 	l := &locker{
-		cache: &mockTokenErrorCache{},
+		cache:   &mockTokenErrorCache{},
+		log:     logrus.New().WithField("component", "lab/locker"),
+		metrics: nil, // Metrics can be nil for this test
 	}
 
 	// Replace the GenerateToken function for this test

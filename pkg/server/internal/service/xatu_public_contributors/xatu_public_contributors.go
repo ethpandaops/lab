@@ -12,8 +12,10 @@ import (
 	"github.com/ethpandaops/lab/pkg/internal/lab/ethereum"
 	"github.com/ethpandaops/lab/pkg/internal/lab/leader"
 	"github.com/ethpandaops/lab/pkg/internal/lab/locker"
+	"github.com/ethpandaops/lab/pkg/internal/lab/metrics"
 	"github.com/ethpandaops/lab/pkg/internal/lab/storage"
 	"github.com/ethpandaops/lab/pkg/internal/lab/xatu"
+	"github.com/prometheus/client_golang/prometheus"
 	"github.com/sirupsen/logrus"
 
 	// Needed for state and config conversion
@@ -34,11 +36,13 @@ type XatuPublicContributors struct {
 
 	config *Config
 
-	ethereumConfig *ethereum.Config
-	xatuClient     *xatu.Client
-	storageClient  storage.Client
-	cacheClient    cache.Client
-	lockerClient   locker.Locker
+	ethereumConfig   *ethereum.Config
+	xatuClient       *xatu.Client
+	storageClient    storage.Client
+	cacheClient      cache.Client
+	lockerClient     locker.Locker
+	metrics          *metrics.Metrics
+	metricsCollector *metrics.Collector
 
 	leaderClient leader.Client
 
@@ -57,19 +61,28 @@ func New(
 	storageClient storage.Client,
 	cacheClient cache.Client,
 	lockerClient locker.Locker,
+	metricsSvc *metrics.Metrics,
 ) (*XatuPublicContributors, error) {
 	if err := config.Validate(); err != nil {
 		return nil, fmt.Errorf("invalid xatu_public_contributors config: %w", err)
 	}
 
+	var metricsCollector *metrics.Collector
+	if metricsSvc != nil {
+		metricsCollector = metricsSvc.NewCollector(XatuPublicContributorsServiceName)
+		log.WithField("component", "service/"+XatuPublicContributorsServiceName).Debug("Created metrics collector for xatu_public_contributors service")
+	}
+
 	return &XatuPublicContributors{
-		log:            log.WithField("component", "service/"+XatuPublicContributorsServiceName),
-		config:         config,
-		ethereumConfig: ethereumConfig,
-		xatuClient:     xatuClient,
-		storageClient:  storageClient,
-		cacheClient:    cacheClient,
-		lockerClient:   lockerClient,
+		log:              log.WithField("component", "service/"+XatuPublicContributorsServiceName),
+		config:           config,
+		ethereumConfig:   ethereumConfig,
+		xatuClient:       xatuClient,
+		storageClient:    storageClient,
+		cacheClient:      cacheClient,
+		lockerClient:     lockerClient,
+		metrics:          metricsSvc,
+		metricsCollector: metricsCollector,
 
 		baseDir: XatuPublicContributorsServiceName,
 
@@ -89,6 +102,9 @@ func (b *XatuPublicContributors) Start(ctx context.Context) error {
 	}
 
 	b.log.Info("Starting XatuPublicContributors service")
+
+	// Initialize metrics
+	b.initializeMetrics()
 
 	leader := leader.New(b.log, b.lockerClient, leader.Config{
 		Resource:        XatuPublicContributorsServiceName + "/batch_processing",
@@ -114,7 +130,7 @@ func (b *XatuPublicContributors) Start(ctx context.Context) error {
 				b.processCtxCancel = nil
 			}
 		},
-	})
+	}, b.metrics)
 
 	leader.Start()
 	b.leaderClient = leader
@@ -284,6 +300,43 @@ func (b *XatuPublicContributors) process(ctx context.Context) {
 	b.log.Info("Starting processing cycle")
 	startTime := time.Now()
 
+	// Track processing cycle with metrics
+	var processingCycleCounter *prometheus.CounterVec
+	var processingErrorsCounter *prometheus.CounterVec
+	var processingDurationHistogram *prometheus.HistogramVec
+
+	if b.metricsCollector != nil {
+		var err error
+
+		processingCycleCounter, err = b.metricsCollector.NewCounterVec(
+			"processing_cycles_total",
+			"Total number of processing cycles run",
+			[]string{},
+		)
+		if err != nil {
+			b.log.WithError(err).Warn("Failed to create processing_cycles_total metric")
+		}
+
+		processingErrorsCounter, err = b.metricsCollector.NewCounterVec(
+			"processing_errors_total",
+			"Total number of processing errors",
+			[]string{"network", "processor"},
+		)
+		if err != nil {
+			b.log.WithError(err).Warn("Failed to create processing_errors_total metric")
+		}
+
+		processingDurationHistogram, err = b.metricsCollector.NewHistogramVec(
+			"processing_duration_seconds",
+			"Duration of processing operations in seconds",
+			[]string{"network", "processor"},
+			[]float64{0.01, 0.05, 0.1, 0.5, 1, 2, 5, 10, 30, 60},
+		)
+		if err != nil {
+			b.log.WithError(err).Warn("Failed to create processing_duration_seconds metric")
+		}
+	}
+
 	// Process each configured network
 	networksToProcess := b.config.Networks
 	if len(networksToProcess) == 0 {
@@ -303,6 +356,15 @@ func (b *XatuPublicContributors) process(ctx context.Context) {
 			// This shouldn't happen for normal "not found" cases - loadState returns a default state for those
 			// This indicates a more serious error like connectivity issues with storage
 			log.WithError(err).Error("Failed to load state due to serious storage error, skipping network")
+
+			// Record error in metrics
+			if b.metricsCollector != nil && processingErrorsCounter != nil {
+				processingErrorsCounter.WithLabelValues(
+					networkName,
+					"state_loading",
+				).Inc()
+			}
+
 			continue
 		}
 
@@ -328,9 +390,25 @@ func (b *XatuPublicContributors) process(ctx context.Context) {
 
 				if should {
 					windowLog.Info("Processing countries window")
+					processorStartTime := time.Now()
 					if err := b.processCountriesWindow(ctx, networkName, window); err != nil {
 						windowLog.WithError(err).Error("Failed to process countries window")
+
+						// Record error in metrics
+						if b.metricsCollector != nil && processingErrorsCounter != nil {
+							processingErrorsCounter.WithLabelValues(
+								networkName,
+								CountriesProcessorName,
+							).Inc()
+						}
 					} else {
+						// Record processing duration
+						if b.metricsCollector != nil && processingDurationHistogram != nil {
+							processingDurationHistogram.WithLabelValues(
+								networkName,
+								CountriesProcessorName,
+							).Observe(time.Since(processorStartTime).Seconds())
+						}
 						// Update map directly
 						countriesProcessorState.LastProcessedWindows[window.File] = time.Now().UTC()
 						processedAnyWindow = true
@@ -371,9 +449,25 @@ func (b *XatuPublicContributors) process(ctx context.Context) {
 
 				if should {
 					windowLog.Info("Processing users window")
+					processorStartTime := time.Now()
 					if err := b.processUsersWindow(ctx, networkName, window); err != nil { // Pass internal TimeWindow
 						windowLog.WithError(err).Error("Failed to process users window")
+
+						// Record error in metrics
+						if b.metricsCollector != nil && processingErrorsCounter != nil {
+							processingErrorsCounter.WithLabelValues(
+								networkName,
+								UsersProcessorName,
+							).Inc()
+						}
 					} else {
+						// Record processing duration
+						if b.metricsCollector != nil && processingDurationHistogram != nil {
+							processingDurationHistogram.WithLabelValues(
+								networkName,
+								UsersProcessorName,
+							).Observe(time.Since(processorStartTime).Seconds())
+						}
 						// Update map directly
 						processorState.LastProcessedWindows[window.File] = time.Now().UTC()
 						processedAnyWindow = true
@@ -426,9 +520,25 @@ func (b *XatuPublicContributors) process(ctx context.Context) {
 					networks = append(networks, net.Name)
 				}
 			}
+			processorStartTime := time.Now()
 			if err := b.processSummary(ctx, networks); err != nil {
 				b.log.WithError(err).Error("Failed to process summary")
+
+				// Record error in metrics
+				if b.metricsCollector != nil && processingErrorsCounter != nil {
+					processingErrorsCounter.WithLabelValues(
+						"global",
+						SummaryProcessorName,
+					).Inc()
+				}
 			} else {
+				// Record processing duration
+				if b.metricsCollector != nil && processingDurationHistogram != nil {
+					processingDurationHistogram.WithLabelValues(
+						"global",
+						SummaryProcessorName,
+					).Observe(time.Since(processorStartTime).Seconds())
+				}
 				summaryProcessorState.LastProcessed = time.Now().UTC()
 				globalState.UpdateProcessorState(SummaryProcessorName, summaryProcessorState)
 				globalNeedsSave = true
@@ -449,9 +559,25 @@ func (b *XatuPublicContributors) process(ctx context.Context) {
 					networks = append(networks, net.Name)
 				}
 			}
+			processorStartTime := time.Now()
 			if err := b.processUserSummaries(ctx, networks); err != nil {
 				b.log.WithError(err).Error("Failed to process user summaries")
+
+				// Record error in metrics
+				if b.metricsCollector != nil && processingErrorsCounter != nil {
+					processingErrorsCounter.WithLabelValues(
+						"global",
+						UserSummariesProcessorName,
+					).Inc()
+				}
 			} else {
+				// Record processing duration
+				if b.metricsCollector != nil && processingDurationHistogram != nil {
+					processingDurationHistogram.WithLabelValues(
+						"global",
+						UserSummariesProcessorName,
+					).Observe(time.Since(processorStartTime).Seconds())
+				}
 				userSummariesProcessorState.LastProcessed = time.Now().UTC()
 				globalState.UpdateProcessorState(UserSummariesProcessorName, userSummariesProcessorState)
 				globalNeedsSave = true
@@ -472,7 +598,71 @@ func (b *XatuPublicContributors) process(ctx context.Context) {
 		}
 	}
 
-	b.log.WithField("duration", time.Since(startTime)).Info("Finished processing cycle")
+	// Increment the processing cycle counter
+	if b.metricsCollector != nil && processingCycleCounter != nil {
+		processingCycleCounter.WithLabelValues().Inc()
+	}
+
+	// Record overall processing duration
+	totalDuration := time.Since(startTime)
+	b.log.WithField("duration", totalDuration).Info("Finished processing cycle")
+
+	if b.metricsCollector != nil && processingDurationHistogram != nil {
+		processingDurationHistogram.WithLabelValues(
+			"all",
+			"full_cycle",
+		).Observe(totalDuration.Seconds())
+	}
+}
+
+// initializeMetrics creates and registers all metrics for the xatu_public_contributors service
+func (b *XatuPublicContributors) initializeMetrics() {
+	if b.metricsCollector == nil {
+		return
+	}
+
+	var err error
+
+	// Processing cycles counter
+	_, err = b.metricsCollector.NewCounterVec(
+		"processing_cycles_total",
+		"Total number of processing cycles run",
+		[]string{},
+	)
+	if err != nil {
+		b.log.WithError(err).Warn("Failed to create processing_cycles_total metric")
+	}
+
+	// Processing errors counter
+	_, err = b.metricsCollector.NewCounterVec(
+		"processing_errors_total",
+		"Total number of processing errors",
+		[]string{"network", "processor"},
+	)
+	if err != nil {
+		b.log.WithError(err).Warn("Failed to create processing_errors_total metric")
+	}
+
+	// Processing duration histogram
+	_, err = b.metricsCollector.NewHistogramVec(
+		"processing_duration_seconds",
+		"Duration of processing operations in seconds",
+		[]string{"network", "processor"},
+		[]float64{0.01, 0.05, 0.1, 0.5, 1, 2, 5, 10, 30, 60},
+	)
+	if err != nil {
+		b.log.WithError(err).Warn("Failed to create processing_duration_seconds metric")
+	}
+
+	// Contributors count gauge
+	_, err = b.metricsCollector.NewGaugeVec(
+		"contributors_count",
+		"Current count of contributors",
+		[]string{"network", "type"},
+	)
+	if err != nil {
+		b.log.WithError(err).Warn("Failed to create contributors_count metric")
+	}
 }
 
 // processSummary generates the global summary file.

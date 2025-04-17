@@ -11,6 +11,7 @@ import (
 	"github.com/ethpandaops/lab/pkg/internal/lab/cache"
 	"github.com/ethpandaops/lab/pkg/internal/lab/locker"
 	"github.com/ethpandaops/lab/pkg/internal/lab/locker/mock"
+	"github.com/ethpandaops/lab/pkg/internal/lab/metrics"
 	"github.com/sirupsen/logrus"
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/wait"
@@ -61,48 +62,63 @@ func SetupRedisContainer(t *testing.T) (string, func()) {
 func createRedisCache(t *testing.T) (cache.Client, func()) {
 	redisURL, cleanup := SetupRedisContainer(t)
 
-	redis, err := cache.NewRedis(cache.RedisConfig{
-		URL: redisURL,
-	})
+	metricsSvc := metrics.NewMetricsService("test", logrus.New())
+
+	// Create Redis cache
+	redisCache, err := cache.NewRedis(cache.RedisConfig{
+		URL:        redisURL,
+		DefaultTTL: time.Minute,
+	}, metricsSvc)
 	if err != nil {
-		t.Fatalf("failed to create Redis client: %v", err)
+		t.Fatalf("failed to create Redis cache: %v", err)
 	}
 
-	return redis, cleanup
+	return redisCache, func() {
+		redisCache.Stop()
+		cleanup()
+	}
 }
 
 func createMemoryCache(t *testing.T) (cache.Client, func()) {
-	memory := cache.NewMemory(cache.MemoryConfig{DefaultTTL: time.Minute})
-	return memory, func() {}
+	metricsSvc := metrics.NewMetricsService("test", logrus.New())
+	memCache := cache.NewMemory(cache.MemoryConfig{DefaultTTL: time.Minute}, metricsSvc)
+	return memCache, func() {}
 }
 
 // TestDistributedLockInterfaces tests the Lock/Unlock behavior with different implementations
 func TestDistributedLockInterfaces(t *testing.T) {
-	testCases := []struct {
-		name       string
-		createFunc func(t *testing.T) (cache.Client, func())
+	// Test with both Redis and memory implementations
+	tests := []struct {
+		name        string
+		createCache func(t *testing.T) (cache.Client, func())
+		skipInShort bool
 	}{
 		{
-			name:       "Redis",
-			createFunc: createRedisCache,
+			name:        "Redis",
+			createCache: createRedisCache,
+			skipInShort: true,
 		},
 		{
-			name:       "Memory",
-			createFunc: createMemoryCache,
+			name:        "Memory",
+			createCache: createMemoryCache,
+			skipInShort: false,
 		},
 	}
 
-	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
-			cache, cleanup := tc.createFunc(t)
-			defer cleanup()
-
-			locker := locker.New(logrus.New(), cache)
-			if locker == nil {
-				t.Fatal("Failed to create locker")
+	for _, test := range tests {
+		test := test // capture range variable
+		t.Run(test.name, func(t *testing.T) {
+			if test.skipInShort && testing.Short() {
+				t.Skip("skipping integration test in short mode")
 			}
 
-			testLockBehavior(t, tc.name, locker)
+			cacheClient, cleanup := test.createCache(t)
+			defer cleanup()
+
+			metricsSvc := metrics.NewMetricsService("test", logrus.New())
+			testLocker := locker.New(logrus.New(), cacheClient, metricsSvc)
+
+			testLockBehavior(t, test.name, testLocker)
 		})
 	}
 }
@@ -302,7 +318,8 @@ func TestLockErrorScenarios(t *testing.T) {
 		// Create mock with error on get but not ErrCacheMiss
 		mockClient := mock.NewStandardCache().WithGetError(fmt.Errorf("forced get error"))
 
-		testLocker := locker.New(logrus.New(), mockClient)
+		metricsSvc := metrics.NewMetricsService("test", logrus.New())
+		testLocker := locker.New(logrus.New(), mockClient, metricsSvc)
 
 		// Should return the error from Get
 		_, success, err := testLocker.Lock("test-lock", time.Second)
@@ -318,7 +335,8 @@ func TestLockErrorScenarios(t *testing.T) {
 		// Create mock with error on set
 		mockClient := mock.NewStandardCache().WithSetError(fmt.Errorf("forced set error"))
 
-		testLocker := locker.New(logrus.New(), mockClient)
+		metricsSvc := metrics.NewMetricsService("test", logrus.New())
+		testLocker := locker.New(logrus.New(), mockClient, metricsSvc)
 
 		// Should return the error from Set
 		_, success, err := testLocker.Lock("test-lock", time.Second)
@@ -332,7 +350,8 @@ func TestLockErrorScenarios(t *testing.T) {
 
 	t.Run("TokenGenerationError", func(t *testing.T) {
 		// Create a memory cache to use as base
-		memCache := cache.NewMemory(cache.MemoryConfig{DefaultTTL: time.Minute})
+		metricsSvc := metrics.NewMetricsService("test", logrus.New())
+		memCache := cache.NewMemory(cache.MemoryConfig{DefaultTTL: time.Minute}, metricsSvc)
 
 		// Create the token error cache that will simulate token generation failures
 		tokenErrorCache := mock.NewTokenErrorCache(memCache)
@@ -354,7 +373,8 @@ func TestUnlockErrorScenarios(t *testing.T) {
 		// Create mock with error on get but not ErrCacheMiss
 		mockClient := mock.NewStandardCache().WithGetError(fmt.Errorf("forced get error"))
 
-		testLocker := locker.New(logrus.New(), mockClient)
+		metricsSvc := metrics.NewMetricsService("test", logrus.New())
+		testLocker := locker.New(logrus.New(), mockClient, metricsSvc)
 
 		// Should return the error from Get
 		success, err := testLocker.Unlock("test-lock", "token")
@@ -370,7 +390,8 @@ func TestUnlockErrorScenarios(t *testing.T) {
 		// Create mock with ErrCacheMiss on get
 		mockClient := mock.NewStandardCache().WithGetError(cache.ErrCacheMiss)
 
-		testLocker := locker.New(logrus.New(), mockClient)
+		metricsSvc := metrics.NewMetricsService("test", logrus.New())
+		testLocker := locker.New(logrus.New(), mockClient, metricsSvc)
 
 		// Should not return an error, but success should be false
 		success, err := testLocker.Unlock("test-lock", "token")
@@ -392,7 +413,8 @@ func TestUnlockErrorScenarios(t *testing.T) {
 			t.Fatalf("Failed to set up test: %v", err)
 		}
 
-		testLocker := locker.New(logrus.New(), mockClient)
+		metricsSvc := metrics.NewMetricsService("test", logrus.New())
+		testLocker := locker.New(logrus.New(), mockClient, metricsSvc)
 
 		// Should return the error from Delete
 		success, err := testLocker.Unlock("test-lock", "token")

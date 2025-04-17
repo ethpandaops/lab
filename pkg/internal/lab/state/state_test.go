@@ -35,7 +35,7 @@ func createTestClient(t *testing.T, key string) (Client[TestJSON], *mock.Standar
 		TTL:       1 * time.Hour,
 	}
 
-	client := New[TestJSON](logger, mockCache, config, key)
+	client := New[TestJSON](logger, mockCache, config, key, nil)
 	return client, mockCache
 }
 
@@ -83,7 +83,7 @@ func TestNamespaceKey(t *testing.T) {
 			}
 
 			// Test the effective key by looking at what's stored in the cache
-			client := New[TestJSON](logger, mockCache, config, tt.key)
+			client := New[TestJSON](logger, mockCache, config, tt.key, nil)
 			ctx := context.Background()
 
 			// Set a value and see what key it uses in the cache
@@ -140,7 +140,7 @@ func TestPointerTypes(t *testing.T) {
 	}
 
 	// Create client with the "pointer-key" key
-	client := New[*TestJSON](logger, mockCache, config, "pointer-key")
+	client := New[*TestJSON](logger, mockCache, config, "pointer-key", nil)
 	ctx := context.Background()
 
 	// Test with pointer data
@@ -184,7 +184,7 @@ func TestDelete(t *testing.T) {
 	}
 
 	// Create a client and assert to the extended interface
-	client := New[TestJSON](logger, mockCache, config, "delete-key")
+	client := New[TestJSON](logger, mockCache, config, "delete-key", nil)
 	extendedClient, ok := client.(ExtendedClient[TestJSON])
 
 	// If we can't cast to extended client, skip this test
@@ -226,7 +226,7 @@ func TestClientWithErrors(t *testing.T) {
 		WithGetError(cache.ErrCacheMiss).
 		WithSetError(assert.AnError)
 
-	client := New[TestJSON](logger, mockCache, &Config{Namespace: "error-test"}, "error-key")
+	client := New[TestJSON](logger, mockCache, &Config{Namespace: "error-test"}, "error-key", nil)
 
 	// Test Get with cache miss
 	_, err := client.Get(ctx)
@@ -248,7 +248,7 @@ func TestConfigDefaults(t *testing.T) {
 		Namespace: "",
 		TTL:       1 * time.Hour,
 	}
-	client := New[TestJSON](logger, mockCache, config, "default-key")
+	client := New[TestJSON](logger, mockCache, config, "default-key", nil)
 	ctx := context.Background()
 
 	// Set some data to verify defaults are applied

@@ -227,5 +227,10 @@ func (c *Client) loadCSV(csvData []byte) error {
 		"countries": countriesLoaded,
 	}).Info("Geolocation database loaded successfully into memory")
 
+	// Update metrics
+	c.cacheItems.WithLabelValues("cities").Set(float64(citiesLoaded))
+	c.cacheItems.WithLabelValues("countries").Set(float64(countriesLoaded))
+	c.cacheItems.WithLabelValues("continents").Set(float64(len(c.locationDB.Continents)))
+
 	return nil
 }

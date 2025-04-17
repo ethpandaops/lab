@@ -86,7 +86,7 @@ func New(...) {
 	}
 
 	// Create typed client for beacon chain state with a specific key
-	stateClient := state.New[*pb.State](log, cacheClient, stateConfig, GetStateKey())
+	stateClient := state.New[*pb.State](log, cacheClient, stateConfig, GetStateKey(), nil)
 
 	return &BeaconChainTimings{
 		// ... existing fields ...
