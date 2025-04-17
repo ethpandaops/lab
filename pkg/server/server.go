@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
+	"sync"
 	"syscall"
 	"time"
 
@@ -65,40 +66,39 @@ func New(config *Config) (*Service, error) {
 	}, nil
 }
 
-// Start starts the sRPC server
+// Start starts the sRPC server and blocks until the context is canceled or an error occurs.
 func (s *Service) Start(ctx context.Context) error {
 	s.log.Info("Starting srv service")
 
+	// Create a cancelable context based on the input context
+	ctx, cancel := context.WithCancel(ctx)
 	s.ctx = ctx
 
-	// Set up signal handling
+	// Set up signal handling to cancel the context
 	sigCh := make(chan os.Signal, 1)
-
 	signal.Notify(sigCh, syscall.SIGINT, syscall.SIGTERM)
 	go func() {
 		sig := <-sigCh
-
-		s.log.WithField("signal", sig.String()).Info("Received signal, shutting down")
-
-		s.stop()
-
-		s.ctx.Done()
+		s.log.WithField("signal", sig.String()).Info("Received signal, initiating shutdown")
+		cancel()
 	}()
 
-	// Initialize dependencies
-	if err := s.initializeDependencies(); err != nil {
+	// Initialize dependencies using the cancelable context
+	if err := s.initializeDependencies(s.ctx); err != nil {
 		return fmt.Errorf("failed to initialize dependencies: %w", err)
 	}
 
-	// Initialize services
-	if err := s.initializeServices(ctx); err != nil {
+	// Initialize services using the cancelable context
+	if err := s.initializeServices(s.ctx); err != nil {
+		cancel() // Ensure context is canceled on initialization error
 		return fmt.Errorf("failed to initialize services: %w", err)
 	}
 
 	// Start all our services
 	for _, service := range s.services {
-		if err := service.Start(ctx); err != nil {
-			return fmt.Errorf("failed to start service: %w", err)
+		if err := service.Start(s.ctx); err != nil {
+			cancel() // Ensure context is canceled on service start error
+			return fmt.Errorf("failed to start service %s: %w", service.Name(), err)
 		}
 	}
 
@@ -126,21 +126,31 @@ func (s *Service) Start(ctx context.Context) error {
 	if err := s.grpcServer.Start(
 		s.ctx,
 		fmt.Sprintf("%s:%d", s.config.Server.Host, s.config.Server.Port),
-		grpcServices, // Pass the instantiated handlers
+		grpcServices,
 	); err != nil {
-		s.log.WithError(err).Fatal("Failed to start gRPC server")
+		s.log.WithError(err).Error("Failed to start gRPC server")
+		cancel()
 	}
 
-	// Block until context is canceled
+	// Block until context is canceled (either by signal or error)
 	<-s.ctx.Done()
-	s.log.Info("Context canceled, shutting down")
+	s.log.Info("Context canceled, initiating graceful shutdown")
+
+	// Perform graceful shutdown
+	s.stop()
 
 	s.log.Info("Srv service stopped")
+
+	// Check the context error after shutdown attempt (optional, depends on desired exit behavior)
+	if err := s.ctx.Err(); err != nil && err != context.Canceled {
+		return fmt.Errorf("service stopped due to unexpected context error: %w", err)
+	}
 
 	return nil
 }
 
-func (s *Service) initializeServices(ctx context.Context) error {
+// initializeServices initializes all services, passing the main service context.
+func (s *Service) initializeServices(ctx context.Context) error { // ctx is already s.ctx passed from Start
 	// Initialize all our services
 	bct, err := beacon_chain_timings.New(
 		s.log,
@@ -204,12 +214,12 @@ func (s *Service) initializeServices(ctx context.Context) error {
 	return nil
 }
 
-// initializeDependencies initializes all of the dependancies to run the srv service
-func (s *Service) initializeDependencies() error {
+// initializeDependencies initializes all dependencies, passing the main service context.
+func (s *Service) initializeDependencies(ctx context.Context) error {
 	// Initialize Ethereum client
 	s.log.Info("Initializing Ethereum client")
 	ethereumClient := ethereum.NewClient(s.config.Ethereum)
-	if err := ethereumClient.Start(s.ctx); err != nil {
+	if err := ethereumClient.Start(ctx); err != nil {
 		return fmt.Errorf("failed to start Ethereum client: %w", err)
 	}
 	s.ethereumClient = ethereumClient
@@ -223,7 +233,7 @@ func (s *Service) initializeDependencies() error {
 	}
 
 	// Start the Xatu client
-	if err := xatuClient.Start(s.ctx); err != nil {
+	if err := xatuClient.Start(ctx); err != nil {
 		return fmt.Errorf("failed to start Xatu client: %w", err)
 	}
 
@@ -235,7 +245,7 @@ func (s *Service) initializeDependencies() error {
 	}
 
 	// Start the storage client
-	if err := storageClient.Start(s.ctx); err != nil {
+	if err := storageClient.Start(ctx); err != nil {
 		return fmt.Errorf("failed to start S3 storage client: %w", err)
 	}
 
@@ -258,7 +268,7 @@ func (s *Service) initializeDependencies() error {
 	}
 
 	// Start the geolocation client
-	if err := geolocationClient.Start(s.ctx); err != nil {
+	if err := geolocationClient.Start(ctx); err != nil {
 		return fmt.Errorf("failed to start geolocation client: %w", err)
 	}
 
@@ -281,45 +291,84 @@ func (s *Service) getService(name string) service.Service {
 	return nil // Explicitly return nil if not found
 }
 
-// stop stops the srv service
+// stop gracefully stops the srv service and its components.
 func (s *Service) stop() {
-	s.log.Info("Stopping srv service")
+	s.log.Info("Starting graceful shutdown sequence")
 
-	// Stop gRPC server
-	s.log.Info("Stopping gRPC server")
+	// Define a shutdown timeout
+	// Use a background context for the timeout itself, as the main context (s.ctx) is already canceled.
+	shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer shutdownCancel()
+
+	// Use a WaitGroup to wait for all components to stop
+	var wg sync.WaitGroup
+
+	// Stop gRPC server gracefully
 	if s.grpcServer != nil {
-		s.grpcServer.Stop()
-
-		// Create a timeout context
-		ctx, cancel := context.WithTimeout(context.Background(), 29*time.Second)
-		defer cancel()
-
-		// Wait for the server to stop or timeout
-		done := make(chan struct{})
+		wg.Add(1)
 		go func() {
-			s.log.Info("Stopping gRPC server")
-
+			defer wg.Done()
+			s.log.Info("Stopping gRPC server...")
 			s.grpcServer.Stop()
-
-			s.log.Info("gRPC server stopped")
-
-			// Stop all our services
-			s.log.Info("Stopping services")
-			for _, service := range s.services {
-				s.log.WithField("service_name", service.Name()).Info("Stopping service")
-
-				service.Stop()
-			}
-
-			close(done)
+			s.log.Info("gRPC server stopped.")
 		}()
-
-		select {
-		case <-done:
-			s.log.Info("Stopped gracefully")
-		case <-ctx.Done():
-			s.log.Warn("Stop timed out after 29s, forcing stop")
-		}
 	}
 
+	// Stop all registered services
+	// Stop them in reverse order of startup
+	for _, svc := range s.services {
+		// Capture loop variable for goroutine
+		serviceToStop := svc
+		s.log.WithField("service_name", serviceToStop.Name()).Info("Stopping service...")
+		serviceToStop.Stop()
+		s.log.WithField("service_name", serviceToStop.Name()).Info("Service stopped.")
+	}
+
+	if s.xatuClient != nil {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			s.log.Info("Stopping Xatu client...")
+			s.xatuClient.Stop()
+			s.log.Info("Xatu client stopped.")
+		}()
+	}
+	if s.storageClient != nil {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			s.log.Info("Stopping Storage client...")
+			if err := s.storageClient.Stop(); err != nil {
+				s.log.WithError(err).Warn("Error stopping storage client")
+			} else {
+				s.log.Info("Storage client stopped.")
+			}
+		}()
+	}
+	if s.cacheClient != nil {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			s.log.Info("Stopping Cache client...")
+			if err := s.cacheClient.Stop(); err != nil {
+				s.log.WithError(err).Warn("Error stopping cache client")
+			} else {
+				s.log.Info("Cache client stopped.")
+			}
+		}()
+	}
+
+	// Wait for all components to stop or timeout
+	waitChan := make(chan struct{})
+	go func() {
+		wg.Wait()
+		close(waitChan)
+	}()
+
+	select {
+	case <-waitChan:
+		s.log.Info("All components stopped gracefully.")
+	case <-shutdownCtx.Done():
+		s.log.Warn("Shutdown timed out after 30s. Some components may not have stopped cleanly.")
+	}
 }
