@@ -305,36 +305,34 @@ func (b *XatuPublicContributors) process(ctx context.Context) {
 	var processingErrorsCounter *prometheus.CounterVec
 	var processingDurationHistogram *prometheus.HistogramVec
 
-	if b.metricsCollector != nil {
-		var err error
+	var err error
 
-		processingCycleCounter, err = b.metricsCollector.NewCounterVec(
-			"processing_cycles_total",
-			"Total number of processing cycles run",
-			[]string{},
-		)
-		if err != nil {
-			b.log.WithError(err).Warn("Failed to create processing_cycles_total metric")
-		}
+	processingCycleCounter, err = b.metricsCollector.NewCounterVec(
+		"processing_cycles_total",
+		"Total number of processing cycles run",
+		[]string{},
+	)
+	if err != nil {
+		b.log.WithError(err).Warn("Failed to create processing_cycles_total metric")
+	}
 
-		processingErrorsCounter, err = b.metricsCollector.NewCounterVec(
-			"processing_errors_total",
-			"Total number of processing errors",
-			[]string{"network", "processor"},
-		)
-		if err != nil {
-			b.log.WithError(err).Warn("Failed to create processing_errors_total metric")
-		}
+	processingErrorsCounter, err = b.metricsCollector.NewCounterVec(
+		"processing_errors_total",
+		"Total number of processing errors",
+		[]string{"network", "processor"},
+	)
+	if err != nil {
+		b.log.WithError(err).Warn("Failed to create processing_errors_total metric")
+	}
 
-		processingDurationHistogram, err = b.metricsCollector.NewHistogramVec(
-			"processing_duration_seconds",
-			"Duration of processing operations in seconds",
-			[]string{"network", "processor"},
-			[]float64{0.01, 0.05, 0.1, 0.5, 1, 2, 5, 10, 30, 60},
-		)
-		if err != nil {
-			b.log.WithError(err).Warn("Failed to create processing_duration_seconds metric")
-		}
+	processingDurationHistogram, err = b.metricsCollector.NewHistogramVec(
+		"processing_duration_seconds",
+		"Duration of processing operations in seconds",
+		[]string{"network", "processor"},
+		[]float64{0.01, 0.05, 0.1, 0.5, 1, 2, 5, 10, 30, 60},
+	)
+	if err != nil {
+		b.log.WithError(err).Warn("Failed to create processing_duration_seconds metric")
 	}
 
 	// Process each configured network

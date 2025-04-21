@@ -20,15 +20,13 @@ func (b *BeaconSlots) processSlot(ctx context.Context, networkName string, slot 
 		Debug("Processing slot")
 
 	// Record processing operation in metrics
-	if b.metricsCollector != nil {
-		counter, err := b.metricsCollector.NewCounterVec(
-			"slots_processed_total",
-			"Total number of slots processed",
-			[]string{"network", "processor"},
-		)
-		if err == nil {
-			counter.WithLabelValues(networkName, "all").Inc()
-		}
+	counter, err := b.metricsCollector.NewCounterVec(
+		"slots_processed_total",
+		"Total number of slots processed",
+		[]string{"network", "processor"},
+	)
+	if err == nil {
+		counter.WithLabelValues(networkName, "all").Inc()
 	}
 
 	// 1. Get block data (should return *pb.BlockData)
@@ -41,15 +39,13 @@ func (b *BeaconSlots) processSlot(ctx context.Context, networkName string, slot 
 		}
 
 		// Record error in metrics
-		if b.metricsCollector != nil {
-			errorCounter, metricErr := b.metricsCollector.NewCounterVec(
-				"processing_errors_total",
-				"Total number of slot processing errors",
-				[]string{"network", "processor", "error_type"},
-			)
-			if metricErr == nil {
-				errorCounter.WithLabelValues(networkName, "all", "block_data").Inc()
-			}
+		errorCounter, metricErr := b.metricsCollector.NewCounterVec(
+			"processing_errors_total",
+			"Total number of slot processing errors",
+			[]string{"network", "processor", "error_type"},
+		)
+		if metricErr == nil {
+			errorCounter.WithLabelValues(networkName, "all", "block_data").Inc()
 		}
 		return false, fmt.Errorf("failed to get block data: %w", err)
 	}
@@ -201,31 +197,27 @@ func (b *BeaconSlots) processSlot(ctx context.Context, networkName string, slot 
 	})
 	if err != nil {
 		// Record error in metrics
-		if b.metricsCollector != nil {
-			errorCounter, metricErr := b.metricsCollector.NewCounterVec(
-				"processing_errors_total",
-				"Total number of slot processing errors",
-				[]string{"network", "processor", "error_type"},
-			)
-			if metricErr == nil {
-				errorCounter.WithLabelValues(networkName, "all", "storage").Inc()
-			}
+		errorCounter, metricErr := b.metricsCollector.NewCounterVec(
+			"processing_errors_total",
+			"Total number of slot processing errors",
+			[]string{"network", "processor", "error_type"},
+		)
+		if metricErr == nil {
+			errorCounter.WithLabelValues(networkName, "all", "storage").Inc()
 		}
 		return false, fmt.Errorf("failed to store slot data: %w", err)
 	}
 
 	// Record processing duration
-	if b.metricsCollector != nil {
-		duration := time.Since(startTime).Seconds()
-		histogram, err := b.metricsCollector.NewHistogramVec(
-			"processing_duration_seconds",
-			"Duration of slot processing operations in seconds",
-			[]string{"network", "processor"},
-			[]float64{0.01, 0.05, 0.1, 0.5, 1, 2, 5, 10},
-		)
-		if err == nil {
-			histogram.WithLabelValues(networkName, "all").Observe(duration)
-		}
+	duration := time.Since(startTime).Seconds()
+	histogram, err := b.metricsCollector.NewHistogramVec(
+		"processing_duration_seconds",
+		"Duration of slot processing operations in seconds",
+		[]string{"network", "processor"},
+		[]float64{0.01, 0.05, 0.1, 0.5, 1, 2, 5, 10},
+	)
+	if err == nil {
+		histogram.WithLabelValues(networkName, "all").Observe(duration)
 	}
 
 	return true, nil

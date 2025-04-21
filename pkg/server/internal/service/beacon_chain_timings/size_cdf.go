@@ -28,30 +28,26 @@ func (b *BeaconChainTimings) processSizeCDF(ctx context.Context, network *ethere
 	startTime := time.Now()
 
 	// Increment processing counter if metrics are available
-	if b.metricsCollector != nil {
-		counter, err := b.metricsCollector.NewCounterVec(
-			"processing_operations_total",
-			"Total number of processing operations",
-			[]string{"operation", "network", "window"},
-		)
-		if err == nil {
-			counter.WithLabelValues("size_cdf", network.Name, window.File).Inc()
-		}
+	counter, err := b.metricsCollector.NewCounterVec(
+		"processing_operations_total",
+		"Total number of processing operations",
+		[]string{"operation", "network", "window"},
+	)
+	if err == nil {
+		counter.WithLabelValues("size_cdf", network.Name, window.File).Inc()
 	}
 
 	// Get time range for the window
 	timeRange, err := b.getTimeRange(window)
 	if err != nil {
 		// Record error metric if available
-		if b.metricsCollector != nil {
-			errorCounter, metricErr := b.metricsCollector.NewCounterVec(
-				"processing_errors_total",
-				"Total number of processing errors",
-				[]string{"operation", "network", "window"},
-			)
-			if metricErr == nil {
-				errorCounter.WithLabelValues("size_cdf", network.Name, window.File).Inc()
-			}
+		errorCounter, metricErr := b.metricsCollector.NewCounterVec(
+			"processing_errors_total",
+			"Total number of processing errors",
+			[]string{"operation", "network", "window"},
+		)
+		if metricErr == nil {
+			errorCounter.WithLabelValues("size_cdf", network.Name, window.File).Inc()
 		}
 		return fmt.Errorf("failed to get time range: %w", err)
 	}
@@ -65,15 +61,13 @@ func (b *BeaconChainTimings) processSizeCDF(ctx context.Context, network *ethere
 	sizeCDFData, err := b.GetSizeCDFData(ctx, network.Name, timeRange)
 	if err != nil {
 		// Record error metric if available
-		if b.metricsCollector != nil {
-			errorCounter, metricErr := b.metricsCollector.NewCounterVec(
-				"processing_errors_total",
-				"Total number of processing errors",
-				[]string{"operation", "network", "window"},
-			)
-			if metricErr == nil {
-				errorCounter.WithLabelValues("size_cdf", network.Name, window.File).Inc()
-			}
+		errorCounter, metricErr := b.metricsCollector.NewCounterVec(
+			"processing_errors_total",
+			"Total number of processing errors",
+			[]string{"operation", "network", "window"},
+		)
+		if metricErr == nil {
+			errorCounter.WithLabelValues("size_cdf", network.Name, window.File).Inc()
 		}
 		return fmt.Errorf("failed to process size CDF data: %w", err)
 	}
@@ -81,31 +75,27 @@ func (b *BeaconChainTimings) processSizeCDF(ctx context.Context, network *ethere
 	// Store the results
 	if err := b.storeSizeCDFData(ctx, network.Name, window.File, sizeCDFData); err != nil {
 		// Record error metric if available
-		if b.metricsCollector != nil {
-			errorCounter, metricErr := b.metricsCollector.NewCounterVec(
-				"processing_errors_total",
-				"Total number of processing errors",
-				[]string{"operation", "network", "window"},
-			)
-			if metricErr == nil {
-				errorCounter.WithLabelValues("size_cdf", network.Name, window.File).Inc()
-			}
+		errorCounter, metricErr := b.metricsCollector.NewCounterVec(
+			"processing_errors_total",
+			"Total number of processing errors",
+			[]string{"operation", "network", "window"},
+		)
+		if metricErr == nil {
+			errorCounter.WithLabelValues("size_cdf", network.Name, window.File).Inc()
 		}
 		return fmt.Errorf("failed to store size CDF data: %w", err)
 	}
 
 	// Record duration metric if available
-	if b.metricsCollector != nil {
-		duration := time.Since(startTime).Seconds()
-		histogram, err := b.metricsCollector.NewHistogramVec(
-			"processing_duration_seconds",
-			"Duration of processing operations in seconds",
-			[]string{"operation", "network", "window"},
-			nil,
-		)
-		if err == nil {
-			histogram.WithLabelValues("size_cdf", network.Name, window.File).Observe(duration)
-		}
+	duration := time.Since(startTime).Seconds()
+	histogram, err := b.metricsCollector.NewHistogramVec(
+		"processing_duration_seconds",
+		"Duration of processing operations in seconds",
+		[]string{"operation", "network", "window"},
+		nil,
+	)
+	if err == nil {
+		histogram.WithLabelValues("size_cdf", network.Name, window.File).Observe(duration)
 	}
 
 	b.log.WithFields(logrus.Fields{

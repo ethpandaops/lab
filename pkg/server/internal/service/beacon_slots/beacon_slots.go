@@ -325,15 +325,13 @@ func (b *BeaconSlots) processHead(ctx context.Context, networkName string) {
 			logCtx.WithError(err).Warn("Failed to get current slot")
 
 			// Record error in metrics
-			if b.metricsCollector != nil {
-				errorCounter, metricErr := b.metricsCollector.NewCounterVec(
-					"processing_errors_total",
-					"Total number of slot processing errors",
-					[]string{"network", "processor", "error_type"},
-				)
-				if metricErr == nil {
-					errorCounter.WithLabelValues(networkName, HeadProcessorName, "get_current_slot").Inc()
-				}
+			errorCounter, metricErr := b.metricsCollector.NewCounterVec(
+				"processing_errors_total",
+				"Total number of slot processing errors",
+				[]string{"network", "processor", "error_type"},
+			)
+			if metricErr == nil {
+				errorCounter.WithLabelValues(networkName, HeadProcessorName, "get_current_slot").Inc()
 			}
 			select {
 			case <-time.After(1 * time.Second):
@@ -358,15 +356,13 @@ func (b *BeaconSlots) processHead(ctx context.Context, networkName string) {
 			logCtx.WithError(err).WithField("slot", targetSlot).Error("Failed to process slot")
 
 			// Record error in metrics
-			if b.metricsCollector != nil {
-				errorCounter, metricErr := b.metricsCollector.NewCounterVec(
-					"processing_errors_total",
-					"Total number of slot processing errors",
-					[]string{"network", "processor", "error_type"},
-				)
-				if metricErr == nil {
-					errorCounter.WithLabelValues(networkName, HeadProcessorName, "process_slot").Inc()
-				}
+			errorCounter, metricErr := b.metricsCollector.NewCounterVec(
+				"processing_errors_total",
+				"Total number of slot processing errors",
+				[]string{"network", "processor", "error_type"},
+			)
+			if metricErr == nil {
+				errorCounter.WithLabelValues(networkName, HeadProcessorName, "process_slot").Inc()
 			}
 			select {
 			case <-time.After(1 * time.Second):
@@ -385,15 +381,13 @@ func (b *BeaconSlots) processHead(ctx context.Context, networkName string) {
 			}
 
 			// Update last processed slot metric
-			if b.metricsCollector != nil {
-				gauge, err := b.metricsCollector.NewGaugeVec(
-					"last_processed_slot",
-					"The last slot that was successfully processed",
-					[]string{"network", "processor"},
-				)
-				if err == nil {
-					gauge.WithLabelValues(networkName, HeadProcessorName).Set(float64(targetSlot))
-				}
+			gauge, err := b.metricsCollector.NewGaugeVec(
+				"last_processed_slot",
+				"The last slot that was successfully processed",
+				[]string{"network", "processor"},
+			)
+			if err == nil {
+				gauge.WithLabelValues(networkName, HeadProcessorName).Set(float64(targetSlot))
 			}
 
 			logCtx.WithField("slot", targetSlot).WithField("processing_time", time.Since(startTime)).Info("Successfully processed head slot")
@@ -449,15 +443,13 @@ func (b *BeaconSlots) processTrailing(ctx context.Context, networkName string) {
 			logCtx.WithError(err).Error("Failed to get current slot")
 
 			// Record error in metrics
-			if b.metricsCollector != nil {
-				errorCounter, metricErr := b.metricsCollector.NewCounterVec(
-					"processing_errors_total",
-					"Total number of slot processing errors",
-					[]string{"network", "processor", "error_type"},
-				)
-				if metricErr == nil {
-					errorCounter.WithLabelValues(networkName, TrailingProcessorName, "get_current_slot").Inc()
-				}
+			errorCounter, metricErr := b.metricsCollector.NewCounterVec(
+				"processing_errors_total",
+				"Total number of slot processing errors",
+				[]string{"network", "processor", "error_type"},
+			)
+			if metricErr == nil {
+				errorCounter.WithLabelValues(networkName, TrailingProcessorName, "get_current_slot").Inc()
 			}
 			select {
 			case <-time.After(1 * time.Second):
@@ -482,15 +474,13 @@ func (b *BeaconSlots) processTrailing(ctx context.Context, networkName string) {
 			logCtx.WithError(err).WithField("slot", nextSlot).Error("Failed to process slot")
 
 			// Record error in metrics
-			if b.metricsCollector != nil {
-				errorCounter, metricErr := b.metricsCollector.NewCounterVec(
-					"processing_errors_total",
-					"Total number of slot processing errors",
-					[]string{"network", "processor", "error_type"},
-				)
-				if metricErr == nil {
-					errorCounter.WithLabelValues(networkName, TrailingProcessorName, "process_slot").Inc()
-				}
+			errorCounter, metricErr := b.metricsCollector.NewCounterVec(
+				"processing_errors_total",
+				"Total number of slot processing errors",
+				[]string{"network", "processor", "error_type"},
+			)
+			if metricErr == nil {
+				errorCounter.WithLabelValues(networkName, TrailingProcessorName, "process_slot").Inc()
 			}
 			select {
 			case <-time.After(5 * time.Second):
@@ -509,15 +499,13 @@ func (b *BeaconSlots) processTrailing(ctx context.Context, networkName string) {
 			}
 
 			// Update last processed slot metric
-			if b.metricsCollector != nil {
-				gauge, err := b.metricsCollector.NewGaugeVec(
-					"last_processed_slot",
-					"The last slot that was successfully processed",
-					[]string{"network", "processor"},
-				)
-				if err == nil {
-					gauge.WithLabelValues(networkName, TrailingProcessorName).Set(float64(nextSlot))
-				}
+			gauge, err := b.metricsCollector.NewGaugeVec(
+				"last_processed_slot",
+				"The last slot that was successfully processed",
+				[]string{"network", "processor"},
+			)
+			if err == nil {
+				gauge.WithLabelValues(networkName, TrailingProcessorName).Set(float64(nextSlot))
 			}
 
 			logCtx.WithField("slot", nextSlot).Info("Successfully processed trailing slot")
@@ -573,15 +561,13 @@ func (b *BeaconSlots) processBackfill(ctx context.Context, networkName string) {
 			logCtx.WithError(err).Warn("Failed to get current slot")
 
 			// Record error in metrics
-			if b.metricsCollector != nil {
-				errorCounter, metricErr := b.metricsCollector.NewCounterVec(
-					"processing_errors_total",
-					"Total number of slot processing errors",
-					[]string{"network", "processor", "error_type"},
-				)
-				if metricErr == nil {
-					errorCounter.WithLabelValues(networkName, BackfillProcessorName, "get_current_slot").Inc()
-				}
+			errorCounter, metricErr := b.metricsCollector.NewCounterVec(
+				"processing_errors_total",
+				"Total number of slot processing errors",
+				[]string{"network", "processor", "error_type"},
+			)
+			if metricErr == nil {
+				errorCounter.WithLabelValues(networkName, BackfillProcessorName, "get_current_slot").Inc()
 			}
 			select {
 			case <-time.After(1 * time.Second):
@@ -622,15 +608,13 @@ func (b *BeaconSlots) processBackfill(ctx context.Context, networkName string) {
 				logCtx.WithError(err).WithField("slot", nextSlot).Error("Failed to process slot")
 
 				// Record error in metrics
-				if b.metricsCollector != nil {
-					errorCounter, metricErr := b.metricsCollector.NewCounterVec(
-						"processing_errors_total",
-						"Total number of slot processing errors",
-						[]string{"network", "processor", "error_type"},
-					)
-					if metricErr == nil {
-						errorCounter.WithLabelValues(networkName, BackfillProcessorName, "process_slot").Inc()
-					}
+				errorCounter, metricErr := b.metricsCollector.NewCounterVec(
+					"processing_errors_total",
+					"Total number of slot processing errors",
+					[]string{"network", "processor", "error_type"},
+				)
+				if metricErr == nil {
+					errorCounter.WithLabelValues(networkName, BackfillProcessorName, "process_slot").Inc()
 				}
 				select {
 				case <-time.After(5 * time.Second):
@@ -654,15 +638,13 @@ func (b *BeaconSlots) processBackfill(ctx context.Context, networkName string) {
 			}
 
 			// Update last processed slot metric
-			if b.metricsCollector != nil {
-				gauge, err := b.metricsCollector.NewGaugeVec(
-					"last_processed_slot",
-					"The last slot that was successfully processed",
-					[]string{"network", "processor"},
-				)
-				if err == nil {
-					gauge.WithLabelValues(networkName, BackfillProcessorName).Set(float64(nextSlot))
-				}
+			gauge, err := b.metricsCollector.NewGaugeVec(
+				"last_processed_slot",
+				"The last slot that was successfully processed",
+				[]string{"network", "processor"},
+			)
+			if err == nil {
+				gauge.WithLabelValues(networkName, BackfillProcessorName).Set(float64(nextSlot))
 			}
 
 			logCtx.WithField("slot", nextSlot).Info("Successfully processed backfill slot")
