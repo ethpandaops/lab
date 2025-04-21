@@ -59,7 +59,11 @@ func (b *BeaconSlots) getBlockSeenAtSlotTime(ctx context.Context, networkName st
 		WITH api_events AS (
 			SELECT
 				propagation_slot_start_diff as slot_time,
-				meta_client_name
+				meta_client_name,
+				meta_client_geo_city,
+				meta_client_geo_country,
+				meta_client_geo_continent_code,
+				slot_start_date_time
 			FROM default.beacon_api_eth_v1_events_block FINAL
 			WHERE
 				slot = ?
@@ -69,7 +73,11 @@ func (b *BeaconSlots) getBlockSeenAtSlotTime(ctx context.Context, networkName st
 		head_events AS (
 			SELECT
 				propagation_slot_start_diff as slot_time,
-				meta_client_name
+				meta_client_name,
+				meta_client_geo_city,
+				meta_client_geo_country,
+				meta_client_geo_continent_code,
+				slot_start_date_time
 			FROM default.beacon_api_eth_v1_events_block FINAL
 			WHERE
 				slot = ?
@@ -89,11 +97,11 @@ func (b *BeaconSlots) getBlockSeenAtSlotTime(ctx context.Context, networkName st
 			meta_client_geo_continent_code
 		FROM (
 			SELECT *,
-				ROW_NUMBER() OVER (PARTITION BY meta_client_name ORDER BY event_date_time ASC) as rn
+				ROW_NUMBER() OVER (PARTITION BY meta_client_name ORDER BY slot_start_date_time ASC) as rn
 			FROM combined_events
 		) t
 		WHERE rn = 1
-		ORDER BY event_date_time ASC
+		ORDER BY slot_start_date_time ASC
 	`
 
 	// Get the Clickhouse client for this network
