@@ -117,7 +117,7 @@ func (b *BeaconSlots) Start(ctx context.Context) error {
 	leaderClient := leader.New(b.log, b.lockerClient, leader.Config{
 		Resource:        ServiceName + "/processing",
 		TTL:             5 * time.Second,
-		RefreshInterval: 1 * time.Second,
+		RefreshInterval: 500 * time.Second,
 
 		OnElected: func() {
 			b.log.Info("Became leader for BeaconSlots service")
@@ -500,7 +500,7 @@ func (b *BeaconSlots) processTrailing(ctx context.Context, networkName string) {
 			// Update last processed slot metric
 			b.lastProcessedSlotMetric.WithLabelValues(networkName, TrailingProcessorName).Set(float64(nextSlot))
 
-			logCtx.WithField("slot", nextSlot).Info("Successfully processed trailing slot")
+			logCtx.WithField("slot", nextSlot).WithField("target_slot", targetSlot).Info("Successfully processed trailing slot")
 		}
 
 		// Sleep until the next slot
@@ -569,12 +569,8 @@ func (b *BeaconSlots) processBackfill(ctx context.Context, networkName string) {
 
 			// Record error in metrics
 			b.processingErrorsTotalMetric.WithLabelValues(networkName, BackfillProcessorName, "get_current_slot").Inc()
-			select {
-			case <-time.After(1 * time.Second):
-				continue
-			case <-ctx.Done():
-				return
-			}
+
+			continue
 		}
 
 		targetSlot := currentSlot - phase0.Slot(b.config.Backfill.Slots)
@@ -591,12 +587,8 @@ func (b *BeaconSlots) processBackfill(ctx context.Context, networkName string) {
 		processed, err := b.slotHasBeenProcessed(ctx, networkName, phase0.Slot(nextSlot))
 		if err != nil {
 			logCtx.WithError(err).WithField("slot", nextSlot).Error("Failed to check if slot has been processed")
-			select {
-			case <-time.After(1 * time.Second):
-				continue
-			case <-ctx.Done():
-				return
-			}
+
+			continue
 		}
 
 		didProcess := false
@@ -609,12 +601,8 @@ func (b *BeaconSlots) processBackfill(ctx context.Context, networkName string) {
 
 				// Record error in metrics
 				b.processingErrorsTotalMetric.WithLabelValues(networkName, BackfillProcessorName, "process_slot").Inc()
-				select {
-				case <-time.After(5 * time.Second):
-					continue
-				case <-ctx.Done():
-					return
-				}
+
+				continue
 			}
 
 			if processed {
@@ -636,7 +624,7 @@ func (b *BeaconSlots) processBackfill(ctx context.Context, networkName string) {
 			// Update last processed slot metric
 			b.lastProcessedSlotMetric.WithLabelValues(networkName, BackfillProcessorName).Set(float64(nextSlot))
 
-			logCtx.WithField("slot", nextSlot).Info("Successfully processed backfill slot")
+			logCtx.WithField("slot", nextSlot).WithField("target_slot", targetSlot).Info("Successfully processed backfill slot")
 		}
 
 		// Small sleep so we don't hammer clickhouse
