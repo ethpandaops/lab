@@ -147,9 +147,14 @@ func (c *Client) loadCSV(csvData []byte) error {
 	colPopulation := indexOf(header, "population")
 	colISO2 := indexOf(header, "iso2")
 	colISO3 := indexOf(header, "iso3")
+	colCoordinates := indexOf(header, "coordinates")
 
-	if colCity == -1 || colCountry == -1 || colLat == -1 || colLon == -1 {
-		return fmt.Errorf("expected headers not found in CSV")
+	if colCity == -1 || colCountry == -1 {
+		return fmt.Errorf("expected city and country headers not found in CSV")
+	}
+
+	if colCoordinates == -1 && (colLat == -1 || colLon == -1) {
+		return fmt.Errorf("coordinates or latitude/longitude headers not found in CSV")
 	}
 
 	// Process CSV rows
@@ -189,9 +194,18 @@ func (c *Client) loadCSV(csvData []byte) error {
 			iso3 = row[colISO3]
 		}
 
+		// If coordinates are present, attempt to parse them
 		var lat, lon float64
-		fmt.Sscanf(row[colLat], "%f", &lat)
-		fmt.Sscanf(row[colLon], "%f", &lon)
+		if colCoordinates != -1 {
+			coordinates := strings.Split(row[colCoordinates], ",")
+			if len(coordinates) == 2 {
+				fmt.Sscanf(coordinates[0], "%f", &lat)
+				fmt.Sscanf(coordinates[1], "%f", &lon)
+			}
+		} else if colLat != -1 && colLon != -1 {
+			fmt.Sscanf(row[colLat], "%f", &lat)
+			fmt.Sscanf(row[colLon], "%f", &lon)
+		}
 
 		cityInfo := CityInfo{
 			City:       city,

@@ -51,7 +51,7 @@ func New(
 		return nil, fmt.Errorf("invalid config: %w", err)
 	}
 
-	log.WithField("dsn", config.DSN).Info("Initializing ClickHouse client")
+	log.Info("Initializing ClickHouse client")
 
 	client := &client{
 		log:    log.WithField("module", "clickhouse"),
@@ -160,10 +160,7 @@ func (c *client) Start(ctx context.Context) error {
 		}
 	}
 
-	c.log.WithFields(logrus.Fields{
-		"original_dsn":  originalDSN,
-		"processed_dsn": dsn,
-	}).Info("Attempting to connect using mailru/chhttp driver")
+	c.log.Info("Using mailru/chhttp driver")
 
 	// Open connection pool using database/sql
 	conn, err := sql.Open("chhttp", dsn) // Use "chhttp" driver name
