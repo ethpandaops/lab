@@ -17,6 +17,7 @@ import (
 	"github.com/ethpandaops/lab/pkg/internal/lab/storage"
 	"github.com/ethpandaops/lab/pkg/internal/lab/xatu"
 	pb "github.com/ethpandaops/lab/pkg/server/proto/lab"
+	"github.com/prometheus/client_golang/prometheus"
 	"github.com/sirupsen/logrus"
 )
 
@@ -44,6 +45,14 @@ type BeaconSlots struct {
 	geolocationClient *geolocation.Client
 	metrics           *metrics.Metrics
 	metricsCollector  *metrics.Collector
+
+	// Metric collectors
+	stateLastProcessedSlotMetric *prometheus.GaugeVec
+	stateSlotAgeMetric           *prometheus.GaugeVec
+	lastProcessedSlotMetric      *prometheus.GaugeVec
+	slotsProcessedTotalMetric    *prometheus.CounterVec
+	processingErrorsTotalMetric  *prometheus.CounterVec
+	processingDurationMetric     *prometheus.HistogramVec
 
 	parentCtx        context.Context // Context passed from Start
 	processCtx       context.Context
@@ -282,10 +291,13 @@ func (b *BeaconSlots) sleepUntilNextSlot(ctx context.Context, network string) {
 
 // processHead processes the latest slot for a network
 func (b *BeaconSlots) processHead(ctx context.Context, networkName string) {
-	logCtx := b.log.WithField("network", networkName).WithField("processor", HeadProcessorName)
+	logCtx := b.log.WithFields(logrus.Fields{
+		"network":   networkName,
+		"processor": HeadProcessorName,
+	})
 	logCtx.Info("Starting up")
 
-	// Create a state client for the network
+	// Initialize state client for this processor
 	stateClient := state.New[*ProcessorState](b.log, b.cacheClient, &state.Config{
 		Namespace: ServiceName,
 		TTL:       31 * 24 * time.Hour,
@@ -298,6 +310,7 @@ func (b *BeaconSlots) processHead(ctx context.Context, networkName string) {
 			return
 		default:
 			// Continue processing
+			time.Sleep(1 * time.Second)
 		}
 
 		var slotState *ProcessorState
@@ -305,19 +318,20 @@ func (b *BeaconSlots) processHead(ctx context.Context, networkName string) {
 		slotState, err := stateClient.Get(ctx)
 		if err != nil {
 			if err == state.ErrNotFound {
+				// No state found, initialize with default values
+				logCtx.Info("No state found, initializing")
 				slotState = &ProcessorState{
 					LastProcessedSlot: 0,
 				}
 			} else {
 				logCtx.WithError(err).Warn("Failed to get state")
-				select {
-				case <-time.After(1 * time.Second):
-					continue
-				case <-ctx.Done():
-					return
-				}
+
+				continue
 			}
 		}
+
+		// Update state metrics
+		b.updateStateMetrics(networkName, HeadProcessorName, slotState)
 
 		// Get the current target slot
 		currentSlot, err := b.getCurrentSlot(ctx, networkName)
@@ -325,25 +339,14 @@ func (b *BeaconSlots) processHead(ctx context.Context, networkName string) {
 			logCtx.WithError(err).Warn("Failed to get current slot")
 
 			// Record error in metrics
-			errorCounter, metricErr := b.metricsCollector.NewCounterVec(
-				"processing_errors_total",
-				"Total number of slot processing errors",
-				[]string{"network", "processor", "error_type"},
-			)
-			if metricErr == nil {
-				errorCounter.WithLabelValues(networkName, HeadProcessorName, "get_current_slot").Inc()
-			}
-			select {
-			case <-time.After(1 * time.Second):
-				continue
-			case <-ctx.Done():
-				return
-			}
+			b.processingErrorsTotalMetric.WithLabelValues(networkName, HeadProcessorName, "get_current_slot").Inc()
+
+			continue
 		}
 
 		targetSlot := currentSlot - phase0.Slot(b.config.HeadDelaySlots)
 
-		if slotState.LastProcessedSlot == targetSlot {
+		if slotState.LastProcessedSlot == phase0.Slot(targetSlot) {
 			b.sleepUntilNextSlot(ctx, networkName)
 			continue
 		}
@@ -356,41 +359,26 @@ func (b *BeaconSlots) processHead(ctx context.Context, networkName string) {
 			logCtx.WithError(err).WithField("slot", targetSlot).Error("Failed to process slot")
 
 			// Record error in metrics
-			errorCounter, metricErr := b.metricsCollector.NewCounterVec(
-				"processing_errors_total",
-				"Total number of slot processing errors",
-				[]string{"network", "processor", "error_type"},
-			)
-			if metricErr == nil {
-				errorCounter.WithLabelValues(networkName, HeadProcessorName, "process_slot").Inc()
-			}
-			select {
-			case <-time.After(1 * time.Second):
-				continue
-			case <-ctx.Done():
-				return
-			}
+			b.processingErrorsTotalMetric.WithLabelValues(networkName, HeadProcessorName, "process_slot").Inc()
+
+			continue
 		}
 
 		if processed {
 			// Update state with the processed slot
-			slotState.LastProcessedSlot = targetSlot
+			slotState.LastProcessedSlot = phase0.Slot(currentSlot)
 
 			if err := stateClient.Set(ctx, slotState); err != nil {
 				logCtx.WithError(err).Error("Failed to update state after processing")
+			} else {
+				// Update state metrics after successful state update
+				b.updateStateMetrics(networkName, HeadProcessorName, slotState)
 			}
 
 			// Update last processed slot metric
-			gauge, err := b.metricsCollector.NewGaugeVec(
-				"last_processed_slot",
-				"The last slot that was successfully processed",
-				[]string{"network", "processor"},
-			)
-			if err == nil {
-				gauge.WithLabelValues(networkName, HeadProcessorName).Set(float64(targetSlot))
-			}
+			b.lastProcessedSlotMetric.WithLabelValues(networkName, HeadProcessorName).Set(float64(currentSlot))
 
-			logCtx.WithField("slot", targetSlot).WithField("processing_time", time.Since(startTime)).Info("Successfully processed head slot")
+			logCtx.WithField("slot", currentSlot).WithField("processing_time", time.Since(startTime)).Info("Successfully processed head slot")
 		}
 
 		// Sleep until the next slot
@@ -400,14 +388,18 @@ func (b *BeaconSlots) processHead(ctx context.Context, networkName string) {
 
 // processTrailing processes trailing slots for a network
 func (b *BeaconSlots) processTrailing(ctx context.Context, networkName string) {
-	logCtx := b.log.WithField("network", networkName).WithField("processor", TrailingProcessorName)
+	logCtx := b.log.WithFields(logrus.Fields{
+		"network":   networkName,
+		"processor": TrailingProcessorName,
+	})
 	logCtx.Info("Starting up")
 
-	// Create a state client for the network
+	// Initialize state client for this processor
+	stateKey := GetStateKey(networkName, TrailingProcessorName)
 	stateClient := state.New[*ProcessorState](b.log, b.cacheClient, &state.Config{
 		Namespace: ServiceName,
 		TTL:       31 * 24 * time.Hour,
-	}, networkName+"/trailing", b.metrics)
+	}, stateKey, b.metrics)
 
 	for {
 		select {
@@ -416,6 +408,7 @@ func (b *BeaconSlots) processTrailing(ctx context.Context, networkName string) {
 			return
 		default:
 			// Continue processing
+			time.Sleep(1 * time.Second)
 		}
 
 		var slotState *ProcessorState
@@ -423,19 +416,29 @@ func (b *BeaconSlots) processTrailing(ctx context.Context, networkName string) {
 		slotState, err := stateClient.Get(ctx)
 		if err != nil {
 			if err == state.ErrNotFound {
+				// No state found, initialize with default values
+				wallclockSlot, err := b.getCurrentSlot(ctx, networkName)
+				if err != nil {
+					logCtx.WithError(err).Warn("Failed to get current slot")
+
+					continue
+				}
+
+				logCtx.Info("No state found, initializing")
+
+				// Add on our lag
 				slotState = &ProcessorState{
-					LastProcessedSlot: 0,
+					LastProcessedSlot: phase0.Slot(wallclockSlot) + phase0.Slot(b.config.HeadDelaySlots),
 				}
 			} else {
 				logCtx.WithError(err).Warn("Failed to get state")
-				select {
-				case <-time.After(1 * time.Second):
-					continue
-				case <-ctx.Done():
-					return
-				}
+
+				continue
 			}
 		}
+
+		// Update state metrics
+		b.updateStateMetrics(networkName, TrailingProcessorName, slotState)
 
 		// Get the current target slot
 		currentSlot, err := b.getCurrentSlot(ctx, networkName)
@@ -443,20 +446,9 @@ func (b *BeaconSlots) processTrailing(ctx context.Context, networkName string) {
 			logCtx.WithError(err).Error("Failed to get current slot")
 
 			// Record error in metrics
-			errorCounter, metricErr := b.metricsCollector.NewCounterVec(
-				"processing_errors_total",
-				"Total number of slot processing errors",
-				[]string{"network", "processor", "error_type"},
-			)
-			if metricErr == nil {
-				errorCounter.WithLabelValues(networkName, TrailingProcessorName, "get_current_slot").Inc()
-			}
-			select {
-			case <-time.After(1 * time.Second):
-				continue
-			case <-ctx.Done():
-				return
-			}
+			b.processingErrorsTotalMetric.WithLabelValues(networkName, TrailingProcessorName, "get_current_slot").Inc()
+
+			continue
 		}
 
 		targetSlot := currentSlot - phase0.Slot(500)
@@ -467,27 +459,31 @@ func (b *BeaconSlots) processTrailing(ctx context.Context, networkName string) {
 			continue
 		}
 
-		nextSlot := slotState.LastProcessedSlot + 1
+		nextSlot := slotState.LastProcessedSlot - 1
+
+		// Check if somehow we've processed this slot already
+		hasProcessed, err := b.slotHasBeenProcessed(ctx, networkName, phase0.Slot(nextSlot))
+		if err != nil {
+			logCtx.WithError(err).WithField("slot", nextSlot).Error("Failed to check if slot has been processed")
+
+			continue
+		}
+
+		if hasProcessed {
+			b.sleepUntilNextSlot(ctx, networkName)
+
+			continue
+		}
+
 		// Process the slot
-		processed, err := b.processSlot(ctx, networkName, nextSlot)
+		processed, err := b.processSlot(ctx, networkName, phase0.Slot(nextSlot))
 		if err != nil {
 			logCtx.WithError(err).WithField("slot", nextSlot).Error("Failed to process slot")
 
 			// Record error in metrics
-			errorCounter, metricErr := b.metricsCollector.NewCounterVec(
-				"processing_errors_total",
-				"Total number of slot processing errors",
-				[]string{"network", "processor", "error_type"},
-			)
-			if metricErr == nil {
-				errorCounter.WithLabelValues(networkName, TrailingProcessorName, "process_slot").Inc()
-			}
-			select {
-			case <-time.After(5 * time.Second):
-				continue
-			case <-ctx.Done():
-				return
-			}
+			b.processingErrorsTotalMetric.WithLabelValues(networkName, TrailingProcessorName, "process_slot").Inc()
+
+			continue
 		}
 
 		if processed {
@@ -496,17 +492,13 @@ func (b *BeaconSlots) processTrailing(ctx context.Context, networkName string) {
 
 			if err := stateClient.Set(ctx, slotState); err != nil {
 				logCtx.WithError(err).Error("Failed to update state after processing")
+			} else {
+				// Update state metrics after successful state update
+				b.updateStateMetrics(networkName, TrailingProcessorName, slotState)
 			}
 
 			// Update last processed slot metric
-			gauge, err := b.metricsCollector.NewGaugeVec(
-				"last_processed_slot",
-				"The last slot that was successfully processed",
-				[]string{"network", "processor"},
-			)
-			if err == nil {
-				gauge.WithLabelValues(networkName, TrailingProcessorName).Set(float64(nextSlot))
-			}
+			b.lastProcessedSlotMetric.WithLabelValues(networkName, TrailingProcessorName).Set(float64(nextSlot))
 
 			logCtx.WithField("slot", nextSlot).Info("Successfully processed trailing slot")
 		}
@@ -518,14 +510,18 @@ func (b *BeaconSlots) processTrailing(ctx context.Context, networkName string) {
 
 // processBackfill processes historical slots for a network
 func (b *BeaconSlots) processBackfill(ctx context.Context, networkName string) {
-	logCtx := b.log.WithField("network", networkName).WithField("processor", BackfillProcessorName)
+	logCtx := b.log.WithFields(logrus.Fields{
+		"network":   networkName,
+		"processor": BackfillProcessorName,
+	})
 	logCtx.Info("Starting up")
 
-	// Create a state client for the network
+	// Initialize state client for this processor
+	stateKey := GetStateKey(networkName, BackfillProcessorName)
 	stateClient := state.New[*ProcessorState](b.log, b.cacheClient, &state.Config{
 		Namespace: ServiceName,
 		TTL:       31 * 24 * time.Hour,
-	}, networkName+"/backfill", b.metrics)
+	}, stateKey, b.metrics)
 
 	for {
 		select {
@@ -534,6 +530,7 @@ func (b *BeaconSlots) processBackfill(ctx context.Context, networkName string) {
 			return
 		default:
 			// Continue processing
+			time.Sleep(1 * time.Second)
 		}
 
 		var slotState *ProcessorState
@@ -541,19 +538,29 @@ func (b *BeaconSlots) processBackfill(ctx context.Context, networkName string) {
 		slotState, err := stateClient.Get(ctx)
 		if err != nil {
 			if err == state.ErrNotFound {
+				// No state found, initialize with default values
+				logCtx.Info("No state found, initializing")
+
+				wallclockSlot, err := b.getCurrentSlot(ctx, networkName)
+				if err != nil {
+					logCtx.WithError(err).Warn("Failed to get current slot")
+
+					continue
+				}
+
+				// Add on our lag
 				slotState = &ProcessorState{
-					LastProcessedSlot: 0,
+					LastProcessedSlot: phase0.Slot(wallclockSlot) + phase0.Slot(b.config.Backfill.Slots),
 				}
 			} else {
 				logCtx.WithError(err).Warn("Failed to get state")
-				select {
-				case <-time.After(1 * time.Second):
-					continue
-				case <-ctx.Done():
-					return
-				}
+
+				continue
 			}
 		}
+
+		// Update state metrics
+		b.updateStateMetrics(networkName, BackfillProcessorName, slotState)
 
 		// Get the current target slot
 		currentSlot, err := b.getCurrentSlot(ctx, networkName)
@@ -561,14 +568,7 @@ func (b *BeaconSlots) processBackfill(ctx context.Context, networkName string) {
 			logCtx.WithError(err).Warn("Failed to get current slot")
 
 			// Record error in metrics
-			errorCounter, metricErr := b.metricsCollector.NewCounterVec(
-				"processing_errors_total",
-				"Total number of slot processing errors",
-				[]string{"network", "processor", "error_type"},
-			)
-			if metricErr == nil {
-				errorCounter.WithLabelValues(networkName, BackfillProcessorName, "get_current_slot").Inc()
-			}
+			b.processingErrorsTotalMetric.WithLabelValues(networkName, BackfillProcessorName, "get_current_slot").Inc()
 			select {
 			case <-time.After(1 * time.Second):
 				continue
@@ -588,7 +588,7 @@ func (b *BeaconSlots) processBackfill(ctx context.Context, networkName string) {
 		nextSlot := slotState.LastProcessedSlot - 1
 
 		// Check if somehow we've processed this slot already
-		processed, err := b.slotHasBeenProcessed(ctx, networkName, nextSlot)
+		processed, err := b.slotHasBeenProcessed(ctx, networkName, phase0.Slot(nextSlot))
 		if err != nil {
 			logCtx.WithError(err).WithField("slot", nextSlot).Error("Failed to check if slot has been processed")
 			select {
@@ -603,19 +603,12 @@ func (b *BeaconSlots) processBackfill(ctx context.Context, networkName string) {
 
 		if !processed {
 			// Process the slot
-			processed, err := b.processSlot(ctx, networkName, nextSlot)
+			processed, err := b.processSlot(ctx, networkName, phase0.Slot(nextSlot))
 			if err != nil {
 				logCtx.WithError(err).WithField("slot", nextSlot).Error("Failed to process slot")
 
 				// Record error in metrics
-				errorCounter, metricErr := b.metricsCollector.NewCounterVec(
-					"processing_errors_total",
-					"Total number of slot processing errors",
-					[]string{"network", "processor", "error_type"},
-				)
-				if metricErr == nil {
-					errorCounter.WithLabelValues(networkName, BackfillProcessorName, "process_slot").Inc()
-				}
+				b.processingErrorsTotalMetric.WithLabelValues(networkName, BackfillProcessorName, "process_slot").Inc()
 				select {
 				case <-time.After(5 * time.Second):
 					continue
@@ -635,17 +628,13 @@ func (b *BeaconSlots) processBackfill(ctx context.Context, networkName string) {
 
 			if err := stateClient.Set(ctx, slotState); err != nil {
 				logCtx.WithError(err).Error("Failed to update state after processing")
+			} else {
+				// Update state metrics after successful state update
+				b.updateStateMetrics(networkName, BackfillProcessorName, slotState)
 			}
 
 			// Update last processed slot metric
-			gauge, err := b.metricsCollector.NewGaugeVec(
-				"last_processed_slot",
-				"The last slot that was successfully processed",
-				[]string{"network", "processor"},
-			)
-			if err == nil {
-				gauge.WithLabelValues(networkName, BackfillProcessorName).Set(float64(nextSlot))
-			}
+			b.lastProcessedSlotMetric.WithLabelValues(networkName, BackfillProcessorName).Set(float64(nextSlot))
 
 			logCtx.WithField("slot", nextSlot).Info("Successfully processed backfill slot")
 		}
@@ -700,7 +689,7 @@ func (b *BeaconSlots) initializeMetrics() {
 	var err error
 
 	// Slots processed counter
-	_, err = b.metricsCollector.NewCounterVec(
+	b.slotsProcessedTotalMetric, err = b.metricsCollector.NewCounterVec(
 		"slots_processed_total",
 		"Total number of slots processed",
 		[]string{"network", "processor"},
@@ -710,7 +699,7 @@ func (b *BeaconSlots) initializeMetrics() {
 	}
 
 	// Processing errors counter
-	_, err = b.metricsCollector.NewCounterVec(
+	b.processingErrorsTotalMetric, err = b.metricsCollector.NewCounterVec(
 		"processing_errors_total",
 		"Total number of slot processing errors",
 		[]string{"network", "processor", "error_type"},
@@ -720,7 +709,7 @@ func (b *BeaconSlots) initializeMetrics() {
 	}
 
 	// Processing duration histogram
-	_, err = b.metricsCollector.NewHistogramVec(
+	b.processingDurationMetric, err = b.metricsCollector.NewHistogramVec(
 		"processing_duration_seconds",
 		"Duration of slot processing operations in seconds",
 		[]string{"network", "processor"},
@@ -731,12 +720,65 @@ func (b *BeaconSlots) initializeMetrics() {
 	}
 
 	// Last processed slot gauge
-	_, err = b.metricsCollector.NewGaugeVec(
+	b.lastProcessedSlotMetric, err = b.metricsCollector.NewGaugeVec(
 		"last_processed_slot",
 		"The last slot that was successfully processed",
 		[]string{"network", "processor"},
 	)
 	if err != nil {
 		b.log.WithError(err).Warn("Failed to create last_processed_slot metric")
+	}
+
+	// State last processed slot metric
+	b.stateLastProcessedSlotMetric, err = b.metricsCollector.NewGaugeVec(
+		"state_last_processed_slot",
+		"The last slot recorded in the processor state",
+		[]string{"network", "processor"},
+	)
+	if err != nil {
+		b.log.WithError(err).Warn("Failed to create state_last_processed_slot metric")
+	}
+
+	// State slot age metric
+	b.stateSlotAgeMetric, err = b.metricsCollector.NewGaugeVec(
+		"state_slot_age",
+		"Age of the last processed slot in terms of slots behind current slot",
+		[]string{"network", "processor"},
+	)
+	if err != nil {
+		b.log.WithError(err).Warn("Failed to create state_slot_age metric")
+	}
+}
+
+// updateStateMetrics updates the metrics related to processor state
+func (b *BeaconSlots) updateStateMetrics(networkName, processorName string, slotState *ProcessorState) {
+	// Skip if slot state is nil
+	if slotState == nil {
+		return
+	}
+
+	// Record the last processed slot from the state
+	b.stateLastProcessedSlotMetric.WithLabelValues(networkName, processorName).Set(float64(slotState.LastProcessedSlot))
+
+	// Calculate and record slot age (difference from current slot)
+	currentSlot, err := b.getCurrentSlot(context.Background(), networkName)
+	if err != nil {
+		b.log.WithError(err).WithFields(logrus.Fields{
+			"network":   networkName,
+			"processor": processorName,
+		}).Debug("Failed to get current slot for state metrics")
+		return
+	}
+
+	// Only calculate age if last processed slot is valid
+	if slotState.LastProcessedSlot > 0 {
+		// Slot age is how many slots behind current we are
+		var slotAge int64
+		if currentSlot > phase0.Slot(slotState.LastProcessedSlot) {
+			slotAge = int64(currentSlot - phase0.Slot(slotState.LastProcessedSlot))
+		} else {
+			slotAge = 0 // In case of issues with current slot calculation
+		}
+		b.stateSlotAgeMetric.WithLabelValues(networkName, processorName).Set(float64(slotAge))
 	}
 }

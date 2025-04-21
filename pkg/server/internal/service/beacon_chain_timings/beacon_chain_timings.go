@@ -3,6 +3,7 @@ package beacon_chain_timings
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/ethpandaops/lab/pkg/internal/lab/cache"
@@ -15,6 +16,7 @@ import (
 	"github.com/ethpandaops/lab/pkg/internal/lab/xatu"
 	pb "github.com/ethpandaops/lab/pkg/server/proto/beacon_chain_timings"
 	pb_lab "github.com/ethpandaops/lab/pkg/server/proto/lab"
+	"github.com/prometheus/client_golang/prometheus"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
@@ -47,6 +49,10 @@ type BeaconChainTimings struct {
 	stateClient      state.Client[*pb.State]
 	metrics          *metrics.Metrics
 	metricsCollector *metrics.Collector
+
+	// Metric collectors
+	stateLastProcessedMetric *prometheus.GaugeVec
+	stateAgeMetric           *prometheus.GaugeVec
 
 	leaderClient leader.Client
 
@@ -160,6 +166,10 @@ func (b *BeaconChainTimings) Start(ctx context.Context) error {
 
 // initializeMetrics creates and registers all metrics for the beacon_chain_timings service
 func (b *BeaconChainTimings) initializeMetrics() {
+	if b.metricsCollector == nil {
+		return
+	}
+
 	var err error
 
 	// Processing duration metrics (histograms)
@@ -203,14 +213,24 @@ func (b *BeaconChainTimings) initializeMetrics() {
 		b.log.WithError(err).Warn("Failed to create processing_decisions_total metric")
 	}
 
-	// Leadership status metric (gauge)
-	_, err = b.metricsCollector.NewGaugeVec(
-		"is_leader",
-		"Indicates whether this instance is currently the leader (1) or not (0)",
-		[]string{},
+	// State last processed time metrics (gauge)
+	b.stateLastProcessedMetric, err = b.metricsCollector.NewGaugeVec(
+		"state_last_processed_seconds",
+		"Last processed time for data types in seconds since epoch",
+		[]string{"network", "window", "data_type"},
 	)
 	if err != nil {
-		b.log.WithError(err).Warn("Failed to create is_leader metric")
+		b.log.WithError(err).Warn("Failed to create state_last_processed_seconds metric")
+	}
+
+	// State age metrics (gauge)
+	b.stateAgeMetric, err = b.metricsCollector.NewGaugeVec(
+		"state_age_seconds",
+		"Age of data type state in seconds",
+		[]string{"network", "window", "data_type"},
+	)
+	if err != nil {
+		b.log.WithError(err).Warn("Failed to create state_age_seconds metric")
 	}
 }
 
@@ -460,6 +480,9 @@ func (b *BeaconChainTimings) process(ctx context.Context) {
 	if err == nil {
 		histogram.WithLabelValues("process_cycle", "all", "all").Observe(duration)
 	}
+
+	// Update state metrics
+	b.updateStateMetrics(st)
 }
 
 // shouldProcess determines if a network/window should be processed based on last processing time
@@ -509,4 +532,61 @@ func (b *BeaconChainTimings) shouldProcess(network, window string, lastProcessed
 	}
 
 	return false, nil
+}
+
+// updateStateMetrics updates the state metrics based on the current state
+func (b *BeaconChainTimings) updateStateMetrics(state *pb.State) {
+	if b.metricsCollector == nil || b.stateLastProcessedMetric == nil || b.stateAgeMetric == nil {
+		return
+	}
+
+	now := time.Now()
+
+	// Process block timings state
+	for stateKey, timestamp := range state.BlockTimings.LastProcessed {
+		// Parse network/window from the stateKey (format: "network/window")
+		parts := strings.Split(stateKey, "/")
+		if len(parts) != 2 {
+			b.log.WithField("state_key", stateKey).Warn("Invalid state key format for metrics")
+			continue
+		}
+		network := parts[0]
+		window := parts[1]
+		dataType := "block_timings"
+
+		// Get the timestamp as time.Time
+		lastProcessed := TimeFromTimestamp(timestamp)
+		if !lastProcessed.IsZero() {
+			// Record last processed time
+			b.stateLastProcessedMetric.WithLabelValues(network, window, dataType).Set(float64(lastProcessed.Unix()))
+
+			// Record age in seconds
+			ageSeconds := now.Sub(lastProcessed).Seconds()
+			b.stateAgeMetric.WithLabelValues(network, window, dataType).Set(ageSeconds)
+		}
+	}
+
+	// Process CDF state
+	for stateKey, timestamp := range state.Cdf.LastProcessed {
+		// Parse network/window from the stateKey (format: "network/window")
+		parts := strings.Split(stateKey, "/")
+		if len(parts) != 2 {
+			b.log.WithField("state_key", stateKey).Warn("Invalid state key format for metrics")
+			continue
+		}
+		network := parts[0]
+		window := parts[1]
+		dataType := "cdf"
+
+		// Get the timestamp as time.Time
+		lastProcessed := TimeFromTimestamp(timestamp)
+		if !lastProcessed.IsZero() {
+			// Record last processed time
+			b.stateLastProcessedMetric.WithLabelValues(network, window, dataType).Set(float64(lastProcessed.Unix()))
+
+			// Record age in seconds
+			ageSeconds := now.Sub(lastProcessed).Seconds()
+			b.stateAgeMetric.WithLabelValues(network, window, dataType).Set(ageSeconds)
+		}
+	}
 }

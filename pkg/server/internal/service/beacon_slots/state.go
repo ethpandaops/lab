@@ -1,8 +1,6 @@
 package beacon_slots
 
-import (
-	"github.com/attestantio/go-eth2-client/spec/phase0"
-)
+import "github.com/attestantio/go-eth2-client/spec/phase0"
 
 // ProcessorState holds the processing state for a specific processor
 type ProcessorState struct {

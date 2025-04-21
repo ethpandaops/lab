@@ -44,6 +44,12 @@ type XatuPublicContributors struct {
 	metrics          *metrics.Metrics
 	metricsCollector *metrics.Collector
 
+	// Metric collectors
+	stateLastProcessedMetric       *prometheus.GaugeVec
+	stateWindowLastProcessedMetric *prometheus.GaugeVec
+	stateAgeMetric                 *prometheus.GaugeVec
+	stateWindowAgeMetric           *prometheus.GaugeVec
+
 	leaderClient leader.Client
 
 	processCtx       context.Context
@@ -366,6 +372,9 @@ func (b *XatuPublicContributors) process(ctx context.Context) {
 			continue
 		}
 
+		// Update state metrics
+		b.updateStateMetrics(networkName, state)
+
 		networkNeedsSave := false // Track if state needs saving for this network
 
 		// --- Process Summary (Now handled globally after network loop) ---
@@ -492,6 +501,8 @@ func (b *XatuPublicContributors) process(ctx context.Context) {
 			if err := b.saveState(ctx, networkName, state); err != nil {
 				log.WithError(err).Error("Failed to save state")
 			} else {
+				// Update state metrics after saving
+				b.updateStateMetrics(networkName, state)
 				log.Debug("Successfully saved state")
 			}
 		}
@@ -505,6 +516,9 @@ func (b *XatuPublicContributors) process(ctx context.Context) {
 		// This indicates a more serious error like connectivity issues with storage
 		b.log.WithError(err).Error("Failed to load global state due to serious storage error, skipping global processors")
 	} else {
+		// Update global state metrics
+		b.updateStateMetrics(globalStateKey, globalState)
+
 		globalNeedsSave := false
 
 		// --- Process Summary (Global) ---
@@ -591,6 +605,8 @@ func (b *XatuPublicContributors) process(ctx context.Context) {
 				b.log.WithError(err).Error("Failed to save global state")
 				// Continue with processing, don't return
 			} else {
+				// Update state metrics after saving
+				b.updateStateMetrics(globalStateKey, globalState)
 				b.log.Debug("Successfully saved global state")
 			}
 		}
@@ -660,6 +676,46 @@ func (b *XatuPublicContributors) initializeMetrics() {
 	)
 	if err != nil {
 		b.log.WithError(err).Warn("Failed to create contributors_count metric")
+	}
+
+	// State last processed time gauge
+	b.stateLastProcessedMetric, err = b.metricsCollector.NewGaugeVec(
+		"state_last_processed_seconds",
+		"Last processed time for processors in seconds since epoch",
+		[]string{"network", "processor"},
+	)
+	if err != nil {
+		b.log.WithError(err).Warn("Failed to create state_last_processed_seconds metric")
+	}
+
+	// State window last processed time gauge
+	b.stateWindowLastProcessedMetric, err = b.metricsCollector.NewGaugeVec(
+		"state_window_last_processed_seconds",
+		"Last processed time for time windows in seconds since epoch",
+		[]string{"network", "processor", "window"},
+	)
+	if err != nil {
+		b.log.WithError(err).Warn("Failed to create state_window_last_processed_seconds metric")
+	}
+
+	// State age gauge (time since last processed)
+	b.stateAgeMetric, err = b.metricsCollector.NewGaugeVec(
+		"state_age_seconds",
+		"Age of processor state in seconds",
+		[]string{"network", "processor"},
+	)
+	if err != nil {
+		b.log.WithError(err).Warn("Failed to create state_age_seconds metric")
+	}
+
+	// State window age gauge (time since window was last processed)
+	b.stateWindowAgeMetric, err = b.metricsCollector.NewGaugeVec(
+		"state_window_age_seconds",
+		"Age of time window state in seconds",
+		[]string{"network", "processor", "window"},
+	)
+	if err != nil {
+		b.log.WithError(err).Warn("Failed to create state_window_age_seconds metric")
 	}
 }
 
@@ -1336,4 +1392,45 @@ func (b *XatuPublicContributors) ReadUserSummary(ctx context.Context, username s
 
 	log.Debug("Successfully read user summary")
 	return userSummary, nil
+}
+
+// updateStateMetrics updates metrics related to state information
+func (b *XatuPublicContributors) updateStateMetrics(network string, state *State) {
+	if b.metricsCollector == nil {
+		return
+	}
+
+	// Check if metrics are initialized
+	if b.stateLastProcessedMetric == nil || b.stateWindowLastProcessedMetric == nil ||
+		b.stateAgeMetric == nil || b.stateWindowAgeMetric == nil {
+		b.log.Debug("State metrics not initialized, skipping metrics update")
+		return
+	}
+
+	now := time.Now()
+
+	// Update metrics for each processor
+	for processorName, processorState := range state.Processors {
+		// Skip processors with zero time (never processed)
+		if !processorState.LastProcessed.IsZero() {
+			// Last processed time in seconds since epoch
+			b.stateLastProcessedMetric.WithLabelValues(network, processorName).Set(float64(processorState.LastProcessed.Unix()))
+
+			// Age in seconds
+			ageSeconds := now.Sub(processorState.LastProcessed).Seconds()
+			b.stateAgeMetric.WithLabelValues(network, processorName).Set(ageSeconds)
+		}
+
+		// Update window-specific metrics
+		for windowName, windowTime := range processorState.LastProcessedWindows {
+			if !windowTime.IsZero() {
+				// Last processed window time in seconds since epoch
+				b.stateWindowLastProcessedMetric.WithLabelValues(network, processorName, windowName).Set(float64(windowTime.Unix()))
+
+				// Window age in seconds
+				windowAgeSeconds := now.Sub(windowTime).Seconds()
+				b.stateWindowAgeMetric.WithLabelValues(network, processorName, windowName).Set(windowAgeSeconds)
+			}
+		}
+	}
 }
