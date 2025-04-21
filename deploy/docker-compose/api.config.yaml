@@ -7,6 +7,9 @@ logLevel: "info"
 httpServer:
   host: "${API_HOST}"
   port: ${API_PORT}
+  pathPrefix: "lab-data"
+  corsAllowAll: true
+  allowedOrigins: []
 
 # SRV client configuration
 srvClient:

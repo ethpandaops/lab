@@ -21,6 +21,9 @@ type SrvClientConfig struct {
 
 // HttpServerConfig contains the configuration for the HTTP server
 type HttpServerConfig struct {
-	Host string `yaml:"host"`
-	Port int    `yaml:"port"`
+	Host           string   `yaml:"host"`
+	Port           int      `yaml:"port"`
+	PathPrefix     string   `yaml:"pathPrefix" default:"/lab-data"`
+	CORSAllowAll   bool     `yaml:"corsAllowAll" default:"true"`
+	AllowedOrigins []string `yaml:"allowedOrigins"`
 }

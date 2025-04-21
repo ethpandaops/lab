@@ -71,7 +71,7 @@ modules:
           range: "-720h"
   xatu_public_contributors:
     xatu_public_contributors:
-      enabled: false
+      enabled: true
       networks: ["mainnet"]
       redis_key_prefix: "lab_xatu_public_contributors"
       interval: "2m"

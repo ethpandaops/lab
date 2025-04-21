@@ -17,6 +17,7 @@ import (
 	"github.com/ethpandaops/lab/pkg/internal/lab/metrics"
 	"github.com/ethpandaops/lab/pkg/internal/lab/storage"
 	"github.com/gorilla/mux"
+	"github.com/rs/cors"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -89,9 +90,12 @@ func (s *Service) Start(ctx context.Context) error {
 		return fmt.Errorf("failed to initialize services: %w", err)
 	}
 
+	// Apply CORS middleware
+	corsHandler := s.getCORSHandler(s.router)
+
 	s.server = &http.Server{
 		Addr:    fmt.Sprintf("%s:%d", s.config.HttpServer.Host, s.config.HttpServer.Port),
-		Handler: s.router,
+		Handler: corsHandler,
 	}
 
 	go func() {
@@ -109,6 +113,39 @@ func (s *Service) Start(ctx context.Context) error {
 
 	s.log.Info("Api service stopped")
 	return nil
+}
+
+// getCORSHandler configures and returns a CORS handler
+func (s *Service) getCORSHandler(h http.Handler) http.Handler {
+	corsOptions := cors.Options{
+		AllowedMethods: []string{
+			http.MethodGet,
+			http.MethodPost,
+			http.MethodPut,
+			http.MethodDelete,
+			http.MethodOptions,
+			http.MethodPatch,
+		},
+		AllowedHeaders:   []string{"*"},
+		ExposedHeaders:   []string{"Content-Length", "Content-Type", "ETag", "Cache-Control", "Last-Modified"},
+		AllowCredentials: true,
+		MaxAge:           300,
+	}
+
+	// Configure allowed origins based on config
+	if s.config.HttpServer.CORSAllowAll {
+		s.log.Info("CORS configured to allow all origins (*)")
+		corsOptions.AllowedOrigins = []string{"*"}
+	} else if len(s.config.HttpServer.AllowedOrigins) > 0 {
+		s.log.WithField("origins", s.config.HttpServer.AllowedOrigins).Info("CORS configured with specific allowed origins")
+		corsOptions.AllowedOrigins = s.config.HttpServer.AllowedOrigins
+	} else {
+		// Default to allowing all origins if nothing is specified
+		s.log.Info("No CORS origins specified, defaulting to allow all (*)")
+		corsOptions.AllowedOrigins = []string{"*"}
+	}
+
+	return cors.New(corsOptions).Handler(h)
 }
 
 func (s *Service) initializeServices(ctx context.Context) error {
@@ -143,31 +180,48 @@ func (s *Service) initializeServices(ctx context.Context) error {
 
 // registerLegacyHandlers registers HTTP handlers for backward compatibility with .json paths
 func (s *Service) registerLegacyHandlers() {
+	// Determine the router to use (main router or prefixed subrouter)
+	router := s.router
+	prefix := s.config.HttpServer.PathPrefix
+	if prefix != "" {
+		s.log.WithField("prefix", prefix).Info("Registering legacy handlers with path prefix")
+		// Ensure prefix starts with / and doesn't end with /
+		if prefix[0] != '/' {
+			prefix = "/" + prefix
+		}
+		if len(prefix) > 1 && prefix[len(prefix)-1] == '/' {
+			prefix = prefix[:len(prefix)-1]
+		}
+		router = s.router.PathPrefix(prefix).Subrouter()
+	} else {
+		s.log.Info("Registering legacy handlers without path prefix")
+	}
+
 	// Block timings
-	s.router.HandleFunc("/beacon_chain_timings/block_timings/{network}/{window_file}.json", s.handleBlockTimings).Methods("GET")
+	router.HandleFunc("/beacon_chain_timings/block_timings/{network}/{window_file}.json", s.handleBlockTimings).Methods("GET")
 
 	// Size CDF - OK
-	s.router.HandleFunc("/beacon_chain_timings/size_cdf/{network}/{window_file}.json", s.handleSizeCDF).Methods("GET")
+	router.HandleFunc("/beacon_chain_timings/size_cdf/{network}/{window_file}.json", s.handleSizeCDF).Methods("GET")
 
 	// Xatu Summary - OK
-	s.router.HandleFunc("/xatu_public_contributors/summary.json", s.handleXatuSummary).Methods("GET")
+	router.HandleFunc("/xatu_public_contributors/summary.json", s.handleXatuSummary).Methods("GET")
 
 	// Beacon Slot
-	s.router.HandleFunc("/beacon/slots/{network}/{slot}.json", s.handleBeaconSlot).Methods("GET")
+	router.HandleFunc("/beacon/slots/{network}/{slot}.json", s.handleBeaconSlot).Methods("GET")
 
 	// Xatu User Summary - OK
-	s.router.HandleFunc("/xatu_public_contributors/user-summaries/summary.json", s.handleXatuUserSummary).Methods("GET")
+	router.HandleFunc("/xatu_public_contributors/user-summaries/summary.json", s.handleXatuUserSummary).Methods("GET")
 
 	// Xatu User - OK
-	s.router.HandleFunc("/xatu_public_contributors/user-summaries/users/{username}.json", s.handleXatuUser).Methods("GET")
+	router.HandleFunc("/xatu_public_contributors/user-summaries/users/{username}.json", s.handleXatuUser).Methods("GET")
 
 	// Xatu Users Window - OK
-	s.router.HandleFunc("/xatu_public_contributors/users/{network}/{window_file}.json", s.handleXatuUsersWindow).Methods("GET")
+	router.HandleFunc("/xatu_public_contributors/users/{network}/{window_file}.json", s.handleXatuUsersWindow).Methods("GET")
 
 	// Xatu Countries Window - OK
-	s.router.HandleFunc("/xatu_public_contributors/countries/{network}/{window_file}.json", s.handleXatuCountriesWindow).Methods("GET")
+	router.HandleFunc("/xatu_public_contributors/countries/{network}/{window_file}.json", s.handleXatuCountriesWindow).Methods("GET")
 
-	s.router.HandleFunc("/config.json", s.handleFrontendConfig).Methods("GET")
+	router.HandleFunc("/config.json", s.handleFrontendConfig).Methods("GET")
 }
 
 func (s *Service) handleFrontendConfig(w http.ResponseWriter, r *http.Request) {
