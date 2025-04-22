@@ -36,7 +36,7 @@ type XatuPublicContributors struct {
 
 	config *Config
 
-	ethereumConfig   *ethereum.Config
+	ethereumClient   *ethereum.Client
 	xatuClient       *xatu.Client
 	storageClient    storage.Client
 	cacheClient      cache.Client
@@ -62,7 +62,7 @@ type XatuPublicContributors struct {
 func New(
 	log logrus.FieldLogger,
 	config *Config,
-	ethereumConfig *ethereum.Config,
+	ethereumClient *ethereum.Client,
 	xatuClient *xatu.Client,
 	storageClient storage.Client,
 	cacheClient cache.Client,
@@ -82,7 +82,7 @@ func New(
 	return &XatuPublicContributors{
 		log:              log.WithField("component", "service/"+XatuPublicContributorsServiceName),
 		config:           config,
-		ethereumConfig:   ethereumConfig,
+		ethereumClient:   ethereumClient,
 		xatuClient:       xatuClient,
 		storageClient:    storageClient,
 		cacheClient:      cacheClient,
@@ -206,8 +206,13 @@ func (b *XatuPublicContributors) FrontendModuleConfig() *pb_lab.FrontendConfig_X
 		})
 	}
 
+	networks := make([]string, 0, len(b.ethereumClient.Networks()))
+	for _, network := range b.ethereumClient.Networks() {
+		networks = append(networks, network.Name)
+	}
+
 	return &pb_lab.FrontendConfig_XatuPublicContributorsModule{
-		Networks:    b.config.Networks,
+		Networks:    networks,
 		TimeWindows: timeWindows,
 		PathPrefix:  b.baseDir,
 		Enabled:     b.config.Enabled != nil && *b.config.Enabled,
@@ -342,20 +347,14 @@ func (b *XatuPublicContributors) process(ctx context.Context) {
 	}
 
 	// Process each configured network
-	networksToProcess := b.config.Networks
-	if len(networksToProcess) == 0 {
-		// Default to all networks from ethereum config if none specified
-		for _, net := range b.ethereumConfig.Networks {
-			networksToProcess = append(networksToProcess, net.Name)
-		}
-	}
+	networksToProcess := b.ethereumClient.Networks()
 
 	for _, networkName := range networksToProcess {
 		log := b.log.WithField("network", networkName)
 		log.Info("Processing network")
 
 		// Load state for the network
-		state, err := b.loadState(ctx, networkName)
+		state, err := b.loadState(ctx, networkName.Name)
 		if err != nil {
 			// This shouldn't happen for normal "not found" cases - loadState returns a default state for those
 			// This indicates a more serious error like connectivity issues with storage
@@ -364,7 +363,7 @@ func (b *XatuPublicContributors) process(ctx context.Context) {
 			// Record error in metrics
 			if b.metricsCollector != nil && processingErrorsCounter != nil {
 				processingErrorsCounter.WithLabelValues(
-					networkName,
+					networkName.Name,
 					"state_loading",
 				).Inc()
 			}
@@ -373,9 +372,7 @@ func (b *XatuPublicContributors) process(ctx context.Context) {
 		}
 
 		// Update state metrics
-		b.updateStateMetrics(networkName, state)
-
-		networkNeedsSave := false // Track if state needs saving for this network
+		b.updateStateMetrics(networkName.Name, state)
 
 		// --- Process Summary (Now handled globally after network loop) ---
 
@@ -398,13 +395,13 @@ func (b *XatuPublicContributors) process(ctx context.Context) {
 				if should {
 					windowLog.Info("Processing countries window")
 					processorStartTime := time.Now()
-					if err := b.processCountriesWindow(ctx, networkName, window); err != nil {
+					if err := b.processCountriesWindow(ctx, networkName.Name, window); err != nil {
 						windowLog.WithError(err).Error("Failed to process countries window")
 
 						// Record error in metrics
 						if b.metricsCollector != nil && processingErrorsCounter != nil {
 							processingErrorsCounter.WithLabelValues(
-								networkName,
+								networkName.Name,
 								CountriesProcessorName,
 							).Inc()
 						}
@@ -412,7 +409,7 @@ func (b *XatuPublicContributors) process(ctx context.Context) {
 						// Record processing duration
 						if b.metricsCollector != nil && processingDurationHistogram != nil {
 							processingDurationHistogram.WithLabelValues(
-								networkName,
+								networkName.Name,
 								CountriesProcessorName,
 							).Observe(time.Since(processorStartTime).Seconds())
 						}
@@ -429,7 +426,6 @@ func (b *XatuPublicContributors) process(ctx context.Context) {
 			if processedAnyWindow {
 				countriesProcessorState.LastProcessed = time.Now().UTC()
 				state.UpdateProcessorState(CountriesProcessorName, countriesProcessorState)
-				networkNeedsSave = true
 				log.Info("Finished processing countries windows")
 			} else {
 				log.Debug("No country windows needed processing in this cycle")
@@ -457,13 +453,13 @@ func (b *XatuPublicContributors) process(ctx context.Context) {
 				if should {
 					windowLog.Info("Processing users window")
 					processorStartTime := time.Now()
-					if err := b.processUsersWindow(ctx, networkName, window); err != nil { // Pass internal TimeWindow
+					if err := b.processUsersWindow(ctx, networkName.Name, window); err != nil { // Pass internal TimeWindow
 						windowLog.WithError(err).Error("Failed to process users window")
 
 						// Record error in metrics
 						if b.metricsCollector != nil && processingErrorsCounter != nil {
 							processingErrorsCounter.WithLabelValues(
-								networkName,
+								networkName.Name,
 								UsersProcessorName,
 							).Inc()
 						}
@@ -471,7 +467,7 @@ func (b *XatuPublicContributors) process(ctx context.Context) {
 						// Record processing duration
 						if b.metricsCollector != nil && processingDurationHistogram != nil {
 							processingDurationHistogram.WithLabelValues(
-								networkName,
+								networkName.Name,
 								UsersProcessorName,
 							).Observe(time.Since(processorStartTime).Seconds())
 						}
@@ -487,7 +483,6 @@ func (b *XatuPublicContributors) process(ctx context.Context) {
 			if processedAnyWindow {
 				processorState.LastProcessed = time.Now().UTC()
 				state.UpdateProcessorState(UsersProcessorName, processorState)
-				networkNeedsSave = true
 				log.Info("Finished processing users windows")
 			} else {
 				log.Debug("No user windows needed processing in this cycle")
@@ -496,16 +491,11 @@ func (b *XatuPublicContributors) process(ctx context.Context) {
 			log.Debug("Skipping users processing (interval not met)")
 		}
 
-		// Save state if changed
-		if networkNeedsSave {
-			if err := b.saveState(ctx, networkName, state); err != nil {
-				log.WithError(err).Error("Failed to save state")
-			} else {
-				// Update state metrics after saving
-				b.updateStateMetrics(networkName, state)
-				log.Debug("Successfully saved state")
-			}
+		// Update state
+		if err := b.saveState(ctx, networkName.Name, state); err != nil {
+			log.WithError(err).Error("Failed to save state")
 		}
+
 	}
 
 	// --- Process Global Summaries (Summary, UserSummaries) ---
@@ -524,14 +514,13 @@ func (b *XatuPublicContributors) process(ctx context.Context) {
 		// --- Process Summary (Global) ---
 		summaryProcessorState := globalState.GetProcessorState(SummaryProcessorName)
 		if b.shouldProcess(SummaryProcessorName, summaryProcessorState.LastProcessed) {
-			b.log.Info("Processing summary (globally)")
+			b.log.
+				WithField("processor", SummaryProcessorName).
+				WithField("last_processed", summaryProcessorState.LastProcessed).
+				Info("Processing summary (globally)")
 			// Ensure all networks from config are passed
-			networks := b.config.Networks
-			if len(networks) == 0 {
-				for _, net := range b.ethereumConfig.Networks {
-					networks = append(networks, net.Name)
-				}
-			}
+			networks := b.ethereumClient.Networks()
+
 			processorStartTime := time.Now()
 			if err := b.processSummary(ctx, networks); err != nil {
 				b.log.WithError(err).Error("Failed to process summary")
@@ -565,12 +554,7 @@ func (b *XatuPublicContributors) process(ctx context.Context) {
 		if b.shouldProcess(UserSummariesProcessorName, userSummariesProcessorState.LastProcessed) {
 			b.log.Info("Processing user summaries (globally)")
 			// Ensure all networks from config are passed
-			networks := b.config.Networks
-			if len(networks) == 0 {
-				for _, net := range b.ethereumConfig.Networks {
-					networks = append(networks, net.Name)
-				}
-			}
+			networks := b.ethereumClient.Networks()
 			processorStartTime := time.Now()
 			if err := b.processUserSummaries(ctx, networks); err != nil {
 				b.log.WithError(err).Error("Failed to process user summaries")
@@ -720,7 +704,7 @@ func (b *XatuPublicContributors) initializeMetrics() {
 }
 
 // processSummary generates the global summary file.
-func (b *XatuPublicContributors) processSummary(ctx context.Context, networks []string) error {
+func (b *XatuPublicContributors) processSummary(ctx context.Context, networks []*ethereum.Network) error {
 	log := b.log.WithFields(logrus.Fields{
 		"processor": SummaryProcessorName,
 		"networks":  networks,
@@ -755,16 +739,16 @@ func (b *XatuPublicContributors) processSummary(ctx context.Context, networks []
 			meta_network_name, country, continent, city, consensus_impl
 	`
 
-	for _, networkName := range networks {
-		networkLog := log.WithField("query_network", networkName)
-		ch, err := b.xatuClient.GetClickhouseClientForNetwork(networkName)
+	for _, network := range networks {
+		networkLog := log.WithField("query_network", network.Name)
+		ch, err := b.xatuClient.GetClickhouseClientForNetwork(network.Name)
 		if err != nil {
 			networkLog.WithError(err).Warnf("Clickhouse client not available for network, skipping summary contribution")
 			continue
 		}
 
 		networkLog.Debug("Querying network for summary data")
-		rows, err := ch.Query(ctx, query, startTime, now, networkName)
+		rows, err := ch.Query(ctx, query, startTime, now, network.Name)
 		if err != nil {
 			networkLog.WithError(err).Errorf("Failed to query clickhouse for summary data")
 			continue // Skip this network's contribution on error
@@ -773,7 +757,7 @@ func (b *XatuPublicContributors) processSummary(ctx context.Context, networks []
 
 		// Initialize network-specific stats
 		networkStats := &pb.NetworkStats{
-			Network:                  networkName,
+			Network:                  network.Name,
 			TotalNodes:               0,
 			TotalPublicNodes:         0,
 			Countries:                make(map[string]*pb.NodeCountStats),
@@ -851,7 +835,7 @@ func (b *XatuPublicContributors) processSummary(ctx context.Context, networks []
 		}
 
 		// Add network summary to global summary
-		summary.Networks[networkName] = networkStats
+		summary.Networks[network.Name] = networkStats
 	}
 
 	// Store the summary
@@ -1098,7 +1082,7 @@ func (b *XatuPublicContributors) processUsersWindow(ctx context.Context, network
 
 // processUserSummaries processes user summaries globally across specified networks.
 // Updated signature to accept []string
-func (b *XatuPublicContributors) processUserSummaries(ctx context.Context, networks []string) error {
+func (b *XatuPublicContributors) processUserSummaries(ctx context.Context, networks []*ethereum.Network) error {
 	log := b.log.WithFields(logrus.Fields{
 		"processor": UserSummariesProcessorName,
 		"networks":  networks,
@@ -1147,9 +1131,9 @@ func (b *XatuPublicContributors) processUserSummaries(ctx context.Context, netwo
 	// as there's no single client to query across multiple networks directly.
 	allRows := []map[string]interface{}{}
 
-	for _, networkName := range networks {
-		networkLog := log.WithField("query_network", networkName)
-		clickhouseClient, err := b.xatuClient.GetClickhouseClientForNetwork(networkName)
+	for _, network := range networks {
+		networkLog := log.WithField("query_network", network.Name)
+		clickhouseClient, err := b.xatuClient.GetClickhouseClientForNetwork(network.Name)
 		if err != nil {
 			networkLog.WithError(err).Warnf("Clickhouse client not available for network, skipping")
 			continue
@@ -1157,13 +1141,13 @@ func (b *XatuPublicContributors) processUserSummaries(ctx context.Context, netwo
 
 		// Extra verification of the client
 		if clickhouseClient == nil {
-			networkLog.Errorf("GetClickhouseClientForNetwork returned nil client without error for network %s", networkName)
+			networkLog.Errorf("GetClickhouseClientForNetwork returned nil client without error for network %s", network.Name)
 			continue
 		}
 
 		networkLog.Debug("Querying network for user summary data")
 		// Pass the single network name to the query placeholder
-		rows, err := clickhouseClient.Query(ctx, query, networkName)
+		rows, err := clickhouseClient.Query(ctx, query, network.Name)
 		if err != nil {
 			// Log error but continue with other networks
 			networkLog.WithError(err).Errorf("Failed to query clickhouse for user summaries")

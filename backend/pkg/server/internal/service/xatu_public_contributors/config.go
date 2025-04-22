@@ -12,8 +12,6 @@ type Config struct {
 	Enabled *bool `yaml:"enabled" json:"enabled"`
 	// Redis key prefix
 	RedisKeyPrefix string `yaml:"redis_key_prefix" json:"redis_key_prefix"`
-	// Networks to target
-	Networks []string `yaml:"networks" json:"networks"`
 	// Hours to backfill when no data exists (Note: This might be less relevant with time windows)
 	BackfillHours int64 `yaml:"backfill_hours" json:"backfill_hours"`
 	// Time windows for processing data (e.g., 1h, 24h)
@@ -70,10 +68,6 @@ func (tw *TimeWindow) GetTimeRange(now time.Time) (time.Time, time.Time, error) 
 func (c *Config) Validate() error {
 	if c.Enabled != nil && !*c.Enabled {
 		return nil
-	}
-
-	if len(c.Networks) == 0 {
-		return errors.New("no networks specified")
 	}
 
 	if c.RedisKeyPrefix == "" {

@@ -181,7 +181,7 @@ func (s *Service) initializeServices(ctx context.Context) error { // ctx is alre
 	xpc, err := xatu_public_contributors.New(
 		s.log,
 		s.config.Modules["xatu_public_contributors"].XatuPublicContributors,
-		s.config.Ethereum,
+		s.ethereumClient,
 		s.xatuClient,
 		s.storageClient,
 		s.cacheClient,
