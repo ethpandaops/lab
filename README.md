@@ -1,15 +1,13 @@
 # ethPandaOps Lab
 
-The ethPandaOps Lab is a comprehensive platform for exploring, analyzing, and visualizing Ethereum network data. It provides interactive dashboards and insights from various data sources, focusing on network health, client diversity, and validator performance across multiple Ethereum networks.
+![Lab](./public/header.png)
+
+The ethPandaOps Lab is our high velocity, experimental platform for exploring new ideas and concepts in the Ethereum ecosystem. We want to make it easy to experiment with new ideas and concepts, and to share them with the community. The codebase is built with a focus on developer experience and integration with LLM's to quickly iterate on ideas.
 
 ## Features
 
-- **Multi-Network Support**: Data collection and analytics for Mainnet, Sepolia, Holesky, and other Ethereum networks
-- **Xatu Integration**: Insights from Xatu, a beacon chain event collector and metrics exporter
-- **Beacon Chain Analytics**: Detailed metrics on block timings, slot performance, and network health
-- **Community Node Tracking**: Visualization of community-run nodes and their geographical distribution
-- **Fork Readiness**: Monitoring of client readiness for upcoming network forks
-- **Interactive Visualizations**: Rich, interactive charts and maps for data exploration
+- **Multi-Network Support**: Data collection and analytics for multiple Ethereum networks
+- **Xatu Integration**: Insights from Xatu, an Ethereum event collector and metrics exporter
 
 ## Architecture
 
