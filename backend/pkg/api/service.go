@@ -46,6 +46,10 @@ type Service struct {
 
 // New creates a new api service
 func New(config *Config) (*Service, error) {
+	if err := config.Validate(); err != nil {
+		return nil, fmt.Errorf("config is invalid: %w", err)
+	}
+
 	log, err := logger.New(config.LogLevel, "api")
 	if err != nil {
 		return nil, fmt.Errorf("failed to create logger: %w", err)
@@ -240,6 +244,9 @@ func (s *Service) handleFrontendConfig(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(data)
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Cache-Control", "max-age=60, s-maxage=60, public")
 }
 
 // Generic handler for S3 passthroughs
@@ -257,8 +264,6 @@ func (s *Service) handleS3Passthrough(w http.ResponseWriter, r *http.Request, ke
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Cache-Control", "max-age=3600")
 	w.Write(data)
 }
 
@@ -269,6 +274,8 @@ func (s *Service) handleBlockTimings(w http.ResponseWriter, r *http.Request) {
 	windowFile := vars["window_file"]
 	key := "beacon_chain_timings/block_timings/" + network + "/" + windowFile + ".json"
 	s.handleS3Passthrough(w, r, key)
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Cache-Control", "max-age=605, s-maxage=605, public")
 }
 
 func (s *Service) handleSizeCDF(w http.ResponseWriter, r *http.Request) {
@@ -277,11 +284,15 @@ func (s *Service) handleSizeCDF(w http.ResponseWriter, r *http.Request) {
 	windowFile := vars["window_file"]
 	key := "beacon_chain_timings/size_cdf/" + network + "/" + windowFile + ".json"
 	s.handleS3Passthrough(w, r, key)
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Cache-Control", "max-age=605, s-maxage=605, public")
 }
 
 func (s *Service) handleXatuSummary(w http.ResponseWriter, r *http.Request) {
 	key := "xatu_public_contributors/summary.json"
 	s.handleS3Passthrough(w, r, key)
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Cache-Control", "max-age=605, s-maxage=605, public")
 }
 
 func (s *Service) handleBeaconSlot(w http.ResponseWriter, r *http.Request) {
@@ -290,11 +301,15 @@ func (s *Service) handleBeaconSlot(w http.ResponseWriter, r *http.Request) {
 	slot := vars["slot"]
 	key := "beacon_slots/slots/" + network + "/" + slot + ".json"
 	s.handleS3Passthrough(w, r, key)
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Cache-Control", "max-age=605, s-maxage=605, public")
 }
 
 func (s *Service) handleXatuUserSummary(w http.ResponseWriter, r *http.Request) {
 	key := "xatu_public_contributors/user-summaries/summary.json"
 	s.handleS3Passthrough(w, r, key)
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Cache-Control", "max-age=605, s-maxage=605, public")
 }
 
 func (s *Service) handleXatuUser(w http.ResponseWriter, r *http.Request) {
@@ -302,6 +317,8 @@ func (s *Service) handleXatuUser(w http.ResponseWriter, r *http.Request) {
 	username := vars["username"]
 	key := "xatu_public_contributors/user-summaries/users/" + username + ".json"
 	s.handleS3Passthrough(w, r, key)
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Cache-Control", "max-age=605, s-maxage=605, public")
 }
 
 func (s *Service) handleXatuUsersWindow(w http.ResponseWriter, r *http.Request) {
@@ -311,6 +328,8 @@ func (s *Service) handleXatuUsersWindow(w http.ResponseWriter, r *http.Request) 
 
 	key := "xatu_public_contributors/users/" + network + "/" + windowFile + ".json"
 	s.handleS3Passthrough(w, r, key)
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Cache-Control", "max-age=605, s-maxage=605, public")
 }
 
 func (s *Service) handleXatuCountriesWindow(w http.ResponseWriter, r *http.Request) {
@@ -406,7 +425,7 @@ func (s *Service) handleXatuCountriesWindow(w http.ResponseWriter, r *http.Reque
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Cache-Control", "max-age=3600")
+	w.Header().Set("Cache-Control", "max-age=605, s-maxage=605, public")
 	w.Write(responseData)
 }
 
