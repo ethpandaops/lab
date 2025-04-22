@@ -29,6 +29,7 @@ func TimestampFromTime(t time.Time) *timestamppb.Timestamp {
 	if t.IsZero() {
 		return &timestamppb.Timestamp{}
 	}
+
 	return timestamppb.New(t)
 }
 
@@ -37,5 +38,6 @@ func TimeFromTimestamp(ts *timestamppb.Timestamp) time.Time {
 	if ts == nil || !ts.IsValid() {
 		return time.Time{}
 	}
+
 	return ts.AsTime()
 }

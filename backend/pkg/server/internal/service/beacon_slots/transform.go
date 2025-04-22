@@ -8,25 +8,7 @@ import (
 	"github.com/attestantio/go-eth2-client/spec/phase0"
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/geolocation"
 	pb "github.com/ethpandaops/lab/backend/pkg/server/proto/beacon_slots"
-	"google.golang.org/protobuf/types/known/timestamppb"
 )
-
-// parseTimestamp parses ISO8601 strings to timestamps
-func parseTimestamp(ts string) (*timestamppb.Timestamp, error) {
-	t, err := time.Parse(time.RFC3339, ts)
-	if err != nil {
-		return nil, err
-	}
-	return timestamppb.New(t), nil
-}
-
-// formatTimestampString formats a timestamp for usage in the blockData
-func formatTimestampString(ts *timestamppb.Timestamp) string {
-	if ts == nil {
-		return ""
-	}
-	return ts.AsTime().Format(time.RFC3339)
-}
 
 // transformSlotDataForStorage transforms slot data into optimized format for storage
 func (b *BeaconSlots) transformSlotDataForStorage(
@@ -62,6 +44,7 @@ func (b *BeaconSlots) transformSlotDataForStorage(
 			if lat != nil {
 				geo.Latitude = *lat
 			}
+
 			if lon != nil {
 				geo.Longitude = *lon
 			}
@@ -101,11 +84,14 @@ func (b *BeaconSlots) transformSlotDataForStorage(
 
 	// Attestation windows
 	attestationBuckets := make(map[int64][]int64)
+
 	for validatorIndex, timeMs := range attestationVotes {
 		bucket := timeMs - (timeMs % 50)
 		attestationBuckets[bucket] = append(attestationBuckets[bucket], validatorIndex)
 	}
+
 	attestationWindows := make([]*pb.AttestationWindow, 0, len(attestationBuckets))
+
 	for startMs, indices := range attestationBuckets {
 		window := &pb.AttestationWindow{
 			StartMs:          startMs,
@@ -138,6 +124,7 @@ func (b *BeaconSlots) transformSlotDataForStorage(
 	for clientName, blockArrivalTime := range arrivalTimes.BlockSeen {
 		timings.BlockSeen[clientName] = blockArrivalTime.SlotTime
 	}
+
 	for clientName, blockArrivalTime := range arrivalTimes.BlockFirstSeenP2P {
 		timings.BlockFirstSeenP2P[clientName] = blockArrivalTime.SlotTime
 	}
@@ -152,6 +139,7 @@ func (b *BeaconSlots) transformSlotDataForStorage(
 
 		timings.BlobSeen[clientName] = blobTimingMap
 	}
+
 	for clientName, blobArrivalTimes := range arrivalTimes.BlobFirstSeenP2P {
 		blobTimingMap := &pb.BlobTimingMap{
 			Timings: make(map[int64]int64),
@@ -159,11 +147,12 @@ func (b *BeaconSlots) transformSlotDataForStorage(
 		for _, blob := range blobArrivalTimes.ArrivalTimes {
 			blobTimingMap.Timings[blob.BlobIndex] = blob.SlotTime
 		}
+
 		timings.BlobFirstSeenP2P[clientName] = blobTimingMap
 	}
 
 	return &pb.BeaconSlotData{
-		Slot:             int64(slot),
+		Slot:             int64(slot), //nolint:gosec // no risk of overflow
 		Network:          network,
 		ProcessedAt:      time.Now().UTC().Format(time.RFC3339),
 		ProcessingTimeMs: processingTimeMs,

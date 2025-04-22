@@ -15,6 +15,7 @@ import (
 // processSlot processes a single slot
 func (b *BeaconSlots) processSlot(ctx context.Context, networkName string, slot phase0.Slot) (bool, error) {
 	startTime := time.Now()
+
 	b.log.WithField("network", networkName).
 		WithField("slot", slot).
 		Debug("Processing slot")
@@ -47,10 +48,13 @@ func (b *BeaconSlots) processSlot(ctx context.Context, networkName string, slot 
 		if metricErr == nil {
 			errorCounter.WithLabelValues(networkName, "all", "block_data").Inc()
 		}
+
 		return false, fmt.Errorf("failed to get block data: %w", err)
 	}
+
 	if blockData == nil {
 		b.log.WithField("slot", slot).Debug("No block data found for slot")
+
 		return false, nil
 	}
 
@@ -82,72 +86,85 @@ func (b *BeaconSlots) processSlot(ctx context.Context, networkName string, slot 
 		var err error
 		proposerData, err = b.getProposerData(groupCtx, networkName, slot)
 		proposerErr = err
+
 		return nil // We collect the error but don't fail the group
 	})
 
 	// 3. Get entity - depends on blockData, can run in parallel
 	group.Go(func() error {
-		entity, _ = b.getProposerEntity(groupCtx, networkName, blockData.ProposerIndex)
-		return nil // We won't always have an entity.
+		entityResult, err := b.getProposerEntity(groupCtx, networkName, blockData.ProposerIndex)
+		if err != nil {
+			if err == ErrEntityNotFound {
+				// We won't always have an entity.
+				return nil
+			}
+
+			return fmt.Errorf("failed to get proposer entity: %w", err)
+		}
+
+		entity = entityResult
+
+		return nil
 	})
 
 	// 4. Get timing data - can all run in parallel
 	group.Go(func() error {
-		var err error
-		blockSeenTimes, err := b.getBlockSeenAtSlotTime(groupCtx, networkName, slot)
-		if err == nil && blockSeenTimes != nil {
+		blockSeenTimes, errr := b.getBlockSeenAtSlotTime(groupCtx, networkName, slot)
+		if errr == nil && blockSeenTimes != nil {
 			blockSeenAtSlotTime = blockSeenTimes
 		}
+
 		return nil
 	})
 
 	group.Go(func() error {
-		var err error
-		blobSeenTimes, err := b.getBlobSeenAtSlotTime(groupCtx, networkName, slot)
-		if err == nil && blobSeenTimes != nil {
+		blobSeenTimes, errr := b.getBlobSeenAtSlotTime(groupCtx, networkName, slot)
+		if errr == nil && blobSeenTimes != nil {
 			blobSeenAtSlotTime = blobSeenTimes
 		}
+
 		return nil
 	})
 
 	group.Go(func() error {
-		var err error
-		blockFirstSeenTimes, err := b.getBlockFirstSeenInP2PSlotTime(groupCtx, networkName, slot)
-		if err == nil && blockFirstSeenTimes != nil {
+		blockFirstSeenTimes, errr := b.getBlockFirstSeenInP2PSlotTime(groupCtx, networkName, slot)
+		if errr == nil && blockFirstSeenTimes != nil {
 			blockFirstSeenInP2PSlotTime = blockFirstSeenTimes
 		}
+
 		return nil
 	})
 
 	group.Go(func() error {
-		var err error
-		blobFirstSeenTimes, err := b.getBlobFirstSeenInP2PSlotTime(groupCtx, networkName, slot)
-		if err == nil && blobFirstSeenTimes != nil {
+		blobFirstSeenTimes, errr := b.getBlobFirstSeenInP2PSlotTime(groupCtx, networkName, slot)
+		if errr == nil && blobFirstSeenTimes != nil {
 			blobFirstSeenInP2PSlotTime = blobFirstSeenTimes
 		}
+
 		return nil
 	})
 
 	// 5. Get attestation data - max can run in parallel, votes depends on blockData
 	group.Go(func() error {
-		var err error
-		maxAttestationVotes, err = b.getMaximumAttestationVotes(groupCtx, networkName, slot)
-		maxAttestationErr = err
-		return nil // We collect the error but don't fail the group
+		var errr error
+		maxAttestationVotes, errr = b.getMaximumAttestationVotes(groupCtx, networkName, slot)
+		maxAttestationErr = errr
+
+		return nil
 	})
 
 	group.Go(func() error {
-		var err error
-		votes, err := b.getAttestationVotes(groupCtx, networkName, slot, blockData.BlockRoot)
-		if err == nil && votes != nil {
+		votes, errr := b.getAttestationVotes(groupCtx, networkName, slot, blockData.BlockRoot)
+		if errr == nil && votes != nil {
 			attestationVotes = votes
 		}
-		return nil // We collect the error but don't fail the group
+
+		return nil
 	})
 
 	// Wait for all goroutines to complete
-	if err := group.Wait(); err != nil {
-		return false, fmt.Errorf("parallel processing error: %w", err)
+	if errr := group.Wait(); errr != nil {
+		return false, fmt.Errorf("parallel processing error: %w", errr)
 	}
 
 	// Check errors from critical operations
@@ -205,6 +222,7 @@ func (b *BeaconSlots) processSlot(ctx context.Context, networkName string, slot 
 		if metricErr == nil {
 			errorCounter.WithLabelValues(networkName, "all", "storage").Inc()
 		}
+
 		return false, fmt.Errorf("failed to store slot data: %w", err)
 	}
 
@@ -216,6 +234,7 @@ func (b *BeaconSlots) processSlot(ctx context.Context, networkName string, slot 
 		[]string{"network", "processor"},
 		[]float64{0.01, 0.05, 0.1, 0.5, 1, 2, 5, 10},
 	)
+
 	if err == nil {
 		histogram.WithLabelValues(networkName, "all").Observe(duration)
 	}

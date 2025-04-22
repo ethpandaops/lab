@@ -9,6 +9,8 @@ import (
 
 	"github.com/docker/go-connections/nat"
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/cache"
+	"github.com/ethpandaops/lab/backend/pkg/internal/lab/metrics"
+	"github.com/sirupsen/logrus"
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/wait"
 )
@@ -69,12 +71,12 @@ func TestRedisCache(t *testing.T) {
 	cache, err := cache.NewRedis(cache.RedisConfig{
 		URL:        redisURL,
 		DefaultTTL: time.Second,
-	}, nil)
+	}, metrics.NewMetricsService("test", logrus.New(), "test"))
 	if err != nil {
 		t.Fatalf("failed to create Redis cache: %v", err)
 	}
 
-	defer cache.Stop()
+	defer func() { _ = cache.Stop() }()
 
 	// Basic set and get
 	key := "test-key"
@@ -121,12 +123,12 @@ func TestRedisExpiration(t *testing.T) {
 	cache, err := cache.NewRedis(cache.RedisConfig{
 		URL:        redisURL,
 		DefaultTTL: time.Second,
-	}, nil)
+	}, metrics.NewMetricsService("test", logrus.New(), "test"))
 	if err != nil {
 		t.Fatalf("failed to create Redis cache: %v", err)
 	}
 
-	defer cache.Stop()
+	defer func() { _ = cache.Stop() }()
 
 	// Set a value with short TTL
 	key := "expiring-key"
@@ -156,7 +158,7 @@ func TestRedisInvalidURL(t *testing.T) {
 	_, err := cache.NewRedis(cache.RedisConfig{
 		URL:        "invalid-url",
 		DefaultTTL: time.Second,
-	}, nil)
+	}, metrics.NewMetricsService("test", logrus.New(), "test"))
 	if err == nil {
 		t.Fatal("expected error when creating Redis cache with invalid URL")
 	}
@@ -167,7 +169,7 @@ func TestRedisConnectionFailure(t *testing.T) {
 	_, err := cache.NewRedis(cache.RedisConfig{
 		URL:        "redis://localhost:54321", // Using a port that's likely not running Redis
 		DefaultTTL: time.Second,
-	}, nil)
+	}, metrics.NewMetricsService("test", logrus.New(), "test"))
 	if err == nil {
 		t.Fatal("expected error when connecting to non-existent Redis server")
 	}
@@ -184,22 +186,22 @@ func TestRedisCacheGetNonExistent(t *testing.T) {
 	defer cleanup()
 
 	// Create Redis cache
-	cache, err := cache.NewRedis(cache.RedisConfig{
+	ch, err := cache.NewRedis(cache.RedisConfig{
 		URL:        redisURL,
 		DefaultTTL: time.Second,
-	}, nil)
+	}, metrics.NewMetricsService("test", logrus.New(), "test"))
 	if err != nil {
 		t.Fatalf("failed to create Redis cache: %v", err)
 	}
-	defer cache.Stop()
+	defer func() { _ = ch.Stop() }()
 
 	// Attempt to get a non-existent key
-	_, err = cache.Get("non-existent-key")
+	_, err = ch.Get("non-existent-key")
 	if err == nil {
 		t.Fatal("expected error when getting non-existent key")
 	}
 	// Check if the error is ErrCacheMiss by looking at the error message
-	if err.Error() != "key not found in cache" {
+	if err.Error() != cache.ErrCacheMissMsg {
 		t.Fatalf("expected cache miss error, got: %v", err)
 	}
 }
@@ -218,7 +220,7 @@ func TestRedisCacheSetCustomTTL(t *testing.T) {
 	cache, err := cache.NewRedis(cache.RedisConfig{
 		URL:        redisURL,
 		DefaultTTL: 1 * time.Hour, // Long default TTL
-	}, nil)
+	}, metrics.NewMetricsService("test", logrus.New(), "test"))
 	if err != nil {
 		t.Fatalf("failed to create Redis cache: %v", err)
 	}
@@ -264,7 +266,7 @@ func TestRedisCacheOverwrite(t *testing.T) {
 	cache, err := cache.NewRedis(cache.RedisConfig{
 		URL:        redisURL,
 		DefaultTTL: time.Second,
-	}, nil)
+	}, metrics.NewMetricsService("test", logrus.New(), "test"))
 	if err != nil {
 		t.Fatalf("failed to create Redis cache: %v", err)
 	}
@@ -307,7 +309,7 @@ func TestRedisCacheDeleteNonExistent(t *testing.T) {
 	cache, err := cache.NewRedis(cache.RedisConfig{
 		URL:        redisURL,
 		DefaultTTL: time.Second,
-	}, nil)
+	}, metrics.NewMetricsService("test", logrus.New(), "test"))
 	if err != nil {
 		t.Fatalf("failed to create Redis cache: %v", err)
 	}
@@ -334,7 +336,7 @@ func TestRedisStop(t *testing.T) {
 	cache, err := cache.NewRedis(cache.RedisConfig{
 		URL:        redisURL,
 		DefaultTTL: time.Second,
-	}, nil)
+	}, metrics.NewMetricsService("test", logrus.New(), "test"))
 	if err != nil {
 		t.Fatalf("failed to create Redis cache: %v", err)
 	}
@@ -363,24 +365,24 @@ func TestRedisCacheGetError(t *testing.T) {
 	defer cleanup()
 
 	// Create Redis cache
-	cache, err := cache.NewRedis(cache.RedisConfig{
+	ch, err := cache.NewRedis(cache.RedisConfig{
 		URL:        redisURL,
 		DefaultTTL: time.Second,
-	}, nil)
+	}, metrics.NewMetricsService("test", logrus.New(), "test"))
 	if err != nil {
 		t.Fatalf("failed to create Redis cache: %v", err)
 	}
 
 	// Stop Redis client to force errors on subsequent operations
-	cache.Stop()
+	ch.Stop()
 
 	// Try to get a key, should return a Redis error (not cache miss)
-	_, err = cache.Get("any-key")
+	_, err = ch.Get("any-key")
 	if err == nil {
 		t.Fatal("expected error when getting key from closed connection")
 	}
 	// Verify it's not a cache miss error
-	if err.Error() == "key not found in cache" {
+	if err.Error() == cache.ErrCacheMissMsg {
 		t.Fatalf("expected Redis error, got cache miss error")
 	}
 }
@@ -399,7 +401,7 @@ func TestRedisCacheDeleteError(t *testing.T) {
 	cache, err := cache.NewRedis(cache.RedisConfig{
 		URL:        redisURL,
 		DefaultTTL: time.Second,
-	}, nil)
+	}, metrics.NewMetricsService("test", logrus.New(), "test"))
 	if err != nil {
 		t.Fatalf("failed to create Redis cache: %v", err)
 	}
@@ -428,7 +430,7 @@ func TestRedisSetError(t *testing.T) {
 	cache, err := cache.NewRedis(cache.RedisConfig{
 		URL:        redisURL,
 		DefaultTTL: time.Second,
-	}, nil)
+	}, metrics.NewMetricsService("test", logrus.New(), "test"))
 	if err != nil {
 		t.Fatalf("failed to create Redis cache: %v", err)
 	}

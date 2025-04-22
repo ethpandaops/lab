@@ -49,6 +49,7 @@ func (c *Compressor) Compress(data []byte, algorithm *CompressionAlgorithm) ([]b
 	}
 
 	var buf bytes.Buffer
+
 	var w io.WriteCloser
 
 	switch algorithm.Name {
@@ -85,6 +86,7 @@ func (c *Compressor) Decompress(data []byte, filename string) ([]byte, error) {
 // DecompressWithAlgorithm decompresses data using the specified algorithm
 func (c *Compressor) DecompressWithAlgorithm(data []byte, algo *CompressionAlgorithm) ([]byte, error) {
 	var r io.ReadCloser
+
 	var err error
 
 	switch algo.Name {
@@ -99,6 +101,7 @@ func (c *Compressor) DecompressWithAlgorithm(data []byte, algo *CompressionAlgor
 	if err != nil {
 		return nil, err
 	}
+
 	defer r.Close()
 
 	return io.ReadAll(r)
@@ -109,6 +112,7 @@ func AddExtension(filename string, algorithm *CompressionAlgorithm) string {
 	if !strings.HasSuffix(filename, algorithm.Extension) {
 		return filename + algorithm.Extension
 	}
+
 	return filename
 }
 
@@ -116,6 +120,7 @@ func AddExtension(filename string, algorithm *CompressionAlgorithm) string {
 func RemoveExtension(filename string) string {
 	filename = strings.TrimSuffix(filename, Gzip.Extension)
 	filename = strings.TrimSuffix(filename, None.Extension)
+
 	return filename
 }
 

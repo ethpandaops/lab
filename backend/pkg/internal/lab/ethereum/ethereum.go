@@ -81,13 +81,14 @@ func (c *Client) GetNetwork(name string) *Network {
 }
 
 func (c *Client) Start(ctx context.Context) error {
+	// Initialize metrics once before starting networks
+	if err := c.initMetrics(); err != nil {
+		return fmt.Errorf("failed to initialize metrics: %w", err)
+	}
+
 	for name, network := range c.networks {
 		if err := network.Start(ctx); err != nil {
 			return err
-		}
-
-		if err := c.initMetrics(); err != nil {
-			return fmt.Errorf("failed to initialize metrics: %w", err)
 		}
 
 		network.GetWallclock().OnSlotChanged(func(slot ethwallclock.Slot) {
@@ -100,7 +101,9 @@ func (c *Client) Start(ctx context.Context) error {
 
 func (c *Client) Stop() error {
 	for _, network := range c.networks {
-		network.Stop()
+		if err := network.Stop(); err != nil {
+			return fmt.Errorf("failed to stop network: %w", err)
+		}
 	}
 
 	return nil

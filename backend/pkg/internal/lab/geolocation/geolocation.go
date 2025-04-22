@@ -11,6 +11,13 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+// Status constants for metrics
+const (
+	StatusError    = "error"
+	StatusSuccess  = "success"
+	StatusNotFound = "not_found"
+)
+
 // Client manages geolocation data and operations
 type Client struct {
 	log              logrus.FieldLogger
@@ -104,8 +111,9 @@ func (c *Client) initMetrics() {
 
 // Start initializes the geolocation database
 func (c *Client) Start(ctx context.Context) error {
-	var status string = "success"
-	var source string = "unknown"
+	var status = "success"
+
+	var source = "unknown"
 
 	// Defer metrics recording
 	defer func() {
@@ -115,7 +123,8 @@ func (c *Client) Start(ctx context.Context) error {
 	// Load the CSV data from either URL or local file
 	csvData, err := c.loadDatabaseFromLocation()
 	if err != nil {
-		status = "error"
+		status = StatusError
+
 		return fmt.Errorf("failed to load geolocation database: %w", err)
 	}
 
@@ -129,7 +138,7 @@ func (c *Client) Start(ctx context.Context) error {
 	// Load the CSV data into memory
 	err = c.loadCSV(csvData)
 	if err != nil {
-		status = "error"
+		status = StatusError
 	}
 
 	return err
@@ -142,6 +151,7 @@ func indexOf(headers []string, name string) int {
 			return i
 		}
 	}
+
 	return -1
 }
 
@@ -157,8 +167,10 @@ func (params *LookupParams) Validate() error {
 // LookupCity returns city information based on provided parameters
 func (c *Client) LookupCity(params LookupParams) (*CityInfo, bool) {
 	startTime := time.Now()
-	var status string = "success"
-	var found bool = false
+
+	var status = "success"
+
+	var found = false
 
 	// Defer metrics recording
 	defer func() {
@@ -168,11 +180,13 @@ func (c *Client) LookupCity(params LookupParams) (*CityInfo, bool) {
 		if !found {
 			status = "not_found"
 		}
+
 		c.lookupsTotal.WithLabelValues(status).Inc()
 	}()
 
 	if err := params.Validate(); err != nil {
-		status = "error"
+		status = StatusError
+
 		return nil, false
 	}
 
@@ -180,6 +194,7 @@ func (c *Client) LookupCity(params LookupParams) (*CityInfo, bool) {
 	if params.City != "" {
 		params.City = strings.ToLower(params.City)
 	}
+
 	if params.Country != "" {
 		params.Country = strings.ToLower(params.Country)
 	}
@@ -195,12 +210,14 @@ func (c *Client) LookupCity(params LookupParams) (*CityInfo, bool) {
 			if params.City != "" {
 				if cityInfo, exists := countryMap[params.City]; exists {
 					found = true
+
 					return &cityInfo, true
 				}
 			} else {
 				// No city specified, return first city in the country
 				for _, cityInfo := range countryMap {
 					found = true
+
 					return &cityInfo, true
 				}
 			}
@@ -216,13 +233,11 @@ func (c *Client) LookupCity(params LookupParams) (*CityInfo, bool) {
 				// If city is specified, look for exact match
 				if params.City != "" {
 					if cityInfo, found := countryMap[params.City]; found {
-						found = true
 						return &cityInfo, true
 					}
 				} else {
 					// No city specified, return first city in country
 					for _, cityInfo := range countryMap {
-						found = true
 						return &cityInfo, true
 					}
 				}
@@ -238,6 +253,7 @@ func (c *Client) LookupCity(params LookupParams) (*CityInfo, bool) {
 		for _, countryMap := range c.locationDB.Continents[continent] {
 			if cityInfo, exists := countryMap[params.City]; exists {
 				found = true
+
 				return &cityInfo, true
 			}
 		}
@@ -251,6 +267,7 @@ func (c *Client) LookupCity(params LookupParams) (*CityInfo, bool) {
 			for _, countryMap := range continentMap {
 				if cityInfo, exists := countryMap[params.City]; exists {
 					found = true
+
 					return &cityInfo, true
 				}
 			}
@@ -264,6 +281,7 @@ func (c *Client) LookupCity(params LookupParams) (*CityInfo, bool) {
 		for _, countryMap := range continentMap {
 			for _, cityInfo := range countryMap {
 				found = true
+
 				return &cityInfo, true
 			}
 		}
@@ -278,6 +296,7 @@ func (c *Client) GetContinents() []string {
 	for continent := range c.locationDB.Continents {
 		continents = append(continents, continent)
 	}
+
 	return continents
 }
 

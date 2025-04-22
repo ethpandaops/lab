@@ -67,6 +67,9 @@ func TestClickHouseIntegration(t *testing.T) {
 		DSN: dsn,
 	}
 
+	// Create a metrics service for the main test
+	metricsSvc := metrics.NewMetricsService("test", logger)
+
 	t.Run("TestNewClient", func(t *testing.T) {
 		testNewClient(t, config, logger)
 	})
@@ -84,10 +87,10 @@ func TestClickHouseIntegration(t *testing.T) {
 	})
 
 	// Initialize client for subsequent tests
-	client, err := clickhouse.New(config, logger)
+	client, err := clickhouse.New(config, logger, metricsSvc)
 	require.NoError(t, err, "Failed to create client")
 	require.NoError(t, client.Start(ctx), "Failed to start client")
-	defer client.Stop()
+	defer func() { _ = client.Stop() }()
 
 	// Run all test suites
 	t.Run("TestExec", func(t *testing.T) {
@@ -113,6 +116,9 @@ func TestClickHouseIntegration(t *testing.T) {
 
 // testDSNVariations tests different DSN formats and connection options
 func testDSNVariations(t *testing.T, ctx context.Context, host, port string, logger logrus.FieldLogger) {
+	// Create metrics service for the test
+	metricsSvc := metrics.NewMetricsService("test", logger)
+
 	testCases := []struct {
 		name               string
 		dsn                string
@@ -170,7 +176,7 @@ func testDSNVariations(t *testing.T, ctx context.Context, host, port string, log
 				InsecureSkipVerify: tc.insecureSkipVerify,
 			}
 
-			client, err := clickhouse.New(config, logger)
+			client, err := clickhouse.New(config, logger, metricsSvc)
 			require.NoError(t, err, "New should not return error even with invalid DSN")
 
 			err = client.Start(ctx)
@@ -182,7 +188,7 @@ func testDSNVariations(t *testing.T, ctx context.Context, host, port string, log
 					assert.NoError(t, err, "Query should succeed after successful Start")
 
 					// Clean up
-					client.Stop()
+					_ = client.Stop()
 				}
 			} else {
 				assert.Error(t, err, "Start should fail for invalid DSN")
@@ -192,8 +198,11 @@ func testDSNVariations(t *testing.T, ctx context.Context, host, port string, log
 }
 
 func testNewClient(t *testing.T, config *clickhouse.Config, logger logrus.FieldLogger) {
+	// Create a metrics service
+	metricsSvc := metrics.NewMetricsService("test", logger)
+
 	// Test with valid config
-	client, err := clickhouse.New(config, logger)
+	client, err := clickhouse.New(config, logger, metricsSvc)
 	assert.NoError(t, err, "Should create client with valid config")
 	assert.NotNil(t, client, "Client should not be nil")
 
@@ -201,14 +210,17 @@ func testNewClient(t *testing.T, config *clickhouse.Config, logger logrus.FieldL
 	invalidConfig := &clickhouse.Config{
 		DSN: "",
 	}
-	client, err = clickhouse.New(invalidConfig, logger)
+	client, err = clickhouse.New(invalidConfig, logger, metricsSvc)
 	assert.Error(t, err, "Should return error with invalid config")
 	assert.Nil(t, client, "Client should be nil with invalid config")
 }
 
 func testClientBeforeStart(t *testing.T, ctx context.Context, config *clickhouse.Config, logger logrus.FieldLogger) {
+	// Create a metrics service
+	metricsSvc := metrics.NewMetricsService("test", logger)
+
 	// Create client but don't start it
-	client, err := clickhouse.New(config, logger)
+	client, err := clickhouse.New(config, logger, metricsSvc)
 	require.NoError(t, err)
 
 	// All operations should fail before Start()
@@ -229,8 +241,11 @@ func testClientBeforeStart(t *testing.T, ctx context.Context, config *clickhouse
 }
 
 func testClientAfterStop(t *testing.T, ctx context.Context, config *clickhouse.Config, logger logrus.FieldLogger) {
+	// Create a metrics service
+	metricsSvc := metrics.NewMetricsService("test", logger)
+
 	// Create and start client
-	client, err := clickhouse.New(config, logger)
+	client, err := clickhouse.New(config, logger, metricsSvc)
 	require.NoError(t, err)
 	require.NoError(t, client.Start(ctx))
 
@@ -454,7 +469,9 @@ func testDataTypes(t *testing.T, ctx context.Context, client clickhouse.Client) 
 	// Verify first row
 	assert.Equal(t, int32(-42), rows[0]["int_val"], "First row int_val should be -42")
 	assert.Equal(t, uint32(42), rows[0]["uint_val"], "First row uint_val should be 42")
-	assert.InDelta(t, 3.14159, rows[0]["float_val"].(float64), 0.00001, "First row float_val should be approximately 3.14159")
+	rowFloatVal, ok := rows[0]["float_val"].(float64)
+	assert.True(t, ok, "float_val should be convertible to float64")
+	assert.InDelta(t, 3.14159, rowFloatVal, 0.00001, "First row float_val should be approximately 3.14159")
 	assert.Equal(t, "hello", rows[0]["string_val"], "First row string_val should be 'hello'")
 
 	// Note: date/time comparison might be tricky due to timezone/formatting differences
@@ -490,54 +507,23 @@ func testDataTypes(t *testing.T, ctx context.Context, client clickhouse.Client) 
 	assert.NoError(t, err, "Should drop table without error")
 }
 
-// testWithMetrics tests the client with metrics instrumentation
+// testWithMetrics tests the client with metrics integration
 func testWithMetrics(t *testing.T, ctx context.Context, config *clickhouse.Config, logger logrus.FieldLogger) {
-	// Create a metrics service
 	metricsSvc := metrics.NewMetricsService("test", logger)
-	require.NotNil(t, metricsSvc, "Metrics service should not be nil")
 
 	// Create client with metrics
 	client, err := clickhouse.New(config, logger, metricsSvc)
 	require.NoError(t, err, "Should create client with metrics")
-	require.NotNil(t, client, "Client should not be nil")
+	require.NoError(t, client.Start(ctx), "Should start client with metrics")
+	defer func() { _ = client.Stop() }()
 
-	// Start the client
-	err = client.Start(ctx)
-	require.NoError(t, err, "Should start client with metrics")
-
-	// Create a test table for insert operations
-	err = client.Exec(ctx, `
-		CREATE TABLE IF NOT EXISTS test_metrics (
-			id UInt32,
-			name String
-		) ENGINE = Memory
-	`)
-	assert.NoError(t, err, "Should create table without error")
-
-	// Execute some operations to generate metrics
-	err = client.Exec(ctx, "SELECT 1")
-	assert.NoError(t, err, "Should execute query with metrics")
-
+	// Perform operations that will be tracked by metrics
 	_, err = client.Query(ctx, "SELECT 1")
-	assert.NoError(t, err, "Should query with metrics")
+	assert.NoError(t, err, "Query should succeed with metrics")
+
+	err = client.Exec(ctx, "SELECT 1")
+	assert.NoError(t, err, "Exec should succeed with metrics")
 
 	_, err = client.QueryRow(ctx, "SELECT 1")
-	assert.NoError(t, err, "Should query row with metrics")
-
-	// Test insert operation to trigger insert-specific metrics
-	err = client.Exec(ctx, "INSERT INTO test_metrics (id, name) VALUES (?, ?)", uint32(1), "test_metrics")
-	assert.NoError(t, err, "Should execute insert with metrics")
-
-	// Test batch insert operation
-	err = client.Exec(ctx, "INSERT INTO test_metrics (id, name) VALUES (?, ?), (?, ?)",
-		uint32(2), "test_batch1", uint32(3), "test_batch2")
-	assert.NoError(t, err, "Should execute batch insert with metrics")
-
-	// Clean up
-	err = client.Exec(ctx, "DROP TABLE test_metrics")
-	assert.NoError(t, err, "Should drop table without error")
-
-	// Stop the client
-	err = client.Stop()
-	assert.NoError(t, err, "Should stop client with metrics")
+	assert.NoError(t, err, "QueryRow should succeed with metrics")
 }

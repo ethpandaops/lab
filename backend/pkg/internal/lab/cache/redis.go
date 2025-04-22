@@ -3,11 +3,20 @@ package cache
 import (
 	"context"
 	"fmt"
+	"os"
 	"time"
 
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/metrics"
 	"github.com/go-redis/redis/v8"
 	"github.com/prometheus/client_golang/prometheus"
+)
+
+// Status constants for metrics
+const (
+	StatusMiss  = "miss"
+	StatusError = "error"
+	StatusHit   = "hit"
+	StatusOK    = "ok"
 )
 
 // RedisConfig contains configuration for Redis cache
@@ -19,7 +28,7 @@ type RedisConfig struct {
 // Redis is a Redis-backed cache implementation
 type Redis struct {
 	client            *redis.Client
-	ctx               context.Context
+	ctx               context.Context //nolint:containedctx // context is used for redis operations
 	defaultTTL        time.Duration
 	metricsCollector  *metrics.Collector
 	requestsTotal     *prometheus.CounterVec
@@ -27,6 +36,7 @@ type Redis struct {
 	items             *prometheus.GaugeVec
 	hitsTotal         *prometheus.CounterVec
 	missesTotal       *prometheus.CounterVec
+	stopChan          chan struct{} // Channel to signal goroutines to stop
 }
 
 // NewRedis creates a new Redis cache
@@ -50,9 +60,13 @@ func NewRedis(config RedisConfig, metricsSvc *metrics.Metrics) (*Redis, error) {
 	collector := metricsSvc.NewCollector("cache")
 
 	var requestsTotal *prometheus.CounterVec
+
 	var operationDuration *prometheus.HistogramVec
+
 	var items *prometheus.GaugeVec
+
 	var hitsTotal *prometheus.CounterVec
+
 	var missesTotal *prometheus.CounterVec
 
 	requestsTotal, err = collector.NewCounterVec(
@@ -101,7 +115,7 @@ func NewRedis(config RedisConfig, metricsSvc *metrics.Metrics) (*Redis, error) {
 		metricsSvc.Log().WithError(err).Warn("Failed to create cache_misses_total metric")
 	}
 
-	redis := &Redis{
+	red := &Redis{
 		client:            client,
 		ctx:               ctx,
 		defaultTTL:        config.DefaultTTL,
@@ -111,22 +125,26 @@ func NewRedis(config RedisConfig, metricsSvc *metrics.Metrics) (*Redis, error) {
 		items:             items,
 		hitsTotal:         hitsTotal,
 		missesTotal:       missesTotal,
+		stopChan:          make(chan struct{}),
 	}
 
 	// Initialize items count
-	go redis.updateItemsCount()
+	go red.updateItemsCount()
 
 	// Start periodic updates of items count
-	go redis.startItemsCountUpdater()
+	go red.startItemsCountUpdater()
 
-	return redis, nil
+	return red, nil
 }
 
 // Get retrieves a value from Redis
 func (r *Redis) Get(key string) ([]byte, error) {
 	start := time.Now()
+
 	var status string
+
 	var err error
+
 	var value []byte
 
 	defer func() {
@@ -139,24 +157,31 @@ func (r *Redis) Get(key string) ([]byte, error) {
 	result, err := r.client.Get(r.ctx, key).Result()
 	if err != nil {
 		if err == redis.Nil {
-			status = "miss"
+			status = StatusMiss
+
 			r.missesTotal.WithLabelValues().Inc()
+
 			return nil, ErrCacheMiss
 		}
-		status = "error"
+
+		status = StatusError
+
 		return nil, fmt.Errorf("redis get error: %w", err)
 	}
 
-	status = "hit"
+	status = StatusHit
 	value = []byte(result)
+
 	r.hitsTotal.WithLabelValues().Inc()
+
 	return value, nil
 }
 
 // Set stores a value in Redis with TTL
 func (r *Redis) Set(key string, value []byte, ttl time.Duration) error {
 	start := time.Now()
-	var status string = "ok" // Assume ok unless error occurs
+
+	var status = StatusOK // Assume ok unless error occurs
 
 	defer func() {
 		duration := time.Since(start).Seconds()
@@ -172,7 +197,8 @@ func (r *Redis) Set(key string, value []byte, ttl time.Duration) error {
 	// Set value in Redis with TTL
 	err := r.client.Set(r.ctx, key, value, ttl).Err()
 	if err != nil {
-		status = "error"
+		status = StatusError
+
 		return fmt.Errorf("redis set error: %w", err)
 	}
 
@@ -185,7 +211,8 @@ func (r *Redis) Set(key string, value []byte, ttl time.Duration) error {
 // Delete removes a value from Redis
 func (r *Redis) Delete(key string) error {
 	start := time.Now()
-	var status string = "ok" // Assume ok unless error occurs
+
+	var status = StatusOK // Assume ok unless error occurs
 
 	defer func() {
 		duration := time.Since(start).Seconds()
@@ -195,7 +222,8 @@ func (r *Redis) Delete(key string) error {
 
 	err := r.client.Del(r.ctx, key).Err()
 	if err != nil {
-		status = "error"
+		status = StatusError
+
 		return fmt.Errorf("redis delete error: %w", err)
 	}
 
@@ -205,8 +233,12 @@ func (r *Redis) Delete(key string) error {
 	return nil
 }
 
-// Stop closes the Redis connection
+// Stop closes the Redis connection and stops background goroutines
 func (r *Redis) Stop() error {
+	// Signal all goroutines to stop
+	close(r.stopChan)
+
+	// Close the Redis connection
 	return r.client.Close()
 }
 
@@ -215,7 +247,9 @@ func (r *Redis) updateItemsCount() {
 	// Use DBSIZE command to get the number of keys in the current database
 	size, err := r.client.DBSize(r.ctx).Result()
 	if err != nil {
-		// Log error but don't fail
+		// Just log to stderr since we can't access the logger directly
+		fmt.Fprintf(os.Stderr, "Failed to get Redis database size: %v\n", err)
+
 		return
 	}
 
@@ -228,7 +262,13 @@ func (r *Redis) startItemsCountUpdater() {
 	ticker := time.NewTicker(time.Minute)
 	defer ticker.Stop()
 
-	for range ticker.C {
-		r.updateItemsCount()
+	for {
+		select {
+		case <-ticker.C:
+			r.updateItemsCount()
+		case <-r.stopChan:
+			// Stop the goroutine when signaled
+			return
+		}
 	}
 }

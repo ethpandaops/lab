@@ -1,0 +1,87 @@
+name: Go Lint
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - 'backend/**.go'
+      - 'backend/.golangci.yml'
+      - '.github/workflows/golang-lint.yml'
+  pull_request:
+    branches:
+      - master
+    paths:
+      - 'backend/**.go'
+      - 'backend/.golangci.yml'
+      - '.github/workflows/golang-lint.yml'
+
+permissions:
+  contents: read
+  pull-requests: read # needed for only-new-issues mode
+
+jobs:
+  check-pr:
+    runs-on: ubuntu-latest
+    outputs:
+      is_authorized: ${{ steps.check.outputs.is_authorized }}
+    steps:
+      - id: check
+        run: |
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            # Check if PR is from a fork
+            if [[ "${{ github.event.pull_request.head.repo.full_name }}" != "${{ github.repository }}" ]]; then
+              echo "is_authorized=false" >> $GITHUB_OUTPUT
+              echo "PR is from a fork - will only lint, not fail build"
+            else
+              # Check if user has write access
+              if [[ "${{ github.event.pull_request.head.repo.permissions.push }}" == "true" ]]; then
+                echo "is_authorized=true" >> $GITHUB_OUTPUT
+                echo "PR is from an authorized contributor"
+              else
+                echo "is_authorized=false" >> $GITHUB_OUTPUT
+                echo "PR is from unauthorized contributor"
+              fi
+            fi
+          else
+            echo "is_authorized=true" >> $GITHUB_OUTPUT
+            echo "Not a PR - authorized"
+          fi
+
+  golangci-lint:
+    name: Lint
+    needs: check-pr
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.24.x'
+          cache: true
+
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v7
+        with:
+          version: v2.0
+          working-directory: backend
+          args: --timeout=10m
+          only-new-issues: ${{ github.event_name == 'pull_request' || github.event_name == 'merge_group' }}
+          skip-cache: false
+          skip-save-cache: false
+          cache-invalidation-interval: 7
+
+      - name: Set exit code
+        if: |
+          needs.check-pr.outputs.is_authorized == 'false' && 
+          github.event_name == 'pull_request' && 
+          steps.golangci-lint.outcome == 'failure'
+        run: |
+          echo "Linting failed but PR is from an unauthorized source, ignoring failure to allow CI to pass."
+          # This allows the workflow to pass even if linting fails for unauthorized contributors
+          exit 0 

@@ -65,6 +65,7 @@ func (r *Registry) Get(name CodecName) (Codec, error) {
 	if !ok {
 		return nil, fmt.Errorf("unknown encoding format: %s", name)
 	}
+
 	return codec, nil
 }
 

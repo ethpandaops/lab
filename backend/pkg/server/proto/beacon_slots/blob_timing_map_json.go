@@ -29,12 +29,14 @@ func (m *BlobTimingMap) UnmarshalJSON(data []byte) error {
 	var flatMap map[string]int64
 	if err := json.Unmarshal(data, &flatMap); err == nil {
 		m.Timings = make(map[int64]int64, len(flatMap))
+
 		for k, v := range flatMap {
 			// Convert string keys like "0", "1" to int64
 			if i, err := strconv.ParseInt(k, 10, 64); err == nil {
 				m.Timings[i] = v
 			}
 		}
+
 		return nil
 	}
 
@@ -42,17 +44,21 @@ func (m *BlobTimingMap) UnmarshalJSON(data []byte) error {
 	var nested struct {
 		Timings map[string]int64 `json:"timings"`
 	}
+
 	if err := json.Unmarshal(data, &nested); err == nil && nested.Timings != nil {
 		m.Timings = make(map[int64]int64, len(nested.Timings))
+
 		for k, v := range nested.Timings {
 			if i, err := strconv.ParseInt(k, 10, 64); err == nil {
 				m.Timings[i] = v
 			}
 		}
+
 		return nil
 	}
 
 	// If both approaches fail, return empty but valid map
 	m.Timings = map[int64]int64{}
+
 	return nil
 }

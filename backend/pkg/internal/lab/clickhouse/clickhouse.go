@@ -16,6 +16,12 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+// Status constants for metrics
+const (
+	StatusError   = "error"
+	StatusSuccess = "success"
+)
+
 // Client represents a ClickHouse client
 type Client interface {
 	Start(ctx context.Context) error
@@ -29,7 +35,7 @@ type Client interface {
 type client struct {
 	conn   *sql.DB // Use standard database/sql connection pool
 	log    logrus.FieldLogger
-	ctx    context.Context
+	ctx    context.Context //nolint:containedctx // context is used for clickhouse operations
 	config *Config
 
 	// Metrics
@@ -45,23 +51,27 @@ type client struct {
 func New(
 	config *Config,
 	log logrus.FieldLogger,
-	metricsSvc ...*metrics.Metrics,
+	metricsSvc *metrics.Metrics,
 ) (Client, error) {
 	if err := config.Validate(); err != nil {
 		return nil, fmt.Errorf("invalid config: %w", err)
 	}
 
+	if metricsSvc == nil {
+		return nil, fmt.Errorf("metrics service is required")
+	}
+
 	log.Info("Initializing ClickHouse client")
 
 	client := &client{
-		log:    log.WithField("module", "clickhouse"),
-		config: config,
+		log:     log.WithField("module", "clickhouse"),
+		config:  config,
+		metrics: metricsSvc,
 	}
 
 	// Handle optional metrics service parameter
-	if len(metricsSvc) > 0 && metricsSvc[0] != nil {
-		client.metrics = metricsSvc[0]
-		client.initMetrics()
+	if err := client.initMetrics(); err != nil {
+		return nil, fmt.Errorf("failed to initialize metrics: %w", err)
 	}
 
 	return client, nil
@@ -71,6 +81,7 @@ func New(
 func (c *client) initMetrics() error {
 	// Create a collector for the clickhouse subsystem
 	var err error
+
 	c.collector = c.metrics.NewCollector("clickhouse")
 
 	// Register metrics
@@ -123,16 +134,20 @@ func (c *client) Start(ctx context.Context) error {
 	// Prepare DSN: Convert custom "clickhouse+" prefix to standard http/https scheme.
 	dsn := c.config.DSN
 	originalDSN := dsn // Keep original for logging/reference
+
 	if strings.HasPrefix(dsn, "clickhouse+https://") {
 		dsn = strings.TrimPrefix(dsn, "clickhouse+") // Becomes https://...
+
 		c.log.Info("Converted 'clickhouse+https://' prefix to standard 'https://'.")
 	} else if strings.HasPrefix(dsn, "clickhouse+http://") {
 		// Check if port or params indicate HTTPS despite the http prefix
 		if strings.Contains(originalDSN, ":443") || strings.Contains(originalDSN, "protocol=https") {
 			dsn = "https" + strings.TrimPrefix(dsn, "clickhouse+http") // Becomes https://...
+
 			c.log.Info("Converted 'clickhouse+http://' prefix with port 443/protocol=https to standard 'https://'.")
 		} else {
 			dsn = strings.TrimPrefix(dsn, "clickhouse+") // Becomes http://...
+
 			c.log.Info("Converted 'clickhouse+http://' prefix to standard 'http://'.")
 		}
 	}
@@ -167,6 +182,7 @@ func (c *client) Start(ctx context.Context) error {
 	if err != nil {
 		// Mask password in error log if present
 		loggedDSN := dsn
+
 		if u, parseErr := url.Parse(dsn); parseErr == nil {
 			if _, pwdSet := u.User.Password(); pwdSet {
 				u.User = url.User(u.User.Username()) // Remove password
@@ -185,6 +201,7 @@ func (c *client) Start(ctx context.Context) error {
 	// Test connection with a ping
 	pingCtx, cancel := context.WithTimeout(ctx, 10*time.Second) // Add timeout to ping
 	defer cancel()
+
 	if err := conn.PingContext(pingCtx); err != nil {
 		conn.Close() // Close pool if ping fails
 
@@ -207,7 +224,8 @@ func (c *client) Start(ctx context.Context) error {
 // Query executes a query and returns all rows
 func (c *client) Query(ctx context.Context, query string, args ...interface{}) ([]map[string]interface{}, error) {
 	startTime := time.Now()
-	var status string = "success"
+
+	var status = "success"
 
 	defer func() {
 		// Record metrics
@@ -219,7 +237,7 @@ func (c *client) Query(ctx context.Context, query string, args ...interface{}) (
 
 	// Verify connection is set
 	if c.conn == nil {
-		status = "error"
+		status = StatusError
 
 		return nil, fmt.Errorf("clickhouse connection is nil, client may not be properly initialized")
 	}
@@ -227,7 +245,7 @@ func (c *client) Query(ctx context.Context, query string, args ...interface{}) (
 	// Use QueryContext from database/sql
 	rows, err := c.conn.QueryContext(ctx, query, args...)
 	if err != nil {
-		status = "error"
+		status = StatusError
 
 		return nil, fmt.Errorf("failed to execute query: %w", err)
 	}
@@ -236,7 +254,8 @@ func (c *client) Query(ctx context.Context, query string, args ...interface{}) (
 	// Get column names using standard sql.Rows.Columns()
 	columnNames, err := rows.Columns()
 	if err != nil {
-		status = "error"
+		status = StatusError
+
 		return nil, fmt.Errorf("failed to get column names: %w", err)
 	}
 
@@ -257,7 +276,7 @@ func (c *client) Query(ctx context.Context, query string, args ...interface{}) (
 		// Scan the row into the slice
 		// Scan using standard sql.Rows.Scan()
 		if err := rows.Scan(valuePointers...); err != nil {
-			status = "error"
+			status = StatusError
 
 			return nil, fmt.Errorf("failed to scan row: %w", err)
 		}
@@ -274,7 +293,7 @@ func (c *client) Query(ctx context.Context, query string, args ...interface{}) (
 
 	// Check for errors after iteration using standard sql.Rows.Err()
 	if err := rows.Err(); err != nil {
-		status = "error"
+		status = StatusError
 
 		return nil, fmt.Errorf("error iterating rows: %w", err)
 	}
@@ -285,7 +304,8 @@ func (c *client) Query(ctx context.Context, query string, args ...interface{}) (
 // QueryRow executes a query and returns a single row
 func (c *client) QueryRow(ctx context.Context, query string, args ...interface{}) (map[string]interface{}, error) {
 	startTime := time.Now()
-	var status string = "success"
+
+	var status = "success"
 
 	defer func() {
 		// Record metrics
@@ -297,12 +317,14 @@ func (c *client) QueryRow(ctx context.Context, query string, args ...interface{}
 
 	rows, err := c.Query(ctx, query, args...)
 	if err != nil {
-		status = "error"
+		status = StatusError
+
 		return nil, err
 	}
 
 	if len(rows) == 0 {
-		status = "error"
+		status = StatusError
+
 		return nil, fmt.Errorf("no rows returned")
 	}
 
@@ -312,7 +334,8 @@ func (c *client) QueryRow(ctx context.Context, query string, args ...interface{}
 // Exec executes a query without returning rows
 func (c *client) Exec(ctx context.Context, query string, args ...interface{}) error {
 	startTime := time.Now()
-	var status string = "success"
+
+	var status = "success"
 
 	defer func() {
 		c.queriesTotal.WithLabelValues("exec", status).Inc()
@@ -323,15 +346,17 @@ func (c *client) Exec(ctx context.Context, query string, args ...interface{}) er
 
 	// Verify connection is set
 	if c.conn == nil {
-		status = "error"
+		status = StatusError
+
 		return fmt.Errorf("clickhouse connection is nil, client may not be properly initialized")
 	}
 
 	// Use ExecContext from database/sql
 	_, err := c.conn.ExecContext(ctx, query, args...)
 	if err != nil {
-		status = "error"
+		status = StatusError
 	}
+
 	return err // Return the error directly
 }
 

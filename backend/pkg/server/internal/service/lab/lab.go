@@ -32,7 +32,7 @@ type Lab struct {
 
 func New(
 	log logrus.FieldLogger,
-	ethereum *ethereum.Client,
+	eth *ethereum.Client,
 	cacheClient cache.Client,
 	bctService *beacon_chain_timings.BeaconChainTimings,
 	xpcService *xatu_public_contributors.XatuPublicContributors,
@@ -42,12 +42,13 @@ func New(
 	var metricsCollector *metrics.Collector
 	if metricsSvc != nil {
 		metricsCollector = metricsSvc.NewCollector("api")
+
 		log.WithField("component", "service/"+ServiceName).Debug("Created metrics collector for lab service")
 	}
 
 	return &Lab{
 		log:              log.WithField("component", "service/"+ServiceName),
-		ethereum:         ethereum,
+		ethereum:         eth,
 		bctService:       bctService,
 		xpcService:       xpcService,
 		bsService:        bsService,
@@ -101,7 +102,9 @@ func (l *Lab) Stop() {
 
 func (l *Lab) GetFrontendConfig() (*pb.FrontendConfig, error) {
 	startTime := time.Now()
+
 	var err error
+
 	statusCode := "success"
 
 	// Record metrics when the function completes
@@ -131,15 +134,12 @@ func (l *Lab) GetFrontendConfig() (*pb.FrontendConfig, error) {
 	}()
 
 	networksConfig := make(map[string]*pb.FrontendConfig_Network)
-	networks := []string{}
 
 	for _, network := range l.ethereum.Networks() {
 		networksConfig[network.Name] = &pb.FrontendConfig_Network{
 			GenesisTime: network.Config.Genesis.UTC().Unix(),
 			Forks:       &pb.FrontendConfig_ForkConfig{}, // TODO(sam.calder-mason): Add forks
 		}
-
-		networks = append(networks, network.Name)
 	}
 
 	config := &pb.FrontendConfig{

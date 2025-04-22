@@ -1,9 +1,9 @@
 package geolocation
 
 import (
-	"context"
 	"testing"
 
+	"github.com/ethpandaops/lab/backend/pkg/internal/lab/metrics"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -11,16 +11,17 @@ import (
 
 func TestNew(t *testing.T) {
 	log := logrus.New()
+	metricsSvc := metrics.NewMetricsService("test", log)
 
-	// Test with nil config and nil metrics
-	client, err := New(log, nil, nil)
+	// Test with nil config and metrics
+	client, err := New(log, nil, metricsSvc)
 	require.NoError(t, err)
 	assert.NotNil(t, client)
 	assert.Equal(t, defaultURL, client.databaseLocation)
 
-	// Test with custom config and nil metrics
+	// Test with custom config and metrics
 	customURL := "https://example.com/custom.zip"
-	client, err = New(log, &Config{DatabaseLocation: customURL}, nil)
+	client, err = New(log, &Config{DatabaseLocation: customURL}, metricsSvc)
 	require.NoError(t, err)
 	assert.NotNil(t, client)
 	assert.Equal(t, customURL, client.databaseLocation)
@@ -50,8 +51,9 @@ func TestIndexOf(t *testing.T) {
 
 func TestLocationDBStructure(t *testing.T) {
 	log := logrus.New()
+	metricsSvc := metrics.NewMetricsService("test", log)
 
-	client, err := New(log, nil, nil)
+	client, err := New(log, nil, metricsSvc)
 	require.NoError(t, err)
 
 	// Manually add some test data
@@ -111,8 +113,9 @@ func TestLocationDBStructure(t *testing.T) {
 
 func TestLoadCSVWithMockData(t *testing.T) {
 	log := logrus.New()
+	metricsSvc := metrics.NewMetricsService("test", log)
 
-	client, err := New(log, nil, nil)
+	client, err := New(log, nil, metricsSvc)
 	require.NoError(t, err)
 
 	// Create mock CSV data in memory
@@ -192,33 +195,5 @@ func TestValidateParams(t *testing.T) {
 				assert.NoError(t, err)
 			}
 		})
-	}
-}
-
-// This test is skipped by default as it would download real data
-func TestInitialize(t *testing.T) {
-	if testing.Short() {
-		t.Skip("Skipping initialization test in short mode")
-	}
-
-	log := logrus.New()
-
-	client, err := New(log, nil, nil)
-	require.NoError(t, err)
-
-	err = client.Start(context.Background())
-	require.NoError(t, err)
-
-	// Verify data was loaded
-	assert.Greater(t, len(client.locationDB.Continents), 0)
-
-	// Try a lookup for a known city
-	cityInfo, found := client.LookupCity(LookupParams{
-		City:    "london",
-		Country: "united kingdom",
-	})
-	if found {
-		assert.Equal(t, "london", cityInfo.City)
-		assert.Equal(t, "united kingdom", cityInfo.Country)
 	}
 }

@@ -48,18 +48,21 @@ func NewStandardCache() *StandardCache {
 // WithGetError configures the mock to return an error on Get
 func (m *StandardCache) WithGetError(err error) *StandardCache {
 	m.getErr = err
+
 	return m
 }
 
 // WithSetError configures the mock to return an error on Set
 func (m *StandardCache) WithSetError(err error) *StandardCache {
 	m.setErr = err
+
 	return m
 }
 
 // WithDeleteError configures the mock to return an error on Delete
 func (m *StandardCache) WithDeleteError(err error) *StandardCache {
 	m.deleteErr = err
+
 	return m
 }
 
@@ -68,10 +71,12 @@ func (m *StandardCache) Get(key string) ([]byte, error) {
 	if m.getErr != nil {
 		return nil, m.getErr
 	}
+
 	value, exists := m.data[key]
 	if !exists {
 		return nil, cache.ErrCacheMiss
 	}
+
 	return value, nil
 }
 
@@ -85,7 +90,9 @@ func (m *StandardCache) Set(key string, value []byte, ttl time.Duration) error {
 	if m.setErr != nil {
 		return m.setErr
 	}
+
 	m.data[key] = value
+
 	return nil
 }
 
@@ -94,7 +101,9 @@ func (m *StandardCache) Delete(key string) error {
 	if m.deleteErr != nil {
 		return m.deleteErr
 	}
+
 	delete(m.data, key)
+
 	return nil
 }
 

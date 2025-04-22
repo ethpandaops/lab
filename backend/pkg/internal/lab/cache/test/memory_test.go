@@ -115,7 +115,7 @@ func TestMemoryCacheGetExpiredWithDeleteError(t *testing.T) {
 	}
 
 	// The error should be a cache miss
-	if err.Error() != "key not found in cache" {
+	if err.Error() != cache.ErrCacheMissMsg {
 		t.Errorf("Expected cache miss error, got: %v", err)
 	}
 
@@ -309,6 +309,7 @@ func TestMemoryCacheConcurrentAccess(t *testing.T) {
 				err := memCache.Set(key, value, 0)
 				if err != nil {
 					t.Errorf("Error setting key %s: %v", key, err)
+
 					return
 				}
 
@@ -316,12 +317,14 @@ func TestMemoryCacheConcurrentAccess(t *testing.T) {
 				retrieved, err := memCache.Get(key)
 				if err != nil {
 					t.Errorf("Error getting key %s: %v", key, err)
+
 					return
 				}
 
 				// Verify value
 				if !bytes.Equal(retrieved, value) {
 					t.Errorf("Expected %s, got %s for key %s", value, retrieved, key)
+
 					return
 				}
 
@@ -330,6 +333,7 @@ func TestMemoryCacheConcurrentAccess(t *testing.T) {
 					err = memCache.Delete(key)
 					if err != nil {
 						t.Errorf("Error deleting key %s: %v", key, err)
+
 						return
 					}
 				}
@@ -368,7 +372,7 @@ func TestMemoryWithCustomGC(t *testing.T) {
 	}
 
 	// Clean up
-	memCache.Stop()
+	_ = memCache.Stop()
 }
 
 func TestMemoryCacheStop(t *testing.T) {

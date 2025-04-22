@@ -44,6 +44,7 @@ func (b *BeaconChainTimings) processBlockTimings(ctx context.Context, network *e
 		if metricErr == nil {
 			errorCounter.WithLabelValues("block_timings", network.Name, windowName).Inc()
 		}
+
 		return fmt.Errorf("failed to get time window config: %w", err)
 	}
 
@@ -59,6 +60,7 @@ func (b *BeaconChainTimings) processBlockTimings(ctx context.Context, network *e
 		if metricErr == nil {
 			errorCounter.WithLabelValues("block_timings", network.Name, windowName).Inc()
 		}
+
 		return fmt.Errorf("failed to get time range: %w", err)
 	}
 
@@ -74,6 +76,7 @@ func (b *BeaconChainTimings) processBlockTimings(ctx context.Context, network *e
 		if metricErr == nil {
 			errorCounter.WithLabelValues("block_timings", network.Name, windowName).Inc()
 		}
+
 		return fmt.Errorf("failed to process block timings: %w", err)
 	}
 
@@ -88,6 +91,7 @@ func (b *BeaconChainTimings) processBlockTimings(ctx context.Context, network *e
 		if metricErr == nil {
 			errorCounter.WithLabelValues("block_timings", network.Name, windowName).Inc()
 		}
+
 		return fmt.Errorf("failed to store timing data: %w", err)
 	}
 
@@ -99,6 +103,7 @@ func (b *BeaconChainTimings) processBlockTimings(ctx context.Context, network *e
 		[]string{"operation", "network", "window"},
 		nil,
 	)
+
 	if err == nil {
 		histogram.WithLabelValues("block_timings", network.Name, windowName).Observe(duration)
 	}
@@ -119,9 +124,11 @@ func (b *BeaconChainTimings) GetTimeWindowConfig(windowName string) (*pb.TimeWin
 				RangeMs: localTW.GetRangeDuration().Milliseconds(), // Use helper and convert to ms
 				StepMs:  localTW.GetStepDuration().Milliseconds(),  // Use helper and convert to ms
 			}
+
 			return pbTW, nil
 		}
 	}
+
 	return nil, fmt.Errorf("unknown window: %s", windowName)
 }
 
@@ -204,7 +211,6 @@ func (b *BeaconChainTimings) GetTimingData(ctx context.Context, network string, 
 		return nil, fmt.Errorf("failed to query block timing data: %w", err)
 	}
 
-	// Directly use rowsData, as it's already []map[string]interface{}
 	rows := rowsData
 
 	// Process the results
@@ -215,9 +221,9 @@ func (b *BeaconChainTimings) GetTimingData(ctx context.Context, network string, 
 		Mins:       make([]float64, 0),
 		Maxs:       make([]float64, 0),
 		Avgs:       make([]float64, 0),
-		P05S:       make([]float64, 0), // Corrected case
-		P50S:       make([]float64, 0), // Corrected case
-		P95S:       make([]float64, 0), // Corrected case
+		P05S:       make([]float64, 0),
+		P50S:       make([]float64, 0),
+		P95S:       make([]float64, 0),
 		Blocks:     make([]int64, 0),
 		// Intentionally not populating the 'validators' map
 	}
@@ -228,63 +234,89 @@ func (b *BeaconChainTimings) GetTimingData(ctx context.Context, network string, 
 		timeSlot, ok := row["time_slot"].(time.Time)
 		if !ok {
 			b.log.WithField("value", row["time_slot"]).Error("Failed to assert time_slot as time.Time")
+
 			continue // Or return error
 		}
+
 		minArrival, ok := row["min_arrival"].(float64)
 		if !ok {
 			// Handle potential integer types from DB if necessary
-			if intVal, okInt := row["min_arrival"].(int64); okInt {
-				minArrival = float64(intVal)
-				ok = true
-			} else if int32Val, okInt32 := row["min_arrival"].(int32); okInt32 {
-				minArrival = float64(int32Val)
-				ok = true
-			} else {
-				b.log.WithField("value", row["min_arrival"]).Error("Failed to assert min_arrival as float64")
+			switch v := row["min_arrival"].(type) {
+			case int64:
+				minArrival = float64(v)
+			case int32:
+				minArrival = float64(v)
+			case int:
+				minArrival = float64(v)
+			case uint64:
+				minArrival = float64(v)
+			default:
+				b.log.
+					WithField("value", row["min_arrival"]).
+					WithField("type", fmt.Sprintf("%T", v)).
+					Error("Failed to assert min_arrival as float64")
+
 				continue
 			}
 		}
+
 		maxArrival, ok := row["max_arrival"].(float64)
 		if !ok {
-			if intVal, okInt := row["max_arrival"].(int64); okInt {
-				maxArrival = float64(intVal)
-				ok = true
-			} else if int32Val, okInt32 := row["max_arrival"].(int32); okInt32 {
-				maxArrival = float64(int32Val)
-				ok = true
-			} else {
-				b.log.WithField("value", row["max_arrival"]).Error("Failed to assert max_arrival as float64")
+			switch v := row["max_arrival"].(type) {
+			case int64:
+				maxArrival = float64(v)
+			case int32:
+				maxArrival = float64(v)
+			case int:
+				maxArrival = float64(v)
+			case uint64:
+				maxArrival = float64(v)
+			default:
+				b.log.
+					WithField("value", row["max_arrival"]).
+					WithField("type", fmt.Sprintf("%T", v)).
+					Error("Failed to assert max_arrival as float64")
+
 				continue
 			}
 		}
+
 		avgArrival, ok := row["avg_arrival"].(float64)
 		if !ok {
 			b.log.WithField("value", row["avg_arrival"]).Error("Failed to assert avg_arrival as float64")
+
 			continue
 		}
+
 		p05Arrival, ok := row["p05_arrival"].(float64)
 		if !ok {
 			b.log.WithField("value", row["p05_arrival"]).Error("Failed to assert p05_arrival as float64")
+
 			continue
 		}
+
 		p50Arrival, ok := row["p50_arrival"].(float64)
 		if !ok {
 			b.log.WithField("value", row["p50_arrival"]).Error("Failed to assert p50_arrival as float64")
+
 			continue
 		}
+
 		p95Arrival, ok := row["p95_arrival"].(float64)
 		if !ok {
 			b.log.WithField("value", row["p95_arrival"]).Error("Failed to assert p95_arrival as float64")
+
 			continue
 		}
+
 		totalBlocks, ok := row["total_blocks"].(int64) // Assuming ClickHouse count returns Int64
 		if !ok {
 			// Handle potential uint64 if count returns that
 			if uintVal, okUint := row["total_blocks"].(uint64); okUint {
-				totalBlocks = int64(uintVal)
-				ok = true
+				totalBlocks = int64(uintVal) //nolint:gosec // no risk of overflow
 			} else {
 				b.log.WithField("value", row["total_blocks"]).Error("Failed to assert total_blocks as int64")
+
 				continue
 			}
 		}
@@ -320,5 +352,6 @@ func (b *BeaconChainTimings) storeTimingData(ctx context.Context, network, windo
 	}
 
 	b.log.WithField("path", dataPath).Info("Stored block timings data")
+
 	return nil
 }

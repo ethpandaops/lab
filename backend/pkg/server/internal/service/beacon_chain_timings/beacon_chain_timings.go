@@ -56,9 +56,9 @@ type BeaconChainTimings struct {
 
 	leaderClient leader.Client
 
-	processCtx       context.Context
+	processCtx       context.Context //nolint:containedctx // context for processing
 	processCtxCancel context.CancelFunc
-	parentCtx        context.Context
+	parentCtx        context.Context //nolint:containedctx // context passed from Start
 
 	// Base directory for storage
 	baseDir string
@@ -77,11 +77,9 @@ func New(
 ) (*BeaconChainTimings, error) {
 	serviceLog := log.WithField("component", "service/beacon_chain_timings")
 
-	var metricsCollector *metrics.Collector
-	if metricsSvc != nil {
-		metricsCollector = metricsSvc.NewCollector("beacon_chain_timings")
-		serviceLog.Debug("Created metrics collector for beacon_chain_timings service")
-	}
+	metricsCollector := metricsSvc.NewCollector("beacon_chain_timings")
+
+	serviceLog.Debug("Created metrics collector for beacon_chain_timings service")
 
 	return &BeaconChainTimings{
 		log:              serviceLog,
@@ -108,16 +106,16 @@ func New(
 func (b *BeaconChainTimings) Start(ctx context.Context) error {
 	if b.config != nil && b.config.Enabled != nil && !*b.config.Enabled {
 		b.log.Info("BeaconChainTimings service is disabled, skipping")
+
 		return nil
 	}
 
 	b.log.Info("Starting BeaconChainTimings service")
-	b.parentCtx = ctx // Store the parent context
+	b.parentCtx = ctx
 
-	// Initialize metrics if collector is available
 	b.initializeMetrics()
 
-	leader := leader.New(b.log, b.lockerClient, leader.Config{
+	lead := leader.New(b.log, b.lockerClient, leader.Config{
 		Resource:        BeaconChainTimingsServiceName + "/batch_processing",
 		TTL:             30 * time.Second,
 		RefreshInterval: 5 * time.Second,
@@ -157,9 +155,9 @@ func (b *BeaconChainTimings) Start(ctx context.Context) error {
 		},
 	}, b.metrics)
 
-	leader.Start()
+	lead.Start()
 
-	b.leaderClient = leader
+	b.leaderClient = lead
 
 	return nil
 }
@@ -243,6 +241,7 @@ func (b *BeaconChainTimings) updateLeadershipMetric(isLeader bool) {
 	)
 	if err != nil {
 		b.log.WithError(err).Warn("Failed to get is_leader metric")
+
 		return
 	}
 
@@ -258,11 +257,13 @@ func (b *BeaconChainTimings) Stop() {
 	b.log.Info("Stopping BeaconChainTimings service")
 
 	b.log.Info("Stopping leader client")
+
 	if b.leaderClient != nil {
 		b.leaderClient.Stop()
 	}
 
 	b.log.Info("Waiting for process loop to finish")
+
 	if b.processCtxCancel != nil {
 		b.processCtxCancel()
 	}
@@ -300,6 +301,7 @@ func (b *BeaconChainTimings) processLoop() {
 	if interval <= 0 {
 		interval = 5 * time.Second
 	}
+
 	ticker := time.NewTicker(interval)
 	defer ticker.Stop()
 
@@ -312,6 +314,7 @@ func (b *BeaconChainTimings) processLoop() {
 		select {
 		case <-b.processCtx.Done():
 			b.log.Info("Context cancelled, stopping BeaconChainTimings processing loop")
+
 			return
 		case <-ticker.C:
 			if b.leaderClient.IsLeader() {
@@ -377,12 +380,14 @@ func (b *BeaconChainTimings) process(ctx context.Context) {
 	// Verify we have valid networks to process
 	if b.ethereumConfig == nil || len(b.ethereumConfig.Networks) == 0 {
 		b.log.Warn("No networks configured to process, skipping")
+
 		return
 	}
 
 	// Verify we have valid time windows to process
 	if b.config == nil || len(b.config.TimeWindows) == 0 {
 		b.log.Warn("No time windows configured to process, skipping")
+
 		return
 	}
 
@@ -391,6 +396,7 @@ func (b *BeaconChainTimings) process(ctx context.Context) {
 		// Skip nil networks (shouldn't happen, but defensive)
 		if network == nil {
 			b.log.Warn("Encountered nil network, skipping")
+
 			continue
 		}
 
@@ -399,6 +405,7 @@ func (b *BeaconChainTimings) process(ctx context.Context) {
 			// Skip empty window configurations
 			if window.File == "" {
 				b.log.Warn("Encountered empty window file name, skipping")
+
 				continue
 			}
 
@@ -414,6 +421,7 @@ func (b *BeaconChainTimings) process(ctx context.Context) {
 			shouldProcess, err := b.shouldProcess(network.Name, window.File, lastProcessedTime)
 			if err != nil {
 				b.log.WithError(err).Errorf("failed to check if should process block timings for network %s, window %s", network.Name, window.File)
+
 				continue
 			}
 
@@ -435,6 +443,7 @@ func (b *BeaconChainTimings) process(ctx context.Context) {
 			shouldProcess, err = b.shouldProcess(network.Name, window.File, lastProcessedTime)
 			if err != nil {
 				b.log.WithError(err).Errorf("failed to check if should process CDF for network %s, window %s", network.Name, window.File)
+
 				continue
 			}
 
@@ -477,6 +486,7 @@ func (b *BeaconChainTimings) process(ctx context.Context) {
 		[]string{"operation", "network", "window"},
 		nil,
 	)
+
 	if err == nil {
 		histogram.WithLabelValues("process_cycle", "all", "all").Observe(duration)
 	}
@@ -503,6 +513,7 @@ func (b *BeaconChainTimings) shouldProcess(network, window string, lastProcessed
 		if err == nil {
 			counter.WithLabelValues("process", "no_previous_state", network, window).Inc()
 		}
+
 		return true, nil
 	}
 
@@ -518,6 +529,7 @@ func (b *BeaconChainTimings) shouldProcess(network, window string, lastProcessed
 		if err == nil {
 			counter.WithLabelValues("process", "interval_elapsed", network, window).Inc()
 		}
+
 		return true, nil
 	}
 
@@ -535,7 +547,7 @@ func (b *BeaconChainTimings) shouldProcess(network, window string, lastProcessed
 }
 
 // updateStateMetrics updates the state metrics based on the current state
-func (b *BeaconChainTimings) updateStateMetrics(state *pb.State) {
+func (b *BeaconChainTimings) updateStateMetrics(st *pb.State) {
 	if b.metricsCollector == nil || b.stateLastProcessedMetric == nil || b.stateAgeMetric == nil {
 		return
 	}
@@ -543,13 +555,15 @@ func (b *BeaconChainTimings) updateStateMetrics(state *pb.State) {
 	now := time.Now()
 
 	// Process block timings state
-	for stateKey, timestamp := range state.BlockTimings.LastProcessed {
+	for stateKey, timestamp := range st.BlockTimings.LastProcessed {
 		// Parse network/window from the stateKey (format: "network/window")
 		parts := strings.Split(stateKey, "/")
 		if len(parts) != 2 {
 			b.log.WithField("state_key", stateKey).Warn("Invalid state key format for metrics")
+
 			continue
 		}
+
 		network := parts[0]
 		window := parts[1]
 		dataType := "block_timings"
@@ -567,13 +581,15 @@ func (b *BeaconChainTimings) updateStateMetrics(state *pb.State) {
 	}
 
 	// Process CDF state
-	for stateKey, timestamp := range state.Cdf.LastProcessed {
+	for stateKey, timestamp := range st.Cdf.LastProcessed {
 		// Parse network/window from the stateKey (format: "network/window")
 		parts := strings.Split(stateKey, "/")
 		if len(parts) != 2 {
 			b.log.WithField("state_key", stateKey).Warn("Invalid state key format for metrics")
+
 			continue
 		}
+
 		network := parts[0]
 		window := parts[1]
 		dataType := "cdf"

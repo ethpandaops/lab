@@ -12,6 +12,15 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+// Status constants for metrics
+const (
+	StatusError         = "error"
+	StatusSuccess       = "success"
+	StatusAlreadyLocked = "already_locked"
+	StatusNotFound      = "not_found"
+	StatusTokenMismatch = "token_mismatch"
+)
+
 // For testing purposes, we can replace this function
 var generateTokenFn = cache.GenerateToken
 
@@ -45,10 +54,10 @@ type locker struct {
 }
 
 // New creates a new distributed lock implementation using the provided cache
-func New(log logrus.FieldLogger, cache cache.Client, metricsSvc *metrics.Metrics) Locker {
+func New(log logrus.FieldLogger, ch cache.Client, metricsSvc *metrics.Metrics) Locker {
 	l := &locker{
 		log:     log.WithField("component", "lab/locker"),
-		cache:   cache,
+		cache:   ch,
 		metrics: metricsSvc,
 	}
 
@@ -64,6 +73,7 @@ func (l *locker) initMetrics() {
 
 	// Register metrics
 	var err error
+
 	l.operationsTotal, err = l.collector.NewCounterVec(
 		"operations_total",
 		"Total number of lock operations (acquire, release)",
@@ -116,8 +126,10 @@ func (l *locker) initMetrics() {
 // Lock attempts to acquire a lock using cache
 func (l *locker) Lock(name string, ttl time.Duration) (string, bool, error) {
 	startTime := time.Now()
-	var status string = "success"
-	var acquired bool = false
+
+	var status = "success"
+
+	var acquired = false
 
 	// Defer metrics recording
 	defer func() {
@@ -138,7 +150,9 @@ func (l *locker) Lock(name string, ttl time.Duration) (string, bool, error) {
 	token, err := generateTokenFn()
 	if err != nil {
 		logCtx.WithError(err).Error("Failed to generate token")
-		status = "error"
+
+		status = StatusError
+
 		return "", false, err
 	}
 
@@ -153,7 +167,8 @@ func (l *locker) Lock(name string, ttl time.Duration) (string, bool, error) {
 	if err == nil {
 		// Lock exists and is valid
 		logCtx.Debug("Lock exists and is valid")
-		status = "already_locked"
+
+		status = StatusAlreadyLocked
 
 		// Increment contention counter when a lock is already held
 		l.lockContention.WithLabelValues().Inc()
@@ -162,7 +177,9 @@ func (l *locker) Lock(name string, ttl time.Duration) (string, bool, error) {
 	} else if err != cache.ErrCacheMiss {
 		// Unexpected error
 		logCtx.WithError(err).Error("Failed to get lock")
-		status = "error"
+
+		status = StatusError
+
 		return "", false, err
 	}
 
@@ -170,18 +187,22 @@ func (l *locker) Lock(name string, ttl time.Duration) (string, bool, error) {
 	err = l.cache.Set(lockKey, []byte(token), ttl)
 	if err != nil {
 		logCtx.WithError(err).Error("Failed to set lock")
-		status = "error"
+
+		status = StatusError
+
 		return "", false, err
 	}
 
 	// Store the acquisition timestamp for measuring hold duration
 	timestamp := time.Now().UnixNano()
+
 	err = l.cache.Set(timestampKey, []byte(fmt.Sprintf("%d", timestamp)), ttl)
 	if err != nil {
 		logCtx.WithError(err).Warn("Failed to set lock timestamp")
 	}
 
 	logCtx.Debug("Lock acquired")
+
 	acquired = true
 
 	return token, true, nil
@@ -190,8 +211,10 @@ func (l *locker) Lock(name string, ttl time.Duration) (string, bool, error) {
 // Unlock releases a lock
 func (l *locker) Unlock(name string, token string) (bool, error) {
 	startTime := time.Now()
-	var status string = "success"
-	var released bool = false
+
+	var status = "success"
+
+	var released = false
 
 	// Defer metrics recording
 	defer func() {
@@ -217,19 +240,25 @@ func (l *locker) Unlock(name string, token string) (bool, error) {
 		if err == cache.ErrCacheMiss {
 			// Lock doesn't exist
 			logCtx.Debug("Lock doesn't exist")
-			status = "not_found"
+
+			status = StatusNotFound
+
 			return false, nil
 		}
 
 		logCtx.WithError(err).Error("Failed to get lock")
-		status = "error"
+
+		status = StatusError
+
 		return false, err
 	}
 
 	// Check if the token matches
 	if string(data) != token {
 		logCtx.Debug("Lock token doesn't match")
-		status = "token_mismatch"
+
+		status = StatusTokenMismatch
+
 		return false, nil
 	}
 
@@ -249,7 +278,9 @@ func (l *locker) Unlock(name string, token string) (bool, error) {
 	err = l.cache.Delete(lockKey)
 	if err != nil {
 		logCtx.WithError(err).Error("Failed to delete lock")
-		status = "error"
+
+		status = StatusError
+
 		return false, err
 	}
 
@@ -257,6 +288,7 @@ func (l *locker) Unlock(name string, token string) (bool, error) {
 	_ = l.cache.Delete(timestampKey) // Ignore errors for cleanup
 
 	logCtx.Debug("Lock released")
+
 	released = true
 
 	return true, nil

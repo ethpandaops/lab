@@ -40,6 +40,7 @@ func (s *LabAPIServerImpl) GetFrontendConfig(ctx context.Context, _ *emptypb.Emp
 		resp := &apipb.FrontendConfigResponse{}
 		_ = proto.Unmarshal(cached, resp)
 		s.setCacheHeaders(ctx, cached, ttl)
+
 		return resp, nil
 	}
 
@@ -53,6 +54,7 @@ func (s *LabAPIServerImpl) GetFrontendConfig(ctx context.Context, _ *emptypb.Emp
 	data, _ := proto.Marshal(resp)
 	_ = s.cache.Set(cacheKey, data, ttl)
 	s.setCacheHeaders(ctx, data, ttl)
+
 	return resp, nil
 }
 
@@ -100,5 +102,6 @@ func (s *LabAPIServerImpl) setCacheHeaders(ctx context.Context, data []byte, ttl
 
 func generateETag(data []byte) string {
 	hash := sha256.Sum256(data)
+
 	return `"` + hex.EncodeToString(hash[:]) + `"`
 }

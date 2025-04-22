@@ -30,7 +30,7 @@ import (
 
 // Service represents the srv service. It glues together all the sub-services and the gRPC server.
 type Service struct {
-	ctx    context.Context
+	ctx    context.Context //nolint:containedctx // context is used for srv operations
 	config *Config
 
 	log logrus.FieldLogger
@@ -83,6 +83,7 @@ func (s *Service) Start(ctx context.Context) error {
 	// Set up signal handling to cancel the context
 	sigCh := make(chan os.Signal, 1)
 	signal.Notify(sigCh, syscall.SIGINT, syscall.SIGTERM)
+
 	go func() {
 		sig := <-sigCh
 		s.log.WithField("signal", sig.String()).Info("Received signal, initiating shutdown")
@@ -97,12 +98,14 @@ func (s *Service) Start(ctx context.Context) error {
 	// Initialize services using the cancelable context
 	if err := s.initializeServices(s.ctx); err != nil {
 		cancel() // Ensure context is canceled on initialization error
+
 		return fmt.Errorf("failed to initialize services: %w", err)
 	}
 
 	// Start HTTP server for metrics
 	if err := s.startMetricsServer(); err != nil {
 		cancel() // Ensure context is canceled on initialization error
+
 		return fmt.Errorf("failed to start HTTP server for metrics: %w", err)
 	}
 
@@ -110,15 +113,39 @@ func (s *Service) Start(ctx context.Context) error {
 	for _, service := range s.services {
 		if err := service.Start(s.ctx); err != nil {
 			cancel() // Ensure context is canceled on service start error
+
 			return fmt.Errorf("failed to start service %s: %w", service.Name(), err)
 		}
 	}
 
 	// Retrieve instantiated services for handlers
-	bctService := s.getService(beacon_chain_timings.BeaconChainTimingsServiceName).(*beacon_chain_timings.BeaconChainTimings)
-	xpcService := s.getService(xatu_public_contributors.XatuPublicContributorsServiceName).(*xatu_public_contributors.XatuPublicContributors)
-	bsService := s.getService(beacon_slots.ServiceName).(*beacon_slots.BeaconSlots)
-	labService := s.getService(lab.ServiceName).(*lab.Lab)
+	bctService, ok := s.getService(beacon_chain_timings.BeaconChainTimingsServiceName).(*beacon_chain_timings.BeaconChainTimings)
+	if !ok {
+		s.log.Error("Failed to get beacon chain timings service")
+
+		return fmt.Errorf("failed to get beacon chain timings service")
+	}
+
+	xpcService, ok := s.getService(xatu_public_contributors.XatuPublicContributorsServiceName).(*xatu_public_contributors.XatuPublicContributors)
+	if !ok {
+		s.log.Error("Failed to get xatu public contributors service")
+
+		return fmt.Errorf("failed to get xatu public contributors service")
+	}
+
+	bsService, ok := s.getService(beacon_slots.ServiceName).(*beacon_slots.BeaconSlots)
+	if !ok {
+		s.log.Error("Failed to get beacon slots service")
+
+		return fmt.Errorf("failed to get beacon slots service")
+	}
+
+	labService, ok := s.getService(lab.ServiceName).(*lab.Lab)
+	if !ok {
+		s.log.Error("Failed to get lab service")
+
+		return fmt.Errorf("failed to get lab service")
+	}
 
 	// Instantiate gRPC handlers
 	grpcServices := []grpc.Service{
@@ -238,10 +265,12 @@ func (s *Service) initializeDependencies(ctx context.Context) error {
 
 	// Initialize Ethereum client
 	s.log.Info("Initializing Ethereum client")
+
 	ethereumClient := ethereum.NewClient(s.config.Ethereum, s.metrics)
 	if err := ethereumClient.Start(ctx); err != nil {
 		return fmt.Errorf("failed to start Ethereum client: %w", err)
 	}
+
 	s.ethereumClient = ethereumClient
 
 	// Initialize global XatuClickhouse
@@ -253,24 +282,26 @@ func (s *Service) initializeDependencies(ctx context.Context) error {
 	}
 
 	// Start the Xatu client
-	if err := xatuClient.Start(ctx); err != nil {
-		return fmt.Errorf("failed to start Xatu client: %w", err)
+	if errr := xatuClient.Start(ctx); errr != nil {
+		return fmt.Errorf("failed to start Xatu client: %w", errr)
 	}
 
 	// Initialize S3 Storage
 	s.log.Info("Initializing S3 storage")
+
 	storageClient, err := storage.New(s.config.Storage, s.log, s.metrics)
 	if err != nil {
 		return fmt.Errorf("failed to initialize S3 storage: %w", err)
 	}
 
 	// Start the storage client
-	if err := storageClient.Start(ctx); err != nil {
-		return fmt.Errorf("failed to start S3 storage client: %w", err)
+	if errr := storageClient.Start(ctx); errr != nil {
+		return fmt.Errorf("failed to start S3 storage client: %w", errr)
 	}
 
 	// Initialize cache client
 	s.log.Info("Initializing cache client")
+
 	cacheClient, err := cache.New(s.config.Cache, s.metrics)
 	if err != nil {
 		return fmt.Errorf("failed to initialize cache client: %w", err)
@@ -282,6 +313,7 @@ func (s *Service) initializeDependencies(ctx context.Context) error {
 
 	// Initialize geolocation client
 	s.log.Info("Initializing geolocation client")
+
 	geolocationClient, err := geolocation.New(s.log, s.config.Geolocation, s.metrics)
 	if err != nil {
 		return fmt.Errorf("failed to initialize geolocation client: %w", err)
@@ -307,7 +339,9 @@ func (s *Service) getService(name string) service.Service {
 			return svc
 		}
 	}
+
 	s.log.WithField("service_name", name).Error("Requested service not found during handler initialization")
+
 	return nil // Explicitly return nil if not found
 }
 
@@ -326,6 +360,7 @@ func (s *Service) stop() {
 	// Stop gRPC server gracefully
 	if s.grpcServer != nil {
 		wg.Add(1)
+
 		go func() {
 			defer wg.Done()
 			s.log.Info("Stopping gRPC server...")
@@ -337,9 +372,11 @@ func (s *Service) stop() {
 	// Stop HTTP server gracefully
 	if s.httpServer != nil {
 		wg.Add(1)
+
 		go func() {
 			defer wg.Done()
 			s.log.Info("Stopping HTTP server...")
+
 			if err := s.httpServer.Shutdown(shutdownCtx); err != nil {
 				s.log.WithError(err).Warn("Error shutting down HTTP server")
 			} else {
@@ -360,6 +397,7 @@ func (s *Service) stop() {
 
 	if s.xatuClient != nil {
 		wg.Add(1)
+
 		go func() {
 			defer wg.Done()
 			s.log.Info("Stopping Xatu client...")
@@ -367,11 +405,14 @@ func (s *Service) stop() {
 			s.log.Info("Xatu client stopped.")
 		}()
 	}
+
 	if s.storageClient != nil {
 		wg.Add(1)
+
 		go func() {
 			defer wg.Done()
 			s.log.Info("Stopping Storage client...")
+
 			if err := s.storageClient.Stop(); err != nil {
 				s.log.WithError(err).Warn("Error stopping storage client")
 			} else {
@@ -379,11 +420,14 @@ func (s *Service) stop() {
 			}
 		}()
 	}
+
 	if s.cacheClient != nil {
 		wg.Add(1)
+
 		go func() {
 			defer wg.Done()
 			s.log.Info("Stopping Cache client...")
+
 			if err := s.cacheClient.Stop(); err != nil {
 				s.log.WithError(err).Warn("Error stopping cache client")
 			} else {
@@ -419,13 +463,15 @@ func (s *Service) startMetricsServer() error {
 
 	// Create the HTTP server
 	s.httpServer = &http.Server{
-		Addr:    ":9090", // Default metrics port
-		Handler: mux,
+		Addr:              ":9090", // Default metrics port
+		Handler:           mux,
+		ReadHeaderTimeout: 10 * time.Second,
 	}
 
 	// Start the HTTP server in a goroutine
 	go func() {
 		s.log.WithField("address", s.httpServer.Addr).Info("HTTP server for metrics listening")
+
 		if err := s.httpServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			s.log.WithError(err).Error("HTTP server for metrics failed to serve")
 		}

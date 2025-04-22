@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"net"
 	"net/http"
 	"os"
 	"os/signal"
@@ -30,12 +29,11 @@ import (
 type Service struct {
 	log           logrus.FieldLogger
 	config        *Config
-	ctx           context.Context
+	ctx           context.Context //nolint:containedctx // This is a context for the service
 	cancel        context.CancelFunc
 	router        *mux.Router
 	server        *http.Server
 	grpcServer    *grpc.Server
-	grpcListener  net.Listener
 	restServer    *http.Server
 	cacheClient   cache.Client
 	storageClient storage.Client
@@ -56,14 +54,14 @@ func New(config *Config) (*Service, error) {
 		return nil, fmt.Errorf("failed to create logger: %w", err)
 	}
 
-	metrics := metrics.NewMetricsService("lab", log, "api")
+	met := metrics.NewMetricsService("lab", log, "api")
 
-	cacheClient, err := cache.New(config.Cache, metrics)
+	cacheClient, err := cache.New(config.Cache, met)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create cache client: %w", err)
 	}
 
-	storageClient, err := storage.New(config.Storage, log, metrics)
+	storageClient, err := storage.New(config.Storage, log, met)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create storage client: %w", err)
 	}
@@ -85,6 +83,7 @@ func (s *Service) Start(ctx context.Context) error {
 
 	sigCh := make(chan os.Signal, 1)
 	signal.Notify(sigCh, syscall.SIGINT, syscall.SIGTERM)
+
 	go func() {
 		sig := <-sigCh
 		s.log.WithField("signal", sig.String()).Info("Received signal, shutting down")
@@ -99,12 +98,14 @@ func (s *Service) Start(ctx context.Context) error {
 	corsHandler := s.getCORSHandler(s.router)
 
 	s.server = &http.Server{
-		Addr:    fmt.Sprintf("%s:%d", s.config.HttpServer.Host, s.config.HttpServer.Port),
-		Handler: corsHandler,
+		Addr:              fmt.Sprintf("%s:%d", s.config.HttpServer.Host, s.config.HttpServer.Port),
+		Handler:           corsHandler,
+		ReadHeaderTimeout: 10 * time.Second,
 	}
 
 	go func() {
 		s.log.WithField("addr", s.server.Addr).Info("Starting HTTP server")
+
 		if err := s.server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			s.log.WithError(err).Error("HTTP server error")
 			s.cancel()
@@ -117,6 +118,7 @@ func (s *Service) Start(ctx context.Context) error {
 	s.cleanup()
 
 	s.log.Info("Api service stopped")
+
 	return nil
 }
 
@@ -138,15 +140,17 @@ func (s *Service) getCORSHandler(h http.Handler) http.Handler {
 	}
 
 	// Configure allowed origins based on config
-	if s.config.HttpServer.CORSAllowAll {
+	switch {
+	case s.config.HttpServer.CORSAllowAll:
 		s.log.Info("CORS configured to allow all origins (*)")
+
 		corsOptions.AllowedOrigins = []string{"*"}
-	} else if len(s.config.HttpServer.AllowedOrigins) > 0 {
+	case len(s.config.HttpServer.AllowedOrigins) > 0:
 		s.log.WithField("origins", s.config.HttpServer.AllowedOrigins).Info("CORS configured with specific allowed origins")
 		corsOptions.AllowedOrigins = s.config.HttpServer.AllowedOrigins
-	} else {
-		// Default to allowing all origins if nothing is specified
+	default:
 		s.log.Info("No CORS origins specified, defaulting to allow all (*)")
+
 		corsOptions.AllowedOrigins = []string{"*"}
 	}
 
@@ -157,19 +161,20 @@ func (s *Service) initializeServices(ctx context.Context) error {
 	srvAddr := s.config.SrvClient.Address
 
 	var conn *grpc.ClientConn
+
 	var err error
 
-	if s.config.SrvClient.TLS {
-		conn, err = grpc.Dial(srvAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
-		if err != nil {
-			return fmt.Errorf("failed to dial srv service at %s: %w", srvAddr, err)
-		}
-	} else {
-		conn, err = grpc.Dial(srvAddr, grpc.WithInsecure())
-		if err != nil {
-			return fmt.Errorf("failed to dial srv service at %s: %w", srvAddr, err)
-		}
+	// Set up dial options with transport credentials
+	opts := []grpc.DialOption{
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
 	}
+
+	// Use the passthrough scheme explicitly to maintain the same behavior as DialContext
+	conn, err = grpc.NewClient("passthrough://"+srvAddr, opts...)
+	if err != nil {
+		return fmt.Errorf("failed to dial srv service at %s: %w", srvAddr, err)
+	}
+
 	s.srvConn = conn
 	s.labClient = labpb.NewLabServiceClient(conn)
 
@@ -187,6 +192,7 @@ func (s *Service) initializeServices(ctx context.Context) error {
 func (s *Service) registerLegacyHandlers() {
 	// Determine the router to use (main router or prefixed subrouter)
 	router := s.router
+
 	prefix := s.config.HttpServer.PathPrefix
 	if prefix != "" {
 		s.log.WithField("prefix", prefix).Info("Registering legacy handlers with path prefix")
@@ -194,9 +200,11 @@ func (s *Service) registerLegacyHandlers() {
 		if prefix[0] != '/' {
 			prefix = "/" + prefix
 		}
+
 		if len(prefix) > 1 && prefix[len(prefix)-1] == '/' {
 			prefix = prefix[:len(prefix)-1]
 		}
+
 		router = s.router.PathPrefix(prefix).Subrouter()
 	} else {
 		s.log.Info("Registering legacy handlers without path prefix")
@@ -231,16 +239,20 @@ func (s *Service) registerLegacyHandlers() {
 
 func (s *Service) handleFrontendConfig(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
+
 	resp, err := s.labClient.GetFrontendConfig(ctx, &labpb.GetFrontendConfigRequest{})
 	if err != nil {
 		s.log.WithError(err).Error("failed to fetch config")
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
+
 		return
 	}
+
 	data, err := json.Marshal(resp.Config.Config)
 	if err != nil {
 		s.log.WithError(err).Error("failed to marshal config response")
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
+
 		return
 	}
 
@@ -250,6 +262,7 @@ func (s *Service) handleFrontendConfig(w http.ResponseWriter, r *http.Request) {
 	if _, err := w.Write(data); err != nil {
 		s.log.WithError(err).Error("failed to write config response")
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
+
 		return
 	}
 }
@@ -290,6 +303,7 @@ func (s *Service) handleBlockTimings(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	network := vars["network"]
 	windowFile := vars["window_file"]
+
 	key := "beacon_chain_timings/block_timings/" + network + "/" + windowFile + ".json"
 	if err := s.handleS3Passthrough(w, r, key, map[string]string{
 		"Content-Type":  "application/json",
@@ -300,13 +314,13 @@ func (s *Service) handleBlockTimings(w http.ResponseWriter, r *http.Request) {
 
 		return
 	}
-
 }
 
 func (s *Service) handleSizeCDF(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	network := vars["network"]
 	windowFile := vars["window_file"]
+
 	key := "beacon_chain_timings/size_cdf/" + network + "/" + windowFile + ".json"
 	if err := s.handleS3Passthrough(w, r, key, map[string]string{
 		"Content-Type":  "application/json",
@@ -330,13 +344,13 @@ func (s *Service) handleXatuSummary(w http.ResponseWriter, r *http.Request) {
 
 		return
 	}
-
 }
 
 func (s *Service) handleBeaconSlot(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	network := vars["network"]
 	slot := vars["slot"]
+
 	key := "beacon_slots/slots/" + network + "/" + slot + ".json"
 	if err := s.handleS3Passthrough(w, r, key, map[string]string{
 		"Content-Type":  "application/json",
@@ -347,7 +361,6 @@ func (s *Service) handleBeaconSlot(w http.ResponseWriter, r *http.Request) {
 
 		return
 	}
-
 }
 
 func (s *Service) handleXatuUserSummary(w http.ResponseWriter, r *http.Request) {
@@ -362,7 +375,6 @@ func (s *Service) handleXatuUserSummary(w http.ResponseWriter, r *http.Request) 
 
 		return
 	}
-
 }
 
 func (s *Service) handleXatuUser(w http.ResponseWriter, r *http.Request) {
@@ -379,7 +391,6 @@ func (s *Service) handleXatuUser(w http.ResponseWriter, r *http.Request) {
 
 		return
 	}
-
 }
 
 func (s *Service) handleXatuUsersWindow(w http.ResponseWriter, r *http.Request) {
@@ -407,6 +418,7 @@ func (s *Service) handleXatuCountriesWindow(w http.ResponseWriter, r *http.Reque
 	key := "xatu_public_contributors/countries/" + network + "/" + windowFile + ".json"
 
 	ctx := r.Context()
+
 	data, err := s.storageClient.Get(ctx, key)
 	if err != nil {
 		if err == storage.ErrNotFound {
@@ -435,17 +447,18 @@ func (s *Service) handleXatuCountriesWindow(w http.ResponseWriter, r *http.Reque
 	if err := json.Unmarshal(data, &internalData); err != nil {
 		s.log.WithError(err).WithField("key", key).Error("Failed to unmarshal countries data")
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
+
 		return
 	}
 
 	// Transform to production format
-	var productionData []struct {
+	productionData := make([]struct {
 		Time      int64 `json:"time"`
 		Countries []struct {
 			Name  string `json:"name"`
 			Value int    `json:"value"`
 		} `json:"countries"`
-	}
+	}, len(internalData))
 
 	// Convert each data point
 	for _, dataPoint := range internalData {
@@ -491,6 +504,7 @@ func (s *Service) handleXatuCountriesWindow(w http.ResponseWriter, r *http.Reque
 	if err != nil {
 		s.log.WithError(err).WithField("key", key).Error("Failed to marshal transformed countries data")
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
+
 		return
 	}
 
@@ -508,8 +522,10 @@ func (s *Service) handleXatuCountriesWindow(w http.ResponseWriter, r *http.Reque
 func (s *Service) cleanup() {
 	if s.server != nil {
 		s.log.Info("Shutting down HTTP server")
+
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancel()
+
 		if err := s.server.Shutdown(ctx); err != nil {
 			s.log.WithError(err).Error("Failed to shut down HTTP server")
 		}
@@ -517,8 +533,10 @@ func (s *Service) cleanup() {
 
 	if s.restServer != nil {
 		s.log.Info("Shutting down REST gateway server")
+
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancel()
+
 		if err := s.restServer.Shutdown(ctx); err != nil {
 			s.log.WithError(err).Error("Failed to shut down REST gateway server")
 		}

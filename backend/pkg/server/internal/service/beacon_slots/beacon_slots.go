@@ -54,8 +54,8 @@ type BeaconSlots struct {
 	processingErrorsTotalMetric  *prometheus.CounterVec
 	processingDurationMetric     *prometheus.HistogramVec
 
-	parentCtx        context.Context // Context passed from Start
-	processCtx       context.Context
+	parentCtx        context.Context //nolint:containedctx // context passed from Start
+	processCtx       context.Context //nolint:containedctx // context for processing
 	processCtxCancel context.CancelFunc
 	processWaitGroup sync.WaitGroup
 
@@ -67,7 +67,7 @@ func New(
 	log logrus.FieldLogger,
 	config *Config,
 	xatuClient *xatu.Client,
-	ethereum *ethereum.Client,
+	eth *ethereum.Client,
 	storageClient storage.Client,
 	cacheClient cache.Client,
 	lockerClient locker.Locker,
@@ -87,7 +87,7 @@ func New(
 	return &BeaconSlots{
 		log:               log.WithField("component", "service/"+ServiceName),
 		config:            config,
-		ethereum:          ethereum,
+		ethereum:          eth,
 		xatuClient:        xatuClient,
 		storageClient:     storageClient,
 		cacheClient:       cacheClient,
@@ -105,6 +105,7 @@ func (b *BeaconSlots) Start(ctx context.Context) error {
 
 	if !b.config.Enabled {
 		b.log.Info("BeaconSlots service disabled")
+
 		return nil
 	}
 
@@ -125,6 +126,7 @@ func (b *BeaconSlots) Start(ctx context.Context) error {
 			if b.processCtx != nil {
 				// We are already processing, so we don't need to start a new one
 				b.log.Info("Already processing, skipping")
+
 				return
 			}
 
@@ -153,6 +155,7 @@ func (b *BeaconSlots) Stop() {
 	b.log.Info("Stopping BeaconSlots service")
 
 	b.log.Info("Stopping leader client")
+
 	if b.leaderClient != nil {
 		b.leaderClient.Stop()
 	}
@@ -201,6 +204,7 @@ func (b *BeaconSlots) startProcessors(ctx context.Context) {
 	for _, network := range b.ethereum.Networks() {
 		// Process head (latest slots)
 		b.processWaitGroup.Add(1)
+
 		go func(network string) {
 			defer b.processWaitGroup.Done()
 			b.processHead(ctx, network)
@@ -208,6 +212,7 @@ func (b *BeaconSlots) startProcessors(ctx context.Context) {
 
 		// Process trailing slots
 		b.processWaitGroup.Add(1)
+
 		go func(network string) {
 			defer b.processWaitGroup.Done()
 			b.processTrailing(ctx, network)
@@ -215,6 +220,7 @@ func (b *BeaconSlots) startProcessors(ctx context.Context) {
 
 		// Process backfill (historical slots)
 		b.processWaitGroup.Add(1)
+
 		go func(network string) {
 			defer b.processWaitGroup.Done()
 			b.processBackfill(ctx, network)
@@ -255,8 +261,8 @@ func (b *BeaconSlots) FrontendModuleConfig() *pb.FrontendConfig_BeaconModule {
 	networks := make(map[string]*pb.FrontendConfig_BeaconNetworkConfig)
 	for _, network := range b.ethereum.Networks() {
 		networks[network.Name] = &pb.FrontendConfig_BeaconNetworkConfig{
-			HeadLagSlots: int32(b.config.HeadDelaySlots),
-			BacklogDays:  int32(b.config.Backfill.Slots),
+			HeadLagSlots: int32(b.config.HeadDelaySlots), //nolint:gosec // no risk of overflow
+			BacklogDays:  int32(b.config.Backfill.Slots), //nolint:gosec // no risk of overflow
 		}
 	}
 
@@ -307,6 +313,7 @@ func (b *BeaconSlots) processHead(ctx context.Context, networkName string) {
 		select {
 		case <-ctx.Done():
 			logCtx.Info("Context cancelled, stopping processor")
+
 			return
 		default:
 			// Continue processing
@@ -320,6 +327,7 @@ func (b *BeaconSlots) processHead(ctx context.Context, networkName string) {
 			if err == state.ErrNotFound {
 				// No state found, initialize with default values
 				logCtx.Info("No state found, initializing")
+
 				slotState = &ProcessorState{
 					LastProcessedSlot: 0,
 				}
@@ -344,10 +352,11 @@ func (b *BeaconSlots) processHead(ctx context.Context, networkName string) {
 			continue
 		}
 
-		targetSlot := currentSlot - phase0.Slot(b.config.HeadDelaySlots)
+		targetSlot := currentSlot - b.config.HeadDelaySlots
 
-		if slotState.LastProcessedSlot == phase0.Slot(targetSlot) {
+		if slotState.LastProcessedSlot == targetSlot {
 			b.sleepUntilNextSlot(ctx, networkName)
+
 			continue
 		}
 
@@ -366,7 +375,7 @@ func (b *BeaconSlots) processHead(ctx context.Context, networkName string) {
 
 		if processed {
 			// Update state with the processed slot
-			slotState.LastProcessedSlot = phase0.Slot(currentSlot)
+			slotState.LastProcessedSlot = currentSlot
 
 			if err := stateClient.Set(ctx, slotState); err != nil {
 				logCtx.WithError(err).Error("Failed to update state after processing")
@@ -405,6 +414,7 @@ func (b *BeaconSlots) processTrailing(ctx context.Context, networkName string) {
 		select {
 		case <-ctx.Done():
 			logCtx.Info("Context cancelled, stopping processor")
+
 			return
 		default:
 			// Continue processing
@@ -428,7 +438,7 @@ func (b *BeaconSlots) processTrailing(ctx context.Context, networkName string) {
 
 				// Add on our lag
 				slotState = &ProcessorState{
-					LastProcessedSlot: phase0.Slot(wallclockSlot) + phase0.Slot(b.config.HeadDelaySlots),
+					LastProcessedSlot: wallclockSlot + b.config.HeadDelaySlots,
 				}
 			} else {
 				logCtx.WithError(err).Warn("Failed to get state")
@@ -456,13 +466,14 @@ func (b *BeaconSlots) processTrailing(ctx context.Context, networkName string) {
 		if slotState.LastProcessedSlot == targetSlot || targetSlot < 1 || slotState.LastProcessedSlot == 0 {
 			// Nothing to do, we are already at the target slot!
 			b.sleepUntilNextSlot(ctx, networkName)
+
 			continue
 		}
 
 		nextSlot := slotState.LastProcessedSlot - 1
 
 		// Check if somehow we've processed this slot already
-		hasProcessed, err := b.slotHasBeenProcessed(ctx, networkName, phase0.Slot(nextSlot))
+		hasProcessed, err := b.slotHasBeenProcessed(ctx, networkName, nextSlot)
 		if err != nil {
 			logCtx.WithError(err).WithField("slot", nextSlot).Error("Failed to check if slot has been processed")
 
@@ -476,7 +487,7 @@ func (b *BeaconSlots) processTrailing(ctx context.Context, networkName string) {
 		}
 
 		// Process the slot
-		processed, err := b.processSlot(ctx, networkName, phase0.Slot(nextSlot))
+		processed, err := b.processSlot(ctx, networkName, nextSlot)
 		if err != nil {
 			logCtx.WithError(err).WithField("slot", nextSlot).Error("Failed to process slot")
 
@@ -527,6 +538,7 @@ func (b *BeaconSlots) processBackfill(ctx context.Context, networkName string) {
 		select {
 		case <-ctx.Done():
 			logCtx.Info("Context cancelled, stopping processor")
+
 			return
 		default:
 			// Continue processing
@@ -541,16 +553,16 @@ func (b *BeaconSlots) processBackfill(ctx context.Context, networkName string) {
 				// No state found, initialize with default values
 				logCtx.Info("No state found, initializing")
 
-				wallclockSlot, err := b.getCurrentSlot(ctx, networkName)
-				if err != nil {
-					logCtx.WithError(err).Warn("Failed to get current slot")
+				wallclockSlot, errr := b.getCurrentSlot(ctx, networkName)
+				if errr != nil {
+					logCtx.WithError(errr).Warn("Failed to get current slot")
 
 					continue
 				}
 
 				// Add on our lag
 				slotState = &ProcessorState{
-					LastProcessedSlot: phase0.Slot(wallclockSlot) + phase0.Slot(b.config.Backfill.Slots),
+					LastProcessedSlot: wallclockSlot + phase0.Slot(b.config.Backfill.Slots), //nolint:gosec // no risk of overflow
 				}
 			} else {
 				logCtx.WithError(err).Warn("Failed to get state")
@@ -573,18 +585,20 @@ func (b *BeaconSlots) processBackfill(ctx context.Context, networkName string) {
 			continue
 		}
 
+		//nolint:gosec // no risk of overflow
 		targetSlot := currentSlot - phase0.Slot(b.config.Backfill.Slots)
 
 		if slotState.LastProcessedSlot == targetSlot || targetSlot < 1 || slotState.LastProcessedSlot == 0 {
 			// Nothing to do, we are already at the target slot!
 			b.sleepUntilNextSlot(ctx, networkName)
+
 			continue
 		}
 
 		nextSlot := slotState.LastProcessedSlot - 1
 
 		// Check if somehow we've processed this slot already
-		processed, err := b.slotHasBeenProcessed(ctx, networkName, phase0.Slot(nextSlot))
+		processed, err := b.slotHasBeenProcessed(ctx, networkName, nextSlot)
 		if err != nil {
 			logCtx.WithError(err).WithField("slot", nextSlot).Error("Failed to check if slot has been processed")
 
@@ -595,7 +609,7 @@ func (b *BeaconSlots) processBackfill(ctx context.Context, networkName string) {
 
 		if !processed {
 			// Process the slot
-			processed, err := b.processSlot(ctx, networkName, phase0.Slot(nextSlot))
+			processed, err := b.processSlot(ctx, networkName, nextSlot)
 			if err != nil {
 				logCtx.WithError(err).WithField("slot", nextSlot).Error("Failed to process slot")
 
@@ -651,6 +665,7 @@ func getStringOrNil(s *string) string {
 	if s == nil {
 		return ""
 	}
+
 	return *s
 }
 
@@ -755,6 +770,7 @@ func (b *BeaconSlots) updateStateMetrics(networkName, processorName string, slot
 			"network":   networkName,
 			"processor": processorName,
 		}).Debug("Failed to get current slot for state metrics")
+
 		return
 	}
 
@@ -762,11 +778,12 @@ func (b *BeaconSlots) updateStateMetrics(networkName, processorName string, slot
 	if slotState.LastProcessedSlot > 0 {
 		// Slot age is how many slots behind current we are
 		var slotAge int64
-		if currentSlot > phase0.Slot(slotState.LastProcessedSlot) {
-			slotAge = int64(currentSlot - phase0.Slot(slotState.LastProcessedSlot))
+		if currentSlot > slotState.LastProcessedSlot {
+			slotAge = int64(currentSlot - slotState.LastProcessedSlot) //nolint:gosec // no risk of overflow
 		} else {
 			slotAge = 0 // In case of issues with current slot calculation
 		}
+
 		b.stateSlotAgeMetric.WithLabelValues(networkName, processorName).Set(float64(slotAge))
 	}
 }

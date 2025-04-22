@@ -52,10 +52,12 @@ func (x *Config) Validate() error {
 
 func (x *Config) GetXatuConfig() map[string]*clickhouse.Config {
 	xatuConfig := make(map[string]*clickhouse.Config)
+
 	for networkName, networkConfig := range x.Ethereum.Networks {
 		if networkConfig.Xatu != nil {
 			xatuConfig[networkName] = networkConfig.Xatu
 		}
 	}
+
 	return xatuConfig
 }

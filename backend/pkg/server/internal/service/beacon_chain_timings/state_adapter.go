@@ -28,9 +28,12 @@ func (s *StateManager) GetState(ctx context.Context) (*pb.State, error) {
 	if err != nil {
 		if err == state.ErrNotFound {
 			s.log.Debug("No existing state found, using initialized default state")
+
 			return NewState(), nil
 		}
+
 		s.log.WithError(err).Error("Failed to get state, using initialized default state")
+
 		return NewState(), err
 	}
 
@@ -41,10 +44,12 @@ func (s *StateManager) GetState(ctx context.Context) (*pb.State, error) {
 func (s *StateManager) SaveState(ctx context.Context, stateObj *pb.State) error {
 	if err := s.stateClient.Set(ctx, stateObj); err != nil {
 		s.log.WithError(err).Error("Failed to store state")
+
 		return err
 	}
 
 	s.log.Debug("Successfully stored updated state")
+
 	return nil
 }
 

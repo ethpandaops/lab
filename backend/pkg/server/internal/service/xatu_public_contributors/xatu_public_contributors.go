@@ -52,7 +52,7 @@ type XatuPublicContributors struct {
 
 	leaderClient leader.Client
 
-	processCtx       context.Context
+	processCtx       context.Context //nolint:containedctx // this is a leader election context
 	processCtxCancel context.CancelFunc
 
 	// Base directory for storage
@@ -104,6 +104,7 @@ func (b *XatuPublicContributors) BaseDirectory() string {
 func (b *XatuPublicContributors) Start(ctx context.Context) error {
 	if b.config != nil && b.config.Enabled != nil && !*b.config.Enabled {
 		b.log.Info("XatuPublicContributors service disabled")
+
 		return nil
 	}
 
@@ -112,7 +113,7 @@ func (b *XatuPublicContributors) Start(ctx context.Context) error {
 	// Initialize metrics
 	b.initializeMetrics()
 
-	leader := leader.New(b.log, b.lockerClient, leader.Config{
+	lead := leader.New(b.log, b.lockerClient, leader.Config{
 		Resource:        XatuPublicContributorsServiceName + "/batch_processing",
 		TTL:             30 * time.Second,
 		RefreshInterval: 5 * time.Second,
@@ -121,6 +122,7 @@ func (b *XatuPublicContributors) Start(ctx context.Context) error {
 			b.log.Info("Became leader")
 			if b.processCtx != nil {
 				b.log.Info("Already processing, skipping start")
+
 				return
 			}
 			ctx, cancel := context.WithCancel(context.Background())
@@ -138,19 +140,22 @@ func (b *XatuPublicContributors) Start(ctx context.Context) error {
 		},
 	}, b.metrics)
 
-	leader.Start()
-	b.leaderClient = leader
+	lead.Start()
+
+	b.leaderClient = lead
 
 	return nil
 }
 
 func (b *XatuPublicContributors) Stop() {
 	b.log.Info("Stopping XatuPublicContributors service")
+
 	if b.leaderClient != nil {
 		b.leaderClient.Stop()
 	}
 
 	b.log.Info("Waiting for process loop to finish")
+
 	if b.processCtxCancel != nil {
 		b.processCtxCancel()
 	}
@@ -171,10 +176,17 @@ func (b *XatuPublicContributors) processLoop() {
 		b.process(b.processCtx)
 	}
 
+	if b.processCtx == nil {
+		b.log.Error("Process context is nil, cannot process")
+
+		return
+	}
+
 	for {
 		select {
 		case <-b.processCtx.Done():
 			b.log.Info("Context cancelled, stopping processing loop")
+
 			return
 		case <-ticker.C:
 			if b.leaderClient.IsLeader() {
@@ -234,11 +246,13 @@ func (b *XatuPublicContributors) loadState(ctx context.Context, network string) 
 
 	// Try to load existing state
 	key := GetStateKey(network)
+
 	err := b.storageClient.GetEncoded(ctx, b.getStoragePath(key), state, storage.CodecNameJSON)
 	if err != nil {
 		// Check for any kind of "not found" error, not just the specific storage.ErrNotFound
 		if err == storage.ErrNotFound || strings.Contains(err.Error(), "not found") {
 			b.log.WithField("network", network).Info("No previous state found, using initialized default state.")
+
 			return state, nil // Return initialized state if not found
 		}
 		// Only non-NotFound errors are returned as actual errors
@@ -274,6 +288,7 @@ func (b *XatuPublicContributors) saveState(ctx context.Context, network string, 
 	}); err != nil {
 		return fmt.Errorf("failed to store state for network %s: %w", network, err)
 	}
+
 	return nil
 }
 
@@ -282,11 +297,14 @@ func (b *XatuPublicContributors) shouldProcess(processorName string, lastProcess
 	interval, err := b.config.GetInterval()
 	if err != nil {
 		b.log.WithError(err).Errorf("Failed to get interval for processor %s check", processorName)
+
 		return false // Don't process if interval is invalid
 	}
+
 	if lastProcessed.IsZero() {
 		return true // Never processed before
 	}
+
 	return time.Since(lastProcessed) > interval
 }
 
@@ -307,13 +325,18 @@ func (b *XatuPublicContributors) shouldProcessWindow(windowConfig TimeWindow, la
 }
 
 // process is the main function called periodically to process data.
+//
+//nolint:gocyclo // this is a complex function
 func (b *XatuPublicContributors) process(ctx context.Context) {
 	b.log.Info("Starting processing cycle")
+
 	startTime := time.Now()
 
 	// Track processing cycle with metrics
 	var processingCycleCounter *prometheus.CounterVec
+
 	var processingErrorsCounter *prometheus.CounterVec
+
 	var processingDurationHistogram *prometheus.HistogramVec
 
 	var err error
@@ -354,19 +377,17 @@ func (b *XatuPublicContributors) process(ctx context.Context) {
 		log.Info("Processing network")
 
 		// Load state for the network
-		state, err := b.loadState(ctx, networkName.Name)
-		if err != nil {
+		state, errr := b.loadState(ctx, networkName.Name)
+		if errr != nil {
 			// This shouldn't happen for normal "not found" cases - loadState returns a default state for those
 			// This indicates a more serious error like connectivity issues with storage
-			log.WithError(err).Error("Failed to load state due to serious storage error, skipping network")
+			log.WithError(errr).Error("Failed to load state due to serious storage error, skipping network")
 
 			// Record error in metrics
-			if b.metricsCollector != nil && processingErrorsCounter != nil {
-				processingErrorsCounter.WithLabelValues(
-					networkName.Name,
-					"state_loading",
-				).Inc()
-			}
+			processingErrorsCounter.WithLabelValues(
+				networkName.Name,
+				"state_loading",
+			).Inc()
 
 			continue
 		}
@@ -374,29 +395,33 @@ func (b *XatuPublicContributors) process(ctx context.Context) {
 		// Update state metrics
 		b.updateStateMetrics(networkName.Name, state)
 
-		// --- Process Summary (Now handled globally after network loop) ---
-
 		// --- Process Countries ---
 		countriesProcessorState := state.GetProcessorState(CountriesProcessorName)
 		// Check overall interval for the processor first
 		if b.shouldProcess(CountriesProcessorName, countriesProcessorState.LastProcessed) {
 			log.Info("Processing countries")
+
 			processedAnyWindow := false
+
 			for _, window := range b.config.TimeWindows {
 				windowLog := log.WithField("window", window.File)
 				// Get last processed time for this specific window file directly from map
 				lastProcessedWindowTime := countriesProcessorState.LastProcessedWindows[window.File]
-				should, err := b.shouldProcessWindow(window, lastProcessedWindowTime)
-				if err != nil {
-					windowLog.WithError(err).Error("Failed to check if should process countries window")
+
+				should, errr := b.shouldProcessWindow(window, lastProcessedWindowTime)
+				if errr != nil {
+					windowLog.WithError(errr).Error("Failed to check if should process countries window")
+
 					continue
 				}
 
 				if should {
 					windowLog.Info("Processing countries window")
+
 					processorStartTime := time.Now()
-					if err := b.processCountriesWindow(ctx, networkName.Name, window); err != nil {
-						windowLog.WithError(err).Error("Failed to process countries window")
+
+					if errr := b.processCountriesWindow(ctx, networkName.Name, window); errr != nil {
+						windowLog.WithError(errr).Error("Failed to process countries window")
 
 						// Record error in metrics
 						if b.metricsCollector != nil && processingErrorsCounter != nil {
@@ -416,12 +441,14 @@ func (b *XatuPublicContributors) process(ctx context.Context) {
 						// Update map directly
 						countriesProcessorState.LastProcessedWindows[window.File] = time.Now().UTC()
 						processedAnyWindow = true
+
 						windowLog.Info("Successfully processed countries window")
 					}
 				} else {
 					windowLog.Debug("Skipping countries window processing (step interval not met)")
 				}
 			}
+
 			// Update main processor time only if any window was processed in this cycle
 			if processedAnyWindow {
 				countriesProcessorState.LastProcessed = time.Now().UTC()
@@ -439,22 +466,28 @@ func (b *XatuPublicContributors) process(ctx context.Context) {
 		processorState := state.GetProcessorState(UsersProcessorName)
 		if b.shouldProcess(UsersProcessorName, processorState.LastProcessed) {
 			log.Info("Processing users")
+
 			processedAnyWindow := false
-			for _, window := range b.config.TimeWindows { // Use internal TimeWindow
+
+			for _, window := range b.config.TimeWindows {
 				windowLog := log.WithField("window", window.File)
 				// Get last processed time for this specific window file directly from map
 				lastProcessedWindowTime := processorState.LastProcessedWindows[window.File]
-				should, err := b.shouldProcessWindow(window, lastProcessedWindowTime) // Pass internal TimeWindow
-				if err != nil {
-					windowLog.WithError(err).Error("Failed to check if should process users window")
+
+				should, errr := b.shouldProcessWindow(window, lastProcessedWindowTime)
+				if errr != nil {
+					windowLog.WithError(errr).Error("Failed to check if should process users window")
+
 					continue
 				}
 
 				if should {
 					windowLog.Info("Processing users window")
+
 					processorStartTime := time.Now()
-					if err := b.processUsersWindow(ctx, networkName.Name, window); err != nil { // Pass internal TimeWindow
-						windowLog.WithError(err).Error("Failed to process users window")
+
+					if errr := b.processUsersWindow(ctx, networkName.Name, window); errr != nil {
+						windowLog.WithError(errr).Error("Failed to process users window")
 
 						// Record error in metrics
 						if b.metricsCollector != nil && processingErrorsCounter != nil {
@@ -474,12 +507,14 @@ func (b *XatuPublicContributors) process(ctx context.Context) {
 						// Update map directly
 						processorState.LastProcessedWindows[window.File] = time.Now().UTC()
 						processedAnyWindow = true
+
 						windowLog.Info("Successfully processed users window")
 					}
 				} else {
 					windowLog.Debug("Skipping users window processing (step interval not met)")
 				}
 			}
+
 			if processedAnyWindow {
 				processorState.LastProcessed = time.Now().UTC()
 				state.UpdateProcessorState(UsersProcessorName, processorState)
@@ -492,14 +527,14 @@ func (b *XatuPublicContributors) process(ctx context.Context) {
 		}
 
 		// Update state
-		if err := b.saveState(ctx, networkName.Name, state); err != nil {
-			log.WithError(err).Error("Failed to save state")
+		if errr := b.saveState(ctx, networkName.Name, state); errr != nil {
+			log.WithError(errr).Error("Failed to save state")
 		}
-
 	}
 
 	// --- Process Global Summaries (Summary, UserSummaries) ---
 	globalStateKey := "global"
+
 	globalState, err := b.loadState(ctx, globalStateKey)
 	if err != nil {
 		// This shouldn't happen for normal "not found" cases - loadState returns a default state for those
@@ -522,6 +557,7 @@ func (b *XatuPublicContributors) process(ctx context.Context) {
 			networks := b.ethereumClient.Networks()
 
 			processorStartTime := time.Now()
+
 			if err := b.processSummary(ctx, networks); err != nil {
 				b.log.WithError(err).Error("Failed to process summary")
 
@@ -540,9 +576,12 @@ func (b *XatuPublicContributors) process(ctx context.Context) {
 						SummaryProcessorName,
 					).Observe(time.Since(processorStartTime).Seconds())
 				}
+
 				summaryProcessorState.LastProcessed = time.Now().UTC()
 				globalState.UpdateProcessorState(SummaryProcessorName, summaryProcessorState)
+
 				globalNeedsSave = true
+
 				b.log.Info("Successfully processed summary")
 			}
 		} else {
@@ -556,6 +595,7 @@ func (b *XatuPublicContributors) process(ctx context.Context) {
 			// Ensure all networks from config are passed
 			networks := b.ethereumClient.Networks()
 			processorStartTime := time.Now()
+
 			if err := b.processUserSummaries(ctx, networks); err != nil {
 				b.log.WithError(err).Error("Failed to process user summaries")
 
@@ -574,9 +614,12 @@ func (b *XatuPublicContributors) process(ctx context.Context) {
 						UserSummariesProcessorName,
 					).Observe(time.Since(processorStartTime).Seconds())
 				}
+
 				userSummariesProcessorState.LastProcessed = time.Now().UTC()
 				globalState.UpdateProcessorState(UserSummariesProcessorName, userSummariesProcessorState)
+
 				globalNeedsSave = true
+
 				b.log.Info("Successfully processed user summaries")
 			}
 		} else {
@@ -710,6 +753,7 @@ func (b *XatuPublicContributors) processSummary(ctx context.Context, networks []
 		"networks":  networks,
 	})
 	log.Info("Processing global summary")
+
 	now := time.Now().UTC()
 	startTime := now.Add(-1 * time.Hour) // Summary is always for the last hour
 
@@ -742,17 +786,22 @@ func (b *XatuPublicContributors) processSummary(ctx context.Context, networks []
 	for _, network := range networks {
 		networkLog := log.WithField("query_network", network.Name)
 		ch, err := b.xatuClient.GetClickhouseClientForNetwork(network.Name)
+
 		if err != nil {
 			networkLog.WithError(err).Warnf("Clickhouse client not available for network, skipping summary contribution")
+
 			continue
 		}
 
 		networkLog.Debug("Querying network for summary data")
+
 		rows, err := ch.Query(ctx, query, startTime, now, network.Name)
 		if err != nil {
 			networkLog.WithError(err).Errorf("Failed to query clickhouse for summary data")
+
 			continue // Skip this network's contribution on error
 		}
+
 		networkLog.Debugf("Got %d aggregation rows from network", len(rows))
 
 		// Initialize network-specific stats
@@ -777,11 +826,14 @@ func (b *XatuPublicContributors) processSummary(ctx context.Context, networks []
 
 			if !okT || !okP {
 				networkLog.Warnf("Could not parse counts from row: %v", row)
+
 				continue
 			}
 
 			// Aggregate totals for the network
+			//nolint:gosec // no risk of overflow
 			networkStats.TotalNodes += int32(totalCount)
+			//nolint:gosec // no risk of overflow
 			networkStats.TotalPublicNodes += int32(publicCount)
 
 			// Aggregate by dimension for the network
@@ -792,8 +844,11 @@ func (b *XatuPublicContributors) processSummary(ctx context.Context, networks []
 						PublicNodes: 0,
 					}
 				}
+
 				current := networkStats.Countries[country]
+				//nolint:gosec // no risk of overflow
 				current.TotalNodes += int32(totalCount)
+				//nolint:gosec // no risk of overflow
 				current.PublicNodes += int32(publicCount)
 			}
 
@@ -804,8 +859,11 @@ func (b *XatuPublicContributors) processSummary(ctx context.Context, networks []
 						PublicNodes: 0,
 					}
 				}
+
 				current := networkStats.Continents[continent]
+				//nolint:gosec // no risk of overflow
 				current.TotalNodes += int32(totalCount)
+				//nolint:gosec // no risk of overflow
 				current.PublicNodes += int32(publicCount)
 			}
 
@@ -816,8 +874,11 @@ func (b *XatuPublicContributors) processSummary(ctx context.Context, networks []
 						PublicNodes: 0,
 					}
 				}
+
 				current := networkStats.Cities[city]
+				//nolint:gosec // no risk of overflow
 				current.TotalNodes += int32(totalCount)
+				//nolint:gosec // no risk of overflow
 				current.PublicNodes += int32(publicCount)
 			}
 
@@ -828,8 +889,11 @@ func (b *XatuPublicContributors) processSummary(ctx context.Context, networks []
 						PublicNodes: 0,
 					}
 				}
+
 				current := networkStats.ConsensusImplementations[consensusImpl]
+				//nolint:gosec // no risk of overflow
 				current.TotalNodes += int32(totalCount)
+				//nolint:gosec // no risk of overflow
 				current.PublicNodes += int32(publicCount)
 			}
 		}
@@ -850,6 +914,7 @@ func (b *XatuPublicContributors) processSummary(ctx context.Context, networks []
 	}
 
 	log.Info("Successfully processed and stored summary")
+
 	return nil
 }
 
@@ -866,10 +931,12 @@ func (b *XatuPublicContributors) processCountriesWindow(ctx context.Context, net
 	if err != nil {
 		return fmt.Errorf("failed to get time range for window %s: %w", window.File, err)
 	}
+
 	stepDuration, err := window.GetStepDuration()
 	if err != nil {
 		return fmt.Errorf("failed to parse step duration for window %s: %w", window.File, err)
 	}
+
 	stepSeconds := int(stepDuration.Seconds())
 
 	// Query to get public node count per country over time intervals
@@ -910,6 +977,7 @@ func (b *XatuPublicContributors) processCountriesWindow(ctx context.Context, net
 
 		if !okT || !okC || !okN || country == "" {
 			log.Warnf("Could not parse row or invalid data for countries window: %v", row)
+
 			continue
 		}
 
@@ -929,12 +997,12 @@ func (b *XatuPublicContributors) processCountriesWindow(ctx context.Context, net
 		// Add country count to data point
 		dataPoint.Countries = append(dataPoint.Countries, &pb.CountryCount{
 			Name:  country,
-			Value: int32(nodeCount),
+			Value: int32(nodeCount), //nolint:gosec // no risk of overflow
 		})
 	}
 
 	// Convert map to sorted array
-	var dataPoints []*pb.CountryDataPoint
+	dataPoints := make([]*pb.CountryDataPoint, 0, len(timePointsMap))
 	for _, dataPoint := range timePointsMap {
 		dataPoints = append(dataPoints, dataPoint)
 	}
@@ -958,6 +1026,7 @@ func (b *XatuPublicContributors) processCountriesWindow(ctx context.Context, net
 	}
 
 	log.Info("Successfully processed and stored countries window")
+
 	return nil
 }
 
@@ -974,10 +1043,12 @@ func (b *XatuPublicContributors) processUsersWindow(ctx context.Context, network
 	if err != nil {
 		return fmt.Errorf("failed to get time range for window %s: %w", window.File, err)
 	}
+
 	stepDuration, err := window.GetStepDuration()
 	if err != nil {
 		return fmt.Errorf("failed to parse step duration: %w", err)
 	}
+
 	stepSeconds := int(stepDuration.Seconds())
 
 	// Query updated to match Python logic: extract username and count distinct nodes
@@ -1023,19 +1094,23 @@ func (b *XatuPublicContributors) processUsersWindow(ctx context.Context, network
 		timestamp, ok := row["time"].(time.Time)
 		if !ok {
 			log.Warnf("Could not parse time from row: %v", row)
+
 			continue
 		}
+
 		username, _ := row["username"].(string)
 		// network, _ := row["meta_network_name"].(string) // Already known (networkName)
 		nodeCount, ok := row["node_count"].(uint64) // Assuming int
 		if !ok {
 			log.Warnf("Could not parse node_count from row: %v", row)
+
 			continue
 		}
 
 		// Skip empty usernames potentially returned by extractAll if regex fails
 		if username == "" {
 			log.Debugf("Skipping row with empty username: %v", row)
+
 			continue
 		}
 
@@ -1051,15 +1126,16 @@ func (b *XatuPublicContributors) processUsersWindow(ctx context.Context, network
 		// Append user data point for this timestamp
 		timePoints[unixTime].Users = append(timePoints[unixTime].Users, &pb.UserDataPoint{
 			Name:  username,
-			Nodes: int32(nodeCount), // Use Nodes field as per proto
+			Nodes: int32(nodeCount), //nolint:gosec // no risk of overflow
 		})
 	}
 
 	// Convert map to slice and sort by time
-	var timePointsList []*pb.UsersTimePoint
+	timePointsList := make([]*pb.UsersTimePoint, 0, len(timePoints))
 	for _, point := range timePoints {
 		timePointsList = append(timePointsList, point)
 	}
+
 	sort.Slice(timePointsList, func(i, j int) bool {
 		return timePointsList[i].Time < timePointsList[j].Time
 	})
@@ -1134,14 +1210,17 @@ func (b *XatuPublicContributors) processUserSummaries(ctx context.Context, netwo
 	for _, network := range networks {
 		networkLog := log.WithField("query_network", network.Name)
 		clickhouseClient, err := b.xatuClient.GetClickhouseClientForNetwork(network.Name)
+
 		if err != nil {
 			networkLog.WithError(err).Warnf("Clickhouse client not available for network, skipping")
+
 			continue
 		}
 
 		// Extra verification of the client
 		if clickhouseClient == nil {
 			networkLog.Errorf("GetClickhouseClientForNetwork returned nil client without error for network %s", network.Name)
+
 			continue
 		}
 
@@ -1151,8 +1230,10 @@ func (b *XatuPublicContributors) processUserSummaries(ctx context.Context, netwo
 		if err != nil {
 			// Log error but continue with other networks
 			networkLog.WithError(err).Errorf("Failed to query clickhouse for user summaries")
+
 			continue
 		}
+
 		networkLog.Debugf("Got %d rows from network", len(rows))
 		allRows = append(allRows, rows...)
 	}
@@ -1180,6 +1261,7 @@ func (b *XatuPublicContributors) processUserSummaries(ctx context.Context, netwo
 
 		if !okSlot || !okTime {
 			log.Warnf("Could not parse slot or time for user summary row: %v", row)
+
 			continue
 		}
 
@@ -1226,8 +1308,10 @@ func (b *XatuPublicContributors) processUserSummaries(ctx context.Context, netwo
 
 	// Store individual user summaries and build global summary
 	storageBaseDir := b.getStoragePath("user-summaries") // Global base directory like Python
+
 	for username, userSummaryData := range usersByName {
 		// Set the node_count field to the number of nodes
+		//nolint:gosec // no risk of overflow
 		userSummaryData.NodeCount = int32(len(userSummaryData.Nodes))
 
 		// Store individual user file
@@ -1266,6 +1350,7 @@ func (b *XatuPublicContributors) processUserSummaries(ctx context.Context, netwo
 	}
 
 	log.Infof("Wrote summary data for %d users", len(usersByName))
+
 	return nil
 }
 
@@ -1277,21 +1362,27 @@ func (b *XatuPublicContributors) ReadSummaryData(ctx context.Context) (*pb.Summa
 	summary := &pb.SummaryData{}
 
 	log.WithField("path", storagePath).Debug("Attempting to read summary data")
+
 	err := b.storageClient.GetEncoded(ctx, storagePath, summary, storage.CodecNameJSON)
 	if err != nil {
 		if err == storage.ErrNotFound {
 			log.Warn("Summary data not found in storage")
+
 			return nil, storage.ErrNotFound // Return specific error for gRPC mapping
 		}
+
 		log.WithError(err).Error("Failed to get summary data from storage")
+
 		return nil, fmt.Errorf("failed to get summary data: %w", err)
 	}
+
 	log.Debug("Successfully read summary data")
+
 	return summary, nil
 }
 
 // ReadCountryDataWindow reads the time-series country data for a specific network and window file from storage.
-func (b *XatuPublicContributors) ReadCountryDataWindow(ctx context.Context, networkName string, windowFile string) ([]*pb.CountryDataPoint, error) {
+func (b *XatuPublicContributors) ReadCountryDataWindow(ctx context.Context, networkName, windowFile string) ([]*pb.CountryDataPoint, error) {
 	log := b.log.WithFields(logrus.Fields{
 		"method":  "ReadCountryDataWindow",
 		"network": networkName,
@@ -1300,25 +1391,32 @@ func (b *XatuPublicContributors) ReadCountryDataWindow(ctx context.Context, netw
 	// Construct path: countries/<network>/<windowFile>
 	key := filepath.Join("countries", networkName, windowFile+"")
 	storagePath := b.getStoragePath(key)
+
 	var dataPoints []*pb.CountryDataPoint
 
 	log.WithField("path", storagePath).Debug("Attempting to read country data window")
+
 	err := b.storageClient.GetEncoded(ctx, storagePath, &dataPoints, storage.CodecNameJSON)
 	if err != nil {
 		if err == storage.ErrNotFound {
 			log.Warn("Country data window not found in storage")
+
 			return nil, storage.ErrNotFound // Return specific error
 		}
+
 		log.WithError(err).Error("Failed to get country data window from storage")
+
 		return nil, fmt.Errorf("failed to get country data for window %s: %w", windowFile, err)
 	}
+
 	log.Debugf("Successfully read %d country data points", len(dataPoints))
+
 	return dataPoints, nil
 }
 
 // ReadUsersDataWindow reads the time-series user data for a specific network and window file from storage.
 // Note: The stored data is already in the []*pb.UsersTimePoint format.
-func (b *XatuPublicContributors) ReadUsersDataWindow(ctx context.Context, networkName string, windowFile string) ([]*pb.UsersTimePoint, error) {
+func (b *XatuPublicContributors) ReadUsersDataWindow(ctx context.Context, networkName, windowFile string) ([]*pb.UsersTimePoint, error) {
 	log := b.log.WithFields(logrus.Fields{
 		"method":  "ReadUsersDataWindow",
 		"network": networkName,
@@ -1327,19 +1425,26 @@ func (b *XatuPublicContributors) ReadUsersDataWindow(ctx context.Context, networ
 	// Construct path: users/<network>/<windowFile>
 	key := filepath.Join("users", networkName, windowFile+"")
 	storagePath := b.getStoragePath(key)
+
 	var dataPoints []*pb.UsersTimePoint // Directly use the proto type as stored
 
 	log.WithField("path", storagePath).Debug("Attempting to read users data window")
+
 	err := b.storageClient.GetEncoded(ctx, storagePath, &dataPoints, storage.CodecNameJSON)
 	if err != nil {
 		if err == storage.ErrNotFound {
 			log.Warn("Users data window not found in storage")
+
 			return nil, storage.ErrNotFound // Return specific error
 		}
+
 		log.WithError(err).Error("Failed to get users data window from storage")
+
 		return nil, fmt.Errorf("failed to get users data for window %s: %w", windowFile, err)
 	}
+
 	log.Debugf("Successfully read %d users time points", len(dataPoints))
+
 	return dataPoints, nil
 }
 
@@ -1358,23 +1463,30 @@ func (b *XatuPublicContributors) ReadUserSummary(ctx context.Context, username s
 	userSummary := &pb.UserSummary{} // Directly use the proto type as stored
 
 	log.WithField("path", storagePath).Debug("Attempting to read user summary")
+
 	err := b.storageClient.GetEncoded(ctx, storagePath, userSummary, storage.CodecNameJSON)
 	if err != nil {
 		if err == storage.ErrNotFound {
 			log.Warn("User summary not found in storage")
+
 			return nil, storage.ErrNotFound // Return specific error
 		}
+
 		log.WithError(err).Error("Failed to get user summary from storage")
+
 		return nil, fmt.Errorf("failed to get user summary for %s: %w", username, err)
 	}
 
 	// Ensure the node_count field is set
 	if userSummary.NodeCount == 0 && len(userSummary.Nodes) > 0 {
+		//nolint:gosec // no risk of overflow
 		userSummary.NodeCount = int32(len(userSummary.Nodes))
+
 		log.Debug("Updated node_count field that was missing")
 	}
 
 	log.Debug("Successfully read user summary")
+
 	return userSummary, nil
 }
 
@@ -1388,6 +1500,7 @@ func (b *XatuPublicContributors) updateStateMetrics(network string, state *State
 	if b.stateLastProcessedMetric == nil || b.stateWindowLastProcessedMetric == nil ||
 		b.stateAgeMetric == nil || b.stateWindowAgeMetric == nil {
 		b.log.Debug("State metrics not initialized, skipping metrics update")
+
 		return
 	}
 

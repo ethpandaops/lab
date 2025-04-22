@@ -33,12 +33,15 @@ func (tw *TimeWindow) Validate() error {
 	if tw.File == "" {
 		return errors.New("time window file is required")
 	}
+
 	if _, err := tw.GetStepDuration(); err != nil {
 		return fmt.Errorf("invalid step duration for window %s: %w", tw.File, err)
 	}
+
 	if _, err := tw.GetRangeDuration(); err != nil {
 		return fmt.Errorf("invalid range duration for window %s: %w", tw.File, err)
 	}
+
 	return nil
 }
 
@@ -61,6 +64,7 @@ func (tw *TimeWindow) GetTimeRange(now time.Time) (time.Time, time.Time, error) 
 	// Range is typically negative, so adding it goes back in time.
 	startTime := now.Add(rangeDuration)
 	endTime := now
+
 	return startTime, endTime, nil
 }
 
@@ -81,6 +85,7 @@ func (c *Config) Validate() error {
 	if len(c.TimeWindows) == 0 {
 		return errors.New("at least one time_window must be defined")
 	}
+
 	for i := range c.TimeWindows {
 		if err := c.TimeWindows[i].Validate(); err != nil {
 			return fmt.Errorf("invalid time_window configuration: %w", err)
@@ -96,5 +101,6 @@ func (c *Config) GetInterval() (time.Duration, error) {
 		// Default interval if not specified
 		return 15 * time.Minute, nil
 	}
+
 	return time.ParseDuration(c.Interval)
 }
