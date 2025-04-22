@@ -38,6 +38,22 @@ func NewMetricsService(namespace string, log logrus.FieldLogger, labels ...strin
 	}
 }
 
+// NewNopMetrics returns a no-op metrics service that doesn't register any actual metrics.
+// This is useful for testing or when metrics are not needed.
+func NewNopMetrics(namespace string, log logrus.FieldLogger) *Metrics {
+	if log == nil {
+		log = logrus.New() // Default logger if none provided
+	}
+
+	return &Metrics{
+		namespace:    namespace,
+		registry:     prometheus.NewRegistry(), // Still use a registry but it won't be exposed
+		log:          log.WithField("service", "metrics").WithField("type", "noop"),
+		collectors:   make(map[string]*Collector),
+		commonLabels: make(map[string]string),
+	}
+}
+
 // SetCommonLabel sets a common label that will be applied to all metrics.
 func (m *Metrics) SetCommonLabel(name, value string) {
 	m.mu.Lock()
@@ -96,6 +112,18 @@ type Collector struct {
 // NewCollector creates or retrieves a metric collector for a specific subsystem.
 // It ensures that collectors for the same subsystem are reused.
 func (m *Metrics) NewCollector(subsystem string) *Collector {
+	// Handle nil metrics case (should never happen, but just in case)
+	if m == nil {
+		// Return a collector that will not register any metrics
+		return &Collector{
+			namespace:    "noop",
+			subsystem:    subsystem,
+			registry:     nil,
+			log:          logrus.New().WithField("service", "metrics").WithField("subsystem", subsystem).WithField("type", "noop"),
+			commonLabels: make(map[string]string),
+		}
+	}
+
 	m.mu.Lock()
 	defer m.mu.Unlock()
 

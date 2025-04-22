@@ -82,7 +82,6 @@ func New(config *Config, metricsSvc *metrics.Metrics) (Client, error) {
 			}
 		}
 
-		// Pass metricsSvc, even though Redis instrumentation is not done yet
 		return NewRedis(*redisConfig, metricsSvc)
 	case CacheTypeMemory:
 		memoryConfig := &MemoryConfig{}

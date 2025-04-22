@@ -51,25 +51,27 @@ type client struct {
 func New(
 	config *Config,
 	log logrus.FieldLogger,
-	metricsSvc ...*metrics.Metrics,
+	metricsSvc *metrics.Metrics,
 ) (Client, error) {
 	if err := config.Validate(); err != nil {
 		return nil, fmt.Errorf("invalid config: %w", err)
 	}
 
+	if metricsSvc == nil {
+		return nil, fmt.Errorf("metrics service is required")
+	}
+
 	log.Info("Initializing ClickHouse client")
 
 	client := &client{
-		log:    log.WithField("module", "clickhouse"),
-		config: config,
+		log:     log.WithField("module", "clickhouse"),
+		config:  config,
+		metrics: metricsSvc,
 	}
 
 	// Handle optional metrics service parameter
-	if len(metricsSvc) > 0 && metricsSvc[0] != nil {
-		client.metrics = metricsSvc[0]
-		if err := client.initMetrics(); err != nil {
-			return nil, fmt.Errorf("failed to initialize metrics: %w", err)
-		}
+	if err := client.initMetrics(); err != nil {
+		return nil, fmt.Errorf("failed to initialize metrics: %w", err)
 	}
 
 	return client, nil

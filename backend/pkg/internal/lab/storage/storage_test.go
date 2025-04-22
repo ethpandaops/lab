@@ -5,7 +5,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"io"
 	"strings"
 	"testing"
 	"time"
@@ -13,6 +12,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/docker/go-connections/nat"
+	"github.com/ethpandaops/lab/backend/pkg/internal/lab/metrics"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -121,8 +121,11 @@ func createStorageClient(t *testing.T) (context.Context, Client, func()) {
 	log := logrus.New()
 	log.SetLevel(logrus.ErrorLevel) // Reduce noise in tests
 
+	// Create metrics service
+	metricsSvc := metrics.NewMetricsService("test", log)
+
 	// Create storage client
-	storageClient, err := New(config, log, nil) // Pass nil for metrics in tests
+	storageClient, err := New(config, log, metricsSvc) // Use metricsSvc instead of nil
 	require.NoError(t, err)
 
 	// Create a background context for the test
@@ -144,13 +147,16 @@ func TestNew(t *testing.T) {
 		SecretKey: "test",
 		Bucket:    "test",
 	}
-	client, err := New(config, nil, nil)
+	log := logrus.New()
+	metricsSvc := metrics.NewMetricsService("test", log)
+	client, err := New(config, nil, metricsSvc)
 	assert.Error(t, err) // logrus is required
 	assert.Nil(t, client)
 
 	// Test with valid logger
-	log := logrus.New()
-	client, err = New(config, log, nil) // Pass nil for metrics in tests
+	log = logrus.New()
+	metricsSvc = metrics.NewMetricsService("test", log)
+	client, err = New(config, log, metricsSvc) // Pass nil for metrics in tests
 	assert.NoError(t, err)
 	assert.NotNil(t, client)
 }
@@ -471,7 +477,9 @@ func TestStartWithInvalidEndpoint(t *testing.T) {
 		UsePathStyle: true,
 	}
 
-	client, err := New(invalidConfig, log, nil) // Pass nil for metrics in tests
+	log = logrus.New()
+	metricsSvc := metrics.NewMetricsService("test", log)
+	client, err := New(invalidConfig, log, metricsSvc) // Use metricsSvc instead of nil
 	require.NoError(t, err)
 
 	// Create a context with timeout to prevent the test from hanging
@@ -1024,7 +1032,7 @@ func (r *errorReadCloser) Close() error {
 // TestStartWithEmptyRegion adapted
 func TestStartWithEmptyRegion(t *testing.T) {
 	log := logrus.New()
-	log.SetOutput(io.Discard)
+	metricsSvc := metrics.NewMetricsService("test", log)
 
 	config := &Config{
 		Endpoint:  "http://localhost:9000", // Needs a valid endpoint structure
@@ -1034,7 +1042,7 @@ func TestStartWithEmptyRegion(t *testing.T) {
 		Bucket:    "test-bucket",
 	}
 
-	client, err := New(config, log, nil) // Pass nil for metrics in tests
+	client, err := New(config, log, metricsSvc) // Use metricsSvc instead of nil
 	require.NoError(t, err)
 
 	// Context with timeout

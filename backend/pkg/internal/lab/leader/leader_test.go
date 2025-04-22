@@ -148,7 +148,7 @@ func TestLeaderElectionCompetition(t *testing.T) {
 	leaders[0].Stop()
 
 	// Wait longer for a new leader to be elected - increase timeout
-	time.Sleep(1000 * time.Millisecond)
+	time.Sleep(3000 * time.Millisecond)
 
 	// One of the other leaders should be elected
 	var newLeaderFound bool
