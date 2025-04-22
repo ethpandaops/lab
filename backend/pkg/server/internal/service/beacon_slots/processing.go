@@ -33,7 +33,7 @@ func (b *BeaconSlots) processSlot(ctx context.Context, networkName string, slot 
 	blockData, err := b.getBlockData(ctx, networkName, slot)
 	if err != nil {
 		if strings.Contains(err.Error(), "no rows returned") {
-			b.log.WithField("slot", slot).Debug("No block data found for slot")
+			b.log.WithField("slot", slot).WithField("network", networkName).Debug("No block data found for slot")
 
 			return true, nil
 		}
