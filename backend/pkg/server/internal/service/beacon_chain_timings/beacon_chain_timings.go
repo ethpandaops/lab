@@ -77,12 +77,9 @@ func New(
 ) (*BeaconChainTimings, error) {
 	serviceLog := log.WithField("component", "service/beacon_chain_timings")
 
-	var metricsCollector *metrics.Collector
-	if metricsSvc != nil {
-		metricsCollector = metricsSvc.NewCollector("beacon_chain_timings")
+	metricsCollector := metricsSvc.NewCollector("beacon_chain_timings")
 
-		serviceLog.Debug("Created metrics collector for beacon_chain_timings service")
-	}
+	serviceLog.Debug("Created metrics collector for beacon_chain_timings service")
 
 	return &BeaconChainTimings{
 		log:              serviceLog,
