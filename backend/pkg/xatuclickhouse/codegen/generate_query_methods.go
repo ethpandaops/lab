@@ -90,6 +90,7 @@ func main() {
 	}
 
 	var imports []string
+
 	timeImportNeeded := false
 
 	// Parse each model file
@@ -99,9 +100,11 @@ func main() {
 		}
 
 		modelFilePath := filepath.Join(modelsDir, file.Name())
+
 		modelName, tableNameStr, fields, err := parseModelFile(modelFilePath)
 		if err != nil {
 			fmt.Printf("Error parsing %s: %v\n", file.Name(), err)
+
 			continue
 		}
 
@@ -117,6 +120,7 @@ func main() {
 		for _, param := range params {
 			if strings.Contains(param.Type, "time.Time") {
 				timeImportNeeded = true
+
 				break
 			}
 		}
@@ -136,6 +140,7 @@ func main() {
 		if timeImportNeeded {
 			imports = append(imports, "time")
 		}
+
 		templateData.Imports = imports
 
 		category := getCategoryFromTableName(tableNameStr)
@@ -151,8 +156,10 @@ func main() {
 		// Only write to existing files
 		outputFile := filepath.Join(outputDir, getCategoryFile(category))
 		f, err := os.Create(outputFile)
+
 		if err != nil {
 			fmt.Printf("Error creating file %s: %v\n", outputFile, err)
+
 			continue
 		}
 
@@ -161,9 +168,11 @@ func main() {
 		fmt.Fprintf(f, "package xatuclickhouse\n\n")
 		fmt.Fprintf(f, "import (\n")
 		fmt.Fprintf(f, "\t\"context\"\n")
+
 		if timeImportNeeded {
 			fmt.Fprintf(f, "\t\"time\"\n")
 		}
+
 		fmt.Fprintf(f, "\n\t\"github.com/ethpandaops/lab/backend/pkg/xatuclickhouse/models\"\n")
 		fmt.Fprintf(f, ")\n\n")
 
@@ -172,9 +181,11 @@ func main() {
 			// Generate params struct
 			fmt.Fprintf(f, "// %sParams defines parameters for querying %s table\n", data.ModelName, data.TableName)
 			fmt.Fprintf(f, "type %sParams struct {\n", data.ModelName)
+
 			for _, param := range data.Params {
 				fmt.Fprintf(f, "\t%s %s\n", param.Name, param.Type)
 			}
+
 			fmt.Fprintf(f, "\tLimit  *uint64\n")
 			fmt.Fprintf(f, "\tOffset *uint64\n")
 			fmt.Fprintf(f, "}\n\n")
@@ -207,14 +218,18 @@ func main() {
 }
 
 // parseModelFile parses a Go file and extracts model information
+//
+//nolint:gocyclo // this is a complex function
 func parseModelFile(filePath string) (string, string, []ParamField, error) {
 	fset := token.NewFileSet()
+
 	node, err := parser.ParseFile(fset, filePath, nil, parser.ParseComments)
 	if err != nil {
 		return "", "", nil, err
 	}
 
 	var modelName, tableNameStr string
+
 	var fields []ParamField
 
 	for _, decl := range node.Decls {
@@ -241,7 +256,7 @@ func parseModelFile(filePath string) (string, string, []ParamField, error) {
 			}
 
 			// Only process types that look like models (start with capital letter)
-			if len(typeSpec.Name.Name) > 0 && typeSpec.Name.Name[0] >= 'A' && typeSpec.Name.Name[0] <= 'Z' {
+			if typeSpec.Name.Name == "" && typeSpec.Name.Name[0] >= 'A' && typeSpec.Name.Name[0] <= 'Z' {
 				modelName = typeSpec.Name.Name
 
 				// Find TableName method to get table name
@@ -338,14 +353,16 @@ func parseModelFile(filePath string) (string, string, []ParamField, error) {
 						strings.Contains(typeStr, "uint") ||
 						strings.Contains(typeStr, "float") ||
 						strings.Contains(typeStr, "Time") {
-						fields = append(fields, ParamField{
-							Name: "Start" + fieldName,
-							Type: typeStr,
-						})
-						fields = append(fields, ParamField{
-							Name: "End" + fieldName,
-							Type: typeStr,
-						})
+						fields = append(fields,
+							ParamField{
+								Name: "Start" + fieldName,
+								Type: typeStr,
+							},
+							ParamField{
+								Name: "End" + fieldName,
+								Type: typeStr,
+							},
+						)
 					}
 				}
 
@@ -364,41 +381,46 @@ func generateParamFields(modelFields []ParamField) []ParamField {
 	if len(modelFields) > maxFields {
 		return modelFields[:maxFields]
 	}
+
 	return modelFields
 }
 
 // getCategoryFromTableName determines which category a table belongs to
 func getCategoryFromTableName(tableName string) string {
-	if strings.HasPrefix(tableName, "beacon_api_") {
+	switch {
+	case strings.HasPrefix(tableName, "beacon_api_"):
 		return "beacon_api"
-	} else if strings.HasPrefix(tableName, "mempool_") {
+	case strings.HasPrefix(tableName, "mempool_"):
 		return "mempool"
-	} else if strings.HasPrefix(tableName, "canonical_beacon_") {
+	case strings.HasPrefix(tableName, "canonical_beacon_"):
 		return "canonical_beacon"
-	} else if strings.HasPrefix(tableName, "canonical_execution_") {
+	case strings.HasPrefix(tableName, "canonical_execution_"):
 		return "canonical_execution"
-	} else if strings.HasPrefix(tableName, "libp2p_") {
+	case strings.HasPrefix(tableName, "libp2p_"):
 		return "libp2p"
-	} else if strings.HasPrefix(tableName, "mev_relay_") {
+	case strings.HasPrefix(tableName, "mev_relay_"):
 		return "mev_relay"
+	default:
+		return "miscellaneous"
 	}
-	return "miscellaneous"
 }
 
 // getCategoryFile returns the file name for a category
 func getCategoryFile(category string) string {
-	if strings.HasPrefix(category, "beacon_api") {
+	switch {
+	case strings.HasPrefix(category, "beacon_api"):
 		return "beacon_api.go"
-	} else if strings.HasPrefix(category, "mempool") {
+	case strings.HasPrefix(category, "mempool"):
 		return "mempool.go"
-	} else if strings.HasPrefix(category, "canonical_beacon") {
+	case strings.HasPrefix(category, "canonical_beacon"):
 		return "canonical_beacon.go"
-	} else if strings.HasPrefix(category, "canonical_execution") {
+	case strings.HasPrefix(category, "canonical_execution"):
 		return "canonical_execution.go"
-	} else if strings.HasPrefix(category, "libp2p") {
+	case strings.HasPrefix(category, "libp2p"):
 		return "libp2p.go"
-	} else if strings.HasPrefix(category, "mev_relay") {
+	case strings.HasPrefix(category, "mev_relay"):
 		return "mev_relay.go"
+	default:
+		return "miscellaneous.go"
 	}
-	return "miscellaneous.go"
 }

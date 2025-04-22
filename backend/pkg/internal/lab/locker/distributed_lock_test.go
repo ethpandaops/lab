@@ -74,7 +74,7 @@ func createRedisCache(t *testing.T) (cache.Client, func()) {
 	}
 
 	return redisCache, func() {
-		redisCache.Stop()
+		_ = redisCache.Stop()
 		cleanup()
 	}
 }
@@ -82,6 +82,7 @@ func createRedisCache(t *testing.T) (cache.Client, func()) {
 func createMemoryCache(t *testing.T) (cache.Client, func()) {
 	metricsSvc := metrics.NewMetricsService("test", logrus.New())
 	memCache := cache.NewMemory(cache.MemoryConfig{DefaultTTL: time.Minute}, metricsSvc)
+
 	return memCache, func() {}
 }
 
@@ -106,7 +107,7 @@ func TestDistributedLockInterfaces(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		test := test // capture range variable
+		// capture range variable
 		t.Run(test.name, func(t *testing.T) {
 			if test.skipInShort && testing.Short() {
 				t.Skip("skipping integration test in short mode")
@@ -269,6 +270,7 @@ func testLockBehavior(t *testing.T, impl string, locker locker.Locker) {
 				token, success, err := locker.Lock(lockName, 500*time.Millisecond)
 				if err != nil {
 					t.Errorf("Error in goroutine %d acquiring lock: %v", id, err)
+
 					return
 				}
 
@@ -285,6 +287,7 @@ func testLockBehavior(t *testing.T, impl string, locker locker.Locker) {
 					released, err := locker.Unlock(lockName, token)
 					if err != nil {
 						t.Errorf("Error in goroutine %d releasing lock: %v", id, err)
+
 						return
 					}
 

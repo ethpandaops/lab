@@ -36,6 +36,7 @@ func createTestClient(t *testing.T, key string) (Client[TestJSON], *mock.Standar
 	}
 
 	client := New[TestJSON](logger, mockCache, config, key, nil)
+
 	return client, mockCache
 }
 
@@ -95,6 +96,7 @@ func TestNamespaceKey(t *testing.T) {
 			var foundKey string
 			for k := range mockCache.GetDataMap() {
 				foundKey = k
+
 				break
 			}
 
@@ -190,6 +192,7 @@ func TestDelete(t *testing.T) {
 	// If we can't cast to extended client, skip this test
 	if !ok {
 		t.Skip("Client implementation doesn't satisfy ExtendedClient interface")
+
 		return
 	}
 

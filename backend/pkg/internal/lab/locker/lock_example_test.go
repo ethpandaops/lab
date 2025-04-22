@@ -27,11 +27,13 @@ func ExampleLocker_Lock() {
 	token, success, err := locker.Lock("my-resource", 30*time.Second)
 	if err != nil {
 		fmt.Println("Error acquiring lock:", err)
+
 		return
 	}
 
 	if !success {
 		fmt.Println("Could not acquire lock, it's already held by another process")
+
 		return
 	}
 
@@ -43,6 +45,7 @@ func ExampleLocker_Lock() {
 	released, err := locker.Unlock("my-resource", token)
 	if err != nil {
 		fmt.Println("Error releasing lock:", err)
+
 		return
 	}
 
@@ -129,6 +132,7 @@ func TestConcurrentLocking(t *testing.T) {
 			token, success, err := locker.Lock("concurrent-lock", 1*time.Second)
 			if err != nil {
 				t.Errorf("Goroutine %d - Error acquiring lock: %v", id, err)
+
 				return
 			}
 

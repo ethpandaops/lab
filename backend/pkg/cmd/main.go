@@ -46,7 +46,12 @@ func loadSRVConfig(path string) (*srv.Config, error) {
 		return nil, fmt.Errorf("failed to load srv config: %w", err)
 	}
 
-	return cfg.(*srv.Config), nil
+	srvConfig, ok := cfg.(*srv.Config)
+	if !ok {
+		return nil, fmt.Errorf("failed to cast config to srv.Config")
+	}
+
+	return srvConfig, nil
 }
 
 func loadAPIConfig(path string) (*api.Config, error) {
@@ -55,7 +60,12 @@ func loadAPIConfig(path string) (*api.Config, error) {
 		return nil, fmt.Errorf("failed to load api config: %w", err)
 	}
 
-	return cfg.(*api.Config), nil
+	apiConfig, ok := cfg.(*api.Config)
+	if !ok {
+		return nil, fmt.Errorf("failed to cast config to api.Config")
+	}
+
+	return apiConfig, nil
 }
 
 func loadConfig(path string, as interface{}) (interface{}, error) {

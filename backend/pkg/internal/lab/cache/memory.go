@@ -36,10 +36,15 @@ func NewMemory(config MemoryConfig, metricsSvc *metrics.Metrics) *Memory {
 	collector := metricsSvc.NewCollector("cache")
 
 	var requestsTotal *prometheus.CounterVec
+
 	var operationDuration *prometheus.HistogramVec
+
 	var items *prometheus.GaugeVec
+
 	var hitsTotal *prometheus.CounterVec
+
 	var missesTotal *prometheus.CounterVec
+
 	var err error
 
 	requestsTotal, err = collector.NewCounterVec(
@@ -108,8 +113,11 @@ func NewMemory(config MemoryConfig, metricsSvc *metrics.Metrics) *Memory {
 // Get gets a value from the cache
 func (c *Memory) Get(key string) ([]byte, error) {
 	start := time.Now()
+
 	var status string
+
 	var err error
+
 	var value []byte
 
 	defer func() {
@@ -123,9 +131,11 @@ func (c *Memory) Get(key string) ([]byte, error) {
 	c.mu.RUnlock()
 
 	if !exists {
-		status = "miss"
+		status = StatusMiss
 		err = ErrCacheMiss
+
 		c.missesTotal.WithLabelValues().Inc()
+
 		return nil, err
 	}
 
@@ -136,27 +146,33 @@ func (c *Memory) Get(key string) ([]byte, error) {
 		if delErr != nil {
 			// Log or handle error? For now, just return the original miss error
 			// but maybe log the delete error.
-			status = "miss" // Still a miss from the caller's perspective
+			status = StatusMiss
 			err = ErrCacheMiss
+
 			return nil, err
 		}
 
-		status = "miss"
+		status = StatusMiss
 		err = ErrCacheMiss
+
 		c.missesTotal.WithLabelValues().Inc()
+
 		return nil, err
 	}
 
 	status = "hit"
 	value = item.value
+
 	c.hitsTotal.WithLabelValues().Inc()
+
 	return value, nil
 }
 
 // Set sets a value in the cache
 func (c *Memory) Set(key string, value []byte, ttl time.Duration) error {
 	start := time.Now()
-	var status string = "ok" // Assume ok unless error occurs (though this impl doesn't error)
+
+	var status = "ok" // Assume ok unless error occurs (though this impl doesn't error)
 
 	defer func() {
 		duration := time.Since(start).Seconds()
@@ -191,7 +207,8 @@ func (c *Memory) Set(key string, value []byte, ttl time.Duration) error {
 // Delete deletes a value from the cache
 func (c *Memory) Delete(key string) error {
 	start := time.Now()
-	var status string = "ok" // Assume ok unless error occurs (though this impl doesn't error)
+
+	var status = "ok" // Assume ok unless error occurs (though this impl doesn't error)
 
 	defer func() {
 		duration := time.Since(start).Seconds()

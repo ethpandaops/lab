@@ -140,6 +140,7 @@ func (c *client[T]) namespaceKey() string {
 // Get retrieves state
 func (c *client[T]) Get(ctx context.Context) (T, error) {
 	var result T
+
 	namespacedKey := c.namespaceKey()
 
 	// Start timer for operation duration if metrics are enabled
@@ -156,12 +157,14 @@ func (c *client[T]) Get(ctx context.Context) (T, error) {
 			if c.operationsTotal != nil {
 				c.operationsTotal.WithLabelValues("get", "not_found").Inc()
 			}
+
 			return result, ErrNotFound
 		}
 		// Increment error counter if metrics are enabled
 		if c.operationsTotal != nil {
 			c.operationsTotal.WithLabelValues("get", "error").Inc()
 		}
+
 		return result, fmt.Errorf("failed to get state for key %s: %w", namespacedKey, err)
 	}
 
@@ -170,6 +173,7 @@ func (c *client[T]) Get(ctx context.Context) (T, error) {
 		if c.operationsTotal != nil {
 			c.operationsTotal.WithLabelValues("get", "error").Inc()
 		}
+
 		return result, fmt.Errorf("failed to unmarshal state for key %s: %w", namespacedKey, err)
 	}
 
@@ -198,6 +202,7 @@ func (c *client[T]) Set(ctx context.Context, value T) error {
 		if c.operationsTotal != nil {
 			c.operationsTotal.WithLabelValues("set", "error").Inc()
 		}
+
 		return fmt.Errorf("failed to marshal state for key %s: %w", namespacedKey, err)
 	}
 
@@ -206,6 +211,7 @@ func (c *client[T]) Set(ctx context.Context, value T) error {
 		if c.operationsTotal != nil {
 			c.operationsTotal.WithLabelValues("set", "error").Inc()
 		}
+
 		return fmt.Errorf("failed to set state for key %s: %w", namespacedKey, err)
 	}
 
@@ -233,6 +239,7 @@ func (c *client[T]) Delete(ctx context.Context) error {
 		if c.operationsTotal != nil {
 			c.operationsTotal.WithLabelValues("delete", "error").Inc()
 		}
+
 		return fmt.Errorf("failed to delete state for key %s: %w", namespacedKey, err)
 	}
 

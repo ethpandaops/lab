@@ -48,7 +48,7 @@ type client struct {
 	isLeader bool
 	token    string
 
-	ctx     context.Context
+	ctx     context.Context //nolint:containedctx // context is used for leader election
 	cancel  context.CancelFunc
 	started bool
 	stopped bool
@@ -63,7 +63,7 @@ type client struct {
 }
 
 // New creates a new Client election controller
-func New(log logrus.FieldLogger, locker locker.Locker, config Config, metricsSvc *metrics.Metrics) *client {
+func New(log logrus.FieldLogger, lock locker.Locker, config Config, metricsSvc *metrics.Metrics) *client {
 	if config.RefreshInterval == 0 {
 		config.RefreshInterval = config.TTL / 3
 	}
@@ -73,7 +73,7 @@ func New(log logrus.FieldLogger, locker locker.Locker, config Config, metricsSvc
 	c := &client{
 		log:      log.WithField("component", "lab/leader").WithField("resource", config.Resource),
 		config:   config,
-		locker:   locker,
+		locker:   lock,
 		ctx:      ctx,
 		cancel:   cancel,
 		isLeader: false,
@@ -143,6 +143,7 @@ func (l *client) initMetrics() {
 func (l *client) IsLeader() bool {
 	l.mu.RLock()
 	defer l.mu.RUnlock()
+
 	return l.isLeader
 }
 
@@ -155,8 +156,10 @@ func (l *client) Start() {
 	l.mu.Lock()
 	if l.started || l.stopped {
 		l.mu.Unlock()
+
 		return
 	}
+
 	l.started = true
 	l.mu.Unlock()
 
@@ -170,8 +173,10 @@ func (l *client) Stop() {
 	l.mu.Lock()
 	if l.stopped {
 		l.mu.Unlock()
+
 		return
 	}
+
 	l.stopped = true
 	l.mu.Unlock()
 
@@ -233,6 +238,7 @@ func (l *client) run() {
 
 					// Update metrics
 					l.isLeaderGauge.WithLabelValues().Set(0)
+
 					if wasLeader {
 						l.leadershipChangesTotal.WithLabelValues("lost").Inc()
 					}
@@ -277,9 +283,11 @@ func (l *client) tryAcquireLeadership() bool {
 	if err != nil {
 		l.electionAttemptsTotal.WithLabelValues("error").Inc()
 		l.errorsTotal.WithLabelValues("acquire").Inc()
+
 		return false
 	} else if !success {
 		l.electionAttemptsTotal.WithLabelValues("failure").Inc()
+
 		return false
 	}
 
@@ -295,6 +303,7 @@ func (l *client) tryAcquireLeadership() bool {
 
 	// Update metrics
 	l.isLeaderGauge.WithLabelValues().Set(1)
+
 	if !wasLeader {
 		l.leadershipChangesTotal.WithLabelValues("gained").Inc()
 	}
@@ -336,6 +345,7 @@ func (l *client) refreshLock() bool {
 
 		// Best effort cleanup of old lock
 		_, _ = l.locker.Unlock(l.config.Resource, token)
+
 		return true
 	}
 

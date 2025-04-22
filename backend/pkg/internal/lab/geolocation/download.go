@@ -19,11 +19,13 @@ func (c *Client) loadDatabaseFromLocation() ([]byte, error) {
 	// Check if the location is a URL
 	if strings.HasPrefix(c.databaseLocation, "http://") || strings.HasPrefix(c.databaseLocation, "https://") {
 		c.log.Debug("Detected URL, downloading database from", c.databaseLocation)
+
 		return c.downloadAndExtract()
 	}
 
 	// Otherwise treat as a local file path
 	c.log.Debug("Detected local file path, loading database from", c.databaseLocation)
+
 	return c.loadFromLocalFile()
 }
 
@@ -42,27 +44,37 @@ func (c *Client) loadFromLocalFile() ([]byte, error) {
 		if strings.HasSuffix(strings.ToLower(c.databaseLocation), ".csv") {
 			return zipData, nil // Return the CSV data directly
 		}
+
 		return nil, fmt.Errorf("failed to parse zip data: %w", err)
 	}
 
 	// Find the CSV file in the zip
 	for _, f := range zipReader.File {
-		if filepath.Ext(f.Name) == ".csv" {
-			rc, err := f.Open()
-			if err != nil {
-				return nil, fmt.Errorf("failed to open csv file in zip: %w", err)
-			}
-			defer rc.Close()
-
-			// Read the CSV content directly into memory
-			c.log.Debug("Extracting city database to memory...")
-			csvData, err := io.ReadAll(rc)
-			if err != nil {
-				return nil, fmt.Errorf("failed to read csv data: %w", err)
-			}
-
-			return csvData, nil
+		if filepath.Ext(f.Name) != ".csv" {
+			continue
 		}
+
+		rc, err := f.Open()
+		if err != nil {
+			return nil, fmt.Errorf("failed to open csv file in zip: %w", err)
+		}
+
+		// Read the CSV content directly into memory
+		c.log.Debug("Extracting city database to memory...")
+
+		csvData, err := io.ReadAll(rc)
+		// Close the reader before checking for errors or returning
+		closeErr := rc.Close()
+
+		if err != nil {
+			return nil, fmt.Errorf("failed to read csv data: %w", err)
+		}
+
+		if closeErr != nil {
+			c.log.WithError(closeErr).Warn("Failed to close zip file reader")
+		}
+
+		return csvData, nil
 	}
 
 	return nil, fmt.Errorf("no CSV file found in zip")
@@ -72,10 +84,12 @@ func (c *Client) loadFromLocalFile() ([]byte, error) {
 func (c *Client) downloadAndExtract() ([]byte, error) {
 	// Download the zip file directly into memory
 	c.log.Debug("Downloading city database from", c.databaseLocation)
+
 	resp, err := http.Get(c.databaseLocation)
 	if err != nil {
 		return nil, fmt.Errorf("failed to download database: %w", err)
 	}
+
 	defer resp.Body.Close()
 
 	// Check if the response content is a CSV file
@@ -86,6 +100,7 @@ func (c *Client) downloadAndExtract() ([]byte, error) {
 		if err != nil {
 			return nil, fmt.Errorf("failed to read csv data: %w", err)
 		}
+
 		return csvData, nil
 	}
 
@@ -102,33 +117,45 @@ func (c *Client) downloadAndExtract() ([]byte, error) {
 		if resp.Header.Get("Content-Type") == "text/csv" || strings.HasSuffix(c.databaseLocation, ".csv") {
 			return zipData, nil // Return the CSV data directly
 		}
+
 		return nil, fmt.Errorf("failed to parse zip data: %w", err)
 	}
 
 	// Find the CSV file in the zip
 	for _, f := range zipReader.File {
-		if filepath.Base(f.Name) == "worldcities.csv" || filepath.Ext(f.Name) == ".csv" {
-			rc, err := f.Open()
-			if err != nil {
-				return nil, fmt.Errorf("failed to open csv file in zip: %w", err)
-			}
-			defer rc.Close()
-
-			// Read the CSV content directly into memory
-			c.log.Debug("Extracting city database to memory...")
-			csvData, err := io.ReadAll(rc)
-			if err != nil {
-				return nil, fmt.Errorf("failed to read csv data: %w", err)
-			}
-
-			return csvData, nil
+		if filepath.Base(f.Name) != "worldcities.csv" && filepath.Base(f.Name) != "worldcities.zip" {
+			continue
 		}
+
+		rc, err := f.Open()
+		if err != nil {
+			return nil, fmt.Errorf("failed to open csv file in zip: %w", err)
+		}
+
+		// Read the CSV content directly into memory
+		c.log.Debug("Extracting city database to memory...")
+
+		csvData, err := io.ReadAll(rc)
+		// Close the reader before checking for errors or returning
+		closeErr := rc.Close()
+
+		if err != nil {
+			return nil, fmt.Errorf("failed to read csv data: %w", err)
+		}
+
+		if closeErr != nil {
+			c.log.WithError(closeErr).Warn("Failed to close zip file reader")
+		}
+
+		return csvData, nil
 	}
 
 	return nil, fmt.Errorf("no CSV file found in zip")
 }
 
 // loadCSV loads the cities database from CSV data in memory
+//
+//nolint:gocyclo // this is a complex function
 func (c *Client) loadCSV(csvData []byte) error {
 	// Create a CSV reader from the in-memory data
 	r := csv.NewReader(bytes.NewReader(csvData))
@@ -166,14 +193,17 @@ func (c *Client) loadCSV(csvData []byte) error {
 		if err == io.EOF {
 			break
 		}
+
 		if err != nil {
 			c.log.WithError(err).Debug("Skipping invalid CSV row")
+
 			continue
 		}
 
 		// Make sure we have enough columns
 		if len(row) <= colCity || len(row) <= colCountry || len(row) <= colLat || len(row) <= colLon {
 			c.log.Debug("Skipping row with insufficient data")
+
 			continue
 		}
 
@@ -187,24 +217,75 @@ func (c *Client) loadCSV(csvData []byte) error {
 		if colPopulation != -1 && len(row) > colPopulation {
 			population = row[colPopulation]
 		}
+
 		if colISO2 != -1 && len(row) > colISO2 {
 			iso2 = row[colISO2]
 		}
+
 		if colISO3 != -1 && len(row) > colISO3 {
 			iso3 = row[colISO3]
 		}
 
 		// If coordinates are present, attempt to parse them
 		var lat, lon float64
+
 		if colCoordinates != -1 {
 			coordinates := strings.Split(row[colCoordinates], ",")
 			if len(coordinates) == 2 {
-				fmt.Sscanf(coordinates[0], "%f", &lat)
-				fmt.Sscanf(coordinates[1], "%f", &lon)
+				latErr := false
+				lonErr := false
+
+				_, err := fmt.Sscanf(coordinates[0], "%f", &lat)
+				if err != nil {
+					c.log.WithError(err).Debug("Failed to parse latitude coordinate")
+
+					latErr = true
+				}
+
+				_, err = fmt.Sscanf(coordinates[1], "%f", &lon)
+				if err != nil {
+					c.log.WithError(err).Debug("Failed to parse longitude coordinate")
+
+					lonErr = true
+				}
+
+				// Skip this entry if both coordinates failed to parse
+				if latErr && lonErr {
+					c.log.WithFields(logrus.Fields{
+						"city":    city,
+						"country": country,
+					}).Debug("Skipping entry with invalid coordinates")
+
+					continue
+				}
 			}
 		} else if colLat != -1 && colLon != -1 {
-			fmt.Sscanf(row[colLat], "%f", &lat)
-			fmt.Sscanf(row[colLon], "%f", &lon)
+			latErr := false
+			lonErr := false
+
+			_, err := fmt.Sscanf(row[colLat], "%f", &lat)
+			if err != nil {
+				c.log.WithError(err).Debug("Failed to parse latitude")
+
+				latErr = true
+			}
+
+			_, err = fmt.Sscanf(row[colLon], "%f", &lon)
+			if err != nil {
+				c.log.WithError(err).Debug("Failed to parse longitude")
+
+				lonErr = true
+			}
+
+			// Skip this entry if both coordinates failed to parse
+			if latErr && lonErr {
+				c.log.WithFields(logrus.Fields{
+					"city":    city,
+					"country": country,
+				}).Debug("Skipping entry with invalid coordinates")
+
+				continue
+			}
 		}
 
 		cityInfo := CityInfo{

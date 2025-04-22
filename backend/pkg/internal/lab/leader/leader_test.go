@@ -155,6 +155,7 @@ func TestLeaderElectionCompetition(t *testing.T) {
 	for i := 1; i < 3; i++ {
 		if leaders[i].IsLeader() {
 			newLeaderFound = true
+
 			break
 		}
 	}
@@ -182,6 +183,7 @@ func TestLeaderElectionCompetition(t *testing.T) {
 	for _, change := range changes {
 		if change.id == 0 && change.elected {
 			leaderElected = true
+
 			break
 		}
 	}
@@ -210,7 +212,7 @@ func TestLeaderElectionWithRedis(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to create Redis cache: %v", err)
 	}
-	defer redisCache.Stop()
+	defer func() { _ = redisCache.Stop() }()
 
 	// Create Redis-backed locker
 	redisLocker := locker.New(logrus.New(), redisCache, metrics)

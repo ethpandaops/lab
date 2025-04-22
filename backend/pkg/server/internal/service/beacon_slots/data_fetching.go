@@ -11,6 +11,12 @@ import (
 	pb "github.com/ethpandaops/lab/backend/pkg/server/proto/beacon_slots"
 )
 
+// ErrEntityNotFound is returned when no entity is found for a validator index
+var ErrEntityNotFound = errors.New("no entity found for validator index")
+
+// ErrBlockDataNotFound is returned when no block data is found for a slot
+var ErrBlockDataNotFound = errors.New("no block data found for slot")
+
 // getProposerEntity gets entity for a given validator index
 func (b *BeaconSlots) getProposerEntity(ctx context.Context, networkName string, index int64) (*string, error) {
 	// Query ClickHouse for the entity
@@ -38,7 +44,7 @@ func (b *BeaconSlots) getProposerEntity(ctx context.Context, networkName string,
 	}
 
 	if result == nil || result["entity"] == nil {
-		return nil, nil // No entity found
+		return nil, ErrEntityNotFound
 	}
 
 	entity := fmt.Sprintf("%v", result["entity"])
@@ -123,6 +129,7 @@ func (b *BeaconSlots) getBlockSeenAtSlotTime(ctx context.Context, networkName st
 	}
 
 	blockSeenAtSlotTime := make(map[string]*pb.BlockArrivalTime)
+
 	for _, row := range result {
 		slotTime, err := strconv.ParseInt(fmt.Sprintf("%v", row["slot_time"]), 10, 64)
 		if err != nil {
@@ -187,6 +194,7 @@ func (b *BeaconSlots) getBlobSeenAtSlotTime(ctx context.Context, networkName str
 	}
 
 	blobTimings := make(map[string]*pb.BlobArrivalTimes)
+
 	for _, row := range result {
 		slotTime, err := strconv.ParseInt(fmt.Sprintf("%v", row["slot_time"]), 10, 64)
 		if err != nil {
@@ -264,6 +272,7 @@ func (b *BeaconSlots) getBlockFirstSeenInP2PSlotTime(ctx context.Context, networ
 	}
 
 	blockFirstSeenInP2PSlotTime := make(map[string]*pb.BlockArrivalTime)
+
 	for _, row := range result {
 		slotTime, err := strconv.ParseInt(fmt.Sprintf("%v", row["slot_time"]), 10, 64)
 		if err != nil {
@@ -332,6 +341,7 @@ func (b *BeaconSlots) getBlobFirstSeenInP2PSlotTime(ctx context.Context, network
 	}
 
 	blobTimings := make(map[string]*pb.BlobArrivalTimes)
+
 	for _, row := range result {
 		slotTime, err := strconv.ParseInt(fmt.Sprintf("%v", row["slot_time"]), 10, 64)
 		if err != nil {
@@ -464,15 +474,18 @@ func (b *BeaconSlots) getAttestationVotes(ctx context.Context, networkName strin
 	}
 
 	attestationTimes := make(map[int64]int64)
+
 	for _, row := range result {
 		validatorIndex, err := strconv.ParseInt(fmt.Sprintf("%v", row["attesting_validator_index"]), 10, 64)
 		if err != nil {
 			continue // Skip invalid data
 		}
+
 		minTime, err := strconv.ParseInt(fmt.Sprintf("%v", row["min_propagation_time"]), 10, 64)
 		if err != nil {
 			continue // Skip invalid data
 		}
+
 		attestationTimes[validatorIndex] = minTime
 	}
 
@@ -524,7 +537,7 @@ func (b *BeaconSlots) getBlockData(ctx context.Context, networkName string, slot
 	}
 
 	if len(result) == 0 {
-		return nil, nil
+		return nil, ErrBlockDataNotFound
 	}
 
 	// Calculate slot and epoch times
@@ -533,8 +546,10 @@ func (b *BeaconSlots) getBlockData(ctx context.Context, networkName string, slot
 
 	// Create a new BlockData object with all fields
 	blockData := &pb.BlockData{
-		Slot:                         int64(slot),
-		SlotStartDateTime:            slotDetail.TimeWindow().Start().Format(time.RFC3339),
+		//nolint:gosec // no risk of overflow
+		Slot:              int64(slot),
+		SlotStartDateTime: slotDetail.TimeWindow().Start().Format(time.RFC3339),
+		//nolint:gosec // no risk of overflow
 		Epoch:                        int64(epoch.Number()),
 		EpochStartDateTime:           epoch.TimeWindow().Start().Format(time.RFC3339),
 		BlockRoot:                    getStringOrEmpty(result["block_root"]),
@@ -674,7 +689,7 @@ func (b *BeaconSlots) getProposerData(ctx context.Context, networkName string, s
 	}
 
 	return &pb.Proposer{
-		Slot:                   int64(slot),
+		Slot:                   int64(slot), //nolint:gosec // no risk of overflow
 		ProposerValidatorIndex: proposerIndex,
 	}, nil
 }

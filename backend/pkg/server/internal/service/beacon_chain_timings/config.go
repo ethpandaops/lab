@@ -35,6 +35,7 @@ func parseDuration(s string) time.Duration {
 	value := s[:len(s)-1]
 
 	var multiplier time.Duration
+
 	switch unit {
 	case "s":
 		multiplier = time.Second
@@ -49,6 +50,7 @@ func parseDuration(s string) time.Duration {
 	}
 
 	val := 0
+
 	_, err := fmt.Sscanf(value, "%d", &val)
 	if err != nil {
 		return 0

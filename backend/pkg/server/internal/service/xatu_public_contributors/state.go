@@ -26,6 +26,7 @@ func (s *State) GetProcessorState(processorName string) ProcessorState {
 	if s.Processors == nil {
 		s.Processors = make(map[string]ProcessorState)
 	}
+
 	state, ok := s.Processors[processorName]
 	if !ok {
 		state = ProcessorState{
@@ -37,6 +38,7 @@ func (s *State) GetProcessorState(processorName string) ProcessorState {
 		state.LastProcessedWindows = make(map[string]time.Time)
 		s.Processors[processorName] = state
 	}
+
 	return state
 }
 
@@ -45,5 +47,6 @@ func (s *State) UpdateProcessorState(processorName string, state ProcessorState)
 	if s.Processors == nil {
 		s.Processors = make(map[string]ProcessorState)
 	}
+
 	s.Processors[processorName] = state
 }

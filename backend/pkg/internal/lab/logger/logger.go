@@ -13,6 +13,7 @@ func New(level string, serviceName string) (logrus.FieldLogger, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	log.SetLevel(logLevel)
 
 	// Set log format.

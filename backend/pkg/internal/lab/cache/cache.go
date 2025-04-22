@@ -11,16 +11,23 @@ import (
 	"github.com/mitchellh/mapstructure"
 )
 
+// Error message constants
+const (
+	ErrCacheMissMsg = "key not found in cache"
+)
+
 // Error returned when a key is not found in the cache
-var ErrCacheMiss = errors.New("key not found in cache")
+var ErrCacheMiss = errors.New(ErrCacheMissMsg)
 
 // GenerateToken generates a random token for lock identification
 func GenerateToken() (string, error) {
 	b := make([]byte, 16)
+
 	_, err := rand.Read(b)
 	if err != nil {
 		return "", err
 	}
+
 	return hex.EncodeToString(b), nil
 }
 

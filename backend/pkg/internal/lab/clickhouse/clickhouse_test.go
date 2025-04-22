@@ -87,7 +87,7 @@ func TestClickHouseIntegration(t *testing.T) {
 	client, err := clickhouse.New(config, logger)
 	require.NoError(t, err, "Failed to create client")
 	require.NoError(t, client.Start(ctx), "Failed to start client")
-	defer client.Stop()
+	defer func() { _ = client.Stop() }()
 
 	// Run all test suites
 	t.Run("TestExec", func(t *testing.T) {
@@ -182,7 +182,7 @@ func testDSNVariations(t *testing.T, ctx context.Context, host, port string, log
 					assert.NoError(t, err, "Query should succeed after successful Start")
 
 					// Clean up
-					client.Stop()
+					_ = client.Stop()
 				}
 			} else {
 				assert.Error(t, err, "Start should fail for invalid DSN")
@@ -454,7 +454,9 @@ func testDataTypes(t *testing.T, ctx context.Context, client clickhouse.Client) 
 	// Verify first row
 	assert.Equal(t, int32(-42), rows[0]["int_val"], "First row int_val should be -42")
 	assert.Equal(t, uint32(42), rows[0]["uint_val"], "First row uint_val should be 42")
-	assert.InDelta(t, 3.14159, rows[0]["float_val"].(float64), 0.00001, "First row float_val should be approximately 3.14159")
+	rowFloatVal, ok := rows[0]["float_val"].(float64)
+	assert.True(t, ok, "float_val should be convertible to float64")
+	assert.InDelta(t, 3.14159, rowFloatVal, 0.00001, "First row float_val should be approximately 3.14159")
 	assert.Equal(t, "hello", rows[0]["string_val"], "First row string_val should be 'hello'")
 
 	// Note: date/time comparison might be tricky due to timezone/formatting differences

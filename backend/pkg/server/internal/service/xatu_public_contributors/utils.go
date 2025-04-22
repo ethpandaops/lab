@@ -15,16 +15,16 @@ var (
 // ExtractUsername replicates the logic from the Python user_summaries processor
 // to extract a username from the meta_client_name.
 func ExtractUsername(metaClientName string) string {
-	// Handle specific cases first as in Python's CASE statement
-	if strings.HasPrefix(metaClientName, "pub") {
+	switch {
+	case strings.HasPrefix(metaClientName, "pub"):
 		matches := usernameRegex.FindStringSubmatch(metaClientName)
 		if len(matches) > 1 {
 			return matches[1]
 		}
-	} else if strings.HasPrefix(metaClientName, "ethpandaops") {
+	case strings.HasPrefix(metaClientName, "ethpandaops"):
 		// Python user_summaries returns 'ethpandaops'
 		return "ethpandaops"
-	} else {
+	default:
 		// Default case from Python user_summaries processor (using the same regex)
 		matches := usernameRegex.FindStringSubmatch(metaClientName)
 		if len(matches) > 1 {
@@ -43,9 +43,11 @@ func ExtractUsernameForUsers(metaClientName string) string {
 	if strings.HasPrefix(metaClientName, "ethpandaops") || metaClientName == "" {
 		return ""
 	}
+
 	matches := usernameRegex.FindStringSubmatch(metaClientName)
 	if len(matches) > 1 {
 		return matches[1]
 	}
+
 	return ""
 }

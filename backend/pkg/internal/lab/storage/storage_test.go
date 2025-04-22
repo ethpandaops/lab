@@ -221,6 +221,7 @@ func TestUnifiedStore(t *testing.T) {
 	for _, k := range keys {
 		if strings.HasSuffix(k, ".tmp") {
 			foundTemp = true
+
 			break
 		}
 	}
@@ -571,11 +572,13 @@ func NewMockStorage() *MockStorage {
 		if data, ok := mock.mockData[key]; ok {
 			return data, nil
 		}
+
 		return nil, ErrNotFound
 	}
 
 	mock.DeleteFn = func(ctx context.Context, key string) error {
 		delete(mock.mockData, key)
+
 		return nil
 	}
 
@@ -586,11 +589,13 @@ func NewMockStorage() *MockStorage {
 				keys = append(keys, k)
 			}
 		}
+
 		return keys, nil
 	}
 
 	mock.ExistsFn = func(ctx context.Context, key string) (bool, error) {
 		_, ok := mock.mockData[key]
+
 		return ok, nil
 	}
 
@@ -604,6 +609,7 @@ func (m *MockStorage) Store(ctx context.Context, params StoreParams) error {
 	if m.StoreFn != nil {
 		return m.StoreFn(ctx, params)
 	}
+
 	return fmt.Errorf("StoreFn not implemented")
 }
 
@@ -611,6 +617,7 @@ func (m *MockStorage) Get(ctx context.Context, key string) ([]byte, error) {
 	if m.GetFn != nil {
 		return m.GetFn(ctx, key)
 	}
+
 	return nil, fmt.Errorf("GetFn not implemented")
 }
 
@@ -628,6 +635,7 @@ func (m *MockStorage) GetEncoded(ctx context.Context, key string, v any, format 
 	if err != nil {
 		return fmt.Errorf("mock GetEncoded failed getting codec: %w", err)
 	}
+
 	return codec.Decode(data, v)
 }
 
@@ -635,6 +643,7 @@ func (m *MockStorage) Delete(ctx context.Context, key string) error {
 	if m.DeleteFn != nil {
 		return m.DeleteFn(ctx, key)
 	}
+
 	return fmt.Errorf("DeleteFn not implemented")
 }
 
@@ -642,6 +651,7 @@ func (m *MockStorage) List(ctx context.Context, prefix string) ([]string, error)
 	if m.ListFn != nil {
 		return m.ListFn(ctx, prefix)
 	}
+
 	return nil, fmt.Errorf("ListFn not implemented")
 }
 
@@ -649,6 +659,7 @@ func (m *MockStorage) Start(ctx context.Context) error {
 	if m.StartFn != nil {
 		return m.StartFn(ctx)
 	}
+
 	return nil // Default mock Start does nothing
 }
 
@@ -656,6 +667,7 @@ func (m *MockStorage) Stop() error {
 	if m.StopFn != nil {
 		return m.StopFn()
 	}
+
 	return nil // Default mock Stop does nothing
 }
 
@@ -663,6 +675,7 @@ func (m *MockStorage) GetClient() *s3.Client {
 	if m.GetClientFn != nil {
 		return m.GetClientFn()
 	}
+
 	return nil // Default mock returns nil client
 }
 
@@ -670,6 +683,7 @@ func (m *MockStorage) GetBucket() string {
 	if m.GetBucketFn != nil {
 		return m.GetBucketFn()
 	}
+
 	return "mock-bucket" // Default mock bucket
 }
 
@@ -683,8 +697,10 @@ func (m *MockStorage) Exists(ctx context.Context, key string) (bool, error) {
 		if errors.Is(err, ErrNotFound) {
 			return false, nil
 		}
+
 		return false, fmt.Errorf("mock Exists failed: %w", err)
 	}
+
 	return true, nil
 }
 
@@ -779,8 +795,10 @@ func TestStoreError(t *testing.T) {
 		if params.Format == CodecNameJSON {
 			// This will trigger the encoding error
 			_, err := mockEncodeClient.encoders.codecs[CodecNameJSON].Encode(params.Data)
+
 			return err
 		}
+
 		return nil
 	}
 	// Replace encoder with our error encoder
@@ -801,6 +819,7 @@ func TestStoreError(t *testing.T) {
 				return fmt.Errorf("invalid data type: expected []byte when Format is not specified, got %T", params.Data)
 			}
 		}
+
 		return nil
 	}
 
@@ -845,6 +864,7 @@ func TestStoreAtomicErrors(t *testing.T) {
 		if params.Atomic {
 			return fmt.Errorf("mock temp write error")
 		}
+
 		return nil
 	}
 
@@ -1036,6 +1056,7 @@ func (c *errorCodec) Encode(v any) ([]byte, error) {
 	if c.encodeErr != nil {
 		return nil, c.encodeErr
 	}
+
 	return []byte("encoded"), nil
 }
 
@@ -1047,6 +1068,7 @@ func (c *errorCodec) Decode(data []byte, v any) error {
 	if sv, ok := v.(*string); ok {
 		*sv = string(data)
 	}
+
 	return nil
 }
 
@@ -1055,7 +1077,7 @@ func (c *errorCodec) FileExtension() string {
 }
 
 func (c *errorCodec) GetContentType() string {
-	return "application/octet-stream"
+	return ContentTypeOctetStream
 }
 
 // TestGetEncodedError adapted
@@ -1126,6 +1148,7 @@ func TestCompression(t *testing.T) {
 		if strings.HasPrefix(k, key) {
 			compressedKeyFound = true
 			actualKey = k
+
 			break
 		}
 	}
@@ -1184,6 +1207,7 @@ func (m *MockStorage) getContentType(key string, format CodecName) string {
 	if format == CodecNameYAML || strings.HasSuffix(key, ".yaml") || strings.HasSuffix(key, ".yml") {
 		return "application/yaml"
 	}
+
 	return "application/octet-stream"
 }
 
