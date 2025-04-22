@@ -51,7 +51,7 @@ export default defineConfig(({ mode }) => {
 		server: {
 			proxy: {
 				'/lab-data': {
-					target: 'http://localhost:9000',
+					target: 'http://localhost:8080',
 					changeOrigin: true,
 					secure: false,
 					configure: (proxy) => {

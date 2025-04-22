@@ -1,5 +1,4 @@
 # State files
-state/
 backend/state/
 config.yaml
 
@@ -38,6 +37,7 @@ ENV/
 *.swp
 *.swo
 *~
+*debug_bin*
 
 # OS
 .DS_Store
@@ -45,3 +45,6 @@ Thumbs.db
 
 node_modules
 config.yaml
+docker-compose.override.yaml
+
+deploy/local

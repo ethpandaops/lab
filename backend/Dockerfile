@@ -1,32 +1,20 @@
-FROM python:3.11-slim
+# syntax=docker/dockerfile:1
+
+FROM golang:1.24-alpine AS builder
 
 WORKDIR /app
 
-# Install build dependencies
-RUN apt-get update && apt-get install -y \
-    gcc \
-    python3-dev \
-    python3-setuptools \
-    python3-wheel \
-    python3-pip \
-    build-essential \
-    && rm -rf /var/lib/apt/lists/*
+COPY go.mod go.sum ./
+RUN go mod download
 
-# Copy requirements
-COPY requirements.txt ./
+COPY . .
 
-# Install dependencies with forced source build for clickhouse-driver
-RUN pip install --upgrade pip && \
-    pip install --no-binary clickhouse-driver -r requirements.txt
+RUN CGO_ENABLED=0 GOOS=linux go build -o /app/app ./pkg/cmd/main.go
 
-# Copy source code and config
-COPY lab/ ./lab/
+FROM alpine:latest
 
-# Create state directory
-RUN mkdir -p /app/state/modules && chmod -R 777 /app/state
+WORKDIR /app
 
-# Create volume mount points
-VOLUME ["/app/state", "/app/config.yaml"]
+COPY --from=builder /app/app .
 
-# Run the application
-ENTRYPOINT ["python", "-m", "lab"] 
+ENTRYPOINT ["/app/app"]
