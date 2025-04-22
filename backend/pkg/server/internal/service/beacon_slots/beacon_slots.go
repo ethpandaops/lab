@@ -408,7 +408,7 @@ func (b *BeaconSlots) processTrailing(ctx context.Context, networkName string) {
 			return
 		default:
 			// Continue processing
-			time.Sleep(1 * time.Second)
+			time.Sleep(5 * time.Second)
 		}
 
 		var slotState *ProcessorState
@@ -530,7 +530,7 @@ func (b *BeaconSlots) processBackfill(ctx context.Context, networkName string) {
 			return
 		default:
 			// Continue processing
-			time.Sleep(1 * time.Second)
+			time.Sleep(30 * time.Second)
 		}
 
 		var slotState *ProcessorState

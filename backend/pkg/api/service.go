@@ -3,6 +3,7 @@ package api
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net"
 	"net/http"
@@ -242,29 +243,46 @@ func (s *Service) handleFrontendConfig(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(data)
 
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Cache-Control", "max-age=60, s-maxage=60, public")
+	w.Header().Set("Cache-Control", "max-age=60,s-maxage=60,public")
+
+	if _, err := w.Write(data); err != nil {
+		s.log.WithError(err).Error("failed to write config response")
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
 }
 
 // Generic handler for S3 passthroughs
-func (s *Service) handleS3Passthrough(w http.ResponseWriter, r *http.Request, key string) {
+func (s *Service) handleS3Passthrough(w http.ResponseWriter, r *http.Request, key string, headers map[string]string) error {
 	ctx := r.Context()
 
 	data, err := s.storageClient.Get(ctx, key)
 	if err != nil {
 		if err == storage.ErrNotFound {
 			http.Error(w, "Not found", http.StatusNotFound)
-		} else {
-			s.log.WithError(err).WithField("key", key).Error("Failed to get object from storage")
-			http.Error(w, "Internal server error", http.StatusInternalServerError)
+
+			return errors.New("not found")
 		}
-		return
+
+		s.log.WithError(err).WithField("key", key).Error("Failed to get object from storage")
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+
+		return err
 	}
 
-	w.Write(data)
+	for k, v := range headers {
+		w.Header().Set(k, v)
+	}
+
+	if _, err := w.Write(data); err != nil {
+		s.log.WithError(err).WithField("key", key).Error("Failed to write data to response")
+
+		return errors.New("failed to write data to response")
+	}
+
+	return nil
 }
 
 // Handler implementations
@@ -273,9 +291,16 @@ func (s *Service) handleBlockTimings(w http.ResponseWriter, r *http.Request) {
 	network := vars["network"]
 	windowFile := vars["window_file"]
 	key := "beacon_chain_timings/block_timings/" + network + "/" + windowFile + ".json"
-	s.handleS3Passthrough(w, r, key)
-	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Cache-Control", "max-age=605, s-maxage=605, public")
+	if err := s.handleS3Passthrough(w, r, key, map[string]string{
+		"Content-Type":  "application/json",
+		"Cache-Control": "max-age=605, s-maxage=605, public",
+	}); err != nil {
+		s.log.WithError(err).WithField("key", key).Error("Failed to handle block timings")
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+
+		return
+	}
+
 }
 
 func (s *Service) handleSizeCDF(w http.ResponseWriter, r *http.Request) {
@@ -283,16 +308,29 @@ func (s *Service) handleSizeCDF(w http.ResponseWriter, r *http.Request) {
 	network := vars["network"]
 	windowFile := vars["window_file"]
 	key := "beacon_chain_timings/size_cdf/" + network + "/" + windowFile + ".json"
-	s.handleS3Passthrough(w, r, key)
-	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Cache-Control", "max-age=605, s-maxage=605, public")
+	if err := s.handleS3Passthrough(w, r, key, map[string]string{
+		"Content-Type":  "application/json",
+		"Cache-Control": "max-age=605, s-maxage=605, public",
+	}); err != nil {
+		s.log.WithError(err).WithField("key", key).Error("Failed to handle size cdf")
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+
+		return
+	}
 }
 
 func (s *Service) handleXatuSummary(w http.ResponseWriter, r *http.Request) {
 	key := "xatu_public_contributors/summary.json"
-	s.handleS3Passthrough(w, r, key)
-	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Cache-Control", "max-age=605, s-maxage=605, public")
+	if err := s.handleS3Passthrough(w, r, key, map[string]string{
+		"Content-Type":  "application/json",
+		"Cache-Control": "max-age=605, s-maxage=605, public",
+	}); err != nil {
+		s.log.WithError(err).WithField("key", key).Error("Failed to handle Xatu summary")
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+
+		return
+	}
+
 }
 
 func (s *Service) handleBeaconSlot(w http.ResponseWriter, r *http.Request) {
@@ -300,25 +338,48 @@ func (s *Service) handleBeaconSlot(w http.ResponseWriter, r *http.Request) {
 	network := vars["network"]
 	slot := vars["slot"]
 	key := "beacon_slots/slots/" + network + "/" + slot + ".json"
-	s.handleS3Passthrough(w, r, key)
-	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Cache-Control", "max-age=605, s-maxage=605, public")
+	if err := s.handleS3Passthrough(w, r, key, map[string]string{
+		"Content-Type":  "application/json",
+		"Cache-Control": "max-age=6000, s-maxage=6000, public",
+	}); err != nil {
+		s.log.WithError(err).WithField("key", key).Error("Failed to handle beacon slot")
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+
+		return
+	}
+
 }
 
 func (s *Service) handleXatuUserSummary(w http.ResponseWriter, r *http.Request) {
 	key := "xatu_public_contributors/user-summaries/summary.json"
-	s.handleS3Passthrough(w, r, key)
-	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Cache-Control", "max-age=605, s-maxage=605, public")
+
+	if err := s.handleS3Passthrough(w, r, key, map[string]string{
+		"Content-Type":  "application/json",
+		"Cache-Control": "max-age=605, s-maxage=605, public",
+	}); err != nil {
+		s.log.WithError(err).WithField("key", key).Error("Failed to handle Xatu user summary")
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+
+		return
+	}
+
 }
 
 func (s *Service) handleXatuUser(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	username := vars["username"]
 	key := "xatu_public_contributors/user-summaries/users/" + username + ".json"
-	s.handleS3Passthrough(w, r, key)
-	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Cache-Control", "max-age=605, s-maxage=605, public")
+
+	if err := s.handleS3Passthrough(w, r, key, map[string]string{
+		"Content-Type":  "application/json",
+		"Cache-Control": "max-age=605, s-maxage=605, public",
+	}); err != nil {
+		s.log.WithError(err).WithField("key", key).Error("Failed to handle Xatu user")
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+
+		return
+	}
+
 }
 
 func (s *Service) handleXatuUsersWindow(w http.ResponseWriter, r *http.Request) {
@@ -327,9 +388,15 @@ func (s *Service) handleXatuUsersWindow(w http.ResponseWriter, r *http.Request) 
 	windowFile := vars["window_file"]
 
 	key := "xatu_public_contributors/users/" + network + "/" + windowFile + ".json"
-	s.handleS3Passthrough(w, r, key)
-	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Cache-Control", "max-age=605, s-maxage=605, public")
+	if err := s.handleS3Passthrough(w, r, key, map[string]string{
+		"Content-Type":  "application/json",
+		"Cache-Control": "max-age=605, s-maxage=605, public",
+	}); err != nil {
+		s.log.WithError(err).WithField("key", key).Error("Failed to handle Xatu users window")
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+
+		return
+	}
 }
 
 func (s *Service) handleXatuCountriesWindow(w http.ResponseWriter, r *http.Request) {
@@ -347,7 +414,10 @@ func (s *Service) handleXatuCountriesWindow(w http.ResponseWriter, r *http.Reque
 		} else {
 			s.log.WithError(err).WithField("key", key).Error("Failed to get object from storage")
 			http.Error(w, "Internal server error", http.StatusInternalServerError)
+
+			return
 		}
+
 		return
 	}
 
@@ -426,7 +496,13 @@ func (s *Service) handleXatuCountriesWindow(w http.ResponseWriter, r *http.Reque
 
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Cache-Control", "max-age=605, s-maxage=605, public")
-	w.Write(responseData)
+
+	if _, err := w.Write(responseData); err != nil {
+		s.log.WithError(err).WithField("key", key).Error("Failed to write transformed countries data")
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+
+		return
+	}
 }
 
 func (s *Service) cleanup() {
