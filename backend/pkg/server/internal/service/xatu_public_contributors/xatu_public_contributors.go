@@ -176,6 +176,12 @@ func (b *XatuPublicContributors) processLoop() {
 		b.process(b.processCtx)
 	}
 
+	if b.processCtx == nil {
+		b.log.Error("Process context is nil, cannot process")
+
+		return
+	}
+
 	for {
 		select {
 		case <-b.processCtx.Done():
@@ -949,7 +955,6 @@ func (b *XatuPublicContributors) processCountriesWindow(ctx context.Context, net
 		GROUP BY time_slot, country
 		ORDER BY time_slot
 	`
-
 	ch, err := b.xatuClient.GetClickhouseClientForNetwork(networkName)
 	if err != nil {
 		return fmt.Errorf("failed to get ClickHouse client for network %s: %w", networkName, err)

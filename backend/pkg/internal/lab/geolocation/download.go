@@ -123,7 +123,7 @@ func (c *Client) downloadAndExtract() ([]byte, error) {
 
 	// Find the CSV file in the zip
 	for _, f := range zipReader.File {
-		if filepath.Base(f.Name) != "worldcities.csv" && filepath.Base(f.Name) != "worldcities.zip" {
+		if filepath.Ext(f.Name) != ".csv" {
 			continue
 		}
 
