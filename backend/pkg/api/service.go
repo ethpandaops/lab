@@ -2,7 +2,6 @@ package api
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"net"
@@ -17,6 +16,7 @@ import (
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/logger"
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/metrics"
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/storage"
+	"github.com/goccy/go-json"
 	"github.com/gorilla/mux"
 	"github.com/rs/cors"
 	"github.com/sirupsen/logrus"
