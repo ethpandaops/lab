@@ -2,7 +2,9 @@
 
 ![Lab](./public/header.png)
 
-The ethPandaOps Lab is our high velocity, experimental platform for exploring new ideas and concepts in the Ethereum ecosystem. We want to make it easy to experiment with new ideas and concepts, and to share them with the community. The codebase is built with a focus on developer experience and integration with LLM's to quickly iterate on ideas.
+The ethPandaOps Lab is our high velocity, experimental platform for exploring new ideas and concepts in the Ethereum ecosystem. The Lab aims to provide insights that are not viable with standard observability tools like Grafana or Prometheus.
+
+The codebase is built with a focus on developer experience and integration with LLM's to quickly iterate on ideas. 
 
 ## Features
 
