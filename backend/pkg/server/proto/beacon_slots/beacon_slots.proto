@@ -1,0 +1,130 @@
+syntax = "proto3";
+
+package beacon_slots;
+
+option go_package = "github.com/ethpandaops/lab/backend/pkg/proto/beacon_slots";
+
+service BeaconSlots {
+}
+
+// Geo location information for a node
+message Geo {
+  string city = 1;
+  string country = 2;
+  string continent = 3;
+  double latitude = 4;
+  double longitude = 5;
+}
+
+// Node information, keyed by meta_client_name
+message Node {
+  string name = 1;
+  string username = 2;
+  Geo geo = 3;
+}
+
+// Proposer information (only slot and proposer_validator_index)
+message Proposer {
+  int64 slot = 1;
+  int64 proposer_validator_index = 2;
+}
+
+// Block data, matching the target JSON structure precisely
+message BlockData {
+  int64 slot = 1;
+  string slot_start_date_time = 2;
+  int64 epoch = 3;
+  string epoch_start_date_time = 4;
+  string block_root = 5;
+  string block_version = 6;
+  int64 block_total_bytes = 7;
+  int64 block_total_bytes_compressed = 8;
+  string parent_root = 9;
+  string state_root = 10;
+  int64 proposer_index = 11;
+  string eth1_data_block_hash = 12;
+  string eth1_data_deposit_root = 13;
+  string execution_payload_block_hash = 14;
+  int64 execution_payload_block_number = 15;
+  string execution_payload_fee_recipient = 16;
+  int64 execution_payload_base_fee_per_gas = 17;
+  int64 execution_payload_blob_gas_used = 18;
+  int64 execution_payload_excess_blob_gas = 19;
+  int64 execution_payload_gas_limit = 20;
+  int64 execution_payload_gas_used = 21;
+  string execution_payload_state_root = 22;
+  string execution_payload_parent_hash = 23;
+  int64 execution_payload_transactions_count = 24;
+  int64 execution_payload_transactions_total_bytes = 25;
+  int64 execution_payload_transactions_total_bytes_compressed = 26;
+}
+
+// Attestation window
+message AttestationWindow {
+  int64 start_ms = 1;
+  int64 end_ms = 2;
+  repeated int64 validator_indices = 3;
+}
+
+// Attestations data
+message AttestationsData {
+  repeated AttestationWindow windows = 1;
+  int64 maximum_votes = 2;
+}
+
+// Intermediate message for nested blob timing maps
+message BlobTimingMap {
+  map<int64, int64> timings = 1; // map blob_index -> ms
+}
+
+message BlockArrivalTime {
+  int64 slot_time = 1;
+  string meta_client_name = 2;
+  string meta_client_geo_city = 3;
+  string meta_client_geo_country = 4;
+  string meta_client_geo_continent_code = 5;
+}
+
+
+message BlobArrivalTime {
+  int64 slot_time = 1;
+  string meta_client_name = 2;
+  string meta_client_geo_city = 3;
+  string meta_client_geo_country = 4;
+  string meta_client_geo_continent_code = 5;
+  int64 blob_index = 6;
+}
+
+message BlobArrivalTimes {
+  repeated BlobArrivalTime arrival_times = 1;
+}
+
+// FullTimings data includes timing data with metadata and geo location
+message FullTimings {
+  map<string, BlockArrivalTime> block_seen = 1; // map meta_client -> BlockArrivalTime
+  map<string, BlobArrivalTimes> blob_seen = 2; // map meta_client -> BlobArrivalTimes
+  map<string, BlockArrivalTime> block_first_seen_p2p = 3; // map meta_client -> BlockArrivalTime
+  map<string, BlobArrivalTimes> blob_first_seen_p2p = 4; // map meta_client -> BlobArrivalTimes
+}
+
+// SlimTimings data is a slimmed down version of FullTimings that drops the metadata and geo location
+message SlimTimings {
+  map<string, int64> block_seen = 1; // map meta_client -> ms
+  map<string, BlobTimingMap> blob_seen = 2; // map meta_client -> BlobTimingMap
+  map<string, int64> block_first_seen_p2p = 3; // map meta_client -> ms
+  map<string, BlobTimingMap> blob_first_seen_p2p = 4; // map meta_client -> BlobTimingMap
+}
+
+// Top-level beacon slot data message
+message BeaconSlotData {
+  int64 slot = 1;
+  string network = 2;
+  string processed_at = 3;
+  int64 processing_time_ms = 4;
+  BlockData block = 5;
+  Proposer proposer = 6;
+  string entity = 7;
+  map<string, Node> nodes = 8;
+  SlimTimings timings = 9;
+  AttestationsData attestations = 10;
+}

@@ -28,7 +28,7 @@ package $PROTO_NAME;
 
 import "google/protobuf/timestamp.proto";
 
-option go_package = "github.com/ethpandaops/lab/pkg/server/proto/$PROTO_NAME";
+option go_package = "github.com/ethpandaops/lab/backend/pkg/server/proto/$PROTO_NAME";
 
 // Add your message and service definitions here
 
