@@ -3,11 +3,11 @@
 # Generate protobuf
 proto:
 	@echo "Generating protobuf code..."
-	buf generate --path pkg/server/proto/beacon_chain_timings
-	buf generate --path pkg/server/proto/lab
-	buf generate --path pkg/server/proto/xatu_public_contributors
-	buf generate --path pkg/server/proto/beacon_slots
-	buf generate --path pkg/api/proto
+	buf generate --path backend/pkg/server/proto/beacon_chain_timings
+	buf generate --path backend/pkg/server/proto/lab
+	buf generate --path backend/pkg/server/proto/xatu_public_contributors
+	buf generate --path backend/pkg/server/proto/beacon_slots
+	buf generate --path backend/pkg/api/proto
 
 	buf generate --template buf-api.gen.yaml . --path pkg/api/proto
 
@@ -32,8 +32,8 @@ run-api:
 clean:
 	@echo "Cleaning..."
 	rm -rf bin
-	rm -rf pkg/srv/proto/*/*.pb.go
-	rm -rf pkg/srv/proto/*/*_grpc.pb.go
-	rm -rf pkg/proto/*/*.pb.go
-	rm -rf pkg/proto/*/*_grpc.pb.go
-	rm -rf pkg/api/proto/*.pb.gw.go 
+	rm -rf backend/pkg/srv/proto/*/*.pb.go
+	rm -rf backend/pkg/srv/proto/*/*_grpc.pb.go
+	rm -rf backend/pkg/proto/*/*.pb.go
+	rm -rf backend/pkg/proto/*/*_grpc.pb.go
+	rm -rf backend/pkg/api/proto/*.pb.gw.go 
