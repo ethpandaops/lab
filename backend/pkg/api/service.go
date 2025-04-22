@@ -169,8 +169,9 @@ func (s *Service) initializeServices(ctx context.Context) error {
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 	}
 
-	// Use the passthrough scheme explicitly to maintain the same behavior as DialContext
-	conn, err = grpc.NewClient("passthrough://"+srvAddr, opts...)
+	// Fix the gRPC connection by using DialContext instead of NewClient
+	//nolint:staticcheck // CBA
+	conn, err = grpc.DialContext(ctx, srvAddr, opts...)
 	if err != nil {
 		return fmt.Errorf("failed to dial srv service at %s: %w", srvAddr, err)
 	}

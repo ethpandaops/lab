@@ -16,18 +16,21 @@ The ethPandaOps Lab is a comprehensive platform for exploring, analyzing, and vi
 The application consists of:
 
 ```
-├── pkg/                    # Go implementation (main codebase)
-│   ├── api/                # API service (client-facing)
-│   ├── server/             # SRV service (business logic, data processing)
-│   │   ├── internal/       # Internal server components
-│   │   │   ├── grpc/       # gRPC server implementation
-│   │   │   └── service/    # Service implementations (beacon_slots, beacon_chain_timings, xatu_public_contributors, etc.)
-│   │   └── proto/          # Protocol buffer definitions
-│   └── xatuclickhouse/     # ClickHouse integration for Xatu
+├── backend/                # Go implementation (main codebase)
+│   ├── pkg/                # Core packages
+│   │   ├── api/            # API service (client-facing)
+│   │   ├── server/         # SRV service (business logic, data processing)
+│   │   │   ├── internal/   # Internal server components
+│   │   │   │   ├── grpc/   # gRPC server implementation
+│   │   │   │   └── service/# Service implementations (beacon_slots, beacon_chain_timings, xatu_public_contributors, etc.)
+│   │   │   └── proto/      # Protocol buffer definitions
+│   │   └── internal/       # Shared internal packages
+│   │       ├── cache/      # Caching implementations (Redis, memory)
+│   │       ├── ethereum/   # Ethereum-specific utilities
+│   │       └── lab/        # Core lab functionality
 ├── frontend/               # React frontend (see frontend/README.md)
 ├── scripts/                # Utility scripts
-├── deploy/                 # Deployment configurations
-└── backend/                # Deprecated Python implementation
+└── deploy/                 # Deployment configurations
 ```
 
 ### Backend (Go)
@@ -75,44 +78,73 @@ The backend is implemented in Go as a single binary with two main components:
    cp .env.example .env
    ```
 
-3. Start the application:
+3. Start the application using profiles:
    ```bash
+   # Start all components (backend, frontend, and infrastructure)
    docker-compose up
+
+   # Start only infrastructure services (Redis, MinIO)
+   docker-compose --profile infra up
+
+   # Start only backend services (API and SRV)
+   docker-compose --profile backend up
+
+   # Start only frontend
+   docker-compose --profile frontend up
    ```
 
-The application will be available at http://localhost:3000.
+The application will be available at:
+- Frontend: http://localhost:3000
+- API: http://localhost:8080
+- MinIO Console: http://localhost:9001 (credentials: minioadmin/minioadmin)
 
-## Backend Development
+## Development
 
-1. Create a configuration file:
+### Backend Development
+
+1. Start required infrastructure services:
    ```bash
-   cp config.example.yaml config.yaml
+   docker-compose --profile infra up -d
    ```
 
-2. Start required services for development:
-   ```bash
-   docker-compose up -d
-   ```
-
-3. Run the SRV service:
+2. Run the SRV service:
    ```bash
    make run-srv
    ```
 
-4. Run the API service (in a separate terminal):
+3. Run the API service (in a separate terminal):
    ```bash
    make run-api
    ```
 
-5. To build the backend binary:
+4. To build the backend binary:
    ```bash
    make build
    ```
 
-6. To generate protobuf code:
+5. To generate protobuf code:
    ```bash
    make proto
    ```
+
+### Frontend Development
+
+1. Navigate to the frontend directory:
+   ```bash
+   cd frontend
+   ```
+
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+3. Start the development server:
+   ```bash
+   npm run dev
+   ```
+
+The frontend development server will be available at http://localhost:5173.
 
 ## Deployment
 
