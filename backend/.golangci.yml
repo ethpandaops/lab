@@ -55,11 +55,10 @@ linters:
       disabled-checks:
         - unnamedResult
         - paramTypeCombine
-      disabled:
     govet:
-      check-shadowing: false
       disable:
         - fieldalignment
+        - shadow
     nolintlint:
       require-explanation: true
       require-specific: true
