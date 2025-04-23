@@ -1,7 +1,7 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "pkg/api/proto/lab_api.proto",
+    "title": "backend/pkg/api/proto/lab_api.proto",
     "version": "version not set"
   },
   "tags": [
@@ -17,31 +17,8 @@
   ],
   "paths": {},
   "definitions": {
-    "labapiDataFileChunk": {
-      "type": "object",
-      "properties": {
-        "content": {
-          "type": "string",
-          "format": "byte"
-        }
-      }
-    },
     "labapiFrontendConfigResponse": {
-      "type": "object",
-      "properties": {
-        "networkName": {
-          "type": "string"
-        },
-        "environment": {
-          "type": "string"
-        },
-        "settings": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "string"
-          }
-        }
-      }
+      "type": "object"
     },
     "protobufAny": {
       "type": "object",

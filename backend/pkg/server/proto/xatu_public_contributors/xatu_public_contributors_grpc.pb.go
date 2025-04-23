@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.5.1
 // - protoc             (unknown)
-// source: pkg/server/proto/xatu_public_contributors/xatu_public_contributors.proto
+// source: backend/pkg/server/proto/xatu_public_contributors/xatu_public_contributors.proto
 
 package xatu_public_contributors
 
@@ -77,5 +77,5 @@ var XatuPublicContributorsService_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*XatuPublicContributorsServiceServer)(nil),
 	Methods:     []grpc.MethodDesc{},
 	Streams:     []grpc.StreamDesc{},
-	Metadata:    "pkg/server/proto/xatu_public_contributors/xatu_public_contributors.proto",
+	Metadata:    "backend/pkg/server/proto/xatu_public_contributors/xatu_public_contributors.proto",
 }

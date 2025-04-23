@@ -22,6 +22,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 
+	beaconslotspb "github.com/ethpandaops/lab/backend/pkg/server/proto/beacon_slots"
 	labpb "github.com/ethpandaops/lab/backend/pkg/server/proto/lab"
 )
 
@@ -39,8 +40,9 @@ type Service struct {
 	storageClient storage.Client
 
 	// gRPC connection to srv service
-	srvConn   *grpc.ClientConn
-	labClient labpb.LabServiceClient
+	srvConn           *grpc.ClientConn
+	labClient         labpb.LabServiceClient
+	beaconSlotsClient beaconslotspb.BeaconSlotsClient
 }
 
 // New creates a new api service
@@ -178,6 +180,7 @@ func (s *Service) initializeServices(ctx context.Context) error {
 
 	s.srvConn = conn
 	s.labClient = labpb.NewLabServiceClient(conn)
+	s.beaconSlotsClient = beaconslotspb.NewBeaconSlotsClient(conn)
 
 	if err := s.storageClient.Start(ctx); err != nil {
 		return fmt.Errorf("failed to start storage client: %w", err)
@@ -223,6 +226,9 @@ func (s *Service) registerLegacyHandlers() {
 	// Beacon Slot
 	router.HandleFunc("/beacon/slots/{network}/{slot}.json", s.handleBeaconSlot).Methods("GET")
 
+	// Locally built blocks
+	router.HandleFunc("/beacon/local_blocks/{network}/latest", s.handlLocallyBuiltBlocks).Methods("GET")
+
 	// Xatu User Summary - OK
 	router.HandleFunc("/xatu_public_contributors/user-summaries/summary.json", s.handleXatuUserSummary).Methods("GET")
 
@@ -234,6 +240,9 @@ func (s *Service) registerLegacyHandlers() {
 
 	// Xatu Countries Window - OK
 	router.HandleFunc("/xatu_public_contributors/countries/{network}/{window_file}.json", s.handleXatuCountriesWindow).Methods("GET")
+
+	// Recent validator blocks
+	router.HandleFunc("/beacon/local_blocks/{network}/latest", s.handleRecentValidatorBlocks).Methods("GET")
 
 	router.HandleFunc("/config.json", s.handleFrontendConfig).Methods("GET")
 }
@@ -264,6 +273,43 @@ func (s *Service) handleFrontendConfig(w http.ResponseWriter, r *http.Request) {
 		s.log.WithError(err).Error("failed to write config response")
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 
+		return
+	}
+}
+
+// handleRecentValidatorBlocks handles requests for recent validator blocks
+func (s *Service) handleRecentValidatorBlocks(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	network := vars["network"]
+
+	ctx, cancel := context.WithTimeout(r.Context(), 15*time.Second)
+	defer cancel()
+
+	// Make the gRPC call to the BeaconSlots service
+	resp, err := s.beaconSlotsClient.GetRecentValidatorBlocks(ctx, &beaconslotspb.GetRecentValidatorBlocksRequest{
+		Network: network,
+	})
+	if err != nil {
+		s.log.WithError(err).Error("Failed to get recent validator blocks")
+		http.Error(w, "Failed to get recent validator blocks", http.StatusInternalServerError)
+		return
+	}
+
+	// Convert response to JSON
+	data, err := json.Marshal(resp)
+	if err != nil {
+		s.log.WithError(err).Error("Failed to marshal validator blocks response")
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
+
+	// Set response headers
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Cache-Control", "max-age=10,s-maxage=10,public")
+
+	if _, err := w.Write(data); err != nil {
+		s.log.WithError(err).Error("Failed to write validator blocks response")
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}
 }
@@ -408,6 +454,41 @@ func (s *Service) handleXatuUsersWindow(w http.ResponseWriter, r *http.Request) 
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 
 		return
+	}
+}
+
+func (s *Service) handlLocallyBuiltBlocks(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	network := vars["network"]
+
+	ctx, cancel := context.WithTimeout(r.Context(), 30*time.Second)
+	defer cancel()
+
+	resp, err := s.beaconSlotsClient.GetRecentLocallyBuiltBlocks(ctx, &beaconslotspb.GetRecentLocallyBuiltBlocksRequest{
+		Network: network,
+	})
+
+	if err != nil {
+		s.log.WithError(err).Error("Failed to get locally built blocks")
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+
+		return
+	}
+
+	data, err := json.Marshal(resp)
+	if err != nil {
+		s.log.WithError(err).Error("Failed to marshal locally built blocks")
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Cache-Control", "max-age=5, s-maxage=5, public")
+
+	if _, err := w.Write(data); err != nil {
+		s.log.WithError(err).Error("Failed to write locally built blocks")
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
 	}
 }
 

@@ -59,6 +59,8 @@ type BeaconSlots struct {
 	processCtxCancel context.CancelFunc
 	processWaitGroup sync.WaitGroup
 
+	locallyBuiltBlocksProcessor *LocallyBuiltBlocksProcessor
+
 	// Base directory for storage
 	baseDir string
 }
@@ -148,6 +150,23 @@ func (b *BeaconSlots) Start(ctx context.Context) error {
 	leaderClient.Start()
 	b.leaderClient = leaderClient
 
+	// Initialize and start the locally built blocks processor
+	if b.config.LocallyBuiltBlocksConfig.Enabled != nil && *b.config.LocallyBuiltBlocksConfig.Enabled {
+		b.locallyBuiltBlocksProcessor = NewLocallyBuiltBlocksProcessor(
+			b.log,
+			&b.config.LocallyBuiltBlocksConfig,
+			b.ethereum,
+			b.xatuClient,
+			b.cacheClient,
+			b.lockerClient,
+			b.metrics,
+		)
+
+		if err := b.locallyBuiltBlocksProcessor.Start(ctx); err != nil {
+			b.log.WithError(err).Error("Failed to start locally built blocks processor")
+		}
+	}
+
 	return nil
 }
 
@@ -162,6 +181,11 @@ func (b *BeaconSlots) Stop() {
 
 	b.log.Info("Stopping processors")
 	b.stopProcessors()
+
+	// Stop the locally built blocks processor
+	if b.locallyBuiltBlocksProcessor != nil {
+		b.locallyBuiltBlocksProcessor.Stop()
+	}
 
 	b.log.Info("BeaconSlots service stopped")
 }

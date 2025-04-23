@@ -40,6 +40,10 @@ func (b *BeaconSlots) getProposerEntity(ctx context.Context, networkName string,
 	// Execute the query
 	result, err := ch.QueryRow(ctx, query, index, networkName)
 	if err != nil {
+		if err.Error() == "no rows returned" {
+			return nil, ErrEntityNotFound
+		}
+
 		return nil, fmt.Errorf("failed to get entity: %w", err)
 	}
 

@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.5.1
 // - protoc             (unknown)
-// source: pkg/server/proto/lab/lab.proto
+// source: backend/pkg/server/proto/lab/lab.proto
 
 package lab
 
@@ -123,5 +123,5 @@ var LabService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "pkg/server/proto/lab/lab.proto",
+	Metadata: "backend/pkg/server/proto/lab/lab.proto",
 }

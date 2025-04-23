@@ -9,7 +9,7 @@ proto:
 	buf generate --path backend/pkg/server/proto/beacon_slots
 	buf generate --path backend/pkg/api/proto
 
-	buf generate --template buf-api.gen.yaml . --path pkg/api/proto
+	buf generate --template buf-api.gen.yaml . --path backend/pkg/api/proto
 
 # Create a new proto file
 create-proto:

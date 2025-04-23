@@ -6,6 +6,6 @@ plugins:
   - module=github.com/ethpandaops/lab
   - generate_unbound_methods=true
   - standalone=false
-  - grpc_api_configuration=./pkg/api/proto/proto.yaml
+  - grpc_api_configuration=./backend/pkg/api/proto/proto.yaml
 - plugin: openapiv2
-  out: pkg/api/openapiv2
+  out: ./backend/pkg/api/openapiv2

@@ -2,9 +2,13 @@ syntax = "proto3";
 
 package beacon_slots;
 
-option go_package = "github.com/ethpandaops/lab/backend/pkg/proto/beacon_slots";
+option go_package = "github.com/ethpandaops/lab/backend/pkg/server/proto/beacon_slots";
+
+import "google/protobuf/timestamp.proto";
 
 service BeaconSlots {
+  rpc GetRecentLocallyBuiltBlocks (GetRecentLocallyBuiltBlocksRequest) returns (GetRecentLocallyBuiltBlocksResponse);
+  rpc GetRecentValidatorBlocks (GetRecentValidatorBlocksRequest) returns (GetRecentValidatorBlocksResponse);
 }
 
 // Geo location information for a node
@@ -127,4 +131,65 @@ message BeaconSlotData {
   map<string, Node> nodes = 8;
   SlimTimings timings = 9;
   AttestationsData attestations = 10;
+}
+
+// LocallyBuiltBlockMetadata contains metadata about the locally built block
+message LocallyBuiltBlockMetadata {
+  string meta_client_name = 1;
+  google.protobuf.Timestamp event_date_time = 2;
+  string meta_client_version = 3;
+  string meta_client_implementation = 4;
+  string meta_client_geo_city = 5;
+  string meta_client_geo_country = 7;
+  string meta_client_geo_country_code = 8;
+  string meta_client_geo_continent_code = 9;
+  double meta_client_geo_longitude = 10;
+  double meta_client_geo_latitude = 11;
+  string meta_consensus_version = 12;
+  string meta_consensus_implementation = 13;
+  string meta_network_name = 14;
+}
+
+// LocallyBuiltBlock represents a locally built block
+message LocallyBuiltBlock {
+  uint64 slot = 1;
+  uint64 slot_start_date_time = 2;
+  LocallyBuiltBlockMetadata metadata = 4;
+  string block_version = 5;
+  uint32 block_total_bytes = 6;
+  uint32 block_total_bytes_compressed = 7;
+  uint64 execution_payload_value = 8;
+  uint64 consensus_payload_value = 9;
+  uint32 execution_payload_block_number = 10;
+  uint64 execution_payload_gas_limit = 11;
+  uint64 execution_payload_gas_used = 12;
+  uint32 execution_payload_transactions_count = 13;
+  uint32 execution_payload_transactions_total_bytes = 14;
+  uint32 execution_payload_transactions_total_bytes_compressed = 15;
+}
+
+// LocallyBuiltSlotBlocks represents all locally built blocks observed for a specific slot
+message LocallyBuiltSlotBlocks {
+  uint64 slot = 1;
+  repeated LocallyBuiltBlock blocks = 2;
+}
+
+// Request for GetRecentLocallyBuiltBlocks
+message GetRecentLocallyBuiltBlocksRequest {
+  string network = 1;
+}
+
+// Response for GetRecentLocallyBuiltBlocks
+message GetRecentLocallyBuiltBlocksResponse {
+  repeated LocallyBuiltSlotBlocks slot_blocks = 1;
+}
+
+// Request for GetRecentValidatorBlocks
+message GetRecentValidatorBlocksRequest {
+  string network = 1;
+}
+
+// Response for GetRecentValidatorBlocks
+message GetRecentValidatorBlocksResponse {
+  repeated LocallyBuiltSlotBlocks slot_blocks = 1;
 }

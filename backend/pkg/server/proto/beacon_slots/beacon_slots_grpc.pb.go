@@ -2,12 +2,15 @@
 // versions:
 // - protoc-gen-go-grpc v1.5.1
 // - protoc             (unknown)
-// source: pkg/server/proto/beacon_slots/beacon_slots.proto
+// source: backend/pkg/server/proto/beacon_slots/beacon_slots.proto
 
 package beacon_slots
 
 import (
+	context "context"
 	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -15,10 +18,17 @@ import (
 // Requires gRPC-Go v1.64.0 or later.
 const _ = grpc.SupportPackageIsVersion9
 
+const (
+	BeaconSlots_GetRecentLocallyBuiltBlocks_FullMethodName = "/beacon_slots.BeaconSlots/GetRecentLocallyBuiltBlocks"
+	BeaconSlots_GetRecentValidatorBlocks_FullMethodName    = "/beacon_slots.BeaconSlots/GetRecentValidatorBlocks"
+)
+
 // BeaconSlotsClient is the client API for BeaconSlots service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type BeaconSlotsClient interface {
+	GetRecentLocallyBuiltBlocks(ctx context.Context, in *GetRecentLocallyBuiltBlocksRequest, opts ...grpc.CallOption) (*GetRecentLocallyBuiltBlocksResponse, error)
+	GetRecentValidatorBlocks(ctx context.Context, in *GetRecentValidatorBlocksRequest, opts ...grpc.CallOption) (*GetRecentValidatorBlocksResponse, error)
 }
 
 type beaconSlotsClient struct {
@@ -29,10 +39,32 @@ func NewBeaconSlotsClient(cc grpc.ClientConnInterface) BeaconSlotsClient {
 	return &beaconSlotsClient{cc}
 }
 
+func (c *beaconSlotsClient) GetRecentLocallyBuiltBlocks(ctx context.Context, in *GetRecentLocallyBuiltBlocksRequest, opts ...grpc.CallOption) (*GetRecentLocallyBuiltBlocksResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetRecentLocallyBuiltBlocksResponse)
+	err := c.cc.Invoke(ctx, BeaconSlots_GetRecentLocallyBuiltBlocks_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *beaconSlotsClient) GetRecentValidatorBlocks(ctx context.Context, in *GetRecentValidatorBlocksRequest, opts ...grpc.CallOption) (*GetRecentValidatorBlocksResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetRecentValidatorBlocksResponse)
+	err := c.cc.Invoke(ctx, BeaconSlots_GetRecentValidatorBlocks_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // BeaconSlotsServer is the server API for BeaconSlots service.
 // All implementations must embed UnimplementedBeaconSlotsServer
 // for forward compatibility.
 type BeaconSlotsServer interface {
+	GetRecentLocallyBuiltBlocks(context.Context, *GetRecentLocallyBuiltBlocksRequest) (*GetRecentLocallyBuiltBlocksResponse, error)
+	GetRecentValidatorBlocks(context.Context, *GetRecentValidatorBlocksRequest) (*GetRecentValidatorBlocksResponse, error)
 	mustEmbedUnimplementedBeaconSlotsServer()
 }
 
@@ -43,6 +75,12 @@ type BeaconSlotsServer interface {
 // pointer dereference when methods are called.
 type UnimplementedBeaconSlotsServer struct{}
 
+func (UnimplementedBeaconSlotsServer) GetRecentLocallyBuiltBlocks(context.Context, *GetRecentLocallyBuiltBlocksRequest) (*GetRecentLocallyBuiltBlocksResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetRecentLocallyBuiltBlocks not implemented")
+}
+func (UnimplementedBeaconSlotsServer) GetRecentValidatorBlocks(context.Context, *GetRecentValidatorBlocksRequest) (*GetRecentValidatorBlocksResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetRecentValidatorBlocks not implemented")
+}
 func (UnimplementedBeaconSlotsServer) mustEmbedUnimplementedBeaconSlotsServer() {}
 func (UnimplementedBeaconSlotsServer) testEmbeddedByValue()                     {}
 
@@ -64,13 +102,58 @@ func RegisterBeaconSlotsServer(s grpc.ServiceRegistrar, srv BeaconSlotsServer) {
 	s.RegisterService(&BeaconSlots_ServiceDesc, srv)
 }
 
+func _BeaconSlots_GetRecentLocallyBuiltBlocks_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetRecentLocallyBuiltBlocksRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BeaconSlotsServer).GetRecentLocallyBuiltBlocks(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: BeaconSlots_GetRecentLocallyBuiltBlocks_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BeaconSlotsServer).GetRecentLocallyBuiltBlocks(ctx, req.(*GetRecentLocallyBuiltBlocksRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _BeaconSlots_GetRecentValidatorBlocks_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetRecentValidatorBlocksRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BeaconSlotsServer).GetRecentValidatorBlocks(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: BeaconSlots_GetRecentValidatorBlocks_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BeaconSlotsServer).GetRecentValidatorBlocks(ctx, req.(*GetRecentValidatorBlocksRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // BeaconSlots_ServiceDesc is the grpc.ServiceDesc for BeaconSlots service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var BeaconSlots_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "beacon_slots.BeaconSlots",
 	HandlerType: (*BeaconSlotsServer)(nil),
-	Methods:     []grpc.MethodDesc{},
-	Streams:     []grpc.StreamDesc{},
-	Metadata:    "pkg/server/proto/beacon_slots/beacon_slots.proto",
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "GetRecentLocallyBuiltBlocks",
+			Handler:    _BeaconSlots_GetRecentLocallyBuiltBlocks_Handler,
+		},
+		{
+			MethodName: "GetRecentValidatorBlocks",
+			Handler:    _BeaconSlots_GetRecentValidatorBlocks_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "backend/pkg/server/proto/beacon_slots/beacon_slots.proto",
 }
