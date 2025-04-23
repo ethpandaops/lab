@@ -2,13 +2,10 @@
 
 # Generate protobuf
 proto:
-	@echo "Generating protobuf code..."
-	buf generate --path backend/pkg/server/proto/beacon_chain_timings
-	buf generate --path backend/pkg/server/proto/lab
-	buf generate --path backend/pkg/server/proto/xatu_public_contributors
-	buf generate --path backend/pkg/server/proto/beacon_slots
-	buf generate --path backend/pkg/api/proto
+	@echo "Generating Go protobuf code..."
+	buf generate .
 
+	@echo "Generating API gateway code..."
 	buf generate --template buf-api.gen.yaml . --path backend/pkg/api/proto
 
 	@echo "Generating TypeScript protobuf types..."

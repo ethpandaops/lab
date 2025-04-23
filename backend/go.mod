@@ -18,7 +18,10 @@ require (
 )
 
 require (
+	connectrpc.com/connect v1.16.2 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
+	github.com/bufbuild/connect-go v1.10.0 // indirect
+	github.com/bufbuild/connect-grpcreflect-go v1.1.0 // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
 	github.com/prometheus/client_model v0.6.1 // indirect
 	github.com/prometheus/common v0.62.0 // indirect

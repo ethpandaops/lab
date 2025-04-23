@@ -10,6 +10,7 @@ interface ExperimentCard {
   logo: string;
   href: string;
   color: string;
+  features?: { title: string; href: string }[]
 }
 
 const experiments: ExperimentCard[] = [
@@ -29,7 +30,10 @@ const experiments: ExperimentCard[] = [
     description: 'Analyze slots, block timing, network performance, and consensus metrics on the Ethereum beacon chain.',
     logo: '/ethereum.png',
     href: '/beacon',
-    color: 'from-accent/20 via-accent-secondary/20 to-error/20'
+    color: 'from-accent/20 via-accent-secondary/20 to-error/20',
+    features: [
+      { title: 'Locally Built Blocks', href: '/beacon/locally-built-blocks' }
+    ]
   },
 ];
 
@@ -52,55 +56,59 @@ function Experiments(): JSX.Element {
       </div>
 
       {/* Experiments Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-4xl">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
         {experiments.map((experiment) => (
-          <Link
-            key={experiment.id}
-            to={experiment.href}
-          >
-            <Card 
-              isPrimary 
-              isInteractive 
-              className="group relative border border-subtle hover:border-accent overflow-hidden transition-all duration-300"
-            >
-              <div className="absolute inset-0 bg-gradient-to-br from-accent/5 via-transparent to-transparent bg-opacity-0 group-hover:bg-opacity-100 transition-colors duration-300" />
+          <Card key={experiment.id} isInteractive className="relative">
+            <Link to={experiment.href} className="block w-full h-full">
+              <div className={`absolute inset-0 bg-gradient-to-br ${experiment.color} opacity-0 group-hover:opacity-100 transition-opacity`} />
               
-              <CardBody className="relative">
-                <div className="flex items-start gap-4">
-                  <div className="relative w-12 h-12 flex-shrink-0">
-                    <div className="absolute inset-0 opacity-50 blur-xl">
-                      <img src={experiment.logo} alt="" className="w-full h-full object-contain" />
-                    </div>
+              <CardBody className="relative flex flex-col h-full">
+                <div className="flex items-start gap-4 mb-4">
+                  <div className="w-12 h-12 flex items-center justify-center flex-shrink-0 relative">
+                    <div className={`absolute inset-0 bg-gradient-to-br ${experiment.color} blur-md rounded-full`} />
                     <img 
                       src={experiment.logo} 
                       alt="" 
-                      className="relative w-full h-full object-contain group-hover:scale-110 transition-transform duration-300"
-                      style={{ 
-                        filter: experiment.id === 'xatu' 
-                          ? 'drop-shadow(0 0 2px rgba(255, 255, 255, 1)) drop-shadow(0 0 4px rgba(255, 255, 255, 0.8)) drop-shadow(0 0 6px rgba(0, 255, 159, 0.5))'
-                          : 'drop-shadow(0 0 12px rgba(0, 255, 159, 0.5))'
-                      }}
+                      className="w-10 h-10 object-contain relative z-10 group-hover:scale-110 transition-transform duration-300"
                     />
                   </div>
 
                   <div className="flex-1 min-w-0">
-                    <h2 className="text-xl font-sans font-bold text-primary group-hover:text-accent transition-colors mb-1">
+                    <h3 className="text-xl font-sans font-bold text-primary group-hover:text-accent transition-colors mb-1">
                       {experiment.title}
-                    </h2>
+                    </h3>
                     <p className="text-sm font-mono text-tertiary truncate">
                       {experiment.subtitle}
                     </p>
                   </div>
-
-                  <ArrowRight className="w-5 h-5 text-accent/50 group-hover:text-accent group-hover:translate-x-1 transition-all duration-300" />
                 </div>
 
-                <p className="text-sm font-mono text-secondary group-hover:text-primary/90 transition-colors mt-4">
+                <p className="text-sm font-mono text-secondary group-hover:text-primary/90 transition-colors mb-4">
                   {experiment.description}
                 </p>
+                
+                {experiment.features && experiment.features.length > 0 && (
+                  <div className="mt-auto">
+                    <h4 className="text-xs font-mono text-tertiary mb-2">Featured Components</h4>
+                    <ul className="space-y-2">
+                      {experiment.features.map((feature, index) => (
+                        <li key={index}>
+                          <Link 
+                            to={feature.href} 
+                            className="flex items-center justify-between p-2 rounded bg-surface/40 hover:bg-surface/70 transition-colors"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <span className="text-sm font-mono text-primary">{feature.title}</span>
+                            <ArrowRight className="w-4 h-4 text-accent/50 group-hover:text-accent transition-colors" />
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
               </CardBody>
-            </Card>
-          </Link>
+            </Link>
+          </Card>
         ))}
       </div>
     </div>

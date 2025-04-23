@@ -6,8 +6,10 @@ option go_package = "github.com/ethpandaops/lab/backend/pkg/api/proto";
 
 import "backend/pkg/server/proto/beacon_slots/beacon_slots.proto";
 
-service LabAPI {  
-  rpc GetRecentLocallyBuiltBlocks(GetRecentLocallyBuiltBlocksRequest) returns (GetRecentLocallyBuiltBlocksResponse) {}
+service LabAPI {
+  rpc GetRecentLocallyBuiltBlocks(GetRecentLocallyBuiltBlocksRequest) returns (GetRecentLocallyBuiltBlocksResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
 }
 
 message GetRecentLocallyBuiltBlocksRequest {

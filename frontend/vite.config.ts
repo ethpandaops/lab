@@ -46,7 +46,7 @@ export default defineConfig(({ mode }) => {
 							buildStart() {
 							}
 						}
-				  ])
+				])
 		],
 		server: {
 			proxy: {

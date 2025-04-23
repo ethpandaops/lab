@@ -35,21 +35,12 @@ func request_LabAPI_GetRecentLocallyBuiltBlocks_0(ctx context.Context, marshaler
 	var protoReq GetRecentLocallyBuiltBlocksRequest
 	var metadata runtime.ServerMetadata
 
-	var (
-		val string
-		ok  bool
-		err error
-		_   = err
-	)
-
-	val, ok = pathParams["network"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "network")
+	newReader, berr := utilities.IOReaderFactory(req.Body)
+	if berr != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", berr)
 	}
-
-	protoReq.Network, err = runtime.String(val)
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "network", err)
+	if err := marshaler.NewDecoder(newReader()).Decode(&protoReq); err != nil && err != io.EOF {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
 	msg, err := client.GetRecentLocallyBuiltBlocks(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -61,21 +52,12 @@ func local_request_LabAPI_GetRecentLocallyBuiltBlocks_0(ctx context.Context, mar
 	var protoReq GetRecentLocallyBuiltBlocksRequest
 	var metadata runtime.ServerMetadata
 
-	var (
-		val string
-		ok  bool
-		err error
-		_   = err
-	)
-
-	val, ok = pathParams["network"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "network")
+	newReader, berr := utilities.IOReaderFactory(req.Body)
+	if berr != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", berr)
 	}
-
-	protoReq.Network, err = runtime.String(val)
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "network", err)
+	if err := marshaler.NewDecoder(newReader()).Decode(&protoReq); err != nil && err != io.EOF {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
 	msg, err := server.GetRecentLocallyBuiltBlocks(ctx, &protoReq)
@@ -89,7 +71,7 @@ func local_request_LabAPI_GetRecentLocallyBuiltBlocks_0(ctx context.Context, mar
 // Note that using this registration option will cause many gRPC library features to stop working. Consider using RegisterLabAPIHandlerFromEndpoint instead.
 func RegisterLabAPIHandlerServer(ctx context.Context, mux *runtime.ServeMux, server LabAPIServer) error {
 
-	mux.Handle("GET", pattern_LabAPI_GetRecentLocallyBuiltBlocks_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("POST", pattern_LabAPI_GetRecentLocallyBuiltBlocks_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		var stream runtime.ServerTransportStream
@@ -97,7 +79,7 @@ func RegisterLabAPIHandlerServer(ctx context.Context, mux *runtime.ServeMux, ser
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/labapi.LabAPI/GetRecentLocallyBuiltBlocks", runtime.WithHTTPPathPattern("/v1/beacon/local_blocks/{network}/latest"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/labapi.LabAPI/GetRecentLocallyBuiltBlocks", runtime.WithHTTPPathPattern("/labapi.LabAPI/GetRecentLocallyBuiltBlocks"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -155,13 +137,13 @@ func RegisterLabAPIHandler(ctx context.Context, mux *runtime.ServeMux, conn *grp
 // "LabAPIClient" to call the correct interceptors.
 func RegisterLabAPIHandlerClient(ctx context.Context, mux *runtime.ServeMux, client LabAPIClient) error {
 
-	mux.Handle("GET", pattern_LabAPI_GetRecentLocallyBuiltBlocks_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("POST", pattern_LabAPI_GetRecentLocallyBuiltBlocks_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/labapi.LabAPI/GetRecentLocallyBuiltBlocks", runtime.WithHTTPPathPattern("/v1/beacon/local_blocks/{network}/latest"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/labapi.LabAPI/GetRecentLocallyBuiltBlocks", runtime.WithHTTPPathPattern("/labapi.LabAPI/GetRecentLocallyBuiltBlocks"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -181,7 +163,7 @@ func RegisterLabAPIHandlerClient(ctx context.Context, mux *runtime.ServeMux, cli
 }
 
 var (
-	pattern_LabAPI_GetRecentLocallyBuiltBlocks_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"v1", "beacon", "local_blocks", "network", "latest"}, ""))
+	pattern_LabAPI_GetRecentLocallyBuiltBlocks_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"labapi.LabAPI", "GetRecentLocallyBuiltBlocks"}, ""))
 )
 
 var (

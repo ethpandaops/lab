@@ -13,20 +13,21 @@ import (
 	"syscall"
 	"time"
 
+	"connectrpc.com/connect"                                                   // Added Connect import
+	apiconnect "github.com/ethpandaops/lab/backend/pkg/api/proto/protoconnect" // Updated Connect handler import path to actual location
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/cache"
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/logger"
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/metrics"
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/storage"
 	"github.com/goccy/go-json"
 	"github.com/gorilla/mux"
-	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/rs/cors"
 	"github.com/sirupsen/logrus"
 	"github.com/soheilhy/cmux"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/grpc/reflection"
 
-	apipb "github.com/ethpandaops/lab/backend/pkg/api/proto"
 	beaconslotspb "github.com/ethpandaops/lab/backend/pkg/server/proto/beacon_slots"
 	labpb "github.com/ethpandaops/lab/backend/pkg/server/proto/lab"
 )
@@ -174,11 +175,11 @@ func (s *Service) initializeServices(ctx context.Context) error {
 	// Initialize the gRPC server
 	s.grpcServer = grpc.NewServer()
 
+	// Register the reflection service on the server
+	reflection.Register(s.grpcServer)
+
 	// Initialize our LabAPI implementation
 	labAPIServer := NewLabAPIServer(s.cacheClient, s.storageClient, conn)
-
-	// Register the LabAPI service
-	apipb.RegisterLabAPIServer(s.grpcServer, labAPIServer)
 
 	// Create a listener for the gRPC/HTTP server
 	lis, err := net.Listen("tcp", fmt.Sprintf("%s:%d", s.config.HttpServer.Host, s.config.HttpServer.Port))
@@ -195,30 +196,19 @@ func (s *Service) initializeServices(ctx context.Context) error {
 	// HTTP/1.1 matcher (matches all other traffic)
 	httpL := mux.Match(cmux.HTTP1Fast())
 
-	// Set up the gRPC Gateway with custom options for handling headers
-	gwmux := runtime.NewServeMux(
-		runtime.WithForwardResponseOption(RegisterHTTPHeadersMiddleware()),
-	)
+	// Create the Connect handler
+	connectHandler := http.NewServeMux()
+	path, handler := apiconnect.NewLabAPIHandler(labAPIServer, connect.WithInterceptors( /* Add interceptors if needed */ ))
+	connectHandler.Handle(path, handler)
 
-	// Register gRPC Gateway handlers
-	opts = []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())}
-	err = apipb.RegisterLabAPIHandlerFromEndpoint(ctx, gwmux, fmt.Sprintf("%s:%d", s.config.HttpServer.Host, s.config.HttpServer.Port), opts)
-	if err != nil {
-		return fmt.Errorf("failed to register gateway handler: %w", err)
-	}
-
-	// Create an HTTP handler that combines both the gRPC Gateway and the legacy HTTP routes
+	// Create an HTTP handler that combines both the Connect handler and the legacy HTTP routes
 	// Use a mux router to route traffic based on the URL path
 	combinedHandler := http.NewServeMux()
 
-	// Apply CORS middleware to the gateway routes
-	gatewayWithCORS := s.getCORSHandler(gwmux)
+	// Apply CORS middleware to the Connect routes
+	connectWithCORS := s.getCORSHandler(connectHandler)
 
-	// Apply gzip compression to the gateway routes if enabled
-	gatewayHandler := gatewayWithCORS
-
-	s.log.Info("Enabling gzip compression for API responses")
-	gatewayHandler = GzipMiddleware(DefaultCompression)(gatewayWithCORS)
+	finalConnectHandler := connectWithCORS
 
 	// Determine API prefix path based on configuration
 	apiPrefix := "/api/"
@@ -237,22 +227,20 @@ func (s *Service) initializeServices(ctx context.Context) error {
 		apiPrefix = prefix + "/api/"
 	}
 
-	s.log.WithField("apiPrefix", apiPrefix).Info("Registering gRPC-Gateway with prefix")
+	s.log.WithField("apiPrefix", apiPrefix).Info("Registering Connect handler with prefix")
 
-	// Add the gRPC Gateway as a handler for the API paths with the proper prefix
-	combinedHandler.Handle(apiPrefix, http.StripPrefix(strings.TrimSuffix(apiPrefix, "/"), gatewayHandler))
+	// Add the Connect handler for the API paths with the proper prefix
+	// Connect handlers typically register their own base path, so we mount it directly
+	combinedHandler.Handle(apiPrefix, http.StripPrefix(strings.TrimSuffix(apiPrefix, "/"), finalConnectHandler))
 
 	// Apply CORS middleware to the legacy routes
 	legacyWithCORS := s.getCORSHandler(s.router)
 
-	// Apply gzip compression to the legacy routes
-	legacyHandler := GzipMiddleware(DefaultCompression)(legacyWithCORS)
-
 	// Add the legacy HTTP routes for backward compatibility
 	if prefix != "" {
-		combinedHandler.Handle(prefix+"/", http.StripPrefix(prefix, legacyHandler))
+		combinedHandler.Handle(prefix+"/", http.StripPrefix(prefix, legacyWithCORS))
 	} else {
-		combinedHandler.Handle("/", legacyHandler)
+		combinedHandler.Handle("/", legacyWithCORS)
 	}
 
 	// Configure the HTTP server
@@ -272,9 +260,9 @@ func (s *Service) initializeServices(ctx context.Context) error {
 
 	// Start the HTTP server in a goroutine
 	go func() {
-		s.log.WithField("addr", fmt.Sprintf("%s:%d", s.config.HttpServer.Host, s.config.HttpServer.Port)).Info("Starting gRPC-Gateway/HTTP server")
+		s.log.WithField("addr", fmt.Sprintf("%s:%d", s.config.HttpServer.Host, s.config.HttpServer.Port)).Info("Starting Connect/HTTP server")
 		if err := httpSrv.Serve(httpL); err != nil && err != http.ErrServerClosed {
-			s.log.WithError(err).Error("HTTP server error")
+			s.log.WithError(err).Error("Connect/HTTP server error")
 			s.cancel()
 		}
 	}()

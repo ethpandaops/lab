@@ -16,7 +16,8 @@ export type LabApiClientType = PromiseClient<typeof LabAPI>;
 export function createLabApiClient(baseUrl: string): LabApiClientType {
   // Create a transport using the Connect-Web transport
   const transport = createConnectTransport({
-    baseUrl,
+    baseUrl: baseUrl + "/api",
+    useHttpGet: true, // Force HTTP GET for all unary calls
   });
 
   // Create the promise-based client

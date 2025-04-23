@@ -4,7 +4,7 @@
 // @ts-nocheck
 
 import { GetRecentLocallyBuiltBlocksRequest, GetRecentLocallyBuiltBlocksResponse } from "./lab_api_pb.js";
-import { MethodKind } from "@bufbuild/protobuf";
+import { MethodIdempotency, MethodKind } from "@bufbuild/protobuf";
 
 /**
  * @generated from service labapi.LabAPI
@@ -20,6 +20,7 @@ export const LabAPI = {
       I: GetRecentLocallyBuiltBlocksRequest,
       O: GetRecentLocallyBuiltBlocksResponse,
       kind: MethodKind.Unary,
+    idempotency: MethodIdempotency.NoSideEffects,
     },
   }
 } as const;

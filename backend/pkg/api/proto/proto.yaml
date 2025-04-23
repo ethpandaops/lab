@@ -2,6 +2,4 @@ type: google.api.Service
 config_version: 3
 
 http:
-  rules:
-    - selector: labapi.LabAPI.GetRecentLocallyBuiltBlocks
-      get: "/v1/beacon/local_blocks/{network}/latest"
+  rules: []

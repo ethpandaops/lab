@@ -6,6 +6,9 @@ plugins:
   - remote: buf.build/grpc/go:v1.5.1
     out: .
     opt: paths=source_relative
+  - remote: buf.build/connectrpc/go:v1.16.2 # protoc-gen-connect-go
+    out: .
+    # Removed opt: paths=source_relative to rely on go_package
   # Frontend TypeScript generation
   - remote: buf.build/bufbuild/es:v1.10.0 # protoc-gen-es
     out: frontend/src/api/gen
