@@ -20,7 +20,8 @@
 		"run-eslint": "eslint --cache --fix --ignore-path .gitignore --ext .ts,.tsx .",
 		"run-stylelint": "stylelint --cache --fix --ignore-path .gitignore **/*.css",
 		"lint": "run-p run-tsc run-eslint run-stylelint",
-		"validate": "run-p lint test:ci test:e2e:headless"
+		"validate": "run-p lint test:ci test:e2e:headless",
+		"generate-types": "node scripts/generate-proto-types.js"
 	},
 	"dependencies": {
 		"@headlessui/react": "^2.2.0",
@@ -35,6 +36,8 @@
 		"framer-motion": "^12.4.7",
 		"globe.gl": "^2.34.6",
 		"lucide-react": "^0.469.0",
+		"protobufjs": "^7.5.0",
+		"protobufjs-cli": "^1.1.3",
 		"react": "18.2.0",
 		"react-dom": "18.2.0",
 		"react-icons": "^5.5.0",

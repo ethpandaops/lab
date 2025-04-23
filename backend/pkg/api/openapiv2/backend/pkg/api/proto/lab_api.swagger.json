@@ -142,9 +142,6 @@
       },
       "title": "LocallyBuiltSlotBlocks represents all locally built blocks observed for a specific slot"
     },
-    "labapiFrontendConfigResponse": {
-      "type": "object"
-    },
     "labapiGetRecentLocallyBuiltBlocksResponse": {
       "type": "object",
       "properties": {

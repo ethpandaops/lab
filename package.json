@@ -1,7 +1,0 @@
-{
-  "dependencies": {
-    "all-the-cities": "^3.1.0",
-    "cities.json": "^1.1.45",
-    "countries-list": "^3.1.1"
-  }
-}

@@ -11,7 +11,6 @@ import (
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
-	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -20,7 +19,6 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	LabAPI_GetFrontendConfig_FullMethodName           = "/labapi.LabAPI/GetFrontendConfig"
 	LabAPI_GetRecentLocallyBuiltBlocks_FullMethodName = "/labapi.LabAPI/GetRecentLocallyBuiltBlocks"
 )
 
@@ -28,7 +26,6 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type LabAPIClient interface {
-	GetFrontendConfig(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*FrontendConfigResponse, error)
 	GetRecentLocallyBuiltBlocks(ctx context.Context, in *GetRecentLocallyBuiltBlocksRequest, opts ...grpc.CallOption) (*GetRecentLocallyBuiltBlocksResponse, error)
 }
 
@@ -38,16 +35,6 @@ type labAPIClient struct {
 
 func NewLabAPIClient(cc grpc.ClientConnInterface) LabAPIClient {
 	return &labAPIClient{cc}
-}
-
-func (c *labAPIClient) GetFrontendConfig(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*FrontendConfigResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(FrontendConfigResponse)
-	err := c.cc.Invoke(ctx, LabAPI_GetFrontendConfig_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
 }
 
 func (c *labAPIClient) GetRecentLocallyBuiltBlocks(ctx context.Context, in *GetRecentLocallyBuiltBlocksRequest, opts ...grpc.CallOption) (*GetRecentLocallyBuiltBlocksResponse, error) {
@@ -64,7 +51,6 @@ func (c *labAPIClient) GetRecentLocallyBuiltBlocks(ctx context.Context, in *GetR
 // All implementations must embed UnimplementedLabAPIServer
 // for forward compatibility.
 type LabAPIServer interface {
-	GetFrontendConfig(context.Context, *emptypb.Empty) (*FrontendConfigResponse, error)
 	GetRecentLocallyBuiltBlocks(context.Context, *GetRecentLocallyBuiltBlocksRequest) (*GetRecentLocallyBuiltBlocksResponse, error)
 	mustEmbedUnimplementedLabAPIServer()
 }
@@ -76,9 +62,6 @@ type LabAPIServer interface {
 // pointer dereference when methods are called.
 type UnimplementedLabAPIServer struct{}
 
-func (UnimplementedLabAPIServer) GetFrontendConfig(context.Context, *emptypb.Empty) (*FrontendConfigResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetFrontendConfig not implemented")
-}
 func (UnimplementedLabAPIServer) GetRecentLocallyBuiltBlocks(context.Context, *GetRecentLocallyBuiltBlocksRequest) (*GetRecentLocallyBuiltBlocksResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetRecentLocallyBuiltBlocks not implemented")
 }
@@ -101,24 +84,6 @@ func RegisterLabAPIServer(s grpc.ServiceRegistrar, srv LabAPIServer) {
 		t.testEmbeddedByValue()
 	}
 	s.RegisterService(&LabAPI_ServiceDesc, srv)
-}
-
-func _LabAPI_GetFrontendConfig_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(emptypb.Empty)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(LabAPIServer).GetFrontendConfig(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: LabAPI_GetFrontendConfig_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(LabAPIServer).GetFrontendConfig(ctx, req.(*emptypb.Empty))
-	}
-	return interceptor(ctx, in, info, handler)
 }
 
 func _LabAPI_GetRecentLocallyBuiltBlocks_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -146,10 +111,6 @@ var LabAPI_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "labapi.LabAPI",
 	HandlerType: (*LabAPIServer)(nil),
 	Methods: []grpc.MethodDesc{
-		{
-			MethodName: "GetFrontendConfig",
-			Handler:    _LabAPI_GetFrontendConfig_Handler,
-		},
 		{
 			MethodName: "GetRecentLocallyBuiltBlocks",
 			Handler:    _LabAPI_GetRecentLocallyBuiltBlocks_Handler,
