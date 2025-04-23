@@ -1,8 +1,7 @@
 import { FC, useState } from 'react'
 import { formatEther, formatBytes } from '../../../utils/format'
-import { Card, CardBody } from '../../../components/common/Card'
 import { LocallyBuiltBlock, LocallyBuiltSlotBlocks } from '../../../api/gen/backend/pkg/server/proto/beacon_slots/beacon_slots_pb'
-import { Package, Clock, FileDown, DollarSign, FileText, Zap, Globe } from 'lucide-react'
+import { Package, Clock, FileDown, DollarSign, FileText, Zap, Globe, Search, ChevronDown, ChevronUp } from 'lucide-react'
 import clsx from 'clsx'
 import { Timestamp } from '@bufbuild/protobuf'
 
@@ -55,6 +54,7 @@ export const LocallyBuiltBlocksTable: FC<LocallyBuiltBlocksTableProps> = ({
 }) => {
   const [sortField, setSortField] = useState<string>('slot')
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc')
+  const [searchTerm, setSearchTerm] = useState<string>('')
 
   const handleSort = (field: string) => {
     if (sortField === field) {
@@ -73,8 +73,21 @@ export const LocallyBuiltBlocksTable: FC<LocallyBuiltBlocksTableProps> = ({
     }))
   )
 
+  // Filter data based on search term
+  const filteredData = flattenedData.filter(item => {
+    if (!searchTerm) return true
+    
+    const searchLower = searchTerm.toLowerCase()
+    return (
+      item.slotNumber.includes(searchTerm) ||
+      (item.block.metadata?.metaClientName?.toLowerCase() || '').includes(searchLower) ||
+      (item.block.metadata?.metaClientGeoCountry?.toLowerCase() || '').includes(searchLower) ||
+      (item.block.blockVersion?.toLowerCase() || '').includes(searchLower)
+    )
+  })
+
   // Sort the data
-  const sortedData = [...flattenedData].sort((a, b) => {
+  const sortedData = [...filteredData].sort((a, b) => {
     let aExecValue, bExecValue, aConsValue, bConsValue;
     
     switch (sortField) {
@@ -117,129 +130,156 @@ export const LocallyBuiltBlocksTable: FC<LocallyBuiltBlocksTableProps> = ({
 
   if (isLoading) {
     return (
-      <Card>
-        <CardBody>
-          <div className="animate-pulse">
-            <div className="h-6 bg-active rounded w-1/4 mb-6"></div>
-            <div className="space-y-3">
-              {[...Array(10)].map((_, i) => (
-                <div key={i} className="h-10 bg-active rounded"></div>
-              ))}
-            </div>
+      <div>
+        <div className="mb-4 flex">
+          <div className="animate-pulse h-9 bg-active/40 rounded w-full"></div>
+        </div>
+        <div className="animate-pulse">
+          <div className="h-10 bg-active/30 rounded-t w-full"></div>
+          <div className="space-y-1 mt-1">
+            {[...Array(8)].map((_, i) => (
+              <div key={i} className="h-12 bg-active/20 rounded flex">
+                <div className="w-1/8 h-full bg-active/5 rounded-l"></div>
+                <div className="flex-1"></div>
+              </div>
+            ))}
           </div>
-        </CardBody>
-      </Card>
+        </div>
+      </div>
     )
   }
 
   if (isError) {
     return (
-      <Card>
-        <CardBody>
-          <div className="text-center py-6">
-            <p className="text-error font-mono">Error loading data. Please try again.</p>
-          </div>
-        </CardBody>
-      </Card>
+      <div className="rounded-lg bg-surface/20 border border-error/20 p-6">
+        <div className="text-center">
+          <p className="text-error font-mono">Error loading data. Please try again.</p>
+        </div>
+      </div>
     )
   }
 
   if (data.length === 0 || flattenedData.length === 0) {
     return (
-      <Card>
-        <CardBody>
-          <div className="text-center py-6">
-            <p className="text-tertiary font-mono">No locally built blocks found.</p>
-          </div>
-        </CardBody>
-      </Card>
+      <div className="rounded-lg bg-surface/20 border border-subtle p-6">
+        <div className="text-center">
+          <p className="text-tertiary font-mono">No locally built blocks found.</p>
+        </div>
+      </div>
     )
   }
 
   const SortIcon = ({ field }: { field: string }) => {
-    if (sortField !== field) return <span className="ml-1 opacity-30">↓</span>
+    if (sortField !== field) return null
     return sortDirection === 'desc' 
-      ? <span className="ml-1">↓</span>
-      : <span className="ml-1">↑</span>
+      ? <ChevronDown className="w-3.5 h-3.5" />
+      : <ChevronUp className="w-3.5 h-3.5" />
   }
 
   const SortHeader = ({ field, label, icon }: { field: string; label: string; icon?: React.ReactNode }) => (
     <th 
-      className="text-left py-2 px-2 text-xs font-mono text-tertiary hover:text-primary cursor-pointer"
+      className="text-left py-2 px-3 text-xs font-mono text-tertiary hover:text-primary cursor-pointer transition-colors duration-200"
       onClick={() => handleSort(field)}
     >
-      <div className="flex items-center gap-1">
+      <div className="flex items-center gap-1.5">
         {icon && <span className="text-accent/70">{icon}</span>}
-        {label}
-        <SortIcon field={field} />
+        <span>{label}</span>
+        <span className={sortField === field ? 'text-accent' : 'opacity-0'}>
+          <SortIcon field={field} />
+        </span>
       </div>
     </th>
   )
 
   return (
-    <Card>
-      <CardBody>
-        <div className="overflow-x-auto -mx-2">
-          <table className="w-full min-w-[800px]">
-            <thead>
-              <tr className="border-b border-subtle">
-                <SortHeader field="slot" label="Slot" icon={<Clock className="w-3 h-3" />} />
-                <SortHeader field="client" label="Client" icon={<Package className="w-3 h-3" />} />
-                <SortHeader field="country" label="Location" icon={<Globe className="w-3 h-3" />} />
-                <SortHeader field="blockSize" label="Size" icon={<FileDown className="w-3 h-3" />} />
-                <SortHeader field="txCount" label="Txns" icon={<FileText className="w-3 h-3" />} />
-                <SortHeader field="execValue" label="Exec Value" icon={<DollarSign className="w-3 h-3" />} />
-                <SortHeader field="consensusValue" label="Consensus Value" icon={<Zap className="w-3 h-3" />} />
-                <th className="text-right py-2 px-2 text-xs font-mono text-tertiary">Version</th>
+    <div>
+      {/* Search Bar */}
+      <div className="mb-4 flex items-center relative">
+        <div className="absolute left-3 text-tertiary">
+          <Search className="w-4 h-4" />
+        </div>
+        <input
+          type="text"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          placeholder="Search by slot, client, location..."
+          className="w-full pl-9 pr-4 py-2 rounded-md bg-surface/40 border border-subtle font-mono text-sm text-primary focus:outline-none focus:ring-1 focus:ring-accent/30 focus:border-accent/50 transition-all"
+        />
+      </div>
+      
+      <div className="overflow-x-auto -mx-2">
+        <table className="w-full min-w-[800px]">
+          <thead>
+            <tr className="border-b border-subtle">
+              <SortHeader field="slot" label="Slot" icon={<Clock className="w-3 h-3" />} />
+              <SortHeader field="client" label="Client" icon={<Package className="w-3 h-3" />} />
+              <SortHeader field="country" label="Location" icon={<Globe className="w-3 h-3" />} />
+              <SortHeader field="blockSize" label="Size" icon={<FileDown className="w-3 h-3" />} />
+              <SortHeader field="txCount" label="Txns" icon={<FileText className="w-3 h-3" />} />
+              <SortHeader field="execValue" label="Exec Value" icon={<DollarSign className="w-3 h-3" />} />
+              <SortHeader field="consensusValue" label="Consensus Value" icon={<Zap className="w-3 h-3" />} />
+              <th className="text-right py-2 px-3 text-xs font-mono text-tertiary">Version</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-subtle/30">
+            {sortedData.length === 0 ? (
+              <tr>
+                <td colSpan={8} className="py-6 text-center text-tertiary font-mono">
+                  No results match your search criteria
+                </td>
               </tr>
-            </thead>
-            <tbody>
-              {sortedData.map(({ slotNumber, block }, index) => (
+            ) : (
+              sortedData.map(({ slotNumber, block }, index) => (
                 <tr 
                   key={`${slotNumber}-${index}`}
                   className={clsx(
-                    "border-b border-subtle/30 last:border-0 hover:bg-hover transition-colors cursor-pointer",
+                    'hover:bg-surface/40 group transition-colors duration-150 cursor-pointer',
+                    index % 2 === 0 ? 'bg-surface/10' : 'bg-transparent',
                   )}
-                  onClick={() => onSelectBlock && onSelectBlock(block)}
+                  onClick={() => onSelectBlock?.(block)}
                 >
-                  <td className="py-2 px-2 font-mono text-primary">
-                    {slotNumber}
-                    <div className="text-xs text-tertiary">
-                      <FormattedTimestamp timestamp={block.slotStartDateTime} />
+                  <td className="py-2.5 px-3 text-sm font-mono">
+                    <div className="flex flex-col">
+                      <span className="text-primary group-hover:text-accent transition-colors">{slotNumber}</span>
+                      <span className="text-xs text-tertiary">
+                        <FormattedTimestamp timestamp={block.slotStartDateTime} />
+                      </span>
                     </div>
                   </td>
-                  <td className="py-2 px-2">
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-primary font-mono">{block.metadata?.metaClientName || 'Unknown'}</span>
-                    </div>
-                    <div className="text-xs text-tertiary font-mono">{block.metadata?.metaClientVersion || '-'}</div>
+                  <td className="py-2.5 px-3 text-sm font-mono text-primary group-hover:text-accent transition-colors">
+                    {block.metadata?.metaClientName || '-'}
                   </td>
-                  <td className="py-2 px-2 font-mono">
-                    <div className="text-primary">{block.metadata?.metaClientGeoCountry || 'Unknown'}</div>
-                    <div className="text-xs text-tertiary">{block.metadata?.metaClientGeoCity || '-'}</div>
+                  <td className="py-2.5 px-3 text-sm font-mono text-primary">
+                    {block.metadata?.metaClientGeoCountry || '-'}
                   </td>
-                  <td className="py-2 px-2 font-mono">
-                    <div className="text-primary">{formatBytes(block.blockTotalBytes)}</div>
-                    <div className="text-xs text-tertiary">{formatBytes(block.blockTotalBytesCompressed)} compressed</div>
+                  <td className="py-2.5 px-3 text-sm font-mono text-primary">
+                    {formatBytes(block.blockTotalBytes)}
                   </td>
-                  <td className="py-2 px-2 text-primary font-mono">
+                  <td className="py-2.5 px-3 text-sm font-mono text-primary">
                     {block.executionPayloadTransactionsCount}
                   </td>
-                  <td className="py-2 px-2 text-primary font-mono">
+                  <td className="py-2.5 px-3 text-sm font-mono text-primary">
                     {formatEther(block.executionPayloadValue)}
                   </td>
-                  <td className="py-2 px-2 text-primary font-mono">
+                  <td className="py-2.5 px-3 text-sm font-mono text-primary">
                     {formatEther(block.consensusPayloadValue)}
                   </td>
-                  <td className="py-2 px-2 text-right text-tertiary font-mono">
+                  <td className="py-2.5 px-3 text-sm font-mono text-tertiary text-right">
                     {block.blockVersion}
                   </td>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </CardBody>
-    </Card>
+              ))
+            )}
+          </tbody>
+        </table>
+        
+        {/* Pagination or Load More could be added here */}
+        {sortedData.length > 0 && (
+          <div className="mt-4 text-xs text-tertiary font-mono text-center">
+            Showing {sortedData.length} of {flattenedData.length} blocks
+          </div>
+        )}
+      </div>
+    </div>
   )
 } 

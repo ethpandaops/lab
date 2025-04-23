@@ -1,2 +1,6 @@
 export { LocallyBuiltBlocksDetail } from './LocallyBuiltBlocksDetail'
-export { LocallyBuiltBlocksVisualization } from './LocallyBuiltBlocksVisualization' 
+export { LocallyBuiltBlocksVisualization } from './LocallyBuiltBlocksVisualization'
+export { LocallyBuiltBlocksTable } from './LocallyBuiltBlocksTable'
+export { ClientPresenceHeatmap } from './ClientPresenceHeatmap'
+export { BlockValueDistribution } from './BlockValueDistribution'
+export { TransactionBubbleChart } from './TransactionBubbleChart' 
