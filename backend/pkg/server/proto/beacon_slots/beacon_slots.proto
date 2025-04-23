@@ -153,7 +153,7 @@ message LocallyBuiltBlockMetadata {
 // LocallyBuiltBlock represents a locally built block
 message LocallyBuiltBlock {
   uint64 slot = 1;
-  uint64 slot_start_date_time = 2;
+  google.protobuf.Timestamp slot_start_date_time = 2;
   LocallyBuiltBlockMetadata metadata = 4;
   string block_version = 5;
   uint32 block_total_bytes = 6;

@@ -46,6 +46,10 @@
 		"world-atlas": "^2.0.2"
 	},
 	"devDependencies": {
+		"@bufbuild/protobuf": "^2.2.5",
+		"@bufbuild/protoc-gen-es": "^2.2.5",
+		"@connectrpc/connect": "^2.0.2",
+		"@connectrpc/connect-web": "^2.0.2",
 		"@nabla/vite-plugin-eslint": "2.0.2",
 		"@tailwindcss/forms": "0.5.7",
 		"@testing-library/cypress": "10.0.1",

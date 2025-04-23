@@ -305,6 +305,11 @@ func (p *LocallyBuiltBlocksProcessor) processLocallyBuiltBlocksForSlot(ctx conte
 			timestamp = eventTime
 		}
 
+		var slotStartDateTime time.Time
+		if slotStartTime, ok := row["slot_start_date_time"].(time.Time); ok {
+			slotStartDateTime = slotStartTime
+		}
+
 		clientName, _ := row["meta_client_name"].(string)
 		clientVersion, _ := row["meta_client_version"].(string)
 		clientImpl, _ := row["meta_client_implementation"].(string)
@@ -368,7 +373,8 @@ func (p *LocallyBuiltBlocksProcessor) processLocallyBuiltBlocksForSlot(ctx conte
 
 		// Create validator block as LocallyBuiltBlock
 		validatorBlock := &beacon_slots.LocallyBuiltBlock{
-			Slot: uint64(dbSlot),
+			Slot:              uint64(dbSlot),
+			SlotStartDateTime: timestamppb.New(slotStartDateTime),
 			Metadata: &beacon_slots.LocallyBuiltBlockMetadata{
 				MetaClientName:              clientName,
 				EventDateTime:               timestamppb.New(timestamp),

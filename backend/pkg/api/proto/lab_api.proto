@@ -4,12 +4,16 @@ package labapi;
 
 option go_package = "github.com/ethpandaops/lab/backend/pkg/api/proto";
 
-import "google/protobuf/empty.proto";
+import "backend/pkg/server/proto/beacon_slots/beacon_slots.proto";
 
-service LabAPI {
-  rpc GetFrontendConfig(google.protobuf.Empty) returns (FrontendConfigResponse) {}
+service LabAPI {  
+  rpc GetRecentLocallyBuiltBlocks(GetRecentLocallyBuiltBlocksRequest) returns (GetRecentLocallyBuiltBlocksResponse) {}
 }
 
-message FrontendConfigResponse {
-  
+message GetRecentLocallyBuiltBlocksRequest {
+  string network = 1;
+}
+
+message GetRecentLocallyBuiltBlocksResponse {
+  repeated beacon_slots.LocallyBuiltSlotBlocks slot_blocks = 1;
 }

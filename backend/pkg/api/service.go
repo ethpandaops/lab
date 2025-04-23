@@ -4,10 +4,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net"
 	"net/http"
 	"os"
 	"os/signal"
 	"strconv"
+	"strings"
 	"syscall"
 	"time"
 
@@ -17,11 +19,14 @@ import (
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/storage"
 	"github.com/goccy/go-json"
 	"github.com/gorilla/mux"
+	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/rs/cors"
 	"github.com/sirupsen/logrus"
+	"github.com/soheilhy/cmux"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 
+	apipb "github.com/ethpandaops/lab/backend/pkg/api/proto"
 	beaconslotspb "github.com/ethpandaops/lab/backend/pkg/server/proto/beacon_slots"
 	labpb "github.com/ethpandaops/lab/backend/pkg/server/proto/lab"
 )
@@ -96,23 +101,7 @@ func (s *Service) Start(ctx context.Context) error {
 		return fmt.Errorf("failed to initialize services: %w", err)
 	}
 
-	// Apply CORS middleware
-	corsHandler := s.getCORSHandler(s.router)
-
-	s.server = &http.Server{
-		Addr:              fmt.Sprintf("%s:%d", s.config.HttpServer.Host, s.config.HttpServer.Port),
-		Handler:           corsHandler,
-		ReadHeaderTimeout: 10 * time.Second,
-	}
-
-	go func() {
-		s.log.WithField("addr", s.server.Addr).Info("Starting HTTP server")
-
-		if err := s.server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			s.log.WithError(err).Error("HTTP server error")
-			s.cancel()
-		}
-	}()
+	// HTTP server is no longer started here since it's handled by the combined gRPC/HTTP server
 
 	<-s.ctx.Done()
 	s.log.Info("Context canceled, cleaning up")
@@ -182,6 +171,126 @@ func (s *Service) initializeServices(ctx context.Context) error {
 	s.labClient = labpb.NewLabServiceClient(conn)
 	s.beaconSlotsClient = beaconslotspb.NewBeaconSlotsClient(conn)
 
+	// Initialize the gRPC server
+	s.grpcServer = grpc.NewServer()
+
+	// Initialize our LabAPI implementation
+	labAPIServer := NewLabAPIServer(s.cacheClient, s.storageClient, conn)
+
+	// Register the LabAPI service
+	apipb.RegisterLabAPIServer(s.grpcServer, labAPIServer)
+
+	// Create a listener for the gRPC/HTTP server
+	lis, err := net.Listen("tcp", fmt.Sprintf("%s:%d", s.config.HttpServer.Host, s.config.HttpServer.Port))
+	if err != nil {
+		return fmt.Errorf("failed to listen for gRPC/HTTP server: %w", err)
+	}
+
+	// Create a cmux multiplexer to handle both gRPC and HTTP traffic
+	mux := cmux.New(lis)
+
+	// gRPC matcher (matches on HTTP2 with Prior Knowledge)
+	grpcL := mux.MatchWithWriters(cmux.HTTP2MatchHeaderFieldSendSettings("content-type", "application/grpc"))
+
+	// HTTP/1.1 matcher (matches all other traffic)
+	httpL := mux.Match(cmux.HTTP1Fast())
+
+	// Set up the gRPC Gateway with custom options for handling headers
+	gwmux := runtime.NewServeMux(
+		runtime.WithForwardResponseOption(RegisterHTTPHeadersMiddleware()),
+	)
+
+	// Register gRPC Gateway handlers
+	opts = []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())}
+	err = apipb.RegisterLabAPIHandlerFromEndpoint(ctx, gwmux, fmt.Sprintf("%s:%d", s.config.HttpServer.Host, s.config.HttpServer.Port), opts)
+	if err != nil {
+		return fmt.Errorf("failed to register gateway handler: %w", err)
+	}
+
+	// Create an HTTP handler that combines both the gRPC Gateway and the legacy HTTP routes
+	// Use a mux router to route traffic based on the URL path
+	combinedHandler := http.NewServeMux()
+
+	// Apply CORS middleware to the gateway routes
+	gatewayWithCORS := s.getCORSHandler(gwmux)
+
+	// Apply gzip compression to the gateway routes if enabled
+	gatewayHandler := gatewayWithCORS
+
+	s.log.Info("Enabling gzip compression for API responses")
+	gatewayHandler = GzipMiddleware(DefaultCompression)(gatewayWithCORS)
+
+	// Determine API prefix path based on configuration
+	apiPrefix := "/api/"
+	prefix := s.config.HttpServer.PathPrefix
+	if prefix != "" {
+		// Ensure prefix starts with / and doesn't end with /
+		if prefix[0] != '/' {
+			prefix = "/" + prefix
+		}
+
+		if len(prefix) > 1 && prefix[len(prefix)-1] == '/' {
+			prefix = prefix[:len(prefix)-1]
+		}
+
+		// Construct the final API prefix by combining the server prefix with /api/
+		apiPrefix = prefix + "/api/"
+	}
+
+	s.log.WithField("apiPrefix", apiPrefix).Info("Registering gRPC-Gateway with prefix")
+
+	// Add the gRPC Gateway as a handler for the API paths with the proper prefix
+	combinedHandler.Handle(apiPrefix, http.StripPrefix(strings.TrimSuffix(apiPrefix, "/"), gatewayHandler))
+
+	// Apply CORS middleware to the legacy routes
+	legacyWithCORS := s.getCORSHandler(s.router)
+
+	// Apply gzip compression to the legacy routes
+	legacyHandler := GzipMiddleware(DefaultCompression)(legacyWithCORS)
+
+	// Add the legacy HTTP routes for backward compatibility
+	if prefix != "" {
+		combinedHandler.Handle(prefix+"/", http.StripPrefix(prefix, legacyHandler))
+	} else {
+		combinedHandler.Handle("/", legacyHandler)
+	}
+
+	// Configure the HTTP server
+	httpSrv := &http.Server{
+		Handler:           combinedHandler,
+		ReadHeaderTimeout: 10 * time.Second,
+	}
+
+	// Start the gRPC server in a goroutine
+	go func() {
+		s.log.WithField("addr", fmt.Sprintf("%s:%d", s.config.HttpServer.Host, s.config.HttpServer.Port)).Info("Starting gRPC server")
+		if err := s.grpcServer.Serve(grpcL); err != nil {
+			s.log.WithError(err).Error("gRPC server error")
+			s.cancel()
+		}
+	}()
+
+	// Start the HTTP server in a goroutine
+	go func() {
+		s.log.WithField("addr", fmt.Sprintf("%s:%d", s.config.HttpServer.Host, s.config.HttpServer.Port)).Info("Starting gRPC-Gateway/HTTP server")
+		if err := httpSrv.Serve(httpL); err != nil && err != http.ErrServerClosed {
+			s.log.WithError(err).Error("HTTP server error")
+			s.cancel()
+		}
+	}()
+
+	// Start the cmux server in a goroutine
+	go func() {
+		s.log.WithField("addr", lis.Addr()).Info("Starting combined gRPC/HTTP server")
+		if err := mux.Serve(); err != nil {
+			s.log.WithError(err).Error("cmux server error")
+			s.cancel()
+		}
+	}()
+
+	// Save the HTTP server for cleanup
+	s.restServer = httpSrv
+
 	if err := s.storageClient.Start(ctx); err != nil {
 		return fmt.Errorf("failed to start storage client: %w", err)
 	}
@@ -225,9 +334,6 @@ func (s *Service) registerLegacyHandlers() {
 
 	// Beacon Slot
 	router.HandleFunc("/beacon/slots/{network}/{slot}.json", s.handleBeaconSlot).Methods("GET")
-
-	// Locally built blocks
-	router.HandleFunc("/beacon/local_blocks/{network}/latest", s.handlLocallyBuiltBlocks).Methods("GET")
 
 	// Xatu User Summary - OK
 	router.HandleFunc("/xatu_public_contributors/user-summaries/summary.json", s.handleXatuUserSummary).Methods("GET")

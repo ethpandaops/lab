@@ -20,7 +20,8 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	LabAPI_GetFrontendConfig_FullMethodName = "/labapi.LabAPI/GetFrontendConfig"
+	LabAPI_GetFrontendConfig_FullMethodName           = "/labapi.LabAPI/GetFrontendConfig"
+	LabAPI_GetRecentLocallyBuiltBlocks_FullMethodName = "/labapi.LabAPI/GetRecentLocallyBuiltBlocks"
 )
 
 // LabAPIClient is the client API for LabAPI service.
@@ -28,6 +29,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type LabAPIClient interface {
 	GetFrontendConfig(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*FrontendConfigResponse, error)
+	GetRecentLocallyBuiltBlocks(ctx context.Context, in *GetRecentLocallyBuiltBlocksRequest, opts ...grpc.CallOption) (*GetRecentLocallyBuiltBlocksResponse, error)
 }
 
 type labAPIClient struct {
@@ -48,11 +50,22 @@ func (c *labAPIClient) GetFrontendConfig(ctx context.Context, in *emptypb.Empty,
 	return out, nil
 }
 
+func (c *labAPIClient) GetRecentLocallyBuiltBlocks(ctx context.Context, in *GetRecentLocallyBuiltBlocksRequest, opts ...grpc.CallOption) (*GetRecentLocallyBuiltBlocksResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetRecentLocallyBuiltBlocksResponse)
+	err := c.cc.Invoke(ctx, LabAPI_GetRecentLocallyBuiltBlocks_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // LabAPIServer is the server API for LabAPI service.
 // All implementations must embed UnimplementedLabAPIServer
 // for forward compatibility.
 type LabAPIServer interface {
 	GetFrontendConfig(context.Context, *emptypb.Empty) (*FrontendConfigResponse, error)
+	GetRecentLocallyBuiltBlocks(context.Context, *GetRecentLocallyBuiltBlocksRequest) (*GetRecentLocallyBuiltBlocksResponse, error)
 	mustEmbedUnimplementedLabAPIServer()
 }
 
@@ -65,6 +78,9 @@ type UnimplementedLabAPIServer struct{}
 
 func (UnimplementedLabAPIServer) GetFrontendConfig(context.Context, *emptypb.Empty) (*FrontendConfigResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetFrontendConfig not implemented")
+}
+func (UnimplementedLabAPIServer) GetRecentLocallyBuiltBlocks(context.Context, *GetRecentLocallyBuiltBlocksRequest) (*GetRecentLocallyBuiltBlocksResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetRecentLocallyBuiltBlocks not implemented")
 }
 func (UnimplementedLabAPIServer) mustEmbedUnimplementedLabAPIServer() {}
 func (UnimplementedLabAPIServer) testEmbeddedByValue()                {}
@@ -105,6 +121,24 @@ func _LabAPI_GetFrontendConfig_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
+func _LabAPI_GetRecentLocallyBuiltBlocks_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetRecentLocallyBuiltBlocksRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LabAPIServer).GetRecentLocallyBuiltBlocks(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: LabAPI_GetRecentLocallyBuiltBlocks_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LabAPIServer).GetRecentLocallyBuiltBlocks(ctx, req.(*GetRecentLocallyBuiltBlocksRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // LabAPI_ServiceDesc is the grpc.ServiceDesc for LabAPI service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -115,6 +149,10 @@ var LabAPI_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetFrontendConfig",
 			Handler:    _LabAPI_GetFrontendConfig_Handler,
+		},
+		{
+			MethodName: "GetRecentLocallyBuiltBlocks",
+			Handler:    _LabAPI_GetRecentLocallyBuiltBlocks_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
