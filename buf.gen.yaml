@@ -6,3 +6,10 @@ plugins:
   - remote: buf.build/grpc/go:v1.5.1
     out: .
     opt: paths=source_relative
+  # Frontend TypeScript generation
+  - remote: buf.build/bufbuild/es:v1.10.0 # protoc-gen-es
+    out: frontend/src/api/gen
+    opt: target=ts
+  - remote: buf.build/bufbuild/connect-web:v0.8.6 # protoc-gen-connect-web
+    out: frontend/src/api/gen
+    opt: target=ts

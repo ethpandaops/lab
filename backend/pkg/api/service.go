@@ -306,23 +306,6 @@ func (s *Service) registerLegacyHandlers() {
 	// Determine the router to use (main router or prefixed subrouter)
 	router := s.router
 
-	prefix := s.config.HttpServer.PathPrefix
-	if prefix != "" {
-		s.log.WithField("prefix", prefix).Info("Registering legacy handlers with path prefix")
-		// Ensure prefix starts with / and doesn't end with /
-		if prefix[0] != '/' {
-			prefix = "/" + prefix
-		}
-
-		if len(prefix) > 1 && prefix[len(prefix)-1] == '/' {
-			prefix = prefix[:len(prefix)-1]
-		}
-
-		router = s.router.PathPrefix(prefix).Subrouter()
-	} else {
-		s.log.Info("Registering legacy handlers without path prefix")
-	}
-
 	// Block timings
 	router.HandleFunc("/beacon_chain_timings/block_timings/{network}/{window_file}.json", s.handleBlockTimings).Methods("GET")
 
@@ -347,9 +330,7 @@ func (s *Service) registerLegacyHandlers() {
 	// Xatu Countries Window - OK
 	router.HandleFunc("/xatu_public_contributors/countries/{network}/{window_file}.json", s.handleXatuCountriesWindow).Methods("GET")
 
-	// Recent validator blocks
-	router.HandleFunc("/beacon/local_blocks/{network}/latest", s.handleRecentValidatorBlocks).Methods("GET")
-
+	// Config file
 	router.HandleFunc("/config.json", s.handleFrontendConfig).Methods("GET")
 }
 
@@ -379,43 +360,6 @@ func (s *Service) handleFrontendConfig(w http.ResponseWriter, r *http.Request) {
 		s.log.WithError(err).Error("failed to write config response")
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 
-		return
-	}
-}
-
-// handleRecentValidatorBlocks handles requests for recent validator blocks
-func (s *Service) handleRecentValidatorBlocks(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	network := vars["network"]
-
-	ctx, cancel := context.WithTimeout(r.Context(), 15*time.Second)
-	defer cancel()
-
-	// Make the gRPC call to the BeaconSlots service
-	resp, err := s.beaconSlotsClient.GetRecentValidatorBlocks(ctx, &beaconslotspb.GetRecentValidatorBlocksRequest{
-		Network: network,
-	})
-	if err != nil {
-		s.log.WithError(err).Error("Failed to get recent validator blocks")
-		http.Error(w, "Failed to get recent validator blocks", http.StatusInternalServerError)
-		return
-	}
-
-	// Convert response to JSON
-	data, err := json.Marshal(resp)
-	if err != nil {
-		s.log.WithError(err).Error("Failed to marshal validator blocks response")
-		http.Error(w, "Internal server error", http.StatusInternalServerError)
-		return
-	}
-
-	// Set response headers
-	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Cache-Control", "max-age=10,s-maxage=10,public")
-
-	if _, err := w.Write(data); err != nil {
-		s.log.WithError(err).Error("Failed to write validator blocks response")
-		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}
 }

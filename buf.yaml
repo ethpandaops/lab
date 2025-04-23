@@ -2,6 +2,8 @@ version: v2
 modules:
   - path: .
     name: github.com/ethpandaops/lab
+    excludes:
+      - frontend/node_modules
 lint:
   use:
     - STANDARD

@@ -12,7 +12,7 @@ proto:
 	buf generate --template buf-api.gen.yaml . --path backend/pkg/api/proto
 
 	@echo "Generating TypeScript protobuf types..."
-	cd frontend/scripts && node generate-proto-types.js
+	cd frontend/scripts && ./generate-api.sh
 	cd ../..
 
 # Create a new proto file

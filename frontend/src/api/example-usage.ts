@@ -1,110 +1,65 @@
-import { labapi, beacon_slots } from './proto';
+import { createLabApiClient, LabApiClientType } from './client';
 
-// Option 2: Import only what you need (better for tree-shaking)
-import { GetRecentLocallyBuiltBlocksRequest, GetRecentLocallyBuiltBlocksResponse } from './proto/labapi';
-import { LocallyBuiltBlock, LocallyBuiltSlotBlocks } from './proto/beacon_slots';
+// Import specific message types if needed for constructing requests or detailed type checking
+// Note: The client methods often infer these types, but explicit imports can be useful.
+import { GetRecentLocallyBuiltBlocksRequest } from './gen/backend/pkg/api/proto/lab_api_pb';
 
 /**
- * Example function to demonstrate how to use the generated TypeScript types
- * 
- * This example creates a request object to get recent locally built blocks
- * and then decodes a hypothetical response.
+ * Example function to demonstrate how to use the generated API client.
+ *
+ * This example creates a client, makes a request to get recent locally built blocks,
+ * and logs the response.
  */
-export const exampleApiUsage = () => {
-  // Create a request message (using namespace import)
-  const request = labapi.GetRecentLocallyBuiltBlocksRequest.create({
+export const exampleApiUsage = async () => {
+  // 1. Create the API client instance
+  // Replace "http://localhost:8080" with your actual API server URL
+  const apiClient: LabApiClientType = createLabApiClient("http://localhost:8080");
+
+  // 2. Prepare the request data (plain JavaScript object matching the request message structure)
+  const requestData = new GetRecentLocallyBuiltBlocksRequest({
     network: 'mainnet',
+    // Add other request fields if the proto definition changes
   });
 
-  // Alternative: create request using direct import
-  const request2 = GetRecentLocallyBuiltBlocksRequest.create({
-    network: 'mainnet',
-  });
+  console.log('Making API call to getRecentLocallyBuiltBlocks...');
 
-  // Encode the request for sending to the server
-  const encodedRequest = labapi.GetRecentLocallyBuiltBlocksRequest.encode(request).finish();
-  
-  // This would be sent via fetch or another HTTP client
-  console.log('Encoded request:', encodedRequest);
-  
-  // Assuming we get a response back, decode it
-  // In a real application, this would come from the server response
-  // This is just an example of how to decode
-  const mockResponse = new Uint8Array(); // In a real app, this would be the binary response
   try {
-    const response = labapi.GetRecentLocallyBuiltBlocksResponse.decode(mockResponse);
-    
-    // Use the decoded response data
-    if (response.slotBlocks && response.slotBlocks.length > 0) {
-      // Access the slot blocks
+    // 3. Call the API method using the Connect client
+    const response = await apiClient.getRecentLocallyBuiltBlocks(requestData);
+
+    // 4. Process the response
+    console.log('API call successful!');
+
+    // Type guard to ensure response and slotBlocks exist
+    if (response.slotBlocks.length > 0) {
+      console.log(`Received ${response.slotBlocks.length} slot blocks.`);
+      
+      // Process the response data
       response.slotBlocks.forEach((slotBlock) => {
-        console.log(`Slot: ${slotBlock.slot}`);
-        
-        // Access blocks within the slot
-        if (slotBlock.blocks) {
+        console.log(`  Slot: ${slotBlock.slot}`);
+
+        if (slotBlock.blocks.length > 0) {
           slotBlock.blocks.forEach((block) => {
-            console.log(`Block Version: ${block.blockVersion}`);
-            console.log(`Block Total Bytes: ${block.blockTotalBytes}`);
-            
-            // Access metadata
+            // Access fields directly from the response object
+            console.log(`    Block Version: ${block.blockVersion}`);
+            console.log(`    Block Total Bytes: ${block.blockTotalBytes}`);
+
             if (block.metadata) {
-              console.log(`Client Name: ${block.metadata.metaClientName}`);
-              console.log(`Client Geo City: ${block.metadata.metaClientGeoCity}`);
+              console.log(`      Client Name: ${block.metadata.metaClientName}`);
+              console.log(`      Client Geo City: ${block.metadata.metaClientGeoCity}`);
             }
           });
         }
       });
+    } else {
+      console.log('No slot blocks received in the response.');
     }
-    
-    return response;
+
+    return response; // Return the response object
+
   } catch (error) {
-    console.error('Error decoding response:', error);
+    console.error('Error calling API:', error);
+    // Handle errors appropriately in a real application
     throw error;
   }
 };
-
-/**
- * Example of how to create a client interface for the LabAPI service
- */
-export class LabAPIClient {
-  private baseUrl: string;
-  
-  constructor(baseUrl: string) {
-    this.baseUrl = baseUrl;
-  }
-  
-  /**
-   * Get recent locally built blocks from the API
-   * @param network The network to get blocks for
-   * @returns Promise with the response
-   */
-  async getRecentLocallyBuiltBlocks(network: string): Promise<labapi.IGetRecentLocallyBuiltBlocksResponse> {
-    // Create the request message
-    const request = labapi.GetRecentLocallyBuiltBlocksRequest.create({ network });
-    
-    // In a real implementation, you would make an HTTP request to the API
-    // Here's a simplified example
-    try {
-      const response = await fetch(`${this.baseUrl}/v1/beacon/local_blocks/${network}/latest`, {
-        method: 'GET',
-        headers: {
-          'Accept': 'application/json',
-        },
-      });
-      
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-      
-      // Parse the response as JSON
-      const jsonData = await response.json();
-      
-      // Convert the JSON response to our generated type
-      // In a real gRPC implementation, you'd decode binary data instead
-      return labapi.GetRecentLocallyBuiltBlocksResponse.fromObject(jsonData);
-    } catch (error) {
-      console.error('Error fetching recent locally built blocks:', error);
-      throw error;
-    }
-  }
-} 

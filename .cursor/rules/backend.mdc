@@ -24,3 +24,49 @@ seperation of concerns, and be small and testable.
   - 'package/store/{store.go, config.go}' - GOOD
   - 'utils/' - DOGSHIT. NEVER do this.
   - 'types/' - DOGSHIT. NEVER do this.
+
+# Backend Development Rules
+
+## API Client Integration
+
+When working on the backend APIs that are consumed by the frontend:
+
+1. All API endpoints should be defined in Protocol Buffer files first
+2. Ensure backward compatibility when modifying existing endpoints
+3. New endpoints should follow the existing naming and structure patterns
+
+### Protocol Buffer Definitions
+
+The Protocol Buffer definitions define the contract between frontend and backend. All API requests and responses must follow these definitions:
+
+- Request objects should be named with the pattern `{MethodName}Request`
+- Response objects should be named with the pattern `{MethodName}Response`
+- Use appropriate field types and validation
+- Include documentation comments for all fields
+
+### Backend API Implementation
+
+When implementing backend API methods:
+
+1. Ensure proper validation of incoming requests
+2. Include appropriate error handling
+3. Return well-structured error messages to the frontend
+4. Log all API errors for debugging
+5. Implement proper authorization checks
+
+### API Endpoints
+
+The frontend LabAPI client connects to backend API endpoints that follow this pattern:
+
+- Base URL is determined by the frontend configuration
+- API methods follow RESTful conventions but are implemented using Connect RPC
+- All endpoints must be documented for frontend developers
+
+### Testing API Endpoints
+
+When developing new API endpoints:
+
+1. Create unit tests for each endpoint
+2. Test error cases and edge conditions
+3. Validate request/response formats match Protocol Buffer definitions
+4. Ensure serialization/deserialization works correctly
