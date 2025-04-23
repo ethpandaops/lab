@@ -6,8 +6,8 @@ package xatu_public_contributorsconnect
 
 import (
 	connect "connectrpc.com/connect"
-	xatu_public_contributors "github.com/ethpandaops/lab/backend/pkg/proto/xatu_public_contributors"
 	http "net/http"
+	xatu_public_contributors "pkg/proto/xatu_public_contributors"
 )
 
 // This is a compile-time assertion to ensure that this generated file and the connect package are
