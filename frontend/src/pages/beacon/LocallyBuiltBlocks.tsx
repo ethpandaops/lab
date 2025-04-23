@@ -1,26 +1,30 @@
 import { useState, useEffect, useCallback } from 'react'
 import { Card, CardBody } from '../../components/common/Card'
-import { NetworkSelector } from '../../components/common/NetworkSelector'
 import { NetworkContext } from '../../App'
 import { useContext } from 'react'
 import { getLabApiClient } from '../../api'
 import { GetRecentLocallyBuiltBlocksRequest } from '../../api/gen/backend/pkg/api/proto/lab_api_pb'
 import { LocallyBuiltSlotBlocks, LocallyBuiltBlock } from '../../api/gen/backend/pkg/server/proto/beacon_slots/beacon_slots_pb'
 import { LocallyBuiltBlocksDetail, LocallyBuiltBlocksVisualization } from '../../components/beacon/LocallyBuiltBlocks'
-import { ChevronLeft } from 'lucide-react'
+import { ChevronLeft, BarChart2, List } from 'lucide-react' // Added icons
+import { TabButton } from '../../components/common/TabButton' // Import TabButton
+import { LocallyBuiltBlocksTable } from '../../components/beacon/LocallyBuiltBlocks/LocallyBuiltBlocksTable' // Import Table
 
 // Refresh interval in milliseconds
 const REFRESH_INTERVAL = 5000
 // Maximum number of slots to keep in memory
 const MAX_SLOTS = 64
 
+type ViewMode = 'visualization' | 'table'
+
 export function LocallyBuiltBlocks(): JSX.Element {
-  const { selectedNetwork, setSelectedNetwork } = useContext(NetworkContext)
+  const { selectedNetwork } = useContext(NetworkContext)
   const [data, setData] = useState<LocallyBuiltSlotBlocks[]>([])
   const [isLoading, setIsLoading] = useState<boolean>(true)
   const [isError, setIsError] = useState<boolean>(false)
   const [selectedBlock, setSelectedBlock] = useState<LocallyBuiltBlock | null>(null)
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date())
+  const [viewMode, setViewMode] = useState<ViewMode>('visualization') // Add state for view mode
 
   // Function to fetch and merge data
   const fetchData = useCallback(async (isInitial = false) => {
@@ -127,14 +131,10 @@ export function LocallyBuiltBlocks(): JSX.Element {
             <h1 className="text-3xl md:text-4xl font-sans font-bold text-primary">
               Locally Built Blocks
             </h1>
-            <NetworkSelector 
-              selectedNetwork={selectedNetwork}
-              onNetworkChange={setSelectedNetwork}
-            />
           </div>
           <p className="text-base md:text-lg font-mono text-secondary max-w-3xl">
             This page shows blocks that were locally built by our sentry nodes. They are NOT canonical blocks, or even blocks that were broadcasted to the network.
-            This data is useful for understanding the performance of different client implementations. 
+            This data is useful for understanding if all clients are able to build blocks based on the contents of the mempool.
           </p>
         </CardBody>
       </Card>
@@ -153,24 +153,52 @@ export function LocallyBuiltBlocks(): JSX.Element {
           <LocallyBuiltBlocksDetail block={selectedBlock} />
         </div>
       ) : (
-        <>
-          {/* Block Stats and Last Updated */}
-          <div className="flex justify-between items-center">
-            <div className="text-tertiary text-sm font-mono">
-              Last updated: {formatLastUpdated()}
+        <Card>
+          <CardBody>
+            {/* Block Stats and Last Updated */}
+            <div className="flex justify-between items-center mb-4"> {/* Added mb-4 */}
+              <div className="text-tertiary text-sm font-mono">
+                Last updated: {formatLastUpdated()}
+              </div>
+              <div className="text-tertiary text-sm font-mono">
+                {data.length > 0 ? `${data.reduce((sum, slotBlocks) => sum + slotBlocks.blocks.length, 0)} blocks across ${data.length} slots` : 'No data'}
+              </div>
             </div>
-            <div className="text-tertiary text-sm font-mono">
-              {data.length > 0 ? `${data.reduce((sum, slotBlocks) => sum + slotBlocks.blocks.length, 0)} blocks across ${data.length} slots` : 'No data'}
-            </div>
-          </div>
 
-          {/* Visualization View */}
-          <LocallyBuiltBlocksVisualization 
-            data={data} 
-            isLoading={isLoading} 
-            isError={isError}
-          />
-        </>
+            {/* Tabs for View Mode */}
+            <div className="flex space-x-2 border-b border-subtle mb-6"> {/* Increased mb-6 */}
+              <TabButton
+                isActive={viewMode === 'visualization'}
+                onClick={() => setViewMode('visualization')}
+                label="Visualization"
+                icon={<BarChart2 className="w-4 h-4" />}
+              />
+              <TabButton
+                isActive={viewMode === 'table'}
+                onClick={() => setViewMode('table')}
+                label="Table"
+                icon={<List className="w-4 h-4" />}
+              />
+            </div>
+
+            {/* Conditional Rendering based on View Mode */}
+            {viewMode === 'visualization' && (
+              <LocallyBuiltBlocksVisualization
+                data={data}
+                isLoading={isLoading}
+                isError={isError}
+              />
+            )}
+            {viewMode === 'table' && (
+              <LocallyBuiltBlocksTable
+                data={data}
+                isLoading={isLoading}
+                isError={isError}
+                onSelectBlock={setSelectedBlock} // Pass handler to select block
+              />
+            )}
+          </CardBody>
+        </Card>
       )}
     </div>
   )

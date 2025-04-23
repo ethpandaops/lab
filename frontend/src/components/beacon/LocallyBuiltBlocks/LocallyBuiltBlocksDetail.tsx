@@ -3,7 +3,7 @@ import { Card, CardBody } from '../../common/Card'
 import { LocallyBuiltBlock } from '../../../api/gen/backend/pkg/server/proto/beacon_slots/beacon_slots_pb'
 import { Timestamp } from '@bufbuild/protobuf'
 import { formatBytes, formatEther } from '../../../utils/format'
-import { Package, Calendar, Users, Hash, Cpu, Server, Globe, Map, MapPin, FileText, ArrowDownToLine } from 'lucide-react'
+import { Package, Calendar, Users, Hash, Cpu, Server, Globe, Map, MapPin, FileText, ArrowDownToLine, Fuel, Gauge } from 'lucide-react' // Added Fuel, Gauge
 
 // Simple timestamp formatter as a replacement for ServerTimestamp
 const FormattedTimestamp: FC<{ timestamp?: Timestamp }> = ({ timestamp }) => {
@@ -108,6 +108,29 @@ export const LocallyBuiltBlocksDetail: FC<LocallyBuiltBlocksDetailProps> = ({ bl
                   <span className="text-tertiary ml-2">
                     ({formatBytes(block.executionPayloadTransactionsTotalBytes)})
                   </span>
+                </p>
+              </div>
+
+              <div>
+                <div className="flex items-center gap-2 mb-1">
+                  <Gauge className="w-4 h-4 text-accent/70" />
+                  <h5 className="text-sm font-mono text-tertiary">Gas Used / Limit</h5>
+                </div>
+                <p className="text-sm font-mono text-primary pl-6">
+                  {block.executionPayloadGasUsed.toString()} / {block.executionPayloadGasLimit.toString()}
+                  <span className="text-tertiary ml-2">
+                    ({((Number(block.executionPayloadGasUsed) / Number(block.executionPayloadGasLimit || 1)) * 100).toFixed(2)}%)
+                  </span>
+                </p>
+              </div>
+
+              <div>
+                <div className="flex items-center gap-2 mb-1">
+                  <Fuel className="w-4 h-4 text-accent/70" />
+                  <h5 className="text-sm font-mono text-tertiary">Exec Block Number</h5>
+                </div>
+                <p className="text-sm font-mono text-primary pl-6">
+                  {block.executionPayloadBlockNumber}
                 </p>
               </div>
             </div>
