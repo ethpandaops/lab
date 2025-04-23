@@ -1,0 +1,15 @@
+---
+description: 
+globs: **internal**
+alwaysApply: false
+---
+Internal lab packages have clear seperation of concerns, and are meant to be reusable within multiple parts of the lab stack. They have clearly defined lifecycles, and focus on the user experience of the consumer. 
+
+# Structure
+Each package MUST:
+- Export an interface publicly. Don't stutter on the package name. For example, `cache.Client` is good.  
+- Provide a `New` function that accepts a minimal set of parameters and provides an implementation of the public interface. `New` MUST NOT start any processing, but can validate the parameters and return an error if needed.
+- Provide a `Start(ctx context.Context) error` function that starts the lifecycle of the component.
+- Provide a clean interface for consumers to use. Don't export functions that the user isn't going to use or that they don't care about.
+- Provide a `Stop() error` function that stops all processing.
+- Implement tests that live in `$package_test.go` that covers the core functionality of the package. 

@@ -1,6 +1,6 @@
 module github.com/ethpandaops/lab/backend
 
-go 1.24.1
+go 1.24.2
 
 require (
 	github.com/attestantio/go-eth2-client v0.25.0
