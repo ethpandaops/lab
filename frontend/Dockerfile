@@ -12,11 +12,13 @@ COPY package.json pnpm-lock.json* ./
 # Install dependencies using pnpm
 RUN pnpm install
 
-# Copy source code
+# Copy source code (excluding node_modules)
 COPY . .
+# Ensure node_modules are preserved from install step
+RUN rm -rf node_modules && pnpm install
 
-# Build for production
-RUN pnpm build
+# Build for production - Skip prebuild scripts
+RUN SKIP_PREBUILD=true pnpm vite build
 
 # Serve stage
 FROM nginx:alpine

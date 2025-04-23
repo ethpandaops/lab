@@ -22,7 +22,7 @@
     "lint": "run-p run-tsc run-eslint run-stylelint",
     "validate": "run-p lint test:ci test:e2e:headless",
     "generate-api": "scripts/generate-api.sh",
-    "prebuild": "pnpm generate-api"
+    "prebuild": "[ \"$SKIP_PREBUILD\" != \"true\" ] && pnpm generate-api || echo \"Skipping prebuild\""
   },
   "dependencies": {
     "@headlessui/react": "^2.2.0",
@@ -32,6 +32,7 @@
     "@types/geojson": "^7946.0.16",
     "@types/react-simple-maps": "^3.0.6",
     "@types/topojson-client": "^3.1.5",
+    "clsx": "^2.0.0",
     "d3": "^7.9.0",
     "date-fns": "^4.1.0",
     "framer-motion": "^12.4.7",
