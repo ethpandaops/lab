@@ -3,17 +3,20 @@ FROM node:20-alpine as builder
 
 WORKDIR /app
 
-# Copy package files
-COPY package.json package-lock.json ./
+# Install pnpm globally
+RUN npm install -g pnpm
 
-# Install dependencies
-RUN npm ci
+# Copy package files
+COPY package.json pnpm-lock.json* ./
+
+# Install dependencies using pnpm
+RUN pnpm install
 
 # Copy source code
 COPY . .
 
 # Build for production
-RUN npm run build
+RUN pnpm build
 
 # Serve stage
 FROM nginx:alpine
