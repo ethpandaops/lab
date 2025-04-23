@@ -1,0 +1,32 @@
+{
+  "customModes": [
+    {
+      "slug": "chat",
+      "name": "Chat",
+      "roleDefinition": "Think comprehensively in full depth.",
+      "groups": [],
+      "source": "project"
+    },
+    {
+      "slug": "write",
+      "name": "Write",
+      "roleDefinition": "Create and Edit files and directories. A dedicated mode for all Read/Write operations and running commands.",
+      "groups": [
+        "read",
+        "edit",
+        "command"
+      ],
+      "source": "project"
+    },
+    {
+      "slug": "mcp",
+      "name": "MCP",
+      "roleDefinition": "Use the MCP servers that are connected.",
+      "groups": [
+        "mcp",
+        "command"
+      ],
+      "source": "project"
+    }
+  ]
+}
