@@ -50,7 +50,6 @@ function Layout(): JSX.Element {
   return (
     <div className="relative min-h-screen text-primary font-mono bg-gradient-to-b from-[rgb(var(--bg-base))] via-[rgb(var(--bg-base))] to-[rgb(var(--bg-base))]">
       {/* Integrated Background Effects */}
-      <div className="absolute inset-0 bg-grid bg-cyber opacity-[0.05] animate-pulse-slow pointer-events-none" />
       <div className="absolute inset-0 bg-gradient-to-b from-accent/5 via-transparent to-transparent pointer-events-none" />
       <div className="absolute inset-0 bg-gradient-to-t from-error/5 via-transparent to-transparent pointer-events-none" />
       

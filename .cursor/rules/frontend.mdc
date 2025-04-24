@@ -207,7 +207,6 @@ alwaysApply: false
 4. Use opacity variants for creating depth
 5. Apply consistent blur effects for layering
 6. Maintain text hierarchy using semantic classes
-7. Keep backgrounds in the root layout for consistency
 8. Use proper mobile navigation patterns with overlays
 9. Ensure smooth transitions between states
 10. Use semantic HTML elements

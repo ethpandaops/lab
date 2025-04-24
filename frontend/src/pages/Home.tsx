@@ -6,18 +6,20 @@ import { Card, CardBody } from '../components/common/Card'
 const featuredExperiments = [
   {
     id: 'xatu',
-    title: 'Xatu',
-    subtitle: 'Node monitoring',
+    title: 'Locally Built Blocks',
+    subtitle: 'Xatu',
+    description: 'Analyze throw-away blocks built by our clients.',
     logo: '/xatu.png',
-    href: '/xatu',
+    href: '/beacon/locally-built-blocks',
     color: 'from-primary/20 via-accent/20 to-error/20',
   },
   {
     id: 'beacon-chain',
-    title: 'Beacon Chain',
-    subtitle: 'Consensus layer',
+    title: 'Slot Explorer',
+    subtitle: 'Beacon Chain',
+    description: 'Explore detailed information about consensus layer slots.',
     logo: '/ethereum.png',
-    href: '/beacon',
+    href: '/beacon/slot/',
     color: 'from-accent/20 via-accent-secondary/20 to-error/20',
   }
 ];
@@ -42,7 +44,7 @@ function Home(): JSX.Element {
                 <div className="w-full h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent"></div>
               </div>
               <div className="relative px-4">
-                <h1 className="text-5xl md:text-6xl lg:text-7xl font-sans font-black text-primary bg-clip-text text-transparent bg-gradient-to-r from-accent via-primary to-error animate-pulse-slow">
+                <h1 className="text-5xl md:text-6xl lg:text-7xl font-sans font-black text-gray-900 dark:text-primary">
                   The Lab
                 </h1>
               </div>
@@ -109,8 +111,11 @@ function Home(): JSX.Element {
                           <h3 className="text-lg font-sans font-bold text-primary group-hover:text-accent transition-colors">
                             {experiment.title}
                           </h3>
-                          <p className="text-xs font-mono text-tertiary truncate">
+                          <p className="text-xs font-mono text-tertiary truncate mb-1">
                             {experiment.subtitle}
+                          </p>
+                          <p className="text-xs font-mono text-muted truncate">
+                            {experiment.description}
                           </p>
                         </div>
                         
