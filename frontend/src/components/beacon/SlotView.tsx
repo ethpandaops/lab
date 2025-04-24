@@ -381,7 +381,7 @@ export function SlotView({ slot, network = 'mainnet', isLive = false, onSlotComp
   return (
     <div className="w-full flex flex-col">
       {/* Main Content */}
-      <div className="h-[calc(100vh-theme(spacing.16))] md:h-[calc(85vh-theme(spacing.36))] flex flex-col md:flex-row">
+      <div className="h-[calc(100vh-theme(spacing.16))] md:h-[calc(75vh-86px)] flex flex-col md:flex-row">
         {/* Mobile Layout */}
         <div className="md:hidden flex flex-col h-full">
           {/* Map Section - Reduced height on mobile */}
@@ -439,8 +439,6 @@ export function SlotView({ slot, network = 'mainnet', isLive = false, onSlotComp
                               block_first_seen_p2p: slotData?.timings?.block_first_seen_p2p
                             }}
                             currentTime={currentTime}
-                            loading={isLoading}
-                            isMissing={isMissingData}
                             nodes={slotData?.nodes}
                           />
                           <BottomPanel
@@ -1014,7 +1012,7 @@ export function SlotView({ slot, network = 'mainnet', isLive = false, onSlotComp
       </div>
 
       {/* Bottom Section - Desktop Only */}
-      <div className="hidden md:flex flex-col h-[calc(15vh-theme(spacing.32))]">
+      <div className="hidden md:flex flex-col h-[calc(25vh)]">
         <div className="h-full bg-surface/90 backdrop-blur-md border-t border-subtle">
           <div className="h-full w-full grid grid-cols-3">
             {/* Data Availability Section */}
@@ -1027,8 +1025,6 @@ export function SlotView({ slot, network = 'mainnet', isLive = false, onSlotComp
                   block_first_seen_p2p: slotData?.timings?.block_first_seen_p2p
                 }}
                 currentTime={currentTime}
-                loading={isLoading}
-                isMissing={isMissingData}
                 nodes={slotData?.nodes}
               />
             </div>
