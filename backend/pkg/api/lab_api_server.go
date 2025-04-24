@@ -15,6 +15,7 @@ import (
 // StandardHTTPHeaders defines common HTTP headers that can be set on responses
 var StandardHTTPHeaders = map[string]string{
 	"Cache-Control":          "max-age=30, s-maxage=30, public",
+	"Cache-Control-Tiny":     "max-age=1, s-maxage=1, public",
 	"Cache-Control-Short":    "max-age=10, s-maxage=10, public",
 	"Cache-Control-Medium":   "max-age=60, s-maxage=60, public",
 	"Cache-Control-Long":     "max-age=300, s-maxage=300, public",
@@ -49,9 +50,6 @@ func (s *LabAPIServerImpl) GetRecentLocallyBuiltBlocks(ctx context.Context, req 
 		return nil, err // Return error directly
 	}
 
-	// TODO: Implement header setting using Connect interceptors if needed
-	// Headers can be set on the response: res.Header().Set("Cache-Control", "...")
-
 	// Convert the response to the API response format and wrap in connect.Response
 	apiResponse := &apipb.GetRecentLocallyBuiltBlocksResponse{
 		SlotBlocks: resp.SlotBlocks,
@@ -59,9 +57,7 @@ func (s *LabAPIServerImpl) GetRecentLocallyBuiltBlocks(ctx context.Context, req 
 	res := connect.NewResponse(apiResponse)
 
 	// Example of setting a header
-	res.Header().Set("Cache-Control", StandardHTTPHeaders["Cache-Control-Short"])
+	res.Header().Set("Cache-Control", StandardHTTPHeaders["Cache-Control-Tiny"])
 
 	return res, nil
 }
-
-// Removed RegisterHTTPHeadersMiddleware as it was specific to gRPC-Gateway
