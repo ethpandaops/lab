@@ -6,7 +6,7 @@ import { useContext, useEffect, useState } from 'react'
 import { NetworkContext } from '../../App'
 import { Logo } from './Logo'
 import { BeaconClockManager } from '../../utils/beacon'
-import { Menu, X } from 'lucide-react'
+import { Menu } from 'lucide-react'
 import { NETWORK_METADATA, type NetworkKey } from '../../constants/networks'
 import clsx from 'clsx'
 
@@ -198,8 +198,6 @@ function Layout(): JSX.Element {
                 : [
                     'backdrop-blur-sm',
                     'bg-gradient-page',
-                    'ring-1 ring-inset ring-white/5',
-                    'container mx-auto max-w-7xl',
                     'p-4 md:p-6 lg:p-8'
                   ]
             )}>

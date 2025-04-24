@@ -1,73 +1,42 @@
 import { Link } from 'react-router-dom'
 import { ArrowRight } from 'lucide-react'
-import { Card, CardBody } from '../components/common/Card'
 
 function Home(): JSX.Element {
   return (
-    <div className="min-h-[calc(100vh-56px)] w-full flex items-center justify-center py-12">
-      {/* Content */}
-      <div className="relative flex flex-col items-center justify-center space-y-32">
-        {/* Hero Content */}
-        <div className="relative text-center space-y-12">
-          <h1 className="text-6xl md:text-7xl lg:text-8xl title-gradient mb-6 font-bold">
-            <span className="relative">
-              <span className="relative">The Lab</span>
-              <div className="absolute -inset-1 bg-accent/10 blur-2xl rounded-full" />
-            </span>
-          </h1>
-          <p className="text-l md:text-3xl font-mono text-primary/90 italic">
-            Let the pandas cook{' '}
-          </p>
-          
-          {/* CTA Button */}
-          <Link 
-            to="/experiments" 
-            className="btn btn-primary btn-lg group inline-flex items-center gap-3 px-8 py-4 text-lg hover:scale-105 transition-all duration-300"
-          >
-            <span className="relative text-2xl">Enter</span>
-            <ArrowRight className="w-7 h-7 group-hover:translate-x-2 transition-all duration-300" />
-          </Link>
+    // Outer container to fill viewport height below header and center content
+    <div className="min-h-[calc(100vh-56px)] w-full flex items-center justify-center py-12 px-4">
+      {/* Centered content container with vertical spacing */}
+      <div className="relative flex flex-col items-center justify-center text-center space-y-12 md:space-y-16 lg:space-y-20">
+        {/* Hero Title */}
+        <div className="relative">
+          {/* Subtle horizontal line effect */}
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="w-3/4 h-px bg-gradient-to-r from-transparent via-primary/10 to-transparent" />
+          </div>
+          {/* Title text positioned above the line */}
+          <div className="relative px-4 bg-base">
+            <h1 className="text-5xl md:text-6xl lg:text-7xl font-sans font-black text-primary animate-text-shine">
+              The Lab
+            </h1>
+          </div>
         </div>
 
-        {/* Showcase */}
-        <div className="relative w-full max-w-2xl">
-          <div className="relative flex justify-center mb-6">
-            <div className="px-6 py-2 bg-nav/80 backdrop-blur-sm border border-subtle rounded-full">
-              <h2 className="text-xl font-sans font-bold text-tertiary">Featured Experiment</h2>
-            </div>
-          </div>
-          <div className="relative px-4">
-            <Card isInteractive className="w-full">
-              <Link 
-                to="/beacon/slot/live" 
-                className="block w-full"
-              >
-                <CardBody className="flex items-center gap-6">
-                  <div className="relative w-16 h-16 shrink-0">
-                    <img 
-                      src="/ethereum.png" 
-                      alt="" 
-                      className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-300"
-                    />
-                    <div className="absolute inset-0 bg-accent/10 blur-xl rounded-full group-hover:bg-accent/20 transition-colors" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h3 className="text-xl font-sans font-bold text-accent group-hover:text-accent transition-colors mb-2">
-                      Live Slot Visualizer
-                    </h3>
-                    <p className="text-sm font-mono text-secondary group-hover:text-primary/80 transition-colors">
-                      Watch Ethereum slots in real-time with detailed metrics and visualizations
-                    </p>
-                  </div>
-                  <ArrowRight className="w-6 h-6 text-accent/50 group-hover:text-accent group-hover:translate-x-2 transition-all duration-300" />
-                </CardBody>
-              </Link>
-            </Card>
-          </div>
-        </div>
+        {/* Description */}
+        <p className="text-lg md:text-xl font-mono text-secondary max-w-md">
+          Let the pandas cook
+        </p>
+
+        {/* Enter Link/Button */}
+        <Link
+          to="/experiments"
+          className="group inline-flex items-center justify-center px-8 py-3 bg-accent hover:bg-accent-hover text-accent-foreground font-bold rounded-lg transition-colors duration-300 text-lg shadow-lg hover:shadow-accent/30 transform hover:-translate-y-1"
+        >
+          Enter
+          <ArrowRight className="ml-2 h-5 w-5 transition-transform duration-300 group-hover:translate-x-1" />
+        </Link>
       </div>
     </div>
   );
 }
 
-export default Home; 
+export default Home;
