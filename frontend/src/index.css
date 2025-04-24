@@ -303,51 +303,37 @@
 		border: none !important;
 	}
 
-	/* Cyberpunk grid background */
-	body::before {
-		content: '';
-		position: fixed;
-		inset: 0;
-		background: linear-gradient(rgb(0 242 255 / 3%) 1px, transparent 1px),
+	/* Grid background */
+	.bg-grid {
+		background-image: linear-gradient(rgb(0 242 255 / 3%) 1px, transparent 1px),
 			linear-gradient(90deg, rgb(0 242 255 / 3%) 1px, transparent 1px),
 			linear-gradient(rgb(0 242 255 / 5%) 2px, transparent 2px),
-			linear-gradient(90deg, rgb(0 242 255 / 5%) 2px, transparent 2px),
+			linear-gradient(90deg, rgb(0 242 255 / 5%) 2px, transparent 2px);
+		background-size:
+			30px 30px,
+			30px 30px,
+			150px 150px,
+			150px 150px;
+		background-position: center center;
+	}
+
+	/* Cyber effect */
+	.bg-cyber {
+		background-image:
 			radial-gradient(circle at 20% 30%, rgb(0 255 159 / 5%) 0%, transparent 50%),
 			radial-gradient(circle at 80% 70%, rgb(0 242 255 / 5%) 0%, transparent 50%),
 			radial-gradient(circle at 50% 50%, rgb(255 0 102 / 5%) 0%, transparent 70%);
-		background-size: 
-			30px 30px,
-			30px 30px,
-			150px 150px,
-			150px 150px,
-			100% 100%,
-			100% 100%,
-			100% 100%;
-		background-position: center center;
-		mask-image: radial-gradient(ellipse at center, rgb(0 0 0 / 80%) 0%, rgb(0 0 0 / 10%) 100%);
-		pointer-events: none;
-		z-index: -1;
-		opacity: 0.5;
-		animation: pulse 4s ease-in-out infinite;
 	}
 
-	/* Enhanced noise texture */
-	body::after {
-		content: '';
-		position: fixed;
-		inset: 0;
+	/* Noise texture */
+	.bg-noise {
 		background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%' height='100%' filter='url(%23noise)'/%3E%3C/svg%3E");
 		opacity: 0.02;
-		pointer-events: none;
-		z-index: -1;
 		mix-blend-mode: overlay;
 	}
 
 	/* Scanline effect */
-	body::after {
-		content: '';
-		position: fixed;
-		inset: 0;
+	.bg-scanlines {
 		background: linear-gradient(
 			to bottom,
 			transparent 50%,
@@ -355,8 +341,6 @@
 			transparent 52%
 		);
 		background-size: 100% 4px;
-		pointer-events: none;
-		z-index: 2;
 		opacity: 0.2;
 	}
 }
@@ -381,6 +365,16 @@
 	}
 }
 
+@keyframes shine {
+	0% {
+		background-position: 0% center;
+	}
+	
+	100% {
+		background-position: 200% center;
+	}
+}
+
 @keyframes highlight {
 	0% { background-color: rgb(var(--accent) / 20%); }
 	100% { background-color: transparent; }
@@ -402,5 +396,32 @@
 
 	.bg-gradient-page {
 		background-image: linear-gradient(to bottom, rgb(var(--bg-base) / 95%), rgb(var(--bg-base) / 85%));
+	}
+
+	/* Text gradient animation */
+	.animate-text-shine {
+		background: linear-gradient(
+			to right,
+			rgb(var(--text-primary)) 20%,
+			rgb(var(--accent)) 30%,
+			rgb(var(--accent)) 70%,
+			rgb(var(--text-primary)) 80%
+		);
+		background-size: 200% auto;
+		background-clip: text;
+		text-fill-color: transparent;
+		-webkit-background-clip: text;
+		-webkit-text-fill-color: transparent;
+		animation: shine 8s linear infinite;
+	}
+
+	/* Slow pulse animation */
+	.animate-pulse-slow {
+		animation: pulse 4s ease-in-out infinite;
+	}
+
+	/* Delay for animations */
+	.delay-1000 {
+		animation-delay: 1s;
 	}
 }
