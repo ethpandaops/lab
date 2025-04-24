@@ -184,3 +184,88 @@ alwaysApply: false
 10. Use semantic HTML elements
 11. Ensure interactive elements have proper focus states
 12. Maintain WCAG 2.1 compliant contrast ratios
+
+# Frontend UI System Rules
+
+## API Client Usage in Components
+
+When using the LabAPI client in components:
+
+1. Use the singleton pattern - import from the API module:
+   ```typescript
+   import { getLabApiClient } from '../api';
+   ```
+
+2. Call API methods inside React hooks or event handlers:
+   ```typescript
+   // In a useEffect or similar hook:
+   useEffect(() => {
+     const fetchData = async () => {
+       const client = await getLabApiClient();
+       const request = new SomeRequest({ param: "value" });
+       const response = await client.someMethod(request);
+       // Process response...
+     };
+     
+     fetchData().catch(console.error);
+   }, []);
+   ```
+
+3. Handle loading and error states:
+   ```typescript
+   const [data, setData] = useState(null);
+   const [loading, setLoading] = useState(true);
+   const [error, setError] = useState(null);
+   
+   useEffect(() => {
+     const fetchData = async () => {
+       try {
+         setLoading(true);
+         const client = await getLabApiClient();
+         const response = await client.someMethod(request);
+         setData(response);
+       } catch (err) {
+         setError(err);
+         console.error('API error:', err);
+       } finally {
+         setLoading(false);
+       }
+     };
+     
+     fetchData();
+   }, []);
+   ```
+
+4. Use custom hooks for repeated API calls:
+   ```typescript
+   function useLabApiMethod(methodFn, requestData, dependencies = []) {
+     const [data, setData] = useState(null);
+     const [loading, setLoading] = useState(true);
+     const [error, setError] = useState(null);
+     
+     useEffect(() => {
+       const callApi = async () => {
+         try {
+           setLoading(true);
+           const client = await getLabApiClient();
+           const response = await methodFn(client, requestData);
+           setData(response);
+         } catch (err) {
+           setError(err);
+         } finally {
+           setLoading(false);
+         }
+       };
+       
+       callApi();
+     }, dependencies);
+     
+     return { data, loading, error };
+   }
+   ```
+
+## UI Component Guidelines
+
+5. Follow existing design patterns for data display and user interaction.
+6. Maintain consistent loading and error states across components.
+7. Use TypeScript for all new components and API interactions.

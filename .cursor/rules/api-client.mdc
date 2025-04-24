@@ -1,0 +1,52 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# LabAPI Client Usage Guide
+
+## Singleton Pattern
+
+The frontend uses a singleton pattern for the LabAPI client to ensure efficient resource usage. Always use the singleton client rather than creating new instances.
+
+### Getting the LabAPI Client
+Import the singleton client from the API module:
+```typescript
+import { getLabApiClient } from '../api';
+
+// Later in your code:
+const apiClient = await getLabApiClient();
+```
+
+The client is created once and reused across the application, ensuring proper connection management.
+
+### API Client Location
+The main LabAPI client files are:
+- [frontend/src/api/client.ts](mdc:frontend/src/api/client.ts) - Base client factory
+- [frontend/src/api/singleton.ts](mdc:frontend/src/api/singleton.ts) - Singleton implementation
+- [frontend/src/api/index.ts](mdc:frontend/src/api/index.ts) - Central export file
+- [frontend/src/api/example-usage-singleton.ts](mdc:frontend/src/api/example-usage-singleton.ts) - Usage example
+
+### Making API Calls
+To make API calls, first retrieve the client using `getLabApiClient()`, then call the appropriate method:
+
+```typescript
+// Create a request object using generated proto types
+const request = new SomeRequestType({
+  // Set request parameters
+  someField: "value"
+});
+
+// Call the API method
+const response = await apiClient.someMethod(request);
+```
+
+### Configuration
+The API client automatically retrieves the backend URL from the application config system in [frontend/src/config.ts](mdc:frontend/src/config.ts).
+
+### Generated Types
+All request and response types are generated from Protocol Buffers and exported from the API module. Always use the generated types for type safety:
+
+```typescript
+import { SomeRequestType, SomeResponseType } from '../api';
+```

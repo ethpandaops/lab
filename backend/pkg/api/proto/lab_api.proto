@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package labapi;
+
+option go_package = "github.com/ethpandaops/lab/backend/pkg/api/proto";
+
+import "backend/pkg/server/proto/beacon_slots/beacon_slots.proto";
+
+service LabAPI {
+  rpc GetRecentLocallyBuiltBlocks(GetRecentLocallyBuiltBlocksRequest) returns (GetRecentLocallyBuiltBlocksResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+}
+
+message GetRecentLocallyBuiltBlocksRequest {
+  string network = 1;
+}
+
+message GetRecentLocallyBuiltBlocksResponse {
+  repeated beacon_slots.LocallyBuiltSlotBlocks slot_blocks = 1;
+}

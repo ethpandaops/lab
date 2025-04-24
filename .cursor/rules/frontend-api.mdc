@@ -1,0 +1,16 @@
+---
+description: 
+globs: **frontend**
+alwaysApply: false
+---
+The frontend interacts with a GRPC gateway. The GRPC gateway is defined here:
+`./backend/pkg/api/proto/proto.yaml`
+
+Typescript types are automatically generated -- you will never need to create them yourself. They are generated in to:
+`./frontend/src/api/proto/`.
+
+The API interface is defined in here:
+`./frontend/src/api/proto/labapi/`. Inspect these files, and work your way backwards to find the raw types if needed.
+
+An example using these types can be found here:
+`./frontend/src/api/example-usage.ts`

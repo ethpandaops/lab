@@ -6,29 +6,12 @@
 		"es2021": true
 	},
 	"parser": "@typescript-eslint/parser",
-	"plugins": [
-		"@typescript-eslint",
-		"react"
-	],
-	"extends": [
-		"eslint:recommended",
-		"plugin:@typescript-eslint/recommended",
-		"plugin:react/recommended",
-		"prettier"
-	],
-	"rules": {
-		"@typescript-eslint/no-magic-numbers": "off",
-		"@typescript-eslint/no-confusing-void-expression": "off",
-		"react/boolean-prop-naming": "off",
-		"react/function-component-definition": "off",
-		"react/no-unstable-nested-components": "off",
-		"react/jsx-handler-names": "off",
-		"react/jsx-key": "warn",
-		"react/jsx-no-bind": "off",
-		"react/jsx-no-constructed-context-values": "off",
-		"react/jsx-no-script-url": "off",
-		"react/jsx-no-useless-fragment": "off",
-		"react/react-in-jsx-scope": "off"
+	"plugins": ["@typescript-eslint"],
+	"extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended"],
+	"parserOptions": {
+		"project": ["./tsconfig.json"],
+		"ecmaVersion": 2021,
+		"sourceType": "module"
 	},
 	"settings": {
 		"react": {

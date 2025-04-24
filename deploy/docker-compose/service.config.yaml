@@ -1,0 +1,96 @@
+# Server (SRV) service configuration
+logLevel: "debug"
+
+# GRPC server configuration
+grpc:
+  host: "0.0.0.0"
+  port: 6666
+
+# S3 storage configuration
+storage:
+  endpoint: "${S3_ENDPOINT}"
+  region: "${S3_REGION}"
+  bucket: "${S3_BUCKET}"
+  accessKey: "${S3_ACCESS_KEY}"
+  secretKey: "${S3_SECRET_KEY}"
+  secure: false
+  usePathStyle: true
+
+# Ethereum configuration
+ethereum:
+  networks:
+    mainnet:
+      name: "mainnet"
+      configURL: ""
+      genesis: "2020-12-01T12:00:23Z"
+      xatu:
+        dsn: "${XATU_CLICKHOUSE_URL}"
+        protocol: "native"
+
+# Cache configuration
+cache:
+  type: "redis"
+  config:
+    url: "${REDIS_URL}"
+    defaultTTL: 60
+
+geolocation:
+  enabled: ${GEOLOCATION_ENABLED}
+  databaseLocation: "${GEOLOCATION_DATABASE_LOCATION}"
+
+# Modules configuration
+modules:
+  beacon_slots:
+    beacon_slots:
+      enabled: true
+      backfill:
+        enabled: true
+        slots: 1000
+      head_delay_slots: 2
+      locally_built_blocks:
+        enabled: true
+        slots: 16
+  beacon_chain_timings:
+    beacon_chain_timings:
+      enabled: false
+      networks: ["mainnet"]
+      interval: "1m"
+      time_windows:
+        - file: "last_1_hour.json"
+          step: "5m"
+          label: "Last hour"
+          range: "-1h"
+        - file: "last_1_day.json"
+          step: "30m"
+          label: "Last 24 hours"
+          range: "-24h"
+        - file: "last_7_days.json"
+          step: "6h"
+          label: "Last 7 days"
+          range: "-168h"
+        - file: "last_30_days.json"
+          step: "24h"
+          label: "Last 30 days"
+          range: "-720h"
+  xatu_public_contributors:
+    xatu_public_contributors:
+      enabled: true
+      networks: ["mainnet"]
+      redis_key_prefix: "lab_xatu_public_contributors"
+      interval: "2m"
+      time_windows:
+        - name: "1d"
+          duration: "24h"
+          file: "last_1_day.json"
+          step: "1h"
+          range: "-24h"
+        - name: "7d"
+          duration: "168h"
+          file: "last_7_days.json"
+          step: "1h"
+          range: "-168h"
+        - name: "30d"
+          duration: "720h"
+          file: "last_30_days.json"
+          step: "1h"
+          range: "-720h" 

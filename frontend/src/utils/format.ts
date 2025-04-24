@@ -1,3 +1,5 @@
+import { protoInt64 } from '@bufbuild/protobuf'
+
 export function formatEntityName(name: string): { name: string; type?: string } {
   if (!name) return { name: 'Unknown' };
 
@@ -79,4 +81,88 @@ export function formatNodeName(fullName: string): { user: string; node: string }
     user: parts[1],
     node: nodeName
   }
+}
+
+/**
+ * Format a number of wei to ether
+ */
+export function formatEther(value: any): string {
+  if (!value) return '0 ETH'
+  
+  let wei: bigint;
+  
+  // Handle various types that could be passed
+  if (typeof value === 'bigint') {
+    wei = value;
+  } else if (typeof value === 'number') {
+    wei = BigInt(value);
+  } else if (typeof value === 'string') {
+    wei = BigInt(value);
+  } else {
+    // Handle proto int64
+    try {
+      const numStr = value.toString();
+      wei = BigInt(numStr);
+    } catch (e) {
+      return '0 ETH';
+    }
+  }
+  
+  const ether = Number(wei) / 1e18
+  
+  if (ether < 0.000001) {
+    return '< 0.000001 ETH'
+  }
+  
+  return `${ether.toFixed(6)} ETH`
+}
+
+/**
+ * Format bytes to human readable format
+ */
+export function formatBytes(bytes: number | undefined): string {
+  if (bytes === undefined || bytes === 0) return '0 B'
+  
+  const k = 1024
+  const sizes = ['B', 'KB', 'MB', 'GB', 'TB']
+  
+  const i = Math.floor(Math.log(bytes) / Math.log(k))
+  
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
+}
+
+/**
+ * Format gas to ether equivalent
+ */
+export function formatGasToEther(gas: number, gasPrice: number): string {
+  if (gas === 0 || gasPrice === 0) return '0 ETH'
+  
+  const wei = BigInt(gas) * BigInt(gasPrice)
+  const ether = Number(wei) / 1e18
+  
+  return `${ether.toFixed(6)} ETH`
+}
+
+/**
+ * Format a timestamp to a human readable string
+ */
+export function formatTimestamp(timestamp: number): string {
+  return new Date(timestamp).toLocaleString()
+}
+
+/**
+ * Format a duration in milliseconds to a human readable string
+ */
+export function formatDuration(ms: number): string {
+  if (ms < 1000) {
+    return `${ms}ms`
+  }
+  
+  const seconds = ms / 1000
+  if (seconds < 60) {
+    return `${seconds.toFixed(2)}s`
+  }
+  
+  const minutes = seconds / 60
+  return `${minutes.toFixed(2)}min`
 } 

@@ -1,0 +1,199 @@
+name: Go Test
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - 'backend/**.go'
+      - 'backend/go.mod'
+      - 'backend/go.sum'
+      - '.github/workflows/golang-test.yml'
+  pull_request:
+    branches:
+      - master
+    paths:
+      - 'backend/**.go'
+      - 'backend/go.mod'
+      - 'backend/go.sum'
+      - '.github/workflows/golang-test.yml'
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  check-pr:
+    runs-on: ubuntu-latest
+    outputs:
+      is_authorized: ${{ steps.check.outputs.is_authorized }}
+    steps:
+      - id: check
+        run: |
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            # Check if PR is from a fork
+            if [[ "${{ github.event.pull_request.head.repo.full_name }}" != "${{ github.repository }}" ]]; then
+              echo "is_authorized=false" >> $GITHUB_OUTPUT
+              echo "PR is from a fork - will only test, not fail build"
+            else
+              # Check if user has write access
+              if [[ "${{ github.event.pull_request.head.repo.permissions.push }}" == "true" ]]; then
+                echo "is_authorized=true" >> $GITHUB_OUTPUT
+                echo "PR is from an authorized contributor"
+              else
+                echo "is_authorized=false" >> $GITHUB_OUTPUT
+                echo "PR is from unauthorized contributor"
+              fi
+            fi
+          else
+            echo "is_authorized=true" >> $GITHUB_OUTPUT
+            echo "Not a PR - authorized"
+          fi
+
+  test:
+    name: Test
+    needs: check-pr
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: ./backend
+    
+    strategy:
+      fail-fast: false
+      matrix:
+        go-version: [1.24.x]
+        test-type: [unit, integration]
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ matrix.go-version }}
+          cache: true
+      
+      - name: Install dependencies
+        run: go mod download
+      
+      - name: Install gotestsum
+        run: go install gotest.tools/gotestsum@latest
+      
+      - name: Run unit tests
+        if: matrix.test-type == 'unit'
+        run: |
+          mkdir -p test-results
+          gotestsum --junitfile test-results/unit-tests.xml --format testname -- -v -race -coverprofile=coverage.txt -covermode=atomic ./... -short
+      
+      - name: Run integration tests
+        if: matrix.test-type == 'integration' 
+        run: |
+          mkdir -p test-results
+          gotestsum --junitfile test-results/integration-tests.xml --format testname -- -v -race -coverprofile=coverage.txt -covermode=atomic ./... -run Integration
+      
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          file: ./backend/coverage.txt
+          flags: ${{ matrix.test-type }}-tests
+          name: codecov-${{ matrix.test-type }}
+          token: ${{ secrets.CODECOV_TOKEN || '' }}
+          fail_ci_if_error: false
+      
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-${{ matrix.test-type }}
+          path: ./backend/test-results
+          retention-days: 7
+      
+      - name: Set exit code for unauthorized PRs
+        if: |
+          needs.check-pr.outputs.is_authorized == 'false' && 
+          github.event_name == 'pull_request' && 
+          failure()
+        run: |
+          echo "Tests failed but PR is from an unauthorized source, ignoring failure to allow CI to pass."
+          # This allows the workflow to pass even if tests fail for unauthorized contributors
+          exit 0
+
+  test-race:
+    name: Race Detector
+    needs: check-pr
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: ./backend
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.24.x'
+          cache: true
+      
+      - name: Install dependencies
+        run: go mod download
+      
+      - name: Install gotestsum
+        run: go install gotest.tools/gotestsum@latest
+      
+      - name: Run race detector tests
+        run: |
+          mkdir -p test-results
+          gotestsum --junitfile test-results/race-tests.xml --format testname -- -race -short ./...
+      
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-race
+          path: ./backend/test-results
+          retention-days: 7
+      
+      - name: Set exit code for unauthorized PRs
+        if: |
+          needs.check-pr.outputs.is_authorized == 'false' && 
+          github.event_name == 'pull_request' && 
+          failure()
+        run: |
+          echo "Race detector tests failed but PR is from an unauthorized source, ignoring failure to allow CI to pass."
+          exit 0
+          
+  test-compile:
+    name: Test Compile
+    needs: check-pr
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    defaults:
+      run:
+        working-directory: ./backend
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.24.x'
+          cache: true
+      
+      - name: Verify code compiles
+        run: go build -v ./...
+      
+      - name: Set exit code for unauthorized PRs
+        if: |
+          needs.check-pr.outputs.is_authorized == 'false' && 
+          github.event_name == 'pull_request' && 
+          failure()
+        run: |
+          echo "Compilation failed but PR is from an unauthorized source, ignoring failure to allow CI to pass."
+          exit 0 

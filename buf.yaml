@@ -1,0 +1,16 @@
+version: v2
+modules:
+  - path: .
+    name: github.com/ethpandaops/lab
+    excludes:
+      - frontend/node_modules
+lint:
+  use:
+    - STANDARD
+breaking:
+  use:
+    - PACKAGE
+deps:
+  - buf.build/googleapis/googleapis
+  - buf.build/grpc/grpc
+  - buf.build/grpc-ecosystem/grpc-gateway

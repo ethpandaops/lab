@@ -1,0 +1,186 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "backend/pkg/api/proto/lab_api.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "LabAPI"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {},
+  "definitions": {
+    "beacon_slotsLocallyBuiltBlock": {
+      "type": "object",
+      "properties": {
+        "slot": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "slotStartDateTime": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "metadata": {
+          "$ref": "#/definitions/beacon_slotsLocallyBuiltBlockMetadata"
+        },
+        "blockVersion": {
+          "type": "string"
+        },
+        "blockTotalBytes": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "blockTotalBytesCompressed": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "executionPayloadValue": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "consensusPayloadValue": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "executionPayloadBlockNumber": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "executionPayloadGasLimit": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "executionPayloadGasUsed": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "executionPayloadTransactionsCount": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "executionPayloadTransactionsTotalBytes": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "executionPayloadTransactionsTotalBytesCompressed": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      "title": "LocallyBuiltBlock represents a locally built block"
+    },
+    "beacon_slotsLocallyBuiltBlockMetadata": {
+      "type": "object",
+      "properties": {
+        "metaClientName": {
+          "type": "string"
+        },
+        "eventDateTime": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "metaClientVersion": {
+          "type": "string"
+        },
+        "metaClientImplementation": {
+          "type": "string"
+        },
+        "metaClientGeoCity": {
+          "type": "string"
+        },
+        "metaClientGeoCountry": {
+          "type": "string"
+        },
+        "metaClientGeoCountryCode": {
+          "type": "string"
+        },
+        "metaClientGeoContinentCode": {
+          "type": "string"
+        },
+        "metaClientGeoLongitude": {
+          "type": "number",
+          "format": "double"
+        },
+        "metaClientGeoLatitude": {
+          "type": "number",
+          "format": "double"
+        },
+        "metaConsensusVersion": {
+          "type": "string"
+        },
+        "metaConsensusImplementation": {
+          "type": "string"
+        },
+        "metaNetworkName": {
+          "type": "string"
+        }
+      },
+      "title": "LocallyBuiltBlockMetadata contains metadata about the locally built block"
+    },
+    "beacon_slotsLocallyBuiltSlotBlocks": {
+      "type": "object",
+      "properties": {
+        "slot": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "blocks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/beacon_slotsLocallyBuiltBlock"
+          }
+        }
+      },
+      "title": "LocallyBuiltSlotBlocks represents all locally built blocks observed for a specific slot"
+    },
+    "labapiGetRecentLocallyBuiltBlocksResponse": {
+      "type": "object",
+      "properties": {
+        "slotBlocks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/beacon_slotsLocallyBuiltSlotBlocks"
+          }
+        }
+      }
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    }
+  }
+}

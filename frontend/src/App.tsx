@@ -25,6 +25,7 @@ import Experiments from './pages/Experiments';
 import MaintenanceOverlay from './components/common/MaintenanceOverlay';
 import { SlotLookup } from './pages/beacon/slot/index';
 import { ModalProvider } from './contexts/ModalContext'
+import { LocallyBuiltBlocks } from './pages/beacon/LocallyBuiltBlocks'
 
 // Create contexts
 export const ConfigContext = createContext<Config | null>(null)
@@ -122,6 +123,7 @@ function App() {
 									<Route path="timings" element={<BeaconChainTimings />}>
 										<Route path="blocks" element={<BlockTimings />} />
 									</Route>
+									<Route path="locally-built-blocks" element={<LocallyBuiltBlocks />} />
 								</Route>
 							</Route>
 						</Routes>

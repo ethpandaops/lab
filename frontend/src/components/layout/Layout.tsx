@@ -56,7 +56,6 @@ function Layout(): JSX.Element {
         <div className="absolute inset-0 bg-gradient-to-b from-accent/5 via-transparent to-transparent" />
         <div className="absolute inset-0 bg-gradient-to-t from-error/5 via-transparent to-transparent" />
       </div>
-      
       {/* Content */}
       <div className="relative z-10 flex flex-col min-h-screen">
         {/* Header Section */}
@@ -210,7 +209,7 @@ function Layout(): JSX.Element {
         </main>
       </div>
     </div>
-  )
+  );
 }
 
 export default Layout 
