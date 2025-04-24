@@ -20,11 +20,10 @@ import {
   List, 
   RefreshCw, 
   Clock, 
-  Grid3X3, 
-  PieChart, 
   ScatterChart
 } from 'lucide-react'
 import { TabButton } from '../../components/common/TabButton'
+import { BeaconClockManager } from '../../utils/beacon'
 
 // Refresh interval in milliseconds
 const REFRESH_INTERVAL = 5000
@@ -49,6 +48,7 @@ export function LocallyBuiltBlocks(): JSX.Element {
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date())
   const [viewMode, setViewMode] = useState<ViewMode>('visualization')
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false)
+  const [currentSlot, setCurrentSlot] = useState<number | null>(null)
 
   // Define view options
   const viewOptions: ViewOption[] = [
@@ -71,6 +71,21 @@ export function LocallyBuiltBlocks(): JSX.Element {
       description: 'Tabular view of all blocks'
     }
   ]
+
+  // Update current slot from wallclock
+  useEffect(() => {
+    const clock = BeaconClockManager.getInstance().getBeaconClock(selectedNetwork)
+    if (!clock) return
+
+    const updateSlot = () => {
+      const slot = clock.getCurrentSlot()
+      setCurrentSlot(slot)
+    }
+
+    updateSlot()
+    const interval = setInterval(updateSlot, 1000)
+    return () => clearInterval(interval)
+  }, [selectedNetwork])
 
   // Function to fetch and merge data
   const fetchData = useCallback(async (isInitial = false) => {
@@ -177,6 +192,16 @@ export function LocallyBuiltBlocks(): JSX.Element {
     }
   }
 
+  // Helper function to get missing slot counts
+  const getMissingSlotInfo = () => {
+    if (!currentSlot || data.length === 0) return 0
+
+    const highestDataSlot = Math.max(...data.map(slotBlock => Number(slotBlock.slot)))
+    const missingSlotCount = currentSlot - highestDataSlot
+    
+    return missingSlotCount > 0 ? missingSlotCount : 0
+  }
+
   // Render active view based on viewMode
   const renderActiveView = () => {
     switch(viewMode) {
@@ -231,6 +256,7 @@ export function LocallyBuiltBlocks(): JSX.Element {
 
   // Find the current view option
   const currentView = viewOptions.find(option => option.id === viewMode) || viewOptions[0]
+  const missingSlotInfo = getMissingSlotInfo()
 
   return (
     <div className="space-y-6">
@@ -279,6 +305,7 @@ export function LocallyBuiltBlocks(): JSX.Element {
             data={data}
             isLoading={isLoading}
             onSelectBlock={setSelectedBlock}
+            currentSlot={currentSlot}
           />
           
           <div className="backdrop-blur-sm rounded-lg bg-surface/80">
@@ -297,10 +324,12 @@ export function LocallyBuiltBlocks(): JSX.Element {
                     <RefreshCw className="w-3.5 h-3.5" />
                   </button>
                 </div>
-                <div className="text-tertiary text-sm font-mono px-2 py-1 bg-surface/50 rounded-md">
-                  {data.length > 0 
-                    ? `${data.reduce((sum, slotBlocks) => sum + slotBlocks.blocks.length, 0)} blocks across ${data.length} slots` 
-                    : 'No data available'}
+                <div className="flex flex-col sm:flex-row gap-2 sm:items-center">
+                  <div className="text-tertiary text-sm font-mono px-2 py-1 bg-surface/50 rounded-md">
+                    {data.length > 0 
+                      ? `${data.reduce((sum, slotBlocks) => sum + slotBlocks.blocks.length, 0)} blocks across ${data.length} slots` 
+                      : 'No data available'}
+                  </div>
                 </div>
               </div>
 
@@ -312,6 +341,13 @@ export function LocallyBuiltBlocks(): JSX.Element {
                 </div>
                 <p className="text-xs font-mono text-tertiary mt-1">{currentView.description}</p>
               </div>
+
+              {/* Current Wallclock Slot */}
+              {currentSlot !== null && (
+                <div className="mb-4 px-2 py-1 bg-accent/10 rounded-md inline-block">
+                  <span className="text-xs font-mono text-secondary">Current slot: {currentSlot}</span>
+                </div>
+              )}
 
               {/* Tabs for View Mode */}
               <div className="flex space-x-2 overflow-x-auto -mx-2 px-2 pb-2 scrollbar-thin scrollbar-thumb-subtle scrollbar-track-transparent">

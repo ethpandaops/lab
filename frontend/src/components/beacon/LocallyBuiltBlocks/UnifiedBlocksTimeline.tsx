@@ -42,12 +42,14 @@ interface UnifiedBlocksTimelineProps {
   data: LocallyBuiltSlotBlocks[]
   isLoading: boolean
   onSelectBlock?: (block: LocallyBuiltBlock) => void
+  currentSlot?: number | null
 }
 
 export const UnifiedBlocksTimeline: FC<UnifiedBlocksTimelineProps> = ({
   data,
   isLoading,
-  onSelectBlock
+  onSelectBlock,
+  currentSlot
 }) => {
   const [timelineBlocks, setTimelineBlocks] = useState<{slot: string, blocks: LocallyBuiltBlock[], isPending: boolean}[]>([])
   
