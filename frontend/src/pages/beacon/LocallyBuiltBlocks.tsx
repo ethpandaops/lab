@@ -11,7 +11,8 @@ import {
   LocallyBuiltBlocksTable,
   ClientPresenceHeatmap,
   BlockValueDistribution,
-  TransactionBubbleChart
+  TransactionBubbleChart,
+  UnifiedBlocksTimeline
 } from '../../components/beacon/LocallyBuiltBlocks'
 import { 
   ChevronLeft, 
@@ -56,18 +57,6 @@ export function LocallyBuiltBlocks(): JSX.Element {
       label: 'Overview',
       icon: <BarChart2 className="w-4 h-4" />,
       description: 'Visual overview of locally built blocks'
-    },
-    {
-      id: 'heatmap',
-      label: 'Client Presence',
-      icon: <Grid3X3 className="w-4 h-4" />,
-      description: 'Heatmap showing client presence across slots'
-    },
-    {
-      id: 'value-distribution',
-      label: 'Value Distribution',
-      icon: <PieChart className="w-4 h-4" />,
-      description: 'Block value distribution by client'
     },
     {
       id: 'bubble-chart',
@@ -284,59 +273,68 @@ export function LocallyBuiltBlocks(): JSX.Element {
           <LocallyBuiltBlocksDetail block={selectedBlock} />
         </div>
       ) : (
-        <div className="backdrop-blur-sm rounded-lg bg-surface/80">
-          <div className="p-4 border-b border-subtle/30">
-            {/* Block Stats and Last Updated with Manual Refresh */}
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-4">
-              <div className="flex items-center gap-2 text-tertiary text-sm font-mono">
-                <Clock className="w-3.5 h-3.5 text-accent/70" />
-                <span>Last updated: {formatLastUpdated()}</span>
-                <button 
-                  onClick={handleManualRefresh} 
-                  className={`p-1 rounded-full hover:bg-surface/60 transition-all duration-200 ${isRefreshing ? 'animate-spin text-accent' : 'text-tertiary hover:text-primary'}`}
-                  disabled={isRefreshing}
-                  title="Refresh data"
-                >
-                  <RefreshCw className="w-3.5 h-3.5" />
-                </button>
+        <>
+          {/* Unified Blocks Timeline */}
+          <UnifiedBlocksTimeline 
+            data={data}
+            isLoading={isLoading}
+            onSelectBlock={setSelectedBlock}
+          />
+          
+          <div className="backdrop-blur-sm rounded-lg bg-surface/80">
+            <div className="p-4 border-b border-subtle/30">
+              {/* Block Stats and Last Updated with Manual Refresh */}
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-4">
+                <div className="flex items-center gap-2 text-tertiary text-sm font-mono">
+                  <Clock className="w-3.5 h-3.5 text-accent/70" />
+                  <span>Last updated: {formatLastUpdated()}</span>
+                  <button 
+                    onClick={handleManualRefresh} 
+                    className={`p-1 rounded-full hover:bg-surface/60 transition-all duration-200 ${isRefreshing ? 'animate-spin text-accent' : 'text-tertiary hover:text-primary'}`}
+                    disabled={isRefreshing}
+                    title="Refresh data"
+                  >
+                    <RefreshCw className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+                <div className="text-tertiary text-sm font-mono px-2 py-1 bg-surface/50 rounded-md">
+                  {data.length > 0 
+                    ? `${data.reduce((sum, slotBlocks) => sum + slotBlocks.blocks.length, 0)} blocks across ${data.length} slots` 
+                    : 'No data available'}
+                </div>
               </div>
-              <div className="text-tertiary text-sm font-mono px-2 py-1 bg-surface/50 rounded-md">
-                {data.length > 0 
-                  ? `${data.reduce((sum, slotBlocks) => sum + slotBlocks.blocks.length, 0)} blocks across ${data.length} slots` 
-                  : 'No data available'}
+
+              {/* View Description */}
+              <div className="mb-4">
+                <div className="flex items-center gap-2">
+                  {currentView.icon}
+                  <h3 className="text-md font-sans font-bold text-primary">{currentView.label}</h3>
+                </div>
+                <p className="text-xs font-mono text-tertiary mt-1">{currentView.description}</p>
+              </div>
+
+              {/* Tabs for View Mode */}
+              <div className="flex space-x-2 overflow-x-auto -mx-2 px-2 pb-2 scrollbar-thin scrollbar-thumb-subtle scrollbar-track-transparent">
+                {viewOptions.map(option => (
+                  <TabButton
+                    key={option.id}
+                    isActive={viewMode === option.id}
+                    onClick={() => setViewMode(option.id)}
+                    label={option.label}
+                    icon={option.icon}
+                  />
+                ))}
               </div>
             </div>
 
-            {/* View Description */}
-            <div className="mb-4">
-              <div className="flex items-center gap-2">
-                {currentView.icon}
-                <h3 className="text-md font-sans font-bold text-primary">{currentView.label}</h3>
+            <div className="p-4">
+              {/* Active View Content */}
+              <div className="transition-opacity duration-300 ease-in-out">
+                {renderActiveView()}
               </div>
-              <p className="text-xs font-mono text-tertiary mt-1">{currentView.description}</p>
-            </div>
-
-            {/* Tabs for View Mode */}
-            <div className="flex space-x-2 overflow-x-auto -mx-2 px-2 pb-2 scrollbar-thin scrollbar-thumb-subtle scrollbar-track-transparent">
-              {viewOptions.map(option => (
-                <TabButton
-                  key={option.id}
-                  isActive={viewMode === option.id}
-                  onClick={() => setViewMode(option.id)}
-                  label={option.label}
-                  icon={option.icon}
-                />
-              ))}
             </div>
           </div>
-
-          <div className="p-4">
-            {/* Active View Content */}
-            <div className="transition-opacity duration-300 ease-in-out">
-              {renderActiveView()}
-            </div>
-          </div>
-        </div>
+        </>
       )}
     </div>
   )

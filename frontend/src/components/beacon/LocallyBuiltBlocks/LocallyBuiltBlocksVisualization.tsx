@@ -318,36 +318,6 @@ export const LocallyBuiltBlocksVisualization: FC<LocallyBuiltBlocksVisualization
 
   return (
     <div className="space-y-6">
-      {/* Client Presence (Last N Slots) */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card>
-          <CardBody>
-            <h3 className="text-xl font-sans font-bold text-primary mb-4">Execution Client Presence (Last {last16SlotsPresence.slotsShown} Slots)</h3>
-            <div className="space-y-2">
-              {last16SlotsPresence.execution.map(client => (
-                <div key={client.name} className="flex items-center justify-between">
-                  <span className="font-mono text-sm text-primary mr-2">{client.name}</span> {/* Reduced margin */}
-                  <SlotPresenceIndicator presence={client.presence} />
-                </div>
-              ))}
-            </div>
-          </CardBody>
-        </Card>
-        <Card>
-          <CardBody>
-            <h3 className="text-xl font-sans font-bold text-primary mb-4">Consensus Client Presence (Last {last16SlotsPresence.slotsShown} Slots)</h3>
-             <div className="space-y-2">
-              {last16SlotsPresence.consensus.map(client => (
-                <div key={client.name} className="flex items-center justify-between">
-                  <span className="font-mono text-sm text-primary mr-2">{client.name}</span> {/* Reduced margin */}
-                  <SlotPresenceIndicator presence={client.presence} />
-                </div>
-              ))}
-            </div>
-          </CardBody>
-        </Card>
-      </div>
-
       {/* Block Size vs. Transaction Count (Full Width) */}
        <ChartWithStats
           title="Block Size vs. Transaction Count"
