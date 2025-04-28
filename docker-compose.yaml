@@ -48,8 +48,8 @@ services:
 
   server:
     build:
-      context: .
-      dockerfile: backend/Dockerfile
+      context: ./backend
+      dockerfile: Dockerfile
     command: ["srv", "--srv-config", "/app/config/service.config.yaml"]
     env_file: .env
     ports:
@@ -61,8 +61,8 @@ services:
 
   api:
     build:
-      context: .
-      dockerfile: backend/Dockerfile
+      context: ./backend
+      dockerfile: Dockerfile
     env_file: .env
     command: ["api", "--api-config", "/app/config/api.config.yaml"]
     ports:
