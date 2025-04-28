@@ -139,7 +139,7 @@ func (l *Lab) GetFrontendConfig() (*pb.FrontendConfig, error) {
 		consensusConfig := &pb.FrontendConfig_ConsensusConfig{}
 
 		electraConfig := &pb.FrontendConfig_ForkDetails{
-			Epoch: int64(network.Spec.ElectraForkEpoch),
+			Epoch: int64(int(network.Spec.ElectraForkEpoch)),
 		}
 
 		if electraConfig.Epoch != 0 {

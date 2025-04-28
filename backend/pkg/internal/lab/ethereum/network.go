@@ -9,7 +9,6 @@ import (
 	"github.com/ethpandaops/ethwallclock"
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/metrics"
 	"github.com/prometheus/client_golang/prometheus"
-	"github.com/sirupsen/logrus"
 )
 
 type Network struct {
@@ -26,8 +25,6 @@ type Network struct {
 
 	// Prometheus metrics
 	wallclockEpoch *prometheus.GaugeVec
-
-	log *logrus.Logger
 }
 
 // initMetrics initializes network-specific metrics
@@ -84,8 +81,8 @@ func (n *Network) Start(ctx context.Context) error {
 		return fmt.Errorf("failed to fetch network specification: %w", err)
 	}
 
-	// Create wallclock using values from spec
-	secondsPerSlot := time.Second * time.Duration(n.Spec.SecondsPerSlot)
+	// Create wallclock using values from spec - fix integer overflow conversion
+	secondsPerSlot := time.Second * time.Duration(int64(n.Spec.SecondsPerSlot))
 	n.wallclock = ethwallclock.NewEthereumBeaconChain(n.Config.Genesis, secondsPerSlot, n.Spec.GetSlotsPerEpoch())
 
 	// Set up epoch tracking

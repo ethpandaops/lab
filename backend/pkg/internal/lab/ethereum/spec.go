@@ -94,7 +94,7 @@ type Spec struct {
 
 // FetchSpecFromURLWithContext fetches and parses the Ethereum network specification from a URL with context
 func FetchSpecFromURLWithContext(ctx context.Context, url string) (*Spec, error) {
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, http.NoBody)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create request: %w", err)
 	}
@@ -104,6 +104,7 @@ func FetchSpecFromURLWithContext(ctx context.Context, url string) (*Spec, error)
 	if err != nil {
 		return nil, fmt.Errorf("failed to fetch spec from URL: %w", err)
 	}
+
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
@@ -127,6 +128,7 @@ func FetchSpecFromURLWithContext(ctx context.Context, url string) (*Spec, error)
 func FetchSpecFromURL(url string) (*Spec, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
+
 	return FetchSpecFromURLWithContext(ctx, url)
 }
 
