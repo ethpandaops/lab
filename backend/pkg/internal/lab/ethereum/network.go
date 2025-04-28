@@ -81,8 +81,9 @@ func (n *Network) Start(ctx context.Context) error {
 		return fmt.Errorf("failed to fetch network specification: %w", err)
 	}
 
-	// Create wallclock using values from spec - fix integer overflow conversion
-	secondsPerSlot := time.Second * time.Duration(int64(n.Spec.SecondsPerSlot))
+	// Create wallclock using values from spec
+	//nolint:gosec // not a security issue
+	secondsPerSlot := time.Second * time.Duration(n.Spec.SecondsPerSlot)
 	n.wallclock = ethwallclock.NewEthereumBeaconChain(n.Config.Genesis, secondsPerSlot, n.Spec.GetSlotsPerEpoch())
 
 	// Set up epoch tracking

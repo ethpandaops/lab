@@ -100,6 +100,7 @@ func FetchSpecFromURLWithContext(ctx context.Context, url string) (*Spec, error)
 	}
 
 	client := &http.Client{}
+
 	resp, err := client.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("failed to fetch spec from URL: %w", err)
