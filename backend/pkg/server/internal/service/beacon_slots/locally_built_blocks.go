@@ -213,7 +213,7 @@ func (p *LocallyBuiltBlocksProcessor) getCurrentSlot(ctx context.Context, networ
 	}
 
 	// Add on our head delay slots
-	headDelaySlots := phase0.Slot(p.headDelaySlots)
+	headDelaySlots := p.headDelaySlots
 
 	return phase0.Slot(slot.Number()) - headDelaySlots, nil
 }
