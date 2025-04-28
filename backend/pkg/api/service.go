@@ -161,9 +161,7 @@ func (s *Service) initializeServices(ctx context.Context) error {
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 	}
 
-	// Fix the gRPC connection by using DialContext instead of NewClient
-	//nolint:staticcheck // CBA
-	conn, err = grpc.DialContext(ctx, srvAddr, opts...)
+	conn, err = grpc.NewClient(srvAddr, opts...)
 	if err != nil {
 		return fmt.Errorf("failed to dial srv service at %s: %w", srvAddr, err)
 	}
@@ -188,13 +186,13 @@ func (s *Service) initializeServices(ctx context.Context) error {
 	}
 
 	// Create a cmux multiplexer to handle both gRPC and HTTP traffic
-	mux := cmux.New(lis)
+	connMux := cmux.New(lis)
 
 	// gRPC matcher (matches on HTTP2 with Prior Knowledge)
-	grpcL := mux.MatchWithWriters(cmux.HTTP2MatchHeaderFieldSendSettings("content-type", "application/grpc"))
+	grpcL := connMux.MatchWithWriters(cmux.HTTP2MatchHeaderFieldSendSettings("content-type", "application/grpc"))
 
 	// HTTP/1.1 matcher (matches all other traffic)
-	httpL := mux.Match(cmux.HTTP1Fast())
+	httpL := connMux.Match(cmux.HTTP1Fast())
 
 	// Create the Connect handler
 	connectHandler := http.NewServeMux()
@@ -213,6 +211,7 @@ func (s *Service) initializeServices(ctx context.Context) error {
 	// Determine API prefix path based on configuration
 	apiPrefix := "/api/"
 	prefix := s.config.HttpServer.PathPrefix
+
 	if prefix != "" {
 		// Ensure prefix starts with / and doesn't end with /
 		if prefix[0] != '/' {
@@ -237,6 +236,7 @@ func (s *Service) initializeServices(ctx context.Context) error {
 	legacyWithCORS := s.getCORSHandler(s.router)
 
 	// Add the legacy HTTP routes for backward compatibility
+
 	if prefix != "" {
 		combinedHandler.Handle(prefix+"/", http.StripPrefix(prefix, legacyWithCORS))
 	} else {
@@ -252,6 +252,7 @@ func (s *Service) initializeServices(ctx context.Context) error {
 	// Start the gRPC server in a goroutine
 	go func() {
 		s.log.WithField("addr", fmt.Sprintf("%s:%d", s.config.HttpServer.Host, s.config.HttpServer.Port)).Info("Starting gRPC server")
+
 		if err := s.grpcServer.Serve(grpcL); err != nil {
 			s.log.WithError(err).Error("gRPC server error")
 			s.cancel()
@@ -261,6 +262,7 @@ func (s *Service) initializeServices(ctx context.Context) error {
 	// Start the HTTP server in a goroutine
 	go func() {
 		s.log.WithField("addr", fmt.Sprintf("%s:%d", s.config.HttpServer.Host, s.config.HttpServer.Port)).Info("Starting Connect/HTTP server")
+
 		if err := httpSrv.Serve(httpL); err != nil && err != http.ErrServerClosed {
 			s.log.WithError(err).Error("Connect/HTTP server error")
 			s.cancel()
@@ -270,7 +272,8 @@ func (s *Service) initializeServices(ctx context.Context) error {
 	// Start the cmux server in a goroutine
 	go func() {
 		s.log.WithField("addr", lis.Addr()).Info("Starting combined gRPC/HTTP server")
-		if err := mux.Serve(); err != nil {
+
+		if err := connMux.Serve(); err != nil {
 			s.log.WithError(err).Error("cmux server error")
 			s.cancel()
 		}
@@ -492,41 +495,6 @@ func (s *Service) handleXatuUsersWindow(w http.ResponseWriter, r *http.Request) 
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 
 		return
-	}
-}
-
-func (s *Service) handlLocallyBuiltBlocks(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	network := vars["network"]
-
-	ctx, cancel := context.WithTimeout(r.Context(), 30*time.Second)
-	defer cancel()
-
-	resp, err := s.beaconSlotsClient.GetRecentLocallyBuiltBlocks(ctx, &beaconslotspb.GetRecentLocallyBuiltBlocksRequest{
-		Network: network,
-	})
-
-	if err != nil {
-		s.log.WithError(err).Error("Failed to get locally built blocks")
-		http.Error(w, "Internal server error", http.StatusInternalServerError)
-
-		return
-	}
-
-	data, err := json.Marshal(resp)
-	if err != nil {
-		s.log.WithError(err).Error("Failed to marshal locally built blocks")
-		http.Error(w, "Internal server error", http.StatusInternalServerError)
-
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Cache-Control", "max-age=5, s-maxage=5, public")
-
-	if _, err := w.Write(data); err != nil {
-		s.log.WithError(err).Error("Failed to write locally built blocks")
-		http.Error(w, "Internal server error", http.StatusInternalServerError)
 	}
 }
 

@@ -274,7 +274,6 @@ func (l *client) tryAcquireLeadership() bool {
 	case <-l.ctx.Done():
 		return false
 	default:
-		// Continue with lock acquisition
 	}
 
 	token, success, err := l.locker.Lock(l.config.Resource, l.config.TTL)
@@ -321,7 +320,6 @@ func (l *client) refreshLock() bool {
 	case <-l.ctx.Done():
 		return false
 	default:
-		// Continue with lock refresh
 	}
 
 	l.mu.RLock()
