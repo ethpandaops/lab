@@ -9,15 +9,16 @@ import (
 	"github.com/ethpandaops/ethwallclock"
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/metrics"
 	"github.com/prometheus/client_golang/prometheus"
+	"github.com/sirupsen/logrus"
 )
 
 type Network struct {
 	Name   string
 	Config *NetworkConfig
+	Spec   *Spec
 
 	wallclock *ethwallclock.EthereumBeaconChain
 	mu        sync.Mutex
-	running   bool
 
 	// Metrics
 	metrics   *metrics.Metrics
@@ -25,7 +26,8 @@ type Network struct {
 
 	// Prometheus metrics
 	wallclockEpoch *prometheus.GaugeVec
-	configLoaded   *prometheus.GaugeVec
+
+	log *logrus.Logger
 }
 
 // initMetrics initializes network-specific metrics
@@ -53,16 +55,6 @@ func (n *Network) initMetrics() error {
 		return fmt.Errorf("failed to create wallclock_epoch metric: %w", err)
 	}
 
-	// Config loaded metric
-	n.configLoaded, err = n.collector.NewGaugeVec(
-		"config_loaded",
-		"Whether the network configuration was successfully loaded (1 = yes, 0 = no)",
-		[]string{"network"},
-	)
-	if err != nil {
-		return fmt.Errorf("failed to create config_loaded metric: %w", err)
-	}
-
 	return nil
 }
 
@@ -70,24 +62,38 @@ func (n *Network) Start(ctx context.Context) error {
 	n.mu.Lock()
 	defer n.mu.Unlock()
 
+	if err := n.Config.Validate(); err != nil {
+		return fmt.Errorf("failed to validate network config: %w", err)
+	}
+
 	// Initialize metrics
 	if err := n.initMetrics(); err != nil {
 		return fmt.Errorf("failed to initialize network metrics: %w", err)
 	}
 
-	// Create wallclock
-	n.wallclock = ethwallclock.NewEthereumBeaconChain(n.Config.Genesis, time.Second*12, 32)
+	// Fetch network specification
+	var err error
+
+	// Create a context with timeout
+	fetchCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+
+	// Update FetchSpecFromURL to use the context with timeout
+	n.Spec, err = FetchSpecFromURLWithContext(fetchCtx, n.Config.ConfigURL)
+	if err != nil {
+		return fmt.Errorf("failed to fetch network specification: %w", err)
+	}
+
+	// Create wallclock using values from spec
+	secondsPerSlot := time.Second * time.Duration(n.Spec.SecondsPerSlot)
+	n.wallclock = ethwallclock.NewEthereumBeaconChain(n.Config.Genesis, secondsPerSlot, n.Spec.GetSlotsPerEpoch())
 
 	// Set up epoch tracking
 	n.wallclock.OnEpochChanged(func(epoch ethwallclock.Epoch) {
-		n.wallclockEpoch.WithLabelValues(n.Name).Set(float64(epoch.Number()))
+		if n.wallclockEpoch != nil {
+			n.wallclockEpoch.WithLabelValues(n.Name).Set(float64(epoch.Number()))
+		}
 	})
-
-	// Mark network as running
-	n.running = true
-
-	// Set config loaded metric
-	n.configLoaded.WithLabelValues(n.Name).Set(1)
 
 	return nil
 }
@@ -100,18 +106,7 @@ func (n *Network) Stop() error {
 		n.wallclock.Stop()
 	}
 
-	// Mark network as stopped
-	n.running = false
-
 	return nil
-}
-
-// IsRunning returns whether the network is currently running
-func (n *Network) IsRunning() bool {
-	n.mu.Lock()
-	defer n.mu.Unlock()
-
-	return n.running
 }
 
 func (n *Network) GetWallclock() *ethwallclock.EthereumBeaconChain {
@@ -119,4 +114,12 @@ func (n *Network) GetWallclock() *ethwallclock.EthereumBeaconChain {
 	defer n.mu.Unlock()
 
 	return n.wallclock
+}
+
+// GetSpec returns the network specification
+func (n *Network) GetSpec() *Spec {
+	n.mu.Lock()
+	defer n.mu.Unlock()
+
+	return n.Spec
 }

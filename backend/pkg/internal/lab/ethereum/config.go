@@ -45,9 +45,20 @@ func (c *Config) GetNetworkConfig(name string) *NetworkConfig {
 
 func (c *Config) Validate() error {
 	for _, network := range c.Networks {
-		if network.Name == "" {
-			return fmt.Errorf("network name is required")
+		if err := network.Validate(); err != nil {
+			return fmt.Errorf("failed to validate network config: %w", err)
 		}
+	}
+
+	return nil
+}
+func (c *NetworkConfig) Validate() error {
+	if c.Name == "" {
+		return fmt.Errorf("network name is required")
+	}
+
+	if c.ConfigURL == "" {
+		return fmt.Errorf("configURL is required for network %s", c.Name)
 	}
 
 	return nil
