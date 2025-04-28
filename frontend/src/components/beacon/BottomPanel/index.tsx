@@ -331,3 +331,5 @@ export function BottomPanel({
     </div>
   )
 }
+
+export default BottomPanel

@@ -21,11 +21,21 @@ ethereum:
   networks:
     mainnet:
       name: "mainnet"
-      configURL: ""
+      configURL: "https://raw.githubusercontent.com/eth-clients/mainnet/refs/heads/main/metadata/config.yaml"
       genesis: "2020-12-01T12:00:23Z"
       xatu:
         dsn: "${XATU_CLICKHOUSE_URL}"
         protocol: "native"
+      forks:
+        consensus:
+          electra:
+            min_client_versions:
+              grandine: "1.1.0"
+              lighthouse: "7.0.0"
+              lodestar: "1.29.0"
+              nimbus: "25.4.1"
+              prysm: "6.0.0"
+              teku: "25.4.1"
 
 # Cache configuration
 cache:

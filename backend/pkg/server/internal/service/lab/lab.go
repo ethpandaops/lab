@@ -136,9 +136,27 @@ func (l *Lab) GetFrontendConfig() (*pb.FrontendConfig, error) {
 	networksConfig := make(map[string]*pb.FrontendConfig_Network)
 
 	for _, network := range l.ethereum.Networks() {
+		consensusConfig := &pb.FrontendConfig_ConsensusConfig{}
+
+		electraConfig := &pb.FrontendConfig_ForkDetails{
+			//nolint:gosec // not a security issue
+			Epoch: int64(network.Spec.ElectraForkEpoch),
+		}
+
+		if electraConfig.Epoch != 0 {
+			clientVersions, ok := network.Config.Forks.Consensus["electra"]
+			if ok {
+				electraConfig.MinClientVersions = clientVersions.MinClientVersions
+			}
+		}
+
+		consensusConfig.Electra = electraConfig
+
 		networksConfig[network.Name] = &pb.FrontendConfig_Network{
 			GenesisTime: network.Config.Genesis.UTC().Unix(),
-			Forks:       &pb.FrontendConfig_ForkConfig{}, // TODO(sam.calder-mason): Add forks
+			Forks: &pb.FrontendConfig_ForkConfig{
+				Consensus: consensusConfig,
+			},
 		}
 	}
 

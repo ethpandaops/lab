@@ -6,7 +6,7 @@ import { useContext, useEffect, useState } from 'react'
 import { NetworkContext } from '../../App'
 import { Logo } from './Logo'
 import { BeaconClockManager } from '../../utils/beacon'
-import { Menu, X } from 'lucide-react'
+import { Menu } from 'lucide-react'
 import { NETWORK_METADATA, type NetworkKey } from '../../constants/networks'
 import clsx from 'clsx'
 
@@ -48,14 +48,11 @@ function Layout(): JSX.Element {
   }, [selectedNetwork])
 
   return (
-    <div className="relative min-h-screen text-primary font-mono">
-      {/* Background Effects */}
-      <div className="fixed inset-0 bg-grid bg-cyber opacity-[0.03] animate-pulse-slow" />
-      <div className="fixed inset-0 bg-gradient-to-b from-[rgb(var(--bg-base)/0.7)] via-[rgb(var(--bg-base)/0.8)] to-[rgb(var(--bg-base)/0.9)]" />
-      <div className="fixed inset-0">
-        <div className="absolute inset-0 bg-gradient-to-b from-accent/5 via-transparent to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-t from-error/5 via-transparent to-transparent" />
-      </div>
+    <div className="relative min-h-screen text-primary font-mono bg-gradient-to-b from-[rgb(var(--bg-base))] via-[rgb(var(--bg-base))] to-[rgb(var(--bg-base))]">
+      {/* Integrated Background Effects */}
+      <div className="absolute inset-0 bg-gradient-to-b from-accent/5 via-transparent to-transparent pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-t from-error/5 via-transparent to-transparent pointer-events-none" />
+      
       {/* Content */}
       <div className="relative z-10 flex flex-col min-h-screen">
         {/* Header Section */}
@@ -188,7 +185,7 @@ function Layout(): JSX.Element {
           <div className={clsx(
             'w-full',
             (location.pathname === '/beacon/slot/live' || /^\/beacon\/slot\/\d+$/.test(location.pathname))
-              ? 'h-[calc(100vh-7rem)]'
+              ? 'h-[calc(100vh-56px)]'
               : ['min-h-0', 'p-2 md:p-4 lg:p-6']
           )}>
             <div className={clsx(
@@ -196,10 +193,6 @@ function Layout(): JSX.Element {
               (location.pathname === '/beacon/slot/live' || /^\/beacon\/slot\/\d+$/.test(location.pathname))
                 ? 'h-full'
                 : [
-                    'backdrop-blur-sm',
-                    'bg-gradient-page',
-                    'ring-1 ring-inset ring-white/5',
-                    'container mx-auto max-w-7xl',
                     'p-4 md:p-6 lg:p-8'
                   ]
             )}>

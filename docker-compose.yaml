@@ -48,12 +48,10 @@ services:
 
   server:
     build:
-      context: .
-      dockerfile: backend/Dockerfile
+      context: ./backend
+      dockerfile: Dockerfile
     command: ["srv", "--srv-config", "/app/config/service.config.yaml"]
-    environment:
-      - XATU_CLICKHOUSE_USERNAME=${XATU_CLICKHOUSE_USERNAME}
-      - XATU_CLICKHOUSE_PASSWORD=${XATU_CLICKHOUSE_PASSWORD}
+    env_file: .env
     ports:
       - "6666:6666"
     volumes:
@@ -63,18 +61,9 @@ services:
 
   api:
     build:
-      context: .
-      dockerfile: backend/Dockerfile
-    environment:
-      - SRV_ADDRESS=${SRV_ADDRESS:-server:6666}
-      - API_HOST=${API_HOST:-0.0.0.0}
-      - API_PORT=${API_PORT:-8080}
-      - S3_ENDPOINT=${S3_ENDPOINT:-minio:9000}
-      - S3_REGION=${S3_REGION:-us-east-1}
-      - S3_BUCKET=${S3_BUCKET:-lab}
-      - S3_ACCESS_KEY=${S3_ACCESS_KEY:-minioadmin}
-      - S3_SECRET_KEY=${S3_SECRET_KEY:-minioadmin}
-      - REDIS_URL=${REDIS_URL:-redis:6379}
+      context: ./backend
+      dockerfile: Dockerfile
+    env_file: .env
     command: ["api", "--api-config", "/app/config/api.config.yaml"]
     ports:
       - "0.0.0.0:8080:8080"

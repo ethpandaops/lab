@@ -17,7 +17,7 @@ alwaysApply: false
     - text-secondary: Supporting text
     - text-tertiary: Less important text
     - text-muted: Subdued text
-  
+
   2. Interactive/State colors:
     - text-accent: Primary call to action/highlights
     - text-accent-secondary: Secondary highlights
@@ -25,14 +25,14 @@ alwaysApply: false
     - text-success: Success states
     - text-warning: Warning/caution states
     - text-error: Error/danger states
-  
+
   3. Background colors:
     - bg-base: Main application background
     - bg-surface: Card/container background
     - bg-surface-raised: Elevated surface
     - bg-hover: Hover state background
     - bg-active: Active/pressed state background
-  
+
   4. Border colors:
     - border-subtle: Subtle separators
     - border-default: Standard borders
@@ -67,53 +67,82 @@ alwaysApply: false
 ## Common Patterns
 
 ### Section Types
-1. Page Header:
-```tsx
-<div className="relative mb-12">
-  <div className="absolute inset-0 flex items-center">
-    <div className="w-full h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
-  </div>
-  <div className="relative flex justify-center">
-    <div className="px-4 bg-base">
-      <h1 className="text-3xl md:text-4xl font-sans font-black text-primary animate-text-shine">
-        Page Title
-      </h1>
-    </div>
-  </div>
-</div>
-```
 
-2. Major Section:
-```tsx
-<section className="mb-16">
-  <h2 className="text-2xl font-sans font-bold text-primary mb-6">
-    Section Title
-  </h2>
-  <div className="space-y-4">
-    {/* Content */}
-  </div>
-</section>
-```
+1.  **Page Header (Legacy/Specific Use):**
+    *   **Note:** This large, centered header pattern consumes significant vertical space. Prefer the `Integrated Contextual Header` for most data-display and content pages. Reserve this pattern for landing pages or specific scenarios requiring a prominent, isolated title.
+    ```tsx
+    <div className="relative mb-12">
+      <div className="absolute inset-0 flex items-center">
+        <div className="w-full h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
+      </div>
+      <div className="relative flex justify-center">
+        <div className="px-4 bg-base">
+          <h1 className="text-3xl md:text-4xl font-sans font-black text-primary animate-text-shine">
+            Page Title
+          </h1>
+        </div>
+      </div>
+    </div>
+    ```
 
-3. Content Groups:
-```tsx
-{/* Parent Container */}
-<div className="backdrop-blur-sm rounded-lg bg-surface/80">
-  {/* Content Groups */}
-  <div className="space-y-4">
-    {/* Group 1 */}
-    <div className="p-4 border-b border-subtle/30">
-      <h3 className="text-xl font-sans font-bold mb-2 text-primary">Group 1</h3>
-      <p className="text-sm font-mono text-tertiary">Content</p>
+2.  **Integrated Contextual Header (Preferred):**
+    *   **Purpose:** To provide essential page context (title, description, controls) with minimal vertical footprint, maximizing space for primary content. Placed directly above or alongside the main interactive elements.
+    *   **Structure:** A compact container holding:
+        *   Page Title (e.g., `h2` or `h3`).
+        *   Brief Description (optional, potentially toggleable).
+        *   Key Actions/Controls (e.g., view mode tabs, refresh buttons).
+    *   **Layout Options:**
+        *   *Compact Row:* A single row spanning the content area width.
+        *   *Sidebar Integration:* Place context in a sidebar adjacent to the main content (requires adjusting content width).
+    *   **Example (Conceptual - Compact Row):**
+    ```tsx
+    <div className="mb-6 p-4 bg-surface/50 rounded-lg border border-subtle">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        {/* Left: Title & Description */}
+        <div>
+          <h2 className="text-xl font-sans font-bold text-primary mb-1">Page Title</h2>
+          <p className="text-sm font-mono text-secondary">Brief page description.</p>
+        </div>
+        {/* Right: Controls/Actions */}
+        <div className="flex items-center gap-2">
+          {/* e.g., View Mode Tabs, Refresh Button */}
+        </div>
+      </div>
     </div>
-    {/* Group 2 */}
-    <div className="p-4">
-      <h3 className="text-xl font-sans font-bold mb-2 text-primary">Group 2</h3>
-      <p className="text-sm font-mono text-tertiary">Content</p>
+    ```
+
+3.  **Major Section:**
+    ```tsx
+    <section className="mb-16">
+      <h2 className="text-2xl font-sans font-bold text-primary mb-6">
+        Section Title
+      </h2>
+      <div className="space-y-4">
+        {/* Content */}
+      </div>
+    </section>
+    ```
+
+4.  **Content Groups:**
+    *   **Note:** The full-width description `Card` previously used after the legacy `Page Header` should generally be replaced or integrated into the `Integrated Contextual Header` or specific content sections.
+    ```tsx
+    {/* Parent Container */}
+    <div className="backdrop-blur-sm rounded-lg bg-surface/80">
+      {/* Content Groups */}
+      <div className="space-y-4">
+        {/* Group 1 */}
+        <div className="p-4 border-b border-subtle/30">
+          <h3 className="text-xl font-sans font-bold mb-2 text-primary">Group 1</h3>
+          <p className="text-sm font-mono text-tertiary">Content</p>
+        </div>
+        {/* Group 2 */}
+        <div className="p-4">
+          <h3 className="text-xl font-sans font-bold mb-2 text-primary">Group 2</h3>
+          <p className="text-sm font-mono text-tertiary">Content</p>
+        </div>
+      </div>
     </div>
-  </div>
-</div>
-``` 
+    ```
 
 ### Chart Standards
 1. Axes:
@@ -167,7 +196,7 @@ alwaysApply: false
   - mb-4: Standard separation (e.g., between paragraphs)
   - mb-6: Medium separation (e.g., between subsections)
   - mb-8: Large separation (e.g., between related sections)
-  - mb-12: Extra large separation (e.g., after page headers)
+  - mb-12: Extra large separation (e.g., after legacy page headers)
   - mb-16: Maximum separation (e.g., between major sections)
 - Use space-y-{n} for consistent vertical spacing between children
 
@@ -178,12 +207,12 @@ alwaysApply: false
 4. Use opacity variants for creating depth
 5. Apply consistent blur effects for layering
 6. Maintain text hierarchy using semantic classes
-7. Keep backgrounds in the root layout for consistency
 8. Use proper mobile navigation patterns with overlays
 9. Ensure smooth transitions between states
 10. Use semantic HTML elements
 11. Ensure interactive elements have proper focus states
 12. Maintain WCAG 2.1 compliant contrast ratios
+13. **Prefer the `Integrated Contextual Header` pattern over the legacy `Page Header` and separate description cards for most content pages to maximize vertical space.**
 
 # Frontend UI System Rules
 
@@ -206,7 +235,7 @@ When using the LabAPI client in components:
        const response = await client.someMethod(request);
        // Process response...
      };
-     
+
      fetchData().catch(console.error);
    }, []);
    ```
@@ -216,7 +245,7 @@ When using the LabAPI client in components:
    const [data, setData] = useState(null);
    const [loading, setLoading] = useState(true);
    const [error, setError] = useState(null);
-   
+
    useEffect(() => {
      const fetchData = async () => {
        try {
@@ -231,7 +260,7 @@ When using the LabAPI client in components:
          setLoading(false);
        }
      };
-     
+
      fetchData();
    }, []);
    ```
@@ -242,7 +271,7 @@ When using the LabAPI client in components:
      const [data, setData] = useState(null);
      const [loading, setLoading] = useState(true);
      const [error, setError] = useState(null);
-     
+
      useEffect(() => {
        const callApi = async () => {
          try {
@@ -256,10 +285,10 @@ When using the LabAPI client in components:
            setLoading(false);
          }
        };
-       
+
        callApi();
      }, dependencies);
-     
+
      return { data, loading, error };
    }
    ```
