@@ -76,7 +76,9 @@ export default defineConfig(({ mode }) => {
 						'Access-Control-Allow-Origin': '*',
 					},
 				}
-			}
+			},
+			// Add history API fallback for SPA routing
+			historyApiFallback: true
 		},
 		build: {
 			rollupOptions: {

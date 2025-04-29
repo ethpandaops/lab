@@ -36,6 +36,13 @@ ethereum:
               nimbus: "25.4.1"
               prysm: "6.0.0"
               teku: "25.4.1"
+    hoodi:
+      name: "hoodi"
+      configURL: "https://raw.githubusercontent.com/eth-clients/hoodi/refs/heads/main/metadata/config.yaml"
+      genesis: "2025-03-17T12:10:00Z"
+      xatu:
+        dsn: "${XATU_CLICKHOUSE_URL}"
+        protocol: "native"
 
 # Cache configuration
 cache:
@@ -63,7 +70,6 @@ modules:
   beacon_chain_timings:
     beacon_chain_timings:
       enabled: true
-      networks: ["mainnet"]
       interval: "1m"
       time_windows:
         - file: "last_1_hour.json"
@@ -85,7 +91,6 @@ modules:
   xatu_public_contributors:
     xatu_public_contributors:
       enabled: true
-      networks: ["mainnet"]
       redis_key_prefix: "lab_xatu_public_contributors"
       interval: "2m"
       time_windows:
