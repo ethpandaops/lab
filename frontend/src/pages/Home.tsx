@@ -207,9 +207,6 @@ function Home(): JSX.Element {
                   Featured Experiments
                 </span>
               </h2>
-              <p className="text-md font-mono text-secondary max-w-lg mx-auto">
-                Explore our latest tools and visualizations for Ethereum network analysis
-              </p>
             </div>
             
             {/* Featured Cards Grid - Using the FeatureCard component */}

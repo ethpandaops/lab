@@ -56,9 +56,9 @@ function Experiments(): JSX.Element {
       </div>
 
       {/* Experiments Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6 mb-8">
         {experiments.map((experiment) => (
-          <Card key={experiment.id} isInteractive className="relative">
+          <Card key={experiment.id} isInteractive className="relative col-span-1 sm:col-span-1 md:col-span-2 lg:col-span-2">
             <Link to={experiment.href} className="block w-full h-full">
               <div className={`absolute inset-0 bg-gradient-to-br ${experiment.color} opacity-0 group-hover:opacity-100 transition-opacity`} />
               
