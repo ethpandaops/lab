@@ -23,11 +23,11 @@ interface TimingData {
 interface CDFData {
   sizes_kb: number[]
   arrival_times_ms: {
-    all: number[]
-    mev: number[]
-    non_mev: number[]
-    solo_mev: number[]
-    solo_non_mev: number[]
+    all: { values: number[] }
+    mev: { values: number[] }
+    non_mev: { values: number[] }
+    solo_mev: { values: number[] }
+    solo_non_mev: { values: number[] }
   }
   updated_at: number
 }
@@ -131,11 +131,11 @@ export const BlockTimings: React.FC = () => {
 
   // Skip data fetching if config isn't loaded
   const timingsPath = config?.modules?.['beacon_chain_timings']?.path_prefix 
-    ? `${config.modules['beacon_chain_timings'].path_prefix}/block_timings/${network}/${timeWindow}.json`
+    ? `${config.modules['beacon_chain_timings'].path_prefix}/block_timings/${network}/${timeWindow}`
     : null;
 
   const cdfPath = config?.modules?.['beacon_chain_timings']?.path_prefix
-    ? `${config.modules['beacon_chain_timings'].path_prefix}/size_cdf/${network}/${timeWindow}.json`
+    ? `${config.modules['beacon_chain_timings'].path_prefix}/size_cdf/${network}/${timeWindow}`
     : null;
 
   const { data: timingData, loading, error } = useDataFetch<TimingData>(
@@ -154,51 +154,52 @@ export const BlockTimings: React.FC = () => {
   }, [currentWindow])
 
   const chartData = useMemo(() => {
-    if (!timingData?.timestamps) return []
+    if (!timingData?.timestamps || !Array.isArray(timingData.timestamps)) return []
 
     return timingData.timestamps.map((time, index) => ({
       time: time,
-      min: timingData.mins[index] / 1000, // Convert to seconds
-      p05: timingData.p05s[index] / 1000,
-      p50: timingData.p50s[index] / 1000,
-      p95: timingData.p95s[index] / 1000,
-      blocks: timingData.blocks[index]
+      min: (timingData.mins && timingData.mins[index]) ? timingData.mins[index] / 1000 : 0, // Convert to seconds
+      p05: (timingData.p05s && timingData.p05s[index]) ? timingData.p05s[index] / 1000 : 0,
+      p50: (timingData.p50s && timingData.p50s[index]) ? timingData.p50s[index] / 1000 : 0,
+      p95: (timingData.p95s && timingData.p95s[index]) ? timingData.p95s[index] / 1000 : 0,
+      blocks: (timingData.blocks && timingData.blocks[index]) ? timingData.blocks[index] : 0
     }))
   }, [timingData])
 
   const scatterData = useMemo(() => {
     if (!cdfData?.arrival_times_ms || !cdfData?.sizes_kb) return []
 
+    // Add optional chaining and default empty arrays for all values
     // Create separate datasets for each type
-    const allData = cdfData.arrival_times_ms.all.map((time, index) => ({
+    const allData = ((cdfData.arrival_times_ms.all?.values) || []).map((time: number, index: number) => ({
       arrival_time: time / 1000,
       size: cdfData.sizes_kb[index],
       type: 'all'
-    })).filter(d => d.size <= 1536)
+    })).filter((d: { size: number }) => d.size <= 1536)
 
-    const mevData = cdfData.arrival_times_ms.mev.map((time, index) => ({
+    const mevData = ((cdfData.arrival_times_ms.mev?.values) || []).map((time: number, index: number) => ({
       arrival_time: time / 1000,
       size: cdfData.sizes_kb[index],
       type: 'mev'
-    })).filter(d => d.size <= 1536)
+    })).filter((d: { size: number }) => d.size <= 1536)
 
-    const nonMevData = cdfData.arrival_times_ms.non_mev.map((time, index) => ({
+    const nonMevData = ((cdfData.arrival_times_ms.non_mev?.values) || []).map((time: number, index: number) => ({
       arrival_time: time / 1000,
       size: cdfData.sizes_kb[index],
       type: 'non_mev'
-    })).filter(d => d.size <= 1536)
+    })).filter((d: { size: number }) => d.size <= 1536)
 
-    const soloMevData = cdfData.arrival_times_ms.solo_mev.map((time, index) => ({
+    const soloMevData = ((cdfData.arrival_times_ms.solo_mev?.values) || []).map((time: number, index: number) => ({
       arrival_time: time / 1000,
       size: cdfData.sizes_kb[index],
       type: 'solo_mev'
-    })).filter(d => d.size <= 1536)
+    })).filter((d: { size: number }) => d.size <= 1536)
 
-    const soloNonMevData = cdfData.arrival_times_ms.solo_non_mev.map((time, index) => ({
+    const soloNonMevData = ((cdfData.arrival_times_ms.solo_non_mev?.values) || []).map((time: number, index: number) => ({
       arrival_time: time / 1000,
       size: cdfData.sizes_kb[index],
       type: 'solo_non_mev'
-    })).filter(d => d.size <= 1536)
+    })).filter((d: { size: number }) => d.size <= 1536)
 
     return [...allData, ...mevData, ...nonMevData, ...soloMevData, ...soloNonMevData].sort((a, b) => a.size - b.size)
   }, [cdfData])

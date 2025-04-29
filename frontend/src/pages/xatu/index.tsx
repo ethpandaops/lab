@@ -6,8 +6,6 @@ import { useRef, useState, useEffect, useContext } from 'react'
 import { GlobeViz } from '../../components/xatu/GlobeViz'
 import { XatuCallToAction } from '../../components/xatu/XatuCallToAction'
 import { ConfigContext } from '../../App'
-import { CardBody } from '../../components/common/Card'
-import type { Config } from '../../types'
 
 interface ConsensusImplementation {
   total_nodes: number
@@ -37,9 +35,7 @@ interface Summary {
   }
 }
 
-const GLOBE_MIN_WIDTH = 600
-const GLOBE_PADDING = 48
-const GLOBE_WIDTH_SCALE = 0.66
+const GLOBE_WIDTH = 500
 const MS_PER_SECOND = 1000
 
 const CLIENT_METADATA: Record<string, { name: string }> = {
@@ -119,231 +115,111 @@ function Xatu(): JSX.Element {
   
   // Calculate additional stats
   const totalCities = Object.keys(summaryData.networks.mainnet.cities).length;
-  const totalContinents = Object.keys(summaryData.networks.mainnet.continents).length;
 
   return (
-    <div className="space-y-6" ref={containerReference}>
+    <div className="space-y-6 max-w-5xl mx-auto" ref={containerReference}>
       <XatuCallToAction />
 
-      {/* Overview Section */}
-      <div className="card card-primary">
-        <div className="card-header">
-          <h2 className="text-2xl font-sans font-bold text-primary mb-2">Overview</h2>
-          <span className="text-sm font-mono text-secondary">
-            Last 24h · Updated{' '}
-            <span 
-              title={new Date(summaryData.updated_at * MS_PER_SECOND).toString()}
-              className="cursor-help text-accent hover:underline"
-            >
-              {formatDistanceToNow(new Date(summaryData.updated_at * MS_PER_SECOND), { addSuffix: true })}
+      {/* Overview Header */}
+      <div className="bg-surface/50 backdrop-blur-sm rounded-lg border border-subtle p-4 shadow-sm">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+          <div>
+            <h2 className="text-xl font-sans font-bold text-primary">Xatu Network</h2>
+            <p className="text-xs font-mono text-secondary mt-1">
+              Last updated {formatDistanceToNow(new Date(summaryData.updated_at * MS_PER_SECOND), { addSuffix: true })}
+            </p>
+          </div>
+          <div className="bg-surface/70 px-3 py-1.5 rounded border border-subtle/30">
+            <span className="text-xs font-mono text-accent">
+              {totalNodes.toLocaleString()} nodes • {Object.keys(summaryData.networks).length} networks
             </span>
-          </span>
-          <p className="text-base font-mono text-secondary mt-2 max-w-3xl">
-            This data shows nodes sending data to ethPandaOps. While we run our own nodes, community-contributed data is most valuable.
-          </p>
-        </div>
-        
-        {/* Globe and Summary Stats */}
-        <div className="px-6 pb-6">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-            {/* Globe */}
-            <div className="lg:col-span-2 card card-secondary">
-              <div className="p-4">
-                <GlobeViz 
-                  data={globeData} 
-                  width={Math.max((containerWidth * GLOBE_WIDTH_SCALE) - GLOBE_PADDING, GLOBE_MIN_WIDTH)} 
-                  height={350} 
-                />
-              </div>
-            </div>
-
-            {/* Summary Stats */}
-            <div className="flex items-center justify-center">
-              <div className="grid grid-cols-2 gap-4 w-full">
-                <div className="card-stat">
-                  <div className="card-stat-header">
-                    <div className="text-tertiary text-xs font-mono uppercase tracking-wider">Total Nodes</div>
-                  </div>
-                  <div className="card-stat-body">
-                    <div className="text-2xl font-mono font-bold text-primary">
-                      {totalNodes.toLocaleString()}
-                    </div>
-                  </div>
-                </div>
-
-                <div className="card-stat">
-                  <div className="card-stat-header">
-                    <div className="text-tertiary text-xs font-mono uppercase tracking-wider">Public Nodes</div>
-                  </div>
-                  <div className="card-stat-body">
-                    <div className="text-2xl font-mono font-bold text-accent">
-                      {totalPublicNodes.toLocaleString()}
-                    </div>
-                  </div>
-                </div>
-
-                <div className="card-stat">
-                  <div className="card-stat-header">
-                    <div className="text-tertiary text-xs font-mono uppercase tracking-wider">Networks</div>
-                  </div>
-                  <div className="card-stat-body">
-                    <div className="text-2xl font-mono font-bold text-primary">
-                      {Object.keys(summaryData.networks).length}
-                    </div>
-                  </div>
-                </div>
-
-                <div className="card-stat">
-                  <div className="card-stat-header">
-                    <div className="text-tertiary text-xs font-mono uppercase tracking-wider">Countries</div>
-                  </div>
-                  <div className="card-stat-body">
-                    <div className="text-2xl font-mono font-bold text-primary">
-                      {Object.keys(summaryData.networks.mainnet.countries).length}
-                    </div>
-                  </div>
-                </div>
-
-                <div className="card-stat">
-                  <div className="card-stat-header">
-                    <div className="text-tertiary text-xs font-mono uppercase tracking-wider">Cities</div>
-                  </div>
-                  <div className="card-stat-body">
-                    <div className="text-2xl font-mono font-bold text-primary">
-                      {totalCities}
-                    </div>
-                  </div>
-                </div>
-
-                <div className="card-stat">
-                  <div className="card-stat-header">
-                    <div className="text-tertiary text-xs font-mono uppercase tracking-wider">Continents</div>
-                  </div>
-                  <div className="card-stat-body">
-                    <div className="text-2xl font-mono font-bold text-primary">
-                      {totalContinents}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Navigation Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <Link 
-              to="contributors" 
-              className="card card-secondary card-interactive"
-            >
-              <CardBody>
-                <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center flex-shrink-0">
-                    <span className="text-xl">👥</span>
-                  </div>
-
-                  <div className="flex-1 min-w-0">
-                    <h3 className="text-lg font-sans font-bold text-primary group-hover:text-accent transition-colors mb-1">
-                      Contributors
-                    </h3>
-                    <p className="text-sm font-mono text-tertiary truncate">
-                      View contributor information
-                    </p>
-                  </div>
-
-                  <ArrowRight className="w-5 h-5 text-accent/50 group-hover:text-accent group-hover:translate-x-1 transition-all duration-300" />
-                </div>
-
-                <p className="text-sm font-mono text-secondary group-hover:text-primary/90 transition-colors mt-3">
-                  Explore detailed information about individual contributors and their nodes
-                </p>
-              </CardBody>
-            </Link>
-
-            <Link 
-              to="networks" 
-              className="card card-secondary card-interactive"
-            >
-              <CardBody>
-                <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center flex-shrink-0">
-                    <span className="text-xl">🌐</span>
-                  </div>
-
-                  <div className="flex-1 min-w-0">
-                    <h3 className="text-lg font-sans font-bold text-primary group-hover:text-accent transition-colors mb-1">
-                      Networks
-                    </h3>
-                    <p className="text-sm font-mono text-tertiary truncate">
-                      Network statistics
-                    </p>
-                  </div>
-
-                  <ArrowRight className="w-5 h-5 text-accent/50 group-hover:text-accent group-hover:translate-x-1 transition-all duration-300" />
-                </div>
-
-                <p className="text-sm font-mono text-secondary group-hover:text-primary/90 transition-colors mt-3">
-                  Compare statistics across different Ethereum networks
-                </p>
-              </CardBody>
-            </Link>
-
-            <Link 
-              to="geographical-checklist" 
-              className="card card-secondary card-interactive"
-            >
-              <CardBody>
-                <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center flex-shrink-0">
-                    <span className="text-xl">🗺️</span>
-                  </div>
-
-                  <div className="flex-1 min-w-0">
-                    <h3 className="text-lg font-sans font-bold text-primary group-hover:text-accent transition-colors mb-1">
-                      Geographical Checklist
-                    </h3>
-                    <p className="text-sm font-mono text-tertiary truncate">
-                      Geographic distribution
-                    </p>
-                  </div>
-
-                  <ArrowRight className="w-5 h-5 text-accent/50 group-hover:text-accent group-hover:translate-x-1 transition-all duration-300" />
-                </div>
-
-                <p className="text-sm font-mono text-secondary group-hover:text-primary/90 transition-colors mt-3">
-                  View node distribution across countries and continents
-                </p>
-              </CardBody>
-            </Link>
-
-            <Link 
-              to="fork-readiness" 
-              className="card card-secondary card-interactive"
-            >
-              <CardBody>
-                <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center flex-shrink-0">
-                    <span className="text-xl">🍴</span>
-                  </div>
-
-                  <div className="flex-1 min-w-0">
-                    <h3 className="text-lg font-sans font-bold text-primary group-hover:text-accent transition-colors mb-1">
-                      Fork Readiness
-                    </h3>
-                    <p className="text-sm font-mono text-tertiary truncate">
-                      Client upgrade status
-                    </p>
-                  </div>
-
-                  <ArrowRight className="w-5 h-5 text-accent/50 group-hover:text-accent group-hover:translate-x-1 transition-all duration-300" />
-                </div>
-
-                <p className="text-sm font-mono text-secondary group-hover:text-primary/90 transition-colors mt-3">
-                  Track client upgrade status for upcoming network forks
-                </p>
-              </CardBody>
-            </Link>
           </div>
         </div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Globe and Key Stats */}
+        <div className="lg:col-span-2 bg-surface/50 rounded-lg border border-subtle p-4 shadow-sm">
+          <h3 className="text-sm font-sans font-medium text-primary mb-4">Global Distribution</h3>
+          <div className="flex justify-center">
+            <GlobeViz 
+              data={globeData} 
+              width={Math.min(containerWidth - 40, GLOBE_WIDTH)}
+              height={300} 
+            />
+          </div>
+          
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-4">
+            <div>
+              <p className="text-xs font-mono text-tertiary">Total Nodes</p>
+              <p className="text-lg font-mono font-medium text-primary">{totalNodes.toLocaleString()}</p>
+            </div>
+            <div>
+              <p className="text-xs font-mono text-tertiary">Public Nodes</p>
+              <p className="text-lg font-mono font-medium text-accent">{totalPublicNodes.toLocaleString()}</p>
+            </div>
+            <div>
+              <p className="text-xs font-mono text-tertiary">Countries</p>
+              <p className="text-lg font-mono font-medium text-primary">{Object.keys(summaryData.networks.mainnet.countries).length}</p>
+            </div>
+            <div>
+              <p className="text-xs font-mono text-tertiary">Cities</p>
+              <p className="text-lg font-mono font-medium text-primary">{totalCities}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Client Distribution */}
+        <div className="bg-surface/50 rounded-lg border border-subtle p-4 shadow-sm">
+          <h3 className="text-sm font-sans font-medium text-primary mb-4">Client Distribution</h3>
+          <div className="space-y-3">
+            {clientDistribution.slice(0, 5).map((client) => (
+              <div key={client.name} className="flex items-center gap-2">
+                <div className="w-5 h-5 rounded bg-surface/70 flex items-center justify-center">
+                  <img
+                    src={`/clients/${client.name.toLowerCase()}.png`}
+                    alt={`${client.name} logo`}
+                    className="w-3 h-3 object-contain"
+                    onError={(event) => {
+                      const target = event.currentTarget;
+                      target.style.display = 'none';
+                    }}
+                  />
+                </div>
+                <div className="flex-1 flex items-center justify-between">
+                  <span className="text-xs font-mono text-primary">{client.name}</span>
+                  <span className="text-xs font-mono text-accent">
+                    {totalMainnetNodes > 0 ? ((client.value / totalMainnetNodes) * 100).toFixed(1) : '0.0'}%
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Navigation Links */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        {[
+          { to: "contributors", emoji: "👥", title: "Contributors" },
+          { to: "networks", emoji: "🌐", title: "Networks" },
+          { to: "geographical-checklist", emoji: "🗺️", title: "Geography" },
+          { to: "fork-readiness", emoji: "🍴", title: "Fork Readiness" }
+        ].map((item) => (
+          <Link 
+            key={item.to}
+            to={item.to} 
+            className="bg-surface/50 hover:bg-surface/70 border border-subtle hover:border-accent/20 rounded-lg p-3 transition-all duration-200 flex items-center gap-2 group"
+          >
+            <div className="w-8 h-8 rounded bg-surface/70 flex items-center justify-center">
+              <span className="text-base">{item.emoji}</span>
+            </div>
+            <div className="flex-1">
+              <span className="text-sm font-sans font-medium text-primary group-hover:text-accent transition-colors">{item.title}</span>
+            </div>
+            <ArrowRight className="w-4 h-4 text-tertiary group-hover:text-accent group-hover:translate-x-1 transition-all duration-300" />
+          </Link>
+        ))}
       </div>
     </div>
   );

@@ -56,7 +56,7 @@ function Layout(): JSX.Element {
       {/* Content */}
       <div className="relative z-10 flex flex-col min-h-screen">
         {/* Header Section */}
-        <header className="sticky top-0 z-50 backdrop-blur-md bg-nav/80 border-b border-subtle">
+        <header className="sticky top-0 z-50 bg-nav border-b border-accent/30">
           {/* Top Bar */}
           <div className="w-full px-4 md:px-6 lg:px-8 xl:px-12 2xl:px-16 py-2 flex items-center justify-between">
             {/* Left - Logo and Mobile Menu */}
@@ -106,7 +106,7 @@ function Layout(): JSX.Element {
 
           {/* Navigation Bar (desktop only) */}
           {!isHome && (
-            <div className="hidden lg:block w-full px-4 md:px-6 lg:px-8 xl:px-12 2xl:px-16 py-2 border-t border-subtle">
+            <div className="hidden lg:block w-full px-4 md:px-6 lg:px-8 xl:px-12 2xl:px-16 py-2 border-t border-accent/20">
               <div className="flex items-center justify-between">
                 <Breadcrumbs />
                 <Navigation />
@@ -132,7 +132,7 @@ function Layout(): JSX.Element {
           {/* Sidebar */}
           <div
             className={clsx(
-              'absolute top-0 left-0 w-72 h-[calc(100vh-56px)] bg-nav/95 backdrop-blur-md border-r border-subtle transform transition-transform duration-300',
+              'absolute top-0 left-0 w-72 h-[calc(100vh-56px)] bg-nav border-r border-accent/30 transform transition-transform duration-300',
               isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
             )}
           >
@@ -163,7 +163,7 @@ function Layout(): JSX.Element {
 
               {/* Footer Info */}
               {currentSlot !== null && currentEpoch !== null && (
-                <div className="mt-auto p-4 border-t border-subtle bg-surface/50">
+                <div className="mt-auto p-4 border-t border-accent/20 bg-surface">
                   <div className="text-sm font-mono space-y-2">
                     <div className="flex items-center justify-between">
                       <span className="text-tertiary">Slot</span>

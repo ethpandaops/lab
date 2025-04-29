@@ -9,6 +9,7 @@ alwaysApply: false
 - When implementing new reusable patterns, design principles, or best practices, add them to this file
 - This file should evolve organically as we discover better ways to do things
 - Document any decisions that would be useful for future implementations
+- The frontend is already running a http://localhost:5173 -- don't try and run the dev server
 
 ## Color System
 - Colors are defined in semantic layers:
@@ -77,7 +78,7 @@ alwaysApply: false
       </div>
       <div className="relative flex justify-center">
         <div className="px-4 bg-base">
-          <h1 className="text-3xl md:text-4xl font-sans font-black text-primary animate-text-shine">
+          <h1 className="text-3xl md:text-4xl font-sans font-black text-primary">
             Page Title
           </h1>
         </div>
@@ -298,3 +299,65 @@ When using the LabAPI client in components:
 5. Follow existing design patterns for data display and user interaction.
 6. Maintain consistent loading and error states across components.
 7. Use TypeScript for all new components and API interactions.
+8. **Card Component Usage Guidelines**
+
+   ### Standard Card vs. FeatureCard
+
+   The codebase uses two primary card components that serve different purposes:
+
+   #### Standard Card Component
+   - **Usage:** For general content, data display, or information containers
+   - **When to use:** 
+     - For most dashboard screens
+     - When displaying dense information or data
+     - For administrative interfaces
+     - When many cards need to be shown in a grid or list
+   - **Example:** Dashboard widgets, data tables, form containers
+
+   ```tsx
+   import { Card, CardBody } from '../components/common/Card';
+
+   <Card>
+     <CardBody>
+       <h3>Card Title</h3>
+       <p>Content goes here</p>
+     </CardBody>
+   </Card>
+   ```
+
+   #### FeatureCard Component
+   - **Usage:** For highlighted features, promotional content, or key offerings
+   - **When to use:**
+     - On landing or marketing pages
+     - When showcasing key features that need visual impact
+     - For product or service cards that benefit from visual differentiation
+     - On pages where drawing visual attention to specific options is desired
+   - **When NOT to use:**
+     - For regular data display or dense information (use the standard Card component)
+     - When multiple cards are needed in tight layouts
+     - For administrative interfaces or data-heavy applications
+     - When performance is a concern (animations can be costly)
+
+   ```tsx
+   import FeatureCard from '../components/common/FeatureCard';
+
+   <FeatureCard
+     title="Feature Name"
+     subtitle="Category"
+     description="This feature does something amazing."
+     logo="/path/to/logo.png" // OR icon={<YourIcon />}
+     href="/feature-details"
+     accentColor={{
+       light: 'rgba(142, 45, 226, 0.05)',
+       medium: 'rgba(142, 45, 226, 0.15)'
+     }}
+   />
+   ```
+
+### Animation Guidelines
+
+- Use animations sparingly and purposefully
+- Prefer transform and opacity transitions for better performance
+- Keep durations between 200ms and 500ms for most UI interactions
+- Use longer durations (500ms-700ms) only for special emphasis elements
+- Use will-change-transform for elements that will be animated frequently

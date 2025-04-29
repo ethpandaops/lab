@@ -235,17 +235,17 @@
 	.card-primary {
 		@apply backdrop-blur-md;
 
-		background-color: #0f172a;
+		background-color: rgb(var(--bg-surface-raised));
 		border: none !important;
-		box-shadow: 0 4px 12px rgb(0 0 0 / 15%);
+		box-shadow: 0 4px 12px rgb(0 0 0 / 15%), 0 0 1px rgb(var(--accent) / 10%);
 	}
 
 	.card-secondary {
 		@apply backdrop-blur-sm;
 
-		background-color: #1e293b;
+		background-color: rgb(var(--bg-card));
 		border: none !important;
-		box-shadow: 0 3px 10px rgb(0 0 0 / 12%);
+		box-shadow: 0 3px 10px rgb(0 0 0 / 12%), 0 0 1px rgb(var(--accent) / 10%);
 	}
 
 	.card-interactive {
@@ -253,8 +253,8 @@
 
 		&:hover {
 			border: none !important;
-			box-shadow: 0 5px 15px rgb(0 0 0 / 20%);
-			background-color: #1e293b;
+			box-shadow: 0 5px 15px rgb(0 0 0 / 20%), 0 0 2px rgb(var(--accent) / 20%);
+			background-color: rgb(var(--bg-hover));
 			transform: translateY(-1px);
 		}
 	}
@@ -264,7 +264,7 @@
 
 		border: none !important;
 		border-bottom: none !important;
-		background-color: #0f172a;
+		background-color: rgb(var(--bg-surface));
 	}
 
 	.card-body {
@@ -278,15 +278,15 @@
 
 		border: none !important;
 		border-top: none !important;
-		background-color: #0f172a;
+		background-color: rgb(var(--bg-surface));
 	}
 
 	.card-stat {
 		@apply rounded-lg overflow-hidden;
 
 		border: none !important;
-		background-color: #1e293b;
-		box-shadow: 0 3px 10px rgb(0 0 0 / 12%);
+		background-color: rgb(var(--bg-card));
+		box-shadow: 0 3px 10px rgb(0 0 0 / 12%), 0 0 1px rgb(var(--accent) / 10%);
 	}
 
 	.card-stat-header {
@@ -294,7 +294,7 @@
 
 		border: none !important;
 		border-bottom: none !important;
-		background-color: #0f172a;
+		background-color: rgb(var(--bg-surface));
 	}
 
 	.card-stat-body {
@@ -372,8 +372,8 @@
 
 @layer utilities {
 	.bg-nav {
-		background-color: rgb(var(--bg-surface) / 95%);
-		border-color: rgb(var(--border-subtle) / 20%);
+		background-color: rgb(25 35 65); /* Darker blue color */
+		border-color: rgb(var(--border-subtle) / 50%);
 	}
 
 	.bg-content {
@@ -382,23 +382,6 @@
 
 	.bg-gradient-page {
 		background-image: linear-gradient(to bottom, rgb(var(--bg-base) / 95%), rgb(var(--bg-base) / 85%));
-	}
-
-	/* Text gradient animation */
-	.animate-text-shine {
-		background: linear-gradient(
-			to right,
-			rgb(var(--text-primary)) 20%,
-			rgb(var(--accent)) 30%,
-			rgb(var(--accent)) 70%,
-			rgb(var(--text-primary)) 80%
-		);
-		background-size: 200% auto;
-		background-clip: text;
-		text-fill-color: transparent;
-		-webkit-background-clip: text;
-		-webkit-text-fill-color: transparent;
-		animation: shine 8s linear infinite;
 	}
 
 	/* Slow pulse animation */

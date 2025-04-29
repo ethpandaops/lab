@@ -6,7 +6,7 @@ function BeaconChainTimings(): JSX.Element {
   const location = useLocation()
 
   // If we're on a nested route, render the child route
-  if (location.pathname !== '/beacon-chain-timings') {
+  if (location.pathname !== '/beacon/timings') {
     return <Outlet />
   }
 
