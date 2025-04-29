@@ -372,8 +372,8 @@
 
 @layer utilities {
 	.bg-nav {
-		background-color: rgb(var(--bg-surface) / 95%);
-		border-color: rgb(var(--border-subtle) / 20%);
+		background-color: rgb(25 35 65); /* Darker blue color */
+		border-color: rgb(var(--border-subtle) / 50%);
 	}
 
 	.bg-content {

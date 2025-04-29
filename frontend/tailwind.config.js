@@ -174,18 +174,18 @@ const config = {
 			addBase({
 				':root': {
 					// Text colors - Space theme
-					'--text-primary': '255 255 255', // Pure white (#FFFFFF)
-					'--text-secondary': '226 232 240', // Slate 200 (#E2E8F0)
-					'--text-tertiary': '148 163 184', // Slate 400 (#94A3B8)
-					'--text-muted': '100 116 139', // Slate 500 (#64748B)
+					'--text-primary': '235 245 255', // Slightly dimmed white (#EBF5FF)
+					'--text-secondary': '210 220 235', // Dimmed slate (#D2DCEB)
+					'--text-tertiary': '140 155 175', // Dimmed slate (#8C9BAF)
+					'--text-muted': '95 110 130', // Dimmed slate (#5F6E82)
 
-					// Background colors - Deep space gradient
-					'--bg-base': '15 25 60', // Much lighter navy (#15193C)
-					'--bg-surface': '30 45 80', // Much lighter slate (#1E2D50)
-					'--bg-surface-raised': '40 55 90', // For primary cards (#28375A)
-					'--bg-hover': '50 65 100', // Lighter slate (#32416E)
-					'--bg-active': '60 75 110', // Lighter slate (#3C4B6E)
-					'--bg-card': '35 50 85', // For secondary cards (#23325A)
+					// Background colors - Deep space gradient (darker)
+					'--bg-base': '10 18 40', // Darker navy (#0A1228)
+					'--bg-surface': '20 30 55', // Darker slate (#141E37)
+					'--bg-surface-raised': '30 40 65', // Darker raised surfaces (#1E2841)
+					'--bg-hover': '40 50 75', // Darker hover (#28324B)
+					'--bg-active': '45 55 85', // Darker active (#2D3755)
+					'--bg-card': '25 35 60', // Darker card (#19233C)
 
 					// Borders - Deep space with cyan accents
 					'--border-subtle': '50 65 95', // Lighter border (#32415F)

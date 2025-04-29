@@ -21,9 +21,9 @@ const featuredExperiments = [
     id: 'beacon-chain',
     title: 'Slot Explorer',
     subtitle: 'Beacon Chain',
-    description: 'Explore detailed information about consensus layer slots.',
+    description: 'Explore live slot data.',
     logo: '/ethereum.png',
-    href: '/beacon/slot/',
+    href: '/beacon/slot/live',
     accentColor: {
       light: 'rgba(56, 189, 248, 0.05)',
       medium: 'rgba(56, 189, 248, 0.15)',
@@ -132,11 +132,11 @@ function Home(): JSX.Element {
           <div className="max-w-6xl mx-auto px-4 text-center">
             {/* Decorative elements */}
             <div className="mb-8 flex justify-center">
-              <div className="relative w-24 h-24">
+              <div className="relative w-60 h-60">
                 <div className="absolute inset-0 bg-accent/20 rounded-full animate-pulse-slow"></div>
                 <div className="absolute inset-2 border border-accent/30 rounded-full"></div>
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <img src="/ethereum.png" alt="Ethereum" className="w-12" />
+                  <img src="/ethpandaops.png" alt="Ethereum" className="w-32" />
                 </div>
               </div>
             </div>
