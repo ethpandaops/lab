@@ -412,13 +412,13 @@ export function SlotView({ slot, network = 'mainnet', isLive = false, onSlotComp
               <div className="flex items-center justify-between mb-1">
                 <div>
                   <div className="text-xl font-sans font-black text-primary">
-                    <a href={`https://beaconcha.in/slot/${slot}`} target="_blank" rel="noopener noreferrer" className="hover:text-accent transition-colors">
+                    <a href={`https://beaconcha.in/slot/${slot}`} target="_blank" rel="noopener noreferrer">
                       Slot {slot}
                     </a>
                   </div>
                   <div className="text-[10px] font-mono text-tertiary">
                     by {slotData?.entity && ['mainnet', 'holesky', 'sepolia'].includes(network) ? (
-                      <a href={`https://ethseer.io/entity/${slotData.entity}?network=${network}`} target="_blank" rel="noopener noreferrer" className="text-accent hover:text-accent/80 transition-colors">
+                      <a href={`https://ethseer.io/entity/${slotData.entity}?network=${network}`} target="_blank" rel="noopener noreferrer" className="text-accent hover:text-accent/80">
                         {slotData.entity}
                       </a>
                     ) : (
@@ -631,12 +631,12 @@ export function SlotView({ slot, network = 'mainnet', isLive = false, onSlotComp
               <div className="p-4 space-y-4">
                 {/* Slot Header */}
                 <div className="mb-3 p-2">
-                  <div className="text-4xl font-sans font-black text-primary animate-text-shine mb-1">
+                  <div className="text-4xl font-sans font-black text-primary mb-1">
                     <a
                       href={`https://beaconcha.in/slot/${slot}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="hover:text-accent transition-colors"
+                      className="hover:text-accent"
                     >
                       {slot}
                     </a>
@@ -647,7 +647,7 @@ export function SlotView({ slot, network = 'mainnet', isLive = false, onSlotComp
                         href={`https://ethseer.io/entity/${slotData.entity}?network=${network}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-accent hover:text-accent/80 transition-colors"
+                        className="text-accent hover:text-accent/80"
                       >
                         {slotData.entity}
                       </a>

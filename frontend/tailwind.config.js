@@ -180,15 +180,15 @@ const config = {
 					'--text-muted': '100 116 139', // Slate 500 (#64748B)
 
 					// Background colors - Deep space gradient
-					'--bg-base': '2 6 23', // Darker than navy (#02061A)
-					'--bg-surface': '15 23 42', // Slate 950 (#0F172A)
-					'--bg-surface-raised': '30 41 59', // Slate 800 (#1E293B)
-					'--bg-hover': '51 65 85', // Slate 700 (#334155)
-					'--bg-active': '71 85 105', // Slate 600 (#475569)
-					'--bg-card': '15 23 42', // Slate 950 (#0F172A)
+					'--bg-base': '15 25 60', // Much lighter navy (#15193C)
+					'--bg-surface': '30 45 80', // Much lighter slate (#1E2D50)
+					'--bg-surface-raised': '40 55 90', // For primary cards (#28375A)
+					'--bg-hover': '50 65 100', // Lighter slate (#32416E)
+					'--bg-active': '60 75 110', // Lighter slate (#3C4B6E)
+					'--bg-card': '35 50 85', // For secondary cards (#23325A)
 
 					// Borders - Deep space with cyan accents
-					'--border-subtle': '30 41 59', // Slate 800 (#1E293B)
+					'--border-subtle': '50 65 95', // Lighter border (#32415F)
 					'--border-default': '45 212 191', // Cyan (#2DD4BF)
 					'--border-prominent': '34 211 238', // Bright cyan (#22D3EE)
 
