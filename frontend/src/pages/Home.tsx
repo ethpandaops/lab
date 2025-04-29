@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
-import { ArrowRight, ExternalLink, Zap, ChevronRight } from 'lucide-react'
-import { Card, CardBody } from '../components/common/Card'
+import { ArrowRight, ExternalLink, Zap } from 'lucide-react'
 import { useEffect, useState, useRef } from 'react'
+import FeatureCard from '../components/common/FeatureCard'
 
 // Import experiment data from Experiments page
 const featuredExperiments = [
@@ -12,7 +12,10 @@ const featuredExperiments = [
     description: 'Analyze throw-away blocks built by our clients.',
     logo: '/xatu.png',
     href: '/beacon/locally-built-blocks',
-    color: 'from-primary/20 via-accent/20 to-error/20',
+    accentColor: {
+      light: 'rgba(142, 45, 226, 0.05)',
+      medium: 'rgba(142, 45, 226, 0.15)',
+    },
   },
   {
     id: 'beacon-chain',
@@ -21,7 +24,10 @@ const featuredExperiments = [
     description: 'Explore detailed information about consensus layer slots.',
     logo: '/ethereum.png',
     href: '/beacon/slot/',
-    color: 'from-accent/20 via-accent-secondary/20 to-error/20',
+    accentColor: {
+      light: 'rgba(56, 189, 248, 0.05)',
+      medium: 'rgba(56, 189, 248, 0.15)',
+    },
   }
 ];
 
@@ -141,7 +147,7 @@ function Home(): JSX.Element {
                 <div className="w-full h-px bg-gradient-to-r from-transparent via-accent/30 to-transparent"></div>
               </div>
               <div className="relative">
-                <h1 className="text-5xl md:text-6xl lg:text-7xl font-sans font-black text-primary animate-text-shine mb-2">
+                <h1 className="text-5xl md:text-6xl lg:text-7xl font-sans font-black text-primary mb-2">
                   The Lab
                 </h1>
                 <div className="w-32 h-1 mx-auto bg-gradient-to-r from-accent/50 to-error/50 rounded-full"></div>
@@ -197,7 +203,7 @@ function Home(): JSX.Element {
                 <Zap className="h-10 w-10 text-accent relative z-10" />
               </div>
               <h2 className="text-3xl md:text-4xl font-sans font-bold mb-3">
-                <span className="bg-gradient-to-r from-accent to-error bg-clip-text text-transparent animate-text-shine">
+                <span className="bg-gradient-to-r from-accent to-accent bg-clip-text text-transparent ">
                   Featured Experiments
                 </span>
               </h2>
@@ -206,76 +212,19 @@ function Home(): JSX.Element {
               </p>
             </div>
             
-            {/* Featured Cards Grid - Enhanced with more visual interest */}
+            {/* Featured Cards Grid - Using the FeatureCard component */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
               {featuredExperiments.map((experiment) => (
-                <Card 
-                  key={experiment.id} 
-                  isInteractive 
-                  className="group relative overflow-hidden rounded-xl bg-surface/30 backdrop-blur-sm border border-subtle hover:border-accent/50 transition-all duration-500 will-change-transform hover:shadow-lg dark:hover:shadow-accent/10"
-                >
-                  <Link to={experiment.href} className="block w-full h-full">
-                    {/* Enhanced gradient background with animation */}
-                    <div className="absolute inset-0 bg-gradient-to-br opacity-0 group-hover:opacity-100 transition-opacity duration-700" 
-                         style={{background: `radial-gradient(circle at 30% 107%, ${experiment.id === 'xatu' ? 'rgba(142, 45, 226, 0.05)' : 'rgba(56, 189, 248, 0.05)'} 0%, rgba(32, 32, 32, 0) 70%)`}}>
-                    </div>
-                    
-                    {/* Animated grid pattern overlay */}
-                    <div className="absolute inset-0 bg-grid-pattern opacity-0 group-hover:opacity-[0.03] transition-opacity duration-700 pointer-events-none"></div>
-                    
-                    {/* Card content container */}
-                    <CardBody className="relative p-6 md:p-8">
-                      <div className="flex flex-col md:flex-row md:items-start gap-6 md:gap-8">
-                        {/* Logo with enhanced effects */}
-                        <div className="w-16 h-16 md:w-20 md:h-20 flex items-center justify-center flex-shrink-0 relative mx-auto md:mx-0">
-                          {/* Logo glow effect - pulsing */}
-                          <div className="absolute inset-0 bg-gradient-to-br rounded-full opacity-70 blur-lg group-hover:blur-xl group-hover:scale-110 transition-all duration-700"
-                               style={{background: `radial-gradient(circle, ${experiment.id === 'xatu' ? 'rgba(142, 45, 226, 0.15)' : 'rgba(56, 189, 248, 0.15)'} 0%, rgba(0, 0, 0, 0) 70%)`}}>
-                          </div>
-                          
-                          {/* Animated border ring */}
-                          <div className="absolute inset-0 rounded-full border border-accent/20 group-hover:border-accent/40 group-hover:scale-110 transition-all duration-700"></div>
-                          
-                          {/* Logo image */}
-                          <img
-                            src={experiment.logo}
-                            alt=""
-                            className="w-12 h-12 md:w-14 md:h-14 object-contain relative z-10 group-hover:scale-110 transition-transform duration-500"
-                          />
-                        </div>
-
-                        {/* Card text content */}
-                        <div className="flex-1 min-w-0 text-center md:text-left">
-                          <div className="mb-1 text-xs font-mono text-accent/80 tracking-wide uppercase">
-                            {experiment.subtitle}
-                          </div>
-                          
-                          <h3 className="text-xl md:text-2xl font-sans font-bold text-primary group-hover:text-accent transition-colors duration-300 mb-2">
-                            {experiment.title}
-                          </h3>
-                          
-                          <p className="text-sm md:text-md font-mono text-secondary mb-4 group-hover:text-primary transition-colors duration-300">
-                            {experiment.description}
-                          </p>
-                          
-                          {/* Animated button/tag */}
-                          <div className="inline-flex items-center text-accent bg-accent/5 border border-accent/10 px-3 py-1.5 rounded-full group-hover:bg-accent/10 group-hover:border-accent/20 transition-all duration-300">
-                            <span className="text-sm font-mono">Explore</span>
-                            <ChevronRight className="ml-1 w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" />
-                          </div>
-                        </div>
-                      </div>
-                      
-                      {/* Decorative elements - subtle corner accents */}
-                      <div className="absolute top-0 right-0 w-16 h-16 pointer-events-none overflow-hidden">
-                        <div className="absolute top-0 right-0 w-6 h-6 translate-x-3 -translate-y-3 bg-accent/5 rounded-full group-hover:bg-accent/10 group-hover:scale-150 transition-all duration-700"></div>
-                      </div>
-                      <div className="absolute bottom-0 left-0 w-16 h-16 pointer-events-none overflow-hidden">
-                        <div className="absolute bottom-0 left-0 w-6 h-6 -translate-x-3 translate-y-3 bg-accent/5 rounded-full group-hover:bg-accent/10 group-hover:scale-150 transition-all duration-700"></div>
-                      </div>
-                    </CardBody>
-                  </Link>
-                </Card>
+                <FeatureCard
+                  key={experiment.id}
+                  id={experiment.id}
+                  title={experiment.title}
+                  subtitle={experiment.subtitle}
+                  description={experiment.description}
+                  logo={experiment.logo}
+                  href={experiment.href}
+                  accentColor={experiment.accentColor}
+                />
               ))}
             </div>
             
@@ -299,7 +248,7 @@ function Home(): JSX.Element {
           <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-accent/20 to-transparent"></div>
           
           <div className="max-w-4xl mx-auto text-center relative z-10">
-            <h2 className="text-2xl md:text-3xl font-sans font-bold mb-4 animate-text-shine">Contribute to the Lab</h2>
+            <h2 className="text-2xl md:text-3xl font-sans font-bold mb-4 ">Contribute to the Lab</h2>
             <p className="text-lg font-mono text-secondary mb-8 max-w-2xl mx-auto">
               Contribute to our open-source tools and help advance Ethereum network analysis
             </p>
