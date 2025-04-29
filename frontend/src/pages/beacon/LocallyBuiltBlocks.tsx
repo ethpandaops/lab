@@ -9,8 +9,6 @@ import {
   LocallyBuiltBlocksVisualization,
   LocallyBuiltBlocksTable,
   ClientPresenceHeatmap,
-  BlockValueDistribution,
-  TransactionBubbleChart,
   UnifiedBlocksTimeline
 } from '../../components/beacon/LocallyBuiltBlocks'
 import {
@@ -219,20 +217,6 @@ export function LocallyBuiltBlocks(): JSX.Element {
             isLoading={isLoading}
           />
         )
-      case 'value-distribution':
-        return (
-          <BlockValueDistribution
-            data={data}
-            isLoading={isLoading}
-          />
-        )
-      case 'bubble-chart':
-        return (
-          <TransactionBubbleChart
-            data={data}
-            isLoading={isLoading}
-          />
-        )
       default:
         return (
           <LocallyBuiltBlocksVisualization
@@ -276,28 +260,6 @@ export function LocallyBuiltBlocks(): JSX.Element {
               </div>
               {/* Right: Controls/Actions */}
               <div className="flex items-center gap-2">
-                {/* Manual Refresh Button */}
-                <button
-                  onClick={handleManualRefresh}
-                  className={`p-1.5 rounded-md hover:bg-surface/60 transition-all duration-200 ${isRefreshing ? 'animate-spin text-accent' : 'text-tertiary hover:text-primary'}`}
-                  disabled={isRefreshing}
-                  title="Refresh data"
-                >
-                  <RefreshCw className="w-4 h-4" />
-                </button>
-                {/* View Mode Tabs */}
-                <div className="flex space-x-1 bg-surface/60 p-1 rounded-md">
-                  {viewOptions.map(option => (
-                    <TabButton
-                      key={option.id}
-                      isActive={viewMode === option.id}
-                      onClick={() => setViewMode(option.id)}
-                      label={option.label}
-                      icon={option.icon}
-                      // Removed size="sm" as it caused an error, assuming default or className handles size
-                    />
-                  ))}
-                </div>
               </div>
             </div>
             {/* Optional: Stats/Info Row */}
@@ -305,16 +267,6 @@ export function LocallyBuiltBlocks(): JSX.Element {
               <div className="flex items-center gap-1.5">
                 <Clock className="w-3 h-3 text-accent/70" />
                 <span>Last updated: {formatLastUpdated()}</span>
-              </div>
-              {currentSlot !== null && (
-                <div className="flex items-center gap-1.5">
-                  <span className="text-secondary">Current slot: {currentSlot}</span>
-                </div>
-              )}
-              <div className="flex items-center gap-1.5">
-                {data.length > 0
-                  ? `Showing ${data.reduce((sum, slotBlocks) => sum + slotBlocks.blocks.length, 0)} blocks across ${data.length} slots`
-                  : 'No data available'}
               </div>
             </div>
           </div>
@@ -327,10 +279,6 @@ export function LocallyBuiltBlocks(): JSX.Element {
             currentSlot={currentSlot}
           />
 
-          {/* Active View Content */}
-          <div className="transition-opacity duration-300 ease-in-out">
-            {renderActiveView()}
-          </div>
         </>
       )}
     </div>

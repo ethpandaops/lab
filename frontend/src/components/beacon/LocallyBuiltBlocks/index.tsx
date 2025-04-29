@@ -3,6 +3,5 @@ export { LocallyBuiltBlocksVisualization } from './LocallyBuiltBlocksVisualizati
 export { LocallyBuiltBlocksTable } from './LocallyBuiltBlocksTable'
 export { ClientPresenceHeatmap } from './ClientPresenceHeatmap'
 export { BlockValueDistribution } from './BlockValueDistribution'
-export { TransactionBubbleChart } from './TransactionBubbleChart'
 export { BlocksTimeline } from './BlocksTimeline'
 export { UnifiedBlocksTimeline } from './UnifiedBlocksTimeline' 
