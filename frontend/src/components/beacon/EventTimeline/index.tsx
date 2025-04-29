@@ -2,8 +2,8 @@ import { useEffect, useRef, useMemo, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronLeft, ChevronRight, Settings, X, Box, Radio, Layers, Network } from 'lucide-react'
 import { FaPlay, FaPause } from 'react-icons/fa'
-import { useModal } from '../../../contexts/ModalContext'
-import { formatNodeName } from '../../../utils/format'
+import { useModal } from '@/contexts/ModalContext.tsx'
+import { formatNodeName } from '@/utils/format.ts'
 import clsx from 'clsx'
 
 interface Event {

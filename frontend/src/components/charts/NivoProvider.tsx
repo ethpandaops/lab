@@ -1,5 +1,5 @@
 import { ReactNode } from 'react'
-import { defaultNivoTheme } from './NivoTheme'
+import { defaultNivoTheme } from '@/components/charts/NivoTheme.ts'
 
 interface NivoProviderProps {
   children: ReactNode

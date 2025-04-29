@@ -1,4 +1,4 @@
-import { createLabApiClient, LabApiClientType } from './client';
+import { createLabApiClient, LabApiClientType } from '@/api/client.ts';
 
 let client: LabApiClientType | null = null;
 

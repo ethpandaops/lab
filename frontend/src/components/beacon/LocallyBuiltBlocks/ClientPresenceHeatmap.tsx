@@ -1,6 +1,6 @@
 import { FC, useState, useMemo } from 'react'
-import { LocallyBuiltSlotBlocks } from '../../../api/gen/backend/pkg/server/proto/beacon_slots/beacon_slots_pb'
-import { EXECUTION_CLIENTS, CONSENSUS_CLIENTS } from '../../../constants/clients'
+import { LocallyBuiltSlotBlocks } from '@/api/gen/backend/pkg/server/proto/beacon_slots/beacon_slots_pb'
+import { EXECUTION_CLIENTS, CONSENSUS_CLIENTS } from '@/constants/clients.ts'
 import { ArrowLeftRight } from 'lucide-react'
 
 interface ClientPresenceHeatmapProps {

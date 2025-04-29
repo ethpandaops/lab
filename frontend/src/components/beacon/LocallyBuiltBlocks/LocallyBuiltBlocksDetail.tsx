@@ -1,7 +1,7 @@
 import { FC } from 'react'
-import { LocallyBuiltBlock } from '../../../api/gen/backend/pkg/server/proto/beacon_slots/beacon_slots_pb'
+import { LocallyBuiltBlock } from '@/api/gen/backend/pkg/server/proto/beacon_slots/beacon_slots_pb'
 import { Timestamp } from '@bufbuild/protobuf'
-import { formatBytes, formatEther } from '../../../utils/format'
+import { formatBytes, formatEther } from '@/utils/format.ts'
 import { 
   Package, Calendar, Hash, Cpu, Server, Globe, 
   FileText, ArrowDownToLine, Gauge, 

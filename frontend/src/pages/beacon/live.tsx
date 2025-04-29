@@ -1,8 +1,8 @@
 import { useEffect, useState, useContext } from 'react'
-import { SlotView } from '../../components/beacon/SlotView'
+import { SlotView } from '@/components/beacon/SlotView'
 import { useSearchParams } from 'react-router-dom'
-import { BeaconClockManager } from '../../utils/beacon'
-import { NetworkContext } from '../../App'
+import { BeaconClockManager } from '@/utils/beacon.ts'
+import { NetworkContext } from '@/App'
 
 function BeaconLive(): JSX.Element {
   const [searchParams, setSearchParams] = useSearchParams()

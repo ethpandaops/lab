@@ -1,5 +1,5 @@
-import { getLabApiClient } from './singleton';
-import { GetRecentLocallyBuiltBlocksRequest } from './gen/backend/pkg/api/proto/lab_api_pb';
+import { getLabApiClient } from '@/api/singleton.ts';
+import { GetRecentLocallyBuiltBlocksRequest } from '@/api/gen/backend/pkg/api/proto/lab_api_pb';
 
 /**
  * Example function demonstrating how to use the singleton LabAPI client.

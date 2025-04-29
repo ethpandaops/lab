@@ -1,11 +1,11 @@
-import { useDataFetch } from '../../../utils/data';
+import { useDataFetch } from '@/utils/data.ts';
 import { formatDistanceToNow } from 'date-fns';
-import { XatuCallToAction } from '../../../components/xatu/XatuCallToAction';
+import { XatuCallToAction } from '@/components/xatu/XatuCallToAction';
 import { useContext, useEffect, useState } from 'react';
-import { ConfigContext } from '../../../App';
-import { NETWORK_METADATA, type NetworkKey } from '../../../constants/networks';
-import { LoadingState } from '../../../components/common/LoadingState';
-import { ErrorState } from '../../../components/common/ErrorState';
+import { ConfigContext } from '@/App';
+import { NETWORK_METADATA, type NetworkKey } from '@/constants/networks.tsx';
+import { LoadingState } from '@/components/common/LoadingState';
+import { ErrorState } from '@/components/common/ErrorState';
 import { Sparkles } from 'lucide-react';
 
 interface ConsensusImplementation {

@@ -1,6 +1,6 @@
 import { ResponsiveScatterPlot, ScatterPlotDatum, ScatterPlotSvgProps } from '@nivo/scatterplot'
-import { withNivoTheme } from './NivoProvider'
-import { defaultNivoTheme } from './NivoTheme'
+import { withNivoTheme } from '@/components/charts/NivoProvider'
+import { defaultNivoTheme } from '@/components/charts/NivoTheme.ts'
 import { ComponentType } from 'react'
 
 // Create a themed version of ResponsiveScatterPlot

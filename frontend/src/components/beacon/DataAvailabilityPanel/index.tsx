@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
-import { ChartWithStats, NivoLineChart, NivoScatterChart } from '../../charts'
+import { ChartWithStats, NivoLineChart, NivoScatterChart } from '@/components/charts'
 import { CheckCircle2, XCircle, HelpCircle } from 'lucide-react'
-import { useModal } from '../../../contexts/ModalContext'
+import { useModal } from '@/contexts/ModalContext.tsx'
 
 // Interface for DataAvailabilityPanelProps
 interface DataAvailabilityPanelProps {

@@ -1,16 +1,16 @@
 import { useState, useEffect, useCallback } from 'react'
-import { NetworkContext } from '../../App'
+import { NetworkContext } from '@/App'
 import { useContext } from 'react'
-import { getLabApiClient } from '../../api'
-import { GetRecentLocallyBuiltBlocksRequest } from '../../api/gen/backend/pkg/api/proto/lab_api_pb'
-import { LocallyBuiltSlotBlocks, LocallyBuiltBlock } from '../../api/gen/backend/pkg/server/proto/beacon_slots/beacon_slots_pb'
+import { getLabApiClient } from '@/api'
+import { GetRecentLocallyBuiltBlocksRequest } from '@/api/gen/backend/pkg/api/proto/lab_api_pb'
+import { LocallyBuiltSlotBlocks, LocallyBuiltBlock } from '@/api/gen/backend/pkg/server/proto/beacon_slots/beacon_slots_pb'
 import {
   LocallyBuiltBlocksDetail,
   LocallyBuiltBlocksVisualization,
   LocallyBuiltBlocksTable,
   ClientPresenceHeatmap,
   UnifiedBlocksTimeline
-} from '../../components/beacon/LocallyBuiltBlocks'
+} from '@/components/beacon/LocallyBuiltBlocks'
 import {
   ChevronLeft,
   BarChart2,
@@ -19,8 +19,8 @@ import {
   Clock,
   ScatterChart
 } from 'lucide-react'
-import { TabButton } from '../../components/common/TabButton' // Assuming TabButton exists and accepts these props
-import { BeaconClockManager } from '../../utils/beacon'
+import { TabButton } from '@/components/common/TabButton' // Assuming TabButton exists and accepts these props
+import { BeaconClockManager } from '@/utils/beacon.ts'
 
 // Refresh interval in milliseconds
 const REFRESH_INTERVAL = 5000

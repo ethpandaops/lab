@@ -1,7 +1,7 @@
 import { FC, useMemo } from 'react'
-import { LocallyBuiltSlotBlocks, LocallyBuiltBlock } from '../../../api/gen/backend/pkg/server/proto/beacon_slots/beacon_slots_pb'
+import { LocallyBuiltSlotBlocks, LocallyBuiltBlock } from '@/api/gen/backend/pkg/server/proto/beacon_slots/beacon_slots_pb'
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts'
-import { formatEther } from '../../../utils/format'
+import { formatEther } from '@/utils/format.ts'
 
 interface BlockValueDistributionProps {
   data: LocallyBuiltSlotBlocks[]

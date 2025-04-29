@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { getDataUrl } from '../config'
+import { getDataUrl } from '@/config'
 
 export const fetchData = async <T>(path: string): Promise<T> => {
   const response = await fetch(getDataUrl(path))

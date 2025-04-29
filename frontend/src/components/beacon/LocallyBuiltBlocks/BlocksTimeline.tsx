@@ -1,7 +1,7 @@
 import { FC, useEffect, useState } from 'react'
-import { LocallyBuiltSlotBlocks, LocallyBuiltBlock } from '../../../api/gen/backend/pkg/server/proto/beacon_slots/beacon_slots_pb'
+import { LocallyBuiltSlotBlocks, LocallyBuiltBlock } from '@/api/gen/backend/pkg/server/proto/beacon_slots/beacon_slots_pb'
 import { Clock, Database, Server, FileText, Zap } from 'lucide-react'
-import { formatBytes } from '../../../utils/format'
+import { formatBytes } from '@/utils/format.ts'
 import { Timestamp } from '@bufbuild/protobuf'
 
 // Simple timestamp formatter component

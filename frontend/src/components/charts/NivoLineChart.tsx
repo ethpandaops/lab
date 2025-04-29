@@ -1,6 +1,6 @@
 import { ResponsiveLine, LineProps } from '@nivo/line'
-import { withNivoTheme } from './NivoProvider'
-import { defaultNivoTheme } from './NivoTheme'
+import { withNivoTheme } from '@/components/charts/NivoProvider'
+import { defaultNivoTheme } from '@/components/charts/NivoTheme.ts'
 
 // Create a themed version of ResponsiveLine
 export const ThemedResponsiveLine = withNivoTheme(ResponsiveLine)

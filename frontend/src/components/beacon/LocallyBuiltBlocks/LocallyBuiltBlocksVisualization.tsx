@@ -1,10 +1,10 @@
 import { FC, useMemo } from 'react'
-import { Card, CardBody } from '../../common/Card'
-import { LocallyBuiltSlotBlocks } from '../../../api/gen/backend/pkg/server/proto/beacon_slots/beacon_slots_pb'
+import { Card, CardBody } from '@/components/common/Card'
+import { LocallyBuiltSlotBlocks } from '@/api/gen/backend/pkg/server/proto/beacon_slots/beacon_slots_pb'
 import { Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend, CartesianGrid, ScatterChart, Scatter, ZAxis } from 'recharts' // Added ScatterChart, Scatter, ZAxis
-import { ChartWithStats } from '../../charts/ChartWithStats'
-import { formatBytes } from '../../../utils/format' // Import formatBytes
-import { EXECUTION_CLIENTS, CONSENSUS_CLIENTS } from '../../../constants/clients' // Import clients
+import { ChartWithStats } from '@/components/charts/ChartWithStats'
+import { formatBytes } from '@/utils/format.ts' // Import formatBytes
+import { EXECUTION_CLIENTS, CONSENSUS_CLIENTS } from '@/constants/clients.ts' // Import clients
 
 interface LocallyBuiltBlocksVisualizationProps {
   data: LocallyBuiltSlotBlocks[]

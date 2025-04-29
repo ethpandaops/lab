@@ -1,5 +1,5 @@
 import { Info } from 'lucide-react'
-import { Card, CardBody } from './Card'
+import { Card, CardBody } from '@/components/common/Card'
 
 interface AboutThisDataProps {
   children: React.ReactNode

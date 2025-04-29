@@ -1,8 +1,8 @@
 import { useEffect, useContext } from 'react'
 import { useParams, useSearchParams } from 'react-router-dom'
-import { SlotView } from '../../components/beacon/SlotView'
-import { NetworkContext } from '../../App'
-import { AboutThisData } from '../../components/common/AboutThisData'
+import { SlotView } from '@/components/beacon/SlotView'
+import { NetworkContext } from '@/App'
+import { AboutThisData } from '@/components/common/AboutThisData'
 
 function BeaconSlot(): JSX.Element {
   const { slot } = useParams<{ slot: string }>()

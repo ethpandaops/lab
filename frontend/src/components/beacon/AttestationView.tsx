@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { ChartWithStats, NivoLineChart } from '../charts'
+import { ChartWithStats, NivoLineChart } from '@/components/charts'
 
 
 interface AttestationPoint {

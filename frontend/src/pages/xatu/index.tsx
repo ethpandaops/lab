@@ -1,11 +1,11 @@
 import { Link, Outlet, useLocation } from 'react-router-dom'
 import { ArrowRight } from 'lucide-react'
-import { useDataFetch } from '../../utils/data'
+import { useDataFetch } from '@/utils/data.ts'
 import { formatDistanceToNow } from 'date-fns'
 import { useRef, useState, useEffect, useContext } from 'react'
-import { GlobeViz } from '../../components/xatu/GlobeViz'
-import { XatuCallToAction } from '../../components/xatu/XatuCallToAction'
-import { ConfigContext } from '../../App'
+import { GlobeViz } from '@/components/xatu/GlobeViz'
+import { XatuCallToAction } from '@/components/xatu/XatuCallToAction'
+import { ConfigContext } from '@/App'
 
 interface ConsensusImplementation {
   total_nodes: number

@@ -1,9 +1,9 @@
 import { Link, Outlet, useLocation } from 'react-router-dom'
 import { ArrowRight, Activity, Search, Clock, Layers, Database } from 'lucide-react'
 import { useContext } from 'react'
-import { NetworkContext } from '../../App'
+import { NetworkContext } from '@/App'
 import { FaEthereum } from 'react-icons/fa'
-import { Card, CardBody, CardHeader } from '../../components/common/Card'
+import { Card, CardBody, CardHeader } from '@/components/common/Card'
 
 function Beacon(): JSX.Element {
   const location = useLocation()

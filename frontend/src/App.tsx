@@ -1,31 +1,31 @@
 import { Routes, Route, Outlet, useSearchParams } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { createContext, useEffect, useState } from 'react'
-import { getConfig } from './config'
-import type { Config } from './types'
-import { LoadingState } from './components/common/LoadingState'
-import { ErrorState } from './components/common/ErrorState'
-import { BeaconClockManager } from './utils/beacon'
-import Home from './pages/Home';
-import { About } from './pages/About';
-import Xatu from './pages/xatu';
-import { CommunityNodes } from './pages/xatu/CommunityNodes';
-import Networks from './pages/xatu/networks';
-import ContributorsList from './pages/xatu/ContributorsList';
-import ContributorDetail from './pages/xatu/ContributorDetail';
-import ForkReadiness from './pages/xatu/ForkReadiness';
-import GeographicalChecklist from './pages/xatu/GeographicalChecklist';
-import Layout from './components/layout/Layout';
-import { BeaconChainTimings } from './pages/beacon/timings';
-import { BlockTimings } from './pages/beacon/timings/blocks';
-import { Beacon } from './pages/beacon';
-import { BeaconLive } from './pages/beacon/live';
-import { BeaconSlot } from './pages/beacon/slot';
-import Experiments from './pages/Experiments';
-import MaintenanceOverlay from './components/common/MaintenanceOverlay';
-import { SlotLookup } from './pages/beacon/slot/index';
-import { ModalProvider } from './contexts/ModalContext'
-import { LocallyBuiltBlocks } from './pages/beacon/LocallyBuiltBlocks'
+import { getConfig } from '@/config'
+import type { Config } from '@/types'
+import { LoadingState } from '@/components/common/LoadingState'
+import { ErrorState } from '@/components/common/ErrorState'
+import { BeaconClockManager } from '@/utils/beacon.ts'
+import Home from '@/pages/Home.tsx';
+import { About } from '@/pages/About.tsx';
+import Xatu from '@/pages/xatu';
+import { CommunityNodes } from '@/pages/xatu/CommunityNodes';
+import Networks from '@/pages/xatu/networks';
+import ContributorsList from '@/pages/xatu/ContributorsList';
+import ContributorDetail from '@/pages/xatu/ContributorDetail';
+import ForkReadiness from '@/pages/xatu/ForkReadiness';
+import GeographicalChecklist from '@/pages/xatu/GeographicalChecklist';
+import Layout from '@/components/layout/Layout';
+import { BeaconChainTimings } from '@/pages/beacon/timings';
+import { BlockTimings } from '@/pages/beacon/timings/blocks';
+import { Beacon } from '@/pages/beacon';
+import { BeaconLive } from '@/pages/beacon/live';
+import { BeaconSlot } from '@/pages/beacon/slot';
+import Experiments from '@/pages/Experiments.tsx';
+import MaintenanceOverlay from '@/components/common/MaintenanceOverlay';
+import { SlotLookup } from '@/pages/beacon/slot/index';
+import { ModalProvider } from '@/contexts/ModalContext.tsx'
+import { LocallyBuiltBlocks } from '@/pages/beacon/LocallyBuiltBlocks'
 
 // Create contexts
 export const ConfigContext = createContext<Config | null>(null)

@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { ArrowRight } from 'lucide-react'
-import { Card, CardBody } from '../components/common/Card'
+import { Card, CardBody } from '@/components/common/Card'
 
 interface ExperimentCard {
   id: string;
