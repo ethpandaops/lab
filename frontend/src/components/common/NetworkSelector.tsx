@@ -2,10 +2,10 @@ import { Fragment } from 'react'
 import { Listbox, Transition } from '@headlessui/react'
 import { ChevronUpDownIcon } from '@heroicons/react/24/outline'
 import clsx from 'clsx'
-import { getConfig } from '../../config'
+import { getConfig } from '@/config'
 import { useEffect, useState, useRef } from 'react'
-import type { Config } from '../../types'
-import { NETWORK_METADATA, type NetworkKey } from '../../constants/networks'
+import type { Config } from '@/types'
+import { NETWORK_METADATA, type NetworkKey } from '@/constants/networks.tsx'
 
 interface NetworkSelectorProps {
   selectedNetwork: string

@@ -1,8 +1,8 @@
-import { createLabApiClient, LabApiClientType } from './client';
+import { createLabApiClient, LabApiClientType } from '@/api/client.ts';
 
 // Import specific message types if needed for constructing requests or detailed type checking
 // Note: The client methods often infer these types, but explicit imports can be useful.
-import { GetRecentLocallyBuiltBlocksRequest } from './gen/backend/pkg/api/proto/lab_api_pb';
+import { GetRecentLocallyBuiltBlocksRequest } from '@/api/gen/backend/pkg/api/proto/lab_api_pb';
 
 /**
  * Example function to demonstrate how to use the generated API client.

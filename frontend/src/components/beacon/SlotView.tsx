@@ -1,13 +1,13 @@
 import { useEffect, useMemo, useState } from 'react'
-import { useDataFetch } from '../../utils/data'
-import { ErrorState } from '../common/ErrorState'
-import { GlobalMap } from './GlobalMap'
-import { EventTimeline } from './EventTimeline'
-import { BottomPanel } from './BottomPanel/index'
-import { DataAvailabilityPanel } from './DataAvailabilityPanel'
+import { useDataFetch } from '@/utils/data.ts'
+import { ErrorState } from '@/components/common/ErrorState'
+import { GlobalMap } from '@/components/beacon/GlobalMap'
+import { EventTimeline } from '@/components/beacon/EventTimeline'
+import { BottomPanel } from '@/components/beacon/BottomPanel/index'
+import { DataAvailabilityPanel } from '@/components/beacon/DataAvailabilityPanel'
 import { useNavigate } from 'react-router-dom'
 import clsx from 'clsx'
-import { useModal } from '../../contexts/ModalContext'
+import { useModal } from '@/contexts/ModalContext.tsx'
 
 interface SlotData {
   slot: number

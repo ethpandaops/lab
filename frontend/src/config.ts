@@ -1,4 +1,4 @@
-import { Config } from './types'
+import { Config } from '@/types'
 
 const isDev = import.meta.env.DEV
 const backendOverride = import.meta.env.VITE_BACKEND_URL

@@ -1,7 +1,7 @@
 import React, { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronRight } from 'lucide-react';
-import { Card, CardBody } from './Card';
+import { Card, CardBody } from '@/components/common/Card';
 
 export interface FeatureCardProps {
   id?: string;

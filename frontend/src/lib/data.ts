@@ -1,4 +1,4 @@
-import { getDataUrl } from "../config";
+import { getDataUrl } from "@/config";
 
 export const getBeaconChainTimingsPath = (network: string, timeWindow: string, dataType: string): string => {
   return `beacon_chain_timings/${dataType}/${network}/${timeWindow}.json`;

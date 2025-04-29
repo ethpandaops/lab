@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import { ArrowRight, ExternalLink, Zap } from 'lucide-react'
 import { useEffect, useState, useRef } from 'react'
-import FeatureCard from '../components/common/FeatureCard'
+import FeatureCard from '@/components/common/FeatureCard'
 
 // Import experiment data from Experiments page
 const featuredExperiments = [

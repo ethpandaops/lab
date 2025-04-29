@@ -1,13 +1,13 @@
 import { useContext, useMemo, useState, useEffect } from 'react'
-import { useDataFetch } from '../../utils/data'
-import { ConfigContext, NetworkContext } from '../../App'
-import type { Config, XatuSummary, EthereumNetwork } from '../../types'
+import { useDataFetch } from '@/utils/data.ts'
+import { ConfigContext, NetworkContext } from '@/App'
+import type { Config, XatuSummary, EthereumNetwork } from '@/types'
 import { formatDistanceToNow } from 'date-fns'
 import { ChevronDown, ChevronUp } from 'lucide-react'
 import { Select } from '@/components/common/Select'
-import { BeaconClockManager } from '../../utils/beacon'
-import { formatNodeName } from '../../utils/format'
-import { Card, CardHeader, CardBody } from '../../components/common/Card'
+import { BeaconClockManager } from '@/utils/beacon.ts'
+import { formatNodeName } from '@/utils/format.ts'
+import { Card, CardHeader, CardBody } from '@/components/common/Card'
 
 const MS_PER_SECOND = 1000
 const SLOTS_PER_EPOCH = 32

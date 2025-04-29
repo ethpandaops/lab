@@ -1,6 +1,6 @@
 import { ArrowRight, Share2 } from 'lucide-react'
 import { Link } from 'react-router-dom'
-import { Card, CardBody } from './common/Card'
+import { Card, CardBody } from '@/components/common/Card'
 
 interface CallToActionProps {
   title: string

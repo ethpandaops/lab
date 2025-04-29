@@ -1,13 +1,13 @@
 import React, { useContext, useState, useEffect } from 'react'
-import { useDataFetch } from '../../utils/data'
-import { ConfigContext, NetworkContext } from '../../App'
-import { LoadingState } from '../../components/common/LoadingState'
-import { ErrorState } from '../../components/common/ErrorState'
-import { XatuCallToAction } from '../../components/xatu/XatuCallToAction'
+import { useDataFetch } from '@/utils/data.ts'
+import { ConfigContext, NetworkContext } from '@/App'
+import { LoadingState } from '@/components/common/LoadingState'
+import { ErrorState } from '@/components/common/ErrorState'
+import { XatuCallToAction } from '@/components/xatu/XatuCallToAction'
 import { formatDistanceToNow } from 'date-fns'
-import { NetworkSelector } from '../../components/common/NetworkSelector'
+import { NetworkSelector } from '@/components/common/NetworkSelector'
 import { Search, ChevronDown, ChevronUp, Check } from 'lucide-react'
-import CONTINENT_TO_COUNTRIES from '../../constants/countries'
+import CONTINENT_TO_COUNTRIES from '@/constants/countries.ts'
 
 // Types
 interface Country {

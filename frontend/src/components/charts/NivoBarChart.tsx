@@ -1,6 +1,6 @@
 import { ResponsiveBar, BarDatum, ResponsiveBarSvgProps } from '@nivo/bar'
-import { withNivoTheme } from './NivoProvider'
-import { defaultNivoTheme } from './NivoTheme'
+import { withNivoTheme } from '@/components/charts/NivoProvider'
+import { defaultNivoTheme } from '@/components/charts/NivoTheme.ts'
 
 // Create a themed version of ResponsiveBar
 export const ThemedResponsiveBar = withNivoTheme(ResponsiveBar)

@@ -1,8 +1,8 @@
 import { FC, useEffect, useState, useMemo } from 'react'
-import { LocallyBuiltSlotBlocks, LocallyBuiltBlock } from '../../../api/gen/backend/pkg/server/proto/beacon_slots/beacon_slots_pb'
+import { LocallyBuiltSlotBlocks, LocallyBuiltBlock } from '@/api/gen/backend/pkg/server/proto/beacon_slots/beacon_slots_pb'
 import { Clock, Database, Package, Cpu } from 'lucide-react'
 import { Timestamp } from '@bufbuild/protobuf'
-import { EXECUTION_CLIENTS, CONSENSUS_CLIENTS } from '../../../constants/clients'
+import { EXECUTION_CLIENTS, CONSENSUS_CLIENTS } from '@/constants/clients.ts'
 
 // Simple timestamp formatter component
 const FormattedTimestamp: FC<{ timestamp?: Timestamp }> = ({ timestamp }) => {

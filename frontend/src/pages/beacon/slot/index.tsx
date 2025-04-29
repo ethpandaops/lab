@@ -1,9 +1,9 @@
 import { useState, useContext } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { AlertTriangle, Search } from 'lucide-react'
-import { NetworkContext } from '../../../App'
-import { BeaconClockManager } from '../../../utils/beacon'
-import { Card, CardBody } from '../../../components/common/Card'
+import { NetworkContext } from '@/App'
+import { BeaconClockManager } from '@/utils/beacon.ts'
+import { Card, CardBody } from '@/components/common/Card'
 
 function SlotLookup(): JSX.Element {
   const navigate = useNavigate()

@@ -1,4 +1,4 @@
-import { CallToAction } from '../CallToAction'
+import { CallToAction } from '@/components/CallToAction.tsx'
 
 export const XatuCallToAction = () => {
   return (

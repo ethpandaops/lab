@@ -1,13 +1,13 @@
 import { useParams } from 'react-router-dom';
-import { useDataFetch } from '../../utils/data';
-import { LoadingState } from '../../components/common/LoadingState';
-import { ErrorState } from '../../components/common/ErrorState';
+import { useDataFetch } from '@/utils/data.ts';
+import { LoadingState } from '@/components/common/LoadingState';
+import { ErrorState } from '@/components/common/ErrorState';
 import { formatDistanceToNow } from 'date-fns';
-import { XatuCallToAction } from '../../components/xatu/XatuCallToAction';
+import { XatuCallToAction } from '@/components/xatu/XatuCallToAction';
 import { useContext } from 'react';
-import { ConfigContext } from '../../App';
-import { NETWORK_METADATA, type NetworkKey } from '../../constants/networks';
-import { Card } from '../../components/common/Card';
+import { ConfigContext } from '@/App';
+import { NETWORK_METADATA, type NetworkKey } from '@/constants/networks.tsx';
+import { Card } from '@/components/common/Card';
 
 interface ContributorNode {
   network: string;

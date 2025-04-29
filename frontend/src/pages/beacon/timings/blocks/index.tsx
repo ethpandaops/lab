@@ -1,13 +1,13 @@
-import { useDataFetch } from '../../../../utils/data'
-import { LoadingState } from '../../../../components/common/LoadingState'
-import { ErrorState } from '../../../../components/common/ErrorState'
-import { AboutThisData } from '../../../../components/common/AboutThisData'
+import { useDataFetch } from '@/utils/data.ts'
+import { LoadingState } from '@/components/common/LoadingState'
+import { ErrorState } from '@/components/common/ErrorState'
+import { AboutThisData } from '@/components/common/AboutThisData'
 import { useState, useEffect, useMemo, useRef } from 'react'
-import { PERCENTILE_COLORS, PERCENTILE_LABELS, PERCENTILE_KEYS, type PercentileKey } from '../../../../constants/percentiles'
-import { NivoLineChart } from '../../../../components/charts'
+import { PERCENTILE_COLORS, PERCENTILE_LABELS, PERCENTILE_KEYS, type PercentileKey } from '@/constants/percentiles.ts'
+import { NivoLineChart } from '@/components/charts'
 import { useSearchParams } from 'react-router-dom'
-import { getConfig } from '../../../../config'
-import type { Config } from '../../../../types'
+import { getConfig } from '@/config'
+import type { Config } from '@/types'
 
 interface TimingData {
   timestamps: number[]

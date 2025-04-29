@@ -1,8 +1,8 @@
 import { useMemo } from 'react'
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, ReferenceLine } from 'recharts'
-import { ChartWithStats } from '../../charts/ChartWithStats'
+import { ChartWithStats } from '@/components/charts/ChartWithStats'
 import { HelpCircle } from 'lucide-react'
-import { useModal } from '../../../contexts/ModalContext'
+import { useModal } from '@/contexts/ModalContext.tsx'
 
 interface AttestationPoint {
   time: number

@@ -4,11 +4,11 @@ import { motion } from 'framer-motion'
 import { feature } from 'topojson-client'
 import { FeatureCollection, Geometry } from 'geojson'
 import * as worldAtlas from 'world-atlas/countries-110m.json'
-import { BlockDetailsOverlay } from './BlockDetailsOverlay'
-import { formatNodeName } from '../../utils/format'
-import { continentCoords, getNodeCoordinates } from '../../utils/coordinates'
+import { BlockDetailsOverlay } from '@/components/beacon/BlockDetailsOverlay/index'
+import { formatNodeName } from '@/utils/format.ts'
+import { continentCoords, getNodeCoordinates } from '@/utils/coordinates.ts'
 import { geoEquirectangular } from 'd3-geo'
-import { Card } from '../common/Card'
+import { Card } from '@/components/common/Card'
 
 // Convert TopoJSON to GeoJSON
 const geoData = feature(worldAtlas as any, (worldAtlas as any).objects.countries) as unknown as FeatureCollection<Geometry>

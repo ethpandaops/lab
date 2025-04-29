@@ -2,7 +2,7 @@ import { createPromiseClient, PromiseClient } from "@connectrpc/connect";
 import { createConnectTransport } from "@connectrpc/connect-web";
 
 // Import the generated LabAPI service
-import { LabAPI } from "./gen/backend/pkg/api/proto/lab_api_connectweb.ts"; // Corrected import path
+import { LabAPI } from "@/api/gen/backend/pkg/api/proto/lab_api_connectweb.ts"; // Corrected import path
 
 // Define the type for the client
 export type LabApiClientType = PromiseClient<typeof LabAPI>;

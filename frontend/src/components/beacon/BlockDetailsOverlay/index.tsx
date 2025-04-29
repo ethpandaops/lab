@@ -3,8 +3,8 @@ import { ChevronDown, ChevronUp } from 'lucide-react'
 import clsx from 'clsx'
 import { FaEthereum } from 'react-icons/fa'
 import { useContext } from 'react'
-import { NetworkContext } from '../../../App'
-import { formatEntityName } from '../../../utils/format'
+import { NetworkContext } from '@/App'
+import { formatEntityName } from '@/utils/format.ts'
 
 interface BlockDetailsProps {
   slot: number

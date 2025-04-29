@@ -1,6 +1,6 @@
 import { FC, useState } from 'react'
-import { formatEther, formatBytes } from '../../../utils/format'
-import { LocallyBuiltBlock, LocallyBuiltSlotBlocks } from '../../../api/gen/backend/pkg/server/proto/beacon_slots/beacon_slots_pb'
+import { formatEther, formatBytes } from '@/utils/format.ts'
+import { LocallyBuiltBlock, LocallyBuiltSlotBlocks } from '@/api/gen/backend/pkg/server/proto/beacon_slots/beacon_slots_pb'
 import { Package, Clock, FileDown, DollarSign, FileText, Zap, Globe, Search, ChevronDown, ChevronUp } from 'lucide-react'
 import clsx from 'clsx'
 import { Timestamp } from '@bufbuild/protobuf'
