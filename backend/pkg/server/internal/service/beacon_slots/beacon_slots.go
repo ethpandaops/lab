@@ -155,6 +155,7 @@ func (b *BeaconSlots) Start(ctx context.Context) error {
 		b.locallyBuiltBlocksProcessor = NewLocallyBuiltBlocksProcessor(
 			b.log,
 			&b.config.LocallyBuiltBlocksConfig,
+			b.config.HeadDelaySlots,
 			b.ethereum,
 			b.xatuClient,
 			b.cacheClient,

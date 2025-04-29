@@ -25,13 +25,12 @@ import (
 type LocallyBuiltBlocksProcessor struct {
 	log               logrus.FieldLogger
 	config            *LocallyBuiltBlocksConfig
-	ethereum          *ethereum.Client
+	headDelaySlots    phase0.Slot
+	ethClient         *ethereum.Client
 	xatuClient        *xatu.Client
 	cacheClient       cache.Client
 	lockerClient      locker.Locker
-	metrics           *metrics.Metrics
-	parentCtx         context.Context
-	processCtx        context.Context
+	metricsSvc        *metrics.Metrics
 	processCtxCancel  context.CancelFunc
 	leaderClient      leader.Client
 	processingEnabled bool
@@ -41,30 +40,31 @@ type LocallyBuiltBlocksProcessor struct {
 func NewLocallyBuiltBlocksProcessor(
 	log logrus.FieldLogger,
 	config *LocallyBuiltBlocksConfig,
-	ethereum *ethereum.Client,
+	headDelaySlots phase0.Slot,
+	ethClient *ethereum.Client,
 	xatuClient *xatu.Client,
 	cacheClient cache.Client,
 	lockerClient locker.Locker,
-	metrics *metrics.Metrics,
+	metricsSvc *metrics.Metrics,
 ) *LocallyBuiltBlocksProcessor {
 	return &LocallyBuiltBlocksProcessor{
 		log:               log.WithField("processor", "locally_built_blocks"),
 		config:            config,
-		ethereum:          ethereum,
+		headDelaySlots:    headDelaySlots,
+		ethClient:         ethClient,
 		xatuClient:        xatuClient,
 		cacheClient:       cacheClient,
 		lockerClient:      lockerClient,
-		metrics:           metrics,
+		metricsSvc:        metricsSvc,
 		processingEnabled: config.Enabled != nil && *config.Enabled,
 	}
 }
 
 // Start begins the processor's operations
 func (p *LocallyBuiltBlocksProcessor) Start(ctx context.Context) error {
-	p.parentCtx = ctx
-
 	if !p.processingEnabled {
 		p.log.Info("Locally built blocks processor disabled")
+
 		return nil
 	}
 
@@ -79,26 +79,28 @@ func (p *LocallyBuiltBlocksProcessor) Start(ctx context.Context) error {
 		OnElected: func() {
 			p.log.Info("Became leader for locally built blocks processor")
 
-			if p.processCtx != nil {
-				// We are already processing, so we don't need to start a new one
-				p.log.Info("Already processing, skipping")
+			// Check if cancellation function exists, indicating processing might be active
+			// Note: This check isn't foolproof against race conditions if OnElected is called rapidly,
+			// but leader election should prevent that.
+			if p.processCtxCancel != nil {
+				p.log.Info("Processing context cancel function already exists, assuming processing is active, skipping start.")
+
 				return
 			}
 
-			// Create a new context for the process, derived from the parent context
-			processCtx, processCancel := context.WithCancel(p.parentCtx)
+			// Create a new context for the process, derived from the Start context
+			processCtx, processCancel := context.WithCancel(ctx)
 
-			p.processCtx = processCtx
 			p.processCtxCancel = processCancel
 
-			// Start processing in a goroutine
-			go p.startProcessing()
+			// Start processing in a goroutine, passing the new context
+			go p.startProcessing(processCtx)
 		},
 		OnRevoked: func() {
 			p.log.Info("Lost leadership for locally built blocks processor")
 			p.stopProcessing()
 		},
-	}, p.metrics)
+	}, p.metricsSvc) // Renamed usage
 
 	leaderClient.Start()
 	p.leaderClient = leaderClient
@@ -123,22 +125,21 @@ func (p *LocallyBuiltBlocksProcessor) Stop() {
 func (p *LocallyBuiltBlocksProcessor) stopProcessing() {
 	if p.processCtxCancel != nil {
 		p.processCtxCancel()
-		p.processCtx = nil
 		p.processCtxCancel = nil
 	}
 }
 
-// startProcessing begins the main processing loop
-func (p *LocallyBuiltBlocksProcessor) startProcessing() {
+// startProcessing begins the main processing loop, using the provided context
+func (p *LocallyBuiltBlocksProcessor) startProcessing(ctx context.Context) {
 	p.log.Info("Starting locally built blocks processing")
 
-	// Process each network
-	for _, network := range p.ethereum.Networks() {
-		go p.processNetworkBlocks(p.processCtx, network.Name)
+	// Process each network using the passed context
+	for _, network := range p.ethClient.Networks() {
+		go p.processNetworkBlocks(ctx, network.Name)
 	}
 
-	// Wait for context cancellation
-	<-p.processCtx.Done()
+	// Wait for context cancellation using the passed context
+	<-ctx.Done()
 	p.log.Info("Context cancelled, locally built blocks processing will stop")
 }
 
@@ -168,11 +169,13 @@ func (p *LocallyBuiltBlocksProcessor) processNetworkBlocks(ctx context.Context, 
 		select {
 		case <-ctx.Done():
 			logCtx.Info("Context cancelled, stopping locally built blocks processing for network")
+
 			return
 		case <-ticker.C:
 			currentSlot, err := p.getCurrentSlot(ctx, networkName)
 			if err != nil {
 				logCtx.WithError(err).Error("Failed to get current slot")
+
 				continue
 			}
 
@@ -196,20 +199,23 @@ func (p *LocallyBuiltBlocksProcessor) getSlotRange(ctx context.Context, networkN
 	}
 
 	// Go back config slots
-	startSlot := nowSlot - phase0.Slot(p.config.Slots)
 	endSlot := nowSlot
+	startSlot := endSlot - phase0.Slot(p.config.Slots) //nolint:gosec // not a security issue
 
 	return startSlot, endSlot, nil
 }
 
 // getCurrentSlot returns the current slot for a network
 func (p *LocallyBuiltBlocksProcessor) getCurrentSlot(ctx context.Context, networkName string) (phase0.Slot, error) {
-	slot, _, err := p.ethereum.GetNetwork(networkName).GetWallclock().Now()
+	slot, _, err := p.ethClient.GetNetwork(networkName).GetWallclock().Now()
 	if err != nil {
 		return 0, fmt.Errorf("failed to get current slot: %w", err)
 	}
 
-	return phase0.Slot(slot.Number()), nil
+	// Add on our head delay slots
+	headDelaySlots := p.headDelaySlots
+
+	return phase0.Slot(slot.Number()) - headDelaySlots, nil
 }
 
 // processLocallyBuiltBlocksForSlot processes locally built blocks for a specific slot in a network
@@ -223,8 +229,10 @@ func (p *LocallyBuiltBlocksProcessor) processLocallyBuiltBlocksForSlot(ctx conte
 	// Check if we already have this slot data cached
 	cacheKey := GetLocallyBuiltBlockSlotCacheKey(networkName, slot)
 	cachedData, err := p.cacheClient.Get(cacheKey)
+
 	if err == nil && len(cachedData) > 0 {
 		logCtx.Debug("Slot data already cached, skipping processing")
+
 		return
 	}
 
@@ -234,6 +242,7 @@ func (p *LocallyBuiltBlocksProcessor) processLocallyBuiltBlocksForSlot(ctx conte
 	ch, err := p.xatuClient.GetClickhouseClientForNetwork(networkName)
 	if err != nil {
 		logCtx.WithError(err).Error("Failed to get Clickhouse client")
+
 		return
 	}
 
@@ -277,11 +286,12 @@ func (p *LocallyBuiltBlocksProcessor) processLocallyBuiltBlocksForSlot(ctx conte
 	rows, err := ch.Query(
 		ctx,
 		query,
-		uint32(slot),
+		uint32(slot), //nolint:gosec // not a security issue
 		networkName,
 	)
 	if err != nil {
 		logCtx.WithError(err).Error("Failed to query Clickhouse for locally built blocks")
+
 		return
 	}
 
@@ -292,11 +302,13 @@ func (p *LocallyBuiltBlocksProcessor) processLocallyBuiltBlocksForSlot(ctx conte
 		dbSlot, ok := row["slot"].(uint32)
 		if !ok {
 			logCtx.WithField("row", row).Warn("Invalid slot value in Clickhouse result")
+
 			continue
 		}
 
 		// Skip if not the requested slot (shouldn't happen due to WHERE clause, but just for safety)
-		if dbSlot != uint32(slot) {
+		// Compare as uint64 to avoid gocritic truncateCmp warning and type mismatch
+		if uint64(dbSlot) != uint64(slot) {
 			continue
 		}
 
@@ -324,6 +336,7 @@ func (p *LocallyBuiltBlocksProcessor) processLocallyBuiltBlocksForSlot(ctx conte
 		if val, ok := row["meta_client_geo_longitude"].(float64); ok {
 			geoLongitude = val
 		}
+
 		if val, ok := row["meta_client_geo_latitude"].(float64); ok {
 			geoLatitude = val
 		}
@@ -335,6 +348,7 @@ func (p *LocallyBuiltBlocksProcessor) processLocallyBuiltBlocksForSlot(ctx conte
 		if val, ok := row["block_total_bytes"].(uint32); ok {
 			blockTotalBytes = val
 		}
+
 		if val, ok := row["block_total_bytes_compressed"].(uint32); ok {
 			blockTotalBytesCompressed = val
 		}
@@ -343,6 +357,7 @@ func (p *LocallyBuiltBlocksProcessor) processLocallyBuiltBlocksForSlot(ctx conte
 		if val, ok := row["execution_payload_value"].(uint64); ok {
 			execPayloadValue = val
 		}
+
 		if val, ok := row["consensus_payload_value"].(uint64); ok {
 			consensusPayloadValue = val
 		}
@@ -356,17 +371,21 @@ func (p *LocallyBuiltBlocksProcessor) processLocallyBuiltBlocksForSlot(ctx conte
 		if val, ok := row["execution_payload_gas_limit"].(uint64); ok {
 			execPayloadGasLimit = val
 		}
+
 		if val, ok := row["execution_payload_gas_used"].(uint64); ok {
 			execPayloadGasUsed = val
 		}
 
 		var execPayloadTxCount, execPayloadTxTotalBytes, execPayloadTxTotalBytesCompressed uint32
+
 		if val, ok := row["execution_payload_transactions_count"].(uint32); ok {
 			execPayloadTxCount = val
 		}
+
 		if val, ok := row["execution_payload_transactions_total_bytes"].(uint32); ok {
 			execPayloadTxTotalBytes = val
 		}
+
 		if val, ok := row["execution_payload_transactions_total_bytes_compressed"].(uint32); ok {
 			execPayloadTxTotalBytesCompressed = val
 		}
@@ -430,20 +449,6 @@ func (p *LocallyBuiltBlocksProcessor) processLocallyBuiltBlocksForSlot(ctx conte
 	}
 }
 
-// processLocallyBuiltBlocks is kept for backward compatibility, but now delegates to per-slot processing
-func (p *LocallyBuiltBlocksProcessor) processLocallyBuiltBlocks(ctx context.Context, networkName string) {
-	startSlot, endSlot, err := p.getSlotRange(ctx, networkName)
-	if err != nil {
-		p.log.WithError(err).Error("Failed to get slot range")
-		return
-	}
-
-	// Process each slot individually
-	for slot := startSlot; slot <= endSlot; slot++ {
-		p.processLocallyBuiltBlocksForSlot(ctx, networkName, slot)
-	}
-}
-
 // GetLocallyBuiltBlockSlotCacheKey returns the cache key for locally built blocks for a specific slot
 func GetLocallyBuiltBlockSlotCacheKey(network string, slot phase0.Slot) string {
 	return fmt.Sprintf("locally_built_blocks/%s/%d", network, slot)
@@ -473,9 +478,11 @@ func (b *BeaconSlots) FetchRecentLocallyBuiltBlocks(ctx context.Context, network
 
 	// Fetch data for each slot
 	result := make([]*beacon_slots.LocallyBuiltSlotBlocks, 0, b.config.LocallyBuiltBlocksConfig.Slots)
-	for slot := nowSlot - phase0.Slot(b.config.LocallyBuiltBlocksConfig.Slots); slot <= nowSlot; slot++ {
+
+	for slot := nowSlot - phase0.Slot(b.config.LocallyBuiltBlocksConfig.Slots); slot <= nowSlot; slot++ { //nolint:gosec // not a security issue
 		slotCacheKey := GetLocallyBuiltBlockSlotCacheKey(networkName, slot)
 		slotData, err := b.cacheClient.Get(slotCacheKey)
+
 		if err != nil {
 			// Skip slots that don't have cached data
 			continue
@@ -485,6 +492,7 @@ func (b *BeaconSlots) FetchRecentLocallyBuiltBlocks(ctx context.Context, network
 		var slotBlocks beacon_slots.LocallyBuiltSlotBlocks
 		if err := json.Unmarshal(slotData, &slotBlocks); err != nil {
 			logCtx.WithError(err).WithField("slot", slot).Warn("Failed to deserialize slot data")
+
 			continue
 		}
 

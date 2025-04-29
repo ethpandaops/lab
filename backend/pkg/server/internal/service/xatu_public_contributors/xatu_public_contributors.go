@@ -630,7 +630,6 @@ func (b *XatuPublicContributors) process(ctx context.Context) {
 		if globalNeedsSave {
 			if err := b.saveState(ctx, globalStateKey, globalState); err != nil {
 				b.log.WithError(err).Error("Failed to save global state")
-				// Continue with processing, don't return
 			} else {
 				// Update state metrics after saving
 				b.updateStateMetrics(globalStateKey, globalState)
@@ -1325,7 +1324,6 @@ func (b *XatuPublicContributors) processUserSummaries(ctx context.Context, netwo
 			Compression: storage.Gzip,
 		}); err != nil {
 			log.WithError(err).Errorf("Failed to store user summary for user %s", username)
-			// Continue processing other users
 		}
 
 		// Add to global summary list

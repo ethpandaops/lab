@@ -50,6 +50,7 @@ func (h *BeaconSlotsHandler) GetRecentLocallyBuiltBlocks(ctx context.Context, re
 	blocks, err := h.service.FetchRecentLocallyBuiltBlocks(ctx, req.Network)
 	if err != nil {
 		h.log.WithError(err).Error("Failed to get recent locally built blocks")
+
 		return nil, status.Error(codes.Internal, "failed to get recent locally built blocks")
 	}
 

@@ -102,7 +102,7 @@ ethereum:
   networks:
     mainnet:
       name: "mainnet"
-      configURL: ""
+      configURL: "https://raw.githubusercontent.com/eth-clients/mainnet/refs/heads/main/metadata/config.yaml"
       genesis: "2020-12-01T12:00:23Z"
       xatu:
         dsn: "${XATU_CLICKHOUSE_URL}"
