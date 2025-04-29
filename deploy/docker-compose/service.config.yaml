@@ -62,7 +62,7 @@ modules:
         slots: 16
   beacon_chain_timings:
     beacon_chain_timings:
-      enabled: false
+      enabled: true
       networks: ["mainnet"]
       interval: "1m"
       time_windows:
