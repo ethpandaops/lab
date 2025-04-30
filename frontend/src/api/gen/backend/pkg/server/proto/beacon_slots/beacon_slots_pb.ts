@@ -7,6 +7,86 @@ import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialM
 import { Message, proto3, protoInt64, Timestamp } from "@bufbuild/protobuf";
 
 /**
+ * @generated from message beacon_slots.GetSlotDataRequest
+ */
+export class GetSlotDataRequest extends Message<GetSlotDataRequest> {
+  /**
+   * @generated from field: string network = 1;
+   */
+  network = "";
+
+  /**
+   * @generated from field: int64 slot = 2;
+   */
+  slot = protoInt64.zero;
+
+  constructor(data?: PartialMessage<GetSlotDataRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "beacon_slots.GetSlotDataRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "network", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "slot", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetSlotDataRequest {
+    return new GetSlotDataRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): GetSlotDataRequest {
+    return new GetSlotDataRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): GetSlotDataRequest {
+    return new GetSlotDataRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: GetSlotDataRequest | PlainMessage<GetSlotDataRequest> | undefined, b: GetSlotDataRequest | PlainMessage<GetSlotDataRequest> | undefined): boolean {
+    return proto3.util.equals(GetSlotDataRequest, a, b);
+  }
+}
+
+/**
+ * @generated from message beacon_slots.GetSlotDataResponse
+ */
+export class GetSlotDataResponse extends Message<GetSlotDataResponse> {
+  /**
+   * @generated from field: beacon_slots.BeaconSlotData data = 1;
+   */
+  data?: BeaconSlotData;
+
+  constructor(data?: PartialMessage<GetSlotDataResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "beacon_slots.GetSlotDataResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "data", kind: "message", T: BeaconSlotData },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetSlotDataResponse {
+    return new GetSlotDataResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): GetSlotDataResponse {
+    return new GetSlotDataResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): GetSlotDataResponse {
+    return new GetSlotDataResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: GetSlotDataResponse | PlainMessage<GetSlotDataResponse> | undefined, b: GetSlotDataResponse | PlainMessage<GetSlotDataResponse> | undefined): boolean {
+    return proto3.util.equals(GetSlotDataResponse, a, b);
+  }
+}
+
+/**
  * Geo location information for a node
  *
  * @generated from message beacon_slots.Geo
@@ -132,7 +212,7 @@ export class Proposer extends Message<Proposer> {
   slot = protoInt64.zero;
 
   /**
-   * @generated from field: int64 proposer_validator_index = 2;
+   * @generated from field: int64 proposer_validator_index = 2 [json_name = "proposer_validator_index"];
    */
   proposerValidatorIndex = protoInt64.zero;
 
@@ -145,7 +225,7 @@ export class Proposer extends Message<Proposer> {
   static readonly typeName = "beacon_slots.Proposer";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "slot", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
-    { no: 2, name: "proposer_validator_index", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
+    { no: 2, name: "proposer_validator_index", jsonName: "proposer_validator_index", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Proposer {
@@ -177,7 +257,7 @@ export class BlockData extends Message<BlockData> {
   slot = protoInt64.zero;
 
   /**
-   * @generated from field: string slot_start_date_time = 2;
+   * @generated from field: string slot_start_date_time = 2 [json_name = "slot_start_date_time"];
    */
   slotStartDateTime = "";
 
@@ -187,117 +267,117 @@ export class BlockData extends Message<BlockData> {
   epoch = protoInt64.zero;
 
   /**
-   * @generated from field: string epoch_start_date_time = 4;
+   * @generated from field: string epoch_start_date_time = 4 [json_name = "epoch_start_date_time"];
    */
   epochStartDateTime = "";
 
   /**
-   * @generated from field: string block_root = 5;
+   * @generated from field: string block_root = 5 [json_name = "block_root"];
    */
   blockRoot = "";
 
   /**
-   * @generated from field: string block_version = 6;
+   * @generated from field: string block_version = 6 [json_name = "block_version"];
    */
   blockVersion = "";
 
   /**
-   * @generated from field: int64 block_total_bytes = 7;
+   * @generated from field: int64 block_total_bytes = 7 [json_name = "block_total_bytes"];
    */
   blockTotalBytes = protoInt64.zero;
 
   /**
-   * @generated from field: int64 block_total_bytes_compressed = 8;
+   * @generated from field: int64 block_total_bytes_compressed = 8 [json_name = "block_total_bytes_compressed"];
    */
   blockTotalBytesCompressed = protoInt64.zero;
 
   /**
-   * @generated from field: string parent_root = 9;
+   * @generated from field: string parent_root = 9 [json_name = "parent_root"];
    */
   parentRoot = "";
 
   /**
-   * @generated from field: string state_root = 10;
+   * @generated from field: string state_root = 10 [json_name = "state_root"];
    */
   stateRoot = "";
 
   /**
-   * @generated from field: int64 proposer_index = 11;
+   * @generated from field: int64 proposer_index = 11 [json_name = "proposer_index"];
    */
   proposerIndex = protoInt64.zero;
 
   /**
-   * @generated from field: string eth1_data_block_hash = 12;
+   * @generated from field: string eth1_data_block_hash = 12 [json_name = "eth1_data_block_hash"];
    */
   eth1DataBlockHash = "";
 
   /**
-   * @generated from field: string eth1_data_deposit_root = 13;
+   * @generated from field: string eth1_data_deposit_root = 13 [json_name = "eth1_data_deposit_root"];
    */
   eth1DataDepositRoot = "";
 
   /**
-   * @generated from field: string execution_payload_block_hash = 14;
+   * @generated from field: string execution_payload_block_hash = 14 [json_name = "execution_payload_block_hash"];
    */
   executionPayloadBlockHash = "";
 
   /**
-   * @generated from field: int64 execution_payload_block_number = 15;
+   * @generated from field: int64 execution_payload_block_number = 15 [json_name = "execution_payload_block_number"];
    */
   executionPayloadBlockNumber = protoInt64.zero;
 
   /**
-   * @generated from field: string execution_payload_fee_recipient = 16;
+   * @generated from field: string execution_payload_fee_recipient = 16 [json_name = "execution_payload_fee_recipient"];
    */
   executionPayloadFeeRecipient = "";
 
   /**
-   * @generated from field: int64 execution_payload_base_fee_per_gas = 17;
+   * @generated from field: int64 execution_payload_base_fee_per_gas = 17 [json_name = "execution_payload_base_fee_per_gas"];
    */
   executionPayloadBaseFeePerGas = protoInt64.zero;
 
   /**
-   * @generated from field: int64 execution_payload_blob_gas_used = 18;
+   * @generated from field: int64 execution_payload_blob_gas_used = 18 [json_name = "execution_payload_blob_gas_used"];
    */
   executionPayloadBlobGasUsed = protoInt64.zero;
 
   /**
-   * @generated from field: int64 execution_payload_excess_blob_gas = 19;
+   * @generated from field: int64 execution_payload_excess_blob_gas = 19 [json_name = "execution_payload_excess_blob_gas"];
    */
   executionPayloadExcessBlobGas = protoInt64.zero;
 
   /**
-   * @generated from field: int64 execution_payload_gas_limit = 20;
+   * @generated from field: int64 execution_payload_gas_limit = 20 [json_name = "execution_payload_gas_limit"];
    */
   executionPayloadGasLimit = protoInt64.zero;
 
   /**
-   * @generated from field: int64 execution_payload_gas_used = 21;
+   * @generated from field: int64 execution_payload_gas_used = 21 [json_name = "execution_payload_gas_used"];
    */
   executionPayloadGasUsed = protoInt64.zero;
 
   /**
-   * @generated from field: string execution_payload_state_root = 22;
+   * @generated from field: string execution_payload_state_root = 22 [json_name = "execution_payload_state_root"];
    */
   executionPayloadStateRoot = "";
 
   /**
-   * @generated from field: string execution_payload_parent_hash = 23;
+   * @generated from field: string execution_payload_parent_hash = 23 [json_name = "execution_payload_parent_hash"];
    */
   executionPayloadParentHash = "";
 
   /**
-   * @generated from field: int64 execution_payload_transactions_count = 24;
+   * @generated from field: int64 execution_payload_transactions_count = 24 [json_name = "execution_payload_transactions_count"];
    */
   executionPayloadTransactionsCount = protoInt64.zero;
 
   /**
-   * @generated from field: int64 execution_payload_transactions_total_bytes = 25;
+   * @generated from field: int64 execution_payload_transactions_total_bytes = 25 [json_name = "execution_payload_transactions_total_bytes"];
    */
   executionPayloadTransactionsTotalBytes = protoInt64.zero;
 
   /**
-   * @generated from field: int64 execution_payload_transactions_total_bytes_compressed = 26;
+   * @generated from field: int64 execution_payload_transactions_total_bytes_compressed = 26 [json_name = "execution_payload_transactions_total_bytes_compressed"];
    */
   executionPayloadTransactionsTotalBytesCompressed = protoInt64.zero;
 
@@ -310,31 +390,31 @@ export class BlockData extends Message<BlockData> {
   static readonly typeName = "beacon_slots.BlockData";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "slot", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
-    { no: 2, name: "slot_start_date_time", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "slot_start_date_time", jsonName: "slot_start_date_time", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 3, name: "epoch", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
-    { no: 4, name: "epoch_start_date_time", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 5, name: "block_root", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 6, name: "block_version", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 7, name: "block_total_bytes", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
-    { no: 8, name: "block_total_bytes_compressed", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
-    { no: 9, name: "parent_root", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 10, name: "state_root", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 11, name: "proposer_index", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
-    { no: 12, name: "eth1_data_block_hash", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 13, name: "eth1_data_deposit_root", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 14, name: "execution_payload_block_hash", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 15, name: "execution_payload_block_number", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
-    { no: 16, name: "execution_payload_fee_recipient", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 17, name: "execution_payload_base_fee_per_gas", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
-    { no: 18, name: "execution_payload_blob_gas_used", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
-    { no: 19, name: "execution_payload_excess_blob_gas", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
-    { no: 20, name: "execution_payload_gas_limit", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
-    { no: 21, name: "execution_payload_gas_used", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
-    { no: 22, name: "execution_payload_state_root", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 23, name: "execution_payload_parent_hash", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 24, name: "execution_payload_transactions_count", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
-    { no: 25, name: "execution_payload_transactions_total_bytes", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
-    { no: 26, name: "execution_payload_transactions_total_bytes_compressed", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
+    { no: 4, name: "epoch_start_date_time", jsonName: "epoch_start_date_time", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 5, name: "block_root", jsonName: "block_root", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 6, name: "block_version", jsonName: "block_version", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 7, name: "block_total_bytes", jsonName: "block_total_bytes", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
+    { no: 8, name: "block_total_bytes_compressed", jsonName: "block_total_bytes_compressed", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
+    { no: 9, name: "parent_root", jsonName: "parent_root", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 10, name: "state_root", jsonName: "state_root", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 11, name: "proposer_index", jsonName: "proposer_index", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
+    { no: 12, name: "eth1_data_block_hash", jsonName: "eth1_data_block_hash", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 13, name: "eth1_data_deposit_root", jsonName: "eth1_data_deposit_root", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 14, name: "execution_payload_block_hash", jsonName: "execution_payload_block_hash", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 15, name: "execution_payload_block_number", jsonName: "execution_payload_block_number", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
+    { no: 16, name: "execution_payload_fee_recipient", jsonName: "execution_payload_fee_recipient", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 17, name: "execution_payload_base_fee_per_gas", jsonName: "execution_payload_base_fee_per_gas", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
+    { no: 18, name: "execution_payload_blob_gas_used", jsonName: "execution_payload_blob_gas_used", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
+    { no: 19, name: "execution_payload_excess_blob_gas", jsonName: "execution_payload_excess_blob_gas", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
+    { no: 20, name: "execution_payload_gas_limit", jsonName: "execution_payload_gas_limit", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
+    { no: 21, name: "execution_payload_gas_used", jsonName: "execution_payload_gas_used", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
+    { no: 22, name: "execution_payload_state_root", jsonName: "execution_payload_state_root", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 23, name: "execution_payload_parent_hash", jsonName: "execution_payload_parent_hash", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 24, name: "execution_payload_transactions_count", jsonName: "execution_payload_transactions_count", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
+    { no: 25, name: "execution_payload_transactions_total_bytes", jsonName: "execution_payload_transactions_total_bytes", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
+    { no: 26, name: "execution_payload_transactions_total_bytes_compressed", jsonName: "execution_payload_transactions_total_bytes_compressed", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): BlockData {
@@ -361,17 +441,17 @@ export class BlockData extends Message<BlockData> {
  */
 export class AttestationWindow extends Message<AttestationWindow> {
   /**
-   * @generated from field: int64 start_ms = 1;
+   * @generated from field: int64 start_ms = 1 [json_name = "start_ms"];
    */
   startMs = protoInt64.zero;
 
   /**
-   * @generated from field: int64 end_ms = 2;
+   * @generated from field: int64 end_ms = 2 [json_name = "end_ms"];
    */
   endMs = protoInt64.zero;
 
   /**
-   * @generated from field: repeated int64 validator_indices = 3;
+   * @generated from field: repeated int64 validator_indices = 3 [json_name = "validator_indices"];
    */
   validatorIndices: bigint[] = [];
 
@@ -383,9 +463,9 @@ export class AttestationWindow extends Message<AttestationWindow> {
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "beacon_slots.AttestationWindow";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "start_ms", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
-    { no: 2, name: "end_ms", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
-    { no: 3, name: "validator_indices", kind: "scalar", T: 3 /* ScalarType.INT64 */, repeated: true },
+    { no: 1, name: "start_ms", jsonName: "start_ms", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
+    { no: 2, name: "end_ms", jsonName: "end_ms", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
+    { no: 3, name: "validator_indices", jsonName: "validator_indices", kind: "scalar", T: 3 /* ScalarType.INT64 */, repeated: true },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): AttestationWindow {
@@ -417,7 +497,7 @@ export class AttestationsData extends Message<AttestationsData> {
   windows: AttestationWindow[] = [];
 
   /**
-   * @generated from field: int64 maximum_votes = 2;
+   * @generated from field: int64 maximum_votes = 2 [json_name = "maximum_votes"];
    */
   maximumVotes = protoInt64.zero;
 
@@ -430,7 +510,7 @@ export class AttestationsData extends Message<AttestationsData> {
   static readonly typeName = "beacon_slots.AttestationsData";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "windows", kind: "message", T: AttestationWindow, repeated: true },
-    { no: 2, name: "maximum_votes", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
+    { no: 2, name: "maximum_votes", jsonName: "maximum_votes", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): AttestationsData {
@@ -496,27 +576,27 @@ export class BlobTimingMap extends Message<BlobTimingMap> {
  */
 export class BlockArrivalTime extends Message<BlockArrivalTime> {
   /**
-   * @generated from field: int64 slot_time = 1;
+   * @generated from field: int64 slot_time = 1 [json_name = "slot_time"];
    */
   slotTime = protoInt64.zero;
 
   /**
-   * @generated from field: string meta_client_name = 2;
+   * @generated from field: string meta_client_name = 2 [json_name = "meta_client_name"];
    */
   metaClientName = "";
 
   /**
-   * @generated from field: string meta_client_geo_city = 3;
+   * @generated from field: string meta_client_geo_city = 3 [json_name = "meta_client_geo_city"];
    */
   metaClientGeoCity = "";
 
   /**
-   * @generated from field: string meta_client_geo_country = 4;
+   * @generated from field: string meta_client_geo_country = 4 [json_name = "meta_client_geo_country"];
    */
   metaClientGeoCountry = "";
 
   /**
-   * @generated from field: string meta_client_geo_continent_code = 5;
+   * @generated from field: string meta_client_geo_continent_code = 5 [json_name = "meta_client_geo_continent_code"];
    */
   metaClientGeoContinentCode = "";
 
@@ -528,11 +608,11 @@ export class BlockArrivalTime extends Message<BlockArrivalTime> {
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "beacon_slots.BlockArrivalTime";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "slot_time", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
-    { no: 2, name: "meta_client_name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "meta_client_geo_city", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 4, name: "meta_client_geo_country", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 5, name: "meta_client_geo_continent_code", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 1, name: "slot_time", jsonName: "slot_time", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
+    { no: 2, name: "meta_client_name", jsonName: "meta_client_name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "meta_client_geo_city", jsonName: "meta_client_geo_city", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "meta_client_geo_country", jsonName: "meta_client_geo_country", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 5, name: "meta_client_geo_continent_code", jsonName: "meta_client_geo_continent_code", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): BlockArrivalTime {
@@ -557,32 +637,32 @@ export class BlockArrivalTime extends Message<BlockArrivalTime> {
  */
 export class BlobArrivalTime extends Message<BlobArrivalTime> {
   /**
-   * @generated from field: int64 slot_time = 1;
+   * @generated from field: int64 slot_time = 1 [json_name = "slot_time"];
    */
   slotTime = protoInt64.zero;
 
   /**
-   * @generated from field: string meta_client_name = 2;
+   * @generated from field: string meta_client_name = 2 [json_name = "meta_client_name"];
    */
   metaClientName = "";
 
   /**
-   * @generated from field: string meta_client_geo_city = 3;
+   * @generated from field: string meta_client_geo_city = 3 [json_name = "meta_client_geo_city"];
    */
   metaClientGeoCity = "";
 
   /**
-   * @generated from field: string meta_client_geo_country = 4;
+   * @generated from field: string meta_client_geo_country = 4 [json_name = "meta_client_geo_country"];
    */
   metaClientGeoCountry = "";
 
   /**
-   * @generated from field: string meta_client_geo_continent_code = 5;
+   * @generated from field: string meta_client_geo_continent_code = 5 [json_name = "meta_client_geo_continent_code"];
    */
   metaClientGeoContinentCode = "";
 
   /**
-   * @generated from field: int64 blob_index = 6;
+   * @generated from field: int64 blob_index = 6 [json_name = "blob_index"];
    */
   blobIndex = protoInt64.zero;
 
@@ -594,12 +674,12 @@ export class BlobArrivalTime extends Message<BlobArrivalTime> {
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "beacon_slots.BlobArrivalTime";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "slot_time", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
-    { no: 2, name: "meta_client_name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "meta_client_geo_city", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 4, name: "meta_client_geo_country", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 5, name: "meta_client_geo_continent_code", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 6, name: "blob_index", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
+    { no: 1, name: "slot_time", jsonName: "slot_time", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
+    { no: 2, name: "meta_client_name", jsonName: "meta_client_name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "meta_client_geo_city", jsonName: "meta_client_geo_city", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "meta_client_geo_country", jsonName: "meta_client_geo_country", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 5, name: "meta_client_geo_continent_code", jsonName: "meta_client_geo_continent_code", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 6, name: "blob_index", jsonName: "blob_index", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): BlobArrivalTime {
@@ -624,7 +704,7 @@ export class BlobArrivalTime extends Message<BlobArrivalTime> {
  */
 export class BlobArrivalTimes extends Message<BlobArrivalTimes> {
   /**
-   * @generated from field: repeated beacon_slots.BlobArrivalTime arrival_times = 1;
+   * @generated from field: repeated beacon_slots.BlobArrivalTime arrival_times = 1 [json_name = "arrival_times"];
    */
   arrivalTimes: BlobArrivalTime[] = [];
 
@@ -636,7 +716,7 @@ export class BlobArrivalTimes extends Message<BlobArrivalTimes> {
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "beacon_slots.BlobArrivalTimes";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "arrival_times", kind: "message", T: BlobArrivalTime, repeated: true },
+    { no: 1, name: "arrival_times", jsonName: "arrival_times", kind: "message", T: BlobArrivalTime, repeated: true },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): BlobArrivalTimes {
@@ -665,28 +745,28 @@ export class FullTimings extends Message<FullTimings> {
   /**
    * map meta_client -> BlockArrivalTime
    *
-   * @generated from field: map<string, beacon_slots.BlockArrivalTime> block_seen = 1;
+   * @generated from field: map<string, beacon_slots.BlockArrivalTime> block_seen = 1 [json_name = "block_seen"];
    */
   blockSeen: { [key: string]: BlockArrivalTime } = {};
 
   /**
    * map meta_client -> BlobArrivalTimes
    *
-   * @generated from field: map<string, beacon_slots.BlobArrivalTimes> blob_seen = 2;
+   * @generated from field: map<string, beacon_slots.BlobArrivalTimes> blob_seen = 2 [json_name = "blob_seen"];
    */
   blobSeen: { [key: string]: BlobArrivalTimes } = {};
 
   /**
    * map meta_client -> BlockArrivalTime
    *
-   * @generated from field: map<string, beacon_slots.BlockArrivalTime> block_first_seen_p2p = 3;
+   * @generated from field: map<string, beacon_slots.BlockArrivalTime> block_first_seen_p2p = 3 [json_name = "block_first_seen_p2p"];
    */
   blockFirstSeenP2p: { [key: string]: BlockArrivalTime } = {};
 
   /**
    * map meta_client -> BlobArrivalTimes
    *
-   * @generated from field: map<string, beacon_slots.BlobArrivalTimes> blob_first_seen_p2p = 4;
+   * @generated from field: map<string, beacon_slots.BlobArrivalTimes> blob_first_seen_p2p = 4 [json_name = "blob_first_seen_p2p"];
    */
   blobFirstSeenP2p: { [key: string]: BlobArrivalTimes } = {};
 
@@ -698,10 +778,10 @@ export class FullTimings extends Message<FullTimings> {
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "beacon_slots.FullTimings";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "block_seen", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "message", T: BlockArrivalTime} },
-    { no: 2, name: "blob_seen", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "message", T: BlobArrivalTimes} },
-    { no: 3, name: "block_first_seen_p2p", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "message", T: BlockArrivalTime} },
-    { no: 4, name: "blob_first_seen_p2p", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "message", T: BlobArrivalTimes} },
+    { no: 1, name: "block_seen", jsonName: "block_seen", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "message", T: BlockArrivalTime} },
+    { no: 2, name: "blob_seen", jsonName: "blob_seen", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "message", T: BlobArrivalTimes} },
+    { no: 3, name: "block_first_seen_p2p", jsonName: "block_first_seen_p2p", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "message", T: BlockArrivalTime} },
+    { no: 4, name: "blob_first_seen_p2p", jsonName: "blob_first_seen_p2p", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "message", T: BlobArrivalTimes} },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): FullTimings {
@@ -730,28 +810,28 @@ export class SlimTimings extends Message<SlimTimings> {
   /**
    * map meta_client -> ms
    *
-   * @generated from field: map<string, int64> block_seen = 1;
+   * @generated from field: map<string, int64> block_seen = 1 [json_name = "block_seen"];
    */
   blockSeen: { [key: string]: bigint } = {};
 
   /**
    * map meta_client -> BlobTimingMap
    *
-   * @generated from field: map<string, beacon_slots.BlobTimingMap> blob_seen = 2;
+   * @generated from field: map<string, beacon_slots.BlobTimingMap> blob_seen = 2 [json_name = "blob_seen"];
    */
   blobSeen: { [key: string]: BlobTimingMap } = {};
 
   /**
    * map meta_client -> ms
    *
-   * @generated from field: map<string, int64> block_first_seen_p2p = 3;
+   * @generated from field: map<string, int64> block_first_seen_p2p = 3 [json_name = "block_first_seen_p2p"];
    */
   blockFirstSeenP2p: { [key: string]: bigint } = {};
 
   /**
    * map meta_client -> BlobTimingMap
    *
-   * @generated from field: map<string, beacon_slots.BlobTimingMap> blob_first_seen_p2p = 4;
+   * @generated from field: map<string, beacon_slots.BlobTimingMap> blob_first_seen_p2p = 4 [json_name = "blob_first_seen_p2p"];
    */
   blobFirstSeenP2p: { [key: string]: BlobTimingMap } = {};
 
@@ -763,10 +843,10 @@ export class SlimTimings extends Message<SlimTimings> {
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "beacon_slots.SlimTimings";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "block_seen", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "scalar", T: 3 /* ScalarType.INT64 */} },
-    { no: 2, name: "blob_seen", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "message", T: BlobTimingMap} },
-    { no: 3, name: "block_first_seen_p2p", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "scalar", T: 3 /* ScalarType.INT64 */} },
-    { no: 4, name: "blob_first_seen_p2p", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "message", T: BlobTimingMap} },
+    { no: 1, name: "block_seen", jsonName: "block_seen", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "scalar", T: 3 /* ScalarType.INT64 */} },
+    { no: 2, name: "blob_seen", jsonName: "blob_seen", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "message", T: BlobTimingMap} },
+    { no: 3, name: "block_first_seen_p2p", jsonName: "block_first_seen_p2p", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "scalar", T: 3 /* ScalarType.INT64 */} },
+    { no: 4, name: "blob_first_seen_p2p", jsonName: "blob_first_seen_p2p", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "message", T: BlobTimingMap} },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): SlimTimings {
@@ -798,27 +878,27 @@ export class RelayBid extends Message<RelayBid> {
   slot = protoInt64.zero;
 
   /**
-   * @generated from field: string parent_hash = 2;
+   * @generated from field: string parent_hash = 2 [json_name = "parent_hash"];
    */
   parentHash = "";
 
   /**
-   * @generated from field: string block_hash = 3;
+   * @generated from field: string block_hash = 3 [json_name = "block_hash"];
    */
   blockHash = "";
 
   /**
-   * @generated from field: string builder_pubkey = 4;
+   * @generated from field: string builder_pubkey = 4 [json_name = "builder_pubkey"];
    */
   builderPubkey = "";
 
   /**
-   * @generated from field: string proposer_pubkey = 5;
+   * @generated from field: string proposer_pubkey = 5 [json_name = "proposer_pubkey"];
    */
   proposerPubkey = "";
 
   /**
-   * @generated from field: string proposer_fee_recipient = 6;
+   * @generated from field: string proposer_fee_recipient = 6 [json_name = "proposer_fee_recipient"];
    */
   proposerFeeRecipient = "";
 
@@ -832,30 +912,30 @@ export class RelayBid extends Message<RelayBid> {
   /**
    * Field name/type to be verified in implementation phase
    *
-   * @generated from field: uint64 gas_limit = 8;
+   * @generated from field: uint64 gas_limit = 8 [json_name = "gas_limit"];
    */
   gasLimit = protoInt64.zero;
 
   /**
    * Field name/type to be verified in implementation phase
    *
-   * @generated from field: uint64 gas_used = 9;
+   * @generated from field: uint64 gas_used = 9 [json_name = "gas_used"];
    */
   gasUsed = protoInt64.zero;
 
   /**
    * Time relative to slot start in ms
    *
-   * @generated from field: int64 slot_time = 10;
+   * @generated from field: int32 slot_time = 10 [json_name = "slot_time"];
    */
-  slotTime = protoInt64.zero;
+  slotTime = 0;
 
   /**
    * Time bucket (granularity) in ms
    *
-   * @generated from field: int64 time_bucket = 11;
+   * @generated from field: int32 time_bucket = 11 [json_name = "time_bucket"];
    */
-  timeBucket = protoInt64.zero;
+  timeBucket = 0;
 
   constructor(data?: PartialMessage<RelayBid>) {
     super();
@@ -866,16 +946,16 @@ export class RelayBid extends Message<RelayBid> {
   static readonly typeName = "beacon_slots.RelayBid";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "slot", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
-    { no: 2, name: "parent_hash", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "block_hash", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 4, name: "builder_pubkey", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 5, name: "proposer_pubkey", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 6, name: "proposer_fee_recipient", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "parent_hash", jsonName: "parent_hash", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "block_hash", jsonName: "block_hash", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "builder_pubkey", jsonName: "builder_pubkey", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 5, name: "proposer_pubkey", jsonName: "proposer_pubkey", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 6, name: "proposer_fee_recipient", jsonName: "proposer_fee_recipient", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 7, name: "value", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 8, name: "gas_limit", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
-    { no: 9, name: "gas_used", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
-    { no: 10, name: "slot_time", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
-    { no: 11, name: "time_bucket", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
+    { no: 8, name: "gas_limit", jsonName: "gas_limit", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
+    { no: 9, name: "gas_used", jsonName: "gas_used", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
+    { no: 10, name: "slot_time", jsonName: "slot_time", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 11, name: "time_bucket", jsonName: "time_bucket", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): RelayBid {
@@ -946,22 +1026,22 @@ export class DeliveredPayload extends Message<DeliveredPayload> {
   slot = protoInt64.zero;
 
   /**
-   * @generated from field: string block_hash = 2;
+   * @generated from field: string block_hash = 2 [json_name = "block_hash"];
    */
   blockHash = "";
 
   /**
-   * @generated from field: uint64 block_number = 3;
+   * @generated from field: uint64 block_number = 3 [json_name = "block_number"];
    */
   blockNumber = protoInt64.zero;
 
   /**
-   * @generated from field: string proposer_pubkey = 4;
+   * @generated from field: string proposer_pubkey = 4 [json_name = "proposer_pubkey"];
    */
   proposerPubkey = "";
 
   /**
-   * @generated from field: string proposer_fee_recipient = 5;
+   * @generated from field: string proposer_fee_recipient = 5 [json_name = "proposer_fee_recipient"];
    */
   proposerFeeRecipient = "";
 
@@ -974,10 +1054,10 @@ export class DeliveredPayload extends Message<DeliveredPayload> {
   static readonly typeName = "beacon_slots.DeliveredPayload";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "slot", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
-    { no: 2, name: "block_hash", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "block_number", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
-    { no: 4, name: "proposer_pubkey", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 5, name: "proposer_fee_recipient", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "block_hash", jsonName: "block_hash", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "block_number", jsonName: "block_number", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
+    { no: 4, name: "proposer_pubkey", jsonName: "proposer_pubkey", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 5, name: "proposer_fee_recipient", jsonName: "proposer_fee_recipient", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): DeliveredPayload {
@@ -1053,12 +1133,12 @@ export class BeaconSlotData extends Message<BeaconSlotData> {
   network = "";
 
   /**
-   * @generated from field: string processed_at = 3;
+   * @generated from field: string processed_at = 3 [json_name = "processed_at"];
    */
   processedAt = "";
 
   /**
-   * @generated from field: int64 processing_time_ms = 4;
+   * @generated from field: int64 processing_time_ms = 4 [json_name = "processing_time_ms"];
    */
   processingTimeMs = protoInt64.zero;
 
@@ -1095,14 +1175,14 @@ export class BeaconSlotData extends Message<BeaconSlotData> {
   /**
    * Keyed by relay_name, stores list of bids via wrapper
    *
-   * @generated from field: map<string, beacon_slots.RelayBids> relay_bids = 11;
+   * @generated from field: map<string, beacon_slots.RelayBids> relay_bids = 11 [json_name = "relay_bids"];
    */
   relayBids: { [key: string]: RelayBids } = {};
 
   /**
    * Keyed by relay_name, stores list of payloads via wrapper
    *
-   * @generated from field: map<string, beacon_slots.DeliveredPayloads> delivered_payloads = 12;
+   * @generated from field: map<string, beacon_slots.DeliveredPayloads> delivered_payloads = 12 [json_name = "delivered_payloads"];
    */
   deliveredPayloads: { [key: string]: DeliveredPayloads } = {};
 
@@ -1116,16 +1196,16 @@ export class BeaconSlotData extends Message<BeaconSlotData> {
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "slot", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
     { no: 2, name: "network", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "processed_at", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 4, name: "processing_time_ms", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
+    { no: 3, name: "processed_at", jsonName: "processed_at", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "processing_time_ms", jsonName: "processing_time_ms", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
     { no: 5, name: "block", kind: "message", T: BlockData },
     { no: 6, name: "proposer", kind: "message", T: Proposer },
     { no: 7, name: "entity", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 8, name: "nodes", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "message", T: Node} },
     { no: 9, name: "timings", kind: "message", T: SlimTimings },
     { no: 10, name: "attestations", kind: "message", T: AttestationsData },
-    { no: 11, name: "relay_bids", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "message", T: RelayBids} },
-    { no: 12, name: "delivered_payloads", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "message", T: DeliveredPayloads} },
+    { no: 11, name: "relay_bids", jsonName: "relay_bids", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "message", T: RelayBids} },
+    { no: 12, name: "delivered_payloads", jsonName: "delivered_payloads", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "message", T: DeliveredPayloads} },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): BeaconSlotData {

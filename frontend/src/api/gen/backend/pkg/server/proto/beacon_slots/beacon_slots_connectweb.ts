@@ -3,7 +3,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { GetRecentLocallyBuiltBlocksRequest, GetRecentLocallyBuiltBlocksResponse, GetRecentValidatorBlocksRequest, GetRecentValidatorBlocksResponse } from "./beacon_slots_pb.js";
+import { GetRecentLocallyBuiltBlocksRequest, GetRecentLocallyBuiltBlocksResponse, GetRecentValidatorBlocksRequest, GetRecentValidatorBlocksResponse, GetSlotDataRequest, GetSlotDataResponse } from "./beacon_slots_pb.js";
 import { MethodKind } from "@bufbuild/protobuf";
 
 /**
@@ -28,6 +28,15 @@ export const BeaconSlots = {
       name: "GetRecentValidatorBlocks",
       I: GetRecentValidatorBlocksRequest,
       O: GetRecentValidatorBlocksResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * @generated from rpc beacon_slots.BeaconSlots.GetSlotData
+     */
+    getSlotData: {
+      name: "GetSlotData",
+      I: GetSlotDataRequest,
+      O: GetSlotDataResponse,
       kind: MethodKind.Unary,
     },
   }

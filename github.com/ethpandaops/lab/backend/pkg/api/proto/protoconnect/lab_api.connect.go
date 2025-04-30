@@ -36,17 +36,21 @@ const (
 	// LabAPIGetRecentLocallyBuiltBlocksProcedure is the fully-qualified name of the LabAPI's
 	// GetRecentLocallyBuiltBlocks RPC.
 	LabAPIGetRecentLocallyBuiltBlocksProcedure = "/labapi.LabAPI/GetRecentLocallyBuiltBlocks"
+	// LabAPIGetSlotDataProcedure is the fully-qualified name of the LabAPI's GetSlotData RPC.
+	LabAPIGetSlotDataProcedure = "/labapi.LabAPI/GetSlotData"
 )
 
 // These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
 var (
 	labAPIServiceDescriptor                           = proto.File_backend_pkg_api_proto_lab_api_proto.Services().ByName("LabAPI")
 	labAPIGetRecentLocallyBuiltBlocksMethodDescriptor = labAPIServiceDescriptor.Methods().ByName("GetRecentLocallyBuiltBlocks")
+	labAPIGetSlotDataMethodDescriptor                 = labAPIServiceDescriptor.Methods().ByName("GetSlotData")
 )
 
 // LabAPIClient is a client for the labapi.LabAPI service.
 type LabAPIClient interface {
 	GetRecentLocallyBuiltBlocks(context.Context, *connect.Request[proto.GetRecentLocallyBuiltBlocksRequest]) (*connect.Response[proto.GetRecentLocallyBuiltBlocksResponse], error)
+	GetSlotData(context.Context, *connect.Request[proto.GetSlotDataRequest]) (*connect.Response[proto.GetSlotDataResponse], error)
 }
 
 // NewLabAPIClient constructs a client for the labapi.LabAPI service. By default, it uses the
@@ -66,12 +70,20 @@ func NewLabAPIClient(httpClient connect.HTTPClient, baseURL string, opts ...conn
 			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 			connect.WithClientOptions(opts...),
 		),
+		getSlotData: connect.NewClient[proto.GetSlotDataRequest, proto.GetSlotDataResponse](
+			httpClient,
+			baseURL+LabAPIGetSlotDataProcedure,
+			connect.WithSchema(labAPIGetSlotDataMethodDescriptor),
+			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
 // labAPIClient implements LabAPIClient.
 type labAPIClient struct {
 	getRecentLocallyBuiltBlocks *connect.Client[proto.GetRecentLocallyBuiltBlocksRequest, proto.GetRecentLocallyBuiltBlocksResponse]
+	getSlotData                 *connect.Client[proto.GetSlotDataRequest, proto.GetSlotDataResponse]
 }
 
 // GetRecentLocallyBuiltBlocks calls labapi.LabAPI.GetRecentLocallyBuiltBlocks.
@@ -79,9 +91,15 @@ func (c *labAPIClient) GetRecentLocallyBuiltBlocks(ctx context.Context, req *con
 	return c.getRecentLocallyBuiltBlocks.CallUnary(ctx, req)
 }
 
+// GetSlotData calls labapi.LabAPI.GetSlotData.
+func (c *labAPIClient) GetSlotData(ctx context.Context, req *connect.Request[proto.GetSlotDataRequest]) (*connect.Response[proto.GetSlotDataResponse], error) {
+	return c.getSlotData.CallUnary(ctx, req)
+}
+
 // LabAPIHandler is an implementation of the labapi.LabAPI service.
 type LabAPIHandler interface {
 	GetRecentLocallyBuiltBlocks(context.Context, *connect.Request[proto.GetRecentLocallyBuiltBlocksRequest]) (*connect.Response[proto.GetRecentLocallyBuiltBlocksResponse], error)
+	GetSlotData(context.Context, *connect.Request[proto.GetSlotDataRequest]) (*connect.Response[proto.GetSlotDataResponse], error)
 }
 
 // NewLabAPIHandler builds an HTTP handler from the service implementation. It returns the path on
@@ -97,10 +115,19 @@ func NewLabAPIHandler(svc LabAPIHandler, opts ...connect.HandlerOption) (string,
 		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 		connect.WithHandlerOptions(opts...),
 	)
+	labAPIGetSlotDataHandler := connect.NewUnaryHandler(
+		LabAPIGetSlotDataProcedure,
+		svc.GetSlotData,
+		connect.WithSchema(labAPIGetSlotDataMethodDescriptor),
+		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/labapi.LabAPI/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case LabAPIGetRecentLocallyBuiltBlocksProcedure:
 			labAPIGetRecentLocallyBuiltBlocksHandler.ServeHTTP(w, r)
+		case LabAPIGetSlotDataProcedure:
+			labAPIGetSlotDataHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -112,4 +139,8 @@ type UnimplementedLabAPIHandler struct{}
 
 func (UnimplementedLabAPIHandler) GetRecentLocallyBuiltBlocks(context.Context, *connect.Request[proto.GetRecentLocallyBuiltBlocksRequest]) (*connect.Response[proto.GetRecentLocallyBuiltBlocksResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("labapi.LabAPI.GetRecentLocallyBuiltBlocks is not implemented"))
+}
+
+func (UnimplementedLabAPIHandler) GetSlotData(context.Context, *connect.Request[proto.GetSlotDataRequest]) (*connect.Response[proto.GetSlotDataResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("labapi.LabAPI.GetSlotData is not implemented"))
 }

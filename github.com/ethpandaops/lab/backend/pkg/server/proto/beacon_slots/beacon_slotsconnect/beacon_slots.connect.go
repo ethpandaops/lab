@@ -39,6 +39,8 @@ const (
 	// BeaconSlotsGetRecentValidatorBlocksProcedure is the fully-qualified name of the BeaconSlots's
 	// GetRecentValidatorBlocks RPC.
 	BeaconSlotsGetRecentValidatorBlocksProcedure = "/beacon_slots.BeaconSlots/GetRecentValidatorBlocks"
+	// BeaconSlotsGetSlotDataProcedure is the fully-qualified name of the BeaconSlots's GetSlotData RPC.
+	BeaconSlotsGetSlotDataProcedure = "/beacon_slots.BeaconSlots/GetSlotData"
 )
 
 // These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
@@ -46,12 +48,14 @@ var (
 	beaconSlotsServiceDescriptor                           = beacon_slots.File_backend_pkg_server_proto_beacon_slots_beacon_slots_proto.Services().ByName("BeaconSlots")
 	beaconSlotsGetRecentLocallyBuiltBlocksMethodDescriptor = beaconSlotsServiceDescriptor.Methods().ByName("GetRecentLocallyBuiltBlocks")
 	beaconSlotsGetRecentValidatorBlocksMethodDescriptor    = beaconSlotsServiceDescriptor.Methods().ByName("GetRecentValidatorBlocks")
+	beaconSlotsGetSlotDataMethodDescriptor                 = beaconSlotsServiceDescriptor.Methods().ByName("GetSlotData")
 )
 
 // BeaconSlotsClient is a client for the beacon_slots.BeaconSlots service.
 type BeaconSlotsClient interface {
 	GetRecentLocallyBuiltBlocks(context.Context, *connect.Request[beacon_slots.GetRecentLocallyBuiltBlocksRequest]) (*connect.Response[beacon_slots.GetRecentLocallyBuiltBlocksResponse], error)
 	GetRecentValidatorBlocks(context.Context, *connect.Request[beacon_slots.GetRecentValidatorBlocksRequest]) (*connect.Response[beacon_slots.GetRecentValidatorBlocksResponse], error)
+	GetSlotData(context.Context, *connect.Request[beacon_slots.GetSlotDataRequest]) (*connect.Response[beacon_slots.GetSlotDataResponse], error)
 }
 
 // NewBeaconSlotsClient constructs a client for the beacon_slots.BeaconSlots service. By default, it
@@ -76,6 +80,12 @@ func NewBeaconSlotsClient(httpClient connect.HTTPClient, baseURL string, opts ..
 			connect.WithSchema(beaconSlotsGetRecentValidatorBlocksMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
+		getSlotData: connect.NewClient[beacon_slots.GetSlotDataRequest, beacon_slots.GetSlotDataResponse](
+			httpClient,
+			baseURL+BeaconSlotsGetSlotDataProcedure,
+			connect.WithSchema(beaconSlotsGetSlotDataMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
@@ -83,6 +93,7 @@ func NewBeaconSlotsClient(httpClient connect.HTTPClient, baseURL string, opts ..
 type beaconSlotsClient struct {
 	getRecentLocallyBuiltBlocks *connect.Client[beacon_slots.GetRecentLocallyBuiltBlocksRequest, beacon_slots.GetRecentLocallyBuiltBlocksResponse]
 	getRecentValidatorBlocks    *connect.Client[beacon_slots.GetRecentValidatorBlocksRequest, beacon_slots.GetRecentValidatorBlocksResponse]
+	getSlotData                 *connect.Client[beacon_slots.GetSlotDataRequest, beacon_slots.GetSlotDataResponse]
 }
 
 // GetRecentLocallyBuiltBlocks calls beacon_slots.BeaconSlots.GetRecentLocallyBuiltBlocks.
@@ -95,10 +106,16 @@ func (c *beaconSlotsClient) GetRecentValidatorBlocks(ctx context.Context, req *c
 	return c.getRecentValidatorBlocks.CallUnary(ctx, req)
 }
 
+// GetSlotData calls beacon_slots.BeaconSlots.GetSlotData.
+func (c *beaconSlotsClient) GetSlotData(ctx context.Context, req *connect.Request[beacon_slots.GetSlotDataRequest]) (*connect.Response[beacon_slots.GetSlotDataResponse], error) {
+	return c.getSlotData.CallUnary(ctx, req)
+}
+
 // BeaconSlotsHandler is an implementation of the beacon_slots.BeaconSlots service.
 type BeaconSlotsHandler interface {
 	GetRecentLocallyBuiltBlocks(context.Context, *connect.Request[beacon_slots.GetRecentLocallyBuiltBlocksRequest]) (*connect.Response[beacon_slots.GetRecentLocallyBuiltBlocksResponse], error)
 	GetRecentValidatorBlocks(context.Context, *connect.Request[beacon_slots.GetRecentValidatorBlocksRequest]) (*connect.Response[beacon_slots.GetRecentValidatorBlocksResponse], error)
+	GetSlotData(context.Context, *connect.Request[beacon_slots.GetSlotDataRequest]) (*connect.Response[beacon_slots.GetSlotDataResponse], error)
 }
 
 // NewBeaconSlotsHandler builds an HTTP handler from the service implementation. It returns the path
@@ -119,12 +136,20 @@ func NewBeaconSlotsHandler(svc BeaconSlotsHandler, opts ...connect.HandlerOption
 		connect.WithSchema(beaconSlotsGetRecentValidatorBlocksMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
+	beaconSlotsGetSlotDataHandler := connect.NewUnaryHandler(
+		BeaconSlotsGetSlotDataProcedure,
+		svc.GetSlotData,
+		connect.WithSchema(beaconSlotsGetSlotDataMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/beacon_slots.BeaconSlots/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case BeaconSlotsGetRecentLocallyBuiltBlocksProcedure:
 			beaconSlotsGetRecentLocallyBuiltBlocksHandler.ServeHTTP(w, r)
 		case BeaconSlotsGetRecentValidatorBlocksProcedure:
 			beaconSlotsGetRecentValidatorBlocksHandler.ServeHTTP(w, r)
+		case BeaconSlotsGetSlotDataProcedure:
+			beaconSlotsGetSlotDataHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -140,4 +165,8 @@ func (UnimplementedBeaconSlotsHandler) GetRecentLocallyBuiltBlocks(context.Conte
 
 func (UnimplementedBeaconSlotsHandler) GetRecentValidatorBlocks(context.Context, *connect.Request[beacon_slots.GetRecentValidatorBlocksRequest]) (*connect.Response[beacon_slots.GetRecentValidatorBlocksResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("beacon_slots.BeaconSlots.GetRecentValidatorBlocks is not implemented"))
+}
+
+func (UnimplementedBeaconSlotsHandler) GetSlotData(context.Context, *connect.Request[beacon_slots.GetSlotDataRequest]) (*connect.Response[beacon_slots.GetSlotDataResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("beacon_slots.BeaconSlots.GetSlotData is not implemented"))
 }

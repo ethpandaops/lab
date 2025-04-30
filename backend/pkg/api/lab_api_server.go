@@ -61,3 +61,26 @@ func (s *LabAPIServerImpl) GetRecentLocallyBuiltBlocks(ctx context.Context, req 
 
 	return res, nil
 }
+
+func (s *LabAPIServerImpl) GetSlotData(ctx context.Context, req *connect.Request[apipb.GetSlotDataRequest]) (*connect.Response[apipb.GetSlotDataResponse], error) {
+	// Forward the request to the beacon slots service
+	resp, err := s.beaconSlotsClient.GetSlotData(ctx, &beaconslotspb.GetSlotDataRequest{
+		Network: req.Msg.Network,
+		Slot:    int64(req.Msg.Slot),
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	// Convert the response to the API response format and wrap in connect.Response
+	apiResponse := &apipb.GetSlotDataResponse{
+		Data: resp.Data,
+	}
+
+	res := connect.NewResponse(apiResponse)
+
+	// Example of setting a header
+	res.Header().Set("Cache-Control", StandardHTTPHeaders["Cache-Control-VeryLong"])
+
+	return res, nil
+}

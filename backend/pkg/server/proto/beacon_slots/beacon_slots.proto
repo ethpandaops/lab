@@ -9,129 +9,139 @@ import "google/protobuf/timestamp.proto";
 service BeaconSlots {
   rpc GetRecentLocallyBuiltBlocks (GetRecentLocallyBuiltBlocksRequest) returns (GetRecentLocallyBuiltBlocksResponse);
   rpc GetRecentValidatorBlocks (GetRecentValidatorBlocksRequest) returns (GetRecentValidatorBlocksResponse);
+  rpc GetSlotData (GetSlotDataRequest) returns (GetSlotDataResponse);
+}
+
+message GetSlotDataRequest {
+  string network = 1;
+  int64 slot = 2;
+}
+
+message GetSlotDataResponse {
+  BeaconSlotData data = 1;
 }
 
 // Geo location information for a node
 message Geo {
-  string city = 1;
-  string country = 2;
-  string continent = 3;
-  double latitude = 4;
-  double longitude = 5;
+  string city = 1 [json_name = "city"];
+  string country = 2 [json_name = "country"];
+  string continent = 3 [json_name = "continent"];
+  double latitude = 4 [json_name = "latitude"];
+  double longitude = 5 [json_name = "longitude"];
 }
 
 // Node information, keyed by meta_client_name
 message Node {
-  string name = 1;
-  string username = 2;
-  Geo geo = 3;
+  string name = 1 [json_name = "name"];
+  string username = 2 [json_name = "username"];
+  Geo geo = 3 [json_name = "geo"];
 }
 
 // Proposer information (only slot and proposer_validator_index)
 message Proposer {
-  int64 slot = 1;
-  int64 proposer_validator_index = 2;
+  int64 slot = 1 [json_name = "slot"];
+  int64 proposer_validator_index = 2 [json_name = "proposer_validator_index"];
 }
 
 // Block data, matching the target JSON structure precisely
 message BlockData {
   int64 slot = 1;
-  string slot_start_date_time = 2;
-  int64 epoch = 3;
-  string epoch_start_date_time = 4;
-  string block_root = 5;
-  string block_version = 6;
-  int64 block_total_bytes = 7;
-  int64 block_total_bytes_compressed = 8;
-  string parent_root = 9;
-  string state_root = 10;
-  int64 proposer_index = 11;
-  string eth1_data_block_hash = 12;
-  string eth1_data_deposit_root = 13;
-  string execution_payload_block_hash = 14;
-  int64 execution_payload_block_number = 15;
-  string execution_payload_fee_recipient = 16;
-  int64 execution_payload_base_fee_per_gas = 17;
-  int64 execution_payload_blob_gas_used = 18;
-  int64 execution_payload_excess_blob_gas = 19;
-  int64 execution_payload_gas_limit = 20;
-  int64 execution_payload_gas_used = 21;
-  string execution_payload_state_root = 22;
-  string execution_payload_parent_hash = 23;
-  int64 execution_payload_transactions_count = 24;
-  int64 execution_payload_transactions_total_bytes = 25;
-  int64 execution_payload_transactions_total_bytes_compressed = 26;
+  string slot_start_date_time = 2 [json_name = "slot_start_date_time"];
+  int64 epoch = 3 [json_name = "epoch"];
+  string epoch_start_date_time = 4 [json_name = "epoch_start_date_time"];
+  string block_root = 5 [json_name = "block_root"];
+  string block_version = 6 [json_name = "block_version"];
+  int64 block_total_bytes = 7 [json_name = "block_total_bytes"];
+  int64 block_total_bytes_compressed = 8 [json_name = "block_total_bytes_compressed"];
+  string parent_root = 9 [json_name = "parent_root"];
+  string state_root = 10 [json_name = "state_root"];
+  int64 proposer_index = 11 [json_name = "proposer_index"];
+  string eth1_data_block_hash = 12 [json_name = "eth1_data_block_hash"];
+  string eth1_data_deposit_root = 13 [json_name = "eth1_data_deposit_root"];
+  string execution_payload_block_hash = 14 [json_name = "execution_payload_block_hash"];
+  int64 execution_payload_block_number = 15 [json_name = "execution_payload_block_number"];
+  string execution_payload_fee_recipient = 16 [json_name = "execution_payload_fee_recipient"];
+  int64 execution_payload_base_fee_per_gas = 17 [json_name = "execution_payload_base_fee_per_gas"];
+  int64 execution_payload_blob_gas_used = 18 [json_name = "execution_payload_blob_gas_used"];
+  int64 execution_payload_excess_blob_gas = 19 [json_name = "execution_payload_excess_blob_gas"];
+  int64 execution_payload_gas_limit = 20 [json_name = "execution_payload_gas_limit"];
+  int64 execution_payload_gas_used = 21 [json_name = "execution_payload_gas_used"];
+  string execution_payload_state_root = 22 [json_name = "execution_payload_state_root"];
+  string execution_payload_parent_hash = 23 [json_name = "execution_payload_parent_hash"];
+  int64 execution_payload_transactions_count = 24 [json_name = "execution_payload_transactions_count"];
+  int64 execution_payload_transactions_total_bytes = 25 [json_name = "execution_payload_transactions_total_bytes"];
+  int64 execution_payload_transactions_total_bytes_compressed = 26 [json_name = "execution_payload_transactions_total_bytes_compressed"];
 }
 
 // Attestation window
 message AttestationWindow {
-  int64 start_ms = 1;
-  int64 end_ms = 2;
-  repeated int64 validator_indices = 3;
+  int64 start_ms = 1 [json_name = "start_ms"];
+  int64 end_ms = 2 [json_name = "end_ms"];
+  repeated int64 validator_indices = 3 [json_name = "validator_indices"];
 }
 
 // Attestations data
 message AttestationsData {
-  repeated AttestationWindow windows = 1;
-  int64 maximum_votes = 2;
+  repeated AttestationWindow windows = 1 [json_name = "windows"];
+  int64 maximum_votes = 2 [json_name = "maximum_votes"];
 }
 
 // Intermediate message for nested blob timing maps
 message BlobTimingMap {
-  map<int64, int64> timings = 1; // map blob_index -> ms
+  map<int64, int64> timings = 1 [json_name = "timings"]; // map blob_index -> ms
 }
 
 message BlockArrivalTime {
-  int64 slot_time = 1;
-  string meta_client_name = 2;
-  string meta_client_geo_city = 3;
-  string meta_client_geo_country = 4;
-  string meta_client_geo_continent_code = 5;
+  int64 slot_time = 1 [json_name = "slot_time"];
+  string meta_client_name = 2 [json_name = "meta_client_name"];
+  string meta_client_geo_city = 3 [json_name = "meta_client_geo_city"];
+  string meta_client_geo_country = 4 [json_name = "meta_client_geo_country"];
+  string meta_client_geo_continent_code = 5 [json_name = "meta_client_geo_continent_code"];
 }
 
 
 message BlobArrivalTime {
-  int64 slot_time = 1;
-  string meta_client_name = 2;
-  string meta_client_geo_city = 3;
-  string meta_client_geo_country = 4;
-  string meta_client_geo_continent_code = 5;
-  int64 blob_index = 6;
+  int64 slot_time = 1 [json_name = "slot_time"];
+  string meta_client_name = 2 [json_name = "meta_client_name"];
+  string meta_client_geo_city = 3 [json_name = "meta_client_geo_city"];
+  string meta_client_geo_country = 4 [json_name = "meta_client_geo_country"];
+  string meta_client_geo_continent_code = 5 [json_name = "meta_client_geo_continent_code"];
+  int64 blob_index = 6 [json_name = "blob_index"];
 }
 
 message BlobArrivalTimes {
-  repeated BlobArrivalTime arrival_times = 1;
+  repeated BlobArrivalTime arrival_times = 1 [json_name = "arrival_times"];
 }
 
 // FullTimings data includes timing data with metadata and geo location
 message FullTimings {
-  map<string, BlockArrivalTime> block_seen = 1; // map meta_client -> BlockArrivalTime
-  map<string, BlobArrivalTimes> blob_seen = 2; // map meta_client -> BlobArrivalTimes
-  map<string, BlockArrivalTime> block_first_seen_p2p = 3; // map meta_client -> BlockArrivalTime
-  map<string, BlobArrivalTimes> blob_first_seen_p2p = 4; // map meta_client -> BlobArrivalTimes
+  map<string, BlockArrivalTime> block_seen = 1 [json_name = "block_seen"]; // map meta_client -> BlockArrivalTime
+  map<string, BlobArrivalTimes> blob_seen = 2 [json_name = "blob_seen"]; // map meta_client -> BlobArrivalTimes
+  map<string, BlockArrivalTime> block_first_seen_p2p = 3 [json_name = "block_first_seen_p2p"]; // map meta_client -> BlockArrivalTime
+  map<string, BlobArrivalTimes> blob_first_seen_p2p = 4 [json_name = "blob_first_seen_p2p"]; // map meta_client -> BlobArrivalTimes
 }
 
 // SlimTimings data is a slimmed down version of FullTimings that drops the metadata and geo location
 message SlimTimings {
-  map<string, int64> block_seen = 1; // map meta_client -> ms
-  map<string, BlobTimingMap> blob_seen = 2; // map meta_client -> BlobTimingMap
-  map<string, int64> block_first_seen_p2p = 3; // map meta_client -> ms
-  map<string, BlobTimingMap> blob_first_seen_p2p = 4; // map meta_client -> BlobTimingMap
+  map<string, int64> block_seen = 1 [json_name = "block_seen"]; // map meta_client -> ms
+  map<string, BlobTimingMap> blob_seen = 2 [json_name = "blob_seen"]; // map meta_client -> BlobTimingMap
+  map<string, int64> block_first_seen_p2p = 3 [json_name = "block_first_seen_p2p"]; // map meta_client -> ms
+  map<string, BlobTimingMap> blob_first_seen_p2p = 4 [json_name = "blob_first_seen_p2p"]; // map meta_client -> BlobTimingMap
 }
 
 // MEV Relay Bid data
 message RelayBid {
-  uint64 slot = 1;
-  string parent_hash = 2;
-  string block_hash = 3;
-  string builder_pubkey = 4;
-  string proposer_pubkey = 5;
-  string proposer_fee_recipient = 6;
-  string value = 7; // String representation of UInt256
-  uint64 gas_limit = 8; // Field name/type to be verified in implementation phase
-  uint64 gas_used = 9;  // Field name/type to be verified in implementation phase
-  int64 slot_time = 10; // Time relative to slot start in ms
-  int64 time_bucket = 11; // Time bucket (granularity) in ms
+  uint64 slot = 1 [json_name = "slot"];
+  string parent_hash = 2 [json_name = "parent_hash"];
+  string block_hash = 3 [json_name = "block_hash"];
+  string builder_pubkey = 4 [json_name = "builder_pubkey"];
+  string proposer_pubkey = 5 [json_name = "proposer_pubkey"];
+  string proposer_fee_recipient = 6 [json_name = "proposer_fee_recipient"];
+  string value = 7 [json_name = "value"]; // String representation of UInt256
+  uint64 gas_limit = 8 [json_name = "gas_limit"]; // Field name/type to be verified in implementation phase
+  uint64 gas_used = 9 [json_name = "gas_used"];  // Field name/type to be verified in implementation phase
+  int32 slot_time = 10 [json_name = "slot_time"]; // Time relative to slot start in ms
+  int32 time_bucket = 11 [json_name = "time_bucket"]; // Time bucket (granularity) in ms
 }
 
 // Wrapper message for repeated RelayBid
@@ -142,31 +152,31 @@ message RelayBids {
 // MEV Delivered Payload data
 message DeliveredPayload {
   uint64 slot = 1;
-  string block_hash = 2;
-  uint64 block_number = 3;
-  string proposer_pubkey = 4;
-  string proposer_fee_recipient = 5;
+  string block_hash = 2 [json_name = "block_hash"];
+  uint64 block_number = 3 [json_name = "block_number"];
+  string proposer_pubkey = 4 [json_name = "proposer_pubkey"];
+  string proposer_fee_recipient = 5 [json_name = "proposer_fee_recipient"];
 }
 
 // Wrapper message for repeated DeliveredPayload
 message DeliveredPayloads {
-  repeated DeliveredPayload payloads = 1;
+  repeated DeliveredPayload payloads = 1 [json_name = "payloads"];
 }
 
 // Top-level beacon slot data message
 message BeaconSlotData {
-  int64 slot = 1;
-  string network = 2;
-  string processed_at = 3;
-  int64 processing_time_ms = 4;
-  BlockData block = 5;
-  Proposer proposer = 6;
-  string entity = 7;
-  map<string, Node> nodes = 8;
-  SlimTimings timings = 9;
-  AttestationsData attestations = 10;
-  map<string, RelayBids> relay_bids = 11; // Keyed by relay_name, stores list of bids via wrapper
-  map<string, DeliveredPayloads> delivered_payloads = 12; // Keyed by relay_name, stores list of payloads via wrapper
+  int64 slot = 1 [json_name = "slot"];
+  string network = 2 [json_name = "network"];
+  string processed_at = 3 [json_name = "processed_at"];
+  int64 processing_time_ms = 4 [json_name = "processing_time_ms"];
+  BlockData block = 5 [json_name = "block"];
+  Proposer proposer = 6 [json_name = "proposer"];
+  string entity = 7 [json_name = "entity"];
+  map<string, Node> nodes = 8 [json_name = "nodes"];
+  SlimTimings timings = 9 [json_name = "timings"];
+  AttestationsData attestations = 10 [json_name = "attestations"];
+  map<string, RelayBids> relay_bids = 11 [json_name = "relay_bids"]; // Keyed by relay_name, stores list of bids via wrapper
+  map<string, DeliveredPayloads> delivered_payloads = 12 [json_name = "delivered_payloads"]; // Keyed by relay_name, stores list of payloads via wrapper
 }
 
 // LocallyBuiltBlockMetadata contains metadata about the locally built block

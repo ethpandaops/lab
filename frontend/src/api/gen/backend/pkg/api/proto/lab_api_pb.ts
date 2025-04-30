@@ -4,8 +4,88 @@
 // @ts-nocheck
 
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
-import { Message, proto3 } from "@bufbuild/protobuf";
-import { LocallyBuiltSlotBlocks } from "../../server/proto/beacon_slots/beacon_slots_pb.js";
+import { Message, proto3, protoInt64 } from "@bufbuild/protobuf";
+import { BeaconSlotData, LocallyBuiltSlotBlocks } from "../../server/proto/beacon_slots/beacon_slots_pb.js";
+
+/**
+ * @generated from message labapi.GetSlotDataRequest
+ */
+export class GetSlotDataRequest extends Message<GetSlotDataRequest> {
+  /**
+   * @generated from field: string network = 1;
+   */
+  network = "";
+
+  /**
+   * @generated from field: uint64 slot = 2;
+   */
+  slot = protoInt64.zero;
+
+  constructor(data?: PartialMessage<GetSlotDataRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "labapi.GetSlotDataRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "network", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "slot", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetSlotDataRequest {
+    return new GetSlotDataRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): GetSlotDataRequest {
+    return new GetSlotDataRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): GetSlotDataRequest {
+    return new GetSlotDataRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: GetSlotDataRequest | PlainMessage<GetSlotDataRequest> | undefined, b: GetSlotDataRequest | PlainMessage<GetSlotDataRequest> | undefined): boolean {
+    return proto3.util.equals(GetSlotDataRequest, a, b);
+  }
+}
+
+/**
+ * @generated from message labapi.GetSlotDataResponse
+ */
+export class GetSlotDataResponse extends Message<GetSlotDataResponse> {
+  /**
+   * @generated from field: beacon_slots.BeaconSlotData data = 1;
+   */
+  data?: BeaconSlotData;
+
+  constructor(data?: PartialMessage<GetSlotDataResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "labapi.GetSlotDataResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "data", kind: "message", T: BeaconSlotData },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetSlotDataResponse {
+    return new GetSlotDataResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): GetSlotDataResponse {
+    return new GetSlotDataResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): GetSlotDataResponse {
+    return new GetSlotDataResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: GetSlotDataResponse | PlainMessage<GetSlotDataResponse> | undefined, b: GetSlotDataResponse | PlainMessage<GetSlotDataResponse> | undefined): boolean {
+    return proto3.util.equals(GetSlotDataResponse, a, b);
+  }
+}
 
 /**
  * @generated from message labapi.GetRecentLocallyBuiltBlocksRequest
