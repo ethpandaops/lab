@@ -787,6 +787,256 @@ export class SlimTimings extends Message<SlimTimings> {
 }
 
 /**
+ * MEV Relay Bid data
+ *
+ * @generated from message beacon_slots.RelayBid
+ */
+export class RelayBid extends Message<RelayBid> {
+  /**
+   * @generated from field: uint64 slot = 1;
+   */
+  slot = protoInt64.zero;
+
+  /**
+   * @generated from field: string parent_hash = 2;
+   */
+  parentHash = "";
+
+  /**
+   * @generated from field: string block_hash = 3;
+   */
+  blockHash = "";
+
+  /**
+   * @generated from field: string builder_pubkey = 4;
+   */
+  builderPubkey = "";
+
+  /**
+   * @generated from field: string proposer_pubkey = 5;
+   */
+  proposerPubkey = "";
+
+  /**
+   * @generated from field: string proposer_fee_recipient = 6;
+   */
+  proposerFeeRecipient = "";
+
+  /**
+   * String representation of UInt256
+   *
+   * @generated from field: string value = 7;
+   */
+  value = "";
+
+  /**
+   * Field name/type to be verified in implementation phase
+   *
+   * @generated from field: uint64 gas_limit = 8;
+   */
+  gasLimit = protoInt64.zero;
+
+  /**
+   * Field name/type to be verified in implementation phase
+   *
+   * @generated from field: uint64 gas_used = 9;
+   */
+  gasUsed = protoInt64.zero;
+
+  /**
+   * Time relative to slot start in ms
+   *
+   * @generated from field: int64 slot_time = 10;
+   */
+  slotTime = protoInt64.zero;
+
+  /**
+   * Time bucket (granularity) in ms
+   *
+   * @generated from field: int64 time_bucket = 11;
+   */
+  timeBucket = protoInt64.zero;
+
+  constructor(data?: PartialMessage<RelayBid>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "beacon_slots.RelayBid";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "slot", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
+    { no: 2, name: "parent_hash", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "block_hash", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "builder_pubkey", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 5, name: "proposer_pubkey", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 6, name: "proposer_fee_recipient", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 7, name: "value", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 8, name: "gas_limit", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
+    { no: 9, name: "gas_used", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
+    { no: 10, name: "slot_time", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
+    { no: 11, name: "time_bucket", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): RelayBid {
+    return new RelayBid().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): RelayBid {
+    return new RelayBid().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): RelayBid {
+    return new RelayBid().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: RelayBid | PlainMessage<RelayBid> | undefined, b: RelayBid | PlainMessage<RelayBid> | undefined): boolean {
+    return proto3.util.equals(RelayBid, a, b);
+  }
+}
+
+/**
+ * Wrapper message for repeated RelayBid
+ *
+ * @generated from message beacon_slots.RelayBids
+ */
+export class RelayBids extends Message<RelayBids> {
+  /**
+   * @generated from field: repeated beacon_slots.RelayBid bids = 1;
+   */
+  bids: RelayBid[] = [];
+
+  constructor(data?: PartialMessage<RelayBids>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "beacon_slots.RelayBids";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "bids", kind: "message", T: RelayBid, repeated: true },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): RelayBids {
+    return new RelayBids().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): RelayBids {
+    return new RelayBids().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): RelayBids {
+    return new RelayBids().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: RelayBids | PlainMessage<RelayBids> | undefined, b: RelayBids | PlainMessage<RelayBids> | undefined): boolean {
+    return proto3.util.equals(RelayBids, a, b);
+  }
+}
+
+/**
+ * MEV Delivered Payload data
+ *
+ * @generated from message beacon_slots.DeliveredPayload
+ */
+export class DeliveredPayload extends Message<DeliveredPayload> {
+  /**
+   * @generated from field: uint64 slot = 1;
+   */
+  slot = protoInt64.zero;
+
+  /**
+   * @generated from field: string block_hash = 2;
+   */
+  blockHash = "";
+
+  /**
+   * @generated from field: uint64 block_number = 3;
+   */
+  blockNumber = protoInt64.zero;
+
+  /**
+   * @generated from field: string proposer_pubkey = 4;
+   */
+  proposerPubkey = "";
+
+  /**
+   * @generated from field: string proposer_fee_recipient = 5;
+   */
+  proposerFeeRecipient = "";
+
+  constructor(data?: PartialMessage<DeliveredPayload>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "beacon_slots.DeliveredPayload";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "slot", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
+    { no: 2, name: "block_hash", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "block_number", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
+    { no: 4, name: "proposer_pubkey", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 5, name: "proposer_fee_recipient", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): DeliveredPayload {
+    return new DeliveredPayload().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): DeliveredPayload {
+    return new DeliveredPayload().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): DeliveredPayload {
+    return new DeliveredPayload().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: DeliveredPayload | PlainMessage<DeliveredPayload> | undefined, b: DeliveredPayload | PlainMessage<DeliveredPayload> | undefined): boolean {
+    return proto3.util.equals(DeliveredPayload, a, b);
+  }
+}
+
+/**
+ * Wrapper message for repeated DeliveredPayload
+ *
+ * @generated from message beacon_slots.DeliveredPayloads
+ */
+export class DeliveredPayloads extends Message<DeliveredPayloads> {
+  /**
+   * @generated from field: repeated beacon_slots.DeliveredPayload payloads = 1;
+   */
+  payloads: DeliveredPayload[] = [];
+
+  constructor(data?: PartialMessage<DeliveredPayloads>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "beacon_slots.DeliveredPayloads";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "payloads", kind: "message", T: DeliveredPayload, repeated: true },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): DeliveredPayloads {
+    return new DeliveredPayloads().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): DeliveredPayloads {
+    return new DeliveredPayloads().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): DeliveredPayloads {
+    return new DeliveredPayloads().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: DeliveredPayloads | PlainMessage<DeliveredPayloads> | undefined, b: DeliveredPayloads | PlainMessage<DeliveredPayloads> | undefined): boolean {
+    return proto3.util.equals(DeliveredPayloads, a, b);
+  }
+}
+
+/**
  * Top-level beacon slot data message
  *
  * @generated from message beacon_slots.BeaconSlotData
@@ -842,6 +1092,20 @@ export class BeaconSlotData extends Message<BeaconSlotData> {
    */
   attestations?: AttestationsData;
 
+  /**
+   * Keyed by relay_name, stores list of bids via wrapper
+   *
+   * @generated from field: map<string, beacon_slots.RelayBids> relay_bids = 11;
+   */
+  relayBids: { [key: string]: RelayBids } = {};
+
+  /**
+   * Keyed by relay_name, stores list of payloads via wrapper
+   *
+   * @generated from field: map<string, beacon_slots.DeliveredPayloads> delivered_payloads = 12;
+   */
+  deliveredPayloads: { [key: string]: DeliveredPayloads } = {};
+
   constructor(data?: PartialMessage<BeaconSlotData>) {
     super();
     proto3.util.initPartial(data, this);
@@ -860,6 +1124,8 @@ export class BeaconSlotData extends Message<BeaconSlotData> {
     { no: 8, name: "nodes", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "message", T: Node} },
     { no: 9, name: "timings", kind: "message", T: SlimTimings },
     { no: 10, name: "attestations", kind: "message", T: AttestationsData },
+    { no: 11, name: "relay_bids", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "message", T: RelayBids} },
+    { no: 12, name: "delivered_payloads", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "message", T: DeliveredPayloads} },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): BeaconSlotData {

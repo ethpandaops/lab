@@ -119,6 +119,40 @@ message SlimTimings {
   map<string, BlobTimingMap> blob_first_seen_p2p = 4; // map meta_client -> BlobTimingMap
 }
 
+// MEV Relay Bid data
+message RelayBid {
+  uint64 slot = 1;
+  string parent_hash = 2;
+  string block_hash = 3;
+  string builder_pubkey = 4;
+  string proposer_pubkey = 5;
+  string proposer_fee_recipient = 6;
+  string value = 7; // String representation of UInt256
+  uint64 gas_limit = 8; // Field name/type to be verified in implementation phase
+  uint64 gas_used = 9;  // Field name/type to be verified in implementation phase
+  int64 slot_time = 10; // Time relative to slot start in ms
+  int64 time_bucket = 11; // Time bucket (granularity) in ms
+}
+
+// Wrapper message for repeated RelayBid
+message RelayBids {
+  repeated RelayBid bids = 1;
+}
+
+// MEV Delivered Payload data
+message DeliveredPayload {
+  uint64 slot = 1;
+  string block_hash = 2;
+  uint64 block_number = 3;
+  string proposer_pubkey = 4;
+  string proposer_fee_recipient = 5;
+}
+
+// Wrapper message for repeated DeliveredPayload
+message DeliveredPayloads {
+  repeated DeliveredPayload payloads = 1;
+}
+
 // Top-level beacon slot data message
 message BeaconSlotData {
   int64 slot = 1;
@@ -131,6 +165,8 @@ message BeaconSlotData {
   map<string, Node> nodes = 8;
   SlimTimings timings = 9;
   AttestationsData attestations = 10;
+  map<string, RelayBids> relay_bids = 11; // Keyed by relay_name, stores list of bids via wrapper
+  map<string, DeliveredPayloads> delivered_payloads = 12; // Keyed by relay_name, stores list of payloads via wrapper
 }
 
 // LocallyBuiltBlockMetadata contains metadata about the locally built block

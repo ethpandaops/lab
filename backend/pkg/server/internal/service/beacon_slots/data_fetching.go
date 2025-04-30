@@ -9,6 +9,7 @@ import (
 
 	"github.com/attestantio/go-eth2-client/spec/phase0"
 	pb "github.com/ethpandaops/lab/backend/pkg/server/proto/beacon_slots"
+	log "github.com/sirupsen/logrus"
 )
 
 // ErrEntityNotFound is returned when no entity is found for a validator index
@@ -706,4 +707,217 @@ func (b *BeaconSlots) getSlotWindow(ctx context.Context, networkName string, slo
 	endTime := slotDetail.TimeWindow().End().Add(5 * time.Minute)
 
 	return startTime, endTime
+}
+
+// getMevRelayBids fetches MEV relay bid traces for a given slot, wrapped per relay.
+// It returns the highest bid per relay per 50ms interval within the slot.
+func (b *BeaconSlots) getMevRelayBids(ctx context.Context, networkName string, slot phase0.Slot, slotStartTime time.Time) (map[string]*pb.RelayBids, error) {
+	ch, err := b.xatuClient.GetClickhouseClientForNetwork(networkName)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get ClickHouse client for network %s: %w", networkName, err)
+	}
+
+	slotStartTimeMs := uint64(slotStartTime.UnixMilli())
+	timeBucketMs := int64(50) // Define time bucket granularity in ms
+
+	query := `
+		WITH RankedBids AS (
+			SELECT
+				*,
+				timestamp_ms - ? as slot_time, -- Calculate slot_time relative to slot start
+				floor((timestamp_ms - ?) / ?) * ? as time_bucket, -- Calculate time bucket
+				ROW_NUMBER() OVER (PARTITION BY meta_network_name, floor((timestamp_ms - ?) / ?) ORDER BY CAST(value AS UInt256) DESC) as rn -- Use UInt256 for value comparison
+			FROM default.mev_relay_bid_trace
+			WHERE 
+				slot = ? 
+				AND meta_network_name = ?
+				AND (timestamp_ms - ?) BETWEEN -12000 AND 12000 -- Filter for only slot times between -12s and +12s
+		)
+		SELECT
+			relay_name,
+			slot,
+			parent_hash,
+			block_hash,
+			builder_pubkey,
+			proposer_pubkey,
+			proposer_fee_recipient,
+			toString(value) AS value, -- Select as string after ranking
+			gas_limit,
+			gas_used,
+			slot_time,
+			time_bucket
+		FROM RankedBids
+		WHERE rn = 1
+		ORDER BY
+			relay_name, slot_time; -- Order by relay first, then slot_time
+	`
+
+	result, err := ch.Query(ctx, query,
+		slotStartTimeMs,                             // For slot_time calculation
+		slotStartTimeMs, timeBucketMs, timeBucketMs, // For time_bucket calculation
+		slotStartTimeMs, timeBucketMs, // For ranking window
+		slot, networkName,
+		slotStartTimeMs) // For slot_time filtering
+
+	if err != nil {
+		// It's okay if no bids are found, return an empty map
+		if err.Error() == "no rows returned" { // Check specific error string
+			log.WithFields(log.Fields{
+				"slot":    slot,
+				"network": networkName,
+			}).Debug("No MEV relay bids found for slot")
+			return make(map[string]*pb.RelayBids), nil // Return empty map of the correct type
+		}
+		return nil, fmt.Errorf("failed to query MEV relay bids: %w", err)
+	}
+
+	// Use the wrapper type for the result map
+	relayBidsMap := make(map[string]*pb.RelayBids)
+
+	for _, row := range result {
+		// Safely parse fields, logging errors for bad data
+		relayName := fmt.Sprintf("%v", row["relay_name"])
+		rowSlot, err := strconv.ParseUint(fmt.Sprintf("%v", row["slot"]), 10, 64)
+		if err != nil {
+			log.WithError(err).WithFields(log.Fields{"slot": slot, "network": networkName, "relay": relayName, "field": "slot", "value": row["slot"]}).Warn("Failed to parse relay bid slot")
+			continue
+		}
+		parentHash := fmt.Sprintf("%v", row["parent_hash"])
+		blockHash := fmt.Sprintf("%v", row["block_hash"])
+		builderPubkey := fmt.Sprintf("%v", row["builder_pubkey"])
+		proposerPubkey := fmt.Sprintf("%v", row["proposer_pubkey"])
+		proposerFeeRecipient := fmt.Sprintf("%v", row["proposer_fee_recipient"])
+		value := fmt.Sprintf("%v", row["value"]) // Value is already string
+		gasLimit, err := strconv.ParseUint(fmt.Sprintf("%v", row["gas_limit"]), 10, 64)
+		if err != nil {
+			log.WithError(err).WithFields(log.Fields{"slot": slot, "network": networkName, "relay": relayName, "field": "gas_limit", "value": row["gas_limit"]}).Warn("Failed to parse relay bid gas_limit")
+			gasLimit = 0 // Default to 0 if parsing fails
+		}
+		gasUsed, err := strconv.ParseUint(fmt.Sprintf("%v", row["gas_used"]), 10, 64)
+		if err != nil {
+			log.WithError(err).WithFields(log.Fields{"slot": slot, "network": networkName, "relay": relayName, "field": "gas_used", "value": row["gas_used"]}).Warn("Failed to parse relay bid gas_used")
+			gasUsed = 0 // Default to 0 if parsing fails
+		}
+		slotTime, err := strconv.ParseInt(fmt.Sprintf("%v", row["slot_time"]), 10, 64)
+		if err != nil {
+			log.WithError(err).WithFields(log.Fields{"slot": slot, "network": networkName, "relay": relayName, "field": "slot_time", "value": row["slot_time"]}).Warn("Failed to parse relay bid slot_time")
+			continue // Skip if slot_time is crucial and invalid
+		}
+		timeBucket, err := strconv.ParseInt(fmt.Sprintf("%v", row["time_bucket"]), 10, 64)
+		if err != nil {
+			log.WithError(err).WithFields(log.Fields{"slot": slot, "network": networkName, "relay": relayName, "field": "time_bucket", "value": row["time_bucket"]}).Warn("Failed to parse relay bid time_bucket")
+			timeBucket = 0 // Default to 0 if parsing fails
+		}
+
+		bid := &pb.RelayBid{
+			Slot:                 rowSlot,
+			ParentHash:           parentHash,
+			BlockHash:            blockHash,
+			BuilderPubkey:        builderPubkey,
+			ProposerPubkey:       proposerPubkey,
+			ProposerFeeRecipient: proposerFeeRecipient,
+			Value:                value,
+			GasLimit:             gasLimit,
+			GasUsed:              gasUsed,
+			SlotTime:             slotTime,
+			TimeBucket:           timeBucket,
+		}
+
+		// Get or create the wrapper for the current relay
+		wrapper, exists := relayBidsMap[relayName]
+		if !exists {
+			wrapper = &pb.RelayBids{Bids: make([]*pb.RelayBid, 0)}
+			relayBidsMap[relayName] = wrapper
+		}
+		// Append the bid to the wrapper's list
+		wrapper.Bids = append(wrapper.Bids, bid)
+	}
+
+	return relayBidsMap, nil
+}
+
+// getMevDeliveredPayloads fetches MEV delivered payloads for a given slot, wrapped per relay.
+func (b *BeaconSlots) getMevDeliveredPayloads(ctx context.Context, networkName string, slot phase0.Slot, slotStartTime time.Time) (map[string]*pb.DeliveredPayloads, error) {
+	ch, err := b.xatuClient.GetClickhouseClientForNetwork(networkName)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get ClickHouse client for network %s: %w", networkName, err)
+	}
+
+	query := `
+		SELECT
+			relay_name,
+			slot,
+			block_hash,
+			block_number,
+			proposer_pubkey,
+			proposer_fee_recipient,
+			gas_limit,
+			gas_used,
+			num_tx
+		FROM default.mev_relay_proposer_payload_delivered
+		WHERE slot = ? AND meta_network_name = ?
+		GROUP BY 
+			relay_name, 
+			slot, 
+			block_hash, 
+			block_number, 
+			proposer_pubkey, 
+			proposer_fee_recipient, 
+			gas_limit, 
+			gas_used, 
+			num_tx
+		ORDER BY relay_name;
+	`
+
+	result, err := ch.Query(ctx, query, slot, networkName)
+	if err != nil {
+		// It's okay if no payloads are found, return an empty map
+		if err.Error() == "no rows returned" { // Check specific error string
+			log.WithFields(log.Fields{
+				"slot":    slot,
+				"network": networkName,
+			}).Debug("No MEV delivered payloads found for slot")
+			return make(map[string]*pb.DeliveredPayloads), nil // Return empty map of the correct type
+		}
+		return nil, fmt.Errorf("failed to query MEV delivered payloads: %w", err)
+	}
+
+	// Use the wrapper type for the result map
+	deliveredPayloadsMap := make(map[string]*pb.DeliveredPayloads)
+
+	for _, row := range result {
+		// Safely parse fields
+		relayName := fmt.Sprintf("%v", row["relay_name"])
+		rowSlot, err := strconv.ParseUint(fmt.Sprintf("%v", row["slot"]), 10, 64)
+		if err != nil {
+			log.WithError(err).WithFields(log.Fields{"slot": slot, "network": networkName, "relay": relayName, "field": "slot", "value": row["slot"]}).Warn("Failed to parse delivered payload slot")
+			continue
+		}
+		blockHash := fmt.Sprintf("%v", row["block_hash"])
+		blockNumber, err := strconv.ParseUint(fmt.Sprintf("%v", row["block_number"]), 10, 64)
+		if err != nil {
+			log.WithError(err).WithFields(log.Fields{"slot": slot, "network": networkName, "relay": relayName, "field": "block_number", "value": row["block_number"]}).Warn("Failed to parse delivered payload block_number")
+			continue
+		}
+		proposerPubkey := fmt.Sprintf("%v", row["proposer_pubkey"])
+		proposerFeeRecipient := fmt.Sprintf("%v", row["proposer_fee_recipient"])
+		payload := &pb.DeliveredPayload{
+			Slot:                 rowSlot,
+			BlockHash:            blockHash,
+			BlockNumber:          blockNumber,
+			ProposerPubkey:       proposerPubkey,
+			ProposerFeeRecipient: proposerFeeRecipient,
+		}
+
+		// Get or create the wrapper for the current relay
+		wrapper, exists := deliveredPayloadsMap[relayName]
+		if !exists {
+			wrapper = &pb.DeliveredPayloads{Payloads: make([]*pb.DeliveredPayload, 0)}
+			deliveredPayloadsMap[relayName] = wrapper
+		}
+		// Append the payload to the wrapper's list
+		wrapper.Payloads = append(wrapper.Payloads, payload)
+	}
+
+	return deliveredPayloadsMap, nil
 }

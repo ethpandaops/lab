@@ -22,6 +22,8 @@ func (b *BeaconSlots) transformSlotDataForStorage(
 	entity *string,
 	arrivalTimes *pb.FullTimings,
 	attestationVotes map[int64]int64,
+	relayBids map[string]*pb.RelayBids,
+	deliveredPayloads map[string]*pb.DeliveredPayloads,
 ) (*pb.BeaconSlotData, error) {
 	nodes := make(map[string]*pb.Node)
 
@@ -152,16 +154,18 @@ func (b *BeaconSlots) transformSlotDataForStorage(
 	}
 
 	return &pb.BeaconSlotData{
-		Slot:             int64(slot), //nolint:gosec // no risk of overflow
-		Network:          network,
-		ProcessedAt:      time.Now().UTC().Format(time.RFC3339),
-		ProcessingTimeMs: processingTimeMs,
-		Block:            blockData,
-		Proposer:         proposerData,
-		Entity:           getStringOrNil(entity),
-		Nodes:            nodes,
-		Timings:          timings,
-		Attestations:     attestations,
+		Slot:              int64(slot), //nolint:gosec // no risk of overflow
+		Network:           network,
+		ProcessedAt:       time.Now().UTC().Format(time.RFC3339),
+		ProcessingTimeMs:  processingTimeMs,
+		Block:             blockData,
+		Proposer:          proposerData,
+		Entity:            getStringOrNil(entity),
+		Nodes:             nodes,
+		Timings:           timings,
+		Attestations:      attestations,
+		RelayBids:         relayBids,
+		DeliveredPayloads: deliveredPayloads,
 	}, nil
 }
 

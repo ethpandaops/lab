@@ -2,6 +2,7 @@ package beacon_slots
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strings"
 	"time"
@@ -9,6 +10,7 @@ import (
 	"github.com/attestantio/go-eth2-client/spec/phase0"
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/storage"
 	pb "github.com/ethpandaops/lab/backend/pkg/server/proto/beacon_slots"
+	log "github.com/sirupsen/logrus"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -71,8 +73,15 @@ func (b *BeaconSlots) processSlot(ctx context.Context, networkName string, slot 
 		blobFirstSeenInP2PSlotTime     map[string]*pb.BlobArrivalTimes
 		maxAttestationVotes            int64
 		attestationVotes               map[int64]int64
+		relayBids                      map[string]*pb.RelayBids         // Use wrapper type
+		deliveredPayloads              map[string]*pb.DeliveredPayloads // Use wrapper type
 		proposerErr, maxAttestationErr error
+		slotStartTime                  time.Time // New: Slot start time for MEV bids/payloads
 	)
+	// Get slot start time (needed for MEV bids query)
+	slotDetail := b.ethereum.GetNetwork(networkName).GetWallclock().Slots().FromNumber(uint64(slot))
+	// Removed nil check for slotDetail as it's an invalid comparison and likely redundant after getBlockData success.
+	slotStartTime = slotDetail.TimeWindow().Start()
 
 	// Initialize empty maps
 	blockSeenAtSlotTime = map[string]*pb.BlockArrivalTime{}
@@ -80,6 +89,8 @@ func (b *BeaconSlots) processSlot(ctx context.Context, networkName string, slot 
 	blockFirstSeenInP2PSlotTime = map[string]*pb.BlockArrivalTime{}
 	blobFirstSeenInP2PSlotTime = map[string]*pb.BlobArrivalTimes{}
 	attestationVotes = make(map[int64]int64)
+	relayBids = make(map[string]*pb.RelayBids)                 // Init with wrapper type
+	deliveredPayloads = make(map[string]*pb.DeliveredPayloads) // Init with wrapper type
 
 	// 2. Get proposer data - can run in parallel
 	group.Go(func() error {
@@ -162,9 +173,39 @@ func (b *BeaconSlots) processSlot(ctx context.Context, networkName string, slot 
 		return nil
 	})
 
+	// 6. Get MEV data - can run in parallel
+	group.Go(func() error {
+		bids, errr := b.getMevRelayBids(groupCtx, networkName, slot, slotStartTime)
+		if errr != nil {
+			// Log error but don't fail the group, treat MEV data as optional
+			b.log.WithError(errr).WithFields(log.Fields{"slot": slot, "network": networkName}).Warn("Failed to get MEV relay bids")
+		} else if bids != nil {
+			relayBids = bids
+		}
+		return nil
+	})
+
+	group.Go(func() error {
+		// Add slotStartTime argument to the call
+		payloads, errr := b.getMevDeliveredPayloads(groupCtx, networkName, slot, slotStartTime)
+		if errr != nil {
+			// Log error but don't fail the group
+			b.log.WithError(errr).WithFields(log.Fields{"slot": slot, "network": networkName}).Warn("Failed to get MEV delivered payloads")
+		} else if payloads != nil {
+			deliveredPayloads = payloads // Assignment now matches the updated variable type
+		}
+		return nil
+	})
+
 	// Wait for all goroutines to complete
 	if errr := group.Wait(); errr != nil {
-		return false, fmt.Errorf("parallel processing error: %w", errr)
+		// Check if the error is critical (e.g., from entity fetching)
+		// For now, we only consider entity errors critical if they are not ErrEntityNotFound
+		if errr != nil && !errors.Is(errr, ErrEntityNotFound) {
+			return false, fmt.Errorf("parallel processing error: %w", errr)
+		}
+		// Log non-critical errors from the group but continue
+		b.log.WithError(errr).WithFields(log.Fields{"slot": slot, "network": networkName}).Warn("Non-critical error during parallel data fetching")
 	}
 
 	// Check errors from critical operations
@@ -184,7 +225,7 @@ func (b *BeaconSlots) processSlot(ctx context.Context, networkName string, slot 
 		BlobFirstSeenP2P:  blobFirstSeenInP2PSlotTime,
 	}
 
-	// 6. Transform the data for storage
+	// 7. Transform the data for storage
 	processingTime := time.Since(startTime).Milliseconds()
 
 	slotData, err := b.transformSlotDataForStorage(
@@ -198,12 +239,14 @@ func (b *BeaconSlots) processSlot(ctx context.Context, networkName string, slot 
 		entity,
 		fullTimings,
 		attestationVotes,
+		relayBids,         // Pass MEV data
+		deliveredPayloads, // Pass MEV data
 	)
 	if err != nil {
 		return false, fmt.Errorf("failed to transform slot data: %w", err)
 	}
 
-	// 7. Store the data to storage
+	// 8. Store the data to storage
 	storageKey := fmt.Sprintf("slots/%s/%d", networkName, slot)
 
 	err = b.storageClient.Store(ctx, storage.StoreParams{
