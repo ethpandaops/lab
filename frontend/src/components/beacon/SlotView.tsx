@@ -52,6 +52,7 @@ interface SlotData {
     }>
     maximumVotes?: bigint
   }
+  deliveredPayloads?: Record<string, { payloads: unknown[] }>
 }
 
 interface SlotViewProps {
@@ -541,6 +542,14 @@ export function SlotView({ slot, network = 'mainnet', isLive = false, onSlotComp
                       <span className="text-accent">{slotData?.entity || 'Unknown'}</span>
                     )}
                   </div>
+                  {/* Version and MEV Tags - Mobile */}
+                  <div className="flex gap-1 mt-1">
+                    {slotData?.block?.blockVersion && (
+                      <div className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-mono font-medium bg-cyber-dark border border-cyber-neon text-cyber-neon">
+                        {slotData.block.blockVersion.toUpperCase()}
+                      </div>
+                    )}
+                  </div>
                 </div>
                 <button
                   onClick={() => {
@@ -688,6 +697,9 @@ export function SlotView({ slot, network = 'mainnet', isLive = false, onSlotComp
                     const maxPossibleValidators = slotData.attestations?.maximumVotes ? Number(slotData.attestations.maximumVotes) : 0
                     const participation = maxPossibleValidators > 0 ? (totalAttestations / maxPossibleValidators) * 100 : null
 
+                    const hasMevRelay = slotData?.deliveredPayloads && Object.keys(slotData.deliveredPayloads).length > 0
+                    const relayNames = hasMevRelay ? Object.keys(slotData.deliveredPayloads).join(', ') : null
+                    
                     return (
                       <>
                         {/* Block Timing */}
@@ -778,6 +790,23 @@ export function SlotView({ slot, network = 'mainnet', isLive = false, onSlotComp
                             )}
                           </div>
                         </div>
+                        
+                        {/* MEV Relay */}
+                        {hasMevRelay ? (
+                          <div className="grid grid-cols-[16px_1fr] items-start gap-1 text-amber-400">
+                            <div className="flex justify-center">⚡</div>
+                            <div className="text-[10px]">
+                              Delivered via {Object.keys(slotData.deliveredPayloads).length} MEV {Object.keys(slotData.deliveredPayloads).length === 1 ? 'Relay' : 'Relays'}
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="grid grid-cols-[16px_1fr] items-start gap-1 text-success">
+                            <div className="flex justify-center">✓</div>
+                            <div className="text-[10px]">
+                              Block built locally
+                            </div>
+                          </div>
+                        )}
                       </>
                     )
                   })()}
@@ -846,7 +875,7 @@ export function SlotView({ slot, network = 'mainnet', isLive = false, onSlotComp
                     )}</span>
                   </div>
                   {slotData?.block?.blockVersion && (
-                    <div className="mt-2">
+                    <div className="mt-2 flex gap-1">
                       <div className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-mono font-medium bg-cyber-dark border border-cyber-neon text-cyber-neon">
                         {slotData.block.blockVersion.toUpperCase()}
                       </div>
@@ -943,6 +972,9 @@ export function SlotView({ slot, network = 'mainnet', isLive = false, onSlotComp
                       const maxPossibleValidators = slotData.attestations?.maximumVotes ? Number(slotData.attestations.maximumVotes) : 0
                       const participation = maxPossibleValidators > 0 ? (totalAttestations / maxPossibleValidators) * 100 : null
 
+                      const hasMevRelay = slotData?.deliveredPayloads && Object.keys(slotData.deliveredPayloads).length > 0
+                      const relayNames = hasMevRelay ? Object.keys(slotData.deliveredPayloads).join(', ') : null
+                      
                       return (
                         <>
                           {/* Block Timing */}
@@ -1033,6 +1065,23 @@ export function SlotView({ slot, network = 'mainnet', isLive = false, onSlotComp
                               )}
                             </div>
                           </div>
+                          
+                          {/* MEV Relay */}
+                          {hasMevRelay ? (
+                            <div className="grid grid-cols-[16px_1fr] items-start gap-1 text-amber-400">
+                              <div className="flex justify-center">⚡</div>
+                              <div className="text-[10px]">
+                                Delivered via {Object.keys(slotData.deliveredPayloads).length} MEV {Object.keys(slotData.deliveredPayloads).length === 1 ? 'Relay' : 'Relays'}
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="grid grid-cols-[16px_1fr] items-start gap-1 text-success">
+                              <div className="flex justify-center">✓</div>
+                              <div className="text-[10px]">
+                                Block built locally
+                              </div>
+                            </div>
+                          )}
                         </>
                       )
                     })()}
@@ -1219,6 +1268,18 @@ export function SlotView({ slot, network = 'mainnet', isLive = false, onSlotComp
                           })()}
                         </div>
                       </div>
+                      
+                      {/* MEV Relay Information */}
+                        <>
+                          <div>
+                            <div className="text-tertiary">Relays</div>
+                            {slotData?.deliveredPayloads && Object.keys(slotData.deliveredPayloads).length > 0 && (
+                            <div className="text-primary">
+                              <span>{Object.keys(slotData.deliveredPayloads).join(', ')}</span>
+                            </div>
+                            )}
+                          </div>
+                        </>
                     </div>
                   </div>
                 </div>
