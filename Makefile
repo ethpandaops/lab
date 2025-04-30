@@ -37,4 +37,7 @@ clean:
 	rm -rf backend/pkg/srv/proto/*/*_grpc.pb.go
 	rm -rf backend/pkg/proto/*/*.pb.go
 	rm -rf backend/pkg/proto/*/*_grpc.pb.go
-	rm -rf backend/pkg/api/proto/*.pb.gw.go 
+	rm -rf backend/pkg/api/proto/*_grpc.pb.go
+	rm -rf backend/pkg/api/proto/protoconnect
+	rm -rf backend/pkg/api/proto/labapiconnect 
+	rm -rf backend/pkg/api/proto/labapiconnectconnect 

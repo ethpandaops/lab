@@ -13,8 +13,7 @@ import (
 	"syscall"
 	"time"
 
-	"connectrpc.com/connect"                                                   // Added Connect import
-	apiconnect "github.com/ethpandaops/lab/backend/pkg/api/proto/protoconnect" // Updated Connect handler import path to actual location
+	apiconnect "github.com/ethpandaops/lab/backend/pkg/api/proto/protoconnect"
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/cache"
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/logger"
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/metrics"
@@ -23,10 +22,8 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/rs/cors"
 	"github.com/sirupsen/logrus"
-	"github.com/soheilhy/cmux"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
-	"google.golang.org/grpc/reflection"
 
 	beaconslotspb "github.com/ethpandaops/lab/backend/pkg/server/proto/beacon_slots"
 	labpb "github.com/ethpandaops/lab/backend/pkg/server/proto/lab"
@@ -40,8 +37,6 @@ type Service struct {
 	cancel        context.CancelFunc
 	router        *mux.Router
 	server        *http.Server
-	grpcServer    *grpc.Server
-	restServer    *http.Server
 	cacheClient   cache.Client
 	storageClient storage.Client
 
@@ -102,7 +97,112 @@ func (s *Service) Start(ctx context.Context) error {
 		return fmt.Errorf("failed to initialize services: %w", err)
 	}
 
-	// HTTP server is no longer started here since it's handled by the combined gRPC/HTTP server
+	// Create a new router for legacy handlers
+	s.router = mux.NewRouter()
+
+	// Get the path prefix from config
+	prefix := s.config.HttpServer.PathPrefix
+	if prefix != "" {
+		// Ensure prefix starts with / and doesn't end with /
+		if !strings.HasPrefix(prefix, "/") {
+			prefix = "/" + prefix
+		}
+		if strings.HasSuffix(prefix, "/") {
+			prefix = prefix[:len(prefix)-1]
+		}
+		s.log.WithField("prefix", prefix).Info("Using path prefix")
+	}
+
+	// Register legacy HTTP handlers under the prefix
+	if prefix != "" {
+		s.registerLegacyHandlers(s.router.PathPrefix(prefix).Subrouter())
+	} else {
+		s.registerLegacyHandlers(s.router)
+	}
+
+	// Create a new HTTP mux for the server
+	rootMux := http.NewServeMux()
+
+	// Initialize the Connect handler
+	labAPIServer := NewLabAPIServer(s.cacheClient, s.storageClient, s.srvConn, s.log)
+	// The path returned is "/labapi.LabAPI/" - This is the base path where Connect expects to find its handlers
+	basePath, handler := apiconnect.NewLabAPIHandler(labAPIServer)
+
+	s.log.WithField("connectBasePath", basePath).Debug("ConnectRPC base path")
+
+	// Mount the Connect handler at the correct path
+	// ConnectRPC handles routing from this base path to the specific endpoints
+	if prefix != "" {
+		// For prefixed paths: /lab-data/api/... -> handler
+		fullAPIPath := prefix + "/api"
+		s.log.WithField("apiPath", fullAPIPath).Info("Registering Connect handler")
+
+		// Create a custom router that will dispatch to either the Connect handler or the legacy router
+		customHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			// Log the original request for debugging
+			s.log.WithFields(logrus.Fields{
+				"path":   r.URL.Path,
+				"method": r.Method,
+			}).Debug("Received request")
+
+			path := r.URL.Path
+
+			// For requests targeting the Connect API routes (/lab-data/api/...)
+			if strings.HasPrefix(path, prefix+"/api/") {
+				s.log.WithField("path", path).Debug("Routing to Connect handler")
+
+				// Create a copy of the request with path adjustments for Connect handler
+				r2 := *r
+				u2 := *r.URL
+				r2.URL = &u2
+				// Remove the prefix+"/api" prefix
+				r2.URL.Path = strings.TrimPrefix(path, prefix+"/api")
+
+				handler.ServeHTTP(w, &r2)
+				return
+			}
+
+			// For all other requests under the prefix, forward to the legacy router
+			if strings.HasPrefix(path, prefix+"/") {
+				s.log.WithField("path", path).Debug("Routing to legacy handler")
+
+				// Forward to router which has handlers registered with the prefix
+				s.router.ServeHTTP(w, r)
+				return
+			}
+
+			// Any non-prefixed requests end up here (health checks, etc.)
+			s.log.WithField("path", path).Debug("Root path request")
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte("OK"))
+		})
+
+		rootMux = http.NewServeMux()
+		rootMux.Handle("/", customHandler)
+	} else {
+		// No prefix case: Use the default approach
+		rootMux.Handle("/api/", handler)
+		rootMux.Handle("/", s.router)
+	}
+
+	// Create the server
+	s.server = &http.Server{
+		Addr:    fmt.Sprintf("%s:%d", s.config.HttpServer.Host, s.config.HttpServer.Port),
+		Handler: s.getCORSHandler(rootMux),
+	}
+
+	// Start the server
+	lis, err := net.Listen("tcp", s.server.Addr)
+	if err != nil {
+		return fmt.Errorf("failed to listen: %w", err)
+	}
+
+	go func() {
+		s.log.WithField("addr", s.server.Addr).Info("Starting HTTP server")
+		if err := s.server.Serve(lis); err != nil && !errors.Is(err, http.ErrServerClosed) {
+			s.log.WithError(err).Error("HTTP server error")
+		}
+	}()
 
 	<-s.ctx.Done()
 	s.log.Info("Context canceled, cleaning up")
@@ -170,133 +270,11 @@ func (s *Service) initializeServices(ctx context.Context) error {
 	s.labClient = labpb.NewLabServiceClient(conn)
 	s.beaconSlotsClient = beaconslotspb.NewBeaconSlotsClient(conn)
 
-	// Initialize the gRPC server
-	s.grpcServer = grpc.NewServer()
-
-	// Register the reflection service on the server
-	reflection.Register(s.grpcServer)
-
-	// Initialize our LabAPI implementation
-	labAPIServer := NewLabAPIServer(s.cacheClient, s.storageClient, conn, s.log)
-
-	// Create a listener for the gRPC/HTTP server
-	lis, err := net.Listen("tcp", fmt.Sprintf("%s:%d", s.config.HttpServer.Host, s.config.HttpServer.Port))
-	if err != nil {
-		return fmt.Errorf("failed to listen for gRPC/HTTP server: %w", err)
-	}
-
-	// Create a cmux multiplexer to handle both gRPC and HTTP traffic
-	connMux := cmux.New(lis)
-
-	// gRPC matcher (matches on HTTP2 with Prior Knowledge)
-	grpcL := connMux.MatchWithWriters(cmux.HTTP2MatchHeaderFieldSendSettings("content-type", "application/grpc"))
-
-	// HTTP/1.1 matcher (matches all other traffic)
-	httpL := connMux.Match(cmux.HTTP1Fast())
-
-	// Create the Connect handler
-	connectHandler := http.NewServeMux()
-	path, handler := apiconnect.NewLabAPIHandler(labAPIServer, connect.WithInterceptors( /* Add interceptors if needed */ ))
-	connectHandler.Handle(path, handler)
-
-	// Create an HTTP handler that combines both the Connect handler and the legacy HTTP routes
-	// Use a mux router to route traffic based on the URL path
-	combinedHandler := http.NewServeMux()
-
-	// Apply CORS middleware to the Connect routes
-	connectWithCORS := s.getCORSHandler(connectHandler)
-
-	finalConnectHandler := connectWithCORS
-
-	// Determine API prefix path based on configuration
-	apiPrefix := "/api/"
-	prefix := s.config.HttpServer.PathPrefix
-
-	if prefix != "" {
-		// Ensure prefix starts with / and doesn't end with /
-		if prefix[0] != '/' {
-			prefix = "/" + prefix
-		}
-
-		if len(prefix) > 1 && prefix[len(prefix)-1] == '/' {
-			prefix = prefix[:len(prefix)-1]
-		}
-
-		// Construct the final API prefix by combining the server prefix with /api/
-		apiPrefix = prefix + "/api/"
-	}
-
-	s.log.WithField("apiPrefix", apiPrefix).Info("Registering Connect handler with prefix")
-
-	// Add the Connect handler for the API paths with the proper prefix
-	// Connect handlers typically register their own base path, so we mount it directly
-	combinedHandler.Handle(apiPrefix, http.StripPrefix(strings.TrimSuffix(apiPrefix, "/"), finalConnectHandler))
-
-	// Apply CORS middleware to the legacy routes
-	legacyWithCORS := s.getCORSHandler(s.router)
-
-	// Add the legacy HTTP routes for backward compatibility
-
-	if prefix != "" {
-		combinedHandler.Handle(prefix+"/", http.StripPrefix(prefix, legacyWithCORS))
-	} else {
-		combinedHandler.Handle("/", legacyWithCORS)
-	}
-
-	// Configure the HTTP server
-	httpSrv := &http.Server{
-		Handler:           combinedHandler,
-		ReadHeaderTimeout: 10 * time.Second,
-	}
-
-	// Start the gRPC server in a goroutine
-	go func() {
-		s.log.WithField("addr", fmt.Sprintf("%s:%d", s.config.HttpServer.Host, s.config.HttpServer.Port)).Info("Starting gRPC server")
-
-		if err := s.grpcServer.Serve(grpcL); err != nil {
-			s.log.WithError(err).Error("gRPC server error")
-			s.cancel()
-		}
-	}()
-
-	// Start the HTTP server in a goroutine
-	go func() {
-		s.log.WithField("addr", fmt.Sprintf("%s:%d", s.config.HttpServer.Host, s.config.HttpServer.Port)).Info("Starting Connect/HTTP server")
-
-		if err := httpSrv.Serve(httpL); err != nil && err != http.ErrServerClosed {
-			s.log.WithError(err).Error("Connect/HTTP server error")
-			s.cancel()
-		}
-	}()
-
-	// Start the cmux server in a goroutine
-	go func() {
-		s.log.WithField("addr", lis.Addr()).Info("Starting combined gRPC/HTTP server")
-
-		if err := connMux.Serve(); err != nil {
-			s.log.WithError(err).Error("cmux server error")
-			s.cancel()
-		}
-	}()
-
-	// Save the HTTP server for cleanup
-	s.restServer = httpSrv
-
-	if err := s.storageClient.Start(ctx); err != nil {
-		return fmt.Errorf("failed to start storage client: %w", err)
-	}
-
-	// Register custom HTTP handlers for backward compatibility
-	s.registerLegacyHandlers()
-
 	return nil
 }
 
 // registerLegacyHandlers registers HTTP handlers for backward compatibility with .json paths
-func (s *Service) registerLegacyHandlers() {
-	// Determine the router to use (main router or prefixed subrouter)
-	router := s.router
-
+func (s *Service) registerLegacyHandlers(router *mux.Router) {
 	// Block timings
 	router.HandleFunc("/beacon_chain_timings/block_timings/{network}/{window_file}.json", s.handleBlockTimings).Methods("GET")
 
@@ -617,22 +595,6 @@ func (s *Service) cleanup() {
 		if err := s.server.Shutdown(ctx); err != nil {
 			s.log.WithError(err).Error("Failed to shut down HTTP server")
 		}
-	}
-
-	if s.restServer != nil {
-		s.log.Info("Shutting down REST gateway server")
-
-		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-		defer cancel()
-
-		if err := s.restServer.Shutdown(ctx); err != nil {
-			s.log.WithError(err).Error("Failed to shut down REST gateway server")
-		}
-	}
-
-	if s.grpcServer != nil {
-		s.log.Info("Stopping gRPC server")
-		s.grpcServer.GracefulStop()
 	}
 
 	if s.srvConn != nil {

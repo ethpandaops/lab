@@ -4,7 +4,8 @@ import (
 	"context"
 
 	"connectrpc.com/connect"
-	apipb "github.com/ethpandaops/lab/backend/pkg/api/proto"
+	"github.com/ethpandaops/lab/backend/pkg/api/proto"
+	apipb "github.com/ethpandaops/lab/backend/pkg/api/proto/protoconnect"
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/cache"
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/storage"
 	beaconslotspb "github.com/ethpandaops/lab/backend/pkg/server/proto/beacon_slots"
@@ -24,7 +25,7 @@ var StandardHTTPHeaders = map[string]string{
 }
 
 type LabAPIServerImpl struct {
-	apipb.UnimplementedLabAPIServer
+	apipb.LabAPIHandler
 
 	log logrus.FieldLogger
 
@@ -45,7 +46,7 @@ func NewLabAPIServer(cacheClient cache.Client, storageClient storage.Client, bea
 }
 
 // GetRecentLocallyBuiltBlocks retrieves recent locally built blocks for a network
-func (s *LabAPIServerImpl) GetRecentLocallyBuiltBlocks(ctx context.Context, req *connect.Request[apipb.GetRecentLocallyBuiltBlocksRequest]) (*connect.Response[apipb.GetRecentLocallyBuiltBlocksResponse], error) {
+func (s *LabAPIServerImpl) GetRecentLocallyBuiltBlocks(ctx context.Context, req *connect.Request[proto.GetRecentLocallyBuiltBlocksRequest]) (*connect.Response[proto.GetRecentLocallyBuiltBlocksResponse], error) {
 	// Forward the request to the beacon slots service
 	resp, err := s.beaconSlotsClient.GetRecentLocallyBuiltBlocks(ctx, &beaconslotspb.GetRecentLocallyBuiltBlocksRequest{
 		Network: req.Msg.Network, // Access message via req.Msg
@@ -55,7 +56,7 @@ func (s *LabAPIServerImpl) GetRecentLocallyBuiltBlocks(ctx context.Context, req 
 	}
 
 	// Convert the response to the API response format and wrap in connect.Response
-	apiResponse := &apipb.GetRecentLocallyBuiltBlocksResponse{
+	apiResponse := &proto.GetRecentLocallyBuiltBlocksResponse{
 		SlotBlocks: resp.SlotBlocks,
 	}
 	res := connect.NewResponse(apiResponse)
@@ -66,7 +67,7 @@ func (s *LabAPIServerImpl) GetRecentLocallyBuiltBlocks(ctx context.Context, req 
 	return res, nil
 }
 
-func (s *LabAPIServerImpl) GetSlotData(ctx context.Context, req *connect.Request[apipb.GetSlotDataRequest]) (*connect.Response[apipb.GetSlotDataResponse], error) {
+func (s *LabAPIServerImpl) GetSlotData(ctx context.Context, req *connect.Request[proto.GetSlotDataRequest]) (*connect.Response[proto.GetSlotDataResponse], error) {
 	s.log.WithField("network", req.Msg.Network).WithField("slot", req.Msg.Slot).Debug("GetSlotData")
 
 	// Forward the request to the beacon slots service
@@ -79,7 +80,7 @@ func (s *LabAPIServerImpl) GetSlotData(ctx context.Context, req *connect.Request
 	}
 
 	// Convert the response to the API response format and wrap in connect.Response
-	apiResponse := &apipb.GetSlotDataResponse{
+	apiResponse := &proto.GetSlotDataResponse{
 		Data: resp.Data,
 	}
 

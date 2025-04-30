@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from 'react'
-import { useDataFetch } from '@/utils/data.ts'
 import { ErrorState } from '@/components/common/ErrorState'
 import { GlobalMap } from '@/components/beacon/GlobalMap'
 import { EventTimeline } from '@/components/beacon/EventTimeline'
@@ -8,45 +7,50 @@ import { DataAvailabilityPanel } from '@/components/beacon/DataAvailabilityPanel
 import { useNavigate } from 'react-router-dom'
 import clsx from 'clsx'
 import { useModal } from '@/contexts/ModalContext.tsx'
+import { getLabApiClient } from '@/api'
+import { GetSlotDataRequest } from '@/api/gen/backend/pkg/api/proto/lab_api_pb'
+import { useQuery } from '@tanstack/react-query'
 
 interface SlotData {
-  slot: number
+  slot: bigint
   block: {
     epoch: number
-    execution_payload_transactions_count?: number
-    block_total_bytes?: number
-    execution_payload_base_fee_per_gas?: number
-    execution_payload_gas_used?: number
-    execution_payload_gas_limit?: number
-    execution_payload_block_number?: number
+    execution_payload_transactions_count?: bigint
+    block_total_bytes?: bigint
+    execution_payload_base_fee_per_gas?: bigint
+    execution_payload_gas_used?: bigint
+    execution_payload_gas_limit?: bigint
+    execution_payload_block_number?: bigint
     block_version?: string
   }
   proposer: {
-    proposer_validator_index: number
+    proposer_validator_index: bigint
   }
   entity?: string
-  nodes: Record<string, {
-    name: string
-    username: string
-    geo: {
-      city: string
-      country: string
-      continent: string
+  nodes: {
+    [key: string]: {
+      name: string
+      username: string
+      geo: {
+        city: string
+        country: string
+        continent: string
+      }
     }
-  }>
+  }
   timings: {
-    block_seen?: Record<string, number>
-    block_first_seen_p2p?: Record<string, number>
-    blob_seen?: Record<string, Record<string, number>>
-    blob_first_seen_p2p?: Record<string, Record<string, number>>
+    block_seen?: Record<string, bigint>
+    block_first_seen_p2p?: Record<string, bigint>
+    blob_seen?: Record<string, Record<string, bigint>>
+    blob_first_seen_p2p?: Record<string, Record<string, bigint>>
   }
   attestations?: {
     windows: Array<{
-      start_ms: number
-      end_ms: number
+      start_ms: bigint
+      end_ms: bigint
       validator_indices: number[]
     }>
-    maximum_votes?: number
+    maximum_votes?: bigint
   }
 }
 
@@ -58,8 +62,8 @@ interface SlotViewProps {
 }
 
 interface AttestationWindow {
-  start_ms: number
-  end_ms: number
+  start_ms: bigint
+  end_ms: bigint
   validator_indices: number[]
 }
 
@@ -114,16 +118,79 @@ export function SlotView({ slot, network = 'mainnet', isLive = false, onSlotComp
   const navigate = useNavigate()
   const { showModal } = useModal()
 
-  // Skip data fetching if no slot is provided
-  const slotPath = slot ? `beacon/slots/${network}/${slot}.json` : null
-  const nextSlotPath = slot ? `beacon/slots/${network}/${slot + 1}.json` : null
+  // Use the new RPC method to fetch slot data
+  const { 
+    data: slotResponse, 
+    isLoading, 
+    error 
+  } = useQuery({
+    queryKey: ['slotData', network, slot],
+    queryFn: async () => {
+      if (!slot) {
+        throw new Error('No slot provided')
+      }
+      
+      const client = await getLabApiClient()
+      const request = new GetSlotDataRequest({
+        network: network,
+        slot: BigInt(slot)
+      })
+      
+      return client.getSlotData(request)
+    },
+    enabled: !!slot,
+  })
 
-  const { data: slotData, loading: isLoading, error } = useDataFetch<SlotData>(slotPath)
+  // Extract the data from the response
+  const slotData = slotResponse?.data
+
   // Optimistically fetch next slot data when we're close to the end
-  const { data: nextSlotData } = useDataFetch<SlotData>(
-    currentTime >= 11000 ? nextSlotPath : null, 
-    { silentFail: true }
-  )
+  const { 
+    data: nextSlotResponse 
+  } = useQuery({
+    queryKey: ['slotData', network, slot ? slot + 1 : null],
+    queryFn: async () => {
+      if (!slot) {
+        throw new Error('No slot provided')
+      }
+      
+      const client = await getLabApiClient()
+      const request = new GetSlotDataRequest({
+        network: network,
+        slot: BigInt(slot + 1)
+      })
+      
+      return client.getSlotData(request)
+    },
+    enabled: !!slot && currentTime >= 11000,
+    retry: false,
+  })
+
+  // Extract the data from the next slot response
+  const nextSlotData = nextSlotResponse?.data
+
+  // Display error state if data fetch failed
+  if (error && !isLive) {
+    return (
+      <div className="w-full flex flex-col">
+        <div className="h-[calc(100vh-theme(spacing.16))] md:h-[calc(85vh-theme(spacing.36))] flex flex-col md:flex-row">
+          <div className="w-full h-full">
+            <GlobalMap
+              nodes={{}}
+              currentTime={0}
+              blockEvents={[]}
+              loading={false}
+              isMissing={true}
+              hideDetails={true}
+            />
+          </div>
+        </div>
+        <div className="absolute inset-0 flex items-center justify-center">
+          <ErrorState message="Failed to load slot data" error={error} />
+        </div>
+      </div>
+    )
+  }
 
   // Timer effect for playback
   useEffect(() => {
@@ -153,7 +220,7 @@ export function SlotView({ slot, network = 'mainnet', isLive = false, onSlotComp
 
   const totalValidators = slotData?.attestations?.windows?.reduce((sum, window) => 
     sum + window.validator_indices.length, 0) || 0
-  const maxPossibleValidators = slotData?.attestations?.maximum_votes || 0
+  const maxPossibleValidators = slotData?.attestations?.maximum_votes ? Number(slotData.attestations.maximum_votes) : 0
   const attestationThreshold = Math.ceil(maxPossibleValidators * 0.66)
 
   const { firstBlockSeen, firstApiBlockSeen, firstP2pBlockSeen, attestationProgress } = useMemo(() => {
@@ -165,16 +232,16 @@ export function SlotView({ slot, network = 'mainnet', isLive = false, onSlotComp
     let firstP2pBlock: BlockEvent | null = null
     
     // Check P2P events
-    const p2pEvents = slotData.timings.block_first_seen_p2p || {}
+    const p2pEvents = slotData.timings?.block_first_seen_p2p || {}
     const p2pTimes = Object.values(p2pEvents)
-    const firstP2pTime = p2pTimes.length > 0 ? Math.min(...p2pTimes) : Infinity
-    const firstP2pNode = Object.entries(p2pEvents).find(([_, time]) => time === firstP2pTime)?.[0]
+    const firstP2pTime = p2pTimes.length > 0 ? Math.min(...p2pTimes.map(t => Number(t))) : Infinity
+    const firstP2pNode = Object.entries(p2pEvents).find(([_k, time]) => Number(time) === firstP2pTime)?.[0]
 
     // Check API events
-    const apiEvents = slotData.timings.block_seen || {}
+    const apiEvents = slotData.timings?.block_seen || {}
     const apiTimes = Object.values(apiEvents)
-    const firstApiTime = apiTimes.length > 0 ? Math.min(...apiTimes) : Infinity
-    const firstApiNode = Object.entries(apiEvents).find(([_, time]) => time === firstApiTime)?.[0]
+    const firstApiTime = apiTimes.length > 0 ? Math.min(...apiTimes.map(t => Number(t))) : Infinity
+    const firstApiNode = Object.entries(apiEvents).find(([_k, time]) => Number(time) === firstApiTime)?.[0]
 
     // Set first API block if exists
     if (firstApiNode) {
@@ -209,7 +276,7 @@ export function SlotView({ slot, network = 'mainnet', isLive = false, onSlotComp
 
     if (slotData.attestations?.windows) {
       // Sort windows by start time
-      const sortedWindows = [...slotData.attestations.windows].sort((a, b) => a.start_ms - b.start_ms)
+      const sortedWindows = [...slotData.attestations.windows].sort((a, b) => Number(a.start_ms) - Number(b.start_ms))
       
       // Add initial point at 0ms
       attestations.push({
@@ -223,14 +290,14 @@ export function SlotView({ slot, network = 'mainnet', isLive = false, onSlotComp
 
         // Add point at window start with current total
         attestations.push({
-          time: window.start_ms,
+          time: Number(window.start_ms),
           totalValidators: runningTotal
         })
 
         // Update running total and add point at window end
         runningTotal += validatorCount
         attestations.push({
-          time: window.end_ms,
+          time: Number(window.end_ms),
           totalValidators: runningTotal
         })
       })
@@ -255,17 +322,17 @@ export function SlotView({ slot, network = 'mainnet', isLive = false, onSlotComp
 
     return [
       // Block seen events
-      ...Object.entries(slotData.timings.block_seen || {}).map(([node, time]) => ({
+      ...Object.entries(slotData.timings?.block_seen || {}).map(([node, time]) => ({
         type: 'block_seen' as const,
         node,
-        time,
+        time: Number(time),
         source: 'api' as const
       })),
       // Block P2P events
-      ...Object.entries(slotData.timings.block_first_seen_p2p || {}).map(([node, time]) => ({
+      ...Object.entries(slotData.timings?.block_first_seen_p2p || {}).map(([node, time]) => ({
         type: 'block_seen' as const,
         node,
-        time,
+        time: Number(time),
         source: 'p2p' as const
       }))
     ].sort((a, b) => a.time - b.time)
@@ -285,66 +352,70 @@ export function SlotView({ slot, network = 'mainnet', isLive = false, onSlotComp
     }
 
     // Add block seen events
-    Object.entries(slotData.timings.block_seen || {}).forEach(([node, time]) => {
+    Object.entries(slotData.timings?.block_seen || {}).forEach(([node, time]) => {
       events.push({
         id: `block-seen-api-${node}-${time}`,
-        timestamp: time,
+        timestamp: Number(time),
         type: 'Block Seen (API)',
         node,
         location: getLocationString(node),
-        data: { time }
+        data: { time: Number(time) }
       })
     })
 
     // Add P2P block events
-    Object.entries(slotData.timings.block_first_seen_p2p || {}).forEach(([node, time]) => {
+    Object.entries(slotData.timings?.block_first_seen_p2p || {}).forEach(([node, time]) => {
       events.push({
         id: `block-seen-p2p-${node}-${time}`,
-        timestamp: time,
+        timestamp: Number(time),
         type: 'Block Seen (P2P)',
         node,
         location: getLocationString(node),
-        data: { time }
+        data: { time: Number(time) }
       })
     })
 
     // Add blob seen events
-    Object.entries(slotData.timings.blob_seen || {}).forEach(([node, blobData]) => {
-      Object.entries(blobData).forEach(([index, time]) => {
-        events.push({
-          id: `blob-seen-api-${node}-${index}-${time}`,
-          timestamp: time,
-          type: 'Blob Seen (API)',
-          node,
-          location: getLocationString(node),
-          data: { time, index: parseInt(index) }
+    Object.entries(slotData.timings?.blob_seen || {}).forEach(([node, blobData]) => {
+      if (blobData) {
+        Object.entries(blobData).forEach(([index, time]) => {
+          events.push({
+            id: `blob-seen-api-${node}-${index}-${time}`,
+            timestamp: Number(time),
+            type: 'Blob Seen (API)',
+            node,
+            location: getLocationString(node),
+            data: { time: Number(time), index: parseInt(index) }
+          })
         })
-      })
+      }
     })
 
     // Add P2P blob events
-    Object.entries(slotData.timings.blob_first_seen_p2p || {}).forEach(([node, blobData]) => {
-      Object.entries(blobData).forEach(([index, time]) => {
-        events.push({
-          id: `blob-seen-p2p-${node}-${index}-${time}`,
-          timestamp: time,
-          type: 'Blob Seen (P2P)',
-          node,
-          location: getLocationString(node),
-          data: { time, index: parseInt(index) }
+    Object.entries(slotData.timings?.blob_first_seen_p2p || {}).forEach(([node, blobData]) => {
+      if (blobData) {
+        Object.entries(blobData).forEach(([index, time]) => {
+          events.push({
+            id: `blob-seen-p2p-${node}-${index}-${time}`,
+            timestamp: Number(time),
+            type: 'Blob Seen (P2P)',
+            node,
+            location: getLocationString(node),
+            data: { time: Number(time), index: parseInt(index) }
+          })
         })
-      })
+      }
     })
 
     // Add attestation events
     slotData.attestations?.windows?.forEach((window, i) => {
       events.push({
         id: `attestation-${i}-${window.start_ms}`,
-        timestamp: window.start_ms,
+        timestamp: Number(window.start_ms),
         type: 'Attestation',
         node: `${window.validator_indices.length} validators`,
         location: '',
-        data: { time: window.start_ms }
+        data: { time: Number(window.start_ms) }
       })
     })
 
@@ -354,29 +425,6 @@ export function SlotView({ slot, network = 'mainnet', isLive = false, onSlotComp
   // Calculate what to show based on data availability
   const showData = slotData || (isLive && slot)
   const isMissingData = !slotData && isLive && slot !== undefined
-
-  // Only show error if not live view
-  if (error && !isLive) {
-    return (
-      <div className="w-full flex flex-col">
-        <div className="h-[calc(100vh-theme(spacing.16))] md:h-[calc(85vh-theme(spacing.36))] flex flex-col md:flex-row">
-          <div className="w-full h-full">
-            <GlobalMap
-              nodes={{}}
-              currentTime={0}
-              blockEvents={[]}
-              loading={false}
-              isMissing={true}
-              hideDetails={true}
-            />
-          </div>
-        </div>
-        <div className="absolute inset-0 flex items-center justify-center">
-          <ErrorState message="Failed to load slot data" error={error} />
-        </div>
-      </div>
-    )
-  }
 
   return (
     <div className="w-full flex flex-col">
@@ -392,15 +440,15 @@ export function SlotView({ slot, network = 'mainnet', isLive = false, onSlotComp
               blockEvents={blockEvents}
               loading={isLoading && !slotData}
               isMissing={isMissingData}
-              slot={slotData?.slot}
+              slot={slotData?.slot ? Number(slotData.slot) : undefined}
               proposer={slotData?.entity || 'Unknown'}
-              proposerIndex={slotData?.proposer?.proposer_validator_index}
-              txCount={slotData?.block?.execution_payload_transactions_count || 0}
-              blockSize={slotData?.block?.block_total_bytes}
-              baseFee={slotData?.block?.execution_payload_base_fee_per_gas}
-              gasUsed={slotData?.block?.execution_payload_gas_used}
-              gasLimit={slotData?.block?.execution_payload_gas_limit}
-              executionBlockNumber={slotData?.block?.execution_payload_block_number}
+              proposerIndex={slotData?.proposer?.proposer_validator_index ? Number(slotData.proposer.proposer_validator_index) : undefined}
+              txCount={slotData?.block?.execution_payload_transactions_count ? Number(slotData.block.execution_payload_transactions_count) : 0}
+              blockSize={slotData?.block?.block_total_bytes ? Number(slotData.block.block_total_bytes) : undefined}
+              baseFee={slotData?.block?.execution_payload_base_fee_per_gas ? Number(slotData.block.execution_payload_base_fee_per_gas) : undefined}
+              gasUsed={slotData?.block?.execution_payload_gas_used ? Number(slotData.block.execution_payload_gas_used) : undefined}
+              gasLimit={slotData?.block?.execution_payload_gas_limit ? Number(slotData.block.execution_payload_gas_limit) : undefined}
+              executionBlockNumber={slotData?.block?.execution_payload_block_number ? Number(slotData.block.execution_payload_block_number) : undefined}
               hideDetails={true}
             />
           </div>
@@ -467,28 +515,30 @@ export function SlotView({ slot, network = 'mainnet', isLive = false, onSlotComp
                   {(() => {
                     // Get first block seen time
                     const blockSeenTimes = [
-                      ...Object.values(slotData.timings.block_seen || {}),
-                      ...Object.values(slotData.timings.block_first_seen_p2p || {})
+                      ...Object.values(slotData.timings?.block_seen || {}),
+                      ...Object.values(slotData.timings?.block_first_seen_p2p || {})
                     ]
                     const firstBlockTime = blockSeenTimes.length > 0 ? Math.min(...blockSeenTimes) : null
                     
                     // Get first blob seen time
                     const blobSeenTimes = [
-                      ...Object.values(slotData.timings.blob_seen || {}).flatMap(obj => Object.values(obj)),
-                      ...Object.values(slotData.timings.blob_first_seen_p2p || {}).flatMap(obj => Object.values(obj))
+                      ...Object.values(slotData.timings?.blob_seen || {}).flatMap(obj => Object.values(obj)),
+                      ...Object.values(slotData.timings?.blob_first_seen_p2p || {}).flatMap(obj => Object.values(obj))
                     ]
                     const firstBlobTime = blobSeenTimes.length > 0 ? Math.min(...blobSeenTimes) : null
 
                     // Calculate blob count
                     const blobIndices = new Set([
-                      ...Object.values(slotData.timings.blob_seen || {}).flatMap(obj => Object.keys(obj)),
-                      ...Object.values(slotData.timings.blob_first_seen_p2p || {}).flatMap(obj => Object.keys(obj))
+                      ...Object.values(slotData.timings?.blob_seen || {}).flatMap(obj => Object.keys(obj)),
+                      ...Object.values(slotData.timings?.blob_first_seen_p2p || {}).flatMap(obj => Object.keys(obj))
                     ])
 
                     // Calculate gas metrics
                     const gasUsage = slotData.block.execution_payload_gas_used
                     const gasLimit = slotData.block.execution_payload_gas_limit
-                    const gasUsagePercent = gasUsage && gasLimit ? Math.min((gasUsage / gasLimit) * 100, 100) : null
+                    const gasUsagePercent = gasUsage && gasLimit ? 
+                      Math.min(Number(gasUsage) / Number(gasLimit) * 100, 100) : 
+                      null
 
                     // Get total validators and attestations
                     const totalAttestations = slotData.attestations?.windows?.reduce((sum, window) => 
@@ -670,36 +720,36 @@ export function SlotView({ slot, network = 'mainnet', isLive = false, onSlotComp
                     {(() => {
                       // Get first block seen time
                       const blockSeenTimes = [
-                        ...Object.values(slotData.timings.block_seen || {}),
-                        ...Object.values(slotData.timings.block_first_seen_p2p || {})
+                        ...Object.values(slotData.timings?.block_seen || {}),
+                        ...Object.values(slotData.timings?.block_first_seen_p2p || {})
                       ]
                       const firstBlockTime = blockSeenTimes.length > 0 ? Math.min(...blockSeenTimes) : null
                       
                       // Get first blob seen time
                       const blobSeenTimes = [
-                        ...Object.values(slotData.timings.blob_seen || {}).flatMap(obj => Object.values(obj)),
-                        ...Object.values(slotData.timings.blob_first_seen_p2p || {}).flatMap(obj => Object.values(obj))
+                        ...Object.values(slotData.timings?.blob_seen || {}).flatMap(obj => Object.values(obj)),
+                        ...Object.values(slotData.timings?.blob_first_seen_p2p || {}).flatMap(obj => Object.values(obj))
                       ]
                       const firstBlobTime = blobSeenTimes.length > 0 ? Math.min(...blobSeenTimes) : null
 
                       // Calculate blob count
                       const blobIndices = new Set([
-                        ...Object.values(slotData.timings.blob_seen || {}).flatMap(obj => Object.keys(obj)),
-                        ...Object.values(slotData.timings.blob_first_seen_p2p || {}).flatMap(obj => Object.keys(obj))
+                        ...Object.values(slotData.timings?.blob_seen || {}).flatMap(obj => Object.keys(obj)),
+                        ...Object.values(slotData.timings?.blob_first_seen_p2p || {}).flatMap(obj => Object.keys(obj))
                       ])
 
                       // Calculate gas metrics
                       const gasUsage = slotData.block.execution_payload_gas_used
                       const gasLimit = slotData.block.execution_payload_gas_limit
-                      const gasUsagePercent = gasUsage && gasLimit ? Math.min((gasUsage / gasLimit) * 100, 100) : null
+                      const gasUsagePercent = gasUsage && gasLimit ? 
+                        Math.min(Number(gasUsage) / Number(gasLimit) * 100, 100) : 
+                        null
 
                       // Get total validators and attestations
-                      const totalValidators = slotData.attestations?.windows?.reduce((sum, window) => 
+                      const totalAttestations = slotData.attestations?.windows?.reduce((sum, window) => 
                         sum + window.validator_indices.length, 0) || 0
                       
                       // Calculate participation based on actual attestations
-                      const totalAttestations = slotData.attestations?.windows?.reduce((sum, window) => 
-                        sum + window.validator_indices.length, 0) || 0
                       const maxPossibleValidators = slotData.attestations?.maximum_votes || 0
                       const participation = maxPossibleValidators > 0 ? (totalAttestations / maxPossibleValidators) * 100 : null
 
@@ -874,7 +924,7 @@ export function SlotView({ slot, network = 'mainnet', isLive = false, onSlotComp
                       {slotData?.block?.block_total_bytes && (
                         <div>
                           <div className="text-tertiary">Size</div>
-                          <div className="text-primary">{(slotData.block.block_total_bytes / 1024).toFixed(1)}KB</div>
+                          <div className="text-primary">{(Number(slotData.block.block_total_bytes) / 1024).toFixed(1)}KB</div>
                         </div>
                       )}
 
@@ -883,13 +933,13 @@ export function SlotView({ slot, network = 'mainnet', isLive = false, onSlotComp
                           <div>
                             <div className="text-tertiary">Gas</div>
                             <div className="text-primary">
-                              {(slotData.block.execution_payload_gas_used / 1e6).toFixed(1)}M / {(slotData.block.execution_payload_gas_limit! / 1e6).toFixed(1)}M
+                              {(Number(slotData.block.execution_payload_gas_used) / 1e6).toFixed(1)}M / {(Number(slotData.block.execution_payload_gas_limit!) / 1e6).toFixed(1)}M
                             </div>
                           </div>
                           {slotData?.block?.execution_payload_base_fee_per_gas && (
                             <div>
                               <div className="text-tertiary">Base Fee</div>
-                              <div className="text-primary">{(slotData.block.execution_payload_base_fee_per_gas / 1e9).toFixed(2)} Gwei</div>
+                              <div className="text-primary">{(Number(slotData.block.execution_payload_base_fee_per_gas) / 1e9).toFixed(2)} Gwei</div>
                             </div>
                           )}
                         </div>
@@ -970,15 +1020,15 @@ export function SlotView({ slot, network = 'mainnet', isLive = false, onSlotComp
               blockEvents={blockEvents}
               loading={isLoading && !slotData}
               isMissing={isMissingData}
-              slot={slotData?.slot}
+              slot={slotData?.slot ? Number(slotData.slot) : undefined}
               proposer={slotData?.entity || 'Unknown'}
-              proposerIndex={slotData?.proposer?.proposer_validator_index}
-              txCount={slotData?.block?.execution_payload_transactions_count || 0}
-              blockSize={slotData?.block?.block_total_bytes}
-              baseFee={slotData?.block?.execution_payload_base_fee_per_gas}
-              gasUsed={slotData?.block?.execution_payload_gas_used}
-              gasLimit={slotData?.block?.execution_payload_gas_limit}
-              executionBlockNumber={slotData?.block?.execution_payload_block_number}
+              proposerIndex={slotData?.proposer?.proposer_validator_index ? Number(slotData.proposer.proposer_validator_index) : undefined}
+              txCount={slotData?.block?.execution_payload_transactions_count ? Number(slotData.block.execution_payload_transactions_count) : 0}
+              blockSize={slotData?.block?.block_total_bytes ? Number(slotData.block.block_total_bytes) : undefined}
+              baseFee={slotData?.block?.execution_payload_base_fee_per_gas ? Number(slotData.block.execution_payload_base_fee_per_gas) : undefined}
+              gasUsed={slotData?.block?.execution_payload_gas_used ? Number(slotData.block.execution_payload_gas_used) : undefined}
+              gasLimit={slotData?.block?.execution_payload_gas_limit ? Number(slotData.block.execution_payload_gas_limit) : undefined}
+              executionBlockNumber={slotData?.block?.execution_payload_block_number ? Number(slotData.block.execution_payload_block_number) : undefined}
               hideDetails={true}
             />
           </div>
