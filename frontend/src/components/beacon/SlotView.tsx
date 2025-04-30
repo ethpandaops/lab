@@ -15,16 +15,16 @@ interface SlotData {
   slot: bigint
   block: {
     epoch: number
-    execution_payload_transactions_count?: bigint
-    block_total_bytes?: bigint
-    execution_payload_base_fee_per_gas?: bigint
-    execution_payload_gas_used?: bigint
-    execution_payload_gas_limit?: bigint
-    execution_payload_block_number?: bigint
-    block_version?: string
+    executionPayloadTransactionsCount?: bigint
+    blockTotalBytes?: bigint
+    executionPayloadBaseFeePerGas?: bigint
+    executionPayloadGasUsed?: bigint
+    executionPayloadGasLimit?: bigint
+    executionPayloadBlockNumber?: bigint
+    blockVersion?: string
   }
   proposer: {
-    proposer_validator_index: bigint
+    proposerValidatorIndex: bigint
   }
   entity?: string
   nodes: {
@@ -39,18 +39,18 @@ interface SlotData {
     }
   }
   timings: {
-    block_seen?: Record<string, bigint>
-    block_first_seen_p2p?: Record<string, bigint>
-    blob_seen?: Record<string, Record<string, bigint>>
-    blob_first_seen_p2p?: Record<string, Record<string, bigint>>
+    blockSeen?: Record<string, bigint>
+    blockFirstSeenP2p?: Record<string, bigint>
+    blobSeen?: Record<string, Record<string, bigint>>
+    blobFirstSeenP2p?: Record<string, Record<string, bigint>>
   }
   attestations?: {
     windows: Array<{
-      start_ms: bigint
-      end_ms: bigint
-      validator_indices: number[]
+      startMs: bigint
+      endMs: bigint
+      validatorIndices: number[]
     }>
-    maximum_votes?: bigint
+    maximumVotes?: bigint
   }
 }
 
@@ -62,9 +62,9 @@ interface SlotViewProps {
 }
 
 interface AttestationWindow {
-  start_ms: bigint
-  end_ms: bigint
-  validator_indices: number[]
+  startMs: bigint
+  endMs: bigint
+  validatorIndices: number[]
 }
 
 interface BlockEvent {
@@ -91,10 +91,10 @@ interface BlobTimingData {
 }
 
 interface SlotTimings {
-  block_seen?: TimingData
-  block_first_seen_p2p?: TimingData
-  blob_seen?: BlobTimingData
-  blob_first_seen_p2p?: BlobTimingData
+  blockSeen?: TimingData
+  blockFirstSeenP2p?: TimingData
+  blobSeen?: BlobTimingData
+  blobFirstSeenP2p?: BlobTimingData
 }
 
 interface AttestationPoint {
@@ -219,8 +219,8 @@ export function SlotView({ slot, network = 'mainnet', isLive = false, onSlotComp
   }, [slot, isLive])
 
   const totalValidators = slotData?.attestations?.windows?.reduce((sum, window) => 
-    sum + window.validator_indices.length, 0) || 0
-  const maxPossibleValidators = slotData?.attestations?.maximum_votes ? Number(slotData.attestations.maximum_votes) : 0
+    sum + (window.validatorIndices?.length || 0), 0) || 0
+  const maxPossibleValidators = slotData?.attestations?.maximumVotes ? Number(slotData.attestations.maximumVotes) : 0
   const attestationThreshold = Math.ceil(maxPossibleValidators * 0.66)
 
   const { firstBlockSeen, firstApiBlockSeen, firstP2pBlockSeen, attestationProgress } = useMemo(() => {
@@ -232,16 +232,16 @@ export function SlotView({ slot, network = 'mainnet', isLive = false, onSlotComp
     let firstP2pBlock: BlockEvent | null = null
     
     // Check P2P events
-    const p2pEvents = slotData.timings?.block_first_seen_p2p || {}
+    const p2pEvents = slotData.timings?.blockFirstSeenP2p || {}
     const p2pTimes = Object.values(p2pEvents)
     const firstP2pTime = p2pTimes.length > 0 ? Math.min(...p2pTimes.map(t => Number(t))) : Infinity
-    const firstP2pNode = Object.entries(p2pEvents).find(([_k, time]) => Number(time) === firstP2pTime)?.[0]
+    const firstP2pNode = Object.entries(p2pEvents).find(([nodeId, time]) => Number(time) === firstP2pTime)?.[0]
 
     // Check API events
-    const apiEvents = slotData.timings?.block_seen || {}
+    const apiEvents = slotData.timings?.blockSeen || {}
     const apiTimes = Object.values(apiEvents)
     const firstApiTime = apiTimes.length > 0 ? Math.min(...apiTimes.map(t => Number(t))) : Infinity
-    const firstApiNode = Object.entries(apiEvents).find(([_k, time]) => Number(time) === firstApiTime)?.[0]
+    const firstApiNode = Object.entries(apiEvents).find(([nodeId, time]) => Number(time) === firstApiTime)?.[0]
 
     // Set first API block if exists
     if (firstApiNode) {
@@ -276,7 +276,7 @@ export function SlotView({ slot, network = 'mainnet', isLive = false, onSlotComp
 
     if (slotData.attestations?.windows) {
       // Sort windows by start time
-      const sortedWindows = [...slotData.attestations.windows].sort((a, b) => Number(a.start_ms) - Number(b.start_ms))
+      const sortedWindows = [...slotData.attestations.windows].sort((a, b) => Number(a.startMs) - Number(b.startMs))
       
       // Add initial point at 0ms
       attestations.push({
@@ -286,18 +286,18 @@ export function SlotView({ slot, network = 'mainnet', isLive = false, onSlotComp
 
       // Process each window
       sortedWindows.forEach(window => {
-        const validatorCount = window.validator_indices.length
+        const validatorCount = window.validatorIndices.length
 
         // Add point at window start with current total
         attestations.push({
-          time: Number(window.start_ms),
+          time: Number(window.startMs),
           totalValidators: runningTotal
         })
 
         // Update running total and add point at window end
         runningTotal += validatorCount
         attestations.push({
-          time: Number(window.end_ms),
+          time: Number(window.endMs),
           totalValidators: runningTotal
         })
       })
@@ -322,14 +322,14 @@ export function SlotView({ slot, network = 'mainnet', isLive = false, onSlotComp
 
     return [
       // Block seen events
-      ...Object.entries(slotData.timings?.block_seen || {}).map(([node, time]) => ({
+      ...Object.entries(slotData.timings?.blockSeen || {}).map(([node, time]) => ({
         type: 'block_seen' as const,
         node,
         time: Number(time),
         source: 'api' as const
       })),
       // Block P2P events
-      ...Object.entries(slotData.timings?.block_first_seen_p2p || {}).map(([node, time]) => ({
+      ...Object.entries(slotData.timings?.blockFirstSeenP2p || {}).map(([node, time]) => ({
         type: 'block_seen' as const,
         node,
         time: Number(time),
@@ -352,7 +352,7 @@ export function SlotView({ slot, network = 'mainnet', isLive = false, onSlotComp
     }
 
     // Add block seen events
-    Object.entries(slotData.timings?.block_seen || {}).forEach(([node, time]) => {
+    Object.entries(slotData.timings?.blockSeen || {}).forEach(([node, time]) => {
       events.push({
         id: `block-seen-api-${node}-${time}`,
         timestamp: Number(time),
@@ -364,7 +364,7 @@ export function SlotView({ slot, network = 'mainnet', isLive = false, onSlotComp
     })
 
     // Add P2P block events
-    Object.entries(slotData.timings?.block_first_seen_p2p || {}).forEach(([node, time]) => {
+    Object.entries(slotData.timings?.blockFirstSeenP2p || {}).forEach(([node, time]) => {
       events.push({
         id: `block-seen-p2p-${node}-${time}`,
         timestamp: Number(time),
@@ -376,46 +376,76 @@ export function SlotView({ slot, network = 'mainnet', isLive = false, onSlotComp
     })
 
     // Add blob seen events
-    Object.entries(slotData.timings?.blob_seen || {}).forEach(([node, blobData]) => {
+    Object.entries(slotData.timings?.blobSeen || {}).forEach(([node, blobData]) => {
       if (blobData) {
-        Object.entries(blobData).forEach(([index, time]) => {
-          events.push({
-            id: `blob-seen-api-${node}-${index}-${time}`,
-            timestamp: Number(time),
-            type: 'Blob Seen (API)',
-            node,
-            location: getLocationString(node),
-            data: { time: Number(time), index: parseInt(index) }
+        if ('timings' in blobData) {
+          // New structure with nested timings
+          Object.entries(blobData.timings).forEach(([index, time]) => {
+            events.push({
+              id: `blob-seen-api-${node}-${index}-${time}`,
+              timestamp: Number(time),
+              type: 'Blob Seen (API)',
+              node,
+              location: getLocationString(node),
+              data: { time: Number(time), index: parseInt(index) }
+            })
           })
-        })
+        } else {
+          // Old structure without nested timings
+          Object.entries(blobData).forEach(([index, time]) => {
+            events.push({
+              id: `blob-seen-api-${node}-${index}-${time}`,
+              timestamp: Number(time),
+              type: 'Blob Seen (API)',
+              node,
+              location: getLocationString(node),
+              data: { time: Number(time), index: parseInt(index) }
+            })
+          })
+        }
       }
     })
 
     // Add P2P blob events
-    Object.entries(slotData.timings?.blob_first_seen_p2p || {}).forEach(([node, blobData]) => {
+    Object.entries(slotData.timings?.blobFirstSeenP2p || {}).forEach(([node, blobData]) => {
       if (blobData) {
-        Object.entries(blobData).forEach(([index, time]) => {
-          events.push({
-            id: `blob-seen-p2p-${node}-${index}-${time}`,
-            timestamp: Number(time),
-            type: 'Blob Seen (P2P)',
-            node,
-            location: getLocationString(node),
-            data: { time: Number(time), index: parseInt(index) }
+        if ('timings' in blobData) {
+          // New structure with nested timings
+          Object.entries(blobData.timings).forEach(([index, time]) => {
+            events.push({
+              id: `blob-seen-p2p-${node}-${index}-${time}`,
+              timestamp: Number(time),
+              type: 'Blob Seen (P2P)',
+              node,
+              location: getLocationString(node),
+              data: { time: Number(time), index: parseInt(index) }
+            })
           })
-        })
+        } else {
+          // Old structure without nested timings
+          Object.entries(blobData).forEach(([index, time]) => {
+            events.push({
+              id: `blob-seen-p2p-${node}-${index}-${time}`,
+              timestamp: Number(time),
+              type: 'Blob Seen (P2P)',
+              node,
+              location: getLocationString(node),
+              data: { time: Number(time), index: parseInt(index) }
+            })
+          })
+        }
       }
     })
 
     // Add attestation events
     slotData.attestations?.windows?.forEach((window, i) => {
       events.push({
-        id: `attestation-${i}-${window.start_ms}`,
-        timestamp: Number(window.start_ms),
+        id: `attestation-${i}-${window.startMs}`,
+        timestamp: Number(window.startMs),
         type: 'Attestation',
-        node: `${window.validator_indices.length} validators`,
+        node: `${window.validatorIndices.length} validators`,
         location: '',
-        data: { time: Number(window.start_ms) }
+        data: { time: Number(window.startMs) }
       })
     })
 
@@ -426,6 +456,44 @@ export function SlotView({ slot, network = 'mainnet', isLive = false, onSlotComp
   const showData = slotData || (isLive && slot)
   const isMissingData = !slotData && isLive && slot !== undefined
 
+  // Helper function to convert nodes to correct type for components
+  const getFormattedNodes = useMemo(() => {
+    if (!slotData?.nodes) return {};
+    
+    return Object.fromEntries(
+      Object.entries(slotData.nodes).map(([key, node]) => [
+        key,
+        {
+          name: node.name,
+          username: node.username,
+          geo: {
+            city: node.geo?.city || '',
+            country: node.geo?.country || '',
+            continent: node.geo?.continent || '',
+            latitude: node.geo?.latitude,
+            longitude: node.geo?.longitude
+          }
+        }
+      ])
+    );
+  }, [slotData?.nodes]);
+
+  // DataAvailabilityPanel nodes format
+  const dataAvailabilityNodes = useMemo(() => {
+    if (!slotData?.nodes) return undefined;
+    
+    return Object.fromEntries(
+      Object.entries(slotData.nodes).map(([key, node]) => [
+        key,
+        {
+          geo: {
+            continent: node.geo?.continent
+          }
+        }
+      ])
+    );
+  }, [slotData?.nodes]);
+
   return (
     <div className="w-full flex flex-col">
       {/* Main Content */}
@@ -435,20 +503,20 @@ export function SlotView({ slot, network = 'mainnet', isLive = false, onSlotComp
           {/* Map Section - Reduced height on mobile */}
           <div className="h-[30vh] border-b border-subtle">
             <GlobalMap
-              nodes={slotData?.nodes || {}}
+              nodes={getFormattedNodes}
               currentTime={currentTime}
               blockEvents={blockEvents}
               loading={isLoading && !slotData}
               isMissing={isMissingData}
               slot={slotData?.slot ? Number(slotData.slot) : undefined}
               proposer={slotData?.entity || 'Unknown'}
-              proposerIndex={slotData?.proposer?.proposer_validator_index ? Number(slotData.proposer.proposer_validator_index) : undefined}
-              txCount={slotData?.block?.execution_payload_transactions_count ? Number(slotData.block.execution_payload_transactions_count) : 0}
-              blockSize={slotData?.block?.block_total_bytes ? Number(slotData.block.block_total_bytes) : undefined}
-              baseFee={slotData?.block?.execution_payload_base_fee_per_gas ? Number(slotData.block.execution_payload_base_fee_per_gas) : undefined}
-              gasUsed={slotData?.block?.execution_payload_gas_used ? Number(slotData.block.execution_payload_gas_used) : undefined}
-              gasLimit={slotData?.block?.execution_payload_gas_limit ? Number(slotData.block.execution_payload_gas_limit) : undefined}
-              executionBlockNumber={slotData?.block?.execution_payload_block_number ? Number(slotData.block.execution_payload_block_number) : undefined}
+              proposerIndex={slotData?.proposer?.proposerValidatorIndex ? Number(slotData.proposer.proposerValidatorIndex) : undefined}
+              txCount={slotData?.block?.executionPayloadTransactionsCount ? Number(slotData.block.executionPayloadTransactionsCount) : 0}
+              blockSize={slotData?.block?.blockTotalBytes ? Number(slotData.block.blockTotalBytes) : undefined}
+              baseFee={slotData?.block?.executionPayloadBaseFeePerGas ? Number(slotData.block.executionPayloadBaseFeePerGas) : undefined}
+              gasUsed={slotData?.block?.executionPayloadGasUsed ? Number(slotData.block.executionPayloadGasUsed) : undefined}
+              gasLimit={slotData?.block?.executionPayloadGasLimit ? Number(slotData.block.executionPayloadGasLimit) : undefined}
+              executionBlockNumber={slotData?.block?.executionPayloadBlockNumber ? Number(slotData.block.executionPayloadBlockNumber) : undefined}
               hideDetails={true}
             />
           </div>
@@ -481,13 +549,31 @@ export function SlotView({ slot, network = 'mainnet', isLive = false, onSlotComp
                         <div className="flex flex-col gap-8">
                           <DataAvailabilityPanel
                             blobTimings={{
-                              blob_seen: slotData?.timings?.blob_seen,
-                              blob_first_seen_p2p: slotData?.timings?.blob_first_seen_p2p,
-                              block_seen: slotData?.timings?.block_seen,
-                              block_first_seen_p2p: slotData?.timings?.block_first_seen_p2p
+                              blobSeen: slotData?.timings?.blobSeen ? Object.fromEntries(
+                                Object.entries(slotData.timings.blobSeen).map(([node, blobs]) => [
+                                  node,
+                                  'timings' in blobs ? 
+                                    Object.fromEntries(Object.entries(blobs.timings).map(([idx, time]) => [idx, Number(time)])) :
+                                    Object.fromEntries(Object.entries(blobs).map(([idx, time]) => [idx, Number(time)]))
+                                ])
+                              ) : undefined,
+                              blobFirstSeenP2p: slotData?.timings?.blobFirstSeenP2p ? Object.fromEntries(
+                                Object.entries(slotData.timings.blobFirstSeenP2p).map(([node, blobs]) => [
+                                  node,
+                                  'timings' in blobs ? 
+                                    Object.fromEntries(Object.entries(blobs.timings).map(([idx, time]) => [idx, Number(time)])) :
+                                    Object.fromEntries(Object.entries(blobs).map(([idx, time]) => [idx, Number(time)]))
+                                ])
+                              ) : undefined,
+                              blockSeen: slotData?.timings?.blockSeen ? Object.fromEntries(
+                                Object.entries(slotData.timings.blockSeen).map(([node, time]) => [node, Number(time)])
+                              ) : undefined,
+                              blockFirstSeenP2p: slotData?.timings?.blockFirstSeenP2p ? Object.fromEntries(
+                                Object.entries(slotData.timings.blockFirstSeenP2p).map(([node, time]) => [node, Number(time)])
+                              ) : undefined
                             }}
                             currentTime={currentTime}
-                            nodes={slotData?.nodes}
+                            nodes={dataAvailabilityNodes}
                           />
                           <BottomPanel
                             attestationProgress={attestationProgress}
@@ -496,7 +582,11 @@ export function SlotView({ slot, network = 'mainnet', isLive = false, onSlotComp
                             currentTime={currentTime}
                             loading={isLoading}
                             isMissing={isMissingData}
-                            attestationWindows={slotData?.attestations?.windows}
+                            attestationWindows={slotData?.attestations?.windows?.map(window => ({
+                              start_ms: Number(window.startMs),
+                              end_ms: Number(window.endMs),
+                              validator_indices: window.validatorIndices.map(Number)
+                            }))}
                             maxPossibleValidators={maxPossibleValidators}
                           />
                         </div>
@@ -515,37 +605,87 @@ export function SlotView({ slot, network = 'mainnet', isLive = false, onSlotComp
                   {(() => {
                     // Get first block seen time
                     const blockSeenTimes = [
-                      ...Object.values(slotData.timings?.block_seen || {}),
-                      ...Object.values(slotData.timings?.block_first_seen_p2p || {})
+                      ...Object.values(slotData.timings?.blockSeen || {}).map(time => Number(time)),
+                      ...Object.values(slotData.timings?.blockFirstSeenP2p || {}).map(time => Number(time))
                     ]
                     const firstBlockTime = blockSeenTimes.length > 0 ? Math.min(...blockSeenTimes) : null
                     
                     // Get first blob seen time
-                    const blobSeenTimes = [
-                      ...Object.values(slotData.timings?.blob_seen || {}).flatMap(obj => Object.values(obj)),
-                      ...Object.values(slotData.timings?.blob_first_seen_p2p || {}).flatMap(obj => Object.values(obj))
-                    ]
+                    const blobSeenTimes: number[] = []
+                    // Process blob_seen with nested structure
+                    if (slotData.timings?.blobSeen) {
+                      Object.values(slotData.timings.blobSeen).forEach(nodeData => {
+                        if ('timings' in nodeData) {
+                          // New structure with nested timings
+                          Object.values(nodeData.timings).forEach(time => 
+                            blobSeenTimes.push(Number(time)))
+                        } else {
+                          // Old structure without nested timings
+                          Object.values(nodeData).forEach(time => 
+                            blobSeenTimes.push(Number(time)))
+                        }
+                      })
+                    }
+                    
+                    // Process blob_first_seen_p2p with nested structure
+                    if (slotData.timings?.blobFirstSeenP2p) {
+                      Object.values(slotData.timings.blobFirstSeenP2p).forEach(nodeData => {
+                        if ('timings' in nodeData) {
+                          // New structure with nested timings
+                          Object.values(nodeData.timings).forEach(time => 
+                            blobSeenTimes.push(Number(time)))
+                        } else {
+                          // Old structure without nested timings
+                          Object.values(nodeData).forEach(time => 
+                            blobSeenTimes.push(Number(time)))
+                        }
+                      })
+                    }
+                    
                     const firstBlobTime = blobSeenTimes.length > 0 ? Math.min(...blobSeenTimes) : null
 
                     // Calculate blob count
-                    const blobIndices = new Set([
-                      ...Object.values(slotData.timings?.blob_seen || {}).flatMap(obj => Object.keys(obj)),
-                      ...Object.values(slotData.timings?.blob_first_seen_p2p || {}).flatMap(obj => Object.keys(obj))
-                    ])
-
+                    const blobIndices = new Set()
+                    
+                    // Handle blob_seen with nested timings structure
+                    if (slotData?.timings?.blobSeen) {
+                      Object.values(slotData.timings.blobSeen).forEach(nodeData => {
+                        if ('timings' in nodeData) {
+                          // New structure with nested timings
+                          Object.keys(nodeData.timings).forEach(index => blobIndices.add(index))
+                        } else {
+                          // Old structure without nested timings
+                          Object.keys(nodeData).forEach(index => blobIndices.add(index))
+                        }
+                      })
+                    }
+                    
+                    // Handle blob_first_seen_p2p
+                    if (slotData?.timings?.blobFirstSeenP2p) {
+                      Object.values(slotData.timings.blobFirstSeenP2p).forEach(nodeData => {
+                        if ('timings' in nodeData) {
+                          // New structure with nested timings
+                          Object.keys(nodeData.timings).forEach(index => blobIndices.add(index))
+                        } else {
+                          // Old structure without nested timings
+                          Object.keys(nodeData).forEach(index => blobIndices.add(index))
+                        }
+                      })
+                    }
+                    
                     // Calculate gas metrics
-                    const gasUsage = slotData.block.execution_payload_gas_used
-                    const gasLimit = slotData.block.execution_payload_gas_limit
+                    const gasUsage = slotData.block?.executionPayloadGasUsed
+                    const gasLimit = slotData.block?.executionPayloadGasLimit
                     const gasUsagePercent = gasUsage && gasLimit ? 
                       Math.min(Number(gasUsage) / Number(gasLimit) * 100, 100) : 
                       null
 
                     // Get total validators and attestations
                     const totalAttestations = slotData.attestations?.windows?.reduce((sum, window) => 
-                      sum + window.validator_indices.length, 0) || 0
+                      sum + window.validatorIndices.length, 0) || 0
                     
                     // Calculate participation based on actual attestations
-                    const maxPossibleValidators = slotData.attestations?.maximum_votes || 0
+                    const maxPossibleValidators = slotData.attestations?.maximumVotes ? Number(slotData.attestations.maximumVotes) : 0
                     const participation = maxPossibleValidators > 0 ? (totalAttestations / maxPossibleValidators) * 100 : null
 
                     return (
@@ -585,7 +725,7 @@ export function SlotView({ slot, network = 'mainnet', isLive = false, onSlotComp
                             {blobIndices.size === 0 ? (
                               "No blobs in block"
                             ) : !firstBlobTime || !firstBlockTime ? (
-                              "Blobs: ${blobIndices.size}"
+                              `Blobs: ${Number(blobIndices.size)}`
                             ) : (firstBlobTime - firstBlockTime) > 1000 ? (
                               `Slow blob delivery (+${((firstBlobTime - firstBlockTime)/1000).toFixed(2)}s)`
                             ) : (firstBlobTime - firstBlockTime) > 500 ? (
@@ -705,10 +845,10 @@ export function SlotView({ slot, network = 'mainnet', isLive = false, onSlotComp
                       <span className="text-accent">{slotData?.entity || 'Unknown'}</span>
                     )}</span>
                   </div>
-                  {slotData?.block?.block_version && (
+                  {slotData?.block?.blockVersion && (
                     <div className="mt-2">
                       <div className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-mono font-medium bg-cyber-dark border border-cyber-neon text-cyber-neon">
-                        {slotData.block.block_version.toUpperCase()}
+                        {slotData.block.blockVersion.toUpperCase()}
                       </div>
                     </div>
                   )}
@@ -720,37 +860,87 @@ export function SlotView({ slot, network = 'mainnet', isLive = false, onSlotComp
                     {(() => {
                       // Get first block seen time
                       const blockSeenTimes = [
-                        ...Object.values(slotData.timings?.block_seen || {}),
-                        ...Object.values(slotData.timings?.block_first_seen_p2p || {})
+                        ...Object.values(slotData.timings?.blockSeen || {}).map(time => Number(time)),
+                        ...Object.values(slotData.timings?.blockFirstSeenP2p || {}).map(time => Number(time))
                       ]
                       const firstBlockTime = blockSeenTimes.length > 0 ? Math.min(...blockSeenTimes) : null
                       
                       // Get first blob seen time
-                      const blobSeenTimes = [
-                        ...Object.values(slotData.timings?.blob_seen || {}).flatMap(obj => Object.values(obj)),
-                        ...Object.values(slotData.timings?.blob_first_seen_p2p || {}).flatMap(obj => Object.values(obj))
-                      ]
+                      const blobSeenTimes: number[] = []
+                      // Process blob_seen with nested structure
+                      if (slotData.timings?.blobSeen) {
+                        Object.values(slotData.timings.blobSeen).forEach(nodeData => {
+                          if ('timings' in nodeData) {
+                            // New structure with nested timings
+                            Object.values(nodeData.timings).forEach(time => 
+                              blobSeenTimes.push(Number(time)))
+                          } else {
+                            // Old structure without nested timings
+                            Object.values(nodeData).forEach(time => 
+                              blobSeenTimes.push(Number(time)))
+                          }
+                        })
+                      }
+                      
+                      // Process blob_first_seen_p2p with nested structure
+                      if (slotData.timings?.blobFirstSeenP2p) {
+                        Object.values(slotData.timings.blobFirstSeenP2p).forEach(nodeData => {
+                          if ('timings' in nodeData) {
+                            // New structure with nested timings
+                            Object.values(nodeData.timings).forEach(time => 
+                              blobSeenTimes.push(Number(time)))
+                          } else {
+                            // Old structure without nested timings
+                            Object.values(nodeData).forEach(time => 
+                              blobSeenTimes.push(Number(time)))
+                          }
+                        })
+                      }
+                      
                       const firstBlobTime = blobSeenTimes.length > 0 ? Math.min(...blobSeenTimes) : null
 
                       // Calculate blob count
-                      const blobIndices = new Set([
-                        ...Object.values(slotData.timings?.blob_seen || {}).flatMap(obj => Object.keys(obj)),
-                        ...Object.values(slotData.timings?.blob_first_seen_p2p || {}).flatMap(obj => Object.keys(obj))
-                      ])
-
+                      const blobIndices = new Set()
+                      
+                      // Handle blob_seen with nested timings structure
+                      if (slotData?.timings?.blobSeen) {
+                        Object.values(slotData.timings.blobSeen).forEach(nodeData => {
+                          if ('timings' in nodeData) {
+                            // New structure with nested timings
+                            Object.keys(nodeData.timings).forEach(index => blobIndices.add(index))
+                          } else {
+                            // Old structure without nested timings
+                            Object.keys(nodeData).forEach(index => blobIndices.add(index))
+                          }
+                        })
+                      }
+                      
+                      // Handle blob_first_seen_p2p
+                      if (slotData?.timings?.blobFirstSeenP2p) {
+                        Object.values(slotData.timings.blobFirstSeenP2p).forEach(nodeData => {
+                          if ('timings' in nodeData) {
+                            // New structure with nested timings
+                            Object.keys(nodeData.timings).forEach(index => blobIndices.add(index))
+                          } else {
+                            // Old structure without nested timings
+                            Object.keys(nodeData).forEach(index => blobIndices.add(index))
+                          }
+                        })
+                      }
+                      
                       // Calculate gas metrics
-                      const gasUsage = slotData.block.execution_payload_gas_used
-                      const gasLimit = slotData.block.execution_payload_gas_limit
+                      const gasUsage = slotData.block?.executionPayloadGasUsed
+                      const gasLimit = slotData.block?.executionPayloadGasLimit
                       const gasUsagePercent = gasUsage && gasLimit ? 
                         Math.min(Number(gasUsage) / Number(gasLimit) * 100, 100) : 
                         null
 
                       // Get total validators and attestations
                       const totalAttestations = slotData.attestations?.windows?.reduce((sum, window) => 
-                        sum + window.validator_indices.length, 0) || 0
+                        sum + window.validatorIndices.length, 0) || 0
                       
                       // Calculate participation based on actual attestations
-                      const maxPossibleValidators = slotData.attestations?.maximum_votes || 0
+                      const maxPossibleValidators = slotData.attestations?.maximumVotes ? Number(slotData.attestations.maximumVotes) : 0
                       const participation = maxPossibleValidators > 0 ? (totalAttestations / maxPossibleValidators) * 100 : null
 
                       return (
@@ -790,7 +980,7 @@ export function SlotView({ slot, network = 'mainnet', isLive = false, onSlotComp
                               {blobIndices.size === 0 ? (
                                 "No blobs in block"
                               ) : !firstBlobTime || !firstBlockTime ? (
-                                "Blobs: ${blobIndices.size}"
+                                `Blobs: ${Number(blobIndices.size)}`
                               ) : (firstBlobTime - firstBlockTime) > 1000 ? (
                                 `Slow blob delivery (+${((firstBlobTime - firstBlockTime)/1000).toFixed(2)}s)`
                               ) : (firstBlobTime - firstBlockTime) > 500 ? (
@@ -885,30 +1075,30 @@ export function SlotView({ slot, network = 'mainnet', isLive = false, onSlotComp
                           <div className="text-tertiary">Validator</div>
                           <div className="text-primary">
                             <a
-                              href={`https://beaconcha.in/validator/${slotData?.proposer?.proposer_validator_index}`}
+                              href={`https://beaconcha.in/validator/${String(slotData?.proposer?.proposerValidatorIndex)}`}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="hover:text-accent transition-colors"
                             >
-                              {slotData?.proposer?.proposer_validator_index || 'Unknown'}
+                              {String(slotData?.proposer?.proposerValidatorIndex) || 'Unknown'}
                             </a>
                           </div>
                         </div>
-                        {slotData?.block?.execution_payload_block_number && (
+                        {slotData?.block?.executionPayloadBlockNumber ? (
                           <div>
                             <div className="text-tertiary">Block</div>
                             <div className="text-primary">
                               <a
-                                href={`https://etherscan.io/block/${slotData.block.execution_payload_block_number}`}
+                                href={`https://etherscan.io/block/${String(slotData.block.executionPayloadBlockNumber)}`}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="hover:text-accent transition-colors"
                               >
-                                {slotData.block.execution_payload_block_number}
+                                {String(slotData.block.executionPayloadBlockNumber)}
                               </a>
                             </div>
                           </div>
-                        )}
+                        ) : null}
                       </div>
                     </div>
                   </div>
@@ -918,32 +1108,32 @@ export function SlotView({ slot, network = 'mainnet', isLive = false, onSlotComp
                     <div className="grid grid-cols-2 gap-x-4 gap-y-2">
                       <div>
                         <div className="text-tertiary">Txns</div>
-                        <div className="text-primary">{slotData?.block?.execution_payload_transactions_count?.toLocaleString() || '0'}</div>
+                        <div className="text-primary">{slotData?.block?.executionPayloadTransactionsCount?.toLocaleString() || '0'}</div>
                       </div>
 
-                      {slotData?.block?.block_total_bytes && (
+                      {slotData?.block?.blockTotalBytes ? (
                         <div>
                           <div className="text-tertiary">Size</div>
-                          <div className="text-primary">{(Number(slotData.block.block_total_bytes) / 1024).toFixed(1)}KB</div>
+                          <div className="text-primary">{(Number(slotData.block.blockTotalBytes) / 1024).toFixed(1)}KB</div>
                         </div>
-                      )}
+                      ) : null}
 
-                      {slotData?.block?.execution_payload_gas_used && (
+                      {slotData?.block?.executionPayloadGasUsed ? (
                         <div className="col-span-2 grid grid-cols-2 gap-x-4">
                           <div>
                             <div className="text-tertiary">Gas</div>
                             <div className="text-primary">
-                              {(Number(slotData.block.execution_payload_gas_used) / 1e6).toFixed(1)}M / {(Number(slotData.block.execution_payload_gas_limit!) / 1e6).toFixed(1)}M
+                              {(Number(slotData.block.executionPayloadGasUsed) / 1e6).toFixed(1)}M / {(Number(slotData.block.executionPayloadGasLimit!) / 1e6).toFixed(1)}M
                             </div>
                           </div>
-                          {slotData?.block?.execution_payload_base_fee_per_gas && (
+                          {slotData?.block?.executionPayloadBaseFeePerGas ? (
                             <div>
                               <div className="text-tertiary">Base Fee</div>
-                              <div className="text-primary">{(Number(slotData.block.execution_payload_base_fee_per_gas) / 1e9).toFixed(2)} Gwei</div>
+                              <div className="text-primary">{(Number(slotData.block.executionPayloadBaseFeePerGas) / 1e9).toFixed(2)} Gwei</div>
                             </div>
-                          )}
+                          ) : null}
                         </div>
-                      )}
+                      ) : null}
                     </div>
                   </div>
 
@@ -955,13 +1145,13 @@ export function SlotView({ slot, network = 'mainnet', isLive = false, onSlotComp
                         <div className="text-primary">
                           {(() => {
                             const times = [
-                              ...Object.values(slotData?.timings?.block_seen || {}),
-                              ...Object.values(slotData?.timings?.block_first_seen_p2p || {})
+                              ...Object.values(slotData?.timings?.blockSeen || {}).map(time => Number(time)),
+                              ...Object.values(slotData?.timings?.blockFirstSeenP2p || {}).map(time => Number(time))
                             ]
                             const firstTime = times.length > 0 ? Math.min(...times) : null
-                            const firstNode = Object.entries(slotData?.timings?.block_seen || {})
-                              .concat(Object.entries(slotData?.timings?.block_first_seen_p2p || {}))
-                              .find(([_, time]) => time === firstTime)?.[0]
+                            const firstNode = Object.entries(slotData?.timings?.blockSeen || {})
+                              .concat(Object.entries(slotData?.timings?.blockFirstSeenP2p || {}))
+                              .find(([nodeId, time]) => Number(time) === firstTime)?.[0]
                             const nodeData = firstNode ? slotData?.nodes[firstNode] : null
                             const country = nodeData?.geo?.country || nodeData?.geo?.continent || 'Unknown'
                             
@@ -973,12 +1163,36 @@ export function SlotView({ slot, network = 'mainnet', isLive = false, onSlotComp
                         <div className="text-tertiary">Blobs</div>
                         <div className="text-primary">
                           {(() => {
-                            if (!slotData?.timings?.blob_seen && !slotData?.timings?.blob_first_seen_p2p) return '0'
-                            const blobIndices = new Set([
-                              ...Object.values(slotData?.timings?.blob_seen || {}).flatMap(obj => Object.keys(obj)),
-                              ...Object.values(slotData?.timings?.blob_first_seen_p2p || {}).flatMap(obj => Object.keys(obj))
-                            ])
-                            return blobIndices.size
+                            if (!slotData?.timings?.blobSeen && !slotData?.timings?.blobFirstSeenP2p) return '0'
+                            const blobIndices = new Set()
+                            
+                            // Handle blob_seen with nested timings structure
+                            if (slotData?.timings?.blobSeen) {
+                              Object.values(slotData.timings.blobSeen).forEach(nodeData => {
+                                if ('timings' in nodeData) {
+                                  // New structure with nested timings
+                                  Object.keys(nodeData.timings).forEach(index => blobIndices.add(index))
+                                } else {
+                                  // Old structure without nested timings
+                                  Object.keys(nodeData).forEach(index => blobIndices.add(index))
+                                }
+                              })
+                            }
+                            
+                            // Handle blob_first_seen_p2p
+                            if (slotData?.timings?.blobFirstSeenP2p) {
+                              Object.values(slotData.timings.blobFirstSeenP2p).forEach(nodeData => {
+                                if ('timings' in nodeData) {
+                                  // New structure with nested timings
+                                  Object.keys(nodeData.timings).forEach(index => blobIndices.add(index))
+                                } else {
+                                  // Old structure without nested timings
+                                  Object.keys(nodeData).forEach(index => blobIndices.add(index))
+                                }
+                              })
+                            }
+                            
+                            return Number(blobIndices.size)
                           })()}
                         </div>
                       </div>
@@ -987,8 +1201,8 @@ export function SlotView({ slot, network = 'mainnet', isLive = false, onSlotComp
                         <div className="text-primary">
                           {(() => {
                             const nodes = new Set([
-                              ...Object.keys(slotData?.timings?.block_seen || {}),
-                              ...Object.keys(slotData?.timings?.block_first_seen_p2p || {})
+                              ...Object.keys(slotData?.timings?.blockSeen || {}),
+                              ...Object.keys(slotData?.timings?.blockFirstSeenP2p || {})
                             ])
                             return nodes.size || '0'
                           })()}
@@ -999,8 +1213,8 @@ export function SlotView({ slot, network = 'mainnet', isLive = false, onSlotComp
                         <div className="text-primary">
                           {(() => {
                             const totalAttestations = slotData?.attestations?.windows?.reduce((sum, window) => 
-                              sum + window.validator_indices.length, 0) || 0
-                            const maxAttestations = slotData?.attestations?.maximum_votes || 0
+                              sum + window.validatorIndices.length, 0) || 0
+                            const maxAttestations = slotData?.attestations?.maximumVotes || 0
                             return `${totalAttestations.toLocaleString()} / ${maxAttestations.toLocaleString()}`
                           })()}
                         </div>
@@ -1015,20 +1229,20 @@ export function SlotView({ slot, network = 'mainnet', isLive = false, onSlotComp
           {/* Center - Map */}
           <div className="w-[60%] h-full border-r border-subtle">
             <GlobalMap
-              nodes={slotData?.nodes || {}}
+              nodes={getFormattedNodes}
               currentTime={currentTime}
               blockEvents={blockEvents}
               loading={isLoading && !slotData}
               isMissing={isMissingData}
               slot={slotData?.slot ? Number(slotData.slot) : undefined}
               proposer={slotData?.entity || 'Unknown'}
-              proposerIndex={slotData?.proposer?.proposer_validator_index ? Number(slotData.proposer.proposer_validator_index) : undefined}
-              txCount={slotData?.block?.execution_payload_transactions_count ? Number(slotData.block.execution_payload_transactions_count) : 0}
-              blockSize={slotData?.block?.block_total_bytes ? Number(slotData.block.block_total_bytes) : undefined}
-              baseFee={slotData?.block?.execution_payload_base_fee_per_gas ? Number(slotData.block.execution_payload_base_fee_per_gas) : undefined}
-              gasUsed={slotData?.block?.execution_payload_gas_used ? Number(slotData.block.execution_payload_gas_used) : undefined}
-              gasLimit={slotData?.block?.execution_payload_gas_limit ? Number(slotData.block.execution_payload_gas_limit) : undefined}
-              executionBlockNumber={slotData?.block?.execution_payload_block_number ? Number(slotData.block.execution_payload_block_number) : undefined}
+              proposerIndex={slotData?.proposer?.proposerValidatorIndex ? Number(slotData.proposer.proposerValidatorIndex) : undefined}
+              txCount={slotData?.block?.executionPayloadTransactionsCount ? Number(slotData.block.executionPayloadTransactionsCount) : 0}
+              blockSize={slotData?.block?.blockTotalBytes ? Number(slotData.block.blockTotalBytes) : undefined}
+              baseFee={slotData?.block?.executionPayloadBaseFeePerGas ? Number(slotData.block.executionPayloadBaseFeePerGas) : undefined}
+              gasUsed={slotData?.block?.executionPayloadGasUsed ? Number(slotData.block.executionPayloadGasUsed) : undefined}
+              gasLimit={slotData?.block?.executionPayloadGasLimit ? Number(slotData.block.executionPayloadGasLimit) : undefined}
+              executionBlockNumber={slotData?.block?.executionPayloadBlockNumber ? Number(slotData.block.executionPayloadBlockNumber) : undefined}
               hideDetails={true}
             />
           </div>
@@ -1069,13 +1283,31 @@ export function SlotView({ slot, network = 'mainnet', isLive = false, onSlotComp
             <div className="col-span-2 p-4 border-r border-subtle">
               <DataAvailabilityPanel
                 blobTimings={{
-                  blob_seen: slotData?.timings?.blob_seen,
-                  blob_first_seen_p2p: slotData?.timings?.blob_first_seen_p2p,
-                  block_seen: slotData?.timings?.block_seen,
-                  block_first_seen_p2p: slotData?.timings?.block_first_seen_p2p
+                  blobSeen: slotData?.timings?.blobSeen ? Object.fromEntries(
+                    Object.entries(slotData.timings.blobSeen).map(([node, blobs]) => [
+                      node,
+                      'timings' in blobs ? 
+                        Object.fromEntries(Object.entries(blobs.timings).map(([idx, time]) => [idx, Number(time)])) :
+                        Object.fromEntries(Object.entries(blobs).map(([idx, time]) => [idx, Number(time)]))
+                    ])
+                  ) : undefined,
+                  blobFirstSeenP2p: slotData?.timings?.blobFirstSeenP2p ? Object.fromEntries(
+                    Object.entries(slotData.timings.blobFirstSeenP2p).map(([node, blobs]) => [
+                      node,
+                      'timings' in blobs ? 
+                        Object.fromEntries(Object.entries(blobs.timings).map(([idx, time]) => [idx, Number(time)])) :
+                        Object.fromEntries(Object.entries(blobs).map(([idx, time]) => [idx, Number(time)]))
+                    ])
+                  ) : undefined,
+                  blockSeen: slotData?.timings?.blockSeen ? Object.fromEntries(
+                    Object.entries(slotData.timings.blockSeen).map(([node, time]) => [node, Number(time)])
+                  ) : undefined,
+                  blockFirstSeenP2p: slotData?.timings?.blockFirstSeenP2p ? Object.fromEntries(
+                    Object.entries(slotData.timings.blockFirstSeenP2p).map(([node, time]) => [node, Number(time)])
+                  ) : undefined
                 }}
                 currentTime={currentTime}
-                nodes={slotData?.nodes}
+                nodes={dataAvailabilityNodes}
               />
             </div>
 
@@ -1088,7 +1320,11 @@ export function SlotView({ slot, network = 'mainnet', isLive = false, onSlotComp
                 currentTime={currentTime}
                 loading={isLoading}
                 isMissing={isMissingData}
-                attestationWindows={slotData?.attestations?.windows}
+                attestationWindows={slotData?.attestations?.windows?.map(window => ({
+                  start_ms: Number(window.startMs),
+                  end_ms: Number(window.endMs),
+                  validator_indices: window.validatorIndices.map(Number)
+                }))}
                 maxPossibleValidators={maxPossibleValidators}
               />
             </div>

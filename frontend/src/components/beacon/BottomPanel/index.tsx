@@ -250,6 +250,7 @@ export function BottomPanel({
                       tickSize={2}
                       width={25}
                       strokeWidth={1}
+                      tickCount={3}
                       tickFormatter={(value) => Math.floor(value).toString()}
                     />
                     <Line
@@ -303,6 +304,8 @@ export function BottomPanel({
                       tickSize={2}
                       width={25}
                       strokeWidth={1}
+                      tickCount={4}
+                      tickFormatter={(value) => value.toString()}
                     />
                     <ReferenceLine
                       y={66}

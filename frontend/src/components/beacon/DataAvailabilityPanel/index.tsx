@@ -6,10 +6,10 @@ import { useModal } from '@/contexts/ModalContext.tsx'
 // Interface for DataAvailabilityPanelProps
 interface DataAvailabilityPanelProps {
   blobTimings: {
-    blob_seen?: Record<string, Record<string, number>>
-    blob_first_seen_p2p?: Record<string, Record<string, number>>
-    block_seen?: Record<string, number>
-    block_first_seen_p2p?: Record<string, number>
+    blobSeen?: Record<string, Record<string, number>>
+    blobFirstSeenP2p?: Record<string, Record<string, number>>
+    blockSeen?: Record<string, number>
+    blockFirstSeenP2p?: Record<string, number>
   }
   currentTime: number
   nodes?: Record<string, { geo?: { continent?: string } }>
@@ -78,10 +78,11 @@ const LabeledScatterPlot = ({
     <div className="w-full h-full">
       <NivoScatterChart
         data={[
-          {
-            id: 'blobs',
-            data: data.map(d => ({ x: d.time, y: d.index }))
-          },
+          // Create a separate series for each blob index
+          ...data.map(d => ({
+            id: `blob-${d.index}`,
+            data: [{ x: d.time, y: d.index }]
+          })),
           ...(blockTime !== null ? [{
             id: 'block',
             data: [{ x: blockTime, y: -0.5 }]
@@ -122,7 +123,13 @@ const LabeledScatterPlot = ({
           // For block series, use blue
           if (serieId === 'block') return 'rgb(0, 128, 255)'
           
-          // For blob series, use the first color from our palette
+          // For blob series, extract the index from the series ID and use it for coloring
+          if (serieId.toString().startsWith('blob-')) {
+            const index = parseInt(serieId.toString().replace('blob-', ''), 10);
+            return BLOB_COLORS[index % BLOB_COLORS.length];
+          }
+          
+          // Default fallback
           return BLOB_COLORS[0];
         }}
         nodeSize={4}
@@ -165,7 +172,7 @@ export function DataAvailabilityPanel({
   // Process blob timing data
   const { firstSeenData, isAllDataAvailable, blobCount, continentalData, timeWindow, arrivalData, blockTime } = useMemo(() => {
     // Early return only if we have no blob data at all
-    if (!blobTimings?.blob_seen && !blobTimings?.blob_first_seen_p2p) {
+    if (!blobTimings?.blobSeen && !blobTimings?.blobFirstSeenP2p) {
       return { firstSeenData: [], isAllDataAvailable: true, blobCount: 0, continentalData: [], timeWindow: { min: 0, max: 12, ticks: [] }, arrivalData: [], blockTime: 0 }
     }
 
@@ -175,7 +182,7 @@ export function DataAvailabilityPanel({
     const continentBlobTimes: Record<string, Record<string, number>> = {}
 
     // Process API timings
-    Object.entries(blobTimings.blob_seen || {}).forEach(([node, blobs]) => {
+    Object.entries(blobTimings.blobSeen || {}).forEach(([node, blobs]) => {
       Object.entries(blobs).forEach(([index, time]) => {
         seenBlobs.add(index)
         if (!firstSeenTimes[index] || time < firstSeenTimes[index]) {
@@ -196,7 +203,7 @@ export function DataAvailabilityPanel({
     })
 
     // Process P2P timings
-    Object.entries(blobTimings.blob_first_seen_p2p || {}).forEach(([node, blobs]) => {
+    Object.entries(blobTimings.blobFirstSeenP2p || {}).forEach(([node, blobs]) => {
       Object.entries(blobs).forEach(([index, time]) => {
         seenBlobs.add(index)
         if (!firstSeenTimes[index] || time < firstSeenTimes[index]) {
@@ -226,8 +233,8 @@ export function DataAvailabilityPanel({
 
     // Find earliest block time
     const blockTimes = [
-      ...Object.values(blobTimings.block_seen || {}).filter(t => t !== undefined),
-      ...Object.values(blobTimings.block_first_seen_p2p || {}).filter(t => t !== undefined)
+      ...Object.values(blobTimings.blockSeen || {}).filter(t => t !== undefined),
+      ...Object.values(blobTimings.blockFirstSeenP2p || {}).filter(t => t !== undefined)
     ]
     const blockTime = blockTimes.length > 0 ? Math.min(...blockTimes) / 1000 : null // Convert to seconds if we have times
 
@@ -240,15 +247,19 @@ export function DataAvailabilityPanel({
       // Add initial point
       points.push({ time: 0, percentage: 0 })
       
-      // Sort blob times for this continent
+      // Calculate and sort blob times for this continent
       const blobTimes = Object.entries(blobs)
         .sort((a, b) => a[1] - b[1])
       
+      // Track how many unique blob indices we've seen for this continent
+      const seenIndices = new Set<string>();
+      
       // Add a point for each blob seen
-      blobTimes.forEach(([, time], index) => {
+      blobTimes.forEach(([index, time]) => {
+        seenIndices.add(index);
         points.push({
           time: time / 1000,
-          percentage: ((index + 1) / seenBlobs.size) * 100
+          percentage: (seenIndices.size / Number(seenBlobs.size)) * 100
         })
       })
       
@@ -299,23 +310,23 @@ export function DataAvailabilityPanel({
 
     // For each node, track block and blob arrivals independently
     const allNodes = new Set([
-      ...Object.keys(blobTimings.block_seen || {}),
-      ...Object.keys(blobTimings.block_first_seen_p2p || {}),
-      ...Object.keys(blobTimings.blob_seen || {}),
-      ...Object.keys(blobTimings.blob_first_seen_p2p || {})
+      ...Object.keys(blobTimings.blockSeen || {}),
+      ...Object.keys(blobTimings.blockFirstSeenP2p || {}),
+      ...Object.keys(blobTimings.blobSeen || {}),
+      ...Object.keys(blobTimings.blobFirstSeenP2p || {})
     ])
 
     allNodes.forEach(node => {
       // Process block arrivals
       const blockTime = Math.min(
-        blobTimings.block_seen?.[node] ?? Infinity,
-        blobTimings.block_first_seen_p2p?.[node] ?? Infinity
+        blobTimings.blockSeen?.[node] ?? Infinity,
+        blobTimings.blockFirstSeenP2p?.[node] ?? Infinity
       )
 
       // Process blob arrivals
       const blobTimes = [
-        ...Object.values(blobTimings.blob_seen?.[node] || {}),
-        ...Object.values(blobTimings.blob_first_seen_p2p?.[node] || {})
+        ...Object.values(blobTimings.blobSeen?.[node] || {}),
+        ...Object.values(blobTimings.blobFirstSeenP2p?.[node] || {})
       ]
 
       // Add block arrival to bins
@@ -326,19 +337,29 @@ export function DataAvailabilityPanel({
 
           // If there are no blobs, also increment blob bins at the same time
           // since the block is all that's needed for data availability
-          if (seenBlobs.size === 0) {
+          if (Number(seenBlobs.size) === 0) {
             blobBins[binIndex]++
           }
         }
       }
 
       // Only process blob arrivals if there are blobs to track
-      if (seenBlobs.size > 0 && blobTimes.length > 0) {
-        const lastBlobTime = Math.max(...blobTimes)
-        if (lastBlobTime <= currentTime) {
-          const binIndex = Math.floor(lastBlobTime / 50)
-          if (binIndex >= 0 && binIndex < blobBins.length) {
-            blobBins[binIndex]++
+      if (Number(seenBlobs.size) > 0 && blobTimes.length > 0) {
+        // A node has complete data availability only when it has seen all blobs
+        // Check if this node has seen all blobs by comparing the count of unique blob indices seen
+        const seenBlobIndices = new Set([
+          ...Object.keys(blobTimings.blobSeen?.[node] || {}),
+          ...Object.keys(blobTimings.blobFirstSeenP2p?.[node] || {})
+        ]);
+        
+        // Only count a node as having data available when it has all blobs
+        if (seenBlobIndices.size === Number(seenBlobs.size)) {
+          const lastBlobTime = Math.max(...blobTimes)
+          if (lastBlobTime <= currentTime) {
+            const binIndex = Math.floor(lastBlobTime / 50)
+            if (binIndex >= 0 && binIndex < blobBins.length) {
+              blobBins[binIndex]++
+            }
           }
         }
       }
@@ -357,8 +378,8 @@ export function DataAvailabilityPanel({
 
     return {
       firstSeenData: data,
-      isAllDataAvailable: data.length === seenBlobs.size,
-      blobCount: seenBlobs.size,
+      isAllDataAvailable: data.length === Number(seenBlobs.size),
+      blobCount: Number(seenBlobs.size),
       continentalData,
       timeWindow: {
         min: minTime,
@@ -389,7 +410,7 @@ export function DataAvailabilityPanel({
           <div className="flex items-center gap-4 mt-2 md:mt-0">
             <div className="flex items-center gap-2 text-sm">
               <span className="text-tertiary">Blobs:</span>
-              <span className="font-mono text-primary">{blobCount}</span>
+              <span className="font-mono text-primary">{Number(blobCount)}</span>
             </div>
             <div className="flex items-center gap-2 text-sm">
               <span className="text-tertiary">Data is available:</span>
