@@ -177,7 +177,7 @@ func (s *Service) initializeServices(ctx context.Context) error {
 	reflection.Register(s.grpcServer)
 
 	// Initialize our LabAPI implementation
-	labAPIServer := NewLabAPIServer(s.cacheClient, s.storageClient, conn)
+	labAPIServer := NewLabAPIServer(s.cacheClient, s.storageClient, conn, s.log)
 
 	// Create a listener for the gRPC/HTTP server
 	lis, err := net.Listen("tcp", fmt.Sprintf("%s:%d", s.config.HttpServer.Host, s.config.HttpServer.Port))

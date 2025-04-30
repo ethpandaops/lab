@@ -3,6 +3,7 @@ package grpc
 import (
 	"context"
 
+	"github.com/attestantio/go-eth2-client/spec/phase0"
 	"github.com/sirupsen/logrus"
 
 	grpc_go "google.golang.org/grpc"
@@ -55,4 +56,15 @@ func (h *BeaconSlotsHandler) GetRecentLocallyBuiltBlocks(ctx context.Context, re
 	}
 
 	return &beacon_slots.GetRecentLocallyBuiltBlocksResponse{SlotBlocks: blocks}, nil
+}
+
+func (h *BeaconSlotsHandler) GetSlotData(ctx context.Context, req *beacon_slots.GetSlotDataRequest) (*beacon_slots.GetSlotDataResponse, error) {
+	data, err := h.service.FetchSlotData(ctx, req.Network, phase0.Slot(req.Slot))
+	if err != nil {
+		h.log.WithError(err).Error("Failed to get slot data")
+
+		return nil, status.Error(codes.Internal, "failed to get slot data")
+	}
+
+	return &beacon_slots.GetSlotDataResponse{Data: data}, nil
 }

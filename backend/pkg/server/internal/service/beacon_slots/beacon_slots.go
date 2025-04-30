@@ -2,6 +2,7 @@ package beacon_slots
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"sync"
 	"time"
@@ -16,6 +17,7 @@ import (
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/state"
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/storage"
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/xatu"
+	bs_pb "github.com/ethpandaops/lab/backend/pkg/server/proto/beacon_slots"
 	pb "github.com/ethpandaops/lab/backend/pkg/server/proto/lab"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/sirupsen/logrus"
@@ -64,6 +66,10 @@ type BeaconSlots struct {
 	// Base directory for storage
 	baseDir string
 }
+
+const (
+	slotCacheKey = "beacon_slot_data_%s_%d"
+)
 
 func New(
 	log logrus.FieldLogger,
@@ -169,6 +175,40 @@ func (b *BeaconSlots) Start(ctx context.Context) error {
 	}
 
 	return nil
+}
+
+func (b *BeaconSlots) FetchSlotData(ctx context.Context, network string, slot phase0.Slot) (*bs_pb.BeaconSlotData, error) {
+	// Check if this is a network that we support
+	if b.ethereum.GetNetwork(network) == nil {
+		return nil, fmt.Errorf("network %s not supported", network)
+	}
+
+	// Check if we've got the slot data in cache
+	cacheData, err := b.cacheClient.Get(fmt.Sprintf(slotCacheKey, network, slot))
+	if err == nil {
+		var data *bs_pb.BeaconSlotData
+		if err := json.Unmarshal(cacheData, &data); err == nil {
+			return data, nil
+		}
+	}
+
+	// Load the slot data from storage
+	var slotData *bs_pb.BeaconSlotData
+	if err := b.storageClient.GetEncoded(ctx, b.getSlotStoragePath(network, slot), &slotData, storage.CodecNameJSON); err != nil {
+		return nil, fmt.Errorf("failed to get slot data for network %s and slot %d: %w", network, slot, err)
+	}
+
+	// If the slot is "recent", cache the data
+	slotTime, _, err := b.ethereum.GetNetwork(network).GetWallclock().Now()
+	if err != nil {
+		return nil, fmt.Errorf("failed to get current slot for network %s: %w", network, err)
+	}
+
+	if slotTime.TimeWindow().Start().Before(time.Now().Add(2 * time.Minute)) {
+		b.cacheClient.Set(fmt.Sprintf(slotCacheKey, network, slot), cacheData, 2*time.Minute)
+	}
+
+	return slotData, nil
 }
 
 func (b *BeaconSlots) Stop() {
@@ -388,7 +428,7 @@ func (b *BeaconSlots) processHead(ctx context.Context, networkName string) {
 		startTime := time.Now()
 
 		// Process the slot
-		processed, err := b.processSlot(ctx, networkName, targetSlot)
+		processed, slotData, err := b.processSlot(ctx, networkName, targetSlot)
 		if err != nil {
 			logCtx.WithError(err).WithField("slot", targetSlot).Error("Failed to process slot")
 
@@ -411,6 +451,14 @@ func (b *BeaconSlots) processHead(ctx context.Context, networkName string) {
 
 			// Update last processed slot metric
 			b.lastProcessedSlotMetric.WithLabelValues(networkName, HeadProcessorName).Set(float64(currentSlot))
+
+			// Cache the slot data since it's recent
+			cacheData, err := json.Marshal(slotData)
+			if err != nil {
+				logCtx.WithError(err).Error("Failed to marshal slot data")
+			} else {
+				b.cacheClient.Set(fmt.Sprintf(slotCacheKey, networkName, currentSlot), cacheData, 2*time.Minute)
+			}
 
 			logCtx.WithField("slot", currentSlot).WithField("processing_time", time.Since(startTime)).Info("Successfully processed head slot")
 		}
@@ -512,7 +560,7 @@ func (b *BeaconSlots) processTrailing(ctx context.Context, networkName string) {
 		}
 
 		// Process the slot
-		processed, err := b.processSlot(ctx, networkName, nextSlot)
+		processed, _, err := b.processSlot(ctx, networkName, nextSlot)
 		if err != nil {
 			logCtx.WithError(err).WithField("slot", nextSlot).Error("Failed to process slot")
 
@@ -634,7 +682,7 @@ func (b *BeaconSlots) processBackfill(ctx context.Context, networkName string) {
 
 		if !processed {
 			// Process the slot
-			processed, err := b.processSlot(ctx, networkName, nextSlot)
+			processed, _, err := b.processSlot(ctx, networkName, nextSlot)
 			if err != nil {
 				logCtx.WithError(err).WithField("slot", nextSlot).Error("Failed to process slot")
 

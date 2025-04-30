@@ -8,6 +8,7 @@ import (
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/cache"
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/storage"
 	beaconslotspb "github.com/ethpandaops/lab/backend/pkg/server/proto/beacon_slots"
+	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 	// Removed metadata and proto imports as they were only used by removed functions
 )
@@ -25,6 +26,8 @@ var StandardHTTPHeaders = map[string]string{
 type LabAPIServerImpl struct {
 	apipb.UnimplementedLabAPIServer
 
+	log logrus.FieldLogger
+
 	cache   cache.Client
 	storage storage.Client
 
@@ -32,11 +35,12 @@ type LabAPIServerImpl struct {
 	beaconSlotsClient beaconslotspb.BeaconSlotsClient
 }
 
-func NewLabAPIServer(cacheClient cache.Client, storageClient storage.Client, beaconSlotsConn *grpc.ClientConn) *LabAPIServerImpl {
+func NewLabAPIServer(cacheClient cache.Client, storageClient storage.Client, beaconSlotsConn *grpc.ClientConn, log logrus.FieldLogger) *LabAPIServerImpl {
 	return &LabAPIServerImpl{
 		cache:             cacheClient,
 		storage:           storageClient,
 		beaconSlotsClient: beaconslotspb.NewBeaconSlotsClient(beaconSlotsConn),
+		log:               log,
 	}
 }
 
@@ -63,6 +67,8 @@ func (s *LabAPIServerImpl) GetRecentLocallyBuiltBlocks(ctx context.Context, req 
 }
 
 func (s *LabAPIServerImpl) GetSlotData(ctx context.Context, req *connect.Request[apipb.GetSlotDataRequest]) (*connect.Response[apipb.GetSlotDataResponse], error) {
+	s.log.WithField("network", req.Msg.Network).WithField("slot", req.Msg.Slot).Debug("GetSlotData")
+
 	// Forward the request to the beacon slots service
 	resp, err := s.beaconSlotsClient.GetSlotData(ctx, &beaconslotspb.GetSlotDataRequest{
 		Network: req.Msg.Network,

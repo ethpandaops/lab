@@ -819,8 +819,8 @@ func (b *BeaconSlots) getMevRelayBids(ctx context.Context, networkName string, s
 			Value:                value,
 			GasLimit:             gasLimit,
 			GasUsed:              gasUsed,
-			SlotTime:             slotTime,
-			TimeBucket:           timeBucket,
+			SlotTime:             int32(slotTime),
+			TimeBucket:           int32(timeBucket),
 		}
 
 		// Get or create the wrapper for the current relay

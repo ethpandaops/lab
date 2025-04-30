@@ -9,13 +9,14 @@ import (
 
 	"github.com/attestantio/go-eth2-client/spec/phase0"
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/storage"
+	bs_pb "github.com/ethpandaops/lab/backend/pkg/server/proto/beacon_slots"
 	pb "github.com/ethpandaops/lab/backend/pkg/server/proto/beacon_slots"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/sync/errgroup"
 )
 
 // processSlot processes a single slot
-func (b *BeaconSlots) processSlot(ctx context.Context, networkName string, slot phase0.Slot) (bool, error) {
+func (b *BeaconSlots) processSlot(ctx context.Context, networkName string, slot phase0.Slot) (bool, *bs_pb.BeaconSlotData, error) {
 	startTime := time.Now()
 
 	b.log.WithField("network", networkName).
@@ -38,7 +39,7 @@ func (b *BeaconSlots) processSlot(ctx context.Context, networkName string, slot 
 		if strings.Contains(err.Error(), "no rows returned") {
 			b.log.WithField("slot", slot).WithField("network", networkName).Debug("No block data found for slot")
 
-			return true, nil
+			return true, nil, nil
 		}
 
 		// Record error in metrics
@@ -51,13 +52,13 @@ func (b *BeaconSlots) processSlot(ctx context.Context, networkName string, slot 
 			errorCounter.WithLabelValues(networkName, "all", "block_data").Inc()
 		}
 
-		return false, fmt.Errorf("failed to get block data: %w", err)
+		return false, nil, fmt.Errorf("failed to get block data: %w", err)
 	}
 
 	if blockData == nil {
 		b.log.WithField("slot", slot).Debug("No block data found for slot")
 
-		return false, nil
+		return false, nil, nil
 	}
 
 	// Create an error group for parallel execution
@@ -202,7 +203,7 @@ func (b *BeaconSlots) processSlot(ctx context.Context, networkName string, slot 
 		// Check if the error is critical (e.g., from entity fetching)
 		// For now, we only consider entity errors critical if they are not ErrEntityNotFound
 		if errr != nil && !errors.Is(errr, ErrEntityNotFound) {
-			return false, fmt.Errorf("parallel processing error: %w", errr)
+			return false, nil, fmt.Errorf("parallel processing error: %w", errr)
 		}
 		// Log non-critical errors from the group but continue
 		b.log.WithError(errr).WithFields(log.Fields{"slot": slot, "network": networkName}).Warn("Non-critical error during parallel data fetching")
@@ -210,11 +211,11 @@ func (b *BeaconSlots) processSlot(ctx context.Context, networkName string, slot 
 
 	// Check errors from critical operations
 	if proposerErr != nil {
-		return false, fmt.Errorf("failed to get proposer data: %w", proposerErr)
+		return false, nil, fmt.Errorf("failed to get proposer data: %w", proposerErr)
 	}
 
 	if maxAttestationErr != nil {
-		return false, fmt.Errorf("failed to get maximum attestation votes: %w", maxAttestationErr)
+		return false, nil, fmt.Errorf("failed to get maximum attestation votes: %w", maxAttestationErr)
 	}
 
 	// Create the full timings structure
@@ -243,7 +244,7 @@ func (b *BeaconSlots) processSlot(ctx context.Context, networkName string, slot 
 		deliveredPayloads, // Pass MEV data
 	)
 	if err != nil {
-		return false, fmt.Errorf("failed to transform slot data: %w", err)
+		return false, nil, fmt.Errorf("failed to transform slot data: %w", err)
 	}
 
 	// 8. Store the data to storage
@@ -266,7 +267,7 @@ func (b *BeaconSlots) processSlot(ctx context.Context, networkName string, slot 
 			errorCounter.WithLabelValues(networkName, "all", "storage").Inc()
 		}
 
-		return false, fmt.Errorf("failed to store slot data: %w", err)
+		return false, nil, fmt.Errorf("failed to store slot data: %w", err)
 	}
 
 	// Record processing duration
@@ -282,5 +283,5 @@ func (b *BeaconSlots) processSlot(ctx context.Context, networkName string, slot 
 		histogram.WithLabelValues(networkName, "all").Observe(duration)
 	}
 
-	return true, nil
+	return true, slotData, nil
 }
