@@ -94,7 +94,7 @@ jobs:
           gotestsum --junitfile test-results/integration-tests.xml --format testname -- -v -race -coverprofile=coverage.txt -covermode=atomic ./... -run Integration
       
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v5
         with:
           file: ./backend/coverage.txt
           flags: ${{ matrix.test-type }}-tests
