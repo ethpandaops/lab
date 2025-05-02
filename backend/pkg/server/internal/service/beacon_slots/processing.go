@@ -9,14 +9,15 @@ import (
 
 	"github.com/attestantio/go-eth2-client/spec/phase0"
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/storage"
-	bs_pb "github.com/ethpandaops/lab/backend/pkg/server/proto/beacon_slots"
 	pb "github.com/ethpandaops/lab/backend/pkg/server/proto/beacon_slots"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/sync/errgroup"
 )
 
 // processSlot processes a single slot
-func (b *BeaconSlots) processSlot(ctx context.Context, networkName string, slot phase0.Slot) (bool, *bs_pb.BeaconSlotData, error) {
+//
+//nolint:gocyclo // This function is unavoidably complex due to the parallel processing of multiple data sources
+func (b *BeaconSlots) processSlot(ctx context.Context, networkName string, slot phase0.Slot) (bool, *pb.BeaconSlotData, error) {
 	startTime := time.Now()
 
 	b.log.WithField("network", networkName).
@@ -183,6 +184,7 @@ func (b *BeaconSlots) processSlot(ctx context.Context, networkName string, slot 
 		} else if bids != nil {
 			relayBids = bids
 		}
+
 		return nil
 	})
 
@@ -195,6 +197,7 @@ func (b *BeaconSlots) processSlot(ctx context.Context, networkName string, slot 
 		} else if payloads != nil {
 			deliveredPayloads = payloads // Assignment now matches the updated variable type
 		}
+
 		return nil
 	})
 

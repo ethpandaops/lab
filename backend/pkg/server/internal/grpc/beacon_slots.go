@@ -2,6 +2,7 @@ package grpc
 
 import (
 	"context"
+	"fmt" // Added fmt import here
 
 	"github.com/attestantio/go-eth2-client/spec/phase0"
 	"github.com/sirupsen/logrus"
@@ -59,6 +60,11 @@ func (h *BeaconSlotsHandler) GetRecentLocallyBuiltBlocks(ctx context.Context, re
 }
 
 func (h *BeaconSlotsHandler) GetSlotData(ctx context.Context, req *beacon_slots.GetSlotDataRequest) (*beacon_slots.GetSlotDataResponse, error) {
+	// Ensure the slot number is not negative before converting to uint64 (phase0.Slot)
+	if req.Slot < 0 {
+		return nil, status.Error(codes.InvalidArgument, fmt.Sprintf("invalid slot number: %d cannot be negative", req.Slot))
+	}
+
 	data, err := h.service.FetchSlotData(ctx, req.Network, phase0.Slot(req.Slot))
 	if err != nil {
 		h.log.WithError(err).Error("Failed to get slot data")

@@ -18,6 +18,9 @@ var ErrEntityNotFound = errors.New("no entity found for validator index")
 // ErrBlockDataNotFound is returned when no block data is found for a slot
 var ErrBlockDataNotFound = errors.New("no block data found for slot")
 
+// ErrNoRowsReturned is a common error string from ClickHouse
+const ErrNoRowsReturned = "no rows returned"
+
 // getProposerEntity gets entity for a given validator index
 func (b *BeaconSlots) getProposerEntity(ctx context.Context, networkName string, index int64) (*string, error) {
 	// Query ClickHouse for the entity
@@ -41,7 +44,7 @@ func (b *BeaconSlots) getProposerEntity(ctx context.Context, networkName string,
 	// Execute the query
 	result, err := ch.QueryRow(ctx, query, index, networkName)
 	if err != nil {
-		if err.Error() == "no rows returned" {
+		if err.Error() == ErrNoRowsReturned {
 			return nil, ErrEntityNotFound
 		}
 
@@ -717,6 +720,7 @@ func (b *BeaconSlots) getMevRelayBids(ctx context.Context, networkName string, s
 		return nil, fmt.Errorf("failed to get ClickHouse client for network %s: %w", networkName, err)
 	}
 
+	//nolint:gosec // The time value range is acceptable for uint64 conversion
 	slotStartTimeMs := uint64(slotStartTime.UnixMilli())
 	timeBucketMs := int64(50) // Define time bucket granularity in ms
 
@@ -766,14 +770,15 @@ func (b *BeaconSlots) getMevRelayBids(ctx context.Context, networkName string, s
 		slotStartTimeMs) // For slot_time filtering
 
 	if err != nil {
-		// It's okay if no bids are found, return an empty map
-		if err.Error() == "no rows returned" { // Check specific error string
+		if err.Error() == ErrNoRowsReturned { // Check specific error string
 			log.WithFields(log.Fields{
 				"slot":    slot,
 				"network": networkName,
 			}).Debug("No MEV relay bids found for slot")
+
 			return make(map[string]*pb.RelayBids), nil // Return empty map of the correct type
 		}
+
 		return nil, fmt.Errorf("failed to query MEV relay bids: %w", err)
 	}
 
@@ -783,35 +788,46 @@ func (b *BeaconSlots) getMevRelayBids(ctx context.Context, networkName string, s
 	for _, row := range result {
 		// Safely parse fields, logging errors for bad data
 		relayName := fmt.Sprintf("%v", row["relay_name"])
+
 		rowSlot, err := strconv.ParseUint(fmt.Sprintf("%v", row["slot"]), 10, 64)
 		if err != nil {
 			log.WithError(err).WithFields(log.Fields{"slot": slot, "network": networkName, "relay": relayName, "field": "slot", "value": row["slot"]}).Warn("Failed to parse relay bid slot")
+
 			continue
 		}
+
 		parentHash := fmt.Sprintf("%v", row["parent_hash"])
 		blockHash := fmt.Sprintf("%v", row["block_hash"])
 		builderPubkey := fmt.Sprintf("%v", row["builder_pubkey"])
 		proposerPubkey := fmt.Sprintf("%v", row["proposer_pubkey"])
 		proposerFeeRecipient := fmt.Sprintf("%v", row["proposer_fee_recipient"])
 		value := fmt.Sprintf("%v", row["value"]) // Value is already string
+
 		gasLimit, err := strconv.ParseUint(fmt.Sprintf("%v", row["gas_limit"]), 10, 64)
 		if err != nil {
 			log.WithError(err).WithFields(log.Fields{"slot": slot, "network": networkName, "relay": relayName, "field": "gas_limit", "value": row["gas_limit"]}).Warn("Failed to parse relay bid gas_limit")
+
 			gasLimit = 0 // Default to 0 if parsing fails
 		}
+
 		gasUsed, err := strconv.ParseUint(fmt.Sprintf("%v", row["gas_used"]), 10, 64)
 		if err != nil {
 			log.WithError(err).WithFields(log.Fields{"slot": slot, "network": networkName, "relay": relayName, "field": "gas_used", "value": row["gas_used"]}).Warn("Failed to parse relay bid gas_used")
+
 			gasUsed = 0 // Default to 0 if parsing fails
 		}
+
 		slotTime, err := strconv.ParseInt(fmt.Sprintf("%v", row["slot_time"]), 10, 64)
 		if err != nil {
 			log.WithError(err).WithFields(log.Fields{"slot": slot, "network": networkName, "relay": relayName, "field": "slot_time", "value": row["slot_time"]}).Warn("Failed to parse relay bid slot_time")
-			continue // Skip if slot_time is crucial and invalid
+
+			continue // Skip because slot_time is crucial
 		}
+
 		timeBucket, err := strconv.ParseInt(fmt.Sprintf("%v", row["time_bucket"]), 10, 64)
 		if err != nil {
 			log.WithError(err).WithFields(log.Fields{"slot": slot, "network": networkName, "relay": relayName, "field": "time_bucket", "value": row["time_bucket"]}).Warn("Failed to parse relay bid time_bucket")
+
 			timeBucket = 0 // Default to 0 if parsing fails
 		}
 
@@ -825,8 +841,8 @@ func (b *BeaconSlots) getMevRelayBids(ctx context.Context, networkName string, s
 			Value:                value,
 			GasLimit:             gasLimit,
 			GasUsed:              gasUsed,
-			SlotTime:             int32(slotTime),
-			TimeBucket:           int32(timeBucket),
+			SlotTime:             int32(slotTime),   //nolint:gosec // Time value is controlled and within int32 range
+			TimeBucket:           int32(timeBucket), //nolint:gosec // Time value is controlled and within int32 range
 		}
 
 		// Get or create the wrapper for the current relay
@@ -882,14 +898,15 @@ func (b *BeaconSlots) getMevDeliveredPayloads(ctx context.Context, networkName s
 
 	result, err := ch.Query(ctx, query, slot, networkName, startTimeStr, endTimeStr)
 	if err != nil {
-		// It's okay if no payloads are found, return an empty map
-		if err.Error() == "no rows returned" { // Check specific error string
+		if err.Error() == ErrNoRowsReturned { // Check specific error string
 			log.WithFields(log.Fields{
 				"slot":    slot,
 				"network": networkName,
 			}).Debug("No MEV delivered payloads found for slot")
+
 			return make(map[string]*pb.DeliveredPayloads), nil // Return empty map of the correct type
 		}
+
 		return nil, fmt.Errorf("failed to query MEV delivered payloads: %w", err)
 	}
 
@@ -899,19 +916,27 @@ func (b *BeaconSlots) getMevDeliveredPayloads(ctx context.Context, networkName s
 	for _, row := range result {
 		// Safely parse fields
 		relayName := fmt.Sprintf("%v", row["relay_name"])
+
 		rowSlot, err := strconv.ParseUint(fmt.Sprintf("%v", row["slot"]), 10, 64)
 		if err != nil {
 			log.WithError(err).WithFields(log.Fields{"slot": slot, "network": networkName, "relay": relayName, "field": "slot", "value": row["slot"]}).Warn("Failed to parse delivered payload slot")
+
 			continue
 		}
+
 		blockHash := fmt.Sprintf("%v", row["block_hash"])
+
 		blockNumber, err := strconv.ParseUint(fmt.Sprintf("%v", row["block_number"]), 10, 64)
 		if err != nil {
 			log.WithError(err).WithFields(log.Fields{"slot": slot, "network": networkName, "relay": relayName, "field": "block_number", "value": row["block_number"]}).Warn("Failed to parse delivered payload block_number")
+
 			continue
 		}
+
 		proposerPubkey := fmt.Sprintf("%v", row["proposer_pubkey"])
+
 		proposerFeeRecipient := fmt.Sprintf("%v", row["proposer_fee_recipient"])
+
 		payload := &pb.DeliveredPayload{
 			Slot:                 rowSlot,
 			BlockHash:            blockHash,
@@ -926,6 +951,7 @@ func (b *BeaconSlots) getMevDeliveredPayloads(ctx context.Context, networkName s
 			wrapper = &pb.DeliveredPayloads{Payloads: make([]*pb.DeliveredPayload, 0)}
 			deliveredPayloadsMap[relayName] = wrapper
 		}
+
 		// Append the payload to the wrapper's list
 		wrapper.Payloads = append(wrapper.Payloads, payload)
 	}

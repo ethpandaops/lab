@@ -2,8 +2,10 @@ package api
 
 import (
 	"context"
+	"fmt"
+	"math"
 
-	"connectrpc.com/connect"
+	"connectrpc.com/connect" // Renamed import alias
 	"github.com/ethpandaops/lab/backend/pkg/api/proto"
 	apipb "github.com/ethpandaops/lab/backend/pkg/api/proto/protoconnect"
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/cache"
@@ -11,7 +13,6 @@ import (
 	beaconslotspb "github.com/ethpandaops/lab/backend/pkg/server/proto/beacon_slots"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
-	// Removed metadata and proto imports as they were only used by removed functions
 )
 
 // StandardHTTPHeaders defines common HTTP headers that can be set on responses
@@ -70,10 +71,15 @@ func (s *LabAPIServerImpl) GetRecentLocallyBuiltBlocks(ctx context.Context, req 
 func (s *LabAPIServerImpl) GetSlotData(ctx context.Context, req *connect.Request[proto.GetSlotDataRequest]) (*connect.Response[proto.GetSlotDataResponse], error) {
 	s.log.WithField("network", req.Msg.Network).WithField("slot", req.Msg.Slot).Debug("GetSlotData")
 
+	// Check for potential overflow before converting uint64 slot to int64
+	if req.Msg.Slot > math.MaxInt64 {
+		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("slot number %d exceeds maximum representable value", req.Msg.Slot))
+	}
+
 	// Forward the request to the beacon slots service
 	resp, err := s.beaconSlotsClient.GetSlotData(ctx, &beaconslotspb.GetSlotDataRequest{
 		Network: req.Msg.Network,
-		Slot:    int64(req.Msg.Slot),
+		Slot:    int64(req.Msg.Slot), //nolint:gosec // We check for overflow above
 	})
 	if err != nil {
 		return nil, err

@@ -212,7 +212,11 @@ func (b *BeaconSlots) FetchSlotData(ctx context.Context, network string, slot ph
 	}
 
 	if slotTime.TimeWindow().Start().Before(time.Now().Add(2 * time.Minute)) {
-		b.cacheClient.Set(cacheKey, dataBytes, 2*time.Minute)
+		err = b.cacheClient.Set(cacheKey, dataBytes, 2*time.Minute)
+		if err != nil {
+			// Don't return error, caching is best-effort
+			b.log.WithError(err).WithField("key", cacheKey).Warn("Failed to set slot data in cache")
+		}
 	}
 
 	return slotData, nil
@@ -464,7 +468,13 @@ func (b *BeaconSlots) processHead(ctx context.Context, networkName string) {
 			if err != nil {
 				logCtx.WithError(err).Error("Failed to marshal slot data")
 			} else {
-				b.cacheClient.Set(fmt.Sprintf(slotCacheKey, networkName, targetSlot), cacheData, 2*time.Minute)
+				cacheKey := fmt.Sprintf(slotCacheKey, networkName, targetSlot)
+
+				err = b.cacheClient.Set(cacheKey, cacheData, 2*time.Minute)
+				if err != nil {
+					// Don't return error, caching is best-effort
+					logCtx.WithError(err).WithField("key", cacheKey).Warn("Failed to set slot data in cache")
+				}
 			}
 
 			logCtx.WithField("slot", currentSlot).WithField("processing_time", time.Since(startTime)).Info("Successfully processed head slot")

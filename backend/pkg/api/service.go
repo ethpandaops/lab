@@ -107,9 +107,9 @@ func (s *Service) Start(ctx context.Context) error {
 		if !strings.HasPrefix(prefix, "/") {
 			prefix = "/" + prefix
 		}
-		if strings.HasSuffix(prefix, "/") {
-			prefix = prefix[:len(prefix)-1]
-		}
+
+		prefix = strings.TrimSuffix(prefix, "/")
+
 		s.log.WithField("prefix", prefix).Info("Using path prefix")
 	}
 
@@ -149,8 +149,6 @@ func (s *Service) Start(ctx context.Context) error {
 
 			// For requests targeting the Connect API routes (/lab-data/api/...)
 			if strings.HasPrefix(path, prefix+"/api/") {
-				s.log.WithField("path", path).Debug("Routing to Connect handler")
-
 				// Create a copy of the request with path adjustments for Connect handler
 				r2 := *r
 				u2 := *r.URL
@@ -159,22 +157,24 @@ func (s *Service) Start(ctx context.Context) error {
 				r2.URL.Path = strings.TrimPrefix(path, prefix+"/api")
 
 				handler.ServeHTTP(w, &r2)
+
 				return
 			}
 
 			// For all other requests under the prefix, forward to the legacy router
 			if strings.HasPrefix(path, prefix+"/") {
-				s.log.WithField("path", path).Debug("Routing to legacy handler")
-
 				// Forward to router which has handlers registered with the prefix
 				s.router.ServeHTTP(w, r)
+
 				return
 			}
 
-			// Any non-prefixed requests end up here (health checks, etc.)
-			s.log.WithField("path", path).Debug("Root path request")
 			w.WriteHeader(http.StatusOK)
-			w.Write([]byte("OK"))
+
+			_, err := w.Write([]byte("OK"))
+			if err != nil {
+				s.log.WithError(err).Error("Failed to write health check response")
+			}
 		})
 
 		rootMux = http.NewServeMux()
@@ -187,8 +187,9 @@ func (s *Service) Start(ctx context.Context) error {
 
 	// Create the server
 	s.server = &http.Server{
-		Addr:    fmt.Sprintf("%s:%d", s.config.HttpServer.Host, s.config.HttpServer.Port),
-		Handler: s.getCORSHandler(rootMux),
+		Addr:              fmt.Sprintf("%s:%d", s.config.HttpServer.Host, s.config.HttpServer.Port),
+		Handler:           s.getCORSHandler(rootMux),
+		ReadHeaderTimeout: 10 * time.Second,
 	}
 
 	// Start the server
@@ -199,12 +200,14 @@ func (s *Service) Start(ctx context.Context) error {
 
 	go func() {
 		s.log.WithField("addr", s.server.Addr).Info("Starting HTTP server")
+
 		if err := s.server.Serve(lis); err != nil && !errors.Is(err, http.ErrServerClosed) {
 			s.log.WithError(err).Error("HTTP server error")
 		}
 	}()
 
 	<-s.ctx.Done()
+
 	s.log.Info("Context canceled, cleaning up")
 
 	s.cleanup()
