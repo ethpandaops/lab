@@ -1,17 +1,13 @@
 import React, { useMemo } from 'react';
-// Removed unused imports: DeliveredPayload, RelayBids, DeliveredPayloads, SlimTimings
-import { BeaconSlotData, RelayBid } from '@/api/gen/backend/pkg/server/proto/beacon_slots/beacon_slots_pb';
-// Removed formatGwei import, will format inline
-import { Box, Layers3, PackageCheck } from 'lucide-react'; // Example icons
-import clsx from 'clsx';
-import { protoInt64 } from '@bufbuild/protobuf';
+import { BeaconSlotData } from '@/api/gen/backend/pkg/server/proto/beacon_slots/beacon_slots_pb';
+import { Box, PackageCheck, Zap, ChevronRight } from 'lucide-react';
 
 // Define the structure for events processed for the timeline
 interface TimelineEvent {
   type: 'bid' | 'payload' | 'block';
   time: number; // Time in milliseconds relative to the start of the *current* slot (can be negative or > 12000)
   value?: bigint | number | string; // e.g., bid value, payload value, block node ID
-  label: string; // e.g., Relay Name, Builder Pubkey, Node ID
+  relay: string; // The relay name
   slotOffset: number; // -1 for previous, 0 for current, 1 for next
 }
 
@@ -24,34 +20,64 @@ interface MultiSlotEventTimelineProps {
   currentSlotNumber: number | null;
 }
 
-// Helper to format Gwei (simplified)
+// Utility function to format Gwei value simply 
 const formatGweiSimple = (value: bigint | number | string | undefined): string => {
-    if (value === undefined || value === null) return 'N/A';
-    const wei = typeof value === 'string' ? BigInt(value) : protoInt64.parse(value);
-    const gwei = Number(wei) / 1e9;
-    if (gwei < 0.001) return '< 0.001';
-    return gwei.toFixed(3);
-}
-
-// Helper to safely get relay/builder name from map key or bid
-const getEntityName = (relayName: string | undefined, bid?: RelayBid): string => {
-    if (bid?.builderPubkey) {
-        // Prefer builder pubkey if available on the bid itself
-        return `Builder ${bid.builderPubkey.substring(0, 8)}...`;
+  if (value === undefined || value === null) return 'N/A';
+  try {
+    let bigIntValue: bigint;
+    if (typeof value === 'bigint') {
+      bigIntValue = value;
+    } else if (typeof value === 'number') {
+      bigIntValue = BigInt(Math.floor(value));
+    } else {
+      bigIntValue = BigInt(value);
     }
-    if (relayName) {
-        // Fallback to relay name from the map key
-        return relayName.charAt(0).toUpperCase() + relayName.slice(1); // Simple capitalization
+    
+    // Convert Wei to Gwei (divide by 10^9)
+    const gweiValue = Number(bigIntValue / (10n**9n)); 
+    
+    // Format based on size
+    if (gweiValue >= 1_000_000) {
+      return `${(gweiValue / 1_000_000).toFixed(1)}M`;
+    } else if (gweiValue >= 1_000) {
+      return `${(gweiValue / 1_000).toFixed(1)}K`;
+    } else {
+      return `${gweiValue.toFixed(1)}`;
     }
-    return 'Unknown';
+  } catch (error) {
+    console.error("Error formatting Gwei value:", error);
+    return 'N/A';
+  }
 };
 
-// Helper to get node name from block arrival map key
-const getNodeNameFromMapKey = (key: string): string => {
-    // Assuming key format is "username/node-name" or just "node-name"
-    const parts = key.split('/');
-    return parts[parts.length - 1] || key;
-}
+// Helper to format ETH value for tooltip
+const formatEthValue = (wei: string | bigint | number | undefined): string => {
+  if (wei === undefined || wei === null) return 'N/A';
+  try {
+    let weiBigInt: bigint;
+    if (typeof wei === 'bigint') {
+      weiBigInt = wei;
+    } else if (typeof wei === 'number') {
+      weiBigInt = BigInt(Math.floor(wei));
+    } else {
+      weiBigInt = BigInt(wei);
+    }
+    const ethValue = Number(weiBigInt * 10000n / (10n**18n)) / 10000;
+    return ethValue.toFixed(4);
+  } catch (error) {
+    console.error("Error formatting ETH value:", error);
+    return 'N/A';
+  }
+};
+
+// Function to format node ID for display
+const getNodeNameFromMapKey = (nodeId: string | number | bigint): string => {
+  const idStr = String(nodeId);
+  if (idStr.length > 10) {
+    return `${idStr.substring(0, 6)}...`;
+  }
+  return idStr;
+};
 
 const SLOT_DURATION_MS = 12000;
 
@@ -72,58 +98,52 @@ export const MultiSlotEventTimeline: React.FC<MultiSlotEventTimelineProps> = ({
 
       // Process Bids from the map
       if (slotData.relayBids) {
-        Object.entries(slotData.relayBids).forEach(([relayName, relayBidsContainer]) => {
-            // Removed explicit : RelayBid type annotation to satisfy linter
-            relayBidsContainer.bids.forEach((bid) => {
-                // Use bid.slotTime which is already relative ms
-                const relativeTime = bid.slotTime;
-                events.push({
-                    type: 'bid',
-                    time: relativeTime + baseTimeOffset,
-                    value: bid.value, // Value is string representation of uint256
-                    label: getEntityName(relayName, bid), // Pass relayName and bid
-                    slotOffset: slotOffset,
-                });
+        Object.entries(slotData.relayBids).forEach(([relay, relayBidsContainer]) => {
+          relayBidsContainer.bids.forEach((bid) => {
+            // Use bid.slotTime which is already relative ms
+            const relativeTime = bid.slotTime;
+            events.push({
+              type: 'bid',
+              time: relativeTime + baseTimeOffset,
+              value: bid.value, // Value is string representation of uint256
+              relay, // Store relay name directly
+              slotOffset: slotOffset,
             });
+          });
         });
       }
 
-
       // Process Delivered Payloads from the map
       if (slotData.deliveredPayloads) {
-         Object.entries(slotData.deliveredPayloads).forEach(([relayName, deliveredPayloadsContainer]) => {
-            // Iterate through payloads, but the payload object itself isn't used for the event data here
-            deliveredPayloadsContainer.payloads.forEach(() => {
-                // DeliveredPayload doesn't have a timestamp in the proto definition provided.
-                // Defaulting to 0ms relative time for its slot as a placeholder.
-                // Consider placing it at 4000ms if block proposal time is known/relevant.
-                const relativeTime = 0; // Placeholder time
-                events.push({
-                    type: 'payload',
-                    time: relativeTime + baseTimeOffset,
-                    // DeliveredPayload also doesn't have 'valueWei' in the proto.
-                    // If value needs to be displayed, it might need fetching from the related bid.
-                    value: undefined, // No value available on payload object itself
-                    label: getEntityName(relayName), // Use relay name from map key
-                    slotOffset: slotOffset,
-                });
+        Object.entries(slotData.deliveredPayloads).forEach(([relay, deliveredPayloadsContainer]) => {
+          // Iterate through payloads, but the payload object itself isn't used for the event data here
+          deliveredPayloadsContainer.payloads.forEach(() => {
+            // DeliveredPayload doesn't have a timestamp in the proto definition provided.
+            // Defaulting to 4000ms relative time as a reasonable estimate
+            const relativeTime = 4000; // More realistic time
+            events.push({
+              type: 'payload',
+              time: relativeTime + baseTimeOffset,
+              value: undefined, // No value available on payload object itself
+              relay, // Store relay name directly
+              slotOffset: slotOffset,
             });
-         });
+          });
+        });
       }
-
 
       // Process Block Seen Events (using SlimTimings)
       if (slotData.timings?.blockSeen) {
         Object.entries(slotData.timings.blockSeen).forEach(([nodeId, relativeMsBigInt]) => {
-            // relativeMsBigInt is the timestamp (bigint)
-            const relativeTime = Number(relativeMsBigInt); // Convert bigint to number
-            events.push({
-                type: 'block',
-                time: relativeTime + baseTimeOffset,
-                value: nodeId, // Store the full node ID
-                label: getNodeNameFromMapKey(nodeId), // Display formatted node name
-                slotOffset: slotOffset,
-            });
+          // relativeMsBigInt is the timestamp (bigint)
+          const relativeTime = Number(relativeMsBigInt); // Convert bigint to number
+          events.push({
+            type: 'block',
+            time: relativeTime + baseTimeOffset,
+            value: nodeId, // Store the full node ID
+            relay: 'node:' + getNodeNameFromMapKey(nodeId), // Prefix for node events
+            slotOffset: slotOffset,
+          });
         });
       }
     };
@@ -137,10 +157,7 @@ export const MultiSlotEventTimeline: React.FC<MultiSlotEventTimelineProps> = ({
     return events.sort((a, b) => a.time - b.time);
   }, [previousSlotData, currentSlotData, nextSlotData]);
 
-  // --- Timeline Visualization ---
-  // Define the time range for the axis (e.g., from start of previous slot to end of next slot)
-  // If previous slot exists: -12000ms to 24000ms (36s total)
-  // Otherwise: 0ms to 24000ms (24s total)
+  // Define the time range for the axis
   const minTime = previousSlotData ? -SLOT_DURATION_MS : 0;
   const maxTime = SLOT_DURATION_MS * 2; // Always show current and next slot range fully
   const totalDuration = maxTime - minTime;
@@ -152,133 +169,257 @@ export const MultiSlotEventTimeline: React.FC<MultiSlotEventTimelineProps> = ({
     return Math.max(0, Math.min(100, position)); // Clamp between 0% and 100%
   };
 
-  const getEventIcon = (type: TimelineEvent['type']) => {
-    switch (type) {
-      case 'bid': return <Layers3 className="w-3 h-3 text-blue-400 shrink-0" />;
-      case 'payload': return <PackageCheck className="w-3 h-3 text-green-400 shrink-0" />;
-      case 'block': return <Box className="w-3 h-3 text-purple-400 shrink-0" />;
-      default: return null;
-    }
-  };
+  // Group events by relay for a more organized display
+  const eventsByRelay = useMemo(() => {
+    const groupedEvents = new Map<string, TimelineEvent[]>();
+    
+    processedEvents.forEach(event => {
+      if (!groupedEvents.has(event.relay)) {
+        groupedEvents.set(event.relay, []);
+      }
+      if (event.time <= currentTime) { // Only show events up to current time
+        groupedEvents.get(event.relay)!.push(event);
+      }
+    });
+    
+    return groupedEvents;
+  }, [processedEvents, currentTime]);
 
-  const getEventColorClass = (type: TimelineEvent['type']) => {
-     switch (type) {
-      case 'bid': return 'border-blue-400/50 bg-blue-900/30 hover:bg-blue-900/60';
-      case 'payload': return 'border-green-400/50 bg-green-900/30 hover:bg-green-900/60';
-      case 'block': return 'border-purple-400/50 bg-purple-900/30 hover:bg-purple-900/60';
-      default: return 'border-gray-500/50 bg-gray-800/30 hover:bg-gray-800/60';
-    }
-  }
+  // Assign colors to relays
+  const relayColors = useMemo(() => {
+    const colors: Record<string, string> = {};
+    const colorOptions = [
+      'bg-red-600 text-white',
+      'bg-blue-600 text-white',
+      'bg-green-600 text-white',
+      'bg-yellow-600 text-black',
+      'bg-purple-600 text-white',
+      'bg-pink-600 text-white',
+      'bg-indigo-600 text-white',
+      'bg-cyan-600 text-white',
+    ];
+    
+    // All relays from all slots
+    const relays = new Set<string>();
+    [previousSlotData, currentSlotData, nextSlotData].forEach(slotData => {
+      if (slotData?.relayBids) {
+        Object.keys(slotData.relayBids).forEach(relay => relays.add(relay));
+      }
+    });
+    
+    // Assign colors
+    [...relays].forEach((relay, index) => {
+      colors[relay] = colorOptions[index % colorOptions.length];
+    });
+    
+    // Node colors
+    colors['node'] = 'bg-gray-600 text-white';
+    
+    return colors;
+  }, [previousSlotData, currentSlotData, nextSlotData]);
 
-  const formatEventValue = (event: TimelineEvent): string => {
-    if (event.value === undefined || event.value === null) return '';
-    // Moved declaration outside switch
-    let formattedValue = '';
-    switch (event.type) {
-        case 'bid':
-             // Use the simplified inline formatter
-            formattedValue = formatGweiSimple(event.value);
-            return formattedValue !== 'N/A' ? `(${formattedValue} Gwei)` : '';
-        case 'payload':
-             // Payload value is currently undefined based on proto
-             return ''; // Or display placeholder if needed
-        case 'block':
-            return ''; // Block value (nodeId) is not displayed directly here
-        default: return '';
-    }
-  }
+  // Count events by type for summary
+  const bidCount = processedEvents.filter(e => e.type === 'bid' && e.time <= currentTime).length;
+  const payloadCount = processedEvents.filter(e => e.type === 'payload' && e.time <= currentTime).length;
+  const blockCount = processedEvents.filter(e => e.type === 'block' && e.time <= currentTime).length;
 
   return (
-    <div className="relative w-full h-48 md:h-64 overflow-hidden bg-surface/30 rounded-lg border border-subtle p-4 font-mono">
-      {/* Timeline Axis Background */}
-      <div className="absolute inset-y-0 left-0 right-0 flex border-b border-dashed border-subtle/50">
-        {/* Slot Boundaries */}
-        {previousSlotData && (
-          <div
-            className="h-full border-r border-dashed border-subtle/50"
-            style={{ width: `${(SLOT_DURATION_MS / totalDuration) * 100}%` }}
-            title={`Slot ${currentSlotNumber ? currentSlotNumber - 1 : 'Previous'}`}
-          ></div>
+    <div className="space-y-4">
+      {/* Progress bar and event counts */}
+      <div className="relative h-8 bg-gray-900 rounded-full overflow-hidden">
+        <div 
+          className="absolute h-full bg-gradient-to-r from-indigo-900 via-purple-900 to-violet-900"
+          style={{ 
+            width: `${(currentTime / 12000) * 100}%`, 
+            transition: 'width 100ms linear',
+            boxShadow: '0 0 10px rgba(167, 139, 250, 0.5)' 
+          }}
+        />
+        <div className="absolute inset-0 flex items-center justify-between px-4">
+          <div className="flex items-center space-x-3">
+            <div className="flex items-center gap-1 bg-yellow-500/80 text-black rounded-full px-2 py-0.5 text-xs font-bold">
+              <Zap className="h-3 w-3" />
+              <span>{bidCount}</span>
+            </div>
+            <div className="flex items-center gap-1 bg-green-500/80 text-black rounded-full px-2 py-0.5 text-xs font-bold">
+              <PackageCheck className="h-3 w-3" />
+              <span>{payloadCount}</span>
+            </div>
+            <div className="flex items-center gap-1 bg-purple-500/80 text-black rounded-full px-2 py-0.5 text-xs font-bold">
+              <Box className="h-3 w-3" />
+              <span>{blockCount}</span>
+            </div>
+          </div>
+          <div className="text-white text-xs font-mono">
+            {(currentTime / 1000).toFixed(1)}s / 12s
+          </div>
+        </div>
+      </div>
+
+      {/* Slot Boundaries Indicator */}
+      <div className="flex text-xs text-center font-medium text-gray-400 mb-2">
+        {previousSlotData && currentSlotNumber && (
+          <div style={{ width: `${(SLOT_DURATION_MS / totalDuration) * 100}%` }}>
+            Slot {currentSlotNumber - 1}
+          </div>
         )}
-        <div
-          className="h-full border-r border-dashed border-subtle/50"
-          style={{ width: `${(SLOT_DURATION_MS / totalDuration) * 100}%` }}
-          title={`Slot ${currentSlotNumber ?? 'Current'}`}
-        ></div>
-         <div
-          className="h-full" // No right border for the last segment
-          style={{ width: `${(SLOT_DURATION_MS / totalDuration) * 100}%` }}
-          title={`Slot ${currentSlotNumber ? currentSlotNumber + 1 : 'Next'}`}
-        ></div>
+        {currentSlotNumber && (
+          <div 
+            style={{ width: `${(SLOT_DURATION_MS / totalDuration) * 100}%` }}
+            className="text-white"
+          >
+            Slot {currentSlotNumber}
+          </div>
+        )}
+        {currentSlotNumber && (
+          <div style={{ width: `${(SLOT_DURATION_MS / totalDuration) * 100}%` }}>
+            Slot {currentSlotNumber + 1}
+          </div>
+        )}
       </div>
 
-       {/* Slot Labels */}
-       <div className="absolute top-1 left-0 right-0 flex text-xs text-muted">
-         {previousSlotData && currentSlotNumber && (
-           <div style={{ width: `${(SLOT_DURATION_MS / totalDuration) * 100}%` }} className="text-center opacity-70">
-             Slot {currentSlotNumber - 1}
-           </div>
-         )}
-         {currentSlotNumber && (
-            <div style={{ width: `${(SLOT_DURATION_MS / totalDuration) * 100}%` }} className="text-center font-medium text-primary">
-                Slot {currentSlotNumber}
-            </div>
-         )}
-         {currentSlotNumber && (
-            <div style={{ width: `${(SLOT_DURATION_MS / totalDuration) * 100}%` }} className="text-center opacity-70">
-                Slot {currentSlotNumber + 1}
-            </div>
-         )}
-       </div>
-
-
-      {/* Current Time Marker */}
-      <div
-        className="absolute top-0 bottom-0 w-0.5 bg-accent z-10"
-        style={{ left: `${calculatePosition(currentTime)}%` }}
-        title={`Current Time: ${(currentTime / 1000).toFixed(1)}s`}
-      >
-         <div className="absolute -top-2 -translate-x-1/2 left-1/2 w-2 h-2 bg-accent rounded-full"></div>
-      </div>
-
-      {/* Events */}
-      <div className="relative h-full pt-6 pb-2 overflow-y-auto scrollbar-thin scrollbar-thumb-surface-raised scrollbar-track-surface">
-        {processedEvents.map((event, index) => {
-          const isFutureEvent = event.time > currentTime;
-          const position = calculatePosition(event.time);
-          // Simple vertical stacking based on index for now to avoid overlap
-          // A more sophisticated layout might be needed for dense events
-          const verticalPosition = (index % 5) * 20 + 10; // Example: 5 vertical lanes
-
+      {/* Event Timeline - Relay oriented */}
+      <div className="space-y-2">
+        {Array.from(eventsByRelay.entries()).map(([relay, events]) => {
+          // Skip empty relay entries
+          if (events.length === 0) return null;
+          
+          // Get color for relay
+          const baseColor = relay.startsWith('node:') 
+            ? 'bg-gray-700 text-white' 
+            : (relayColors[relay] || 'bg-gray-700 text-white');
+          
+          // Format relay name
+          const displayName = relay.startsWith('node:') ? relay.substring(5) : relay;
+          
+          // Get counts
+          const relayBidCount = events.filter(e => e.type === 'bid').length;
+          const relayPayloadCount = events.filter(e => e.type === 'payload').length;
+          const relayBlockCount = events.filter(e => e.type === 'block').length;
+          
+          // Find best bid
+          const bestBid = events
+            .filter(e => e.type === 'bid')
+            .sort((a, b) => {
+              try {
+                return BigInt(String(b.value || 0)) > BigInt(String(a.value || 0)) ? 1 : -1;
+              } catch {
+                return 0;
+              }
+            })[0];
+          
           return (
-            <div
-              key={`${event.type}-${event.time}-${event.label}-${index}`} // Basic key, might need improvement
-              className={clsx(
-                'absolute transition-opacity duration-300 ease-in-out transform -translate-y-1/2',
-                'px-2 py-1 rounded border text-xs shadow-sm cursor-default',
-                 getEventColorClass(event.type),
-                isFutureEvent ? 'opacity-40' : 'opacity-90'
-              )}
-              style={{
-                left: `${position}%`,
-                top: `${verticalPosition}%`, // Adjust vertical positioning logic as needed
-                // Add a small horizontal offset to avoid exact overlap with time marker
-                transform: `translateY(-50%) translateX(${event.time === currentTime ? '4px' : '0px'})`,
-              }}
-              title={`${event.type.charAt(0).toUpperCase() + event.type.slice(1)} at ${(event.time / 1000).toFixed(3)}s\nLabel: ${event.label}\nValue: ${event.type === 'bid' ? formatGweiSimple(event.value) + ' Gwei' : (event.type === 'block' ? event.value : 'N/A')}`}
+            <div 
+              key={relay}
+              className="bg-gray-900/40 rounded-lg border border-gray-800 overflow-hidden"
             >
-              <div className="flex items-center gap-1.5 truncate">
-                 {getEventIcon(event.type)}
-                 <span className="truncate">{event.label} {formatEventValue(event)}</span>
+              {/* Relay Header */}
+              <div className={`${baseColor} p-2 flex justify-between items-center`}>
+                <div className="font-medium">{displayName}</div>
+                <div className="flex items-center space-x-2 text-xs">
+                  {relayBidCount > 0 && (
+                    <div className="flex items-center gap-1">
+                      <Zap className="h-3 w-3" />
+                      <span>{relayBidCount}</span>
+                    </div>
+                  )}
+                  {relayPayloadCount > 0 && (
+                    <div className="flex items-center gap-1">
+                      <PackageCheck className="h-3 w-3" />
+                      <span>{relayPayloadCount}</span>
+                    </div>
+                  )}
+                  {relayBlockCount > 0 && (
+                    <div className="flex items-center gap-1">
+                      <Box className="h-3 w-3" />
+                      <span>{relayBlockCount}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+              
+              {/* Event Markers */}
+              <div className="relative h-10 px-4">
+                {events.map((event, idx) => {
+                  const position = calculatePosition(event.time);
+                  const eventIcon = (() => {
+                    switch (event.type) {
+                      case 'bid': return <Zap className="h-4 w-4 text-yellow-500" />;
+                      case 'payload': return <PackageCheck className="h-4 w-4 text-green-500" />;
+                      case 'block': return <Box className="h-4 w-4 text-purple-500" />;
+                      default: return null;
+                    }
+                  })();
+                  
+                  return (
+                    <div
+                      key={`${relay}-${event.type}-${idx}`}
+                      className="absolute top-1/2 transform -translate-y-1/2 cursor-pointer"
+                      style={{ left: `${position}%` }}
+                      title={
+                        event.type === 'bid' 
+                          ? `${relay} bid: ${formatEthValue(event.value)} ETH (${formatGweiSimple(event.value)} Gwei)`
+                          : event.type === 'payload'
+                          ? `${relay} delivered payload`
+                          : `Block seen by ${displayName}`
+                      }
+                    >
+                      {eventIcon}
+                    </div>
+                  );
+                })}
+                
+                {/* Best bid highlight */}
+                {bestBid && (
+                  <div className="absolute bottom-0 left-0 right-0 h-1.5 flex items-center px-4">
+                    <div 
+                      className="px-1 bg-yellow-500 text-[9px] text-black font-medium rounded"
+                      style={{ 
+                        position: 'absolute',
+                        left: `${calculatePosition(bestBid.time)}%`,
+                        transform: 'translateX(-50%)'
+                      }}
+                      title={`Best bid: ${formatEthValue(bestBid.value)} ETH`}
+                    >
+                      {formatGweiSimple(bestBid.value)}
+                    </div>
+                  </div>
+                )}
+              </div>
+              
+              {/* Connection Lines */}
+              <div className="relative h-1 bg-gray-800">
+                {/* Progress Line */}
+                <div 
+                  className="h-full bg-white/20"
+                  style={{ 
+                    width: `${calculatePosition(currentTime)}%`,
+                    transition: 'width 100ms linear' 
+                  }}
+                />
               </div>
             </div>
           );
         })}
-         {processedEvents.length === 0 && (
-            <div className="absolute inset-0 flex items-center justify-center text-sm text-muted">
-                Waiting for events...
-            </div>
-         )}
+        
+        {eventsByRelay.size === 0 && (
+          <div className="h-20 flex items-center justify-center text-gray-400 bg-gray-900/40 rounded-lg border border-gray-800">
+            Waiting for events...
+          </div>
+        )}
+      </div>
+      
+      {/* Current time marker */}
+      <div className="relative h-6">
+        <div 
+          className="absolute h-full border-l-2 border-dashed border-white/40 flex items-center"
+          style={{ 
+            left: `${calculatePosition(currentTime)}%`,
+            transition: 'left 100ms linear'
+          }}
+        >
+          <ChevronRight className="w-4 h-4 -ml-2 text-white" />
+        </div>
       </div>
     </div>
   );

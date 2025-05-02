@@ -111,8 +111,8 @@ export const MevSlotDetailView: React.FC<MevSlotDetailViewProps> = ({
     <Card>
       <CardBody>
         <h3 className="text-xl font-sans font-bold mb-4">
-          {isCurrentSlot ? 'Current Slot' : 'Next Slot'}
-          {slotNumber !== null ? `: ${slotNumber}` : ''}
+          Slot Details {slotNumber !== null ? `(${slotNumber})` : ''}
+          {isCurrentSlot && <span className="ml-2 text-xs text-green-400 font-normal">(Current)</span>}
         </h3>
         {renderContent()}
       </CardBody>

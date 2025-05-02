@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useQuery } from '@tanstack/react-query';
 // import { useParams } from 'react-router-dom'; // Uncomment if network comes from URL params
 import { getLabApiClient } from '../../../api';
@@ -7,274 +7,281 @@ import { BeaconSlotData } from '../../../api/gen/backend/pkg/server/proto/beacon
 // import LoadingOrError from '../../../components/LoadingOrError'; // Removed unused import
 import { Card, CardBody } from '../../../components/common/Card'; // Import Card components
 import { MevSlotDetailView } from '../../../components/beacon/mev_relays'; // Added import
-import { MultiSlotEventTimeline } from '../../../components/beacon/mev_relays/MultiSlotEventTimeline'; // Import the new timeline
 import { BeaconClockManager } from '../../../utils/beacon'; // Add BeaconClockManager import
+import BidsChart from '../../../components/beacon/mev_relays/BidsChart';
+import BlocksVisualization from '../../../components/beacon/mev_relays/BlocksVisualization';
+import { Zap, TrendingUp, Trophy, ChevronLeft, ChevronRight } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { NetworkContext } from '@/App';
 
-const MevRelaysLivePage: React.FC = () => {
-  // TODO: Replace with actual network determination (e.g., useParams or context)
-  const network = 'mainnet';
+const LiveMev: React.FC = () => {
+  // Get the selected network from context
+  const { selectedNetwork } = useContext(NetworkContext);
+  
+  const beaconClockManager = BeaconClockManager.getInstance();
+  const clock = beaconClockManager.getBeaconClock(selectedNetwork);
+  
+  // Get the configurable head lag slots
+  const headLagSlots = beaconClockManager.getHeadLagSlots(selectedNetwork);
+  
+  // Calculate the display slot by applying the head lag
+  const headSlot = clock ? clock.getCurrentSlot() : null;
+  
+  // State to track the currently displayed slot
+  const [displaySlotOffset, setDisplaySlotOffset] = useState<number>(0);
+  
+  // Calculate the actual slot to display based on head slot, lag, and user selection
+  const baseSlot = headSlot ? headSlot - headLagSlots : null;
+  const slotNumber = baseSlot ? baseSlot + displaySlotOffset : null;
+  
+  const [currentTime, setCurrentTime] = useState<number>(0);
 
-  // State for the slot calculated from the wall clock
-  const [wallClockSlot, setWallClockSlot] = useState<number | null>(null);
+  const labApiClient = getLabApiClient();
 
-  const [currentSlotNumber, setCurrentSlotNumber] = useState<number | null>(
-    null,
-  );
-  const [previousSlotNumber, setPreviousSlotNumber] = useState<number | null>(null); // Add state for previous slot
-  const [nextSlotNumber, setNextSlotNumber] = useState<number | null>(null);
-  const [currentTime, setCurrentTime] = useState<number>(0); // Time in ms within the current slot
+  const { data: slotData, isLoading: isSlotLoading, error: slotError } = useQuery({
+    queryKey: ['mev-relays-live', 'slot', selectedNetwork, slotNumber],
+    queryFn: async () => {
+      if (!slotNumber) return null;
+      const client = await labApiClient;
+      const req = new GetSlotDataRequest({
+        network: selectedNetwork,
+        slot: BigInt(slotNumber),
+      });
+      const res = await client.getSlotData(req);
+      return res.data;
+    },
+    refetchInterval: 5000,
+    enabled: !!slotNumber,
+  });
 
-  // Periodically check the wall clock slot
   useEffect(() => {
-    const checkWallClock = () => {
-      try {
-        const manager = BeaconClockManager.getInstance();
-        const clock = manager.getBeaconClock(network);
-        if (clock) {
-          const currentSlot = clock.getCurrentSlot();
-          setWallClockSlot(currentSlot);
-          // console.log(`Wall clock slot: ${currentSlot}`); // Debug log
-        } else {
-          console.warn(`BeaconClock not available for network: ${network}`);
-          setWallClockSlot(null); // Ensure state is null if clock is missing
-        }
-      } catch (error) {
-        console.error("Error getting wall clock slot:", error);
-        setWallClockSlot(null); // Reset on error
+    const interval = setInterval(() => {
+      if (clock && slotNumber) {
+        // Calculate milliseconds into the current slot
+        const now = Math.floor(Date.now() / 1000);
+        
+        // For the target slot, we want to show the slot progression from 0-12 seconds
+        // based on the current time of day. This gives a smooth animation effect
+        // that stays synchronized with the wall clock, just offset by the lag slots.
+        const slotTimeInSeconds = now % 12; // Time of day modulo 12 seconds per slot
+        const msIntoSlot = slotTimeInSeconds * 1000;
+        
+        setCurrentTime(msIntoSlot);
       }
+    }, 100);
+
+    return () => {
+      clearInterval(interval);
     };
+  }, [clock, slotNumber]);
 
-    // Run immediately on mount
-    checkWallClock();
-
-    // Set up interval to check every second
-    const intervalId = setInterval(checkWallClock, 1000); // Check every 1 second
-
-    // Cleanup function
-    return () => clearInterval(intervalId);
-  }, [network]); // Re-run if network changes
-
-  // Calculate target display slots based on wall clock slot
-  useEffect(() => {
-    if (wallClockSlot !== null) {
-      const calculatedCurrentSlot = wallClockSlot - 2; // Target slot is 2 slots behind wall clock
-      const calculatedNextSlot = wallClockSlot - 1;
-      const calculatedPreviousSlot = wallClockSlot - 3;
-
-      // Set initial slots or update if there's a significant jump
-      if (currentSlotNumber === null || calculatedCurrentSlot > currentSlotNumber) {
-        console.log(`Updating slots based on wall clock. Wall: ${wallClockSlot}, Calculated Current: ${calculatedCurrentSlot}, Current State: ${currentSlotNumber}`);
-        setCurrentSlotNumber(calculatedCurrentSlot);
-        setNextSlotNumber(calculatedNextSlot);
-        setPreviousSlotNumber(calculatedPreviousSlot);
-        // Reset timer only on significant jumps, not initial load if timer already started somehow
-        if (currentSlotNumber !== null && calculatedCurrentSlot > currentSlotNumber + 1) {
-           setCurrentTime(0);
-        } else if (currentSlotNumber === null) {
-           // Don't reset time on initial load if it might have started from previous state
-           // setCurrentTime(0); // Let the timer logic handle its own start
-        }
+  // Helper function: Get the highest bid value
+  const getHighestBidValue = (slotData: BeaconSlotData | null | undefined): { value: string; relay: string } | null => {
+    if (!slotData?.relayBids) return null;
+    
+    let highestBid: { value: string; relay: string } | null = null;
+    
+    Object.entries(slotData.relayBids).forEach(([relay, relayBids]) => {
+      if (relayBids && relayBids.bids) {
+        relayBids.bids.forEach(bid => {
+          if (!highestBid || (bid.value && BigInt(bid.value) > BigInt(highestBid.value))) {
+            highestBid = { value: bid.value || '0', relay };
+          }
+        });
       }
+    });
+    
+    return highestBid;
+  };
+
+  // Get stats for the hero section
+  const highestBid = getHighestBidValue(slotData);
+  const formattedEth = highestBid ? formatEth(highestBid.value) : '0.0000';
+  
+  // Helper to convert wei to ETH
+  function formatEth(wei: string): string {
+    try {
+      const valueInWei = BigInt(wei);
+      const valueInEth = Number(valueInWei) / 1e18;
+      return valueInEth.toFixed(4);
+    } catch {
+      return '0.0000';
     }
-  }, [wallClockSlot, currentSlotNumber]); // Depend on wallClockSlot and currentSlotNumber for comparison
+  }
 
-  // Fetch data for the current slot
-  const currentSlotQuery = useQuery({
-    queryKey: ['beaconSlotData', network, currentSlotNumber],
-    queryFn: async (): Promise<BeaconSlotData | null> => {
-      if (!currentSlotNumber) return null;
-      const client = await getLabApiClient();
-      const request = new GetSlotDataRequest({
-        network,
-        slot: BigInt(currentSlotNumber),
-      });
-      // Assuming the method is getSlotData, adjust if different
-      const response = await client.getSlotData(request);
-      return response.data ?? null;
-    },
-    enabled: !!currentSlotNumber && !!network,
-    staleTime: Infinity, // Data for a specific slot never changes
-    gcTime: 60 * 60 * 1000, // Cache for 1 hour (gcTime is the correct prop name)
-  });
+  // Count total bids for the slot
+  const totalBids = !slotData?.relayBids 
+    ? 0 
+    : Object.values(slotData.relayBids).reduce((sum, relayBids) => {
+        return sum + (relayBids.bids?.length || 0);
+      }, 0);
 
-  // Fetch data for the next slot
-  const nextSlotQuery = useQuery({
-    queryKey: ['beaconSlotData', network, nextSlotNumber],
-    queryFn: async (): Promise<BeaconSlotData | null> => {
-      if (!nextSlotNumber) return null;
-      const client = await getLabApiClient();
-      const request = new GetSlotDataRequest({
-        network,
-        slot: BigInt(nextSlotNumber),
-      });
-      // Assuming the method is getSlotData, adjust if different
-      const response = await client.getSlotData(request);
-      return response.data ?? null;
-    },
-    enabled: !!nextSlotNumber && !!network,
-    staleTime: Infinity, // Data for a specific slot never changes
-    gcTime: 60 * 60 * 1000, // Cache for 1 hour (gcTime is the correct prop name)
-  });
+  // Navigation functions
+  const goToPreviousSlot = () => {
+    setDisplaySlotOffset(prev => prev - 1);
+  };
 
-  // Fetch data for the previous slot
-  const previousSlotQuery = useQuery({
-    queryKey: ['beaconSlotData', network, previousSlotNumber],
-    queryFn: async (): Promise<BeaconSlotData | null> => {
-      if (!previousSlotNumber) return null;
-      const client = await getLabApiClient();
-      const request = new GetSlotDataRequest({
-        network,
-        slot: BigInt(previousSlotNumber),
-      });
-      const response = await client.getSlotData(request);
-      return response.data ?? null;
-    },
-    enabled: !!previousSlotNumber && !!network,
-    staleTime: Infinity,
-    gcTime: 60 * 60 * 1000,
-  });
+  const goToNextSlot = () => {
+    setDisplaySlotOffset(prev => prev + 1);
+  };
 
+  const resetToCurrentSlot = () => {
+    setDisplaySlotOffset(0);
+  };
 
-  // Simulation Timer: Increment time within the slot
-  useEffect(() => {
-    if (currentSlotNumber === null) return; // Don't start timer until slots are set
-
-    const intervalId = setInterval(() => {
-      setCurrentTime((prevTime) => {
-        if (prevTime >= 12000) {
-          clearInterval(intervalId);
-          return 12000; // Cap at 12000
-        }
-        return prevTime + 100; // Increment by 100ms
-      });
-    }, 100); // Update every 100ms
-
-    // Cleanup function
-    return () => clearInterval(intervalId);
-  }, [currentSlotNumber]); // Restart timer if currentSlotNumber changes
-
-  // Slot Transition: Move to the next slot when timer reaches 12s
-  useEffect(() => {
-    if (currentTime >= 12000) {
-      console.log(`Transitioning from slot ${currentSlotNumber} to ${nextSlotNumber}`);
-      setPreviousSlotNumber(currentSlotNumber); // Old current becomes new previous
-      setCurrentSlotNumber(nextSlotNumber);
-      setNextSlotNumber((prev) => (prev !== null ? prev + 1 : null));
-      setCurrentTime(0); // Reset timer for the new slot
-    }
-  }, [currentTime, currentSlotNumber, nextSlotNumber]); // Add currentSlotNumber dependency
+  // Determine if next button should be disabled (don't allow going past latest slot)
+  const isNextDisabled = displaySlotOffset >= 0;
 
   return (
-    <div className="space-y-6">
-      {/* Integrated Contextual Header */}
-      <div className="mb-6 p-4 bg-surface/50 rounded-lg border border-subtle">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-          <div>
-            <h1 className="text-xl font-sans font-bold text-primary mb-1">
-              MEV Relays Live View ({network})
-            </h1>
-            <p className="text-sm font-mono text-secondary">
-              Real-time view of MEV relay activity for the current and upcoming slots.
-            </p>
-          </div>
-          <div className="flex items-center gap-2">
-            {/* Placeholder for controls like network selector or refresh */}
-          </div>
-        </div>
-      </div>
-
-      {/* Handle initial loading state */}
-      {/* Handle initial loading state based on wallClockSlot */}
-      {(wallClockSlot === null || (!currentSlotNumber && !nextSlotNumber && !previousSlotNumber)) && (
-        <Card>
-          <CardBody>
-            <div className="text-center p-4 text-secondary">Determining current slot from wall clock...</div>
-          </CardBody>
-        </Card>
-      )}
-
-      {/* Main Content Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Left Column: Current Slot */}
-        <div className="current-slot-view space-y-4"> {/* Renamed class for clarity */}
-          <Card>
-            <CardBody>
-              <h2 className="text-lg font-sans font-bold text-primary mb-2">
-                Current Slot Details ({currentSlotNumber ?? 'N/A'})
-              </h2>
-              <p className="text-sm font-mono text-secondary mb-4">
-                Time in Slot: {(currentTime / 1000).toFixed(1)}s / 12s
+    <div className="flex flex-col gap-6">
+      {/* Hero Section with Slot Navigation */}
+      <motion.div 
+        className="relative overflow-hidden bg-gray-900/70 rounded-xl border border-gray-800 shadow-lg"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <div className="absolute inset-0 bg-gradient-to-r from-indigo-900/20 to-purple-900/20 
+          mix-blend-overlay" />
+        
+        <div className="relative p-6 flex flex-col md:flex-row items-center gap-6">
+          <div className="flex-1 space-y-4">
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.2, duration: 0.5 }}
+            >
+              <h1 className="text-2xl font-bold text-white flex items-center gap-2">
+                <Trophy className="h-6 w-6 text-yellow-400" />
+                Block Building Arena
+              </h1>
+              <p className="text-gray-400 mt-1">
+                Watch relays compete in real-time with their best bids for inclusion on {selectedNetwork}
+                {headSlot && slotNumber && (
+                  <span className="ml-2 text-xs opacity-70">
+                    (Head: {headSlot}, Showing: {slotNumber}, Lag: {headLagSlots - displaySlotOffset} slots)
+                  </span>
+                )}
               </p>
-              {/* --- Replaced Placeholder and Debug --- */}
-              <MevSlotDetailView
-                slotData={currentSlotQuery.data ?? undefined} // Pass undefined if null
-                slotNumber={currentSlotNumber}
+            </motion.div>
+
+            {/* Slot Navigation */}
+            <div className="flex items-center gap-3">
+              <button
+                onClick={goToPreviousSlot}
+                className="bg-gray-800/70 p-2 rounded-lg border border-gray-700 hover:bg-gray-700/70 transition"
+                title="Previous Slot"
+              >
+                <ChevronLeft className="h-4 w-4 text-gray-300" />
+              </button>
+              
+              <button
+                onClick={resetToCurrentSlot}
+                className={`px-3 py-1.5 rounded-lg border font-medium text-sm ${
+                  displaySlotOffset === 0 
+                    ? 'bg-purple-800/50 border-purple-500/50 text-purple-200' 
+                    : 'bg-gray-800/70 border-gray-700 text-gray-300 hover:bg-gray-700/70'
+                } transition`}
+                disabled={displaySlotOffset === 0}
+                title="Return to Current Slot"
+              >
+                Current Slot
+              </button>
+              
+              <button
+                onClick={goToNextSlot}
+                className={`bg-gray-800/70 p-2 rounded-lg border border-gray-700 transition ${
+                  isNextDisabled ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-700/70'
+                }`}
+                disabled={isNextDisabled}
+                title="Next Slot"
+              >
+                <ChevronRight className="h-4 w-4 text-gray-300" />
+              </button>
+              
+              <div className="text-sm font-mono ml-2 text-white">
+                Slot: {slotNumber || "—"}
+              </div>
+            </div>
+
+            {/* Key Stats */}
+            <div className="grid grid-cols-2 md:grid-cols-2 gap-4">
+              <motion.div 
+                className="bg-gray-800/50 p-4 rounded-lg border border-gray-700"
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.4, duration: 0.4 }}
+              >
+                <div className="text-sm font-medium text-gray-400">Total Bids</div>
+                <div className="mt-1 flex items-center gap-2">
+                  <Zap className="h-5 w-5 text-yellow-400" />
+                  <span className="text-xl font-bold text-white">{totalBids}</span>
+                </div>
+              </motion.div>
+              
+              <motion.div 
+                className="bg-gray-800/50 p-4 rounded-lg border border-gray-700"
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.5, duration: 0.4 }}
+              >
+                <div className="text-sm font-medium text-gray-400">Top Bid</div>
+                <div className="mt-1 flex items-center gap-2">
+                  <TrendingUp className="h-5 w-5 text-green-400" />
+                  <span className="text-xl font-bold text-white">
+                    {formattedEth} ETH
+                    {highestBid && <span className="text-xs ml-1 text-gray-400">by {highestBid.relay}</span>}
+                  </span>
+                </div>
+              </motion.div>
+            </div>
+          </div>
+          
+          <div className="w-full md:w-64">
+            <motion.div
+              className="rounded-lg overflow-hidden bg-gray-800/30 border border-gray-700"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.6, duration: 0.5 }}
+              whileHover={{ scale: 1.02 }}
+            >
+              <BlocksVisualization 
+                slotData={slotData || null} 
                 currentTime={currentTime}
-                isLoading={currentSlotQuery.isLoading}
-                error={currentSlotQuery.error ?? null} // Pass null if null/undefined
-                isCurrentSlot={true}
+                slotNumber={slotNumber}
               />
-              {/* --- End Replacement --- */}
-            </CardBody>
-          </Card>
+            </motion.div>
+          </div>
         </div>
+      </motion.div>
 
-        {/* Right Column: Next Slot */}
-        <div className="next-slot-view space-y-4"> {/* Renamed class for clarity */}
-          <Card>
-            <CardBody>
-              <h2 className="text-lg font-sans font-bold text-primary mb-2">
-                Next Slot Preview ({nextSlotNumber ?? 'N/A'})
-              </h2>
-              {/* --- Replaced Placeholder and Debug --- */}
-              <MevSlotDetailView
-                slotData={nextSlotQuery.data ?? undefined} // Pass undefined if null
-                slotNumber={nextSlotNumber}
-                currentTime={currentTime} // Pass timer, though less relevant here
-                isLoading={nextSlotQuery.isLoading}
-                error={nextSlotQuery.error ?? null} // Pass null if null/undefined
-                isCurrentSlot={false}
-              />
-              {/* --- End Replacement --- */}
-            </CardBody>
-          </Card>
-        </div>
-      </div>
-
-      {/* Full Width Section: Timeline */}
-      <div className="timeline-placeholder mt-6">
-        <Card>
+      {/* Main Content */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Bids Chart - 2/3 width on large screens */}
+        <Card className="lg:col-span-2 overflow-hidden">
           <CardBody>
-            <h2 className="text-lg font-sans font-bold text-primary mb-2">
-              Event Timeline
-            </h2>
-            {/* --- Replace Placeholder with Actual Component --- */}
-            <MultiSlotEventTimeline
-                previousSlotData={previousSlotQuery.data}
-                currentSlotData={currentSlotQuery.data}
-                nextSlotData={nextSlotQuery.data}
-                currentTime={currentTime}
-                currentSlotNumber={currentSlotNumber}
+            <BidsChart 
+              currentSlotData={slotData}
+              currentTime={currentTime}
+              currentSlotNumber={slotNumber}
             />
-            {/* --- End Replacement --- */}
           </CardBody>
         </Card>
+
+        {/* Slot Detail Card */}
+        <MevSlotDetailView 
+          slotData={slotData || null}
+          slotNumber={slotNumber}
+          currentTime={currentTime}
+          isCurrentSlot={displaySlotOffset === 0}
+          isLoading={isSlotLoading}
+          error={slotError}
+        />
       </div>
-
-      {/* Existing Debug Info (Optional - can be removed later) */}
-      <Card>
-        <CardBody>
-          <h2 className="text-lg font-sans font-bold text-primary mb-2">Debug Info</h2>
-          <p className="text-sm font-mono text-secondary">Wall Clock Slot: {wallClockSlot ?? 'Loading...'}</p>
-          <p className="text-sm font-mono text-secondary">Previous Slot: {previousSlotNumber ?? 'N/A'}</p> {/* Added Previous Slot */}
-          <p className="text-sm font-mono text-secondary">Current Slot: {currentSlotNumber ?? 'N/A'}</p>
-          <p className="text-sm font-mono text-secondary">Next Slot: {nextSlotNumber ?? 'N/A'}</p>
-          <p className="text-sm font-mono text-secondary">Time in Slot: {(currentTime / 1000).toFixed(1)}s / 12s</p>
-        </CardBody>
-      </Card>
-
     </div>
   );
 };
 
-export default MevRelaysLivePage;
+export default function Live() {
+  return <LiveMev />;
+}
