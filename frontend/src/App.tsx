@@ -22,10 +22,10 @@ import { Beacon } from '@/pages/beacon';
 import { BeaconLive } from '@/pages/beacon/live';
 import { BeaconSlot } from '@/pages/beacon/slot';
 import Experiments from '@/pages/Experiments.tsx';
-import MaintenanceOverlay from '@/components/common/MaintenanceOverlay';
 import { SlotLookup } from '@/pages/beacon/slot/index';
 import { ModalProvider } from '@/contexts/ModalContext.tsx'
 import { LocallyBuiltBlocks } from '@/pages/beacon/LocallyBuiltBlocks'
+import MevRelaysLivePage from '@/pages/beacon/mev_relays/live.tsx';
 
 // Create contexts
 export const ConfigContext = createContext<Config | null>(null)
@@ -124,6 +124,7 @@ function App() {
 										<Route path="blocks" element={<BlockTimings />} />
 									</Route>
 									<Route path="locally-built-blocks" element={<LocallyBuiltBlocks />} />
+									<Route path="mev_relays/live" element={<MevRelaysLivePage />} />
 								</Route>
 							</Route>
 						</Routes>
