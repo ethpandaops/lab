@@ -248,7 +248,7 @@ func (b *BeaconSlots) processSlot(ctx context.Context, networkName string, slot 
 	}
 
 	// 8. Store the data to storage
-	storageKey := fmt.Sprintf("slots/%s/%d", networkName, slot)
+	storageKey := b.getSlotStoragePath(networkName, slot)
 
 	err = b.storageClient.Store(ctx, storage.StoreParams{
 		Key:         b.getStoragePath(storageKey),

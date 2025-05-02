@@ -299,7 +299,7 @@ func (b *BeaconSlots) startProcessors(ctx context.Context) {
 
 // getSlotStoragePath constructs the storage path for a slot
 func (b *BeaconSlots) getSlotStoragePath(network string, slot phase0.Slot) string {
-	return b.getStoragePath(fmt.Sprintf("%s/%d", network, slot))
+	return fmt.Sprintf("slots/%s/%d", network, slot)
 }
 
 func (b *BeaconSlots) BaseDirectory() string {

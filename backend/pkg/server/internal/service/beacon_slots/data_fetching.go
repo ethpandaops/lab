@@ -720,6 +720,10 @@ func (b *BeaconSlots) getMevRelayBids(ctx context.Context, networkName string, s
 	slotStartTimeMs := uint64(slotStartTime.UnixMilli())
 	timeBucketMs := int64(50) // Define time bucket granularity in ms
 
+	// Calculate time window with 3-minute margin
+	startTimeStr := slotStartTime.Add(-3 * time.Minute).Format("2006-01-02 15:04:05")
+	endTimeStr := slotStartTime.Add(3 * time.Minute).Format("2006-01-02 15:04:05")
+
 	query := `
 		WITH RankedBids AS (
 			SELECT
@@ -731,6 +735,7 @@ func (b *BeaconSlots) getMevRelayBids(ctx context.Context, networkName string, s
 			WHERE 
 				slot = ? 
 				AND meta_network_name = ?
+				AND slot_start_date_time BETWEEN ? AND ?
 				AND (timestamp_ms - ?) BETWEEN -12000 AND 12000 -- Filter for only slot times between -12s and +12s
 		)
 		SELECT
@@ -757,6 +762,7 @@ func (b *BeaconSlots) getMevRelayBids(ctx context.Context, networkName string, s
 		slotStartTimeMs, timeBucketMs, timeBucketMs, // For time_bucket calculation
 		slotStartTimeMs, timeBucketMs, // For ranking window
 		slot, networkName,
+		startTimeStr, endTimeStr, // Added slot_start_date_time filter
 		slotStartTimeMs) // For slot_time filtering
 
 	if err != nil {
@@ -843,6 +849,10 @@ func (b *BeaconSlots) getMevDeliveredPayloads(ctx context.Context, networkName s
 		return nil, fmt.Errorf("failed to get ClickHouse client for network %s: %w", networkName, err)
 	}
 
+	// Calculate time window with 3-minute margin
+	startTimeStr := slotStartTime.Add(-3 * time.Minute).Format("2006-01-02 15:04:05")
+	endTimeStr := slotStartTime.Add(3 * time.Minute).Format("2006-01-02 15:04:05")
+
 	query := `
 		SELECT
 			relay_name,
@@ -856,6 +866,7 @@ func (b *BeaconSlots) getMevDeliveredPayloads(ctx context.Context, networkName s
 			num_tx
 		FROM default.mev_relay_proposer_payload_delivered
 		WHERE slot = ? AND meta_network_name = ?
+		AND slot_start_date_time BETWEEN ? AND ?
 		GROUP BY 
 			relay_name, 
 			slot, 
@@ -869,7 +880,7 @@ func (b *BeaconSlots) getMevDeliveredPayloads(ctx context.Context, networkName s
 		ORDER BY relay_name;
 	`
 
-	result, err := ch.Query(ctx, query, slot, networkName)
+	result, err := ch.Query(ctx, query, slot, networkName, startTimeStr, endTimeStr)
 	if err != nil {
 		// It's okay if no payloads are found, return an empty map
 		if err.Error() == "no rows returned" { // Check specific error string

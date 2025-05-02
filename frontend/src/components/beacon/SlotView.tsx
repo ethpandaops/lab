@@ -22,6 +22,7 @@ interface SlotData {
     executionPayloadGasLimit?: bigint
     executionPayloadBlockNumber?: bigint
     blockVersion?: string
+    executionPayloadBlockHash?: string
   }
   proposer: {
     proposerValidatorIndex: bigint
@@ -53,6 +54,21 @@ interface SlotData {
     maximumVotes?: bigint
   }
   deliveredPayloads?: Record<string, { payloads: unknown[] }>
+  relayBids?: Record<string, { 
+    bids: Array<{
+      slot: number
+      parentHash: string
+      blockHash: string
+      builderPubkey: string
+      proposerPubkey: string
+      proposerFeeRecipient: string
+      value: string
+      gasLimit: number
+      gasUsed: number
+      slotTime: number
+      timeBucket: number
+    }>
+  }>
 }
 
 interface SlotViewProps {
@@ -457,6 +473,51 @@ export function SlotView({ slot, network = 'mainnet', isLive = false, onSlotComp
   const showData = slotData || (isLive && slot)
   const isMissingData = !slotData && isLive && slot !== undefined
 
+  // Find the winning bid based on matching block hash
+  const winningBid = useMemo(() => {
+    if (!slotData?.relayBids || !slotData?.block?.executionPayloadBlockHash) return null;
+    
+    // Check all relays for bids
+    for (const [relayName, relayData] of Object.entries(slotData.relayBids)) {
+      // Find a bid that matches the block hash
+      const matchingBid = relayData.bids.find(bid => 
+        bid.blockHash === slotData.block?.executionPayloadBlockHash
+      );
+      
+      if (matchingBid) {
+        // Convert wei value to ETH
+        const valueInWei = BigInt(matchingBid.value);
+        const valueInEth = Number(valueInWei) / 1e18;
+        
+        // Format ETH value with appropriate decimals based on size
+        let formattedEth: string;
+        if (valueInEth >= 100) {
+          formattedEth = valueInEth.toFixed(2);
+        } else if (valueInEth >= 10) {
+          formattedEth = valueInEth.toFixed(3);
+        } else {
+          formattedEth = valueInEth.toFixed(4);
+        }
+        
+        // Format time relative to slot start
+        const timeMs = matchingBid.slotTime;
+        const formattedTime = timeMs >= 0 
+          ? `+${(timeMs / 1000).toFixed(2)}s` 
+          : `${(timeMs / 1000).toFixed(2)}s`;
+        
+        return {
+          ...matchingBid,
+          relay: relayName,
+          valueInEth,
+          formattedEth,
+          formattedTime
+        };
+      }
+    }
+    
+    return null;
+  }, [slotData?.relayBids, slotData?.block?.executionPayloadBlockHash]);
+
   // Helper function to convert nodes to correct type for components
   const getFormattedNodes = useMemo(() => {
     if (!slotData?.nodes) return {};
@@ -812,6 +873,49 @@ export function SlotView({ slot, network = 'mainnet', isLive = false, onSlotComp
                   })()}
                 </div>
               )}
+
+              {/* MEV Information (Mobile) */}
+              <div className="mt-1.5 bg-surface/30 rounded p-1.5">
+                <div className="text-[10px] font-medium mb-1 text-primary">
+                  MEV Data
+                </div>
+                <div className="grid grid-cols-2 gap-x-2 gap-y-0.5 text-[10px] font-mono text-primary">
+                  <div>
+                    <div className="text-tertiary">Bid Value</div>
+                    {winningBid ? (
+                      <div className="text-amber-400 font-medium">{winningBid.formattedEth} ETH</div>
+                    ) : (
+                      <div className="text-tertiary">0.0000 ETH</div>
+                    )}
+                  </div>
+                  <div>
+                    <div className="text-tertiary">Bid Time</div>
+                    {winningBid ? (
+                      <div>{winningBid.formattedTime}</div>
+                    ) : (
+                      <div className="text-tertiary">--</div>
+                    )}
+                  </div>
+                  <div>
+                    <div className="text-tertiary">Relay</div>
+                    {winningBid ? (
+                      <div>{winningBid.relay}</div>
+                    ) : (
+                      <div className="text-tertiary">--</div>
+                    )}
+                  </div>
+                  <div>
+                    <div className="text-tertiary">Builder</div>
+                    {winningBid ? (
+                      <div className="truncate" title={winningBid.builderPubkey}>
+                        {winningBid.builderPubkey.substring(0, 6)}...
+                      </div>
+                    ) : (
+                      <div className="text-tertiary">--</div>
+                    )}
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -1257,6 +1361,7 @@ export function SlotView({ slot, network = 'mainnet', isLive = false, onSlotComp
                           })()}
                         </div>
                       </div>
+                      {/* MEV Relay Information */}
                       <div className="col-span-2">
                         <div className="text-tertiary">Attestations</div>
                         <div className="text-primary">
@@ -1268,18 +1373,55 @@ export function SlotView({ slot, network = 'mainnet', isLive = false, onSlotComp
                           })()}
                         </div>
                       </div>
-                      
-                      {/* MEV Relay Information */}
-                        <>
-                          <div>
-                            <div className="text-tertiary">Relays</div>
-                            {slotData?.deliveredPayloads && Object.keys(slotData.deliveredPayloads).length > 0 && (
-                            <div className="text-primary">
-                              <span>{Object.keys(slotData.deliveredPayloads).join(', ')}</span>
-                            </div>
-                            )}
+                    </div>
+                  </div>
+
+                  {/* MEV Information Section */}
+                  <div className="p-2 bg-surface/50 rounded mt-2">
+                    <div className="text-sm font-medium mb-1.5 text-primary">MEV Data</div>
+                    <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-xs font-mono">
+                      <div>
+                        <div className="text-tertiary">Bid Value</div>
+                        {winningBid ? (
+                          <div className="text-primary text-amber-400 font-medium">
+                            {winningBid.formattedEth} ETH
                           </div>
-                        </>
+                        ) : (
+                          <div className="text-tertiary">
+                            0.0000 ETH
+                          </div>
+                        )}
+                      </div>
+                      <div>
+                        <div className="text-tertiary">Bid Time</div>
+                        {winningBid ? (
+                          <div className="text-primary">
+                            {winningBid.formattedTime}
+                          </div>
+                        ) : (
+                          <div className="text-tertiary">
+                            --
+                          </div>
+                        )}
+                      </div>
+                      <div>
+                        <div className="text-tertiary">Relay</div>
+                        {winningBid ? (
+                          <div className="text-primary">{winningBid.relay}</div>
+                        ) : (
+                          <div className="text-tertiary">--</div>
+                        )}
+                      </div>
+                      <div>
+                        <div className="text-tertiary">Builder</div>
+                        {winningBid ? (
+                          <div className="text-primary truncate" title={winningBid.builderPubkey}>
+                            {winningBid.builderPubkey.substring(0, 6)}...
+                          </div>
+                        ) : (
+                          <div className="text-tertiary">--</div>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
