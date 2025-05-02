@@ -266,6 +266,10 @@ func (s *Service) initializeServices(ctx context.Context) error {
 		return fmt.Errorf("failed to dial srv service at %s: %w", srvAddr, err)
 	}
 
+	if err := s.storageClient.Start(ctx); err != nil {
+		return fmt.Errorf("failed to start storage client: %w", err)
+	}
+
 	s.srvConn = conn
 	s.labClient = labpb.NewLabServiceClient(conn)
 	s.beaconSlotsClient = beaconslotspb.NewBeaconSlotsClient(conn)
