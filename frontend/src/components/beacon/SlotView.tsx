@@ -186,29 +186,6 @@ export function SlotView({ slot, network = 'mainnet', isLive = false, onSlotComp
   // Extract the data from the next slot response
   const nextSlotData = nextSlotResponse?.data
 
-  // Display error state if data fetch failed
-  if (error && !isLive) {
-    return (
-      <div className="w-full flex flex-col">
-        <div className="h-[calc(100vh-theme(spacing.16))] md:h-[calc(85vh-theme(spacing.36))] flex flex-col md:flex-row">
-          <div className="w-full h-full">
-            <GlobalMap
-              nodes={{}}
-              currentTime={0}
-              blockEvents={[]}
-              loading={false}
-              isMissing={true}
-              hideDetails={true}
-            />
-          </div>
-        </div>
-        <div className="absolute inset-0 flex items-center justify-center">
-          <ErrorState message="Failed to load slot data" error={error} />
-        </div>
-      </div>
-    )
-  }
-
   // Timer effect for playback
   useEffect(() => {
     if (!isPlaying) return
@@ -555,6 +532,29 @@ export function SlotView({ slot, network = 'mainnet', isLive = false, onSlotComp
       ])
     );
   }, [slotData?.nodes]);
+
+  // Display error state if data fetch failed - MOVED AFTER ALL HOOKS
+  if (error && !isLive) {
+    return (
+      <div className="w-full flex flex-col">
+        <div className="h-[calc(100vh-theme(spacing.16))] md:h-[calc(85vh-theme(spacing.36))] flex flex-col md:flex-row">
+          <div className="w-full h-full">
+            <GlobalMap
+              nodes={{}}
+              currentTime={0}
+              blockEvents={[]}
+              loading={false}
+              isMissing={true}
+              hideDetails={true}
+            />
+          </div>
+        </div>
+        <div className="absolute inset-0 flex items-center justify-center">
+          <ErrorState message="Failed to load slot data" error={error} />
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="w-full flex flex-col">
