@@ -90,7 +90,7 @@ export const BidsTable: React.FC<BidsTableProps> = ({
     return (
       <ArrowUpDown 
         className={clsx(
-          "inline-block ml-1 h-3 w-3",
+          "inline-block ml-1 h-4 w-4",
           sortDirection === 'asc' ? "rotate-0" : "rotate-180"
         )} 
       />
@@ -108,35 +108,35 @@ export const BidsTable: React.FC<BidsTableProps> = ({
     <Card className={className}>
       <CardBody>
         <div className="max-h-[400px] overflow-y-auto">
-          <table className="w-full text-sm">
+          <table className="w-full text-base">
             <thead className="text-left text-secondary border-b border-subtle">
               <tr>
                 <th 
-                  className="py-2 px-3 font-medium cursor-pointer hover:text-primary transition-colors"
+                  className="py-3 px-4 font-medium cursor-pointer hover:text-primary transition-colors text-base"
                   onClick={() => handleSort('relay')}
                 >
                   Relay {renderSortIndicator('relay')}
                 </th>
                 <th 
-                  className="py-2 px-3 font-medium cursor-pointer hover:text-primary transition-colors"
+                  className="py-3 px-4 font-medium cursor-pointer hover:text-primary transition-colors text-base"
                   onClick={() => handleSort('value')}
                 >
                   Value (ETH) {renderSortIndicator('value')}
                 </th>
                 <th 
-                  className="py-2 px-3 font-medium cursor-pointer hover:text-primary transition-colors"
+                  className="py-3 px-4 font-medium cursor-pointer hover:text-primary transition-colors text-base"
                   onClick={() => handleSort('time')}
                 >
                   Time (s) {renderSortIndicator('time')}
                 </th>
                 <th 
-                  className="py-2 px-3 font-medium cursor-pointer hover:text-primary transition-colors"
+                  className="py-3 px-4 font-medium cursor-pointer hover:text-primary transition-colors text-base"
                   onClick={() => handleSort('builder')}
                 >
                   Builder {renderSortIndicator('builder')}
                 </th>
                 <th 
-                  className="py-2 px-3 font-medium cursor-pointer hover:text-primary transition-colors"
+                  className="py-3 px-4 font-medium cursor-pointer hover:text-primary transition-colors text-base"
                   onClick={() => handleSort('blockHash')}
                 >
                   Block Hash {renderSortIndicator('blockHash')}
@@ -152,30 +152,30 @@ export const BidsTable: React.FC<BidsTableProps> = ({
                     bid.isWinning ? "bg-success/10" : ""
                   )}
                 >
-                  <td className="py-2 px-3">
+                  <td className="py-3 px-4">
                     <div className="flex items-center gap-2">
                       <div 
-                        className="w-3 h-3 rounded-full" 
+                        className="w-4 h-4 rounded-full" 
                         style={{ backgroundColor: relayColors[bid.relayName] || '#888' }}
                       />
-                      <span className={bid.isWinning ? "font-medium text-primary" : "text-secondary"}>
+                      <span className={bid.isWinning ? "font-medium text-primary text-base" : "text-secondary text-base"}>
                         {bid.relayName}
-                        {bid.isWinning && <span className="ml-2 text-xs text-success">Winner</span>}
+                        {bid.isWinning && <span className="ml-2 text-sm text-success">Winner</span>}
                       </span>
                     </div>
                   </td>
-                  <td className="py-2 px-3 font-mono text-secondary">
+                  <td className="py-3 px-4 font-mono text-secondary text-base">
                     {bid.value.toFixed(4)}
                   </td>
-                  <td className="py-2 px-3 font-mono text-secondary">
+                  <td className="py-3 px-4 font-mono text-secondary text-base">
                     {(bid.time / 1000).toFixed(3)}
                   </td>
-                  <td className="py-2 px-3 font-mono text-secondary">
+                  <td className="py-3 px-4 font-mono text-secondary text-base">
                     {bid.builderPubkey ? truncateMiddle(bid.builderPubkey) : 'N/A'}
                   </td>
-                  <td className="py-2 px-3">
+                  <td className="py-3 px-4">
                     <div className="flex items-center gap-2">
-                      <span className="font-mono text-secondary">
+                      <span className="font-mono text-secondary text-base">
                         {bid.blockHash ? truncateMiddle(bid.blockHash) : 'N/A'}
                       </span>
                       {bid.blockHash && (
@@ -185,9 +185,9 @@ export const BidsTable: React.FC<BidsTableProps> = ({
                           title="Copy block hash"
                         >
                           {copiedHash === bid.blockHash ? (
-                            <Check className="h-4 w-4 text-success" />
+                            <Check className="h-5 w-5 text-success" />
                           ) : (
-                            <Copy className="h-4 w-4" />
+                            <Copy className="h-5 w-5" />
                           )}
                         </button>
                       )}
@@ -197,7 +197,7 @@ export const BidsTable: React.FC<BidsTableProps> = ({
               ))}
               {paginatedBids.length === 0 && (
                 <tr>
-                  <td colSpan={5} className="py-4 text-center text-tertiary">
+                  <td colSpan={5} className="py-4 text-center text-tertiary text-base">
                     No bids available for this slot.
                   </td>
                 </tr>
@@ -208,7 +208,7 @@ export const BidsTable: React.FC<BidsTableProps> = ({
         
         {/* Pagination */}
         {totalPages > 1 && (
-          <div className="flex justify-between items-center mt-4 text-xs">
+          <div className="flex justify-between items-center mt-4 text-sm">
             <div className="text-tertiary">
               Showing {page * itemsPerPage + 1}-{Math.min((page + 1) * itemsPerPage, sortedBids.length)} of {sortedBids.length}
             </div>
@@ -217,7 +217,7 @@ export const BidsTable: React.FC<BidsTableProps> = ({
                 onClick={() => setPage(Math.max(0, page - 1))}
                 disabled={page === 0}
                 className={clsx(
-                  "px-2 py-1 rounded border border-subtle",
+                  "px-3 py-1.5 rounded border border-subtle text-sm",
                   page === 0 
                     ? "opacity-50 cursor-not-allowed" 
                     : "hover:bg-surface/70 text-secondary hover:text-primary"
@@ -229,7 +229,7 @@ export const BidsTable: React.FC<BidsTableProps> = ({
                 onClick={() => setPage(Math.min(totalPages - 1, page + 1))}
                 disabled={page === totalPages - 1}
                 className={clsx(
-                  "px-2 py-1 rounded border border-subtle",
+                  "px-3 py-1.5 rounded border border-subtle text-sm",
                   page === totalPages - 1 
                     ? "opacity-50 cursor-not-allowed" 
                     : "hover:bg-surface/70 text-secondary hover:text-primary"
