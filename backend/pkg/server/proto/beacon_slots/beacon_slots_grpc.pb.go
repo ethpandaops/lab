@@ -21,6 +21,7 @@ const _ = grpc.SupportPackageIsVersion9
 const (
 	BeaconSlots_GetRecentLocallyBuiltBlocks_FullMethodName = "/beacon_slots.BeaconSlots/GetRecentLocallyBuiltBlocks"
 	BeaconSlots_GetRecentValidatorBlocks_FullMethodName    = "/beacon_slots.BeaconSlots/GetRecentValidatorBlocks"
+	BeaconSlots_GetSlotData_FullMethodName                 = "/beacon_slots.BeaconSlots/GetSlotData"
 )
 
 // BeaconSlotsClient is the client API for BeaconSlots service.
@@ -29,6 +30,7 @@ const (
 type BeaconSlotsClient interface {
 	GetRecentLocallyBuiltBlocks(ctx context.Context, in *GetRecentLocallyBuiltBlocksRequest, opts ...grpc.CallOption) (*GetRecentLocallyBuiltBlocksResponse, error)
 	GetRecentValidatorBlocks(ctx context.Context, in *GetRecentValidatorBlocksRequest, opts ...grpc.CallOption) (*GetRecentValidatorBlocksResponse, error)
+	GetSlotData(ctx context.Context, in *GetSlotDataRequest, opts ...grpc.CallOption) (*GetSlotDataResponse, error)
 }
 
 type beaconSlotsClient struct {
@@ -59,12 +61,23 @@ func (c *beaconSlotsClient) GetRecentValidatorBlocks(ctx context.Context, in *Ge
 	return out, nil
 }
 
+func (c *beaconSlotsClient) GetSlotData(ctx context.Context, in *GetSlotDataRequest, opts ...grpc.CallOption) (*GetSlotDataResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetSlotDataResponse)
+	err := c.cc.Invoke(ctx, BeaconSlots_GetSlotData_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // BeaconSlotsServer is the server API for BeaconSlots service.
 // All implementations must embed UnimplementedBeaconSlotsServer
 // for forward compatibility.
 type BeaconSlotsServer interface {
 	GetRecentLocallyBuiltBlocks(context.Context, *GetRecentLocallyBuiltBlocksRequest) (*GetRecentLocallyBuiltBlocksResponse, error)
 	GetRecentValidatorBlocks(context.Context, *GetRecentValidatorBlocksRequest) (*GetRecentValidatorBlocksResponse, error)
+	GetSlotData(context.Context, *GetSlotDataRequest) (*GetSlotDataResponse, error)
 	mustEmbedUnimplementedBeaconSlotsServer()
 }
 
@@ -80,6 +93,9 @@ func (UnimplementedBeaconSlotsServer) GetRecentLocallyBuiltBlocks(context.Contex
 }
 func (UnimplementedBeaconSlotsServer) GetRecentValidatorBlocks(context.Context, *GetRecentValidatorBlocksRequest) (*GetRecentValidatorBlocksResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetRecentValidatorBlocks not implemented")
+}
+func (UnimplementedBeaconSlotsServer) GetSlotData(context.Context, *GetSlotDataRequest) (*GetSlotDataResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetSlotData not implemented")
 }
 func (UnimplementedBeaconSlotsServer) mustEmbedUnimplementedBeaconSlotsServer() {}
 func (UnimplementedBeaconSlotsServer) testEmbeddedByValue()                     {}
@@ -138,6 +154,24 @@ func _BeaconSlots_GetRecentValidatorBlocks_Handler(srv interface{}, ctx context.
 	return interceptor(ctx, in, info, handler)
 }
 
+func _BeaconSlots_GetSlotData_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetSlotDataRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BeaconSlotsServer).GetSlotData(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: BeaconSlots_GetSlotData_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BeaconSlotsServer).GetSlotData(ctx, req.(*GetSlotDataRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // BeaconSlots_ServiceDesc is the grpc.ServiceDesc for BeaconSlots service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -152,6 +186,10 @@ var BeaconSlots_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetRecentValidatorBlocks",
 			Handler:    _BeaconSlots_GetRecentValidatorBlocks_Handler,
+		},
+		{
+			MethodName: "GetSlotData",
+			Handler:    _BeaconSlots_GetSlotData_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

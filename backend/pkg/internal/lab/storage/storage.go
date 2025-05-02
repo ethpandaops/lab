@@ -666,15 +666,8 @@ func (c *client) GetEncoded(ctx context.Context, key string, v any, format Codec
 		}).Observe(time.Since(start).Seconds())
 	}()
 
-	data, err := c.Get(ctx, key)
-	if err != nil {
-		status = StatusError
-
-		c.log.WithError(err).Error("GetEncoded failed: failed to get data")
-
-		c.errorsTotal.With(prometheus.Labels{"operation": "get_encoded"}).Inc()
-
-		return fmt.Errorf("GetEncoded failed: %w", err)
+	if format == "" {
+		return fmt.Errorf("format is required")
 	}
 
 	codec, err := c.encoders.Get(format)
@@ -682,6 +675,22 @@ func (c *client) GetEncoded(ctx context.Context, key string, v any, format Codec
 		status = StatusError
 
 		c.log.WithError(err).Error("GetEncoded failed: failed to get codec")
+
+		c.errorsTotal.With(prometheus.Labels{"operation": "get_encoded"}).Inc()
+
+		return fmt.Errorf("failed to get codec: %w", err)
+	}
+
+	// Add the codec extension to the key if it doesn't already have it
+	if !strings.HasSuffix(key, "."+codec.FileExtension()) {
+		key = key + "." + codec.FileExtension()
+	}
+
+	data, err := c.Get(ctx, key)
+	if err != nil {
+		status = StatusError
+
+		c.log.WithError(err).Error("GetEncoded failed: failed to get data")
 
 		c.errorsTotal.With(prometheus.Labels{"operation": "get_encoded"}).Inc()
 

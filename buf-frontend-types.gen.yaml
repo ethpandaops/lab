@@ -1,0 +1,6 @@
+version: v2
+plugins:
+  # TypeScript message type generation for all protos
+  - remote: buf.build/bufbuild/es:v1.10.0
+    out: frontend/src/api/gen
+    opt: target=ts 
