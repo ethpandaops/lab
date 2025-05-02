@@ -2,13 +2,18 @@
 
 # Generate protobuf
 proto:
-	@echo "Generating Go protobuf code..."
-	buf generate .
+	@echo "Generating non-Connect Go code..."
+	# Generate Go code without Connect for all protos
+	buf generate --template buf-noconnect.gen.yaml .
+	
+	@echo "Generating Connect code for API protos only..."
+	# Generate Connect code only for API protos
+	buf generate --template buf.gen.yaml --path backend/pkg/api/proto .
 
 	@echo "Generating API gateway code..."
 	buf generate --template buf-api.gen.yaml . --path backend/pkg/api/proto
 
-	@echo "Generating TypeScript protobuf types..."
+	@echo "Generating frontend TypeScript protos..."
 	cd frontend/scripts && ./generate-api.sh
 	cd ../..
 
@@ -40,4 +45,6 @@ clean:
 	rm -rf backend/pkg/api/proto/*_grpc.pb.go
 	rm -rf backend/pkg/api/proto/protoconnect
 	rm -rf backend/pkg/api/proto/labapiconnect 
-	rm -rf backend/pkg/api/proto/labapiconnectconnect 
+	rm -rf backend/pkg/api/proto/labapiconnectconnect
+	rm -rf backend/pkg/server/proto/*/*connect/
+	rm -rf frontend/src/api/gen/

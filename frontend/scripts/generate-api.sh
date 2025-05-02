@@ -18,8 +18,12 @@ echo "Cleaning previous generated files in $OUTPUT_DIR..."
 rm -rf "$OUTPUT_DIR"
 mkdir -p "$OUTPUT_DIR" # Ensure the directory exists
 
-echo "Generating frontend API code using buf..."
-# Use buf generate with the updated buf.gen.yaml
-buf generate
+echo "Generating TypeScript message types for all protos..."
+# Generate TypeScript message types for all protos
+buf generate --template buf-frontend-types.gen.yaml
+
+echo "Generating Connect for API protos only..."
+# Generate Connect-web for API protos only
+buf generate --template buf-frontend-connect.gen.yaml --path backend/pkg/api/proto
 
 echo "Frontend API code generated successfully in $OUTPUT_DIR!"
