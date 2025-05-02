@@ -533,29 +533,6 @@ export function SlotView({ slot, network = 'mainnet', isLive = false, onSlotComp
     );
   }, [slotData?.nodes]);
 
-  // Display error state if data fetch failed - MOVED AFTER ALL HOOKS
-  if (error && !isLive) {
-    return (
-      <div className="w-full flex flex-col">
-        <div className="h-[calc(100vh-theme(spacing.16))] md:h-[calc(85vh-theme(spacing.36))] flex flex-col md:flex-row">
-          <div className="w-full h-full">
-            <GlobalMap
-              nodes={{}}
-              currentTime={0}
-              blockEvents={[]}
-              loading={false}
-              isMissing={true}
-              hideDetails={true}
-            />
-          </div>
-        </div>
-        <div className="absolute inset-0 flex items-center justify-center">
-          <ErrorState message="Failed to load slot data" error={error} />
-        </div>
-      </div>
-    )
-  }
-
   return (
     <div className="w-full flex flex-col">
       {/* Main Content */}
@@ -568,8 +545,8 @@ export function SlotView({ slot, network = 'mainnet', isLive = false, onSlotComp
               nodes={getFormattedNodes}
               currentTime={currentTime}
               blockEvents={blockEvents}
-              loading={isLoading && !slotData}
-              isMissing={isMissingData}
+              loading={isLoading || !!error}
+              isMissing={isMissingData || !!error}
               slot={slotData?.slot ? Number(slotData.slot) : undefined}
               proposer={slotData?.entity || 'Unknown'}
               proposerIndex={slotData?.proposer?.proposerValidatorIndex ? Number(slotData.proposer.proposerValidatorIndex) : undefined}
@@ -1404,24 +1381,6 @@ export function SlotView({ slot, network = 'mainnet', isLive = false, onSlotComp
                           </div>
                         )}
                       </div>
-                      <div>
-                        <div className="text-tertiary">Relay</div>
-                        {winningBid ? (
-                          <div className="text-primary">{winningBid.relay}</div>
-                        ) : (
-                          <div className="text-tertiary">--</div>
-                        )}
-                      </div>
-                      <div>
-                        <div className="text-tertiary">Builder</div>
-                        {winningBid ? (
-                          <div className="text-primary truncate" title={winningBid.builderPubkey}>
-                            {winningBid.builderPubkey.substring(0, 6)}...
-                          </div>
-                        ) : (
-                          <div className="text-tertiary">--</div>
-                        )}
-                      </div>
                     </div>
                   </div>
                 </div>
@@ -1435,8 +1394,8 @@ export function SlotView({ slot, network = 'mainnet', isLive = false, onSlotComp
               nodes={getFormattedNodes}
               currentTime={currentTime}
               blockEvents={blockEvents}
-              loading={isLoading && !slotData}
-              isMissing={isMissingData}
+              loading={isLoading || !!error}
+              isMissing={isMissingData || !!error}
               slot={slotData?.slot ? Number(slotData.slot) : undefined}
               proposer={slotData?.entity || 'Unknown'}
               proposerIndex={slotData?.proposer?.proposerValidatorIndex ? Number(slotData.proposer.proposerValidatorIndex) : undefined}

@@ -184,7 +184,9 @@ func (b *BeaconSlots) FetchSlotData(ctx context.Context, network string, slot ph
 	}
 
 	// Check if we've got the slot data in cache
-	cacheData, err := b.cacheClient.Get(fmt.Sprintf(slotCacheKey, network, slot))
+	cacheKey := fmt.Sprintf(slotCacheKey, network, slot)
+
+	cacheData, err := b.cacheClient.Get(cacheKey)
 	if err == nil {
 		var data *bs_pb.BeaconSlotData
 		if err := json.Unmarshal(cacheData, &data); err == nil {
@@ -204,8 +206,13 @@ func (b *BeaconSlots) FetchSlotData(ctx context.Context, network string, slot ph
 		return nil, fmt.Errorf("failed to get current slot for network %s: %w", network, err)
 	}
 
+	dataBytes, err := json.Marshal(slotData)
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal slot data: %w", err)
+	}
+
 	if slotTime.TimeWindow().Start().Before(time.Now().Add(2 * time.Minute)) {
-		b.cacheClient.Set(fmt.Sprintf(slotCacheKey, network, slot), cacheData, 2*time.Minute)
+		b.cacheClient.Set(cacheKey, dataBytes, 2*time.Minute)
 	}
 
 	return slotData, nil
@@ -299,7 +306,7 @@ func (b *BeaconSlots) startProcessors(ctx context.Context) {
 
 // getSlotStoragePath constructs the storage path for a slot
 func (b *BeaconSlots) getSlotStoragePath(network string, slot phase0.Slot) string {
-	return fmt.Sprintf("slots/%s/%d", network, slot)
+	return b.getStoragePath(fmt.Sprintf("slots/%s/%d", network, slot))
 }
 
 func (b *BeaconSlots) BaseDirectory() string {
@@ -457,7 +464,7 @@ func (b *BeaconSlots) processHead(ctx context.Context, networkName string) {
 			if err != nil {
 				logCtx.WithError(err).Error("Failed to marshal slot data")
 			} else {
-				b.cacheClient.Set(fmt.Sprintf(slotCacheKey, networkName, currentSlot), cacheData, 2*time.Minute)
+				b.cacheClient.Set(fmt.Sprintf(slotCacheKey, networkName, targetSlot), cacheData, 2*time.Minute)
 			}
 
 			logCtx.WithField("slot", currentSlot).WithField("processing_time", time.Since(startTime)).Info("Successfully processed head slot")

@@ -251,7 +251,7 @@ func (b *BeaconSlots) processSlot(ctx context.Context, networkName string, slot 
 	storageKey := b.getSlotStoragePath(networkName, slot)
 
 	err = b.storageClient.Store(ctx, storage.StoreParams{
-		Key:         b.getStoragePath(storageKey),
+		Key:         storageKey,
 		Data:        slotData,
 		Format:      storage.CodecNameJSON,
 		Compression: storage.Gzip,
