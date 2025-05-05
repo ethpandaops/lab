@@ -1,17 +1,14 @@
 import React, { useState, useEffect, useContext, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { useQuery } from '@tanstack/react-query';
 import { useParams } from 'react-router-dom';
 import { getLabApiClient } from '../../../api';
 import { GetSlotDataRequest } from '../../../api/gen/backend/pkg/api/proto/lab_api_pb';
 import { MevBidsVisualizer } from '../../../components/beacon/mev_relays/MevBidsVisualizer';
-import { BidsTable } from '../../../components/beacon/mev_relays/BidsTable';
-import { TimingsView } from '../../../components/beacon/mev_relays/TimingsView';
 import { SankeyNetworkView } from '../../../components/beacon/mev_relays/SankeyNetworkView';
 import { BeaconClockManager } from '../../../utils/beacon';
 import { ChevronLeft, ChevronRight, Play, Pause } from 'lucide-react';
 import { NetworkContext } from '@/App';
-import { TabButton } from '@/components/common/TabButton';
 
 // Simple hash function to generate a color from a string (e.g., relay name)
 const generateConsistentColor = (str: string): string => {
@@ -25,7 +22,12 @@ const generateConsistentColor = (str: string): string => {
   return `hsl(${hue}, 70%, 60%)`;
 };
 
-export default function MevRelaysLivePage() {
+/**
+ * BlockProductionLivePage visualizes the entire Ethereum block production process
+ * across four key stages: Block Builders, MEV Relays, Block Proposers, and Network Nodes.
+ * The visualization tracks the flow of blocks through the system in real-time.
+ */
+export default function BlockProductionLivePage() {
   const { network } = useParams<{ network?: string }>();
   const selectedNetwork = network || 'mainnet'; // Default to mainnet if no network param
 
@@ -40,7 +42,7 @@ export default function MevRelaysLivePage() {
   const [displaySlotOffset, setDisplaySlotOffset] = useState<number>(0); // 0 is current, -1 is previous, etc.
   const [currentTime, setCurrentTime] = useState<number>(0); // ms into slot
   const [isPlaying, setIsPlaying] = useState<boolean>(true); // Control playback
-  const [activeTab, setActiveTab] = useState<string>('overview'); // State for bottom panel tabs
+  // Removed activeTab state since we no longer have tabs
 
   const baseSlot = headSlot ? headSlot - headLagSlots : null;
   const slotNumber = baseSlot !== null ? baseSlot + displaySlotOffset : null;
@@ -48,7 +50,7 @@ export default function MevRelaysLivePage() {
   const labApiClient = getLabApiClient();
 
   const { data: slotData, isLoading: isSlotLoading, error: slotError } = useQuery({
-    queryKey: ['mev-relays-live', 'slot', selectedNetwork, slotNumber],
+    queryKey: ['block-production-live', 'slot', selectedNetwork, slotNumber],
     queryFn: async () => {
       if (slotNumber === null) return null;
       const client = await labApiClient;
@@ -159,7 +161,8 @@ export default function MevRelaysLivePage() {
     return null;
   }, [slotData?.relayBids, slotData?.block?.executionPayloadBlockHash]);
 
-  const transformedBids = useMemo(() => {
+  // Initial transformation of bids from the data
+  const allTransformedBids = useMemo(() => {
     if (!slotData?.relayBids) return [];
 
     const bidsForVisualizer: Array<{
@@ -193,6 +196,21 @@ export default function MevRelaysLivePage() {
     
     return bidsForVisualizer.sort((a, b) => a.time - b.time);
   }, [slotData?.relayBids, winningBidData]);
+  
+  // Dynamically filter bids based on current time
+  const transformedBids = useMemo(() => {
+    // Only show bids that have occurred before the current time
+    const timeFilteredBids = allTransformedBids.filter(bid => bid.time <= currentTime);
+    
+    // Sort by value descending (highest value bids first)
+    return [...timeFilteredBids].sort((a, b) => {
+      // Always keep winning bid first
+      if (a.isWinning && !b.isWinning) return -1;
+      if (!a.isWinning && b.isWinning) return 1;
+      // Then sort by value
+      return b.value - a.value;
+    });
+  }, [allTransformedBids, currentTime]);
 
   const totalBids = transformedBids.length;
 
@@ -208,6 +226,80 @@ export default function MevRelaysLivePage() {
     const maxVal = Math.max(...values);
     return { min: 0, max: maxVal * 1.1 };
   }, [transformedBids]);
+  
+  // Calculate which continent saw the block first
+  const firstContinentToSeeBlock = useMemo(() => {
+    // Map of continent codes to full names
+    const continentNames: Record<string, string> = {
+      'NA': 'North America',
+      'SA': 'South America',
+      'EU': 'Europe',
+      'AS': 'Asia',
+      'AF': 'Africa',
+      'OC': 'Oceania',
+      'AN': 'Antarctica'
+    };
+    
+    if (!slotData?.timings?.blockSeen && !slotData?.timings?.blockFirstSeenP2p) {
+      return null;
+    }
+    
+    // Combine API and P2P block seen timings
+    const nodeBlockSeen = slotData.timings?.blockSeen ? 
+      Object.fromEntries(Object.entries(slotData.timings.blockSeen).map(([node, time]) => 
+        [node, typeof time === 'bigint' ? Number(time) : Number(time)]
+      )) : {};
+      
+    const nodeBlockP2P = slotData.timings?.blockFirstSeenP2p ? 
+      Object.fromEntries(Object.entries(slotData.timings.blockFirstSeenP2p).map(([node, time]) => 
+        [node, typeof time === 'bigint' ? Number(time) : Number(time)]
+      )) : {};
+    
+    // Get earliest node timings grouped by continent
+    const continentTimings: Record<string, number> = {};
+    const nodeContinent: Record<string, string> = {};
+    
+    // Map nodes to continents
+    Object.entries(slotData.nodes || {}).forEach(([nodeId, node]) => {
+      if (node.geo?.continent) {
+        nodeContinent[nodeId] = node.geo.continent;
+      }
+    });
+    
+    // Process API timings
+    Object.entries(nodeBlockSeen).forEach(([nodeId, time]) => {
+      const continent = nodeContinent[nodeId];
+      if (continent && typeof time === 'number') {
+        if (!continentTimings[continent] || time < continentTimings[continent]) {
+          continentTimings[continent] = time;
+        }
+      }
+    });
+    
+    // Process P2P timings
+    Object.entries(nodeBlockP2P).forEach(([nodeId, time]) => {
+      const continent = nodeContinent[nodeId];
+      if (continent && typeof time === 'number') {
+        if (!continentTimings[continent] || time < continentTimings[continent]) {
+          continentTimings[continent] = time;
+        }
+      }
+    });
+    
+    // Find earliest continent
+    let earliestContinent = null;
+    let earliestTime = Infinity;
+    
+    Object.entries(continentTimings).forEach(([continent, time]) => {
+      if (time < earliestTime) {
+        earliestTime = time;
+        earliestContinent = continent;
+      }
+    });
+    
+    // Return full continent name if available
+    return earliestContinent ? continentNames[earliestContinent] || earliestContinent : null;
+  }, [slotData?.timings, slotData?.nodes]);
 
   // Pass entity info separately since it might be in a different part of the slotData
   const proposerEntity = slotData?.entity;
@@ -223,44 +315,44 @@ export default function MevRelaysLivePage() {
 
   return (
     <div className="flex flex-col h-full">
-      {/* Top Controls Area */}
-      <div className="flex items-center justify-between p-4 border-b border-subtle">
-        <div className="flex items-center gap-3">
+      {/* Compact Top Controls Bar */}
+      <div className="flex items-center justify-between py-2 px-4 bg-surface/30 rounded-t-lg">
+        <div className="flex items-center gap-2">
           <button
             onClick={goToPreviousSlot}
-            className="bg-surface p-2 rounded-lg border border-subtle hover:bg-hover transition"
+            className="bg-surface/50 p-1.5 rounded border border-subtle hover:bg-hover transition"
             title="Previous Slot"
           >
-            <ChevronLeft className="h-4 w-4 text-primary" />
+            <ChevronLeft className="h-3.5 w-3.5 text-primary" />
           </button>
 
           <button
             onClick={resetToCurrentSlot}
-            className={`px-3 py-1.5 rounded-lg border font-medium text-xs ${displaySlotOffset === 0
+            className={`px-2 py-1 rounded border font-medium text-xs ${displaySlotOffset === 0
                 ? 'bg-accent/20 border-accent/50 text-accent'
-                : 'bg-surface border-subtle text-secondary hover:bg-hover'
+                : 'bg-surface/50 border-subtle text-secondary hover:bg-hover'
               } transition`}
             disabled={displaySlotOffset === 0}
             title="Return to Current Slot"
           >
-            Live Slot
+            Live
           </button>
 
           <button
             onClick={goToNextSlot}
-            className={`bg-surface p-2 rounded-lg border border-subtle transition ${isNextDisabled ? 'opacity-50 cursor-not-allowed' : 'hover:bg-hover'
+            className={`bg-surface/50 p-1.5 rounded border border-subtle transition ${isNextDisabled ? 'opacity-50 cursor-not-allowed' : 'hover:bg-hover'
               }`}
             disabled={isNextDisabled}
             title="Next Slot"
           >
-            <ChevronRight className="h-4 w-4 text-primary" />
+            <ChevronRight className="h-3.5 w-3.5 text-primary" />
           </button>
 
-          <div className="text-sm font-mono ml-2 text-primary">
+          <div className="text-sm font-mono ml-1 text-primary">
             Slot: {slotNumber ?? "—"}
             {headSlot !== null && slotNumber !== null && displaySlotOffset !== 0 && (
-              <span className="ml-2 text-xs text-secondary opacity-70">
-                (Lag: {headLagSlots - displaySlotOffset} slots)
+              <span className="ml-1 text-xs text-secondary opacity-70">
+                (Lag: {headLagSlots - displaySlotOffset})
               </span>
             )}
           </div>
@@ -268,16 +360,18 @@ export default function MevRelaysLivePage() {
 
         <button
           onClick={togglePlayPause}
-          className="bg-surface p-2 rounded-lg border border-subtle hover:bg-hover transition"
+          className="bg-surface/50 p-1.5 rounded border border-subtle hover:bg-hover transition"
           title={isPlaying ? "Pause" : "Play"}
         >
-          {isPlaying ? <Pause className="h-4 w-4 text-primary" /> : <Play className="h-4 w-4 text-primary" />}
+          {isPlaying ? <Pause className="h-3.5 w-3.5 text-primary" /> : <Play className="h-3.5 w-3.5 text-primary" />}
         </button>
       </div>
 
+      {/* Timeline has been merged into the hero section in SankeyNetworkView component */}
+
       {/* Network Tree Visualization */}
       {slotData && (
-        <div className="px-4 pt-4">
+        <div className="px-4 pt-2">
           <SankeyNetworkView
             bids={transformedBids}
             currentTime={currentTime}
@@ -305,9 +399,9 @@ export default function MevRelaysLivePage() {
 
       {/* Main Content Area (Visualization) */}
       <div className="flex-1 p-4 min-h-0">
-        {isSlotLoading && !slotData && <div className="text-center p-8 text-secondary">Loading slot data...</div>}
-        {slotError && <div className="text-center p-8 text-error">Error loading slot data: {slotError.message}</div>}
-        {!isSlotLoading && !slotData && slotNumber !== null && <div className="text-center p-8 text-secondary">No data available for slot {slotNumber}.</div>}
+        {isSlotLoading && !slotData && <div className="text-center p-8 text-secondary">Loading block production data...</div>}
+        {slotError && <div className="text-center p-8 text-error">Error loading block data: {slotError.message}</div>}
+        {!isSlotLoading && !slotData && slotNumber !== null && <div className="text-center p-8 text-secondary">No block production data available for slot {slotNumber}.</div>}
 
         {slotData && (
           <MevBidsVisualizer
@@ -317,52 +411,11 @@ export default function MevRelaysLivePage() {
             winningBid={winningBidData}
             timeRange={timeRange}
             valueRange={valueRange}
-            height={400} // Adjust height as needed
+            height={420} // Slightly taller for better visibility
           />
         )}
       </div>
 
-      {/* Bottom Panel Area */}
-      <div className="border-t border-subtle bg-surface/50 backdrop-blur-sm p-4">
-        {/* Tab Navigation */}
-        <div className="flex gap-2 mb-4">
-          <TabButton
-            label="Slot Details"
-            isActive={activeTab === 'overview'}
-            onClick={() => setActiveTab('overview')}
-          />
-          <TabButton
-            label={`Bids (${totalBids})`}
-            isActive={activeTab === 'bids'}
-            onClick={() => setActiveTab('bids')}
-          />
-        </div>
-
-        {/* Tab Content */}
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={activeTab}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.2 }}
-          >
-          {activeTab === 'overview' && (
-            <TimingsView
-              bids={transformedBids}
-              relayColors={relayColors}
-            />
-          )}
-
-          {activeTab === 'bids' && (
-            <BidsTable
-              bids={transformedBids}
-              relayColors={relayColors}
-            />
-          )}
-          </motion.div>
-        </AnimatePresence>
-      </div>
     </div>
   );
 }

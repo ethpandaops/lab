@@ -15,6 +15,19 @@
 	input, textarea, select {
 		color: black
 	}
+	
+	/* Gold color for winning elements */
+	.text-gold {
+		color: #FFD700;
+	}
+	
+	.bg-gold {
+		background-color: #FFD700;
+	}
+	
+	.border-gold {
+		border-color: #FFD700;
+	}
 
 	/* Text colors */
 	.text-primary {
@@ -364,6 +377,34 @@
 @keyframes highlight {
 	0% { background-color: rgb(var(--accent) / 20%); }
 	100% { background-color: transparent; }
+}
+
+@keyframes flowRight {
+  0% {
+    left: 0%;
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    left: 100%;
+    opacity: 0;
+  }
+}
+
+@keyframes pulseOpacity {
+  0%, 100% { 
+    opacity: 0.3; 
+    transform: translateY(-50%) scale(0.8);
+  }
+  50% { 
+    opacity: 1; 
+    transform: translateY(-50%) scale(1.1);
+  }
 }
 
 .event-highlight {

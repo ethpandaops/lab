@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "@nivo/core": "^0.93.0",
+    "@nivo/tree": "^0.93.0"
+  }
+}

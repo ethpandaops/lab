@@ -49,3 +49,5 @@ config.yaml
 docker-compose.override.yaml
 
 deploy/local
+
+**/.claude/settings.local.json
