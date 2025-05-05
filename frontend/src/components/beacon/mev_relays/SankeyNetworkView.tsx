@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { Card, CardBody } from '@/components/common/Card';
 import { Node, Proposer } from '@/api/gen/backend/pkg/server/proto/beacon_slots/beacon_slots_pb';
+import BlockContentsTreemap from '@/components/beacon/BlockContentsTreemap';
 
 export interface BlockFlowViewProps {
   bids: Array<{
@@ -28,6 +29,14 @@ export interface BlockFlowViewProps {
   // Node timing data (when each node saw the block)
   nodeBlockSeen?: Record<string, number>; // API timings - when nodes saw the block via API
   nodeBlockP2P?: Record<string, number>; // P2P timings - when nodes saw the block via P2P
+  
+  // Block data from the beacon node
+  block?: {
+    execution_payload_transactions_count?: number; // Field name in proto is snake_case
+    executionPayloadTransactionsCount?: number; // Field name could be camelCase in some places
+    blockTotalBytes?: number; // Total block size in bytes
+    [key: string]: any; // Allow other properties
+  };
 }
 
 // Component to represent a stage in the block flow
@@ -416,7 +425,8 @@ export const SankeyNetworkView: React.FC<BlockFlowViewProps> = ({
   nodes = {},
   blockTime,
   nodeBlockSeen = {},  // API timings
-  nodeBlockP2P = {}    // P2P timings
+  nodeBlockP2P = {},   // P2P timings
+  block                // Block data
 }) => {
   // Truncate string with ellipsis in the middle
   const truncateMiddle = (str: string, startChars = 6, endChars = 4) => {
@@ -1182,22 +1192,61 @@ export const SankeyNetworkView: React.FC<BlockFlowViewProps> = ({
             <div className={`flex-1 flex items-center justify-center rounded-lg ${isActive('proposer') ? 'opacity-100 bg-surface/30' : 'opacity-40 bg-surface/20'} transition-opacity transition-colors duration-700`}>
               {proposer && (
                 <div className={`
-                  relative w-44 h-32 
+                  relative w-44 h-full
                   bg-gradient-to-br from-gold/30 to-gold/5
                   rounded-md
-                  flex flex-col items-center justify-center
+                  flex flex-col
                   transition-opacity duration-500
+                  overflow-hidden
                 `}
                 style={{ boxShadow: isActive('proposer') ? 'inset 0 0 0 1px rgba(255, 215, 0, 0.5)' : 'none' }}
                 >
-                  <div className="text-xs font-medium text-primary mb-1">Proposer {proposer.proposerValidatorIndex}</div>
-                  {proposerEntity && <div className="text-xs text-secondary mb-2">{proposerEntity}</div>}
+                  {/* Header with proposer info */}
+                  <div className="p-2 text-center border-b border-gold/30">
+                    <div className="text-xs font-medium text-primary">Proposer {proposer.proposerValidatorIndex}</div>
+                    {proposerEntity && <div className="text-xs text-secondary">{proposerEntity}</div>}
+                    
+                    {winningBid && (
+                      <div className="text-xs text-secondary mt-1">
+                        Block Value: <span className="font-mono text-success/90">{winningBid.value.toFixed(4)} ETH</span>
+                      </div>
+                    )}
+                  </div>
                   
-                  {winningBid && (
-                    <div className="text-xs text-secondary">
-                      Block Value: <span className="font-mono text-success/90">{winningBid.value.toFixed(4)} ETH</span>
+                  {/* Block contents visualization */}
+                  <div className="flex-1 p-1">
+                    <div className="h-full w-full">
+                      {block ? (
+                        <div className="relative h-full w-full">
+                          {/* Debug overlay */}
+                          <div className="absolute top-2 right-2 bg-black/70 text-white text-[10px] p-1 rounded z-10 text-left">
+                            <div>Snake: {typeof block.execution_payload_transactions_count !== 'undefined' ? 
+                              String(block.execution_payload_transactions_count) : 'none'}</div>
+                            <div>Camel: {typeof block.executionPayloadTransactionsCount !== 'undefined' ? 
+                              String(block.executionPayloadTransactionsCount) : 'none'}</div>
+                            <div>Props: {Object.keys(block || {}).join(', ').slice(0, 30)}...</div>
+                          </div>
+                          
+                          {/* Try multiple field name formats */}
+                          <BlockContentsTreemap 
+                            transactionCount={
+                              typeof block.execution_payload_transactions_count !== 'undefined' 
+                                ? Number(block.execution_payload_transactions_count)
+                                : typeof block.executionPayloadTransactionsCount !== 'undefined'
+                                  ? Number(block.executionPayloadTransactionsCount)
+                                  : 80 // Fallback if neither field exists
+                            }
+                            height="100%"
+                            width="100%"
+                          />
+                        </div>
+                      ) : (
+                        <div className="h-full w-full flex items-center justify-center text-xs text-tertiary">
+                          Waiting for block data...
+                        </div>
+                      )}
                     </div>
-                  )}
+                  </div>
                   
                   {/* Ping animation when block is first seen */}
                   {isActive('proposer') && (

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useParams } from 'react-router-dom';
 import { getLabApiClient } from '../../../api';
 import { GetSlotDataRequest } from '../../../api/gen/backend/pkg/api/proto/lab_api_pb';
@@ -30,6 +30,7 @@ const generateConsistentColor = (str: string): string => {
 export default function BlockProductionLivePage() {
   const { network } = useParams<{ network?: string }>();
   const selectedNetwork = network || 'mainnet'; // Default to mainnet if no network param
+  const queryClient = useQueryClient();
 
   // Use BeaconClockManager for slot timing
   useContext(NetworkContext); // Keep context connection for potential future use
@@ -95,6 +96,14 @@ export default function BlockProductionLivePage() {
     queryKey: ['block-production-live', 'slot', selectedNetwork, slotNumber],
     queryFn: async () => {
       if (slotNumber === null) return null;
+      
+      // First check if we already have this data cached (additional safety check)
+      const existingData = queryClient.getQueryData(['block-production-live', 'slot', selectedNetwork, slotNumber]);
+      if (existingData) {
+        console.log(`Using cached data for main query slot: ${slotNumber}`);
+        return existingData;
+      }
+      
       const client = await labApiClient;
       const req = new GetSlotDataRequest({
         network: selectedNetwork,
@@ -125,6 +134,14 @@ export default function BlockProductionLivePage() {
       // Create a query key for this slot - must match the key used in the main useQuery
       const queryKey = ['block-production-live', 'slot', selectedNetwork, slotNumber];
       
+      // Check if we already have data for this slot
+      const existingData = queryClient.getQueryData(queryKey);
+      if (existingData) {
+        // We already have this data in the cache, no need to fetch it again
+        console.log(`Using cached data for ${direction} slot: ${slotNumber}`);
+        return;
+      }
+      
       // Create a query function that will be used for prefetching
       const queryFn = async () => {
         const client = await labApiClient;
@@ -136,9 +153,10 @@ export default function BlockProductionLivePage() {
         return res.data;
       };
       
-      // Use React Query's prefetchQuery function from the queryClient
-      // This is done by accessing the client manually from the main useQuery hook
-      await queryFn();
+      // Use React Query's prefetchQuery to fetch and cache the data
+      await queryClient.prefetchQuery(queryKey, queryFn, {
+        staleTime: 30000, // Consider data fresh for 30 seconds
+      });
       
       console.log(`Prefetched data for ${direction} slot: ${slotNumber}`);
     } catch (error) {
@@ -535,6 +553,7 @@ export default function BlockProductionLivePage() {
                   [node, typeof time === 'bigint' ? Number(time) : Number(time)]
                 )) : {}
               }
+              block={slotData.block}
             />
           </div>
         )}
