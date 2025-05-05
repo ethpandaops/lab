@@ -57,17 +57,25 @@ const FlowStage: React.FC<{
   // For relays, sort alphabetically (with winning bid first)
   // For other stages, sort by value
   const displayItems = useMemo(() => {
-    if (items.length <= maxItems) return items;
+    if (items.length <= maxItems && stageType !== 'builder') return items;
     
-    if (stageType === 'relay') {
-      // For relays, sort alphabetically with winning bid first
+    if (stageType === 'builder') {
+      // For builders, show top 10 builders by value (winning bid first)
+      return [...items]
+        .sort((a, b) => {
+          if (a.isWinning && !b.isWinning) return -1;
+          if (!a.isWinning && b.isWinning) return 1;
+          return b.value - a.value;
+        })
+        .slice(0, 10); // Only show top 10 builders
+    } else if (stageType === 'relay') {
+      // For relays, show all relays, sorted alphabetically with winning bid first
       return [...items]
         .sort((a, b) => {
           if (a.isWinning && !b.isWinning) return -1;
           if (!a.isWinning && b.isWinning) return 1;
           return a.label.localeCompare(b.label);
-        })
-        .slice(0, maxItems);
+        });
     } else if (stageType === 'node') {
       // For nodes, prioritize sorting by timing data (who saw the block first)
       if (items.some(item => item.earliestTime !== undefined && item.earliestTime <= currentTime)) {
@@ -102,22 +110,20 @@ const FlowStage: React.FC<{
 
   return (
     <div 
-      className={`flex-1 flex flex-col transition-all duration-700 transform ${isActive ? 'opacity-100 scale-100' : 'opacity-40 scale-95'}`}
+      className={`w-full h-full flex flex-col transition-opacity duration-700 ${isActive ? 'opacity-100' : 'opacity-40'}`}
     >
-      <div className="flex items-center gap-1.5 mb-1.5">
-        <div className={`w-3 h-3 rounded-full transition-colors duration-500`} style={{ backgroundColor: isActive ? color : '#9ca3af' }}></div>
-        <h3 className="font-medium text-primary text-sm">{title}</h3>
-        <span className="text-[10px] font-mono text-secondary ml-auto opacity-70">{items.length}</span>
-      </div>
+{/* Title row removed */}
       
-      <div className={`flex-1 ${stageType === 'node' ? 'p-1' : 'p-1.5'} rounded-lg overflow-y-auto transition-all duration-500 ${isActive ? 'bg-surface/30' : 'bg-surface/20'}`}>
+      <div className={`flex-1 ${stageType === 'node' ? 'p-1' : 'p-1.5'} rounded-lg overflow-y-auto transition-colors duration-500 ${isActive ? 'bg-surface/30' : 'bg-surface/20'}`}>
         {displayItems.length > 0 ? (
           <div className={`${
             stageType === 'node' 
               ? 'space-y-1' 
-              : stageType === 'builder' || stageType === 'relay'
-                ? 'space-y-0.5' 
-                : 'space-y-1.5'
+              : stageType === 'relay'
+                ? 'space-y-0.5'
+                : stageType === 'builder'
+                  ? 'space-y-0.25' // Even smaller spacing for builders
+                  : 'space-y-1.5'
           }`}>
             {displayItems.map(item => (
               <div 
@@ -125,26 +131,32 @@ const FlowStage: React.FC<{
                 className={`${
                   stageType === 'node' 
                     ? 'p-1.5' 
-                    : stageType === 'builder' || stageType === 'relay'
+                    : stageType === 'relay'
                       ? 'py-1 px-1.5'
-                      : 'p-2'
+                      : stageType === 'builder'
+                        ? 'py-0.5 px-1' // Even smaller padding for builders
+                        : 'p-2'
                 } rounded text-xs ${
                   stageType === 'node'
-                    ? `transition-all duration-500 ${isActive ? '' : 'opacity-70'}`
+                    ? `transition-opacity duration-500 ${isActive ? '' : 'opacity-70'}`
                     : item.isWinning 
                       ? 'bg-gold/5' 
                       : 'bg-surface/30'
-                } ${isActive ? 'transition-all duration-300 hover:bg-opacity-80' : ''}`}
+                } ${isActive ? 'transition-colors duration-300 hover:bg-opacity-80' : ''}`}
                 style={{
                   ...(stageType === 'node' && {
-                    backgroundColor: `${item.color}10`, // Very light background
-                    boxShadow: item.rank > 0 && item.rank <= 3 ? `inset 0 0 0 1px ${item.color}` : 'none',
+                    // Slightly deeper background color for top 3 continents, without borders
+                    backgroundColor: item.rank > 0 && item.rank <= 3 
+                      ? `${item.color}20` // More visible background for top 3
+                      : `${item.color}10`, // Light background for others
+                    boxShadow: 'none', // No borders
                     marginBottom: '0.25rem' // Reduce spacing between items
                   }),
                   ...(stageType === 'builder' && {
                     backgroundColor: item.isWinning ? 'rgba(255, 215, 0, 0.05)' : 'rgba(230, 126, 34, 0.05)',
                     boxShadow: item.isWinning ? 'inset 0 0 0 1px rgba(255, 215, 0, 0.2)' : 'none',
-                    marginBottom: '0.125rem' // Even smaller spacing for builders
+                    marginBottom: '0.075rem', // Minimal spacing for builders to fit more
+                    fontSize: '0.65rem' // Slightly smaller text to fit more builders
                   }),
                   ...(stageType === 'relay' && {
                     backgroundColor: item.isWinning ? 'rgba(255, 215, 0, 0.05)' : 'rgba(46, 204, 113, 0.05)',
@@ -169,7 +181,6 @@ const FlowStage: React.FC<{
                       <span className={`${item.isWinning ? 'text-gold/90 font-medium' : ''}`}>
                         {item.value ? item.value.toFixed(4) : '0.0000'} ETH
                       </span>
-                      {item.isWinning && <span className="ml-1 text-gold font-bold">✓</span>}
                     </div>
                   </div>
                 ) : stageType === 'relay' ? (
@@ -183,18 +194,10 @@ const FlowStage: React.FC<{
                         {item.label}
                       </div>
                     </div>
-                    <div className="flex items-center gap-1.5 ml-1.5">
+                    <div className="flex items-center ml-1.5">
                       <div className="text-[10px] font-mono text-tertiary">
-                        {item.bidCount !== undefined ? item.bidCount : 0}
+                        {item.bidCount !== undefined ? `${item.bidCount} bid${item.bidCount !== 1 ? 's' : ''}` : '0 bids'}
                       </div>
-                      {item.value !== undefined && (
-                        <div className="text-[11px] font-mono text-tertiary">
-                          <span className={`${item.isWinning ? 'text-gold/90 font-medium' : ''}`}>
-                            {item.value.toFixed(4)}
-                          </span>
-                          {item.isWinning && <span className="ml-1 text-gold font-bold">✓</span>}
-                        </div>
-                      )}
                     </div>
                   </div>
                 ) : (
@@ -216,9 +219,6 @@ const FlowStage: React.FC<{
                         </div>
                       )}
                     </div>
-                    {item.isWinning && (
-                      <div className="ml-1.5 text-[10px] text-gold font-bold">✓</div>
-                    )}
                   </div>
                 )}
                 
@@ -229,31 +229,26 @@ const FlowStage: React.FC<{
                 {/* For node items - super compact display with medal rankings */}
                 {stageType === 'node' && (
                   <div className="mt-0.5">
-                    {/* Single-line compact display */}
-                    <div className="flex justify-between items-center mb-0.5">
+                    {/* Single-line compact display with fixed height */}
+                    <div className="flex justify-between items-center mb-0.5 h-5">
                       {/* Medal + Time */}
-                      <div className="flex items-center gap-1">
-                        {/* Medal for top 3 */}
-                        {item.rank > 0 && item.rank <= 3 && item.earliestTime && item.earliestTime <= currentTime && (
-                          <span className="text-[11px] mr-0.5">
-                            {item.rank === 1 ? '🥇' : item.rank === 2 ? '🥈' : '🥉'}
-                          </span>
-                        )}
+                      <div className="flex items-center gap-1 min-w-0">
+                        {/* Medal for top 3 - always reserve space */}
+                        <span className="text-[11px] mr-0.5 w-4 flex justify-center">
+                          {item.rank > 0 && item.rank <= 3 && item.earliestTime && item.earliestTime <= currentTime ? 
+                            (item.rank === 1 ? '🥇' : item.rank === 2 ? '🥈' : '🥉') : ''}
+                        </span>
                         
-                        {/* Time formatted as pill */}
-                        {item.earliestTime && item.earliestTime <= currentTime && item.formattedTime ? (
-                          <span className="font-mono text-[10px] font-medium bg-gray-800/40 px-1 py-0.5 rounded">
-                            {item.formattedTime}
-                          </span>
-                        ) : (
-                          <span className="font-mono text-[9px] text-tertiary/70">
-                            Waiting...
-                          </span>
-                        )}
+                        {/* Time pill with fixed height/width */}
+                        <span className="font-mono text-[10px] font-medium bg-gray-800/40 px-1 py-0.5 rounded min-w-[40px] text-center">
+                          {item.earliestTime && item.earliestTime <= currentTime && item.formattedTime
+                            ? item.formattedTime
+                            : "Waiting..."}
+                        </span>
                       </div>
                       
-                      {/* Node count */}
-                      <div className="text-[10px] font-medium">
+                      {/* Node count - fixed width */}
+                      <div className="text-[10px] font-medium min-w-[60px] text-right">
                         Seen: 
                         <span className={`font-mono ml-1 ${
                           !isActive 
@@ -264,18 +259,13 @@ const FlowStage: React.FC<{
                         }`}>
                           {item.nodesThatHaveSeenBlock}/{item.count}
                         </span>
-                        {item.progress > 0 && (
-                          <span className="ml-1 text-[9px] font-mono opacity-70">
-                            ({Math.round(item.progress)}%)
-                          </span>
-                        )}
                       </div>
                     </div>
                     
-                    {/* Thin progress bar */}
+                    {/* Thin progress bar - fixed height */}
                     <div className="h-[2px] w-full bg-gray-200/10 rounded-full overflow-hidden">
                       <div 
-                        className="h-full transition-all duration-700 ease-out"
+                        className="h-full transition-width duration-700 ease-out"
                         style={{ 
                           width: `${item.progress || 0}%`,
                           backgroundColor: item.color
@@ -310,11 +300,11 @@ const ConnectionLine: React.FC<{
   isWinning?: boolean;
 }> = ({ isActive, isWinning = false }) => {
   return (
-    <div className="w-12 flex-shrink-0 flex items-center justify-center relative">
+    <div className="w-full h-full flex items-center justify-center relative">
       {/* Minimal connection line */}
-      <div className="h-4 w-full relative">
+      <div className="h-4 w-20 relative">
         <div 
-          className={`absolute top-1/2 -translate-y-1/2 h-[1px] w-full transition-all duration-300 ${
+          className={`absolute top-1/2 -translate-y-1/2 h-[1px] w-full transition-colors duration-300 ${
             !isActive 
               ? 'bg-tertiary/20 opacity-50' 
               : isWinning 
@@ -358,6 +348,64 @@ const ConnectionLine: React.FC<{
   );
 };
 
+// Helper function to count unique builder pubkeys in a list of builder items
+const countUniqueBuilders = (builders: Array<{builderPubkey: string; [key: string]: any}>): number => {
+  const uniqueBuilderPubkeys = new Set();
+  builders.forEach(builder => {
+    if (builder.builderPubkey) {
+      uniqueBuilderPubkeys.add(builder.builderPubkey);
+    }
+  });
+  return uniqueBuilderPubkeys.size;
+};
+
+// Helper function to count unique builder pubkeys from all bids
+const countUniqueBuilderPubkeys = (bids: Array<{builderPubkey?: string; [key: string]: any}>): number => {
+  const uniqueBuilderPubkeys = new Set();
+  bids.forEach(bid => {
+    if (bid.builderPubkey) {
+      uniqueBuilderPubkeys.add(bid.builderPubkey);
+    }
+  });
+  return uniqueBuilderPubkeys.size;
+};
+
+// Helper function to determine if we're in the Propagation phase
+// This happens when the first node has seen the block
+const isInPropagationPhase = (
+  currentTime: number, 
+  nodeBlockSeen: Record<string, number>, 
+  nodeBlockP2P: Record<string, number>
+): boolean => {
+  // Find the earliest time any node saw the block
+  let earliestNodeTime = Infinity;
+  
+  // Check API timings
+  Object.values(nodeBlockSeen).forEach(time => {
+    if (typeof time === 'number') {
+      earliestNodeTime = Math.min(earliestNodeTime, time);
+    }
+  });
+  
+  // Check P2P timings
+  Object.values(nodeBlockP2P).forEach(time => {
+    if (typeof time === 'number') {
+      earliestNodeTime = Math.min(earliestNodeTime, time);
+    }
+  });
+  
+  // Default transition time if no real data (around 5 seconds into the slot)
+  const defaultTransitionTime = 5000;
+  
+  // If we have real timing data and the current time has passed that point
+  if (earliestNodeTime !== Infinity && currentTime >= earliestNodeTime) {
+    return true;
+  }
+  
+  // If no real data or we haven't reached the transition point yet
+  return currentTime >= defaultTransitionTime;
+};
+
 export const SankeyNetworkView: React.FC<BlockFlowViewProps> = ({
   bids,
   currentTime,
@@ -377,99 +425,68 @@ export const SankeyNetworkView: React.FC<BlockFlowViewProps> = ({
     return `${str.substring(0, startChars)}...${str.substring(str.length - endChars)}`;
   };
 
-  // Get active status based on role and actual event times
+  // Get active status based on role and phase
   const isActive = (role: 'builder' | 'relay' | 'proposer' | 'node') => {
-    // Default to early activation for builders
-    if (role === 'builder') return currentTime >= 0;
+    // Determine transition point - when first node saw block or fallback to 5s
+    let transitionTime = 5000; // Default fallback transition time
     
-    // For other roles, use actual data timing when available
-    if (bids.length > 0) {
-      // For relay, activate when the first bid is seen
-      if (role === 'relay') {
-        const earliestBidTime = Math.min(...bids.map(bid => bid.time));
-        return currentTime >= earliestBidTime;
+    // Try to find earliest node timing from available data
+    let earliestNodeTime = Infinity;
+    
+    // Check API timings
+    Object.values(nodeBlockSeen).forEach(time => {
+      if (typeof time === 'number') {
+        earliestNodeTime = Math.min(earliestNodeTime, time);
       }
-      
-      // For proposer, activate when block is seen (or winning bid is selected)
-      if (role === 'proposer') {
-        if (blockTime) {
-          return currentTime >= blockTime;
-        } else if (winningBid) {
-          // If we have a winning bid but no blockTime, use the winning bid time
-          const winningBidTime = bids.find(bid => bid.isWinning)?.time;
-          return currentTime >= (winningBidTime || 4000);
-        }
+    });
+    
+    // Check P2P timings
+    Object.values(nodeBlockP2P).forEach(time => {
+      if (typeof time === 'number') {
+        earliestNodeTime = Math.min(earliestNodeTime, time);
+      }
+    });
+    
+    // If we have real timing data, use it as transition point
+    if (earliestNodeTime !== Infinity) {
+      transitionTime = earliestNodeTime;
+    } else if (blockTime) {
+      // If we have block time but no node data, use block time
+      transitionTime = blockTime;
+    } else if (winningBid) {
+      // If we have winning bid but no block time, estimate based on winning bid
+      const winningBidTime = bids.find(bid => bid.isWinning)?.time;
+      if (winningBidTime) {
+        transitionTime = winningBidTime + 1000; // Roughly 1s after winning bid
       }
     }
     
-    // Node activation based on timing data and role
-    if (role === 'node') {
-      // This function determines when the entire nodes SECTION activates
-      // Individual node progress is handled separately in the continent data
-      
-      // Strategy: Activate the nodes section when:
-      // 1. We have real node data and at least one node has seen the block, OR
-      // 2. We have a block time and we've passed the expected nodes activation time, OR
-      // 3. We have a winning bid and we've passed the expected nodes activation time
-      
-      // Check if we have any actual node timing data for this slot
-      const hasRealNodeTimings = Object.keys(nodeBlockSeen).length > 0 || Object.keys(nodeBlockP2P).length > 0;
-      
-      // If we have real timing data, use it to determine when the section activates
-      if (hasRealNodeTimings) {
-        // Find the earliest node timing from all available sources
-        let earliestNodeTime = Infinity;
+    // For each role, determine if it's active based on the phase
+    switch (role) {
+      case 'builder':
+        // Builders are active from the start
+        return currentTime >= 0;
         
-        // Check API timings
-        Object.values(nodeBlockSeen).forEach(time => {
-          if (typeof time === 'number') {
-            earliestNodeTime = Math.min(earliestNodeTime, time);
-          }
-        });
-        
-        // Check P2P timings
-        Object.values(nodeBlockP2P).forEach(time => {
-          if (typeof time === 'number') {
-            earliestNodeTime = Math.min(earliestNodeTime, time);
-          }
-        });
-        
-        // If we found valid node timing, use it to activate the section
-        if (earliestNodeTime !== Infinity) {
-          // Add a small offset before activation to make the transition smoother
-          // No more than 200ms to keep it feeling responsive
-          const activationTime = Math.max(0, earliestNodeTime - 200);
-          return currentTime >= activationTime;
+      case 'relay':
+        // For relay, use the earliest bid time if available
+        if (bids.length > 0) {
+          const earliestBidTime = Math.min(...bids.map(bid => bid.time));
+          return currentTime >= earliestBidTime;
         }
-      }
-      
-      // If we have block time but no node timing data, activate based on block time
-      if (blockTime) {
-        // Activate nodes shortly after block time (nodes typically see blocks quickly)
-        return currentTime >= (blockTime + 800); // Reduced from 1000ms for more responsiveness
-      } 
-      
-      // If we have a winning bid but no block time or node data
-      if (winningBid) {
-        const winningBidTime = bids.find(bid => bid.isWinning)?.time;
-        if (winningBidTime) {
-          // Slightly faster activation after winning bid (more responsive visual)
-          return currentTime >= (winningBidTime + 1800); // Reduced from 2000ms
-        }
-      }
-      
-      // Final fallback to default timing if no other data is available
-      return currentTime >= 5000; // Fallback to 5s into slot
+        // Otherwise activate relays shortly after start
+        return currentTime >= 1000;
+        
+      case 'proposer':
+        // Proposer activates just before transition to propagation
+        return currentTime >= (transitionTime - 500);
+        
+      case 'node':
+        // Nodes activate at the transition point
+        return currentTime >= transitionTime;
     }
     
-    // Fallback to sensible defaults if we don't have actual timings
-    const fallbackTimes = {
-      builder: 0,      // Builders are active from the start
-      relay: 2000,     // Relays activate at ~2 seconds
-      proposer: 4000,  // Proposer activates at ~4 seconds
-      node: 5000       // Network nodes activate at ~5 seconds
-    };
-    return currentTime >= fallbackTimes[role];
+    // Function should never reach here since all cases are handled above
+    return false;
   };
 
   // Get builder bids - filtered by current time and deduplicated by builder pubkey
@@ -518,14 +535,15 @@ export const SankeyNetworkView: React.FC<BlockFlowViewProps> = ({
       relayName: bid.relayName // Keep track of which relay it came from
     }));
     
-    // Get the top 5 bids by value with winning bid always first
+    // Return all unique builder items, sorted with winning bid first then by value
+    // We don't slice here - we want the full list for accurate counting,
+    // but the FlowStage component will only display the top 10
     return builderItems
       .sort((a, b) => {
         if (a.isWinning && !b.isWinning) return -1;
         if (!a.isWinning && b.isWinning) return 1;
         return b.value - a.value;
-      })
-      .slice(0, 5);
+      });
   }, [bids, currentTime]);
 
   // Get unique relay items - filtered by current time
@@ -811,68 +829,163 @@ export const SankeyNetworkView: React.FC<BlockFlowViewProps> = ({
         {/* Hero Timeline with Phase Icons and Key Information */}
         <div className="border-b border-subtle/30">
           <div className="flex justify-between items-center pt-3 px-4">
-            <h3 className="text-base font-bold text-primary">Block Production Timeline</h3>
+            <div className="flex flex-col">
+              <h3 className="text-base font-bold text-primary">Block Production Timeline</h3>
+              <div className="text-xs mt-0.5">
+                Phase: <span 
+                  className={`font-medium ${isInPropagationPhase(currentTime, nodeBlockSeen, nodeBlockP2P) ? 'text-purple-400' : 'text-orange-400'}`}
+                >
+                  {isInPropagationPhase(currentTime, nodeBlockSeen, nodeBlockP2P) ? 'Propagating' : 'Building'}
+                </span>
+              </div>
+            </div>
             <div className="font-mono text-xs text-tertiary/80">{(currentTime / 1000).toFixed(1)}s</div>
           </div>
           
           <div className="relative px-4 pt-2 pb-6">
-            {/* Phase progress bar */}
-            <div className="h-2 mb-3 flex rounded-lg overflow-hidden border border-subtle">
-              <div className="w-1/4 bg-orange-500/20 border-r border-white/5" />
-              <div className="w-1/4 bg-green-500/20 border-r border-white/5" />
-              <div className="w-1/4 bg-gold/20 border-r border-white/5" />
-              <div className="w-1/4 bg-purple-500/20" />
+            {/* Two-phase progress bar: Building and Propagating */}
+            <div className="h-2 mb-3 flex rounded-lg overflow-hidden border border-subtle relative">
+              {/* Dynamic phase bars based on transition time */}
+              {(() => {
+                // Calculate transition time 
+                let transitionTime = 5000; // Default
+                let earliestNodeTime = Infinity;
+                
+                // Look for earliest node time in the data
+                Object.values(nodeBlockSeen).forEach(time => {
+                  if (typeof time === 'number') {
+                    earliestNodeTime = Math.min(earliestNodeTime, time);
+                  }
+                });
+                
+                Object.values(nodeBlockP2P).forEach(time => {
+                  if (typeof time === 'number') {
+                    earliestNodeTime = Math.min(earliestNodeTime, time);
+                  }
+                });
+                
+                // Use earliest node time if we have it, otherwise default
+                if (earliestNodeTime !== Infinity) {
+                  transitionTime = earliestNodeTime;
+                } else if (blockTime) {
+                  transitionTime = blockTime;
+                }
+                
+                // Calculate the percentage for transition (as portion of the 12s slot)
+                const transitionPercent = Math.min(98, Math.max(2, (transitionTime / 12000) * 100));
+                const isInPropagation = isInPropagationPhase(currentTime, nodeBlockSeen, nodeBlockP2P);
+                
+                return (
+                  <>
+                    {/* Building phase - dynamic width based on transition time */}
+                    <div 
+                      className="border-r border-white/5 transition-colors duration-300" 
+                      style={{ 
+                        width: `${transitionPercent}%`,
+                        backgroundColor: isInPropagation
+                          ? 'rgba(249, 115, 22, 0.1)' // faded orange when inactive
+                          : 'rgba(249, 115, 22, 0.3)' // brighter orange when active
+                      }}
+                    />
+                    {/* Propagating phase - dynamic width based on transition time */}
+                    <div 
+                      className="transition-colors duration-300"
+                      style={{ 
+                        width: `${100 - transitionPercent}%`,
+                        backgroundColor: isInPropagation
+                          ? 'rgba(168, 85, 247, 0.3)' // brighter purple when active
+                          : 'rgba(168, 85, 247, 0.1)' // faded purple when inactive
+                      }}
+                    />
+                    
+                    {/* Phase transition marker */}
+                    <div 
+                      className="absolute top-0 bottom-0 w-[3px] transition-colors duration-300" 
+                      style={{
+                        left: `${transitionPercent}%`,
+                        backgroundColor: isInPropagation
+                          ? 'rgba(255, 255, 255, 0.6)' // brighter when we've passed the transition
+                          : 'rgba(255, 255, 255, 0.2)' // dimmer before transition
+                      }}
+                    />
+                  </>
+                );
+              })()}
             </div>
             
-            {/* Progress overlay on phases */}
+            {/* Progress overlay on phases - using linear time progression */}
             <div 
-              className="absolute top-2 left-4 h-2 bg-active/20 transition-all duration-100 rounded-l-lg"
+              className="absolute top-2 left-4 h-2 bg-active/20 transition-width duration-100 rounded-l-lg"
               style={{ 
                 width: `${(currentTime / 12000) * 100}%`,
                 maxWidth: 'calc(100% - 32px)' // Stay within container boundaries
               }}
             />
             
-            {/* Phase time labels */}
-            <div className="flex justify-between mb-6 px-1">
-              <div className="flex flex-col items-center">
+            {/* Time markers showing evenly spaced time intervals */}
+            <div className="flex mb-6 px-1 relative">
+              {/* 0s marker */}
+              <div className="absolute left-0 flex flex-col items-center">
                 <div className="w-px h-1 bg-white/10 mb-0.5" />
                 <span className="font-mono text-[9px] text-tertiary/60">0s</span>
               </div>
-              <div className="flex flex-col items-center">
+              
+              {/* 2s marker */}
+              <div className="absolute left-[16.7%] flex flex-col items-center">
                 <div className="w-px h-1 bg-white/10 mb-0.5" />
-                <span className="font-mono text-[9px] text-tertiary/60">3s</span>
+                <span className="font-mono text-[9px] text-tertiary/60">2s</span>
               </div>
-              <div className="flex flex-col items-center">
+              
+              {/* 4s marker */}
+              <div className="absolute left-[33.3%] flex flex-col items-center">
+                <div className="w-px h-1 bg-white/10 mb-0.5" />
+                <span className="font-mono text-[9px] text-tertiary/60">4s</span>
+              </div>
+              
+              {/* 6s marker */}
+              <div className="absolute left-[50%] flex flex-col items-center">
                 <div className="w-px h-1 bg-white/10 mb-0.5" />
                 <span className="font-mono text-[9px] text-tertiary/60">6s</span>
               </div>
-              <div className="flex flex-col items-center">
+              
+              {/* 8s marker */}
+              <div className="absolute left-[66.7%] flex flex-col items-center">
                 <div className="w-px h-1 bg-white/10 mb-0.5" />
-                <span className="font-mono text-[9px] text-tertiary/60">9s</span>
+                <span className="font-mono text-[9px] text-tertiary/60">8s</span>
               </div>
-              <div className="flex flex-col items-center">
+              
+              {/* 10s marker */}
+              <div className="absolute left-[83.3%] flex flex-col items-center">
+                <div className="w-px h-1 bg-white/10 mb-0.5" />
+                <span className="font-mono text-[9px] text-tertiary/60">10s</span>
+              </div>
+              
+              {/* 12s marker */}
+              <div className="absolute right-0 flex flex-col items-center">
                 <div className="w-px h-1 bg-white/10 mb-0.5" />
                 <span className="font-mono text-[9px] text-tertiary/60">12s</span>
               </div>
+              
+              {/* Transition time marker removed */}
             </div>
           
-            {/* Timeline connecting line */}
-            <div className="absolute top-[90px] left-[60px] right-[60px] h-0.5 bg-gradient-to-r from-[#e67e22]/30 via-[#2ecc71]/30 to-[#9b59b6]/30 rounded-full"></div>
+            {/* Removed timeline connecting line */}
             
-            {/* Timeline nodes and connecting arrows */}
+            {/* Timeline nodes with custom connectors */}
             <div className="flex justify-between items-center px-6 relative z-10">
               {/* Builders Phase */}
-              <div className="flex flex-col items-center text-center">
+              <div className={`flex flex-col items-center text-center ${!isActive('builder') ? 'opacity-60' : ''}`}>
                 <div 
-                  className={`w-16 h-16 flex items-center justify-center rounded-full mb-2 shadow-md transition-all duration-500 ${
-                    isActive('builder') 
-                      ? 'bg-gradient-to-br from-orange-500/30 to-orange-500/10 border-2 border-orange-400/50' 
-                      : 'bg-surface/30 border border-subtle'
+                  className={`w-16 h-16 flex items-center justify-center rounded-full mb-2 shadow-md transition-colors duration-500 ${
+                    isActive('builder')
+                      ? !isInPropagationPhase(currentTime, nodeBlockSeen, nodeBlockP2P)
+                        ? 'bg-gradient-to-br from-orange-500/60 to-orange-500/30 border-2 border-orange-400/80' // Brighter during building phase
+                        : 'bg-gradient-to-br from-orange-500/30 to-orange-500/10 border-2 border-orange-400/50' // Normal when active
+                      : 'bg-surface/20 border border-subtle/50 opacity-50' // More dull when inactive
                   }`}
                 >
                   <div 
-                    className={`text-3xl ${isActive('builder') ? 'animate-pulse' : 'opacity-60'}`} 
+                    className={`text-3xl ${isActive('builder') ? 'animate-pulse' : 'opacity-40'}`} 
                     role="img" 
                     aria-label="Robot (Builder)"
                   >
@@ -881,39 +994,30 @@ export const SankeyNetworkView: React.FC<BlockFlowViewProps> = ({
                 </div>
                 <div className="font-medium text-sm">Builders</div>
                 <div className="text-xs text-tertiary mt-0.5 max-w-[110px] h-8">
-                  {builders.length > 0 
-                    ? `${builders.length} builder${builders.length > 1 ? 's' : ''}` 
+                  {bids.length > 0 
+                    ? `${countUniqueBuilderPubkeys(bids)} builder${countUniqueBuilderPubkeys(bids) > 1 ? 's' : ''} total` 
                     : 'Waiting for blocks...'}
                 </div>
-                {winningBid && (
-                  <div className="text-xs font-mono text-gold absolute bottom-0 whitespace-nowrap">
-                    {winningBid.value.toFixed(4)} ETH
-                  </div>
-                )}
               </div>
 
-              {/* Arrow 1 */}
+              {/* Connection between Builders and Relays */}
               <div className="flex-shrink-0 flex items-center justify-center relative">
-                <div className={`h-0.5 w-[40px] ${isActive('relay') ? 'bg-active' : 'bg-tertiary/30'} transition-all duration-500`}></div>
-                <div 
-                  className={`absolute right-0 text-xs ${isActive('relay') ? 'text-active' : 'text-tertiary/30'} transition-all duration-500`}
-                  style={{transform: 'translateX(50%) rotate(45deg)'}}
-                >
-                  ▶
-                </div>
+                <div className={`h-0.5 w-[40px] ${isActive('relay') ? isActive('builder') ? 'bg-active' : 'bg-active/40' : 'bg-tertiary/20'} transition-colors duration-500`}></div>
               </div>
 
               {/* Relays Phase */}
-              <div className="flex flex-col items-center text-center">
+              <div className={`flex flex-col items-center text-center ${!isActive('relay') ? 'opacity-60' : ''}`}>
                 <div 
-                  className={`w-16 h-16 flex items-center justify-center rounded-full mb-2 shadow-md transition-all duration-500 ${
-                    isActive('relay') 
-                      ? 'bg-gradient-to-br from-green-500/30 to-green-500/10 border-2 border-green-400/50' 
-                      : 'bg-surface/30 border border-subtle'
+                  className={`w-16 h-16 flex items-center justify-center rounded-full mb-2 shadow-md transition-colors duration-500 ${
+                    isActive('relay')
+                      ? !isInPropagationPhase(currentTime, nodeBlockSeen, nodeBlockP2P)
+                        ? 'bg-gradient-to-br from-green-500/60 to-green-500/30 border-2 border-green-400/80' // Brighter during building phase
+                        : 'bg-gradient-to-br from-green-500/30 to-green-500/10 border-2 border-green-400/50' // Normal when active
+                      : 'bg-surface/20 border border-subtle/50 opacity-50' // More dull when inactive
                   }`}
                 >
                   <div 
-                    className={`text-3xl ${isActive('relay') ? 'animate-pulse' : 'opacity-60'}`} 
+                    className={`text-3xl ${isActive('relay') ? 'animate-pulse' : 'opacity-40'}`} 
                     role="img" 
                     aria-label="MEV Relay"
                   >
@@ -930,28 +1034,24 @@ export const SankeyNetworkView: React.FC<BlockFlowViewProps> = ({
                 </div>
               </div>
 
-              {/* Arrow 2 */}
+              {/* Connection between Relays and Proposer */}
               <div className="flex-shrink-0 flex items-center justify-center relative">
-                <div className={`h-0.5 w-[40px] ${isActive('proposer') ? 'bg-active' : 'bg-tertiary/30'} transition-all duration-500`}></div>
-                <div 
-                  className={`absolute right-0 text-xs ${isActive('proposer') ? 'text-active' : 'text-tertiary/30'} transition-all duration-500`}
-                  style={{transform: 'translateX(50%) rotate(45deg)'}}
-                >
-                  ▶
-                </div>
+                <div className={`h-0.5 w-[40px] ${isActive('proposer') ? isActive('relay') ? 'bg-active' : 'bg-active/40' : 'bg-tertiary/20'} transition-colors duration-500`}></div>
               </div>
 
               {/* Proposer Phase */}
-              <div className="flex flex-col items-center text-center">
+              <div className={`flex flex-col items-center text-center ${!isActive('proposer') ? 'opacity-60' : ''}`}>
                 <div 
-                  className={`w-16 h-16 flex items-center justify-center rounded-full mb-2 shadow-md transition-all duration-500 ${
-                    isActive('proposer') 
-                      ? 'bg-gradient-to-br from-gold/30 to-gold/10 border-2 border-gold/50' 
-                      : 'bg-surface/30 border border-subtle'
+                  className={`w-16 h-16 flex items-center justify-center rounded-full mb-2 shadow-md transition-colors duration-500 ${
+                    isActive('proposer')
+                      ? isInPropagationPhase(currentTime, nodeBlockSeen, nodeBlockP2P)
+                        ? 'bg-gradient-to-br from-gold/60 to-gold/30 border-2 border-gold/80' // Brighter during propagation phase
+                        : 'bg-gradient-to-br from-gold/30 to-gold/10 border-2 border-gold/50' // Normal when active
+                      : 'bg-surface/20 border border-subtle/50 opacity-50' // More dull when inactive
                   }`}
                 >
                   <div 
-                    className={`text-3xl ${isActive('proposer') ? 'animate-pulse' : 'opacity-60'}`} 
+                    className={`text-3xl ${isActive('proposer') ? 'animate-pulse' : 'opacity-40'}`} 
                     role="img" 
                     aria-label="Proposer"
                   >
@@ -971,28 +1071,24 @@ export const SankeyNetworkView: React.FC<BlockFlowViewProps> = ({
                 )}
               </div>
 
-              {/* Arrow 3 */}
+              {/* Connection between Proposer and Nodes */}
               <div className="flex-shrink-0 flex items-center justify-center relative">
-                <div className={`h-0.5 w-[40px] ${isActive('node') ? 'bg-active' : 'bg-tertiary/30'} transition-all duration-500`}></div>
-                <div 
-                  className={`absolute right-0 text-xs ${isActive('node') ? 'text-active' : 'text-tertiary/30'} transition-all duration-500`}
-                  style={{transform: 'translateX(50%) rotate(45deg)'}}
-                >
-                  ▶
-                </div>
+                <div className={`h-0.5 w-[40px] ${isActive('node') ? isActive('proposer') ? 'bg-active' : 'bg-active/40' : 'bg-tertiary/20'} transition-colors duration-500`}></div>
               </div>
 
               {/* Network Nodes Phase */}
-              <div className="flex flex-col items-center text-center">
+              <div className={`flex flex-col items-center text-center ${!isActive('node') ? 'opacity-60' : ''}`}>
                 <div 
-                  className={`w-16 h-16 flex items-center justify-center rounded-full mb-2 shadow-md transition-all duration-500 ${
-                    isActive('node') 
-                      ? 'bg-gradient-to-br from-purple-500/30 to-purple-500/10 border-2 border-purple-400/50' 
-                      : 'bg-surface/30 border border-subtle'
+                  className={`w-16 h-16 flex items-center justify-center rounded-full mb-2 shadow-md transition-colors duration-500 ${
+                    isActive('node')
+                      ? isInPropagationPhase(currentTime, nodeBlockSeen, nodeBlockP2P)
+                        ? 'bg-gradient-to-br from-purple-500/60 to-purple-500/30 border-2 border-purple-400/80' // Brighter during propagation phase
+                        : 'bg-gradient-to-br from-purple-500/30 to-purple-500/10 border-2 border-purple-400/50' // Normal when active
+                      : 'bg-surface/20 border border-subtle/50 opacity-50' // More dull when inactive
                   }`}
                 >
                   <div 
-                    className={`text-3xl ${isActive('node') ? 'animate-pulse' : 'opacity-60'}`} 
+                    className={`text-3xl ${isActive('node') ? 'animate-pulse' : 'opacity-40'}`} 
                     role="img" 
                     aria-label="Network Nodes"
                   >
@@ -1018,85 +1114,79 @@ export const SankeyNetworkView: React.FC<BlockFlowViewProps> = ({
               </div>
             </div>
             
-            {/* Process phase labels (shown below icons) */}
-            <div className="flex justify-between px-[50px] my-1">
-              <div className="w-[100px] text-center">
-                <span className="text-[9px] font-mono font-medium text-orange-400">Building</span>
-              </div>
-              <div className="w-[100px] text-center">
-                <span className="text-[9px] font-mono font-medium text-green-400">Relaying</span>
-              </div>
-              <div className="w-[100px] text-center">
-                <span className="text-[9px] font-mono font-medium text-gold">Proposing</span>
-              </div>
-              <div className="w-[100px] text-center">
-                <span className="text-[9px] font-mono font-medium text-purple-400">Propagating</span>
-              </div>
-            </div>
+{/* Removed redundant Building/Propagating labels */}
             
-            {/* Current progress indicator */}
+            {/* Enhanced current progress indicator - using linear time progression */}
             <div 
-              className="absolute top-2 left-4 h-2 bg-active transition-all duration-100"
+              className="absolute top-2 left-4 h-2 bg-active/80 transition-width duration-100"
               style={{ 
                 left: `calc(4px + ${(currentTime / 12000) * 100}%)`,
-                width: '2px',
+                width: '3px',
+                boxShadow: '0 0 10px 2px rgba(255, 255, 255, 0.5)'
               }}
             >
-              <div className="absolute top-0 w-2 h-2 bg-active rounded-full transform -translate-x-1/2 -translate-y-1/2"></div>
+              <div 
+                className="absolute top-0 w-4 h-4 bg-white rounded-full transform -translate-x-1/2 -translate-y-1/2 animate-pulse"
+                style={{
+                  boxShadow: '0 0 8px 2px rgba(255, 255, 255, 0.8)'
+                }}
+              ></div>
             </div>
           </div>
         </div>
         
-        <div className="flex flex-row h-[420px] gap-4">
-          {/* Stage 1: Builders */}
-          <FlowStage
-            title="1. Block Builders"
-            color="#e67e22"
-            isActive={isActive('builder')}
-            items={builders}
-            stageType="builder"
-            currentTime={currentTime}
-          />
+        {/* Main content area with precisely aligned columns */}
+        <div className="grid grid-cols-7 h-[420px] gap-0">
+          {/* Column 1: Builders */}
+          <div className="col-span-1">
+            <FlowStage
+              title="Block Builders"
+              color="#e67e22"
+              isActive={isActive('builder')}
+              items={builders}
+              stageType="builder"
+              currentTime={currentTime}
+            />
+          </div>
           
-          {/* Connection Line */}
-          <ConnectionLine 
-            isActive={isActive('relay')} 
-            isWinning={winningBid !== null && isActive('relay')}
-          />
+          {/* Column 2: Connection Line */}
+          <div className="flex justify-center items-center">
+            <ConnectionLine 
+              isActive={isActive('relay')} 
+              isWinning={winningBid !== null && isActive('relay')}
+            />
+          </div>
           
-          {/* Stage 2: Relays */}
-          <FlowStage
-            title="2. MEV Relays"
-            color="#2ecc71"
-            isActive={isActive('relay')}
-            items={relays}
-            stageType="relay"
-            currentTime={currentTime}
-          />
+          {/* Column 3: Relays */}
+          <div className="col-span-1">
+            <FlowStage
+              title="MEV Relays"
+              color="#2ecc71"
+              isActive={isActive('relay')}
+              items={relays}
+              stageType="relay"
+              currentTime={currentTime}
+            />
+          </div>
           
-          {/* Connection Line */}
-          <ConnectionLine 
-            isActive={isActive('proposer')} 
-            isWinning={winningBid !== null && isActive('proposer')}
-          />
+          {/* Column 4: Connection Line */}
+          <div className="flex justify-center items-center">
+            <ConnectionLine 
+              isActive={isActive('proposer')} 
+              isWinning={winningBid !== null && isActive('proposer')}
+            />
+          </div>
           
-          {/* Stage 3: Proposer as Block */}
-          <div className="flex-1 flex flex-col">
-            <div className="flex items-center gap-1.5 mb-1.5">
-              <div className={`w-3 h-3 rounded-full transition-colors duration-500`} 
-                   style={{ backgroundColor: isActive('proposer') ? '#FFD700' : '#9ca3af' }}></div>
-              <h3 className="font-medium text-primary text-sm">3. Block Proposer</h3>
-            </div>
-            
-            <div className={`flex-1 flex items-center justify-center rounded-lg ${isActive('proposer') ? 'opacity-100 bg-surface/30' : 'opacity-40 bg-surface/20'} transition-all duration-700`}>
+          {/* Column 5: Proposer */}
+          <div className="col-span-1">
+            <div className={`flex-1 flex items-center justify-center rounded-lg ${isActive('proposer') ? 'opacity-100 bg-surface/30' : 'opacity-40 bg-surface/20'} transition-opacity transition-colors duration-700`}>
               {proposer && (
                 <div className={`
                   relative w-44 h-32 
                   bg-gradient-to-br from-gold/30 to-gold/5
                   rounded-md
                   flex flex-col items-center justify-center
-                  transform transition-all duration-500
-                  ${isActive('proposer') ? 'scale-100' : 'scale-95'}
+                  transition-opacity duration-500
                 `}
                 style={{ boxShadow: isActive('proposer') ? 'inset 0 0 0 1px rgba(255, 215, 0, 0.5)' : 'none' }}
                 >
@@ -1127,26 +1217,30 @@ export const SankeyNetworkView: React.FC<BlockFlowViewProps> = ({
             </div>
           </div>
           
-          {/* Connection Line */}
-          <ConnectionLine 
-            isActive={isActive('node')} 
-            isWinning={proposerData.length > 0 && isActive('node')}
-          />
+          {/* Column 6: Connection Line */}
+          <div className="flex justify-center items-center">
+            <ConnectionLine 
+              isActive={isActive('node')} 
+              isWinning={proposerData.length > 0 && isActive('node')}
+            />
+          </div>
           
-          {/* Stage 4: Network Nodes with progress bars */}
-          <FlowStage
-            title="4. Network Nodes"
-            color="#9b59b6"
-            isActive={isActive('node')}
-            items={continents}
-            stageType="node"
-            currentTime={currentTime}
-            maxItems={20} /* Ensure we show all possible continents */
-          />
+          {/* Column 7: Network Nodes */}
+          <div className="col-span-1">
+            <FlowStage
+              title="Network Nodes"
+              color="#9b59b6"
+              isActive={isActive('node')}
+              items={continents}
+              stageType="node"
+              currentTime={currentTime}
+              maxItems={20} /* Ensure we show all possible continents */
+            />
+          </div>
         </div>
 
         <div className="text-xs text-tertiary mt-2 px-1">
-          <p>This visualization demonstrates the complete Ethereum block production process through 4 key stages: Builders proposing blocks, Relays forwarding bids, Proposers selecting blocks, and Network nodes receiving blocks.</p>
+          <p>This visualization demonstrates the complete Ethereum block production process: Builders proposing blocks, Relays forwarding bids, Proposers selecting blocks, and Network nodes receiving blocks.</p>
         </div>
       </div>
     </div>

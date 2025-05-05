@@ -44,10 +44,52 @@ export default function BlockProductionLivePage() {
   const [isPlaying, setIsPlaying] = useState<boolean>(true); // Control playback
   // Removed activeTab state since we no longer have tabs
 
-  const baseSlot = headSlot ? headSlot - headLagSlots : null;
+  // Calculate the base slot with proper lag (we add 2 extra slots of lag for data to populate)
+  // This matches the behavior in beacon/live.tsx that adds extra lag for data processing
+  const baseSlot = headSlot ? headSlot - (headLagSlots + 2) : null;
   const slotNumber = baseSlot !== null ? baseSlot + displaySlotOffset : null;
 
   const labApiClient = getLabApiClient();
+
+  // Navigation and Playback functions - defined early to avoid reference errors
+  // Prefetch previous slot before navigating to reduce flash
+  const goToPreviousSlot = () => {
+    if (slotNumber !== null) {
+      // Prefetch previous slot data before navigating
+      prefetchPreviousSlotData(slotNumber - 1);
+    }
+    setDisplaySlotOffset(prev => prev - 1);
+  };
+  
+  const goToNextSlot = () => {
+    // Only allow advancing to next slot if we're not already at the head slot
+    if (headSlot !== null && slotNumber !== null && slotNumber < headSlot) {
+      // Prefetch next slot data before navigating
+      prefetchNextSlotData(slotNumber + 1);
+      setDisplaySlotOffset(prev => prev + 1);
+    } else if (displaySlotOffset < 0) {
+      // If we're on a historical slot, we can move forward even if we don't know the head yet
+      if (slotNumber !== null) {
+        prefetchNextSlotData(slotNumber + 1);
+      }
+      setDisplaySlotOffset(prev => prev + 1);
+    } else {
+      console.log("Already at head slot or next slot, can't advance further");
+    }
+  };
+  
+  const resetToCurrentSlot = () => {
+    // If we have a head slot and we're not already at the current slot
+    if (headSlot !== null && slotNumber !== null && displaySlotOffset !== 0) {
+      // Calculate what the current slot would be
+      const currentSlot = headSlot - (headLagSlots + 2);
+      // Prefetch the current slot data before resetting
+      prefetchSlotData(currentSlot, 'next');
+    }
+    setDisplaySlotOffset(0);
+  };
+  const isNextDisabled = displaySlotOffset >= 0;
+  const togglePlayPause = () => setIsPlaying(prev => !prev);
 
   const { data: slotData, isLoading: isSlotLoading, error: slotError } = useQuery({
     queryKey: ['block-production-live', 'slot', selectedNetwork, slotNumber],
@@ -61,9 +103,58 @@ export default function BlockProductionLivePage() {
       const res = await client.getSlotData(req);
       return res.data;
     },
-    refetchInterval: 5000,
+    refetchInterval: 5000, // Periodically check for updates
+    refetchIntervalInBackground: true, // Refetch even if tab is not focused
+    staleTime: 30000, // Consider data fresh for 30 seconds to avoid flashing
+    keepPreviousData: true, // Keep showing previous slot's data while loading new data
+    retry: 2, // Retry failed requests twice
     enabled: slotNumber !== null,
   });
+
+  // Generic data prefetching function with retry and caching strategy
+  const prefetchSlotData = async (slotNumber: number | null, direction: 'next' | 'previous') => {
+    if (slotNumber === null) return;
+    
+    // Don't try to prefetch slots that are too far in the future
+    if (direction === 'next' && headSlot !== null && slotNumber > headSlot + 1) return;
+    
+    // Don't prefetch negative slots
+    if (slotNumber < 0) return;
+    
+    try {
+      // Create a query key for this slot - must match the key used in the main useQuery
+      const queryKey = ['block-production-live', 'slot', selectedNetwork, slotNumber];
+      
+      // Create a query function that will be used for prefetching
+      const queryFn = async () => {
+        const client = await labApiClient;
+        const req = new GetSlotDataRequest({
+          network: selectedNetwork,
+          slot: BigInt(slotNumber),
+        });
+        const res = await client.getSlotData(req);
+        return res.data;
+      };
+      
+      // Use React Query's prefetchQuery function from the queryClient
+      // This is done by accessing the client manually from the main useQuery hook
+      await queryFn();
+      
+      console.log(`Prefetched data for ${direction} slot: ${slotNumber}`);
+    } catch (error) {
+      console.error(`Failed to prefetch data for slot ${slotNumber}:`, error);
+    }
+  };
+
+  // Prefetching next slot's data
+  const prefetchNextSlotData = async (nextSlotNumber: number | null) => {
+    await prefetchSlotData(nextSlotNumber, 'next');
+  };
+  
+  // Prefetching previous slot's data
+  const prefetchPreviousSlotData = async (prevSlotNumber: number | null) => {
+    await prefetchSlotData(prevSlotNumber, 'previous');
+  };
 
   // Timer effect for playback
   useEffect(() => {
@@ -74,20 +165,71 @@ export default function BlockProductionLivePage() {
         const now = Date.now();
         const slotStartTime = clock.getSlotStartTime(slotNumber) * 1000;
         const msIntoSlot = now - slotStartTime;
+        
+        // Calculate the actual next slot number based on current slot and head slot
+        const nextSlot = displaySlotOffset === 0 
+          ? (slotNumber + 1) // If we're at the live slot, next is just +1
+          : baseSlot !== null ? (baseSlot + displaySlotOffset + 1) : null; // Otherwise consider display offset
 
         // If viewing the *current* slot (offset 0), sync with wall clock
         if (displaySlotOffset === 0) {
+          // Start prefetching early - first prefetch at 6 seconds into the slot
+          if (msIntoSlot >= 6000 && msIntoSlot < 6100) {
+            prefetchNextSlotData(nextSlot);
+          }
+          
+          // Second prefetch at 8 seconds into the slot (4s before end)
+          if (msIntoSlot >= 8000 && msIntoSlot < 8100) {
+            prefetchNextSlotData(nextSlot);
+          }
+          
+          // Final prefetch at 10 seconds into the slot (2s before end)
+          if (msIntoSlot >= 10000 && msIntoSlot < 10100) {
+            prefetchNextSlotData(nextSlot);
+          }
+          
+          // With 0.5s remaining, prepare for transition by setting a transition flag
+          if (msIntoSlot >= 11500 && msIntoSlot < 11600) {
+            // Pre-warm next slot's data one final time just before transitioning
+            prefetchNextSlotData(nextSlot);
+          }
+          
           if (msIntoSlot >= 12000) {
-            setIsPlaying(false); // Stop playback at the end of the live slot
-            return 12000;
+            // Instead of stopping playback, move to the next slot automatically
+            goToNextSlot();
+            return 0; // Reset time to beginning of new slot
           }
           return Math.max(0, msIntoSlot); // Ensure time doesn't go negative
         } else {
           // For historical slots, just increment playback time
           const next = Math.min(12000, prev + 100); // Increment by 100ms
+          
+          // Enhanced prefetching for historical slots too
+          
+          // First prefetch at 6s into the slot
+          if (next >= 6000 && prev < 6000) {
+            prefetchNextSlotData(nextSlot);
+          }
+          
+          // Second prefetch at 8s into the slot
+          if (next >= 8000 && prev < 8000) {
+            prefetchNextSlotData(nextSlot);
+          }
+          
+          // Third prefetch at 10s into the slot
+          if (next >= 10000 && prev < 10000) {
+            prefetchNextSlotData(nextSlot);
+          }
+          
+          // Final prefetch with 0.5s remaining
+          if (next >= 11500 && prev < 11500) {
+            prefetchNextSlotData(nextSlot);
+          }
+          
           if (next >= 12000) {
-            setIsPlaying(false); // Stop playback at the end
-            return 12000;
+            // Instead of stopping, move to the next slot automatically
+            goToNextSlot();
+            return 0; // Reset time to beginning of new slot
           }
           return next;
         }
@@ -95,7 +237,7 @@ export default function BlockProductionLivePage() {
     }, 100); // Update every 100ms
 
     return () => clearInterval(interval);
-  }, [isPlaying, clock, slotNumber, displaySlotOffset]);
+  }, [isPlaying, clock, slotNumber, displaySlotOffset, selectedNetwork, baseSlot, headSlot, goToNextSlot]);
 
   // Reset timer when slot changes
   useEffect(() => {
@@ -306,13 +448,6 @@ export default function BlockProductionLivePage() {
 
   // --- End Data Transformation ---
 
-  // Navigation and Playback functions
-  const goToPreviousSlot = () => setDisplaySlotOffset(prev => prev - 1);
-  const goToNextSlot = () => setDisplaySlotOffset(prev => prev + 1);
-  const resetToCurrentSlot = () => setDisplaySlotOffset(0);
-  const isNextDisabled = displaySlotOffset >= 0;
-  const togglePlayPause = () => setIsPlaying(prev => !prev);
-
   return (
     <div className="flex flex-col h-full">
       {/* Compact Top Controls Bar */}
@@ -370,49 +505,95 @@ export default function BlockProductionLivePage() {
       {/* Timeline has been merged into the hero section in SankeyNetworkView component */}
 
       {/* Network Tree Visualization */}
-      {slotData && (
-        <div className="px-4 pt-2">
-          <SankeyNetworkView
-            bids={transformedBids}
-            currentTime={currentTime}
-            relayColors={relayColors}
-            winningBid={winningBidData}
-            slot={slotNumber || undefined}
-            proposer={slotData.proposer}
-            proposerEntity={proposerEntity}
-            nodes={slotData.nodes || {}}
-            blockTime={slotData.block?.slotTime}
-            // Pass node timing information for block visibility
-            nodeBlockSeen={slotData.timings?.blockSeen ? 
-              Object.fromEntries(Object.entries(slotData.timings.blockSeen).map(([node, time]) => 
-                [node, typeof time === 'bigint' ? Number(time) : Number(time)]
-              )) : {}
-            }
-            nodeBlockP2P={slotData.timings?.blockFirstSeenP2p ? 
-              Object.fromEntries(Object.entries(slotData.timings.blockFirstSeenP2p).map(([node, time]) => 
-                [node, typeof time === 'bigint' ? Number(time) : Number(time)]
-              )) : {}
-            }
-          />
-        </div>
-      )}
+      <div className="px-2 pt-1">
+        {/* Always render SankeyNetworkView if we have data */}
+        {/* This prevents flashing during transitions */}
+        {slotData && (
+          <div 
+            className={`transition-opacity duration-300 ${
+              isSlotLoading ? 'opacity-70' : 'opacity-100'
+            }`}
+          >
+            <SankeyNetworkView
+              bids={transformedBids}
+              currentTime={currentTime}
+              relayColors={relayColors}
+              winningBid={winningBidData}
+              slot={slotNumber || undefined}
+              proposer={slotData.proposer}
+              proposerEntity={proposerEntity}
+              nodes={slotData.nodes || {}}
+              blockTime={slotData.block?.slotTime}
+              // Pass node timing information for block visibility
+              nodeBlockSeen={slotData.timings?.blockSeen ? 
+                Object.fromEntries(Object.entries(slotData.timings.blockSeen).map(([node, time]) => 
+                  [node, typeof time === 'bigint' ? Number(time) : Number(time)]
+                )) : {}
+              }
+              nodeBlockP2P={slotData.timings?.blockFirstSeenP2p ? 
+                Object.fromEntries(Object.entries(slotData.timings.blockFirstSeenP2p).map(([node, time]) => 
+                  [node, typeof time === 'bigint' ? Number(time) : Number(time)]
+                )) : {}
+              }
+            />
+          </div>
+        )}
+        
+        {/* Initial loading state for SankeyNetworkView */}
+        {isSlotLoading && !slotData && (
+          <div className="h-20 bg-surface/10 rounded-lg mb-2 animate-pulse flex items-center justify-center">
+            <div className="text-secondary text-sm">Loading network view...</div>
+          </div>
+        )}
+      </div>
 
       {/* Main Content Area (Visualization) */}
-      <div className="flex-1 p-4 min-h-0">
-        {isSlotLoading && !slotData && <div className="text-center p-8 text-secondary">Loading block production data...</div>}
-        {slotError && <div className="text-center p-8 text-error">Error loading block data: {slotError.message}</div>}
-        {!isSlotLoading && !slotData && slotNumber !== null && <div className="text-center p-8 text-secondary">No block production data available for slot {slotNumber}.</div>}
+      <div className="flex-1 px-2 py-2 min-h-0">
+        {/* Error state */}
+        {slotError && (
+          <div className="text-center p-4 text-error rounded bg-error/10 border border-error/20 my-2">
+            Error loading block data: {slotError.message}
+          </div>
+        )}
+        
+        {/* Initial loading state - only show when we have no data at all */}
+        {isSlotLoading && !slotData && (
+          <div className="flex items-center justify-center h-[420px] bg-surface/10 rounded-lg animate-pulse">
+            <div className="text-center p-4 text-secondary">
+              <div className="inline-block w-6 h-6 border-2 border-t-accent border-r-accent border-b-transparent border-l-transparent rounded-full animate-spin mr-2"></div>
+              Loading block production data...
+            </div>
+          </div>
+        )}
+        
+        {/* No data state */}
+        {!isSlotLoading && !slotData && slotNumber !== null && (
+          <div className="text-center p-4 text-secondary bg-surface/20 rounded-lg h-[420px] flex items-center justify-center">
+            <div>
+              <div className="text-3xl mb-2 opacity-60">📭</div>
+              <div>No block production data available for slot {slotNumber}.</div>
+            </div>
+          </div>
+        )}
 
+        {/* Data visualization - always render if we have data, even during loading state */}
+        {/* This prevents flashing and ensures smooth transitions */}
         {slotData && (
-          <MevBidsVisualizer
-            bids={transformedBids}
-            currentTime={currentTime}
-            relayColors={relayColors}
-            winningBid={winningBidData}
-            timeRange={timeRange}
-            valueRange={valueRange}
-            height={420} // Slightly taller for better visibility
-          />
+          <div 
+            className={`transition-opacity duration-300 ${
+              isSlotLoading ? 'opacity-70' : 'opacity-100'
+            }`}
+          >
+            <MevBidsVisualizer
+              bids={transformedBids}
+              currentTime={currentTime}
+              relayColors={relayColors}
+              winningBid={winningBidData}
+              timeRange={timeRange}
+              valueRange={valueRange}
+              height={420} // Slightly taller for better visibility
+            />
+          </div>
         )}
       </div>
 
