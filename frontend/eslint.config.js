@@ -4,6 +4,8 @@ import reactHooks from 'eslint-plugin-react-hooks';
 import reactRefresh from 'eslint-plugin-react-refresh';
 import tseslint from 'typescript-eslint';
 import prettier from 'eslint-plugin-prettier/recommended';
+import css from "@eslint/css";
+import { tailwindSyntax } from "@eslint/css/syntax";
 
 export default tseslint.config(
   {
@@ -50,5 +52,21 @@ export default tseslint.config(
       '@typescript-eslint/no-unused-vars': 'off',
       'react/react-in-jsx-scope': 'off',
     },
+  },
+  {
+    files: ["**/*.css"],
+    plugins: {
+        css,
+    },
+    language: "css/css",
+    languageOptions: {
+        customSyntax: tailwindSyntax,
+        tolerant: true,
+    },
+    rules: {
+        "css/no-empty-blocks": "error",
+        "css/no-invalid-at-rules": "off", // disabled for now as tailwind not fully supported
+    },
+    extends: [css.configs.recommended, ...tseslint.configs.recommended, prettier],
   },
 );

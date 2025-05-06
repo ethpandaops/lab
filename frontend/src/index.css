@@ -12,7 +12,7 @@
 
 	/* Input elements should inherit text color by default */
 	input, textarea, select {
-		color: black
+		color: black;
 	}
 	
 	/* Gold color for winning elements */
