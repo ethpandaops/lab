@@ -29,8 +29,6 @@ const FixedPhaseTimeline: React.FC<PhaseTimelineProps> = ({
   
   // Animation effect - manually step through the frames
   useEffect(() => {
-    console.log("FIXED ANIMATION: Starting frame-by-frame animation");
-    
     // Reset to frame 0
     setFrameIndex(0);
     
@@ -39,7 +37,6 @@ const FixedPhaseTimeline: React.FC<PhaseTimelineProps> = ({
       setFrameIndex(current => {
         // Next frame (loop when we reach the end)
         const next = (current + 1) % FRAMES.length;
-        console.log(`FRAME ADVANCE: ${current} -> ${next}, time=${FRAMES[next]}ms`);
         return next;
       });
     }, 1000); // 1 frame per second

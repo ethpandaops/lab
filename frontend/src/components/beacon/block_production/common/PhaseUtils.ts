@@ -9,7 +9,18 @@ export const getCurrentPhase = (
   blockTime?: number,
   attestationsCount: number = 0,
   totalExpectedAttestations: number = 0
-): Phase => {
+): Phase | null => {
+  // REQUIREMENT 1: Always show Building phase even with no data (this prevents "Waiting for data...")
+  // Check if we have at least one of: node seen times, node P2P times, or block time
+  const hasNodeSeenData = Object.keys(nodeBlockSeen).length > 0;
+  const hasNodeP2PData = Object.keys(nodeBlockP2P).length > 0;
+  const hasBlockTimeData = blockTime !== undefined;
+  
+  // Instead of returning null, default to Building phase
+  // if (!hasNodeSeenData && !hasNodeP2PData && !hasBlockTimeData) {
+  //   return null; // No data about the block at all, don't show any phase
+  // }
+  
   // Find the earliest time any node saw the block (propagation start time)
   let earliestNodeTime = Infinity;
   
@@ -32,35 +43,32 @@ export const getCurrentPhase = (
     earliestNodeTime = blockTime;
   }
 
-  // If we don't have real timing data, use defaults
-  const propagationTime = earliestNodeTime !== Infinity ? earliestNodeTime : PROPAGATION_DEFAULT_TIME;
+  // REQUIREMENT 2: If we've never seen the block, we stay in building phase
+  // No propagation defaults - if we never see the block, we never exit the build stage
+  if (earliestNodeTime === Infinity || !hasNodeSeenData && !hasNodeP2PData && !hasBlockTimeData) {
+    return Phase.Building; // No block seen, stay in building phase
+  }
   
-  // Attestation phase starts when attestations start coming in
-  // We'll start 1.5s after propagation begins as a default
-  const attestationTime = propagationTime + 1500;
-
-  // Check if we have real attestation data
-  const hasAttestationData = attestationsCount > 0 && totalExpectedAttestations > 0;
+  // REQUIREMENT 3: Check for attestation data
+  const hasAttestationData = attestationsCount > 0;
+  const hasExpectedAttestations = totalExpectedAttestations > 0;
   
-  // Accepted phase starts when 66% of attestations are received
-  // Only use attestation data if we actually have it
-  const isAttestation66PercentComplete = hasAttestationData && 
+  // REQUIREMENT 4: Accepted phase starts at 66% attestations
+  const is66PercentAttested = hasAttestationData && hasExpectedAttestations && 
     attestationsCount >= (totalExpectedAttestations * 0.66);
-
+  
   // If we have 66% of attestations, move to accepted phase
-  if (isAttestation66PercentComplete && currentTime >= attestationTime) {
+  if (is66PercentAttested) {
     return Phase.Accepted;
   }
   
-  // If we're in attestation phase time and have attestations or it's just attestation time
-  if (currentTime >= attestationTime) {
-    // We've reached attestation time, so we're at least in the attesting phase
-    // Only upgrade to accepted phase if we have the required 66% attestations
+  // REQUIREMENT 3: Attestation phase starts when first attestation is seen
+  if (hasAttestationData) {
     return Phase.Attesting;
   }
   
-  // If we're in propagation phase
-  if (currentTime >= propagationTime) {
+  // If we've seen the block but no attestations yet, we're in propagating phase
+  if (earliestNodeTime !== Infinity && earliestNodeTime <= currentTime) {
     return Phase.Propagating;
   }
   

@@ -40,17 +40,19 @@ const PhaseIcons: React.FC<PhaseIconsProps> = ({
   slotData,
   firstContinentToSeeBlock
 }) => {
-  // Get attestation data for phase calculation
+  // Get attestation data for phase calculation - using startMs instead of inclusionDelay
   const attestationsCount = slotData?.attestations?.windows.reduce((total: number, window: any) => {
-    if (window.inclusionDelay !== undefined && (window.inclusionDelay * 1000) <= currentTime) {
+    // CRITICAL FIX: Use startMs instead of inclusionDelay
+    if (window.startMs !== undefined && Number(window.startMs) <= currentTime) {
       return total + (window.validatorIndices?.length || 0);
     }
     return total;
   }, 0) || 0;
   
+  // Use actual maximumVotes for expected attestations, with no default
   const totalExpectedAttestations = slotData?.attestations?.maximumVotes 
     ? Number(slotData.attestations.maximumVotes) 
-    : 128;
+    : 0;
     
   // Calculate the current phase
   const currentPhase = getCurrentPhase(
@@ -70,6 +72,12 @@ const PhaseIcons: React.FC<PhaseIconsProps> = ({
 
   // Helper function to determine if an entity should be active in current phase
   const isActiveInPhase = (entity: 'builder' | 'relay' | 'proposer' | 'node' | 'attester' | 'accepted') => {
+    // REQUIREMENT 1: If we don't have a phase (null), default to showing Building phase
+    if (currentPhase === null) {
+      // When no phase data is available, show builders and relays as active
+      return entity === 'builder' || entity === 'relay';
+    }
+    
     switch (currentPhase) {
       case Phase.Building:
         // "Building" -> "Builders | Relays" active
@@ -307,41 +315,32 @@ const PhaseIcons: React.FC<PhaseIconsProps> = ({
         <div className={`font-medium text-sm mb-0.5 ${isActiveInPhase('attester') ? 'text-blue-300' : 'text-primary/70'}`}>Attesters</div>
         <div className={`text-xs ${isActiveInPhase('attester') ? 'text-white/90' : 'text-tertiary'} max-w-[85px] h-6`}>
           {(() => {
-            // Get attestation count from data, filtering by current time
-            let count = 0;
-            let total = 128; // Default total
+            // REQUIREMENT 3 & 4: Calculate attestation percentage based on actual data with max from the slot
+            let visibleAttestationsCount = 0;
+            let totalExpectedAttestations = 0;
             
-            if (slotData?.attestations) {
-              // Method 1: Using windowed attestations data, filtered by current time
-              if (Array.isArray(slotData.attestations.windows)) {
-                // Only include windows that have occurred at or before the current time
-                const filteredWindows = slotData.attestations.windows.filter((window: any) => {
-                  return window.inclusionDelay !== undefined && 
-                    (window.inclusionDelay * 1000) <= currentTime;
-                });
-                
-                // Count attestations from filtered windows
-                count = filteredWindows.reduce((sum: number, window: any) => {
-                  return sum + (Array.isArray(window.validatorIndices) ? window.validatorIndices.length : 0);
-                }, 0);
-              }
-              
-              // Use maximum votes as total if available
-              if (slotData.attestations.maximumVotes) {
-                total = Number(slotData.attestations.maximumVotes);
-              }
+            // Get the maximum expected attestations from the slot data
+            if (slotData?.attestations?.maximumVotes) {
+              totalExpectedAttestations = Number(slotData.attestations.maximumVotes);
             }
             
-            // Show actual percentage of attestations received regardless of phase
-            if (currentPhase === Phase.Attesting || currentPhase === Phase.Accepted) {
-              // Always calculate attestation percentage based on actual data at the current time
-              if (total > 0) {
-                // Calculate percentage based on attestation count, ensuring we don't exceed 100%
-                const percentage = Math.min(100, Math.round((count / total) * 100));
-                return `${percentage}%`;
-              } else {
-                return '0%';
-              }
+            // Count attestations that have been included up to the current time
+            if (slotData?.attestations?.windows && Array.isArray(slotData.attestations.windows)) {
+              slotData.attestations.windows.forEach((window: any) => {
+                // Use the same method as in the phase calculation above
+                if (window.startMs !== undefined && 
+                    Number(window.startMs) <= currentTime) {
+                  visibleAttestationsCount += (window.validatorIndices?.length || 0);
+                }
+              });
+            }
+            
+            // Show percentage in attestation or accepted phase
+            if ((isActiveInPhase('attester') || isActiveInPhase('accepted')) && 
+                totalExpectedAttestations > 0) {
+              // Calculate percentage
+              const percentage = Math.min(100, Math.round((visibleAttestationsCount / totalExpectedAttestations) * 100));
+              return `${percentage}%`;
             }
             
             return 'Waiting...';
@@ -389,8 +388,44 @@ const PhaseIcons: React.FC<PhaseIconsProps> = ({
         </div>
         <div className={`font-medium text-sm mb-0.5 ${isActiveInPhase('accepted') ? 'text-green-300' : 'text-primary/70'}`}>Accepted</div>
         <div className={`text-xs ${isActiveInPhase('accepted') ? 'text-white/90' : 'text-tertiary'} max-w-[85px] h-6`}>
-          {currentPhase === Phase.Accepted
-            ? "Finalized"
+          {isActiveInPhase('accepted') && slotData?.attestations?.windows
+            ? (() => {
+                // Calculate when it hit 66% attestations (acceptance time)
+                let acceptanceTime = Infinity;
+                const totalExpectedAttestations = slotData?.attestations?.maximumVotes 
+                  ? Number(slotData.attestations.maximumVotes) 
+                  : 0;
+                
+                if (totalExpectedAttestations > 0) {
+                  // Threshold for 66% of attestations
+                  const threshold = Math.ceil(totalExpectedAttestations * 0.66);
+                  let cumulativeAttestations = 0;
+                  
+                  // Sort windows by time
+                  const sortedWindows = [...(slotData.attestations.windows || [])].sort((a, b) => {
+                    return Number(a.startMs || Infinity) - Number(b.startMs || Infinity);
+                  });
+                  
+                  // Find the window when we reach 66%
+                  for (const window of sortedWindows) {
+                    if (window.startMs !== undefined && window.validatorIndices?.length) {
+                      cumulativeAttestations += window.validatorIndices.length;
+                      
+                      if (cumulativeAttestations >= threshold) {
+                        acceptanceTime = Number(window.startMs);
+                        break;
+                      }
+                    }
+                  }
+                }
+                
+                // Format the acceptance time
+                if (acceptanceTime !== Infinity) {
+                  return `${(acceptanceTime / 1000).toFixed(1)}s`;
+                }
+                
+                return "Accepted";
+              })()
             : "Waiting..."}
         </div>
       </div>

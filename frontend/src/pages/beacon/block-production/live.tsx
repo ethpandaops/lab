@@ -4,6 +4,7 @@ import { useParams } from 'react-router-dom';
 import { getLabApiClient } from '../../../api';
 import { GetSlotDataRequest } from '../../../api/gen/backend/pkg/api/proto/lab_api_pb';
 import { BeaconClockManager } from '../../../utils/beacon';
+import SlotDataStore from '../../../utils/SlotDataStore';
 import { NetworkContext } from '@/App';
 import {
   MobileBlockProductionView,
@@ -66,12 +67,8 @@ export default function BlockProductionLivePage() {
   useEffect(() => {
     if (!selectedNetwork) return;
     
-    console.log(`Setting up slot change subscription for network: ${selectedNetwork}`);
-    
     // Create a slot change callback
     const slotChangeCallback: SlotChangeCallback = (network, newSlot, previousSlot) => {
-      console.log(`Slot changed for ${network}: ${previousSlot} -> ${newSlot}`);
-      
       // Update the head slot
       setHeadSlot(newSlot);
       
@@ -86,21 +83,10 @@ export default function BlockProductionLivePage() {
     
     // Clean up subscription when component unmounts or network changes
     return () => {
-      console.log(`Cleaning up slot change subscription for network: ${selectedNetwork}`);
       unsubscribe();
     };
   }, [selectedNetwork, beaconClockManager]);
   
-  // Log information about slot calculation for debugging
-  useEffect(() => {
-    if (headSlot !== null) {
-      console.log(`Current head slot: ${headSlot}`);
-      console.log(`Head lag slots config: ${headLagSlots}`);
-      console.log(`Base lag used: ${headLagSlots + 2} (config + 2 extra slots for processing)`);
-      console.log(`Displaying slot: ${headSlot - (headLagSlots + 2)} (head - (lag + 2))`);
-    }
-  }, [headSlot, headLagSlots]);
-
   const [displaySlotOffset, setDisplaySlotOffset] = useState<number>(0); // 0 is current, -1 is previous, etc.
   const [currentTime, setCurrentTime] = useState<number>(0); // ms into slot
   const [isPlaying, setIsPlaying] = useState<boolean>(true); // Control playback
@@ -108,7 +94,6 @@ export default function BlockProductionLivePage() {
   // Update the isAtLivePositionRef whenever displaySlotOffset changes
   useEffect(() => {
     isAtLivePositionRef.current = displaySlotOffset === 0;
-    console.log(`Live position tracking updated: ${isAtLivePositionRef.current}`);
   }, [displaySlotOffset]);
 
   // Calculate the base slot with proper lag
@@ -122,7 +107,10 @@ export default function BlockProductionLivePage() {
   const [isTransitioning, setIsTransitioning] = useState<boolean>(false);
 
   // Define prefetch helpers with useCallback to avoid unnecessary recreations
-  // Generic data prefetching function with retry and caching strategy
+  // Get the slot data store instance
+  const slotDataStore = useMemo(() => SlotDataStore.getInstance(), []);
+  
+  // Enhanced data prefetching function with global storage
   const prefetchSlotData = React.useCallback(async (slotNumber: number | null, direction: 'next' | 'previous') => {
     if (slotNumber === null) return;
     
@@ -133,14 +121,23 @@ export default function BlockProductionLivePage() {
     if (slotNumber < 0) return;
     
     try {
+      // First check the global slot data store
+      if (slotDataStore.hasSlotData(selectedNetwork, slotNumber)) {
+        // Still need to update React Query cache with this data for the component to use it
+        const storeData = slotDataStore.getSlotData(selectedNetwork, slotNumber);
+        const queryKey = ['block-production-live', 'slot', selectedNetwork, slotNumber];
+        queryClient.setQueryData(queryKey, storeData);
+        return;
+      }
+      
       // Create a query key for this slot - must match the key used in the main useQuery
       const queryKey = ['block-production-live', 'slot', selectedNetwork, slotNumber];
       
-      // Check if we already have data for this slot
+      // Check if we already have data in React Query cache
       const existingData = queryClient.getQueryData(queryKey);
       if (existingData) {
-        // We already have this data in the cache, no need to fetch it again
-        console.log(`Using cached data for ${direction} slot: ${slotNumber}`);
+        // We already have this data in the cache, store it in our global store too
+        slotDataStore.storeSlotData(selectedNetwork, slotNumber, existingData);
         return;
       }
       
@@ -152,19 +149,24 @@ export default function BlockProductionLivePage() {
           slot: BigInt(slotNumber),
         });
         const res = await client.getSlotData(req);
+        
+        // Store the data in our global store
+        slotDataStore.storeSlotData(selectedNetwork, slotNumber, res.data);
+        
         return res.data;
       };
       
-      // Use React Query's prefetchQuery to fetch and cache the data
-      await queryClient.prefetchQuery(queryKey, queryFn, {
-        staleTime: 30000, // Consider data fresh for 30 seconds
+      // Use React Query's prefetchQuery with updated v4 format
+      // The first argument must be an object with queryKey and queryFn properties
+      await queryClient.prefetchQuery({
+        queryKey: queryKey,
+        queryFn: queryFn,
+        staleTime: 5 * 60 * 1000, // Consider data fresh for 5 minutes
       });
-      
-      console.log(`Prefetched data for ${direction} slot: ${slotNumber}`);
     } catch (error) {
-      console.error(`Failed to prefetch data for slot ${slotNumber}:`, error);
+      console.error(`[PREFETCH] Failed to prefetch data for slot ${slotNumber}:`, error);
     }
-  }, [headSlot, selectedNetwork, queryClient, labApiClient]);
+  }, [headSlot, selectedNetwork, queryClient, labApiClient, slotDataStore]);
 
   // Prefetching next slot's data
   const prefetchNextSlotData = React.useCallback(async (nextSlotNumber: number | null) => {
@@ -175,6 +177,97 @@ export default function BlockProductionLivePage() {
   const prefetchPreviousSlotData = React.useCallback(async (prevSlotNumber: number | null) => {
     await prefetchSlotData(prevSlotNumber, 'previous');
   }, [prefetchSlotData]);
+  
+  // Reference for tracking prefetched slots (must be outside useEffect)
+  const prefetchedSlotsRef = useRef<Set<number>>(new Set());
+  
+  // Helper function for prefetching multiple slots (defined outside of effects)
+  const prefetchMultipleSlotsCallback = React.useCallback((baseSlotNumber: number, count: number) => {
+    // Skip invalid inputs
+    if (baseSlotNumber === null || count <= 0) return;
+    
+    // Prefetch 'count' slots ahead
+    for (let i = 0; i < count; i++) {
+      const slotToPrefetch = baseSlotNumber + i;
+      
+      // Skip if we've already prefetched this slot in this cycle
+      if (prefetchedSlotsRef.current.has(slotToPrefetch)) continue;
+      
+      // Mark as prefetched for this cycle
+      prefetchedSlotsRef.current.add(slotToPrefetch);
+      
+      // Queue the prefetch with a small delay to avoid overwhelming the API
+      const delay = i * 200; // Stagger prefetches by 200ms
+      
+      // Use setTimeout outside of the component rendering
+      setTimeout(() => {
+        prefetchNextSlotData(slotToPrefetch);
+      }, delay);
+    }
+  }, [prefetchNextSlotData]);
+  
+  // Staggered prefetching in response to timer thresholds
+  const prefetchAtTimerThreshold = React.useCallback((nextDisplaySlot: number, timeToNextSlot: number, timeInSlot: number) => {
+    // At 11s (start of slot), prefetch the next 3 slots
+    if (timeToNextSlot <= 11000 && timeToNextSlot > 10900) {
+      prefetchMultipleSlotsCallback(nextDisplaySlot, 3);
+    } 
+    // At 10s, prefetch the next slot
+    else if (timeToNextSlot <= 10000 && timeToNextSlot > 9900) {
+      prefetchNextSlotData(nextDisplaySlot);
+    } 
+    // At 5s, prefetch the next 2 slots again (refresh data)
+    else if (timeToNextSlot <= 5000 && timeToNextSlot > 4900) {
+      prefetchMultipleSlotsCallback(nextDisplaySlot, 2);
+    } 
+    // At 1s, prefetch just the next slot (final refresh before transition)
+    else if (timeToNextSlot <= 1000 && timeToNextSlot > 900) {
+      prefetchNextSlotData(nextDisplaySlot);
+    } 
+    // At the very start of a new slot, reset the prefetched slots tracker
+    else if (timeInSlot < 100) {
+      prefetchedSlotsRef.current = new Set();
+    }
+  }, [prefetchNextSlotData, prefetchMultipleSlotsCallback]);
+  
+  // Enhanced early prefetching at multiple time points and multiple slots ahead
+  useEffect(() => {
+    if (!selectedNetwork || !clock) return;
+    
+    // Function to check if we should prefetch - avoids calling hooks inside
+    const checkAndPrefetch = () => {
+      // Get current time in slot (milliseconds)
+      // Use the correct method from BeaconClock to calculate time in slot
+      const slotDuration = 12000; // 12 seconds in ms
+      const slotProgress = clock ? clock.getCurrentSlotProgress() : 0;
+      const timeInSlot = slotProgress * slotDuration;
+      const timeToNextSlot = slotDuration - timeInSlot;
+      
+      // Calculate the next slot we'll need to display
+      const nextHeadSlot = (headSlot || 0) + 1;
+      // Adding extra 2 slots of lag for processing to match behavior in prefetch logic
+      const nextDisplaySlot = nextHeadSlot - (headLagSlots + 2);
+      
+      // Use the callback for prefetching based on timer thresholds
+      prefetchAtTimerThreshold(nextDisplaySlot, timeToNextSlot, timeInSlot);
+    };
+    
+    // Run the check every 100ms
+    const intervalId = setInterval(checkAndPrefetch, 100);
+    
+    // Initial prefetch of current and next slots when component mounts
+    if (headSlot !== null) {
+      const currentDisplaySlot = headSlot - (headLagSlots + 2);
+      const nextDisplaySlot = currentDisplaySlot + 1;
+      
+      // Safely prefetch the initial slots
+      prefetchMultipleSlotsCallback(currentDisplaySlot, 2);
+    }
+    
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, [selectedNetwork, clock, headSlot, headLagSlots, prefetchNextSlotData, prefetchMultipleSlotsCallback, prefetchAtTimerThreshold]);
 
   // Navigation and Playback functions - wrapped in useCallback for proper dependency tracking
   // Prefetch previous slot before navigating to reduce flash
@@ -189,7 +282,6 @@ export default function BlockProductionLivePage() {
   const goToNextSlot = React.useCallback(() => {
     // Prevent advancing if we're already transitioning
     if (isTransitioning) {
-      console.log("Slot transition already in progress, ignoring duplicate call");
       return;
     }
 
@@ -197,17 +289,13 @@ export default function BlockProductionLivePage() {
     if (headSlot !== null && slotNumber !== null && slotNumber < headSlot) {
       // Prefetch next slot data before navigating
       prefetchNextSlotData(slotNumber + 1);
-      console.log(`Advancing to slot ${slotNumber + 1}`);
       setDisplaySlotOffset(prev => prev + 1);
     } else if (displaySlotOffset < 0) {
       // If we're on a historical slot, we can move forward even if we don't know the head yet
       if (slotNumber !== null) {
-        console.log(`Advancing from historical slot ${slotNumber} to ${slotNumber + 1}`);
         prefetchNextSlotData(slotNumber + 1);
       }
       setDisplaySlotOffset(prev => prev + 1);
-    } else {
-      console.log("Already at head slot or next slot, can't advance further");
     }
   }, [headSlot, slotNumber, displaySlotOffset, isTransitioning, prefetchNextSlotData]);
   
@@ -218,9 +306,6 @@ export default function BlockProductionLivePage() {
       const currentSlot = headSlot - (headLagSlots + 2);
       // Prefetch the current slot data before resetting
       prefetchSlotData(currentSlot, 'next');
-      
-      // Log the reset operation
-      console.log(`Resetting to current slot: ${currentSlot} (head ${headSlot} - lag ${headLagSlots + 2})`);
     }
     
     // Reset to the live position
@@ -233,31 +318,42 @@ export default function BlockProductionLivePage() {
     setIsPlaying(true);
   }, [headSlot, slotNumber, displaySlotOffset, headLagSlots, prefetchSlotData]);
   const isNextDisabled = displaySlotOffset >= 0;
-  const togglePlayPause = () => setIsPlaying(prev => !prev);
+  const togglePlayPause = React.useCallback(() => setIsPlaying(prev => !prev), []);
 
   const { data: slotData, isLoading: isSlotLoading, error: slotError, isPreviousData } = useQuery({
     queryKey: ['block-production-live', 'slot', selectedNetwork, slotNumber],
     queryFn: async () => {
       if (slotNumber === null) return null;
       
-      // First check if we already have this data cached (additional safety check)
+      // First check our global slot data store
+      if (slotDataStore.hasSlotData(selectedNetwork, slotNumber)) {
+        return slotDataStore.getSlotData(selectedNetwork, slotNumber);
+      }
+      
+      // Next check if we already have this data cached in React Query
       const existingData = queryClient.getQueryData(['block-production-live', 'slot', selectedNetwork, slotNumber]);
       if (existingData) {
-        console.log(`Using cached data for main query slot: ${slotNumber}`);
+        // Store it in our global store too
+        slotDataStore.storeSlotData(selectedNetwork, slotNumber, existingData);
         return existingData;
       }
       
+      // No cached data, fetch from API
       const client = await labApiClient;
       const req = new GetSlotDataRequest({
         network: selectedNetwork,
         slot: BigInt(slotNumber),
       });
       const res = await client.getSlotData(req);
+      
+      // Store in our global store
+      slotDataStore.storeSlotData(selectedNetwork, slotNumber, res.data);
+      
       return res.data;
     },
     refetchInterval: 5000, // Periodically check for updates
     refetchIntervalInBackground: true, // Refetch even if tab is not focused
-    staleTime: 30000, // Consider data fresh for 30 seconds to avoid flashing
+    staleTime: 5 * 60 * 1000, // Consider data fresh for 5 minutes
     keepPreviousData: true, // Keep showing previous slot's data while loading new data
     retry: 2, // Retry failed requests twice
     enabled: slotNumber !== null,
@@ -288,8 +384,6 @@ export default function BlockProductionLivePage() {
   useEffect(() => {
     if (slotNumber === null) return;
     
-    console.log(`Slot changed to ${slotNumber}, ensuring playback is active`);
-    
     // Auto-start playback on slot change
     setIsPlaying(true);
     
@@ -317,7 +411,6 @@ export default function BlockProductionLivePage() {
     
     // Ensure it's a non-empty string
     if (!executionPayloadBlockHash || typeof executionPayloadBlockHash !== 'string' || executionPayloadBlockHash.length < 10) {
-      console.warn('Invalid execution payload block hash:', executionPayloadBlockHash);
       return null;
     }
 
@@ -344,14 +437,12 @@ export default function BlockProductionLivePage() {
             builderPubkey: matchingBid.builderPubkey,
           };
         } catch (error) { 
-          console.error('Error processing winning bid:', error);
           return null; 
         }
       }
     }
     
     // If no matching bid was found
-    console.info('No matching bid found for execution payload:', executionPayloadBlockHash);
     return null;
   }, [slotData?.relayBids, slotData?.block?.executionPayloadBlockHash]);
 
@@ -473,24 +564,10 @@ export default function BlockProductionLivePage() {
               block={displayData.block}
             />
           </div>
-
-          {/* Error state */}
-          {slotError && (
-            <div className="text-center p-4 text-error rounded bg-error/10 border border-error/20 my-2">
-              Error loading block data: {slotError.message}
-            </div>
-          )}
         </div>
       ) : (
         // Desktop View
         <div className="px-2 pt-1 h-full flex flex-col">
-          {/* Error state */}
-          {slotError && (
-            <div className="text-center p-4 text-error rounded bg-error/10 border border-error/20 mb-2">
-              Error loading block data: {slotError.message}
-            </div>
-          )}
-          
           <div className={`transition-opacity duration-300 flex-1 ${isSlotLoading && !isPreviousData ? 'opacity-70' : 'opacity-100'}`}>
             <DesktopBlockProductionView
               bids={slotData ? transformedBids : emptyBids}
