@@ -15,19 +15,23 @@ const MobileTimelineBar: React.FC<MobileTimelineBarProps> = ({
   blockTime
 }) => {
   return (
-    <div className="border-b border-subtle/30 pb-2">
+    <div className="bg-surface/40 rounded-t-xl shadow-lg overflow-hidden p-3 pb-4">
       <div className="flex justify-between items-center">
         <div className="flex flex-col">
           <h3 className="text-base font-bold text-primary">Block Production Timeline</h3>
           <div className="text-xs mt-0.5">
             Phase: <span 
-              className={`font-medium ${isInPropagationPhase(currentTime, nodeBlockSeen, nodeBlockP2P) ? 'text-purple-400' : 'text-orange-400'}`}
+              className={`font-medium px-1.5 py-0.5 rounded-full ${
+                isInPropagationPhase(currentTime, nodeBlockSeen, nodeBlockP2P) 
+                  ? 'bg-purple-500/20 text-purple-300' 
+                  : 'bg-orange-500/20 text-orange-300'
+              }`}
             >
               {isInPropagationPhase(currentTime, nodeBlockSeen, nodeBlockP2P) ? 'Propagating' : 'Building'}
             </span>
           </div>
         </div>
-        <div className="font-mono text-xs text-tertiary/80">{(currentTime / 1000).toFixed(1)}s</div>
+        <div className="font-mono text-sm text-white">{(currentTime / 1000).toFixed(1)}s</div>
       </div>
       
       <div className="relative pt-2 pb-4">

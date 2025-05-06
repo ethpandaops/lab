@@ -117,7 +117,7 @@ const FixedPhaseTimeline: React.FC<PhaseTimelineProps> = ({
   const acceptancePercent = Math.min(98, Math.max(attestationPercent + 1, (acceptanceTime / 12000) * 100));
 
   return (
-    <div className="bg-surface/40 rounded-xl shadow-lg overflow-hidden p-3 pb-6">
+    <div className="bg-surface/40 rounded-t-xl shadow-lg overflow-hidden p-3 pb-6">
       <div className="flex justify-between items-center mb-2">
         <div className="flex flex-col">
           <h3 className="text-base font-bold text-primary">Block Production Timeline</h3>

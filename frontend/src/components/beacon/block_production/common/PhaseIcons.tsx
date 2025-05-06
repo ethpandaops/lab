@@ -71,6 +71,7 @@ const PhaseIcons: React.FC<PhaseIconsProps> = ({
   }, [bids, currentTime]);
 
   // Helper function to determine if an entity should be active in current phase
+  // Modified to keep entities active once they've been activated
   const isActiveInPhase = (entity: 'builder' | 'relay' | 'proposer' | 'node' | 'attester' | 'accepted') => {
     // REQUIREMENT 1: If we don't have a phase (null), default to showing Building phase
     if (currentPhase === null) {
@@ -78,26 +79,34 @@ const PhaseIcons: React.FC<PhaseIconsProps> = ({
       return entity === 'builder' || entity === 'relay';
     }
     
-    switch (currentPhase) {
-      case Phase.Building:
-        // "Building" -> "Builders | Relays" active
-        return entity === 'builder' || entity === 'relay';
-      case Phase.Propagating:
-        // "Propagating" -> "Relays | Proposer | Nodes active"
-        return entity === 'relay' || entity === 'proposer' || entity === 'node';
-      case Phase.Attesting:
-        // "Attesting -> Attesters active"
-        return entity === 'attester';
-      case Phase.Accepted:
-        // "Accepted -> Only accepted active"
-        return entity === 'accepted';
+    // Keep each entity active once its phase has been reached or passed
+    switch (entity) {
+      case 'builder':
+        // Builders are always active
+        return true;
+      case 'relay':
+        // Relays are always active
+        return true;
+      case 'proposer':
+        // Proposer active during/after propagation phase
+        return currentPhase !== Phase.Building;
+      case 'node':
+        // Nodes active during/after propagation phase
+        return currentPhase !== Phase.Building;
+      case 'attester':
+        // Attesters active during/after attestation phase
+        return currentPhase === Phase.Attesting || currentPhase === Phase.Accepted;
+      case 'accepted':
+        // Accepted only active during accepted phase
+        return currentPhase === Phase.Accepted;
       default:
         return false;
     }
   };
 
   return (
-    <div className="flex justify-between items-center px-2 mt-4 relative z-10">
+    <div className="bg-surface/40 rounded-b-xl shadow-lg mt-0 pt-3 px-2 pb-6 relative z-10 border-t-0 -mt-2">
+      <div className="flex justify-between items-center px-2 relative z-10">
       {/* 1. BUILDERS PHASE */}
       <div className={`flex flex-col items-center text-center transition-opacity duration-500 ${isActiveInPhase('builder') ? 'opacity-100' : 'opacity-60'}`}>
         <div 
@@ -428,6 +437,7 @@ const PhaseIcons: React.FC<PhaseIconsProps> = ({
               })()
             : "Waiting..."}
         </div>
+      </div>
       </div>
     </div>
   );

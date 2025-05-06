@@ -58,26 +58,22 @@ const MobileBlockProductionView: React.FC<BlockProductionBaseProps> = ({
     }
     
     // For each role, determine if it's active based on the phase
+    // Modified to keep icons active once they've been activated during the slot
     switch (role) {
       case 'builder':
-        // Builders are active from the start
-        return currentTime >= 0;
+        // Builders are always active
+        return true;
         
       case 'relay':
-        // For relay, use the earliest bid time if available
-        if (bids.length > 0) {
-          const earliestBidTime = Math.min(...bids.map(bid => bid.time));
-          return currentTime >= earliestBidTime;
-        }
-        // Otherwise activate relays shortly after start
-        return currentTime >= 1000;
+        // Relays are always active
+        return true;
         
       case 'proposer':
-        // Proposer activates just before transition to propagation
+        // Proposer activates just before transition to propagation and stays active
         return currentTime >= (transitionTime - 500);
         
       case 'node':
-        // Nodes activate at the transition point
+        // Nodes activate at the transition point and stay active
         return currentTime >= transitionTime;
     }
     
@@ -143,7 +139,7 @@ const MobileBlockProductionView: React.FC<BlockProductionBaseProps> = ({
   return (
     <div className="flex flex-col w-full">
       {/* Timeline with Phase Icons and Key Information */}
-      <div className="bg-surface/30 py-2 px-2 rounded-lg mb-3">
+      <div className="mb-3">
         <MobileTimelineBar 
           currentTime={currentTime}
           nodeBlockSeen={nodeBlockSeen}
@@ -151,8 +147,8 @@ const MobileBlockProductionView: React.FC<BlockProductionBaseProps> = ({
           blockTime={blockTime}
         />
 
-        {/* Mobile-optimized cards for each stage */}
-        <div className="grid grid-cols-1 gap-2 mt-2">
+        {/* Mobile-optimized cards for each stage - with border below the hero section */}
+        <div className="grid grid-cols-1 gap-2 mt-4 pt-4 border-t border-primary/10">
           {/* Builders Stage */}
           <StageCard 
             title="Builders"

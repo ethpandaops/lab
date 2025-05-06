@@ -94,26 +94,22 @@ const DesktopBlockProductionView: React.FC<DesktopBlockProductionViewProps> = ({
     }
     
     // For each role, determine if it's active based on the phase
+    // Modified to keep entities active once they've been activated during the slot
     switch (role) {
       case 'builder':
-        // Builders are active from the start
-        return currentTime >= 0;
+        // Builders are always active
+        return true;
         
       case 'relay':
-        // For relay, use the earliest bid time if available
-        if (bids.length > 0) {
-          const earliestBidTime = Math.min(...bids.map(bid => bid.time));
-          return currentTime >= earliestBidTime;
-        }
-        // Otherwise activate relays shortly after start
-        return currentTime >= 1000;
+        // Relays are always active
+        return true;
         
       case 'proposer':
-        // Proposer activates just before transition to propagation
+        // Proposer activates just before transition to propagation and stays active
         return currentTime >= (transitionTime - 500);
         
       case 'node':
-        // Nodes activate at the transition point
+        // Nodes activate at the transition point and stays active
         return currentTime >= transitionTime;
     }
     
@@ -221,8 +217,8 @@ const DesktopBlockProductionView: React.FC<DesktopBlockProductionViewProps> = ({
         firstContinentToSeeBlock={firstContinentToSeeBlock}
       />
 
-      {/* Main content */}
-      <div className="flex flex-1 gap-4 min-h-0 overflow-hidden">
+      {/* Main content with border separating from hero section */}
+      <div className="flex flex-1 gap-4 min-h-0 overflow-hidden mt-4 pt-4 border-t border-primary/10">
         {/* Left panel - Builders and Relays */}
         <BuildersRelaysPanel 
           bids={bids}
