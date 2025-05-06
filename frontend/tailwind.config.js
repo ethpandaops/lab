@@ -46,9 +46,9 @@ export default {
 					card: 'rgb(var(--bg-card) / <alpha-value>)',
 				},
 				border: {
-					DEFAULT: 'rgb(var(--border-default) / <alpha-value>)',
-					subtle: 'rgb(var(--border-subtle) / <alpha-value>)',
-					prominent: 'rgb(var(--border-prominent) / <alpha-value>)',
+					DEFAULT: 'rgb(var(--border-subtle) / 0.5)',
+					prominent: 'rgb(var(--border-default) / 0.5)',
+					accent: 'rgb(var(--border-prominent) / 0.5)',
 				},
 				accent: {
 					DEFAULT: 'rgb(var(--accent) / <alpha-value>)',
@@ -165,16 +165,50 @@ export default {
 			},
 		},
 	},
+	experimental: { optimizeUniversalDefaults: true },
 	plugins: [
 		formsPlugin,
 		scrollbarPlugin({ nocompatible: true }),
 		function({ addBase }) {
-			// Add default border color behavior for consistency
 			addBase({
-				'*,::before,::after': {
-					borderColor: 'var(--border-subtle)',
+				':root': {
+					// Text colors - Space theme
+					'--text-primary': '235 245 255', // Slightly dimmed white (#EBF5FF)
+					'--text-secondary': '210 220 235', // Dimmed slate (#D2DCEB)
+					'--text-tertiary': '140 155 175', // Dimmed slate (#8C9BAF)
+					'--text-muted': '95 110 130', // Dimmed slate (#5F6E82)
+
+					// Background colors - Deep space gradient (darker)
+					'--bg-base': '10 18 40', // Darker navy (#0A1228)
+					'--bg-surface': '20 30 55', // Darker slate (#141E37)
+					'--bg-surface-raised': '30 40 65', // Darker raised surfaces (#1E2841)
+					'--bg-hover': '40 50 75', // Darker hover (#28324B)
+					'--bg-active': '45 55 85', // Darker active (#2D3755)
+					'--bg-card': '25 35 60', // Darker card (#19233C)
+
+					// Borders - Deep space with cyan accents
+					'--border-subtle': '50 65 95', // Lighter border (#32415F)
+					'--border-default': '45 212 191', // Cyan (#2DD4BF)
+					'--border-prominent': '34 211 238', // Bright cyan (#22D3EE)
+
+					// Accent colors - Bright cyan primary
+					'--accent': '34 211 238', // Bright cyan (#22D3EE)
+					'--accent-muted': '45 212 191', // Teal (#2DD4BF)
+
+					// Status colors - Space theme
+					'--success': '52 211 153', // Emerald (#34D399)
+					'--warning': '245 158 11', // Amber (#F59E0B)
+					'--error': '239 68 68', // Rose (#EF4444)
+
+					// Data visualization colors - Space theme
+					'--data-blue-1': '59 130 246', // Blue (#3B82F6)
+					'--data-blue-2': '99 102 241', // Indigo (#6366F1)
+					'--data-green-1': '52 211 153', // Emerald (#34D399)
+					'--data-green-2': '16 185 129', // Emerald (#10B981)
+					'--data-yellow': '245 158 11', // Amber (#F59E0B)
+					'--data-orange': '249 115 22', // Orange (#F97316)
 				}
-			});
+			})
 		}
 	]
 }

@@ -114,12 +114,20 @@ export class BeaconClock {
 }
 
 /**
+ * Type definition for slot change callback function
+ */
+export type SlotChangeCallback = (network: string, newSlot: number, previousSlot: number) => void;
+
+/**
  * BeaconClockManager provides singleton access to network-specific BeaconClocks
  */
 export class BeaconClockManager {
   private static instance: BeaconClockManager
   private clocks: Map<string, BeaconClock> = new Map()
   private config: any
+  private slotChangeCallbacks: Map<string, SlotChangeCallback[]> = new Map()
+  private currentSlots: Map<string, number> = new Map()
+  private slotCheckInterval: NodeJS.Timeout | null = null
 
   private constructor() {}
 
@@ -145,8 +153,78 @@ export class BeaconClockManager {
         const genesisTime = networkConfig.genesis_time
         if (genesisTime) {
           this.clocks.set(network, new BeaconClock(genesisTime))
+          // Initialize the current slot for each network
+          const clock = new BeaconClock(genesisTime)
+          this.currentSlots.set(network, clock.getCurrentSlot())
         }
       })
+    }
+
+    // Start slot monitoring if not already running
+    this.startSlotMonitoring()
+  }
+
+  /**
+   * Start monitoring for slot changes across all networks
+   */
+  private startSlotMonitoring(): void {
+    // Clear any existing interval
+    if (this.slotCheckInterval) {
+      clearInterval(this.slotCheckInterval)
+    }
+
+    // Check for slot changes every second
+    this.slotCheckInterval = setInterval(() => {
+      this.clocks.forEach((clock, network) => {
+        const currentSlot = clock.getCurrentSlot()
+        const previousSlot = this.currentSlots.get(network) || currentSlot
+        
+        // If the slot has changed
+        if (currentSlot !== previousSlot) {
+          // Update stored slot
+          this.currentSlots.set(network, currentSlot)
+          
+          // Notify listeners
+          this.notifySlotChange(network, currentSlot, previousSlot)
+        }
+      })
+    }, 1000)
+  }
+
+  /**
+   * Notify all registered callbacks about a slot change
+   */
+  private notifySlotChange(network: string, newSlot: number, previousSlot: number): void {
+    const callbacks = this.slotChangeCallbacks.get(network) || []
+    callbacks.forEach(callback => {
+      try {
+        callback(network, newSlot, previousSlot)
+      } catch (error) {
+        console.error(`Error in slot change callback for network ${network}:`, error)
+      }
+    })
+  }
+
+  /**
+   * Register a callback for slot changes on a specific network
+   * Returns a function that can be called to unregister the callback
+   */
+  subscribeToSlotChanges(network: string, callback: SlotChangeCallback): () => void {
+    // Initialize the callbacks array for this network if it doesn't exist
+    if (!this.slotChangeCallbacks.has(network)) {
+      this.slotChangeCallbacks.set(network, [])
+    }
+    
+    // Add the callback to the list
+    const callbacks = this.slotChangeCallbacks.get(network)!
+    callbacks.push(callback)
+    
+    // Return a function to unsubscribe
+    return () => {
+      const index = callbacks.indexOf(callback)
+      if (index !== -1) {
+        callbacks.splice(index, 1)
+      }
     }
   }
 

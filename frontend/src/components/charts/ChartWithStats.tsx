@@ -94,19 +94,19 @@ export const ChartWithStats = ({
               <div className="flex flex-col" style={{ height: `${height}px` }}>
                 <div className={clsx(
                   "font-mono text-tertiary sticky top-0 z-10 flex border-b border-subtle",
-                  compactSeries ? "text-[6px] p-1" : "text-[8px] p-2"
+                  compactSeries ? "text-xs p-1.5" : "text-xs p-2.5"
                 )}>
-                  <div className="flex-1">Series</div>
-                  <div className="w-12 text-right">{valueHeader}</div>
+                  <div className="flex-1 font-medium">Series</div>
+                  <div className="w-20 text-right font-medium">{valueHeader}</div>
                 </div>
-                <div className="overflow-y-auto cyber-scrollbar flex flex-col p-1">
+                <div className="overflow-y-auto cyber-scrollbar flex flex-col p-1.5">
                   {series.map((item) => (
                     <button
                       key={item.name}
                       onClick={item.onClick}
                       className={clsx(
                         'group w-full rounded transition-colors flex items-center',
-                        compactSeries ? 'px-1 py-0.5' : 'px-2 py-1',
+                        compactSeries ? 'px-1.5 py-1' : 'px-2.5 py-1.5',
                         item.isHidden ? 'opacity-50' : '',
                         item.isHighlighted ? 'bg-prominent' : '',
                         'hover:bg-hover'
@@ -115,19 +115,19 @@ export const ChartWithStats = ({
 Avg: ${typeof item.avg === 'number' ? item.avg.toFixed(2) : item.avg}${item.unit || ''}
 Max: ${typeof item.max === 'number' ? item.max.toFixed(2) : item.max}${item.unit || ''}`}
                     >
-                      <div className="flex-1 flex items-center gap-1 min-w-0">
+                      <div className="flex-1 flex items-center gap-2 min-w-0">
                         <div className={clsx(
                           "rounded-full flex-shrink-0",
-                          compactSeries ? "w-1.5 h-1.5" : "w-2 h-2"
+                          compactSeries ? "w-2.5 h-2.5" : "w-3 h-3"
                         )} style={{ backgroundColor: item.color }} />
                         <span className={clsx(
                           "font-mono text-primary truncate",
-                          compactSeries ? "text-[7px]" : "text-[9px]"
+                          compactSeries ? "text-xs" : "text-sm"
                         )}>{item.name}</span>
                       </div>
                       <div className={clsx(
-                        "font-mono font-medium text-secondary whitespace-nowrap w-12 text-right",
-                        compactSeries ? "text-[7px]" : "text-[9px]"
+                        "font-mono font-medium text-secondary whitespace-nowrap w-20 text-right",
+                        compactSeries ? "text-xs" : "text-sm"
                       )}>
                         {typeof item.last === 'number' 
                           ? `${item.last.toFixed(1)}${item.unit || ''}`

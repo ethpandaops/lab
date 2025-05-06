@@ -1,68 +1,31 @@
+@config "../tailwind.config.js";
 @import "tailwindcss";
-
-@layer theme, base, components, utilities;
-
-:root {
-	--font-family-display: "Inter", "sans-serif";
-	
-	/* Text colors */
-	--text-primary: 235 245 255; /* Slightly dimmed white (#EBF5FF) */
-	--text-secondary: 210 220 235; /* Dimmed slate (#D2DCEB) */
-	--text-tertiary: 140 155 175; /* Dimmed slate (#8C9BAF) */
-	--text-muted: 95 110 130; /* Dimmed slate (#5F6E82) */
-
-	/* Background colors */
-	--bg-base: 10 18 40; /* Darker navy (#0A1228) */
-	--bg-surface: 20 30 55; /* Darker slate (#141E37) */
-	--bg-surface-raised: 30 40 65; /* Darker raised surfaces (#1E2841) */
-	--bg-hover: 40 50 75; /* Darker hover (#28324B) */
-	--bg-active: 45 55 85; /* Darker active (#2D3755) */
-	--bg-card: 25 35 60; /* Darker card (#19233C) */
-
-	/* Borders */
-	--border-subtle: 50 65 95; /* Lighter border (#32415F) */
-	--border-default: 45 212 191; /* Cyan (#2DD4BF) */
-	--border-prominent: 34 211 238; /* Bright cyan (#22D3EE) */
-
-	/* Accent colors */
-	--accent: 34 211 238; /* Bright cyan (#22D3EE) */
-	--accent-muted: 45 212 191; /* Teal (#2DD4BF) */
-
-	/* Status colors */
-	--success: 52 211 153; /* Emerald (#34D399) */
-	--warning: 245 158 11; /* Amber (#F59E0B) */
-	--error: 239 68 68; /* Rose (#EF4444) */
-
-	/* Data visualization colors */
-	--data-blue-1: 59 130 246; /* Blue (#3B82F6) */
-	--data-blue-2: 99 102 241; /* Indigo (#6366F1) */
-	--data-green-1: 52 211 153; /* Emerald (#34D399) */
-	--data-green-2: 16 185 129; /* Emerald (#10B981) */
-	--data-yellow: 245 158 11; /* Amber (#F59E0B) */
-	--data-orange: 249 115 22; /* Orange (#F97316) */
-	
-	/* Breakpoints for theme() */
-	--breakpoint-sm: 640px;
-	--breakpoint-md: 768px;
-	--breakpoint-lg: 1024px;
-	--breakpoint-xl: 1280px;
-	--breakpoint-2xl: 1536px;
-}
 
 @layer base {
 	html {
-		background-color: rgb(var(--bg-base) / 100%);
+		@apply bg-bg;
 	}
 
 	body {
-		background-color: rgb(var(--bg-base) / 100%);
-		color: rgb(var(--text-primary) / 100%);
-		min-height: 100vh;
+		@apply bg-bg text-text-primary min-h-screen;
 	}
 
 	/* Input elements should inherit text color by default */
 	input, textarea, select {
 		color: black
+	}
+	
+	/* Gold color for winning elements */
+	.text-gold {
+		color: #FFD700;
+	}
+	
+	.bg-gold {
+		background-color: #FFD700;
+	}
+	
+	.border-gold {
+		border-color: #FFD700;
 	}
 
 	/* Text colors */
@@ -108,6 +71,10 @@
 	}
 
 	/* Border colors */
+	.border-subtle {
+		border-color: rgb(var(--border-subtle) / 100%);
+	}
+
 	.border-default {
 		border-color: rgb(var(--border-default) / 100%);
 	}
@@ -184,7 +151,7 @@
 
 	/* Set default text color */
 	body {
-		color: rgb(var(--text-primary) / 100%);
+		@apply text-text-primary;
 	}
 
 	/* Border styles */
@@ -225,94 +192,76 @@
 @layer components {
 	/* Title styles */
 	.title-gradient {
-		font-family: var(--font-family-display), sans-serif;
-		font-weight: 900;
-		color: rgb(var(--accent) / 100%);
+		@apply font-sans font-black text-accent;
 	}
 
 	/* Button styles */
 	.btn {
-		padding-left: 1rem;
-		padding-right: 1rem;
-		padding-top: 0.5rem;
-		padding-bottom: 0.5rem;
-		border-width: 1px;
-		transition-property: all;
-		transition-duration: 300ms;
-		font-family: ui-monospace, monospace;
+		@apply px-4 py-2 border transition-all duration-300 font-mono;
+
 		background-color: rgb(var(--bg-surface) / 80%);
-		border-color: rgb(var(--border-subtle) / 100%);
+
+		@apply border-border hover:border-border;
 
 		&:hover {
 			background-color: rgb(var(--bg-surface) / 90%);
-			border-color: rgb(var(--border-default) / 100%);
 		}
 	}
 
 	.btn-primary {
-		border-color: rgb(var(--accent) / 100%);
+		@apply border-accent hover:border-accent;
+
 		background-color: rgb(var(--accent) / 20%);
 
 		&:hover {
-			border-color: rgb(var(--accent) / 100%);
 			background-color: rgb(var(--accent) / 30%);
 		}
 	}
 
 	.btn-error {
-		border-color: rgb(var(--error) / 100%);
+		@apply border-error hover:border-error;
+
 		background-color: rgb(var(--error) / 20%);
 
 		&:hover {
-			border-color: rgb(var(--error) / 100%);
 			background-color: rgb(var(--error) / 30%);
 		}
 	}
 
 	.btn-lg {
-		padding-left: 1.5rem;
-		padding-right: 1.5rem;
-		padding-top: 0.75rem;
-		padding-bottom: 0.75rem;
-		font-size: 1.125rem;
-		line-height: 1.75rem;
+		@apply px-6 py-3 text-lg;
 	}
 
 	.btn-sm {
-		padding-left: 0.75rem;
-		padding-right: 0.75rem;
-		padding-top: 0.375rem;
-		padding-bottom: 0.375rem;
-		font-size: 0.875rem;
-		line-height: 1.25rem;
+		@apply px-3 py-1.5 text-sm;
 	}
 
 	/* Card styles */
 	.card {
-		border-radius: 0.5rem;
-		overflow: hidden;
+		@apply rounded-lg overflow-hidden;
+
 		border: none !important;
 		box-shadow: 0 4px 12px rgb(0 0 0 / 15%);
 	}
 
 	.card-primary {
-		backdrop-filter: blur(12px);
+		@apply backdrop-blur-md;
+
 		background-color: rgb(var(--bg-surface-raised));
 		border: none !important;
 		box-shadow: 0 4px 12px rgb(0 0 0 / 15%), 0 0 1px rgb(var(--accent) / 10%);
 	}
 
 	.card-secondary {
-		backdrop-filter: blur(4px);
+		@apply backdrop-blur-sm;
+
 		background-color: rgb(var(--bg-card));
 		border: none !important;
 		box-shadow: 0 3px 10px rgb(0 0 0 / 12%), 0 0 1px rgb(var(--accent) / 10%);
 	}
 
 	.card-interactive {
-		transition-property: all;
-		transition-duration: 200ms;
-		cursor: pointer;
+		@apply transition-all duration-200 cursor-pointer;
 
 		&:hover {
 			border: none !important;
@@ -323,67 +272,52 @@
 	}
 
 	.card-header {
-		padding: 1rem;
+		@apply p-4 md:p-6;
+
 		border: none !important;
 		border-bottom: none !important;
 		background-color: rgb(var(--bg-surface));
 	}
 
-	@media (min-width: 768px) {
-		.card-header {
-			padding: 1.5rem;
-		}
-	}
-
 	.card-body {
-		padding: 1rem;
+		@apply p-4 md:p-6;
+
 		border: none !important;
 	}
 
-	@media (min-width: 768px) {
-		.card-body {
-			padding: 1.5rem;
-		}
-	}
-
 	.card-footer {
-		padding: 1rem;
+		@apply p-4 md:p-6;
+
 		border: none !important;
 		border-top: none !important;
 		background-color: rgb(var(--bg-surface));
 	}
 
-	@media (min-width: 768px) {
-		.card-footer {
-			padding: 1.5rem;
-		}
-	}
-
 	.card-stat {
-		border-radius: 0.5rem;
-		overflow: hidden;
+		@apply rounded-lg overflow-hidden;
+
 		border: none !important;
 		background-color: rgb(var(--bg-card));
 		box-shadow: 0 3px 10px rgb(0 0 0 / 12%), 0 0 1px rgb(var(--accent) / 10%);
 	}
 
 	.card-stat-header {
-		padding: 0.75rem;
+		@apply p-3;
+
 		border: none !important;
 		border-bottom: none !important;
 		background-color: rgb(var(--bg-surface));
 	}
 
 	.card-stat-body {
-		padding: 0.75rem;
-		display: flex;
-		align-items: center;
-		justify-content: center;
+		@apply p-3 flex items-center justify-center;
+
 		border: none !important;
 	}
 
 	/* Cyber effect */
 	.bg-cyber {
+		background-size: 100px 100px;
 		background-image:
 			radial-gradient(circle at 20% 30%, rgb(0 255 159 / 5%) 0%, transparent 50%),
 			radial-gradient(circle at 80% 70%, rgb(0 242 255 / 5%) 0%, transparent 50%),
@@ -443,6 +377,34 @@
 @keyframes highlight {
 	0% { background-color: rgb(var(--accent) / 20%); }
 	100% { background-color: transparent; }
+}
+
+@keyframes flowRight {
+  0% {
+    left: 0%;
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    left: 100%;
+    opacity: 0;
+  }
+}
+
+@keyframes pulseOpacity {
+  0%, 100% { 
+    opacity: 0.3; 
+    transform: translateY(-50%) scale(0.8);
+  }
+  50% { 
+    opacity: 1; 
+    transform: translateY(-50%) scale(1.1);
+  }
 }
 
 .event-highlight {

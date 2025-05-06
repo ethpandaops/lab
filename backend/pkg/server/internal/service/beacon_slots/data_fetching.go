@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"math/big"
+	"sort"
 	"strconv"
 	"time"
 
@@ -714,7 +716,7 @@ func (b *BeaconSlots) getSlotWindow(ctx context.Context, networkName string, slo
 
 // getMevRelayBids fetches MEV relay bid traces for a given slot, wrapped per relay.
 // It returns the highest bid per relay per 50ms interval within the slot.
-func (b *BeaconSlots) getMevRelayBids(ctx context.Context, networkName string, slot phase0.Slot, slotStartTime time.Time) (map[string]*pb.RelayBids, error) {
+func (b *BeaconSlots) getMevRelayBids(ctx context.Context, networkName string, slot phase0.Slot, slotStartTime time.Time, executionBlockHash string) (map[string]*pb.RelayBids, error) {
 	ch, err := b.xatuClient.GetClickhouseClientForNetwork(networkName)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get ClickHouse client for network %s: %w", networkName, err)
@@ -727,20 +729,71 @@ func (b *BeaconSlots) getMevRelayBids(ctx context.Context, networkName string, s
 	// Calculate time window with 3-minute margin
 	startTimeStr := slotStartTime.Add(-3 * time.Minute).Format("2006-01-02 15:04:05")
 	endTimeStr := slotStartTime.Add(3 * time.Minute).Format("2006-01-02 15:04:05")
-
+	// We want to find the top bid for each relay per 50ms interval within the slot.
+	// But we also want to ensure that we return the winning bid for the slot if it exists.
 	query := `
-		WITH RankedBids AS (
+		WITH RawBids AS (
 			SELECT
-				*,
-				timestamp_ms - ? as slot_time, -- Calculate slot_time relative to slot start
-				floor((timestamp_ms - ?) / ?) * ? as time_bucket, -- Calculate time bucket
-				ROW_NUMBER() OVER (PARTITION BY meta_network_name, floor((timestamp_ms - ?) / ?) ORDER BY CAST(value AS UInt256) DESC) as rn -- Use UInt256 for value comparison
+				relay_name,
+				slot,
+				block_hash,
+				builder_pubkey,
+				timestamp_ms,
+				meta_network_name,
+				parent_hash,
+				proposer_pubkey,
+				proposer_fee_recipient,
+				gas_limit,
+				gas_used,
+				value,
+				timestamp_ms - ? as slot_time,
+				floor((timestamp_ms - ?) / ?) * ? as time_bucket
 			FROM default.mev_relay_bid_trace
 			WHERE 
 				slot = ? 
 				AND meta_network_name = ?
 				AND slot_start_date_time BETWEEN ? AND ?
-				AND (timestamp_ms - ?) BETWEEN -12000 AND 12000 -- Filter for only slot times between -12s and +12s
+				AND (timestamp_ms - ?) BETWEEN -12000 AND 12000
+		),
+		RankedBids AS (
+			SELECT
+				*,
+				ROW_NUMBER() OVER (
+					PARTITION BY 
+						meta_network_name, 
+						time_bucket, 
+						relay_name,
+						block_hash,
+						builder_pubkey,
+						proposer_pubkey,
+						proposer_fee_recipient
+					ORDER BY CAST(value AS UInt256) DESC
+				) as rn
+			FROM RawBids
+		),
+		WinningBid AS (
+			SELECT
+				relay_name,
+				slot,
+				block_hash,
+				builder_pubkey,
+				timestamp_ms,
+				meta_network_name,
+				parent_hash,
+				proposer_pubkey,
+				proposer_fee_recipient,
+				gas_limit,
+				gas_used,
+				value,
+				timestamp_ms - ? as slot_time,
+				floor((timestamp_ms - ?) / ?) * ? as time_bucket,
+				0 as rn
+			FROM default.mev_relay_bid_trace
+			WHERE 
+				slot = ? 
+				AND meta_network_name = ?
+				AND slot_start_date_time BETWEEN ? AND ?
+				AND block_hash = ?
 		)
 		SELECT
 			relay_name,
@@ -750,24 +803,31 @@ func (b *BeaconSlots) getMevRelayBids(ctx context.Context, networkName string, s
 			builder_pubkey,
 			proposer_pubkey,
 			proposer_fee_recipient,
-			toString(value) AS value, -- Select as string after ranking
+			toString(value) AS value,
 			gas_limit,
 			gas_used,
 			slot_time,
 			time_bucket
-		FROM RankedBids
-		WHERE rn = 1
+		FROM (
+			SELECT * FROM RankedBids WHERE rn = 1
+			UNION ALL
+			SELECT * FROM WinningBid
+		)
 		ORDER BY
-			relay_name, slot_time; -- Order by relay first, then slot_time
+			relay_name, slot_time;
 	`
 
 	result, err := ch.Query(ctx, query,
 		slotStartTimeMs,                             // For slot_time calculation
 		slotStartTimeMs, timeBucketMs, timeBucketMs, // For time_bucket calculation
-		slotStartTimeMs, timeBucketMs, // For ranking window
 		slot, networkName,
 		startTimeStr, endTimeStr, // Added slot_start_date_time filter
-		slotStartTimeMs) // For slot_time filtering
+		slotStartTimeMs,
+		slotStartTimeMs,                             // For slot_time calculation in WinningBid
+		slotStartTimeMs, timeBucketMs, timeBucketMs, // For time_bucket calculation in WinningBid
+		slot, networkName,
+		startTimeStr, endTimeStr, // Added slot_start_date_time filter
+		executionBlockHash)
 
 	if err != nil {
 		if err.Error() == ErrNoRowsReturned { // Check specific error string
@@ -785,6 +845,16 @@ func (b *BeaconSlots) getMevRelayBids(ctx context.Context, networkName string, s
 	// Use the wrapper type for the result map
 	relayBidsMap := make(map[string]*pb.RelayBids)
 
+	// Track bids by relay and time bucket to limit to top 50 per bucket
+	type bucketKey struct {
+		relay      string
+		timeBucket int64
+	}
+	bucketBids := make(map[bucketKey][]*pb.RelayBid)
+
+	// Track winning bid to ensure it's included
+	winningBids := make(map[string]*pb.RelayBid) // map by relay name
+
 	for _, row := range result {
 		// Safely parse fields, logging errors for bad data
 		relayName := fmt.Sprintf("%v", row["relay_name"])
@@ -792,7 +862,6 @@ func (b *BeaconSlots) getMevRelayBids(ctx context.Context, networkName string, s
 		rowSlot, err := strconv.ParseUint(fmt.Sprintf("%v", row["slot"]), 10, 64)
 		if err != nil {
 			log.WithError(err).WithFields(log.Fields{"slot": slot, "network": networkName, "relay": relayName, "field": "slot", "value": row["slot"]}).Warn("Failed to parse relay bid slot")
-
 			continue
 		}
 
@@ -806,28 +875,24 @@ func (b *BeaconSlots) getMevRelayBids(ctx context.Context, networkName string, s
 		gasLimit, err := strconv.ParseUint(fmt.Sprintf("%v", row["gas_limit"]), 10, 64)
 		if err != nil {
 			log.WithError(err).WithFields(log.Fields{"slot": slot, "network": networkName, "relay": relayName, "field": "gas_limit", "value": row["gas_limit"]}).Warn("Failed to parse relay bid gas_limit")
-
 			gasLimit = 0 // Default to 0 if parsing fails
 		}
 
 		gasUsed, err := strconv.ParseUint(fmt.Sprintf("%v", row["gas_used"]), 10, 64)
 		if err != nil {
 			log.WithError(err).WithFields(log.Fields{"slot": slot, "network": networkName, "relay": relayName, "field": "gas_used", "value": row["gas_used"]}).Warn("Failed to parse relay bid gas_used")
-
 			gasUsed = 0 // Default to 0 if parsing fails
 		}
 
 		slotTime, err := strconv.ParseInt(fmt.Sprintf("%v", row["slot_time"]), 10, 64)
 		if err != nil {
 			log.WithError(err).WithFields(log.Fields{"slot": slot, "network": networkName, "relay": relayName, "field": "slot_time", "value": row["slot_time"]}).Warn("Failed to parse relay bid slot_time")
-
 			continue // Skip because slot_time is crucial
 		}
 
 		timeBucket, err := strconv.ParseInt(fmt.Sprintf("%v", row["time_bucket"]), 10, 64)
 		if err != nil {
 			log.WithError(err).WithFields(log.Fields{"slot": slot, "network": networkName, "relay": relayName, "field": "time_bucket", "value": row["time_bucket"]}).Warn("Failed to parse relay bid time_bucket")
-
 			timeBucket = 0 // Default to 0 if parsing fails
 		}
 
@@ -845,14 +910,76 @@ func (b *BeaconSlots) getMevRelayBids(ctx context.Context, networkName string, s
 			TimeBucket:           int32(timeBucket), //nolint:gosec // Time value is controlled and within int32 range
 		}
 
+		// Check if this is the winning bid
+		if bid.BlockHash == executionBlockHash {
+			b.log.WithFields(log.Fields{
+				"slot":    slot,
+				"network": networkName,
+				"relay":   relayName,
+				"bid":     bid,
+			}).Info("Winning bid found for slot")
+
+			winningBids[relayName] = bid
+		} else {
+			// Add to bucket map for limiting
+			key := bucketKey{relay: relayName, timeBucket: timeBucket}
+			bucketBids[key] = append(bucketBids[key], bid)
+		}
+	}
+
+	// Process buckets and limit to top 50 bids per bucket
+	for key, bids := range bucketBids {
+		relayName := key.relay
+
+		// Sort bids by value (descending)
+		sort.Slice(bids, func(i, j int) bool {
+			// Parse values as big integers for accurate comparison
+			valI, okI := new(big.Int).SetString(bids[i].Value, 10)
+			valJ, okJ := new(big.Int).SetString(bids[j].Value, 10)
+
+			if !okI || !okJ {
+				return false // If parsing fails, don't change order
+			}
+
+			return valI.Cmp(valJ) > 0 // Return true if valI > valJ
+		})
+
+		// Limit to top 5
+		if len(bids) > 2 {
+			bids = bids[:2]
+		}
+
 		// Get or create the wrapper for the current relay
 		wrapper, exists := relayBidsMap[relayName]
 		if !exists {
 			wrapper = &pb.RelayBids{Bids: make([]*pb.RelayBid, 0)}
 			relayBidsMap[relayName] = wrapper
 		}
-		// Append the bid to the wrapper's list
-		wrapper.Bids = append(wrapper.Bids, bid)
+
+		// Add bids to the wrapper
+		wrapper.Bids = append(wrapper.Bids, bids...)
+	}
+
+	// Add winning bids to ensure they're included
+	for relayName, winningBid := range winningBids {
+		wrapper, exists := relayBidsMap[relayName]
+		if !exists {
+			wrapper = &pb.RelayBids{Bids: make([]*pb.RelayBid, 0)}
+			relayBidsMap[relayName] = wrapper
+		}
+
+		// Check if winning bid is already included
+		alreadyIncluded := false
+		for _, bid := range wrapper.Bids {
+			if bid.BlockHash == winningBid.BlockHash {
+				alreadyIncluded = true
+				break
+			}
+		}
+
+		if !alreadyIncluded {
+			wrapper.Bids = append(wrapper.Bids, winningBid)
+		}
 	}
 
 	return relayBidsMap, nil

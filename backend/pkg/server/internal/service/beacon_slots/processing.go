@@ -177,7 +177,7 @@ func (b *BeaconSlots) processSlot(ctx context.Context, networkName string, slot 
 
 	// 6. Get MEV data - can run in parallel
 	group.Go(func() error {
-		bids, errr := b.getMevRelayBids(groupCtx, networkName, slot, slotStartTime)
+		bids, errr := b.getMevRelayBids(groupCtx, networkName, slot, slotStartTime, blockData.ExecutionPayloadBlockHash)
 		if errr != nil {
 			// Log error but don't fail the group, treat MEV data as optional
 			b.log.WithError(errr).WithFields(log.Fields{"slot": slot, "network": networkName}).Warn("Failed to get MEV relay bids")

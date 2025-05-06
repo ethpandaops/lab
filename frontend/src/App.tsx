@@ -1,11 +1,11 @@
 import { Routes, Route, Outlet, useSearchParams } from 'react-router-dom'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { createContext, useEffect, useState } from 'react'
 import { getConfig } from '@/config'
 import type { Config } from '@/types'
 import { LoadingState } from '@/components/common/LoadingState'
 import { ErrorState } from '@/components/common/ErrorState'
 import { BeaconClockManager } from '@/utils/beacon.ts'
+import ScrollToTop from '@/components/common/ScrollToTop'
 import Home from '@/pages/Home.tsx';
 import { About } from '@/pages/About.tsx';
 import Xatu from '@/pages/xatu';
@@ -22,10 +22,12 @@ import { Beacon } from '@/pages/beacon';
 import { BeaconLive } from '@/pages/beacon/live';
 import { BeaconSlot } from '@/pages/beacon/slot';
 import Experiments from '@/pages/Experiments.tsx';
-import MaintenanceOverlay from '@/components/common/MaintenanceOverlay';
 import { SlotLookup } from '@/pages/beacon/slot/index';
 import { ModalProvider } from '@/contexts/ModalContext.tsx'
 import { LocallyBuiltBlocks } from '@/pages/beacon/LocallyBuiltBlocks'
+import MevRelaysLivePage from '@/pages/beacon/mev_relays/live.tsx';
+import BlockProductionLivePage from '@/pages/beacon/block-production/live.tsx';
+import BlockProductionSlotPage from '@/pages/beacon/block-production/slot.tsx';
 
 // Create contexts
 export const ConfigContext = createContext<Config | null>(null)
@@ -41,8 +43,6 @@ export const NetworkContext = createContext<NetworkContextType>({
 	setSelectedNetwork: () => {},
 	availableNetworks: ['mainnet']
 })
-
-const queryClient = new QueryClient()
 
 function App() {
 	const [config, setConfig] = useState<Config | null>(null)
@@ -94,42 +94,44 @@ function App() {
 
 	return (
 		<ModalProvider>
-			<QueryClientProvider client={queryClient}>
-				<ConfigContext.Provider value={config}>
-					<NetworkContext.Provider value={{
-						selectedNetwork,
-						setSelectedNetwork,
-						availableNetworks
-					}}>
-						<Routes>
-							<Route path="/" element={<Layout />}>
-								<Route index element={<Home />} />
-								<Route path="about" element={<About />} />
-								<Route path="experiments" element={<Experiments />} />
-								<Route path="xatu" element={<Xatu />}>
-									<Route path="community-nodes" element={<CommunityNodes />} />
-									<Route path="networks" element={<Networks />} />
-									<Route path="contributors" element={<ContributorsList />} />
-									<Route path="contributors/:name" element={<ContributorDetail />} />
-									<Route path="fork-readiness" element={<ForkReadiness />} />
-									<Route path="geographical-checklist" element={<GeographicalChecklist />} />
-								</Route>
-								<Route path="beacon" element={<Beacon />}>
-									<Route path="slot" element={<Outlet />}>
-										<Route index element={<SlotLookup />} />
-										<Route path="live" element={<BeaconLive />} />
-										<Route path=":slot" element={<BeaconSlot />} />
-									</Route>
-									<Route path="timings" element={<BeaconChainTimings />}>
-										<Route path="blocks" element={<BlockTimings />} />
-									</Route>
-									<Route path="locally-built-blocks" element={<LocallyBuiltBlocks />} />
-								</Route>
+			<ConfigContext.Provider value={config}>
+				<NetworkContext.Provider value={{
+					selectedNetwork,
+					setSelectedNetwork,
+					availableNetworks
+				}}>
+					<ScrollToTop />
+					<Routes>
+						<Route path="/" element={<Layout />}>
+							<Route index element={<Home />} />
+							<Route path="about" element={<About />} />
+							<Route path="experiments" element={<Experiments />} />
+							<Route path="xatu" element={<Xatu />}>
+								<Route path="community-nodes" element={<CommunityNodes />} />
+								<Route path="networks" element={<Networks />} />
+								<Route path="contributors" element={<ContributorsList />} />
+								<Route path="contributors/:name" element={<ContributorDetail />} />
+								<Route path="fork-readiness" element={<ForkReadiness />} />
+								<Route path="geographical-checklist" element={<GeographicalChecklist />} />
 							</Route>
-						</Routes>
-					</NetworkContext.Provider>
-				</ConfigContext.Provider>
-			</QueryClientProvider>
+							<Route path="beacon" element={<Beacon />}>
+								<Route path="slot" element={<Outlet />}>
+									<Route index element={<SlotLookup />} />
+									<Route path="live" element={<BeaconLive />} />
+									<Route path=":slot" element={<BeaconSlot />} />
+								</Route>
+								<Route path="timings" element={<BeaconChainTimings />}>
+									<Route path="blocks" element={<BlockTimings />} />
+								</Route>
+								<Route path="locally-built-blocks" element={<LocallyBuiltBlocks />} />
+								<Route path="mev_relays/live" element={<MevRelaysLivePage />} />
+								<Route path="block-production/live" element={<BlockProductionLivePage />} />
+									<Route path="block-production/:slot" element={<BlockProductionSlotPage />} />
+							</Route>
+						</Route>
+					</Routes>
+				</NetworkContext.Provider>
+			</ConfigContext.Provider>
 		</ModalProvider>
 	)
 }
