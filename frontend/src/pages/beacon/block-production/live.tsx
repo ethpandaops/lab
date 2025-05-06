@@ -588,6 +588,7 @@ export default function BlockProductionLivePage() {
               resetToCurrentSlot={resetToCurrentSlot}
               togglePlayPause={togglePlayPause}
               isNextDisabled={isNextDisabled}
+              network={selectedNetwork} // Pass network to MobileBlockProductionView
             />
           </div>
         </div>
@@ -629,6 +630,7 @@ export default function BlockProductionLivePage() {
               resetToCurrentSlot={resetToCurrentSlot}
               togglePlayPause={togglePlayPause}
               isNextDisabled={isNextDisabled}
+              network={selectedNetwork} // Pass network to DesktopBlockProductionView
             />
           </div>
         </div>

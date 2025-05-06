@@ -47,6 +47,7 @@ interface DesktopBlockProductionViewProps extends BlockProductionBaseProps {
   resetToCurrentSlot: () => void;
   togglePlayPause: () => void;
   isNextDisabled: boolean;
+  network: string; // Add network prop for builder names lookup
 }
 
 const DesktopBlockProductionView: React.FC<DesktopBlockProductionViewProps> = ({
@@ -75,7 +76,8 @@ const DesktopBlockProductionView: React.FC<DesktopBlockProductionViewProps> = ({
   goToNextSlot,
   resetToCurrentSlot,
   togglePlayPause,
-  isNextDisabled
+  isNextDisabled,
+  network
 }) => {
   // Get active status based on role and phase
   const isActive = (role: 'builder' | 'relay' | 'proposer' | 'node') => {
@@ -266,6 +268,7 @@ const DesktopBlockProductionView: React.FC<DesktopBlockProductionViewProps> = ({
             winningBid={winningBid}
             isBuilderActive={isActive('builder')}
             isRelayActive={isActive('relay')}
+            network={network}
           />
         </div>
 

@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import { BidData } from '../common/types';
 import { truncateMiddle } from '../common/utils';
 import FlowStage from './FlowStage';
+import { useBuilderNames } from '../../../../hooks/useBuilderNames';
 
 interface BuildersRelaysPanelProps {
   bids: BidData[];
@@ -15,6 +16,7 @@ interface BuildersRelaysPanelProps {
   } | null;
   isBuilderActive: boolean;
   isRelayActive: boolean;
+  network: string; // Add network prop to fetch appropriate builder names
 }
 
 const BuildersRelaysPanel: React.FC<BuildersRelaysPanelProps> = ({
@@ -23,8 +25,11 @@ const BuildersRelaysPanel: React.FC<BuildersRelaysPanelProps> = ({
   relayColors,
   winningBid,
   isBuilderActive,
-  isRelayActive
+  isRelayActive,
+  network
 }) => {
+  // Fetch builder names for the given network
+  const builderNames = useBuilderNames(network);
   // Get builder bids - filtered by current time and deduplicated by builder pubkey
   const builders = useMemo(() => {
     // Filter bids by current time first
@@ -59,17 +64,28 @@ const BuildersRelaysPanel: React.FC<BuildersRelaysPanelProps> = ({
     });
     
     // Create individual bid items from the deduplicated bids
-    const builderItems = uniqueBuilderBids.map(bid => ({
-      id: `${bid.builderPubkey || 'unknown'}-${bid.time}-${bid.value}`,
-      blockHash: bid.blockHash,
-      builderPubkey: bid.builderPubkey || 'unknown',
-      label: truncateMiddle(bid.builderPubkey || 'unknown', 8, 6),
-      color: bid.isWinning ? '#FFD700' : '#e67e22', // Gold for winning builder
-      value: bid.value,
-      time: bid.time,
-      isWinning: bid.isWinning,
-      relayName: bid.relayName // Keep track of which relay it came from
-    }));
+    const builderItems = uniqueBuilderBids.map(bid => {
+      // Get the normalized pubkey for builder name lookup
+      const normalizedPubkey = (bid.builderPubkey || '').toLowerCase().replace(/^0x/, '');
+      
+      // Get the builder name if available, otherwise use truncated pubkey
+      const builderName = builderNames[normalizedPubkey];
+      const displayName = builderName || truncateMiddle(bid.builderPubkey || 'unknown', 8, 6);
+      
+      return {
+        id: `${bid.builderPubkey || 'unknown'}-${bid.time}-${bid.value}`,
+        blockHash: bid.blockHash,
+        builderPubkey: bid.builderPubkey || 'unknown',
+        label: displayName,
+        fullName: builderName,
+        pubkeyLabel: truncateMiddle(bid.builderPubkey || 'unknown', 8, 6),
+        color: bid.isWinning ? '#FFD700' : '#e67e22', // Gold for winning builder
+        value: bid.value,
+        time: bid.time,
+        isWinning: bid.isWinning,
+        relayName: bid.relayName // Keep track of which relay it came from
+      };
+    });
     
     // Return all unique builder items, sorted with winning bid first then by value
     return builderItems
@@ -171,8 +187,21 @@ const BuildersRelaysPanel: React.FC<BuildersRelaysPanelProps> = ({
                         className={`w-2 h-2 rounded-full mr-2 flex-shrink-0 ${item.isWinning ? 'bg-amber-400' : ''}`}
                         style={{ backgroundColor: item.isWinning ? undefined : (item.color || '#e67e22') }}
                       ></div>
-                      <div className="text-sm font-mono truncate flex-1">
-                        {item.label}
+                      <div className="flex flex-col truncate flex-1">
+                        {item.fullName ? (
+                          <>
+                            <div className={`text-sm truncate ${item.isWinning ? 'font-medium' : ''}`}>
+                              {item.label}
+                            </div>
+                            <div className="text-[10px] font-mono text-tertiary truncate">
+                              {item.pubkeyLabel}
+                            </div>
+                          </>
+                        ) : (
+                          <div className="text-sm font-mono truncate">
+                            {item.label}
+                          </div>
+                        )}
                       </div>
                     </div>
                     <div className="font-mono ml-1.5 rounded-md px-1.5 py-0.25">
