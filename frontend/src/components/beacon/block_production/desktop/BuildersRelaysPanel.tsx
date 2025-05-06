@@ -35,7 +35,22 @@ const BuildersRelaysPanel: React.FC<BuildersRelaysPanelProps> = ({
   React.useEffect(() => {
     console.log('Builder names loaded:', Object.keys(builderNames).length, 
       'First few keys:', Object.keys(builderNames).slice(0, 3));
-  }, [builderNames]);
+      
+    // Debug current builder pubkeys
+    if (bids.length > 0) {
+      const builderKeys = bids.map(bid => 
+        (bid.builderPubkey || '').toLowerCase().replace(/^0x/, '')
+      ).filter(k => k);
+      
+      console.log('Builder pubkeys in current bids:', 
+        builderKeys.slice(0, 5).map(k => k.substring(0, 10) + '...'));
+      
+      // Check if we have matches
+      const matches = builderKeys.filter(key => builderNames[key]);
+      console.log('Matching builder keys:', matches.length, 
+        matches.slice(0, 3).map(k => `${k.substring(0, 8)}... => ${builderNames[k]}`));
+    }
+  }, [builderNames, bids]);
   // Get builder bids - filtered by current time and deduplicated by builder pubkey
   const builders = useMemo(() => {
     // Filter bids by current time first
