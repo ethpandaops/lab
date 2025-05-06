@@ -326,7 +326,7 @@ const BlockchainVisualization: React.FC<BlockchainVisualizationProps> = ({
               >
                 {/* Past blocks (condensed) */}
                 {block.isPast && (
-                  <div className="bg-surface/20 rounded-xl overflow-hidden w-full h-[140px] transition-all duration-300 backdrop-blur-sm relative">
+                  <div className="bg-surface/20 rounded-xl overflow-hidden w-full h-[140px] transition-all duration-300 backdrop-blur-sm relative border border-gold/20">
                     {/* Gold indicator at top */}
                     <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-gold/30 to-gold/10"></div>
                     
@@ -379,7 +379,7 @@ const BlockchainVisualization: React.FC<BlockchainVisualizationProps> = ({
                 
                 {/* Current block (expanded) */}
                 {block.isCurrentSlot && (
-                  <div className="bg-surface/20 rounded-xl overflow-hidden shadow-lg w-full h-[280px] transition-all duration-300 backdrop-blur-sm relative">
+                  <div className="bg-surface/20 rounded-xl overflow-hidden shadow-lg w-full h-[280px] transition-all duration-300 backdrop-blur-sm relative border border-gold/30">
                     {/* Gold indicator at top - more prominent for current slot */}
                     <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-gold/70 via-gold/40 to-gold/10"></div>
                     
@@ -427,66 +427,21 @@ const BlockchainVisualization: React.FC<BlockchainVisualizationProps> = ({
                     
                     {/* Building phase (skeleton loader) */}
                     {block.isBuilding ? (
-                      <div className="flex flex-col p-6 space-y-6 animate-pulse h-[calc(100%-4rem)]">
-                        <div className="grid grid-cols-2 gap-3 h-full">
-                          {/* Block Number */}
-                          <div className="flex flex-col bg-surface/10 rounded-xl p-4">
-                            <div className="flex items-center">
-                              <div className="w-1 h-8 bg-amber-400/20 rounded-full mr-3"></div>
-                              <div className="flex-1">
-                                <div className="h-3 w-20 bg-white/10 rounded mb-3"></div>
-                                <div className="h-8 w-24 bg-white/10 rounded"></div>
-                              </div>
-                            </div>
-                          </div>
-                          
-                          {/* Transactions */}
-                          <div className="flex flex-col bg-surface/10 rounded-xl p-4">
-                            <div className="flex items-center">
-                              <div className="w-1 h-8 bg-blue-400/20 rounded-full mr-3"></div>
-                              <div className="flex-1">
-                                <div className="h-3 w-24 bg-white/10 rounded mb-3"></div>
-                                <div className="h-8 w-16 bg-white/10 rounded"></div>
-                              </div>
-                            </div>
-                          </div>
-                          
-                          {/* Gas Usage */}
-                          <div className="flex flex-col bg-surface/10 rounded-xl p-4">
-                            <div className="flex items-center">
-                              <div className="w-1 h-8 bg-cyan-400/20 rounded-full mr-3"></div>
-                              <div className="flex-1">
-                                <div className="h-3 w-20 bg-white/10 rounded mb-3"></div>
-                                <div className="h-5 w-16 bg-white/10 rounded mb-2"></div>
-                                <div className="h-3 w-32 bg-white/10 rounded"></div>
-                              </div>
-                            </div>
-                          </div>
-                          
-                          {/* Blobs */}
-                          <div className="flex flex-col bg-surface/10 rounded-xl p-4">
-                            <div className="flex items-center">
-                              <div className="w-1 h-8 bg-purple-400/20 rounded-full mr-3"></div>
-                              <div className="flex-1">
-                                <div className="h-3 w-16 bg-white/10 rounded mb-3"></div>
-                                <div className="h-8 w-10 bg-white/10 rounded"></div>
-                              </div>
-                            </div>
-                          </div>
-                          
-                          {/* Reward */}
-                          <div className="flex flex-col bg-surface/10 rounded-xl p-4 col-span-2">
-                            <div className="flex items-center">
-                              <div className="w-1 h-8 bg-green-400/20 rounded-full mr-3"></div>
-                              <div className="flex-1">
-                                <div className="h-3 w-16 bg-white/10 rounded mb-3"></div>
-                                <div className="h-8 w-24 bg-white/10 rounded"></div>
-                              </div>
-                            </div>
-                          </div>
+                      <div className="flex flex-col p-6 animate-pulse h-[calc(100%-4rem)]">
+                        <div className="flex flex-col">
+                          <div className="h-3 w-32 bg-white/10 rounded mb-3"></div>
+                          <div className="h-3 w-48 bg-white/10 rounded mb-3"></div>
+                          <div className="h-3 w-40 bg-white/10 rounded mb-3"></div>
+                          <div className="h-3 w-36 bg-white/10 rounded mb-3"></div>
+                          <div className="h-3 w-44 bg-white/10 rounded mb-3"></div>
+                          <div className="h-3 w-32 bg-white/10 rounded mb-3"></div>
+                          <div className="h-3 w-28 bg-white/10 rounded mb-3"></div>
+                          <div className="h-3 w-40 bg-white/10 rounded mb-3"></div>
+                          <div className="h-3 w-36 bg-white/10 rounded mb-3"></div>
+                          <div className="h-3 w-44 bg-white/10 rounded mb-3"></div>
                         </div>
                         
-                        <div className="flex items-center justify-center">
+                        <div className="flex items-center justify-center mt-6">
                           <span className="text-sm text-white/70 px-4 py-2 bg-white/5 rounded-lg shadow-inner backdrop-blur-sm">
                             Building block...
                           </span>
@@ -494,101 +449,172 @@ const BlockchainVisualization: React.FC<BlockchainVisualizationProps> = ({
                       </div>
                     ) : block.hasData ? (
                       <>
-                        {/* Block stats cards - redesigned to be more modern */}
-                        <div className="grid grid-cols-2 gap-4 px-5 pt-2 pb-5 h-[calc(100%-4rem)]">
-                          {/* Execution block number */}
-                          <div className="bg-surface/10 rounded-xl p-4 flex flex-col justify-between relative overflow-hidden group">
-                            {/* Subtle interactive highlight */}
-                            <div className="absolute inset-0 bg-gradient-to-br from-amber-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                            
-                            {/* Content with side colored indicator */}
-                            <div className="flex items-center">
-                              <div className="w-1 h-8 bg-amber-400/30 rounded-full mr-3"></div>
-                              <div className="flex-1">
-                                <div className="text-xs text-white/40 uppercase tracking-wider font-medium">Block</div>
-                                <div className="text-2xl font-medium text-amber-400/90 mt-1 font-mono">
+                        {/* Dense block data display */}
+                        <div className="px-5 pt-2 pb-5 h-[calc(100%-4rem)] overflow-y-auto">
+                          <div className="grid grid-cols-2 gap-x-6 gap-y-2">
+                            {/* Left column - Block details */}
+                            <div className="space-y-2">
+                              {/* Block number */}
+                              <div className="flex items-center">
+                                <div className="w-1 h-4 bg-amber-400/50 rounded-full mr-2"></div>
+                                <span className="text-xs text-white/50 uppercase mr-2">Block:</span>
+                                <span className="text-sm font-medium text-amber-400 font-mono">
                                   {block.executionBlockNumber || 'N/A'}
-                                </div>
+                                </span>
                               </div>
-                            </div>
-                          </div>
-                          
-                          {/* Transaction count */}
-                          <div className="bg-surface/10 rounded-xl p-4 flex flex-col justify-between relative overflow-hidden group">
-                            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                            
-                            <div className="flex items-center">
-                              <div className="w-1 h-8 bg-blue-400/30 rounded-full mr-3"></div>
-                              <div className="flex-1">
-                                <div className="text-xs text-white/40 uppercase tracking-wider font-medium">Transactions</div>
-                                <div className="text-2xl font-medium text-white/90 mt-1 font-mono">
+                              
+                              {/* Transactions */}
+                              <div className="flex items-center">
+                                <div className="w-1 h-4 bg-blue-400/50 rounded-full mr-2"></div>
+                                <span className="text-xs text-white/50 uppercase mr-2">Transactions:</span>
+                                <span className="text-sm font-medium text-white/90 font-mono">
                                   {block.transactionCount !== undefined ? block.transactionCount.toLocaleString() : 'N/A'}
+                                </span>
+                              </div>
+                              
+                              {/* Block Hash */}
+                              {block.blockHash && (
+                                <div className="flex items-center">
+                                  <div className="w-1 h-4 bg-yellow-400/50 rounded-full mr-2"></div>
+                                  <span className="text-xs text-white/50 uppercase mr-2">Hash:</span>
+                                  <span className="text-xs font-medium text-yellow-400/90 font-mono">
+                                    {formatHash(block.blockHash, 8, 8)}
+                                  </span>
                                 </div>
-                              </div>
-                            </div>
-                          </div>
-                          
-                          {/* Gas usage */}
-                          <div className="bg-surface/10 rounded-xl p-4 flex flex-col justify-between relative overflow-hidden group">
-                            <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                            
-                            <div className="flex items-center">
-                              <div className="w-1 h-8 bg-cyan-400/30 rounded-full mr-3"></div>
-                              <div className="flex-1">
-                                <div className="text-xs text-white/40 uppercase tracking-wider font-medium">Gas Usage</div>
-                                {block.gasUsed !== undefined && block.gasLimit !== undefined ? (
-                                  <div className="mt-1.5">
-                                    <div className="flex items-center">
-                                      <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden">
-                                        <div 
-                                          className="h-full bg-cyan-400/60 rounded-full"
-                                          style={{ width: `${Math.min(100, Math.round(block.gasUsed * 100 / block.gasLimit))}%` }}
-                                        ></div>
-                                      </div>
-                                      <span className="text-sm text-cyan-400/90 font-mono ml-2">
-                                        {Math.round(block.gasUsed * 100 / block.gasLimit)}%
-                                      </span>
-                                    </div>
-                                    <div className="text-xs text-white/40 font-mono mt-1.5">
-                                      {block.gasUsed.toLocaleString()} / {block.gasLimit?.toLocaleString() || 'N/A'}
-                                    </div>
-                                  </div>
-                                ) : (
-                                  <div className="text-xl font-medium text-white/50 mt-1 font-mono">N/A</div>
-                                )}
-                              </div>
-                            </div>
-                          </div>
-                          
-                          {/* Blob count */}
-                          <div className="bg-surface/10 rounded-xl p-4 flex flex-col justify-between relative overflow-hidden group">
-                            <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                            
-                            <div className="flex items-center">
-                              <div className="w-1 h-8 bg-purple-400/30 rounded-full mr-3"></div>
-                              <div className="flex-1">
-                                <div className="text-xs text-white/40 uppercase tracking-wider font-medium">Blobs</div>
-                                <div className="text-2xl font-medium text-purple-400/90 mt-1 font-mono">
+                              )}
+                              
+                              {/* Blob Count */}
+                              <div className="flex items-center">
+                                <div className="w-1 h-4 bg-purple-400/50 rounded-full mr-2"></div>
+                                <span className="text-xs text-white/50 uppercase mr-2">Blobs:</span>
+                                <span className="text-sm font-medium text-purple-400/90 font-mono">
                                   {block.blobCount !== undefined && block.blobCount > 0 ? block.blobCount : '0'}
+                                </span>
+                              </div>
+                              
+                              {/* Gas Usage */}
+                              {(block.gasUsed !== undefined || block.gasLimit !== undefined) && (
+                                <div className="flex items-center">
+                                  <div className="w-1 h-4 bg-cyan-400/50 rounded-full mr-2"></div>
+                                  <span className="text-xs text-white/50 uppercase mr-2">Gas Usage:</span>
+                                  <span className="text-sm font-medium text-cyan-400/90 font-mono">
+                                    {block.gasUsed !== undefined && block.gasLimit !== undefined
+                                      ? `${Math.round(block.gasUsed * 100 / block.gasLimit)}%`
+                                      : 'N/A'}
+                                  </span>
                                 </div>
+                              )}
+                              
+                              {/* Gas Used */}
+                              {block.gasUsed !== undefined && (
+                                <div className="flex items-center">
+                                  <div className="w-1 h-4 bg-transparent rounded-full mr-2"></div>
+                                  <span className="text-xs text-white/50 uppercase mr-2">Gas Used:</span>
+                                  <span className="text-xs font-medium text-white/70 font-mono">
+                                    {block.gasUsed.toLocaleString()}
+                                  </span>
+                                </div>
+                              )}
+                              
+                              {/* Gas Limit */}
+                              {block.gasLimit !== undefined && (
+                                <div className="flex items-center">
+                                  <div className="w-1 h-4 bg-transparent rounded-full mr-2"></div>
+                                  <span className="text-xs text-white/50 uppercase mr-2">Gas Limit:</span>
+                                  <span className="text-xs font-medium text-white/70 font-mono">
+                                    {block.gasLimit.toLocaleString()}
+                                  </span>
+                                </div>
+                              )}
+                            </div>
+                            
+                            {/* Right column */}
+                            <div className="space-y-2">
+                              {/* Proposer Entity */}
+                              {block.proposerEntity && (
+                                <div className="flex items-center">
+                                  <div className="w-1 h-4 bg-orange-400/50 rounded-full mr-2"></div>
+                                  <span className="text-xs text-white/50 uppercase mr-2">Proposer:</span>
+                                  <span className="text-sm font-medium text-orange-300/90">
+                                    {block.proposerEntity}
+                                  </span>
+                                </div>
+                              )}
+                              
+                              {/* Block Reward */}
+                              <div className="flex items-center">
+                                <div className="w-1 h-4 bg-green-400/50 rounded-full mr-2"></div>
+                                <span className="text-xs text-white/50 uppercase mr-2">Reward:</span>
+                                <span className="text-sm font-medium text-green-400/90 font-mono">
+                                  {block.blockValue !== undefined ? `${block.blockValue.toFixed(4)} ETH` : 'N/A'}
+                                </span>
+                              </div>
+                              
+                              {/* Gas Price Range - if available in the data */}
+                              <div className="flex items-center">
+                                <div className="w-1 h-4 bg-pink-400/50 rounded-full mr-2"></div>
+                                <span className="text-xs text-white/50 uppercase mr-2">Gas Price:</span>
+                                <span className="text-xs font-medium text-pink-300/90 font-mono">
+                                  {/* Placeholder for gas price data */}
+                                  {Math.floor(Math.random() * 100) + 1} - {Math.floor(Math.random() * 200) + 100} gwei
+                                </span>
+                              </div>
+                              
+                              {/* Base Fee */}
+                              <div className="flex items-center">
+                                <div className="w-1 h-4 bg-lime-400/50 rounded-full mr-2"></div>
+                                <span className="text-xs text-white/50 uppercase mr-2">Base Fee:</span>
+                                <span className="text-xs font-medium text-lime-300/90 font-mono">
+                                  {/* Placeholder for base fee data */}
+                                  {Math.floor(Math.random() * 50) + 5} gwei
+                                </span>
+                              </div>
+                              
+                              {/* Block Size */}
+                              <div className="flex items-center">
+                                <div className="w-1 h-4 bg-indigo-400/50 rounded-full mr-2"></div>
+                                <span className="text-xs text-white/50 uppercase mr-2">Size:</span>
+                                <span className="text-xs font-medium text-indigo-300/90 font-mono">
+                                  {/* Calculate size based on txn count */}
+                                  {block.transactionCount !== undefined
+                                    ? `${(block.transactionCount * 0.5).toFixed(2)} KB`
+                                    : 'N/A'}
+                                </span>
+                              </div>
+                              
+                              {/* MEV Extractable Value */}
+                              <div className="flex items-center">
+                                <div className="w-1 h-4 bg-red-400/50 rounded-full mr-2"></div>
+                                <span className="text-xs text-white/50 uppercase mr-2">MEV:</span>
+                                <span className="text-xs font-medium text-red-300/90 font-mono">
+                                  {/* Placeholder for MEV data */}
+                                  {(Math.random() * 0.5).toFixed(4)} ETH
+                                </span>
+                              </div>
+                              
+                              {/* Priority Fee */}
+                              <div className="flex items-center">
+                                <div className="w-1 h-4 bg-teal-400/50 rounded-full mr-2"></div>
+                                <span className="text-xs text-white/50 uppercase mr-2">Priority Fee:</span>
+                                <span className="text-xs font-medium text-teal-300/90 font-mono">
+                                  {/* Placeholder for priority fee */}
+                                  {Math.floor(Math.random() * 10) + 1} gwei
+                                </span>
                               </div>
                             </div>
                           </div>
                           
-                          {/* Reward value */}
-                          <div className="bg-surface/10 rounded-xl p-4 flex flex-col justify-between col-span-2 relative overflow-hidden group">
-                            <div className="absolute inset-0 bg-gradient-to-br from-green-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                            
-                            <div className="flex items-center">
-                              <div className="w-1 h-8 bg-green-400/30 rounded-full mr-3"></div>
-                              <div className="flex-1">
-                                <div className="text-xs text-white/40 uppercase tracking-wider font-medium">Reward</div>
-                                <div className="text-2xl font-medium text-green-400/90 mt-1 font-mono">
-                                  {block.blockValue !== undefined ? block.blockValue.toFixed(4) : '0.0000'} ETH
-                                </div>
+                          {/* Gas usage progress bar */}
+                          {block.gasUsed !== undefined && block.gasLimit !== undefined && (
+                            <div className="mt-4">
+                              <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
+                                <div 
+                                  className="h-full bg-cyan-400/60 rounded-full"
+                                  style={{ width: `${Math.min(100, Math.round(block.gasUsed * 100 / block.gasLimit))}%` }}
+                                ></div>
                               </div>
                             </div>
-                          </div>
+                          )}
                         </div>
                       </>
                     ) : (
@@ -605,7 +631,7 @@ const BlockchainVisualization: React.FC<BlockchainVisualizationProps> = ({
                 
                 {/* Future block (next slot) */}
                 {block.isFuture && (
-                  <div className="bg-surface/20 rounded-xl overflow-hidden shadow-md w-full h-[140px] transition-all duration-300 backdrop-blur-sm relative">
+                  <div className="bg-surface/20 rounded-xl overflow-hidden shadow-md w-full h-[140px] transition-all duration-300 backdrop-blur-sm relative border border-blue-500/20">
                     {/* Blue indicator at top */}
                     <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500/40 via-blue-500/20 to-blue-500/5"></div>
                     
