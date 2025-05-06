@@ -331,7 +331,7 @@ const BlockchainVisualization: React.FC<BlockchainVisualizationProps> = ({
                     <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-gold/30 to-gold/10"></div>
                     
                     {/* Header with slot number */}
-                    <div className="px-4 pt-3 pb-1">
+                    <div className="px-4 pt-3 pb-1 border-b border-gold/10">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center">
                           <div className="bg-gold/5 px-2 py-1 rounded text-xs font-medium text-gold/80">
@@ -587,7 +587,7 @@ const BlockchainVisualization: React.FC<BlockchainVisualizationProps> = ({
                     <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500/40 via-blue-500/20 to-blue-500/5"></div>
                     
                     {/* Header with slot number */}
-                    <div className="px-4 pt-3 pb-1">
+                    <div className="px-4 pt-3 pb-1 border-b border-blue-500/10">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center">
                           <div className="bg-blue-500/5 px-2 py-1 rounded text-xs font-medium text-blue-400/80">
