@@ -33,6 +33,7 @@
     "@nivo/network": "^0.93.0",
     "@nivo/sankey": "^0.93.0",
     "@nivo/scatterplot": "^0.88.0",
+    "@nivo/treemap": "^0.88.0",
     "@tanstack/react-query": "5.29.2",
     "@types/d3": "^7.4.3",
     "@types/geojson": "^7946.0.16",
