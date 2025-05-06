@@ -62,16 +62,28 @@ export default function BlockProductionLivePage() {
   // Ref to track the actual time value and avoid conflicts between state updates
   const timeRef = useRef<number>(0);
   
+  // Store the playing state in a ref to avoid dependency cycles
+  const isPlayingRef = useRef(isPlaying);
+  
+  // Update the ref when isPlaying changes
+  useEffect(() => {
+    isPlayingRef.current = isPlaying;
+  }, [isPlaying]);
+  
   // Subscribe to slot changes
   useEffect(() => {
     if (!selectedNetwork) return;
     
     // Create a slot change callback
     const slotChangeCallback: SlotChangeCallback = (network, newSlot, previousSlot) => {
-      // Update the head slot
-      setHeadSlot(newSlot);
-      
-      // NOTE: We don't reset time here - we'll handle that in the slotNumber effect
+      // Only update the head slot if we're in play mode
+      // This prevents real-world slot changes from affecting our visualization when paused
+      if (isPlayingRef.current) {
+        // Update the head slot
+        setHeadSlot(newSlot);
+        
+        // NOTE: We don't reset time here - we'll handle that in the slotNumber effect
+      }
     };
     
     // Subscribe to slot changes
@@ -235,6 +247,9 @@ export default function BlockProductionLivePage() {
     
     // Function to check if we should prefetch - avoids calling hooks inside
     const checkAndPrefetch = () => {
+      // Only prefetch if we're playing - prevents unwanted slot changes while paused
+      if (!isPlayingRef.current) return;
+      
       // Get current time in slot (milliseconds)
       // Use the correct method from BeaconClock to calculate time in slot
       const slotDuration = 12000; // 12 seconds in ms
