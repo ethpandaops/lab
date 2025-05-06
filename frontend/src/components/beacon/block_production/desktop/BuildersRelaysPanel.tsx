@@ -1,5 +1,5 @@
 import React, { useMemo, useEffect } from 'react';
-import { BidData } from '../common/types';
+import { BidData, Phase } from '../common/types';
 import { truncateMiddle } from '../common/utils';
 import FlowStage from './FlowStage';
 import BuilderNamesStore from '../../../../stores/BuilderNamesStore';
@@ -13,10 +13,12 @@ interface BuildersRelaysPanelProps {
     value: number;
     relayName: string;
     builderPubkey?: string;
+    deliveredRelays?: string[]; // Add support for multiple delivered relays
   } | null;
   isBuilderActive: boolean;
   isRelayActive: boolean;
   network: string; // Add network prop to fetch appropriate builder names
+  currentPhase?: Phase; // Add current phase to determine when to show winning bid/relay
 }
 
 const BuildersRelaysPanel: React.FC<BuildersRelaysPanelProps> = ({
@@ -26,7 +28,8 @@ const BuildersRelaysPanel: React.FC<BuildersRelaysPanelProps> = ({
   winningBid,
   isBuilderActive,
   isRelayActive,
-  network
+  network,
+  currentPhase = Phase.Building // Default to building phase if not provided
 }) => {
   // Load builder names from the singleton store
   const [builderNamesLoaded, setBuilderNamesLoaded] = React.useState(false);
@@ -134,7 +137,8 @@ const BuildersRelaysPanel: React.FC<BuildersRelaysPanelProps> = ({
           relayName: relayName,
           label: relayName,
           // Using semantic colors instead of hardcoded ones - success color for winning relay
-          isWinning: winningBid?.relayName === relayName,
+          // Mark relay as winning if it's in the deliveredPayloads list or it matches the winning bid relay
+          isWinning: (winningBid?.deliveredRelays && winningBid.deliveredRelays.includes(relayName)) || winningBid?.relayName === relayName,
           // Use highest value bid from this relay
           value: uniqueRelays.has(relayName) 
             ? Math.max(uniqueRelays.get(relayName).value, bid.value)
@@ -169,10 +173,10 @@ const BuildersRelaysPanel: React.FC<BuildersRelaysPanelProps> = ({
   }, [bids, currentTime, winningBid]);
 
   return (
-    <div className="flex flex-col space-y-3 h-full bg-surface/80 p-2 rounded-lg shadow-sm border border-border-subtle">
-      {/* Builders list - fixed height */}
-      <div className="bg-surface/80 rounded-lg shadow-sm overflow-hidden p-2 h-[calc(50%-0.375rem)]">
-        <div className="text-sm font-medium mb-1 text-text-primary flex items-center justify-between">
+    <div className="flex flex-col space-y-3 h-full">
+      {/* Builders list - fixed height (250px) - increased from 200px */}
+      <div className="rounded-lg overflow-hidden bg-bg-surface border border-border-subtle h-[250px]">
+        <div className="text-sm font-medium p-2 bg-surface/80 flex items-center justify-between">
           <div className="flex items-center">
             <div className="w-2 h-2 rounded-full bg-accent mr-1.5"></div>
             Builder bids
@@ -181,7 +185,7 @@ const BuildersRelaysPanel: React.FC<BuildersRelaysPanelProps> = ({
             {builders.length > 0 ? `Top bid per builder` : ''}
           </div>
         </div>
-        <div className={`rounded-lg overflow-y-auto h-[calc(100%-1.75rem)] scrollbar-hide transition-colors duration-500 ${isBuilderActive ? 'bg-bg-surface-raised' : 'bg-surface/70'}`}
+        <div className="overflow-y-auto h-[calc(100%-2.5rem)] scrollbar-hide transition-colors duration-500"
             style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
           <style jsx>{`
             .scrollbar-hide::-webkit-scrollbar {
@@ -189,43 +193,48 @@ const BuildersRelaysPanel: React.FC<BuildersRelaysPanelProps> = ({
             }
           `}</style>
           {builders.length > 0 ? (
-            <div className="space-y-0.5 p-1">
-              {/* Only show the top 6 builders */}
-              {builders.slice(0, 6).map(item => (
-                <div 
-                  key={item.id}
-                  className={`py-1 px-2 rounded-md text-xs ${
-                    item.isWinning 
-                      ? 'bg-success/10 border border-success/20 shadow-sm' 
-                      : 'bg-bg-surface'
-                  } ${isBuilderActive ? 'transition-all duration-300 hover:bg-opacity-80' : ''}`}
-                  style={{
-                    marginBottom: '0.25rem',
-                  }}
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center flex-1">
-                      <div 
-                        className={`w-2 h-2 rounded-full mr-2 flex-shrink-0 ${item.isWinning ? 'bg-success' : 'bg-accent-muted'}`}
-                      ></div>
-                      <div className="truncate flex-1">
-                        <span className={`${item.isWinning ? 'font-medium' : ''}`}>
-                          {item.label}
+            <div className="space-y-0.5 p-2">
+              {/* Show top 10 builders (increased from 8) */}
+              {builders.slice(0, 10).map(item => {
+                // Only show winning styling if we're not in building phase
+                const showWinningStyle = item.isWinning && currentPhase !== Phase.Building;
+                
+                return (
+                  <div 
+                    key={item.id}
+                    className={`py-1 px-2 rounded text-xs transition-all duration-300 ${
+                      showWinningStyle 
+                        ? 'bg-amber-100/20 border border-amber-300/20 shadow-sm' 
+                        : 'bg-bg-surface'
+                    }`}
+                    style={{
+                      marginBottom: '0.25rem',
+                    }}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center flex-1">
+                        <div 
+                          className={`w-2 h-2 rounded-full mr-2 flex-shrink-0 ${showWinningStyle ? 'bg-amber-400' : 'bg-accent-muted'}`}
+                        ></div>
+                        <div className="truncate flex-1">
+                          <span className={`${showWinningStyle ? 'font-medium text-amber-400' : ''}`}>
+                            {item.label}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="font-mono ml-1.5 rounded-md px-1.5 py-0.25">
+                        <span className={`${showWinningStyle ? 'text-amber-400 font-semibold' : 'text-text-secondary'} text-xs`}>
+                          {item.value ? item.value.toFixed(4) : '0.0000'} ETH
                         </span>
                       </div>
                     </div>
-                    <div className="font-mono ml-1.5 rounded-md px-1.5 py-0.25">
-                      <span className={`${item.isWinning ? 'text-success font-semibold text-sm' : 'text-text-secondary text-xs'}`}>
-                        {item.value ? item.value.toFixed(4) : '0.0000'} ETH
-                      </span>
-                    </div>
                   </div>
-                </div>
-              ))}
-              {/* Show count of hidden builders if there are more than 6 */}
-              {builders.length > 6 && (
+                );
+              })}
+              {/* Show count of hidden builders if there are more than 10 */}
+              {builders.length > 10 && (
                 <div className="text-xs text-text-tertiary text-center pt-1 pb-1">
-                  + {builders.length - 6} more builders
+                  + {builders.length - 10} more builders
                 </div>
               )}
             </div>
@@ -237,42 +246,52 @@ const BuildersRelaysPanel: React.FC<BuildersRelaysPanelProps> = ({
         </div>
       </div>
 
-      {/* Relays list - fixed height */}
-      <div className="bg-surface/80 rounded-lg shadow-sm overflow-hidden p-2 h-[calc(50%-0.375rem)]">
-        <div className="text-sm font-medium mb-1 text-text-primary flex items-center">
-          <div className="w-2 h-2 rounded-full bg-accent mr-1.5"></div>
-          MEV Relays
+      {/* Relays list - fixed height (220px) - increased from 180px */}
+      <div className="rounded-lg overflow-hidden bg-bg-surface border border-border-subtle h-[220px]">
+        <div className="text-sm font-medium p-2 bg-surface/80 flex items-center justify-between">
+          <div className="flex items-center">
+            <div className="w-2 h-2 rounded-full bg-accent mr-1.5"></div>
+            MEV Relays
+          </div>
+          <div className="text-xs text-text-tertiary">
+            {relays.length > 0 ? `${relays.length} relay${relays.length !== 1 ? 's' : ''}` : ''}
+          </div>
         </div>
-        <div className={`rounded-lg overflow-y-auto h-[calc(100%-1.75rem)] scrollbar-hide transition-colors duration-500 ${isRelayActive ? 'bg-bg-surface-raised' : 'bg-surface/70'}`}
+        <div className="overflow-y-auto h-[calc(100%-2.5rem)] scrollbar-hide transition-colors duration-500"
             style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
           {relays.length > 0 ? (
-            <div className="space-y-1 p-1">
-              {relays.map(item => (
-                <div 
-                  key={item.id}
-                  className={`py-1.5 px-2 rounded-md text-xs ${
-                    item.isWinning 
-                      ? 'bg-success/10 border border-success/20 shadow-sm' 
-                      : 'bg-bg-surface'
-                  } ${isRelayActive ? 'transition-all duration-300 hover:bg-opacity-80' : ''}`}
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center flex-1">
-                      <div 
-                        className={`w-2 h-2 rounded-full mr-2 flex-shrink-0 ${item.isWinning ? 'bg-success' : 'bg-accent-muted'}`}
-                      ></div>
-                      <div className={`truncate flex-1 ${item.isWinning ? 'text-sm font-medium' : 'text-xs'}`}>
-                        {item.label}
+            <div className="space-y-0.5 p-2">
+              {relays.map(item => {
+                // Only show winning styling if we're not in building phase
+                const showWinningStyle = item.isWinning && currentPhase !== Phase.Building;
+                
+                return (
+                  <div 
+                    key={item.id}
+                    className={`py-1 px-2 rounded text-xs transition-all duration-300 ${
+                      showWinningStyle 
+                        ? 'bg-amber-100/20 border border-amber-300/20 shadow-sm' 
+                        : 'bg-bg-surface'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center flex-1">
+                        <div 
+                          className={`w-2 h-2 rounded-full mr-2 flex-shrink-0 ${showWinningStyle ? 'bg-amber-400' : 'bg-accent-muted'}`}
+                        ></div>
+                        <div className={`truncate flex-1 ${showWinningStyle ? 'text-amber-400 font-medium' : 'text-xs'}`}>
+                          {item.label}
+                        </div>
                       </div>
-                    </div>
-                    <div className="flex items-center ml-1.5">
-                      <div className={`font-mono rounded px-1.5 py-0.5 ${item.isWinning ? 'bg-success/10 text-xs' : 'text-text-tertiary text-[10px]'}`}>
-                        {item.bidCount !== undefined ? `${item.bidCount} bid${item.bidCount !== 1 ? 's' : ''}` : '0 bids'}
+                      <div className="flex items-center ml-1.5">
+                        <div className={`font-mono ${showWinningStyle ? 'text-amber-400' : 'text-text-tertiary'} text-[10px]`}>
+                          {item.bidCount !== undefined ? `${item.bidCount} bid${item.bidCount !== 1 ? 's' : ''}` : '0 bids'}
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           ) : (
             <div className="h-full flex items-center justify-center text-xs text-text-tertiary p-3">

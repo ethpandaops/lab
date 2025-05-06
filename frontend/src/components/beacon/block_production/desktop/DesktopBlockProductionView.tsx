@@ -139,6 +139,16 @@ const DesktopBlockProductionView: React.FC<DesktopBlockProductionViewProps> = ({
     return false;
   };
 
+  // Get the current phase
+  const currentPhase = useMemo(() => {
+    return getCurrentPhase(
+      currentTime,
+      nodeBlockSeen || {},
+      nodeBlockP2P || {},
+      blockTime
+    );
+  }, [currentTime, nodeBlockSeen, nodeBlockP2P, blockTime]);
+
   // Calculate which continent saw the block first
   const firstContinentToSeeBlock = useMemo(() => {
     // Map of continent codes to full names
@@ -269,6 +279,7 @@ const DesktopBlockProductionView: React.FC<DesktopBlockProductionViewProps> = ({
             isBuilderActive={isActive('builder')}
             isRelayActive={isActive('relay')}
             network={network}
+            currentPhase={currentPhase}
           />
         </div>
 
