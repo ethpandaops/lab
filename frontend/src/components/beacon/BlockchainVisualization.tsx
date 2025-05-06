@@ -158,12 +158,28 @@ const BlockchainVisualization: React.FC<BlockchainVisualizationProps> = ({
         // Get block hash
         const blockHash = block.state_root || block.blockRoot || block.block_root || executionPayload.block_hash || block.executionPayloadBlockHash || block.execution_payload_block_hash;
         
+        // Get list of relays that delivered the payload
+        const deliveredRelays: string[] = slotDataForSlot.deliveredPayloads ? 
+          Object.keys(slotDataForSlot.deliveredPayloads) : [];
+        
         // Get block value from winning bid if available
-        const winningBid = slotDataForSlot.relayBids ? 
-          Object.values(slotDataForSlot.relayBids).flatMap((relay: any) => 
+        let winningBid = null;
+        
+        if (slotDataForSlot.relayBids) {
+          // Find winning bids from all relays (bids marked as winning)
+          const winningBids = Object.values(slotDataForSlot.relayBids).flatMap((relay: any) => 
             relay.bids?.filter((bid: any) => bid.isWinning) || []
-          )[0] : null;
+          );
           
+          // Use the first winning bid for value display
+          winningBid = winningBids[0];
+          
+          // Add delivered relays to the winning bid
+          if (winningBid) {
+            winningBid.deliveredRelays = deliveredRelays;
+          }
+        }
+        
         const blockValue = winningBid?.value;
         
         return {
@@ -332,6 +348,7 @@ const BlockchainVisualization: React.FC<BlockchainVisualizationProps> = ({
                       proposerEntity={block.proposerEntity}
                       slotDataStore={slotDataStore}
                       network={network}
+                      currentTime={currentTime}
                     />
                   </div>
                 );

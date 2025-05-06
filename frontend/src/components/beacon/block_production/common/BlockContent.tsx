@@ -190,19 +190,7 @@ const BlockContent: React.FC<BlockContentProps> = ({
             </div>
           )}
           
-          {/* Gas Limit and Gas Used combined into a single line */}
-          {blockData?.executionPayloadGasLimit !== undefined && (
-            <div className="flex items-center">
-              <div className="w-1 h-4 bg-bg-surface-raised rounded-full mr-2"></div>
-              <span className="text-xs text-text-tertiary uppercase mr-2">Gas:</span>
-              <span className="text-xs font-medium text-text-secondary font-mono">
-                {blockData.executionPayloadGasUsed ? blockData.executionPayloadGasUsed.toLocaleString() : '0'} / {blockData.executionPayloadGasLimit.toLocaleString()}
-                {blockData.executionPayloadGasUsed 
-                  ? ` (${Math.round(blockData.executionPayloadGasUsed * 100 / blockData.executionPayloadGasLimit)}%)`
-                  : ''}
-              </span>
-            </div>
-          )}
+          {/* Gas Used and Gas Limit moved after Parent line */}
 
           {/* State Root - only show if different from the state root in the header */}
           {blockData?.executionPayloadStateRoot && 
@@ -250,7 +238,30 @@ const BlockContent: React.FC<BlockContentProps> = ({
             </div>
           )}
           
-          {/* Removed Excess Blob Gas as requested */}
+          {/* Gas Used - right after parent */}
+          {blockData?.executionPayloadGasUsed !== undefined && (
+            <div className="flex items-center">
+              <div className="w-1 h-4 bg-bg-surface-raised rounded-full mr-2"></div>
+              <span className="text-xs text-text-tertiary uppercase mr-2">Gas Used:</span>
+              <span className="text-xs font-medium text-text-secondary font-mono">
+                {blockData.executionPayloadGasUsed.toLocaleString()} 
+                {blockData.executionPayloadGasLimit 
+                  ? ` (${Math.round(blockData.executionPayloadGasUsed * 100 / blockData.executionPayloadGasLimit)}%)`
+                  : ''}
+              </span>
+            </div>
+          )}
+          
+          {/* Gas Limit - right after Gas Used */}
+          {blockData?.executionPayloadGasLimit !== undefined && (
+            <div className="flex items-center">
+              <div className="w-1 h-4 bg-bg-surface-raised rounded-full mr-2"></div>
+              <span className="text-xs text-text-tertiary uppercase mr-2">Gas Limit:</span>
+              <span className="text-xs font-medium text-text-secondary font-mono">
+                {blockData.executionPayloadGasLimit.toLocaleString()}
+              </span>
+            </div>
+          )}
           
           {/* Transaction Total Bytes */}
           {blockData?.transactionsTotalBytes !== undefined && (

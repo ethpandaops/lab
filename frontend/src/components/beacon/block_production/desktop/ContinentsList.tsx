@@ -179,21 +179,13 @@ const ContinentsList: React.FC<ContinentsListProps> = ({
             {continents.map(item => (
               <div 
                 key={item.id}
-                className={`rounded-lg p-2 transition-all duration-300 ${
-                  item.rank === 1 && item.earliestTime && item.earliestTime <= currentTime 
-                    ? 'bg-success/10 border border-success/20' 
-                    : 'bg-bg-surface'
-                }`}
+                className="rounded-lg p-2 transition-all duration-300 bg-bg-surface"
                 style={{
                   opacity: item.progress > 0 && isActive ? 1 : 0.7,
                 }}
               >
                 <div className="flex justify-between items-center">
-                  <div className={`font-medium flex items-center ${
-                    item.rank === 1 && item.earliestTime && item.earliestTime <= currentTime 
-                      ? 'text-base' 
-                      : 'text-sm'
-                  }`}>
+                  <div className="font-medium flex items-center text-sm">
                     {item.rank > 0 && item.rank <= 3 && item.earliestTime && item.earliestTime <= currentTime && (
                       <span className="text-xs mr-2">
                         {item.rank === 1 ? '🥇' : item.rank === 2 ? '🥈' : '🥉'}
@@ -203,11 +195,7 @@ const ContinentsList: React.FC<ContinentsListProps> = ({
                   </div>
                   
                   {item.earliestTime && item.earliestTime <= currentTime && (
-                    <div className={`font-mono px-1.5 py-0.5 rounded ${
-                      item.rank === 1 
-                        ? 'bg-success/10 text-success text-sm' 
-                        : 'bg-bg-surface-raised text-xs text-text-tertiary'
-                    }`}>
+                    <div className="font-mono px-1.5 py-0.5 rounded bg-bg-surface-raised text-xs text-text-tertiary">
                       {item.formattedTime}
                     </div>
                   )}
@@ -217,9 +205,7 @@ const ContinentsList: React.FC<ContinentsListProps> = ({
                   <span className="text-text-tertiary">
                     Seen: <span className="font-mono">{item.nodesThatHaveSeenBlock}/{item.count}</span>
                   </span>
-                  <span className={`font-medium ${
-                    item.rank === 1 ? 'text-success' : 'text-text-tertiary'
-                  }`}>
+                  <span className="font-medium text-text-tertiary">
                     {Math.round(item.progress)}%
                   </span>
                 </div>
@@ -227,12 +213,10 @@ const ContinentsList: React.FC<ContinentsListProps> = ({
                 {/* Progress bar */}
                 <div className="mt-1.5 h-2 w-full bg-bg-surface-raised rounded-full overflow-hidden">
                   <div 
-                    className={`h-full transition-width duration-700 ease-out rounded-full ${
-                      item.rank === 1 ? 'bg-success' : 'bg-accent'
-                    }`}
+                    className="h-full transition-width duration-700 ease-out rounded-full bg-accent"
                     style={{ 
                       width: `${item.progress || 0}%`,
-                      opacity: item.rank === 1 ? 1 : 0.7,
+                      opacity: 0.7,
                     }}
                   ></div>
                 </div>

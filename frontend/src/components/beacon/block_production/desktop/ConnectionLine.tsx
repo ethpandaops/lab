@@ -8,15 +8,15 @@ interface ConnectionLineProps {
 const ConnectionLine: React.FC<ConnectionLineProps> = ({ isActive, isWinning = false }) => {
   return (
     <div className="w-full h-full flex items-center justify-center relative">
-      {/* Horizontal connection line */}
-      <div className="h-4 w-20 relative">
+      {/* Horizontal connection line - with responsive width */}
+      <div className="h-4 w-full max-w-[8rem] lg:max-w-[12rem] xl:max-w-[18rem] relative">
         <div 
           className={`absolute top-1/2 -translate-y-1/2 h-[1px] w-full transition-colors duration-300 ${
             !isActive 
               ? 'bg-tertiary/20 opacity-50' 
               : isWinning 
-                ? 'bg-gold/70' 
-                : 'bg-tertiary/30'
+                ? 'bg-accent/70' 
+                : 'bg-border-subtle'
           }`}
         />
         
@@ -25,7 +25,7 @@ const ConnectionLine: React.FC<ConnectionLineProps> = ({ isActive, isWinning = f
           <>
             <div 
               className={`absolute w-1.5 h-1.5 rounded-full top-1/2 -translate-y-1/2 ${
-                isWinning ? 'bg-gold/90' : 'bg-tertiary/70'
+                isWinning ? 'bg-accent' : 'bg-text-tertiary'
               }`}
               style={{
                 left: '30%',
@@ -37,7 +37,7 @@ const ConnectionLine: React.FC<ConnectionLineProps> = ({ isActive, isWinning = f
             />
             <div 
               className={`absolute w-1.5 h-1.5 rounded-full top-1/2 -translate-y-1/2 ${
-                isWinning ? 'bg-gold/90' : 'bg-tertiary/70'
+                isWinning ? 'bg-accent' : 'bg-text-tertiary'
               }`}
               style={{
                 left: '70%',
