@@ -326,48 +326,52 @@ const BlockchainVisualization: React.FC<BlockchainVisualizationProps> = ({
               >
                 {/* Past blocks (condensed) */}
                 {block.isPast && (
-                  <div className="bg-surface/30 border border-gold/20 rounded-lg overflow-hidden shadow-md w-full h-[140px] transition-all duration-300 backdrop-blur-sm">
-                    <div className="py-3 px-4 border-b border-gold/10">
+                  <div className="bg-surface/20 rounded-xl overflow-hidden w-full h-[140px] transition-all duration-300 backdrop-blur-sm relative">
+                    {/* Gold indicator at top */}
+                    <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-gold/30 to-gold/10"></div>
+                    
+                    {/* Header with slot number */}
+                    <div className="px-4 pt-3 pb-1">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center">
-                          <div className="w-6 h-6 bg-gold/10 rounded-md border border-gold/20 flex items-center justify-center mr-2">
-                            <svg className="w-3 h-3 text-gold" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                              <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" strokeWidth="2" />
-                            </svg>
+                          <div className="bg-gold/5 px-2 py-1 rounded text-xs font-medium text-gold/80">
+                            SLOT {block.slot}
                           </div>
-                          <div className="text-xs font-medium text-white">Slot {block.slot}</div>
                         </div>
                         {block.hasData && block.blockValue !== undefined && (
-                          <div className="text-[10px] bg-green-500/10 px-1.5 py-0.5 rounded-sm text-green-300 font-mono">
+                          <div className="text-xs bg-green-500/5 px-2 py-0.5 rounded text-green-300/90 font-mono font-medium">
                             {block.blockValue.toFixed(2)} ETH
                           </div>
                         )}
                       </div>
                     </div>
-                    <div className="p-3">
-                      <div className="flex items-center justify-between">
-                        <div className="flex flex-col">
-                          {block.executionBlockNumber && (
-                            <div>
-                              <span className="text-[10px] text-white/50 uppercase mr-1">BLOCK</span>
-                              <span className="text-sm font-medium text-amber-400 font-mono">{block.executionBlockNumber}</span>
-                            </div>
-                          )}
-                        </div>
-                        <div className="flex flex-col items-end">
-                          {block.hasData && block.transactionCount !== undefined && (
-                            <div className="flex items-center">
-                              <div className="text-[10px] text-white/50 uppercase mr-1">TX</div>
-                              <div className="text-sm font-medium text-amber-400 font-mono">{block.transactionCount}</div>
-                            </div>
-                          )}
-                          {block.hasData && block.blobCount !== undefined && block.blobCount > 0 && (
-                            <div className="flex items-center mt-1">
-                              <div className="text-[10px] text-white/50 uppercase mr-1">BLOBS</div>
-                              <div className="text-sm font-medium text-purple-400 font-mono">{block.blobCount}</div>
-                            </div>
-                          )}
-                        </div>
+                    
+                    {/* Block content */}
+                    <div className="px-4 pt-2 pb-3">
+                      <div className="flex flex-col gap-1.5">
+                        {block.executionBlockNumber && (
+                          <div className="flex items-center">
+                            <div className="w-1.5 h-1.5 rounded-full bg-amber-400/30 mr-1.5"></div>
+                            <span className="text-[10px] text-white/40 uppercase mr-1">Block</span>
+                            <span className="text-sm font-medium text-amber-400/90 font-mono">{block.executionBlockNumber}</span>
+                          </div>
+                        )}
+                        
+                        {block.hasData && block.transactionCount !== undefined && (
+                          <div className="flex items-center">
+                            <div className="w-1.5 h-1.5 rounded-full bg-blue-400/30 mr-1.5"></div>
+                            <span className="text-[10px] text-white/40 uppercase mr-1">Tx</span>
+                            <span className="text-sm font-medium text-white/80 font-mono">{block.transactionCount}</span>
+                          </div>
+                        )}
+                        
+                        {block.hasData && block.blobCount !== undefined && block.blobCount > 0 && (
+                          <div className="flex items-center">
+                            <div className="w-1.5 h-1.5 rounded-full bg-purple-400/30 mr-1.5"></div>
+                            <span className="text-[10px] text-white/40 uppercase mr-1">Blobs</span>
+                            <span className="text-sm font-medium text-purple-400/90 font-mono">{block.blobCount}</span>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -375,24 +379,32 @@ const BlockchainVisualization: React.FC<BlockchainVisualizationProps> = ({
                 
                 {/* Current block (expanded) */}
                 {block.isCurrentSlot && (
-                  <div className="bg-surface/20 border border-gold/20 rounded-lg overflow-hidden shadow-xl w-full h-[280px] transition-all duration-300 backdrop-blur-sm">
-                    <div className="p-4 border-b border-gold/20 bg-gold/5 flex items-center justify-between">
+                  <div className="bg-surface/20 rounded-xl overflow-hidden shadow-lg w-full h-[280px] transition-all duration-300 backdrop-blur-sm relative">
+                    {/* Gold indicator at top - more prominent for current slot */}
+                    <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-gold/70 via-gold/40 to-gold/10"></div>
+                    
+                    <div className="p-4 flex items-center justify-between">
                       <div className="flex items-center">
-                        <div className="w-10 h-10 bg-gold/20 rounded-md border border-gold/40 flex items-center justify-center mr-3" style={{ boxShadow: '0 0 10px rgba(255, 215, 0, 0.3)' }}>
-                          <svg className="w-5 h-5 text-gold" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <div className="w-10 h-10 bg-gold/10 rounded-lg flex items-center justify-center mr-3 relative overflow-hidden">
+                          {/* Animated pulse in the background */}
+                          <div className="absolute inset-0 bg-gradient-to-tr from-gold/30 to-amber-500/5 animate-pulse"></div>
+                          
+                          <svg className="w-5 h-5 text-gold/90 relative z-10" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" strokeWidth="2" />
                             <path d="M16 8H8M16 12H8M16 16H8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                           </svg>
                         </div>
                         <div>
                           <div className="flex items-baseline">
-                            <h3 className="text-sm uppercase tracking-wide text-white/70">SLOT</h3>
-                            <span className="text-xl font-mono font-semibold text-gold ml-2">{block.slot}</span>
+                            <div className="bg-gold/10 px-2 py-1 rounded text-xs font-semibold text-gold/90 uppercase tracking-wide mr-2">
+                              SLOT
+                            </div>
+                            <span className="text-xl font-mono font-bold text-gold/90">{block.slot}</span>
                           </div>
                           {block.hasData && block.proposerEntity && (
-                            <p className="text-xs mt-0.5 flex items-center">
-                              <span className="text-white/60">Proposer:</span>
-                              <span className="text-white/90 ml-1 font-medium">{block.proposerEntity}</span>
+                            <p className="text-xs mt-1.5 flex items-center">
+                              <span className="text-white/50 mr-1">Proposer:</span>
+                              <span className="text-white/80 font-medium">{block.proposerEntity}</span>
                             </p>
                           )}
                         </div>
@@ -400,12 +412,15 @@ const BlockchainVisualization: React.FC<BlockchainVisualizationProps> = ({
                       
                       {/* Value badge */}
                       {block.hasData && block.blockValue !== undefined && (
-                        <div className="px-3 py-1.5 bg-green-500/10 border border-green-500/30 rounded-md text-green-400 text-sm font-mono flex items-center" style={{ boxShadow: '0 0 8px rgba(74, 222, 128, 0.2)' }}>
-                          <svg className="w-4 h-4 mr-1.5 text-green-400" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <div className="px-3 py-1.5 bg-green-500/5 rounded-lg text-green-400/90 text-sm font-mono flex items-center relative overflow-hidden group">
+                          {/* Background glow effect */}
+                          <div className="absolute inset-0 bg-gradient-to-r from-green-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                          
+                          <svg className="w-4 h-4 mr-1.5 text-green-400/80 relative z-10" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" />
                             <path d="M12 6V18M16 10L8 14M8 10L16 14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                           </svg>
-                          {block.blockValue.toFixed(4)} ETH
+                          <span className="relative z-10 font-semibold">{block.blockValue.toFixed(4)} ETH</span>
                         </div>
                       )}
                     </div>
@@ -415,94 +430,164 @@ const BlockchainVisualization: React.FC<BlockchainVisualizationProps> = ({
                       <div className="flex flex-col p-6 space-y-6 animate-pulse h-[calc(100%-4rem)]">
                         <div className="grid grid-cols-2 gap-3 h-full">
                           {/* Block Number */}
-                          <div className="flex flex-col bg-surface/10 rounded-lg p-4 border border-white/5">
-                            <div className="h-3 w-20 bg-white/10 rounded mb-3"></div>
-                            <div className="h-8 w-24 bg-white/10 rounded"></div>
+                          <div className="flex flex-col bg-surface/10 rounded-xl p-4">
+                            <div className="flex items-center">
+                              <div className="w-1 h-8 bg-amber-400/20 rounded-full mr-3"></div>
+                              <div className="flex-1">
+                                <div className="h-3 w-20 bg-white/10 rounded mb-3"></div>
+                                <div className="h-8 w-24 bg-white/10 rounded"></div>
+                              </div>
+                            </div>
                           </div>
                           
                           {/* Transactions */}
-                          <div className="flex flex-col bg-surface/10 rounded-lg p-4 border border-white/5">
-                            <div className="h-3 w-24 bg-white/10 rounded mb-3"></div>
-                            <div className="h-8 w-16 bg-white/10 rounded"></div>
+                          <div className="flex flex-col bg-surface/10 rounded-xl p-4">
+                            <div className="flex items-center">
+                              <div className="w-1 h-8 bg-blue-400/20 rounded-full mr-3"></div>
+                              <div className="flex-1">
+                                <div className="h-3 w-24 bg-white/10 rounded mb-3"></div>
+                                <div className="h-8 w-16 bg-white/10 rounded"></div>
+                              </div>
+                            </div>
                           </div>
                           
                           {/* Gas Usage */}
-                          <div className="flex flex-col bg-surface/10 rounded-lg p-4 border border-white/5">
-                            <div className="h-3 w-20 bg-white/10 rounded mb-3"></div>
-                            <div className="h-5 w-16 bg-white/10 rounded mb-2"></div>
-                            <div className="h-3 w-32 bg-white/10 rounded"></div>
+                          <div className="flex flex-col bg-surface/10 rounded-xl p-4">
+                            <div className="flex items-center">
+                              <div className="w-1 h-8 bg-cyan-400/20 rounded-full mr-3"></div>
+                              <div className="flex-1">
+                                <div className="h-3 w-20 bg-white/10 rounded mb-3"></div>
+                                <div className="h-5 w-16 bg-white/10 rounded mb-2"></div>
+                                <div className="h-3 w-32 bg-white/10 rounded"></div>
+                              </div>
+                            </div>
                           </div>
                           
                           {/* Blobs */}
-                          <div className="flex flex-col bg-surface/10 rounded-lg p-4 border border-white/5">
-                            <div className="h-3 w-16 bg-white/10 rounded mb-3"></div>
-                            <div className="h-8 w-10 bg-white/10 rounded"></div>
+                          <div className="flex flex-col bg-surface/10 rounded-xl p-4">
+                            <div className="flex items-center">
+                              <div className="w-1 h-8 bg-purple-400/20 rounded-full mr-3"></div>
+                              <div className="flex-1">
+                                <div className="h-3 w-16 bg-white/10 rounded mb-3"></div>
+                                <div className="h-8 w-10 bg-white/10 rounded"></div>
+                              </div>
+                            </div>
                           </div>
                           
                           {/* Reward */}
-                          <div className="flex flex-col bg-surface/10 rounded-lg p-4 border border-white/5 col-span-2">
-                            <div className="h-3 w-16 bg-white/10 rounded mb-3"></div>
-                            <div className="h-8 w-24 bg-white/10 rounded"></div>
+                          <div className="flex flex-col bg-surface/10 rounded-xl p-4 col-span-2">
+                            <div className="flex items-center">
+                              <div className="w-1 h-8 bg-green-400/20 rounded-full mr-3"></div>
+                              <div className="flex-1">
+                                <div className="h-3 w-16 bg-white/10 rounded mb-3"></div>
+                                <div className="h-8 w-24 bg-white/10 rounded"></div>
+                              </div>
+                            </div>
                           </div>
                         </div>
                         
                         <div className="flex items-center justify-center">
-                          <span className="text-sm text-white/70 px-4 py-2 bg-white/5 rounded-md border border-white/10 shadow-inner">
+                          <span className="text-sm text-white/70 px-4 py-2 bg-white/5 rounded-lg shadow-inner backdrop-blur-sm">
                             Building block...
                           </span>
                         </div>
                       </div>
                     ) : block.hasData ? (
                       <>
-                        {/* Block stats in a 3x2 grid */}
-                        <div className="grid grid-cols-2 gap-3 p-5 h-[calc(100%-4rem)]">
+                        {/* Block stats cards - redesigned to be more modern */}
+                        <div className="grid grid-cols-2 gap-4 px-5 pt-2 pb-5 h-[calc(100%-4rem)]">
                           {/* Execution block number */}
-                          <div className="bg-surface/10 rounded-lg p-4 border border-white/5 flex flex-col justify-between">
-                            <span className="text-xs text-white/50 uppercase tracking-wider">Block</span>
-                            <span className="text-2xl font-medium text-amber-400 mt-1 font-mono">
-                              {block.executionBlockNumber || 'N/A'}
-                            </span>
+                          <div className="bg-surface/10 rounded-xl p-4 flex flex-col justify-between relative overflow-hidden group">
+                            {/* Subtle interactive highlight */}
+                            <div className="absolute inset-0 bg-gradient-to-br from-amber-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                            
+                            {/* Content with side colored indicator */}
+                            <div className="flex items-center">
+                              <div className="w-1 h-8 bg-amber-400/30 rounded-full mr-3"></div>
+                              <div className="flex-1">
+                                <div className="text-xs text-white/40 uppercase tracking-wider font-medium">Block</div>
+                                <div className="text-2xl font-medium text-amber-400/90 mt-1 font-mono">
+                                  {block.executionBlockNumber || 'N/A'}
+                                </div>
+                              </div>
+                            </div>
                           </div>
                           
                           {/* Transaction count */}
-                          <div className="bg-surface/10 rounded-lg p-4 border border-white/5 flex flex-col justify-between">
-                            <span className="text-xs text-white/50 uppercase tracking-wider">Transactions</span>
-                            <span className="text-2xl font-medium text-amber-400 mt-1 font-mono">
-                              {block.transactionCount !== undefined ? block.transactionCount.toLocaleString() : 'N/A'}
-                            </span>
+                          <div className="bg-surface/10 rounded-xl p-4 flex flex-col justify-between relative overflow-hidden group">
+                            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                            
+                            <div className="flex items-center">
+                              <div className="w-1 h-8 bg-blue-400/30 rounded-full mr-3"></div>
+                              <div className="flex-1">
+                                <div className="text-xs text-white/40 uppercase tracking-wider font-medium">Transactions</div>
+                                <div className="text-2xl font-medium text-white/90 mt-1 font-mono">
+                                  {block.transactionCount !== undefined ? block.transactionCount.toLocaleString() : 'N/A'}
+                                </div>
+                              </div>
+                            </div>
                           </div>
                           
                           {/* Gas usage */}
-                          <div className="bg-surface/10 rounded-lg p-4 border border-white/5 flex flex-col justify-between">
-                            <span className="text-xs text-white/50 uppercase tracking-wider">Gas Usage</span>
-                            <div className="flex flex-col">
-                              <span className="text-base font-medium text-blue-400 mt-1 font-mono">
-                                {block.gasUsed !== undefined && block.gasLimit !== undefined 
-                                  ? `${Math.round(block.gasUsed * 100 / block.gasLimit)}%` 
-                                  : 'N/A'}
-                              </span>
-                              {block.gasUsed !== undefined && (
-                                <span className="text-xs text-white/50 font-mono mt-1">
-                                  {block.gasUsed.toLocaleString()} / {block.gasLimit?.toLocaleString() || 'N/A'}
-                                </span>
-                              )}
+                          <div className="bg-surface/10 rounded-xl p-4 flex flex-col justify-between relative overflow-hidden group">
+                            <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                            
+                            <div className="flex items-center">
+                              <div className="w-1 h-8 bg-cyan-400/30 rounded-full mr-3"></div>
+                              <div className="flex-1">
+                                <div className="text-xs text-white/40 uppercase tracking-wider font-medium">Gas Usage</div>
+                                {block.gasUsed !== undefined && block.gasLimit !== undefined ? (
+                                  <div className="mt-1.5">
+                                    <div className="flex items-center">
+                                      <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden">
+                                        <div 
+                                          className="h-full bg-cyan-400/60 rounded-full"
+                                          style={{ width: `${Math.min(100, Math.round(block.gasUsed * 100 / block.gasLimit))}%` }}
+                                        ></div>
+                                      </div>
+                                      <span className="text-sm text-cyan-400/90 font-mono ml-2">
+                                        {Math.round(block.gasUsed * 100 / block.gasLimit)}%
+                                      </span>
+                                    </div>
+                                    <div className="text-xs text-white/40 font-mono mt-1.5">
+                                      {block.gasUsed.toLocaleString()} / {block.gasLimit?.toLocaleString() || 'N/A'}
+                                    </div>
+                                  </div>
+                                ) : (
+                                  <div className="text-xl font-medium text-white/50 mt-1 font-mono">N/A</div>
+                                )}
+                              </div>
                             </div>
                           </div>
                           
                           {/* Blob count */}
-                          <div className="bg-surface/10 rounded-lg p-4 border border-white/5 flex flex-col justify-between">
-                            <span className="text-xs text-white/50 uppercase tracking-wider">Blobs</span>
-                            <span className="text-2xl font-medium text-purple-400 mt-1 font-mono">
-                              {block.blobCount !== undefined && block.blobCount > 0 ? block.blobCount : '0'}
-                            </span>
+                          <div className="bg-surface/10 rounded-xl p-4 flex flex-col justify-between relative overflow-hidden group">
+                            <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                            
+                            <div className="flex items-center">
+                              <div className="w-1 h-8 bg-purple-400/30 rounded-full mr-3"></div>
+                              <div className="flex-1">
+                                <div className="text-xs text-white/40 uppercase tracking-wider font-medium">Blobs</div>
+                                <div className="text-2xl font-medium text-purple-400/90 mt-1 font-mono">
+                                  {block.blobCount !== undefined && block.blobCount > 0 ? block.blobCount : '0'}
+                                </div>
+                              </div>
+                            </div>
                           </div>
                           
                           {/* Reward value */}
-                          <div className="bg-surface/10 rounded-lg p-4 border border-white/5 flex flex-col justify-between col-span-2">
-                            <span className="text-xs text-white/50 uppercase tracking-wider">Reward</span>
-                            <span className="text-2xl font-medium text-green-400 mt-1 font-mono">
-                              {block.blockValue !== undefined ? block.blockValue.toFixed(4) : '0.0000'} ETH
-                            </span>
+                          <div className="bg-surface/10 rounded-xl p-4 flex flex-col justify-between col-span-2 relative overflow-hidden group">
+                            <div className="absolute inset-0 bg-gradient-to-br from-green-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                            
+                            <div className="flex items-center">
+                              <div className="w-1 h-8 bg-green-400/30 rounded-full mr-3"></div>
+                              <div className="flex-1">
+                                <div className="text-xs text-white/40 uppercase tracking-wider font-medium">Reward</div>
+                                <div className="text-2xl font-medium text-green-400/90 mt-1 font-mono">
+                                  {block.blockValue !== undefined ? block.blockValue.toFixed(4) : '0.0000'} ETH
+                                </div>
+                              </div>
+                            </div>
                           </div>
                         </div>
                       </>
@@ -520,19 +605,20 @@ const BlockchainVisualization: React.FC<BlockchainVisualizationProps> = ({
                 
                 {/* Future block (next slot) */}
                 {block.isFuture && (
-                  <div className="bg-surface/20 border border-blue-500/20 rounded-lg overflow-hidden shadow-md w-full h-[140px] transition-all duration-300 backdrop-blur-sm">
-                    <div className="py-3 px-4 border-b border-blue-500/10 bg-blue-500/5">
+                  <div className="bg-surface/20 rounded-xl overflow-hidden shadow-md w-full h-[140px] transition-all duration-300 backdrop-blur-sm relative">
+                    {/* Blue indicator at top */}
+                    <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500/40 via-blue-500/20 to-blue-500/5"></div>
+                    
+                    {/* Header with slot number */}
+                    <div className="px-4 pt-3 pb-1">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center">
-                          <div className="w-6 h-6 bg-blue-500/10 rounded-md border border-blue-500/20 flex items-center justify-center mr-2">
-                            <svg className="w-3 h-3 text-blue-400" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                              <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" strokeWidth="2" strokeDasharray="2 2" />
-                            </svg>
+                          <div className="bg-blue-500/5 px-2 py-1 rounded text-xs font-medium text-blue-400/80">
+                            SLOT {block.slot}
                           </div>
-                          <div className="text-xs font-medium text-white/90">Slot {block.slot}</div>
                         </div>
                         {block.futureBidsCount > 0 && (
-                          <div className="text-[10px] bg-blue-500/10 px-1.5 py-0.5 rounded-sm text-blue-300">
+                          <div className="text-xs bg-blue-500/5 px-2 py-0.5 rounded text-blue-400/90 font-mono font-medium">
                             {block.futureBidsCount} bid{block.futureBidsCount !== 1 ? 's' : ''}
                           </div>
                         )}
@@ -541,37 +627,42 @@ const BlockchainVisualization: React.FC<BlockchainVisualizationProps> = ({
                     
                     {/* Future bids preview */}
                     {block.futureBids && block.futureBids.length > 0 ? (
-                      <div className="px-3 pt-2 overflow-y-auto max-h-[70px]">
-                        <div className="space-y-1">
+                      <div className="px-4 pt-2 overflow-y-auto max-h-[80px]">
+                        <div className="space-y-2">
                           {block.futureBids.slice(0, 2).map((bid, i) => (
-                            <div key={i} className="flex justify-between items-center py-1 px-2 bg-blue-500/5 rounded border border-blue-500/10">
-                              <div className="text-xs text-white/80 truncate">
-                                {bid.builderName || `${truncateMiddle(bid.relayName, 6, 4)}`}
+                            <div key={i} className="flex justify-between items-center py-1.5 px-3 bg-blue-500/5 rounded-lg">
+                              <div className="flex items-center">
+                                <div className="w-1 h-5 bg-blue-400/20 rounded-full mr-2"></div>
+                                <div className="text-xs text-white/80 truncate">
+                                  {bid.builderName || `${truncateMiddle(bid.relayName, 6, 4)}`}
+                                </div>
                               </div>
-                              <div className="text-xs font-mono text-green-300/90">
+                              <div className="text-xs font-mono text-green-300/90 font-medium">
                                 {bid.value.toFixed(4)} ETH
                               </div>
                             </div>
                           ))}
                           {block.futureBids.length > 2 && (
-                            <div className="text-[10px] text-center text-white/40 mt-1">
+                            <div className="text-[10px] text-center text-white/50 mt-1">
                               +{block.futureBids.length - 2} more bids
                             </div>
                           )}
                         </div>
                       </div>
                     ) : block.futureBidsCount && block.futureBidsCount > 0 ? (
-                      <div className="p-3 flex items-center justify-center h-[70px]">
-                        <div className="text-xs bg-blue-500/10 px-3 py-1.5 rounded-md text-blue-300 flex items-center">
-                          <svg className="w-4 h-4 mr-1.5 text-blue-300/80" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <div className="p-3 flex items-center justify-center h-[80px]">
+                        <div className="text-xs bg-blue-500/5 px-3 py-2 rounded-lg text-blue-400/90 flex items-center">
+                          <svg className="w-4 h-4 mr-1.5 text-blue-400/80" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                           </svg>
                           {block.futureBidsCount} incoming bid{block.futureBidsCount !== 1 ? 's' : ''}
                         </div>
                       </div>
                     ) : (
-                      <div className="p-3 flex items-center justify-center h-[70px] text-white/40 text-xs">
-                        Waiting for builder bids...
+                      <div className="p-4 flex items-center justify-center h-[80px]">
+                        <div className="text-xs text-white/40 bg-white/5 px-3 py-2 rounded-lg backdrop-blur-sm">
+                          Waiting for builder bids...
+                        </div>
                       </div>
                     )}
                   </div>
