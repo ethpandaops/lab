@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { BlockProductionBaseProps } from '../common/types';
-import BeaconBlockVisualization from '@/components/beacon/BeaconBlockVisualization';
+import BlockchainVisualization from '@/components/beacon/BlockchainVisualization';
 import { isInPropagationPhase } from '../common/PhaseUtils';
 import { countUniqueBuilderPubkeys } from '../common/utils';
 import MobileTimelineBar from './MobileTimelineBar';
@@ -18,6 +18,7 @@ interface MobileBlockProductionViewProps extends BlockProductionBaseProps {
   resetToCurrentSlot: () => void;
   togglePlayPause: () => void;
   isNextDisabled: boolean;
+  network: string; // Add network parameter for blockchain visualization
 }
 
 const MobileBlockProductionView: React.FC<MobileBlockProductionViewProps> = ({
@@ -42,7 +43,8 @@ const MobileBlockProductionView: React.FC<MobileBlockProductionViewProps> = ({
   goToNextSlot,
   resetToCurrentSlot,
   togglePlayPause,
-  isNextDisabled
+  isNextDisabled,
+  network
 }) => {
   // Get active status based on role and phase
   const isActive = (role: 'builder' | 'relay' | 'proposer' | 'node') => {
@@ -244,53 +246,18 @@ const MobileBlockProductionView: React.FC<MobileBlockProductionViewProps> = ({
               )}
             </div>
             
-            {/* Beacon Block visualization */}
+            {/* Blockchain visualization */}
             <div className="p-2 h-[180px] overflow-hidden">
-              {(() => {
-                // Calculate the blob count based on blob gas used
-                const blobGasUsed = typeof block?.execution_payload_blob_gas_used !== 'undefined'
-                  ? Number(block.execution_payload_blob_gas_used)
-                  : typeof block?.executionPayloadBlobGasUsed !== 'undefined'
-                    ? Number(block.executionPayloadBlobGasUsed)
-                    : 0;
-                    
-                const blobCount = blobGasUsed > 0 
-                  ? Math.ceil(blobGasUsed / 131072) 
-                  : 0;
-                
-                // Get the execution block number in the correct format
-                const executionBlockNumber = typeof block?.execution_payload_block_number !== 'undefined'
-                  ? Number(block.execution_payload_block_number)
-                  : typeof block?.executionPayloadBlockNumber !== 'undefined'
-                    ? Number(block.executionPayloadBlockNumber)
-                    : undefined;
-                    
-                // Get the execution transaction count
-                const executionTxCount = typeof block?.execution_payload_transactions_count !== 'undefined'
-                  ? Number(block.execution_payload_transactions_count)
-                  : typeof block?.executionPayloadTransactionsCount !== 'undefined'
-                    ? Number(block.executionPayloadTransactionsCount)
-                    : undefined;
-                    
-                // Get block value from winning bid if available
-                const blockValue = winningBid?.value;
-                
-                return (
-                  <BeaconBlockVisualization
-                    proposer_index={proposer?.proposerValidatorIndex}
-                    slot={proposer?.slot}
-                    execution_block_number={executionBlockNumber}
-                    execution_transaction_count={executionTxCount}
-                    block_hash={block?.blockRoot || block?.block_root}
-                    execution_block_hash={block?.executionPayloadBlockHash || block?.execution_payload_block_hash}
-                    blob_count={blobCount}
-                    block_value={blockValue}
-                    proposer_entity={proposerEntity}
-                    height="100%"
-                    width="100%"
-                  />
-                );
-              })()}
+              <BlockchainVisualization
+                currentSlot={slotNumber}
+                network={network}
+                currentTime={currentTime}
+                nodeBlockSeen={nodeBlockSeen}
+                nodeBlockP2P={nodeBlockP2P}
+                blockTime={blockTime}
+                height="100%"
+                width="100%"
+              />
             </div>
           </div>
 

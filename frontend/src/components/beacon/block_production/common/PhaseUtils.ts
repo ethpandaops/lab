@@ -38,6 +38,9 @@ export const getCurrentPhase = (
     }
   });
   
+  // Debug logging to help troubleshoot phase transitions
+  console.debug('PhaseUtils - Calculating phase:', { currentTime, earliestNodeTime, blockTime });
+  
   // Use block time if available and earlier than node times
   if (blockTime !== undefined && blockTime < earliestNodeTime) {
     earliestNodeTime = blockTime;
@@ -45,7 +48,7 @@ export const getCurrentPhase = (
 
   // REQUIREMENT 2: If we've never seen the block, we stay in building phase
   // No propagation defaults - if we never see the block, we never exit the build stage
-  if (earliestNodeTime === Infinity || !hasNodeSeenData && !hasNodeP2PData && !hasBlockTimeData) {
+  if (earliestNodeTime === Infinity || (!hasNodeSeenData && !hasNodeP2PData && !hasBlockTimeData)) {
     return Phase.Building; // No block seen, stay in building phase
   }
   
