@@ -125,7 +125,7 @@ const PhaseTimeline: React.FC<PhaseTimelineProps> = ({
             </button>
 
             <div className={`font-mono ml-1 text-primary flex flex-col ${isMobile ? 'text-xs' : 'text-sm'}`}>
-              <div className="text-base font-semibold">Slot: {slotNumber ?? "—"}</div>
+              <div className="text-lg font-semibold">Slot: {slotNumber ?? "—"}</div>
               {slotNumber !== null && displaySlotOffset !== 0 && (
                 <div className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-secondary opacity-70`}>
                   Lag: {headLagSlots - displaySlotOffset}
@@ -135,11 +135,11 @@ const PhaseTimeline: React.FC<PhaseTimelineProps> = ({
           </div>
 
           {/* Phase info and time on the right */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-4">
             <div className="flex flex-col">
               <div className="flex items-center">
-                <span className="font-medium mr-1 text-sm">Phase:</span>
-                <span className="font-medium px-2 py-0.5 rounded-full text-sm bg-orange-500/20 text-orange-300">
+                <span className="font-medium mr-1.5 text-base">Phase:</span>
+                <span className="font-medium px-2.5 py-0.5 rounded-full text-base bg-orange-500/20 text-orange-300">
                   Building
                 </span>
               </div>
@@ -147,7 +147,7 @@ const PhaseTimeline: React.FC<PhaseTimelineProps> = ({
             
             {/* Time display */}
             <div className="flex items-center gap-2">
-              <span className="font-mono text-base font-semibold text-white">{(currentTime / 1000).toFixed(1)}s</span>
+              <span className="font-mono text-lg font-semibold text-white">{(currentTime / 1000).toFixed(1)}s</span>
               <button
                 onClick={togglePlayPause}
                 className="bg-surface/50 p-1.5 rounded border border-subtle hover:bg-hover transition"
@@ -343,7 +343,7 @@ const PhaseTimeline: React.FC<PhaseTimelineProps> = ({
           </button>
 
           <div className={`font-mono ml-1 text-primary flex flex-col ${isMobile ? 'text-xs' : 'text-sm'}`}>
-            <div className="text-base font-semibold">Slot: {slotNumber ?? "—"}</div>
+            <div className="text-lg font-semibold">Slot: {slotNumber ?? "—"}</div>
             {slotNumber !== null && displaySlotOffset !== 0 && (
               <div className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-secondary opacity-70`}>
                 Lag: {headLagSlots - displaySlotOffset}
@@ -353,11 +353,11 @@ const PhaseTimeline: React.FC<PhaseTimelineProps> = ({
         </div>
 
         {/* Phase info and time on the right */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-4">
           <div className="flex flex-col">
             <div className="flex items-center">
-              <span className="font-medium mr-1 text-sm">Phase:</span>
-              <span className={`font-medium px-2 py-0.5 rounded-full text-sm 
+              <span className="font-medium mr-1.5 text-base">Phase:</span>
+              <span className={`font-medium px-2.5 py-0.5 rounded-full text-base 
                 ${currentPhase === Phase.Building ? 'bg-orange-500/20 text-orange-300' :
                   currentPhase === Phase.Propagating ? 'bg-purple-500/20 text-purple-300' :
                   currentPhase === Phase.Attesting ? 'bg-blue-500/20 text-blue-300' :
@@ -373,7 +373,7 @@ const PhaseTimeline: React.FC<PhaseTimelineProps> = ({
           
           {/* Time display */}
           <div className="flex items-center gap-2">
-            <span className="font-mono text-base font-semibold text-white">{(currentTime / 1000).toFixed(1)}s</span>
+            <span className="font-mono text-lg font-semibold text-white">{(currentTime / 1000).toFixed(1)}s</span>
             <button
               onClick={togglePlayPause}
               className="bg-surface/50 p-1.5 rounded border border-subtle hover:bg-hover transition"
