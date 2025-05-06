@@ -110,9 +110,9 @@ const PhaseIcons: React.FC<PhaseIconsProps> = ({
       {/* 1. BUILDERS PHASE */}
       <div className={`flex flex-col items-center text-center transition-opacity duration-500 ${isActiveInPhase('builder') ? 'opacity-100' : 'opacity-60'}`}>
         <div 
-          className={`w-14 h-14 flex items-center justify-center rounded-full mb-1.5 shadow-lg transition-all duration-500 ${
+          className={`w-14 h-14 flex items-center justify-center rounded-full mb-1.5 shadow-lg transition-opacity duration-500 ${
             isActiveInPhase('builder')
-              ? 'bg-gradient-to-br from-orange-500/60 to-orange-600/30 border-2 border-orange-400/80 scale-105' // Active
+              ? 'bg-gradient-to-br from-orange-500/60 to-orange-600/30 border-2 border-orange-400/80' // Active
               : currentPhase === Phase.Propagating || currentPhase === Phase.Attesting || currentPhase === Phase.Accepted
                 ? 'bg-gradient-to-br from-orange-500/30 to-orange-600/10 border-2 border-orange-400/40' // Completed
                 : 'bg-surface/30 border border-subtle/60' // Not yet active
@@ -147,9 +147,9 @@ const PhaseIcons: React.FC<PhaseIconsProps> = ({
       {/* 2. RELAYS PHASE */}
       <div className={`flex flex-col items-center text-center transition-opacity duration-500 ${isActiveInPhase('relay') ? 'opacity-100' : 'opacity-60'}`}>
         <div 
-          className={`w-14 h-14 flex items-center justify-center rounded-full mb-1.5 shadow-lg transition-all duration-500 ${
+          className={`w-14 h-14 flex items-center justify-center rounded-full mb-1.5 shadow-lg transition-opacity duration-500 ${
             isActiveInPhase('relay')
-              ? 'bg-gradient-to-br from-green-500/60 to-green-600/30 border-2 border-green-400/80 scale-105' // Active
+              ? 'bg-gradient-to-br from-green-500/60 to-green-600/30 border-2 border-green-400/80' // Active
               : currentPhase === Phase.Attesting || currentPhase === Phase.Accepted
                 ? 'bg-gradient-to-br from-green-500/30 to-green-600/10 border-2 border-green-400/40' // Completed
                 : 'bg-surface/30 border border-subtle/60' // Not yet active
@@ -186,11 +186,11 @@ const PhaseIcons: React.FC<PhaseIconsProps> = ({
       {/* 3. PROPOSER PHASE */}
       <div className={`flex flex-col items-center text-center transition-opacity duration-500 ${isActiveInPhase('proposer') ? 'opacity-100' : 'opacity-60'}`}>
         <div 
-          className={`w-14 h-14 flex items-center justify-center rounded-full mb-1.5 shadow-lg transition-all duration-500 ${
+          className={`w-14 h-14 flex items-center justify-center rounded-full mb-1.5 shadow-lg transition-opacity duration-500 ${
             isActiveInPhase('proposer')
-              ? 'bg-gradient-to-br from-gold/60 to-amber-600/30 border-2 border-gold/80 scale-105' // Active
+              ? 'bg-gradient-to-br from-amber-500/60 to-amber-600/30 border-2 border-amber-400/80' // Active
               : currentPhase === Phase.Attesting || currentPhase === Phase.Accepted
-                ? 'bg-gradient-to-br from-gold/40 to-amber-600/10 border-2 border-gold/60' // Completed
+                ? 'bg-gradient-to-br from-amber-500/40 to-amber-600/10 border-2 border-amber-400/60' // Completed
                 : 'bg-surface/30 border border-subtle/60' // Not yet active
           }`}
         >
@@ -226,9 +226,9 @@ const PhaseIcons: React.FC<PhaseIconsProps> = ({
       {/* NODES PHASE - INSERTED BETWEEN PROPOSER AND ATTESTERS */}
       <div className={`flex flex-col items-center text-center transition-opacity duration-500 ${isActiveInPhase('node') ? 'opacity-100' : 'opacity-60'}`}>
         <div 
-          className={`w-14 h-14 flex items-center justify-center rounded-full mb-1.5 shadow-lg transition-all duration-500 ${
+          className={`w-14 h-14 flex items-center justify-center rounded-full mb-1.5 shadow-lg transition-opacity duration-500 ${
             isActiveInPhase('node')
-              ? 'bg-gradient-to-br from-purple-500/60 to-purple-600/30 border-2 border-purple-400/80 scale-105' // Active
+              ? 'bg-gradient-to-br from-purple-500/60 to-purple-600/30 border-2 border-purple-400/80' // Active
               : currentPhase === Phase.Attesting || currentPhase === Phase.Accepted
                 ? 'bg-gradient-to-br from-purple-500/40 to-purple-600/20 border-2 border-purple-400/60' // Completed
                 : 'bg-surface/30 border border-subtle/60' // Not yet active
@@ -261,9 +261,9 @@ const PhaseIcons: React.FC<PhaseIconsProps> = ({
       {/* 4. ATTESTATION PHASE */}
       <div className={`flex flex-col items-center text-center transition-opacity duration-500 ${isActiveInPhase('attester') ? 'opacity-100' : 'opacity-60'}`}>
         <div 
-          className={`w-14 h-14 flex items-center justify-center rounded-full mb-1.5 shadow-lg transition-all duration-500 ${
+          className={`w-14 h-14 flex items-center justify-center rounded-full mb-1.5 shadow-lg transition-opacity duration-500 ${
             isActiveInPhase('attester')
-              ? 'bg-gradient-to-br from-blue-500/60 to-blue-600/30 border-2 border-blue-400/80 scale-105' // Active
+              ? 'bg-gradient-to-br from-blue-500/60 to-blue-600/30 border-2 border-blue-400/80' // Active
               : currentPhase === Phase.Accepted
                 ? 'bg-gradient-to-br from-blue-500/30 to-blue-600/10 border-2 border-blue-400/40' // Completed
                 : 'bg-surface/30 border border-subtle/60' // Not yet active
@@ -326,9 +326,9 @@ const PhaseIcons: React.FC<PhaseIconsProps> = ({
       {/* 5. ACCEPTED PHASE - NEW */}
       <div className={`flex flex-col items-center text-center transition-opacity duration-500 ${isActiveInPhase('accepted') ? 'opacity-100' : 'opacity-60'}`}>
         <div 
-          className={`w-14 h-14 flex items-center justify-center rounded-full mb-1.5 shadow-lg transition-all duration-500 ${
+          className={`w-14 h-14 flex items-center justify-center rounded-full mb-1.5 shadow-lg transition-opacity duration-500 ${
             isActiveInPhase('accepted')
-              ? 'bg-gradient-to-br from-green-500/60 to-green-600/30 border-2 border-green-400/80 scale-105' // Active
+              ? 'bg-gradient-to-br from-green-500/60 to-green-600/30 border-2 border-green-400/80' // Active
               : 'bg-surface/30 border border-subtle/60' // Not yet active
           }`}
         >

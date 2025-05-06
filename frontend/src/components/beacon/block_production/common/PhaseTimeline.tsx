@@ -86,10 +86,10 @@ const PhaseTimeline: React.FC<PhaseTimelineProps> = ({
   if (currentPhase === null) {
     // Use Building phase by default instead of showing "Waiting for data..."
     return (
-      <div className="bg-surface/40 rounded-t-xl shadow-lg overflow-hidden p-2 pb-3">
-        <div className="flex justify-between items-center mb-2">
+      <div className="bg-surface/40 rounded-t-xl shadow-lg overflow-hidden p-3 pb-5">
+        <div className="flex justify-between items-center mb-4">
           {/* Navigation controls on the left */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 mt-1 mb-1">
             <button
               onClick={goToPreviousSlot}
               className="bg-surface/50 p-1.5 rounded border border-subtle hover:bg-hover transition"
@@ -137,7 +137,7 @@ const PhaseTimeline: React.FC<PhaseTimelineProps> = ({
           {/* Phase info and time on the right */}
           <div className="flex items-center gap-4">
             <div className="flex flex-col">
-              <div className="flex items-center">
+              <div className="flex items-center mt-1 mb-1">
                 <span className="font-medium mr-1.5 text-base">Phase:</span>
                 <span className="font-medium px-2.5 py-0.5 rounded-full text-base bg-orange-500/20 text-orange-300">
                   Building
@@ -146,7 +146,7 @@ const PhaseTimeline: React.FC<PhaseTimelineProps> = ({
             </div>
             
             {/* Time display */}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 mt-1 mb-1">
               <span className="font-mono text-lg font-semibold text-white">{(currentTime / 1000).toFixed(1)}s</span>
               <button
                 onClick={togglePlayPause}
@@ -304,10 +304,10 @@ const PhaseTimeline: React.FC<PhaseTimelineProps> = ({
   const acceptancePercent = Math.min(98, Math.max(attestationPercent + 1, (acceptanceTime / 12000) * 100));
 
   return (
-    <div className="bg-surface/40 rounded-t-xl shadow-lg overflow-hidden p-2 pb-3">
-      <div className="flex justify-between items-center mb-2">
+    <div className="bg-surface/40 rounded-t-xl shadow-lg overflow-hidden p-3 pb-5">
+      <div className="flex justify-between items-center mb-4">
         {/* Navigation controls on the left */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 mt-1 mb-1">
           <button
             onClick={goToPreviousSlot}
             className="bg-surface/50 p-1.5 rounded border border-subtle hover:bg-hover transition"
@@ -355,7 +355,7 @@ const PhaseTimeline: React.FC<PhaseTimelineProps> = ({
         {/* Phase info and time on the right */}
         <div className="flex items-center gap-4">
           <div className="flex flex-col">
-            <div className="flex items-center">
+            <div className="flex items-center mt-1 mb-1">
               <span className="font-medium mr-1.5 text-base">Phase:</span>
               <span className={`font-medium px-2.5 py-0.5 rounded-full text-base 
                 ${currentPhase === Phase.Building ? 'bg-orange-500/20 text-orange-300' :
@@ -372,7 +372,7 @@ const PhaseTimeline: React.FC<PhaseTimelineProps> = ({
           </div>
           
           {/* Time display */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 mt-1 mb-1">
             <span className="font-mono text-lg font-semibold text-white">{(currentTime / 1000).toFixed(1)}s</span>
             <button
               onClick={togglePlayPause}
