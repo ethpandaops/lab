@@ -1,7 +1,6 @@
 import React, { useMemo } from 'react';
 import { Phase, BlockProductionBaseProps } from '../common/types';
 import BeaconBlockVisualization from '@/components/beacon/BeaconBlockVisualization';
-import { Card, CardBody } from '@/components/common/Card';
 import { getCurrentPhase } from '../common/PhaseUtils';
 import PhaseTimeline from '../common/PhaseTimeline';
 import PhaseIcons from '../common/PhaseIcons';
@@ -211,118 +210,127 @@ const DesktopBlockProductionView: React.FC<DesktopBlockProductionViewProps> = ({
   }, [nodeBlockSeen, nodeBlockP2P, nodes, currentTime]);
 
   return (
-    <div className="px-2 py-1 h-full flex flex-col space-y-2">
+    <div className="h-full flex flex-col">
       <style jsx>{flowAnimations}</style>
       
-      {/* Timeline Header */}
-      <PhaseTimeline 
-        currentTime={currentTime}
-        nodeBlockSeen={nodeBlockSeen}
-        nodeBlockP2P={nodeBlockP2P}
-        blockTime={blockTime}
-        slotData={slotData}
-        onPhaseChange={onPhaseChange}
-        // Navigation controls
-        slotNumber={slotNumber}
-        headLagSlots={headLagSlots}
-        displaySlotOffset={displaySlotOffset}
-        isPlaying={isPlaying}
-        isMobile={false} // Desktop view is never mobile
-        goToPreviousSlot={goToPreviousSlot}
-        goToNextSlot={goToNextSlot}
-        resetToCurrentSlot={resetToCurrentSlot}
-        togglePlayPause={togglePlayPause}
-        isNextDisabled={isNextDisabled}
-      />
+      {/* Hero section with solid background */}
+      <div className="bg-surface border-b border-subtle mb-3 shadow-sm">
+        {/* Timeline Header with solid background */}
+        <div className="px-4 pt-3 pb-2">
+          <PhaseTimeline 
+            currentTime={currentTime}
+            nodeBlockSeen={nodeBlockSeen}
+            nodeBlockP2P={nodeBlockP2P}
+            blockTime={blockTime}
+            slotData={slotData}
+            onPhaseChange={onPhaseChange}
+            // Navigation controls
+            slotNumber={slotNumber}
+            headLagSlots={headLagSlots}
+            displaySlotOffset={displaySlotOffset}
+            isPlaying={isPlaying}
+            isMobile={false} // Desktop view is never mobile
+            goToPreviousSlot={goToPreviousSlot}
+            goToNextSlot={goToNextSlot}
+            resetToCurrentSlot={resetToCurrentSlot}
+            togglePlayPause={togglePlayPause}
+            isNextDisabled={isNextDisabled}
+          />
+        </div>
 
-      {/* Phase Icons */}
-      <PhaseIcons 
-        currentTime={currentTime}
-        nodeBlockSeen={nodeBlockSeen}
-        nodeBlockP2P={nodeBlockP2P}
-        blockTime={blockTime}
-        bids={bids}
-        winningBid={winningBid}
-        proposer={proposer}
-        nodes={nodes}
-        slotData={slotData}
-        firstContinentToSeeBlock={firstContinentToSeeBlock}
-      />
+        {/* Phase Icons Section with clean separation */}
+        <div className="px-4 py-4 bg-background-alt border-y border-border/30">
+          <PhaseIcons 
+            currentTime={currentTime}
+            nodeBlockSeen={nodeBlockSeen}
+            nodeBlockP2P={nodeBlockP2P}
+            blockTime={blockTime}
+            bids={bids}
+            winningBid={winningBid}
+            proposer={proposer}
+            nodes={nodes}
+            slotData={slotData}
+            firstContinentToSeeBlock={firstContinentToSeeBlock}
+          />
+        </div>
+      </div>
 
-      {/* Main content with border separating from hero section */}
-      <div className="flex flex-1 gap-4 min-h-0 overflow-hidden mt-4 pt-4 border-t border-primary/10">
+      {/* Main content area */}
+      <div className="flex flex-1 gap-4 min-h-0 overflow-hidden px-4 pb-4">
         {/* Left panel - Builders and Relays */}
-        <BuildersRelaysPanel 
-          bids={bids}
-          currentTime={currentTime}
-          relayColors={relayColors}
-          winningBid={winningBid}
-          isBuilderActive={isActive('builder')}
-          isRelayActive={isActive('relay')}
-        />
+        <div className="w-1/5 overflow-hidden">
+          <BuildersRelaysPanel 
+            bids={bids}
+            currentTime={currentTime}
+            relayColors={relayColors}
+            winningBid={winningBid}
+            isBuilderActive={isActive('builder')}
+            isRelayActive={isActive('relay')}
+          />
+        </div>
 
-        {/* Center panel - Block Visualization */}
-        <div className="bg-surface/40 rounded-xl shadow-lg overflow-hidden flex-1 flex flex-col">
-          <div className="flex-1 p-3 overflow-auto flex flex-col">
-            {(() => {
-              // Calculate the blob count based on blob gas used
-              const blobGasUsed = typeof block?.execution_payload_blob_gas_used !== 'undefined'
-                ? Number(block.execution_payload_blob_gas_used)
-                : typeof block?.executionPayloadBlobGasUsed !== 'undefined'
-                  ? Number(block.executionPayloadBlobGasUsed)
-                  : 0;
-                  
-              const blobCount = blobGasUsed > 0 
-                ? Math.ceil(blobGasUsed / 131072) 
+        {/* Center panel - Block Visualization - no card wrapper or border */}
+        <div className="flex-1 overflow-hidden flex flex-col bg-surface/10 rounded-lg shadow-sm p-3">
+          {(() => {
+            // Calculate the blob count based on blob gas used
+            const blobGasUsed = typeof block?.execution_payload_blob_gas_used !== 'undefined'
+              ? Number(block.execution_payload_blob_gas_used)
+              : typeof block?.executionPayloadBlobGasUsed !== 'undefined'
+                ? Number(block.executionPayloadBlobGasUsed)
                 : 0;
-              
-              // Get the execution block number in the correct format
-              const executionBlockNumber = typeof block?.execution_payload_block_number !== 'undefined'
-                ? Number(block.execution_payload_block_number)
-                : typeof block?.executionPayloadBlockNumber !== 'undefined'
-                  ? Number(block.executionPayloadBlockNumber)
-                  : undefined;
-                  
-              // Get the execution transaction count
-              const executionTxCount = typeof block?.execution_payload_transactions_count !== 'undefined'
-                ? Number(block.execution_payload_transactions_count)
-                : typeof block?.executionPayloadTransactionsCount !== 'undefined'
-                  ? Number(block.executionPayloadTransactionsCount)
-                  : undefined;
-                  
-              // Get block value from winning bid if available
-              const blockValue = winningBid?.value;
-              
-              return (
-                <div className="h-full flex flex-col">
-                  {/* Completely redesigned Beacon Block with integrated blob visualization */}
-                  <BeaconBlockVisualization
-                    proposer_index={proposer?.proposerValidatorIndex}
-                    slot={proposer?.slot}
-                    execution_block_number={executionBlockNumber}
-                    execution_transaction_count={executionTxCount}
-                    block_hash={block?.blockRoot || block?.block_root}
-                    execution_block_hash={block?.executionPayloadBlockHash || block?.execution_payload_block_hash}
-                    blob_count={blobCount}
-                    block_value={blockValue}
-                    proposer_entity={proposerEntity}
-                    height="100%"
-                    width="100%"
-                  />
-                </div>
-              );
-            })()}
-          </div>
+                
+            const blobCount = blobGasUsed > 0 
+              ? Math.ceil(blobGasUsed / 131072) 
+              : 0;
+            
+            // Get the execution block number in the correct format
+            const executionBlockNumber = typeof block?.execution_payload_block_number !== 'undefined'
+              ? Number(block.execution_payload_block_number)
+              : typeof block?.executionPayloadBlockNumber !== 'undefined'
+                ? Number(block.executionPayloadBlockNumber)
+                : undefined;
+                
+            // Get the execution transaction count
+            const executionTxCount = typeof block?.execution_payload_transactions_count !== 'undefined'
+              ? Number(block.execution_payload_transactions_count)
+              : typeof block?.executionPayloadTransactionsCount !== 'undefined'
+                ? Number(block.executionPayloadTransactionsCount)
+                : undefined;
+                
+            // Get block value from winning bid if available
+            const blockValue = winningBid?.value;
+            
+            return (
+              <div className="h-full flex flex-col">
+                {/* Completely redesigned Beacon Block with integrated blob visualization */}
+                <BeaconBlockVisualization
+                  proposer_index={proposer?.proposerValidatorIndex}
+                  slot={proposer?.slot}
+                  execution_block_number={executionBlockNumber}
+                  execution_transaction_count={executionTxCount}
+                  block_hash={block?.blockRoot || block?.block_root}
+                  execution_block_hash={block?.executionPayloadBlockHash || block?.execution_payload_block_hash}
+                  blob_count={blobCount}
+                  block_value={blockValue}
+                  proposer_entity={proposerEntity}
+                  height="100%"
+                  width="100%"
+                />
+              </div>
+            );
+          })()}
         </div>
         
         {/* Right panel - Continents */}
-        <ContinentsList 
-          nodes={nodes}
-          nodeBlockSeen={nodeBlockSeen}
-          nodeBlockP2P={nodeBlockP2P}
-          currentTime={currentTime}
-          isActive={isActive('node')}
-        />
+        <div className="w-1/5 overflow-hidden">
+          <ContinentsList 
+            nodes={nodes}
+            nodeBlockSeen={nodeBlockSeen}
+            nodeBlockP2P={nodeBlockP2P}
+            currentTime={currentTime}
+            isActive={isActive('node')}
+          />
+        </div>
       </div>
     </div>
   );

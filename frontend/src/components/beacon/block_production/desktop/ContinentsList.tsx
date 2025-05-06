@@ -169,33 +169,42 @@ const ContinentsList: React.FC<ContinentsListProps> = ({
   }, [nodes, currentTime, nodeBlockSeen, nodeBlockP2P]);
 
   return (
-    <div className="bg-surface/40 rounded-xl shadow-lg overflow-hidden w-[300px] min-w-[300px] flex flex-col">
-      <div className="p-2 border-b border-subtle/20">
+    <div className="bg-surface/10 p-2 rounded-lg shadow-sm border border-subtle/30 overflow-hidden h-full flex flex-col">
+      <div className="p-2 border-b border-subtle/20 bg-surface/60 rounded-t-lg">
         <div className="text-sm font-medium text-primary flex items-center">
           <div className="w-2 h-2 rounded-full bg-purple-400 mr-1.5"></div>
-          Continents
+          Nodes
         </div>
       </div>
       
-      <div className="flex-1 p-2 overflow-auto">
+      <div className="flex-1 p-2 overflow-auto scrollbar-hide" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+        <style jsx>{`
+          .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+          }
+        `}</style>
         {continents.length > 0 ? (
           <div className="space-y-2">
             {continents.map(item => (
               <div 
                 key={item.id}
-                className="rounded-lg p-2 bg-surface/30 transition-all duration-300"
+                className={`rounded-lg p-2 transition-all duration-300 ${
+                  item.rank === 1 && item.earliestTime && item.earliestTime <= currentTime 
+                    ? 'bg-amber-400/10 border border-amber-400/20' 
+                    : 'bg-surface/30'
+                }`}
                 style={{
                   opacity: item.progress > 0 && isActive ? 1 : 0.7,
-                  boxShadow: item.rank > 0 && item.rank <= 3 ? 'inset 0 0 0 1px rgba(255, 255, 255, 0.1)' : 'none',
-                  backgroundColor: item.rank > 0 && item.rank <= 3 
-                    ? `${item.color}15` // More visible background for top 3
-                    : 'rgba(30, 41, 59, 0.3)' // Default background
                 }}
               >
                 <div className="flex justify-between items-center">
-                  <div className="font-medium text-sm flex items-center">
+                  <div className={`font-medium flex items-center ${
+                    item.rank === 1 && item.earliestTime && item.earliestTime <= currentTime 
+                      ? 'text-base' 
+                      : 'text-sm'
+                  }`}>
                     {item.rank > 0 && item.rank <= 3 && item.earliestTime && item.earliestTime <= currentTime && (
-                      <span className="text-xs mr-1.5">
+                      <span className="text-xs mr-2">
                         {item.rank === 1 ? '🥇' : item.rank === 2 ? '🥈' : '🥉'}
                       </span>
                     )}
@@ -203,28 +212,34 @@ const ContinentsList: React.FC<ContinentsListProps> = ({
                   </div>
                   
                   {item.earliestTime && item.earliestTime <= currentTime && (
-                    <div className="text-xs font-mono bg-surface/30 px-1.5 py-0.5 rounded">
+                    <div className={`font-mono px-1.5 py-0.5 rounded ${
+                      item.rank === 1 
+                        ? 'bg-amber-400/20 text-amber-400 text-sm' 
+                        : 'bg-surface/30 text-xs text-tertiary'
+                    }`}>
                       {item.formattedTime}
                     </div>
                   )}
                 </div>
                 
-                <div className="mt-1.5 flex justify-between items-center text-xs">
+                <div className="mt-2 flex justify-between items-center text-xs">
                   <span className="text-tertiary">
                     Seen: <span className="font-mono">{item.nodesThatHaveSeenBlock}/{item.count}</span>
                   </span>
-                  <span className="text-tertiary">
+                  <span className={`font-medium ${
+                    item.rank === 1 ? 'text-amber-400' : 'text-tertiary'
+                  }`}>
                     {Math.round(item.progress)}%
                   </span>
                 </div>
                 
                 {/* Progress bar */}
-                <div className="mt-1 h-1.5 w-full bg-surface/50 rounded-full overflow-hidden">
+                <div className="mt-1.5 h-2 w-full bg-surface/50 rounded-full overflow-hidden">
                   <div 
                     className="h-full transition-width duration-700 ease-out rounded-full"
                     style={{ 
                       width: `${item.progress || 0}%`,
-                      backgroundColor: item.color,
+                      backgroundColor: item.rank === 1 ? '#f59e0b' : item.color,
                       boxShadow: item.progress > 0 ? 'inset 0 0 4px rgba(255, 255, 255, 0.3)' : 'none'
                     }}
                   ></div>
