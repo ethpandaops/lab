@@ -56,11 +56,20 @@ export function useBuilderNames(network: string): BuilderNameMap {
           "Eden Network": "0x8b8edce58fafe098763e4fabdeb318d347f9238845f42b44fca8d5a8129d2a98b0647a2e3a3730f3b05b48e86436e224",
           
           // Common builders from debug output
+          // Live builders seen on mainnet
           "Blocknative": "0x95c8cc31f8906cc10a2e9f58988ad374d68d108914b997ef0567751b041bd0b7d104183d235ac5769d51912cd680608e",
           "bloXroute ETHICAL": "0xa00001792d3046dc7063a80e2a3a75124aa55177124a7bb529ac924356279349c4d6369b380cead786da0d2e1e4870cf",
           "DSRV": "0xb0cf6d83096ac494ddca7507a7bcdcbd5ce97e82da508780b3fc64ec548d7b243dd09761f95979d1eab79c5ec42bd004",
           "BloXroute Max Profit": "0x946fcf51fbd6d0a69d9478feb2504cd5af6fd3b68e36e51c5429dff02fadfbd0490f18e75fa608554d9b9447206f452e",
-          "Beaver": "0x95c8cc31f8906cc10a2e9f58988ad374d68d108914b997ef0567751b041bd0b7d104183d235ac5769d51912cd680608e"
+          "Beaver": "0x95c8cc31f8906cc10a2e9f58988ad374d68d108914b997ef0567751b041bd0b7d104183d235ac5769d51912cd680608e",
+          
+          // Builders from the specific UI display
+          "Builder 1": "0x95c8cc31f890",
+          "Builder 2": "0xb46162",
+          "Builder 3": "0xa412c4",
+          "Builder 4": "0xb26f96",
+          "Builder 5": "0xa03663",
+          "Builder 6": "0xa9d0a0"
         };
         
         // Process the data - invert the mapping
@@ -95,8 +104,20 @@ export function useBuilderNames(network: string): BuilderNameMap {
           }
           
           // Otherwise match by prefix - for any pubkey that starts with this one
+          // or any key that starts with this pubkey
           const candidates = Object.entries(pubkeyToName)
-            .filter(([key]) => key.startsWith(normalized) || normalized.startsWith(key))
+            .filter(([key]) => {
+              // Match either direction - a starts with b OR b starts with a
+              const keyStartsWithPubkey = key.startsWith(normalized);
+              const pubkeyStartsWithKey = normalized.startsWith(key);
+              
+              // Log matches for debugging
+              if (keyStartsWithPubkey || pubkeyStartsWithKey) {
+                console.log(`Found match: ${pubkey} ~ ${key} => ${pubkeyToName[key]}`);
+              }
+              
+              return keyStartsWithPubkey || pubkeyStartsWithKey;
+            })
             .map(([_, name]) => name);
             
           return candidates.length > 0 ? candidates[0] : undefined;
