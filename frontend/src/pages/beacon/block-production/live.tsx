@@ -9,7 +9,6 @@ import { NetworkContext } from '@/App';
 import {
   MobileBlockProductionView,
   DesktopBlockProductionView,
-  TopControls,
   generateConsistentColor,
   getTransformedBids
 } from '@/components/beacon/block_production';
@@ -522,24 +521,10 @@ export default function BlockProductionLivePage() {
 
   return (
     <div className="flex flex-col h-full">
-      {/* Top Controls */}
-      <TopControls 
-        slotNumber={slotNumber}
-        headLagSlots={headLagSlots}
-        displaySlotOffset={displaySlotOffset}
-        isPlaying={isPlaying}
-        isMobile={isMobile}
-        goToPreviousSlot={goToPreviousSlot}
-        goToNextSlot={goToNextSlot}
-        resetToCurrentSlot={resetToCurrentSlot}
-        togglePlayPause={togglePlayPause}
-        isNextDisabled={isNextDisabled}
-      />
-
       {/* Conditionally render mobile or desktop view based on screen size */}
       {isMobile ? (
         // Mobile View
-        <div className="px-2 pt-1">
+        <div className="px-2">
           <div className={`transition-opacity duration-300 ${isSlotLoading && !isPreviousData ? 'opacity-70' : 'opacity-100'}`}>
             <MobileBlockProductionView 
               bids={slotData ? transformedBids : emptyBids}
@@ -562,12 +547,22 @@ export default function BlockProductionLivePage() {
                 )) : {}
               }
               block={displayData.block}
+              // Navigation controls
+              slotNumber={slotNumber}
+              headLagSlots={headLagSlots}
+              displaySlotOffset={displaySlotOffset}
+              isPlaying={isPlaying}
+              goToPreviousSlot={goToPreviousSlot}
+              goToNextSlot={goToNextSlot}
+              resetToCurrentSlot={resetToCurrentSlot}
+              togglePlayPause={togglePlayPause}
+              isNextDisabled={isNextDisabled}
             />
           </div>
         </div>
       ) : (
         // Desktop View
-        <div className="px-2 pt-1 h-full flex flex-col">
+        <div className="px-2 h-full flex flex-col">
           <div className={`transition-opacity duration-300 flex-1 ${isSlotLoading && !isPreviousData ? 'opacity-70' : 'opacity-100'}`}>
             <DesktopBlockProductionView
               bids={slotData ? transformedBids : emptyBids}
@@ -593,6 +588,16 @@ export default function BlockProductionLivePage() {
               slotData={displayData}
               timeRange={timeRange}
               valueRange={valueRange}
+              // Navigation controls
+              slotNumber={slotNumber}
+              headLagSlots={headLagSlots}
+              displaySlotOffset={displaySlotOffset}
+              isPlaying={isPlaying}
+              goToPreviousSlot={goToPreviousSlot}
+              goToNextSlot={goToNextSlot}
+              resetToCurrentSlot={resetToCurrentSlot}
+              togglePlayPause={togglePlayPause}
+              isNextDisabled={isNextDisabled}
             />
           </div>
         </div>

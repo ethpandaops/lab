@@ -7,7 +7,20 @@ import MobileTimelineBar from './MobileTimelineBar';
 import StageCard from './StageCard';
 import MobileContinentsPanel from './MobileContinentsPanel';
 
-const MobileBlockProductionView: React.FC<BlockProductionBaseProps> = ({
+interface MobileBlockProductionViewProps extends BlockProductionBaseProps {
+  // Navigation controls for merged timeline
+  slotNumber: number | null;
+  headLagSlots: number;
+  displaySlotOffset: number;
+  isPlaying: boolean;
+  goToPreviousSlot: () => void;
+  goToNextSlot: () => void;
+  resetToCurrentSlot: () => void;
+  togglePlayPause: () => void;
+  isNextDisabled: boolean;
+}
+
+const MobileBlockProductionView: React.FC<MobileBlockProductionViewProps> = ({
   bids,
   currentTime,
   relayColors,
@@ -19,7 +32,17 @@ const MobileBlockProductionView: React.FC<BlockProductionBaseProps> = ({
   blockTime,
   nodeBlockSeen = {},
   nodeBlockP2P = {},
-  block
+  block,
+  // Navigation controls
+  slotNumber,
+  headLagSlots,
+  displaySlotOffset,
+  isPlaying,
+  goToPreviousSlot,
+  goToNextSlot,
+  resetToCurrentSlot,
+  togglePlayPause,
+  isNextDisabled
 }) => {
   // Get active status based on role and phase
   const isActive = (role: 'builder' | 'relay' | 'proposer' | 'node') => {
@@ -145,6 +168,16 @@ const MobileBlockProductionView: React.FC<BlockProductionBaseProps> = ({
           nodeBlockSeen={nodeBlockSeen}
           nodeBlockP2P={nodeBlockP2P}
           blockTime={blockTime}
+          // Navigation controls
+          slotNumber={slotNumber}
+          headLagSlots={headLagSlots}
+          displaySlotOffset={displaySlotOffset}
+          isPlaying={isPlaying}
+          goToPreviousSlot={goToPreviousSlot}
+          goToNextSlot={goToNextSlot}
+          resetToCurrentSlot={resetToCurrentSlot}
+          togglePlayPause={togglePlayPause}
+          isNextDisabled={isNextDisabled}
         />
 
         {/* Mobile-optimized cards for each stage - with border below the hero section */}

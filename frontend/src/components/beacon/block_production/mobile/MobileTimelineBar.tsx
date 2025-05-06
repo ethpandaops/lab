@@ -6,32 +6,114 @@ interface MobileTimelineBarProps {
   nodeBlockSeen: Record<string, number>;
   nodeBlockP2P: Record<string, number>;
   blockTime?: number;
+  
+  // Navigation controls
+  slotNumber: number | null;
+  headLagSlots: number;
+  displaySlotOffset: number;
+  isPlaying: boolean;
+  goToPreviousSlot: () => void;
+  goToNextSlot: () => void;
+  resetToCurrentSlot: () => void;
+  togglePlayPause: () => void;
+  isNextDisabled: boolean;
 }
 
 const MobileTimelineBar: React.FC<MobileTimelineBarProps> = ({
   currentTime,
   nodeBlockSeen,
   nodeBlockP2P,
-  blockTime
+  blockTime,
+  // Navigation controls
+  slotNumber,
+  headLagSlots,
+  displaySlotOffset,
+  isPlaying,
+  goToPreviousSlot,
+  goToNextSlot,
+  resetToCurrentSlot,
+  togglePlayPause,
+  isNextDisabled
 }) => {
   return (
     <div className="bg-surface/40 rounded-t-xl shadow-lg overflow-hidden p-3 pb-4">
-      <div className="flex justify-between items-center">
-        <div className="flex flex-col">
-          <h3 className="text-base font-bold text-primary">Block Production Timeline</h3>
-          <div className="text-xs mt-0.5">
-            Phase: <span 
-              className={`font-medium px-1.5 py-0.5 rounded-full ${
-                isInPropagationPhase(currentTime, nodeBlockSeen, nodeBlockP2P) 
-                  ? 'bg-purple-500/20 text-purple-300' 
-                  : 'bg-orange-500/20 text-orange-300'
+      <div className="flex justify-between items-center mb-2">
+        {/* Slot navigation on the left */}
+        <div className="flex items-center gap-1.5">
+          <button
+            onClick={goToPreviousSlot}
+            className="bg-surface/50 p-1 rounded border border-subtle hover:bg-hover transition"
+            title="Previous Slot"
+          >
+            <svg className="h-3 w-3 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+          </button>
+
+          <button
+            onClick={resetToCurrentSlot}
+            className={`px-1.5 py-0.5 rounded border font-medium text-xs ${displaySlotOffset === 0
+                ? 'bg-accent/20 border-accent/50 text-accent'
+                : 'bg-surface/50 border-subtle text-secondary hover:bg-hover'
+              } transition`}
+            disabled={displaySlotOffset === 0}
+            title="Return to Current Slot"
+          >
+            Live
+          </button>
+
+          <button
+            onClick={goToNextSlot}
+            className={`bg-surface/50 p-1 rounded border border-subtle transition ${isNextDisabled ? 'opacity-50 cursor-not-allowed' : 'hover:bg-hover'
               }`}
-            >
-              {isInPropagationPhase(currentTime, nodeBlockSeen, nodeBlockP2P) ? 'Propagating' : 'Building'}
-            </span>
-          </div>
+            disabled={isNextDisabled}
+            title="Next Slot"
+          >
+            <svg className="h-3 w-3 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </button>
         </div>
-        <div className="font-mono text-sm text-white">{(currentTime / 1000).toFixed(1)}s</div>
+
+        {/* Slot number centered */}
+        <div className="font-mono text-xs text-primary">
+          Slot: {slotNumber ?? "—"}
+        </div>
+
+        {/* Play/Pause on the right */}
+        <button
+          onClick={togglePlayPause}
+          className="bg-surface/50 p-1 rounded border border-subtle hover:bg-hover transition"
+          title={isPlaying ? "Pause" : "Play"}
+        >
+          {isPlaying ? (
+            <svg className="h-3 w-3 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="6" y="4" width="4" height="16"></rect>
+              <rect x="14" y="4" width="4" height="16"></rect>
+            </svg>
+          ) : (
+            <svg className="h-3 w-3 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <polygon points="5 3 19 12 5 21 5 3"></polygon>
+            </svg>
+          )}
+        </button>
+      </div>
+      
+      {/* Phase and time info */}
+      <div className="flex justify-between items-center mb-1.5">
+        <div className="flex items-center text-xs">
+          <span className="mr-1">Phase:</span>
+          <span 
+            className={`font-medium px-1.5 py-0.5 rounded-full ${
+              isInPropagationPhase(currentTime, nodeBlockSeen, nodeBlockP2P) 
+                ? 'bg-purple-500/20 text-purple-300' 
+                : 'bg-orange-500/20 text-orange-300'
+            }`}
+          >
+            {isInPropagationPhase(currentTime, nodeBlockSeen, nodeBlockP2P) ? 'Propagating' : 'Building'}
+          </span>
+        </div>
+        <div className="font-mono text-xs text-white">{(currentTime / 1000).toFixed(1)}s</div>
       </div>
       
       <div className="relative pt-2 pb-4">

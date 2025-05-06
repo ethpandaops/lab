@@ -37,6 +37,17 @@ interface DesktopBlockProductionViewProps extends BlockProductionBaseProps {
   };
   // Optional callback to notify parent component when the phase changes
   onPhaseChange?: (phase: Phase) => void;
+  
+  // Navigation controls for merged timeline
+  slotNumber: number | null;
+  headLagSlots: number;
+  displaySlotOffset: number;
+  isPlaying: boolean;
+  goToPreviousSlot: () => void;
+  goToNextSlot: () => void;
+  resetToCurrentSlot: () => void;
+  togglePlayPause: () => void;
+  isNextDisabled: boolean;
 }
 
 const DesktopBlockProductionView: React.FC<DesktopBlockProductionViewProps> = ({
@@ -55,7 +66,17 @@ const DesktopBlockProductionView: React.FC<DesktopBlockProductionViewProps> = ({
   slotData,
   valueRange,
   timeRange,
-  onPhaseChange
+  onPhaseChange,
+  // Navigation controls
+  slotNumber,
+  headLagSlots,
+  displaySlotOffset,
+  isPlaying,
+  goToPreviousSlot,
+  goToNextSlot,
+  resetToCurrentSlot,
+  togglePlayPause,
+  isNextDisabled
 }) => {
   // Get active status based on role and phase
   const isActive = (role: 'builder' | 'relay' | 'proposer' | 'node') => {
@@ -190,7 +211,7 @@ const DesktopBlockProductionView: React.FC<DesktopBlockProductionViewProps> = ({
   }, [nodeBlockSeen, nodeBlockP2P, nodes, currentTime]);
 
   return (
-    <div className="px-2 py-2 h-full flex flex-col space-y-3">
+    <div className="px-2 py-1 h-full flex flex-col space-y-2">
       <style jsx>{flowAnimations}</style>
       
       {/* Timeline Header */}
@@ -201,6 +222,17 @@ const DesktopBlockProductionView: React.FC<DesktopBlockProductionViewProps> = ({
         blockTime={blockTime}
         slotData={slotData}
         onPhaseChange={onPhaseChange}
+        // Navigation controls
+        slotNumber={slotNumber}
+        headLagSlots={headLagSlots}
+        displaySlotOffset={displaySlotOffset}
+        isPlaying={isPlaying}
+        isMobile={false} // Desktop view is never mobile
+        goToPreviousSlot={goToPreviousSlot}
+        goToNextSlot={goToNextSlot}
+        resetToCurrentSlot={resetToCurrentSlot}
+        togglePlayPause={togglePlayPause}
+        isNextDisabled={isNextDisabled}
       />
 
       {/* Phase Icons */}

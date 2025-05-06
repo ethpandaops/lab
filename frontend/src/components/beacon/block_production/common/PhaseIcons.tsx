@@ -105,7 +105,7 @@ const PhaseIcons: React.FC<PhaseIconsProps> = ({
   };
 
   return (
-    <div className="bg-surface/40 rounded-b-xl shadow-lg mt-0 pt-3 px-2 pb-6 relative z-10 border-t-0 -mt-2">
+    <div className="bg-surface/40 rounded-b-xl shadow-lg px-2 pb-4 relative z-10 border-t-0 -mt-1">
       <div className="flex justify-between items-center px-2 relative z-10">
       {/* 1. BUILDERS PHASE */}
       <div className={`flex flex-col items-center text-center transition-opacity duration-500 ${isActiveInPhase('builder') ? 'opacity-100' : 'opacity-60'}`}>
@@ -134,25 +134,14 @@ const PhaseIcons: React.FC<PhaseIconsProps> = ({
         </div>
       </div>
 
-      {/* Flow line 1 */}
+      {/* Flow line 1 - Builder to Relay: Orange to Green */}
       <div className="flex-shrink-0 flex items-center justify-center relative w-10">
         <div 
-          className={`h-1 w-full ${
-            currentPhase !== Phase.Building
-              ? 'bg-gradient-to-r from-orange-400/80 to-green-400/80' 
-              : 'bg-gradient-to-r from-orange-400/30 to-green-400/30'
-          } transition-colors duration-500 rounded-full overflow-hidden`}
-        >
-          {currentPhase !== Phase.Building && (
-            <div 
-              className={`h-full w-2 bg-white opacity-70 rounded-full`}
-              style={{
-                animation: 'pulseOpacity 1.5s infinite ease-in-out',
-                boxShadow: '0 0 5px 1px rgba(255, 255, 255, 0.5)'
-              }}
-            ></div>
-          )}
-        </div>
+          className="h-1.5 w-full bg-gradient-to-r from-orange-400 to-green-400 rounded-full shadow-inner"
+          style={{
+            opacity: 0.8
+          }}
+        />
       </div>
 
       {/* 2. RELAYS PHASE */}
@@ -184,25 +173,14 @@ const PhaseIcons: React.FC<PhaseIconsProps> = ({
         </div>
       </div>
 
-      {/* Flow line 2 */}
+      {/* Flow line 2 - Relay to Proposer: Green to Gold */}
       <div className="flex-shrink-0 flex items-center justify-center relative w-10">
         <div 
-          className={`h-1 w-full ${
-            currentPhase !== Phase.Building
-              ? 'bg-gradient-to-r from-green-400/80 to-gold/80' 
-              : 'bg-gradient-to-r from-green-400/30 to-gold/30'
-          } transition-colors duration-500 rounded-full overflow-hidden`}
-        >
-          {currentPhase !== Phase.Building && (
-            <div 
-              className="h-full w-2 bg-white opacity-70 rounded-full"
-              style={{
-                animation: 'pulseOpacity 1.5s infinite ease-in-out',
-                boxShadow: '0 0 5px 1px rgba(255, 255, 255, 0.5)'
-              }}
-            ></div>
-          )}
-        </div>
+          className="h-1.5 w-full bg-gradient-to-r from-green-400 to-amber-400 rounded-full shadow-inner"
+          style={{
+            opacity: 0.8
+          }}
+        />
       </div>
 
       {/* 3. PROPOSER PHASE */}
@@ -235,25 +213,14 @@ const PhaseIcons: React.FC<PhaseIconsProps> = ({
         )}
       </div>
 
-      {/* Flow line 3 */}
+      {/* Flow line 3 - Proposer to Nodes: Gold to Purple */}
       <div className="flex-shrink-0 flex items-center justify-center relative w-10">
         <div 
-          className={`h-1 w-full ${
-            currentPhase === Phase.Attesting || currentPhase === Phase.Accepted
-              ? 'bg-gradient-to-r from-gold/80 to-purple-400/80' 
-              : 'bg-gradient-to-r from-gold/30 to-purple-400/30'
-          } transition-colors duration-500 rounded-full overflow-hidden`}
-        >
-          {(currentPhase === Phase.Attesting || currentPhase === Phase.Accepted) && (
-            <div 
-              className="h-full w-2 bg-white opacity-70 rounded-full"
-              style={{
-                animation: 'pulseOpacity 1.5s infinite ease-in-out',
-                boxShadow: '0 0 5px 1px rgba(255, 255, 255, 0.5)'
-              }}
-            ></div>
-          )}
-        </div>
+          className="h-1.5 w-full bg-gradient-to-r from-amber-400 to-purple-400 rounded-full shadow-inner"
+          style={{
+            opacity: 0.8
+          }}
+        />
       </div>
 
       {/* NODES PHASE - INSERTED BETWEEN PROPOSER AND ATTESTERS */}
@@ -281,25 +248,14 @@ const PhaseIcons: React.FC<PhaseIconsProps> = ({
         </div>
       </div>
 
-      {/* Flow line between Nodes and Attesters */}
+      {/* Flow line 4 - Nodes to Attesters: Purple to Blue */}
       <div className="flex-shrink-0 flex items-center justify-center relative w-10">
         <div 
-          className={`h-1 w-full ${
-            currentPhase === Phase.Attesting || currentPhase === Phase.Accepted
-              ? 'bg-gradient-to-r from-purple-400/80 to-blue-400/80' 
-              : 'bg-gradient-to-r from-purple-400/30 to-blue-400/30'
-          } transition-colors duration-500 rounded-full overflow-hidden`}
-        >
-          {(currentPhase === Phase.Attesting || currentPhase === Phase.Accepted) && (
-            <div 
-              className="h-full w-2 bg-white opacity-70 rounded-full"
-              style={{
-                animation: 'pulseOpacity 1.5s infinite ease-in-out',
-                boxShadow: '0 0 5px 1px rgba(255, 255, 255, 0.5)'
-              }}
-            ></div>
-          )}
-        </div>
+          className="h-1.5 w-full bg-gradient-to-r from-purple-400 to-blue-400 rounded-full shadow-inner"
+          style={{
+            opacity: 0.8
+          }}
+        />
       </div>
 
       {/* 4. ATTESTATION PHASE */}
@@ -357,25 +313,14 @@ const PhaseIcons: React.FC<PhaseIconsProps> = ({
         </div>
       </div>
 
-      {/* Flow line 4 */}
+      {/* Flow line 5 - Attesters to Accepted: Blue to Green */}
       <div className="flex-shrink-0 flex items-center justify-center relative w-10">
         <div 
-          className={`h-1 w-full ${
-            currentPhase === Phase.Accepted
-              ? 'bg-gradient-to-r from-blue-400/80 to-green-400/80' 
-              : 'bg-gradient-to-r from-blue-400/30 to-green-400/30'
-          } transition-colors duration-500 rounded-full overflow-hidden`}
-        >
-          {currentPhase === Phase.Accepted && (
-            <div 
-              className="h-full w-2 bg-white opacity-70 rounded-full"
-              style={{
-                animation: 'pulseOpacity 1.5s infinite ease-in-out',
-                boxShadow: '0 0 5px 1px rgba(255, 255, 255, 0.5)'
-              }}
-            ></div>
-          )}
-        </div>
+          className="h-1.5 w-full bg-gradient-to-r from-blue-400 to-green-400 rounded-full shadow-inner"
+          style={{
+            opacity: 0.8
+          }}
+        />
       </div>
 
       {/* 5. ACCEPTED PHASE - NEW */}

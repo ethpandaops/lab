@@ -9,6 +9,18 @@ interface PhaseTimelineProps {
   blockTime?: number;
   slotData?: any;
   onPhaseChange?: (phase: Phase) => void;
+  
+  // Navigation controls
+  slotNumber: number | null;
+  headLagSlots: number;
+  displaySlotOffset: number;
+  isPlaying: boolean;
+  isMobile: boolean;
+  goToPreviousSlot: () => void;
+  goToNextSlot: () => void;
+  resetToCurrentSlot: () => void;
+  togglePlayPause: () => void;
+  isNextDisabled: boolean;
 }
 
 const PhaseTimeline: React.FC<PhaseTimelineProps> = ({
@@ -17,7 +29,18 @@ const PhaseTimeline: React.FC<PhaseTimelineProps> = ({
   nodeBlockP2P,
   blockTime,
   slotData,
-  onPhaseChange
+  onPhaseChange,
+  // Navigation controls
+  slotNumber,
+  headLagSlots,
+  displaySlotOffset,
+  isPlaying,
+  isMobile,
+  goToPreviousSlot,
+  goToNextSlot,
+  resetToCurrentSlot,
+  togglePlayPause,
+  isNextDisabled
 }) => {
   // CRITICAL FIX: Use startMs/endMs instead of inclusionDelay!
   // Calculate which attestation windows have already happened by the current time
@@ -51,8 +74,6 @@ const PhaseTimeline: React.FC<PhaseTimelineProps> = ({
     totalExpectedAttestations
   );
   
-  // Calculate the current phase for display
-  
   // Notify parent component about the current phase if callback is provided
   React.useEffect(() => {
     if (typeof onPhaseChange === 'function' && currentPhase !== null) {
@@ -65,18 +86,84 @@ const PhaseTimeline: React.FC<PhaseTimelineProps> = ({
   if (currentPhase === null) {
     // Use Building phase by default instead of showing "Waiting for data..."
     return (
-      <div className="bg-surface/40 rounded-t-xl shadow-lg overflow-hidden p-3 pb-6">
+      <div className="bg-surface/40 rounded-t-xl shadow-lg overflow-hidden p-2 pb-3">
         <div className="flex justify-between items-center mb-2">
-          <div className="flex flex-col">
-            <h3 className="text-base font-bold text-primary">Block Production Timeline</h3>
-            <div className="text-xs mt-0.5 flex items-center">
-              <span className="font-medium mr-1">Phase:</span>
-              <span className="font-medium px-1.5 py-0.5 rounded-full text-xs bg-orange-500/20 text-orange-300">
-                Building
-              </span>
-              <span className="ml-auto font-mono text-sm text-white">
-                {(currentTime / 1000).toFixed(1)}s
-              </span>
+          {/* Navigation controls on the left */}
+          <div className="flex items-center gap-2">
+            <button
+              onClick={goToPreviousSlot}
+              className="bg-surface/50 p-1.5 rounded border border-subtle hover:bg-hover transition"
+              title="Previous Slot"
+            >
+              <svg className="h-3.5 w-3.5 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="15 18 9 12 15 6"></polyline>
+              </svg>
+            </button>
+
+            <button
+              onClick={resetToCurrentSlot}
+              className={`px-2 py-1 rounded border font-medium text-xs ${displaySlotOffset === 0
+                  ? 'bg-accent/20 border-accent/50 text-accent'
+                  : 'bg-surface/50 border-subtle text-secondary hover:bg-hover'
+                } transition`}
+              disabled={displaySlotOffset === 0}
+              title="Return to Current Slot"
+            >
+              Live
+            </button>
+
+            <button
+              onClick={goToNextSlot}
+              className={`bg-surface/50 p-1.5 rounded border border-subtle transition ${isNextDisabled ? 'opacity-50 cursor-not-allowed' : 'hover:bg-hover'
+                }`}
+              disabled={isNextDisabled}
+              title="Next Slot"
+            >
+              <svg className="h-3.5 w-3.5 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="9 18 15 12 9 6"></polyline>
+              </svg>
+            </button>
+
+            <div className={`font-mono ml-1 text-primary flex flex-col ${isMobile ? 'text-xs' : 'text-sm'}`}>
+              <div className="text-base font-semibold">Slot: {slotNumber ?? "—"}</div>
+              {slotNumber !== null && displaySlotOffset !== 0 && (
+                <div className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-secondary opacity-70`}>
+                  Lag: {headLagSlots - displaySlotOffset}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Phase info and time on the right */}
+          <div className="flex items-center gap-2">
+            <div className="flex flex-col">
+              <div className="flex items-center">
+                <span className="font-medium mr-1 text-sm">Phase:</span>
+                <span className="font-medium px-2 py-0.5 rounded-full text-sm bg-orange-500/20 text-orange-300">
+                  Building
+                </span>
+              </div>
+            </div>
+            
+            {/* Time display */}
+            <div className="flex items-center gap-2">
+              <span className="font-mono text-base font-semibold text-white">{(currentTime / 1000).toFixed(1)}s</span>
+              <button
+                onClick={togglePlayPause}
+                className="bg-surface/50 p-1.5 rounded border border-subtle hover:bg-hover transition"
+                title={isPlaying ? "Pause" : "Play"}
+              >
+                {isPlaying ? (
+                  <svg className="h-3.5 w-3.5 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="6" y="4" width="4" height="16"></rect>
+                    <rect x="14" y="4" width="4" height="16"></rect>
+                  </svg>
+                ) : (
+                  <svg className="h-3.5 w-3.5 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                  </svg>
+                )}
+              </button>
             </div>
           </div>
         </div>
@@ -93,7 +180,8 @@ const PhaseTimeline: React.FC<PhaseTimelineProps> = ({
             className="absolute top-0 h-3 bg-orange-500/30 rounded-l-lg border-r-2 border-white/40"
             style={{ 
               width: `${(currentTime / 12000) * 100}%`,
-              maxWidth: 'calc(100% - 4px)' // Stay within container boundaries
+              maxWidth: 'calc(100% - 4px)', // Stay within container boundaries
+              willChange: 'width' // Performance hint
             }}
           />
           
@@ -102,11 +190,12 @@ const PhaseTimeline: React.FC<PhaseTimelineProps> = ({
             className="absolute top-0 h-3"
             style={{ 
               left: `${(currentTime / 12000) * 100}%`,
-              transform: 'translateX(-50%)'
+              transform: 'translateX(-50%)',
+              willChange: 'left' // Performance hint
             }}
           >
             <div 
-              className="w-5 h-5 bg-white rounded-full transform -translate-y-1/3 opacity-50"
+              className="w-5 h-5 bg-white rounded-full -translate-y-1/3 opacity-50"
               style={{
                 boxShadow: '0 0 10px 3px rgba(255, 255, 255, 0.5), 0 0 20px 5px rgba(255, 255, 255, 0.3)'
               }}
@@ -215,49 +304,92 @@ const PhaseTimeline: React.FC<PhaseTimelineProps> = ({
   const acceptancePercent = Math.min(98, Math.max(attestationPercent + 1, (acceptanceTime / 12000) * 100));
 
   return (
-    <div className="bg-surface/40 rounded-t-xl shadow-lg overflow-hidden p-3 pb-6">
+    <div className="bg-surface/40 rounded-t-xl shadow-lg overflow-hidden p-2 pb-3">
       <div className="flex justify-between items-center mb-2">
-        <div className="flex flex-col">
-          <h3 className="text-base font-bold text-primary">Block Production Timeline</h3>
-          <div className="text-xs mt-0.5 flex items-center">
-            <span className="font-medium mr-1">Phase:</span>
-            <span className={`font-medium px-1.5 py-0.5 rounded-full text-xs 
-              ${currentPhase === Phase.Building ? 'bg-orange-500/20 text-orange-300' :
-                currentPhase === Phase.Propagating ? 'bg-purple-500/20 text-purple-300' :
-                currentPhase === Phase.Attesting ? 'bg-blue-500/20 text-blue-300' :
-                'bg-green-500/20 text-green-300'}`}
+        {/* Navigation controls on the left */}
+        <div className="flex items-center gap-2">
+          <button
+            onClick={goToPreviousSlot}
+            className="bg-surface/50 p-1.5 rounded border border-subtle hover:bg-hover transition"
+            title="Previous Slot"
+          >
+            <svg className="h-3.5 w-3.5 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+          </button>
+
+          <button
+            onClick={resetToCurrentSlot}
+            className={`px-2 py-1 rounded border font-medium text-xs ${displaySlotOffset === 0
+                ? 'bg-accent/20 border-accent/50 text-accent'
+                : 'bg-surface/50 border-subtle text-secondary hover:bg-hover'
+              } transition`}
+            disabled={displaySlotOffset === 0}
+            title="Return to Current Slot"
+          >
+            Live
+          </button>
+
+          <button
+            onClick={goToNextSlot}
+            className={`bg-surface/50 p-1.5 rounded border border-subtle transition ${isNextDisabled ? 'opacity-50 cursor-not-allowed' : 'hover:bg-hover'
+              }`}
+            disabled={isNextDisabled}
+            title="Next Slot"
+          >
+            <svg className="h-3.5 w-3.5 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </button>
+
+          <div className={`font-mono ml-1 text-primary flex flex-col ${isMobile ? 'text-xs' : 'text-sm'}`}>
+            <div className="text-base font-semibold">Slot: {slotNumber ?? "—"}</div>
+            {slotNumber !== null && displaySlotOffset !== 0 && (
+              <div className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-secondary opacity-70`}>
+                Lag: {headLagSlots - displaySlotOffset}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Phase info and time on the right */}
+        <div className="flex items-center gap-2">
+          <div className="flex flex-col">
+            <div className="flex items-center">
+              <span className="font-medium mr-1 text-sm">Phase:</span>
+              <span className={`font-medium px-2 py-0.5 rounded-full text-sm 
+                ${currentPhase === Phase.Building ? 'bg-orange-500/20 text-orange-300' :
+                  currentPhase === Phase.Propagating ? 'bg-purple-500/20 text-purple-300' :
+                  currentPhase === Phase.Attesting ? 'bg-blue-500/20 text-blue-300' :
+                  'bg-green-500/20 text-green-300'}`}
+              >
+                {currentPhase === Phase.Building ? 'Building' :
+                  currentPhase === Phase.Propagating ? 'Propagating' :
+                  currentPhase === Phase.Attesting ? 'Attesting' :
+                  'Accepted'}
+              </span>
+            </div>
+          </div>
+          
+          {/* Time display */}
+          <div className="flex items-center gap-2">
+            <span className="font-mono text-base font-semibold text-white">{(currentTime / 1000).toFixed(1)}s</span>
+            <button
+              onClick={togglePlayPause}
+              className="bg-surface/50 p-1.5 rounded border border-subtle hover:bg-hover transition"
+              title={isPlaying ? "Pause" : "Play"}
             >
-              {currentPhase === Phase.Building ? 'Building' :
-                currentPhase === Phase.Propagating ? 'Propagating' :
-                currentPhase === Phase.Attesting ? 'Attesting' :
-                'Accepted'}
-              
-              {/* REQUIREMENT 3: Show attestation percentage in the attestation phase */}
-              {currentPhase === Phase.Attesting && totalExpectedAttestations > 0 && (
-                <span className="ml-1">
-                  {(() => {
-                    // Count attestations that have been included up to the current time
-                    let visibleAttestationsCount = 0;
-                    if (slotData?.attestations?.windows && Array.isArray(slotData.attestations.windows)) {
-                      slotData.attestations.windows.forEach((window: any) => {
-                        if (window.inclusionDelay !== undefined && 
-                            window.inclusionDelay * 1000 <= currentTime && 
-                            window.validatorIndices?.length) {
-                          visibleAttestationsCount += window.validatorIndices.length;
-                        }
-                      });
-                    }
-                    
-                    // Calculate percentage
-                    const percentage = Math.min(100, Math.round((visibleAttestationsCount / totalExpectedAttestations) * 100));
-                    return `(${percentage}%)`;
-                  })()}
-                </span>
+              {isPlaying ? (
+                <svg className="h-3.5 w-3.5 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="6" y="4" width="4" height="16"></rect>
+                  <rect x="14" y="4" width="4" height="16"></rect>
+                </svg>
+              ) : (
+                <svg className="h-3.5 w-3.5 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                </svg>
               )}
-            </span>
-            <span className="ml-auto font-mono text-sm text-white">
-              {(currentTime / 1000).toFixed(1)}s
-            </span>
+            </button>
           </div>
         </div>
       </div>
@@ -267,7 +399,7 @@ const PhaseTimeline: React.FC<PhaseTimelineProps> = ({
         <div className="h-3 mb-2 flex rounded-lg overflow-hidden border border-subtle shadow-inner relative">
           {/* Building phase */}
           <div 
-            className="border-r border-white/10 transition-colors duration-300 shadow-inner" 
+            className="border-r border-white/10 shadow-inner" 
             style={{ 
               width: `${propagationPercent}%`,
               backgroundColor: currentPhase === Phase.Building
@@ -278,7 +410,7 @@ const PhaseTimeline: React.FC<PhaseTimelineProps> = ({
           
           {/* Propagating phase */}
           <div 
-            className="border-r border-white/10 transition-colors duration-300 shadow-inner"
+            className="border-r border-white/10 shadow-inner"
             style={{ 
               width: `${attestationPercent - propagationPercent}%`,
               backgroundColor: currentPhase === Phase.Propagating
@@ -289,7 +421,7 @@ const PhaseTimeline: React.FC<PhaseTimelineProps> = ({
           
           {/* Attesting phase */}
           <div 
-            className="border-r border-white/10 transition-colors duration-300 shadow-inner"
+            className="border-r border-white/10 shadow-inner"
             style={{ 
               width: `${acceptancePercent - attestationPercent}%`,
               backgroundColor: currentPhase === Phase.Attesting
@@ -300,7 +432,7 @@ const PhaseTimeline: React.FC<PhaseTimelineProps> = ({
           
           {/* Accepted phase */}
           <div 
-            className="transition-colors duration-300 shadow-inner"
+            className="shadow-inner"
             style={{ 
               width: `${100 - acceptancePercent}%`,
               backgroundColor: currentPhase === Phase.Accepted
@@ -309,9 +441,9 @@ const PhaseTimeline: React.FC<PhaseTimelineProps> = ({
             }}
           />
           
-          {/* Phase transition markers */}
+          {/* Phase transition markers - no transitions for crisp movement */}
           <div 
-            className="absolute top-0 bottom-0 w-1 transition-colors duration-300" 
+            className="absolute top-0 bottom-0 w-1" 
             style={{
               left: `${propagationPercent}%`,
               backgroundColor: 'rgba(255, 255, 255, 0.7)',
@@ -319,7 +451,7 @@ const PhaseTimeline: React.FC<PhaseTimelineProps> = ({
             }}
           />
           <div 
-            className="absolute top-0 bottom-0 w-1 transition-colors duration-300" 
+            className="absolute top-0 bottom-0 w-1" 
             style={{
               left: `${attestationPercent}%`,
               backgroundColor: 'rgba(255, 255, 255, 0.7)',
@@ -327,7 +459,7 @@ const PhaseTimeline: React.FC<PhaseTimelineProps> = ({
             }}
           />
           <div 
-            className="absolute top-0 bottom-0 w-1 transition-colors duration-300" 
+            className="absolute top-0 bottom-0 w-1" 
             style={{
               left: `${acceptancePercent}%`,
               backgroundColor: 'rgba(255, 255, 255, 0.7)',
@@ -336,27 +468,29 @@ const PhaseTimeline: React.FC<PhaseTimelineProps> = ({
           />
         </div>
         
-        {/* Progress overlay */}
+        {/* Progress overlay - using linear time progression with no transitions */}
         <div 
           className="absolute top-0 h-3 bg-active/30 rounded-l-lg border-r-2 border-white"
           style={{ 
             width: `${(currentTime / 12000) * 100}%`,
-            maxWidth: 'calc(100% - 4px)' // Stay within container boundaries
+            maxWidth: 'calc(100% - 4px)', // Stay within container boundaries
+            willChange: 'width', // Performance hint to browser
           }}
         />
         
-        {/* Current time indicator with glowing dot */}
+        {/* Current time indicator with glowing dot - no transitions for crisp movement */}
         <div 
-          className="absolute top-0 h-3"
+          className="absolute top-0 h-3" 
           style={{ 
-            left: `${(currentTime / 12000) * 100}%`,
-            transform: 'translateX(-50%)'
+            left: `calc(${(currentTime / 12000) * 100}%)`,
+            transform: 'translateX(-50%)',
+            willChange: 'left', // Performance hint to browser
           }}
         >
           <div 
-            className="w-5 h-5 bg-white rounded-full transform -translate-y-1/3 opacity-90"
+            className="w-5 h-5 bg-white rounded-full -translate-y-1/3 opacity-90"
             style={{
-              boxShadow: '0 0 10px 3px rgba(255, 255, 255, 0.8), 0 0 20px 5px rgba(255, 255, 255, 0.4)'
+              boxShadow: '0 0 10px 3px rgba(255, 255, 255, 0.8), 0 0 20px 5px rgba(255, 255, 255, 0.4)',
             }}
           ></div>
         </div>
