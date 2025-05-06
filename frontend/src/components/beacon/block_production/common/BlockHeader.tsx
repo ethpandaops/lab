@@ -28,50 +28,50 @@ const BlockHeader: React.FC<BlockHeaderProps> = ({
 }) => {
   // Determine header styles based on slot position (past, current, future)
   const getHeaderBgColor = () => {
-    if (isPast) return 'bg-gold/5';
-    if (isCurrentSlot) return 'bg-gold/10';
-    if (isFuture) return 'bg-blue-500/5';
-    return 'bg-white/5';
+    if (isPast) return 'bg-surface/50';
+    if (isCurrentSlot) return 'bg-surface/70';
+    if (isFuture) return 'bg-surface/50';
+    return 'bg-surface/50';
   };
 
   const getHeaderTextColor = () => {
-    if (isPast) return 'text-gold/80';
-    if (isCurrentSlot) return 'text-gold/90';
-    if (isFuture) return 'text-blue-400/80';
-    return 'text-white/80';
+    if (isPast) return 'text-text-primary';
+    if (isCurrentSlot) return 'text-text-primary';
+    if (isFuture) return 'text-text-primary';
+    return 'text-text-primary';
   };
 
   // Calculate epoch from slot number
   const epoch = Math.floor(slot / 32);
   
   return (
-    <div className="p-4 flex flex-col border-b border-gold/20">
+    <div className="p-4 flex flex-col border-b border-border-subtle">
       <div className="flex justify-between items-start mb-2">
         <div className="flex items-center">
-          <div className="w-8 h-8 bg-gold/10 rounded-lg flex items-center justify-center mr-2 relative overflow-hidden">
+          <div className="w-8 h-8 bg-bg-surface-raised rounded-lg flex items-center justify-center mr-2 relative overflow-hidden">
             {/* Animated pulse in the background */}
-            <div className="absolute inset-0 bg-gradient-to-tr from-gold/30 to-amber-500/5 animate-pulse"></div>
+            <div className="absolute inset-0 bg-gradient-to-tr from-accent-muted/20 to-accent/5 animate-pulse"></div>
             
-            <svg className="w-4 h-4 text-gold/90 relative z-10" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <svg className="w-4 h-4 text-accent-muted relative z-10" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" strokeWidth="2" />
               <path d="M16 8H8M16 12H8M16 16H8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
             </svg>
           </div>
           <div>
             <div className="flex items-baseline flex-wrap gap-2">
-              <div className={`${getHeaderBgColor()} px-2 py-0.5 rounded text-xs font-semibold ${getHeaderTextColor()} uppercase tracking-wide`}>
-                SLOT
-              </div>
-              <span className="text-lg font-mono font-bold text-gold/90">{slot}</span>
+              {/* For all blocks, just show the slot number directly */}
+              <span className="text-lg font-mono font-bold text-text-primary">{slot}</span>
               
-              {/* Block Version - Always show "DENEB" for current network version */}
-              <div className="bg-purple-500/10 px-2 py-0.5 rounded text-xs font-semibold text-purple-400/90 uppercase tracking-wide">
+              {/* Epoch as subtitle - Only show for current or future blocks */}
+              {!isPast && (
+                <div className="bg-bg-surface-raised px-2 py-0.5 rounded text-xs font-semibold text-text-secondary uppercase tracking-wide">
+                  EPOCH {epoch}
+                </div>
+              )}
+                
+              {/* Block Version - Always show "DENEB" but moved to far right */}
+              <div className="ml-auto bg-cyber-neon/10 px-2 py-0.5 rounded text-xs font-semibold text-cyber-neon uppercase tracking-wide">
                 DENEB
-              </div>
-              
-              {/* Epoch - calculated from slot number */}
-              <div className="bg-blue-500/10 px-2 py-0.5 rounded text-xs font-semibold text-blue-400/90 uppercase tracking-wide">
-                EPOCH {epoch}
               </div>
             </div>
           </div>
@@ -79,52 +79,55 @@ const BlockHeader: React.FC<BlockHeaderProps> = ({
         
         {/* Value badge */}
         {(blockValue !== undefined && blockValue > 0) ? (
-          <div className="px-2 py-1 bg-green-500/5 rounded-lg text-green-400/90 text-sm font-mono flex items-center relative overflow-hidden group">
-            <svg className="w-3.5 h-3.5 mr-1 text-green-400/80 relative z-10" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <div className="px-2 py-1 bg-success/10 rounded-lg text-success text-sm font-mono flex items-center relative overflow-hidden group">
+            <svg className="w-3.5 h-3.5 mr-1 text-success relative z-10" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" />
               <path d="M12 6V18M16 10L8 14M8 10L16 14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
             </svg>
             <span className="relative z-10 font-semibold">{blockValue.toFixed(4)} ETH</span>
           </div>
         ) : futureBidsCount && futureBidsCount > 0 ? (
-          <div className="text-xs bg-blue-500/5 px-2 py-0.5 rounded text-blue-400/90 font-mono font-medium">
+          <div className="text-xs bg-bg-surface-raised px-2 py-0.5 rounded text-text-secondary font-mono font-medium">
             {futureBidsCount} bid{futureBidsCount !== 1 ? 's' : ''}
           </div>
         ) : null}
       </div>
       
-      {/* State Root & Block Proposer */}
-      <div className="flex justify-between items-center text-xs">
-        <div className="flex items-center">
-          <span className="text-white/50 mr-1">State Root:</span>
-          <span className="text-yellow-300/90 font-mono">
-            {formatHash(blockData?.stateRoot, 6, 6)}
-          </span>
-        </div>
-        
-        {proposerEntity && (
+      {/* State Root & Block Proposer - Only show for current and future blocks */}
+      {!isPast && (
+        <div className="flex justify-between items-center text-xs">
           <div className="flex items-center">
-            <span className="text-white/50 mr-1">Proposer:</span>
-            <span className="text-white/80 font-medium">{proposerEntity}</span>
+            <span className="text-text-tertiary mr-1">State Root:</span>
+            <span className="text-text-secondary font-mono">
+              {formatHash(blockData?.stateRoot, 6, 6)}
+            </span>
           </div>
-        )}
-      </div>
-      
-      {/* Block Size */}
-      <div className="flex justify-between items-center text-xs mt-1">
-        <div className="flex items-center">
-          <span className="text-white/50 mr-1">Size:</span>
-          <span className="text-indigo-300/90 font-mono">
-            {blockData?.blockTotalBytes
-              ? `${(blockData.blockTotalBytes / 1024).toFixed(1)} KB${
-                  blockData.blockTotalBytesCompressed 
-                    ? ` (${(blockData.blockTotalBytesCompressed / 1024).toFixed(1)} KB compressed)` 
-                    : ''
-                }`
-              : '—'}
-          </span>
+          
+          {proposerEntity && (
+            <div className="flex items-center">
+              <span className="text-text-tertiary mr-1">Proposer:</span>
+              <span className="text-text-secondary font-medium">{proposerEntity}</span>
+            </div>
+          )}
         </div>
-      </div>
+      )}
+      
+      {/* Block Size - Only show for current and future blocks - removed compressed size */}
+      {!isPast && (
+        <div className="flex justify-between items-center text-xs mt-1">
+          <div className="flex items-center">
+            <span className="text-text-tertiary mr-1">Size:</span>
+            <span className="text-text-secondary font-mono">
+              {blockData?.blockTotalBytes
+                ? `${(blockData.blockTotalBytes / 1024).toFixed(1)} KB`
+                : '—'}
+            </span>
+          </div>
+        </div>
+      )}
+      
+      {/* For past blocks, we'll move the blob and transaction count to BlockContent, so removing this section */}
+      {isPast && <div></div>}
     </div>
   );
 };

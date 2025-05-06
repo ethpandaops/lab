@@ -1,16 +1,8 @@
 import React from 'react';
 import { Node } from '@/api/gen/backend/pkg/server/proto/beacon_slots/beacon_slots_pb';
 
-// Continent colors mapping
-const CONTINENT_COLORS: Record<string, string> = {
-  'NA': '#4285F4', // Blue for North America
-  'EU': '#34A853', // Green for Europe
-  'AS': '#FBBC05', // Yellow for Asia
-  'OC': '#EA4335', // Red for Oceania
-  'SA': '#9C27B0', // Purple for South America
-  'AF': '#FF9800', // Orange for Africa
-  'AN': '#00BCD4'  // Cyan for Antarctica
-};
+// We'll use the app's semantic colors instead of specific colors per continent
+// This simplifies the color palette and makes it more consistent with the rest of the app
 
 // Map of continent codes to full names
 const CONTINENT_NAMES: Record<string, string> = {
@@ -132,10 +124,9 @@ const ContinentsList: React.FC<ContinentsListProps> = ({
       
       return {
         id: continentCode,
-        continentCode, // Keep the code for color lookup
+        continentCode, // Keep the code for reference
         fullName,      // Store the full name
         label: fullName, 
-        color: CONTINENT_COLORS[continentCode] || '#9b59b6', // Use continent-specific color
         count: data.count,
         nodesThatHaveSeenBlock,
         progress,       // Store progress percentage
@@ -169,10 +160,10 @@ const ContinentsList: React.FC<ContinentsListProps> = ({
   }, [nodes, currentTime, nodeBlockSeen, nodeBlockP2P]);
 
   return (
-    <div className="bg-surface/10 p-2 rounded-lg shadow-sm border border-subtle/30 overflow-hidden h-full flex flex-col">
-      <div className="p-2 border-b border-subtle/20 bg-surface/60 rounded-t-lg">
-        <div className="text-sm font-medium text-primary flex items-center">
-          <div className="w-2 h-2 rounded-full bg-purple-400 mr-1.5"></div>
+    <div className="bg-surface/80 p-2 rounded-lg shadow-sm border border-border-subtle overflow-hidden h-full flex flex-col">
+      <div className="p-2 border-b border-border-subtle bg-surface/80 rounded-t-lg">
+        <div className="text-sm font-medium text-text-primary flex items-center">
+          <div className="w-2 h-2 rounded-full bg-accent mr-1.5"></div>
           Nodes
         </div>
       </div>
@@ -190,8 +181,8 @@ const ContinentsList: React.FC<ContinentsListProps> = ({
                 key={item.id}
                 className={`rounded-lg p-2 transition-all duration-300 ${
                   item.rank === 1 && item.earliestTime && item.earliestTime <= currentTime 
-                    ? 'bg-amber-400/10 border border-amber-400/20' 
-                    : 'bg-surface/30'
+                    ? 'bg-success/10 border border-success/20' 
+                    : 'bg-bg-surface'
                 }`}
                 style={{
                   opacity: item.progress > 0 && isActive ? 1 : 0.7,
@@ -214,8 +205,8 @@ const ContinentsList: React.FC<ContinentsListProps> = ({
                   {item.earliestTime && item.earliestTime <= currentTime && (
                     <div className={`font-mono px-1.5 py-0.5 rounded ${
                       item.rank === 1 
-                        ? 'bg-amber-400/20 text-amber-400 text-sm' 
-                        : 'bg-surface/30 text-xs text-tertiary'
+                        ? 'bg-success/10 text-success text-sm' 
+                        : 'bg-bg-surface-raised text-xs text-text-tertiary'
                     }`}>
                       {item.formattedTime}
                     </div>
@@ -223,24 +214,25 @@ const ContinentsList: React.FC<ContinentsListProps> = ({
                 </div>
                 
                 <div className="mt-2 flex justify-between items-center text-xs">
-                  <span className="text-tertiary">
+                  <span className="text-text-tertiary">
                     Seen: <span className="font-mono">{item.nodesThatHaveSeenBlock}/{item.count}</span>
                   </span>
                   <span className={`font-medium ${
-                    item.rank === 1 ? 'text-amber-400' : 'text-tertiary'
+                    item.rank === 1 ? 'text-success' : 'text-text-tertiary'
                   }`}>
                     {Math.round(item.progress)}%
                   </span>
                 </div>
                 
                 {/* Progress bar */}
-                <div className="mt-1.5 h-2 w-full bg-surface/50 rounded-full overflow-hidden">
+                <div className="mt-1.5 h-2 w-full bg-bg-surface-raised rounded-full overflow-hidden">
                   <div 
-                    className="h-full transition-width duration-700 ease-out rounded-full"
+                    className={`h-full transition-width duration-700 ease-out rounded-full ${
+                      item.rank === 1 ? 'bg-success' : 'bg-accent'
+                    }`}
                     style={{ 
                       width: `${item.progress || 0}%`,
-                      backgroundColor: item.rank === 1 ? '#f59e0b' : item.color,
-                      boxShadow: item.progress > 0 ? 'inset 0 0 4px rgba(255, 255, 255, 0.3)' : 'none'
+                      opacity: item.rank === 1 ? 1 : 0.7,
                     }}
                   ></div>
                 </div>
@@ -248,7 +240,7 @@ const ContinentsList: React.FC<ContinentsListProps> = ({
             ))}
           </div>
         ) : (
-          <div className="h-full flex items-center justify-center text-xs text-tertiary p-3">
+          <div className="h-full flex items-center justify-center text-xs text-text-tertiary p-3">
             {isActive ? 'No continent data yet' : 'Waiting for propagation...'}
           </div>
         )}

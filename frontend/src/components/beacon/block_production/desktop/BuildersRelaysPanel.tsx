@@ -99,7 +99,6 @@ const BuildersRelaysPanel: React.FC<BuildersRelaysPanelProps> = ({
         label: displayName,
         fullName: builderName,
         pubkeyLabel: truncateMiddle(bid.builderPubkey || 'unknown', 8, 6),
-        color: bid.isWinning ? '#FFD700' : '#e67e22', // Gold for winning builder
         value: bid.value,
         time: bid.time,
         isWinning: bid.isWinning,
@@ -134,8 +133,8 @@ const BuildersRelaysPanel: React.FC<BuildersRelaysPanelProps> = ({
           id: `relay-${relayName}`,
           relayName: relayName,
           label: relayName,
-          // Gold color for relay that provided the winning bid
-          color: winningBid?.relayName === relayName ? '#FFD700' : (relayColors[relayName] || '#3498db'),
+          // Using semantic colors instead of hardcoded ones - success color for winning relay
+          isWinning: winningBid?.relayName === relayName,
           // Use highest value bid from this relay
           value: uniqueRelays.has(relayName) 
             ? Math.max(uniqueRelays.get(relayName).value, bid.value)
@@ -143,8 +142,6 @@ const BuildersRelaysPanel: React.FC<BuildersRelaysPanelProps> = ({
           time: uniqueRelays.has(relayName)
             ? Math.min(uniqueRelays.get(relayName).time, bid.time) // Use earliest bid time
             : bid.time,
-          // Mark relay as winning if it provided the block
-          isWinning: winningBid?.relayName === relayName,
           bidCount: (uniqueRelays.get(relayName)?.bidCount || 0) + 1
         });
       } else {
@@ -169,22 +166,22 @@ const BuildersRelaysPanel: React.FC<BuildersRelaysPanelProps> = ({
         if (!a.isWinning && b.isWinning) return 1;
         return a.relayName.localeCompare(b.relayName);
       });
-  }, [bids, relayColors, currentTime, winningBid]);
+  }, [bids, currentTime, winningBid]);
 
   return (
-    <div className="flex flex-col space-y-3 h-full bg-surface/10 p-2 rounded-lg shadow-sm border border-subtle/30">
+    <div className="flex flex-col space-y-3 h-full bg-surface/80 p-2 rounded-lg shadow-sm border border-border-subtle">
       {/* Builders list - fixed height */}
-      <div className="bg-surface/60 rounded-lg shadow-sm overflow-hidden p-2 h-[calc(50%-0.375rem)]">
-        <div className="text-sm font-medium mb-1 text-primary flex items-center justify-between">
+      <div className="bg-surface/80 rounded-lg shadow-sm overflow-hidden p-2 h-[calc(50%-0.375rem)]">
+        <div className="text-sm font-medium mb-1 text-text-primary flex items-center justify-between">
           <div className="flex items-center">
-            <div className="w-2 h-2 rounded-full bg-orange-400 mr-1.5"></div>
+            <div className="w-2 h-2 rounded-full bg-accent mr-1.5"></div>
             Builder bids
           </div>
-          <div className="text-xs text-tertiary">
+          <div className="text-xs text-text-tertiary">
             {builders.length > 0 ? `Top bid per builder` : ''}
           </div>
         </div>
-        <div className={`rounded-lg overflow-y-auto h-[calc(100%-1.75rem)] scrollbar-hide transition-colors duration-500 ${isBuilderActive ? 'bg-surface/30' : 'bg-surface/20'}`}
+        <div className={`rounded-lg overflow-y-auto h-[calc(100%-1.75rem)] scrollbar-hide transition-colors duration-500 ${isBuilderActive ? 'bg-bg-surface-raised' : 'bg-surface/70'}`}
             style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
           <style jsx>{`
             .scrollbar-hide::-webkit-scrollbar {
@@ -199,8 +196,8 @@ const BuildersRelaysPanel: React.FC<BuildersRelaysPanelProps> = ({
                   key={item.id}
                   className={`py-1 px-2 rounded-md text-xs ${
                     item.isWinning 
-                      ? 'bg-amber-400/20 border border-amber-400/40 shadow-sm' 
-                      : 'bg-surface/30'
+                      ? 'bg-success/10 border border-success/20 shadow-sm' 
+                      : 'bg-bg-surface'
                   } ${isBuilderActive ? 'transition-all duration-300 hover:bg-opacity-80' : ''}`}
                   style={{
                     marginBottom: '0.25rem',
@@ -209,8 +206,7 @@ const BuildersRelaysPanel: React.FC<BuildersRelaysPanelProps> = ({
                   <div className="flex items-center justify-between">
                     <div className="flex items-center flex-1">
                       <div 
-                        className={`w-2 h-2 rounded-full mr-2 flex-shrink-0 ${item.isWinning ? 'bg-amber-400' : ''}`}
-                        style={{ backgroundColor: item.isWinning ? undefined : (item.color || '#e67e22') }}
+                        className={`w-2 h-2 rounded-full mr-2 flex-shrink-0 ${item.isWinning ? 'bg-success' : 'bg-accent-muted'}`}
                       ></div>
                       <div className="truncate flex-1">
                         <span className={`${item.isWinning ? 'font-medium' : ''}`}>
@@ -219,7 +215,7 @@ const BuildersRelaysPanel: React.FC<BuildersRelaysPanelProps> = ({
                       </div>
                     </div>
                     <div className="font-mono ml-1.5 rounded-md px-1.5 py-0.25">
-                      <span className={`${item.isWinning ? 'text-amber-400 font-semibold text-sm' : 'text-tertiary text-xs'}`}>
+                      <span className={`${item.isWinning ? 'text-success font-semibold text-sm' : 'text-text-secondary text-xs'}`}>
                         {item.value ? item.value.toFixed(4) : '0.0000'} ETH
                       </span>
                     </div>
@@ -228,13 +224,13 @@ const BuildersRelaysPanel: React.FC<BuildersRelaysPanelProps> = ({
               ))}
               {/* Show count of hidden builders if there are more than 6 */}
               {builders.length > 6 && (
-                <div className="text-xs text-tertiary text-center pt-1 pb-1">
+                <div className="text-xs text-text-tertiary text-center pt-1 pb-1">
                   + {builders.length - 6} more builders
                 </div>
               )}
             </div>
           ) : (
-            <div className="h-full flex items-center justify-center text-xs text-tertiary p-3">
+            <div className="h-full flex items-center justify-center text-xs text-text-tertiary p-3">
               {isBuilderActive ? 'No builders yet' : 'Waiting...'}
             </div>
           )}
@@ -242,12 +238,12 @@ const BuildersRelaysPanel: React.FC<BuildersRelaysPanelProps> = ({
       </div>
 
       {/* Relays list - fixed height */}
-      <div className="bg-surface/60 rounded-lg shadow-sm overflow-hidden p-2 h-[calc(50%-0.375rem)]">
-        <div className="text-sm font-medium mb-1 text-primary flex items-center">
-          <div className="w-2 h-2 rounded-full bg-green-400 mr-1.5"></div>
+      <div className="bg-surface/80 rounded-lg shadow-sm overflow-hidden p-2 h-[calc(50%-0.375rem)]">
+        <div className="text-sm font-medium mb-1 text-text-primary flex items-center">
+          <div className="w-2 h-2 rounded-full bg-accent mr-1.5"></div>
           MEV Relays
         </div>
-        <div className={`rounded-lg overflow-y-auto h-[calc(100%-1.75rem)] scrollbar-hide transition-colors duration-500 ${isRelayActive ? 'bg-surface/30' : 'bg-surface/20'}`}
+        <div className={`rounded-lg overflow-y-auto h-[calc(100%-1.75rem)] scrollbar-hide transition-colors duration-500 ${isRelayActive ? 'bg-bg-surface-raised' : 'bg-surface/70'}`}
             style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
           {relays.length > 0 ? (
             <div className="space-y-1 p-1">
@@ -256,22 +252,21 @@ const BuildersRelaysPanel: React.FC<BuildersRelaysPanelProps> = ({
                   key={item.id}
                   className={`py-1.5 px-2 rounded-md text-xs ${
                     item.isWinning 
-                      ? 'bg-amber-400/20 border border-amber-400/40 shadow-sm' 
-                      : 'bg-surface/30'
+                      ? 'bg-success/10 border border-success/20 shadow-sm' 
+                      : 'bg-bg-surface'
                   } ${isRelayActive ? 'transition-all duration-300 hover:bg-opacity-80' : ''}`}
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center flex-1">
                       <div 
-                        className={`w-2 h-2 rounded-full mr-2 flex-shrink-0 ${item.isWinning ? 'bg-amber-400' : ''}`}
-                        style={{ backgroundColor: item.isWinning ? undefined : (item.color || '#2ecc71') }}
+                        className={`w-2 h-2 rounded-full mr-2 flex-shrink-0 ${item.isWinning ? 'bg-success' : 'bg-accent-muted'}`}
                       ></div>
                       <div className={`truncate flex-1 ${item.isWinning ? 'text-sm font-medium' : 'text-xs'}`}>
                         {item.label}
                       </div>
                     </div>
                     <div className="flex items-center ml-1.5">
-                      <div className={`font-mono rounded px-1.5 py-0.5 ${item.isWinning ? 'bg-amber-400/10 text-xs' : 'text-tertiary text-[10px]'}`}>
+                      <div className={`font-mono rounded px-1.5 py-0.5 ${item.isWinning ? 'bg-success/10 text-xs' : 'text-text-tertiary text-[10px]'}`}>
                         {item.bidCount !== undefined ? `${item.bidCount} bid${item.bidCount !== 1 ? 's' : ''}` : '0 bids'}
                       </div>
                     </div>
@@ -280,7 +275,7 @@ const BuildersRelaysPanel: React.FC<BuildersRelaysPanelProps> = ({
               ))}
             </div>
           ) : (
-            <div className="h-full flex items-center justify-center text-xs text-tertiary p-3">
+            <div className="h-full flex items-center justify-center text-xs text-text-tertiary p-3">
               {isRelayActive ? 'No relays yet' : 'Waiting...'}
             </div>
           )}

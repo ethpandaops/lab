@@ -4,6 +4,7 @@ import SlotDataStore from '@/utils/SlotDataStore';
 import { getCurrentPhase } from '@/components/beacon/block_production/common/PhaseUtils';
 import { Phase } from '@/components/beacon/block_production/common/types';
 import BlockDetailsPanel from '@/components/beacon/block_production/common/BlockDetailsPanel';
+import PendingBlock from '@/components/beacon/block_production/common/PendingBlock';
 
 // Define types for our component props
 interface BlockchainVisualizationProps {
@@ -95,8 +96,10 @@ const BlockchainVisualization: React.FC<BlockchainVisualizationProps> = ({
       const isCurrentSlot = slot === currentSlot;
       const hasData = !!slotDataForSlot;
       
-      // Determine if the block is in building phase based solely on the phase
-      const isBuilding = isCurrentSlot && currentPhase === Phase.Building;
+      // Always show building/pending for future slots and for current slot in Building phase
+      // For debugging - log the decision process
+      const isBuilding = isFuture || (isCurrentSlot && currentPhase === Phase.Building);
+      console.log(`Slot ${slot}: isFuture=${isFuture}, isCurrentSlot=${isCurrentSlot}, currentPhase=${currentPhase}, isBuilding=${isBuilding}, hasData=${hasData}`);
 
       // If we have data for this slot, extract relevant information
       if (slotDataForSlot) {
@@ -260,7 +263,7 @@ const BlockchainVisualization: React.FC<BlockchainVisualizationProps> = ({
             isPast,
             isFuture,
             hasData: !!prefetchedData,
-            isBuilding: false, // Future slot is not in building phase yet
+            isBuilding: true, // Always show future blocks as pending
             slotDataObject: prefetchedData
           };
         }
@@ -274,7 +277,7 @@ const BlockchainVisualization: React.FC<BlockchainVisualizationProps> = ({
           isPast,
           isFuture,
           hasData: false,
-          isBuilding: false
+          isBuilding: true // Always show future blocks as pending
         };
       }
       
@@ -296,9 +299,9 @@ const BlockchainVisualization: React.FC<BlockchainVisualizationProps> = ({
       style={{ width, height }}
     >
       <div className="w-full h-full flex flex-col justify-center">
-        <div className="text-sm font-medium mb-3 text-primary flex items-center justify-between">
+        <div className="text-sm font-medium mb-3 text-primary flex items-center justify-between backdrop-blur-sm bg-surface/30 rounded-lg px-3 py-2">
           <div className="flex items-center">
-            <div className="w-2 h-2 rounded-full bg-gold mr-1.5"></div>
+            <div className="w-2 h-2 rounded-full bg-accent mr-1.5"></div>
             Blockchain
           </div>
         </div>
@@ -306,7 +309,7 @@ const BlockchainVisualization: React.FC<BlockchainVisualizationProps> = ({
         {/* Top-down Blockchain visualization */}
         <div className="relative flex flex-col items-center justify-center h-full">
           {/* Connecting line - now horizontal from top to bottom */}
-          <div className="absolute top-1/2 left-0 right-0 h-1 bg-white/10 -translate-y-1/2 z-0"></div>
+          <div className="absolute top-1/2 left-0 right-0 h-1 bg-border-subtle -translate-y-1/2 z-0"></div>
           
           {/* Blocks - now arranged horizontally */}
           <div className="relative z-10 flex flex-row items-center justify-around space-x-4 px-4 w-full h-full">
@@ -316,6 +319,25 @@ const BlockchainVisualization: React.FC<BlockchainVisualizationProps> = ({
                 ? 'w-2/4 mx-auto'  // Updated to make current block bigger and centered
                 : 'w-1/4';
               
+              // Only use PendingBlock for future blocks
+              if (block.isFuture) {
+                return (
+                  <div 
+                    key={block.slot}
+                    className={`flex items-center justify-center h-full ${flexClassNames} transition-all duration-300`}
+                  >
+                    <PendingBlock
+                      slot={block.slot}
+                      epoch={Math.floor(block.slot / 32)}
+                      proposerEntity={block.proposerEntity}
+                      slotDataStore={slotDataStore}
+                      network={network}
+                    />
+                  </div>
+                );
+              }
+              
+              // Otherwise, use BlockDetailsPanel for past and current slots
               return (
                 <div 
                   key={block.slot}
@@ -325,7 +347,7 @@ const BlockchainVisualization: React.FC<BlockchainVisualizationProps> = ({
                     slot={block.slot}
                     isCurrentSlot={block.isCurrentSlot}
                     isPast={block.isPast}
-                    isFuture={block.isFuture}
+                    isFuture={false} // Never mark as future since we're using PendingBlock for that
                     block={block.slotDataObject?.block}
                     isBuilding={block.isBuilding}
                     hasData={block.hasData}
