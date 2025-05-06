@@ -92,7 +92,7 @@ export default function BlockProductionLivePage() {
   const isNextDisabled = displaySlotOffset >= 0;
   const togglePlayPause = () => setIsPlaying(prev => !prev);
 
-  const { data: slotData, isLoading: isSlotLoading, error: slotError } = useQuery({
+  const { data: slotData, isLoading: isSlotLoading, error: slotError, isPreviousData } = useQuery({
     queryKey: ['block-production-live', 'slot', selectedNetwork, slotNumber],
     queryFn: async () => {
       if (slotNumber === null) return null;
@@ -466,9 +466,29 @@ export default function BlockProductionLivePage() {
 
   // --- End Data Transformation ---
 
+  // Create empty fallback data that matches the structure of real data
+  const fallbackData = {
+    proposer: null,
+    proposerEntity: null,
+    nodes: {},
+    block: null,
+    timings: {
+      blockSeen: {},
+      blockFirstSeenP2p: {},
+    },
+    relayBids: {},
+  };
+
+  // Always use data - either real data or fallback data
+  const displayData = slotData || fallbackData;
+  
+  // Empty arrays for displaying when no real data
+  const emptyBids = [];
+  const emptyRelayColors = {};
+
   return (
     <div className="flex flex-col h-full">
-      {/* Compact Top Controls Bar */}
+      {/* Compact Top Controls Bar - Always render */}
       <div className="flex items-center justify-between py-2 px-4 bg-surface/30 rounded-t-lg">
         <div className="flex items-center gap-2">
           <button
@@ -522,51 +542,37 @@ export default function BlockProductionLivePage() {
 
       {/* Timeline has been merged into the hero section in SankeyNetworkView component */}
 
-      {/* Network Tree Visualization */}
+      {/* Network Tree Visualization - Always render */}
       <div className="px-2 pt-1">
-        {/* Always render SankeyNetworkView if we have data */}
-        {/* This prevents flashing during transitions */}
-        {slotData && (
-          <div 
-            className={`transition-opacity duration-300 ${
-              isSlotLoading ? 'opacity-70' : 'opacity-100'
-            }`}
-          >
-            <SankeyNetworkView
-              bids={transformedBids}
-              currentTime={currentTime}
-              relayColors={relayColors}
-              winningBid={winningBidData}
-              slot={slotNumber || undefined}
-              proposer={slotData.proposer}
-              proposerEntity={proposerEntity}
-              nodes={slotData.nodes || {}}
-              blockTime={slotData.block?.slotTime}
-              // Pass node timing information for block visibility
-              nodeBlockSeen={slotData.timings?.blockSeen ? 
-                Object.fromEntries(Object.entries(slotData.timings.blockSeen).map(([node, time]) => 
-                  [node, typeof time === 'bigint' ? Number(time) : Number(time)]
-                )) : {}
-              }
-              nodeBlockP2P={slotData.timings?.blockFirstSeenP2p ? 
-                Object.fromEntries(Object.entries(slotData.timings.blockFirstSeenP2p).map(([node, time]) => 
-                  [node, typeof time === 'bigint' ? Number(time) : Number(time)]
-                )) : {}
-              }
-              block={slotData.block}
-            />
-          </div>
-        )}
-        
-        {/* Initial loading state for SankeyNetworkView */}
-        {isSlotLoading && !slotData && (
-          <div className="h-20 bg-surface/10 rounded-lg mb-2 animate-pulse flex items-center justify-center">
-            <div className="text-secondary text-sm">Loading network view...</div>
-          </div>
-        )}
+        <div className={`transition-opacity duration-300 ${isSlotLoading && !isPreviousData ? 'opacity-70' : 'opacity-100'}`}>
+          {/* Always render real or placeholder component */}
+          <SankeyNetworkView
+            bids={slotData ? transformedBids : emptyBids}
+            currentTime={currentTime}
+            relayColors={slotData ? relayColors : emptyRelayColors}
+            winningBid={slotData ? winningBidData : null}
+            slot={slotNumber || undefined}
+            proposer={displayData.proposer}
+            proposerEntity={displayData.proposerEntity}
+            nodes={displayData.nodes || {}}
+            blockTime={displayData.block?.slotTime}
+            // Pass node timing information for block visibility
+            nodeBlockSeen={displayData.timings?.blockSeen ? 
+              Object.fromEntries(Object.entries(displayData.timings.blockSeen).map(([node, time]) => 
+                [node, typeof time === 'bigint' ? Number(time) : Number(time)]
+              )) : {}
+            }
+            nodeBlockP2P={displayData.timings?.blockFirstSeenP2p ? 
+              Object.fromEntries(Object.entries(displayData.timings.blockFirstSeenP2p).map(([node, time]) => 
+                [node, typeof time === 'bigint' ? Number(time) : Number(time)]
+              )) : {}
+            }
+            block={displayData.block}
+          />
+        </div>
       </div>
 
-      {/* Main Content Area (Visualization) */}
+      {/* Main Content Area (Visualization) - Always render */}
       <div className="flex-1 px-2 py-2 min-h-0">
         {/* Error state */}
         {slotError && (
@@ -574,46 +580,20 @@ export default function BlockProductionLivePage() {
             Error loading block data: {slotError.message}
           </div>
         )}
-        
-        {/* Initial loading state - only show when we have no data at all */}
-        {isSlotLoading && !slotData && (
-          <div className="flex items-center justify-center h-[420px] bg-surface/10 rounded-lg animate-pulse">
-            <div className="text-center p-4 text-secondary">
-              <div className="inline-block w-6 h-6 border-2 border-t-accent border-r-accent border-b-transparent border-l-transparent rounded-full animate-spin mr-2"></div>
-              Loading block production data...
-            </div>
-          </div>
-        )}
-        
-        {/* No data state */}
-        {!isSlotLoading && !slotData && slotNumber !== null && (
-          <div className="text-center p-4 text-secondary bg-surface/20 rounded-lg h-[420px] flex items-center justify-center">
-            <div>
-              <div className="text-3xl mb-2 opacity-60">📭</div>
-              <div>No block production data available for slot {slotNumber}.</div>
-            </div>
-          </div>
-        )}
 
-        {/* Data visualization - always render if we have data, even during loading state */}
-        {/* This prevents flashing and ensures smooth transitions */}
-        {slotData && (
-          <div 
-            className={`transition-opacity duration-300 ${
-              isSlotLoading ? 'opacity-70' : 'opacity-100'
-            }`}
-          >
-            <MevBidsVisualizer
-              bids={transformedBids}
-              currentTime={currentTime}
-              relayColors={relayColors}
-              winningBid={winningBidData}
-              timeRange={timeRange}
-              valueRange={valueRange}
-              height={420} // Slightly taller for better visibility
-            />
-          </div>
-        )}
+        {/* Always render the visualization container */}
+        <div className={`transition-opacity duration-300 ${isSlotLoading && !isPreviousData ? 'opacity-70' : 'opacity-100'}`}>
+          {/* Always render real or empty visualization */}
+          <MevBidsVisualizer
+            bids={slotData ? transformedBids : emptyBids}
+            currentTime={currentTime}
+            relayColors={slotData ? relayColors : emptyRelayColors}
+            winningBid={slotData ? winningBidData : null}
+            timeRange={timeRange}
+            valueRange={valueRange}
+            height={420} // Slightly taller for better visibility
+          />
+        </div>
       </div>
 
     </div>

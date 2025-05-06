@@ -6,6 +6,7 @@ interface BlockContentsTreemapProps {
   className?: string
   height?: string | number
   width?: string | number
+  isEmpty?: boolean
 }
 
 const BlockContentsTreemap: React.FC<BlockContentsTreemapProps> = ({
@@ -13,6 +14,7 @@ const BlockContentsTreemap: React.FC<BlockContentsTreemapProps> = ({
   className = '',
   height = '100%',
   width = '100%',
+  isEmpty = false,
 }) => {
   // Generate a fake block structure with the specified number of transactions
   const blockData = useMemo(() => {
@@ -82,12 +84,12 @@ const BlockContentsTreemap: React.FC<BlockContentsTreemapProps> = ({
     )
   }
   
-  // If there are no transactions, show a placeholder
-  if (transactionCount === 0 || transactionCount === undefined) {
+  // If there are no transactions or isEmpty is true, show a placeholder
+  if (isEmpty || transactionCount === 0 || transactionCount === undefined) {
+    // Even when empty, just render a static placeholder that matches the dimensions
     return (
-      <div className={`relative flex items-center justify-center text-gray-400 ${className}`} style={{ height, width }}>
-        {showCount(transactionCount)}
-        {transactionCount === 0 ? 'No transactions in block' : 'Waiting for transaction data...'}
+      <div className={`relative flex items-center justify-center bg-surface/20 rounded ${className}`} style={{ height, width }}>
+        <div className="text-tertiary/50 text-xs font-mono">Block data unavailable</div>
       </div>
     )
   }

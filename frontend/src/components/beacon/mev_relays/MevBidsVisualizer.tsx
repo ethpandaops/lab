@@ -378,21 +378,18 @@ export const MevBidsVisualizer: React.FC<MevBidsVisualizerProps> = ({
       description="Visualization of bids received over time relative to slot start"
       chart={
         <div className="relative w-full h-full flex items-center justify-center bg-surface/30 rounded-lg">
-          {chartData.length === 0 ? (
-            <div className="text-center text-tertiary">No bids data to display</div>
-          ) : (
-            <SimpleScatterPlot 
-              data={chartData}
-              width={800}
-              height={height}
-              xMin={timeRange.min}
-              xMax={timeRange.max}
-              yMin={calculatedValueRange.min}
-              yMax={calculatedValueRange.max}
-              currentTime={currentTime}
-              relayColors={relayColors}
-            />
-          )}
+          {/* Always render the chart, even with empty data */}
+          <SimpleScatterPlot 
+            data={chartData}
+            width={800}
+            height={height}
+            xMin={timeRange.min}
+            xMax={timeRange.max}
+            yMin={calculatedValueRange.min}
+            yMax={calculatedValueRange.max}
+            currentTime={currentTime}
+            relayColors={relayColors}
+          />
         </div>
       }
       series={seriesStats}
