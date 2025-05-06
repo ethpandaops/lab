@@ -27,19 +27,23 @@ const FixedPhaseTimeline: React.FC<PhaseTimelineProps> = ({
   const [frameIndex, setFrameIndex] = useState(0);
   const internalTime = FRAMES[frameIndex];
   
-  // Animation effect - manually step through the frames
+  // Animation effect - manually step through the frames with high frequency updates
   useEffect(() => {
     // Reset to frame 0
     setFrameIndex(0);
     
-    // Advance through frames
+    // Use a higher frequency update (10ms) for smoother movement
+    // This avoids using animations which can cause issues with timeline resetting
     const intervalId = setInterval(() => {
       setFrameIndex(current => {
-        // Next frame (loop when we reach the end)
-        const next = (current + 1) % FRAMES.length;
-        return next;
+        // Calculate the precise fractional position based on elapsed time
+        const elapsedMs = (Date.now() % 12000); // Modulo 12 seconds in ms
+        const framePosition = (elapsedMs / 1000); // Convert to seconds
+        
+        // Find the closest frame index
+        return Math.min(12, Math.floor(framePosition));
       });
-    }, 1000); // 1 frame per second
+    }, 10); // Update every 10ms for smoother movement
     
     // Clean up
     return () => clearInterval(intervalId);
@@ -153,7 +157,7 @@ const FixedPhaseTimeline: React.FC<PhaseTimelineProps> = ({
         <div className="h-3 mb-2 flex rounded-lg overflow-hidden border border-subtle shadow-inner relative">
           {/* Building phase */}
           <div 
-            className="border-r border-white/10 transition-colors duration-300 shadow-inner" 
+            className="border-r border-white/10 shadow-inner" 
             style={{ 
               width: `${propagationPercent}%`,
               backgroundColor: currentPhase === Phase.Building
@@ -164,7 +168,7 @@ const FixedPhaseTimeline: React.FC<PhaseTimelineProps> = ({
           
           {/* Propagating phase */}
           <div 
-            className="border-r border-white/10 transition-colors duration-300 shadow-inner"
+            className="border-r border-white/10 shadow-inner"
             style={{ 
               width: `${attestationPercent - propagationPercent}%`,
               backgroundColor: currentPhase === Phase.Propagating
@@ -175,7 +179,7 @@ const FixedPhaseTimeline: React.FC<PhaseTimelineProps> = ({
           
           {/* Attesting phase */}
           <div 
-            className="border-r border-white/10 transition-colors duration-300 shadow-inner"
+            className="border-r border-white/10 shadow-inner"
             style={{ 
               width: `${acceptancePercent - attestationPercent}%`,
               backgroundColor: currentPhase === Phase.Attesting
@@ -186,7 +190,7 @@ const FixedPhaseTimeline: React.FC<PhaseTimelineProps> = ({
           
           {/* Accepted phase */}
           <div 
-            className="transition-colors duration-300 shadow-inner"
+            className="shadow-inner"
             style={{ 
               width: `${100 - acceptancePercent}%`,
               backgroundColor: currentPhase === Phase.Accepted
@@ -195,9 +199,9 @@ const FixedPhaseTimeline: React.FC<PhaseTimelineProps> = ({
             }}
           />
           
-          {/* Phase transition markers */}
+          {/* Phase transition markers - no transitions for crisp movement */}
           <div 
-            className="absolute top-0 bottom-0 w-1 transition-colors duration-300" 
+            className="absolute top-0 bottom-0 w-1" 
             style={{
               left: `${propagationPercent}%`,
               backgroundColor: 'rgba(255, 255, 255, 0.7)',
@@ -205,7 +209,7 @@ const FixedPhaseTimeline: React.FC<PhaseTimelineProps> = ({
             }}
           />
           <div 
-            className="absolute top-0 bottom-0 w-1 transition-colors duration-300" 
+            className="absolute top-0 bottom-0 w-1" 
             style={{
               left: `${attestationPercent}%`,
               backgroundColor: 'rgba(255, 255, 255, 0.7)',
@@ -213,7 +217,7 @@ const FixedPhaseTimeline: React.FC<PhaseTimelineProps> = ({
             }}
           />
           <div 
-            className="absolute top-0 bottom-0 w-1 transition-colors duration-300" 
+            className="absolute top-0 bottom-0 w-1" 
             style={{
               left: `${acceptancePercent}%`,
               backgroundColor: 'rgba(255, 255, 255, 0.7)',
@@ -222,27 +226,29 @@ const FixedPhaseTimeline: React.FC<PhaseTimelineProps> = ({
           />
         </div>
         
-        {/* Progress overlay - using linear time progression */}
+        {/* Progress overlay - using linear time progression with no transitions */}
         <div 
           className="absolute top-0 h-3 bg-active/30 rounded-l-lg border-r-2 border-white"
           style={{ 
             width: `${(internalTime / 12000) * 100}%`,
-            maxWidth: 'calc(100% - 4px)' // Stay within container boundaries
+            maxWidth: 'calc(100% - 4px)', // Stay within container boundaries
+            willChange: 'width', // Performance hint to browser
           }}
         />
         
-        {/* Current time indicator with glowing dot */}
+        {/* Current time indicator with glowing dot - no transitions for crisp movement */}
         <div 
-          className="absolute top-0 h-3"
+          className="absolute top-0 h-3" 
           style={{ 
             left: `calc(${(internalTime / 12000) * 100}%)`,
             transform: 'translateX(-50%)',
+            willChange: 'left', // Performance hint to browser
           }}
         >
           <div 
-            className="w-5 h-5 bg-white rounded-full transform -translate-y-1/3 opacity-90"
+            className="w-5 h-5 bg-white rounded-full -translate-y-1/3 opacity-90"
             style={{
-              boxShadow: '0 0 10px 3px rgba(255, 255, 255, 0.8), 0 0 20px 5px rgba(255, 255, 255, 0.4)'
+              boxShadow: '0 0 10px 3px rgba(255, 255, 255, 0.8), 0 0 20px 5px rgba(255, 255, 255, 0.4)',
             }}
           ></div>
         </div>
