@@ -364,20 +364,23 @@ export default function BlockProductionLivePage() {
     
     // Simple interval to count time
     const interval = setInterval(() => {
-      // Increment by 100ms
-      currentTime += 100;
-      
-      // Reset at 12 seconds
-      if (currentTime > 12000) {
-        currentTime = 0;
+      // Only increment if playing
+      if (isPlaying) {
+        // Increment by 100ms
+        currentTime += 100;
+        
+        // Reset at 12 seconds
+        if (currentTime > 12000) {
+          currentTime = 0;
+        }
+        
+        // Update React state only
+        setCurrentTime(currentTime);
       }
-      
-      // Update React state only
-      setCurrentTime(currentTime);
     }, 100);
     
     return () => clearInterval(interval);
-  }, [slotNumber]);
+  }, [slotNumber, isPlaying]);
   
   // Normal playback enablement
   useEffect(() => {
