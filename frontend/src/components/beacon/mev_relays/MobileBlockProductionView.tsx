@@ -366,6 +366,23 @@ const MobileBlockProductionView: React.FC<MobileBlockProductionViewProps> = ({
               }}
             />
             
+            {/* Current time slider indicator - prominently displayed */}
+            <div 
+              className="absolute top-2 h-2 bg-active/80 transition-all duration-100"
+              style={{ 
+                left: `${(currentTime / 12000) * 100}%`,
+                width: '2px',
+                boxShadow: '0 0 8px 2px rgba(255, 255, 255, 0.5)'
+              }}
+            >
+              <div 
+                className="absolute top-0 w-3 h-3 bg-white rounded-full transform -translate-x-1/2 -translate-y-1/2 opacity-70"
+                style={{
+                  boxShadow: '0 0 6px 2px rgba(255, 255, 255, 0.8)'
+                }}
+              ></div>
+            </div>
+            
             {/* Time markers */}
             <div className="flex justify-between text-[9px] font-mono text-tertiary/60 px-1">
               <span>0s</span>

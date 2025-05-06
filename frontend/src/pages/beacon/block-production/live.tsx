@@ -4,9 +4,8 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useParams } from 'react-router-dom';
 import { getLabApiClient } from '../../../api';
 import { GetSlotDataRequest } from '../../../api/gen/backend/pkg/api/proto/lab_api_pb';
-import { MevBidsVisualizer } from '../../../components/beacon/mev_relays/MevBidsVisualizer';
-import { SankeyNetworkView } from '../../../components/beacon/mev_relays/SankeyNetworkView';
 import MobileBlockProductionView from '../../../components/beacon/mev_relays/MobileBlockProductionView';
+import DesktopBlockProductionView from '../../../components/beacon/mev_relays/DesktopBlockProductionView';
 import { BeaconClockManager } from '../../../utils/beacon';
 import { ChevronLeft, ChevronRight, Play, Pause } from 'lucide-react';
 import { NetworkContext } from '@/App';
@@ -508,7 +507,7 @@ export default function BlockProductionLivePage() {
 
   return (
     <div className="flex flex-col h-full">
-      {/* Compact Top Controls Bar - Always render */}
+      {/* Compact Top Controls Bar - Always render, with responsive classes */}
       <div className="flex items-center justify-between py-2 px-4 bg-surface/30 rounded-t-lg">
         <div className="flex items-center gap-2">
           <button
@@ -541,12 +540,12 @@ export default function BlockProductionLivePage() {
             <ChevronRight className="h-3.5 w-3.5 text-primary" />
           </button>
 
-          <div className="text-sm font-mono ml-1 text-primary">
-            Slot: {slotNumber ?? "—"}
+          <div className={`font-mono ml-1 text-primary flex flex-col ${isMobile ? 'text-xs' : 'text-sm'}`}>
+            <div>Slot: {slotNumber ?? "—"}</div>
             {headSlot !== null && slotNumber !== null && displaySlotOffset !== 0 && (
-              <span className="ml-1 text-xs text-secondary opacity-70">
-                (Lag: {headLagSlots - displaySlotOffset})
-              </span>
+              <div className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-secondary opacity-70`}>
+                Lag: {headLagSlots - displaySlotOffset}
+              </div>
             )}
           </div>
         </div>
@@ -597,59 +596,42 @@ export default function BlockProductionLivePage() {
           )}
         </div>
       ) : (
-        // Desktop View
-        <>
-          {/* Network Tree Visualization */}
-          <div className="px-2 pt-1">
-            <div className={`transition-opacity duration-300 ${isSlotLoading && !isPreviousData ? 'opacity-70' : 'opacity-100'}`}>
-              <SankeyNetworkView
-                bids={slotData ? transformedBids : emptyBids}
-                currentTime={currentTime}
-                relayColors={slotData ? relayColors : emptyRelayColors}
-                winningBid={slotData ? winningBidData : null}
-                slot={slotNumber || undefined}
-                proposer={displayData.proposer}
-                proposerEntity={displayData.proposerEntity}
-                nodes={displayData.nodes || {}}
-                blockTime={displayData.block?.slotTime}
-                nodeBlockSeen={displayData.timings?.blockSeen ? 
-                  Object.fromEntries(Object.entries(displayData.timings.blockSeen).map(([node, time]) => 
-                    [node, typeof time === 'bigint' ? Number(time) : Number(time)]
-                  )) : {}
-                }
-                nodeBlockP2P={displayData.timings?.blockFirstSeenP2p ? 
-                  Object.fromEntries(Object.entries(displayData.timings.blockFirstSeenP2p).map(([node, time]) => 
-                    [node, typeof time === 'bigint' ? Number(time) : Number(time)]
-                  )) : {}
-                }
-                block={displayData.block}
-              />
+        // Desktop View - Unified using the new DesktopBlockProductionView component
+        <div className="px-2 pt-1 h-full flex flex-col">
+          {/* Error state */}
+          {slotError && (
+            <div className="text-center p-4 text-error rounded bg-error/10 border border-error/20 mb-2">
+              Error loading block data: {slotError.message}
             </div>
+          )}
+          
+          <div className={`transition-opacity duration-300 flex-1 ${isSlotLoading && !isPreviousData ? 'opacity-70' : 'opacity-100'}`}>
+            <DesktopBlockProductionView
+              bids={slotData ? transformedBids : emptyBids}
+              currentTime={currentTime}
+              relayColors={slotData ? relayColors : emptyRelayColors}
+              winningBid={slotData ? winningBidData : null}
+              slot={slotNumber || undefined}
+              proposer={displayData.proposer}
+              proposerEntity={displayData.proposerEntity}
+              nodes={displayData.nodes || {}}
+              blockTime={displayData.block?.slotTime}
+              nodeBlockSeen={displayData.timings?.blockSeen ? 
+                Object.fromEntries(Object.entries(displayData.timings.blockSeen).map(([node, time]) => 
+                  [node, typeof time === 'bigint' ? Number(time) : Number(time)]
+                )) : {}
+              }
+              nodeBlockP2P={displayData.timings?.blockFirstSeenP2p ? 
+                Object.fromEntries(Object.entries(displayData.timings.blockFirstSeenP2p).map(([node, time]) => 
+                  [node, typeof time === 'bigint' ? Number(time) : Number(time)]
+                )) : {}
+              }
+              block={displayData.block}
+              timeRange={timeRange}
+              valueRange={valueRange}
+            />
           </div>
-
-          {/* Main Content Area (Visualization) */}
-          <div className="flex-1 px-2 py-2 min-h-0">
-            {/* Error state */}
-            {slotError && (
-              <div className="text-center p-4 text-error rounded bg-error/10 border border-error/20 my-2">
-                Error loading block data: {slotError.message}
-              </div>
-            )}
-
-            {/* Always render the visualization container */}
-            <div className={`transition-opacity duration-300 ${isSlotLoading && !isPreviousData ? 'opacity-70' : 'opacity-100'}`}>
-              <MevBidsVisualizer
-                bids={slotData ? transformedBids : emptyBids}
-                currentTime={currentTime}
-                relayColors={slotData ? relayColors : emptyRelayColors}
-                winningBid={slotData ? winningBidData : null}
-                timeRange={timeRange}
-                valueRange={valueRange}
-                height={420} // Slightly taller for better visibility
-              />
-            </div>
-          </div>
-        </>
+        </div>
       )}
     </div>
   );
