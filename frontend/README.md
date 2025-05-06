@@ -16,7 +16,6 @@ This React-based frontend application provides a user interface for exploring an
 - **Globe.gl** and **React Simple Maps** for geographical visualizations
 - **Framer Motion** for smooth animations and transitions
 - **Headless UI** and **Heroicons** for accessible UI components
-- **Comprehensive testing** with Vitest, Testing Library, and Cypress
 
 ## Requirements
 
@@ -64,10 +63,6 @@ To override the backend URL in development mode, set the `VITE_BACKEND_URL` envi
 - `pnpm dev` - Start the development server with hot reload
 - `pnpm build` - Build for production (output to `dist` folder)
 - `pnpm preview` - Preview the production build locally
-- `pnpm test` - Run unit and integration tests for changed files
-- `pnpm test:ci` - Run all unit and integration tests in CI mode
-- `pnpm test:e2e` - Run end-to-end tests with Cypress Test Runner
-- `pnpm test:e2e:headless` - Run end-to-end tests headlessly
 - `pnpm format` - Format all files with Prettier
 - `pnpm lint` - Run TypeScript, ESLint, and Stylelint checks
 - `pnpm validate` - Run linting, tests, and e2e tests for CI
