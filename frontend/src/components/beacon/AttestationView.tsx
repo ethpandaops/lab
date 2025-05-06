@@ -1,39 +1,38 @@
-import { useMemo } from 'react'
-import { ChartWithStats, NivoLineChart } from '@/components/charts'
-
+import { useMemo } from 'react';
+import { ChartWithStats, NivoLineChart } from '@/components/charts';
 
 interface AttestationPoint {
-  time: number
-  totalValidators: number
+  time: number;
+  totalValidators: number;
 }
 
 interface AttestationViewProps {
-  loading: boolean
-  isMissing: boolean
+  loading: boolean;
+  isMissing: boolean;
   attestationWindows?: Array<{
-    start_ms: number
-    end_ms: number
-    validator_indices: number[]
-  }>
-  attestationProgress: AttestationPoint[]
-  TOTAL_VALIDATORS: number
-  ATTESTATION_THRESHOLD: number
-  currentTime: number
+    start_ms: number;
+    end_ms: number;
+    validator_indices: number[];
+  }>;
+  attestationProgress: AttestationPoint[];
+  TOTAL_VALIDATORS: number;
+  ATTESTATION_THRESHOLD: number;
+  currentTime: number;
 }
 
-export function AttestationView({ 
-  loading, 
-  isMissing, 
-  attestationWindows, 
+export function AttestationView({
+  loading,
+  isMissing,
+  attestationWindows,
   attestationProgress,
   TOTAL_VALIDATORS,
   ATTESTATION_THRESHOLD,
-  currentTime
-}: AttestationViewProps): JSX.Element {
+  currentTime,
+}: AttestationViewProps) {
   // Calculate current attestation count based on currentTime
   const currentAttestationCount = useMemo(() => {
     if (!attestationProgress?.length) return 0;
-    
+
     // Find the last point that's before or at the current time
     for (let i = attestationProgress.length - 1; i >= 0; i--) {
       if (attestationProgress[i].time <= currentTime) {
@@ -42,97 +41,102 @@ export function AttestationView({
     }
     return 0;
   }, [attestationProgress, currentTime]);
-
   // Process data for arrival count chart
+  const currentTimeRounded = useMemo(() => Math.floor(currentTime / 100) * 100, [currentTime]);
+
   const arrivalData = useMemo(() => {
-    if (!attestationWindows || loading || isMissing) return []
-    
-    const bins = new Array(240).fill(0)
+    if (!attestationWindows || loading || isMissing) return [];
+
+    const bins = new Array(240).fill(0);
     attestationWindows.forEach(window => {
       if (window.start_ms <= currentTime) {
-        const binIndex = Math.floor(window.start_ms / 50)
+        const binIndex = Math.floor(window.start_ms / 50);
         if (binIndex >= 0 && binIndex < bins.length) {
-          bins[binIndex] += window.validator_indices.length
+          bins[binIndex] += window.validator_indices.length;
         }
       }
-    })
+    });
 
     // Only return points up to currentTime
-    const currentBinIndex = Math.floor(currentTime / 50)
+    const currentBinIndex = Math.floor(currentTime / 50);
     return bins.slice(0, currentBinIndex + 1).map((count, i) => ({
       time: i * 0.05,
-      count
-    }))
-  }, [attestationWindows, loading, isMissing, Math.floor(currentTime / 100) * 100])
+      count,
+    }));
+  }, [attestationWindows, loading, isMissing, currentTimeRounded]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Process data for CDF chart
   const cdfData = useMemo(() => {
-    if (loading || isMissing || attestationProgress.length === 0) return []
+    if (loading || isMissing || attestationProgress.length === 0) return [];
 
     // Find the last valid point at or before currentTime
-    const validPoints = attestationProgress.filter(p => p.time <= currentTime)
-    if (validPoints.length === 0) return []
+    const validPoints = attestationProgress.filter(p => p.time <= currentTime);
+    if (validPoints.length === 0) return [];
 
     // Create points from 0 to currentTime
-    const currentTimeInSeconds = currentTime / 1000
+    const currentTimeInSeconds = currentTime / 1000;
     const timePoints = Array.from(
-      { length: Math.floor(currentTimeInSeconds * 10) + 1 }, 
-      (_, i) => i / 10
-    )
-    
+      { length: Math.floor(currentTimeInSeconds * 10) + 1 },
+      (_, i) => i / 10,
+    );
+
     return timePoints.map(timePoint => {
       // Find the last progress point before or at this time
-      const relevantPoints = validPoints.filter(p => p.time <= timePoint * 1000)
-      const lastPoint = relevantPoints[relevantPoints.length - 1]
-      
+      const relevantPoints = validPoints.filter(p => p.time <= timePoint * 1000);
+      const lastPoint = relevantPoints[relevantPoints.length - 1];
+
       return {
         time: timePoint,
-        percentage: lastPoint ? (lastPoint.totalValidators / TOTAL_VALIDATORS) * 100 : 0
-      }
-    })
-  }, [attestationProgress, loading, isMissing, TOTAL_VALIDATORS, Math.floor(currentTime / 100) * 100])
+        percentage: lastPoint ? (lastPoint.totalValidators / TOTAL_VALIDATORS) * 100 : 0,
+      };
+    });
+  }, [attestationProgress, loading, isMissing, TOTAL_VALIDATORS, currentTimeRounded]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Stats for arrival count chart
   const arrivalStats = useMemo(() => {
-    if (loading || isMissing || arrivalData.length === 0) return []
-    const counts = arrivalData.map(d => d.count)
-    return [{
-      name: "Attestation Count",
-      color: "currentColor",
-      min: Math.min(...counts),
-      max: Math.max(...counts),
-      avg: counts.reduce((a, b) => a + b, 0) / counts.length,
-      last: counts[counts.length - 1],
-      unit: ""
-    }]
-  }, [arrivalData, loading, isMissing])
+    if (loading || isMissing || arrivalData.length === 0) return [];
+    const counts = arrivalData.map(d => d.count);
+    return [
+      {
+        name: 'Attestation Count',
+        color: 'currentColor',
+        min: Math.min(...counts),
+        max: Math.max(...counts),
+        avg: counts.reduce((a, b) => a + b, 0) / counts.length,
+        last: counts[counts.length - 1],
+        unit: '',
+      },
+    ];
+  }, [arrivalData, loading, isMissing]);
 
   // Stats for CDF chart
   const cdfStats = useMemo(() => {
-    if (loading || isMissing || cdfData.length === 0) return []
-    const percentages = cdfData.map(d => d.percentage)
-    return [{
-      name: "Cumulative %",
-      color: "currentColor",
-      min: Math.min(...percentages),
-      max: Math.max(...percentages),
-      avg: percentages.reduce((a, b) => a + b, 0) / percentages.length,
-      last: percentages[percentages.length - 1],
-      unit: "%"
-    }]
-  }, [cdfData, loading, isMissing])
+    if (loading || isMissing || cdfData.length === 0) return [];
+    const percentages = cdfData.map(d => d.percentage);
+    return [
+      {
+        name: 'Cumulative %',
+        color: 'currentColor',
+        min: Math.min(...percentages),
+        max: Math.max(...percentages),
+        avg: percentages.reduce((a, b) => a + b, 0) / percentages.length,
+        last: percentages[percentages.length - 1],
+        unit: '%',
+      },
+    ];
+  }, [cdfData, loading, isMissing]);
 
   // Calculate max Y value for arrivals chart based on bin size
   const maxArrivalsPerBin = useMemo(() => {
     if (!attestationWindows?.length) return 0;
-    
+
     // Group attestations into 50ms bins
     const bins = new Map<number, number>();
     attestationWindows.forEach(window => {
       const binIndex = Math.floor(window.start_ms / 50);
       bins.set(binIndex, (bins.get(binIndex) || 0) + window.validator_indices.length);
     });
-    
+
     // Get max bin size and add 20% buffer
     const maxBin = Math.max(...bins.values());
     return Math.ceil(maxBin * 1.2);
@@ -148,8 +152,12 @@ export function AttestationView({
           {/* Progress stats */}
           <div className="flex items-center justify-between text-xs font-mono">
             <div className="flex items-baseline gap-1.5">
-              <span className="text-lg font-medium text-success">{currentAttestationCount.toLocaleString()}</span>
-              <span className="text-tertiary">of {TOTAL_VALIDATORS.toLocaleString()} validators</span>
+              <span className="text-lg font-medium text-success">
+                {currentAttestationCount.toLocaleString()}
+              </span>
+              <span className="text-tertiary">
+                of {TOTAL_VALIDATORS.toLocaleString()} validators
+              </span>
             </div>
             <div className="text-tertiary">
               {Math.round((currentAttestationCount / TOTAL_VALIDATORS) * 100)}%
@@ -159,11 +167,9 @@ export function AttestationView({
           {/* Bar container */}
           <div className="relative h-1.5 rounded-full overflow-hidden bg-base">
             {/* Progress fill */}
-            <div 
+            <div
               className={`absolute inset-y-0 left-0 transition-all duration-100 ${
-                currentAttestationCount >= ATTESTATION_THRESHOLD 
-                  ? 'bg-success' 
-                  : 'bg-success/40'
+                currentAttestationCount >= ATTESTATION_THRESHOLD ? 'bg-success' : 'bg-success/40'
               }`}
               style={{ width: `${(currentAttestationCount / TOTAL_VALIDATORS) * 100}%` }}
             >
@@ -202,7 +208,14 @@ export function AttestationView({
             <div>
               <h4 className="text-xs font-mono text-tertiary mb-1">66% Threshold Reached</h4>
               <p className="text-sm font-mono text-primary">
-                {((attestationProgress.find(p => p.totalValidators >= ATTESTATION_THRESHOLD) || { time: 0 }).time / 1000).toFixed(2)}s
+                {(
+                  (
+                    attestationProgress.find(p => p.totalValidators >= ATTESTATION_THRESHOLD) || {
+                      time: 0,
+                    }
+                  ).time / 1000
+                ).toFixed(2)}
+                s
               </p>
             </div>
             <div>
@@ -210,7 +223,12 @@ export function AttestationView({
               <p className="text-sm font-mono text-primary">
                 {attestationProgress.slice(-1)[0]?.totalValidators.toLocaleString() || 0}
                 <span className="text-tertiary ml-2">
-                  ({Math.round((attestationProgress.slice(-1)[0]?.totalValidators || 0) / TOTAL_VALIDATORS * 100)}% of target)
+                  (
+                  {Math.round(
+                    ((attestationProgress.slice(-1)[0]?.totalValidators || 0) / TOTAL_VALIDATORS) *
+                      100,
+                  )}
+                  % of target)
                 </span>
               </p>
             </div>
@@ -224,44 +242,46 @@ export function AttestationView({
             <ChartWithStats
               title="Arrivals"
               headerSize="small"
-              description='When an attestation was first seen'
+              description="When an attestation was first seen"
               height={250}
               chart={
                 <NivoLineChart
                   data={[
                     {
                       id: 'count',
-                      data: arrivalData.map(d => ({ x: d.time, y: d.count }))
-                    }
+                      data: arrivalData.map(d => ({ x: d.time, y: d.count })),
+                    },
                   ]}
                   margin={{ top: 20, right: 20, left: 60, bottom: 40 }}
                   xScale={{
                     type: 'linear',
                     min: 0,
-                    max: 12
+                    max: 12,
                   }}
                   yScale={{
                     type: 'linear',
                     min: 0,
-                    max: maxArrivalsPerBin
+                    max: maxArrivalsPerBin,
                   }}
                   axisBottom={{
                     tickSize: 5,
                     tickPadding: 5,
                     tickRotation: 0,
                     tickValues: [0, 2, 4, 6, 8, 10, 12],
-                    legend: "Time (s)",
+                    legend: 'Time (s)',
                     legendOffset: 36,
-                    legendPosition: "middle"
+                    legendPosition: 'middle',
                   }}
                   axisLeft={{
                     tickSize: 5,
                     tickPadding: 5,
                     tickRotation: 0,
-                    tickValues: Array.from({ length: 6 }, (_, i) => Math.floor(maxArrivalsPerBin * i / 5)),
-                    legend: "Count",
+                    tickValues: Array.from({ length: 6 }, (_, i) =>
+                      Math.floor((maxArrivalsPerBin * i) / 5),
+                    ),
+                    legend: 'Count',
                     legendOffset: -40,
-                    legendPosition: "middle"
+                    legendPosition: 'middle',
                   }}
                   colors={['currentColor']}
                   pointSize={0}
@@ -279,44 +299,44 @@ export function AttestationView({
             <ChartWithStats
               title="Cumulative Distribution"
               headerSize="small"
-              description='The percentage of attestations for the block at a given time'
+              description="The percentage of attestations for the block at a given time"
               height={250}
               chart={
                 <NivoLineChart
                   data={[
                     {
                       id: 'percentage',
-                      data: cdfData.map(d => ({ x: d.time, y: d.percentage }))
-                    }
+                      data: cdfData.map(d => ({ x: d.time, y: d.percentage })),
+                    },
                   ]}
                   margin={{ top: 20, right: 20, left: 60, bottom: 40 }}
                   xScale={{
                     type: 'linear',
                     min: 0,
-                    max: 12
+                    max: 12,
                   }}
                   yScale={{
                     type: 'linear',
                     min: 0,
-                    max: 100
+                    max: 100,
                   }}
                   axisBottom={{
                     tickSize: 5,
                     tickPadding: 5,
                     tickRotation: 0,
                     tickValues: [0, 2, 4, 6, 8, 10, 12],
-                    legend: "Time (s)",
+                    legend: 'Time (s)',
                     legendOffset: 36,
-                    legendPosition: "middle"
+                    legendPosition: 'middle',
                   }}
                   axisLeft={{
                     tickSize: 5,
                     tickPadding: 5,
                     tickRotation: 0,
                     tickValues: [0, 20, 40, 60, 80, 100],
-                    legend: "Percentage",
+                    legend: 'Percentage',
                     legendOffset: -40,
-                    legendPosition: "middle"
+                    legendPosition: 'middle',
                   }}
                   colors={['currentColor']}
                   pointSize={0}
@@ -329,8 +349,8 @@ export function AttestationView({
                       legend: '66%',
                       legendPosition: 'right',
                       legendOrientation: 'vertical',
-                      textStyle: { fill: 'currentColor', fontSize: 12 }
-                    }
+                      textStyle: { fill: 'currentColor', fontSize: 12 },
+                    },
                   ]}
                 />
               }
@@ -342,5 +362,5 @@ export function AttestationView({
         </div>
       </div>
     </div>
-  )
-} 
+  );
+}

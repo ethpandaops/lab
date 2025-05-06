@@ -1,15 +1,28 @@
-import { FC, useMemo } from 'react'
-import { Card, CardBody } from '@/components/common/Card'
-import { LocallyBuiltSlotBlocks } from '@/api/gen/backend/pkg/server/proto/beacon_slots/beacon_slots_pb'
-import { Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend, CartesianGrid, ScatterChart, Scatter, ZAxis } from 'recharts' // Added ScatterChart, Scatter, ZAxis
-import { ChartWithStats } from '@/components/charts/ChartWithStats'
-import { formatBytes } from '@/utils/format.ts' // Import formatBytes
-import { EXECUTION_CLIENTS, CONSENSUS_CLIENTS } from '@/constants/clients.ts' // Import clients
+import { FC, useMemo } from 'react';
+import { Card, CardBody } from '@/components/common/Card';
+import { LocallyBuiltSlotBlocks } from '@/api/gen/backend/pkg/server/proto/beacon_slots/beacon_slots_pb';
+import {
+  Cell,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+  Legend,
+  CartesianGrid,
+  ScatterChart,
+  Scatter,
+  ZAxis,
+} from 'recharts'; // Added ScatterChart, Scatter, ZAxis
+import { ChartWithStats } from '@/components/charts/ChartWithStats';
+import { formatBytes } from '@/utils/format.ts'; // Import formatBytes
+import { EXECUTION_CLIENTS, CONSENSUS_CLIENTS } from '@/constants/clients.ts'; // Import clients
 
 interface LocallyBuiltBlocksVisualizationProps {
-  data: LocallyBuiltSlotBlocks[]
-  isLoading: boolean
-  isError: boolean
+  data: LocallyBuiltSlotBlocks[];
+  isLoading: boolean;
+  isError: boolean;
 }
 
 // Define tooltip interfaces for different chart types
@@ -45,11 +58,12 @@ interface ChartTooltipProps {
 export const LocallyBuiltBlocksVisualization: FC<LocallyBuiltBlocksVisualizationProps> = ({
   data,
   isLoading,
-  isError
+  isError,
 }) => {
   // Process data for last 16 slots client presence
   const last16SlotsPresence = useMemo(() => {
-    if (isLoading || isError || data.length === 0) return { execution: [], consensus: [], slotsShown: 0 };
+    if (isLoading || isError || data.length === 0)
+      return { execution: [], consensus: [], slotsShown: 0 };
 
     const SLOTS_TO_SHOW = 16; // Define the number of slots
 
@@ -94,50 +108,47 @@ export const LocallyBuiltBlocksVisualization: FC<LocallyBuiltBlocksVisualization
     return { execution, consensus, slotsShown: lastSlotNumbers.length }; // Return how many slots are actually shown
   }, [data, isLoading, isError]);
 
-
   // Process data for client distribution
   const clientData = useMemo(() => {
-    if (isLoading || isError || data.length === 0) return []
+    if (isLoading || isError || data.length === 0) return [];
 
-    const clientCounts: Record<string, number> = {}
+    const clientCounts: Record<string, number> = {};
 
     data.forEach(slotBlocks => {
       slotBlocks.blocks.forEach(block => {
-        const clientName = block.metadata?.metaClientName || 'Unknown'
-        clientCounts[clientName] = (clientCounts[clientName] || 0) + 1
-      })
-    })
+        const clientName = block.metadata?.metaClientName || 'Unknown';
+        clientCounts[clientName] = (clientCounts[clientName] || 0) + 1;
+      });
+    });
 
     return Object.entries(clientCounts)
       .map(([name, value]) => ({ name, value }))
-      .sort((a, b) => b.value - a.value)
-  }, [data, isLoading, isError])
+      .sort((a, b) => b.value - a.value);
+  }, [data, isLoading, isError]);
 
   // Process data for location distribution
   const locationData = useMemo(() => {
-    if (isLoading || isError || data.length === 0) return []
+    if (isLoading || isError || data.length === 0) return [];
 
-    const locationCounts: Record<string, number> = {}
+    const locationCounts: Record<string, number> = {};
 
     data.forEach(slotBlocks => {
       slotBlocks.blocks.forEach(block => {
-        const location = block.metadata?.metaClientGeoCountry || 'Unknown'
-        locationCounts[location] = (locationCounts[location] || 0) + 1
-      })
-    })
+        const location = block.metadata?.metaClientGeoCountry || 'Unknown';
+        locationCounts[location] = (locationCounts[location] || 0) + 1;
+      });
+    });
 
     return Object.entries(locationCounts)
       .map(([name, value]) => ({ name, value }))
-      .sort((a, b) => b.value - a.value)
-  }, [data, isLoading, isError])
+      .sort((a, b) => b.value - a.value);
+  }, [data, isLoading, isError]);
 
   // Process data for block size distribution
   const blockSizeData = useMemo(() => {
-    if (isLoading || isError || data.length === 0) return []
+    if (isLoading || isError || data.length === 0) return [];
 
-    const sizes = data.flatMap(slotBlocks =>
-      slotBlocks.blocks.map(block => block.blockTotalBytes)
-    )
+    const sizes = data.flatMap(slotBlocks => slotBlocks.blocks.map(block => block.blockTotalBytes));
 
     // Create size buckets
     const buckets: Record<string, number> = {
@@ -146,31 +157,30 @@ export const LocallyBuiltBlocksVisualization: FC<LocallyBuiltBlocksVisualization
       '200-300KB': 0,
       '300-400KB': 0,
       '400-500KB': 0,
-      '500KB+': 0
-    }
+      '500KB+': 0,
+    };
 
     sizes.forEach(size => {
-      const sizeKB = size / 1024
+      const sizeKB = size / 1024;
 
-      if (sizeKB < 100) buckets['0-100KB']++
-      else if (sizeKB < 200) buckets['100-200KB']++
-      else if (sizeKB < 300) buckets['200-300KB']++
-      else if (sizeKB < 400) buckets['300-400KB']++
-      else if (sizeKB < 500) buckets['400-500KB']++
-      else buckets['500KB+']++
-    })
+      if (sizeKB < 100) buckets['0-100KB']++;
+      else if (sizeKB < 200) buckets['100-200KB']++;
+      else if (sizeKB < 300) buckets['200-300KB']++;
+      else if (sizeKB < 400) buckets['300-400KB']++;
+      else if (sizeKB < 500) buckets['400-500KB']++;
+      else buckets['500KB+']++;
+    });
 
-    return Object.entries(buckets)
-      .map(([name, value]) => ({ name, value }))
-  }, [data, isLoading, isError])
+    return Object.entries(buckets).map(([name, value]) => ({ name, value }));
+  }, [data, isLoading, isError]);
 
   // Process data for transaction count distribution
   const txCountData = useMemo(() => {
-    if (isLoading || isError || data.length === 0) return []
+    if (isLoading || isError || data.length === 0) return [];
 
     const txCounts = data.flatMap(slotBlocks =>
-      slotBlocks.blocks.map(block => block.executionPayloadTransactionsCount)
-    )
+      slotBlocks.blocks.map(block => block.executionPayloadTransactionsCount),
+    );
 
     // Create count buckets
     const buckets: Record<string, number> = {
@@ -179,39 +189,48 @@ export const LocallyBuiltBlocksVisualization: FC<LocallyBuiltBlocksVisualization
       '101-150': 0,
       '151-200': 0,
       '201-250': 0,
-      '250+': 0
-    }
+      '250+': 0,
+    };
 
     txCounts.forEach(count => {
-      if (count < 50) buckets['0-50']++
-      else if (count < 100) buckets['51-100']++
-      else if (count < 150) buckets['101-150']++
-      else if (count < 200) buckets['151-200']++
-      else if (count < 250) buckets['201-250']++
-      else buckets['250+']++
-    })
+      if (count < 50) buckets['0-50']++;
+      else if (count < 100) buckets['51-100']++;
+      else if (count < 150) buckets['101-150']++;
+      else if (count < 200) buckets['151-200']++;
+      else if (count < 250) buckets['201-250']++;
+      else buckets['250+']++;
+    });
 
-    return Object.entries(buckets)
-      .map(([name, value]) => ({ name, value }))
-  }, [data, isLoading, isError])
+    return Object.entries(buckets).map(([name, value]) => ({ name, value }));
+  }, [data, isLoading, isError]);
 
   // Process data for block size vs tx count scatter plot
   const scatterData = useMemo(() => {
-    if (isLoading || isError || data.length === 0) return []
+    if (isLoading || isError || data.length === 0) return [];
 
     return data.flatMap(slotBlocks =>
       slotBlocks.blocks.map(block => ({
         x: block.executionPayloadTransactionsCount, // Transaction Count
         y: block.blockTotalBytes, // Block Size
-        z: block.metadata?.metaClientName || 'Unknown' // Client Name for color/tooltip
-      }))
-    )
-  }, [data, isLoading, isError])
+        z: block.metadata?.metaClientName || 'Unknown', // Client Name for color/tooltip
+      })),
+    );
+  }, [data, isLoading, isError]);
 
   const COLORS = [
-    '#8884d8', '#82ca9d', '#ffc658', '#ff8042', '#0088FE', '#00C49F',
-    '#FFBB28', '#FF8042', '#a4de6c', '#d0ed57', '#83a6ed', '#6a4c93'
-  ]
+    '#8884d8',
+    '#82ca9d',
+    '#ffc658',
+    '#ff8042',
+    '#0088FE',
+    '#00C49F',
+    '#FFBB28',
+    '#FF8042',
+    '#a4de6c',
+    '#d0ed57',
+    '#83a6ed',
+    '#6a4c93',
+  ];
 
   // Custom tooltip for charts
   const CustomTooltip = ({ active, payload, label }: ChartTooltipProps) => {
@@ -222,7 +241,14 @@ export const LocallyBuiltBlocksVisualization: FC<LocallyBuiltBlocksVisualization
           {(() => {
             const item = payload[0];
             // Check if it's scatter chart payload (has nested payload with x, y, z)
-            if (item && 'payload' in item && item.payload && 'x' in item.payload && 'y' in item.payload && 'z' in item.payload) {
+            if (
+              item &&
+              'payload' in item &&
+              item.payload &&
+              'x' in item.payload &&
+              'y' in item.payload &&
+              'z' in item.payload
+            ) {
               const scatterItem = item as ScatterPayloadItem;
               return (
                 <>
@@ -242,10 +268,10 @@ export const LocallyBuiltBlocksVisualization: FC<LocallyBuiltBlocksVisualization
             return null; // Fallback if payload structure is unexpected
           })()}
         </div>
-      )
+      );
     }
-    return null
-  }
+    return null;
+  };
 
   if (isLoading) {
     return (
@@ -260,7 +286,7 @@ export const LocallyBuiltBlocksVisualization: FC<LocallyBuiltBlocksVisualization
           </div>
         </CardBody>
       </Card>
-    )
+    );
   }
 
   if (isError) {
@@ -268,11 +294,13 @@ export const LocallyBuiltBlocksVisualization: FC<LocallyBuiltBlocksVisualization
       <Card>
         <CardBody>
           <div className="text-center py-6">
-            <p className="text-error font-mono">Error loading visualization data. Please try again.</p>
+            <p className="text-error font-mono">
+              Error loading visualization data. Please try again.
+            </p>
           </div>
         </CardBody>
       </Card>
-    )
+    );
   }
 
   if (data.length === 0) {
@@ -284,14 +312,16 @@ export const LocallyBuiltBlocksVisualization: FC<LocallyBuiltBlocksVisualization
           </div>
         </CardBody>
       </Card>
-    )
+    );
   }
 
   const SLOTS_TO_SHOW = 16; // Define constant here as well for the indicator
 
   // Small component to render the N slot presence indicators
   const SlotPresenceIndicator: FC<{ presence: boolean[] }> = ({ presence }) => (
-    <div className="flex space-x-0.5"> {/* Reduced space for more squares */}
+    <div className="flex space-x-0.5">
+      {' '}
+      {/* Reduced space for more squares */}
       {/* Pending Slot Indicator */}
       <div
         key="pending"
@@ -308,7 +338,7 @@ export const LocallyBuiltBlocksVisualization: FC<LocallyBuiltBlocksVisualization
       ))}
       {/* Pad with empty slots if less than N */}
       {Array.from({ length: Math.max(0, SLOTS_TO_SHOW - presence.length) }).map((_, index) => (
-         <div
+        <div
           key={`pad-${index}`}
           className="w-2 h-3 rounded-sm bg-subtle opacity-50 transition-all duration-300 ease-in-out" // Made slightly narrower, added transition
         />
@@ -319,43 +349,41 @@ export const LocallyBuiltBlocksVisualization: FC<LocallyBuiltBlocksVisualization
   return (
     <div className="space-y-6">
       {/* Block Size vs. Transaction Count (Full Width) */}
-       <ChartWithStats
-          title="Block Size vs. Transaction Count"
-          description="Relationship between block size and transaction count"
-          chart={
-            <ResponsiveContainer width="100%" height={300}>
-              <ScatterChart
-                margin={{ top: 20, right: 20, bottom: 20, left: 20 }}
-              >
-                <CartesianGrid strokeDasharray="3 3" opacity={0.1} />
-                <XAxis
-                  type="number"
-                  dataKey="x"
-                  name="Transaction Count"
-                  label={{ value: 'Transaction Count', position: 'insideBottom', offset: -10 }}
-                  tick={{ fontSize: 12 }}
-                />
-                <YAxis
-                  type="number"
-                  dataKey="y"
-                  name="Block Size"
-                  label={{ value: 'Block Size', angle: -90, position: 'insideLeft' }}
-                  tickFormatter={formatBytes} // Use formatBytes for Y-axis ticks
-                  tick={{ fontSize: 12 }}
-                />
-                <ZAxis type="category" dataKey="z" name="Client" />
-                <Tooltip content={<CustomTooltip />} cursor={{ strokeDasharray: '3 3' }} />
-                <Legend />
-                <Scatter name="Blocks" data={scatterData} fill="#8884d8">
-                  {scatterData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                  ))}
-                </Scatter>
-              </ScatterChart>
-            </ResponsiveContainer>
-          }
-          series={[]} // Add empty series prop to satisfy ChartWithStatsProps
-        />
+      <ChartWithStats
+        title="Block Size vs. Transaction Count"
+        description="Relationship between block size and transaction count"
+        chart={
+          <ResponsiveContainer width="100%" height={300}>
+            <ScatterChart margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
+              <CartesianGrid strokeDasharray="3 3" opacity={0.1} />
+              <XAxis
+                type="number"
+                dataKey="x"
+                name="Transaction Count"
+                label={{ value: 'Transaction Count', position: 'insideBottom', offset: -10 }}
+                tick={{ fontSize: 12 }}
+              />
+              <YAxis
+                type="number"
+                dataKey="y"
+                name="Block Size"
+                label={{ value: 'Block Size', angle: -90, position: 'insideLeft' }}
+                tickFormatter={formatBytes} // Use formatBytes for Y-axis ticks
+                tick={{ fontSize: 12 }}
+              />
+              <ZAxis type="category" dataKey="z" name="Client" />
+              <Tooltip content={<CustomTooltip />} cursor={{ strokeDasharray: '3 3' }} />
+              <Legend />
+              <Scatter name="Blocks" data={scatterData} fill="#8884d8">
+                {scatterData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                ))}
+              </Scatter>
+            </ScatterChart>
+          </ResponsiveContainer>
+        }
+        series={[]} // Add empty series prop to satisfy ChartWithStatsProps
+      />
 
       {/* Other Distributions (Two Columns) */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -393,7 +421,7 @@ export const LocallyBuiltBlocksVisualization: FC<LocallyBuiltBlocksVisualization
             min: 0,
             max: item.value,
             avg: item.value,
-            last: item.value
+            last: item.value,
           }))}
         />
 
@@ -431,7 +459,7 @@ export const LocallyBuiltBlocksVisualization: FC<LocallyBuiltBlocksVisualization
             min: 0,
             max: item.value,
             avg: item.value,
-            last: item.value
+            last: item.value,
           }))}
         />
 
@@ -441,10 +469,7 @@ export const LocallyBuiltBlocksVisualization: FC<LocallyBuiltBlocksVisualization
           description="Distribution of blocks by size"
           chart={
             <ResponsiveContainer width="100%" height={300}>
-              <BarChart
-                data={blockSizeData}
-                margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-              >
+              <BarChart data={blockSizeData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
                 <CartesianGrid strokeDasharray="3 3" opacity={0.1} />
                 <XAxis
                   dataKey="name"
@@ -467,7 +492,7 @@ export const LocallyBuiltBlocksVisualization: FC<LocallyBuiltBlocksVisualization
             min: 0,
             max: item.value,
             avg: item.value,
-            last: item.value
+            last: item.value,
           }))}
         />
 
@@ -477,10 +502,7 @@ export const LocallyBuiltBlocksVisualization: FC<LocallyBuiltBlocksVisualization
           description="Distribution of blocks by transaction count"
           chart={
             <ResponsiveContainer width="100%" height={300}>
-              <BarChart
-                data={txCountData}
-                margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-              >
+              <BarChart data={txCountData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
                 <CartesianGrid strokeDasharray="3 3" opacity={0.1} />
                 <XAxis
                   dataKey="name"
@@ -503,10 +525,10 @@ export const LocallyBuiltBlocksVisualization: FC<LocallyBuiltBlocksVisualization
             min: 0,
             max: item.value,
             avg: item.value,
-            last: item.value
+            last: item.value,
           }))}
         />
       </div>
     </div>
-  )
-}
+  );
+};

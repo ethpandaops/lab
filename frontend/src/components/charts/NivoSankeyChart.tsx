@@ -1,13 +1,14 @@
-import { ResponsiveSankey, SankeySvgProps, DefaultNode, DefaultLink } from '@nivo/sankey'
-import { withNivoTheme } from '@/components/charts/NivoProvider'
-import { defaultNivoTheme } from '@/components/charts/NivoTheme.ts'
+import { ResponsiveSankey, SankeySvgProps, DefaultNode, DefaultLink } from '@nivo/sankey';
+import { withNivoTheme } from '@/components/charts/NivoProvider';
+import { defaultNivoTheme } from '@/components/charts/NivoTheme.ts';
 
 // Create a themed version of ResponsiveSankey
-export const ThemedResponsiveSankey = withNivoTheme(ResponsiveSankey)
+export const ThemedResponsiveSankey = withNivoTheme(ResponsiveSankey);
 
-export interface NivoSankeyChartProps extends Omit<SankeySvgProps<DefaultNode, DefaultLink>, 'height' | 'width'> {
-  height?: number | string
-  width?: number | string
+export interface NivoSankeyChartProps
+  extends Omit<SankeySvgProps<DefaultNode, DefaultLink>, 'height' | 'width'> {
+  height?: number | string;
+  width?: number | string;
 }
 
 /**
@@ -49,5 +50,5 @@ export const NivoSankeyChart = ({
         {...rest}
       />
     </div>
-  )
-} 
+  );
+};

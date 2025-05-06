@@ -19,12 +19,14 @@ const StageCard: React.FC<StageCardProps> = ({
   isInPropagationPhase,
   subtitle,
   value,
-  className
+  className,
 }) => {
   return (
-    <div className={`p-2 rounded-lg border ${isActive ? 'bg-surface border-subtle' : 'bg-surface/90 border-subtle/50 opacity-80'} transition-opacity duration-300 ${className}`}>
+    <div
+      className={`p-2 rounded-lg border ${isActive ? 'bg-surface border-subtle' : 'bg-surface/90 border-subtle/50 opacity-80'} transition-opacity duration-300 ${className}`}
+    >
       <div className="flex items-center">
-        <div 
+        <div
           className={`w-10 h-10 flex items-center justify-center rounded-full mr-3 shadow-md transition-colors duration-500 ${
             isActive
               ? !isInPropagationPhase
@@ -33,9 +35,9 @@ const StageCard: React.FC<StageCardProps> = ({
               : 'bg-surface/20 border border-subtle/50 opacity-50' // More dull when inactive
           }`}
         >
-          <div 
-            className={`text-xl ${isActive ? 'opacity-70' : 'opacity-40'}`} 
-            role="img" 
+          <div
+            className={`text-xl ${isActive ? 'opacity-70' : 'opacity-40'}`}
+            role="img"
             aria-label={emojiLabel}
           >
             {emoji}
@@ -43,15 +45,9 @@ const StageCard: React.FC<StageCardProps> = ({
         </div>
         <div className="flex-1">
           <div className="font-medium text-sm">{title}</div>
-          <div className="text-xs text-tertiary">
-            {subtitle}
-          </div>
+          <div className="text-xs text-tertiary">{subtitle}</div>
         </div>
-        {value && (
-          <div className="text-xs font-mono text-success">
-            {value}
-          </div>
-        )}
+        {value && <div className="text-xs font-mono text-success">{value}</div>}
       </div>
     </div>
   );

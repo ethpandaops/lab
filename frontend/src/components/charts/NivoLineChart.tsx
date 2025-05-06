@@ -1,13 +1,13 @@
-import { ResponsiveLine, LineProps } from '@nivo/line'
-import { withNivoTheme } from '@/components/charts/NivoProvider'
-import { defaultNivoTheme } from '@/components/charts/NivoTheme.ts'
+import { ResponsiveLine, LineProps } from '@nivo/line';
+import { withNivoTheme } from '@/components/charts/NivoProvider';
+import { defaultNivoTheme } from '@/components/charts/NivoTheme.ts';
 
 // Create a themed version of ResponsiveLine
-export const ThemedResponsiveLine = withNivoTheme(ResponsiveLine)
+export const ThemedResponsiveLine = withNivoTheme(ResponsiveLine);
 
 export interface NivoLineChartProps extends Omit<LineProps, 'height' | 'width'> {
-  height?: number | string
-  width?: number | string
+  height?: number | string;
+  width?: number | string;
 }
 
 /**
@@ -24,7 +24,7 @@ export const NivoLineChart = ({
     tickRotation: 0,
     legend: 'Time',
     legendOffset: 36,
-    legendPosition: 'middle'
+    legendPosition: 'middle',
   },
   axisLeft = {
     tickSize: 5,
@@ -32,7 +32,7 @@ export const NivoLineChart = ({
     tickRotation: 0,
     legend: 'Value',
     legendOffset: -40,
-    legendPosition: 'middle'
+    legendPosition: 'middle',
   },
   enableGridX = true,
   enableGridY = true,
@@ -63,5 +63,5 @@ export const NivoLineChart = ({
         {...rest}
       />
     </div>
-  )
-} 
+  );
+};

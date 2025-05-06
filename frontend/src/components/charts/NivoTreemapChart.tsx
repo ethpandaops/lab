@@ -1,43 +1,43 @@
-import { ResponsiveTreeMap } from '@nivo/treemap'
-import { withNivoTheme } from './NivoProvider'
-import { defaultNivoTheme } from './NivoTheme'
+import { ResponsiveTreeMap } from '@nivo/treemap';
+import { withNivoTheme } from './NivoProvider';
+import { defaultNivoTheme } from './NivoTheme';
 
 // Themed component using HOC
-export const ThemedResponsiveTreeMap = withNivoTheme(ResponsiveTreeMap)
+export const ThemedResponsiveTreeMap = withNivoTheme(ResponsiveTreeMap);
 
 // TreeMap data node type
 export interface TreeMapNode {
-  id: string
-  value?: number
-  children?: TreeMapNode[]
-  color?: string
-  [key: string]: any
+  id: string;
+  value?: number;
+  children?: TreeMapNode[];
+  color?: string;
+  [key: string]: any;
 }
 
 export interface NivoTreemapChartProps {
   // Base props
-  data: TreeMapNode
-  height?: number | string
-  width?: number | string
-  
+  data: TreeMapNode;
+  height?: number | string;
+  width?: number | string;
+
   // Visual options
-  valueFormat?: string
-  padding?: number
-  margin?: { top?: number; right?: number; bottom?: number; left?: number }
-  colors?: string[] | ((node: TreeMapNode) => string)
-  colorBy?: 'id' | 'depth' | ((node: TreeMapNode) => string)
-  borderWidth?: number
-  borderColor?: string | ((node: TreeMapNode) => string)
-  
+  valueFormat?: string;
+  padding?: number;
+  margin?: { top?: number; right?: number; bottom?: number; left?: number };
+  colors?: string[] | ((node: TreeMapNode) => string);
+  colorBy?: 'id' | 'depth' | ((node: TreeMapNode) => string);
+  borderWidth?: number;
+  borderColor?: string | ((node: TreeMapNode) => string);
+
   // Enable/disable features
-  enableLabel?: boolean
-  enableParentLabel?: boolean
-  orientLabel?: boolean
-  
+  enableLabel?: boolean;
+  enableParentLabel?: boolean;
+  orientLabel?: boolean;
+
   // Interaction props
-  isInteractive?: boolean
-  onClick?: (node: TreeMapNode, event: React.MouseEvent) => void
-  tooltip?: React.ComponentType<{ node: TreeMapNode }>
+  isInteractive?: boolean;
+  onClick?: (node: TreeMapNode, event: React.MouseEvent) => void;
+  tooltip?: React.ComponentType<{ node: TreeMapNode }>;
 }
 
 export const NivoTreemapChart = ({
@@ -88,7 +88,7 @@ export const NivoTreemapChart = ({
         nodeOpacity={1}
       />
     </div>
-  )
-}
+  );
+};
 
-export default NivoTreemapChart
+export default NivoTreemapChart;

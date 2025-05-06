@@ -28,4 +28,4 @@ export const PERCENTILE_KEYS = {
   min: 'min',
 } as const;
 
-export type PercentileKey = keyof typeof PERCENTILE_KEYS; 
+export type PercentileKey = keyof typeof PERCENTILE_KEYS;

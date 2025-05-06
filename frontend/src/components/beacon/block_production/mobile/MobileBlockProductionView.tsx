@@ -44,30 +44,30 @@ const MobileBlockProductionView: React.FC<MobileBlockProductionViewProps> = ({
   resetToCurrentSlot,
   togglePlayPause,
   isNextDisabled,
-  network
+  network,
 }) => {
   // Get active status based on role and phase
   const isActive = (role: 'builder' | 'relay' | 'proposer' | 'node') => {
     // Determine transition point - when first node saw block or fallback to 5s
     let transitionTime = 5000; // Default fallback transition time
-    
+
     // Try to find earliest node timing from available data
     let earliestNodeTime = Infinity;
-    
+
     // Check API timings
     Object.values(nodeBlockSeen).forEach(time => {
       if (typeof time === 'number') {
         earliestNodeTime = Math.min(earliestNodeTime, time);
       }
     });
-    
+
     // Check P2P timings
     Object.values(nodeBlockP2P).forEach(time => {
       if (typeof time === 'number') {
         earliestNodeTime = Math.min(earliestNodeTime, time);
       }
     });
-    
+
     // If we have real timing data, use it as transition point
     if (earliestNodeTime !== Infinity) {
       transitionTime = earliestNodeTime;
@@ -81,34 +81,36 @@ const MobileBlockProductionView: React.FC<MobileBlockProductionViewProps> = ({
         transitionTime = winningBidTime + 1000; // Roughly 1s after winning bid
       }
     }
-    
+
     // For each role, determine if it's active based on the phase
     // Modified to keep icons active once they've been activated during the slot
     switch (role) {
       case 'builder':
         // Builders are always active
         return true;
-        
+
       case 'relay':
         // Relays are always active
         return true;
-        
+
       case 'proposer':
         // Proposer activates just before transition to propagation and stays active
-        return currentTime >= (transitionTime - 500);
-        
+        return currentTime >= transitionTime - 500;
+
       case 'node':
         // Nodes activate at the transition point and stay active
         return currentTime >= transitionTime;
     }
-    
+
     // Function should never reach here since all cases are handled above
     return false;
   };
 
   // Count unique relays
   const activeRelays = useMemo(() => {
-    const relaysSet = new Set(bids.filter(bid => bid.time <= currentTime).map(bid => bid.relayName));
+    const relaysSet = new Set(
+      bids.filter(bid => bid.time <= currentTime).map(bid => bid.relayName),
+    );
     return relaysSet.size;
   }, [bids, currentTime]);
 
@@ -116,7 +118,7 @@ const MobileBlockProductionView: React.FC<MobileBlockProductionViewProps> = ({
   const firstContinentToSeeBlock = useMemo(() => {
     let earliestContinent = null;
     let earliestTime = Infinity;
-    
+
     // Create a mapping of nodes to continents
     const nodeContinent: Record<string, string> = {};
     Object.entries(nodes).forEach(([nodeId, node]) => {
@@ -124,7 +126,7 @@ const MobileBlockProductionView: React.FC<MobileBlockProductionViewProps> = ({
         nodeContinent[nodeId] = node.geo.continent;
       }
     });
-    
+
     // Examine API timings
     Object.entries(nodeBlockSeen).forEach(([nodeId, time]) => {
       if (typeof time === 'number' && time <= currentTime) {
@@ -135,7 +137,7 @@ const MobileBlockProductionView: React.FC<MobileBlockProductionViewProps> = ({
         }
       }
     });
-    
+
     // Examine P2P timings
     Object.entries(nodeBlockP2P).forEach(([nodeId, time]) => {
       if (typeof time === 'number' && time <= currentTime) {
@@ -146,26 +148,26 @@ const MobileBlockProductionView: React.FC<MobileBlockProductionViewProps> = ({
         }
       }
     });
-    
+
     // Map continent code to full name
     const continentFullNames: Record<string, string> = {
-      'NA': 'North America',
-      'SA': 'South America',
-      'EU': 'Europe',
-      'AS': 'Asia',
-      'AF': 'Africa',
-      'OC': 'Oceania',
-      'AN': 'Antarctica'
+      NA: 'North America',
+      SA: 'South America',
+      EU: 'Europe',
+      AS: 'Asia',
+      AF: 'Africa',
+      OC: 'Oceania',
+      AN: 'Antarctica',
     };
-    
+
     return earliestContinent ? continentFullNames[earliestContinent] || earliestContinent : null;
   }, [nodes, nodeBlockSeen, nodeBlockP2P, currentTime]);
-  
+
   return (
     <div className="flex flex-col w-full">
       {/* Timeline with Phase Icons and Key Information - solid background */}
       <div className="bg-surface border border-subtle shadow-sm rounded-lg mb-3">
-        <MobileTimelineBar 
+        <MobileTimelineBar
           currentTime={currentTime}
           nodeBlockSeen={nodeBlockSeen}
           nodeBlockP2P={nodeBlockP2P}
@@ -185,36 +187,42 @@ const MobileBlockProductionView: React.FC<MobileBlockProductionViewProps> = ({
         {/* Mobile-optimized cards for each stage */}
         <div className="grid grid-cols-1 gap-3 p-3">
           {/* Builders Stage */}
-          <StageCard 
+          <StageCard
             title="Builders"
             emoji="🤖"
             emojiLabel="Robot (Builder)"
             isActive={isActive('builder')}
             isInPropagationPhase={isInPropagationPhase(currentTime, nodeBlockSeen, nodeBlockP2P)}
-            subtitle={bids.length > 0 
-              ? `${countUniqueBuilderPubkeys(bids)} builder${countUniqueBuilderPubkeys(bids) > 1 ? 's' : ''} total` 
-              : 'Waiting for blocks...'}
+            subtitle={
+              bids.length > 0
+                ? `${countUniqueBuilderPubkeys(bids)} builder${countUniqueBuilderPubkeys(bids) > 1 ? 's' : ''} total`
+                : 'Waiting for blocks...'
+            }
             value={winningBid ? `${winningBid.value.toFixed(2)} ETH` : undefined}
           />
 
           {/* Relays Stage */}
-          <StageCard 
+          <StageCard
             title="MEV Relays"
             emoji="🔄"
             emojiLabel="MEV Relay"
             isActive={isActive('relay')}
             isInPropagationPhase={isInPropagationPhase(currentTime, nodeBlockSeen, nodeBlockP2P)}
-            subtitle={winningBid 
-              ? `via ${winningBid.relayName}` 
-              : activeRelays > 0 
-                ? `${activeRelays} relay${activeRelays > 1 ? 's' : ''}` 
-                : 'Waiting for relays...'}
+            subtitle={
+              winningBid
+                ? `via ${winningBid.relayName}`
+                : activeRelays > 0
+                  ? `${activeRelays} relay${activeRelays > 1 ? 's' : ''}`
+                  : 'Waiting for relays...'
+            }
           />
 
           {/* Proposer Stage - Beacon Block Card */}
-          <div className={`rounded-lg overflow-hidden border shadow-sm ${isActive('proposer') ? 'bg-surface border-subtle' : 'bg-surface/90 border-subtle/50 opacity-80'} transition-opacity duration-300`}>
+          <div
+            className={`rounded-lg overflow-hidden border shadow-sm ${isActive('proposer') ? 'bg-surface border-subtle' : 'bg-surface/90 border-subtle/50 opacity-80'} transition-opacity duration-300`}
+          >
             <div className="flex items-center p-2 border-b border-subtle/20">
-              <div 
+              <div
                 className={`w-10 h-10 flex items-center justify-center rounded-full mr-3 shadow-md transition-colors duration-500 ${
                   isActive('proposer')
                     ? isInPropagationPhase(currentTime, nodeBlockSeen, nodeBlockP2P)
@@ -223,9 +231,9 @@ const MobileBlockProductionView: React.FC<MobileBlockProductionViewProps> = ({
                     : 'bg-surface/20 border border-subtle/50 opacity-50' // More dull when inactive
                 }`}
               >
-                <div 
-                  className={`text-xl ${isActive('proposer') ? 'opacity-70' : 'opacity-40'}`} 
-                  role="img" 
+                <div
+                  className={`text-xl ${isActive('proposer') ? 'opacity-70' : 'opacity-40'}`}
+                  role="img"
                   aria-label="Proposer"
                 >
                   👤
@@ -245,7 +253,7 @@ const MobileBlockProductionView: React.FC<MobileBlockProductionViewProps> = ({
                 </div>
               )}
             </div>
-            
+
             {/* Blockchain visualization */}
             <div className="p-2 h-[180px] overflow-hidden">
               <BlockchainVisualization
@@ -262,9 +270,11 @@ const MobileBlockProductionView: React.FC<MobileBlockProductionViewProps> = ({
           </div>
 
           {/* Network Nodes Stage */}
-          <div className={`p-2 rounded-lg border shadow-sm ${isActive('node') ? 'bg-surface border-subtle' : 'bg-surface/90 border-subtle/50 opacity-80'} transition-opacity duration-300`}>
+          <div
+            className={`p-2 rounded-lg border shadow-sm ${isActive('node') ? 'bg-surface border-subtle' : 'bg-surface/90 border-subtle/50 opacity-80'} transition-opacity duration-300`}
+          >
             <div className="flex items-center mb-2">
-              <div 
+              <div
                 className={`w-10 h-10 flex items-center justify-center rounded-full mr-3 shadow-md transition-colors duration-500 ${
                   isActive('node')
                     ? isInPropagationPhase(currentTime, nodeBlockSeen, nodeBlockP2P)
@@ -273,9 +283,9 @@ const MobileBlockProductionView: React.FC<MobileBlockProductionViewProps> = ({
                     : 'bg-surface/20 border border-subtle/50 opacity-50' // More dull when inactive
                 }`}
               >
-                <div 
-                  className={`text-xl ${isActive('node') ? 'opacity-70' : 'opacity-40'}`} 
-                  role="img" 
+                <div
+                  className={`text-xl ${isActive('node') ? 'opacity-70' : 'opacity-40'}`}
+                  role="img"
                   aria-label="Network Nodes"
                 >
                   🖥️
@@ -284,14 +294,16 @@ const MobileBlockProductionView: React.FC<MobileBlockProductionViewProps> = ({
               <div className="flex-1">
                 <div className="font-medium text-sm">Network</div>
                 <div className="text-xs text-tertiary">
-                  {firstContinentToSeeBlock ? `First in ${firstContinentToSeeBlock}` : 'Waiting for propagation...'}
+                  {firstContinentToSeeBlock
+                    ? `First in ${firstContinentToSeeBlock}`
+                    : 'Waiting for propagation...'}
                 </div>
               </div>
             </div>
-            
+
             {/* Continent progress bars */}
             {isActive('node') && (
-              <MobileContinentsPanel 
+              <MobileContinentsPanel
                 nodes={nodes}
                 nodeBlockSeen={nodeBlockSeen}
                 nodeBlockP2P={nodeBlockP2P}

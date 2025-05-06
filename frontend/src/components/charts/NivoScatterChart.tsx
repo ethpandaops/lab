@@ -1,38 +1,39 @@
-import { ResponsiveScatterPlot, ScatterPlotDatum, ScatterPlotSvgProps } from '@nivo/scatterplot'
-import { withNivoTheme } from '@/components/charts/NivoProvider'
-import { defaultNivoTheme } from '@/components/charts/NivoTheme.ts'
-import { ComponentType } from 'react'
+import { ResponsiveScatterPlot, ScatterPlotDatum, ScatterPlotSvgProps } from '@nivo/scatterplot';
+import { withNivoTheme } from '@/components/charts/NivoProvider';
+import { defaultNivoTheme } from '@/components/charts/NivoTheme.ts';
+import { ComponentType } from 'react';
 
 // Create a themed version of ResponsiveScatterPlot
-export const ThemedResponsiveScatterPlot = withNivoTheme(ResponsiveScatterPlot)
+export const ThemedResponsiveScatterPlot = withNivoTheme(ResponsiveScatterPlot);
 
 // Define the node render props type
 export interface NodeRenderProps {
   node: {
-    id: string | number
-    serieId: string | number
+    id: string | number;
+    serieId: string | number;
     data: {
-      x: number
-      y: number
-      [key: string]: any
-    }
-    [key: string]: any
-  }
-  x: number
-  y: number
-  size: number
-  color: string
-  blendMode: string
-  onMouseEnter: () => void
-  onMouseMove: () => void
-  onMouseLeave: () => void
-  onClick: () => void
+      x: number;
+      y: number;
+      [key: string]: any;
+    };
+    [key: string]: any;
+  };
+  x: number;
+  y: number;
+  size: number;
+  color: string;
+  blendMode: string;
+  onMouseEnter: () => void;
+  onMouseMove: () => void;
+  onMouseLeave: () => void;
+  onClick: () => void;
 }
 
-export interface NivoScatterChartProps extends Omit<ScatterPlotSvgProps<ScatterPlotDatum>, 'height' | 'width'> {
-  height?: number | string
-  width?: number | string
-  nodeComponent?: ComponentType<any>
+export interface NivoScatterChartProps
+  extends Omit<ScatterPlotSvgProps<ScatterPlotDatum>, 'height' | 'width'> {
+  height?: number | string;
+  width?: number | string;
+  nodeComponent?: ComponentType<any>;
 }
 
 /**
@@ -51,7 +52,7 @@ export const NivoScatterChart = ({
     tickRotation: 0,
     legend: 'X',
     legendOffset: 36,
-    legendPosition: 'middle'
+    legendPosition: 'middle',
   },
   axisLeft = {
     tickSize: 5,
@@ -59,7 +60,7 @@ export const NivoScatterChart = ({
     tickRotation: 0,
     legend: 'Y',
     legendOffset: -40,
-    legendPosition: 'middle'
+    legendPosition: 'middle',
   },
   enableGridX = true,
   enableGridY = true,
@@ -88,5 +89,5 @@ export const NivoScatterChart = ({
         {...rest}
       />
     </div>
-  )
-} 
+  );
+};

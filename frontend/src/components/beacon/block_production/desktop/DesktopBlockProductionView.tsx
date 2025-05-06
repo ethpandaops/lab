@@ -36,7 +36,7 @@ interface DesktopBlockProductionViewProps extends BlockProductionBaseProps {
   };
   // Optional callback to notify parent component when the phase changes
   onPhaseChange?: (phase: Phase) => void;
-  
+
   // Navigation controls for merged timeline
   slotNumber: number | null;
   headLagSlots: number;
@@ -77,30 +77,30 @@ const DesktopBlockProductionView: React.FC<DesktopBlockProductionViewProps> = ({
   resetToCurrentSlot,
   togglePlayPause,
   isNextDisabled,
-  network
+  network,
 }) => {
   // Get active status based on role and phase
   const isActive = (role: 'builder' | 'relay' | 'proposer' | 'node') => {
     // Determine transition point - when first node saw block or fallback to 5s
     let transitionTime = 5000; // Default fallback transition time
-    
+
     // Try to find earliest node timing from available data
     let earliestNodeTime = Infinity;
-    
+
     // Check API timings
     Object.values(nodeBlockSeen).forEach(time => {
       if (typeof time === 'number') {
         earliestNodeTime = Math.min(earliestNodeTime, time);
       }
     });
-    
+
     // Check P2P timings
     Object.values(nodeBlockP2P).forEach(time => {
       if (typeof time === 'number') {
         earliestNodeTime = Math.min(earliestNodeTime, time);
       }
     });
-    
+
     // If we have real timing data, use it as transition point
     if (earliestNodeTime !== Infinity) {
       transitionTime = earliestNodeTime;
@@ -114,78 +114,79 @@ const DesktopBlockProductionView: React.FC<DesktopBlockProductionViewProps> = ({
         transitionTime = winningBidTime + 1000; // Roughly 1s after winning bid
       }
     }
-    
+
     // For each role, determine if it's active based on the phase
     // Modified to keep entities active once they've been activated during the slot
     switch (role) {
       case 'builder':
         // Builders are always active
         return true;
-        
+
       case 'relay':
         // Relays are always active
         return true;
-        
+
       case 'proposer':
         // Proposer activates just before transition to propagation and stays active
-        return currentTime >= (transitionTime - 500);
-        
+        return currentTime >= transitionTime - 500;
+
       case 'node':
         // Nodes activate at the transition point and stays active
         return currentTime >= transitionTime;
     }
-    
+
     // Function should never reach here since all cases are handled above
     return false;
   };
 
   // Get the current phase
   const currentPhase = useMemo(() => {
-    return getCurrentPhase(
-      currentTime,
-      nodeBlockSeen || {},
-      nodeBlockP2P || {},
-      blockTime
-    );
+    return getCurrentPhase(currentTime, nodeBlockSeen || {}, nodeBlockP2P || {}, blockTime);
   }, [currentTime, nodeBlockSeen, nodeBlockP2P, blockTime]);
 
   // Calculate which continent saw the block first
   const firstContinentToSeeBlock = useMemo(() => {
     // Map of continent codes to full names
     const continentNames: Record<string, string> = {
-      'NA': 'North America',
-      'SA': 'South America',
-      'EU': 'Europe',
-      'AS': 'Asia',
-      'AF': 'Africa',
-      'OC': 'Oceania',
-      'AN': 'Antarctica'
+      NA: 'North America',
+      SA: 'South America',
+      EU: 'Europe',
+      AS: 'Asia',
+      AF: 'Africa',
+      OC: 'Oceania',
+      AN: 'Antarctica',
     };
-    
+
     if (!Object.keys(nodeBlockSeen).length && !Object.keys(nodeBlockP2P).length) {
       return null;
     }
-    
+
     // Combine API and P2P block seen timings
-    const nodeBlockSeen1 = Object.fromEntries(Object.entries(nodeBlockSeen).map(([node, time]) => 
-      [node, typeof time === 'bigint' ? Number(time) : Number(time)]
-    ));
-      
-    const nodeBlockP2P1 = Object.fromEntries(Object.entries(nodeBlockP2P).map(([node, time]) => 
-      [node, typeof time === 'bigint' ? Number(time) : Number(time)]
-    ));
-    
+    const nodeBlockSeen1 = Object.fromEntries(
+      Object.entries(nodeBlockSeen).map(([node, time]) => [
+        node,
+        typeof time === 'bigint' ? Number(time) : Number(time),
+      ]),
+    );
+
+    const nodeBlockP2P1 = Object.fromEntries(
+      Object.entries(nodeBlockP2P).map(([node, time]) => [
+        node,
+        typeof time === 'bigint' ? Number(time) : Number(time),
+      ]),
+    );
+
     // Get earliest node timings grouped by continent
     const continentTimings: Record<string, number> = {};
     const nodeContinent: Record<string, string> = {};
-    
+
     // Map nodes to continents
     Object.entries(nodes).forEach(([nodeId, node]) => {
       if (node.geo?.continent) {
         nodeContinent[nodeId] = node.geo.continent;
       }
     });
-    
+
     // Process API timings
     Object.entries(nodeBlockSeen1).forEach(([nodeId, time]) => {
       const continent = nodeContinent[nodeId];
@@ -195,7 +196,7 @@ const DesktopBlockProductionView: React.FC<DesktopBlockProductionViewProps> = ({
         }
       }
     });
-    
+
     // Process P2P timings
     Object.entries(nodeBlockP2P1).forEach(([nodeId, time]) => {
       const continent = nodeContinent[nodeId];
@@ -205,18 +206,18 @@ const DesktopBlockProductionView: React.FC<DesktopBlockProductionViewProps> = ({
         }
       }
     });
-    
+
     // Find earliest continent
     let earliestContinent = null;
     let earliestTime = Infinity;
-    
+
     Object.entries(continentTimings).forEach(([continent, time]) => {
       if (time < earliestTime) {
         earliestTime = time;
         earliestContinent = continent;
       }
     });
-    
+
     // Return full continent name if available
     return earliestContinent ? continentNames[earliestContinent] || earliestContinent : null;
   }, [nodeBlockSeen, nodeBlockP2P, nodes, currentTime]);
@@ -224,12 +225,12 @@ const DesktopBlockProductionView: React.FC<DesktopBlockProductionViewProps> = ({
   return (
     <div className="h-full flex flex-col">
       <style jsx>{flowAnimations}</style>
-      
+
       {/* Hero section with solid background */}
       <div className="bg-surface border-b border-subtle mb-3 shadow-sm">
         {/* Timeline Header with solid background */}
         <div className="px-4 pt-3 pb-2">
-          <PhaseTimeline 
+          <PhaseTimeline
             currentTime={currentTime}
             nodeBlockSeen={nodeBlockSeen}
             nodeBlockP2P={nodeBlockP2P}
@@ -252,7 +253,7 @@ const DesktopBlockProductionView: React.FC<DesktopBlockProductionViewProps> = ({
 
         {/* Phase Icons Section with clean separation - increased height */}
         <div className="px-4 py-10 bg-background-alt border-y border-border/30">
-          <PhaseIcons 
+          <PhaseIcons
             currentTime={currentTime}
             nodeBlockSeen={nodeBlockSeen}
             nodeBlockP2P={nodeBlockP2P}
@@ -271,7 +272,7 @@ const DesktopBlockProductionView: React.FC<DesktopBlockProductionViewProps> = ({
       <div className="flex flex-1 gap-4 min-h-0 overflow-hidden px-4 pb-4">
         {/* Left panel - Builders and Relays */}
         <div className="w-1/5 overflow-hidden">
-          <BuildersRelaysPanel 
+          <BuildersRelaysPanel
             bids={bids}
             currentTime={currentTime}
             relayColors={relayColors}
@@ -297,10 +298,10 @@ const DesktopBlockProductionView: React.FC<DesktopBlockProductionViewProps> = ({
             slotData={slotData}
           />
         </div>
-        
+
         {/* Right panel - Continents */}
         <div className="w-1/5 overflow-hidden">
-          <ContinentsList 
+          <ContinentsList
             nodes={nodes}
             nodeBlockSeen={nodeBlockSeen}
             nodeBlockP2P={nodeBlockP2P}

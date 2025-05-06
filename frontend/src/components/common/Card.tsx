@@ -9,20 +9,20 @@ interface CardProps {
   onClick?: () => void;
 }
 
-export const Card: React.FC<CardProps> = ({ 
-  children, 
-  className, 
+export const Card: React.FC<CardProps> = ({
+  children,
+  className,
   isPrimary = false,
   isInteractive = false,
-  onClick
+  onClick,
 }) => {
   return (
-    <div 
+    <div
       className={clsx(
         'card',
         isPrimary ? 'card-primary' : 'card-secondary',
         isInteractive && 'card-interactive',
-        className
+        className,
       )}
       onClick={isInteractive ? onClick : undefined}
     >
@@ -37,11 +37,7 @@ interface CardHeaderProps {
 }
 
 export const CardHeader: React.FC<CardHeaderProps> = ({ children, className }) => {
-  return (
-    <div className={clsx('card-header', className)}>
-      {children}
-    </div>
-  );
+  return <div className={clsx('card-header', className)}>{children}</div>;
 };
 
 interface CardBodyProps {
@@ -50,11 +46,7 @@ interface CardBodyProps {
 }
 
 export const CardBody: React.FC<CardBodyProps> = ({ children, className }) => {
-  return (
-    <div className={clsx('card-body', className)}>
-      {children}
-    </div>
-  );
+  return <div className={clsx('card-body', className)}>{children}</div>;
 };
 
 interface CardFooterProps {
@@ -63,9 +55,5 @@ interface CardFooterProps {
 }
 
 export const CardFooter: React.FC<CardFooterProps> = ({ children, className }) => {
-  return (
-    <div className={clsx('card-footer', className)}>
-      {children}
-    </div>
-  );
-}; 
+  return <div className={clsx('card-footer', className)}>{children}</div>;
+};

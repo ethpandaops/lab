@@ -10,7 +10,7 @@ import type { Config } from '@/types'
 import { useSearchParams, useLocation, useNavigate } from 'react-router-dom'
 import { GlobeViz } from '@/components/xatu/GlobeViz'
 import { useContext } from 'react'
-import { ConfigContext } from '@/App'
+import ConfigContext from '@/contexts/ConfigContext';
 
 interface CountryData {
   time: number

@@ -24,10 +24,15 @@ export const DeliveredPayloadInfo: React.FC<DeliveredPayloadInfoProps> = ({
     <div className="border border-success/50 rounded p-2 bg-success/5 mt-2 text-sm font-mono">
       <div className="text-primary font-medium mb-1">Delivered Payload Info</div>
       <div className="text-secondary">
-        Block Hash: <span className="text-primary">{deliveredPayload.blockHash.substring(0, 10)}...{deliveredPayload.blockHash.substring(deliveredPayload.blockHash.length - 8)}</span>
+        Block Hash:{' '}
+        <span className="text-primary">
+          {deliveredPayload.blockHash.substring(0, 10)}...
+          {deliveredPayload.blockHash.substring(deliveredPayload.blockHash.length - 8)}
+        </span>
       </div>
       <div className="text-secondary">
-        Proposer: <span className="text-primary">{deliveredPayload.proposerPubkey.substring(0, 10)}...</span>
+        Proposer:{' '}
+        <span className="text-primary">{deliveredPayload.proposerPubkey.substring(0, 10)}...</span>
       </div>
     </div>
   );

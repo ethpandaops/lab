@@ -1,9 +1,9 @@
-import { ReactNode } from 'react'
-import { defaultNivoTheme } from '@/components/charts/NivoTheme.ts'
+import { ReactNode } from 'react';
+import { defaultNivoTheme } from '@/components/charts/NivoTheme.ts';
 
 interface NivoProviderProps {
-  children: ReactNode
-  theme?: typeof defaultNivoTheme
+  children: ReactNode;
+  theme?: typeof defaultNivoTheme;
 }
 
 /**
@@ -11,15 +11,9 @@ interface NivoProviderProps {
  * This component doesn't actually create a React context, but it's a pattern
  * that can be used to pass theme props to Nivo charts consistently.
  */
-export const NivoProvider = ({ 
-  children 
-}: NivoProviderProps) => {
-  return (
-    <>
-      {children}
-    </>
-  )
-}
+export const NivoProvider = ({ children }: NivoProviderProps) => {
+  return <>{children}</>;
+};
 
 /**
  * withNivoTheme is a higher-order component that applies the Nivo theme to a chart component.
@@ -29,14 +23,14 @@ export const NivoProvider = ({
  */
 export function withNivoTheme<P extends object>(
   Component: React.ComponentType<P & { theme?: typeof defaultNivoTheme }>,
-  customTheme?: typeof defaultNivoTheme
+  customTheme?: typeof defaultNivoTheme,
 ) {
   const ThemedComponent = (props: P) => {
-    const theme = customTheme || defaultNivoTheme
-    return <Component {...props} theme={theme} />
-  }
-  
-  ThemedComponent.displayName = `withNivoTheme(${Component.displayName || Component.name || 'Component'})`
-  
-  return ThemedComponent
-} 
+    const theme = customTheme || defaultNivoTheme;
+    return <Component {...props} theme={theme} />;
+  };
+
+  ThemedComponent.displayName = `withNivoTheme(${Component.displayName || Component.name || 'Component'})`;
+
+  return ThemedComponent;
+}

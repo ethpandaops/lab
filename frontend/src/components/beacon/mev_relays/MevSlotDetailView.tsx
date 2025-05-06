@@ -51,9 +51,9 @@ export const MevSlotDetailView: React.FC<MevSlotDetailViewProps> = ({
 
     // Add explicit types here to satisfy ESLint for imported types
     const typedRelayBids: { [key: string]: RelayBids } | undefined = relayBids;
-    const typedDeliveredPayloads: { [key: string]: DeliveredPayloads } | undefined = deliveredPayloads;
+    const typedDeliveredPayloads: { [key: string]: DeliveredPayloads } | undefined =
+      deliveredPayloads;
     const typedTimings: SlimTimings | undefined = timings;
-
 
     // Prepare flattened bids array with explicit type
     const allBids: RelayBid[] = useMemo(() => {
@@ -63,7 +63,9 @@ export const MevSlotDetailView: React.FC<MevSlotDetailViewProps> = ({
     // Prepare the single delivered payload with explicit type
     const actualDeliveredPayload: DeliveredPayload | null = useMemo(() => {
       // Find the first DeliveredPayloads wrapper that has payloads
-      const payloadWrapper = Object.values(typedDeliveredPayloads || {}).find(dp => dp.payloads?.length > 0);
+      const payloadWrapper = Object.values(typedDeliveredPayloads || {}).find(
+        dp => dp.payloads?.length > 0,
+      );
       // Return the first payload from that wrapper, or null
       return payloadWrapper?.payloads?.[0] || null; // Removed duplicate declaration
     }, [typedDeliveredPayloads]);
@@ -98,9 +100,7 @@ export const MevSlotDetailView: React.FC<MevSlotDetailViewProps> = ({
           slotStartTime={slotStartTime}
         />
         {/* Pass prepared payload to DeliveredPayloadInfo */}
-        <DeliveredPayloadInfo
-          deliveredPayload={actualDeliveredPayload}
-        />
+        <DeliveredPayloadInfo deliveredPayload={actualDeliveredPayload} />
         {/* Pass typed timings to SlotTimingBreakdown */}
         <SlotTimingBreakdown timings={typedTimings} currentTime={currentTime} />
       </div>
@@ -112,7 +112,9 @@ export const MevSlotDetailView: React.FC<MevSlotDetailViewProps> = ({
       <CardBody>
         <h3 className="text-xl font-sans font-bold mb-4">
           Slot Details {slotNumber !== null ? `(${slotNumber})` : ''}
-          {isCurrentSlot && <span className="ml-2 text-xs text-green-400 font-normal">(Current)</span>}
+          {isCurrentSlot && (
+            <span className="ml-2 text-xs text-green-400 font-normal">(Current)</span>
+          )}
         </h3>
         {renderContent()}
       </CardBody>

@@ -1,4 +1,4 @@
-import { Github } from 'lucide-react'
+import { Github } from 'lucide-react';
 
 export const Footer = () => {
   return (
@@ -22,5 +22,5 @@ export const Footer = () => {
         </div>
       </div>
     </footer>
-  )
-} 
+  );
+};

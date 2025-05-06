@@ -21,11 +21,7 @@ interface BidsTableProps {
 type SortField = 'relay' | 'value' | 'time' | 'builder' | 'blockHash';
 type SortDirection = 'asc' | 'desc';
 
-export const BidsTable: React.FC<BidsTableProps> = ({ 
-  bids, 
-  relayColors,
-  className 
-}) => {
+export const BidsTable: React.FC<BidsTableProps> = ({ bids, relayColors, className }) => {
   const [sortField, setSortField] = useState<SortField>('time');
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
   const [copiedHash, setCopiedHash] = useState<string | null>(null);
@@ -53,7 +49,7 @@ export const BidsTable: React.FC<BidsTableProps> = ({
   const sortedBids = useMemo(() => {
     return [...bids].sort((a, b) => {
       let comparison = 0;
-      
+
       switch (sortField) {
         case 'relay':
           comparison = a.relayName.localeCompare(b.relayName);
@@ -71,28 +67,25 @@ export const BidsTable: React.FC<BidsTableProps> = ({
           comparison = (a.blockHash || '').localeCompare(b.blockHash || '');
           break;
       }
-      
+
       return sortDirection === 'asc' ? comparison : -comparison;
     });
   }, [bids, sortField, sortDirection]);
 
   // Calculate pagination
   const totalPages = Math.ceil(sortedBids.length / itemsPerPage);
-  const paginatedBids = sortedBids.slice(
-    page * itemsPerPage, 
-    (page + 1) * itemsPerPage
-  );
+  const paginatedBids = sortedBids.slice(page * itemsPerPage, (page + 1) * itemsPerPage);
 
   // Render sort indicator
   const renderSortIndicator = (field: SortField) => {
     if (sortField !== field) return null;
-    
+
     return (
-      <ArrowUpDown 
+      <ArrowUpDown
         className={clsx(
-          "inline-block ml-1 h-4 w-4",
-          sortDirection === 'asc' ? "rotate-0" : "rotate-180"
-        )} 
+          'inline-block ml-1 h-4 w-4',
+          sortDirection === 'asc' ? 'rotate-0' : 'rotate-180',
+        )}
       />
     );
   };
@@ -111,31 +104,31 @@ export const BidsTable: React.FC<BidsTableProps> = ({
           <table className="w-full text-base">
             <thead className="text-left text-secondary border-b border-subtle">
               <tr>
-                <th 
+                <th
                   className="py-3 px-4 font-medium cursor-pointer hover:text-primary transition-colors text-base"
                   onClick={() => handleSort('relay')}
                 >
                   Relay {renderSortIndicator('relay')}
                 </th>
-                <th 
+                <th
                   className="py-3 px-4 font-medium cursor-pointer hover:text-primary transition-colors text-base"
                   onClick={() => handleSort('value')}
                 >
                   Value (ETH) {renderSortIndicator('value')}
                 </th>
-                <th 
+                <th
                   className="py-3 px-4 font-medium cursor-pointer hover:text-primary transition-colors text-base"
                   onClick={() => handleSort('time')}
                 >
                   Time (s) {renderSortIndicator('time')}
                 </th>
-                <th 
+                <th
                   className="py-3 px-4 font-medium cursor-pointer hover:text-primary transition-colors text-base"
                   onClick={() => handleSort('builder')}
                 >
                   Builder {renderSortIndicator('builder')}
                 </th>
-                <th 
+                <th
                   className="py-3 px-4 font-medium cursor-pointer hover:text-primary transition-colors text-base"
                   onClick={() => handleSort('blockHash')}
                 >
@@ -145,20 +138,26 @@ export const BidsTable: React.FC<BidsTableProps> = ({
             </thead>
             <tbody>
               {paginatedBids.map((bid, index) => (
-                <tr 
+                <tr
                   key={`${bid.relayName}-${bid.blockHash}-${index}`}
                   className={clsx(
-                    "border-b border-subtle/50 hover:bg-surface/50 transition-colors",
-                    bid.isWinning ? "bg-success/10" : ""
+                    'border-b border-subtle/50 hover:bg-surface/50 transition-colors',
+                    bid.isWinning ? 'bg-success/10' : '',
                   )}
                 >
                   <td className="py-3 px-4">
                     <div className="flex items-center gap-2">
-                      <div 
-                        className="w-4 h-4 rounded-full" 
+                      <div
+                        className="w-4 h-4 rounded-full"
                         style={{ backgroundColor: relayColors[bid.relayName] || '#888' }}
                       />
-                      <span className={bid.isWinning ? "font-medium text-primary text-base" : "text-secondary text-base"}>
+                      <span
+                        className={
+                          bid.isWinning
+                            ? 'font-medium text-primary text-base'
+                            : 'text-secondary text-base'
+                        }
+                      >
                         {bid.relayName}
                         {bid.isWinning && <span className="ml-2 text-sm text-success">Winner</span>}
                       </span>
@@ -205,22 +204,23 @@ export const BidsTable: React.FC<BidsTableProps> = ({
             </tbody>
           </table>
         </div>
-        
+
         {/* Pagination */}
         {totalPages > 1 && (
           <div className="flex justify-between items-center mt-4 text-sm">
             <div className="text-tertiary">
-              Showing {page * itemsPerPage + 1}-{Math.min((page + 1) * itemsPerPage, sortedBids.length)} of {sortedBids.length}
+              Showing {page * itemsPerPage + 1}-
+              {Math.min((page + 1) * itemsPerPage, sortedBids.length)} of {sortedBids.length}
             </div>
             <div className="flex gap-1">
               <button
                 onClick={() => setPage(Math.max(0, page - 1))}
                 disabled={page === 0}
                 className={clsx(
-                  "px-3 py-1.5 rounded border border-subtle text-sm",
-                  page === 0 
-                    ? "opacity-50 cursor-not-allowed" 
-                    : "hover:bg-surface/70 text-secondary hover:text-primary"
+                  'px-3 py-1.5 rounded border border-subtle text-sm',
+                  page === 0
+                    ? 'opacity-50 cursor-not-allowed'
+                    : 'hover:bg-surface/70 text-secondary hover:text-primary',
                 )}
               >
                 Previous
@@ -229,10 +229,10 @@ export const BidsTable: React.FC<BidsTableProps> = ({
                 onClick={() => setPage(Math.min(totalPages - 1, page + 1))}
                 disabled={page === totalPages - 1}
                 className={clsx(
-                  "px-3 py-1.5 rounded border border-subtle text-sm",
-                  page === totalPages - 1 
-                    ? "opacity-50 cursor-not-allowed" 
-                    : "hover:bg-surface/70 text-secondary hover:text-primary"
+                  'px-3 py-1.5 rounded border border-subtle text-sm',
+                  page === totalPages - 1
+                    ? 'opacity-50 cursor-not-allowed'
+                    : 'hover:bg-surface/70 text-secondary hover:text-primary',
                 )}
               >
                 Next

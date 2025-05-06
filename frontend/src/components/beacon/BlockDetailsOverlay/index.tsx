@@ -1,23 +1,23 @@
-import { useState } from 'react'
-import { ChevronDown, ChevronUp } from 'lucide-react'
-import clsx from 'clsx'
-import { FaEthereum } from 'react-icons/fa'
-import { useContext } from 'react'
-import { NetworkContext } from '@/App'
-import { formatEntityName } from '@/utils/format.ts'
+import { useState } from 'react';
+import { ChevronDown, ChevronUp } from 'lucide-react';
+import clsx from 'clsx';
+import { FaEthereum } from 'react-icons/fa';
+import { useContext } from 'react';
+import NetworkContext from '@/contexts/NetworkContext';
+import { formatEntityName } from '@/utils/format.ts';
 
 interface BlockDetailsProps {
-  slot: number
-  proposer: string
-  proposerIndex?: number
-  txCount: number
-  blockSize?: number
-  baseFee?: number
-  gasUsed?: number
-  gasLimit?: number
-  executionBlockNumber?: number
-  isCollapsed: boolean
-  onToggleCollapse: () => void
+  slot: number;
+  proposer: string;
+  proposerIndex?: number;
+  txCount: number;
+  blockSize?: number;
+  baseFee?: number;
+  gasUsed?: number;
+  gasLimit?: number;
+  executionBlockNumber?: number;
+  isCollapsed: boolean;
+  onToggleCollapse: () => void;
 }
 
 export function BlockDetailsOverlay({
@@ -31,23 +31,23 @@ export function BlockDetailsOverlay({
   gasLimit,
   executionBlockNumber,
   isCollapsed,
-  onToggleCollapse
+  onToggleCollapse,
 }: BlockDetailsProps): JSX.Element {
-  const { selectedNetwork } = useContext(NetworkContext)
-  const epoch = Math.floor(slot / 32)
-  const slotInEpoch = (slot % 32) + 1
+  const { selectedNetwork } = useContext(NetworkContext);
+  const epoch = Math.floor(slot / 32);
+  const slotInEpoch = (slot % 32) + 1;
 
   return (
-    <div className={clsx(
-      'absolute transition-all duration-300 ease-in-out z-10',
-      'w-full md:w-96',
-      isCollapsed
-        ? 'h-12 md:top-4 md:left-4'
-        : 'h-auto md:top-4 md:left-4',
-      'bottom-0 md:bottom-auto',
-      'left-0',
-      'backdrop-blur-lg bg-surface/40 ring-1 ring-inset ring-white/5 rounded-lg overflow-hidden'
-    )}>
+    <div
+      className={clsx(
+        'absolute transition-all duration-300 ease-in-out z-10',
+        'w-full md:w-96',
+        isCollapsed ? 'h-12 md:top-4 md:left-4' : 'h-auto md:top-4 md:left-4',
+        'bottom-0 md:bottom-auto',
+        'left-0',
+        'backdrop-blur-lg bg-surface/40 ring-1 ring-inset ring-white/5 rounded-lg overflow-hidden',
+      )}
+    >
       {/* Header */}
       <div className="flex items-center justify-between p-4">
         <div className="flex items-center gap-2">
@@ -158,5 +158,5 @@ export function BlockDetailsOverlay({
         </div>
       )}
     </div>
-  )
-} 
+  );
+}

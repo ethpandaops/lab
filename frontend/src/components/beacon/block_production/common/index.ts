@@ -11,12 +11,12 @@ export { default as TopControls } from './TopControls';
 export { default as BlockHeader } from './BlockHeader';
 export { default as BlockContent } from './BlockContent';
 export { default as BlockDetailsPanel } from './BlockDetailsPanel';
-export { 
+export {
   normalizeBlockData,
   calculateBlobCount,
   formatHash,
   formatTimestamp,
   formatBytes,
-  formatGwei
+  formatGwei,
 } from './blockDataNormalizer';
 export type { NormalizedBlockData } from './blockDataNormalizer';

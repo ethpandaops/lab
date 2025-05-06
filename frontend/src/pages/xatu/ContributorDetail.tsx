@@ -5,7 +5,7 @@ import { ErrorState } from '@/components/common/ErrorState';
 import { formatDistanceToNow } from 'date-fns';
 import { XatuCallToAction } from '@/components/xatu/XatuCallToAction';
 import { useContext } from 'react';
-import { ConfigContext } from '@/App';
+import ConfigContext from '@/contexts/ConfigContext';
 import { NETWORK_METADATA, type NetworkKey } from '@/constants/networks.tsx';
 import { Card } from '@/components/common/Card';
 
@@ -65,9 +65,10 @@ function getShortNodeName(fullName: string): string {
 }
 
 function capitalizeWords(input: string): string {
-  return input.split('-').map((word) => (
-    word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
-  )).join(' ');
+  return input
+    .split('-')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ');
 }
 
 function isNodeOffline(node: ContributorNode, updatedAt: number): boolean {
@@ -77,7 +78,7 @@ function isNodeOffline(node: ContributorNode, updatedAt: number): boolean {
 function ContributorDetail(): JSX.Element {
   const { name } = useParams<{ name: string }>();
   const config = useContext(ConfigContext);
-  const userPath = config?.modules?.['xatu_public_contributors']?.path_prefix 
+  const userPath = config?.modules?.['xatu_public_contributors']?.path_prefix
     ? `${config.modules['xatu_public_contributors'].path_prefix}/user-summaries/users/${name}.json`
     : null;
 
@@ -125,9 +126,9 @@ function ContributorDetail(): JSX.Element {
       <Card className="card-primary">
         <div className="card-body">
           <div className="flex items-start gap-6">
-            <div 
+            <div
               className="w-20 h-20 flex items-center justify-center text-2xl font-mono font-bold text-base shadow-neon transition-transform hover:scale-105"
-              style={{ 
+              style={{
                 backgroundColor: avatarColor,
                 boxShadow: `0 0 20px ${avatarColor}10`,
               }}
@@ -137,11 +138,13 @@ function ContributorDetail(): JSX.Element {
             <div className="flex-1">
               <div className="text-sm font-mono text-tertiary mb-4">
                 Last updated{' '}
-                <span 
+                <span
                   title={new Date(contributor.updated_at * 1000).toString()}
                   className="text-primary cursor-help -b -prominent"
                 >
-                  {formatDistanceToNow(new Date(contributor.updated_at * 1000), { addSuffix: true })}
+                  {formatDistanceToNow(new Date(contributor.updated_at * 1000), {
+                    addSuffix: true,
+                  })}
                 </span>
               </div>
               <div className="flex flex-wrap gap-3">
@@ -151,8 +154,8 @@ function ContributorDetail(): JSX.Element {
                     icon: '🔥',
                   };
                   return (
-                    <div 
-                      key={network} 
+                    <div
+                      key={network}
                       className="flex items-center gap-2 card-secondary px-3 py-1.5 text-sm font-mono"
                     >
                       <span className="w-5 h-5 flex items-center justify-center">
@@ -179,24 +182,18 @@ function ContributorDetail(): JSX.Element {
           return (
             <section key={network} className="space-y-4">
               <div className="flex items-center gap-3">
-                <div className="w-6 h-6 flex items-center justify-center">
-                  {metadata.icon}
-                </div>
-                <h2 className="text-xl font-sans font-bold text-primary">
-                  {metadata.name}
-                </h2>
+                <div className="w-6 h-6 flex items-center justify-center">{metadata.icon}</div>
+                <h2 className="text-xl font-sans font-bold text-primary">{metadata.name}</h2>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {nodes.map((node) => {
+                {nodes.map(node => {
                   const offline = isNodeOffline(node, contributor.updated_at);
                   const shortName = getShortNodeName(node.client_name);
                   return (
                     <Card
                       key={node.client_name}
                       className={`card-secondary ${
-                        offline 
-                          ? 'border-error/30 hover:border-error/50' 
-                          : ''
+                        offline ? 'border-error/30 hover:border-error/50' : ''
                       }`}
                     >
                       <div className="card-body">
@@ -205,7 +202,7 @@ function ContributorDetail(): JSX.Element {
                             src={`/clients/${node.consensus_client}.png`}
                             alt={`${node.consensus_client} logo`}
                             className="w-6 h-6 object-contain opacity-90"
-                            onError={(e) => {
+                            onError={e => {
                               const target = e.currentTarget;
                               target.style.display = 'none';
                             }}
@@ -215,9 +212,7 @@ function ContributorDetail(): JSX.Element {
                               {shortName}
                             </div>
                             <div className="text-sm font-mono text-tertiary">
-                              {capitalizeWords(node.consensus_client)}
-                              {' '}
-                              ({node.consensus_version})
+                              {capitalizeWords(node.consensus_client)} ({node.consensus_version})
                             </div>
                           </div>
                         </div>
@@ -255,4 +250,4 @@ function ContributorDetail(): JSX.Element {
   );
 }
 
-export default ContributorDetail; 
+export default ContributorDetail;

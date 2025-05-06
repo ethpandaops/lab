@@ -1,25 +1,17 @@
-import { AlertCircle } from 'lucide-react'
+import { AlertCircle } from 'lucide-react';
 
 interface ErrorStateProps {
-  message?: string
-  error?: Error
-  retry?: () => void
+  message?: string;
+  error?: Error;
+  retry?: () => void;
 }
 
-export const ErrorState = ({
-  message = 'Something went wrong',
-  error,
-  retry
-}: ErrorStateProps) => {
+export const ErrorState = ({ message = 'Something went wrong', error, retry }: ErrorStateProps) => {
   return (
     <div className="flex flex-col items-center justify-center min-h-[200px] p-4">
       <AlertCircle className="h-8 w-8 text-red-500" />
       <p className="mt-4 text-sm text-tertiary dark:text-secondary">{message}</p>
-      {error && (
-        <p className="mt-2 text-xs text-secondary dark:text-tertiary">
-          {error.message}
-        </p>
-      )}
+      {error && <p className="mt-2 text-xs text-secondary dark:text-tertiary">{error.message}</p>}
       {retry && (
         <button
           onClick={retry}
@@ -29,5 +21,5 @@ export const ErrorState = ({
         </button>
       )}
     </div>
-  )
-} 
+  );
+};

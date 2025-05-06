@@ -7,12 +7,10 @@ export const MaintenanceOverlay: React.FC = () => {
         <h1 className="text-4xl font-sans font-black bg-gradient-to-r from-primary via-accent to-error bg-clip-text text-transparent">
           Offline for Maintenance
         </h1>
-        <p className="text-lg font-mono text-tertiary">
-          Come back soon...
-        </p>
+        <p className="text-lg font-mono text-tertiary">Come back soon...</p>
       </div>
     </div>
   );
 };
 
-export default MaintenanceOverlay; 
+export default MaintenanceOverlay;

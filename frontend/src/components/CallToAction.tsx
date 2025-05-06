@@ -1,12 +1,12 @@
-import { ArrowRight, Share2 } from 'lucide-react'
-import { Link } from 'react-router-dom'
-import { Card, CardBody } from '@/components/common/Card'
+import { ArrowRight, Share2 } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Card, CardBody } from '@/components/common/Card';
 
 interface CallToActionProps {
-  title: string
-  description: string
-  buttonText: string
-  buttonLink: string
+  title: string;
+  description: string;
+  buttonText: string;
+  buttonLink: string;
 }
 
 export const CallToAction = ({ title, description, buttonText, buttonLink }: CallToActionProps) => {
@@ -31,5 +31,5 @@ export const CallToAction = ({ title, description, buttonText, buttonLink }: Cal
         </div>
       </CardBody>
     </Card>
-  )
-}
+  );
+};

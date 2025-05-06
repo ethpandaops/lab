@@ -1,4 +1,4 @@
-import { CallToAction } from '@/components/CallToAction.tsx'
+import { CallToAction } from '@/components/CallToAction.tsx';
 
 export const XatuCallToAction = () => {
   return (
@@ -8,5 +8,5 @@ export const XatuCallToAction = () => {
       buttonText="Contribute"
       buttonLink="https://docs.google.com/forms/d/e/1FAIpQLSfSCHLZv2xdDKceQ3ajzYbkm2jkQnG0lVBhjEX4c1Jxvf8QfA/viewform"
     />
-  )
-} 
+  );
+};

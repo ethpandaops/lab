@@ -9,9 +9,5 @@ export const SlotTimer: React.FC<SlotTimerProps> = ({ currentTime }) => {
   const clampedTime = Math.max(0, Math.min(currentTime, 12000));
   const seconds = (clampedTime / 1000).toFixed(1);
 
-  return (
-    <div className="text-sm text-secondary font-mono">
-      Slot Timer: {seconds}s / 12.0s
-    </div>
-  );
+  return <div className="text-sm text-secondary font-mono">Slot Timer: {seconds}s / 12.0s</div>;
 };

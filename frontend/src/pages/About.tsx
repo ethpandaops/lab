@@ -1,26 +1,23 @@
-import { Github, ExternalLink } from 'lucide-react'
+import { Github, ExternalLink } from 'lucide-react';
 
 export const About = () => {
   return (
     <div className="space-y-12">
       {/* The Lab Section */}
       <section className="mb-16">
-        <h2 className="text-2xl font-sans font-bold text-primary mb-6">
-          The Lab
-        </h2>
+        <h2 className="text-2xl font-sans font-bold text-primary mb-6">The Lab</h2>
         <div className="space-y-4">
           <p className="text-base font-mono text-secondary">
-            The Lab is an experimental platform that provides insights into Ethereum.
-            Here we present data and visualizations that we've collected. All of our data is public and open source.
+            The Lab is an experimental platform that provides insights into Ethereum. Here we
+            present data and visualizations that we've collected. All of our data is public and open
+            source.
           </p>
         </div>
       </section>
 
       {/* ethPandaOps Section */}
       <section>
-        <h2 className="text-2xl font-sans font-bold text-primary mb-6">
-          ethPandaOps
-        </h2>
+        <h2 className="text-2xl font-sans font-bold text-primary mb-6">ethPandaOps</h2>
         <div className="space-y-6">
           <p className="text-base font-mono text-secondary">
             Check out our main website for more information:
@@ -49,5 +46,5 @@ export const About = () => {
         </div>
       </section>
     </div>
-  )
-} 
+  );
+};

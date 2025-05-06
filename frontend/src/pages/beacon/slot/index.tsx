@@ -1,22 +1,22 @@
-import { useState, useContext } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { AlertTriangle, Search } from 'lucide-react'
-import { NetworkContext } from '@/App'
-import { BeaconClockManager } from '@/utils/beacon.ts'
-import { Card, CardBody } from '@/components/common/Card'
+import { useState, useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { AlertTriangle, Search } from 'lucide-react';
+import NetworkContext from '@/contexts/NetworkContext';
+import { BeaconClockManager } from '@/utils/beacon.ts';
+import { Card, CardBody } from '@/components/common/Card';
 
 function SlotLookup(): JSX.Element {
-  const navigate = useNavigate()
-  const [slotNumber, setSlotNumber] = useState('')
-  const { selectedNetwork } = useContext(NetworkContext)
-  const clock = BeaconClockManager.getInstance().getBeaconClock(selectedNetwork)
-  const currentSlot = clock?.getCurrentSlot() || 0
+  const navigate = useNavigate();
+  const [slotNumber, setSlotNumber] = useState('');
+  const { selectedNetwork } = useContext(NetworkContext);
+  const clock = BeaconClockManager.getInstance().getBeaconClock(selectedNetwork);
+  const currentSlot = clock?.getCurrentSlot() || 0;
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!slotNumber) return
-    navigate(`${slotNumber}`)
-  }
+    e.preventDefault();
+    if (!slotNumber) return;
+    navigate(`${slotNumber}`);
+  };
 
   return (
     <div className="space-y-6">
@@ -24,7 +24,7 @@ function SlotLookup(): JSX.Element {
       <Card isPrimary className="relative">
         {/* Background Gradient */}
         <div className="absolute inset-0 bg-gradient-to-br from-accent/5 via-transparent to-transparent" />
-        
+
         <CardBody className="relative">
           <div className="flex items-center gap-4 mb-6">
             <div className="w-12 h-12 rounded-lg bg-accent/10 flex items-center justify-center flex-shrink-0">
@@ -47,7 +47,7 @@ function SlotLookup(): JSX.Element {
                 <input
                   type="number"
                   value={slotNumber}
-                  onChange={(e) => setSlotNumber(e.target.value)}
+                  onChange={e => setSlotNumber(e.target.value)}
                   placeholder={`Current slot: ${currentSlot.toLocaleString()}`}
                   className="w-full bg-nav/50 backdrop-blur-sm border border-subtle rounded-lg pl-4 pr-32 py-3 text-lg font-mono text-primary placeholder:text-tertiary focus:border-accent focus:outline-none transition-colors [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                 />
@@ -92,12 +92,13 @@ function SlotLookup(): JSX.Element {
             <AlertTriangle className="w-4 h-4 text-warning" />
           </div>
           <p className="text-sm font-mono text-secondary">
-            This is an experimental feature. Historical slot data is only available for the past few days.
+            This is an experimental feature. Historical slot data is only available for the past few
+            days.
           </p>
         </CardBody>
       </Card>
     </div>
-  )
+  );
 }
 
-export { SlotLookup } 
+export { SlotLookup };

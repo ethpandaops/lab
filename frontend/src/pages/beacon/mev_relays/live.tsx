@@ -10,7 +10,7 @@ import { TimingsView } from '../../../components/beacon/mev_relays/TimingsView';
 import { SankeyNetworkView } from '../../../components/beacon/mev_relays/SankeyNetworkView';
 import { BeaconClockManager } from '../../../utils/beacon';
 import { ChevronLeft, ChevronRight, Play, Pause } from 'lucide-react';
-import { NetworkContext } from '@/App';
+import NetworkContext from '@/contexts/NetworkContext';
 import { TabButton } from '@/components/common/TabButton';
 
 // Simple hash function to generate a color from a string (e.g., relay name)

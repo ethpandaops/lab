@@ -48,7 +48,7 @@ export enum Phase {
   Building = 'building',
   Propagating = 'propagating',
   Attesting = 'attesting',
-  Accepted = 'accepted'
+  Accepted = 'accepted',
 }
 
 // Common props interface for block production components

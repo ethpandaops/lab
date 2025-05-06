@@ -1,1 +1,1 @@
-export * from '@/components/layout/IntegratedContextualHeader'
+export * from '@/components/layout/IntegratedContextualHeader';
