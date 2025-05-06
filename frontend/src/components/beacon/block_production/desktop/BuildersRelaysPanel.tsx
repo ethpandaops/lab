@@ -30,6 +30,12 @@ const BuildersRelaysPanel: React.FC<BuildersRelaysPanelProps> = ({
 }) => {
   // Fetch builder names for the given network
   const builderNames = useBuilderNames(network);
+  
+  // Debug log for builder names
+  React.useEffect(() => {
+    console.log('Builder names loaded:', Object.keys(builderNames).length, 
+      'First few keys:', Object.keys(builderNames).slice(0, 3));
+  }, [builderNames]);
   // Get builder bids - filtered by current time and deduplicated by builder pubkey
   const builders = useMemo(() => {
     // Filter bids by current time first

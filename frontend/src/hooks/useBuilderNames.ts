@@ -1,30 +1,44 @@
 import { useState, useEffect } from 'react';
 
+// Global cache to avoid duplicate fetches across components
+const builderNamesCache: Record<string, Record<string, string>> = {};
+// Track ongoing fetch requests to prevent duplicates
+const pendingFetches: Record<string, Promise<Record<string, string>>> = {};
+
 /**
  * Custom hook to fetch builder names from JSON file.
+ * Implements a global cache to prevent multiple requests.
  * 
  * @param network - The network to fetch builder names for (e.g. 'mainnet')
  * @returns A map of builder pubkeys to builder names
  */
 export function useBuilderNames(network: string): Record<string, string> {
-  const [builderNames, setBuilderNames] = useState<Record<string, string>>({});
+  const [builderNames, setBuilderNames] = useState<Record<string, string>>(
+    // Initialize from cache if available
+    builderNamesCache[network.toLowerCase()] || {}
+  );
   
   useEffect(() => {
-    async function fetchBuilderNames() {
+    const formattedNetwork = network.toLowerCase();
+    
+    // Return immediately if data is already in cache
+    if (builderNamesCache[formattedNetwork]) {
+      return;
+    }
+    
+    // Create a function to fetch builder names that can be shared
+    async function fetchAndProcessBuilderNames(): Promise<Record<string, string>> {
       try {
-        // Format the network name for the file path
-        const formattedNetwork = network.toLowerCase();
         const response = await fetch(`/data/${formattedNetwork}-builders.json`);
         
-        // If the file doesn't exist, just return an empty object
+        // If file doesn't exist, return empty object
         if (!response.ok) {
-          console.warn(`No builder names file found for ${formattedNetwork} network`);
-          return;
+          return {};
         }
         
         const data = await response.json();
         
-        // Invert the mapping - from names->pubkeys to pubkeys->names
+        // Process the data - invert the mapping
         const pubkeyToName: Record<string, string> = {};
         
         Object.entries(data).forEach(([name, pubkey]) => {
@@ -35,13 +49,29 @@ export function useBuilderNames(network: string): Record<string, string> {
           }
         });
         
-        setBuilderNames(pubkeyToName);
+        // Cache the results
+        builderNamesCache[formattedNetwork] = pubkeyToName;
+        
+        return pubkeyToName;
       } catch (error) {
         console.error('Error fetching builder names:', error);
+        return {}; // Return empty object on error
+      } finally {
+        // Clear this pending fetch
+        delete pendingFetches[formattedNetwork];
       }
     }
     
-    fetchBuilderNames();
+    // If there's an existing fetch, use it, otherwise create a new one
+    const fetchPromise = pendingFetches[formattedNetwork] || 
+      (pendingFetches[formattedNetwork] = fetchAndProcessBuilderNames());
+    
+    // Use the fetch promise
+    fetchPromise.then(names => {
+      setBuilderNames(names);
+    });
+    
+    // No cleanup needed since the cache is global
   }, [network]);
   
   return builderNames;
