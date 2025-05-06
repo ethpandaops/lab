@@ -369,9 +369,15 @@ export default function BlockProductionLivePage() {
         // Increment by 100ms
         currentTime += 100;
         
-        // Reset at 12 seconds
+        // Reset at 12 seconds and advance to next slot if at live position
         if (currentTime > 12000) {
           currentTime = 0;
+          
+          // If we're at live position (current slot), auto-advance to the next slot
+          // by incrementing the head slot (simulating what would happen when the real slot changes)
+          if (displaySlotOffset === 0 && !isTransitioning && headSlot !== null) {
+            setHeadSlot(headSlot + 1);
+          }
         }
         
         // Update React state only
@@ -380,7 +386,7 @@ export default function BlockProductionLivePage() {
     }, 100);
     
     return () => clearInterval(interval);
-  }, [slotNumber, isPlaying]);
+  }, [slotNumber, isPlaying, displaySlotOffset, isTransitioning, headSlot]);
   
   // Normal playback enablement
   useEffect(() => {
