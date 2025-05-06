@@ -11,6 +11,7 @@ export default tseslint.config(
   {
     ignores: [
       'build',
+      'dist',
       'public',
       'tailwind.config.js',
       'craco.config.js',

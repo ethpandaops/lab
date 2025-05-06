@@ -15,14 +15,14 @@ export async function getLabApiClient(): Promise<LabApiClientType> {
   try {
     // Dynamically import the config to avoid circular dependencies
     const { getDataUrl } = await import('../config');
-    
+
     // The backend URL is part of the data URL without the trailing path
     // We can extract the base URL from the data URL of an empty path
     const baseUrl = getDataUrl('').replace(/\/$/, '');
-    
+
     // Create the client using the URL from config
     client = createLabApiClient(baseUrl);
-    
+
     return client;
   } catch (error) {
     console.error('Failed to initialize Lab API client:', error);
@@ -36,4 +36,4 @@ export async function getLabApiClient(): Promise<LabApiClientType> {
  */
 export function resetLabApiClient(): void {
   client = null;
-} 
+}

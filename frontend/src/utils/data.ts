@@ -1,26 +1,30 @@
-import { useQuery } from '@tanstack/react-query'
-import { getDataUrl } from '@/config'
+import { useQuery } from '@tanstack/react-query';
+import { getDataUrl } from '@/config';
 
 export const fetchData = async <T>(path: string): Promise<T> => {
-  const response = await fetch(getDataUrl(path))
+  const response = await fetch(getDataUrl(path));
   if (!response.ok) {
-    throw new Error(`Failed to fetch data: ${response.statusText}`)
+    throw new Error(`Failed to fetch data: ${response.statusText}`);
   }
-  return response.json()
-}
+  return response.json();
+};
 
 export const useDataFetch = <T>(path: string | null, options?: { silentFail?: boolean }) => {
-  const { data, isLoading: loading, error } = useQuery<T, Error>({
+  const {
+    data,
+    isLoading: loading,
+    error,
+  } = useQuery<T, Error>({
     queryKey: ['data', path],
     queryFn: () => {
       if (!path) {
-        throw new Error('No path provided')
+        throw new Error('No path provided');
       }
-      return fetchData<T>(path)
+      return fetchData<T>(path);
     },
     enabled: !!path,
     retry: options?.silentFail ? false : 3,
-  })
+  });
 
-  return { data, loading, error }
-} 
+  return { data, loading, error };
+};

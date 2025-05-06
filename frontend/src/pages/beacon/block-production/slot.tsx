@@ -3,10 +3,14 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { getLabApiClient } from '../../../api';
 import { GetSlotDataRequest } from '../../../api/gen/backend/pkg/api/proto/lab_api_pb';
-import { MobileBlockProductionView, DesktopBlockProductionView, Phase } from '../../../components/beacon/block_production';
+import {
+  MobileBlockProductionView,
+  DesktopBlockProductionView,
+  Phase,
+} from '../../../components/beacon/block_production';
 import { BeaconClockManager } from '../../../utils/beacon';
 import { ChevronLeft, ChevronRight, Play, Pause } from 'lucide-react';
-import { NetworkContext } from '@/App';
+import NetworkContext from '@/contexts/NetworkContext';
 
 // Simple hash function to generate a color from a string (e.g., relay name)
 const generateConsistentColor = (str: string): string => {
@@ -26,38 +30,38 @@ const generateConsistentColor = (str: string): string => {
  * This component can be linked to with a specific time parameter.
  */
 export default function BlockProductionSlotPage() {
-  const { network, slot: slotParam } = useParams<{ network?: string, slot?: string }>();
+  const { network, slot: slotParam } = useParams<{ network?: string; slot?: string }>();
   const selectedNetwork = network || 'mainnet'; // Default to mainnet if no network param
   const [searchParams] = useSearchParams();
   const queryClient = useQueryClient();
-  
+
   // Initial time value from URL query parameter, default to 0
   const initialTimeParam = searchParams.get('time');
   const initialTimeMs = initialTimeParam ? parseFloat(initialTimeParam) * 1000 : 0;
   console.log(`Initializing with time: ${initialTimeParam}s (${initialTimeMs}ms)`);
-  
+
   // Add state to handle screen size
   const [isMobile, setIsMobile] = useState<boolean>(false);
-  
+
   // Detect screen size and update state
   useEffect(() => {
     const checkScreenSize = () => {
       setIsMobile(window.innerWidth < 768); // 768px is typical tablet breakpoint
     };
-    
+
     // Check immediately
     checkScreenSize();
-    
+
     // Listen for window resize events
     window.addEventListener('resize', checkScreenSize);
-    
+
     // Clean up event listener
     return () => window.removeEventListener('resize', checkScreenSize);
   }, []);
 
   // Convert slot param to a number
   const slotNumber = slotParam ? parseInt(slotParam, 10) : null;
-  
+
   // Handle time management
   const [currentTime, setCurrentTime] = useState<number>(initialTimeMs);
   const [isPlaying, setIsPlaying] = useState<boolean>(false); // Start paused since we're showing a specific time
@@ -70,28 +74,32 @@ export default function BlockProductionSlotPage() {
       window.location.href = `/beacon/block-production/${slotNumber - 1}`;
     }
   };
-  
+
   const goToNextSlot = () => {
     if (slotNumber !== null) {
       // Navigate to next slot
       window.location.href = `/beacon/block-production/${slotNumber + 1}`;
     }
   };
-  
+
   const goToLiveView = () => {
     // Navigate to live view
     window.location.href = `/beacon/block-production/live`;
   };
-  
+
   const togglePlayPause = () => setIsPlaying(prev => !prev);
 
   const labApiClient = getLabApiClient();
 
-  const { data: slotData, isLoading: isSlotLoading, error: slotError } = useQuery({
+  const {
+    data: slotData,
+    isLoading: isSlotLoading,
+    error: slotError,
+  } = useQuery({
     queryKey: ['block-production-slot', 'slot', selectedNetwork, slotNumber],
     queryFn: async () => {
       if (slotNumber === null) return null;
-      
+
       const client = await labApiClient;
       const req = new GetSlotDataRequest({
         network: selectedNetwork,
@@ -141,9 +149,13 @@ export default function BlockProductionSlotPage() {
 
     // The execution payload block hash is the definitive way to identify which bid won
     const executionPayloadBlockHash = slotData.block.executionPayloadBlockHash;
-    
+
     // Ensure it's a non-empty string
-    if (!executionPayloadBlockHash || typeof executionPayloadBlockHash !== 'string' || executionPayloadBlockHash.length < 10) {
+    if (
+      !executionPayloadBlockHash ||
+      typeof executionPayloadBlockHash !== 'string' ||
+      executionPayloadBlockHash.length < 10
+    ) {
       console.warn('Invalid execution payload block hash:', executionPayloadBlockHash);
       return null;
     }
@@ -152,17 +164,18 @@ export default function BlockProductionSlotPage() {
     for (const [relayName, relayData] of Object.entries(slotData.relayBids)) {
       if (!relayData.bids || !Array.isArray(relayData.bids)) continue;
 
-      const matchingBid = relayData.bids.find(bid => 
-        bid.blockHash && 
-        typeof bid.blockHash === 'string' && 
-        bid.blockHash === executionPayloadBlockHash
+      const matchingBid = relayData.bids.find(
+        bid =>
+          bid.blockHash &&
+          typeof bid.blockHash === 'string' &&
+          bid.blockHash === executionPayloadBlockHash,
       );
 
       if (matchingBid) {
         try {
           // Convert the bid value to ETH (from wei)
           const valueInEth = Number(BigInt(matchingBid.value)) / 1e18;
-          
+
           // Return the winning bid data
           return {
             blockHash: matchingBid.blockHash,
@@ -170,13 +183,13 @@ export default function BlockProductionSlotPage() {
             relayName: relayName,
             builderPubkey: matchingBid.builderPubkey,
           };
-        } catch (error) { 
+        } catch (error) {
           console.error('Error processing winning bid:', error);
-          return null; 
+          return null;
         }
       }
     }
-    
+
     // If no matching bid was found
     console.info('No matching bid found for execution payload:', executionPayloadBlockHash);
     return null;
@@ -211,18 +224,20 @@ export default function BlockProductionSlotPage() {
             builderPubkey: bid.builderPubkey,
             isWinning: bid.blockHash === winningBidData?.blockHash,
           });
-        } catch { /* Skip bid if conversion fails */ }
+        } catch {
+          /* Skip bid if conversion fails */
+        }
       });
     });
-    
+
     return bidsForVisualizer.sort((a, b) => a.time - b.time);
   }, [slotData?.relayBids, winningBidData]);
-  
+
   // Dynamically filter bids based on current time
   const transformedBids = useMemo(() => {
     // Only show bids that have occurred before the current time
     const timeFilteredBids = allTransformedBids.filter(bid => bid.time <= currentTime);
-    
+
     // Sort by value descending (highest value bids first)
     return [...timeFilteredBids].sort((a, b) => {
       // Always keep winning bid first
@@ -266,7 +281,7 @@ export default function BlockProductionSlotPage() {
 
   // Always use data - either real data or fallback data
   const displayData = slotData || fallbackData;
-  
+
   // Empty arrays for displaying when no real data
   const emptyBids = [];
   const emptyRelayColors = {};
@@ -301,23 +316,23 @@ export default function BlockProductionSlotPage() {
           </button>
 
           <div className="font-mono ml-1 text-primary flex flex-col">
-            <div>Slot: {slotNumber ?? "—"}</div>
-            <div className="text-xs text-secondary opacity-70">
-              Phase: {currentPhase}
-            </div>
+            <div>Slot: {slotNumber ?? '—'}</div>
+            <div className="text-xs text-secondary opacity-70">Phase: {currentPhase}</div>
           </div>
         </div>
 
         <div className="flex items-center gap-2">
-          <div className="text-sm font-mono text-primary">
-            {(currentTime / 1000).toFixed(1)}s
-          </div>
+          <div className="text-sm font-mono text-primary">{(currentTime / 1000).toFixed(1)}s</div>
           <button
             onClick={togglePlayPause}
             className="bg-surface/50 p-1.5 rounded border border-subtle hover:bg-hover transition"
-            title={isPlaying ? "Pause" : "Play"}
+            title={isPlaying ? 'Pause' : 'Play'}
           >
-            {isPlaying ? <Pause className="h-3.5 w-3.5 text-primary" /> : <Play className="h-3.5 w-3.5 text-primary" />}
+            {isPlaying ? (
+              <Pause className="h-3.5 w-3.5 text-primary" />
+            ) : (
+              <Play className="h-3.5 w-3.5 text-primary" />
+            )}
           </button>
         </div>
       </div>
@@ -326,8 +341,10 @@ export default function BlockProductionSlotPage() {
       {isMobile ? (
         // Mobile View
         <div className="px-2 pt-1">
-          <div className={`transition-opacity duration-300 ${isSlotLoading ? 'opacity-70' : 'opacity-100'}`}>
-            <MobileBlockProductionView 
+          <div
+            className={`transition-opacity duration-300 ${isSlotLoading ? 'opacity-70' : 'opacity-100'}`}
+          >
+            <MobileBlockProductionView
               bids={slotData ? transformedBids : emptyBids}
               currentTime={currentTime}
               relayColors={slotData ? relayColors : emptyRelayColors}
@@ -337,15 +354,25 @@ export default function BlockProductionSlotPage() {
               proposerEntity={displayData.proposerEntity}
               nodes={displayData.nodes || {}}
               blockTime={displayData.block?.slotTime}
-              nodeBlockSeen={displayData.timings?.blockSeen ? 
-                Object.fromEntries(Object.entries(displayData.timings.blockSeen).map(([node, time]) => 
-                  [node, typeof time === 'bigint' ? Number(time) : Number(time)]
-                )) : {}
+              nodeBlockSeen={
+                displayData.timings?.blockSeen
+                  ? Object.fromEntries(
+                      Object.entries(displayData.timings.blockSeen).map(([node, time]) => [
+                        node,
+                        typeof time === 'bigint' ? Number(time) : Number(time),
+                      ]),
+                    )
+                  : {}
               }
-              nodeBlockP2P={displayData.timings?.blockFirstSeenP2p ? 
-                Object.fromEntries(Object.entries(displayData.timings.blockFirstSeenP2p).map(([node, time]) => 
-                  [node, typeof time === 'bigint' ? Number(time) : Number(time)]
-                )) : {}
+              nodeBlockP2P={
+                displayData.timings?.blockFirstSeenP2p
+                  ? Object.fromEntries(
+                      Object.entries(displayData.timings.blockFirstSeenP2p).map(([node, time]) => [
+                        node,
+                        typeof time === 'bigint' ? Number(time) : Number(time),
+                      ]),
+                    )
+                  : {}
               }
               block={displayData.block}
             />
@@ -367,8 +394,10 @@ export default function BlockProductionSlotPage() {
               Error loading block data: {slotError.message}
             </div>
           )}
-          
-          <div className={`transition-opacity duration-300 flex-1 ${isSlotLoading ? 'opacity-70' : 'opacity-100'}`}>
+
+          <div
+            className={`transition-opacity duration-300 flex-1 ${isSlotLoading ? 'opacity-70' : 'opacity-100'}`}
+          >
             <DesktopBlockProductionView
               bids={slotData ? transformedBids : emptyBids}
               currentTime={currentTime}
@@ -379,15 +408,25 @@ export default function BlockProductionSlotPage() {
               proposerEntity={displayData.proposerEntity}
               nodes={displayData.nodes || {}}
               blockTime={displayData.block?.slotTime}
-              nodeBlockSeen={displayData.timings?.blockSeen ? 
-                Object.fromEntries(Object.entries(displayData.timings.blockSeen).map(([node, time]) => 
-                  [node, typeof time === 'bigint' ? Number(time) : Number(time)]
-                )) : {}
+              nodeBlockSeen={
+                displayData.timings?.blockSeen
+                  ? Object.fromEntries(
+                      Object.entries(displayData.timings.blockSeen).map(([node, time]) => [
+                        node,
+                        typeof time === 'bigint' ? Number(time) : Number(time),
+                      ]),
+                    )
+                  : {}
               }
-              nodeBlockP2P={displayData.timings?.blockFirstSeenP2p ? 
-                Object.fromEntries(Object.entries(displayData.timings.blockFirstSeenP2p).map(([node, time]) => 
-                  [node, typeof time === 'bigint' ? Number(time) : Number(time)]
-                )) : {}
+              nodeBlockP2P={
+                displayData.timings?.blockFirstSeenP2p
+                  ? Object.fromEntries(
+                      Object.entries(displayData.timings.blockFirstSeenP2p).map(([node, time]) => [
+                        node,
+                        typeof time === 'bigint' ? Number(time) : Number(time),
+                      ]),
+                    )
+                  : {}
               }
               block={displayData.block}
               slotData={displayData}

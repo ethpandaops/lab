@@ -1,5 +1,8 @@
 import React, { useMemo } from 'react';
-import { RelayBid, DeliveredPayload } from '@/api/gen/backend/pkg/server/proto/beacon_slots/beacon_slots_pb';
+import {
+  RelayBid,
+  DeliveredPayload,
+} from '@/api/gen/backend/pkg/server/proto/beacon_slots/beacon_slots_pb';
 // Removed unused Timestamp import
 
 // --- Placeholder Helper Functions ---
@@ -13,10 +16,10 @@ const formatEthValue = (wei: string | undefined): string => {
   try {
     const weiBigInt = BigInt(wei);
     // Divide by 10^18 to get ETH
-    const ethValue = Number(weiBigInt * 10000n / (10n**18n)) / 10000; // Keep 4 decimal places
+    const ethValue = Number((weiBigInt * 10000n) / 10n ** 18n) / 10000; // Keep 4 decimal places
     return ethValue.toFixed(4);
   } catch (parseError) {
-    console.error("Error formatting ETH value:", wei, parseError);
+    console.error('Error formatting ETH value:', wei, parseError);
     return 'N/A';
   }
 };
@@ -46,7 +49,8 @@ export const HighestBidDisplay: React.FC<HighestBidDisplayProps> = ({
   // slotStartTime removed
 }) => {
   const highestBidToShow = useMemo(() => {
-    if (!bids || bids.length === 0) { // Removed slotStartTime check
+    if (!bids || bids.length === 0) {
+      // Removed slotStartTime check
       return null;
     }
 
@@ -68,9 +72,9 @@ export const HighestBidDisplay: React.FC<HighestBidDisplayProps> = ({
             highestBid = bid;
           }
         } catch (e) {
-           console.error("Error processing bid value:", bid, e);
-           // Skip this bid if value conversion fails
-           continue;
+          console.error('Error processing bid value:', bid, e);
+          // Skip this bid if value conversion fails
+          continue;
         }
       }
     }
@@ -95,7 +99,8 @@ export const HighestBidDisplay: React.FC<HighestBidDisplayProps> = ({
         <span className={`font-mono ${isWinning ? 'text-success font-medium' : 'text-primary'}`}>
           {formatEthValue(highestBidToShow.value)} ETH
           <span className="text-xs text-tertiary ml-2">
-            (Relay: {getRelayName(highestBidToShow.builderPubkey)}, Received: +{(highestBidToShow.slotTime / 1000).toFixed(3)}s)
+            (Relay: {getRelayName(highestBidToShow.builderPubkey)}, Received: +
+            {(highestBidToShow.slotTime / 1000).toFixed(3)}s)
           </span>
         </span>
       ) : (

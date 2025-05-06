@@ -1,40 +1,41 @@
-import { useDataFetch } from '@/utils/data.ts'
-import { LoadingState } from '@/components/common/LoadingState'
-import { ErrorState } from '@/components/common/ErrorState'
-import { XatuCallToAction } from '@/components/xatu/XatuCallToAction'
-import { NetworkSelector } from '@/components/common/NetworkSelector'
-import { useState, useEffect, useMemo, useRef } from 'react'
-import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from 'recharts'
-import { getConfig } from '@/config'
-import type { Config } from '@/types'
-import { useSearchParams, useLocation, useNavigate } from 'react-router-dom'
-import { GlobeViz } from '@/components/xatu/GlobeViz'
-import { AboutThisData } from '@/components/common/AboutThisData'
-import { ChartWithStats, NivoLineChart } from '@/components/charts'
-import { ConfigContext, NetworkContext } from '@/App'
-import { useContext } from 'react'
+import { useDataFetch } from '@/utils/data.ts';
+import { LoadingState } from '@/components/common/LoadingState';
+import { ErrorState } from '@/components/common/ErrorState';
+import { XatuCallToAction } from '@/components/xatu/XatuCallToAction';
+import { NetworkSelector } from '@/components/common/NetworkSelector';
+import { useState, useEffect, useMemo, useRef } from 'react';
+import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from 'recharts';
+import { getConfig } from '@/config';
+import type { Config } from '@/types';
+import { useSearchParams, useLocation, useNavigate } from 'react-router-dom';
+import { GlobeViz } from '@/components/xatu/GlobeViz';
+import { AboutThisData } from '@/components/common/AboutThisData';
+import { ChartWithStats, NivoLineChart } from '@/components/charts';
+import ConfigContext from '@/contexts/ConfigContext';
+import NetworkContext from '@/contexts/NetworkContext';
+import { useContext } from 'react';
 
 interface CountryData {
-  time: number
+  time: number;
   countries: {
-    name: string
-    value: number
-  }[]
+    name: string;
+    value: number;
+  }[];
 }
 
 interface UserData {
-  time: number
+  time: number;
   users: {
-    name: string
-    nodes: number
-  }[]
+    name: string;
+    nodes: number;
+  }[];
 }
 
 interface TimeWindow {
-  file: string
-  step: string
-  label: string
-  range: string
+  file: string;
+  step: string;
+  label: string;
+  range: string;
 }
 
 type SectionId = 'total-nodes' | 'nodes-by-country' | 'map';
@@ -42,7 +43,7 @@ type SectionId = 'total-nodes' | 'nodes-by-country' | 'map';
 const SECTIONS: Record<SectionId, string> = {
   'total-nodes': 'total-nodes',
   'nodes-by-country': 'nodes-by-country',
-  'map': 'map'
+  map: 'map',
 };
 
 // Generate a deterministic color based on string
@@ -56,216 +57,242 @@ const stringToColor = (str: string) => {
 };
 
 export const CommunityNodes = () => {
-  const [searchParams, setSearchParams] = useSearchParams()
-  const location = useLocation()
-  const navigate = useNavigate()
-  const [config, setConfig] = useState<Config | null>(null)
-  const [isTimeWindowOpen, setIsTimeWindowOpen] = useState(false)
-  const [hiddenCountries, setHiddenCountries] = useState<Set<string>>(new Set())
-  const containerRef = useRef<HTMLDivElement>(null)
-  const timeWindowRef = useRef<HTMLDivElement>(null)
-  const [containerWidth, setContainerWidth] = useState(0)
+  const [searchParams, setSearchParams] = useSearchParams();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [config, setConfig] = useState<Config | null>(null);
+  const [isTimeWindowOpen, setIsTimeWindowOpen] = useState(false);
+  const [hiddenCountries, setHiddenCountries] = useState<Set<string>>(new Set());
+  const containerRef = useRef<HTMLDivElement>(null);
+  const timeWindowRef = useRef<HTMLDivElement>(null);
+  const [containerWidth, setContainerWidth] = useState(0);
 
-  const configContext = useContext(ConfigContext)
-  const pathPrefix = configContext?.modules?.['xatu_public_contributors']?.path_prefix
+  const configContext = useContext(ConfigContext);
+  const pathPrefix = configContext?.modules?.['xatu_public_contributors']?.path_prefix;
 
-  const { selectedNetwork, setSelectedNetwork } = useContext(NetworkContext)
-  const [currentWindow, setCurrentWindow] = useState<TimeWindow | null>(null)
-  const [countryData, setCountryData] = useState<CountryData[]>([])
-  const [userData, setUserData] = useState<UserData[]>([])
-  const [activeSection, setActiveSection] = useState<SectionId>('total-nodes')
-  const [hiddenUsers, setHiddenUsers] = useState<Set<string>>(new Set())
-  const [mapWidth, setMapWidth] = useState(0)
-  const mapRef = useRef<HTMLDivElement>(null)
+  const { selectedNetwork, setSelectedNetwork } = useContext(NetworkContext);
+  const [currentWindow, setCurrentWindow] = useState<TimeWindow | null>(null);
+  const [countryData, setCountryData] = useState<CountryData[]>([]);
+  const [userData, setUserData] = useState<UserData[]>([]);
+  const [activeSection, setActiveSection] = useState<SectionId>('total-nodes');
+  const [hiddenUsers, setHiddenUsers] = useState<Set<string>>(new Set());
+  const [mapWidth, setMapWidth] = useState(0);
+  const mapRef = useRef<HTMLDivElement>(null);
 
   // Update container width on mount and resize
   useEffect(() => {
     const updateWidth = () => {
       if (containerRef.current) {
-        setContainerWidth(containerRef.current.clientWidth)
+        setContainerWidth(containerRef.current.clientWidth);
       }
-    }
+    };
 
-    updateWidth()
-    window.addEventListener('resize', updateWidth)
-    return () => window.removeEventListener('resize', updateWidth)
-  }, [])
+    updateWidth();
+    window.addEventListener('resize', updateWidth);
+    return () => window.removeEventListener('resize', updateWidth);
+  }, []);
 
-  const timeWindows = useMemo(() => 
-    config?.modules['xatu_public_contributors'].time_windows || [
-      { file: 'last_30_days', step: '1d', label: '30d', range: '-30d' },
-      { file: 'last_1_day', step: '1h', label: '1d', range: '-1d' }
-    ],
-    [config]
-  )
+  const timeWindows = useMemo(
+    () =>
+      config?.modules['xatu_public_contributors'].time_windows || [
+        { file: 'last_30_days', step: '1d', label: '30d', range: '-30d' },
+        { file: 'last_1_day', step: '1h', label: '1d', range: '-1d' },
+      ],
+    [config],
+  );
 
-  const defaultTimeWindow = useMemo(() => timeWindows[0]?.file || 'last_30_days', [timeWindows])
-  const defaultNetwork = useMemo(() => 
-    config?.modules['xatu_public_contributors'].networks?.[0] || 'mainnet',
-    [config]
-  )
+  const defaultTimeWindow = useMemo(() => timeWindows[0]?.file || 'last_30_days', [timeWindows]);
+  const defaultNetwork = useMemo(
+    () => config?.modules['xatu_public_contributors'].networks?.[0] || 'mainnet',
+    [config],
+  );
 
   // Get initial values from URL or defaults
-  const initialNetwork = searchParams.get('network') || defaultNetwork
-  const initialTimeWindow = searchParams.get('timeWindow') || defaultTimeWindow
+  const initialNetwork = searchParams.get('network') || defaultNetwork;
+  const initialTimeWindow = searchParams.get('timeWindow') || defaultTimeWindow;
 
   // Update handleNetworkChange to use setSelectedNetwork
   const handleNetworkChange = (newNetwork: string) => {
-    setSelectedNetwork(newNetwork)
+    setSelectedNetwork(newNetwork);
     // Reset data when network changes
-    setCountryData([])
-    setUserData([])
-    setCurrentWindow(null)
-  }
+    setCountryData([]);
+    setUserData([]);
+    setCurrentWindow(null);
+  };
 
   const handleTimeWindowChange = (newTimeWindow: TimeWindow) => {
-    setCurrentWindow(newTimeWindow)
-    const newParams = new URLSearchParams(searchParams)
+    setCurrentWindow(newTimeWindow);
+    const newParams = new URLSearchParams(searchParams);
     if (newTimeWindow.file !== defaultTimeWindow) {
-      newParams.set('timeWindow', newTimeWindow.file)
+      newParams.set('timeWindow', newTimeWindow.file);
     } else {
-      newParams.delete('timeWindow')
+      newParams.delete('timeWindow');
     }
-    setSearchParams(newParams, { replace: true })
-  }
+    setSearchParams(newParams, { replace: true });
+  };
 
   // Refs for section scrolling
-  const totalNodesRef = useRef<HTMLDivElement>(null)
-  const countriesRef = useRef<HTMLDivElement>(null)
+  const totalNodesRef = useRef<HTMLDivElement>(null);
+  const countriesRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    getConfig().then(setConfig).catch(console.error)
-  }, [])
+    getConfig().then(setConfig).catch(console.error);
+  }, []);
 
   // Handle section scrolling
   useEffect(() => {
-    const hash = location.hash.slice(1) as SectionId
-    if (!hash) return
+    const hash = location.hash.slice(1) as SectionId;
+    if (!hash) return;
 
     const refs = {
       [SECTIONS['total-nodes']]: totalNodesRef,
-      [SECTIONS['nodes-by-country']]: countriesRef
-    }
+      [SECTIONS['nodes-by-country']]: countriesRef,
+    };
 
-    const ref = refs[hash]
+    const ref = refs[hash];
     if (ref?.current) {
-      ref.current.scrollIntoView({ behavior: 'smooth' })
+      ref.current.scrollIntoView({ behavior: 'smooth' });
     }
-  }, [location.hash])
+  }, [location.hash]);
 
   const handleSectionClick = (section: SectionId) => {
-    navigate({ hash: SECTIONS[section] })
-  }
+    navigate({ hash: SECTIONS[section] });
+  };
 
   // Set initial time window when config loads
   useEffect(() => {
     if (timeWindows.length > 0) {
-      const initialWindow = timeWindows.find(w => w.file === initialTimeWindow) || timeWindows[0]
-      setCurrentWindow(initialWindow)
+      const initialWindow = timeWindows.find(w => w.file === initialTimeWindow) || timeWindows[0];
+      setCurrentWindow(initialWindow);
     }
-  }, [timeWindows, initialTimeWindow])
+  }, [timeWindows, initialTimeWindow]);
 
-  const countriesPath = pathPrefix ? `${pathPrefix}/countries/${selectedNetwork}/${currentWindow?.file || defaultTimeWindow}.json` : null
-  const usersPath = pathPrefix ? `${pathPrefix}/users/${selectedNetwork}/${currentWindow?.file || defaultTimeWindow}.json` : null
+  const countriesPath = pathPrefix
+    ? `${pathPrefix}/countries/${selectedNetwork}/${currentWindow?.file || defaultTimeWindow}.json`
+    : null;
+  const usersPath = pathPrefix
+    ? `${pathPrefix}/users/${selectedNetwork}/${currentWindow?.file || defaultTimeWindow}.json`
+    : null;
 
-  const { data: countriesData, loading: countriesLoading, error: countriesError } = useDataFetch<CountryData[]>(countriesPath)
-  const { data: usersData, loading: usersLoading, error: usersError } = useDataFetch<UserData[]>(usersPath)
+  const {
+    data: countriesData,
+    loading: countriesLoading,
+    error: countriesError,
+  } = useDataFetch<CountryData[]>(countriesPath);
+  const {
+    data: usersData,
+    loading: usersLoading,
+    error: usersError,
+  } = useDataFetch<UserData[]>(usersPath);
 
   const { chartData, totalNodesData, topCountries } = useMemo(() => {
     if (!countriesData) {
-      return { chartData: [], totalNodesData: [], topCountries: [] }
+      return { chartData: [], totalNodesData: [], topCountries: [] };
     }
 
     // Convert the new format to chart data
-    const chartData = countriesData.map(timePoint => {
-      const dataPoint: Record<string, number | string> = { time: timePoint.time };
-      timePoint.countries.forEach(country => {
-        dataPoint[country.name] = country.value;
-      });
-      return dataPoint;
-    }).sort((a, b) => a.time - b.time);
+    const chartData = countriesData
+      .map(timePoint => {
+        const dataPoint: Record<string, number | string> = { time: timePoint.time };
+        timePoint.countries.forEach(country => {
+          dataPoint[country.name] = country.value;
+        });
+        return dataPoint;
+      })
+      .sort((a, b) => a.time - b.time);
 
     // Calculate total nodes per time point
     const totalNodesData = chartData.map(timePoint => ({
       time: timePoint.time,
       total: Object.entries(timePoint)
         .filter(([key]) => key !== 'time')
-        .reduce((sum, [, value]) => sum + (value as number), 0)
+        .reduce((sum, [, value]) => sum + (value as number), 0),
     }));
 
     // Get all countries by total contributors (remove slice)
-    const countryTotals = chartData.reduce((acc, timePoint) => {
-      Object.entries(timePoint).forEach(([key, value]) => {
-        if (key !== 'time') {
-          acc[key] = (acc[key] || 0) + (value as number);
-        }
-      });
-      return acc;
-    }, {} as Record<string, number>);
+    const countryTotals = chartData.reduce(
+      (acc, timePoint) => {
+        Object.entries(timePoint).forEach(([key, value]) => {
+          if (key !== 'time') {
+            acc[key] = (acc[key] || 0) + (value as number);
+          }
+        });
+        return acc;
+      },
+      {} as Record<string, number>,
+    );
 
     const topCountries = Object.entries(countryTotals)
       .sort(([, a], [, b]) => b - a)
       .map(([country]) => country);
 
-    return { chartData, totalNodesData, topCountries }
-  }, [countriesData])
+    return { chartData, totalNodesData, topCountries };
+  }, [countriesData]);
 
   const { userChartData, topUsers } = useMemo(() => {
     if (!usersData) {
-      return { userChartData: [], topUsers: [] }
+      return { userChartData: [], topUsers: [] };
     }
 
     // Convert the new format to chart data
-    const chartData = usersData.map(timePoint => {
-      const dataPoint: Record<string, number | string> = { time: timePoint.time };
-      timePoint.users.forEach(user => {
-        dataPoint[user.name] = user.nodes;
-      });
-      dataPoint.uniqueUsers = timePoint.users.length;
-      return dataPoint;
-    }).sort((a, b) => a.time - b.time);
+    const chartData = usersData
+      .map(timePoint => {
+        const dataPoint: Record<string, number | string> = { time: timePoint.time };
+        timePoint.users.forEach(user => {
+          dataPoint[user.name] = user.nodes;
+        });
+        dataPoint.uniqueUsers = timePoint.users.length;
+        return dataPoint;
+      })
+      .sort((a, b) => a.time - b.time);
 
     // Get all users by total nodes
-    const userTotals = chartData.reduce((acc, timePoint) => {
-      Object.entries(timePoint).forEach(([key, value]) => {
-        if (key !== 'time' && key !== 'uniqueUsers') {
-          acc[key] = (acc[key] || 0) + (value as number);
-        }
-      });
-      return acc;
-    }, {} as Record<string, number>);
+    const userTotals = chartData.reduce(
+      (acc, timePoint) => {
+        Object.entries(timePoint).forEach(([key, value]) => {
+          if (key !== 'time' && key !== 'uniqueUsers') {
+            acc[key] = (acc[key] || 0) + (value as number);
+          }
+        });
+        return acc;
+      },
+      {} as Record<string, number>,
+    );
 
     const topUsers = Object.entries(userTotals)
       .sort(([, a], [, b]) => b - a)
       .map(([user]) => user);
 
-    return { userChartData: chartData, topUsers }
-  }, [usersData])
+    return { userChartData: chartData, topUsers };
+  }, [usersData]);
 
-  const handleLegendClick = (e: React.MouseEvent<HTMLButtonElement>, item: { value: string; type: string }) => {
-    const setHiddenItems = item.type === 'country' ? setHiddenCountries : setHiddenUsers
-    const availableItems = item.type === 'country' ? topCountries : topUsers
+  const handleLegendClick = (
+    e: React.MouseEvent<HTMLButtonElement>,
+    item: { value: string; type: string },
+  ) => {
+    const setHiddenItems = item.type === 'country' ? setHiddenCountries : setHiddenUsers;
+    const availableItems = item.type === 'country' ? topCountries : topUsers;
 
     setHiddenItems(prev => {
-      const next = new Set(prev)
-      const isOnlyVisible = !next.has(item.value) && next.size === availableItems.length - 1
-      const isHidden = next.has(item.value)
+      const next = new Set(prev);
+      const isOnlyVisible = !next.has(item.value) && next.size === availableItems.length - 1;
+      const isHidden = next.has(item.value);
 
       if (isOnlyVisible) {
-        next.clear()
+        next.clear();
       } else if (isHidden) {
-        next.delete(item.value)
+        next.delete(item.value);
       } else if (next.size === 0) {
         availableItems.forEach(i => {
-          if (i !== item.value) next.add(i)
-        })
+          if (i !== item.value) next.add(i);
+        });
       } else {
-        next.add(item.value)
+        next.add(item.value);
       }
-      
-      return next
-    })
-  }
+
+      return next;
+    });
+  };
 
   const scrollToSection = (id: string) => {
     const element = document.getElementById(id);
@@ -276,22 +303,27 @@ export const CommunityNodes = () => {
 
       window.scrollTo({
         top: offsetPosition,
-        behavior: 'smooth'
+        behavior: 'smooth',
       });
       navigate({ hash: id });
     }
   };
 
   if (countriesLoading || usersLoading) {
-    return <LoadingState message="Loading data..." />
+    return <LoadingState message="Loading data..." />;
   }
 
   if (countriesError || usersError) {
-    return <ErrorState message="Failed to load data" error={countriesError || usersError || new Error('Unknown error')} />
+    return (
+      <ErrorState
+        message="Failed to load data"
+        error={countriesError || usersError || new Error('Unknown error')}
+      />
+    );
   }
 
   if (!countriesData || !usersData) {
-    return <ErrorState message="No data available" />
+    return <ErrorState message="No data available" />;
   }
 
   return (
@@ -345,10 +377,11 @@ export const CommunityNodes = () => {
       <div className="space-y-6">
         <AboutThisData>
           <p>
-            This data represents Xatu nodes that community members have voluntarily contributed to the network. 
-            These are specifically nodes running the Xatu software to help collect network metrics, and are distinct from Ethereum nodes. 
-            The data helps us understand the geographical distribution of Xatu nodes and monitor the health of the Xatu network.
-            All data is anonymized and no personally identifiable information is collected.
+            This data represents Xatu nodes that community members have voluntarily contributed to
+            the network. These are specifically nodes running the Xatu software to help collect
+            network metrics, and are distinct from Ethereum nodes. The data helps us understand the
+            geographical distribution of Xatu nodes and monitor the health of the Xatu network. All
+            data is anonymized and no personally identifiable information is collected.
           </p>
         </AboutThisData>
 
@@ -366,28 +399,38 @@ export const CommunityNodes = () => {
             >
               <div className="flex items-center gap-2">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
                 </svg>
                 <span className="font-mono">{currentWindow?.label || 'Select Time'}</span>
               </div>
-              <svg 
-                className={`w-4 h-4 transition-transform ${isTimeWindowOpen ? 'rotate-180' : ''}`} 
-                fill="none" 
-                stroke="currentColor" 
+              <svg
+                className={`w-4 h-4 transition-transform ${isTimeWindowOpen ? 'rotate-180' : ''}`}
+                fill="none"
+                stroke="currentColor"
                 viewBox="0 0 24 24"
               >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M19 9l-7 7-7-7"
+                />
               </svg>
             </button>
 
             {isTimeWindowOpen && (
               <div className="absolute z-10 right-0 mt-2 w-48 border border-default">
-                {timeWindows.map((window) => (
+                {timeWindows.map(window => (
                   <button
                     key={window.file}
                     onClick={() => {
-                      handleTimeWindowChange(window)
-                      setIsTimeWindowOpen(false)
+                      handleTimeWindowChange(window);
+                      setIsTimeWindowOpen(false);
                     }}
                     className={`w-full flex items-center gap-2 px-4 py-2 hover:bg-hover first:rounded-t-lg last:rounded-b-lg text-primary ${
                       window.file === currentWindow?.file ? 'bg-active' : ''
@@ -404,10 +447,15 @@ export const CommunityNodes = () => {
         {/* Total Nodes Chart */}
         <ChartWithStats
           title={
-            <a href="#total-nodes" id="total-nodes" onClick={(e) => {
-              e.preventDefault();
-              scrollToSection('total-nodes');
-            }} className="chart-title">
+            <a
+              href="#total-nodes"
+              id="total-nodes"
+              onClick={e => {
+                e.preventDefault();
+                scrollToSection('total-nodes');
+              }}
+              className="chart-title"
+            >
               Total Xatu Nodes
             </a>
           }
@@ -417,44 +465,44 @@ export const CommunityNodes = () => {
               data={[
                 {
                   id: 'total',
-                  data: totalNodesData.map(d => ({ 
-                    x: d.time, 
-                    y: d.total 
-                  }))
-                }
+                  data: totalNodesData.map(d => ({
+                    x: d.time,
+                    y: d.total,
+                  })),
+                },
               ]}
-              margin={{ 
-                top: 20, 
-                right: 10, 
+              margin={{
+                top: 20,
+                right: 10,
                 left: 25,
-                bottom: 40 
+                bottom: 40,
               }}
               xScale={{
                 type: 'time',
                 format: 'native',
-                precision: 'second'
+                precision: 'second',
               }}
               yScale={{
                 type: 'linear',
                 min: 0,
-                max: 'auto'
+                max: 'auto',
               }}
               axisBottom={{
-                format: (value) => {
+                format: value => {
                   const date = new Date(value * 1000);
                   return currentWindow?.step === '1h'
-                    ? date.toLocaleTimeString() 
+                    ? date.toLocaleTimeString()
                     : date.toLocaleDateString();
                 },
                 tickRotation: -45,
-                legend: "Time",
+                legend: 'Time',
                 legendOffset: 36,
-                legendPosition: "middle"
+                legendPosition: 'middle',
               }}
               axisLeft={{
-                legend: "Number of Nodes",
+                legend: 'Number of Nodes',
                 legendOffset: -40,
-                legendPosition: "middle"
+                legendPosition: 'middle',
               }}
               colors={['currentColor']}
               pointSize={0}
@@ -463,45 +511,50 @@ export const CommunityNodes = () => {
           }
           series={[
             {
-              name: "Total Nodes",
-              color: "currentColor",
+              name: 'Total Nodes',
+              color: 'currentColor',
               min: Math.min(...totalNodesData.map(d => d.total)),
               max: Math.max(...totalNodesData.map(d => d.total)),
               avg: totalNodesData.reduce((sum, d) => sum + d.total, 0) / totalNodesData.length,
-              last: totalNodesData[totalNodesData.length - 1].total
-            }
+              last: totalNodesData[totalNodesData.length - 1].total,
+            },
           ]}
         />
 
         {/* Nodes by Country Chart */}
         <ChartWithStats
           title={
-            <a href="#nodes-by-country" id="nodes-by-country" onClick={(e) => {
-              e.preventDefault();
-              scrollToSection('nodes-by-country');
-            }} className="chart-title">
+            <a
+              href="#nodes-by-country"
+              id="nodes-by-country"
+              onClick={e => {
+                e.preventDefault();
+                scrollToSection('nodes-by-country');
+              }}
+              className="chart-title"
+            >
               Xatu Nodes by Country
             </a>
           }
           description="Distribution of Xatu nodes across different countries."
           chart={
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart 
+              <LineChart
                 data={chartData}
-                margin={{ 
-                  top: 20, 
-                  right: 10, 
+                margin={{
+                  top: 20,
+                  right: 10,
                   left: 25,
-                  bottom: 40 
+                  bottom: 40,
                 }}
               >
-                <XAxis 
-                  dataKey="time" 
+                <XAxis
+                  dataKey="time"
                   stroke="currentColor"
-                  tickFormatter={(str) => {
+                  tickFormatter={str => {
                     const date = new Date(str * 1000);
                     return currentWindow?.step === '1h'
-                      ? date.toLocaleTimeString() 
+                      ? date.toLocaleTimeString()
                       : date.toLocaleDateString();
                   }}
                   angle={-45}
@@ -509,39 +562,39 @@ export const CommunityNodes = () => {
                   height={60}
                   interval="preserveStartEnd"
                   tick={{ fontSize: 10 }}
-                  label={{ 
-                    value: "Time",
-                    position: "insideBottom",
+                  label={{
+                    value: 'Time',
+                    position: 'insideBottom',
                     offset: -10,
-                    style: { fill: "currentColor", fontSize: 12 }
+                    style: { fill: 'currentColor', fontSize: 12 },
                   }}
                 />
-                <YAxis 
+                <YAxis
                   stroke="currentColor"
-                  label={{ 
-                    value: 'Number of Nodes', 
-                    angle: -90, 
+                  label={{
+                    value: 'Number of Nodes',
+                    angle: -90,
                     position: 'insideLeft',
                     style: { fill: 'currentColor', fontSize: 12 },
-                    offset: -10
+                    offset: -10,
                   }}
                   tick={{ fontSize: 10 }}
                   width={35}
                 />
-                <Tooltip 
+                <Tooltip
                   contentStyle={{
                     backgroundColor: 'rgba(10, 10, 15, 0.95)',
                     border: '1px solid rgba(0, 255, 159, 0.3)',
                     borderRadius: '0.5rem',
                     color: '#00ff9f',
-                    fontSize: '12px'
+                    fontSize: '12px',
                   }}
-                  labelFormatter={(value) => new Date(value * 1000).toLocaleString()}
+                  labelFormatter={value => new Date(value * 1000).toLocaleString()}
                   formatter={(value: number, name: string) => [value, name]}
                 />
                 {topCountries
                   .filter(country => hiddenCountries.size === 0 || !hiddenCountries.has(country))
-                  .map((country) => (
+                  .map(country => (
                     <Line
                       key={country}
                       type="monotone"
@@ -556,15 +609,15 @@ export const CommunityNodes = () => {
               </LineChart>
             </ResponsiveContainer>
           }
-          series={topCountries.map((country) => {
-            const isHidden = hiddenCountries.has(country)
-            const isOnlyVisible = !isHidden && hiddenCountries.size === topCountries.length - 1
-            const color = stringToColor(country)
-            const values = chartData.map(d => d[country]).filter(Boolean)
-            const latestValue = values[values.length - 1] || 0
-            const avg = values.length ? values.reduce((a, b) => a + b, 0) / values.length : 0
-            const min = values.length ? Math.min(...values) : 0
-            const max = values.length ? Math.max(...values) : 0
+          series={topCountries.map(country => {
+            const isHidden = hiddenCountries.has(country);
+            const isOnlyVisible = !isHidden && hiddenCountries.size === topCountries.length - 1;
+            const color = stringToColor(country);
+            const values = chartData.map(d => d[country]).filter(Boolean);
+            const latestValue = values[values.length - 1] || 0;
+            const avg = values.length ? values.reduce((a, b) => a + b, 0) / values.length : 0;
+            const min = values.length ? Math.min(...values) : 0;
+            const max = values.length ? Math.max(...values) : 0;
 
             return {
               name: country,
@@ -575,40 +628,45 @@ export const CommunityNodes = () => {
               last: latestValue,
               isHidden,
               isHighlighted: isOnlyVisible,
-              onClick: (e) => handleLegendClick(e, { value: country, type: 'country' })
-            }
+              onClick: e => handleLegendClick(e, { value: country, type: 'country' }),
+            };
           })}
         />
 
         {/* Nodes per User Chart */}
         <ChartWithStats
           title={
-            <a href="#nodes-per-user" id="nodes-per-user" onClick={(e) => {
-              e.preventDefault();
-              scrollToSection('nodes-per-user');
-            }} className="chart-title">
+            <a
+              href="#nodes-per-user"
+              id="nodes-per-user"
+              onClick={e => {
+                e.preventDefault();
+                scrollToSection('nodes-per-user');
+              }}
+              className="chart-title"
+            >
               Nodes per User
             </a>
           }
           description="Number of nodes contributed by each user."
           chart={
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart 
+              <LineChart
                 data={userChartData}
-                margin={{ 
-                  top: 20, 
-                  right: 10, 
+                margin={{
+                  top: 20,
+                  right: 10,
                   left: 25,
-                  bottom: 40 
+                  bottom: 40,
                 }}
               >
-                <XAxis 
-                  dataKey="time" 
+                <XAxis
+                  dataKey="time"
                   stroke="currentColor"
-                  tickFormatter={(str) => {
+                  tickFormatter={str => {
                     const date = new Date(str * 1000);
                     return currentWindow?.step === '1h'
-                      ? date.toLocaleTimeString() 
+                      ? date.toLocaleTimeString()
                       : date.toLocaleDateString();
                   }}
                   angle={-45}
@@ -616,39 +674,39 @@ export const CommunityNodes = () => {
                   height={60}
                   interval="preserveStartEnd"
                   tick={{ fontSize: 10 }}
-                  label={{ 
-                    value: "Time",
-                    position: "insideBottom",
+                  label={{
+                    value: 'Time',
+                    position: 'insideBottom',
                     offset: -10,
-                    style: { fill: "currentColor", fontSize: 12 }
+                    style: { fill: 'currentColor', fontSize: 12 },
                   }}
                 />
-                <YAxis 
+                <YAxis
                   stroke="currentColor"
-                  label={{ 
-                    value: 'Number of Nodes', 
-                    angle: -90, 
+                  label={{
+                    value: 'Number of Nodes',
+                    angle: -90,
                     position: 'insideLeft',
                     style: { fill: 'currentColor', fontSize: 12 },
-                    offset: -10
+                    offset: -10,
                   }}
                   tick={{ fontSize: 10 }}
                   width={35}
                 />
-                <Tooltip 
+                <Tooltip
                   contentStyle={{
                     backgroundColor: 'rgba(10, 10, 15, 0.95)',
                     border: '1px solid rgba(0, 255, 159, 0.3)',
                     borderRadius: '0.5rem',
                     color: '#00ff9f',
-                    fontSize: '12px'
+                    fontSize: '12px',
                   }}
-                  labelFormatter={(value) => new Date(value * 1000).toLocaleString()}
+                  labelFormatter={value => new Date(value * 1000).toLocaleString()}
                   formatter={(value: number, name: string) => [value, name]}
                 />
                 {topUsers
                   .filter(user => hiddenUsers.size === 0 || !hiddenUsers.has(user))
-                  .map((user) => (
+                  .map(user => (
                     <Line
                       key={user}
                       type="monotone"
@@ -663,15 +721,15 @@ export const CommunityNodes = () => {
               </LineChart>
             </ResponsiveContainer>
           }
-          series={topUsers.map((user) => {
-            const isHidden = hiddenUsers.has(user)
-            const isOnlyVisible = !isHidden && hiddenUsers.size === topUsers.length - 1
-            const color = stringToColor(user)
-            const values = userChartData.map(d => d[user]).filter(Boolean)
-            const latestValue = values[values.length - 1] || 0
-            const avg = values.length ? values.reduce((a, b) => a + b, 0) / values.length : 0
-            const min = values.length ? Math.min(...values) : 0
-            const max = values.length ? Math.max(...values) : 0
+          series={topUsers.map(user => {
+            const isHidden = hiddenUsers.has(user);
+            const isOnlyVisible = !isHidden && hiddenUsers.size === topUsers.length - 1;
+            const color = stringToColor(user);
+            const values = userChartData.map(d => d[user]).filter(Boolean);
+            const latestValue = values[values.length - 1] || 0;
+            const avg = values.length ? values.reduce((a, b) => a + b, 0) / values.length : 0;
+            const min = values.length ? Math.min(...values) : 0;
+            const max = values.length ? Math.max(...values) : 0;
 
             return {
               name: user,
@@ -682,40 +740,45 @@ export const CommunityNodes = () => {
               last: latestValue,
               isHidden,
               isHighlighted: isOnlyVisible,
-              onClick: (e) => handleLegendClick(e, { value: user, type: 'user' })
-            }
+              onClick: e => handleLegendClick(e, { value: user, type: 'user' }),
+            };
           })}
         />
 
         {/* Contributing Users Chart */}
         <ChartWithStats
           title={
-            <a href="#contributing-users" id="contributing-users" onClick={(e) => {
-              e.preventDefault();
-              scrollToSection('contributing-users');
-            }} className="chart-title">
+            <a
+              href="#contributing-users"
+              id="contributing-users"
+              onClick={e => {
+                e.preventDefault();
+                scrollToSection('contributing-users');
+              }}
+              className="chart-title"
+            >
               Contributing Users
             </a>
           }
           description="Number of unique users contributing nodes over time."
           chart={
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart 
+              <LineChart
                 data={userChartData}
-                margin={{ 
-                  top: 20, 
-                  right: 10, 
+                margin={{
+                  top: 20,
+                  right: 10,
                   left: 25,
-                  bottom: 40 
+                  bottom: 40,
                 }}
               >
-                <XAxis 
-                  dataKey="time" 
+                <XAxis
+                  dataKey="time"
                   stroke="currentColor"
-                  tickFormatter={(str) => {
+                  tickFormatter={str => {
                     const date = new Date(str * 1000);
                     return currentWindow?.step === '1h'
-                      ? date.toLocaleTimeString() 
+                      ? date.toLocaleTimeString()
                       : date.toLocaleDateString();
                   }}
                   angle={-45}
@@ -723,34 +786,34 @@ export const CommunityNodes = () => {
                   height={60}
                   interval="preserveStartEnd"
                   tick={{ fontSize: 10 }}
-                  label={{ 
-                    value: "Time",
-                    position: "insideBottom",
+                  label={{
+                    value: 'Time',
+                    position: 'insideBottom',
                     offset: -10,
-                    style: { fill: "currentColor", fontSize: 12 }
+                    style: { fill: 'currentColor', fontSize: 12 },
                   }}
                 />
-                <YAxis 
+                <YAxis
                   stroke="currentColor"
-                  label={{ 
-                    value: 'Number of Users', 
-                    angle: -90, 
+                  label={{
+                    value: 'Number of Users',
+                    angle: -90,
                     position: 'insideLeft',
                     style: { fill: 'currentColor', fontSize: 12 },
-                    offset: -10
+                    offset: -10,
                   }}
                   tick={{ fontSize: 10 }}
                   width={35}
                 />
-                <Tooltip 
+                <Tooltip
                   contentStyle={{
                     backgroundColor: 'rgba(10, 10, 15, 0.95)',
                     border: '1px solid rgba(0, 255, 159, 0.3)',
                     borderRadius: '0.5rem',
                     color: '#00ff9f',
-                    fontSize: '12px'
+                    fontSize: '12px',
                   }}
-                  labelFormatter={(value) => new Date(value * 1000).toLocaleString()}
+                  labelFormatter={value => new Date(value * 1000).toLocaleString()}
                   formatter={(value: number) => [value, 'Users']}
                 />
                 <Line
@@ -766,7 +829,7 @@ export const CommunityNodes = () => {
           }
           series={[
             {
-              name: "Users",
+              name: 'Users',
               color: '#ff2b92',
               min: Math.min(...userChartData.map(d => d.uniqueUsers)),
               avg: userChartData.reduce((sum, d) => sum + d.uniqueUsers, 0) / userChartData.length,
@@ -774,11 +837,11 @@ export const CommunityNodes = () => {
               last: userChartData[userChartData.length - 1].uniqueUsers,
               isHidden: false,
               isHighlighted: false,
-              onClick: () => {}
-            }
+              onClick: () => {},
+            },
           ]}
         />
       </div>
     </div>
-  )
-} 
+  );
+};

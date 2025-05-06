@@ -1,44 +1,44 @@
-import { ReactNode, useContext, useEffect, useRef } from 'react'
-import { Tooltip } from 'react-tooltip'
-import { FaPlay, FaPause, FaEthereum } from 'react-icons/fa'
-import { NetworkContext } from '@/App'
-import { formatEntityName } from '@/utils/format.ts'
-import { useNavigate } from 'react-router-dom'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
-import clsx from 'clsx'
+import { ReactNode, useContext, useEffect, useRef } from 'react';
+import { Tooltip } from 'react-tooltip';
+import { FaPlay, FaPause, FaEthereum } from 'react-icons/fa';
+import NetworkContext from '@/contexts/NetworkContext';
+import { formatEntityName } from '@/utils/format.ts';
+import { useNavigate } from 'react-router-dom';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import clsx from 'clsx';
 
 interface BlockEvent {
-  type: 'block_seen'
-  time: number
-  node: string
-  source: 'p2p' | 'api'
+  type: 'block_seen';
+  time: number;
+  node: string;
+  source: 'p2p' | 'api';
 }
 
 interface TimelineViewProps {
-  slot?: number
-  isPlaying: boolean
-  currentTime: number
-  firstBlockSeen: BlockEvent | null
-  firstApiBlockSeen?: BlockEvent | null
-  firstP2pBlockSeen?: BlockEvent | null
+  slot?: number;
+  isPlaying: boolean;
+  currentTime: number;
+  firstBlockSeen: BlockEvent | null;
+  firstApiBlockSeen?: BlockEvent | null;
+  firstP2pBlockSeen?: BlockEvent | null;
   attestationWindows?: Array<{
-    start_ms: number
-    end_ms: number
-    validator_indices: number[]
-  }>
+    start_ms: number;
+    end_ms: number;
+    validator_indices: number[];
+  }>;
   attestationProgress: Array<{
-    time: number
-    totalValidators: number
-  }>
-  ATTESTATION_THRESHOLD: number
-  TOTAL_VALIDATORS: number
-  loading: boolean
-  isMissing: boolean
-  onPlayPauseClick: () => void
-  proposerIndex?: number
-  entity?: string
-  executionBlockNumber?: number
-  isLive?: boolean
+    time: number;
+    totalValidators: number;
+  }>;
+  ATTESTATION_THRESHOLD: number;
+  TOTAL_VALIDATORS: number;
+  loading: boolean;
+  isMissing: boolean;
+  onPlayPauseClick: () => void;
+  proposerIndex?: number;
+  entity?: string;
+  executionBlockNumber?: number;
+  isLive?: boolean;
 }
 
 export function TimelineView({
@@ -58,62 +58,65 @@ export function TimelineView({
   proposerIndex,
   entity,
   executionBlockNumber,
-  isLive = false
+  isLive = false,
 }: TimelineViewProps): JSX.Element {
-  const epoch = slot ? Math.floor(slot / 32) : 0
-  const slotInEpoch = slot ? (slot % 32) + 1 : 0
-  const { selectedNetwork } = useContext(NetworkContext)
-  const navigate = useNavigate()
-  const timelineRef = useRef<HTMLDivElement>(null)
+  const epoch = slot ? Math.floor(slot / 32) : 0;
+  const slotInEpoch = slot ? (slot % 32) + 1 : 0;
+  const { selectedNetwork } = useContext(NetworkContext);
+  const navigate = useNavigate();
+  const timelineRef = useRef<HTMLDivElement>(null);
 
   const handlePreviousSlot = () => {
     if (slot) {
-      navigate(`/beacon/slot/${slot - 1}?network=${selectedNetwork}`)
+      navigate(`/beacon/slot/${slot - 1}?network=${selectedNetwork}`);
     }
-  }
+  };
 
   const handleNextSlot = () => {
     if (slot && !isLive) {
-      navigate(`/beacon/slot/${slot + 1}?network=${selectedNetwork}`)
+      navigate(`/beacon/slot/${slot + 1}?network=${selectedNetwork}`);
     }
-  }
+  };
 
   // Auto-scroll to keep current time position visible
   useEffect(() => {
-    if (!timelineRef.current || loading || !attestationWindows || attestationWindows.length === 0) return
+    if (!timelineRef.current || loading || !attestationWindows || attestationWindows.length === 0)
+      return;
 
-    const container = timelineRef.current
-    const containerHeight = container.clientHeight
-    const scrollHeight = container.scrollHeight
+    const container = timelineRef.current;
+    const containerHeight = container.clientHeight;
+    const scrollHeight = container.scrollHeight;
 
     // Calculate where we are in the timeline as a percentage
-    const timelinePosition = (currentTime / 12) // 12 seconds total
-    
+    const timelinePosition = currentTime / 12; // 12 seconds total
+
     // Convert that to pixels
-    const targetScroll = Math.floor(scrollHeight * timelinePosition)
-    
+    const targetScroll = Math.floor(scrollHeight * timelinePosition);
+
     // Keep the current time position in the middle of the viewport
-    const scrollPosition = Math.max(0, targetScroll - (containerHeight / 2))
+    const scrollPosition = Math.max(0, targetScroll - containerHeight / 2);
 
     container.scrollTo({
       top: scrollPosition,
-      behavior: isPlaying ? 'smooth' : 'auto'
-    })
-  }, [currentTime, loading, isPlaying])
+      behavior: isPlaying ? 'smooth' : 'auto',
+    });
+  }, [currentTime, loading, isPlaying]);
 
   // Reset scroll position when slot changes
   useEffect(() => {
     if (timelineRef.current) {
-      timelineRef.current.scrollTop = 0
+      timelineRef.current.scrollTop = 0;
     }
-  }, [slot])
+  }, [slot]);
 
   return (
     <div className="w-full md:max-w-[80%] mx-auto">
-      <div className={clsx(
-        'relative backdrop-blur-lg bg-surface/40 ring-1 ring-inset ring-white/5 rounded-lg overflow-hidden',
-        loading && 'animate-pulse'
-      )}>
+      <div
+        className={clsx(
+          'relative backdrop-blur-lg bg-surface/40 ring-1 ring-inset ring-white/5 rounded-lg overflow-hidden',
+          loading && 'animate-pulse',
+        )}
+      >
         {/* Header with info */}
         <div className="flex flex-col space-y-4 p-3 sm:p-4">
           {/* Top row - Slot number and controls */}
@@ -133,7 +136,7 @@ export function TimelineView({
                   <div className="flex items-baseline gap-2">
                     <span className="text-tertiary/50 text-base sm:text-lg">by</span>
                     {entity ? (
-                      <a 
+                      <a
                         href={`https://ethseer.io/entity/${entity}?network=${selectedNetwork}`}
                         target="_blank"
                         rel="noopener noreferrer"
@@ -149,7 +152,9 @@ export function TimelineView({
                         </span>
                       </a>
                     ) : (
-                      <span className="text-xl sm:text-2xl font-mono font-medium text-accent">Unknown</span>
+                      <span className="text-xl sm:text-2xl font-mono font-medium text-accent">
+                        Unknown
+                      </span>
                     )}
                   </div>
                 </>
@@ -171,9 +176,9 @@ export function TimelineView({
                   disabled={isLive}
                   className={clsx(
                     'w-12 h-12 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center transition-all border touch-manipulation',
-                    isLive 
-                      ? 'opacity-50 cursor-not-allowed bg-surface/50 border-text-muted/50' 
-                      : 'bg-surface hover:bg-hover border-text-muted'
+                    isLive
+                      ? 'opacity-50 cursor-not-allowed bg-surface/50 border-text-muted/50'
+                      : 'bg-surface hover:bg-hover border-text-muted',
                   )}
                 >
                   <ChevronRight className="w-6 h-6 sm:w-5 sm:h-5" />
@@ -186,7 +191,11 @@ export function TimelineView({
                   onClick={onPlayPauseClick}
                   className="w-14 h-14 sm:w-12 sm:h-12 rounded-full flex items-center justify-center bg-surface hover:bg-hover transition-all border border-text-muted touch-manipulation"
                 >
-                  {isPlaying ? <FaPause className="w-6 h-6 sm:w-5 sm:h-5" /> : <FaPlay className="w-6 h-6 sm:w-5 sm:h-5 ml-0.5" />}
+                  {isPlaying ? (
+                    <FaPause className="w-6 h-6 sm:w-5 sm:h-5" />
+                  ) : (
+                    <FaPlay className="w-6 h-6 sm:w-5 sm:h-5 ml-0.5" />
+                  )}
                 </button>
                 <div className="text-center">
                   <span className="font-mono text-lg sm:text-xl text-primary">
@@ -203,7 +212,9 @@ export function TimelineView({
               <div className="h-4 w-48 bg-surface/50 rounded" />
             ) : (
               <>
-                <span>Slot {slotInEpoch} of Epoch {epoch}</span>
+                <span>
+                  Slot {slotInEpoch} of Epoch {epoch}
+                </span>
                 <span className="hidden sm:inline text-tertiary/50">·</span>
                 <div className="flex flex-wrap items-center gap-4">
                   <div className="flex items-center gap-1.5">
@@ -217,10 +228,7 @@ export function TimelineView({
         </div>
 
         {/* Timeline */}
-        <div 
-          ref={timelineRef}
-          className="relative max-h-[20rem] overflow-y-auto"
-        >
+        <div ref={timelineRef} className="relative max-h-[20rem] overflow-y-auto">
           {/* Background sections */}
           <div className="absolute inset-0 flex">
             <div className="w-1/3 h-full bg-accent/5" />
@@ -251,7 +259,7 @@ export function TimelineView({
 
           {/* Progress bar */}
           <div className="absolute inset-0 overflow-hidden">
-            <div 
+            <div
               className="absolute inset-y-0 left-0 bg-gradient-to-r from-active/30 to-active/10 transition-all duration-100"
               style={{ width: `${(currentTime / 12000) * 100}%` }}
             >
@@ -314,7 +322,7 @@ export function TimelineView({
           {/* Time markers */}
           <div className="absolute inset-x-0 bottom-0 h-8 sm:h-6 flex">
             {Array.from({ length: 11 }).map((_, i) => {
-              const time = i + 1
+              const time = i + 1;
               return (
                 <div
                   key={time}
@@ -322,11 +330,9 @@ export function TimelineView({
                   style={{ left: `${(time / 12) * 100}%` }}
                 >
                   <div className="w-px h-2 sm:h-1.5 bg-primary/20" />
-                  <span className="mt-1 text-[10px] font-mono text-muted">
-                    {time}s
-                  </span>
+                  <span className="mt-1 text-[10px] font-mono text-muted">{time}s</span>
                 </div>
-              )
+              );
             })}
           </div>
         </div>
@@ -364,5 +370,5 @@ export function TimelineView({
         className="z-50 max-w-xs !bg-surface !text-primary !font-mono !text-xs !px-2 !py-1"
       />
     </div>
-  )
-} 
+  );
+}

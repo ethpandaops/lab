@@ -36,13 +36,13 @@ class SlotDataStore {
   // Store slot data
   public storeSlotData(network: string, slot: number, data: any): void {
     const key = this.getCacheKey(network, slot);
-    
+
     // Store the data with a timestamp
     this.slotDataCache.set(key, {
       network,
       slot,
       data,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     });
 
     // Clean up old entries if we exceed the cache size
@@ -55,19 +55,19 @@ class SlotDataStore {
   public getSlotData(network: string, slot: number): any | null {
     const key = this.getCacheKey(network, slot);
     const entry = this.slotDataCache.get(key);
-    
+
     // If entry doesn't exist, return null
     if (!entry) {
       return null;
     }
-    
+
     // Check if the data is too old
     const now = Date.now();
     if (now - entry.timestamp > this.maxAgeMs) {
       this.slotDataCache.delete(key);
       return null;
     }
-    
+
     return entry.data;
   }
 
@@ -75,18 +75,18 @@ class SlotDataStore {
   public hasSlotData(network: string, slot: number): boolean {
     const key = this.getCacheKey(network, slot);
     const entry = this.slotDataCache.get(key);
-    
+
     // If entry doesn't exist, return false
     if (!entry) {
       return false;
     }
-    
+
     // Check if the data is too old
     const now = Date.now();
     if (now - entry.timestamp > this.maxAgeMs) {
       return false;
     }
-    
+
     return true;
   }
 
@@ -94,23 +94,23 @@ class SlotDataStore {
   private cleanupOldEntries(): void {
     // Convert to array for sorting
     const entries = Array.from(this.slotDataCache.entries());
-    
+
     // Sort by timestamp (oldest first)
     entries.sort((a, b) => a[1].timestamp - b[1].timestamp);
-    
+
     // Remove oldest entries until we're under the limit
     const entriesToRemove = entries.slice(0, entries.length - this.maxCacheSize);
-    
+
     for (const [key] of entriesToRemove) {
       this.slotDataCache.delete(key);
     }
   }
 
   // Debug method to get cache stats
-  public getCacheStats(): { size: number, keys: string[] } {
+  public getCacheStats(): { size: number; keys: string[] } {
     return {
       size: this.slotDataCache.size,
-      keys: Array.from(this.slotDataCache.keys())
+      keys: Array.from(this.slotDataCache.keys()),
     };
   }
 }

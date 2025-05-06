@@ -12,7 +12,6 @@ const formatRelativeTime = (ms: number | null | undefined): string => {
 
 // Removed getRelativeMs helper as it's no longer needed
 
-
 export interface SlotTimingBreakdownProps {
   // bids: RelayBid[] | undefined; // Not passed from parent
   // deliveredPayload: DeliveredPayload | null | undefined; // Not passed from parent
@@ -33,15 +32,15 @@ export const SlotTimingBreakdown: React.FC<SlotTimingBreakdownProps> = ({
 
     let firstBlockSeenTimeMs: number | null = null;
     if (timings?.blockSeen && Object.keys(timings.blockSeen).length > 0) {
-        // blockSeen values are bigint, convert to number
-        const seenTimes = Object.values(timings.blockSeen)
-                                .filter((t): t is bigint => t != null) // Filter null/undefined first
-                                .map(t => Number(t)); // Convert bigint to number
-        if (seenTimes.length > 0) {
-            // Clamp seen times relative to the 12s slot
-            const clampedSeenTimes = seenTimes.map(t => Math.max(0, Math.min(t, 12000)));
-            firstBlockSeenTimeMs = Math.min(...clampedSeenTimes);
-        }
+      // blockSeen values are bigint, convert to number
+      const seenTimes = Object.values(timings.blockSeen)
+        .filter((t): t is bigint => t != null) // Filter null/undefined first
+        .map(t => Number(t)); // Convert bigint to number
+      if (seenTimes.length > 0) {
+        // Clamp seen times relative to the 12s slot
+        const clampedSeenTimes = seenTimes.map(t => Math.max(0, Math.min(t, 12000)));
+        firstBlockSeenTimeMs = Math.min(...clampedSeenTimes);
+      }
     }
 
     return {
@@ -56,7 +55,7 @@ export const SlotTimingBreakdown: React.FC<SlotTimingBreakdownProps> = ({
     timeMs: number | null,
     label: string,
     colorClass: string,
-    icon?: React.ReactNode // Optional icon
+    icon?: React.ReactNode, // Optional icon
   ) => {
     if (timeMs === null || timeMs > currentTime) {
       return null;
@@ -67,8 +66,8 @@ export const SlotTimingBreakdown: React.FC<SlotTimingBreakdownProps> = ({
     return (
       <div
         className={cn(
-          "absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-2.5 h-2.5 rounded-full border border-background", // Centered marker
-          colorClass
+          'absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-2.5 h-2.5 rounded-full border border-background', // Centered marker
+          colorClass,
         )}
         style={{ left: `${percentage}%` }}
         aria-label={`${label} at ${formatRelativeTime(timeMs)}`}
@@ -87,8 +86,8 @@ export const SlotTimingBreakdown: React.FC<SlotTimingBreakdownProps> = ({
       <div className="relative w-full h-2 bg-surface rounded">
         {/* Progress Fill */}
         <div
-            className="absolute top-0 left-0 h-full bg-primary/30 rounded"
-            style={{ width: `${currentTimePercentage}%` }}
+          className="absolute top-0 left-0 h-full bg-primary/30 rounded"
+          style={{ width: `${currentTimePercentage}%` }}
         />
         {/* Event Markers - Only show block seen */}
         {/* {renderMarker(eventTimes.firstBidTimeMs, 'First Bid Received', 'bg-blue-500')} */}
@@ -103,13 +102,13 @@ export const SlotTimingBreakdown: React.FC<SlotTimingBreakdownProps> = ({
           aria-label={`Current time: ${formatRelativeTime(currentTime)}`}
         /> */}
       </div>
-       {/* Optional: Simple Text Fallback/Alternative - Only show block seen */}
-       {/* <div className="mt-2 text-xs text-muted"> */}
-         {/* {eventTimes.firstBidTimeMs !== null && eventTimes.firstBidTimeMs <= currentTime && <div>First Bid: {formatRelativeTime(eventTimes.firstBidTimeMs)}</div>} */}
-         {/* {eventTimes.highestBidTimeMs !== null && eventTimes.highestBidTimeMs <= currentTime && <div>Highest Bid: {formatRelativeTime(eventTimes.highestBidTimeMs)}</div>} */}
-         {/* {eventTimes.payloadDeliveredTimeMs !== null && eventTimes.payloadDeliveredTimeMs <= currentTime && <div>Payload Delivered: {formatRelativeTime(eventTimes.payloadDeliveredTimeMs)}</div>} */}
-         {/* {eventTimes.firstBlockSeenTimeMs !== null && eventTimes.firstBlockSeenTimeMs <= currentTime && <div>First Block Seen: {formatRelativeTime(eventTimes.firstBlockSeenTimeMs)}</div>} */}
-       {/* </div> */}
+      {/* Optional: Simple Text Fallback/Alternative - Only show block seen */}
+      {/* <div className="mt-2 text-xs text-muted"> */}
+      {/* {eventTimes.firstBidTimeMs !== null && eventTimes.firstBidTimeMs <= currentTime && <div>First Bid: {formatRelativeTime(eventTimes.firstBidTimeMs)}</div>} */}
+      {/* {eventTimes.highestBidTimeMs !== null && eventTimes.highestBidTimeMs <= currentTime && <div>Highest Bid: {formatRelativeTime(eventTimes.highestBidTimeMs)}</div>} */}
+      {/* {eventTimes.payloadDeliveredTimeMs !== null && eventTimes.payloadDeliveredTimeMs <= currentTime && <div>Payload Delivered: {formatRelativeTime(eventTimes.payloadDeliveredTimeMs)}</div>} */}
+      {/* {eventTimes.firstBlockSeenTimeMs !== null && eventTimes.firstBlockSeenTimeMs <= currentTime && <div>First Block Seen: {formatRelativeTime(eventTimes.firstBlockSeenTimeMs)}</div>} */}
+      {/* </div> */}
     </div>
   );
 };

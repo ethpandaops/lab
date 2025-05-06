@@ -18,8 +18,7 @@ export const ProposerInfoDisplay: React.FC<ProposerInfoDisplayProps> = ({
   entity,
 }) => {
   // Format proposerIndex, handling potential BigInt and undefined values
-  const formattedProposerIndex =
-    proposerIndex !== undefined ? proposerIndex.toString() : 'Unknown';
+  const formattedProposerIndex = proposerIndex !== undefined ? proposerIndex.toString() : 'Unknown';
 
   // Determine entity display value, providing a fallback
   const entityDisplay = entity || '-';

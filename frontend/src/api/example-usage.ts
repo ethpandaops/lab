@@ -13,7 +13,7 @@ import { GetRecentLocallyBuiltBlocksRequest } from '@/api/gen/backend/pkg/api/pr
 export const exampleApiUsage = async () => {
   // 1. Create the API client instance
   // Replace "http://localhost:8080" with your actual API server URL
-  const apiClient: LabApiClientType = createLabApiClient("http://localhost:8080");
+  const apiClient: LabApiClientType = createLabApiClient('http://localhost:8080');
 
   // 2. Prepare the request data (plain JavaScript object matching the request message structure)
   const requestData = new GetRecentLocallyBuiltBlocksRequest({
@@ -33,13 +33,13 @@ export const exampleApiUsage = async () => {
     // Type guard to ensure response and slotBlocks exist
     if (response.slotBlocks.length > 0) {
       console.log(`Received ${response.slotBlocks.length} slot blocks.`);
-      
+
       // Process the response data
-      response.slotBlocks.forEach((slotBlock) => {
+      response.slotBlocks.forEach(slotBlock => {
         console.log(`  Slot: ${slotBlock.slot}`);
 
         if (slotBlock.blocks.length > 0) {
-          slotBlock.blocks.forEach((block) => {
+          slotBlock.blocks.forEach(block => {
             // Access fields directly from the response object
             console.log(`    Block Version: ${block.blockVersion}`);
             console.log(`    Block Total Bytes: ${block.blockTotalBytes}`);
@@ -56,7 +56,6 @@ export const exampleApiUsage = async () => {
     }
 
     return response; // Return the response object
-
   } catch (error) {
     console.error('Error calling API:', error);
     // Handle errors appropriately in a real application

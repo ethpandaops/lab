@@ -1,6 +1,10 @@
-import { getDataUrl } from "@/config";
+import { getDataUrl } from '@/config';
 
-export const getBeaconChainTimingsPath = (network: string, timeWindow: string, dataType: string): string => {
+export const getBeaconChainTimingsPath = (
+  network: string,
+  timeWindow: string,
+  dataType: string,
+): string => {
   return `beacon_chain_timings/${dataType}/${network}/${timeWindow}.json`;
 };
 
@@ -17,4 +21,4 @@ export const fetchData = async <T>(path: string): Promise<T> => {
     console.error(`Failed to fetch data from ${url}:`, error);
     throw error;
   }
-}; 
+};

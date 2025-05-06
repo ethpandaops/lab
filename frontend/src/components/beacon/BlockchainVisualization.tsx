@@ -1,11 +1,10 @@
 import React, { useMemo } from 'react';
-import { truncateMiddle } from '@/components/beacon/block_production/common/utils';
 import SlotDataStore from '@/utils/SlotDataStore';
 import { getCurrentPhase } from '@/components/beacon/block_production/common/PhaseUtils';
 import { Phase } from '@/components/beacon/block_production/common/types';
 import BlockDetailsPanel from '@/components/beacon/block_production/common/BlockDetailsPanel';
 import PendingBlock from '@/components/beacon/block_production/common/PendingBlock';
-
+import { SlotData } from '@/types/index';
 // Define types for our component props
 interface BlockchainVisualizationProps {
   currentSlot: number | null;
@@ -18,7 +17,7 @@ interface BlockchainVisualizationProps {
   width?: string | number;
   className?: string;
   // New prop to pass down slot data directly
-  slotData?: any;
+  slotData?: Record<number, SlotData>;
 }
 
 // Type for block data display
@@ -43,7 +42,7 @@ interface BlockDisplayData {
     relayName: string;
     builderName?: string;
   }>;
-  slotDataObject?: any; // Store the full slot data object
+  slotDataObject?: SlotData; // Store the full slot data object
 }
 
 const BlockchainVisualization: React.FC<BlockchainVisualizationProps> = ({
@@ -60,127 +59,135 @@ const BlockchainVisualization: React.FC<BlockchainVisualizationProps> = ({
 }) => {
   // Determine the current phase using PhaseUtils
   const currentPhase = useMemo(() => {
-    return getCurrentPhase(
-      currentTime,
-      nodeBlockSeen,
-      nodeBlockP2P,
-      blockTime
-    );
+    return getCurrentPhase(currentTime, nodeBlockSeen, nodeBlockP2P, blockTime);
   }, [currentTime, nodeBlockSeen, nodeBlockP2P, blockTime]);
-  
+
   // Get the slot data store
   const slotDataStore = useMemo(() => SlotDataStore.getInstance(), []);
 
   // Calculate the slots to display: 1 previous, current, and 1 next
   const displaySlots = useMemo(() => {
     if (currentSlot === null) return [];
-    
+
     return [
       currentSlot - 1, // -1 slot
-      currentSlot,     // Current slot
+      currentSlot, // Current slot
       currentSlot + 1, // Next slot
     ];
   }, [currentSlot]);
 
   // For debugging
   // console.log("slotData:", slotData);
-  
+
   // Process data for each slot
   const blockData: BlockDisplayData[] = useMemo(() => {
     return displaySlots.map(slot => {
       // Prefer passed-in slot data, fall back to store if needed
-      const slotDataForSlot = (slotData && slotData[slot]) || slotDataStore.getSlotData(network, slot);
+      const slotDataForSlot =
+        (slotData && slotData[slot]) || slotDataStore.getSlotData(network, slot);
       const isPast = slot < (currentSlot || 0);
       const isFuture = slot > (currentSlot || 0);
       const isCurrentSlot = slot === currentSlot;
       const hasData = !!slotDataForSlot;
-      
+
       // Always show building/pending for future slots and for current slot in Building phase
       // For debugging - log the decision process
       const isBuilding = isFuture || (isCurrentSlot && currentPhase === Phase.Building);
-      console.log(`Slot ${slot}: isFuture=${isFuture}, isCurrentSlot=${isCurrentSlot}, currentPhase=${currentPhase}, isBuilding=${isBuilding}, hasData=${hasData}`);
+      console.log(
+        `Slot ${slot}: isFuture=${isFuture}, isCurrentSlot=${isCurrentSlot}, currentPhase=${currentPhase}, isBuilding=${isBuilding}, hasData=${hasData}`,
+      );
 
       // If we have data for this slot, extract relevant information
       if (slotDataForSlot) {
         const block = slotDataForSlot.block || {};
         const executionPayload = block.execution_payload || {};
-        
+
         // Extract blob count
-        const blobGasUsed = typeof executionPayload.blob_gas_used !== 'undefined'
-          ? Number(executionPayload.blob_gas_used)
-          : typeof block.execution_payload_blob_gas_used !== 'undefined'
-            ? Number(block.execution_payload_blob_gas_used)
-            : typeof block.executionPayloadBlobGasUsed !== 'undefined'
-              ? Number(block.executionPayloadBlobGasUsed)
-              : 0;
-        
-        const blobCount = blobGasUsed > 0 
-          ? Math.ceil(blobGasUsed / 131072) 
-          : 0;
-        
+        const blobGasUsed =
+          typeof executionPayload.blob_gas_used !== 'undefined'
+            ? Number(executionPayload.blob_gas_used)
+            : typeof block.execution_payload_blob_gas_used !== 'undefined'
+              ? Number(block.execution_payload_blob_gas_used)
+              : typeof block.executionPayloadBlobGasUsed !== 'undefined'
+                ? Number(block.executionPayloadBlobGasUsed)
+                : 0;
+
+        const blobCount = blobGasUsed > 0 ? Math.ceil(blobGasUsed / 131072) : 0;
+
         // Extract execution block number
-        const executionBlockNumber = typeof executionPayload.block_number !== 'undefined'
-          ? Number(executionPayload.block_number)
-          : typeof block.execution_payload_block_number !== 'undefined'
-            ? Number(block.execution_payload_block_number)
-            : typeof block.executionPayloadBlockNumber !== 'undefined'
-              ? Number(block.executionPayloadBlockNumber)
-              : undefined;
-            
+        const executionBlockNumber =
+          typeof executionPayload.block_number !== 'undefined'
+            ? Number(executionPayload.block_number)
+            : typeof block.execution_payload_block_number !== 'undefined'
+              ? Number(block.execution_payload_block_number)
+              : typeof block.executionPayloadBlockNumber !== 'undefined'
+                ? Number(block.executionPayloadBlockNumber)
+                : undefined;
+
         // Extract transaction count
-        const transactionCount = typeof executionPayload.transactions_count !== 'undefined'
-          ? Number(executionPayload.transactions_count)
-          : typeof block.execution_payload_transactions_count !== 'undefined'
-            ? Number(block.execution_payload_transactions_count)
-            : typeof block.executionPayloadTransactionsCount !== 'undefined'
-              ? Number(block.executionPayloadTransactionsCount)
-              : undefined;
-            
+        const transactionCount =
+          typeof executionPayload.transactions_count !== 'undefined'
+            ? Number(executionPayload.transactions_count)
+            : typeof block.execution_payload_transactions_count !== 'undefined'
+              ? Number(block.execution_payload_transactions_count)
+              : typeof block.executionPayloadTransactionsCount !== 'undefined'
+                ? Number(block.executionPayloadTransactionsCount)
+                : undefined;
+
         // Extract gas used
-        const gasUsed = typeof executionPayload.gas_used !== 'undefined'
-          ? Number(executionPayload.gas_used)
-          : typeof block.execution_payload_gas_used !== 'undefined'
-            ? Number(block.execution_payload_gas_used)
-            : typeof block.executionPayloadGasUsed !== 'undefined'
-              ? Number(block.executionPayloadGasUsed)
-              : undefined;
-            
+        const gasUsed =
+          typeof executionPayload.gas_used !== 'undefined'
+            ? Number(executionPayload.gas_used)
+            : typeof block.execution_payload_gas_used !== 'undefined'
+              ? Number(block.execution_payload_gas_used)
+              : typeof block.executionPayloadGasUsed !== 'undefined'
+                ? Number(block.executionPayloadGasUsed)
+                : undefined;
+
         // Extract gas limit
-        const gasLimit = typeof executionPayload.gas_limit !== 'undefined'
-          ? Number(executionPayload.gas_limit)
-          : typeof block.execution_payload_gas_limit !== 'undefined'
-            ? Number(block.execution_payload_gas_limit)
-            : typeof block.executionPayloadGasLimit !== 'undefined'
-              ? Number(block.executionPayloadGasLimit)
-              : undefined;
-        
+        const gasLimit =
+          typeof executionPayload.gas_limit !== 'undefined'
+            ? Number(executionPayload.gas_limit)
+            : typeof block.execution_payload_gas_limit !== 'undefined'
+              ? Number(block.execution_payload_gas_limit)
+              : typeof block.executionPayloadGasLimit !== 'undefined'
+                ? Number(block.executionPayloadGasLimit)
+                : undefined;
+
         // Get block hash
-        const blockHash = block.state_root || block.blockRoot || block.block_root || executionPayload.block_hash || block.executionPayloadBlockHash || block.execution_payload_block_hash;
-        
+        const blockHash =
+          block.state_root ||
+          block.blockRoot ||
+          block.block_root ||
+          executionPayload.block_hash ||
+          block.executionPayloadBlockHash ||
+          block.execution_payload_block_hash;
+
         // Get list of relays that delivered the payload
-        const deliveredRelays: string[] = slotDataForSlot.deliveredPayloads ? 
-          Object.keys(slotDataForSlot.deliveredPayloads) : [];
-        
+        const deliveredRelays: string[] = slotDataForSlot.deliveredPayloads
+          ? Object.keys(slotDataForSlot.deliveredPayloads)
+          : [];
+
         // Get block value from winning bid if available
         let winningBid = null;
-        
+
         if (slotDataForSlot.relayBids) {
           // Find winning bids from all relays (bids marked as winning)
-          const winningBids = Object.values(slotDataForSlot.relayBids).flatMap((relay: any) => 
-            relay.bids?.filter((bid: any) => bid.isWinning) || []
+          const winningBids = Object.values(slotDataForSlot.relayBids).flatMap(
+            relay => relay.bids?.filter(bid => bid.isWinning) || [],
           );
-          
+
           // Use the first winning bid for value display
           winningBid = winningBids[0];
-          
+
           // Add delivered relays to the winning bid
           if (winningBid) {
             winningBid.deliveredRelays = deliveredRelays;
           }
         }
-        
+
         const blockValue = winningBid?.value;
-        
+
         return {
           slot,
           blockHash,
@@ -196,35 +203,37 @@ const BlockchainVisualization: React.FC<BlockchainVisualizationProps> = ({
           isFuture,
           hasData,
           isBuilding,
-          slotDataObject: slotDataForSlot // Store the full slot data object
+          slotDataObject: slotDataForSlot, // Store the full slot data object
         };
       }
-      
+
       // For future slots, check for bids with negative time and extract detailed bid information
       if (isFuture) {
-        const previousSlotData = (slotData && slotData[currentSlot || 0]) || slotDataStore.getSlotData(network, currentSlot || 0);
+        const previousSlotData =
+          (slotData && slotData[currentSlot || 0]) ||
+          slotDataStore.getSlotData(network, currentSlot || 0);
         let futureBidsCount = 0;
         const futureBids: Array<{ value: number; relayName: string; builderName?: string }> = [];
-        
+
         if (previousSlotData?.relayBids) {
           // Process bids with negative time (for next slot)
-          Object.entries(previousSlotData.relayBids).forEach(([relayName, relay]: [string, any]) => {
+          Object.entries(previousSlotData.relayBids).forEach(([relayName, relay]) => {
             if (relay.bids && Array.isArray(relay.bids)) {
               // Filter bids with negative time (which indicates they're for the next slot)
               // Some systems use negative time to indicate next slot bids
-              const negativeBids = relay.bids.filter((bid: any) => {
+              const negativeBids = relay.bids.filter(bid => {
                 const bidTime = typeof bid.time === 'number' ? bid.time : 0;
                 return bidTime < 0;
               });
-              
+
               futureBidsCount += negativeBids.length;
-              
+
               // Process detailed bid information to show in the UI
-              negativeBids.forEach((bid: any) => {
+              negativeBids.forEach(bid => {
                 try {
                   // Get builder name if available
                   let builderName = undefined;
-                  
+
                   // Try to get builder name from the data
                   if (bid.builderPubkey) {
                     // Check if any BuilderNames store/data is available
@@ -232,7 +241,7 @@ const BlockchainVisualization: React.FC<BlockchainVisualizationProps> = ({
                       builderName = previousSlotData.builderNames[bid.builderPubkey];
                     }
                   }
-                  
+
                   // Convert value to ETH - handle various value formats
                   let valueInEth = 0;
                   if (typeof bid.value === 'string') {
@@ -246,29 +255,30 @@ const BlockchainVisualization: React.FC<BlockchainVisualizationProps> = ({
                   } else if (typeof bid.value === 'number') {
                     valueInEth = bid.value;
                   }
-                  
+
                   futureBids.push({
                     value: valueInEth,
                     relayName,
-                    builderName
+                    builderName,
                   });
                 } catch (error) {
-                  console.error("Error processing future bid", error);
+                  console.error('Error processing future bid', error);
                 }
               });
             }
           });
         }
-        
+
         // Sort future bids by value (highest first)
         futureBids.sort((a, b) => b.value - a.value);
-        
+
         // Try to get prefetched data for the future slot
-        const prefetchedData = (slotData && slotData[slot]) || slotDataStore.getSlotData(network, slot);
+        const prefetchedData =
+          (slotData && slotData[slot]) || slotDataStore.getSlotData(network, slot);
         if (prefetchedData) {
           // We have prefetched data for this future slot
           const proposerEntity = prefetchedData.proposerEntity;
-          
+
           return {
             slot,
             futureBidsCount,
@@ -279,10 +289,10 @@ const BlockchainVisualization: React.FC<BlockchainVisualizationProps> = ({
             isFuture,
             hasData: !!prefetchedData,
             isBuilding: true, // Always show future blocks as pending
-            slotDataObject: prefetchedData
+            slotDataObject: prefetchedData,
           };
         }
-        
+
         // If we have future bids but no prefetched data, still include the bids
         return {
           slot,
@@ -292,10 +302,10 @@ const BlockchainVisualization: React.FC<BlockchainVisualizationProps> = ({
           isPast,
           isFuture,
           hasData: false,
-          isBuilding: true // Always show future blocks as pending
+          isBuilding: true, // Always show future blocks as pending
         };
       }
-      
+
       // Return basic data for slots without data
       return {
         slot,
@@ -303,13 +313,13 @@ const BlockchainVisualization: React.FC<BlockchainVisualizationProps> = ({
         isPast,
         isFuture,
         hasData: false,
-        isBuilding: isCurrentSlot // If current slot with no data, it's likely in building phase
+        isBuilding: isCurrentSlot, // If current slot with no data, it's likely in building phase
       };
     });
   }, [displaySlots, slotDataStore, network, currentSlot, currentTime, currentPhase, slotData]);
 
   return (
-    <div 
+    <div
       className={`w-full h-full flex flex-col items-center justify-center ${className}`}
       style={{ width, height }}
     >
@@ -320,7 +330,7 @@ const BlockchainVisualization: React.FC<BlockchainVisualizationProps> = ({
             Blockchain
           </div>
         </div>
-        
+
         {/* Top-down Blockchain visualization */}
         <div className="relative flex flex-col items-center justify-center h-full">
           {/* Connecting line - simple horizontal chain line */}
@@ -328,19 +338,19 @@ const BlockchainVisualization: React.FC<BlockchainVisualizationProps> = ({
             {/* Main horizontal line with subtle glow */}
             <div className="absolute h-1 bg-cyan-600 w-full shadow-[0_0_8px_rgba(8,145,178,0.6)]"></div>
           </div>
-          
+
           {/* Blocks - now arranged horizontally */}
           <div className="relative z-10 flex flex-row items-center justify-center gap-6 px-4 w-full h-full">
-            {blockData.map((block) => {
+            {blockData.map(block => {
               // Calculate flex layout based on whether this is the current slot or not
-              const flexClassNames = block.isCurrentSlot 
-                ? 'w-[40%]'  // Make current block 40% width
+              const flexClassNames = block.isCurrentSlot
+                ? 'w-[40%]' // Make current block 40% width
                 : 'w-[30%]'; // Make other blocks 30% width
-              
+
               // Only use PendingBlock for future blocks
               if (block.isFuture) {
                 return (
-                  <div 
+                  <div
                     key={block.slot}
                     className={`flex items-center justify-center h-full ${flexClassNames} transition-all duration-300`}
                   >
@@ -355,10 +365,10 @@ const BlockchainVisualization: React.FC<BlockchainVisualizationProps> = ({
                   </div>
                 );
               }
-              
+
               // Otherwise, use BlockDetailsPanel for past and current slots
               return (
-                <div 
+                <div
                   key={block.slot}
                   className={`flex items-center justify-center h-full ${flexClassNames} transition-all duration-300`}
                 >

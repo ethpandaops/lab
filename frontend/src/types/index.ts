@@ -4,7 +4,7 @@ export interface SlotData {
   network: string;
   processed_at: string; // ISO timestamp
   processing_time_ms: number;
-  
+
   // Block information
   block: {
     slot: number;
@@ -18,7 +18,7 @@ export interface SlotData {
     parent_root: string;
     state_root: string;
     proposer_index: number;
-    
+
     // Execution payload data
     eth1_data_block_hash: string;
     eth1_data_deposit_root: string;
@@ -85,11 +85,11 @@ export interface SlotData {
   // Attestation data
   attestations: {
     windows: Array<{
-      start_ms: number;  // Window start (ms from slot start)
-      end_ms: number;    // Window end (ms from slot start)
-      validator_indices: number[];  // Validators that attested in this window
+      start_ms: number; // Window start (ms from slot start)
+      end_ms: number; // Window end (ms from slot start)
+      validator_indices: number[]; // Validators that attested in this window
     }>;
-    maximum_votes: number;  // Maximum possible attestation votes for this slot
+    maximum_votes: number; // Maximum possible attestation votes for this slot
   };
 }
 
@@ -105,4 +105,4 @@ export interface Config {
       };
     };
   };
-} 
+}

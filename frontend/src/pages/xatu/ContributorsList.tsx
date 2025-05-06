@@ -1,75 +1,76 @@
-import { useDataFetch } from '@/utils/data.ts'
-import { LoadingState } from '@/components/common/LoadingState'
-import { ErrorState } from '@/components/common/ErrorState'
-import { Link } from 'react-router-dom'
-import { XatuCallToAction } from '@/components/xatu/XatuCallToAction'
-import { formatDistanceToNow } from 'date-fns'
-import { useContext } from 'react'
-import { ConfigContext } from '@/App'
-import { Card } from '@/components/common/Card'
+import { useDataFetch } from '@/utils/data.ts';
+import { LoadingState } from '@/components/common/LoadingState';
+import { ErrorState } from '@/components/common/ErrorState';
+import { Link } from 'react-router-dom';
+import { XatuCallToAction } from '@/components/xatu/XatuCallToAction';
+import { formatDistanceToNow } from 'date-fns';
+import { useContext } from 'react';
+import ConfigContext from '@/contexts/ConfigContext';
+import { Card } from '@/components/common/Card';
 
 interface Contributor {
-  name: string
-  node_count: number
-  updated_at: number
+  name: string;
+  node_count: number;
+  updated_at: number;
 }
 
 interface Summary {
-  contributors: Contributor[]
-  updated_at: number
+  contributors: Contributor[];
+  updated_at: number;
 }
 
 // Function to generate a deterministic color from a string
 const stringToColor = (str: string): string => {
-  let hash = 0
+  let hash = 0;
   for (let index = 0; index < str.length; index++) {
-    hash = str.codePointAt(index) ?? 0 + ((hash << 5) - hash)
+    hash = str.codePointAt(index) ?? 0 + ((hash << 5) - hash);
   }
-  const hue = hash % 360
-  return `hsl(${hue}, 70%, 60%)`
-}
+  const hue = hash % 360;
+  return `hsl(${hue}, 70%, 60%)`;
+};
 
 // Function to generate initials from a string
-const getInitials = (name: string): string => name
-  .split(/[^\dA-Za-z]/)
-  .filter(Boolean)
-  .slice(0, 2)
-  .map((word) => word[0])
-  .join('')
-  .toUpperCase()
+const getInitials = (name: string): string =>
+  name
+    .split(/[^\dA-Za-z]/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map(word => word[0])
+    .join('')
+    .toUpperCase();
 
 // Function to safely format a timestamp
 const formatTimestamp = (timestamp: number): string => {
   try {
-    const date = new Date(timestamp * 1000)
+    const date = new Date(timestamp * 1000);
     // Check if the date is valid
     if (isNaN(date.getTime())) {
-      return 'Invalid date'
+      return 'Invalid date';
     }
-    return formatDistanceToNow(date, { addSuffix: true })
+    return formatDistanceToNow(date, { addSuffix: true });
   } catch (e) {
-    return 'Invalid date'
+    return 'Invalid date';
   }
-}
+};
 
 const ContributorsList = (): JSX.Element => {
-  const config = useContext(ConfigContext)
-  const summaryPath = config?.modules?.['xatu_public_contributors']?.path_prefix 
+  const config = useContext(ConfigContext);
+  const summaryPath = config?.modules?.['xatu_public_contributors']?.path_prefix
     ? `${config.modules['xatu_public_contributors'].path_prefix}/user-summaries/summary.json`
     : null;
 
-  const { data: summaryData, loading, error } = useDataFetch<Summary>(summaryPath)
+  const { data: summaryData, loading, error } = useDataFetch<Summary>(summaryPath);
 
   if (loading) {
-    return <LoadingState />
+    return <LoadingState />;
   }
 
   if (error) {
-    return <ErrorState message="Failed to load contributors data" />
+    return <ErrorState message="Failed to load contributors data" />;
   }
 
   if (!summaryData || !summaryData) {
-    return <ErrorState message="No data available" />
+    return <ErrorState message="No data available" />;
   }
 
   return (
@@ -87,7 +88,7 @@ const ContributorsList = (): JSX.Element => {
             </p>
             <div className="text-sm font-mono text-tertiary mt-4">
               Last updated{' '}
-              <span 
+              <span
                 title={new Date(summaryData.updated_at * 1000).toString()}
                 className="text-primary cursor-help -b -prominent"
               >
@@ -113,16 +114,23 @@ const ContributorsList = (): JSX.Element => {
             <table className="w-full min-w-[300px]">
               <thead>
                 <tr className="-b -subtle">
-                  <th className="text-left py-2 px-2 text-sm font-mono text-tertiary w-[60%]">Contributor</th>
-                  <th className="text-right py-2 px-2 text-sm font-mono text-tertiary w-[20%]">Nodes</th>
-                  <th className="text-right py-2 px-2 text-sm font-mono text-tertiary hidden sm:table-cell w-[20%]">Last Update</th>
+                  <th className="text-left py-2 px-2 text-sm font-mono text-tertiary w-[60%]">
+                    Contributor
+                  </th>
+                  <th className="text-right py-2 px-2 text-sm font-mono text-tertiary w-[20%]">
+                    Nodes
+                  </th>
+                  <th className="text-right py-2 px-2 text-sm font-mono text-tertiary hidden sm:table-cell w-[20%]">
+                    Last Update
+                  </th>
                 </tr>
               </thead>
               <tbody>
-                {summaryData.contributors.sort((a, b) => b.node_count - a.node_count)
-                  .map((contributor) => {
-                    const avatarColor = stringToColor(contributor.name)
-                    const initials = getInitials(contributor.name)
+                {summaryData.contributors
+                  .sort((a, b) => b.node_count - a.node_count)
+                  .map(contributor => {
+                    const avatarColor = stringToColor(contributor.name);
+                    const initials = getInitials(contributor.name);
                     return (
                       <tr
                         key={contributor.name}
@@ -135,14 +143,16 @@ const ContributorsList = (): JSX.Element => {
                           >
                             <div
                               className="w-6 h-6 flex items-center justify-center text-xs font-mono font-bold text-base shadow-neon transition-transform hover:scale-105"
-                              style={{ 
+                              style={{
                                 backgroundColor: avatarColor,
                                 boxShadow: `0 0 10px ${avatarColor}05`,
                               }}
                             >
                               {initials}
                             </div>
-                            <span className="text-sm font-mono text-primary truncate">{contributor.name}</span>
+                            <span className="text-sm font-mono text-primary truncate">
+                              {contributor.name}
+                            </span>
                           </Link>
                         </td>
                         <td className="text-right py-2 px-2 text-sm font-mono text-primary w-[20%]">
@@ -152,7 +162,7 @@ const ContributorsList = (): JSX.Element => {
                           {formatTimestamp(contributor.updated_at)}
                         </td>
                       </tr>
-                    )
+                    );
                   })}
               </tbody>
             </table>
@@ -160,7 +170,7 @@ const ContributorsList = (): JSX.Element => {
         </div>
       </Card>
     </div>
-  )
-}
+  );
+};
 
-export default ContributorsList 
+export default ContributorsList;

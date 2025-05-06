@@ -1,27 +1,27 @@
-import { Menu, Github, Twitter, ExternalLink } from 'lucide-react'
-import { Link } from 'react-router-dom'
+import { Menu, Github, Twitter, ExternalLink } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 interface HeaderProps {
-  onToggleSidebar: () => void
+  onToggleSidebar: () => void;
 }
 
 const socialLinks = [
   {
     name: 'Website',
     href: 'https://ethpandaops.io',
-    icon: ExternalLink
+    icon: ExternalLink,
   },
   {
     name: 'Twitter',
     href: 'https://twitter.com/ethpandaops',
-    icon: Twitter
+    icon: Twitter,
   },
   {
     name: 'GitHub',
     href: 'https://github.com/ethpandaops',
-    icon: Github
-  }
-]
+    icon: Github,
+  },
+];
 
 export const Header = ({ onToggleSidebar }: HeaderProps) => {
   return (
@@ -38,11 +38,7 @@ export const Header = ({ onToggleSidebar }: HeaderProps) => {
               <Menu className="h-6 w-6" />
             </button>
             <Link to="/" className="flex items-center space-x-3">
-              <img
-                src="/ethpandaops.png"
-                alt="ethPandaOps Logo"
-                className="h-8 w-8"
-              />
+              <img src="/ethpandaops.png" alt="ethPandaOps Logo" className="h-8 w-8" />
               <div className="hidden lg:block">
                 <h1 className="text-2xl font-bold text-gray-900 dark:text-primary">
                   ethPandaOps Lab
@@ -53,7 +49,7 @@ export const Header = ({ onToggleSidebar }: HeaderProps) => {
 
           {/* Social Links */}
           <div className="flex items-center space-x-4">
-            {socialLinks.map((link) => (
+            {socialLinks.map(link => (
               <a
                 key={link.name}
                 href={link.href}
@@ -70,5 +66,5 @@ export const Header = ({ onToggleSidebar }: HeaderProps) => {
         </div>
       </div>
     </header>
-  )
-} 
+  );
+};

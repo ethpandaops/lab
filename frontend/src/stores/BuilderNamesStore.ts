@@ -24,13 +24,13 @@ class BuilderNamesStore {
     const loadPromise = new Promise<void>(async (resolve, reject) => {
       try {
         const response = await fetch(`/data/${network}-builders.json`);
-        
+
         if (!response.ok) {
           throw new Error(`Failed to fetch builder names: ${response.status}`);
         }
-        
+
         const data = await response.json();
-        
+
         // The data is structured as { "builder": { "BuilderName": ["pubkey1", "pubkey2"], ... } }
         if (data.builder) {
           // Iterate through each builder
@@ -42,7 +42,7 @@ class BuilderNamesStore {
                   // Normalize the pubkey (remove 0x prefix and convert to lowercase)
                   const normalizedPubkey = pubkey.toLowerCase().replace(/^0x/, '');
                   this.builderNames.set(normalizedPubkey, builderName);
-                  
+
                   // Also store with 0x prefix for convenience
                   this.builderNames.set(`0x${normalizedPubkey}`, builderName);
                 }
@@ -50,38 +50,37 @@ class BuilderNamesStore {
             }
           });
         }
-        
+
         resolve();
       } catch (error) {
         console.error('Error loading builder names:', error);
         resolve(); // Resolve anyway to prevent blocking UI
       }
     });
-    
+
     this.loadPromises.set(network, loadPromise);
     return loadPromise;
   }
 
   public getBuilderName(pubkey: string): string | undefined {
     if (!pubkey) return undefined;
-    
+
     // Normalize the pubkey (remove 0x prefix and convert to lowercase)
     const normalizedPubkey = pubkey.toLowerCase();
-    
+
     // Try with original format first
     let result = this.builderNames.get(normalizedPubkey);
     if (result) return result;
-    
+
     // Try without 0x prefix
     const withoutPrefix = normalizedPubkey.replace(/^0x/, '');
     result = this.builderNames.get(withoutPrefix);
     if (result) return result;
-    
+
     // Try with 0x prefix
     result = this.builderNames.get(`0x${withoutPrefix}`);
     return result;
   }
-  
 }
 
 export default BuilderNamesStore;

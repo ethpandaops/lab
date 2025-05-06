@@ -31,19 +31,19 @@ export interface MevBidsVisualizerProps {
 }
 
 // Simple tooltip component
-const Tooltip = ({ 
-  x, 
-  y, 
-  relayName, 
-  value, 
-  time, 
-  isWinning 
-}: { 
-  x: number; 
-  y: number; 
-  relayName: string; 
-  value: number; 
-  time: number; 
+const Tooltip = ({
+  x,
+  y,
+  relayName,
+  value,
+  time,
+  isWinning,
+}: {
+  x: number;
+  y: number;
+  relayName: string;
+  value: number;
+  time: number;
   isWinning?: boolean;
 }) => {
   return (
@@ -52,7 +52,7 @@ const Tooltip = ({
       style={{
         left: x + 10,
         top: y - 40,
-        minWidth: '150px'
+        minWidth: '150px',
       }}
     >
       <div className="font-mono text-xs">
@@ -64,25 +64,29 @@ const Tooltip = ({
             </span>
           )}
         </div>
-        <div className="text-secondary">Value: <span className="text-accent">{value.toFixed(4)} ETH</span></div>
-        <div className="text-secondary">Time: <span className="text-accent">{(time / 1000).toFixed(2)}s</span></div>
+        <div className="text-secondary">
+          Value: <span className="text-accent">{value.toFixed(4)} ETH</span>
+        </div>
+        <div className="text-secondary">
+          Time: <span className="text-accent">{(time / 1000).toFixed(2)}s</span>
+        </div>
       </div>
     </div>
   );
 };
 
 // Super simple scatterplot component
-const SimpleScatterPlot = ({ 
-  data, 
-  width, 
-  height, 
-  xMin, 
-  xMax, 
-  yMin, 
+const SimpleScatterPlot = ({
+  data,
+  width,
+  height,
+  xMin,
+  xMax,
+  yMin,
   yMax,
   currentTime,
-  relayColors
-}: { 
+  relayColors,
+}: {
   data: Array<{ x: number; y: number; relayName: string; isWinning?: boolean }>;
   width: number;
   height: number;
@@ -114,46 +118,46 @@ const SimpleScatterPlot = ({
   const yScale = (y: number) => {
     return height - padding.bottom - (chartHeight * (y - yMin)) / (yMax - yMin);
   };
-  
+
   // Ticks for the axes
   const xTicks = [-12, -9, -6, -3, 0, 3, 6, 9, 12].map(t => t * 1000);
-  const yTicks = Array.from({ length: 6 }, (_, i) => yMin + (i * (yMax - yMin) / 5));
+  const yTicks = Array.from({ length: 6 }, (_, i) => yMin + (i * (yMax - yMin)) / 5);
 
   return (
     <div className="relative" style={{ width, height }}>
       <svg width={width} height={height} style={{ overflow: 'visible' }}>
         {/* X-axis */}
-        <line 
-          x1={padding.left} 
-          y1={height - padding.bottom} 
-          x2={width - padding.right} 
-          y2={height - padding.bottom} 
-          stroke="rgba(255, 255, 255, 0.3)" 
+        <line
+          x1={padding.left}
+          y1={height - padding.bottom}
+          x2={width - padding.right}
+          y2={height - padding.bottom}
+          stroke="rgba(255, 255, 255, 0.3)"
         />
-        
+
         {/* Y-axis */}
-        <line 
-          x1={padding.left} 
-          y1={padding.top} 
-          x2={padding.left} 
-          y2={height - padding.bottom} 
-          stroke="rgba(255, 255, 255, 0.3)" 
+        <line
+          x1={padding.left}
+          y1={padding.top}
+          x2={padding.left}
+          y2={height - padding.bottom}
+          stroke="rgba(255, 255, 255, 0.3)"
         />
-        
+
         {/* X-axis ticks and labels */}
         {xTicks.map(tick => (
           <g key={`x-tick-${tick}`}>
-            <line 
-              x1={xScale(tick)} 
-              y1={height - padding.bottom} 
-              x2={xScale(tick)} 
-              y2={height - padding.bottom + 5} 
-              stroke="rgba(255, 255, 255, 0.3)" 
+            <line
+              x1={xScale(tick)}
+              y1={height - padding.bottom}
+              x2={xScale(tick)}
+              y2={height - padding.bottom + 5}
+              stroke="rgba(255, 255, 255, 0.3)"
             />
-            <text 
-              x={xScale(tick)} 
-              y={height - padding.bottom + 20} 
-              textAnchor="middle" 
+            <text
+              x={xScale(tick)}
+              y={height - padding.bottom + 20}
+              textAnchor="middle"
               fill="rgba(255, 255, 255, 0.7)"
               fontSize="10px"
             >
@@ -161,22 +165,22 @@ const SimpleScatterPlot = ({
             </text>
           </g>
         ))}
-        
+
         {/* Y-axis ticks and labels */}
         {yTicks.map(tick => (
           <g key={`y-tick-${tick}`}>
-            <line 
-              x1={padding.left - 5} 
-              y1={yScale(tick)} 
-              x2={padding.left} 
-              y2={yScale(tick)} 
-              stroke="rgba(255, 255, 255, 0.3)" 
+            <line
+              x1={padding.left - 5}
+              y1={yScale(tick)}
+              x2={padding.left}
+              y2={yScale(tick)}
+              stroke="rgba(255, 255, 255, 0.3)"
             />
-            <text 
-              x={padding.left - 10} 
-              y={yScale(tick)} 
-              textAnchor="end" 
-              alignmentBaseline="middle" 
+            <text
+              x={padding.left - 10}
+              y={yScale(tick)}
+              textAnchor="end"
+              alignmentBaseline="middle"
               fill="rgba(255, 255, 255, 0.7)"
               fontSize="10px"
             >
@@ -184,60 +188,60 @@ const SimpleScatterPlot = ({
             </text>
           </g>
         ))}
-        
+
         {/* Grid lines */}
         {xTicks.map(tick => (
-          <line 
+          <line
             key={`x-grid-${tick}`}
-            x1={xScale(tick)} 
-            y1={padding.top} 
-            x2={xScale(tick)} 
-            y2={height - padding.bottom} 
-            stroke="rgba(255, 255, 255, 0.1)" 
+            x1={xScale(tick)}
+            y1={padding.top}
+            x2={xScale(tick)}
+            y2={height - padding.bottom}
+            stroke="rgba(255, 255, 255, 0.1)"
             strokeDasharray="2,2"
           />
         ))}
-        
+
         {yTicks.map(tick => (
-          <line 
+          <line
             key={`y-grid-${tick}`}
-            x1={padding.left} 
-            y1={yScale(tick)} 
-            x2={width - padding.right} 
-            y2={yScale(tick)} 
-            stroke="rgba(255, 255, 255, 0.1)" 
+            x1={padding.left}
+            y1={yScale(tick)}
+            x2={width - padding.right}
+            y2={yScale(tick)}
+            stroke="rgba(255, 255, 255, 0.1)"
             strokeDasharray="2,2"
           />
         ))}
-        
+
         {/* Current time marker */}
-        <line 
-          x1={xScale(currentTime)} 
-          y1={padding.top} 
-          x2={xScale(currentTime)} 
-          y2={height - padding.bottom} 
-          stroke="rgba(255, 255, 255, 0.5)" 
+        <line
+          x1={xScale(currentTime)}
+          y1={padding.top}
+          x2={xScale(currentTime)}
+          y2={height - padding.bottom}
+          stroke="rgba(255, 255, 255, 0.5)"
           strokeWidth={2}
           strokeDasharray="4,4"
         />
-        
+
         {/* X-axis label */}
-        <text 
-          x={width / 2} 
-          y={height + 5} 
-          textAnchor="middle" 
+        <text
+          x={width / 2}
+          y={height + 5}
+          textAnchor="middle"
           fill="rgba(255, 255, 255, 0.7)"
           fontSize="12px"
           fontWeight="medium"
         >
           Time relative to slot start (seconds)
         </text>
-        
+
         {/* Y-axis label */}
-        <text 
-          x={-height / 2} 
-          y={-15} 
-          textAnchor="middle" 
+        <text
+          x={-height / 2}
+          y={-15}
+          textAnchor="middle"
           transform={`rotate(-90)`}
           fill="rgba(255, 255, 255, 0.7)"
           fontSize="12px"
@@ -245,10 +249,10 @@ const SimpleScatterPlot = ({
         >
           Bid Value (ETH)
         </text>
-        
+
         {/* Data points */}
         {data.map((point, i) => (
-          <g 
+          <g
             key={`point-${i}`}
             onMouseEnter={() => {
               setHoveredPoint({
@@ -256,17 +260,17 @@ const SimpleScatterPlot = ({
                 x: point.x,
                 y: point.y,
                 screenX: xScale(point.x),
-                screenY: yScale(point.y)
+                screenY: yScale(point.y),
               });
             }}
             onMouseLeave={() => setHoveredPoint(null)}
           >
-            <circle 
-              cx={xScale(point.x)} 
-              cy={yScale(point.y)} 
-              r={point.isWinning ? 8 : 6} 
-              fill={relayColors[point.relayName] || '#888888'} 
-              stroke={point.isWinning ? 'white' : 'rgba(255, 255, 255, 0.5)'} 
+            <circle
+              cx={xScale(point.x)}
+              cy={yScale(point.y)}
+              r={point.isWinning ? 8 : 6}
+              fill={relayColors[point.relayName] || '#888888'}
+              stroke={point.isWinning ? 'white' : 'rgba(255, 255, 255, 0.5)'}
               strokeWidth={point.isWinning ? 2 : 1}
               opacity={0.8}
               style={{ cursor: 'pointer' }}
@@ -298,46 +302,46 @@ export const MevBidsVisualizer: React.FC<MevBidsVisualizerProps> = ({
   timeRange = {
     min: -12000,
     max: 12000,
-    ticks: [-12, -9, -6, -3, 0, 3, 6, 9, 12]
+    ticks: [-12, -9, -6, -3, 0, 3, 6, 9, 12],
   },
   valueRange,
-  height = 400
+  height = 400,
 }) => {
   // Group bids by relay for stats
   const { chartData, seriesStats } = useMemo(() => {
     const bidsByRelay: Record<string, Array<{ x: number; y: number; isWinning?: boolean }>> = {};
-    
+
     // Process bids
     bids.forEach(bid => {
       if (!bidsByRelay[bid.relayName]) {
         bidsByRelay[bid.relayName] = [];
       }
-      
+
       bidsByRelay[bid.relayName].push({
         x: bid.time,
         y: bid.value,
-        isWinning: bid.isWinning
+        isWinning: bid.isWinning,
       });
     });
-    
+
     // Flatten for chart
     const flatData = bids.map(bid => ({
       x: bid.time,
       y: bid.value,
       relayName: bid.relayName,
-      isWinning: bid.isWinning
+      isWinning: bid.isWinning,
     }));
-    
+
     // Calculate stats for each relay
     const stats = Object.entries(bidsByRelay).map(([relay, relayBids]) => {
       const values = relayBids.map(bid => bid.y);
-      
+
       // Make sure we have values to avoid empty arrays
       const min = values.length ? Math.min(...values) : 0;
       const avg = values.length ? values.reduce((sum, val) => sum + val, 0) / values.length : 0;
       const max = values.length ? Math.max(...values) : 0;
       const last = values.length ? values[values.length - 1] : 0;
-      
+
       return {
         name: relay,
         color: relayColors[relay] || '#888888',
@@ -345,33 +349,33 @@ export const MevBidsVisualizer: React.FC<MevBidsVisualizerProps> = ({
         avg: avg.toFixed(3),
         max: max.toFixed(3),
         last: last.toFixed(3),
-        unit: ' ETH'
+        unit: ' ETH',
       };
     });
-    
+
     return {
       chartData: flatData,
-      seriesStats: stats
+      seriesStats: stats,
     };
   }, [bids, relayColors]);
-  
+
   // Calculate value range if not provided
   const calculatedValueRange = useMemo(() => {
     if (valueRange) return valueRange;
-    
+
     if (bids.length === 0) return { min: 0, max: 1 };
-    
+
     const allValues = bids.map(bid => bid.value);
     const min = Math.min(...allValues);
     const max = Math.max(...allValues);
     const padding = (max - min) * 0.1 || 0.1;
-    
+
     return {
       min: Math.max(0, min - padding),
-      max: max + padding || 1
+      max: max + padding || 1,
     };
   }, [bids, valueRange]);
-  
+
   return (
     <ChartWithStats
       title={`MEV Bids Timeline (${bids.length} bids)`}
@@ -379,7 +383,7 @@ export const MevBidsVisualizer: React.FC<MevBidsVisualizerProps> = ({
       chart={
         <div className="relative w-full h-full flex items-center justify-center bg-surface/30 rounded-lg">
           {/* Always render the chart, even with empty data */}
-          <SimpleScatterPlot 
+          <SimpleScatterPlot
             data={chartData}
             width={800}
             height={height}
@@ -401,7 +405,8 @@ export const MevBidsVisualizer: React.FC<MevBidsVisualizerProps> = ({
       notes={
         winningBid ? (
           <div className="text-xs font-mono">
-            Winning bid: <span className="text-success">{winningBid.value.toFixed(4)} ETH</span> from <span className="font-medium">{winningBid.relayName}</span>
+            Winning bid: <span className="text-success">{winningBid.value.toFixed(4)} ETH</span>{' '}
+            from <span className="font-medium">{winningBid.relayName}</span>
           </div>
         ) : bids.length === 0 ? (
           <div className="text-xs font-mono text-tertiary">No bids received for this slot</div>

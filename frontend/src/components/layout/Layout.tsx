@@ -1,58 +1,58 @@
-import { Outlet, useLocation } from 'react-router-dom'
-import { Navigation } from '@/components/layout/Navigation'
-import { Breadcrumbs } from '@/components/layout/Breadcrumbs'
-import { NetworkSelector } from '@/components/common/NetworkSelector'
-import { useContext, useEffect, useState } from 'react'
-import { NetworkContext } from '@/App'
-import { Logo } from '@/components/layout/Logo'
-import { BeaconClockManager } from '@/utils/beacon.ts'
-import { Menu } from 'lucide-react'
-import { NETWORK_METADATA, type NetworkKey } from '@/constants/networks.tsx'
-import clsx from 'clsx'
+import { Outlet, useLocation } from 'react-router-dom';
+import { Navigation } from '@/components/layout/Navigation';
+import { Breadcrumbs } from '@/components/layout/Breadcrumbs';
+import { NetworkSelector } from '@/components/common/NetworkSelector';
+import { useContext, useEffect, useState } from 'react';
+import NetworkContext from '@/contexts/NetworkContext';
+import { Logo } from '@/components/layout/Logo';
+import { BeaconClockManager } from '@/utils/beacon.ts';
+import { Menu } from 'lucide-react';
+import { NETWORK_METADATA, type NetworkKey } from '@/constants/networks.tsx';
+import clsx from 'clsx';
 
 function Layout(): JSX.Element {
-  const location = useLocation()
-  const isHome = location.pathname === '/'
-  const { selectedNetwork, setSelectedNetwork } = useContext(NetworkContext)
-  const [currentSlot, setCurrentSlot] = useState<number | null>(null)
-  const [currentEpoch, setCurrentEpoch] = useState<number | null>(null)
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const location = useLocation();
+  const isHome = location.pathname === '/';
+  const { selectedNetwork, setSelectedNetwork } = useContext(NetworkContext);
+  const [currentSlot, setCurrentSlot] = useState<number | null>(null);
+  const [currentEpoch, setCurrentEpoch] = useState<number | null>(null);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // Get network metadata
   const selectedMetadata = NETWORK_METADATA[selectedNetwork as NetworkKey] || {
     name: selectedNetwork.charAt(0).toUpperCase() + selectedNetwork.slice(1),
     icon: '🔥',
-    color: '#627EEA'
-  }
+    color: '#627EEA',
+  };
 
   // Close mobile menu on route change
   useEffect(() => {
-    setIsMobileMenuOpen(false)
-  }, [location])
+    setIsMobileMenuOpen(false);
+  }, [location]);
 
   // Update slot and epoch every second
   useEffect(() => {
-    const clock = BeaconClockManager.getInstance().getBeaconClock(selectedNetwork)
-    if (!clock) return
+    const clock = BeaconClockManager.getInstance().getBeaconClock(selectedNetwork);
+    if (!clock) return;
 
     const updateTime = () => {
-      const slot = clock.getCurrentSlot()
-      const epoch = Math.floor(slot / 32)
-      setCurrentSlot(slot)
-      setCurrentEpoch(epoch)
-    }
+      const slot = clock.getCurrentSlot();
+      const epoch = Math.floor(slot / 32);
+      setCurrentSlot(slot);
+      setCurrentEpoch(epoch);
+    };
 
-    updateTime()
-    const interval = setInterval(updateTime, 1000)
-    return () => clearInterval(interval)
-  }, [selectedNetwork])
+    updateTime();
+    const interval = setInterval(updateTime, 1000);
+    return () => clearInterval(interval);
+  }, [selectedNetwork]);
 
   return (
     <div className="relative min-h-screen text-primary font-mono bg-gradient-to-b from-[rgb(var(--bg-base))] via-[rgb(var(--bg-base))] to-[rgb(var(--bg-base))]">
       {/* Integrated Background Effects */}
       <div className="absolute inset-0 bg-gradient-to-b from-accent/5 via-transparent to-transparent pointer-events-none" />
       <div className="absolute inset-0 bg-gradient-to-t from-error/5 via-transparent to-transparent pointer-events-none" />
-      
+
       {/* Content */}
       <div className="relative z-10 flex flex-col min-h-screen">
         {/* Header Section */}
@@ -70,7 +70,7 @@ function Layout(): JSX.Element {
               </button>
               <Logo />
             </div>
-            
+
             {/* Center - Network Selector (hidden on mobile) */}
             <div className="hidden lg:flex justify-center">
               <NetworkSelector
@@ -119,7 +119,7 @@ function Layout(): JSX.Element {
         <div
           className={clsx(
             'fixed inset-0 z-40 lg:hidden transition-opacity duration-300',
-            isMobileMenuOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
+            isMobileMenuOpen ? 'opacity-100' : 'opacity-0 pointer-events-none',
           )}
           style={{ top: '56px' }}
         >
@@ -128,12 +128,12 @@ function Layout(): JSX.Element {
             className="absolute inset-0 bg-black/70 backdrop-blur-sm"
             onClick={() => setIsMobileMenuOpen(false)}
           />
-          
+
           {/* Sidebar */}
           <div
             className={clsx(
               'absolute top-0 left-0 w-72 h-[calc(100vh-56px)] bg-nav border-r border-accent/30 transform transition-transform duration-300',
-              isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
+              isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full',
             )}
           >
             <div className="flex flex-col h-full">
@@ -182,20 +182,24 @@ function Layout(): JSX.Element {
 
         {/* Main Content */}
         <main className="flex-1 relative">
-          <div className={clsx(
-            'w-full',
-            (location.pathname === '/beacon/slot/live' || /^\/beacon\/slot\/\d+$/.test(location.pathname))
-              ? 'h-[calc(100vh-56px)]'
-              : ['min-h-0', 'p-2 md:p-4 lg:p-6']
-          )}>
-            <div className={clsx(
-              'relative',
-              (location.pathname === '/beacon/slot/live' || /^\/beacon\/slot\/\d+$/.test(location.pathname))
-                ? 'h-full'
-                : [
-                    'p-4 md:p-6 lg:p-8'
-                  ]
-            )}>
+          <div
+            className={clsx(
+              'w-full',
+              location.pathname === '/beacon/slot/live' ||
+                /^\/beacon\/slot\/\d+$/.test(location.pathname)
+                ? 'h-[calc(100vh-56px)]'
+                : ['min-h-0', 'p-2 md:p-4 lg:p-6'],
+            )}
+          >
+            <div
+              className={clsx(
+                'relative',
+                location.pathname === '/beacon/slot/live' ||
+                  /^\/beacon\/slot\/\d+$/.test(location.pathname)
+                  ? 'h-full'
+                  : ['p-4 md:p-6 lg:p-8'],
+              )}
+            >
               <Outlet />
             </div>
           </div>
@@ -205,4 +209,4 @@ function Layout(): JSX.Element {
   );
 }
 
-export default Layout 
+export default Layout;

@@ -1,37 +1,37 @@
 import { useMemo } from 'react';
 
 interface DetailsViewProps {
-  loading: boolean
-  isMissing: boolean
+  loading: boolean;
+  isMissing: boolean;
   slotData?: {
     block: {
-      execution_payload_transactions_count?: number
-      block_total_bytes?: number
-      execution_payload_base_fee_per_gas?: number
-      execution_payload_gas_used?: number
-      execution_payload_gas_limit?: number
-    }
+      execution_payload_transactions_count?: number;
+      block_total_bytes?: number;
+      execution_payload_base_fee_per_gas?: number;
+      execution_payload_gas_used?: number;
+      execution_payload_gas_limit?: number;
+    };
     proposer: {
-      proposer_validator_index: number
-    }
-    entity?: string
+      proposer_validator_index: number;
+    };
+    entity?: string;
     timings: {
-      block_seen?: Record<string, number>
-      block_first_seen_p2p?: Record<string, number>
-      blob_seen?: Record<string, Record<string, number>>
-    }
+      block_seen?: Record<string, number>;
+      block_first_seen_p2p?: Record<string, number>;
+      blob_seen?: Record<string, Record<string, number>>;
+    };
     nodes: {
       [clientName: string]: {
-        name: string
-        username: string
+        name: string;
+        username: string;
         geo: {
-          city: string
-          country: string
-          continent: string
-        }
-      }
-    }
-  }
+          city: string;
+          country: string;
+          continent: string;
+        };
+      };
+    };
+  };
 }
 
 export function DetailsView({ loading, isMissing, slotData }: DetailsViewProps): JSX.Element {
@@ -61,18 +61,24 @@ export function DetailsView({ loading, isMissing, slotData }: DetailsViewProps):
     });
 
     return {
-      api: firstApiNode && slotData.nodes[firstApiNode] ? {
-        city: slotData.nodes[firstApiNode].geo.city,
-        country: slotData.nodes[firstApiNode].geo.country,
-        continent: slotData.nodes[firstApiNode].geo.continent,
-        time: firstApiTime
-      } : null,
-      p2p: firstP2pNode && slotData.nodes[firstP2pNode] ? {
-        city: slotData.nodes[firstP2pNode].geo.city,
-        country: slotData.nodes[firstP2pNode].geo.country,
-        continent: slotData.nodes[firstP2pNode].geo.continent,
-        time: firstP2pTime
-      } : null
+      api:
+        firstApiNode && slotData.nodes[firstApiNode]
+          ? {
+              city: slotData.nodes[firstApiNode].geo.city,
+              country: slotData.nodes[firstApiNode].geo.country,
+              continent: slotData.nodes[firstApiNode].geo.continent,
+              time: firstApiTime,
+            }
+          : null,
+      p2p:
+        firstP2pNode && slotData.nodes[firstP2pNode]
+          ? {
+              city: slotData.nodes[firstP2pNode].geo.city,
+              country: slotData.nodes[firstP2pNode].geo.country,
+              continent: slotData.nodes[firstP2pNode].geo.continent,
+              time: firstP2pTime,
+            }
+          : null,
     };
   }, [slotData]);
 
@@ -144,9 +150,9 @@ export function DetailsView({ loading, isMissing, slotData }: DetailsViewProps):
             <div>
               <h4 className="text-xs font-mono text-tertiary">Size</h4>
               <p className="text-sm font-mono font-medium text-primary">
-                {slotData?.block.block_total_bytes ? 
-                  `${(slotData.block.block_total_bytes / 1024).toFixed(1)}KB` : 
-                  'Unknown'}
+                {slotData?.block.block_total_bytes
+                  ? `${(slotData.block.block_total_bytes / 1024).toFixed(1)}KB`
+                  : 'Unknown'}
               </p>
             </div>
             <div>
@@ -154,11 +160,13 @@ export function DetailsView({ loading, isMissing, slotData }: DetailsViewProps):
               <p className="text-sm font-mono font-medium text-primary">
                 {(() => {
                   if (!slotData) return 0;
-                  const maxBlobIndex = Object.values(slotData.timings.blob_seen || {})
-                    .reduce((max, obj) => {
+                  const maxBlobIndex = Object.values(slotData.timings.blob_seen || {}).reduce(
+                    (max, obj) => {
                       const indices = Object.keys(obj).map(Number);
                       return indices.length ? Math.max(max, Math.max(...indices)) : max;
-                    }, -1);
+                    },
+                    -1,
+                  );
                   return maxBlobIndex + 1;
                 })()}
               </p>
@@ -166,17 +174,18 @@ export function DetailsView({ loading, isMissing, slotData }: DetailsViewProps):
             <div>
               <h4 className="text-xs font-mono text-tertiary">Base Fee</h4>
               <p className="text-sm font-mono font-medium text-primary">
-                {slotData?.block.execution_payload_base_fee_per_gas ? 
-                  `${(slotData.block.execution_payload_base_fee_per_gas / 1e9).toFixed(2)} Gwei` : 
-                  'Unknown'}
+                {slotData?.block.execution_payload_base_fee_per_gas
+                  ? `${(slotData.block.execution_payload_base_fee_per_gas / 1e9).toFixed(2)} Gwei`
+                  : 'Unknown'}
               </p>
             </div>
             <div className="col-span-2">
               <h4 className="text-xs font-mono text-tertiary">Gas / Limit</h4>
               <p className="text-sm font-mono font-medium text-primary">
-                {slotData?.block.execution_payload_gas_used && slotData?.block.execution_payload_gas_limit ? 
-                  `${(slotData.block.execution_payload_gas_used / 1e6).toFixed(1)}M / ${(slotData.block.execution_payload_gas_limit / 1e6).toFixed(1)}M` : 
-                  'Unknown'}
+                {slotData?.block.execution_payload_gas_used &&
+                slotData?.block.execution_payload_gas_limit
+                  ? `${(slotData.block.execution_payload_gas_used / 1e6).toFixed(1)}M / ${(slotData.block.execution_payload_gas_limit / 1e6).toFixed(1)}M`
+                  : 'Unknown'}
               </p>
             </div>
             <div className="col-span-2">
@@ -188,10 +197,13 @@ export function DetailsView({ loading, isMissing, slotData }: DetailsViewProps):
                       <span className="text-purple-500">P2P: </span>
                       {firstSeenLocations.p2p.country}
                       <span className="text-tertiary ml-2">
-                        ({firstSeenLocations.p2p.continent}) at {(firstSeenLocations.p2p.time / 1000).toFixed(2)}s
+                        ({firstSeenLocations.p2p.continent}) at{' '}
+                        {(firstSeenLocations.p2p.time / 1000).toFixed(2)}s
                       </span>
                     </>
-                  ) : 'Unknown'}
+                  ) : (
+                    'Unknown'
+                  )}
                 </p>
                 <p className="text-sm font-mono font-medium text-primary">
                   {firstSeenLocations.api ? (
@@ -199,10 +211,13 @@ export function DetailsView({ loading, isMissing, slotData }: DetailsViewProps):
                       <span className="text-accent">API: </span>
                       {firstSeenLocations.api.country}
                       <span className="text-tertiary ml-2">
-                        ({firstSeenLocations.api.continent}) at {(firstSeenLocations.api.time / 1000).toFixed(2)}s
+                        ({firstSeenLocations.api.continent}) at{' '}
+                        {(firstSeenLocations.api.time / 1000).toFixed(2)}s
                       </span>
                     </>
-                  ) : 'Unknown'}
+                  ) : (
+                    'Unknown'
+                  )}
                 </p>
               </div>
             </div>
@@ -210,5 +225,5 @@ export function DetailsView({ loading, isMissing, slotData }: DetailsViewProps):
         )}
       </div>
     </div>
-  )
-} 
+  );
+}

@@ -27,12 +27,12 @@ const formatEthValue = (value: bigint | string | undefined): string => {
   if (value === undefined || value === null) return 'N/A';
   try {
     const wei = BigInt(value);
-    const ether = wei / BigInt(10**18);
-    const remainder = wei % BigInt(10**18);
+    const ether = wei / BigInt(10 ** 18);
+    const remainder = wei % BigInt(10 ** 18);
     const decimals = remainder.toString().padStart(18, '0').substring(0, 4);
     return `${ether}.${decimals}`;
   } catch (e) {
-    console.error("Error formatting ETH value:", value, e);
+    console.error('Error formatting ETH value:', value, e);
     return 'Invalid Value';
   }
 };
@@ -45,25 +45,25 @@ const getRelayName = (pubkey: string | undefined): string => {
 
 // Helper to convert Timestamp object or number to seconds relative to slot start
 const getBidReceivedTimeRelative = (
-    receivedAt: Timestamp | number | undefined,
-    slotStartTime: number | undefined
+  receivedAt: Timestamp | number | undefined,
+  slotStartTime: number | undefined,
 ): number | null => {
-    if (receivedAt === undefined || slotStartTime === undefined) return null;
+  if (receivedAt === undefined || slotStartTime === undefined) return null;
 
-    if (typeof receivedAt === 'number') {
-        // Assume it's already relative if it's just a number
-        return receivedAt;
-    } else if (receivedAt && typeof receivedAt.seconds === 'number') {
-        // Calculate relative time from absolute timestamp
-        const receivedSeconds = receivedAt.seconds + (receivedAt.nanos || 0) / 1e9;
-        return receivedSeconds - slotStartTime;
-    }
-    return null;
+  if (typeof receivedAt === 'number') {
+    // Assume it's already relative if it's just a number
+    return receivedAt;
+  } else if (receivedAt && typeof receivedAt.seconds === 'number') {
+    // Calculate relative time from absolute timestamp
+    const receivedSeconds = receivedAt.seconds + (receivedAt.nanos || 0) / 1e9;
+    return receivedSeconds - slotStartTime;
+  }
+  return null;
 };
 
 const formatRelativeTime = (relativeSeconds: number | null): string => {
-    if (relativeSeconds === null) return 'N/A';
-    return `+${relativeSeconds.toFixed(3)}`;
+  if (relativeSeconds === null) return 'N/A';
+  return `+${relativeSeconds.toFixed(3)}`;
 };
 
 // --- Component Implementation ---
@@ -106,8 +106,8 @@ export const BidListComponent: React.FC<BidListComponentProps> = ({
 
     // Sort by received time ascending
     filteredAndProcessed.sort((a, b) => {
-        if (a.receivedTimeRelative === null || b.receivedTimeRelative === null) return 0;
-        return a.receivedTimeRelative - b.receivedTimeRelative;
+      if (a.receivedTimeRelative === null || b.receivedTimeRelative === null) return 0;
+      return a.receivedTimeRelative - b.receivedTimeRelative;
     });
     // Optional: Secondary sort by value descending if times are equal?
     // filteredAndProcessed.sort((a, b) => {
@@ -121,7 +121,6 @@ export const BidListComponent: React.FC<BidListComponentProps> = ({
     //   if (valA > valB) return -1;
     //   return 0;
     // });
-
 
     return filteredAndProcessed;
   }, [bids, currentTime, slotStartTime, deliveredPayload]);
@@ -137,22 +136,16 @@ export const BidListComponent: React.FC<BidListComponentProps> = ({
             <li
               key={`${bid.builderPubkey}-${bid.blockHash}-${index}`} // Simple key, might need refinement
               className={`p-2 border rounded-md text-sm font-mono ${
-                bid.isWinning
-                  ? 'bg-success/10 border-success/50'
-                  : 'bg-surface/50 border-subtle'
+                bid.isWinning ? 'bg-success/10 border-success/50' : 'bg-surface/50 border-subtle'
               }`}
             >
               <div className="flex justify-between items-center">
-                <span className="font-medium text-primary">
-                  {formatEthValue(bid.value)} ETH
-                </span>
+                <span className="font-medium text-primary">{formatEthValue(bid.value)} ETH</span>
                 <span className="text-tertiary">
                   {formatRelativeTime(bid.receivedTimeRelative)}s
                 </span>
               </div>
-              <div className="text-xs text-secondary mt-1">
-                {getRelayName(bid.builderPubkey)}
-              </div>
+              <div className="text-xs text-secondary mt-1">{getRelayName(bid.builderPubkey)}</div>
             </li>
           ))}
         </ul>

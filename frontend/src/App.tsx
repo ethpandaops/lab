@@ -1,11 +1,11 @@
-import { Routes, Route, Outlet, useSearchParams } from 'react-router-dom'
-import { createContext, useEffect, useState } from 'react'
-import { getConfig } from '@/config'
-import type { Config } from '@/types'
-import { LoadingState } from '@/components/common/LoadingState'
-import { ErrorState } from '@/components/common/ErrorState'
-import { BeaconClockManager } from '@/utils/beacon.ts'
-import ScrollToTop from '@/components/common/ScrollToTop'
+import { Routes, Route, Outlet, useSearchParams } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { getConfig } from '@/config';
+import type { Config } from '@/types';
+import { LoadingState } from '@/components/common/LoadingState';
+import { ErrorState } from '@/components/common/ErrorState';
+import { BeaconClockManager } from '@/utils/beacon.ts';
+import ScrollToTop from '@/components/common/ScrollToTop';
 import Home from '@/pages/Home.tsx';
 import { About } from '@/pages/About.tsx';
 import Xatu from '@/pages/xatu';
@@ -23,117 +23,106 @@ import { BeaconLive } from '@/pages/beacon/live';
 import { BeaconSlot } from '@/pages/beacon/slot';
 import Experiments from '@/pages/Experiments.tsx';
 import { SlotLookup } from '@/pages/beacon/slot/index';
-import { ModalProvider } from '@/contexts/ModalContext.tsx'
-import { LocallyBuiltBlocks } from '@/pages/beacon/LocallyBuiltBlocks'
+import { ModalProvider } from '@/contexts/ModalContext.tsx';
+import { LocallyBuiltBlocks } from '@/pages/beacon/LocallyBuiltBlocks';
 import MevRelaysLivePage from '@/pages/beacon/mev_relays/live.tsx';
 import BlockProductionLivePage from '@/pages/beacon/block-production/live.tsx';
 import BlockProductionSlotPage from '@/pages/beacon/block-production/slot.tsx';
-
-// Create contexts
-export const ConfigContext = createContext<Config | null>(null)
-
-interface NetworkContextType {
-	selectedNetwork: string
-	setSelectedNetwork: (network: string) => void
-	availableNetworks: string[]
-}
-
-export const NetworkContext = createContext<NetworkContextType>({
-	selectedNetwork: 'mainnet',
-	setSelectedNetwork: () => {},
-	availableNetworks: ['mainnet']
-})
+import NetworkContext from '@/contexts/NetworkContext';
+import ConfigContext from '@/contexts/ConfigContext';
 
 function App() {
-	const [config, setConfig] = useState<Config | null>(null)
-	const [configError, setConfigError] = useState<Error | null>(null)
-	const [selectedNetwork, setSelectedNetwork] = useState('mainnet')
-	const [searchParams, setSearchParams] = useSearchParams()
+  const [config, setConfig] = useState<Config | null>(null);
+  const [configError, setConfigError] = useState<Error | null>(null);
+  const [selectedNetwork, setSelectedNetwork] = useState('mainnet');
+  const [searchParams, setSearchParams] = useSearchParams();
 
-	// Update URL when network changes (but only if it's not the default)
-	useEffect(() => {
-		const newParams = new URLSearchParams(searchParams)
-		if (selectedNetwork === 'mainnet') {
-			newParams.delete('network')
-		} else {
-			newParams.set('network', selectedNetwork)
-		}
-		setSearchParams(newParams, { replace: true })
-	}, [selectedNetwork])
+  // Update URL when network changes (but only if it's not the default)
+  useEffect(() => {
+    const newParams = new URLSearchParams(searchParams);
+    if (selectedNetwork === 'mainnet') {
+      newParams.delete('network');
+    } else {
+      newParams.set('network', selectedNetwork);
+    }
+    setSearchParams(newParams, { replace: true });
+  }, [selectedNetwork, searchParams, setSearchParams]);
 
-	useEffect(() => {
-		getConfig()
-			.then(config => {
-				// Initialize BeaconClockManager with config
-				BeaconClockManager.getInstance().initialize(config)
-				setConfig(config)
-				
-				// Get network from URL or use mainnet as default
-				const networkFromUrl = searchParams.get('network')
-				const availableNetworks = Object.keys(config.ethereum?.networks || {})
-				
-				if (networkFromUrl && availableNetworks.includes(networkFromUrl)) {
-					setSelectedNetwork(networkFromUrl)
-				} else if (availableNetworks.length > 0 && !availableNetworks.includes(selectedNetwork)) {
-					// If current network is not in available networks, switch to first available
-					setSelectedNetwork(availableNetworks[0])
-				}
-			})
-			.catch(setConfigError)
-	}, [])
+  useEffect(() => {
+    getConfig()
+      .then(config => {
+        // Initialize BeaconClockManager with config
+        BeaconClockManager.getInstance().initialize(config);
+        setConfig(config);
 
-	if (configError) {
-		return <ErrorState message="Failed to load configuration" error={configError} />
-	}
+        // Get network from URL or use mainnet as default
+        const networkFromUrl = searchParams.get('network');
+        const availableNetworks = Object.keys(config.ethereum?.networks || {});
 
-	if (!config) {
-		return <LoadingState message="Loading configuration..." />
-	}
+        if (networkFromUrl && availableNetworks.includes(networkFromUrl)) {
+          setSelectedNetwork(networkFromUrl);
+        } else if (availableNetworks.length > 0 && !availableNetworks.includes(selectedNetwork)) {
+          // If current network is not in available networks, switch to first available
+          setSelectedNetwork(availableNetworks[0]);
+        }
+      })
+      .catch(setConfigError);
+  }, [searchParams, selectedNetwork]);
 
-	const availableNetworks = Object.keys(config.ethereum?.networks || {})
+  if (configError) {
+    return <ErrorState message="Failed to load configuration" error={configError} />;
+  }
 
-	return (
-		<ModalProvider>
-			<ConfigContext.Provider value={config}>
-				<NetworkContext.Provider value={{
-					selectedNetwork,
-					setSelectedNetwork,
-					availableNetworks
-				}}>
-					<ScrollToTop />
-					<Routes>
-						<Route path="/" element={<Layout />}>
-							<Route index element={<Home />} />
-							<Route path="about" element={<About />} />
-							<Route path="experiments" element={<Experiments />} />
-							<Route path="xatu" element={<Xatu />}>
-								<Route path="community-nodes" element={<CommunityNodes />} />
-								<Route path="networks" element={<Networks />} />
-								<Route path="contributors" element={<ContributorsList />} />
-								<Route path="contributors/:name" element={<ContributorDetail />} />
-								<Route path="fork-readiness" element={<ForkReadiness />} />
-								<Route path="geographical-checklist" element={<GeographicalChecklist />} />
-							</Route>
-							<Route path="beacon" element={<Beacon />}>
-								<Route path="slot" element={<Outlet />}>
-									<Route index element={<SlotLookup />} />
-									<Route path="live" element={<BeaconLive />} />
-									<Route path=":slot" element={<BeaconSlot />} />
-								</Route>
-								<Route path="timings" element={<BeaconChainTimings />}>
-									<Route path="blocks" element={<BlockTimings />} />
-								</Route>
-								<Route path="locally-built-blocks" element={<LocallyBuiltBlocks />} />
-								<Route path="mev_relays/live" element={<MevRelaysLivePage />} />
-								<Route path="block-production/live" element={<BlockProductionLivePage />} />
-									<Route path="block-production/:slot" element={<BlockProductionSlotPage />} />
-							</Route>
-						</Route>
-					</Routes>
-				</NetworkContext.Provider>
-			</ConfigContext.Provider>
-		</ModalProvider>
-	)
+  if (!config) {
+    return <LoadingState message="Loading configuration..." />;
+  }
+
+  const availableNetworks = Object.keys(config.ethereum?.networks || {});
+
+  return (
+    <ModalProvider>
+      <ConfigContext.Provider value={config}>
+        <NetworkContext.Provider
+          value={{
+            selectedNetwork,
+            setSelectedNetwork,
+            availableNetworks,
+          }}
+        >
+          <ScrollToTop />
+          <Routes>
+            <Route path="/" element={<Layout />}>
+              <Route index element={<Home />} />
+              <Route path="about" element={<About />} />
+              <Route path="experiments" element={<Experiments />} />
+              <Route path="xatu" element={<Xatu />}>
+                <Route path="community-nodes" element={<CommunityNodes />} />
+                <Route path="networks" element={<Networks />} />
+                <Route path="contributors" element={<ContributorsList />} />
+                <Route path="contributors/:name" element={<ContributorDetail />} />
+                <Route path="fork-readiness" element={<ForkReadiness />} />
+                <Route path="geographical-checklist" element={<GeographicalChecklist />} />
+              </Route>
+              <Route path="beacon" element={<Beacon />}>
+                <Route path="slot" element={<Outlet />}>
+                  <Route index element={<SlotLookup />} />
+                  <Route path="live" element={<BeaconLive />} />
+                  <Route path=":slot" element={<BeaconSlot />} />
+                </Route>
+                <Route path="timings" element={<BeaconChainTimings />}>
+                  <Route path="blocks" element={<BlockTimings />} />
+                </Route>
+                <Route path="locally-built-blocks" element={<LocallyBuiltBlocks />} />
+                <Route path="mev_relays/live" element={<MevRelaysLivePage />} />
+                <Route path="block-production/live" element={<BlockProductionLivePage />} />
+                <Route path="block-production/:slot" element={<BlockProductionSlotPage />} />
+              </Route>
+            </Route>
+          </Routes>
+        </NetworkContext.Provider>
+      </ConfigContext.Provider>
+    </ModalProvider>
+  );
 }
 
-export default App
+export default App;

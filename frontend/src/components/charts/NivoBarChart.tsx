@@ -1,13 +1,14 @@
-import { ResponsiveBar, BarDatum, ResponsiveBarSvgProps } from '@nivo/bar'
-import { withNivoTheme } from '@/components/charts/NivoProvider'
-import { defaultNivoTheme } from '@/components/charts/NivoTheme.ts'
+import { ResponsiveBar, BarDatum, ResponsiveBarSvgProps } from '@nivo/bar';
+import { withNivoTheme } from '@/components/charts/NivoProvider';
+import { defaultNivoTheme } from '@/components/charts/NivoTheme.ts';
 
 // Create a themed version of ResponsiveBar
-export const ThemedResponsiveBar = withNivoTheme(ResponsiveBar)
+export const ThemedResponsiveBar = withNivoTheme(ResponsiveBar);
 
-export interface NivoBarChartProps extends Omit<ResponsiveBarSvgProps<BarDatum>, 'height' | 'width'> {
-  height?: number | string
-  width?: number | string
+export interface NivoBarChartProps
+  extends Omit<ResponsiveBarSvgProps<BarDatum>, 'height' | 'width'> {
+  height?: number | string;
+  width?: number | string;
 }
 
 /**
@@ -25,7 +26,7 @@ export const NivoBarChart = ({
     tickRotation: 0,
     legend: 'Category',
     legendOffset: 36,
-    legendPosition: 'middle'
+    legendPosition: 'middle',
   },
   axisLeft = {
     tickSize: 5,
@@ -33,7 +34,7 @@ export const NivoBarChart = ({
     tickRotation: 0,
     legend: 'Value',
     legendOffset: -40,
-    legendPosition: 'middle'
+    legendPosition: 'middle',
   },
   enableGridX = false,
   enableGridY = true,
@@ -61,5 +62,5 @@ export const NivoBarChart = ({
         {...rest}
       />
     </div>
-  )
-} 
+  );
+};

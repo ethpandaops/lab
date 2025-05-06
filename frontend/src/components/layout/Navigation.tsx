@@ -1,25 +1,23 @@
-import { Link } from 'react-router-dom'
-import { useLocation } from 'react-router-dom'
-import { BeakerIcon, HomeIcon, InformationCircleIcon } from '@heroicons/react/24/outline'
+import { Link } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
+import { BeakerIcon, HomeIcon, InformationCircleIcon } from '@heroicons/react/24/outline';
 
 interface NavigationProps {
-  showLinks?: boolean
+  showLinks?: boolean;
 }
 
 export function Navigation({ showLinks = true }: NavigationProps): JSX.Element {
-  const location = useLocation()
+  const location = useLocation();
 
   const linkClasses = (path: string) => {
-    const isActive = location.pathname === path
+    const isActive = location.pathname === path;
     return `flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors w-full ${
-      isActive
-        ? 'bg-active text-accent'
-        : 'hover:bg-hover text-primary hover:text-accent'
-    }`
-  }
+      isActive ? 'bg-active text-accent' : 'hover:bg-hover text-primary hover:text-accent'
+    }`;
+  };
 
   if (!showLinks) {
-    return null
+    return null;
   }
 
   return (
@@ -37,5 +35,5 @@ export function Navigation({ showLinks = true }: NavigationProps): JSX.Element {
         About
       </Link>
     </nav>
-  )
-} 
+  );
+}

@@ -1,8 +1,8 @@
-import { ReactNode } from 'react'
+import { ReactNode } from 'react';
 
 interface AnalysisViewProps {
-  loading?: boolean
-  isMissing?: boolean
+  loading?: boolean;
+  isMissing?: boolean;
 }
 
 export function AnalysisView({ loading, isMissing }: AnalysisViewProps): JSX.Element {
@@ -11,5 +11,5 @@ export function AnalysisView({ loading, isMissing }: AnalysisViewProps): JSX.Ele
       <h3 className="text-lg font-sans font-bold text-primary mb-4">Analysis</h3>
       <p className="text-sm font-mono text-tertiary">Coming soon...</p>
     </div>
-  )
-} 
+  );
+}

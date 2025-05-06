@@ -1,8 +1,8 @@
-import { createPromiseClient, PromiseClient } from "@connectrpc/connect";
-import { createConnectTransport } from "@connectrpc/connect-web";
+import { createPromiseClient, PromiseClient } from '@connectrpc/connect';
+import { createConnectTransport } from '@connectrpc/connect-web';
 
 // Import the generated LabAPI service
-import { LabAPI } from "@/api/gen/backend/pkg/api/proto/lab_api_connectweb.ts"; // Corrected import path
+import { LabAPI } from '@/api/gen/backend/pkg/api/proto/lab_api_connectweb.ts'; // Corrected import path
 
 // Define the type for the client
 export type LabApiClientType = PromiseClient<typeof LabAPI>;
@@ -16,7 +16,7 @@ export type LabApiClientType = PromiseClient<typeof LabAPI>;
 export function createLabApiClient(baseUrl: string): LabApiClientType {
   // Create a transport using the Connect-Web transport
   const transport = createConnectTransport({
-    baseUrl: baseUrl + "/api",
+    baseUrl: baseUrl + '/api',
     useHttpGet: true, // Force HTTP GET for all unary calls
   });
 

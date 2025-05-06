@@ -1,16 +1,16 @@
-import { Link, Outlet, useLocation } from 'react-router-dom'
-import { ArrowRight, Activity, Search, Clock, Layers, Database } from 'lucide-react'
-import { useContext } from 'react'
-import { NetworkContext } from '@/App'
-import { FaEthereum } from 'react-icons/fa'
-import { Card, CardBody, CardHeader } from '@/components/common/Card'
+import { Link, Outlet, useLocation } from 'react-router-dom';
+import { ArrowRight, Activity, Search, Clock, Layers, Database } from 'lucide-react';
+import { useContext } from 'react';
+import NetworkContext from '@/contexts/NetworkContext';
+import { FaEthereum } from 'react-icons/fa';
+import { Card, CardBody, CardHeader } from '@/components/common/Card';
 
 function Beacon(): JSX.Element {
-  const location = useLocation()
+  const location = useLocation();
 
   // If we're on a nested route, render the child route
   if (location.pathname !== '/beacon') {
-    return <Outlet />
+    return <Outlet />;
   }
 
   return (
@@ -24,7 +24,8 @@ function Beacon(): JSX.Element {
               Beacon Chain Explorer
             </h1>
             <p className="text-base md:text-lg font-mono text-secondary max-w-3xl">
-              Explore detailed information about individual slots on the Ethereum beacon chain, including timing data, attestations, and network propagation metrics.
+              Explore detailed information about individual slots on the Ethereum beacon chain,
+              including timing data, attestations, and network propagation metrics.
             </p>
           </div>
           <FaEthereum className="w-24 h-24 text-accent/20" />
@@ -41,7 +42,7 @@ function Beacon(): JSX.Element {
             <Card isInteractive className="relative">
               <Link to="slot/live" className="block w-full">
                 <div className="absolute inset-0 bg-gradient-to-br from-accent/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                
+
                 <CardBody className="relative">
                   <div className="flex items-start gap-4">
                     <div className="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center flex-shrink-0">
@@ -71,7 +72,7 @@ function Beacon(): JSX.Element {
             <Card isInteractive className="relative">
               <Link to="slot" className="block w-full">
                 <div className="absolute inset-0 bg-gradient-to-br from-accent/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                
+
                 <CardBody className="relative">
                   <div className="flex items-start gap-4">
                     <div className="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center flex-shrink-0">
@@ -82,9 +83,7 @@ function Beacon(): JSX.Element {
                       <h3 className="text-lg font-sans font-bold text-primary group-hover:text-accent transition-colors mb-1">
                         Historical Slots
                       </h3>
-                      <p className="text-sm font-mono text-tertiary truncate">
-                        Look up past slots
-                      </p>
+                      <p className="text-sm font-mono text-tertiary truncate">Look up past slots</p>
                     </div>
 
                     <ArrowRight className="w-5 h-5 text-accent/50 group-hover:text-accent group-hover:translate-x-1 transition-all duration-300" />
@@ -101,7 +100,7 @@ function Beacon(): JSX.Element {
             <Card isInteractive className="relative">
               <Link to="locally-built-blocks" className="block w-full">
                 <div className="absolute inset-0 bg-gradient-to-br from-accent/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                
+
                 <CardBody className="relative">
                   <div className="flex items-start gap-4">
                     <div className="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center flex-shrink-0">
@@ -136,7 +135,7 @@ function Beacon(): JSX.Element {
             <Card isInteractive className="relative">
               <Link to="timings" className="block w-full">
                 <div className="absolute inset-0 bg-gradient-to-br from-accent/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                
+
                 <CardBody className="relative">
                   <div className="flex items-start gap-4">
                     <div className="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center flex-shrink-0">
@@ -165,7 +164,7 @@ function Beacon(): JSX.Element {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
-export { Beacon } 
+export { Beacon };
