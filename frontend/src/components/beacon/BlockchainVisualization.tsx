@@ -71,12 +71,11 @@ const BlockchainVisualization: React.FC<BlockchainVisualizationProps> = ({
   // Get the slot data store
   const slotDataStore = useMemo(() => SlotDataStore.getInstance(), []);
 
-  // Calculate the slots to display: 2 previous, current, and 1 next
+  // Calculate the slots to display: 1 previous, current, and 1 next
   const displaySlots = useMemo(() => {
     if (currentSlot === null) return [];
     
     return [
-      currentSlot - 2, // -2 slots
       currentSlot - 1, // -1 slot
       currentSlot,     // Current slot
       currentSlot + 1, // Next slot
@@ -324,16 +323,19 @@ const BlockchainVisualization: React.FC<BlockchainVisualizationProps> = ({
         
         {/* Top-down Blockchain visualization */}
         <div className="relative flex flex-col items-center justify-center h-full">
-          {/* Connecting line - now horizontal from top to bottom */}
-          <div className="absolute top-1/2 left-0 right-0 h-1 bg-border-subtle -translate-y-1/2 z-0"></div>
+          {/* Connecting line - simple horizontal chain line */}
+          <div className="absolute top-1/2 left-0 right-0 -translate-y-1/2 z-0 flex items-center justify-center">
+            {/* Main horizontal line with subtle glow */}
+            <div className="absolute h-1 bg-cyan-600 w-full shadow-[0_0_8px_rgba(8,145,178,0.6)]"></div>
+          </div>
           
           {/* Blocks - now arranged horizontally */}
-          <div className="relative z-10 flex flex-row items-center justify-around space-x-4 px-4 w-full h-full">
+          <div className="relative z-10 flex flex-row items-center justify-center gap-6 px-4 w-full h-full">
             {blockData.map((block) => {
               // Calculate flex layout based on whether this is the current slot or not
               const flexClassNames = block.isCurrentSlot 
-                ? 'w-2/4 mx-auto'  // Updated to make current block bigger and centered
-                : 'w-1/4';
+                ? 'w-[40%]'  // Make current block 40% width
+                : 'w-[30%]'; // Make other blocks 30% width
               
               // Only use PendingBlock for future blocks
               if (block.isFuture) {

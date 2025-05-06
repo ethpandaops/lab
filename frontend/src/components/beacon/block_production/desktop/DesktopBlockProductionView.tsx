@@ -250,8 +250,8 @@ const DesktopBlockProductionView: React.FC<DesktopBlockProductionViewProps> = ({
           />
         </div>
 
-        {/* Phase Icons Section with clean separation */}
-        <div className="px-4 py-4 bg-background-alt border-y border-border/30">
+        {/* Phase Icons Section with clean separation - increased height */}
+        <div className="px-4 py-10 bg-background-alt border-y border-border/30">
           <PhaseIcons 
             currentTime={currentTime}
             nodeBlockSeen={nodeBlockSeen}

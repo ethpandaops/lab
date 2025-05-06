@@ -106,7 +106,7 @@ const PhaseIcons: React.FC<PhaseIconsProps> = ({
 
   return (
     <div className="w-full">
-      <div className="flex justify-between items-center px-2 relative z-10">
+      <div className="flex justify-between items-start px-2 relative z-10">
       {/* 1. BUILDERS PHASE */}
       <div className={`flex flex-col items-center text-center transition-opacity duration-300 ${isActiveInPhase('builder') ? 'opacity-100' : 'opacity-60'}`}>
         <div 
@@ -127,15 +127,21 @@ const PhaseIcons: React.FC<PhaseIconsProps> = ({
           </div>
         </div>
         <div className={`font-medium text-sm mb-0.5 ${isActiveInPhase('builder') ? 'text-orange-300' : 'text-primary/70'}`}>Builders</div>
-        <div className={`text-xs ${isActiveInPhase('builder') ? 'text-white/90' : 'text-tertiary'} max-w-[85px] h-6`}>
-          {bids.length > 0 
-            ? `${countUniqueBuilderPubkeys(bids)} builder${countUniqueBuilderPubkeys(bids) > 1 ? 's' : ''}` 
-            : 'Waiting...'}
+        <div className={`text-[12px] leading-tight max-w-[100px] lg:max-w-[160px] text-center min-h-[48px]`}>
+          <span className={`${isActiveInPhase('builder') ? 'text-white/90' : 'text-tertiary'}`}>
+            Builders compete amongst each other to create the most profitable blocks.
+          </span>
+          <div className="h-1"></div>
+          <span className={`${isActiveInPhase('builder') ? 'text-orange-300' : 'text-tertiary'}`}>
+            {bids.length > 0 
+              ? <>{countUniqueBuilderPubkeys(bids)} builder{countUniqueBuilderPubkeys(bids) > 1 ? 's' : ''} bidded for this slot</> 
+              : <>Waiting...</>}
+          </span>
         </div>
       </div>
 
       {/* Flow line 1 - Builder to Relay: Orange to Green */}
-      <div className="flex-shrink-0 flex items-center justify-center relative w-10">
+      <div className="flex-shrink-0 flex items-start justify-center relative w-10 pt-[28px]">
         <div 
           className="h-1.5 w-full bg-gradient-to-r from-orange-400 to-green-400 rounded-full shadow-inner"
           style={{
@@ -163,18 +169,22 @@ const PhaseIcons: React.FC<PhaseIconsProps> = ({
             🔄
           </div>
         </div>
-        <div className={`font-medium text-sm mb-0.5 ${isActiveInPhase('relay') ? 'text-green-300' : 'text-primary/70'}`}>Relays</div>
-        <div className={`text-xs ${isActiveInPhase('relay') ? 'text-white/90' : 'text-tertiary'} max-w-[85px] h-6`}>
-          {winningBid 
-            ? `${winningBid.relayName}` 
-            : activeRelays > 0 
-              ? `${activeRelays} relay${activeRelays > 1 ? 's' : ''}` 
-              : 'Waiting...'}
+        <div className={`font-medium text-sm mb-0.5 ${isActiveInPhase('relay') ? 'text-green-300' : 'text-primary/70'}`}>Relaying</div>
+        <div className={`text-[12px] leading-tight max-w-[100px] lg:max-w-[160px] min-h-[48px]`}>
+          <span className={`${isActiveInPhase('relay') ? 'text-white/90' : 'text-tertiary'}`}>
+            Relays connect builders and proposers, allowing proposers to select blocks.
+          </span>
+          <div className="h-1"></div>
+          <span className={`${isActiveInPhase('relay') ? 'text-green-300' : 'text-tertiary'}`}>
+            {activeRelays > 0
+              ? <>{activeRelays} relay{activeRelays > 1 ? 's' : ''} were involved in this slot.</> 
+              : <>Waiting...</>}
+          </span>
         </div>
       </div>
 
       {/* Flow line 2 - Relay to Proposer: Green to Gold */}
-      <div className="flex-shrink-0 flex items-center justify-center relative w-10">
+      <div className="flex-shrink-0 flex items-start justify-center relative w-10 pt-[28px]">
         <div 
           className="h-1.5 w-full bg-gradient-to-r from-green-400 to-amber-400 rounded-full shadow-inner"
           style={{
@@ -202,9 +212,17 @@ const PhaseIcons: React.FC<PhaseIconsProps> = ({
             👤
           </div>
         </div>
-        <div className={`font-medium text-sm mb-0.5 ${isActiveInPhase('proposer') ? 'text-amber-300' : 'text-primary/70'}`}>Proposer</div>
-        <div className={`text-xs ${isActiveInPhase('proposer') ? 'text-white/90' : 'text-tertiary'} max-w-[85px] h-6 text-center`}>
-          {proposer ? `${proposer.proposerValidatorIndex}` : 'Waiting...'}
+        <div className={`font-medium text-sm mb-0.5 ${isActiveInPhase('proposer') ? 'text-amber-300' : 'text-primary/70'}`}>Proposing</div>
+        <div className={`text-[12px] leading-tight max-w-[100px] lg:max-w-[160px]  min-h-[48px]`}>
+          <span className={`${isActiveInPhase('proposer') ? 'text-white/90' : 'text-tertiary'}`}>
+            The proposer is selected to create this slot's block, choosing the best bid or building a block themselves.
+          </span>
+          <div className="h-1"></div>
+          <span className={`${isActiveInPhase('proposer') ? 'text-amber-300' : 'text-tertiary'}`}>
+            {proposer 
+              ? <></> 
+              : <>Waiting...</>}
+          </span>
         </div>
         {currentPhase !== Phase.Building && blockTime !== undefined && (
           <div className="text-xs font-mono text-success absolute -bottom-4 whitespace-nowrap">
@@ -214,7 +232,7 @@ const PhaseIcons: React.FC<PhaseIconsProps> = ({
       </div>
 
       {/* Flow line 3 - Proposer to Nodes: Gold to Purple */}
-      <div className="flex-shrink-0 flex items-center justify-center relative w-10">
+      <div className="flex-shrink-0 flex items-start justify-center relative w-10 pt-[28px]">
         <div 
           className="h-1.5 w-full bg-gradient-to-r from-amber-400 to-purple-400 rounded-full shadow-inner"
           style={{
@@ -242,14 +260,22 @@ const PhaseIcons: React.FC<PhaseIconsProps> = ({
             🖥️
           </div>
         </div>
-        <div className={`font-medium text-sm mb-0.5 ${isActiveInPhase('node') ? 'text-purple-300' : 'text-primary/70'}`}>Nodes</div>
-        <div className={`text-xs ${isActiveInPhase('node') ? 'text-white/90' : 'text-tertiary'} max-w-[85px] h-6`}>
-          {Object.keys(nodes).length > 0 ? `${Object.keys(nodes).length} nodes` : 'Waiting...'}
+        <div className={`font-medium text-sm mb-0.5 ${isActiveInPhase('node') ? 'text-purple-300' : 'text-primary/70'}`}>Gossiping</div>
+        <div className={`text-[12px] leading-tight max-w-[100px] lg:max-w-[160px] text-center min-h-[48px]`}>
+          <span className={`${isActiveInPhase('node') ? 'text-white/90' : 'text-tertiary'}`}>
+            Beacon nodes gossip the proposed blocks amongst themselves.
+          </span>
+          <div className="h-1"></div>
+          <span className={`${isActiveInPhase('node') ? 'text-purple-300' : 'text-tertiary'}`}>
+            {Object.keys(nodes).length > 0 
+              ? <>{Object.keys(nodes).length} nodes from Xatu saw this block</> 
+              : <>Waiting...</>}
+          </span>
         </div>
       </div>
 
       {/* Flow line 4 - Nodes to Attesters: Purple to Blue */}
-      <div className="flex-shrink-0 flex items-center justify-center relative w-10">
+      <div className="flex-shrink-0 flex items-start justify-center relative w-10 pt-[28px]">
         <div 
           className="h-1.5 w-full bg-gradient-to-r from-purple-400 to-blue-400 rounded-full shadow-inner"
           style={{
@@ -277,44 +303,50 @@ const PhaseIcons: React.FC<PhaseIconsProps> = ({
             ✓
           </div>
         </div>
-        <div className={`font-medium text-sm mb-0.5 ${isActiveInPhase('attester') ? 'text-blue-300' : 'text-primary/70'}`}>Attesters</div>
-        <div className={`text-xs ${isActiveInPhase('attester') ? 'text-white/90' : 'text-tertiary'} max-w-[85px] h-6`}>
-          {(() => {
-            // REQUIREMENT 3 & 4: Calculate attestation percentage based on actual data with max from the slot
-            let visibleAttestationsCount = 0;
-            let totalExpectedAttestations = 0;
-            
-            // Get the maximum expected attestations from the slot data
-            if (slotData?.attestations?.maximumVotes) {
-              totalExpectedAttestations = Number(slotData.attestations.maximumVotes);
-            }
-            
-            // Count attestations that have been included up to the current time
-            if (slotData?.attestations?.windows && Array.isArray(slotData.attestations.windows)) {
-              slotData.attestations.windows.forEach((window: any) => {
-                // Use the same method as in the phase calculation above
-                if (window.startMs !== undefined && 
-                    Number(window.startMs) <= currentTime) {
-                  visibleAttestationsCount += (window.validatorIndices?.length || 0);
-                }
-              });
-            }
-            
-            // Show percentage in attestation or accepted phase
-            if ((isActiveInPhase('attester') || isActiveInPhase('accepted')) && 
-                totalExpectedAttestations > 0) {
-              // Calculate percentage
-              const percentage = Math.min(100, Math.round((visibleAttestationsCount / totalExpectedAttestations) * 100));
-              return `${percentage}%`;
-            }
-            
-            return 'Waiting...';
-          })()}
+        <div className={`font-medium text-sm mb-0.5 ${isActiveInPhase('attester') ? 'text-blue-300' : 'text-primary/70'}`}>Attesting</div>
+        <div className={`text-[12px] leading-tight max-w-[100px] lg:max-w-[160px] text-center min-h-[48px]`}>
+          <span className={`${isActiveInPhase('attester') ? 'text-white/90' : 'text-tertiary'}`}>
+            Attesters validate and verify the block, and attest to its correctness.
+          </span>
+          <div className="h-1"></div>
+          <span className={`${isActiveInPhase('attester') ? 'text-blue-300' : 'text-tertiary'}`}>
+            {(() => {
+              // REQUIREMENT 3 & 4: Calculate attestation percentage based on actual data with max from the slot
+              let visibleAttestationsCount = 0;
+              let totalExpectedAttestations = 0;
+              
+              // Get the maximum expected attestations from the slot data
+              if (slotData?.attestations?.maximumVotes) {
+                totalExpectedAttestations = Number(slotData.attestations.maximumVotes);
+              }
+              
+              // Count attestations that have been included up to the current time
+              if (slotData?.attestations?.windows && Array.isArray(slotData.attestations.windows)) {
+                slotData.attestations.windows.forEach((window: any) => {
+                  // Use the same method as in the phase calculation above
+                  if (window.startMs !== undefined && 
+                      Number(window.startMs) <= currentTime) {
+                    visibleAttestationsCount += (window.validatorIndices?.length || 0);
+                  }
+                });
+              }
+              
+              // Show percentage in attestation or accepted phase
+              if ((isActiveInPhase('attester') || isActiveInPhase('accepted')) && 
+                  totalExpectedAttestations > 0) {
+                // Calculate percentage
+                const percentage = Math.min(100, Math.round((visibleAttestationsCount / totalExpectedAttestations) * 100));
+                return `${percentage}% of the slot's attesters voted for this block`;
+              }
+              
+              return 'Waiting...';
+            })()}
+          </span>
         </div>
       </div>
 
       {/* Flow line 5 - Attesters to Accepted: Blue to Green */}
-      <div className="flex-shrink-0 flex items-center justify-center relative w-10">
+      <div className="flex-shrink-0 flex items-start justify-center relative w-10 pt-[28px]">
         <div 
           className="h-1.5 w-full bg-gradient-to-r from-blue-400 to-green-400 rounded-full shadow-inner"
           style={{
@@ -341,46 +373,52 @@ const PhaseIcons: React.FC<PhaseIconsProps> = ({
           </div>
         </div>
         <div className={`font-medium text-sm mb-0.5 ${isActiveInPhase('accepted') ? 'text-green-300' : 'text-primary/70'}`}>Accepted</div>
-        <div className={`text-xs ${isActiveInPhase('accepted') ? 'text-white/90' : 'text-tertiary'} max-w-[85px] h-6`}>
-          {isActiveInPhase('accepted') && slotData?.attestations?.windows
-            ? (() => {
-                // Calculate when it hit 66% attestations (acceptance time)
-                let acceptanceTime = Infinity;
-                const totalExpectedAttestations = slotData?.attestations?.maximumVotes 
-                  ? Number(slotData.attestations.maximumVotes) 
-                  : 0;
-                
-                if (totalExpectedAttestations > 0) {
-                  // Threshold for 66% of attestations
-                  const threshold = Math.ceil(totalExpectedAttestations * 0.66);
-                  let cumulativeAttestations = 0;
+        <div className={`text-[12px] leading-tight max-w-[100px] lg:max-w-[160px] text-center min-h-[48px]`}>
+          <span className={`${isActiveInPhase('accepted') ? 'text-white/90' : 'text-tertiary'}`}>
+            Once 66% of the slot's attesters have voted for the block, it's unlikely to be re-orged out.
+          </span>
+          <div className="h-1"></div>
+          <span className={`${isActiveInPhase('accepted') ? 'text-green-300' : 'text-tertiary'}`}>
+            {isActiveInPhase('accepted') && slotData?.attestations?.windows
+              ? (() => {
+                  // Calculate when it hit 66% attestations (acceptance time)
+                  let acceptanceTime = Infinity;
+                  const totalExpectedAttestations = slotData?.attestations?.maximumVotes 
+                    ? Number(slotData.attestations.maximumVotes) 
+                    : 0;
                   
-                  // Sort windows by time
-                  const sortedWindows = [...(slotData.attestations.windows || [])].sort((a, b) => {
-                    return Number(a.startMs || Infinity) - Number(b.startMs || Infinity);
-                  });
-                  
-                  // Find the window when we reach 66%
-                  for (const window of sortedWindows) {
-                    if (window.startMs !== undefined && window.validatorIndices?.length) {
-                      cumulativeAttestations += window.validatorIndices.length;
-                      
-                      if (cumulativeAttestations >= threshold) {
-                        acceptanceTime = Number(window.startMs);
-                        break;
+                  if (totalExpectedAttestations > 0) {
+                    // Threshold for 66% of attestations
+                    const threshold = Math.ceil(totalExpectedAttestations * 0.66);
+                    let cumulativeAttestations = 0;
+                    
+                    // Sort windows by time
+                    const sortedWindows = [...(slotData.attestations.windows || [])].sort((a, b) => {
+                      return Number(a.startMs || Infinity) - Number(b.startMs || Infinity);
+                    });
+                    
+                    // Find the window when we reach 66%
+                    for (const window of sortedWindows) {
+                      if (window.startMs !== undefined && window.validatorIndices?.length) {
+                        cumulativeAttestations += window.validatorIndices.length;
+                        
+                        if (cumulativeAttestations >= threshold) {
+                          acceptanceTime = Number(window.startMs);
+                          break;
+                        }
                       }
                     }
                   }
-                }
-                
-                // Format the acceptance time
-                if (acceptanceTime !== Infinity) {
-                  return `${(acceptanceTime / 1000).toFixed(1)}s`;
-                }
-                
-                return "Accepted";
-              })()
-            : "Waiting..."}
+                  
+                  // Format the acceptance time
+                  if (acceptanceTime !== Infinity) {
+                    return `This block achieved acceptance at ${(acceptanceTime / 1000).toFixed(1)}s`;
+                  }
+                  
+                  return "Accepted";
+                })()
+              : "Waiting..."}
+          </span>
         </div>
       </div>
       </div>

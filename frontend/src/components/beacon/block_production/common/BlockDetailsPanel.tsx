@@ -44,34 +44,34 @@ const BlockDetailsPanel: React.FC<BlockDetailsPanelProps> = ({
 
   // Determine border and indicator colors based on slot position using app color system
   const getBorderColor = () => {
-    if (isPast) return 'border-border-subtle';
-    if (isCurrentSlot) return 'border-border-prominent';
-    if (isFuture) return 'border-border-accent';
+    if (isPast) return 'border-cyan-700/40';
+    if (isCurrentSlot) return 'border-cyan-500/60';
+    if (isFuture) return 'border-cyan-600/30';
     return 'border-border-subtle';
   };
 
   const getIndicatorColor = () => {
-    if (isPast) return 'from-accent-muted/30 to-accent-muted/10';
-    if (isCurrentSlot) return 'from-accent/70 via-accent/40 to-accent/10';
-    if (isFuture) return 'from-accent/40 via-accent-muted/20 to-accent-muted/5';
-    return 'from-text-secondary/30 to-text-secondary/10';
+    if (isPast) return 'from-cyan-600 to-cyan-700';
+    if (isCurrentSlot) return 'from-cyan-400 via-cyan-500 to-cyan-600';
+    if (isFuture) return 'from-cyan-500 via-cyan-600 to-cyan-700';
+    return 'from-cyan-600 to-cyan-700';
   };
 
   // Determine container size and style based on slot position
   const getContainerClasses = () => {
     if (isCurrentSlot) {
-      return 'bg-surface/80 rounded-lg overflow-hidden shadow-lg w-full h-[280px] transition-all duration-300 backdrop-blur-sm relative';
+      return 'bg-slate-900 rounded-lg overflow-hidden shadow-[0_0_20px_rgba(56,189,248,0.25)] w-full h-[280px] transition-all duration-300 relative';
     }
     
     if (isPast) {
-      return 'bg-surface/80 rounded-lg overflow-hidden w-full h-[140px] transition-all duration-300 backdrop-blur-sm relative';
+      return 'bg-slate-900 rounded-lg overflow-hidden shadow-[0_0_10px_rgba(56,189,248,0.15)] w-full h-[140px] transition-all duration-300 relative';
     }
     
     if (isFuture) {
-      return 'bg-surface/80 rounded-lg overflow-hidden shadow-md w-full h-[140px] transition-all duration-300 backdrop-blur-sm relative';
+      return 'bg-slate-900 rounded-lg overflow-hidden shadow-[0_0_15px_rgba(56,189,248,0.2)] w-full h-[140px] transition-all duration-300 relative';
     }
     
-    return 'bg-surface/80 rounded-lg overflow-hidden w-full h-[140px] transition-all duration-300 backdrop-blur-sm relative';
+    return 'bg-slate-900 rounded-lg overflow-hidden shadow-md w-full h-[140px] transition-all duration-300 relative';
   };
 
   // If we don't have data and we're not in a special state, show a simplified version

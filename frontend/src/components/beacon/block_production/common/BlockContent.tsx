@@ -192,17 +192,7 @@ const BlockContent: React.FC<BlockContentProps> = ({
           
           {/* Gas Used and Gas Limit moved after Parent line */}
 
-          {/* State Root - only show if different from the state root in the header */}
-          {blockData?.executionPayloadStateRoot && 
-           blockData.executionPayloadStateRoot !== blockData.stateRoot && (
-            <div className="flex items-center">
-              <div className="w-1 h-4 bg-bg-surface-raised rounded-full mr-2"></div>
-              <span className="text-xs text-text-tertiary uppercase mr-2">State Root (EL):</span>
-              <span className="text-xs font-medium text-text-secondary font-mono">
-                {formatHash(blockData.executionPayloadStateRoot, 6, 4)}
-              </span>
-            </div>
-          )}
+          {/* State Root removed as requested */}
         </div>
         
         {/* Right column */}
