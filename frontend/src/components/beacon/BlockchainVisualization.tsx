@@ -26,6 +26,8 @@ interface BlockDisplayData {
   blobCount?: number;
   blockValue?: number;
   proposerEntity?: string;
+  gasUsed?: number;
+  gasLimit?: number;
   isCurrentSlot: boolean;
   isPast: boolean;
   isFuture: boolean;
@@ -138,6 +140,20 @@ const BlockchainVisualization: React.FC<BlockchainVisualizationProps> = ({
           : typeof block.executionPayloadTransactionsCount !== 'undefined'
             ? Number(block.executionPayloadTransactionsCount)
             : undefined;
+            
+        // Extract gas used
+        const gasUsed = typeof block.execution_payload_gas_used !== 'undefined'
+          ? Number(block.execution_payload_gas_used)
+          : typeof block.executionPayloadGasUsed !== 'undefined'
+            ? Number(block.executionPayloadGasUsed)
+            : undefined;
+            
+        // Extract gas limit
+        const gasLimit = typeof block.execution_payload_gas_limit !== 'undefined'
+          ? Number(block.execution_payload_gas_limit)
+          : typeof block.executionPayloadGasLimit !== 'undefined'
+            ? Number(block.executionPayloadGasLimit)
+            : undefined;
         
         // Get block hash
         const blockHash = block.blockRoot || block.block_root || block.executionPayloadBlockHash || block.execution_payload_block_hash;
@@ -158,6 +174,8 @@ const BlockchainVisualization: React.FC<BlockchainVisualizationProps> = ({
           blobCount,
           blockValue,
           proposerEntity: slotData.proposerEntity,
+          gasUsed,
+          gasLimit,
           isCurrentSlot,
           isPast,
           isFuture,
@@ -357,7 +375,7 @@ const BlockchainVisualization: React.FC<BlockchainVisualizationProps> = ({
                 
                 {/* Current block (expanded) */}
                 {block.isCurrentSlot && (
-                  <div className="bg-surface/20 border-2 border-gold/40 rounded-lg overflow-hidden shadow-xl w-full h-[280px] transition-all duration-300 backdrop-blur-sm">
+                  <div className="bg-surface/20 border border-gold/20 rounded-lg overflow-hidden shadow-xl w-full h-[280px] transition-all duration-300 backdrop-blur-sm">
                     <div className="p-4 border-b border-gold/20 bg-gold/5 flex items-center justify-between">
                       <div className="flex items-center">
                         <div className="w-10 h-10 bg-gold/20 rounded-md border border-gold/40 flex items-center justify-center mr-3" style={{ boxShadow: '0 0 10px rgba(255, 215, 0, 0.3)' }}>
@@ -368,7 +386,7 @@ const BlockchainVisualization: React.FC<BlockchainVisualizationProps> = ({
                         </div>
                         <div>
                           <div className="flex items-baseline">
-                            <h3 className="text-sm uppercase tracking-wide text-white/70">Current Slot</h3>
+                            <h3 className="text-sm uppercase tracking-wide text-white/70">SLOT</h3>
                             <span className="text-xl font-mono font-semibold text-gold ml-2">{block.slot}</span>
                           </div>
                           {block.hasData && block.proposerEntity && (
@@ -395,7 +413,7 @@ const BlockchainVisualization: React.FC<BlockchainVisualizationProps> = ({
                     {/* Building phase (skeleton loader) */}
                     {block.isBuilding ? (
                       <div className="flex flex-col p-6 space-y-6 animate-pulse h-[calc(100%-4rem)]">
-                        <div className="grid grid-cols-2 gap-4 h-full">
+                        <div className="grid grid-cols-2 gap-3 h-full">
                           {/* Block Number */}
                           <div className="flex flex-col bg-surface/10 rounded-lg p-4 border border-white/5">
                             <div className="h-3 w-20 bg-white/10 rounded mb-3"></div>
@@ -408,16 +426,23 @@ const BlockchainVisualization: React.FC<BlockchainVisualizationProps> = ({
                             <div className="h-8 w-16 bg-white/10 rounded"></div>
                           </div>
                           
+                          {/* Gas Usage */}
+                          <div className="flex flex-col bg-surface/10 rounded-lg p-4 border border-white/5">
+                            <div className="h-3 w-20 bg-white/10 rounded mb-3"></div>
+                            <div className="h-5 w-16 bg-white/10 rounded mb-2"></div>
+                            <div className="h-3 w-32 bg-white/10 rounded"></div>
+                          </div>
+                          
                           {/* Blobs */}
                           <div className="flex flex-col bg-surface/10 rounded-lg p-4 border border-white/5">
                             <div className="h-3 w-16 bg-white/10 rounded mb-3"></div>
                             <div className="h-8 w-10 bg-white/10 rounded"></div>
                           </div>
                           
-                          {/* Fee */}
-                          <div className="flex flex-col bg-surface/10 rounded-lg p-4 border border-white/5">
-                            <div className="h-3 w-12 bg-white/10 rounded mb-3"></div>
-                            <div className="h-8 w-20 bg-white/10 rounded"></div>
+                          {/* Reward */}
+                          <div className="flex flex-col bg-surface/10 rounded-lg p-4 border border-white/5 col-span-2">
+                            <div className="h-3 w-16 bg-white/10 rounded mb-3"></div>
+                            <div className="h-8 w-24 bg-white/10 rounded"></div>
                           </div>
                         </div>
                         
@@ -429,7 +454,7 @@ const BlockchainVisualization: React.FC<BlockchainVisualizationProps> = ({
                       </div>
                     ) : block.hasData ? (
                       <>
-                        {/* Block stats in a clean 2x2 grid */}
+                        {/* Block stats in a 3x2 grid */}
                         <div className="grid grid-cols-2 gap-3 p-5 h-[calc(100%-4rem)]">
                           {/* Execution block number */}
                           <div className="bg-surface/10 rounded-lg p-4 border border-white/5 flex flex-col justify-between">
@@ -447,6 +472,23 @@ const BlockchainVisualization: React.FC<BlockchainVisualizationProps> = ({
                             </span>
                           </div>
                           
+                          {/* Gas usage */}
+                          <div className="bg-surface/10 rounded-lg p-4 border border-white/5 flex flex-col justify-between">
+                            <span className="text-xs text-white/50 uppercase tracking-wider">Gas Usage</span>
+                            <div className="flex flex-col">
+                              <span className="text-base font-medium text-blue-400 mt-1 font-mono">
+                                {block.gasUsed !== undefined && block.gasLimit !== undefined 
+                                  ? `${Math.round(block.gasUsed * 100 / block.gasLimit)}%` 
+                                  : 'N/A'}
+                              </span>
+                              {block.gasUsed !== undefined && (
+                                <span className="text-xs text-white/50 font-mono mt-1">
+                                  {block.gasUsed.toLocaleString()} / {block.gasLimit?.toLocaleString() || 'N/A'}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                          
                           {/* Blob count */}
                           <div className="bg-surface/10 rounded-lg p-4 border border-white/5 flex flex-col justify-between">
                             <span className="text-xs text-white/50 uppercase tracking-wider">Blobs</span>
@@ -455,9 +497,9 @@ const BlockchainVisualization: React.FC<BlockchainVisualizationProps> = ({
                             </span>
                           </div>
                           
-                          {/* Fee value */}
-                          <div className="bg-surface/10 rounded-lg p-4 border border-white/5 flex flex-col justify-between">
-                            <span className="text-xs text-white/50 uppercase tracking-wider">Fee</span>
+                          {/* Reward value */}
+                          <div className="bg-surface/10 rounded-lg p-4 border border-white/5 flex flex-col justify-between col-span-2">
+                            <span className="text-xs text-white/50 uppercase tracking-wider">Reward</span>
                             <span className="text-2xl font-medium text-green-400 mt-1 font-mono">
                               {block.blockValue !== undefined ? block.blockValue.toFixed(4) : '0.0000'} ETH
                             </span>
@@ -535,8 +577,7 @@ const BlockchainVisualization: React.FC<BlockchainVisualizationProps> = ({
                   </div>
                 )}
                 
-                {/* Connection dots for chain visualization */}
-                <div className="absolute top-1/2 w-5 h-5 -translate-y-1/2 rounded-full bg-gray-800 border border-white/30 z-20" style={{ boxShadow: '0 0 6px rgba(255, 255, 255, 0.15)' }}></div>
+                {/* Removed connection dots as requested */}
               </div>
             ))}
           </div>
