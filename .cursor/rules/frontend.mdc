@@ -10,6 +10,7 @@ alwaysApply: false
 - This file should evolve organically as we discover better ways to do things
 - Document any decisions that would be useful for future implementations
 - The frontend is already running a http://localhost:5173 -- don't try and run the dev server
+- Always use pnpm instead of npm or yarn for package management to avoid generating conflicting lock files
 
 ## Color System
 - Colors are defined in semantic layers:

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'motion/react';
 import { useQuery } from '@tanstack/react-query';
 import { useParams } from 'react-router-dom';
 import { getLabApiClient } from '../../../api';
@@ -47,7 +47,11 @@ export default function MevRelaysLivePage() {
 
   const labApiClient = getLabApiClient();
 
-  const { data: slotData, isLoading: isSlotLoading, error: slotError } = useQuery({
+  const {
+    data: slotData,
+    isLoading: isSlotLoading,
+    error: slotError,
+  } = useQuery({
     queryKey: ['mev-relays-live', 'slot', selectedNetwork, slotNumber],
     queryFn: async () => {
       if (slotNumber === null) return null;
@@ -118,9 +122,13 @@ export default function MevRelaysLivePage() {
 
     // The execution payload block hash is the definitive way to identify which bid won
     const executionPayloadBlockHash = slotData.block.executionPayloadBlockHash;
-    
+
     // Ensure it's a non-empty string
-    if (!executionPayloadBlockHash || typeof executionPayloadBlockHash !== 'string' || executionPayloadBlockHash.length < 10) {
+    if (
+      !executionPayloadBlockHash ||
+      typeof executionPayloadBlockHash !== 'string' ||
+      executionPayloadBlockHash.length < 10
+    ) {
       console.warn('Invalid execution payload block hash:', executionPayloadBlockHash);
       return null;
     }
@@ -129,17 +137,18 @@ export default function MevRelaysLivePage() {
     for (const [relayName, relayData] of Object.entries(slotData.relayBids)) {
       if (!relayData.bids || !Array.isArray(relayData.bids)) continue;
 
-      const matchingBid = relayData.bids.find(bid => 
-        bid.blockHash && 
-        typeof bid.blockHash === 'string' && 
-        bid.blockHash === executionPayloadBlockHash
+      const matchingBid = relayData.bids.find(
+        bid =>
+          bid.blockHash &&
+          typeof bid.blockHash === 'string' &&
+          bid.blockHash === executionPayloadBlockHash,
       );
 
       if (matchingBid) {
         try {
           // Convert the bid value to ETH (from wei)
           const valueInEth = Number(BigInt(matchingBid.value)) / 1e18;
-          
+
           // Return the winning bid data
           return {
             blockHash: matchingBid.blockHash,
@@ -147,13 +156,13 @@ export default function MevRelaysLivePage() {
             relayName: relayName,
             builderPubkey: matchingBid.builderPubkey,
           };
-        } catch (error) { 
+        } catch (error) {
           console.error('Error processing winning bid:', error);
-          return null; 
+          return null;
         }
       }
     }
-    
+
     // If no matching bid was found
     console.info('No matching bid found for execution payload:', executionPayloadBlockHash);
     return null;
@@ -187,10 +196,12 @@ export default function MevRelaysLivePage() {
             builderPubkey: bid.builderPubkey,
             isWinning: bid.blockHash === winningBidData?.blockHash,
           });
-        } catch { /* Skip bid if conversion fails */ }
+        } catch {
+          /* Skip bid if conversion fails */
+        }
       });
     });
-    
+
     return bidsForVisualizer.sort((a, b) => a.time - b.time);
   }, [slotData?.relayBids, winningBidData]);
 
@@ -236,10 +247,11 @@ export default function MevRelaysLivePage() {
 
           <button
             onClick={resetToCurrentSlot}
-            className={`px-3 py-1.5 rounded-lg border font-medium text-xs ${displaySlotOffset === 0
+            className={`px-3 py-1.5 rounded-lg border font-medium text-xs ${
+              displaySlotOffset === 0
                 ? 'bg-accent/20 border-accent/50 text-accent'
                 : 'bg-surface border-subtle text-secondary hover:bg-hover'
-              } transition`}
+            } transition`}
             disabled={displaySlotOffset === 0}
             title="Return to Current Slot"
           >
@@ -248,8 +260,9 @@ export default function MevRelaysLivePage() {
 
           <button
             onClick={goToNextSlot}
-            className={`bg-surface p-2 rounded-lg border border-subtle transition ${isNextDisabled ? 'opacity-50 cursor-not-allowed' : 'hover:bg-hover'
-              }`}
+            className={`bg-surface p-2 rounded-lg border border-subtle transition ${
+              isNextDisabled ? 'opacity-50 cursor-not-allowed' : 'hover:bg-hover'
+            }`}
             disabled={isNextDisabled}
             title="Next Slot"
           >
@@ -257,7 +270,7 @@ export default function MevRelaysLivePage() {
           </button>
 
           <div className="text-sm font-mono ml-2 text-primary">
-            Slot: {slotNumber ?? "—"}
+            Slot: {slotNumber ?? '—'}
             {headSlot !== null && slotNumber !== null && displaySlotOffset !== 0 && (
               <span className="ml-2 text-xs text-secondary opacity-70">
                 (Lag: {headLagSlots - displaySlotOffset} slots)
@@ -269,9 +282,13 @@ export default function MevRelaysLivePage() {
         <button
           onClick={togglePlayPause}
           className="bg-surface p-2 rounded-lg border border-subtle hover:bg-hover transition"
-          title={isPlaying ? "Pause" : "Play"}
+          title={isPlaying ? 'Pause' : 'Play'}
         >
-          {isPlaying ? <Pause className="h-4 w-4 text-primary" /> : <Play className="h-4 w-4 text-primary" />}
+          {isPlaying ? (
+            <Pause className="h-4 w-4 text-primary" />
+          ) : (
+            <Play className="h-4 w-4 text-primary" />
+          )}
         </button>
       </div>
 
@@ -289,15 +306,25 @@ export default function MevRelaysLivePage() {
             nodes={slotData.nodes || {}}
             blockTime={slotData.block?.slotTime}
             // Pass node timing information for block visibility
-            nodeBlockSeen={slotData.timings?.blockSeen ? 
-              Object.fromEntries(Object.entries(slotData.timings.blockSeen).map(([node, time]) => 
-                [node, typeof time === 'bigint' ? Number(time) : Number(time)]
-              )) : {}
+            nodeBlockSeen={
+              slotData.timings?.blockSeen
+                ? Object.fromEntries(
+                    Object.entries(slotData.timings.blockSeen).map(([node, time]) => [
+                      node,
+                      typeof time === 'bigint' ? Number(time) : Number(time),
+                    ]),
+                  )
+                : {}
             }
-            nodeBlockP2P={slotData.timings?.blockFirstSeenP2p ? 
-              Object.fromEntries(Object.entries(slotData.timings.blockFirstSeenP2p).map(([node, time]) => 
-                [node, typeof time === 'bigint' ? Number(time) : Number(time)]
-              )) : {}
+            nodeBlockP2P={
+              slotData.timings?.blockFirstSeenP2p
+                ? Object.fromEntries(
+                    Object.entries(slotData.timings.blockFirstSeenP2p).map(([node, time]) => [
+                      node,
+                      typeof time === 'bigint' ? Number(time) : Number(time),
+                    ]),
+                  )
+                : {}
             }
           />
         </div>
@@ -305,9 +332,19 @@ export default function MevRelaysLivePage() {
 
       {/* Main Content Area (Visualization) */}
       <div className="flex-1 p-4 min-h-0">
-        {isSlotLoading && !slotData && <div className="text-center p-8 text-secondary">Loading slot data...</div>}
-        {slotError && <div className="text-center p-8 text-error">Error loading slot data: {slotError.message}</div>}
-        {!isSlotLoading && !slotData && slotNumber !== null && <div className="text-center p-8 text-secondary">No data available for slot {slotNumber}.</div>}
+        {isSlotLoading && !slotData && (
+          <div className="text-center p-8 text-secondary">Loading slot data...</div>
+        )}
+        {slotError && (
+          <div className="text-center p-8 text-error">
+            Error loading slot data: {slotError.message}
+          </div>
+        )}
+        {!isSlotLoading && !slotData && slotNumber !== null && (
+          <div className="text-center p-8 text-secondary">
+            No data available for slot {slotNumber}.
+          </div>
+        )}
 
         {slotData && (
           <MevBidsVisualizer
@@ -347,19 +384,11 @@ export default function MevRelaysLivePage() {
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.2 }}
           >
-          {activeTab === 'overview' && (
-            <TimingsView
-              bids={transformedBids}
-              relayColors={relayColors}
-            />
-          )}
+            {activeTab === 'overview' && (
+              <TimingsView bids={transformedBids} relayColors={relayColors} />
+            )}
 
-          {activeTab === 'bids' && (
-            <BidsTable
-              bids={transformedBids}
-              relayColors={relayColors}
-            />
-          )}
+            {activeTab === 'bids' && <BidsTable bids={transformedBids} relayColors={relayColors} />}
           </motion.div>
         </AnimatePresence>
       </div>

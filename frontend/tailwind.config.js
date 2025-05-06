@@ -1,9 +1,8 @@
-const defaultConfig = require('tailwindcss/defaultConfig')
-const formsPlugin = require('@tailwindcss/forms')
-const scrollbarPlugin = require('tailwind-scrollbar')
+import formsPlugin from '@tailwindcss/forms'
+import scrollbarPlugin from 'tailwind-scrollbar'
 
-/** @type {import('tailwindcss/types').Config} */
-const config = {
+/** @type {import('tailwindcss').Config} */
+export default {
 	content: ['index.html', 'src/**/*.tsx'],
 	theme: {
 		screens: {
@@ -14,8 +13,8 @@ const config = {
 			'2xl': '1536px'
 		},
 		fontFamily: {
-			sans: ['Orbitron', 'Inter', ...defaultConfig.theme.fontFamily.sans],
-			mono: ['JetBrains Mono', ...defaultConfig.theme.fontFamily.mono]
+			sans: ['Orbitron', 'Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+			mono: ['JetBrains Mono', 'ui-monospace', 'monospace']
 		},
 		extend: {
 			colors: {
@@ -213,5 +212,3 @@ const config = {
 		}
 	]
 }
-
-module.exports = config

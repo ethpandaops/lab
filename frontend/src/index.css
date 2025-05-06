@@ -1,6 +1,5 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@config "../tailwind.config.js";
+@import "tailwindcss";
 
 @layer base {
 	html {
@@ -13,7 +12,7 @@
 
 	/* Input elements should inherit text color by default */
 	input, textarea, select {
-		color: black
+		color: black;
 	}
 	
 	/* Gold color for winning elements */
@@ -202,7 +201,7 @@
 
 		background-color: rgb(var(--bg-surface) / 80%);
 
-		@apply border-subtle hover:border-default;
+		@apply border-border hover:border-border;
 
 		&:hover {
 			background-color: rgb(var(--bg-surface) / 90%);
@@ -318,6 +317,7 @@
 
 	/* Cyber effect */
 	.bg-cyber {
+		background-size: 100px 100px;
 		background-image:
 			radial-gradient(circle at 20% 30%, rgb(0 255 159 / 5%) 0%, transparent 50%),
 			radial-gradient(circle at 80% 70%, rgb(0 242 255 / 5%) 0%, transparent 50%),
