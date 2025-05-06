@@ -283,6 +283,7 @@ const DesktopBlockProductionView: React.FC<DesktopBlockProductionViewProps> = ({
             blockTime={blockTime}
             height="100%"
             width="100%"
+            slotData={slotData}
           />
         </div>
         

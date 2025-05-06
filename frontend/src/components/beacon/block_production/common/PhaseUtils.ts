@@ -38,9 +38,6 @@ export const getCurrentPhase = (
     }
   });
   
-  // Debug logging to help troubleshoot phase transitions
-  console.debug('PhaseUtils - Calculating phase:', { currentTime, earliestNodeTime, blockTime });
-  
   // Use block time if available and earlier than node times
   if (blockTime !== undefined && blockTime < earliestNodeTime) {
     earliestNodeTime = blockTime;
