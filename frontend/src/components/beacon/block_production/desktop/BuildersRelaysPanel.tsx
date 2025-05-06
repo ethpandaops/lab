@@ -89,8 +89,12 @@ const BuildersRelaysPanel: React.FC<BuildersRelaysPanelProps> = ({
       // Get the normalized pubkey for builder name lookup
       const normalizedPubkey = (bid.builderPubkey || '').toLowerCase().replace(/^0x/, '');
       
-      // Get the builder name if available, otherwise use truncated pubkey
-      const builderName = builderNames[normalizedPubkey];
+      // Use more flexible builder name matching
+      // Try exact match first, then try the flexible finder function
+      const builderName = 
+        builderNames[normalizedPubkey] || 
+        (builderNames.findBuilder && builderNames.findBuilder(bid.builderPubkey || ''));
+      
       const displayName = builderName || truncateMiddle(bid.builderPubkey || 'unknown', 8, 6);
       
       return {
