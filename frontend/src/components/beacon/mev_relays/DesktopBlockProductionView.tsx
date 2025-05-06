@@ -31,6 +31,7 @@ export interface DesktopBlockProductionViewProps {
     execution_payload_transactions_count?: number;
     executionPayloadTransactionsCount?: number;
     blockTotalBytes?: number;
+    attestations?: any[] | null;
     [key: string]: any;
   };
   valueRange?: {
@@ -44,13 +45,29 @@ export interface DesktopBlockProductionViewProps {
   };
 }
 
-// Helper function to determine if we're in the Propagation phase
-const isInPropagationPhase = (
-  currentTime: number, 
-  nodeBlockSeen: Record<string, number>, 
-  nodeBlockP2P: Record<string, number>
-): boolean => {
-  // Find the earliest time any node saw the block
+// Enum for phase types
+enum Phase {
+  Building = 'building',
+  Propagating = 'propagating',
+  Attesting = 'attesting',
+  Accepted = 'accepted'
+}
+
+// Transition times (in milliseconds)
+const PROPAGATION_DEFAULT_TIME = 5000; // 5s into slot
+const ATTESTATION_DEFAULT_TIME = 6500; // 6.5s into slot
+const ACCEPTANCE_DEFAULT_TIME = 8500;  // 8.5s into slot
+
+// Helper function to determine the current phase
+const getCurrentPhase = (
+  currentTime: number,
+  nodeBlockSeen: Record<string, number>,
+  nodeBlockP2P: Record<string, number>,
+  blockTime?: number,
+  attestationsCount: number = 0,
+  totalExpectedAttestations: number = 0
+): Phase => {
+  // Find the earliest time any node saw the block (propagation start time)
   let earliestNodeTime = Infinity;
   
   // Check API timings
@@ -67,16 +84,49 @@ const isInPropagationPhase = (
     }
   });
   
-  // Default transition time if no real data (around 5 seconds into the slot)
-  const defaultTransitionTime = 5000;
+  // Use block time if available and earlier than node times
+  if (blockTime !== undefined && blockTime < earliestNodeTime) {
+    earliestNodeTime = blockTime;
+  }
+
+  // If we don't have real timing data, use defaults
+  const propagationTime = earliestNodeTime !== Infinity ? earliestNodeTime : PROPAGATION_DEFAULT_TIME;
   
-  // If we have real timing data and the current time has passed that point
-  if (earliestNodeTime !== Infinity && currentTime >= earliestNodeTime) {
-    return true;
+  // Attestation phase starts when attestations start coming in
+  // We'll start 1.5s after propagation begins as a default
+  const attestationTime = propagationTime + 1500;
+  
+  // Accepted phase starts when 66% of attestations are received
+  const isAttestation66PercentComplete = totalExpectedAttestations > 0 && 
+    attestationsCount >= (totalExpectedAttestations * 0.66);
+
+  // If we have 66% of attestations, move to accepted phase
+  if (isAttestation66PercentComplete && currentTime >= attestationTime) {
+    return Phase.Accepted;
   }
   
-  // If no real data or we haven't reached the transition point yet
-  return currentTime >= defaultTransitionTime;
+  // If we're in attestation phase time
+  if (currentTime >= attestationTime) {
+    return Phase.Attesting;
+  }
+  
+  // If we're in propagation phase
+  if (currentTime >= propagationTime) {
+    return Phase.Propagating;
+  }
+  
+  // Otherwise we're in the building phase
+  return Phase.Building;
+};
+
+// Helper function to determine if we're in the Propagation phase (legacy)
+const isInPropagationPhase = (
+  currentTime: number, 
+  nodeBlockSeen: Record<string, number>, 
+  nodeBlockP2P: Record<string, number>
+): boolean => {
+  const phase = getCurrentPhase(currentTime, nodeBlockSeen, nodeBlockP2P);
+  return phase !== Phase.Building;
 };
 
 // Helper function to count unique builder pubkeys from all bids
@@ -838,8 +888,25 @@ const DesktopBlockProductionView: React.FC<DesktopBlockProductionViewProps> = ({
     return earliestContinent ? continentNames[earliestContinent] || earliestContinent : null;
   }, [nodeBlockSeen, nodeBlockP2P, nodes, currentTime]);
 
-  return (
+  // Define flow animation
+const flowAnimations = `
+  @keyframes flowRight {
+    0% { transform: translateX(0); opacity: 0.5; }
+    50% { transform: translateX(100%); opacity: 1; }
+    50.1% { transform: translateX(-100%); opacity: 1; }
+    100% { transform: translateX(0); opacity: 0.5; }
+  }
+  
+  @keyframes pulseOpacity {
+    0% { opacity: 0.5; }
+    50% { opacity: 1; }
+    100% { opacity: 0.5; }
+  }
+`;
+
+return (
     <div className="px-2 py-2 h-full flex flex-col space-y-3">
+      <style jsx>{flowAnimations}</style>
       {/* Timeline Header */}
       <div className="bg-surface/40 rounded-xl shadow-lg overflow-hidden p-3 pb-6">
         <div className="flex justify-between items-center mb-2">
@@ -847,15 +914,52 @@ const DesktopBlockProductionView: React.FC<DesktopBlockProductionViewProps> = ({
             <h3 className="text-base font-bold text-primary">Block Production Timeline</h3>
             <div className="text-xs mt-0.5 flex items-center">
               <span className="font-medium mr-1">Phase:</span>
-              <span 
-                className={`font-medium px-1.5 py-0.5 rounded-full text-xs ${
-                  isInPropagationPhase(currentTime, nodeBlockSeen, nodeBlockP2P) 
-                    ? 'bg-purple-500/20 text-purple-300' 
-                    : 'bg-orange-500/20 text-orange-300'
-                }`}
-              >
-                {isInPropagationPhase(currentTime, nodeBlockSeen, nodeBlockP2P) ? 'Propagating' : 'Building'}
-              </span>
+              {(() => {
+                // Get attestation counts to determine phase
+                const attestationsCount = block?.attestations?.length || 0;
+                // We expect around 128 attestations per slot
+                const totalExpectedAttestations = 128;
+                
+                // Calculate the current phase
+                const currentPhase = getCurrentPhase(
+                  currentTime, 
+                  nodeBlockSeen, 
+                  nodeBlockP2P, 
+                  blockTime,
+                  attestationsCount,
+                  totalExpectedAttestations
+                );
+                
+                // Determine display styles based on phase
+                let bgColor = 'bg-orange-500/20';
+                let textColor = 'text-orange-300';
+                let phaseName = 'Building';
+                
+                if (currentPhase === Phase.Propagating) {
+                  bgColor = 'bg-purple-500/20';
+                  textColor = 'text-purple-300';
+                  phaseName = 'Propagating';
+                } else if (currentPhase === Phase.Attesting) {
+                  bgColor = 'bg-blue-500/20';
+                  textColor = 'text-blue-300';
+                  phaseName = 'Attesting';
+                } else if (currentPhase === Phase.Accepted) {
+                  bgColor = 'bg-green-500/20';
+                  textColor = 'text-green-300';
+                  phaseName = 'Accepted';
+                }
+                
+                return (
+                  <span className={`font-medium px-1.5 py-0.5 rounded-full text-xs ${bgColor} ${textColor}`}>
+                    {phaseName}
+                    {currentPhase === Phase.Attesting && totalExpectedAttestations > 0 && (
+                      <span className="ml-1">
+                        ({Math.round((attestationsCount / totalExpectedAttestations) * 100)}%)
+                      </span>
+                    )}
+                  </span>
+                );
+              })()}
               <span className="ml-auto font-mono text-sm text-white">
                 {(currentTime / 1000).toFixed(1)}s
               </span>
@@ -864,11 +968,16 @@ const DesktopBlockProductionView: React.FC<DesktopBlockProductionViewProps> = ({
         </div>
         
         <div className="relative mt-2">
-          {/* Two-phase progress bar: Building and Propagating */}
+          {/* Four-phase progress bar: Building → Propagating → Attesting → Accepted */}
           <div className="h-3 mb-2 flex rounded-lg overflow-hidden border border-subtle shadow-inner relative">
-            {/* Calculate transition time */}
+            {/* Calculate transition times and render phases */}
             {(() => {
-              let transitionTime = 5000; // Default
+              // Get attestation counts
+              const attestationsCount = block?.attestations?.length || 0;
+              const totalExpectedAttestations = 128;
+              
+              // Calculate phase transition times
+              let propagationTime = PROPAGATION_DEFAULT_TIME; // Default 5s
               let earliestNodeTime = Infinity;
               
               // Look for earliest node time in the data
@@ -884,45 +993,101 @@ const DesktopBlockProductionView: React.FC<DesktopBlockProductionViewProps> = ({
                 }
               });
               
-              // Use earliest node time if we have it, otherwise default
+              // Use earliest node time or block time if we have it
               if (earliestNodeTime !== Infinity) {
-                transitionTime = earliestNodeTime;
+                propagationTime = earliestNodeTime;
               } else if (blockTime) {
-                transitionTime = blockTime;
+                propagationTime = blockTime;
               }
               
-              // Calculate the percentage for transition (as portion of the 12s slot)
-              const transitionPercent = Math.min(98, Math.max(2, (transitionTime / 12000) * 100));
-              const isInPropagation = isInPropagationPhase(currentTime, nodeBlockSeen, nodeBlockP2P);
+              // Calculate the attestation phase time (1.5s after propagation starts)
+              const attestationTime = propagationTime + 1500;
+              
+              // For the accepted phase, either use 66% attestation or a time-based fallback
+              const acceptanceTime = attestationTime + 2000; // 2s after attestation phase starts
+
+              // Get percentages for phase transitions (as portion of the 12s slot)
+              const propagationPercent = Math.min(98, Math.max(2, (propagationTime / 12000) * 100));
+              const attestationPercent = Math.min(98, Math.max(propagationPercent + 1, (attestationTime / 12000) * 100));
+              const acceptancePercent = Math.min(98, Math.max(attestationPercent + 1, (acceptanceTime / 12000) * 100));
+              
+              // Calculate which phase we're currently in
+              const currentPhase = getCurrentPhase(
+                currentTime, 
+                nodeBlockSeen, 
+                nodeBlockP2P, 
+                blockTime,
+                attestationsCount,
+                totalExpectedAttestations
+              );
               
               return (
                 <>
-                  {/* Building phase - dynamic width based on transition time */}
+                  {/* Building phase */}
                   <div 
                     className="border-r border-white/10 transition-colors duration-300 shadow-inner" 
                     style={{ 
-                      width: `${transitionPercent}%`,
-                      backgroundColor: isInPropagation
-                        ? 'rgba(249, 115, 22, 0.15)' // faded orange when inactive
-                        : 'rgba(249, 115, 22, 0.4)' // brighter orange when active
+                      width: `${propagationPercent}%`,
+                      backgroundColor: currentPhase === Phase.Building
+                        ? 'rgba(249, 115, 22, 0.4)' // brighter orange when active
+                        : 'rgba(249, 115, 22, 0.15)' // faded orange when inactive
                     }}
                   />
-                  {/* Propagating phase - dynamic width based on transition time */}
+                  
+                  {/* Propagating phase */}
                   <div 
-                    className="transition-colors duration-300 shadow-inner"
+                    className="border-r border-white/10 transition-colors duration-300 shadow-inner"
                     style={{ 
-                      width: `${100 - transitionPercent}%`,
-                      backgroundColor: isInPropagation
+                      width: `${attestationPercent - propagationPercent}%`,
+                      backgroundColor: currentPhase === Phase.Propagating
                         ? 'rgba(168, 85, 247, 0.4)' // brighter purple when active
                         : 'rgba(168, 85, 247, 0.15)' // faded purple when inactive
                     }}
                   />
                   
-                  {/* Phase transition marker */}
+                  {/* Attesting phase */}
+                  <div 
+                    className="border-r border-white/10 transition-colors duration-300 shadow-inner"
+                    style={{ 
+                      width: `${acceptancePercent - attestationPercent}%`,
+                      backgroundColor: currentPhase === Phase.Attesting
+                        ? 'rgba(59, 130, 246, 0.4)' // brighter blue when active
+                        : 'rgba(59, 130, 246, 0.15)' // faded blue when inactive
+                    }}
+                  />
+                  
+                  {/* Accepted phase */}
+                  <div 
+                    className="transition-colors duration-300 shadow-inner"
+                    style={{ 
+                      width: `${100 - acceptancePercent}%`,
+                      backgroundColor: currentPhase === Phase.Accepted
+                        ? 'rgba(34, 197, 94, 0.4)' // brighter green when active
+                        : 'rgba(34, 197, 94, 0.15)' // faded green when inactive
+                    }}
+                  />
+                  
+                  {/* Phase transition markers */}
                   <div 
                     className="absolute top-0 bottom-0 w-1 transition-colors duration-300" 
                     style={{
-                      left: `${transitionPercent}%`,
+                      left: `${propagationPercent}%`,
+                      backgroundColor: 'rgba(255, 255, 255, 0.7)',
+                      boxShadow: '0 0 4px rgba(255, 255, 255, 0.7)'
+                    }}
+                  />
+                  <div 
+                    className="absolute top-0 bottom-0 w-1 transition-colors duration-300" 
+                    style={{
+                      left: `${attestationPercent}%`,
+                      backgroundColor: 'rgba(255, 255, 255, 0.7)',
+                      boxShadow: '0 0 4px rgba(255, 255, 255, 0.7)'
+                    }}
+                  />
+                  <div 
+                    className="absolute top-0 bottom-0 w-1 transition-colors duration-300" 
+                    style={{
+                      left: `${acceptancePercent}%`,
                       backgroundColor: 'rgba(255, 255, 255, 0.7)',
                       boxShadow: '0 0 4px rgba(255, 255, 255, 0.7)'
                     }}
@@ -968,37 +1133,310 @@ const DesktopBlockProductionView: React.FC<DesktopBlockProductionViewProps> = ({
           </div>
         </div>
 
-        {/* Timeline nodes with icons */}
+        {/* Timeline nodes with icons - six phase icons */}
         <div className="flex justify-between items-center px-2 mt-4 relative z-10">
-          {/* Builders Phase */}
-          <div className={`flex flex-col items-center text-center transition-opacity duration-500 ${!isActive('builder') ? 'opacity-60' : 'opacity-100'}`}>
-            <div 
-              className={`w-16 h-16 flex items-center justify-center rounded-full mb-1.5 shadow-lg transition-all duration-500 ${
-                isActive('builder')
-                  ? !isInPropagationPhase(currentTime, nodeBlockSeen, nodeBlockP2P)
-                    ? 'bg-gradient-to-br from-orange-500/60 to-orange-600/30 border-2 border-orange-400/80 scale-105' // Brighter & larger during building phase
-                    : 'bg-gradient-to-br from-orange-500/40 to-orange-600/20 border-2 border-orange-400/60' // Normal when active
-                  : 'bg-surface/30 border border-subtle/60' // More dull when inactive
-              }`}
-            >
-              <div 
-                className={`text-3xl ${isActive('builder') ? 'opacity-90' : 'opacity-50'}`} 
-                role="img" 
-                aria-label="Robot (Builder)"
-              >
-                🤖
-              </div>
-            </div>
-            <div className={`font-medium text-sm mb-0.5 ${isActive('builder') ? 'text-orange-300' : 'text-primary/70'}`}>Builders</div>
-            <div className={`text-xs ${isActive('builder') ? 'text-white/90' : 'text-tertiary'} max-w-[110px] h-6`}>
-              {bids.length > 0 
-                ? `${countUniqueBuilderPubkeys(bids)} builder${countUniqueBuilderPubkeys(bids) > 1 ? 's' : ''} total` 
-                : 'Waiting for blocks...'}
-            </div>
-          </div>
+          {/* Get attestation data and current phase */}
+          {(() => {
+            const attestationsCount = block?.attestations?.length || 0;
+            const totalExpectedAttestations = 128;
+            const currentPhase = getCurrentPhase(
+              currentTime, 
+              nodeBlockSeen, 
+              nodeBlockP2P, 
+              blockTime,
+              attestationsCount,
+              totalExpectedAttestations
+            );
+            
+            return (
+              <>
+                {/* 1. BUILDERS PHASE */}
+                <div className={`flex flex-col items-center text-center transition-opacity duration-500 ${currentPhase !== Phase.Building ? 'opacity-60' : 'opacity-100'}`}>
+                  <div 
+                    className={`w-14 h-14 flex items-center justify-center rounded-full mb-1.5 shadow-lg transition-all duration-500 ${
+                      currentPhase === Phase.Building
+                        ? 'bg-gradient-to-br from-orange-500/60 to-orange-600/30 border-2 border-orange-400/80 scale-105' // Active
+                        : currentPhase === Phase.Propagating || currentPhase === Phase.Attesting || currentPhase === Phase.Accepted
+                          ? 'bg-gradient-to-br from-orange-500/30 to-orange-600/10 border-2 border-orange-400/40' // Completed
+                          : 'bg-surface/30 border border-subtle/60' // Not yet active
+                    }`}
+                  >
+                    <div 
+                      className={`text-2xl ${currentPhase === Phase.Building ? 'opacity-90' : 'opacity-50'}`} 
+                      role="img" 
+                      aria-label="Robot (Builder)"
+                    >
+                      🤖
+                    </div>
+                  </div>
+                  <div className={`font-medium text-sm mb-0.5 ${currentPhase === Phase.Building ? 'text-orange-300' : 'text-primary/70'}`}>Builders</div>
+                  <div className={`text-xs ${currentPhase === Phase.Building ? 'text-white/90' : 'text-tertiary'} max-w-[85px] h-6`}>
+                    {bids.length > 0 
+                      ? `${countUniqueBuilderPubkeys(bids)} builder${countUniqueBuilderPubkeys(bids) > 1 ? 's' : ''}` 
+                      : 'Waiting...'}
+                  </div>
+                </div>
 
-          {/* Animated flow lines */}
-          <div className="flex-shrink-0 flex items-center justify-center relative w-20">
+                {/* Flow line 1 */}
+                <div className="flex-shrink-0 flex items-center justify-center relative w-10">
+                  <div 
+                    className={`h-1 w-full ${
+                      currentPhase !== Phase.Building
+                        ? 'bg-gradient-to-r from-orange-400/80 to-green-400/80' 
+                        : 'bg-gradient-to-r from-orange-400/30 to-green-400/30'
+                    } transition-colors duration-500 rounded-full overflow-hidden`}
+                  >
+                    {currentPhase !== Phase.Building && (
+                      <div 
+                        className="h-full w-2 bg-white opacity-70 rounded-full"
+                        style={{
+                          animation: 'flowRight 1.5s infinite ease-in-out',
+                          boxShadow: '0 0 5px 1px rgba(255, 255, 255, 0.5)'
+                        }}
+                      ></div>
+                    )}
+                  </div>
+                </div>
+
+                {/* 2. RELAYS PHASE */}
+                <div className={`flex flex-col items-center text-center transition-opacity duration-500 ${currentPhase !== Phase.Building && currentPhase !== Phase.Propagating ? 'opacity-60' : 'opacity-100'}`}>
+                  <div 
+                    className={`w-14 h-14 flex items-center justify-center rounded-full mb-1.5 shadow-lg transition-all duration-500 ${
+                      currentPhase === Phase.Building
+                        ? 'bg-surface/30 border border-subtle/60' // Not yet active
+                        : currentPhase === Phase.Propagating
+                          ? 'bg-gradient-to-br from-green-500/60 to-green-600/30 border-2 border-green-400/80 scale-105' // Active
+                          : 'bg-gradient-to-br from-green-500/30 to-green-600/10 border-2 border-green-400/40' // Completed
+                    }`}
+                  >
+                    <div 
+                      className={`text-2xl ${currentPhase === Phase.Propagating ? 'opacity-90' : 'opacity-50'}`} 
+                      role="img" 
+                      aria-label="MEV Relay"
+                    >
+                      🔄
+                    </div>
+                  </div>
+                  <div className={`font-medium text-sm mb-0.5 ${currentPhase === Phase.Propagating ? 'text-green-300' : 'text-primary/70'}`}>Relays</div>
+                  <div className={`text-xs ${currentPhase === Phase.Propagating ? 'text-white/90' : 'text-tertiary'} max-w-[85px] h-6`}>
+                    {winningBid 
+                      ? `${winningBid.relayName}` 
+                      : relays.length > 0 
+                        ? `${relays.length} relay${relays.length > 1 ? 's' : ''}` 
+                        : 'Waiting...'}
+                  </div>
+                </div>
+
+                {/* Flow line 2 */}
+                <div className="flex-shrink-0 flex items-center justify-center relative w-10">
+                  <div 
+                    className={`h-1 w-full ${
+                      currentPhase !== Phase.Building && currentPhase !== Phase.Propagating
+                        ? 'bg-gradient-to-r from-green-400/80 to-gold/80' 
+                        : 'bg-gradient-to-r from-green-400/30 to-gold/30'
+                    } transition-colors duration-500 rounded-full overflow-hidden`}
+                  >
+                    {currentPhase !== Phase.Building && currentPhase !== Phase.Propagating && (
+                      <div 
+                        className="h-full w-2 bg-white opacity-70 rounded-full"
+                        style={{
+                          animation: 'flowRight 1.5s infinite ease-in-out',
+                          boxShadow: '0 0 5px 1px rgba(255, 255, 255, 0.5)'
+                        }}
+                      ></div>
+                    )}
+                  </div>
+                </div>
+
+                {/* 3. PROPOSER PHASE */}
+                <div className={`flex flex-col items-center text-center transition-opacity duration-500 ${
+                  currentPhase === Phase.Building || currentPhase === Phase.Propagating 
+                    ? 'opacity-60' 
+                    : currentPhase === Phase.Attesting 
+                      ? 'opacity-100' 
+                      : 'opacity-80'
+                }`}>
+                  <div 
+                    className={`w-14 h-14 flex items-center justify-center rounded-full mb-1.5 shadow-lg transition-all duration-500 ${
+                      currentPhase === Phase.Building || currentPhase === Phase.Propagating
+                        ? 'bg-surface/30 border border-subtle/60' // Not yet active
+                        : currentPhase === Phase.Attesting
+                          ? 'bg-gradient-to-br from-gold/60 to-amber-600/30 border-2 border-gold/80 scale-105' // Active
+                          : 'bg-gradient-to-br from-gold/40 to-amber-600/10 border-2 border-gold/60' // Completed
+                    }`}
+                  >
+                    <div 
+                      className={`text-2xl ${currentPhase === Phase.Attesting ? 'opacity-90' : 'opacity-50'}`} 
+                      role="img" 
+                      aria-label="Proposer"
+                    >
+                      👤
+                    </div>
+                  </div>
+                  <div className={`font-medium text-sm mb-0.5 ${currentPhase === Phase.Attesting ? 'text-amber-300' : 'text-primary/70'}`}>Proposer</div>
+                  <div className={`text-xs ${currentPhase === Phase.Attesting ? 'text-white/90' : 'text-tertiary'} max-w-[85px] h-6 text-center`}>
+                    {proposer ? `${proposer.proposerValidatorIndex}` : 'Waiting...'}
+                  </div>
+                  {currentPhase !== Phase.Building && blockTime !== undefined && (
+                    <div className="text-xs font-mono text-success absolute -bottom-4 whitespace-nowrap">
+                      {(blockTime / 1000).toFixed(1)}s
+                    </div>
+                  )}
+                </div>
+
+                {/* Flow line 3 */}
+                <div className="flex-shrink-0 flex items-center justify-center relative w-10">
+                  <div 
+                    className={`h-1 w-full ${
+                      currentPhase === Phase.Attesting || currentPhase === Phase.Accepted
+                        ? 'bg-gradient-to-r from-gold/80 to-blue-400/80' 
+                        : 'bg-gradient-to-r from-gold/30 to-blue-400/30'
+                    } transition-colors duration-500 rounded-full overflow-hidden`}
+                  >
+                    {(currentPhase === Phase.Attesting || currentPhase === Phase.Accepted) && (
+                      <div 
+                        className="h-full w-2 bg-white opacity-70 rounded-full"
+                        style={{
+                          animation: 'flowRight 1.5s infinite ease-in-out',
+                          boxShadow: '0 0 5px 1px rgba(255, 255, 255, 0.5)'
+                        }}
+                      ></div>
+                    )}
+                  </div>
+                </div>
+
+                {/* 4. ATTESTATION PHASE - NEW */}
+                <div className={`flex flex-col items-center text-center transition-opacity duration-500 ${
+                  currentPhase === Phase.Attesting
+                    ? 'opacity-100'
+                    : currentPhase === Phase.Accepted
+                      ? 'opacity-80'
+                      : 'opacity-60'
+                }`}>
+                  <div 
+                    className={`w-14 h-14 flex items-center justify-center rounded-full mb-1.5 shadow-lg transition-all duration-500 ${
+                      currentPhase === Phase.Building || currentPhase === Phase.Propagating
+                        ? 'bg-surface/30 border border-subtle/60' // Not yet active
+                        : currentPhase === Phase.Attesting
+                          ? 'bg-gradient-to-br from-blue-500/60 to-blue-600/30 border-2 border-blue-400/80 scale-105' // Active
+                          : 'bg-gradient-to-br from-blue-500/30 to-blue-600/10 border-2 border-blue-400/40' // Completed
+                    }`}
+                  >
+                    <div 
+                      className={`text-2xl ${currentPhase === Phase.Attesting || currentPhase === Phase.Accepted ? 'opacity-90' : 'opacity-50'}`} 
+                      role="img" 
+                      aria-label="Attesters"
+                    >
+                      ✓
+                    </div>
+                  </div>
+                  <div className={`font-medium text-sm mb-0.5 ${currentPhase === Phase.Attesting ? 'text-blue-300' : 'text-primary/70'}`}>Attesters</div>
+                  <div className={`text-xs ${currentPhase === Phase.Attesting ? 'text-white/90' : 'text-tertiary'} max-w-[85px] h-6`}>
+                    {attestationsCount > 0
+                      ? `${Math.round((attestationsCount / totalExpectedAttestations) * 100)}%`
+                      : 'Waiting...'}
+                  </div>
+                </div>
+
+                {/* Flow line 4 */}
+                <div className="flex-shrink-0 flex items-center justify-center relative w-10">
+                  <div 
+                    className={`h-1 w-full ${
+                      currentPhase === Phase.Accepted
+                        ? 'bg-gradient-to-r from-blue-400/80 to-green-400/80' 
+                        : 'bg-gradient-to-r from-blue-400/30 to-green-400/30'
+                    } transition-colors duration-500 rounded-full overflow-hidden`}
+                  >
+                    {currentPhase === Phase.Accepted && (
+                      <div 
+                        className="h-full w-2 bg-white opacity-70 rounded-full"
+                        style={{
+                          animation: 'flowRight 1.5s infinite ease-in-out',
+                          boxShadow: '0 0 5px 1px rgba(255, 255, 255, 0.5)'
+                        }}
+                      ></div>
+                    )}
+                  </div>
+                </div>
+
+                {/* 5. ACCEPTED PHASE - NEW */}
+                <div className={`flex flex-col items-center text-center transition-opacity duration-500 ${currentPhase === Phase.Accepted ? 'opacity-100' : 'opacity-60'}`}>
+                  <div 
+                    className={`w-14 h-14 flex items-center justify-center rounded-full mb-1.5 shadow-lg transition-all duration-500 ${
+                      currentPhase === Phase.Accepted
+                        ? 'bg-gradient-to-br from-green-500/60 to-green-600/30 border-2 border-green-400/80 scale-105' // Active
+                        : 'bg-surface/30 border border-subtle/60' // Not yet active
+                    }`}
+                  >
+                    <div 
+                      className={`text-2xl ${currentPhase === Phase.Accepted ? 'opacity-90' : 'opacity-50'}`} 
+                      role="img" 
+                      aria-label="Accepted"
+                    >
+                      🔒
+                    </div>
+                  </div>
+                  <div className={`font-medium text-sm mb-0.5 ${currentPhase === Phase.Accepted ? 'text-green-300' : 'text-primary/70'}`}>Accepted</div>
+                  <div className={`text-xs ${currentPhase === Phase.Accepted ? 'text-white/90' : 'text-tertiary'} max-w-[85px] h-6`}>
+                    {currentPhase === Phase.Accepted
+                      ? "Finalized"
+                      : "Waiting..."}
+                  </div>
+                </div>
+
+                {/* Flow line 5 */}
+                <div className="flex-shrink-0 flex items-center justify-center relative w-10">
+                  <div 
+                    className={`h-1 w-full ${
+                      currentPhase === Phase.Accepted
+                        ? 'bg-gradient-to-r from-green-400/80 to-purple-400/80' 
+                        : 'bg-gradient-to-r from-green-400/30 to-purple-400/30'
+                    } transition-colors duration-500 rounded-full overflow-hidden`}
+                  >
+                    {currentPhase === Phase.Accepted && (
+                      <div 
+                        className="h-full w-2 bg-white opacity-70 rounded-full"
+                        style={{
+                          animation: 'flowRight 1.5s infinite ease-in-out',
+                          boxShadow: '0 0 5px 1px rgba(255, 255, 255, 0.5)'
+                        }}
+                      ></div>
+                    )}
+                  </div>
+                </div>
+
+                {/* 6. NETWORK PHASE */}
+                <div className={`flex flex-col items-center text-center transition-opacity duration-500 ${currentPhase === Phase.Accepted ? 'opacity-100' : 'opacity-60'}`}>
+                  <div 
+                    className={`w-14 h-14 flex items-center justify-center rounded-full mb-1.5 shadow-lg transition-all duration-500 ${
+                      currentPhase !== Phase.Building && currentPhase !== Phase.Propagating
+                        ? currentPhase === Phase.Accepted
+                          ? 'bg-gradient-to-br from-purple-500/60 to-purple-600/30 border-2 border-purple-400/80 scale-105' // Active
+                          : 'bg-gradient-to-br from-purple-500/40 to-purple-600/20 border-2 border-purple-400/60' // Normal when in attesting phase
+                        : 'bg-surface/30 border border-subtle/60' // Not yet active
+                    }`}
+                  >
+                    <div 
+                      className={`text-2xl ${currentPhase === Phase.Accepted ? 'opacity-90' : 'opacity-50'}`} 
+                      role="img" 
+                      aria-label="Network Nodes"
+                    >
+                      🖥️
+                    </div>
+                  </div>
+                  <div className={`font-medium text-sm mb-0.5 ${currentPhase === Phase.Accepted ? 'text-purple-300' : 'text-primary/70'}`}>Network</div>
+                  <div className={`text-xs ${currentPhase === Phase.Accepted ? 'text-white/90' : 'text-tertiary'} max-w-[85px] h-6`}>
+                    {continents.length > 0 && continents.some(c => c.progress > 0)
+                      ? `${continents.filter(c => c.progress > 0).length}/${continents.length}`
+                      : 'Waiting...'}
+                  </div>
+                </div>
+              </>
+            );
+          })()}
+                    
+          {/* Hidden, legacy code - can be removed later */}
+          <div style={{display: 'none'}} className="flex-shrink-0 flex items-center justify-center relative w-20">
             <div 
               className={`h-1 w-full ${
                 isActive('relay') 
@@ -1165,6 +1603,8 @@ const DesktopBlockProductionView: React.FC<DesktopBlockProductionViewProps> = ({
           </div>
         </div>
       </div>
+
+      {/* Note: We're completely replacing the phase timeline with our new one that includes "attesting" and "accepted" phases */}
 
       {/* Main content */}
       <div className="flex flex-1 gap-4 min-h-0 overflow-hidden">
