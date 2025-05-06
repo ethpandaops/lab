@@ -417,11 +417,21 @@ export default function BlockProductionLivePage() {
     for (const [relayName, relayData] of Object.entries(slotData.relayBids)) {
       if (!relayData.bids || !Array.isArray(relayData.bids)) continue;
 
-      const matchingBid = relayData.bids.find(bid => 
-        bid.blockHash && 
-        typeof bid.blockHash === 'string' && 
-        bid.blockHash === executionPayloadBlockHash
-      );
+      // Look for a bid with a matching block hash to the execution payload block hash
+      const matchingBid = relayData.bids.find(bid => {
+        // Both values should be strings and non-empty
+        if (!bid.blockHash || typeof bid.blockHash !== 'string' || 
+            !executionPayloadBlockHash || typeof executionPayloadBlockHash !== 'string') {
+          return false;
+        }
+        
+        // Normalize both hashes for comparison
+        const normalizedBidHash = bid.blockHash.toLowerCase().replace(/^0x/, '');
+        const normalizedExecutionHash = executionPayloadBlockHash.toLowerCase().replace(/^0x/, '');
+        
+        // Return true if the hashes match
+        return normalizedBidHash === normalizedExecutionHash;
+      });
 
       if (matchingBid) {
         try {
@@ -436,12 +446,14 @@ export default function BlockProductionLivePage() {
             builderPubkey: matchingBid.builderPubkey,
           };
         } catch (error) { 
+          console.error("Error converting bid value:", error);
           return null; 
         }
       }
     }
     
     // If no matching bid was found
+    console.log("No matching bid found for execution payload block hash:", executionPayloadBlockHash);
     return null;
   }, [slotData?.relayBids, slotData?.block?.executionPayloadBlockHash]);
 
@@ -457,14 +469,30 @@ export default function BlockProductionLivePage() {
       builderPubkey?: string;
       isWinning?: boolean;
     }> = [];
+    
+    // Function to check if a bid matches the winning bid's block hash
+    const isBidWinning = (bidBlockHash?: string) => {
+      if (!bidBlockHash || !winningBidData?.blockHash) return false;
+      
+      // Normalize both hashes for comparison
+      const normalizedBidHash = bidBlockHash.toLowerCase().replace(/^0x/, '');
+      const normalizedWinningHash = winningBidData.blockHash.toLowerCase().replace(/^0x/, '');
+      
+      return normalizedBidHash === normalizedWinningHash;
+    };
 
     Object.entries(slotData.relayBids).forEach(([relayName, relayData]) => {
+      if (!relayData.bids || !Array.isArray(relayData.bids)) return;
+      
       relayData.bids.forEach(bid => {
         try {
           const valueInEth = Number(BigInt(bid.value)) / 1e18;
           // Use slotTime directly as it's already relative to slot start in ms
           // Default to 0 if slotTime is undefined or not a number
           const time = typeof bid.slotTime === 'number' ? bid.slotTime : 0;
+          
+          // Check if this bid is the winning bid by comparing block hashes
+          const isWinning = isBidWinning(bid.blockHash);
 
           bidsForVisualizer.push({
             relayName: relayName,
@@ -472,9 +500,12 @@ export default function BlockProductionLivePage() {
             time: time,
             blockHash: bid.blockHash,
             builderPubkey: bid.builderPubkey,
-            isWinning: bid.blockHash === winningBidData?.blockHash,
+            isWinning: isWinning,
           });
-        } catch { /* Skip bid if conversion fails */ }
+        } catch (error) {
+          console.debug(`Error processing bid from ${relayName}:`, error);
+          /* Skip bid if conversion fails */
+        }
       });
     });
     
@@ -520,11 +551,11 @@ export default function BlockProductionLivePage() {
   const emptyRelayColors = {};
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full bg-base">
       {/* Conditionally render mobile or desktop view based on screen size */}
       {isMobile ? (
         // Mobile View
-        <div className="px-2">
+        <div className="px-2 py-1">
           <div className={`transition-opacity duration-300 ${isSlotLoading && !isPreviousData ? 'opacity-70' : 'opacity-100'}`}>
             <MobileBlockProductionView 
               bids={slotData ? transformedBids : emptyBids}
@@ -562,8 +593,8 @@ export default function BlockProductionLivePage() {
         </div>
       ) : (
         // Desktop View
-        <div className="px-2 h-full flex flex-col">
-          <div className={`transition-opacity duration-300 flex-1 ${isSlotLoading && !isPreviousData ? 'opacity-70' : 'opacity-100'}`}>
+        <div className="h-full">
+          <div className={`transition-opacity duration-300 h-full ${isSlotLoading && !isPreviousData ? 'opacity-70' : 'opacity-100'}`}>
             <DesktopBlockProductionView
               bids={slotData ? transformedBids : emptyBids}
               currentTime={currentTime}
