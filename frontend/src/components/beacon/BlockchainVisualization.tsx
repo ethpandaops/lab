@@ -383,7 +383,7 @@ const BlockchainVisualization: React.FC<BlockchainVisualizationProps> = ({
                     {/* Gold indicator at top - more prominent for current slot */}
                     <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-gold/70 via-gold/40 to-gold/10"></div>
                     
-                    <div className="p-4 flex items-center justify-between">
+                    <div className="p-4 flex items-center justify-between border-b border-gold/20">
                       <div className="flex items-center">
                         <div className="w-10 h-10 bg-gold/10 rounded-lg flex items-center justify-center mr-3 relative overflow-hidden">
                           {/* Animated pulse in the background */}
@@ -449,28 +449,32 @@ const BlockchainVisualization: React.FC<BlockchainVisualizationProps> = ({
                       </div>
                     ) : block.hasData ? (
                       <>
-                        {/* Dense block data display */}
+                        {/* Dense block data display - only showing fields we have data for */}
                         <div className="px-5 pt-2 pb-5 h-[calc(100%-4rem)] overflow-y-auto">
                           <div className="grid grid-cols-2 gap-x-6 gap-y-2">
                             {/* Left column - Block details */}
                             <div className="space-y-2">
-                              {/* Block number */}
-                              <div className="flex items-center">
-                                <div className="w-1 h-4 bg-amber-400/50 rounded-full mr-2"></div>
-                                <span className="text-xs text-white/50 uppercase mr-2">Block:</span>
-                                <span className="text-sm font-medium text-amber-400 font-mono">
-                                  {block.executionBlockNumber || 'N/A'}
-                                </span>
-                              </div>
+                              {/* Block number - from ExecutionPayloadBlockNumber */}
+                              {block.executionBlockNumber !== undefined && (
+                                <div className="flex items-center">
+                                  <div className="w-1 h-4 bg-amber-400/50 rounded-full mr-2"></div>
+                                  <span className="text-xs text-white/50 uppercase mr-2">Block:</span>
+                                  <span className="text-sm font-medium text-amber-400 font-mono">
+                                    {block.executionBlockNumber}
+                                  </span>
+                                </div>
+                              )}
                               
-                              {/* Transactions */}
-                              <div className="flex items-center">
-                                <div className="w-1 h-4 bg-blue-400/50 rounded-full mr-2"></div>
-                                <span className="text-xs text-white/50 uppercase mr-2">Transactions:</span>
-                                <span className="text-sm font-medium text-white/90 font-mono">
-                                  {block.transactionCount !== undefined ? block.transactionCount.toLocaleString() : 'N/A'}
-                                </span>
-                              </div>
+                              {/* Transactions - from ExecutionPayloadTransactionsCount */}
+                              {block.transactionCount !== undefined && (
+                                <div className="flex items-center">
+                                  <div className="w-1 h-4 bg-blue-400/50 rounded-full mr-2"></div>
+                                  <span className="text-xs text-white/50 uppercase mr-2">Transactions:</span>
+                                  <span className="text-sm font-medium text-white/90 font-mono">
+                                    {block.transactionCount.toLocaleString()}
+                                  </span>
+                                </div>
+                              )}
                               
                               {/* Block Hash */}
                               {block.blockHash && (
@@ -483,29 +487,29 @@ const BlockchainVisualization: React.FC<BlockchainVisualizationProps> = ({
                                 </div>
                               )}
                               
-                              {/* Blob Count */}
-                              <div className="flex items-center">
-                                <div className="w-1 h-4 bg-purple-400/50 rounded-full mr-2"></div>
-                                <span className="text-xs text-white/50 uppercase mr-2">Blobs:</span>
-                                <span className="text-sm font-medium text-purple-400/90 font-mono">
-                                  {block.blobCount !== undefined && block.blobCount > 0 ? block.blobCount : '0'}
-                                </span>
-                              </div>
-                              
-                              {/* Gas Usage */}
-                              {(block.gasUsed !== undefined || block.gasLimit !== undefined) && (
+                              {/* Blob Count - calculated from ExecutionPayloadBlobGasUsed */}
+                              {block.blobCount !== undefined && (
                                 <div className="flex items-center">
-                                  <div className="w-1 h-4 bg-cyan-400/50 rounded-full mr-2"></div>
-                                  <span className="text-xs text-white/50 uppercase mr-2">Gas Usage:</span>
-                                  <span className="text-sm font-medium text-cyan-400/90 font-mono">
-                                    {block.gasUsed !== undefined && block.gasLimit !== undefined
-                                      ? `${Math.round(block.gasUsed * 100 / block.gasLimit)}%`
-                                      : 'N/A'}
+                                  <div className="w-1 h-4 bg-purple-400/50 rounded-full mr-2"></div>
+                                  <span className="text-xs text-white/50 uppercase mr-2">Blobs:</span>
+                                  <span className="text-sm font-medium text-purple-400/90 font-mono">
+                                    {block.blobCount > 0 ? block.blobCount : '0'}
                                   </span>
                                 </div>
                               )}
                               
-                              {/* Gas Used */}
+                              {/* Gas Usage - percentage */}
+                              {block.gasUsed !== undefined && block.gasLimit !== undefined && (
+                                <div className="flex items-center">
+                                  <div className="w-1 h-4 bg-cyan-400/50 rounded-full mr-2"></div>
+                                  <span className="text-xs text-white/50 uppercase mr-2">Gas Usage:</span>
+                                  <span className="text-sm font-medium text-cyan-400/90 font-mono">
+                                    {Math.round(block.gasUsed * 100 / block.gasLimit)}%
+                                  </span>
+                                </div>
+                              )}
+                              
+                              {/* Gas Used - from ExecutionPayloadGasUsed */}
                               {block.gasUsed !== undefined && (
                                 <div className="flex items-center">
                                   <div className="w-1 h-4 bg-transparent rounded-full mr-2"></div>
@@ -516,7 +520,7 @@ const BlockchainVisualization: React.FC<BlockchainVisualizationProps> = ({
                                 </div>
                               )}
                               
-                              {/* Gas Limit */}
+                              {/* Gas Limit - from ExecutionPayloadGasLimit */}
                               {block.gasLimit !== undefined && (
                                 <div className="flex items-center">
                                   <div className="w-1 h-4 bg-transparent rounded-full mr-2"></div>
@@ -526,6 +530,9 @@ const BlockchainVisualization: React.FC<BlockchainVisualizationProps> = ({
                                   </span>
                                 </div>
                               )}
+                              
+                              {/* Block Total Bytes - would come from block_total_bytes */}
+                              {/* Add actual field if it exists in the data */}
                             </div>
                             
                             {/* Right column */}
@@ -541,80 +548,24 @@ const BlockchainVisualization: React.FC<BlockchainVisualizationProps> = ({
                                 </div>
                               )}
                               
-                              {/* Block Reward */}
-                              <div className="flex items-center">
-                                <div className="w-1 h-4 bg-green-400/50 rounded-full mr-2"></div>
-                                <span className="text-xs text-white/50 uppercase mr-2">Reward:</span>
-                                <span className="text-sm font-medium text-green-400/90 font-mono">
-                                  {block.blockValue !== undefined ? `${block.blockValue.toFixed(4)} ETH` : 'N/A'}
-                                </span>
-                              </div>
+                              {/* Block Reward - from winning bid value */}
+                              {block.blockValue !== undefined && (
+                                <div className="flex items-center">
+                                  <div className="w-1 h-4 bg-green-400/50 rounded-full mr-2"></div>
+                                  <span className="text-xs text-white/50 uppercase mr-2">Reward:</span>
+                                  <span className="text-sm font-medium text-green-400/90 font-mono">
+                                    {block.blockValue.toFixed(4)} ETH
+                                  </span>
+                                </div>
+                              )}
                               
-                              {/* Gas Price Range - if available in the data */}
-                              <div className="flex items-center">
-                                <div className="w-1 h-4 bg-pink-400/50 rounded-full mr-2"></div>
-                                <span className="text-xs text-white/50 uppercase mr-2">Gas Price:</span>
-                                <span className="text-xs font-medium text-pink-300/90 font-mono">
-                                  {/* Placeholder for gas price data */}
-                                  {Math.floor(Math.random() * 100) + 1} - {Math.floor(Math.random() * 200) + 100} gwei
-                                </span>
-                              </div>
-                              
-                              {/* Base Fee */}
-                              <div className="flex items-center">
-                                <div className="w-1 h-4 bg-lime-400/50 rounded-full mr-2"></div>
-                                <span className="text-xs text-white/50 uppercase mr-2">Base Fee:</span>
-                                <span className="text-xs font-medium text-lime-300/90 font-mono">
-                                  {/* Placeholder for base fee data */}
-                                  {Math.floor(Math.random() * 50) + 5} gwei
-                                </span>
-                              </div>
-                              
-                              {/* Block Size */}
-                              <div className="flex items-center">
-                                <div className="w-1 h-4 bg-indigo-400/50 rounded-full mr-2"></div>
-                                <span className="text-xs text-white/50 uppercase mr-2">Size:</span>
-                                <span className="text-xs font-medium text-indigo-300/90 font-mono">
-                                  {/* Calculate size based on txn count */}
-                                  {block.transactionCount !== undefined
-                                    ? `${(block.transactionCount * 0.5).toFixed(2)} KB`
-                                    : 'N/A'}
-                                </span>
-                              </div>
-                              
-                              {/* MEV Extractable Value */}
-                              <div className="flex items-center">
-                                <div className="w-1 h-4 bg-red-400/50 rounded-full mr-2"></div>
-                                <span className="text-xs text-white/50 uppercase mr-2">MEV:</span>
-                                <span className="text-xs font-medium text-red-300/90 font-mono">
-                                  {/* Placeholder for MEV data */}
-                                  {(Math.random() * 0.5).toFixed(4)} ETH
-                                </span>
-                              </div>
-                              
-                              {/* Priority Fee */}
-                              <div className="flex items-center">
-                                <div className="w-1 h-4 bg-teal-400/50 rounded-full mr-2"></div>
-                                <span className="text-xs text-white/50 uppercase mr-2">Priority Fee:</span>
-                                <span className="text-xs font-medium text-teal-300/90 font-mono">
-                                  {/* Placeholder for priority fee */}
-                                  {Math.floor(Math.random() * 10) + 1} gwei
-                                </span>
-                              </div>
+                              {/* Base Fee - from ExecutionPayloadBaseFeePerGas */}
+                              {/* Field would come from execution_payload_base_fee_per_gas */}
+                              {/* Add actual field if available in your data store */}
                             </div>
                           </div>
                           
-                          {/* Gas usage progress bar */}
-                          {block.gasUsed !== undefined && block.gasLimit !== undefined && (
-                            <div className="mt-4">
-                              <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
-                                <div 
-                                  className="h-full bg-cyan-400/60 rounded-full"
-                                  style={{ width: `${Math.min(100, Math.round(block.gasUsed * 100 / block.gasLimit))}%` }}
-                                ></div>
-                              </div>
-                            </div>
-                          )}
+                          {/* Progress bar removed as requested */}
                         </div>
                       </>
                     ) : (
