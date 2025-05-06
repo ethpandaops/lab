@@ -1,8 +1,8 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useEffect } from 'react';
 import { BidData } from '../common/types';
 import { truncateMiddle } from '../common/utils';
 import FlowStage from './FlowStage';
-import { useBuilderNames } from '../../../../hooks/useBuilderNames';
+import BuilderNamesStore from '../../../../stores/BuilderNamesStore';
 
 interface BuildersRelaysPanelProps {
   bids: BidData[];
@@ -28,29 +28,22 @@ const BuildersRelaysPanel: React.FC<BuildersRelaysPanelProps> = ({
   isRelayActive,
   network
 }) => {
-  // Fetch builder names for the given network
-  const builderNames = useBuilderNames(network);
+  // Load builder names from the singleton store
+  const [builderNamesLoaded, setBuilderNamesLoaded] = React.useState(false);
   
-  // Debug log for builder names
-  React.useEffect(() => {
-    console.log('Builder names loaded:', Object.keys(builderNames).length, 
-      'First few keys:', Object.keys(builderNames).slice(0, 3));
-      
-    // Debug current builder pubkeys
-    if (bids.length > 0) {
-      const builderKeys = bids.map(bid => 
-        (bid.builderPubkey || '').toLowerCase().replace(/^0x/, '')
-      ).filter(k => k);
-      
-      console.log('Builder pubkeys in current bids:', 
-        builderKeys.slice(0, 5).map(k => k.substring(0, 10) + '...'));
-      
-      // Check if we have matches
-      const matches = builderKeys.filter(key => builderNames[key]);
-      console.log('Matching builder keys:', matches.length, 
-        matches.slice(0, 3).map(k => `${k.substring(0, 8)}... => ${builderNames[k]}`));
-    }
-  }, [builderNames, bids]);
+  useEffect(() => {
+    const builderStore = BuilderNamesStore.getInstance();
+    
+    // Load the builder names for this network
+    builderStore.loadBuilderNames(network)
+      .then(() => {
+        setBuilderNamesLoaded(true);
+      })
+      .catch(error => {
+        console.error('Failed to load builder names:', error);
+        setBuilderNamesLoaded(true); // Still mark as loaded to prevent infinite loading state
+      });
+  }, [network]);
   // Get builder bids - filtered by current time and deduplicated by builder pubkey
   const builders = useMemo(() => {
     // Filter bids by current time first
@@ -86,14 +79,9 @@ const BuildersRelaysPanel: React.FC<BuildersRelaysPanelProps> = ({
     
     // Create individual bid items from the deduplicated bids
     const builderItems = uniqueBuilderBids.map(bid => {
-      // Get the normalized pubkey for builder name lookup
-      const normalizedPubkey = (bid.builderPubkey || '').toLowerCase().replace(/^0x/, '');
-      
-      // Use more flexible builder name matching
-      // Try exact match first, then try the flexible finder function
-      const builderName = 
-        builderNames[normalizedPubkey] || 
-        (builderNames.findBuilder && builderNames.findBuilder(bid.builderPubkey || ''));
+      // Get builder name from the singleton store
+      const builderStore = BuilderNamesStore.getInstance();
+      const builderName = builderStore.getBuilderName(bid.builderPubkey || '');
       
       const displayName = builderName || truncateMiddle(bid.builderPubkey || 'unknown', 8, 6);
       
@@ -212,21 +200,10 @@ const BuildersRelaysPanel: React.FC<BuildersRelaysPanelProps> = ({
                         className={`w-2 h-2 rounded-full mr-2 flex-shrink-0 ${item.isWinning ? 'bg-amber-400' : ''}`}
                         style={{ backgroundColor: item.isWinning ? undefined : (item.color || '#e67e22') }}
                       ></div>
-                      <div className="flex flex-col truncate flex-1">
-                        {item.fullName ? (
-                          <>
-                            <div className={`text-sm truncate ${item.isWinning ? 'font-medium' : ''}`}>
-                              {item.label}
-                            </div>
-                            <div className="text-[10px] font-mono text-tertiary truncate">
-                              {item.pubkeyLabel}
-                            </div>
-                          </>
-                        ) : (
-                          <div className="text-sm font-mono truncate">
-                            {item.label}
-                          </div>
-                        )}
+                      <div className="truncate flex-1">
+                        <span className={`${item.isWinning ? 'font-medium' : ''}`}>
+                          {item.label}
+                        </span>
                       </div>
                     </div>
                     <div className="font-mono ml-1.5 rounded-md px-1.5 py-0.25">
