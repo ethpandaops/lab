@@ -627,6 +627,7 @@ export default function BlockProductionLivePage() {
                 )) : {}
               }
               block={displayData.block}
+              slotData={displayData}
               timeRange={timeRange}
               valueRange={valueRange}
             />

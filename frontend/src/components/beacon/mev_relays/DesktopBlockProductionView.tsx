@@ -31,9 +31,9 @@ export interface DesktopBlockProductionViewProps {
     execution_payload_transactions_count?: number;
     executionPayloadTransactionsCount?: number;
     blockTotalBytes?: number;
-    attestations?: any[] | null;
     [key: string]: any;
   };
+  slotData?: any;
   valueRange?: {
     min: number;
     max: number;
@@ -43,10 +43,12 @@ export interface DesktopBlockProductionViewProps {
     max: number;
     ticks: number[];
   };
+  // Optional callback to notify parent component when the phase changes
+  onPhaseChange?: (phase: Phase) => void;
 }
 
-// Enum for phase types
-enum Phase {
+// Enum for phase types - export it so other components can use it
+export enum Phase {
   Building = 'building',
   Propagating = 'propagating',
   Attesting = 'attesting',
@@ -96,8 +98,34 @@ const getCurrentPhase = (
   // We'll start 1.5s after propagation begins as a default
   const attestationTime = propagationTime + 1500;
   
+  // Debug the attestation counts
+  console.log('Attestation check for phase:', {
+    attestationsCount,
+    totalExpectedAttestations,
+    percentComplete: totalExpectedAttestations > 0 ? 
+      (attestationsCount / totalExpectedAttestations) * 100 : 0,
+    requiredFor66Percent: totalExpectedAttestations > 0 ? 
+      Math.ceil(totalExpectedAttestations * 0.66) : 0,
+    isAttestation66PercentComplete: totalExpectedAttestations > 0 && 
+      attestationsCount >= (totalExpectedAttestations * 0.66),
+    currentTime
+  });
+  
+  // Debug timings and attestation data
+  console.log('Phase timings:', {
+    currentTime,
+    propagationTime,
+    attestationTime,
+    attestationsCount,
+    totalExpectedAttestations
+  });
+  
+  // Check if we have real attestation data
+  const hasAttestationData = attestationsCount > 0 && totalExpectedAttestations > 0;
+  
   // Accepted phase starts when 66% of attestations are received
-  const isAttestation66PercentComplete = totalExpectedAttestations > 0 && 
+  // Only use attestation data if we actually have it
+  const isAttestation66PercentComplete = hasAttestationData && 
     attestationsCount >= (totalExpectedAttestations * 0.66);
 
   // If we have 66% of attestations, move to accepted phase
@@ -105,8 +133,10 @@ const getCurrentPhase = (
     return Phase.Accepted;
   }
   
-  // If we're in attestation phase time
+  // If we're in attestation phase time and have attestations or it's just attestation time
   if (currentTime >= attestationTime) {
+    // We've reached attestation time, so we're at least in the attesting phase
+    // Only upgrade to accepted phase if we have the required 66% attestations
     return Phase.Attesting;
   }
   
@@ -474,8 +504,10 @@ const DesktopBlockProductionView: React.FC<DesktopBlockProductionViewProps> = ({
   nodeBlockSeen = {},
   nodeBlockP2P = {},
   block,
+  slotData,
   valueRange,
-  timeRange
+  timeRange,
+  onPhaseChange
 }) => {
   // Get active status based on role and phase
   const isActive = (role: 'builder' | 'relay' | 'proposer' | 'node') => {
@@ -915,10 +947,31 @@ return (
             <div className="text-xs mt-0.5 flex items-center">
               <span className="font-medium mr-1">Phase:</span>
               {(() => {
-                // Get attestation counts to determine phase
-                const attestationsCount = block?.attestations?.length || 0;
-                // We expect around 128 attestations per slot
-                const totalExpectedAttestations = 128;
+                // Get attestation counts from the slot data, filtering by current time
+                const filteredAttestationWindows = slotData?.attestations?.windows.filter(window => {
+                  return window.inclusionDelay !== undefined && 
+                    (window.inclusionDelay * 1000) <= currentTime;
+                }) || [];
+                
+                // Count attestations from windows that have occurred at or before the current time
+                const attestationsCount = filteredAttestationWindows.reduce((total, window) => {
+                  return total + window.validatorIndices.length;
+                }, 0) || 0;
+                
+                // Get the maximum expected attestations (or default to 128)
+                const totalExpectedAttestations = slotData?.attestations?.maximumVotes 
+                  ? Number(slotData.attestations.maximumVotes) 
+                  : 128;
+                  
+                console.log('Phase attestation calculation:', {
+                  currentTime,
+                  totalWindows: slotData?.attestations?.windows.length || 0,
+                  filteredWindowsCount: filteredAttestationWindows.length,
+                  attestationsCount,
+                  totalExpectedAttestations,
+                  percentage: totalExpectedAttestations > 0 ? 
+                    (attestationsCount / totalExpectedAttestations) * 100 : 0
+                });
                 
                 // Calculate the current phase
                 const currentPhase = getCurrentPhase(
@@ -929,6 +982,15 @@ return (
                   attestationsCount,
                   totalExpectedAttestations
                 );
+                
+                // Debug the current phase
+                console.log('Current phase:', {
+                  phase: currentPhase,
+                  attestationCount: attestationsCount,
+                  expectedAttestations: totalExpectedAttestations,
+                  percentComplete: totalExpectedAttestations > 0 ? 
+                    (attestationsCount / totalExpectedAttestations) * 100 : 0
+                });
                 
                 // Determine display styles based on phase
                 let bgColor = 'bg-orange-500/20';
@@ -952,9 +1014,39 @@ return (
                 return (
                   <span className={`font-medium px-1.5 py-0.5 rounded-full text-xs ${bgColor} ${textColor}`}>
                     {phaseName}
-                    {currentPhase === Phase.Attesting && totalExpectedAttestations > 0 && (
+                    {currentPhase === Phase.Attesting && (
                       <span className="ml-1">
-                        ({Math.round((attestationsCount / totalExpectedAttestations) * 100)}%)
+                        {(() => {
+                          // Filter attestation windows to only include those that have occurred before or at the current time
+                          const filteredWindows = slotData?.attestations?.windows.filter(window => {
+                            return window.inclusionDelay !== undefined && 
+                              (window.inclusionDelay * 1000) <= currentTime;
+                          }) || [];
+                          
+                          console.log('Filtered attestation windows:', {
+                            currentTime,
+                            totalWindows: slotData?.attestations?.windows.length || 0,
+                            filteredWindowsCount: filteredWindows.length,
+                            windows: filteredWindows.map(w => ({
+                              delay: w.inclusionDelay,
+                              timestampMs: w.inclusionDelay * 1000,
+                              validatorCount: w.validatorIndices.length
+                            }))
+                          });
+                          
+                          const count = filteredWindows.reduce((total, window) => {
+                            return total + window.validatorIndices.length;
+                          }, 0) || 0;
+                          
+                          const total = slotData?.attestations?.maximumVotes 
+                            ? Number(slotData.attestations.maximumVotes)
+                            : 128;
+                          
+                          // Calculate the actual percentage based on attestations received so far
+                          const percentage = total > 0 ? Math.round((count / total) * 100) : 0;
+                          console.log('Attestation percentage calculation:', { count, total, percentage, currentTime });
+                          return `(${percentage}%)`;
+                        })()}
                       </span>
                     )}
                   </span>
@@ -972,9 +1064,7 @@ return (
           <div className="h-3 mb-2 flex rounded-lg overflow-hidden border border-subtle shadow-inner relative">
             {/* Calculate transition times and render phases */}
             {(() => {
-              // Get attestation counts
-              const attestationsCount = block?.attestations?.length || 0;
-              const totalExpectedAttestations = 128;
+              // Get attestation counts - we'll calculate these from slotData below
               
               // Calculate phase transition times
               let propagationTime = PROPAGATION_DEFAULT_TIME; // Default 5s
@@ -1006,12 +1096,54 @@ return (
               // For the accepted phase, either use 66% attestation or a time-based fallback
               const acceptanceTime = attestationTime + 2000; // 2s after attestation phase starts
 
+              // Filter attestation windows to only include those that have occurred at or before the current time
+              const filteredAttestationWindows = slotData?.attestations?.windows?.filter(window => {
+                return window.inclusionDelay !== undefined && 
+                  (window.inclusionDelay * 1000) <= currentTime;
+              }) || [];
+              
+              // Get attestation count from the filtered attestation data
+              const attestationsCount = filteredAttestationWindows.reduce((total, window) => {
+                return total + (window.validatorIndices?.length || 0);
+              }, 0) || 0;
+              
+              // Get the maximum expected attestations (or default to 128)
+              const totalExpectedAttestations = slotData?.attestations?.maximumVotes 
+                ? Number(slotData.attestations.maximumVotes) 
+                : 128;
+                
+              console.log('Progress bar attestation calculation:', {
+                currentTime,
+                totalWindows: slotData?.attestations?.windows?.length || 0,
+                filteredWindowsCount: filteredAttestationWindows.length,
+                attestationsCount,
+                totalExpectedAttestations,
+                percentage: totalExpectedAttestations > 0 ? 
+                  (attestationsCount / totalExpectedAttestations) * 100 : 0
+              });
+              
+              // Debug attestation data
+              console.log('Attestation data structure:', {
+                attestations: slotData?.attestations,
+                windows: slotData?.attestations?.windows,
+                maximumVotes: slotData?.attestations?.maximumVotes,
+                hasWindows: Array.isArray(slotData?.attestations?.windows)
+              });
+                
+              // Log attestation data for debugging
+              console.log('Attestation data:', {
+                attestationCount: attestationsCount,
+                expectedAttestations: totalExpectedAttestations,
+                windows: slotData?.attestations?.windows.length || 0
+              });
+
               // Get percentages for phase transitions (as portion of the 12s slot)
               const propagationPercent = Math.min(98, Math.max(2, (propagationTime / 12000) * 100));
               const attestationPercent = Math.min(98, Math.max(propagationPercent + 1, (attestationTime / 12000) * 100));
               const acceptancePercent = Math.min(98, Math.max(attestationPercent + 1, (acceptanceTime / 12000) * 100));
               
               // Calculate which phase we're currently in
+              // Use the attestation count and total expected attestations calculated above
               const currentPhase = getCurrentPhase(
                 currentTime, 
                 nodeBlockSeen, 
@@ -1020,6 +1152,11 @@ return (
                 attestationsCount,
                 totalExpectedAttestations
               );
+              
+              // Notify parent component about the current phase if callback is provided
+              if (typeof onPhaseChange === 'function') {
+                onPhaseChange(currentPhase);
+              }
               
               return (
                 <>
@@ -1289,8 +1426,8 @@ return (
                   <div 
                     className={`h-1 w-full ${
                       currentPhase === Phase.Attesting || currentPhase === Phase.Accepted
-                        ? 'bg-gradient-to-r from-gold/80 to-blue-400/80' 
-                        : 'bg-gradient-to-r from-gold/30 to-blue-400/30'
+                        ? 'bg-gradient-to-r from-gold/80 to-purple-400/80' 
+                        : 'bg-gradient-to-r from-gold/30 to-purple-400/30'
                     } transition-colors duration-500 rounded-full overflow-hidden`}
                   >
                     {(currentPhase === Phase.Attesting || currentPhase === Phase.Accepted) && (
@@ -1305,7 +1442,59 @@ return (
                   </div>
                 </div>
 
-                {/* 4. ATTESTATION PHASE - NEW */}
+                {/* NODES PHASE - INSERTED BETWEEN PROPOSER AND ATTESTERS */}
+                <div className={`flex flex-col items-center text-center transition-opacity duration-500 ${
+                  currentPhase === Phase.Building || currentPhase === Phase.Propagating 
+                    ? 'opacity-60' 
+                    : currentPhase === Phase.Attesting 
+                      ? 'opacity-100' 
+                      : 'opacity-80'
+                }`}>
+                  <div 
+                    className={`w-14 h-14 flex items-center justify-center rounded-full mb-1.5 shadow-lg transition-all duration-500 ${
+                      currentPhase === Phase.Building || currentPhase === Phase.Propagating
+                        ? 'bg-surface/30 border border-subtle/60' // Not yet active
+                        : currentPhase === Phase.Attesting
+                          ? 'bg-gradient-to-br from-purple-500/60 to-purple-600/30 border-2 border-purple-400/80 scale-105' // Active
+                          : 'bg-gradient-to-br from-purple-500/40 to-purple-600/20 border-2 border-purple-400/60' // Completed
+                    }`}
+                  >
+                    <div 
+                      className={`text-2xl ${currentPhase === Phase.Attesting ? 'opacity-90' : 'opacity-50'}`} 
+                      role="img" 
+                      aria-label="Network Nodes"
+                    >
+                      🖥️
+                    </div>
+                  </div>
+                  <div className={`font-medium text-sm mb-0.5 ${currentPhase === Phase.Attesting ? 'text-purple-300' : 'text-primary/70'}`}>Nodes</div>
+                  <div className={`text-xs ${currentPhase === Phase.Attesting ? 'text-white/90' : 'text-tertiary'} max-w-[85px] h-6`}>
+                    {Object.keys(nodes).length > 0 ? `${Object.keys(nodes).length} nodes` : 'Waiting...'}
+                  </div>
+                </div>
+
+                {/* Flow line between Nodes and Attesters */}
+                <div className="flex-shrink-0 flex items-center justify-center relative w-10">
+                  <div 
+                    className={`h-1 w-full ${
+                      currentPhase === Phase.Attesting || currentPhase === Phase.Accepted
+                        ? 'bg-gradient-to-r from-purple-400/80 to-blue-400/80' 
+                        : 'bg-gradient-to-r from-purple-400/30 to-blue-400/30'
+                    } transition-colors duration-500 rounded-full overflow-hidden`}
+                  >
+                    {(currentPhase === Phase.Attesting || currentPhase === Phase.Accepted) && (
+                      <div 
+                        className="h-full w-2 bg-white opacity-70 rounded-full"
+                        style={{
+                          animation: 'flowRight 1.5s infinite ease-in-out',
+                          boxShadow: '0 0 5px 1px rgba(255, 255, 255, 0.5)'
+                        }}
+                      ></div>
+                    )}
+                  </div>
+                </div>
+
+                {/* 4. ATTESTATION PHASE */}
                 <div className={`flex flex-col items-center text-center transition-opacity duration-500 ${
                   currentPhase === Phase.Attesting
                     ? 'opacity-100'
@@ -1332,9 +1521,61 @@ return (
                   </div>
                   <div className={`font-medium text-sm mb-0.5 ${currentPhase === Phase.Attesting ? 'text-blue-300' : 'text-primary/70'}`}>Attesters</div>
                   <div className={`text-xs ${currentPhase === Phase.Attesting ? 'text-white/90' : 'text-tertiary'} max-w-[85px] h-6`}>
-                    {attestationsCount > 0
-                      ? `${Math.round((attestationsCount / totalExpectedAttestations) * 100)}%`
-                      : 'Waiting...'}
+                    {(() => {
+                      // Get attestation count from data, filtering by current time
+                      let count = 0;
+                      let total = 128; // Default total
+                      
+                      if (slotData?.attestations) {
+                        // Method 1: Using windowed attestations data, filtered by current time
+                        if (Array.isArray(slotData.attestations.windows)) {
+                          // Only include windows that have occurred at or before the current time
+                          const filteredWindows = slotData.attestations.windows.filter(window => {
+                            return window.inclusionDelay !== undefined && 
+                              (window.inclusionDelay * 1000) <= currentTime;
+                          });
+                          
+                          // Count attestations from filtered windows
+                          count = filteredWindows.reduce((sum, window) => {
+                            return sum + (Array.isArray(window.validatorIndices) ? window.validatorIndices.length : 0);
+                          }, 0);
+                          
+                          console.log('Attesters box calculation:', {
+                            currentTime,
+                            totalWindows: slotData.attestations.windows.length,
+                            filteredWindowsCount: filteredWindows.length,
+                            count
+                          });
+                        }
+                        
+                        // Use maximum votes as total if available
+                        if (slotData.attestations.maximumVotes) {
+                          total = Number(slotData.attestations.maximumVotes);
+                        }
+                      }
+                      
+                      // Debug attestation data
+                      console.log('Attestation rendering:', { 
+                        count, 
+                        total, 
+                        percent: count > 0 ? Math.round((count / total) * 100) : 0,
+                        phase: currentPhase
+                      });
+                      
+                      // Show actual percentage of attestations received regardless of phase
+                      if (currentPhase === Phase.Attesting || currentPhase === Phase.Accepted) {
+                        // Always calculate attestation percentage based on actual data at the current time
+                        if (total > 0) {
+                          // Calculate percentage based on attestation count, ensuring we don't exceed 100%
+                          const percentage = Math.min(100, Math.round((count / total) * 100));
+                          return `${percentage}%`;
+                        } else {
+                          return '0%';
+                        }
+                      }
+                      
+                      return 'Waiting...';
+                    })()}
                   </div>
                 </div>
 
@@ -1384,53 +1625,7 @@ return (
                   </div>
                 </div>
 
-                {/* Flow line 5 */}
-                <div className="flex-shrink-0 flex items-center justify-center relative w-10">
-                  <div 
-                    className={`h-1 w-full ${
-                      currentPhase === Phase.Accepted
-                        ? 'bg-gradient-to-r from-green-400/80 to-purple-400/80' 
-                        : 'bg-gradient-to-r from-green-400/30 to-purple-400/30'
-                    } transition-colors duration-500 rounded-full overflow-hidden`}
-                  >
-                    {currentPhase === Phase.Accepted && (
-                      <div 
-                        className="h-full w-2 bg-white opacity-70 rounded-full"
-                        style={{
-                          animation: 'flowRight 1.5s infinite ease-in-out',
-                          boxShadow: '0 0 5px 1px rgba(255, 255, 255, 0.5)'
-                        }}
-                      ></div>
-                    )}
-                  </div>
-                </div>
-
-                {/* 6. NETWORK PHASE */}
-                <div className={`flex flex-col items-center text-center transition-opacity duration-500 ${currentPhase === Phase.Accepted ? 'opacity-100' : 'opacity-60'}`}>
-                  <div 
-                    className={`w-14 h-14 flex items-center justify-center rounded-full mb-1.5 shadow-lg transition-all duration-500 ${
-                      currentPhase !== Phase.Building && currentPhase !== Phase.Propagating
-                        ? currentPhase === Phase.Accepted
-                          ? 'bg-gradient-to-br from-purple-500/60 to-purple-600/30 border-2 border-purple-400/80 scale-105' // Active
-                          : 'bg-gradient-to-br from-purple-500/40 to-purple-600/20 border-2 border-purple-400/60' // Normal when in attesting phase
-                        : 'bg-surface/30 border border-subtle/60' // Not yet active
-                    }`}
-                  >
-                    <div 
-                      className={`text-2xl ${currentPhase === Phase.Accepted ? 'opacity-90' : 'opacity-50'}`} 
-                      role="img" 
-                      aria-label="Network Nodes"
-                    >
-                      🖥️
-                    </div>
-                  </div>
-                  <div className={`font-medium text-sm mb-0.5 ${currentPhase === Phase.Accepted ? 'text-purple-300' : 'text-primary/70'}`}>Network</div>
-                  <div className={`text-xs ${currentPhase === Phase.Accepted ? 'text-white/90' : 'text-tertiary'} max-w-[85px] h-6`}>
-                    {continents.length > 0 && continents.some(c => c.progress > 0)
-                      ? `${continents.filter(c => c.progress > 0).length}/${continents.length}`
-                      : 'Waiting...'}
-                  </div>
-                </div>
+                {/* No additional elements after Accepted phase */}
               </>
             );
           })()}

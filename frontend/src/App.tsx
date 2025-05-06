@@ -27,6 +27,7 @@ import { ModalProvider } from '@/contexts/ModalContext.tsx'
 import { LocallyBuiltBlocks } from '@/pages/beacon/LocallyBuiltBlocks'
 import MevRelaysLivePage from '@/pages/beacon/mev_relays/live.tsx';
 import BlockProductionLivePage from '@/pages/beacon/block-production/live.tsx';
+import BlockProductionSlotPage from '@/pages/beacon/block-production/slot.tsx';
 
 // Create contexts
 export const ConfigContext = createContext<Config | null>(null)
@@ -125,6 +126,7 @@ function App() {
 								<Route path="locally-built-blocks" element={<LocallyBuiltBlocks />} />
 								<Route path="mev_relays/live" element={<MevRelaysLivePage />} />
 								<Route path="block-production/live" element={<BlockProductionLivePage />} />
+									<Route path="block-production/:slot" element={<BlockProductionSlotPage />} />
 							</Route>
 						</Route>
 					</Routes>
