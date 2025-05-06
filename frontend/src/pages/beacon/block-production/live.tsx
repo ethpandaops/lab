@@ -1,26 +1,17 @@
 import React, { useState, useEffect, useContext, useMemo } from 'react';
-import { motion } from 'framer-motion';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useParams } from 'react-router-dom';
 import { getLabApiClient } from '../../../api';
 import { GetSlotDataRequest } from '../../../api/gen/backend/pkg/api/proto/lab_api_pb';
-import MobileBlockProductionView from '../../../components/beacon/mev_relays/MobileBlockProductionView';
-import DesktopBlockProductionView from '../../../components/beacon/mev_relays/DesktopBlockProductionView';
 import { BeaconClockManager } from '../../../utils/beacon';
-import { ChevronLeft, ChevronRight, Play, Pause } from 'lucide-react';
 import { NetworkContext } from '@/App';
-
-// Simple hash function to generate a color from a string (e.g., relay name)
-const generateConsistentColor = (str: string): string => {
-  let hash = 0;
-  for (let i = 0; i < str.length; i++) {
-    hash = str.charCodeAt(i) + ((hash << 5) - hash);
-    hash = hash & hash; // Convert to 32bit integer
-  }
-  // Generate HSL color - fixed saturation and lightness for consistency
-  const hue = hash % 360;
-  return `hsl(${hue}, 70%, 60%)`;
-};
+import {
+  MobileBlockProductionView,
+  DesktopBlockProductionView,
+  TopControls,
+  generateConsistentColor,
+  getTransformedBids
+} from '@/components/beacon/block_production';
 
 /**
  * BlockProductionLivePage visualizes the entire Ethereum block production process
@@ -62,7 +53,6 @@ export default function BlockProductionLivePage() {
   const [displaySlotOffset, setDisplaySlotOffset] = useState<number>(0); // 0 is current, -1 is previous, etc.
   const [currentTime, setCurrentTime] = useState<number>(0); // ms into slot
   const [isPlaying, setIsPlaying] = useState<boolean>(true); // Control playback
-  // Removed activeTab state since we no longer have tabs
 
   // Calculate the base slot with proper lag (we add 2 extra slots of lag for data to populate)
   // This matches the behavior in beacon/live.tsx that adds extra lag for data processing
@@ -71,7 +61,62 @@ export default function BlockProductionLivePage() {
 
   const labApiClient = getLabApiClient();
 
-  // Navigation and Playback functions - defined early to avoid reference errors
+  // Define prefetch helpers upfront
+  // Generic data prefetching function with retry and caching strategy
+  const prefetchSlotData = async (slotNumber: number | null, direction: 'next' | 'previous') => {
+    if (slotNumber === null) return;
+    
+    // Don't try to prefetch slots that are too far in the future
+    if (direction === 'next' && headSlot !== null && slotNumber > headSlot + 1) return;
+    
+    // Don't prefetch negative slots
+    if (slotNumber < 0) return;
+    
+    try {
+      // Create a query key for this slot - must match the key used in the main useQuery
+      const queryKey = ['block-production-live', 'slot', selectedNetwork, slotNumber];
+      
+      // Check if we already have data for this slot
+      const existingData = queryClient.getQueryData(queryKey);
+      if (existingData) {
+        // We already have this data in the cache, no need to fetch it again
+        console.log(`Using cached data for ${direction} slot: ${slotNumber}`);
+        return;
+      }
+      
+      // Create a query function that will be used for prefetching
+      const queryFn = async () => {
+        const client = await labApiClient;
+        const req = new GetSlotDataRequest({
+          network: selectedNetwork,
+          slot: BigInt(slotNumber),
+        });
+        const res = await client.getSlotData(req);
+        return res.data;
+      };
+      
+      // Use React Query's prefetchQuery to fetch and cache the data
+      await queryClient.prefetchQuery(queryKey, queryFn, {
+        staleTime: 30000, // Consider data fresh for 30 seconds
+      });
+      
+      console.log(`Prefetched data for ${direction} slot: ${slotNumber}`);
+    } catch (error) {
+      console.error(`Failed to prefetch data for slot ${slotNumber}:`, error);
+    }
+  };
+
+  // Prefetching next slot's data
+  const prefetchNextSlotData = async (nextSlotNumber: number | null) => {
+    await prefetchSlotData(nextSlotNumber, 'next');
+  };
+  
+  // Prefetching previous slot's data
+  const prefetchPreviousSlotData = async (prevSlotNumber: number | null) => {
+    await prefetchSlotData(prevSlotNumber, 'previous');
+  };
+
+  // Navigation and Playback functions
   // Prefetch previous slot before navigating to reduce flash
   const goToPreviousSlot = () => {
     if (slotNumber !== null) {
@@ -138,60 +183,6 @@ export default function BlockProductionLivePage() {
     retry: 2, // Retry failed requests twice
     enabled: slotNumber !== null,
   });
-
-  // Generic data prefetching function with retry and caching strategy
-  const prefetchSlotData = async (slotNumber: number | null, direction: 'next' | 'previous') => {
-    if (slotNumber === null) return;
-    
-    // Don't try to prefetch slots that are too far in the future
-    if (direction === 'next' && headSlot !== null && slotNumber > headSlot + 1) return;
-    
-    // Don't prefetch negative slots
-    if (slotNumber < 0) return;
-    
-    try {
-      // Create a query key for this slot - must match the key used in the main useQuery
-      const queryKey = ['block-production-live', 'slot', selectedNetwork, slotNumber];
-      
-      // Check if we already have data for this slot
-      const existingData = queryClient.getQueryData(queryKey);
-      if (existingData) {
-        // We already have this data in the cache, no need to fetch it again
-        console.log(`Using cached data for ${direction} slot: ${slotNumber}`);
-        return;
-      }
-      
-      // Create a query function that will be used for prefetching
-      const queryFn = async () => {
-        const client = await labApiClient;
-        const req = new GetSlotDataRequest({
-          network: selectedNetwork,
-          slot: BigInt(slotNumber),
-        });
-        const res = await client.getSlotData(req);
-        return res.data;
-      };
-      
-      // Use React Query's prefetchQuery to fetch and cache the data
-      await queryClient.prefetchQuery(queryKey, queryFn, {
-        staleTime: 30000, // Consider data fresh for 30 seconds
-      });
-      
-      console.log(`Prefetched data for ${direction} slot: ${slotNumber}`);
-    } catch (error) {
-      console.error(`Failed to prefetch data for slot ${slotNumber}:`, error);
-    }
-  };
-
-  // Prefetching next slot's data
-  const prefetchNextSlotData = async (nextSlotNumber: number | null) => {
-    await prefetchSlotData(nextSlotNumber, 'next');
-  };
-  
-  // Prefetching previous slot's data
-  const prefetchPreviousSlotData = async (prevSlotNumber: number | null) => {
-    await prefetchSlotData(prevSlotNumber, 'previous');
-  };
 
   // Timer effect for playback
   useEffect(() => {
@@ -274,7 +265,7 @@ export default function BlockProductionLivePage() {
     }, 100); // Update every 100ms
 
     return () => clearInterval(interval);
-  }, [isPlaying, clock, slotNumber, displaySlotOffset, selectedNetwork, baseSlot, headSlot, goToNextSlot]);
+  }, [isPlaying, clock, slotNumber, displaySlotOffset, selectedNetwork, baseSlot, headSlot]);
 
   // Reset timer when slot changes
   useEffect(() => {
@@ -378,20 +369,8 @@ export default function BlockProductionLivePage() {
   
   // Dynamically filter bids based on current time
   const transformedBids = useMemo(() => {
-    // Only show bids that have occurred before the current time
-    const timeFilteredBids = allTransformedBids.filter(bid => bid.time <= currentTime);
-    
-    // Sort by value descending (highest value bids first)
-    return [...timeFilteredBids].sort((a, b) => {
-      // Always keep winning bid first
-      if (a.isWinning && !b.isWinning) return -1;
-      if (!a.isWinning && b.isWinning) return 1;
-      // Then sort by value
-      return b.value - a.value;
-    });
-  }, [allTransformedBids, currentTime]);
-
-  const totalBids = transformedBids.length;
+    return getTransformedBids(allTransformedBids, currentTime, winningBidData);
+  }, [allTransformedBids, currentTime, winningBidData]);
 
   const timeRange = {
     min: -12000,
@@ -405,85 +384,6 @@ export default function BlockProductionLivePage() {
     const maxVal = Math.max(...values);
     return { min: 0, max: maxVal * 1.1 };
   }, [transformedBids]);
-  
-  // Calculate which continent saw the block first
-  const firstContinentToSeeBlock = useMemo(() => {
-    // Map of continent codes to full names
-    const continentNames: Record<string, string> = {
-      'NA': 'North America',
-      'SA': 'South America',
-      'EU': 'Europe',
-      'AS': 'Asia',
-      'AF': 'Africa',
-      'OC': 'Oceania',
-      'AN': 'Antarctica'
-    };
-    
-    if (!slotData?.timings?.blockSeen && !slotData?.timings?.blockFirstSeenP2p) {
-      return null;
-    }
-    
-    // Combine API and P2P block seen timings
-    const nodeBlockSeen = slotData.timings?.blockSeen ? 
-      Object.fromEntries(Object.entries(slotData.timings.blockSeen).map(([node, time]) => 
-        [node, typeof time === 'bigint' ? Number(time) : Number(time)]
-      )) : {};
-      
-    const nodeBlockP2P = slotData.timings?.blockFirstSeenP2p ? 
-      Object.fromEntries(Object.entries(slotData.timings.blockFirstSeenP2p).map(([node, time]) => 
-        [node, typeof time === 'bigint' ? Number(time) : Number(time)]
-      )) : {};
-    
-    // Get earliest node timings grouped by continent
-    const continentTimings: Record<string, number> = {};
-    const nodeContinent: Record<string, string> = {};
-    
-    // Map nodes to continents
-    Object.entries(slotData.nodes || {}).forEach(([nodeId, node]) => {
-      if (node.geo?.continent) {
-        nodeContinent[nodeId] = node.geo.continent;
-      }
-    });
-    
-    // Process API timings
-    Object.entries(nodeBlockSeen).forEach(([nodeId, time]) => {
-      const continent = nodeContinent[nodeId];
-      if (continent && typeof time === 'number') {
-        if (!continentTimings[continent] || time < continentTimings[continent]) {
-          continentTimings[continent] = time;
-        }
-      }
-    });
-    
-    // Process P2P timings
-    Object.entries(nodeBlockP2P).forEach(([nodeId, time]) => {
-      const continent = nodeContinent[nodeId];
-      if (continent && typeof time === 'number') {
-        if (!continentTimings[continent] || time < continentTimings[continent]) {
-          continentTimings[continent] = time;
-        }
-      }
-    });
-    
-    // Find earliest continent
-    let earliestContinent = null;
-    let earliestTime = Infinity;
-    
-    Object.entries(continentTimings).forEach(([continent, time]) => {
-      if (time < earliestTime) {
-        earliestTime = time;
-        earliestContinent = continent;
-      }
-    });
-    
-    // Return full continent name if available
-    return earliestContinent ? continentNames[earliestContinent] || earliestContinent : null;
-  }, [slotData?.timings, slotData?.nodes]);
-
-  // Pass entity info separately since it might be in a different part of the slotData
-  const proposerEntity = slotData?.entity;
-
-  // --- End Data Transformation ---
 
   // Create empty fallback data that matches the structure of real data
   const fallbackData = {
@@ -507,57 +407,19 @@ export default function BlockProductionLivePage() {
 
   return (
     <div className="flex flex-col h-full">
-      {/* Compact Top Controls Bar - Always render, with responsive classes */}
-      <div className="flex items-center justify-between py-2 px-4 bg-surface/30 rounded-t-lg">
-        <div className="flex items-center gap-2">
-          <button
-            onClick={goToPreviousSlot}
-            className="bg-surface/50 p-1.5 rounded border border-subtle hover:bg-hover transition"
-            title="Previous Slot"
-          >
-            <ChevronLeft className="h-3.5 w-3.5 text-primary" />
-          </button>
-
-          <button
-            onClick={resetToCurrentSlot}
-            className={`px-2 py-1 rounded border font-medium text-xs ${displaySlotOffset === 0
-                ? 'bg-accent/20 border-accent/50 text-accent'
-                : 'bg-surface/50 border-subtle text-secondary hover:bg-hover'
-              } transition`}
-            disabled={displaySlotOffset === 0}
-            title="Return to Current Slot"
-          >
-            Live
-          </button>
-
-          <button
-            onClick={goToNextSlot}
-            className={`bg-surface/50 p-1.5 rounded border border-subtle transition ${isNextDisabled ? 'opacity-50 cursor-not-allowed' : 'hover:bg-hover'
-              }`}
-            disabled={isNextDisabled}
-            title="Next Slot"
-          >
-            <ChevronRight className="h-3.5 w-3.5 text-primary" />
-          </button>
-
-          <div className={`font-mono ml-1 text-primary flex flex-col ${isMobile ? 'text-xs' : 'text-sm'}`}>
-            <div>Slot: {slotNumber ?? "—"}</div>
-            {headSlot !== null && slotNumber !== null && displaySlotOffset !== 0 && (
-              <div className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-secondary opacity-70`}>
-                Lag: {headLagSlots - displaySlotOffset}
-              </div>
-            )}
-          </div>
-        </div>
-
-        <button
-          onClick={togglePlayPause}
-          className="bg-surface/50 p-1.5 rounded border border-subtle hover:bg-hover transition"
-          title={isPlaying ? "Pause" : "Play"}
-        >
-          {isPlaying ? <Pause className="h-3.5 w-3.5 text-primary" /> : <Play className="h-3.5 w-3.5 text-primary" />}
-        </button>
-      </div>
+      {/* Top Controls */}
+      <TopControls 
+        slotNumber={slotNumber}
+        headLagSlots={headLagSlots}
+        displaySlotOffset={displaySlotOffset}
+        isPlaying={isPlaying}
+        isMobile={isMobile}
+        goToPreviousSlot={goToPreviousSlot}
+        goToNextSlot={goToNextSlot}
+        resetToCurrentSlot={resetToCurrentSlot}
+        togglePlayPause={togglePlayPause}
+        isNextDisabled={isNextDisabled}
+      />
 
       {/* Conditionally render mobile or desktop view based on screen size */}
       {isMobile ? (
@@ -596,7 +458,7 @@ export default function BlockProductionLivePage() {
           )}
         </div>
       ) : (
-        // Desktop View - Unified using the new DesktopBlockProductionView component
+        // Desktop View
         <div className="px-2 pt-1 h-full flex flex-col">
           {/* Error state */}
           {slotError && (

@@ -1,0 +1,303 @@
+import React, { useMemo } from 'react';
+import { Phase, BlockProductionBaseProps } from '../common/types';
+import BeaconBlockVisualization from '@/components/beacon/BeaconBlockVisualization';
+import { Card, CardBody } from '@/components/common/Card';
+import { getCurrentPhase } from '../common/PhaseUtils';
+import PhaseTimeline from '../common/PhaseTimeline';
+import PhaseIcons from '../common/PhaseIcons';
+import BuildersRelaysPanel from './BuildersRelaysPanel';
+import ContinentsList from './ContinentsList';
+
+// Define the flow animation styles
+const flowAnimations = `
+  @keyframes flowRight {
+    0% { transform: translateX(0); opacity: 0.5; }
+    50% { transform: translateX(100%); opacity: 1; }
+    50.1% { transform: translateX(-100%); opacity: 1; }
+    100% { transform: translateX(0); opacity: 0.5; }
+  }
+  
+  @keyframes pulseOpacity {
+    0% { opacity: 0.5; }
+    50% { opacity: 1; }
+    100% { opacity: 0.5; }
+  }
+`;
+
+interface DesktopBlockProductionViewProps extends BlockProductionBaseProps {
+  slotData?: any;
+  valueRange?: {
+    min: number;
+    max: number;
+  };
+  timeRange?: {
+    min: number;
+    max: number;
+    ticks: number[];
+  };
+  // Optional callback to notify parent component when the phase changes
+  onPhaseChange?: (phase: Phase) => void;
+}
+
+const DesktopBlockProductionView: React.FC<DesktopBlockProductionViewProps> = ({
+  bids,
+  currentTime,
+  relayColors,
+  winningBid,
+  slot,
+  proposer,
+  proposerEntity,
+  nodes = {},
+  blockTime,
+  nodeBlockSeen = {},
+  nodeBlockP2P = {},
+  block,
+  slotData,
+  valueRange,
+  timeRange,
+  onPhaseChange
+}) => {
+  // Get active status based on role and phase
+  const isActive = (role: 'builder' | 'relay' | 'proposer' | 'node') => {
+    // Determine transition point - when first node saw block or fallback to 5s
+    let transitionTime = 5000; // Default fallback transition time
+    
+    // Try to find earliest node timing from available data
+    let earliestNodeTime = Infinity;
+    
+    // Check API timings
+    Object.values(nodeBlockSeen).forEach(time => {
+      if (typeof time === 'number') {
+        earliestNodeTime = Math.min(earliestNodeTime, time);
+      }
+    });
+    
+    // Check P2P timings
+    Object.values(nodeBlockP2P).forEach(time => {
+      if (typeof time === 'number') {
+        earliestNodeTime = Math.min(earliestNodeTime, time);
+      }
+    });
+    
+    // If we have real timing data, use it as transition point
+    if (earliestNodeTime !== Infinity) {
+      transitionTime = earliestNodeTime;
+    } else if (blockTime) {
+      // If we have block time but no node data, use block time
+      transitionTime = blockTime;
+    } else if (winningBid) {
+      // If we have winning bid but no block time, estimate based on winning bid
+      const winningBidTime = bids.find(bid => bid.isWinning)?.time;
+      if (winningBidTime) {
+        transitionTime = winningBidTime + 1000; // Roughly 1s after winning bid
+      }
+    }
+    
+    // For each role, determine if it's active based on the phase
+    switch (role) {
+      case 'builder':
+        // Builders are active from the start
+        return currentTime >= 0;
+        
+      case 'relay':
+        // For relay, use the earliest bid time if available
+        if (bids.length > 0) {
+          const earliestBidTime = Math.min(...bids.map(bid => bid.time));
+          return currentTime >= earliestBidTime;
+        }
+        // Otherwise activate relays shortly after start
+        return currentTime >= 1000;
+        
+      case 'proposer':
+        // Proposer activates just before transition to propagation
+        return currentTime >= (transitionTime - 500);
+        
+      case 'node':
+        // Nodes activate at the transition point
+        return currentTime >= transitionTime;
+    }
+    
+    // Function should never reach here since all cases are handled above
+    return false;
+  };
+
+  // Calculate which continent saw the block first
+  const firstContinentToSeeBlock = useMemo(() => {
+    // Map of continent codes to full names
+    const continentNames: Record<string, string> = {
+      'NA': 'North America',
+      'SA': 'South America',
+      'EU': 'Europe',
+      'AS': 'Asia',
+      'AF': 'Africa',
+      'OC': 'Oceania',
+      'AN': 'Antarctica'
+    };
+    
+    if (!Object.keys(nodeBlockSeen).length && !Object.keys(nodeBlockP2P).length) {
+      return null;
+    }
+    
+    // Combine API and P2P block seen timings
+    const nodeBlockSeen1 = Object.fromEntries(Object.entries(nodeBlockSeen).map(([node, time]) => 
+      [node, typeof time === 'bigint' ? Number(time) : Number(time)]
+    ));
+      
+    const nodeBlockP2P1 = Object.fromEntries(Object.entries(nodeBlockP2P).map(([node, time]) => 
+      [node, typeof time === 'bigint' ? Number(time) : Number(time)]
+    ));
+    
+    // Get earliest node timings grouped by continent
+    const continentTimings: Record<string, number> = {};
+    const nodeContinent: Record<string, string> = {};
+    
+    // Map nodes to continents
+    Object.entries(nodes).forEach(([nodeId, node]) => {
+      if (node.geo?.continent) {
+        nodeContinent[nodeId] = node.geo.continent;
+      }
+    });
+    
+    // Process API timings
+    Object.entries(nodeBlockSeen1).forEach(([nodeId, time]) => {
+      const continent = nodeContinent[nodeId];
+      if (continent && typeof time === 'number' && time <= currentTime) {
+        if (!continentTimings[continent] || time < continentTimings[continent]) {
+          continentTimings[continent] = time;
+        }
+      }
+    });
+    
+    // Process P2P timings
+    Object.entries(nodeBlockP2P1).forEach(([nodeId, time]) => {
+      const continent = nodeContinent[nodeId];
+      if (continent && typeof time === 'number' && time <= currentTime) {
+        if (!continentTimings[continent] || time < continentTimings[continent]) {
+          continentTimings[continent] = time;
+        }
+      }
+    });
+    
+    // Find earliest continent
+    let earliestContinent = null;
+    let earliestTime = Infinity;
+    
+    Object.entries(continentTimings).forEach(([continent, time]) => {
+      if (time < earliestTime) {
+        earliestTime = time;
+        earliestContinent = continent;
+      }
+    });
+    
+    // Return full continent name if available
+    return earliestContinent ? continentNames[earliestContinent] || earliestContinent : null;
+  }, [nodeBlockSeen, nodeBlockP2P, nodes, currentTime]);
+
+  return (
+    <div className="px-2 py-2 h-full flex flex-col space-y-3">
+      <style jsx>{flowAnimations}</style>
+      
+      {/* Timeline Header */}
+      <PhaseTimeline 
+        currentTime={currentTime}
+        nodeBlockSeen={nodeBlockSeen}
+        nodeBlockP2P={nodeBlockP2P}
+        blockTime={blockTime}
+        slotData={slotData}
+        onPhaseChange={onPhaseChange}
+      />
+
+      {/* Phase Icons */}
+      <PhaseIcons 
+        currentTime={currentTime}
+        nodeBlockSeen={nodeBlockSeen}
+        nodeBlockP2P={nodeBlockP2P}
+        blockTime={blockTime}
+        bids={bids}
+        winningBid={winningBid}
+        proposer={proposer}
+        nodes={nodes}
+        slotData={slotData}
+        firstContinentToSeeBlock={firstContinentToSeeBlock}
+      />
+
+      {/* Main content */}
+      <div className="flex flex-1 gap-4 min-h-0 overflow-hidden">
+        {/* Left panel - Builders and Relays */}
+        <BuildersRelaysPanel 
+          bids={bids}
+          currentTime={currentTime}
+          relayColors={relayColors}
+          winningBid={winningBid}
+          isBuilderActive={isActive('builder')}
+          isRelayActive={isActive('relay')}
+        />
+
+        {/* Center panel - Block Visualization */}
+        <div className="bg-surface/40 rounded-xl shadow-lg overflow-hidden flex-1 flex flex-col">
+          <div className="flex-1 p-3 overflow-auto flex flex-col">
+            {(() => {
+              // Calculate the blob count based on blob gas used
+              const blobGasUsed = typeof block?.execution_payload_blob_gas_used !== 'undefined'
+                ? Number(block.execution_payload_blob_gas_used)
+                : typeof block?.executionPayloadBlobGasUsed !== 'undefined'
+                  ? Number(block.executionPayloadBlobGasUsed)
+                  : 0;
+                  
+              const blobCount = blobGasUsed > 0 
+                ? Math.ceil(blobGasUsed / 131072) 
+                : 0;
+              
+              // Get the execution block number in the correct format
+              const executionBlockNumber = typeof block?.execution_payload_block_number !== 'undefined'
+                ? Number(block.execution_payload_block_number)
+                : typeof block?.executionPayloadBlockNumber !== 'undefined'
+                  ? Number(block.executionPayloadBlockNumber)
+                  : undefined;
+                  
+              // Get the execution transaction count
+              const executionTxCount = typeof block?.execution_payload_transactions_count !== 'undefined'
+                ? Number(block.execution_payload_transactions_count)
+                : typeof block?.executionPayloadTransactionsCount !== 'undefined'
+                  ? Number(block.executionPayloadTransactionsCount)
+                  : undefined;
+                  
+              // Get block value from winning bid if available
+              const blockValue = winningBid?.value;
+              
+              return (
+                <div className="h-full flex flex-col">
+                  {/* Completely redesigned Beacon Block with integrated blob visualization */}
+                  <BeaconBlockVisualization
+                    proposer_index={proposer?.proposerValidatorIndex}
+                    slot={proposer?.slot}
+                    execution_block_number={executionBlockNumber}
+                    execution_transaction_count={executionTxCount}
+                    block_hash={block?.blockRoot || block?.block_root}
+                    execution_block_hash={block?.executionPayloadBlockHash || block?.execution_payload_block_hash}
+                    blob_count={blobCount}
+                    block_value={blockValue}
+                    proposer_entity={proposerEntity}
+                    height="100%"
+                    width="100%"
+                  />
+                </div>
+              );
+            })()}
+          </div>
+        </div>
+        
+        {/* Right panel - Continents */}
+        <ContinentsList 
+          nodes={nodes}
+          nodeBlockSeen={nodeBlockSeen}
+          nodeBlockP2P={nodeBlockP2P}
+          currentTime={currentTime}
+          isActive={isActive('node')}
+        />
+      </div>
+    </div>
+  );
+};
+
+export default DesktopBlockProductionView;
