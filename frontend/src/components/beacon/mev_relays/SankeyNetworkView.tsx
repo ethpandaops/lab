@@ -1,7 +1,8 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useEffect } from 'react';
 import { Card, CardBody } from '@/components/common/Card';
 import { Node, Proposer } from '@/api/gen/backend/pkg/server/proto/beacon_slots/beacon_slots_pb';
 import BlockContentsTreemap from '@/components/beacon/BlockContentsTreemap';
+import BeaconBlockVisualization from '@/components/beacon/BeaconBlockVisualization';
 
 export interface BlockFlowViewProps {
   bids: Array<{
@@ -428,6 +429,28 @@ export const SankeyNetworkView: React.FC<BlockFlowViewProps> = ({
   nodeBlockP2P = {},   // P2P timings
   block                // Block data
 }) => {
+  // Debug log block data for visualization
+  useEffect(() => {
+    if (block) {
+      console.log('Block data for visualization:', {
+        transactionCount: typeof block.execution_payload_transactions_count !== 'undefined' 
+          ? Number(block.execution_payload_transactions_count)
+          : typeof block.executionPayloadTransactionsCount !== 'undefined'
+            ? Number(block.executionPayloadTransactionsCount)
+            : 'undefined',
+        blobGasUsed: typeof block.execution_payload_blob_gas_used !== 'undefined'
+          ? Number(block.execution_payload_blob_gas_used)
+          : typeof block.executionPayloadBlobGasUsed !== 'undefined'
+            ? Number(block.executionPayloadBlobGasUsed)
+            : 'undefined',
+        totalBytes: typeof block.block_total_bytes !== 'undefined'
+          ? Number(block.block_total_bytes)
+          : typeof block.blockTotalBytes !== 'undefined'
+            ? Number(block.blockTotalBytes)
+            : 'undefined'
+      });
+    }
+  }, [block]);
   // Truncate string with ellipsis in the middle
   const truncateMiddle = (str: string, startChars = 6, endChars = 4) => {
     if (!str) return 'N/A';
@@ -1189,60 +1212,68 @@ export const SankeyNetworkView: React.FC<BlockFlowViewProps> = ({
           
           {/* Column 5: Proposer */}
           <div className="col-span-1">
-            <div className={`flex-1 flex items-center justify-center rounded-lg ${isActive('proposer') ? 'opacity-100 bg-surface/30' : 'opacity-40 bg-surface/20'} transition-opacity transition-colors duration-700`}>
+            <div className={`flex-1 flex items-center justify-center pt-2 pb-16 ${isActive('proposer') ? 'opacity-100 bg-surface/30' : 'opacity-40 bg-surface/20'} transition-opacity transition-colors duration-700`}>
               {/* Always render the box, with or without proposer data */}
               <div className={`
-                relative w-44 h-full
-                bg-gradient-to-br from-gold/30 to-gold/5
+                relative w-64 h-full
                 rounded-md
                 flex flex-col
                 transition-opacity duration-500
-                overflow-hidden
+                overflow-visible
               `}
-              style={{ boxShadow: isActive('proposer') ? 'inset 0 0 0 1px rgba(255, 215, 0, 0.5)' : 'none' }}
+              style={{}}
               >
-                {/* Header with proposer info */}
-                <div className="p-2 text-center border-b border-gold/30">
-                  <div className="text-xs font-medium text-primary">
-                    {proposer ? `Proposer ${proposer.proposerValidatorIndex}` : "Unknown Proposer"}
-                  </div>
-                  {proposerEntity && <div className="text-xs text-secondary">{proposerEntity}</div>}
-                  
-                  {winningBid && (
-                    <div className="text-xs text-secondary mt-1">
-                      Block Value: <span className="font-mono text-success/90">{winningBid.value.toFixed(4)} ETH</span>
-                    </div>
-                  )}
-                </div>
+                {/* No header needed - all info is in the BeaconBlockVisualization component */}
                 
-                {/* Block contents visualization */}
+                {/* Block contents visualization using the new component */}
                 <div className="flex-1 p-1">
                   <div className="h-full w-full">
-                    {block ? (
-                      <div className="relative h-full w-full">
-                        {/* Try multiple field name formats */}
-                        <BlockContentsTreemap 
-                          transactionCount={
-                            typeof block.execution_payload_transactions_count !== 'undefined' 
-                              ? Number(block.execution_payload_transactions_count)
-                              : typeof block.executionPayloadTransactionsCount !== 'undefined'
-                                ? Number(block.executionPayloadTransactionsCount)
-                                : 80 // Fallback if neither field exists
-                          }
+                    {/* Get blob count from blob gas used */}
+                    {(() => {
+                      // Calculate the blob count based on blob gas used
+                      const blobGasUsed = typeof block?.execution_payload_blob_gas_used !== 'undefined'
+                        ? Number(block.execution_payload_blob_gas_used)
+                        : typeof block?.executionPayloadBlobGasUsed !== 'undefined'
+                          ? Number(block.executionPayloadBlobGasUsed)
+                          : 0;
+                          
+                      const blobCount = blobGasUsed > 0 
+                        ? Math.ceil(blobGasUsed / 131072) 
+                        : 0;
+                      
+                      // Get the execution block number in the correct format
+                      const executionBlockNumber = typeof block?.execution_payload_block_number !== 'undefined'
+                        ? Number(block.execution_payload_block_number)
+                        : typeof block?.executionPayloadBlockNumber !== 'undefined'
+                          ? Number(block.executionPayloadBlockNumber)
+                          : undefined;
+                          
+                      // Get the execution transaction count
+                      const executionTxCount = typeof block?.execution_payload_transactions_count !== 'undefined'
+                        ? Number(block.execution_payload_transactions_count)
+                        : typeof block?.executionPayloadTransactionsCount !== 'undefined'
+                          ? Number(block.executionPayloadTransactionsCount)
+                          : undefined;
+                          
+                      // Get block value from winning bid if available
+                      const blockValue = winningBid?.value;
+                      
+                      return (
+                        <BeaconBlockVisualization
+                          proposer_index={proposer?.proposerValidatorIndex}
+                          slot={proposer?.slot}
+                          execution_block_number={executionBlockNumber}
+                          execution_transaction_count={executionTxCount}
+                          block_hash={block?.blockRoot || block?.block_root}
+                          execution_block_hash={block?.executionPayloadBlockHash || block?.execution_payload_block_hash}
+                          blob_count={blobCount}
+                          block_value={blockValue}
+                          proposer_entity={proposerEntity}
                           height="100%"
                           width="100%"
                         />
-                      </div>
-                    ) : (
-                      <div className="flex items-center justify-center h-full bg-surface/20 rounded">
-                        <BlockContentsTreemap 
-                          transactionCount={0}
-                          height="100%"
-                          width="100%"
-                          isEmpty={true}
-                        />
-                      </div>
-                    )}
+                      );
+                    })()}
                   </div>
                 </div>
               </div>
