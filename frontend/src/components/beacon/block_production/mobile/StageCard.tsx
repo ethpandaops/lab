@@ -22,7 +22,7 @@ const StageCard: React.FC<StageCardProps> = ({
   className
 }) => {
   return (
-    <div className={`p-2 rounded-lg ${isActive ? 'bg-surface/40' : 'bg-surface/20 opacity-60'} transition-all duration-300 ${className}`}>
+    <div className={`p-2 rounded-lg border ${isActive ? 'bg-surface border-subtle' : 'bg-surface/90 border-subtle/50 opacity-80'} transition-opacity duration-300 ${className}`}>
       <div className="flex items-center">
         <div 
           className={`w-10 h-10 flex items-center justify-center rounded-full mr-3 shadow-md transition-colors duration-500 ${

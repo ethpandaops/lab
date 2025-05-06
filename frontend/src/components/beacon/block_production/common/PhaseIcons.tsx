@@ -105,17 +105,17 @@ const PhaseIcons: React.FC<PhaseIconsProps> = ({
   };
 
   return (
-    <div className="bg-surface/40 rounded-b-xl shadow-lg px-2 pb-4 relative z-10 border-t-0 -mt-1">
+    <div className="w-full">
       <div className="flex justify-between items-center px-2 relative z-10">
       {/* 1. BUILDERS PHASE */}
-      <div className={`flex flex-col items-center text-center transition-opacity duration-500 ${isActiveInPhase('builder') ? 'opacity-100' : 'opacity-60'}`}>
+      <div className={`flex flex-col items-center text-center transition-opacity duration-300 ${isActiveInPhase('builder') ? 'opacity-100' : 'opacity-60'}`}>
         <div 
-          className={`w-14 h-14 flex items-center justify-center rounded-full mb-1.5 shadow-lg transition-opacity duration-500 ${
+          className={`w-14 h-14 flex items-center justify-center rounded-full mb-1.5 shadow-md transition-colors duration-300 ${
             isActiveInPhase('builder')
               ? 'bg-gradient-to-br from-orange-500/60 to-orange-600/30 border-2 border-orange-400/80' // Active
               : currentPhase === Phase.Propagating || currentPhase === Phase.Attesting || currentPhase === Phase.Accepted
                 ? 'bg-gradient-to-br from-orange-500/30 to-orange-600/10 border-2 border-orange-400/40' // Completed
-                : 'bg-surface/30 border border-subtle/60' // Not yet active
+                : 'bg-surface border border-border/80' // Not yet active
           }`}
         >
           <div 
@@ -145,14 +145,14 @@ const PhaseIcons: React.FC<PhaseIconsProps> = ({
       </div>
 
       {/* 2. RELAYS PHASE */}
-      <div className={`flex flex-col items-center text-center transition-opacity duration-500 ${isActiveInPhase('relay') ? 'opacity-100' : 'opacity-60'}`}>
+      <div className={`flex flex-col items-center text-center transition-opacity duration-300 ${isActiveInPhase('relay') ? 'opacity-100' : 'opacity-60'}`}>
         <div 
-          className={`w-14 h-14 flex items-center justify-center rounded-full mb-1.5 shadow-lg transition-opacity duration-500 ${
+          className={`w-14 h-14 flex items-center justify-center rounded-full mb-1.5 shadow-md transition-colors duration-300 ${
             isActiveInPhase('relay')
               ? 'bg-gradient-to-br from-green-500/60 to-green-600/30 border-2 border-green-400/80' // Active
               : currentPhase === Phase.Attesting || currentPhase === Phase.Accepted
                 ? 'bg-gradient-to-br from-green-500/30 to-green-600/10 border-2 border-green-400/40' // Completed
-                : 'bg-surface/30 border border-subtle/60' // Not yet active
+                : 'bg-surface border border-border/80' // Not yet active
           }`}
         >
           <div 
@@ -184,14 +184,14 @@ const PhaseIcons: React.FC<PhaseIconsProps> = ({
       </div>
 
       {/* 3. PROPOSER PHASE */}
-      <div className={`flex flex-col items-center text-center transition-opacity duration-500 ${isActiveInPhase('proposer') ? 'opacity-100' : 'opacity-60'}`}>
+      <div className={`flex flex-col items-center text-center transition-opacity duration-300 ${isActiveInPhase('proposer') ? 'opacity-100' : 'opacity-60'}`}>
         <div 
-          className={`w-14 h-14 flex items-center justify-center rounded-full mb-1.5 shadow-lg transition-opacity duration-500 ${
+          className={`w-14 h-14 flex items-center justify-center rounded-full mb-1.5 shadow-md transition-colors duration-300 ${
             isActiveInPhase('proposer')
               ? 'bg-gradient-to-br from-amber-500/60 to-amber-600/30 border-2 border-amber-400/80' // Active
               : currentPhase === Phase.Attesting || currentPhase === Phase.Accepted
                 ? 'bg-gradient-to-br from-amber-500/40 to-amber-600/10 border-2 border-amber-400/60' // Completed
-                : 'bg-surface/30 border border-subtle/60' // Not yet active
+                : 'bg-surface border border-border/80' // Not yet active
           }`}
         >
           <div 
@@ -224,14 +224,14 @@ const PhaseIcons: React.FC<PhaseIconsProps> = ({
       </div>
 
       {/* NODES PHASE - INSERTED BETWEEN PROPOSER AND ATTESTERS */}
-      <div className={`flex flex-col items-center text-center transition-opacity duration-500 ${isActiveInPhase('node') ? 'opacity-100' : 'opacity-60'}`}>
+      <div className={`flex flex-col items-center text-center transition-opacity duration-300 ${isActiveInPhase('node') ? 'opacity-100' : 'opacity-60'}`}>
         <div 
-          className={`w-14 h-14 flex items-center justify-center rounded-full mb-1.5 shadow-lg transition-opacity duration-500 ${
+          className={`w-14 h-14 flex items-center justify-center rounded-full mb-1.5 shadow-md transition-colors duration-300 ${
             isActiveInPhase('node')
               ? 'bg-gradient-to-br from-purple-500/60 to-purple-600/30 border-2 border-purple-400/80' // Active
               : currentPhase === Phase.Attesting || currentPhase === Phase.Accepted
                 ? 'bg-gradient-to-br from-purple-500/40 to-purple-600/20 border-2 border-purple-400/60' // Completed
-                : 'bg-surface/30 border border-subtle/60' // Not yet active
+                : 'bg-surface border border-border/80' // Not yet active
           }`}
         >
           <div 
@@ -259,14 +259,14 @@ const PhaseIcons: React.FC<PhaseIconsProps> = ({
       </div>
 
       {/* 4. ATTESTATION PHASE */}
-      <div className={`flex flex-col items-center text-center transition-opacity duration-500 ${isActiveInPhase('attester') ? 'opacity-100' : 'opacity-60'}`}>
+      <div className={`flex flex-col items-center text-center transition-opacity duration-300 ${isActiveInPhase('attester') ? 'opacity-100' : 'opacity-60'}`}>
         <div 
-          className={`w-14 h-14 flex items-center justify-center rounded-full mb-1.5 shadow-lg transition-opacity duration-500 ${
+          className={`w-14 h-14 flex items-center justify-center rounded-full mb-1.5 shadow-md transition-colors duration-300 ${
             isActiveInPhase('attester')
               ? 'bg-gradient-to-br from-blue-500/60 to-blue-600/30 border-2 border-blue-400/80' // Active
               : currentPhase === Phase.Accepted
                 ? 'bg-gradient-to-br from-blue-500/30 to-blue-600/10 border-2 border-blue-400/40' // Completed
-                : 'bg-surface/30 border border-subtle/60' // Not yet active
+                : 'bg-surface border border-border/80' // Not yet active
           }`}
         >
           <div 
@@ -324,12 +324,12 @@ const PhaseIcons: React.FC<PhaseIconsProps> = ({
       </div>
 
       {/* 5. ACCEPTED PHASE - NEW */}
-      <div className={`flex flex-col items-center text-center transition-opacity duration-500 ${isActiveInPhase('accepted') ? 'opacity-100' : 'opacity-60'}`}>
+      <div className={`flex flex-col items-center text-center transition-opacity duration-300 ${isActiveInPhase('accepted') ? 'opacity-100' : 'opacity-60'}`}>
         <div 
-          className={`w-14 h-14 flex items-center justify-center rounded-full mb-1.5 shadow-lg transition-opacity duration-500 ${
+          className={`w-14 h-14 flex items-center justify-center rounded-full mb-1.5 shadow-md transition-colors duration-300 ${
             isActiveInPhase('accepted')
               ? 'bg-gradient-to-br from-green-500/60 to-green-600/30 border-2 border-green-400/80' // Active
-              : 'bg-surface/30 border border-subtle/60' // Not yet active
+              : 'bg-surface border border-border/80' // Not yet active
           }`}
         >
           <div 

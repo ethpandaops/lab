@@ -714,7 +714,7 @@ func (b *BeaconSlots) getSlotWindow(ctx context.Context, networkName string, slo
 
 // getMevRelayBids fetches MEV relay bid traces for a given slot, wrapped per relay.
 // It returns the highest bid per relay per 50ms interval within the slot.
-func (b *BeaconSlots) getMevRelayBids(ctx context.Context, networkName string, slot phase0.Slot, slotStartTime time.Time) (map[string]*pb.RelayBids, error) {
+func (b *BeaconSlots) getMevRelayBids(ctx context.Context, networkName string, slot phase0.Slot, slotStartTime time.Time, executionBlockHash string) (map[string]*pb.RelayBids, error) {
 	ch, err := b.xatuClient.GetClickhouseClientForNetwork(networkName)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get ClickHouse client for network %s: %w", networkName, err)
@@ -727,20 +727,71 @@ func (b *BeaconSlots) getMevRelayBids(ctx context.Context, networkName string, s
 	// Calculate time window with 3-minute margin
 	startTimeStr := slotStartTime.Add(-3 * time.Minute).Format("2006-01-02 15:04:05")
 	endTimeStr := slotStartTime.Add(3 * time.Minute).Format("2006-01-02 15:04:05")
-
+	// We want to find the top bid for each relay per 50ms interval within the slot.
+	// But we also want to ensure that we return the winning bid for the slot if it exists.
 	query := `
-		WITH RankedBids AS (
+		WITH RawBids AS (
 			SELECT
-				*,
-				timestamp_ms - ? as slot_time, -- Calculate slot_time relative to slot start
-				floor((timestamp_ms - ?) / ?) * ? as time_bucket, -- Calculate time bucket
-				ROW_NUMBER() OVER (PARTITION BY meta_network_name, floor((timestamp_ms - ?) / ?) ORDER BY CAST(value AS UInt256) DESC) as rn -- Use UInt256 for value comparison
+				relay_name,
+				slot,
+				block_hash,
+				builder_pubkey,
+				timestamp_ms,
+				meta_network_name,
+				parent_hash,
+				proposer_pubkey,
+				proposer_fee_recipient,
+				gas_limit,
+				gas_used,
+				value,
+				timestamp_ms - ? as slot_time,
+				floor((timestamp_ms - ?) / ?) * ? as time_bucket
 			FROM default.mev_relay_bid_trace
 			WHERE 
 				slot = ? 
 				AND meta_network_name = ?
 				AND slot_start_date_time BETWEEN ? AND ?
-				AND (timestamp_ms - ?) BETWEEN -12000 AND 12000 -- Filter for only slot times between -12s and +12s
+				AND (timestamp_ms - ?) BETWEEN -12000 AND 12000
+		),
+		RankedBids AS (
+			SELECT
+				*,
+				ROW_NUMBER() OVER (
+					PARTITION BY 
+						meta_network_name, 
+						time_bucket, 
+						relay_name,
+						block_hash,
+						builder_pubkey,
+						proposer_pubkey,
+						proposer_fee_recipient
+					ORDER BY CAST(value AS UInt256) DESC
+				) as rn
+			FROM RawBids
+		),
+		WinningBid AS (
+			SELECT
+				relay_name,
+				slot,
+				block_hash,
+				builder_pubkey,
+				timestamp_ms,
+				meta_network_name,
+				parent_hash,
+				proposer_pubkey,
+				proposer_fee_recipient,
+				gas_limit,
+				gas_used,
+				value,
+				timestamp_ms - ? as slot_time,
+				floor((timestamp_ms - ?) / ?) * ? as time_bucket,
+				0 as rn
+			FROM default.mev_relay_bid_trace
+			WHERE 
+				slot = ? 
+				AND meta_network_name = ?
+				AND slot_start_date_time BETWEEN ? AND ?
+				AND block_hash = ?
 		)
 		SELECT
 			relay_name,
@@ -750,24 +801,31 @@ func (b *BeaconSlots) getMevRelayBids(ctx context.Context, networkName string, s
 			builder_pubkey,
 			proposer_pubkey,
 			proposer_fee_recipient,
-			toString(value) AS value, -- Select as string after ranking
+			toString(value) AS value,
 			gas_limit,
 			gas_used,
 			slot_time,
 			time_bucket
-		FROM RankedBids
-		WHERE rn = 1
+		FROM (
+			SELECT * FROM RankedBids WHERE rn = 1
+			UNION ALL
+			SELECT * FROM WinningBid
+		)
 		ORDER BY
-			relay_name, slot_time; -- Order by relay first, then slot_time
+			relay_name, slot_time;
 	`
 
 	result, err := ch.Query(ctx, query,
 		slotStartTimeMs,                             // For slot_time calculation
 		slotStartTimeMs, timeBucketMs, timeBucketMs, // For time_bucket calculation
-		slotStartTimeMs, timeBucketMs, // For ranking window
 		slot, networkName,
 		startTimeStr, endTimeStr, // Added slot_start_date_time filter
-		slotStartTimeMs) // For slot_time filtering
+		slotStartTimeMs,
+		slotStartTimeMs,                             // For slot_time calculation in WinningBid
+		slotStartTimeMs, timeBucketMs, timeBucketMs, // For time_bucket calculation in WinningBid
+		slot, networkName,
+		startTimeStr, endTimeStr, // Added slot_start_date_time filter
+		executionBlockHash)
 
 	if err != nil {
 		if err.Error() == ErrNoRowsReturned { // Check specific error string
@@ -851,6 +909,16 @@ func (b *BeaconSlots) getMevRelayBids(ctx context.Context, networkName string, s
 			wrapper = &pb.RelayBids{Bids: make([]*pb.RelayBid, 0)}
 			relayBidsMap[relayName] = wrapper
 		}
+
+		if bid.BlockHash == executionBlockHash {
+			b.log.WithFields(log.Fields{
+				"slot":    slot,
+				"network": networkName,
+				"relay":   relayName,
+				"bid":     bid,
+			}).Info("Winning bid found for slot")
+		}
+
 		// Append the bid to the wrapper's list
 		wrapper.Bids = append(wrapper.Bids, bid)
 	}

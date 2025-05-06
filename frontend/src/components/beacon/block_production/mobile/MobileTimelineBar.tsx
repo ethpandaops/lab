@@ -36,13 +36,13 @@ const MobileTimelineBar: React.FC<MobileTimelineBarProps> = ({
   isNextDisabled
 }) => {
   return (
-    <div className="bg-surface/40 rounded-t-xl shadow-lg overflow-hidden p-3 pb-4">
+    <div className="p-3 pb-4">
       <div className="flex justify-between items-center mb-2">
         {/* Slot navigation on the left */}
         <div className="flex items-center gap-1.5">
           <button
             onClick={goToPreviousSlot}
-            className="bg-surface/50 p-1 rounded border border-subtle hover:bg-hover transition"
+            className="bg-surface p-1 rounded border border-subtle hover:bg-hover transition"
             title="Previous Slot"
           >
             <svg className="h-3 w-3 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -54,7 +54,7 @@ const MobileTimelineBar: React.FC<MobileTimelineBarProps> = ({
             onClick={resetToCurrentSlot}
             className={`px-1.5 py-0.5 rounded border font-medium text-xs ${displaySlotOffset === 0
                 ? 'bg-accent/20 border-accent/50 text-accent'
-                : 'bg-surface/50 border-subtle text-secondary hover:bg-hover'
+                : 'bg-surface border-subtle text-secondary hover:bg-hover'
               } transition`}
             disabled={displaySlotOffset === 0}
             title="Return to Current Slot"
@@ -64,7 +64,7 @@ const MobileTimelineBar: React.FC<MobileTimelineBarProps> = ({
 
           <button
             onClick={goToNextSlot}
-            className={`bg-surface/50 p-1 rounded border border-subtle transition ${isNextDisabled ? 'opacity-50 cursor-not-allowed' : 'hover:bg-hover'
+            className={`bg-surface p-1 rounded border border-subtle transition ${isNextDisabled ? 'opacity-50 cursor-not-allowed' : 'hover:bg-hover'
               }`}
             disabled={isNextDisabled}
             title="Next Slot"
@@ -83,7 +83,7 @@ const MobileTimelineBar: React.FC<MobileTimelineBarProps> = ({
         {/* Play/Pause on the right */}
         <button
           onClick={togglePlayPause}
-          className="bg-surface/50 p-1 rounded border border-subtle hover:bg-hover transition"
+          className="bg-surface p-1 rounded border border-subtle hover:bg-hover transition"
           title={isPlaying ? "Pause" : "Play"}
         >
           {isPlaying ? (

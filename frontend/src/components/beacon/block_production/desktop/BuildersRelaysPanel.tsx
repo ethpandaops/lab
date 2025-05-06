@@ -44,26 +44,34 @@ const BuildersRelaysPanel: React.FC<BuildersRelaysPanelProps> = ({
         setBuilderNamesLoaded(true); // Still mark as loaded to prevent infinite loading state
       });
   }, [network]);
-  // Get builder bids - filtered by current time and deduplicated by builder pubkey
+  // Get builder bids - filtered by current time and deduplicated by builder label/pubkey
   const builders = useMemo(() => {
     // Filter bids by current time first
     const timeFilteredBids = bids.filter(bid => bid.time <= currentTime);
     
-    // First, group bids by builder pubkey to understand the data structure
-    const builderBidsByPubkey = new Map<string, any[]>();
+    // Get builder store to resolve names
+    const builderStore = BuilderNamesStore.getInstance();
+    
+    // First, group bids by builder label (or pubkey if no label)
+    const builderBidsByLabel = new Map<string, any[]>();
     
     timeFilteredBids.forEach(bid => {
-      const builderKey = bid.builderPubkey || 'unknown';
-      if (!builderBidsByPubkey.has(builderKey)) {
-        builderBidsByPubkey.set(builderKey, []);
+      const builderPubkey = bid.builderPubkey || 'unknown';
+      // Try to get builder name, fall back to pubkey if not available
+      const builderName = builderStore.getBuilderName(builderPubkey);
+      // Use the builder name as the key if available, otherwise use pubkey
+      const groupKey = builderName || builderPubkey;
+      
+      if (!builderBidsByLabel.has(groupKey)) {
+        builderBidsByLabel.set(groupKey, []);
       }
-      builderBidsByPubkey.get(builderKey)?.push(bid);
+      builderBidsByLabel.get(groupKey)?.push(bid);
     });
     
-    // For each builder, get their highest-value bid
+    // For each builder group, get their highest-value bid
     const uniqueBuilderBids: any[] = [];
     
-    builderBidsByPubkey.forEach((builderBids, builderPubkey) => {
+    builderBidsByLabel.forEach((builderBids, builderLabel) => {
       // First check if this builder has a winning bid
       const winningBid = builderBids.find(bid => bid.isWinning);
       
@@ -80,7 +88,6 @@ const BuildersRelaysPanel: React.FC<BuildersRelaysPanelProps> = ({
     // Create individual bid items from the deduplicated bids
     const builderItems = uniqueBuilderBids.map(bid => {
       // Get builder name from the singleton store
-      const builderStore = BuilderNamesStore.getInstance();
       const builderName = builderStore.getBuilderName(bid.builderPubkey || '');
       
       const displayName = builderName || truncateMiddle(bid.builderPubkey || 'unknown', 8, 6);
@@ -168,9 +175,14 @@ const BuildersRelaysPanel: React.FC<BuildersRelaysPanelProps> = ({
     <div className="flex flex-col space-y-3 h-full bg-surface/10 p-2 rounded-lg shadow-sm border border-subtle/30">
       {/* Builders list - fixed height */}
       <div className="bg-surface/60 rounded-lg shadow-sm overflow-hidden p-2 h-[calc(50%-0.375rem)]">
-        <div className="text-sm font-medium mb-1 text-primary flex items-center">
-          <div className="w-2 h-2 rounded-full bg-orange-400 mr-1.5"></div>
-          Builder bids
+        <div className="text-sm font-medium mb-1 text-primary flex items-center justify-between">
+          <div className="flex items-center">
+            <div className="w-2 h-2 rounded-full bg-orange-400 mr-1.5"></div>
+            Builder bids
+          </div>
+          <div className="text-xs text-tertiary">
+            {builders.length > 0 ? `Top bid per builder` : ''}
+          </div>
         </div>
         <div className={`rounded-lg overflow-y-auto h-[calc(100%-1.75rem)] scrollbar-hide transition-colors duration-500 ${isBuilderActive ? 'bg-surface/30' : 'bg-surface/20'}`}
             style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>

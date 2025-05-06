@@ -161,8 +161,8 @@ const MobileBlockProductionView: React.FC<MobileBlockProductionViewProps> = ({
   
   return (
     <div className="flex flex-col w-full">
-      {/* Timeline with Phase Icons and Key Information */}
-      <div className="mb-3">
+      {/* Timeline with Phase Icons and Key Information - solid background */}
+      <div className="bg-surface border border-subtle shadow-sm rounded-lg mb-3">
         <MobileTimelineBar 
           currentTime={currentTime}
           nodeBlockSeen={nodeBlockSeen}
@@ -180,8 +180,8 @@ const MobileBlockProductionView: React.FC<MobileBlockProductionViewProps> = ({
           isNextDisabled={isNextDisabled}
         />
 
-        {/* Mobile-optimized cards for each stage - with border below the hero section */}
-        <div className="grid grid-cols-1 gap-2 mt-4 pt-4 border-t border-primary/10">
+        {/* Mobile-optimized cards for each stage */}
+        <div className="grid grid-cols-1 gap-3 p-3">
           {/* Builders Stage */}
           <StageCard 
             title="Builders"
@@ -210,7 +210,7 @@ const MobileBlockProductionView: React.FC<MobileBlockProductionViewProps> = ({
           />
 
           {/* Proposer Stage - Beacon Block Card */}
-          <div className={`rounded-lg overflow-hidden ${isActive('proposer') ? 'bg-surface/40' : 'bg-surface/20 opacity-60'} transition-all duration-300`}>
+          <div className={`rounded-lg overflow-hidden border shadow-sm ${isActive('proposer') ? 'bg-surface border-subtle' : 'bg-surface/90 border-subtle/50 opacity-80'} transition-opacity duration-300`}>
             <div className="flex items-center p-2 border-b border-subtle/20">
               <div 
                 className={`w-10 h-10 flex items-center justify-center rounded-full mr-3 shadow-md transition-colors duration-500 ${
@@ -295,7 +295,7 @@ const MobileBlockProductionView: React.FC<MobileBlockProductionViewProps> = ({
           </div>
 
           {/* Network Nodes Stage */}
-          <div className={`p-2 rounded-lg ${isActive('node') ? 'bg-surface/40' : 'bg-surface/20 opacity-60'} transition-all duration-300`}>
+          <div className={`p-2 rounded-lg border shadow-sm ${isActive('node') ? 'bg-surface border-subtle' : 'bg-surface/90 border-subtle/50 opacity-80'} transition-opacity duration-300`}>
             <div className="flex items-center mb-2">
               <div 
                 className={`w-10 h-10 flex items-center justify-center rounded-full mr-3 shadow-md transition-colors duration-500 ${

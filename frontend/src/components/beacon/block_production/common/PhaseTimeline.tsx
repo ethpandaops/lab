@@ -86,13 +86,13 @@ const PhaseTimeline: React.FC<PhaseTimelineProps> = ({
   if (currentPhase === null) {
     // Use Building phase by default instead of showing "Waiting for data..."
     return (
-      <div className="bg-surface/40 rounded-t-xl shadow-lg overflow-hidden p-3 pb-5">
+      <div className="w-full">
         <div className="flex justify-between items-center mb-4">
           {/* Navigation controls on the left */}
           <div className="flex items-center gap-2 mt-1 mb-1">
             <button
               onClick={goToPreviousSlot}
-              className="bg-surface/50 p-1.5 rounded border border-subtle hover:bg-hover transition"
+              className="bg-surface p-1.5 rounded border border-border hover:bg-hover transition"
               title="Previous Slot"
             >
               <svg className="h-3.5 w-3.5 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -104,7 +104,7 @@ const PhaseTimeline: React.FC<PhaseTimelineProps> = ({
               onClick={resetToCurrentSlot}
               className={`px-2 py-1 rounded border font-medium text-xs ${displaySlotOffset === 0
                   ? 'bg-accent/20 border-accent/50 text-accent'
-                  : 'bg-surface/50 border-subtle text-secondary hover:bg-hover'
+                  : 'bg-surface border-border text-secondary hover:bg-hover'
                 } transition`}
               disabled={displaySlotOffset === 0}
               title="Return to Current Slot"
@@ -114,7 +114,7 @@ const PhaseTimeline: React.FC<PhaseTimelineProps> = ({
 
             <button
               onClick={goToNextSlot}
-              className={`bg-surface/50 p-1.5 rounded border border-subtle transition ${isNextDisabled ? 'opacity-50 cursor-not-allowed' : 'hover:bg-hover'
+              className={`bg-surface p-1.5 rounded border border-border transition ${isNextDisabled ? 'opacity-50 cursor-not-allowed' : 'hover:bg-hover'
                 }`}
               disabled={isNextDisabled}
               title="Next Slot"
@@ -150,7 +150,7 @@ const PhaseTimeline: React.FC<PhaseTimelineProps> = ({
               <span className="font-mono text-lg font-semibold text-white">{(currentTime / 1000).toFixed(1)}s</span>
               <button
                 onClick={togglePlayPause}
-                className="bg-surface/50 p-1.5 rounded border border-subtle hover:bg-hover transition"
+                className="bg-surface p-1.5 rounded border border-border hover:bg-hover transition"
                 title={isPlaying ? "Pause" : "Play"}
               >
                 {isPlaying ? (
@@ -170,7 +170,7 @@ const PhaseTimeline: React.FC<PhaseTimelineProps> = ({
         
         <div className="relative mt-2">
           {/* Empty timeline bar - but colored for building phase */}
-          <div className="h-3 mb-2 rounded-lg overflow-hidden border border-subtle shadow-inner bg-surface/30 relative">
+          <div className="h-3 mb-2 rounded-lg overflow-hidden border border-border shadow-inner bg-surface relative">
             {/* Building phase colored background */}
             <div className="h-full bg-orange-500/15 w-full"></div>
           </div>
@@ -304,13 +304,13 @@ const PhaseTimeline: React.FC<PhaseTimelineProps> = ({
   const acceptancePercent = Math.min(98, Math.max(attestationPercent + 1, (acceptanceTime / 12000) * 100));
 
   return (
-    <div className="bg-surface/40 rounded-t-xl shadow-lg overflow-hidden p-3 pb-5">
+    <div className="w-full">
       <div className="flex justify-between items-center mb-4">
         {/* Navigation controls on the left */}
         <div className="flex items-center gap-2 mt-1 mb-1">
           <button
             onClick={goToPreviousSlot}
-            className="bg-surface/50 p-1.5 rounded border border-subtle hover:bg-hover transition"
+            className="bg-surface p-1.5 rounded border border-border hover:bg-hover transition"
             title="Previous Slot"
           >
             <svg className="h-3.5 w-3.5 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -322,7 +322,7 @@ const PhaseTimeline: React.FC<PhaseTimelineProps> = ({
             onClick={resetToCurrentSlot}
             className={`px-2 py-1 rounded border font-medium text-xs ${displaySlotOffset === 0
                 ? 'bg-accent/20 border-accent/50 text-accent'
-                : 'bg-surface/50 border-subtle text-secondary hover:bg-hover'
+                : 'bg-surface border-border text-secondary hover:bg-hover'
               } transition`}
             disabled={displaySlotOffset === 0}
             title="Return to Current Slot"
@@ -332,7 +332,7 @@ const PhaseTimeline: React.FC<PhaseTimelineProps> = ({
 
           <button
             onClick={goToNextSlot}
-            className={`bg-surface/50 p-1.5 rounded border border-subtle transition ${isNextDisabled ? 'opacity-50 cursor-not-allowed' : 'hover:bg-hover'
+            className={`bg-surface p-1.5 rounded border border-border transition ${isNextDisabled ? 'opacity-50 cursor-not-allowed' : 'hover:bg-hover'
               }`}
             disabled={isNextDisabled}
             title="Next Slot"
@@ -376,7 +376,7 @@ const PhaseTimeline: React.FC<PhaseTimelineProps> = ({
             <span className="font-mono text-lg font-semibold text-white">{(currentTime / 1000).toFixed(1)}s</span>
             <button
               onClick={togglePlayPause}
-              className="bg-surface/50 p-1.5 rounded border border-subtle hover:bg-hover transition"
+              className="bg-surface p-1.5 rounded border border-border hover:bg-hover transition"
               title={isPlaying ? "Pause" : "Play"}
             >
               {isPlaying ? (
@@ -396,7 +396,7 @@ const PhaseTimeline: React.FC<PhaseTimelineProps> = ({
       
       <div className="relative mt-2">
         {/* Four-phase progress bar: Building → Propagating → Attesting → Accepted */}
-        <div className="h-3 mb-2 flex rounded-lg overflow-hidden border border-subtle shadow-inner relative">
+        <div className="h-3 mb-2 flex rounded-lg overflow-hidden border border-border shadow-inner relative">
           {/* Building phase */}
           <div 
             className="border-r border-white/10 shadow-inner" 

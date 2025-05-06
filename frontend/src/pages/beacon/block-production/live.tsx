@@ -62,6 +62,9 @@ export default function BlockProductionLivePage() {
   // Ref to track the actual time value and avoid conflicts between state updates
   const timeRef = useRef<number>(0);
   
+  // Define isPlaying state here, before we use it in refs
+  const [isPlaying, setIsPlaying] = useState<boolean>(true); // Control playback
+  
   // Store the playing state in a ref to avoid dependency cycles
   const isPlayingRef = useRef(isPlaying);
   
@@ -100,7 +103,7 @@ export default function BlockProductionLivePage() {
   
   const [displaySlotOffset, setDisplaySlotOffset] = useState<number>(0); // 0 is current, -1 is previous, etc.
   const [currentTime, setCurrentTime] = useState<number>(0); // ms into slot
-  const [isPlaying, setIsPlaying] = useState<boolean>(true); // Control playback
+  // isPlaying is already defined above (line 66)
 
   // Update the isAtLivePositionRef whenever displaySlotOffset changes
   useEffect(() => {
