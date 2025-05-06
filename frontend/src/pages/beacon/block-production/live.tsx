@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext, useMemo } from 'react';
+import React, { useState, useEffect, useContext, useMemo, useRef } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useParams } from 'react-router-dom';
 import { getLabApiClient } from '../../../api';
@@ -48,22 +48,82 @@ export default function BlockProductionLivePage() {
   const clock = beaconClockManager.getBeaconClock(selectedNetwork);
 
   const headLagSlots = beaconClockManager.getHeadLagSlots(selectedNetwork);
-  const headSlot = clock ? clock.getCurrentSlot() : null;
+  const [headSlot, setHeadSlot] = useState<number | null>(
+    clock ? clock.getCurrentSlot() : null
+  );
+  
+  // Use a ref to track if we're at the "live" position
+  // This will help determine if we should auto-update when slots change
+  const isAtLivePositionRef = useRef<boolean>(true);
+  
+  // Use a ref to track first render of interval effect
+  const isFirstRender = useRef<boolean>(true);
+  
+  // Ref to track the actual time value and avoid conflicts between state updates
+  const timeRef = useRef<number>(0);
+  
+  // Subscribe to slot changes
+  useEffect(() => {
+    if (!selectedNetwork) return;
+    
+    console.log(`Setting up slot change subscription for network: ${selectedNetwork}`);
+    
+    // Create a slot change callback
+    const slotChangeCallback: SlotChangeCallback = (network, newSlot, previousSlot) => {
+      console.log(`Slot changed for ${network}: ${previousSlot} -> ${newSlot}`);
+      
+      // Update the head slot
+      setHeadSlot(newSlot);
+      
+      // NOTE: We don't reset time here - we'll handle that in the slotNumber effect
+    };
+    
+    // Subscribe to slot changes
+    const unsubscribe = beaconClockManager.subscribeToSlotChanges(
+      selectedNetwork, 
+      slotChangeCallback
+    );
+    
+    // Clean up subscription when component unmounts or network changes
+    return () => {
+      console.log(`Cleaning up slot change subscription for network: ${selectedNetwork}`);
+      unsubscribe();
+    };
+  }, [selectedNetwork, beaconClockManager]);
+  
+  // Log information about slot calculation for debugging
+  useEffect(() => {
+    if (headSlot !== null) {
+      console.log(`Current head slot: ${headSlot}`);
+      console.log(`Head lag slots config: ${headLagSlots}`);
+      console.log(`Base lag used: ${headLagSlots + 2} (config + 2 extra slots for processing)`);
+      console.log(`Displaying slot: ${headSlot - (headLagSlots + 2)} (head - (lag + 2))`);
+    }
+  }, [headSlot, headLagSlots]);
 
   const [displaySlotOffset, setDisplaySlotOffset] = useState<number>(0); // 0 is current, -1 is previous, etc.
   const [currentTime, setCurrentTime] = useState<number>(0); // ms into slot
   const [isPlaying, setIsPlaying] = useState<boolean>(true); // Control playback
 
-  // Calculate the base slot with proper lag (we add 2 extra slots of lag for data to populate)
-  // This matches the behavior in beacon/live.tsx that adds extra lag for data processing
+  // Update the isAtLivePositionRef whenever displaySlotOffset changes
+  useEffect(() => {
+    isAtLivePositionRef.current = displaySlotOffset === 0;
+    console.log(`Live position tracking updated: ${isAtLivePositionRef.current}`);
+  }, [displaySlotOffset]);
+
+  // Calculate the base slot with proper lag
+  // Adding extra 2 slots of lag for processing to match behavior in beacon/live.tsx
   const baseSlot = headSlot ? headSlot - (headLagSlots + 2) : null;
   const slotNumber = baseSlot !== null ? baseSlot + displaySlotOffset : null;
 
   const labApiClient = getLabApiClient();
+  
+  // Track if a slot transition is in progress to prevent double transitions
+  const [isTransitioning, setIsTransitioning] = useState<boolean>(false);
 
-  // Define prefetch helpers upfront
+  // Define prefetch helpers with useCallback to avoid unnecessary recreations
   // Generic data prefetching function with retry and caching strategy
-  const prefetchSlotData = async (slotNumber: number | null, direction: 'next' | 'previous') => {
+  const prefetchSlotData = React.useCallback(async (slotNumber: number | null, direction: 'next' | 'previous') => {
     if (slotNumber === null) return;
     
     // Don't try to prefetch slots that are too far in the future
@@ -104,55 +164,74 @@ export default function BlockProductionLivePage() {
     } catch (error) {
       console.error(`Failed to prefetch data for slot ${slotNumber}:`, error);
     }
-  };
+  }, [headSlot, selectedNetwork, queryClient, labApiClient]);
 
   // Prefetching next slot's data
-  const prefetchNextSlotData = async (nextSlotNumber: number | null) => {
+  const prefetchNextSlotData = React.useCallback(async (nextSlotNumber: number | null) => {
     await prefetchSlotData(nextSlotNumber, 'next');
-  };
+  }, [prefetchSlotData]);
   
   // Prefetching previous slot's data
-  const prefetchPreviousSlotData = async (prevSlotNumber: number | null) => {
+  const prefetchPreviousSlotData = React.useCallback(async (prevSlotNumber: number | null) => {
     await prefetchSlotData(prevSlotNumber, 'previous');
-  };
+  }, [prefetchSlotData]);
 
-  // Navigation and Playback functions
+  // Navigation and Playback functions - wrapped in useCallback for proper dependency tracking
   // Prefetch previous slot before navigating to reduce flash
-  const goToPreviousSlot = () => {
+  const goToPreviousSlot = React.useCallback(() => {
     if (slotNumber !== null) {
       // Prefetch previous slot data before navigating
       prefetchPreviousSlotData(slotNumber - 1);
     }
     setDisplaySlotOffset(prev => prev - 1);
-  };
+  }, [slotNumber, prefetchPreviousSlotData]);
   
-  const goToNextSlot = () => {
+  const goToNextSlot = React.useCallback(() => {
+    // Prevent advancing if we're already transitioning
+    if (isTransitioning) {
+      console.log("Slot transition already in progress, ignoring duplicate call");
+      return;
+    }
+
     // Only allow advancing to next slot if we're not already at the head slot
     if (headSlot !== null && slotNumber !== null && slotNumber < headSlot) {
       // Prefetch next slot data before navigating
       prefetchNextSlotData(slotNumber + 1);
+      console.log(`Advancing to slot ${slotNumber + 1}`);
       setDisplaySlotOffset(prev => prev + 1);
     } else if (displaySlotOffset < 0) {
       // If we're on a historical slot, we can move forward even if we don't know the head yet
       if (slotNumber !== null) {
+        console.log(`Advancing from historical slot ${slotNumber} to ${slotNumber + 1}`);
         prefetchNextSlotData(slotNumber + 1);
       }
       setDisplaySlotOffset(prev => prev + 1);
     } else {
       console.log("Already at head slot or next slot, can't advance further");
     }
-  };
+  }, [headSlot, slotNumber, displaySlotOffset, isTransitioning, prefetchNextSlotData]);
   
-  const resetToCurrentSlot = () => {
+  const resetToCurrentSlot = React.useCallback(() => {
     // If we have a head slot and we're not already at the current slot
     if (headSlot !== null && slotNumber !== null && displaySlotOffset !== 0) {
-      // Calculate what the current slot would be
+      // Calculate what the current slot would be - adding extra 2 slots of lag for processing
       const currentSlot = headSlot - (headLagSlots + 2);
       // Prefetch the current slot data before resetting
       prefetchSlotData(currentSlot, 'next');
+      
+      // Log the reset operation
+      console.log(`Resetting to current slot: ${currentSlot} (head ${headSlot} - lag ${headLagSlots + 2})`);
     }
+    
+    // Reset to the live position
     setDisplaySlotOffset(0);
-  };
+    
+    // Reset the time counter to 0 for the new slot
+    setCurrentTime(0);
+    
+    // Ensure we're in playing state
+    setIsPlaying(true);
+  }, [headSlot, slotNumber, displaySlotOffset, headLagSlots, prefetchSlotData]);
   const isNextDisabled = displaySlotOffset >= 0;
   const togglePlayPause = () => setIsPlaying(prev => !prev);
 
@@ -184,93 +263,38 @@ export default function BlockProductionLivePage() {
     enabled: slotNumber !== null,
   });
 
-  // Timer effect for playback
+  // Simple time counter - pure React
   useEffect(() => {
-    if (!isPlaying || !clock || slotNumber === null) return;
-
+    let currentTime = 0;
+    
+    // Simple interval to count time
     const interval = setInterval(() => {
-      setCurrentTime(prev => {
-        const now = Date.now();
-        const slotStartTime = clock.getSlotStartTime(slotNumber) * 1000;
-        const msIntoSlot = now - slotStartTime;
-        
-        // Calculate the actual next slot number based on current slot and head slot
-        const nextSlot = displaySlotOffset === 0 
-          ? (slotNumber + 1) // If we're at the live slot, next is just +1
-          : baseSlot !== null ? (baseSlot + displaySlotOffset + 1) : null; // Otherwise consider display offset
-
-        // If viewing the *current* slot (offset 0), sync with wall clock
-        if (displaySlotOffset === 0) {
-          // Start prefetching early - first prefetch at 6 seconds into the slot
-          if (msIntoSlot >= 6000 && msIntoSlot < 6100) {
-            prefetchNextSlotData(nextSlot);
-          }
-          
-          // Second prefetch at 8 seconds into the slot (4s before end)
-          if (msIntoSlot >= 8000 && msIntoSlot < 8100) {
-            prefetchNextSlotData(nextSlot);
-          }
-          
-          // Final prefetch at 10 seconds into the slot (2s before end)
-          if (msIntoSlot >= 10000 && msIntoSlot < 10100) {
-            prefetchNextSlotData(nextSlot);
-          }
-          
-          // With 0.5s remaining, prepare for transition by setting a transition flag
-          if (msIntoSlot >= 11500 && msIntoSlot < 11600) {
-            // Pre-warm next slot's data one final time just before transitioning
-            prefetchNextSlotData(nextSlot);
-          }
-          
-          if (msIntoSlot >= 12000) {
-            // Instead of stopping playback, move to the next slot automatically
-            goToNextSlot();
-            return 0; // Reset time to beginning of new slot
-          }
-          return Math.max(0, msIntoSlot); // Ensure time doesn't go negative
-        } else {
-          // For historical slots, just increment playback time
-          const next = Math.min(12000, prev + 100); // Increment by 100ms
-          
-          // Enhanced prefetching for historical slots too
-          
-          // First prefetch at 6s into the slot
-          if (next >= 6000 && prev < 6000) {
-            prefetchNextSlotData(nextSlot);
-          }
-          
-          // Second prefetch at 8s into the slot
-          if (next >= 8000 && prev < 8000) {
-            prefetchNextSlotData(nextSlot);
-          }
-          
-          // Third prefetch at 10s into the slot
-          if (next >= 10000 && prev < 10000) {
-            prefetchNextSlotData(nextSlot);
-          }
-          
-          // Final prefetch with 0.5s remaining
-          if (next >= 11500 && prev < 11500) {
-            prefetchNextSlotData(nextSlot);
-          }
-          
-          if (next >= 12000) {
-            // Instead of stopping, move to the next slot automatically
-            goToNextSlot();
-            return 0; // Reset time to beginning of new slot
-          }
-          return next;
-        }
-      });
-    }, 100); // Update every 100ms
-
+      // Increment by 100ms
+      currentTime += 100;
+      
+      // Reset at 12 seconds
+      if (currentTime > 12000) {
+        currentTime = 0;
+      }
+      
+      // Update React state only
+      setCurrentTime(currentTime);
+    }, 100);
+    
     return () => clearInterval(interval);
-  }, [isPlaying, clock, slotNumber, displaySlotOffset, selectedNetwork, baseSlot, headSlot]);
-
-  // Reset timer when slot changes
+  }, [slotNumber]);
+  
+  // Normal playback enablement
   useEffect(() => {
-    setCurrentTime(0);
-    setIsPlaying(true); // Auto-play when slot changes
+    if (slotNumber === null) return;
+    
+    console.log(`Slot changed to ${slotNumber}, ensuring playback is active`);
+    
+    // Auto-start playback on slot change
+    setIsPlaying(true);
+    
+    // Reset transition state
+    setIsTransitioning(false);
   }, [slotNumber]);
 
   // --- Data Transformation ---

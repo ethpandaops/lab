@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Phase } from './types';
 import { getCurrentPhase } from './PhaseUtils';
 
@@ -11,17 +11,46 @@ interface PhaseTimelineProps {
   onPhaseChange?: (phase: Phase) => void;
 }
 
-const PhaseTimeline: React.FC<PhaseTimelineProps> = ({
-  currentTime,
+/**
+ * HARDCODED ANIMATION VERSION - Show a fake, pre-rendered animation of the timeline
+ * by incrementing through a sequence of individual frames
+ */
+const FixedPhaseTimeline: React.FC<PhaseTimelineProps> = ({
   nodeBlockSeen,
   nodeBlockP2P,
   blockTime,
   slotData,
   onPhaseChange
 }) => {
+  // Generate 13 frames (0s to 12s)
+  const FRAMES = Array.from({ length: 13 }).map((_, i) => i * 1000);
+  const [frameIndex, setFrameIndex] = useState(0);
+  const internalTime = FRAMES[frameIndex];
+  
+  // Animation effect - manually step through the frames
+  useEffect(() => {
+    console.log("FIXED ANIMATION: Starting frame-by-frame animation");
+    
+    // Reset to frame 0
+    setFrameIndex(0);
+    
+    // Advance through frames
+    const intervalId = setInterval(() => {
+      setFrameIndex(current => {
+        // Next frame (loop when we reach the end)
+        const next = (current + 1) % FRAMES.length;
+        console.log(`FRAME ADVANCE: ${current} -> ${next}, time=${FRAMES[next]}ms`);
+        return next;
+      });
+    }, 1000); // 1 frame per second
+    
+    // Clean up
+    return () => clearInterval(intervalId);
+  }, []);
+  
   // Calculate which attestation windows have already happened by the current time
   const filteredAttestationWindows = slotData?.attestations?.windows?.filter((window: any) => {
-    return window.inclusionDelay !== undefined && (window.inclusionDelay * 1000) <= currentTime;
+    return window.inclusionDelay !== undefined && (window.inclusionDelay * 1000) <= internalTime;
   }) || [];
   
   // Count attestations from windows that have occurred at or before the current time
@@ -36,7 +65,7 @@ const PhaseTimeline: React.FC<PhaseTimelineProps> = ({
     
   // Calculate the current phase
   const currentPhase = getCurrentPhase(
-    currentTime, 
+    internalTime, 
     nodeBlockSeen, 
     nodeBlockP2P, 
     blockTime,
@@ -116,7 +145,7 @@ const PhaseTimeline: React.FC<PhaseTimelineProps> = ({
               )}
             </span>
             <span className="ml-auto font-mono text-sm text-white">
-              {(currentTime / 1000).toFixed(1)}s
+              {(internalTime / 1000).toFixed(1)}s
             </span>
           </div>
         </div>
@@ -196,11 +225,11 @@ const PhaseTimeline: React.FC<PhaseTimelineProps> = ({
           />
         </div>
         
-        {/* Progress overlay */}
+        {/* Progress overlay - using linear time progression */}
         <div 
           className="absolute top-0 h-3 bg-active/30 rounded-l-lg border-r-2 border-white"
           style={{ 
-            width: `${(currentTime / 12000) * 100}%`,
+            width: `${(internalTime / 12000) * 100}%`,
             maxWidth: 'calc(100% - 4px)' // Stay within container boundaries
           }}
         />
@@ -209,8 +238,8 @@ const PhaseTimeline: React.FC<PhaseTimelineProps> = ({
         <div 
           className="absolute top-0 h-3"
           style={{ 
-            left: `${(currentTime / 12000) * 100}%`,
-            transform: 'translateX(-50%)'
+            left: `calc(${(internalTime / 12000) * 100}%)`,
+            transform: 'translateX(-50%)',
           }}
         >
           <div 
@@ -235,4 +264,4 @@ const PhaseTimeline: React.FC<PhaseTimelineProps> = ({
   );
 };
 
-export default PhaseTimeline;
+export default FixedPhaseTimeline;
