@@ -29,23 +29,39 @@ export function useBuilderNames(network: string): Record<string, string> {
     // Create a function to fetch builder names that can be shared
     async function fetchAndProcessBuilderNames(): Promise<Record<string, string>> {
       try {
+        console.log(`Actual fetch for ${formattedNetwork}-builders.json started`);
         const response = await fetch(`/data/${formattedNetwork}-builders.json`);
         
         // If file doesn't exist, return empty object
         if (!response.ok) {
+          console.warn(`Fetch failed for ${formattedNetwork}-builders.json:`, response.status, response.statusText);
           return {};
         }
         
-        const data = await response.json();
+        const text = await response.text();
+        console.log(`Got JSON data (${text.length} bytes):`, text.substring(0, 100) + '...');
+        
+        let data;
+        try {
+          data = JSON.parse(text);
+        } catch (jsonError) {
+          console.error('JSON parse error:', jsonError);
+          return {};
+        }
         
         // Process the data - invert the mapping
         const pubkeyToName: Record<string, string> = {};
+        
+        console.log('Processing builder data:', Object.keys(data));
         
         Object.entries(data).forEach(([name, pubkey]) => {
           if (typeof pubkey === 'string') {
             // Normalize the pubkey for consistent lookup
             const normalizedPubkey = pubkey.toLowerCase().replace(/^0x/, '');
+            console.log(`Mapped ${name} -> ${normalizedPubkey.substring(0, 12)}...`);
             pubkeyToName[normalizedPubkey] = name;
+          } else {
+            console.warn(`Skipping invalid pubkey for ${name}:`, pubkey);
           }
         });
         
