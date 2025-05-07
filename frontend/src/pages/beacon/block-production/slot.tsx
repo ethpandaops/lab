@@ -113,6 +113,17 @@ export default function BlockProductionSlotPage() {
     staleTime: 60000, // Consider data fresh for 60 seconds to avoid refetching when viewing fixed slots
     retry: 2, // Retry failed requests twice
     enabled: slotNumber !== null,
+    onSuccess: (data) => {
+      if (data?.block) {
+        console.log('Block data:', data.block);
+        if ('delivered_payloads' in data.block) {
+          console.log('delivered_payloads found:', data.block.delivered_payloads);
+        }
+        if ('deliveredPayloads' in data.block) {
+          console.log('deliveredPayloads found:', data.block.deliveredPayloads);
+        }
+      }
+    },
   });
 
   // Timer effect for playback
@@ -377,8 +388,8 @@ export default function BlockProductionSlotPage() {
               block={displayData.block}
               slotData={displayData}
               network={selectedNetwork || 'mainnet'}
-              isLocallyBuilt={Array.isArray(displayData.block?.payloadsDelivered) && 
-                             displayData.block?.payloadsDelivered.length === 0}
+              isLocallyBuilt={!displayData.block?.deliveredPayloads || 
+                            Object.keys(displayData.block?.deliveredPayloads || {}).length === 0}
             />
           </div>
 
@@ -448,8 +459,8 @@ export default function BlockProductionSlotPage() {
               togglePlayPause={togglePlayPause}
               isNextDisabled={false}
               network={selectedNetwork || 'mainnet'}
-              isLocallyBuilt={Array.isArray(displayData.block?.payloadsDelivered) && 
-                             displayData.block?.payloadsDelivered.length === 0}
+              isLocallyBuilt={!displayData.block?.deliveredPayloads || 
+                            Object.keys(displayData.block?.deliveredPayloads || {}).length === 0}
             />
           </div>
         </div>
