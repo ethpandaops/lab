@@ -6,6 +6,7 @@
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
 import { Message, proto3, protoInt64 } from "@bufbuild/protobuf";
 import { BeaconSlotData, LocallyBuiltSlotBlocks } from "../../server/proto/beacon_slots/beacon_slots_pb.js";
+import { FrontendConfig } from "../../server/proto/lab/lab_pb.js";
 
 /**
  * @generated from message labapi.GetSlotDataRequest
@@ -158,6 +159,76 @@ export class GetRecentLocallyBuiltBlocksResponse extends Message<GetRecentLocall
 
   static equals(a: GetRecentLocallyBuiltBlocksResponse | PlainMessage<GetRecentLocallyBuiltBlocksResponse> | undefined, b: GetRecentLocallyBuiltBlocksResponse | PlainMessage<GetRecentLocallyBuiltBlocksResponse> | undefined): boolean {
     return proto3.util.equals(GetRecentLocallyBuiltBlocksResponse, a, b);
+  }
+}
+
+/**
+ * Empty request
+ *
+ * @generated from message labapi.GetConfigRequest
+ */
+export class GetConfigRequest extends Message<GetConfigRequest> {
+  constructor(data?: PartialMessage<GetConfigRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "labapi.GetConfigRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetConfigRequest {
+    return new GetConfigRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): GetConfigRequest {
+    return new GetConfigRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): GetConfigRequest {
+    return new GetConfigRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: GetConfigRequest | PlainMessage<GetConfigRequest> | undefined, b: GetConfigRequest | PlainMessage<GetConfigRequest> | undefined): boolean {
+    return proto3.util.equals(GetConfigRequest, a, b);
+  }
+}
+
+/**
+ * @generated from message labapi.GetConfigResponse
+ */
+export class GetConfigResponse extends Message<GetConfigResponse> {
+  /**
+   * @generated from field: lab.FrontendConfig config = 1;
+   */
+  config?: FrontendConfig;
+
+  constructor(data?: PartialMessage<GetConfigResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "labapi.GetConfigResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "config", kind: "message", T: FrontendConfig },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetConfigResponse {
+    return new GetConfigResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): GetConfigResponse {
+    return new GetConfigResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): GetConfigResponse {
+    return new GetConfigResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: GetConfigResponse | PlainMessage<GetConfigResponse> | undefined, b: GetConfigResponse | PlainMessage<GetConfigResponse> | undefined): boolean {
+    return proto3.util.equals(GetConfigResponse, a, b);
   }
 }
 

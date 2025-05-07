@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package lab;
 
-option go_package = "github.com/ethpandaops/lab/backend/pkg/proto/lab";
+option go_package = "github.com/ethpandaops/lab/backend/pkg/server/proto/lab";
 
 // Service definitions
 service LabService {

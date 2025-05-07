@@ -1,9 +1,8 @@
 import { useDataFetch } from '@/utils/data.ts';
 import { formatDistanceToNow } from 'date-fns';
 import { XatuCallToAction } from '@/components/xatu/XatuCallToAction';
-import { useContext, useEffect, useState } from 'react';
-import ConfigContext from '@/contexts/ConfigContext';
-import NetworkContext from '@/contexts/NetworkContext';
+import { useEffect, useState } from 'react';
+import useConfig from '@/contexts/config';
 import { NETWORK_METADATA, type NetworkKey } from '@/constants/networks.tsx';
 import { LoadingState } from '@/components/common/LoadingState';
 import { ErrorState } from '@/components/common/ErrorState';
@@ -87,7 +86,7 @@ const getNetworkMetadata = (network: string) => {
 };
 
 export default function Networks(): JSX.Element {
-  const config = useContext(ConfigContext);
+  const { config } = useConfig();
   const [availableNetworks, setAvailableNetworks] = useState<string[]>([]);
 
   // Get available networks from config

@@ -4,8 +4,7 @@ import { ErrorState } from '@/components/common/ErrorState';
 import { Link } from 'react-router-dom';
 import { XatuCallToAction } from '@/components/xatu/XatuCallToAction';
 import { formatDistanceToNow } from 'date-fns';
-import { useContext } from 'react';
-import ConfigContext from '@/contexts/ConfigContext';
+import useConfig from '@/contexts/config';
 import { Card } from '@/components/common/Card';
 
 interface Contributor {
@@ -54,7 +53,7 @@ const formatTimestamp = (timestamp: number): string => {
 };
 
 const ContributorsList = (): JSX.Element => {
-  const config = useContext(ConfigContext);
+  const config = useConfig();
   const summaryPath = config?.modules?.['xatu_public_contributors']?.path_prefix
     ? `${config.modules['xatu_public_contributors'].path_prefix}/user-summaries/summary.json`
     : null;

@@ -4,8 +4,7 @@ import { LoadingState } from '@/components/common/LoadingState';
 import { ErrorState } from '@/components/common/ErrorState';
 import { formatDistanceToNow } from 'date-fns';
 import { XatuCallToAction } from '@/components/xatu/XatuCallToAction';
-import { useContext } from 'react';
-import ConfigContext from '@/contexts/ConfigContext';
+import useConfig from '@/contexts/config';
 import { NETWORK_METADATA, type NetworkKey } from '@/constants/networks.tsx';
 import { Card } from '@/components/common/Card';
 
@@ -77,7 +76,7 @@ function isNodeOffline(node: ContributorNode, updatedAt: number): boolean {
 
 function ContributorDetail(): JSX.Element {
   const { name } = useParams<{ name: string }>();
-  const config = useContext(ConfigContext);
+  const { config } = useConfig();
   const userPath = config?.modules?.['xatu_public_contributors']?.path_prefix
     ? `${config.modules['xatu_public_contributors'].path_prefix}/user-summaries/users/${name}.json`
     : null;

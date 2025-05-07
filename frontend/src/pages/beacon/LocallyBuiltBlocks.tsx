@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import NetworkContext from '@/contexts/NetworkContext';
-import { useContext } from 'react';
+import useNetwork from '@/contexts/network';
 import { getLabApiClient } from '@/api';
 import { GetRecentLocallyBuiltBlocksRequest } from '@/api/gen/backend/pkg/api/proto/lab_api_pb';
 import {
@@ -14,8 +13,7 @@ import {
   ClientPresenceHeatmap,
   UnifiedBlocksTimeline,
 } from '@/components/beacon/LocallyBuiltBlocks';
-import { ChevronLeft, BarChart2, List, RefreshCw, Clock, ScatterChart } from 'lucide-react';
-import { TabButton } from '@/components/common/TabButton'; // Assuming TabButton exists and accepts these props
+import { ChevronLeft, BarChart2, List, Clock, ScatterChart } from 'lucide-react';
 import { BeaconClockManager } from '@/utils/beacon.ts';
 
 // Refresh interval in milliseconds
@@ -33,7 +31,7 @@ interface ViewOption {
 }
 
 export function LocallyBuiltBlocks(): JSX.Element {
-  const { selectedNetwork } = useContext(NetworkContext);
+  const { selectedNetwork } = useNetwork();
   const [data, setData] = useState<LocallyBuiltSlotBlocks[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isError, setIsError] = useState<boolean>(false);

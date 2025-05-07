@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useQuery } from '@tanstack/react-query';
 import { useParams } from 'react-router-dom';
@@ -10,7 +10,7 @@ import { TimingsView } from '../../../components/beacon/mev_relays/TimingsView';
 import { SankeyNetworkView } from '../../../components/beacon/mev_relays/SankeyNetworkView';
 import { BeaconClockManager } from '../../../utils/beacon';
 import { ChevronLeft, ChevronRight, Play, Pause } from 'lucide-react';
-import NetworkContext from '@/contexts/NetworkContext';
+import useNetwork from '@/contexts/network';
 import { TabButton } from '@/components/common/TabButton';
 
 // Simple hash function to generate a color from a string (e.g., relay name)
@@ -30,7 +30,7 @@ export default function MevRelaysLivePage() {
   const selectedNetwork = network || 'mainnet'; // Default to mainnet if no network param
 
   // Use BeaconClockManager for slot timing
-  useContext(NetworkContext); // Keep context connection for potential future use
+  useNetwork(); // Keep context connection for potential future use
   const beaconClockManager = BeaconClockManager.getInstance();
   const clock = beaconClockManager.getBeaconClock(selectedNetwork);
 

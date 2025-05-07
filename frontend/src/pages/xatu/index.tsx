@@ -2,11 +2,10 @@ import { Link, Outlet, useLocation } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import { useDataFetch } from '@/utils/data.ts';
 import { formatDistanceToNow } from 'date-fns';
-import { useRef, useState, useEffect, useContext } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { GlobeViz } from '@/components/xatu/GlobeViz';
 import { XatuCallToAction } from '@/components/xatu/XatuCallToAction';
-import ConfigContext from '@/contexts/ConfigContext';
-import NetworkContext from '@/contexts/NetworkContext';
+import useConfig from '@/contexts/config';
 
 interface ConsensusImplementation {
   total_nodes: number;
@@ -51,7 +50,7 @@ function Xatu(): JSX.Element {
   const location = useLocation();
   const containerReference = useRef<HTMLDivElement>(null);
   const [containerWidth, setContainerWidth] = useState(0);
-  const config = useContext(ConfigContext);
+  const { config } = useConfig();
 
   // Skip data fetching if config isn't loaded
   const summaryPath = config?.modules?.['xatu_public_contributors']?.path_prefix

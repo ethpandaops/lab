@@ -1,10 +1,9 @@
-import { useContext, useMemo, useState, useEffect } from 'react';
+import { useMemo, useState } from 'react';
 import { useDataFetch } from '@/utils/data.ts';
-import ConfigContext from '@/contexts/ConfigContext';
-import NetworkContext from '@/contexts/NetworkContext';
-import type { Config, XatuSummary, EthereumNetwork } from '@/types';
+import useConfig from '@/contexts/config';
+import useNetwork from '@/contexts/network';
+import type { XatuSummary } from '@/types';
 import { formatDistanceToNow } from 'date-fns';
-import { ChevronDown, ChevronUp } from 'lucide-react';
 import { Select } from '@/components/common/Select';
 import { BeaconClockManager } from '@/utils/beacon.ts';
 import { formatNodeName } from '@/utils/format.ts';
@@ -35,18 +34,9 @@ interface ClientReadiness {
   }[];
 }
 
-interface NetworkReadiness {
-  name: string;
-  totalNodes: number;
-  readyNodes: number;
-  readyPercentage: number;
-  clients: ClientReadiness[];
-}
-
 function ForkReadiness(): JSX.Element {
-  const config = useContext<Config | null>(ConfigContext);
-  const { selectedNetwork, availableNetworks } = useContext(NetworkContext);
-  const [expandedClient, setExpandedClient] = useState<string | null>(null);
+  const { config } = useConfig();
+  const { selectedNetwork, availableNetworks } = useNetwork();
   const [selectedUser, setSelectedUser] = useState<string>('all');
 
   const summaryPath = config?.modules?.['xatu_public_contributors']?.path_prefix

@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useContext, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useParams } from 'react-router-dom';
 import { getLabApiClient } from '../../../api';
 import { GetSlotDataRequest } from '../../../api/gen/backend/pkg/api/proto/lab_api_pb';
 import { BeaconClockManager } from '../../../utils/beacon';
 import SlotDataStore from '../../../utils/SlotDataStore';
-import NetworkContext from '@/contexts/NetworkContext';
+import useNetwork from '@/contexts/network';
 import {
   MobileBlockProductionView,
   DesktopBlockProductionView,
@@ -43,7 +43,7 @@ export default function BlockProductionLivePage() {
   }, []);
 
   // Use BeaconClockManager for slot timing
-  useContext(NetworkContext); // Keep context connection for potential future use
+  useNetwork(); // Keep context connection for potential future use
   const beaconClockManager = BeaconClockManager.getInstance();
   const clock = beaconClockManager.getBeaconClock(selectedNetwork);
 
@@ -53,12 +53,6 @@ export default function BlockProductionLivePage() {
   // Use a ref to track if we're at the "live" position
   // This will help determine if we should auto-update when slots change
   const isAtLivePositionRef = useRef<boolean>(true);
-
-  // Use a ref to track first render of interval effect
-  const isFirstRender = useRef<boolean>(true);
-
-  // Ref to track the actual time value and avoid conflicts between state updates
-  const timeRef = useRef<number>(0);
 
   // Define isPlaying state here, before we use it in refs
   const [isPlaying, setIsPlaying] = useState<boolean>(true); // Control playback

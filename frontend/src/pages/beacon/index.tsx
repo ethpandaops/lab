@@ -1,11 +1,9 @@
 import { Link, Outlet, useLocation } from 'react-router-dom';
-import { ArrowRight, Activity, Search, Clock, Layers, Database } from 'lucide-react';
-import { useContext } from 'react';
-import NetworkContext from '@/contexts/NetworkContext';
+import { ArrowRight, Activity, Search, Clock, Layers } from 'lucide-react';
 import { FaEthereum } from 'react-icons/fa';
-import { Card, CardBody, CardHeader } from '@/components/common/Card';
+import { Card, CardBody } from '@/components/common/Card';
 
-function Beacon(): JSX.Element {
+function Beacon() {
   const location = useLocation();
 
   // If we're on a nested route, render the child route

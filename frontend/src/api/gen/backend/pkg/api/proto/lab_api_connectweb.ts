@@ -3,7 +3,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { GetRecentLocallyBuiltBlocksRequest, GetRecentLocallyBuiltBlocksResponse, GetSlotDataRequest, GetSlotDataResponse } from "./lab_api_pb.js";
+import { GetConfigRequest, GetConfigResponse, GetRecentLocallyBuiltBlocksRequest, GetRecentLocallyBuiltBlocksResponse, GetSlotDataRequest, GetSlotDataResponse } from "./lab_api_pb.js";
 import { MethodIdempotency, MethodKind } from "@bufbuild/protobuf";
 
 /**
@@ -29,6 +29,16 @@ export const LabAPI = {
       name: "GetSlotData",
       I: GetSlotDataRequest,
       O: GetSlotDataResponse,
+      kind: MethodKind.Unary,
+    idempotency: MethodIdempotency.NoSideEffects,
+    },
+    /**
+     * @generated from rpc labapi.LabAPI.GetConfig
+     */
+    getConfig: {
+      name: "GetConfig",
+      I: GetConfigRequest,
+      O: GetConfigResponse,
       kind: MethodKind.Unary,
     idempotency: MethodIdempotency.NoSideEffects,
     },

@@ -1,9 +1,6 @@
-import { useState } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import clsx from 'clsx';
 import { FaEthereum } from 'react-icons/fa';
-import { useContext } from 'react';
-import NetworkContext from '@/contexts/NetworkContext';
 import { formatEntityName } from '@/utils/format.ts';
 
 interface BlockDetailsProps {
@@ -33,7 +30,6 @@ export function BlockDetailsOverlay({
   isCollapsed,
   onToggleCollapse,
 }: BlockDetailsProps): JSX.Element {
-  const { selectedNetwork } = useContext(NetworkContext);
   const epoch = Math.floor(slot / 32);
   const slotInEpoch = (slot % 32) + 1;
 

@@ -1,12 +1,12 @@
-import { useEffect, useContext } from 'react';
+import { useEffect } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { SlotView } from '@/components/beacon/SlotView';
-import NetworkContext from '@/contexts/NetworkContext';
+import useNetwork from '@/contexts/network';
 
 function BeaconSlot() {
   const { slot } = useParams<{ slot: string }>();
   const [searchParams, setSearchParams] = useSearchParams();
-  const { selectedNetwork } = useContext(NetworkContext);
+  const { selectedNetwork } = useNetwork();
 
   // Update URL when network changes
   useEffect(() => {

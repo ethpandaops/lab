@@ -2,18 +2,18 @@ import { Outlet, useLocation } from 'react-router-dom';
 import { Navigation } from '@/components/layout/Navigation';
 import { Breadcrumbs } from '@/components/layout/Breadcrumbs';
 import { NetworkSelector } from '@/components/common/NetworkSelector';
-import { useContext, useEffect, useState } from 'react';
-import NetworkContext from '@/contexts/NetworkContext';
+import { useEffect, useState } from 'react';
+import useNetwork from '@/contexts/network';
 import { Logo } from '@/components/layout/Logo';
 import { BeaconClockManager } from '@/utils/beacon.ts';
 import { Menu } from 'lucide-react';
 import { NETWORK_METADATA, type NetworkKey } from '@/constants/networks.tsx';
 import clsx from 'clsx';
 
-function Layout(): JSX.Element {
+function Layout() {
   const location = useLocation();
   const isHome = location.pathname === '/';
-  const { selectedNetwork, setSelectedNetwork } = useContext(NetworkContext);
+  const { selectedNetwork, setSelectedNetwork } = useNetwork();
   const [currentSlot, setCurrentSlot] = useState<number | null>(null);
   const [currentEpoch, setCurrentEpoch] = useState<number | null>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);

@@ -10,9 +10,8 @@ import { GetConfigResponse } from '@/api/gen/backend/pkg/server/proto/lab/lab_pb
 import { useSearchParams, useLocation, useNavigate } from 'react-router-dom';
 import { AboutThisData } from '@/components/common/AboutThisData';
 import { ChartWithStats, NivoLineChart } from '@/components/charts';
-import ConfigContext from '@/contexts/ConfigContext';
-import NetworkContext from '@/contexts/NetworkContext';
-import { useContext } from 'react';
+import useConfig from '@/contexts/config';
+import useNetwork from '@/contexts/network';
 
 interface CountryData {
   time: number;
@@ -65,10 +64,12 @@ export const CommunityNodes = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const timeWindowRef = useRef<HTMLDivElement>(null);
 
-  const configContext = useContext(ConfigContext);
+  const configContext = useConfig();
   const pathPrefix = configContext?.modules?.['xatu_public_contributors']?.pathPrefix;
 
-  const { selectedNetwork, setSelectedNetwork } = useContext(NetworkContext);
+  console.log('fuck you', pathPrefix, configContext);
+
+  const { selectedNetwork, setSelectedNetwork } = useNetwork();
   const [currentWindow, setCurrentWindow] = useState<TimeWindow | null>(null);
   const [hiddenUsers, setHiddenUsers] = useState<Set<string>>(new Set());
 

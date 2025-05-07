@@ -1,14 +1,14 @@
-import { useState, useContext } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AlertTriangle, Search } from 'lucide-react';
-import NetworkContext from '@/contexts/NetworkContext';
+import useNetwork from '@/contexts/network';
 import { BeaconClockManager } from '@/utils/beacon.ts';
 import { Card, CardBody } from '@/components/common/Card';
 
-function SlotLookup(): JSX.Element {
+function SlotLookup() {
   const navigate = useNavigate();
   const [slotNumber, setSlotNumber] = useState('');
-  const { selectedNetwork } = useContext(NetworkContext);
+  const { selectedNetwork } = useNetwork();
   const clock = BeaconClockManager.getInstance().getBeaconClock(selectedNetwork);
   const currentSlot = clock?.getCurrentSlot() || 0;
 

@@ -1,12 +1,12 @@
-import { useEffect, useState, useContext } from 'react';
+import { useEffect, useState } from 'react';
 import { SlotView } from '@/components/beacon/SlotView';
 import { useSearchParams } from 'react-router-dom';
 import { BeaconClockManager } from '@/utils/beacon.ts';
-import NetworkContext from '@/contexts/NetworkContext';
+import useNetwork from '@/contexts/network';
 
 function BeaconLive() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const { selectedNetwork } = useContext(NetworkContext);
+  const { selectedNetwork } = useNetwork();
   const [currentSlot, setCurrentSlot] = useState<number>();
 
   // Get the BeaconClock for the current network

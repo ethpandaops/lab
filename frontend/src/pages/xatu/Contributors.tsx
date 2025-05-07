@@ -8,8 +8,7 @@ import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'rec
 import { getConfig } from '@/config';
 import { GetConfigResponse } from '@/api/gen/backend/pkg/server/proto/lab/lab_pb';
 import { useSearchParams, useLocation, useNavigate } from 'react-router-dom';
-import { useContext } from 'react';
-import ConfigContext from '@/contexts/ConfigContext';
+import useConfig from '@/contexts/config';
 
 interface CountryData {
   time: number;
@@ -55,7 +54,7 @@ export const CommunityNodes = () => {
   const [hiddenCountries, setHiddenCountries] = useState<Set<string>>(new Set());
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const configContext = useContext(ConfigContext);
+  const configContext = useConfig();
   const pathPrefix = configContext?.modules?.['xatu_public_contributors']?.path_prefix;
 
   const timeWindows = useMemo(

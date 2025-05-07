@@ -1,7 +1,7 @@
-import { useContext, useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useDataFetch } from '@/utils/data.ts';
-import ConfigContext from '@/contexts/ConfigContext';
-import NetworkContext from '@/contexts/NetworkContext';
+import useConfig from '@/contexts/config';
+import useNetwork from '@/contexts/network';
 import { LoadingState } from '@/components/common/LoadingState';
 import { ErrorState } from '@/components/common/ErrorState';
 import { XatuCallToAction } from '@/components/xatu/XatuCallToAction';
@@ -83,8 +83,8 @@ const getCountryEmoji = (countryName: string) => {
 };
 
 const GeographicalChecklist = () => {
-  const config = useContext(ConfigContext);
-  const { selectedNetwork, setSelectedNetwork } = useContext(NetworkContext);
+  const { config } = useConfig();
+  const { selectedNetwork, setSelectedNetwork } = useNetwork();
   const [searchTerm, setSearchTerm] = useState('');
   const [expandedContinents, setExpandedContinents] = useState<Set<string>>(new Set([])); // All collapsed by default
 
