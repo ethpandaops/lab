@@ -238,7 +238,10 @@ const PhaseIcons: React.FC<PhaseIconsProps> = ({
                   : 'bg-surface border border-border/80' // Not yet active
             }`}
           >
-            {isLocallyBuilt && currentPhase !== Phase.Building && (
+            {isLocallyBuilt && 
+              blockTime !== undefined && 
+              currentPhase !== Phase.Building && 
+              isActiveInPhase('proposer') && (
               <div
                 className="absolute -top-6 left-1/2 transform -translate-x-1/2 text-3xl z-10"
                 role="img"
