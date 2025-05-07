@@ -238,14 +238,12 @@ const PhaseIcons: React.FC<PhaseIconsProps> = ({
                   : 'bg-surface border border-border/80' // Not yet active
             }`}
           >
-            {isLocallyBuilt && 
-              blockTime !== undefined && 
-              currentPhase !== Phase.Building && 
-              isActiveInPhase('proposer') && (
+            {isLocallyBuilt && (
               <div
-                className="absolute -top-6 left-1/2 transform -translate-x-1/2 text-3xl z-10"
+                className="absolute -top-6 left-1/2 transform -translate-x-1/2 text-3xl z-50"
                 role="img"
                 aria-label="Locally Built Crown"
+                style={{filter: "drop-shadow(0 0 3px gold)"}}
               >
                 👑
               </div>
