@@ -1,5 +1,5 @@
 import { Routes, Route, Outlet, useSearchParams } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { getConfig } from '@/config';
 import type { Config } from '@/types';
 import { LoadingState } from '@/components/common/LoadingState';
@@ -37,19 +37,85 @@ function App() {
   const [configError, setConfigError] = useState<Error | null>(null);
   const [selectedNetwork, setSelectedNetwork] = useState('mainnet');
   const [searchParams, setSearchParams] = useSearchParams();
+  const initializedRef = useRef(false);
 
-  // Update URL when network changes (but only if it's not the default)
+  // Add a ref to track the source of network changes
+  const networkChangeSourceRef = useRef<'url' | 'ui' | null>(null);
+  
+  // This effect handles URL updates when the network changes via the UI
   useEffect(() => {
+    // Skip URL updates during initial loading until config is loaded
+    if (!initializedRef.current || !config) return;
+    
+    // Only update URL if the change came from UI
+    if (networkChangeSourceRef.current !== 'ui') return;
+    
+    console.log(`[App.tsx] Network changed to ${selectedNetwork} via UI, updating URL params`);
+
+    // Update URL when network changes (but only if it's not the default)
     const newParams = new URLSearchParams(searchParams);
     if (selectedNetwork === 'mainnet') {
-      newParams.delete('network');
+      if (newParams.has('network')) {
+        console.log(`[App.tsx] Removing network param (was: ${newParams.get('network')})`);
+        newParams.delete('network');
+        setSearchParams(newParams, { replace: true });
+      }
     } else {
-      newParams.set('network', selectedNetwork);
+      if (newParams.get('network') !== selectedNetwork) {
+        console.log(`[App.tsx] Setting network param to ${selectedNetwork} (was: ${newParams.get('network')})`);
+        newParams.set('network', selectedNetwork);
+        setSearchParams(newParams, { replace: true });
+      }
     }
-    setSearchParams(newParams, { replace: true });
-  }, [selectedNetwork, searchParams, setSearchParams]);
+    
+    // Reset the source after handling the change
+    networkChangeSourceRef.current = null;
+  }, [selectedNetwork, config, searchParams, setSearchParams]);
+  
+  // This effect handles direct navigation with URL network param
+  useEffect(() => {
+    // Only run if we're initialized and have config
+    if (!initializedRef.current || !config) return;
+    
+    // Get network from URL
+    const networkFromUrl = searchParams.get('network');
+    
+    // Skip if we're already processing a UI change
+    if (networkChangeSourceRef.current === 'ui') return;
+    
+    // If the URL has a network param that differs from context, update the context
+    if (networkFromUrl && networkFromUrl !== selectedNetwork) {
+      console.log(`[App.tsx] URL network param changed to ${networkFromUrl}, updating context`);
+      
+      // Get available networks
+      const availableNetworks = Object.keys(config.ethereum?.networks || {});
+      
+      // Only set if it's a valid network
+      if (availableNetworks.includes(networkFromUrl)) {
+        // Mark that this change came from URL
+        networkChangeSourceRef.current = 'url';
+        setSelectedNetwork(networkFromUrl);
+      }
+    } else if (!networkFromUrl && selectedNetwork !== 'mainnet') {
+      // If there's no network in URL but we're not on mainnet, switch to mainnet
+      console.log(`[App.tsx] No network param in URL, switching to mainnet`);
+      networkChangeSourceRef.current = 'url';
+      setSelectedNetwork('mainnet');
+    }
+  }, [searchParams, config, selectedNetwork]);
+
+  // One-time initialization effect - loads config and sets up initial network
+  // We use a ref to track if this effect has run to prevent re-running it
+  // This is more reliable than using dependencies like selectedNetwork which can cause loops
+  const hasInitializedRef = useRef(false);
 
   useEffect(() => {
+    // Skip if we've already initialized or if we're in the middle of updating
+    if (hasInitializedRef.current) return;
+    
+    console.log(`[App.tsx] Initializing app, searchParams: ${JSON.stringify(Object.fromEntries(searchParams.entries()))}`);
+    hasInitializedRef.current = true;
+    
     getConfig()
       .then(config => {
         // Initialize BeaconClockManager with config
@@ -60,15 +126,29 @@ function App() {
         const networkFromUrl = searchParams.get('network');
         const availableNetworks = Object.keys(config.ethereum?.networks || {});
 
-        if (networkFromUrl && availableNetworks.includes(networkFromUrl)) {
+        console.log(`[App.tsx] Available networks: ${availableNetworks.join(', ')}`);
+        console.log(`[App.tsx] Current network: ${selectedNetwork}, URL network: ${networkFromUrl || 'none'}`);
+
+        // Only update if needed to prevent loops
+        if (networkFromUrl && availableNetworks.includes(networkFromUrl) && networkFromUrl !== selectedNetwork) {
+          console.log(`[App.tsx] Setting network from URL: ${networkFromUrl}`);
           setSelectedNetwork(networkFromUrl);
         } else if (availableNetworks.length > 0 && !availableNetworks.includes(selectedNetwork)) {
           // If current network is not in available networks, switch to first available
+          console.log(`[App.tsx] Current network ${selectedNetwork} not available, switching to ${availableNetworks[0]}`);
           setSelectedNetwork(availableNetworks[0]);
         }
+        
+        // Mark as initialized AFTER network is set
+        initializedRef.current = true;
+        console.log(`[App.tsx] Initialization complete, network set to ${selectedNetwork}`);
       })
-      .catch(setConfigError);
-  }, [searchParams, selectedNetwork]);
+      .catch(error => {
+        // Reset flag on error so we can retry
+        hasInitializedRef.current = false;
+        setConfigError(error);
+      });
+  }, [searchParams]); // Only depend on searchParams, not selectedNetwork
 
   if (configError) {
     return <ErrorState message="Failed to load configuration" error={configError} />;
@@ -86,7 +166,11 @@ function App() {
         <NetworkContext.Provider
           value={{
             selectedNetwork,
-            setSelectedNetwork,
+            setSelectedNetwork: (network, source = 'ui') => {
+              // Set the source of the network change
+              networkChangeSourceRef.current = source;
+              setSelectedNetwork(network);
+            },
             availableNetworks,
           }}
         >

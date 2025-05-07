@@ -75,7 +75,7 @@ function Layout(): JSX.Element {
             <div className="hidden lg:flex justify-center">
               <NetworkSelector
                 selectedNetwork={selectedNetwork}
-                onNetworkChange={setSelectedNetwork}
+                onNetworkChange={(network) => setSelectedNetwork(network, 'ui')}
                 className="w-48"
               />
             </div>
@@ -141,7 +141,7 @@ function Layout(): JSX.Element {
               <div className="p-4 border-b border-subtle">
                 <NetworkSelector
                   selectedNetwork={selectedNetwork}
-                  onNetworkChange={setSelectedNetwork}
+                  onNetworkChange={(network) => setSelectedNetwork(network, 'ui')}
                   className="w-full"
                 />
               </div>
