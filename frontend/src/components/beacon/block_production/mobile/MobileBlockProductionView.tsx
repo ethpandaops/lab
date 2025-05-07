@@ -278,12 +278,12 @@ const MobileBlockProductionView: React.FC<MobileBlockProductionViewProps> = ({
           >
             <div className="flex items-center p-3 relative">
               {/* Locally built crown */}
-              {isLocallyBuilt && 
-                isActive('proposer') && (
+              {isLocallyBuilt && (
                 <div
-                  className="absolute -top-4 left-5 transform text-2xl z-10"
+                  className="absolute -top-6 left-6 transform text-2xl z-50"
                   role="img"
                   aria-label="Locally Built Crown"
+                  style={{filter: "drop-shadow(0 0 3px gold)"}}
                 >
                   👑
                 </div>
