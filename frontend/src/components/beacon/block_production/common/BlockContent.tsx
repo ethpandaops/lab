@@ -224,7 +224,7 @@ const BlockContent: React.FC<BlockContentProps> = ({
                 <span className="text-xs text-text-tertiary uppercase mr-2">Proposer:</span>
                 <span className="text-sm font-medium text-text-secondary">{proposerEntity}</span>
               </div>
-              {!isPast && !isBuilding && !isFuture && (
+              {/* Show the local build status text regardless of other conditions */}
                 <div className="ml-3 text-xs font-medium">
                   {isLocallyBuilt ? (
                     <span className="text-amber-300">This block was built locally</span>
@@ -232,7 +232,6 @@ const BlockContent: React.FC<BlockContentProps> = ({
                     <span className="text-text-tertiary">This block was built by a builder</span>
                   )}
                 </div>
-              )}
             </div>
           )}
 
