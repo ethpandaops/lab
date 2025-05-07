@@ -5,13 +5,12 @@ import { XatuCallToAction } from '@/components/xatu/XatuCallToAction';
 import { NetworkSelector } from '@/components/common/NetworkSelector';
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
-import { getConfig } from '@/config';
-import { GetConfigResponse } from '@/api/gen/backend/pkg/server/proto/lab/lab_pb';
 import { useSearchParams, useLocation, useNavigate } from 'react-router-dom';
 import { AboutThisData } from '@/components/common/AboutThisData';
 import { ChartWithStats, NivoLineChart } from '@/components/charts';
 import useConfig from '@/contexts/config';
 import useNetwork from '@/contexts/network';
+import useApi from '@/contexts/api';
 
 interface CountryData {
   time: number;
@@ -58,7 +57,8 @@ export const CommunityNodes = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const location = useLocation();
   const navigate = useNavigate();
-  const [config, setConfig] = useState<GetConfigResponse | null>(null);
+  const { config } = useConfig();
+  const { baseUrl } = useApi();
   const [isTimeWindowOpen, setIsTimeWindowOpen] = useState(false);
   const [hiddenCountries, setHiddenCountries] = useState<Set<string>>(new Set());
   const containerRef = useRef<HTMLDivElement>(null);
@@ -109,10 +109,6 @@ export const CommunityNodes = () => {
   const totalNodesRef = useRef<HTMLDivElement>(null);
   const countriesRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    getConfig().then(setConfig).catch(console.error);
-  }, []);
-
   // Handle section scrolling
   useEffect(() => {
     const hash = location.hash.slice(1) as SectionId;
@@ -148,12 +144,12 @@ export const CommunityNodes = () => {
     data: countriesData,
     loading: countriesLoading,
     error: countriesError,
-  } = useDataFetch<CountryData[]>(countriesPath);
+  } = useDataFetch<CountryData[]>(baseUrl, countriesPath);
   const {
     data: usersData,
     loading: usersLoading,
     error: usersError,
-  } = useDataFetch<UserData[]>(usersPath);
+  } = useDataFetch<UserData[]>(baseUrl, usersPath);
 
   const { chartData, totalNodesData, topCountries } = useMemo(() => {
     if (!countriesData) {

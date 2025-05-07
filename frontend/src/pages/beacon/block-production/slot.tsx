@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { useParams, useSearchParams } from 'react-router-dom';
-import { getLabApiClient } from '@/api';
+import useApi from '@/contexts/api';
 import { GetSlotDataRequest } from '@/api/gen/backend/pkg/api/proto/lab_api_pb';
 import {
   MobileBlockProductionView,
@@ -30,6 +30,7 @@ export default function BlockProductionSlotPage() {
   const { network, slot: slotParam } = useParams<{ network?: string; slot?: string }>();
   const selectedNetwork = network || 'mainnet'; // Default to mainnet if no network param
   const [searchParams] = useSearchParams();
+  const { client: labApiClient } = useApi();
 
   // Initial time value from URL query parameter, default to 0
   // Check both 'time' and 't' parameters for backward compatibility
@@ -84,8 +85,6 @@ export default function BlockProductionSlotPage() {
   };
 
   const togglePlayPause = () => setIsPlaying(prev => !prev);
-
-  const labApiClient = getLabApiClient();
 
   const {
     data: slotData,

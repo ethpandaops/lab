@@ -5,9 +5,10 @@ import useNetwork from '@/contexts/network';
 import type { XatuSummary } from '@/types';
 import { formatDistanceToNow } from 'date-fns';
 import { Select } from '@/components/common/Select';
-import { BeaconClockManager } from '@/utils/beacon.ts';
+import useBeacon from '@/contexts/beacon';
 import { formatNodeName } from '@/utils/format.ts';
 import { Card, CardHeader, CardBody } from '@/components/common/Card';
+import useApi from '@/contexts/api';
 
 const MS_PER_SECOND = 1000;
 const SLOTS_PER_EPOCH = 32;
@@ -21,21 +22,10 @@ const CLIENT_METADATA: Record<string, { name: string }> = {
   grandine: { name: 'Grandine' },
 };
 
-interface ClientReadiness {
-  name: string;
-  totalNodes: number;
-  readyNodes: number;
-  readyPercentage: number;
-  minVersion: string;
-  nodes: {
-    name: string;
-    version: string;
-    isReady: boolean;
-  }[];
-}
-
-function ForkReadiness(): JSX.Element {
+function ForkReadiness() {
   const { config } = useConfig();
+  const { baseUrl } = useApi();
+  const { getBeaconClock } = useBeacon();
   const { selectedNetwork, availableNetworks } = useNetwork();
   const [selectedUser, setSelectedUser] = useState<string>('all');
 
@@ -43,7 +33,7 @@ function ForkReadiness(): JSX.Element {
     ? `${config.modules['xatu_public_contributors'].path_prefix}/user-summaries/summary.json`
     : null;
 
-  const { data: summaryData } = useDataFetch<XatuSummary>(summaryPath);
+  const { data: summaryData } = useDataFetch<XatuSummary>(baseUrl, summaryPath);
 
   const users = useMemo(() => {
     if (!summaryData) return [];
@@ -125,7 +115,7 @@ function ForkReadiness(): JSX.Element {
     const readyNodes = clientReadiness.reduce((acc, client) => acc + client.readyNodes, 0);
 
     // Calculate time until fork
-    const clock = BeaconClockManager.getInstance().getBeaconClock(selectedNetwork);
+    const clock = getBeaconClock(selectedNetwork);
     const electraEpoch = network.forks?.consensus?.electra?.epoch || 0;
     const currentEpoch = clock?.getCurrentEpoch() || 0;
     const epochsUntilFork = electraEpoch - currentEpoch;

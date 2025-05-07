@@ -5,10 +5,9 @@ import { XatuCallToAction } from '@/components/xatu/XatuCallToAction';
 import { NetworkSelector } from '@/components/common/NetworkSelector';
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
-import { getConfig } from '@/config';
-import { GetConfigResponse } from '@/api/gen/backend/pkg/server/proto/lab/lab_pb';
 import { useSearchParams, useLocation, useNavigate } from 'react-router-dom';
 import useConfig from '@/contexts/config';
+import useApi from '@/contexts/api';
 
 interface CountryData {
   time: number;
@@ -49,13 +48,13 @@ export const CommunityNodes = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const location = useLocation();
   const navigate = useNavigate();
-  const [config, setConfig] = useState<GetConfigResponse | null>(null);
+  const { config } = useConfig();
+  const { baseUrl } = useApi();
   const [isTimeWindowOpen, setIsTimeWindowOpen] = useState(false);
   const [hiddenCountries, setHiddenCountries] = useState<Set<string>>(new Set());
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const configContext = useConfig();
-  const pathPrefix = configContext?.modules?.['xatu_public_contributors']?.path_prefix;
+  const pathPrefix = config?.modules?.['xatu_public_contributors']?.path_prefix;
 
   const timeWindows = useMemo(
     () =>
@@ -82,10 +81,6 @@ export const CommunityNodes = () => {
   // Refs for section scrolling
   const totalNodesRef = useRef<HTMLDivElement>(null);
   const countriesRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    getConfig().then(setConfig).catch(console.error);
-  }, []);
 
   // Update URL when network/timeWindow changes
   useEffect(() => {
@@ -122,12 +117,12 @@ export const CommunityNodes = () => {
     data: countriesData,
     loading: countriesLoading,
     error: countriesError,
-  } = useDataFetch<CountryData[]>(countriesPath);
+  } = useDataFetch<CountryData[]>(baseUrl, countriesPath);
   const {
     data: usersData,
     loading: usersLoading,
     error: usersError,
-  } = useDataFetch<UserData[]>(usersPath);
+  } = useDataFetch<UserData[]>(baseUrl, usersPath);
 
   const currentWindow = useMemo(
     () => timeWindows.find(w => w.file === timeWindow),

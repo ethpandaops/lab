@@ -7,6 +7,7 @@ import { NETWORK_METADATA, type NetworkKey } from '@/constants/networks.tsx';
 import { LoadingState } from '@/components/common/LoadingState';
 import { ErrorState } from '@/components/common/ErrorState';
 import { Sparkles } from 'lucide-react';
+import useApi from '@/contexts/api';
 
 interface ConsensusImplementation {
   total_nodes: number;
@@ -85,8 +86,9 @@ const getNetworkMetadata = (network: string) => {
   };
 };
 
-export default function Networks(): JSX.Element {
+export default function Networks() {
   const { config } = useConfig();
+  const { baseUrl } = useApi();
   const [availableNetworks, setAvailableNetworks] = useState<string[]>([]);
 
   // Get available networks from config
@@ -101,7 +103,7 @@ export default function Networks(): JSX.Element {
     ? `${config.modules['xatu_public_contributors'].path_prefix}/summary.json`
     : null;
 
-  const { data: summaryData, loading, error } = useDataFetch<Summary>(summaryPath);
+  const { data: summaryData, loading, error } = useDataFetch<Summary>(baseUrl, summaryPath);
 
   if (loading) return <LoadingState message="Loading network data..." />;
   if (error) return <ErrorState message="Failed to load network data" error={error} />;

@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useParams } from 'react-router-dom';
-import { getLabApiClient } from '../../../api';
-import { GetSlotDataRequest } from '../../../api/gen/backend/pkg/api/proto/lab_api_pb';
-import { BeaconClockManager } from '../../../utils/beacon';
-import SlotDataStore from '../../../utils/SlotDataStore';
+import useApi from '@/contexts/api';
+import { GetSlotDataRequest } from '@/api/gen/backend/pkg/api/proto/lab_api_pb';
+import useBeacon from '@/contexts/beacon';
+import SlotDataStore from '@/utils/SlotDataStore';
 import useNetwork from '@/contexts/network';
 import {
   MobileBlockProductionView,
@@ -22,7 +22,7 @@ export default function BlockProductionLivePage() {
   const { network } = useParams<{ network?: string }>();
   const selectedNetwork = network || 'mainnet'; // Default to mainnet if no network param
   const queryClient = useQueryClient();
-
+  const { client: labApiClient } = useApi();
   // Add state to handle screen size
   const [isMobile, setIsMobile] = useState<boolean>(false);
 
@@ -42,12 +42,11 @@ export default function BlockProductionLivePage() {
     return () => window.removeEventListener('resize', checkScreenSize);
   }, []);
 
+  const { getBeaconClock, getHeadLagSlots, subscribeToSlotChanges } = useBeacon();
   // Use BeaconClockManager for slot timing
   useNetwork(); // Keep context connection for potential future use
-  const beaconClockManager = BeaconClockManager.getInstance();
-  const clock = beaconClockManager.getBeaconClock(selectedNetwork);
-
-  const headLagSlots = beaconClockManager.getHeadLagSlots(selectedNetwork);
+  const clock = getBeaconClock(selectedNetwork);
+  const headLagSlots = getHeadLagSlots(selectedNetwork);
   const [headSlot, setHeadSlot] = useState<number | null>(clock ? clock.getCurrentSlot() : null);
 
   // Use a ref to track if we're at the "live" position
@@ -70,7 +69,7 @@ export default function BlockProductionLivePage() {
     if (!selectedNetwork) return;
 
     // Create a slot change callback
-    const slotChangeCallback: SlotChangeCallback = (network, newSlot, previousSlot) => {
+    const slotChangeCallback = (network, newSlot, previousSlot) => {
       // Only update the head slot if we're in play mode
       // This prevents real-world slot changes from affecting our visualization when paused
       if (isPlayingRef.current) {
@@ -82,16 +81,13 @@ export default function BlockProductionLivePage() {
     };
 
     // Subscribe to slot changes
-    const unsubscribe = beaconClockManager.subscribeToSlotChanges(
-      selectedNetwork,
-      slotChangeCallback,
-    );
+    const unsubscribe = subscribeToSlotChanges(selectedNetwork, slotChangeCallback);
 
     // Clean up subscription when component unmounts or network changes
     return () => {
       unsubscribe();
     };
-  }, [selectedNetwork, beaconClockManager]);
+  }, [selectedNetwork, getBeaconClock, getHeadLagSlots, subscribeToSlotChanges]);
 
   const [displaySlotOffset, setDisplaySlotOffset] = useState<number>(0); // 0 is current, -1 is previous, etc.
   const [currentTime, setCurrentTime] = useState<number>(0); // ms into slot
@@ -106,8 +102,6 @@ export default function BlockProductionLivePage() {
   // Adding extra 2 slots of lag for processing to match behavior in beacon/live.tsx
   const baseSlot = headSlot ? headSlot - (headLagSlots + 2) : null;
   const slotNumber = baseSlot !== null ? baseSlot + displaySlotOffset : null;
-
-  const labApiClient = getLabApiClient();
 
   // Track if a slot transition is in progress to prevent double transitions
   const [isTransitioning, setIsTransitioning] = useState<boolean>(false);

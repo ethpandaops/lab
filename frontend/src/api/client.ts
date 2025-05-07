@@ -19,7 +19,7 @@ export function createLabApiClient(baseUrl: string): LabApiClient {
     LabAPI,
     createConnectTransport({
       interceptors: [logger],
-      baseUrl,
+      baseUrl: baseUrl.endsWith('/') ? baseUrl + 'api' : baseUrl + '/api',
       useHttpGet: true, // Force HTTP GET for all unary calls
     }),
   );

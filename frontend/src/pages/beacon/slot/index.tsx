@@ -2,14 +2,15 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AlertTriangle, Search } from 'lucide-react';
 import useNetwork from '@/contexts/network';
-import { BeaconClockManager } from '@/utils/beacon.ts';
+import useBeacon from '@/contexts/beacon';
 import { Card, CardBody } from '@/components/common/Card';
 
 function SlotLookup() {
   const navigate = useNavigate();
   const [slotNumber, setSlotNumber] = useState('');
   const { selectedNetwork } = useNetwork();
-  const clock = BeaconClockManager.getInstance().getBeaconClock(selectedNetwork);
+  const { getBeaconClock } = useBeacon();
+  const clock = getBeaconClock(selectedNetwork);
   const currentSlot = clock?.getCurrentSlot() || 0;
 
   const handleSubmit = (e: React.FormEvent) => {

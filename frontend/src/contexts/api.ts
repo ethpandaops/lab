@@ -14,17 +14,23 @@ export default function useContext() {
 export interface State {
   client: LabApiClient;
   setClient: (client: LabApiClient) => void;
+  baseUrl: string;
+  setBaseUrl: (baseUrl: string) => void;
 }
 
 export interface ValueProps {
   client: LabApiClient;
+  baseUrl: string;
 }
 
 export function useValue(props: ValueProps): State {
   const [client, setClient] = useState<LabApiClient>(props.client);
+  const [baseUrl, setBaseUrl] = useState<string>(props.baseUrl);
 
   return {
     client,
     setClient,
+    baseUrl,
+    setBaseUrl,
   };
 }

@@ -2,9 +2,8 @@ import { Fragment } from 'react';
 import { Listbox, Transition } from '@headlessui/react';
 import { ChevronUpDownIcon } from '@heroicons/react/24/outline';
 import clsx from 'clsx';
-import { getConfig } from '@/config';
-import { useEffect, useState, useRef } from 'react';
-import { GetConfigResponse } from '@/api/gen/backend/pkg/server/proto/lab/lab_pb';
+import useNetwork from '@/contexts/network';
+import { useEffect, useRef } from 'react';
 import { NETWORK_METADATA, type NetworkKey } from '@/constants/networks.tsx';
 
 interface NetworkSelectorProps {
@@ -60,15 +59,11 @@ const sortNetworks = (networks: string[]): string[] => {
 export function NetworkSelector({
   selectedNetwork,
   onNetworkChange,
-  availableNetworks = [],
   className = '',
 }: NetworkSelectorProps) {
-  const [config, setConfig] = useState<GetConfigResponse>();
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    getConfig().then(setConfig);
-  }, []);
+  const { availableNetworks: availableNetworksFromContext } = useNetwork();
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -82,12 +77,7 @@ export function NetworkSelector({
   }, []);
 
   // Get available networks from props or config
-  const unsortedNetworks: string[] =
-    availableNetworks.length > 0
-      ? availableNetworks
-      : config?.ethereum?.networks
-        ? Object.keys(config.ethereum.networks)
-        : ['mainnet'];
+  const unsortedNetworks: string[] = [...(availableNetworksFromContext ?? ['mainnet'])];
 
   // Sort networks according to the specified order
   const networks = sortNetworks(unsortedNetworks);

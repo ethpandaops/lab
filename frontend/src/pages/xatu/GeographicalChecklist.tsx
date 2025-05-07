@@ -9,6 +9,7 @@ import { formatDistanceToNow } from 'date-fns';
 import { NetworkSelector } from '@/components/common/NetworkSelector';
 import { Search, ChevronDown, ChevronUp, Check } from 'lucide-react';
 import CONTINENT_TO_COUNTRIES from '@/constants/countries.ts';
+import useApi from '@/contexts/api';
 
 // Types
 interface Country {
@@ -84,6 +85,7 @@ const getCountryEmoji = (countryName: string) => {
 
 const GeographicalChecklist = () => {
   const { config } = useConfig();
+  const { baseUrl } = useApi();
   const { selectedNetwork, setSelectedNetwork } = useNetwork();
   const [searchTerm, setSearchTerm] = useState('');
   const [expandedContinents, setExpandedContinents] = useState<Set<string>>(new Set([])); // All collapsed by default
@@ -93,7 +95,7 @@ const GeographicalChecklist = () => {
     ? `${config.modules['xatu_public_contributors'].path_prefix}/summary.json`
     : null;
 
-  const { data: summaryData, loading, error } = useDataFetch<Summary>(summaryPath);
+  const { data: summaryData, loading, error } = useDataFetch<Summary>(baseUrl, summaryPath);
 
   // Auto-expand continents that match the search term
   useEffect(() => {

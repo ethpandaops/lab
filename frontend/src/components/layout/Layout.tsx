@@ -5,7 +5,7 @@ import { NetworkSelector } from '@/components/common/NetworkSelector';
 import { useEffect, useState } from 'react';
 import useNetwork from '@/contexts/network';
 import { Logo } from '@/components/layout/Logo';
-import { BeaconClockManager } from '@/utils/beacon.ts';
+import useBeacon from '@/contexts/beacon';
 import { Menu } from 'lucide-react';
 import { NETWORK_METADATA, type NetworkKey } from '@/constants/networks.tsx';
 import clsx from 'clsx';
@@ -17,6 +17,7 @@ function Layout() {
   const [currentSlot, setCurrentSlot] = useState<number | null>(null);
   const [currentEpoch, setCurrentEpoch] = useState<number | null>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { getBeaconClock } = useBeacon();
 
   // Get network metadata
   const selectedMetadata = NETWORK_METADATA[selectedNetwork as NetworkKey] || {
@@ -32,7 +33,7 @@ function Layout() {
 
   // Update slot and epoch every second
   useEffect(() => {
-    const clock = BeaconClockManager.getInstance().getBeaconClock(selectedNetwork);
+    const clock = getBeaconClock(selectedNetwork);
     if (!clock) return;
 
     const updateTime = () => {
@@ -45,7 +46,7 @@ function Layout() {
     updateTime();
     const interval = setInterval(updateTime, 1000);
     return () => clearInterval(interval);
-  }, [selectedNetwork]);
+  }, [selectedNetwork, getBeaconClock]);
 
   return (
     <div className="relative min-h-screen text-primary font-mono bg-gradient-to-b from-[rgb(var(--bg-base))] via-[rgb(var(--bg-base))] to-[rgb(var(--bg-base))]">

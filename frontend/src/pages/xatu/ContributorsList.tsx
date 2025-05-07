@@ -6,6 +6,7 @@ import { XatuCallToAction } from '@/components/xatu/XatuCallToAction';
 import { formatDistanceToNow } from 'date-fns';
 import useConfig from '@/contexts/config';
 import { Card } from '@/components/common/Card';
+import useApi from '@/contexts/api';
 
 interface Contributor {
   name: string;
@@ -53,12 +54,13 @@ const formatTimestamp = (timestamp: number): string => {
 };
 
 const ContributorsList = (): JSX.Element => {
-  const config = useConfig();
+  const { config } = useConfig();
+  const { baseUrl } = useApi();
   const summaryPath = config?.modules?.['xatu_public_contributors']?.path_prefix
     ? `${config.modules['xatu_public_contributors'].path_prefix}/user-summaries/summary.json`
     : null;
 
-  const { data: summaryData, loading, error } = useDataFetch<Summary>(summaryPath);
+  const { data: summaryData, loading, error } = useDataFetch<Summary>(baseUrl, summaryPath);
 
   if (loading) {
     return <LoadingState />;

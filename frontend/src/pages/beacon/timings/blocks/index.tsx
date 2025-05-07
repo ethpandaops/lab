@@ -1,5 +1,4 @@
 import { useDataFetch } from '@/utils/data.ts';
-import { LoadingState } from '@/components/common/LoadingState';
 import { ErrorState } from '@/components/common/ErrorState';
 import { AboutThisData } from '@/components/common/AboutThisData';
 import { useState, useEffect, useMemo, useRef } from 'react';
@@ -11,8 +10,8 @@ import {
 } from '@/constants/percentiles.ts';
 import { NivoLineChart } from '@/components/charts';
 import { useSearchParams } from 'react-router-dom';
-import { getConfig } from '@/config';
-import { GetConfigResponse } from '@/api/gen/backend/pkg/server/proto/lab/lab_pb';
+import useConfig from '@/contexts/config';
+import useApi from '@/contexts/api';
 
 interface TimingData {
   timestamps: number[];
@@ -79,9 +78,8 @@ const BLOCK_TYPE_DESCRIPTIONS = {
 
 export const BlockTimings: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const [config, setConfig] = useState<GetConfigResponse | null>(null);
-  const [configLoading, setConfigLoading] = useState(true);
-  const [configError, setConfigError] = useState<Error | undefined>();
+  const { config } = useConfig();
+  const { baseUrl } = useApi();
   const [isTimeWindowOpen, setIsTimeWindowOpen] = useState(false);
   const [hiddenArrivalLines, setHiddenArrivalLines] = useState<Set<string>>(new Set());
   const [hiddenSizeLines, setHiddenSizeLines] = useState<Set<string>>(new Set());
@@ -107,14 +105,6 @@ export const BlockTimings: React.FC = () => {
     () => searchParams.get('timeWindow') || defaultTimeWindow,
   );
   const [network] = useState<string>(() => searchParams.get('network') || defaultNetwork);
-
-  useEffect(() => {
-    setConfigLoading(true);
-    getConfig()
-      .then(setConfig)
-      .catch(setConfigError)
-      .finally(() => setConfigLoading(false));
-  }, []);
 
   // Update URL when network/timeWindow changes
   useEffect(() => {
@@ -144,9 +134,9 @@ export const BlockTimings: React.FC = () => {
     ? `${config.modules['beacon_chain_timings'].pathPrefix}/size_cdf/${network}/${timeWindow}`
     : null;
 
-  const { data: timingData, loading, error } = useDataFetch<TimingData>(timingsPath);
+  const { data: timingData, error } = useDataFetch<TimingData>(timingsPath);
 
-  const { data: cdfData } = useDataFetch<CDFData>(cdfPath);
+  const { data: cdfData } = useDataFetch<CDFData>(baseUrl, cdfPath);
 
   const formatTime = useMemo(
     () => (time: number) => {
@@ -346,14 +336,6 @@ export const BlockTimings: React.FC = () => {
         };
       });
   }, [scatterData, hiddenSizeLines]);
-
-  if (configLoading || loading) {
-    return <LoadingState message="Loading data..." />;
-  }
-
-  if (configError) {
-    return <ErrorState message="Failed to load configuration" error={configError} />;
-  }
 
   if (error) {
     return <ErrorState message="Failed to load data" error={error} />;

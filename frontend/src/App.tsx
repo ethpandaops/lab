@@ -2,7 +2,6 @@ import { Routes, Route, Outlet, useSearchParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { LoadingState } from '@/components/common/LoadingState';
 import { ErrorState } from '@/components/common/ErrorState';
-import { BeaconClockManager } from '@/utils/beacon.ts';
 import ScrollToTop from '@/components/common/ScrollToTop';
 import Redirect from '@/components/common/Redirect';
 import Home from '@/pages/Home.tsx';
@@ -63,8 +62,6 @@ function App() {
 
   useEffect(() => {
     if (config) {
-      BeaconClockManager.getInstance().initialize(config);
-
       const newParams = new URLSearchParams(searchParams);
       if (selectedNetwork === 'mainnet') {
         newParams.delete('network');
@@ -103,13 +100,18 @@ function App() {
     return <ErrorState message="Failed to load API client" />;
   }
 
+  if (!bootstrap) {
+    return <LoadingState message="Loading bootstrap..." />;
+  }
+
   const availableNetworks = Object.keys(config.ethereum?.networks || {});
 
   return (
     <ApplicationProvider
       network={{ selectedNetwork, availableNetworks }}
       config={{ config }}
-      api={{ client }}
+      api={{ client, baseUrl: bootstrap.backend.url }}
+      beacon={{ config }}
     >
       <ModalProvider>
         <ScrollToTop />

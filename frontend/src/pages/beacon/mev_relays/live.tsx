@@ -2,13 +2,13 @@ import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useQuery } from '@tanstack/react-query';
 import { useParams } from 'react-router-dom';
-import { getLabApiClient } from '../../../api';
-import { GetSlotDataRequest } from '../../../api/gen/backend/pkg/api/proto/lab_api_pb';
-import { MevBidsVisualizer } from '../../../components/beacon/mev_relays/MevBidsVisualizer';
-import { BidsTable } from '../../../components/beacon/mev_relays/BidsTable';
-import { TimingsView } from '../../../components/beacon/mev_relays/TimingsView';
-import { SankeyNetworkView } from '../../../components/beacon/mev_relays/SankeyNetworkView';
-import { BeaconClockManager } from '../../../utils/beacon';
+import useApi from '@/contexts/api';
+import { GetSlotDataRequest } from '@/api/gen/backend/pkg/api/proto/lab_api_pb';
+import { MevBidsVisualizer } from '@/components/beacon/mev_relays/MevBidsVisualizer';
+import { BidsTable } from '@/components/beacon/mev_relays/BidsTable';
+import { TimingsView } from '@/components/beacon/mev_relays/TimingsView';
+import { SankeyNetworkView } from '@/components/beacon/mev_relays/SankeyNetworkView';
+import useBeacon from '@/contexts/beacon';
 import { ChevronLeft, ChevronRight, Play, Pause } from 'lucide-react';
 import useNetwork from '@/contexts/network';
 import { TabButton } from '@/components/common/TabButton';
@@ -27,14 +27,14 @@ const generateConsistentColor = (str: string): string => {
 
 export default function MevRelaysLivePage() {
   const { network } = useParams<{ network?: string }>();
+  const { getBeaconClock, getHeadLagSlots } = useBeacon();
   const selectedNetwork = network || 'mainnet'; // Default to mainnet if no network param
 
   // Use BeaconClockManager for slot timing
   useNetwork(); // Keep context connection for potential future use
-  const beaconClockManager = BeaconClockManager.getInstance();
-  const clock = beaconClockManager.getBeaconClock(selectedNetwork);
+  const clock = getBeaconClock(selectedNetwork);
 
-  const headLagSlots = beaconClockManager.getHeadLagSlots(selectedNetwork);
+  const headLagSlots = getHeadLagSlots(selectedNetwork);
   const headSlot = clock ? clock.getCurrentSlot() : null;
 
   const [displaySlotOffset, setDisplaySlotOffset] = useState<number>(0); // 0 is current, -1 is previous, etc.
@@ -45,7 +45,7 @@ export default function MevRelaysLivePage() {
   const baseSlot = headSlot ? headSlot - headLagSlots : null;
   const slotNumber = baseSlot !== null ? baseSlot + displaySlotOffset : null;
 
-  const labApiClient = getLabApiClient();
+  const { client: labApiClient } = useApi();
 
   const {
     data: slotData,
