@@ -1,6 +1,5 @@
 import React, { useMemo } from 'react';
 import { BlockProductionBaseProps } from '../common/types';
-import BlockchainVisualization from '@/components/beacon/BlockchainVisualization';
 import { isInPropagationPhase } from '../common/PhaseUtils';
 import { countUniqueBuilderPubkeys } from '../common/utils';
 import MobileTimelineBar from './MobileTimelineBar';
@@ -276,7 +275,7 @@ const MobileBlockProductionView: React.FC<MobileBlockProductionViewProps> = ({
           <div
             className={`rounded-lg overflow-hidden border shadow-sm ${isActive('proposer') ? 'bg-surface border-subtle' : 'bg-surface/90 border-subtle/50 opacity-80'} transition-opacity duration-300`}
           >
-            <div className="flex items-center p-2 border-b border-subtle/20 relative">
+            <div className="flex items-center p-3 relative">
               {/* Locally built crown */}
               {isLocallyBuilt && 
                 isActive('proposer') && (
@@ -319,21 +318,27 @@ const MobileBlockProductionView: React.FC<MobileBlockProductionViewProps> = ({
                 </div>
               )}
             </div>
-
-            {/* Blockchain visualization */}
-            <div className="p-2 h-[180px] overflow-hidden">
-              <BlockchainVisualization
-                currentSlot={slotNumber}
-                network={network}
-                currentTime={currentTime}
-                nodeBlockSeen={nodeBlockSeen}
-                nodeBlockP2P={nodeBlockP2P}
-                blockTime={blockTime}
-                height="100%"
-                width="100%"
-                slotData={slotData}
-              />
-            </div>
+            
+            {/* Block info instead of visualization */}
+            {block && (
+              <div className="px-3 pb-3 text-xs">
+                <div className="grid grid-cols-2 gap-x-4 gap-y-1">
+                  <div className="text-tertiary">Size:</div>
+                  <div className="font-mono text-primary">{block.size} KB</div>
+                  
+                  {block.executionPayloadBlockHash && (
+                    <>
+                      <div className="text-tertiary">Hash:</div>
+                      <div className="font-mono text-primary truncate">
+                        {typeof block.executionPayloadBlockHash === 'string' 
+                          ? block.executionPayloadBlockHash.substring(0, 8) + '...' 
+                          : '—'}
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
           
           {/* Attestation Stage - New Card */}
