@@ -38,7 +38,6 @@ function App() {
   const [bootstrapError, setBootstrapError] = useState<Error | null>(null);
   const [selectedNetwork, setSelectedNetwork] = useState('mainnet');
   const [searchParams, setSearchParams] = useSearchParams();
-  const initializedRef = useRef(false);
 
   useEffect(() => {
     fetchBootstrap().then(setBootstrap).catch(setBootstrapError);

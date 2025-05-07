@@ -86,12 +86,14 @@ const MobileBlockProductionView: React.FC<MobileBlockProductionViewProps> = ({
     }
 
     // Calculate whether we have attestation data
-    const hasAttestationData = slotData?.attestations?.windows && 
+    const hasAttestationData =
+      slotData?.attestations?.windows &&
       Array.isArray(slotData.attestations.windows) &&
-      slotData.attestations.windows.some((window: any) => 
-        window.startMs !== undefined && 
-        Number(window.startMs) <= currentTime && 
-        window.validatorIndices?.length > 0
+      slotData.attestations.windows.some(
+        (window: any) =>
+          window.startMs !== undefined &&
+          Number(window.startMs) <= currentTime &&
+          window.validatorIndices?.length > 0,
       );
 
     // For each role, determine if it's active based on the phase
@@ -112,7 +114,7 @@ const MobileBlockProductionView: React.FC<MobileBlockProductionViewProps> = ({
       case 'node':
         // Nodes activate at the transition point and stay active
         return currentTime >= transitionTime;
-        
+
       case 'attester':
         // Attesters activate when we have attestation data
         return hasAttestationData;
@@ -187,7 +189,7 @@ const MobileBlockProductionView: React.FC<MobileBlockProductionViewProps> = ({
 
     // Count attestations that have been included up to the current time
     let visibleAttestationsCount = 0;
-    
+
     if (slotData.attestations.windows && Array.isArray(slotData.attestations.windows)) {
       slotData.attestations.windows.forEach((window: any) => {
         if (window.startMs !== undefined && Number(window.startMs) <= currentTime) {
@@ -195,15 +197,15 @@ const MobileBlockProductionView: React.FC<MobileBlockProductionViewProps> = ({
         }
       });
     }
-    
+
     // Get the maximum expected attestations from the slot data
-    const maxExpectedAttestations = slotData.attestations.maximumVotes 
-      ? Number(slotData.attestations.maximumVotes) 
+    const maxExpectedAttestations = slotData.attestations.maximumVotes
+      ? Number(slotData.attestations.maximumVotes)
       : 0;
-      
+
     return {
       attestationsCount: visibleAttestationsCount,
-      totalExpectedAttestations: maxExpectedAttestations
+      totalExpectedAttestations: maxExpectedAttestations,
     };
   }, [slotData, currentTime]);
 
@@ -283,7 +285,7 @@ const MobileBlockProductionView: React.FC<MobileBlockProductionViewProps> = ({
                   className="absolute -top-1 left-4 transform text-3xl z-50"
                   role="img"
                   aria-label="Locally Built Crown"
-                  style={{filter: "drop-shadow(0 0 4px gold)"}}
+                  style={{ filter: 'drop-shadow(0 0 4px gold)' }}
                 >
                   👑
                 </div>
@@ -328,9 +330,8 @@ const MobileBlockProductionView: React.FC<MobileBlockProductionViewProps> = ({
                 </div>
               )}
             </div>
-            
           </div>
-          
+
           {/* Attestation Stage - New Card */}
           <StageCard
             title="Attesters"

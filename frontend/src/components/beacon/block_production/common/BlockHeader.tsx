@@ -88,9 +88,13 @@ const BlockHeader: React.FC<BlockHeaderProps> = ({
               )}
 
               {/* Block Version - Try to get from any available source */}
-              {(blockData?.blockVersion || blockData?.raw?.block_version || blockData?.raw?.blockVersion) && (
+              {(blockData?.blockVersion ||
+                blockData?.raw?.block_version ||
+                blockData?.raw?.blockVersion) && (
                 <div className="ml-auto bg-cyber-neon/10 px-2 py-0.5 rounded text-xs font-semibold text-cyber-neon uppercase tracking-wide">
-                  {blockData?.blockVersion || blockData?.raw?.block_version || blockData?.raw?.blockVersion}
+                  {blockData?.blockVersion ||
+                    blockData?.raw?.block_version ||
+                    blockData?.raw?.blockVersion}
                 </div>
               )}
             </div>

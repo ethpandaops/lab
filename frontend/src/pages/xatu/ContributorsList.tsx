@@ -56,8 +56,8 @@ const formatTimestamp = (timestamp: number): string => {
 const ContributorsList = (): JSX.Element => {
   const { config } = useConfig();
   const { baseUrl } = useApi();
-  const summaryPath = config?.modules?.['xatu_public_contributors']?.path_prefix
-    ? `${config.modules['xatu_public_contributors'].path_prefix}/user-summaries/summary.json`
+  const summaryPath = config?.modules?.['xatuPublicContributors']?.pathPrefix
+    ? `${config.modules['xatuPublicContributors'].pathPrefix}/user-summaries/summary.json`
     : null;
 
   const { data: summaryData, loading, error } = useDataFetch<Summary>(baseUrl, summaryPath);

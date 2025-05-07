@@ -45,19 +45,13 @@ export function TimelineView({
   slot,
   isPlaying,
   currentTime,
-  firstBlockSeen,
   firstApiBlockSeen,
   firstP2pBlockSeen,
   attestationWindows,
-  attestationProgress,
-  ATTESTATION_THRESHOLD,
-  TOTAL_VALIDATORS,
   loading,
   isMissing,
   onPlayPauseClick,
-  proposerIndex,
   entity,
-  executionBlockNumber,
   isLive = false,
 }: TimelineViewProps) {
   const epoch = slot ? Math.floor(slot / 32) : 0;
@@ -100,7 +94,7 @@ export function TimelineView({
       top: scrollPosition,
       behavior: isPlaying ? 'smooth' : 'auto',
     });
-  }, [currentTime, loading, isPlaying]);
+  }, [currentTime, loading, isPlaying, attestationWindows]);
 
   // Reset scroll position when slot changes
   useEffect(() => {

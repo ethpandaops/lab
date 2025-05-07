@@ -30,13 +30,13 @@ const StageCard: React.FC<StageCardProps> = ({
   // Determine icon color scheme based on title or custom iconColor
   const getIconColorScheme = () => {
     if (iconColor) return iconColor;
-    
+
     // Default color schemes for known stages
     switch (title) {
       case 'Builders':
         return isActive && !isInPropagationPhase
           ? 'from-orange-500/60 to-orange-500/30 border-orange-400/80' // Building active
-          : 'from-orange-500/30 to-orange-500/10 border-orange-400/50';  // Building inactive
+          : 'from-orange-500/30 to-orange-500/10 border-orange-400/50'; // Building inactive
       case 'MEV Relays':
         return isActive
           ? 'from-green-500/60 to-green-600/30 border-green-400/80' // Relays active
@@ -44,7 +44,7 @@ const StageCard: React.FC<StageCardProps> = ({
       case 'Proposer':
         return isActive
           ? 'from-amber-500/60 to-amber-600/30 border-amber-400/80' // Proposer active
-          : 'from-amber-500/30 to-amber-600/10 border-amber-400/50'; // Proposer inactive  
+          : 'from-amber-500/30 to-amber-600/10 border-amber-400/50'; // Proposer inactive
       case 'Attesters':
         return isActive
           ? 'from-blue-500/60 to-blue-600/30 border-blue-400/80' // Attesters active
@@ -59,11 +59,16 @@ const StageCard: React.FC<StageCardProps> = ({
   // Get progress color based on title
   const getProgressColor = () => {
     switch (title) {
-      case 'Builders': return 'bg-orange-500';
-      case 'MEV Relays': return 'bg-green-500';
-      case 'Proposer': return 'bg-amber-500';
-      case 'Attesters': return 'bg-blue-500';
-      default: return 'bg-purple-500';
+      case 'Builders':
+        return 'bg-orange-500';
+      case 'MEV Relays':
+        return 'bg-green-500';
+      case 'Proposer':
+        return 'bg-amber-500';
+      case 'Attesters':
+        return 'bg-blue-500';
+      default:
+        return 'bg-purple-500';
     }
   };
 
@@ -88,12 +93,12 @@ const StageCard: React.FC<StageCardProps> = ({
             {emoji}
           </div>
         </div>
-        
+
         {/* Content section */}
         <div className="flex-1">
           <div className="font-medium text-sm">{title}</div>
           <div className="text-xs text-tertiary">{subtitle}</div>
-          
+
           {/* Progress bar (if progress is provided) */}
           {progress !== undefined && progress > 0 && (
             <div className="mt-1.5 h-1.5 w-full bg-surface/30 rounded-full overflow-hidden">
@@ -104,7 +109,7 @@ const StageCard: React.FC<StageCardProps> = ({
             </div>
           )}
         </div>
-        
+
         {/* Value indicator on the right */}
         {value && (
           <div className="text-xs font-mono text-success font-medium px-1.5 py-0.5 bg-success/10 rounded-md">
@@ -112,13 +117,9 @@ const StageCard: React.FC<StageCardProps> = ({
           </div>
         )}
       </div>
-      
+
       {/* Optional detailed content */}
-      {details && (
-        <div className="mt-2 pt-2 border-t border-subtle/10 text-xs">
-          {details}
-        </div>
-      )}
+      {details && <div className="mt-2 pt-2 border-t border-subtle/10 text-xs">{details}</div>}
     </div>
   );
 };

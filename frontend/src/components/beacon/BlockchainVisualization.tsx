@@ -321,7 +321,7 @@ const BlockchainVisualization: React.FC<BlockchainVisualizationProps> = ({
         isBuilding: isCurrentSlot, // If current slot with no data, it's likely in building phase
       };
     });
-  }, [displaySlots, slotDataStore, network, currentSlot, currentTime, currentPhase, slotData]);
+  }, [displaySlots, slotDataStore, network, currentSlot, currentPhase, slotData]);
 
   return (
     <div
@@ -349,10 +349,10 @@ const BlockchainVisualization: React.FC<BlockchainVisualizationProps> = ({
             {blockData.map(block => {
               // Hide previous and next blocks on screens below 1536px (2xl)
               // Only show them on extra large screens (>= 1536px)
-              const visibilityClassNames = !block.isCurrentSlot 
+              const visibilityClassNames = !block.isCurrentSlot
                 ? 'hidden 2xl:flex' // Hide on smaller screens, show only on 2xl screens (1536px+)
                 : 'flex'; // Always show current block
-              
+
               // Calculate flex layout based on whether this is the current slot or not
               const flexClassNames = block.isCurrentSlot
                 ? 'w-full 2xl:w-[40%]' // Full width on smaller screens, 40% on 2xl screens

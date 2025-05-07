@@ -90,11 +90,9 @@ const PhaseIcons: React.FC<PhaseIconsProps> = ({
   nodeBlockP2P,
   blockTime,
   bids,
-  winningBid,
   proposer,
   nodes = {},
   slotData,
-  firstContinentToSeeBlock,
   isLocallyBuilt = false,
 }) => {
   // Check if we need to override isLocallyBuilt based on the slotData content
@@ -268,27 +266,26 @@ const PhaseIcons: React.FC<PhaseIconsProps> = ({
         ) : (
           <>Waiting...</>
         );
-
-      case 'attester':
+      case 'attester': {
         // REQUIREMENT 3 & 4: Calculate attestation percentage based on actual data with max from the slot
-        let visibleAttestationsCount = 0;
-        let totalExpectedAttestations = 0;
+        const visibleAttestationsCount = (() => {
+          let count = 0;
+          // Count attestations that have been included up to the current time
+          if (attestationsData?.windows && Array.isArray(attestationsData.windows)) {
+            attestationsData.windows.forEach(window => {
+              // Use the same method as in the phase calculation above
+              if (window.startMs !== undefined && Number(window.startMs) <= currentTime) {
+                count += window.validatorIndices?.length || 0;
+              }
+            });
+          }
+          return count;
+        })();
 
         // Get the maximum expected attestations from the slot data
-        // Use the already extracted attestationsData variable
-        if (attestationsData?.maximumVotes) {
-          totalExpectedAttestations = Number(attestationsData.maximumVotes);
-        }
-
-        // Count attestations that have been included up to the current time
-        if (attestationsData?.windows && Array.isArray(attestationsData.windows)) {
-          attestationsData.windows.forEach((window: any) => {
-            // Use the same method as in the phase calculation above
-            if (window.startMs !== undefined && Number(window.startMs) <= currentTime) {
-              visibleAttestationsCount += window.validatorIndices?.length || 0;
-            }
-          });
-        }
+        const totalExpectedAttestations = attestationsData?.maximumVotes
+          ? Number(attestationsData.maximumVotes)
+          : 0;
 
         // Show percentage in attestation or accepted phase
         if (
@@ -304,6 +301,7 @@ const PhaseIcons: React.FC<PhaseIconsProps> = ({
         }
 
         return 'Waiting...';
+      }
 
       case 'accepted':
         if (isActiveInPhase('accepted') && attestationsData?.windows) {

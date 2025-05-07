@@ -26,11 +26,11 @@ function ForkReadiness() {
   const { config } = useConfig();
   const { baseUrl } = useApi();
   const { getBeaconClock } = useBeacon();
-  const { selectedNetwork, availableNetworks } = useNetwork();
+  const { selectedNetwork } = useNetwork();
   const [selectedUser, setSelectedUser] = useState<string>('all');
 
-  const summaryPath = config?.modules?.['xatu_public_contributors']?.path_prefix
-    ? `${config.modules['xatu_public_contributors'].path_prefix}/user-summaries/summary.json`
+  const summaryPath = config?.modules?.['xatuPublicContributors']?.pathPrefix
+    ? `${config.modules['xatuPublicContributors'].pathPrefix}/user-summaries/summary.json`
     : null;
 
   const { data: summaryData } = useDataFetch<XatuSummary>(baseUrl, summaryPath);
@@ -46,23 +46,12 @@ function ForkReadiness() {
     return ['all', ...usersWithNodes];
   }, [summaryData, selectedNetwork]);
 
-  const networks = useMemo(() => {
-    if (!config) return [];
-    return availableNetworks
-      .filter(name => config.ethereum.networks[name]?.forks?.consensus?.electra)
-      .sort((a, b) => {
-        if (a === 'mainnet') return -1;
-        if (b === 'mainnet') return 1;
-        return a.localeCompare(b);
-      });
-  }, [config, availableNetworks]);
-
   const readinessData = useMemo(() => {
     if (!summaryData || !config) {
       return [];
     }
 
-    if (!config.ethereum.networks[selectedNetwork]?.forks?.consensus?.electra) {
+    if (!config?.ethereum?.networks[selectedNetwork]?.forks?.consensus?.electra) {
       return [];
     }
 
@@ -73,7 +62,7 @@ function ForkReadiness() {
       .filter(n => n.network === selectedNetwork);
 
     const clientReadiness = Object.entries(
-      network.forks?.consensus?.electra?.min_client_versions || {},
+      network.forks?.consensus?.electra?.minClientVersions || {},
     )
       .map(([clientName, minVersion]) => {
         const clientNodes = nodes.filter(n => n.consensus_client === clientName);
@@ -118,7 +107,7 @@ function ForkReadiness() {
     const clock = getBeaconClock(selectedNetwork);
     const electraEpoch = network.forks?.consensus?.electra?.epoch || 0;
     const currentEpoch = clock?.getCurrentEpoch() || 0;
-    const epochsUntilFork = electraEpoch - currentEpoch;
+    const epochsUntilFork = Number(electraEpoch) - Number(currentEpoch);
     const timeUntilFork = epochsUntilFork * SLOTS_PER_EPOCH * 12; // 12 seconds per slot
 
     return [
@@ -139,7 +128,7 @@ function ForkReadiness() {
     return <div>Loading...</div>;
   }
 
-  if (!config.ethereum.networks[selectedNetwork]?.forks?.consensus?.electra) {
+  if (!config?.ethereum?.networks[selectedNetwork]?.forks?.consensus?.electra) {
     return (
       <div className="space-y-6">
         <Card isPrimary>

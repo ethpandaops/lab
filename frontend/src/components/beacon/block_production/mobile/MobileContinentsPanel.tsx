@@ -66,7 +66,7 @@ const MobileContinentsPanel: React.FC<MobileContinentsPanelProps> = ({
           nodesThatHaveSeenBlock: 0,
           earliestTime: Infinity,
           totalPropagationTime: 0,
-          nodesSeen: 0
+          nodesSeen: 0,
         };
       }
 
@@ -76,19 +76,19 @@ const MobileContinentsPanel: React.FC<MobileContinentsPanelProps> = ({
       const p2pTime = typeof nodeBlockP2P[nodeId] === 'number' ? nodeBlockP2P[nodeId] : Infinity;
       const apiTime = typeof nodeBlockSeen[nodeId] === 'number' ? nodeBlockSeen[nodeId] : Infinity;
       const nodeTime = Math.min(p2pTime, apiTime);
-      
+
       // Check if this node has seen the block by current time
       const hasSeen = nodeTime !== Infinity && nodeTime <= currentTime;
 
       if (hasSeen) {
         continentsMap[continentCode].nodesThatHaveSeenBlock += 1;
-        
+
         // Track the earliest time for this continent
         continentsMap[continentCode].earliestTime = Math.min(
-          continentsMap[continentCode].earliestTime, 
-          nodeTime
+          continentsMap[continentCode].earliestTime,
+          nodeTime,
         );
-        
+
         // Add to propagation time totals
         continentsMap[continentCode].totalPropagationTime += nodeTime;
         continentsMap[continentCode].nodesSeen += 1;
@@ -96,37 +96,38 @@ const MobileContinentsPanel: React.FC<MobileContinentsPanelProps> = ({
     });
 
     // Transform the data for rendering, adding derived metrics
-    return Object.entries(continentsMap)
-      .map(([code, data]) => {
-        // Calculate average propagation time if we have at least one node
-        const avgPropagationTime = data.nodesSeen > 0 
-          ? data.totalPropagationTime / data.nodesSeen 
-          : 0;
-        
-        return {
-          name: continentFullNames[code] || code,
-          code,
-          count: data.count,
-          seen: data.nodesThatHaveSeenBlock,
-          progress: data.count > 0 ? (data.nodesThatHaveSeenBlock / data.count) * 100 : 0,
-          earliestTime: data.earliestTime !== Infinity ? data.earliestTime : null,
-          avgTime: avgPropagationTime || null,
-          isFirst: code === firstContinentToSeeBlock?.toUpperCase()
-        };
-      })
-      // Sort by propagation time (earliest first) then by percentage seen
-      .sort((a, b) => {
-        // First by propagation time
-        if (a.earliestTime !== null && b.earliestTime !== null) {
-          return a.earliestTime - b.earliestTime;
-        }
-        // If one has timing data and other doesn't, prioritize the one with data
-        if (a.earliestTime !== null) return -1;
-        if (b.earliestTime !== null) return 1;
-        
-        // Otherwise sort by percentage seen
-        return b.seen - a.seen;
-      });
+    return (
+      Object.entries(continentsMap)
+        .map(([code, data]) => {
+          // Calculate average propagation time if we have at least one node
+          const avgPropagationTime =
+            data.nodesSeen > 0 ? data.totalPropagationTime / data.nodesSeen : 0;
+
+          return {
+            name: continentFullNames[code] || code,
+            code,
+            count: data.count,
+            seen: data.nodesThatHaveSeenBlock,
+            progress: data.count > 0 ? (data.nodesThatHaveSeenBlock / data.count) * 100 : 0,
+            earliestTime: data.earliestTime !== Infinity ? data.earliestTime : null,
+            avgTime: avgPropagationTime || null,
+            isFirst: code === firstContinentToSeeBlock?.toUpperCase(),
+          };
+        })
+        // Sort by propagation time (earliest first) then by percentage seen
+        .sort((a, b) => {
+          // First by propagation time
+          if (a.earliestTime !== null && b.earliestTime !== null) {
+            return a.earliestTime - b.earliestTime;
+          }
+          // If one has timing data and other doesn't, prioritize the one with data
+          if (a.earliestTime !== null) return -1;
+          if (b.earliestTime !== null) return 1;
+
+          // Otherwise sort by percentage seen
+          return b.seen - a.seen;
+        })
+    );
   }, [nodes, nodeBlockP2P, nodeBlockSeen, currentTime, firstContinentToSeeBlock]);
 
   // Show detailed view of all continents
@@ -137,7 +138,9 @@ const MobileContinentsPanel: React.FC<MobileContinentsPanelProps> = ({
           <div className="flex justify-between items-center text-xs">
             <div className="flex items-center gap-1">
               {continent.isFirst && (
-                <span title="First to see the block" className="text-[10px] mr-0.5">🥇</span>
+                <span title="First to see the block" className="text-[10px] mr-0.5">
+                  🥇
+                </span>
               )}
               {continent.name}
               {continent.earliestTime !== null && (
@@ -150,14 +153,12 @@ const MobileContinentsPanel: React.FC<MobileContinentsPanelProps> = ({
               {continent.seen}/{continent.count}
             </div>
           </div>
-          
+
           {/* Progress bar with pulse animation for active propagation */}
           <div className="h-1.5 w-full bg-surface/30 rounded-full overflow-hidden">
             <div
               className={`h-full transition-all duration-500 ease-out ${
-                continent.progress < 100 && continent.progress > 0 
-                  ? 'animate-pulse' 
-                  : ''
+                continent.progress < 100 && continent.progress > 0 ? 'animate-pulse' : ''
               }`}
               style={{
                 width: `${continent.progress}%`,
@@ -167,7 +168,7 @@ const MobileContinentsPanel: React.FC<MobileContinentsPanelProps> = ({
           </div>
         </div>
       ))}
-      
+
       {/* Global propagation summary stats */}
       {continentData.length > 0 && (
         <div className="pt-1 mt-1 border-t border-subtle/10 text-xs flex justify-between text-tertiary">
@@ -175,7 +176,8 @@ const MobileContinentsPanel: React.FC<MobileContinentsPanelProps> = ({
             Continents: {continentData.filter(c => c.seen > 0).length}/{continentData.length}
           </div>
           <div>
-            {continentData.reduce((sum, c) => sum + c.seen, 0)}/{continentData.reduce((sum, c) => sum + c.count, 0)} nodes
+            {continentData.reduce((sum, c) => sum + c.seen, 0)}/
+            {continentData.reduce((sum, c) => sum + c.count, 0)} nodes
           </div>
         </div>
       )}
