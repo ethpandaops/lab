@@ -12,6 +12,8 @@ import {
   generateConsistentColor,
   getTransformedBids,
 } from '@/components/beacon/block_production';
+import { isBlockLocallyBuilt } from '@/components/beacon/block_production/common/blockUtils';
+import { hasNonEmptyDeliveredPayloads } from '@/components/beacon/block_production/common/blockDebug';
 
 /**
  * BlockProductionLivePage visualizes the entire Ethereum block production process
@@ -416,6 +418,9 @@ export default function BlockProductionLivePage() {
     keepPreviousData: true, // Keep showing previous slot's data while loading new data
     retry: 2, // Retry failed requests twice
     enabled: slotNumber !== null,
+    onSuccess: (data) => {
+      // Data loaded successfully
+    },
   });
 
   // Simple time counter - pure React
@@ -537,15 +542,13 @@ export default function BlockProductionLivePage() {
     return null;
   }, [slotData?.relayBids, slotData?.block?.executionPayloadBlockHash]);
 
-  // Initial transformation of bids from the data
+  // Determine if a block was locally built using the enhanced method
   const isLocallyBuilt = useMemo(() => {
-    if (!slotData?.block?.payloadsDelivered || 
-        slotData.block.payloadsDelivered.length === 0 || 
-        !Array.isArray(slotData.block.payloadsDelivered)) {
-      return true;
-    }
-    return false;
-  }, [slotData?.block?.payloadsDelivered]);
+    if (!slotData) return false;
+    
+    // Check for deliveredPayloads both in block and in slotData directly
+    return !hasNonEmptyDeliveredPayloads(slotData.block, slotData);
+  }, [slotData]);
 
   const allTransformedBids = useMemo(() => {
     if (!slotData?.relayBids) return [];

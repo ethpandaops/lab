@@ -12,6 +12,8 @@ import { Phase as PhaseEnum } from '../../../components/beacon/block_production/
 import { BeaconClockManager } from '../../../utils/beacon';
 import { ChevronLeft, ChevronRight, Play, Pause } from 'lucide-react';
 import NetworkContext from '@/contexts/NetworkContext';
+import { isBlockLocallyBuilt } from '@/components/beacon/block_production/common/blockUtils';
+import { hasNonEmptyDeliveredPayloads } from '@/components/beacon/block_production/common/blockDebug';
 
 // Simple hash function to generate a color from a string (e.g., relay name)
 const generateConsistentColor = (str: string): string => {
@@ -114,15 +116,7 @@ export default function BlockProductionSlotPage() {
     retry: 2, // Retry failed requests twice
     enabled: slotNumber !== null,
     onSuccess: (data) => {
-      if (data?.block) {
-        console.log('Block data:', data.block);
-        if ('delivered_payloads' in data.block) {
-          console.log('delivered_payloads found:', data.block.delivered_payloads);
-        }
-        if ('deliveredPayloads' in data.block) {
-          console.log('deliveredPayloads found:', data.block.deliveredPayloads);
-        }
-      }
+      // Got slot data
     },
   });
 
@@ -388,8 +382,7 @@ export default function BlockProductionSlotPage() {
               block={displayData.block}
               slotData={displayData}
               network={selectedNetwork || 'mainnet'}
-              isLocallyBuilt={!displayData.block?.deliveredPayloads || 
-                            Object.keys(displayData.block?.deliveredPayloads || {}).length === 0}
+              isLocallyBuilt={displayData ? !hasNonEmptyDeliveredPayloads(displayData.block, displayData) : false}
             />
           </div>
 
@@ -444,7 +437,10 @@ export default function BlockProductionSlotPage() {
                   : {}
               }
               block={displayData.block}
-              slotData={{[slotNumber || 0]: displayData}} // Pass slotData as an object keyed by slotNumber
+              slotData={displayData} // Pass slotData directly
+              // For debugging:
+              // eslint-disable-next-line
+              dummy={console.log('Desktop slotData format:', displayData)}
               timeRange={timeRange}
               valueRange={valueRange}
               onPhaseChange={handlePhaseChange}
@@ -459,8 +455,7 @@ export default function BlockProductionSlotPage() {
               togglePlayPause={togglePlayPause}
               isNextDisabled={false}
               network={selectedNetwork || 'mainnet'}
-              isLocallyBuilt={!displayData.block?.deliveredPayloads || 
-                            Object.keys(displayData.block?.deliveredPayloads || {}).length === 0}
+              isLocallyBuilt={displayData ? !hasNonEmptyDeliveredPayloads(displayData.block, displayData) : false}
             />
           </div>
         </div>

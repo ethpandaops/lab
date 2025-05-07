@@ -141,6 +141,8 @@ const DesktopBlockProductionView: React.FC<DesktopBlockProductionViewProps> = ({
     return false;
   };
 
+  // No debug needed
+  
   // Get the current phase
   const currentPhase = useMemo(() => {
     return getCurrentPhase(currentTime, nodeBlockSeen || {}, nodeBlockP2P || {}, blockTime);
