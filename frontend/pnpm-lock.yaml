@@ -123,9 +123,6 @@ importers:
       '@types/css-mediaquery':
         specifier: 0.1.4
         version: 0.1.4
-      '@types/js-yaml':
-        specifier: 4.0.9
-        version: 4.0.9
       '@types/react':
         specifier: 19.1.2
         version: 19.1.2
@@ -174,9 +171,6 @@ importers:
       husky:
         specifier: 9.0.11
         version: 9.0.11
-      js-yaml:
-        specifier: 4.1.0
-        version: 4.1.0
       jsdom:
         specifier: 26.1.0
         version: 26.1.0
@@ -1634,9 +1628,6 @@ packages:
 
   '@types/history@4.7.11':
     resolution: {integrity: sha512-qjDJRrmvBMiTx+jyLxvLfJU7UznFuokDv4f3WRuriHKERccVpFU+8XMQUAbDzoiJCsmexxRExQeMwwCdamSKDA==}
-
-  '@types/js-yaml@4.0.9':
-    resolution: {integrity: sha512-k4MGaQl5TGo/iipqb2UDG2UwjXziSWkh0uysQelTlJpX1qGlpUZYm8PnO4DxG1qBomtJUdYJ6qR6xdIah10JLg==}
 
   '@types/json-schema@7.0.15':
     resolution: {integrity: sha512-5+fP8P8MFNC+AyZCDxrB2pkZFPGzqQWUzpSeuuVLvm8VMcorNYavBqoFcxK8bQz4Qsbn4oUEEem4wDLfcysGHA==}
@@ -5812,8 +5803,6 @@ snapshots:
   '@types/geojson@7946.0.16': {}
 
   '@types/history@4.7.11': {}
-
-  '@types/js-yaml@4.0.9': {}
 
   '@types/json-schema@7.0.15': {}
 
