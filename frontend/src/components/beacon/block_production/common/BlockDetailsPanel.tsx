@@ -20,6 +20,7 @@ interface BlockDetailsPanelProps {
     relayName: string;
     builderName?: string;
   }>;
+  isLocallyBuilt?: boolean;
 }
 
 /**
@@ -38,6 +39,7 @@ const BlockDetailsPanel: React.FC<BlockDetailsPanelProps> = ({
   blockValue,
   futureBidsCount,
   futureBids,
+  isLocallyBuilt = false,
 }) => {
   // Normalize the block data to handle different field naming conventions
   const normalizedBlock = React.useMemo(() => normalizeBlockData(block), [block]);
@@ -156,10 +158,18 @@ const BlockDetailsPanel: React.FC<BlockDetailsPanelProps> = ({
           isCurrentSlot={isCurrentSlot}
           isFuture={isFuture}
           futureBids={futureBids}
+          isLocallyBuilt={isLocallyBuilt}
         />
       </div>
     );
   }
+
+  // Debug the values
+  console.log('BlockDetailsPanel - isLocallyBuilt:', isLocallyBuilt);
+  console.log('BlockDetailsPanel - proposerEntity:', proposerEntity);
+  console.log('BlockDetailsPanel - isPast:', isPast);
+  console.log('BlockDetailsPanel - isBuilding:', isBuilding);
+  console.log('BlockDetailsPanel - isFuture:', isFuture);
 
   return (
     <div className={`${getContainerClasses()} border ${getBorderColor()}`}>
@@ -192,6 +202,7 @@ const BlockDetailsPanel: React.FC<BlockDetailsPanelProps> = ({
           isCurrentSlot={isCurrentSlot}
           isFuture={isFuture}
           futureBids={futureBids}
+          isLocallyBuilt={isLocallyBuilt}
         />
       )}
     </div>

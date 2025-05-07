@@ -527,6 +527,15 @@ export default function BlockProductionLivePage() {
   }, [slotData?.relayBids, slotData?.block?.executionPayloadBlockHash]);
 
   // Initial transformation of bids from the data
+  const isLocallyBuilt = useMemo(() => {
+    if (!slotData?.block?.payloadsDelivered || 
+        slotData.block.payloadsDelivered.length === 0 || 
+        !Array.isArray(slotData.block.payloadsDelivered)) {
+      return true;
+    }
+    return false;
+  }, [slotData?.block?.payloadsDelivered]);
+
   const allTransformedBids = useMemo(() => {
     if (!slotData?.relayBids) return [];
 
@@ -670,6 +679,7 @@ export default function BlockProductionLivePage() {
               togglePlayPause={togglePlayPause}
               isNextDisabled={isNextDisabled}
               network={selectedNetwork} // Pass network to MobileBlockProductionView
+              isLocallyBuilt={isLocallyBuilt}
             />
           </div>
         </div>
@@ -724,6 +734,7 @@ export default function BlockProductionLivePage() {
               togglePlayPause={togglePlayPause}
               isNextDisabled={isNextDisabled}
               network={selectedNetwork} // Pass network to DesktopBlockProductionView
+              isLocallyBuilt={isLocallyBuilt}
             />
           </div>
         </div>

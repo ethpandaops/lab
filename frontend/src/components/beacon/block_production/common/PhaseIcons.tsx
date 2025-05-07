@@ -26,6 +26,7 @@ interface PhaseIconsProps {
   nodes?: Record<string, any>;
   slotData?: any;
   firstContinentToSeeBlock?: string | null;
+  isLocallyBuilt?: boolean;
 }
 
 const PhaseIcons: React.FC<PhaseIconsProps> = ({
@@ -39,6 +40,7 @@ const PhaseIcons: React.FC<PhaseIconsProps> = ({
   nodes = {},
   slotData,
   firstContinentToSeeBlock,
+  isLocallyBuilt = false,
 }) => {
   // Get attestation data for phase calculation - using startMs instead of inclusionDelay
   const attestationsCount =
@@ -228,7 +230,7 @@ const PhaseIcons: React.FC<PhaseIconsProps> = ({
           className={`flex flex-col items-center text-center transition-opacity duration-300 ${isActiveInPhase('proposer') ? 'opacity-100' : 'opacity-60'}`}
         >
           <div
-            className={`w-14 h-14 flex items-center justify-center rounded-full mb-1.5 shadow-md transition-colors duration-300 ${
+            className={`w-14 h-14 flex items-center justify-center rounded-full mb-1.5 shadow-md transition-colors duration-300 relative ${
               isActiveInPhase('proposer')
                 ? 'bg-gradient-to-br from-amber-500/60 to-amber-600/30 border-2 border-amber-400/80' // Active
                 : currentPhase === Phase.Attesting || currentPhase === Phase.Accepted
@@ -236,6 +238,18 @@ const PhaseIcons: React.FC<PhaseIconsProps> = ({
                   : 'bg-surface border border-border/80' // Not yet active
             }`}
           >
+            {isLocallyBuilt && 
+              blockTime !== undefined && 
+              currentPhase !== Phase.Building && 
+              isActiveInPhase('proposer') && (
+              <div
+                className="absolute -top-6 left-1/2 transform -translate-x-1/2 text-3xl z-10"
+                role="img"
+                aria-label="Locally Built Crown"
+              >
+                👑
+              </div>
+            )}
             <div
               className={`text-2xl ${isActiveInPhase('proposer') ? 'opacity-90' : 'opacity-50'}`}
               role="img"
