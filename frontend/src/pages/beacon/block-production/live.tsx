@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useContext, useMemo, useRef } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { useParams, useSearchParams } from 'react-router-dom';
 import { getLabApiClient } from '../../../api';
 import { GetSlotDataRequest } from '../../../api/gen/backend/pkg/api/proto/lab_api_pb';
 import { BeaconClockManager } from '../../../utils/beacon';
@@ -20,14 +19,8 @@ import { isBlockLocallyBuilt, hasNonEmptyDeliveredPayloads } from '@/components/
  * The visualization tracks the flow of blocks through the system in real-time.
  */
 export default function BlockProductionLivePage() {
-  // Get network from both URL params and NetworkContext
-  const { network: networkParam } = useParams<{ network?: string }>();
-  const [searchParams] = useSearchParams();
-  const { selectedNetwork: contextNetwork } = useContext(NetworkContext);
-  
-  // Priority: 1. URL param 2. Search param 3. NetworkContext 4. Default to mainnet
-  const networkFromUrl = networkParam || searchParams.get('network');
-  const selectedNetwork = networkFromUrl || contextNetwork || 'mainnet';
+  // Use network directly from NetworkContext - App.tsx handles URL updates
+  const { selectedNetwork } = useContext(NetworkContext);
   const queryClient = useQueryClient();
 
   // Add state to handle screen size with more granular breakpoints
@@ -61,7 +54,6 @@ export default function BlockProductionLivePage() {
   const isMobile = viewMode !== 'desktop';
 
   // Use BeaconClockManager for slot timing
-  const networkContext = useContext(NetworkContext);
   const beaconClockManager = BeaconClockManager.getInstance();
   const clock = beaconClockManager.getBeaconClock(selectedNetwork);
 
@@ -90,7 +82,7 @@ export default function BlockProductionLivePage() {
       
       // Invalidate queries for the previous network to force refetching
       queryClient.invalidateQueries({
-        queryKey: ['block-production-live', 'slot', selectedNetwork]
+        queryKey: ['block-production-live', 'slot']
       });
     }
   }, [selectedNetwork, beaconClockManager, queryClient]);

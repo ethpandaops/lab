@@ -32,9 +32,9 @@ const generateConsistentColor = (str: string): string => {
  * This component can be linked to with a specific time parameter.
  */
 export default function BlockProductionSlotPage() {
-  const { network, slot: slotParam } = useParams<{ network?: string; slot?: string }>();
-  const selectedNetwork = network || 'mainnet'; // Default to mainnet if no network param
+  const { slot: slotParam } = useParams<{ slot?: string }>();
   const [searchParams] = useSearchParams();
+  const { selectedNetwork } = useContext(NetworkContext);
   const queryClient = useQueryClient();
 
   // Initial time value from URL query parameter, default to 0
