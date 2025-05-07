@@ -1,7 +1,7 @@
 import { Routes, Route, Outlet, useSearchParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { getConfig } from '@/config';
-import type { Config } from '@/types';
+import { GetConfigResponse } from '@/api/gen/backend/pkg/server/proto/lab/lab_pb';
 import { LoadingState } from '@/components/common/LoadingState';
 import { ErrorState } from '@/components/common/ErrorState';
 import { BeaconClockManager } from '@/utils/beacon.ts';
@@ -33,7 +33,7 @@ import NetworkContext from '@/contexts/NetworkContext';
 import ConfigContext from '@/contexts/ConfigContext';
 
 function App() {
-  const [config, setConfig] = useState<Config | null>(null);
+  const [config, setConfig] = useState<GetConfigResponse | null>(null);
   const [configError, setConfigError] = useState<Error | null>(null);
   const [selectedNetwork, setSelectedNetwork] = useState('mainnet');
   const [searchParams, setSearchParams] = useSearchParams();
@@ -115,7 +115,10 @@ function App() {
                 </Route>
                 <Route path="locally-built-blocks" element={<LocallyBuiltBlocks />} />
                 <Route path="mev_relays/live" element={<MevRelaysLivePage />} />
-                <Route path="block-production" element={<Redirect to="/beacon/block-production/live" />} />
+                <Route
+                  path="block-production"
+                  element={<Redirect to="/beacon/block-production/live" />}
+                />
                 <Route path="block-production/live" element={<BlockProductionLivePage />} />
                 <Route path="block-production/:slot" element={<BlockProductionSlotPage />} />
               </Route>

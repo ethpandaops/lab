@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from 'react';
+import { useContext, useState, useEffect } from 'react';
 import { useDataFetch } from '@/utils/data.ts';
 import ConfigContext from '@/contexts/ConfigContext';
 import NetworkContext from '@/contexts/NetworkContext';
@@ -131,7 +131,7 @@ const GeographicalChecklist = () => {
     if (hasChanges) {
       setExpandedContinents(newExpandedContinents);
     }
-  }, [searchTerm, summaryData, selectedNetwork]);
+  }, [searchTerm, summaryData, selectedNetwork, expandedContinents]);
 
   // Handle loading and error states
   if (loading) return <LoadingState message="Loading geographical data..." />;

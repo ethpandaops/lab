@@ -528,9 +528,11 @@ export default function BlockProductionLivePage() {
 
   // Initial transformation of bids from the data
   const isLocallyBuilt = useMemo(() => {
-    if (!slotData?.block?.payloadsDelivered || 
-        slotData.block.payloadsDelivered.length === 0 || 
-        !Array.isArray(slotData.block.payloadsDelivered)) {
+    if (
+      !slotData?.block?.payloadsDelivered ||
+      slotData.block.payloadsDelivered.length === 0 ||
+      !Array.isArray(slotData.block.payloadsDelivered)
+    ) {
       return true;
     }
     return false;

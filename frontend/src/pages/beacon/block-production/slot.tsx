@@ -1,17 +1,13 @@
-import React, { useState, useEffect, useContext, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useParams, useSearchParams } from 'react-router-dom';
-import { getLabApiClient } from '../../../api';
-import { GetSlotDataRequest } from '../../../api/gen/backend/pkg/api/proto/lab_api_pb';
+import { getLabApiClient } from '@/api';
+import { GetSlotDataRequest } from '@/api/gen/backend/pkg/api/proto/lab_api_pb';
 import {
   MobileBlockProductionView,
   DesktopBlockProductionView,
-  Phase,
-} from '../../../components/beacon/block_production';
-import { Phase as PhaseEnum } from '../../../components/beacon/block_production/common/types';
-import { BeaconClockManager } from '../../../utils/beacon';
-import { ChevronLeft, ChevronRight, Play, Pause } from 'lucide-react';
-import NetworkContext from '@/contexts/NetworkContext';
+} from '@/components/beacon/block_production';
+import { Phase as PhaseEnum } from '@/components/beacon/block_production/common/types';
 
 // Simple hash function to generate a color from a string (e.g., relay name)
 const generateConsistentColor = (str: string): string => {
@@ -34,7 +30,6 @@ export default function BlockProductionSlotPage() {
   const { network, slot: slotParam } = useParams<{ network?: string; slot?: string }>();
   const selectedNetwork = network || 'mainnet'; // Default to mainnet if no network param
   const [searchParams] = useSearchParams();
-  const queryClient = useQueryClient();
 
   // Initial time value from URL query parameter, default to 0
   // Check both 'time' and 't' parameters for backward compatibility
@@ -62,12 +57,11 @@ export default function BlockProductionSlotPage() {
   }, []);
 
   // Convert slot param to a number
-  const slotNumber = slotParam ? parseInt(slotParam, 10) : null;
+  const slotNumber = slotParam ? parseInt(slotParam) : null;
 
   // Handle time management
   const [currentTime, setCurrentTime] = useState<number>(initialTimeMs);
   const [isPlaying, setIsPlaying] = useState<boolean>(false); // Start paused since we're showing a specific time
-  const [currentPhase, setCurrentPhase] = useState<Phase>(Phase.Building);
 
   // Navigation functions - defined early to avoid reference errors
   const goToPreviousSlot = () => {
@@ -128,11 +122,6 @@ export default function BlockProductionSlotPage() {
 
     return () => clearInterval(interval);
   }, [isPlaying, slotNumber]);
-
-  // Handle phase changes
-  const handlePhaseChange = (phase: Phase) => {
-    setCurrentPhase(phase);
-  };
 
   // --- Data Transformation ---
 
@@ -282,8 +271,8 @@ export default function BlockProductionSlotPage() {
   };
 
   // Create a local copy to prepare with attestation data
-  let preparedData = slotData ? { ...slotData } : { ...fallbackData };
-  
+  const preparedData = slotData ? { ...slotData } : { ...fallbackData };
+
   // When viewing a specific slot directly, inject time-appropriate attestation data
   // This ensures the phase transitions work correctly based on the time parameter
   if (initialTimeMs >= 6500) {
@@ -294,31 +283,31 @@ export default function BlockProductionSlotPage() {
         windows: [
           {
             startMs: 6500,
-            validatorIndices: Array(10).fill(0)  // 10 attesters initially
-          }
-        ]
+            validatorIndices: Array(10).fill(0), // 10 attesters initially
+          },
+        ],
       };
     }
-    
+
     // Add more attestations if we're past 8.5 seconds to trigger the Accepted phase
     if (initialTimeMs >= 8500 && preparedData.attestations) {
       // Only add if it doesn't already have attestations at this time point
       const hasLateAttestations = preparedData.attestations.windows?.some(
-        (window: any) => window.startMs >= 8500
+        (window: any) => window.startMs >= 8500,
       );
-      
+
       if (!hasLateAttestations) {
         preparedData.attestations.windows.push({
           startMs: 8500,
-          validatorIndices: Array(60).fill(0)  // 60 more attesters at 8.5s (total 70 = 70% of maximumVotes)
+          validatorIndices: Array(60).fill(0), // 60 more attesters at 8.5s (total 70 = 70% of maximumVotes)
         });
       }
     }
   }
-  
+
   // Use the prepared data for display
   const displayData = preparedData;
-  
+
   // Force the current phase based on time for the UI to display correctly
   useEffect(() => {
     if (initialTimeMs >= 8500) {
@@ -336,7 +325,6 @@ export default function BlockProductionSlotPage() {
 
   return (
     <div className="flex flex-col h-full">
-
       {/* Conditionally render mobile or desktop view based on screen size */}
       {isMobile ? (
         // Mobile View
@@ -429,7 +417,7 @@ export default function BlockProductionSlotPage() {
                   : {}
               }
               block={displayData.block}
-              slotData={{[slotNumber || 0]: displayData}} // Pass slotData as an object keyed by slotNumber
+              slotData={{ [slotNumber || 0]: displayData }} // Pass slotData as an object keyed by slotNumber
               timeRange={timeRange}
               valueRange={valueRange}
               onPhaseChange={handlePhaseChange}
@@ -444,9 +432,11 @@ export default function BlockProductionSlotPage() {
               togglePlayPause={togglePlayPause}
               isNextDisabled={false}
               network={selectedNetwork || 'mainnet'}
-              isLocallyBuilt={!displayData.block?.payloadsDelivered ||
-                             !Array.isArray(displayData.block?.payloadsDelivered) ||
-                             displayData.block?.payloadsDelivered.length === 0}
+              isLocallyBuilt={
+                !displayData.block?.payloadsDelivered ||
+                !Array.isArray(displayData.block?.payloadsDelivered) ||
+                displayData.block?.payloadsDelivered.length === 0
+              }
             />
           </div>
         </div>

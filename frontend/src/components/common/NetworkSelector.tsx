@@ -4,7 +4,7 @@ import { ChevronUpDownIcon } from '@heroicons/react/24/outline';
 import clsx from 'clsx';
 import { getConfig } from '@/config';
 import { useEffect, useState, useRef } from 'react';
-import type { Config } from '@/types';
+import { GetConfigResponse } from '@/api/gen/backend/pkg/server/proto/lab/lab_pb';
 import { NETWORK_METADATA, type NetworkKey } from '@/constants/networks.tsx';
 
 interface NetworkSelectorProps {
@@ -62,8 +62,8 @@ export function NetworkSelector({
   onNetworkChange,
   availableNetworks = [],
   className = '',
-}: NetworkSelectorProps): JSX.Element {
-  const [config, setConfig] = useState<Config>();
+}: NetworkSelectorProps) {
+  const [config, setConfig] = useState<GetConfigResponse>();
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {

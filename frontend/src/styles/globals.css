@@ -28,18 +28,31 @@
   background: rgb(var(--bg-hover));
 }
 
-/* Firefox */
-* {
-  scrollbar-width: thin;
-  scrollbar-color: rgb(var(--border-subtle)) rgb(var(--bg-surface));
+/* Firefox - with @supports check */
+@supports (scrollbar-width: thin) {
+  * {
+    scrollbar-width: thin;
+  }
+}
+
+/* Firefox - scrollbar color with separate @supports check */
+@supports (scrollbar-color: auto) {
+  * {
+    scrollbar-color: rgb(var(--border-subtle)) rgb(var(--bg-surface));
+  }
 }
 
 /* Hide scrollbar class */
 .scrollbar-hide {
   -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
+}
+
+@supports (scrollbar-width: none) {
+  .scrollbar-hide {
+    scrollbar-width: none;
+  }
 }
 
 .scrollbar-hide::-webkit-scrollbar {
   display: none;  /* Chrome, Safari and Opera */
-} 
+}

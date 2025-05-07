@@ -12,7 +12,7 @@ import {
 import { NivoLineChart } from '@/components/charts';
 import { useSearchParams } from 'react-router-dom';
 import { getConfig } from '@/config';
-import type { Config } from '@/types';
+import { GetConfigResponse } from '@/api/gen/backend/pkg/server/proto/lab/lab_pb';
 
 interface TimingData {
   timestamps: number[];
@@ -79,7 +79,7 @@ const BLOCK_TYPE_DESCRIPTIONS = {
 
 export const BlockTimings: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const [config, setConfig] = useState<Config | null>(null);
+  const [config, setConfig] = useState<GetConfigResponse | null>(null);
   const [configLoading, setConfigLoading] = useState(true);
   const [configError, setConfigError] = useState<Error | undefined>();
   const [isTimeWindowOpen, setIsTimeWindowOpen] = useState(false);
@@ -90,7 +90,7 @@ export const BlockTimings: React.FC = () => {
 
   const timeWindows = useMemo<TimeWindowConfig[]>(() => {
     const moduleConfig = config?.modules?.['beacon_chain_timings'];
-    return moduleConfig?.time_windows || DEFAULT_TIME_WINDOWS;
+    return moduleConfig?.timeWindows || DEFAULT_TIME_WINDOWS;
   }, [config]);
 
   const defaultTimeWindow = useMemo(() => timeWindows[0]?.file || 'last_30_days', [timeWindows]);
@@ -136,12 +136,12 @@ export const BlockTimings: React.FC = () => {
   }, [timeWindows, timeWindow]);
 
   // Skip data fetching if config isn't loaded
-  const timingsPath = config?.modules?.['beacon_chain_timings']?.path_prefix
-    ? `${config.modules['beacon_chain_timings'].path_prefix}/block_timings/${network}/${timeWindow}`
+  const timingsPath = config?.modules?.['beacon_chain_timings']?.pathPrefix
+    ? `${config.modules['beacon_chain_timings'].pathPrefix}/block_timings/${network}/${timeWindow}`
     : null;
 
-  const cdfPath = config?.modules?.['beacon_chain_timings']?.path_prefix
-    ? `${config.modules['beacon_chain_timings'].path_prefix}/size_cdf/${network}/${timeWindow}`
+  const cdfPath = config?.modules?.['beacon_chain_timings']?.pathPrefix
+    ? `${config.modules['beacon_chain_timings'].pathPrefix}/size_cdf/${network}/${timeWindow}`
     : null;
 
   const { data: timingData, loading, error } = useDataFetch<TimingData>(timingsPath);
@@ -262,12 +262,15 @@ export const BlockTimings: React.FC = () => {
     return ['All Blocks', 'MEV Blocks', 'Non-MEV Blocks', 'Solo MEV Blocks', 'Solo Non-MEV Blocks'];
   };
 
-  const dataKeyMap: Record<string, string> = {
-    [PERCENTILE_KEYS.p95]: 'p95',
-    [PERCENTILE_KEYS.p50]: 'p50',
-    [PERCENTILE_KEYS.p05]: 'p05',
-    [PERCENTILE_KEYS.min]: 'min',
-  };
+  const dataKeyMap = useMemo<Record<string, string>>(
+    () => ({
+      [PERCENTILE_KEYS.p95]: 'p95',
+      [PERCENTILE_KEYS.p50]: 'p50',
+      [PERCENTILE_KEYS.p05]: 'p05',
+      [PERCENTILE_KEYS.min]: 'min',
+    }),
+    [],
+  );
 
   const lineNames = Object.keys(dataKeyMap) as PercentileKey[];
 

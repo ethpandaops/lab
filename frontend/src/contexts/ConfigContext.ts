@@ -1,5 +1,5 @@
 import { createContext } from 'react';
 
-import type { Config } from '@/types';
+import { GetConfigResponse } from '@/api/gen/backend/pkg/server/proto/lab/lab_pb';
 
-export default createContext<Config | null>(null);
+export default createContext<GetConfigResponse | null>(null);

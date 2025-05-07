@@ -93,7 +93,8 @@ const BlockchainVisualization: React.FC<BlockchainVisualizationProps> = ({
 
       // Only show building/pending for future slots and for current slot in Building phase
       // But if slotData is directly provided for the current slot, don't mark as building
-      const isBuilding = isFuture || (isCurrentSlot && currentPhase === Phase.Building && !slotData?.[slot]);
+      const isBuilding =
+        isFuture || (isCurrentSlot && currentPhase === Phase.Building && !slotData?.[slot]);
 
       // If we have data for this slot, extract relevant information
       if (slotDataForSlot) {
@@ -165,10 +166,11 @@ const BlockchainVisualization: React.FC<BlockchainVisualizationProps> = ({
         const deliveredRelays: string[] = slotDataForSlot.deliveredPayloads
           ? Object.keys(slotDataForSlot.deliveredPayloads)
           : [];
-        
-        const isLocallyBuilt = !slotDataForSlot.block?.payloadsDelivered ||
-                               !Array.isArray(slotDataForSlot.block?.payloadsDelivered) ||
-                               slotDataForSlot.block?.payloadsDelivered.length === 0;
+
+        const isLocallyBuilt =
+          !slotDataForSlot.block?.payloadsDelivered ||
+          !Array.isArray(slotDataForSlot.block?.payloadsDelivered) ||
+          slotDataForSlot.block?.payloadsDelivered.length === 0;
 
         // Get block value from winning bid if available
         let winningBid = null;

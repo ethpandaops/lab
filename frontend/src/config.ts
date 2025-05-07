@@ -1,4 +1,4 @@
-import { Config } from '@/types';
+import { GetConfigResponse } from '@/api/gen/backend/pkg/server/proto/lab/lab_pb';
 
 const isDev = import.meta.env.DEV;
 const backendOverride = import.meta.env.VITE_BACKEND_URL;
@@ -29,18 +29,14 @@ async function loadBootstrapConfig(): Promise<BootstrapConfig> {
     };
   }
 
-  try {
-    const response = await fetch('/bootstrap.json');
-    if (!response.ok) {
-      throw new Error(`Failed to load bootstrap config: ${response.statusText}`);
-    }
-    return await response.json();
-  } catch (error) {
-    throw error;
+  const response = await fetch('/bootstrap.json');
+  if (!response.ok) {
+    throw new Error(`Failed to load bootstrap config: ${response.statusText}`);
   }
+  return await response.json();
 }
 
-async function loadRemoteConfig(bootstrapConfig: BootstrapConfig): Promise<Config> {
+async function loadRemoteConfig(bootstrapConfig: BootstrapConfig): Promise<GetConfigResponse> {
   try {
     const response = await fetch(`${bootstrapConfig.backend.url}/config.json`);
     if (!response.ok) {
@@ -54,9 +50,9 @@ async function loadRemoteConfig(bootstrapConfig: BootstrapConfig): Promise<Confi
 }
 
 let bootstrapConfig: BootstrapConfig | null = null;
-let remoteConfig: Config | null = null;
+let remoteConfig: GetConfigResponse | null = null;
 
-export async function getConfig(): Promise<Config> {
+export async function getConfig(): Promise<GetConfigResponse> {
   // Step 1: Load bootstrap config if not already loaded
   if (!bootstrapConfig) {
     bootstrapConfig = await loadBootstrapConfig();
