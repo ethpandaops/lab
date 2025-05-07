@@ -14,7 +14,7 @@ export interface SlotData {
 class SlotDataStore {
   private static instance: SlotDataStore;
   private slotDataCache: Map<string, SlotData> = new Map();
-  private maxCacheSize: number = 30; // Store data for up to 30 slots
+  private maxCacheSize: number = 5; // Store data for up to 5 slots
   private maxAgeMs: number = 5 * 60 * 1000; // 5 minutes
 
   // Private constructor for singleton
