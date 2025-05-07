@@ -226,6 +226,7 @@ const MobileBlockProductionView: React.FC<MobileBlockProductionViewProps> = ({
           blockTime={blockTime}
           attestationsCount={attestationsCount}
           totalExpectedAttestations={totalExpectedAttestations}
+          slotData={slotData}
           // Navigation controls
           slotNumber={slotNumber}
           headLagSlots={headLagSlots}

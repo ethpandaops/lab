@@ -13,6 +13,7 @@ interface MobileTimelineBarProps {
   blockTime?: number;
   attestationsCount?: number;
   totalExpectedAttestations?: number;
+  slotData?: any; // Add slot data for more accurate phase transitions
 
   // Navigation controls
   slotNumber: number | null;
@@ -33,6 +34,7 @@ const MobileTimelineBar: React.FC<MobileTimelineBarProps> = ({
   blockTime,
   attestationsCount = 0,
   totalExpectedAttestations = 0,
+  slotData,
   // Navigation controls
   slotNumber,
   headLagSlots,
@@ -93,13 +95,17 @@ const MobileTimelineBar: React.FC<MobileTimelineBarProps> = ({
     return { phaseText: text, phaseColors: colorClass };
   }, [currentPhase]);
 
-  // Calculate phase transition times
+  // Calculate phase transition times dynamically from real data when available
   const { transitionTimes, phaseWidths } = useMemo(() => {
-    // Start with default transition times
-    let propagationTime = 5000; // Default
-    const attestationTime = ATTESTATION_DEFAULT_TIME;
-    const acceptanceTime = ACCEPTANCE_DEFAULT_TIME;
-
+    const slotDuration = 12000; // 12 seconds in ms
+    
+    // Find the actual phase transition times from the data
+    let propagationTime: number | null = null; // When any node first sees the block
+    let attestationTime: number | null = null; // When first attestation is received
+    let acceptanceTime: number | null = null;  // When 66% attestations are received
+    
+    // --- Find propagation transition time (when block first propagates) ---
+    
     // Try to find earliest node timing from available data
     let earliestNodeTime = Infinity;
 
@@ -117,27 +123,99 @@ const MobileTimelineBar: React.FC<MobileTimelineBarProps> = ({
       }
     });
 
-    // If we have real timing data, use it as propagation time
+    // If we have actual block data, use it
     if (earliestNodeTime !== Infinity) {
       propagationTime = earliestNodeTime;
-    } else if (blockTime) {
-      // If we have block time but no node data, use block time
+    } else if (blockTime !== undefined) {
       propagationTime = blockTime;
+    } else {
+      // Fallback to default if no real data
+      propagationTime = PROPAGATION_DEFAULT_TIME;
     }
-
-    const slotDuration = 12000; // 12 seconds in ms
-
+    
+    // --- Find attestation transition time ---
+    
+    // Look for first attestation in the data if available
+    if (slotData?.attestations?.windows && Array.isArray(slotData.attestations.windows)) {
+      // Sort windows by time to find the earliest attestation
+      const sortedWindows = [...slotData.attestations.windows].sort((a, b) => {
+        return Number(a.startMs || Infinity) - Number(b.startMs || Infinity);
+      });
+      
+      // Find first window with attestations
+      for (const window of sortedWindows) {
+        if (window.startMs !== undefined && 
+            window.validatorIndices?.length && 
+            window.validatorIndices.length > 0) {
+          attestationTime = Number(window.startMs);
+          break;
+        }
+      }
+    }
+    
+    // Use default attestation time if no data
+    if (attestationTime === null) {
+      // If propagation time is known, make attestation time relative to it
+      if (propagationTime !== null) {
+        attestationTime = propagationTime + 1500; // 1.5s after propagation
+      } else {
+        attestationTime = ATTESTATION_DEFAULT_TIME;
+      }
+    }
+    
+    // --- Find acceptance transition time (66% attestations) ---
+    
+    // Check for 66% attestation threshold in data
+    if (slotData?.attestations?.windows && 
+        Array.isArray(slotData.attestations.windows) && 
+        totalExpectedAttestations > 0) {
+      
+      const threshold = Math.ceil(totalExpectedAttestations * 0.66);
+      let cumulativeAttestations = 0;
+      
+      // Sort windows by time
+      const sortedWindows = [...slotData.attestations.windows].sort((a, b) => {
+        return Number(a.startMs || Infinity) - Number(b.startMs || Infinity);
+      });
+      
+      // Find when attestations reach 66%
+      for (const window of sortedWindows) {
+        if (window.startMs !== undefined && window.validatorIndices?.length) {
+          cumulativeAttestations += window.validatorIndices.length;
+          
+          if (cumulativeAttestations >= threshold) {
+            acceptanceTime = Number(window.startMs);
+            break;
+          }
+        }
+      }
+    }
+    
+    // Use default acceptance time if no data
+    if (acceptanceTime === null) {
+      if (attestationTime !== null) {
+        acceptanceTime = attestationTime + 2000; // 2s after attestation
+      } else {
+        acceptanceTime = ACCEPTANCE_DEFAULT_TIME;
+      }
+    }
+    
+    // Ensure transitions are in proper order and within slot duration
+    propagationTime = Math.min(Math.max(propagationTime, 1000), slotDuration - 3000); 
+    attestationTime = Math.min(Math.max(attestationTime, propagationTime + 500), slotDuration - 2000);
+    acceptanceTime = Math.min(Math.max(acceptanceTime, attestationTime + 500), slotDuration - 1000);
+    
     // Calculate the percentages for each phase
-    const propagationPercent = Math.min(90, Math.max(10, (propagationTime / slotDuration) * 100));
-    const attestationPercent = Math.min(90, Math.max(10, (attestationTime / slotDuration) * 100));
-    const acceptancePercent = Math.min(95, Math.max(10, (acceptanceTime / slotDuration) * 100));
-
+    const propagationPercent = (propagationTime / slotDuration) * 100;
+    const attestationPercent = (attestationTime / slotDuration) * 100;
+    const acceptancePercent = (acceptanceTime / slotDuration) * 100;
+    
     // Calculate widths for each phase section
     const buildingWidth = propagationPercent;
     const propagatingWidth = attestationPercent - propagationPercent;
     const attestingWidth = acceptancePercent - attestationPercent;
     const acceptedWidth = 100 - acceptancePercent;
-
+    
     return {
       transitionTimes: {
         propagation: propagationTime,
@@ -151,7 +229,7 @@ const MobileTimelineBar: React.FC<MobileTimelineBarProps> = ({
         accepted: acceptedWidth
       }
     };
-  }, [nodeBlockSeen, nodeBlockP2P, blockTime]);
+  }, [nodeBlockSeen, nodeBlockP2P, blockTime, slotData, attestationsCount, totalExpectedAttestations]);
 
   return (
     <div className="p-3 pb-4">
@@ -264,16 +342,14 @@ const MobileTimelineBar: React.FC<MobileTimelineBarProps> = ({
 
       {/* Phase indicators - Mini icons for all phases */}
       <div className="flex justify-between items-center mb-2 px-1">
-        {/* Building phase icon */}
+        {/* Building phase icon - Always shows as active during building, completed after */}
         <div className={`flex flex-col items-center transition-opacity duration-300 ${
-          currentPhase === Phase.Building ? 'opacity-100' : 'opacity-60'
+          currentTime < transitionTimes.propagation ? 'opacity-100' : 'opacity-80'
         }`}>
           <div className={`w-6 h-6 flex items-center justify-center rounded-full mb-1 
             ${currentPhase === Phase.Building 
-              ? 'bg-gradient-to-br from-orange-500/60 to-orange-600/30 border-2 border-orange-400/80' 
-              : currentPhase > Phase.Building 
-                ? 'bg-gradient-to-br from-orange-500/30 to-orange-600/10 border-2 border-orange-400/40'
-                : 'bg-surface/50 border border-border/40'}`}>
+              ? 'bg-gradient-to-br from-orange-500/70 to-orange-600/40 border-2 border-orange-400/80 shadow-orange-500/30 shadow-sm' 
+              : 'bg-gradient-to-br from-orange-500/30 to-orange-600/10 border-2 border-orange-400/40'}`}>
             <span className="text-xs">🤖</span>
           </div>
           <span className={`text-[8px] ${currentPhase === Phase.Building ? 'text-orange-300' : 'text-primary/50'}`}>
@@ -281,13 +357,13 @@ const MobileTimelineBar: React.FC<MobileTimelineBarProps> = ({
           </span>
         </div>
         
-        {/* Relaying phase icon */}
+        {/* Relaying phase icon - Active during propagating, dimmed otherwise */}
         <div className={`flex flex-col items-center transition-opacity duration-300 ${
-          currentPhase >= Phase.Propagating ? 'opacity-100' : 'opacity-60'
+          currentTime >= transitionTimes.propagation ? 'opacity-100' : 'opacity-60'
         }`}>  
           <div className={`w-6 h-6 flex items-center justify-center rounded-full mb-1
             ${currentPhase === Phase.Propagating 
-              ? 'bg-gradient-to-br from-purple-500/60 to-purple-600/30 border-2 border-purple-400/80' 
+              ? 'bg-gradient-to-br from-purple-500/70 to-purple-600/40 border-2 border-purple-400/80 shadow-purple-500/30 shadow-sm' 
               : currentPhase > Phase.Propagating
                 ? 'bg-gradient-to-br from-purple-500/30 to-purple-600/10 border-2 border-purple-400/40'
                 : 'bg-surface/50 border border-border/40'}`}>
@@ -298,13 +374,13 @@ const MobileTimelineBar: React.FC<MobileTimelineBarProps> = ({
           </span>
         </div>
         
-        {/* Attesting phase icon */}
+        {/* Attesting phase icon - Active during attesting, dimmed before, completed after */}
         <div className={`flex flex-col items-center transition-opacity duration-300 ${
-          currentPhase >= Phase.Attesting ? 'opacity-100' : 'opacity-60'
+          currentTime >= transitionTimes.attestation ? 'opacity-100' : 'opacity-60'
         }`}>
           <div className={`w-6 h-6 flex items-center justify-center rounded-full mb-1
             ${currentPhase === Phase.Attesting 
-              ? 'bg-gradient-to-br from-blue-500/60 to-blue-600/30 border-2 border-blue-400/80' 
+              ? 'bg-gradient-to-br from-blue-500/70 to-blue-600/40 border-2 border-blue-400/80 shadow-blue-500/30 shadow-sm' 
               : currentPhase > Phase.Attesting
                 ? 'bg-gradient-to-br from-blue-500/30 to-blue-600/10 border-2 border-blue-400/40'
                 : 'bg-surface/50 border border-border/40'}`}>
@@ -315,13 +391,13 @@ const MobileTimelineBar: React.FC<MobileTimelineBarProps> = ({
           </span>
         </div>
         
-        {/* Accepted phase icon */}
+        {/* Accepted phase icon - Only active during acceptance phase */}
         <div className={`flex flex-col items-center transition-opacity duration-300 ${
-          currentPhase >= Phase.Accepted ? 'opacity-100' : 'opacity-60'
+          currentTime >= transitionTimes.acceptance ? 'opacity-100' : 'opacity-60'
         }`}>
           <div className={`w-6 h-6 flex items-center justify-center rounded-full mb-1
             ${currentPhase === Phase.Accepted 
-              ? 'bg-gradient-to-br from-green-500/60 to-green-600/30 border-2 border-green-400/80' 
+              ? 'bg-gradient-to-br from-green-500/70 to-green-600/40 border-2 border-green-400/80 shadow-green-500/30 shadow-sm' 
               : 'bg-surface/50 border border-border/40'}`}>
             <span className="text-xs">🔒</span>
           </div>
