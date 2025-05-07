@@ -182,7 +182,7 @@ const BlockContent: React.FC<BlockContentProps> = ({
               <div className="w-1 h-4 bg-bg-surface-raised rounded-full mr-2"></div>
               <span className="text-xs text-text-tertiary uppercase mr-2">Hash:</span>
               <span className="text-xs font-medium text-text-secondary font-mono">
-                {formatHash(blockData.executionPayloadBlockHash, 8, 8)}
+                {formatHash(blockData.executionPayloadBlockHash)}
               </span>
             </div>
           )}
@@ -193,7 +193,7 @@ const BlockContent: React.FC<BlockContentProps> = ({
               <div className="w-1 h-4 bg-bg-surface-raised rounded-full mr-2"></div>
               <span className="text-xs text-text-tertiary uppercase mr-2">Recipient:</span>
               <span className="text-xs font-medium text-text-secondary font-mono">
-                {formatHash(blockData.executionPayloadFeeRecipient, 6, 4)}
+                {formatHash(blockData.executionPayloadFeeRecipient)}
               </span>
             </div>
           )}
@@ -248,7 +248,7 @@ const BlockContent: React.FC<BlockContentProps> = ({
               <div className="w-1 h-4 bg-bg-surface-raised rounded-full mr-2"></div>
               <span className="text-xs text-text-tertiary uppercase mr-2">Parent:</span>
               <span className="text-xs font-medium text-text-secondary font-mono">
-                {formatHash(blockData.executionPayloadParentHash, 6, 4)}
+                {formatHash(blockData.executionPayloadParentHash)}
               </span>
             </div>
           )}

@@ -11,6 +11,7 @@ export interface NormalizedBlockData {
   stateRoot?: string;
   parentRoot?: string;
   proposerIndex?: number;
+  blockVersion?: string;
 
   // Execution payload info
   executionPayloadBlockHash?: string;
@@ -60,9 +61,7 @@ const safeNumberConversion = (value: any): number | undefined => {
  * Debugging helper to log field availability
  */
 function logFieldAvailability(field: string, value: any) {
-  if (value !== undefined && value !== null) {
-    console.log(`Field ${field} available:`, value);
-  }
+  // Function left for reference but logging disabled
 }
 
 /**
@@ -71,8 +70,7 @@ function logFieldAvailability(field: string, value: any) {
 export function normalizeBlockData(block?: BlockData): NormalizedBlockData | undefined {
   if (!block) return undefined;
 
-  // For debugging - inspect what fields are available
-  // console.log("Original block data:", block);
+  // Initialize the result object
 
   const result: NormalizedBlockData = {
     raw: block,
@@ -80,15 +78,9 @@ export function normalizeBlockData(block?: BlockData): NormalizedBlockData | und
 
   // Handle block root
   result.blockRoot = block.block_root || block.blockRoot;
-  if (result.blockRoot) {
-    console.log('Found blockRoot:', result.blockRoot);
-  }
 
   // Handle state root
   result.stateRoot = block.state_root || block.stateRoot;
-  if (result.stateRoot) {
-    console.log('Found stateRoot:', result.stateRoot);
-  }
 
   // Handle parent root
   result.parentRoot = block.parent_root || block.parentRoot;
@@ -99,10 +91,7 @@ export function normalizeBlockData(block?: BlockData): NormalizedBlockData | und
   // Handle slot
   result.slot = safeNumberConversion(block.slot);
 
-  // Debug log to check the execution payload structure
-  if (block.execution_payload) {
-    console.log('Found execution_payload object:', Object.keys(block.execution_payload));
-  }
+  // Check for execution payload
 
   // Handle execution payload block hash
   result.executionPayloadBlockHash =
@@ -198,6 +187,9 @@ export function normalizeBlockData(block?: BlockData): NormalizedBlockData | und
   // Handle slot time
   result.slotTime = safeNumberConversion(block.slotTime);
 
+  // Handle block version
+  result.blockVersion = block.block_version || block.blockVersion;
+
   return result;
 }
 
@@ -218,10 +210,12 @@ export function calculateBlobCount(normalizedBlock?: NormalizedBlockData): numbe
 /**
  * Format a hash string for display
  */
-export function formatHash(hash?: string, startChars = 6, endChars = 4): string {
+export function formatHash(hash?: string, startChars = 5, endChars = 0): string {
   if (!hash) return '—';
-  if (hash.length <= startChars + endChars) return hash;
-  return `${hash.substring(0, startChars)}...${hash.substring(hash.length - endChars)}`;
+  if (hash.length <= startChars) return hash;
+  return endChars > 0 
+    ? `${hash.substring(0, startChars)}...${hash.substring(hash.length - endChars)}`
+    : `${hash.substring(0, startChars)}...`;
 }
 
 /**

@@ -6,15 +6,15 @@ import FeatureCard from '@/components/common/FeatureCard';
 // Import experiment data from Experiments page
 const featuredExperiments = [
   {
-    id: 'xatu',
-    title: 'Locally Built Blocks',
-    subtitle: 'Xatu',
-    description: 'Analyze throw-away blocks built by our clients.',
-    logo: '/xatu.png',
-    href: '/beacon/locally-built-blocks',
+    id: 'block-production',
+    title: 'Block Production Flow',
+    subtitle: 'Beacon Chain',
+    description: 'Visualize the entire Ethereum block production process in real-time.',
+    logo: '/ethereum.png',
+    href: '/beacon/block-production/live',
     accentColor: {
-      light: 'rgba(142, 45, 226, 0.05)',
-      medium: 'rgba(142, 45, 226, 0.15)',
+      light: 'rgba(34, 211, 238, 0.05)',
+      medium: 'rgba(34, 211, 238, 0.15)',
     },
   },
   {

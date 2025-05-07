@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { useParams } from 'react-router-dom';
 import useApi from '@/contexts/api';
 import { GetSlotDataRequest } from '@/api/gen/backend/pkg/api/proto/lab_api_pb';
 import useBeacon from '@/contexts/beacon';
@@ -12,6 +11,10 @@ import {
   generateConsistentColor,
   getTransformedBids,
 } from '@/components/beacon/block_production';
+import {
+  isBlockLocallyBuilt,
+  hasNonEmptyDeliveredPayloads,
+} from '@/components/beacon/block_production/common/blockUtils';
 
 /**
  * BlockProductionLivePage visualizes the entire Ethereum block production process
@@ -19,17 +22,25 @@ import {
  * The visualization tracks the flow of blocks through the system in real-time.
  */
 export default function BlockProductionLivePage() {
-  const { network } = useParams<{ network?: string }>();
-  const selectedNetwork = network || 'mainnet'; // Default to mainnet if no network param
+  // Use network directly from NetworkContext - App.tsx handles URL updates
+  const { selectedNetwork } = useNetwork();
   const queryClient = useQueryClient();
   const { client: labApiClient } = useApi();
-  // Add state to handle screen size
-  const [isMobile, setIsMobile] = useState<boolean>(false);
+  // Add state to handle screen size with more granular breakpoints
+  const [viewMode, setViewMode] = useState<'mobile' | 'tablet' | 'desktop'>('desktop');
 
-  // Detect screen size and update state
+  // Detect screen size and update view mode
   useEffect(() => {
     const checkScreenSize = () => {
-      setIsMobile(window.innerWidth < 768); // 768px is typical tablet breakpoint
+      const width = window.innerWidth;
+
+      if (width < 768) {
+        setViewMode('mobile'); // Mobile phone
+      } else if (width < 1200) {
+        setViewMode('tablet'); // Tablet or small laptop
+      } else {
+        setViewMode('desktop'); // Full desktop
+      }
     };
 
     // Check immediately
@@ -42,12 +53,41 @@ export default function BlockProductionLivePage() {
     return () => window.removeEventListener('resize', checkScreenSize);
   }, []);
 
+  // Only use mobile view for real mobile devices, use desktop view for tablets
+  const isMobile = viewMode === 'mobile';
+
   const { getBeaconClock, getHeadLagSlots, subscribeToSlotChanges } = useBeacon();
   // Use BeaconClockManager for slot timing
-  useNetwork(); // Keep context connection for potential future use
   const clock = getBeaconClock(selectedNetwork);
   const headLagSlots = getHeadLagSlots(selectedNetwork);
   const [headSlot, setHeadSlot] = useState<number | null>(clock ? clock.getCurrentSlot() : null);
+
+  // Reset state when network changes
+  useEffect(() => {
+    // Get updated clock for the selected network
+    const updatedClock = getBeaconClock(selectedNetwork);
+
+    if (updatedClock) {
+      // Reset head slot to the current slot of the new network
+      const newSlot = updatedClock.getCurrentSlot();
+      setHeadSlot(newSlot);
+
+      // Reset to live position
+      setDisplaySlotOffset(0);
+      setCurrentTime(0);
+
+      // Clear prefetched slots for the previous network
+      prefetchedSlotsRef.current = new Set();
+
+      // Make sure we're in playing state
+      setIsPlaying(true);
+
+      // Invalidate queries for the previous network to force refetching
+      queryClient.invalidateQueries({
+        queryKey: ['block-production-live', 'slot'],
+      });
+    }
+  }, [selectedNetwork, getBeaconClock, queryClient]);
 
   // Use a ref to track if we're at the "live" position
   // This will help determine if we should auto-update when slots change
@@ -68,8 +108,12 @@ export default function BlockProductionLivePage() {
   useEffect(() => {
     if (!selectedNetwork) return;
 
+    // Reset state when network changes to ensure fresh data
+    setCurrentTime(0);
+    prefetchedSlotsRef.current = new Set();
+
     // Create a slot change callback
-    const slotChangeCallback = (network, newSlot, previousSlot) => {
+    const slotChangeCallback = (network: string, newSlot: number, previousSlot: number) => {
       // Only update the head slot if we're in play mode
       // This prevents real-world slot changes from affecting our visualization when paused
       if (isPlayingRef.current) {
@@ -273,12 +317,15 @@ export default function BlockProductionLivePage() {
     // Run the check every 100ms
     const intervalId = setInterval(checkAndPrefetch, 100);
 
-    // Initial prefetch of current and next slots when component mounts
+    // Initial prefetch of current and next slots when component mounts or network changes
     if (headSlot !== null) {
       const currentDisplaySlot = headSlot - (headLagSlots + 2);
       const nextDisplaySlot = currentDisplaySlot + 1;
 
-      // Safely prefetch the initial slots
+      // Clear any previously prefetched slots when network changes
+      prefetchedSlotsRef.current = new Set();
+
+      // Safely prefetch the initial slots for the current network
       prefetchMultipleSlotsCallback(currentDisplaySlot, 2);
     }
 
@@ -342,7 +389,7 @@ export default function BlockProductionLivePage() {
 
     // Ensure we're in playing state
     setIsPlaying(true);
-  }, [headSlot, slotNumber, displaySlotOffset, headLagSlots, prefetchSlotData]);
+  }, [headSlot, slotNumber, displaySlotOffset, headLagSlots, prefetchSlotData, selectedNetwork]);
   const isNextDisabled = displaySlotOffset >= 0;
   const togglePlayPause = React.useCallback(() => setIsPlaying(prev => !prev), []);
 
@@ -393,6 +440,9 @@ export default function BlockProductionLivePage() {
     keepPreviousData: true, // Keep showing previous slot's data while loading new data
     retry: 2, // Retry failed requests twice
     enabled: slotNumber !== null,
+    onSuccess: data => {
+      // Data loaded successfully
+    },
   });
 
   // Simple time counter - pure React
@@ -507,24 +557,17 @@ export default function BlockProductionLivePage() {
     }
 
     // If no matching bid was found
-    console.log(
-      'No matching bid found for execution payload block hash:',
-      executionPayloadBlockHash,
-    );
+    // No matching bid found
     return null;
   }, [slotData?.relayBids, slotData?.block?.executionPayloadBlockHash]);
 
-  // Initial transformation of bids from the data
+  // Determine if a block was locally built using the enhanced method
   const isLocallyBuilt = useMemo(() => {
-    if (
-      !slotData?.block?.payloadsDelivered ||
-      slotData.block.payloadsDelivered.length === 0 ||
-      !Array.isArray(slotData.block.payloadsDelivered)
-    ) {
-      return true;
-    }
-    return false;
-  }, [slotData?.block?.payloadsDelivered]);
+    if (!slotData) return false;
+
+    // Check for deliveredPayloads both in block and in slotData directly
+    return !hasNonEmptyDeliveredPayloads(slotData.block, slotData);
+  }, [slotData]);
 
   const allTransformedBids = useMemo(() => {
     if (!slotData?.relayBids) return [];
@@ -658,6 +701,7 @@ export default function BlockProductionLivePage() {
                   : {}
               }
               block={displayData.block}
+              slotData={displayData} // Pass slot data with attestation info
               // Navigation controls
               slotNumber={slotNumber}
               headLagSlots={headLagSlots}

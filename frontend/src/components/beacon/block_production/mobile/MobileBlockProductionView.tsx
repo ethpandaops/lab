@@ -1,6 +1,5 @@
 import React, { useMemo } from 'react';
 import { BlockProductionBaseProps } from '../common/types';
-import BlockchainVisualization from '@/components/beacon/BlockchainVisualization';
 import { isInPropagationPhase } from '../common/PhaseUtils';
 import { countUniqueBuilderPubkeys } from '../common/utils';
 import MobileTimelineBar from './MobileTimelineBar';
@@ -19,6 +18,8 @@ interface MobileBlockProductionViewProps extends BlockProductionBaseProps {
   togglePlayPause: () => void;
   isNextDisabled: boolean;
   network: string; // Add network parameter for blockchain visualization
+  slotData?: any; // Add slot data with attestation info (same as in desktop view)
+  isLocallyBuilt?: boolean; // Flag to indicate if the block was locally built
 }
 
 const MobileBlockProductionView: React.FC<MobileBlockProductionViewProps> = ({
@@ -45,9 +46,11 @@ const MobileBlockProductionView: React.FC<MobileBlockProductionViewProps> = ({
   togglePlayPause,
   isNextDisabled,
   network,
+  slotData,
+  isLocallyBuilt = false,
 }) => {
   // Get active status based on role and phase
-  const isActive = (role: 'builder' | 'relay' | 'proposer' | 'node') => {
+  const isActive = (role: 'builder' | 'relay' | 'proposer' | 'node' | 'attester') => {
     // Determine transition point - when first node saw block or fallback to 5s
     let transitionTime = 5000; // Default fallback transition time
 
@@ -82,6 +85,15 @@ const MobileBlockProductionView: React.FC<MobileBlockProductionViewProps> = ({
       }
     }
 
+    // Calculate whether we have attestation data
+    const hasAttestationData = slotData?.attestations?.windows && 
+      Array.isArray(slotData.attestations.windows) &&
+      slotData.attestations.windows.some((window: any) => 
+        window.startMs !== undefined && 
+        Number(window.startMs) <= currentTime && 
+        window.validatorIndices?.length > 0
+      );
+
     // For each role, determine if it's active based on the phase
     // Modified to keep icons active once they've been activated during the slot
     switch (role) {
@@ -100,6 +112,10 @@ const MobileBlockProductionView: React.FC<MobileBlockProductionViewProps> = ({
       case 'node':
         // Nodes activate at the transition point and stay active
         return currentTime >= transitionTime;
+        
+      case 'attester':
+        // Attesters activate when we have attestation data
+        return hasAttestationData;
     }
 
     // Function should never reach here since all cases are handled above
@@ -163,6 +179,42 @@ const MobileBlockProductionView: React.FC<MobileBlockProductionViewProps> = ({
     return earliestContinent ? continentFullNames[earliestContinent] || earliestContinent : null;
   }, [nodes, nodeBlockSeen, nodeBlockP2P, currentTime]);
 
+  // Extract attestation counts for the timeline
+  const { attestationsCount, totalExpectedAttestations } = useMemo(() => {
+    if (!slotData?.attestations) {
+      return { attestationsCount: 0, totalExpectedAttestations: 0 };
+    }
+
+    // Count attestations that have been included up to the current time
+    let visibleAttestationsCount = 0;
+    
+    if (slotData.attestations.windows && Array.isArray(slotData.attestations.windows)) {
+      slotData.attestations.windows.forEach((window: any) => {
+        if (window.startMs !== undefined && Number(window.startMs) <= currentTime) {
+          visibleAttestationsCount += window.validatorIndices?.length || 0;
+        }
+      });
+    }
+    
+    // Get the maximum expected attestations from the slot data
+    const maxExpectedAttestations = slotData.attestations.maximumVotes 
+      ? Number(slotData.attestations.maximumVotes) 
+      : 0;
+      
+    return {
+      attestationsCount: visibleAttestationsCount,
+      totalExpectedAttestations: maxExpectedAttestations
+    };
+  }, [slotData, currentTime]);
+
+  // Calculate attestation percentage for display
+  const attestationPercentage = useMemo(() => {
+    if (totalExpectedAttestations > 0 && attestationsCount > 0) {
+      return Math.min(100, Math.round((attestationsCount / totalExpectedAttestations) * 100));
+    }
+    return 0;
+  }, [attestationsCount, totalExpectedAttestations]);
+
   return (
     <div className="flex flex-col w-full">
       {/* Timeline with Phase Icons and Key Information - solid background */}
@@ -172,6 +224,9 @@ const MobileBlockProductionView: React.FC<MobileBlockProductionViewProps> = ({
           nodeBlockSeen={nodeBlockSeen}
           nodeBlockP2P={nodeBlockP2P}
           blockTime={blockTime}
+          attestationsCount={attestationsCount}
+          totalExpectedAttestations={totalExpectedAttestations}
+          slotData={slotData}
           // Navigation controls
           slotNumber={slotNumber}
           headLagSlots={headLagSlots}
@@ -198,7 +253,7 @@ const MobileBlockProductionView: React.FC<MobileBlockProductionViewProps> = ({
                 ? `${countUniqueBuilderPubkeys(bids)} builder${countUniqueBuilderPubkeys(bids) > 1 ? 's' : ''} total`
                 : 'Waiting for blocks...'
             }
-            value={winningBid ? `${winningBid.value.toFixed(2)} ETH` : undefined}
+            value={winningBid ? `${winningBid.value.toFixed(4)} ETH` : undefined}
           />
 
           {/* Relays Stage */}
@@ -221,13 +276,24 @@ const MobileBlockProductionView: React.FC<MobileBlockProductionViewProps> = ({
           <div
             className={`rounded-lg overflow-hidden border shadow-sm ${isActive('proposer') ? 'bg-surface border-subtle' : 'bg-surface/90 border-subtle/50 opacity-80'} transition-opacity duration-300`}
           >
-            <div className="flex items-center p-2 border-b border-subtle/20">
+            <div className="flex items-center p-3 relative">
+              {/* Locally built crown */}
+              {isLocallyBuilt && (
+                <div
+                  className="absolute -top-1 left-4 transform text-3xl z-50"
+                  role="img"
+                  aria-label="Locally Built Crown"
+                  style={{filter: "drop-shadow(0 0 4px gold)"}}
+                >
+                  👑
+                </div>
+              )}
               <div
                 className={`w-10 h-10 flex items-center justify-center rounded-full mr-3 shadow-md transition-colors duration-500 ${
                   isActive('proposer')
                     ? isInPropagationPhase(currentTime, nodeBlockSeen, nodeBlockP2P)
-                      ? 'bg-gradient-to-br from-gold/60 to-gold/30 border-2 border-gold/80' // Brighter during propagation phase
-                      : 'bg-gradient-to-br from-gold/30 to-gold/10 border-2 border-gold/50' // Normal when active
+                      ? 'bg-gradient-to-br from-amber-500/60 to-amber-600/30 border-2 border-amber-400/80' // Brighter during propagation phase
+                      : 'bg-gradient-to-br from-amber-500/30 to-amber-600/10 border-2 border-amber-400/50' // Normal when active
                     : 'bg-surface/20 border border-subtle/50 opacity-50' // More dull when inactive
                 }`}
               >
@@ -246,6 +312,15 @@ const MobileBlockProductionView: React.FC<MobileBlockProductionViewProps> = ({
                     ? `${proposer.proposerValidatorIndex}${proposerEntity ? ` (${proposerEntity})` : ''}`
                     : 'Waiting for block...'}
                 </div>
+                {proposer && (
+                  <div className="text-xs mt-0.5">
+                    {isLocallyBuilt ? (
+                      <span className="text-amber-300 font-medium">Locally built</span>
+                    ) : (
+                      <span className="text-tertiary">External builder</span>
+                    )}
+                  </div>
+                )}
               </div>
               {blockTime !== undefined && (
                 <div className="text-xs font-mono text-success">
@@ -253,21 +328,23 @@ const MobileBlockProductionView: React.FC<MobileBlockProductionViewProps> = ({
                 </div>
               )}
             </div>
-
-            {/* Blockchain visualization */}
-            <div className="p-2 h-[180px] overflow-hidden">
-              <BlockchainVisualization
-                currentSlot={slotNumber}
-                network={network}
-                currentTime={currentTime}
-                nodeBlockSeen={nodeBlockSeen}
-                nodeBlockP2P={nodeBlockP2P}
-                blockTime={blockTime}
-                height="100%"
-                width="100%"
-              />
-            </div>
+            
           </div>
+          
+          {/* Attestation Stage - New Card */}
+          <StageCard
+            title="Attesters"
+            emoji="✓"
+            emojiLabel="Attesters"
+            isActive={isActive('attester')}
+            isInPropagationPhase={isInPropagationPhase(currentTime, nodeBlockSeen, nodeBlockP2P)}
+            subtitle={
+              attestationsCount > 0 && totalExpectedAttestations > 0
+                ? `${attestationPercentage}% of validators voted`
+                : 'Waiting for attestations...'
+            }
+            progress={attestationPercentage}
+          />
 
           {/* Network Nodes Stage */}
           <div

@@ -1,11 +1,9 @@
 import { useEffect, useState } from 'react';
 import { SlotView } from '@/components/beacon/SlotView';
-import { useSearchParams } from 'react-router-dom';
 import useNetwork from '@/contexts/network';
 import useBeacon from '@/contexts/beacon';
 
 function BeaconLive() {
-  const [searchParams, setSearchParams] = useSearchParams();
   const { selectedNetwork } = useNetwork();
   const [currentSlot, setCurrentSlot] = useState<number>();
   const { getBeaconClock, getHeadLagSlots } = useBeacon();
@@ -13,13 +11,6 @@ function BeaconLive() {
   // Get the BeaconClock for the current network
   const clock = getBeaconClock(selectedNetwork);
   const headLagSlots = getHeadLagSlots(selectedNetwork);
-
-  // Update URL when network changes
-  useEffect(() => {
-    const params = new URLSearchParams(searchParams);
-    params.set('network', selectedNetwork);
-    setSearchParams(params);
-  }, [selectedNetwork, setSearchParams, searchParams]);
 
   // Initialize and update current slot
   useEffect(() => {

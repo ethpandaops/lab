@@ -89,66 +89,68 @@ const PhaseTimeline: React.FC<PhaseTimelineProps> = ({
       <div className="w-full">
         <div className="flex justify-between items-center mb-4">
           {/* Navigation controls on the left */}
-          <div className="flex items-center gap-2 mt-1 mb-1">
-            <button
-              onClick={goToPreviousSlot}
-              className="bg-surface p-1.5 rounded border border-border hover:bg-hover transition"
-              title="Previous Slot"
-            >
-              <svg
-                className="h-3.5 w-3.5 text-primary"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
+          <div className="flex items-center gap-3 mt-1 mb-1">
+            <div className="flex items-center gap-1.5 bg-surface/40 p-0.5 rounded-lg border border-subtle/50">
+              <button
+                onClick={goToPreviousSlot}
+                className="p-1.5 rounded-md transition focus:outline-none focus:ring-1 focus:ring-accent/50 hover:bg-hover/70"
+                title="Previous Slot"
               >
-                <polyline points="15 18 9 12 15 6"></polyline>
-              </svg>
-            </button>
+                <svg
+                  className="h-4 w-4 text-primary"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+              </button>
 
-            <button
-              onClick={resetToCurrentSlot}
-              className={`px-2 py-1 rounded border font-medium text-xs ${
-                displaySlotOffset === 0
-                  ? 'bg-accent/20 border-accent/50 text-accent'
-                  : 'bg-surface border-border text-secondary hover:bg-hover'
-              } transition`}
-              disabled={displaySlotOffset === 0}
-              title="Return to Current Slot"
-            >
-              Live
-            </button>
-
-            <button
-              onClick={goToNextSlot}
-              className={`bg-surface p-1.5 rounded border border-border transition ${
-                isNextDisabled ? 'opacity-50 cursor-not-allowed' : 'hover:bg-hover'
-              }`}
-              disabled={isNextDisabled}
-              title="Next Slot"
-            >
-              <svg
-                className="h-3.5 w-3.5 text-primary"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
+              <button
+                onClick={resetToCurrentSlot}
+                className={`px-2.5 py-1 rounded-md font-medium text-xs transition focus:outline-none focus:ring-1 focus:ring-accent/70 ${
+                  displaySlotOffset === 0
+                    ? 'bg-accent/20 text-accent'
+                    : 'text-secondary hover:bg-hover'
+                }`}
+                disabled={displaySlotOffset === 0}
+                title="Return to Current Slot"
               >
-                <polyline points="9 18 15 12 9 6"></polyline>
-              </svg>
-            </button>
+                Live
+              </button>
+
+              <button
+                onClick={goToNextSlot}
+                className={`p-1.5 rounded-md transition focus:outline-none focus:ring-1 focus:ring-accent/70 ${
+                  isNextDisabled ? 'opacity-50 cursor-not-allowed' : 'hover:bg-hover'
+                }`}
+                disabled={isNextDisabled}
+                title="Next Slot"
+              >
+                <svg
+                  className="h-4 w-4 text-primary"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
+              </button>
+            </div>
 
             <div
-              className={`font-mono ml-1 text-primary flex flex-col ${isMobile ? 'text-xs' : 'text-sm'}`}
+              className={`font-mono text-primary flex flex-col ${isMobile ? 'text-xs' : 'text-sm'}`}
             >
               <div className="text-lg font-semibold">Slot: {slotNumber ?? '—'}</div>
               {slotNumber !== null && displaySlotOffset !== 0 && (
                 <div
-                  className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-secondary opacity-70`}
+                  className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-secondary opacity-80`}
                 >
                   Lag: {headLagSlots - displaySlotOffset}
                 </div>
@@ -160,8 +162,8 @@ const PhaseTimeline: React.FC<PhaseTimelineProps> = ({
           <div className="flex items-center gap-4">
             <div className="flex flex-col">
               <div className="flex items-center mt-1 mb-1">
-                <span className="font-medium mr-1.5 text-base">Phase:</span>
-                <span className="font-medium px-2.5 py-0.5 rounded-full text-base bg-orange-500/20 text-orange-300">
+                <span className="font-medium mr-2 text-base text-tertiary">Phase:</span>
+                <span className="font-medium px-3 py-0.5 rounded-md text-sm bg-surface/30 border text-orange-300 border-orange-500/20">
                   Building
                 </span>
               </div>
@@ -169,17 +171,19 @@ const PhaseTimeline: React.FC<PhaseTimelineProps> = ({
 
             {/* Time display */}
             <div className="flex items-center gap-2 mt-1 mb-1">
-              <span className="font-mono text-lg font-semibold text-white">
-                {(currentTime / 1000).toFixed(1)}s
-              </span>
+              <div className="bg-surface/40 border border-subtle/50 px-3 py-1 rounded-md flex items-center">
+                <span className="font-mono text-base font-semibold text-primary">
+                  {(currentTime / 1000).toFixed(1)}s
+                </span>
+              </div>
               <button
                 onClick={togglePlayPause}
-                className="bg-surface p-1.5 rounded border border-border hover:bg-hover transition"
+                className="bg-surface/40 p-1.5 rounded-md border border-subtle/50 hover:bg-hover/70 transition focus:outline-none focus:ring-1 focus:ring-accent/50"
                 title={isPlaying ? 'Pause' : 'Play'}
               >
                 {isPlaying ? (
                   <svg
-                    className="h-3.5 w-3.5 text-primary"
+                    className="h-4 w-4 text-primary"
                     viewBox="0 0 24 24"
                     fill="none"
                     stroke="currentColor"
@@ -192,7 +196,7 @@ const PhaseTimeline: React.FC<PhaseTimelineProps> = ({
                   </svg>
                 ) : (
                   <svg
-                    className="h-3.5 w-3.5 text-primary"
+                    className="h-4 w-4 text-primary"
                     viewBox="0 0 24 24"
                     fill="none"
                     stroke="currentColor"
@@ -353,65 +357,67 @@ const PhaseTimeline: React.FC<PhaseTimelineProps> = ({
     <div className="w-full">
       <div className="flex justify-between items-center mb-4">
         {/* Navigation controls on the left */}
-        <div className="flex items-center gap-2 mt-1 mb-1">
-          <button
-            onClick={goToPreviousSlot}
-            className="bg-surface p-1.5 rounded border border-border hover:bg-hover transition"
-            title="Previous Slot"
-          >
-            <svg
-              className="h-3.5 w-3.5 text-primary"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
+        <div className="flex items-center gap-3 mt-1 mb-1">
+          <div className="flex items-center gap-1.5 bg-surface/80 p-0.5 rounded-lg border border-subtle">
+            <button
+              onClick={goToPreviousSlot}
+              className="p-1.5 rounded-md transition focus:outline-none focus:ring-1 focus:ring-accent/70 hover:bg-hover"
+              title="Previous Slot"
             >
-              <polyline points="15 18 9 12 15 6"></polyline>
-            </svg>
-          </button>
+              <svg
+                className="h-4 w-4 text-primary"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <polyline points="15 18 9 12 15 6"></polyline>
+              </svg>
+            </button>
 
-          <button
-            onClick={resetToCurrentSlot}
-            className={`px-2 py-1 rounded border font-medium text-xs ${
-              displaySlotOffset === 0
-                ? 'bg-accent/20 border-accent/50 text-accent'
-                : 'bg-surface border-border text-secondary hover:bg-hover'
-            } transition`}
-            disabled={displaySlotOffset === 0}
-            title="Return to Current Slot"
-          >
-            Live
-          </button>
-
-          <button
-            onClick={goToNextSlot}
-            className={`bg-surface p-1.5 rounded border border-border transition ${
-              isNextDisabled ? 'opacity-50 cursor-not-allowed' : 'hover:bg-hover'
-            }`}
-            disabled={isNextDisabled}
-            title="Next Slot"
-          >
-            <svg
-              className="h-3.5 w-3.5 text-primary"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
+            <button
+              onClick={resetToCurrentSlot}
+              className={`px-2.5 py-1 rounded-md font-medium text-xs transition focus:outline-none focus:ring-1 focus:ring-accent/70 ${
+                displaySlotOffset === 0
+                  ? 'bg-accent/20 text-accent'
+                  : 'text-secondary hover:bg-hover'
+              }`}
+              disabled={displaySlotOffset === 0}
+              title="Return to Current Slot"
             >
-              <polyline points="9 18 15 12 9 6"></polyline>
-            </svg>
-          </button>
+              Live
+            </button>
+
+            <button
+              onClick={goToNextSlot}
+              className={`p-1.5 rounded-md transition focus:outline-none focus:ring-1 focus:ring-accent/70 ${
+                isNextDisabled ? 'opacity-50 cursor-not-allowed' : 'hover:bg-hover'
+              }`}
+              disabled={isNextDisabled}
+              title="Next Slot"
+            >
+              <svg
+                className="h-4 w-4 text-primary"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <polyline points="9 18 15 12 9 6"></polyline>
+              </svg>
+            </button>
+          </div>
 
           <div
-            className={`font-mono ml-1 text-primary flex flex-col ${isMobile ? 'text-xs' : 'text-sm'}`}
+            className={`font-mono text-primary flex flex-col ${isMobile ? 'text-xs' : 'text-sm'}`}
           >
             <div className="text-lg font-semibold">Slot: {slotNumber ?? '—'}</div>
             {slotNumber !== null && displaySlotOffset !== 0 && (
-              <div className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-secondary opacity-70`}>
+              <div className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-secondary opacity-80`}>
                 Lag: {headLagSlots - displaySlotOffset}
               </div>
             )}
@@ -422,17 +428,17 @@ const PhaseTimeline: React.FC<PhaseTimelineProps> = ({
         <div className="flex items-center gap-4">
           <div className="flex flex-col">
             <div className="flex items-center mt-1 mb-1">
-              <span className="font-medium mr-1.5 text-base">Phase:</span>
+              <span className="font-medium mr-2 text-base text-tertiary">Phase:</span>
               <span
-                className={`font-medium px-2.5 py-0.5 rounded-full text-base 
+                className={`font-medium px-3 py-0.5 rounded-md text-sm bg-surface/30 border 
                 ${
                   currentPhase === Phase.Building
-                    ? 'bg-orange-500/20 text-orange-300'
+                    ? 'text-orange-300 border-orange-500/20'
                     : currentPhase === Phase.Propagating
-                      ? 'bg-purple-500/20 text-purple-300'
+                      ? 'text-purple-300 border-purple-500/20'
                       : currentPhase === Phase.Attesting
-                        ? 'bg-blue-500/20 text-blue-300'
-                        : 'bg-green-500/20 text-green-300'
+                        ? 'text-blue-300 border-blue-500/20'
+                        : 'text-green-300 border-green-500/20'
                 }`}
               >
                 {currentPhase === Phase.Building
@@ -448,17 +454,19 @@ const PhaseTimeline: React.FC<PhaseTimelineProps> = ({
 
           {/* Time display */}
           <div className="flex items-center gap-2 mt-1 mb-1">
-            <span className="font-mono text-lg font-semibold text-white">
-              {(currentTime / 1000).toFixed(1)}s
-            </span>
+            <div className="bg-surface/40 border border-subtle/50 px-3 py-1 rounded-md flex items-center">
+              <span className="font-mono text-base font-semibold text-primary">
+                {(currentTime / 1000).toFixed(1)}s
+              </span>
+            </div>
             <button
               onClick={togglePlayPause}
-              className="bg-surface p-1.5 rounded border border-border hover:bg-hover transition"
+              className="bg-surface/40 p-1.5 rounded-md border border-subtle/50 hover:bg-hover/70 transition focus:outline-none focus:ring-1 focus:ring-accent/50"
               title={isPlaying ? 'Pause' : 'Play'}
             >
               {isPlaying ? (
                 <svg
-                  className="h-3.5 w-3.5 text-primary"
+                  className="h-4 w-4 text-primary"
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
@@ -471,7 +479,7 @@ const PhaseTimeline: React.FC<PhaseTimelineProps> = ({
                 </svg>
               ) : (
                 <svg
-                  className="h-3.5 w-3.5 text-primary"
+                  className="h-4 w-4 text-primary"
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
