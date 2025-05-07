@@ -41,7 +41,7 @@ export default function BlockProductionSlotPage() {
   // Check both 'time' and 't' parameters for backward compatibility
   const initialTimeParam = searchParams.get('time') || searchParams.get('t');
   const initialTimeMs = initialTimeParam ? parseFloat(initialTimeParam) * 1000 : 0;
-  console.log(`Initializing with time: ${initialTimeParam}s (${initialTimeMs}ms)`);
+  // Initialize with time parameter
 
   // Add state to handle screen size
   const [isMobile, setIsMobile] = useState<boolean>(false);
@@ -437,9 +437,6 @@ export default function BlockProductionSlotPage() {
               }
               block={displayData.block}
               slotData={displayData} // Pass slotData directly
-              // For debugging:
-              // eslint-disable-next-line
-              dummy={console.log('Desktop slotData format:', displayData)}
               timeRange={timeRange}
               valueRange={valueRange}
               onPhaseChange={handlePhaseChange}

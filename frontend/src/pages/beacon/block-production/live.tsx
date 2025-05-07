@@ -534,10 +534,7 @@ export default function BlockProductionLivePage() {
     }
 
     // If no matching bid was found
-    console.log(
-      'No matching bid found for execution payload block hash:',
-      executionPayloadBlockHash,
-    );
+    // No matching bid found
     return null;
   }, [slotData?.relayBids, slotData?.block?.executionPayloadBlockHash]);
 
