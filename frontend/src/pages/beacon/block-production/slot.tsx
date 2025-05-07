@@ -12,6 +12,7 @@ import { Phase as PhaseEnum } from '../../../components/beacon/block_production/
 import { BeaconClockManager } from '../../../utils/beacon';
 import { ChevronLeft, ChevronRight, Play, Pause } from 'lucide-react';
 import NetworkContext from '@/contexts/NetworkContext';
+import { isBlockLocallyBuilt, hasNonEmptyDeliveredPayloads } from '@/components/beacon/block_production/common/blockUtils';
 
 // Simple hash function to generate a color from a string (e.g., relay name)
 const generateConsistentColor = (str: string): string => {
@@ -40,7 +41,7 @@ export default function BlockProductionSlotPage() {
   // Check both 'time' and 't' parameters for backward compatibility
   const initialTimeParam = searchParams.get('time') || searchParams.get('t');
   const initialTimeMs = initialTimeParam ? parseFloat(initialTimeParam) * 1000 : 0;
-  console.log(`Initializing with time: ${initialTimeParam}s (${initialTimeMs}ms)`);
+  // Initialize with time parameter
 
   // Add state to handle screen size
   const [isMobile, setIsMobile] = useState<boolean>(false);
@@ -113,6 +114,9 @@ export default function BlockProductionSlotPage() {
     staleTime: 60000, // Consider data fresh for 60 seconds to avoid refetching when viewing fixed slots
     retry: 2, // Retry failed requests twice
     enabled: slotNumber !== null,
+    onSuccess: (data) => {
+      // Got slot data
+    },
   });
 
   // Timer effect for playback
@@ -375,6 +379,9 @@ export default function BlockProductionSlotPage() {
                   : {}
               }
               block={displayData.block}
+              slotData={displayData}
+              network={selectedNetwork || 'mainnet'}
+              isLocallyBuilt={displayData ? !hasNonEmptyDeliveredPayloads(displayData.block, displayData) : false}
             />
           </div>
 
@@ -429,7 +436,7 @@ export default function BlockProductionSlotPage() {
                   : {}
               }
               block={displayData.block}
-              slotData={{[slotNumber || 0]: displayData}} // Pass slotData as an object keyed by slotNumber
+              slotData={displayData} // Pass slotData directly
               timeRange={timeRange}
               valueRange={valueRange}
               onPhaseChange={handlePhaseChange}
@@ -444,9 +451,7 @@ export default function BlockProductionSlotPage() {
               togglePlayPause={togglePlayPause}
               isNextDisabled={false}
               network={selectedNetwork || 'mainnet'}
-              isLocallyBuilt={!displayData.block?.payloadsDelivered ||
-                             !Array.isArray(displayData.block?.payloadsDelivered) ||
-                             displayData.block?.payloadsDelivered.length === 0}
+              isLocallyBuilt={displayData ? !hasNonEmptyDeliveredPayloads(displayData.block, displayData) : false}
             />
           </div>
         </div>

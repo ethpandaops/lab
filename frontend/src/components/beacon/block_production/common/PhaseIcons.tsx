@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Phase } from './types';
 import { getCurrentPhase } from './PhaseUtils';
 import { countUniqueBuilderPubkeys } from './utils';
+import { hasNonEmptyDeliveredPayloads } from './blockUtils';
 
 interface PhaseIconsProps {
   currentTime: number;
@@ -42,9 +43,54 @@ const PhaseIcons: React.FC<PhaseIconsProps> = ({
   firstContinentToSeeBlock,
   isLocallyBuilt = false,
 }) => {
+  // Check if we need to override isLocallyBuilt based on the slotData content
+  const effectiveIsLocallyBuilt = useMemo(() => {
+    try {
+      // If the explicit prop is already false, respect that
+      if (!isLocallyBuilt) {
+        return false;
+      }
+      
+      // Try a more thorough check on both block and slotData
+      if (slotData) {
+        // Pass both block and slotData for complete checking
+        const hasDeliveredPayloads = hasNonEmptyDeliveredPayloads(slotData.block, slotData);
+        if (hasDeliveredPayloads) {
+          return false; // Not locally built if we have delivered payloads
+        }
+      }
+      
+      // Use the provided isLocallyBuilt value
+      return isLocallyBuilt;
+    } catch (error) {
+      // Fall back to the passed-in value in case of errors
+      return isLocallyBuilt;
+    }
+  }, [isLocallyBuilt, slotData]);
+  // Extract the attestation data from slotData based on its format
+  let attestationsData = null;
+  
+  try {
+    // If slotData is an object with numeric keys (desktop format), get the first slot's data
+    if (slotData && typeof slotData === 'object') {
+      const keys = Object.keys(slotData);
+      if (keys.length > 0 && !isNaN(Number(keys[0]))) {
+        // Desktop format: slotData is keyed by slot number
+        const firstKey = keys[0];
+        attestationsData = slotData[firstKey]?.attestations;
+      } else {
+        // Mobile format: slotData has attestations directly
+        attestationsData = slotData?.attestations;
+      }
+    }
+  } catch (error) {
+    console.error('Error extracting attestation data:', error);
+    attestationsData = null;
+  }
+  
   // Get attestation data for phase calculation - using startMs instead of inclusionDelay
   const attestationsCount =
-    slotData?.attestations?.windows.reduce((total: number, window: any) => {
+    attestationsData?.windows?.reduce((total: number, window: any) => {
       // CRITICAL FIX: Use startMs instead of inclusionDelay
       if (window.startMs !== undefined && Number(window.startMs) <= currentTime) {
         return total + (window.validatorIndices?.length || 0);
@@ -53,8 +99,8 @@ const PhaseIcons: React.FC<PhaseIconsProps> = ({
     }, 0) || 0;
 
   // Use actual maximumVotes for expected attestations, with no default
-  const totalExpectedAttestations = slotData?.attestations?.maximumVotes
-    ? Number(slotData.attestations.maximumVotes)
+  const totalExpectedAttestations = attestationsData?.maximumVotes
+    ? Number(attestationsData.maximumVotes)
     : 0;
 
   // Calculate the current phase
@@ -238,7 +284,7 @@ const PhaseIcons: React.FC<PhaseIconsProps> = ({
                   : 'bg-surface border border-border/80' // Not yet active
             }`}
           >
-            {isLocallyBuilt && (
+            {effectiveIsLocallyBuilt && (
               <div
                 className="absolute -top-7 left-1/2 transform -translate-x-1/2 text-4xl z-50"
                 role="img"
@@ -270,7 +316,7 @@ const PhaseIcons: React.FC<PhaseIconsProps> = ({
             <span className={`${isActiveInPhase('proposer') ? 'text-amber-300' : 'text-tertiary'}`}>
               {proposer ? (
                 <>
-                  {isLocallyBuilt ? (
+                  {effectiveIsLocallyBuilt ? (
                     <span className="font-medium">Locally built by proposer</span>
                   ) : (
                     <span>Built via external builder</span>
@@ -391,16 +437,17 @@ const PhaseIcons: React.FC<PhaseIconsProps> = ({
                 let totalExpectedAttestations = 0;
 
                 // Get the maximum expected attestations from the slot data
-                if (slotData?.attestations?.maximumVotes) {
-                  totalExpectedAttestations = Number(slotData.attestations.maximumVotes);
+                // Use the already extracted attestationsData variable
+                if (attestationsData?.maximumVotes) {
+                  totalExpectedAttestations = Number(attestationsData.maximumVotes);
                 }
 
                 // Count attestations that have been included up to the current time
                 if (
-                  slotData?.attestations?.windows &&
-                  Array.isArray(slotData.attestations.windows)
+                  attestationsData?.windows &&
+                  Array.isArray(attestationsData.windows)
                 ) {
-                  slotData.attestations.windows.forEach((window: any) => {
+                  attestationsData.windows.forEach((window: any) => {
                     // Use the same method as in the phase calculation above
                     if (window.startMs !== undefined && Number(window.startMs) <= currentTime) {
                       visibleAttestationsCount += window.validatorIndices?.length || 0;
@@ -470,12 +517,12 @@ const PhaseIcons: React.FC<PhaseIconsProps> = ({
             </span>
             <div className="h-1"></div>
             <span className={`${isActiveInPhase('accepted') ? 'text-green-300' : 'text-tertiary'}`}>
-              {isActiveInPhase('accepted') && slotData?.attestations?.windows
+              {isActiveInPhase('accepted') && attestationsData?.windows
                 ? (() => {
                     // Calculate when it hit 66% attestations (acceptance time)
                     let acceptanceTime = Infinity;
-                    const totalExpectedAttestations = slotData?.attestations?.maximumVotes
-                      ? Number(slotData.attestations.maximumVotes)
+                    const totalExpectedAttestations = attestationsData?.maximumVotes
+                      ? Number(attestationsData.maximumVotes)
                       : 0;
 
                     if (totalExpectedAttestations > 0) {
@@ -484,7 +531,7 @@ const PhaseIcons: React.FC<PhaseIconsProps> = ({
                       let cumulativeAttestations = 0;
 
                       // Sort windows by time
-                      const sortedWindows = [...(slotData.attestations.windows || [])].sort(
+                      const sortedWindows = [...(attestationsData.windows || [])].sort(
                         (a, b) => {
                           return Number(a.startMs || Infinity) - Number(b.startMs || Infinity);
                         },
