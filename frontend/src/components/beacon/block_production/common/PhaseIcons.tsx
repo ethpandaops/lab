@@ -240,6 +240,15 @@ const PhaseIcons: React.FC<PhaseIconsProps> = ({
             ) : (
               <span>Built via external builder</span>
             )}
+            <div className="mt-1 text-xs">
+              {slotData?.entity ? (
+                <>Validator: {slotData.entity}</>
+              ) : (
+                proposer.proposerValidatorIndex && (
+                  <>Validator index: {proposer.proposerValidatorIndex}</>
+                )
+              )}
+            </div>
           </>
         ) : (
           <>Waiting...</>
