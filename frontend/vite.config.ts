@@ -18,13 +18,10 @@ export default defineConfig({
   },
   server: {
     proxy: {
-      // '/lab-data': {
-      //   target: 'https://lab-api.primary.staging.platform.ethpandaops.io',
-      //   changeOrigin: true,
-      //   secure: false,
-      // },
       '/lab-data': {
         target: 'http://localhost:8080',
+        changeOrigin: true,
+        secure: false,
       },
     },
   },
