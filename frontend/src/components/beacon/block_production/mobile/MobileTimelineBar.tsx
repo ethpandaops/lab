@@ -136,7 +136,9 @@ const MobileTimelineBar: React.FC<MobileTimelineBarProps> = ({
     // --- Find attestation transition time ---
     
     // Look for first attestation in the data if available
-    if (slotData?.attestations?.windows && Array.isArray(slotData.attestations.windows)) {
+    if (slotData && slotData.attestations && 
+        slotData.attestations.windows && 
+        Array.isArray(slotData.attestations.windows)) {
       // Sort windows by time to find the earliest attestation
       const sortedWindows = [...slotData.attestations.windows].sort((a, b) => {
         return Number(a.startMs || Infinity) - Number(b.startMs || Infinity);
@@ -166,7 +168,8 @@ const MobileTimelineBar: React.FC<MobileTimelineBarProps> = ({
     // --- Find acceptance transition time (66% attestations) ---
     
     // Check for 66% attestation threshold in data
-    if (slotData?.attestations?.windows && 
+    if (slotData && slotData.attestations && 
+        slotData.attestations.windows && 
         Array.isArray(slotData.attestations.windows) && 
         totalExpectedAttestations > 0) {
       
