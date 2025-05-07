@@ -4,7 +4,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## LLM Rules System
 
-This repository contains coding standards and best practices that you MUST follow. Before starting any work, YOU MUST check the relevant rules by using the script below.
+- This repository contains coding standards and best practices that you MUST follow. 
+- Before starting ANY work, YOU MUST check for relevant rules by using the script below.
 
 ### Getting Contextual Rules
 
