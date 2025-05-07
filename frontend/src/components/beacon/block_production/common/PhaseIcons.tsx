@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import { Phase } from './types';
 import { getCurrentPhase } from './PhaseUtils';
 import { countUniqueBuilderPubkeys } from './utils';
-import { hasNonEmptyDeliveredPayloads } from './blockDebug';
+import { hasNonEmptyDeliveredPayloads } from './blockUtils';
 
 interface PhaseIconsProps {
   currentTime: number;

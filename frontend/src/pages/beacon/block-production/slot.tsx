@@ -12,8 +12,7 @@ import { Phase as PhaseEnum } from '../../../components/beacon/block_production/
 import { BeaconClockManager } from '../../../utils/beacon';
 import { ChevronLeft, ChevronRight, Play, Pause } from 'lucide-react';
 import NetworkContext from '@/contexts/NetworkContext';
-import { isBlockLocallyBuilt } from '@/components/beacon/block_production/common/blockUtils';
-import { hasNonEmptyDeliveredPayloads } from '@/components/beacon/block_production/common/blockDebug';
+import { isBlockLocallyBuilt, hasNonEmptyDeliveredPayloads } from '@/components/beacon/block_production/common/blockUtils';
 
 // Simple hash function to generate a color from a string (e.g., relay name)
 const generateConsistentColor = (str: string): string => {

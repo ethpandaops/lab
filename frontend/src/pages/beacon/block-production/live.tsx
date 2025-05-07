@@ -12,8 +12,7 @@ import {
   generateConsistentColor,
   getTransformedBids,
 } from '@/components/beacon/block_production';
-import { isBlockLocallyBuilt } from '@/components/beacon/block_production/common/blockUtils';
-import { hasNonEmptyDeliveredPayloads } from '@/components/beacon/block_production/common/blockDebug';
+import { isBlockLocallyBuilt, hasNonEmptyDeliveredPayloads } from '@/components/beacon/block_production/common/blockUtils';
 
 /**
  * BlockProductionLivePage visualizes the entire Ethereum block production process
