@@ -20,7 +20,7 @@ interface BlockContentProps {
     relayName: string;
     builderName?: string;
   }>;
-  isLocallyBuilt?: boolean; // Added property for locally built blocks
+  isLocallyBuilt?: boolean;
 }
 
 /**
@@ -35,7 +35,7 @@ const BlockContent: React.FC<BlockContentProps> = ({
   isCurrentSlot = false,
   isFuture = false,
   futureBids = [],
-  isLocallyBuilt = false, // Default to false
+  isLocallyBuilt = false,
 }) => {
   // If we're in the building phase, show a skeleton loader
   if (isBuilding) {
@@ -224,7 +224,6 @@ const BlockContent: React.FC<BlockContentProps> = ({
                 <span className="text-xs text-text-tertiary uppercase mr-2">Proposer:</span>
                 <span className="text-sm font-medium text-text-secondary">{proposerEntity}</span>
               </div>
-              {/* Add dynamic text for locally built blocks */}
               {!isPast && !isBuilding && !isFuture && (
                 <div className="ml-3 text-xs font-medium">
                   {isLocallyBuilt ? (

@@ -26,7 +26,7 @@ interface PhaseIconsProps {
   nodes?: Record<string, any>;
   slotData?: any;
   firstContinentToSeeBlock?: string | null;
-  isLocallyBuilt?: boolean; // Add new prop for locally built blocks
+  isLocallyBuilt?: boolean;
 }
 
 const PhaseIcons: React.FC<PhaseIconsProps> = ({
@@ -40,7 +40,7 @@ const PhaseIcons: React.FC<PhaseIconsProps> = ({
   nodes = {},
   slotData,
   firstContinentToSeeBlock,
-  isLocallyBuilt = false, // Default to false
+  isLocallyBuilt = false,
 }) => {
   // Get attestation data for phase calculation - using startMs instead of inclusionDelay
   const attestationsCount =
@@ -238,7 +238,6 @@ const PhaseIcons: React.FC<PhaseIconsProps> = ({
                   : 'bg-surface border border-border/80' // Not yet active
             }`}
           >
-            {/* Add crown emoji for locally built blocks above the user icon */}
             {isLocallyBuilt && currentPhase !== Phase.Building && (
               <div
                 className="absolute -top-6 left-1/2 transform -translate-x-1/2 text-3xl z-10"

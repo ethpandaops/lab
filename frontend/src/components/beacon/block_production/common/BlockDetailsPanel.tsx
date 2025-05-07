@@ -20,7 +20,7 @@ interface BlockDetailsPanelProps {
     relayName: string;
     builderName?: string;
   }>;
-  isLocallyBuilt?: boolean; // Added property for locally built blocks
+  isLocallyBuilt?: boolean;
 }
 
 /**
@@ -39,7 +39,7 @@ const BlockDetailsPanel: React.FC<BlockDetailsPanelProps> = ({
   blockValue,
   futureBidsCount,
   futureBids,
-  isLocallyBuilt = false, // Default to false
+  isLocallyBuilt = false,
 }) => {
   // Normalize the block data to handle different field naming conventions
   const normalizedBlock = React.useMemo(() => normalizeBlockData(block), [block]);

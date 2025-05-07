@@ -48,7 +48,7 @@ interface DesktopBlockProductionViewProps extends BlockProductionBaseProps {
   togglePlayPause: () => void;
   isNextDisabled: boolean;
   network: string; // Add network prop for builder names lookup
-  isLocallyBuilt?: boolean; // Add prop for locally built blocks
+  isLocallyBuilt?: boolean;
 }
 
 const DesktopBlockProductionView: React.FC<DesktopBlockProductionViewProps> = ({
