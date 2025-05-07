@@ -164,7 +164,12 @@ const BlockDetailsPanel: React.FC<BlockDetailsPanelProps> = ({
     );
   }
 
-  // Values were logged previously for debugging
+  // Debug the values
+  console.log('BlockDetailsPanel - isLocallyBuilt:', isLocallyBuilt);
+  console.log('BlockDetailsPanel - proposerEntity:', proposerEntity);
+  console.log('BlockDetailsPanel - isPast:', isPast);
+  console.log('BlockDetailsPanel - isBuilding:', isBuilding);
+  console.log('BlockDetailsPanel - isFuture:', isFuture);
 
   return (
     <div className={`${getContainerClasses()} border ${getBorderColor()}`}>

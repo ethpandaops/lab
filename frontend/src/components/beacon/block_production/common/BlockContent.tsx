@@ -217,23 +217,23 @@ const BlockContent: React.FC<BlockContentProps> = ({
         {/* Right column */}
         <div className="space-y-2">
           {/* Proposer Entity */}
-          <div className="flex flex-col space-y-1">
-            {proposerEntity && (
+          {proposerEntity && (
+            <div className="flex flex-col space-y-1">
               <div className="flex items-center">
                 <div className="w-1 h-4 bg-bg-surface-raised rounded-full mr-2"></div>
                 <span className="text-xs text-text-tertiary uppercase mr-2">Proposer:</span>
                 <span className="text-sm font-medium text-text-secondary">{proposerEntity}</span>
               </div>
-            )}
-            {/* Always show the build status regardless of whether we have a proposer entity */}
-            <div className="ml-3 text-xs font-medium">
-              {isLocallyBuilt ? (
-                <span className="text-amber-300">This block was built locally</span>
-              ) : (
-                <span className="text-text-tertiary">This block was built by a builder</span>
-              )}
+              {/* Show the local build status text regardless of other conditions */}
+                <div className="ml-3 text-xs font-medium">
+                  {isLocallyBuilt ? (
+                    <span className="text-amber-300">This block was built locally</span>
+                  ) : (
+                    <span className="text-text-tertiary">This block was built by a builder</span>
+                  )}
+                </div>
             </div>
-          </div>
+          )}
 
           {/* Blob Count */}
           <div className="flex items-center">
