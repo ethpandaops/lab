@@ -280,7 +280,7 @@ const MobileBlockProductionView: React.FC<MobileBlockProductionViewProps> = ({
               {/* Locally built crown */}
               {isLocallyBuilt && (
                 <div
-                  className="absolute -top-6 left-6 transform text-3xl z-50"
+                  className="absolute -top-2 left-0 transform text-3xl z-50"
                   role="img"
                   aria-label="Locally Built Crown"
                   style={{filter: "drop-shadow(0 0 4px gold)"}}
@@ -329,26 +329,6 @@ const MobileBlockProductionView: React.FC<MobileBlockProductionViewProps> = ({
               )}
             </div>
             
-            {/* Block info instead of visualization */}
-            {block && (
-              <div className="px-3 pb-3 text-xs">
-                <div className="grid grid-cols-2 gap-x-4 gap-y-1">
-                  <div className="text-tertiary">Size:</div>
-                  <div className="font-mono text-primary">{block.size} KB</div>
-                  
-                  {block.executionPayloadBlockHash && (
-                    <>
-                      <div className="text-tertiary">Hash:</div>
-                      <div className="font-mono text-primary truncate">
-                        {typeof block.executionPayloadBlockHash === 'string' 
-                          ? block.executionPayloadBlockHash.substring(0, 8) + '...' 
-                          : '—'}
-                      </div>
-                    </>
-                  )}
-                </div>
-              </div>
-            )}
           </div>
           
           {/* Attestation Stage - New Card */}
