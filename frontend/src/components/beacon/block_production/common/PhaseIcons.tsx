@@ -240,10 +240,10 @@ const PhaseIcons: React.FC<PhaseIconsProps> = ({
           >
             {isLocallyBuilt && (
               <div
-                className="absolute -top-6 left-1/2 transform -translate-x-1/2 text-3xl z-50"
+                className="absolute -top-7 left-1/2 transform -translate-x-1/2 text-4xl z-50"
                 role="img"
                 aria-label="Locally Built Crown"
-                style={{filter: "drop-shadow(0 0 3px gold)"}}
+                style={{filter: "drop-shadow(0 0 4px gold)"}}
               >
                 👑
               </div>
@@ -268,7 +268,17 @@ const PhaseIcons: React.FC<PhaseIconsProps> = ({
             </span>
             <div className="h-1"></div>
             <span className={`${isActiveInPhase('proposer') ? 'text-amber-300' : 'text-tertiary'}`}>
-              {proposer ? <></> : <>Waiting...</>}
+              {proposer ? (
+                <>
+                  {isLocallyBuilt ? (
+                    <span className="font-medium">Locally built by proposer</span>
+                  ) : (
+                    <span>Built via external builder</span>
+                  )}
+                </>
+              ) : (
+                <>Waiting...</>
+              )}
             </span>
           </div>
           {currentPhase !== Phase.Building && blockTime !== undefined && (

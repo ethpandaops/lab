@@ -280,10 +280,10 @@ const MobileBlockProductionView: React.FC<MobileBlockProductionViewProps> = ({
               {/* Locally built crown */}
               {isLocallyBuilt && (
                 <div
-                  className="absolute -top-6 left-6 transform text-2xl z-50"
+                  className="absolute -top-6 left-6 transform text-3xl z-50"
                   role="img"
                   aria-label="Locally Built Crown"
-                  style={{filter: "drop-shadow(0 0 3px gold)"}}
+                  style={{filter: "drop-shadow(0 0 4px gold)"}}
                 >
                   👑
                 </div>
@@ -312,6 +312,15 @@ const MobileBlockProductionView: React.FC<MobileBlockProductionViewProps> = ({
                     ? `${proposer.proposerValidatorIndex}${proposerEntity ? ` (${proposerEntity})` : ''}`
                     : 'Waiting for block...'}
                 </div>
+                {proposer && (
+                  <div className="text-xs mt-0.5">
+                    {isLocallyBuilt ? (
+                      <span className="text-amber-300 font-medium">Locally built</span>
+                    ) : (
+                      <span className="text-tertiary">External builder</span>
+                    )}
+                  </div>
+                )}
               </div>
               {blockTime !== undefined && (
                 <div className="text-xs font-mono text-success">
