@@ -250,7 +250,7 @@ const PhaseIcons: React.FC<PhaseIconsProps> = ({
               ) : (
                 proposer.proposerValidatorIndex && (
                   <span className="truncate block">
-                    Val: {proposer.proposerValidatorIndex}
+                    Validator: {proposer.proposerValidatorIndex}
                   </span>
                 )
               )}
