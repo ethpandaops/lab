@@ -236,11 +236,11 @@ const DesktopBlockProductionView: React.FC<DesktopBlockProductionViewProps> = ({
     <div className="h-full flex flex-col">
       <style jsx>{flowAnimations}</style>
 
-      {/* Hero section with solid background */}
-      <div className="bg-surface border-b border-subtle mb-3 shadow-sm">
-        {/* Timeline Header with solid background - only shown on live page */}
+      {/* Main card for timeline and phase icons */}
+      <div className="bg-surface rounded-lg overflow-hidden shadow-sm mb-3">
+        {/* Timeline Header - only shown on live page */}
         {showTimeline && (
-          <div className="px-4 pt-3 pb-2">
+          <div className="px-4 py-3">
             <PhaseTimeline
               currentTime={currentTime}
               nodeBlockSeen={nodeBlockSeen}
@@ -263,8 +263,8 @@ const DesktopBlockProductionView: React.FC<DesktopBlockProductionViewProps> = ({
           </div>
         )}
 
-        {/* Phase Icons Section with clean separation - increased height */}
-        <div className="px-4 py-10 bg-background-alt border-y border-border/30">
+        {/* Phase Icons Section */}
+        <div className="px-4 py-8 bg-surface/50">
           <PhaseIcons
             currentTime={currentTime}
             nodeBlockSeen={nodeBlockSeen}
@@ -297,8 +297,8 @@ const DesktopBlockProductionView: React.FC<DesktopBlockProductionViewProps> = ({
           />
         </div>
 
-        {/* Center panel - Blockchain Visualization - no card wrapper or border */}
-        <div className="flex-1 overflow-hidden flex flex-col bg-surface/10 rounded-lg shadow-sm p-3">
+        {/* Center panel - Blockchain Visualization */}
+        <div className="flex-1 overflow-hidden flex flex-col bg-surface/40 border border-subtle/50 rounded-lg shadow-sm p-3">
           <BlockchainVisualization
             currentSlot={slotNumber}
             network={network}

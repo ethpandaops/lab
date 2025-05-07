@@ -175,14 +175,14 @@ const BuildersRelaysPanel: React.FC<BuildersRelaysPanelProps> = ({
 
   return (
     <div className="flex flex-col space-y-3 h-full">
-      {/* Builders list - fixed height (250px) - increased from 200px */}
-      <div className="rounded-lg overflow-hidden bg-bg-surface border border-border-subtle h-[250px]">
-        <div className="text-sm font-medium p-2 bg-surface/80 flex items-center justify-between">
+      {/* Builders list */}
+      <div className="rounded-lg overflow-hidden bg-surface/40 border border-subtle/50 shadow-sm flex-grow-[0.65]">
+        <div className="p-2 border-b border-subtle/50 bg-surface/60 rounded-t-lg flex items-center justify-between">
           <div className="flex items-center">
             <div className="w-2 h-2 rounded-full bg-accent mr-1.5"></div>
-            Builder bids
+            <span className="text-sm font-medium text-primary">Builder bids</span>
           </div>
-          <div className="text-xs text-text-tertiary">
+          <div className="text-xs text-tertiary">
             {builders.length > 0 ? `Top bid per builder` : ''}
           </div>
         </div>
@@ -196,19 +196,19 @@ const BuildersRelaysPanel: React.FC<BuildersRelaysPanelProps> = ({
             }
           `}</style>
           {builders.length > 0 ? (
-            <div className="space-y-0.5 p-2">
-              {/* Show top 10 builders (increased from 8) */}
-              {builders.slice(0, 10).map(item => {
+            <div className="space-y-1.5 p-2">
+              {/* Show top 7 builders */}
+              {builders.slice(0, 7).map(item => {
                 // Only show winning styling if we're not in building phase
                 const showWinningStyle = item.isWinning && currentPhase !== Phase.Building;
 
                 return (
                   <div
                     key={item.id}
-                    className={`py-1 px-2 rounded text-xs transition-all duration-300 ${
+                    className={`py-2 px-2.5 rounded text-xs transition-all duration-300 ${
                       showWinningStyle
-                        ? 'bg-amber-100/20 border border-amber-300/20 shadow-sm'
-                        : 'bg-bg-surface'
+                        ? 'bg-amber-100/10 border-l-2 border-amber-300 hover:bg-amber-100/15'
+                        : 'bg-surface/20 hover:bg-surface/30 border-l-2 border-subtle/30'
                     }`}
                     style={{
                       marginBottom: '0.25rem',
@@ -229,7 +229,7 @@ const BuildersRelaysPanel: React.FC<BuildersRelaysPanelProps> = ({
                       </div>
                       <div className="font-mono ml-1.5 rounded-md px-1.5 py-0.25">
                         <span
-                          className={`${showWinningStyle ? 'text-amber-400 font-semibold' : 'text-text-secondary'} text-xs`}
+                          className={`${showWinningStyle ? 'text-amber-400 font-semibold' : 'text-secondary'} text-xs`}
                         >
                           {item.value ? item.value.toFixed(4) : '0.0000'} ETH
                         </span>
@@ -238,29 +238,29 @@ const BuildersRelaysPanel: React.FC<BuildersRelaysPanelProps> = ({
                   </div>
                 );
               })}
-              {/* Show count of hidden builders if there are more than 10 */}
-              {builders.length > 10 && (
-                <div className="text-xs text-text-tertiary text-center pt-1 pb-1">
-                  + {builders.length - 10} more builders
+              {/* Show count of hidden builders if there are more than 7 */}
+              {builders.length > 7 && (
+                <div className="text-xs text-tertiary text-center pt-1 pb-1">
+                  + {builders.length - 7} more builders
                 </div>
               )}
             </div>
           ) : (
-            <div className="h-full flex items-center justify-center text-xs text-text-tertiary p-3">
+            <div className="h-full flex items-center justify-center text-xs text-tertiary p-3">
               {isBuilderActive ? 'No builders yet' : 'Waiting...'}
             </div>
           )}
         </div>
       </div>
 
-      {/* Relays list - fixed height (220px) - increased from 180px */}
-      <div className="rounded-lg overflow-hidden bg-bg-surface border border-border-subtle h-[220px]">
-        <div className="text-sm font-medium p-2 bg-surface/80 flex items-center justify-between">
+      {/* Relays list */}
+      <div className="rounded-lg overflow-hidden bg-surface/40 border border-subtle/50 shadow-sm flex-grow-[0.35]">
+        <div className="p-2 border-b border-subtle/50 bg-surface/60 rounded-t-lg flex items-center justify-between">
           <div className="flex items-center">
             <div className="w-2 h-2 rounded-full bg-accent mr-1.5"></div>
-            MEV Relays
+            <span className="text-sm font-medium text-primary">MEV Relays</span>
           </div>
-          <div className="text-xs text-text-tertiary">
+          <div className="text-xs text-tertiary">
             {relays.length > 0 ? `${relays.length} relay${relays.length !== 1 ? 's' : ''}` : ''}
           </div>
         </div>
@@ -269,18 +269,18 @@ const BuildersRelaysPanel: React.FC<BuildersRelaysPanelProps> = ({
           style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
         >
           {relays.length > 0 ? (
-            <div className="space-y-0.5 p-2">
-              {relays.map(item => {
+            <div className="space-y-1.5 p-2">
+              {relays.slice(0, 5).map(item => {
                 // Only show winning styling if we're not in building phase
                 const showWinningStyle = item.isWinning && currentPhase !== Phase.Building;
 
                 return (
                   <div
                     key={item.id}
-                    className={`py-1 px-2 rounded text-xs transition-all duration-300 ${
+                    className={`py-2 px-2.5 rounded text-xs transition-all duration-300 ${
                       showWinningStyle
-                        ? 'bg-amber-100/20 border border-amber-300/20 shadow-sm'
-                        : 'bg-bg-surface'
+                        ? 'bg-amber-100/10 border-l-2 border-amber-300 hover:bg-amber-100/15'
+                        : 'bg-surface/20 hover:bg-surface/30 border-l-2 border-subtle/30'
                     }`}
                   >
                     <div className="flex items-center justify-between">
@@ -296,7 +296,7 @@ const BuildersRelaysPanel: React.FC<BuildersRelaysPanelProps> = ({
                       </div>
                       <div className="flex items-center ml-1.5">
                         <div
-                          className={`font-mono ${showWinningStyle ? 'text-amber-400' : 'text-text-tertiary'} text-[10px]`}
+                          className={`font-mono ${showWinningStyle ? 'text-amber-400' : 'text-tertiary'} text-[10px]`}
                         >
                           {item.bidCount !== undefined
                             ? `${item.bidCount} bid${item.bidCount !== 1 ? 's' : ''}`
@@ -307,9 +307,15 @@ const BuildersRelaysPanel: React.FC<BuildersRelaysPanelProps> = ({
                   </div>
                 );
               })}
+              {/* Show count of hidden relays if there are more than 5 */}
+              {relays.length > 5 && (
+                <div className="text-xs text-tertiary text-center pt-1 pb-1">
+                  + {relays.length - 5} more relays
+                </div>
+              )}
             </div>
           ) : (
-            <div className="h-full flex items-center justify-center text-xs text-text-tertiary p-3">
+            <div className="h-full flex items-center justify-center text-xs text-tertiary p-3">
               {isRelayActive ? 'No relays yet' : 'Waiting...'}
             </div>
           )}
