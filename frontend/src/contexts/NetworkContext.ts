@@ -2,7 +2,7 @@ import { createContext } from 'react';
 
 interface NetworkContextType {
   selectedNetwork: string;
-  setSelectedNetwork: (network: string) => void;
+  setSelectedNetwork: (network: string, source?: 'ui' | 'url') => void;
   availableNetworks: string[];
 }
 
