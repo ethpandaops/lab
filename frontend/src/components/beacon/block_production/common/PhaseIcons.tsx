@@ -30,6 +30,58 @@ interface PhaseIconsProps {
   isLocallyBuilt?: boolean;
 }
 
+// Define phase configurations
+const phases = [
+  {
+    id: 'builder',
+    icon: '🤖',
+    title: 'Builders',
+    description: 'Builders compete amongst each other to create the most profitable blocks.',
+    color: 'orange' as const,
+    nextColor: 'green',
+  },
+  {
+    id: 'relay',
+    icon: '🔄',
+    title: 'Relaying',
+    description: 'Relays connect builders and proposers, allowing proposers to select blocks.',
+    color: 'green' as const,
+    nextColor: 'amber',
+  },
+  {
+    id: 'proposer',
+    icon: '👤',
+    title: 'Proposing',
+    description: 'The proposer is selected to create this slot\'s block, choosing the best bid or building a block themselves.',
+    color: 'amber' as const,
+    nextColor: 'purple',
+  },
+  {
+    id: 'node',
+    icon: '🖥️',
+    title: 'Gossiping',
+    description: 'Beacon nodes gossip the proposed blocks amongst themselves.',
+    color: 'purple' as const,
+    nextColor: 'blue',
+  },
+  {
+    id: 'attester',
+    icon: '✓',
+    title: 'Attesting',
+    description: 'Attesters validate and verify the block, and attest to its correctness.',
+    color: 'blue' as const,
+    nextColor: 'green',
+  },
+  {
+    id: 'accepted',
+    icon: '🔒',
+    title: 'Accepted',
+    description: 'Once 66% of the slot\'s attesters have voted for the block, it\'s unlikely to be re-orged out.',
+    color: 'green' as const,
+    nextColor: '',
+  },
+];
+
 const PhaseIcons: React.FC<PhaseIconsProps> = ({
   currentTime,
   nodeBlockSeen,
@@ -67,6 +119,7 @@ const PhaseIcons: React.FC<PhaseIconsProps> = ({
       return isLocallyBuilt;
     }
   }, [isLocallyBuilt, slotData]);
+
   // Extract the attestation data from slotData based on its format
   let attestationsData = null;
   
@@ -157,410 +210,229 @@ const PhaseIcons: React.FC<PhaseIconsProps> = ({
     }
   };
 
+  // Function to get dynamic content for each phase
+  const getDynamicContent = (phaseId: string) => {
+    switch (phaseId) {
+      case 'builder':
+        return bids.length > 0 ? (
+          <>
+            {countUniqueBuilderPubkeys(bids)} builder
+            {countUniqueBuilderPubkeys(bids) > 1 ? 's' : ''} bidded for this slot
+          </>
+        ) : (
+          <>Waiting...</>
+        );
+        
+      case 'relay':
+        return activeRelays > 0 ? (
+          <>
+            {activeRelays} relay{activeRelays > 1 ? 's' : ''} were involved in this slot.
+          </>
+        ) : (
+          <>Waiting...</>
+        );
+        
+      case 'proposer':
+        return proposer ? (
+          <>
+            {effectiveIsLocallyBuilt ? (
+              <span className="font-medium">Locally built by proposer</span>
+            ) : (
+              <span>Built via external builder</span>
+            )}
+          </>
+        ) : (
+          <>Waiting...</>
+        );
+        
+      case 'node':
+        return Object.keys(nodes).length > 0 ? (
+          <>{Object.keys(nodes).length} nodes from Xatu saw this block</>
+        ) : (
+          <>Waiting...</>
+        );
+        
+      case 'attester':
+        // REQUIREMENT 3 & 4: Calculate attestation percentage based on actual data with max from the slot
+        let visibleAttestationsCount = 0;
+        let totalExpectedAttestations = 0;
+
+        // Get the maximum expected attestations from the slot data
+        // Use the already extracted attestationsData variable
+        if (attestationsData?.maximumVotes) {
+          totalExpectedAttestations = Number(attestationsData.maximumVotes);
+        }
+
+        // Count attestations that have been included up to the current time
+        if (
+          attestationsData?.windows &&
+          Array.isArray(attestationsData.windows)
+        ) {
+          attestationsData.windows.forEach((window: any) => {
+            // Use the same method as in the phase calculation above
+            if (window.startMs !== undefined && Number(window.startMs) <= currentTime) {
+              visibleAttestationsCount += window.validatorIndices?.length || 0;
+            }
+          });
+        }
+
+        // Show percentage in attestation or accepted phase
+        if (
+          (isActiveInPhase('attester') || isActiveInPhase('accepted')) &&
+          totalExpectedAttestations > 0
+        ) {
+          // Calculate percentage
+          const percentage = Math.min(
+            100,
+            Math.round((visibleAttestationsCount / totalExpectedAttestations) * 100),
+          );
+          return `${percentage}% of the slot's attesters voted for this block`;
+        }
+
+        return 'Waiting...';
+        
+      case 'accepted':
+        if (isActiveInPhase('accepted') && attestationsData?.windows) {
+          // Calculate when it hit 66% attestations (acceptance time)
+          let acceptanceTime = Infinity;
+          const totalExpectedAttestations = attestationsData?.maximumVotes
+            ? Number(attestationsData.maximumVotes)
+            : 0;
+
+          if (totalExpectedAttestations > 0) {
+            // Threshold for 66% of attestations
+            const threshold = Math.ceil(totalExpectedAttestations * 0.66);
+            let cumulativeAttestations = 0;
+
+            // Sort windows by time
+            const sortedWindows = [...(attestationsData.windows || [])].sort(
+              (a, b) => {
+                return Number(a.startMs || Infinity) - Number(b.startMs || Infinity);
+              },
+            );
+
+            // Find the window when we reach 66%
+            for (const window of sortedWindows) {
+              if (window.startMs !== undefined && window.validatorIndices?.length) {
+                cumulativeAttestations += window.validatorIndices.length;
+
+                if (cumulativeAttestations >= threshold) {
+                  acceptanceTime = Number(window.startMs);
+                  break;
+                }
+              }
+            }
+          }
+
+          // Format the acceptance time
+          if (acceptanceTime !== Infinity) {
+            return `This block achieved acceptance at ${(acceptanceTime / 1000).toFixed(1)}s`;
+          }
+
+          return 'Accepted';
+        }
+        return 'Waiting...';
+      
+      default:
+        return 'Waiting...';
+    }
+  };
+
+  // Create a badge for the proposer icon if locally built
+  const getProposerBadge = () => {
+    if (effectiveIsLocallyBuilt) {
+      return (
+        <div
+          className="absolute -top-7 left-1/2 transform -translate-x-1/2 text-4xl z-50"
+          role="img"
+          aria-label="Locally Built Crown"
+          style={{filter: "drop-shadow(0 0 4px gold)"}}
+        >
+          👑
+        </div>
+      );
+    }
+    return null;
+  };
+
   return (
-    <div className="w-full">
-      <div className="flex justify-between items-start px-2 relative z-10">
-        {/* 1. BUILDERS PHASE */}
-        <div
-          className={`flex flex-col items-center text-center transition-opacity duration-300 ${isActiveInPhase('builder') ? 'opacity-100' : 'opacity-60'}`}
-        >
-          <div
-            className={`w-14 h-14 flex items-center justify-center rounded-full mb-1.5 shadow-md transition-colors duration-300 ${
-              isActiveInPhase('builder')
-                ? 'bg-gradient-to-br from-orange-500/60 to-orange-600/30 border-2 border-orange-400/80' // Active
-                : currentPhase === Phase.Propagating ||
-                    currentPhase === Phase.Attesting ||
-                    currentPhase === Phase.Accepted
-                  ? 'bg-gradient-to-br from-orange-500/30 to-orange-600/10 border-2 border-orange-400/40' // Completed
-                  : 'bg-surface border border-border/80' // Not yet active
-            }`}
-          >
-            <div
-              className={`text-2xl ${isActiveInPhase('builder') ? 'opacity-90' : 'opacity-50'}`}
-              role="img"
-              aria-label="Robot (Builder)"
-            >
-              🤖
-            </div>
-          </div>
-          <div
-            className={`font-medium text-sm mb-0.5 ${isActiveInPhase('builder') ? 'text-orange-300' : 'text-primary/70'}`}
-          >
-            Builders
-          </div>
-          <div
-            className={`text-[12px] leading-tight max-w-[100px] lg:max-w-[160px] text-center min-h-[48px]`}
-          >
-            <span className={`${isActiveInPhase('builder') ? 'text-white/90' : 'text-tertiary'}`}>
-              Builders compete amongst each other to create the most profitable blocks.
-            </span>
-            <div className="h-1"></div>
-            <span className={`${isActiveInPhase('builder') ? 'text-orange-300' : 'text-tertiary'}`}>
-              {bids.length > 0 ? (
-                <>
-                  {countUniqueBuilderPubkeys(bids)} builder
-                  {countUniqueBuilderPubkeys(bids) > 1 ? 's' : ''} bidded for this slot
-                </>
-              ) : (
-                <>Waiting...</>
-              )}
-            </span>
-          </div>
-        </div>
-
-        {/* Flow line 1 - Builder to Relay: Orange to Green */}
-        <div className="flex-shrink-0 flex items-start justify-center relative w-20 pt-[28px]">
-          <div
-            className="h-1.5 w-full bg-gradient-to-r from-orange-400 to-green-400 rounded-full shadow-inner"
-            style={{
-              opacity: 0.8,
-            }}
-          />
-        </div>
-
-        {/* 2. RELAYS PHASE */}
-        <div
-          className={`flex flex-col items-center text-center transition-opacity duration-300 ${isActiveInPhase('relay') ? 'opacity-100' : 'opacity-60'}`}
-        >
-          <div
-            className={`w-14 h-14 flex items-center justify-center rounded-full mb-1.5 shadow-md transition-colors duration-300 ${
-              isActiveInPhase('relay')
-                ? 'bg-gradient-to-br from-green-500/60 to-green-600/30 border-2 border-green-400/80' // Active
-                : currentPhase === Phase.Attesting || currentPhase === Phase.Accepted
-                  ? 'bg-gradient-to-br from-green-500/30 to-green-600/10 border-2 border-green-400/40' // Completed
-                  : 'bg-surface border border-border/80' // Not yet active
-            }`}
-          >
-            <div
-              className={`text-2xl ${isActiveInPhase('relay') ? 'opacity-90' : 'opacity-50'}`}
-              role="img"
-              aria-label="MEV Relay"
-            >
-              🔄
-            </div>
-          </div>
-          <div
-            className={`font-medium text-sm mb-0.5 ${isActiveInPhase('relay') ? 'text-green-300' : 'text-primary/70'}`}
-          >
-            Relaying
-          </div>
-          <div className={`text-[12px] leading-tight max-w-[100px] lg:max-w-[160px] min-h-[48px]`}>
-            <span className={`${isActiveInPhase('relay') ? 'text-white/90' : 'text-tertiary'}`}>
-              Relays connect builders and proposers, allowing proposers to select blocks.
-            </span>
-            <div className="h-1"></div>
-            <span className={`${isActiveInPhase('relay') ? 'text-green-300' : 'text-tertiary'}`}>
-              {activeRelays > 0 ? (
-                <>
-                  {activeRelays} relay{activeRelays > 1 ? 's' : ''} were involved in this slot.
-                </>
-              ) : (
-                <>Waiting...</>
-              )}
-            </span>
-          </div>
-        </div>
-
-        {/* Flow line 2 - Relay to Proposer: Green to Gold */}
-        <div className="flex-shrink-0 flex items-start justify-center relative w-20 pt-[28px]">
-          <div
-            className="h-1.5 w-full bg-gradient-to-r from-green-400 to-amber-400 rounded-full shadow-inner"
-            style={{
-              opacity: 0.8,
-            }}
-          />
-        </div>
-
-        {/* 3. PROPOSER PHASE */}
-        <div
-          className={`flex flex-col items-center text-center transition-opacity duration-300 ${isActiveInPhase('proposer') ? 'opacity-100' : 'opacity-60'}`}
-        >
-          <div
-            className={`w-14 h-14 flex items-center justify-center rounded-full mb-1.5 shadow-md transition-colors duration-300 relative ${
-              isActiveInPhase('proposer')
-                ? 'bg-gradient-to-br from-amber-500/60 to-amber-600/30 border-2 border-amber-400/80' // Active
-                : currentPhase === Phase.Attesting || currentPhase === Phase.Accepted
-                  ? 'bg-gradient-to-br from-amber-500/40 to-amber-600/10 border-2 border-amber-400/60' // Completed
-                  : 'bg-surface border border-border/80' // Not yet active
-            }`}
-          >
-            {effectiveIsLocallyBuilt && (
-              <div
-                className="absolute -top-7 left-1/2 transform -translate-x-1/2 text-4xl z-50"
-                role="img"
-                aria-label="Locally Built Crown"
-                style={{filter: "drop-shadow(0 0 4px gold)"}}
+    <div className="w-full px-4 sm:px-6 md:px-10">
+      {/* Container with fixed width for each phase and flow lines in between */}
+      <div className="grid grid-cols-11 w-full">
+        {phases.map((phase, index) => (
+          <React.Fragment key={phase.id}>
+            {/* Each phase gets its own column */}
+            <div className="col-span-1 flex flex-col items-center">
+              {/* Icon */}
+              <div 
+                className={`w-14 h-14 flex items-center justify-center rounded-full shadow-md transition-colors duration-300 relative ${
+                  isActiveInPhase(phase.id as any)
+                    ? `bg-gradient-to-br from-${phase.color}-500/60 to-${phase.color}-600/30 border-2 border-${phase.color}-400/80` // Active
+                    : currentPhase === Phase.Propagating ||
+                      currentPhase === Phase.Attesting ||
+                      currentPhase === Phase.Accepted
+                      ? `bg-gradient-to-br from-${phase.color}-500/30 to-${phase.color}-600/10 border-2 border-${phase.color}-400/40` // Completed
+                      : 'bg-surface border border-border/80' // Not yet active
+                }`}
               >
-                👑
+                {phase.id === 'proposer' && getProposerBadge()}
+                <div
+                  className={`text-2xl ${isActiveInPhase(phase.id as any) ? 'opacity-90' : 'opacity-50'}`}
+                  role="img"
+                  aria-label={phase.title}
+                >
+                  {phase.icon}
+                </div>
+              </div>
+              
+              {/* Title */}
+              <div
+                className={`font-medium text-sm mt-2 mb-1 text-center ${
+                  isActiveInPhase(phase.id as any) ? `text-${phase.color}-300` : 'text-primary/70'
+                }`}
+              >
+                {phase.title}
+              </div>
+              
+              {/* Description */}
+              <div 
+                className={`text-[12px] leading-tight text-left min-h-[75px] transition-opacity duration-300 w-full px-1 ${
+                  isActiveInPhase(phase.id as any) ? 'opacity-100' : 'opacity-60'
+                }`}
+              >
+                <span className={`${isActiveInPhase(phase.id as any) ? 'text-white/90' : 'text-tertiary'}`}>
+                  {phase.description}
+                </span>
+              </div>
+              
+              {/* Dynamic content */}
+              <div 
+                className={`text-[12px] leading-tight text-center mt-2 transition-opacity duration-300 w-full ${
+                  isActiveInPhase(phase.id as any) ? 'opacity-100' : 'opacity-60'
+                }`}
+              >
+                <span className={`${isActiveInPhase(phase.id as any) ? `text-${phase.color}-300` : 'text-tertiary'}`}>
+                  {getDynamicContent(phase.id)}
+                </span>
+                {phase.id === 'proposer' && currentPhase !== Phase.Building && blockTime !== undefined && (
+                  <div className="text-xs font-mono text-success mt-1 whitespace-nowrap">
+                    {(blockTime / 1000).toFixed(1)}s
+                  </div>
+                )}
+              </div>
+            </div>
+            
+            {/* Flow line after each phase except the last one */}
+            {index < phases.length - 1 && (
+              <div className="col-span-1 flex items-center h-14">
+                <div 
+                  className={`h-1.5 w-full bg-gradient-to-r from-${phase.color}-400 to-${phases[index + 1].color}-400 rounded-full shadow-inner`}
+                  style={{ opacity: 0.8 }}
+                />
               </div>
             )}
-            <div
-              className={`text-2xl ${isActiveInPhase('proposer') ? 'opacity-90' : 'opacity-50'}`}
-              role="img"
-              aria-label="Proposer"
-            >
-              👤
-            </div>
-          </div>
-          <div
-            className={`font-medium text-sm mb-0.5 ${isActiveInPhase('proposer') ? 'text-amber-300' : 'text-primary/70'}`}
-          >
-            Proposing
-          </div>
-          <div className={`text-[12px] leading-tight max-w-[100px] lg:max-w-[160px]  min-h-[48px]`}>
-            <span className={`${isActiveInPhase('proposer') ? 'text-white/90' : 'text-tertiary'}`}>
-              The proposer is selected to create this slot's block, choosing the best bid or
-              building a block themselves.
-            </span>
-            <div className="h-1"></div>
-            <span className={`${isActiveInPhase('proposer') ? 'text-amber-300' : 'text-tertiary'}`}>
-              {proposer ? (
-                <>
-                  {effectiveIsLocallyBuilt ? (
-                    <span className="font-medium">Locally built by proposer</span>
-                  ) : (
-                    <span>Built via external builder</span>
-                  )}
-                </>
-              ) : (
-                <>Waiting...</>
-              )}
-            </span>
-          </div>
-          {currentPhase !== Phase.Building && blockTime !== undefined && (
-            <div className="text-xs font-mono text-success absolute -bottom-4 whitespace-nowrap">
-              {(blockTime / 1000).toFixed(1)}s
-            </div>
-          )}
-        </div>
-
-        {/* Flow line 3 - Proposer to Nodes: Gold to Purple */}
-        <div className="flex-shrink-0 flex items-start justify-center relative w-20 pt-[28px]">
-          <div
-            className="h-1.5 w-full bg-gradient-to-r from-amber-400 to-purple-400 rounded-full shadow-inner"
-            style={{
-              opacity: 0.8,
-            }}
-          />
-        </div>
-
-        {/* NODES PHASE - INSERTED BETWEEN PROPOSER AND ATTESTERS */}
-        <div
-          className={`flex flex-col items-center text-center transition-opacity duration-300 ${isActiveInPhase('node') ? 'opacity-100' : 'opacity-60'}`}
-        >
-          <div
-            className={`w-14 h-14 flex items-center justify-center rounded-full mb-1.5 shadow-md transition-colors duration-300 ${
-              isActiveInPhase('node')
-                ? 'bg-gradient-to-br from-purple-500/60 to-purple-600/30 border-2 border-purple-400/80' // Active
-                : currentPhase === Phase.Attesting || currentPhase === Phase.Accepted
-                  ? 'bg-gradient-to-br from-purple-500/40 to-purple-600/20 border-2 border-purple-400/60' // Completed
-                  : 'bg-surface border border-border/80' // Not yet active
-            }`}
-          >
-            <div
-              className={`text-2xl ${isActiveInPhase('node') ? 'opacity-90' : 'opacity-50'}`}
-              role="img"
-              aria-label="Network Nodes"
-            >
-              🖥️
-            </div>
-          </div>
-          <div
-            className={`font-medium text-sm mb-0.5 ${isActiveInPhase('node') ? 'text-purple-300' : 'text-primary/70'}`}
-          >
-            Gossiping
-          </div>
-          <div
-            className={`text-[12px] leading-tight max-w-[100px] lg:max-w-[160px] text-center min-h-[48px]`}
-          >
-            <span className={`${isActiveInPhase('node') ? 'text-white/90' : 'text-tertiary'}`}>
-              Beacon nodes gossip the proposed blocks amongst themselves.
-            </span>
-            <div className="h-1"></div>
-            <span className={`${isActiveInPhase('node') ? 'text-purple-300' : 'text-tertiary'}`}>
-              {Object.keys(nodes).length > 0 ? (
-                <>{Object.keys(nodes).length} nodes from Xatu saw this block</>
-              ) : (
-                <>Waiting...</>
-              )}
-            </span>
-          </div>
-        </div>
-
-        {/* Flow line 4 - Nodes to Attesters: Purple to Blue */}
-        <div className="flex-shrink-0 flex items-start justify-center relative w-20 pt-[28px]">
-          <div
-            className="h-1.5 w-full bg-gradient-to-r from-purple-400 to-blue-400 rounded-full shadow-inner"
-            style={{
-              opacity: 0.8,
-            }}
-          />
-        </div>
-
-        {/* 4. ATTESTATION PHASE */}
-        <div
-          className={`flex flex-col items-center text-center transition-opacity duration-300 ${isActiveInPhase('attester') ? 'opacity-100' : 'opacity-60'}`}
-        >
-          <div
-            className={`w-14 h-14 flex items-center justify-center rounded-full mb-1.5 shadow-md transition-colors duration-300 ${
-              isActiveInPhase('attester')
-                ? 'bg-gradient-to-br from-blue-500/60 to-blue-600/30 border-2 border-blue-400/80' // Active
-                : currentPhase === Phase.Accepted
-                  ? 'bg-gradient-to-br from-blue-500/30 to-blue-600/10 border-2 border-blue-400/40' // Completed
-                  : 'bg-surface border border-border/80' // Not yet active
-            }`}
-          >
-            <div
-              className={`text-2xl ${isActiveInPhase('attester') ? 'opacity-90' : 'opacity-50'}`}
-              role="img"
-              aria-label="Attesters"
-            >
-              ✓
-            </div>
-          </div>
-          <div
-            className={`font-medium text-sm mb-0.5 ${isActiveInPhase('attester') ? 'text-blue-300' : 'text-primary/70'}`}
-          >
-            Attesting
-          </div>
-          <div
-            className={`text-[12px] leading-tight max-w-[100px] lg:max-w-[160px] text-center min-h-[48px]`}
-          >
-            <span className={`${isActiveInPhase('attester') ? 'text-white/90' : 'text-tertiary'}`}>
-              Attesters validate and verify the block, and attest to its correctness.
-            </span>
-            <div className="h-1"></div>
-            <span className={`${isActiveInPhase('attester') ? 'text-blue-300' : 'text-tertiary'}`}>
-              {(() => {
-                // REQUIREMENT 3 & 4: Calculate attestation percentage based on actual data with max from the slot
-                let visibleAttestationsCount = 0;
-                let totalExpectedAttestations = 0;
-
-                // Get the maximum expected attestations from the slot data
-                // Use the already extracted attestationsData variable
-                if (attestationsData?.maximumVotes) {
-                  totalExpectedAttestations = Number(attestationsData.maximumVotes);
-                }
-
-                // Count attestations that have been included up to the current time
-                if (
-                  attestationsData?.windows &&
-                  Array.isArray(attestationsData.windows)
-                ) {
-                  attestationsData.windows.forEach((window: any) => {
-                    // Use the same method as in the phase calculation above
-                    if (window.startMs !== undefined && Number(window.startMs) <= currentTime) {
-                      visibleAttestationsCount += window.validatorIndices?.length || 0;
-                    }
-                  });
-                }
-
-                // Show percentage in attestation or accepted phase
-                if (
-                  (isActiveInPhase('attester') || isActiveInPhase('accepted')) &&
-                  totalExpectedAttestations > 0
-                ) {
-                  // Calculate percentage
-                  const percentage = Math.min(
-                    100,
-                    Math.round((visibleAttestationsCount / totalExpectedAttestations) * 100),
-                  );
-                  return `${percentage}% of the slot's attesters voted for this block`;
-                }
-
-                return 'Waiting...';
-              })()}
-            </span>
-          </div>
-        </div>
-
-        {/* Flow line 5 - Attesters to Accepted: Blue to Green */}
-        <div className="flex-shrink-0 flex items-start justify-center relative w-20 pt-[28px]">
-          <div
-            className="h-1.5 w-full bg-gradient-to-r from-blue-400 to-green-400 rounded-full shadow-inner"
-            style={{
-              opacity: 0.8,
-            }}
-          />
-        </div>
-
-        {/* 5. ACCEPTED PHASE - NEW */}
-        <div
-          className={`flex flex-col items-center text-center transition-opacity duration-300 ${isActiveInPhase('accepted') ? 'opacity-100' : 'opacity-60'}`}
-        >
-          <div
-            className={`w-14 h-14 flex items-center justify-center rounded-full mb-1.5 shadow-md transition-colors duration-300 ${
-              isActiveInPhase('accepted')
-                ? 'bg-gradient-to-br from-green-500/60 to-green-600/30 border-2 border-green-400/80' // Active
-                : 'bg-surface border border-border/80' // Not yet active
-            }`}
-          >
-            <div
-              className={`text-2xl ${isActiveInPhase('accepted') ? 'opacity-90' : 'opacity-50'}`}
-              role="img"
-              aria-label="Accepted"
-            >
-              🔒
-            </div>
-          </div>
-          <div
-            className={`font-medium text-sm mb-0.5 ${isActiveInPhase('accepted') ? 'text-green-300' : 'text-primary/70'}`}
-          >
-            Accepted
-          </div>
-          <div
-            className={`text-[12px] leading-tight max-w-[100px] lg:max-w-[160px] text-center min-h-[48px]`}
-          >
-            <span className={`${isActiveInPhase('accepted') ? 'text-white/90' : 'text-tertiary'}`}>
-              Once 66% of the slot's attesters have voted for the block, it's unlikely to be
-              re-orged out.
-            </span>
-            <div className="h-1"></div>
-            <span className={`${isActiveInPhase('accepted') ? 'text-green-300' : 'text-tertiary'}`}>
-              {isActiveInPhase('accepted') && attestationsData?.windows
-                ? (() => {
-                    // Calculate when it hit 66% attestations (acceptance time)
-                    let acceptanceTime = Infinity;
-                    const totalExpectedAttestations = attestationsData?.maximumVotes
-                      ? Number(attestationsData.maximumVotes)
-                      : 0;
-
-                    if (totalExpectedAttestations > 0) {
-                      // Threshold for 66% of attestations
-                      const threshold = Math.ceil(totalExpectedAttestations * 0.66);
-                      let cumulativeAttestations = 0;
-
-                      // Sort windows by time
-                      const sortedWindows = [...(attestationsData.windows || [])].sort(
-                        (a, b) => {
-                          return Number(a.startMs || Infinity) - Number(b.startMs || Infinity);
-                        },
-                      );
-
-                      // Find the window when we reach 66%
-                      for (const window of sortedWindows) {
-                        if (window.startMs !== undefined && window.validatorIndices?.length) {
-                          cumulativeAttestations += window.validatorIndices.length;
-
-                          if (cumulativeAttestations >= threshold) {
-                            acceptanceTime = Number(window.startMs);
-                            break;
-                          }
-                        }
-                      }
-                    }
-
-                    // Format the acceptance time
-                    if (acceptanceTime !== Infinity) {
-                      return `This block achieved acceptance at ${(acceptanceTime / 1000).toFixed(1)}s`;
-                    }
-
-                    return 'Accepted';
-                  })()
-                : 'Waiting...'}
-            </span>
-          </div>
-        </div>
+          </React.Fragment>
+        ))}
       </div>
     </div>
   );
