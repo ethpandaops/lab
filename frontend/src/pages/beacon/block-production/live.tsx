@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext, useMemo, useRef } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { useParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 import { getLabApiClient } from '../../../api';
 import { GetSlotDataRequest } from '../../../api/gen/backend/pkg/api/proto/lab_api_pb';
 import { BeaconClockManager } from '../../../utils/beacon';
@@ -20,8 +20,14 @@ import { isBlockLocallyBuilt, hasNonEmptyDeliveredPayloads } from '@/components/
  * The visualization tracks the flow of blocks through the system in real-time.
  */
 export default function BlockProductionLivePage() {
-  const { network } = useParams<{ network?: string }>();
-  const selectedNetwork = network || 'mainnet'; // Default to mainnet if no network param
+  // Get network from both URL params and NetworkContext
+  const { network: networkParam } = useParams<{ network?: string }>();
+  const [searchParams] = useSearchParams();
+  const { selectedNetwork: contextNetwork } = useContext(NetworkContext);
+  
+  // Priority: 1. URL param 2. Search param 3. NetworkContext 4. Default to mainnet
+  const networkFromUrl = networkParam || searchParams.get('network');
+  const selectedNetwork = networkFromUrl || contextNetwork || 'mainnet';
   const queryClient = useQueryClient();
 
   // Add state to handle screen size with more granular breakpoints
@@ -55,12 +61,39 @@ export default function BlockProductionLivePage() {
   const isMobile = viewMode !== 'desktop';
 
   // Use BeaconClockManager for slot timing
-  useContext(NetworkContext); // Keep context connection for potential future use
+  const networkContext = useContext(NetworkContext);
   const beaconClockManager = BeaconClockManager.getInstance();
   const clock = beaconClockManager.getBeaconClock(selectedNetwork);
 
   const headLagSlots = beaconClockManager.getHeadLagSlots(selectedNetwork);
   const [headSlot, setHeadSlot] = useState<number | null>(clock ? clock.getCurrentSlot() : null);
+  
+  // Reset state when network changes
+  useEffect(() => {
+    // Get updated clock for the selected network
+    const updatedClock = beaconClockManager.getBeaconClock(selectedNetwork);
+    
+    if (updatedClock) {
+      // Reset head slot to the current slot of the new network
+      const newSlot = updatedClock.getCurrentSlot();
+      setHeadSlot(newSlot);
+      
+      // Reset to live position
+      setDisplaySlotOffset(0);
+      setCurrentTime(0);
+      
+      // Clear prefetched slots for the previous network
+      prefetchedSlotsRef.current = new Set();
+      
+      // Make sure we're in playing state
+      setIsPlaying(true);
+      
+      // Invalidate queries for the previous network to force refetching
+      queryClient.invalidateQueries({
+        queryKey: ['block-production-live', 'slot', selectedNetwork]
+      });
+    }
+  }, [selectedNetwork, beaconClockManager, queryClient]);
 
   // Use a ref to track if we're at the "live" position
   // This will help determine if we should auto-update when slots change
@@ -87,8 +120,12 @@ export default function BlockProductionLivePage() {
   useEffect(() => {
     if (!selectedNetwork) return;
 
+    // Reset state when network changes to ensure fresh data
+    setCurrentTime(0);
+    prefetchedSlotsRef.current = new Set();
+
     // Create a slot change callback
-    const slotChangeCallback: SlotChangeCallback = (network, newSlot, previousSlot) => {
+    const slotChangeCallback = (network: string, newSlot: number, previousSlot: number) => {
       // Only update the head slot if we're in play mode
       // This prevents real-world slot changes from affecting our visualization when paused
       if (isPlayingRef.current) {
@@ -297,12 +334,15 @@ export default function BlockProductionLivePage() {
     // Run the check every 100ms
     const intervalId = setInterval(checkAndPrefetch, 100);
 
-    // Initial prefetch of current and next slots when component mounts
+    // Initial prefetch of current and next slots when component mounts or network changes
     if (headSlot !== null) {
       const currentDisplaySlot = headSlot - (headLagSlots + 2);
       const nextDisplaySlot = currentDisplaySlot + 1;
 
-      // Safely prefetch the initial slots
+      // Clear any previously prefetched slots when network changes
+      prefetchedSlotsRef.current = new Set();
+      
+      // Safely prefetch the initial slots for the current network
       prefetchMultipleSlotsCallback(currentDisplaySlot, 2);
     }
 
@@ -366,7 +406,7 @@ export default function BlockProductionLivePage() {
 
     // Ensure we're in playing state
     setIsPlaying(true);
-  }, [headSlot, slotNumber, displaySlotOffset, headLagSlots, prefetchSlotData]);
+  }, [headSlot, slotNumber, displaySlotOffset, headLagSlots, prefetchSlotData, selectedNetwork]);
   const isNextDisabled = displaySlotOffset >= 0;
   const togglePlayPause = React.useCallback(() => setIsPlaying(prev => !prev), []);
 
