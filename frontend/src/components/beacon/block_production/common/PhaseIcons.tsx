@@ -407,13 +407,21 @@ const PhaseIcons: React.FC<PhaseIconsProps> = ({
               
               {/* Dynamic content */}
               <div 
-                className={`text-[12px] leading-tight text-center mt-2 transition-opacity duration-300 w-full ${
+                className={`text-[12px] leading-tight text-center mt-2 transition-opacity duration-300 w-full min-h-[48px] ${
                   isActiveInPhase(phase.id as any) ? 'opacity-100' : 'opacity-60'
                 }`}
               >
-                <span className={`${isActiveInPhase(phase.id as any) ? `text-${phase.color}-300` : 'text-tertiary'}`}>
-                  {getDynamicContent(phase.id)}
-                </span>
+                {getDynamicContent(phase.id) === 'Waiting...' ? (
+                  /* Skeleton loader for waiting state */
+                  <div className="flex flex-col items-center space-y-2">
+                    <div className={`h-2 w-3/4 rounded-full bg-${phase.color}-400/20 animate-pulse`}></div>
+                    <div className={`h-2 w-2/3 rounded-full bg-${phase.color}-400/20 animate-pulse`}></div>
+                  </div>
+                ) : (
+                  <span className={`${isActiveInPhase(phase.id as any) ? `text-${phase.color}-300` : 'text-tertiary'}`}>
+                    {getDynamicContent(phase.id)}
+                  </span>
+                )}
                 {phase.id === 'proposer' && currentPhase !== Phase.Building && blockTime !== undefined && (
                   <div className="text-xs font-mono text-success mt-1 whitespace-nowrap">
                     {(blockTime / 1000).toFixed(1)}s
