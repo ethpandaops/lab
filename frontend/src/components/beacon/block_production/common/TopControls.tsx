@@ -27,46 +27,46 @@ const TopControls: React.FC<TopControlsProps> = ({
   isNextDisabled,
 }) => {
   return (
-    <div className="flex items-center justify-between py-2 px-4 bg-surface/30 rounded-t-lg">
-      <div className="flex items-center gap-2">
-        <button
-          onClick={goToPreviousSlot}
-          className="bg-surface/50 p-1.5 rounded border border-subtle hover:bg-hover transition"
-          title="Previous Slot"
-        >
-          <ChevronLeft className="h-3.5 w-3.5 text-primary" />
-        </button>
+    <div className="flex items-center justify-between py-3 px-4 bg-surface border-b border-subtle shadow-sm">
+      <div className="flex items-center gap-3">
+        <div className="flex items-center gap-1.5 bg-surface/70 p-0.5 rounded-lg border border-subtle">
+          <button
+            onClick={goToPreviousSlot}
+            className="p-1.5 rounded-md transition focus:outline-none focus:ring-1 focus:ring-accent/70 hover:bg-hover"
+            title="Previous Slot"
+          >
+            <ChevronLeft className="h-4 w-4 text-primary" />
+          </button>
 
-        <button
-          onClick={resetToCurrentSlot}
-          className={`px-2 py-1 rounded border font-medium text-xs ${
-            displaySlotOffset === 0
-              ? 'bg-accent/20 border-accent/50 text-accent'
-              : 'bg-surface/50 border-subtle text-secondary hover:bg-hover'
-          } transition`}
-          disabled={displaySlotOffset === 0}
-          title="Return to Current Slot"
-        >
-          Live
-        </button>
+          <button
+            onClick={resetToCurrentSlot}
+            className={`px-2.5 py-1 rounded-md font-medium text-xs transition focus:outline-none focus:ring-1 focus:ring-accent/70 ${
+              displaySlotOffset === 0
+                ? 'bg-accent/20 text-accent'
+                : 'text-secondary hover:bg-hover'
+            }`}
+            disabled={displaySlotOffset === 0}
+            title="Return to Current Slot"
+          >
+            Live
+          </button>
 
-        <button
-          onClick={goToNextSlot}
-          className={`bg-surface/50 p-1.5 rounded border border-subtle transition ${
-            isNextDisabled ? 'opacity-50 cursor-not-allowed' : 'hover:bg-hover'
-          }`}
-          disabled={isNextDisabled}
-          title="Next Slot"
-        >
-          <ChevronRight className="h-3.5 w-3.5 text-primary" />
-        </button>
+          <button
+            onClick={goToNextSlot}
+            className={`p-1.5 rounded-md transition focus:outline-none focus:ring-1 focus:ring-accent/70 ${
+              isNextDisabled ? 'opacity-50 cursor-not-allowed' : 'hover:bg-hover'
+            }`}
+            disabled={isNextDisabled}
+            title="Next Slot"
+          >
+            <ChevronRight className="h-4 w-4 text-primary" />
+          </button>
+        </div>
 
-        <div
-          className={`font-mono ml-1 text-primary flex flex-col ${isMobile ? 'text-xs' : 'text-sm'}`}
-        >
-          <div>Slot: {slotNumber ?? '—'}</div>
+        <div className={`font-mono text-primary flex flex-col ${isMobile ? 'text-xs' : 'text-sm'}`}>
+          <div className="font-semibold text-base">Slot: {slotNumber ?? '—'}</div>
           {slotNumber !== null && displaySlotOffset !== 0 && (
-            <div className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-secondary opacity-70`}>
+            <div className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-secondary opacity-80`}>
               Lag: {headLagSlots - displaySlotOffset}
             </div>
           )}
@@ -75,13 +75,13 @@ const TopControls: React.FC<TopControlsProps> = ({
 
       <button
         onClick={togglePlayPause}
-        className="bg-surface/50 p-1.5 rounded border border-subtle hover:bg-hover transition"
+        className="bg-surface/70 p-1.5 rounded-md border border-subtle hover:bg-hover transition focus:outline-none focus:ring-1 focus:ring-accent/70"
         title={isPlaying ? 'Pause' : 'Play'}
       >
         {isPlaying ? (
-          <Pause className="h-3.5 w-3.5 text-primary" />
+          <Pause className="h-4 w-4 text-primary" />
         ) : (
-          <Play className="h-3.5 w-3.5 text-primary" />
+          <Play className="h-4 w-4 text-primary" />
         )}
       </button>
     </div>

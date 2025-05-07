@@ -286,7 +286,7 @@ const PhaseIcons: React.FC<PhaseIconsProps> = ({
             100,
             Math.round((visibleAttestationsCount / totalExpectedAttestations) * 100),
           );
-          return `${percentage}% of the slot's attesters voted for this block`;
+          return `${percentage}% of the attesters voted for this block`;
         }
 
         return 'Waiting...';
