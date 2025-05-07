@@ -87,10 +87,12 @@ const BlockHeader: React.FC<BlockHeaderProps> = ({
                 </div>
               )}
 
-              {/* Block Version - Always show "DENEB" but moved to far right */}
-              <div className="ml-auto bg-cyber-neon/10 px-2 py-0.5 rounded text-xs font-semibold text-cyber-neon uppercase tracking-wide">
-                DENEB
-              </div>
+              {/* Block Version - Try to get from any available source */}
+              {(blockData?.blockVersion || blockData?.raw?.block_version || blockData?.raw?.blockVersion) && (
+                <div className="ml-auto bg-cyber-neon/10 px-2 py-0.5 rounded text-xs font-semibold text-cyber-neon uppercase tracking-wide">
+                  {blockData?.blockVersion || blockData?.raw?.block_version || blockData?.raw?.blockVersion}
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -121,8 +123,8 @@ const BlockHeader: React.FC<BlockHeaderProps> = ({
         ) : null}
       </div>
 
-      {/* State Root & Block Proposer - Only show for current and future blocks */}
-      {!isPast && (
+      {/* State Root & Block Proposer - Only show for current and future blocks AND when we have a block */}
+      {!isPast && (blockData?.blockRoot || blockData?.executionPayloadBlockHash) && (
         <div className="flex justify-between items-center text-xs">
           <div className="flex items-center">
             <span className="text-text-tertiary mr-1">State Root:</span>
@@ -140,8 +142,8 @@ const BlockHeader: React.FC<BlockHeaderProps> = ({
         </div>
       )}
 
-      {/* Block Size - Only show for current and future blocks - removed compressed size */}
-      {!isPast && (
+      {/* Block Size - Only show for current and future blocks AND when we have a block */}
+      {!isPast && (blockData?.blockRoot || blockData?.executionPayloadBlockHash) && (
         <div className="flex justify-between items-center text-xs mt-1">
           <div className="flex items-center">
             <span className="text-text-tertiary mr-1">Size:</span>
