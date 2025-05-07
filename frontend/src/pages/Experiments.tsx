@@ -33,7 +33,10 @@ const experiments: ExperimentCard[] = [
     logo: '/ethereum.png',
     href: '/beacon',
     color: 'from-accent/20 via-accent-secondary/20 to-error/20',
-    features: [{ title: 'Locally Built Blocks', href: '/beacon/locally-built-blocks' }],
+    features: [
+      { title: 'Locally Built Blocks', href: '/beacon/locally-built-blocks' },
+      { title: 'Block Production Flow', href: '/beacon/block-production/live' },
+    ],
   },
 ];
 
