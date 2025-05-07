@@ -426,8 +426,24 @@ const PhaseIcons: React.FC<PhaseIconsProps> = ({
             {index < phases.length - 1 && (
               <div className="col-span-1 flex items-center h-14">
                 <div 
-                  className={`h-1.5 w-full bg-gradient-to-r from-${phase.color}-400 to-${phases[index + 1].color}-400 rounded-full shadow-inner`}
-                  style={{ opacity: 0.8 }}
+                  className={`h-1.5 w-full rounded-full shadow-inner ${
+                    // Only apply the gradient when both phases are active or when second phase is active/completed
+                    (isActiveInPhase(phase.id as any) && 
+                     (isActiveInPhase(phases[index + 1].id as any) || 
+                      currentPhase === Phase.Propagating || 
+                      currentPhase === Phase.Attesting || 
+                      currentPhase === Phase.Accepted))
+                      ? `bg-gradient-to-r from-${phase.color}-400 to-${phases[index + 1].color}-400`
+                      : 'bg-gray-700/30' // Dimmed state
+                  }`}
+                  style={{ 
+                    opacity: (isActiveInPhase(phase.id as any) && 
+                             (isActiveInPhase(phases[index + 1].id as any) || 
+                              currentPhase === Phase.Propagating || 
+                              currentPhase === Phase.Attesting || 
+                              currentPhase === Phase.Accepted))
+                              ? 0.8 : 0.4 
+                  }}
                 />
               </div>
             )}
