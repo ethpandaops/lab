@@ -345,16 +345,16 @@ const BlockchainVisualization: React.FC<BlockchainVisualizationProps> = ({
           {/* Blocks - now arranged horizontally */}
           <div className="relative z-10 flex flex-row items-center justify-center gap-6 px-4 w-full h-full">
             {blockData.map(block => {
-              // Hide previous and next blocks on medium screens (< 1280px)
-              // Only show them on large screens (>= 1280px)
+              // Hide previous and next blocks on screens below 1536px (2xl)
+              // Only show them on extra large screens (>= 1536px)
               const visibilityClassNames = !block.isCurrentSlot 
-                ? 'hidden lg:flex' // Hide on medium screens, show on large screens
+                ? 'hidden 2xl:flex' // Hide on smaller screens, show only on 2xl screens (1536px+)
                 : 'flex'; // Always show current block
               
               // Calculate flex layout based on whether this is the current slot or not
               const flexClassNames = block.isCurrentSlot
-                ? 'w-full lg:w-[40%]' // Full width on medium screens, 40% on large screens
-                : 'lg:w-[30%]'; // 30% width on large screens only
+                ? 'w-full 2xl:w-[40%]' // Full width on smaller screens, 40% on 2xl screens
+                : '2xl:w-[30%]'; // 30% width on 2xl screens only
 
               // Only use PendingBlock for future blocks
               if (block.isFuture) {
