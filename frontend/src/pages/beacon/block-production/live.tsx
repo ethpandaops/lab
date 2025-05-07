@@ -528,10 +528,6 @@ export default function BlockProductionLivePage() {
 
   // Initial transformation of bids from the data
   const isLocallyBuilt = useMemo(() => {
-    // Debug what data we're getting
-    console.log('slotData.block:', slotData?.block);
-    console.log('payloadsDelivered:', slotData?.block?.payloadsDelivered);
-    
     if (!slotData?.block?.payloadsDelivered || 
         slotData.block.payloadsDelivered.length === 0 || 
         !Array.isArray(slotData.block.payloadsDelivered)) {
