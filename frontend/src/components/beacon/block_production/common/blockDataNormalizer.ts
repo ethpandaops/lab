@@ -210,10 +210,12 @@ export function calculateBlobCount(normalizedBlock?: NormalizedBlockData): numbe
 /**
  * Format a hash string for display
  */
-export function formatHash(hash?: string, startChars = 6, endChars = 4): string {
+export function formatHash(hash?: string, startChars = 5, endChars = 0): string {
   if (!hash) return '—';
-  if (hash.length <= startChars + endChars) return hash;
-  return `${hash.substring(0, startChars)}...${hash.substring(hash.length - endChars)}`;
+  if (hash.length <= startChars) return hash;
+  return endChars > 0 
+    ? `${hash.substring(0, startChars)}...${hash.substring(hash.length - endChars)}`
+    : `${hash.substring(0, startChars)}...`;
 }
 
 /**
