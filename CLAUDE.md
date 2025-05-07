@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## LLM Rules System
 
-This repository contains coding standards and best practices that you MUST follow. Before starting any work, gather the relevant rules by using the script below.
+This repository contains coding standards and best practices that you MUST follow. Before starting any work, YOU MUST check the relevant rules by using the script below.
 
 ### Getting Contextual Rules
 
@@ -41,4 +41,4 @@ The development server runs at:
 - Do not run `npm build` commands unless explicitly requested. 
 - If making a frontend change, you should use puppeteer to test the change, pointing at the development server.
   - Make sure you test against both desktop and mobile sizes.
-- For package management, always use pnpm instead of npm or yarn.
+- You MUST NOT provide "fallback" or "defaults" values in the code you write. This is a very dangerous practice that can lead to bugs, poor user experiences, and security issues.
