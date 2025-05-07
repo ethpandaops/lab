@@ -5,13 +5,18 @@ import { useModal } from '@/contexts/ModalContext.tsx';
 import { formatNodeName } from '@/utils/format.ts';
 import clsx from 'clsx';
 
+interface EventData {
+  time: number;
+  index?: number;
+}
+
 interface Event {
   id: string;
   timestamp: number;
   type: string;
   node: string;
   location: string;
-  data: any;
+  data: EventData;
 }
 
 interface EventFilter {
@@ -85,9 +90,10 @@ function EventItem({ event, currentTime }: { event: Event; currentTime: number }
       case 'Blob Seen (API)':
       case 'Blob Seen (P2P)':
         return `Blob ${event.data.index}`;
-      case 'Attestation':
+      case 'Attestation': {
         const validatorCount = event.node.split(' ')[0];
         return `${validatorCount} validators attested`;
+      }
       default:
         return event.type;
     }
@@ -153,7 +159,7 @@ function ConfigPanel({
     return Array.from(nodes).sort();
   }, [events, localFilters.username]);
 
-  const handleChange = (key: keyof EventFilter, value?: any) => {
+  const handleChange = (key: keyof EventFilter, value?: string) => {
     const newFilters = {
       ...localFilters,
       [key]: typeof value !== 'undefined' ? value : !localFilters[key],
@@ -322,16 +328,14 @@ export function EventTimeline({
   events,
   loading,
   isCollapsed,
-  onToggleCollapse,
   currentTime,
   isPlaying,
   onPlayPauseClick,
-  slot,
   onPreviousSlot,
   onNextSlot,
   isLive,
   className,
-}: EventTimelineProps): JSX.Element {
+}: EventTimelineProps) {
   const { showModal, hideModal } = useModal();
   const [filters, setFilters] = useState<EventFilter>(() => {
     const saved = localStorage.getItem('eventTimelineFilters');
@@ -349,7 +353,7 @@ export function EventTimeline({
   });
   const timelineRef = useRef<HTMLDivElement>(null);
   const lastEventRef = useRef<HTMLDivElement>(null);
-  const scrollTimeoutRef = useRef<number>();
+  const scrollTimeoutRef = useRef<number | undefined>(undefined);
 
   // Save filters to localStorage whenever they change
   useEffect(() => {
@@ -472,10 +476,6 @@ export function EventTimeline({
       }
     };
   }, [events, loading, isCollapsed, currentTime, sortedEvents, isPlaying]);
-
-  const handleFilterChange = (newFilters: EventFilter) => {
-    setFilters(newFilters);
-  };
 
   const handleOpenConfig = () => {
     showModal(

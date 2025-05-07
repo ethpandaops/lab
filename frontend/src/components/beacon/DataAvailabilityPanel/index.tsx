@@ -129,7 +129,7 @@ const LabeledScatterPlot = ({
 
           // For blob series, extract the index from the series ID and use it for coloring
           if (serieId.toString().startsWith('blob-')) {
-            const index = parseInt(serieId.toString().replace('blob-', ''), 10);
+            const index = parseInt(serieId.toString().replace('blob-', ''));
             return BLOB_COLORS[index % BLOB_COLORS.length];
           }
 
@@ -148,7 +148,7 @@ export function DataAvailabilityPanel({
   blobTimings,
   currentTime,
   nodes,
-}: DataAvailabilityPanelProps): JSX.Element {
+}: DataAvailabilityPanelProps) {
   const { showModal } = useModal();
 
   const handleInfoClick = () => {
@@ -546,7 +546,7 @@ export function DataAvailabilityPanel({
                     tickPadding: 5,
                     tickRotation: 0,
                     tickValues: [0, 4, 8, 12],
-                    format: value => value.toString(),
+                    format: (value: number) => value.toString(),
                     legend: 'Time (s)',
                     legendOffset: 20,
                     legendPosition: 'middle',
@@ -629,7 +629,7 @@ export function DataAvailabilityPanel({
                     tickPadding: 5,
                     tickRotation: 0,
                     tickValues: timeWindow.ticks,
-                    format: value => value.toString(),
+                    format: (value: number) => value.toString(),
                     legend: 'Time (s)',
                     legendOffset: 20,
                     legendPosition: 'middle',
@@ -639,12 +639,12 @@ export function DataAvailabilityPanel({
                     tickPadding: 5,
                     tickRotation: 0,
                     tickValues: [0, 25, 50, 75, 100],
-                    format: value => `${value}%`,
+                    format: (value: number) => `${value}%`,
                     legend: 'Complete',
                     legendOffset: -30,
                     legendPosition: 'middle',
                   }}
-                  colors={d => CONTINENT_COLORS[d.id] || 'rgb(var(--success))'}
+                  colors={(d: { id: string }) => CONTINENT_COLORS[d.id] || 'rgb(var(--success))'}
                   pointSize={0}
                   enableGridX={true}
                   enableGridY={true}

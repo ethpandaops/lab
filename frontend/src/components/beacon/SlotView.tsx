@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from 'react';
-import { ErrorState } from '@/components/common/ErrorState';
 import { GlobalMap } from '@/components/beacon/GlobalMap';
 import { EventTimeline } from '@/components/beacon/EventTimeline';
 import { BottomPanel } from '@/components/beacon/BottomPanel/index';
@@ -11,80 +10,11 @@ import { getLabApiClient } from '@/api';
 import { GetSlotDataRequest } from '@/api/gen/backend/pkg/api/proto/lab_api_pb';
 import { useQuery } from '@tanstack/react-query';
 
-interface SlotData {
-  slot: bigint;
-  block: {
-    epoch: number;
-    executionPayloadTransactionsCount?: bigint;
-    blockTotalBytes?: bigint;
-    executionPayloadBaseFeePerGas?: bigint;
-    executionPayloadGasUsed?: bigint;
-    executionPayloadGasLimit?: bigint;
-    executionPayloadBlockNumber?: bigint;
-    blockVersion?: string;
-    executionPayloadBlockHash?: string;
-  };
-  proposer: {
-    proposerValidatorIndex: bigint;
-  };
-  entity?: string;
-  nodes: {
-    [key: string]: {
-      name: string;
-      username: string;
-      geo: {
-        city: string;
-        country: string;
-        continent: string;
-      };
-    };
-  };
-  timings: {
-    blockSeen?: Record<string, bigint>;
-    blockFirstSeenP2p?: Record<string, bigint>;
-    blobSeen?: Record<string, Record<string, bigint>>;
-    blobFirstSeenP2p?: Record<string, Record<string, bigint>>;
-  };
-  attestations?: {
-    windows: Array<{
-      startMs: bigint;
-      endMs: bigint;
-      validatorIndices: number[];
-    }>;
-    maximumVotes?: bigint;
-  };
-  deliveredPayloads?: Record<string, { payloads: unknown[] }>;
-  relayBids?: Record<
-    string,
-    {
-      bids: Array<{
-        slot: number;
-        parentHash: string;
-        blockHash: string;
-        builderPubkey: string;
-        proposerPubkey: string;
-        proposerFeeRecipient: string;
-        value: string;
-        gasLimit: number;
-        gasUsed: number;
-        slotTime: number;
-        timeBucket: number;
-      }>;
-    }
-  >;
-}
-
 interface SlotViewProps {
   slot?: number;
   network?: string;
   isLive?: boolean;
   onSlotComplete?: () => void;
-}
-
-interface AttestationWindow {
-  startMs: bigint;
-  endMs: bigint;
-  validatorIndices: number[];
 }
 
 interface BlockEvent {
@@ -94,32 +24,14 @@ interface BlockEvent {
   source: 'p2p' | 'api';
 }
 
-interface AttestationProgress {
-  time: number;
-  validatorCount: number;
-  totalValidators: number;
-}
-
-interface TimingData {
-  [node: string]: number;
-}
-
-interface BlobTimingData {
-  [node: string]: {
-    [index: string]: number;
-  };
-}
-
-interface SlotTimings {
-  blockSeen?: TimingData;
-  blockFirstSeenP2p?: TimingData;
-  blobSeen?: BlobTimingData;
-  blobFirstSeenP2p?: BlobTimingData;
-}
-
 interface AttestationPoint {
   time: number;
   totalValidators: number;
+}
+
+interface EventData {
+  time: number;
+  index?: number;
 }
 
 interface Event {
@@ -128,7 +40,7 @@ interface Event {
   type: string;
   node: string;
   location: string;
-  data: any;
+  data: EventData;
 }
 
 export function SlotView({
@@ -136,7 +48,7 @@ export function SlotView({
   network = 'mainnet',
   isLive = false,
   onSlotComplete,
-}: SlotViewProps): JSX.Element {
+}: SlotViewProps) {
   const [currentTime, setCurrentTime] = useState<number>(0);
   const [isPlaying, setIsPlaying] = useState<boolean>(isLive);
   const [isTimelineCollapsed, setIsTimelineCollapsed] = useState(false);
@@ -170,7 +82,7 @@ export function SlotView({
   const slotData = slotResponse?.data;
 
   // Optimistically fetch next slot data when we're close to the end
-  const { data: nextSlotResponse } = useQuery({
+  useQuery({
     queryKey: ['slotData', network, slot ? slot + 1 : null],
     queryFn: async () => {
       if (!slot) {
@@ -188,9 +100,6 @@ export function SlotView({
     enabled: !!slot && currentTime >= 11000,
     retry: false,
   });
-
-  // Extract the data from the next slot response
-  const nextSlotData = nextSlotResponse?.data;
 
   // Timer effect for playback
   useEffect(() => {
@@ -229,114 +138,111 @@ export function SlotView({
     : 0;
   const attestationThreshold = Math.ceil(maxPossibleValidators * 0.66);
 
-  const { firstBlockSeen, firstApiBlockSeen, firstP2pBlockSeen, attestationProgress } =
-    useMemo(() => {
-      if (!slotData)
-        return {
-          firstBlockSeen: null,
-          firstApiBlockSeen: null,
-          firstP2pBlockSeen: null,
-          attestationProgress: [],
-        };
+  const { attestationProgress } = useMemo(() => {
+    if (!slotData)
+      return {
+        firstBlockSeen: null,
+        firstApiBlockSeen: null,
+        firstP2pBlockSeen: null,
+        attestationProgress: [],
+      };
 
-      // Find first block seen event
-      let firstBlock: BlockEvent | null = null;
-      let firstApiBlock: BlockEvent | null = null;
-      let firstP2pBlock: BlockEvent | null = null;
+    // Find first block seen event
+    let firstBlock: BlockEvent | null = null;
+    let firstApiBlock: BlockEvent | null = null;
+    let firstP2pBlock: BlockEvent | null = null;
 
-      // Check P2P events
-      const p2pEvents = slotData.timings?.blockFirstSeenP2p || {};
-      const p2pTimes = Object.values(p2pEvents);
-      const firstP2pTime =
-        p2pTimes.length > 0 ? Math.min(...p2pTimes.map(t => Number(t))) : Infinity;
-      const firstP2pNode = Object.entries(p2pEvents).find(
-        ([nodeId, time]) => Number(time) === firstP2pTime,
-      )?.[0];
+    // Check P2P events
+    const p2pEvents = slotData.timings?.blockFirstSeenP2p || {};
+    const p2pTimes = Object.values(p2pEvents);
+    const firstP2pTime = p2pTimes.length > 0 ? Math.min(...p2pTimes.map(t => Number(t))) : Infinity;
+    const firstP2pNode = Object.entries(p2pEvents).find(
+      ([_, time]) => Number(time) === firstP2pTime,
+    )?.[0];
 
-      // Check API events
-      const apiEvents = slotData.timings?.blockSeen || {};
-      const apiTimes = Object.values(apiEvents);
-      const firstApiTime =
-        apiTimes.length > 0 ? Math.min(...apiTimes.map(t => Number(t))) : Infinity;
-      const firstApiNode = Object.entries(apiEvents).find(
-        ([nodeId, time]) => Number(time) === firstApiTime,
-      )?.[0];
+    // Check API events
+    const apiEvents = slotData.timings?.blockSeen || {};
+    const apiTimes = Object.values(apiEvents);
+    const firstApiTime = apiTimes.length > 0 ? Math.min(...apiTimes.map(t => Number(t))) : Infinity;
+    const firstApiNode = Object.entries(apiEvents).find(
+      ([_, time]) => Number(time) === firstApiTime,
+    )?.[0];
 
-      // Set first API block if exists
-      if (firstApiNode) {
-        firstApiBlock = {
-          type: 'block_seen',
-          time: firstApiTime,
-          node: firstApiNode,
-          source: 'api',
-        };
-      }
+    // Set first API block if exists
+    if (firstApiNode) {
+      firstApiBlock = {
+        type: 'block_seen',
+        time: firstApiTime,
+        node: firstApiNode,
+        source: 'api',
+      };
+    }
 
-      // Set first P2P block if exists
-      if (firstP2pNode) {
-        firstP2pBlock = {
-          type: 'block_seen',
-          time: firstP2pTime,
-          node: firstP2pNode,
-          source: 'p2p',
-        };
-      }
+    // Set first P2P block if exists
+    if (firstP2pNode) {
+      firstP2pBlock = {
+        type: 'block_seen',
+        time: firstP2pTime,
+        node: firstP2pNode,
+        source: 'p2p',
+      };
+    }
 
-      // Use API event if it's first, otherwise use P2P event for the combined firstBlockSeen
-      if (firstApiNode && (!firstP2pNode || firstApiTime < firstP2pTime)) {
-        firstBlock = firstApiBlock;
-      } else if (firstP2pNode) {
-        firstBlock = firstP2pBlock;
-      }
+    // Use API event if it's first, otherwise use P2P event for the combined firstBlockSeen
+    if (firstApiNode && (!firstP2pNode || firstApiTime < firstP2pTime)) {
+      firstBlock = firstApiBlock;
+    } else if (firstP2pNode) {
+      firstBlock = firstP2pBlock;
+    }
 
-      // Process attestations into cumulative progress
-      const attestations: AttestationPoint[] = [];
-      let runningTotal = 0;
+    // Process attestations into cumulative progress
+    const attestations: AttestationPoint[] = [];
+    let runningTotal = 0;
 
-      if (slotData.attestations?.windows) {
-        // Sort windows by start time
-        const sortedWindows = [...slotData.attestations.windows].sort(
-          (a, b) => Number(a.startMs) - Number(b.startMs),
-        );
+    if (slotData.attestations?.windows) {
+      // Sort windows by start time
+      const sortedWindows = [...slotData.attestations.windows].sort(
+        (a, b) => Number(a.startMs) - Number(b.startMs),
+      );
 
-        // Add initial point at 0ms
+      // Add initial point at 0ms
+      attestations.push({
+        time: 0,
+        totalValidators: 0,
+      });
+
+      // Process each window
+      sortedWindows.forEach(window => {
+        const validatorCount = window.validatorIndices.length;
+
+        // Add point at window start with current total
         attestations.push({
-          time: 0,
-          totalValidators: 0,
-        });
-
-        // Process each window
-        sortedWindows.forEach(window => {
-          const validatorCount = window.validatorIndices.length;
-
-          // Add point at window start with current total
-          attestations.push({
-            time: Number(window.startMs),
-            totalValidators: runningTotal,
-          });
-
-          // Update running total and add point at window end
-          runningTotal += validatorCount;
-          attestations.push({
-            time: Number(window.endMs),
-            totalValidators: runningTotal,
-          });
-        });
-
-        // Add final point at 12s
-        attestations.push({
-          time: 12000,
+          time: Number(window.startMs),
           totalValidators: runningTotal,
         });
-      }
 
-      return {
-        firstBlockSeen: firstBlock,
-        firstApiBlockSeen: firstApiBlock,
-        firstP2pBlockSeen: firstP2pBlock,
-        attestationProgress: attestations,
-      };
-    }, [slotData]);
+        // Update running total and add point at window end
+        runningTotal += validatorCount;
+        attestations.push({
+          time: Number(window.endMs),
+          totalValidators: runningTotal,
+        });
+      });
+
+      // Add final point at 12s
+      attestations.push({
+        time: 12000,
+        totalValidators: runningTotal,
+      });
+    }
+
+    return {
+      firstBlockSeen: firstBlock,
+      firstApiBlockSeen: firstApiBlock,
+      firstP2pBlockSeen: firstP2pBlock,
+      attestationProgress: attestations,
+    };
+  }, [slotData]);
 
   const blockEvents = useMemo(() => {
     if (!slotData) return [];
@@ -474,7 +380,6 @@ export function SlotView({
   }, [slotData]);
 
   // Calculate what to show based on data availability
-  const showData = slotData || (isLive && slot);
   const isMissingData = !slotData && isLive && slot !== undefined;
 
   // Find the winning bid based on matching block hash
@@ -566,53 +471,7 @@ export function SlotView({
         {/* Mobile Layout */}
         <div className="md:hidden flex flex-col h-full">
           {/* Map Section - Reduced height on mobile */}
-          <div className="h-[30vh] border-b border-subtle">
-            <GlobalMap
-              nodes={getFormattedNodes}
-              currentTime={currentTime}
-              blockEvents={blockEvents}
-              loading={isLoading || !!error}
-              isMissing={isMissingData || !!error}
-              slot={slotData?.slot ? Number(slotData.slot) : undefined}
-              proposer={slotData?.entity || 'Unknown'}
-              proposerIndex={
-                slotData?.proposer?.proposerValidatorIndex
-                  ? Number(slotData.proposer.proposerValidatorIndex)
-                  : undefined
-              }
-              txCount={
-                slotData?.block?.executionPayloadTransactionsCount
-                  ? Number(slotData.block.executionPayloadTransactionsCount)
-                  : 0
-              }
-              blockSize={
-                slotData?.block?.blockTotalBytes
-                  ? Number(slotData.block.blockTotalBytes)
-                  : undefined
-              }
-              baseFee={
-                slotData?.block?.executionPayloadBaseFeePerGas
-                  ? Number(slotData.block.executionPayloadBaseFeePerGas)
-                  : undefined
-              }
-              gasUsed={
-                slotData?.block?.executionPayloadGasUsed
-                  ? Number(slotData.block.executionPayloadGasUsed)
-                  : undefined
-              }
-              gasLimit={
-                slotData?.block?.executionPayloadGasLimit
-                  ? Number(slotData.block.executionPayloadGasLimit)
-                  : undefined
-              }
-              executionBlockNumber={
-                slotData?.block?.executionPayloadBlockNumber
-                  ? Number(slotData.block.executionPayloadBlockNumber)
-                  : undefined
-              }
-              hideDetails={true}
-            />
-          </div>
+          <div className="h-[30vh] border-b border-subtle"></div>
 
           {/* Compact Slot Details - More compact on mobile */}
           <div className="border-b border-subtle">
@@ -851,9 +710,6 @@ export function SlotView({
                     const hasMevRelay =
                       slotData?.deliveredPayloads &&
                       Object.keys(slotData.deliveredPayloads).length > 0;
-                    const relayNames = hasMevRelay
-                      ? Object.keys(slotData.deliveredPayloads).join(', ')
-                      : null;
 
                     return (
                       <>
@@ -1250,9 +1106,6 @@ export function SlotView({
                       const hasMevRelay =
                         slotData?.deliveredPayloads &&
                         Object.keys(slotData.deliveredPayloads).length > 0;
-                      const relayNames = hasMevRelay
-                        ? Object.keys(slotData.deliveredPayloads).join(', ')
-                        : null;
 
                       return (
                         <>
@@ -1549,7 +1402,7 @@ export function SlotView({
                             const firstTime = times.length > 0 ? Math.min(...times) : null;
                             const firstNode = Object.entries(slotData?.timings?.blockSeen || {})
                               .concat(Object.entries(slotData?.timings?.blockFirstSeenP2p || {}))
-                              .find(([nodeId, time]) => Number(time) === firstTime)?.[0];
+                              .find(([_, time]) => Number(time) === firstTime)?.[0];
                             const nodeData = firstNode ? slotData?.nodes[firstNode] : null;
                             const country =
                               nodeData?.geo?.country || nodeData?.geo?.continent || 'Unknown';

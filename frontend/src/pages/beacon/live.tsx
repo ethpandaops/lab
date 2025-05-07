@@ -4,9 +4,9 @@ import { useSearchParams } from 'react-router-dom';
 import { BeaconClockManager } from '@/utils/beacon.ts';
 import NetworkContext from '@/contexts/NetworkContext';
 
-function BeaconLive(): JSX.Element {
+function BeaconLive() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const { selectedNetwork, setSelectedNetwork } = useContext(NetworkContext);
+  const { selectedNetwork } = useContext(NetworkContext);
   const [currentSlot, setCurrentSlot] = useState<number>();
 
   // Get the BeaconClock for the current network
