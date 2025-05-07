@@ -1,10 +1,6 @@
 import React, { useMemo } from 'react';
 import { getCurrentPhase, isInPropagationPhase } from '../common/PhaseUtils';
 import { Phase } from '../common/types';
-import {
-  ATTESTATION_DEFAULT_TIME,
-  ACCEPTANCE_DEFAULT_TIME,
-} from '../common/utils';
 
 interface MobileTimelineBarProps {
   currentTime: number;
@@ -97,7 +93,10 @@ const MobileTimelineBar: React.FC<MobileTimelineBarProps> = ({
 
   // Calculate phase transition times dynamically from real data when available
   const { transitionTimes, phaseWidths } = useMemo(() => {
-    const slotDuration = 12000; // 12 seconds in ms
+    // Get slot duration from data or use a reasonable guess based on the network
+    const slotDuration = slotData?.network?.config?.SECONDS_PER_SLOT 
+      ? slotData.network.config.SECONDS_PER_SLOT * 1000 
+      : 12000; // If not available in data, most networks use 12s
     
     // Find the actual phase transition times from the data
     let propagationTime: number | null = null; // When any node first sees the block
@@ -123,14 +122,14 @@ const MobileTimelineBar: React.FC<MobileTimelineBarProps> = ({
       }
     });
 
-    // If we have actual block data, use it
+    // Only use real data, no fallbacks
     if (earliestNodeTime !== Infinity) {
       propagationTime = earliestNodeTime;
     } else if (blockTime !== undefined) {
       propagationTime = blockTime;
     } else {
-      // Fallback to default if no real data
-      propagationTime = PROPAGATION_DEFAULT_TIME;
+      // No fallback - if no block data, use the current time
+      propagationTime = currentTime;
     }
     
     // --- Find attestation transition time ---
@@ -155,14 +154,10 @@ const MobileTimelineBar: React.FC<MobileTimelineBarProps> = ({
       }
     }
     
-    // Use default attestation time if no data
+    // No fallbacks - only use real data
     if (attestationTime === null) {
-      // If propagation time is known, make attestation time relative to it
-      if (propagationTime !== null) {
-        attestationTime = propagationTime + 1500; // 1.5s after propagation
-      } else {
-        attestationTime = ATTESTATION_DEFAULT_TIME;
-      }
+      // If no attestation data, use current time
+      attestationTime = currentTime;
     }
     
     // --- Find acceptance transition time (66% attestations) ---
@@ -194,19 +189,34 @@ const MobileTimelineBar: React.FC<MobileTimelineBarProps> = ({
       }
     }
     
-    // Use default acceptance time if no data
+    // No fallbacks - only use real data
     if (acceptanceTime === null) {
-      if (attestationTime !== null) {
-        acceptanceTime = attestationTime + 2000; // 2s after attestation
-      } else {
-        acceptanceTime = ACCEPTANCE_DEFAULT_TIME;
-      }
+      // If no acceptance data, use current time
+      acceptanceTime = currentTime;
     }
     
-    // Ensure transitions are in proper order and within slot duration
-    propagationTime = Math.min(Math.max(propagationTime, 1000), slotDuration - 3000); 
-    attestationTime = Math.min(Math.max(attestationTime, propagationTime + 500), slotDuration - 2000);
-    acceptanceTime = Math.min(Math.max(acceptanceTime, attestationTime + 500), slotDuration - 1000);
+    // Ensure transitions are in proper order (but don't force specific times)
+    // Just make sure they happen in sequence if we have real data
+    if (propagationTime !== null && attestationTime !== null && propagationTime > attestationTime) {
+      attestationTime = propagationTime;
+    }
+    
+    if (attestationTime !== null && acceptanceTime !== null && attestationTime > acceptanceTime) {
+      acceptanceTime = attestationTime;
+    }
+    
+    // Ensure values are within the slot (0 to slotDuration)
+    if (propagationTime !== null) {
+      propagationTime = Math.max(0, Math.min(propagationTime, slotDuration));
+    }
+    
+    if (attestationTime !== null) {
+      attestationTime = Math.max(0, Math.min(attestationTime, slotDuration));
+    }
+    
+    if (acceptanceTime !== null) {
+      acceptanceTime = Math.max(0, Math.min(acceptanceTime, slotDuration));
+    }
     
     // Calculate the percentages for each phase
     const propagationPercent = (propagationTime / slotDuration) * 100;
@@ -491,7 +501,7 @@ const MobileTimelineBar: React.FC<MobileTimelineBarProps> = ({
         <div
           className="absolute top-2 left-0 h-2 bg-active/20 transition-width duration-100 rounded-l-lg"
           style={{
-            width: `${(currentTime / 12000) * 100}%`,
+            width: `${(currentTime / (slotData?.network?.config?.SECONDS_PER_SLOT ? slotData.network.config.SECONDS_PER_SLOT * 1000 : 12000)) * 100}%`,
             maxWidth: '100%', // Stay within container boundaries
           }}
         />
@@ -500,7 +510,7 @@ const MobileTimelineBar: React.FC<MobileTimelineBarProps> = ({
         <div
           className="absolute top-2 h-2 bg-active/80 transition-all duration-100"
           style={{
-            left: `${(currentTime / 12000) * 100}%`,
+            left: `${(currentTime / (slotData?.network?.config?.SECONDS_PER_SLOT ? slotData.network.config.SECONDS_PER_SLOT * 1000 : 12000)) * 100}%`,
             width: '2px',
             boxShadow: '0 0 8px 2px rgba(255, 255, 255, 0.5)',
           }}
@@ -513,12 +523,22 @@ const MobileTimelineBar: React.FC<MobileTimelineBarProps> = ({
           ></div>
         </div>
 
-        {/* Time markers */}
+        {/* Time markers - dynamic based on slot duration */}
         <div className="flex justify-between text-[9px] font-mono text-tertiary/60 px-1">
           <span>0s</span>
-          <span>4s</span>
-          <span>8s</span>
-          <span>12s</span>
+          {slotData?.network?.config?.SECONDS_PER_SLOT ? (
+            <>
+              <span>{Math.floor(slotData.network.config.SECONDS_PER_SLOT / 3)}s</span>
+              <span>{Math.floor((slotData.network.config.SECONDS_PER_SLOT / 3) * 2)}s</span>
+              <span>{slotData.network.config.SECONDS_PER_SLOT}s</span>
+            </>
+          ) : (
+            <>
+              <span>4s</span>
+              <span>8s</span>
+              <span>12s</span>
+            </>
+          )}
         </div>
       </div>
     </div>
