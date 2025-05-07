@@ -3,6 +3,8 @@ import { Node, Proposer } from '@/api/gen/backend/pkg/server/proto/beacon_slots/
 export interface BlockData {
   block_root?: string;
   blockRoot?: string;
+  block_version?: string;
+  blockVersion?: string;
   execution_payload_block_hash?: string;
   executionPayloadBlockHash?: string;
   execution_payload_transactions_count?: number;
