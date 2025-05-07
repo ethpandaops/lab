@@ -163,7 +163,7 @@ const PhaseIcons: React.FC<PhaseIconsProps> = ({
         </div>
 
         {/* Flow line 1 - Builder to Relay: Orange to Green */}
-        <div className="flex-shrink-0 flex items-start justify-center relative w-10 pt-[28px]">
+        <div className="flex-shrink-0 flex items-start justify-center relative w-20 pt-[28px]">
           <div
             className="h-1.5 w-full bg-gradient-to-r from-orange-400 to-green-400 rounded-full shadow-inner"
             style={{
@@ -216,7 +216,7 @@ const PhaseIcons: React.FC<PhaseIconsProps> = ({
         </div>
 
         {/* Flow line 2 - Relay to Proposer: Green to Gold */}
-        <div className="flex-shrink-0 flex items-start justify-center relative w-10 pt-[28px]">
+        <div className="flex-shrink-0 flex items-start justify-center relative w-20 pt-[28px]">
           <div
             className="h-1.5 w-full bg-gradient-to-r from-green-400 to-amber-400 rounded-full shadow-inner"
             style={{
@@ -281,7 +281,7 @@ const PhaseIcons: React.FC<PhaseIconsProps> = ({
         </div>
 
         {/* Flow line 3 - Proposer to Nodes: Gold to Purple */}
-        <div className="flex-shrink-0 flex items-start justify-center relative w-10 pt-[28px]">
+        <div className="flex-shrink-0 flex items-start justify-center relative w-20 pt-[28px]">
           <div
             className="h-1.5 w-full bg-gradient-to-r from-amber-400 to-purple-400 rounded-full shadow-inner"
             style={{
@@ -334,7 +334,7 @@ const PhaseIcons: React.FC<PhaseIconsProps> = ({
         </div>
 
         {/* Flow line 4 - Nodes to Attesters: Purple to Blue */}
-        <div className="flex-shrink-0 flex items-start justify-center relative w-10 pt-[28px]">
+        <div className="flex-shrink-0 flex items-start justify-center relative w-20 pt-[28px]">
           <div
             className="h-1.5 w-full bg-gradient-to-r from-purple-400 to-blue-400 rounded-full shadow-inner"
             style={{
@@ -420,7 +420,7 @@ const PhaseIcons: React.FC<PhaseIconsProps> = ({
         </div>
 
         {/* Flow line 5 - Attesters to Accepted: Blue to Green */}
-        <div className="flex-shrink-0 flex items-start justify-center relative w-10 pt-[28px]">
+        <div className="flex-shrink-0 flex items-start justify-center relative w-20 pt-[28px]">
           <div
             className="h-1.5 w-full bg-gradient-to-r from-blue-400 to-green-400 rounded-full shadow-inner"
             style={{
