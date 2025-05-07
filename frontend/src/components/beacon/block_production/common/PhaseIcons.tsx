@@ -240,12 +240,18 @@ const PhaseIcons: React.FC<PhaseIconsProps> = ({
             ) : (
               <span>Built via external builder</span>
             )}
-            <div className="mt-1 text-xs">
+            <div className="mt-1 text-xs truncate max-w-full">
               {slotData?.entity ? (
-                <>Validator: {slotData.entity}</>
+                <span className="truncate block" title={`Validator: ${slotData.entity}`}>
+                  {slotData.entity.length > 12 
+                    ? `${slotData.entity.substring(0, 10)}...` 
+                    : slotData.entity}
+                </span>
               ) : (
                 proposer.proposerValidatorIndex && (
-                  <>Validator index: {proposer.proposerValidatorIndex}</>
+                  <span className="truncate block">
+                    Val: {proposer.proposerValidatorIndex}
+                  </span>
                 )
               )}
             </div>
@@ -366,12 +372,12 @@ const PhaseIcons: React.FC<PhaseIconsProps> = ({
 
   return (
     <div className="w-full px-4 sm:px-6 md:px-10">
-      {/* Container with fixed width for each phase and flow lines in between */}
-      <div className="grid grid-cols-11 w-full">
+      {/* Container with responsive grid for phases and flow lines */}
+      <div className="grid grid-cols-11 w-full min-w-0">
         {phases.map((phase, index) => (
           <React.Fragment key={phase.id}>
             {/* Each phase gets its own column */}
-            <div className="col-span-1 flex flex-col items-center">
+            <div className="col-span-1 flex flex-col items-center min-w-0">
               {/* Icon */}
               <div 
                 className={`w-14 h-14 flex items-center justify-center rounded-full shadow-md transition-colors duration-300 relative ${
@@ -409,7 +415,7 @@ const PhaseIcons: React.FC<PhaseIconsProps> = ({
                   isActiveInPhase(phase.id as any) ? 'opacity-100' : 'opacity-60'
                 }`}
               >
-                <span className={`${isActiveInPhase(phase.id as any) ? 'text-white/90' : 'text-tertiary'}`}>
+                <span className={`${isActiveInPhase(phase.id as any) ? 'text-white/90' : 'text-tertiary'} line-clamp-4 break-words`}>
                   {phase.description}
                 </span>
               </div>
@@ -427,7 +433,7 @@ const PhaseIcons: React.FC<PhaseIconsProps> = ({
                     <div className={`h-2 w-2/3 rounded-full bg-${phase.color}-400/20 animate-pulse`}></div>
                   </div>
                 ) : (
-                  <span className={`${isActiveInPhase(phase.id as any) ? `text-${phase.color}-300` : 'text-tertiary'}`}>
+                  <span className={`${isActiveInPhase(phase.id as any) ? `text-${phase.color}-300` : 'text-tertiary'} break-words line-clamp-3`}>
                     {getDynamicContent(phase.id)}
                   </span>
                 )}
