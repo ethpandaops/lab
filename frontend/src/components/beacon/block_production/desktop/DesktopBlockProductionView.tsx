@@ -224,34 +224,42 @@ const DesktopBlockProductionView: React.FC<DesktopBlockProductionViewProps> = ({
     return earliestContinent ? continentNames[earliestContinent] || earliestContinent : null;
   }, [nodeBlockSeen, nodeBlockP2P, nodes, currentTime]);
 
+  // Determine if we should show the timeline based on whether we're on the live page
+  // If goToPreviousSlot is not provided, we're likely on the specific slot page
+  const showTimeline = typeof goToPreviousSlot === 'function' && 
+                      typeof goToNextSlot === 'function' && 
+                      typeof resetToCurrentSlot === 'function';
+
   return (
     <div className="h-full flex flex-col">
       <style jsx>{flowAnimations}</style>
 
       {/* Hero section with solid background */}
       <div className="bg-surface border-b border-subtle mb-3 shadow-sm">
-        {/* Timeline Header with solid background */}
-        <div className="px-4 pt-3 pb-2">
-          <PhaseTimeline
-            currentTime={currentTime}
-            nodeBlockSeen={nodeBlockSeen}
-            nodeBlockP2P={nodeBlockP2P}
-            blockTime={blockTime}
-            slotData={slotData}
-            onPhaseChange={onPhaseChange}
-            // Navigation controls
-            slotNumber={slotNumber}
-            headLagSlots={headLagSlots}
-            displaySlotOffset={displaySlotOffset}
-            isPlaying={isPlaying}
-            isMobile={false} // Desktop view is never mobile
-            goToPreviousSlot={goToPreviousSlot}
-            goToNextSlot={goToNextSlot}
-            resetToCurrentSlot={resetToCurrentSlot}
-            togglePlayPause={togglePlayPause}
-            isNextDisabled={isNextDisabled}
-          />
-        </div>
+        {/* Timeline Header with solid background - only shown on live page */}
+        {showTimeline && (
+          <div className="px-4 pt-3 pb-2">
+            <PhaseTimeline
+              currentTime={currentTime}
+              nodeBlockSeen={nodeBlockSeen}
+              nodeBlockP2P={nodeBlockP2P}
+              blockTime={blockTime}
+              slotData={slotData}
+              onPhaseChange={onPhaseChange}
+              // Navigation controls
+              slotNumber={slotNumber}
+              headLagSlots={headLagSlots}
+              displaySlotOffset={displaySlotOffset}
+              isPlaying={isPlaying}
+              isMobile={false} // Desktop view is never mobile
+              goToPreviousSlot={goToPreviousSlot}
+              goToNextSlot={goToNextSlot}
+              resetToCurrentSlot={resetToCurrentSlot}
+              togglePlayPause={togglePlayPause}
+              isNextDisabled={isNextDisabled}
+            />
+          </div>
+        )}
 
         {/* Phase Icons Section with clean separation - increased height */}
         <div className="px-4 py-10 bg-background-alt border-y border-border/30">

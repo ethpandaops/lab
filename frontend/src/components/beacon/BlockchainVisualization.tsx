@@ -91,8 +91,9 @@ const BlockchainVisualization: React.FC<BlockchainVisualizationProps> = ({
       const isCurrentSlot = slot === currentSlot;
       const hasData = !!slotDataForSlot;
 
-      // Always show building/pending for future slots and for current slot in Building phase
-      const isBuilding = isFuture || (isCurrentSlot && currentPhase === Phase.Building);
+      // Only show building/pending for future slots and for current slot in Building phase
+      // But if slotData is directly provided for the current slot, don't mark as building
+      const isBuilding = isFuture || (isCurrentSlot && currentPhase === Phase.Building && !slotData?.[slot]);
 
       // If we have data for this slot, extract relevant information
       if (slotDataForSlot) {

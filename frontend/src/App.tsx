@@ -6,6 +6,7 @@ import { LoadingState } from '@/components/common/LoadingState';
 import { ErrorState } from '@/components/common/ErrorState';
 import { BeaconClockManager } from '@/utils/beacon.ts';
 import ScrollToTop from '@/components/common/ScrollToTop';
+import Redirect from '@/components/common/Redirect';
 import Home from '@/pages/Home.tsx';
 import { About } from '@/pages/About.tsx';
 import Xatu from '@/pages/xatu';
@@ -114,6 +115,7 @@ function App() {
                 </Route>
                 <Route path="locally-built-blocks" element={<LocallyBuiltBlocks />} />
                 <Route path="mev_relays/live" element={<MevRelaysLivePage />} />
+                <Route path="block-production" element={<Redirect to="/beacon/block-production/live" />} />
                 <Route path="block-production/live" element={<BlockProductionLivePage />} />
                 <Route path="block-production/:slot" element={<BlockProductionSlotPage />} />
               </Route>
