@@ -163,7 +163,7 @@ const PhaseIcons: React.FC<PhaseIconsProps> = ({
         </div>
 
         {/* Flow line 1 - Builder to Relay: Orange to Green */}
-        <div className="flex-shrink-0 flex items-start justify-center relative w-10 pt-[28px]">
+        <div className="flex-shrink-0 flex items-start justify-center relative w-20 pt-[28px]">
           <div
             className="h-1.5 w-full bg-gradient-to-r from-orange-400 to-green-400 rounded-full shadow-inner"
             style={{
@@ -216,7 +216,7 @@ const PhaseIcons: React.FC<PhaseIconsProps> = ({
         </div>
 
         {/* Flow line 2 - Relay to Proposer: Green to Gold */}
-        <div className="flex-shrink-0 flex items-start justify-center relative w-10 pt-[28px]">
+        <div className="flex-shrink-0 flex items-start justify-center relative w-20 pt-[28px]">
           <div
             className="h-1.5 w-full bg-gradient-to-r from-green-400 to-amber-400 rounded-full shadow-inner"
             style={{
@@ -238,14 +238,12 @@ const PhaseIcons: React.FC<PhaseIconsProps> = ({
                   : 'bg-surface border border-border/80' // Not yet active
             }`}
           >
-            {isLocallyBuilt && 
-              blockTime !== undefined && 
-              currentPhase !== Phase.Building && 
-              isActiveInPhase('proposer') && (
+            {isLocallyBuilt && (
               <div
-                className="absolute -top-6 left-1/2 transform -translate-x-1/2 text-3xl z-10"
+                className="absolute -top-7 left-1/2 transform -translate-x-1/2 text-4xl z-50"
                 role="img"
                 aria-label="Locally Built Crown"
+                style={{filter: "drop-shadow(0 0 4px gold)"}}
               >
                 👑
               </div>
@@ -270,7 +268,17 @@ const PhaseIcons: React.FC<PhaseIconsProps> = ({
             </span>
             <div className="h-1"></div>
             <span className={`${isActiveInPhase('proposer') ? 'text-amber-300' : 'text-tertiary'}`}>
-              {proposer ? <></> : <>Waiting...</>}
+              {proposer ? (
+                <>
+                  {isLocallyBuilt ? (
+                    <span className="font-medium">Locally built by proposer</span>
+                  ) : (
+                    <span>Built via external builder</span>
+                  )}
+                </>
+              ) : (
+                <>Waiting...</>
+              )}
             </span>
           </div>
           {currentPhase !== Phase.Building && blockTime !== undefined && (
@@ -281,7 +289,7 @@ const PhaseIcons: React.FC<PhaseIconsProps> = ({
         </div>
 
         {/* Flow line 3 - Proposer to Nodes: Gold to Purple */}
-        <div className="flex-shrink-0 flex items-start justify-center relative w-10 pt-[28px]">
+        <div className="flex-shrink-0 flex items-start justify-center relative w-20 pt-[28px]">
           <div
             className="h-1.5 w-full bg-gradient-to-r from-amber-400 to-purple-400 rounded-full shadow-inner"
             style={{
@@ -334,7 +342,7 @@ const PhaseIcons: React.FC<PhaseIconsProps> = ({
         </div>
 
         {/* Flow line 4 - Nodes to Attesters: Purple to Blue */}
-        <div className="flex-shrink-0 flex items-start justify-center relative w-10 pt-[28px]">
+        <div className="flex-shrink-0 flex items-start justify-center relative w-20 pt-[28px]">
           <div
             className="h-1.5 w-full bg-gradient-to-r from-purple-400 to-blue-400 rounded-full shadow-inner"
             style={{
@@ -420,7 +428,7 @@ const PhaseIcons: React.FC<PhaseIconsProps> = ({
         </div>
 
         {/* Flow line 5 - Attesters to Accepted: Blue to Green */}
-        <div className="flex-shrink-0 flex items-start justify-center relative w-10 pt-[28px]">
+        <div className="flex-shrink-0 flex items-start justify-center relative w-20 pt-[28px]">
           <div
             className="h-1.5 w-full bg-gradient-to-r from-blue-400 to-green-400 rounded-full shadow-inner"
             style={{
