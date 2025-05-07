@@ -23,13 +23,21 @@ export default function BlockProductionLivePage() {
   const selectedNetwork = network || 'mainnet'; // Default to mainnet if no network param
   const queryClient = useQueryClient();
 
-  // Add state to handle screen size
-  const [isMobile, setIsMobile] = useState<boolean>(false);
+  // Add state to handle screen size with more granular breakpoints
+  const [viewMode, setViewMode] = useState<'mobile' | 'tablet' | 'desktop'>('desktop');
 
-  // Detect screen size and update state
+  // Detect screen size and update view mode
   useEffect(() => {
     const checkScreenSize = () => {
-      setIsMobile(window.innerWidth < 768); // 768px is typical tablet breakpoint
+      const width = window.innerWidth;
+      
+      if (width < 768) {
+        setViewMode('mobile'); // Mobile phone
+      } else if (width < 1200) {
+        setViewMode('tablet'); // Tablet or small laptop
+      } else {
+        setViewMode('desktop'); // Full desktop
+      }
     };
 
     // Check immediately
@@ -41,6 +49,9 @@ export default function BlockProductionLivePage() {
     // Clean up event listener
     return () => window.removeEventListener('resize', checkScreenSize);
   }, []);
+  
+  // Simplified check for mobile view (either mobile or tablet uses the mobile view)
+  const isMobile = viewMode !== 'desktop';
 
   // Use BeaconClockManager for slot timing
   useContext(NetworkContext); // Keep context connection for potential future use
@@ -668,6 +679,7 @@ export default function BlockProductionLivePage() {
                   : {}
               }
               block={displayData.block}
+              slotData={displayData} // Pass slot data with attestation info
               // Navigation controls
               slotNumber={slotNumber}
               headLagSlots={headLagSlots}
