@@ -48,6 +48,7 @@ interface DesktopBlockProductionViewProps extends BlockProductionBaseProps {
   togglePlayPause: () => void;
   isNextDisabled: boolean;
   network: string; // Add network prop for builder names lookup
+  isLocallyBuilt?: boolean; // Add prop for locally built blocks
 }
 
 const DesktopBlockProductionView: React.FC<DesktopBlockProductionViewProps> = ({
@@ -78,6 +79,7 @@ const DesktopBlockProductionView: React.FC<DesktopBlockProductionViewProps> = ({
   togglePlayPause,
   isNextDisabled,
   network,
+  isLocallyBuilt = false,
 }) => {
   // Get active status based on role and phase
   const isActive = (role: 'builder' | 'relay' | 'proposer' | 'node') => {
@@ -264,6 +266,7 @@ const DesktopBlockProductionView: React.FC<DesktopBlockProductionViewProps> = ({
             nodes={nodes}
             slotData={slotData}
             firstContinentToSeeBlock={firstContinentToSeeBlock}
+            isLocallyBuilt={isLocallyBuilt}
           />
         </div>
       </div>

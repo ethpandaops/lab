@@ -43,6 +43,7 @@ interface BlockDisplayData {
     builderName?: string;
   }>;
   slotDataObject?: SlotData; // Store the full slot data object
+  isLocallyBuilt?: boolean; // Added property for locally built blocks
 }
 
 const BlockchainVisualization: React.FC<BlockchainVisualizationProps> = ({
@@ -167,6 +168,11 @@ const BlockchainVisualization: React.FC<BlockchainVisualizationProps> = ({
         const deliveredRelays: string[] = slotDataForSlot.deliveredPayloads
           ? Object.keys(slotDataForSlot.deliveredPayloads)
           : [];
+        
+        // Determine if block was built locally
+        const isLocallyBuilt = !slotDataForSlot.block?.payloadsDelivered ||
+                               !Array.isArray(slotDataForSlot.block?.payloadsDelivered) ||
+                               slotDataForSlot.block?.payloadsDelivered.length === 0;
 
         // Get block value from winning bid if available
         let winningBid = null;
@@ -204,6 +210,7 @@ const BlockchainVisualization: React.FC<BlockchainVisualizationProps> = ({
           hasData,
           isBuilding,
           slotDataObject: slotDataForSlot, // Store the full slot data object
+          isLocallyBuilt, // Add the locally built flag
         };
       }
 
@@ -384,6 +391,7 @@ const BlockchainVisualization: React.FC<BlockchainVisualizationProps> = ({
                     blockValue={block.blockValue}
                     futureBidsCount={block.futureBidsCount}
                     futureBids={block.futureBids}
+                    isLocallyBuilt={block.isLocallyBuilt} // Add the locally built flag
                   />
                 </div>
               );
