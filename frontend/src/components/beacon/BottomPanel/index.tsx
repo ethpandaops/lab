@@ -26,14 +26,13 @@ interface BottomPanelProps {
 
 export function BottomPanel({
   attestationProgress,
-  totalValidators,
   attestationThreshold,
   currentTime,
   loading,
   isMissing,
   maxPossibleValidators,
   attestationWindows,
-}: BottomPanelProps): JSX.Element {
+}: BottomPanelProps) {
   const { showModal } = useModal();
 
   // Calculate current attestation count based on currentTime
@@ -48,6 +47,8 @@ export function BottomPanel({
     }
     return 0;
   }, [attestationProgress, currentTime]);
+
+  const currentTimeRounded = Math.floor(currentTime / 100) * 100;
 
   // Process data for arrival count chart
   const arrivalData = useMemo(() => {
@@ -69,7 +70,7 @@ export function BottomPanel({
       time: i * 0.05,
       count,
     }));
-  }, [attestationWindows, loading, isMissing, Math.floor(currentTime / 100) * 100]);
+  }, [attestationWindows, loading, isMissing, currentTimeRounded]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Process data for CDF chart
   const cdfData = useMemo(() => {
@@ -96,13 +97,7 @@ export function BottomPanel({
         percentage: lastPoint ? (lastPoint.totalValidators / maxPossibleValidators) * 100 : 0,
       };
     });
-  }, [
-    attestationProgress,
-    loading,
-    isMissing,
-    maxPossibleValidators,
-    Math.floor(currentTime / 100) * 100,
-  ]);
+  }, [attestationProgress, loading, isMissing, maxPossibleValidators, currentTimeRounded]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Stats for arrival count chart
   const arrivalStats = useMemo(() => {

@@ -5,14 +5,14 @@ import { FeatureCollection, Geometry } from 'geojson';
 import * as worldAtlas from 'world-atlas/countries-110m.json';
 import { BlockDetailsOverlay } from '@/components/beacon/BlockDetailsOverlay/index';
 import { formatNodeName } from '@/utils/format.ts';
-import { continentCoords, getNodeCoordinates } from '@/utils/coordinates.ts';
-import { geoEquirectangular } from 'd3-geo';
+import { getNodeCoordinates } from '@/utils/coordinates.ts';
 import { Card } from '@/components/common/Card';
+import { Topology } from 'topojson-specification';
 
 // Convert TopoJSON to GeoJSON
 const geoData = feature(
-  worldAtlas as any,
-  (worldAtlas as any).objects.countries,
+  worldAtlas as unknown as Topology,
+  (worldAtlas as unknown as Topology).objects.countries,
 ) as unknown as FeatureCollection<Geometry>;
 
 interface Node {
@@ -96,7 +96,7 @@ const useMarkers = (
   return useMemo(() => {
     // First, create individual markers
     const individualMarkers = Object.entries(nodes)
-      .map(([id, node]) => {
+      .map(([id]) => {
         // Find the latest block event for this node
         const nodeEvents = filteredBlockEvents.filter(event => event.node === id);
         const latestEvent = nodeEvents.length > 0 ? nodeEvents[nodeEvents.length - 1] : null;
@@ -141,7 +141,7 @@ const useMarkers = (
     });
 
     // Convert grouped markers to final format
-    return Array.from(groupedMarkers.entries()).map(([coordKey, markers]) => {
+    return Array.from(groupedMarkers.entries()).map(([_, markers]) => {
       const coordinates = markers[0].coordinates;
       const hasMultipleNodes = markers.length > 1;
 
@@ -184,7 +184,7 @@ export function GlobalMap({
   gasLimit,
   executionBlockNumber,
   hideDetails = false,
-}: GlobalMapProps): JSX.Element {
+}: GlobalMapProps) {
   const [isDetailsCollapsed, setIsDetailsCollapsed] = useState(false);
   const [hoveredNode, setHoveredNode] = useState<{
     nodeIds: string[];
@@ -224,7 +224,7 @@ export function GlobalMap({
 
   // Memoize pointer event handler
   const handlePointerEnter = useCallback(
-    (e: React.PointerEvent<SVGCircleElement | SVGGElement>, nodeIds: string[]) => {
+    (_: React.PointerEvent<SVGCircleElement | SVGGElement>, nodeIds: string[]) => {
       const nodeDetails = nodeIds.map(id => {
         const nodeData = nodes[id];
         const { user, node } = formatNodeName(nodeData.name);
@@ -430,7 +430,6 @@ export function GlobalMap({
             coordinates,
             hasMultipleNodes,
             nodeCount,
-            visibleNodeCount,
             hasVisibleNodes,
             nodeIds,
             nodes: nodeData,
