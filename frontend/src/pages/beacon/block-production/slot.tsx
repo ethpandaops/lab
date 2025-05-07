@@ -375,6 +375,10 @@ export default function BlockProductionSlotPage() {
                   : {}
               }
               block={displayData.block}
+              slotData={displayData}
+              network={selectedNetwork || 'mainnet'}
+              isLocallyBuilt={Array.isArray(displayData.block?.payloadsDelivered) && 
+                             displayData.block?.payloadsDelivered.length === 0}
             />
           </div>
 
@@ -444,8 +448,7 @@ export default function BlockProductionSlotPage() {
               togglePlayPause={togglePlayPause}
               isNextDisabled={false}
               network={selectedNetwork || 'mainnet'}
-              isLocallyBuilt={!displayData.block?.payloadsDelivered ||
-                             !Array.isArray(displayData.block?.payloadsDelivered) ||
+              isLocallyBuilt={Array.isArray(displayData.block?.payloadsDelivered) && 
                              displayData.block?.payloadsDelivered.length === 0}
             />
           </div>
