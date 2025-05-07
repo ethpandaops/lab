@@ -129,7 +129,7 @@ const BlockHeader: React.FC<BlockHeaderProps> = ({
           <div className="flex items-center">
             <span className="text-text-tertiary mr-1">State Root:</span>
             <span className="text-text-secondary font-mono">
-              {formatHash(blockData?.stateRoot, 6, 6)}
+              {formatHash(blockData?.stateRoot)}
             </span>
           </div>
 

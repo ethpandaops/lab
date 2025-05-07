@@ -345,17 +345,23 @@ const BlockchainVisualization: React.FC<BlockchainVisualizationProps> = ({
           {/* Blocks - now arranged horizontally */}
           <div className="relative z-10 flex flex-row items-center justify-center gap-6 px-4 w-full h-full">
             {blockData.map(block => {
+              // Hide previous and next blocks on screens below 1536px (2xl)
+              // Only show them on extra large screens (>= 1536px)
+              const visibilityClassNames = !block.isCurrentSlot 
+                ? 'hidden 2xl:flex' // Hide on smaller screens, show only on 2xl screens (1536px+)
+                : 'flex'; // Always show current block
+              
               // Calculate flex layout based on whether this is the current slot or not
               const flexClassNames = block.isCurrentSlot
-                ? 'w-[40%]' // Make current block 40% width
-                : 'w-[30%]'; // Make other blocks 30% width
+                ? 'w-full 2xl:w-[40%]' // Full width on smaller screens, 40% on 2xl screens
+                : '2xl:w-[30%]'; // 30% width on 2xl screens only
 
               // Only use PendingBlock for future blocks
               if (block.isFuture) {
                 return (
                   <div
                     key={block.slot}
-                    className={`flex items-center justify-center h-full ${flexClassNames} transition-all duration-300`}
+                    className={`${visibilityClassNames} items-center justify-center h-full ${flexClassNames} transition-all duration-300`}
                   >
                     <PendingBlock
                       slot={block.slot}
@@ -373,7 +379,7 @@ const BlockchainVisualization: React.FC<BlockchainVisualizationProps> = ({
               return (
                 <div
                   key={block.slot}
-                  className={`flex items-center justify-center h-full ${flexClassNames} transition-all duration-300`}
+                  className={`${visibilityClassNames} items-center justify-center h-full ${flexClassNames} transition-all duration-300`}
                 >
                   <BlockDetailsPanel
                     slot={block.slot}

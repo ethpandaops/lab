@@ -50,8 +50,8 @@ export default function BlockProductionLivePage() {
     return () => window.removeEventListener('resize', checkScreenSize);
   }, []);
   
-  // Simplified check for mobile view (either mobile or tablet uses the mobile view)
-  const isMobile = viewMode !== 'desktop';
+  // Only use mobile view for real mobile devices, use desktop view for tablets
+  const isMobile = viewMode === 'mobile';
 
   // Use BeaconClockManager for slot timing
   const beaconClockManager = BeaconClockManager.getInstance();

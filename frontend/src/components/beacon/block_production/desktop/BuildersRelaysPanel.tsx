@@ -214,22 +214,23 @@ const BuildersRelaysPanel: React.FC<BuildersRelaysPanelProps> = ({
                       marginBottom: '0.25rem',
                     }}
                   >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center flex-1">
+                    <div className="flex items-center w-full">
+                      <div className="flex items-center w-[70%] min-w-0 overflow-hidden">
                         <div
                           className={`w-2 h-2 rounded-full mr-2 flex-shrink-0 ${showWinningStyle ? 'bg-amber-400' : 'bg-accent-muted'}`}
                         ></div>
-                        <div className="truncate flex-1">
+                        <div className="truncate min-w-0 max-w-full overflow-hidden">
                           <span
-                            className={`${showWinningStyle ? 'font-medium text-amber-400' : ''}`}
+                            className={`${showWinningStyle ? 'font-medium text-amber-400' : ''} truncate block overflow-hidden`}
+                            title={item.label}
                           >
                             {item.label}
                           </span>
                         </div>
                       </div>
-                      <div className="font-mono ml-1.5 rounded-md px-1.5 py-0.25">
+                      <div className="font-mono ml-1.5 rounded-md px-1.5 py-0.25 w-[30%] flex-shrink-0 text-right">
                         <span
-                          className={`${showWinningStyle ? 'text-amber-400 font-semibold' : 'text-secondary'} text-xs`}
+                          className={`${showWinningStyle ? 'text-amber-400 font-semibold' : 'text-secondary'} text-xs whitespace-nowrap`}
                         >
                           {item.value ? item.value.toFixed(4) : '0.0000'} ETH
                         </span>
@@ -283,20 +284,23 @@ const BuildersRelaysPanel: React.FC<BuildersRelaysPanelProps> = ({
                         : 'bg-surface/20 hover:bg-surface/30 border-l-2 border-subtle/30'
                     }`}
                   >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center flex-1">
+                    <div className="flex items-center w-full">
+                      <div className="flex items-center w-[70%] min-w-0 overflow-hidden">
                         <div
                           className={`w-2 h-2 rounded-full mr-2 flex-shrink-0 ${showWinningStyle ? 'bg-amber-400' : 'bg-accent-muted'}`}
                         ></div>
-                        <div
-                          className={`truncate flex-1 ${showWinningStyle ? 'text-amber-400 font-medium' : 'text-xs'}`}
-                        >
-                          {item.label}
+                        <div className="truncate min-w-0 max-w-full overflow-hidden">
+                          <span
+                            className={`${showWinningStyle ? 'text-amber-400 font-medium' : 'text-xs'} truncate block overflow-hidden`}
+                            title={item.label}
+                          >
+                            {item.label}
+                          </span>
                         </div>
                       </div>
-                      <div className="flex items-center ml-1.5">
+                      <div className="w-[30%] flex-shrink-0 text-right ml-1.5">
                         <div
-                          className={`font-mono ${showWinningStyle ? 'text-amber-400' : 'text-tertiary'} text-[10px]`}
+                          className={`font-mono ${showWinningStyle ? 'text-amber-400' : 'text-tertiary'} text-[10px] whitespace-nowrap`}
                         >
                           {item.bidCount !== undefined
                             ? `${item.bidCount} bid${item.bidCount !== 1 ? 's' : ''}`
