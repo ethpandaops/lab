@@ -6,7 +6,7 @@ import PhaseTimeline from '../common/PhaseTimeline';
 import PhaseIcons from '../common/PhaseIcons';
 import BuildersRelaysPanel from './BuildersRelaysPanel';
 import ContinentsList from './ContinentsList';
-
+import { BeaconSlotData } from '@/api/gen/backend/pkg/server/proto/beacon_slots/beacon_slots_pb';
 // Define the flow animation styles
 const flowAnimations = `
   @keyframes flowRight {
@@ -24,7 +24,7 @@ const flowAnimations = `
 `;
 
 interface DesktopBlockProductionViewProps extends BlockProductionBaseProps {
-  slotData?: any;
+  slotData?: BeaconSlotData;
   valueRange?: {
     min: number;
     max: number;
@@ -56,17 +56,12 @@ const DesktopBlockProductionView: React.FC<DesktopBlockProductionViewProps> = ({
   currentTime,
   relayColors,
   winningBid,
-  slot,
   proposer,
-  proposerEntity,
   nodes = {},
   blockTime,
   nodeBlockSeen = {},
   nodeBlockP2P = {},
-  block,
   slotData,
-  valueRange,
-  timeRange,
   onPhaseChange,
   // Navigation controls
   slotNumber,
@@ -235,7 +230,7 @@ const DesktopBlockProductionView: React.FC<DesktopBlockProductionViewProps> = ({
 
   return (
     <div className="h-full flex flex-col">
-      <style jsx>{flowAnimations}</style>
+      <style>{flowAnimations}</style>
 
       {/* Main card for timeline and phase icons */}
       <div className="bg-surface rounded-lg overflow-hidden shadow-sm mb-3">
@@ -273,7 +268,11 @@ const DesktopBlockProductionView: React.FC<DesktopBlockProductionViewProps> = ({
             blockTime={blockTime}
             bids={bids}
             winningBid={winningBid}
-            proposer={proposer}
+            proposer={
+              proposer
+                ? { proposerValidatorIndex: Number(proposer.proposerValidatorIndex) }
+                : undefined
+            }
             nodes={nodes}
             slotData={slotData}
             firstContinentToSeeBlock={firstContinentToSeeBlock}
@@ -294,7 +293,7 @@ const DesktopBlockProductionView: React.FC<DesktopBlockProductionViewProps> = ({
             isBuilderActive={isActive('builder')}
             isRelayActive={isActive('relay')}
             network={network}
-            currentPhase={currentPhase}
+            currentPhase={currentPhase ?? undefined}
           />
         </div>
 

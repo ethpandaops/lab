@@ -122,7 +122,7 @@ function ForkReadiness() {
         currentEpoch,
       },
     ];
-  }, [summaryData, config, selectedUser, selectedNetwork]);
+  }, [summaryData, config, selectedUser, selectedNetwork, getBeaconClock]);
 
   if (!summaryData || !config) {
     return <div>Loading...</div>;

@@ -87,13 +87,13 @@ export const BlockTimings: React.FC = () => {
   const [currentWindow, setCurrentWindow] = useState<TimeWindowConfig | null>(null);
 
   const timeWindows = useMemo<TimeWindowConfig[]>(() => {
-    const moduleConfig = config?.modules?.['beacon_chain_timings'];
+    const moduleConfig = config?.modules?.['beaconChainTimings'];
     return moduleConfig?.timeWindows || DEFAULT_TIME_WINDOWS;
   }, [config]);
 
   const defaultTimeWindow = useMemo(() => timeWindows[0]?.file || 'last_30_days', [timeWindows]);
   const defaultNetwork = useMemo(() => {
-    const moduleConfig = config?.modules?.['beacon_chain_timings'];
+    const moduleConfig = config?.modules?.['beaconChainTimings'];
     return moduleConfig?.networks &&
       Array.isArray(moduleConfig.networks) &&
       moduleConfig.networks.length > 0
@@ -126,15 +126,15 @@ export const BlockTimings: React.FC = () => {
   }, [timeWindows, timeWindow]);
 
   // Skip data fetching if config isn't loaded
-  const timingsPath = config?.modules?.['beacon_chain_timings']?.pathPrefix
-    ? `${config.modules['beacon_chain_timings'].pathPrefix}/block_timings/${network}/${timeWindow}`
+  const timingsPath = config?.modules?.['beaconChainTimings']?.pathPrefix
+    ? `${config.modules['beaconChainTimings'].pathPrefix}/block_timings/${network}/${timeWindow}`
     : null;
 
-  const cdfPath = config?.modules?.['beacon_chain_timings']?.pathPrefix
-    ? `${config.modules['beacon_chain_timings'].pathPrefix}/size_cdf/${network}/${timeWindow}`
+  const cdfPath = config?.modules?.['beaconChainTimings']?.pathPrefix
+    ? `${config.modules['beaconChainTimings'].pathPrefix}/size_cdf/${network}/${timeWindow}`
     : null;
 
-  const { data: timingData, error } = useDataFetch<TimingData>(timingsPath);
+  const { data: timingData, error } = useDataFetch<TimingData>(baseUrl, timingsPath);
 
   const { data: cdfData } = useDataFetch<CDFData>(baseUrl, cdfPath);
 

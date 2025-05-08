@@ -349,7 +349,7 @@ export const GlobeViz = ({ data, width = 600, height = 400 }: Props) => {
         globeRef.current._destructor();
       }
     };
-  }, []);
+  }, [arcs, height, points]);
 
   // Update globe data
   useEffect(() => {

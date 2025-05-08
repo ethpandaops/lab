@@ -88,7 +88,7 @@ interface BreadcrumbsProps {
   className?: string;
 }
 
-export function Breadcrumbs({ className = '' }: BreadcrumbsProps): JSX.Element {
+export function Breadcrumbs({ className = '' }: BreadcrumbsProps) {
   const location = useLocation();
   const pathnames = location.pathname.split('/').filter(Boolean);
 

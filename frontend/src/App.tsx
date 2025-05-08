@@ -23,7 +23,6 @@ import Experiments from '@/pages/Experiments.tsx';
 import { SlotLookup } from '@/pages/beacon/slot/index';
 import { ModalProvider } from '@/contexts/ModalContext.tsx';
 import { LocallyBuiltBlocks } from '@/pages/beacon/LocallyBuiltBlocks';
-import MevRelaysLivePage from '@/pages/beacon/mev_relays/live.tsx';
 import BlockProductionLivePage from '@/pages/beacon/block-production/live.tsx';
 import BlockProductionSlotPage from '@/pages/beacon/block-production/slot.tsx';
 import ApplicationProvider from '@/providers/application';
@@ -138,7 +137,6 @@ function App() {
                 <Route path="blocks" element={<BlockTimings />} />
               </Route>
               <Route path="locally-built-blocks" element={<LocallyBuiltBlocks />} />
-              <Route path="mev_relays/live" element={<MevRelaysLivePage />} />
               <Route
                 path="block-production"
                 element={<Redirect to="/beacon/block-production/live" />}

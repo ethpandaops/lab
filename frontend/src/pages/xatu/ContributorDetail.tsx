@@ -75,7 +75,7 @@ function isNodeOffline(node: ContributorNode, updatedAt: number): boolean {
   return updatedAt - node.latest_slot_start_date_time > OFFLINE_THRESHOLD;
 }
 
-function ContributorDetail(): JSX.Element {
+function ContributorDetail() {
   const { name } = useParams<{ name: string }>();
   const { config } = useConfig();
   const { baseUrl } = useApi();
@@ -128,7 +128,7 @@ function ContributorDetail(): JSX.Element {
         <div className="card-body">
           <div className="flex items-start gap-6">
             <div
-              className="w-20 h-20 flex items-center justify-center text-2xl font-mono font-bold text-base shadow-neon transition-transform hover:scale-105"
+              className="w-20 h-20 flex items-center justify-center text-2xl font-mono font-bold shadow-neon transition-transform hover:scale-105"
               style={{
                 backgroundColor: avatarColor,
                 boxShadow: `0 0 20px ${avatarColor}10`,

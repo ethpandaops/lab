@@ -25,7 +25,9 @@ export interface ValueProps {
 
 export function useValue(props: ValueProps): State {
   const [client, setClient] = useState<LabApiClient>(props.client);
-  const [baseUrl, setBaseUrl] = useState<string>(props.baseUrl);
+  const [baseUrl, setBaseUrl] = useState<string>(
+    props.baseUrl.endsWith('/') ? props.baseUrl : `${props.baseUrl}/`,
+  );
 
   return {
     client,

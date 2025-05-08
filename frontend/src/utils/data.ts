@@ -13,6 +13,7 @@ export const useDataFetch = <T>(
   path: string | null,
   options?: { silentFail?: boolean },
 ) => {
+  console.log('useDataFetch', baseUrl, path);
   const {
     data,
     isLoading: loading,
