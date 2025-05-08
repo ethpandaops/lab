@@ -64,10 +64,7 @@ export const CommunityNodes = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const timeWindowRef = useRef<HTMLDivElement>(null);
 
-  const configContext = useConfig();
-  const pathPrefix = configContext?.modules?.['xatu_public_contributors']?.pathPrefix;
-
-  console.log('fuck you', pathPrefix, configContext);
+  const pathPrefix = config?.modules?.['xatuPublicContributors']?.pathPrefix;
 
   const { selectedNetwork, setSelectedNetwork } = useNetwork();
   const [currentWindow, setCurrentWindow] = useState<TimeWindow | null>(null);
@@ -75,7 +72,7 @@ export const CommunityNodes = () => {
 
   const timeWindows = useMemo(
     () =>
-      config?.modules['xatu_public_contributors'].timeWindows || [
+      config?.modules?.['xatuPublicContributors']?.timeWindows || [
         { file: 'last_30_days', step: '1d', label: '30d', range: '-30d' },
         { file: 'last_1_day', step: '1h', label: '1d', range: '-1d' },
       ],

@@ -34,7 +34,7 @@ interface DetailsViewProps {
   };
 }
 
-export function DetailsView({ loading, isMissing, slotData }: DetailsViewProps): JSX.Element {
+export function DetailsView({ loading, isMissing, slotData }: DetailsViewProps) {
   // Find the first node that saw the block (both API and P2P)
   const firstSeenLocations = useMemo(() => {
     if (!slotData?.timings || !slotData?.nodes) return { api: null, p2p: null };

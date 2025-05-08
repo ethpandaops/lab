@@ -6,7 +6,7 @@ interface NavigationProps {
   showLinks?: boolean;
 }
 
-export function Navigation({ showLinks = true }: NavigationProps): JSX.Element {
+export function Navigation({ showLinks = true }: NavigationProps) {
   const location = useLocation();
 
   const linkClasses = (path: string) => {

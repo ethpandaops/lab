@@ -10,11 +10,10 @@ import {
   DesktopBlockProductionView,
   generateConsistentColor,
   getTransformedBids,
+  BidData,
 } from '@/components/beacon/block_production';
-import {
-  isBlockLocallyBuilt,
-  hasNonEmptyDeliveredPayloads,
-} from '@/components/beacon/block_production/common/blockUtils';
+import { hasNonEmptyDeliveredPayloads } from '@/components/beacon/block_production/common/blockUtils';
+import { BeaconSlotData } from '@/api/gen/backend/pkg/server/proto/beacon_slots/beacon_slots_pb';
 
 /**
  * BlockProductionLivePage visualizes the entire Ethereum block production process
@@ -113,7 +112,7 @@ export default function BlockProductionLivePage() {
     prefetchedSlotsRef.current = new Set();
 
     // Create a slot change callback
-    const slotChangeCallback = (network: string, newSlot: number, previousSlot: number) => {
+    const slotChangeCallback = (_network: string, newSlot: number, _previousSlot: number) => {
       // Only update the head slot if we're in play mode
       // This prevents real-world slot changes from affecting our visualization when paused
       if (isPlayingRef.current) {
@@ -320,7 +319,6 @@ export default function BlockProductionLivePage() {
     // Initial prefetch of current and next slots when component mounts or network changes
     if (headSlot !== null) {
       const currentDisplaySlot = headSlot - (headLagSlots + 2);
-      const nextDisplaySlot = currentDisplaySlot + 1;
 
       // Clear any previously prefetched slots when network changes
       prefetchedSlotsRef.current = new Set();
@@ -389,16 +387,11 @@ export default function BlockProductionLivePage() {
 
     // Ensure we're in playing state
     setIsPlaying(true);
-  }, [headSlot, slotNumber, displaySlotOffset, headLagSlots, prefetchSlotData, selectedNetwork]);
+  }, [headSlot, slotNumber, displaySlotOffset, headLagSlots, prefetchSlotData]);
   const isNextDisabled = displaySlotOffset >= 0;
   const togglePlayPause = React.useCallback(() => setIsPlaying(prev => !prev), []);
 
-  const {
-    data: slotData,
-    isLoading: isSlotLoading,
-    error: slotError,
-    isPreviousData,
-  } = useQuery({
+  const { data: slotData, isLoading: isSlotLoading } = useQuery<BeaconSlotData>({
     queryKey: ['block-production-live', 'slot', selectedNetwork, slotNumber],
     queryFn: async () => {
       if (slotNumber === null) return null;
@@ -409,7 +402,7 @@ export default function BlockProductionLivePage() {
       }
 
       // Next check if we already have this data cached in React Query
-      const existingData = queryClient.getQueryData([
+      const existingData = queryClient.getQueryData<BeaconSlotData>([
         'block-production-live',
         'slot',
         selectedNetwork,
@@ -437,12 +430,8 @@ export default function BlockProductionLivePage() {
     refetchInterval: 5000, // Periodically check for updates
     refetchIntervalInBackground: true, // Refetch even if tab is not focused
     staleTime: 5 * 60 * 1000, // Consider data fresh for 5 minutes
-    keepPreviousData: true, // Keep showing previous slot's data while loading new data
     retry: 2, // Retry failed requests twice
     enabled: slotNumber !== null,
-    onSuccess: data => {
-      // Data loaded successfully
-    },
   });
 
   // Simple time counter - pure React
@@ -641,24 +630,8 @@ export default function BlockProductionLivePage() {
     return { min: 0, max: maxVal * 1.1 };
   }, [transformedBids]);
 
-  // Create empty fallback data that matches the structure of real data
-  const fallbackData = {
-    proposer: null,
-    proposerEntity: null,
-    nodes: {},
-    block: null,
-    timings: {
-      blockSeen: {},
-      blockFirstSeenP2p: {},
-    },
-    relayBids: {},
-  };
-
-  // Always use data - either real data or fallback data
-  const displayData = slotData || fallbackData;
-
   // Empty arrays for displaying when no real data
-  const emptyBids = [];
+  const emptyBids: BidData[] = [];
   const emptyRelayColors = {};
 
   return (
@@ -668,7 +641,7 @@ export default function BlockProductionLivePage() {
         // Mobile View
         <div className="px-2 py-1">
           <div
-            className={`transition-opacity duration-300 ${isSlotLoading && !isPreviousData ? 'opacity-70' : 'opacity-100'}`}
+            className={`transition-opacity duration-300 ${isSlotLoading ? 'opacity-70' : 'opacity-100'}`}
           >
             <MobileBlockProductionView
               bids={slotData ? transformedBids : emptyBids}
@@ -676,14 +649,14 @@ export default function BlockProductionLivePage() {
               relayColors={slotData ? relayColors : emptyRelayColors}
               winningBid={slotData ? winningBidData : null}
               slot={slotNumber || undefined}
-              proposer={displayData.proposer}
-              proposerEntity={displayData.proposerEntity}
-              nodes={displayData.nodes || {}}
-              blockTime={displayData.block?.slotTime}
+              proposer={slotData?.proposer}
+              proposerEntity="TODO"
+              nodes={slotData?.nodes || {}}
+              // blockTime={} - TODO: Add block time
               nodeBlockSeen={
-                displayData.timings?.blockSeen
+                slotData?.timings?.blockSeen
                   ? Object.fromEntries(
-                      Object.entries(displayData.timings.blockSeen).map(([node, time]) => [
+                      Object.entries(slotData.timings.blockSeen).map(([node, time]) => [
                         node,
                         typeof time === 'bigint' ? Number(time) : Number(time),
                       ]),
@@ -691,17 +664,16 @@ export default function BlockProductionLivePage() {
                   : {}
               }
               nodeBlockP2P={
-                displayData.timings?.blockFirstSeenP2p
+                slotData?.timings?.blockFirstSeenP2p
                   ? Object.fromEntries(
-                      Object.entries(displayData.timings.blockFirstSeenP2p).map(([node, time]) => [
+                      Object.entries(slotData.timings.blockFirstSeenP2p).map(([node, time]) => [
                         node,
                         typeof time === 'bigint' ? Number(time) : Number(time),
                       ]),
                     )
                   : {}
               }
-              block={displayData.block}
-              slotData={displayData} // Pass slot data with attestation info
+              slotData={slotData} // Pass slot data with attestation info
               // Navigation controls
               slotNumber={slotNumber}
               headLagSlots={headLagSlots}
@@ -721,7 +693,7 @@ export default function BlockProductionLivePage() {
         // Desktop View
         <div className="h-full">
           <div
-            className={`transition-opacity duration-300 h-full ${isSlotLoading && !isPreviousData ? 'opacity-70' : 'opacity-100'}`}
+            className={`transition-opacity duration-300 h-full ${isSlotLoading ? 'opacity-70' : 'opacity-100'}`}
           >
             <DesktopBlockProductionView
               bids={slotData ? transformedBids : emptyBids}
@@ -729,14 +701,14 @@ export default function BlockProductionLivePage() {
               relayColors={slotData ? relayColors : emptyRelayColors}
               winningBid={slotData ? winningBidData : null}
               slot={slotNumber || undefined}
-              proposer={displayData.proposer}
-              proposerEntity={displayData.proposerEntity}
-              nodes={displayData.nodes || {}}
-              blockTime={displayData.block?.slotTime}
+              proposer={slotData?.proposer}
+              proposerEntity="TODO"
+              nodes={slotData?.nodes || {}}
+              // blockTime={} - TODO: Add block time
               nodeBlockSeen={
-                displayData.timings?.blockSeen
+                slotData?.timings?.blockSeen
                   ? Object.fromEntries(
-                      Object.entries(displayData.timings.blockSeen).map(([node, time]) => [
+                      Object.entries(slotData.timings.blockSeen).map(([node, time]) => [
                         node,
                         typeof time === 'bigint' ? Number(time) : Number(time),
                       ]),
@@ -744,17 +716,16 @@ export default function BlockProductionLivePage() {
                   : {}
               }
               nodeBlockP2P={
-                displayData.timings?.blockFirstSeenP2p
+                slotData?.timings?.blockFirstSeenP2p
                   ? Object.fromEntries(
-                      Object.entries(displayData.timings.blockFirstSeenP2p).map(([node, time]) => [
+                      Object.entries(slotData.timings.blockFirstSeenP2p).map(([node, time]) => [
                         node,
                         typeof time === 'bigint' ? Number(time) : Number(time),
                       ]),
                     )
                   : {}
               }
-              block={displayData.block}
-              slotData={displayData}
+              slotData={slotData}
               timeRange={timeRange}
               valueRange={valueRange}
               // Navigation controls

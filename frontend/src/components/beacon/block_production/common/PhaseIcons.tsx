@@ -440,6 +440,7 @@ const PhaseIcons: React.FC<PhaseIconsProps> = ({
                     {getDynamicContent(phase.id)}
                   </span>
                 )}
+                <div>{blockTime}</div>
                 {phase.id === 'proposer' &&
                   currentPhase !== Phase.Building &&
                   blockTime !== undefined && (

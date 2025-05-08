@@ -53,7 +53,7 @@ const formatTimestamp = (timestamp: number): string => {
   }
 };
 
-const ContributorsList = (): JSX.Element => {
+const ContributorsList = () => {
   const { config } = useConfig();
   const { baseUrl } = useApi();
   const summaryPath = config?.modules?.['xatuPublicContributors']?.pathPrefix
@@ -143,7 +143,7 @@ const ContributorsList = (): JSX.Element => {
                             className="flex items-center gap-2 hover:opacity-80 transition-opacity"
                           >
                             <div
-                              className="w-6 h-6 flex items-center justify-center text-xs font-mono font-bold text-base shadow-neon transition-transform hover:scale-105"
+                              className="w-6 h-6 flex items-center justify-center text-xs font-mono font-bold shadow-neon transition-transform hover:scale-105"
                               style={{
                                 backgroundColor: avatarColor,
                                 boxShadow: `0 0 10px ${avatarColor}05`,

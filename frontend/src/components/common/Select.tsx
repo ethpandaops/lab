@@ -11,7 +11,7 @@ interface SelectProps {
   multiple?: boolean;
 }
 
-export function Select({ value, onChange, options, label, multiple }: SelectProps): JSX.Element {
+export function Select({ value, onChange, options, label, multiple }: SelectProps) {
   return (
     <div className="w-full">
       {label && <label className="block text-xs font-mono text-tertiary mb-1">{label}</label>}

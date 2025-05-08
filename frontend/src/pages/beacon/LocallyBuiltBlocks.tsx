@@ -18,16 +18,7 @@ const REFRESH_INTERVAL = 5000;
 // Maximum number of slots to keep in memory
 const MAX_SLOTS = 64;
 
-type ViewMode = 'visualization' | 'table' | 'heatmap' | 'value-distribution' | 'bubble-chart';
-
-interface ViewOption {
-  id: ViewMode;
-  label: string;
-  icon: JSX.Element;
-  description: string; // Kept for potential future use, though not displayed in header now
-}
-
-export function LocallyBuiltBlocks(): JSX.Element {
+export function LocallyBuiltBlocks() {
   const { selectedNetwork } = useNetwork();
   const [data, setData] = useState<LocallyBuiltSlotBlocks[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -119,13 +110,13 @@ export function LocallyBuiltBlocks(): JSX.Element {
         }
       }
     },
-    [selectedNetwork, data.length],
+    [selectedNetwork, data.length, client],
   ); // Added data.length dependency
 
   // Initial data fetch when network changes
   useEffect(() => {
     fetchData(true);
-  }, [selectedNetwork]); // Only depend on selectedNetwork
+  }, [selectedNetwork, fetchData]); // Only depend on selectedNetwork
 
   // Set up automatic refresh interval
   useEffect(() => {

@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 
-export function Logo(): JSX.Element {
+export function Logo() {
   return (
     <Link to="/" className="flex items-center gap-3">
       <img src="/lab.png" alt="Logo" className="h-10 w-10 object-contain" />

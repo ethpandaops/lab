@@ -25,9 +25,7 @@ interface MobileBlockProductionViewProps extends BlockProductionBaseProps {
 const MobileBlockProductionView: React.FC<MobileBlockProductionViewProps> = ({
   bids,
   currentTime,
-  relayColors,
   winningBid,
-  slot,
   proposer,
   proposerEntity,
   nodes = {},

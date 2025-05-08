@@ -29,7 +29,7 @@ export function BlockDetailsOverlay({
   executionBlockNumber,
   isCollapsed,
   onToggleCollapse,
-}: BlockDetailsProps): JSX.Element {
+}: BlockDetailsProps) {
   const epoch = Math.floor(slot / 32);
   const slotInEpoch = (slot % 32) + 1;
 

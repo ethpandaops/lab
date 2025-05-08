@@ -31,10 +31,11 @@ const featuredExperiments = [
   },
 ];
 
+const networkTerms = ['Ethereum', 'Consensus Layer', 'Execution Layer', 'Beacon Chain'];
+
 function Home() {
   const [animatedText, setAnimatedText] = useState('Ethereum');
   const [isTransitioning, setIsTransitioning] = useState(false);
-  const networkTerms = ['Ethereum', 'Consensus Layer', 'Execution Layer', 'Beacon Chain'];
   const containerRef = useRef<HTMLDivElement>(null);
   const textContainerRef = useRef<HTMLDivElement>(null);
 

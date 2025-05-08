@@ -8,7 +8,6 @@ import {
   MobileBlockProductionView,
   DesktopBlockProductionView,
 } from '@/components/beacon/block_production';
-import { Phase as PhaseEnum } from '@/components/beacon/block_production/common/types';
 import { hasNonEmptyDeliveredPayloads } from '@/components/beacon/block_production/common/blockUtils';
 
 // Simple hash function to generate a color from a string (e.g., relay name)
@@ -108,9 +107,6 @@ export default function BlockProductionSlotPage() {
     staleTime: 60000, // Consider data fresh for 60 seconds to avoid refetching when viewing fixed slots
     retry: 2, // Retry failed requests twice
     enabled: slotNumber !== null,
-    onSuccess: data => {
-      // Got slot data
-    },
   });
 
   // Timer effect for playback
@@ -256,9 +252,6 @@ export default function BlockProductionSlotPage() {
     return { min: 0, max: maxVal * 1.1 };
   }, [transformedBids]);
 
-  // Pass entity info separately since it might be in a different part of the slotData
-  const proposerEntity = slotData?.entity;
-
   // --- End Data Transformation ---
 
   // Create empty fallback data that matches the structure of real data
@@ -311,17 +304,6 @@ export default function BlockProductionSlotPage() {
 
   // Use the prepared data for display
   const displayData = preparedData;
-
-  // Force the current phase based on time for the UI to display correctly
-  useEffect(() => {
-    if (initialTimeMs >= 8500) {
-      setCurrentPhase(PhaseEnum.Accepted);
-    } else if (initialTimeMs >= 6500) {
-      setCurrentPhase(PhaseEnum.Attesting);
-    } else if (initialTimeMs >= 5000) {
-      setCurrentPhase(PhaseEnum.Propagating);
-    }
-  }, [initialTimeMs]);
 
   // Empty arrays for displaying when no real data
   const emptyBids = [];
@@ -429,7 +411,6 @@ export default function BlockProductionSlotPage() {
               slotData={displayData} // Pass slotData directly
               timeRange={timeRange}
               valueRange={valueRange}
-              onPhaseChange={handlePhaseChange}
               // Add navigation props required by DesktopBlockProductionView
               slotNumber={slotNumber}
               headLagSlots={0}

@@ -2,7 +2,7 @@ import { Link, Outlet, useLocation } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import { AboutThisData } from '@/components/common/AboutThisData';
 
-function BeaconChainTimings(): JSX.Element {
+function BeaconChainTimings() {
   const location = useLocation();
 
   // If we're on a nested route, render the child route
