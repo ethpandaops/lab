@@ -8,7 +8,7 @@ import (
 	connect "connectrpc.com/connect"
 	context "context"
 	errors "errors"
-	lab "github.com/ethpandaops/lab/backend/pkg/proto/lab"
+	lab "github.com/ethpandaops/lab/backend/pkg/server/proto/lab"
 	http "net/http"
 	strings "strings"
 )

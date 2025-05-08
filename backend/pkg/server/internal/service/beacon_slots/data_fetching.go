@@ -850,6 +850,7 @@ func (b *BeaconSlots) getMevRelayBids(ctx context.Context, networkName string, s
 		relay      string
 		timeBucket int64
 	}
+
 	bucketBids := make(map[bucketKey][]*pb.RelayBid)
 
 	// Track winning bid to ensure it's included
@@ -862,6 +863,7 @@ func (b *BeaconSlots) getMevRelayBids(ctx context.Context, networkName string, s
 		rowSlot, err := strconv.ParseUint(fmt.Sprintf("%v", row["slot"]), 10, 64)
 		if err != nil {
 			log.WithError(err).WithFields(log.Fields{"slot": slot, "network": networkName, "relay": relayName, "field": "slot", "value": row["slot"]}).Warn("Failed to parse relay bid slot")
+
 			continue
 		}
 
@@ -875,24 +877,28 @@ func (b *BeaconSlots) getMevRelayBids(ctx context.Context, networkName string, s
 		gasLimit, err := strconv.ParseUint(fmt.Sprintf("%v", row["gas_limit"]), 10, 64)
 		if err != nil {
 			log.WithError(err).WithFields(log.Fields{"slot": slot, "network": networkName, "relay": relayName, "field": "gas_limit", "value": row["gas_limit"]}).Warn("Failed to parse relay bid gas_limit")
+
 			gasLimit = 0 // Default to 0 if parsing fails
 		}
 
 		gasUsed, err := strconv.ParseUint(fmt.Sprintf("%v", row["gas_used"]), 10, 64)
 		if err != nil {
 			log.WithError(err).WithFields(log.Fields{"slot": slot, "network": networkName, "relay": relayName, "field": "gas_used", "value": row["gas_used"]}).Warn("Failed to parse relay bid gas_used")
+
 			gasUsed = 0 // Default to 0 if parsing fails
 		}
 
 		slotTime, err := strconv.ParseInt(fmt.Sprintf("%v", row["slot_time"]), 10, 64)
 		if err != nil {
 			log.WithError(err).WithFields(log.Fields{"slot": slot, "network": networkName, "relay": relayName, "field": "slot_time", "value": row["slot_time"]}).Warn("Failed to parse relay bid slot_time")
+
 			continue // Skip because slot_time is crucial
 		}
 
 		timeBucket, err := strconv.ParseInt(fmt.Sprintf("%v", row["time_bucket"]), 10, 64)
 		if err != nil {
 			log.WithError(err).WithFields(log.Fields{"slot": slot, "network": networkName, "relay": relayName, "field": "time_bucket", "value": row["time_bucket"]}).Warn("Failed to parse relay bid time_bucket")
+
 			timeBucket = 0 // Default to 0 if parsing fails
 		}
 
@@ -965,14 +971,17 @@ func (b *BeaconSlots) getMevRelayBids(ctx context.Context, networkName string, s
 		wrapper, exists := relayBidsMap[relayName]
 		if !exists {
 			wrapper = &pb.RelayBids{Bids: make([]*pb.RelayBid, 0)}
+
 			relayBidsMap[relayName] = wrapper
 		}
 
 		// Check if winning bid is already included
 		alreadyIncluded := false
+
 		for _, bid := range wrapper.Bids {
 			if bid.BlockHash == winningBid.BlockHash {
 				alreadyIncluded = true
+
 				break
 			}
 		}
