@@ -1,27 +1,26 @@
-import { createPromiseClient, PromiseClient } from '@connectrpc/connect';
+import { createClient, Client, Interceptor } from '@connectrpc/connect';
 import { createConnectTransport } from '@connectrpc/connect-web';
 
-// Import the generated LabAPI service
-import { LabAPI } from '@/api/gen/backend/pkg/api/proto/lab_api_connectweb.ts'; // Corrected import path
+import { LabAPI } from '@/api/gen/backend/pkg/api/proto/lab_api_connectweb';
+import { GetConfigResponse } from '@/api/gen/backend/pkg/api/proto/lab_api_pb';
 
-// Define the type for the client
-export type LabApiClientType = PromiseClient<typeof LabAPI>;
+export type LabApiClient = Client<typeof LabAPI>;
 
-/**
- * Creates a LabAPI client instance.
- *
- * @param baseUrl The base URL of the LabAPI server (e.g., "http://localhost:8080").
- * @returns A PromiseClient for the LabAPI service.
- */
-export function createLabApiClient(baseUrl: string): LabApiClientType {
-  // Create a transport using the Connect-Web transport
-  const transport = createConnectTransport({
-    baseUrl: baseUrl + '/api',
-    useHttpGet: true, // Force HTTP GET for all unary calls
-  });
+export type Config = NonNullable<NonNullable<GetConfigResponse['config']>['config']>;
 
-  // Create the promise-based client
-  const client = createPromiseClient(LabAPI, transport);
+const logger: Interceptor = next => async req => {
+  console.log(`sending message to ${req.url}`);
+  return await next(req);
+};
 
-  return client;
+export function createLabApiClient(baseUrl: string): LabApiClient {
+  console.log('Creating LabAPI client with baseUrl:', baseUrl);
+  return createClient(
+    LabAPI,
+    createConnectTransport({
+      interceptors: [logger],
+      baseUrl: baseUrl.endsWith('/') ? baseUrl + 'api' : baseUrl + '/api',
+      useHttpGet: true, // Force HTTP GET for all unary calls
+    }),
+  );
 }

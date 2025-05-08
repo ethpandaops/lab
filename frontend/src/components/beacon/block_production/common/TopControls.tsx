@@ -41,9 +41,7 @@ const TopControls: React.FC<TopControlsProps> = ({
           <button
             onClick={resetToCurrentSlot}
             className={`px-2.5 py-1 rounded-md font-medium text-xs transition focus:outline-none focus:ring-1 focus:ring-accent/70 ${
-              displaySlotOffset === 0
-                ? 'bg-accent/20 text-accent'
-                : 'text-secondary hover:bg-hover'
+              displaySlotOffset === 0 ? 'bg-accent/20 text-accent' : 'text-secondary hover:bg-hover'
             }`}
             disabled={displaySlotOffset === 0}
             title="Return to Current Slot"

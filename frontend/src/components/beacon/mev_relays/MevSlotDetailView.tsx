@@ -9,14 +9,14 @@ import {
   RelayBids, // Import RelayBids wrapper type
   DeliveredPayloads, // Import DeliveredPayloads wrapper type
   SlimTimings, // Import SlimTimings
-} from '../../../api/gen/backend/pkg/server/proto/beacon_slots/beacon_slots_pb';
+} from '@/api/gen/backend/pkg/server/proto/beacon_slots/beacon_slots_pb';
 import { SlotTimer } from './SlotTimer';
 import ProposerInfoDisplay from './ProposerInfoDisplay';
 import HighestBidDisplay from './HighestBidDisplay';
 import BidListComponent from './BidListComponent';
 import { DeliveredPayloadInfo } from './DeliveredPayloadInfo'; // Use named import
 import { SlotTimingBreakdown } from './SlotTimingBreakdown'; // Changed to named import
-import { BeaconClockManager } from '../../../utils/beacon'; // Import BeaconClockManager
+import useBeacon from '@/contexts/beacon';
 
 interface MevSlotDetailViewProps {
   slotData: BeaconSlotData | null | undefined;
@@ -35,6 +35,7 @@ export const MevSlotDetailView: React.FC<MevSlotDetailViewProps> = ({
   isLoading,
   error,
 }) => {
+  const { getBeaconClock } = useBeacon();
   const renderContent = () => {
     if (isLoading) {
       return <LoadingState />;
@@ -70,13 +71,11 @@ export const MevSlotDetailView: React.FC<MevSlotDetailViewProps> = ({
       return payloadWrapper?.payloads?.[0] || null; // Removed duplicate declaration
     }, [typedDeliveredPayloads]);
 
-    // Calculate slotStartTime using BeaconClockManager
     const slotStartTime = useMemo(() => {
       if (!slotData?.network || slotNumber === null || slotNumber === undefined) {
         return undefined;
       }
-      const manager = BeaconClockManager.getInstance();
-      const clock = manager.getBeaconClock(slotData.network);
+      const clock = getBeaconClock(slotData.network);
       return clock ? clock.getSlotStartTime(slotNumber) : undefined;
     }, [slotData?.network, slotNumber]);
 

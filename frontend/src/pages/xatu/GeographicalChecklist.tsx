@@ -1,7 +1,7 @@
-import React, { useContext, useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useDataFetch } from '@/utils/data.ts';
-import ConfigContext from '@/contexts/ConfigContext';
-import NetworkContext from '@/contexts/NetworkContext';
+import useConfig from '@/contexts/config';
+import useNetwork from '@/contexts/network';
 import { LoadingState } from '@/components/common/LoadingState';
 import { ErrorState } from '@/components/common/ErrorState';
 import { XatuCallToAction } from '@/components/xatu/XatuCallToAction';
@@ -9,6 +9,7 @@ import { formatDistanceToNow } from 'date-fns';
 import { NetworkSelector } from '@/components/common/NetworkSelector';
 import { Search, ChevronDown, ChevronUp, Check } from 'lucide-react';
 import CONTINENT_TO_COUNTRIES from '@/constants/countries.ts';
+import useApi from '@/contexts/api';
 
 // Types
 interface Country {
@@ -83,17 +84,18 @@ const getCountryEmoji = (countryName: string) => {
 };
 
 const GeographicalChecklist = () => {
-  const config = useContext(ConfigContext);
-  const { selectedNetwork, setSelectedNetwork } = useContext(NetworkContext);
+  const { config } = useConfig();
+  const { baseUrl } = useApi();
+  const { selectedNetwork, setSelectedNetwork } = useNetwork();
   const [searchTerm, setSearchTerm] = useState('');
   const [expandedContinents, setExpandedContinents] = useState<Set<string>>(new Set([])); // All collapsed by default
 
   // Skip data fetching if config isn't loaded
-  const summaryPath = config?.modules?.['xatu_public_contributors']?.path_prefix
-    ? `${config.modules['xatu_public_contributors'].path_prefix}/summary.json`
+  const summaryPath = config?.modules?.['xatuPublicContributors']?.pathPrefix
+    ? `${config.modules['xatuPublicContributors'].pathPrefix}/summary.json`
     : null;
 
-  const { data: summaryData, loading, error } = useDataFetch<Summary>(summaryPath);
+  const { data: summaryData, loading, error } = useDataFetch<Summary>(baseUrl, summaryPath);
 
   // Auto-expand continents that match the search term
   useEffect(() => {
@@ -131,7 +133,7 @@ const GeographicalChecklist = () => {
     if (hasChanges) {
       setExpandedContinents(newExpandedContinents);
     }
-  }, [searchTerm, summaryData, selectedNetwork]);
+  }, [searchTerm, summaryData, selectedNetwork, expandedContinents]);
 
   // Handle loading and error states
   if (loading) return <LoadingState message="Loading geographical data..." />;

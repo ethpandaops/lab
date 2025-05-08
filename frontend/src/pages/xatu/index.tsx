@@ -2,11 +2,11 @@ import { Link, Outlet, useLocation } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import { useDataFetch } from '@/utils/data.ts';
 import { formatDistanceToNow } from 'date-fns';
-import { useRef, useState, useEffect, useContext } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { GlobeViz } from '@/components/xatu/GlobeViz';
 import { XatuCallToAction } from '@/components/xatu/XatuCallToAction';
-import ConfigContext from '@/contexts/ConfigContext';
-import NetworkContext from '@/contexts/NetworkContext';
+import useConfig from '@/contexts/config';
+import useApi from '@/contexts/api';
 
 interface ConsensusImplementation {
   total_nodes: number;
@@ -47,18 +47,18 @@ const CLIENT_METADATA: Record<string, { name: string }> = {
   nimbus: { name: 'Nimbus' },
 };
 
-function Xatu(): JSX.Element {
+function Xatu() {
   const location = useLocation();
   const containerReference = useRef<HTMLDivElement>(null);
   const [containerWidth, setContainerWidth] = useState(0);
-  const config = useContext(ConfigContext);
-
+  const { config } = useConfig();
+  const { baseUrl } = useApi();
   // Skip data fetching if config isn't loaded
-  const summaryPath = config?.modules?.['xatu_public_contributors']?.path_prefix
-    ? `${config.modules['xatu_public_contributors'].path_prefix}/summary.json`
+  const summaryPath = config?.modules?.['xatuPublicContributors']?.pathPrefix
+    ? `${config.modules['xatuPublicContributors'].pathPrefix}/summary.json`
     : null;
 
-  const { data: summaryData } = useDataFetch<Summary>(summaryPath);
+  const { data: summaryData } = useDataFetch<Summary>(baseUrl, summaryPath);
 
   useEffect(() => {
     if (!containerReference.current) {

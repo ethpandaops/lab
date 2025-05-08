@@ -142,7 +142,7 @@ const DesktopBlockProductionView: React.FC<DesktopBlockProductionViewProps> = ({
   };
 
   // No debug needed
-  
+
   // Get the current phase
   const currentPhase = useMemo(() => {
     return getCurrentPhase(currentTime, nodeBlockSeen || {}, nodeBlockP2P || {}, blockTime);
@@ -228,9 +228,10 @@ const DesktopBlockProductionView: React.FC<DesktopBlockProductionViewProps> = ({
 
   // Determine if we should show the timeline based on whether we're on the live page
   // If goToPreviousSlot is not provided, we're likely on the specific slot page
-  const showTimeline = typeof goToPreviousSlot === 'function' && 
-                      typeof goToNextSlot === 'function' && 
-                      typeof resetToCurrentSlot === 'function';
+  const showTimeline =
+    typeof goToPreviousSlot === 'function' &&
+    typeof goToNextSlot === 'function' &&
+    typeof resetToCurrentSlot === 'function';
 
   return (
     <div className="h-full flex flex-col">

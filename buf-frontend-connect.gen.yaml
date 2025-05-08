@@ -3,4 +3,4 @@ plugins:
   # Connect-web generation
   - remote: buf.build/bufbuild/connect-web:v0.8.6
     out: frontend/src/api/gen
-    opt: target=ts 
+    opt: target=ts

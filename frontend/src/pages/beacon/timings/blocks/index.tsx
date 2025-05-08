@@ -1,5 +1,4 @@
 import { useDataFetch } from '@/utils/data.ts';
-import { LoadingState } from '@/components/common/LoadingState';
 import { ErrorState } from '@/components/common/ErrorState';
 import { AboutThisData } from '@/components/common/AboutThisData';
 import { useState, useEffect, useMemo, useRef } from 'react';
@@ -11,8 +10,8 @@ import {
 } from '@/constants/percentiles.ts';
 import { NivoLineChart } from '@/components/charts';
 import { useSearchParams } from 'react-router-dom';
-import { getConfig } from '@/config';
-import type { Config } from '@/types';
+import useConfig from '@/contexts/config';
+import useApi from '@/contexts/api';
 
 interface TimingData {
   timestamps: number[];
@@ -79,9 +78,8 @@ const BLOCK_TYPE_DESCRIPTIONS = {
 
 export const BlockTimings: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const [config, setConfig] = useState<Config | null>(null);
-  const [configLoading, setConfigLoading] = useState(true);
-  const [configError, setConfigError] = useState<Error | undefined>();
+  const { config } = useConfig();
+  const { baseUrl } = useApi();
   const [isTimeWindowOpen, setIsTimeWindowOpen] = useState(false);
   const [hiddenArrivalLines, setHiddenArrivalLines] = useState<Set<string>>(new Set());
   const [hiddenSizeLines, setHiddenSizeLines] = useState<Set<string>>(new Set());
@@ -90,7 +88,7 @@ export const BlockTimings: React.FC = () => {
 
   const timeWindows = useMemo<TimeWindowConfig[]>(() => {
     const moduleConfig = config?.modules?.['beacon_chain_timings'];
-    return moduleConfig?.time_windows || DEFAULT_TIME_WINDOWS;
+    return moduleConfig?.timeWindows || DEFAULT_TIME_WINDOWS;
   }, [config]);
 
   const defaultTimeWindow = useMemo(() => timeWindows[0]?.file || 'last_30_days', [timeWindows]);
@@ -107,14 +105,6 @@ export const BlockTimings: React.FC = () => {
     () => searchParams.get('timeWindow') || defaultTimeWindow,
   );
   const [network] = useState<string>(() => searchParams.get('network') || defaultNetwork);
-
-  useEffect(() => {
-    setConfigLoading(true);
-    getConfig()
-      .then(setConfig)
-      .catch(setConfigError)
-      .finally(() => setConfigLoading(false));
-  }, []);
 
   // Update URL when network/timeWindow changes
   useEffect(() => {
@@ -136,17 +126,17 @@ export const BlockTimings: React.FC = () => {
   }, [timeWindows, timeWindow]);
 
   // Skip data fetching if config isn't loaded
-  const timingsPath = config?.modules?.['beacon_chain_timings']?.path_prefix
-    ? `${config.modules['beacon_chain_timings'].path_prefix}/block_timings/${network}/${timeWindow}`
+  const timingsPath = config?.modules?.['beacon_chain_timings']?.pathPrefix
+    ? `${config.modules['beacon_chain_timings'].pathPrefix}/block_timings/${network}/${timeWindow}`
     : null;
 
-  const cdfPath = config?.modules?.['beacon_chain_timings']?.path_prefix
-    ? `${config.modules['beacon_chain_timings'].path_prefix}/size_cdf/${network}/${timeWindow}`
+  const cdfPath = config?.modules?.['beacon_chain_timings']?.pathPrefix
+    ? `${config.modules['beacon_chain_timings'].pathPrefix}/size_cdf/${network}/${timeWindow}`
     : null;
 
-  const { data: timingData, loading, error } = useDataFetch<TimingData>(timingsPath);
+  const { data: timingData, error } = useDataFetch<TimingData>(timingsPath);
 
-  const { data: cdfData } = useDataFetch<CDFData>(cdfPath);
+  const { data: cdfData } = useDataFetch<CDFData>(baseUrl, cdfPath);
 
   const formatTime = useMemo(
     () => (time: number) => {
@@ -262,12 +252,15 @@ export const BlockTimings: React.FC = () => {
     return ['All Blocks', 'MEV Blocks', 'Non-MEV Blocks', 'Solo MEV Blocks', 'Solo Non-MEV Blocks'];
   };
 
-  const dataKeyMap: Record<string, string> = {
-    [PERCENTILE_KEYS.p95]: 'p95',
-    [PERCENTILE_KEYS.p50]: 'p50',
-    [PERCENTILE_KEYS.p05]: 'p05',
-    [PERCENTILE_KEYS.min]: 'min',
-  };
+  const dataKeyMap = useMemo<Record<string, string>>(
+    () => ({
+      [PERCENTILE_KEYS.p95]: 'p95',
+      [PERCENTILE_KEYS.p50]: 'p50',
+      [PERCENTILE_KEYS.p05]: 'p05',
+      [PERCENTILE_KEYS.min]: 'min',
+    }),
+    [],
+  );
 
   const lineNames = Object.keys(dataKeyMap) as PercentileKey[];
 
@@ -343,14 +336,6 @@ export const BlockTimings: React.FC = () => {
         };
       });
   }, [scatterData, hiddenSizeLines]);
-
-  if (configLoading || loading) {
-    return <LoadingState message="Loading data..." />;
-  }
-
-  if (configError) {
-    return <ErrorState message="Failed to load configuration" error={configError} />;
-  }
 
   if (error) {
     return <ErrorState message="Failed to load data" error={error} />;

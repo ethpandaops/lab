@@ -4,9 +4,9 @@ import { ErrorState } from '@/components/common/ErrorState';
 import { Link } from 'react-router-dom';
 import { XatuCallToAction } from '@/components/xatu/XatuCallToAction';
 import { formatDistanceToNow } from 'date-fns';
-import { useContext } from 'react';
-import ConfigContext from '@/contexts/ConfigContext';
+import useConfig from '@/contexts/config';
 import { Card } from '@/components/common/Card';
+import useApi from '@/contexts/api';
 
 interface Contributor {
   name: string;
@@ -54,12 +54,13 @@ const formatTimestamp = (timestamp: number): string => {
 };
 
 const ContributorsList = (): JSX.Element => {
-  const config = useContext(ConfigContext);
-  const summaryPath = config?.modules?.['xatu_public_contributors']?.path_prefix
-    ? `${config.modules['xatu_public_contributors'].path_prefix}/user-summaries/summary.json`
+  const { config } = useConfig();
+  const { baseUrl } = useApi();
+  const summaryPath = config?.modules?.['xatuPublicContributors']?.pathPrefix
+    ? `${config.modules['xatuPublicContributors'].pathPrefix}/user-summaries/summary.json`
     : null;
 
-  const { data: summaryData, loading, error } = useDataFetch<Summary>(summaryPath);
+  const { data: summaryData, loading, error } = useDataFetch<Summary>(baseUrl, summaryPath);
 
   if (loading) {
     return <LoadingState />;

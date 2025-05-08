@@ -1,15 +1,16 @@
-import { useEffect, useState, useContext } from 'react';
+import { useEffect, useState } from 'react';
 import { SlotView } from '@/components/beacon/SlotView';
-import { BeaconClockManager } from '@/utils/beacon.ts';
-import NetworkContext from '@/contexts/NetworkContext';
+import useNetwork from '@/contexts/network';
+import useBeacon from '@/contexts/beacon';
 
 function BeaconLive() {
-  const { selectedNetwork } = useContext(NetworkContext);
+  const { selectedNetwork } = useNetwork();
   const [currentSlot, setCurrentSlot] = useState<number>();
+  const { getBeaconClock, getHeadLagSlots } = useBeacon();
 
   // Get the BeaconClock for the current network
-  const clock = BeaconClockManager.getInstance().getBeaconClock(selectedNetwork);
-  const headLagSlots = BeaconClockManager.getInstance().getHeadLagSlots(selectedNetwork);
+  const clock = getBeaconClock(selectedNetwork);
+  const headLagSlots = getHeadLagSlots(selectedNetwork);
 
   // Initialize and update current slot
   useEffect(() => {

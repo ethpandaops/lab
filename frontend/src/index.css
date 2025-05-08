@@ -194,38 +194,33 @@
 	.title-gradient {
 		@apply font-sans font-black text-accent;
 	}
-
 	/* Button styles */
 	.btn {
 		@apply px-4 py-2 border transition-all duration-300 font-mono;
-
 		background-color: rgb(var(--bg-surface) / 80%);
-
 		@apply border-border hover:border-border;
-
-		&:hover {
-			background-color: rgb(var(--bg-surface) / 90%);
-		}
 	}
 
+	.btn:hover {
+		background-color: rgb(var(--bg-surface) / 90%);
+	}
 	.btn-primary {
 		@apply border-accent hover:border-accent;
-
 		background-color: rgb(var(--accent) / 20%);
+	}
 
-		&:hover {
-			background-color: rgb(var(--accent) / 30%);
-		}
+	.btn-primary:hover {
+		background-color: rgb(var(--accent) / 30%);
 	}
 
 	.btn-error {
 		@apply border-error hover:border-error;
 
 		background-color: rgb(var(--error) / 20%);
+	}
 
-		&:hover {
-			background-color: rgb(var(--error) / 30%);
-		}
+	.btn-error:hover {
+		background-color: rgb(var(--error) / 30%);
 	}
 
 	.btn-lg {
@@ -259,16 +254,15 @@
 		border: none !important;
 		box-shadow: 0 3px 10px rgb(0 0 0 / 12%), 0 0 1px rgb(var(--accent) / 10%);
 	}
-
 	.card-interactive {
 		@apply transition-all duration-200 cursor-pointer;
+	}
 
-		&:hover {
-			border: none !important;
-			box-shadow: 0 5px 15px rgb(0 0 0 / 20%), 0 0 2px rgb(var(--accent) / 20%);
-			background-color: rgb(var(--bg-hover));
-			transform: translateY(-1px);
-		}
+	.card-interactive:hover {
+		border: none !important;
+		box-shadow: 0 5px 15px rgb(0 0 0 / 20%), 0 0 2px rgb(var(--accent) / 20%);
+		background-color: rgb(var(--bg-hover));
+		transform: translateY(-1px);
 	}
 
 	.card-header {

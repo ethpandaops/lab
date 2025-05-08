@@ -40,7 +40,7 @@ const experiments: ExperimentCard[] = [
   },
 ];
 
-function Experiments(): JSX.Element {
+function Experiments(): React.ReactElement {
   return (
     <div className="min-h-[calc(100vh-10rem)] flex flex-col">
       {/* Hero Section */}
@@ -67,59 +67,60 @@ function Experiments(): JSX.Element {
             isInteractive
             className="relative col-span-1 sm:col-span-1 md:col-span-2 lg:col-span-2"
           >
-            <Link to={experiment.href} className="block w-full h-full">
-              <div
-                className={`absolute inset-0 bg-gradient-to-br ${experiment.color} opacity-0 group-hover:opacity-100 transition-opacity`}
-              />
+            <div className="block w-full h-full">
+              <Link to={experiment.href} className="block w-full h-full">
+                <div
+                  className={`absolute inset-0 bg-gradient-to-br ${experiment.color} opacity-0 group-hover:opacity-100 transition-opacity`}
+                />
 
-              <CardBody className="relative flex flex-col h-full">
-                <div className="flex items-start gap-4 mb-4">
-                  <div className="w-12 h-12 flex items-center justify-center flex-shrink-0 relative">
-                    <div
-                      className={`absolute inset-0 bg-gradient-to-br ${experiment.color} blur-md rounded-full`}
-                    />
-                    <img
-                      src={experiment.logo}
-                      alt=""
-                      className="w-10 h-10 object-contain relative z-10 group-hover:scale-110 transition-transform duration-300"
-                    />
+                <CardBody className="relative flex flex-col h-full">
+                  <div className="flex items-start gap-4 mb-4">
+                    <div className="w-12 h-12 flex items-center justify-center flex-shrink-0 relative">
+                      <div
+                        className={`absolute inset-0 bg-gradient-to-br ${experiment.color} blur-md rounded-full`}
+                      />
+                      <img
+                        src={experiment.logo}
+                        alt=""
+                        className="w-10 h-10 object-contain relative z-10 group-hover:scale-110 transition-transform duration-300"
+                      />
+                    </div>
+
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-xl font-sans font-bold text-primary group-hover:text-accent transition-colors mb-1">
+                        {experiment.title}
+                      </h3>
+                      <p className="text-sm font-mono text-tertiary truncate">
+                        {experiment.subtitle}
+                      </p>
+                    </div>
                   </div>
 
-                  <div className="flex-1 min-w-0">
-                    <h3 className="text-xl font-sans font-bold text-primary group-hover:text-accent transition-colors mb-1">
-                      {experiment.title}
-                    </h3>
-                    <p className="text-sm font-mono text-tertiary truncate">
-                      {experiment.subtitle}
-                    </p>
-                  </div>
+                  <p className="text-sm font-mono text-secondary group-hover:text-primary/90 transition-colors mb-4">
+                    {experiment.description}
+                  </p>
+                </CardBody>
+              </Link>
+
+              {experiment.features && experiment.features.length > 0 && (
+                <div className="mt-auto px-4 pb-4">
+                  <h4 className="text-xs font-mono text-tertiary mb-2">Featured Components</h4>
+                  <ul className="space-y-2">
+                    {experiment.features.map((feature, index) => (
+                      <li key={index}>
+                        <Link
+                          to={feature.href}
+                          className="flex items-center justify-between p-2 rounded bg-surface/40 hover:bg-surface/70 transition-colors"
+                        >
+                          <span className="text-sm font-mono text-primary">{feature.title}</span>
+                          <ArrowRight className="w-4 h-4 text-accent/50 group-hover:text-accent transition-colors" />
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
-
-                <p className="text-sm font-mono text-secondary group-hover:text-primary/90 transition-colors mb-4">
-                  {experiment.description}
-                </p>
-
-                {experiment.features && experiment.features.length > 0 && (
-                  <div className="mt-auto">
-                    <h4 className="text-xs font-mono text-tertiary mb-2">Featured Components</h4>
-                    <ul className="space-y-2">
-                      {experiment.features.map((feature, index) => (
-                        <li key={index}>
-                          <Link
-                            to={feature.href}
-                            className="flex items-center justify-between p-2 rounded bg-surface/40 hover:bg-surface/70 transition-colors"
-                            onClick={e => e.stopPropagation()}
-                          >
-                            <span className="text-sm font-mono text-primary">{feature.title}</span>
-                            <ArrowRight className="w-4 h-4 text-accent/50 group-hover:text-accent transition-colors" />
-                          </Link>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-              </CardBody>
-            </Link>
+              )}
+            </div>
           </Card>
         ))}
       </div>

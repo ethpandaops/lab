@@ -1,7 +1,5 @@
 import React, { useMemo, useEffect } from 'react';
-import { Card, CardBody } from '@/components/common/Card';
 import { Node, Proposer } from '@/api/gen/backend/pkg/server/proto/beacon_slots/beacon_slots_pb';
-import BlockContentsTreemap from '@/components/beacon/BlockContentsTreemap';
 import BeaconBlockVisualization from '@/components/beacon/BeaconBlockVisualization';
 
 export interface BlockFlowViewProps {
@@ -63,16 +61,7 @@ const FlowStage: React.FC<{
   showValue?: boolean;
   stageType?: 'builder' | 'relay' | 'proposer' | 'node';
   currentTime: number; // Current time to determine visibility
-}> = ({
-  title,
-  color,
-  isActive,
-  items,
-  maxItems = 10,
-  showValue = false,
-  stageType,
-  currentTime,
-}) => {
+}> = ({ color, isActive, items, maxItems = 10, showValue = false, stageType, currentTime }) => {
   // For relays, sort alphabetically (with winning bid first)
   // For other stages, sort by value
   const displayItems = useMemo(() => {
@@ -84,7 +73,7 @@ const FlowStage: React.FC<{
         .sort((a, b) => {
           if (a.isWinning && !b.isWinning) return -1;
           if (!a.isWinning && b.isWinning) return 1;
-          return b.value - a.value;
+          return (b.value || 0) - (a.value || 0);
         })
         .slice(0, 10); // Only show top 10 builders
     } else if (stageType === 'relay') {
@@ -126,7 +115,7 @@ const FlowStage: React.FC<{
       // For other stages, sort by value (highest first)
       return [...items].sort((a, b) => (b.value || 0) - (a.value || 0)).slice(0, maxItems);
     }
-  }, [items, maxItems, stageType]);
+  }, [items, maxItems, stageType, currentTime]);
 
   return (
     <div
@@ -171,7 +160,7 @@ const FlowStage: React.FC<{
                   ...(stageType === 'node' && {
                     // Slightly deeper background color for top 3 continents, without borders
                     backgroundColor:
-                      item.rank > 0 && item.rank <= 3
+                      item.rank !== undefined && item.rank > 0 && item.rank <= 3
                         ? `${item.color}20` // More visible background for top 3
                         : `${item.color}10`, // Light background for others
                     boxShadow: 'none', // No borders
@@ -237,7 +226,7 @@ const FlowStage: React.FC<{
                         ></div>
                       )}
                       {stageType === 'node' ? (
-                        <div className="font-medium">{item.fullName || item.label}</div>
+                        <div className="font-medium">{item.label}</div>
                       ) : (
                         <div className="font-medium truncate">{item.label}</div>
                       )}
@@ -258,7 +247,9 @@ const FlowStage: React.FC<{
                       <div className="flex items-center gap-1 min-w-0">
                         {/* Medal for top 3 - always reserve space */}
                         <span className="text-[11px] mr-0.5 w-4 flex justify-center">
-                          {item.rank > 0 &&
+                          {item.rank !== undefined &&
+                          item.rank > 0 &&
+                          item.rank !== undefined &&
                           item.rank <= 3 &&
                           item.earliestTime &&
                           item.earliestTime <= currentTime
@@ -287,7 +278,8 @@ const FlowStage: React.FC<{
                           className={`font-mono ml-1 ${
                             !isActive
                               ? 'text-tertiary/50'
-                              : item.nodesThatHaveSeenBlock > 0
+                              : item.nodesThatHaveSeenBlock !== undefined &&
+                                  item.nodesThatHaveSeenBlock > 0
                                 ? 'text-white'
                                 : ''
                           }`}
@@ -381,19 +373,6 @@ const ConnectionLine: React.FC<{
       </div>
     </div>
   );
-};
-
-// Helper function to count unique builder pubkeys in a list of builder items
-const countUniqueBuilders = (
-  builders: Array<{ builderPubkey: string; [key: string]: any }>,
-): number => {
-  const uniqueBuilderPubkeys = new Set();
-  builders.forEach(builder => {
-    if (builder.builderPubkey) {
-      uniqueBuilderPubkeys.add(builder.builderPubkey);
-    }
-  });
-  return uniqueBuilderPubkeys.size;
 };
 
 // Helper function to count unique builder pubkeys from all bids
@@ -573,7 +552,7 @@ export const SankeyNetworkView: React.FC<BlockFlowViewProps> = ({
     // For each builder, get their highest-value bid
     const uniqueBuilderBids: any[] = [];
 
-    builderBidsByPubkey.forEach((builderBids, builderPubkey) => {
+    builderBidsByPubkey.forEach(builderBids => {
       // First check if this builder has a winning bid
       const winningBid = builderBids.find(bid => bid.isWinning);
 

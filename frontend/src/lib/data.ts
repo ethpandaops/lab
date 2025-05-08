@@ -1,5 +1,3 @@
-import { getDataUrl } from '@/config';
-
 export const getBeaconChainTimingsPath = (
   network: string,
   timeWindow: string,
@@ -8,8 +6,8 @@ export const getBeaconChainTimingsPath = (
   return `beacon_chain_timings/${dataType}/${network}/${timeWindow}.json`;
 };
 
-export const fetchData = async <T>(path: string): Promise<T> => {
-  const url = `${getDataUrl(path)}`;
+export const fetchData = async <T>(baseUrl: string, path: string): Promise<T> => {
+  const url = `${baseUrl}${path}`;
 
   try {
     const response = await fetch(url);

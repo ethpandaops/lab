@@ -1,13 +1,13 @@
 import { useDataFetch } from '@/utils/data.ts';
 import { formatDistanceToNow } from 'date-fns';
 import { XatuCallToAction } from '@/components/xatu/XatuCallToAction';
-import { useContext, useEffect, useState } from 'react';
-import ConfigContext from '@/contexts/ConfigContext';
-import NetworkContext from '@/contexts/NetworkContext';
+import { useEffect, useState } from 'react';
+import useConfig from '@/contexts/config';
 import { NETWORK_METADATA, type NetworkKey } from '@/constants/networks.tsx';
 import { LoadingState } from '@/components/common/LoadingState';
 import { ErrorState } from '@/components/common/ErrorState';
 import { Sparkles } from 'lucide-react';
+import useApi from '@/contexts/api';
 
 interface ConsensusImplementation {
   total_nodes: number;
@@ -86,8 +86,9 @@ const getNetworkMetadata = (network: string) => {
   };
 };
 
-export default function Networks(): JSX.Element {
-  const config = useContext(ConfigContext);
+export default function Networks() {
+  const { config } = useConfig();
+  const { baseUrl } = useApi();
   const [availableNetworks, setAvailableNetworks] = useState<string[]>([]);
 
   // Get available networks from config
@@ -98,11 +99,11 @@ export default function Networks(): JSX.Element {
     }
   }, [config]);
 
-  const summaryPath = config?.modules?.['xatu_public_contributors']?.path_prefix
-    ? `${config.modules['xatu_public_contributors'].path_prefix}/summary.json`
+  const summaryPath = config?.modules?.['xatuPublicContributors']?.pathPrefix
+    ? `${config.modules['xatuPublicContributors'].pathPrefix}/summary.json`
     : null;
 
-  const { data: summaryData, loading, error } = useDataFetch<Summary>(summaryPath);
+  const { data: summaryData, loading, error } = useDataFetch<Summary>(baseUrl, summaryPath);
 
   if (loading) return <LoadingState message="Loading network data..." />;
   if (error) return <ErrorState message="Failed to load network data" error={error} />;

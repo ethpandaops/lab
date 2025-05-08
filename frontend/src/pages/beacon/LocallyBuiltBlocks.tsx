@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
-import NetworkContext from '@/contexts/NetworkContext';
-import { useContext } from 'react';
-import { getLabApiClient } from '@/api';
+import useNetwork from '@/contexts/network';
+import useApi from '@/contexts/api';
 import { GetRecentLocallyBuiltBlocksRequest } from '@/api/gen/backend/pkg/api/proto/lab_api_pb';
 import {
   LocallyBuiltSlotBlocks,
@@ -9,14 +8,10 @@ import {
 } from '@/api/gen/backend/pkg/server/proto/beacon_slots/beacon_slots_pb';
 import {
   LocallyBuiltBlocksDetail,
-  LocallyBuiltBlocksVisualization,
-  LocallyBuiltBlocksTable,
-  ClientPresenceHeatmap,
   UnifiedBlocksTimeline,
 } from '@/components/beacon/LocallyBuiltBlocks';
-import { ChevronLeft, BarChart2, List, RefreshCw, Clock, ScatterChart } from 'lucide-react';
-import { TabButton } from '@/components/common/TabButton'; // Assuming TabButton exists and accepts these props
-import { BeaconClockManager } from '@/utils/beacon.ts';
+import { ChevronLeft, Clock } from 'lucide-react';
+import useBeacon from '@/contexts/beacon';
 
 // Refresh interval in milliseconds
 const REFRESH_INTERVAL = 5000;
@@ -33,42 +28,18 @@ interface ViewOption {
 }
 
 export function LocallyBuiltBlocks(): JSX.Element {
-  const { selectedNetwork } = useContext(NetworkContext);
+  const { selectedNetwork } = useNetwork();
   const [data, setData] = useState<LocallyBuiltSlotBlocks[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [isError, setIsError] = useState<boolean>(false);
   const [selectedBlock, setSelectedBlock] = useState<LocallyBuiltBlock | null>(null);
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
-  const [viewMode, setViewMode] = useState<ViewMode>('visualization');
-  const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
   const [currentSlot, setCurrentSlot] = useState<number | null>(null);
-
-  // Define view options
-  const viewOptions: ViewOption[] = [
-    {
-      id: 'visualization',
-      label: 'Overview',
-      icon: <BarChart2 className="w-4 h-4" />,
-      description: 'Visual overview of locally built blocks',
-    },
-    {
-      id: 'bubble-chart',
-      label: 'Tx Analysis', // Shortened label for tabs
-      icon: <ScatterChart className="w-4 h-4" />,
-      description: 'Block size vs transaction count analysis',
-    },
-    {
-      id: 'table',
-      label: 'Data Table',
-      icon: <List className="w-4 h-4" />,
-      description: 'Tabular view of all blocks',
-    },
-    // Add other view options like heatmap, value-distribution if needed
-  ];
+  const { getBeaconClock } = useBeacon();
+  const { client } = useApi();
 
   // Update current slot from wallclock
   useEffect(() => {
-    const clock = BeaconClockManager.getInstance().getBeaconClock(selectedNetwork);
+    const clock = getBeaconClock(selectedNetwork);
     if (!clock) return;
 
     const updateSlot = () => {
@@ -79,7 +50,7 @@ export function LocallyBuiltBlocks(): JSX.Element {
     updateSlot();
     const interval = setInterval(updateSlot, 1000);
     return () => clearInterval(interval);
-  }, [selectedNetwork]);
+  }, [selectedNetwork, getBeaconClock]);
 
   // Function to fetch and merge data
   const fetchData = useCallback(
@@ -87,12 +58,8 @@ export function LocallyBuiltBlocks(): JSX.Element {
       try {
         if (isInitial) {
           setIsLoading(true);
-        } else {
-          setIsRefreshing(true);
         }
-        setIsError(false);
 
-        const client = await getLabApiClient();
         const request = new GetRecentLocallyBuiltBlocksRequest({
           network: selectedNetwork,
         });
@@ -146,12 +113,10 @@ export function LocallyBuiltBlocks(): JSX.Element {
         setLastUpdated(new Date());
       } catch (error) {
         console.error('Error fetching locally built blocks:', error);
-        setIsError(true);
       } finally {
         if (isInitial) {
           setIsLoading(false);
         }
-        setIsRefreshing(false);
       }
     },
     [selectedNetwork, data.length],
@@ -182,38 +147,6 @@ export function LocallyBuiltBlocks(): JSX.Element {
   // Format the last updated time
   const formatLastUpdated = () => {
     return lastUpdated.toLocaleTimeString();
-  };
-
-  // Manual refresh handler
-  const handleManualRefresh = () => {
-    if (!isRefreshing && !selectedBlock) {
-      fetchData(false);
-    }
-  };
-
-  // Render active view based on viewMode
-  const renderActiveView = () => {
-    switch (viewMode) {
-      case 'visualization':
-        return (
-          <LocallyBuiltBlocksVisualization data={data} isLoading={isLoading} isError={isError} />
-        );
-      case 'table':
-        return (
-          <LocallyBuiltBlocksTable
-            data={data}
-            isLoading={isLoading}
-            isError={isError}
-            onSelectBlock={setSelectedBlock}
-          />
-        );
-      case 'heatmap':
-        return <ClientPresenceHeatmap data={data} isLoading={isLoading} />;
-      default:
-        return (
-          <LocallyBuiltBlocksVisualization data={data} isLoading={isLoading} isError={isError} />
-        );
-    }
   };
 
   return (

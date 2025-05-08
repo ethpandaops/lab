@@ -1,12 +1,12 @@
-import { createLabApiClient, LabApiClientType } from '@/api/client.ts';
+import { createLabApiClient, LabApiClient } from '@/api/client.ts';
 
-let client: LabApiClientType | null = null;
+let client: LabApiClient | null = null;
 
 /**
  * Get the singleton LabAPI client instance.
  * This function will initialize the client on first call and return the same instance on subsequent calls.
  */
-export async function getLabApiClient(): Promise<LabApiClientType> {
+export async function getLabApiClient(): Promise<LabApiClient> {
   // If client is already initialized, return it
   if (client) {
     return client;

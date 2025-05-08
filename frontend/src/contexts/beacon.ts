@@ -1,0 +1,229 @@
+import {
+  useContext as reactUseContext,
+  createContext,
+  useState,
+  useEffect,
+  ReactNode,
+} from 'react';
+import { Config } from '@/api/client.ts';
+
+// Constants for beacon chain timing calculations
+export const SECONDS_PER_SLOT = 12;
+export const SLOTS_PER_EPOCH = 32;
+
+/**
+ * BeaconClock provides utilities for beacon chain time calculations
+ */
+export class BeaconClock {
+  private genesisTime: number;
+
+  constructor(genesisTime: number) {
+    this.genesisTime = genesisTime;
+  }
+
+  getCurrentSlot(): number {
+    const now = Math.floor(Date.now() / 1000);
+    return Math.floor((now - this.genesisTime) / SECONDS_PER_SLOT);
+  }
+
+  getCurrentEpoch(): number {
+    return Math.floor(this.getCurrentSlot() / SLOTS_PER_EPOCH);
+  }
+
+  getSlotStartTime(slot: number): number {
+    return this.genesisTime + slot * SECONDS_PER_SLOT;
+  }
+
+  getSlotEndTime(slot: number): number {
+    return this.getSlotStartTime(slot) + SECONDS_PER_SLOT;
+  }
+
+  getSlotAtTime(timestamp: number): number {
+    return Math.floor((timestamp - this.genesisTime) / SECONDS_PER_SLOT);
+  }
+
+  getEpochAtTime(timestamp: number): number {
+    return Math.floor(this.getSlotAtTime(timestamp) / SLOTS_PER_EPOCH);
+  }
+
+  getFirstSlotOfEpoch(epoch: number): number {
+    return epoch * SLOTS_PER_EPOCH;
+  }
+
+  getLastSlotOfEpoch(epoch: number): number {
+    return this.getFirstSlotOfEpoch(epoch + 1) - 1;
+  }
+
+  getEpochOfSlot(slot: number): number {
+    return Math.floor(slot / SLOTS_PER_EPOCH);
+  }
+
+  getCurrentSlotProgress(): number {
+    const now = Math.floor(Date.now() / 1000);
+    const currentSlot = this.getCurrentSlot();
+    const slotStart = this.getSlotStartTime(currentSlot);
+    return Math.min(1, Math.max(0, (now - slotStart) / SECONDS_PER_SLOT));
+  }
+
+  getTimeUntilNextSlot(): number {
+    const now = Math.floor(Date.now() / 1000);
+    const currentSlot = this.getCurrentSlot();
+    const nextSlotStart = this.getSlotStartTime(currentSlot + 1);
+    return Math.max(0, nextSlotStart - now);
+  }
+
+  isFutureSlot(slot: number): boolean {
+    return slot > this.getCurrentSlot();
+  }
+
+  formatSlotTime(slot: number): string {
+    return new Date(this.getSlotStartTime(slot) * 1000).toLocaleString();
+  }
+}
+
+// Type definition for slot change callback function
+export type SlotChangeCallback = (network: string, newSlot: number, previousSlot: number) => void;
+
+// State interface for the context
+export interface State {
+  config: Config;
+  setConfig: (config: Config) => void;
+  clocks: Map<string, BeaconClock>;
+  currentSlots: Map<string, number>;
+  availableNetworks: string[];
+  subscribeToSlotChanges: (network: string, callback: SlotChangeCallback) => () => void;
+  getBeaconClock: (network: string) => BeaconClock | null;
+  getHeadLagSlots: (network: string) => number;
+  getBacklogDays: (network: string) => number;
+}
+
+// Props for useValue hook
+export interface ValueProps {
+  config: Config;
+}
+
+// Create the context
+export const Context = createContext<State | undefined>(undefined);
+
+// Custom hook to use the beacon context
+export default function useContext() {
+  const context = reactUseContext(Context);
+  if (context === undefined) {
+    throw new Error('Beacon context must be used within a Beacon provider');
+  }
+  return context;
+}
+
+// Implementation of the useValue hook similar to network.ts
+export function useValue(props: ValueProps): State {
+  const [config, setConfig] = useState<Config>(props.config);
+  const [clocks, setClocks] = useState<Map<string, BeaconClock>>(new Map());
+  const [currentSlots, setCurrentSlots] = useState<Map<string, number>>(new Map());
+  const [slotChangeCallbacks] = useState<Map<string, SlotChangeCallback[]>>(new Map());
+  const [availableNetworks, setAvailableNetworks] = useState<string[]>([]);
+
+  // Initialize clocks when config changes
+  useEffect(() => {
+    const newClocks = new Map<string, BeaconClock>();
+    const newCurrentSlots = new Map<string, number>();
+    const networks: string[] = [];
+
+    if (config?.ethereum?.networks) {
+      Object.entries(config.ethereum.networks).forEach(([network, networkConfig]) => {
+        if (networkConfig && typeof networkConfig === 'object') {
+          const genesisTime = Number(networkConfig.genesisTime);
+          if (genesisTime) {
+            const clock = new BeaconClock(genesisTime);
+            newClocks.set(network, clock);
+            newCurrentSlots.set(network, clock.getCurrentSlot());
+            networks.push(network);
+          }
+        }
+      });
+    }
+
+    setClocks(newClocks);
+    setCurrentSlots(newCurrentSlots);
+    setAvailableNetworks(networks);
+  }, [config]);
+
+  // Set up slot monitoring
+  useEffect(() => {
+    if (clocks.size === 0) return;
+
+    const intervalId = setInterval(() => {
+      const newCurrentSlots = new Map(currentSlots);
+      let hasChanges = false;
+
+      clocks.forEach((clock, network) => {
+        const newSlot = clock.getCurrentSlot();
+        const prevSlot = currentSlots.get(network) || newSlot;
+
+        if (newSlot !== prevSlot) {
+          newCurrentSlots.set(network, newSlot);
+          hasChanges = true;
+
+          // Notify listeners
+          const callbacks = slotChangeCallbacks.get(network) || [];
+          callbacks.forEach(callback => {
+            try {
+              callback(network, newSlot, prevSlot);
+            } catch (error) {
+              console.error(`Error in slot change callback for network ${network}:`, error);
+            }
+          });
+        }
+      });
+
+      if (hasChanges) {
+        setCurrentSlots(newCurrentSlots);
+      }
+    }, 1000);
+
+    return () => clearInterval(intervalId);
+  }, [clocks, currentSlots, slotChangeCallbacks]);
+
+  // Function to subscribe to slot changes
+  const subscribeToSlotChanges = (network: string, callback: SlotChangeCallback): (() => void) => {
+    if (!slotChangeCallbacks.has(network)) {
+      slotChangeCallbacks.set(network, []);
+    }
+
+    const callbacks = slotChangeCallbacks.get(network)!;
+    callbacks.push(callback);
+
+    return () => {
+      const index = callbacks.indexOf(callback);
+      if (index !== -1) {
+        callbacks.splice(index, 1);
+      }
+    };
+  };
+
+  // Function to get a beacon clock for a network
+  const getBeaconClock = (network: string): BeaconClock | null => {
+    return clocks.get(network) || null;
+  };
+
+  // Function to get head lag slots for a network
+  const getHeadLagSlots = (network: string): number => {
+    return config?.modules?.beacon?.networks?.[network]?.headLagSlots ?? 4;
+  };
+
+  // Function to get backlog days for a network
+  const getBacklogDays = (network: string): number => {
+    return config?.modules?.beacon?.networks?.[network]?.backlogDays ?? 3;
+  };
+
+  return {
+    config,
+    setConfig,
+    clocks,
+    currentSlots,
+    availableNetworks,
+    subscribeToSlotChanges,
+    getBeaconClock,
+    getHeadLagSlots,
+    getBacklogDays,
+  };
+}

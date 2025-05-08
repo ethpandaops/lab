@@ -1,7 +1,7 @@
-import { ReactNode, useContext, useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { Tooltip } from 'react-tooltip';
 import { FaPlay, FaPause, FaEthereum } from 'react-icons/fa';
-import NetworkContext from '@/contexts/NetworkContext';
+import useNetwork from '@/contexts/network';
 import { formatEntityName } from '@/utils/format.ts';
 import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
@@ -45,24 +45,18 @@ export function TimelineView({
   slot,
   isPlaying,
   currentTime,
-  firstBlockSeen,
   firstApiBlockSeen,
   firstP2pBlockSeen,
   attestationWindows,
-  attestationProgress,
-  ATTESTATION_THRESHOLD,
-  TOTAL_VALIDATORS,
   loading,
   isMissing,
   onPlayPauseClick,
-  proposerIndex,
   entity,
-  executionBlockNumber,
   isLive = false,
-}: TimelineViewProps): JSX.Element {
+}: TimelineViewProps) {
   const epoch = slot ? Math.floor(slot / 32) : 0;
   const slotInEpoch = slot ? (slot % 32) + 1 : 0;
-  const { selectedNetwork } = useContext(NetworkContext);
+  const { selectedNetwork } = useNetwork();
   const navigate = useNavigate();
   const timelineRef = useRef<HTMLDivElement>(null);
 
@@ -100,7 +94,7 @@ export function TimelineView({
       top: scrollPosition,
       behavior: isPlaying ? 'smooth' : 'auto',
     });
-  }, [currentTime, loading, isPlaying]);
+  }, [currentTime, loading, isPlaying, attestationWindows]);
 
   // Reset scroll position when slot changes
   useEffect(() => {

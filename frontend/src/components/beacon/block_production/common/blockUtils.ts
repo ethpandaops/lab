@@ -21,7 +21,7 @@ export function hasNonEmptyDeliveredPayloads(block: any, parentData?: any): bool
         }
       }
     }
-    
+
     // Then check in parent data (slotData)
     if (parentData && 'deliveredPayloads' in parentData) {
       if (typeof parentData.deliveredPayloads === 'object') {
@@ -31,7 +31,7 @@ export function hasNonEmptyDeliveredPayloads(block: any, parentData?: any): bool
         }
       }
     }
-    
+
     return false;
   } catch (error) {
     return false;
@@ -47,36 +47,46 @@ export function isBlockLocallyBuilt(block: any): boolean {
   if (!block) {
     return false;
   }
-  
+
   // Check for specific cases where the block is known to be locally built
   const hasEmptyBockRoot = !block.blockRoot && !block.block_root;
   if (hasEmptyBockRoot) {
     return false;
   }
-  
+
   // Use the helper function for a thorough check
   const hasPayloads = hasNonEmptyDeliveredPayloads(block);
   if (hasPayloads) {
     return false;
   }
-  
+
   // Check for payloadsDelivered array
-  if (block.payloadsDelivered && Array.isArray(block.payloadsDelivered) && block.payloadsDelivered.length > 0) {
-    return false; // NOT locally built 
+  if (
+    block.payloadsDelivered &&
+    Array.isArray(block.payloadsDelivered) &&
+    block.payloadsDelivered.length > 0
+  ) {
+    return false; // NOT locally built
   }
-  
+
   // Check snake_case versions
-  if (block.delivered_payloads && typeof block.delivered_payloads === 'object' && 
-      Object.keys(block.delivered_payloads).length > 0) {
+  if (
+    block.delivered_payloads &&
+    typeof block.delivered_payloads === 'object' &&
+    Object.keys(block.delivered_payloads).length > 0
+  ) {
     return false; // NOT locally built
   }
-  
-  if (block.payloads_delivered && Array.isArray(block.payloads_delivered) && 
-      block.payloads_delivered.length > 0) {
+
+  if (
+    block.payloads_delivered &&
+    Array.isArray(block.payloads_delivered) &&
+    block.payloads_delivered.length > 0
+  ) {
     return false; // NOT locally built
   }
-  
-  // If we have a block and no delivered payloads were found in any format, 
+
+  // If we have a block and no delivered payloads were found in any format,
   // then it's locally built
   return true;
 }

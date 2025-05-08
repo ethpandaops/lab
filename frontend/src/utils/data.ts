@@ -1,15 +1,18 @@
 import { useQuery } from '@tanstack/react-query';
-import { getDataUrl } from '@/config';
 
-export const fetchData = async <T>(path: string): Promise<T> => {
-  const response = await fetch(getDataUrl(path));
+export const fetchData = async <T>(baseUrl: string, path: string): Promise<T> => {
+  const response = await fetch(`${baseUrl}${path}`);
   if (!response.ok) {
     throw new Error(`Failed to fetch data: ${response.statusText}`);
   }
   return response.json();
 };
 
-export const useDataFetch = <T>(path: string | null, options?: { silentFail?: boolean }) => {
+export const useDataFetch = <T>(
+  baseUrl: string,
+  path: string | null,
+  options?: { silentFail?: boolean },
+) => {
   const {
     data,
     isLoading: loading,
@@ -20,7 +23,7 @@ export const useDataFetch = <T>(path: string | null, options?: { silentFail?: bo
       if (!path) {
         throw new Error('No path provided');
       }
-      return fetchData<T>(path);
+      return fetchData<T>(baseUrl, path);
     },
     enabled: !!path,
     retry: options?.silentFail ? false : 3,

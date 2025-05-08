@@ -1,17 +1,20 @@
-import React, { useState, useEffect, useContext, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { getLabApiClient } from '../../../api';
-import { GetSlotDataRequest } from '../../../api/gen/backend/pkg/api/proto/lab_api_pb';
-import { BeaconClockManager } from '../../../utils/beacon';
-import SlotDataStore from '../../../utils/SlotDataStore';
-import NetworkContext from '@/contexts/NetworkContext';
+import useApi from '@/contexts/api';
+import { GetSlotDataRequest } from '@/api/gen/backend/pkg/api/proto/lab_api_pb';
+import useBeacon from '@/contexts/beacon';
+import SlotDataStore from '@/utils/SlotDataStore';
+import useNetwork from '@/contexts/network';
 import {
   MobileBlockProductionView,
   DesktopBlockProductionView,
   generateConsistentColor,
   getTransformedBids,
 } from '@/components/beacon/block_production';
-import { isBlockLocallyBuilt, hasNonEmptyDeliveredPayloads } from '@/components/beacon/block_production/common/blockUtils';
+import {
+  isBlockLocallyBuilt,
+  hasNonEmptyDeliveredPayloads,
+} from '@/components/beacon/block_production/common/blockUtils';
 
 /**
  * BlockProductionLivePage visualizes the entire Ethereum block production process
@@ -20,9 +23,9 @@ import { isBlockLocallyBuilt, hasNonEmptyDeliveredPayloads } from '@/components/
  */
 export default function BlockProductionLivePage() {
   // Use network directly from NetworkContext - App.tsx handles URL updates
-  const { selectedNetwork } = useContext(NetworkContext);
+  const { selectedNetwork } = useNetwork();
   const queryClient = useQueryClient();
-
+  const { client: labApiClient } = useApi();
   // Add state to handle screen size with more granular breakpoints
   const [viewMode, setViewMode] = useState<'mobile' | 'tablet' | 'desktop'>('desktop');
 
@@ -30,7 +33,7 @@ export default function BlockProductionLivePage() {
   useEffect(() => {
     const checkScreenSize = () => {
       const width = window.innerWidth;
-      
+
       if (width < 768) {
         setViewMode('mobile'); // Mobile phone
       } else if (width < 1200) {
@@ -49,53 +52,46 @@ export default function BlockProductionLivePage() {
     // Clean up event listener
     return () => window.removeEventListener('resize', checkScreenSize);
   }, []);
-  
+
   // Only use mobile view for real mobile devices, use desktop view for tablets
   const isMobile = viewMode === 'mobile';
 
+  const { getBeaconClock, getHeadLagSlots, subscribeToSlotChanges } = useBeacon();
   // Use BeaconClockManager for slot timing
-  const beaconClockManager = BeaconClockManager.getInstance();
-  const clock = beaconClockManager.getBeaconClock(selectedNetwork);
-
-  const headLagSlots = beaconClockManager.getHeadLagSlots(selectedNetwork);
+  const clock = getBeaconClock(selectedNetwork);
+  const headLagSlots = getHeadLagSlots(selectedNetwork);
   const [headSlot, setHeadSlot] = useState<number | null>(clock ? clock.getCurrentSlot() : null);
-  
+
   // Reset state when network changes
   useEffect(() => {
     // Get updated clock for the selected network
-    const updatedClock = beaconClockManager.getBeaconClock(selectedNetwork);
-    
+    const updatedClock = getBeaconClock(selectedNetwork);
+
     if (updatedClock) {
       // Reset head slot to the current slot of the new network
       const newSlot = updatedClock.getCurrentSlot();
       setHeadSlot(newSlot);
-      
+
       // Reset to live position
       setDisplaySlotOffset(0);
       setCurrentTime(0);
-      
+
       // Clear prefetched slots for the previous network
       prefetchedSlotsRef.current = new Set();
-      
+
       // Make sure we're in playing state
       setIsPlaying(true);
-      
+
       // Invalidate queries for the previous network to force refetching
       queryClient.invalidateQueries({
-        queryKey: ['block-production-live', 'slot']
+        queryKey: ['block-production-live', 'slot'],
       });
     }
-  }, [selectedNetwork, beaconClockManager, queryClient]);
+  }, [selectedNetwork, getBeaconClock, queryClient]);
 
   // Use a ref to track if we're at the "live" position
   // This will help determine if we should auto-update when slots change
   const isAtLivePositionRef = useRef<boolean>(true);
-
-  // Use a ref to track first render of interval effect
-  const isFirstRender = useRef<boolean>(true);
-
-  // Ref to track the actual time value and avoid conflicts between state updates
-  const timeRef = useRef<number>(0);
 
   // Define isPlaying state here, before we use it in refs
   const [isPlaying, setIsPlaying] = useState<boolean>(true); // Control playback
@@ -129,16 +125,13 @@ export default function BlockProductionLivePage() {
     };
 
     // Subscribe to slot changes
-    const unsubscribe = beaconClockManager.subscribeToSlotChanges(
-      selectedNetwork,
-      slotChangeCallback,
-    );
+    const unsubscribe = subscribeToSlotChanges(selectedNetwork, slotChangeCallback);
 
     // Clean up subscription when component unmounts or network changes
     return () => {
       unsubscribe();
     };
-  }, [selectedNetwork, beaconClockManager]);
+  }, [selectedNetwork, getBeaconClock, getHeadLagSlots, subscribeToSlotChanges]);
 
   const [displaySlotOffset, setDisplaySlotOffset] = useState<number>(0); // 0 is current, -1 is previous, etc.
   const [currentTime, setCurrentTime] = useState<number>(0); // ms into slot
@@ -153,8 +146,6 @@ export default function BlockProductionLivePage() {
   // Adding extra 2 slots of lag for processing to match behavior in beacon/live.tsx
   const baseSlot = headSlot ? headSlot - (headLagSlots + 2) : null;
   const slotNumber = baseSlot !== null ? baseSlot + displaySlotOffset : null;
-
-  const labApiClient = getLabApiClient();
 
   // Track if a slot transition is in progress to prevent double transitions
   const [isTransitioning, setIsTransitioning] = useState<boolean>(false);
@@ -333,7 +324,7 @@ export default function BlockProductionLivePage() {
 
       // Clear any previously prefetched slots when network changes
       prefetchedSlotsRef.current = new Set();
-      
+
       // Safely prefetch the initial slots for the current network
       prefetchMultipleSlotsCallback(currentDisplaySlot, 2);
     }
@@ -449,7 +440,7 @@ export default function BlockProductionLivePage() {
     keepPreviousData: true, // Keep showing previous slot's data while loading new data
     retry: 2, // Retry failed requests twice
     enabled: slotNumber !== null,
-    onSuccess: (data) => {
+    onSuccess: data => {
       // Data loaded successfully
     },
   });
@@ -573,7 +564,7 @@ export default function BlockProductionLivePage() {
   // Determine if a block was locally built using the enhanced method
   const isLocallyBuilt = useMemo(() => {
     if (!slotData) return false;
-    
+
     // Check for deliveredPayloads both in block and in slotData directly
     return !hasNonEmptyDeliveredPayloads(slotData.block, slotData);
   }, [slotData]);

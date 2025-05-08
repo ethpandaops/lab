@@ -5,12 +5,16 @@ package labapi;
 option go_package = "github.com/ethpandaops/lab/backend/pkg/api/proto";
 
 import "backend/pkg/server/proto/beacon_slots/beacon_slots.proto";
+import "backend/pkg/server/proto/lab/lab.proto";
 
 service LabAPI {
   rpc GetRecentLocallyBuiltBlocks(GetRecentLocallyBuiltBlocksRequest) returns (GetRecentLocallyBuiltBlocksResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
   rpc GetSlotData(GetSlotDataRequest) returns (GetSlotDataResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+  rpc GetConfig(GetConfigRequest) returns (GetConfigResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
 }
@@ -30,4 +34,12 @@ message GetRecentLocallyBuiltBlocksRequest {
 
 message GetRecentLocallyBuiltBlocksResponse {
   repeated beacon_slots.LocallyBuiltSlotBlocks slot_blocks = 1;
+}
+
+message GetConfigRequest {
+  // Empty request
+}
+
+message GetConfigResponse {
+  lab.FrontendConfig config = 1;
 }

@@ -1,14 +1,14 @@
-import { useContext, useMemo, useState, useEffect } from 'react';
+import { useMemo, useState } from 'react';
 import { useDataFetch } from '@/utils/data.ts';
-import ConfigContext from '@/contexts/ConfigContext';
-import NetworkContext from '@/contexts/NetworkContext';
-import type { Config, XatuSummary, EthereumNetwork } from '@/types';
+import useConfig from '@/contexts/config';
+import useNetwork from '@/contexts/network';
+import type { XatuSummary } from '@/types';
 import { formatDistanceToNow } from 'date-fns';
-import { ChevronDown, ChevronUp } from 'lucide-react';
 import { Select } from '@/components/common/Select';
-import { BeaconClockManager } from '@/utils/beacon.ts';
+import useBeacon from '@/contexts/beacon';
 import { formatNodeName } from '@/utils/format.ts';
 import { Card, CardHeader, CardBody } from '@/components/common/Card';
+import useApi from '@/contexts/api';
 
 const MS_PER_SECOND = 1000;
 const SLOTS_PER_EPOCH = 32;
@@ -22,38 +22,18 @@ const CLIENT_METADATA: Record<string, { name: string }> = {
   grandine: { name: 'Grandine' },
 };
 
-interface ClientReadiness {
-  name: string;
-  totalNodes: number;
-  readyNodes: number;
-  readyPercentage: number;
-  minVersion: string;
-  nodes: {
-    name: string;
-    version: string;
-    isReady: boolean;
-  }[];
-}
-
-interface NetworkReadiness {
-  name: string;
-  totalNodes: number;
-  readyNodes: number;
-  readyPercentage: number;
-  clients: ClientReadiness[];
-}
-
-function ForkReadiness(): JSX.Element {
-  const config = useContext<Config | null>(ConfigContext);
-  const { selectedNetwork, availableNetworks } = useContext(NetworkContext);
-  const [expandedClient, setExpandedClient] = useState<string | null>(null);
+function ForkReadiness() {
+  const { config } = useConfig();
+  const { baseUrl } = useApi();
+  const { getBeaconClock } = useBeacon();
+  const { selectedNetwork } = useNetwork();
   const [selectedUser, setSelectedUser] = useState<string>('all');
 
-  const summaryPath = config?.modules?.['xatu_public_contributors']?.path_prefix
-    ? `${config.modules['xatu_public_contributors'].path_prefix}/user-summaries/summary.json`
+  const summaryPath = config?.modules?.['xatuPublicContributors']?.pathPrefix
+    ? `${config.modules['xatuPublicContributors'].pathPrefix}/user-summaries/summary.json`
     : null;
 
-  const { data: summaryData } = useDataFetch<XatuSummary>(summaryPath);
+  const { data: summaryData } = useDataFetch<XatuSummary>(baseUrl, summaryPath);
 
   const users = useMemo(() => {
     if (!summaryData) return [];
@@ -66,23 +46,12 @@ function ForkReadiness(): JSX.Element {
     return ['all', ...usersWithNodes];
   }, [summaryData, selectedNetwork]);
 
-  const networks = useMemo(() => {
-    if (!config) return [];
-    return availableNetworks
-      .filter(name => config.ethereum.networks[name]?.forks?.consensus?.electra)
-      .sort((a, b) => {
-        if (a === 'mainnet') return -1;
-        if (b === 'mainnet') return 1;
-        return a.localeCompare(b);
-      });
-  }, [config, availableNetworks]);
-
   const readinessData = useMemo(() => {
     if (!summaryData || !config) {
       return [];
     }
 
-    if (!config.ethereum.networks[selectedNetwork]?.forks?.consensus?.electra) {
+    if (!config?.ethereum?.networks[selectedNetwork]?.forks?.consensus?.electra) {
       return [];
     }
 
@@ -93,7 +62,7 @@ function ForkReadiness(): JSX.Element {
       .filter(n => n.network === selectedNetwork);
 
     const clientReadiness = Object.entries(
-      network.forks?.consensus?.electra?.min_client_versions || {},
+      network.forks?.consensus?.electra?.minClientVersions || {},
     )
       .map(([clientName, minVersion]) => {
         const clientNodes = nodes.filter(n => n.consensus_client === clientName);
@@ -135,10 +104,10 @@ function ForkReadiness(): JSX.Element {
     const readyNodes = clientReadiness.reduce((acc, client) => acc + client.readyNodes, 0);
 
     // Calculate time until fork
-    const clock = BeaconClockManager.getInstance().getBeaconClock(selectedNetwork);
+    const clock = getBeaconClock(selectedNetwork);
     const electraEpoch = network.forks?.consensus?.electra?.epoch || 0;
     const currentEpoch = clock?.getCurrentEpoch() || 0;
-    const epochsUntilFork = electraEpoch - currentEpoch;
+    const epochsUntilFork = Number(electraEpoch) - Number(currentEpoch);
     const timeUntilFork = epochsUntilFork * SLOTS_PER_EPOCH * 12; // 12 seconds per slot
 
     return [
@@ -159,7 +128,7 @@ function ForkReadiness(): JSX.Element {
     return <div>Loading...</div>;
   }
 
-  if (!config.ethereum.networks[selectedNetwork]?.forks?.consensus?.electra) {
+  if (!config?.ethereum?.networks[selectedNetwork]?.forks?.consensus?.electra) {
     return (
       <div className="space-y-6">
         <Card isPrimary>

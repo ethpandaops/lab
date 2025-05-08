@@ -203,9 +203,7 @@ const ContinentsList: React.FC<ContinentsListProps> = ({
                   </div>
 
                   {item.earliestTime && item.earliestTime <= currentTime && (
-                    <div className="font-mono text-xs text-tertiary">
-                      {item.formattedTime}
-                    </div>
+                    <div className="font-mono text-xs text-tertiary">{item.formattedTime}</div>
                   )}
                 </div>
 
@@ -216,9 +214,7 @@ const ContinentsList: React.FC<ContinentsListProps> = ({
                       {item.nodesThatHaveSeenBlock}/{item.count}
                     </span>
                   </span>
-                  <span className="font-medium text-tertiary">
-                    {Math.round(item.progress)}%
-                  </span>
+                  <span className="font-medium text-tertiary">{Math.round(item.progress)}%</span>
                 </div>
 
                 {/* Progress bar */}

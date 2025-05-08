@@ -316,7 +316,6 @@ export const NetworkTreeView: React.FC<NetworkTreeViewProps> = ({
 
     return { nodes, links };
   }, [
-    bids,
     relayColors,
     relaysMap,
     topBuilders,
@@ -324,6 +323,9 @@ export const NetworkTreeView: React.FC<NetworkTreeViewProps> = ({
     winningBid,
     nodesByContinent,
     currentTime,
+    proposerEntity,
+    calculateOpacity,
+    isActive,
   ]);
 
   return (

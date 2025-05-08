@@ -52,7 +52,8 @@ const phases = [
     id: 'proposer',
     icon: '👤',
     title: 'Proposing',
-    description: 'The proposer is selected to create this slot\'s block, choosing the best bid or building a block themselves.',
+    description:
+      "The proposer is selected to create this slot's block, choosing the best bid or building a block themselves.",
     color: 'amber' as const,
     nextColor: 'purple',
   },
@@ -76,7 +77,8 @@ const phases = [
     id: 'accepted',
     icon: '🔒',
     title: 'Accepted',
-    description: 'Once 66% of the slot\'s attesters have voted for the block, it\'s unlikely to be re-orged out.',
+    description:
+      "Once 66% of the slot's attesters have voted for the block, it's unlikely to be re-orged out.",
     color: 'green' as const,
     nextColor: '',
   },
@@ -88,11 +90,9 @@ const PhaseIcons: React.FC<PhaseIconsProps> = ({
   nodeBlockP2P,
   blockTime,
   bids,
-  winningBid,
   proposer,
   nodes = {},
   slotData,
-  firstContinentToSeeBlock,
   isLocallyBuilt = false,
 }) => {
   // Check if we need to override isLocallyBuilt based on the slotData content
@@ -102,7 +102,7 @@ const PhaseIcons: React.FC<PhaseIconsProps> = ({
       if (!isLocallyBuilt) {
         return false;
       }
-      
+
       // Try a more thorough check on both block and slotData
       if (slotData) {
         // Pass both block and slotData for complete checking
@@ -111,7 +111,7 @@ const PhaseIcons: React.FC<PhaseIconsProps> = ({
           return false; // Not locally built if we have delivered payloads
         }
       }
-      
+
       // Use the provided isLocallyBuilt value
       return isLocallyBuilt;
     } catch (error) {
@@ -122,7 +122,7 @@ const PhaseIcons: React.FC<PhaseIconsProps> = ({
 
   // Extract the attestation data from slotData based on its format
   let attestationsData = null;
-  
+
   try {
     // If slotData is an object with numeric keys (desktop format), get the first slot's data
     if (slotData && typeof slotData === 'object') {
@@ -140,7 +140,7 @@ const PhaseIcons: React.FC<PhaseIconsProps> = ({
     console.error('Error extracting attestation data:', error);
     attestationsData = null;
   }
-  
+
   // Get attestation data for phase calculation - using startMs instead of inclusionDelay
   const attestationsCount =
     attestationsData?.windows?.reduce((total: number, window: any) => {
@@ -222,7 +222,7 @@ const PhaseIcons: React.FC<PhaseIconsProps> = ({
         ) : (
           <>Waiting...</>
         );
-        
+
       case 'relay':
         return activeRelays > 0 ? (
           <>
@@ -231,7 +231,7 @@ const PhaseIcons: React.FC<PhaseIconsProps> = ({
         ) : (
           <>Waiting...</>
         );
-        
+
       case 'proposer':
         return proposer ? (
           <>
@@ -243,8 +243,8 @@ const PhaseIcons: React.FC<PhaseIconsProps> = ({
             <div className="mt-1 text-xs truncate max-w-full">
               {slotData?.entity ? (
                 <span className="truncate block" title={`Validator: ${slotData.entity}`}>
-                  {slotData.entity.length > 12 
-                    ? `${slotData.entity.substring(0, 10)}...` 
+                  {slotData.entity.length > 12
+                    ? `${slotData.entity.substring(0, 10)}...`
                     : slotData.entity}
                 </span>
               ) : (
@@ -259,37 +259,33 @@ const PhaseIcons: React.FC<PhaseIconsProps> = ({
         ) : (
           <>Waiting...</>
         );
-        
+
       case 'node':
         return Object.keys(nodes).length > 0 ? (
           <>{Object.keys(nodes).length} nodes from Xatu saw this block</>
         ) : (
           <>Waiting...</>
         );
-        
-      case 'attester':
+      case 'attester': {
         // REQUIREMENT 3 & 4: Calculate attestation percentage based on actual data with max from the slot
-        let visibleAttestationsCount = 0;
-        let totalExpectedAttestations = 0;
+        const visibleAttestationsCount = (() => {
+          let count = 0;
+          // Count attestations that have been included up to the current time
+          if (attestationsData?.windows && Array.isArray(attestationsData.windows)) {
+            attestationsData.windows.forEach(window => {
+              // Use the same method as in the phase calculation above
+              if (window.startMs !== undefined && Number(window.startMs) <= currentTime) {
+                count += window.validatorIndices?.length || 0;
+              }
+            });
+          }
+          return count;
+        })();
 
         // Get the maximum expected attestations from the slot data
-        // Use the already extracted attestationsData variable
-        if (attestationsData?.maximumVotes) {
-          totalExpectedAttestations = Number(attestationsData.maximumVotes);
-        }
-
-        // Count attestations that have been included up to the current time
-        if (
-          attestationsData?.windows &&
-          Array.isArray(attestationsData.windows)
-        ) {
-          attestationsData.windows.forEach((window: any) => {
-            // Use the same method as in the phase calculation above
-            if (window.startMs !== undefined && Number(window.startMs) <= currentTime) {
-              visibleAttestationsCount += window.validatorIndices?.length || 0;
-            }
-          });
-        }
+        const totalExpectedAttestations = attestationsData?.maximumVotes
+          ? Number(attestationsData.maximumVotes)
+          : 0;
 
         // Show percentage in attestation or accepted phase
         if (
@@ -305,7 +301,8 @@ const PhaseIcons: React.FC<PhaseIconsProps> = ({
         }
 
         return 'Waiting...';
-        
+      }
+
       case 'accepted':
         if (isActiveInPhase('accepted') && attestationsData?.windows) {
           // Calculate when it hit 66% attestations (acceptance time)
@@ -320,11 +317,9 @@ const PhaseIcons: React.FC<PhaseIconsProps> = ({
             let cumulativeAttestations = 0;
 
             // Sort windows by time
-            const sortedWindows = [...(attestationsData.windows || [])].sort(
-              (a, b) => {
-                return Number(a.startMs || Infinity) - Number(b.startMs || Infinity);
-              },
-            );
+            const sortedWindows = [...(attestationsData.windows || [])].sort((a, b) => {
+              return Number(a.startMs || Infinity) - Number(b.startMs || Infinity);
+            });
 
             // Find the window when we reach 66%
             for (const window of sortedWindows) {
@@ -347,7 +342,7 @@ const PhaseIcons: React.FC<PhaseIconsProps> = ({
           return 'Accepted';
         }
         return 'Waiting...';
-      
+
       default:
         return 'Waiting...';
     }
@@ -361,7 +356,7 @@ const PhaseIcons: React.FC<PhaseIconsProps> = ({
           className="absolute -top-7 left-1/2 transform -translate-x-1/2 text-4xl z-50"
           role="img"
           aria-label="Locally Built Crown"
-          style={{filter: "drop-shadow(0 0 4px gold)"}}
+          style={{ filter: 'drop-shadow(0 0 4px gold)' }}
         >
           👑
         </div>
@@ -379,13 +374,13 @@ const PhaseIcons: React.FC<PhaseIconsProps> = ({
             {/* Each phase gets its own column */}
             <div className="col-span-1 flex flex-col items-center min-w-0">
               {/* Icon */}
-              <div 
+              <div
                 className={`w-14 h-14 flex items-center justify-center rounded-full shadow-md transition-colors duration-300 relative ${
                   isActiveInPhase(phase.id as any)
                     ? `bg-gradient-to-br from-${phase.color}-500/60 to-${phase.color}-600/30 border-2 border-${phase.color}-400/80` // Active
                     : currentPhase === Phase.Propagating ||
-                      currentPhase === Phase.Attesting ||
-                      currentPhase === Phase.Accepted
+                        currentPhase === Phase.Attesting ||
+                        currentPhase === Phase.Accepted
                       ? `bg-gradient-to-br from-${phase.color}-500/30 to-${phase.color}-600/10 border-2 border-${phase.color}-400/40` // Completed
                       : 'bg-surface border border-border/80' // Not yet active
                 }`}
@@ -399,7 +394,7 @@ const PhaseIcons: React.FC<PhaseIconsProps> = ({
                   {phase.icon}
                 </div>
               </div>
-              
+
               {/* Title */}
               <div
                 className={`font-medium text-sm mt-2 mb-1 text-center ${
@@ -408,20 +403,22 @@ const PhaseIcons: React.FC<PhaseIconsProps> = ({
               >
                 {phase.title}
               </div>
-              
+
               {/* Description */}
-              <div 
+              <div
                 className={`text-[12px] leading-tight text-left min-h-[75px] transition-opacity duration-300 w-full px-1 ${
                   isActiveInPhase(phase.id as any) ? 'opacity-100' : 'opacity-60'
                 }`}
               >
-                <span className={`${isActiveInPhase(phase.id as any) ? 'text-white/90' : 'text-tertiary'} line-clamp-4 break-words`}>
+                <span
+                  className={`${isActiveInPhase(phase.id as any) ? 'text-white/90' : 'text-tertiary'} line-clamp-4 break-words`}
+                >
                   {phase.description}
                 </span>
               </div>
-              
+
               {/* Dynamic content */}
-              <div 
+              <div
                 className={`text-[12px] leading-tight text-center mt-2 transition-opacity duration-300 w-full min-h-[48px] ${
                   isActiveInPhase(phase.id as any) ? 'opacity-100' : 'opacity-60'
                 }`}
@@ -429,43 +426,53 @@ const PhaseIcons: React.FC<PhaseIconsProps> = ({
                 {getDynamicContent(phase.id) === 'Waiting...' ? (
                   /* Skeleton loader for waiting state */
                   <div className="flex flex-col items-center space-y-2">
-                    <div className={`h-2 w-3/4 rounded-full bg-${phase.color}-400/20 animate-pulse`}></div>
-                    <div className={`h-2 w-2/3 rounded-full bg-${phase.color}-400/20 animate-pulse`}></div>
+                    <div
+                      className={`h-2 w-3/4 rounded-full bg-${phase.color}-400/20 animate-pulse`}
+                    ></div>
+                    <div
+                      className={`h-2 w-2/3 rounded-full bg-${phase.color}-400/20 animate-pulse`}
+                    ></div>
                   </div>
                 ) : (
-                  <span className={`${isActiveInPhase(phase.id as any) ? `text-${phase.color}-300` : 'text-tertiary'} break-words line-clamp-3`}>
+                  <span
+                    className={`${isActiveInPhase(phase.id as any) ? `text-${phase.color}-300` : 'text-tertiary'} break-words line-clamp-3`}
+                  >
                     {getDynamicContent(phase.id)}
                   </span>
                 )}
-                {phase.id === 'proposer' && currentPhase !== Phase.Building && blockTime !== undefined && (
-                  <div className="text-xs font-mono text-success mt-1 whitespace-nowrap">
-                    {(blockTime / 1000).toFixed(1)}s
-                  </div>
-                )}
+                {phase.id === 'proposer' &&
+                  currentPhase !== Phase.Building &&
+                  blockTime !== undefined && (
+                    <div className="text-xs font-mono text-success mt-1 whitespace-nowrap">
+                      {(blockTime / 1000).toFixed(1)}s
+                    </div>
+                  )}
               </div>
             </div>
-            
+
             {/* Flow line after each phase except the last one */}
             {index < phases.length - 1 && (
               <div className="col-span-1 flex items-center h-14">
-                <div 
+                <div
                   className={`h-1.5 w-full rounded-full shadow-inner ${
                     // Only apply the gradient when both phases are active or when second phase is active/completed
-                    (isActiveInPhase(phase.id as any) && 
-                     (isActiveInPhase(phases[index + 1].id as any) || 
-                      currentPhase === Phase.Propagating || 
-                      currentPhase === Phase.Attesting || 
-                      currentPhase === Phase.Accepted))
+                    isActiveInPhase(phase.id as any) &&
+                    (isActiveInPhase(phases[index + 1].id as any) ||
+                      currentPhase === Phase.Propagating ||
+                      currentPhase === Phase.Attesting ||
+                      currentPhase === Phase.Accepted)
                       ? `bg-gradient-to-r from-${phase.color}-400 to-${phases[index + 1].color}-400`
                       : 'bg-gray-700/30' // Dimmed state
                   }`}
-                  style={{ 
-                    opacity: (isActiveInPhase(phase.id as any) && 
-                             (isActiveInPhase(phases[index + 1].id as any) || 
-                              currentPhase === Phase.Propagating || 
-                              currentPhase === Phase.Attesting || 
-                              currentPhase === Phase.Accepted))
-                              ? 0.8 : 0.4 
+                  style={{
+                    opacity:
+                      isActiveInPhase(phase.id as any) &&
+                      (isActiveInPhase(phases[index + 1].id as any) ||
+                        currentPhase === Phase.Propagating ||
+                        currentPhase === Phase.Attesting ||
+                        currentPhase === Phase.Accepted)
+                        ? 0.8
+                        : 0.4,
                   }}
                 />
               </div>

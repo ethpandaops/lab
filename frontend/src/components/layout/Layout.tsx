@@ -2,21 +2,22 @@ import { Outlet, useLocation } from 'react-router-dom';
 import { Navigation } from '@/components/layout/Navigation';
 import { Breadcrumbs } from '@/components/layout/Breadcrumbs';
 import { NetworkSelector } from '@/components/common/NetworkSelector';
-import { useContext, useEffect, useState } from 'react';
-import NetworkContext from '@/contexts/NetworkContext';
+import { useEffect, useState } from 'react';
+import useNetwork from '@/contexts/network';
 import { Logo } from '@/components/layout/Logo';
-import { BeaconClockManager } from '@/utils/beacon.ts';
+import useBeacon from '@/contexts/beacon';
 import { Menu } from 'lucide-react';
 import { NETWORK_METADATA, type NetworkKey } from '@/constants/networks.tsx';
 import clsx from 'clsx';
 
-function Layout(): JSX.Element {
+function Layout() {
   const location = useLocation();
   const isHome = location.pathname === '/';
-  const { selectedNetwork, setSelectedNetwork } = useContext(NetworkContext);
+  const { selectedNetwork, setSelectedNetwork } = useNetwork();
   const [currentSlot, setCurrentSlot] = useState<number | null>(null);
   const [currentEpoch, setCurrentEpoch] = useState<number | null>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { getBeaconClock } = useBeacon();
 
   // Get network metadata
   const selectedMetadata = NETWORK_METADATA[selectedNetwork as NetworkKey] || {
@@ -32,7 +33,7 @@ function Layout(): JSX.Element {
 
   // Update slot and epoch every second
   useEffect(() => {
-    const clock = BeaconClockManager.getInstance().getBeaconClock(selectedNetwork);
+    const clock = getBeaconClock(selectedNetwork);
     if (!clock) return;
 
     const updateTime = () => {
@@ -45,7 +46,7 @@ function Layout(): JSX.Element {
     updateTime();
     const interval = setInterval(updateTime, 1000);
     return () => clearInterval(interval);
-  }, [selectedNetwork]);
+  }, [selectedNetwork, getBeaconClock]);
 
   return (
     <div className="relative min-h-screen text-primary font-mono bg-gradient-to-b from-[rgb(var(--bg-base))] via-[rgb(var(--bg-base))] to-[rgb(var(--bg-base))]">
@@ -75,7 +76,7 @@ function Layout(): JSX.Element {
             <div className="hidden lg:flex justify-center">
               <NetworkSelector
                 selectedNetwork={selectedNetwork}
-                onNetworkChange={(network) => setSelectedNetwork(network, 'ui')}
+                onNetworkChange={network => setSelectedNetwork(network, 'ui')}
                 className="w-48"
               />
             </div>
@@ -141,7 +142,7 @@ function Layout(): JSX.Element {
               <div className="p-4 border-b border-subtle">
                 <NetworkSelector
                   selectedNetwork={selectedNetwork}
-                  onNetworkChange={(network) => setSelectedNetwork(network, 'ui')}
+                  onNetworkChange={network => setSelectedNetwork(network, 'ui')}
                   className="w-full"
                 />
               </div>

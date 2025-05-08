@@ -6,7 +6,7 @@ import { DataAvailabilityPanel } from '@/components/beacon/DataAvailabilityPanel
 import { useNavigate } from 'react-router-dom';
 import clsx from 'clsx';
 import { useModal } from '@/contexts/ModalContext.tsx';
-import { getLabApiClient } from '@/api';
+import useApi from '@/contexts/api';
 import { GetSlotDataRequest } from '@/api/gen/backend/pkg/api/proto/lab_api_pb';
 import { useQuery } from '@tanstack/react-query';
 
@@ -54,6 +54,7 @@ export function SlotView({
   const [isTimelineCollapsed, setIsTimelineCollapsed] = useState(false);
   const navigate = useNavigate();
   const { showModal } = useModal();
+  const { client } = useApi();
 
   // Use the new RPC method to fetch slot data
   const {
@@ -67,7 +68,6 @@ export function SlotView({
         throw new Error('No slot provided');
       }
 
-      const client = await getLabApiClient();
       const request = new GetSlotDataRequest({
         network: network,
         slot: BigInt(slot),
@@ -89,7 +89,6 @@ export function SlotView({
         throw new Error('No slot provided');
       }
 
-      const client = await getLabApiClient();
       const request = new GetSlotDataRequest({
         network: network,
         slot: BigInt(slot + 1),

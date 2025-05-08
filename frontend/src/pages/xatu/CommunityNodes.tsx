@@ -4,16 +4,13 @@ import { ErrorState } from '@/components/common/ErrorState';
 import { XatuCallToAction } from '@/components/xatu/XatuCallToAction';
 import { NetworkSelector } from '@/components/common/NetworkSelector';
 import { useState, useEffect, useMemo, useRef } from 'react';
-import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from 'recharts';
-import { getConfig } from '@/config';
-import type { Config } from '@/types';
+import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { useSearchParams, useLocation, useNavigate } from 'react-router-dom';
-import { GlobeViz } from '@/components/xatu/GlobeViz';
 import { AboutThisData } from '@/components/common/AboutThisData';
 import { ChartWithStats, NivoLineChart } from '@/components/charts';
-import ConfigContext from '@/contexts/ConfigContext';
-import NetworkContext from '@/contexts/NetworkContext';
-import { useContext } from 'react';
+import useConfig from '@/contexts/config';
+import useNetwork from '@/contexts/network';
+import useApi from '@/contexts/api';
 
 interface CountryData {
   time: number;
@@ -60,41 +57,25 @@ export const CommunityNodes = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const location = useLocation();
   const navigate = useNavigate();
-  const [config, setConfig] = useState<Config | null>(null);
+  const { config } = useConfig();
+  const { baseUrl } = useApi();
   const [isTimeWindowOpen, setIsTimeWindowOpen] = useState(false);
   const [hiddenCountries, setHiddenCountries] = useState<Set<string>>(new Set());
   const containerRef = useRef<HTMLDivElement>(null);
   const timeWindowRef = useRef<HTMLDivElement>(null);
-  const [containerWidth, setContainerWidth] = useState(0);
 
-  const configContext = useContext(ConfigContext);
-  const pathPrefix = configContext?.modules?.['xatu_public_contributors']?.path_prefix;
+  const configContext = useConfig();
+  const pathPrefix = configContext?.modules?.['xatu_public_contributors']?.pathPrefix;
 
-  const { selectedNetwork, setSelectedNetwork } = useContext(NetworkContext);
+  console.log('fuck you', pathPrefix, configContext);
+
+  const { selectedNetwork, setSelectedNetwork } = useNetwork();
   const [currentWindow, setCurrentWindow] = useState<TimeWindow | null>(null);
-  const [countryData, setCountryData] = useState<CountryData[]>([]);
-  const [userData, setUserData] = useState<UserData[]>([]);
-  const [activeSection, setActiveSection] = useState<SectionId>('total-nodes');
   const [hiddenUsers, setHiddenUsers] = useState<Set<string>>(new Set());
-  const [mapWidth, setMapWidth] = useState(0);
-  const mapRef = useRef<HTMLDivElement>(null);
-
-  // Update container width on mount and resize
-  useEffect(() => {
-    const updateWidth = () => {
-      if (containerRef.current) {
-        setContainerWidth(containerRef.current.clientWidth);
-      }
-    };
-
-    updateWidth();
-    window.addEventListener('resize', updateWidth);
-    return () => window.removeEventListener('resize', updateWidth);
-  }, []);
 
   const timeWindows = useMemo(
     () =>
-      config?.modules['xatu_public_contributors'].time_windows || [
+      config?.modules['xatu_public_contributors'].timeWindows || [
         { file: 'last_30_days', step: '1d', label: '30d', range: '-30d' },
         { file: 'last_1_day', step: '1h', label: '1d', range: '-1d' },
       ],
@@ -102,21 +83,14 @@ export const CommunityNodes = () => {
   );
 
   const defaultTimeWindow = useMemo(() => timeWindows[0]?.file || 'last_30_days', [timeWindows]);
-  const defaultNetwork = useMemo(
-    () => config?.modules['xatu_public_contributors'].networks?.[0] || 'mainnet',
-    [config],
-  );
 
   // Get initial values from URL or defaults
-  const initialNetwork = searchParams.get('network') || defaultNetwork;
   const initialTimeWindow = searchParams.get('timeWindow') || defaultTimeWindow;
 
   // Update handleNetworkChange to use setSelectedNetwork
   const handleNetworkChange = (newNetwork: string) => {
     setSelectedNetwork(newNetwork);
     // Reset data when network changes
-    setCountryData([]);
-    setUserData([]);
     setCurrentWindow(null);
   };
 
@@ -135,10 +109,6 @@ export const CommunityNodes = () => {
   const totalNodesRef = useRef<HTMLDivElement>(null);
   const countriesRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    getConfig().then(setConfig).catch(console.error);
-  }, []);
-
   // Handle section scrolling
   useEffect(() => {
     const hash = location.hash.slice(1) as SectionId;
@@ -154,10 +124,6 @@ export const CommunityNodes = () => {
       ref.current.scrollIntoView({ behavior: 'smooth' });
     }
   }, [location.hash]);
-
-  const handleSectionClick = (section: SectionId) => {
-    navigate({ hash: SECTIONS[section] });
-  };
 
   // Set initial time window when config loads
   useEffect(() => {
@@ -178,12 +144,12 @@ export const CommunityNodes = () => {
     data: countriesData,
     loading: countriesLoading,
     error: countriesError,
-  } = useDataFetch<CountryData[]>(countriesPath);
+  } = useDataFetch<CountryData[]>(baseUrl, countriesPath);
   const {
     data: usersData,
     loading: usersLoading,
     error: usersError,
-  } = useDataFetch<UserData[]>(usersPath);
+  } = useDataFetch<UserData[]>(baseUrl, usersPath);
 
   const { chartData, totalNodesData, topCountries } = useMemo(() => {
     if (!countriesData) {
@@ -199,7 +165,7 @@ export const CommunityNodes = () => {
         });
         return dataPoint;
       })
-      .sort((a, b) => a.time - b.time);
+      .sort((a, b) => Number(a.time) - Number(b.time));
 
     // Calculate total nodes per time point
     const totalNodesData = chartData.map(timePoint => ({
@@ -214,7 +180,7 @@ export const CommunityNodes = () => {
       (acc, timePoint) => {
         Object.entries(timePoint).forEach(([key, value]) => {
           if (key !== 'time') {
-            acc[key] = (acc[key] || 0) + (value as number);
+            acc[key] = (Number(acc[key]) || 0) + Number(value);
           }
         });
         return acc;
@@ -223,7 +189,7 @@ export const CommunityNodes = () => {
     );
 
     const topCountries = Object.entries(countryTotals)
-      .sort(([, a], [, b]) => b - a)
+      .sort(([, a], [, b]) => Number(b) - Number(a))
       .map(([country]) => country);
 
     return { chartData, totalNodesData, topCountries };
@@ -244,14 +210,14 @@ export const CommunityNodes = () => {
         dataPoint.uniqueUsers = timePoint.users.length;
         return dataPoint;
       })
-      .sort((a, b) => a.time - b.time);
+      .sort((a, b) => Number(a.time) - Number(b.time));
 
     // Get all users by total nodes
     const userTotals = chartData.reduce(
       (acc, timePoint) => {
         Object.entries(timePoint).forEach(([key, value]) => {
           if (key !== 'time' && key !== 'uniqueUsers') {
-            acc[key] = (acc[key] || 0) + (value as number);
+            acc[key] = (Number(acc[key]) || 0) + Number(value);
           }
         });
         return acc;
@@ -260,14 +226,14 @@ export const CommunityNodes = () => {
     );
 
     const topUsers = Object.entries(userTotals)
-      .sort(([, a], [, b]) => b - a)
+      .sort(([, a], [, b]) => Number(b) - Number(a))
       .map(([user]) => user);
 
     return { userChartData: chartData, topUsers };
   }, [usersData]);
 
   const handleLegendClick = (
-    e: React.MouseEvent<HTMLButtonElement>,
+    _: React.MouseEvent<HTMLButtonElement>,
     item: { value: string; type: string },
   ) => {
     const setHiddenItems = item.type === 'country' ? setHiddenCountries : setHiddenUsers;
@@ -488,7 +454,7 @@ export const CommunityNodes = () => {
                 max: 'auto',
               }}
               axisBottom={{
-                format: value => {
+                format: (value: number) => {
                   const date = new Date(value * 1000);
                   return currentWindow?.step === '1h'
                     ? date.toLocaleTimeString()
@@ -615,9 +581,11 @@ export const CommunityNodes = () => {
             const color = stringToColor(country);
             const values = chartData.map(d => d[country]).filter(Boolean);
             const latestValue = values[values.length - 1] || 0;
-            const avg = values.length ? values.reduce((a, b) => a + b, 0) / values.length : 0;
-            const min = values.length ? Math.min(...values) : 0;
-            const max = values.length ? Math.max(...values) : 0;
+            const avg = values.length
+              ? (values.reduce((a, b) => Number(a) + Number(b), 0) as number) / values.length
+              : 0;
+            const min = values.length ? Math.min(...values.map(Number)) : 0;
+            const max = values.length ? Math.max(...values.map(Number)) : 0;
 
             return {
               name: country,
@@ -727,9 +695,11 @@ export const CommunityNodes = () => {
             const color = stringToColor(user);
             const values = userChartData.map(d => d[user]).filter(Boolean);
             const latestValue = values[values.length - 1] || 0;
-            const avg = values.length ? values.reduce((a, b) => a + b, 0) / values.length : 0;
-            const min = values.length ? Math.min(...values) : 0;
-            const max = values.length ? Math.max(...values) : 0;
+            const avg = values.length
+              ? (values.reduce((a, b) => Number(a) + Number(b), 0) as number) / values.length
+              : 0;
+            const min = values.length ? Math.min(...values.map(Number)) : 0;
+            const max = values.length ? Math.max(...values.map(Number)) : 0;
 
             return {
               name: user,
@@ -831,9 +801,11 @@ export const CommunityNodes = () => {
             {
               name: 'Users',
               color: '#ff2b92',
-              min: Math.min(...userChartData.map(d => d.uniqueUsers)),
-              avg: userChartData.reduce((sum, d) => sum + d.uniqueUsers, 0) / userChartData.length,
-              max: Math.max(...userChartData.map(d => d.uniqueUsers)),
+              min: Math.min(...userChartData.map(d => Number(d.uniqueUsers))),
+              avg:
+                userChartData.reduce((sum, d) => sum + Number(d.uniqueUsers), 0) /
+                userChartData.length,
+              max: Math.max(...userChartData.map(d => Number(d.uniqueUsers))),
               last: userChartData[userChartData.length - 1].uniqueUsers,
               isHidden: false,
               isHighlighted: false,
