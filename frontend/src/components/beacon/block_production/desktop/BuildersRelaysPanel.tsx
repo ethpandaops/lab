@@ -183,10 +183,18 @@ const BuildersRelaysPanel: React.FC<BuildersRelaysPanelProps> = ({
 
     // Convert map to array and sort:
     // 1. Winning relays first (relays in delivered_payloads)
-    // 2. Then alphabetically for non-winning relays
+    // 2. Then sort non-winning relays by their highest bid value
     return Array.from(uniqueRelays.values()).sort((a, b) => {
+      // Always put winning relays first
       if (a.isWinning && !b.isWinning) return -1;
       if (!a.isWinning && b.isWinning) return 1;
+      
+      // For non-winning relays, sort by highest bid value
+      if (!a.isWinning && !b.isWinning) {
+        return b.value - a.value;
+      }
+      
+      // For winning relays (if there are multiple), sort alphabetically
       return a.relayName.localeCompare(b.relayName);
     });
   }, [bids, currentTime, winningBid]);
