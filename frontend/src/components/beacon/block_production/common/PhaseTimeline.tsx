@@ -610,7 +610,7 @@ const PhaseTimeline: React.FC<PhaseTimelineProps> = ({
             width: '4px',
             left: `calc(${(currentTimeMs / 12000) * 100}% - 2px)`,
             willChange: 'left',
-            transition: isReset ? 'none' : 'left 250ms linear',
+            transition: isReset ? 'none' : 'left 50ms linear',
             boxShadow: '0 0 5px rgba(255, 255, 255, 0.8)',
           }}
         />

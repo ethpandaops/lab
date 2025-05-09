@@ -563,7 +563,7 @@ const MobileTimelineBar: React.FC<MobileTimelineBarProps> = ({
             width: '2px',
             left: `${(currentTime / (slotData?.network?.config?.SECONDS_PER_SLOT ? slotData.network.config.SECONDS_PER_SLOT * 1000 : 12000)) * 100}%`,
             boxShadow: '0 0 5px rgba(255, 255, 255, 0.8)',
-            transition: isReset ? 'none' : 'left 250ms linear',
+            transition: isReset ? 'none' : 'left 50ms linear',
           }}
         />
 
