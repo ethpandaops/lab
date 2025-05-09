@@ -119,6 +119,18 @@ const BuildersRelaysPanel: React.FC<BuildersRelaysPanelProps> = ({
   }, [bids, currentTime]);
 
   // Get unique relay items - filtered by current time
+  // For debugging
+  useEffect(() => {
+    // Always log phase changes to help debug
+    console.log(`BuildersRelaysPanel: currentPhase=${currentPhase}, 
+                 hasWinningBid=${!!winningBid}, 
+                 hasDeliveredRelays=${!!winningBid?.deliveredRelays?.length}`);
+    
+    if (winningBid?.deliveredRelays?.length > 0) {
+      console.log(`BuildersRelaysPanel: deliveredRelays=`, winningBid.deliveredRelays);
+    }
+  }, [winningBid, currentPhase, currentTime]);
+
   const relays = useMemo(() => {
     // Filter bids by current time first
     const timeFilteredBids = bids.filter(bid => bid.time <= currentTime);
@@ -197,7 +209,7 @@ const BuildersRelaysPanel: React.FC<BuildersRelaysPanelProps> = ({
       // For relays in the same winning/non-winning category, sort by value
       return b.value - a.value;
     });
-  }, [bids, currentTime, winningBid]);
+  }, [bids, currentTime, winningBid, currentPhase]);
 
   return (
     <div className="flex flex-col space-y-3 h-full">
@@ -226,7 +238,9 @@ const BuildersRelaysPanel: React.FC<BuildersRelaysPanelProps> = ({
               {/* Show top 7 builders */}
               {builders.slice(0, 7).map(item => {
                 // Only show winning styling after the building phase
-                const showWinningStyle = item.isWinning && currentPhase !== Phase.Building;
+                // Re-evaluate this each render with the latest phase value
+                const isWinningBuilder = !!winningBid?.builderPubkey && item.builderPubkey === winningBid.builderPubkey;
+                const showWinningStyle = isWinningBuilder && currentPhase !== Phase.Building;
 
                 return (
                   <div
@@ -299,7 +313,9 @@ const BuildersRelaysPanel: React.FC<BuildersRelaysPanelProps> = ({
             <div className="space-y-1.5 p-2">
               {relays.slice(0, 5).map(item => {
                 // Only show winning styling after the building phase
-                const showWinningStyle = item.isWinning && currentPhase !== Phase.Building;
+                // Re-evaluate this each render with the latest phase value
+                const isWinningRelay = !!winningBid?.deliveredRelays?.includes(item.relayName);
+                const showWinningStyle = isWinningRelay && currentPhase !== Phase.Building;
 
                 return (
                   <div
