@@ -225,8 +225,8 @@ const BuildersRelaysPanel: React.FC<BuildersRelaysPanelProps> = ({
             <div className="space-y-1.5 p-2">
               {/* Show top 7 builders */}
               {builders.slice(0, 7).map(item => {
-                // Only show winning styling if we're not in building phase
-                const showWinningStyle = item.isWinning && currentPhase !== Phase.Building;
+                // Always show winning styling for delivered relays, regardless of phase
+                const showWinningStyle = item.isWinning;
 
                 return (
                   <div
@@ -298,8 +298,8 @@ const BuildersRelaysPanel: React.FC<BuildersRelaysPanelProps> = ({
           {relays.length > 0 ? (
             <div className="space-y-1.5 p-2">
               {relays.slice(0, 5).map(item => {
-                // Only show winning styling if we're not in building phase
-                const showWinningStyle = item.isWinning && currentPhase !== Phase.Building;
+                // Always show winning styling for delivered relays, regardless of phase
+                const showWinningStyle = item.isWinning;
 
                 return (
                   <div
