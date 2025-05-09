@@ -126,46 +126,64 @@ const BuildersRelaysPanel: React.FC<BuildersRelaysPanelProps> = ({
     // Create a map of unique relays
     const uniqueRelays = new Map();
 
-    // Process bids to get unique relays
+    // Add delivered relays first (they should always be shown, even if they have no bids)
+    // These are the ONLY winning relays - those that actually delivered payloads
+    if (winningBid?.deliveredRelays && Array.isArray(winningBid.deliveredRelays)) {
+      winningBid.deliveredRelays.forEach(relayName => {
+        if (!uniqueRelays.has(relayName)) {
+          uniqueRelays.set(relayName, {
+            id: `relay-${relayName}`,
+            relayName: relayName,
+            label: relayName,
+            // Delivered relays are ALWAYS winning relays
+            isWinning: true,
+            // These values will be updated if we find bids from this relay
+            value: 0,
+            time: 0,
+            bidCount: 0,
+          });
+        }
+      });
+    }
+
+    // Process bids to get unique relays or update existing ones
     timeFilteredBids.forEach(bid => {
       const relayName = bid.relayName;
 
-      // If relay not yet in map, or this is a winning bid, update the entry
-      if (!uniqueRelays.has(relayName) || bid.isWinning) {
+      if (!uniqueRelays.has(relayName)) {
+        // Create a new relay entry
         uniqueRelays.set(relayName, {
           id: `relay-${relayName}`,
           relayName: relayName,
           label: relayName,
-          // Using semantic colors instead of hardcoded ones - success color for winning relay
-          // Mark relay as winning if it's in the deliveredPayloads list or it matches the winning bid relay
-          isWinning:
-            (winningBid?.deliveredRelays && winningBid.deliveredRelays.includes(relayName)) ||
-            winningBid?.relayName === relayName,
-          // Use highest value bid from this relay
-          value: uniqueRelays.has(relayName)
-            ? Math.max(uniqueRelays.get(relayName).value, bid.value)
-            : bid.value,
-          time: uniqueRelays.has(relayName)
-            ? Math.min(uniqueRelays.get(relayName).time, bid.time) // Use earliest bid time
-            : bid.time,
-          bidCount: (uniqueRelays.get(relayName)?.bidCount || 0) + 1,
+          // A relay is winning ONLY if it's in the delivered_payloads list
+          isWinning: winningBid?.deliveredRelays && winningBid.deliveredRelays.includes(relayName),
+          value: bid.value,
+          time: bid.time,
+          bidCount: 1,
         });
       } else {
-        // Update bid count for existing relay
+        // Update existing relay entry
         const relay = uniqueRelays.get(relayName);
+        
+        // Update bid count
         relay.bidCount = (relay.bidCount || 0) + 1;
+        
         // Update with highest value bid
         if (bid.value > relay.value) {
           relay.value = bid.value;
         }
+        
         // Update with earliest time
-        if (bid.time < relay.time) {
+        if (bid.time < relay.time || relay.time === 0) {
           relay.time = bid.time;
         }
       }
     });
 
-    // Convert map to array and sort (winning relay first, then alphabetically)
+    // Convert map to array and sort:
+    // 1. Winning relays first (relays in delivered_payloads)
+    // 2. Then alphabetically for non-winning relays
     return Array.from(uniqueRelays.values()).sort((a, b) => {
       if (a.isWinning && !b.isWinning) return -1;
       if (!a.isWinning && b.isWinning) return 1;
@@ -292,9 +310,16 @@ const BuildersRelaysPanel: React.FC<BuildersRelaysPanelProps> = ({
                         <div className="truncate min-w-0 max-w-full overflow-hidden">
                           <span
                             className={`${showWinningStyle ? 'text-amber-400 font-medium' : 'text-xs'} truncate block overflow-hidden`}
-                            title={item.label}
+                            title={`${item.label}${showWinningStyle ? ' (delivered payload)' : ''}`}
                           >
                             {item.label}
+                            {showWinningStyle && (
+                              <span className="ml-1 inline-flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 inline text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                </svg>
+                              </span>
+                            )}
                           </span>
                         </div>
                       </div>
@@ -304,7 +329,8 @@ const BuildersRelaysPanel: React.FC<BuildersRelaysPanelProps> = ({
                         >
                           {item.bidCount !== undefined
                             ? `${item.bidCount} bid${item.bidCount !== 1 ? 's' : ''}`
-                            : '0 bids'}
+                            : '0 bids'
+                          }
                         </div>
                       </div>
                     </div>

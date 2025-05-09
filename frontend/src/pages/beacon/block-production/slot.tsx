@@ -135,8 +135,8 @@ export default function BlockProductionSlotPage() {
   }, [slotData?.relayBids]);
 
   const winningBidData = useMemo(() => {
-    // We need both relay bids and a valid execution payload block hash to determine the winning bid
-    if (!slotData?.relayBids || !slotData?.block?.executionPayloadBlockHash) return null;
+    // We need a valid execution payload block hash to determine the winning bid
+    if (!slotData?.block?.executionPayloadBlockHash) return null;
 
     // The execution payload block hash is the definitive way to identify which bid won
     const executionPayloadBlockHash = slotData.block.executionPayloadBlockHash;
@@ -151,40 +151,79 @@ export default function BlockProductionSlotPage() {
       return null;
     }
 
-    // Search through all relay bids to find a matching block hash
-    for (const [relayName, relayData] of Object.entries(slotData.relayBids)) {
-      if (!relayData.bids || !Array.isArray(relayData.bids)) continue;
+    // First identify relays that delivered payloads (these are the actual winning relays)
+    const deliveredRelays: string[] = [];
+    
+    // Check for delivered_payloads and extract relay names
+    if (slotData.deliveredPayloads && typeof slotData.deliveredPayloads === 'object') {
+      Object.keys(slotData.deliveredPayloads).forEach(relayName => {
+        deliveredRelays.push(relayName);
+      });
+    }
 
-      const matchingBid = relayData.bids.find(
-        bid =>
-          bid.blockHash &&
-          typeof bid.blockHash === 'string' &&
-          bid.blockHash === executionPayloadBlockHash,
-      );
+    // If block has delivered_payloads
+    if (slotData.block?.deliveredPayloads && typeof slotData.block.deliveredPayloads === 'object') {
+      Object.keys(slotData.block.deliveredPayloads).forEach(relayName => {
+        if (!deliveredRelays.includes(relayName)) {
+          deliveredRelays.push(relayName);
+        }
+      });
+    }
 
-      if (matchingBid) {
-        try {
-          // Convert the bid value to ETH (from wei)
-          const valueInEth = Number(BigInt(matchingBid.value)) / 1e18;
+    // If we have relay bids, find the matching bid for more details
+    let winningBid = null;
+    if (slotData?.relayBids) {
+      // Search through all relay bids to find a matching block hash
+      for (const [relayName, relayData] of Object.entries(slotData.relayBids)) {
+        if (!relayData.bids || !Array.isArray(relayData.bids)) continue;
 
-          // Return the winning bid data
-          return {
-            blockHash: matchingBid.blockHash,
-            value: valueInEth,
-            relayName: relayName,
-            builderPubkey: matchingBid.builderPubkey,
-          };
-        } catch (error) {
-          console.error('Error processing winning bid:', error);
-          return null;
+        const matchingBid = relayData.bids.find(
+          bid =>
+            bid.blockHash &&
+            typeof bid.blockHash === 'string' &&
+            bid.blockHash === executionPayloadBlockHash,
+        );
+
+        if (matchingBid) {
+          try {
+            // Convert the bid value to ETH (from wei)
+            const valueInEth = Number(BigInt(matchingBid.value)) / 1e18;
+
+            // Store the winning bid data
+            winningBid = {
+              blockHash: matchingBid.blockHash,
+              value: valueInEth,
+              relayName: relayName,
+              builderPubkey: matchingBid.builderPubkey,
+              deliveredRelays: deliveredRelays, // Include all delivered relays
+            };
+            break; // We found what we were looking for
+          } catch (error) {
+            console.error('Error processing winning bid:', error);
+          }
         }
       }
     }
 
-    // If no matching bid was found
-    console.info('No matching bid found for execution payload:', executionPayloadBlockHash);
+    // If we found a winning bid in relay_bids, return it
+    if (winningBid) {
+      return winningBid;
+    }
+    
+    // If we have delivered relays but no matching bid, create a simple winner object
+    if (deliveredRelays.length > 0) {
+      return {
+        blockHash: executionPayloadBlockHash,
+        value: 0, // We don't know the value without the bid data
+        relayName: deliveredRelays[0], // Use the first relay as the main relay
+        deliveredRelays: deliveredRelays, // Include all delivered relays
+      };
+    }
+
+    // If no matching bid was found and no delivered payloads
+    console.info('No matching bid or delivered payload found for execution payload:', executionPayloadBlockHash);
     return null;
-  }, [slotData?.relayBids, slotData?.block?.executionPayloadBlockHash]);
+  }, [slotData?.relayBids, slotData?.block?.executionPayloadBlockHash, slotData?.deliveredPayloads, slotData?.block?.deliveredPayloads]);
 
   // Initial transformation of bids from the data
   const allTransformedBids = useMemo(() => {
