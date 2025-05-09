@@ -181,21 +181,21 @@ const BuildersRelaysPanel: React.FC<BuildersRelaysPanelProps> = ({
       }
     });
 
-    // Convert map to array and sort:
-    // 1. Winning relays first (relays in delivered_payloads)
-    // 2. Then sort non-winning relays by their highest bid value
+    // Convert map to array and sort by different rules depending on the phase
     return Array.from(uniqueRelays.values()).sort((a, b) => {
-      // Always put winning relays first
-      if (a.isWinning && !b.isWinning) return -1;
-      if (!a.isWinning && b.isWinning) return 1;
-      
-      // For non-winning relays, sort by highest bid value
-      if (!a.isWinning && !b.isWinning) {
+      // In building phase, sort purely by bid value (highest first)
+      if (currentPhase === Phase.Building) {
         return b.value - a.value;
       }
       
-      // For winning relays (if there are multiple), sort alphabetically
-      return a.relayName.localeCompare(b.relayName);
+      // After building phase:
+      // 1. Winning relays first (relays in delivered_payloads)
+      // 2. Then sort non-winning relays by their highest bid value
+      if (a.isWinning && !b.isWinning) return -1;
+      if (!a.isWinning && b.isWinning) return 1;
+      
+      // For relays in the same winning/non-winning category, sort by value
+      return b.value - a.value;
     });
   }, [bids, currentTime, winningBid]);
 
@@ -225,8 +225,8 @@ const BuildersRelaysPanel: React.FC<BuildersRelaysPanelProps> = ({
             <div className="space-y-1.5 p-2">
               {/* Show top 7 builders */}
               {builders.slice(0, 7).map(item => {
-                // Always show winning styling for delivered relays, regardless of phase
-                const showWinningStyle = item.isWinning;
+                // Only show winning styling after the building phase
+                const showWinningStyle = item.isWinning && currentPhase !== Phase.Building;
 
                 return (
                   <div
@@ -298,8 +298,8 @@ const BuildersRelaysPanel: React.FC<BuildersRelaysPanelProps> = ({
           {relays.length > 0 ? (
             <div className="space-y-1.5 p-2">
               {relays.slice(0, 5).map(item => {
-                // Always show winning styling for delivered relays, regardless of phase
-                const showWinningStyle = item.isWinning;
+                // Only show winning styling after the building phase
+                const showWinningStyle = item.isWinning && currentPhase !== Phase.Building;
 
                 return (
                   <div
