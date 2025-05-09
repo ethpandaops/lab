@@ -21,6 +21,7 @@ export class BeaconClock {
     this.genesisTime = genesisTime;
   }
 
+  // For slot numbers, we still use seconds precision since slots are whole numbers
   getCurrentSlot(): number {
     const now = Math.floor(Date.now() / 1000);
     return Math.floor((now - this.genesisTime) / SECONDS_PER_SLOT);
@@ -59,14 +60,14 @@ export class BeaconClock {
   }
 
   getCurrentSlotProgress(): number {
-    const now = Math.floor(Date.now() / 1000);
+    const now = Date.now() / 1000; // Remove Math.floor to keep millisecond precision
     const currentSlot = this.getCurrentSlot();
     const slotStart = this.getSlotStartTime(currentSlot);
     return Math.min(1, Math.max(0, (now - slotStart) / SECONDS_PER_SLOT));
   }
 
   getTimeUntilNextSlot(): number {
-    const now = Math.floor(Date.now() / 1000);
+    const now = Date.now() / 1000; // Remove Math.floor to keep millisecond precision
     const currentSlot = this.getCurrentSlot();
     const nextSlotStart = this.getSlotStartTime(currentSlot + 1);
     return Math.max(0, nextSlotStart - now);
