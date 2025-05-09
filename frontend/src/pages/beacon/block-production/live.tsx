@@ -5,6 +5,7 @@ import { GetSlotDataRequest } from '@/api/gen/backend/pkg/api/proto/lab_api_pb';
 import useBeacon from '@/contexts/beacon';
 import SlotDataStore from '@/utils/SlotDataStore';
 import useNetwork from '@/contexts/network';
+import { TimelineProvider } from '@/contexts/timeline';
 import {
   MobileBlockProductionView,
   DesktopBlockProductionView,
@@ -73,13 +74,9 @@ export default function BlockProductionLivePage() {
 
       // Reset to live position
       setDisplaySlotOffset(0);
-      setCurrentTime(0);
 
       // Clear prefetched slots for the previous network
       prefetchedSlotsRef.current = new Set();
-
-      // Make sure we're in playing state
-      setIsPlaying(true);
 
       // Invalidate queries for the previous network to force refetching
       queryClient.invalidateQueries({
@@ -92,35 +89,17 @@ export default function BlockProductionLivePage() {
   // This will help determine if we should auto-update when slots change
   const isAtLivePositionRef = useRef<boolean>(true);
 
-  // Define isPlaying state here, before we use it in refs
-  const [isPlaying, setIsPlaying] = useState<boolean>(true); // Control playback
-
-  // Store the playing state in a ref to avoid dependency cycles
-  const isPlayingRef = useRef(isPlaying);
-
-  // Update the ref when isPlaying changes
-  useEffect(() => {
-    isPlayingRef.current = isPlaying;
-  }, [isPlaying]);
-
   // Subscribe to slot changes
   useEffect(() => {
     if (!selectedNetwork) return;
 
     // Reset state when network changes to ensure fresh data
-    setCurrentTime(0);
     prefetchedSlotsRef.current = new Set();
 
     // Create a slot change callback
     const slotChangeCallback = (_network: string, newSlot: number, _previousSlot: number) => {
-      // Only update the head slot if we're in play mode
-      // This prevents real-world slot changes from affecting our visualization when paused
-      if (isPlayingRef.current) {
-        // Update the head slot
-        setHeadSlot(newSlot);
-
-        // NOTE: We don't reset time here - we'll handle that in the slotNumber effect
-      }
+      // Update the head slot
+      setHeadSlot(newSlot);
     };
 
     // Subscribe to slot changes
@@ -133,8 +112,6 @@ export default function BlockProductionLivePage() {
   }, [selectedNetwork, getBeaconClock, getHeadLagSlots, subscribeToSlotChanges]);
 
   const [displaySlotOffset, setDisplaySlotOffset] = useState<number>(0); // 0 is current, -1 is previous, etc.
-  const [currentTime, setCurrentTime] = useState<number>(0); // ms into slot
-  // isPlaying is already defined above (line 66)
 
   // Update the isAtLivePositionRef whenever displaySlotOffset changes
   useEffect(() => {
@@ -294,9 +271,6 @@ export default function BlockProductionLivePage() {
 
     // Function to check if we should prefetch - avoids calling hooks inside
     const checkAndPrefetch = () => {
-      // Only prefetch if we're playing - prevents unwanted slot changes while paused
-      if (!isPlayingRef.current) return;
-
       // Get current time in slot (milliseconds)
       // Use the correct method from BeaconClock to calculate time in slot
       const slotDuration = 12000; // 12 seconds in ms
@@ -313,8 +287,8 @@ export default function BlockProductionLivePage() {
       prefetchAtTimerThreshold(nextDisplaySlot, timeToNextSlot, timeInSlot);
     };
 
-    // Run the check every 100ms
-    const intervalId = setInterval(checkAndPrefetch, 100);
+    // Run the check every 1000ms (reduced from 100ms since we're using TimelineProvider for animations)
+    const intervalId = setInterval(checkAndPrefetch, 1000);
 
     // Initial prefetch of current and next slots when component mounts or network changes
     if (headSlot !== null) {
@@ -382,14 +356,11 @@ export default function BlockProductionLivePage() {
     // Reset to the live position
     setDisplaySlotOffset(0);
 
-    // Reset the time counter to 0 for the new slot
-    setCurrentTime(0);
-
-    // Ensure we're in playing state
-    setIsPlaying(true);
+    // Reset transition state
+    setIsTransitioning(false);
   }, [headSlot, slotNumber, displaySlotOffset, headLagSlots, prefetchSlotData]);
+  
   const isNextDisabled = displaySlotOffset >= 0;
-  const togglePlayPause = React.useCallback(() => setIsPlaying(prev => !prev), []);
 
   const { data: slotData, isLoading: isSlotLoading } = useQuery<BeaconSlotData>({
     queryKey: ['block-production-live', 'slot', selectedNetwork, slotNumber],
@@ -434,42 +405,9 @@ export default function BlockProductionLivePage() {
     enabled: slotNumber !== null,
   });
 
-  // Simple time counter - pure React
-  useEffect(() => {
-    let currentTime = 0;
-
-    // Simple interval to count time
-    const interval = setInterval(() => {
-      // Only increment if playing
-      if (isPlaying) {
-        // Increment by 100ms
-        currentTime += 100;
-
-        // Reset at 12 seconds and advance to next slot if at live position
-        if (currentTime > 12000) {
-          currentTime = 0;
-
-          // If we're at live position (current slot), auto-advance to the next slot
-          // by incrementing the head slot (simulating what would happen when the real slot changes)
-          if (displaySlotOffset === 0 && !isTransitioning && headSlot !== null) {
-            setHeadSlot(headSlot + 1);
-          }
-        }
-
-        // Update React state only
-        setCurrentTime(currentTime);
-      }
-    }, 100);
-
-    return () => clearInterval(interval);
-  }, [slotNumber, isPlaying, displaySlotOffset, isTransitioning, headSlot]);
-
   // Normal playback enablement
   useEffect(() => {
     if (slotNumber === null) return;
-
-    // Auto-start playback on slot change
-    setIsPlaying(true);
 
     // Reset transition state
     setIsTransitioning(false);
@@ -651,11 +589,6 @@ export default function BlockProductionLivePage() {
     return bidsForVisualizer.sort((a, b) => a.time - b.time);
   }, [slotData?.relayBids, winningBidData]);
 
-  // Dynamically filter bids based on current time
-  const transformedBids = useMemo(() => {
-    return getTransformedBids(allTransformedBids, currentTime, winningBidData);
-  }, [allTransformedBids, currentTime, winningBidData]);
-
   const timeRange = {
     min: -12000,
     max: 12000,
@@ -663,11 +596,11 @@ export default function BlockProductionLivePage() {
   };
 
   const valueRange = useMemo(() => {
-    if (transformedBids.length === 0) return { min: 0, max: 1 };
-    const values = transformedBids.map(b => b.value);
+    if (allTransformedBids.length === 0) return { min: 0, max: 1 };
+    const values = allTransformedBids.map(b => b.value);
     const maxVal = Math.max(...values);
     return { min: 0, max: maxVal * 1.1 };
-  }, [transformedBids]);
+  }, [allTransformedBids]);
 
   // Empty arrays for displaying when no real data
   const emptyBids: BidData[] = [];
@@ -675,114 +608,109 @@ export default function BlockProductionLivePage() {
 
   return (
     <div className="flex flex-col h-full bg-base">
-      {/* Conditionally render mobile or desktop view based on screen size */}
-      {isMobile ? (
-        // Mobile View
-        <div className="px-2 py-1">
-          <div
-            className={`transition-opacity duration-300 ${isSlotLoading ? 'opacity-70' : 'opacity-100'}`}
-          >
-            <MobileBlockProductionView
-              bids={slotData ? transformedBids : emptyBids}
-              currentTime={currentTime}
-              relayColors={slotData ? relayColors : emptyRelayColors}
-              winningBid={slotData ? winningBidData : null}
-              slot={slotNumber || undefined}
-              proposer={slotData?.proposer}
-              proposerEntity="TODO"
-              nodes={slotData?.nodes || {}}
-              // blockTime={} - TODO: Add block time
-              nodeBlockSeen={
-                slotData?.timings?.blockSeen
-                  ? Object.fromEntries(
-                      Object.entries(slotData.timings.blockSeen).map(([node, time]) => [
-                        node,
-                        typeof time === 'bigint' ? Number(time) : Number(time),
-                      ]),
-                    )
-                  : {}
-              }
-              nodeBlockP2P={
-                slotData?.timings?.blockFirstSeenP2p
-                  ? Object.fromEntries(
-                      Object.entries(slotData.timings.blockFirstSeenP2p).map(([node, time]) => [
-                        node,
-                        typeof time === 'bigint' ? Number(time) : Number(time),
-                      ]),
-                    )
-                  : {}
-              }
-              slotData={slotData} // Pass slot data with attestation info
-              // Navigation controls
-              slotNumber={slotNumber}
-              headLagSlots={headLagSlots}
-              displaySlotOffset={displaySlotOffset}
-              isPlaying={isPlaying}
-              goToPreviousSlot={goToPreviousSlot}
-              goToNextSlot={goToNextSlot}
-              resetToCurrentSlot={resetToCurrentSlot}
-              togglePlayPause={togglePlayPause}
-              isNextDisabled={isNextDisabled}
-              network={selectedNetwork} // Pass network to MobileBlockProductionView
-              isLocallyBuilt={isLocallyBuilt}
-            />
+      {/* Wrap with TimelineProvider */}
+      <TimelineProvider network={selectedNetwork} slotOffset={displaySlotOffset}>
+        {/* Conditionally render mobile or desktop view based on screen size */}
+        {isMobile ? (
+          // Mobile View
+          <div className="px-2 py-1">
+            <div
+              className={`transition-opacity duration-300 ${isSlotLoading ? 'opacity-70' : 'opacity-100'}`}
+            >
+              <MobileBlockProductionView
+                bids={slotData ? allTransformedBids : emptyBids}
+                relayColors={slotData ? relayColors : emptyRelayColors}
+                winningBid={slotData ? winningBidData : null}
+                slot={slotNumber || undefined}
+                proposer={slotData?.proposer}
+                proposerEntity="TODO"
+                nodes={slotData?.nodes || {}}
+                nodeBlockSeen={
+                  slotData?.timings?.blockSeen
+                    ? Object.fromEntries(
+                        Object.entries(slotData.timings.blockSeen).map(([node, time]) => [
+                          node,
+                          typeof time === 'bigint' ? Number(time) : Number(time),
+                        ]),
+                      )
+                    : {}
+                }
+                nodeBlockP2P={
+                  slotData?.timings?.blockFirstSeenP2p
+                    ? Object.fromEntries(
+                        Object.entries(slotData.timings.blockFirstSeenP2p).map(([node, time]) => [
+                          node,
+                          typeof time === 'bigint' ? Number(time) : Number(time),
+                        ]),
+                      )
+                    : {}
+                }
+                slotData={slotData} // Pass slot data with attestation info
+                // Navigation controls
+                slotNumber={slotNumber}
+                headLagSlots={headLagSlots}
+                displaySlotOffset={displaySlotOffset}
+                goToPreviousSlot={goToPreviousSlot}
+                goToNextSlot={goToNextSlot}
+                resetToCurrentSlot={resetToCurrentSlot}
+                isNextDisabled={isNextDisabled}
+                network={selectedNetwork}
+                isLocallyBuilt={isLocallyBuilt}
+              />
+            </div>
           </div>
-        </div>
-      ) : (
-        // Desktop View
-        <div className="h-full">
-          <div
-            className={`transition-opacity duration-300 h-full ${isSlotLoading ? 'opacity-70' : 'opacity-100'}`}
-          >
-            <DesktopBlockProductionView
-              bids={slotData ? transformedBids : emptyBids}
-              currentTime={currentTime}
-              relayColors={slotData ? relayColors : emptyRelayColors}
-              winningBid={slotData ? winningBidData : null}
-              slot={slotNumber || undefined}
-              proposer={slotData?.proposer}
-              proposerEntity="TODO"
-              nodes={slotData?.nodes || {}}
-              // blockTime={} - TODO: Add block time
-              nodeBlockSeen={
-                slotData?.timings?.blockSeen
-                  ? Object.fromEntries(
-                      Object.entries(slotData.timings.blockSeen).map(([node, time]) => [
-                        node,
-                        typeof time === 'bigint' ? Number(time) : Number(time),
-                      ]),
-                    )
-                  : {}
-              }
-              nodeBlockP2P={
-                slotData?.timings?.blockFirstSeenP2p
-                  ? Object.fromEntries(
-                      Object.entries(slotData.timings.blockFirstSeenP2p).map(([node, time]) => [
-                        node,
-                        typeof time === 'bigint' ? Number(time) : Number(time),
-                      ]),
-                    )
-                  : {}
-              }
-              slotData={slotData}
-              timeRange={timeRange}
-              valueRange={valueRange}
-              // Navigation controls
-              slotNumber={slotNumber}
-              headLagSlots={headLagSlots}
-              displaySlotOffset={displaySlotOffset}
-              isPlaying={isPlaying}
-              goToPreviousSlot={goToPreviousSlot}
-              goToNextSlot={goToNextSlot}
-              resetToCurrentSlot={resetToCurrentSlot}
-              togglePlayPause={togglePlayPause}
-              isNextDisabled={isNextDisabled}
-              network={selectedNetwork} // Pass network to DesktopBlockProductionView
-              isLocallyBuilt={isLocallyBuilt}
-            />
+        ) : (
+          // Desktop View
+          <div className="h-full">
+            <div
+              className={`transition-opacity duration-300 h-full ${isSlotLoading ? 'opacity-70' : 'opacity-100'}`}
+            >
+              <DesktopBlockProductionView
+                bids={slotData ? allTransformedBids : emptyBids}
+                relayColors={slotData ? relayColors : emptyRelayColors}
+                winningBid={slotData ? winningBidData : null}
+                slot={slotNumber || undefined}
+                proposer={slotData?.proposer}
+                proposerEntity="TODO"
+                nodes={slotData?.nodes || {}}
+                nodeBlockSeen={
+                  slotData?.timings?.blockSeen
+                    ? Object.fromEntries(
+                        Object.entries(slotData.timings.blockSeen).map(([node, time]) => [
+                          node,
+                          typeof time === 'bigint' ? Number(time) : Number(time),
+                        ]),
+                      )
+                    : {}
+                }
+                nodeBlockP2P={
+                  slotData?.timings?.blockFirstSeenP2p
+                    ? Object.fromEntries(
+                        Object.entries(slotData.timings.blockFirstSeenP2p).map(([node, time]) => [
+                          node,
+                          typeof time === 'bigint' ? Number(time) : Number(time),
+                        ]),
+                      )
+                    : {}
+                }
+                slotData={slotData}
+                timeRange={timeRange}
+                valueRange={valueRange}
+                // Navigation controls
+                slotNumber={slotNumber}
+                headLagSlots={headLagSlots}
+                displaySlotOffset={displaySlotOffset}
+                goToPreviousSlot={goToPreviousSlot}
+                goToNextSlot={goToNextSlot}
+                resetToCurrentSlot={resetToCurrentSlot}
+                isNextDisabled={isNextDisabled}
+                network={selectedNetwork}
+                isLocallyBuilt={isLocallyBuilt}
+              />
+            </div>
           </div>
-        </div>
-      )}
+        )}
+      </TimelineProvider>
     </div>
   );
 }

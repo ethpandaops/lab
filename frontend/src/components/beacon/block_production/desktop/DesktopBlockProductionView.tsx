@@ -7,6 +7,8 @@ import PhaseIcons from '../common/PhaseIcons';
 import BuildersRelaysPanel from './BuildersRelaysPanel';
 import ContinentsList from './ContinentsList';
 import { BeaconSlotData } from '@/api/gen/backend/pkg/server/proto/beacon_slots/beacon_slots_pb';
+import useTimeline from '@/contexts/timeline';
+
 // Define the flow animation styles
 const flowAnimations = `
   @keyframes flowRight {
@@ -23,7 +25,7 @@ const flowAnimations = `
   }
 `;
 
-interface DesktopBlockProductionViewProps extends BlockProductionBaseProps {
+interface DesktopBlockProductionViewProps extends Omit<BlockProductionBaseProps, 'currentTime'> {
   slotData?: BeaconSlotData;
   valueRange?: {
     min: number;
@@ -41,11 +43,9 @@ interface DesktopBlockProductionViewProps extends BlockProductionBaseProps {
   slotNumber: number | null;
   headLagSlots: number;
   displaySlotOffset: number;
-  isPlaying: boolean;
   goToPreviousSlot: () => void;
   goToNextSlot: () => void;
   resetToCurrentSlot: () => void;
-  togglePlayPause: () => void;
   isNextDisabled: boolean;
   network: string; // Add network prop for builder names lookup
   isLocallyBuilt?: boolean;
@@ -53,7 +53,6 @@ interface DesktopBlockProductionViewProps extends BlockProductionBaseProps {
 
 const DesktopBlockProductionView: React.FC<DesktopBlockProductionViewProps> = ({
   bids,
-  currentTime,
   relayColors,
   winningBid,
   proposer,
@@ -67,15 +66,16 @@ const DesktopBlockProductionView: React.FC<DesktopBlockProductionViewProps> = ({
   slotNumber,
   headLagSlots,
   displaySlotOffset,
-  isPlaying,
   goToPreviousSlot,
   goToNextSlot,
   resetToCurrentSlot,
-  togglePlayPause,
   isNextDisabled,
   network,
   isLocallyBuilt = false,
 }) => {
+  // Get currentTime from the timeline context
+  const { currentTimeMs, isPlaying, togglePlayPause } = useTimeline();
+  
   // Get active status based on role and phase
   const isActive = (role: 'builder' | 'relay' | 'proposer' | 'node') => {
     // Determine transition point - when first node saw block or fallback to 5s
@@ -125,23 +125,21 @@ const DesktopBlockProductionView: React.FC<DesktopBlockProductionViewProps> = ({
 
       case 'proposer':
         // Proposer activates just before transition to propagation and stays active
-        return currentTime >= transitionTime - 500;
+        return currentTimeMs >= transitionTime - 500;
 
       case 'node':
         // Nodes activate at the transition point and stays active
-        return currentTime >= transitionTime;
+        return currentTimeMs >= transitionTime;
     }
 
     // Function should never reach here since all cases are handled above
     return false;
   };
 
-  // No debug needed
-
   // Get the current phase
   const currentPhase = useMemo(() => {
-    return getCurrentPhase(currentTime, nodeBlockSeen || {}, nodeBlockP2P || {}, blockTime);
-  }, [currentTime, nodeBlockSeen, nodeBlockP2P, blockTime]);
+    return getCurrentPhase(currentTimeMs, nodeBlockSeen || {}, nodeBlockP2P || {}, blockTime);
+  }, [currentTimeMs, nodeBlockSeen, nodeBlockP2P, blockTime]);
 
   // Calculate which continent saw the block first
   const firstContinentToSeeBlock = useMemo(() => {
@@ -189,7 +187,7 @@ const DesktopBlockProductionView: React.FC<DesktopBlockProductionViewProps> = ({
     // Process API timings
     Object.entries(nodeBlockSeen1).forEach(([nodeId, time]) => {
       const continent = nodeContinent[nodeId];
-      if (continent && typeof time === 'number' && time <= currentTime) {
+      if (continent && typeof time === 'number' && time <= currentTimeMs) {
         if (!continentTimings[continent] || time < continentTimings[continent]) {
           continentTimings[continent] = time;
         }
@@ -199,7 +197,7 @@ const DesktopBlockProductionView: React.FC<DesktopBlockProductionViewProps> = ({
     // Process P2P timings
     Object.entries(nodeBlockP2P1).forEach(([nodeId, time]) => {
       const continent = nodeContinent[nodeId];
-      if (continent && typeof time === 'number' && time <= currentTime) {
+      if (continent && typeof time === 'number' && time <= currentTimeMs) {
         if (!continentTimings[continent] || time < continentTimings[continent]) {
           continentTimings[continent] = time;
         }
@@ -219,7 +217,7 @@ const DesktopBlockProductionView: React.FC<DesktopBlockProductionViewProps> = ({
 
     // Return full continent name if available
     return earliestContinent ? continentNames[earliestContinent] || earliestContinent : null;
-  }, [nodeBlockSeen, nodeBlockP2P, nodes, currentTime]);
+  }, [nodeBlockSeen, nodeBlockP2P, nodes, currentTimeMs]);
 
   // Determine if we should show the timeline based on whether we're on the live page
   // If goToPreviousSlot is not provided, we're likely on the specific slot page
@@ -238,7 +236,6 @@ const DesktopBlockProductionView: React.FC<DesktopBlockProductionViewProps> = ({
         {showTimeline && (
           <div className="px-4 py-3">
             <PhaseTimeline
-              currentTime={currentTime}
               nodeBlockSeen={nodeBlockSeen}
               nodeBlockP2P={nodeBlockP2P}
               blockTime={blockTime}
@@ -248,12 +245,10 @@ const DesktopBlockProductionView: React.FC<DesktopBlockProductionViewProps> = ({
               slotNumber={slotNumber}
               headLagSlots={headLagSlots}
               displaySlotOffset={displaySlotOffset}
-              isPlaying={isPlaying}
               isMobile={false} // Desktop view is never mobile
               goToPreviousSlot={goToPreviousSlot}
               goToNextSlot={goToNextSlot}
               resetToCurrentSlot={resetToCurrentSlot}
-              togglePlayPause={togglePlayPause}
               isNextDisabled={isNextDisabled}
             />
           </div>
@@ -262,7 +257,7 @@ const DesktopBlockProductionView: React.FC<DesktopBlockProductionViewProps> = ({
         {/* Phase Icons Section */}
         <div className="px-4 py-8 bg-surface/50">
           <PhaseIcons
-            currentTime={currentTime}
+            currentTime={currentTimeMs}
             nodeBlockSeen={nodeBlockSeen}
             nodeBlockP2P={nodeBlockP2P}
             blockTime={blockTime}
@@ -287,7 +282,7 @@ const DesktopBlockProductionView: React.FC<DesktopBlockProductionViewProps> = ({
         <div className="w-1/5 overflow-hidden">
           <BuildersRelaysPanel
             bids={bids}
-            currentTime={currentTime}
+            currentTime={currentTimeMs}
             relayColors={relayColors}
             winningBid={winningBid}
             isBuilderActive={isActive('builder')}
@@ -302,7 +297,7 @@ const DesktopBlockProductionView: React.FC<DesktopBlockProductionViewProps> = ({
           <BlockchainVisualization
             currentSlot={slotNumber}
             network={network}
-            currentTime={currentTime}
+            currentTime={currentTimeMs}
             nodeBlockSeen={nodeBlockSeen}
             nodeBlockP2P={nodeBlockP2P}
             blockTime={blockTime}
@@ -318,7 +313,7 @@ const DesktopBlockProductionView: React.FC<DesktopBlockProductionViewProps> = ({
             nodes={nodes}
             nodeBlockSeen={nodeBlockSeen}
             nodeBlockP2P={nodeBlockP2P}
-            currentTime={currentTime}
+            currentTime={currentTimeMs}
             isActive={isActive('node')}
           />
         </div>

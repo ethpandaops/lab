@@ -5,17 +5,16 @@ import { countUniqueBuilderPubkeys } from '../common/utils';
 import MobileTimelineBar from './MobileTimelineBar';
 import StageCard from './StageCard';
 import MobileContinentsPanel from './MobileContinentsPanel';
+import useTimeline from '@/contexts/timeline';
 
 interface MobileBlockProductionViewProps extends BlockProductionBaseProps {
   // Navigation controls for merged timeline
   slotNumber: number | null;
   headLagSlots: number;
   displaySlotOffset: number;
-  isPlaying: boolean;
   goToPreviousSlot: () => void;
   goToNextSlot: () => void;
   resetToCurrentSlot: () => void;
-  togglePlayPause: () => void;
   isNextDisabled: boolean;
   network: string; // Add network parameter for blockchain visualization
   slotData?: any; // Add slot data with attestation info (same as in desktop view)
@@ -37,16 +36,17 @@ const MobileBlockProductionView: React.FC<MobileBlockProductionViewProps> = ({
   slotNumber,
   headLagSlots,
   displaySlotOffset,
-  isPlaying,
   goToPreviousSlot,
   goToNextSlot,
   resetToCurrentSlot,
-  togglePlayPause,
   isNextDisabled,
   network,
   slotData,
   isLocallyBuilt = false,
 }) => {
+  // Get time and play state from context
+  const { currentTimeMs, isPlaying, togglePlayPause } = useTimeline();
+  currentTime = currentTimeMs;
   // Get active status based on role and phase
   const isActive = (role: 'builder' | 'relay' | 'proposer' | 'node' | 'attester') => {
     // Determine transition point - when first node saw block or fallback to 5s

@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { getCurrentPhase } from '../common/PhaseUtils';
 import { Phase } from '../common/types';
+import useTimeline from '@/contexts/timeline';
 
 interface MobileTimelineBarProps {
   currentTime: number;
@@ -15,11 +16,9 @@ interface MobileTimelineBarProps {
   slotNumber: number | null;
   headLagSlots: number;
   displaySlotOffset: number;
-  isPlaying: boolean;
   goToPreviousSlot: () => void;
   goToNextSlot: () => void;
   resetToCurrentSlot: () => void;
-  togglePlayPause: () => void;
   isNextDisabled: boolean;
 }
 
@@ -34,13 +33,23 @@ const MobileTimelineBar: React.FC<MobileTimelineBarProps> = ({
   // Navigation controls
   slotNumber,
   displaySlotOffset,
-  isPlaying,
   goToPreviousSlot,
   goToNextSlot,
   resetToCurrentSlot,
-  togglePlayPause,
   isNextDisabled,
 }) => {
+  // Get timeline state from context
+  const { currentTimeMs, displayTimeMs, isPlaying, togglePlayPause } = useTimeline();
+  currentTime = currentTimeMs;
+
+  // Track previous time for reset detection
+  const [previousTimeMs, setPreviousTimeMs] = React.useState(currentTimeMs);
+  const isReset = previousTimeMs > currentTimeMs && previousTimeMs > 11000;
+
+  // Update previous time after checking for resets
+  React.useEffect(() => {
+    setPreviousTimeMs(currentTimeMs);
+  }, [currentTimeMs]);
   // Get the current phase
   const currentPhase = useMemo(() => {
     return getCurrentPhase(
@@ -361,7 +370,7 @@ const MobileTimelineBar: React.FC<MobileTimelineBarProps> = ({
             {phaseText}
           </span>
         </div>
-        <div className="font-mono text-xs text-white">{(currentTime / 1000).toFixed(1)}s</div>
+        <div className="font-mono text-xs text-white">{(displayTimeMs / 1000).toFixed(1)}s</div>
       </div>
 
       {/* Phase indicators - Mini icons for all phases */}
@@ -547,31 +556,16 @@ const MobileTimelineBar: React.FC<MobileTimelineBarProps> = ({
           />
         </div>
 
-        {/* Progress overlay on phases - using linear time progression */}
+        {/* Time indicator tick */}
         <div
-          className="absolute top-2 left-0 h-2 bg-active/20 transition-width duration-100 rounded-l-lg"
+          className="absolute top-2 h-2 bg-white"
           style={{
-            width: `${(currentTime / (slotData?.network?.config?.SECONDS_PER_SLOT ? slotData.network.config.SECONDS_PER_SLOT * 1000 : 12000)) * 100}%`,
-            maxWidth: '100%', // Stay within container boundaries
+            width: '2px',
+            left: `${(currentTime / (slotData?.network?.config?.SECONDS_PER_SLOT ? slotData.network.config.SECONDS_PER_SLOT * 1000 : 12000)) * 100}%`,
+            boxShadow: '0 0 5px rgba(255, 255, 255, 0.8)',
+            transition: isReset ? 'none' : 'left 250ms linear',
           }}
         />
-
-        {/* Current time slider indicator - prominently displayed */}
-        <div
-          className="absolute top-2 h-2 bg-active/80 transition-all duration-100"
-          style={{
-            left: `${(currentTime / (slotData?.network?.config?.SECONDS_PER_SLOT ? slotData.network.config.SECONDS_PER_SLOT * 1000 : 12000)) * 100}%`,
-            width: '2px',
-            boxShadow: '0 0 8px 2px rgba(255, 255, 255, 0.5)',
-          }}
-        >
-          <div
-            className="absolute top-0 w-3 h-3 bg-white rounded-full transform -translate-x-1/2 -translate-y-1/2 opacity-70"
-            style={{
-              boxShadow: '0 0 6px 2px rgba(255, 255, 255, 0.8)',
-            }}
-          ></div>
-        </div>
 
         {/* Time markers - dynamic based on slot duration */}
         <div className="flex justify-between text-[9px] font-mono text-tertiary/60 px-1">

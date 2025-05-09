@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Phase } from './types';
+import useTimeline from '@/contexts/timeline';
 import { getCurrentPhase } from './PhaseUtils';
 
 interface PhaseTimelineProps {
-  currentTime: number;
   nodeBlockSeen: Record<string, number>;
   nodeBlockP2P: Record<string, number>;
   blockTime?: number;
@@ -14,17 +14,14 @@ interface PhaseTimelineProps {
   slotNumber: number | null;
   headLagSlots: number;
   displaySlotOffset: number;
-  isPlaying: boolean;
   isMobile: boolean;
   goToPreviousSlot: () => void;
   goToNextSlot: () => void;
   resetToCurrentSlot: () => void;
-  togglePlayPause: () => void;
   isNextDisabled: boolean;
 }
 
 const PhaseTimeline: React.FC<PhaseTimelineProps> = ({
-  currentTime,
   nodeBlockSeen,
   nodeBlockP2P,
   blockTime,
@@ -34,14 +31,15 @@ const PhaseTimeline: React.FC<PhaseTimelineProps> = ({
   slotNumber,
   headLagSlots,
   displaySlotOffset,
-  isPlaying,
   isMobile,
   goToPreviousSlot,
   goToNextSlot,
   resetToCurrentSlot,
-  togglePlayPause,
   isNextDisabled,
 }) => {
+  // Use timeline context
+  const { currentTimeMs, displayTimeMs, isPlaying, togglePlayPause } = useTimeline();
+  
   // CRITICAL FIX: Use startMs/endMs instead of inclusionDelay!
   // Calculate which attestation windows have already happened by the current time
   const filteredAttestationWindows =
@@ -50,7 +48,7 @@ const PhaseTimeline: React.FC<PhaseTimelineProps> = ({
       const startMs = window.startMs ? Number(window.startMs) : Infinity;
 
       // Check if this window is before the current time using startMs
-      return startMs <= currentTime;
+      return startMs <= currentTimeMs;
     }) || [];
 
   // Count attestations from windows that have occurred at or before the current time
@@ -66,7 +64,7 @@ const PhaseTimeline: React.FC<PhaseTimelineProps> = ({
 
   // Calculate the current phase
   const currentPhase = getCurrentPhase(
-    currentTime,
+    currentTimeMs,
     nodeBlockSeen,
     nodeBlockP2P,
     blockTime,
@@ -80,6 +78,38 @@ const PhaseTimeline: React.FC<PhaseTimelineProps> = ({
       onPhaseChange(currentPhase);
     }
   }, [currentPhase, onPhaseChange]);
+
+  // Track renders to ensure we're not re-rendering too frequently
+  const lastRenderRef = React.useRef<number>(Date.now());
+  const lastLogTimeRef = React.useRef<number>(Date.now());
+
+  React.useEffect(() => {
+    const now = Date.now();
+    const timeSinceLastRender = now - lastRenderRef.current;
+
+      // Update the last log time
+    lastLogTimeRef.current = now;
+
+    lastRenderRef.current = now;
+  });
+
+  // Format the time display with seconds and milliseconds
+  const formatTime = (ms: number) => {
+    const seconds = Math.floor(ms / 1000);
+    // Only show milliseconds to 1 decimal place for readability (100ms precision)
+    const decimal = Math.floor((ms % 1000) / 100);
+    return `${seconds}.${decimal}s`;
+  };
+
+  // Keep track of the previous time value to detect resets
+  const [previousTimeMs, setPreviousTimeMs] = React.useState(currentTimeMs);
+  const isReset = previousTimeMs > currentTimeMs && previousTimeMs > 11000;
+
+  // Update previous time after checking for resets
+  React.useEffect(() => {
+
+    setPreviousTimeMs(currentTimeMs);
+  }, [currentTimeMs, isReset]);
 
   // REQUIREMENT 1: If we don't have a phase, use Building phase instead of showing "Waiting for data..."
   // This prevents the "Waiting for data..." message at the start of slots
@@ -173,7 +203,7 @@ const PhaseTimeline: React.FC<PhaseTimelineProps> = ({
             <div className="flex items-center gap-2 mt-1 mb-1">
               <div className="bg-surface/40 border border-subtle/50 px-3 py-1 rounded-md flex items-center">
                 <span className="font-mono text-base font-semibold text-primary">
-                  {(currentTime / 1000).toFixed(1)}s
+                  {formatTime(displayTimeMs)}
                 </span>
               </div>
               <button
@@ -223,7 +253,7 @@ const PhaseTimeline: React.FC<PhaseTimelineProps> = ({
           <div
             className="absolute top-0 h-3 bg-orange-500/30 rounded-l-lg border-r-2 border-white/40"
             style={{
-              width: `${(currentTime / 12000) * 100}%`,
+              width: `${(currentTimeMs / 12000) * 100}%`,
               maxWidth: 'calc(100% - 4px)', // Stay within container boundaries
               willChange: 'width', // Performance hint
             }}
@@ -233,7 +263,7 @@ const PhaseTimeline: React.FC<PhaseTimelineProps> = ({
           <div
             className="absolute top-0 h-3"
             style={{
-              left: `${(currentTime / 12000) * 100}%`,
+              left: `${(currentTimeMs / 12000) * 100}%`,
               transform: 'translateX(-50%)',
               willChange: 'left', // Performance hint
             }}
@@ -456,7 +486,7 @@ const PhaseTimeline: React.FC<PhaseTimelineProps> = ({
           <div className="flex items-center gap-2 mt-1 mb-1">
             <div className="bg-surface/40 border border-subtle/50 px-3 py-1 rounded-md flex items-center">
               <span className="font-mono text-base font-semibold text-primary">
-                {(currentTime / 1000).toFixed(1)}s
+                {formatTime(displayTimeMs)}
               </span>
             </div>
             <button
@@ -497,7 +527,7 @@ const PhaseTimeline: React.FC<PhaseTimelineProps> = ({
 
       <div className="relative mt-2">
         {/* Four-phase progress bar: Building → Propagating → Attesting → Accepted */}
-        <div className="h-3 mb-2 flex rounded-lg overflow-hidden border border-border shadow-inner relative">
+        <div className="h-3 mb-2 flex rounded-lg overflow-hidden border border-border/30 shadow-inner relative">
           {/* Building phase */}
           <div
             className="border-r border-white/10 shadow-inner"
@@ -573,33 +603,19 @@ const PhaseTimeline: React.FC<PhaseTimelineProps> = ({
           />
         </div>
 
-        {/* Progress overlay - using linear time progression with no transitions */}
+        {/* Time indicator tick */}
         <div
-          className="absolute top-0 h-3 bg-active/30 rounded-l-lg border-r-2 border-white"
+          className="absolute top-0 h-3 bg-white"
           style={{
-            width: `${(currentTime / 12000) * 100}%`,
-            maxWidth: 'calc(100% - 4px)', // Stay within container boundaries
-            willChange: 'width', // Performance hint to browser
+            width: '4px',
+            left: `calc(${(currentTimeMs / 12000) * 100}% - 2px)`,
+            willChange: 'left',
+            transition: isReset ? 'none' : 'left 250ms linear',
+            boxShadow: '0 0 5px rgba(255, 255, 255, 0.8)',
           }}
         />
 
-        {/* Current time indicator with glowing dot - no transitions for crisp movement */}
-        <div
-          className="absolute top-0 h-3"
-          style={{
-            left: `calc(${(currentTime / 12000) * 100}%)`,
-            transform: 'translateX(-50%)',
-            willChange: 'left', // Performance hint to browser
-          }}
-        >
-          <div
-            className="w-5 h-5 bg-white rounded-full -translate-y-1/3 opacity-90"
-            style={{
-              boxShadow:
-                '0 0 10px 3px rgba(255, 255, 255, 0.8), 0 0 20px 5px rgba(255, 255, 255, 0.4)',
-            }}
-          ></div>
-        </div>
+        {/* We've removed the dot and are using a wider progress bar instead */}
 
         {/* Time markers with ticks */}
         <div className="flex justify-between mt-1 px-1 relative">
