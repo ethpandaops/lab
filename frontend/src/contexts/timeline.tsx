@@ -171,7 +171,6 @@ export const TimelineProvider: React.FC<TimelineProviderProps> = ({
               lastTimeDisplayUpdateRef.current = now;
 
               setCurrentSlot(currentSlot + 1);
-              console.log('🔄 Simulated slot complete - advancing to next slot and resetting timeline to 0');
             }
           }
 
@@ -222,11 +221,8 @@ export const TimelineProvider: React.FC<TimelineProviderProps> = ({
     const intervalId = setInterval(() => {
       const now = Date.now();
 
-      // Log every 5000ms to avoid console spam
-      if (now - lastLogTimeRef.current > 5000) {
-        console.log('⏱️ TimelineProvider update intervals: internal=10ms, animation=250ms, display=10ms (rounded)');
-        lastLogTimeRef.current = now;
-      }
+      // Update last log time
+      lastLogTimeRef.current = now;
 
       updateTime();
     }, 10); // Much more frequent updates for smoother animation

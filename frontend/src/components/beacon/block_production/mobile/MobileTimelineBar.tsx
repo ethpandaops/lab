@@ -40,7 +40,6 @@ const MobileTimelineBar: React.FC<MobileTimelineBarProps> = ({
 }) => {
   // Get timeline state from context
   const { currentTimeMs, displayTimeMs, isPlaying, togglePlayPause } = useTimeline();
-  // Override currentTime with the one from TimelineProvider
   currentTime = currentTimeMs;
 
   // Track previous time for reset detection
@@ -557,14 +556,13 @@ const MobileTimelineBar: React.FC<MobileTimelineBarProps> = ({
           />
         </div>
 
-        {/* Tick marker - using the new approach with just a vertical line */}
+        {/* Time indicator tick */}
         <div
           className="absolute top-2 h-2 bg-white"
           style={{
             width: '2px',
             left: `${(currentTime / (slotData?.network?.config?.SECONDS_PER_SLOT ? slotData.network.config.SECONDS_PER_SLOT * 1000 : 12000)) * 100}%`,
-            boxShadow: '0 0 5px rgba(255, 255, 255, 0.8)', // Add glow effect
-            // Only apply transition when not resetting to beginning of slot
+            boxShadow: '0 0 5px rgba(255, 255, 255, 0.8)',
             transition: isReset ? 'none' : 'left 250ms linear',
           }}
         />

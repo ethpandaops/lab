@@ -44,9 +44,8 @@ const MobileBlockProductionView: React.FC<MobileBlockProductionViewProps> = ({
   slotData,
   isLocallyBuilt = false,
 }) => {
-  // Import useTimeline hook to get time and play state from the TimelineProvider
+  // Get time and play state from context
   const { currentTimeMs, isPlaying, togglePlayPause } = useTimeline();
-  // Override currentTime with the one from TimelineProvider
   currentTime = currentTimeMs;
   // Get active status based on role and phase
   const isActive = (role: 'builder' | 'relay' | 'proposer' | 'node' | 'attester') => {

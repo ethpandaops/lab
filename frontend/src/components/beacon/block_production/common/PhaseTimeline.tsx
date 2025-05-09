@@ -87,11 +87,8 @@ const PhaseTimeline: React.FC<PhaseTimelineProps> = ({
     const now = Date.now();
     const timeSinceLastRender = now - lastRenderRef.current;
 
-    // Only log every 5 seconds to avoid console spam
-    if (now - lastLogTimeRef.current > 5000) {
-      console.log(`🔄 PhaseTimeline rendered. Average render interval: ${timeSinceLastRender}ms (target: 250ms). CSS transitions handle the smooth animation between renders.`);
-      lastLogTimeRef.current = now;
-    }
+      // Update the last log time
+    lastLogTimeRef.current = now;
 
     lastRenderRef.current = now;
   });
@@ -110,10 +107,6 @@ const PhaseTimeline: React.FC<PhaseTimelineProps> = ({
 
   // Update previous time after checking for resets
   React.useEffect(() => {
-    // Log when a reset is detected (slot transition)
-    if (isReset) {
-      console.log('⏮️ Timeline reset detected! Disabling transitions for instant jump to slot start.');
-    }
 
     setPreviousTimeMs(currentTimeMs);
   }, [currentTimeMs, isReset]);
@@ -610,16 +603,15 @@ const PhaseTimeline: React.FC<PhaseTimelineProps> = ({
           />
         </div>
 
-        {/* Tick marker - only show a vertical line at the current position */}
+        {/* Time indicator tick */}
         <div
           className="absolute top-0 h-3 bg-white"
           style={{
             width: '4px',
             left: `calc(${(currentTimeMs / 12000) * 100}% - 2px)`,
-            willChange: 'left', // Performance hint to browser
-            // Only apply transition when not resetting to beginning of slot
+            willChange: 'left',
             transition: isReset ? 'none' : 'left 250ms linear',
-            boxShadow: '0 0 5px rgba(255, 255, 255, 0.8)', // Add glow effect
+            boxShadow: '0 0 5px rgba(255, 255, 255, 0.8)',
           }}
         />
 
