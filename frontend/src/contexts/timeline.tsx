@@ -145,8 +145,8 @@ export const TimelineProvider: React.FC<TimelineProviderProps> = ({
             setDisplayTimeMs(roundedDisplayTime);
           }
 
-          // Only update main React state (and cause re-renders) every 50ms
-          if (now - lastStateUpdateRef.current >= 50) {
+          // Only update main React state (and cause re-renders) every 100ms
+          if (now - lastStateUpdateRef.current >= 100) {
             setCurrentTimeMs(currentTime);
             lastStateUpdateRef.current = now;
           }
@@ -187,8 +187,8 @@ export const TimelineProvider: React.FC<TimelineProviderProps> = ({
             setDisplayTimeMs(roundedDisplayTime);
           }
 
-          // Only update main React state (and cause re-renders) every 50ms
-          if (now - lastStateUpdateRef.current >= 50) {
+          // Only update main React state (and cause re-renders) every 100ms
+          if (now - lastStateUpdateRef.current >= 100) {
             setCurrentTimeMs(simulatedTimeRef.current);
             lastStateUpdateRef.current = now;
           }
