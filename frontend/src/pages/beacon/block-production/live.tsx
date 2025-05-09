@@ -577,7 +577,6 @@ export default function BlockProductionLivePage() {
 
     // If no matching bid was found but we have delivered payloads
     if (deliveredRelays.length > 0) {
-      console.info('No matching bid found, but we have delivered payloads for:', executionPayloadBlockHash);
       return {
         blockHash: executionPayloadBlockHash,
         value: 0,

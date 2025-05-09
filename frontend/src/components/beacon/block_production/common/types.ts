@@ -32,7 +32,7 @@ export interface WinningBidData {
   value: number;
   relayName: string;
   builderPubkey?: string;
-  deliveredRelays?: string[]; // Array of relay names that delivered the payload
+  deliveredRelays?: string[];
 }
 
 export interface TimeRange {

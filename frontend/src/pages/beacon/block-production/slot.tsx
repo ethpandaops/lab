@@ -213,8 +213,7 @@ export default function BlockProductionSlotPage() {
 
     // If no matching bid was found but we have delivered payloads
     if (deliveredRelays.length > 0) {
-      console.info('No matching bid found, but we have delivered payloads for:', executionPayloadBlockHash);
-      return {
+        return {
         blockHash: executionPayloadBlockHash,
         value: 0,
         relayName: deliveredRelays[0], // Use the first relay as primary
@@ -222,7 +221,6 @@ export default function BlockProductionSlotPage() {
       };
     }
 
-    console.info('No matching bid or delivered payloads found for execution payload:', executionPayloadBlockHash);
     return null;
   }, [slotData?.relayBids, slotData?.block?.executionPayloadBlockHash, slotData?.deliveredPayloads]);
 
