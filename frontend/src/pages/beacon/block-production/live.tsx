@@ -487,8 +487,8 @@ export default function BlockProductionLivePage() {
   }, [slotData?.relayBids]);
 
   const winningBidData = useMemo(() => {
-    // We need both relay bids and a valid execution payload block hash to determine the winning bid
-    if (!slotData?.relayBids || !slotData?.block?.executionPayloadBlockHash) return null;
+    // We need a valid execution payload block hash to determine the winning bid
+    if (!slotData?.block?.executionPayloadBlockHash) return null;
 
     // The execution payload block hash is the definitive way to identify which bid won
     const executionPayloadBlockHash = slotData.block.executionPayloadBlockHash;
@@ -499,6 +499,28 @@ export default function BlockProductionLivePage() {
       typeof executionPayloadBlockHash !== 'string' ||
       executionPayloadBlockHash.length < 10
     ) {
+      return null;
+    }
+
+    // Extract delivered relay names from deliveredPayloads
+    const deliveredRelays: string[] = [];
+    if (slotData.deliveredPayloads && typeof slotData.deliveredPayloads === 'object') {
+      // Add relay names from the deliveredPayloads object
+      Object.keys(slotData.deliveredPayloads).forEach(relayName => {
+        deliveredRelays.push(relayName);
+      });
+    }
+
+    // If we don't have relay bids, we can still return information about delivered payloads
+    if (!slotData?.relayBids) {
+      if (deliveredRelays.length > 0) {
+        return {
+          blockHash: executionPayloadBlockHash,
+          value: 0, // We don't know the value without the bids
+          relayName: deliveredRelays[0], // Use the first relay as primary
+          deliveredRelays: deliveredRelays,
+        };
+      }
       return null;
     }
 
@@ -531,24 +553,42 @@ export default function BlockProductionLivePage() {
           // Convert the bid value to ETH (from wei)
           const valueInEth = Number(BigInt(matchingBid.value)) / 1e18;
 
-          // Return the winning bid data
+          // Return the winning bid data including deliveredRelays
           return {
             blockHash: matchingBid.blockHash,
             value: valueInEth,
             relayName: relayName,
             builderPubkey: matchingBid.builderPubkey,
+            deliveredRelays: deliveredRelays,
           };
         } catch (error) {
           console.error('Error converting bid value:', error);
-          return null;
+          // Return partial data if there was an error with the value conversion
+          return {
+            blockHash: executionPayloadBlockHash,
+            value: 0,
+            relayName: relayName,
+            builderPubkey: matchingBid.builderPubkey,
+            deliveredRelays: deliveredRelays,
+          };
         }
       }
     }
 
-    // If no matching bid was found
-    // No matching bid found
+    // If no matching bid was found but we have delivered payloads
+    if (deliveredRelays.length > 0) {
+      console.info('No matching bid found, but we have delivered payloads for:', executionPayloadBlockHash);
+      return {
+        blockHash: executionPayloadBlockHash,
+        value: 0,
+        relayName: deliveredRelays[0], // Use the first relay as primary
+        deliveredRelays: deliveredRelays,
+      };
+    }
+
+    // No matching bid or delivered payloads found
     return null;
-  }, [slotData?.relayBids, slotData?.block?.executionPayloadBlockHash]);
+  }, [slotData?.relayBids, slotData?.block?.executionPayloadBlockHash, slotData?.deliveredPayloads]);
 
   // Determine if a block was locally built using the enhanced method
   const isLocallyBuilt = useMemo(() => {

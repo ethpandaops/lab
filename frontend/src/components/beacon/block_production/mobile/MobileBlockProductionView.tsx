@@ -264,11 +264,13 @@ const MobileBlockProductionView: React.FC<MobileBlockProductionViewProps> = ({
             isActive={isActive('relay')}
             isInPropagationPhase={isInPropagationPhase(currentTime, nodeBlockSeen, nodeBlockP2P)}
             subtitle={
-              winningBid
-                ? `via ${winningBid.relayName}`
-                : activeRelays > 0
-                  ? `${activeRelays} relay${activeRelays > 1 ? 's' : ''}`
-                  : 'Waiting for relays...'
+              winningBid?.deliveredRelays?.length
+                ? `Delivered by ${winningBid.deliveredRelays.join(', ')}`
+                : winningBid
+                  ? `via ${winningBid.relayName}`
+                  : activeRelays > 0
+                    ? `${activeRelays} relay${activeRelays > 1 ? 's' : ''}`
+                    : 'Waiting for relays...'
             }
           />
 
