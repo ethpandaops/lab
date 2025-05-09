@@ -136,7 +136,6 @@ const BuildersRelaysPanel: React.FC<BuildersRelaysPanelProps> = ({
           id: `relay-${relayName}`,
           relayName: relayName,
           label: relayName,
-          // Using semantic colors instead of hardcoded ones - success color for winning relay
           // Mark relay as winning if it's in the deliveredPayloads list or it matches the winning bid relay
           isWinning:
             (winningBid?.deliveredRelays && winningBid.deliveredRelays.includes(relayName)) ||
@@ -164,6 +163,29 @@ const BuildersRelaysPanel: React.FC<BuildersRelaysPanelProps> = ({
         }
       }
     });
+
+    // Add relays from deliveredPayloads that might not be in the bids
+    if (winningBid?.deliveredRelays) {
+      winningBid.deliveredRelays.forEach(relayName => {
+        if (!uniqueRelays.has(relayName)) {
+          // Add relay from deliveredPayloads that wasn't in the bids
+          uniqueRelays.set(relayName, {
+            id: `relay-${relayName}`,
+            relayName: relayName,
+            label: relayName,
+            isWinning: true, // This is a winning relay since it's in deliveredPayloads
+            value: 0, // No bid value available
+            time: 0, // No bid time available
+            bidCount: 0, // No bids
+            isDeliveredOnly: true, // Flag to identify relays that only appear in deliveredPayloads
+          });
+        } else {
+          // Update existing relay to mark it as winning if it's in deliveredPayloads
+          const relay = uniqueRelays.get(relayName);
+          relay.isWinning = true;
+        }
+      });
+    }
 
     // Convert map to array and sort (winning relay first, then alphabetically)
     return Array.from(uniqueRelays.values()).sort((a, b) => {
@@ -302,9 +324,11 @@ const BuildersRelaysPanel: React.FC<BuildersRelaysPanelProps> = ({
                         <div
                           className={`font-mono ${showWinningStyle ? 'text-amber-400' : 'text-tertiary'} text-[10px] whitespace-nowrap`}
                         >
-                          {item.bidCount !== undefined
-                            ? `${item.bidCount} bid${item.bidCount !== 1 ? 's' : ''}`
-                            : '0 bids'}
+                          {item.isDeliveredOnly
+                            ? 'Delivered'
+                            : (item.bidCount !== undefined
+                              ? `${item.bidCount} bid${item.bidCount !== 1 ? 's' : ''}`
+                              : '0 bids')}
                         </div>
                       </div>
                     </div>

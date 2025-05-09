@@ -32,6 +32,7 @@ export interface WinningBidData {
   value: number;
   relayName: string;
   builderPubkey?: string;
+  deliveredRelays?: string[];
 }
 
 export interface TimeRange {
