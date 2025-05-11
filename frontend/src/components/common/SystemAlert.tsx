@@ -1,6 +1,5 @@
 import { Share2, Database } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
-import { Card, CardBody } from '@/components/common/Card';
 
 interface SystemAlertProps {
   title: string;
@@ -11,8 +10,7 @@ interface SystemAlertProps {
 }
 
 export const SystemAlert = ({
-  title,
-  description,
+  title,,
   buttonText,
   buttonLink,
   showOnPaths = ['/beacon']
