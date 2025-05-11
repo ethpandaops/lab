@@ -10,7 +10,7 @@ interface SystemAlertProps {
 }
 
 export const SystemAlert = ({
-  title,,
+  title,
   buttonText,
   buttonLink,
   showOnPaths = ['/beacon']
