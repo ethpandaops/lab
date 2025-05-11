@@ -4,9 +4,10 @@ import { BeakerIcon, HomeIcon, InformationCircleIcon } from '@heroicons/react/24
 
 interface NavigationProps {
   showLinks?: boolean;
+  className?: string;
 }
 
-export function Navigation({ showLinks = true }: NavigationProps) {
+export function Navigation({ showLinks = true, className = '' }: NavigationProps) {
   const location = useLocation();
 
   const linkClasses = (path: string) => {
@@ -21,7 +22,7 @@ export function Navigation({ showLinks = true }: NavigationProps) {
   }
 
   return (
-    <nav className="flex lg:flex-row flex-col lg:items-center gap-2">
+    <nav className={`flex lg:flex-row flex-col lg:items-center gap-2 ${className}`}>
       <Link to="/" className={linkClasses('/')}>
         <HomeIcon className="w-4 h-4" />
         Home
