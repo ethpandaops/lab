@@ -9,6 +9,7 @@ import useBeacon from '@/contexts/beacon';
 import { Menu } from 'lucide-react';
 import { NETWORK_METADATA, type NetworkKey } from '@/constants/networks.tsx';
 import clsx from 'clsx';
+import { GoogleFormSystemAlert } from '@/components/common/SystemAlert';
 
 function Layout() {
   const location = useLocation();
@@ -108,9 +109,16 @@ function Layout() {
           {/* Navigation Bar (desktop only) */}
           {!isHome && (
             <div className="hidden lg:block w-full px-4 md:px-6 lg:px-8 xl:px-12 2xl:px-16 py-2 border-t border-accent/20">
-              <div className="flex items-center justify-between">
-                <Breadcrumbs />
-                <Navigation />
+              <div className="grid grid-cols-3 items-center">
+                <div className="col-span-1">
+                  <Breadcrumbs />
+                </div>
+                <div className="col-span-1 flex justify-center">
+                  <GoogleFormSystemAlert />
+                </div>
+                <div className="col-span-1 flex justify-end">
+                  <Navigation />
+                </div>
               </div>
             </div>
           )}
@@ -158,7 +166,12 @@ function Layout() {
                   )}
 
                   {/* Navigation */}
-                  <Navigation showLinks={true} />
+                  <div className="flex flex-col space-y-4">
+                    <Navigation showLinks={true} />
+                    <div className="mt-2 pt-2 border-t border-accent/10 flex justify-center">
+                      <GoogleFormSystemAlert />
+                    </div>
+                  </div>
                 </div>
               </div>
 
