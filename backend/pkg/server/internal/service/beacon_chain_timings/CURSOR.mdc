@@ -1,0 +1,24 @@
+---
+description: Beacon Chain Timings Service - Processes Ethereum beacon chain timing data with configurable time windows and CDF calculations
+globs: 
+  - "*.go"
+  - "**/*_test.go"
+alwaysApply: false
+---
+
+# Beacon Chain Timings Service
+
+Processes and analyzes Ethereum beacon chain timing data with configurable time windows and CDF calculations.
+
+## Key Patterns
+- Use state management pattern with protobuf-based persistence via `state.Client[*pb.State]`
+- Implement leader election coordination for distributed processing
+- Structure timing data processing around configurable `TimeWindow` configurations
+- Always maintain CDF (Cumulative Distribution Function) calculations alongside timing data
+- Use cache-backed data fetching with proper state tracking via `LastProcessed` timestamps
+
+## Implementation Requirements
+- All state changes must use the `state_adapter.go` interface for protobuf state management
+- Time window configurations must support both step and range duration parsing
+- Processing operations require proper leader election coordination before execution
+- Always update `LastProcessed` timestamps when processing timing data batches

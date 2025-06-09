@@ -1,0 +1,23 @@
+---
+description: Build and development automation scripts for the ETHPandaOps Lab project
+globs: 
+  - "*.sh"
+  - "scripts/*.sh"
+alwaysApply: false
+---
+
+# Scripts Component
+
+Development and build automation utilities for ETHPandaOps Lab project.
+
+## Key Patterns
+- All scripts use `set -e` for fail-fast error handling
+- Scripts validate required parameters and provide usage instructions
+- External dependencies are validated before execution
+- Generated files include clear auto-generation warnings
+
+## Important Constraints
+- Scripts must be executable and include proper shebang lines
+- Always validate external URLs and resources before fetching
+- Use relative paths for project-internal operations
+- Include cleanup and error recovery where appropriate

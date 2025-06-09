@@ -1,0 +1,15 @@
+---
+description: ClickHouse - Database client for ClickHouse analytics with metrics integration
+globs: 
+  - "*.go"
+  - "**/*_test.go"
+alwaysApply: false
+---
+
+ClickHouse database client that uses standard database/sql interface with metrics integration and connection pooling.
+
+- Use mailru/go-clickhouse/v2 driver with "chhttp" driver name for HTTP connections
+- Support clickhouse+ DSN prefix conversion (clickhouse+http:// → http://, clickhouse+https:// → https://)
+- Always configure connection pool settings (MaxOpenConns: 10, MaxIdleConns: 5, ConnMaxLifetime: 1h)
+- Include comprehensive Prometheus metrics for all operations (queries_total, query_duration_seconds, connection_status, connections_active)
+- Test against real ClickHouse instance using testcontainers for integration tests

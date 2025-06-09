@@ -1,0 +1,35 @@
+---
+description: Frontend Source Root - React TypeScript frontend for Ethereum lab monitoring dashboard
+globs: 
+  - "*.tsx"
+  - "*.ts"
+  - "App.tsx"
+  - "main.tsx"
+  - "bootstrap.ts"
+alwaysApply: false
+---
+
+# Frontend Source Root
+
+React TypeScript frontend for Ethereum lab monitoring dashboard that visualizes beacon chain block production and network metrics.
+
+## Application Bootstrap Pattern
+- Use bootstrap.ts for environment-specific backend URL configuration
+- Support dev mode backend override via VITE_BACKEND_URL
+- Always validate bootstrap response contains required backend.url
+
+## Multi-Network Architecture
+- Implement network selection via URL parameters with fallback to mainnet
+- Use ApplicationProvider to cascade network context to all child components
+- Maintain network state consistency between URL and application state
+- Validate selected network against available networks from config
+
+## Provider Orchestration
+- Wrap application in provider hierarchy: ApplicationProvider → ModalProvider → QueryClientProvider
+- Initialize providers with bootstrap config and API client before rendering routes
+- Use error boundaries at top level for bootstrap and config failures
+
+## Route Structure Conventions
+- Use nested routes with Outlet pattern for hierarchical navigation
+- Implement redirect routes for backward compatibility
+- Place network-aware routes under network-context providers

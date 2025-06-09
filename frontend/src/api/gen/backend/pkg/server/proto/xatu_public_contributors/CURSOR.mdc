@@ -1,0 +1,14 @@
+---
+description: Xatu Public Contributors - Generated TypeScript types for Ethereum node contributor analytics
+globs: 
+  - "xatu_public_contributors_pb.ts"
+  - "**/xatu_public_contributors/**"
+alwaysApply: false
+---
+
+Auto-generated TypeScript Protobuf types for tracking Ethereum network node contributors and analytics.
+
+- Generated from `backend/pkg/server/proto/xatu_public_contributors/xatu_public_contributors.proto`
+- Provides types for network statistics, user data, geographic distributions, and time-series analytics
+- Supports multi-network Ethereum monitoring with time window configurations
+- Never modify generated files directly - changes must be made to the source .proto file

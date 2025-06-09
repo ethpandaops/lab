@@ -1,0 +1,23 @@
+---
+description: Beacon Block Production Component - Real-time block production visualization with responsive desktop/mobile views
+globs: 
+  - "**/beacon/block_production/**/*.{ts,tsx}"
+  - "**/block_production/**/*.{ts,tsx}"
+alwaysApply: false
+---
+
+# Beacon Block Production Component
+
+Real-time visualization of Ethereum beacon chain block production process with responsive desktop and mobile interfaces.
+
+## Core Integration Pattern
+
+- **View Selection**: Route between `DesktopBlockProductionView` and `MobileBlockProductionView` based on screen size/device type
+- **Shared Props Interface**: All views implement `BlockProductionBaseProps` for consistent data flow and prop typing
+- **Timeline Context Integration**: Components must consume `useTimeline()` context for real-time state synchronization across views
+
+## Cross-Component Coordination
+
+- **Responsive Breakpoints**: Switch between desktop 3-panel and mobile single-column layouts at appropriate breakpoints
+- **Real-time Data Flow**: All child components receive live `currentTime`, `bids`, and `winningBid` props for synchronized state updates
+- **Phase State Consistency**: Use shared `getCurrentPhase()` and phase transition logic across desktop/mobile implementations

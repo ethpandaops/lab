@@ -1,0 +1,15 @@
+---
+description: Ethereum - Multi-network Ethereum beacon chain client with wallclock tracking and metrics
+globs: 
+  - "*.go"
+  - "**/*_test.go"
+alwaysApply: false
+---
+
+Ethereum beacon chain client that manages multiple networks with wallclock synchronization, network specification parsing, and comprehensive metrics.
+
+- Use Network struct for per-network state with thread-safe access via mutex
+- Fetch network specifications from remote URLs with context-based timeouts (5s for network start, 10s default)
+- Initialize ethwallclock.EthereumBeaconChain using spec values (genesis time, seconds per slot, slots per epoch)
+- Always instrument wallclock events (slot/epoch changes) with Prometheus metrics per network
+- Validate network configs before starting and ensure graceful error handling for network failures

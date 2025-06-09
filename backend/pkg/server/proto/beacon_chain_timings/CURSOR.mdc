@@ -1,0 +1,24 @@
+---
+description: Beacon Chain Timings Proto - Protobuf definitions and generated gRPC bindings for beacon chain timing analytics
+globs: 
+  - "*.proto"
+  - "*.pb.go"
+  - "*_grpc.pb.go"
+alwaysApply: false
+---
+
+# Beacon Chain Timings Proto
+
+Protobuf definitions and generated gRPC bindings for beacon chain timing analytics and size distribution analysis.
+
+## Key Integration Pattern
+
+- **Dual analytics service**: Combines timing data aggregation (GetTimingData) and size CDF analysis (GetSizeCDFData) in single service
+- **Time window processing**: Uses configurable time windows with range_ms and step_ms for data aggregation
+- **Validator categorization**: Supports per-validator timing category tracking in TimingData message
+
+## Important Constraints
+
+- Generated .pb.go files - regenerate via protoc when .proto changes
+- State tracking requires network+window composite keys for processor coordination
+- CDF data distinguishes MEV vs non-MEV categories for block size analysis

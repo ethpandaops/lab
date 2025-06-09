@@ -1,0 +1,27 @@
+---
+description: Frontend Hooks - Custom React hooks for data fetching and state management
+globs: 
+  - "**/hooks/**/*.ts"
+  - "**/hooks/**/*.tsx"
+alwaysApply: false
+---
+
+# Frontend Hooks
+
+Custom React hooks that provide reusable data fetching and state management with global caching and deduplication patterns.
+
+## Key Patterns
+
+- **Global Cache with Deduplication**: Implement singleton cache objects to prevent duplicate network requests across components
+- **Pending Request Tracking**: Track ongoing fetches to avoid duplicate requests when multiple components mount simultaneously
+- **Flexible Lookup Functions**: Include helper methods on cached objects for pattern matching and prefix lookups
+- **Graceful Fallback**: Always include hardcoded fallback data when external data sources fail
+- **Network-Specific Isolation**: Cache data separately per network/environment to prevent cross-contamination
+
+## Implementation Guidelines
+
+- Cache objects should persist outside React component lifecycle
+- Initialize state from cache when available to prevent loading flickers
+- Use async/await patterns with proper error handling
+- Include console logging for debugging data fetch operations
+- Normalize data keys for consistent lookups (lowercase, remove 0x prefix)

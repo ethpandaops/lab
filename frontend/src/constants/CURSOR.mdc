@@ -1,0 +1,23 @@
+---
+description: Frontend Constants - Centralized application constants for Ethereum clients, geography, UI layout, networks, and data visualization
+globs: 
+  - "*.ts"
+  - "*.tsx"
+alwaysApply: false
+---
+
+# Frontend Constants
+
+## Primary Purpose
+Provides centralized application constants for Ethereum client types, geographic data, UI layout values, network configurations, and data visualization parameters.
+
+## Key Integration Patterns
+- Use TypeScript const assertions (`as const`) for all constant definitions to ensure strict typing
+- Export both the constant arrays/objects and their derived TypeScript types
+- Separate concerns by constant type (clients, geography, UI, networks, statistics)
+
+## Important Constraints
+- Always use const assertions to prevent mutations and enable strict type inference
+- Maintain consistent naming conventions: SCREAMING_SNAKE_CASE for constants, PascalCase for types
+- Keep constants grouped by domain (execution clients, consensus clients, geographic data, etc.)
+- Export derived types using `typeof` and indexed access patterns for type-safe usage across the application

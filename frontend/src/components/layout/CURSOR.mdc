@@ -1,0 +1,22 @@
+---
+description: Layout Components - Unified UI shell with responsive navigation and contextual headers
+globs: 
+  - "*.tsx"
+  - "*.ts"
+alwaysApply: false
+---
+
+# Layout Components
+
+Primary application shell providing unified navigation, header management, and responsive layout structure.
+
+## Key Patterns
+- **Unified Layout System**: Single Layout.tsx component orchestrates entire app shell with sticky header, mobile sidebar, and contextual navigation
+- **Responsive Navigation**: Desktop header bar with mobile slide-out sidebar, synchronized network selection and beacon clock display
+- **Contextual Header Integration**: Supports both legacy page headers and preferred integrated contextual headers with breadcrumbs and system alerts
+
+## Design Constraints
+- Mobile-first responsive design with breakpoint-specific layouts (lg:hidden, lg:block patterns)
+- Sticky positioning for header (z-50) with proper mobile menu overlay management
+- Network-aware state synchronization across header, navigation, and mobile sidebar components
+- Consistent semantic color usage following established frontend color system

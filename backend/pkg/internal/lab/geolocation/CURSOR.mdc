@@ -1,0 +1,15 @@
+---
+description: Geolocation - Geographic data lookup service with CSV database and metrics
+globs: 
+  - "*.go"
+  - "**/*_test.go"
+alwaysApply: false
+---
+
+Geolocation service that provides city/country lookup with downloadable CSV database and Prometheus metrics integration.
+
+- Load geographic data from URL or local file into nested map structure (continent → country → city → CityInfo)
+- Support flexible lookup by city, country, or both with case-insensitive search across all continents
+- Always instrument operations with Prometheus metrics (lookups_total, lookup_duration_seconds, database_load_total, database_items)
+- Implement deferred metrics recording with proper status tracking (success, error, not_found)
+- Use structured logging with component field and normalize all lookup parameters to lowercase

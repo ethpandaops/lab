@@ -1,0 +1,24 @@
+---
+description: Xatu Public Contributors Proto - Protocol Buffer definitions and generated gRPC bindings for Ethereum node contributor tracking and network statistics
+globs: 
+  - "*.proto"
+  - "*.pb.go"
+  - "*_grpc.pb.go"
+alwaysApply: false
+---
+
+# Xatu Public Contributors Proto
+
+Protocol Buffer definitions and generated gRPC bindings for tracking Ethereum node contributors and aggregating network statistics.
+
+## Key Integration Pattern
+
+- **Multi-network aggregation**: Supports configurable time windows and Redis-based state persistence across networks
+- **Geolocation tracking**: Comprehensive geographic data (countries, cities, continents) with node count statistics
+- **Multi-processor architecture**: Supports Users (time-series), User Summaries, and Country Data processors with independent state tracking
+
+## Important Constraints
+
+- Generated .pb.go and _grpc.pb.go files must not be manually edited - regenerate via protoc when .proto changes
+- Service currently has empty method definitions (placeholder for future RPC implementations)
+- Time window configurations mirror Python config structure for compatibility with existing infrastructure

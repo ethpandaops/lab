@@ -1,0 +1,25 @@
+---
+description: Beacon Slots Proto - Protocol Buffer definitions and generated code for Ethereum beacon chain slot data services
+globs: 
+  - "*.proto"
+  - "*.pb.go"
+  - "*_grpc.pb.go"
+  - "blob_timing_map_json.go"
+alwaysApply: false
+---
+
+# Beacon Slots Proto
+
+Protocol Buffer definitions and generated code for comprehensive Ethereum beacon chain slot data services.
+
+## Key Integration Pattern
+
+- **Comprehensive slot data**: Aggregates block data, timing information, attestations, MEV relay bids, and node geolocation
+- **Multi-format support**: Handles both FullTimings (with metadata) and SlimTimings (optimized) data structures
+- **Custom JSON marshaling**: Implements backward-compatible JSON serialization for BlobTimingMap structures
+
+## Important Constraints
+
+- Generated .pb.go and _grpc.pb.go files must not be manually edited - regenerate via protoc
+- BlobTimingMap requires custom JSON marshaling for backward compatibility with older clients
+- All timing data uses millisecond precision relative to slot start times

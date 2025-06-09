@@ -1,0 +1,23 @@
+---
+description: Xatu Public Contributors Service - Processes Ethereum network contributor analytics with time-windowed data aggregation
+globs: 
+  - "*.go"
+  - "**/*_test.go"
+alwaysApply: false
+---
+
+# Xatu Public Contributors Service
+
+Processes Ethereum network contributor analytics across multiple time windows with leader-elected coordination.
+
+## Key Patterns
+- Use multi-processor architecture with state tracking per processor (`SummaryProcessorName`, `CountriesProcessorName`, `UsersProcessorName`, `UserSummariesProcessorName`)
+- Implement username extraction from `meta_client_name` using regex patterns via `ExtractUsername()` and `ExtractUsernameForUsers()`
+- Process data globally for summaries and per-network for time-windowed analytics
+- Maintain separate state tracking for overall processor intervals and individual time window processing
+
+## Implementation Requirements
+- All processors must check both overall interval (`shouldProcess`) and window-specific intervals (`shouldProcessWindow`) before execution
+- State management uses `ProcessorState` with `LastProcessedWindows` map for per-window tracking
+- Always exclude `ethpandaops` clients from public node counts using `meta_client_name NOT LIKE 'ethpandaops%'`
+- Username extraction must handle both `pub` prefixed names and general path patterns consistently

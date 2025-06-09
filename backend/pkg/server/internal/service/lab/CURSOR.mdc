@@ -1,0 +1,25 @@
+---
+description: Lab Service - Main aggregation service for frontend configuration from multiple Ethereum data sources
+globs: 
+  - "*.go"
+  - "**/*_test.go"
+alwaysApply: false
+---
+
+# Lab Service
+
+Main aggregation service that consolidates frontend configuration from multiple Ethereum data sources and service modules.
+
+## Key Integration Patterns
+
+- **Service orchestration**: Coordinates multiple specialized services (beacon chain timings, beacon slots, xatu contributors) through dependency injection
+- **Frontend config aggregation**: Centralizes frontend module configurations with network-specific Ethereum fork data
+- **Metrics standardization**: Uses consistent API metrics patterns with request counters and duration histograms
+- **Ethereum network abstraction**: Handles multiple Ethereum networks with network-specific genesis times and fork configurations
+
+## Critical Constraints
+
+- Always defer metrics recording in API methods with proper error status tracking
+- Use consistent service naming with ServiceName constant pattern
+- Frontend configs must include all active module configurations via FrontendModuleConfig() calls
+- Network configurations require proper fork epoch handling with client version constraints

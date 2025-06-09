@@ -1,0 +1,15 @@
+---
+description: State - generic typed state storage with JSON serialization over cache backend
+globs: 
+  - "*.go"
+  - "**/*_test.go"
+alwaysApply: false
+---
+
+Generic typed state storage that provides Get/Set operations over a cache backend with JSON serialization and namespace isolation.
+
+- Use Go generics for type-safe state operations: `Client[T any]` for specific types
+- Always include namespace configuration to prevent key conflicts between modules  
+- Handle JSON serialization/deserialization errors explicitly with meaningful error messages
+- Return `ErrNotFound` for cache misses to distinguish from other errors
+- Test both value types and pointer types for generic type safety

@@ -1,0 +1,15 @@
+---
+description: Metrics - Prometheus metrics service with structured collector management and common label propagation
+globs: 
+  - "*.go"
+  - "**/*_test.go"
+alwaysApply: false
+---
+
+Prometheus metrics service that provides structured metric management with subsystem-specific collectors and automatic common label propagation.
+
+- Use NewCollector() factory pattern to create subsystem-specific metric collectors for organized metric registration
+- Apply thread-safe operations with proper mutex locking when accessing collector registry and common labels
+- Handle duplicate metric registrations gracefully by reusing existing collectors and checking type compatibility
+- Propagate common labels automatically to all metrics and update existing collectors when labels change
+- Use metric name sanitization to ensure Prometheus compatibility (snake_case, lowercase)

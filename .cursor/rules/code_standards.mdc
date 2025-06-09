@@ -1,0 +1,195 @@
+---
+description: Coding standards and conventions for ethPandaOps Lab
+alwaysApply: false
+---
+
+# ethPandaOps Lab Code Standards
+
+## General Principles
+- **Consistency**: Follow established patterns in the codebase
+- **Readability**: Write code that tells a story
+- **Safety**: Avoid "fallback" or "default" values that can mask issues
+- **Performance**: Consider the impact of code on data processing pipelines
+
+## Go Backend Standards
+
+### Code Organization
+- Use the existing package structure under `backend/pkg/`
+- Keep internal packages in `internal/` directories
+- Group related functionality in cohesive packages
+- Follow Go's convention of short, descriptive package names
+
+### Naming Conventions
+- Use PascalCase for exported functions, types, and constants
+- Use camelCase for unexported functions and variables
+- Use descriptive names that explain purpose, not implementation
+- Prefer `userID` over `id` when context isn't clear
+- Use common Go abbreviations: `HTTP`, `URL`, `ID`, `JSON`, `API`
+
+### Error Handling
+- Always handle errors explicitly - never ignore them
+- Use structured error types for API responses
+- Include context in error messages to aid debugging
+- Return errors early and avoid deep nesting
+- Use `fmt.Errorf` with `%w` verb for error wrapping
+
+```go
+if err != nil {
+    return fmt.Errorf("failed to process beacon slot %d: %w", slot, err)
+}
+```
+
+### Interface Design
+- Keep interfaces small and focused
+- Prefer accepting interfaces over concrete types
+- Define interfaces in the package that uses them, not implements them
+- Use descriptive interface names ending in `-er` when appropriate
+
+### Concurrency
+- Use channels for communication between goroutines
+- Prefer `context.Context` for cancellation and timeouts
+- Always handle context cancellation in long-running operations
+- Use `sync.WaitGroup` for coordinating goroutine completion
+
+### Configuration
+- Use struct tags for YAML/JSON configuration
+- Provide reasonable validation for configuration values
+- Use environment variable overrides where appropriate
+- Document configuration options thoroughly
+
+## TypeScript/React Frontend Standards
+
+### File Organization
+- Use kebab-case for file and directory names
+- Group components by feature/domain in subdirectories
+- Keep related types close to their usage
+- Use index files for clean imports
+
+### Component Design
+- Use functional components with hooks
+- Keep components focused on a single responsibility
+- Prefer composition over inheritance
+- Use TypeScript interfaces for props definition
+
+### Naming Conventions
+- Use PascalCase for component names and types
+- Use camelCase for functions and variables
+- Use SCREAMING_SNAKE_CASE for constants
+- Use descriptive names that explain purpose
+
+### Type Safety
+- Always define explicit types for props and state
+- Use strict TypeScript configuration
+- Prefer union types over `any`
+- Use type guards for runtime type checking
+
+### API Integration
+- Use the generated Connect clients from protobuf
+- Handle loading and error states consistently
+- Implement proper caching strategies
+- Use React Query or similar for data fetching
+
+### Styling
+- Use Tailwind CSS classes for styling
+- Prefer utility classes over custom CSS
+- Use responsive design principles
+- Maintain consistency with existing design patterns
+
+## Protocol Buffers
+
+### Message Design
+- Use clear, descriptive field names
+- Follow protobuf naming conventions (snake_case)
+- Include comprehensive field documentation
+- Version your APIs with proper deprecation
+
+### Service Definition
+- Group related operations in logical services
+- Use consistent error response patterns
+- Include request/response documentation
+- Follow gRPC conventions for method names
+
+## Testing Standards
+
+### Go Testing
+- Write table-driven tests for complex logic
+- Use `testify` for assertions and mocking
+- Test error conditions as well as success paths
+- Keep tests focused and independent
+
+### Frontend Testing
+- Test component behavior, not implementation
+- Use React Testing Library patterns
+- Mock external dependencies appropriately
+- Test accessibility and user interactions
+
+## Documentation
+
+### Code Comments
+- Focus comments on why, not what
+- Document public APIs thoroughly
+- Include examples for complex functions
+- Keep comments up to date with code changes
+
+### README Files
+- Include setup and development instructions
+- Document configuration options
+- Provide troubleshooting guidance
+- Keep examples current and working
+
+## Security
+
+### Data Handling
+- Validate all user inputs
+- Use parameterized queries for database operations
+- Never log sensitive information
+- Implement proper authentication and authorization
+
+### Dependencies
+- Keep dependencies up to date
+- Review security advisories regularly
+- Use minimal dependencies for attack surface reduction
+- Pin dependency versions in production
+
+## Performance
+
+### Backend Performance
+- Use connection pooling for databases
+- Implement proper caching strategies
+- Profile code under realistic loads
+- Consider memory usage in data processing
+
+### Frontend Performance
+- Implement virtual scrolling for large lists
+- Use React.memo for expensive components
+- Optimize bundle size and loading
+- Implement proper error boundaries
+
+## Code Review Guidelines
+
+### What to Look For
+- Correctness and logic errors
+- Performance implications
+- Security considerations
+- Code style consistency
+- Test coverage and quality
+
+### Review Process
+- Be constructive and specific in feedback
+- Explain the reasoning behind suggestions
+- Approve when code meets standards
+- Request changes for significant issues
+
+## Prohibited Patterns
+
+### Never Use "Fallback" Values
+- Don't provide default values that hide missing data
+- Explicitly handle all error cases
+- Make missing data visible to users when appropriate
+- Use null/undefined states intentionally
+
+### Avoid These Anti-patterns
+- Deeply nested error handling
+- Global state for local concerns
+- Overly complex component hierarchies
+- Inconsistent error handling patterns

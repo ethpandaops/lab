@@ -1,0 +1,25 @@
+---
+description: Frontend TypeScript type definitions for Ethereum data and third-party libraries
+globs: 
+  - "*.ts"
+  - "*.d.ts"
+  - "**/*.ts"
+  - "**/*.d.ts"
+alwaysApply: false
+---
+
+# Frontend Types Directory
+
+Central TypeScript type definitions for Ethereum beacon chain data and external libraries.
+
+## Key Patterns
+
+- **Ethereum Data Types**: Use comprehensive interfaces that mirror backend data structures (SlotData, Config)
+- **Third-Party Declarations**: Provide complete module declarations for libraries lacking TypeScript support
+- **Geographic Types**: Maintain consistent coordinate and location data structures across city libraries
+
+## Constraints
+
+- All interfaces must be exported from index.ts for centralized imports
+- Use optional properties (?) for fields that may not exist in all API responses
+- Maintain backwards compatibility when extending existing interfaces

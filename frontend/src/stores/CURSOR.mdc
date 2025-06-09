@@ -1,0 +1,27 @@
+---
+description: Stores - Singleton data stores for global state management
+globs: 
+  - "**/*Store.ts"
+  - "**/stores/**/*.ts"
+alwaysApply: false
+---
+
+# Stores - Singleton Data Stores
+
+Singleton stores for managing global application state with async data loading.
+
+## Singleton Pattern
+- Use lazy initialization with static getInstance() method
+- Private constructor to prevent direct instantiation
+- Store instance as private static property
+
+## Async Data Loading
+- Cache promises to prevent duplicate network requests for same resource
+- Use Map<key, Promise<void>> for tracking ongoing loads
+- Always resolve promises (even on error) to prevent blocking UI
+- Provide synchronous getter methods that return cached data
+
+## Data Normalization
+- Normalize keys consistently (lowercase, handle optional 0x prefixes)
+- Store data in multiple formats for flexible lookup when needed
+- Use Map for O(1) key-value lookups instead of arrays for large datasets

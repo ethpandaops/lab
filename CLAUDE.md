@@ -1,6 +1,18 @@
-# CLAUDE.md
+# ethPandaOps Lab
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+The ethPandaOps Lab is a high-velocity experimental platform for exploring new ideas and concepts in the Ethereum ecosystem. Built with a focus on developer experience and LLM integration for rapid iteration.
+
+## Project Structure
+Claude MUST read the `.cursor/rules/project_architecture.mdc` file before making any structural changes to the project.
+
+## Code Standards  
+Claude MUST read the `.cursor/rules/code_standards.mdc` file before writing any code in this project.
+
+## Development Workflow
+Claude MUST read the `.cursor/rules/development_workflow.mdc` file before making changes to build, test, or deployment configurations.
+
+## Component Documentation
+Individual components have their own CLAUDE.md files with component-specific rules. Always check for and read component-level documentation when working on specific parts of the codebase.
 
 ## LLM Rules System
 

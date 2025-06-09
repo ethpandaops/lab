@@ -1,0 +1,124 @@
+---
+description: Architecture and structure guidelines for ethPandaOps Lab
+alwaysApply: false
+---
+
+# ethPandaOps Lab Project Architecture
+
+## Overview
+The ethPandaOps Lab is a high-velocity experimental platform for exploring new ideas in the Ethereum ecosystem. It provides insights not viable with standard observability tools.
+
+## Core Architecture Principles
+- **Microservices**: Separate API and SRV (business logic) services
+- **Event-driven**: Built around Ethereum blockchain events and metrics
+- **Scalable**: Designed for high-throughput data processing
+- **Developer-friendly**: Built with LLM integration and rapid iteration in mind
+
+## Technology Stack
+
+### Backend (Go)
+- **Language**: Go 1.24+
+- **APIs**: gRPC for internal communication, HTTP/REST for client-facing
+- **Data Storage**: ClickHouse (analytics), MinIO/S3 (object storage)
+- **Caching**: Redis for distributed caching and locking
+- **Protocols**: Protocol Buffers for API definitions
+
+### Frontend (TypeScript/React)
+- **Framework**: React with TypeScript
+- **Build Tool**: Vite
+- **Styling**: Tailwind CSS
+- **Charts**: Nivo for data visualization
+- **API Client**: Connect (gRPC-Web)
+
+## Service Architecture
+
+### SRV Service (Business Logic)
+- **Purpose**: Data processing, scheduled tasks, storage management
+- **Responsibilities**:
+  - Collect and process Ethereum network data
+  - Process Xatu events and metrics
+  - Store processed data in S3-compatible storage
+  - Implement distributed processing with leader election
+  - Expose gRPC endpoints for internal communication
+
+### API Service (Client-facing)
+- **Purpose**: HTTP/REST API for frontend consumption
+- **Responsibilities**:
+  - Retrieve and serve data from S3 storage
+  - Implement caching strategies
+  - Provide HTTP endpoints for frontend
+  - Communicate with SRV service via gRPC
+
+## Directory Structure
+```
+├── backend/                # Go backend services
+│   ├── pkg/                # Shared packages
+│   │   ├── api/            # API service implementation
+│   │   ├── server/         # SRV service implementation
+│   │   │   ├── internal/   # Internal server components
+│   │   │   │   ├── grpc/   # gRPC server implementations
+│   │   │   │   └── service/# Business logic services
+│   │   │   └── proto/      # Protocol buffer definitions
+│   │   └── internal/       # Shared internal packages
+│   │       └── lab/        # Core lab functionality modules
+├── frontend/               # React TypeScript frontend
+│   ├── src/
+│   │   ├── api/            # Generated API clients
+│   │   ├── components/     # React components
+│   │   ├── pages/          # Page components
+│   │   └── utils/          # Utility functions
+├── scripts/                # Development and build scripts
+└── deploy/                 # Deployment configurations
+```
+
+## Data Processing Modules
+
+### beacon_slots
+- Processes beacon chain slots in three modes: head, trailing, backfill
+- Real-time and historical data processing
+
+### beacon_chain_timings
+- Provides timing statistics and size distribution metrics
+- Performance analytics for beacon chain operations
+
+### xatu_public_contributors
+- Tracks contributor data with time window processing
+- Community engagement metrics
+
+### lab
+- Central configuration service for frontend
+- Coordinates service communication
+
+## Key Design Patterns
+
+### Protocol Buffers
+- All API definitions use Protocol Buffers
+- Generated clients for frontend TypeScript
+- Type-safe communication between services
+
+### Distributed Processing
+- Leader election for coordinating distributed tasks
+- Redis-based distributed locking
+- Stateless service design for horizontal scaling
+
+### Caching Strategy
+- Multi-level caching: Redis for distributed cache, in-memory for hot data
+- Cache invalidation based on data freshness requirements
+- Storage-first approach with cache-aside pattern
+
+### Error Handling
+- Structured error responses with appropriate HTTP status codes
+- Comprehensive logging for debugging and monitoring
+- Graceful degradation for non-critical failures
+
+## Configuration Management
+- YAML-based configuration files
+- Environment variable overrides
+- Separate configurations for different deployment environments
+- Hot-reloading support for development
+
+## Development Workflow
+- Make-based build system
+- Docker Compose for local development
+- Automated protobuf generation
+- Integrated testing with real infrastructure dependencies

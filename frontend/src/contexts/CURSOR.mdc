@@ -1,0 +1,16 @@
+---
+description: React Contexts - Application state management layer for Ethereum beacon chain monitoring
+globs: 
+  - "**/*context*.ts"
+  - "**/*context*.tsx"
+  - "**/contexts/**"
+alwaysApply: false
+---
+
+React contexts layer that provides centralized state management for beacon chain timing, network selection, API clients, and UI controls.
+
+- **Use consistent context/hook pattern** - `createContext()` with error-checked custom hook for safe access
+- **Implement BeaconClock utilities** - Provide precise 12-second slot and 32-slot epoch calculations for all networks  
+- **Maintain timeline precision** - 10ms update intervals required for smooth animation, separate display vs state updates
+- **Ensure provider error boundaries** - All contexts must throw meaningful errors when used outside providers
+- **Support real-time slot monitoring** - Callback subscription pattern for slot change notifications across components

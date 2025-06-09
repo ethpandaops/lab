@@ -1,0 +1,25 @@
+---
+description: gRPC server layer - Protocol Buffer service implementations that expose internal services via gRPC endpoints
+globs: 
+  - "*.go"
+  - "**/*_test.go"
+alwaysApply: false
+---
+
+# gRPC Server Layer
+
+Protocol Buffer service implementations that expose internal services via standardized gRPC endpoints with reflection support.
+
+## Key Integration Patterns
+
+- **Service adapter pattern**: Each gRPC handler wraps an internal service and implements the Service interface with Name() and Start() methods
+- **Protocol Buffer contract**: All RPC methods use generated protobuf types for request/response validation and serialization
+- **Graceful lifecycle management**: Server supports graceful shutdown with proper cleanup of registered services
+- **Service registry**: Dynamic service registration via AddService() with name-based lookup for runtime management
+
+## Critical Constraints
+
+- Always register services via Service interface - never register protobuf services directly on grpc.Server
+- Use status.Errorf() with appropriate gRPC status codes for all error responses
+- Include reflection.Register() for development tooling compatibility (grpcurl, etc.)
+- Service names must match the constant pattern defined in each service file

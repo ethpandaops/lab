@@ -1,0 +1,14 @@
+---
+description: Xatu - Multi-network Ethereum data client with ClickHouse backends
+globs: 
+  - "*.go"
+  - "*_test.go"
+alwaysApply: false
+---
+
+Multi-network Ethereum data client that manages ClickHouse connections across different networks.
+
+- Use network-keyed maps for managing multiple ClickHouse clients
+- Always validate nil configs and clients to prevent runtime panics
+- Include comprehensive metrics for client operations and connection health
+- Implement graceful degradation when metrics service is unavailable

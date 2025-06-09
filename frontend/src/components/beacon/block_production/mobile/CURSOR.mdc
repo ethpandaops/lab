@@ -1,0 +1,32 @@
+---
+description: Mobile Block Production - Mobile-optimized visualization with phase-based progressive disclosure
+globs: 
+  - "*.tsx"
+  - "*.ts"
+alwaysApply: false
+---
+
+Mobile block production visualization with progressive disclosure pattern for touch interfaces.
+
+## Layout Pattern
+- Single-column card stack replaces desktop 3-panel layout
+- Integrated timeline bar with navigation controls at top
+- Progressive activation of stage cards based on block lifecycle timing
+
+## Phase-Based Activation Logic
+- Use `isActive(role)` function to determine component visibility/styling
+- Calculate dynamic transition times from real node/attestation data
+- Apply progressive opacity/color changes during phase transitions
+- Maintain visual continuity through phase-based color schemes
+
+## Mobile Navigation Controls
+- Slot navigation (prev/next) with disabled states for boundaries
+- Live mode toggle with visual distinction when active
+- Play/pause timeline control integrated with global timeline context
+- Time scrubbing via timeline bar progress indicator
+
+## Progressive Disclosure
+- Show minimal info initially, expand detail as phases progress
+- Use StageCard component for consistent emoji/title/subtitle/progress pattern
+- Apply continent propagation details only when nodes are active
+- Integrate progress bars for measurable metrics (attestation percentage)

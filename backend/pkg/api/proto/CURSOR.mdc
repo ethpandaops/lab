@@ -1,0 +1,25 @@
+---
+description: Lab API Protocol Definitions - Core protobuf service definitions and generated bindings
+globs: 
+  - "*.proto"
+  - "*.pb.go"
+  - "proto.yaml"
+alwaysApply: false
+---
+
+# Lab API Protocol Definitions
+
+Core protocol buffer definitions for the Lab API service that bridges frontend and backend communication.
+
+## Primary Purpose
+Defines read-only API endpoints for beacon slot data, locally built blocks, and frontend configuration.
+
+## Key Integration Pattern
+- All API methods marked as IdempotencyNoSideEffects (read-only operations)
+- Uses Connect-RPC framework for multi-protocol support (Connect, gRPC, gRPC-Web)
+- Imports beacon_slots and lab proto definitions for data consistency
+
+## Important Constraints  
+- Generated .pb.go files are auto-generated - DO NOT EDIT manually
+- All endpoints must maintain backward compatibility
+- Proto definitions must follow established naming patterns: {MethodName}Request/Response

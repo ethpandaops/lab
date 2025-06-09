@@ -1,0 +1,14 @@
+---
+description: CLI entry point - orchestrates API and server services via Cobra commands
+globs: 
+  - "main.go"
+  - "*cmd*.go"
+alwaysApply: false
+---
+
+CLI entry point that orchestrates API and server services through Cobra command routing.
+
+- Use Cobra for all command definitions and routing
+- Maintain separate config paths for API and server services  
+- Always expand environment variables in YAML config files using os.ExpandEnv()
+- Implement service-specific subcommands that delegate to their respective packages

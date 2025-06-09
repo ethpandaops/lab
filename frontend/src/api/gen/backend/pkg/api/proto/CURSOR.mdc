@@ -1,0 +1,15 @@
+---
+description: Lab API Proto - Connect-web client interface and generated message types for lab backend API
+globs: 
+  - "**/lab_api_connectweb.ts"
+  - "**/lab_api_pb.ts"
+  - "**/proto/lab_api*"
+alwaysApply: false
+---
+
+Generated Lab API protobuf client interface that provides Connect-web RPC methods and TypeScript message types for the lab backend.
+
+- **NEVER manually edit generated files** - regenerated from backend/pkg/api/proto/lab_api.proto
+- **Use LabAPI service methods** - getRecentLocallyBuiltBlocks, getSlotData, getConfig (all idempotent)
+- **Import from relative paths** - references beacon_slots_pb.js and lab_pb.js for shared types
+- **All RPC methods are unary** with no side effects for safe frontend consumption

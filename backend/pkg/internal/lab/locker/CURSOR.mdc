@@ -1,0 +1,15 @@
+---
+description: Distributed locking service with token-based authentication and TTL expiration
+globs: 
+  - "*.go"
+  - "**/*_test.go"
+alwaysApply: false
+---
+
+Distributed locking service that provides atomic lock operations with token-based authentication and automatic TTL expiration.
+
+- Use cache.Client as backend storage for distributed coordination
+- Generate unique tokens for secure lock/unlock operations
+- Always implement comprehensive Prometheus metrics (operations, contention, hold duration)
+- Support both Redis and memory cache backends through common interface
+- Handle race conditions and edge cases (token mismatch, expiration, not found)

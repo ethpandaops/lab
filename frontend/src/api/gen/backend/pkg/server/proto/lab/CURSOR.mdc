@@ -1,0 +1,14 @@
+---
+description: Lab API Proto Types - Generated TypeScript types for lab frontend configuration and module management
+globs: 
+  - "**/*lab_pb.ts"
+  - "**/lab*.proto"
+alwaysApply: false
+---
+
+Generated Lab API protobuf types that define frontend configuration and module management structures.
+
+- **Never manually edit `lab_pb.ts`** - auto-generated from backend proto definitions
+- **Use FrontendConfig hierarchy** for module configuration (modules.beaconChainTimings, modules.beacon, etc.)
+- **Follow lab module pattern** - enabled flag, pathPrefix, network-specific configs
+- **Network configuration structure** - genesisTime + fork configurations for Ethereum networks
