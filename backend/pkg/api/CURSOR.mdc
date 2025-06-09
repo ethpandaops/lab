@@ -1,0 +1,24 @@
+---
+description: Backend API Service - Public HTTP API layer with dual routing and service proxy patterns
+globs: 
+  - "*.go"
+  - "config.go"
+  - "service.go"
+  - "lab_api_server.go"
+alwaysApply: false
+---
+
+# Backend API Service
+
+Public HTTP API layer providing dual-path routing (ConnectRPC + legacy JSON) with gRPC service proxy pattern.
+
+## Key Integration Pattern
+- **Hybrid routing**: ConnectRPC endpoints at `/api/` prefix, legacy JSON endpoints for backward compatibility
+- **Service proxy**: Forward all data requests to internal gRPC services (beacon slots, lab config)  
+- **Storage passthrough**: Serve S3 static data with standardized cache headers
+
+## Important Constraints
+- Always use `StandardHTTPHeaders` constants for cache control settings
+- Configurable path prefix support via `HttpServerConfig.PathPrefix`
+- Legacy endpoints must maintain exact URL patterns for backward compatibility
+- All Connect handlers must set appropriate cache headers via `res.Header().Set()`

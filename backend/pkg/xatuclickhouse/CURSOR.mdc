@@ -1,0 +1,26 @@
+---
+description: Xatu ClickHouse package - Type-safe query client for Xatu schema tables
+globs: 
+  - "*.go"
+  - "**/*.go"
+alwaysApply: false
+---
+
+Xatu ClickHouse client package providing type-safe querying of Xatu schema tables with aggregation support.
+
+## Query Execution Patterns
+- Use `QueryWithModel` for standard model-based queries with automatic result mapping
+- Use `ExecuteAggregate` for single aggregation operations (MAX, MIN, COUNT, SUM, AVG)
+- Use `GroupByAggregate` for aggregation queries with GROUP BY clauses
+- Use `QueryWithModelAndOptions` for complex queries with custom aggregations and ordering
+
+## Xatu Schema Conventions
+- Table names follow Xatu naming patterns (beacon_api_*, canonical_*, mempool_*, libp2p_*, mev_relay_*)
+- Model structs must implement `TableName() string` method returning exact ClickHouse table name
+- Parameter structs must follow `{ModelName}Params` pattern with optional pointer fields
+- Always include `ExtractConditions()` support for parameter struct conversion
+
+## Type Safety Requirements
+- All query methods return strongly-typed slices: `[]models.{ModelName}`
+- Use factory functions `newModel := func() Model { return &models.{ModelName}{} }`
+- Parameter validation must happen at client level, not in generated query methods

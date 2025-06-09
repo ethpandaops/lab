@@ -1,0 +1,14 @@
+---
+description: Mock cache implementations for testing lock and cache error conditions
+globs: 
+  - "*.go"
+  - "**/*_test.go"
+alwaysApply: false
+---
+
+Mock cache implementations that provide controllable error injection for testing cache and locking scenarios.
+
+- Implement cache.Client interface for all mock types
+- Use builder pattern for error configuration (WithGetError, WithSetError, etc.)
+- Provide both error-forcing mocks (TokenErrorCache) and configurable mocks (StandardCache)
+- Keep in-memory data simple with map[string][]byte storage

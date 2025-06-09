@@ -1,0 +1,17 @@
+---
+description: Frontend API Client - Connect-web transport layer with singleton and custom client patterns
+globs: 
+  - "**/api/client.ts"
+  - "**/api/singleton.ts"
+  - "**/api/index.ts"
+  - "**/api/example-*.ts"
+alwaysApply: false
+---
+
+Frontend API client layer that provides Connect-web transport for Lab backend gRPC services.
+
+- **Use singleton pattern by default** - `getLabApiClient()` for shared instances across components
+- **Force HTTP GET for unary calls** - `useHttpGet: true` in transport config for frontend compatibility
+- **Include request logging interceptor** - all API calls automatically logged via interceptor
+- **Dynamic config import in singleton** - avoid circular dependencies when accessing base URL
+- **Dual instantiation support** - singleton for normal use, `createLabApiClient()` for custom instances

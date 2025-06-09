@@ -1,0 +1,16 @@
+---
+description: Beacon Slots - Auto-generated protobuf TypeScript definitions for comprehensive beacon slot data
+globs: 
+  - "**/beacon_slots/**/*.ts"
+  - "**/beacon_slots_pb.ts"
+alwaysApply: false
+---
+
+Auto-generated protobuf TypeScript types for comprehensive beacon chain slot data structures.
+
+- NEVER manually edit generated protobuf files - regenerate using protoc-gen-es instead
+- Use BeaconSlotData as the main container with block, proposer, timings, attestations, and MEV data
+- SlimTimings vs FullTimings: SlimTimings drops metadata/geo for efficiency
+- MEV data includes RelayBids and DeliveredPayloads keyed by relay name
+- LocallyBuiltBlock structures track validator-built blocks with comprehensive metadata
+- All timing data uses millisecond precision relative to slot start times

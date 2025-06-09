@@ -1,0 +1,15 @@
+---
+description: Cache - pluggable backend cache implementation with metrics instrumentation
+globs: 
+  - "*.go"
+  - "**/*_test.go"
+alwaysApply: false
+---
+
+Cache component that provides pluggable backend implementations (Redis, memory) with unified interface and comprehensive metrics instrumentation.
+
+- Use the Client interface for all cache operations to ensure implementation agnostic code
+- Initialize all Prometheus metrics with error handling and graceful degradation if metrics fail
+- Implement background goroutines for maintenance (garbage collection, metrics updates) with proper cleanup via channels
+- Always instrument cache operations with duration, status, hits/misses metrics for observability
+- Use consistent error types (ErrCacheMiss) and status constants across implementations

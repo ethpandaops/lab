@@ -1,0 +1,23 @@
+---
+description: Desktop Block Production View - Large-screen optimized block production visualization
+globs: 
+  - "**/beacon/block_production/desktop/**/*.{ts,tsx}"
+  - "**/block_production/desktop/**/*.{ts,tsx}"
+alwaysApply: false
+---
+
+# Desktop Block Production View
+
+Desktop-optimized 3-panel layout for visualizing Ethereum beacon chain block production with timeline integration.
+
+## Layout Architecture
+
+- **3-Panel Design**: Builders/Relays (left 20%) → Blockchain Visualization (center 60%) → Continents (right 20%)
+- **Conditional Timeline**: Show PhaseTimeline component only when navigation controls are provided (live page mode)
+- **Active State Management**: Components transition opacity based on phase timing and activity patterns
+
+## Key Integration Patterns
+
+- All panels coordinate through shared `isActive()` logic that determines component visibility based on block propagation timeline
+- Timeline context (`useTimeline`) drives real-time state updates across all visualization components
+- FlowStage components handle dense data display with role-specific sorting and rendering optimizations

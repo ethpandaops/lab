@@ -1,0 +1,20 @@
+---
+description: Lab Connect RPC - Generated Connect-Go client and server for Lab service
+globs: 
+  - "**/labconnect/*.go"
+  - "**/labconnect/**/*.go"
+alwaysApply: false
+---
+
+Generated Connect-Go RPC bindings for Lab service providing frontend configuration endpoints.
+
+**Key Patterns:**
+- Generated code from protobuf definitions - DO NOT manually edit
+- Implements Connect RPC protocol for HTTP/gRPC compatibility  
+- Provides both client and server interfaces for LabService
+- Uses connect.Request/Response wrappers for all RPC calls
+
+**Important Constraints:**
+- File is code-generated - regenerate via protoc-gen-connect-go when proto changes
+- Maintain backward compatibility when modifying underlying proto definitions
+- Client construction requires baseURL and HTTPClient configuration

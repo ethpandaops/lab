@@ -1,0 +1,23 @@
+---
+description: S3-compatible storage client with encoding, compression, and atomic operations
+globs:
+  - "*.go"
+  - "**/*_test.go"
+alwaysApply: false
+---
+
+S3-compatible object storage client that supports structured data encoding, compression, and atomic writes.
+
+## Key Integration Patterns
+- Use `StoreParams` struct for all store operations with validation
+- Support JSON/YAML encoding via codec registry pattern  
+- Optional gzip compression with automatic Content-Encoding handling
+- Atomic writes using temporary keys with copy-and-delete pattern
+- Comprehensive Prometheus metrics for all operations
+
+## Critical Design Constraints
+- All operations require initialized S3 client (call Start() first)
+- Store() validates parameters before processing - never skip validation
+- Content type auto-detection based on encoding format
+- Decompression is automatic on Get() when Content-Encoding header present
+- Error handling distinguishes between not-found vs actual errors

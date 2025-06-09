@@ -1,0 +1,33 @@
+---
+description: Beacon Slots - Ethereum beacon chain slot data collection and processing service
+globs: 
+  - "*.go"
+  - "**/*_test.go"
+alwaysApply: false
+---
+
+# Beacon Slots Service
+
+Ethereum beacon chain slot data collection service that processes slots using multi-stage pipeline with distributed leadership coordination.
+
+## Key Integration Patterns
+
+- **Multi-stage processing pipeline**: Uses head, trailing, and backfill processors with distinct purposes and timing
+- **Distributed leader election**: Coordinates processing across multiple instances using leader.Client with TTL-based leasing
+- **Parallel data aggregation**: Fetches block, attestation, MEV, and timing data concurrently using errgroup patterns
+- **ClickHouse integration**: All data fetching uses network-specific ClickHouse clients via xatu.Client
+- **State persistence**: Maintains processor state using state.Client with cache backend for resumable processing
+
+## Processing Architecture
+
+- Head processor: Processes recent slots with configured delay (HeadDelaySlots)
+- Trailing processor: Processes intermediate slots (~500 slots behind current)
+- Backfill processor: Handles historical slot processing with configurable backlog
+- All processors coordinate via shared leader election to prevent conflicts
+
+## Critical Constraints
+
+- Only process when leader elected - never run multiple instances simultaneously
+- Always use storage.Client for persistence with Gzip compression
+- MEV data fetching is optional - failures should not break slot processing
+- State updates must be atomic - complete processing before updating state

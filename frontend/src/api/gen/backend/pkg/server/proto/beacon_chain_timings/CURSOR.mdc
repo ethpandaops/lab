@@ -1,0 +1,15 @@
+---
+description: Beacon Chain Timings - Auto-generated protobuf TypeScript definitions
+globs: 
+  - "**/beacon_chain_timings/**/*.ts"
+  - "**/beacon_chain_timings_pb.ts"
+alwaysApply: false
+---
+
+Auto-generated protobuf TypeScript types for beacon chain timing analysis data structures.
+
+- NEVER manually edit generated protobuf files - regenerate using protoc-gen-es instead
+- Use TimingData for block timing statistics with percentile breakdowns (p05, p50, p95)
+- Use SizeCDFData for cumulative distribution function analysis of block sizes
+- All request/response pairs follow standard protobuf patterns with binary/JSON serialization
+- State tracking uses network+window_name as composite keys for processor coordination

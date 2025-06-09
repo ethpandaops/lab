@@ -1,0 +1,14 @@
+---
+description: Frontend Utils - Core utility functions for data management and formatting
+globs: 
+  - "**/utils/*.ts"
+  - "**/utils.ts"
+alwaysApply: false
+---
+
+Core utility functions providing data management, caching, formatting, and geolocation services for the frontend application.
+
+- **Singleton data store pattern** - use `SlotDataStore.getInstance()` for persistent slot data caching with automatic cleanup
+- **Coordinate fallback strategy** - prefer backend-provided coordinates, fallback to continent centers using `getNodeCoordinates()`
+- **Entity name normalization** - use `formatEntityName()` for consistent validator/operator name formatting (handles CSM, Lido, whales, ENS)
+- **React Query integration** - use `useDataFetch<T>()` hook for type-safe API calls with standardized loading/error states
