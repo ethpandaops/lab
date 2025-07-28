@@ -35,9 +35,9 @@ services:
     entrypoint: >
       /bin/sh -c "
       sleep 5;
-      /usr/bin/mc config host add myminio http://minio:9000 minioadmin minioadmin;
+      /usr/bin/mc alias set myminio http://minio:9000 minioadmin minioadmin;
       /usr/bin/mc mb myminio/lab;
-      /usr/bin/mc policy set public myminio/lab;
+      /usr/bin/mc anonymous set public myminio/lab;
       exit 0;
       "
     profiles: 
