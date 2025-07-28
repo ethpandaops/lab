@@ -61,7 +61,7 @@ export const GoogleFormSystemAlert = () => {
         <p className="text-xs font-medium text-primary whitespace-nowrap">Add your node to The Lab</p>
       </div>
       <a
-        href="https://docs.google.com/forms/d/e/1FAIpQLSfSCHLZv2xdDKceQ3ajzYbkm2jkQnG0lVBhjEX4c1Jxvf8QfA/viewform"
+        href="https://ethpandaops.io/contribute-data/"
         target="_blank"
         rel="noopener noreferrer"
         className="flex-shrink-0 inline-flex items-center justify-center px-3 py-1 text-xs font-medium text-primary bg-accent/10 hover:bg-accent/20 transition-all hover:scale-105"
