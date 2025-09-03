@@ -287,8 +287,6 @@ func testLockBehavior(t *testing.T, impl string, locker locker.Locker) {
 					released, err := locker.Unlock(lockName, token)
 					if err != nil {
 						t.Errorf("Error in goroutine %d releasing lock: %v", id, err)
-
-						return
 					}
 
 					if released {
