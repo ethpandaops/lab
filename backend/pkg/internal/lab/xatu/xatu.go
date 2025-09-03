@@ -95,11 +95,13 @@ func (c *Client) Start(ctx context.Context) error {
 
 	// Track success/failure for metrics
 	var status = "success"
+
 	defer func() {
 		// Record metrics if available
 		c.requestsTotal.WithLabelValues("start", status).Inc()
 
 		duration := time.Since(startTime).Seconds()
+
 		c.requestDuration.WithLabelValues("start").Observe(duration)
 	}()
 

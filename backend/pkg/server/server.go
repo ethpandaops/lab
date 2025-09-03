@@ -21,10 +21,10 @@ import (
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/xatu"
 	"github.com/ethpandaops/lab/backend/pkg/server/internal/grpc"
 	"github.com/ethpandaops/lab/backend/pkg/server/internal/service"
-	beacon_chain_timings "github.com/ethpandaops/lab/backend/pkg/server/internal/service/beacon_chain_timings"
-	beacon_slots "github.com/ethpandaops/lab/backend/pkg/server/internal/service/beacon_slots"
-	lab "github.com/ethpandaops/lab/backend/pkg/server/internal/service/lab"
-	xatu_public_contributors "github.com/ethpandaops/lab/backend/pkg/server/internal/service/xatu_public_contributors"
+	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/beacon_chain_timings"
+	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/beacon_slots"
+	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/lab"
+	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/xatu_public_contributors"
 	"github.com/sirupsen/logrus"
 )
 
@@ -363,8 +363,11 @@ func (s *Service) stop() {
 
 		go func() {
 			defer wg.Done()
+
 			s.log.Info("Stopping gRPC server...")
+
 			s.grpcServer.Stop()
+
 			s.log.Info("gRPC server stopped.")
 		}()
 	}
@@ -375,6 +378,7 @@ func (s *Service) stop() {
 
 		go func() {
 			defer wg.Done()
+
 			s.log.Info("Stopping HTTP server...")
 
 			if err := s.httpServer.Shutdown(shutdownCtx); err != nil {
@@ -400,8 +404,11 @@ func (s *Service) stop() {
 
 		go func() {
 			defer wg.Done()
+
 			s.log.Info("Stopping Xatu client...")
+
 			s.xatuClient.Stop()
+
 			s.log.Info("Xatu client stopped.")
 		}()
 	}
@@ -411,6 +418,7 @@ func (s *Service) stop() {
 
 		go func() {
 			defer wg.Done()
+
 			s.log.Info("Stopping Storage client...")
 
 			if err := s.storageClient.Stop(); err != nil {
@@ -426,6 +434,7 @@ func (s *Service) stop() {
 
 		go func() {
 			defer wg.Done()
+
 			s.log.Info("Stopping Cache client...")
 
 			if err := s.cacheClient.Stop(); err != nil {
@@ -438,8 +447,10 @@ func (s *Service) stop() {
 
 	// Wait for all components to stop or timeout
 	waitChan := make(chan struct{})
+
 	go func() {
 		wg.Wait()
+
 		close(waitChan)
 	}()
 

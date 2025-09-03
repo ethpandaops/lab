@@ -155,8 +155,8 @@ func main() {
 
 		// Only write to existing files
 		outputFile := filepath.Join(outputDir, getCategoryFile(category))
-		f, err := os.Create(outputFile)
 
+		f, err := os.Create(outputFile)
 		if err != nil {
 			fmt.Printf("Error creating file %s: %v\n", outputFile, err)
 

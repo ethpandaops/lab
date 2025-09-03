@@ -154,6 +154,7 @@ func (l *client) Start() {
 	l.log.Info("Starting Client election")
 
 	l.mu.Lock()
+
 	if l.started || l.stopped {
 		l.mu.Unlock()
 
@@ -161,6 +162,7 @@ func (l *client) Start() {
 	}
 
 	l.started = true
+
 	l.mu.Unlock()
 
 	go l.run()
@@ -171,6 +173,7 @@ func (l *client) Stop() {
 	l.log.Info("Stopping Client election")
 
 	l.mu.Lock()
+
 	if l.stopped {
 		l.mu.Unlock()
 
@@ -178,6 +181,7 @@ func (l *client) Stop() {
 	}
 
 	l.stopped = true
+
 	l.mu.Unlock()
 
 	// Cancel the context to stop the refresh goroutine

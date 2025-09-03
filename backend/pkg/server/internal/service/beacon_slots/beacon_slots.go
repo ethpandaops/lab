@@ -251,8 +251,10 @@ func (b *BeaconSlots) stopProcessors() {
 
 		// Wait for all processors to stop with a timeout
 		done := make(chan struct{})
+
 		go func() {
 			b.processWaitGroup.Wait()
+
 			close(done)
 		}()
 
@@ -283,6 +285,7 @@ func (b *BeaconSlots) startProcessors(ctx context.Context) {
 
 		go func(network string) {
 			defer b.processWaitGroup.Done()
+
 			b.processHead(ctx, network)
 		}(network.Name)
 
@@ -291,6 +294,7 @@ func (b *BeaconSlots) startProcessors(ctx context.Context) {
 
 		go func(network string) {
 			defer b.processWaitGroup.Done()
+
 			b.processTrailing(ctx, network)
 		}(network.Name)
 
@@ -299,6 +303,7 @@ func (b *BeaconSlots) startProcessors(ctx context.Context) {
 
 		go func(network string) {
 			defer b.processWaitGroup.Done()
+
 			b.processBackfill(ctx, network)
 		}(network.Name)
 	}

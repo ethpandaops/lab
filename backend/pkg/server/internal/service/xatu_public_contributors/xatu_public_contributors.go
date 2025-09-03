@@ -784,8 +784,8 @@ func (b *XatuPublicContributors) processSummary(ctx context.Context, networks []
 
 	for _, network := range networks {
 		networkLog := log.WithField("query_network", network.Name)
-		ch, err := b.xatuClient.GetClickhouseClientForNetwork(network.Name)
 
+		ch, err := b.xatuClient.GetClickhouseClientForNetwork(network.Name)
 		if err != nil {
 			networkLog.WithError(err).Warnf("Clickhouse client not available for network, skipping summary contribution")
 
@@ -1208,8 +1208,8 @@ func (b *XatuPublicContributors) processUserSummaries(ctx context.Context, netwo
 
 	for _, network := range networks {
 		networkLog := log.WithField("query_network", network.Name)
-		clickhouseClient, err := b.xatuClient.GetClickhouseClientForNetwork(network.Name)
 
+		clickhouseClient, err := b.xatuClient.GetClickhouseClientForNetwork(network.Name)
 		if err != nil {
 			networkLog.WithError(err).Warnf("Clickhouse client not available for network, skipping")
 

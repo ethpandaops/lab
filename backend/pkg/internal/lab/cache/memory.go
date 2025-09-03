@@ -247,12 +247,15 @@ func (c *Memory) deleteExpired() {
 
 	// Clean up cache items
 	c.mu.Lock()
+
 	for key, item := range c.data {
 		if !item.expiration.IsZero() && now.After(item.expiration) {
 			delete(c.data, key)
 		}
 	}
+
 	// Update items metric after cleanup
 	c.items.WithLabelValues().Set(float64(len(c.data)))
+
 	c.mu.Unlock()
 }

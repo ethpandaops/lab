@@ -91,13 +91,13 @@ func (b *BeaconChainTimings) processSizeCDF(ctx context.Context, network *ethere
 
 	// Record duration metric if available
 	duration := time.Since(startTime).Seconds()
+
 	histogram, err := b.metricsCollector.NewHistogramVec(
 		"processing_duration_seconds",
 		"Duration of processing operations in seconds",
 		[]string{"operation", "network", "window"},
 		nil,
 	)
-
 	if err == nil {
 		histogram.WithLabelValues("size_cdf", network.Name, window.File).Observe(duration)
 	}
@@ -254,7 +254,7 @@ func (b *BeaconChainTimings) GetSizeCDFData(ctx context.Context, network string,
 	b.log.Debug("Querying block arrival data")
 
 	arrivalQuery := `
-		SELECT 
+		SELECT
 			slot,
 			meta_network_name,
 			min(propagation_slot_start_diff) as arrival_time
@@ -329,7 +329,7 @@ func (b *BeaconChainTimings) GetSizeCDFData(ctx context.Context, network string,
 	b.log.Debug("Querying block size data")
 
 	sizeQuery := `
-		SELECT 
+		SELECT
 			slot,
 			meta_network_name,
 			proposer_index,
@@ -356,7 +356,7 @@ func (b *BeaconChainTimings) GetSizeCDFData(ctx context.Context, network string,
 	b.log.Debug("Getting proposer entities")
 
 	proposerQuery := `
-		SELECT 
+		SELECT
 			"index" as proposer_index,
 			entity
 		FROM ethseer_validator_entity FINAL

@@ -68,7 +68,7 @@ jobs:
       - name: golangci-lint
         uses: golangci/golangci-lint-action@9fae48acfc02a90574d7c304a1758ef9895495fa # v7.0.1
         with:
-          version: v2.0
+          version: v2.4.0
           working-directory: backend
           args: --timeout=10m
           only-new-issues: ${{ github.event_name == 'pull_request' || github.event_name == 'merge_group' }}
@@ -78,10 +78,10 @@ jobs:
 
       - name: Set exit code
         if: |
-          needs.check-pr.outputs.is_authorized == 'false' && 
-          github.event_name == 'pull_request' && 
+          needs.check-pr.outputs.is_authorized == 'false' &&
+          github.event_name == 'pull_request' &&
           steps.golangci-lint.outcome == 'failure'
         run: |
           echo "Linting failed but PR is from an unauthorized source, ignoring failure to allow CI to pass."
           # This allows the workflow to pass even if linting fails for unauthorized contributors
-          exit 0 
+          exit 0

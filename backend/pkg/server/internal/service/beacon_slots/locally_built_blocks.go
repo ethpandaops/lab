@@ -14,7 +14,7 @@ import (
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/locker"
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/metrics"
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/xatu"
-	beacon_slots "github.com/ethpandaops/lab/backend/pkg/server/proto/beacon_slots"
+	"github.com/ethpandaops/lab/backend/pkg/server/proto/beacon_slots"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -481,8 +481,8 @@ func (b *BeaconSlots) FetchRecentLocallyBuiltBlocks(ctx context.Context, network
 
 	for slot := nowSlot - phase0.Slot(b.config.LocallyBuiltBlocksConfig.Slots); slot <= nowSlot; slot++ { //nolint:gosec // not a security issue
 		slotCacheKey := GetLocallyBuiltBlockSlotCacheKey(networkName, slot)
-		slotData, err := b.cacheClient.Get(slotCacheKey)
 
+		slotData, err := b.cacheClient.Get(slotCacheKey)
 		if err != nil {
 			// Skip slots that don't have cached data
 			continue
