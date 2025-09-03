@@ -208,6 +208,103 @@ func (r *Redis) Set(key string, value []byte, ttl time.Duration) error {
 	return nil
 }
 
+// SetNX sets a value in Redis only if the key doesn't exist (atomic operation)
+func (r *Redis) SetNX(key string, value []byte, ttl time.Duration) (bool, error) {
+	start := time.Now()
+
+	var status = StatusOK
+
+	var set bool
+
+	defer func() {
+		duration := time.Since(start).Seconds()
+		r.operationDuration.With(prometheus.Labels{"operation": "setnx"}).Observe(duration)
+		r.requestsTotal.With(prometheus.Labels{"operation": "setnx", "status": status}).Inc()
+	}()
+
+	// Use default TTL if not specified
+	if ttl == 0 {
+		ttl = r.defaultTTL
+	}
+
+	// Use Redis SetNX operation (atomic)
+	result := r.client.SetNX(r.ctx, key, value, ttl)
+
+	set, err := result.Result()
+	if err != nil {
+		status = StatusError
+
+		return false, fmt.Errorf("redis setnx error: %w", err)
+	}
+
+	// Update items count after successful set
+	if set {
+		go r.updateItemsCount()
+	}
+
+	return set, nil
+}
+
+// SetIfMatch sets a value in Redis only if the current value matches expected (atomic operation)
+func (r *Redis) SetIfMatch(key string, value []byte, expected []byte, ttl time.Duration) (bool, error) {
+	start := time.Now()
+
+	var status = StatusOK
+
+	var set bool
+
+	defer func() {
+		duration := time.Since(start).Seconds()
+		r.operationDuration.With(prometheus.Labels{"operation": "setifmatch"}).Observe(duration)
+		r.requestsTotal.With(prometheus.Labels{"operation": "setifmatch", "status": status}).Inc()
+	}()
+
+	// Use default TTL if not specified
+	if ttl == 0 {
+		ttl = r.defaultTTL
+	}
+
+	// Use a Lua script for atomic compare-and-set
+	// Script: if current value matches expected, set new value and return 1, else return 0
+	script := `
+		local key = KEYS[1]
+		local expected = ARGV[1]
+		local newval = ARGV[2]
+		local ttl = ARGV[3]
+		
+		local current = redis.call('GET', key)
+		if current == expected then
+			if ttl == "0" then
+				redis.call('SET', key, newval)
+			else
+				redis.call('SET', key, newval, 'EX', ttl)
+			end
+			return 1
+		else
+			return 0
+		end
+	`
+
+	ttlSeconds := int64(ttl.Seconds())
+	result := r.client.Eval(r.ctx, script, []string{key}, expected, value, ttlSeconds)
+
+	val, err := result.Int()
+	if err != nil {
+		status = StatusError
+
+		return false, fmt.Errorf("redis setifmatch error: %w", err)
+	}
+
+	set = val == 1
+
+	// Update items count after successful set
+	if set {
+		go r.updateItemsCount()
+	}
+
+	return set, nil
+}
+
 // Delete removes a value from Redis
 func (r *Redis) Delete(key string) error {
 	start := time.Now()

@@ -36,6 +36,11 @@ type Locker interface {
 	// The token must match the one returned by Lock.
 	// Returns true if the lock was released, false otherwise.
 	Unlock(name string, token string) (bool, error)
+
+	// Refresh atomically refreshes a lock by updating its token and TTL.
+	// The old token must match the current lock token.
+	// Returns the new token if successful, or empty string if refresh failed.
+	Refresh(name string, oldToken string, ttl time.Duration) (string, bool, error)
 }
 
 // locker implements the Locker interface
@@ -162,10 +167,18 @@ func (l *locker) Lock(name string, ttl time.Duration) (string, bool, error) {
 	// The timestamp key in the cache (for measuring hold duration)
 	timestampKey := "lock_timestamp:" + name
 
-	// Try to get the existing lock
-	_, err = l.cache.Get(lockKey)
-	if err == nil {
-		// Lock exists and is valid
+	// Atomically try to set the lock (only succeeds if key doesn't exist)
+	success, err := l.cache.SetNX(lockKey, []byte(token), ttl)
+	if err != nil {
+		logCtx.WithError(err).Error("Failed to set lock")
+
+		status = StatusError
+
+		return "", false, err
+	}
+
+	if !success {
+		// Lock already exists
 		logCtx.Debug("Lock exists and is valid")
 
 		status = StatusAlreadyLocked
@@ -174,23 +187,6 @@ func (l *locker) Lock(name string, ttl time.Duration) (string, bool, error) {
 		l.lockContention.WithLabelValues().Inc()
 
 		return "", false, nil
-	} else if err != cache.ErrCacheMiss {
-		// Unexpected error
-		logCtx.WithError(err).Error("Failed to get lock")
-
-		status = StatusError
-
-		return "", false, err
-	}
-
-	// No lock exists or it has expired, try to set it
-	err = l.cache.Set(lockKey, []byte(token), ttl)
-	if err != nil {
-		logCtx.WithError(err).Error("Failed to set lock")
-
-		status = StatusError
-
-		return "", false, err
 	}
 
 	// Store the acquisition timestamp for measuring hold duration
@@ -292,4 +288,68 @@ func (l *locker) Unlock(name string, token string) (bool, error) {
 	released = true
 
 	return true, nil
+}
+
+// Refresh atomically refreshes a lock by updating its token and TTL
+func (l *locker) Refresh(name string, oldToken string, ttl time.Duration) (string, bool, error) {
+	startTime := time.Now()
+
+	var status = "success"
+
+	// Defer metrics recording
+	defer func() {
+		duration := time.Since(startTime).Seconds()
+		l.operationDuration.WithLabelValues("refresh").Observe(duration)
+		l.operationsTotal.WithLabelValues("refresh", status).Inc()
+	}()
+
+	logCtx := l.log.WithField("name", name).WithField("ttl", ttl)
+	logCtx.Debug("Refreshing lock")
+
+	// Generate a new token for the refresh
+	newToken, err := generateTokenFn()
+	if err != nil {
+		logCtx.WithError(err).Error("Failed to generate new token")
+
+		status = StatusError
+
+		return "", false, err
+	}
+
+	// The lock key in the cache
+	lockKey := "lock:" + name
+
+	// Use SetIfMatch to atomically update the lock if the old token matches
+	success, err := l.cache.SetIfMatch(lockKey, []byte(newToken), []byte(oldToken), ttl)
+	if err != nil {
+		logCtx.WithError(err).Error("Failed to refresh lock")
+
+		status = StatusError
+
+		return "", false, err
+	}
+
+	if !success {
+		logCtx.Debug("Lock token doesn't match or lock doesn't exist")
+
+		status = "mismatch"
+
+		return "", false, nil
+	}
+
+	// Update the timestamp for duration tracking
+	timestampKey := "lock_timestamp:" + name
+	timestamp := time.Now().UnixNano()
+
+	err = l.cache.Set(timestampKey, []byte(fmt.Sprintf("%d", timestamp)), ttl)
+	if err != nil {
+		logCtx.WithError(err).Warn("Failed to update lock timestamp")
+	}
+
+	logCtx.Debug("Lock refreshed")
+
+	// Update locks held gauge (still held, just refreshed)
+	// No change needed to the gauge
+
+	return newToken, true, nil
 }

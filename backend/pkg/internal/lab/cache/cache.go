@@ -39,6 +39,14 @@ type Client interface {
 	// Set sets a value in the cache
 	Set(key string, value []byte, ttl time.Duration) error
 
+	// SetNX sets a value in the cache only if the key doesn't exist
+	// Returns true if the value was set, false if it already exists
+	SetNX(key string, value []byte, ttl time.Duration) (bool, error)
+
+	// SetIfMatch sets a value in the cache only if the current value matches the expected value
+	// Returns true if the value was set, false if the current value doesn't match
+	SetIfMatch(key string, value []byte, expected []byte, ttl time.Duration) (bool, error)
+
 	// Delete deletes a value from the cache
 	Delete(key string) error
 

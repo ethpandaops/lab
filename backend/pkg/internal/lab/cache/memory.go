@@ -1,6 +1,7 @@
 package cache
 
 import (
+	"bytes"
 	"sync"
 	"time"
 
@@ -128,10 +129,12 @@ func (c *Memory) Get(key string) ([]byte, error) {
 
 	c.mu.RLock()
 	item, exists := c.data[key]
-	c.mu.RUnlock()
 
 	if !exists {
+		c.mu.RUnlock()
+
 		status = StatusMiss
+
 		err = ErrCacheMiss
 
 		c.missesTotal.WithLabelValues().Inc()
@@ -139,8 +142,10 @@ func (c *Memory) Get(key string) ([]byte, error) {
 		return nil, err
 	}
 
-	// Check if the item has expired
+	// Check if the item has expired while holding the lock
 	if !item.expiration.IsZero() && time.Now().After(item.expiration) {
+		c.mu.RUnlock()
+
 		// Item has expired, delete it (Delete method already has instrumentation)
 		delErr := c.Delete(key) // Use separate var to avoid shadowing outer err
 		if delErr != nil {
@@ -160,8 +165,12 @@ func (c *Memory) Get(key string) ([]byte, error) {
 		return nil, err
 	}
 
-	status = "hit"
+	// Item is valid, get the value while still holding the lock
 	value = item.value
+
+	c.mu.RUnlock()
+
+	status = "hit"
 
 	c.hitsTotal.WithLabelValues().Inc()
 
@@ -202,6 +211,118 @@ func (c *Memory) Set(key string, value []byte, ttl time.Duration) error {
 	c.mu.Unlock()
 
 	return nil
+}
+
+// SetNX sets a value in the cache only if the key doesn't exist (atomic operation)
+func (c *Memory) SetNX(key string, value []byte, ttl time.Duration) (bool, error) {
+	start := time.Now()
+
+	var status = "ok"
+
+	var set bool
+
+	defer func() {
+		duration := time.Since(start).Seconds()
+		c.operationDuration.With(prometheus.Labels{"operation": "setnx"}).Observe(duration)
+		c.requestsTotal.With(prometheus.Labels{"operation": "setnx", "status": status}).Inc()
+	}()
+
+	// Use default TTL if not specified
+	if ttl == 0 {
+		ttl = c.defaultTTL
+	}
+
+	// Calculate expiration
+	var expiration time.Time
+	if ttl > 0 {
+		expiration = time.Now().Add(ttl)
+	}
+
+	// Atomically check and set if not exists
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	// Check if key exists and is not expired
+	if item, exists := c.data[key]; exists {
+		// Check if item has expired
+		if !item.expiration.IsZero() && time.Now().After(item.expiration) {
+			// Item expired, we can set it
+			c.data[key] = cacheItem{
+				value:      value,
+				expiration: expiration,
+			}
+			c.items.WithLabelValues().Set(float64(len(c.data)))
+
+			set = true
+		} else {
+			// Item exists and is valid
+			set = false
+		}
+	} else {
+		// Key doesn't exist, set it
+		c.data[key] = cacheItem{
+			value:      value,
+			expiration: expiration,
+		}
+		c.items.WithLabelValues().Set(float64(len(c.data)))
+
+		set = true
+	}
+
+	return set, nil
+}
+
+// SetIfMatch sets a value in the cache only if the current value matches expected (atomic operation)
+func (c *Memory) SetIfMatch(key string, value []byte, expected []byte, ttl time.Duration) (bool, error) {
+	start := time.Now()
+
+	var status = "ok"
+
+	var set bool
+
+	defer func() {
+		duration := time.Since(start).Seconds()
+		c.operationDuration.With(prometheus.Labels{"operation": "setifmatch"}).Observe(duration)
+		c.requestsTotal.With(prometheus.Labels{"operation": "setifmatch", "status": status}).Inc()
+	}()
+
+	// Use default TTL if not specified
+	if ttl == 0 {
+		ttl = c.defaultTTL
+	}
+
+	// Calculate expiration
+	var expiration time.Time
+	if ttl > 0 {
+		expiration = time.Now().Add(ttl)
+	}
+
+	// Atomically check and set if match
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	// Check if key exists and matches expected value
+	item, exists := c.data[key]
+	if !exists { //nolint:gocritic // switch not possible.
+		// Key doesn't exist, doesn't match
+		set = false
+	} else if !item.expiration.IsZero() && time.Now().After(item.expiration) {
+		// Item expired, doesn't match
+		set = false
+	} else if bytes.Equal(item.value, expected) {
+		// Item matches expected, update it
+		c.data[key] = cacheItem{
+			value:      value,
+			expiration: expiration,
+		}
+
+		set = true
+	} else {
+		// Item doesn't match expected
+		set = false
+	}
+
+	return set, nil
 }
 
 // Delete deletes a value from the cache

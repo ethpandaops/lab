@@ -2,6 +2,7 @@
 package mock
 
 import (
+	"bytes"
 	"fmt"
 	"time"
 
@@ -94,6 +95,39 @@ func (m *StandardCache) Set(key string, value []byte, ttl time.Duration) error {
 	m.data[key] = value
 
 	return nil
+}
+
+// SetNX implements cache.Client
+func (m *StandardCache) SetNX(key string, value []byte, ttl time.Duration) (bool, error) {
+	if m.setErr != nil {
+		return false, m.setErr
+	}
+
+	// Check if key already exists
+	if _, exists := m.data[key]; exists {
+		return false, nil
+	}
+
+	m.data[key] = value
+
+	return true, nil
+}
+
+// SetIfMatch implements cache.Client
+func (m *StandardCache) SetIfMatch(key string, value []byte, expected []byte, ttl time.Duration) (bool, error) {
+	if m.setErr != nil {
+		return false, m.setErr
+	}
+
+	// Check if key exists and matches expected
+	current, exists := m.data[key]
+	if !exists || !bytes.Equal(current, expected) {
+		return false, nil
+	}
+
+	m.data[key] = value
+
+	return true, nil
 }
 
 // Delete implements cache.Client
