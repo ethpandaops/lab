@@ -154,6 +154,7 @@ func (l *client) Start() {
 	l.log.Info("Starting Client election")
 
 	l.mu.Lock()
+
 	if l.started || l.stopped {
 		l.mu.Unlock()
 
@@ -161,6 +162,7 @@ func (l *client) Start() {
 	}
 
 	l.started = true
+
 	l.mu.Unlock()
 
 	go l.run()
@@ -171,6 +173,7 @@ func (l *client) Stop() {
 	l.log.Info("Stopping Client election")
 
 	l.mu.Lock()
+
 	if l.stopped {
 		l.mu.Unlock()
 
@@ -178,6 +181,7 @@ func (l *client) Stop() {
 	}
 
 	l.stopped = true
+
 	l.mu.Unlock()
 
 	// Cancel the context to stop the refresh goroutine
@@ -331,45 +335,43 @@ func (l *client) refreshLock() bool {
 		return false
 	}
 
-	// Approach 1: Try to extend the existing lock by reacquiring it
-	newToken, success, err := l.locker.Lock(l.config.Resource, l.config.TTL)
-	if err == nil && success {
-		l.log.Debug("Successfully refreshed lock")
+	// Use the locker's atomic Refresh method
+	newToken, success, err := l.locker.Refresh(l.config.Resource, token, l.config.TTL)
+	if err != nil {
+		l.log.WithError(err).Error("Failed to refresh lock")
+		l.errorsTotal.WithLabelValues("refresh").Inc()
 
-		// Successfully refreshed, update token
-		l.mu.Lock()
-		l.token = newToken
-		l.mu.Unlock()
-
-		// Best effort cleanup of old lock
-		_, _ = l.locker.Unlock(l.config.Resource, token)
-
-		return true
-	}
-
-	// Approach 2: If the lock couldn't be acquired, verify we still hold it
-	// by attempting a no-op unlock/lock cycle with 0 TTL
-	released, _ := l.locker.Unlock(l.config.Resource, token)
-	if !released {
-		l.log.Error("Failed to release our own lock, something is wrong")
-		l.errorsTotal.WithLabelValues("release").Inc()
-
-		// We couldn't release our own lock, something is wrong
 		return false
 	}
 
-	// Immediately try to reacquire
-	newToken, success, err = l.locker.Lock(l.config.Resource, l.config.TTL)
-	if err != nil || !success {
-		l.log.Error("Failed to reacquire lock, something is wrong")
-		l.errorsTotal.WithLabelValues("reacquire").Inc()
+	if !success {
+		l.log.Warn("Lost leadership during refresh")
+		l.errorsTotal.WithLabelValues("lost").Inc()
+
+		// We've lost leadership
+		l.mu.Lock()
+		wasLeader := l.isLeader
+		l.isLeader = false
+		l.token = ""
+		l.mu.Unlock()
+
+		// Update metrics
+		l.isLeaderGauge.WithLabelValues().Set(0)
+
+		if wasLeader {
+			l.leadershipChangesTotal.WithLabelValues("lost").Inc()
+
+			if l.config.OnRevoked != nil {
+				go l.config.OnRevoked()
+			}
+		}
 
 		return false
 	}
 
 	l.log.Debug("Successfully refreshed lock")
 
-	// Successfully refreshed with approach 2
+	// Successfully refreshed with new token
 	l.mu.Lock()
 	l.token = newToken
 	l.mu.Unlock()

@@ -4,7 +4,7 @@
 
 The ethPandaOps Lab is our high velocity, experimental platform for exploring new ideas and concepts in the Ethereum ecosystem. The Lab aims to provide insights that are not viable with standard observability tools like Grafana or Prometheus.
 
-The codebase is built with a focus on developer experience and integration with LLM's to quickly iterate on ideas. 
+The codebase is built with a focus on developer experience and integration with LLM's to quickly iterate on ideas.
 
 ## Features
 
@@ -35,125 +35,55 @@ The application consists of:
 
 ### Backend (Go)
 
-The backend is implemented in Go as a single binary with two main components:
+The backend is implemented in Go as a single binary with two main services:
 
-- **SRV Service**: Handles business logic, data processing, scheduled tasks, and storage. Collects and processes data from Ethereum networks and Xatu, stores processed data in S3-compatible storage, and exposes gRPC endpoints for internal communication. Implements leader election for distributed processing.
-- **API Service**: Client-facing service providing HTTP/REST endpoints, retrieving data from S3 storage, implementing caching, and serving data to the frontend. Communicates with the SRV service via gRPC.
+- **SRV Service**: Handles business logic, data processing, and metrics collection
+- **API Service**: Provides client-facing HTTP/REST endpoints
 
-#### Key Backend Modules
+For detailed backend architecture, modules, and technologies, see [backend/README.md](backend/README.md).
 
-- **beacon_slots**: Processes beacon chain slots in three modes (head, trailing, backfill)
-- **beacon_chain_timings**: Provides timing statistics and size distribution metrics
-- **xatu_public_contributors**: Tracks contributor data with time window processing
-- **lab**: Central configuration service for frontend
+### Frontend (React)
 
-#### Technologies
-
-- **Go 1.24+**
-- **ClickHouse**: Analytics database for storing and querying large volumes of data
-- **MinIO (S3)**: Object storage for processed data
-- **Redis**: Caching, distributed locking, and temporary state storage
-- **gRPC & Protocol Buffers**: Internal and external APIs
-- **Makefile**: For build and development tasks
-- **Docker Compose**: For local development and orchestration
+The frontend is a React application that visualizes the data collected by the backend. See [frontend/README.md](frontend/README.md) for development details.
 
 ## Setup and Installation
 
-### Prerequisites
+### Backend
 
-- Go 1.24+ (for backend development)
-- Docker and Docker Compose
-- Node.js 18+ (for local frontend development, see frontend/README.md)
+See [backend/README.md](backend/README.md)
 
-### Using Docker Compose
+### Frontend
 
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/ethpandaops/lab.git
-   cd lab
-   ```
+See [frontend/README.md](backend/README.md)
 
-2. Create a `.env` file based on the example:
-   ```bash
-   cp .env.example .env
-   ```
+### Docker Compose Profiles:
 
-3. Start the application using profiles:
-   ```bash
-   # Start all components (backend, frontend, and infrastructure)
-   docker-compose up
-
-   # Start only infrastructure services (Redis, MinIO)
-   docker-compose --profile infra up
-
-   # Start only backend services (API and SRV)
-   docker-compose --profile backend up
-
-   # Start only frontend
-   docker-compose --profile frontend up
-   ```
-
-The application will be available at:
-- Frontend: http://localhost:3000
-- API: http://localhost:8080
-- MinIO Console: http://localhost:9001 (credentials: minioadmin/minioadmin)
-
-## Development
-
-### Backend Development
-
-1. Start required infrastructure services:
-   ```bash
-   docker-compose --profile infra up -d
-   ```
-
-2. Run the SRV service:
-   ```bash
-   make run-srv
-   ```
-
-3. Run the API service (in a separate terminal):
-   ```bash
-   make run-api
-   ```
-
-4. To build the backend binary:
-   ```bash
-   make build
-   ```
-
-5. To generate protobuf code:
-   ```bash
-   make proto
-   ```
-
-### Frontend Development
-
-1. Navigate to the frontend directory:
-   ```bash
-   cd frontend
-   ```
-
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-
-3. Start the development server:
-   ```bash
-   npm run dev
-   ```
-
-The frontend development server will be available at http://localhost:5173.
-
-## Deployment
-
-For production deployment, build the binary and deploy it with the required configuration:
+You can also start specific components:
 
 ```bash
-make build
-./bin/lab [srv|api] --config=/path/to/config.yaml
+# Infrastructure only (Redis, MinIO)
+docker-compose --profile infra up -d
+
+# Backend services only (API and SRV)
+docker-compose --profile backend up -d
+
+# Frontend only
+docker-compose --profile frontend up -d
 ```
+
+## Configuration
+
+### Environment Variables
+
+Copy `.env.example` to `.env` and configure as needed. Key variables include:
+
+### Configuration Files
+
+For detailed configuration information:
+- **Backend**: See [backend/README.md](backend/README.md)
+- **Frontend**: See [frontend/README.md](backend/README.md)
+- **Docker Compose**: Uses configs from `deploy/docker-compose/` automatically
+- **Manual Setup**: Copy configs from `deploy/docker-compose/` to project root
 
 ## Contributing
 

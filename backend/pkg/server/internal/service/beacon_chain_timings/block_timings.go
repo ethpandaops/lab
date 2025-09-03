@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"path/filepath"
-
 	"time"
 
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/ethereum"
@@ -97,13 +96,13 @@ func (b *BeaconChainTimings) processBlockTimings(ctx context.Context, network *e
 
 	// Record duration metric if available
 	duration := time.Since(startTime).Seconds()
+
 	histogram, err := b.metricsCollector.NewHistogramVec(
 		"processing_duration_seconds",
 		"Duration of processing operations in seconds",
 		[]string{"operation", "network", "window"},
 		nil,
 	)
-
 	if err == nil {
 		histogram.WithLabelValues("block_timings", network.Name, windowName).Observe(duration)
 	}

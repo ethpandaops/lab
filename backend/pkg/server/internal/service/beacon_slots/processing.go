@@ -97,6 +97,7 @@ func (b *BeaconSlots) processSlot(ctx context.Context, networkName string, slot 
 	// 2. Get proposer data - can run in parallel
 	group.Go(func() error {
 		var err error
+
 		proposerData, err = b.getProposerData(groupCtx, networkName, slot)
 		proposerErr = err
 
@@ -160,6 +161,7 @@ func (b *BeaconSlots) processSlot(ctx context.Context, networkName string, slot 
 	// 5. Get attestation data - max can run in parallel, votes depends on blockData
 	group.Go(func() error {
 		var errr error
+
 		maxAttestationVotes, errr = b.getMaximumAttestationVotes(groupCtx, networkName, slot)
 		maxAttestationErr = errr
 
@@ -275,13 +277,13 @@ func (b *BeaconSlots) processSlot(ctx context.Context, networkName string, slot 
 
 	// Record processing duration
 	duration := time.Since(startTime).Seconds()
+
 	histogram, err := b.metricsCollector.NewHistogramVec(
 		"processing_duration_seconds",
 		"Duration of slot processing operations in seconds",
 		[]string{"network", "processor"},
 		[]float64{0.01, 0.05, 0.1, 0.5, 1, 2, 5, 10},
 	)
-
 	if err == nil {
 		histogram.WithLabelValues(networkName, "all").Observe(duration)
 	}

@@ -480,13 +480,13 @@ func (b *BeaconChainTimings) process(ctx context.Context) {
 
 	// Record duration metric for the entire processing cycle if available
 	duration := time.Since(startTime).Seconds()
+
 	histogram, err := b.metricsCollector.NewHistogramVec(
 		"processing_duration_seconds",
 		"Duration of processing operations in seconds",
 		[]string{"operation", "network", "window"},
 		nil,
 	)
-
 	if err == nil {
 		histogram.WithLabelValues("process_cycle", "all", "all").Observe(duration)
 	}

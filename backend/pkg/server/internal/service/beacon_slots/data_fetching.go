@@ -397,7 +397,7 @@ func (b *BeaconSlots) getMaximumAttestationVotes(ctx context.Context, networkNam
 	endStr := endTime.Format("2006-01-02 15:04:05")
 
 	query := `
-		SELECT 
+		SELECT
 			MAX(committee_size * (CAST(committee_index AS UInt32) + 1)) as max_attestations
 		FROM (
 			SELECT
@@ -446,9 +446,9 @@ func (b *BeaconSlots) getAttestationVotes(ctx context.Context, networkName strin
 	endStr := endTime.Format("2006-01-02 15:04:05")
 
 	query := `
-		WITH 
+		WITH
 		raw_data AS (
-			SELECT 
+			SELECT
 				attesting_validator_index,
 				MIN(propagation_slot_start_diff) as min_propagation_time
 			FROM default.beacon_api_eth_v1_events_attestation
@@ -749,8 +749,8 @@ func (b *BeaconSlots) getMevRelayBids(ctx context.Context, networkName string, s
 				timestamp_ms - ? as slot_time,
 				floor((timestamp_ms - ?) / ?) * ? as time_bucket
 			FROM default.mev_relay_bid_trace
-			WHERE 
-				slot = ? 
+			WHERE
+				slot = ?
 				AND meta_network_name = ?
 				AND slot_start_date_time BETWEEN ? AND ?
 				AND (timestamp_ms - ?) BETWEEN -12000 AND 12000
@@ -759,9 +759,9 @@ func (b *BeaconSlots) getMevRelayBids(ctx context.Context, networkName string, s
 			SELECT
 				*,
 				ROW_NUMBER() OVER (
-					PARTITION BY 
-						meta_network_name, 
-						time_bucket, 
+					PARTITION BY
+						meta_network_name,
+						time_bucket,
 						relay_name,
 						block_hash,
 						builder_pubkey,
@@ -789,8 +789,8 @@ func (b *BeaconSlots) getMevRelayBids(ctx context.Context, networkName string, s
 				floor((timestamp_ms - ?) / ?) * ? as time_bucket,
 				0 as rn
 			FROM default.mev_relay_bid_trace
-			WHERE 
-				slot = ? 
+			WHERE
+				slot = ?
 				AND meta_network_name = ?
 				AND slot_start_date_time BETWEEN ? AND ?
 				AND block_hash = ?
@@ -828,7 +828,6 @@ func (b *BeaconSlots) getMevRelayBids(ctx context.Context, networkName string, s
 		slot, networkName,
 		startTimeStr, endTimeStr, // Added slot_start_date_time filter
 		executionBlockHash)
-
 	if err != nil {
 		if err.Error() == ErrNoRowsReturned { // Check specific error string
 			log.WithFields(log.Fields{
@@ -1019,15 +1018,15 @@ func (b *BeaconSlots) getMevDeliveredPayloads(ctx context.Context, networkName s
 		FROM default.mev_relay_proposer_payload_delivered
 		WHERE slot = ? AND meta_network_name = ?
 		AND slot_start_date_time BETWEEN ? AND ?
-		GROUP BY 
-			relay_name, 
-			slot, 
-			block_hash, 
-			block_number, 
-			proposer_pubkey, 
-			proposer_fee_recipient, 
-			gas_limit, 
-			gas_used, 
+		GROUP BY
+			relay_name,
+			slot,
+			block_hash,
+			block_number,
+			proposer_pubkey,
+			proposer_fee_recipient,
+			gas_limit,
+			gas_used,
 			num_tx
 		ORDER BY relay_name;
 	`

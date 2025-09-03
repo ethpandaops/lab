@@ -287,14 +287,15 @@ func testLockBehavior(t *testing.T, impl string, locker locker.Locker) {
 					released, err := locker.Unlock(lockName, token)
 					if err != nil {
 						t.Errorf("Error in goroutine %d releasing lock: %v", id, err)
-
-						return
 					}
 
 					if released {
 						countMutex.Lock()
 						releaseCount++
 						countMutex.Unlock()
+					} else if err == nil {
+						// This indicates a bug - we acquired the lock but can't release it
+						t.Errorf("Goroutine %d: failed to release lock (no error but released=false)", id)
 					}
 				}
 			}(i)
@@ -317,23 +318,6 @@ func testLockBehavior(t *testing.T, impl string, locker locker.Locker) {
 
 // TestLockErrorScenarios tests error scenarios in the Lock method
 func TestLockErrorScenarios(t *testing.T) {
-	t.Run("ErrorGettingLock", func(t *testing.T) {
-		// Create mock with error on get but not ErrCacheMiss
-		mockClient := mock.NewStandardCache().WithGetError(fmt.Errorf("forced get error"))
-
-		metricsSvc := metrics.NewMetricsService("test", logrus.New())
-		testLocker := locker.New(logrus.New(), mockClient, metricsSvc)
-
-		// Should return the error from Get
-		_, success, err := testLocker.Lock("test-lock", time.Second)
-		if err == nil {
-			t.Fatal("Expected error from Lock when cache Get fails")
-		}
-		if success {
-			t.Fatal("Expected success to be false when error occurs")
-		}
-	})
-
 	t.Run("ErrorSettingLock", func(t *testing.T) {
 		// Create mock with error on set
 		mockClient := mock.NewStandardCache().WithSetError(fmt.Errorf("forced set error"))
@@ -341,10 +325,10 @@ func TestLockErrorScenarios(t *testing.T) {
 		metricsSvc := metrics.NewMetricsService("test", logrus.New())
 		testLocker := locker.New(logrus.New(), mockClient, metricsSvc)
 
-		// Should return the error from Set
+		// Should return the error from SetNX
 		_, success, err := testLocker.Lock("test-lock", time.Second)
 		if err == nil {
-			t.Fatal("Expected error from Lock when cache Set fails")
+			t.Fatal("Expected error from Lock when cache SetNX fails")
 		}
 		if success {
 			t.Fatal("Expected success to be false when error occurs")

@@ -34,171 +34,103 @@ backend/
 
 ## Requirements
 
-- Go 1.24 or later
+- Go 1.24.5 or later
 - Redis (for caching)
-- ClickHouse (for data storage)
+- ClickHouse (for data storage - optional, only if using Xatu integration)
 - MinIO/S3 (for object storage)
+- Make (for build commands)
 
 ## Setup
 
-### Local Development
+There are two ways to run the backend services:
 
-1. Clone the repository:
+### Option 1: Using Docker Compose
+
+The simplest way is to use Docker Compose from the project root:
+
+```bash
+# From the project root
+cp .env.example .env
+docker-compose up -d
+```
+
+This will start all services including the backend. No additional setup required.
+
+### Option 2: Local Development Setup
+
+For active backend development:
+
+1. **Prerequisites:**
    ```bash
-   git clone https://github.com/ethpandaops/lab.git
+   # Ensure you're in the project root
    cd lab
    ```
 
-2. Install dependencies:
-   ```bash
-   go mod download
-   ```
-
-3. Generate Protocol Buffer code:
+2. **Generate Protocol Buffer code:**
    ```bash
    make proto
    ```
 
-4. Set up required services using Docker Compose:
+3. **Set up infrastructure services:**
    ```bash
-   docker-compose up -d redis minio createbuckets
+   # Start Redis and MinIO only
+   docker-compose --profile infra up -d
    ```
 
-5. Configure environment variables (copy from `.env.example` at the root):
+4. **Configure environment:**
    ```bash
+   # Create .env file
    cp .env.example .env
    # Edit .env with your configuration
    ```
+
+5. **Create configuration files:**
+   ```bash
+   # Copy example configs
+   cp deploy/docker-compose/service.config.yaml srv-config.yaml
+   cp deploy/docker-compose/api.config.yaml api-config.yaml
+   # Edit configs as needed
+   ```
+6. **Run services:**
+```bash
+# Terminal 1: Start the SRV service
+make run-srv
+# Automatically loads .env and runs:
+# go run backend/pkg/cmd/main.go srv -s srv-config.yaml
+
+# Terminal 2: Start the API service
+make run-api
+# Automatically loads .env and runs:
+# go run backend/pkg/cmd/main.go api -a api-config.yaml
+```
 
 ## Configuration
 
 The backend services are configured using YAML files and environment variables:
 
-### Server (SRV) Service Configuration
+**Server (SRV) Service Configuration:**
 
-The server service is configured via `service.config.yaml`:
+The server service is configured via `srv-config.yaml`.
 
-```yaml
-# Log level
-logLevel: "info"
+See [deploy/docker-compose/service.config.yaml](../deploy/docker-compose/service.config.yaml) for a complete example.
 
-# GRPC server configuration
-grpc:
-  host: "0.0.0.0"
-  port: 6666
+**API Service Configuration:**
 
-# S3 storage configuration
-storage:
-  endpoint: "${S3_ENDPOINT}"
-  region: "${S3_REGION}"
-  bucket: "${S3_BUCKET}"
-  accessKey: "${S3_ACCESS_KEY}"
-  secretKey: "${S3_SECRET_KEY}"
-  secure: false
-  usePathStyle: true
+The API service is configured via `api-config.yaml`.
 
-# Ethereum configuration
-ethereum:
-  networks:
-    mainnet:
-      name: "mainnet"
-      configURL: "https://raw.githubusercontent.com/eth-clients/mainnet/refs/heads/main/metadata/config.yaml"
-      genesis: "2020-12-01T12:00:23Z"
-      xatu:
-        dsn: "${XATU_CLICKHOUSE_URL}"
-        protocol: "native"
+See [deploy/docker-compose/api.config.yaml](../deploy/docker-compose/api.config.yaml) for a complete example.
 
-# Cache configuration
-cache:
-  type: "redis"
-  config:
-    url: "${REDIS_URL}"
-    defaultTTL: 60
-
-# Modules configuration
-modules:
-  beacon_slots:
-    enabled: true
-    # Additional module-specific configuration...
-  beacon_chain_timings:
-    enabled: true
-    # Additional module-specific configuration...
-  xatu_public_contributors:
-    enabled: true
-    # Additional module-specific configuration...
-```
-
-### API Service Configuration
-
-The API service is configured via `api.config.yaml`:
-
-```yaml
-# Log level
-logLevel: "info"
-
-# HTTP server configuration
-httpServer:
-  host: "${API_HOST}"
-  port: ${API_PORT}
-  pathPrefix: "lab-data"
-  corsAllowAll: true
-
-# SRV client configuration
-srvClient:
-  address: "${SRV_ADDRESS}"
-
-# Cache configuration
-cache:
-  type: "redis"
-  config:
-    url: "${REDIS_URL}"
-    defaultTTL: 60
-
-# S3 storage configuration
-storage:
-  endpoint: "${S3_ENDPOINT}"
-  region: "${S3_REGION}"
-  bucket: "${S3_BUCKET}"
-  accessKey: "${S3_ACCESS_KEY}"
-  secretKey: "${S3_SECRET_KEY}"
-  secure: false
-  usePathStyle: true
-```
-
-## Running the Services
-
-### Running Locally
-
-1. Start the server (SRV) service:
-   ```bash
-   go run backend/pkg/cmd/main.go srv --srv-config path/to/service.config.yaml
-   ```
-
-2. Start the API service:
-   ```bash
-   go run backend/pkg/cmd/main.go api --api-config path/to/api.config.yaml
-   ```
-
-### Using Docker Compose
-
-The project includes Docker Compose configurations for easy deployment:
+### Available Make Commands
 
 ```bash
-# Start backend services (server and API)
-docker-compose --profile backend up -d
-
-# Start all services including frontend
-docker-compose up -d
+make proto      # Generate Protocol Buffer code
+make build      # Build the binary
+make run-srv    # Run the SRV service
+make run-api    # Run the API service
+make clean      # Clean generated files
 ```
 
 ## Development
-
-### Code Structure
-
-- **pkg/cmd/main.go**: Entry point for both services
-- **pkg/server/**: Server service implementation
-- **pkg/api/**: API service implementation
-- **pkg/internal/lab/**: Shared internal packages
 
 ### Protocol Buffers
 
@@ -250,8 +182,17 @@ The backend uses:
 The server service includes several modules for different data collection and processing tasks:
 
 1. **beacon_slots**: Collects and processes beacon chain slot data
+   - Supports head tracking, trailing slots, and backfilling
+   - Tracks locally built blocks
+
 2. **beacon_chain_timings**: Analyzes beacon chain timing metrics
+   - Configurable time windows for different analysis periods
+   - Generates timing statistics and distributions
+
 3. **xatu_public_contributors**: Tracks Xatu public contributors
+   - Time-windowed contributor statistics
+   - Redis-based caching for performance
+
 
 ## Metrics
 
@@ -261,17 +202,3 @@ The backend exposes Prometheus metrics for monitoring:
 - Cache performance metrics
 - Ethereum network metrics
 - Module-specific metrics
-
-## Docker
-
-The backend can be containerized using the provided Dockerfile:
-
-```bash
-# Build the Docker image
-docker build -t ethpandaops/lab-backend -f backend/Dockerfile .
-
-# Run the server service
-docker run -p 6666:6666 -v /path/to/config.yaml:/app/config.yaml ethpandaops/lab-backend srv --srv-config /app/config.yaml
-
-# Run the API service
-docker run -p 8080:8080 -v /path/to/config.yaml:/app/config.yaml ethpandaops/lab-backend api --api-config /app/config.yaml
