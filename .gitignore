@@ -1,3 +1,7 @@
+# Test coverage
+coverage.out
+*.test
+
 # Local config
 api-config.yaml
 srv-config.yaml
