@@ -5,7 +5,7 @@ proto:
 	@echo "Generating non-Connect Go code..."
 	# Generate Go code without Connect for all protos
 	buf generate --template buf-noconnect.gen.yaml .
-	
+
 	@echo "Generating Connect code for API protos only..."
 	# Generate Connect code only for API protos
 	buf generate --template buf.gen.yaml --path backend/pkg/api/proto .
@@ -27,12 +27,12 @@ create-proto:
 # Run srv service
 run-srv:
 	@echo "Running srv service..."
-	go run cmd/main.go srv
+	set -a && source .env && set +a && go run backend/pkg/cmd/main.go srv -s srv-config.yaml
 
 # Run api service
 run-api:
 	@echo "Running api service..."
-	go run cmd/main.go api
+	set -a && source .env && set +a && go run backend/pkg/cmd/main.go api -a api-config.yaml
 
 # Clean
 clean:
@@ -44,7 +44,7 @@ clean:
 	rm -rf backend/pkg/proto/*/*_grpc.pb.go
 	rm -rf backend/pkg/api/proto/*_grpc.pb.go
 	rm -rf backend/pkg/api/proto/protoconnect
-	rm -rf backend/pkg/api/proto/labapiconnect 
+	rm -rf backend/pkg/api/proto/labapiconnect
 	rm -rf backend/pkg/api/proto/labapiconnectconnect
 	rm -rf backend/pkg/server/proto/*/*connect/
 	rm -rf frontend/src/api/gen/

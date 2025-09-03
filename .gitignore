@@ -1,3 +1,7 @@
+# Local config
+api-config.yaml
+srv-config.yaml
+
 # State files
 backend/state/
 config.yaml
