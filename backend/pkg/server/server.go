@@ -24,6 +24,7 @@ import (
 	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/beacon_chain_timings"
 	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/beacon_slots"
 	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/lab"
+	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/xatu_cbt"
 	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/xatu_public_contributors"
 	"github.com/sirupsen/logrus"
 )
@@ -51,6 +52,7 @@ type Service struct {
 	cacheClient       cache.Client
 	lockerClient      locker.Locker
 	geolocationClient *geolocation.Client
+	xatuCBTService    *xatu_cbt.XatuCBT
 	metrics           *metrics.Metrics
 }
 
@@ -153,6 +155,7 @@ func (s *Service) Start(ctx context.Context) error {
 		grpc.NewBeaconChainTimings(s.log, bctService),
 		grpc.NewXatuPublicContributors(s.log, xpcService),
 		grpc.NewBeaconSlotsHandler(s.log, bsService),
+		grpc.NewXatuCBT(s.log, s.xatuCBTService),
 	}
 
 	// Create gRPC server
@@ -324,11 +327,30 @@ func (s *Service) initializeDependencies(ctx context.Context) error {
 		return fmt.Errorf("failed to start geolocation client: %w", err)
 	}
 
+	// Initialize Xatu CBT datasource
+	s.log.Info("Initializing Xatu CBT datasource")
+
+	xatuCBTService, err := xatu_cbt.New(
+		s.log,
+		s.config.XatuCBT,
+		cacheClient,
+		s.metrics,
+	)
+	if err != nil {
+		return fmt.Errorf("failed to initialize Xatu CBT datasource: %w", err)
+	}
+
+	// Start the CBT service
+	if err := xatuCBTService.Start(ctx); err != nil {
+		return fmt.Errorf("failed to start Xatu CBT datasource: %w", err)
+	}
+
 	s.xatuClient = xatuClient
 	s.storageClient = storageClient
 	s.cacheClient = cacheClient
 	s.lockerClient = lockerClient
 	s.geolocationClient = geolocationClient
+	s.xatuCBTService = xatuCBTService
 
 	return nil
 }
@@ -441,6 +463,22 @@ func (s *Service) stop() {
 				s.log.WithError(err).Warn("Error stopping cache client")
 			} else {
 				s.log.Info("Cache client stopped.")
+			}
+		}()
+	}
+
+	if s.xatuCBTService != nil {
+		wg.Add(1)
+
+		go func() {
+			defer wg.Done()
+
+			s.log.Info("Stopping Xatu CBT datasource...")
+
+			if err := s.xatuCBTService.Stop(); err != nil {
+				s.log.WithError(err).Warn("Error stopping Xatu CBT datasource")
+			} else {
+				s.log.Info("Xatu CBT datasource stopped.")
 			}
 		}()
 	}

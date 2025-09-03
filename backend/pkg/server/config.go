@@ -11,6 +11,7 @@ import (
 	"github.com/ethpandaops/lab/backend/pkg/server/internal/grpc"
 	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/beacon_chain_timings"
 	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/beacon_slots"
+	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/xatu_cbt"
 	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/xatu_public_contributors"
 )
 
@@ -22,6 +23,7 @@ type Config struct {
 	Modules     map[string]*ModuleConfig `yaml:"modules"`
 	Cache       *cache.Config            `yaml:"cache"`
 	Geolocation *geolocation.Config      `yaml:"geolocation"`
+	XatuCBT     *xatu_cbt.Config         `yaml:"xatu_cbt"`
 }
 
 type ModuleConfig struct {
@@ -45,6 +47,14 @@ func (x *Config) Validate() error {
 
 	if x.Geolocation == nil {
 		return fmt.Errorf("geolocation config is required")
+	}
+
+	if x.XatuCBT == nil {
+		return fmt.Errorf("xatu_cbt config is required")
+	}
+
+	if err := x.XatuCBT.Validate(); err != nil {
+		return fmt.Errorf("xatu_cbt config is invalid: %w", err)
 	}
 
 	return nil

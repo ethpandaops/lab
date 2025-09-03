@@ -6,6 +6,7 @@ option go_package = "github.com/ethpandaops/lab/backend/pkg/api/proto";
 
 import "backend/pkg/server/proto/beacon_slots/beacon_slots.proto";
 import "backend/pkg/server/proto/lab/lab.proto";
+import "backend/pkg/server/proto/xatu_cbt/xatu_cbt.proto";
 
 service LabAPI {
   rpc GetRecentLocallyBuiltBlocks(GetRecentLocallyBuiltBlocksRequest) returns (GetRecentLocallyBuiltBlocksResponse) {
@@ -15,6 +16,14 @@ service LabAPI {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
   rpc GetConfig(GetConfigRequest) returns (GetConfigResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+  
+  // Xatu CBT endpoints
+  rpc ListCBTNetworks(xatu_cbt.ListNetworksRequest) returns (xatu_cbt.ListNetworksResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+  rpc ListCBTXatuNodes(xatu_cbt.ListXatuNodesRequest) returns (xatu_cbt.ListXatuNodesResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
 }

@@ -786,6 +786,86 @@
           }
         }
       }
+    },
+    "xatu_cbtContributor": {
+      "type": "object",
+      "properties": {
+        "username": {
+          "type": "string"
+        },
+        "nodeId": {
+          "type": "string"
+        },
+        "classification": {
+          "type": "string",
+          "title": "individual, internal, unclassified"
+        },
+        "metaClientName": {
+          "type": "string"
+        },
+        "metaClientVersion": {
+          "type": "string"
+        },
+        "metaClientImplementation": {
+          "type": "string"
+        },
+        "metaClientGeoCity": {
+          "type": "string"
+        },
+        "metaClientGeoCountry": {
+          "type": "string"
+        },
+        "metaClientGeoCountryCode": {
+          "type": "string"
+        },
+        "metaClientGeoContinentCode": {
+          "type": "string"
+        },
+        "metaConsensusVersion": {
+          "type": "string"
+        },
+        "metaConsensusImplementation": {
+          "type": "string"
+        },
+        "lastSeenDateTime": {
+          "type": "string"
+        }
+      }
+    },
+    "xatu_cbtGetContributorsResponse": {
+      "type": "object",
+      "properties": {
+        "contributors": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/xatu_cbtContributor"
+          }
+        }
+      }
+    },
+    "xatu_cbtGetNetworksResponse": {
+      "type": "object",
+      "properties": {
+        "networks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/xatu_cbtNetworkInfo"
+          }
+        }
+      }
+    },
+    "xatu_cbtNetworkInfo": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "enabled": {
+          "type": "boolean"
+        }
+      }
     }
   }
 }

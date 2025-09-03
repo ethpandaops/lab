@@ -9,6 +9,7 @@ import (
 	context "context"
 	errors "errors"
 	proto "github.com/ethpandaops/lab/backend/pkg/api/proto"
+	xatu_cbt "github.com/ethpandaops/lab/backend/pkg/server/proto/xatu_cbt"
 	http "net/http"
 	strings "strings"
 )
@@ -40,6 +41,10 @@ const (
 	LabAPIGetSlotDataProcedure = "/labapi.LabAPI/GetSlotData"
 	// LabAPIGetConfigProcedure is the fully-qualified name of the LabAPI's GetConfig RPC.
 	LabAPIGetConfigProcedure = "/labapi.LabAPI/GetConfig"
+	// LabAPIListCBTNetworksProcedure is the fully-qualified name of the LabAPI's ListCBTNetworks RPC.
+	LabAPIListCBTNetworksProcedure = "/labapi.LabAPI/ListCBTNetworks"
+	// LabAPIListCBTXatuNodesProcedure is the fully-qualified name of the LabAPI's ListCBTXatuNodes RPC.
+	LabAPIListCBTXatuNodesProcedure = "/labapi.LabAPI/ListCBTXatuNodes"
 )
 
 // These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
@@ -48,6 +53,8 @@ var (
 	labAPIGetRecentLocallyBuiltBlocksMethodDescriptor = labAPIServiceDescriptor.Methods().ByName("GetRecentLocallyBuiltBlocks")
 	labAPIGetSlotDataMethodDescriptor                 = labAPIServiceDescriptor.Methods().ByName("GetSlotData")
 	labAPIGetConfigMethodDescriptor                   = labAPIServiceDescriptor.Methods().ByName("GetConfig")
+	labAPIListCBTNetworksMethodDescriptor             = labAPIServiceDescriptor.Methods().ByName("ListCBTNetworks")
+	labAPIListCBTXatuNodesMethodDescriptor            = labAPIServiceDescriptor.Methods().ByName("ListCBTXatuNodes")
 )
 
 // LabAPIClient is a client for the labapi.LabAPI service.
@@ -55,6 +62,9 @@ type LabAPIClient interface {
 	GetRecentLocallyBuiltBlocks(context.Context, *connect.Request[proto.GetRecentLocallyBuiltBlocksRequest]) (*connect.Response[proto.GetRecentLocallyBuiltBlocksResponse], error)
 	GetSlotData(context.Context, *connect.Request[proto.GetSlotDataRequest]) (*connect.Response[proto.GetSlotDataResponse], error)
 	GetConfig(context.Context, *connect.Request[proto.GetConfigRequest]) (*connect.Response[proto.GetConfigResponse], error)
+	// Xatu CBT endpoints
+	ListCBTNetworks(context.Context, *connect.Request[xatu_cbt.ListNetworksRequest]) (*connect.Response[xatu_cbt.ListNetworksResponse], error)
+	ListCBTXatuNodes(context.Context, *connect.Request[xatu_cbt.ListXatuNodesRequest]) (*connect.Response[xatu_cbt.ListXatuNodesResponse], error)
 }
 
 // NewLabAPIClient constructs a client for the labapi.LabAPI service. By default, it uses the
@@ -88,6 +98,20 @@ func NewLabAPIClient(httpClient connect.HTTPClient, baseURL string, opts ...conn
 			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 			connect.WithClientOptions(opts...),
 		),
+		listCBTNetworks: connect.NewClient[xatu_cbt.ListNetworksRequest, xatu_cbt.ListNetworksResponse](
+			httpClient,
+			baseURL+LabAPIListCBTNetworksProcedure,
+			connect.WithSchema(labAPIListCBTNetworksMethodDescriptor),
+			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
+			connect.WithClientOptions(opts...),
+		),
+		listCBTXatuNodes: connect.NewClient[xatu_cbt.ListXatuNodesRequest, xatu_cbt.ListXatuNodesResponse](
+			httpClient,
+			baseURL+LabAPIListCBTXatuNodesProcedure,
+			connect.WithSchema(labAPIListCBTXatuNodesMethodDescriptor),
+			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
@@ -96,6 +120,8 @@ type labAPIClient struct {
 	getRecentLocallyBuiltBlocks *connect.Client[proto.GetRecentLocallyBuiltBlocksRequest, proto.GetRecentLocallyBuiltBlocksResponse]
 	getSlotData                 *connect.Client[proto.GetSlotDataRequest, proto.GetSlotDataResponse]
 	getConfig                   *connect.Client[proto.GetConfigRequest, proto.GetConfigResponse]
+	listCBTNetworks             *connect.Client[xatu_cbt.ListNetworksRequest, xatu_cbt.ListNetworksResponse]
+	listCBTXatuNodes            *connect.Client[xatu_cbt.ListXatuNodesRequest, xatu_cbt.ListXatuNodesResponse]
 }
 
 // GetRecentLocallyBuiltBlocks calls labapi.LabAPI.GetRecentLocallyBuiltBlocks.
@@ -113,11 +139,24 @@ func (c *labAPIClient) GetConfig(ctx context.Context, req *connect.Request[proto
 	return c.getConfig.CallUnary(ctx, req)
 }
 
+// ListCBTNetworks calls labapi.LabAPI.ListCBTNetworks.
+func (c *labAPIClient) ListCBTNetworks(ctx context.Context, req *connect.Request[xatu_cbt.ListNetworksRequest]) (*connect.Response[xatu_cbt.ListNetworksResponse], error) {
+	return c.listCBTNetworks.CallUnary(ctx, req)
+}
+
+// ListCBTXatuNodes calls labapi.LabAPI.ListCBTXatuNodes.
+func (c *labAPIClient) ListCBTXatuNodes(ctx context.Context, req *connect.Request[xatu_cbt.ListXatuNodesRequest]) (*connect.Response[xatu_cbt.ListXatuNodesResponse], error) {
+	return c.listCBTXatuNodes.CallUnary(ctx, req)
+}
+
 // LabAPIHandler is an implementation of the labapi.LabAPI service.
 type LabAPIHandler interface {
 	GetRecentLocallyBuiltBlocks(context.Context, *connect.Request[proto.GetRecentLocallyBuiltBlocksRequest]) (*connect.Response[proto.GetRecentLocallyBuiltBlocksResponse], error)
 	GetSlotData(context.Context, *connect.Request[proto.GetSlotDataRequest]) (*connect.Response[proto.GetSlotDataResponse], error)
 	GetConfig(context.Context, *connect.Request[proto.GetConfigRequest]) (*connect.Response[proto.GetConfigResponse], error)
+	// Xatu CBT endpoints
+	ListCBTNetworks(context.Context, *connect.Request[xatu_cbt.ListNetworksRequest]) (*connect.Response[xatu_cbt.ListNetworksResponse], error)
+	ListCBTXatuNodes(context.Context, *connect.Request[xatu_cbt.ListXatuNodesRequest]) (*connect.Response[xatu_cbt.ListXatuNodesResponse], error)
 }
 
 // NewLabAPIHandler builds an HTTP handler from the service implementation. It returns the path on
@@ -147,6 +186,20 @@ func NewLabAPIHandler(svc LabAPIHandler, opts ...connect.HandlerOption) (string,
 		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 		connect.WithHandlerOptions(opts...),
 	)
+	labAPIListCBTNetworksHandler := connect.NewUnaryHandler(
+		LabAPIListCBTNetworksProcedure,
+		svc.ListCBTNetworks,
+		connect.WithSchema(labAPIListCBTNetworksMethodDescriptor),
+		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
+		connect.WithHandlerOptions(opts...),
+	)
+	labAPIListCBTXatuNodesHandler := connect.NewUnaryHandler(
+		LabAPIListCBTXatuNodesProcedure,
+		svc.ListCBTXatuNodes,
+		connect.WithSchema(labAPIListCBTXatuNodesMethodDescriptor),
+		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/labapi.LabAPI/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case LabAPIGetRecentLocallyBuiltBlocksProcedure:
@@ -155,6 +208,10 @@ func NewLabAPIHandler(svc LabAPIHandler, opts ...connect.HandlerOption) (string,
 			labAPIGetSlotDataHandler.ServeHTTP(w, r)
 		case LabAPIGetConfigProcedure:
 			labAPIGetConfigHandler.ServeHTTP(w, r)
+		case LabAPIListCBTNetworksProcedure:
+			labAPIListCBTNetworksHandler.ServeHTTP(w, r)
+		case LabAPIListCBTXatuNodesProcedure:
+			labAPIListCBTXatuNodesHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -174,4 +231,12 @@ func (UnimplementedLabAPIHandler) GetSlotData(context.Context, *connect.Request[
 
 func (UnimplementedLabAPIHandler) GetConfig(context.Context, *connect.Request[proto.GetConfigRequest]) (*connect.Response[proto.GetConfigResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("labapi.LabAPI.GetConfig is not implemented"))
+}
+
+func (UnimplementedLabAPIHandler) ListCBTNetworks(context.Context, *connect.Request[xatu_cbt.ListNetworksRequest]) (*connect.Response[xatu_cbt.ListNetworksResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("labapi.LabAPI.ListCBTNetworks is not implemented"))
+}
+
+func (UnimplementedLabAPIHandler) ListCBTXatuNodes(context.Context, *connect.Request[xatu_cbt.ListXatuNodesRequest]) (*connect.Response[xatu_cbt.ListXatuNodesResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("labapi.LabAPI.ListCBTXatuNodes is not implemented"))
 }

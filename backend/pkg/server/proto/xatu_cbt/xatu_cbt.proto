@@ -1,0 +1,39 @@
+syntax = "proto3";
+package xatu_cbt;
+option go_package = "github.com/ethpandaops/lab/backend/pkg/server/proto/xatu_cbt";
+
+service XatuCBT {
+  rpc ListNetworks(ListNetworksRequest) returns (ListNetworksResponse);
+  rpc ListXatuNodes(ListXatuNodesRequest) returns (ListXatuNodesResponse);
+}
+
+message ListNetworksRequest {}
+message ListNetworksResponse {
+  repeated NetworkInfo networks = 1;
+}
+message NetworkInfo {
+  string name = 1;
+  bool enabled = 2;
+}
+
+message ListXatuNodesRequest {
+  string network = 1;
+}
+message ListXatuNodesResponse {
+  repeated XatuNode xatu_nodes = 1;
+}
+message XatuNode {
+  string username = 1;
+  string node_id = 2;
+  string classification = 3; // individual, internal, unclassified
+  string meta_client_name = 4;
+  string meta_client_version = 5;
+  string meta_client_implementation = 6;
+  string meta_client_geo_city = 7;
+  string meta_client_geo_country = 8;
+  string meta_client_geo_country_code = 9;
+  string meta_client_geo_continent_code = 10;
+  string meta_consensus_version = 11;
+  string meta_consensus_implementation = 12;
+  string last_seen_date_time = 13;
+}
