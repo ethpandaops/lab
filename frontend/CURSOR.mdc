@@ -1,0 +1,33 @@
+---
+description: Frontend Root - React TypeScript dashboard for Ethereum network monitoring and visualization
+globs: 
+  - "package.json"
+  - "vite.config.ts"
+  - "tailwind.config.js"
+  - "tsconfig*.json"
+  - "eslint.config.js"
+  - "index.html"
+  - "Dockerfile"
+  - "docker-compose.yml"
+alwaysApply: false
+---
+
+# Frontend Root
+
+React TypeScript dashboard for Ethereum network monitoring and visualization that provides interactive analysis of beacon chain block production and network metrics.
+
+## Core Integration Patterns
+- **Multi-Network Support**: Implements network-aware routing with URL-based network selection and fallback defaults
+- **Bootstrap Configuration**: Uses runtime configuration loading via `/lab-data/bootstrap` to support deployment flexibility
+- **Vite Proxy Development**: Local development uses Vite proxy to backend at localhost:8080 with production bootstrap override
+
+## Build System Architecture
+- **Vite + TypeScript**: Fast development server with HMR and TypeScript path mapping
+- **Manual Chunk Strategy**: Vendor code separation for optimal caching and bundle splitting
+- **TailwindCSS Integration**: Utility-first styling with semantic color system and responsive design
+- **API Generation**: Protocol buffer client generation via `generate-api.sh` script before builds
+
+## Production Deployment Constraints
+- **Static Asset Serving**: Builds to static files for CDN deployment with nginx routing configuration
+- **Backend URL Discovery**: Runtime backend URL resolution supports multiple deployment environments
+- **Docker Multi-Stage**: Optimized container builds with nginx serving layer

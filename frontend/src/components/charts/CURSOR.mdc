@@ -1,0 +1,33 @@
+---
+description: Charts Component Library - Nivo-based charting components with consistent theming
+globs: 
+  - "**/*Chart*.tsx"
+  - "**/Nivo*.tsx"
+  - "**/Chart*.ts"
+alwaysApply: false
+---
+
+# Charts Component Library
+
+Reusable chart components built on Nivo with consistent theming and standardized layouts.
+
+## Key Architecture Patterns
+
+- **Centralized Theme System**: All charts use `defaultNivoTheme` for consistent visual styling across the application
+- **HOC Pattern**: `withNivoTheme` higher-order component applies themes to any Nivo chart component
+- **Chart+Stats Layout**: `ChartWithStats` component provides standardized layout with series tables on the right side
+- **Responsive Design**: Charts adapt to container width with consistent spacing and margins
+
+## Design Standards
+
+- **Theme Inheritance**: Use `currentColor` for text and axis elements to inherit from CSS color system
+- **Series Table**: Always positioned on right side (25% width) showing last values with min/avg/max in tooltips
+- **Chart Margins**: Left margin minimum 60px to accommodate Y-axis labels
+- **Interactive States**: Support toggle/highlight via click and shift+click with 20% opacity for hidden series
+
+## Component Guidelines
+
+- Extend chart components through the theme system rather than overriding individual props
+- Use `ChartWithStats` wrapper for data visualization requiring series legends
+- Apply semantic color classes for chart percentiles as defined in frontend rules
+- Maintain stroke width of 2px for lines, no dots, monotone curves for consistency

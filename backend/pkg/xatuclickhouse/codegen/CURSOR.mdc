@@ -1,0 +1,26 @@
+---
+description: Xatu ClickHouse codegen - Generates type-safe query methods from Go model structs
+globs: 
+  - "*.go"
+  - "*.sh"
+alwaysApply: false
+---
+
+Xatu ClickHouse code generator that creates type-safe query methods by parsing Go model structs via AST.
+
+## Code Generation Rules
+- Generated files MUST include "DO NOT EDIT" header with generator source
+- Use AST parsing for robust struct field extraction, avoid regex/string parsing
+- Categorize generated methods by table name prefix (beacon_api_, mempool_, canonical_beacon_, etc.)
+- All query parameters must be optional pointers to support flexible filtering
+
+## Template Consistency
+- Parameter structs follow `{ModelName}Params` naming pattern
+- Query methods follow `func (x *XatuClickhouse) {ModelName}(ctx context.Context, params {ModelName}Params) ([]models.{ModelName}, error)` signature
+- Always include Limit and Offset fields in parameter structs
+- Use newModel factory pattern for type safety in QueryWithModel calls
+
+## Field Processing
+- Skip Meta* fields when generating parameters
+- Generate Start{Field}/End{Field} range parameters for numeric and time types
+- Limit parameter struct fields to 10 maximum to keep interfaces manageable

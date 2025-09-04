@@ -1,0 +1,21 @@
+---
+description: Service layer - Common interface and orchestration patterns for Ethereum blockchain analysis services
+globs: 
+  - "*.go"
+  - "**/*_test.go"
+alwaysApply: false
+---
+
+# Service Layer
+
+Service orchestration layer that defines a common interface for Ethereum blockchain analysis services.
+
+## Service Interface Pattern
+- All services must implement the `Service` interface with `Start(ctx context.Context) error`, `Name() string`, and `Stop()` methods
+- Use context-based lifecycle management for graceful startup/shutdown coordination
+- Service names should be descriptive constants using `ServiceName` pattern
+
+## Cross-Service Coordination
+- Services operate independently but share common infrastructure (leader election, state management, storage)
+- Never assume service startup order - implement proper dependency injection where needed
+- Use consistent metrics patterns across all services with request counters and duration histograms

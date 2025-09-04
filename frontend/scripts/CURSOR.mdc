@@ -1,0 +1,21 @@
+---
+description: Frontend Scripts - API code generation automation
+globs: 
+  - "*.sh"
+  - "generate-*.sh"
+alwaysApply: false
+---
+
+# Frontend Scripts
+
+API code generation automation using buf protobuf compiler for TypeScript and Connect clients.
+
+## Key Patterns
+- Two-phase generation: TypeScript types for all protos, Connect clients for API protos only
+- Clean output directory before generation to ensure consistent state
+- Operate from project root context with relative path navigation from script location
+
+## Requirements
+- buf tool with project-specific template configurations (buf-frontend-types.gen.yaml, buf-frontend-connect.gen.yaml)
+- Must run scripts from their containing directory, scripts navigate to project root automatically
+- Output directory: frontend/src/api/gen (cleaned before each generation)

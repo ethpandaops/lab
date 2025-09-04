@@ -1,0 +1,24 @@
+---
+description: Beacon Block Production Common Components - Shared UI patterns for block production visualization
+globs: 
+  - "**/beacon/block_production/common/**/*.{ts,tsx}"
+  - "**/block_production/common/**/*.{ts,tsx}"
+alwaysApply: false
+---
+
+# Beacon Block Production Common Components
+
+Shared components and utilities for visualizing Ethereum beacon chain block production phases and metadata.
+
+## Core Patterns
+
+- **Phase-Based Timeline**: Use 4-phase model (Building → Propagating → Attesting → Accepted) with `getCurrentPhase()` utility
+- **Block Metadata Display**: Consistent formatting of execution payload data, blob counts, and validator information using `blockDataNormalizer`
+- **Temporal State Management**: All components handle time-relative state using `currentTime` prop for phase transitions
+
+## Key Constraints
+
+- Time-sensitive components must accept `currentTime` in milliseconds relative to slot start
+- Block data supports both snake_case and camelCase field names for API compatibility
+- Phase transitions are deterministic - use `PhaseUtils.getCurrentPhase()` for consistent state logic
+- Relay colors must be generated consistently across components using `generateConsistentColor()`

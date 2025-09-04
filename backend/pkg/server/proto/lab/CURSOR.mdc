@@ -1,0 +1,20 @@
+---
+description: Lab Proto - Protocol Buffer definitions and generated bindings for Lab service frontend configuration API
+globs: 
+  - "*.proto"
+  - "*.pb.go"
+  - "*_grpc.pb.go"
+alwaysApply: false
+---
+
+Protocol Buffer definitions and generated bindings for Lab service providing frontend configuration endpoints.
+
+**Key Integration Pattern:**
+- Proto-first API design with generated Go bindings for gRPC and Connect-RPC
+- Single frontend configuration endpoint with structured module configuration
+- Multi-protocol support via Connect-RPC (HTTP, gRPC, gRPC-Web)
+
+**Important Constraints:**
+- Generated Go files (*.pb.go, *_grpc.pb.go) are code-generated - DO NOT manually edit
+- Proto modifications require regeneration of all generated bindings
+- Frontend configuration data is publicly exposed - ensure no sensitive information

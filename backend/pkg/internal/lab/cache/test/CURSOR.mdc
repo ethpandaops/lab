@@ -1,0 +1,15 @@
+---
+description: Cache test component - comprehensive test suites for memory and Redis cache implementations
+globs: 
+  - "*_test.go"
+  - "**/*_test.go"
+alwaysApply: false
+---
+
+Cache testing component that validates memory and Redis cache implementations with focus on expiration handling and concurrency safety.
+
+- Use testcontainers for Redis integration tests to ensure isolated test environments
+- Use reflection carefully to access unexported cache methods for internal testing (requires maintenance awareness)
+- Include comprehensive concurrency testing patterns with goroutines and sync.WaitGroup
+- Skip integration tests in short mode using `testing.Short()` for fast unit test runs
+- Test all error paths including expired key deletion and connection failures

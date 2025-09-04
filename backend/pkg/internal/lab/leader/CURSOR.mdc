@@ -1,0 +1,15 @@
+---
+description: Leader - distributed leader election with automatic failover and metrics instrumentation
+globs: 
+  - "*.go"
+  - "**/*_test.go"
+alwaysApply: false
+---
+
+Leader election component that provides distributed leadership with automatic failover using distributed locks and comprehensive metrics instrumentation.
+
+- Use the Client interface for all leader election operations to maintain abstraction
+- Initialize Prometheus metrics with error handling and graceful degradation if metrics registration fails
+- Implement TTL-based locks with refresh intervals set to less than half the TTL to prevent expiry during normal operation
+- Always protect state changes with mutex locks to ensure thread-safe leader transitions
+- Use context cancellation for clean shutdown and proper resource cleanup

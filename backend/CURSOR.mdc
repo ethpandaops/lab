@@ -1,0 +1,23 @@
+---
+description: EthPandaOps Lab Backend - Ethereum blockchain analytics platform with dual service architecture
+globs: 
+  - "*.go"
+  - "**/*.go"
+  - "Dockerfile"
+alwaysApply: false
+---
+
+# Backend
+
+EthPandaOps Lab Backend is an Ethereum blockchain analytics platform with dual service architecture for metrics collection, processing, and API delivery.
+
+## Key Integration Pattern
+- **Dual service orchestration**: API service (public HTTP endpoints) and Server service (business logic/data processing) communicate via gRPC
+- **Shared infrastructure pattern**: Common storage (S3), cache (Redis), and database (ClickHouse) layers across both services
+- **Modular service system**: Server coordinates multiple specialized modules (beacon_slots, beacon_chain_timings, xatu_public_contributors)
+
+## Critical Constraints
+- All Protocol Buffer definitions must be defined before implementation - frontend/backend contract enforcement
+- Services must support graceful shutdown with 30-second timeout coordination
+- Always use environment variable expansion in YAML configs via `os.ExpandEnv()`
+- Container builds require Go 1.24+ and Alpine base image for minimal footprint

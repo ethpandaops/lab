@@ -1,0 +1,14 @@
+---
+description: Logger - Service-specific logger factory with consistent formatting
+globs: 
+  - "*.go"
+  - "**/*_test.go"
+alwaysApply: false
+---
+
+Logger factory that creates service-specific logrus instances with standardized configuration and service field injection.
+
+- Use the New() function to create loggers with service name field for consistent log identification
+- Configure TextFormatter with FullTimestamp for consistent timestamp formatting across services
+- Always validate and parse log levels before setting to ensure proper error handling
+- Return FieldLogger interface to maintain abstraction and enable service field pre-injection

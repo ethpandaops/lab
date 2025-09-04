@@ -1,0 +1,24 @@
+---
+description: Server - Ethereum blockchain analytics server with gRPC API and multi-service orchestration
+globs: 
+  - "*.go"
+  - "**/*_test.go"
+alwaysApply: false
+---
+
+# Server
+
+Ethereum blockchain analytics server that orchestrates multiple services through gRPC API with dependency injection and graceful lifecycle management.
+
+## Key Integration Pattern
+
+- **Service orchestration pattern**: Main server coordinates multiple independent services (beacon_chain_timings, beacon_slots, xatu_public_contributors, lab) via shared infrastructure
+- **Dependency injection framework**: Centralized initialization of shared clients (Ethereum, Xatu, storage, cache, locker, geolocation) passed to all services
+- **Dual server architecture**: gRPC server for API endpoints and HTTP server for Prometheus metrics on separate ports
+
+## Critical Constraints
+
+- Initialize all dependencies before services - strict startup order prevents nil pointer issues
+- Use cancelable context for graceful shutdown coordination across all components
+- Service lookup by name - implement Name() method consistently across all services
+- Always use 30-second shutdown timeout with concurrent goroutines for parallel cleanup

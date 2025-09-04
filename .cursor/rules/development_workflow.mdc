@@ -1,0 +1,244 @@
+---
+description: Development workflow and processes for ethPandaOps Lab
+alwaysApply: false
+---
+
+# ethPandaOps Lab Development Workflow
+
+## Development Environment Setup
+
+### Local Development
+1. **Infrastructure Setup**:
+   ```bash
+   # Start required infrastructure services
+   docker-compose --profile infra up -d
+   ```
+
+2. **Backend Development**:
+   ```bash
+   # Run SRV service
+   make run-srv
+   
+   # Run API service (separate terminal)
+   make run-api
+   ```
+
+3. **Frontend Development**:
+   ```bash
+   cd frontend
+   npm install
+   npm run dev  # Development server at localhost:5173
+   ```
+
+### Build Commands
+- **Backend**: `make build` - Builds the Go binary
+- **Frontend**: `npm run build` - Production build (avoid unless requested)
+- **Protobuf**: `make proto` - Regenerates protobuf code
+
+## Git Workflow
+
+### Branch Strategy
+- **main/master**: Production-ready code
+- **feature branches**: `feature/descriptive-name` or `feat/component-name`
+- **bugfix branches**: `fix/issue-description`
+- **hotfix branches**: `hotfix/critical-issue`
+
+### Commit Guidelines
+- Use descriptive commit messages
+- Follow conventional commits format when possible
+- Include context about what and why, not just what changed
+- Keep commits focused on a single logical change
+
+### Pull Request Process
+1. Create feature branch from master
+2. Make changes following code standards
+3. Write/update tests as needed
+4. Submit pull request with clear description
+5. Address review feedback
+6. Merge after approval
+
+## Testing Strategy
+
+### Backend Testing
+- **Unit Tests**: Test individual functions and methods
+- **Integration Tests**: Test component interactions
+- **Table-driven Tests**: Use for complex logic testing
+- **Mock Dependencies**: Use `testify` for mocking external services
+
+### Frontend Testing
+- **Component Tests**: Test React component behavior
+- **Integration Tests**: Test component interactions
+- **Visual Testing**: Test UI changes with Puppeteer
+- **Accessibility Tests**: Ensure compliance with a11y standards
+
+### Test Execution
+```bash
+# Backend tests
+cd backend && go test ./...
+
+# Frontend tests
+cd frontend && npm run test
+```
+
+## Code Quality
+
+### Linting and Formatting
+- **Go**: Use `gofmt` and `golint`
+- **TypeScript**: Use ESLint configuration
+- **Automatic Formatting**: Configure editor for format on save
+
+### Code Review Checklist
+- [ ] Code follows established patterns
+- [ ] No "fallback" or dangerous default values
+- [ ] Error handling is comprehensive
+- [ ] Tests cover new functionality
+- [ ] Documentation is updated
+- [ ] Performance impact considered
+- [ ] Security implications reviewed
+
+## Build and Deployment
+
+### Build Process
+- **Protobuf Generation**: Always regenerate after proto changes
+- **Backend Binary**: Single binary supporting both API and SRV modes
+- **Frontend Assets**: Static build for production deployment
+- **Docker Images**: Multi-stage builds for production
+
+### Deployment Environments
+- **Development**: Local Docker Compose setup
+- **Staging**: Integration testing environment
+- **Production**: Full infrastructure deployment
+
+### Configuration Management
+- Use YAML configuration files
+- Environment-specific overrides
+- Secrets managed separately from code
+- Validate configuration on startup
+
+## Development Tools
+
+### Required Tools
+- **Go 1.24+**: Backend development
+- **Node.js 18+**: Frontend development
+- **Docker & Docker Compose**: Local infrastructure
+- **Protocol Buffers**: API definition
+- **Make**: Build automation
+
+### Recommended Editor Setup
+- **VS Code/Cursor**: With Go and TypeScript extensions
+- **Linting**: ESLint for TypeScript, golint for Go
+- **Formatting**: Auto-format on save
+- **Debugging**: Integrated debugger configuration
+
+## Performance Testing
+
+### Backend Performance
+- Load testing for API endpoints
+- Memory profiling for data processing
+- Database query optimization
+- Caching effectiveness measurement
+
+### Frontend Performance
+- Bundle size analysis
+- Lighthouse audits
+- Core Web Vitals monitoring
+- Runtime performance profiling
+
+## Debugging Guidelines
+
+### Backend Debugging
+- Use structured logging throughout
+- Include request IDs for tracing
+- Log errors with full context
+- Use Go's built-in debugging tools
+
+### Frontend Debugging
+- Use browser developer tools
+- React Developer Tools for component debugging
+- Network tab for API debugging
+- Performance tab for optimization
+
+## API Development
+
+### Protocol Buffer Workflow
+1. Define .proto files with clear documentation
+2. Generate Go and TypeScript code: `make proto`
+3. Implement service methods in Go
+4. Update frontend to use new API methods
+5. Test both gRPC and HTTP endpoints
+
+### API Versioning
+- Use semantic versioning for breaking changes
+- Maintain backward compatibility when possible
+- Document API changes in release notes
+- Deprecate old endpoints gracefully
+
+## Data Processing
+
+### Data Pipeline Development
+- Process data in configurable chunks
+- Implement proper error handling and retries
+- Use distributed locking for coordination
+- Monitor processing performance and errors
+
+### Storage Management
+- Use appropriate storage backends (S3, ClickHouse, Redis)
+- Implement proper data retention policies
+- Consider data compression and encoding
+- Plan for data migration and schema changes
+
+## Monitoring and Observability
+
+### Logging Standards
+- Use structured logging (JSON format)
+- Include correlation IDs
+- Log at appropriate levels
+- Avoid logging sensitive information
+
+### Metrics Collection
+- Track business metrics and KPIs
+- Monitor system performance
+- Implement alerting for critical issues
+- Use dashboards for operational visibility
+
+## Dependency Management
+
+### Backend Dependencies
+- Use Go modules for dependency management
+- Pin versions for reproducible builds
+- Regularly update dependencies
+- Review security advisories
+
+### Frontend Dependencies
+- Use npm for package management
+- Audit packages for security issues
+- Keep dependencies minimal
+- Update major versions carefully
+
+## Documentation
+
+### Code Documentation
+- Document public APIs and interfaces
+- Include examples for complex functions
+- Keep documentation close to code
+- Update docs with code changes
+
+### Project Documentation
+- Maintain README files
+- Document configuration options
+- Provide troubleshooting guides
+- Include architecture diagrams
+
+## Experimentation and Iteration
+
+### Feature Development
+- Start with minimal viable implementation
+- Iterate based on feedback
+- Use feature flags for gradual rollout
+- Measure impact and effectiveness
+
+### LLM Integration
+- Design for LLM-assisted development
+- Maintain clear abstractions
+- Document system behavior clearly
+- Enable rapid prototyping and testing
