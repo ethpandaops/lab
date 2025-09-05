@@ -2,9 +2,11 @@ package xatu_cbt_test
 
 import (
 	"context"
+	"fmt"
 	"testing"
 	"time"
 
+	"github.com/docker/go-connections/nat"
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/clickhouse"
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/metrics"
 	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/xatu_cbt"
@@ -12,6 +14,8 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"github.com/testcontainers/testcontainers-go"
+	"github.com/testcontainers/testcontainers-go/wait"
 	"google.golang.org/grpc/metadata"
 )
 
@@ -72,9 +76,18 @@ func TestNew(t *testing.T) {
 }
 
 func TestServiceLifecycle(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping integration test in short mode")
+	}
+
+	ctx := context.Background()
 	logger := logrus.New()
 	logger.SetLevel(logrus.DebugLevel)
 	metricsSvc := metrics.NewMetricsService("test", logger)
+
+	// Start ClickHouse container for testing
+	host, port, cleanup := setupClickHouseContainer(t, ctx)
+	defer cleanup()
 
 	config := &xatu_cbt.Config{
 		CacheTTL:      60 * time.Second,
@@ -84,7 +97,7 @@ func TestServiceLifecycle(t *testing.T) {
 			"mainnet": {
 				Enabled: true,
 				ClickHouse: &clickhouse.Config{
-					DSN: "http://localhost:8123/default",
+					DSN: fmt.Sprintf("http://default:password@%s:%s/test", host, port),
 				},
 			},
 		},
@@ -93,8 +106,6 @@ func TestServiceLifecycle(t *testing.T) {
 	svc, err := xatu_cbt.New(logger, config, nil, metricsSvc)
 	require.NoError(t, err)
 	require.NotNil(t, svc)
-
-	ctx := context.Background()
 
 	// Test Start
 	err = svc.Start(ctx)
@@ -105,10 +116,19 @@ func TestServiceLifecycle(t *testing.T) {
 	assert.NoError(t, err)
 }
 
-func TestListIntXatuNodes24HValidation(t *testing.T) {
+func TestListFctNodeActiveLast24hValidation(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping integration test in short mode")
+	}
+
+	ctx := context.Background()
 	logger := logrus.New()
 	logger.SetLevel(logrus.DebugLevel)
 	metricsSvc := metrics.NewMetricsService("test", logger)
+
+	// Start ClickHouse container for testing
+	host, port, cleanup := setupClickHouseContainer(t, ctx)
+	defer cleanup()
 
 	config := &xatu_cbt.Config{
 		CacheTTL:      60 * time.Second,
@@ -118,7 +138,7 @@ func TestListIntXatuNodes24HValidation(t *testing.T) {
 			"mainnet": {
 				Enabled: true,
 				ClickHouse: &clickhouse.Config{
-					DSN: "http://localhost:8123/default",
+					DSN: fmt.Sprintf("http://default:password@%s:%s/test", host, port),
 				},
 			},
 		},
@@ -128,32 +148,79 @@ func TestListIntXatuNodes24HValidation(t *testing.T) {
 	require.NoError(t, err)
 	require.NotNil(t, svc)
 
-	ctx := context.Background()
 	err = svc.Start(ctx)
 	require.NoError(t, err)
 
 	defer func() { _ = svc.Stop() }()
 
-	// Test ListIntXatuNodes24H with missing network metadata
-	req := &cbtproto.ListIntXatuNodes24HRequest{
+	// Test ListFctNodeActiveLast24h with missing network metadata
+	req := &cbtproto.ListFctNodeActiveLast24HRequest{
 		MetaClientName: &cbtproto.StringFilter{
 			Filter: &cbtproto.StringFilter_Like{
 				Like: "%",
 			},
 		},
 	}
-	resp, err := svc.ListIntXatuNodes24H(ctx, req)
+	resp, err := svc.ListFctNodeActiveLast24h(ctx, req)
 	assert.Error(t, err)
 	assert.Nil(t, resp)
 	assert.Contains(t, err.Error(), "failed to extract network from metadata")
 
-	// Test ListIntXatuNodes24H with non-existent network
+	// Test ListFctNodeActiveLast24h with non-existent network
 	md := metadata.New(map[string]string{"network": "nonexistent"})
 	ctxWithMeta := metadata.NewIncomingContext(ctx, md)
-	resp, err = svc.ListIntXatuNodes24H(ctxWithMeta, req)
+	resp, err = svc.ListFctNodeActiveLast24h(ctxWithMeta, req)
 	assert.Error(t, err)
 	assert.Nil(t, resp)
 	assert.Contains(t, err.Error(), "network nonexistent not configured")
+}
+
+// setupClickHouseContainer starts a ClickHouse container for testing and returns connection details
+func setupClickHouseContainer(t *testing.T, ctx context.Context) (string, string, func()) {
+	t.Helper()
+
+	clickhousePort := "8123/tcp"
+	req := testcontainers.ContainerRequest{
+		Image:        "clickhouse/clickhouse-server:latest",
+		ExposedPorts: []string{clickhousePort},
+		Env: map[string]string{
+			"CLICKHOUSE_USER":     "default",
+			"CLICKHOUSE_PASSWORD": "password",
+			"CLICKHOUSE_DB":       "test",
+		},
+		WaitingFor: wait.ForHTTP("/ping").WithPort(nat.Port(clickhousePort)),
+	}
+
+	container, err := testcontainers.GenericContainer(ctx, testcontainers.GenericContainerRequest{
+		ContainerRequest: req,
+		Started:          true,
+	})
+	if err != nil {
+		t.Skipf("Could not start ClickHouse container: %v", err)
+	}
+
+	host, err := container.Host(ctx)
+	if err != nil {
+		container.Terminate(ctx)
+		t.Fatalf("Failed to get container host: %v", err)
+	}
+
+	mappedPort, err := container.MappedPort(ctx, nat.Port(clickhousePort))
+	if err != nil {
+		container.Terminate(ctx)
+		t.Fatalf("Failed to get container port: %v", err)
+	}
+
+	cleanup := func() {
+		if err := container.Terminate(ctx); err != nil {
+			t.Logf("Failed to terminate container: %s", err)
+		}
+	}
+
+	// Wait a moment for ClickHouse to be fully ready
+	time.Sleep(2 * time.Second)
+
+	return host, mappedPort.Port(), cleanup
 }
 
 func TestConfigDefaults(t *testing.T) {

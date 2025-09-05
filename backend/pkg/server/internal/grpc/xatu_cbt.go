@@ -42,10 +42,10 @@ func (x *XatuCBT) Start(ctx context.Context, grpcServer *grpc.Server) error {
 	return nil
 }
 
-// ListIntXatuNodes24H returns the list of xatu nodes in the last 24h.
-func (x *XatuCBT) ListIntXatuNodes24H(
+// ListFctNodeActiveLast24H returns the list of active nodes in the last 24h.
+func (x *XatuCBT) ListFctNodeActiveLast24H(
 	ctx context.Context,
-	req *cbtproto.ListIntXatuNodes24HRequest,
-) (*cbtproto.ListIntXatuNodes24HResponse, error) {
-	return x.service.ListIntXatuNodes24H(ctx, req)
+	req *cbtproto.ListFctNodeActiveLast24HRequest,
+) (*cbtproto.ListFctNodeActiveLast24HResponse, error) {
+	return x.service.ListFctNodeActiveLast24h(ctx, req)
 }

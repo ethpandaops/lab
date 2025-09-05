@@ -20,7 +20,7 @@ import (
 const _ = grpc.SupportPackageIsVersion8
 
 const (
-	XatuCBT_ListIntXatuNodes24H_FullMethodName = "/xatu_cbt.XatuCBT/ListIntXatuNodes24H"
+	XatuCBT_ListFctNodeActiveLast24H_FullMethodName = "/xatu_cbt.XatuCBT/ListFctNodeActiveLast24h"
 )
 
 // XatuCBTClient is the client API for XatuCBT service.
@@ -30,9 +30,9 @@ const (
 // XatuCBT service provides access to CBT data from multiple ClickHouse instances.
 // Each RPC corresponds to a specific CBT table/view and uses upstream request/response types.
 type XatuCBTClient interface {
-	// ListIntXatuNodes24H queries the intermediate 24-hour aggregated nodes table.
-	// This table contains node metadata aggregated over rolling 24-hour periods.
-	ListIntXatuNodes24H(ctx context.Context, in *clickhouse.ListIntXatuNodes24HRequest, opts ...grpc.CallOption) (*clickhouse.ListIntXatuNodes24HResponse, error)
+	// ListFctNodeActiveLast24h queries the fact table of nodes active in the last 24 hours.
+	// This table contains node metadata for all nodes seen within a rolling 24-hour window.
+	ListFctNodeActiveLast24H(ctx context.Context, in *clickhouse.ListFctNodeActiveLast24HRequest, opts ...grpc.CallOption) (*clickhouse.ListFctNodeActiveLast24HResponse, error)
 }
 
 type xatuCBTClient struct {
@@ -43,10 +43,10 @@ func NewXatuCBTClient(cc grpc.ClientConnInterface) XatuCBTClient {
 	return &xatuCBTClient{cc}
 }
 
-func (c *xatuCBTClient) ListIntXatuNodes24H(ctx context.Context, in *clickhouse.ListIntXatuNodes24HRequest, opts ...grpc.CallOption) (*clickhouse.ListIntXatuNodes24HResponse, error) {
+func (c *xatuCBTClient) ListFctNodeActiveLast24H(ctx context.Context, in *clickhouse.ListFctNodeActiveLast24HRequest, opts ...grpc.CallOption) (*clickhouse.ListFctNodeActiveLast24HResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(clickhouse.ListIntXatuNodes24HResponse)
-	err := c.cc.Invoke(ctx, XatuCBT_ListIntXatuNodes24H_FullMethodName, in, out, cOpts...)
+	out := new(clickhouse.ListFctNodeActiveLast24HResponse)
+	err := c.cc.Invoke(ctx, XatuCBT_ListFctNodeActiveLast24H_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -60,9 +60,9 @@ func (c *xatuCBTClient) ListIntXatuNodes24H(ctx context.Context, in *clickhouse.
 // XatuCBT service provides access to CBT data from multiple ClickHouse instances.
 // Each RPC corresponds to a specific CBT table/view and uses upstream request/response types.
 type XatuCBTServer interface {
-	// ListIntXatuNodes24H queries the intermediate 24-hour aggregated nodes table.
-	// This table contains node metadata aggregated over rolling 24-hour periods.
-	ListIntXatuNodes24H(context.Context, *clickhouse.ListIntXatuNodes24HRequest) (*clickhouse.ListIntXatuNodes24HResponse, error)
+	// ListFctNodeActiveLast24h queries the fact table of nodes active in the last 24 hours.
+	// This table contains node metadata for all nodes seen within a rolling 24-hour window.
+	ListFctNodeActiveLast24H(context.Context, *clickhouse.ListFctNodeActiveLast24HRequest) (*clickhouse.ListFctNodeActiveLast24HResponse, error)
 	mustEmbedUnimplementedXatuCBTServer()
 }
 
@@ -70,8 +70,8 @@ type XatuCBTServer interface {
 type UnimplementedXatuCBTServer struct {
 }
 
-func (UnimplementedXatuCBTServer) ListIntXatuNodes24H(context.Context, *clickhouse.ListIntXatuNodes24HRequest) (*clickhouse.ListIntXatuNodes24HResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ListIntXatuNodes24H not implemented")
+func (UnimplementedXatuCBTServer) ListFctNodeActiveLast24H(context.Context, *clickhouse.ListFctNodeActiveLast24HRequest) (*clickhouse.ListFctNodeActiveLast24HResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListFctNodeActiveLast24H not implemented")
 }
 func (UnimplementedXatuCBTServer) mustEmbedUnimplementedXatuCBTServer() {}
 
@@ -86,20 +86,20 @@ func RegisterXatuCBTServer(s grpc.ServiceRegistrar, srv XatuCBTServer) {
 	s.RegisterService(&XatuCBT_ServiceDesc, srv)
 }
 
-func _XatuCBT_ListIntXatuNodes24H_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(clickhouse.ListIntXatuNodes24HRequest)
+func _XatuCBT_ListFctNodeActiveLast24H_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(clickhouse.ListFctNodeActiveLast24HRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(XatuCBTServer).ListIntXatuNodes24H(ctx, in)
+		return srv.(XatuCBTServer).ListFctNodeActiveLast24H(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: XatuCBT_ListIntXatuNodes24H_FullMethodName,
+		FullMethod: XatuCBT_ListFctNodeActiveLast24H_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(XatuCBTServer).ListIntXatuNodes24H(ctx, req.(*clickhouse.ListIntXatuNodes24HRequest))
+		return srv.(XatuCBTServer).ListFctNodeActiveLast24H(ctx, req.(*clickhouse.ListFctNodeActiveLast24HRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -112,8 +112,8 @@ var XatuCBT_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*XatuCBTServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "ListIntXatuNodes24H",
-			Handler:    _XatuCBT_ListIntXatuNodes24H_Handler,
+			MethodName: "ListFctNodeActiveLast24h",
+			Handler:    _XatuCBT_ListFctNodeActiveLast24H_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

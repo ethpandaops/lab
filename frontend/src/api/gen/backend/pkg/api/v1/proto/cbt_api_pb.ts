@@ -352,17 +352,14 @@ export class FilterMetadata extends Message<FilterMetadata> {
   network = "";
 
   /**
-   * @generated from field: string time_range = 2;
-   */
-  timeRange = "";
-
-  /**
-   * @generated from field: map<string, string> applied_filters = 3;
+   * All filters including time filters
+   *
+   * @generated from field: map<string, string> applied_filters = 2;
    */
   appliedFilters: { [key: string]: string } = {};
 
   /**
-   * @generated from field: string order_by = 4;
+   * @generated from field: string order_by = 3;
    */
   orderBy = "";
 
@@ -375,9 +372,8 @@ export class FilterMetadata extends Message<FilterMetadata> {
   static readonly typeName = "api.v1.FilterMetadata";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "network", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "time_range", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "applied_filters", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "scalar", T: 9 /* ScalarType.STRING */} },
-    { no: 4, name: "order_by", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "applied_filters", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "scalar", T: 9 /* ScalarType.STRING */} },
+    { no: 3, name: "order_by", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): FilterMetadata {
