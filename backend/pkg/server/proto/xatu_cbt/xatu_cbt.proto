@@ -18,13 +18,13 @@ option go_package = "github.com/ethpandaops/lab/backend/pkg/server/proto/xatu_cb
 // 4. Returns raw CBT data using upstream types
 // 5. REST layer transforms CBT types to public API types
 
-import "vendor/xatu-cbt/clickhouse/int_xatu_nodes__24h.proto";
+import "vendor/xatu-cbt/clickhouse/fct_node_active_last_24h.proto";
 import "vendor/xatu-cbt/clickhouse/common.proto";
 
 // XatuCBT service provides access to CBT data from multiple ClickHouse instances.
 // Each RPC corresponds to a specific CBT table/view and uses upstream request/response types.
 service XatuCBT {
-  // ListIntXatuNodes24H queries the intermediate 24-hour aggregated nodes table.
-  // This table contains node metadata aggregated over rolling 24-hour periods.
-  rpc ListIntXatuNodes24H(cbt.ListIntXatuNodes24hRequest) returns (cbt.ListIntXatuNodes24hResponse);
+  // ListFctNodeActiveLast24h queries the fact table of nodes active in the last 24 hours.
+  // This table contains node metadata for all nodes seen within a rolling 24-hour window.
+  rpc ListFctNodeActiveLast24h(cbt.ListFctNodeActiveLast24hRequest) returns (cbt.ListFctNodeActiveLast24hResponse);
 }

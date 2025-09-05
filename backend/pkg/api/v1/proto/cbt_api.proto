@@ -67,9 +67,8 @@ message PaginationMetadata {
 // Filter metadata showing applied filters.
 message FilterMetadata {
   string network = 1;
-  string time_range = 2;
-  map<string, string> applied_filters = 3;
-  string order_by = 4;
+  map<string, string> applied_filters = 2;  // All filters including time filters
+  string order_by = 3;
 }
 
 // Error response.

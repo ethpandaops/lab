@@ -60,83 +60,52 @@ func (r *CBTRouter) handleListNodes(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	// Build upstream gRPC request with all filtering capabilities.
-	grpcReq := &cbtproto.ListIntXatuNodes24HRequest{}
-
 	// Parse query parameters and map to upstream proto fields.
 	queryParams := req.URL.Query()
 
-	// String filters - map to upstream StringFilter.
-	if v := queryParams.Get("meta_client_name"); v != "" {
-		grpcReq.MetaClientName = &cbtproto.StringFilter{
-			Filter: &cbtproto.StringFilter_Eq{Eq: v},
-		}
+	// Build upstream gRPC request with all filtering capabilities.
+	grpcReq := &cbtproto.ListFctNodeActiveLast24HRequest{}
+
+	// Map of known string filter fields
+	stringFilterFields := map[string]**cbtproto.StringFilter{
+		"username":                       &grpcReq.Username,
+		"node_id":                        &grpcReq.NodeId,
+		"classification":                 &grpcReq.Classification,
+		"meta_client_name":               &grpcReq.MetaClientName,
+		"meta_client_version":            &grpcReq.MetaClientVersion,
+		"meta_client_implementation":     &grpcReq.MetaClientImplementation,
+		"meta_client_geo_city":           &grpcReq.MetaClientGeoCity,
+		"meta_client_geo_country":        &grpcReq.MetaClientGeoCountry,
+		"meta_client_geo_country_code":   &grpcReq.MetaClientGeoCountryCode,
+		"meta_client_geo_continent_code": &grpcReq.MetaClientGeoContinentCode,
+		"meta_consensus_version":         &grpcReq.MetaConsensusVersion,
+		"meta_consensus_implementation":  &grpcReq.MetaConsensusImplementation,
 	}
 
-	if v := queryParams.Get("username"); v != "" {
-		grpcReq.Username = &cbtproto.StringFilter{
-			Filter: &cbtproto.StringFilter_Eq{Eq: v},
+	// Process each query parameter
+	for key, values := range queryParams {
+		if len(values) == 0 || values[0] == "" {
+			continue
 		}
-	}
 
-	if v := queryParams.Get("node_id"); v != "" {
-		grpcReq.NodeId = &cbtproto.StringFilter{
-			Filter: &cbtproto.StringFilter_Eq{Eq: v},
-		}
-	}
+		// Parse the filter (handles bracket notation and defaults)
+		filter, fieldName, err := parseStringFilter(key, values[0])
+		if err != nil {
+			r.writeError(w, http.StatusBadRequest, err.Error())
 
-	if v := queryParams.Get("classification"); v != "" {
-		grpcReq.Classification = &cbtproto.StringFilter{
-			Filter: &cbtproto.StringFilter_Eq{Eq: v},
+			return
 		}
-	}
 
-	if v := queryParams.Get("meta_client_version"); v != "" {
-		grpcReq.MetaClientVersion = &cbtproto.StringFilter{
-			Filter: &cbtproto.StringFilter_Eq{Eq: v},
+		// Skip if no filter was created (empty value)
+		if filter == nil {
+			continue
 		}
-	}
 
-	if v := queryParams.Get("meta_client_implementation"); v != "" {
-		grpcReq.MetaClientImplementation = &cbtproto.StringFilter{
-			Filter: &cbtproto.StringFilter_Eq{Eq: v},
+		// Apply filter to the appropriate field
+		if fieldPtr, ok := stringFilterFields[fieldName]; ok {
+			*fieldPtr = filter
 		}
-	}
-
-	if v := queryParams.Get("meta_client_geo_city"); v != "" {
-		grpcReq.MetaClientGeoCity = &cbtproto.StringFilter{
-			Filter: &cbtproto.StringFilter_Eq{Eq: v},
-		}
-	}
-
-	if v := queryParams.Get("meta_client_geo_country"); v != "" {
-		grpcReq.MetaClientGeoCountry = &cbtproto.StringFilter{
-			Filter: &cbtproto.StringFilter_Eq{Eq: v},
-		}
-	}
-
-	if v := queryParams.Get("meta_client_geo_country_code"); v != "" {
-		grpcReq.MetaClientGeoCountryCode = &cbtproto.StringFilter{
-			Filter: &cbtproto.StringFilter_Eq{Eq: v},
-		}
-	}
-
-	if v := queryParams.Get("meta_client_geo_continent_code"); v != "" {
-		grpcReq.MetaClientGeoContinentCode = &cbtproto.StringFilter{
-			Filter: &cbtproto.StringFilter_Eq{Eq: v},
-		}
-	}
-
-	if v := queryParams.Get("meta_consensus_version"); v != "" {
-		grpcReq.MetaConsensusVersion = &cbtproto.StringFilter{
-			Filter: &cbtproto.StringFilter_Eq{Eq: v},
-		}
-	}
-
-	if v := queryParams.Get("meta_consensus_implementation"); v != "" {
-		grpcReq.MetaConsensusImplementation = &cbtproto.StringFilter{
-			Filter: &cbtproto.StringFilter_Eq{Eq: v},
-		}
+		// Non-filter parameters (page_size, page_token, etc.) handled separately below
 	}
 
 	// Time filter - handle various formats with UInt32Filter
@@ -178,7 +147,7 @@ func (r *CBTRouter) handleListNodes(w http.ResponseWriter, req *http.Request) {
 	)
 
 	// Call the gRPC service with upstream types directly
-	upstreamResp, err := r.xatuCBTClient.ListIntXatuNodes24H(ctxWithMeta, grpcReq)
+	upstreamResp, err := r.xatuCBTClient.ListFctNodeActiveLast24H(ctxWithMeta, grpcReq)
 	if err != nil {
 		r.log.WithError(err).WithField("network", network).Error("Failed to list nodes")
 		r.handleError(w, err)
@@ -187,9 +156,9 @@ func (r *CBTRouter) handleListNodes(w http.ResponseWriter, req *http.Request) {
 	}
 
 	// Transform upstream response to v1 API response
-	nodes := make([]*apiv1.Node, 0, len(upstreamResp.IntXatuNodes__24H))
+	nodes := make([]*apiv1.Node, 0, len(upstreamResp.FctNodeActiveLast_24H))
 
-	for _, n := range upstreamResp.IntXatuNodes__24H {
+	for _, n := range upstreamResp.FctNodeActiveLast_24H {
 		nodes = append(nodes, &apiv1.Node{
 			Username:       n.Username,
 			NodeId:         n.NodeId,
@@ -230,7 +199,6 @@ func (r *CBTRouter) handleListNodes(w http.ResponseWriter, req *http.Request) {
 		},
 		Filters: &apiv1.FilterMetadata{
 			Network:        network,
-			TimeRange:      "24h",
 			AppliedFilters: appliedFilters,
 		},
 	}
@@ -290,6 +258,87 @@ func (r *CBTRouter) writeError(w http.ResponseWriter, statusCode int, message st
 	if err := json.NewEncoder(w).Encode(response); err != nil {
 		r.log.WithError(err).Error("Failed to encode error response")
 	}
+}
+
+// parseStringFilter parses Stripe-style bracket notation into StringFilter.
+// Supports formats like: field[operator]=value or field=value (defaults to eq).
+// Returns the filter, the base field name, and any error.
+func parseStringFilter(key, value string) (*cbtproto.StringFilter, string, error) {
+	// Empty value means no filter
+	if value == "" {
+		return nil, "", nil
+	}
+
+	// Check for bracket notation: field[operator]
+	if idx := strings.Index(key, "["); idx > 0 {
+		if end := strings.Index(key, "]"); end > idx {
+			fieldName := key[:idx]
+			operator := key[idx+1 : end]
+
+			switch operator {
+			case "eq":
+				return &cbtproto.StringFilter{
+					Filter: &cbtproto.StringFilter_Eq{Eq: value},
+				}, fieldName, nil
+
+			case "ne":
+				return &cbtproto.StringFilter{
+					Filter: &cbtproto.StringFilter_Ne{Ne: value},
+				}, fieldName, nil
+
+			case "contains":
+				return &cbtproto.StringFilter{
+					Filter: &cbtproto.StringFilter_Contains{Contains: value},
+				}, fieldName, nil
+
+			case "starts_with":
+				return &cbtproto.StringFilter{
+					Filter: &cbtproto.StringFilter_StartsWith{StartsWith: value},
+				}, fieldName, nil
+
+			case "ends_with":
+				return &cbtproto.StringFilter{
+					Filter: &cbtproto.StringFilter_EndsWith{EndsWith: value},
+				}, fieldName, nil
+
+			case "like":
+				return &cbtproto.StringFilter{
+					Filter: &cbtproto.StringFilter_Like{Like: value},
+				}, fieldName, nil
+
+			case "not_like":
+				return &cbtproto.StringFilter{
+					Filter: &cbtproto.StringFilter_NotLike{NotLike: value},
+				}, fieldName, nil
+
+			case "in":
+				values := strings.Split(value, ",")
+
+				return &cbtproto.StringFilter{
+					Filter: &cbtproto.StringFilter_In{
+						In: &cbtproto.StringList{Values: values},
+					},
+				}, fieldName, nil
+
+			case "not_in":
+				values := strings.Split(value, ",")
+
+				return &cbtproto.StringFilter{
+					Filter: &cbtproto.StringFilter_NotIn{
+						NotIn: &cbtproto.StringList{Values: values},
+					},
+				}, fieldName, nil
+
+			default:
+				return nil, "", fmt.Errorf("unknown filter operator: %s", operator)
+			}
+		}
+	}
+
+	// No bracket notation = default to equality
+	return &cbtproto.StringFilter{
+		Filter: &cbtproto.StringFilter_Eq{Eq: value},
+	}, key, nil
 }
 
 // parseTimeParam parses time parameter from various formats

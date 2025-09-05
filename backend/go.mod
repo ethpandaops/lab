@@ -51,7 +51,7 @@ require (
 	github.com/docker/go-units v0.5.0 // indirect
 	github.com/emicklei/dot v1.6.4 // indirect
 	github.com/ethpandaops/ethwallclock v0.3.0
-	github.com/ethpandaops/xatu-cbt v0.0.0-20250905015121-3ebb14903c5e
+	github.com/ethpandaops/xatu-cbt v0.0.0-20250905043030-2408bb24eb6d
 	github.com/fatih/color v1.10.0 // indirect
 	github.com/felixge/httpsnoop v1.0.4 // indirect
 	github.com/ferranbt/fastssz v0.1.4 // indirect

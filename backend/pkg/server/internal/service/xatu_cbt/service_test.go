@@ -105,7 +105,7 @@ func TestServiceLifecycle(t *testing.T) {
 	assert.NoError(t, err)
 }
 
-func TestListIntXatuNodes24HValidation(t *testing.T) {
+func TestListFctNodeActiveLast24hValidation(t *testing.T) {
 	logger := logrus.New()
 	logger.SetLevel(logrus.DebugLevel)
 	metricsSvc := metrics.NewMetricsService("test", logger)
@@ -134,23 +134,23 @@ func TestListIntXatuNodes24HValidation(t *testing.T) {
 
 	defer func() { _ = svc.Stop() }()
 
-	// Test ListIntXatuNodes24H with missing network metadata
-	req := &cbtproto.ListIntXatuNodes24HRequest{
+	// Test ListFctNodeActiveLast24h with missing network metadata
+	req := &cbtproto.ListFctNodeActiveLast24HRequest{
 		MetaClientName: &cbtproto.StringFilter{
 			Filter: &cbtproto.StringFilter_Like{
 				Like: "%",
 			},
 		},
 	}
-	resp, err := svc.ListIntXatuNodes24H(ctx, req)
+	resp, err := svc.ListFctNodeActiveLast24h(ctx, req)
 	assert.Error(t, err)
 	assert.Nil(t, resp)
 	assert.Contains(t, err.Error(), "failed to extract network from metadata")
 
-	// Test ListIntXatuNodes24H with non-existent network
+	// Test ListFctNodeActiveLast24h with non-existent network
 	md := metadata.New(map[string]string{"network": "nonexistent"})
 	ctxWithMeta := metadata.NewIncomingContext(ctx, md)
-	resp, err = svc.ListIntXatuNodes24H(ctxWithMeta, req)
+	resp, err = svc.ListFctNodeActiveLast24h(ctxWithMeta, req)
 	assert.Error(t, err)
 	assert.Nil(t, resp)
 	assert.Contains(t, err.Error(), "network nonexistent not configured")
