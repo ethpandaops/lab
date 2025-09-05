@@ -144,8 +144,8 @@ func testDSNVariations(t *testing.T, ctx context.Context, host, port string, log
 			name:               "HTTP DSN with InsecureSkipVerify",
 			dsn:                fmt.Sprintf("clickhouse+http://default:password@%s:%s/test", host, port),
 			insecureSkipVerify: true,
-			// This should fail because the driver doesn't support tls_skip_verify as query parameter
-			shouldSucceed: false,
+			// InsecureSkipVerify is ignored for HTTP connections (no TLS to skip)
+			shouldSucceed: true,
 		},
 		{
 			name:          "HTTP DSN without clickhouse+ Prefix",
