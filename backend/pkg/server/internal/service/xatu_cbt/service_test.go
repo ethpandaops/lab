@@ -98,6 +98,9 @@ func TestServiceLifecycle(t *testing.T) {
 
 	// Test Start
 	err = svc.Start(ctx)
+	if err != nil && err.Error() == "no CBT clients were successfully initialized" {
+		t.Skip("Skipping test: ClickHouse is not available")
+	}
 	assert.NoError(t, err)
 
 	// Test Stop
@@ -130,6 +133,9 @@ func TestListFctNodeActiveLast24hValidation(t *testing.T) {
 
 	ctx := context.Background()
 	err = svc.Start(ctx)
+	if err != nil && err.Error() == "no CBT clients were successfully initialized" {
+		t.Skip("Skipping test: ClickHouse is not available")
+	}
 	require.NoError(t, err)
 
 	defer func() { _ = svc.Stop() }()
