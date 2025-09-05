@@ -1,0 +1,80 @@
+syntax = "proto3";
+package api.v1;
+
+option go_package = "github.com/ethpandaops/lab/backend/pkg/api/v1/proto";
+
+// This file defines the public API layer for CBT data.
+//
+// Purpose:
+// - Acts as a translation layer between internal CBT structs and public API responses
+// - Provides control over what data is exposed to clients
+// - Allows selective field exposure (e.g., excluding internal metadata or sensitive fields)
+// - Enables API versioning independent of internal data structures
+// - Transforms raw database responses into client-friendly formats
+//
+// Example: instead of directly exposing cbt.IntXatuNodes24H structs (which may
+// contain internal fields, raw timestamps, or implementation details), we
+// transform them into clean API responses with only the fields clients need.
+
+// ListNodesResponse is the v1 API response for listing nodes with pagination.
+message ListNodesResponse {
+  repeated Node nodes = 1;
+  PaginationMetadata pagination = 2;
+  FilterMetadata filters = 3;
+}
+
+// Node represents a transformed view of CBT node data for public consumption.
+// This is a curated subset of fields from the internal CBT structs,
+// formatted for client convenience (e.g., timestamps as ISO strings).
+message Node {
+  string username = 1;
+  string node_id = 2;
+  string classification = 3;
+  ClientInfo client = 4;
+  GeoInfo geo = 5;
+  ConsensusInfo consensus = 6;
+  string last_seen = 7;  // ISO 8601 formatted, not raw Unix timestamp
+}
+
+// ClientInfo groups execution client metadata.
+message ClientInfo {
+  string name = 1;
+  string version = 2;
+  string implementation = 3;
+}
+
+// GeoInfo groups geographical metadata.
+message GeoInfo {
+  string city = 1;
+  string country = 2;
+  string country_code = 3;
+  string continent_code = 4;
+}
+
+// ConsensusInfo groups consensus client metadata.
+message ConsensusInfo {
+  string version = 1;
+  string implementation = 2;
+}
+
+// Pagination metadata following AIP-132.
+message PaginationMetadata {
+  int32 page_size = 1;
+  string page_token = 2;
+  string next_page_token = 3;
+}
+
+// Filter metadata showing applied filters.
+message FilterMetadata {
+  string network = 1;
+  string time_range = 2;
+  map<string, string> applied_filters = 3;
+  string order_by = 4;
+}
+
+// Error response.
+message ErrorResponse {
+  string error = 1;
+  string message = 2;
+  int32 code = 3;
+}

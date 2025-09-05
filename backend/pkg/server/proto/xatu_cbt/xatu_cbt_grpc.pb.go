@@ -8,6 +8,7 @@ package xatu_cbt
 
 import (
 	context "context"
+	clickhouse "github.com/ethpandaops/xatu-cbt/pkg/proto/clickhouse"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -19,16 +20,19 @@ import (
 const _ = grpc.SupportPackageIsVersion8
 
 const (
-	XatuCBT_ListNetworks_FullMethodName  = "/xatu_cbt.XatuCBT/ListNetworks"
-	XatuCBT_ListXatuNodes_FullMethodName = "/xatu_cbt.XatuCBT/ListXatuNodes"
+	XatuCBT_ListIntXatuNodes24H_FullMethodName = "/xatu_cbt.XatuCBT/ListIntXatuNodes24H"
 )
 
 // XatuCBTClient is the client API for XatuCBT service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+//
+// XatuCBT service provides access to CBT data from multiple ClickHouse instances.
+// Each RPC corresponds to a specific CBT table/view and uses upstream request/response types.
 type XatuCBTClient interface {
-	ListNetworks(ctx context.Context, in *ListNetworksRequest, opts ...grpc.CallOption) (*ListNetworksResponse, error)
-	ListXatuNodes(ctx context.Context, in *ListXatuNodesRequest, opts ...grpc.CallOption) (*ListXatuNodesResponse, error)
+	// ListIntXatuNodes24H queries the intermediate 24-hour aggregated nodes table.
+	// This table contains node metadata aggregated over rolling 24-hour periods.
+	ListIntXatuNodes24H(ctx context.Context, in *clickhouse.ListIntXatuNodes24HRequest, opts ...grpc.CallOption) (*clickhouse.ListIntXatuNodes24HResponse, error)
 }
 
 type xatuCBTClient struct {
@@ -39,20 +43,10 @@ func NewXatuCBTClient(cc grpc.ClientConnInterface) XatuCBTClient {
 	return &xatuCBTClient{cc}
 }
 
-func (c *xatuCBTClient) ListNetworks(ctx context.Context, in *ListNetworksRequest, opts ...grpc.CallOption) (*ListNetworksResponse, error) {
+func (c *xatuCBTClient) ListIntXatuNodes24H(ctx context.Context, in *clickhouse.ListIntXatuNodes24HRequest, opts ...grpc.CallOption) (*clickhouse.ListIntXatuNodes24HResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(ListNetworksResponse)
-	err := c.cc.Invoke(ctx, XatuCBT_ListNetworks_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *xatuCBTClient) ListXatuNodes(ctx context.Context, in *ListXatuNodesRequest, opts ...grpc.CallOption) (*ListXatuNodesResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(ListXatuNodesResponse)
-	err := c.cc.Invoke(ctx, XatuCBT_ListXatuNodes_FullMethodName, in, out, cOpts...)
+	out := new(clickhouse.ListIntXatuNodes24HResponse)
+	err := c.cc.Invoke(ctx, XatuCBT_ListIntXatuNodes24H_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -62,9 +56,13 @@ func (c *xatuCBTClient) ListXatuNodes(ctx context.Context, in *ListXatuNodesRequ
 // XatuCBTServer is the server API for XatuCBT service.
 // All implementations must embed UnimplementedXatuCBTServer
 // for forward compatibility
+//
+// XatuCBT service provides access to CBT data from multiple ClickHouse instances.
+// Each RPC corresponds to a specific CBT table/view and uses upstream request/response types.
 type XatuCBTServer interface {
-	ListNetworks(context.Context, *ListNetworksRequest) (*ListNetworksResponse, error)
-	ListXatuNodes(context.Context, *ListXatuNodesRequest) (*ListXatuNodesResponse, error)
+	// ListIntXatuNodes24H queries the intermediate 24-hour aggregated nodes table.
+	// This table contains node metadata aggregated over rolling 24-hour periods.
+	ListIntXatuNodes24H(context.Context, *clickhouse.ListIntXatuNodes24HRequest) (*clickhouse.ListIntXatuNodes24HResponse, error)
 	mustEmbedUnimplementedXatuCBTServer()
 }
 
@@ -72,11 +70,8 @@ type XatuCBTServer interface {
 type UnimplementedXatuCBTServer struct {
 }
 
-func (UnimplementedXatuCBTServer) ListNetworks(context.Context, *ListNetworksRequest) (*ListNetworksResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ListNetworks not implemented")
-}
-func (UnimplementedXatuCBTServer) ListXatuNodes(context.Context, *ListXatuNodesRequest) (*ListXatuNodesResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ListXatuNodes not implemented")
+func (UnimplementedXatuCBTServer) ListIntXatuNodes24H(context.Context, *clickhouse.ListIntXatuNodes24HRequest) (*clickhouse.ListIntXatuNodes24HResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListIntXatuNodes24H not implemented")
 }
 func (UnimplementedXatuCBTServer) mustEmbedUnimplementedXatuCBTServer() {}
 
@@ -91,38 +86,20 @@ func RegisterXatuCBTServer(s grpc.ServiceRegistrar, srv XatuCBTServer) {
 	s.RegisterService(&XatuCBT_ServiceDesc, srv)
 }
 
-func _XatuCBT_ListNetworks_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ListNetworksRequest)
+func _XatuCBT_ListIntXatuNodes24H_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(clickhouse.ListIntXatuNodes24HRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(XatuCBTServer).ListNetworks(ctx, in)
+		return srv.(XatuCBTServer).ListIntXatuNodes24H(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: XatuCBT_ListNetworks_FullMethodName,
+		FullMethod: XatuCBT_ListIntXatuNodes24H_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(XatuCBTServer).ListNetworks(ctx, req.(*ListNetworksRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _XatuCBT_ListXatuNodes_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ListXatuNodesRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(XatuCBTServer).ListXatuNodes(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: XatuCBT_ListXatuNodes_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(XatuCBTServer).ListXatuNodes(ctx, req.(*ListXatuNodesRequest))
+		return srv.(XatuCBTServer).ListIntXatuNodes24H(ctx, req.(*clickhouse.ListIntXatuNodes24HRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -135,12 +112,8 @@ var XatuCBT_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*XatuCBTServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "ListNetworks",
-			Handler:    _XatuCBT_ListNetworks_Handler,
-		},
-		{
-			MethodName: "ListXatuNodes",
-			Handler:    _XatuCBT_ListXatuNodes_Handler,
+			MethodName: "ListIntXatuNodes24H",
+			Handler:    _XatuCBT_ListIntXatuNodes24H_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

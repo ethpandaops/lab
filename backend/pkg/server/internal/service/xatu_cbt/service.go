@@ -2,10 +2,7 @@ package xatu_cbt
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
-	"sync"
-	"time"
 
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/cache"
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/clickhouse"
@@ -13,10 +10,12 @@ import (
 	pb "github.com/ethpandaops/lab/backend/pkg/server/proto/xatu_cbt"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/sirupsen/logrus"
+	"google.golang.org/grpc/metadata"
 )
 
 const (
-	ServiceName = "xatu_cbt"
+	ServiceName     = "xatu_cbt"
+	DefaultPageSize = 100
 )
 
 type XatuCBT struct {
@@ -36,12 +35,6 @@ type XatuCBT struct {
 	requestDuration  *prometheus.HistogramVec
 	cacheHitsTotal   *prometheus.CounterVec
 	cacheMissesTotal *prometheus.CounterVec
-
-	ctx      context.Context //nolint:containedctx // context is used for lifecycle management
-	cancel   context.CancelFunc
-	wg       sync.WaitGroup
-	mu       sync.RWMutex
-	networks map[string]*pb.NetworkInfo
 }
 
 func New(
@@ -68,7 +61,6 @@ func New(
 		metrics:          metricsSvc,
 		metricsCollector: metricsCollector,
 		cbtClients:       make(map[string]clickhouse.Client),
-		networks:         make(map[string]*pb.NetworkInfo),
 	}, nil
 }
 
@@ -78,8 +70,6 @@ func (x *XatuCBT) Name() string {
 
 func (x *XatuCBT) Start(ctx context.Context) error {
 	x.log.Info("Starting XatuCBT datasource")
-
-	x.ctx, x.cancel = context.WithCancel(ctx)
 
 	// Initialize metrics
 	if err := x.initializeMetrics(); err != nil {
@@ -106,17 +96,13 @@ func (x *XatuCBT) Start(ctx context.Context) error {
 			return fmt.Errorf("failed to create ClickHouse client for network %s: %w", networkName, err)
 		}
 
-		if err := client.Start(x.ctx); err != nil {
+		if err := client.Start(ctx); err != nil {
 			x.log.WithField("network", networkName).WithError(err).Warn("Failed to start ClickHouse client, skipping network")
 
 			continue
 		}
 
 		x.cbtClients[networkName] = client
-		x.networks[networkName] = &pb.NetworkInfo{
-			Name:    networkName,
-			Enabled: true,
-		}
 
 		x.log.WithField("network", networkName).Info("Initialized ClickHouse client")
 	}
@@ -133,10 +119,6 @@ func (x *XatuCBT) Start(ctx context.Context) error {
 func (x *XatuCBT) Stop() error {
 	x.log.Info("Stopping XatuCBT datasource")
 
-	if x.cancel != nil {
-		x.cancel()
-	}
-
 	// Stop all CBT clients
 	for network, client := range x.cbtClients {
 		if err := client.Stop(); err != nil {
@@ -144,7 +126,6 @@ func (x *XatuCBT) Stop() error {
 		}
 	}
 
-	x.wg.Wait()
 	x.log.Info("XatuCBT datasource stopped")
 
 	return nil
@@ -197,20 +178,37 @@ func (x *XatuCBT) initializeMetrics() error {
 	return nil
 }
 
-// storeInCache stores a response in the cache
-func (x *XatuCBT) storeInCache(key string, value interface{}, ttl time.Duration) {
-	if x.cacheClient == nil {
-		return
-	}
-
-	data, err := json.Marshal(value)
+// getNetworkClient extracts network from context and returns the corresponding client.
+func (x *XatuCBT) getNetworkClient(ctx context.Context) (clickhouse.Client, error) {
+	network, err := x.extractNetworkFromMetadata(ctx)
 	if err != nil {
-		x.log.WithError(err).Warn("Failed to marshal data for cache")
-
-		return
+		return nil, fmt.Errorf("failed to extract network from metadata: %w", err)
 	}
 
-	if err := x.cacheClient.Set(key, data, ttl); err != nil {
-		x.log.WithError(err).Warn("Failed to store in cache")
+	client, ok := x.cbtClients[network]
+	if !ok {
+		return nil, fmt.Errorf("network %s not configured", network)
 	}
+
+	return client, nil
+}
+
+// extractNetworkFromMetadata extracts the network name from gRPC metadata.
+func (x *XatuCBT) extractNetworkFromMetadata(ctx context.Context) (string, error) {
+	md, ok := metadata.FromIncomingContext(ctx)
+	if !ok {
+		return "", fmt.Errorf("no metadata found")
+	}
+
+	networks := md.Get("network")
+	if len(networks) == 0 {
+		return "", fmt.Errorf("network not found in metadata")
+	}
+
+	network := networks[0]
+	if network == "" {
+		return "", fmt.Errorf("network is empty")
+	}
+
+	return network, nil
 }

@@ -5,7 +5,6 @@
 
 import { GetConfigRequest, GetConfigResponse, GetRecentLocallyBuiltBlocksRequest, GetRecentLocallyBuiltBlocksResponse, GetSlotDataRequest, GetSlotDataResponse } from "./lab_api_pb.js";
 import { MethodIdempotency, MethodKind } from "@bufbuild/protobuf";
-import { GetContributorsRequest, GetContributorsResponse, GetNetworksRequest, GetNetworksResponse } from "../../server/proto/xatu_cbt/xatu_cbt_pb.js";
 
 /**
  * @generated from service labapi.LabAPI
@@ -40,28 +39,6 @@ export const LabAPI = {
       name: "GetConfig",
       I: GetConfigRequest,
       O: GetConfigResponse,
-      kind: MethodKind.Unary,
-    idempotency: MethodIdempotency.NoSideEffects,
-    },
-    /**
-     * Xatu CBT endpoints
-     *
-     * @generated from rpc labapi.LabAPI.GetCBTNetworks
-     */
-    getCBTNetworks: {
-      name: "GetCBTNetworks",
-      I: GetNetworksRequest,
-      O: GetNetworksResponse,
-      kind: MethodKind.Unary,
-    idempotency: MethodIdempotency.NoSideEffects,
-    },
-    /**
-     * @generated from rpc labapi.LabAPI.GetCBTContributors
-     */
-    getCBTContributors: {
-      name: "GetCBTContributors",
-      I: GetContributorsRequest,
-      O: GetContributorsResponse,
       kind: MethodKind.Unary,
     idempotency: MethodIdempotency.NoSideEffects,
     },

@@ -4,7 +4,7 @@ package beacon_chain_timings;
 
 import "google/protobuf/timestamp.proto";
 
-option go_package = "github.com/ethpandaops/lab/backend/pkg/proto/beacon_chain_timings";
+option go_package = "github.com/ethpandaops/lab/backend/pkg/server/proto/beacon_chain_timings";
 
 // Service definitions
 service BeaconChainTimingsService {

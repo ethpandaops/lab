@@ -8,7 +8,6 @@ package proto
 
 import (
 	context "context"
-	xatu_cbt "github.com/ethpandaops/lab/backend/pkg/server/proto/xatu_cbt"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -23,8 +22,6 @@ const (
 	LabAPI_GetRecentLocallyBuiltBlocks_FullMethodName = "/labapi.LabAPI/GetRecentLocallyBuiltBlocks"
 	LabAPI_GetSlotData_FullMethodName                 = "/labapi.LabAPI/GetSlotData"
 	LabAPI_GetConfig_FullMethodName                   = "/labapi.LabAPI/GetConfig"
-	LabAPI_ListCBTNetworks_FullMethodName             = "/labapi.LabAPI/ListCBTNetworks"
-	LabAPI_ListCBTXatuNodes_FullMethodName            = "/labapi.LabAPI/ListCBTXatuNodes"
 )
 
 // LabAPIClient is the client API for LabAPI service.
@@ -34,9 +31,6 @@ type LabAPIClient interface {
 	GetRecentLocallyBuiltBlocks(ctx context.Context, in *GetRecentLocallyBuiltBlocksRequest, opts ...grpc.CallOption) (*GetRecentLocallyBuiltBlocksResponse, error)
 	GetSlotData(ctx context.Context, in *GetSlotDataRequest, opts ...grpc.CallOption) (*GetSlotDataResponse, error)
 	GetConfig(ctx context.Context, in *GetConfigRequest, opts ...grpc.CallOption) (*GetConfigResponse, error)
-	// Xatu CBT endpoints
-	ListCBTNetworks(ctx context.Context, in *xatu_cbt.ListNetworksRequest, opts ...grpc.CallOption) (*xatu_cbt.ListNetworksResponse, error)
-	ListCBTXatuNodes(ctx context.Context, in *xatu_cbt.ListXatuNodesRequest, opts ...grpc.CallOption) (*xatu_cbt.ListXatuNodesResponse, error)
 }
 
 type labAPIClient struct {
@@ -77,26 +71,6 @@ func (c *labAPIClient) GetConfig(ctx context.Context, in *GetConfigRequest, opts
 	return out, nil
 }
 
-func (c *labAPIClient) ListCBTNetworks(ctx context.Context, in *xatu_cbt.ListNetworksRequest, opts ...grpc.CallOption) (*xatu_cbt.ListNetworksResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(xatu_cbt.ListNetworksResponse)
-	err := c.cc.Invoke(ctx, LabAPI_ListCBTNetworks_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *labAPIClient) ListCBTXatuNodes(ctx context.Context, in *xatu_cbt.ListXatuNodesRequest, opts ...grpc.CallOption) (*xatu_cbt.ListXatuNodesResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(xatu_cbt.ListXatuNodesResponse)
-	err := c.cc.Invoke(ctx, LabAPI_ListCBTXatuNodes_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 // LabAPIServer is the server API for LabAPI service.
 // All implementations must embed UnimplementedLabAPIServer
 // for forward compatibility
@@ -104,9 +78,6 @@ type LabAPIServer interface {
 	GetRecentLocallyBuiltBlocks(context.Context, *GetRecentLocallyBuiltBlocksRequest) (*GetRecentLocallyBuiltBlocksResponse, error)
 	GetSlotData(context.Context, *GetSlotDataRequest) (*GetSlotDataResponse, error)
 	GetConfig(context.Context, *GetConfigRequest) (*GetConfigResponse, error)
-	// Xatu CBT endpoints
-	ListCBTNetworks(context.Context, *xatu_cbt.ListNetworksRequest) (*xatu_cbt.ListNetworksResponse, error)
-	ListCBTXatuNodes(context.Context, *xatu_cbt.ListXatuNodesRequest) (*xatu_cbt.ListXatuNodesResponse, error)
 	mustEmbedUnimplementedLabAPIServer()
 }
 
@@ -122,12 +93,6 @@ func (UnimplementedLabAPIServer) GetSlotData(context.Context, *GetSlotDataReques
 }
 func (UnimplementedLabAPIServer) GetConfig(context.Context, *GetConfigRequest) (*GetConfigResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetConfig not implemented")
-}
-func (UnimplementedLabAPIServer) ListCBTNetworks(context.Context, *xatu_cbt.ListNetworksRequest) (*xatu_cbt.ListNetworksResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ListCBTNetworks not implemented")
-}
-func (UnimplementedLabAPIServer) ListCBTXatuNodes(context.Context, *xatu_cbt.ListXatuNodesRequest) (*xatu_cbt.ListXatuNodesResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ListCBTXatuNodes not implemented")
 }
 func (UnimplementedLabAPIServer) mustEmbedUnimplementedLabAPIServer() {}
 
@@ -196,42 +161,6 @@ func _LabAPI_GetConfig_Handler(srv interface{}, ctx context.Context, dec func(in
 	return interceptor(ctx, in, info, handler)
 }
 
-func _LabAPI_ListCBTNetworks_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(xatu_cbt.ListNetworksRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(LabAPIServer).ListCBTNetworks(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: LabAPI_ListCBTNetworks_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(LabAPIServer).ListCBTNetworks(ctx, req.(*xatu_cbt.ListNetworksRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _LabAPI_ListCBTXatuNodes_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(xatu_cbt.ListXatuNodesRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(LabAPIServer).ListCBTXatuNodes(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: LabAPI_ListCBTXatuNodes_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(LabAPIServer).ListCBTXatuNodes(ctx, req.(*xatu_cbt.ListXatuNodesRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 // LabAPI_ServiceDesc is the grpc.ServiceDesc for LabAPI service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -250,14 +179,6 @@ var LabAPI_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetConfig",
 			Handler:    _LabAPI_GetConfig_Handler,
-		},
-		{
-			MethodName: "ListCBTNetworks",
-			Handler:    _LabAPI_ListCBTNetworks_Handler,
-		},
-		{
-			MethodName: "ListCBTXatuNodes",
-			Handler:    _LabAPI_ListCBTXatuNodes_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

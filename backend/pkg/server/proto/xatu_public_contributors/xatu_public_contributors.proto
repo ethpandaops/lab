@@ -4,7 +4,7 @@ package xatu_public_contributors;
 
 import "google/protobuf/timestamp.proto";
 
-option go_package = "pkg/proto/xatu_public_contributors";
+option go_package = "github.com/ethpandaops/lab/backend/pkg/server/proto/xatu_public_contributors";
 
 
 // The xatu_public_contributors service definition

@@ -5,14 +5,14 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ethpandaops/lab/backend/pkg/internal/lab/cache"
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/clickhouse"
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/metrics"
 	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/xatu_cbt"
-	pb "github.com/ethpandaops/lab/backend/pkg/server/proto/xatu_cbt"
+	cbtproto "github.com/ethpandaops/xatu-cbt/pkg/proto/clickhouse"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"google.golang.org/grpc/metadata"
 )
 
 func TestNew(t *testing.T) {
@@ -105,53 +105,7 @@ func TestServiceLifecycle(t *testing.T) {
 	assert.NoError(t, err)
 }
 
-func TestListNetworks(t *testing.T) {
-	logger := logrus.New()
-	logger.SetLevel(logrus.DebugLevel)
-	metricsSvc := metrics.NewMetricsService("test", logger)
-
-	config := &xatu_cbt.Config{
-		CacheTTL:      60 * time.Second,
-		MaxQueryLimit: 1000,
-		DefaultLimit:  100,
-		NetworkConfigs: map[string]*xatu_cbt.NetworkConfig{
-			"mainnet": {
-				Enabled: true,
-				ClickHouse: &clickhouse.Config{
-					DSN: "http://localhost:8123/default",
-				},
-			},
-			"sepolia": {
-				Enabled: false,
-				ClickHouse: &clickhouse.Config{
-					DSN: "http://localhost:8123/default",
-				},
-			},
-		},
-	}
-
-	svc, err := xatu_cbt.New(logger, config, nil, metricsSvc)
-	require.NoError(t, err)
-	require.NotNil(t, svc)
-
-	ctx := context.Background()
-	err = svc.Start(ctx)
-	require.NoError(t, err)
-
-	defer func() { _ = svc.Stop() }()
-
-	// Test ListNetworks
-	req := &pb.ListNetworksRequest{}
-	resp, err := svc.ListNetworks(ctx, req)
-	require.NoError(t, err)
-	require.NotNil(t, resp)
-	assert.NotNil(t, resp.Networks)
-	assert.Len(t, resp.Networks, 1) // Only mainnet should be active
-	assert.Equal(t, "mainnet", resp.Networks[0].Name)
-	assert.True(t, resp.Networks[0].Enabled)
-}
-
-func TestListXatuNodesValidation(t *testing.T) {
+func TestListIntXatuNodes24HValidation(t *testing.T) {
 	logger := logrus.New()
 	logger.SetLevel(logrus.DebugLevel)
 	metricsSvc := metrics.NewMetricsService("test", logger)
@@ -180,59 +134,26 @@ func TestListXatuNodesValidation(t *testing.T) {
 
 	defer func() { _ = svc.Stop() }()
 
-	// Test ListXatuNodes with empty network
-	req := &pb.ListXatuNodesRequest{
-		Network: "",
+	// Test ListIntXatuNodes24H with missing network metadata
+	req := &cbtproto.ListIntXatuNodes24HRequest{
+		MetaClientName: &cbtproto.StringFilter{
+			Filter: &cbtproto.StringFilter_Like{
+				Like: "%",
+			},
+		},
 	}
-	resp, err := svc.ListXatuNodes(ctx, req)
+	resp, err := svc.ListIntXatuNodes24H(ctx, req)
 	assert.Error(t, err)
 	assert.Nil(t, resp)
-	assert.Contains(t, err.Error(), "network is required")
+	assert.Contains(t, err.Error(), "failed to extract network from metadata")
 
-	// Test ListXatuNodes with non-existent network
-	req = &pb.ListXatuNodesRequest{
-		Network: "nonexistent",
-	}
-	resp, err = svc.ListXatuNodes(ctx, req)
+	// Test ListIntXatuNodes24H with non-existent network
+	md := metadata.New(map[string]string{"network": "nonexistent"})
+	ctxWithMeta := metadata.NewIncomingContext(ctx, md)
+	resp, err = svc.ListIntXatuNodes24H(ctxWithMeta, req)
 	assert.Error(t, err)
 	assert.Nil(t, resp)
 	assert.Contains(t, err.Error(), "network nonexistent not configured")
-}
-
-func TestCacheIntegration(t *testing.T) {
-	logger := logrus.New()
-	logger.SetLevel(logrus.DebugLevel)
-	metricsSvc := metrics.NewMetricsService("test", logger)
-
-	// Create a mock cache client
-	cacheClient := cache.NewMemory(cache.MemoryConfig{DefaultTTL: 60 * time.Second}, metricsSvc)
-
-	config := &xatu_cbt.Config{
-		CacheTTL:      60 * time.Second,
-		MaxQueryLimit: 1000,
-		DefaultLimit:  100,
-		NetworkConfigs: map[string]*xatu_cbt.NetworkConfig{
-			"mainnet": {
-				Enabled: true,
-				ClickHouse: &clickhouse.Config{
-					DSN: "http://localhost:8123/default",
-				},
-			},
-		},
-	}
-
-	svc, err := xatu_cbt.New(logger, config, cacheClient, metricsSvc)
-	require.NoError(t, err)
-	require.NotNil(t, svc)
-
-	ctx := context.Background()
-	err = svc.Start(ctx)
-	require.NoError(t, err)
-
-	defer func() { _ = svc.Stop() }()
-
-	// The service will have cache integration
-	// Further testing would require actual data in ClickHouse
 }
 
 func TestConfigDefaults(t *testing.T) {

@@ -12,7 +12,6 @@ import (
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/storage"
 	beaconslotspb "github.com/ethpandaops/lab/backend/pkg/server/proto/beacon_slots"
 	labpb "github.com/ethpandaops/lab/backend/pkg/server/proto/lab"
-	xatu_cbt_pb "github.com/ethpandaops/lab/backend/pkg/server/proto/xatu_cbt"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 )
@@ -38,7 +37,6 @@ type LabAPIServerImpl struct {
 	// gRPC clients
 	beaconSlotsClient beaconslotspb.BeaconSlotsClient
 	labClient         labpb.LabServiceClient
-	xatuCBTClient     xatu_cbt_pb.XatuCBTClient
 }
 
 func NewLabAPIServer(cacheClient cache.Client, storageClient storage.Client, srvConn *grpc.ClientConn, log logrus.FieldLogger) *LabAPIServerImpl {
@@ -47,7 +45,6 @@ func NewLabAPIServer(cacheClient cache.Client, storageClient storage.Client, srv
 		storage:           storageClient,
 		beaconSlotsClient: beaconslotspb.NewBeaconSlotsClient(srvConn),
 		labClient:         labpb.NewLabServiceClient(srvConn),
-		xatuCBTClient:     xatu_cbt_pb.NewXatuCBTClient(srvConn),
 		log:               log,
 	}
 }
@@ -123,36 +120,6 @@ func (s *LabAPIServerImpl) GetConfig(ctx context.Context, req *connect.Request[p
 
 	// Set medium-term caching headers
 	res.Header().Set("Cache-Control", StandardHTTPHeaders["Cache-Control-Medium"])
-
-	return res, nil
-}
-
-// ListCBTNetworks retrieves the list of configured CBT networks
-func (s *LabAPIServerImpl) ListCBTNetworks(ctx context.Context, req *connect.Request[xatu_cbt_pb.ListNetworksRequest]) (*connect.Response[xatu_cbt_pb.ListNetworksResponse], error) {
-	s.log.Debug("ListCBTNetworks")
-
-	resp, err := s.xatuCBTClient.ListNetworks(ctx, req.Msg)
-	if err != nil {
-		return nil, err
-	}
-
-	res := connect.NewResponse(resp)
-	res.Header().Set("Cache-Control", StandardHTTPHeaders["Cache-Control-Short"])
-
-	return res, nil
-}
-
-// ListCBTXatuNodes retrieves the list of xatu nodes in the last 24h
-func (s *LabAPIServerImpl) ListCBTXatuNodes(ctx context.Context, req *connect.Request[xatu_cbt_pb.ListXatuNodesRequest]) (*connect.Response[xatu_cbt_pb.ListXatuNodesResponse], error) {
-	s.log.WithField("network", req.Msg.Network).Debug("ListCBTXatuNodes")
-
-	resp, err := s.xatuCBTClient.ListXatuNodes(ctx, req.Msg)
-	if err != nil {
-		return nil, err
-	}
-
-	res := connect.NewResponse(resp)
-	res.Header().Set("Cache-Control", StandardHTTPHeaders["Cache-Control-Short"])
 
 	return res, nil
 }
