@@ -1,0 +1,68 @@
+syntax = "proto3";
+
+package cbt;
+
+import "vendor/xatu-cbt/clickhouse/common.proto";
+
+option go_package = "github.com/ethpandaops/xatu-cbt/pkg/proto/clickhouse";
+// Table for accounts first access data
+
+message IntAddressFirstAccess {
+  // The address of the account
+  string address = 11;
+  // The block number of the first access
+  uint32 block_number = 12;
+  // Version for this address, for internal use in clickhouse to keep first access
+  uint32 version = 13;
+}
+
+// ListIntAddressFirstAccessRequest is the request message for listing int_address__first_access records
+message ListIntAddressFirstAccessRequest {
+  // Filter by address (PRIMARY KEY - required)
+  StringFilter address = 1;
+
+  // Filter by block_number (optional)
+  UInt32Filter block_number = 2;
+  // Filter by version (optional)
+  UInt32Filter version = 3;
+
+  // The maximum number of int_address__first_access to return.
+  // If unspecified, at most 100 items will be returned.
+  // The maximum value is 1000; values above 1000 will be coerced to 1000.
+  int32 page_size = 4;
+  // A page token, received from a previous `ListIntAddressFirstAccess` call.
+  // Provide this to retrieve the subsequent page.
+  string page_token = 5;
+  // The order of results. Format: comma-separated list of fields.
+  // Example: "foo,bar" or "foo desc,bar" for descending order on foo.
+  // If unspecified, results will be returned in the default order.
+  string order_by = 6;
+}
+
+// ListIntAddressFirstAccessResponse is the response message for listing int_address__first_access records
+message ListIntAddressFirstAccessResponse {
+  // The list of int_address__first_access.
+  repeated IntAddressFirstAccess int_address__first_access = 1;
+  // A token, which can be sent as `page_token` to retrieve the next page.
+  // If this field is omitted, there are no subsequent pages.
+  string next_page_token = 2;
+}
+
+// GetIntAddressFirstAccessRequest is the request message for getting a single int_address__first_access record by primary key
+message GetIntAddressFirstAccessRequest {
+  // The address of the account
+  string address = 1; // Primary key (required)
+}
+
+// GetIntAddressFirstAccessResponse is the response message for getting a single int_address__first_access record
+message GetIntAddressFirstAccessResponse {
+  IntAddressFirstAccess item = 1;
+}
+
+// IntAddressFirstAccessService provides RPC methods for querying int_address__first_access data
+service IntAddressFirstAccessService {
+  // List returns paginated int_address__first_access records
+  rpc List(ListIntAddressFirstAccessRequest) returns (ListIntAddressFirstAccessResponse);
+  // Get returns a single int_address__first_access record by primary key
+  rpc Get(GetIntAddressFirstAccessRequest) returns (GetIntAddressFirstAccessResponse);
+}

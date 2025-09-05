@@ -22,21 +22,29 @@ const (
 	StatusSuccess = "success"
 )
 
+// RowScanner interface for scanning database rows
+type RowScanner interface {
+	Scan(dest ...interface{}) error
+}
+
 // Client represents a ClickHouse client
 type Client interface {
 	Start(ctx context.Context) error
 	Query(ctx context.Context, query string, args ...interface{}) ([]map[string]interface{}, error)
 	QueryRow(ctx context.Context, query string, args ...interface{}) (map[string]interface{}, error)
+	QueryWithScanner(ctx context.Context, query string, scanFunc func(RowScanner) error, args ...interface{}) error
 	Exec(ctx context.Context, query string, args ...interface{}) error
+	Network() string
 	Stop() error
 }
 
 // client is an implementation of the Client interface
 type client struct {
-	conn   *sql.DB // Use standard database/sql connection pool
-	log    logrus.FieldLogger
-	ctx    context.Context //nolint:containedctx // context is used for clickhouse operations
-	config *Config
+	conn    *sql.DB // Use standard database/sql connection pool
+	log     logrus.FieldLogger
+	ctx     context.Context //nolint:containedctx // context is used for clickhouse operations
+	config  *Config
+	network string
 
 	// Metrics
 	metrics           *metrics.Metrics
@@ -51,6 +59,7 @@ type client struct {
 func New(
 	config *Config,
 	log logrus.FieldLogger,
+	network string,
 	metricsSvc *metrics.Metrics,
 ) (Client, error) {
 	if err := config.Validate(); err != nil {
@@ -63,18 +72,22 @@ func New(
 
 	log.Info("Initializing ClickHouse client")
 
-	client := &client{
-		log:     log.WithField("module", "clickhouse"),
+	c := &client{
+		log: log.WithFields(logrus.Fields{
+			"module":  "clickhouse",
+			"network": network,
+		}),
 		config:  config,
 		metrics: metricsSvc,
+		network: network,
 	}
 
 	// Handle optional metrics service parameter
-	if err := client.initMetrics(); err != nil {
+	if err := c.initMetrics(); err != nil {
 		return nil, fmt.Errorf("failed to initialize metrics: %w", err)
 	}
 
-	return client, nil
+	return c, nil
 }
 
 // initMetrics initializes Prometheus metrics for the ClickHouse client
@@ -159,10 +172,13 @@ func (c *client) Start(ctx context.Context) error {
 	dsnParams.Add("read_timeout", "30s")  // Add 's' unit
 	dsnParams.Add("write_timeout", "30s") // Add 's' unit
 
-	if c.config.InsecureSkipVerify {
-		// Attempt to add standard param, but verify if driver supports it.
+	if c.config.InsecureSkipVerify && strings.HasPrefix(dsn, "https://") {
+		// Only add tls_skip_verify for HTTPS connections
+		// Note: mailru/go-clickhouse/v2 driver may not support this parameter
 		dsnParams.Add("tls_skip_verify", "true")
 		c.log.Warn("Attempting to configure InsecureSkipVerify via DSN parameter (tls_skip_verify=true)")
+	} else if c.config.InsecureSkipVerify {
+		c.log.Debug("InsecureSkipVerify configured but connection is HTTP, skipping TLS parameter")
 	}
 
 	// Append parameters to DSN
@@ -301,6 +317,55 @@ func (c *client) Query(ctx context.Context, query string, args ...interface{}) (
 	return result, nil
 }
 
+// QueryWithScanner executes a query and allows direct scanning into custom structs
+func (c *client) QueryWithScanner(ctx context.Context, query string, scanFunc func(RowScanner) error, args ...interface{}) error {
+	startTime := time.Now()
+
+	var status = "success"
+
+	defer func() {
+		// Record metrics
+		c.queriesTotal.WithLabelValues("query_scanner", status).Inc()
+
+		duration := time.Since(startTime).Seconds()
+		c.queryDuration.WithLabelValues("query_scanner").Observe(duration)
+	}()
+
+	// Verify connection is set
+	if c.conn == nil {
+		status = StatusError
+
+		return fmt.Errorf("clickhouse connection is nil, client may not be properly initialized")
+	}
+
+	// Use QueryContext from database/sql
+	rows, err := c.conn.QueryContext(ctx, query, args...)
+	if err != nil {
+		status = StatusError
+
+		return fmt.Errorf("failed to execute query: %w", err)
+	}
+	defer rows.Close() // Ensure rows are closed
+
+	// Iterate through rows and call scanFunc for each
+	for rows.Next() {
+		if err := scanFunc(rows); err != nil {
+			status = StatusError
+
+			return fmt.Errorf("failed to scan row: %w", err)
+		}
+	}
+
+	// Check for errors after iteration using standard sql.Rows.Err()
+	if err := rows.Err(); err != nil {
+		status = StatusError
+
+		return fmt.Errorf("error iterating rows: %w", err)
+	}
+
+	return nil
+}
+
 // QueryRow executes a query and returns a single row
 func (c *client) QueryRow(ctx context.Context, query string, args ...interface{}) (map[string]interface{}, error) {
 	startTime := time.Now()
@@ -358,6 +423,11 @@ func (c *client) Exec(ctx context.Context, query string, args ...interface{}) er
 	}
 
 	return err // Return the error directly
+}
+
+// Network returns the network this client is configured for
+func (c *client) Network() string {
+	return c.network
 }
 
 // Stop gracefully stops the ClickHouse client

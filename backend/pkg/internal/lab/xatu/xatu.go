@@ -120,7 +120,7 @@ func (c *Client) Start(ctx context.Context) error {
 			continue
 		}
 
-		clickhouseClient, err := clickhouse.New(config, c.log.WithField("network", network), c.metrics)
+		clickhouseClient, err := clickhouse.New(config, c.log, network, c.metrics)
 		if err != nil {
 			status = StatusError
 
