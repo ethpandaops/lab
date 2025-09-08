@@ -28,6 +28,7 @@ import (
 
 	beaconslotspb "github.com/ethpandaops/lab/backend/pkg/server/proto/beacon_slots"
 	labpb "github.com/ethpandaops/lab/backend/pkg/server/proto/lab"
+	networkspb "github.com/ethpandaops/lab/backend/pkg/server/proto/networks"
 	xatu_cbt_pb "github.com/ethpandaops/lab/backend/pkg/server/proto/xatu_cbt"
 )
 
@@ -47,7 +48,8 @@ type Service struct {
 	labClient         labpb.LabServiceClient
 	beaconSlotsClient beaconslotspb.BeaconSlotsClient
 	xatuCBTClient     xatu_cbt_pb.XatuCBTClient
-	cbtV1Router       *v1rest.CBTRouter
+	networksClient    networkspb.NetworksServiceClient
+	publicV1Router    *v1rest.PublicRouter
 }
 
 // New creates a new api service
@@ -124,9 +126,9 @@ func (s *Service) Start(ctx context.Context) error {
 		s.registerLegacyHandlers(s.router)
 	}
 
-	// Create a separate router for v1 CBT REST routes (without prefix)
-	cbtRouter := mux.NewRouter()
-	s.cbtV1Router.RegisterRoutes(cbtRouter)
+	// Create a separate router for v1 public REST routes (without prefix)
+	publicRouter := mux.NewRouter()
+	s.publicV1Router.RegisterRoutes(publicRouter)
 
 	// Create a new HTTP mux for the server
 	rootMux := http.NewServeMux()
@@ -145,7 +147,7 @@ func (s *Service) Start(ctx context.Context) error {
 		fullAPIPath := prefix + "/api"
 		s.log.WithField("apiPath", fullAPIPath).Info("Registering Connect handler")
 
-		// Create a custom router that will dispatch to CBT routes, Connect handler, or legacy router
+		// Create a custom router that will dispatch to public API routes, Connect handler, or legacy router
 		customHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			// Log the original request for debugging
 			s.log.WithFields(logrus.Fields{
@@ -155,9 +157,9 @@ func (s *Service) Start(ctx context.Context) error {
 
 			path := r.URL.Path
 
-			// For CBT API routes (no prefix) - handle first
+			// For public API routes (no prefix) - handle first
 			if strings.HasPrefix(path, "/api/v1/") {
-				cbtRouter.ServeHTTP(w, r)
+				publicRouter.ServeHTTP(w, r)
 				return
 			}
 
@@ -194,10 +196,10 @@ func (s *Service) Start(ctx context.Context) error {
 		rootMux = http.NewServeMux()
 		rootMux.Handle("/", customHandler)
 	} else {
-		// No prefix case: Use the default approach with CBT routes
-		rootMux.Handle("/api/v1/", cbtRouter) // CBT routes at root level
-		rootMux.Handle("/api/", handler)      // Connect routes
-		rootMux.Handle("/", s.router)         // Legacy routes
+		// No prefix case: Use the default approach with public REST routes
+		rootMux.Handle("/api/v1/", publicRouter) // Public REST routes at root level
+		rootMux.Handle("/api/", handler)         // Connect routes
+		rootMux.Handle("/", s.router)            // Legacy routes
 	}
 
 	// Create the server
@@ -292,7 +294,8 @@ func (s *Service) initializeServices(ctx context.Context) error {
 	s.labClient = labpb.NewLabServiceClient(conn)
 	s.beaconSlotsClient = beaconslotspb.NewBeaconSlotsClient(conn)
 	s.xatuCBTClient = xatu_cbt_pb.NewXatuCBTClient(conn)
-	s.cbtV1Router = v1rest.NewCBTRouter(s.log, s.xatuCBTClient)
+	s.networksClient = networkspb.NewNetworksServiceClient(conn)
+	s.publicV1Router = v1rest.NewPublicRouter(s.log, s.xatuCBTClient, s.networksClient)
 
 	return nil
 }

@@ -61,7 +61,7 @@ func TestNew(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			svc, err := xatu_cbt.New(logger, tt.config, nil, metricsSvc)
+			svc, err := xatu_cbt.New(logger, tt.config, nil, metricsSvc, nil)
 			if tt.wantErr {
 				require.Error(t, err)
 				assert.Contains(t, err.Error(), tt.errMsg)
@@ -103,7 +103,7 @@ func TestServiceLifecycle(t *testing.T) {
 		},
 	}
 
-	svc, err := xatu_cbt.New(logger, config, nil, metricsSvc)
+	svc, err := xatu_cbt.New(logger, config, nil, metricsSvc, nil)
 	require.NoError(t, err)
 	require.NotNil(t, svc)
 
@@ -144,7 +144,7 @@ func TestListFctNodeActiveLast24hValidation(t *testing.T) {
 		},
 	}
 
-	svc, err := xatu_cbt.New(logger, config, nil, metricsSvc)
+	svc, err := xatu_cbt.New(logger, config, nil, metricsSvc, nil)
 	require.NoError(t, err)
 	require.NotNil(t, svc)
 

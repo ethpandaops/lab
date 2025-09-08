@@ -7,6 +7,7 @@ import (
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/cache"
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/clickhouse"
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/metrics"
+	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/cartographoor"
 	pb "github.com/ethpandaops/lab/backend/pkg/server/proto/xatu_cbt"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/sirupsen/logrus"
@@ -24,8 +25,9 @@ type XatuCBT struct {
 	log    logrus.FieldLogger
 	config *Config
 
-	cbtClients  map[string]clickhouse.Client
-	cacheClient cache.Client
+	cbtClients           map[string]clickhouse.Client
+	cacheClient          cache.Client
+	cartographoorService *cartographoor.Service
 
 	metrics          *metrics.Metrics
 	metricsCollector *metrics.Collector
@@ -42,6 +44,7 @@ func New(
 	config *Config,
 	cacheClient cache.Client,
 	metricsSvc *metrics.Metrics,
+	cartographoorService *cartographoor.Service,
 ) (*XatuCBT, error) {
 	if err := config.Validate(); err != nil {
 		return nil, fmt.Errorf("invalid xatu_cbt config: %w", err)
@@ -55,12 +58,13 @@ func New(
 	}
 
 	return &XatuCBT{
-		log:              log.WithField("component", "service/"+ServiceName),
-		config:           config,
-		cacheClient:      cacheClient,
-		metrics:          metricsSvc,
-		metricsCollector: metricsCollector,
-		cbtClients:       make(map[string]clickhouse.Client),
+		log:                  log.WithField("component", "service/"+ServiceName),
+		config:               config,
+		cacheClient:          cacheClient,
+		metrics:              metricsSvc,
+		metricsCollector:     metricsCollector,
+		cartographoorService: cartographoorService,
+		cbtClients:           make(map[string]clickhouse.Client),
 	}, nil
 }
 
@@ -193,7 +197,7 @@ func (x *XatuCBT) getNetworkClient(ctx context.Context) (clickhouse.Client, erro
 	return client, nil
 }
 
-// extractNetworkFromMetadata extracts the network name from gRPC metadata.
+// extractNetworkFromMetadata extracts and validates the network name from gRPC metadata.
 func (x *XatuCBT) extractNetworkFromMetadata(ctx context.Context) (string, error) {
 	md, ok := metadata.FromIncomingContext(ctx)
 	if !ok {
@@ -210,5 +214,16 @@ func (x *XatuCBT) extractNetworkFromMetadata(ctx context.Context) (string, error
 		return "", fmt.Errorf("network is empty")
 	}
 
+	// Validate network using cartographoor service
+	if x.cartographoorService != nil {
+		validatedNetwork, err := x.cartographoorService.ValidateNetwork(ctx, network)
+		if err != nil {
+			return "", fmt.Errorf("invalid network '%s': %w", network, err)
+		}
+
+		return validatedNetwork.Name, nil
+	}
+
+	// Fallback to original behavior if no validator is available
 	return network, nil
 }
