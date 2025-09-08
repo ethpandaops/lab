@@ -115,8 +115,6 @@ func (s *Service) Start(ctx context.Context) error {
 		}
 
 		prefix = strings.TrimSuffix(prefix, "/")
-
-		s.log.WithField("prefix", prefix).Info("Using path prefix")
 	}
 
 	// Register legacy HTTP handlers under the prefix
@@ -143,9 +141,10 @@ func (s *Service) Start(ctx context.Context) error {
 	// Mount the Connect handler at the correct path
 	// ConnectRPC handles routing from this base path to the specific endpoints
 	if prefix != "" {
-		// For prefixed paths: /lab-data/api/... -> handler
-		fullAPIPath := prefix + "/api"
-		s.log.WithField("apiPath", fullAPIPath).Info("Registering Connect handler")
+		s.log.WithFields(logrus.Fields{
+			"public_v1": "/api/v1/",
+			"connect":   prefix + "/api/",
+		}).Info("Registering handlers")
 
 		// Create a custom router that will dispatch to public API routes, Connect handler, or legacy router
 		customHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

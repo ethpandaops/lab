@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, UseQueryOptions } from '@tanstack/react-query';
 
 export const fetchData = async <T>(baseUrl: string, path: string): Promise<T> => {
   const response = await fetch(`${baseUrl}${path}`);
@@ -32,3 +32,37 @@ export const useDataFetch = <T>(
 
   return { data, loading, error };
 };
+
+/**
+ * Hybrid data fetching hook that can fetch from either static JSON or REST API
+ * based on a feature flag. This allows gradual migration from static to dynamic data sources.
+ *
+ * @param staticUrl - URL for the static JSON file
+ * @param restFetcher - Function to fetch data from REST API
+ * @param featureFlag - Whether to use REST API (true) or static JSON (false)
+ * @param queryOptions - Additional react-query options
+ * @returns Query result with data, loading state, and error
+ */
+export function useHybridDataFetch<T>(
+  staticUrl: string,
+  restFetcher?: () => Promise<T>,
+  featureFlag?: boolean,
+  queryOptions?: Omit<UseQueryOptions<T, Error>, 'queryKey' | 'queryFn'>,
+) {
+  return useQuery<T, Error>({
+    queryKey: [featureFlag ? 'rest' : 'static', staticUrl],
+    queryFn: async () => {
+      if (featureFlag && restFetcher) {
+        // Use REST API
+        return await restFetcher();
+      }
+      // Use static JSON
+      const response = await fetch(staticUrl);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch static data: ${response.statusText}`);
+      }
+      return response.json();
+    },
+    ...queryOptions,
+  });
+}

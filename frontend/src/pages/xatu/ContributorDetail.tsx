@@ -1,5 +1,5 @@
 import { useParams } from 'react-router-dom';
-import { useDataFetch } from '@/utils/data.ts';
+import { useDataFetch, useHybridDataFetch } from '@/utils/data.ts';
 import { LoadingState } from '@/components/common/LoadingState';
 import { ErrorState } from '@/components/common/ErrorState';
 import { formatDistanceToNow } from 'date-fns';
@@ -8,6 +8,10 @@ import useConfig from '@/contexts/config';
 import { NETWORK_METADATA, type NetworkKey } from '@/constants/networks.tsx';
 import { Card } from '@/components/common/Card';
 import useApi from '@/contexts/api';
+import useNetwork from '@/contexts/network';
+import { getRestApiClient } from '@/api';
+import { FEATURE_FLAGS } from '@/config/features';
+import { transformNodeToContributor } from '@/utils/transformers';
 
 interface ContributorNode {
   network: string;
@@ -79,11 +83,40 @@ function ContributorDetail() {
   const { name } = useParams<{ name: string }>();
   const { config } = useConfig();
   const { baseUrl } = useApi();
+  const { selectedNetwork } = useNetwork();
   const userPath = config?.modules?.['xatuPublicContributors']?.pathPrefix
     ? `${config.modules['xatuPublicContributors'].pathPrefix}/user-summaries/users/${name}.json`
     : null;
 
-  const { data: contributor, loading, error } = useDataFetch<ContributorData>(baseUrl, userPath);
+  const {
+    data: contributor,
+    loading,
+    error,
+  } = useHybridDataFetch<ContributorData>(
+    `${baseUrl}${userPath}`,
+    async () => {
+      const client = await getRestApiClient();
+      // When using REST API, only fetch user's nodes from selected network (performance optimization)
+      const response = await client.getNodes(selectedNetwork, {
+        username: { eq: name || '' },
+      });
+      // Transform nodes for selected network only
+      const nodesWithNetwork = response.nodes.map(node =>
+        transformNodeToContributor(node, selectedNetwork),
+      );
+      return {
+        name: name || '',
+        nodes: nodesWithNetwork,
+        updated_at: Date.now() / 1000,
+      };
+    },
+    FEATURE_FLAGS.useRestApiForXatu,
+    {
+      enabled: !!userPath || (FEATURE_FLAGS.useRestApiForXatu && !!selectedNetwork && !!name),
+      // Re-fetch when selected network changes
+      queryKey: ['contributor-detail', name, selectedNetwork, FEATURE_FLAGS.useRestApiForXatu],
+    },
+  );
 
   if (loading) {
     return <LoadingState />;
