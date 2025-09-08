@@ -62,7 +62,7 @@ func (x *XatuCBT) ListFctNodeActiveLast24h(
 	sqlQuery, err := cbtproto.BuildListFctNodeActiveLast24HQuery(
 		req,
 		cbtproto.WithFinal(),
-		// TODO: Add cbtproto.WithDatabase(network) when upstream is updated
+		cbtproto.WithDatabase(network),
 	)
 	if err != nil {
 		return nil, fmt.Errorf("failed to build query: %w", err)

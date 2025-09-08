@@ -61,86 +61,93 @@ export class IntBlockFirstSeenByNode extends Message<IntBlockFirstSeenByNode> {
   seenSlotStartDiff = 0;
 
   /**
+   * The beacon block root hash
+   *
+   * @generated from field: string block_root = 18;
+   */
+  blockRoot = "";
+
+  /**
    * Username of the node
    *
-   * @generated from field: string username = 18;
+   * @generated from field: string username = 19;
    */
   username = "";
 
   /**
    * ID of the node
    *
-   * @generated from field: string node_id = 19;
+   * @generated from field: string node_id = 20;
    */
   nodeId = "";
 
   /**
    * Classification of the node, e.g. "individual", "institution", "internal" (aka ethPandaOps) or "unclassified"
    *
-   * @generated from field: string classification = 20;
+   * @generated from field: string classification = 21;
    */
   classification = "";
 
   /**
    * Name of the client
    *
-   * @generated from field: string meta_client_name = 21;
+   * @generated from field: string meta_client_name = 22;
    */
   metaClientName = "";
 
   /**
    * Version of the client
    *
-   * @generated from field: string meta_client_version = 22;
+   * @generated from field: string meta_client_version = 23;
    */
   metaClientVersion = "";
 
   /**
    * Implementation of the client
    *
-   * @generated from field: string meta_client_implementation = 23;
+   * @generated from field: string meta_client_implementation = 24;
    */
   metaClientImplementation = "";
 
   /**
    * City of the client
    *
-   * @generated from field: string meta_client_geo_city = 24;
+   * @generated from field: string meta_client_geo_city = 25;
    */
   metaClientGeoCity = "";
 
   /**
    * Country of the client
    *
-   * @generated from field: string meta_client_geo_country = 25;
+   * @generated from field: string meta_client_geo_country = 26;
    */
   metaClientGeoCountry = "";
 
   /**
    * Country code of the client
    *
-   * @generated from field: string meta_client_geo_country_code = 26;
+   * @generated from field: string meta_client_geo_country_code = 27;
    */
   metaClientGeoCountryCode = "";
 
   /**
    * Continent code of the client
    *
-   * @generated from field: string meta_client_geo_continent_code = 27;
+   * @generated from field: string meta_client_geo_continent_code = 28;
    */
   metaClientGeoContinentCode = "";
 
   /**
    * Ethereum consensus client version
    *
-   * @generated from field: string meta_consensus_version = 28;
+   * @generated from field: string meta_consensus_version = 29;
    */
   metaConsensusVersion = "";
 
   /**
    * Ethereum consensus client implementation
    *
-   * @generated from field: string meta_consensus_implementation = 29;
+   * @generated from field: string meta_consensus_implementation = 30;
    */
   metaConsensusImplementation = "";
 
@@ -159,18 +166,19 @@ export class IntBlockFirstSeenByNode extends Message<IntBlockFirstSeenByNode> {
     { no: 15, name: "epoch", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
     { no: 16, name: "epoch_start_date_time", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
     { no: 17, name: "seen_slot_start_diff", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
-    { no: 18, name: "username", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 19, name: "node_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 20, name: "classification", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 21, name: "meta_client_name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 22, name: "meta_client_version", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 23, name: "meta_client_implementation", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 24, name: "meta_client_geo_city", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 25, name: "meta_client_geo_country", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 26, name: "meta_client_geo_country_code", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 27, name: "meta_client_geo_continent_code", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 28, name: "meta_consensus_version", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 29, name: "meta_consensus_implementation", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 18, name: "block_root", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 19, name: "username", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 20, name: "node_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 21, name: "classification", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 22, name: "meta_client_name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 23, name: "meta_client_version", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 24, name: "meta_client_implementation", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 25, name: "meta_client_geo_city", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 26, name: "meta_client_geo_country", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 27, name: "meta_client_geo_country_code", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 28, name: "meta_client_geo_continent_code", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 29, name: "meta_consensus_version", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 30, name: "meta_consensus_implementation", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): IntBlockFirstSeenByNode {
@@ -253,79 +261,86 @@ export class ListIntBlockFirstSeenByNodeRequest extends Message<ListIntBlockFirs
   seenSlotStartDiff?: UInt32Filter;
 
   /**
+   * Filter by block_root (optional)
+   *
+   * @generated from field: cbt.StringFilter block_root = 9;
+   */
+  blockRoot?: StringFilter;
+
+  /**
    * Filter by username (optional)
    *
-   * @generated from field: cbt.StringFilter username = 9;
+   * @generated from field: cbt.StringFilter username = 10;
    */
   username?: StringFilter;
 
   /**
    * Filter by node_id (optional)
    *
-   * @generated from field: cbt.StringFilter node_id = 10;
+   * @generated from field: cbt.StringFilter node_id = 11;
    */
   nodeId?: StringFilter;
 
   /**
    * Filter by classification (optional)
    *
-   * @generated from field: cbt.StringFilter classification = 11;
+   * @generated from field: cbt.StringFilter classification = 12;
    */
   classification?: StringFilter;
 
   /**
    * Filter by meta_client_version (optional)
    *
-   * @generated from field: cbt.StringFilter meta_client_version = 12;
+   * @generated from field: cbt.StringFilter meta_client_version = 13;
    */
   metaClientVersion?: StringFilter;
 
   /**
    * Filter by meta_client_implementation (optional)
    *
-   * @generated from field: cbt.StringFilter meta_client_implementation = 13;
+   * @generated from field: cbt.StringFilter meta_client_implementation = 14;
    */
   metaClientImplementation?: StringFilter;
 
   /**
    * Filter by meta_client_geo_city (optional)
    *
-   * @generated from field: cbt.StringFilter meta_client_geo_city = 14;
+   * @generated from field: cbt.StringFilter meta_client_geo_city = 15;
    */
   metaClientGeoCity?: StringFilter;
 
   /**
    * Filter by meta_client_geo_country (optional)
    *
-   * @generated from field: cbt.StringFilter meta_client_geo_country = 15;
+   * @generated from field: cbt.StringFilter meta_client_geo_country = 16;
    */
   metaClientGeoCountry?: StringFilter;
 
   /**
    * Filter by meta_client_geo_country_code (optional)
    *
-   * @generated from field: cbt.StringFilter meta_client_geo_country_code = 16;
+   * @generated from field: cbt.StringFilter meta_client_geo_country_code = 17;
    */
   metaClientGeoCountryCode?: StringFilter;
 
   /**
    * Filter by meta_client_geo_continent_code (optional)
    *
-   * @generated from field: cbt.StringFilter meta_client_geo_continent_code = 17;
+   * @generated from field: cbt.StringFilter meta_client_geo_continent_code = 18;
    */
   metaClientGeoContinentCode?: StringFilter;
 
   /**
    * Filter by meta_consensus_version (optional)
    *
-   * @generated from field: cbt.StringFilter meta_consensus_version = 18;
+   * @generated from field: cbt.StringFilter meta_consensus_version = 19;
    */
   metaConsensusVersion?: StringFilter;
 
   /**
    * Filter by meta_consensus_implementation (optional)
    *
-   * @generated from field: cbt.StringFilter meta_consensus_implementation = 19;
+   * @generated from field: cbt.StringFilter meta_consensus_implementation = 20;
    */
   metaConsensusImplementation?: StringFilter;
 
@@ -334,7 +349,7 @@ export class ListIntBlockFirstSeenByNodeRequest extends Message<ListIntBlockFirs
    * If unspecified, at most 100 items will be returned.
    * The maximum value is 1000; values above 1000 will be coerced to 1000.
    *
-   * @generated from field: int32 page_size = 20;
+   * @generated from field: int32 page_size = 21;
    */
   pageSize = 0;
 
@@ -342,7 +357,7 @@ export class ListIntBlockFirstSeenByNodeRequest extends Message<ListIntBlockFirs
    * A page token, received from a previous `ListIntBlockFirstSeenByNode` call.
    * Provide this to retrieve the subsequent page.
    *
-   * @generated from field: string page_token = 21;
+   * @generated from field: string page_token = 22;
    */
   pageToken = "";
 
@@ -351,7 +366,7 @@ export class ListIntBlockFirstSeenByNodeRequest extends Message<ListIntBlockFirs
    * Example: "foo,bar" or "foo desc,bar" for descending order on foo.
    * If unspecified, results will be returned in the default order.
    *
-   * @generated from field: string order_by = 22;
+   * @generated from field: string order_by = 23;
    */
   orderBy = "";
 
@@ -371,20 +386,21 @@ export class ListIntBlockFirstSeenByNodeRequest extends Message<ListIntBlockFirs
     { no: 6, name: "epoch", kind: "message", T: UInt32Filter },
     { no: 7, name: "epoch_start_date_time", kind: "message", T: UInt32Filter },
     { no: 8, name: "seen_slot_start_diff", kind: "message", T: UInt32Filter },
-    { no: 9, name: "username", kind: "message", T: StringFilter },
-    { no: 10, name: "node_id", kind: "message", T: StringFilter },
-    { no: 11, name: "classification", kind: "message", T: StringFilter },
-    { no: 12, name: "meta_client_version", kind: "message", T: StringFilter },
-    { no: 13, name: "meta_client_implementation", kind: "message", T: StringFilter },
-    { no: 14, name: "meta_client_geo_city", kind: "message", T: StringFilter },
-    { no: 15, name: "meta_client_geo_country", kind: "message", T: StringFilter },
-    { no: 16, name: "meta_client_geo_country_code", kind: "message", T: StringFilter },
-    { no: 17, name: "meta_client_geo_continent_code", kind: "message", T: StringFilter },
-    { no: 18, name: "meta_consensus_version", kind: "message", T: StringFilter },
-    { no: 19, name: "meta_consensus_implementation", kind: "message", T: StringFilter },
-    { no: 20, name: "page_size", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
-    { no: 21, name: "page_token", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 22, name: "order_by", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 9, name: "block_root", kind: "message", T: StringFilter },
+    { no: 10, name: "username", kind: "message", T: StringFilter },
+    { no: 11, name: "node_id", kind: "message", T: StringFilter },
+    { no: 12, name: "classification", kind: "message", T: StringFilter },
+    { no: 13, name: "meta_client_version", kind: "message", T: StringFilter },
+    { no: 14, name: "meta_client_implementation", kind: "message", T: StringFilter },
+    { no: 15, name: "meta_client_geo_city", kind: "message", T: StringFilter },
+    { no: 16, name: "meta_client_geo_country", kind: "message", T: StringFilter },
+    { no: 17, name: "meta_client_geo_country_code", kind: "message", T: StringFilter },
+    { no: 18, name: "meta_client_geo_continent_code", kind: "message", T: StringFilter },
+    { no: 19, name: "meta_consensus_version", kind: "message", T: StringFilter },
+    { no: 20, name: "meta_consensus_implementation", kind: "message", T: StringFilter },
+    { no: 21, name: "page_size", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 22, name: "page_token", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 23, name: "order_by", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ListIntBlockFirstSeenByNodeRequest {
