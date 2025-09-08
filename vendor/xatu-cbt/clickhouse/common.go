@@ -39,6 +39,8 @@ func WithVariableSubstitution(style VariableSubstitutionStyle) QueryBuilderOptio
 type QueryOptions struct {
 	// AddFinal adds FINAL modifier after table name for ClickHouse MergeTree tables
 	AddFinal bool
+	// Database optionally specifies the database name
+	Database string
 }
 
 // QueryOption is a functional option for query configuration
@@ -48,6 +50,13 @@ type QueryOption func(*QueryOptions)
 func WithFinal() QueryOption {
 	return func(opts *QueryOptions) {
 		opts.AddFinal = true
+	}
+}
+
+// WithDatabase specifies the database to query from
+func WithDatabase(database string) QueryOption {
+	return func(opts *QueryOptions) {
+		opts.Database = database
 	}
 }
 
@@ -347,15 +356,20 @@ func BuildOrderByClause(fields []OrderByField) string {
 }
 
 // BuildParameterizedQuery constructs the final parameterized query with optional ordering
-func BuildParameterizedQuery(database, table string, qb *QueryBuilder, orderByClause string, limit, offset uint32, options ...QueryOption) SQLQuery {
+func BuildParameterizedQuery(table string, qb *QueryBuilder, orderByClause string, limit, offset uint32, options ...QueryOption) SQLQuery {
 	// Apply options
 	opts := &QueryOptions{}
 	for _, opt := range options {
 		opt(opts)
 	}
 
-	// Build FROM clause with optional FINAL
-	fromClause := fmt.Sprintf("%s.%s", database, table)
+	// Build FROM clause with optional database and FINAL
+	var fromClause string
+	if opts.Database != "" {
+		fromClause = fmt.Sprintf("%s.%s", opts.Database, table)
+	} else {
+		fromClause = table
+	}
 	if opts.AddFinal {
 		fromClause += " FINAL"
 	}
