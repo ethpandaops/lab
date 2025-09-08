@@ -1,12 +1,21 @@
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
-import { useDataFetch } from '@/utils/data.ts';
+import { useDataFetch, useHybridDataFetch } from '@/utils/data.ts';
 import { formatDistanceToNow } from 'date-fns';
 import { useRef, useState, useEffect } from 'react';
 import { GlobeViz } from '@/components/xatu/GlobeViz';
 import { XatuCallToAction } from '@/components/xatu/XatuCallToAction';
 import useConfig from '@/contexts/config';
 import useApi from '@/contexts/api';
+import useNetwork from '@/contexts/network';
+import { getRestApiClient } from '@/api';
+import { FEATURE_FLAGS } from '@/config/features';
+import {
+  aggregateNodesByCountry,
+  aggregateNodesByCity,
+  aggregateNodesByContinents,
+  aggregateNodesByClient,
+} from '@/utils/transformers';
 
 interface ConsensusImplementation {
   total_nodes: number;
@@ -53,12 +62,65 @@ function Xatu() {
   const [containerWidth, setContainerWidth] = useState(0);
   const { config } = useConfig();
   const { baseUrl } = useApi();
+  const { availableNetworks } = useNetwork();
+
   // Skip data fetching if config isn't loaded
   const summaryPath = config?.modules?.['xatuPublicContributors']?.pathPrefix
     ? `${config.modules['xatuPublicContributors'].pathPrefix}/summary.json`
     : null;
 
-  const { data: summaryData } = useDataFetch<Summary>(baseUrl, summaryPath);
+  const { selectedNetwork } = useNetwork();
+
+  const { data: summaryData } = useHybridDataFetch<Summary>(
+    `${baseUrl}${summaryPath}`,
+    async () => {
+      // When using REST API, only fetch nodes for the selected network (performance optimization)
+      const client = await getRestApiClient();
+      const nodeResponse = await client.getNodes(selectedNetwork);
+      const nodes = nodeResponse.nodes;
+
+      // Build summary structure for selected network only
+      const networkSummary = {
+        total_nodes: nodes.length,
+        total_public_nodes: nodes.length, // All nodes from API are public
+        countries: aggregateNodesByCountry(nodes),
+        cities: aggregateNodesByCity(nodes),
+        continents: aggregateNodesByContinents(nodes),
+        consensus_implementations: aggregateNodesByClient(nodes),
+      };
+
+      // Create summary matching existing format but only for selected network
+      return {
+        updated_at: Date.now() / 1000,
+        networks: {
+          [selectedNetwork]: networkSummary,
+          // Add empty data for other networks to maintain UI compatibility
+          ...availableNetworks.reduce(
+            (acc, network) => {
+              if (network !== selectedNetwork) {
+                acc[network] = {
+                  total_nodes: 0,
+                  total_public_nodes: 0,
+                  countries: {},
+                  cities: {},
+                  continents: {},
+                  consensus_implementations: {},
+                };
+              }
+              return acc;
+            },
+            {} as Record<string, NetworkData>,
+          ),
+        } as any,
+      };
+    },
+    FEATURE_FLAGS.useRestApiForXatu,
+    {
+      enabled: !!summaryPath || (FEATURE_FLAGS.useRestApiForXatu && !!selectedNetwork),
+      // Re-fetch when selected network changes
+      queryKey: ['xatu-summary', selectedNetwork, FEATURE_FLAGS.useRestApiForXatu],
+    },
+  );
 
   useEffect(() => {
     if (!containerReference.current) {
@@ -90,29 +152,38 @@ function Xatu() {
     return <div>Loading...</div>;
   }
 
-  // Transform summary data for the globe - use mainnet data for the globe
+  // Get current network data (when using REST API, this is the selected network)
+  const currentNetworkData = FEATURE_FLAGS.useRestApiForXatu
+    ? summaryData.networks[selectedNetwork]
+    : summaryData.networks.mainnet;
+
+  // Transform summary data for the globe - use current network data
   const globeData = [
     {
       time: Date.now() / MS_PER_SECOND,
-      countries: Object.entries(summaryData.networks.mainnet.countries).map(([name, data]) => ({
+      countries: Object.entries(currentNetworkData?.countries || {}).map(([name, data]) => ({
         name,
         value: data.total_nodes,
       })),
     },
   ];
 
-  // Calculate total nodes across all networks
-  const totalNodes = Object.values(summaryData.networks).reduce(
-    (accumulator, network) => accumulator + network.total_nodes,
-    0,
-  );
-  const totalPublicNodes = Object.values(summaryData.networks).reduce(
-    (accumulator, network) => accumulator + network.total_public_nodes,
-    0,
-  );
+  // Calculate total nodes (when using REST API, this is just the selected network)
+  const totalNodes = FEATURE_FLAGS.useRestApiForXatu
+    ? currentNetworkData?.total_nodes || 0
+    : Object.values(summaryData.networks).reduce(
+        (accumulator, network) => accumulator + network.total_nodes,
+        0,
+      );
+  const totalPublicNodes = FEATURE_FLAGS.useRestApiForXatu
+    ? currentNetworkData?.total_public_nodes || 0
+    : Object.values(summaryData.networks).reduce(
+        (accumulator, network) => accumulator + network.total_public_nodes,
+        0,
+      );
 
-  // Calculate client distribution for mainnet
-  const clientDistribution = Object.entries(summaryData.networks.mainnet.consensus_implementations)
+  // Calculate client distribution for current network
+  const clientDistribution = Object.entries(currentNetworkData?.consensus_implementations || {})
     .map(([client, data]) => ({
       name: CLIENT_METADATA[client]?.name || client,
       value: data.total_nodes,
@@ -120,10 +191,10 @@ function Xatu() {
     }))
     .sort((a, b) => b.value - a.value);
 
-  const totalMainnetNodes = summaryData.networks.mainnet.total_nodes;
+  const totalCurrentNetworkNodes = currentNetworkData?.total_nodes || 0;
 
   // Calculate additional stats
-  const totalCities = Object.keys(summaryData.networks.mainnet.cities).length;
+  const totalCities = Object.keys(currentNetworkData?.cities || {}).length;
 
   return (
     <div className="space-y-6 max-w-5xl mx-auto" ref={containerReference}>
@@ -133,7 +204,9 @@ function Xatu() {
       <div className="bg-surface/50 backdrop-blur-sm rounded-lg border border-subtle p-4 shadow-sm">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
           <div>
-            <h2 className="text-xl font-sans font-bold text-primary">Xatu Network</h2>
+            <h2 className="text-xl font-sans font-bold text-primary">
+              Xatu Network {FEATURE_FLAGS.useRestApiForXatu && `- ${selectedNetwork}`}
+            </h2>
             <p className="text-xs font-mono text-secondary mt-1">
               Last updated{' '}
               {formatDistanceToNow(new Date(summaryData.updated_at * MS_PER_SECOND), {
@@ -143,8 +216,10 @@ function Xatu() {
           </div>
           <div className="bg-surface/70 px-3 py-1.5 rounded border border-subtle/30">
             <span className="text-xs font-mono text-accent">
-              {totalNodes.toLocaleString()} nodes • {Object.keys(summaryData.networks).length}{' '}
-              networks
+              {totalNodes.toLocaleString()} nodes
+              {FEATURE_FLAGS.useRestApiForXatu
+                ? ` • ${selectedNetwork}`
+                : ` • ${Object.keys(summaryData.networks).length} networks`}
             </span>
           </div>
         </div>
@@ -208,8 +283,8 @@ function Xatu() {
                 <div className="flex-1 flex items-center justify-between">
                   <span className="text-xs font-mono text-primary">{client.name}</span>
                   <span className="text-xs font-mono text-accent">
-                    {totalMainnetNodes > 0
-                      ? ((client.value / totalMainnetNodes) * 100).toFixed(1)
+                    {totalCurrentNetworkNodes > 0
+                      ? ((client.value / totalCurrentNetworkNodes) * 100).toFixed(1)
                       : '0.0'}
                     %
                   </span>

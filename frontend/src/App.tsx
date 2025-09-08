@@ -109,7 +109,7 @@ function App() {
     <ApplicationProvider
       network={{ selectedNetwork, availableNetworks }}
       config={{ config }}
-      api={{ client, baseUrl: bootstrap.backend.url }}
+      api={{ client, baseUrl: bootstrap.backend.url, restApiUrl: bootstrap.backend.restApiUrl }}
       beacon={{ config }}
     >
       <ModalProvider>

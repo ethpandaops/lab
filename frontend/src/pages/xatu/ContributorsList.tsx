@@ -1,4 +1,4 @@
-import { useDataFetch } from '@/utils/data.ts';
+import { useDataFetch, useHybridDataFetch } from '@/utils/data.ts';
 import { LoadingState } from '@/components/common/LoadingState';
 import { ErrorState } from '@/components/common/ErrorState';
 import { Link } from 'react-router-dom';
@@ -7,6 +7,10 @@ import { formatDistanceToNow } from 'date-fns';
 import useConfig from '@/contexts/config';
 import { Card } from '@/components/common/Card';
 import useApi from '@/contexts/api';
+import useNetwork from '@/contexts/network';
+import { getRestApiClient } from '@/api';
+import { FEATURE_FLAGS } from '@/config/features';
+import { aggregateContributorSummary } from '@/utils/transformers';
 
 interface Contributor {
   name: string;
@@ -56,11 +60,31 @@ const formatTimestamp = (timestamp: number): string => {
 const ContributorsList = () => {
   const { config } = useConfig();
   const { baseUrl } = useApi();
+  const { selectedNetwork } = useNetwork();
   const summaryPath = config?.modules?.['xatuPublicContributors']?.pathPrefix
     ? `${config.modules['xatuPublicContributors'].pathPrefix}/user-summaries/summary.json`
     : null;
 
-  const { data: summaryData, loading, error } = useDataFetch<Summary>(baseUrl, summaryPath);
+  const {
+    data: summaryData,
+    loading,
+    error,
+  } = useHybridDataFetch<Summary>(
+    `${baseUrl}${summaryPath}`,
+    async () => {
+      const client = await getRestApiClient();
+      // When using REST API, only fetch nodes for the selected network (performance optimization)
+      const response = await client.getNodes(selectedNetwork);
+      // Aggregate nodes by username for selected network only
+      return aggregateContributorSummary(response.nodes);
+    },
+    FEATURE_FLAGS.useRestApiForXatu,
+    {
+      enabled: !!summaryPath || (FEATURE_FLAGS.useRestApiForXatu && !!selectedNetwork),
+      // Re-fetch when selected network changes
+      queryKey: ['contributors-summary', selectedNetwork, FEATURE_FLAGS.useRestApiForXatu],
+    },
+  );
 
   if (loading) {
     return <LoadingState />;
