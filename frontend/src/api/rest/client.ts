@@ -142,12 +142,17 @@ export class RestApiClient {
         `Fetched ${pubNodes.nodes.length} pub- nodes and ${ethpandaopsNodes.nodes.length} ethpandaops nodes (total: ${combinedNodes.length})`,
       );
 
-      // Create a combined response
-      return new ListNodesResponse({
+      // Create a combined response with public node count
+      const response = new ListNodesResponse({
         nodes: combinedNodes,
         pagination: pubNodes.pagination, // Use pagination from first response
         filters: pubNodes.filters,
       });
+
+      // Add public node count to response for easy access
+      (response as any).publicNodeCount = pubNodes.nodes.length;
+
+      return response;
     }
   }
 
