@@ -1,6 +1,9 @@
 version: "2"
 run:
   issues-exit-code: 1
+  skip-dirs:
+    - vendor
+  skip-dirs-use-default: true
 linters:
   default: none
   enable:

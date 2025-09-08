@@ -160,6 +160,7 @@ func (s *Service) Start(ctx context.Context) error {
 			// For public API routes (no prefix) - handle first
 			if strings.HasPrefix(path, "/api/v1/") {
 				publicRouter.ServeHTTP(w, r)
+
 				return
 			}
 
