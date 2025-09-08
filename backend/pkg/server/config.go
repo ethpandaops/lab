@@ -11,19 +11,21 @@ import (
 	"github.com/ethpandaops/lab/backend/pkg/server/internal/grpc"
 	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/beacon_chain_timings"
 	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/beacon_slots"
+	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/cartographoor"
 	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/xatu_cbt"
 	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/xatu_public_contributors"
 )
 
 type Config struct {
-	LogLevel    string                   `yaml:"logLevel" default:"info"`
-	Server      *grpc.Config             `yaml:"grpc"`
-	Ethereum    *ethereum.Config         `yaml:"ethereum"`
-	Storage     *storage.Config          `yaml:"storage"`
-	Modules     map[string]*ModuleConfig `yaml:"modules"`
-	Cache       *cache.Config            `yaml:"cache"`
-	Geolocation *geolocation.Config      `yaml:"geolocation"`
-	XatuCBT     *xatu_cbt.Config         `yaml:"xatu_cbt"`
+	LogLevel      string                   `yaml:"logLevel" default:"info"`
+	Server        *grpc.Config             `yaml:"grpc"`
+	Ethereum      *ethereum.Config         `yaml:"ethereum"`
+	Storage       *storage.Config          `yaml:"storage"`
+	Modules       map[string]*ModuleConfig `yaml:"modules"`
+	Cache         *cache.Config            `yaml:"cache"`
+	Geolocation   *geolocation.Config      `yaml:"geolocation"`
+	XatuCBT       *xatu_cbt.Config         `yaml:"xatu_cbt"`
+	Cartographoor *cartographoor.Config    `yaml:"cartographoor"`
 }
 
 type ModuleConfig struct {
@@ -55,6 +57,19 @@ func (x *Config) Validate() error {
 
 	if err := x.XatuCBT.Validate(); err != nil {
 		return fmt.Errorf("xatu_cbt config is invalid: %w", err)
+	}
+
+	// Cartographoor config is optional, but validate if provided
+	if x.Cartographoor != nil {
+		if err := x.Cartographoor.Validate(); err != nil {
+			return fmt.Errorf("cartographoor config is invalid: %w", err)
+		}
+	} else {
+		// Provide default configuration
+		x.Cartographoor = &cartographoor.Config{}
+		if err := x.Cartographoor.Validate(); err != nil {
+			return fmt.Errorf("cartographoor default config validation failed: %w", err)
+		}
 	}
 
 	return nil

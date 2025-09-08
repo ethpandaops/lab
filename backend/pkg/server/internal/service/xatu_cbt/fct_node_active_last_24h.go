@@ -59,7 +59,11 @@ func (x *XatuCBT) ListFctNodeActiveLast24h(
 	x.cacheMissesTotal.WithLabelValues(MethodListFctNodeActiveLast24h, network).Inc()
 
 	// Use our clickhouse-proto-gen to handle building for us.
-	sqlQuery, err := cbtproto.BuildListFctNodeActiveLast24HQuery(req)
+	sqlQuery, err := cbtproto.BuildListFctNodeActiveLast24HQuery(
+		req,
+		cbtproto.WithFinal(),
+		// TODO: Add cbtproto.WithDatabase(network) when upstream is updated
+	)
 	if err != nil {
 		return nil, fmt.Errorf("failed to build query: %w", err)
 	}

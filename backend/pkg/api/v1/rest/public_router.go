@@ -9,6 +9,7 @@ import (
 	"time"
 
 	apiv1 "github.com/ethpandaops/lab/backend/pkg/api/v1/proto"
+	networkspb "github.com/ethpandaops/lab/backend/pkg/server/proto/networks"
 	xatu_cbt_pb "github.com/ethpandaops/lab/backend/pkg/server/proto/xatu_cbt"
 	cbtproto "github.com/ethpandaops/xatu-cbt/pkg/proto/clickhouse"
 	"github.com/gorilla/mux"
@@ -16,31 +17,101 @@ import (
 	"google.golang.org/grpc/metadata"
 )
 
-// CBTRouter handles REST API v1 requests for CBT endpoints.
-type CBTRouter struct {
-	log           logrus.FieldLogger
-	xatuCBTClient xatu_cbt_pb.XatuCBTClient
+// PublicRouter handles public REST API v1 requests for all Lab endpoints.
+type PublicRouter struct {
+	log            logrus.FieldLogger
+	xatuCBTClient  xatu_cbt_pb.XatuCBTClient
+	networksClient networkspb.NetworksServiceClient
 }
 
-// NewCBTRouter creates a new CBT REST router for API v1.
-func NewCBTRouter(
+// NewPublicRouter creates a new public REST router for API v1.
+func NewPublicRouter(
 	log logrus.FieldLogger,
 	xatuCBTClient xatu_cbt_pb.XatuCBTClient,
-) *CBTRouter {
-	return &CBTRouter{
-		log:           log.WithField("component", "cbt_rest_router_v1"),
-		xatuCBTClient: xatuCBTClient,
+	networksClient networkspb.NetworksServiceClient,
+) *PublicRouter {
+	return &PublicRouter{
+		log:            log.WithField("component", "public_rest_router_v1"),
+		xatuCBTClient:  xatuCBTClient,
+		networksClient: networksClient,
 	}
 }
 
-// RegisterRoutes registers all CBT REST v1 endpoints on the provided router.
-func (r *CBTRouter) RegisterRoutes(router *mux.Router) {
+// RegisterRoutes registers all public REST v1 endpoints on the provided router.
+func (r *PublicRouter) RegisterRoutes(router *mux.Router) {
 	v1 := router.PathPrefix("/api/v1").Subrouter()
+	v1.HandleFunc("/networks", r.handleListNetworks).Methods("GET", "OPTIONS")
 	v1.HandleFunc("/{network}/nodes", r.handleListNodes).Methods("GET", "OPTIONS")
 }
 
+// handleListNetworks handles GET /api/v1/networks
+func (r *PublicRouter) handleListNetworks(w http.ResponseWriter, req *http.Request) {
+	ctx := req.Context()
+
+	// Handle CORS preflight
+	if req.Method == "OPTIONS" {
+		w.WriteHeader(http.StatusOK)
+
+		return
+	}
+
+	// Parse query parameter for active_only filter
+	activeOnly := false
+	if v := req.URL.Query().Get("active_only"); v == "true" || v == "1" {
+		activeOnly = true
+	}
+
+	r.log.WithField("active_only", activeOnly).Debug("REST v1: ListNetworks")
+
+	// Call the gRPC service
+	grpcReq := &networkspb.ListNetworksRequest{
+		ActiveOnly: activeOnly,
+	}
+
+	grpcResp, err := r.networksClient.ListNetworks(ctx, grpcReq)
+	if err != nil {
+		r.log.WithError(err).Error("Failed to list networks")
+		r.handleError(w, err)
+
+		return
+	}
+
+	// Convert to API proto response format
+	networks := make([]*apiv1.Network, 0, len(grpcResp.Networks))
+	for _, network := range grpcResp.Networks {
+		networks = append(networks, &apiv1.Network{
+			Name:        network.Name,
+			Status:      network.Status,
+			ChainId:     network.ChainId,
+			LastUpdated: network.LastUpdated,
+		})
+	}
+
+	response := &apiv1.ListNetworksResponse{
+		Networks: networks,
+	}
+
+	// Add filter metadata if present
+	if grpcResp.Filters != nil {
+		response.Filters = &apiv1.NetworkFilterMetadata{
+			AppliedFilters: grpcResp.Filters.AppliedFilters,
+			TotalCount:     grpcResp.Filters.TotalCount,
+			FilteredCount:  grpcResp.Filters.FilteredCount,
+		}
+	}
+
+	// Set headers
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Cache-Control", "max-age=60, s-maxage=60, public")
+
+	// Write response
+	if err := json.NewEncoder(w).Encode(response); err != nil {
+		r.log.WithError(err).Error("Failed to encode response")
+	}
+}
+
 // handleListNodes handles GET /api/v1/{network}/nodes with full filtering
-func (r *CBTRouter) handleListNodes(w http.ResponseWriter, req *http.Request) {
+func (r *PublicRouter) handleListNodes(w http.ResponseWriter, req *http.Request) {
 	var (
 		ctx     = req.Context()
 		vars    = mux.Vars(req)
@@ -220,7 +291,7 @@ func (r *CBTRouter) handleListNodes(w http.ResponseWriter, req *http.Request) {
 }
 
 // handleError converts errors to appropriate HTTP responses
-func (r *CBTRouter) handleError(w http.ResponseWriter, err error) {
+func (r *PublicRouter) handleError(w http.ResponseWriter, err error) {
 	// Check for specific error types
 	if strings.Contains(err.Error(), "not found") || strings.Contains(err.Error(), "not configured") {
 		r.writeError(w, http.StatusNotFound, err.Error())
@@ -245,7 +316,7 @@ func (r *CBTRouter) handleError(w http.ResponseWriter, err error) {
 }
 
 // writeError writes a JSON error response using v1 API proto
-func (r *CBTRouter) writeError(w http.ResponseWriter, statusCode int, message string) {
+func (r *PublicRouter) writeError(w http.ResponseWriter, statusCode int, message string) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(statusCode)
 

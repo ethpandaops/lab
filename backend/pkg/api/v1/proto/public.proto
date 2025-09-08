@@ -3,16 +3,16 @@ package api.v1;
 
 option go_package = "github.com/ethpandaops/lab/backend/pkg/api/v1/proto";
 
-// This file defines the public API layer for CBT data.
+// This file defines the public REST API layer for all Lab data.
 //
 // Purpose:
-// - Acts as a translation layer between internal CBT structs and public API responses
+// - Acts as a translation layer between internal structs and public API responses
 // - Provides control over what data is exposed to clients
 // - Allows selective field exposure (e.g., excluding internal metadata or sensitive fields)
 // - Enables API versioning independent of internal data structures
 // - Transforms raw database responses into client-friendly formats
 //
-// Example: instead of directly exposing cbt.IntXatuNodes24H structs (which may
+// Example: instead of directly exposing internal structs (which may
 // contain internal fields, raw timestamps, or implementation details), we
 // transform them into clean API responses with only the fields clients need.
 
@@ -23,8 +23,14 @@ message ListNodesResponse {
   FilterMetadata filters = 3;
 }
 
-// Node represents a transformed view of CBT node data for public consumption.
-// This is a curated subset of fields from the internal CBT structs,
+// ListNetworksResponse is the v1 API response for listing available networks.
+message ListNetworksResponse {
+  repeated Network networks = 1;
+  NetworkFilterMetadata filters = 2;
+}
+
+// Node represents a transformed view of node data for public consumption.
+// This is a curated subset of fields from the internal structs,
 // formatted for client convenience (e.g., timestamps as ISO strings).
 message Node {
   string username = 1;
@@ -69,6 +75,23 @@ message FilterMetadata {
   string network = 1;
   map<string, string> applied_filters = 2;  // All filters including time filters
   string order_by = 3;
+}
+
+
+// Network represents an Ethereum network for public API consumption.
+// This provides essential network metadata needed by clients.
+message Network {
+  string name = 1;           // Full network name (e.g., "mainnet", "sepolia", "fusaka-devnet-0")
+  string status = 2;         // "active", "inactive", or "unknown"
+  int64 chain_id = 3;       // Ethereum chain ID
+  string last_updated = 4;   // ISO 8601 formatted timestamp
+}
+
+// NetworkFilterMetadata shows filtering information for network queries.
+message NetworkFilterMetadata {
+  repeated string applied_filters = 1;  // e.g., ["active_only"]
+  int32 total_count = 2;                // Total networks before filtering
+  int32 filtered_count = 3;             // Networks after filtering
 }
 
 // Error response.
