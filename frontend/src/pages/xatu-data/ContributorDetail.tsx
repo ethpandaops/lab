@@ -9,6 +9,7 @@ import useNetwork from '@/contexts/network';
 import { getRestApiClient } from '@/api';
 import { useQuery } from '@tanstack/react-query';
 import { transformNodeToContributor } from '@/utils/transformers';
+import { NetworkSelector } from '@/components/common/NetworkSelector';
 
 interface ContributorNode {
   network: string;
@@ -78,7 +79,7 @@ function isNodeOffline(node: ContributorNode, updatedAt: number): boolean {
 
 function ContributorDetail() {
   const { name } = useParams<{ name: string }>();
-  const { selectedNetwork } = useNetwork();
+  const { selectedNetwork, setSelectedNetwork } = useNetwork();
 
   // Fetch contributor data using REST API only - no conditionals!
   const {
@@ -146,52 +147,41 @@ function ContributorDetail() {
       <XatuCallToAction />
 
       {/* Contributor Overview */}
-      <Card className="card-primary">
+      <Card className="card-primary overflow-visible">
         <div className="card-body">
-          <div className="flex items-start gap-6">
-            <div
-              className="w-20 h-20 flex items-center justify-center text-2xl font-mono font-bold shadow-neon transition-transform hover:scale-105"
-              style={{
-                backgroundColor: avatarColor,
-                boxShadow: `0 0 20px ${avatarColor}10`,
-              }}
-            >
-              {initials}
-            </div>
-            <div className="flex-1">
-              <h1 className="text-2xl font-sans font-bold text-primary mb-2">{contributor.name}</h1>
-              <div className="text-sm font-mono text-tertiary mb-4">
-                Last updated{' '}
-                <span
-                  title={new Date(contributor.updated_at * 1000).toString()}
-                  className="text-primary cursor-help -b -prominent"
-                >
-                  {formatDistanceToNow(new Date(contributor.updated_at * 1000), {
-                    addSuffix: true,
-                  })}
-                </span>
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-start gap-4">
+            <div className="flex items-start gap-6">
+              <div
+                className="w-20 h-20 flex items-center justify-center text-2xl font-mono font-bold shadow-neon transition-transform hover:scale-105"
+                style={{
+                  backgroundColor: avatarColor,
+                  boxShadow: `0 0 20px ${avatarColor}10`,
+                }}
+              >
+                {initials}
               </div>
-              <div className="flex flex-wrap gap-3">
-                {sortedNetworks.map(([network, nodes]) => {
-                  const metadata = NETWORK_METADATA[network as NetworkKey] || {
-                    name: network.charAt(0).toUpperCase() + network.slice(1),
-                    icon: '🔥',
-                  };
-                  return (
-                    <div
-                      key={network}
-                      className="flex items-center gap-2 card-secondary px-3 py-1.5 text-sm font-mono"
-                    >
-                      <span className="w-5 h-5 flex items-center justify-center">
-                        {metadata.icon}
-                      </span>
-                      <span className="text-primary/90">{metadata.name}</span>
-                      <span className="text-accent font-medium">{nodes.length} nodes</span>
-                    </div>
-                  );
-                })}
+              <div className="flex-1">
+                <h1 className="text-2xl font-sans font-bold text-primary mb-2">
+                  {contributor.name}
+                </h1>
+                <div className="text-sm font-mono text-tertiary mb-4">
+                  Last updated{' '}
+                  <span
+                    title={new Date(contributor.updated_at * 1000).toString()}
+                    className="text-primary cursor-help -b -prominent"
+                  >
+                    {formatDistanceToNow(new Date(contributor.updated_at * 1000), {
+                      addSuffix: true,
+                    })}
+                  </span>
+                </div>
               </div>
             </div>
+            <NetworkSelector
+              selectedNetwork={selectedNetwork}
+              onNetworkChange={network => setSelectedNetwork(network, 'ui')}
+              className="w-48"
+            />
           </div>
         </div>
       </Card>
@@ -207,7 +197,12 @@ function ContributorDetail() {
             <section key={network} className="space-y-4">
               <div className="flex items-center gap-3">
                 <div className="w-6 h-6 flex items-center justify-center">{metadata.icon}</div>
-                <h2 className="text-xl font-sans font-bold text-primary">{metadata.name}</h2>
+                <h2 className="text-xl font-sans font-bold text-primary">
+                  {metadata.name}{' '}
+                  <span className="text-accent">
+                    ({nodes.length} {nodes.length === 1 ? 'node' : 'nodes'})
+                  </span>
+                </h2>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {nodes.map(node => {

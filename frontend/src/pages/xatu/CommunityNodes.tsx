@@ -1,4 +1,4 @@
-import { useDataFetch, useHybridDataFetch } from '@/utils/data.ts';
+import { useDataFetch } from '@/utils/data.ts';
 import { LoadingState } from '@/components/common/LoadingState';
 import { ErrorState } from '@/components/common/ErrorState';
 import { XatuCallToAction } from '@/components/xatu/XatuCallToAction';
@@ -11,9 +11,6 @@ import { ChartWithStats, NivoLineChart } from '@/components/charts';
 import useConfig from '@/contexts/config';
 import useNetwork from '@/contexts/network';
 import useApi from '@/contexts/api';
-import { getRestApiClient } from '@/api';
-import { FEATURE_FLAGS } from '@/config/features';
-import { aggregateNodesByCountry, aggregateNodesByUser } from '@/utils/transformers';
 
 interface CountryData {
   time: number;
@@ -140,76 +137,16 @@ export const CommunityNodes = () => {
     ? `${pathPrefix}/users/${selectedNetwork}/${currentWindow?.file || defaultTimeWindow}.json`
     : null;
 
-  // Determine if we're looking at current data (for which we can use the API)
-  const isCurrentData = currentWindow?.file === 'current' || currentWindow?.file === 'last_1_day';
-  const shouldUseRestApi =
-    FEATURE_FLAGS.useRestApiForXatu && isCurrentData && !!selectedNetwork && !!currentWindow;
-
   const {
     data: countriesData,
     loading: countriesLoading,
     error: countriesError,
-  } = useHybridDataFetch<CountryData[]>(
-    countriesPath ? `${baseUrl}${countriesPath}` : '',
-    async () => {
-      // Use live data for current snapshot
-      const client = await getRestApiClient();
-      const nodes = await client.getNodes(selectedNetwork);
-      const countries = aggregateNodesByCountry(nodes.nodes);
-      return [
-        {
-          time: Date.now() / 1000,
-          countries: Object.entries(countries).map(([name, data]) => ({
-            name,
-            value: data.total_nodes,
-          })),
-        },
-      ];
-    },
-    shouldUseRestApi,
-    {
-      enabled: (!!countriesPath && !shouldUseRestApi) || shouldUseRestApi,
-      queryKey: [
-        'community-nodes-countries',
-        selectedNetwork,
-        currentWindow?.file,
-        FEATURE_FLAGS.useRestApiForXatu,
-      ],
-    },
-  );
-
+  } = useDataFetch<CountryData[]>(baseUrl, countriesPath);
   const {
     data: usersData,
     loading: usersLoading,
     error: usersError,
-  } = useHybridDataFetch<UserData[]>(
-    usersPath ? `${baseUrl}${usersPath}` : '',
-    async () => {
-      // Use live data for current snapshot
-      const client = await getRestApiClient();
-      const nodes = await client.getNodes(selectedNetwork);
-      const users = aggregateNodesByUser(nodes.nodes);
-      return [
-        {
-          time: Date.now() / 1000,
-          users: users.map(user => ({
-            name: user.name,
-            nodes: user.node_count,
-          })),
-        },
-      ];
-    },
-    shouldUseRestApi,
-    {
-      enabled: (!!usersPath && !shouldUseRestApi) || shouldUseRestApi,
-      queryKey: [
-        'community-nodes-users',
-        selectedNetwork,
-        currentWindow?.file,
-        FEATURE_FLAGS.useRestApiForXatu,
-      ],
-    },
-  );
+  } = useDataFetch<UserData[]>(baseUrl, usersPath);
 
   const { chartData, totalNodesData, topCountries } = useMemo(() => {
     if (!countriesData) {
@@ -359,27 +296,27 @@ export const CommunityNodes = () => {
           scrollbar-width: thin;
           scrollbar-color: rgba(0, 255, 159, 0.3) rgba(0, 0, 0, 0);
         }
-        
+
         .cyber-scrollbar::-webkit-scrollbar {
           width: 6px;
           height: 6px;
         }
-        
+
         .cyber-scrollbar::-webkit-scrollbar-track {
           background: rgba(0, 0, 0, 0.2);
           -radius: 3px;
         }
-        
+
         .cyber-scrollbar::-webkit-scrollbar-thumb {
           background: rgba(0, 255, 159, 0.3);
           -radius: 3px;
           transition: background 0.2s ease;
         }
-        
+
         .cyber-scrollbar::-webkit-scrollbar-thumb:hover {
           background: rgba(0, 255, 159, 0.5);
         }
-        
+
         .cyber-scrollbar::-webkit-scrollbar-corner {
           background: transparent;
         }
@@ -492,7 +429,7 @@ export const CommunityNodes = () => {
                 {
                   id: 'total',
                   data: totalNodesData.map(d => ({
-                    x: new Date(d.time * 1000),
+                    x: d.time,
                     y: d.total,
                   })),
                 },
@@ -514,8 +451,8 @@ export const CommunityNodes = () => {
                 max: 'auto',
               }}
               axisBottom={{
-                format: (value: any) => {
-                  const date = value instanceof Date ? value : new Date(value);
+                format: (value: number) => {
+                  const date = new Date(value * 1000);
                   return currentWindow?.step === '1h'
                     ? date.toLocaleTimeString()
                     : date.toLocaleDateString();
