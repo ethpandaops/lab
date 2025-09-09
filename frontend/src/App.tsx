@@ -10,6 +10,8 @@ import Xatu from '@/pages/xatu';
 import XatuData from '@/pages/xatu-data';
 import XatuDataContributorsList from '@/pages/xatu-data/ContributorsList';
 import XatuDataContributorDetail from '@/pages/xatu-data/ContributorDetail';
+import XatuDataNetworks from '@/pages/xatu-data/networks';
+import XatuDataGeographicalChecklist from '@/pages/xatu-data/geographical-checklist';
 import { CommunityNodes } from '@/pages/xatu/CommunityNodes';
 import Networks from '@/pages/xatu/networks';
 import ContributorsList from '@/pages/xatu/ContributorsList';
@@ -133,6 +135,8 @@ function App() {
             <Route path="xatu-data" element={<XatuData />}>
               <Route path="contributors" element={<XatuDataContributorsList />} />
               <Route path="contributors/:name" element={<XatuDataContributorDetail />} />
+              <Route path="networks" element={<XatuDataNetworks />} />
+              <Route path="geographical-checklist" element={<XatuDataGeographicalChecklist />} />
             </Route>
             <Route path="beacon" element={<Beacon />}>
               <Route path="slot" element={<Outlet />}>
