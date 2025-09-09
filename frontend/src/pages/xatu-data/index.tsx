@@ -117,7 +117,7 @@ function XatuData() {
       <XatuCallToAction />
 
       {/* Overview Header */}
-      <div className="bg-surface/50 backdrop-blur-sm rounded-lg border border-subtle p-4 shadow-sm">
+      <div className="bg-surface/50 backdrop-blur-sm rounded-lg border border-subtle p-4 shadow-sm overflow-visible">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
           <div>
             <h2 className="text-xl font-sans font-bold text-primary">Xatu Network</h2>
