@@ -14,6 +14,8 @@ import {
   aggregateNodesByClient,
 } from '@/utils/transformers';
 import { NetworkSelector } from '@/components/common/NetworkSelector';
+import { LoadingState } from '@/components/common/LoadingState';
+import { ErrorState } from '@/components/common/ErrorState';
 
 const GLOBE_WIDTH = 500;
 const MS_PER_SECOND = 1000;
@@ -24,6 +26,8 @@ const CLIENT_METADATA: Record<string, { name: string }> = {
   lighthouse: { name: 'Lighthouse' },
   lodestar: { name: 'Lodestar' },
   nimbus: { name: 'Nimbus' },
+  caplin: { name: 'Caplin' },
+  grandine: { name: 'Grandine' },
 };
 
 function XatuData() {
@@ -33,7 +37,11 @@ function XatuData() {
   const { selectedNetwork, setSelectedNetwork } = useNetwork();
 
   // Fetch nodes data using REST API only - no conditionals!
-  const { data: networkData, isLoading } = useQuery({
+  const {
+    data: networkData,
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ['xatu-data-nodes', selectedNetwork],
     queryFn: async () => {
       const client = await getRestApiClient();
@@ -85,8 +93,12 @@ function XatuData() {
     );
   }
 
+  if (error) {
+    return <ErrorState message="Failed to load network data" />;
+  }
+
   if (isLoading || !networkData) {
-    return <div>Loading live data...</div>;
+    return <LoadingState message="Loading..." />;
   }
 
   // Transform data for the globe visualization
@@ -117,7 +129,7 @@ function XatuData() {
       <XatuCallToAction />
 
       {/* Overview Header */}
-      <div className="bg-surface/50 backdrop-blur-sm rounded-lg border border-subtle p-4 shadow-sm overflow-visible">
+      <div className="relative z-10 bg-surface/50 backdrop-blur-sm rounded-lg border border-subtle p-4 shadow-sm overflow-visible">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
           <div>
             <h2 className="text-xl font-sans font-bold text-primary">Xatu Network</h2>
@@ -183,7 +195,7 @@ function XatuData() {
         <div className="bg-surface/50 rounded-lg border border-subtle p-4 shadow-sm">
           <h3 className="text-sm font-sans font-medium text-primary mb-4">Client Distribution</h3>
           <div className="space-y-3">
-            {clientDistribution.slice(0, 5).map(client => (
+            {clientDistribution.map(client => (
               <div key={client.name} className="flex items-center gap-2">
                 <div className="w-5 h-5 rounded bg-surface/70 flex items-center justify-center">
                   <img
@@ -215,7 +227,7 @@ function XatuData() {
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         {[
           { to: 'contributors', emoji: '👥', title: 'Contributors' },
-          { to: 'networks', emoji: '🌐', title: 'Networks' },
+          { to: 'networks', emoji: '🌐', title: 'Network Details' },
           { to: 'geographical-checklist', emoji: '🗺️', title: 'Geography' },
           { to: 'fork-readiness', emoji: '🍴', title: 'Fork Readiness' },
         ].map(item => (
@@ -235,6 +247,14 @@ function XatuData() {
             <ArrowRight className="w-4 h-4 text-tertiary group-hover:text-accent group-hover:translate-x-1 transition-all duration-300" />
           </Link>
         ))}
+      </div>
+
+      {/* Data Note */}
+      <div className="text-center py-4">
+        <p className="text-xs font-mono text-tertiary">
+          Note: This data represents only nodes sending data to the Xatu project and is not
+          representative of the total network.
+        </p>
       </div>
     </div>
   );

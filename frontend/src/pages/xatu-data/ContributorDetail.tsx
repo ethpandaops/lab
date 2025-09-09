@@ -108,12 +108,12 @@ function ContributorDetail() {
     refetchInterval: 60000, // Refetch every minute
   });
 
-  if (isLoading) {
-    return <LoadingState />;
-  }
-
   if (error) {
     return <ErrorState message="Failed to load contributor data" />;
+  }
+
+  if (isLoading) {
+    return <LoadingState />;
   }
 
   if (!contributor || !contributor.nodes || contributor.nodes.length === 0) {
@@ -147,7 +147,7 @@ function ContributorDetail() {
       <XatuCallToAction />
 
       {/* Contributor Overview */}
-      <Card className="card-primary overflow-visible">
+      <Card className="relative z-10 card-primary overflow-visible">
         <div className="card-body">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-start gap-4">
             <div className="flex items-start gap-6">
@@ -264,6 +264,14 @@ function ContributorDetail() {
             </section>
           );
         })}
+      </div>
+
+      {/* Data Note */}
+      <div className="text-center py-4">
+        <p className="text-xs font-mono text-tertiary">
+          Note: This data represents only nodes sending data to the Xatu project and is not
+          representative of the total network.
+        </p>
       </div>
     </div>
   );

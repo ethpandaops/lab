@@ -76,12 +76,12 @@ const ContributorsList = () => {
     refetchInterval: 60000, // Refetch every minute
   });
 
-  if (isLoading) {
-    return <LoadingState />;
-  }
-
   if (error) {
     return <ErrorState message="Failed to load contributors data" />;
+  }
+
+  if (isLoading) {
+    return <LoadingState />;
   }
 
   if (!summaryData || !summaryData.contributors) {
@@ -117,7 +117,7 @@ const ContributorsList = () => {
       </Card>
 
       {/* Contributors List */}
-      <Card className="card-primary overflow-visible">
+      <Card className="relative z-10 card-primary overflow-visible">
         <div className="card-header">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div className="flex flex-col">
@@ -204,6 +204,14 @@ const ContributorsList = () => {
           </div>
         </div>
       </Card>
+
+      {/* Data Note */}
+      <div className="text-center py-4">
+        <p className="text-xs font-mono text-tertiary">
+          Note: This data represents only nodes sending data to the Xatu project and is not
+          representative of the total network.
+        </p>
+      </div>
     </div>
   );
 };
