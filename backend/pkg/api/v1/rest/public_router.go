@@ -102,7 +102,11 @@ func (r *PublicRouter) handleListNetworks(w http.ResponseWriter, req *http.Reque
 
 	// Set headers
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Cache-Control", "max-age=60, s-maxage=60, public")
+	w.Header().Set("Vary", "Accept-Encoding")
+
+	// Cache headers for networks endpoint - 2 minute cache
+	// Networks data is relatively stable, so we can cache more aggressively
+	w.Header().Set("Cache-Control", "public, max-age=120, s-maxage=120, stale-while-revalidate=60")
 
 	// Write response
 	if err := json.NewEncoder(w).Encode(response); err != nil {
@@ -276,13 +280,13 @@ func (r *PublicRouter) handleListNodes(w http.ResponseWriter, req *http.Request)
 
 	// Set headers
 	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Vary", "Accept-Encoding")
 
-	// Shorter cache for filtered results
-	if len(appliedFilters) > 0 {
-		w.Header().Set("Cache-Control", "max-age=5, s-maxage=5, public")
-	} else {
-		w.Header().Set("Cache-Control", "max-age=10, s-maxage=10, public")
-	}
+	// Cache headers optimized for 1-minute data refresh cycle
+	// max-age=30: Browser cache for 30 seconds (half the update interval)
+	// s-maxage=45: CDN cache slightly longer to reduce origin load
+	// stale-while-revalidate=30: Serve stale content while fetching updates
+	w.Header().Set("Cache-Control", "public, max-age=30, s-maxage=45, stale-while-revalidate=30")
 
 	// Write response
 	if err := json.NewEncoder(w).Encode(response); err != nil {
