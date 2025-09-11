@@ -92,32 +92,46 @@ export function Breadcrumbs({ className = '' }: BreadcrumbsProps) {
   const location = useLocation();
   const pathnames = location.pathname.split('/').filter(Boolean);
 
+  // Build breadcrumb items with Experiments as parent for xatu-data and beacon
+  const breadcrumbItems: { name: string; path: string }[] = [];
+
+  // Add experiments as parent for xatu-data and beacon routes
+  if (pathnames[0] === 'xatu-data' || pathnames[0] === 'beacon') {
+    breadcrumbItems.push({ name: 'Experiments', path: '/experiments' });
+  }
+
+  // Build the rest of the breadcrumb path
+  pathnames.forEach((name, index) => {
+    // Skip "beacon" in the breadcrumb trail
+    if (name === 'beacon') {
+      return;
+    }
+
+    const routeTo = `/${pathnames.slice(0, index + 1).join('/')}`;
+    const displayName = name
+      .split('-')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
+    breadcrumbItems.push({ name: displayName, path: routeTo });
+  });
+
   return (
     <nav className={`flex flex-wrap items-center gap-2 text-sm font-mono ${className}`}>
       <Link to="/" className="text-tertiary hover:text-primary transition-colors">
         Home
       </Link>
 
-      {pathnames.map((name, index) => {
-        const routeTo = `/${pathnames.slice(0, index + 1).join('/')}`;
-        const isLast = index === pathnames.length - 1;
+      {breadcrumbItems.map((item, index) => {
+        const isLast = index === breadcrumbItems.length - 1;
 
         return (
-          <div key={routeTo} className="flex items-center gap-2">
+          <div key={item.path} className="flex items-center gap-2">
             <ChevronRight className="w-4 h-4 text-muted" />
             {isLast ? (
-              <span className="text-primary">
-                {name
-                  .split('-')
-                  .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-                  .join(' ')}
-              </span>
+              <span className="text-primary">{item.name}</span>
             ) : (
-              <Link to={routeTo} className="text-tertiary hover:text-primary transition-colors">
-                {name
-                  .split('-')
-                  .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-                  .join(' ')}
+              <Link to={item.path} className="text-tertiary hover:text-primary transition-colors">
+                {item.name}
               </Link>
             )}
           </div>

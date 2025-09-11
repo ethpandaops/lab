@@ -93,7 +93,7 @@ function ContributorDetail() {
   }
 
   if (!contributor) {
-    return <ErrorState message="No data available for this contributor" />;
+    return <ErrorState message="No data available for this contributor across any network" />;
   }
 
   // Group nodes by network
@@ -120,7 +120,6 @@ function ContributorDetail() {
 
   return (
     <div className="space-y-8">
-
       {/* Contributor Overview */}
       <Card className="card-primary">
         <div className="card-body">
