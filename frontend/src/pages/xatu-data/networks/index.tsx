@@ -1,5 +1,4 @@
 import { formatDistanceToNow } from 'date-fns';
-import { XatuCallToAction } from '@/components/xatu/XatuCallToAction';
 import { NETWORK_METADATA, type NetworkKey } from '@/constants/networks.tsx';
 import { LoadingState } from '@/components/common/LoadingState';
 import { ErrorState } from '@/components/common/ErrorState';
@@ -107,7 +106,6 @@ export default function Networks() {
 
   return (
     <div className="space-y-6 max-w-5xl mx-auto">
-      <XatuCallToAction />
 
       {/* Page Header */}
       <div className="relative z-10 bg-surface/50 backdrop-blur-sm rounded-lg border border-subtle p-4 shadow-sm overflow-visible">

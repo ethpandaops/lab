@@ -6,7 +6,6 @@ import { formatNodeName } from '@/utils/format.ts';
 import { Card, CardHeader, CardBody } from '@/components/common/Card';
 import { LoadingState } from '@/components/common/LoadingState';
 import { ErrorState } from '@/components/common/ErrorState';
-import { XatuCallToAction } from '@/components/xatu/XatuCallToAction';
 import useNetwork from '@/contexts/network';
 import useConfig from '@/contexts/config';
 import { getRestApiClient } from '@/api';
@@ -158,7 +157,6 @@ function ForkReadiness() {
   if (!config?.ethereum?.networks[selectedNetwork]?.forks?.consensus?.electra) {
     return (
       <div className="space-y-6">
-        <XatuCallToAction />
 
         <Card className="relative z-10 card-primary overflow-visible">
           <CardBody className="flex flex-col items-center justify-center py-12 text-center">
@@ -184,7 +182,6 @@ function ForkReadiness() {
 
   return (
     <div className="space-y-6">
-      <XatuCallToAction />
 
       <Card className="relative z-10 card-primary overflow-visible">
         <CardHeader>

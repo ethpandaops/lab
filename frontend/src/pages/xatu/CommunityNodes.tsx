@@ -1,7 +1,6 @@
 import { useDataFetch } from '@/utils/data.ts';
 import { LoadingState } from '@/components/common/LoadingState';
 import { ErrorState } from '@/components/common/ErrorState';
-import { XatuCallToAction } from '@/components/xatu/XatuCallToAction';
 import { NetworkSelector } from '@/components/common/NetworkSelector';
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
@@ -335,7 +334,6 @@ export const CommunityNodes = () => {
           opacity: 0.5;
         }
       `}</style>
-      <XatuCallToAction />
 
       <div className="space-y-6">
         <AboutThisData>

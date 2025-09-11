@@ -2,7 +2,6 @@ import { useParams } from 'react-router-dom';
 import { LoadingState } from '@/components/common/LoadingState';
 import { ErrorState } from '@/components/common/ErrorState';
 import { formatDistanceToNow } from 'date-fns';
-import { XatuCallToAction } from '@/components/xatu/XatuCallToAction';
 import { NETWORK_METADATA, type NetworkKey } from '@/constants/networks.tsx';
 import { Card } from '@/components/common/Card';
 import useNetwork from '@/contexts/network';
@@ -144,7 +143,6 @@ function ContributorDetail() {
 
   return (
     <div className="space-y-8">
-      <XatuCallToAction />
 
       {/* Contributor Overview */}
       <Card className="relative z-10 card-primary overflow-visible">
