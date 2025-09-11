@@ -1,4 +1,4 @@
-import { Routes, Route, Outlet, useSearchParams, Navigate } from 'react-router-dom';
+import { Routes, Route, Outlet, useSearchParams, Navigate, useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { LoadingState } from '@/components/common/LoadingState';
 import { ErrorState } from '@/components/common/ErrorState';
@@ -27,6 +27,12 @@ import BlockProductionSlotPage from '@/pages/beacon/block-production/slot.tsx';
 import ApplicationProvider from '@/providers/application';
 import fetchBootstrap, { Bootstrap } from '@/bootstrap';
 import { createLabApiClient, LabApiClient, Config } from '@/api/client.ts';
+
+// Redirect component for dynamic contributor routes
+function XatuContributorRedirect() {
+  const { name } = useParams<{ name: string }>();
+  return <Navigate to={`/xatu-data/contributors/${name}`} replace />;
+}
 
 function App() {
   const [bootstrap, setBootstrap] = useState<Bootstrap | null>(null);
@@ -118,7 +124,24 @@ function App() {
             <Route index element={<Home />} />
             <Route path="about" element={<About />} />
             <Route path="experiments" element={<Experiments />} />
+            {/* Redirects from old /xatu routes to new /xatu-data routes */}
             <Route path="xatu" element={<Navigate to="/xatu-data" replace />} />
+            <Route path="xatu/community-nodes" element={<Navigate to="/xatu-data" replace />} />
+            <Route path="xatu/networks" element={<Navigate to="/xatu-data/networks" replace />} />
+            <Route
+              path="xatu/contributors"
+              element={<Navigate to="/xatu-data/contributors" replace />}
+            />
+            <Route path="xatu/contributors/:name" element={<XatuContributorRedirect />} />
+            <Route
+              path="xatu/fork-readiness"
+              element={<Navigate to="/xatu-data/fork-readiness" replace />}
+            />
+            <Route
+              path="xatu/geographical-checklist"
+              element={<Navigate to="/xatu-data/geographical-checklist" replace />}
+            />
+            {/* Catch-all for any other xatu routes */}
             <Route path="xatu/*" element={<Navigate to="/xatu-data" replace />} />
             <Route path="xatu-data" element={<XatuData />}>
               <Route path="contributors" element={<XatuDataContributorsList />} />
