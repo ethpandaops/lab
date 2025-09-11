@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import useNetwork from '@/contexts/network';
 import { LoadingState } from '@/components/common/LoadingState';
 import { ErrorState } from '@/components/common/ErrorState';
-import { XatuCallToAction } from '@/components/xatu/XatuCallToAction';
 import { formatDistanceToNow } from 'date-fns';
 import { NetworkSelector } from '@/components/common/NetworkSelector';
 import { Search, ChevronDown, ChevronUp, Check, Globe, MapPin, Users } from 'lucide-react';
@@ -258,7 +257,6 @@ const GeographicalChecklist = () => {
 
   return (
     <div className="space-y-6 max-w-5xl mx-auto">
-      <XatuCallToAction />
 
       {/* Header */}
       <div className="relative z-10 bg-surface/50 backdrop-blur-sm rounded-lg border border-subtle p-4 shadow-sm overflow-visible">

@@ -3,7 +3,6 @@ import { ArrowRight } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { useRef, useState, useEffect } from 'react';
 import { GlobeViz } from '@/components/xatu/GlobeViz';
-import { XatuCallToAction } from '@/components/xatu/XatuCallToAction';
 import useNetwork from '@/contexts/network';
 import { getRestApiClient } from '@/api';
 import { useQuery } from '@tanstack/react-query';
@@ -126,7 +125,6 @@ function XatuData() {
 
   return (
     <div className="space-y-6 max-w-5xl mx-auto" ref={containerReference}>
-      <XatuCallToAction />
 
       {/* Overview Header */}
       <div className="relative z-10 bg-surface/50 backdrop-blur-sm rounded-lg border border-subtle p-4 shadow-sm overflow-visible">

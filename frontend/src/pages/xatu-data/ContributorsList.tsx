@@ -1,7 +1,6 @@
 import { LoadingState } from '@/components/common/LoadingState';
 import { ErrorState } from '@/components/common/ErrorState';
 import { Link } from 'react-router-dom';
-import { XatuCallToAction } from '@/components/xatu/XatuCallToAction';
 import { formatDistanceToNow } from 'date-fns';
 import { Card } from '@/components/common/Card';
 import useNetwork from '@/contexts/network';
@@ -90,7 +89,6 @@ const ContributorsList = () => {
 
   return (
     <div className="space-y-8">
-      <XatuCallToAction />
 
       {/* About Section */}
       <Card className="card-primary">

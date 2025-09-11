@@ -4,7 +4,6 @@ import { useDataFetch } from '@/utils/data.ts';
 import { formatDistanceToNow } from 'date-fns';
 import { useRef, useState, useEffect } from 'react';
 import { GlobeViz } from '@/components/xatu/GlobeViz';
-import { XatuCallToAction } from '@/components/xatu/XatuCallToAction';
 import useConfig from '@/contexts/config';
 import useApi from '@/contexts/api';
 
@@ -127,8 +126,6 @@ function Xatu() {
 
   return (
     <div className="space-y-6 max-w-5xl mx-auto" ref={containerReference}>
-      <XatuCallToAction />
-
       {/* Overview Header */}
       <div className="bg-surface/50 backdrop-blur-sm rounded-lg border border-subtle p-4 shadow-sm">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
