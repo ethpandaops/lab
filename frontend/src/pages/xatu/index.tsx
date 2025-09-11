@@ -31,7 +31,7 @@ interface Summary {
   networks: {
     mainnet: NetworkData;
     sepolia: NetworkData;
-    holesky: NetworkData;
+    hoodi: NetworkData;
   };
 }
 

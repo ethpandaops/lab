@@ -32,7 +32,7 @@ interface ContributorData {
 
 type NetworkNodes = Record<string, ContributorNode[]>;
 
-const NETWORK_ORDER = ['mainnet', 'holesky', 'sepolia'];
+const NETWORK_ORDER = ['mainnet', 'hoodi', 'sepolia'];
 const OFFLINE_THRESHOLD = 3600; // 1 hour in seconds
 
 // Function to generate a deterministic color from a string

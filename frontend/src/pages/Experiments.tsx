@@ -21,7 +21,7 @@ const experiments: ExperimentCard[] = [
     description:
       'Explore node distribution, network health, and community contributions across Ethereum networks.',
     logo: '/xatu.png',
-    href: '/xatu',
+    href: '/xatu-data',
     color: 'from-primary/20 via-accent/20 to-error/20',
   },
   {

@@ -43,7 +43,7 @@ const CLIENT_METADATA: Record<string, { name: string }> = {
 };
 
 // Network order priority (lower index = higher priority)
-const NETWORK_ORDER = ['mainnet', 'sepolia', 'holesky', 'hoodi'];
+const NETWORK_ORDER = ['mainnet', 'hoodi', 'sepolia'];
 
 // Sort networks based on predefined order
 const sortNetworks = (networks: string[]): string[] => {
@@ -128,7 +128,6 @@ export default function Networks() {
 
   return (
     <div className="space-y-6 max-w-5xl mx-auto">
-
       {/* Page Header */}
       <div className="bg-surface/50 backdrop-blur-sm rounded-lg border border-subtle p-4 shadow-sm">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
@@ -253,56 +252,56 @@ export default function Networks() {
                     <div className="overflow-x-auto rounded border border-subtle/30">
                       <table className="w-full text-xs font-mono border-collapse">
                         <thead className="bg-surface/70">
-                        <tr className="text-2xs text-tertiary">
-                          <th className="text-left font-normal p-2 pr-4 border-b border-subtle/30">
-                            Client
-                          </th>
-                          <th className="text-left font-normal p-2 border-b border-subtle/30 w-full">
-                            Distribution
-                          </th>
-                          <th className="text-right font-normal p-2 pl-4 border-b border-subtle/30">
-                            Share
-                          </th>
-                          <th className="text-right font-normal p-2 pl-4 border-b border-subtle/30">
-                            Total
-                          </th>
-                          <th className="text-right font-normal p-2 pl-4 border-b border-subtle/30">
-                            Community
-                          </th>
-                        </tr>
+                          <tr className="text-2xs text-tertiary">
+                            <th className="text-left font-normal p-2 pr-4 border-b border-subtle/30">
+                              Client
+                            </th>
+                            <th className="text-left font-normal p-2 border-b border-subtle/30 w-full">
+                              Distribution
+                            </th>
+                            <th className="text-right font-normal p-2 pl-4 border-b border-subtle/30">
+                              Share
+                            </th>
+                            <th className="text-right font-normal p-2 pl-4 border-b border-subtle/30">
+                              Total
+                            </th>
+                            <th className="text-right font-normal p-2 pl-4 border-b border-subtle/30">
+                              Community
+                            </th>
+                          </tr>
                         </thead>
                         <tbody>
-                        {displayedClients.map((client, index) => {
-                          const percentage =
-                            totalNodes > 0 ? (client.value / totalNodes) * 100 : 0;
-                          const isLastRow = index === displayedClients.length - 1;
+                          {displayedClients.map((client, index) => {
+                            const percentage =
+                              totalNodes > 0 ? (client.value / totalNodes) * 100 : 0;
+                            const isLastRow = index === displayedClients.length - 1;
 
-                          return (
-                            <tr
-                              key={client.name}
-                              className={`align-middle hover:bg-surface/50 ${!isLastRow ? 'border-b border-subtle/20' : ''}`}
-                            >
-                              <td className="p-2 pr-4 font-medium text-primary">{client.name}</td>
-                              <td className="p-2">
-                                <div className="w-full h-2 bg-surface/70 rounded-full overflow-hidden">
-                                  <div
-                                    className="h-full bg-accent"
-                                    style={{ width: `${percentage}%` }}
-                                  />
-                                </div>
-                              </td>
-                              <td className="text-right p-2 pl-4 text-accent whitespace-nowrap">
-                                {percentage.toFixed(1)}%
-                              </td>
-                              <td className="text-right p-2 pl-4 text-tertiary whitespace-nowrap">
-                                {client.value.toLocaleString()}
-                              </td>
-                              <td className="text-right p-2 pl-4 text-secondary whitespace-nowrap">
-                                {client.publicValue.toLocaleString()}
-                              </td>
-                            </tr>
-                          );
-                        })}
+                            return (
+                              <tr
+                                key={client.name}
+                                className={`align-middle hover:bg-surface/50 ${!isLastRow ? 'border-b border-subtle/20' : ''}`}
+                              >
+                                <td className="p-2 pr-4 font-medium text-primary">{client.name}</td>
+                                <td className="p-2">
+                                  <div className="w-full h-2 bg-surface/70 rounded-full overflow-hidden">
+                                    <div
+                                      className="h-full bg-accent"
+                                      style={{ width: `${percentage}%` }}
+                                    />
+                                  </div>
+                                </td>
+                                <td className="text-right p-2 pl-4 text-accent whitespace-nowrap">
+                                  {percentage.toFixed(1)}%
+                                </td>
+                                <td className="text-right p-2 pl-4 text-tertiary whitespace-nowrap">
+                                  {client.value.toLocaleString()}
+                                </td>
+                                <td className="text-right p-2 pl-4 text-secondary whitespace-nowrap">
+                                  {client.publicValue.toLocaleString()}
+                                </td>
+                              </tr>
+                            );
+                          })}
                         </tbody>
                       </table>
                     </div>
