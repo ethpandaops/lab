@@ -96,7 +96,7 @@ export function Breadcrumbs({ className = '' }: BreadcrumbsProps) {
   const breadcrumbItems: { name: string; path: string }[] = [];
 
   // Add experiments as parent for xatu-data and beacon routes
-  if (pathnames[0] === 'xatu-data' || pathnames[0] === 'beacon') {
+  if (pathnames[0] === 'xatu-data' || pathnames[0] === 'beacon' || pathnames[0] === 'xatu') {
     breadcrumbItems.push({ name: 'Experiments', path: '/experiments' });
   }
 
