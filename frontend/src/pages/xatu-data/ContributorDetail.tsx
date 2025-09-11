@@ -116,7 +116,21 @@ function ContributorDetail() {
   }
 
   if (!contributor || !contributor.nodes || contributor.nodes.length === 0) {
-    return <ErrorState message="No data available for this contributor" />;
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[200px] p-4">
+        <ErrorState message={`No data available for this contributor on ${selectedNetwork}`} />
+        <div className="flex flex-col items-center gap-2 -mt-2">
+          <p className="text-sm text-tertiary dark:text-secondary">
+            Try switching to a different network:
+          </p>
+          <NetworkSelector
+            selectedNetwork={selectedNetwork}
+            onNetworkChange={setSelectedNetwork}
+            className="w-48"
+          />
+        </div>
+      </div>
+    );
   }
 
   // Group nodes by network (in REST version, all nodes are from selected network)
@@ -143,7 +157,6 @@ function ContributorDetail() {
 
   return (
     <div className="space-y-8">
-
       {/* Contributor Overview */}
       <Card className="relative z-10 card-primary overflow-visible">
         <div className="card-body">
