@@ -2,7 +2,6 @@ import { useDataFetch } from '@/utils/data.ts';
 import { LoadingState } from '@/components/common/LoadingState';
 import { ErrorState } from '@/components/common/ErrorState';
 import { Link } from 'react-router-dom';
-import { XatuCallToAction } from '@/components/xatu/XatuCallToAction';
 import { formatDistanceToNow } from 'date-fns';
 import useConfig from '@/contexts/config';
 import { Card } from '@/components/common/Card';
@@ -76,7 +75,6 @@ const ContributorsList = () => {
 
   return (
     <div className="space-y-8">
-      <XatuCallToAction />
 
       {/* About Section */}
       <Card className="card-primary">
@@ -114,57 +112,57 @@ const ContributorsList = () => {
           <div className="overflow-x-auto -mx-2">
             <table className="w-full min-w-[300px]">
               <thead>
-                <tr className="-b -subtle">
-                  <th className="text-left py-2 px-2 text-sm font-mono text-tertiary w-[60%]">
-                    Contributor
-                  </th>
-                  <th className="text-right py-2 px-2 text-sm font-mono text-tertiary w-[20%]">
-                    Nodes
-                  </th>
-                  <th className="text-right py-2 px-2 text-sm font-mono text-tertiary hidden sm:table-cell w-[20%]">
-                    Last Update
-                  </th>
-                </tr>
+              <tr className="-b -subtle">
+                <th className="text-left py-2 px-2 text-sm font-mono text-tertiary w-[60%]">
+                  Contributor
+                </th>
+                <th className="text-right py-2 px-2 text-sm font-mono text-tertiary w-[20%]">
+                  Nodes
+                </th>
+                <th className="text-right py-2 px-2 text-sm font-mono text-tertiary hidden sm:table-cell w-[20%]">
+                  Last Update
+                </th>
+              </tr>
               </thead>
               <tbody>
-                {summaryData.contributors
-                  .sort((a, b) => b.node_count - a.node_count)
-                  .map(contributor => {
-                    const avatarColor = stringToColor(contributor.name);
-                    const initials = getInitials(contributor.name);
-                    return (
-                      <tr
-                        key={contributor.name}
-                        className="-b -subtle hover:bg-hover transition-colors"
-                      >
-                        <td className="py-2 px-2 w-[60%]">
-                          <Link
-                            to={`/xatu/contributors/${contributor.name}`}
-                            className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+              {summaryData.contributors
+                .sort((a, b) => b.node_count - a.node_count)
+                .map(contributor => {
+                  const avatarColor = stringToColor(contributor.name);
+                  const initials = getInitials(contributor.name);
+                  return (
+                    <tr
+                      key={contributor.name}
+                      className="-b -subtle hover:bg-hover transition-colors"
+                    >
+                      <td className="py-2 px-2 w-[60%]">
+                        <Link
+                          to={`/xatu/contributors/${contributor.name}`}
+                          className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+                        >
+                          <div
+                            className="w-6 h-6 flex items-center justify-center text-xs font-mono font-bold shadow-neon transition-transform hover:scale-105"
+                            style={{
+                              backgroundColor: avatarColor,
+                              boxShadow: `0 0 10px ${avatarColor}05`,
+                            }}
                           >
-                            <div
-                              className="w-6 h-6 flex items-center justify-center text-xs font-mono font-bold shadow-neon transition-transform hover:scale-105"
-                              style={{
-                                backgroundColor: avatarColor,
-                                boxShadow: `0 0 10px ${avatarColor}05`,
-                              }}
-                            >
-                              {initials}
-                            </div>
-                            <span className="text-sm font-mono text-primary truncate">
+                            {initials}
+                          </div>
+                          <span className="text-sm font-mono text-primary truncate">
                               {contributor.name}
                             </span>
-                          </Link>
-                        </td>
-                        <td className="text-right py-2 px-2 text-sm font-mono text-primary w-[20%]">
-                          {contributor.node_count}
-                        </td>
-                        <td className="text-right py-2 px-2 text-sm font-mono text-tertiary hidden sm:table-cell w-[20%]">
-                          {formatTimestamp(contributor.updated_at)}
-                        </td>
-                      </tr>
-                    );
-                  })}
+                        </Link>
+                      </td>
+                      <td className="text-right py-2 px-2 text-sm font-mono text-primary w-[20%]">
+                        {contributor.node_count}
+                      </td>
+                      <td className="text-right py-2 px-2 text-sm font-mono text-tertiary hidden sm:table-cell w-[20%]">
+                        {formatTimestamp(contributor.updated_at)}
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>

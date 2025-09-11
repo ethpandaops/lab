@@ -1,6 +1,5 @@
 import { useDataFetch } from '@/utils/data.ts';
 import { formatDistanceToNow } from 'date-fns';
-import { XatuCallToAction } from '@/components/xatu/XatuCallToAction';
 import { useEffect, useState } from 'react';
 import useConfig from '@/contexts/config';
 import { NETWORK_METADATA, type NetworkKey } from '@/constants/networks.tsx';
@@ -44,7 +43,7 @@ const CLIENT_METADATA: Record<string, { name: string }> = {
 };
 
 // Network order priority (lower index = higher priority)
-const NETWORK_ORDER = ['mainnet', 'sepolia', 'holesky', 'hoodi'];
+const NETWORK_ORDER = ['mainnet', 'hoodi', 'sepolia'];
 
 // Sort networks based on predefined order
 const sortNetworks = (networks: string[]): string[] => {
@@ -113,7 +112,6 @@ export default function Networks() {
   if (!summaryData.networks || Object.keys(summaryData.networks).length === 0) {
     return (
       <div className="space-y-6 max-w-5xl mx-auto">
-        <XatuCallToAction />
         <div className="text-center py-10 bg-surface/50 backdrop-blur-sm rounded-lg border border-subtle p-8 shadow-sm">
           <Sparkles className="h-12 w-12 mx-auto text-tertiary/50 mb-4" />
           <h3 className="text-xl font-sans font-bold text-primary mb-2">
@@ -130,8 +128,6 @@ export default function Networks() {
 
   return (
     <div className="space-y-6 max-w-5xl mx-auto">
-      <XatuCallToAction />
-
       {/* Page Header */}
       <div className="bg-surface/50 backdrop-blur-sm rounded-lg border border-subtle p-4 shadow-sm">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">

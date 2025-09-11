@@ -1,7 +1,6 @@
 import { useDataFetch } from '@/utils/data.ts';
 import { LoadingState } from '@/components/common/LoadingState';
 import { ErrorState } from '@/components/common/ErrorState';
-import { XatuCallToAction } from '@/components/xatu/XatuCallToAction';
 import { NetworkSelector } from '@/components/common/NetworkSelector';
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
@@ -296,27 +295,27 @@ export const CommunityNodes = () => {
           scrollbar-width: thin;
           scrollbar-color: rgba(0, 255, 159, 0.3) rgba(0, 0, 0, 0);
         }
-        
+
         .cyber-scrollbar::-webkit-scrollbar {
           width: 6px;
           height: 6px;
         }
-        
+
         .cyber-scrollbar::-webkit-scrollbar-track {
           background: rgba(0, 0, 0, 0.2);
           -radius: 3px;
         }
-        
+
         .cyber-scrollbar::-webkit-scrollbar-thumb {
           background: rgba(0, 255, 159, 0.3);
           -radius: 3px;
           transition: background 0.2s ease;
         }
-        
+
         .cyber-scrollbar::-webkit-scrollbar-thumb:hover {
           background: rgba(0, 255, 159, 0.5);
         }
-        
+
         .cyber-scrollbar::-webkit-scrollbar-corner {
           background: transparent;
         }
@@ -335,7 +334,6 @@ export const CommunityNodes = () => {
           opacity: 0.5;
         }
       `}</style>
-      <XatuCallToAction />
 
       <div className="space-y-6">
         <AboutThisData>

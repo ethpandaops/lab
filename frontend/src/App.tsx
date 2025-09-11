@@ -7,6 +7,12 @@ import Redirect from '@/components/common/Redirect';
 import Home from '@/pages/Home.tsx';
 import { About } from '@/pages/About.tsx';
 import Xatu from '@/pages/xatu';
+import XatuData from '@/pages/xatu-data';
+import XatuDataContributorsList from '@/pages/xatu-data/ContributorsList';
+import XatuDataContributorDetail from '@/pages/xatu-data/ContributorDetail';
+import XatuDataNetworks from '@/pages/xatu-data/networks';
+import XatuDataGeographicalChecklist from '@/pages/xatu-data/geographical-checklist';
+import XatuDataForkReadiness from '@/pages/xatu-data/fork-readiness';
 import { CommunityNodes } from '@/pages/xatu/CommunityNodes';
 import Networks from '@/pages/xatu/networks';
 import ContributorsList from '@/pages/xatu/ContributorsList';
@@ -109,7 +115,7 @@ function App() {
     <ApplicationProvider
       network={{ selectedNetwork, availableNetworks }}
       config={{ config }}
-      api={{ client, baseUrl: bootstrap.backend.url }}
+      api={{ client, baseUrl: bootstrap.backend.url, restApiUrl: bootstrap.backend.restApiUrl }}
       beacon={{ config }}
     >
       <ModalProvider>
@@ -126,6 +132,13 @@ function App() {
               <Route path="contributors/:name" element={<ContributorDetail />} />
               <Route path="fork-readiness" element={<ForkReadiness />} />
               <Route path="geographical-checklist" element={<GeographicalChecklist />} />
+            </Route>
+            <Route path="xatu-data" element={<XatuData />}>
+              <Route path="contributors" element={<XatuDataContributorsList />} />
+              <Route path="contributors/:name" element={<XatuDataContributorDetail />} />
+              <Route path="networks" element={<XatuDataNetworks />} />
+              <Route path="geographical-checklist" element={<XatuDataGeographicalChecklist />} />
+              <Route path="fork-readiness" element={<XatuDataForkReadiness />} />
             </Route>
             <Route path="beacon" element={<Beacon />}>
               <Route path="slot" element={<Outlet />}>

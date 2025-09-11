@@ -26,9 +26,7 @@ jobs:
             ethpandaops/lab
           tags: |
             type=semver,pattern=${{ matrix.component }}-{{version}}
-            type=semver,pattern=${{ matrix.component }}-{{major}}.{{minor}}
-            type=semver,pattern=${{ matrix.component }}-{{major}},enable={{is_default_branch}}
-            type=raw,value=${{ matrix.component }}-latest,enable={{is_default_branch}}
+            type=raw,value=${{ matrix.component }}-latest,enable=${{ github.event.release.target_commitish == 'master' || github.event.release.target_commitish == 'main' }}
           flavor: |
             latest=false
 

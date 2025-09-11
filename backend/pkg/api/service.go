@@ -14,6 +14,7 @@ import (
 	"time"
 
 	apiconnect "github.com/ethpandaops/lab/backend/pkg/api/proto/protoconnect"
+	v1rest "github.com/ethpandaops/lab/backend/pkg/api/v1/rest"
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/cache"
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/logger"
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/metrics"
@@ -27,6 +28,8 @@ import (
 
 	beaconslotspb "github.com/ethpandaops/lab/backend/pkg/server/proto/beacon_slots"
 	labpb "github.com/ethpandaops/lab/backend/pkg/server/proto/lab"
+	networkspb "github.com/ethpandaops/lab/backend/pkg/server/proto/networks"
+	xatu_cbt_pb "github.com/ethpandaops/lab/backend/pkg/server/proto/xatu_cbt"
 )
 
 // Service represents the api service
@@ -44,6 +47,9 @@ type Service struct {
 	srvConn           *grpc.ClientConn
 	labClient         labpb.LabServiceClient
 	beaconSlotsClient beaconslotspb.BeaconSlotsClient
+	xatuCBTClient     xatu_cbt_pb.XatuCBTClient
+	networksClient    networkspb.NetworksServiceClient
+	publicV1Router    *v1rest.PublicRouter
 }
 
 // New creates a new api service
@@ -109,8 +115,6 @@ func (s *Service) Start(ctx context.Context) error {
 		}
 
 		prefix = strings.TrimSuffix(prefix, "/")
-
-		s.log.WithField("prefix", prefix).Info("Using path prefix")
 	}
 
 	// Register legacy HTTP handlers under the prefix
@@ -119,6 +123,10 @@ func (s *Service) Start(ctx context.Context) error {
 	} else {
 		s.registerLegacyHandlers(s.router)
 	}
+
+	// Create a separate router for v1 public REST routes (without prefix)
+	publicRouter := mux.NewRouter()
+	s.publicV1Router.RegisterRoutes(publicRouter)
 
 	// Create a new HTTP mux for the server
 	rootMux := http.NewServeMux()
@@ -133,11 +141,12 @@ func (s *Service) Start(ctx context.Context) error {
 	// Mount the Connect handler at the correct path
 	// ConnectRPC handles routing from this base path to the specific endpoints
 	if prefix != "" {
-		// For prefixed paths: /lab-data/api/... -> handler
-		fullAPIPath := prefix + "/api"
-		s.log.WithField("apiPath", fullAPIPath).Info("Registering Connect handler")
+		s.log.WithFields(logrus.Fields{
+			"public_v1": "/api/v1/",
+			"connect":   prefix + "/api/",
+		}).Info("Registering handlers")
 
-		// Create a custom router that will dispatch to either the Connect handler or the legacy router
+		// Create a custom router that will dispatch to public API routes, Connect handler, or legacy router
 		customHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			// Log the original request for debugging
 			s.log.WithFields(logrus.Fields{
@@ -146,6 +155,13 @@ func (s *Service) Start(ctx context.Context) error {
 			}).Debug("Received request")
 
 			path := r.URL.Path
+
+			// For public API routes (no prefix) - handle first
+			if strings.HasPrefix(path, "/api/v1/") {
+				publicRouter.ServeHTTP(w, r)
+
+				return
+			}
 
 			// For requests targeting the Connect API routes (/lab-data/api/...)
 			if strings.HasPrefix(path, prefix+"/api/") {
@@ -180,9 +196,10 @@ func (s *Service) Start(ctx context.Context) error {
 		rootMux = http.NewServeMux()
 		rootMux.Handle("/", customHandler)
 	} else {
-		// No prefix case: Use the default approach
-		rootMux.Handle("/api/", handler)
-		rootMux.Handle("/", s.router)
+		// No prefix case: Use the default approach with public REST routes
+		rootMux.Handle("/api/v1/", publicRouter) // Public REST routes at root level
+		rootMux.Handle("/api/", handler)         // Connect routes
+		rootMux.Handle("/", s.router)            // Legacy routes
 	}
 
 	// Create the server
@@ -276,6 +293,9 @@ func (s *Service) initializeServices(ctx context.Context) error {
 	s.srvConn = conn
 	s.labClient = labpb.NewLabServiceClient(conn)
 	s.beaconSlotsClient = beaconslotspb.NewBeaconSlotsClient(conn)
+	s.xatuCBTClient = xatu_cbt_pb.NewXatuCBTClient(conn)
+	s.networksClient = networkspb.NewNetworksServiceClient(conn)
+	s.publicV1Router = v1rest.NewPublicRouter(s.log, s.xatuCBTClient, s.networksClient)
 
 	return nil
 }

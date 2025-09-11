@@ -3,7 +3,6 @@ import { useDataFetch } from '@/utils/data.ts';
 import { LoadingState } from '@/components/common/LoadingState';
 import { ErrorState } from '@/components/common/ErrorState';
 import { formatDistanceToNow } from 'date-fns';
-import { XatuCallToAction } from '@/components/xatu/XatuCallToAction';
 import useConfig from '@/contexts/config';
 import { NETWORK_METADATA, type NetworkKey } from '@/constants/networks.tsx';
 import { Card } from '@/components/common/Card';
@@ -31,7 +30,7 @@ interface ContributorData {
 
 type NetworkNodes = Record<string, ContributorNode[]>;
 
-const NETWORK_ORDER = ['mainnet', 'holesky', 'sepolia'];
+const NETWORK_ORDER = ['mainnet', 'hoodi', 'sepolia'];
 const OFFLINE_THRESHOLD = 3600; // 1 hour in seconds
 
 // Function to generate a deterministic color from a string
@@ -121,7 +120,6 @@ function ContributorDetail() {
 
   return (
     <div className="space-y-8">
-      <XatuCallToAction />
 
       {/* Contributor Overview */}
       <Card className="card-primary">

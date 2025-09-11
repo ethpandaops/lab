@@ -13,13 +13,13 @@ export const SystemAlert = ({
   title,
   buttonText,
   buttonLink,
-  showOnPaths = ['/beacon']
+  showOnPaths = ['/beacon'],
 }: SystemAlertProps) => {
   const location = useLocation();
-  
+
   // Check if current path starts with any of the paths in showOnPaths
   const shouldShow = showOnPaths.some(path => location.pathname.startsWith(path));
-  
+
   if (!shouldShow) {
     return null;
   }
@@ -48,7 +48,10 @@ export const SystemAlert = ({
 // Custom component with special styling for the Xatu contribution alert
 export const GoogleFormSystemAlert = () => {
   const location = useLocation();
-  const shouldShow = location.pathname.startsWith('/beacon');
+  const shouldShow =
+    location.pathname.startsWith('/beacon') ||
+    location.pathname.startsWith('/xatu') ||
+    location.pathname.startsWith('/xatu-data');
 
   if (!shouldShow) {
     return null;
@@ -58,7 +61,9 @@ export const GoogleFormSystemAlert = () => {
     <div className="flex items-center gap-2">
       <Database className="hidden xl:block h-4 w-4 text-accent" />
       <div className="flex-1 min-w-0 hidden xl:block">
-        <p className="text-xs font-medium text-primary whitespace-nowrap">Add your node to The Lab</p>
+        <p className="text-xs font-medium text-primary whitespace-nowrap">
+          Add your node to The Lab
+        </p>
       </div>
       <a
         href="https://ethpandaops.io/contribute-data/"

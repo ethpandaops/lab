@@ -87,7 +87,7 @@ func TestClickHouseIntegration(t *testing.T) {
 	})
 
 	// Initialize client for subsequent tests
-	client, err := clickhouse.New(config, logger, metricsSvc)
+	client, err := clickhouse.New(config, logger, "test", metricsSvc)
 	require.NoError(t, err, "Failed to create client")
 	require.NoError(t, client.Start(ctx), "Failed to start client")
 	defer func() { _ = client.Stop() }()
@@ -144,8 +144,8 @@ func testDSNVariations(t *testing.T, ctx context.Context, host, port string, log
 			name:               "HTTP DSN with InsecureSkipVerify",
 			dsn:                fmt.Sprintf("clickhouse+http://default:password@%s:%s/test", host, port),
 			insecureSkipVerify: true,
-			// This should fail because the driver doesn't support tls_skip_verify as query parameter
-			shouldSucceed: false,
+			// InsecureSkipVerify is ignored for HTTP connections (no TLS to skip)
+			shouldSucceed: true,
 		},
 		{
 			name:          "HTTP DSN without clickhouse+ Prefix",
@@ -176,7 +176,7 @@ func testDSNVariations(t *testing.T, ctx context.Context, host, port string, log
 				InsecureSkipVerify: tc.insecureSkipVerify,
 			}
 
-			client, err := clickhouse.New(config, logger, metricsSvc)
+			client, err := clickhouse.New(config, logger, "test", metricsSvc)
 			require.NoError(t, err, "New should not return error even with invalid DSN")
 
 			err = client.Start(ctx)
@@ -202,7 +202,7 @@ func testNewClient(t *testing.T, config *clickhouse.Config, logger logrus.FieldL
 	metricsSvc := metrics.NewMetricsService("test", logger)
 
 	// Test with valid config
-	client, err := clickhouse.New(config, logger, metricsSvc)
+	client, err := clickhouse.New(config, logger, "test", metricsSvc)
 	assert.NoError(t, err, "Should create client with valid config")
 	assert.NotNil(t, client, "Client should not be nil")
 
@@ -210,7 +210,7 @@ func testNewClient(t *testing.T, config *clickhouse.Config, logger logrus.FieldL
 	invalidConfig := &clickhouse.Config{
 		DSN: "",
 	}
-	client, err = clickhouse.New(invalidConfig, logger, metricsSvc)
+	client, err = clickhouse.New(invalidConfig, logger, "test", metricsSvc)
 	assert.Error(t, err, "Should return error with invalid config")
 	assert.Nil(t, client, "Client should be nil with invalid config")
 }
@@ -220,7 +220,7 @@ func testClientBeforeStart(t *testing.T, ctx context.Context, config *clickhouse
 	metricsSvc := metrics.NewMetricsService("test", logger)
 
 	// Create client but don't start it
-	client, err := clickhouse.New(config, logger, metricsSvc)
+	client, err := clickhouse.New(config, logger, "test", metricsSvc)
 	require.NoError(t, err)
 
 	// All operations should fail before Start()
@@ -245,7 +245,7 @@ func testClientAfterStop(t *testing.T, ctx context.Context, config *clickhouse.C
 	metricsSvc := metrics.NewMetricsService("test", logger)
 
 	// Create and start client
-	client, err := clickhouse.New(config, logger, metricsSvc)
+	client, err := clickhouse.New(config, logger, "test", metricsSvc)
 	require.NoError(t, err)
 	require.NoError(t, client.Start(ctx))
 
@@ -512,7 +512,7 @@ func testWithMetrics(t *testing.T, ctx context.Context, config *clickhouse.Confi
 	metricsSvc := metrics.NewMetricsService("test", logger)
 
 	// Create client with metrics
-	client, err := clickhouse.New(config, logger, metricsSvc)
+	client, err := clickhouse.New(config, logger, "test", metricsSvc)
 	require.NoError(t, err, "Should create client with metrics")
 	require.NoError(t, client.Start(ctx), "Should start client with metrics")
 	defer func() { _ = client.Stop() }()

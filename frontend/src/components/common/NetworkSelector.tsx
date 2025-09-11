@@ -28,7 +28,7 @@ const getNetworkMetadata = (network: string) => {
 };
 
 // Network order priority (lower index = higher priority)
-const NETWORK_ORDER = ['mainnet', 'sepolia', 'holesky', 'hoodi'];
+const NETWORK_ORDER = ['mainnet', 'sepolia', 'hoodi'];
 
 // Sort networks based on predefined order
 const sortNetworks = (networks: string[]): string[] => {

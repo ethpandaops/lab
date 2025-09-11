@@ -56,7 +56,24 @@ The development server will be available at http://localhost:5173 and will autom
 
 By default, the frontend connects to the backend API through a Vite proxy configuration. This allows you to run the frontend independently while still accessing backend data.
 
-To override the backend URL in development mode, set the `VITE_BACKEND_URL` environment variable in your `.env` file.
+The frontend supports two separate backend URLs:
+
+1. **Legacy Backend URL** (`VITE_BACKEND_URL`): Used for gRPC endpoints and static JSON files. This URL typically includes the `/lab-data` suffix.
+   ```
+   VITE_BACKEND_URL=https://lab-api.primary.production.platform.ethpandaops.io/lab-data
+   ```
+
+2. **REST API URL** (`VITE_REST_API_URL`): Used for new v1 REST API endpoints (`/api/v1/*`). This URL should NOT include the `/lab-data` suffix.
+   ```
+   VITE_REST_API_URL=https://lab-api.primary.production.platform.ethpandaops.io
+   ```
+
+If `VITE_REST_API_URL` is not set, the system will fall back to using `VITE_BACKEND_URL` (automatically stripping `/lab-data` if present).
+
+This dual-URL configuration allows you to:
+- Point to different servers for legacy and new endpoints
+- Gradually migrate from static data to REST APIs
+- Support different deployment scenarios
 
 ## Scripts
 
