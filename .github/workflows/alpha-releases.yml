@@ -11,6 +11,7 @@ permissions:
 
 jobs:
   tag-release:
+    if: startsWith(github.ref, 'refs/heads/release/')
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.latest_version.outputs.version }}
@@ -22,7 +23,6 @@ jobs:
           ref: ${{ github.ref }}
           token: ${{ secrets.EPOBOT_TOKEN }}
       - name: Get latest release version for this release branch
-        if: startsWith(github.ref, 'refs/heads/release/')
         id: latest_version
         run: |
           # Extract suffix from branch name (e.g., 'dencun' from 'release/dencun')
@@ -67,6 +67,7 @@ jobs:
 
   build-and-push:
     needs: tag-release
+    if: needs.tag-release.outputs.version != ''
     runs-on: ubuntu-latest
     strategy:
       matrix:
