@@ -11,14 +11,9 @@ export const NETWORK_METADATA = {
     icon: '🐬',
     color: '#CFB5F0',
   },
-  holesky: {
-    name: 'Holesky',
-    icon: '🐱',
-    color: '#A4E887',
-  },
   hoodi: {
     name: 'Hoodi',
-    icon: '🦊',
+    icon: '🦚',
     color: '#FF9E2C',
   },
 } as const;

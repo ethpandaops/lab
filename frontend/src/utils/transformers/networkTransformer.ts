@@ -61,7 +61,7 @@ export function getActiveNetworks(networks: Network[]): Network[] {
  * Sort networks by a standard order
  */
 export function sortNetworksByPriority(networks: Network[]): Network[] {
-  const priority = ['mainnet', 'holesky', 'sepolia'];
+  const priority = ['mainnet', 'hoodi', 'sepolia'];
 
   return networks.sort((a, b) => {
     const aIndex = priority.indexOf(a.name);

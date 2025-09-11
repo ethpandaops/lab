@@ -489,7 +489,7 @@ export function SlotView({
                   </div>
                   <div className="text-[10px] font-mono text-tertiary">
                     by{' '}
-                    {slotData?.entity && ['mainnet', 'holesky', 'sepolia'].includes(network) ? (
+                    {slotData?.entity && ['mainnet', 'hoodi', 'sepolia'].includes(network) ? (
                       <a
                         href={`https://ethseer.io/entity/${slotData.entity}?network=${network}`}
                         target="_blank"
@@ -971,7 +971,7 @@ export function SlotView({
                   <div className="text-sm font-mono">
                     <span className="text-tertiary">
                       by{' '}
-                      {slotData?.entity && ['mainnet', 'holesky', 'sepolia'].includes(network) ? (
+                      {slotData?.entity && ['mainnet', 'hoodi', 'sepolia'].includes(network) ? (
                         <a
                           href={`https://ethseer.io/entity/${slotData.entity}?network=${network}`}
                           target="_blank"
