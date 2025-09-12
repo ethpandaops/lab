@@ -27,8 +27,8 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 
 	beaconslotspb "github.com/ethpandaops/lab/backend/pkg/server/proto/beacon_slots"
+	configpb "github.com/ethpandaops/lab/backend/pkg/server/proto/config"
 	labpb "github.com/ethpandaops/lab/backend/pkg/server/proto/lab"
-	networkspb "github.com/ethpandaops/lab/backend/pkg/server/proto/networks"
 	xatu_cbt_pb "github.com/ethpandaops/lab/backend/pkg/server/proto/xatu_cbt"
 )
 
@@ -48,7 +48,7 @@ type Service struct {
 	labClient         labpb.LabServiceClient
 	beaconSlotsClient beaconslotspb.BeaconSlotsClient
 	xatuCBTClient     xatu_cbt_pb.XatuCBTClient
-	networksClient    networkspb.NetworksServiceClient
+	configClient      configpb.ConfigServiceClient
 	publicV1Router    *v1rest.PublicRouter
 }
 
@@ -294,8 +294,8 @@ func (s *Service) initializeServices(ctx context.Context) error {
 	s.labClient = labpb.NewLabServiceClient(conn)
 	s.beaconSlotsClient = beaconslotspb.NewBeaconSlotsClient(conn)
 	s.xatuCBTClient = xatu_cbt_pb.NewXatuCBTClient(conn)
-	s.networksClient = networkspb.NewNetworksServiceClient(conn)
-	s.publicV1Router = v1rest.NewPublicRouter(s.log, s.xatuCBTClient, s.networksClient)
+	s.configClient = configpb.NewConfigServiceClient(conn)
+	s.publicV1Router = v1rest.NewPublicRouter(s.log, s.configClient, s.xatuCBTClient)
 
 	return nil
 }

@@ -1,9 +1,8 @@
 import {
   ListNodesResponse,
-  ListNetworksResponse,
   ErrorResponse,
 } from '../gen/backend/pkg/api/v1/proto/public_pb';
-import { API_V1_ENDPOINTS, buildQueryString, NodeFilters, NetworkFilters } from './endpoints';
+import { API_V1_ENDPOINTS, buildQueryString, NodeFilters } from './endpoints';
 
 /**
  * REST API client for v1 endpoints
@@ -33,22 +32,16 @@ export class RestApiClient {
   }
 
   /**
-   * Get list of available networks
-   * @param filters Optional filters for networks
-   * @returns ListNetworksResponse
+   * Get configuration
+   * @returns Configuration object
    */
-  async getNetworks(filters?: NetworkFilters): Promise<ListNetworksResponse> {
-    const queryString = filters ? buildQueryString(filters) : new URLSearchParams();
-    const url = `${this.baseUrl}${API_V1_ENDPOINTS.networks}${
-      queryString.toString() ? `?${queryString.toString()}` : ''
-    }`;
+  async getConfig(): Promise<any> {
+    const url = `${this.baseUrl}${API_V1_ENDPOINTS.config}`;
 
-    console.log('Fetching networks from:', url);
+    console.log('Fetching config from:', url);
     const response = await this.fetchWithRetry<any>(url);
 
-    // The REST API returns JSON that matches the protobuf message format
-    // Use fromJson to deserialize the JSON response into protobuf message instance
-    return ListNetworksResponse.fromJson(response);
+    return response;
   }
 
   /**
