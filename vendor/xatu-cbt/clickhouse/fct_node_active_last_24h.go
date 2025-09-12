@@ -9,7 +9,8 @@ import (
 
 // BuildListFctNodeActiveLast24HQuery constructs a parameterized SQL query from a ListFctNodeActiveLast24HRequest
 func BuildListFctNodeActiveLast24HQuery(req *ListFctNodeActiveLast24HRequest, options ...QueryOption) (SQLQuery, error) {
-	// Validate primary key is provided
+	// Validate that at least one primary key is provided
+	// Primary keys can come from base table or projections
 	if req.MetaClientName == nil {
 		return SQLQuery{}, fmt.Errorf("primary key field meta_client_name is required")
 	}

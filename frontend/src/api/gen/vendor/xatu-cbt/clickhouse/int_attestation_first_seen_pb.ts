@@ -26,7 +26,7 @@ export class IntAttestationFirstSeen extends Message<IntAttestationFirstSeen> {
   source = "";
 
   /**
-   * The slot number for which the proposer duty is assigned
+   * The slot number
    *
    * @generated from field: uint32 slot = 13;
    */

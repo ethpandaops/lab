@@ -41,6 +41,8 @@ type QueryOptions struct {
 	AddFinal bool
 	// Database optionally specifies the database name
 	Database string
+	// Projection optionally specifies the projection to use
+	Projection string
 }
 
 // QueryOption is a functional option for query configuration
@@ -57,6 +59,13 @@ func WithFinal() QueryOption {
 func WithDatabase(database string) QueryOption {
 	return func(opts *QueryOptions) {
 		opts.Database = database
+	}
+}
+
+// WithProjection specifies the projection to use
+func WithProjection(projection string) QueryOption {
+	return func(opts *QueryOptions) {
+		opts.Projection = projection
 	}
 }
 
@@ -370,6 +379,12 @@ func BuildParameterizedQuery(table string, qb *QueryBuilder, orderByClause strin
 	} else {
 		fromClause = table
 	}
+	
+	// Add projection if specified
+	if opts.Projection != "" {
+		fromClause = fmt.Sprintf("%s PROJECTION %s", fromClause, opts.Projection)
+	}
+	
 	if opts.AddFinal {
 		fromClause += " FINAL"
 	}

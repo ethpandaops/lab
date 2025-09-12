@@ -28,7 +28,7 @@ type IntBlockProposerHead struct {
 
 	// Timestamp when the record was last updated
 	UpdatedDateTime uint32 `protobuf:"varint,11,opt,name=updated_date_time,json=updatedDateTime,proto3" json:"updated_date_time,omitempty"`
-	// The slot number for which the proposer duty is assigned
+	// The slot number
 	Slot uint32 `protobuf:"varint,12,opt,name=slot,proto3" json:"slot,omitempty"`
 	// The wall clock time when the slot started
 	SlotStartDateTime uint32 `protobuf:"varint,13,opt,name=slot_start_date_time,json=slotStartDateTime,proto3" json:"slot_start_date_time,omitempty"`
@@ -40,7 +40,7 @@ type IntBlockProposerHead struct {
 	ProposerValidatorIndex uint32 `protobuf:"varint,16,opt,name=proposer_validator_index,json=proposerValidatorIndex,proto3" json:"proposer_validator_index,omitempty"`
 	// The public key of the validator proposer
 	ProposerPubkey string `protobuf:"bytes,17,opt,name=proposer_pubkey,json=proposerPubkey,proto3" json:"proposer_pubkey,omitempty"`
-	// The beacon block root hash
+	// The beacon block root hash. Null if a block was never seen by a sentry
 	BlockRoot *wrapperspb.StringValue `protobuf:"bytes,18,opt,name=block_root,json=blockRoot,proto3" json:"block_root,omitempty"`
 }
 

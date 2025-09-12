@@ -17,6 +17,11 @@ import (
 	"google.golang.org/grpc/metadata"
 )
 
+const (
+	// HTTP methods
+	methodOptions = "OPTIONS"
+)
+
 // PublicRouter handles public REST API v1 requests for all Lab endpoints.
 type PublicRouter struct {
 	log            logrus.FieldLogger
@@ -40,8 +45,107 @@ func NewPublicRouter(
 // RegisterRoutes registers all public REST v1 endpoints on the provided router.
 func (r *PublicRouter) RegisterRoutes(router *mux.Router) {
 	v1 := router.PathPrefix("/api/v1").Subrouter()
-	v1.HandleFunc("/networks", r.handleListNetworks).Methods("GET", "OPTIONS")
-	v1.HandleFunc("/{network}/nodes", r.handleListNodes).Methods("GET", "OPTIONS")
+	v1.HandleFunc("/networks", r.handleListNetworks).Methods("GET", methodOptions)
+	v1.HandleFunc("/config/networks", r.handleNetworkConfig).Methods("GET", methodOptions)
+	v1.HandleFunc("/{network}/nodes", r.handleListNodes).Methods("GET", methodOptions)
+}
+
+// handleNetworkConfig handles GET /api/v1/config/networks
+func (r *PublicRouter) handleNetworkConfig(w http.ResponseWriter, req *http.Request) {
+	ctx := req.Context()
+
+	// Handle CORS preflight
+	if req.Method == methodOptions {
+		w.WriteHeader(http.StatusOK)
+
+		return
+	}
+
+	r.log.Debug("REST v1: GetNetworkConfig")
+
+	// Get all networks including inactive ones to provide full config
+	grpcReq := &networkspb.ListNetworksRequest{
+		ActiveOnly: false,
+	}
+
+	grpcResp, err := r.networksClient.ListNetworks(ctx, grpcReq)
+	if err != nil {
+		r.log.WithError(err).Error("Failed to list networks for config")
+		r.handleError(w, err)
+
+		return
+	}
+
+	// Build the network configuration response
+	networksConfig := make(map[string]interface{})
+
+	for _, network := range grpcResp.Networks {
+		networkConfig := map[string]interface{}{
+			"name":        network.Name,
+			"status":      network.Status,
+			"chainId":     network.ChainId,
+			"lastUpdated": network.LastUpdated,
+		}
+
+		// Add optional fields if they exist
+		if network.Description != "" {
+			networkConfig["description"] = network.Description
+		}
+
+		// Add genesis config if present
+		if network.GenesisConfig != nil && network.GenesisConfig.GenesisTime != 0 {
+			networkConfig["genesisTime"] = strconv.FormatInt(network.GenesisConfig.GenesisTime, 10)
+		}
+
+		// Add service URLs if present
+		if len(network.ServiceUrls) > 0 {
+			networkConfig["serviceUrls"] = network.ServiceUrls
+		}
+
+		// Add self-hosted DNS flag if set
+		if network.SelfHostedDns {
+			networkConfig["selfHostedDns"] = network.SelfHostedDns
+		}
+
+		// Add fork information if present
+		if network.Forks != nil && network.Forks.Consensus != nil {
+			forks := map[string]interface{}{
+				"consensus": map[string]interface{}{},
+			}
+
+			if network.Forks.Consensus.Electra != nil {
+				electraFork := map[string]interface{}{
+					"epoch": strconv.FormatInt(network.Forks.Consensus.Electra.Epoch, 10),
+				}
+				if len(network.Forks.Consensus.Electra.MinClientVersions) > 0 {
+					electraFork["minClientVersions"] = network.Forks.Consensus.Electra.MinClientVersions
+				}
+
+				if consensusMap, ok := forks["consensus"].(map[string]interface{}); ok {
+					consensusMap["electra"] = electraFork
+				}
+			}
+
+			networkConfig["forks"] = forks
+		}
+
+		networksConfig[network.Name] = networkConfig
+	}
+
+	response := map[string]interface{}{
+		"networks": networksConfig,
+	}
+
+	// Set headers
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Vary", "Accept-Encoding")
+	// Network config data is relatively stable, cache for 5 minutes
+	w.Header().Set("Cache-Control", "public, max-age=300, s-maxage=300, stale-while-revalidate=120")
+
+	// Write response
+	if err := json.NewEncoder(w).Encode(response); err != nil {
+		r.log.WithError(err).Error("Failed to encode network config response")
+	}
 }
 
 // handleListNetworks handles GET /api/v1/networks
@@ -49,7 +153,7 @@ func (r *PublicRouter) handleListNetworks(w http.ResponseWriter, req *http.Reque
 	ctx := req.Context()
 
 	// Handle CORS preflight
-	if req.Method == "OPTIONS" {
+	if req.Method == methodOptions {
 		w.WriteHeader(http.StatusOK)
 
 		return

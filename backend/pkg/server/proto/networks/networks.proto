@@ -41,6 +41,42 @@ message Network {
   int64 chain_id = 3;
   // ISO 8601 timestamp of when this network metadata was last updated.
   string last_updated = 4;
+  // Description of the network (for static networks).
+  string description = 5;
+  // Genesis configuration (for static networks).
+  GenesisConfig genesis_config = 6;
+  // Service URLs for various network services (for static networks).
+  map<string, string> service_urls = 7;
+  // Whether the network uses self-hosted DNS (for static networks).
+  bool self_hosted_dns = 8;
+  // Fork information (for static networks).
+  Forks forks = 9;
+}
+
+// GenesisConfig contains the genesis configuration for a network.
+message GenesisConfig {
+  // Genesis time as Unix timestamp.
+  int64 genesis_time = 1 [json_name = "genesisTime"];
+}
+
+// Forks contains fork information for a network.
+message Forks {
+  // Consensus layer fork information.
+  ConsensusForks consensus = 1 [json_name = "consensus"];
+}
+
+// ConsensusForks contains consensus layer fork information.
+message ConsensusForks {
+  // Electra fork information.
+  ForkInfo electra = 1 [json_name = "electra"];
+}
+
+// ForkInfo contains information about a specific fork.
+message ForkInfo {
+  // Epoch when the fork activates.
+  int64 epoch = 1 [json_name = "epoch"];
+  // Minimum client versions required for the fork.
+  map<string, string> min_client_versions = 2 [json_name = "minClientVersions"];
 }
 
 // ListNetworksRequest defines filters for listing networks.
@@ -92,13 +128,23 @@ message NetworksData {
 // Used for unmarshaling the cartographoor API response.
 message RawNetworkData {
   // Network suffix name (e.g., "devnet-0" without prefix).
-  string name = 1;
+  string name = 1 [json_name = "name"];
   // Network status: "active", "inactive", or "unknown".
-  string status = 2;
+  string status = 2 [json_name = "status"];
   // ISO 8601 timestamp of last update.
-  string last_updated = 3;
+  string last_updated = 3 [json_name = "lastUpdated"];
   // Ethereum chain ID.
-  int64 chain_id = 4;
+  int64 chain_id = 4 [json_name = "chainId"];
+  // Description of the network (for static networks).
+  string description = 5 [json_name = "description"];
+  // Genesis configuration (for static networks).
+  GenesisConfig genesis_config = 6 [json_name = "genesisConfig"];
+  // Service URLs for various network services (for static networks).
+  map<string, string> service_urls = 7 [json_name = "serviceUrls"];
+  // Whether the network uses self-hosted DNS (for static networks).
+  bool self_hosted_dns = 8 [json_name = "selfHostedDns"];
+  // Fork information (for static networks).
+  Forks forks = 9 [json_name = "forks"];
 }
 
 // CartographoorResponse represents the raw cartographoor API response.
