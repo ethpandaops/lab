@@ -19,7 +19,7 @@ export class IntBlockProposerHead extends Message<IntBlockProposerHead> {
   updatedDateTime = 0;
 
   /**
-   * The slot number for which the proposer duty is assigned
+   * The slot number
    *
    * @generated from field: uint32 slot = 12;
    */
@@ -61,7 +61,7 @@ export class IntBlockProposerHead extends Message<IntBlockProposerHead> {
   proposerPubkey = "";
 
   /**
-   * The beacon block root hash
+   * The beacon block root hash. Null if a block was never seen by a sentry
    *
    * @generated from field: google.protobuf.StringValue block_root = 18;
    */

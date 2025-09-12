@@ -2,7 +2,6 @@ package cartographoor
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -13,6 +12,7 @@ import (
 
 	"github.com/ethpandaops/lab/backend/pkg/server/proto/networks"
 	"github.com/sirupsen/logrus"
+	"google.golang.org/protobuf/encoding/protojson"
 )
 
 const (
@@ -197,7 +197,11 @@ func (s *Service) fetchAndUpdateData(ctx context.Context) error {
 
 	// Parse JSON into CartographoorResponse proto
 	var rawResponse networks.CartographoorResponse
-	if err := json.Unmarshal(body, &rawResponse); err != nil {
+
+	unmarshaler := protojson.UnmarshalOptions{
+		DiscardUnknown: true,
+	}
+	if err := unmarshaler.Unmarshal(body, &rawResponse); err != nil {
 		return fmt.Errorf("parse JSON: %w", err)
 	}
 
@@ -210,10 +214,15 @@ func (s *Service) fetchAndUpdateData(ctx context.Context) error {
 	// Process each network, using the map key as the full network name
 	for fullName, rawNet := range rawResponse.Networks {
 		data.Networks[fullName] = &networks.Network{
-			Name:        fullName, // Use the full prefixed name from the map key
-			Status:      rawNet.Status,
-			ChainId:     rawNet.ChainId,
-			LastUpdated: rawNet.LastUpdated,
+			Name:          fullName, // Use the full prefixed name from the map key
+			Status:        rawNet.Status,
+			ChainId:       rawNet.ChainId,
+			LastUpdated:   rawNet.LastUpdated,
+			Description:   rawNet.Description,
+			GenesisConfig: rawNet.GenesisConfig,
+			ServiceUrls:   rawNet.ServiceUrls,
+			SelfHostedDns: rawNet.SelfHostedDns,
+			Forks:         rawNet.Forks,
 		}
 	}
 

@@ -12,7 +12,7 @@ message IntAttestationFirstSeen {
   uint32 updated_date_time = 11;
   // Source of the event
   string source = 12;
-  // The slot number for which the proposer duty is assigned
+  // The slot number
   uint32 slot = 13;
   // The wall clock time when the slot started
   uint32 slot_start_date_time = 14;

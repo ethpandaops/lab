@@ -9,7 +9,8 @@ import (
 
 // BuildListIntAddressStorageSlotFirstAccessQuery constructs a parameterized SQL query from a ListIntAddressStorageSlotFirstAccessRequest
 func BuildListIntAddressStorageSlotFirstAccessQuery(req *ListIntAddressStorageSlotFirstAccessRequest, options ...QueryOption) (SQLQuery, error) {
-	// Validate primary key is provided
+	// Validate that at least one primary key is provided
+	// Primary keys can come from base table or projections
 	if req.Address == nil {
 		return SQLQuery{}, fmt.Errorf("primary key field address is required")
 	}

@@ -9,7 +9,8 @@ import (
 
 // BuildListIntBlockFirstSeenByNodeQuery constructs a parameterized SQL query from a ListIntBlockFirstSeenByNodeRequest
 func BuildListIntBlockFirstSeenByNodeQuery(req *ListIntBlockFirstSeenByNodeRequest, options ...QueryOption) (SQLQuery, error) {
-	// Validate primary key is provided
+	// Validate that at least one primary key is provided
+	// Primary keys can come from base table or projections
 	if req.SlotStartDateTime == nil {
 		return SQLQuery{}, fmt.Errorf("primary key field slot_start_date_time is required")
 	}

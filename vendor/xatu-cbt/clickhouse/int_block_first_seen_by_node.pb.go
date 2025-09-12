@@ -29,7 +29,7 @@ type IntBlockFirstSeenByNode struct {
 	UpdatedDateTime uint32 `protobuf:"varint,11,opt,name=updated_date_time,json=updatedDateTime,proto3" json:"updated_date_time,omitempty"`
 	// Source of the event
 	Source string `protobuf:"bytes,12,opt,name=source,proto3" json:"source,omitempty"`
-	// The slot number for which the proposer duty is assigned
+	// The slot number
 	Slot uint32 `protobuf:"varint,13,opt,name=slot,proto3" json:"slot,omitempty"`
 	// The wall clock time when the slot started
 	SlotStartDateTime uint32 `protobuf:"varint,14,opt,name=slot_start_date_time,json=slotStartDateTime,proto3" json:"slot_start_date_time,omitempty"`

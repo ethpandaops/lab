@@ -158,7 +158,7 @@ func (s *Service) Start(ctx context.Context) error {
 		grpc.NewXatuPublicContributors(s.log, xpcService),
 		grpc.NewBeaconSlotsHandler(s.log, bsService),
 		grpc.NewXatuCBT(s.log, s.xatuCBTService),
-		grpc.NewCartographoorService(s.log, s.cartographoorService),
+		grpc.NewCartographoorService(s.log, s.cartographoorService, s.ethereumClient),
 	}
 
 	// Create gRPC server

@@ -6,12 +6,12 @@ import "vendor/xatu-cbt/clickhouse/common.proto";
 import "google/protobuf/wrappers.proto";
 
 option go_package = "github.com/ethpandaops/xatu-cbt/pkg/proto/clickhouse";
-// Block proposers for the unfinalized chain. Forks in the chain may cause mulitple proposers for the same slot to be present
+// Block proposers for the unfinalized chain
 
 message IntBlockProposerHead {
   // Timestamp when the record was last updated
   uint32 updated_date_time = 11;
-  // The slot number for which the proposer duty is assigned
+  // The slot number
   uint32 slot = 12;
   // The wall clock time when the slot started
   uint32 slot_start_date_time = 13;
@@ -23,7 +23,7 @@ message IntBlockProposerHead {
   uint32 proposer_validator_index = 16;
   // The public key of the validator proposer
   string proposer_pubkey = 17;
-  // The beacon block root hash
+  // The beacon block root hash. Null if a block was never seen by a sentry
   google.protobuf.StringValue block_root = 18;
 }
 

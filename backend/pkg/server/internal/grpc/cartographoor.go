@@ -4,6 +4,7 @@ import (
 	"context"
 	"sort"
 
+	"github.com/ethpandaops/lab/backend/pkg/internal/lab/ethereum"
 	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/cartographoor"
 	"github.com/ethpandaops/lab/backend/pkg/server/proto/networks"
 	"github.com/sirupsen/logrus"
@@ -15,15 +16,17 @@ import (
 // CartographoorService provides gRPC API for network discovery
 type CartographoorService struct {
 	networks.UnimplementedNetworksServiceServer
-	log     logrus.FieldLogger
-	service *cartographoor.Service
+	log      logrus.FieldLogger
+	service  *cartographoor.Service
+	ethereum *ethereum.Client
 }
 
 // NewCartographoorService creates a new CartographoorService
-func NewCartographoorService(log logrus.FieldLogger, svc *cartographoor.Service) *CartographoorService {
+func NewCartographoorService(log logrus.FieldLogger, svc *cartographoor.Service, eth *ethereum.Client) *CartographoorService {
 	return &CartographoorService{
-		log:     log.WithField("grpc", "cartographoor"),
-		service: svc,
+		log:      log.WithField("grpc", "cartographoor"),
+		service:  svc,
+		ethereum: eth,
 	}
 }
 
@@ -60,6 +63,23 @@ func (c *CartographoorService) ListNetworks(
 		// Apply active filter if requested.
 		if req.ActiveOnly && network.Status != "active" {
 			continue
+		}
+
+		// Only include networks that are configured in the lab
+		if c.ethereum != nil {
+			configured := false
+
+			for _, ethNetwork := range c.ethereum.Networks() {
+				if ethNetwork.Name == network.Name {
+					configured = true
+
+					break
+				}
+			}
+
+			if !configured {
+				continue
+			}
 		}
 
 		protoNetworks = append(protoNetworks, network)

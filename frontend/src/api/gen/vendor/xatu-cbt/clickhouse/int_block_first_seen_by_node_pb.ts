@@ -26,7 +26,7 @@ export class IntBlockFirstSeenByNode extends Message<IntBlockFirstSeenByNode> {
   source = "";
 
   /**
-   * The slot number for which the proposer duty is assigned
+   * The slot number
    *
    * @generated from field: uint32 slot = 13;
    */

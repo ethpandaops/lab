@@ -40,6 +40,41 @@ export class Network extends Message<Network> {
    */
   lastUpdated = "";
 
+  /**
+   * Description of the network (for static networks).
+   *
+   * @generated from field: string description = 5;
+   */
+  description = "";
+
+  /**
+   * Genesis configuration (for static networks).
+   *
+   * @generated from field: networks.GenesisConfig genesis_config = 6;
+   */
+  genesisConfig?: GenesisConfig;
+
+  /**
+   * Service URLs for various network services (for static networks).
+   *
+   * @generated from field: map<string, string> service_urls = 7;
+   */
+  serviceUrls: { [key: string]: string } = {};
+
+  /**
+   * Whether the network uses self-hosted DNS (for static networks).
+   *
+   * @generated from field: bool self_hosted_dns = 8;
+   */
+  selfHostedDns = false;
+
+  /**
+   * Fork information (for static networks).
+   *
+   * @generated from field: networks.Forks forks = 9;
+   */
+  forks?: Forks;
+
   constructor(data?: PartialMessage<Network>) {
     super();
     proto3.util.initPartial(data, this);
@@ -52,6 +87,11 @@ export class Network extends Message<Network> {
     { no: 2, name: "status", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 3, name: "chain_id", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
     { no: 4, name: "last_updated", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 5, name: "description", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 6, name: "genesis_config", kind: "message", T: GenesisConfig },
+    { no: 7, name: "service_urls", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "scalar", T: 9 /* ScalarType.STRING */} },
+    { no: 8, name: "self_hosted_dns", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 9, name: "forks", kind: "message", T: Forks },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Network {
@@ -68,6 +108,178 @@ export class Network extends Message<Network> {
 
   static equals(a: Network | PlainMessage<Network> | undefined, b: Network | PlainMessage<Network> | undefined): boolean {
     return proto3.util.equals(Network, a, b);
+  }
+}
+
+/**
+ * GenesisConfig contains the genesis configuration for a network.
+ *
+ * @generated from message networks.GenesisConfig
+ */
+export class GenesisConfig extends Message<GenesisConfig> {
+  /**
+   * Genesis time as Unix timestamp.
+   *
+   * @generated from field: int64 genesis_time = 1;
+   */
+  genesisTime = protoInt64.zero;
+
+  constructor(data?: PartialMessage<GenesisConfig>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "networks.GenesisConfig";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "genesis_time", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GenesisConfig {
+    return new GenesisConfig().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): GenesisConfig {
+    return new GenesisConfig().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): GenesisConfig {
+    return new GenesisConfig().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: GenesisConfig | PlainMessage<GenesisConfig> | undefined, b: GenesisConfig | PlainMessage<GenesisConfig> | undefined): boolean {
+    return proto3.util.equals(GenesisConfig, a, b);
+  }
+}
+
+/**
+ * Forks contains fork information for a network.
+ *
+ * @generated from message networks.Forks
+ */
+export class Forks extends Message<Forks> {
+  /**
+   * Consensus layer fork information.
+   *
+   * @generated from field: networks.ConsensusForks consensus = 1;
+   */
+  consensus?: ConsensusForks;
+
+  constructor(data?: PartialMessage<Forks>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "networks.Forks";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "consensus", kind: "message", T: ConsensusForks },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Forks {
+    return new Forks().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): Forks {
+    return new Forks().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): Forks {
+    return new Forks().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: Forks | PlainMessage<Forks> | undefined, b: Forks | PlainMessage<Forks> | undefined): boolean {
+    return proto3.util.equals(Forks, a, b);
+  }
+}
+
+/**
+ * ConsensusForks contains consensus layer fork information.
+ *
+ * @generated from message networks.ConsensusForks
+ */
+export class ConsensusForks extends Message<ConsensusForks> {
+  /**
+   * Electra fork information.
+   *
+   * @generated from field: networks.ForkInfo electra = 1;
+   */
+  electra?: ForkInfo;
+
+  constructor(data?: PartialMessage<ConsensusForks>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "networks.ConsensusForks";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "electra", kind: "message", T: ForkInfo },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ConsensusForks {
+    return new ConsensusForks().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ConsensusForks {
+    return new ConsensusForks().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ConsensusForks {
+    return new ConsensusForks().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: ConsensusForks | PlainMessage<ConsensusForks> | undefined, b: ConsensusForks | PlainMessage<ConsensusForks> | undefined): boolean {
+    return proto3.util.equals(ConsensusForks, a, b);
+  }
+}
+
+/**
+ * ForkInfo contains information about a specific fork.
+ *
+ * @generated from message networks.ForkInfo
+ */
+export class ForkInfo extends Message<ForkInfo> {
+  /**
+   * Epoch when the fork activates.
+   *
+   * @generated from field: int64 epoch = 1;
+   */
+  epoch = protoInt64.zero;
+
+  /**
+   * Minimum client versions required for the fork.
+   *
+   * @generated from field: map<string, string> min_client_versions = 2;
+   */
+  minClientVersions: { [key: string]: string } = {};
+
+  constructor(data?: PartialMessage<ForkInfo>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "networks.ForkInfo";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "epoch", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
+    { no: 2, name: "min_client_versions", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "scalar", T: 9 /* ScalarType.STRING */} },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ForkInfo {
+    return new ForkInfo().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ForkInfo {
+    return new ForkInfo().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ForkInfo {
+    return new ForkInfo().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: ForkInfo | PlainMessage<ForkInfo> | undefined, b: ForkInfo | PlainMessage<ForkInfo> | undefined): boolean {
+    return proto3.util.equals(ForkInfo, a, b);
   }
 }
 
@@ -385,6 +597,41 @@ export class RawNetworkData extends Message<RawNetworkData> {
    */
   chainId = protoInt64.zero;
 
+  /**
+   * Description of the network (for static networks).
+   *
+   * @generated from field: string description = 5;
+   */
+  description = "";
+
+  /**
+   * Genesis configuration (for static networks).
+   *
+   * @generated from field: networks.GenesisConfig genesis_config = 6;
+   */
+  genesisConfig?: GenesisConfig;
+
+  /**
+   * Service URLs for various network services (for static networks).
+   *
+   * @generated from field: map<string, string> service_urls = 7;
+   */
+  serviceUrls: { [key: string]: string } = {};
+
+  /**
+   * Whether the network uses self-hosted DNS (for static networks).
+   *
+   * @generated from field: bool self_hosted_dns = 8;
+   */
+  selfHostedDns = false;
+
+  /**
+   * Fork information (for static networks).
+   *
+   * @generated from field: networks.Forks forks = 9;
+   */
+  forks?: Forks;
+
   constructor(data?: PartialMessage<RawNetworkData>) {
     super();
     proto3.util.initPartial(data, this);
@@ -397,6 +644,11 @@ export class RawNetworkData extends Message<RawNetworkData> {
     { no: 2, name: "status", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 3, name: "last_updated", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 4, name: "chain_id", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
+    { no: 5, name: "description", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 6, name: "genesis_config", kind: "message", T: GenesisConfig },
+    { no: 7, name: "service_urls", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "scalar", T: 9 /* ScalarType.STRING */} },
+    { no: 8, name: "self_hosted_dns", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 9, name: "forks", kind: "message", T: Forks },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): RawNetworkData {
