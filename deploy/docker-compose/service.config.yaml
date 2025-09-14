@@ -25,7 +25,15 @@ ethereum:
       genesis: "2020-12-01T12:00:23Z"
       xatu:
         dsn: "${XATU_CLICKHOUSE_URL}"
-        protocol: "native"
+        connection:
+          insecure_skip_verify: false  # Default: false
+          dial_timeout: 10s      # Default: 10s
+          read_timeout: 30s      # Default: 30s
+          write_timeout: 30s     # Default: 30s
+          max_execution_time: 60 # Default: 60 (seconds)
+          max_open_conns: 10     # Default: 10
+          max_idle_conns: 5      # Default: 5
+          conn_max_lifetime: 1h  # Default: 1h
       forks:
         consensus:
           electra:
@@ -42,7 +50,15 @@ ethereum:
       genesis: "2025-03-17T12:10:00Z"
       xatu:
         dsn: "${XATU_CLICKHOUSE_URL}"
-        protocol: "native"
+        connection:
+          insecure_skip_verify: false  # Default: false
+          dial_timeout: 10s      # Default: 10s
+          read_timeout: 30s      # Default: 30s
+          write_timeout: 30s     # Default: 30s
+          max_execution_time: 60 # Default: 60 (seconds)
+          max_open_conns: 10     # Default: 10
+          max_idle_conns: 5      # Default: 5
+          conn_max_lifetime: 1h  # Default: 1h
 
 # Cache configuration
 cache:
@@ -108,4 +124,4 @@ modules:
           duration: "720h"
           file: "last_30_days.json"
           step: "1h"
-          range: "-720h" 
+          range: "-720h"
