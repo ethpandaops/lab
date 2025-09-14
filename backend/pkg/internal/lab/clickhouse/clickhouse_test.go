@@ -172,8 +172,10 @@ func testDSNVariations(t *testing.T, ctx context.Context, host, port string, log
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			config := &clickhouse.Config{
-				DSN:                tc.dsn,
-				InsecureSkipVerify: tc.insecureSkipVerify,
+				DSN: tc.dsn,
+				ConnectionConfig: clickhouse.ConnectionConfig{
+					InsecureSkipVerify: tc.insecureSkipVerify,
+				},
 			}
 
 			client, err := clickhouse.New(config, logger, "test", metricsSvc)
