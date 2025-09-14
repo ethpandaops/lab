@@ -2,6 +2,7 @@ module github.com/ethpandaops/lab/backend
 
 go 1.24.6
 
+// Until we bump ch-proxy: https://github.com/ClickHouse/clickhouse-go/issues/674
 replace github.com/ClickHouse/clickhouse-go/v2 => github.com/ClickHouse/clickhouse-go/v2 v2.36.1-0.20250616170804-ac33f72aba3a
 
 require (
