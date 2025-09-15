@@ -74,7 +74,7 @@ func (p *LocallyBuiltBlocksProcessor) Start(ctx context.Context) error {
 	leaderClient := leader.New(p.log, p.lockerClient, leader.Config{
 		Resource:        ServiceName + "/locally_built_blocks",
 		TTL:             5 * time.Second,
-		RefreshInterval: 500 * time.Second,
+		RefreshInterval: 1 * time.Second, // Refresh every second (5x before TTL expires)
 
 		OnElected: func() {
 			p.log.Info("Became leader for locally built blocks processor")
