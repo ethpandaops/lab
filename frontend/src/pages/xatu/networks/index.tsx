@@ -98,8 +98,8 @@ export default function Networks() {
     }
   }, [config]);
 
-  const summaryPath = config?.modules?.['xatuPublicContributors']?.pathPrefix
-    ? `${config.modules['xatuPublicContributors'].pathPrefix}/summary.json`
+  const summaryPath = config?.modules?.['xatu_public_contributors']?.path_prefix
+    ? `${config.modules['xatu_public_contributors'].path_prefix}/summary.json`
     : null;
 
   const { data: summaryData, loading, error } = useDataFetch<Summary>(baseUrl, summaryPath);

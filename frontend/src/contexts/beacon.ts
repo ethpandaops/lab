@@ -132,7 +132,7 @@ export function useValue(props: ValueProps): State {
     if (config?.ethereum?.networks) {
       Object.entries(config.ethereum.networks).forEach(([network, networkConfig]) => {
         if (networkConfig && typeof networkConfig === 'object') {
-          const genesisTime = Number(networkConfig.genesisTime);
+          const genesisTime = Number(networkConfig.genesis_time);
           if (genesisTime) {
             const clock = new BeaconClock(genesisTime);
             newClocks.set(network, clock);
@@ -208,12 +208,12 @@ export function useValue(props: ValueProps): State {
 
   // Function to get head lag slots for a network
   const getHeadLagSlots = (network: string): number => {
-    return config?.modules?.beacon?.networks?.[network]?.headLagSlots ?? 4;
+    return config?.modules?.beacon?.networks?.[network]?.head_lag_slots ?? 4;
   };
 
   // Function to get backlog days for a network
   const getBacklogDays = (network: string): number => {
-    return config?.modules?.beacon?.networks?.[network]?.backlogDays ?? 3;
+    return config?.modules?.beacon?.networks?.[network]?.backlog_days ?? 3;
   };
 
   return {

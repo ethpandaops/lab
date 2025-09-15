@@ -79,8 +79,8 @@ func (r *PublicRouter) handleConfig(w http.ResponseWriter, req *http.Request) {
 	// Set headers
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Vary", "Accept-Encoding")
-	// Network config data is relatively stable, cache for 5 minutes
-	w.Header().Set("Cache-Control", "public, max-age=300, s-maxage=300, stale-while-revalidate=120")
+	// Network config data is relatively stable, cache for 60 seconds
+	w.Header().Set("Cache-Control", "public, max-age=60, s-maxage=60, stale-while-revalidate=30")
 
 	// Write response
 	if err := json.NewEncoder(w).Encode(response); err != nil {

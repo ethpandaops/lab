@@ -53,8 +53,8 @@ function Xatu() {
   const { config } = useConfig();
   const { baseUrl } = useApi();
   // Skip data fetching if config isn't loaded
-  const summaryPath = config?.modules?.['xatuPublicContributors']?.pathPrefix
-    ? `${config.modules['xatuPublicContributors'].pathPrefix}/summary.json`
+  const summaryPath = config?.modules?.['xatu_public_contributors']?.path_prefix
+    ? `${config.modules['xatu_public_contributors'].path_prefix}/summary.json`
     : null;
 
   const { data: summaryData } = useDataFetch<Summary>(baseUrl, summaryPath);

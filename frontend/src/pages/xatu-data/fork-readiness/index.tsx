@@ -80,7 +80,7 @@ function ForkReadiness() {
     const nodes = nodesData.filter(n => selectedUser === 'all' || n.username === selectedUser);
 
     const clientReadiness = Object.entries(
-      network.forks?.consensus?.electra?.minClientVersions || {},
+      network.forks?.consensus?.electra?.min_client_versions || {},
     )
       .map(([clientName, minVersion]) => {
         const clientNodes = nodes.filter(n => n.consensus_client === clientName);
@@ -157,7 +157,6 @@ function ForkReadiness() {
   if (!config?.ethereum?.networks[selectedNetwork]?.forks?.consensus?.electra) {
     return (
       <div className="space-y-6">
-
         <Card className="relative z-10 card-primary overflow-visible">
           <CardBody className="flex flex-col items-center justify-center py-12 text-center">
             <div className="text-4xl mb-4">🎉</div>
@@ -182,7 +181,6 @@ function ForkReadiness() {
 
   return (
     <div className="space-y-6">
-
       <Card className="relative z-10 card-primary overflow-visible">
         <CardHeader>
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-2">

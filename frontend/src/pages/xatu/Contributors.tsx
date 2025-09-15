@@ -53,11 +53,11 @@ export const CommunityNodes = () => {
   const [hiddenCountries, setHiddenCountries] = useState<Set<string>>(new Set());
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const pathPrefix = config?.modules?.['xatuPublicContributors']?.pathPrefix;
+  const pathPrefix = config?.modules?.['xatu_public_contributors']?.path_prefix;
 
   const timeWindows = useMemo(
     () =>
-      config?.modules?.['xatuPublicContributors']?.timeWindows || [
+      config?.modules?.['xatu_public_contributors']?.time_windows || [
         { file: 'last_30_days', step: '1d', label: '30d', range: '-30d' },
         { file: 'last_1_day', step: '1h', label: '1d', range: '-1d' },
       ],
@@ -66,7 +66,7 @@ export const CommunityNodes = () => {
 
   const defaultTimeWindow = useMemo(() => timeWindows[0]?.file || 'last_30_days', [timeWindows]);
   const defaultNetwork = useMemo(
-    () => config?.modules?.['xatuPublicContributors']?.networks?.[0] || 'mainnet',
+    () => config?.modules?.['xatu_public_contributors']?.networks?.[0] || 'mainnet',
     [config],
   );
 
