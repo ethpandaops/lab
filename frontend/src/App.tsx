@@ -61,24 +61,14 @@ function App() {
 
   useEffect(() => {
     if (restClient) {
-      // Use REST API to fetch config
       restClient
         .getConfig()
         .then(response => {
-          // The REST API returns the config directly, similar to the old structure
           setConfig(response.config || null);
         })
         .catch(setConfigError);
-    } else if (client) {
-      // Fallback to Connect API if REST client is not available
-      client
-        .getConfig({})
-        .then(config => {
-          setConfig(config.config?.config || null);
-        })
-        .catch(setConfigError);
     }
-  }, [client, restClient]);
+  }, [restClient]);
 
   useEffect(() => {
     if (config) {

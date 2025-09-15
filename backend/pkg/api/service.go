@@ -28,7 +28,6 @@ import (
 
 	beaconslotspb "github.com/ethpandaops/lab/backend/pkg/server/proto/beacon_slots"
 	configpb "github.com/ethpandaops/lab/backend/pkg/server/proto/config"
-	labpb "github.com/ethpandaops/lab/backend/pkg/server/proto/lab"
 	xatu_cbt_pb "github.com/ethpandaops/lab/backend/pkg/server/proto/xatu_cbt"
 )
 
@@ -45,7 +44,6 @@ type Service struct {
 
 	// gRPC connection to srv service
 	srvConn           *grpc.ClientConn
-	labClient         labpb.LabServiceClient
 	beaconSlotsClient beaconslotspb.BeaconSlotsClient
 	xatuCBTClient     xatu_cbt_pb.XatuCBTClient
 	configClient      configpb.ConfigServiceClient
@@ -291,7 +289,6 @@ func (s *Service) initializeServices(ctx context.Context) error {
 	}
 
 	s.srvConn = conn
-	s.labClient = labpb.NewLabServiceClient(conn)
 	s.beaconSlotsClient = beaconslotspb.NewBeaconSlotsClient(conn)
 	s.xatuCBTClient = xatu_cbt_pb.NewXatuCBTClient(conn)
 	s.configClient = configpb.NewConfigServiceClient(conn)
@@ -326,38 +323,6 @@ func (s *Service) registerLegacyHandlers(router *mux.Router) {
 	// Xatu Countries Window - OK
 	router.HandleFunc("/xatu_public_contributors/countries/{network}/{window_file}.json", s.handleXatuCountriesWindow).Methods("GET")
 
-	// Config file
-	router.HandleFunc("/config.json", s.handleFrontendConfig).Methods("GET")
-}
-
-func (s *Service) handleFrontendConfig(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-
-	resp, err := s.labClient.GetFrontendConfig(ctx, &labpb.GetFrontendConfigRequest{})
-	if err != nil {
-		s.log.WithError(err).Error("failed to fetch config")
-		http.Error(w, "Internal server error", http.StatusInternalServerError)
-
-		return
-	}
-
-	data, err := json.Marshal(resp.Config.Config)
-	if err != nil {
-		s.log.WithError(err).Error("failed to marshal config response")
-		http.Error(w, "Internal server error", http.StatusInternalServerError)
-
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Cache-Control", "max-age=60,s-maxage=60,public")
-
-	if _, err := w.Write(data); err != nil {
-		s.log.WithError(err).Error("failed to write config response")
-		http.Error(w, "Internal server error", http.StatusInternalServerError)
-
-		return
-	}
 }
 
 // Generic handler for S3 passthroughs

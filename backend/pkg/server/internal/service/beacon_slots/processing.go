@@ -20,6 +20,45 @@ import (
 func (b *BeaconSlots) processSlot(ctx context.Context, networkName string, slot phase0.Slot) (bool, *pb.BeaconSlotData, error) {
 	startTime := time.Now()
 
+	// Acquire slot-level lock to prevent concurrent processing of the same slot
+	lockKey := fmt.Sprintf("beacon_slots:slot:%s:%d", networkName, slot)
+	lockTTL := 30 * time.Second // Allow enough time for processing
+
+	// Try to acquire the lock
+	token, acquired, err := b.lockerClient.Lock(lockKey, lockTTL)
+	if err != nil {
+		b.log.WithError(err).
+			WithField("network", networkName).
+			WithField("slot", slot).
+			Warn("Error acquiring slot lock")
+
+		return false, nil, fmt.Errorf("failed to acquire lock: %w", err)
+	}
+
+	if !acquired {
+		// Another processor is already handling this slot
+		b.log.WithField("network", networkName).
+			WithField("slot", slot).
+			Debug("Slot already being processed by another processor, skipping")
+
+		return false, nil, nil
+	}
+
+	// Ensure we release the lock when done
+	defer func() {
+		released, err := b.lockerClient.Unlock(lockKey, token)
+		if err != nil {
+			b.log.WithError(err).
+				WithField("network", networkName).
+				WithField("slot", slot).
+				Warn("Failed to release slot lock")
+		} else if !released {
+			b.log.WithField("network", networkName).
+				WithField("slot", slot).
+				Warn("Lock was not released (token invalid or lock expired)")
+		}
+	}()
+
 	b.log.WithField("network", networkName).
 		WithField("slot", slot).
 		Debug("Processing slot")
