@@ -126,7 +126,7 @@ func (b *BeaconSlots) Start(ctx context.Context) error {
 	leaderClient := leader.New(b.log, b.lockerClient, leader.Config{
 		Resource:        ServiceName + "/processing",
 		TTL:             5 * time.Second,
-		RefreshInterval: 500 * time.Second,
+		RefreshInterval: 1 * time.Second, // Refresh every second (5x before TTL expires)
 
 		OnElected: func() {
 			b.log.Info("Became leader for BeaconSlots service")
