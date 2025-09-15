@@ -398,8 +398,7 @@ func (b *BeaconSlots) processHead(ctx context.Context, networkName string) {
 			return
 		default:
 			// Continue processing
-			// Use a more reasonable interval - check every 3 seconds (4 checks per slot)
-			time.Sleep(3 * time.Second)
+			time.Sleep(1 * time.Second)
 		}
 
 		var slotState *ProcessorState
