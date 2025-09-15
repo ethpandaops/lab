@@ -16,6 +16,7 @@ import (
 	"fmt"
 	"net/url"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/ClickHouse/clickhouse-go/v2"
@@ -77,6 +78,7 @@ type client struct {
 	config      *Config
 	network     string
 	stopMetrics chan struct{} // Channel to signal metrics updater to stop
+	stopOnce    sync.Once     // Ensures Stop is only executed once
 
 	// Metrics
 	metrics           *metrics.Metrics
@@ -474,22 +476,28 @@ func (c *client) Stop() error {
 		return nil
 	}
 
-	c.log.Info("Stopping ClickHouse client")
+	var closeErr error
 
-	// Stop metrics updater goroutine
-	if c.stopMetrics != nil {
-		close(c.stopMetrics)
-	}
+	c.stopOnce.Do(func() {
+		c.log.Info("Stopping ClickHouse client")
 
-	// Update connection metrics.
-	c.connectionStatus.WithLabelValues(c.metricsDatabase, "active").Set(0)
-	c.connectionStatus.WithLabelValues(c.metricsDatabase, "error").Set(0)
-	c.connectionsActive.WithLabelValues(c.metricsDatabase).Set(0)
-	c.connectionsIdle.WithLabelValues(c.metricsDatabase).Set(0)
-	c.connectionsInUse.WithLabelValues(c.metricsDatabase).Set(0)
+		// Stop metrics updater goroutine
+		if c.stopMetrics != nil {
+			close(c.stopMetrics)
+		}
 
-	// Close the connection pool using standard sql.DB.Close().
-	return c.conn.Close()
+		// Update connection metrics.
+		c.connectionStatus.WithLabelValues(c.metricsDatabase, "active").Set(0)
+		c.connectionStatus.WithLabelValues(c.metricsDatabase, "error").Set(0)
+		c.connectionsActive.WithLabelValues(c.metricsDatabase).Set(0)
+		c.connectionsIdle.WithLabelValues(c.metricsDatabase).Set(0)
+		c.connectionsInUse.WithLabelValues(c.metricsDatabase).Set(0)
+
+		// Close the connection pool using standard sql.DB.Close().
+		closeErr = c.conn.Close()
+	})
+
+	return closeErr
 }
 
 // initMetrics initializes Prometheus metrics for monitoring ClickHouse operations.
