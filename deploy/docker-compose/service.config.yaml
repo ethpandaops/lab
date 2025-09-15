@@ -20,9 +20,7 @@ storage:
 ethereum:
   networks:
     mainnet:
-      name: "mainnet"
       configURL: "https://raw.githubusercontent.com/eth-clients/mainnet/refs/heads/main/metadata/config.yaml"
-      genesis: "2020-12-01T12:00:23Z"
       xatu:
         dsn: "${XATU_CLICKHOUSE_URL}"
         connection:
@@ -34,20 +32,8 @@ ethereum:
           max_open_conns: 10     # Default: 10
           max_idle_conns: 5      # Default: 5
           conn_max_lifetime: 1h  # Default: 1h
-      forks:
-        consensus:
-          electra:
-            min_client_versions:
-              grandine: "1.1.0"
-              lighthouse: "7.0.0"
-              lodestar: "1.29.0"
-              nimbus: "25.4.1"
-              prysm: "6.0.0"
-              teku: "25.4.1"
     hoodi:
-      name: "hoodi"
       configURL: "https://raw.githubusercontent.com/eth-clients/hoodi/refs/heads/main/metadata/config.yaml"
-      genesis: "2025-03-17T12:10:00Z"
       xatu:
         dsn: "${XATU_CLICKHOUSE_URL}"
         connection:

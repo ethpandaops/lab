@@ -29,8 +29,8 @@ function ForkReadiness() {
   const { selectedNetwork } = useNetwork();
   const [selectedUser, setSelectedUser] = useState<string>('all');
 
-  const summaryPath = config?.modules?.['xatuPublicContributors']?.pathPrefix
-    ? `${config.modules['xatuPublicContributors'].pathPrefix}/user-summaries/summary.json`
+  const summaryPath = config?.modules?.['xatu_public_contributors']?.path_prefix
+    ? `${config.modules['xatu_public_contributors'].path_prefix}/user-summaries/summary.json`
     : null;
 
   const { data: summaryData } = useDataFetch<XatuSummary>(baseUrl, summaryPath);
@@ -62,7 +62,7 @@ function ForkReadiness() {
       .filter(n => n.network === selectedNetwork);
 
     const clientReadiness = Object.entries(
-      network.forks?.consensus?.electra?.minClientVersions || {},
+      network.forks?.consensus?.electra?.min_client_versions || {},
     )
       .map(([clientName, minVersion]) => {
         const clientNodes = nodes.filter(n => n.consensus_client === clientName);

@@ -11,7 +11,6 @@ import (
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/cache"
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/storage"
 	beaconslotspb "github.com/ethpandaops/lab/backend/pkg/server/proto/beacon_slots"
-	labpb "github.com/ethpandaops/lab/backend/pkg/server/proto/lab"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 )
@@ -36,7 +35,6 @@ type LabAPIServerImpl struct {
 
 	// gRPC clients
 	beaconSlotsClient beaconslotspb.BeaconSlotsClient
-	labClient         labpb.LabServiceClient
 }
 
 func NewLabAPIServer(cacheClient cache.Client, storageClient storage.Client, srvConn *grpc.ClientConn, log logrus.FieldLogger) *LabAPIServerImpl {
@@ -44,7 +42,6 @@ func NewLabAPIServer(cacheClient cache.Client, storageClient storage.Client, srv
 		cache:             cacheClient,
 		storage:           storageClient,
 		beaconSlotsClient: beaconslotspb.NewBeaconSlotsClient(srvConn),
-		labClient:         labpb.NewLabServiceClient(srvConn),
 		log:               log,
 	}
 }
@@ -97,29 +94,6 @@ func (s *LabAPIServerImpl) GetSlotData(ctx context.Context, req *connect.Request
 
 	// Example of setting a header
 	res.Header().Set("Cache-Control", StandardHTTPHeaders["Cache-Control-VeryLong"])
-
-	return res, nil
-}
-
-// GetConfig retrieves the frontend configuration
-func (s *LabAPIServerImpl) GetConfig(ctx context.Context, req *connect.Request[proto.GetConfigRequest]) (*connect.Response[proto.GetConfigResponse], error) {
-	s.log.Debug("GetConfig")
-
-	// Forward the request to the lab service
-	resp, err := s.labClient.GetFrontendConfig(ctx, &labpb.GetFrontendConfigRequest{})
-	if err != nil {
-		return nil, err
-	}
-
-	// Convert the response to the API response format
-	apiResponse := &proto.GetConfigResponse{
-		Config: resp.Config,
-	}
-
-	res := connect.NewResponse(apiResponse)
-
-	// Set medium-term caching headers
-	res.Header().Set("Cache-Control", StandardHTTPHeaders["Cache-Control-Medium"])
 
 	return res, nil
 }

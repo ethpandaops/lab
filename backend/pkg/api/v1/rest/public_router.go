@@ -9,7 +9,7 @@ import (
 	"time"
 
 	apiv1 "github.com/ethpandaops/lab/backend/pkg/api/v1/proto"
-	networkspb "github.com/ethpandaops/lab/backend/pkg/server/proto/networks"
+	configpb "github.com/ethpandaops/lab/backend/pkg/server/proto/config"
 	xatu_cbt_pb "github.com/ethpandaops/lab/backend/pkg/server/proto/xatu_cbt"
 	cbtproto "github.com/ethpandaops/xatu-cbt/pkg/proto/clickhouse"
 	"github.com/gorilla/mux"
@@ -24,34 +24,33 @@ const (
 
 // PublicRouter handles public REST API v1 requests for all Lab endpoints.
 type PublicRouter struct {
-	log            logrus.FieldLogger
-	xatuCBTClient  xatu_cbt_pb.XatuCBTClient
-	networksClient networkspb.NetworksServiceClient
+	log           logrus.FieldLogger
+	configClient  configpb.ConfigServiceClient
+	xatuCBTClient xatu_cbt_pb.XatuCBTClient
 }
 
 // NewPublicRouter creates a new public REST router for API v1.
 func NewPublicRouter(
 	log logrus.FieldLogger,
+	configClient configpb.ConfigServiceClient,
 	xatuCBTClient xatu_cbt_pb.XatuCBTClient,
-	networksClient networkspb.NetworksServiceClient,
 ) *PublicRouter {
 	return &PublicRouter{
-		log:            log.WithField("component", "public_rest_router_v1"),
-		xatuCBTClient:  xatuCBTClient,
-		networksClient: networksClient,
+		log:           log.WithField("component", "public_rest_router_v1"),
+		configClient:  configClient,
+		xatuCBTClient: xatuCBTClient,
 	}
 }
 
 // RegisterRoutes registers all public REST v1 endpoints on the provided router.
 func (r *PublicRouter) RegisterRoutes(router *mux.Router) {
 	v1 := router.PathPrefix("/api/v1").Subrouter()
-	v1.HandleFunc("/networks", r.handleListNetworks).Methods("GET", methodOptions)
-	v1.HandleFunc("/config/networks", r.handleNetworkConfig).Methods("GET", methodOptions)
+	v1.HandleFunc("/config", r.handleConfig).Methods("GET", methodOptions)
 	v1.HandleFunc("/{network}/nodes", r.handleListNodes).Methods("GET", methodOptions)
 }
 
-// handleNetworkConfig handles GET /api/v1/config/networks
-func (r *PublicRouter) handleNetworkConfig(w http.ResponseWriter, req *http.Request) {
+// handleConfig handles GET /api/v1/config
+func (r *PublicRouter) handleConfig(w http.ResponseWriter, req *http.Request) {
 	ctx := req.Context()
 
 	// Handle CORS preflight
@@ -61,160 +60,31 @@ func (r *PublicRouter) handleNetworkConfig(w http.ResponseWriter, req *http.Requ
 		return
 	}
 
-	r.log.Debug("REST v1: GetNetworkConfig")
+	r.log.Debug("REST v1: GetConfig")
 
-	// Get all networks including inactive ones to provide full config
-	grpcReq := &networkspb.ListNetworksRequest{
-		ActiveOnly: false,
-	}
-
-	grpcResp, err := r.networksClient.ListNetworks(ctx, grpcReq)
+	// Call the config service to get the complete configuration
+	grpcResp, err := r.configClient.GetConfig(ctx, &configpb.GetConfigRequest{})
 	if err != nil {
-		r.log.WithError(err).Error("Failed to list networks for config")
+		r.log.WithError(err).Error("Failed to get config")
 		r.handleError(w, err)
 
 		return
 	}
 
-	// Build the network configuration response
-	networksConfig := make(map[string]interface{})
-
-	for _, network := range grpcResp.Networks {
-		networkConfig := map[string]interface{}{
-			"name":        network.Name,
-			"status":      network.Status,
-			"chainId":     network.ChainId,
-			"lastUpdated": network.LastUpdated,
-		}
-
-		// Add optional fields if they exist
-		if network.Description != "" {
-			networkConfig["description"] = network.Description
-		}
-
-		// Add genesis config if present
-		if network.GenesisConfig != nil && network.GenesisConfig.GenesisTime != 0 {
-			networkConfig["genesisTime"] = strconv.FormatInt(network.GenesisConfig.GenesisTime, 10)
-		}
-
-		// Add service URLs if present
-		if len(network.ServiceUrls) > 0 {
-			networkConfig["serviceUrls"] = network.ServiceUrls
-		}
-
-		// Add self-hosted DNS flag if set
-		if network.SelfHostedDns {
-			networkConfig["selfHostedDns"] = network.SelfHostedDns
-		}
-
-		// Add fork information if present
-		if network.Forks != nil && network.Forks.Consensus != nil {
-			forks := map[string]interface{}{
-				"consensus": map[string]interface{}{},
-			}
-
-			if network.Forks.Consensus.Electra != nil {
-				electraFork := map[string]interface{}{
-					"epoch": strconv.FormatInt(network.Forks.Consensus.Electra.Epoch, 10),
-				}
-				if len(network.Forks.Consensus.Electra.MinClientVersions) > 0 {
-					electraFork["minClientVersions"] = network.Forks.Consensus.Electra.MinClientVersions
-				}
-
-				if consensusMap, ok := forks["consensus"].(map[string]interface{}); ok {
-					consensusMap["electra"] = electraFork
-				}
-			}
-
-			networkConfig["forks"] = forks
-		}
-
-		networksConfig[network.Name] = networkConfig
-	}
-
-	response := map[string]interface{}{
-		"networks": networksConfig,
+	// Convert the internal config proto to public API proto
+	response := &apiv1.GetConfigResponse{
+		Config: convertConfigToAPIProto(grpcResp.Config),
 	}
 
 	// Set headers
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Vary", "Accept-Encoding")
-	// Network config data is relatively stable, cache for 5 minutes
-	w.Header().Set("Cache-Control", "public, max-age=300, s-maxage=300, stale-while-revalidate=120")
+	// Network config data is relatively stable, cache for 60 seconds
+	w.Header().Set("Cache-Control", "public, max-age=60, s-maxage=60, stale-while-revalidate=30")
 
 	// Write response
 	if err := json.NewEncoder(w).Encode(response); err != nil {
 		r.log.WithError(err).Error("Failed to encode network config response")
-	}
-}
-
-// handleListNetworks handles GET /api/v1/networks
-func (r *PublicRouter) handleListNetworks(w http.ResponseWriter, req *http.Request) {
-	ctx := req.Context()
-
-	// Handle CORS preflight
-	if req.Method == methodOptions {
-		w.WriteHeader(http.StatusOK)
-
-		return
-	}
-
-	// Parse query parameter for active_only filter
-	activeOnly := false
-	if v := req.URL.Query().Get("active_only"); v == "true" || v == "1" {
-		activeOnly = true
-	}
-
-	r.log.WithField("active_only", activeOnly).Debug("REST v1: ListNetworks")
-
-	// Call the gRPC service
-	grpcReq := &networkspb.ListNetworksRequest{
-		ActiveOnly: activeOnly,
-	}
-
-	grpcResp, err := r.networksClient.ListNetworks(ctx, grpcReq)
-	if err != nil {
-		r.log.WithError(err).Error("Failed to list networks")
-		r.handleError(w, err)
-
-		return
-	}
-
-	// Convert to API proto response format
-	networks := make([]*apiv1.Network, 0, len(grpcResp.Networks))
-	for _, network := range grpcResp.Networks {
-		networks = append(networks, &apiv1.Network{
-			Name:        network.Name,
-			Status:      network.Status,
-			ChainId:     network.ChainId,
-			LastUpdated: network.LastUpdated,
-		})
-	}
-
-	response := &apiv1.ListNetworksResponse{
-		Networks: networks,
-	}
-
-	// Add filter metadata if present
-	if grpcResp.Filters != nil {
-		response.Filters = &apiv1.NetworkFilterMetadata{
-			AppliedFilters: grpcResp.Filters.AppliedFilters,
-			TotalCount:     grpcResp.Filters.TotalCount,
-			FilteredCount:  grpcResp.Filters.FilteredCount,
-		}
-	}
-
-	// Set headers
-	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Vary", "Accept-Encoding")
-
-	// Cache headers for networks endpoint - 2 minute cache
-	// Networks data is relatively stable, so we can cache more aggressively
-	w.Header().Set("Cache-Control", "public, max-age=120, s-maxage=120, stale-while-revalidate=60")
-
-	// Write response
-	if err := json.NewEncoder(w).Encode(response); err != nil {
-		r.log.WithError(err).Error("Failed to encode response")
 	}
 }
 
@@ -560,4 +430,133 @@ func formatUnixTime(timestamp uint32) string {
 	}
 
 	return time.Unix(int64(timestamp), 0).Format(time.RFC3339)
+}
+
+// convertConfigToAPIProto converts the internal config proto to public API proto
+func convertConfigToAPIProto(config *configpb.FrontendConfig) *apiv1.FrontendConfig {
+	if config == nil {
+		return nil
+	}
+
+	result := &apiv1.FrontendConfig{}
+
+	// Convert Ethereum config
+	if config.Ethereum != nil {
+		ethereum := &apiv1.EthereumConfig{
+			Networks: make(map[string]*apiv1.NetworkConfig),
+		}
+
+		for name, network := range config.Ethereum.Networks {
+			networkConfig := &apiv1.NetworkConfig{
+				Name:        network.Name,
+				Status:      network.Status,
+				ChainId:     network.ChainId,
+				Description: network.Description,
+				GenesisTime: network.GenesisTime,
+				LastUpdated: network.LastUpdated,
+			}
+
+			// Add service URLs if present
+			if len(network.ServiceUrls) > 0 {
+				networkConfig.ServiceUrls = network.ServiceUrls
+			}
+
+			// Add forks if present
+			if network.Forks != nil && network.Forks.Consensus != nil && network.Forks.Consensus.Electra != nil {
+				networkConfig.Forks = &apiv1.ForkConfig{
+					Consensus: &apiv1.ConsensusForks{
+						Electra: &apiv1.ForkInfo{
+							Epoch:             network.Forks.Consensus.Electra.Epoch,
+							MinClientVersions: network.Forks.Consensus.Electra.MinClientVersions,
+						},
+					},
+				}
+			}
+
+			ethereum.Networks[name] = networkConfig
+		}
+
+		result.Ethereum = ethereum
+	}
+
+	// Convert Modules config
+	if config.Modules != nil {
+		modules := &apiv1.ModulesConfig{}
+
+		// Beacon Chain Timings module
+		if config.Modules.BeaconChainTimings != nil {
+			bct := &apiv1.BeaconChainTimingsModule{
+				Networks:   config.Modules.BeaconChainTimings.Networks,
+				PathPrefix: config.Modules.BeaconChainTimings.PathPrefix,
+			}
+
+			if config.Modules.BeaconChainTimings.TimeWindows != nil {
+				timeWindows := make([]*apiv1.TimeWindow, 0, len(config.Modules.BeaconChainTimings.TimeWindows))
+				for _, tw := range config.Modules.BeaconChainTimings.TimeWindows {
+					timeWindows = append(timeWindows, &apiv1.TimeWindow{
+						File:  tw.File,
+						Step:  tw.Step,
+						Range: tw.Range,
+						Label: tw.Label,
+					})
+				}
+
+				bct.TimeWindows = timeWindows
+			}
+
+			modules.BeaconChainTimings = bct
+		}
+
+		// Xatu Public Contributors module
+		if config.Modules.XatuPublicContributors != nil {
+			xpc := &apiv1.XatuPublicContributorsModule{
+				Networks:   config.Modules.XatuPublicContributors.Networks,
+				PathPrefix: config.Modules.XatuPublicContributors.PathPrefix,
+				Enabled:    config.Modules.XatuPublicContributors.Enabled,
+			}
+
+			if config.Modules.XatuPublicContributors.TimeWindows != nil {
+				timeWindows := make([]*apiv1.TimeWindow, 0, len(config.Modules.XatuPublicContributors.TimeWindows))
+				for _, tw := range config.Modules.XatuPublicContributors.TimeWindows {
+					timeWindows = append(timeWindows, &apiv1.TimeWindow{
+						File:  tw.File,
+						Step:  tw.Step,
+						Range: tw.Range,
+						Label: tw.Label,
+					})
+				}
+
+				xpc.TimeWindows = timeWindows
+			}
+
+			modules.XatuPublicContributors = xpc
+		}
+
+		// Beacon module
+		if config.Modules.Beacon != nil {
+			beacon := &apiv1.BeaconModule{
+				Enabled:     config.Modules.Beacon.Enabled,
+				Description: config.Modules.Beacon.Description,
+				PathPrefix:  config.Modules.Beacon.PathPrefix,
+			}
+
+			if len(config.Modules.Beacon.Networks) > 0 {
+				beaconNetworks := make(map[string]*apiv1.BeaconNetworkConfig)
+				for name, netCfg := range config.Modules.Beacon.Networks {
+					beaconNetworks[name] = &apiv1.BeaconNetworkConfig{
+						HeadLagSlots: netCfg.HeadLagSlots,
+						BacklogDays:  netCfg.BacklogDays,
+					}
+				}
+
+				beacon.Networks = beaconNetworks
+			}
+
+			modules.Beacon = beacon
+		}
+
+		result.Modules = modules
+	}
+
+	return result
 }

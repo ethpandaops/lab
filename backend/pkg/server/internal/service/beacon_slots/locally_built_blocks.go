@@ -148,7 +148,7 @@ func (p *LocallyBuiltBlocksProcessor) processNetworkBlocks(ctx context.Context, 
 	logCtx := p.log.WithField("network", networkName)
 	logCtx.Info("Starting locally built blocks processing for network")
 
-	ticker := time.NewTicker(time.Second)
+	ticker := time.NewTicker(1 * time.Second)
 	defer ticker.Stop()
 
 	lastProcessedSlot := phase0.Slot(0)
@@ -225,6 +225,35 @@ func (p *LocallyBuiltBlocksProcessor) processLocallyBuiltBlocksForSlot(ctx conte
 		"feature": "locally_built_blocks",
 		"slot":    slot,
 	})
+
+	// Acquire slot-level lock to prevent concurrent processing of the same slot
+	lockKey := fmt.Sprintf("locally_built_blocks:slot:%s:%d", networkName, slot)
+	lockTTL := 30 * time.Second // Allow enough time for processing
+
+	// Try to acquire the lock
+	token, acquired, err := p.lockerClient.Lock(lockKey, lockTTL)
+	if err != nil {
+		logCtx.WithError(err).Warn("Error acquiring slot lock for locally built blocks")
+
+		return
+	}
+
+	if !acquired {
+		// Another processor is already handling this slot
+		logCtx.Debug("Slot already being processed by another processor, skipping")
+
+		return
+	}
+
+	// Ensure we release the lock when done
+	defer func() {
+		released, err := p.lockerClient.Unlock(lockKey, token)
+		if err != nil {
+			logCtx.WithError(err).Warn("Failed to release slot lock")
+		} else if !released {
+			logCtx.Warn("Lock was not released (token invalid or lock expired)")
+		}
+	}()
 
 	// Check if we already have this slot data cached
 	cacheKey := GetLocallyBuiltBlockSlotCacheKey(networkName, slot)

@@ -24,7 +24,6 @@ import (
 	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/beacon_chain_timings"
 	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/beacon_slots"
 	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/cartographoor"
-	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/lab"
 	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/xatu_cbt"
 	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/xatu_public_contributors"
 	"github.com/sirupsen/logrus"
@@ -144,21 +143,14 @@ func (s *Service) Start(ctx context.Context) error {
 		return fmt.Errorf("failed to get beacon slots service")
 	}
 
-	labService, ok := s.getService(lab.ServiceName).(*lab.Lab)
-	if !ok {
-		s.log.Error("Failed to get lab service")
-
-		return fmt.Errorf("failed to get lab service")
-	}
-
 	// Instantiate gRPC handlers
 	grpcServices := []grpc.Service{
-		grpc.NewLab(s.log, labService),
 		grpc.NewBeaconChainTimings(s.log, bctService),
 		grpc.NewXatuPublicContributors(s.log, xpcService),
 		grpc.NewBeaconSlotsHandler(s.log, bsService),
 		grpc.NewXatuCBT(s.log, s.xatuCBTService),
 		grpc.NewCartographoorService(s.log, s.cartographoorService, s.ethereumClient),
+		grpc.NewConfigService(s.log, s.ethereumClient, s.cartographoorService, bctService, xpcService, bsService),
 	}
 
 	// Create gRPC server
@@ -240,21 +232,7 @@ func (s *Service) initializeServices(ctx context.Context) error { // ctx is alre
 		return fmt.Errorf("failed to initialize beacon slots service: %w", err)
 	}
 
-	labService, err := lab.New(
-		s.log,
-		s.ethereumClient,
-		s.cacheClient,
-		bct,
-		xpc,
-		beaconSlotsService,
-		s.metrics,
-	)
-	if err != nil {
-		return fmt.Errorf("failed to initialize lab service: %w", err)
-	}
-
 	s.services = []service.Service{
-		labService,
 		bct,
 		xpc,
 		beaconSlotsService,

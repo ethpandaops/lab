@@ -759,6 +759,814 @@ func (x *ErrorResponse) GetCode() int32 {
 	return 0
 }
 
+// GetConfigResponse is the v1 API response for getting the complete lab configuration.
+type GetConfigResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Config *FrontendConfig `protobuf:"bytes,1,opt,name=config,proto3" json:"config,omitempty"`
+}
+
+func (x *GetConfigResponse) Reset() {
+	*x = GetConfigResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_backend_pkg_api_v1_proto_public_proto_msgTypes[11]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetConfigResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetConfigResponse) ProtoMessage() {}
+
+func (x *GetConfigResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_backend_pkg_api_v1_proto_public_proto_msgTypes[11]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetConfigResponse.ProtoReflect.Descriptor instead.
+func (*GetConfigResponse) Descriptor() ([]byte, []int) {
+	return file_backend_pkg_api_v1_proto_public_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *GetConfigResponse) GetConfig() *FrontendConfig {
+	if x != nil {
+		return x.Config
+	}
+	return nil
+}
+
+// FrontendConfig represents the complete frontend configuration for public API consumption.
+type FrontendConfig struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Ethereum *EthereumConfig `protobuf:"bytes,1,opt,name=ethereum,proto3" json:"ethereum,omitempty"`
+	Modules  *ModulesConfig  `protobuf:"bytes,2,opt,name=modules,proto3" json:"modules,omitempty"`
+}
+
+func (x *FrontendConfig) Reset() {
+	*x = FrontendConfig{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_backend_pkg_api_v1_proto_public_proto_msgTypes[12]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *FrontendConfig) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FrontendConfig) ProtoMessage() {}
+
+func (x *FrontendConfig) ProtoReflect() protoreflect.Message {
+	mi := &file_backend_pkg_api_v1_proto_public_proto_msgTypes[12]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FrontendConfig.ProtoReflect.Descriptor instead.
+func (*FrontendConfig) Descriptor() ([]byte, []int) {
+	return file_backend_pkg_api_v1_proto_public_proto_rawDescGZIP(), []int{12}
+}
+
+func (x *FrontendConfig) GetEthereum() *EthereumConfig {
+	if x != nil {
+		return x.Ethereum
+	}
+	return nil
+}
+
+func (x *FrontendConfig) GetModules() *ModulesConfig {
+	if x != nil {
+		return x.Modules
+	}
+	return nil
+}
+
+// EthereumConfig contains Ethereum-related configuration for public API consumption.
+type EthereumConfig struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Networks map[string]*NetworkConfig `protobuf:"bytes,1,rep,name=networks,proto3" json:"networks,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+}
+
+func (x *EthereumConfig) Reset() {
+	*x = EthereumConfig{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_backend_pkg_api_v1_proto_public_proto_msgTypes[13]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *EthereumConfig) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*EthereumConfig) ProtoMessage() {}
+
+func (x *EthereumConfig) ProtoReflect() protoreflect.Message {
+	mi := &file_backend_pkg_api_v1_proto_public_proto_msgTypes[13]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use EthereumConfig.ProtoReflect.Descriptor instead.
+func (*EthereumConfig) Descriptor() ([]byte, []int) {
+	return file_backend_pkg_api_v1_proto_public_proto_rawDescGZIP(), []int{13}
+}
+
+func (x *EthereumConfig) GetNetworks() map[string]*NetworkConfig {
+	if x != nil {
+		return x.Networks
+	}
+	return nil
+}
+
+// NetworkConfig represents configuration for a single network for public API consumption.
+type NetworkConfig struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Name        string            `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	Status      string            `protobuf:"bytes,2,opt,name=status,proto3" json:"status,omitempty"`
+	ChainId     int64             `protobuf:"varint,3,opt,name=chain_id,json=chainId,proto3" json:"chain_id,omitempty"`
+	Description string            `protobuf:"bytes,4,opt,name=description,proto3" json:"description,omitempty"`
+	GenesisTime int64             `protobuf:"varint,5,opt,name=genesis_time,json=genesisTime,proto3" json:"genesis_time,omitempty"`
+	ServiceUrls map[string]string `protobuf:"bytes,6,rep,name=service_urls,json=serviceUrls,proto3" json:"service_urls,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	Forks       *ForkConfig       `protobuf:"bytes,7,opt,name=forks,proto3" json:"forks,omitempty"`
+	LastUpdated string            `protobuf:"bytes,8,opt,name=last_updated,json=lastUpdated,proto3" json:"last_updated,omitempty"`
+}
+
+func (x *NetworkConfig) Reset() {
+	*x = NetworkConfig{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_backend_pkg_api_v1_proto_public_proto_msgTypes[14]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *NetworkConfig) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*NetworkConfig) ProtoMessage() {}
+
+func (x *NetworkConfig) ProtoReflect() protoreflect.Message {
+	mi := &file_backend_pkg_api_v1_proto_public_proto_msgTypes[14]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use NetworkConfig.ProtoReflect.Descriptor instead.
+func (*NetworkConfig) Descriptor() ([]byte, []int) {
+	return file_backend_pkg_api_v1_proto_public_proto_rawDescGZIP(), []int{14}
+}
+
+func (x *NetworkConfig) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *NetworkConfig) GetStatus() string {
+	if x != nil {
+		return x.Status
+	}
+	return ""
+}
+
+func (x *NetworkConfig) GetChainId() int64 {
+	if x != nil {
+		return x.ChainId
+	}
+	return 0
+}
+
+func (x *NetworkConfig) GetDescription() string {
+	if x != nil {
+		return x.Description
+	}
+	return ""
+}
+
+func (x *NetworkConfig) GetGenesisTime() int64 {
+	if x != nil {
+		return x.GenesisTime
+	}
+	return 0
+}
+
+func (x *NetworkConfig) GetServiceUrls() map[string]string {
+	if x != nil {
+		return x.ServiceUrls
+	}
+	return nil
+}
+
+func (x *NetworkConfig) GetForks() *ForkConfig {
+	if x != nil {
+		return x.Forks
+	}
+	return nil
+}
+
+func (x *NetworkConfig) GetLastUpdated() string {
+	if x != nil {
+		return x.LastUpdated
+	}
+	return ""
+}
+
+// ForkConfig contains fork information for public API consumption.
+type ForkConfig struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Consensus *ConsensusForks `protobuf:"bytes,1,opt,name=consensus,proto3" json:"consensus,omitempty"`
+}
+
+func (x *ForkConfig) Reset() {
+	*x = ForkConfig{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_backend_pkg_api_v1_proto_public_proto_msgTypes[15]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *ForkConfig) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ForkConfig) ProtoMessage() {}
+
+func (x *ForkConfig) ProtoReflect() protoreflect.Message {
+	mi := &file_backend_pkg_api_v1_proto_public_proto_msgTypes[15]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ForkConfig.ProtoReflect.Descriptor instead.
+func (*ForkConfig) Descriptor() ([]byte, []int) {
+	return file_backend_pkg_api_v1_proto_public_proto_rawDescGZIP(), []int{15}
+}
+
+func (x *ForkConfig) GetConsensus() *ConsensusForks {
+	if x != nil {
+		return x.Consensus
+	}
+	return nil
+}
+
+// ConsensusForks contains consensus layer fork information for public API consumption.
+type ConsensusForks struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Electra *ForkInfo `protobuf:"bytes,1,opt,name=electra,proto3" json:"electra,omitempty"`
+}
+
+func (x *ConsensusForks) Reset() {
+	*x = ConsensusForks{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_backend_pkg_api_v1_proto_public_proto_msgTypes[16]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *ConsensusForks) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ConsensusForks) ProtoMessage() {}
+
+func (x *ConsensusForks) ProtoReflect() protoreflect.Message {
+	mi := &file_backend_pkg_api_v1_proto_public_proto_msgTypes[16]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ConsensusForks.ProtoReflect.Descriptor instead.
+func (*ConsensusForks) Descriptor() ([]byte, []int) {
+	return file_backend_pkg_api_v1_proto_public_proto_rawDescGZIP(), []int{16}
+}
+
+func (x *ConsensusForks) GetElectra() *ForkInfo {
+	if x != nil {
+		return x.Electra
+	}
+	return nil
+}
+
+// ForkInfo contains information about a specific fork for public API consumption.
+type ForkInfo struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Epoch             int64             `protobuf:"varint,1,opt,name=epoch,proto3" json:"epoch,omitempty"`
+	MinClientVersions map[string]string `protobuf:"bytes,2,rep,name=min_client_versions,json=minClientVersions,proto3" json:"min_client_versions,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+}
+
+func (x *ForkInfo) Reset() {
+	*x = ForkInfo{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_backend_pkg_api_v1_proto_public_proto_msgTypes[17]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *ForkInfo) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ForkInfo) ProtoMessage() {}
+
+func (x *ForkInfo) ProtoReflect() protoreflect.Message {
+	mi := &file_backend_pkg_api_v1_proto_public_proto_msgTypes[17]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ForkInfo.ProtoReflect.Descriptor instead.
+func (*ForkInfo) Descriptor() ([]byte, []int) {
+	return file_backend_pkg_api_v1_proto_public_proto_rawDescGZIP(), []int{17}
+}
+
+func (x *ForkInfo) GetEpoch() int64 {
+	if x != nil {
+		return x.Epoch
+	}
+	return 0
+}
+
+func (x *ForkInfo) GetMinClientVersions() map[string]string {
+	if x != nil {
+		return x.MinClientVersions
+	}
+	return nil
+}
+
+// ModulesConfig contains all module configurations for public API consumption.
+type ModulesConfig struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	BeaconChainTimings     *BeaconChainTimingsModule     `protobuf:"bytes,1,opt,name=beacon_chain_timings,json=beaconChainTimings,proto3" json:"beacon_chain_timings,omitempty"`
+	XatuPublicContributors *XatuPublicContributorsModule `protobuf:"bytes,2,opt,name=xatu_public_contributors,json=xatuPublicContributors,proto3" json:"xatu_public_contributors,omitempty"`
+	Beacon                 *BeaconModule                 `protobuf:"bytes,3,opt,name=beacon,proto3" json:"beacon,omitempty"`
+}
+
+func (x *ModulesConfig) Reset() {
+	*x = ModulesConfig{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_backend_pkg_api_v1_proto_public_proto_msgTypes[18]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *ModulesConfig) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ModulesConfig) ProtoMessage() {}
+
+func (x *ModulesConfig) ProtoReflect() protoreflect.Message {
+	mi := &file_backend_pkg_api_v1_proto_public_proto_msgTypes[18]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ModulesConfig.ProtoReflect.Descriptor instead.
+func (*ModulesConfig) Descriptor() ([]byte, []int) {
+	return file_backend_pkg_api_v1_proto_public_proto_rawDescGZIP(), []int{18}
+}
+
+func (x *ModulesConfig) GetBeaconChainTimings() *BeaconChainTimingsModule {
+	if x != nil {
+		return x.BeaconChainTimings
+	}
+	return nil
+}
+
+func (x *ModulesConfig) GetXatuPublicContributors() *XatuPublicContributorsModule {
+	if x != nil {
+		return x.XatuPublicContributors
+	}
+	return nil
+}
+
+func (x *ModulesConfig) GetBeacon() *BeaconModule {
+	if x != nil {
+		return x.Beacon
+	}
+	return nil
+}
+
+// BeaconChainTimingsModule configuration for public API consumption.
+type BeaconChainTimingsModule struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Networks    []string      `protobuf:"bytes,1,rep,name=networks,proto3" json:"networks,omitempty"`
+	TimeWindows []*TimeWindow `protobuf:"bytes,2,rep,name=time_windows,json=timeWindows,proto3" json:"time_windows,omitempty"`
+	PathPrefix  string        `protobuf:"bytes,3,opt,name=path_prefix,json=pathPrefix,proto3" json:"path_prefix,omitempty"`
+}
+
+func (x *BeaconChainTimingsModule) Reset() {
+	*x = BeaconChainTimingsModule{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_backend_pkg_api_v1_proto_public_proto_msgTypes[19]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *BeaconChainTimingsModule) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BeaconChainTimingsModule) ProtoMessage() {}
+
+func (x *BeaconChainTimingsModule) ProtoReflect() protoreflect.Message {
+	mi := &file_backend_pkg_api_v1_proto_public_proto_msgTypes[19]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BeaconChainTimingsModule.ProtoReflect.Descriptor instead.
+func (*BeaconChainTimingsModule) Descriptor() ([]byte, []int) {
+	return file_backend_pkg_api_v1_proto_public_proto_rawDescGZIP(), []int{19}
+}
+
+func (x *BeaconChainTimingsModule) GetNetworks() []string {
+	if x != nil {
+		return x.Networks
+	}
+	return nil
+}
+
+func (x *BeaconChainTimingsModule) GetTimeWindows() []*TimeWindow {
+	if x != nil {
+		return x.TimeWindows
+	}
+	return nil
+}
+
+func (x *BeaconChainTimingsModule) GetPathPrefix() string {
+	if x != nil {
+		return x.PathPrefix
+	}
+	return ""
+}
+
+// XatuPublicContributorsModule configuration for public API consumption.
+type XatuPublicContributorsModule struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Networks    []string      `protobuf:"bytes,1,rep,name=networks,proto3" json:"networks,omitempty"`
+	TimeWindows []*TimeWindow `protobuf:"bytes,2,rep,name=time_windows,json=timeWindows,proto3" json:"time_windows,omitempty"`
+	PathPrefix  string        `protobuf:"bytes,3,opt,name=path_prefix,json=pathPrefix,proto3" json:"path_prefix,omitempty"`
+	Enabled     bool          `protobuf:"varint,4,opt,name=enabled,proto3" json:"enabled,omitempty"`
+}
+
+func (x *XatuPublicContributorsModule) Reset() {
+	*x = XatuPublicContributorsModule{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_backend_pkg_api_v1_proto_public_proto_msgTypes[20]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *XatuPublicContributorsModule) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*XatuPublicContributorsModule) ProtoMessage() {}
+
+func (x *XatuPublicContributorsModule) ProtoReflect() protoreflect.Message {
+	mi := &file_backend_pkg_api_v1_proto_public_proto_msgTypes[20]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use XatuPublicContributorsModule.ProtoReflect.Descriptor instead.
+func (*XatuPublicContributorsModule) Descriptor() ([]byte, []int) {
+	return file_backend_pkg_api_v1_proto_public_proto_rawDescGZIP(), []int{20}
+}
+
+func (x *XatuPublicContributorsModule) GetNetworks() []string {
+	if x != nil {
+		return x.Networks
+	}
+	return nil
+}
+
+func (x *XatuPublicContributorsModule) GetTimeWindows() []*TimeWindow {
+	if x != nil {
+		return x.TimeWindows
+	}
+	return nil
+}
+
+func (x *XatuPublicContributorsModule) GetPathPrefix() string {
+	if x != nil {
+		return x.PathPrefix
+	}
+	return ""
+}
+
+func (x *XatuPublicContributorsModule) GetEnabled() bool {
+	if x != nil {
+		return x.Enabled
+	}
+	return false
+}
+
+// BeaconModule configuration for public API consumption.
+type BeaconModule struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Enabled     bool                            `protobuf:"varint,1,opt,name=enabled,proto3" json:"enabled,omitempty"`
+	Description string                          `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
+	PathPrefix  string                          `protobuf:"bytes,3,opt,name=path_prefix,json=pathPrefix,proto3" json:"path_prefix,omitempty"`
+	Networks    map[string]*BeaconNetworkConfig `protobuf:"bytes,4,rep,name=networks,proto3" json:"networks,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+}
+
+func (x *BeaconModule) Reset() {
+	*x = BeaconModule{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_backend_pkg_api_v1_proto_public_proto_msgTypes[21]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *BeaconModule) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BeaconModule) ProtoMessage() {}
+
+func (x *BeaconModule) ProtoReflect() protoreflect.Message {
+	mi := &file_backend_pkg_api_v1_proto_public_proto_msgTypes[21]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BeaconModule.ProtoReflect.Descriptor instead.
+func (*BeaconModule) Descriptor() ([]byte, []int) {
+	return file_backend_pkg_api_v1_proto_public_proto_rawDescGZIP(), []int{21}
+}
+
+func (x *BeaconModule) GetEnabled() bool {
+	if x != nil {
+		return x.Enabled
+	}
+	return false
+}
+
+func (x *BeaconModule) GetDescription() string {
+	if x != nil {
+		return x.Description
+	}
+	return ""
+}
+
+func (x *BeaconModule) GetPathPrefix() string {
+	if x != nil {
+		return x.PathPrefix
+	}
+	return ""
+}
+
+func (x *BeaconModule) GetNetworks() map[string]*BeaconNetworkConfig {
+	if x != nil {
+		return x.Networks
+	}
+	return nil
+}
+
+// BeaconNetworkConfig contains beacon-specific network configuration for public API consumption.
+type BeaconNetworkConfig struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	HeadLagSlots int32 `protobuf:"varint,1,opt,name=head_lag_slots,json=headLagSlots,proto3" json:"head_lag_slots,omitempty"`
+	BacklogDays  int32 `protobuf:"varint,2,opt,name=backlog_days,json=backlogDays,proto3" json:"backlog_days,omitempty"`
+}
+
+func (x *BeaconNetworkConfig) Reset() {
+	*x = BeaconNetworkConfig{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_backend_pkg_api_v1_proto_public_proto_msgTypes[22]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *BeaconNetworkConfig) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BeaconNetworkConfig) ProtoMessage() {}
+
+func (x *BeaconNetworkConfig) ProtoReflect() protoreflect.Message {
+	mi := &file_backend_pkg_api_v1_proto_public_proto_msgTypes[22]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BeaconNetworkConfig.ProtoReflect.Descriptor instead.
+func (*BeaconNetworkConfig) Descriptor() ([]byte, []int) {
+	return file_backend_pkg_api_v1_proto_public_proto_rawDescGZIP(), []int{22}
+}
+
+func (x *BeaconNetworkConfig) GetHeadLagSlots() int32 {
+	if x != nil {
+		return x.HeadLagSlots
+	}
+	return 0
+}
+
+func (x *BeaconNetworkConfig) GetBacklogDays() int32 {
+	if x != nil {
+		return x.BacklogDays
+	}
+	return 0
+}
+
+// TimeWindow represents a time window configuration for public API consumption.
+type TimeWindow struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	File  string `protobuf:"bytes,1,opt,name=file,proto3" json:"file,omitempty"`
+	Step  string `protobuf:"bytes,2,opt,name=step,proto3" json:"step,omitempty"`
+	Range string `protobuf:"bytes,3,opt,name=range,proto3" json:"range,omitempty"`
+	Label string `protobuf:"bytes,4,opt,name=label,proto3" json:"label,omitempty"`
+}
+
+func (x *TimeWindow) Reset() {
+	*x = TimeWindow{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_backend_pkg_api_v1_proto_public_proto_msgTypes[23]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *TimeWindow) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TimeWindow) ProtoMessage() {}
+
+func (x *TimeWindow) ProtoReflect() protoreflect.Message {
+	mi := &file_backend_pkg_api_v1_proto_public_proto_msgTypes[23]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TimeWindow.ProtoReflect.Descriptor instead.
+func (*TimeWindow) Descriptor() ([]byte, []int) {
+	return file_backend_pkg_api_v1_proto_public_proto_rawDescGZIP(), []int{23}
+}
+
+func (x *TimeWindow) GetFile() string {
+	if x != nil {
+		return x.File
+	}
+	return ""
+}
+
+func (x *TimeWindow) GetStep() string {
+	if x != nil {
+		return x.Step
+	}
+	return ""
+}
+
+func (x *TimeWindow) GetRange() string {
+	if x != nil {
+		return x.Range
+	}
+	return ""
+}
+
+func (x *TimeWindow) GetLabel() string {
+	if x != nil {
+		return x.Label
+	}
+	return ""
+}
+
 var File_backend_pkg_api_v1_proto_public_proto protoreflect.FileDescriptor
 
 var file_backend_pkg_api_v1_proto_public_proto_rawDesc = []byte{
@@ -862,11 +1670,141 @@ var file_backend_pkg_api_v1_proto_public_proto_rawDesc = []byte{
 	0x09, 0x52, 0x05, 0x65, 0x72, 0x72, 0x6f, 0x72, 0x12, 0x18, 0x0a, 0x07, 0x6d, 0x65, 0x73, 0x73,
 	0x61, 0x67, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x6d, 0x65, 0x73, 0x73, 0x61,
 	0x67, 0x65, 0x12, 0x12, 0x0a, 0x04, 0x63, 0x6f, 0x64, 0x65, 0x18, 0x03, 0x20, 0x01, 0x28, 0x05,
-	0x52, 0x04, 0x63, 0x6f, 0x64, 0x65, 0x42, 0x35, 0x5a, 0x33, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62,
-	0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x65, 0x74, 0x68, 0x70, 0x61, 0x6e, 0x64, 0x61, 0x6f, 0x70, 0x73,
-	0x2f, 0x6c, 0x61, 0x62, 0x2f, 0x62, 0x61, 0x63, 0x6b, 0x65, 0x6e, 0x64, 0x2f, 0x70, 0x6b, 0x67,
-	0x2f, 0x61, 0x70, 0x69, 0x2f, 0x76, 0x31, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x06, 0x70,
-	0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x52, 0x04, 0x63, 0x6f, 0x64, 0x65, 0x22, 0x43, 0x0a, 0x11, 0x47, 0x65, 0x74, 0x43, 0x6f, 0x6e,
+	0x66, 0x69, 0x67, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x2e, 0x0a, 0x06, 0x63,
+	0x6f, 0x6e, 0x66, 0x69, 0x67, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x16, 0x2e, 0x61, 0x70,
+	0x69, 0x2e, 0x76, 0x31, 0x2e, 0x46, 0x72, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x64, 0x43, 0x6f, 0x6e,
+	0x66, 0x69, 0x67, 0x52, 0x06, 0x63, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x22, 0x75, 0x0a, 0x0e, 0x46,
+	0x72, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x64, 0x43, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x12, 0x32, 0x0a,
+	0x08, 0x65, 0x74, 0x68, 0x65, 0x72, 0x65, 0x75, 0x6d, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32,
+	0x16, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x76, 0x31, 0x2e, 0x45, 0x74, 0x68, 0x65, 0x72, 0x65, 0x75,
+	0x6d, 0x43, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x52, 0x08, 0x65, 0x74, 0x68, 0x65, 0x72, 0x65, 0x75,
+	0x6d, 0x12, 0x2f, 0x0a, 0x07, 0x6d, 0x6f, 0x64, 0x75, 0x6c, 0x65, 0x73, 0x18, 0x02, 0x20, 0x01,
+	0x28, 0x0b, 0x32, 0x15, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x76, 0x31, 0x2e, 0x4d, 0x6f, 0x64, 0x75,
+	0x6c, 0x65, 0x73, 0x43, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x52, 0x07, 0x6d, 0x6f, 0x64, 0x75, 0x6c,
+	0x65, 0x73, 0x22, 0xa6, 0x01, 0x0a, 0x0e, 0x45, 0x74, 0x68, 0x65, 0x72, 0x65, 0x75, 0x6d, 0x43,
+	0x6f, 0x6e, 0x66, 0x69, 0x67, 0x12, 0x40, 0x0a, 0x08, 0x6e, 0x65, 0x74, 0x77, 0x6f, 0x72, 0x6b,
+	0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x24, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x76, 0x31,
+	0x2e, 0x45, 0x74, 0x68, 0x65, 0x72, 0x65, 0x75, 0x6d, 0x43, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x2e,
+	0x4e, 0x65, 0x74, 0x77, 0x6f, 0x72, 0x6b, 0x73, 0x45, 0x6e, 0x74, 0x72, 0x79, 0x52, 0x08, 0x6e,
+	0x65, 0x74, 0x77, 0x6f, 0x72, 0x6b, 0x73, 0x1a, 0x52, 0x0a, 0x0d, 0x4e, 0x65, 0x74, 0x77, 0x6f,
+	0x72, 0x6b, 0x73, 0x45, 0x6e, 0x74, 0x72, 0x79, 0x12, 0x10, 0x0a, 0x03, 0x6b, 0x65, 0x79, 0x18,
+	0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x03, 0x6b, 0x65, 0x79, 0x12, 0x2b, 0x0a, 0x05, 0x76, 0x61,
+	0x6c, 0x75, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x15, 0x2e, 0x61, 0x70, 0x69, 0x2e,
+	0x76, 0x31, 0x2e, 0x4e, 0x65, 0x74, 0x77, 0x6f, 0x72, 0x6b, 0x43, 0x6f, 0x6e, 0x66, 0x69, 0x67,
+	0x52, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x3a, 0x02, 0x38, 0x01, 0x22, 0xf3, 0x02, 0x0a, 0x0d,
+	0x4e, 0x65, 0x74, 0x77, 0x6f, 0x72, 0x6b, 0x43, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x12, 0x12, 0x0a,
+	0x04, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x6e, 0x61, 0x6d,
+	0x65, 0x12, 0x16, 0x0a, 0x06, 0x73, 0x74, 0x61, 0x74, 0x75, 0x73, 0x18, 0x02, 0x20, 0x01, 0x28,
+	0x09, 0x52, 0x06, 0x73, 0x74, 0x61, 0x74, 0x75, 0x73, 0x12, 0x19, 0x0a, 0x08, 0x63, 0x68, 0x61,
+	0x69, 0x6e, 0x5f, 0x69, 0x64, 0x18, 0x03, 0x20, 0x01, 0x28, 0x03, 0x52, 0x07, 0x63, 0x68, 0x61,
+	0x69, 0x6e, 0x49, 0x64, 0x12, 0x20, 0x0a, 0x0b, 0x64, 0x65, 0x73, 0x63, 0x72, 0x69, 0x70, 0x74,
+	0x69, 0x6f, 0x6e, 0x18, 0x04, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0b, 0x64, 0x65, 0x73, 0x63, 0x72,
+	0x69, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x12, 0x21, 0x0a, 0x0c, 0x67, 0x65, 0x6e, 0x65, 0x73, 0x69,
+	0x73, 0x5f, 0x74, 0x69, 0x6d, 0x65, 0x18, 0x05, 0x20, 0x01, 0x28, 0x03, 0x52, 0x0b, 0x67, 0x65,
+	0x6e, 0x65, 0x73, 0x69, 0x73, 0x54, 0x69, 0x6d, 0x65, 0x12, 0x49, 0x0a, 0x0c, 0x73, 0x65, 0x72,
+	0x76, 0x69, 0x63, 0x65, 0x5f, 0x75, 0x72, 0x6c, 0x73, 0x18, 0x06, 0x20, 0x03, 0x28, 0x0b, 0x32,
+	0x26, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x76, 0x31, 0x2e, 0x4e, 0x65, 0x74, 0x77, 0x6f, 0x72, 0x6b,
+	0x43, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x2e, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x55, 0x72,
+	0x6c, 0x73, 0x45, 0x6e, 0x74, 0x72, 0x79, 0x52, 0x0b, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65,
+	0x55, 0x72, 0x6c, 0x73, 0x12, 0x28, 0x0a, 0x05, 0x66, 0x6f, 0x72, 0x6b, 0x73, 0x18, 0x07, 0x20,
+	0x01, 0x28, 0x0b, 0x32, 0x12, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x76, 0x31, 0x2e, 0x46, 0x6f, 0x72,
+	0x6b, 0x43, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x52, 0x05, 0x66, 0x6f, 0x72, 0x6b, 0x73, 0x12, 0x21,
+	0x0a, 0x0c, 0x6c, 0x61, 0x73, 0x74, 0x5f, 0x75, 0x70, 0x64, 0x61, 0x74, 0x65, 0x64, 0x18, 0x08,
+	0x20, 0x01, 0x28, 0x09, 0x52, 0x0b, 0x6c, 0x61, 0x73, 0x74, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65,
+	0x64, 0x1a, 0x3e, 0x0a, 0x10, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x55, 0x72, 0x6c, 0x73,
+	0x45, 0x6e, 0x74, 0x72, 0x79, 0x12, 0x10, 0x0a, 0x03, 0x6b, 0x65, 0x79, 0x18, 0x01, 0x20, 0x01,
+	0x28, 0x09, 0x52, 0x03, 0x6b, 0x65, 0x79, 0x12, 0x14, 0x0a, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65,
+	0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x3a, 0x02, 0x38,
+	0x01, 0x22, 0x42, 0x0a, 0x0a, 0x46, 0x6f, 0x72, 0x6b, 0x43, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x12,
+	0x34, 0x0a, 0x09, 0x63, 0x6f, 0x6e, 0x73, 0x65, 0x6e, 0x73, 0x75, 0x73, 0x18, 0x01, 0x20, 0x01,
+	0x28, 0x0b, 0x32, 0x16, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x76, 0x31, 0x2e, 0x43, 0x6f, 0x6e, 0x73,
+	0x65, 0x6e, 0x73, 0x75, 0x73, 0x46, 0x6f, 0x72, 0x6b, 0x73, 0x52, 0x09, 0x63, 0x6f, 0x6e, 0x73,
+	0x65, 0x6e, 0x73, 0x75, 0x73, 0x22, 0x3c, 0x0a, 0x0e, 0x43, 0x6f, 0x6e, 0x73, 0x65, 0x6e, 0x73,
+	0x75, 0x73, 0x46, 0x6f, 0x72, 0x6b, 0x73, 0x12, 0x2a, 0x0a, 0x07, 0x65, 0x6c, 0x65, 0x63, 0x74,
+	0x72, 0x61, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x10, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x76,
+	0x31, 0x2e, 0x46, 0x6f, 0x72, 0x6b, 0x49, 0x6e, 0x66, 0x6f, 0x52, 0x07, 0x65, 0x6c, 0x65, 0x63,
+	0x74, 0x72, 0x61, 0x22, 0xbf, 0x01, 0x0a, 0x08, 0x46, 0x6f, 0x72, 0x6b, 0x49, 0x6e, 0x66, 0x6f,
+	0x12, 0x14, 0x0a, 0x05, 0x65, 0x70, 0x6f, 0x63, 0x68, 0x18, 0x01, 0x20, 0x01, 0x28, 0x03, 0x52,
+	0x05, 0x65, 0x70, 0x6f, 0x63, 0x68, 0x12, 0x57, 0x0a, 0x13, 0x6d, 0x69, 0x6e, 0x5f, 0x63, 0x6c,
+	0x69, 0x65, 0x6e, 0x74, 0x5f, 0x76, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x73, 0x18, 0x02, 0x20,
+	0x03, 0x28, 0x0b, 0x32, 0x27, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x76, 0x31, 0x2e, 0x46, 0x6f, 0x72,
+	0x6b, 0x49, 0x6e, 0x66, 0x6f, 0x2e, 0x4d, 0x69, 0x6e, 0x43, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x56,
+	0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x73, 0x45, 0x6e, 0x74, 0x72, 0x79, 0x52, 0x11, 0x6d, 0x69,
+	0x6e, 0x43, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x56, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x73, 0x1a,
+	0x44, 0x0a, 0x16, 0x4d, 0x69, 0x6e, 0x43, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x56, 0x65, 0x72, 0x73,
+	0x69, 0x6f, 0x6e, 0x73, 0x45, 0x6e, 0x74, 0x72, 0x79, 0x12, 0x10, 0x0a, 0x03, 0x6b, 0x65, 0x79,
+	0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x03, 0x6b, 0x65, 0x79, 0x12, 0x14, 0x0a, 0x05, 0x76,
+	0x61, 0x6c, 0x75, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x76, 0x61, 0x6c, 0x75,
+	0x65, 0x3a, 0x02, 0x38, 0x01, 0x22, 0xf1, 0x01, 0x0a, 0x0d, 0x4d, 0x6f, 0x64, 0x75, 0x6c, 0x65,
+	0x73, 0x43, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x12, 0x52, 0x0a, 0x14, 0x62, 0x65, 0x61, 0x63, 0x6f,
+	0x6e, 0x5f, 0x63, 0x68, 0x61, 0x69, 0x6e, 0x5f, 0x74, 0x69, 0x6d, 0x69, 0x6e, 0x67, 0x73, 0x18,
+	0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x20, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x76, 0x31, 0x2e, 0x42,
+	0x65, 0x61, 0x63, 0x6f, 0x6e, 0x43, 0x68, 0x61, 0x69, 0x6e, 0x54, 0x69, 0x6d, 0x69, 0x6e, 0x67,
+	0x73, 0x4d, 0x6f, 0x64, 0x75, 0x6c, 0x65, 0x52, 0x12, 0x62, 0x65, 0x61, 0x63, 0x6f, 0x6e, 0x43,
+	0x68, 0x61, 0x69, 0x6e, 0x54, 0x69, 0x6d, 0x69, 0x6e, 0x67, 0x73, 0x12, 0x5e, 0x0a, 0x18, 0x78,
+	0x61, 0x74, 0x75, 0x5f, 0x70, 0x75, 0x62, 0x6c, 0x69, 0x63, 0x5f, 0x63, 0x6f, 0x6e, 0x74, 0x72,
+	0x69, 0x62, 0x75, 0x74, 0x6f, 0x72, 0x73, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x24, 0x2e,
+	0x61, 0x70, 0x69, 0x2e, 0x76, 0x31, 0x2e, 0x58, 0x61, 0x74, 0x75, 0x50, 0x75, 0x62, 0x6c, 0x69,
+	0x63, 0x43, 0x6f, 0x6e, 0x74, 0x72, 0x69, 0x62, 0x75, 0x74, 0x6f, 0x72, 0x73, 0x4d, 0x6f, 0x64,
+	0x75, 0x6c, 0x65, 0x52, 0x16, 0x78, 0x61, 0x74, 0x75, 0x50, 0x75, 0x62, 0x6c, 0x69, 0x63, 0x43,
+	0x6f, 0x6e, 0x74, 0x72, 0x69, 0x62, 0x75, 0x74, 0x6f, 0x72, 0x73, 0x12, 0x2c, 0x0a, 0x06, 0x62,
+	0x65, 0x61, 0x63, 0x6f, 0x6e, 0x18, 0x03, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x14, 0x2e, 0x61, 0x70,
+	0x69, 0x2e, 0x76, 0x31, 0x2e, 0x42, 0x65, 0x61, 0x63, 0x6f, 0x6e, 0x4d, 0x6f, 0x64, 0x75, 0x6c,
+	0x65, 0x52, 0x06, 0x62, 0x65, 0x61, 0x63, 0x6f, 0x6e, 0x22, 0x8e, 0x01, 0x0a, 0x18, 0x42, 0x65,
+	0x61, 0x63, 0x6f, 0x6e, 0x43, 0x68, 0x61, 0x69, 0x6e, 0x54, 0x69, 0x6d, 0x69, 0x6e, 0x67, 0x73,
+	0x4d, 0x6f, 0x64, 0x75, 0x6c, 0x65, 0x12, 0x1a, 0x0a, 0x08, 0x6e, 0x65, 0x74, 0x77, 0x6f, 0x72,
+	0x6b, 0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x09, 0x52, 0x08, 0x6e, 0x65, 0x74, 0x77, 0x6f, 0x72,
+	0x6b, 0x73, 0x12, 0x35, 0x0a, 0x0c, 0x74, 0x69, 0x6d, 0x65, 0x5f, 0x77, 0x69, 0x6e, 0x64, 0x6f,
+	0x77, 0x73, 0x18, 0x02, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x12, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x76,
+	0x31, 0x2e, 0x54, 0x69, 0x6d, 0x65, 0x57, 0x69, 0x6e, 0x64, 0x6f, 0x77, 0x52, 0x0b, 0x74, 0x69,
+	0x6d, 0x65, 0x57, 0x69, 0x6e, 0x64, 0x6f, 0x77, 0x73, 0x12, 0x1f, 0x0a, 0x0b, 0x70, 0x61, 0x74,
+	0x68, 0x5f, 0x70, 0x72, 0x65, 0x66, 0x69, 0x78, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0a,
+	0x70, 0x61, 0x74, 0x68, 0x50, 0x72, 0x65, 0x66, 0x69, 0x78, 0x22, 0xac, 0x01, 0x0a, 0x1c, 0x58,
+	0x61, 0x74, 0x75, 0x50, 0x75, 0x62, 0x6c, 0x69, 0x63, 0x43, 0x6f, 0x6e, 0x74, 0x72, 0x69, 0x62,
+	0x75, 0x74, 0x6f, 0x72, 0x73, 0x4d, 0x6f, 0x64, 0x75, 0x6c, 0x65, 0x12, 0x1a, 0x0a, 0x08, 0x6e,
+	0x65, 0x74, 0x77, 0x6f, 0x72, 0x6b, 0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x09, 0x52, 0x08, 0x6e,
+	0x65, 0x74, 0x77, 0x6f, 0x72, 0x6b, 0x73, 0x12, 0x35, 0x0a, 0x0c, 0x74, 0x69, 0x6d, 0x65, 0x5f,
+	0x77, 0x69, 0x6e, 0x64, 0x6f, 0x77, 0x73, 0x18, 0x02, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x12, 0x2e,
+	0x61, 0x70, 0x69, 0x2e, 0x76, 0x31, 0x2e, 0x54, 0x69, 0x6d, 0x65, 0x57, 0x69, 0x6e, 0x64, 0x6f,
+	0x77, 0x52, 0x0b, 0x74, 0x69, 0x6d, 0x65, 0x57, 0x69, 0x6e, 0x64, 0x6f, 0x77, 0x73, 0x12, 0x1f,
+	0x0a, 0x0b, 0x70, 0x61, 0x74, 0x68, 0x5f, 0x70, 0x72, 0x65, 0x66, 0x69, 0x78, 0x18, 0x03, 0x20,
+	0x01, 0x28, 0x09, 0x52, 0x0a, 0x70, 0x61, 0x74, 0x68, 0x50, 0x72, 0x65, 0x66, 0x69, 0x78, 0x12,
+	0x18, 0x0a, 0x07, 0x65, 0x6e, 0x61, 0x62, 0x6c, 0x65, 0x64, 0x18, 0x04, 0x20, 0x01, 0x28, 0x08,
+	0x52, 0x07, 0x65, 0x6e, 0x61, 0x62, 0x6c, 0x65, 0x64, 0x22, 0x85, 0x02, 0x0a, 0x0c, 0x42, 0x65,
+	0x61, 0x63, 0x6f, 0x6e, 0x4d, 0x6f, 0x64, 0x75, 0x6c, 0x65, 0x12, 0x18, 0x0a, 0x07, 0x65, 0x6e,
+	0x61, 0x62, 0x6c, 0x65, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x08, 0x52, 0x07, 0x65, 0x6e, 0x61,
+	0x62, 0x6c, 0x65, 0x64, 0x12, 0x20, 0x0a, 0x0b, 0x64, 0x65, 0x73, 0x63, 0x72, 0x69, 0x70, 0x74,
+	0x69, 0x6f, 0x6e, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0b, 0x64, 0x65, 0x73, 0x63, 0x72,
+	0x69, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x12, 0x1f, 0x0a, 0x0b, 0x70, 0x61, 0x74, 0x68, 0x5f, 0x70,
+	0x72, 0x65, 0x66, 0x69, 0x78, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0a, 0x70, 0x61, 0x74,
+	0x68, 0x50, 0x72, 0x65, 0x66, 0x69, 0x78, 0x12, 0x3e, 0x0a, 0x08, 0x6e, 0x65, 0x74, 0x77, 0x6f,
+	0x72, 0x6b, 0x73, 0x18, 0x04, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x22, 0x2e, 0x61, 0x70, 0x69, 0x2e,
+	0x76, 0x31, 0x2e, 0x42, 0x65, 0x61, 0x63, 0x6f, 0x6e, 0x4d, 0x6f, 0x64, 0x75, 0x6c, 0x65, 0x2e,
+	0x4e, 0x65, 0x74, 0x77, 0x6f, 0x72, 0x6b, 0x73, 0x45, 0x6e, 0x74, 0x72, 0x79, 0x52, 0x08, 0x6e,
+	0x65, 0x74, 0x77, 0x6f, 0x72, 0x6b, 0x73, 0x1a, 0x58, 0x0a, 0x0d, 0x4e, 0x65, 0x74, 0x77, 0x6f,
+	0x72, 0x6b, 0x73, 0x45, 0x6e, 0x74, 0x72, 0x79, 0x12, 0x10, 0x0a, 0x03, 0x6b, 0x65, 0x79, 0x18,
+	0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x03, 0x6b, 0x65, 0x79, 0x12, 0x31, 0x0a, 0x05, 0x76, 0x61,
+	0x6c, 0x75, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1b, 0x2e, 0x61, 0x70, 0x69, 0x2e,
+	0x76, 0x31, 0x2e, 0x42, 0x65, 0x61, 0x63, 0x6f, 0x6e, 0x4e, 0x65, 0x74, 0x77, 0x6f, 0x72, 0x6b,
+	0x43, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x52, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x3a, 0x02, 0x38,
+	0x01, 0x22, 0x5e, 0x0a, 0x13, 0x42, 0x65, 0x61, 0x63, 0x6f, 0x6e, 0x4e, 0x65, 0x74, 0x77, 0x6f,
+	0x72, 0x6b, 0x43, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x12, 0x24, 0x0a, 0x0e, 0x68, 0x65, 0x61, 0x64,
+	0x5f, 0x6c, 0x61, 0x67, 0x5f, 0x73, 0x6c, 0x6f, 0x74, 0x73, 0x18, 0x01, 0x20, 0x01, 0x28, 0x05,
+	0x52, 0x0c, 0x68, 0x65, 0x61, 0x64, 0x4c, 0x61, 0x67, 0x53, 0x6c, 0x6f, 0x74, 0x73, 0x12, 0x21,
+	0x0a, 0x0c, 0x62, 0x61, 0x63, 0x6b, 0x6c, 0x6f, 0x67, 0x5f, 0x64, 0x61, 0x79, 0x73, 0x18, 0x02,
+	0x20, 0x01, 0x28, 0x05, 0x52, 0x0b, 0x62, 0x61, 0x63, 0x6b, 0x6c, 0x6f, 0x67, 0x44, 0x61, 0x79,
+	0x73, 0x22, 0x60, 0x0a, 0x0a, 0x54, 0x69, 0x6d, 0x65, 0x57, 0x69, 0x6e, 0x64, 0x6f, 0x77, 0x12,
+	0x12, 0x0a, 0x04, 0x66, 0x69, 0x6c, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x66,
+	0x69, 0x6c, 0x65, 0x12, 0x12, 0x0a, 0x04, 0x73, 0x74, 0x65, 0x70, 0x18, 0x02, 0x20, 0x01, 0x28,
+	0x09, 0x52, 0x04, 0x73, 0x74, 0x65, 0x70, 0x12, 0x14, 0x0a, 0x05, 0x72, 0x61, 0x6e, 0x67, 0x65,
+	0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x72, 0x61, 0x6e, 0x67, 0x65, 0x12, 0x14, 0x0a,
+	0x05, 0x6c, 0x61, 0x62, 0x65, 0x6c, 0x18, 0x04, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x6c, 0x61,
+	0x62, 0x65, 0x6c, 0x42, 0x35, 0x5a, 0x33, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f,
+	0x6d, 0x2f, 0x65, 0x74, 0x68, 0x70, 0x61, 0x6e, 0x64, 0x61, 0x6f, 0x70, 0x73, 0x2f, 0x6c, 0x61,
+	0x62, 0x2f, 0x62, 0x61, 0x63, 0x6b, 0x65, 0x6e, 0x64, 0x2f, 0x70, 0x6b, 0x67, 0x2f, 0x61, 0x70,
+	0x69, 0x2f, 0x76, 0x31, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74,
+	0x6f, 0x33,
 }
 
 var (
@@ -881,20 +1819,37 @@ func file_backend_pkg_api_v1_proto_public_proto_rawDescGZIP() []byte {
 	return file_backend_pkg_api_v1_proto_public_proto_rawDescData
 }
 
-var file_backend_pkg_api_v1_proto_public_proto_msgTypes = make([]protoimpl.MessageInfo, 12)
+var file_backend_pkg_api_v1_proto_public_proto_msgTypes = make([]protoimpl.MessageInfo, 29)
 var file_backend_pkg_api_v1_proto_public_proto_goTypes = []any{
-	(*ListNodesResponse)(nil),     // 0: api.v1.ListNodesResponse
-	(*ListNetworksResponse)(nil),  // 1: api.v1.ListNetworksResponse
-	(*Node)(nil),                  // 2: api.v1.Node
-	(*ClientInfo)(nil),            // 3: api.v1.ClientInfo
-	(*GeoInfo)(nil),               // 4: api.v1.GeoInfo
-	(*ConsensusInfo)(nil),         // 5: api.v1.ConsensusInfo
-	(*PaginationMetadata)(nil),    // 6: api.v1.PaginationMetadata
-	(*FilterMetadata)(nil),        // 7: api.v1.FilterMetadata
-	(*Network)(nil),               // 8: api.v1.Network
-	(*NetworkFilterMetadata)(nil), // 9: api.v1.NetworkFilterMetadata
-	(*ErrorResponse)(nil),         // 10: api.v1.ErrorResponse
-	nil,                           // 11: api.v1.FilterMetadata.AppliedFiltersEntry
+	(*ListNodesResponse)(nil),            // 0: api.v1.ListNodesResponse
+	(*ListNetworksResponse)(nil),         // 1: api.v1.ListNetworksResponse
+	(*Node)(nil),                         // 2: api.v1.Node
+	(*ClientInfo)(nil),                   // 3: api.v1.ClientInfo
+	(*GeoInfo)(nil),                      // 4: api.v1.GeoInfo
+	(*ConsensusInfo)(nil),                // 5: api.v1.ConsensusInfo
+	(*PaginationMetadata)(nil),           // 6: api.v1.PaginationMetadata
+	(*FilterMetadata)(nil),               // 7: api.v1.FilterMetadata
+	(*Network)(nil),                      // 8: api.v1.Network
+	(*NetworkFilterMetadata)(nil),        // 9: api.v1.NetworkFilterMetadata
+	(*ErrorResponse)(nil),                // 10: api.v1.ErrorResponse
+	(*GetConfigResponse)(nil),            // 11: api.v1.GetConfigResponse
+	(*FrontendConfig)(nil),               // 12: api.v1.FrontendConfig
+	(*EthereumConfig)(nil),               // 13: api.v1.EthereumConfig
+	(*NetworkConfig)(nil),                // 14: api.v1.NetworkConfig
+	(*ForkConfig)(nil),                   // 15: api.v1.ForkConfig
+	(*ConsensusForks)(nil),               // 16: api.v1.ConsensusForks
+	(*ForkInfo)(nil),                     // 17: api.v1.ForkInfo
+	(*ModulesConfig)(nil),                // 18: api.v1.ModulesConfig
+	(*BeaconChainTimingsModule)(nil),     // 19: api.v1.BeaconChainTimingsModule
+	(*XatuPublicContributorsModule)(nil), // 20: api.v1.XatuPublicContributorsModule
+	(*BeaconModule)(nil),                 // 21: api.v1.BeaconModule
+	(*BeaconNetworkConfig)(nil),          // 22: api.v1.BeaconNetworkConfig
+	(*TimeWindow)(nil),                   // 23: api.v1.TimeWindow
+	nil,                                  // 24: api.v1.FilterMetadata.AppliedFiltersEntry
+	nil,                                  // 25: api.v1.EthereumConfig.NetworksEntry
+	nil,                                  // 26: api.v1.NetworkConfig.ServiceUrlsEntry
+	nil,                                  // 27: api.v1.ForkInfo.MinClientVersionsEntry
+	nil,                                  // 28: api.v1.BeaconModule.NetworksEntry
 }
 var file_backend_pkg_api_v1_proto_public_proto_depIdxs = []int32{
 	2,  // 0: api.v1.ListNodesResponse.nodes:type_name -> api.v1.Node
@@ -905,12 +1860,29 @@ var file_backend_pkg_api_v1_proto_public_proto_depIdxs = []int32{
 	3,  // 5: api.v1.Node.client:type_name -> api.v1.ClientInfo
 	4,  // 6: api.v1.Node.geo:type_name -> api.v1.GeoInfo
 	5,  // 7: api.v1.Node.consensus:type_name -> api.v1.ConsensusInfo
-	11, // 8: api.v1.FilterMetadata.applied_filters:type_name -> api.v1.FilterMetadata.AppliedFiltersEntry
-	9,  // [9:9] is the sub-list for method output_type
-	9,  // [9:9] is the sub-list for method input_type
-	9,  // [9:9] is the sub-list for extension type_name
-	9,  // [9:9] is the sub-list for extension extendee
-	0,  // [0:9] is the sub-list for field type_name
+	24, // 8: api.v1.FilterMetadata.applied_filters:type_name -> api.v1.FilterMetadata.AppliedFiltersEntry
+	12, // 9: api.v1.GetConfigResponse.config:type_name -> api.v1.FrontendConfig
+	13, // 10: api.v1.FrontendConfig.ethereum:type_name -> api.v1.EthereumConfig
+	18, // 11: api.v1.FrontendConfig.modules:type_name -> api.v1.ModulesConfig
+	25, // 12: api.v1.EthereumConfig.networks:type_name -> api.v1.EthereumConfig.NetworksEntry
+	26, // 13: api.v1.NetworkConfig.service_urls:type_name -> api.v1.NetworkConfig.ServiceUrlsEntry
+	15, // 14: api.v1.NetworkConfig.forks:type_name -> api.v1.ForkConfig
+	16, // 15: api.v1.ForkConfig.consensus:type_name -> api.v1.ConsensusForks
+	17, // 16: api.v1.ConsensusForks.electra:type_name -> api.v1.ForkInfo
+	27, // 17: api.v1.ForkInfo.min_client_versions:type_name -> api.v1.ForkInfo.MinClientVersionsEntry
+	19, // 18: api.v1.ModulesConfig.beacon_chain_timings:type_name -> api.v1.BeaconChainTimingsModule
+	20, // 19: api.v1.ModulesConfig.xatu_public_contributors:type_name -> api.v1.XatuPublicContributorsModule
+	21, // 20: api.v1.ModulesConfig.beacon:type_name -> api.v1.BeaconModule
+	23, // 21: api.v1.BeaconChainTimingsModule.time_windows:type_name -> api.v1.TimeWindow
+	23, // 22: api.v1.XatuPublicContributorsModule.time_windows:type_name -> api.v1.TimeWindow
+	28, // 23: api.v1.BeaconModule.networks:type_name -> api.v1.BeaconModule.NetworksEntry
+	14, // 24: api.v1.EthereumConfig.NetworksEntry.value:type_name -> api.v1.NetworkConfig
+	22, // 25: api.v1.BeaconModule.NetworksEntry.value:type_name -> api.v1.BeaconNetworkConfig
+	26, // [26:26] is the sub-list for method output_type
+	26, // [26:26] is the sub-list for method input_type
+	26, // [26:26] is the sub-list for extension type_name
+	26, // [26:26] is the sub-list for extension extendee
+	0,  // [0:26] is the sub-list for field type_name
 }
 
 func init() { file_backend_pkg_api_v1_proto_public_proto_init() }
@@ -1051,6 +2023,162 @@ func file_backend_pkg_api_v1_proto_public_proto_init() {
 				return nil
 			}
 		}
+		file_backend_pkg_api_v1_proto_public_proto_msgTypes[11].Exporter = func(v any, i int) any {
+			switch v := v.(*GetConfigResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_backend_pkg_api_v1_proto_public_proto_msgTypes[12].Exporter = func(v any, i int) any {
+			switch v := v.(*FrontendConfig); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_backend_pkg_api_v1_proto_public_proto_msgTypes[13].Exporter = func(v any, i int) any {
+			switch v := v.(*EthereumConfig); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_backend_pkg_api_v1_proto_public_proto_msgTypes[14].Exporter = func(v any, i int) any {
+			switch v := v.(*NetworkConfig); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_backend_pkg_api_v1_proto_public_proto_msgTypes[15].Exporter = func(v any, i int) any {
+			switch v := v.(*ForkConfig); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_backend_pkg_api_v1_proto_public_proto_msgTypes[16].Exporter = func(v any, i int) any {
+			switch v := v.(*ConsensusForks); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_backend_pkg_api_v1_proto_public_proto_msgTypes[17].Exporter = func(v any, i int) any {
+			switch v := v.(*ForkInfo); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_backend_pkg_api_v1_proto_public_proto_msgTypes[18].Exporter = func(v any, i int) any {
+			switch v := v.(*ModulesConfig); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_backend_pkg_api_v1_proto_public_proto_msgTypes[19].Exporter = func(v any, i int) any {
+			switch v := v.(*BeaconChainTimingsModule); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_backend_pkg_api_v1_proto_public_proto_msgTypes[20].Exporter = func(v any, i int) any {
+			switch v := v.(*XatuPublicContributorsModule); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_backend_pkg_api_v1_proto_public_proto_msgTypes[21].Exporter = func(v any, i int) any {
+			switch v := v.(*BeaconModule); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_backend_pkg_api_v1_proto_public_proto_msgTypes[22].Exporter = func(v any, i int) any {
+			switch v := v.(*BeaconNetworkConfig); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_backend_pkg_api_v1_proto_public_proto_msgTypes[23].Exporter = func(v any, i int) any {
+			switch v := v.(*TimeWindow); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
@@ -1058,7 +2186,7 @@ func file_backend_pkg_api_v1_proto_public_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_backend_pkg_api_v1_proto_public_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   12,
+			NumMessages:   29,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

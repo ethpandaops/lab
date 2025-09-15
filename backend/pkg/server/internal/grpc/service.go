@@ -12,6 +12,5 @@ type Service interface {
 	Name() string
 }
 
-var _ Service = &Lab{}
 var _ Service = &BeaconChainTimings{}
 var _ Service = &XatuPublicContributors{}

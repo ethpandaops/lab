@@ -34,10 +34,12 @@ import BlockProductionSlotPage from '@/pages/beacon/block-production/slot.tsx';
 import ApplicationProvider from '@/providers/application';
 import fetchBootstrap, { Bootstrap } from '@/bootstrap';
 import { createLabApiClient, LabApiClient, Config } from '@/api/client.ts';
+import { RestApiClient } from '@/api/rest/client';
 
 function App() {
   const [bootstrap, setBootstrap] = useState<Bootstrap | null>(null);
   const [client, setClient] = useState<LabApiClient | null>(null);
+  const [restClient, setRestClient] = useState<RestApiClient | null>(null);
   const [config, setConfig] = useState<Config | null>(null);
   const [configError, setConfigError] = useState<Error | null>(null);
   const [bootstrapError, setBootstrapError] = useState<Error | null>(null);
@@ -51,19 +53,22 @@ function App() {
   useEffect(() => {
     if (bootstrap?.backend?.url) {
       setClient(createLabApiClient(bootstrap.backend.url));
+      // Create REST client using the dedicated REST API URL if available, otherwise use the main URL
+      const restApiUrl = bootstrap.backend.restApiUrl || bootstrap.backend.url;
+      setRestClient(new RestApiClient(restApiUrl));
     }
   }, [bootstrap]);
 
   useEffect(() => {
-    if (client) {
-      client
-        .getConfig({})
-        .then(config => {
-          setConfig(config.config?.config || null);
+    if (restClient) {
+      restClient
+        .getConfig()
+        .then(response => {
+          setConfig(response.config || null);
         })
         .catch(setConfigError);
     }
-  }, [client]);
+  }, [restClient]);
 
   useEffect(() => {
     if (config) {

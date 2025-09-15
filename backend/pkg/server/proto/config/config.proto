@@ -1,0 +1,139 @@
+syntax = "proto3";
+
+package config;
+
+option go_package = "github.com/ethpandaops/lab/backend/pkg/server/proto/config";
+
+// ConfigService provides configuration for the lab application.
+// This replaces the legacy GetConfig from the lab service.
+service ConfigService {
+  // GetConfig returns the complete frontend configuration including networks and modules.
+  rpc GetConfig(GetConfigRequest) returns (GetConfigResponse);
+}
+
+// GetConfigRequest is empty for now but allows future expansion
+message GetConfigRequest {}
+
+// GetConfigResponse contains the complete configuration
+message GetConfigResponse {
+  // The main configuration object
+  FrontendConfig config = 1;
+}
+
+// FrontendConfig represents the complete frontend configuration
+message FrontendConfig {
+  // Ethereum configuration including networks
+  EthereumConfig ethereum = 1;
+  // Module configurations
+  ModulesConfig modules = 2;
+}
+
+// EthereumConfig contains Ethereum-related configuration
+message EthereumConfig {
+  // Map of network name to network configuration
+  map<string, NetworkConfig> networks = 1;
+}
+
+// NetworkConfig represents configuration for a single network
+message NetworkConfig {
+  // Network name
+  string name = 1;
+  // Network status
+  string status = 2;
+  // Chain ID
+  int64 chain_id = 3;
+  // Description
+  string description = 4;
+  // Genesis time as Unix timestamp
+  int64 genesis_time = 5;
+  // Service URLs
+  map<string, string> service_urls = 6;
+  // Fork information
+  ForkConfig forks = 7;
+  // Last updated timestamp
+  string last_updated = 8;
+}
+
+// ForkConfig contains fork information
+message ForkConfig {
+  // Consensus layer forks
+  ConsensusForks consensus = 1;
+}
+
+// ConsensusForks contains consensus layer fork information
+message ConsensusForks {
+  // Electra fork info
+  ForkInfo electra = 1;
+}
+
+// ForkInfo contains information about a specific fork
+message ForkInfo {
+  // Epoch when the fork activates
+  int64 epoch = 1;
+  // Minimum client versions
+  map<string, string> min_client_versions = 2;
+}
+
+// ModulesConfig contains all module configurations
+message ModulesConfig {
+  // Beacon chain timings module
+  BeaconChainTimingsModule beacon_chain_timings = 1;
+  // Xatu public contributors module
+  XatuPublicContributorsModule xatu_public_contributors = 2;
+  // Beacon module
+  BeaconModule beacon = 3;
+}
+
+// BeaconChainTimingsModule configuration
+message BeaconChainTimingsModule {
+  // List of networks this module supports
+  repeated string networks = 1;
+  // Time windows configuration
+  repeated TimeWindow time_windows = 2;
+  // Path prefix for data files
+  string path_prefix = 3;
+}
+
+// XatuPublicContributorsModule configuration
+message XatuPublicContributorsModule {
+  // List of networks this module supports
+  repeated string networks = 1;
+  // Time windows configuration
+  repeated TimeWindow time_windows = 2;
+  // Path prefix for data files
+  string path_prefix = 3;
+  // Whether the module is enabled
+  bool enabled = 4;
+}
+
+// BeaconModule configuration
+message BeaconModule {
+  // Whether the module is enabled
+  bool enabled = 1;
+  // Description
+  string description = 2;
+  // Path prefix for data files
+  string path_prefix = 3;
+  // Per-network configuration
+  map<string, BeaconNetworkConfig> networks = 4;
+}
+
+// BeaconNetworkConfig contains beacon-specific network configuration
+message BeaconNetworkConfig {
+  // Head lag slots
+  int32 head_lag_slots = 1;
+  // Backlog days
+  int32 backlog_days = 2;
+}
+
+// TimeWindow represents a time window configuration
+message TimeWindow {
+  // File identifier
+  string file = 1;
+  // Step interval
+  string step = 2;
+  // Time range
+  string range = 3;
+  // Display label
+  string label = 4;
+}

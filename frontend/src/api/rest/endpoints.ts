@@ -6,8 +6,8 @@
  * Build API v1 endpoint URLs
  */
 export const API_V1_ENDPOINTS = {
-  networks: '/api/v1/networks',
   nodes: (network: string) => `/api/v1/${network}/nodes`,
+  config: '/api/v1/config',
 };
 
 /**
@@ -82,11 +82,3 @@ export interface NodeFilters {
   order_by?: string;
 }
 
-/**
- * Network filter parameters
- */
-export interface NetworkFilters {
-  active_only?: boolean;
-  status?: string | FilterOperator<string>;
-  chain_id?: number | FilterOperator<number>;
-}

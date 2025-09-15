@@ -78,8 +78,8 @@ function ContributorDetail() {
   const { name } = useParams<{ name: string }>();
   const { config } = useConfig();
   const { baseUrl } = useApi();
-  const userPath = config?.modules?.['xatuPublicContributors']?.pathPrefix
-    ? `${config.modules['xatuPublicContributors'].pathPrefix}/user-summaries/users/${name}.json`
+  const userPath = config?.modules?.['xatu_public_contributors']?.path_prefix
+    ? `${config.modules['xatu_public_contributors'].path_prefix}/user-summaries/users/${name}.json`
     : null;
 
   const { data: contributor, loading, error } = useDataFetch<ContributorData>(baseUrl, userPath);
