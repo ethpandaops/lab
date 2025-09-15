@@ -16,6 +16,7 @@ import (
 	"fmt"
 	"net/url"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/ClickHouse/clickhouse-go/v2"
@@ -71,11 +72,13 @@ type parsedDSNInfo struct {
 // client implements the Client interface for ClickHouse database operations.
 // It manages connection pooling, metrics collection, and protocol selection.
 type client struct {
-	conn    *sql.DB
-	log     logrus.FieldLogger
-	ctx     context.Context //nolint:containedctx // context is used for clickhouse operations.
-	config  *Config
-	network string
+	conn        *sql.DB
+	log         logrus.FieldLogger
+	ctx         context.Context //nolint:containedctx // context is used for clickhouse operations.
+	config      *Config
+	network     string
+	stopMetrics chan struct{} // Channel to signal metrics updater to stop
+	stopOnce    sync.Once     // Ensures Stop is only executed once
 
 	// Metrics
 	metrics           *metrics.Metrics
@@ -84,6 +87,9 @@ type client struct {
 	queryDuration     *prometheus.HistogramVec
 	connectionStatus  *prometheus.GaugeVec
 	connectionsActive *prometheus.GaugeVec
+	connectionsIdle   *prometheus.GaugeVec
+	connectionsInUse  *prometheus.GaugeVec
+	connectionsWait   *prometheus.GaugeVec
 	metricsDatabase   string // The database label to use in metrics.
 }
 
@@ -214,7 +220,13 @@ func (c *client) Start(ctx context.Context) error {
 	// Update metrics to reflect successful initialization.
 	c.connectionStatus.WithLabelValues(c.metricsDatabase, "active").Set(1)
 	c.connectionStatus.WithLabelValues(c.metricsDatabase, "error").Set(0)
-	c.connectionsActive.WithLabelValues(c.metricsDatabase).Set(float64(c.config.ConnectionConfig.MaxIdleConns)) // Initial value based on MaxIdleConns.
+
+	// Set initial connection pool metrics from actual stats
+	stats := c.conn.Stats()
+	c.connectionsActive.WithLabelValues(c.metricsDatabase).Set(float64(stats.OpenConnections))
+	c.connectionsIdle.WithLabelValues(c.metricsDatabase).Set(float64(stats.Idle))
+	c.connectionsInUse.WithLabelValues(c.metricsDatabase).Set(float64(stats.InUse))
+	c.connectionsWait.WithLabelValues(c.metricsDatabase).Set(float64(stats.WaitCount))
 
 	protocolType := "HTTP"
 	if parsedDSN.useNative {
@@ -243,6 +255,10 @@ func (c *client) Start(ctx context.Context) error {
 		"protocol": protocolType,
 		"database": database,
 	}).Info("ClickHouse client connected successfully")
+
+	// Start metrics updater goroutine
+	c.stopMetrics = make(chan struct{})
+	go c.updateConnectionMetrics()
 
 	return nil
 }
@@ -460,15 +476,28 @@ func (c *client) Stop() error {
 		return nil
 	}
 
-	c.log.Info("Stopping ClickHouse client")
+	var closeErr error
 
-	// Update connection metrics.
-	c.connectionStatus.WithLabelValues(c.metricsDatabase, "active").Set(0)
-	c.connectionStatus.WithLabelValues(c.metricsDatabase, "error").Set(0)
-	c.connectionsActive.WithLabelValues(c.metricsDatabase).Set(0)
+	c.stopOnce.Do(func() {
+		c.log.Info("Stopping ClickHouse client")
 
-	// Close the connection pool using standard sql.DB.Close().
-	return c.conn.Close()
+		// Stop metrics updater goroutine
+		if c.stopMetrics != nil {
+			close(c.stopMetrics)
+		}
+
+		// Update connection metrics.
+		c.connectionStatus.WithLabelValues(c.metricsDatabase, "active").Set(0)
+		c.connectionStatus.WithLabelValues(c.metricsDatabase, "error").Set(0)
+		c.connectionsActive.WithLabelValues(c.metricsDatabase).Set(0)
+		c.connectionsIdle.WithLabelValues(c.metricsDatabase).Set(0)
+		c.connectionsInUse.WithLabelValues(c.metricsDatabase).Set(0)
+
+		// Close the connection pool using standard sql.DB.Close().
+		closeErr = c.conn.Close()
+	})
+
+	return closeErr
 }
 
 // initMetrics initializes Prometheus metrics for monitoring ClickHouse operations.
@@ -514,14 +543,62 @@ func (c *client) initMetrics() error {
 
 	c.connectionsActive, err = c.collector.NewGaugeVec(
 		"connections_active",
-		"Number of active ClickHouse connections",
+		"Number of active ClickHouse connections (OpenConnections from pool stats)",
 		[]string{"database"},
 	)
 	if err != nil {
 		return fmt.Errorf("failed to create connections_active metric: %w", err)
 	}
 
+	c.connectionsIdle, err = c.collector.NewGaugeVec(
+		"connections_idle",
+		"Number of idle ClickHouse connections in the pool",
+		[]string{"database"},
+	)
+	if err != nil {
+		return fmt.Errorf("failed to create connections_idle metric: %w", err)
+	}
+
+	c.connectionsInUse, err = c.collector.NewGaugeVec(
+		"connections_in_use",
+		"Number of ClickHouse connections currently in use",
+		[]string{"database"},
+	)
+	if err != nil {
+		return fmt.Errorf("failed to create connections_in_use metric: %w", err)
+	}
+
+	c.connectionsWait, err = c.collector.NewGaugeVec(
+		"connections_wait_count",
+		"Total number of connections waited for",
+		[]string{"database"},
+	)
+	if err != nil {
+		return fmt.Errorf("failed to create connections_wait_count metric: %w", err)
+	}
+
 	return nil
+}
+
+// updateConnectionMetrics periodically updates connection pool metrics
+func (c *client) updateConnectionMetrics() {
+	ticker := time.NewTicker(10 * time.Second)
+	defer ticker.Stop()
+
+	for {
+		select {
+		case <-ticker.C:
+			if c.conn != nil {
+				stats := c.conn.Stats()
+				c.connectionsActive.WithLabelValues(c.metricsDatabase).Set(float64(stats.OpenConnections))
+				c.connectionsIdle.WithLabelValues(c.metricsDatabase).Set(float64(stats.Idle))
+				c.connectionsInUse.WithLabelValues(c.metricsDatabase).Set(float64(stats.InUse))
+				c.connectionsWait.WithLabelValues(c.metricsDatabase).Set(float64(stats.WaitCount))
+			}
+		case <-c.stopMetrics:
+			return
+		}
+	}
 }
 
 // parseDSN processes the DSN and determines the connection protocol.
