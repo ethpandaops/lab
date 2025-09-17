@@ -46,6 +46,7 @@ func NewPublicRouter(
 func (r *PublicRouter) RegisterRoutes(router *mux.Router) {
 	v1 := router.PathPrefix("/api/v1").Subrouter()
 	v1.HandleFunc("/config", r.handleConfig).Methods("GET", methodOptions)
+	v1.HandleFunc("/experiments/{experimentId}/config", r.handleExperimentConfig).Methods("GET", methodOptions)
 	v1.HandleFunc("/{network}/nodes", r.handleListNodes).Methods("GET", methodOptions)
 }
 
@@ -85,6 +86,70 @@ func (r *PublicRouter) handleConfig(w http.ResponseWriter, req *http.Request) {
 	// Write response
 	if err := json.NewEncoder(w).Encode(response); err != nil {
 		r.log.WithError(err).Error("Failed to encode network config response")
+	}
+}
+
+// handleExperimentConfig handles GET /api/v1/experiments/{experimentId}/config
+func (r *PublicRouter) handleExperimentConfig(w http.ResponseWriter, req *http.Request) {
+	ctx := req.Context()
+	vars := mux.Vars(req)
+	experimentID := vars["experimentId"]
+
+	// Handle CORS preflight
+	if req.Method == methodOptions {
+		w.WriteHeader(http.StatusOK)
+
+		return
+	}
+
+	r.log.WithField("experiment_id", experimentID).Debug("REST v1: GetExperimentConfig")
+
+	// Call the config service to get the experiment configuration
+	grpcResp, err := r.configClient.GetExperimentConfig(ctx, &configpb.GetExperimentConfigRequest{
+		ExperimentId: experimentID,
+	})
+	if err != nil {
+		r.log.WithError(err).WithField("experiment_id", experimentID).Error("Failed to get experiment config")
+		r.handleError(w, err)
+
+		return
+	}
+
+	// Convert the internal config proto to public API proto
+	dataAvailability := make(map[string]*apiv1.ExperimentDataAvailability)
+	for network, availability := range grpcResp.Experiment.DataAvailability {
+		dataAvailability[network] = &apiv1.ExperimentDataAvailability{
+			AvailableFromTimestamp:  availability.AvailableFromTimestamp,
+			AvailableUntilTimestamp: availability.AvailableUntilTimestamp,
+			MinSlot:                 availability.MinSlot,
+			MaxSlot:                 availability.MaxSlot,
+			SafeSlot:                availability.SafeSlot,
+			HeadSlot:                availability.HeadSlot,
+			HasData:                 availability.HasData,
+		}
+	}
+
+	experimentConfig := &apiv1.ExperimentConfig{
+		Id:               grpcResp.Experiment.Id,
+		Enabled:          grpcResp.Experiment.Enabled,
+		Networks:         grpcResp.Experiment.Networks,
+		DataAvailability: dataAvailability,
+	}
+
+	response := &apiv1.GetExperimentConfigResponse{
+		Experiment: experimentConfig,
+	}
+
+	// Set headers
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Vary", "Accept-Encoding")
+
+	// Experiment config data can be cached briefly.
+	w.Header().Set("Cache-Control", "public, max-age=30, s-maxage=30, stale-while-revalidate=15")
+
+	// Write response
+	if err := json.NewEncoder(w).Encode(response); err != nil {
+		r.log.WithError(err).Error("Failed to encode experiment config response")
 	}
 }
 
@@ -531,6 +596,26 @@ func convertConfigToAPIProto(config *configpb.FrontendConfig) *apiv1.FrontendCon
 		}
 
 		result.Modules = modules
+	}
+
+	// Convert Experiments config
+	if config.Experiments != nil {
+		experiments := &apiv1.ExperimentsConfig{}
+
+		if config.Experiments.Experiments != nil {
+			expConfigs := make([]*apiv1.ExperimentConfig, 0, len(config.Experiments.Experiments))
+			for _, exp := range config.Experiments.Experiments {
+				expConfigs = append(expConfigs, &apiv1.ExperimentConfig{
+					Id:       exp.Id,
+					Enabled:  exp.Enabled,
+					Networks: exp.Networks,
+				})
+			}
+
+			experiments.Experiments = expConfigs
+		}
+
+		result.Experiments = experiments
 	}
 
 	return result

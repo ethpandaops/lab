@@ -24,6 +24,7 @@ import (
 	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/beacon_chain_timings"
 	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/beacon_slots"
 	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/cartographoor"
+	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/experiments"
 	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/xatu_cbt"
 	"github.com/sirupsen/logrus"
 )
@@ -53,6 +54,7 @@ type Service struct {
 	geolocationClient    *geolocation.Client
 	xatuCBTService       *xatu_cbt.XatuCBT
 	cartographoorService *cartographoor.Service
+	experimentsService   *experiments.ExperimentsService
 	metrics              *metrics.Metrics
 }
 
@@ -141,7 +143,7 @@ func (s *Service) Start(ctx context.Context) error {
 		grpc.NewBeaconSlotsHandler(s.log, bsService),
 		grpc.NewXatuCBT(s.log, s.xatuCBTService),
 		grpc.NewCartographoorService(s.log, s.cartographoorService, s.ethereumClient),
-		grpc.NewConfigService(s.log, s.ethereumClient, s.cartographoorService, bctService, bsService),
+		grpc.NewConfigService(s.log, s.ethereumClient, s.cartographoorService, bctService, bsService, s.experimentsService),
 	}
 
 	// Create gRPC server
@@ -307,6 +309,7 @@ func (s *Service) initializeDependencies(ctx context.Context) error {
 		cacheClient,
 		s.metrics,
 		cartographoorSvc,
+		ethereumClient,
 	)
 	if err != nil {
 		return fmt.Errorf("failed to initialize Xatu CBT datasource: %w", err)
@@ -324,6 +327,20 @@ func (s *Service) initializeDependencies(ctx context.Context) error {
 	s.geolocationClient = geolocationClient
 	s.xatuCBTService = xatuCBTService
 	s.cartographoorService = cartographoorSvc
+
+	// Initialize experiments service if configured
+	if s.config.Experiments != nil && len(*s.config.Experiments) > 0 {
+		s.experimentsService = experiments.NewExperimentsService(
+			s.config.Experiments,
+			s.log,
+			s.xatuCBTService,
+			s.cartographoorService,
+		)
+
+		if err := s.experimentsService.Start(ctx); err != nil {
+			return fmt.Errorf("failed to start experiments service: %w", err)
+		}
+	}
 
 	return nil
 }
