@@ -13,4 +13,3 @@ type Service interface {
 }
 
 var _ Service = &BeaconChainTimings{}
-var _ Service = &XatuPublicContributors{}

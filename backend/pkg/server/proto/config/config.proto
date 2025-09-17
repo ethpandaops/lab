@@ -9,6 +9,8 @@ option go_package = "github.com/ethpandaops/lab/backend/pkg/server/proto/config"
 service ConfigService {
   // GetConfig returns the complete frontend configuration including networks and modules.
   rpc GetConfig(GetConfigRequest) returns (GetConfigResponse);
+  // GetExperimentConfig returns a single experiment's configuration with data availability.
+  rpc GetExperimentConfig(GetExperimentConfigRequest) returns (GetExperimentConfigResponse);
 }
 
 // GetConfigRequest is empty for now but allows future expansion
@@ -26,6 +28,8 @@ message FrontendConfig {
   EthereumConfig ethereum = 1;
   // Module configurations
   ModulesConfig modules = 2;
+  // Experiments configuration
+  ExperimentsConfig experiments = 3;
 }
 
 // EthereumConfig contains Ethereum-related configuration
@@ -78,8 +82,6 @@ message ForkInfo {
 message ModulesConfig {
   // Beacon chain timings module
   BeaconChainTimingsModule beacon_chain_timings = 1;
-  // Xatu public contributors module
-  XatuPublicContributorsModule xatu_public_contributors = 2;
   // Beacon module
   BeaconModule beacon = 3;
 }
@@ -92,18 +94,6 @@ message BeaconChainTimingsModule {
   repeated TimeWindow time_windows = 2;
   // Path prefix for data files
   string path_prefix = 3;
-}
-
-// XatuPublicContributorsModule configuration
-message XatuPublicContributorsModule {
-  // List of networks this module supports
-  repeated string networks = 1;
-  // Time windows configuration
-  repeated TimeWindow time_windows = 2;
-  // Path prefix for data files
-  string path_prefix = 3;
-  // Whether the module is enabled
-  bool enabled = 4;
 }
 
 // BeaconModule configuration
@@ -136,4 +126,52 @@ message TimeWindow {
   string range = 3;
   // Display label
   string label = 4;
+}
+
+// ExperimentsConfig contains all experiments configuration
+message ExperimentsConfig {
+  // List of available experiments
+  repeated ExperimentConfig experiments = 1;
+}
+
+// ExperimentConfig represents a single experiment
+message ExperimentConfig {
+  // Unique identifier for the experiment
+  string id = 1;
+  // Whether this experiment is enabled
+  bool enabled = 2;
+  // Networks this experiment supports
+  repeated string networks = 3;
+  // Data availability per network
+  map<string, ExperimentDataAvailability> data_availability = 4;
+}
+
+// ExperimentDataAvailability contains data availability information for an experiment on a specific network
+message ExperimentDataAvailability {
+  // Unix timestamp (seconds) of the earliest available data
+  int64 available_from_timestamp = 1;
+  // Unix timestamp (seconds) of the latest available data
+  int64 available_until_timestamp = 2;
+  // Earliest available slot number
+  uint64 min_slot = 3;
+  // Latest available slot number
+  uint64 max_slot = 4;
+  // Safe slot for "live" view (head - 2 slots)
+  uint64 safe_slot = 5;
+  // The current head slot of the network
+  uint64 head_slot = 6;
+  // Indicates if data is available (overlapping interval exists)
+  bool has_data = 7;
+}
+
+// GetExperimentConfigRequest defines the request for getting a single experiment's configuration.
+message GetExperimentConfigRequest {
+  // The experiment ID to get configuration for
+  string experiment_id = 1;
+}
+
+// GetExperimentConfigResponse returns a single experiment's full configuration with data availability.
+message GetExperimentConfigResponse {
+  // The experiment configuration with data availability
+  ExperimentConfig experiment = 1;
 }

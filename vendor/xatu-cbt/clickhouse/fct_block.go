@@ -17,8 +17,8 @@ import (
 func BuildListFctBlockQuery(req *ListFctBlockRequest, options ...QueryOption) (SQLQuery, error) {
 	// Validate that at least one primary key is provided
 	// Primary keys can come from base table or projections
-	if req.SlotStartDateTime == nil && req.BlockRoot == nil && req.Slot == nil {
-		return SQLQuery{}, fmt.Errorf("at least one primary key field is required: slot_start_date_time, block_root, slot")
+	if req.BlockRoot == nil && req.Slot == nil && req.SlotStartDateTime == nil {
+		return SQLQuery{}, fmt.Errorf("at least one primary key field is required: block_root, slot, slot_start_date_time")
 	}
 
 	// Build query using QueryBuilder

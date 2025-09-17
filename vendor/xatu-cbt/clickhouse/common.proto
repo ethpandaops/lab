@@ -217,6 +217,24 @@ message StringList {
   repeated string values = 1;
 }
 
+// BoolFilter represents filtering options for non-nullable bool values
+message BoolFilter {
+  oneof filter {
+    bool eq = 1;                   // Equal to value
+    bool ne = 2;                   // Not equal to value
+  }
+}
+
+// NullableBoolFilter represents filtering options for nullable bool values
+message NullableBoolFilter {
+  oneof filter {
+    bool eq = 1;                   // Equal to value
+    bool ne = 2;                   // Not equal to value
+    google.protobuf.Empty is_null = 3;     // IS NULL check
+    google.protobuf.Empty is_not_null = 4; // IS NOT NULL check
+  }
+}
+
 // SortOrder defines the order of results
 enum SortOrder {
   ASC = 0;

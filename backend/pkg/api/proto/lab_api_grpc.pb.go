@@ -21,7 +21,6 @@ const _ = grpc.SupportPackageIsVersion8
 const (
 	LabAPI_GetRecentLocallyBuiltBlocks_FullMethodName = "/labapi.LabAPI/GetRecentLocallyBuiltBlocks"
 	LabAPI_GetSlotData_FullMethodName                 = "/labapi.LabAPI/GetSlotData"
-	LabAPI_GetConfig_FullMethodName                   = "/labapi.LabAPI/GetConfig"
 )
 
 // LabAPIClient is the client API for LabAPI service.
@@ -30,7 +29,6 @@ const (
 type LabAPIClient interface {
 	GetRecentLocallyBuiltBlocks(ctx context.Context, in *GetRecentLocallyBuiltBlocksRequest, opts ...grpc.CallOption) (*GetRecentLocallyBuiltBlocksResponse, error)
 	GetSlotData(ctx context.Context, in *GetSlotDataRequest, opts ...grpc.CallOption) (*GetSlotDataResponse, error)
-	GetConfig(ctx context.Context, in *GetConfigRequest, opts ...grpc.CallOption) (*GetConfigResponse, error)
 }
 
 type labAPIClient struct {
@@ -61,23 +59,12 @@ func (c *labAPIClient) GetSlotData(ctx context.Context, in *GetSlotDataRequest, 
 	return out, nil
 }
 
-func (c *labAPIClient) GetConfig(ctx context.Context, in *GetConfigRequest, opts ...grpc.CallOption) (*GetConfigResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(GetConfigResponse)
-	err := c.cc.Invoke(ctx, LabAPI_GetConfig_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 // LabAPIServer is the server API for LabAPI service.
 // All implementations must embed UnimplementedLabAPIServer
 // for forward compatibility
 type LabAPIServer interface {
 	GetRecentLocallyBuiltBlocks(context.Context, *GetRecentLocallyBuiltBlocksRequest) (*GetRecentLocallyBuiltBlocksResponse, error)
 	GetSlotData(context.Context, *GetSlotDataRequest) (*GetSlotDataResponse, error)
-	GetConfig(context.Context, *GetConfigRequest) (*GetConfigResponse, error)
 	mustEmbedUnimplementedLabAPIServer()
 }
 
@@ -90,9 +77,6 @@ func (UnimplementedLabAPIServer) GetRecentLocallyBuiltBlocks(context.Context, *G
 }
 func (UnimplementedLabAPIServer) GetSlotData(context.Context, *GetSlotDataRequest) (*GetSlotDataResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetSlotData not implemented")
-}
-func (UnimplementedLabAPIServer) GetConfig(context.Context, *GetConfigRequest) (*GetConfigResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetConfig not implemented")
 }
 func (UnimplementedLabAPIServer) mustEmbedUnimplementedLabAPIServer() {}
 
@@ -143,24 +127,6 @@ func _LabAPI_GetSlotData_Handler(srv interface{}, ctx context.Context, dec func(
 	return interceptor(ctx, in, info, handler)
 }
 
-func _LabAPI_GetConfig_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetConfigRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(LabAPIServer).GetConfig(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: LabAPI_GetConfig_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(LabAPIServer).GetConfig(ctx, req.(*GetConfigRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 // LabAPI_ServiceDesc is the grpc.ServiceDesc for LabAPI service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -175,10 +141,6 @@ var LabAPI_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetSlotData",
 			Handler:    _LabAPI_GetSlotData_Handler,
-		},
-		{
-			MethodName: "GetConfig",
-			Handler:    _LabAPI_GetConfig_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

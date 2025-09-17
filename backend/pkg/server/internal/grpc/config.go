@@ -2,12 +2,13 @@ package grpc
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/ethereum"
 	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/beacon_chain_timings"
 	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/beacon_slots"
 	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/cartographoor"
-	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/xatu_public_contributors"
+	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/experiments"
 	"github.com/ethpandaops/lab/backend/pkg/server/proto/config"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
@@ -20,8 +21,8 @@ type ConfigService struct {
 	ethereumClient       *ethereum.Client
 	cartographoorService *cartographoor.Service
 	bctService           *beacon_chain_timings.BeaconChainTimings
-	xpcService           *xatu_public_contributors.XatuPublicContributors
 	bsService            *beacon_slots.BeaconSlots
+	experimentsService   *experiments.ExperimentsService
 }
 
 // NewConfigService creates a new ConfigService
@@ -30,16 +31,16 @@ func NewConfigService(
 	ethereumClient *ethereum.Client,
 	cartographoorService *cartographoor.Service,
 	bctService *beacon_chain_timings.BeaconChainTimings,
-	xpcService *xatu_public_contributors.XatuPublicContributors,
 	bsService *beacon_slots.BeaconSlots,
+	experimentsService *experiments.ExperimentsService,
 ) *ConfigService {
 	return &ConfigService{
 		log:                  log.WithField("grpc", "config"),
 		ethereumClient:       ethereumClient,
 		cartographoorService: cartographoorService,
 		bctService:           bctService,
-		xpcService:           xpcService,
 		bsService:            bsService,
+		experimentsService:   experimentsService,
 	}
 }
 
@@ -142,29 +143,6 @@ func (c *ConfigService) GetConfig(
 		}
 	}
 
-	// Add xatu public contributors module config
-	if c.xpcService != nil {
-		xpcConfig := c.xpcService.FrontendModuleConfig()
-		if xpcConfig != nil {
-			timeWindows := make([]*config.TimeWindow, 0, len(xpcConfig.TimeWindows))
-			for _, tw := range xpcConfig.TimeWindows {
-				timeWindows = append(timeWindows, &config.TimeWindow{
-					File:  tw.File,
-					Step:  tw.Step,
-					Range: tw.Range,
-					Label: tw.Label,
-				})
-			}
-
-			modulesConfig.XatuPublicContributors = &config.XatuPublicContributorsModule{
-				Networks:    xpcConfig.Networks,
-				TimeWindows: timeWindows,
-				PathPrefix:  xpcConfig.PathPrefix,
-				Enabled:     xpcConfig.Enabled,
-			}
-		}
-	}
-
 	// Add beacon module config
 	if c.bsService != nil {
 		bsConfig := c.bsService.FrontendModuleConfig()
@@ -186,12 +164,42 @@ func (c *ConfigService) GetConfig(
 		}
 	}
 
+	// Add experiments configuration
+	var experimentsConfig *config.ExperimentsConfig
+	if c.experimentsService != nil {
+		experimentsConfig = c.experimentsService.GetAllExperimentsConfig(ctx, false)
+	}
+
 	return &config.GetConfigResponse{
 		Config: &config.FrontendConfig{
 			Ethereum: &config.EthereumConfig{
 				Networks: networksConfig,
 			},
-			Modules: modulesConfig,
+			Modules:     modulesConfig,
+			Experiments: experimentsConfig,
 		},
+	}, nil
+}
+
+// GetExperimentConfig returns a single experiment's configuration with data availability
+func (c *ConfigService) GetExperimentConfig(ctx context.Context, req *config.GetExperimentConfigRequest) (*config.GetExperimentConfigResponse, error) {
+	c.log.WithField("experiment_id", req.ExperimentId).Debug("GetExperimentConfig called")
+
+	if c.experimentsService == nil {
+		return nil, fmt.Errorf("experiments service not available")
+	}
+
+	// Get experiment config with data availability
+	experimentConfig, err := c.experimentsService.GetExperimentConfig(ctx, req.ExperimentId)
+	if err != nil {
+		c.log.WithError(err).
+			WithField("experiment_id", req.ExperimentId).
+			Error("Failed to get experiment config")
+
+		return nil, fmt.Errorf("failed to get experiment config: %w", err)
+	}
+
+	return &config.GetExperimentConfigResponse{
+		Experiment: experimentConfig,
 	}, nil
 }

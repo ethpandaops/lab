@@ -110,6 +110,7 @@ message GetConfigResponse {
 message FrontendConfig {
   EthereumConfig ethereum = 1;
   ModulesConfig modules = 2;
+  ExperimentsConfig experiments = 3;
 }
 
 // EthereumConfig contains Ethereum-related configuration for public API consumption.
@@ -187,4 +188,38 @@ message TimeWindow {
   string step = 2;
   string range = 3;
   string label = 4;
+}
+
+// ExperimentsConfig contains all experiments configuration for public API consumption.
+message ExperimentsConfig {
+  repeated ExperimentConfig experiments = 1;
+}
+
+// ExperimentConfig represents a single experiment for public API consumption.
+message ExperimentConfig {
+  string id = 1;
+  bool enabled = 2;
+  repeated string networks = 3;
+  map<string, ExperimentDataAvailability> data_availability = 4 [json_name = "dataAvailability"];
+}
+
+// ExperimentDataAvailability contains data availability information for an experiment on a specific network.
+message ExperimentDataAvailability {
+  int64 available_from_timestamp = 1 [json_name = "availableFromTimestamp"];
+  int64 available_until_timestamp = 2 [json_name = "availableUntilTimestamp"];
+  uint64 min_slot = 3 [json_name = "minSlot"];
+  uint64 max_slot = 4 [json_name = "maxSlot"];
+  uint64 safe_slot = 5 [json_name = "safeSlot"];
+  uint64 head_slot = 6 [json_name = "headSlot"];
+  bool has_data = 7 [json_name = "hasData"];
+}
+
+// GetExperimentConfigRequest defines the request for getting a single experiment's configuration.
+message GetExperimentConfigRequest {
+  string experiment_id = 1 [json_name = "experimentId"];
+}
+
+// GetExperimentConfigResponse returns a single experiment's full configuration with data availability.
+message GetExperimentConfigResponse {
+  ExperimentConfig experiment = 1;
 }

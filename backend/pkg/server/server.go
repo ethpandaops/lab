@@ -24,8 +24,8 @@ import (
 	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/beacon_chain_timings"
 	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/beacon_slots"
 	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/cartographoor"
+	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/experiments"
 	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/xatu_cbt"
-	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/xatu_public_contributors"
 	"github.com/sirupsen/logrus"
 )
 
@@ -54,6 +54,7 @@ type Service struct {
 	geolocationClient    *geolocation.Client
 	xatuCBTService       *xatu_cbt.XatuCBT
 	cartographoorService *cartographoor.Service
+	experimentsService   *experiments.ExperimentsService
 	metrics              *metrics.Metrics
 }
 
@@ -129,13 +130,6 @@ func (s *Service) Start(ctx context.Context) error {
 		return fmt.Errorf("failed to get beacon chain timings service")
 	}
 
-	xpcService, ok := s.getService(xatu_public_contributors.XatuPublicContributorsServiceName).(*xatu_public_contributors.XatuPublicContributors)
-	if !ok {
-		s.log.Error("Failed to get xatu public contributors service")
-
-		return fmt.Errorf("failed to get xatu public contributors service")
-	}
-
 	bsService, ok := s.getService(beacon_slots.ServiceName).(*beacon_slots.BeaconSlots)
 	if !ok {
 		s.log.Error("Failed to get beacon slots service")
@@ -146,11 +140,10 @@ func (s *Service) Start(ctx context.Context) error {
 	// Instantiate gRPC handlers
 	grpcServices := []grpc.Service{
 		grpc.NewBeaconChainTimings(s.log, bctService),
-		grpc.NewXatuPublicContributors(s.log, xpcService),
 		grpc.NewBeaconSlotsHandler(s.log, bsService),
 		grpc.NewXatuCBT(s.log, s.xatuCBTService),
 		grpc.NewCartographoorService(s.log, s.cartographoorService, s.ethereumClient),
-		grpc.NewConfigService(s.log, s.ethereumClient, s.cartographoorService, bctService, xpcService, bsService),
+		grpc.NewConfigService(s.log, s.ethereumClient, s.cartographoorService, bctService, bsService, s.experimentsService),
 	}
 
 	// Create gRPC server
@@ -203,20 +196,6 @@ func (s *Service) initializeServices(ctx context.Context) error { // ctx is alre
 		return fmt.Errorf("failed to initialize beacon chain timings service: %w", err)
 	}
 
-	xpc, err := xatu_public_contributors.New(
-		s.log,
-		s.config.Modules["xatu_public_contributors"].XatuPublicContributors,
-		s.ethereumClient,
-		s.xatuClient,
-		s.storageClient,
-		s.cacheClient,
-		s.lockerClient,
-		s.metrics,
-	)
-	if err != nil {
-		return fmt.Errorf("failed to initialize xatu public contributors service: %w", err)
-	}
-
 	beaconSlotsService, err := beacon_slots.New(
 		s.log,
 		s.config.Modules["beacon_slots"].BeaconSlots,
@@ -234,7 +213,6 @@ func (s *Service) initializeServices(ctx context.Context) error { // ctx is alre
 
 	s.services = []service.Service{
 		bct,
-		xpc,
 		beaconSlotsService,
 		s.cartographoorService,
 	}
@@ -331,6 +309,7 @@ func (s *Service) initializeDependencies(ctx context.Context) error {
 		cacheClient,
 		s.metrics,
 		cartographoorSvc,
+		ethereumClient,
 	)
 	if err != nil {
 		return fmt.Errorf("failed to initialize Xatu CBT datasource: %w", err)
@@ -348,6 +327,20 @@ func (s *Service) initializeDependencies(ctx context.Context) error {
 	s.geolocationClient = geolocationClient
 	s.xatuCBTService = xatuCBTService
 	s.cartographoorService = cartographoorSvc
+
+	// Initialize experiments service if configured
+	if s.config.Experiments != nil && len(*s.config.Experiments) > 0 {
+		s.experimentsService = experiments.NewExperimentsService(
+			s.config.Experiments,
+			s.log,
+			s.xatuCBTService,
+			s.cartographoorService,
+		)
+
+		if err := s.experimentsService.Start(ctx); err != nil {
+			return fmt.Errorf("failed to start experiments service: %w", err)
+		}
+	}
 
 	return nil
 }

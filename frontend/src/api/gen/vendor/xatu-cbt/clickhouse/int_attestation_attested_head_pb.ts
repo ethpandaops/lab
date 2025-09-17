@@ -102,6 +102,13 @@ export class IntAttestationAttestedHead extends Message<IntAttestationAttestedHe
    */
   attestingValidatorIndex = 0;
 
+  /**
+   * The distance from the slot when the attestation was propagated. 0 means the attestation was propagated within the same slot as its duty was assigned, 1 means the attestation was propagated within the next slot, etc.
+   *
+   * @generated from field: uint32 propagation_distance = 24;
+   */
+  propagationDistance = 0;
+
   constructor(data?: PartialMessage<IntAttestationAttestedHead>) {
     super();
     proto3.util.initPartial(data, this);
@@ -123,6 +130,7 @@ export class IntAttestationAttestedHead extends Message<IntAttestationAttestedHe
     { no: 21, name: "target_root", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 22, name: "block_root", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 23, name: "attesting_validator_index", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
+    { no: 24, name: "propagation_distance", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): IntAttestationAttestedHead {
@@ -240,11 +248,18 @@ export class ListIntAttestationAttestedHeadRequest extends Message<ListIntAttest
   targetRoot?: StringFilter;
 
   /**
+   * Filter by propagation_distance (optional)
+   *
+   * @generated from field: cbt.UInt32Filter propagation_distance = 14;
+   */
+  propagationDistance?: UInt32Filter;
+
+  /**
    * The maximum number of int_attestation_attested_head to return.
    * If unspecified, at most 100 items will be returned.
    * The maximum value is 1000; values above 1000 will be coerced to 1000.
    *
-   * @generated from field: int32 page_size = 14;
+   * @generated from field: int32 page_size = 15;
    */
   pageSize = 0;
 
@@ -252,7 +267,7 @@ export class ListIntAttestationAttestedHeadRequest extends Message<ListIntAttest
    * A page token, received from a previous `ListIntAttestationAttestedHead` call.
    * Provide this to retrieve the subsequent page.
    *
-   * @generated from field: string page_token = 15;
+   * @generated from field: string page_token = 16;
    */
   pageToken = "";
 
@@ -261,7 +276,7 @@ export class ListIntAttestationAttestedHeadRequest extends Message<ListIntAttest
    * Example: "foo,bar" or "foo desc,bar" for descending order on foo.
    * If unspecified, results will be returned in the default order.
    *
-   * @generated from field: string order_by = 16;
+   * @generated from field: string order_by = 17;
    */
   orderBy = "";
 
@@ -286,9 +301,10 @@ export class ListIntAttestationAttestedHeadRequest extends Message<ListIntAttest
     { no: 11, name: "target_epoch", kind: "message", T: UInt32Filter },
     { no: 12, name: "target_epoch_start_date_time", kind: "message", T: UInt32Filter },
     { no: 13, name: "target_root", kind: "message", T: StringFilter },
-    { no: 14, name: "page_size", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
-    { no: 15, name: "page_token", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 16, name: "order_by", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 14, name: "propagation_distance", kind: "message", T: UInt32Filter },
+    { no: 15, name: "page_size", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 16, name: "page_token", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 17, name: "order_by", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ListIntAttestationAttestedHeadRequest {

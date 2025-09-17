@@ -5,7 +5,7 @@ package cbt;
 import "vendor/xatu-cbt/clickhouse/common.proto";
 
 option go_package = "github.com/ethpandaops/xatu-cbt/pkg/proto/clickhouse";
-// Attested head of a block for the unfinalized chain. Only includes attestations by validators propagated within the same slot as their duty was assigned.
+// Attested head of a block for the unfinalized chain.
 
 message IntAttestationAttestedHead {
   // Timestamp when the record was last updated
@@ -34,6 +34,8 @@ message IntAttestationAttestedHead {
   string block_root = 22;
   // The index of the validator attesting
   uint32 attesting_validator_index = 23;
+  // The distance from the slot when the attestation was propagated. 0 means the attestation was propagated within the same slot as its duty was assigned, 1 means the attestation was propagated within the next slot, etc.
+  uint32 propagation_distance = 24;
 }
 
 // ListIntAttestationAttestedHeadRequest is the request message for listing int_attestation_attested_head records
@@ -67,18 +69,20 @@ message ListIntAttestationAttestedHeadRequest {
   UInt32Filter target_epoch_start_date_time = 12;
   // Filter by target_root (optional)
   StringFilter target_root = 13;
+  // Filter by propagation_distance (optional)
+  UInt32Filter propagation_distance = 14;
 
   // The maximum number of int_attestation_attested_head to return.
   // If unspecified, at most 100 items will be returned.
   // The maximum value is 1000; values above 1000 will be coerced to 1000.
-  int32 page_size = 14;
+  int32 page_size = 15;
   // A page token, received from a previous `ListIntAttestationAttestedHead` call.
   // Provide this to retrieve the subsequent page.
-  string page_token = 15;
+  string page_token = 16;
   // The order of results. Format: comma-separated list of fields.
   // Example: "foo,bar" or "foo desc,bar" for descending order on foo.
   // If unspecified, results will be returned in the default order.
-  string order_by = 16;
+  string order_by = 17;
 }
 
 // ListIntAttestationAttestedHeadResponse is the response message for listing int_attestation_attested_head records

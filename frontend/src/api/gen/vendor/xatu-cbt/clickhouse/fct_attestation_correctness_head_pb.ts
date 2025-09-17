@@ -4,8 +4,8 @@
 // @ts-nocheck
 
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
-import { Message, proto3 } from "@bufbuild/protobuf";
-import { StringFilter, UInt32Filter } from "./common_pb.js";
+import { Message, proto3, StringValue, UInt32Value } from "@bufbuild/protobuf";
+import { NullableStringFilter, NullableUInt32Filter, UInt32Filter } from "./common_pb.js";
 
 /**
  * @generated from message cbt.FctAttestationCorrectnessHead
@@ -49,9 +49,9 @@ export class FctAttestationCorrectnessHead extends Message<FctAttestationCorrect
   /**
    * The beacon block root hash
    *
-   * @generated from field: string block_root = 16;
+   * @generated from field: google.protobuf.StringValue block_root = 16;
    */
-  blockRoot = "";
+  blockRoot?: string;
 
   /**
    * The maximum number of scheduled votes for the block
@@ -63,9 +63,9 @@ export class FctAttestationCorrectnessHead extends Message<FctAttestationCorrect
   /**
    * The number of actual votes for the block
    *
-   * @generated from field: uint32 votes_actual = 18;
+   * @generated from field: google.protobuf.UInt32Value votes_actual = 18;
    */
-  votesActual = 0;
+  votesActual?: number;
 
   constructor(data?: PartialMessage<FctAttestationCorrectnessHead>) {
     super();
@@ -80,9 +80,9 @@ export class FctAttestationCorrectnessHead extends Message<FctAttestationCorrect
     { no: 13, name: "slot_start_date_time", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
     { no: 14, name: "epoch", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
     { no: 15, name: "epoch_start_date_time", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
-    { no: 16, name: "block_root", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 16, name: "block_root", kind: "message", T: StringValue },
     { no: 17, name: "votes_max", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
-    { no: 18, name: "votes_actual", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
+    { no: 18, name: "votes_actual", kind: "message", T: UInt32Value },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): FctAttestationCorrectnessHead {
@@ -116,39 +116,39 @@ export class ListFctAttestationCorrectnessHeadRequest extends Message<ListFctAtt
   slotStartDateTime?: UInt32Filter;
 
   /**
-   * Filter by block_root (ORDER BY column 2 - optional)
-   *
-   * @generated from field: cbt.StringFilter block_root = 2;
-   */
-  blockRoot?: StringFilter;
-
-  /**
    * Filter by updated_date_time (optional)
    *
-   * @generated from field: cbt.UInt32Filter updated_date_time = 3;
+   * @generated from field: cbt.UInt32Filter updated_date_time = 2;
    */
   updatedDateTime?: UInt32Filter;
 
   /**
    * Filter by slot (optional)
    *
-   * @generated from field: cbt.UInt32Filter slot = 4;
+   * @generated from field: cbt.UInt32Filter slot = 3;
    */
   slot?: UInt32Filter;
 
   /**
    * Filter by epoch (optional)
    *
-   * @generated from field: cbt.UInt32Filter epoch = 5;
+   * @generated from field: cbt.UInt32Filter epoch = 4;
    */
   epoch?: UInt32Filter;
 
   /**
    * Filter by epoch_start_date_time (optional)
    *
-   * @generated from field: cbt.UInt32Filter epoch_start_date_time = 6;
+   * @generated from field: cbt.UInt32Filter epoch_start_date_time = 5;
    */
   epochStartDateTime?: UInt32Filter;
+
+  /**
+   * Filter by block_root (optional)
+   *
+   * @generated from field: cbt.NullableStringFilter block_root = 6;
+   */
+  blockRoot?: NullableStringFilter;
 
   /**
    * Filter by votes_max (optional)
@@ -160,9 +160,9 @@ export class ListFctAttestationCorrectnessHeadRequest extends Message<ListFctAtt
   /**
    * Filter by votes_actual (optional)
    *
-   * @generated from field: cbt.UInt32Filter votes_actual = 8;
+   * @generated from field: cbt.NullableUInt32Filter votes_actual = 8;
    */
-  votesActual?: UInt32Filter;
+  votesActual?: NullableUInt32Filter;
 
   /**
    * The maximum number of fct_attestation_correctness_head to return.
@@ -199,13 +199,13 @@ export class ListFctAttestationCorrectnessHeadRequest extends Message<ListFctAtt
   static readonly typeName = "cbt.ListFctAttestationCorrectnessHeadRequest";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "slot_start_date_time", kind: "message", T: UInt32Filter },
-    { no: 2, name: "block_root", kind: "message", T: StringFilter },
-    { no: 3, name: "updated_date_time", kind: "message", T: UInt32Filter },
-    { no: 4, name: "slot", kind: "message", T: UInt32Filter },
-    { no: 5, name: "epoch", kind: "message", T: UInt32Filter },
-    { no: 6, name: "epoch_start_date_time", kind: "message", T: UInt32Filter },
+    { no: 2, name: "updated_date_time", kind: "message", T: UInt32Filter },
+    { no: 3, name: "slot", kind: "message", T: UInt32Filter },
+    { no: 4, name: "epoch", kind: "message", T: UInt32Filter },
+    { no: 5, name: "epoch_start_date_time", kind: "message", T: UInt32Filter },
+    { no: 6, name: "block_root", kind: "message", T: NullableStringFilter },
     { no: 7, name: "votes_max", kind: "message", T: UInt32Filter },
-    { no: 8, name: "votes_actual", kind: "message", T: UInt32Filter },
+    { no: 8, name: "votes_actual", kind: "message", T: NullableUInt32Filter },
     { no: 9, name: "page_size", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
     { no: 10, name: "page_token", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 11, name: "order_by", kind: "scalar", T: 9 /* ScalarType.STRING */ },
