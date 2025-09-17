@@ -16,7 +16,7 @@ import (
 func BuildListFctAttestationCorrectnessHeadQuery(req *ListFctAttestationCorrectnessHeadRequest, options ...QueryOption) (SQLQuery, error) {
 	// Validate that at least one primary key is provided
 	// Primary keys can come from base table or projections
-	if req.SlotStartDateTime == nil && req.Slot == nil {
+	if req.Slot == nil && req.SlotStartDateTime == nil {
 		return SQLQuery{}, fmt.Errorf("at least one primary key field is required: slot, slot_start_date_time")
 	}
 
@@ -174,28 +174,32 @@ func BuildListFctAttestationCorrectnessHeadQuery(req *ListFctAttestationCorrectn
 	// Add filter for column: block_root
 	if req.BlockRoot != nil {
 		switch filter := req.BlockRoot.Filter.(type) {
-		case *StringFilter_Eq:
+		case *NullableStringFilter_Eq:
 			qb.AddCondition("block_root", "=", filter.Eq)
-		case *StringFilter_Ne:
+		case *NullableStringFilter_Ne:
 			qb.AddCondition("block_root", "!=", filter.Ne)
-		case *StringFilter_Contains:
+		case *NullableStringFilter_Contains:
 			qb.AddLikeCondition("block_root", "%" + filter.Contains + "%")
-		case *StringFilter_StartsWith:
+		case *NullableStringFilter_StartsWith:
 			qb.AddLikeCondition("block_root", filter.StartsWith + "%")
-		case *StringFilter_EndsWith:
+		case *NullableStringFilter_EndsWith:
 			qb.AddLikeCondition("block_root", "%" + filter.EndsWith)
-		case *StringFilter_Like:
+		case *NullableStringFilter_Like:
 			qb.AddLikeCondition("block_root", filter.Like)
-		case *StringFilter_NotLike:
+		case *NullableStringFilter_NotLike:
 			qb.AddNotLikeCondition("block_root", filter.NotLike)
-		case *StringFilter_In:
+		case *NullableStringFilter_In:
 			if len(filter.In.Values) > 0 {
 				qb.AddInCondition("block_root", StringSliceToInterface(filter.In.Values))
 			}
-		case *StringFilter_NotIn:
+		case *NullableStringFilter_NotIn:
 			if len(filter.NotIn.Values) > 0 {
 				qb.AddNotInCondition("block_root", StringSliceToInterface(filter.NotIn.Values))
 			}
+		case *NullableStringFilter_IsNull:
+			qb.AddIsNullCondition("block_root")
+		case *NullableStringFilter_IsNotNull:
+			qb.AddIsNotNullCondition("block_root")
 		default:
 			// Unsupported filter type
 		}
@@ -234,28 +238,32 @@ func BuildListFctAttestationCorrectnessHeadQuery(req *ListFctAttestationCorrectn
 	// Add filter for column: votes_actual
 	if req.VotesActual != nil {
 		switch filter := req.VotesActual.Filter.(type) {
-		case *UInt32Filter_Eq:
+		case *NullableUInt32Filter_Eq:
 			qb.AddCondition("votes_actual", "=", filter.Eq)
-		case *UInt32Filter_Ne:
+		case *NullableUInt32Filter_Ne:
 			qb.AddCondition("votes_actual", "!=", filter.Ne)
-		case *UInt32Filter_Lt:
+		case *NullableUInt32Filter_Lt:
 			qb.AddCondition("votes_actual", "<", filter.Lt)
-		case *UInt32Filter_Lte:
+		case *NullableUInt32Filter_Lte:
 			qb.AddCondition("votes_actual", "<=", filter.Lte)
-		case *UInt32Filter_Gt:
+		case *NullableUInt32Filter_Gt:
 			qb.AddCondition("votes_actual", ">", filter.Gt)
-		case *UInt32Filter_Gte:
+		case *NullableUInt32Filter_Gte:
 			qb.AddCondition("votes_actual", ">=", filter.Gte)
-		case *UInt32Filter_Between:
+		case *NullableUInt32Filter_Between:
 			qb.AddBetweenCondition("votes_actual", filter.Between.Min, filter.Between.Max)
-		case *UInt32Filter_In:
+		case *NullableUInt32Filter_In:
 			if len(filter.In.Values) > 0 {
 				qb.AddInCondition("votes_actual", UInt32SliceToInterface(filter.In.Values))
 			}
-		case *UInt32Filter_NotIn:
+		case *NullableUInt32Filter_NotIn:
 			if len(filter.NotIn.Values) > 0 {
 				qb.AddNotInCondition("votes_actual", UInt32SliceToInterface(filter.NotIn.Values))
 			}
+		case *NullableUInt32Filter_IsNull:
+			qb.AddIsNullCondition("votes_actual")
+		case *NullableUInt32Filter_IsNotNull:
+			qb.AddIsNotNullCondition("votes_actual")
 		default:
 			// Unsupported filter type
 		}
@@ -289,7 +297,7 @@ func BuildListFctAttestationCorrectnessHeadQuery(req *ListFctAttestationCorrectn
 		orderByClause = BuildOrderByClause(orderFields)
 	} else {
 		// Default sorting by primary key
-		orderByClause = " ORDER BY slot_start_date_time" + ", block_root"
+		orderByClause = " ORDER BY slot_start_date_time"
 	}
 
 	return BuildParameterizedQuery("fct_attestation_correctness_head", qb, orderByClause, limit, offset, options...), nil
@@ -307,7 +315,7 @@ func BuildGetFctAttestationCorrectnessHeadQuery(req *GetFctAttestationCorrectnes
 	qb.AddCondition("slot_start_date_time", "=", req.SlotStartDateTime)
 
 	// Build ORDER BY clause
-	orderByClause := " ORDER BY slot_start_date_time, block_root"
+	orderByClause := " ORDER BY slot_start_date_time"
 
 	// Return single record
 	return BuildParameterizedQuery("fct_attestation_correctness_head", qb, orderByClause, 1, 0, options...), nil

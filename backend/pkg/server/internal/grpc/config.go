@@ -7,7 +7,6 @@ import (
 	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/beacon_chain_timings"
 	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/beacon_slots"
 	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/cartographoor"
-	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/xatu_public_contributors"
 	"github.com/ethpandaops/lab/backend/pkg/server/proto/config"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
@@ -20,7 +19,6 @@ type ConfigService struct {
 	ethereumClient       *ethereum.Client
 	cartographoorService *cartographoor.Service
 	bctService           *beacon_chain_timings.BeaconChainTimings
-	xpcService           *xatu_public_contributors.XatuPublicContributors
 	bsService            *beacon_slots.BeaconSlots
 }
 
@@ -30,7 +28,6 @@ func NewConfigService(
 	ethereumClient *ethereum.Client,
 	cartographoorService *cartographoor.Service,
 	bctService *beacon_chain_timings.BeaconChainTimings,
-	xpcService *xatu_public_contributors.XatuPublicContributors,
 	bsService *beacon_slots.BeaconSlots,
 ) *ConfigService {
 	return &ConfigService{
@@ -38,7 +35,6 @@ func NewConfigService(
 		ethereumClient:       ethereumClient,
 		cartographoorService: cartographoorService,
 		bctService:           bctService,
-		xpcService:           xpcService,
 		bsService:            bsService,
 	}
 }
@@ -138,29 +134,6 @@ func (c *ConfigService) GetConfig(
 				Networks:    bctConfig.Networks,
 				TimeWindows: timeWindows,
 				PathPrefix:  bctConfig.PathPrefix,
-			}
-		}
-	}
-
-	// Add xatu public contributors module config
-	if c.xpcService != nil {
-		xpcConfig := c.xpcService.FrontendModuleConfig()
-		if xpcConfig != nil {
-			timeWindows := make([]*config.TimeWindow, 0, len(xpcConfig.TimeWindows))
-			for _, tw := range xpcConfig.TimeWindows {
-				timeWindows = append(timeWindows, &config.TimeWindow{
-					File:  tw.File,
-					Step:  tw.Step,
-					Range: tw.Range,
-					Label: tw.Label,
-				})
-			}
-
-			modulesConfig.XatuPublicContributors = &config.XatuPublicContributorsModule{
-				Networks:    xpcConfig.Networks,
-				TimeWindows: timeWindows,
-				PathPrefix:  xpcConfig.PathPrefix,
-				Enabled:     xpcConfig.Enabled,
 			}
 		}
 	}

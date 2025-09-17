@@ -4,21 +4,15 @@ import { LoadingState } from '@/components/common/LoadingState';
 import { ErrorState } from '@/components/common/ErrorState';
 import ScrollToTop from '@/components/common/ScrollToTop';
 import Redirect from '@/components/common/Redirect';
+import XatuRedirect from '@/components/common/XatuRedirect';
 import Home from '@/pages/Home.tsx';
 import { About } from '@/pages/About.tsx';
-import Xatu from '@/pages/xatu';
 import XatuData from '@/pages/xatu-data';
 import XatuDataContributorsList from '@/pages/xatu-data/ContributorsList';
 import XatuDataContributorDetail from '@/pages/xatu-data/ContributorDetail';
 import XatuDataNetworks from '@/pages/xatu-data/networks';
 import XatuDataGeographicalChecklist from '@/pages/xatu-data/geographical-checklist';
 import XatuDataForkReadiness from '@/pages/xatu-data/fork-readiness';
-import { CommunityNodes } from '@/pages/xatu/CommunityNodes';
-import Networks from '@/pages/xatu/networks';
-import ContributorsList from '@/pages/xatu/ContributorsList';
-import ContributorDetail from '@/pages/xatu/ContributorDetail';
-import ForkReadiness from '@/pages/xatu/ForkReadiness';
-import GeographicalChecklist from '@/pages/xatu/GeographicalChecklist';
 import Layout from '@/components/layout/Layout';
 import { BeaconChainTimings } from '@/pages/beacon/timings';
 import { BlockTimings } from '@/pages/beacon/timings/blocks';
@@ -130,14 +124,9 @@ function App() {
             <Route index element={<Home />} />
             <Route path="about" element={<About />} />
             <Route path="experiments" element={<Experiments />} />
-            <Route path="xatu" element={<Xatu />}>
-              <Route path="community-nodes" element={<CommunityNodes />} />
-              <Route path="networks" element={<Networks />} />
-              <Route path="contributors" element={<ContributorsList />} />
-              <Route path="contributors/:name" element={<ContributorDetail />} />
-              <Route path="fork-readiness" element={<ForkReadiness />} />
-              <Route path="geographical-checklist" element={<GeographicalChecklist />} />
-            </Route>
+            {/* Redirect all /xatu routes to /xatu-data */}
+            <Route path="xatu" element={<XatuRedirect />} />
+            <Route path="xatu/*" element={<XatuRedirect />} />
             <Route path="xatu-data" element={<XatuData />}>
               <Route path="contributors" element={<XatuDataContributorsList />} />
               <Route path="contributors/:name" element={<XatuDataContributorDetail />} />

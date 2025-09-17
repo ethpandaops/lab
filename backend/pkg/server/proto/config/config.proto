@@ -78,8 +78,6 @@ message ForkInfo {
 message ModulesConfig {
   // Beacon chain timings module
   BeaconChainTimingsModule beacon_chain_timings = 1;
-  // Xatu public contributors module
-  XatuPublicContributorsModule xatu_public_contributors = 2;
   // Beacon module
   BeaconModule beacon = 3;
 }
@@ -92,18 +90,6 @@ message BeaconChainTimingsModule {
   repeated TimeWindow time_windows = 2;
   // Path prefix for data files
   string path_prefix = 3;
-}
-
-// XatuPublicContributorsModule configuration
-message XatuPublicContributorsModule {
-  // List of networks this module supports
-  repeated string networks = 1;
-  // Time windows configuration
-  repeated TimeWindow time_windows = 2;
-  // Path prefix for data files
-  string path_prefix = 3;
-  // Whether the module is enabled
-  bool enabled = 4;
 }
 
 // BeaconModule configuration

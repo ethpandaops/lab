@@ -8,7 +8,6 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
-	"strconv"
 	"strings"
 	"syscall"
 	"time"
@@ -19,7 +18,6 @@ import (
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/logger"
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/metrics"
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/storage"
-	"github.com/goccy/go-json"
 	"github.com/gorilla/mux"
 	"github.com/rs/cors"
 	"github.com/sirupsen/logrus"
@@ -305,23 +303,8 @@ func (s *Service) registerLegacyHandlers(router *mux.Router) {
 	// Size CDF - OK
 	router.HandleFunc("/beacon_chain_timings/size_cdf/{network}/{window_file}.json", s.handleSizeCDF).Methods("GET")
 
-	// Xatu Summary - OK
-	router.HandleFunc("/xatu_public_contributors/summary.json", s.handleXatuSummary).Methods("GET")
-
 	// Beacon Slot
 	router.HandleFunc("/beacon/slots/{network}/{slot}.json", s.handleBeaconSlot).Methods("GET")
-
-	// Xatu User Summary - OK
-	router.HandleFunc("/xatu_public_contributors/user-summaries/summary.json", s.handleXatuUserSummary).Methods("GET")
-
-	// Xatu User - OK
-	router.HandleFunc("/xatu_public_contributors/user-summaries/users/{username}.json", s.handleXatuUser).Methods("GET")
-
-	// Xatu Users Window - OK
-	router.HandleFunc("/xatu_public_contributors/users/{network}/{window_file}.json", s.handleXatuUsersWindow).Methods("GET")
-
-	// Xatu Countries Window - OK
-	router.HandleFunc("/xatu_public_contributors/countries/{network}/{window_file}.json", s.handleXatuCountriesWindow).Methods("GET")
 
 }
 
@@ -391,19 +374,6 @@ func (s *Service) handleSizeCDF(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (s *Service) handleXatuSummary(w http.ResponseWriter, r *http.Request) {
-	key := "xatu_public_contributors/summary.json"
-	if err := s.handleS3Passthrough(w, r, key, map[string]string{
-		"Content-Type":  "application/json",
-		"Cache-Control": "max-age=605, s-maxage=605, public",
-	}); err != nil {
-		s.log.WithError(err).WithField("key", key).Error("Failed to handle Xatu summary")
-		http.Error(w, "Internal server error", http.StatusInternalServerError)
-
-		return
-	}
-}
-
 func (s *Service) handleBeaconSlot(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	network := vars["network"]
@@ -415,162 +385,6 @@ func (s *Service) handleBeaconSlot(w http.ResponseWriter, r *http.Request) {
 		"Cache-Control": "max-age=6000, s-maxage=6000, public",
 	}); err != nil {
 		s.log.WithError(err).WithField("key", key).Error("Failed to handle beacon slot")
-		http.Error(w, "Internal server error", http.StatusInternalServerError)
-
-		return
-	}
-}
-
-func (s *Service) handleXatuUserSummary(w http.ResponseWriter, r *http.Request) {
-	key := "xatu_public_contributors/user-summaries/summary.json"
-
-	if err := s.handleS3Passthrough(w, r, key, map[string]string{
-		"Content-Type":  "application/json",
-		"Cache-Control": "max-age=605, s-maxage=605, public",
-	}); err != nil {
-		s.log.WithError(err).WithField("key", key).Error("Failed to handle Xatu user summary")
-		http.Error(w, "Internal server error", http.StatusInternalServerError)
-
-		return
-	}
-}
-
-func (s *Service) handleXatuUser(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	username := vars["username"]
-	key := "xatu_public_contributors/user-summaries/users/" + username + ".json"
-
-	if err := s.handleS3Passthrough(w, r, key, map[string]string{
-		"Content-Type":  "application/json",
-		"Cache-Control": "max-age=605, s-maxage=605, public",
-	}); err != nil {
-		s.log.WithError(err).WithField("key", key).Error("Failed to handle Xatu user")
-		http.Error(w, "Internal server error", http.StatusInternalServerError)
-
-		return
-	}
-}
-
-func (s *Service) handleXatuUsersWindow(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	network := vars["network"]
-	windowFile := vars["window_file"]
-
-	key := "xatu_public_contributors/users/" + network + "/" + windowFile + ".json"
-	if err := s.handleS3Passthrough(w, r, key, map[string]string{
-		"Content-Type":  "application/json",
-		"Cache-Control": "max-age=605, s-maxage=605, public",
-	}); err != nil {
-		s.log.WithError(err).WithField("key", key).Error("Failed to handle Xatu users window")
-		http.Error(w, "Internal server error", http.StatusInternalServerError)
-
-		return
-	}
-}
-
-func (s *Service) handleXatuCountriesWindow(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	network := vars["network"]
-	windowFile := vars["window_file"]
-
-	key := "xatu_public_contributors/countries/" + network + "/" + windowFile + ".json"
-
-	ctx := r.Context()
-
-	data, err := s.storageClient.Get(ctx, key)
-	if err != nil {
-		if err == storage.ErrNotFound {
-			http.Error(w, "Not found", http.StatusNotFound)
-		} else {
-			s.log.WithError(err).WithField("key", key).Error("Failed to get object from storage")
-			http.Error(w, "Internal server error", http.StatusInternalServerError)
-
-			return
-		}
-
-		return
-	}
-
-	// Unmarshal the internal format data
-	var internalData []struct {
-		Timestamp struct {
-			Seconds int64 `json:"seconds"`
-		} `json:"timestamp"`
-		NodeCounts []struct {
-			TotalNodes  int `json:"total_nodes"`
-			PublicNodes int `json:"public_nodes"`
-		} `json:"node_counts"`
-	}
-
-	if err := json.Unmarshal(data, &internalData); err != nil {
-		s.log.WithError(err).WithField("key", key).Error("Failed to unmarshal countries data")
-		http.Error(w, "Internal server error", http.StatusInternalServerError)
-
-		return
-	}
-
-	// Transform to production format
-	productionData := make([]struct {
-		Time      int64 `json:"time"`
-		Countries []struct {
-			Name  string `json:"name"`
-			Value int    `json:"value"`
-		} `json:"countries"`
-	}, len(internalData))
-
-	// Convert each data point
-	for _, dataPoint := range internalData {
-		productionPoint := struct {
-			Time      int64 `json:"time"`
-			Countries []struct {
-				Name  string `json:"name"`
-				Value int    `json:"value"`
-			} `json:"countries"`
-		}{
-			Time: dataPoint.Timestamp.Seconds,
-			Countries: []struct {
-				Name  string `json:"name"`
-				Value int    `json:"value"`
-			}{},
-		}
-
-		// For each node count entry, create a country entry
-		// The internal data doesn't seem to include country names, so we need to determine them
-		countryIndex := 0
-		for _, nodeCount := range dataPoint.NodeCounts {
-			// We need to determine country names from indexes or other means
-			// For this example, we'll extract the country info directly from nodeCount data
-			// In a real implementation, there might be a mapping from index to country name
-			// or the country name might be included in the data
-			productionPoint.Countries = append(productionPoint.Countries, struct {
-				Name  string `json:"name"`
-				Value int    `json:"value"`
-			}{
-				// This is just a placeholder. In a real implementation, you'd need to get
-				// the actual country name from somewhere.
-				Name:  "Country_" + strconv.Itoa(countryIndex),
-				Value: nodeCount.TotalNodes,
-			})
-			countryIndex++
-		}
-
-		productionData = append(productionData, productionPoint)
-	}
-
-	// Marshal to JSON
-	responseData, err := json.Marshal(productionData)
-	if err != nil {
-		s.log.WithError(err).WithField("key", key).Error("Failed to marshal transformed countries data")
-		http.Error(w, "Internal server error", http.StatusInternalServerError)
-
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Cache-Control", "max-age=605, s-maxage=605, public")
-
-	if _, err := w.Write(responseData); err != nil {
-		s.log.WithError(err).WithField("key", key).Error("Failed to write transformed countries data")
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 
 		return

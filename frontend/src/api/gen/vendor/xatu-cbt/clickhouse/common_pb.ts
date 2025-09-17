@@ -1685,3 +1685,133 @@ export class StringList extends Message<StringList> {
   }
 }
 
+/**
+ * BoolFilter represents filtering options for non-nullable bool values
+ *
+ * @generated from message cbt.BoolFilter
+ */
+export class BoolFilter extends Message<BoolFilter> {
+  /**
+   * @generated from oneof cbt.BoolFilter.filter
+   */
+  filter: {
+    /**
+     * Equal to value
+     *
+     * @generated from field: bool eq = 1;
+     */
+    value: boolean;
+    case: "eq";
+  } | {
+    /**
+     * Not equal to value
+     *
+     * @generated from field: bool ne = 2;
+     */
+    value: boolean;
+    case: "ne";
+  } | { case: undefined; value?: undefined } = { case: undefined };
+
+  constructor(data?: PartialMessage<BoolFilter>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "cbt.BoolFilter";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "eq", kind: "scalar", T: 8 /* ScalarType.BOOL */, oneof: "filter" },
+    { no: 2, name: "ne", kind: "scalar", T: 8 /* ScalarType.BOOL */, oneof: "filter" },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): BoolFilter {
+    return new BoolFilter().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): BoolFilter {
+    return new BoolFilter().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): BoolFilter {
+    return new BoolFilter().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: BoolFilter | PlainMessage<BoolFilter> | undefined, b: BoolFilter | PlainMessage<BoolFilter> | undefined): boolean {
+    return proto3.util.equals(BoolFilter, a, b);
+  }
+}
+
+/**
+ * NullableBoolFilter represents filtering options for nullable bool values
+ *
+ * @generated from message cbt.NullableBoolFilter
+ */
+export class NullableBoolFilter extends Message<NullableBoolFilter> {
+  /**
+   * @generated from oneof cbt.NullableBoolFilter.filter
+   */
+  filter: {
+    /**
+     * Equal to value
+     *
+     * @generated from field: bool eq = 1;
+     */
+    value: boolean;
+    case: "eq";
+  } | {
+    /**
+     * Not equal to value
+     *
+     * @generated from field: bool ne = 2;
+     */
+    value: boolean;
+    case: "ne";
+  } | {
+    /**
+     * IS NULL check
+     *
+     * @generated from field: google.protobuf.Empty is_null = 3;
+     */
+    value: Empty;
+    case: "isNull";
+  } | {
+    /**
+     * IS NOT NULL check
+     *
+     * @generated from field: google.protobuf.Empty is_not_null = 4;
+     */
+    value: Empty;
+    case: "isNotNull";
+  } | { case: undefined; value?: undefined } = { case: undefined };
+
+  constructor(data?: PartialMessage<NullableBoolFilter>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "cbt.NullableBoolFilter";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "eq", kind: "scalar", T: 8 /* ScalarType.BOOL */, oneof: "filter" },
+    { no: 2, name: "ne", kind: "scalar", T: 8 /* ScalarType.BOOL */, oneof: "filter" },
+    { no: 3, name: "is_null", kind: "message", T: Empty, oneof: "filter" },
+    { no: 4, name: "is_not_null", kind: "message", T: Empty, oneof: "filter" },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): NullableBoolFilter {
+    return new NullableBoolFilter().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): NullableBoolFilter {
+    return new NullableBoolFilter().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): NullableBoolFilter {
+    return new NullableBoolFilter().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: NullableBoolFilter | PlainMessage<NullableBoolFilter> | undefined, b: NullableBoolFilter | PlainMessage<NullableBoolFilter> | undefined): boolean {
+    return proto3.util.equals(NullableBoolFilter, a, b);
+  }
+}
+

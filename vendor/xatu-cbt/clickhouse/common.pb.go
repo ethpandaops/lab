@@ -2473,6 +2473,198 @@ func (x *StringList) GetValues() []string {
 	return nil
 }
 
+// BoolFilter represents filtering options for non-nullable bool values
+type BoolFilter struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	// Types that are assignable to Filter:
+	//
+	//	*BoolFilter_Eq
+	//	*BoolFilter_Ne
+	Filter isBoolFilter_Filter `protobuf_oneof:"filter"`
+}
+
+func (x *BoolFilter) Reset() {
+	*x = BoolFilter{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_vendor_xatu_cbt_clickhouse_common_proto_msgTypes[19]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *BoolFilter) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BoolFilter) ProtoMessage() {}
+
+func (x *BoolFilter) ProtoReflect() protoreflect.Message {
+	mi := &file_vendor_xatu_cbt_clickhouse_common_proto_msgTypes[19]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BoolFilter.ProtoReflect.Descriptor instead.
+func (*BoolFilter) Descriptor() ([]byte, []int) {
+	return file_vendor_xatu_cbt_clickhouse_common_proto_rawDescGZIP(), []int{19}
+}
+
+func (m *BoolFilter) GetFilter() isBoolFilter_Filter {
+	if m != nil {
+		return m.Filter
+	}
+	return nil
+}
+
+func (x *BoolFilter) GetEq() bool {
+	if x, ok := x.GetFilter().(*BoolFilter_Eq); ok {
+		return x.Eq
+	}
+	return false
+}
+
+func (x *BoolFilter) GetNe() bool {
+	if x, ok := x.GetFilter().(*BoolFilter_Ne); ok {
+		return x.Ne
+	}
+	return false
+}
+
+type isBoolFilter_Filter interface {
+	isBoolFilter_Filter()
+}
+
+type BoolFilter_Eq struct {
+	Eq bool `protobuf:"varint,1,opt,name=eq,proto3,oneof"` // Equal to value
+}
+
+type BoolFilter_Ne struct {
+	Ne bool `protobuf:"varint,2,opt,name=ne,proto3,oneof"` // Not equal to value
+}
+
+func (*BoolFilter_Eq) isBoolFilter_Filter() {}
+
+func (*BoolFilter_Ne) isBoolFilter_Filter() {}
+
+// NullableBoolFilter represents filtering options for nullable bool values
+type NullableBoolFilter struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	// Types that are assignable to Filter:
+	//
+	//	*NullableBoolFilter_Eq
+	//	*NullableBoolFilter_Ne
+	//	*NullableBoolFilter_IsNull
+	//	*NullableBoolFilter_IsNotNull
+	Filter isNullableBoolFilter_Filter `protobuf_oneof:"filter"`
+}
+
+func (x *NullableBoolFilter) Reset() {
+	*x = NullableBoolFilter{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_vendor_xatu_cbt_clickhouse_common_proto_msgTypes[20]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *NullableBoolFilter) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*NullableBoolFilter) ProtoMessage() {}
+
+func (x *NullableBoolFilter) ProtoReflect() protoreflect.Message {
+	mi := &file_vendor_xatu_cbt_clickhouse_common_proto_msgTypes[20]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use NullableBoolFilter.ProtoReflect.Descriptor instead.
+func (*NullableBoolFilter) Descriptor() ([]byte, []int) {
+	return file_vendor_xatu_cbt_clickhouse_common_proto_rawDescGZIP(), []int{20}
+}
+
+func (m *NullableBoolFilter) GetFilter() isNullableBoolFilter_Filter {
+	if m != nil {
+		return m.Filter
+	}
+	return nil
+}
+
+func (x *NullableBoolFilter) GetEq() bool {
+	if x, ok := x.GetFilter().(*NullableBoolFilter_Eq); ok {
+		return x.Eq
+	}
+	return false
+}
+
+func (x *NullableBoolFilter) GetNe() bool {
+	if x, ok := x.GetFilter().(*NullableBoolFilter_Ne); ok {
+		return x.Ne
+	}
+	return false
+}
+
+func (x *NullableBoolFilter) GetIsNull() *emptypb.Empty {
+	if x, ok := x.GetFilter().(*NullableBoolFilter_IsNull); ok {
+		return x.IsNull
+	}
+	return nil
+}
+
+func (x *NullableBoolFilter) GetIsNotNull() *emptypb.Empty {
+	if x, ok := x.GetFilter().(*NullableBoolFilter_IsNotNull); ok {
+		return x.IsNotNull
+	}
+	return nil
+}
+
+type isNullableBoolFilter_Filter interface {
+	isNullableBoolFilter_Filter()
+}
+
+type NullableBoolFilter_Eq struct {
+	Eq bool `protobuf:"varint,1,opt,name=eq,proto3,oneof"` // Equal to value
+}
+
+type NullableBoolFilter_Ne struct {
+	Ne bool `protobuf:"varint,2,opt,name=ne,proto3,oneof"` // Not equal to value
+}
+
+type NullableBoolFilter_IsNull struct {
+	IsNull *emptypb.Empty `protobuf:"bytes,3,opt,name=is_null,json=isNull,proto3,oneof"` // IS NULL check
+}
+
+type NullableBoolFilter_IsNotNull struct {
+	IsNotNull *emptypb.Empty `protobuf:"bytes,4,opt,name=is_not_null,json=isNotNull,proto3,oneof"` // IS NOT NULL check
+}
+
+func (*NullableBoolFilter_Eq) isNullableBoolFilter_Filter() {}
+
+func (*NullableBoolFilter_Ne) isNullableBoolFilter_Filter() {}
+
+func (*NullableBoolFilter_IsNull) isNullableBoolFilter_Filter() {}
+
+func (*NullableBoolFilter_IsNotNull) isNullableBoolFilter_Filter() {}
+
 var File_vendor_xatu_cbt_clickhouse_common_proto protoreflect.FileDescriptor
 
 var file_vendor_xatu_cbt_clickhouse_common_proto_rawDesc = []byte{
@@ -2716,13 +2908,28 @@ var file_vendor_xatu_cbt_clickhouse_common_proto_rawDesc = []byte{
 	0x79, 0x48, 0x00, 0x52, 0x09, 0x69, 0x73, 0x4e, 0x6f, 0x74, 0x4e, 0x75, 0x6c, 0x6c, 0x42, 0x08,
 	0x0a, 0x06, 0x66, 0x69, 0x6c, 0x74, 0x65, 0x72, 0x22, 0x24, 0x0a, 0x0a, 0x53, 0x74, 0x72, 0x69,
 	0x6e, 0x67, 0x4c, 0x69, 0x73, 0x74, 0x12, 0x16, 0x0a, 0x06, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x73,
-	0x18, 0x01, 0x20, 0x03, 0x28, 0x09, 0x52, 0x06, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x73, 0x2a, 0x1e,
-	0x0a, 0x09, 0x53, 0x6f, 0x72, 0x74, 0x4f, 0x72, 0x64, 0x65, 0x72, 0x12, 0x07, 0x0a, 0x03, 0x41,
-	0x53, 0x43, 0x10, 0x00, 0x12, 0x08, 0x0a, 0x04, 0x44, 0x45, 0x53, 0x43, 0x10, 0x01, 0x42, 0x36,
-	0x5a, 0x34, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x65, 0x74, 0x68,
-	0x70, 0x61, 0x6e, 0x64, 0x61, 0x6f, 0x70, 0x73, 0x2f, 0x78, 0x61, 0x74, 0x75, 0x2d, 0x63, 0x62,
-	0x74, 0x2f, 0x70, 0x6b, 0x67, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x63, 0x6c, 0x69, 0x63,
-	0x6b, 0x68, 0x6f, 0x75, 0x73, 0x65, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x18, 0x01, 0x20, 0x03, 0x28, 0x09, 0x52, 0x06, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x73, 0x22, 0x3a,
+	0x0a, 0x0a, 0x42, 0x6f, 0x6f, 0x6c, 0x46, 0x69, 0x6c, 0x74, 0x65, 0x72, 0x12, 0x10, 0x0a, 0x02,
+	0x65, 0x71, 0x18, 0x01, 0x20, 0x01, 0x28, 0x08, 0x48, 0x00, 0x52, 0x02, 0x65, 0x71, 0x12, 0x10,
+	0x0a, 0x02, 0x6e, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x08, 0x48, 0x00, 0x52, 0x02, 0x6e, 0x65,
+	0x42, 0x08, 0x0a, 0x06, 0x66, 0x69, 0x6c, 0x74, 0x65, 0x72, 0x22, 0xaf, 0x01, 0x0a, 0x12, 0x4e,
+	0x75, 0x6c, 0x6c, 0x61, 0x62, 0x6c, 0x65, 0x42, 0x6f, 0x6f, 0x6c, 0x46, 0x69, 0x6c, 0x74, 0x65,
+	0x72, 0x12, 0x10, 0x0a, 0x02, 0x65, 0x71, 0x18, 0x01, 0x20, 0x01, 0x28, 0x08, 0x48, 0x00, 0x52,
+	0x02, 0x65, 0x71, 0x12, 0x10, 0x0a, 0x02, 0x6e, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x08, 0x48,
+	0x00, 0x52, 0x02, 0x6e, 0x65, 0x12, 0x31, 0x0a, 0x07, 0x69, 0x73, 0x5f, 0x6e, 0x75, 0x6c, 0x6c,
+	0x18, 0x03, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x16, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e,
+	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x45, 0x6d, 0x70, 0x74, 0x79, 0x48, 0x00,
+	0x52, 0x06, 0x69, 0x73, 0x4e, 0x75, 0x6c, 0x6c, 0x12, 0x38, 0x0a, 0x0b, 0x69, 0x73, 0x5f, 0x6e,
+	0x6f, 0x74, 0x5f, 0x6e, 0x75, 0x6c, 0x6c, 0x18, 0x04, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x16, 0x2e,
+	0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e,
+	0x45, 0x6d, 0x70, 0x74, 0x79, 0x48, 0x00, 0x52, 0x09, 0x69, 0x73, 0x4e, 0x6f, 0x74, 0x4e, 0x75,
+	0x6c, 0x6c, 0x42, 0x08, 0x0a, 0x06, 0x66, 0x69, 0x6c, 0x74, 0x65, 0x72, 0x2a, 0x1e, 0x0a, 0x09,
+	0x53, 0x6f, 0x72, 0x74, 0x4f, 0x72, 0x64, 0x65, 0x72, 0x12, 0x07, 0x0a, 0x03, 0x41, 0x53, 0x43,
+	0x10, 0x00, 0x12, 0x08, 0x0a, 0x04, 0x44, 0x45, 0x53, 0x43, 0x10, 0x01, 0x42, 0x36, 0x5a, 0x34,
+	0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x65, 0x74, 0x68, 0x70, 0x61,
+	0x6e, 0x64, 0x61, 0x6f, 0x70, 0x73, 0x2f, 0x78, 0x61, 0x74, 0x75, 0x2d, 0x63, 0x62, 0x74, 0x2f,
+	0x70, 0x6b, 0x67, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x63, 0x6c, 0x69, 0x63, 0x6b, 0x68,
+	0x6f, 0x75, 0x73, 0x65, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -2738,7 +2945,7 @@ func file_vendor_xatu_cbt_clickhouse_common_proto_rawDescGZIP() []byte {
 }
 
 var file_vendor_xatu_cbt_clickhouse_common_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_vendor_xatu_cbt_clickhouse_common_proto_msgTypes = make([]protoimpl.MessageInfo, 19)
+var file_vendor_xatu_cbt_clickhouse_common_proto_msgTypes = make([]protoimpl.MessageInfo, 21)
 var file_vendor_xatu_cbt_clickhouse_common_proto_goTypes = []any{
 	(SortOrder)(0),                 // 0: cbt.SortOrder
 	(*UInt32Filter)(nil),           // 1: cbt.UInt32Filter
@@ -2760,11 +2967,13 @@ var file_vendor_xatu_cbt_clickhouse_common_proto_goTypes = []any{
 	(*StringFilter)(nil),           // 17: cbt.StringFilter
 	(*NullableStringFilter)(nil),   // 18: cbt.NullableStringFilter
 	(*StringList)(nil),             // 19: cbt.StringList
-	(*emptypb.Empty)(nil),          // 20: google.protobuf.Empty
-	(*wrapperspb.UInt32Value)(nil), // 21: google.protobuf.UInt32Value
-	(*wrapperspb.UInt64Value)(nil), // 22: google.protobuf.UInt64Value
-	(*wrapperspb.Int32Value)(nil),  // 23: google.protobuf.Int32Value
-	(*wrapperspb.Int64Value)(nil),  // 24: google.protobuf.Int64Value
+	(*BoolFilter)(nil),             // 20: cbt.BoolFilter
+	(*NullableBoolFilter)(nil),     // 21: cbt.NullableBoolFilter
+	(*emptypb.Empty)(nil),          // 22: google.protobuf.Empty
+	(*wrapperspb.UInt32Value)(nil), // 23: google.protobuf.UInt32Value
+	(*wrapperspb.UInt64Value)(nil), // 24: google.protobuf.UInt64Value
+	(*wrapperspb.Int32Value)(nil),  // 25: google.protobuf.Int32Value
+	(*wrapperspb.Int64Value)(nil),  // 26: google.protobuf.Int64Value
 }
 var file_vendor_xatu_cbt_clickhouse_common_proto_depIdxs = []int32{
 	3,  // 0: cbt.UInt32Filter.between:type_name -> cbt.UInt32Range
@@ -2773,47 +2982,49 @@ var file_vendor_xatu_cbt_clickhouse_common_proto_depIdxs = []int32{
 	3,  // 3: cbt.NullableUInt32Filter.between:type_name -> cbt.UInt32Range
 	4,  // 4: cbt.NullableUInt32Filter.in:type_name -> cbt.UInt32List
 	4,  // 5: cbt.NullableUInt32Filter.not_in:type_name -> cbt.UInt32List
-	20, // 6: cbt.NullableUInt32Filter.is_null:type_name -> google.protobuf.Empty
-	20, // 7: cbt.NullableUInt32Filter.is_not_null:type_name -> google.protobuf.Empty
-	21, // 8: cbt.UInt32Range.max:type_name -> google.protobuf.UInt32Value
+	22, // 6: cbt.NullableUInt32Filter.is_null:type_name -> google.protobuf.Empty
+	22, // 7: cbt.NullableUInt32Filter.is_not_null:type_name -> google.protobuf.Empty
+	23, // 8: cbt.UInt32Range.max:type_name -> google.protobuf.UInt32Value
 	7,  // 9: cbt.UInt64Filter.between:type_name -> cbt.UInt64Range
 	8,  // 10: cbt.UInt64Filter.in:type_name -> cbt.UInt64List
 	8,  // 11: cbt.UInt64Filter.not_in:type_name -> cbt.UInt64List
 	7,  // 12: cbt.NullableUInt64Filter.between:type_name -> cbt.UInt64Range
 	8,  // 13: cbt.NullableUInt64Filter.in:type_name -> cbt.UInt64List
 	8,  // 14: cbt.NullableUInt64Filter.not_in:type_name -> cbt.UInt64List
-	20, // 15: cbt.NullableUInt64Filter.is_null:type_name -> google.protobuf.Empty
-	20, // 16: cbt.NullableUInt64Filter.is_not_null:type_name -> google.protobuf.Empty
-	22, // 17: cbt.UInt64Range.max:type_name -> google.protobuf.UInt64Value
+	22, // 15: cbt.NullableUInt64Filter.is_null:type_name -> google.protobuf.Empty
+	22, // 16: cbt.NullableUInt64Filter.is_not_null:type_name -> google.protobuf.Empty
+	24, // 17: cbt.UInt64Range.max:type_name -> google.protobuf.UInt64Value
 	11, // 18: cbt.Int32Filter.between:type_name -> cbt.Int32Range
 	12, // 19: cbt.Int32Filter.in:type_name -> cbt.Int32List
 	12, // 20: cbt.Int32Filter.not_in:type_name -> cbt.Int32List
 	11, // 21: cbt.NullableInt32Filter.between:type_name -> cbt.Int32Range
 	12, // 22: cbt.NullableInt32Filter.in:type_name -> cbt.Int32List
 	12, // 23: cbt.NullableInt32Filter.not_in:type_name -> cbt.Int32List
-	20, // 24: cbt.NullableInt32Filter.is_null:type_name -> google.protobuf.Empty
-	20, // 25: cbt.NullableInt32Filter.is_not_null:type_name -> google.protobuf.Empty
-	23, // 26: cbt.Int32Range.max:type_name -> google.protobuf.Int32Value
+	22, // 24: cbt.NullableInt32Filter.is_null:type_name -> google.protobuf.Empty
+	22, // 25: cbt.NullableInt32Filter.is_not_null:type_name -> google.protobuf.Empty
+	25, // 26: cbt.Int32Range.max:type_name -> google.protobuf.Int32Value
 	15, // 27: cbt.Int64Filter.between:type_name -> cbt.Int64Range
 	16, // 28: cbt.Int64Filter.in:type_name -> cbt.Int64List
 	16, // 29: cbt.Int64Filter.not_in:type_name -> cbt.Int64List
 	15, // 30: cbt.NullableInt64Filter.between:type_name -> cbt.Int64Range
 	16, // 31: cbt.NullableInt64Filter.in:type_name -> cbt.Int64List
 	16, // 32: cbt.NullableInt64Filter.not_in:type_name -> cbt.Int64List
-	20, // 33: cbt.NullableInt64Filter.is_null:type_name -> google.protobuf.Empty
-	20, // 34: cbt.NullableInt64Filter.is_not_null:type_name -> google.protobuf.Empty
-	24, // 35: cbt.Int64Range.max:type_name -> google.protobuf.Int64Value
+	22, // 33: cbt.NullableInt64Filter.is_null:type_name -> google.protobuf.Empty
+	22, // 34: cbt.NullableInt64Filter.is_not_null:type_name -> google.protobuf.Empty
+	26, // 35: cbt.Int64Range.max:type_name -> google.protobuf.Int64Value
 	19, // 36: cbt.StringFilter.in:type_name -> cbt.StringList
 	19, // 37: cbt.StringFilter.not_in:type_name -> cbt.StringList
 	19, // 38: cbt.NullableStringFilter.in:type_name -> cbt.StringList
 	19, // 39: cbt.NullableStringFilter.not_in:type_name -> cbt.StringList
-	20, // 40: cbt.NullableStringFilter.is_null:type_name -> google.protobuf.Empty
-	20, // 41: cbt.NullableStringFilter.is_not_null:type_name -> google.protobuf.Empty
-	42, // [42:42] is the sub-list for method output_type
-	42, // [42:42] is the sub-list for method input_type
-	42, // [42:42] is the sub-list for extension type_name
-	42, // [42:42] is the sub-list for extension extendee
-	0,  // [0:42] is the sub-list for field type_name
+	22, // 40: cbt.NullableStringFilter.is_null:type_name -> google.protobuf.Empty
+	22, // 41: cbt.NullableStringFilter.is_not_null:type_name -> google.protobuf.Empty
+	22, // 42: cbt.NullableBoolFilter.is_null:type_name -> google.protobuf.Empty
+	22, // 43: cbt.NullableBoolFilter.is_not_null:type_name -> google.protobuf.Empty
+	44, // [44:44] is the sub-list for method output_type
+	44, // [44:44] is the sub-list for method input_type
+	44, // [44:44] is the sub-list for extension type_name
+	44, // [44:44] is the sub-list for extension extendee
+	0,  // [0:44] is the sub-list for field type_name
 }
 
 func init() { file_vendor_xatu_cbt_clickhouse_common_proto_init() }
@@ -3050,6 +3261,30 @@ func file_vendor_xatu_cbt_clickhouse_common_proto_init() {
 				return nil
 			}
 		}
+		file_vendor_xatu_cbt_clickhouse_common_proto_msgTypes[19].Exporter = func(v any, i int) any {
+			switch v := v.(*BoolFilter); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_vendor_xatu_cbt_clickhouse_common_proto_msgTypes[20].Exporter = func(v any, i int) any {
+			switch v := v.(*NullableBoolFilter); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
 	}
 	file_vendor_xatu_cbt_clickhouse_common_proto_msgTypes[0].OneofWrappers = []any{
 		(*UInt32Filter_Eq)(nil),
@@ -3171,13 +3406,23 @@ func file_vendor_xatu_cbt_clickhouse_common_proto_init() {
 		(*NullableStringFilter_IsNull)(nil),
 		(*NullableStringFilter_IsNotNull)(nil),
 	}
+	file_vendor_xatu_cbt_clickhouse_common_proto_msgTypes[19].OneofWrappers = []any{
+		(*BoolFilter_Eq)(nil),
+		(*BoolFilter_Ne)(nil),
+	}
+	file_vendor_xatu_cbt_clickhouse_common_proto_msgTypes[20].OneofWrappers = []any{
+		(*NullableBoolFilter_Eq)(nil),
+		(*NullableBoolFilter_Ne)(nil),
+		(*NullableBoolFilter_IsNull)(nil),
+		(*NullableBoolFilter_IsNotNull)(nil),
+	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_vendor_xatu_cbt_clickhouse_common_proto_rawDesc,
 			NumEnums:      1,
-			NumMessages:   19,
+			NumMessages:   21,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

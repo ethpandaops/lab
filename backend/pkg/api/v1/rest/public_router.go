@@ -507,31 +507,6 @@ func convertConfigToAPIProto(config *configpb.FrontendConfig) *apiv1.FrontendCon
 			modules.BeaconChainTimings = bct
 		}
 
-		// Xatu Public Contributors module
-		if config.Modules.XatuPublicContributors != nil {
-			xpc := &apiv1.XatuPublicContributorsModule{
-				Networks:   config.Modules.XatuPublicContributors.Networks,
-				PathPrefix: config.Modules.XatuPublicContributors.PathPrefix,
-				Enabled:    config.Modules.XatuPublicContributors.Enabled,
-			}
-
-			if config.Modules.XatuPublicContributors.TimeWindows != nil {
-				timeWindows := make([]*apiv1.TimeWindow, 0, len(config.Modules.XatuPublicContributors.TimeWindows))
-				for _, tw := range config.Modules.XatuPublicContributors.TimeWindows {
-					timeWindows = append(timeWindows, &apiv1.TimeWindow{
-						File:  tw.File,
-						Step:  tw.Step,
-						Range: tw.Range,
-						Label: tw.Label,
-					})
-				}
-
-				xpc.TimeWindows = timeWindows
-			}
-
-			modules.XatuPublicContributors = xpc
-		}
-
 		// Beacon module
 		if config.Modules.Beacon != nil {
 			beacon := &apiv1.BeaconModule{

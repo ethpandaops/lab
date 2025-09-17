@@ -7,78 +7,6 @@ import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialM
 import { Message, proto3, protoInt64 } from "@bufbuild/protobuf";
 
 /**
- * GetFrontendConfigRequest is the request for the GetFrontendConfig method
- *
- * @generated from message lab.GetFrontendConfigRequest
- */
-export class GetFrontendConfigRequest extends Message<GetFrontendConfigRequest> {
-  constructor(data?: PartialMessage<GetFrontendConfigRequest>) {
-    super();
-    proto3.util.initPartial(data, this);
-  }
-
-  static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "lab.GetFrontendConfigRequest";
-  static readonly fields: FieldList = proto3.util.newFieldList(() => [
-  ]);
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetFrontendConfigRequest {
-    return new GetFrontendConfigRequest().fromBinary(bytes, options);
-  }
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): GetFrontendConfigRequest {
-    return new GetFrontendConfigRequest().fromJson(jsonValue, options);
-  }
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): GetFrontendConfigRequest {
-    return new GetFrontendConfigRequest().fromJsonString(jsonString, options);
-  }
-
-  static equals(a: GetFrontendConfigRequest | PlainMessage<GetFrontendConfigRequest> | undefined, b: GetFrontendConfigRequest | PlainMessage<GetFrontendConfigRequest> | undefined): boolean {
-    return proto3.util.equals(GetFrontendConfigRequest, a, b);
-  }
-}
-
-/**
- * GetFrontendConfigResponse is the response for the GetFrontendConfig method
- *
- * @generated from message lab.GetFrontendConfigResponse
- */
-export class GetFrontendConfigResponse extends Message<GetFrontendConfigResponse> {
-  /**
-   * @generated from field: lab.FrontendConfig config = 1;
-   */
-  config?: FrontendConfig;
-
-  constructor(data?: PartialMessage<GetFrontendConfigResponse>) {
-    super();
-    proto3.util.initPartial(data, this);
-  }
-
-  static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "lab.GetFrontendConfigResponse";
-  static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "config", kind: "message", T: FrontendConfig },
-  ]);
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetFrontendConfigResponse {
-    return new GetFrontendConfigResponse().fromBinary(bytes, options);
-  }
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): GetFrontendConfigResponse {
-    return new GetFrontendConfigResponse().fromJson(jsonValue, options);
-  }
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): GetFrontendConfigResponse {
-    return new GetFrontendConfigResponse().fromJsonString(jsonString, options);
-  }
-
-  static equals(a: GetFrontendConfigResponse | PlainMessage<GetFrontendConfigResponse> | undefined, b: GetFrontendConfigResponse | PlainMessage<GetFrontendConfigResponse> | undefined): boolean {
-    return proto3.util.equals(GetFrontendConfigResponse, a, b);
-  }
-}
-
-/**
  * FrontendConfig is the frontend configuration for the lab. Data here is used to populate the frontend UI,
  * and is exposed publically.
  *
@@ -175,11 +103,6 @@ export class FrontendConfig_Modules extends Message<FrontendConfig_Modules> {
   beaconChainTimings?: FrontendConfig_BeaconChainTimingsModule;
 
   /**
-   * @generated from field: lab.FrontendConfig.XatuPublicContributorsModule xatu_public_contributors = 2;
-   */
-  xatuPublicContributors?: FrontendConfig_XatuPublicContributorsModule;
-
-  /**
    * @generated from field: lab.FrontendConfig.BeaconModule beacon = 3;
    */
   beacon?: FrontendConfig_BeaconModule;
@@ -193,7 +116,6 @@ export class FrontendConfig_Modules extends Message<FrontendConfig_Modules> {
   static readonly typeName = "lab.FrontendConfig.Modules";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "beacon_chain_timings", kind: "message", T: FrontendConfig_BeaconChainTimingsModule },
-    { no: 2, name: "xatu_public_contributors", kind: "message", T: FrontendConfig_XatuPublicContributorsModule },
     { no: 3, name: "beacon", kind: "message", T: FrontendConfig_BeaconModule },
   ]);
 
@@ -268,63 +190,6 @@ export class FrontendConfig_BeaconChainTimingsModule extends Message<FrontendCon
 
   static equals(a: FrontendConfig_BeaconChainTimingsModule | PlainMessage<FrontendConfig_BeaconChainTimingsModule> | undefined, b: FrontendConfig_BeaconChainTimingsModule | PlainMessage<FrontendConfig_BeaconChainTimingsModule> | undefined): boolean {
     return proto3.util.equals(FrontendConfig_BeaconChainTimingsModule, a, b);
-  }
-}
-
-/**
- * XatuPublicContributorsModule represents the Xatu public contributors module configuration
- *
- * @generated from message lab.FrontendConfig.XatuPublicContributorsModule
- */
-export class FrontendConfig_XatuPublicContributorsModule extends Message<FrontendConfig_XatuPublicContributorsModule> {
-  /**
-   * @generated from field: repeated string networks = 1;
-   */
-  networks: string[] = [];
-
-  /**
-   * @generated from field: repeated lab.FrontendConfig.TimeWindow time_windows = 2;
-   */
-  timeWindows: FrontendConfig_TimeWindow[] = [];
-
-  /**
-   * @generated from field: string path_prefix = 3;
-   */
-  pathPrefix = "";
-
-  /**
-   * @generated from field: bool enabled = 4;
-   */
-  enabled = false;
-
-  constructor(data?: PartialMessage<FrontendConfig_XatuPublicContributorsModule>) {
-    super();
-    proto3.util.initPartial(data, this);
-  }
-
-  static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "lab.FrontendConfig.XatuPublicContributorsModule";
-  static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "networks", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
-    { no: 2, name: "time_windows", kind: "message", T: FrontendConfig_TimeWindow, repeated: true },
-    { no: 3, name: "path_prefix", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 4, name: "enabled", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
-  ]);
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): FrontendConfig_XatuPublicContributorsModule {
-    return new FrontendConfig_XatuPublicContributorsModule().fromBinary(bytes, options);
-  }
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): FrontendConfig_XatuPublicContributorsModule {
-    return new FrontendConfig_XatuPublicContributorsModule().fromJson(jsonValue, options);
-  }
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): FrontendConfig_XatuPublicContributorsModule {
-    return new FrontendConfig_XatuPublicContributorsModule().fromJsonString(jsonString, options);
-  }
-
-  static equals(a: FrontendConfig_XatuPublicContributorsModule | PlainMessage<FrontendConfig_XatuPublicContributorsModule> | undefined, b: FrontendConfig_XatuPublicContributorsModule | PlainMessage<FrontendConfig_XatuPublicContributorsModule> | undefined): boolean {
-    return proto3.util.equals(FrontendConfig_XatuPublicContributorsModule, a, b);
   }
 }
 
@@ -691,110 +556,6 @@ export class FrontendConfig_ForkDetails extends Message<FrontendConfig_ForkDetai
 
   static equals(a: FrontendConfig_ForkDetails | PlainMessage<FrontendConfig_ForkDetails> | undefined, b: FrontendConfig_ForkDetails | PlainMessage<FrontendConfig_ForkDetails> | undefined): boolean {
     return proto3.util.equals(FrontendConfig_ForkDetails, a, b);
-  }
-}
-
-/**
- * @generated from message lab.GetConfigResponse
- */
-export class GetConfigResponse extends Message<GetConfigResponse> {
-  /**
-   * @generated from field: map<string, lab.GetConfigResponse.ModuleConfig> modules = 1;
-   */
-  modules: { [key: string]: GetConfigResponse_ModuleConfig } = {};
-
-  /**
-   * @generated from field: lab.FrontendConfig.EthereumConfig ethereum = 2;
-   */
-  ethereum?: FrontendConfig_EthereumConfig;
-
-  constructor(data?: PartialMessage<GetConfigResponse>) {
-    super();
-    proto3.util.initPartial(data, this);
-  }
-
-  static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "lab.GetConfigResponse";
-  static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "modules", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "message", T: GetConfigResponse_ModuleConfig} },
-    { no: 2, name: "ethereum", kind: "message", T: FrontendConfig_EthereumConfig },
-  ]);
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetConfigResponse {
-    return new GetConfigResponse().fromBinary(bytes, options);
-  }
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): GetConfigResponse {
-    return new GetConfigResponse().fromJson(jsonValue, options);
-  }
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): GetConfigResponse {
-    return new GetConfigResponse().fromJsonString(jsonString, options);
-  }
-
-  static equals(a: GetConfigResponse | PlainMessage<GetConfigResponse> | undefined, b: GetConfigResponse | PlainMessage<GetConfigResponse> | undefined): boolean {
-    return proto3.util.equals(GetConfigResponse, a, b);
-  }
-}
-
-/**
- * @generated from message lab.GetConfigResponse.ModuleConfig
- */
-export class GetConfigResponse_ModuleConfig extends Message<GetConfigResponse_ModuleConfig> {
-  /**
-   * @generated from field: bool enabled = 1;
-   */
-  enabled = false;
-
-  /**
-   * @generated from field: string description = 2;
-   */
-  description = "";
-
-  /**
-   * @generated from field: string path_prefix = 3;
-   */
-  pathPrefix = "";
-
-  /**
-   * @generated from field: repeated string networks = 4;
-   */
-  networks: string[] = [];
-
-  /**
-   * @generated from field: repeated lab.FrontendConfig.TimeWindow time_windows = 5;
-   */
-  timeWindows: FrontendConfig_TimeWindow[] = [];
-
-  constructor(data?: PartialMessage<GetConfigResponse_ModuleConfig>) {
-    super();
-    proto3.util.initPartial(data, this);
-  }
-
-  static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "lab.GetConfigResponse.ModuleConfig";
-  static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "enabled", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
-    { no: 2, name: "description", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "path_prefix", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 4, name: "networks", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
-    { no: 5, name: "time_windows", kind: "message", T: FrontendConfig_TimeWindow, repeated: true },
-  ]);
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetConfigResponse_ModuleConfig {
-    return new GetConfigResponse_ModuleConfig().fromBinary(bytes, options);
-  }
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): GetConfigResponse_ModuleConfig {
-    return new GetConfigResponse_ModuleConfig().fromJson(jsonValue, options);
-  }
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): GetConfigResponse_ModuleConfig {
-    return new GetConfigResponse_ModuleConfig().fromJsonString(jsonString, options);
-  }
-
-  static equals(a: GetConfigResponse_ModuleConfig | PlainMessage<GetConfigResponse_ModuleConfig> | undefined, b: GetConfigResponse_ModuleConfig | PlainMessage<GetConfigResponse_ModuleConfig> | undefined): boolean {
-    return proto3.util.equals(GetConfigResponse_ModuleConfig, a, b);
   }
 }
 

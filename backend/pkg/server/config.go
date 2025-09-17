@@ -13,7 +13,6 @@ import (
 	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/beacon_slots"
 	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/cartographoor"
 	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/xatu_cbt"
-	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/xatu_public_contributors"
 )
 
 type Config struct {
@@ -29,9 +28,8 @@ type Config struct {
 }
 
 type ModuleConfig struct {
-	BeaconChainTimings     *beacon_chain_timings.Config     `yaml:"beacon_chain_timings"`
-	XatuPublicContributors *xatu_public_contributors.Config `yaml:"xatu_public_contributors"`
-	BeaconSlots            *beacon_slots.Config             `yaml:"beacon_slots"`
+	BeaconChainTimings *beacon_chain_timings.Config `yaml:"beacon_chain_timings"`
+	BeaconSlots        *beacon_slots.Config         `yaml:"beacon_slots"`
 }
 
 func (x *Config) Validate() error {

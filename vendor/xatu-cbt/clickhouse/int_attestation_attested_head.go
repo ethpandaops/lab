@@ -406,6 +406,36 @@ func BuildListIntAttestationAttestedHeadQuery(req *ListIntAttestationAttestedHea
 		}
 	}
 
+	// Add filter for column: propagation_distance
+	if req.PropagationDistance != nil {
+		switch filter := req.PropagationDistance.Filter.(type) {
+		case *UInt32Filter_Eq:
+			qb.AddCondition("propagation_distance", "=", filter.Eq)
+		case *UInt32Filter_Ne:
+			qb.AddCondition("propagation_distance", "!=", filter.Ne)
+		case *UInt32Filter_Lt:
+			qb.AddCondition("propagation_distance", "<", filter.Lt)
+		case *UInt32Filter_Lte:
+			qb.AddCondition("propagation_distance", "<=", filter.Lte)
+		case *UInt32Filter_Gt:
+			qb.AddCondition("propagation_distance", ">", filter.Gt)
+		case *UInt32Filter_Gte:
+			qb.AddCondition("propagation_distance", ">=", filter.Gte)
+		case *UInt32Filter_Between:
+			qb.AddBetweenCondition("propagation_distance", filter.Between.Min, filter.Between.Max)
+		case *UInt32Filter_In:
+			if len(filter.In.Values) > 0 {
+				qb.AddInCondition("propagation_distance", UInt32SliceToInterface(filter.In.Values))
+			}
+		case *UInt32Filter_NotIn:
+			if len(filter.NotIn.Values) > 0 {
+				qb.AddNotInCondition("propagation_distance", UInt32SliceToInterface(filter.NotIn.Values))
+			}
+		default:
+			// Unsupported filter type
+		}
+	}
+
 	// Handle pagination per AIP-132
 	var limit, offset uint32
 	limit = 100 // Default page size
@@ -426,7 +456,7 @@ func BuildListIntAttestationAttestedHeadQuery(req *ListIntAttestationAttestedHea
 	// Handle custom ordering if provided
 	var orderByClause string
 	if req.OrderBy != "" {
-		validFields := []string{"updated_date_time", "slot", "slot_start_date_time", "epoch", "epoch_start_date_time", "source_epoch", "source_epoch_start_date_time", "source_root", "target_epoch", "target_epoch_start_date_time", "target_root", "block_root", "attesting_validator_index"}
+		validFields := []string{"updated_date_time", "slot", "slot_start_date_time", "epoch", "epoch_start_date_time", "source_epoch", "source_epoch_start_date_time", "source_root", "target_epoch", "target_epoch_start_date_time", "target_root", "block_root", "attesting_validator_index", "propagation_distance"}
 		orderFields, err := ParseOrderBy(req.OrderBy, validFields)
 		if err != nil {
 			return SQLQuery{}, fmt.Errorf("invalid order_by: %w", err)

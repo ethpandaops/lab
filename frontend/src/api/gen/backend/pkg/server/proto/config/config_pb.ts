@@ -412,13 +412,6 @@ export class ModulesConfig extends Message<ModulesConfig> {
   beaconChainTimings?: BeaconChainTimingsModule;
 
   /**
-   * Xatu public contributors module
-   *
-   * @generated from field: config.XatuPublicContributorsModule xatu_public_contributors = 2;
-   */
-  xatuPublicContributors?: XatuPublicContributorsModule;
-
-  /**
    * Beacon module
    *
    * @generated from field: config.BeaconModule beacon = 3;
@@ -434,7 +427,6 @@ export class ModulesConfig extends Message<ModulesConfig> {
   static readonly typeName = "config.ModulesConfig";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "beacon_chain_timings", kind: "message", T: BeaconChainTimingsModule },
-    { no: 2, name: "xatu_public_contributors", kind: "message", T: XatuPublicContributorsModule },
     { no: 3, name: "beacon", kind: "message", T: BeaconModule },
   ]);
 
@@ -509,71 +501,6 @@ export class BeaconChainTimingsModule extends Message<BeaconChainTimingsModule> 
 
   static equals(a: BeaconChainTimingsModule | PlainMessage<BeaconChainTimingsModule> | undefined, b: BeaconChainTimingsModule | PlainMessage<BeaconChainTimingsModule> | undefined): boolean {
     return proto3.util.equals(BeaconChainTimingsModule, a, b);
-  }
-}
-
-/**
- * XatuPublicContributorsModule configuration
- *
- * @generated from message config.XatuPublicContributorsModule
- */
-export class XatuPublicContributorsModule extends Message<XatuPublicContributorsModule> {
-  /**
-   * List of networks this module supports
-   *
-   * @generated from field: repeated string networks = 1;
-   */
-  networks: string[] = [];
-
-  /**
-   * Time windows configuration
-   *
-   * @generated from field: repeated config.TimeWindow time_windows = 2;
-   */
-  timeWindows: TimeWindow[] = [];
-
-  /**
-   * Path prefix for data files
-   *
-   * @generated from field: string path_prefix = 3;
-   */
-  pathPrefix = "";
-
-  /**
-   * Whether the module is enabled
-   *
-   * @generated from field: bool enabled = 4;
-   */
-  enabled = false;
-
-  constructor(data?: PartialMessage<XatuPublicContributorsModule>) {
-    super();
-    proto3.util.initPartial(data, this);
-  }
-
-  static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "config.XatuPublicContributorsModule";
-  static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "networks", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
-    { no: 2, name: "time_windows", kind: "message", T: TimeWindow, repeated: true },
-    { no: 3, name: "path_prefix", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 4, name: "enabled", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
-  ]);
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): XatuPublicContributorsModule {
-    return new XatuPublicContributorsModule().fromBinary(bytes, options);
-  }
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): XatuPublicContributorsModule {
-    return new XatuPublicContributorsModule().fromJson(jsonValue, options);
-  }
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): XatuPublicContributorsModule {
-    return new XatuPublicContributorsModule().fromJsonString(jsonString, options);
-  }
-
-  static equals(a: XatuPublicContributorsModule | PlainMessage<XatuPublicContributorsModule> | undefined, b: XatuPublicContributorsModule | PlainMessage<XatuPublicContributorsModule> | undefined): boolean {
-    return proto3.util.equals(XatuPublicContributorsModule, a, b);
   }
 }
 
