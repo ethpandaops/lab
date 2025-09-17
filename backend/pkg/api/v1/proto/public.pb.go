@@ -1629,9 +1629,10 @@ type ExperimentConfig struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Id       string   `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Enabled  bool     `protobuf:"varint,2,opt,name=enabled,proto3" json:"enabled,omitempty"`
-	Networks []string `protobuf:"bytes,3,rep,name=networks,proto3" json:"networks,omitempty"`
+	Id               string                                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Enabled          bool                                   `protobuf:"varint,2,opt,name=enabled,proto3" json:"enabled,omitempty"`
+	Networks         []string                               `protobuf:"bytes,3,rep,name=networks,proto3" json:"networks,omitempty"`
+	DataAvailability map[string]*ExperimentDataAvailability `protobuf:"bytes,4,rep,name=data_availability,json=dataAvailability,proto3" json:"data_availability,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 }
 
 func (x *ExperimentConfig) Reset() {
@@ -1683,6 +1684,205 @@ func (x *ExperimentConfig) GetEnabled() bool {
 func (x *ExperimentConfig) GetNetworks() []string {
 	if x != nil {
 		return x.Networks
+	}
+	return nil
+}
+
+func (x *ExperimentConfig) GetDataAvailability() map[string]*ExperimentDataAvailability {
+	if x != nil {
+		return x.DataAvailability
+	}
+	return nil
+}
+
+// ExperimentDataAvailability contains data availability information for an experiment on a specific network.
+type ExperimentDataAvailability struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	AvailableFromTimestamp  int64  `protobuf:"varint,1,opt,name=available_from_timestamp,json=availableFromTimestamp,proto3" json:"available_from_timestamp,omitempty"`
+	AvailableUntilTimestamp int64  `protobuf:"varint,2,opt,name=available_until_timestamp,json=availableUntilTimestamp,proto3" json:"available_until_timestamp,omitempty"`
+	MinSlot                 uint64 `protobuf:"varint,3,opt,name=min_slot,json=minSlot,proto3" json:"min_slot,omitempty"`
+	MaxSlot                 uint64 `protobuf:"varint,4,opt,name=max_slot,json=maxSlot,proto3" json:"max_slot,omitempty"`
+	SafeSlot                uint64 `protobuf:"varint,5,opt,name=safe_slot,json=safeSlot,proto3" json:"safe_slot,omitempty"`
+	HeadSlot                uint64 `protobuf:"varint,6,opt,name=head_slot,json=headSlot,proto3" json:"head_slot,omitempty"`
+	HasData                 bool   `protobuf:"varint,7,opt,name=has_data,json=hasData,proto3" json:"has_data,omitempty"`
+}
+
+func (x *ExperimentDataAvailability) Reset() {
+	*x = ExperimentDataAvailability{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_backend_pkg_api_v1_proto_public_proto_msgTypes[26]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *ExperimentDataAvailability) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ExperimentDataAvailability) ProtoMessage() {}
+
+func (x *ExperimentDataAvailability) ProtoReflect() protoreflect.Message {
+	mi := &file_backend_pkg_api_v1_proto_public_proto_msgTypes[26]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ExperimentDataAvailability.ProtoReflect.Descriptor instead.
+func (*ExperimentDataAvailability) Descriptor() ([]byte, []int) {
+	return file_backend_pkg_api_v1_proto_public_proto_rawDescGZIP(), []int{26}
+}
+
+func (x *ExperimentDataAvailability) GetAvailableFromTimestamp() int64 {
+	if x != nil {
+		return x.AvailableFromTimestamp
+	}
+	return 0
+}
+
+func (x *ExperimentDataAvailability) GetAvailableUntilTimestamp() int64 {
+	if x != nil {
+		return x.AvailableUntilTimestamp
+	}
+	return 0
+}
+
+func (x *ExperimentDataAvailability) GetMinSlot() uint64 {
+	if x != nil {
+		return x.MinSlot
+	}
+	return 0
+}
+
+func (x *ExperimentDataAvailability) GetMaxSlot() uint64 {
+	if x != nil {
+		return x.MaxSlot
+	}
+	return 0
+}
+
+func (x *ExperimentDataAvailability) GetSafeSlot() uint64 {
+	if x != nil {
+		return x.SafeSlot
+	}
+	return 0
+}
+
+func (x *ExperimentDataAvailability) GetHeadSlot() uint64 {
+	if x != nil {
+		return x.HeadSlot
+	}
+	return 0
+}
+
+func (x *ExperimentDataAvailability) GetHasData() bool {
+	if x != nil {
+		return x.HasData
+	}
+	return false
+}
+
+// GetExperimentConfigRequest defines the request for getting a single experiment's configuration.
+type GetExperimentConfigRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	ExperimentId string `protobuf:"bytes,1,opt,name=experiment_id,json=experimentId,proto3" json:"experiment_id,omitempty"`
+}
+
+func (x *GetExperimentConfigRequest) Reset() {
+	*x = GetExperimentConfigRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_backend_pkg_api_v1_proto_public_proto_msgTypes[27]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetExperimentConfigRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetExperimentConfigRequest) ProtoMessage() {}
+
+func (x *GetExperimentConfigRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_backend_pkg_api_v1_proto_public_proto_msgTypes[27]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetExperimentConfigRequest.ProtoReflect.Descriptor instead.
+func (*GetExperimentConfigRequest) Descriptor() ([]byte, []int) {
+	return file_backend_pkg_api_v1_proto_public_proto_rawDescGZIP(), []int{27}
+}
+
+func (x *GetExperimentConfigRequest) GetExperimentId() string {
+	if x != nil {
+		return x.ExperimentId
+	}
+	return ""
+}
+
+// GetExperimentConfigResponse returns a single experiment's full configuration with data availability.
+type GetExperimentConfigResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Experiment *ExperimentConfig `protobuf:"bytes,1,opt,name=experiment,proto3" json:"experiment,omitempty"`
+}
+
+func (x *GetExperimentConfigResponse) Reset() {
+	*x = GetExperimentConfigResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_backend_pkg_api_v1_proto_public_proto_msgTypes[28]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetExperimentConfigResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetExperimentConfigResponse) ProtoMessage() {}
+
+func (x *GetExperimentConfigResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_backend_pkg_api_v1_proto_public_proto_msgTypes[28]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetExperimentConfigResponse.ProtoReflect.Descriptor instead.
+func (*GetExperimentConfigResponse) Descriptor() ([]byte, []int) {
+	return file_backend_pkg_api_v1_proto_public_proto_rawDescGZIP(), []int{28}
+}
+
+func (x *GetExperimentConfigResponse) GetExperiment() *ExperimentConfig {
+	if x != nil {
+		return x.Experiment
 	}
 	return nil
 }
@@ -1929,16 +2129,56 @@ var file_backend_pkg_api_v1_proto_public_proto_rawDesc = []byte{
 	0x6d, 0x65, 0x6e, 0x74, 0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x18, 0x2e, 0x61, 0x70,
 	0x69, 0x2e, 0x76, 0x31, 0x2e, 0x45, 0x78, 0x70, 0x65, 0x72, 0x69, 0x6d, 0x65, 0x6e, 0x74, 0x43,
 	0x6f, 0x6e, 0x66, 0x69, 0x67, 0x52, 0x0b, 0x65, 0x78, 0x70, 0x65, 0x72, 0x69, 0x6d, 0x65, 0x6e,
-	0x74, 0x73, 0x22, 0x58, 0x0a, 0x10, 0x45, 0x78, 0x70, 0x65, 0x72, 0x69, 0x6d, 0x65, 0x6e, 0x74,
-	0x43, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01,
-	0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x12, 0x18, 0x0a, 0x07, 0x65, 0x6e, 0x61, 0x62, 0x6c, 0x65,
-	0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x08, 0x52, 0x07, 0x65, 0x6e, 0x61, 0x62, 0x6c, 0x65, 0x64,
-	0x12, 0x1a, 0x0a, 0x08, 0x6e, 0x65, 0x74, 0x77, 0x6f, 0x72, 0x6b, 0x73, 0x18, 0x03, 0x20, 0x03,
-	0x28, 0x09, 0x52, 0x08, 0x6e, 0x65, 0x74, 0x77, 0x6f, 0x72, 0x6b, 0x73, 0x42, 0x35, 0x5a, 0x33,
-	0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x65, 0x74, 0x68, 0x70, 0x61,
-	0x6e, 0x64, 0x61, 0x6f, 0x70, 0x73, 0x2f, 0x6c, 0x61, 0x62, 0x2f, 0x62, 0x61, 0x63, 0x6b, 0x65,
-	0x6e, 0x64, 0x2f, 0x70, 0x6b, 0x67, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x76, 0x31, 0x2f, 0x70, 0x72,
-	0x6f, 0x74, 0x6f, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x74, 0x73, 0x22, 0x9e, 0x02, 0x0a, 0x10, 0x45, 0x78, 0x70, 0x65, 0x72, 0x69, 0x6d, 0x65, 0x6e,
+	0x74, 0x43, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20,
+	0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x12, 0x18, 0x0a, 0x07, 0x65, 0x6e, 0x61, 0x62, 0x6c,
+	0x65, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x08, 0x52, 0x07, 0x65, 0x6e, 0x61, 0x62, 0x6c, 0x65,
+	0x64, 0x12, 0x1a, 0x0a, 0x08, 0x6e, 0x65, 0x74, 0x77, 0x6f, 0x72, 0x6b, 0x73, 0x18, 0x03, 0x20,
+	0x03, 0x28, 0x09, 0x52, 0x08, 0x6e, 0x65, 0x74, 0x77, 0x6f, 0x72, 0x6b, 0x73, 0x12, 0x5b, 0x0a,
+	0x11, 0x64, 0x61, 0x74, 0x61, 0x5f, 0x61, 0x76, 0x61, 0x69, 0x6c, 0x61, 0x62, 0x69, 0x6c, 0x69,
+	0x74, 0x79, 0x18, 0x04, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x2e, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x76,
+	0x31, 0x2e, 0x45, 0x78, 0x70, 0x65, 0x72, 0x69, 0x6d, 0x65, 0x6e, 0x74, 0x43, 0x6f, 0x6e, 0x66,
+	0x69, 0x67, 0x2e, 0x44, 0x61, 0x74, 0x61, 0x41, 0x76, 0x61, 0x69, 0x6c, 0x61, 0x62, 0x69, 0x6c,
+	0x69, 0x74, 0x79, 0x45, 0x6e, 0x74, 0x72, 0x79, 0x52, 0x10, 0x64, 0x61, 0x74, 0x61, 0x41, 0x76,
+	0x61, 0x69, 0x6c, 0x61, 0x62, 0x69, 0x6c, 0x69, 0x74, 0x79, 0x1a, 0x67, 0x0a, 0x15, 0x44, 0x61,
+	0x74, 0x61, 0x41, 0x76, 0x61, 0x69, 0x6c, 0x61, 0x62, 0x69, 0x6c, 0x69, 0x74, 0x79, 0x45, 0x6e,
+	0x74, 0x72, 0x79, 0x12, 0x10, 0x0a, 0x03, 0x6b, 0x65, 0x79, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09,
+	0x52, 0x03, 0x6b, 0x65, 0x79, 0x12, 0x38, 0x0a, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x18, 0x02,
+	0x20, 0x01, 0x28, 0x0b, 0x32, 0x22, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x76, 0x31, 0x2e, 0x45, 0x78,
+	0x70, 0x65, 0x72, 0x69, 0x6d, 0x65, 0x6e, 0x74, 0x44, 0x61, 0x74, 0x61, 0x41, 0x76, 0x61, 0x69,
+	0x6c, 0x61, 0x62, 0x69, 0x6c, 0x69, 0x74, 0x79, 0x52, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x3a,
+	0x02, 0x38, 0x01, 0x22, 0x9d, 0x02, 0x0a, 0x1a, 0x45, 0x78, 0x70, 0x65, 0x72, 0x69, 0x6d, 0x65,
+	0x6e, 0x74, 0x44, 0x61, 0x74, 0x61, 0x41, 0x76, 0x61, 0x69, 0x6c, 0x61, 0x62, 0x69, 0x6c, 0x69,
+	0x74, 0x79, 0x12, 0x38, 0x0a, 0x18, 0x61, 0x76, 0x61, 0x69, 0x6c, 0x61, 0x62, 0x6c, 0x65, 0x5f,
+	0x66, 0x72, 0x6f, 0x6d, 0x5f, 0x74, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x18, 0x01,
+	0x20, 0x01, 0x28, 0x03, 0x52, 0x16, 0x61, 0x76, 0x61, 0x69, 0x6c, 0x61, 0x62, 0x6c, 0x65, 0x46,
+	0x72, 0x6f, 0x6d, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x12, 0x3a, 0x0a, 0x19,
+	0x61, 0x76, 0x61, 0x69, 0x6c, 0x61, 0x62, 0x6c, 0x65, 0x5f, 0x75, 0x6e, 0x74, 0x69, 0x6c, 0x5f,
+	0x74, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x18, 0x02, 0x20, 0x01, 0x28, 0x03, 0x52,
+	0x17, 0x61, 0x76, 0x61, 0x69, 0x6c, 0x61, 0x62, 0x6c, 0x65, 0x55, 0x6e, 0x74, 0x69, 0x6c, 0x54,
+	0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x12, 0x19, 0x0a, 0x08, 0x6d, 0x69, 0x6e, 0x5f,
+	0x73, 0x6c, 0x6f, 0x74, 0x18, 0x03, 0x20, 0x01, 0x28, 0x04, 0x52, 0x07, 0x6d, 0x69, 0x6e, 0x53,
+	0x6c, 0x6f, 0x74, 0x12, 0x19, 0x0a, 0x08, 0x6d, 0x61, 0x78, 0x5f, 0x73, 0x6c, 0x6f, 0x74, 0x18,
+	0x04, 0x20, 0x01, 0x28, 0x04, 0x52, 0x07, 0x6d, 0x61, 0x78, 0x53, 0x6c, 0x6f, 0x74, 0x12, 0x1b,
+	0x0a, 0x09, 0x73, 0x61, 0x66, 0x65, 0x5f, 0x73, 0x6c, 0x6f, 0x74, 0x18, 0x05, 0x20, 0x01, 0x28,
+	0x04, 0x52, 0x08, 0x73, 0x61, 0x66, 0x65, 0x53, 0x6c, 0x6f, 0x74, 0x12, 0x1b, 0x0a, 0x09, 0x68,
+	0x65, 0x61, 0x64, 0x5f, 0x73, 0x6c, 0x6f, 0x74, 0x18, 0x06, 0x20, 0x01, 0x28, 0x04, 0x52, 0x08,
+	0x68, 0x65, 0x61, 0x64, 0x53, 0x6c, 0x6f, 0x74, 0x12, 0x19, 0x0a, 0x08, 0x68, 0x61, 0x73, 0x5f,
+	0x64, 0x61, 0x74, 0x61, 0x18, 0x07, 0x20, 0x01, 0x28, 0x08, 0x52, 0x07, 0x68, 0x61, 0x73, 0x44,
+	0x61, 0x74, 0x61, 0x22, 0x41, 0x0a, 0x1a, 0x47, 0x65, 0x74, 0x45, 0x78, 0x70, 0x65, 0x72, 0x69,
+	0x6d, 0x65, 0x6e, 0x74, 0x43, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73,
+	0x74, 0x12, 0x23, 0x0a, 0x0d, 0x65, 0x78, 0x70, 0x65, 0x72, 0x69, 0x6d, 0x65, 0x6e, 0x74, 0x5f,
+	0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0c, 0x65, 0x78, 0x70, 0x65, 0x72, 0x69,
+	0x6d, 0x65, 0x6e, 0x74, 0x49, 0x64, 0x22, 0x57, 0x0a, 0x1b, 0x47, 0x65, 0x74, 0x45, 0x78, 0x70,
+	0x65, 0x72, 0x69, 0x6d, 0x65, 0x6e, 0x74, 0x43, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x52, 0x65, 0x73,
+	0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x38, 0x0a, 0x0a, 0x65, 0x78, 0x70, 0x65, 0x72, 0x69, 0x6d,
+	0x65, 0x6e, 0x74, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x18, 0x2e, 0x61, 0x70, 0x69, 0x2e,
+	0x76, 0x31, 0x2e, 0x45, 0x78, 0x70, 0x65, 0x72, 0x69, 0x6d, 0x65, 0x6e, 0x74, 0x43, 0x6f, 0x6e,
+	0x66, 0x69, 0x67, 0x52, 0x0a, 0x65, 0x78, 0x70, 0x65, 0x72, 0x69, 0x6d, 0x65, 0x6e, 0x74, 0x42,
+	0x35, 0x5a, 0x33, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x65, 0x74,
+	0x68, 0x70, 0x61, 0x6e, 0x64, 0x61, 0x6f, 0x70, 0x73, 0x2f, 0x6c, 0x61, 0x62, 0x2f, 0x62, 0x61,
+	0x63, 0x6b, 0x65, 0x6e, 0x64, 0x2f, 0x70, 0x6b, 0x67, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x76, 0x31,
+	0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -1953,7 +2193,7 @@ func file_backend_pkg_api_v1_proto_public_proto_rawDescGZIP() []byte {
 	return file_backend_pkg_api_v1_proto_public_proto_rawDescData
 }
 
-var file_backend_pkg_api_v1_proto_public_proto_msgTypes = make([]protoimpl.MessageInfo, 31)
+var file_backend_pkg_api_v1_proto_public_proto_msgTypes = make([]protoimpl.MessageInfo, 35)
 var file_backend_pkg_api_v1_proto_public_proto_goTypes = []any{
 	(*ListNodesResponse)(nil),            // 0: api.v1.ListNodesResponse
 	(*ListNetworksResponse)(nil),         // 1: api.v1.ListNetworksResponse
@@ -1981,11 +2221,15 @@ var file_backend_pkg_api_v1_proto_public_proto_goTypes = []any{
 	(*TimeWindow)(nil),                   // 23: api.v1.TimeWindow
 	(*ExperimentsConfig)(nil),            // 24: api.v1.ExperimentsConfig
 	(*ExperimentConfig)(nil),             // 25: api.v1.ExperimentConfig
-	nil,                                  // 26: api.v1.FilterMetadata.AppliedFiltersEntry
-	nil,                                  // 27: api.v1.EthereumConfig.NetworksEntry
-	nil,                                  // 28: api.v1.NetworkConfig.ServiceUrlsEntry
-	nil,                                  // 29: api.v1.ForkInfo.MinClientVersionsEntry
-	nil,                                  // 30: api.v1.BeaconModule.NetworksEntry
+	(*ExperimentDataAvailability)(nil),   // 26: api.v1.ExperimentDataAvailability
+	(*GetExperimentConfigRequest)(nil),   // 27: api.v1.GetExperimentConfigRequest
+	(*GetExperimentConfigResponse)(nil),  // 28: api.v1.GetExperimentConfigResponse
+	nil,                                  // 29: api.v1.FilterMetadata.AppliedFiltersEntry
+	nil,                                  // 30: api.v1.EthereumConfig.NetworksEntry
+	nil,                                  // 31: api.v1.NetworkConfig.ServiceUrlsEntry
+	nil,                                  // 32: api.v1.ForkInfo.MinClientVersionsEntry
+	nil,                                  // 33: api.v1.BeaconModule.NetworksEntry
+	nil,                                  // 34: api.v1.ExperimentConfig.DataAvailabilityEntry
 }
 var file_backend_pkg_api_v1_proto_public_proto_depIdxs = []int32{
 	2,  // 0: api.v1.ListNodesResponse.nodes:type_name -> api.v1.Node
@@ -1996,31 +2240,34 @@ var file_backend_pkg_api_v1_proto_public_proto_depIdxs = []int32{
 	3,  // 5: api.v1.Node.client:type_name -> api.v1.ClientInfo
 	4,  // 6: api.v1.Node.geo:type_name -> api.v1.GeoInfo
 	5,  // 7: api.v1.Node.consensus:type_name -> api.v1.ConsensusInfo
-	26, // 8: api.v1.FilterMetadata.applied_filters:type_name -> api.v1.FilterMetadata.AppliedFiltersEntry
+	29, // 8: api.v1.FilterMetadata.applied_filters:type_name -> api.v1.FilterMetadata.AppliedFiltersEntry
 	12, // 9: api.v1.GetConfigResponse.config:type_name -> api.v1.FrontendConfig
 	13, // 10: api.v1.FrontendConfig.ethereum:type_name -> api.v1.EthereumConfig
 	18, // 11: api.v1.FrontendConfig.modules:type_name -> api.v1.ModulesConfig
 	24, // 12: api.v1.FrontendConfig.experiments:type_name -> api.v1.ExperimentsConfig
-	27, // 13: api.v1.EthereumConfig.networks:type_name -> api.v1.EthereumConfig.NetworksEntry
-	28, // 14: api.v1.NetworkConfig.service_urls:type_name -> api.v1.NetworkConfig.ServiceUrlsEntry
+	30, // 13: api.v1.EthereumConfig.networks:type_name -> api.v1.EthereumConfig.NetworksEntry
+	31, // 14: api.v1.NetworkConfig.service_urls:type_name -> api.v1.NetworkConfig.ServiceUrlsEntry
 	15, // 15: api.v1.NetworkConfig.forks:type_name -> api.v1.ForkConfig
 	16, // 16: api.v1.ForkConfig.consensus:type_name -> api.v1.ConsensusForks
 	17, // 17: api.v1.ConsensusForks.electra:type_name -> api.v1.ForkInfo
-	29, // 18: api.v1.ForkInfo.min_client_versions:type_name -> api.v1.ForkInfo.MinClientVersionsEntry
+	32, // 18: api.v1.ForkInfo.min_client_versions:type_name -> api.v1.ForkInfo.MinClientVersionsEntry
 	19, // 19: api.v1.ModulesConfig.beacon_chain_timings:type_name -> api.v1.BeaconChainTimingsModule
 	20, // 20: api.v1.ModulesConfig.xatu_public_contributors:type_name -> api.v1.XatuPublicContributorsModule
 	21, // 21: api.v1.ModulesConfig.beacon:type_name -> api.v1.BeaconModule
 	23, // 22: api.v1.BeaconChainTimingsModule.time_windows:type_name -> api.v1.TimeWindow
 	23, // 23: api.v1.XatuPublicContributorsModule.time_windows:type_name -> api.v1.TimeWindow
-	30, // 24: api.v1.BeaconModule.networks:type_name -> api.v1.BeaconModule.NetworksEntry
+	33, // 24: api.v1.BeaconModule.networks:type_name -> api.v1.BeaconModule.NetworksEntry
 	25, // 25: api.v1.ExperimentsConfig.experiments:type_name -> api.v1.ExperimentConfig
-	14, // 26: api.v1.EthereumConfig.NetworksEntry.value:type_name -> api.v1.NetworkConfig
-	22, // 27: api.v1.BeaconModule.NetworksEntry.value:type_name -> api.v1.BeaconNetworkConfig
-	28, // [28:28] is the sub-list for method output_type
-	28, // [28:28] is the sub-list for method input_type
-	28, // [28:28] is the sub-list for extension type_name
-	28, // [28:28] is the sub-list for extension extendee
-	0,  // [0:28] is the sub-list for field type_name
+	34, // 26: api.v1.ExperimentConfig.data_availability:type_name -> api.v1.ExperimentConfig.DataAvailabilityEntry
+	25, // 27: api.v1.GetExperimentConfigResponse.experiment:type_name -> api.v1.ExperimentConfig
+	14, // 28: api.v1.EthereumConfig.NetworksEntry.value:type_name -> api.v1.NetworkConfig
+	22, // 29: api.v1.BeaconModule.NetworksEntry.value:type_name -> api.v1.BeaconNetworkConfig
+	26, // 30: api.v1.ExperimentConfig.DataAvailabilityEntry.value:type_name -> api.v1.ExperimentDataAvailability
+	31, // [31:31] is the sub-list for method output_type
+	31, // [31:31] is the sub-list for method input_type
+	31, // [31:31] is the sub-list for extension type_name
+	31, // [31:31] is the sub-list for extension extendee
+	0,  // [0:31] is the sub-list for field type_name
 }
 
 func init() { file_backend_pkg_api_v1_proto_public_proto_init() }
@@ -2341,6 +2588,42 @@ func file_backend_pkg_api_v1_proto_public_proto_init() {
 				return nil
 			}
 		}
+		file_backend_pkg_api_v1_proto_public_proto_msgTypes[26].Exporter = func(v any, i int) any {
+			switch v := v.(*ExperimentDataAvailability); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_backend_pkg_api_v1_proto_public_proto_msgTypes[27].Exporter = func(v any, i int) any {
+			switch v := v.(*GetExperimentConfigRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_backend_pkg_api_v1_proto_public_proto_msgTypes[28].Exporter = func(v any, i int) any {
+			switch v := v.(*GetExperimentConfigResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
@@ -2348,7 +2631,7 @@ func file_backend_pkg_api_v1_proto_public_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_backend_pkg_api_v1_proto_public_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   31,
+			NumMessages:   35,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

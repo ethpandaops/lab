@@ -2,6 +2,7 @@ package grpc
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/ethereum"
 	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/beacon_chain_timings"
@@ -177,5 +178,28 @@ func (c *ConfigService) GetConfig(
 			Modules:     modulesConfig,
 			Experiments: experimentsConfig,
 		},
+	}, nil
+}
+
+// GetExperimentConfig returns a single experiment's configuration with data availability
+func (c *ConfigService) GetExperimentConfig(ctx context.Context, req *config.GetExperimentConfigRequest) (*config.GetExperimentConfigResponse, error) {
+	c.log.WithField("experiment_id", req.ExperimentId).Debug("GetExperimentConfig called")
+
+	if c.experimentsService == nil {
+		return nil, fmt.Errorf("experiments service not available")
+	}
+
+	// Get experiment config with data availability
+	experimentConfig, err := c.experimentsService.GetExperimentConfigWithAvailability(ctx, req.ExperimentId)
+	if err != nil {
+		c.log.WithError(err).
+			WithField("experiment_id", req.ExperimentId).
+			Error("Failed to get experiment config")
+
+		return nil, fmt.Errorf("failed to get experiment config: %w", err)
+	}
+
+	return &config.GetExperimentConfigResponse{
+		Experiment: experimentConfig,
 	}, nil
 }

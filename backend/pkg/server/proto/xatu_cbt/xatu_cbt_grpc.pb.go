@@ -21,6 +21,7 @@ const _ = grpc.SupportPackageIsVersion8
 
 const (
 	XatuCBT_ListFctNodeActiveLast24H_FullMethodName = "/xatu_cbt.XatuCBT/ListFctNodeActiveLast24h"
+	XatuCBT_GetDataAvailability_FullMethodName      = "/xatu_cbt.XatuCBT/GetDataAvailability"
 )
 
 // XatuCBTClient is the client API for XatuCBT service.
@@ -33,6 +34,9 @@ type XatuCBTClient interface {
 	// ListFctNodeActiveLast24h queries the fact table of nodes active in the last 24 hours.
 	// This table contains node metadata for all nodes seen within a rolling 24-hour window.
 	ListFctNodeActiveLast24H(ctx context.Context, in *clickhouse.ListFctNodeActiveLast24HRequest, opts ...grpc.CallOption) (*clickhouse.ListFctNodeActiveLast24HResponse, error)
+	// GetDataAvailability returns the common availability interval across a set of transformation tables.
+	// It calculates the overlapping data range for the specified tables and returns slot information.
+	GetDataAvailability(ctx context.Context, in *GetDataAvailabilityRequest, opts ...grpc.CallOption) (*GetDataAvailabilityResponse, error)
 }
 
 type xatuCBTClient struct {
@@ -53,6 +57,16 @@ func (c *xatuCBTClient) ListFctNodeActiveLast24H(ctx context.Context, in *clickh
 	return out, nil
 }
 
+func (c *xatuCBTClient) GetDataAvailability(ctx context.Context, in *GetDataAvailabilityRequest, opts ...grpc.CallOption) (*GetDataAvailabilityResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetDataAvailabilityResponse)
+	err := c.cc.Invoke(ctx, XatuCBT_GetDataAvailability_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // XatuCBTServer is the server API for XatuCBT service.
 // All implementations must embed UnimplementedXatuCBTServer
 // for forward compatibility
@@ -63,6 +77,9 @@ type XatuCBTServer interface {
 	// ListFctNodeActiveLast24h queries the fact table of nodes active in the last 24 hours.
 	// This table contains node metadata for all nodes seen within a rolling 24-hour window.
 	ListFctNodeActiveLast24H(context.Context, *clickhouse.ListFctNodeActiveLast24HRequest) (*clickhouse.ListFctNodeActiveLast24HResponse, error)
+	// GetDataAvailability returns the common availability interval across a set of transformation tables.
+	// It calculates the overlapping data range for the specified tables and returns slot information.
+	GetDataAvailability(context.Context, *GetDataAvailabilityRequest) (*GetDataAvailabilityResponse, error)
 	mustEmbedUnimplementedXatuCBTServer()
 }
 
@@ -72,6 +89,9 @@ type UnimplementedXatuCBTServer struct {
 
 func (UnimplementedXatuCBTServer) ListFctNodeActiveLast24H(context.Context, *clickhouse.ListFctNodeActiveLast24HRequest) (*clickhouse.ListFctNodeActiveLast24HResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListFctNodeActiveLast24H not implemented")
+}
+func (UnimplementedXatuCBTServer) GetDataAvailability(context.Context, *GetDataAvailabilityRequest) (*GetDataAvailabilityResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetDataAvailability not implemented")
 }
 func (UnimplementedXatuCBTServer) mustEmbedUnimplementedXatuCBTServer() {}
 
@@ -104,6 +124,24 @@ func _XatuCBT_ListFctNodeActiveLast24H_Handler(srv interface{}, ctx context.Cont
 	return interceptor(ctx, in, info, handler)
 }
 
+func _XatuCBT_GetDataAvailability_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetDataAvailabilityRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(XatuCBTServer).GetDataAvailability(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: XatuCBT_GetDataAvailability_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(XatuCBTServer).GetDataAvailability(ctx, req.(*GetDataAvailabilityRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // XatuCBT_ServiceDesc is the grpc.ServiceDesc for XatuCBT service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -114,6 +152,10 @@ var XatuCBT_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListFctNodeActiveLast24h",
 			Handler:    _XatuCBT_ListFctNodeActiveLast24H_Handler,
+		},
+		{
+			MethodName: "GetDataAvailability",
+			Handler:    _XatuCBT_GetDataAvailability_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
