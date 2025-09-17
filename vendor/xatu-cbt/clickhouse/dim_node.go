@@ -113,27 +113,35 @@ func BuildListDimNodeQuery(req *ListDimNodeRequest, options ...QueryOption) (SQL
 	// Add filter for column: attributes
 	if req.Attributes != nil {
 		switch filter := req.Attributes.Filter.(type) {
-		case *StringFilter_Eq:
-			qb.AddCondition("attributes", "=", filter.Eq)
-		case *StringFilter_Ne:
-			qb.AddCondition("attributes", "!=", filter.Ne)
-		case *StringFilter_Contains:
-			qb.AddLikeCondition("attributes", "%" + filter.Contains + "%")
-		case *StringFilter_StartsWith:
-			qb.AddLikeCondition("attributes", filter.StartsWith + "%")
-		case *StringFilter_EndsWith:
-			qb.AddLikeCondition("attributes", "%" + filter.EndsWith)
-		case *StringFilter_Like:
-			qb.AddLikeCondition("attributes", filter.Like)
-		case *StringFilter_NotLike:
-			qb.AddNotLikeCondition("attributes", filter.NotLike)
-		case *StringFilter_In:
-			if len(filter.In.Values) > 0 {
-				qb.AddInCondition("attributes", StringSliceToInterface(filter.In.Values))
+		case *MapStringStringFilter_KeyValue:
+			// Handle key-value filter with string values
+			switch kvFilter := filter.KeyValue.ValueFilter.Filter.(type) {
+			case *StringFilter_Eq:
+				qb.AddMapKeyCondition("attributes", filter.KeyValue.Key, "=", kvFilter.Eq)
+			case *StringFilter_Ne:
+				qb.AddMapKeyCondition("attributes", filter.KeyValue.Key, "!=", kvFilter.Ne)
+			case *StringFilter_Like:
+				qb.AddMapKeyLikeCondition("attributes", filter.KeyValue.Key, kvFilter.Like)
+			case *StringFilter_StartsWith:
+				qb.AddMapKeyLikeCondition("attributes", filter.KeyValue.Key, kvFilter.StartsWith + "%")
+			case *StringFilter_EndsWith:
+				qb.AddMapKeyLikeCondition("attributes", filter.KeyValue.Key, "%" + kvFilter.EndsWith)
+			case *StringFilter_Contains:
+				qb.AddMapKeyLikeCondition("attributes", filter.KeyValue.Key, "%" + kvFilter.Contains + "%")
 			}
-		case *StringFilter_NotIn:
-			if len(filter.NotIn.Values) > 0 {
-				qb.AddNotInCondition("attributes", StringSliceToInterface(filter.NotIn.Values))
+		case *MapStringStringFilter_HasKey:
+			qb.AddMapContainsCondition("attributes", filter.HasKey)
+		case *MapStringStringFilter_NotHasKey:
+			qb.AddNotMapContainsCondition("attributes", filter.NotHasKey)
+		case *MapStringStringFilter_HasAnyKey:
+			if len(filter.HasAnyKey.Values) > 0 {
+				qb.AddMapContainsAnyCondition("attributes", filter.HasAnyKey.Values)
+			}
+		case *MapStringStringFilter_HasAllKeys:
+			if len(filter.HasAllKeys.Values) > 0 {
+				for _, key := range filter.HasAllKeys.Values {
+					qb.AddMapContainsCondition("attributes", key)
+				}
 			}
 		default:
 			// Unsupported filter type

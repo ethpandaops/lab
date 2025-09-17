@@ -92,6 +92,8 @@ github.com/ethpandaops/ethwallclock v0.3.0 h1:xF5fwtBf+bHFHZKBnwiPFEuelW3sMM7SD3
 github.com/ethpandaops/ethwallclock v0.3.0/go.mod h1:y0Cu+mhGLlem19vnAV2x0hpFS5KZ7oOi2SWYayv9l24=
 github.com/ethpandaops/xatu-cbt v0.0.0-20250912051341-3fba7b565dc3 h1:9yfXiTJKKpU6L//mESSfLHl7z+Eb4PWtBi+u83r7JfI=
 github.com/ethpandaops/xatu-cbt v0.0.0-20250912051341-3fba7b565dc3/go.mod h1:iJpkfBEpE98rnSIb+6dBlrBXfy35VqhCxhwRFzefUsU=
+github.com/ethpandaops/xatu-cbt v0.0.0-20250917072956-40bdd0451bd6 h1:6xu0QLF8PSok51NYtA44lQfapLPJMedrwftp81b3Opw=
+github.com/ethpandaops/xatu-cbt v0.0.0-20250917072956-40bdd0451bd6/go.mod h1:iJpkfBEpE98rnSIb+6dBlrBXfy35VqhCxhwRFzefUsU=
 github.com/fatih/color v1.10.0 h1:s36xzo75JdqLaaWoiEHk767eHiwo0598uUxyfiPkDsg=
 github.com/fatih/color v1.10.0/go.mod h1:ELkj/draVOlAH/xkhN6mQ50Qd0MPOk5AAr3maGEBuJM=
 github.com/felixge/httpsnoop v1.0.4 h1:NFTV2Zj1bL4mc9sqWACXbQFVBBg2W3GPvqp8/ESS2Wg=

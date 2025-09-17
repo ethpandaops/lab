@@ -21,8 +21,8 @@ message IntBlockMevCanonical {
   uint32 epoch_start_date_time = 15;
   // The root hash of the beacon block
   string block_root = 16;
-  // The timestamp of the earliest bid trace in milliseconds
-  google.protobuf.UInt64Value bid_date_time = 17;
+  // The earliest timestamp of the accepted bid in milliseconds
+  google.protobuf.UInt64Value earliest_bid_date_time = 17;
   // The relay names that delivered the proposer payload
   repeated string relay_names = 18;
   // The parent hash of the proposer payload
@@ -63,8 +63,8 @@ message ListIntBlockMevCanonicalRequest {
   UInt32Filter epoch = 5;
   // Filter by epoch_start_date_time (optional)
   UInt32Filter epoch_start_date_time = 6;
-  // Filter by bid_date_time (optional)
-  NullableUInt64Filter bid_date_time = 7;
+  // Filter by earliest_bid_date_time (optional)
+  NullableUInt64Filter earliest_bid_date_time = 7;
   // Filter by relay_names (optional)
   repeated string relay_names = 8;
   // Filter by parent_hash (optional)

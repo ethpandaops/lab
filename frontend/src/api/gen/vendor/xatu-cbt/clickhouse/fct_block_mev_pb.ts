@@ -54,11 +54,11 @@ export class FctBlockMev extends Message<FctBlockMev> {
   blockRoot = "";
 
   /**
-   * The timestamp of the earliest bid trace in milliseconds
+   * The earliest timestamp of the accepted bid in milliseconds
    *
-   * @generated from field: google.protobuf.UInt64Value bid_date_time = 17;
+   * @generated from field: google.protobuf.UInt64Value earliest_bid_date_time = 17;
    */
-  bidDateTime?: bigint;
+  earliestBidDateTime?: bigint;
 
   /**
    * The relay names that delivered the proposer payload
@@ -158,7 +158,7 @@ export class FctBlockMev extends Message<FctBlockMev> {
     { no: 14, name: "epoch", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
     { no: 15, name: "epoch_start_date_time", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
     { no: 16, name: "block_root", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 17, name: "bid_date_time", kind: "message", T: UInt64Value },
+    { no: 17, name: "earliest_bid_date_time", kind: "message", T: UInt64Value },
     { no: 18, name: "relay_names", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
     { no: 19, name: "parent_hash", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 20, name: "block_number", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
@@ -239,11 +239,11 @@ export class ListFctBlockMevRequest extends Message<ListFctBlockMevRequest> {
   epochStartDateTime?: UInt32Filter;
 
   /**
-   * Filter by bid_date_time (optional)
+   * Filter by earliest_bid_date_time (optional)
    *
-   * @generated from field: cbt.NullableUInt64Filter bid_date_time = 7;
+   * @generated from field: cbt.NullableUInt64Filter earliest_bid_date_time = 7;
    */
-  bidDateTime?: NullableUInt64Filter;
+  earliestBidDateTime?: NullableUInt64Filter;
 
   /**
    * Filter by relay_names (optional)
@@ -369,7 +369,7 @@ export class ListFctBlockMevRequest extends Message<ListFctBlockMevRequest> {
     { no: 4, name: "slot", kind: "message", T: UInt32Filter },
     { no: 5, name: "epoch", kind: "message", T: UInt32Filter },
     { no: 6, name: "epoch_start_date_time", kind: "message", T: UInt32Filter },
-    { no: 7, name: "bid_date_time", kind: "message", T: NullableUInt64Filter },
+    { no: 7, name: "earliest_bid_date_time", kind: "message", T: NullableUInt64Filter },
     { no: 8, name: "relay_names", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
     { no: 9, name: "parent_hash", kind: "message", T: StringFilter },
     { no: 10, name: "block_number", kind: "message", T: UInt64Filter },
