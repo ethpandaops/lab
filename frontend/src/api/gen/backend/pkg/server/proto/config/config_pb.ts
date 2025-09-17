@@ -100,6 +100,13 @@ export class FrontendConfig extends Message<FrontendConfig> {
    */
   modules?: ModulesConfig;
 
+  /**
+   * Experiments configuration
+   *
+   * @generated from field: config.ExperimentsConfig experiments = 3;
+   */
+  experiments?: ExperimentsConfig;
+
   constructor(data?: PartialMessage<FrontendConfig>) {
     super();
     proto3.util.initPartial(data, this);
@@ -110,6 +117,7 @@ export class FrontendConfig extends Message<FrontendConfig> {
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "ethereum", kind: "message", T: EthereumConfig },
     { no: 2, name: "modules", kind: "message", T: ModulesConfig },
+    { no: 3, name: "experiments", kind: "message", T: ExperimentsConfig },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): FrontendConfig {
@@ -680,6 +688,104 @@ export class TimeWindow extends Message<TimeWindow> {
 
   static equals(a: TimeWindow | PlainMessage<TimeWindow> | undefined, b: TimeWindow | PlainMessage<TimeWindow> | undefined): boolean {
     return proto3.util.equals(TimeWindow, a, b);
+  }
+}
+
+/**
+ * ExperimentsConfig contains all experiments configuration
+ *
+ * @generated from message config.ExperimentsConfig
+ */
+export class ExperimentsConfig extends Message<ExperimentsConfig> {
+  /**
+   * List of available experiments
+   *
+   * @generated from field: repeated config.ExperimentConfig experiments = 1;
+   */
+  experiments: ExperimentConfig[] = [];
+
+  constructor(data?: PartialMessage<ExperimentsConfig>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "config.ExperimentsConfig";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "experiments", kind: "message", T: ExperimentConfig, repeated: true },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ExperimentsConfig {
+    return new ExperimentsConfig().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ExperimentsConfig {
+    return new ExperimentsConfig().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ExperimentsConfig {
+    return new ExperimentsConfig().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: ExperimentsConfig | PlainMessage<ExperimentsConfig> | undefined, b: ExperimentsConfig | PlainMessage<ExperimentsConfig> | undefined): boolean {
+    return proto3.util.equals(ExperimentsConfig, a, b);
+  }
+}
+
+/**
+ * ExperimentConfig represents a single experiment
+ *
+ * @generated from message config.ExperimentConfig
+ */
+export class ExperimentConfig extends Message<ExperimentConfig> {
+  /**
+   * Unique identifier for the experiment
+   *
+   * @generated from field: string id = 1;
+   */
+  id = "";
+
+  /**
+   * Whether this experiment is enabled
+   *
+   * @generated from field: bool enabled = 2;
+   */
+  enabled = false;
+
+  /**
+   * Networks this experiment supports
+   *
+   * @generated from field: repeated string networks = 3;
+   */
+  networks: string[] = [];
+
+  constructor(data?: PartialMessage<ExperimentConfig>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "config.ExperimentConfig";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "enabled", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 3, name: "networks", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ExperimentConfig {
+    return new ExperimentConfig().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ExperimentConfig {
+    return new ExperimentConfig().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ExperimentConfig {
+    return new ExperimentConfig().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: ExperimentConfig | PlainMessage<ExperimentConfig> | undefined, b: ExperimentConfig | PlainMessage<ExperimentConfig> | undefined): boolean {
+    return proto3.util.equals(ExperimentConfig, a, b);
   }
 }
 

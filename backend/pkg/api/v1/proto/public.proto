@@ -110,6 +110,7 @@ message GetConfigResponse {
 message FrontendConfig {
   EthereumConfig ethereum = 1;
   ModulesConfig modules = 2;
+  ExperimentsConfig experiments = 3;
 }
 
 // EthereumConfig contains Ethereum-related configuration for public API consumption.
@@ -187,4 +188,16 @@ message TimeWindow {
   string step = 2;
   string range = 3;
   string label = 4;
+}
+
+// ExperimentsConfig contains all experiments configuration for public API consumption.
+message ExperimentsConfig {
+  repeated ExperimentConfig experiments = 1;
+}
+
+// ExperimentConfig represents a single experiment for public API consumption.
+message ExperimentConfig {
+  string id = 1;
+  bool enabled = 2;
+  repeated string networks = 3;
 }

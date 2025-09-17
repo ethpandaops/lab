@@ -12,6 +12,7 @@ import (
 	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/beacon_chain_timings"
 	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/beacon_slots"
 	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/cartographoor"
+	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/experiments"
 	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/xatu_cbt"
 )
 
@@ -25,6 +26,7 @@ type Config struct {
 	Geolocation   *geolocation.Config      `yaml:"geolocation"`
 	XatuCBT       *xatu_cbt.Config         `yaml:"xatu_cbt"`
 	Cartographoor *cartographoor.Config    `yaml:"cartographoor"`
+	Experiments   *experiments.Config      `yaml:"experiments"`
 }
 
 type ModuleConfig struct {

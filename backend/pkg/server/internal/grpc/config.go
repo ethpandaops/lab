@@ -7,6 +7,7 @@ import (
 	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/beacon_chain_timings"
 	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/beacon_slots"
 	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/cartographoor"
+	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/experiments"
 	"github.com/ethpandaops/lab/backend/pkg/server/proto/config"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
@@ -20,6 +21,7 @@ type ConfigService struct {
 	cartographoorService *cartographoor.Service
 	bctService           *beacon_chain_timings.BeaconChainTimings
 	bsService            *beacon_slots.BeaconSlots
+	experimentsService   *experiments.ExperimentsService
 }
 
 // NewConfigService creates a new ConfigService
@@ -29,6 +31,7 @@ func NewConfigService(
 	cartographoorService *cartographoor.Service,
 	bctService *beacon_chain_timings.BeaconChainTimings,
 	bsService *beacon_slots.BeaconSlots,
+	experimentsService *experiments.ExperimentsService,
 ) *ConfigService {
 	return &ConfigService{
 		log:                  log.WithField("grpc", "config"),
@@ -36,6 +39,7 @@ func NewConfigService(
 		cartographoorService: cartographoorService,
 		bctService:           bctService,
 		bsService:            bsService,
+		experimentsService:   experimentsService,
 	}
 }
 
@@ -159,12 +163,19 @@ func (c *ConfigService) GetConfig(
 		}
 	}
 
+	// Add experiments configuration
+	var experimentsConfig *config.ExperimentsConfig
+	if c.experimentsService != nil {
+		experimentsConfig = c.experimentsService.FrontendExperimentsConfig()
+	}
+
 	return &config.GetConfigResponse{
 		Config: &config.FrontendConfig{
 			Ethereum: &config.EthereumConfig{
 				Networks: networksConfig,
 			},
-			Modules: modulesConfig,
+			Modules:     modulesConfig,
+			Experiments: experimentsConfig,
 		},
 	}, nil
 }

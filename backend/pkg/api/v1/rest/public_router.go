@@ -533,5 +533,25 @@ func convertConfigToAPIProto(config *configpb.FrontendConfig) *apiv1.FrontendCon
 		result.Modules = modules
 	}
 
+	// Convert Experiments config
+	if config.Experiments != nil {
+		experiments := &apiv1.ExperimentsConfig{}
+
+		if config.Experiments.Experiments != nil {
+			expConfigs := make([]*apiv1.ExperimentConfig, 0, len(config.Experiments.Experiments))
+			for _, exp := range config.Experiments.Experiments {
+				expConfigs = append(expConfigs, &apiv1.ExperimentConfig{
+					Id:       exp.Id,
+					Enabled:  exp.Enabled,
+					Networks: exp.Networks,
+				})
+			}
+
+			experiments.Experiments = expConfigs
+		}
+
+		result.Experiments = experiments
+	}
+
 	return result
 }

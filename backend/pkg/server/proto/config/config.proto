@@ -26,6 +26,8 @@ message FrontendConfig {
   EthereumConfig ethereum = 1;
   // Module configurations
   ModulesConfig modules = 2;
+  // Experiments configuration
+  ExperimentsConfig experiments = 3;
 }
 
 // EthereumConfig contains Ethereum-related configuration
@@ -122,4 +124,20 @@ message TimeWindow {
   string range = 3;
   // Display label
   string label = 4;
+}
+
+// ExperimentsConfig contains all experiments configuration
+message ExperimentsConfig {
+  // List of available experiments
+  repeated ExperimentConfig experiments = 1;
+}
+
+// ExperimentConfig represents a single experiment
+message ExperimentConfig {
+  // Unique identifier for the experiment
+  string id = 1;
+  // Whether this experiment is enabled
+  bool enabled = 2;
+  // Networks this experiment supports
+  repeated string networks = 3;
 }
