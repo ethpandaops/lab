@@ -19,7 +19,8 @@ import (
 const _ = grpc.SupportPackageIsVersion8
 
 const (
-	ConfigService_GetConfig_FullMethodName = "/config.ConfigService/GetConfig"
+	ConfigService_GetConfig_FullMethodName           = "/config.ConfigService/GetConfig"
+	ConfigService_GetExperimentConfig_FullMethodName = "/config.ConfigService/GetExperimentConfig"
 )
 
 // ConfigServiceClient is the client API for ConfigService service.
@@ -31,6 +32,8 @@ const (
 type ConfigServiceClient interface {
 	// GetConfig returns the complete frontend configuration including networks and modules.
 	GetConfig(ctx context.Context, in *GetConfigRequest, opts ...grpc.CallOption) (*GetConfigResponse, error)
+	// GetExperimentConfig returns a single experiment's configuration with data availability.
+	GetExperimentConfig(ctx context.Context, in *GetExperimentConfigRequest, opts ...grpc.CallOption) (*GetExperimentConfigResponse, error)
 }
 
 type configServiceClient struct {
@@ -51,6 +54,16 @@ func (c *configServiceClient) GetConfig(ctx context.Context, in *GetConfigReques
 	return out, nil
 }
 
+func (c *configServiceClient) GetExperimentConfig(ctx context.Context, in *GetExperimentConfigRequest, opts ...grpc.CallOption) (*GetExperimentConfigResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetExperimentConfigResponse)
+	err := c.cc.Invoke(ctx, ConfigService_GetExperimentConfig_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ConfigServiceServer is the server API for ConfigService service.
 // All implementations must embed UnimplementedConfigServiceServer
 // for forward compatibility
@@ -60,6 +73,8 @@ func (c *configServiceClient) GetConfig(ctx context.Context, in *GetConfigReques
 type ConfigServiceServer interface {
 	// GetConfig returns the complete frontend configuration including networks and modules.
 	GetConfig(context.Context, *GetConfigRequest) (*GetConfigResponse, error)
+	// GetExperimentConfig returns a single experiment's configuration with data availability.
+	GetExperimentConfig(context.Context, *GetExperimentConfigRequest) (*GetExperimentConfigResponse, error)
 	mustEmbedUnimplementedConfigServiceServer()
 }
 
@@ -69,6 +84,9 @@ type UnimplementedConfigServiceServer struct {
 
 func (UnimplementedConfigServiceServer) GetConfig(context.Context, *GetConfigRequest) (*GetConfigResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetConfig not implemented")
+}
+func (UnimplementedConfigServiceServer) GetExperimentConfig(context.Context, *GetExperimentConfigRequest) (*GetExperimentConfigResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetExperimentConfig not implemented")
 }
 func (UnimplementedConfigServiceServer) mustEmbedUnimplementedConfigServiceServer() {}
 
@@ -101,6 +119,24 @@ func _ConfigService_GetConfig_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ConfigService_GetExperimentConfig_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetExperimentConfigRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ConfigServiceServer).GetExperimentConfig(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ConfigService_GetExperimentConfig_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ConfigServiceServer).GetExperimentConfig(ctx, req.(*GetExperimentConfigRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ConfigService_ServiceDesc is the grpc.ServiceDesc for ConfigService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -111,6 +147,10 @@ var ConfigService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetConfig",
 			Handler:    _ConfigService_GetConfig_Handler,
+		},
+		{
+			MethodName: "GetExperimentConfig",
+			Handler:    _ConfigService_GetExperimentConfig_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

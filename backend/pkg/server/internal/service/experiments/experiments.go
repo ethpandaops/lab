@@ -4,8 +4,12 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/cartographoor"
+	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/xatu_cbt"
 	"github.com/ethpandaops/lab/backend/pkg/server/proto/config"
+	xatu_cbt_proto "github.com/ethpandaops/lab/backend/pkg/server/proto/xatu_cbt"
 	"github.com/sirupsen/logrus"
+	"google.golang.org/grpc/metadata"
 )
 
 // ServiceName is the name of the experiments service
@@ -13,15 +17,24 @@ const ServiceName = "experiments"
 
 // ExperimentsService manages experiment definitions and configurations
 type ExperimentsService struct {
-	config *Config
-	log    *logrus.Entry
+	config               *Config
+	log                  *logrus.Entry
+	xatuCBTService       *xatu_cbt.XatuCBT
+	cartographoorService *cartographoor.Service
 }
 
 // NewExperimentsService creates a new experiments service
-func NewExperimentsService(cfg *Config, log logrus.FieldLogger) *ExperimentsService {
+func NewExperimentsService(
+	cfg *Config,
+	log logrus.FieldLogger,
+	xatuCBTService *xatu_cbt.XatuCBT,
+	cartographoorService *cartographoor.Service,
+) *ExperimentsService {
 	return &ExperimentsService{
-		config: cfg,
-		log:    log.WithField("service", ServiceName),
+		config:               cfg,
+		log:                  log.WithField("service", ServiceName),
+		xatuCBTService:       xatuCBTService,
+		cartographoorService: cartographoorService,
 	}
 }
 
@@ -62,8 +75,8 @@ func (s *ExperimentsService) Name() string {
 	return ServiceName
 }
 
-// FrontendExperimentsConfig returns the experiments configuration for the frontend
-func (s *ExperimentsService) FrontendExperimentsConfig() *config.ExperimentsConfig {
+// GetAllExperimentsConfig returns ALL experiments configuration without data availbility by default
+func (s *ExperimentsService) GetAllExperimentsConfig(ctx context.Context, includeDA bool) *config.ExperimentsConfig {
 	if s.config == nil {
 		return nil
 	}
@@ -83,6 +96,10 @@ func (s *ExperimentsService) FrontendExperimentsConfig() *config.ExperimentsConf
 			Networks: exp.Networks,
 		}
 
+		if includeDA {
+			expConfig.DataAvailability = s.getDataAvailabilityForExperiment(ctx, exp)
+		}
+
 		experiments = append(experiments, expConfig)
 	}
 
@@ -91,55 +108,115 @@ func (s *ExperimentsService) FrontendExperimentsConfig() *config.ExperimentsConf
 	}
 }
 
-// GetExperiments returns all configured experiments
-func (s *ExperimentsService) GetExperiments() []*ExperimentConfig {
-	if s.config == nil {
-		return nil
-	}
-
-	experiments := make([]*ExperimentConfig, 0, len(*s.config))
-
-	for i := range *s.config {
-		experiments = append(experiments, &(*s.config)[i])
-	}
-
-	return experiments
-}
-
-// GetExperimentByID returns a specific experiment by ID
-func (s *ExperimentsService) GetExperimentByID(id string) (*ExperimentConfig, error) {
+// GetExperimentConfig returns a single experiment's configuration with data availability.
+func (s *ExperimentsService) GetExperimentConfig(ctx context.Context, experimentID string) (*config.ExperimentConfig, error) {
 	if s.config == nil {
 		return nil, fmt.Errorf("experiments service not configured")
 	}
 
+	// Find the experiment
+	var experiment *ExperimentConfig
+
 	for i := range *s.config {
-		if (*s.config)[i].ID == id {
-			return &(*s.config)[i], nil
+		if (*s.config)[i].ID == experimentID {
+			experiment = &(*s.config)[i]
+
+			break
 		}
 	}
 
-	return nil, fmt.Errorf("experiment not found: %s", id)
+	if experiment == nil {
+		return nil, fmt.Errorf("experiment not found: %s", experimentID)
+	}
+
+	if !experiment.Enabled {
+		return nil, fmt.Errorf("experiment disabled: %s", experimentID)
+	}
+
+	// Get data availability for this experiment
+	dataAvailability := s.getDataAvailabilityForExperiment(ctx, experiment)
+
+	return &config.ExperimentConfig{
+		Id:               experiment.ID,
+		Enabled:          experiment.Enabled,
+		Networks:         experiment.Networks,
+		DataAvailability: dataAvailability,
+	}, nil
 }
 
-// GetExperimentsByNetwork returns experiments that support a specific network
-func (s *ExperimentsService) GetExperimentsByNetwork(network string) []*ExperimentConfig {
-	if s.config == nil {
+// getDataAvailabilityForExperiment queries data availability for all networks of an experiment
+func (s *ExperimentsService) getDataAvailabilityForExperiment(ctx context.Context, exp *ExperimentConfig) map[string]*config.ExperimentDataAvailability {
+	if s.xatuCBTService == nil || s.cartographoorService == nil {
 		return nil
 	}
 
-	experiments := make([]*ExperimentConfig, 0)
+	dataAvailability := make(map[string]*config.ExperimentDataAvailability)
+	tables := GetTablesForExperiment(exp.ID)
 
-	for i := range *s.config {
-		exp := &(*s.config)[i]
+	if len(tables) == 0 {
+		s.log.WithField("experiment_id", exp.ID).Debug("No tables defined for experiment")
 
-		for _, net := range exp.Networks {
-			if net == network {
-				experiments = append(experiments, exp)
+		return dataAvailability
+	}
 
-				break
-			}
+	// First, validate which networks exist via cartographoor
+	validNetworks := make([]string, 0, len(exp.Networks))
+	for _, network := range exp.Networks {
+		if s.cartographoorService.GetNetwork(network) != nil {
+			validNetworks = append(validNetworks, network)
+		} else {
+			s.log.WithField("experiment_id", exp.ID).
+				WithField("network", network).
+				Warn("Network not found in cartographoor, skipping data availability query")
 		}
 	}
 
-	return experiments
+	if len(validNetworks) == 0 {
+		s.log.WithField("experiment_id", exp.ID).
+			Warn("No valid networks found for experiment")
+
+		return dataAvailability
+	}
+
+	// Query data availability for valid networks only
+	for _, network := range validNetworks {
+		// Add network to context metadata - use incoming context for internal service calls
+		md := metadata.New(map[string]string{"network": network})
+		ctxWithNetwork := metadata.NewIncomingContext(ctx, md)
+
+		// Query data availability
+		req := &xatu_cbt_proto.GetDataAvailabilityRequest{
+			Tables:        tables,
+			PositionField: "slot_start_date_time",
+		}
+
+		resp, err := s.xatuCBTService.GetDataAvailability(ctxWithNetwork, req)
+		if err != nil {
+			s.log.WithError(err).
+				WithField("experiment_id", exp.ID).
+				WithField("network", network).
+				Warn("Failed to get data availability for valid network")
+
+			continue
+		}
+
+		// Convert to config proto format
+		dataAvailability[network] = &config.ExperimentDataAvailability{
+			AvailableFromTimestamp:  resp.AvailableFromTimestamp,
+			AvailableUntilTimestamp: resp.AvailableUntilTimestamp,
+			MinSlot:                 resp.MinSlot,
+			MaxSlot:                 resp.MaxSlot,
+			SafeSlot:                resp.SafeSlot,
+			HeadSlot:                resp.HeadSlot,
+			HasData:                 resp.HasData,
+		}
+	}
+
+	s.log.WithField("experiment_id", exp.ID).
+		WithField("total_networks", len(exp.Networks)).
+		WithField("valid_networks", len(validNetworks)).
+		WithField("successful_queries", len(dataAvailability)).
+		Debug("Completed data availability queries for experiment")
+
+	return dataAvailability
 }

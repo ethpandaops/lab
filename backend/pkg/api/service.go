@@ -305,7 +305,6 @@ func (s *Service) registerLegacyHandlers(router *mux.Router) {
 
 	// Beacon Slot
 	router.HandleFunc("/beacon/slots/{network}/{slot}.json", s.handleBeaconSlot).Methods("GET")
-
 }
 
 // Generic handler for S3 passthroughs

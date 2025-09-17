@@ -211,15 +211,6 @@ func (s *Service) initializeServices(ctx context.Context) error { // ctx is alre
 		return fmt.Errorf("failed to initialize beacon slots service: %w", err)
 	}
 
-	// Initialize experiments service if configured
-	if s.config.Experiments != nil && len(*s.config.Experiments) > 0 {
-		s.experimentsService = experiments.NewExperimentsService(s.config.Experiments, s.log)
-
-		if err := s.experimentsService.Start(ctx); err != nil {
-			return fmt.Errorf("failed to start experiments service: %w", err)
-		}
-	}
-
 	s.services = []service.Service{
 		bct,
 		beaconSlotsService,
@@ -318,6 +309,7 @@ func (s *Service) initializeDependencies(ctx context.Context) error {
 		cacheClient,
 		s.metrics,
 		cartographoorSvc,
+		ethereumClient,
 	)
 	if err != nil {
 		return fmt.Errorf("failed to initialize Xatu CBT datasource: %w", err)
@@ -335,6 +327,20 @@ func (s *Service) initializeDependencies(ctx context.Context) error {
 	s.geolocationClient = geolocationClient
 	s.xatuCBTService = xatuCBTService
 	s.cartographoorService = cartographoorSvc
+
+	// Initialize experiments service if configured
+	if s.config.Experiments != nil && len(*s.config.Experiments) > 0 {
+		s.experimentsService = experiments.NewExperimentsService(
+			s.config.Experiments,
+			s.log,
+			s.xatuCBTService,
+			s.cartographoorService,
+		)
+
+		if err := s.experimentsService.Start(ctx); err != nil {
+			return fmt.Errorf("failed to start experiments service: %w", err)
+		}
+	}
 
 	return nil
 }

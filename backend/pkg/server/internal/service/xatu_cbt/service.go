@@ -6,6 +6,7 @@ import (
 
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/cache"
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/clickhouse"
+	"github.com/ethpandaops/lab/backend/pkg/internal/lab/ethereum"
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/metrics"
 	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/cartographoor"
 	pb "github.com/ethpandaops/lab/backend/pkg/server/proto/xatu_cbt"
@@ -28,6 +29,7 @@ type XatuCBT struct {
 	cbtClients           map[string]clickhouse.Client
 	cacheClient          cache.Client
 	cartographoorService *cartographoor.Service
+	ethereumClient       *ethereum.Client
 
 	metrics          *metrics.Metrics
 	metricsCollector *metrics.Collector
@@ -45,6 +47,7 @@ func New(
 	cacheClient cache.Client,
 	metricsSvc *metrics.Metrics,
 	cartographoorService *cartographoor.Service,
+	ethereumClient *ethereum.Client,
 ) (*XatuCBT, error) {
 	if err := config.Validate(); err != nil {
 		return nil, fmt.Errorf("invalid xatu_cbt config: %w", err)
@@ -64,6 +67,7 @@ func New(
 		metrics:              metricsSvc,
 		metricsCollector:     metricsCollector,
 		cartographoorService: cartographoorService,
+		ethereumClient:       ethereumClient,
 		cbtClients:           make(map[string]clickhouse.Client),
 	}, nil
 }
