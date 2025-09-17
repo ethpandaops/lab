@@ -235,6 +235,91 @@ message NullableBoolFilter {
   }
 }
 
+// MapKeyValueStringString represents a key-value pair filter for Map(String, String)
+message MapKeyValueStringString {
+  string key = 1;
+  StringFilter value_filter = 2;
+}
+
+// MapStringStringFilter represents filtering options for Map(String, String) values
+message MapStringStringFilter {
+  oneof filter {
+    MapKeyValueStringString key_value = 1;  // mapColumn['key'] op 'value'
+    string has_key = 2;                     // mapContains(mapColumn, 'key')
+    string not_has_key = 3;                 // NOT mapContains(mapColumn, 'key')
+    StringList has_any_key = 4;             // mapContainsAny(mapColumn, ['k1', 'k2'])
+    StringList has_all_keys = 5;            // mapContainsAll(mapColumn, ['k1', 'k2'])
+  }
+}
+
+// MapKeyValueStringUInt32 represents a key-value pair filter for Map(String, UInt32)
+message MapKeyValueStringUInt32 {
+  string key = 1;
+  UInt32Filter value_filter = 2;
+}
+
+// MapStringUInt32Filter represents filtering options for Map(String, UInt32) values
+message MapStringUInt32Filter {
+  oneof filter {
+    MapKeyValueStringUInt32 key_value = 1;  // mapColumn['key'] op value
+    string has_key = 2;                     // mapContains(mapColumn, 'key')
+    string not_has_key = 3;                 // NOT mapContains(mapColumn, 'key')
+    StringList has_any_key = 4;             // mapContainsAny(mapColumn, ['k1', 'k2'])
+    StringList has_all_keys = 5;            // mapContainsAll(mapColumn, ['k1', 'k2'])
+  }
+}
+
+// MapKeyValueStringInt32 represents a key-value pair filter for Map(String, Int32)
+message MapKeyValueStringInt32 {
+  string key = 1;
+  Int32Filter value_filter = 2;
+}
+
+// MapStringInt32Filter represents filtering options for Map(String, Int32) values
+message MapStringInt32Filter {
+  oneof filter {
+    MapKeyValueStringInt32 key_value = 1;   // mapColumn['key'] op value
+    string has_key = 2;                     // mapContains(mapColumn, 'key')
+    string not_has_key = 3;                 // NOT mapContains(mapColumn, 'key')
+    StringList has_any_key = 4;             // mapContainsAny(mapColumn, ['k1', 'k2'])
+    StringList has_all_keys = 5;            // mapContainsAll(mapColumn, ['k1', 'k2'])
+  }
+}
+
+// MapKeyValueStringUInt64 represents a key-value pair filter for Map(String, UInt64)
+message MapKeyValueStringUInt64 {
+  string key = 1;
+  UInt64Filter value_filter = 2;
+}
+
+// MapStringUInt64Filter represents filtering options for Map(String, UInt64) values
+message MapStringUInt64Filter {
+  oneof filter {
+    MapKeyValueStringUInt64 key_value = 1;  // mapColumn['key'] op value
+    string has_key = 2;                     // mapContains(mapColumn, 'key')
+    string not_has_key = 3;                 // NOT mapContains(mapColumn, 'key')
+    StringList has_any_key = 4;             // mapContainsAny(mapColumn, ['k1', 'k2'])
+    StringList has_all_keys = 5;            // mapContainsAll(mapColumn, ['k1', 'k2'])
+  }
+}
+
+// MapKeyValueStringInt64 represents a key-value pair filter for Map(String, Int64)
+message MapKeyValueStringInt64 {
+  string key = 1;
+  Int64Filter value_filter = 2;
+}
+
+// MapStringInt64Filter represents filtering options for Map(String, Int64) values
+message MapStringInt64Filter {
+  oneof filter {
+    MapKeyValueStringInt64 key_value = 1;   // mapColumn['key'] op value
+    string has_key = 2;                     // mapContains(mapColumn, 'key')
+    string not_has_key = 3;                 // NOT mapContains(mapColumn, 'key')
+    StringList has_any_key = 4;             // mapContainsAny(mapColumn, ['k1', 'k2'])
+    StringList has_all_keys = 5;            // mapContainsAll(mapColumn, ['k1', 'k2'])
+  }
+}
+
 // SortOrder defines the order of results
 enum SortOrder {
   ASC = 0;

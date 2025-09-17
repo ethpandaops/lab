@@ -38,7 +38,7 @@ message ListDimNodeRequest {
   // Filter by tags (optional)
   repeated string tags = 5;
   // Filter by attributes (optional)
-  StringFilter attributes = 6;
+  MapStringStringFilter attributes = 6;
   // Filter by source (optional)
   StringFilter source = 7;
 

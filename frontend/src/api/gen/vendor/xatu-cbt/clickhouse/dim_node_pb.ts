@@ -5,7 +5,7 @@
 
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
 import { Message, proto3 } from "@bufbuild/protobuf";
-import { StringFilter, UInt32Filter } from "./common_pb.js";
+import { MapStringStringFilter, StringFilter, UInt32Filter } from "./common_pb.js";
 
 /**
  * @generated from message cbt.DimNode
@@ -138,9 +138,9 @@ export class ListDimNodeRequest extends Message<ListDimNodeRequest> {
   /**
    * Filter by attributes (optional)
    *
-   * @generated from field: cbt.StringFilter attributes = 6;
+   * @generated from field: cbt.MapStringStringFilter attributes = 6;
    */
-  attributes?: StringFilter;
+  attributes?: MapStringStringFilter;
 
   /**
    * Filter by source (optional)
@@ -188,7 +188,7 @@ export class ListDimNodeRequest extends Message<ListDimNodeRequest> {
     { no: 3, name: "name", kind: "message", T: StringFilter },
     { no: 4, name: "groups", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
     { no: 5, name: "tags", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
-    { no: 6, name: "attributes", kind: "message", T: StringFilter },
+    { no: 6, name: "attributes", kind: "message", T: MapStringStringFilter },
     { no: 7, name: "source", kind: "message", T: StringFilter },
     { no: 8, name: "page_size", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
     { no: 9, name: "page_token", kind: "scalar", T: 9 /* ScalarType.STRING */ },

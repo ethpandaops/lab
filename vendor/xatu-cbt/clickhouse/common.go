@@ -185,6 +185,68 @@ func (qb *QueryBuilder) AddIsNotNullCondition(column string) {
 	qb.conditions = append(qb.conditions, fmt.Sprintf("%s IS NOT NULL", column))
 }
 
+// AddMapKeyCondition adds a condition for accessing a map key value
+func (qb *QueryBuilder) AddMapKeyCondition(column, key, operator string, value interface{}) {
+	placeholder := qb.formatVariable(qb.argCounter)
+	// Escape the key for SQL safety
+	escapedKey := strings.ReplaceAll(key, "'", "''")
+	qb.conditions = append(qb.conditions, fmt.Sprintf("%s['%s'] %s %s", column, escapedKey, operator, placeholder))
+	qb.args = append(qb.args, value)
+	qb.argCounter++
+}
+
+// AddMapKeyLikeCondition adds a LIKE condition for a map key value
+func (qb *QueryBuilder) AddMapKeyLikeCondition(column, key, pattern string) {
+	placeholder := qb.formatVariable(qb.argCounter)
+	escapedKey := strings.ReplaceAll(key, "'", "''")
+	qb.conditions = append(qb.conditions, fmt.Sprintf("%s['%s'] LIKE %s", column, escapedKey, placeholder))
+	qb.args = append(qb.args, pattern)
+	qb.argCounter++
+}
+
+// AddMapKeyBetweenCondition adds a BETWEEN condition for a map key value
+func (qb *QueryBuilder) AddMapKeyBetweenCondition(column, key string, minValue, maxValue interface{}) {
+	placeholderMin := qb.formatVariable(qb.argCounter)
+	qb.argCounter++
+	placeholderMax := qb.formatVariable(qb.argCounter)
+	qb.argCounter++
+	escapedKey := strings.ReplaceAll(key, "'", "''")
+	qb.conditions = append(qb.conditions, fmt.Sprintf("%s['%s'] BETWEEN %s AND %s", column, escapedKey, placeholderMin, placeholderMax))
+	qb.args = append(qb.args, minValue, maxValue)
+}
+
+// AddMapContainsCondition adds a mapContains condition
+func (qb *QueryBuilder) AddMapContainsCondition(column string, key interface{}) {
+	placeholder := qb.formatVariable(qb.argCounter)
+	qb.conditions = append(qb.conditions, fmt.Sprintf("mapContains(%s, %s)", column, placeholder))
+	qb.args = append(qb.args, key)
+	qb.argCounter++
+}
+
+// AddNotMapContainsCondition adds a NOT mapContains condition
+func (qb *QueryBuilder) AddNotMapContainsCondition(column string, key interface{}) {
+	placeholder := qb.formatVariable(qb.argCounter)
+	qb.conditions = append(qb.conditions, fmt.Sprintf("NOT mapContains(%s, %s)", column, placeholder))
+	qb.args = append(qb.args, key)
+	qb.argCounter++
+}
+
+// AddMapContainsAnyCondition adds a condition to check if map contains any of the given keys
+func (qb *QueryBuilder) AddMapContainsAnyCondition(column string, keys []string) {
+	if len(keys) == 0 {
+		return
+	}
+	conditions := make([]string, 0, len(keys))
+	for _, key := range keys {
+		placeholder := qb.formatVariable(qb.argCounter)
+		conditions = append(conditions, fmt.Sprintf("mapContains(%s, %s)", column, placeholder))
+		qb.args = append(qb.args, key)
+		qb.argCounter++
+	}
+	// Join with OR for any match
+	qb.conditions = append(qb.conditions, fmt.Sprintf("(%s)", strings.Join(conditions, " OR ")))
+}
+
 // GetWhereClause returns the WHERE clause if conditions exist
 func (qb *QueryBuilder) GetWhereClause() string {
 	if len(qb.conditions) == 0 {

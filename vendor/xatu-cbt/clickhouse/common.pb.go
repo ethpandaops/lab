@@ -2665,6 +2665,906 @@ func (*NullableBoolFilter_IsNull) isNullableBoolFilter_Filter() {}
 
 func (*NullableBoolFilter_IsNotNull) isNullableBoolFilter_Filter() {}
 
+// MapKeyValueStringString represents a key-value pair filter for Map(String, String)
+type MapKeyValueStringString struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Key         string        `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
+	ValueFilter *StringFilter `protobuf:"bytes,2,opt,name=value_filter,json=valueFilter,proto3" json:"value_filter,omitempty"`
+}
+
+func (x *MapKeyValueStringString) Reset() {
+	*x = MapKeyValueStringString{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_vendor_xatu_cbt_clickhouse_common_proto_msgTypes[21]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *MapKeyValueStringString) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*MapKeyValueStringString) ProtoMessage() {}
+
+func (x *MapKeyValueStringString) ProtoReflect() protoreflect.Message {
+	mi := &file_vendor_xatu_cbt_clickhouse_common_proto_msgTypes[21]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use MapKeyValueStringString.ProtoReflect.Descriptor instead.
+func (*MapKeyValueStringString) Descriptor() ([]byte, []int) {
+	return file_vendor_xatu_cbt_clickhouse_common_proto_rawDescGZIP(), []int{21}
+}
+
+func (x *MapKeyValueStringString) GetKey() string {
+	if x != nil {
+		return x.Key
+	}
+	return ""
+}
+
+func (x *MapKeyValueStringString) GetValueFilter() *StringFilter {
+	if x != nil {
+		return x.ValueFilter
+	}
+	return nil
+}
+
+// MapStringStringFilter represents filtering options for Map(String, String) values
+type MapStringStringFilter struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	// Types that are assignable to Filter:
+	//
+	//	*MapStringStringFilter_KeyValue
+	//	*MapStringStringFilter_HasKey
+	//	*MapStringStringFilter_NotHasKey
+	//	*MapStringStringFilter_HasAnyKey
+	//	*MapStringStringFilter_HasAllKeys
+	Filter isMapStringStringFilter_Filter `protobuf_oneof:"filter"`
+}
+
+func (x *MapStringStringFilter) Reset() {
+	*x = MapStringStringFilter{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_vendor_xatu_cbt_clickhouse_common_proto_msgTypes[22]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *MapStringStringFilter) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*MapStringStringFilter) ProtoMessage() {}
+
+func (x *MapStringStringFilter) ProtoReflect() protoreflect.Message {
+	mi := &file_vendor_xatu_cbt_clickhouse_common_proto_msgTypes[22]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use MapStringStringFilter.ProtoReflect.Descriptor instead.
+func (*MapStringStringFilter) Descriptor() ([]byte, []int) {
+	return file_vendor_xatu_cbt_clickhouse_common_proto_rawDescGZIP(), []int{22}
+}
+
+func (m *MapStringStringFilter) GetFilter() isMapStringStringFilter_Filter {
+	if m != nil {
+		return m.Filter
+	}
+	return nil
+}
+
+func (x *MapStringStringFilter) GetKeyValue() *MapKeyValueStringString {
+	if x, ok := x.GetFilter().(*MapStringStringFilter_KeyValue); ok {
+		return x.KeyValue
+	}
+	return nil
+}
+
+func (x *MapStringStringFilter) GetHasKey() string {
+	if x, ok := x.GetFilter().(*MapStringStringFilter_HasKey); ok {
+		return x.HasKey
+	}
+	return ""
+}
+
+func (x *MapStringStringFilter) GetNotHasKey() string {
+	if x, ok := x.GetFilter().(*MapStringStringFilter_NotHasKey); ok {
+		return x.NotHasKey
+	}
+	return ""
+}
+
+func (x *MapStringStringFilter) GetHasAnyKey() *StringList {
+	if x, ok := x.GetFilter().(*MapStringStringFilter_HasAnyKey); ok {
+		return x.HasAnyKey
+	}
+	return nil
+}
+
+func (x *MapStringStringFilter) GetHasAllKeys() *StringList {
+	if x, ok := x.GetFilter().(*MapStringStringFilter_HasAllKeys); ok {
+		return x.HasAllKeys
+	}
+	return nil
+}
+
+type isMapStringStringFilter_Filter interface {
+	isMapStringStringFilter_Filter()
+}
+
+type MapStringStringFilter_KeyValue struct {
+	KeyValue *MapKeyValueStringString `protobuf:"bytes,1,opt,name=key_value,json=keyValue,proto3,oneof"` // mapColumn['key'] op 'value'
+}
+
+type MapStringStringFilter_HasKey struct {
+	HasKey string `protobuf:"bytes,2,opt,name=has_key,json=hasKey,proto3,oneof"` // mapContains(mapColumn, 'key')
+}
+
+type MapStringStringFilter_NotHasKey struct {
+	NotHasKey string `protobuf:"bytes,3,opt,name=not_has_key,json=notHasKey,proto3,oneof"` // NOT mapContains(mapColumn, 'key')
+}
+
+type MapStringStringFilter_HasAnyKey struct {
+	HasAnyKey *StringList `protobuf:"bytes,4,opt,name=has_any_key,json=hasAnyKey,proto3,oneof"` // mapContainsAny(mapColumn, ['k1', 'k2'])
+}
+
+type MapStringStringFilter_HasAllKeys struct {
+	HasAllKeys *StringList `protobuf:"bytes,5,opt,name=has_all_keys,json=hasAllKeys,proto3,oneof"` // mapContainsAll(mapColumn, ['k1', 'k2'])
+}
+
+func (*MapStringStringFilter_KeyValue) isMapStringStringFilter_Filter() {}
+
+func (*MapStringStringFilter_HasKey) isMapStringStringFilter_Filter() {}
+
+func (*MapStringStringFilter_NotHasKey) isMapStringStringFilter_Filter() {}
+
+func (*MapStringStringFilter_HasAnyKey) isMapStringStringFilter_Filter() {}
+
+func (*MapStringStringFilter_HasAllKeys) isMapStringStringFilter_Filter() {}
+
+// MapKeyValueStringUInt32 represents a key-value pair filter for Map(String, UInt32)
+type MapKeyValueStringUInt32 struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Key         string        `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
+	ValueFilter *UInt32Filter `protobuf:"bytes,2,opt,name=value_filter,json=valueFilter,proto3" json:"value_filter,omitempty"`
+}
+
+func (x *MapKeyValueStringUInt32) Reset() {
+	*x = MapKeyValueStringUInt32{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_vendor_xatu_cbt_clickhouse_common_proto_msgTypes[23]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *MapKeyValueStringUInt32) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*MapKeyValueStringUInt32) ProtoMessage() {}
+
+func (x *MapKeyValueStringUInt32) ProtoReflect() protoreflect.Message {
+	mi := &file_vendor_xatu_cbt_clickhouse_common_proto_msgTypes[23]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use MapKeyValueStringUInt32.ProtoReflect.Descriptor instead.
+func (*MapKeyValueStringUInt32) Descriptor() ([]byte, []int) {
+	return file_vendor_xatu_cbt_clickhouse_common_proto_rawDescGZIP(), []int{23}
+}
+
+func (x *MapKeyValueStringUInt32) GetKey() string {
+	if x != nil {
+		return x.Key
+	}
+	return ""
+}
+
+func (x *MapKeyValueStringUInt32) GetValueFilter() *UInt32Filter {
+	if x != nil {
+		return x.ValueFilter
+	}
+	return nil
+}
+
+// MapStringUInt32Filter represents filtering options for Map(String, UInt32) values
+type MapStringUInt32Filter struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	// Types that are assignable to Filter:
+	//
+	//	*MapStringUInt32Filter_KeyValue
+	//	*MapStringUInt32Filter_HasKey
+	//	*MapStringUInt32Filter_NotHasKey
+	//	*MapStringUInt32Filter_HasAnyKey
+	//	*MapStringUInt32Filter_HasAllKeys
+	Filter isMapStringUInt32Filter_Filter `protobuf_oneof:"filter"`
+}
+
+func (x *MapStringUInt32Filter) Reset() {
+	*x = MapStringUInt32Filter{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_vendor_xatu_cbt_clickhouse_common_proto_msgTypes[24]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *MapStringUInt32Filter) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*MapStringUInt32Filter) ProtoMessage() {}
+
+func (x *MapStringUInt32Filter) ProtoReflect() protoreflect.Message {
+	mi := &file_vendor_xatu_cbt_clickhouse_common_proto_msgTypes[24]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use MapStringUInt32Filter.ProtoReflect.Descriptor instead.
+func (*MapStringUInt32Filter) Descriptor() ([]byte, []int) {
+	return file_vendor_xatu_cbt_clickhouse_common_proto_rawDescGZIP(), []int{24}
+}
+
+func (m *MapStringUInt32Filter) GetFilter() isMapStringUInt32Filter_Filter {
+	if m != nil {
+		return m.Filter
+	}
+	return nil
+}
+
+func (x *MapStringUInt32Filter) GetKeyValue() *MapKeyValueStringUInt32 {
+	if x, ok := x.GetFilter().(*MapStringUInt32Filter_KeyValue); ok {
+		return x.KeyValue
+	}
+	return nil
+}
+
+func (x *MapStringUInt32Filter) GetHasKey() string {
+	if x, ok := x.GetFilter().(*MapStringUInt32Filter_HasKey); ok {
+		return x.HasKey
+	}
+	return ""
+}
+
+func (x *MapStringUInt32Filter) GetNotHasKey() string {
+	if x, ok := x.GetFilter().(*MapStringUInt32Filter_NotHasKey); ok {
+		return x.NotHasKey
+	}
+	return ""
+}
+
+func (x *MapStringUInt32Filter) GetHasAnyKey() *StringList {
+	if x, ok := x.GetFilter().(*MapStringUInt32Filter_HasAnyKey); ok {
+		return x.HasAnyKey
+	}
+	return nil
+}
+
+func (x *MapStringUInt32Filter) GetHasAllKeys() *StringList {
+	if x, ok := x.GetFilter().(*MapStringUInt32Filter_HasAllKeys); ok {
+		return x.HasAllKeys
+	}
+	return nil
+}
+
+type isMapStringUInt32Filter_Filter interface {
+	isMapStringUInt32Filter_Filter()
+}
+
+type MapStringUInt32Filter_KeyValue struct {
+	KeyValue *MapKeyValueStringUInt32 `protobuf:"bytes,1,opt,name=key_value,json=keyValue,proto3,oneof"` // mapColumn['key'] op value
+}
+
+type MapStringUInt32Filter_HasKey struct {
+	HasKey string `protobuf:"bytes,2,opt,name=has_key,json=hasKey,proto3,oneof"` // mapContains(mapColumn, 'key')
+}
+
+type MapStringUInt32Filter_NotHasKey struct {
+	NotHasKey string `protobuf:"bytes,3,opt,name=not_has_key,json=notHasKey,proto3,oneof"` // NOT mapContains(mapColumn, 'key')
+}
+
+type MapStringUInt32Filter_HasAnyKey struct {
+	HasAnyKey *StringList `protobuf:"bytes,4,opt,name=has_any_key,json=hasAnyKey,proto3,oneof"` // mapContainsAny(mapColumn, ['k1', 'k2'])
+}
+
+type MapStringUInt32Filter_HasAllKeys struct {
+	HasAllKeys *StringList `protobuf:"bytes,5,opt,name=has_all_keys,json=hasAllKeys,proto3,oneof"` // mapContainsAll(mapColumn, ['k1', 'k2'])
+}
+
+func (*MapStringUInt32Filter_KeyValue) isMapStringUInt32Filter_Filter() {}
+
+func (*MapStringUInt32Filter_HasKey) isMapStringUInt32Filter_Filter() {}
+
+func (*MapStringUInt32Filter_NotHasKey) isMapStringUInt32Filter_Filter() {}
+
+func (*MapStringUInt32Filter_HasAnyKey) isMapStringUInt32Filter_Filter() {}
+
+func (*MapStringUInt32Filter_HasAllKeys) isMapStringUInt32Filter_Filter() {}
+
+// MapKeyValueStringInt32 represents a key-value pair filter for Map(String, Int32)
+type MapKeyValueStringInt32 struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Key         string       `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
+	ValueFilter *Int32Filter `protobuf:"bytes,2,opt,name=value_filter,json=valueFilter,proto3" json:"value_filter,omitempty"`
+}
+
+func (x *MapKeyValueStringInt32) Reset() {
+	*x = MapKeyValueStringInt32{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_vendor_xatu_cbt_clickhouse_common_proto_msgTypes[25]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *MapKeyValueStringInt32) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*MapKeyValueStringInt32) ProtoMessage() {}
+
+func (x *MapKeyValueStringInt32) ProtoReflect() protoreflect.Message {
+	mi := &file_vendor_xatu_cbt_clickhouse_common_proto_msgTypes[25]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use MapKeyValueStringInt32.ProtoReflect.Descriptor instead.
+func (*MapKeyValueStringInt32) Descriptor() ([]byte, []int) {
+	return file_vendor_xatu_cbt_clickhouse_common_proto_rawDescGZIP(), []int{25}
+}
+
+func (x *MapKeyValueStringInt32) GetKey() string {
+	if x != nil {
+		return x.Key
+	}
+	return ""
+}
+
+func (x *MapKeyValueStringInt32) GetValueFilter() *Int32Filter {
+	if x != nil {
+		return x.ValueFilter
+	}
+	return nil
+}
+
+// MapStringInt32Filter represents filtering options for Map(String, Int32) values
+type MapStringInt32Filter struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	// Types that are assignable to Filter:
+	//
+	//	*MapStringInt32Filter_KeyValue
+	//	*MapStringInt32Filter_HasKey
+	//	*MapStringInt32Filter_NotHasKey
+	//	*MapStringInt32Filter_HasAnyKey
+	//	*MapStringInt32Filter_HasAllKeys
+	Filter isMapStringInt32Filter_Filter `protobuf_oneof:"filter"`
+}
+
+func (x *MapStringInt32Filter) Reset() {
+	*x = MapStringInt32Filter{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_vendor_xatu_cbt_clickhouse_common_proto_msgTypes[26]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *MapStringInt32Filter) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*MapStringInt32Filter) ProtoMessage() {}
+
+func (x *MapStringInt32Filter) ProtoReflect() protoreflect.Message {
+	mi := &file_vendor_xatu_cbt_clickhouse_common_proto_msgTypes[26]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use MapStringInt32Filter.ProtoReflect.Descriptor instead.
+func (*MapStringInt32Filter) Descriptor() ([]byte, []int) {
+	return file_vendor_xatu_cbt_clickhouse_common_proto_rawDescGZIP(), []int{26}
+}
+
+func (m *MapStringInt32Filter) GetFilter() isMapStringInt32Filter_Filter {
+	if m != nil {
+		return m.Filter
+	}
+	return nil
+}
+
+func (x *MapStringInt32Filter) GetKeyValue() *MapKeyValueStringInt32 {
+	if x, ok := x.GetFilter().(*MapStringInt32Filter_KeyValue); ok {
+		return x.KeyValue
+	}
+	return nil
+}
+
+func (x *MapStringInt32Filter) GetHasKey() string {
+	if x, ok := x.GetFilter().(*MapStringInt32Filter_HasKey); ok {
+		return x.HasKey
+	}
+	return ""
+}
+
+func (x *MapStringInt32Filter) GetNotHasKey() string {
+	if x, ok := x.GetFilter().(*MapStringInt32Filter_NotHasKey); ok {
+		return x.NotHasKey
+	}
+	return ""
+}
+
+func (x *MapStringInt32Filter) GetHasAnyKey() *StringList {
+	if x, ok := x.GetFilter().(*MapStringInt32Filter_HasAnyKey); ok {
+		return x.HasAnyKey
+	}
+	return nil
+}
+
+func (x *MapStringInt32Filter) GetHasAllKeys() *StringList {
+	if x, ok := x.GetFilter().(*MapStringInt32Filter_HasAllKeys); ok {
+		return x.HasAllKeys
+	}
+	return nil
+}
+
+type isMapStringInt32Filter_Filter interface {
+	isMapStringInt32Filter_Filter()
+}
+
+type MapStringInt32Filter_KeyValue struct {
+	KeyValue *MapKeyValueStringInt32 `protobuf:"bytes,1,opt,name=key_value,json=keyValue,proto3,oneof"` // mapColumn['key'] op value
+}
+
+type MapStringInt32Filter_HasKey struct {
+	HasKey string `protobuf:"bytes,2,opt,name=has_key,json=hasKey,proto3,oneof"` // mapContains(mapColumn, 'key')
+}
+
+type MapStringInt32Filter_NotHasKey struct {
+	NotHasKey string `protobuf:"bytes,3,opt,name=not_has_key,json=notHasKey,proto3,oneof"` // NOT mapContains(mapColumn, 'key')
+}
+
+type MapStringInt32Filter_HasAnyKey struct {
+	HasAnyKey *StringList `protobuf:"bytes,4,opt,name=has_any_key,json=hasAnyKey,proto3,oneof"` // mapContainsAny(mapColumn, ['k1', 'k2'])
+}
+
+type MapStringInt32Filter_HasAllKeys struct {
+	HasAllKeys *StringList `protobuf:"bytes,5,opt,name=has_all_keys,json=hasAllKeys,proto3,oneof"` // mapContainsAll(mapColumn, ['k1', 'k2'])
+}
+
+func (*MapStringInt32Filter_KeyValue) isMapStringInt32Filter_Filter() {}
+
+func (*MapStringInt32Filter_HasKey) isMapStringInt32Filter_Filter() {}
+
+func (*MapStringInt32Filter_NotHasKey) isMapStringInt32Filter_Filter() {}
+
+func (*MapStringInt32Filter_HasAnyKey) isMapStringInt32Filter_Filter() {}
+
+func (*MapStringInt32Filter_HasAllKeys) isMapStringInt32Filter_Filter() {}
+
+// MapKeyValueStringUInt64 represents a key-value pair filter for Map(String, UInt64)
+type MapKeyValueStringUInt64 struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Key         string        `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
+	ValueFilter *UInt64Filter `protobuf:"bytes,2,opt,name=value_filter,json=valueFilter,proto3" json:"value_filter,omitempty"`
+}
+
+func (x *MapKeyValueStringUInt64) Reset() {
+	*x = MapKeyValueStringUInt64{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_vendor_xatu_cbt_clickhouse_common_proto_msgTypes[27]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *MapKeyValueStringUInt64) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*MapKeyValueStringUInt64) ProtoMessage() {}
+
+func (x *MapKeyValueStringUInt64) ProtoReflect() protoreflect.Message {
+	mi := &file_vendor_xatu_cbt_clickhouse_common_proto_msgTypes[27]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use MapKeyValueStringUInt64.ProtoReflect.Descriptor instead.
+func (*MapKeyValueStringUInt64) Descriptor() ([]byte, []int) {
+	return file_vendor_xatu_cbt_clickhouse_common_proto_rawDescGZIP(), []int{27}
+}
+
+func (x *MapKeyValueStringUInt64) GetKey() string {
+	if x != nil {
+		return x.Key
+	}
+	return ""
+}
+
+func (x *MapKeyValueStringUInt64) GetValueFilter() *UInt64Filter {
+	if x != nil {
+		return x.ValueFilter
+	}
+	return nil
+}
+
+// MapStringUInt64Filter represents filtering options for Map(String, UInt64) values
+type MapStringUInt64Filter struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	// Types that are assignable to Filter:
+	//
+	//	*MapStringUInt64Filter_KeyValue
+	//	*MapStringUInt64Filter_HasKey
+	//	*MapStringUInt64Filter_NotHasKey
+	//	*MapStringUInt64Filter_HasAnyKey
+	//	*MapStringUInt64Filter_HasAllKeys
+	Filter isMapStringUInt64Filter_Filter `protobuf_oneof:"filter"`
+}
+
+func (x *MapStringUInt64Filter) Reset() {
+	*x = MapStringUInt64Filter{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_vendor_xatu_cbt_clickhouse_common_proto_msgTypes[28]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *MapStringUInt64Filter) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*MapStringUInt64Filter) ProtoMessage() {}
+
+func (x *MapStringUInt64Filter) ProtoReflect() protoreflect.Message {
+	mi := &file_vendor_xatu_cbt_clickhouse_common_proto_msgTypes[28]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use MapStringUInt64Filter.ProtoReflect.Descriptor instead.
+func (*MapStringUInt64Filter) Descriptor() ([]byte, []int) {
+	return file_vendor_xatu_cbt_clickhouse_common_proto_rawDescGZIP(), []int{28}
+}
+
+func (m *MapStringUInt64Filter) GetFilter() isMapStringUInt64Filter_Filter {
+	if m != nil {
+		return m.Filter
+	}
+	return nil
+}
+
+func (x *MapStringUInt64Filter) GetKeyValue() *MapKeyValueStringUInt64 {
+	if x, ok := x.GetFilter().(*MapStringUInt64Filter_KeyValue); ok {
+		return x.KeyValue
+	}
+	return nil
+}
+
+func (x *MapStringUInt64Filter) GetHasKey() string {
+	if x, ok := x.GetFilter().(*MapStringUInt64Filter_HasKey); ok {
+		return x.HasKey
+	}
+	return ""
+}
+
+func (x *MapStringUInt64Filter) GetNotHasKey() string {
+	if x, ok := x.GetFilter().(*MapStringUInt64Filter_NotHasKey); ok {
+		return x.NotHasKey
+	}
+	return ""
+}
+
+func (x *MapStringUInt64Filter) GetHasAnyKey() *StringList {
+	if x, ok := x.GetFilter().(*MapStringUInt64Filter_HasAnyKey); ok {
+		return x.HasAnyKey
+	}
+	return nil
+}
+
+func (x *MapStringUInt64Filter) GetHasAllKeys() *StringList {
+	if x, ok := x.GetFilter().(*MapStringUInt64Filter_HasAllKeys); ok {
+		return x.HasAllKeys
+	}
+	return nil
+}
+
+type isMapStringUInt64Filter_Filter interface {
+	isMapStringUInt64Filter_Filter()
+}
+
+type MapStringUInt64Filter_KeyValue struct {
+	KeyValue *MapKeyValueStringUInt64 `protobuf:"bytes,1,opt,name=key_value,json=keyValue,proto3,oneof"` // mapColumn['key'] op value
+}
+
+type MapStringUInt64Filter_HasKey struct {
+	HasKey string `protobuf:"bytes,2,opt,name=has_key,json=hasKey,proto3,oneof"` // mapContains(mapColumn, 'key')
+}
+
+type MapStringUInt64Filter_NotHasKey struct {
+	NotHasKey string `protobuf:"bytes,3,opt,name=not_has_key,json=notHasKey,proto3,oneof"` // NOT mapContains(mapColumn, 'key')
+}
+
+type MapStringUInt64Filter_HasAnyKey struct {
+	HasAnyKey *StringList `protobuf:"bytes,4,opt,name=has_any_key,json=hasAnyKey,proto3,oneof"` // mapContainsAny(mapColumn, ['k1', 'k2'])
+}
+
+type MapStringUInt64Filter_HasAllKeys struct {
+	HasAllKeys *StringList `protobuf:"bytes,5,opt,name=has_all_keys,json=hasAllKeys,proto3,oneof"` // mapContainsAll(mapColumn, ['k1', 'k2'])
+}
+
+func (*MapStringUInt64Filter_KeyValue) isMapStringUInt64Filter_Filter() {}
+
+func (*MapStringUInt64Filter_HasKey) isMapStringUInt64Filter_Filter() {}
+
+func (*MapStringUInt64Filter_NotHasKey) isMapStringUInt64Filter_Filter() {}
+
+func (*MapStringUInt64Filter_HasAnyKey) isMapStringUInt64Filter_Filter() {}
+
+func (*MapStringUInt64Filter_HasAllKeys) isMapStringUInt64Filter_Filter() {}
+
+// MapKeyValueStringInt64 represents a key-value pair filter for Map(String, Int64)
+type MapKeyValueStringInt64 struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Key         string       `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
+	ValueFilter *Int64Filter `protobuf:"bytes,2,opt,name=value_filter,json=valueFilter,proto3" json:"value_filter,omitempty"`
+}
+
+func (x *MapKeyValueStringInt64) Reset() {
+	*x = MapKeyValueStringInt64{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_vendor_xatu_cbt_clickhouse_common_proto_msgTypes[29]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *MapKeyValueStringInt64) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*MapKeyValueStringInt64) ProtoMessage() {}
+
+func (x *MapKeyValueStringInt64) ProtoReflect() protoreflect.Message {
+	mi := &file_vendor_xatu_cbt_clickhouse_common_proto_msgTypes[29]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use MapKeyValueStringInt64.ProtoReflect.Descriptor instead.
+func (*MapKeyValueStringInt64) Descriptor() ([]byte, []int) {
+	return file_vendor_xatu_cbt_clickhouse_common_proto_rawDescGZIP(), []int{29}
+}
+
+func (x *MapKeyValueStringInt64) GetKey() string {
+	if x != nil {
+		return x.Key
+	}
+	return ""
+}
+
+func (x *MapKeyValueStringInt64) GetValueFilter() *Int64Filter {
+	if x != nil {
+		return x.ValueFilter
+	}
+	return nil
+}
+
+// MapStringInt64Filter represents filtering options for Map(String, Int64) values
+type MapStringInt64Filter struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	// Types that are assignable to Filter:
+	//
+	//	*MapStringInt64Filter_KeyValue
+	//	*MapStringInt64Filter_HasKey
+	//	*MapStringInt64Filter_NotHasKey
+	//	*MapStringInt64Filter_HasAnyKey
+	//	*MapStringInt64Filter_HasAllKeys
+	Filter isMapStringInt64Filter_Filter `protobuf_oneof:"filter"`
+}
+
+func (x *MapStringInt64Filter) Reset() {
+	*x = MapStringInt64Filter{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_vendor_xatu_cbt_clickhouse_common_proto_msgTypes[30]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *MapStringInt64Filter) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*MapStringInt64Filter) ProtoMessage() {}
+
+func (x *MapStringInt64Filter) ProtoReflect() protoreflect.Message {
+	mi := &file_vendor_xatu_cbt_clickhouse_common_proto_msgTypes[30]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use MapStringInt64Filter.ProtoReflect.Descriptor instead.
+func (*MapStringInt64Filter) Descriptor() ([]byte, []int) {
+	return file_vendor_xatu_cbt_clickhouse_common_proto_rawDescGZIP(), []int{30}
+}
+
+func (m *MapStringInt64Filter) GetFilter() isMapStringInt64Filter_Filter {
+	if m != nil {
+		return m.Filter
+	}
+	return nil
+}
+
+func (x *MapStringInt64Filter) GetKeyValue() *MapKeyValueStringInt64 {
+	if x, ok := x.GetFilter().(*MapStringInt64Filter_KeyValue); ok {
+		return x.KeyValue
+	}
+	return nil
+}
+
+func (x *MapStringInt64Filter) GetHasKey() string {
+	if x, ok := x.GetFilter().(*MapStringInt64Filter_HasKey); ok {
+		return x.HasKey
+	}
+	return ""
+}
+
+func (x *MapStringInt64Filter) GetNotHasKey() string {
+	if x, ok := x.GetFilter().(*MapStringInt64Filter_NotHasKey); ok {
+		return x.NotHasKey
+	}
+	return ""
+}
+
+func (x *MapStringInt64Filter) GetHasAnyKey() *StringList {
+	if x, ok := x.GetFilter().(*MapStringInt64Filter_HasAnyKey); ok {
+		return x.HasAnyKey
+	}
+	return nil
+}
+
+func (x *MapStringInt64Filter) GetHasAllKeys() *StringList {
+	if x, ok := x.GetFilter().(*MapStringInt64Filter_HasAllKeys); ok {
+		return x.HasAllKeys
+	}
+	return nil
+}
+
+type isMapStringInt64Filter_Filter interface {
+	isMapStringInt64Filter_Filter()
+}
+
+type MapStringInt64Filter_KeyValue struct {
+	KeyValue *MapKeyValueStringInt64 `protobuf:"bytes,1,opt,name=key_value,json=keyValue,proto3,oneof"` // mapColumn['key'] op value
+}
+
+type MapStringInt64Filter_HasKey struct {
+	HasKey string `protobuf:"bytes,2,opt,name=has_key,json=hasKey,proto3,oneof"` // mapContains(mapColumn, 'key')
+}
+
+type MapStringInt64Filter_NotHasKey struct {
+	NotHasKey string `protobuf:"bytes,3,opt,name=not_has_key,json=notHasKey,proto3,oneof"` // NOT mapContains(mapColumn, 'key')
+}
+
+type MapStringInt64Filter_HasAnyKey struct {
+	HasAnyKey *StringList `protobuf:"bytes,4,opt,name=has_any_key,json=hasAnyKey,proto3,oneof"` // mapContainsAny(mapColumn, ['k1', 'k2'])
+}
+
+type MapStringInt64Filter_HasAllKeys struct {
+	HasAllKeys *StringList `protobuf:"bytes,5,opt,name=has_all_keys,json=hasAllKeys,proto3,oneof"` // mapContainsAll(mapColumn, ['k1', 'k2'])
+}
+
+func (*MapStringInt64Filter_KeyValue) isMapStringInt64Filter_Filter() {}
+
+func (*MapStringInt64Filter_HasKey) isMapStringInt64Filter_Filter() {}
+
+func (*MapStringInt64Filter_NotHasKey) isMapStringInt64Filter_Filter() {}
+
+func (*MapStringInt64Filter_HasAnyKey) isMapStringInt64Filter_Filter() {}
+
+func (*MapStringInt64Filter_HasAllKeys) isMapStringInt64Filter_Filter() {}
+
 var File_vendor_xatu_cbt_clickhouse_common_proto protoreflect.FileDescriptor
 
 var file_vendor_xatu_cbt_clickhouse_common_proto_rawDesc = []byte{
@@ -2923,13 +3823,126 @@ var file_vendor_xatu_cbt_clickhouse_common_proto_rawDesc = []byte{
 	0x6f, 0x74, 0x5f, 0x6e, 0x75, 0x6c, 0x6c, 0x18, 0x04, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x16, 0x2e,
 	0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e,
 	0x45, 0x6d, 0x70, 0x74, 0x79, 0x48, 0x00, 0x52, 0x09, 0x69, 0x73, 0x4e, 0x6f, 0x74, 0x4e, 0x75,
-	0x6c, 0x6c, 0x42, 0x08, 0x0a, 0x06, 0x66, 0x69, 0x6c, 0x74, 0x65, 0x72, 0x2a, 0x1e, 0x0a, 0x09,
-	0x53, 0x6f, 0x72, 0x74, 0x4f, 0x72, 0x64, 0x65, 0x72, 0x12, 0x07, 0x0a, 0x03, 0x41, 0x53, 0x43,
-	0x10, 0x00, 0x12, 0x08, 0x0a, 0x04, 0x44, 0x45, 0x53, 0x43, 0x10, 0x01, 0x42, 0x36, 0x5a, 0x34,
-	0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x65, 0x74, 0x68, 0x70, 0x61,
-	0x6e, 0x64, 0x61, 0x6f, 0x70, 0x73, 0x2f, 0x78, 0x61, 0x74, 0x75, 0x2d, 0x63, 0x62, 0x74, 0x2f,
-	0x70, 0x6b, 0x67, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x63, 0x6c, 0x69, 0x63, 0x6b, 0x68,
-	0x6f, 0x75, 0x73, 0x65, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x6c, 0x6c, 0x42, 0x08, 0x0a, 0x06, 0x66, 0x69, 0x6c, 0x74, 0x65, 0x72, 0x22, 0x61, 0x0a, 0x17,
+	0x4d, 0x61, 0x70, 0x4b, 0x65, 0x79, 0x56, 0x61, 0x6c, 0x75, 0x65, 0x53, 0x74, 0x72, 0x69, 0x6e,
+	0x67, 0x53, 0x74, 0x72, 0x69, 0x6e, 0x67, 0x12, 0x10, 0x0a, 0x03, 0x6b, 0x65, 0x79, 0x18, 0x01,
+	0x20, 0x01, 0x28, 0x09, 0x52, 0x03, 0x6b, 0x65, 0x79, 0x12, 0x34, 0x0a, 0x0c, 0x76, 0x61, 0x6c,
+	0x75, 0x65, 0x5f, 0x66, 0x69, 0x6c, 0x74, 0x65, 0x72, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32,
+	0x11, 0x2e, 0x63, 0x62, 0x74, 0x2e, 0x53, 0x74, 0x72, 0x69, 0x6e, 0x67, 0x46, 0x69, 0x6c, 0x74,
+	0x65, 0x72, 0x52, 0x0b, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x46, 0x69, 0x6c, 0x74, 0x65, 0x72, 0x22,
+	0x83, 0x02, 0x0a, 0x15, 0x4d, 0x61, 0x70, 0x53, 0x74, 0x72, 0x69, 0x6e, 0x67, 0x53, 0x74, 0x72,
+	0x69, 0x6e, 0x67, 0x46, 0x69, 0x6c, 0x74, 0x65, 0x72, 0x12, 0x3b, 0x0a, 0x09, 0x6b, 0x65, 0x79,
+	0x5f, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1c, 0x2e, 0x63,
+	0x62, 0x74, 0x2e, 0x4d, 0x61, 0x70, 0x4b, 0x65, 0x79, 0x56, 0x61, 0x6c, 0x75, 0x65, 0x53, 0x74,
+	0x72, 0x69, 0x6e, 0x67, 0x53, 0x74, 0x72, 0x69, 0x6e, 0x67, 0x48, 0x00, 0x52, 0x08, 0x6b, 0x65,
+	0x79, 0x56, 0x61, 0x6c, 0x75, 0x65, 0x12, 0x19, 0x0a, 0x07, 0x68, 0x61, 0x73, 0x5f, 0x6b, 0x65,
+	0x79, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x48, 0x00, 0x52, 0x06, 0x68, 0x61, 0x73, 0x4b, 0x65,
+	0x79, 0x12, 0x20, 0x0a, 0x0b, 0x6e, 0x6f, 0x74, 0x5f, 0x68, 0x61, 0x73, 0x5f, 0x6b, 0x65, 0x79,
+	0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x48, 0x00, 0x52, 0x09, 0x6e, 0x6f, 0x74, 0x48, 0x61, 0x73,
+	0x4b, 0x65, 0x79, 0x12, 0x31, 0x0a, 0x0b, 0x68, 0x61, 0x73, 0x5f, 0x61, 0x6e, 0x79, 0x5f, 0x6b,
+	0x65, 0x79, 0x18, 0x04, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x0f, 0x2e, 0x63, 0x62, 0x74, 0x2e, 0x53,
+	0x74, 0x72, 0x69, 0x6e, 0x67, 0x4c, 0x69, 0x73, 0x74, 0x48, 0x00, 0x52, 0x09, 0x68, 0x61, 0x73,
+	0x41, 0x6e, 0x79, 0x4b, 0x65, 0x79, 0x12, 0x33, 0x0a, 0x0c, 0x68, 0x61, 0x73, 0x5f, 0x61, 0x6c,
+	0x6c, 0x5f, 0x6b, 0x65, 0x79, 0x73, 0x18, 0x05, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x0f, 0x2e, 0x63,
+	0x62, 0x74, 0x2e, 0x53, 0x74, 0x72, 0x69, 0x6e, 0x67, 0x4c, 0x69, 0x73, 0x74, 0x48, 0x00, 0x52,
+	0x0a, 0x68, 0x61, 0x73, 0x41, 0x6c, 0x6c, 0x4b, 0x65, 0x79, 0x73, 0x42, 0x08, 0x0a, 0x06, 0x66,
+	0x69, 0x6c, 0x74, 0x65, 0x72, 0x22, 0x61, 0x0a, 0x17, 0x4d, 0x61, 0x70, 0x4b, 0x65, 0x79, 0x56,
+	0x61, 0x6c, 0x75, 0x65, 0x53, 0x74, 0x72, 0x69, 0x6e, 0x67, 0x55, 0x49, 0x6e, 0x74, 0x33, 0x32,
+	0x12, 0x10, 0x0a, 0x03, 0x6b, 0x65, 0x79, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x03, 0x6b,
+	0x65, 0x79, 0x12, 0x34, 0x0a, 0x0c, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x5f, 0x66, 0x69, 0x6c, 0x74,
+	0x65, 0x72, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x11, 0x2e, 0x63, 0x62, 0x74, 0x2e, 0x55,
+	0x49, 0x6e, 0x74, 0x33, 0x32, 0x46, 0x69, 0x6c, 0x74, 0x65, 0x72, 0x52, 0x0b, 0x76, 0x61, 0x6c,
+	0x75, 0x65, 0x46, 0x69, 0x6c, 0x74, 0x65, 0x72, 0x22, 0x83, 0x02, 0x0a, 0x15, 0x4d, 0x61, 0x70,
+	0x53, 0x74, 0x72, 0x69, 0x6e, 0x67, 0x55, 0x49, 0x6e, 0x74, 0x33, 0x32, 0x46, 0x69, 0x6c, 0x74,
+	0x65, 0x72, 0x12, 0x3b, 0x0a, 0x09, 0x6b, 0x65, 0x79, 0x5f, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x18,
+	0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1c, 0x2e, 0x63, 0x62, 0x74, 0x2e, 0x4d, 0x61, 0x70, 0x4b,
+	0x65, 0x79, 0x56, 0x61, 0x6c, 0x75, 0x65, 0x53, 0x74, 0x72, 0x69, 0x6e, 0x67, 0x55, 0x49, 0x6e,
+	0x74, 0x33, 0x32, 0x48, 0x00, 0x52, 0x08, 0x6b, 0x65, 0x79, 0x56, 0x61, 0x6c, 0x75, 0x65, 0x12,
+	0x19, 0x0a, 0x07, 0x68, 0x61, 0x73, 0x5f, 0x6b, 0x65, 0x79, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09,
+	0x48, 0x00, 0x52, 0x06, 0x68, 0x61, 0x73, 0x4b, 0x65, 0x79, 0x12, 0x20, 0x0a, 0x0b, 0x6e, 0x6f,
+	0x74, 0x5f, 0x68, 0x61, 0x73, 0x5f, 0x6b, 0x65, 0x79, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x48,
+	0x00, 0x52, 0x09, 0x6e, 0x6f, 0x74, 0x48, 0x61, 0x73, 0x4b, 0x65, 0x79, 0x12, 0x31, 0x0a, 0x0b,
+	0x68, 0x61, 0x73, 0x5f, 0x61, 0x6e, 0x79, 0x5f, 0x6b, 0x65, 0x79, 0x18, 0x04, 0x20, 0x01, 0x28,
+	0x0b, 0x32, 0x0f, 0x2e, 0x63, 0x62, 0x74, 0x2e, 0x53, 0x74, 0x72, 0x69, 0x6e, 0x67, 0x4c, 0x69,
+	0x73, 0x74, 0x48, 0x00, 0x52, 0x09, 0x68, 0x61, 0x73, 0x41, 0x6e, 0x79, 0x4b, 0x65, 0x79, 0x12,
+	0x33, 0x0a, 0x0c, 0x68, 0x61, 0x73, 0x5f, 0x61, 0x6c, 0x6c, 0x5f, 0x6b, 0x65, 0x79, 0x73, 0x18,
+	0x05, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x0f, 0x2e, 0x63, 0x62, 0x74, 0x2e, 0x53, 0x74, 0x72, 0x69,
+	0x6e, 0x67, 0x4c, 0x69, 0x73, 0x74, 0x48, 0x00, 0x52, 0x0a, 0x68, 0x61, 0x73, 0x41, 0x6c, 0x6c,
+	0x4b, 0x65, 0x79, 0x73, 0x42, 0x08, 0x0a, 0x06, 0x66, 0x69, 0x6c, 0x74, 0x65, 0x72, 0x22, 0x5f,
+	0x0a, 0x16, 0x4d, 0x61, 0x70, 0x4b, 0x65, 0x79, 0x56, 0x61, 0x6c, 0x75, 0x65, 0x53, 0x74, 0x72,
+	0x69, 0x6e, 0x67, 0x49, 0x6e, 0x74, 0x33, 0x32, 0x12, 0x10, 0x0a, 0x03, 0x6b, 0x65, 0x79, 0x18,
+	0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x03, 0x6b, 0x65, 0x79, 0x12, 0x33, 0x0a, 0x0c, 0x76, 0x61,
+	0x6c, 0x75, 0x65, 0x5f, 0x66, 0x69, 0x6c, 0x74, 0x65, 0x72, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b,
+	0x32, 0x10, 0x2e, 0x63, 0x62, 0x74, 0x2e, 0x49, 0x6e, 0x74, 0x33, 0x32, 0x46, 0x69, 0x6c, 0x74,
+	0x65, 0x72, 0x52, 0x0b, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x46, 0x69, 0x6c, 0x74, 0x65, 0x72, 0x22,
+	0x81, 0x02, 0x0a, 0x14, 0x4d, 0x61, 0x70, 0x53, 0x74, 0x72, 0x69, 0x6e, 0x67, 0x49, 0x6e, 0x74,
+	0x33, 0x32, 0x46, 0x69, 0x6c, 0x74, 0x65, 0x72, 0x12, 0x3a, 0x0a, 0x09, 0x6b, 0x65, 0x79, 0x5f,
+	0x76, 0x61, 0x6c, 0x75, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1b, 0x2e, 0x63, 0x62,
+	0x74, 0x2e, 0x4d, 0x61, 0x70, 0x4b, 0x65, 0x79, 0x56, 0x61, 0x6c, 0x75, 0x65, 0x53, 0x74, 0x72,
+	0x69, 0x6e, 0x67, 0x49, 0x6e, 0x74, 0x33, 0x32, 0x48, 0x00, 0x52, 0x08, 0x6b, 0x65, 0x79, 0x56,
+	0x61, 0x6c, 0x75, 0x65, 0x12, 0x19, 0x0a, 0x07, 0x68, 0x61, 0x73, 0x5f, 0x6b, 0x65, 0x79, 0x18,
+	0x02, 0x20, 0x01, 0x28, 0x09, 0x48, 0x00, 0x52, 0x06, 0x68, 0x61, 0x73, 0x4b, 0x65, 0x79, 0x12,
+	0x20, 0x0a, 0x0b, 0x6e, 0x6f, 0x74, 0x5f, 0x68, 0x61, 0x73, 0x5f, 0x6b, 0x65, 0x79, 0x18, 0x03,
+	0x20, 0x01, 0x28, 0x09, 0x48, 0x00, 0x52, 0x09, 0x6e, 0x6f, 0x74, 0x48, 0x61, 0x73, 0x4b, 0x65,
+	0x79, 0x12, 0x31, 0x0a, 0x0b, 0x68, 0x61, 0x73, 0x5f, 0x61, 0x6e, 0x79, 0x5f, 0x6b, 0x65, 0x79,
+	0x18, 0x04, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x0f, 0x2e, 0x63, 0x62, 0x74, 0x2e, 0x53, 0x74, 0x72,
+	0x69, 0x6e, 0x67, 0x4c, 0x69, 0x73, 0x74, 0x48, 0x00, 0x52, 0x09, 0x68, 0x61, 0x73, 0x41, 0x6e,
+	0x79, 0x4b, 0x65, 0x79, 0x12, 0x33, 0x0a, 0x0c, 0x68, 0x61, 0x73, 0x5f, 0x61, 0x6c, 0x6c, 0x5f,
+	0x6b, 0x65, 0x79, 0x73, 0x18, 0x05, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x0f, 0x2e, 0x63, 0x62, 0x74,
+	0x2e, 0x53, 0x74, 0x72, 0x69, 0x6e, 0x67, 0x4c, 0x69, 0x73, 0x74, 0x48, 0x00, 0x52, 0x0a, 0x68,
+	0x61, 0x73, 0x41, 0x6c, 0x6c, 0x4b, 0x65, 0x79, 0x73, 0x42, 0x08, 0x0a, 0x06, 0x66, 0x69, 0x6c,
+	0x74, 0x65, 0x72, 0x22, 0x61, 0x0a, 0x17, 0x4d, 0x61, 0x70, 0x4b, 0x65, 0x79, 0x56, 0x61, 0x6c,
+	0x75, 0x65, 0x53, 0x74, 0x72, 0x69, 0x6e, 0x67, 0x55, 0x49, 0x6e, 0x74, 0x36, 0x34, 0x12, 0x10,
+	0x0a, 0x03, 0x6b, 0x65, 0x79, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x03, 0x6b, 0x65, 0x79,
+	0x12, 0x34, 0x0a, 0x0c, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x5f, 0x66, 0x69, 0x6c, 0x74, 0x65, 0x72,
+	0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x11, 0x2e, 0x63, 0x62, 0x74, 0x2e, 0x55, 0x49, 0x6e,
+	0x74, 0x36, 0x34, 0x46, 0x69, 0x6c, 0x74, 0x65, 0x72, 0x52, 0x0b, 0x76, 0x61, 0x6c, 0x75, 0x65,
+	0x46, 0x69, 0x6c, 0x74, 0x65, 0x72, 0x22, 0x83, 0x02, 0x0a, 0x15, 0x4d, 0x61, 0x70, 0x53, 0x74,
+	0x72, 0x69, 0x6e, 0x67, 0x55, 0x49, 0x6e, 0x74, 0x36, 0x34, 0x46, 0x69, 0x6c, 0x74, 0x65, 0x72,
+	0x12, 0x3b, 0x0a, 0x09, 0x6b, 0x65, 0x79, 0x5f, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x18, 0x01, 0x20,
+	0x01, 0x28, 0x0b, 0x32, 0x1c, 0x2e, 0x63, 0x62, 0x74, 0x2e, 0x4d, 0x61, 0x70, 0x4b, 0x65, 0x79,
+	0x56, 0x61, 0x6c, 0x75, 0x65, 0x53, 0x74, 0x72, 0x69, 0x6e, 0x67, 0x55, 0x49, 0x6e, 0x74, 0x36,
+	0x34, 0x48, 0x00, 0x52, 0x08, 0x6b, 0x65, 0x79, 0x56, 0x61, 0x6c, 0x75, 0x65, 0x12, 0x19, 0x0a,
+	0x07, 0x68, 0x61, 0x73, 0x5f, 0x6b, 0x65, 0x79, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x48, 0x00,
+	0x52, 0x06, 0x68, 0x61, 0x73, 0x4b, 0x65, 0x79, 0x12, 0x20, 0x0a, 0x0b, 0x6e, 0x6f, 0x74, 0x5f,
+	0x68, 0x61, 0x73, 0x5f, 0x6b, 0x65, 0x79, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x48, 0x00, 0x52,
+	0x09, 0x6e, 0x6f, 0x74, 0x48, 0x61, 0x73, 0x4b, 0x65, 0x79, 0x12, 0x31, 0x0a, 0x0b, 0x68, 0x61,
+	0x73, 0x5f, 0x61, 0x6e, 0x79, 0x5f, 0x6b, 0x65, 0x79, 0x18, 0x04, 0x20, 0x01, 0x28, 0x0b, 0x32,
+	0x0f, 0x2e, 0x63, 0x62, 0x74, 0x2e, 0x53, 0x74, 0x72, 0x69, 0x6e, 0x67, 0x4c, 0x69, 0x73, 0x74,
+	0x48, 0x00, 0x52, 0x09, 0x68, 0x61, 0x73, 0x41, 0x6e, 0x79, 0x4b, 0x65, 0x79, 0x12, 0x33, 0x0a,
+	0x0c, 0x68, 0x61, 0x73, 0x5f, 0x61, 0x6c, 0x6c, 0x5f, 0x6b, 0x65, 0x79, 0x73, 0x18, 0x05, 0x20,
+	0x01, 0x28, 0x0b, 0x32, 0x0f, 0x2e, 0x63, 0x62, 0x74, 0x2e, 0x53, 0x74, 0x72, 0x69, 0x6e, 0x67,
+	0x4c, 0x69, 0x73, 0x74, 0x48, 0x00, 0x52, 0x0a, 0x68, 0x61, 0x73, 0x41, 0x6c, 0x6c, 0x4b, 0x65,
+	0x79, 0x73, 0x42, 0x08, 0x0a, 0x06, 0x66, 0x69, 0x6c, 0x74, 0x65, 0x72, 0x22, 0x5f, 0x0a, 0x16,
+	0x4d, 0x61, 0x70, 0x4b, 0x65, 0x79, 0x56, 0x61, 0x6c, 0x75, 0x65, 0x53, 0x74, 0x72, 0x69, 0x6e,
+	0x67, 0x49, 0x6e, 0x74, 0x36, 0x34, 0x12, 0x10, 0x0a, 0x03, 0x6b, 0x65, 0x79, 0x18, 0x01, 0x20,
+	0x01, 0x28, 0x09, 0x52, 0x03, 0x6b, 0x65, 0x79, 0x12, 0x33, 0x0a, 0x0c, 0x76, 0x61, 0x6c, 0x75,
+	0x65, 0x5f, 0x66, 0x69, 0x6c, 0x74, 0x65, 0x72, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x10,
+	0x2e, 0x63, 0x62, 0x74, 0x2e, 0x49, 0x6e, 0x74, 0x36, 0x34, 0x46, 0x69, 0x6c, 0x74, 0x65, 0x72,
+	0x52, 0x0b, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x46, 0x69, 0x6c, 0x74, 0x65, 0x72, 0x22, 0x81, 0x02,
+	0x0a, 0x14, 0x4d, 0x61, 0x70, 0x53, 0x74, 0x72, 0x69, 0x6e, 0x67, 0x49, 0x6e, 0x74, 0x36, 0x34,
+	0x46, 0x69, 0x6c, 0x74, 0x65, 0x72, 0x12, 0x3a, 0x0a, 0x09, 0x6b, 0x65, 0x79, 0x5f, 0x76, 0x61,
+	0x6c, 0x75, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1b, 0x2e, 0x63, 0x62, 0x74, 0x2e,
+	0x4d, 0x61, 0x70, 0x4b, 0x65, 0x79, 0x56, 0x61, 0x6c, 0x75, 0x65, 0x53, 0x74, 0x72, 0x69, 0x6e,
+	0x67, 0x49, 0x6e, 0x74, 0x36, 0x34, 0x48, 0x00, 0x52, 0x08, 0x6b, 0x65, 0x79, 0x56, 0x61, 0x6c,
+	0x75, 0x65, 0x12, 0x19, 0x0a, 0x07, 0x68, 0x61, 0x73, 0x5f, 0x6b, 0x65, 0x79, 0x18, 0x02, 0x20,
+	0x01, 0x28, 0x09, 0x48, 0x00, 0x52, 0x06, 0x68, 0x61, 0x73, 0x4b, 0x65, 0x79, 0x12, 0x20, 0x0a,
+	0x0b, 0x6e, 0x6f, 0x74, 0x5f, 0x68, 0x61, 0x73, 0x5f, 0x6b, 0x65, 0x79, 0x18, 0x03, 0x20, 0x01,
+	0x28, 0x09, 0x48, 0x00, 0x52, 0x09, 0x6e, 0x6f, 0x74, 0x48, 0x61, 0x73, 0x4b, 0x65, 0x79, 0x12,
+	0x31, 0x0a, 0x0b, 0x68, 0x61, 0x73, 0x5f, 0x61, 0x6e, 0x79, 0x5f, 0x6b, 0x65, 0x79, 0x18, 0x04,
+	0x20, 0x01, 0x28, 0x0b, 0x32, 0x0f, 0x2e, 0x63, 0x62, 0x74, 0x2e, 0x53, 0x74, 0x72, 0x69, 0x6e,
+	0x67, 0x4c, 0x69, 0x73, 0x74, 0x48, 0x00, 0x52, 0x09, 0x68, 0x61, 0x73, 0x41, 0x6e, 0x79, 0x4b,
+	0x65, 0x79, 0x12, 0x33, 0x0a, 0x0c, 0x68, 0x61, 0x73, 0x5f, 0x61, 0x6c, 0x6c, 0x5f, 0x6b, 0x65,
+	0x79, 0x73, 0x18, 0x05, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x0f, 0x2e, 0x63, 0x62, 0x74, 0x2e, 0x53,
+	0x74, 0x72, 0x69, 0x6e, 0x67, 0x4c, 0x69, 0x73, 0x74, 0x48, 0x00, 0x52, 0x0a, 0x68, 0x61, 0x73,
+	0x41, 0x6c, 0x6c, 0x4b, 0x65, 0x79, 0x73, 0x42, 0x08, 0x0a, 0x06, 0x66, 0x69, 0x6c, 0x74, 0x65,
+	0x72, 0x2a, 0x1e, 0x0a, 0x09, 0x53, 0x6f, 0x72, 0x74, 0x4f, 0x72, 0x64, 0x65, 0x72, 0x12, 0x07,
+	0x0a, 0x03, 0x41, 0x53, 0x43, 0x10, 0x00, 0x12, 0x08, 0x0a, 0x04, 0x44, 0x45, 0x53, 0x43, 0x10,
+	0x01, 0x42, 0x36, 0x5a, 0x34, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f,
+	0x65, 0x74, 0x68, 0x70, 0x61, 0x6e, 0x64, 0x61, 0x6f, 0x70, 0x73, 0x2f, 0x78, 0x61, 0x74, 0x75,
+	0x2d, 0x63, 0x62, 0x74, 0x2f, 0x70, 0x6b, 0x67, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x63,
+	0x6c, 0x69, 0x63, 0x6b, 0x68, 0x6f, 0x75, 0x73, 0x65, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f,
+	0x33,
 }
 
 var (
@@ -2945,35 +3958,45 @@ func file_vendor_xatu_cbt_clickhouse_common_proto_rawDescGZIP() []byte {
 }
 
 var file_vendor_xatu_cbt_clickhouse_common_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_vendor_xatu_cbt_clickhouse_common_proto_msgTypes = make([]protoimpl.MessageInfo, 21)
+var file_vendor_xatu_cbt_clickhouse_common_proto_msgTypes = make([]protoimpl.MessageInfo, 31)
 var file_vendor_xatu_cbt_clickhouse_common_proto_goTypes = []any{
-	(SortOrder)(0),                 // 0: cbt.SortOrder
-	(*UInt32Filter)(nil),           // 1: cbt.UInt32Filter
-	(*NullableUInt32Filter)(nil),   // 2: cbt.NullableUInt32Filter
-	(*UInt32Range)(nil),            // 3: cbt.UInt32Range
-	(*UInt32List)(nil),             // 4: cbt.UInt32List
-	(*UInt64Filter)(nil),           // 5: cbt.UInt64Filter
-	(*NullableUInt64Filter)(nil),   // 6: cbt.NullableUInt64Filter
-	(*UInt64Range)(nil),            // 7: cbt.UInt64Range
-	(*UInt64List)(nil),             // 8: cbt.UInt64List
-	(*Int32Filter)(nil),            // 9: cbt.Int32Filter
-	(*NullableInt32Filter)(nil),    // 10: cbt.NullableInt32Filter
-	(*Int32Range)(nil),             // 11: cbt.Int32Range
-	(*Int32List)(nil),              // 12: cbt.Int32List
-	(*Int64Filter)(nil),            // 13: cbt.Int64Filter
-	(*NullableInt64Filter)(nil),    // 14: cbt.NullableInt64Filter
-	(*Int64Range)(nil),             // 15: cbt.Int64Range
-	(*Int64List)(nil),              // 16: cbt.Int64List
-	(*StringFilter)(nil),           // 17: cbt.StringFilter
-	(*NullableStringFilter)(nil),   // 18: cbt.NullableStringFilter
-	(*StringList)(nil),             // 19: cbt.StringList
-	(*BoolFilter)(nil),             // 20: cbt.BoolFilter
-	(*NullableBoolFilter)(nil),     // 21: cbt.NullableBoolFilter
-	(*emptypb.Empty)(nil),          // 22: google.protobuf.Empty
-	(*wrapperspb.UInt32Value)(nil), // 23: google.protobuf.UInt32Value
-	(*wrapperspb.UInt64Value)(nil), // 24: google.protobuf.UInt64Value
-	(*wrapperspb.Int32Value)(nil),  // 25: google.protobuf.Int32Value
-	(*wrapperspb.Int64Value)(nil),  // 26: google.protobuf.Int64Value
+	(SortOrder)(0),                  // 0: cbt.SortOrder
+	(*UInt32Filter)(nil),            // 1: cbt.UInt32Filter
+	(*NullableUInt32Filter)(nil),    // 2: cbt.NullableUInt32Filter
+	(*UInt32Range)(nil),             // 3: cbt.UInt32Range
+	(*UInt32List)(nil),              // 4: cbt.UInt32List
+	(*UInt64Filter)(nil),            // 5: cbt.UInt64Filter
+	(*NullableUInt64Filter)(nil),    // 6: cbt.NullableUInt64Filter
+	(*UInt64Range)(nil),             // 7: cbt.UInt64Range
+	(*UInt64List)(nil),              // 8: cbt.UInt64List
+	(*Int32Filter)(nil),             // 9: cbt.Int32Filter
+	(*NullableInt32Filter)(nil),     // 10: cbt.NullableInt32Filter
+	(*Int32Range)(nil),              // 11: cbt.Int32Range
+	(*Int32List)(nil),               // 12: cbt.Int32List
+	(*Int64Filter)(nil),             // 13: cbt.Int64Filter
+	(*NullableInt64Filter)(nil),     // 14: cbt.NullableInt64Filter
+	(*Int64Range)(nil),              // 15: cbt.Int64Range
+	(*Int64List)(nil),               // 16: cbt.Int64List
+	(*StringFilter)(nil),            // 17: cbt.StringFilter
+	(*NullableStringFilter)(nil),    // 18: cbt.NullableStringFilter
+	(*StringList)(nil),              // 19: cbt.StringList
+	(*BoolFilter)(nil),              // 20: cbt.BoolFilter
+	(*NullableBoolFilter)(nil),      // 21: cbt.NullableBoolFilter
+	(*MapKeyValueStringString)(nil), // 22: cbt.MapKeyValueStringString
+	(*MapStringStringFilter)(nil),   // 23: cbt.MapStringStringFilter
+	(*MapKeyValueStringUInt32)(nil), // 24: cbt.MapKeyValueStringUInt32
+	(*MapStringUInt32Filter)(nil),   // 25: cbt.MapStringUInt32Filter
+	(*MapKeyValueStringInt32)(nil),  // 26: cbt.MapKeyValueStringInt32
+	(*MapStringInt32Filter)(nil),    // 27: cbt.MapStringInt32Filter
+	(*MapKeyValueStringUInt64)(nil), // 28: cbt.MapKeyValueStringUInt64
+	(*MapStringUInt64Filter)(nil),   // 29: cbt.MapStringUInt64Filter
+	(*MapKeyValueStringInt64)(nil),  // 30: cbt.MapKeyValueStringInt64
+	(*MapStringInt64Filter)(nil),    // 31: cbt.MapStringInt64Filter
+	(*emptypb.Empty)(nil),           // 32: google.protobuf.Empty
+	(*wrapperspb.UInt32Value)(nil),  // 33: google.protobuf.UInt32Value
+	(*wrapperspb.UInt64Value)(nil),  // 34: google.protobuf.UInt64Value
+	(*wrapperspb.Int32Value)(nil),   // 35: google.protobuf.Int32Value
+	(*wrapperspb.Int64Value)(nil),   // 36: google.protobuf.Int64Value
 }
 var file_vendor_xatu_cbt_clickhouse_common_proto_depIdxs = []int32{
 	3,  // 0: cbt.UInt32Filter.between:type_name -> cbt.UInt32Range
@@ -2982,49 +4005,69 @@ var file_vendor_xatu_cbt_clickhouse_common_proto_depIdxs = []int32{
 	3,  // 3: cbt.NullableUInt32Filter.between:type_name -> cbt.UInt32Range
 	4,  // 4: cbt.NullableUInt32Filter.in:type_name -> cbt.UInt32List
 	4,  // 5: cbt.NullableUInt32Filter.not_in:type_name -> cbt.UInt32List
-	22, // 6: cbt.NullableUInt32Filter.is_null:type_name -> google.protobuf.Empty
-	22, // 7: cbt.NullableUInt32Filter.is_not_null:type_name -> google.protobuf.Empty
-	23, // 8: cbt.UInt32Range.max:type_name -> google.protobuf.UInt32Value
+	32, // 6: cbt.NullableUInt32Filter.is_null:type_name -> google.protobuf.Empty
+	32, // 7: cbt.NullableUInt32Filter.is_not_null:type_name -> google.protobuf.Empty
+	33, // 8: cbt.UInt32Range.max:type_name -> google.protobuf.UInt32Value
 	7,  // 9: cbt.UInt64Filter.between:type_name -> cbt.UInt64Range
 	8,  // 10: cbt.UInt64Filter.in:type_name -> cbt.UInt64List
 	8,  // 11: cbt.UInt64Filter.not_in:type_name -> cbt.UInt64List
 	7,  // 12: cbt.NullableUInt64Filter.between:type_name -> cbt.UInt64Range
 	8,  // 13: cbt.NullableUInt64Filter.in:type_name -> cbt.UInt64List
 	8,  // 14: cbt.NullableUInt64Filter.not_in:type_name -> cbt.UInt64List
-	22, // 15: cbt.NullableUInt64Filter.is_null:type_name -> google.protobuf.Empty
-	22, // 16: cbt.NullableUInt64Filter.is_not_null:type_name -> google.protobuf.Empty
-	24, // 17: cbt.UInt64Range.max:type_name -> google.protobuf.UInt64Value
+	32, // 15: cbt.NullableUInt64Filter.is_null:type_name -> google.protobuf.Empty
+	32, // 16: cbt.NullableUInt64Filter.is_not_null:type_name -> google.protobuf.Empty
+	34, // 17: cbt.UInt64Range.max:type_name -> google.protobuf.UInt64Value
 	11, // 18: cbt.Int32Filter.between:type_name -> cbt.Int32Range
 	12, // 19: cbt.Int32Filter.in:type_name -> cbt.Int32List
 	12, // 20: cbt.Int32Filter.not_in:type_name -> cbt.Int32List
 	11, // 21: cbt.NullableInt32Filter.between:type_name -> cbt.Int32Range
 	12, // 22: cbt.NullableInt32Filter.in:type_name -> cbt.Int32List
 	12, // 23: cbt.NullableInt32Filter.not_in:type_name -> cbt.Int32List
-	22, // 24: cbt.NullableInt32Filter.is_null:type_name -> google.protobuf.Empty
-	22, // 25: cbt.NullableInt32Filter.is_not_null:type_name -> google.protobuf.Empty
-	25, // 26: cbt.Int32Range.max:type_name -> google.protobuf.Int32Value
+	32, // 24: cbt.NullableInt32Filter.is_null:type_name -> google.protobuf.Empty
+	32, // 25: cbt.NullableInt32Filter.is_not_null:type_name -> google.protobuf.Empty
+	35, // 26: cbt.Int32Range.max:type_name -> google.protobuf.Int32Value
 	15, // 27: cbt.Int64Filter.between:type_name -> cbt.Int64Range
 	16, // 28: cbt.Int64Filter.in:type_name -> cbt.Int64List
 	16, // 29: cbt.Int64Filter.not_in:type_name -> cbt.Int64List
 	15, // 30: cbt.NullableInt64Filter.between:type_name -> cbt.Int64Range
 	16, // 31: cbt.NullableInt64Filter.in:type_name -> cbt.Int64List
 	16, // 32: cbt.NullableInt64Filter.not_in:type_name -> cbt.Int64List
-	22, // 33: cbt.NullableInt64Filter.is_null:type_name -> google.protobuf.Empty
-	22, // 34: cbt.NullableInt64Filter.is_not_null:type_name -> google.protobuf.Empty
-	26, // 35: cbt.Int64Range.max:type_name -> google.protobuf.Int64Value
+	32, // 33: cbt.NullableInt64Filter.is_null:type_name -> google.protobuf.Empty
+	32, // 34: cbt.NullableInt64Filter.is_not_null:type_name -> google.protobuf.Empty
+	36, // 35: cbt.Int64Range.max:type_name -> google.protobuf.Int64Value
 	19, // 36: cbt.StringFilter.in:type_name -> cbt.StringList
 	19, // 37: cbt.StringFilter.not_in:type_name -> cbt.StringList
 	19, // 38: cbt.NullableStringFilter.in:type_name -> cbt.StringList
 	19, // 39: cbt.NullableStringFilter.not_in:type_name -> cbt.StringList
-	22, // 40: cbt.NullableStringFilter.is_null:type_name -> google.protobuf.Empty
-	22, // 41: cbt.NullableStringFilter.is_not_null:type_name -> google.protobuf.Empty
-	22, // 42: cbt.NullableBoolFilter.is_null:type_name -> google.protobuf.Empty
-	22, // 43: cbt.NullableBoolFilter.is_not_null:type_name -> google.protobuf.Empty
-	44, // [44:44] is the sub-list for method output_type
-	44, // [44:44] is the sub-list for method input_type
-	44, // [44:44] is the sub-list for extension type_name
-	44, // [44:44] is the sub-list for extension extendee
-	0,  // [0:44] is the sub-list for field type_name
+	32, // 40: cbt.NullableStringFilter.is_null:type_name -> google.protobuf.Empty
+	32, // 41: cbt.NullableStringFilter.is_not_null:type_name -> google.protobuf.Empty
+	32, // 42: cbt.NullableBoolFilter.is_null:type_name -> google.protobuf.Empty
+	32, // 43: cbt.NullableBoolFilter.is_not_null:type_name -> google.protobuf.Empty
+	17, // 44: cbt.MapKeyValueStringString.value_filter:type_name -> cbt.StringFilter
+	22, // 45: cbt.MapStringStringFilter.key_value:type_name -> cbt.MapKeyValueStringString
+	19, // 46: cbt.MapStringStringFilter.has_any_key:type_name -> cbt.StringList
+	19, // 47: cbt.MapStringStringFilter.has_all_keys:type_name -> cbt.StringList
+	1,  // 48: cbt.MapKeyValueStringUInt32.value_filter:type_name -> cbt.UInt32Filter
+	24, // 49: cbt.MapStringUInt32Filter.key_value:type_name -> cbt.MapKeyValueStringUInt32
+	19, // 50: cbt.MapStringUInt32Filter.has_any_key:type_name -> cbt.StringList
+	19, // 51: cbt.MapStringUInt32Filter.has_all_keys:type_name -> cbt.StringList
+	9,  // 52: cbt.MapKeyValueStringInt32.value_filter:type_name -> cbt.Int32Filter
+	26, // 53: cbt.MapStringInt32Filter.key_value:type_name -> cbt.MapKeyValueStringInt32
+	19, // 54: cbt.MapStringInt32Filter.has_any_key:type_name -> cbt.StringList
+	19, // 55: cbt.MapStringInt32Filter.has_all_keys:type_name -> cbt.StringList
+	5,  // 56: cbt.MapKeyValueStringUInt64.value_filter:type_name -> cbt.UInt64Filter
+	28, // 57: cbt.MapStringUInt64Filter.key_value:type_name -> cbt.MapKeyValueStringUInt64
+	19, // 58: cbt.MapStringUInt64Filter.has_any_key:type_name -> cbt.StringList
+	19, // 59: cbt.MapStringUInt64Filter.has_all_keys:type_name -> cbt.StringList
+	13, // 60: cbt.MapKeyValueStringInt64.value_filter:type_name -> cbt.Int64Filter
+	30, // 61: cbt.MapStringInt64Filter.key_value:type_name -> cbt.MapKeyValueStringInt64
+	19, // 62: cbt.MapStringInt64Filter.has_any_key:type_name -> cbt.StringList
+	19, // 63: cbt.MapStringInt64Filter.has_all_keys:type_name -> cbt.StringList
+	64, // [64:64] is the sub-list for method output_type
+	64, // [64:64] is the sub-list for method input_type
+	64, // [64:64] is the sub-list for extension type_name
+	64, // [64:64] is the sub-list for extension extendee
+	0,  // [0:64] is the sub-list for field type_name
 }
 
 func init() { file_vendor_xatu_cbt_clickhouse_common_proto_init() }
@@ -3285,6 +4328,126 @@ func file_vendor_xatu_cbt_clickhouse_common_proto_init() {
 				return nil
 			}
 		}
+		file_vendor_xatu_cbt_clickhouse_common_proto_msgTypes[21].Exporter = func(v any, i int) any {
+			switch v := v.(*MapKeyValueStringString); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_vendor_xatu_cbt_clickhouse_common_proto_msgTypes[22].Exporter = func(v any, i int) any {
+			switch v := v.(*MapStringStringFilter); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_vendor_xatu_cbt_clickhouse_common_proto_msgTypes[23].Exporter = func(v any, i int) any {
+			switch v := v.(*MapKeyValueStringUInt32); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_vendor_xatu_cbt_clickhouse_common_proto_msgTypes[24].Exporter = func(v any, i int) any {
+			switch v := v.(*MapStringUInt32Filter); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_vendor_xatu_cbt_clickhouse_common_proto_msgTypes[25].Exporter = func(v any, i int) any {
+			switch v := v.(*MapKeyValueStringInt32); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_vendor_xatu_cbt_clickhouse_common_proto_msgTypes[26].Exporter = func(v any, i int) any {
+			switch v := v.(*MapStringInt32Filter); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_vendor_xatu_cbt_clickhouse_common_proto_msgTypes[27].Exporter = func(v any, i int) any {
+			switch v := v.(*MapKeyValueStringUInt64); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_vendor_xatu_cbt_clickhouse_common_proto_msgTypes[28].Exporter = func(v any, i int) any {
+			switch v := v.(*MapStringUInt64Filter); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_vendor_xatu_cbt_clickhouse_common_proto_msgTypes[29].Exporter = func(v any, i int) any {
+			switch v := v.(*MapKeyValueStringInt64); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_vendor_xatu_cbt_clickhouse_common_proto_msgTypes[30].Exporter = func(v any, i int) any {
+			switch v := v.(*MapStringInt64Filter); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
 	}
 	file_vendor_xatu_cbt_clickhouse_common_proto_msgTypes[0].OneofWrappers = []any{
 		(*UInt32Filter_Eq)(nil),
@@ -3416,13 +4579,48 @@ func file_vendor_xatu_cbt_clickhouse_common_proto_init() {
 		(*NullableBoolFilter_IsNull)(nil),
 		(*NullableBoolFilter_IsNotNull)(nil),
 	}
+	file_vendor_xatu_cbt_clickhouse_common_proto_msgTypes[22].OneofWrappers = []any{
+		(*MapStringStringFilter_KeyValue)(nil),
+		(*MapStringStringFilter_HasKey)(nil),
+		(*MapStringStringFilter_NotHasKey)(nil),
+		(*MapStringStringFilter_HasAnyKey)(nil),
+		(*MapStringStringFilter_HasAllKeys)(nil),
+	}
+	file_vendor_xatu_cbt_clickhouse_common_proto_msgTypes[24].OneofWrappers = []any{
+		(*MapStringUInt32Filter_KeyValue)(nil),
+		(*MapStringUInt32Filter_HasKey)(nil),
+		(*MapStringUInt32Filter_NotHasKey)(nil),
+		(*MapStringUInt32Filter_HasAnyKey)(nil),
+		(*MapStringUInt32Filter_HasAllKeys)(nil),
+	}
+	file_vendor_xatu_cbt_clickhouse_common_proto_msgTypes[26].OneofWrappers = []any{
+		(*MapStringInt32Filter_KeyValue)(nil),
+		(*MapStringInt32Filter_HasKey)(nil),
+		(*MapStringInt32Filter_NotHasKey)(nil),
+		(*MapStringInt32Filter_HasAnyKey)(nil),
+		(*MapStringInt32Filter_HasAllKeys)(nil),
+	}
+	file_vendor_xatu_cbt_clickhouse_common_proto_msgTypes[28].OneofWrappers = []any{
+		(*MapStringUInt64Filter_KeyValue)(nil),
+		(*MapStringUInt64Filter_HasKey)(nil),
+		(*MapStringUInt64Filter_NotHasKey)(nil),
+		(*MapStringUInt64Filter_HasAnyKey)(nil),
+		(*MapStringUInt64Filter_HasAllKeys)(nil),
+	}
+	file_vendor_xatu_cbt_clickhouse_common_proto_msgTypes[30].OneofWrappers = []any{
+		(*MapStringInt64Filter_KeyValue)(nil),
+		(*MapStringInt64Filter_HasKey)(nil),
+		(*MapStringInt64Filter_NotHasKey)(nil),
+		(*MapStringInt64Filter_HasAnyKey)(nil),
+		(*MapStringInt64Filter_HasAllKeys)(nil),
+	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_vendor_xatu_cbt_clickhouse_common_proto_rawDesc,
 			NumEnums:      1,
-			NumMessages:   21,
+			NumMessages:   31,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

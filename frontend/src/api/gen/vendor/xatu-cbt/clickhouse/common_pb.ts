@@ -1815,3 +1815,643 @@ export class NullableBoolFilter extends Message<NullableBoolFilter> {
   }
 }
 
+/**
+ * MapKeyValueStringString represents a key-value pair filter for Map(String, String)
+ *
+ * @generated from message cbt.MapKeyValueStringString
+ */
+export class MapKeyValueStringString extends Message<MapKeyValueStringString> {
+  /**
+   * @generated from field: string key = 1;
+   */
+  key = "";
+
+  /**
+   * @generated from field: cbt.StringFilter value_filter = 2;
+   */
+  valueFilter?: StringFilter;
+
+  constructor(data?: PartialMessage<MapKeyValueStringString>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "cbt.MapKeyValueStringString";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "key", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "value_filter", kind: "message", T: StringFilter },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): MapKeyValueStringString {
+    return new MapKeyValueStringString().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): MapKeyValueStringString {
+    return new MapKeyValueStringString().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): MapKeyValueStringString {
+    return new MapKeyValueStringString().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: MapKeyValueStringString | PlainMessage<MapKeyValueStringString> | undefined, b: MapKeyValueStringString | PlainMessage<MapKeyValueStringString> | undefined): boolean {
+    return proto3.util.equals(MapKeyValueStringString, a, b);
+  }
+}
+
+/**
+ * MapStringStringFilter represents filtering options for Map(String, String) values
+ *
+ * @generated from message cbt.MapStringStringFilter
+ */
+export class MapStringStringFilter extends Message<MapStringStringFilter> {
+  /**
+   * @generated from oneof cbt.MapStringStringFilter.filter
+   */
+  filter: {
+    /**
+     * mapColumn['key'] op 'value'
+     *
+     * @generated from field: cbt.MapKeyValueStringString key_value = 1;
+     */
+    value: MapKeyValueStringString;
+    case: "keyValue";
+  } | {
+    /**
+     * mapContains(mapColumn, 'key')
+     *
+     * @generated from field: string has_key = 2;
+     */
+    value: string;
+    case: "hasKey";
+  } | {
+    /**
+     * NOT mapContains(mapColumn, 'key')
+     *
+     * @generated from field: string not_has_key = 3;
+     */
+    value: string;
+    case: "notHasKey";
+  } | {
+    /**
+     * mapContainsAny(mapColumn, ['k1', 'k2'])
+     *
+     * @generated from field: cbt.StringList has_any_key = 4;
+     */
+    value: StringList;
+    case: "hasAnyKey";
+  } | {
+    /**
+     * mapContainsAll(mapColumn, ['k1', 'k2'])
+     *
+     * @generated from field: cbt.StringList has_all_keys = 5;
+     */
+    value: StringList;
+    case: "hasAllKeys";
+  } | { case: undefined; value?: undefined } = { case: undefined };
+
+  constructor(data?: PartialMessage<MapStringStringFilter>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "cbt.MapStringStringFilter";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "key_value", kind: "message", T: MapKeyValueStringString, oneof: "filter" },
+    { no: 2, name: "has_key", kind: "scalar", T: 9 /* ScalarType.STRING */, oneof: "filter" },
+    { no: 3, name: "not_has_key", kind: "scalar", T: 9 /* ScalarType.STRING */, oneof: "filter" },
+    { no: 4, name: "has_any_key", kind: "message", T: StringList, oneof: "filter" },
+    { no: 5, name: "has_all_keys", kind: "message", T: StringList, oneof: "filter" },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): MapStringStringFilter {
+    return new MapStringStringFilter().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): MapStringStringFilter {
+    return new MapStringStringFilter().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): MapStringStringFilter {
+    return new MapStringStringFilter().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: MapStringStringFilter | PlainMessage<MapStringStringFilter> | undefined, b: MapStringStringFilter | PlainMessage<MapStringStringFilter> | undefined): boolean {
+    return proto3.util.equals(MapStringStringFilter, a, b);
+  }
+}
+
+/**
+ * MapKeyValueStringUInt32 represents a key-value pair filter for Map(String, UInt32)
+ *
+ * @generated from message cbt.MapKeyValueStringUInt32
+ */
+export class MapKeyValueStringUInt32 extends Message<MapKeyValueStringUInt32> {
+  /**
+   * @generated from field: string key = 1;
+   */
+  key = "";
+
+  /**
+   * @generated from field: cbt.UInt32Filter value_filter = 2;
+   */
+  valueFilter?: UInt32Filter;
+
+  constructor(data?: PartialMessage<MapKeyValueStringUInt32>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "cbt.MapKeyValueStringUInt32";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "key", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "value_filter", kind: "message", T: UInt32Filter },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): MapKeyValueStringUInt32 {
+    return new MapKeyValueStringUInt32().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): MapKeyValueStringUInt32 {
+    return new MapKeyValueStringUInt32().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): MapKeyValueStringUInt32 {
+    return new MapKeyValueStringUInt32().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: MapKeyValueStringUInt32 | PlainMessage<MapKeyValueStringUInt32> | undefined, b: MapKeyValueStringUInt32 | PlainMessage<MapKeyValueStringUInt32> | undefined): boolean {
+    return proto3.util.equals(MapKeyValueStringUInt32, a, b);
+  }
+}
+
+/**
+ * MapStringUInt32Filter represents filtering options for Map(String, UInt32) values
+ *
+ * @generated from message cbt.MapStringUInt32Filter
+ */
+export class MapStringUInt32Filter extends Message<MapStringUInt32Filter> {
+  /**
+   * @generated from oneof cbt.MapStringUInt32Filter.filter
+   */
+  filter: {
+    /**
+     * mapColumn['key'] op value
+     *
+     * @generated from field: cbt.MapKeyValueStringUInt32 key_value = 1;
+     */
+    value: MapKeyValueStringUInt32;
+    case: "keyValue";
+  } | {
+    /**
+     * mapContains(mapColumn, 'key')
+     *
+     * @generated from field: string has_key = 2;
+     */
+    value: string;
+    case: "hasKey";
+  } | {
+    /**
+     * NOT mapContains(mapColumn, 'key')
+     *
+     * @generated from field: string not_has_key = 3;
+     */
+    value: string;
+    case: "notHasKey";
+  } | {
+    /**
+     * mapContainsAny(mapColumn, ['k1', 'k2'])
+     *
+     * @generated from field: cbt.StringList has_any_key = 4;
+     */
+    value: StringList;
+    case: "hasAnyKey";
+  } | {
+    /**
+     * mapContainsAll(mapColumn, ['k1', 'k2'])
+     *
+     * @generated from field: cbt.StringList has_all_keys = 5;
+     */
+    value: StringList;
+    case: "hasAllKeys";
+  } | { case: undefined; value?: undefined } = { case: undefined };
+
+  constructor(data?: PartialMessage<MapStringUInt32Filter>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "cbt.MapStringUInt32Filter";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "key_value", kind: "message", T: MapKeyValueStringUInt32, oneof: "filter" },
+    { no: 2, name: "has_key", kind: "scalar", T: 9 /* ScalarType.STRING */, oneof: "filter" },
+    { no: 3, name: "not_has_key", kind: "scalar", T: 9 /* ScalarType.STRING */, oneof: "filter" },
+    { no: 4, name: "has_any_key", kind: "message", T: StringList, oneof: "filter" },
+    { no: 5, name: "has_all_keys", kind: "message", T: StringList, oneof: "filter" },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): MapStringUInt32Filter {
+    return new MapStringUInt32Filter().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): MapStringUInt32Filter {
+    return new MapStringUInt32Filter().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): MapStringUInt32Filter {
+    return new MapStringUInt32Filter().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: MapStringUInt32Filter | PlainMessage<MapStringUInt32Filter> | undefined, b: MapStringUInt32Filter | PlainMessage<MapStringUInt32Filter> | undefined): boolean {
+    return proto3.util.equals(MapStringUInt32Filter, a, b);
+  }
+}
+
+/**
+ * MapKeyValueStringInt32 represents a key-value pair filter for Map(String, Int32)
+ *
+ * @generated from message cbt.MapKeyValueStringInt32
+ */
+export class MapKeyValueStringInt32 extends Message<MapKeyValueStringInt32> {
+  /**
+   * @generated from field: string key = 1;
+   */
+  key = "";
+
+  /**
+   * @generated from field: cbt.Int32Filter value_filter = 2;
+   */
+  valueFilter?: Int32Filter;
+
+  constructor(data?: PartialMessage<MapKeyValueStringInt32>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "cbt.MapKeyValueStringInt32";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "key", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "value_filter", kind: "message", T: Int32Filter },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): MapKeyValueStringInt32 {
+    return new MapKeyValueStringInt32().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): MapKeyValueStringInt32 {
+    return new MapKeyValueStringInt32().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): MapKeyValueStringInt32 {
+    return new MapKeyValueStringInt32().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: MapKeyValueStringInt32 | PlainMessage<MapKeyValueStringInt32> | undefined, b: MapKeyValueStringInt32 | PlainMessage<MapKeyValueStringInt32> | undefined): boolean {
+    return proto3.util.equals(MapKeyValueStringInt32, a, b);
+  }
+}
+
+/**
+ * MapStringInt32Filter represents filtering options for Map(String, Int32) values
+ *
+ * @generated from message cbt.MapStringInt32Filter
+ */
+export class MapStringInt32Filter extends Message<MapStringInt32Filter> {
+  /**
+   * @generated from oneof cbt.MapStringInt32Filter.filter
+   */
+  filter: {
+    /**
+     * mapColumn['key'] op value
+     *
+     * @generated from field: cbt.MapKeyValueStringInt32 key_value = 1;
+     */
+    value: MapKeyValueStringInt32;
+    case: "keyValue";
+  } | {
+    /**
+     * mapContains(mapColumn, 'key')
+     *
+     * @generated from field: string has_key = 2;
+     */
+    value: string;
+    case: "hasKey";
+  } | {
+    /**
+     * NOT mapContains(mapColumn, 'key')
+     *
+     * @generated from field: string not_has_key = 3;
+     */
+    value: string;
+    case: "notHasKey";
+  } | {
+    /**
+     * mapContainsAny(mapColumn, ['k1', 'k2'])
+     *
+     * @generated from field: cbt.StringList has_any_key = 4;
+     */
+    value: StringList;
+    case: "hasAnyKey";
+  } | {
+    /**
+     * mapContainsAll(mapColumn, ['k1', 'k2'])
+     *
+     * @generated from field: cbt.StringList has_all_keys = 5;
+     */
+    value: StringList;
+    case: "hasAllKeys";
+  } | { case: undefined; value?: undefined } = { case: undefined };
+
+  constructor(data?: PartialMessage<MapStringInt32Filter>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "cbt.MapStringInt32Filter";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "key_value", kind: "message", T: MapKeyValueStringInt32, oneof: "filter" },
+    { no: 2, name: "has_key", kind: "scalar", T: 9 /* ScalarType.STRING */, oneof: "filter" },
+    { no: 3, name: "not_has_key", kind: "scalar", T: 9 /* ScalarType.STRING */, oneof: "filter" },
+    { no: 4, name: "has_any_key", kind: "message", T: StringList, oneof: "filter" },
+    { no: 5, name: "has_all_keys", kind: "message", T: StringList, oneof: "filter" },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): MapStringInt32Filter {
+    return new MapStringInt32Filter().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): MapStringInt32Filter {
+    return new MapStringInt32Filter().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): MapStringInt32Filter {
+    return new MapStringInt32Filter().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: MapStringInt32Filter | PlainMessage<MapStringInt32Filter> | undefined, b: MapStringInt32Filter | PlainMessage<MapStringInt32Filter> | undefined): boolean {
+    return proto3.util.equals(MapStringInt32Filter, a, b);
+  }
+}
+
+/**
+ * MapKeyValueStringUInt64 represents a key-value pair filter for Map(String, UInt64)
+ *
+ * @generated from message cbt.MapKeyValueStringUInt64
+ */
+export class MapKeyValueStringUInt64 extends Message<MapKeyValueStringUInt64> {
+  /**
+   * @generated from field: string key = 1;
+   */
+  key = "";
+
+  /**
+   * @generated from field: cbt.UInt64Filter value_filter = 2;
+   */
+  valueFilter?: UInt64Filter;
+
+  constructor(data?: PartialMessage<MapKeyValueStringUInt64>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "cbt.MapKeyValueStringUInt64";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "key", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "value_filter", kind: "message", T: UInt64Filter },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): MapKeyValueStringUInt64 {
+    return new MapKeyValueStringUInt64().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): MapKeyValueStringUInt64 {
+    return new MapKeyValueStringUInt64().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): MapKeyValueStringUInt64 {
+    return new MapKeyValueStringUInt64().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: MapKeyValueStringUInt64 | PlainMessage<MapKeyValueStringUInt64> | undefined, b: MapKeyValueStringUInt64 | PlainMessage<MapKeyValueStringUInt64> | undefined): boolean {
+    return proto3.util.equals(MapKeyValueStringUInt64, a, b);
+  }
+}
+
+/**
+ * MapStringUInt64Filter represents filtering options for Map(String, UInt64) values
+ *
+ * @generated from message cbt.MapStringUInt64Filter
+ */
+export class MapStringUInt64Filter extends Message<MapStringUInt64Filter> {
+  /**
+   * @generated from oneof cbt.MapStringUInt64Filter.filter
+   */
+  filter: {
+    /**
+     * mapColumn['key'] op value
+     *
+     * @generated from field: cbt.MapKeyValueStringUInt64 key_value = 1;
+     */
+    value: MapKeyValueStringUInt64;
+    case: "keyValue";
+  } | {
+    /**
+     * mapContains(mapColumn, 'key')
+     *
+     * @generated from field: string has_key = 2;
+     */
+    value: string;
+    case: "hasKey";
+  } | {
+    /**
+     * NOT mapContains(mapColumn, 'key')
+     *
+     * @generated from field: string not_has_key = 3;
+     */
+    value: string;
+    case: "notHasKey";
+  } | {
+    /**
+     * mapContainsAny(mapColumn, ['k1', 'k2'])
+     *
+     * @generated from field: cbt.StringList has_any_key = 4;
+     */
+    value: StringList;
+    case: "hasAnyKey";
+  } | {
+    /**
+     * mapContainsAll(mapColumn, ['k1', 'k2'])
+     *
+     * @generated from field: cbt.StringList has_all_keys = 5;
+     */
+    value: StringList;
+    case: "hasAllKeys";
+  } | { case: undefined; value?: undefined } = { case: undefined };
+
+  constructor(data?: PartialMessage<MapStringUInt64Filter>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "cbt.MapStringUInt64Filter";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "key_value", kind: "message", T: MapKeyValueStringUInt64, oneof: "filter" },
+    { no: 2, name: "has_key", kind: "scalar", T: 9 /* ScalarType.STRING */, oneof: "filter" },
+    { no: 3, name: "not_has_key", kind: "scalar", T: 9 /* ScalarType.STRING */, oneof: "filter" },
+    { no: 4, name: "has_any_key", kind: "message", T: StringList, oneof: "filter" },
+    { no: 5, name: "has_all_keys", kind: "message", T: StringList, oneof: "filter" },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): MapStringUInt64Filter {
+    return new MapStringUInt64Filter().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): MapStringUInt64Filter {
+    return new MapStringUInt64Filter().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): MapStringUInt64Filter {
+    return new MapStringUInt64Filter().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: MapStringUInt64Filter | PlainMessage<MapStringUInt64Filter> | undefined, b: MapStringUInt64Filter | PlainMessage<MapStringUInt64Filter> | undefined): boolean {
+    return proto3.util.equals(MapStringUInt64Filter, a, b);
+  }
+}
+
+/**
+ * MapKeyValueStringInt64 represents a key-value pair filter for Map(String, Int64)
+ *
+ * @generated from message cbt.MapKeyValueStringInt64
+ */
+export class MapKeyValueStringInt64 extends Message<MapKeyValueStringInt64> {
+  /**
+   * @generated from field: string key = 1;
+   */
+  key = "";
+
+  /**
+   * @generated from field: cbt.Int64Filter value_filter = 2;
+   */
+  valueFilter?: Int64Filter;
+
+  constructor(data?: PartialMessage<MapKeyValueStringInt64>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "cbt.MapKeyValueStringInt64";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "key", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "value_filter", kind: "message", T: Int64Filter },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): MapKeyValueStringInt64 {
+    return new MapKeyValueStringInt64().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): MapKeyValueStringInt64 {
+    return new MapKeyValueStringInt64().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): MapKeyValueStringInt64 {
+    return new MapKeyValueStringInt64().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: MapKeyValueStringInt64 | PlainMessage<MapKeyValueStringInt64> | undefined, b: MapKeyValueStringInt64 | PlainMessage<MapKeyValueStringInt64> | undefined): boolean {
+    return proto3.util.equals(MapKeyValueStringInt64, a, b);
+  }
+}
+
+/**
+ * MapStringInt64Filter represents filtering options for Map(String, Int64) values
+ *
+ * @generated from message cbt.MapStringInt64Filter
+ */
+export class MapStringInt64Filter extends Message<MapStringInt64Filter> {
+  /**
+   * @generated from oneof cbt.MapStringInt64Filter.filter
+   */
+  filter: {
+    /**
+     * mapColumn['key'] op value
+     *
+     * @generated from field: cbt.MapKeyValueStringInt64 key_value = 1;
+     */
+    value: MapKeyValueStringInt64;
+    case: "keyValue";
+  } | {
+    /**
+     * mapContains(mapColumn, 'key')
+     *
+     * @generated from field: string has_key = 2;
+     */
+    value: string;
+    case: "hasKey";
+  } | {
+    /**
+     * NOT mapContains(mapColumn, 'key')
+     *
+     * @generated from field: string not_has_key = 3;
+     */
+    value: string;
+    case: "notHasKey";
+  } | {
+    /**
+     * mapContainsAny(mapColumn, ['k1', 'k2'])
+     *
+     * @generated from field: cbt.StringList has_any_key = 4;
+     */
+    value: StringList;
+    case: "hasAnyKey";
+  } | {
+    /**
+     * mapContainsAll(mapColumn, ['k1', 'k2'])
+     *
+     * @generated from field: cbt.StringList has_all_keys = 5;
+     */
+    value: StringList;
+    case: "hasAllKeys";
+  } | { case: undefined; value?: undefined } = { case: undefined };
+
+  constructor(data?: PartialMessage<MapStringInt64Filter>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "cbt.MapStringInt64Filter";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "key_value", kind: "message", T: MapKeyValueStringInt64, oneof: "filter" },
+    { no: 2, name: "has_key", kind: "scalar", T: 9 /* ScalarType.STRING */, oneof: "filter" },
+    { no: 3, name: "not_has_key", kind: "scalar", T: 9 /* ScalarType.STRING */, oneof: "filter" },
+    { no: 4, name: "has_any_key", kind: "message", T: StringList, oneof: "filter" },
+    { no: 5, name: "has_all_keys", kind: "message", T: StringList, oneof: "filter" },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): MapStringInt64Filter {
+    return new MapStringInt64Filter().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): MapStringInt64Filter {
+    return new MapStringInt64Filter().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): MapStringInt64Filter {
+    return new MapStringInt64Filter().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: MapStringInt64Filter | PlainMessage<MapStringInt64Filter> | undefined, b: MapStringInt64Filter | PlainMessage<MapStringInt64Filter> | undefined): boolean {
+    return proto3.util.equals(MapStringInt64Filter, a, b);
+  }
+}
+
