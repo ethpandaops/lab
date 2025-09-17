@@ -75,8 +75,8 @@ func (s *ExperimentsService) Name() string {
 	return ServiceName
 }
 
-// FrontendExperimentsConfig returns the experiments configuration for the frontend
-func (s *ExperimentsService) FrontendExperimentsConfig() *config.ExperimentsConfig {
+// GetAllExperimentsConfig returns ALL experiments configuration without data availbility by default
+func (s *ExperimentsService) GetAllExperimentsConfig(ctx context.Context, includeDA bool) *config.ExperimentsConfig {
 	if s.config == nil {
 		return nil
 	}
@@ -96,6 +96,10 @@ func (s *ExperimentsService) FrontendExperimentsConfig() *config.ExperimentsConf
 			Networks: exp.Networks,
 		}
 
+		if includeDA {
+			expConfig.DataAvailability = s.getDataAvailabilityForExperiment(ctx, exp)
+		}
+
 		experiments = append(experiments, expConfig)
 	}
 
@@ -104,34 +108,40 @@ func (s *ExperimentsService) FrontendExperimentsConfig() *config.ExperimentsConf
 	}
 }
 
-// FrontendExperimentsConfigWithAvailability returns experiments config with data availability information
-func (s *ExperimentsService) FrontendExperimentsConfigWithAvailability(ctx context.Context) *config.ExperimentsConfig {
+// GetExperimentConfig returns a single experiment's configuration with data availability.
+func (s *ExperimentsService) GetExperimentConfig(ctx context.Context, experimentID string) (*config.ExperimentConfig, error) {
 	if s.config == nil {
-		return nil
+		return nil, fmt.Errorf("experiments service not configured")
 	}
 
-	experiments := make([]*config.ExperimentConfig, 0, len(*s.config))
+	// Find the experiment
+	var experiment *ExperimentConfig
 
 	for i := range *s.config {
-		exp := &(*s.config)[i]
+		if (*s.config)[i].ID == experimentID {
+			experiment = &(*s.config)[i]
 
-		if !exp.Enabled {
-			continue
+			break
 		}
-
-		expConfig := &config.ExperimentConfig{
-			Id:               exp.ID,
-			Enabled:          exp.Enabled,
-			Networks:         exp.Networks,
-			DataAvailability: s.getDataAvailabilityForExperiment(ctx, exp),
-		}
-
-		experiments = append(experiments, expConfig)
 	}
 
-	return &config.ExperimentsConfig{
-		Experiments: experiments,
+	if experiment == nil {
+		return nil, fmt.Errorf("experiment not found: %s", experimentID)
 	}
+
+	if !experiment.Enabled {
+		return nil, fmt.Errorf("experiment disabled: %s", experimentID)
+	}
+
+	// Get data availability for this experiment
+	dataAvailability := s.getDataAvailabilityForExperiment(ctx, experiment)
+
+	return &config.ExperimentConfig{
+		Id:               experiment.ID,
+		Enabled:          experiment.Enabled,
+		Networks:         experiment.Networks,
+		DataAvailability: dataAvailability,
+	}, nil
 }
 
 // getDataAvailabilityForExperiment queries data availability for all networks of an experiment
@@ -209,93 +219,4 @@ func (s *ExperimentsService) getDataAvailabilityForExperiment(ctx context.Contex
 		Debug("Completed data availability queries for experiment")
 
 	return dataAvailability
-}
-
-// GetExperimentConfigWithAvailability returns a single experiment's configuration with data availability
-func (s *ExperimentsService) GetExperimentConfigWithAvailability(ctx context.Context, experimentID string) (*config.ExperimentConfig, error) {
-	if s.config == nil {
-		return nil, fmt.Errorf("experiments service not configured")
-	}
-
-	// Find the experiment
-	var experiment *ExperimentConfig
-
-	for i := range *s.config {
-		if (*s.config)[i].ID == experimentID {
-			experiment = &(*s.config)[i]
-
-			break
-		}
-	}
-
-	if experiment == nil {
-		return nil, fmt.Errorf("experiment not found: %s", experimentID)
-	}
-
-	if !experiment.Enabled {
-		return nil, fmt.Errorf("experiment disabled: %s", experimentID)
-	}
-
-	// Get data availability for this experiment
-	dataAvailability := s.getDataAvailabilityForExperiment(ctx, experiment)
-
-	return &config.ExperimentConfig{
-		Id:               experiment.ID,
-		Enabled:          experiment.Enabled,
-		Networks:         experiment.Networks,
-		DataAvailability: dataAvailability,
-	}, nil
-}
-
-// GetExperiments returns all configured experiments
-func (s *ExperimentsService) GetExperiments() []*ExperimentConfig {
-	if s.config == nil {
-		return nil
-	}
-
-	experiments := make([]*ExperimentConfig, 0, len(*s.config))
-
-	for i := range *s.config {
-		experiments = append(experiments, &(*s.config)[i])
-	}
-
-	return experiments
-}
-
-// GetExperimentByID returns a specific experiment by ID
-func (s *ExperimentsService) GetExperimentByID(id string) (*ExperimentConfig, error) {
-	if s.config == nil {
-		return nil, fmt.Errorf("experiments service not configured")
-	}
-
-	for i := range *s.config {
-		if (*s.config)[i].ID == id {
-			return &(*s.config)[i], nil
-		}
-	}
-
-	return nil, fmt.Errorf("experiment not found: %s", id)
-}
-
-// GetExperimentsByNetwork returns experiments that support a specific network
-func (s *ExperimentsService) GetExperimentsByNetwork(network string) []*ExperimentConfig {
-	if s.config == nil {
-		return nil
-	}
-
-	experiments := make([]*ExperimentConfig, 0)
-
-	for i := range *s.config {
-		exp := &(*s.config)[i]
-
-		for _, net := range exp.Networks {
-			if net == network {
-				experiments = append(experiments, exp)
-
-				break
-			}
-		}
-	}
-
-	return experiments
 }

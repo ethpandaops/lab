@@ -167,7 +167,7 @@ func (c *ConfigService) GetConfig(
 	// Add experiments configuration
 	var experimentsConfig *config.ExperimentsConfig
 	if c.experimentsService != nil {
-		experimentsConfig = c.experimentsService.FrontendExperimentsConfig()
+		experimentsConfig = c.experimentsService.GetAllExperimentsConfig(ctx, false)
 	}
 
 	return &config.GetConfigResponse{
@@ -190,7 +190,7 @@ func (c *ConfigService) GetExperimentConfig(ctx context.Context, req *config.Get
 	}
 
 	// Get experiment config with data availability
-	experimentConfig, err := c.experimentsService.GetExperimentConfigWithAvailability(ctx, req.ExperimentId)
+	experimentConfig, err := c.experimentsService.GetExperimentConfig(ctx, req.ExperimentId)
 	if err != nil {
 		c.log.WithError(err).
 			WithField("experiment_id", req.ExperimentId).
