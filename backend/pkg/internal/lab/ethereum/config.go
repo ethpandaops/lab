@@ -18,15 +18,7 @@ type NetworkConfig struct {
 	Xatu      *clickhouse.Config `yaml:"xatu"`      // Per-network Xatu config
 	ConfigURL string             `yaml:"configURL"` // URL to the network's config
 	Genesis   time.Time          `yaml:"genesis"`   // Genesis time
-	Validator ValidatorSet       `yaml:"validator"` // Validator set
 	Forks     EthereumForkConfig `yaml:"forks"`     // Forks
-}
-
-// ValidatorSet contains the configuration for the validator set
-type ValidatorSet struct {
-	// KnownValidatorRanges contains the known validator ranges for the network
-	// This is usually the genesis validator set for testnets.
-	KnownValidatorRanges map[string]string `yaml:"knownValidatorRanges"`
 }
 
 // EthereumForkConfig contains the configuration for the Ethereum fork

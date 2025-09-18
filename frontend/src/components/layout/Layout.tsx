@@ -22,8 +22,8 @@ function Layout() {
 
   // Get network metadata
   const selectedMetadata = NETWORK_METADATA[selectedNetwork as NetworkKey] || {
-    name: selectedNetwork.charAt(0).toUpperCase() + selectedNetwork.slice(1),
-    icon: '🔥',
+    name: selectedNetwork,
+    icon: '🧪',
     color: '#627EEA',
   };
 
@@ -78,7 +78,7 @@ function Layout() {
               <NetworkSelector
                 selectedNetwork={selectedNetwork}
                 onNetworkChange={network => setSelectedNetwork(network, 'ui')}
-                className="w-48"
+                expandToFit={true}
               />
             </div>
 

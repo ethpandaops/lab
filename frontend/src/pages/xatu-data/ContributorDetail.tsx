@@ -201,8 +201,8 @@ function ContributorDetail() {
       <div className="space-y-8">
         {sortedNetworks.map(([network, nodes]) => {
           const metadata = NETWORK_METADATA[network as NetworkKey] || {
-            name: network.charAt(0).toUpperCase() + network.slice(1),
-            icon: '🔥',
+            name: network,
+            icon: '🧪',
           };
           return (
             <section key={network} className="space-y-4">
