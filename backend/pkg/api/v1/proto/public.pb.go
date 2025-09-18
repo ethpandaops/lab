@@ -1887,6 +1887,150 @@ func (x *GetExperimentConfigResponse) GetExperiment() *ExperimentConfig {
 	return nil
 }
 
+// BlockTimingResponse is the v1 API response for block timing data.
+type BlockTimingResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Nodes      []*BlockTimingNode  `protobuf:"bytes,1,rep,name=nodes,proto3" json:"nodes,omitempty"`
+	Pagination *PaginationMetadata `protobuf:"bytes,2,opt,name=pagination,proto3" json:"pagination,omitempty"`
+	Filters    *FilterMetadata     `protobuf:"bytes,3,opt,name=filters,proto3" json:"filters,omitempty"`
+}
+
+func (x *BlockTimingResponse) Reset() {
+	*x = BlockTimingResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_backend_pkg_api_v1_proto_public_proto_msgTypes[29]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *BlockTimingResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BlockTimingResponse) ProtoMessage() {}
+
+func (x *BlockTimingResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_backend_pkg_api_v1_proto_public_proto_msgTypes[29]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BlockTimingResponse.ProtoReflect.Descriptor instead.
+func (*BlockTimingResponse) Descriptor() ([]byte, []int) {
+	return file_backend_pkg_api_v1_proto_public_proto_rawDescGZIP(), []int{29}
+}
+
+func (x *BlockTimingResponse) GetNodes() []*BlockTimingNode {
+	if x != nil {
+		return x.Nodes
+	}
+	return nil
+}
+
+func (x *BlockTimingResponse) GetPagination() *PaginationMetadata {
+	if x != nil {
+		return x.Pagination
+	}
+	return nil
+}
+
+func (x *BlockTimingResponse) GetFilters() *FilterMetadata {
+	if x != nil {
+		return x.Filters
+	}
+	return nil
+}
+
+// BlockTimingNode represents a node that observed a block.
+type BlockTimingNode struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	NodeId     string      `protobuf:"bytes,1,opt,name=node_id,json=nodeId,proto3" json:"node_id,omitempty"`
+	Username   string      `protobuf:"bytes,2,opt,name=username,proto3" json:"username,omitempty"`
+	SeenDiffMs int64       `protobuf:"varint,3,opt,name=seen_diff_ms,json=seenDiffMs,proto3" json:"seen_diff_ms,omitempty"` // milliseconds from slot start
+	Geo        *GeoInfo    `protobuf:"bytes,4,opt,name=geo,proto3" json:"geo,omitempty"`                                    // reuse existing GeoInfo type
+	Client     *ClientInfo `protobuf:"bytes,5,opt,name=client,proto3" json:"client,omitempty"`                              // reuse existing ClientInfo type
+}
+
+func (x *BlockTimingNode) Reset() {
+	*x = BlockTimingNode{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_backend_pkg_api_v1_proto_public_proto_msgTypes[30]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *BlockTimingNode) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BlockTimingNode) ProtoMessage() {}
+
+func (x *BlockTimingNode) ProtoReflect() protoreflect.Message {
+	mi := &file_backend_pkg_api_v1_proto_public_proto_msgTypes[30]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BlockTimingNode.ProtoReflect.Descriptor instead.
+func (*BlockTimingNode) Descriptor() ([]byte, []int) {
+	return file_backend_pkg_api_v1_proto_public_proto_rawDescGZIP(), []int{30}
+}
+
+func (x *BlockTimingNode) GetNodeId() string {
+	if x != nil {
+		return x.NodeId
+	}
+	return ""
+}
+
+func (x *BlockTimingNode) GetUsername() string {
+	if x != nil {
+		return x.Username
+	}
+	return ""
+}
+
+func (x *BlockTimingNode) GetSeenDiffMs() int64 {
+	if x != nil {
+		return x.SeenDiffMs
+	}
+	return 0
+}
+
+func (x *BlockTimingNode) GetGeo() *GeoInfo {
+	if x != nil {
+		return x.Geo
+	}
+	return nil
+}
+
+func (x *BlockTimingNode) GetClient() *ClientInfo {
+	if x != nil {
+		return x.Client
+	}
+	return nil
+}
+
 var File_backend_pkg_api_v1_proto_public_proto protoreflect.FileDescriptor
 
 var file_backend_pkg_api_v1_proto_public_proto_rawDesc = []byte{
@@ -2174,11 +2318,34 @@ var file_backend_pkg_api_v1_proto_public_proto_rawDesc = []byte{
 	0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x38, 0x0a, 0x0a, 0x65, 0x78, 0x70, 0x65, 0x72, 0x69, 0x6d,
 	0x65, 0x6e, 0x74, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x18, 0x2e, 0x61, 0x70, 0x69, 0x2e,
 	0x76, 0x31, 0x2e, 0x45, 0x78, 0x70, 0x65, 0x72, 0x69, 0x6d, 0x65, 0x6e, 0x74, 0x43, 0x6f, 0x6e,
-	0x66, 0x69, 0x67, 0x52, 0x0a, 0x65, 0x78, 0x70, 0x65, 0x72, 0x69, 0x6d, 0x65, 0x6e, 0x74, 0x42,
-	0x35, 0x5a, 0x33, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x65, 0x74,
-	0x68, 0x70, 0x61, 0x6e, 0x64, 0x61, 0x6f, 0x70, 0x73, 0x2f, 0x6c, 0x61, 0x62, 0x2f, 0x62, 0x61,
-	0x63, 0x6b, 0x65, 0x6e, 0x64, 0x2f, 0x70, 0x6b, 0x67, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x76, 0x31,
-	0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x66, 0x69, 0x67, 0x52, 0x0a, 0x65, 0x78, 0x70, 0x65, 0x72, 0x69, 0x6d, 0x65, 0x6e, 0x74, 0x22,
+	0xb2, 0x01, 0x0a, 0x13, 0x42, 0x6c, 0x6f, 0x63, 0x6b, 0x54, 0x69, 0x6d, 0x69, 0x6e, 0x67, 0x52,
+	0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x2d, 0x0a, 0x05, 0x6e, 0x6f, 0x64, 0x65, 0x73,
+	0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x17, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x76, 0x31, 0x2e,
+	0x42, 0x6c, 0x6f, 0x63, 0x6b, 0x54, 0x69, 0x6d, 0x69, 0x6e, 0x67, 0x4e, 0x6f, 0x64, 0x65, 0x52,
+	0x05, 0x6e, 0x6f, 0x64, 0x65, 0x73, 0x12, 0x3a, 0x0a, 0x0a, 0x70, 0x61, 0x67, 0x69, 0x6e, 0x61,
+	0x74, 0x69, 0x6f, 0x6e, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x61, 0x70, 0x69,
+	0x2e, 0x76, 0x31, 0x2e, 0x50, 0x61, 0x67, 0x69, 0x6e, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x4d, 0x65,
+	0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0x52, 0x0a, 0x70, 0x61, 0x67, 0x69, 0x6e, 0x61, 0x74, 0x69,
+	0x6f, 0x6e, 0x12, 0x30, 0x0a, 0x07, 0x66, 0x69, 0x6c, 0x74, 0x65, 0x72, 0x73, 0x18, 0x03, 0x20,
+	0x01, 0x28, 0x0b, 0x32, 0x16, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x76, 0x31, 0x2e, 0x46, 0x69, 0x6c,
+	0x74, 0x65, 0x72, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0x52, 0x07, 0x66, 0x69, 0x6c,
+	0x74, 0x65, 0x72, 0x73, 0x22, 0xb7, 0x01, 0x0a, 0x0f, 0x42, 0x6c, 0x6f, 0x63, 0x6b, 0x54, 0x69,
+	0x6d, 0x69, 0x6e, 0x67, 0x4e, 0x6f, 0x64, 0x65, 0x12, 0x17, 0x0a, 0x07, 0x6e, 0x6f, 0x64, 0x65,
+	0x5f, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x6e, 0x6f, 0x64, 0x65, 0x49,
+	0x64, 0x12, 0x1a, 0x0a, 0x08, 0x75, 0x73, 0x65, 0x72, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x02, 0x20,
+	0x01, 0x28, 0x09, 0x52, 0x08, 0x75, 0x73, 0x65, 0x72, 0x6e, 0x61, 0x6d, 0x65, 0x12, 0x20, 0x0a,
+	0x0c, 0x73, 0x65, 0x65, 0x6e, 0x5f, 0x64, 0x69, 0x66, 0x66, 0x5f, 0x6d, 0x73, 0x18, 0x03, 0x20,
+	0x01, 0x28, 0x03, 0x52, 0x0a, 0x73, 0x65, 0x65, 0x6e, 0x44, 0x69, 0x66, 0x66, 0x4d, 0x73, 0x12,
+	0x21, 0x0a, 0x03, 0x67, 0x65, 0x6f, 0x18, 0x04, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x0f, 0x2e, 0x61,
+	0x70, 0x69, 0x2e, 0x76, 0x31, 0x2e, 0x47, 0x65, 0x6f, 0x49, 0x6e, 0x66, 0x6f, 0x52, 0x03, 0x67,
+	0x65, 0x6f, 0x12, 0x2a, 0x0a, 0x06, 0x63, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x18, 0x05, 0x20, 0x01,
+	0x28, 0x0b, 0x32, 0x12, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x76, 0x31, 0x2e, 0x43, 0x6c, 0x69, 0x65,
+	0x6e, 0x74, 0x49, 0x6e, 0x66, 0x6f, 0x52, 0x06, 0x63, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x42, 0x35,
+	0x5a, 0x33, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x65, 0x74, 0x68,
+	0x70, 0x61, 0x6e, 0x64, 0x61, 0x6f, 0x70, 0x73, 0x2f, 0x6c, 0x61, 0x62, 0x2f, 0x62, 0x61, 0x63,
+	0x6b, 0x65, 0x6e, 0x64, 0x2f, 0x70, 0x6b, 0x67, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x76, 0x31, 0x2f,
+	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -2193,7 +2360,7 @@ func file_backend_pkg_api_v1_proto_public_proto_rawDescGZIP() []byte {
 	return file_backend_pkg_api_v1_proto_public_proto_rawDescData
 }
 
-var file_backend_pkg_api_v1_proto_public_proto_msgTypes = make([]protoimpl.MessageInfo, 35)
+var file_backend_pkg_api_v1_proto_public_proto_msgTypes = make([]protoimpl.MessageInfo, 37)
 var file_backend_pkg_api_v1_proto_public_proto_goTypes = []any{
 	(*ListNodesResponse)(nil),            // 0: api.v1.ListNodesResponse
 	(*ListNetworksResponse)(nil),         // 1: api.v1.ListNetworksResponse
@@ -2224,12 +2391,14 @@ var file_backend_pkg_api_v1_proto_public_proto_goTypes = []any{
 	(*ExperimentDataAvailability)(nil),   // 26: api.v1.ExperimentDataAvailability
 	(*GetExperimentConfigRequest)(nil),   // 27: api.v1.GetExperimentConfigRequest
 	(*GetExperimentConfigResponse)(nil),  // 28: api.v1.GetExperimentConfigResponse
-	nil,                                  // 29: api.v1.FilterMetadata.AppliedFiltersEntry
-	nil,                                  // 30: api.v1.EthereumConfig.NetworksEntry
-	nil,                                  // 31: api.v1.NetworkConfig.ServiceUrlsEntry
-	nil,                                  // 32: api.v1.ForkInfo.MinClientVersionsEntry
-	nil,                                  // 33: api.v1.BeaconModule.NetworksEntry
-	nil,                                  // 34: api.v1.ExperimentConfig.DataAvailabilityEntry
+	(*BlockTimingResponse)(nil),          // 29: api.v1.BlockTimingResponse
+	(*BlockTimingNode)(nil),              // 30: api.v1.BlockTimingNode
+	nil,                                  // 31: api.v1.FilterMetadata.AppliedFiltersEntry
+	nil,                                  // 32: api.v1.EthereumConfig.NetworksEntry
+	nil,                                  // 33: api.v1.NetworkConfig.ServiceUrlsEntry
+	nil,                                  // 34: api.v1.ForkInfo.MinClientVersionsEntry
+	nil,                                  // 35: api.v1.BeaconModule.NetworksEntry
+	nil,                                  // 36: api.v1.ExperimentConfig.DataAvailabilityEntry
 }
 var file_backend_pkg_api_v1_proto_public_proto_depIdxs = []int32{
 	2,  // 0: api.v1.ListNodesResponse.nodes:type_name -> api.v1.Node
@@ -2240,34 +2409,39 @@ var file_backend_pkg_api_v1_proto_public_proto_depIdxs = []int32{
 	3,  // 5: api.v1.Node.client:type_name -> api.v1.ClientInfo
 	4,  // 6: api.v1.Node.geo:type_name -> api.v1.GeoInfo
 	5,  // 7: api.v1.Node.consensus:type_name -> api.v1.ConsensusInfo
-	29, // 8: api.v1.FilterMetadata.applied_filters:type_name -> api.v1.FilterMetadata.AppliedFiltersEntry
+	31, // 8: api.v1.FilterMetadata.applied_filters:type_name -> api.v1.FilterMetadata.AppliedFiltersEntry
 	12, // 9: api.v1.GetConfigResponse.config:type_name -> api.v1.FrontendConfig
 	13, // 10: api.v1.FrontendConfig.ethereum:type_name -> api.v1.EthereumConfig
 	18, // 11: api.v1.FrontendConfig.modules:type_name -> api.v1.ModulesConfig
 	24, // 12: api.v1.FrontendConfig.experiments:type_name -> api.v1.ExperimentsConfig
-	30, // 13: api.v1.EthereumConfig.networks:type_name -> api.v1.EthereumConfig.NetworksEntry
-	31, // 14: api.v1.NetworkConfig.service_urls:type_name -> api.v1.NetworkConfig.ServiceUrlsEntry
+	32, // 13: api.v1.EthereumConfig.networks:type_name -> api.v1.EthereumConfig.NetworksEntry
+	33, // 14: api.v1.NetworkConfig.service_urls:type_name -> api.v1.NetworkConfig.ServiceUrlsEntry
 	15, // 15: api.v1.NetworkConfig.forks:type_name -> api.v1.ForkConfig
 	16, // 16: api.v1.ForkConfig.consensus:type_name -> api.v1.ConsensusForks
 	17, // 17: api.v1.ConsensusForks.electra:type_name -> api.v1.ForkInfo
-	32, // 18: api.v1.ForkInfo.min_client_versions:type_name -> api.v1.ForkInfo.MinClientVersionsEntry
+	34, // 18: api.v1.ForkInfo.min_client_versions:type_name -> api.v1.ForkInfo.MinClientVersionsEntry
 	19, // 19: api.v1.ModulesConfig.beacon_chain_timings:type_name -> api.v1.BeaconChainTimingsModule
 	20, // 20: api.v1.ModulesConfig.xatu_public_contributors:type_name -> api.v1.XatuPublicContributorsModule
 	21, // 21: api.v1.ModulesConfig.beacon:type_name -> api.v1.BeaconModule
 	23, // 22: api.v1.BeaconChainTimingsModule.time_windows:type_name -> api.v1.TimeWindow
 	23, // 23: api.v1.XatuPublicContributorsModule.time_windows:type_name -> api.v1.TimeWindow
-	33, // 24: api.v1.BeaconModule.networks:type_name -> api.v1.BeaconModule.NetworksEntry
+	35, // 24: api.v1.BeaconModule.networks:type_name -> api.v1.BeaconModule.NetworksEntry
 	25, // 25: api.v1.ExperimentsConfig.experiments:type_name -> api.v1.ExperimentConfig
-	34, // 26: api.v1.ExperimentConfig.data_availability:type_name -> api.v1.ExperimentConfig.DataAvailabilityEntry
+	36, // 26: api.v1.ExperimentConfig.data_availability:type_name -> api.v1.ExperimentConfig.DataAvailabilityEntry
 	25, // 27: api.v1.GetExperimentConfigResponse.experiment:type_name -> api.v1.ExperimentConfig
-	14, // 28: api.v1.EthereumConfig.NetworksEntry.value:type_name -> api.v1.NetworkConfig
-	22, // 29: api.v1.BeaconModule.NetworksEntry.value:type_name -> api.v1.BeaconNetworkConfig
-	26, // 30: api.v1.ExperimentConfig.DataAvailabilityEntry.value:type_name -> api.v1.ExperimentDataAvailability
-	31, // [31:31] is the sub-list for method output_type
-	31, // [31:31] is the sub-list for method input_type
-	31, // [31:31] is the sub-list for extension type_name
-	31, // [31:31] is the sub-list for extension extendee
-	0,  // [0:31] is the sub-list for field type_name
+	30, // 28: api.v1.BlockTimingResponse.nodes:type_name -> api.v1.BlockTimingNode
+	6,  // 29: api.v1.BlockTimingResponse.pagination:type_name -> api.v1.PaginationMetadata
+	7,  // 30: api.v1.BlockTimingResponse.filters:type_name -> api.v1.FilterMetadata
+	4,  // 31: api.v1.BlockTimingNode.geo:type_name -> api.v1.GeoInfo
+	3,  // 32: api.v1.BlockTimingNode.client:type_name -> api.v1.ClientInfo
+	14, // 33: api.v1.EthereumConfig.NetworksEntry.value:type_name -> api.v1.NetworkConfig
+	22, // 34: api.v1.BeaconModule.NetworksEntry.value:type_name -> api.v1.BeaconNetworkConfig
+	26, // 35: api.v1.ExperimentConfig.DataAvailabilityEntry.value:type_name -> api.v1.ExperimentDataAvailability
+	36, // [36:36] is the sub-list for method output_type
+	36, // [36:36] is the sub-list for method input_type
+	36, // [36:36] is the sub-list for extension type_name
+	36, // [36:36] is the sub-list for extension extendee
+	0,  // [0:36] is the sub-list for field type_name
 }
 
 func init() { file_backend_pkg_api_v1_proto_public_proto_init() }
@@ -2624,6 +2798,30 @@ func file_backend_pkg_api_v1_proto_public_proto_init() {
 				return nil
 			}
 		}
+		file_backend_pkg_api_v1_proto_public_proto_msgTypes[29].Exporter = func(v any, i int) any {
+			switch v := v.(*BlockTimingResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_backend_pkg_api_v1_proto_public_proto_msgTypes[30].Exporter = func(v any, i int) any {
+			switch v := v.(*BlockTimingNode); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
@@ -2631,7 +2829,7 @@ func file_backend_pkg_api_v1_proto_public_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_backend_pkg_api_v1_proto_public_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   35,
+			NumMessages:   37,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

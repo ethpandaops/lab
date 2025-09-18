@@ -223,3 +223,19 @@ message GetExperimentConfigRequest {
 message GetExperimentConfigResponse {
   ExperimentConfig experiment = 1;
 }
+
+// BlockTimingResponse is the v1 API response for block timing data.
+message BlockTimingResponse {
+  repeated BlockTimingNode nodes = 1;
+  PaginationMetadata pagination = 2;
+  FilterMetadata filters = 3;
+}
+
+// BlockTimingNode represents a node that observed a block.
+message BlockTimingNode {
+  string node_id = 1;
+  string username = 2;
+  int64 seen_diff_ms = 3;  // milliseconds from slot start
+  GeoInfo geo = 4;          // reuse existing GeoInfo type
+  ClientInfo client = 5;    // reuse existing ClientInfo type
+}

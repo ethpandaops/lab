@@ -157,10 +157,11 @@ Update `backend/pkg/server/internal/service/xatu_cbt/service.go`:
 // List[CbtTableName] is now available to the gRPC layer
 ```
 
-## Step 4: Add gRPC Wrapper
+## Step 4: Add gRPC Wrapper with Primary Key Enrichment
 
 Update `backend/pkg/server/internal/grpc/xatu_cbt.go`:
 
+### Basic gRPC Wrapper
 ```go
 import (
     cbtproto "xatu-cbt/clickhouse"
@@ -191,6 +192,111 @@ func (s *XatuCBT) List[CbtTableName](
     return connect.NewResponse(resp), nil
 }
 ```
+
+### Primary Key Enrichment Pattern
+
+For tables with slot-based primary keys (like `slot_start_date_time`), the gRPC layer should calculate and inject the primary key for efficient ClickHouse queries. This avoids full table scans and dramatically improves performance.
+
+**When to use**: When the CBT table has a timestamp primary key that can be calculated from a slot number.
+
+```go
+// ListIntBlockFirstSeenByNode with PK enrichment
+func (x *XatuCBT) ListIntBlockFirstSeenByNode(
+    ctx context.Context,
+    req *cbtproto.ListIntBlockFirstSeenByNodeRequest,
+) (*cbtproto.ListIntBlockFirstSeenByNodeResponse, error) {
+    // Calculate SlotStartDateTime if not already set for more efficient queries
+    if req.SlotStartDateTime == nil && req.Slot != nil {
+        req.SlotStartDateTime = x.calculateSlotStartDateTime(ctx, req.Slot)
+    }
+    
+    return x.service.ListIntBlockFirstSeenByNode(ctx, req)
+}
+```
+
+The helper function is reusable for ALL CBT methods that need slot-based timestamps:
+
+```go
+// calculateSlotStartDateTime calculates the SlotStartDateTime filter for a given slot filter.
+// This enables efficient queries using the primary key in ClickHouse.
+func (x *XatuCBT) calculateSlotStartDateTime(
+    ctx context.Context,
+    slotFilter *cbtproto.UInt32Filter,
+) *cbtproto.UInt32Filter {
+    // Default fallback filter
+    fallback := &cbtproto.UInt32Filter{
+        Filter: &cbtproto.UInt32Filter_Gte{Gte: 0},
+    }
+    
+    if slotFilter == nil {
+        return fallback
+    }
+    
+    // Extract network from metadata
+    md, ok := metadata.FromIncomingContext(ctx)
+    if !ok {
+        x.log.Debug("No metadata in context, using fallback")
+        return fallback
+    }
+    
+    networks := md.Get("network")
+    if len(networks) == 0 || x.ethereumClient == nil {
+        return fallback
+    }
+    
+    network := networks[0]
+    
+    // Extract slot number from filter (handles all filter types)
+    var slotNumber uint64
+    switch filter := slotFilter.Filter.(type) {
+    case *cbtproto.UInt32Filter_Eq:
+        slotNumber = uint64(filter.Eq)
+    case *cbtproto.UInt32Filter_Gte:
+        slotNumber = uint64(filter.Gte)
+    // ... handle other filter types
+    }
+    
+    if slotNumber == 0 {
+        return fallback
+    }
+    
+    // Calculate slot start time using wallclock
+    networkObj := x.ethereumClient.GetNetwork(network)
+    if networkObj == nil {
+        return fallback
+    }
+    
+    wallclock := networkObj.GetWallclock()
+    if wallclock == nil {
+        return fallback
+    }
+    
+    slot := wallclock.Slots().FromNumber(slotNumber)
+    startTime := slot.TimeWindow().Start()
+    slotStartTime := uint32(startTime.Unix()) //nolint:gosec // safe for slot times
+    
+    x.log.WithFields(logrus.Fields{
+        "network":       network,
+        "slot":          slotNumber,
+        "slotStartTime": slotStartTime,
+    }).Debug("Calculated slot start time for efficient query")
+    
+    return &cbtproto.UInt32Filter{
+        Filter: &cbtproto.UInt32Filter_Eq{Eq: slotStartTime},
+    }
+}
+```
+
+**Benefits of PK Enrichment**:
+- Avoids full table scans in ClickHouse
+- Uses primary key index for O(log n) lookups instead of O(n) scans
+- Reduces query time from seconds to milliseconds
+- Reduces ClickHouse resource usage
+
+**When NOT to use**: 
+- When the primary key cannot be calculated from request parameters
+- When the table doesn't have a timestamp-based primary key
+- When the query needs to scan multiple time ranges
 
 ## Step 5: Implement REST Handler with Transformation
 
@@ -534,8 +640,9 @@ Group D (After C):
 3. **Single Transformation Point**: CBT→API transformation ONLY in REST handlers
 4. **Metadata Context**: Network passed via metadata through service layers
 5. **Query Builders**: Use vendored CBT query builders, don't write raw SQL
-6. **Error Handling**: Graceful degradation, structured error responses
-7. **Caching Strategy**: Recent data gets short TTL, historical data gets longer TTL
+6. **Primary Key Enrichment**: Calculate and inject PKs at gRPC layer for efficient queries
+7. **Error Handling**: Graceful degradation, structured error responses
+8. **Caching Strategy**: Recent data gets short TTL, historical data gets longer TTL
 
 ## Common Patterns
 
@@ -582,8 +689,12 @@ grep -r "BuildList.*Query" vendor/xatu-cbt/
 ### Issue: Transformation losing data
 **Solution**: Review field mapping in transformCBTToAPI function
 
+### Issue: Query performance is slow
+**Solution**: Check if the table has a calculable primary key (like slot_start_date_time). If yes, implement PK enrichment at the gRPC layer using `calculateSlotStartDateTime` helper. This can improve query performance from O(n) to O(log n).
+
 ## Important Notes
 
+- **Check table primary keys**: Before implementing, check if the CBT table has a timestamp-based PK that can be calculated from request params. If yes, implement PK enrichment at gRPC layer for massive performance gains
 - Always handle nil pointers when transforming nested structures
 - Use appropriate HTTP status codes (400 for client errors, 500 for server errors)
 - Include correlation IDs in error logs for debugging

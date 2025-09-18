@@ -11,17 +11,17 @@ import (
 )
 
 const (
-	MethodListFctNodeActiveLast24h = "ListFctNodeActiveLast24h"
+	MethodListIntBlockFirstSeenByNode = "ListIntBlockFirstSeenByNode"
 )
 
-// ListFctNodeActiveLast24h returns nodes active in the last 24 hours from the fact table.
-func (x *XatuCBT) ListFctNodeActiveLast24h(
+// ListIntBlockFirstSeenByNode returns block timing data from the int_block_first_seen_by_node table.
+func (x *XatuCBT) ListIntBlockFirstSeenByNode(
 	ctx context.Context,
-	req *cbtproto.ListFctNodeActiveLast24HRequest,
-) (resp *cbtproto.ListFctNodeActiveLast24HResponse, err error) {
+	req *cbtproto.ListIntBlockFirstSeenByNodeRequest,
+) (resp *cbtproto.ListIntBlockFirstSeenByNodeResponse, err error) {
 	var (
 		network string
-		nodes   []*cbtproto.FctNodeActiveLast24H
+		nodes   []*cbtproto.IntBlockFirstSeenByNode
 	)
 
 	defer func() {
@@ -30,7 +30,7 @@ func (x *XatuCBT) ListFctNodeActiveLast24h(
 			status = StatusError
 		}
 
-		x.requestsTotal.WithLabelValues(MethodListFctNodeActiveLast24h, network, status).Inc()
+		x.requestsTotal.WithLabelValues(MethodListIntBlockFirstSeenByNode, network, status).Inc()
 	}()
 
 	// Get network and clickhouse client.
@@ -41,25 +41,25 @@ func (x *XatuCBT) ListFctNodeActiveLast24h(
 
 	network = client.Network()
 
-	timer := prometheus.NewTimer(x.requestDuration.WithLabelValues(MethodListFctNodeActiveLast24h, network))
+	timer := prometheus.NewTimer(x.requestDuration.WithLabelValues(MethodListIntBlockFirstSeenByNode, network))
 	defer timer.ObserveDuration()
 
 	var (
-		cacheKey       = x.generateCacheKey("fct_node_active_last_24h", network, req)
-		cachedResponse = &cbtproto.ListFctNodeActiveLast24HResponse{}
+		cacheKey       = x.generateCacheKey("int_block_first_seen_by_node", network, req)
+		cachedResponse = &cbtproto.ListIntBlockFirstSeenByNodeResponse{}
 	)
 
 	// Check cache first.
 	if found, _ := x.tryCache(cacheKey, cachedResponse); found {
-		x.cacheHitsTotal.WithLabelValues(MethodListFctNodeActiveLast24h, network).Inc()
+		x.cacheHitsTotal.WithLabelValues(MethodListIntBlockFirstSeenByNode, network).Inc()
 
 		return cachedResponse, nil
 	}
 
-	x.cacheMissesTotal.WithLabelValues(MethodListFctNodeActiveLast24h, network).Inc()
+	x.cacheMissesTotal.WithLabelValues(MethodListIntBlockFirstSeenByNode, network).Inc()
 
 	// Use our clickhouse-proto-gen to handle building for us.
-	sqlQuery, err := cbtproto.BuildListFctNodeActiveLast24HQuery(
+	sqlQuery, err := cbtproto.BuildListIntBlockFirstSeenByNodeQuery(
 		req,
 		cbtproto.WithFinal(),
 		cbtproto.WithDatabase(network),
@@ -69,7 +69,7 @@ func (x *XatuCBT) ListFctNodeActiveLast24h(
 	}
 
 	if err = client.QueryWithScanner(ctx, sqlQuery.Query, func(scanner clickhouse.RowScanner) error {
-		node, scanErr := scanFctNodeActiveLast24h(scanner)
+		node, scanErr := scanIntBlockFirstSeenByNode(scanner)
 		if scanErr != nil {
 			x.log.WithError(scanErr).Error("Failed to scan row")
 
@@ -80,7 +80,7 @@ func (x *XatuCBT) ListFctNodeActiveLast24h(
 
 		return nil
 	}, sqlQuery.Args...); err != nil {
-		return nil, fmt.Errorf("failed to query fct_node_active_last_24h: %w", err)
+		return nil, fmt.Errorf("failed to query int_block_first_seen_by_node: %w", err)
 	}
 
 	// Calculate pagination.
@@ -96,8 +96,8 @@ func (x *XatuCBT) ListFctNodeActiveLast24h(
 	}
 
 	//nolint:gosec // conversion safe.
-	rsp := &cbtproto.ListFctNodeActiveLast24HResponse{
-		FctNodeActiveLast_24H: nodes,
+	rsp := &cbtproto.ListIntBlockFirstSeenByNodeResponse{
+		IntBlockFirstSeenByNode: nodes,
 		NextPageToken: cbtproto.CalculateNextPageToken(
 			currentOffset,
 			uint32(pageSize),
@@ -111,18 +111,25 @@ func (x *XatuCBT) ListFctNodeActiveLast24h(
 	return rsp, nil
 }
 
-// scanFctNodeActiveLast24h scans a single fct_node_active_last_24h row from the database.
-func scanFctNodeActiveLast24h(
+// scanIntBlockFirstSeenByNode scans a single int_block_first_seen_by_node row from the database.
+func scanIntBlockFirstSeenByNode(
 	scanner clickhouse.RowScanner,
-) (*cbtproto.FctNodeActiveLast24H, error) {
+) (*cbtproto.IntBlockFirstSeenByNode, error) {
 	var (
-		node                              cbtproto.FctNodeActiveLast24H
-		updatedDateTime, lastSeenDateTime time.Time
+		node                               cbtproto.IntBlockFirstSeenByNode
+		updatedDateTime, slotStartDateTime time.Time
+		epochStartDateTime                 time.Time
 	)
 
 	if err := scanner.Scan(
 		&updatedDateTime,
-		&lastSeenDateTime,
+		&node.Source,
+		&node.Slot,
+		&slotStartDateTime,
+		&node.Epoch,
+		&epochStartDateTime,
+		&node.SeenSlotStartDiff,
+		&node.BlockRoot,
 		&node.Username,
 		&node.NodeId,
 		&node.Classification,
@@ -139,8 +146,9 @@ func scanFctNodeActiveLast24h(
 		return nil, fmt.Errorf("failed to scan row: %w", err)
 	}
 
-	node.UpdatedDateTime = uint32(updatedDateTime.Unix())   //nolint:gosec // safe.
-	node.LastSeenDateTime = uint32(lastSeenDateTime.Unix()) //nolint:gosec // safe.
+	node.UpdatedDateTime = uint32(updatedDateTime.Unix())       //nolint:gosec // safe.
+	node.SlotStartDateTime = uint32(slotStartDateTime.Unix())   //nolint:gosec // safe.
+	node.EpochStartDateTime = uint32(epochStartDateTime.Unix()) //nolint:gosec // safe.
 
 	return &node, nil
 }

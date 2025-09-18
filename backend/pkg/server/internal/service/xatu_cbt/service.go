@@ -18,6 +18,8 @@ import (
 const (
 	ServiceName     = "xatu_cbt"
 	DefaultPageSize = 100
+	StatusError     = "error"
+	StatusSuccess   = "success"
 )
 
 type XatuCBT struct {

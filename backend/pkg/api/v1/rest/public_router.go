@@ -48,6 +48,9 @@ func (r *PublicRouter) RegisterRoutes(router *mux.Router) {
 	v1.HandleFunc("/config", r.handleConfig).Methods("GET", methodOptions)
 	v1.HandleFunc("/experiments/{experimentId}/config", r.handleExperimentConfig).Methods("GET", methodOptions)
 	v1.HandleFunc("/{network}/nodes", r.handleListNodes).Methods("GET", methodOptions)
+
+	// Beacon slot endpoints
+	v1.HandleFunc("/{network}/beacon/slot/{slot}/block/timing", r.handleBeaconBlockTiming).Methods("GET", methodOptions)
 }
 
 // handleConfig handles GET /api/v1/config
