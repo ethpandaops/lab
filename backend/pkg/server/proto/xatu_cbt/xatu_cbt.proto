@@ -19,7 +19,7 @@ option go_package = "github.com/ethpandaops/lab/backend/pkg/server/proto/xatu_cb
 // 5. REST layer transforms CBT types to public API types
 
 import "vendor/xatu-cbt/clickhouse/fct_node_active_last_24h.proto";
-import "vendor/xatu-cbt/clickhouse/int_block_first_seen_by_node.proto";
+import "vendor/xatu-cbt/clickhouse/fct_block_first_seen_by_node.proto";
 import "vendor/xatu-cbt/clickhouse/common.proto";
 
 // XatuCBT service provides access to CBT data from multiple ClickHouse instances.
@@ -28,11 +28,11 @@ service XatuCBT {
   // ListFctNodeActiveLast24h queries the fact table of nodes active in the last 24 hours.
   // This table contains node metadata for all nodes seen within a rolling 24-hour window.
   rpc ListFctNodeActiveLast24h(cbt.ListFctNodeActiveLast24hRequest) returns (cbt.ListFctNodeActiveLast24hResponse);
-  
-  // ListIntBlockFirstSeenByNode returns block timing data from the int_block_first_seen_by_node table.
+
+  // ListFctBlockFirstSeenByNode returns block timing data from the fct_block_first_seen_by_node table.
   // This table contains information about when blocks were first seen by different nodes.
-  rpc ListIntBlockFirstSeenByNode(cbt.ListIntBlockFirstSeenByNodeRequest) returns (cbt.ListIntBlockFirstSeenByNodeResponse);
-  
+  rpc ListFctBlockFirstSeenByNode(cbt.ListFctBlockFirstSeenByNodeRequest) returns (cbt.ListFctBlockFirstSeenByNodeResponse);
+
   // GetDataAvailability returns the common availability interval across a set of transformation tables.
   // It calculates the overlapping data range for the specified tables and returns slot information.
   rpc GetDataAvailability(GetDataAvailabilityRequest) returns (GetDataAvailabilityResponse);
@@ -43,7 +43,7 @@ message GetDataAvailabilityRequest {
   // List of transformation tables to check for availability.
   // Format: table names without the network prefix (e.g., "fct_attestation_correctness_head").
   repeated string tables = 1;
-  
+
   // The position field name to use for min/max calculation.
   // Common values: "slot_start_date_time", "block_number", etc.
   // If empty, defaults to "slot_start_date_time".
@@ -54,22 +54,22 @@ message GetDataAvailabilityRequest {
 message GetDataAvailabilityResponse {
   // Unix timestamp (seconds) of the earliest available data across all tables.
   int64 available_from_timestamp = 1;
-  
+
   // Unix timestamp (seconds) of the latest available data across all tables.
   int64 available_until_timestamp = 2;
-  
+
   // Earliest available slot number (calculated from available_from_timestamp).
   uint64 min_slot = 3;
-  
+
   // Latest available slot number (calculated from available_until_timestamp).
   uint64 max_slot = 4;
-  
+
   // Safe slot for "live" view (head - 2 slots from max_slot).
   uint64 safe_slot = 5;
-  
+
   // The current head slot of the network.
   uint64 head_slot = 6;
-  
+
   // Indicates if data is available (overlapping interval exists).
   bool has_data = 7;
 }

@@ -21,7 +21,7 @@ const _ = grpc.SupportPackageIsVersion8
 
 const (
 	XatuCBT_ListFctNodeActiveLast24H_FullMethodName    = "/xatu_cbt.XatuCBT/ListFctNodeActiveLast24h"
-	XatuCBT_ListIntBlockFirstSeenByNode_FullMethodName = "/xatu_cbt.XatuCBT/ListIntBlockFirstSeenByNode"
+	XatuCBT_ListFctBlockFirstSeenByNode_FullMethodName = "/xatu_cbt.XatuCBT/ListFctBlockFirstSeenByNode"
 	XatuCBT_GetDataAvailability_FullMethodName         = "/xatu_cbt.XatuCBT/GetDataAvailability"
 )
 
@@ -35,9 +35,9 @@ type XatuCBTClient interface {
 	// ListFctNodeActiveLast24h queries the fact table of nodes active in the last 24 hours.
 	// This table contains node metadata for all nodes seen within a rolling 24-hour window.
 	ListFctNodeActiveLast24H(ctx context.Context, in *clickhouse.ListFctNodeActiveLast24HRequest, opts ...grpc.CallOption) (*clickhouse.ListFctNodeActiveLast24HResponse, error)
-	// ListIntBlockFirstSeenByNode returns block timing data from the int_block_first_seen_by_node table.
+	// ListFctBlockFirstSeenByNode returns block timing data from the fct_block_first_seen_by_node table.
 	// This table contains information about when blocks were first seen by different nodes.
-	ListIntBlockFirstSeenByNode(ctx context.Context, in *clickhouse.ListIntBlockFirstSeenByNodeRequest, opts ...grpc.CallOption) (*clickhouse.ListIntBlockFirstSeenByNodeResponse, error)
+	ListFctBlockFirstSeenByNode(ctx context.Context, in *clickhouse.ListFctBlockFirstSeenByNodeRequest, opts ...grpc.CallOption) (*clickhouse.ListFctBlockFirstSeenByNodeResponse, error)
 	// GetDataAvailability returns the common availability interval across a set of transformation tables.
 	// It calculates the overlapping data range for the specified tables and returns slot information.
 	GetDataAvailability(ctx context.Context, in *GetDataAvailabilityRequest, opts ...grpc.CallOption) (*GetDataAvailabilityResponse, error)
@@ -61,10 +61,10 @@ func (c *xatuCBTClient) ListFctNodeActiveLast24H(ctx context.Context, in *clickh
 	return out, nil
 }
 
-func (c *xatuCBTClient) ListIntBlockFirstSeenByNode(ctx context.Context, in *clickhouse.ListIntBlockFirstSeenByNodeRequest, opts ...grpc.CallOption) (*clickhouse.ListIntBlockFirstSeenByNodeResponse, error) {
+func (c *xatuCBTClient) ListFctBlockFirstSeenByNode(ctx context.Context, in *clickhouse.ListFctBlockFirstSeenByNodeRequest, opts ...grpc.CallOption) (*clickhouse.ListFctBlockFirstSeenByNodeResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(clickhouse.ListIntBlockFirstSeenByNodeResponse)
-	err := c.cc.Invoke(ctx, XatuCBT_ListIntBlockFirstSeenByNode_FullMethodName, in, out, cOpts...)
+	out := new(clickhouse.ListFctBlockFirstSeenByNodeResponse)
+	err := c.cc.Invoke(ctx, XatuCBT_ListFctBlockFirstSeenByNode_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -91,9 +91,9 @@ type XatuCBTServer interface {
 	// ListFctNodeActiveLast24h queries the fact table of nodes active in the last 24 hours.
 	// This table contains node metadata for all nodes seen within a rolling 24-hour window.
 	ListFctNodeActiveLast24H(context.Context, *clickhouse.ListFctNodeActiveLast24HRequest) (*clickhouse.ListFctNodeActiveLast24HResponse, error)
-	// ListIntBlockFirstSeenByNode returns block timing data from the int_block_first_seen_by_node table.
+	// ListFctBlockFirstSeenByNode returns block timing data from the fct_block_first_seen_by_node table.
 	// This table contains information about when blocks were first seen by different nodes.
-	ListIntBlockFirstSeenByNode(context.Context, *clickhouse.ListIntBlockFirstSeenByNodeRequest) (*clickhouse.ListIntBlockFirstSeenByNodeResponse, error)
+	ListFctBlockFirstSeenByNode(context.Context, *clickhouse.ListFctBlockFirstSeenByNodeRequest) (*clickhouse.ListFctBlockFirstSeenByNodeResponse, error)
 	// GetDataAvailability returns the common availability interval across a set of transformation tables.
 	// It calculates the overlapping data range for the specified tables and returns slot information.
 	GetDataAvailability(context.Context, *GetDataAvailabilityRequest) (*GetDataAvailabilityResponse, error)
@@ -107,8 +107,8 @@ type UnimplementedXatuCBTServer struct {
 func (UnimplementedXatuCBTServer) ListFctNodeActiveLast24H(context.Context, *clickhouse.ListFctNodeActiveLast24HRequest) (*clickhouse.ListFctNodeActiveLast24HResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListFctNodeActiveLast24H not implemented")
 }
-func (UnimplementedXatuCBTServer) ListIntBlockFirstSeenByNode(context.Context, *clickhouse.ListIntBlockFirstSeenByNodeRequest) (*clickhouse.ListIntBlockFirstSeenByNodeResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ListIntBlockFirstSeenByNode not implemented")
+func (UnimplementedXatuCBTServer) ListFctBlockFirstSeenByNode(context.Context, *clickhouse.ListFctBlockFirstSeenByNodeRequest) (*clickhouse.ListFctBlockFirstSeenByNodeResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListFctBlockFirstSeenByNode not implemented")
 }
 func (UnimplementedXatuCBTServer) GetDataAvailability(context.Context, *GetDataAvailabilityRequest) (*GetDataAvailabilityResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetDataAvailability not implemented")
@@ -144,20 +144,20 @@ func _XatuCBT_ListFctNodeActiveLast24H_Handler(srv interface{}, ctx context.Cont
 	return interceptor(ctx, in, info, handler)
 }
 
-func _XatuCBT_ListIntBlockFirstSeenByNode_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(clickhouse.ListIntBlockFirstSeenByNodeRequest)
+func _XatuCBT_ListFctBlockFirstSeenByNode_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(clickhouse.ListFctBlockFirstSeenByNodeRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(XatuCBTServer).ListIntBlockFirstSeenByNode(ctx, in)
+		return srv.(XatuCBTServer).ListFctBlockFirstSeenByNode(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: XatuCBT_ListIntBlockFirstSeenByNode_FullMethodName,
+		FullMethod: XatuCBT_ListFctBlockFirstSeenByNode_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(XatuCBTServer).ListIntBlockFirstSeenByNode(ctx, req.(*clickhouse.ListIntBlockFirstSeenByNodeRequest))
+		return srv.(XatuCBTServer).ListFctBlockFirstSeenByNode(ctx, req.(*clickhouse.ListFctBlockFirstSeenByNodeRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -192,8 +192,8 @@ var XatuCBT_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _XatuCBT_ListFctNodeActiveLast24H_Handler,
 		},
 		{
-			MethodName: "ListIntBlockFirstSeenByNode",
-			Handler:    _XatuCBT_ListIntBlockFirstSeenByNode_Handler,
+			MethodName: "ListFctBlockFirstSeenByNode",
+			Handler:    _XatuCBT_ListFctBlockFirstSeenByNode_Handler,
 		},
 		{
 			MethodName: "GetDataAvailability",

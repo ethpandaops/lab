@@ -55,17 +55,17 @@ func (x *XatuCBT) ListFctNodeActiveLast24H(
 	return x.service.ListFctNodeActiveLast24h(ctx, req)
 }
 
-// ListIntBlockFirstSeenByNode returns block timing data from the int_block_first_seen_by_node table.
-func (x *XatuCBT) ListIntBlockFirstSeenByNode(
+// ListFctBlockFirstSeenByNode returns block timing data from the fct_block_first_seen_by_node table.
+func (x *XatuCBT) ListFctBlockFirstSeenByNode(
 	ctx context.Context,
-	req *cbtproto.ListIntBlockFirstSeenByNodeRequest,
-) (*cbtproto.ListIntBlockFirstSeenByNodeResponse, error) {
+	req *cbtproto.ListFctBlockFirstSeenByNodeRequest,
+) (*cbtproto.ListFctBlockFirstSeenByNodeResponse, error) {
 	// Calculate SlotStartDateTime if not already set, more efficient queries.
 	if req.SlotStartDateTime == nil && req.Slot != nil {
 		req.SlotStartDateTime = x.calculateSlotStartDateTime(ctx, req.Slot)
 	}
 
-	return x.service.ListIntBlockFirstSeenByNode(ctx, req)
+	return x.service.ListFctBlockFirstSeenByNode(ctx, req)
 }
 
 // calculateSlotStartDateTime calculates the SlotStartDateTime filter for a given slot filter.

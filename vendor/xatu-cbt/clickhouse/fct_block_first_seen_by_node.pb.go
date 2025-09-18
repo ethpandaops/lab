@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.34.2
 // 	protoc        (unknown)
-// source: vendor/xatu-cbt/clickhouse/int_block_first_seen_by_node.proto
+// source: vendor/xatu-cbt/clickhouse/fct_block_first_seen_by_node.proto
 
 package clickhouse
 
@@ -20,7 +20,7 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-type IntBlockFirstSeenByNode struct {
+type FctBlockFirstSeenByNode struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
@@ -67,23 +67,23 @@ type IntBlockFirstSeenByNode struct {
 	MetaConsensusImplementation string `protobuf:"bytes,30,opt,name=meta_consensus_implementation,json=metaConsensusImplementation,proto3" json:"meta_consensus_implementation,omitempty"`
 }
 
-func (x *IntBlockFirstSeenByNode) Reset() {
-	*x = IntBlockFirstSeenByNode{}
+func (x *FctBlockFirstSeenByNode) Reset() {
+	*x = FctBlockFirstSeenByNode{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_vendor_xatu_cbt_clickhouse_int_block_first_seen_by_node_proto_msgTypes[0]
+		mi := &file_vendor_xatu_cbt_clickhouse_fct_block_first_seen_by_node_proto_msgTypes[0]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
 }
 
-func (x *IntBlockFirstSeenByNode) String() string {
+func (x *FctBlockFirstSeenByNode) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*IntBlockFirstSeenByNode) ProtoMessage() {}
+func (*FctBlockFirstSeenByNode) ProtoMessage() {}
 
-func (x *IntBlockFirstSeenByNode) ProtoReflect() protoreflect.Message {
-	mi := &file_vendor_xatu_cbt_clickhouse_int_block_first_seen_by_node_proto_msgTypes[0]
+func (x *FctBlockFirstSeenByNode) ProtoReflect() protoreflect.Message {
+	mi := &file_vendor_xatu_cbt_clickhouse_fct_block_first_seen_by_node_proto_msgTypes[0]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -94,153 +94,153 @@ func (x *IntBlockFirstSeenByNode) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use IntBlockFirstSeenByNode.ProtoReflect.Descriptor instead.
-func (*IntBlockFirstSeenByNode) Descriptor() ([]byte, []int) {
-	return file_vendor_xatu_cbt_clickhouse_int_block_first_seen_by_node_proto_rawDescGZIP(), []int{0}
+// Deprecated: Use FctBlockFirstSeenByNode.ProtoReflect.Descriptor instead.
+func (*FctBlockFirstSeenByNode) Descriptor() ([]byte, []int) {
+	return file_vendor_xatu_cbt_clickhouse_fct_block_first_seen_by_node_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *IntBlockFirstSeenByNode) GetUpdatedDateTime() uint32 {
+func (x *FctBlockFirstSeenByNode) GetUpdatedDateTime() uint32 {
 	if x != nil {
 		return x.UpdatedDateTime
 	}
 	return 0
 }
 
-func (x *IntBlockFirstSeenByNode) GetSource() string {
+func (x *FctBlockFirstSeenByNode) GetSource() string {
 	if x != nil {
 		return x.Source
 	}
 	return ""
 }
 
-func (x *IntBlockFirstSeenByNode) GetSlot() uint32 {
+func (x *FctBlockFirstSeenByNode) GetSlot() uint32 {
 	if x != nil {
 		return x.Slot
 	}
 	return 0
 }
 
-func (x *IntBlockFirstSeenByNode) GetSlotStartDateTime() uint32 {
+func (x *FctBlockFirstSeenByNode) GetSlotStartDateTime() uint32 {
 	if x != nil {
 		return x.SlotStartDateTime
 	}
 	return 0
 }
 
-func (x *IntBlockFirstSeenByNode) GetEpoch() uint32 {
+func (x *FctBlockFirstSeenByNode) GetEpoch() uint32 {
 	if x != nil {
 		return x.Epoch
 	}
 	return 0
 }
 
-func (x *IntBlockFirstSeenByNode) GetEpochStartDateTime() uint32 {
+func (x *FctBlockFirstSeenByNode) GetEpochStartDateTime() uint32 {
 	if x != nil {
 		return x.EpochStartDateTime
 	}
 	return 0
 }
 
-func (x *IntBlockFirstSeenByNode) GetSeenSlotStartDiff() uint32 {
+func (x *FctBlockFirstSeenByNode) GetSeenSlotStartDiff() uint32 {
 	if x != nil {
 		return x.SeenSlotStartDiff
 	}
 	return 0
 }
 
-func (x *IntBlockFirstSeenByNode) GetBlockRoot() string {
+func (x *FctBlockFirstSeenByNode) GetBlockRoot() string {
 	if x != nil {
 		return x.BlockRoot
 	}
 	return ""
 }
 
-func (x *IntBlockFirstSeenByNode) GetUsername() string {
+func (x *FctBlockFirstSeenByNode) GetUsername() string {
 	if x != nil {
 		return x.Username
 	}
 	return ""
 }
 
-func (x *IntBlockFirstSeenByNode) GetNodeId() string {
+func (x *FctBlockFirstSeenByNode) GetNodeId() string {
 	if x != nil {
 		return x.NodeId
 	}
 	return ""
 }
 
-func (x *IntBlockFirstSeenByNode) GetClassification() string {
+func (x *FctBlockFirstSeenByNode) GetClassification() string {
 	if x != nil {
 		return x.Classification
 	}
 	return ""
 }
 
-func (x *IntBlockFirstSeenByNode) GetMetaClientName() string {
+func (x *FctBlockFirstSeenByNode) GetMetaClientName() string {
 	if x != nil {
 		return x.MetaClientName
 	}
 	return ""
 }
 
-func (x *IntBlockFirstSeenByNode) GetMetaClientVersion() string {
+func (x *FctBlockFirstSeenByNode) GetMetaClientVersion() string {
 	if x != nil {
 		return x.MetaClientVersion
 	}
 	return ""
 }
 
-func (x *IntBlockFirstSeenByNode) GetMetaClientImplementation() string {
+func (x *FctBlockFirstSeenByNode) GetMetaClientImplementation() string {
 	if x != nil {
 		return x.MetaClientImplementation
 	}
 	return ""
 }
 
-func (x *IntBlockFirstSeenByNode) GetMetaClientGeoCity() string {
+func (x *FctBlockFirstSeenByNode) GetMetaClientGeoCity() string {
 	if x != nil {
 		return x.MetaClientGeoCity
 	}
 	return ""
 }
 
-func (x *IntBlockFirstSeenByNode) GetMetaClientGeoCountry() string {
+func (x *FctBlockFirstSeenByNode) GetMetaClientGeoCountry() string {
 	if x != nil {
 		return x.MetaClientGeoCountry
 	}
 	return ""
 }
 
-func (x *IntBlockFirstSeenByNode) GetMetaClientGeoCountryCode() string {
+func (x *FctBlockFirstSeenByNode) GetMetaClientGeoCountryCode() string {
 	if x != nil {
 		return x.MetaClientGeoCountryCode
 	}
 	return ""
 }
 
-func (x *IntBlockFirstSeenByNode) GetMetaClientGeoContinentCode() string {
+func (x *FctBlockFirstSeenByNode) GetMetaClientGeoContinentCode() string {
 	if x != nil {
 		return x.MetaClientGeoContinentCode
 	}
 	return ""
 }
 
-func (x *IntBlockFirstSeenByNode) GetMetaConsensusVersion() string {
+func (x *FctBlockFirstSeenByNode) GetMetaConsensusVersion() string {
 	if x != nil {
 		return x.MetaConsensusVersion
 	}
 	return ""
 }
 
-func (x *IntBlockFirstSeenByNode) GetMetaConsensusImplementation() string {
+func (x *FctBlockFirstSeenByNode) GetMetaConsensusImplementation() string {
 	if x != nil {
 		return x.MetaConsensusImplementation
 	}
 	return ""
 }
 
-// ListIntBlockFirstSeenByNodeRequest is the request message for listing int_block_first_seen_by_node records
-type ListIntBlockFirstSeenByNodeRequest struct {
+// ListFctBlockFirstSeenByNodeRequest is the request message for listing fct_block_first_seen_by_node records
+type ListFctBlockFirstSeenByNodeRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
@@ -285,11 +285,11 @@ type ListIntBlockFirstSeenByNodeRequest struct {
 	MetaConsensusVersion *StringFilter `protobuf:"bytes,19,opt,name=meta_consensus_version,json=metaConsensusVersion,proto3" json:"meta_consensus_version,omitempty"`
 	// Filter by meta_consensus_implementation (optional)
 	MetaConsensusImplementation *StringFilter `protobuf:"bytes,20,opt,name=meta_consensus_implementation,json=metaConsensusImplementation,proto3" json:"meta_consensus_implementation,omitempty"`
-	// The maximum number of int_block_first_seen_by_node to return.
+	// The maximum number of fct_block_first_seen_by_node to return.
 	// If unspecified, at most 100 items will be returned.
 	// The maximum value is 1000; values above 1000 will be coerced to 1000.
 	PageSize int32 `protobuf:"varint,21,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
-	// A page token, received from a previous `ListIntBlockFirstSeenByNode` call.
+	// A page token, received from a previous `ListFctBlockFirstSeenByNode` call.
 	// Provide this to retrieve the subsequent page.
 	PageToken string `protobuf:"bytes,22,opt,name=page_token,json=pageToken,proto3" json:"page_token,omitempty"`
 	// The order of results. Format: comma-separated list of fields.
@@ -298,23 +298,23 @@ type ListIntBlockFirstSeenByNodeRequest struct {
 	OrderBy string `protobuf:"bytes,23,opt,name=order_by,json=orderBy,proto3" json:"order_by,omitempty"`
 }
 
-func (x *ListIntBlockFirstSeenByNodeRequest) Reset() {
-	*x = ListIntBlockFirstSeenByNodeRequest{}
+func (x *ListFctBlockFirstSeenByNodeRequest) Reset() {
+	*x = ListFctBlockFirstSeenByNodeRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_vendor_xatu_cbt_clickhouse_int_block_first_seen_by_node_proto_msgTypes[1]
+		mi := &file_vendor_xatu_cbt_clickhouse_fct_block_first_seen_by_node_proto_msgTypes[1]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
 }
 
-func (x *ListIntBlockFirstSeenByNodeRequest) String() string {
+func (x *ListFctBlockFirstSeenByNodeRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*ListIntBlockFirstSeenByNodeRequest) ProtoMessage() {}
+func (*ListFctBlockFirstSeenByNodeRequest) ProtoMessage() {}
 
-func (x *ListIntBlockFirstSeenByNodeRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_vendor_xatu_cbt_clickhouse_int_block_first_seen_by_node_proto_msgTypes[1]
+func (x *ListFctBlockFirstSeenByNodeRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_vendor_xatu_cbt_clickhouse_fct_block_first_seen_by_node_proto_msgTypes[1]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -325,202 +325,202 @@ func (x *ListIntBlockFirstSeenByNodeRequest) ProtoReflect() protoreflect.Message
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ListIntBlockFirstSeenByNodeRequest.ProtoReflect.Descriptor instead.
-func (*ListIntBlockFirstSeenByNodeRequest) Descriptor() ([]byte, []int) {
-	return file_vendor_xatu_cbt_clickhouse_int_block_first_seen_by_node_proto_rawDescGZIP(), []int{1}
+// Deprecated: Use ListFctBlockFirstSeenByNodeRequest.ProtoReflect.Descriptor instead.
+func (*ListFctBlockFirstSeenByNodeRequest) Descriptor() ([]byte, []int) {
+	return file_vendor_xatu_cbt_clickhouse_fct_block_first_seen_by_node_proto_rawDescGZIP(), []int{1}
 }
 
-func (x *ListIntBlockFirstSeenByNodeRequest) GetSlotStartDateTime() *UInt32Filter {
+func (x *ListFctBlockFirstSeenByNodeRequest) GetSlotStartDateTime() *UInt32Filter {
 	if x != nil {
 		return x.SlotStartDateTime
 	}
 	return nil
 }
 
-func (x *ListIntBlockFirstSeenByNodeRequest) GetMetaClientName() *StringFilter {
+func (x *ListFctBlockFirstSeenByNodeRequest) GetMetaClientName() *StringFilter {
 	if x != nil {
 		return x.MetaClientName
 	}
 	return nil
 }
 
-func (x *ListIntBlockFirstSeenByNodeRequest) GetUpdatedDateTime() *UInt32Filter {
+func (x *ListFctBlockFirstSeenByNodeRequest) GetUpdatedDateTime() *UInt32Filter {
 	if x != nil {
 		return x.UpdatedDateTime
 	}
 	return nil
 }
 
-func (x *ListIntBlockFirstSeenByNodeRequest) GetSource() *StringFilter {
+func (x *ListFctBlockFirstSeenByNodeRequest) GetSource() *StringFilter {
 	if x != nil {
 		return x.Source
 	}
 	return nil
 }
 
-func (x *ListIntBlockFirstSeenByNodeRequest) GetSlot() *UInt32Filter {
+func (x *ListFctBlockFirstSeenByNodeRequest) GetSlot() *UInt32Filter {
 	if x != nil {
 		return x.Slot
 	}
 	return nil
 }
 
-func (x *ListIntBlockFirstSeenByNodeRequest) GetEpoch() *UInt32Filter {
+func (x *ListFctBlockFirstSeenByNodeRequest) GetEpoch() *UInt32Filter {
 	if x != nil {
 		return x.Epoch
 	}
 	return nil
 }
 
-func (x *ListIntBlockFirstSeenByNodeRequest) GetEpochStartDateTime() *UInt32Filter {
+func (x *ListFctBlockFirstSeenByNodeRequest) GetEpochStartDateTime() *UInt32Filter {
 	if x != nil {
 		return x.EpochStartDateTime
 	}
 	return nil
 }
 
-func (x *ListIntBlockFirstSeenByNodeRequest) GetSeenSlotStartDiff() *UInt32Filter {
+func (x *ListFctBlockFirstSeenByNodeRequest) GetSeenSlotStartDiff() *UInt32Filter {
 	if x != nil {
 		return x.SeenSlotStartDiff
 	}
 	return nil
 }
 
-func (x *ListIntBlockFirstSeenByNodeRequest) GetBlockRoot() *StringFilter {
+func (x *ListFctBlockFirstSeenByNodeRequest) GetBlockRoot() *StringFilter {
 	if x != nil {
 		return x.BlockRoot
 	}
 	return nil
 }
 
-func (x *ListIntBlockFirstSeenByNodeRequest) GetUsername() *StringFilter {
+func (x *ListFctBlockFirstSeenByNodeRequest) GetUsername() *StringFilter {
 	if x != nil {
 		return x.Username
 	}
 	return nil
 }
 
-func (x *ListIntBlockFirstSeenByNodeRequest) GetNodeId() *StringFilter {
+func (x *ListFctBlockFirstSeenByNodeRequest) GetNodeId() *StringFilter {
 	if x != nil {
 		return x.NodeId
 	}
 	return nil
 }
 
-func (x *ListIntBlockFirstSeenByNodeRequest) GetClassification() *StringFilter {
+func (x *ListFctBlockFirstSeenByNodeRequest) GetClassification() *StringFilter {
 	if x != nil {
 		return x.Classification
 	}
 	return nil
 }
 
-func (x *ListIntBlockFirstSeenByNodeRequest) GetMetaClientVersion() *StringFilter {
+func (x *ListFctBlockFirstSeenByNodeRequest) GetMetaClientVersion() *StringFilter {
 	if x != nil {
 		return x.MetaClientVersion
 	}
 	return nil
 }
 
-func (x *ListIntBlockFirstSeenByNodeRequest) GetMetaClientImplementation() *StringFilter {
+func (x *ListFctBlockFirstSeenByNodeRequest) GetMetaClientImplementation() *StringFilter {
 	if x != nil {
 		return x.MetaClientImplementation
 	}
 	return nil
 }
 
-func (x *ListIntBlockFirstSeenByNodeRequest) GetMetaClientGeoCity() *StringFilter {
+func (x *ListFctBlockFirstSeenByNodeRequest) GetMetaClientGeoCity() *StringFilter {
 	if x != nil {
 		return x.MetaClientGeoCity
 	}
 	return nil
 }
 
-func (x *ListIntBlockFirstSeenByNodeRequest) GetMetaClientGeoCountry() *StringFilter {
+func (x *ListFctBlockFirstSeenByNodeRequest) GetMetaClientGeoCountry() *StringFilter {
 	if x != nil {
 		return x.MetaClientGeoCountry
 	}
 	return nil
 }
 
-func (x *ListIntBlockFirstSeenByNodeRequest) GetMetaClientGeoCountryCode() *StringFilter {
+func (x *ListFctBlockFirstSeenByNodeRequest) GetMetaClientGeoCountryCode() *StringFilter {
 	if x != nil {
 		return x.MetaClientGeoCountryCode
 	}
 	return nil
 }
 
-func (x *ListIntBlockFirstSeenByNodeRequest) GetMetaClientGeoContinentCode() *StringFilter {
+func (x *ListFctBlockFirstSeenByNodeRequest) GetMetaClientGeoContinentCode() *StringFilter {
 	if x != nil {
 		return x.MetaClientGeoContinentCode
 	}
 	return nil
 }
 
-func (x *ListIntBlockFirstSeenByNodeRequest) GetMetaConsensusVersion() *StringFilter {
+func (x *ListFctBlockFirstSeenByNodeRequest) GetMetaConsensusVersion() *StringFilter {
 	if x != nil {
 		return x.MetaConsensusVersion
 	}
 	return nil
 }
 
-func (x *ListIntBlockFirstSeenByNodeRequest) GetMetaConsensusImplementation() *StringFilter {
+func (x *ListFctBlockFirstSeenByNodeRequest) GetMetaConsensusImplementation() *StringFilter {
 	if x != nil {
 		return x.MetaConsensusImplementation
 	}
 	return nil
 }
 
-func (x *ListIntBlockFirstSeenByNodeRequest) GetPageSize() int32 {
+func (x *ListFctBlockFirstSeenByNodeRequest) GetPageSize() int32 {
 	if x != nil {
 		return x.PageSize
 	}
 	return 0
 }
 
-func (x *ListIntBlockFirstSeenByNodeRequest) GetPageToken() string {
+func (x *ListFctBlockFirstSeenByNodeRequest) GetPageToken() string {
 	if x != nil {
 		return x.PageToken
 	}
 	return ""
 }
 
-func (x *ListIntBlockFirstSeenByNodeRequest) GetOrderBy() string {
+func (x *ListFctBlockFirstSeenByNodeRequest) GetOrderBy() string {
 	if x != nil {
 		return x.OrderBy
 	}
 	return ""
 }
 
-// ListIntBlockFirstSeenByNodeResponse is the response message for listing int_block_first_seen_by_node records
-type ListIntBlockFirstSeenByNodeResponse struct {
+// ListFctBlockFirstSeenByNodeResponse is the response message for listing fct_block_first_seen_by_node records
+type ListFctBlockFirstSeenByNodeResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// The list of int_block_first_seen_by_node.
-	IntBlockFirstSeenByNode []*IntBlockFirstSeenByNode `protobuf:"bytes,1,rep,name=int_block_first_seen_by_node,json=intBlockFirstSeenByNode,proto3" json:"int_block_first_seen_by_node,omitempty"`
+	// The list of fct_block_first_seen_by_node.
+	FctBlockFirstSeenByNode []*FctBlockFirstSeenByNode `protobuf:"bytes,1,rep,name=fct_block_first_seen_by_node,json=fctBlockFirstSeenByNode,proto3" json:"fct_block_first_seen_by_node,omitempty"`
 	// A token, which can be sent as `page_token` to retrieve the next page.
 	// If this field is omitted, there are no subsequent pages.
 	NextPageToken string `protobuf:"bytes,2,opt,name=next_page_token,json=nextPageToken,proto3" json:"next_page_token,omitempty"`
 }
 
-func (x *ListIntBlockFirstSeenByNodeResponse) Reset() {
-	*x = ListIntBlockFirstSeenByNodeResponse{}
+func (x *ListFctBlockFirstSeenByNodeResponse) Reset() {
+	*x = ListFctBlockFirstSeenByNodeResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_vendor_xatu_cbt_clickhouse_int_block_first_seen_by_node_proto_msgTypes[2]
+		mi := &file_vendor_xatu_cbt_clickhouse_fct_block_first_seen_by_node_proto_msgTypes[2]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
 }
 
-func (x *ListIntBlockFirstSeenByNodeResponse) String() string {
+func (x *ListFctBlockFirstSeenByNodeResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*ListIntBlockFirstSeenByNodeResponse) ProtoMessage() {}
+func (*ListFctBlockFirstSeenByNodeResponse) ProtoMessage() {}
 
-func (x *ListIntBlockFirstSeenByNodeResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_vendor_xatu_cbt_clickhouse_int_block_first_seen_by_node_proto_msgTypes[2]
+func (x *ListFctBlockFirstSeenByNodeResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_vendor_xatu_cbt_clickhouse_fct_block_first_seen_by_node_proto_msgTypes[2]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -531,27 +531,27 @@ func (x *ListIntBlockFirstSeenByNodeResponse) ProtoReflect() protoreflect.Messag
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ListIntBlockFirstSeenByNodeResponse.ProtoReflect.Descriptor instead.
-func (*ListIntBlockFirstSeenByNodeResponse) Descriptor() ([]byte, []int) {
-	return file_vendor_xatu_cbt_clickhouse_int_block_first_seen_by_node_proto_rawDescGZIP(), []int{2}
+// Deprecated: Use ListFctBlockFirstSeenByNodeResponse.ProtoReflect.Descriptor instead.
+func (*ListFctBlockFirstSeenByNodeResponse) Descriptor() ([]byte, []int) {
+	return file_vendor_xatu_cbt_clickhouse_fct_block_first_seen_by_node_proto_rawDescGZIP(), []int{2}
 }
 
-func (x *ListIntBlockFirstSeenByNodeResponse) GetIntBlockFirstSeenByNode() []*IntBlockFirstSeenByNode {
+func (x *ListFctBlockFirstSeenByNodeResponse) GetFctBlockFirstSeenByNode() []*FctBlockFirstSeenByNode {
 	if x != nil {
-		return x.IntBlockFirstSeenByNode
+		return x.FctBlockFirstSeenByNode
 	}
 	return nil
 }
 
-func (x *ListIntBlockFirstSeenByNodeResponse) GetNextPageToken() string {
+func (x *ListFctBlockFirstSeenByNodeResponse) GetNextPageToken() string {
 	if x != nil {
 		return x.NextPageToken
 	}
 	return ""
 }
 
-// GetIntBlockFirstSeenByNodeRequest is the request message for getting a single int_block_first_seen_by_node record by primary key
-type GetIntBlockFirstSeenByNodeRequest struct {
+// GetFctBlockFirstSeenByNodeRequest is the request message for getting a single fct_block_first_seen_by_node record by primary key
+type GetFctBlockFirstSeenByNodeRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
@@ -560,23 +560,23 @@ type GetIntBlockFirstSeenByNodeRequest struct {
 	SlotStartDateTime uint32 `protobuf:"varint,1,opt,name=slot_start_date_time,json=slotStartDateTime,proto3" json:"slot_start_date_time,omitempty"` // Primary key (required)
 }
 
-func (x *GetIntBlockFirstSeenByNodeRequest) Reset() {
-	*x = GetIntBlockFirstSeenByNodeRequest{}
+func (x *GetFctBlockFirstSeenByNodeRequest) Reset() {
+	*x = GetFctBlockFirstSeenByNodeRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_vendor_xatu_cbt_clickhouse_int_block_first_seen_by_node_proto_msgTypes[3]
+		mi := &file_vendor_xatu_cbt_clickhouse_fct_block_first_seen_by_node_proto_msgTypes[3]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
 }
 
-func (x *GetIntBlockFirstSeenByNodeRequest) String() string {
+func (x *GetFctBlockFirstSeenByNodeRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*GetIntBlockFirstSeenByNodeRequest) ProtoMessage() {}
+func (*GetFctBlockFirstSeenByNodeRequest) ProtoMessage() {}
 
-func (x *GetIntBlockFirstSeenByNodeRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_vendor_xatu_cbt_clickhouse_int_block_first_seen_by_node_proto_msgTypes[3]
+func (x *GetFctBlockFirstSeenByNodeRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_vendor_xatu_cbt_clickhouse_fct_block_first_seen_by_node_proto_msgTypes[3]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -587,44 +587,44 @@ func (x *GetIntBlockFirstSeenByNodeRequest) ProtoReflect() protoreflect.Message 
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetIntBlockFirstSeenByNodeRequest.ProtoReflect.Descriptor instead.
-func (*GetIntBlockFirstSeenByNodeRequest) Descriptor() ([]byte, []int) {
-	return file_vendor_xatu_cbt_clickhouse_int_block_first_seen_by_node_proto_rawDescGZIP(), []int{3}
+// Deprecated: Use GetFctBlockFirstSeenByNodeRequest.ProtoReflect.Descriptor instead.
+func (*GetFctBlockFirstSeenByNodeRequest) Descriptor() ([]byte, []int) {
+	return file_vendor_xatu_cbt_clickhouse_fct_block_first_seen_by_node_proto_rawDescGZIP(), []int{3}
 }
 
-func (x *GetIntBlockFirstSeenByNodeRequest) GetSlotStartDateTime() uint32 {
+func (x *GetFctBlockFirstSeenByNodeRequest) GetSlotStartDateTime() uint32 {
 	if x != nil {
 		return x.SlotStartDateTime
 	}
 	return 0
 }
 
-// GetIntBlockFirstSeenByNodeResponse is the response message for getting a single int_block_first_seen_by_node record
-type GetIntBlockFirstSeenByNodeResponse struct {
+// GetFctBlockFirstSeenByNodeResponse is the response message for getting a single fct_block_first_seen_by_node record
+type GetFctBlockFirstSeenByNodeResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Item *IntBlockFirstSeenByNode `protobuf:"bytes,1,opt,name=item,proto3" json:"item,omitempty"`
+	Item *FctBlockFirstSeenByNode `protobuf:"bytes,1,opt,name=item,proto3" json:"item,omitempty"`
 }
 
-func (x *GetIntBlockFirstSeenByNodeResponse) Reset() {
-	*x = GetIntBlockFirstSeenByNodeResponse{}
+func (x *GetFctBlockFirstSeenByNodeResponse) Reset() {
+	*x = GetFctBlockFirstSeenByNodeResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_vendor_xatu_cbt_clickhouse_int_block_first_seen_by_node_proto_msgTypes[4]
+		mi := &file_vendor_xatu_cbt_clickhouse_fct_block_first_seen_by_node_proto_msgTypes[4]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
 }
 
-func (x *GetIntBlockFirstSeenByNodeResponse) String() string {
+func (x *GetFctBlockFirstSeenByNodeResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*GetIntBlockFirstSeenByNodeResponse) ProtoMessage() {}
+func (*GetFctBlockFirstSeenByNodeResponse) ProtoMessage() {}
 
-func (x *GetIntBlockFirstSeenByNodeResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_vendor_xatu_cbt_clickhouse_int_block_first_seen_by_node_proto_msgTypes[4]
+func (x *GetFctBlockFirstSeenByNodeResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_vendor_xatu_cbt_clickhouse_fct_block_first_seen_by_node_proto_msgTypes[4]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -635,29 +635,29 @@ func (x *GetIntBlockFirstSeenByNodeResponse) ProtoReflect() protoreflect.Message
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetIntBlockFirstSeenByNodeResponse.ProtoReflect.Descriptor instead.
-func (*GetIntBlockFirstSeenByNodeResponse) Descriptor() ([]byte, []int) {
-	return file_vendor_xatu_cbt_clickhouse_int_block_first_seen_by_node_proto_rawDescGZIP(), []int{4}
+// Deprecated: Use GetFctBlockFirstSeenByNodeResponse.ProtoReflect.Descriptor instead.
+func (*GetFctBlockFirstSeenByNodeResponse) Descriptor() ([]byte, []int) {
+	return file_vendor_xatu_cbt_clickhouse_fct_block_first_seen_by_node_proto_rawDescGZIP(), []int{4}
 }
 
-func (x *GetIntBlockFirstSeenByNodeResponse) GetItem() *IntBlockFirstSeenByNode {
+func (x *GetFctBlockFirstSeenByNodeResponse) GetItem() *FctBlockFirstSeenByNode {
 	if x != nil {
 		return x.Item
 	}
 	return nil
 }
 
-var File_vendor_xatu_cbt_clickhouse_int_block_first_seen_by_node_proto protoreflect.FileDescriptor
+var File_vendor_xatu_cbt_clickhouse_fct_block_first_seen_by_node_proto protoreflect.FileDescriptor
 
-var file_vendor_xatu_cbt_clickhouse_int_block_first_seen_by_node_proto_rawDesc = []byte{
+var file_vendor_xatu_cbt_clickhouse_fct_block_first_seen_by_node_proto_rawDesc = []byte{
 	0x0a, 0x3d, 0x76, 0x65, 0x6e, 0x64, 0x6f, 0x72, 0x2f, 0x78, 0x61, 0x74, 0x75, 0x2d, 0x63, 0x62,
-	0x74, 0x2f, 0x63, 0x6c, 0x69, 0x63, 0x6b, 0x68, 0x6f, 0x75, 0x73, 0x65, 0x2f, 0x69, 0x6e, 0x74,
+	0x74, 0x2f, 0x63, 0x6c, 0x69, 0x63, 0x6b, 0x68, 0x6f, 0x75, 0x73, 0x65, 0x2f, 0x66, 0x63, 0x74,
 	0x5f, 0x62, 0x6c, 0x6f, 0x63, 0x6b, 0x5f, 0x66, 0x69, 0x72, 0x73, 0x74, 0x5f, 0x73, 0x65, 0x65,
 	0x6e, 0x5f, 0x62, 0x79, 0x5f, 0x6e, 0x6f, 0x64, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x12,
 	0x03, 0x63, 0x62, 0x74, 0x1a, 0x27, 0x76, 0x65, 0x6e, 0x64, 0x6f, 0x72, 0x2f, 0x78, 0x61, 0x74,
 	0x75, 0x2d, 0x63, 0x62, 0x74, 0x2f, 0x63, 0x6c, 0x69, 0x63, 0x6b, 0x68, 0x6f, 0x75, 0x73, 0x65,
 	0x2f, 0x63, 0x6f, 0x6d, 0x6d, 0x6f, 0x6e, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0x96, 0x07,
-	0x0a, 0x17, 0x49, 0x6e, 0x74, 0x42, 0x6c, 0x6f, 0x63, 0x6b, 0x46, 0x69, 0x72, 0x73, 0x74, 0x53,
+	0x0a, 0x17, 0x46, 0x63, 0x74, 0x42, 0x6c, 0x6f, 0x63, 0x6b, 0x46, 0x69, 0x72, 0x73, 0x74, 0x53,
 	0x65, 0x65, 0x6e, 0x42, 0x79, 0x4e, 0x6f, 0x64, 0x65, 0x12, 0x2a, 0x0a, 0x11, 0x75, 0x70, 0x64,
 	0x61, 0x74, 0x65, 0x64, 0x5f, 0x64, 0x61, 0x74, 0x65, 0x5f, 0x74, 0x69, 0x6d, 0x65, 0x18, 0x0b,
 	0x20, 0x01, 0x28, 0x0d, 0x52, 0x0f, 0x75, 0x70, 0x64, 0x61, 0x74, 0x65, 0x64, 0x44, 0x61, 0x74,
@@ -714,8 +714,8 @@ var file_vendor_xatu_cbt_clickhouse_int_block_first_seen_by_node_proto_rawDesc =
 	0x6e, 0x73, 0x75, 0x73, 0x5f, 0x69, 0x6d, 0x70, 0x6c, 0x65, 0x6d, 0x65, 0x6e, 0x74, 0x61, 0x74,
 	0x69, 0x6f, 0x6e, 0x18, 0x1e, 0x20, 0x01, 0x28, 0x09, 0x52, 0x1b, 0x6d, 0x65, 0x74, 0x61, 0x43,
 	0x6f, 0x6e, 0x73, 0x65, 0x6e, 0x73, 0x75, 0x73, 0x49, 0x6d, 0x70, 0x6c, 0x65, 0x6d, 0x65, 0x6e,
-	0x74, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x22, 0xf4, 0x0a, 0x0a, 0x22, 0x4c, 0x69, 0x73, 0x74, 0x49,
-	0x6e, 0x74, 0x42, 0x6c, 0x6f, 0x63, 0x6b, 0x46, 0x69, 0x72, 0x73, 0x74, 0x53, 0x65, 0x65, 0x6e,
+	0x74, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x22, 0xf4, 0x0a, 0x0a, 0x22, 0x4c, 0x69, 0x73, 0x74, 0x46,
+	0x63, 0x74, 0x42, 0x6c, 0x6f, 0x63, 0x6b, 0x46, 0x69, 0x72, 0x73, 0x74, 0x53, 0x65, 0x65, 0x6e,
 	0x42, 0x79, 0x4e, 0x6f, 0x64, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x42, 0x0a,
 	0x14, 0x73, 0x6c, 0x6f, 0x74, 0x5f, 0x73, 0x74, 0x61, 0x72, 0x74, 0x5f, 0x64, 0x61, 0x74, 0x65,
 	0x5f, 0x74, 0x69, 0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x11, 0x2e, 0x63, 0x62,
@@ -802,40 +802,40 @@ var file_vendor_xatu_cbt_clickhouse_int_block_first_seen_by_node_proto_rawDesc =
 	0x6e, 0x18, 0x16, 0x20, 0x01, 0x28, 0x09, 0x52, 0x09, 0x70, 0x61, 0x67, 0x65, 0x54, 0x6f, 0x6b,
 	0x65, 0x6e, 0x12, 0x19, 0x0a, 0x08, 0x6f, 0x72, 0x64, 0x65, 0x72, 0x5f, 0x62, 0x79, 0x18, 0x17,
 	0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x6f, 0x72, 0x64, 0x65, 0x72, 0x42, 0x79, 0x22, 0xaa, 0x01,
-	0x0a, 0x23, 0x4c, 0x69, 0x73, 0x74, 0x49, 0x6e, 0x74, 0x42, 0x6c, 0x6f, 0x63, 0x6b, 0x46, 0x69,
+	0x0a, 0x23, 0x4c, 0x69, 0x73, 0x74, 0x46, 0x63, 0x74, 0x42, 0x6c, 0x6f, 0x63, 0x6b, 0x46, 0x69,
 	0x72, 0x73, 0x74, 0x53, 0x65, 0x65, 0x6e, 0x42, 0x79, 0x4e, 0x6f, 0x64, 0x65, 0x52, 0x65, 0x73,
-	0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x5b, 0x0a, 0x1c, 0x69, 0x6e, 0x74, 0x5f, 0x62, 0x6c, 0x6f,
+	0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x5b, 0x0a, 0x1c, 0x66, 0x63, 0x74, 0x5f, 0x62, 0x6c, 0x6f,
 	0x63, 0x6b, 0x5f, 0x66, 0x69, 0x72, 0x73, 0x74, 0x5f, 0x73, 0x65, 0x65, 0x6e, 0x5f, 0x62, 0x79,
 	0x5f, 0x6e, 0x6f, 0x64, 0x65, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x1c, 0x2e, 0x63, 0x62,
-	0x74, 0x2e, 0x49, 0x6e, 0x74, 0x42, 0x6c, 0x6f, 0x63, 0x6b, 0x46, 0x69, 0x72, 0x73, 0x74, 0x53,
-	0x65, 0x65, 0x6e, 0x42, 0x79, 0x4e, 0x6f, 0x64, 0x65, 0x52, 0x17, 0x69, 0x6e, 0x74, 0x42, 0x6c,
+	0x74, 0x2e, 0x46, 0x63, 0x74, 0x42, 0x6c, 0x6f, 0x63, 0x6b, 0x46, 0x69, 0x72, 0x73, 0x74, 0x53,
+	0x65, 0x65, 0x6e, 0x42, 0x79, 0x4e, 0x6f, 0x64, 0x65, 0x52, 0x17, 0x66, 0x63, 0x74, 0x42, 0x6c,
 	0x6f, 0x63, 0x6b, 0x46, 0x69, 0x72, 0x73, 0x74, 0x53, 0x65, 0x65, 0x6e, 0x42, 0x79, 0x4e, 0x6f,
 	0x64, 0x65, 0x12, 0x26, 0x0a, 0x0f, 0x6e, 0x65, 0x78, 0x74, 0x5f, 0x70, 0x61, 0x67, 0x65, 0x5f,
 	0x74, 0x6f, 0x6b, 0x65, 0x6e, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0d, 0x6e, 0x65, 0x78,
 	0x74, 0x50, 0x61, 0x67, 0x65, 0x54, 0x6f, 0x6b, 0x65, 0x6e, 0x22, 0x54, 0x0a, 0x21, 0x47, 0x65,
-	0x74, 0x49, 0x6e, 0x74, 0x42, 0x6c, 0x6f, 0x63, 0x6b, 0x46, 0x69, 0x72, 0x73, 0x74, 0x53, 0x65,
+	0x74, 0x46, 0x63, 0x74, 0x42, 0x6c, 0x6f, 0x63, 0x6b, 0x46, 0x69, 0x72, 0x73, 0x74, 0x53, 0x65,
 	0x65, 0x6e, 0x42, 0x79, 0x4e, 0x6f, 0x64, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12,
 	0x2f, 0x0a, 0x14, 0x73, 0x6c, 0x6f, 0x74, 0x5f, 0x73, 0x74, 0x61, 0x72, 0x74, 0x5f, 0x64, 0x61,
 	0x74, 0x65, 0x5f, 0x74, 0x69, 0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0d, 0x52, 0x11, 0x73,
 	0x6c, 0x6f, 0x74, 0x53, 0x74, 0x61, 0x72, 0x74, 0x44, 0x61, 0x74, 0x65, 0x54, 0x69, 0x6d, 0x65,
-	0x22, 0x56, 0x0a, 0x22, 0x47, 0x65, 0x74, 0x49, 0x6e, 0x74, 0x42, 0x6c, 0x6f, 0x63, 0x6b, 0x46,
+	0x22, 0x56, 0x0a, 0x22, 0x47, 0x65, 0x74, 0x46, 0x63, 0x74, 0x42, 0x6c, 0x6f, 0x63, 0x6b, 0x46,
 	0x69, 0x72, 0x73, 0x74, 0x53, 0x65, 0x65, 0x6e, 0x42, 0x79, 0x4e, 0x6f, 0x64, 0x65, 0x52, 0x65,
 	0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x30, 0x0a, 0x04, 0x69, 0x74, 0x65, 0x6d, 0x18, 0x01,
-	0x20, 0x01, 0x28, 0x0b, 0x32, 0x1c, 0x2e, 0x63, 0x62, 0x74, 0x2e, 0x49, 0x6e, 0x74, 0x42, 0x6c,
+	0x20, 0x01, 0x28, 0x0b, 0x32, 0x1c, 0x2e, 0x63, 0x62, 0x74, 0x2e, 0x46, 0x63, 0x74, 0x42, 0x6c,
 	0x6f, 0x63, 0x6b, 0x46, 0x69, 0x72, 0x73, 0x74, 0x53, 0x65, 0x65, 0x6e, 0x42, 0x79, 0x4e, 0x6f,
-	0x64, 0x65, 0x52, 0x04, 0x69, 0x74, 0x65, 0x6d, 0x32, 0xd3, 0x01, 0x0a, 0x1e, 0x49, 0x6e, 0x74,
+	0x64, 0x65, 0x52, 0x04, 0x69, 0x74, 0x65, 0x6d, 0x32, 0xd3, 0x01, 0x0a, 0x1e, 0x46, 0x63, 0x74,
 	0x42, 0x6c, 0x6f, 0x63, 0x6b, 0x46, 0x69, 0x72, 0x73, 0x74, 0x53, 0x65, 0x65, 0x6e, 0x42, 0x79,
 	0x4e, 0x6f, 0x64, 0x65, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x12, 0x59, 0x0a, 0x04, 0x4c,
-	0x69, 0x73, 0x74, 0x12, 0x27, 0x2e, 0x63, 0x62, 0x74, 0x2e, 0x4c, 0x69, 0x73, 0x74, 0x49, 0x6e,
+	0x69, 0x73, 0x74, 0x12, 0x27, 0x2e, 0x63, 0x62, 0x74, 0x2e, 0x4c, 0x69, 0x73, 0x74, 0x46, 0x63,
 	0x74, 0x42, 0x6c, 0x6f, 0x63, 0x6b, 0x46, 0x69, 0x72, 0x73, 0x74, 0x53, 0x65, 0x65, 0x6e, 0x42,
 	0x79, 0x4e, 0x6f, 0x64, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x28, 0x2e, 0x63,
-	0x62, 0x74, 0x2e, 0x4c, 0x69, 0x73, 0x74, 0x49, 0x6e, 0x74, 0x42, 0x6c, 0x6f, 0x63, 0x6b, 0x46,
+	0x62, 0x74, 0x2e, 0x4c, 0x69, 0x73, 0x74, 0x46, 0x63, 0x74, 0x42, 0x6c, 0x6f, 0x63, 0x6b, 0x46,
 	0x69, 0x72, 0x73, 0x74, 0x53, 0x65, 0x65, 0x6e, 0x42, 0x79, 0x4e, 0x6f, 0x64, 0x65, 0x52, 0x65,
 	0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x56, 0x0a, 0x03, 0x47, 0x65, 0x74, 0x12, 0x26, 0x2e,
-	0x63, 0x62, 0x74, 0x2e, 0x47, 0x65, 0x74, 0x49, 0x6e, 0x74, 0x42, 0x6c, 0x6f, 0x63, 0x6b, 0x46,
+	0x63, 0x62, 0x74, 0x2e, 0x47, 0x65, 0x74, 0x46, 0x63, 0x74, 0x42, 0x6c, 0x6f, 0x63, 0x6b, 0x46,
 	0x69, 0x72, 0x73, 0x74, 0x53, 0x65, 0x65, 0x6e, 0x42, 0x79, 0x4e, 0x6f, 0x64, 0x65, 0x52, 0x65,
-	0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x27, 0x2e, 0x63, 0x62, 0x74, 0x2e, 0x47, 0x65, 0x74, 0x49,
-	0x6e, 0x74, 0x42, 0x6c, 0x6f, 0x63, 0x6b, 0x46, 0x69, 0x72, 0x73, 0x74, 0x53, 0x65, 0x65, 0x6e,
+	0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x27, 0x2e, 0x63, 0x62, 0x74, 0x2e, 0x47, 0x65, 0x74, 0x46,
+	0x63, 0x74, 0x42, 0x6c, 0x6f, 0x63, 0x6b, 0x46, 0x69, 0x72, 0x73, 0x74, 0x53, 0x65, 0x65, 0x6e,
 	0x42, 0x79, 0x4e, 0x6f, 0x64, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x42, 0x36,
 	0x5a, 0x34, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x65, 0x74, 0x68,
 	0x70, 0x61, 0x6e, 0x64, 0x61, 0x6f, 0x70, 0x73, 0x2f, 0x78, 0x61, 0x74, 0x75, 0x2d, 0x63, 0x62,
@@ -844,54 +844,54 @@ var file_vendor_xatu_cbt_clickhouse_int_block_first_seen_by_node_proto_rawDesc =
 }
 
 var (
-	file_vendor_xatu_cbt_clickhouse_int_block_first_seen_by_node_proto_rawDescOnce sync.Once
-	file_vendor_xatu_cbt_clickhouse_int_block_first_seen_by_node_proto_rawDescData = file_vendor_xatu_cbt_clickhouse_int_block_first_seen_by_node_proto_rawDesc
+	file_vendor_xatu_cbt_clickhouse_fct_block_first_seen_by_node_proto_rawDescOnce sync.Once
+	file_vendor_xatu_cbt_clickhouse_fct_block_first_seen_by_node_proto_rawDescData = file_vendor_xatu_cbt_clickhouse_fct_block_first_seen_by_node_proto_rawDesc
 )
 
-func file_vendor_xatu_cbt_clickhouse_int_block_first_seen_by_node_proto_rawDescGZIP() []byte {
-	file_vendor_xatu_cbt_clickhouse_int_block_first_seen_by_node_proto_rawDescOnce.Do(func() {
-		file_vendor_xatu_cbt_clickhouse_int_block_first_seen_by_node_proto_rawDescData = protoimpl.X.CompressGZIP(file_vendor_xatu_cbt_clickhouse_int_block_first_seen_by_node_proto_rawDescData)
+func file_vendor_xatu_cbt_clickhouse_fct_block_first_seen_by_node_proto_rawDescGZIP() []byte {
+	file_vendor_xatu_cbt_clickhouse_fct_block_first_seen_by_node_proto_rawDescOnce.Do(func() {
+		file_vendor_xatu_cbt_clickhouse_fct_block_first_seen_by_node_proto_rawDescData = protoimpl.X.CompressGZIP(file_vendor_xatu_cbt_clickhouse_fct_block_first_seen_by_node_proto_rawDescData)
 	})
-	return file_vendor_xatu_cbt_clickhouse_int_block_first_seen_by_node_proto_rawDescData
+	return file_vendor_xatu_cbt_clickhouse_fct_block_first_seen_by_node_proto_rawDescData
 }
 
-var file_vendor_xatu_cbt_clickhouse_int_block_first_seen_by_node_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
-var file_vendor_xatu_cbt_clickhouse_int_block_first_seen_by_node_proto_goTypes = []any{
-	(*IntBlockFirstSeenByNode)(nil),             // 0: cbt.IntBlockFirstSeenByNode
-	(*ListIntBlockFirstSeenByNodeRequest)(nil),  // 1: cbt.ListIntBlockFirstSeenByNodeRequest
-	(*ListIntBlockFirstSeenByNodeResponse)(nil), // 2: cbt.ListIntBlockFirstSeenByNodeResponse
-	(*GetIntBlockFirstSeenByNodeRequest)(nil),   // 3: cbt.GetIntBlockFirstSeenByNodeRequest
-	(*GetIntBlockFirstSeenByNodeResponse)(nil),  // 4: cbt.GetIntBlockFirstSeenByNodeResponse
+var file_vendor_xatu_cbt_clickhouse_fct_block_first_seen_by_node_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
+var file_vendor_xatu_cbt_clickhouse_fct_block_first_seen_by_node_proto_goTypes = []any{
+	(*FctBlockFirstSeenByNode)(nil),             // 0: cbt.FctBlockFirstSeenByNode
+	(*ListFctBlockFirstSeenByNodeRequest)(nil),  // 1: cbt.ListFctBlockFirstSeenByNodeRequest
+	(*ListFctBlockFirstSeenByNodeResponse)(nil), // 2: cbt.ListFctBlockFirstSeenByNodeResponse
+	(*GetFctBlockFirstSeenByNodeRequest)(nil),   // 3: cbt.GetFctBlockFirstSeenByNodeRequest
+	(*GetFctBlockFirstSeenByNodeResponse)(nil),  // 4: cbt.GetFctBlockFirstSeenByNodeResponse
 	(*UInt32Filter)(nil),                        // 5: cbt.UInt32Filter
 	(*StringFilter)(nil),                        // 6: cbt.StringFilter
 }
-var file_vendor_xatu_cbt_clickhouse_int_block_first_seen_by_node_proto_depIdxs = []int32{
-	5,  // 0: cbt.ListIntBlockFirstSeenByNodeRequest.slot_start_date_time:type_name -> cbt.UInt32Filter
-	6,  // 1: cbt.ListIntBlockFirstSeenByNodeRequest.meta_client_name:type_name -> cbt.StringFilter
-	5,  // 2: cbt.ListIntBlockFirstSeenByNodeRequest.updated_date_time:type_name -> cbt.UInt32Filter
-	6,  // 3: cbt.ListIntBlockFirstSeenByNodeRequest.source:type_name -> cbt.StringFilter
-	5,  // 4: cbt.ListIntBlockFirstSeenByNodeRequest.slot:type_name -> cbt.UInt32Filter
-	5,  // 5: cbt.ListIntBlockFirstSeenByNodeRequest.epoch:type_name -> cbt.UInt32Filter
-	5,  // 6: cbt.ListIntBlockFirstSeenByNodeRequest.epoch_start_date_time:type_name -> cbt.UInt32Filter
-	5,  // 7: cbt.ListIntBlockFirstSeenByNodeRequest.seen_slot_start_diff:type_name -> cbt.UInt32Filter
-	6,  // 8: cbt.ListIntBlockFirstSeenByNodeRequest.block_root:type_name -> cbt.StringFilter
-	6,  // 9: cbt.ListIntBlockFirstSeenByNodeRequest.username:type_name -> cbt.StringFilter
-	6,  // 10: cbt.ListIntBlockFirstSeenByNodeRequest.node_id:type_name -> cbt.StringFilter
-	6,  // 11: cbt.ListIntBlockFirstSeenByNodeRequest.classification:type_name -> cbt.StringFilter
-	6,  // 12: cbt.ListIntBlockFirstSeenByNodeRequest.meta_client_version:type_name -> cbt.StringFilter
-	6,  // 13: cbt.ListIntBlockFirstSeenByNodeRequest.meta_client_implementation:type_name -> cbt.StringFilter
-	6,  // 14: cbt.ListIntBlockFirstSeenByNodeRequest.meta_client_geo_city:type_name -> cbt.StringFilter
-	6,  // 15: cbt.ListIntBlockFirstSeenByNodeRequest.meta_client_geo_country:type_name -> cbt.StringFilter
-	6,  // 16: cbt.ListIntBlockFirstSeenByNodeRequest.meta_client_geo_country_code:type_name -> cbt.StringFilter
-	6,  // 17: cbt.ListIntBlockFirstSeenByNodeRequest.meta_client_geo_continent_code:type_name -> cbt.StringFilter
-	6,  // 18: cbt.ListIntBlockFirstSeenByNodeRequest.meta_consensus_version:type_name -> cbt.StringFilter
-	6,  // 19: cbt.ListIntBlockFirstSeenByNodeRequest.meta_consensus_implementation:type_name -> cbt.StringFilter
-	0,  // 20: cbt.ListIntBlockFirstSeenByNodeResponse.int_block_first_seen_by_node:type_name -> cbt.IntBlockFirstSeenByNode
-	0,  // 21: cbt.GetIntBlockFirstSeenByNodeResponse.item:type_name -> cbt.IntBlockFirstSeenByNode
-	1,  // 22: cbt.IntBlockFirstSeenByNodeService.List:input_type -> cbt.ListIntBlockFirstSeenByNodeRequest
-	3,  // 23: cbt.IntBlockFirstSeenByNodeService.Get:input_type -> cbt.GetIntBlockFirstSeenByNodeRequest
-	2,  // 24: cbt.IntBlockFirstSeenByNodeService.List:output_type -> cbt.ListIntBlockFirstSeenByNodeResponse
-	4,  // 25: cbt.IntBlockFirstSeenByNodeService.Get:output_type -> cbt.GetIntBlockFirstSeenByNodeResponse
+var file_vendor_xatu_cbt_clickhouse_fct_block_first_seen_by_node_proto_depIdxs = []int32{
+	5,  // 0: cbt.ListFctBlockFirstSeenByNodeRequest.slot_start_date_time:type_name -> cbt.UInt32Filter
+	6,  // 1: cbt.ListFctBlockFirstSeenByNodeRequest.meta_client_name:type_name -> cbt.StringFilter
+	5,  // 2: cbt.ListFctBlockFirstSeenByNodeRequest.updated_date_time:type_name -> cbt.UInt32Filter
+	6,  // 3: cbt.ListFctBlockFirstSeenByNodeRequest.source:type_name -> cbt.StringFilter
+	5,  // 4: cbt.ListFctBlockFirstSeenByNodeRequest.slot:type_name -> cbt.UInt32Filter
+	5,  // 5: cbt.ListFctBlockFirstSeenByNodeRequest.epoch:type_name -> cbt.UInt32Filter
+	5,  // 6: cbt.ListFctBlockFirstSeenByNodeRequest.epoch_start_date_time:type_name -> cbt.UInt32Filter
+	5,  // 7: cbt.ListFctBlockFirstSeenByNodeRequest.seen_slot_start_diff:type_name -> cbt.UInt32Filter
+	6,  // 8: cbt.ListFctBlockFirstSeenByNodeRequest.block_root:type_name -> cbt.StringFilter
+	6,  // 9: cbt.ListFctBlockFirstSeenByNodeRequest.username:type_name -> cbt.StringFilter
+	6,  // 10: cbt.ListFctBlockFirstSeenByNodeRequest.node_id:type_name -> cbt.StringFilter
+	6,  // 11: cbt.ListFctBlockFirstSeenByNodeRequest.classification:type_name -> cbt.StringFilter
+	6,  // 12: cbt.ListFctBlockFirstSeenByNodeRequest.meta_client_version:type_name -> cbt.StringFilter
+	6,  // 13: cbt.ListFctBlockFirstSeenByNodeRequest.meta_client_implementation:type_name -> cbt.StringFilter
+	6,  // 14: cbt.ListFctBlockFirstSeenByNodeRequest.meta_client_geo_city:type_name -> cbt.StringFilter
+	6,  // 15: cbt.ListFctBlockFirstSeenByNodeRequest.meta_client_geo_country:type_name -> cbt.StringFilter
+	6,  // 16: cbt.ListFctBlockFirstSeenByNodeRequest.meta_client_geo_country_code:type_name -> cbt.StringFilter
+	6,  // 17: cbt.ListFctBlockFirstSeenByNodeRequest.meta_client_geo_continent_code:type_name -> cbt.StringFilter
+	6,  // 18: cbt.ListFctBlockFirstSeenByNodeRequest.meta_consensus_version:type_name -> cbt.StringFilter
+	6,  // 19: cbt.ListFctBlockFirstSeenByNodeRequest.meta_consensus_implementation:type_name -> cbt.StringFilter
+	0,  // 20: cbt.ListFctBlockFirstSeenByNodeResponse.fct_block_first_seen_by_node:type_name -> cbt.FctBlockFirstSeenByNode
+	0,  // 21: cbt.GetFctBlockFirstSeenByNodeResponse.item:type_name -> cbt.FctBlockFirstSeenByNode
+	1,  // 22: cbt.FctBlockFirstSeenByNodeService.List:input_type -> cbt.ListFctBlockFirstSeenByNodeRequest
+	3,  // 23: cbt.FctBlockFirstSeenByNodeService.Get:input_type -> cbt.GetFctBlockFirstSeenByNodeRequest
+	2,  // 24: cbt.FctBlockFirstSeenByNodeService.List:output_type -> cbt.ListFctBlockFirstSeenByNodeResponse
+	4,  // 25: cbt.FctBlockFirstSeenByNodeService.Get:output_type -> cbt.GetFctBlockFirstSeenByNodeResponse
 	24, // [24:26] is the sub-list for method output_type
 	22, // [22:24] is the sub-list for method input_type
 	22, // [22:22] is the sub-list for extension type_name
@@ -899,15 +899,15 @@ var file_vendor_xatu_cbt_clickhouse_int_block_first_seen_by_node_proto_depIdxs =
 	0,  // [0:22] is the sub-list for field type_name
 }
 
-func init() { file_vendor_xatu_cbt_clickhouse_int_block_first_seen_by_node_proto_init() }
-func file_vendor_xatu_cbt_clickhouse_int_block_first_seen_by_node_proto_init() {
-	if File_vendor_xatu_cbt_clickhouse_int_block_first_seen_by_node_proto != nil {
+func init() { file_vendor_xatu_cbt_clickhouse_fct_block_first_seen_by_node_proto_init() }
+func file_vendor_xatu_cbt_clickhouse_fct_block_first_seen_by_node_proto_init() {
+	if File_vendor_xatu_cbt_clickhouse_fct_block_first_seen_by_node_proto != nil {
 		return
 	}
 	file_vendor_xatu_cbt_clickhouse_common_proto_init()
 	if !protoimpl.UnsafeEnabled {
-		file_vendor_xatu_cbt_clickhouse_int_block_first_seen_by_node_proto_msgTypes[0].Exporter = func(v any, i int) any {
-			switch v := v.(*IntBlockFirstSeenByNode); i {
+		file_vendor_xatu_cbt_clickhouse_fct_block_first_seen_by_node_proto_msgTypes[0].Exporter = func(v any, i int) any {
+			switch v := v.(*FctBlockFirstSeenByNode); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -918,8 +918,8 @@ func file_vendor_xatu_cbt_clickhouse_int_block_first_seen_by_node_proto_init() {
 				return nil
 			}
 		}
-		file_vendor_xatu_cbt_clickhouse_int_block_first_seen_by_node_proto_msgTypes[1].Exporter = func(v any, i int) any {
-			switch v := v.(*ListIntBlockFirstSeenByNodeRequest); i {
+		file_vendor_xatu_cbt_clickhouse_fct_block_first_seen_by_node_proto_msgTypes[1].Exporter = func(v any, i int) any {
+			switch v := v.(*ListFctBlockFirstSeenByNodeRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -930,8 +930,8 @@ func file_vendor_xatu_cbt_clickhouse_int_block_first_seen_by_node_proto_init() {
 				return nil
 			}
 		}
-		file_vendor_xatu_cbt_clickhouse_int_block_first_seen_by_node_proto_msgTypes[2].Exporter = func(v any, i int) any {
-			switch v := v.(*ListIntBlockFirstSeenByNodeResponse); i {
+		file_vendor_xatu_cbt_clickhouse_fct_block_first_seen_by_node_proto_msgTypes[2].Exporter = func(v any, i int) any {
+			switch v := v.(*ListFctBlockFirstSeenByNodeResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -942,8 +942,8 @@ func file_vendor_xatu_cbt_clickhouse_int_block_first_seen_by_node_proto_init() {
 				return nil
 			}
 		}
-		file_vendor_xatu_cbt_clickhouse_int_block_first_seen_by_node_proto_msgTypes[3].Exporter = func(v any, i int) any {
-			switch v := v.(*GetIntBlockFirstSeenByNodeRequest); i {
+		file_vendor_xatu_cbt_clickhouse_fct_block_first_seen_by_node_proto_msgTypes[3].Exporter = func(v any, i int) any {
+			switch v := v.(*GetFctBlockFirstSeenByNodeRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -954,8 +954,8 @@ func file_vendor_xatu_cbt_clickhouse_int_block_first_seen_by_node_proto_init() {
 				return nil
 			}
 		}
-		file_vendor_xatu_cbt_clickhouse_int_block_first_seen_by_node_proto_msgTypes[4].Exporter = func(v any, i int) any {
-			switch v := v.(*GetIntBlockFirstSeenByNodeResponse); i {
+		file_vendor_xatu_cbt_clickhouse_fct_block_first_seen_by_node_proto_msgTypes[4].Exporter = func(v any, i int) any {
+			switch v := v.(*GetFctBlockFirstSeenByNodeResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -971,18 +971,18 @@ func file_vendor_xatu_cbt_clickhouse_int_block_first_seen_by_node_proto_init() {
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: file_vendor_xatu_cbt_clickhouse_int_block_first_seen_by_node_proto_rawDesc,
+			RawDescriptor: file_vendor_xatu_cbt_clickhouse_fct_block_first_seen_by_node_proto_rawDesc,
 			NumEnums:      0,
 			NumMessages:   5,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
-		GoTypes:           file_vendor_xatu_cbt_clickhouse_int_block_first_seen_by_node_proto_goTypes,
-		DependencyIndexes: file_vendor_xatu_cbt_clickhouse_int_block_first_seen_by_node_proto_depIdxs,
-		MessageInfos:      file_vendor_xatu_cbt_clickhouse_int_block_first_seen_by_node_proto_msgTypes,
+		GoTypes:           file_vendor_xatu_cbt_clickhouse_fct_block_first_seen_by_node_proto_goTypes,
+		DependencyIndexes: file_vendor_xatu_cbt_clickhouse_fct_block_first_seen_by_node_proto_depIdxs,
+		MessageInfos:      file_vendor_xatu_cbt_clickhouse_fct_block_first_seen_by_node_proto_msgTypes,
 	}.Build()
-	File_vendor_xatu_cbt_clickhouse_int_block_first_seen_by_node_proto = out.File
-	file_vendor_xatu_cbt_clickhouse_int_block_first_seen_by_node_proto_rawDesc = nil
-	file_vendor_xatu_cbt_clickhouse_int_block_first_seen_by_node_proto_goTypes = nil
-	file_vendor_xatu_cbt_clickhouse_int_block_first_seen_by_node_proto_depIdxs = nil
+	File_vendor_xatu_cbt_clickhouse_fct_block_first_seen_by_node_proto = out.File
+	file_vendor_xatu_cbt_clickhouse_fct_block_first_seen_by_node_proto_rawDesc = nil
+	file_vendor_xatu_cbt_clickhouse_fct_block_first_seen_by_node_proto_goTypes = nil
+	file_vendor_xatu_cbt_clickhouse_fct_block_first_seen_by_node_proto_depIdxs = nil
 }

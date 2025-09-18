@@ -22,7 +22,7 @@ func TestHandleBeaconBlockTiming(t *testing.T) {
 		network        string
 		slot           string
 		queryParams    map[string]string
-		mockResponse   *cbtproto.ListIntBlockFirstSeenByNodeResponse
+		mockResponse   *cbtproto.ListFctBlockFirstSeenByNodeResponse
 		mockError      error
 		expectedStatus int
 		validateBody   func(t *testing.T, body []byte)
@@ -31,8 +31,8 @@ func TestHandleBeaconBlockTiming(t *testing.T) {
 			name:    "successful request",
 			network: "mainnet",
 			slot:    "123456",
-			mockResponse: &cbtproto.ListIntBlockFirstSeenByNodeResponse{
-				IntBlockFirstSeenByNode: []*cbtproto.IntBlockFirstSeenByNode{
+			mockResponse: &cbtproto.ListFctBlockFirstSeenByNodeResponse{
+				FctBlockFirstSeenByNode: []*cbtproto.FctBlockFirstSeenByNode{
 					{
 						NodeId:                     "node1",
 						Username:                   "user1",
@@ -114,8 +114,8 @@ func TestHandleBeaconBlockTiming(t *testing.T) {
 				"page_size":  "50",
 				"page_token": "token123",
 			},
-			mockResponse: &cbtproto.ListIntBlockFirstSeenByNodeResponse{
-				IntBlockFirstSeenByNode: []*cbtproto.IntBlockFirstSeenByNode{},
+			mockResponse: &cbtproto.ListFctBlockFirstSeenByNodeResponse{
+				FctBlockFirstSeenByNode: []*cbtproto.FctBlockFirstSeenByNode{},
 				NextPageToken:           "",
 			},
 			expectedStatus: http.StatusOK,
@@ -141,7 +141,7 @@ func TestHandleBeaconBlockTiming(t *testing.T) {
 			// Set up mock expectations if not an error case
 			if tt.mockResponse != nil {
 				mockClient.EXPECT().
-					ListIntBlockFirstSeenByNode(gomock.Any(), gomock.Any(), gomock.Any()).
+					ListFctBlockFirstSeenByNode(gomock.Any(), gomock.Any(), gomock.Any()).
 					Return(tt.mockResponse, tt.mockError)
 			}
 

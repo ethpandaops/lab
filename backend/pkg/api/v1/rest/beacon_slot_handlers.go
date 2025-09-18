@@ -47,7 +47,7 @@ func (r *PublicRouter) handleBeaconBlockTiming(w http.ResponseWriter, req *http.
 	queryParams := req.URL.Query()
 
 	// Build gRPC request with required slot filter
-	grpcReq := &cbtproto.ListIntBlockFirstSeenByNodeRequest{
+	grpcReq := &cbtproto.ListFctBlockFirstSeenByNodeRequest{
 		// Set slot filter to get data for specific slot
 		Slot: &cbtproto.UInt32Filter{
 			Filter: &cbtproto.UInt32Filter_Eq{Eq: uint32(slot)},
@@ -90,7 +90,7 @@ func (r *PublicRouter) handleBeaconBlockTiming(w http.ResponseWriter, req *http.
 	)
 
 	// Call the gRPC service
-	grpcResp, err := r.xatuCBTClient.ListIntBlockFirstSeenByNode(ctxWithMeta, grpcReq)
+	grpcResp, err := r.xatuCBTClient.ListFctBlockFirstSeenByNode(ctxWithMeta, grpcReq)
 	if err != nil {
 		r.log.WithError(err).WithFields(logrus.Fields{
 			"network": network,
@@ -102,9 +102,9 @@ func (r *PublicRouter) handleBeaconBlockTiming(w http.ResponseWriter, req *http.
 	}
 
 	// Transform CBT types to public API types
-	nodes := make([]*apiv1.BlockTimingNode, 0, len(grpcResp.IntBlockFirstSeenByNode))
+	nodes := make([]*apiv1.BlockTimingNode, 0, len(grpcResp.FctBlockFirstSeenByNode))
 
-	for _, n := range grpcResp.IntBlockFirstSeenByNode {
+	for _, n := range grpcResp.FctBlockFirstSeenByNode {
 		nodes = append(nodes, &apiv1.BlockTimingNode{
 			NodeId:     n.NodeId,
 			Username:   n.Username,

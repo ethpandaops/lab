@@ -7,7 +7,7 @@ import "vendor/xatu-cbt/clickhouse/common.proto";
 option go_package = "github.com/ethpandaops/xatu-cbt/pkg/proto/clickhouse";
 // When the block was first seen on the network by a sentry node
 
-message IntBlockFirstSeenByNode {
+message FctBlockFirstSeenByNode {
   // Timestamp when the record was last updated
   uint32 updated_date_time = 11;
   // Source of the event
@@ -50,8 +50,8 @@ message IntBlockFirstSeenByNode {
   string meta_consensus_implementation = 30;
 }
 
-// ListIntBlockFirstSeenByNodeRequest is the request message for listing int_block_first_seen_by_node records
-message ListIntBlockFirstSeenByNodeRequest {
+// ListFctBlockFirstSeenByNodeRequest is the request message for listing fct_block_first_seen_by_node records
+message ListFctBlockFirstSeenByNodeRequest {
   // Filter by slot_start_date_time (PRIMARY KEY - required)
   UInt32Filter slot_start_date_time = 1;
 
@@ -95,11 +95,11 @@ message ListIntBlockFirstSeenByNodeRequest {
   // Filter by meta_consensus_implementation (optional)
   StringFilter meta_consensus_implementation = 20;
 
-  // The maximum number of int_block_first_seen_by_node to return.
+  // The maximum number of fct_block_first_seen_by_node to return.
   // If unspecified, at most 100 items will be returned.
   // The maximum value is 1000; values above 1000 will be coerced to 1000.
   int32 page_size = 21;
-  // A page token, received from a previous `ListIntBlockFirstSeenByNode` call.
+  // A page token, received from a previous `ListFctBlockFirstSeenByNode` call.
   // Provide this to retrieve the subsequent page.
   string page_token = 22;
   // The order of results. Format: comma-separated list of fields.
@@ -108,30 +108,30 @@ message ListIntBlockFirstSeenByNodeRequest {
   string order_by = 23;
 }
 
-// ListIntBlockFirstSeenByNodeResponse is the response message for listing int_block_first_seen_by_node records
-message ListIntBlockFirstSeenByNodeResponse {
-  // The list of int_block_first_seen_by_node.
-  repeated IntBlockFirstSeenByNode int_block_first_seen_by_node = 1;
+// ListFctBlockFirstSeenByNodeResponse is the response message for listing fct_block_first_seen_by_node records
+message ListFctBlockFirstSeenByNodeResponse {
+  // The list of fct_block_first_seen_by_node.
+  repeated FctBlockFirstSeenByNode fct_block_first_seen_by_node = 1;
   // A token, which can be sent as `page_token` to retrieve the next page.
   // If this field is omitted, there are no subsequent pages.
   string next_page_token = 2;
 }
 
-// GetIntBlockFirstSeenByNodeRequest is the request message for getting a single int_block_first_seen_by_node record by primary key
-message GetIntBlockFirstSeenByNodeRequest {
+// GetFctBlockFirstSeenByNodeRequest is the request message for getting a single fct_block_first_seen_by_node record by primary key
+message GetFctBlockFirstSeenByNodeRequest {
   // The wall clock time when the slot started
   uint32 slot_start_date_time = 1; // Primary key (required)
 }
 
-// GetIntBlockFirstSeenByNodeResponse is the response message for getting a single int_block_first_seen_by_node record
-message GetIntBlockFirstSeenByNodeResponse {
-  IntBlockFirstSeenByNode item = 1;
+// GetFctBlockFirstSeenByNodeResponse is the response message for getting a single fct_block_first_seen_by_node record
+message GetFctBlockFirstSeenByNodeResponse {
+  FctBlockFirstSeenByNode item = 1;
 }
 
-// IntBlockFirstSeenByNodeService provides RPC methods for querying int_block_first_seen_by_node data
-service IntBlockFirstSeenByNodeService {
-  // List returns paginated int_block_first_seen_by_node records
-  rpc List(ListIntBlockFirstSeenByNodeRequest) returns (ListIntBlockFirstSeenByNodeResponse);
-  // Get returns a single int_block_first_seen_by_node record by primary key
-  rpc Get(GetIntBlockFirstSeenByNodeRequest) returns (GetIntBlockFirstSeenByNodeResponse);
+// FctBlockFirstSeenByNodeService provides RPC methods for querying fct_block_first_seen_by_node data
+service FctBlockFirstSeenByNodeService {
+  // List returns paginated fct_block_first_seen_by_node records
+  rpc List(ListFctBlockFirstSeenByNodeRequest) returns (ListFctBlockFirstSeenByNodeResponse);
+  // Get returns a single fct_block_first_seen_by_node record by primary key
+  rpc Get(GetFctBlockFirstSeenByNodeRequest) returns (GetFctBlockFirstSeenByNodeResponse);
 }

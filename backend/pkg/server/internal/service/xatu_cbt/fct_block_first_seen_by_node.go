@@ -11,17 +11,17 @@ import (
 )
 
 const (
-	MethodListIntBlockFirstSeenByNode = "ListIntBlockFirstSeenByNode"
+	MethodListFctBlockFirstSeenByNode = "ListFctBlockFirstSeenByNode"
 )
 
-// ListIntBlockFirstSeenByNode returns block timing data from the int_block_first_seen_by_node table.
-func (x *XatuCBT) ListIntBlockFirstSeenByNode(
+// ListFctBlockFirstSeenByNode returns block timing data from the fct_block_first_seen_by_node table.
+func (x *XatuCBT) ListFctBlockFirstSeenByNode(
 	ctx context.Context,
-	req *cbtproto.ListIntBlockFirstSeenByNodeRequest,
-) (resp *cbtproto.ListIntBlockFirstSeenByNodeResponse, err error) {
+	req *cbtproto.ListFctBlockFirstSeenByNodeRequest,
+) (resp *cbtproto.ListFctBlockFirstSeenByNodeResponse, err error) {
 	var (
 		network string
-		nodes   []*cbtproto.IntBlockFirstSeenByNode
+		nodes   []*cbtproto.FctBlockFirstSeenByNode
 	)
 
 	defer func() {
@@ -30,7 +30,7 @@ func (x *XatuCBT) ListIntBlockFirstSeenByNode(
 			status = StatusError
 		}
 
-		x.requestsTotal.WithLabelValues(MethodListIntBlockFirstSeenByNode, network, status).Inc()
+		x.requestsTotal.WithLabelValues(MethodListFctBlockFirstSeenByNode, network, status).Inc()
 	}()
 
 	// Get network and clickhouse client.
@@ -41,25 +41,25 @@ func (x *XatuCBT) ListIntBlockFirstSeenByNode(
 
 	network = client.Network()
 
-	timer := prometheus.NewTimer(x.requestDuration.WithLabelValues(MethodListIntBlockFirstSeenByNode, network))
+	timer := prometheus.NewTimer(x.requestDuration.WithLabelValues(MethodListFctBlockFirstSeenByNode, network))
 	defer timer.ObserveDuration()
 
 	var (
-		cacheKey       = x.generateCacheKey("int_block_first_seen_by_node", network, req)
-		cachedResponse = &cbtproto.ListIntBlockFirstSeenByNodeResponse{}
+		cacheKey       = x.generateCacheKey("fct_block_first_seen_by_node", network, req)
+		cachedResponse = &cbtproto.ListFctBlockFirstSeenByNodeResponse{}
 	)
 
 	// Check cache first.
 	if found, _ := x.tryCache(cacheKey, cachedResponse); found {
-		x.cacheHitsTotal.WithLabelValues(MethodListIntBlockFirstSeenByNode, network).Inc()
+		x.cacheHitsTotal.WithLabelValues(MethodListFctBlockFirstSeenByNode, network).Inc()
 
 		return cachedResponse, nil
 	}
 
-	x.cacheMissesTotal.WithLabelValues(MethodListIntBlockFirstSeenByNode, network).Inc()
+	x.cacheMissesTotal.WithLabelValues(MethodListFctBlockFirstSeenByNode, network).Inc()
 
 	// Use our clickhouse-proto-gen to handle building for us.
-	sqlQuery, err := cbtproto.BuildListIntBlockFirstSeenByNodeQuery(
+	sqlQuery, err := cbtproto.BuildListFctBlockFirstSeenByNodeQuery(
 		req,
 		cbtproto.WithFinal(),
 		cbtproto.WithDatabase(network),
@@ -69,7 +69,7 @@ func (x *XatuCBT) ListIntBlockFirstSeenByNode(
 	}
 
 	if err = client.QueryWithScanner(ctx, sqlQuery.Query, func(scanner clickhouse.RowScanner) error {
-		node, scanErr := scanIntBlockFirstSeenByNode(scanner)
+		node, scanErr := scanFctBlockFirstSeenByNode(scanner)
 		if scanErr != nil {
 			x.log.WithError(scanErr).Error("Failed to scan row")
 
@@ -80,7 +80,7 @@ func (x *XatuCBT) ListIntBlockFirstSeenByNode(
 
 		return nil
 	}, sqlQuery.Args...); err != nil {
-		return nil, fmt.Errorf("failed to query int_block_first_seen_by_node: %w", err)
+		return nil, fmt.Errorf("failed to query fct_block_first_seen_by_node: %w", err)
 	}
 
 	// Calculate pagination.
@@ -96,8 +96,8 @@ func (x *XatuCBT) ListIntBlockFirstSeenByNode(
 	}
 
 	//nolint:gosec // conversion safe.
-	rsp := &cbtproto.ListIntBlockFirstSeenByNodeResponse{
-		IntBlockFirstSeenByNode: nodes,
+	rsp := &cbtproto.ListFctBlockFirstSeenByNodeResponse{
+		FctBlockFirstSeenByNode: nodes,
 		NextPageToken: cbtproto.CalculateNextPageToken(
 			currentOffset,
 			uint32(pageSize),
@@ -111,12 +111,12 @@ func (x *XatuCBT) ListIntBlockFirstSeenByNode(
 	return rsp, nil
 }
 
-// scanIntBlockFirstSeenByNode scans a single int_block_first_seen_by_node row from the database.
-func scanIntBlockFirstSeenByNode(
+// scanFctBlockFirstSeenByNode scans a single fct_block_first_seen_by_node row from the database.
+func scanFctBlockFirstSeenByNode(
 	scanner clickhouse.RowScanner,
-) (*cbtproto.IntBlockFirstSeenByNode, error) {
+) (*cbtproto.FctBlockFirstSeenByNode, error) {
 	var (
-		node                               cbtproto.IntBlockFirstSeenByNode
+		node                               cbtproto.FctBlockFirstSeenByNode
 		updatedDateTime, slotStartDateTime time.Time
 		epochStartDateTime                 time.Time
 	)
