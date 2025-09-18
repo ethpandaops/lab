@@ -1,0 +1,353 @@
+package rest
+
+import (
+	"bytes"
+	"encoding/json"
+	"fmt"
+	"net/http"
+	"strconv"
+	"strings"
+	"time"
+
+	apiv1 "github.com/ethpandaops/lab/backend/pkg/api/v1/proto"
+	"github.com/ethpandaops/lab/backend/pkg/api/v1/rest/middleware"
+	configpb "github.com/ethpandaops/lab/backend/pkg/server/proto/config"
+	xatu_cbt_pb "github.com/ethpandaops/lab/backend/pkg/server/proto/xatu_cbt"
+	cbtproto "github.com/ethpandaops/xatu-cbt/pkg/proto/clickhouse"
+	"github.com/gorilla/mux"
+	"github.com/sirupsen/logrus"
+)
+
+// PublicRouter handles public REST API v1 requests for all Lab endpoints.
+type PublicRouter struct {
+	log           logrus.FieldLogger
+	configClient  configpb.ConfigServiceClient
+	xatuCBTClient xatu_cbt_pb.XatuCBTClient
+}
+
+// NewPublicRouter creates a new public REST router for API v1.
+func NewPublicRouter(
+	log logrus.FieldLogger,
+	configClient configpb.ConfigServiceClient,
+	xatuCBTClient xatu_cbt_pb.XatuCBTClient,
+) *PublicRouter {
+	return &PublicRouter{
+		log:           log.WithField("component", "public_rest_router_v1"),
+		configClient:  configClient,
+		xatuCBTClient: xatuCBTClient,
+	}
+}
+
+// RegisterRoutes registers all public REST v1 endpoints on the provided router.
+func (r *PublicRouter) RegisterRoutes(router *mux.Router) {
+	v1 := router.PathPrefix("/api/v1").Subrouter()
+
+	// Register all routes from the centralized configuration
+	for _, route := range r.GetRoutes() {
+		// Build middleware chain for this route
+		chain := middleware.DefaultChain(r.log, route.Path)
+
+		// Apply caching, then wrap with the middleware chain
+		handler := middleware.WithCaching(route.Handler, route.Cache)
+		handler = chain.Then(handler)
+
+		v1.HandleFunc(route.Path, handler).Methods(route.Methods...)
+	}
+}
+
+// HandleGRPCError properly converts gRPC errors to appropriate HTTP responses
+func (r *PublicRouter) HandleGRPCError(w http.ResponseWriter, req *http.Request, err error) {
+	handler := NewErrorHandler(r.log)
+	handler.HandleGRPCError(w, req, err)
+}
+
+// WriteJSONResponse safely writes a JSON response, handling encoding errors properly.
+func (r *PublicRouter) WriteJSONResponse(w http.ResponseWriter, req *http.Request, statusCode int, response interface{}) {
+	// Buffer the response first to catch encoding errors.
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		// Encoding failed - we haven't written anything yet, so we can send an error
+		r.log.WithError(err).WithField("type", response).Error("Failed to encode response")
+		r.HandleGRPCError(w, req, err)
+
+		return
+	}
+
+	// Set headers only after successful encoding.
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(statusCode)
+
+	// Write the buffered response
+	if _, err := w.Write(buf.Bytes()); err != nil {
+		// Headers sent at this point, client disconnected most likely.
+		r.log.WithError(err).Debug("Failed to write response")
+	}
+}
+
+// WriteJSONResponseOK is a convenience method for 200 OK responses.
+func (r *PublicRouter) WriteJSONResponseOK(w http.ResponseWriter, req *http.Request, response interface{}) {
+	r.WriteJSONResponse(w, req, http.StatusOK, response)
+}
+
+// WriteJSONResponseError safely writes an error response with proper encoding error handling.
+func (r *PublicRouter) WriteJSONResponseError(w http.ResponseWriter, req *http.Request, statusCode int, message string) {
+	// Get request ID from context for correlation
+	requestID := middleware.GetRequestID(req.Context())
+
+	response := &apiv1.ErrorResponse{
+		Error:     http.StatusText(statusCode),
+		Message:   message,
+		Code:      int32(statusCode), //nolint:gosec // statusCode is from HTTP constants
+		RequestId: requestID,
+	}
+
+	// Use the safe WriteJSONResponse method
+	r.WriteJSONResponse(w, req, statusCode, response)
+}
+
+// parseStringFilter parses Stripe-style bracket notation into StringFilter.
+// Supports formats like: field[operator]=value or field=value (defaults to eq).
+// Returns the filter, the base field name, and any error.
+func parseStringFilter(key, value string) (*cbtproto.StringFilter, string, error) {
+	// Empty value means no filter
+	if value == "" {
+		return nil, "", nil
+	}
+
+	// Check for bracket notation: field[operator]
+	if idx := strings.Index(key, "["); idx > 0 {
+		if end := strings.Index(key, "]"); end > idx {
+			fieldName := key[:idx]
+			operator := key[idx+1 : end]
+
+			switch operator {
+			case "eq":
+				return &cbtproto.StringFilter{
+					Filter: &cbtproto.StringFilter_Eq{Eq: value},
+				}, fieldName, nil
+
+			case "ne":
+				return &cbtproto.StringFilter{
+					Filter: &cbtproto.StringFilter_Ne{Ne: value},
+				}, fieldName, nil
+
+			case "contains":
+				return &cbtproto.StringFilter{
+					Filter: &cbtproto.StringFilter_Contains{Contains: value},
+				}, fieldName, nil
+
+			case "starts_with":
+				return &cbtproto.StringFilter{
+					Filter: &cbtproto.StringFilter_StartsWith{StartsWith: value},
+				}, fieldName, nil
+
+			case "ends_with":
+				return &cbtproto.StringFilter{
+					Filter: &cbtproto.StringFilter_EndsWith{EndsWith: value},
+				}, fieldName, nil
+
+			case "like":
+				return &cbtproto.StringFilter{
+					Filter: &cbtproto.StringFilter_Like{Like: value},
+				}, fieldName, nil
+
+			case "not_like":
+				return &cbtproto.StringFilter{
+					Filter: &cbtproto.StringFilter_NotLike{NotLike: value},
+				}, fieldName, nil
+
+			case "in":
+				values := strings.Split(value, ",")
+
+				return &cbtproto.StringFilter{
+					Filter: &cbtproto.StringFilter_In{
+						In: &cbtproto.StringList{Values: values},
+					},
+				}, fieldName, nil
+
+			case "not_in":
+				values := strings.Split(value, ",")
+
+				return &cbtproto.StringFilter{
+					Filter: &cbtproto.StringFilter_NotIn{
+						NotIn: &cbtproto.StringList{Values: values},
+					},
+				}, fieldName, nil
+
+			default:
+				return nil, "", fmt.Errorf("unknown filter operator: %s", operator)
+			}
+		}
+	}
+
+	// No bracket notation = default to equality
+	return &cbtproto.StringFilter{
+		Filter: &cbtproto.StringFilter_Eq{Eq: value},
+	}, key, nil
+}
+
+// parseTimeParam parses time parameter from various formats
+func parseTimeParam(value string) (int64, error) {
+	// Try parsing as Unix timestamp
+	if timestamp, err := strconv.ParseInt(value, 10, 64); err == nil {
+		return timestamp, nil
+	}
+
+	// Try parsing as RFC3339
+	if t, err := time.Parse(time.RFC3339, value); err == nil {
+		return t.Unix(), nil
+	}
+
+	// Try parsing as date only (YYYY-MM-DD)
+	if t, err := time.Parse("2006-01-02", value); err == nil {
+		return t.Unix(), nil
+	}
+
+	// Try parsing relative time (e.g., "24h", "7d")
+	if strings.HasSuffix(value, "h") {
+		if hours, err := strconv.Atoi(strings.TrimSuffix(value, "h")); err == nil {
+			return time.Now().Add(-time.Duration(hours) * time.Hour).Unix(), nil
+		}
+	}
+
+	if strings.HasSuffix(value, "d") {
+		if days, err := strconv.Atoi(strings.TrimSuffix(value, "d")); err == nil {
+			return time.Now().Add(-time.Duration(days) * 24 * time.Hour).Unix(), nil
+		}
+	}
+
+	return 0, fmt.Errorf("invalid time format: %s", value)
+}
+
+// formatUnixTime formats Unix timestamp to string
+func formatUnixTime(timestamp uint32) string {
+	if timestamp == 0 {
+		return ""
+	}
+
+	return time.Unix(int64(timestamp), 0).Format(time.RFC3339)
+}
+
+// convertConfigToAPIProto converts the internal config proto to public API proto
+func convertConfigToAPIProto(config *configpb.FrontendConfig) *apiv1.FrontendConfig {
+	if config == nil {
+		return nil
+	}
+
+	result := &apiv1.FrontendConfig{}
+
+	// Convert Ethereum config
+	if config.Ethereum != nil {
+		ethereum := &apiv1.EthereumConfig{
+			Networks: make(map[string]*apiv1.NetworkConfig),
+		}
+
+		for name, network := range config.Ethereum.Networks {
+			networkConfig := &apiv1.NetworkConfig{
+				Name:        network.Name,
+				Status:      network.Status,
+				ChainId:     network.ChainId,
+				Description: network.Description,
+				GenesisTime: network.GenesisTime,
+				LastUpdated: network.LastUpdated,
+			}
+
+			// Add service URLs if present
+			if len(network.ServiceUrls) > 0 {
+				networkConfig.ServiceUrls = network.ServiceUrls
+			}
+
+			// Add forks if present
+			if network.Forks != nil && network.Forks.Consensus != nil && network.Forks.Consensus.Electra != nil {
+				networkConfig.Forks = &apiv1.ForkConfig{
+					Consensus: &apiv1.ConsensusForks{
+						Electra: &apiv1.ForkInfo{
+							Epoch:             network.Forks.Consensus.Electra.Epoch,
+							MinClientVersions: network.Forks.Consensus.Electra.MinClientVersions,
+						},
+					},
+				}
+			}
+
+			ethereum.Networks[name] = networkConfig
+		}
+
+		result.Ethereum = ethereum
+	}
+
+	// Convert Modules config
+	if config.Modules != nil {
+		modules := &apiv1.ModulesConfig{}
+
+		// Beacon Chain Timings module
+		if config.Modules.BeaconChainTimings != nil {
+			bct := &apiv1.BeaconChainTimingsModule{
+				Networks:   config.Modules.BeaconChainTimings.Networks,
+				PathPrefix: config.Modules.BeaconChainTimings.PathPrefix,
+			}
+
+			if config.Modules.BeaconChainTimings.TimeWindows != nil {
+				timeWindows := make([]*apiv1.TimeWindow, 0, len(config.Modules.BeaconChainTimings.TimeWindows))
+				for _, tw := range config.Modules.BeaconChainTimings.TimeWindows {
+					timeWindows = append(timeWindows, &apiv1.TimeWindow{
+						File:  tw.File,
+						Step:  tw.Step,
+						Range: tw.Range,
+						Label: tw.Label,
+					})
+				}
+
+				bct.TimeWindows = timeWindows
+			}
+
+			modules.BeaconChainTimings = bct
+		}
+
+		// Beacon module
+		if config.Modules.Beacon != nil {
+			beacon := &apiv1.BeaconModule{
+				Enabled:     config.Modules.Beacon.Enabled,
+				Description: config.Modules.Beacon.Description,
+				PathPrefix:  config.Modules.Beacon.PathPrefix,
+			}
+
+			if len(config.Modules.Beacon.Networks) > 0 {
+				beaconNetworks := make(map[string]*apiv1.BeaconNetworkConfig)
+				for name, netCfg := range config.Modules.Beacon.Networks {
+					beaconNetworks[name] = &apiv1.BeaconNetworkConfig{
+						HeadLagSlots: netCfg.HeadLagSlots,
+						BacklogDays:  netCfg.BacklogDays,
+					}
+				}
+
+				beacon.Networks = beaconNetworks
+			}
+
+			modules.Beacon = beacon
+		}
+
+		result.Modules = modules
+	}
+
+	// Convert Experiments config
+	if config.Experiments != nil {
+		experiments := &apiv1.ExperimentsConfig{}
+
+		if config.Experiments.Experiments != nil {
+			expConfigs := make([]*apiv1.ExperimentConfig, 0, len(config.Experiments.Experiments))
+			for _, exp := range config.Experiments.Experiments {
+				expConfigs = append(expConfigs, &apiv1.ExperimentConfig{
+					Id:       exp.Id,
+					Enabled:  exp.Enabled,
+					Networks: exp.Networks,
+				})
+			}
+
+			experiments.Experiments = expConfigs
+		}
+
+		result.Experiments = experiments
+	}
+
+	return result
+}

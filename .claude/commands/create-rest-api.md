@@ -75,6 +75,15 @@ backend/pkg/server/internal/service/xatu_cbt/
 ├── service.go (register method)
 └── [cbt_table_name].go (new file for implementation)
      └── List[CbtTableName]() → returns vendored CBT types directly
+
+backend/pkg/api/v1/rest/
+├── handler.go (RegisterRoutes method - central route registration)
+├── routes.go (centralized route configuration)
+├── middleware/
+│   └── cache.go (caching middleware and cache presets)
+├── [resource]_handlers.go (new file with handler methods)
+│   └── handle[ResourceName]() → transforms CBT to public API types
+└── [resource]_handlers_test.go (tests for the handler)
 ```
 
 ### Create Service Method
@@ -302,7 +311,7 @@ func (x *XatuCBT) calculateSlotStartDateTime(
 
 ### Create Handler File
 
-Create `backend/pkg/api/v1/rest/[resource]_handlers.go`:
+Create `backend/pkg/api/v1/rest/[resource]_handlers.go` (e.g., `beacon_slot_handlers.go`, `nodes_handlers.go`):
 
 ```go
 package rest
@@ -315,83 +324,116 @@ import (
     
     "github.com/gorilla/mux"
     apiv1 "github.com/ethpandaops/lab/backend/pkg/api/v1/proto"
-    cbtproto "xatu-cbt/clickhouse"
-    "connectrpc.com/connect"
+    cbtproto "github.com/ethpandaops/xatu-cbt/pkg/proto/clickhouse"
+    "google.golang.org/grpc/metadata"
+    "github.com/sirupsen/logrus"
 )
 
 // handle[ResourceName] handles GET /api/v1/{network}/[resource/path]
 // This is where CBT → Public API transformation happens
-func (s *Server) handle[ResourceName](w http.ResponseWriter, r *http.Request) {
-    vars := mux.Vars(r)
-    network := vars["network"]
+// Note: CORS and caching are handled by middleware, not in the handler
+func (r *PublicRouter) handle[ResourceName](w http.ResponseWriter, req *http.Request) {
+    var (
+        ctx     = req.Context()
+        vars    = mux.Vars(req)
+        network = vars["network"]
+    )
     
     // 1. Validate network
-    if err := s.validateNetwork(r.Context(), network); err != nil {
-        writeError(w, http.StatusBadRequest, "invalid network: %v", err)
+    if network == "" {
+        r.writeError(w, http.StatusBadRequest, "Network parameter is required")
         return
     }
     
     // 2. Parse query parameters and path parameters
     // Example for slot in path:
     slotStr := vars["slot"]
-    slot, err := strconv.ParseUint(slotStr, 10, 64)
+    slot, err := strconv.ParseUint(slotStr, 10, 32)
     if err != nil {
-        writeError(w, http.StatusBadRequest, "invalid slot: %v", err)
+        r.writeError(w, http.StatusBadRequest, "Invalid slot number")
         return
     }
     
+    // Parse query parameters
+    queryParams := req.URL.Query()
+    
     // 3. Build CBT request
-    cbtReq := &cbtproto.List[CbtTableName]Request{
-        // Map query params to CBT request fields
-        Filters: []*cbtproto.Filter{
-            {
-                Field:    "slot",
-                Operator: cbtproto.FilterOperator_EQUALS,
-                Value:    fmt.Sprintf("%d", slot),
-            },
+    grpcReq := &cbtproto.List[CbtTableName]Request{
+        // Set filters based on path/query parameters
+        Slot: &cbtproto.UInt32Filter{
+            Filter: &cbtproto.UInt32Filter_Eq{Eq: uint32(slot)},
         },
-        Limit: parseLimit(r, 1000),
-        PageToken: r.URL.Query().Get("page_token"),
+        // Add other filters from query params as needed
     }
     
-    // 4. Call gRPC service (returns CBT types)
-    req := connect.NewRequest(cbtReq)
-    req.Header().Set("X-Network", network)
+    // Apply pagination from query parameters
+    if v := queryParams.Get("page_size"); v != "" {
+        if pageSize, err := strconv.ParseInt(v, 10, 32); err == nil {
+            grpcReq.PageSize = int32(pageSize)
+        }
+    }
+    if v := queryParams.Get("page_token"); v != "" {
+        grpcReq.PageToken = v
+    }
     
-    resp, err := s.xatuCBTClient.List[CbtTableName](r.Context(), req)
+    r.log.WithFields(logrus.Fields{
+        "network": network,
+        "slot":    slot,
+    }).Debug("REST v1: [ResourceName]")
+    
+    // 4. Set network in gRPC metadata and call service
+    ctxWithMeta := metadata.NewOutgoingContext(
+        ctx,
+        metadata.New(map[string]string{"network": network}),
+    )
+    
+    // Call the gRPC service
+    grpcResp, err := r.xatuCBTClient.List[CbtTableName](ctxWithMeta, grpcReq)
     if err != nil {
-        s.log.WithError(err).Error("failed to query CBT table")
-        writeError(w, http.StatusInternalServerError, "failed to fetch data")
+        r.log.WithError(err).WithFields(logrus.Fields{
+            "network": network,
+            "slot":    slot,
+        }).Error("Failed to query CBT table")
+        r.handleError(w, err)
         return
     }
     
     // 5. TRANSFORM CBT types → Public API types
-    apiResponse := &apiv1.[ResourceName]Response{
-        Items: make([]*apiv1.[ResourceName], 0, len(resp.Msg.[CbtTableName]s)),
+    items := make([]*apiv1.[ResourceName], 0, len(grpcResp.[CbtTableName]s))
+    
+    for _, cbtItem := range grpcResp.[CbtTableName]s {
+        apiItem := transformCBTToAPI[ResourceName](cbtItem)
+        items = append(items, apiItem)
+    }
+    
+    // Build applied filters map for metadata
+    appliedFilters := make(map[string]string)
+    appliedFilters["slot"] = slotStr
+    
+    for k, v := range queryParams {
+        if v[0] != "" && k != "page_size" && k != "page_token" {
+            appliedFilters[k] = v[0]
+        }
+    }
+    
+    response := &apiv1.[ResourceName]Response{
+        Items: items,
         Pagination: &apiv1.PaginationMetadata{
-            PageSize:      int32(len(resp.Msg.[CbtTableName]s)),
-            PageToken:     r.URL.Query().Get("page_token"),
-            NextPageToken: resp.Msg.NextPageToken,
+            PageSize:      grpcReq.PageSize,
+            NextPageToken: grpcResp.NextPageToken,
         },
         Filters: &apiv1.FilterMetadata{
-            Network: network,
-            AppliedFilters: extractAppliedFilters(r),
+            Network:        network,
+            AppliedFilters: appliedFilters,
         },
     }
     
-    // Transform each CBT item to public API item
-    for _, cbtItem := range resp.Msg.[CbtTableName]s {
-        apiItem := transformCBTToAPI[ResourceName](cbtItem)
-        apiResponse.Items = append(apiResponse.Items, apiItem)
-    }
-    
-    // 6. Set cache headers
-    setCacheHeaders(w, 30, 45) // 30s browser, 45s CDN
+    // 6. Set content type header (cache headers are handled by middleware)
+    w.Header().Set("Content-Type", "application/json")
     
     // 7. Write JSON response
-    w.Header().Set("Content-Type", "application/json")
-    if err := json.NewEncoder(w).Encode(apiResponse); err != nil {
-        s.log.WithError(err).Error("failed to encode response")
+    if err := json.NewEncoder(w).Encode(response); err != nil {
+        r.log.WithError(err).Error("Failed to encode response")
     }
 }
 
@@ -419,47 +461,47 @@ func transformCBTToAPI[ResourceName](cbt *cbtproto.[CbtTableName]) *apiv1.[Resou
     }
 }
 
-// Helper functions
-func parseLimit(r *http.Request, defaultLimit int) int32 {
-    limitStr := r.URL.Query().Get("limit")
-    if limitStr == "" {
-        return int32(defaultLimit)
-    }
-    limit, err := strconv.Atoi(limitStr)
-    if err != nil || limit <= 0 {
-        return int32(defaultLimit)
-    }
-    if limit > 10000 {
-        return 10000
-    }
-    return int32(limit)
-}
-
-func setCacheHeaders(w http.ResponseWriter, browserTTL, cdnTTL int) {
-    w.Header().Set("Cache-Control", fmt.Sprintf("public, max-age=%d, s-maxage=%d", browserTTL, cdnTTL))
-}
-
+// Helper functions (most are now in handler.go as methods on PublicRouter)
 func formatTimestamp(ms int64) string {
     return time.Unix(0, ms*int64(time.Millisecond)).UTC().Format(time.RFC3339)
 }
 ```
 
-## Step 6: Add Route to Router
+## Step 6: Add Route to Centralized Registry
 
-Update `backend/pkg/api/v1/rest/public_router.go`:
+Update `backend/pkg/api/v1/rest/routes.go` in the `GetRoutes` method:
 
 ```go
-func (s *Server) setupPublicRoutes(r *mux.Router) {
-    // Add new route
-    r.HandleFunc("/api/v1/{network}/[resource/path]", s.handle[ResourceName]).Methods("GET")
-    
-    // Example with path parameters:
-    // r.HandleFunc("/api/v1/{network}/beacon/slot/{slot}/block/timing", s.handleBeaconBlockTiming).Methods("GET")
-    
-    // Example with query parameters only:
-    // r.HandleFunc("/api/v1/{network}/validators", s.handleValidators).Methods("GET")
+import (
+    "net/http"
+    "github.com/ethpandaops/lab/backend/pkg/api/v1/rest/middleware"
+)
+
+// GetRoutes returns all route configurations for the API
+func (r *PublicRouter) GetRoutes() []RouteConfig {
+    return []RouteConfig{
+        // ... existing routes ...
+        
+        // Add your new route with appropriate cache configuration
+        {
+            Path:        "/{network}/[resource/path]",
+            Handler:     r.handle[ResourceName],
+            Methods:     []string{http.MethodGet, http.MethodOptions},
+            Cache:       middleware.CacheRealtime, // Choose appropriate cache preset
+            Description: "[Description of what this endpoint does]",
+        },
+    }
 }
 ```
+
+### Available Cache Presets (from middleware package):
+- `middleware.CacheRealtime`: 30s browser, 45s CDN (frequently changing data)
+- `middleware.CacheNearRealtime`: 2m browser, 5m CDN (updates every few minutes)
+- `middleware.CacheConfigEndpoint`: 1m browser, 5m CDN (configuration data)
+- `middleware.CachePrivate`: Private, 30s browser (user-specific data)
+- `middleware.CacheNone`: No caching
+
+Note: The route is automatically registered in `handler.go`'s `RegisterRoutes` method which iterates through all routes and applies caching middleware.
 
 ## Step 7: Test the Endpoint
 
@@ -471,7 +513,6 @@ Create `backend/pkg/api/v1/rest/[resource]_handlers_test.go`:
 package rest
 
 import (
-    "context"
     "encoding/json"
     "net/http"
     "net/http/httptest"
@@ -482,8 +523,8 @@ import (
 )
 
 func TestHandle[ResourceName](t *testing.T) {
-    // Setup test server
-    s := setupTestServer(t)
+    // Setup test router
+    r := setupTestRouter(t)
     
     tests := []struct {
         name           string
@@ -519,7 +560,7 @@ func TestHandle[ResourceName](t *testing.T) {
             req := httptest.NewRequest("GET", tt.path+tt.queryParams, nil)
             w := httptest.NewRecorder()
             
-            s.router.ServeHTTP(w, req)
+            r.router.ServeHTTP(w, req)
             
             require.Equal(t, tt.expectedStatus, w.Code)
             
@@ -604,9 +645,9 @@ curl "https://lab.ethpandaops.com/api/v1/mainnet/[resource/path]?limit=10"
 - [ ] **Service layer implemented**: Created `[cbt_table_name].go` with List method
 - [ ] **Service registered**: Method added to service struct
 - [ ] **gRPC wrapper added**: Connect-RPC wrapper in `xatu_cbt.go`
-- [ ] **REST handler created**: Handler with CBT→API transformation
-- [ ] **Route registered**: Added to public router
-- [ ] **Integration tests written**: Test coverage for success and error cases
+- [ ] **REST handler created**: New handler file `[resource]_handlers.go` with CBT→API transformation (no cache/CORS handling)
+- [ ] **Route registered**: Added to `GetRoutes` method in `routes.go` with appropriate cache configuration
+- [ ] **Integration tests written**: Test file `[resource]_handlers_test.go` with coverage
 - [ ] **Manual testing completed**: Verified with curl commands
 - [ ] **Documentation updated**: API docs with examples
 
@@ -641,8 +682,11 @@ Group D (After C):
 4. **Metadata Context**: Network passed via metadata through service layers
 5. **Query Builders**: Use vendored CBT query builders, don't write raw SQL
 6. **Primary Key Enrichment**: Calculate and inject PKs at gRPC layer for efficient queries
-7. **Error Handling**: Graceful degradation, structured error responses
-8. **Caching Strategy**: Recent data gets short TTL, historical data gets longer TTL
+7. **Error Handling**: Graceful degradation, use `PublicRouter.handleError()` and `writeError()`
+8. **Centralized Caching**: Cache configuration defined in `routes.go`, applied by middleware
+9. **Handler Organization**: Each resource gets its own handler file (e.g., `beacon_slot_handlers.go`, `nodes_handlers.go`)
+10. **CORS Support**: Handled centrally by middleware, not in individual handlers
+11. **Separation of Concerns**: Handlers focus on business logic, middleware handles cross-cutting concerns
 
 ## Common Patterns
 
@@ -684,7 +728,7 @@ grep -r "BuildList.*Query" vendor/xatu-cbt/
 ```
 
 ### Issue: Network not found in metadata
-**Solution**: Ensure REST handler sets X-Network header when calling gRPC
+**Solution**: Ensure REST handler passes network via `metadata.NewOutgoingContext()`
 
 ### Issue: Transformation losing data
 **Solution**: Review field mapping in transformCBTToAPI function
@@ -694,9 +738,14 @@ grep -r "BuildList.*Query" vendor/xatu-cbt/
 
 ## Important Notes
 
+- **Handler files**: Each resource/domain gets its own handler file, methods are on `PublicRouter` struct
+- **Routes registration**: Routes defined in `routes.go`, automatically registered in `handler.go`'s `RegisterRoutes` method
+- **Cache configuration**: Choose appropriate cache preset in `routes.go` based on data characteristics
+- **Handler simplicity**: Handlers should NOT handle CORS or cache headers - these are handled by middleware
 - **Check table primary keys**: Before implementing, check if the CBT table has a timestamp-based PK that can be calculated from request params. If yes, implement PK enrichment at gRPC layer for massive performance gains
 - Always handle nil pointers when transforming nested structures
-- Use appropriate HTTP status codes (400 for client errors, 500 for server errors)
+- Use `PublicRouter.handleError()` for error handling which provides consistent error responses
+- Use `PublicRouter.writeError()` for writing error responses
 - Include correlation IDs in error logs for debugging
 - Monitor query performance and adjust indexes if needed
 - Consider implementing request-level caching for expensive queries
