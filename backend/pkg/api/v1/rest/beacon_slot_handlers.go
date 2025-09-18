@@ -1,14 +1,12 @@
 package rest
 
 import (
-	"encoding/json"
 	"net/http"
 	"strconv"
 
 	apiv1 "github.com/ethpandaops/lab/backend/pkg/api/v1/proto"
 	cbtproto "github.com/ethpandaops/xatu-cbt/pkg/proto/clickhouse"
 	"github.com/gorilla/mux"
-	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc/metadata"
 )
 
@@ -21,24 +19,17 @@ func (r *PublicRouter) handleBeaconBlockTiming(w http.ResponseWriter, req *http.
 		slotStr = vars["slot"]
 	)
 
-	// Handle CORS preflight.
-	if req.Method == methodOptions {
-		w.WriteHeader(http.StatusOK)
-
-		return
-	}
-
 	// Parse and validate slot number
 	slot, err := strconv.ParseUint(slotStr, 10, 32)
 	if err != nil {
-		r.writeError(w, http.StatusBadRequest, "Invalid slot number")
+		r.WriteJSONResponseError(w, req, http.StatusBadRequest, "Invalid slot number")
 
 		return
 	}
 
 	// Validate network
 	if network == "" {
-		r.writeError(w, http.StatusBadRequest, "Network parameter is required")
+		r.WriteJSONResponseError(w, req, http.StatusBadRequest, "Network parameter is required")
 
 		return
 	}
@@ -78,11 +69,6 @@ func (r *PublicRouter) handleBeaconBlockTiming(w http.ResponseWriter, req *http.
 		grpcReq.PageToken = v
 	}
 
-	r.log.WithFields(logrus.Fields{
-		"network": network,
-		"slot":    slot,
-	}).Debug("REST v1: BeaconBlockTiming")
-
 	// Set network in gRPC metadata
 	ctxWithMeta := metadata.NewOutgoingContext(
 		ctx,
@@ -92,11 +78,7 @@ func (r *PublicRouter) handleBeaconBlockTiming(w http.ResponseWriter, req *http.
 	// Call the gRPC service
 	grpcResp, err := r.xatuCBTClient.ListFctBlockFirstSeenByNode(ctxWithMeta, grpcReq)
 	if err != nil {
-		r.log.WithError(err).WithFields(logrus.Fields{
-			"network": network,
-			"slot":    slot,
-		}).Error("Failed to get block timing")
-		r.handleError(w, err)
+		r.HandleGRPCError(w, req, err)
 
 		return
 	}
@@ -133,7 +115,8 @@ func (r *PublicRouter) handleBeaconBlockTiming(w http.ResponseWriter, req *http.
 		}
 	}
 
-	response := &apiv1.BlockTimingResponse{
+	// Write response
+	r.WriteJSONResponseOK(w, req, &apiv1.BlockTimingResponse{
 		Nodes: nodes,
 		Pagination: &apiv1.PaginationMetadata{
 			PageSize:      grpcReq.PageSize,
@@ -143,20 +126,5 @@ func (r *PublicRouter) handleBeaconBlockTiming(w http.ResponseWriter, req *http.
 			Network:        network,
 			AppliedFilters: appliedFilters,
 		},
-	}
-
-	// Set headers
-	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Vary", "Accept-Encoding")
-
-	// Cache headers optimized for block timing data
-	// max-age=30: Browser cache for 30 seconds
-	// s-maxage=45: CDN cache slightly longer
-	// stale-while-revalidate=30: Serve stale content while fetching updates
-	w.Header().Set("Cache-Control", "public, max-age=30, s-maxage=45, stale-while-revalidate=30")
-
-	// Write response
-	if err := json.NewEncoder(w).Encode(response); err != nil {
-		r.log.WithError(err).Error("Failed to encode block timing response")
-	}
+	})
 }
