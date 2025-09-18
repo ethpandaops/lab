@@ -23,9 +23,9 @@ func (x *XatuCBT) GetDataAvailability(
 	var network string
 
 	defer func() {
-		status := "success"
+		status := StatusSuccess
 		if err != nil {
-			status = "error"
+			status = StatusError
 		}
 
 		if x.requestsTotal != nil {

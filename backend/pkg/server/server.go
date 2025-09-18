@@ -141,7 +141,7 @@ func (s *Service) Start(ctx context.Context) error {
 	grpcServices := []grpc.Service{
 		grpc.NewBeaconChainTimings(s.log, bctService),
 		grpc.NewBeaconSlotsHandler(s.log, bsService),
-		grpc.NewXatuCBT(s.log, s.xatuCBTService),
+		grpc.NewXatuCBT(s.log, s.xatuCBTService, s.ethereumClient),
 		grpc.NewCartographoorService(s.log, s.cartographoorService, s.ethereumClient),
 		grpc.NewConfigService(s.log, s.ethereumClient, s.cartographoorService, bctService, bsService, s.experimentsService),
 	}

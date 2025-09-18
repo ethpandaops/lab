@@ -1512,3 +1512,123 @@ export class GetExperimentConfigResponse extends Message<GetExperimentConfigResp
   }
 }
 
+/**
+ * BlockTimingResponse is the v1 API response for block timing data.
+ *
+ * @generated from message api.v1.BlockTimingResponse
+ */
+export class BlockTimingResponse extends Message<BlockTimingResponse> {
+  /**
+   * @generated from field: repeated api.v1.BlockTimingNode nodes = 1;
+   */
+  nodes: BlockTimingNode[] = [];
+
+  /**
+   * @generated from field: api.v1.PaginationMetadata pagination = 2;
+   */
+  pagination?: PaginationMetadata;
+
+  /**
+   * @generated from field: api.v1.FilterMetadata filters = 3;
+   */
+  filters?: FilterMetadata;
+
+  constructor(data?: PartialMessage<BlockTimingResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.v1.BlockTimingResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "nodes", kind: "message", T: BlockTimingNode, repeated: true },
+    { no: 2, name: "pagination", kind: "message", T: PaginationMetadata },
+    { no: 3, name: "filters", kind: "message", T: FilterMetadata },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): BlockTimingResponse {
+    return new BlockTimingResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): BlockTimingResponse {
+    return new BlockTimingResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): BlockTimingResponse {
+    return new BlockTimingResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: BlockTimingResponse | PlainMessage<BlockTimingResponse> | undefined, b: BlockTimingResponse | PlainMessage<BlockTimingResponse> | undefined): boolean {
+    return proto3.util.equals(BlockTimingResponse, a, b);
+  }
+}
+
+/**
+ * BlockTimingNode represents a node that observed a block.
+ *
+ * @generated from message api.v1.BlockTimingNode
+ */
+export class BlockTimingNode extends Message<BlockTimingNode> {
+  /**
+   * @generated from field: string node_id = 1;
+   */
+  nodeId = "";
+
+  /**
+   * @generated from field: string username = 2;
+   */
+  username = "";
+
+  /**
+   * milliseconds from slot start
+   *
+   * @generated from field: int64 seen_diff_ms = 3;
+   */
+  seenDiffMs = protoInt64.zero;
+
+  /**
+   * reuse existing GeoInfo type
+   *
+   * @generated from field: api.v1.GeoInfo geo = 4;
+   */
+  geo?: GeoInfo;
+
+  /**
+   * reuse existing ClientInfo type
+   *
+   * @generated from field: api.v1.ClientInfo client = 5;
+   */
+  client?: ClientInfo;
+
+  constructor(data?: PartialMessage<BlockTimingNode>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.v1.BlockTimingNode";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "node_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "username", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "seen_diff_ms", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
+    { no: 4, name: "geo", kind: "message", T: GeoInfo },
+    { no: 5, name: "client", kind: "message", T: ClientInfo },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): BlockTimingNode {
+    return new BlockTimingNode().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): BlockTimingNode {
+    return new BlockTimingNode().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): BlockTimingNode {
+    return new BlockTimingNode().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: BlockTimingNode | PlainMessage<BlockTimingNode> | undefined, b: BlockTimingNode | PlainMessage<BlockTimingNode> | undefined): boolean {
+    return proto3.util.equals(BlockTimingNode, a, b);
+  }
+}
+
