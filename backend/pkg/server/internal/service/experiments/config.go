@@ -9,9 +9,10 @@ type Config []ExperimentConfig
 
 // ExperimentConfig represents a single experiment configuration
 type ExperimentConfig struct {
-	ID       string   `yaml:"id"`
-	Enabled  bool     `yaml:"enabled"`
-	Networks []string `yaml:"networks"`
+	ID       string                 `yaml:"id"`
+	Enabled  bool                   `yaml:"enabled"`
+	Networks []string               `yaml:"networks"`
+	Config   map[string]interface{} `yaml:"config,omitempty"` // Experiment-specific configuration
 }
 
 // Validate checks if the configuration is valid

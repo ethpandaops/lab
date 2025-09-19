@@ -252,11 +252,6 @@ func convertConfigToAPIProto(config *configpb.FrontendConfig) *apiv1.FrontendCon
 				LastUpdated: network.LastUpdated,
 			}
 
-			// Add service URLs if present
-			if len(network.ServiceUrls) > 0 {
-				networkConfig.ServiceUrls = network.ServiceUrls
-			}
-
 			// Add forks if present
 			if network.Forks != nil && network.Forks.Consensus != nil && network.Forks.Consensus.Electra != nil {
 				networkConfig.Forks = &apiv1.ForkConfig{
@@ -275,78 +270,41 @@ func convertConfigToAPIProto(config *configpb.FrontendConfig) *apiv1.FrontendCon
 		result.Ethereum = ethereum
 	}
 
-	// Convert Modules config
-	if config.Modules != nil {
-		modules := &apiv1.ModulesConfig{}
-
-		// Beacon Chain Timings module
-		if config.Modules.BeaconChainTimings != nil {
-			bct := &apiv1.BeaconChainTimingsModule{
-				Networks:   config.Modules.BeaconChainTimings.Networks,
-				PathPrefix: config.Modules.BeaconChainTimings.PathPrefix,
-			}
-
-			if config.Modules.BeaconChainTimings.TimeWindows != nil {
-				timeWindows := make([]*apiv1.TimeWindow, 0, len(config.Modules.BeaconChainTimings.TimeWindows))
-				for _, tw := range config.Modules.BeaconChainTimings.TimeWindows {
-					timeWindows = append(timeWindows, &apiv1.TimeWindow{
-						File:  tw.File,
-						Step:  tw.Step,
-						Range: tw.Range,
-						Label: tw.Label,
-					})
-				}
-
-				bct.TimeWindows = timeWindows
-			}
-
-			modules.BeaconChainTimings = bct
-		}
-
-		// Beacon module
-		if config.Modules.Beacon != nil {
-			beacon := &apiv1.BeaconModule{
-				Enabled:     config.Modules.Beacon.Enabled,
-				Description: config.Modules.Beacon.Description,
-				PathPrefix:  config.Modules.Beacon.PathPrefix,
-			}
-
-			if len(config.Modules.Beacon.Networks) > 0 {
-				beaconNetworks := make(map[string]*apiv1.BeaconNetworkConfig)
-				for name, netCfg := range config.Modules.Beacon.Networks {
-					beaconNetworks[name] = &apiv1.BeaconNetworkConfig{
-						HeadLagSlots: netCfg.HeadLagSlots,
-						BacklogDays:  netCfg.BacklogDays,
-					}
-				}
-
-				beacon.Networks = beaconNetworks
-			}
-
-			modules.Beacon = beacon
-		}
-
-		result.Modules = modules
-	}
-
 	// Convert Experiments config
 	if config.Experiments != nil {
-		experiments := &apiv1.ExperimentsConfig{}
-
-		if config.Experiments.Experiments != nil {
-			expConfigs := make([]*apiv1.ExperimentConfig, 0, len(config.Experiments.Experiments))
-			for _, exp := range config.Experiments.Experiments {
-				expConfigs = append(expConfigs, &apiv1.ExperimentConfig{
-					Id:       exp.Id,
-					Enabled:  exp.Enabled,
-					Networks: exp.Networks,
-				})
+		expConfigs := make([]*apiv1.ExperimentConfig, 0, len(config.Experiments))
+		for _, exp := range config.Experiments {
+			expConfig := &apiv1.ExperimentConfig{
+				Id:       exp.Id,
+				Enabled:  exp.Enabled,
+				Networks: exp.Networks,
 			}
 
-			experiments.Experiments = expConfigs
+			// Include config if present
+			if exp.Config != nil {
+				expConfig.Config = exp.Config
+			}
+
+			// Include data availability if present
+			if exp.DataAvailability != nil {
+				expConfig.DataAvailability = make(map[string]*apiv1.ExperimentDataAvailability)
+				for network, da := range exp.DataAvailability {
+					expConfig.DataAvailability[network] = &apiv1.ExperimentDataAvailability{
+						AvailableFromTimestamp:  da.AvailableFromTimestamp,
+						AvailableUntilTimestamp: da.AvailableUntilTimestamp,
+						MinSlot:                 da.MinSlot,
+						MaxSlot:                 da.MaxSlot,
+						SafeSlot:                da.SafeSlot,
+						HeadSlot:                da.HeadSlot,
+						HasData:                 da.HasData,
+					}
+				}
+			}
+
+			expConfigs = append(expConfigs, expConfig)
 		}
 
-		result.Experiments = experiments
+		result.Experiments = expConfigs
 	}
 
 	return result

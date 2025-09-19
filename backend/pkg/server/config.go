@@ -7,34 +7,23 @@ import (
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/geolocation"
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/storage"
 	"github.com/ethpandaops/lab/backend/pkg/server/internal/grpc"
-	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/beacon_chain_timings"
-	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/beacon_slots"
 	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/cartographoor"
 	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/experiments"
 	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/xatu_cbt"
 )
 
 type Config struct {
-	LogLevel      string                   `yaml:"logLevel" default:"info"`
-	Server        *grpc.Config             `yaml:"grpc"`
-	Storage       *storage.Config          `yaml:"storage"`
-	Modules       map[string]*ModuleConfig `yaml:"modules"`
-	Cache         *cache.Config            `yaml:"cache"`
-	Geolocation   *geolocation.Config      `yaml:"geolocation"`
-	XatuCBT       *xatu_cbt.Config         `yaml:"xatu_cbt"`
-	Cartographoor *cartographoor.Config    `yaml:"cartographoor"`
-	Experiments   *experiments.Config      `yaml:"experiments"`
-}
-
-type ModuleConfig struct {
-	BeaconChainTimings *beacon_chain_timings.Config `yaml:"beacon_chain_timings"`
-	BeaconSlots        *beacon_slots.Config         `yaml:"beacon_slots"`
+	LogLevel      string                `yaml:"logLevel" default:"info"`
+	Server        *grpc.Config          `yaml:"grpc"`
+	Storage       *storage.Config       `yaml:"storage"`
+	Cache         *cache.Config         `yaml:"cache"`
+	Geolocation   *geolocation.Config   `yaml:"geolocation"`
+	XatuCBT       *xatu_cbt.Config      `yaml:"xatu_cbt"`
+	Cartographoor *cartographoor.Config `yaml:"cartographoor"`
+	Experiments   *experiments.Config   `yaml:"experiments"`
 }
 
 func (x *Config) Validate() error {
-	if x.Modules == nil {
-		return fmt.Errorf("modules config is required")
-	}
 
 	if x.Geolocation == nil {
 		return fmt.Errorf("geolocation config is required")

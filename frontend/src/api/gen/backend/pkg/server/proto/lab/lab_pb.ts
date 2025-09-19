@@ -98,11 +98,6 @@ export class FrontendConfig_Config extends Message<FrontendConfig_Config> {
  */
 export class FrontendConfig_Modules extends Message<FrontendConfig_Modules> {
   /**
-   * @generated from field: lab.FrontendConfig.BeaconChainTimingsModule beacon_chain_timings = 1;
-   */
-  beaconChainTimings?: FrontendConfig_BeaconChainTimingsModule;
-
-  /**
    * @generated from field: lab.FrontendConfig.BeaconModule beacon = 3;
    */
   beacon?: FrontendConfig_BeaconModule;
@@ -115,7 +110,6 @@ export class FrontendConfig_Modules extends Message<FrontendConfig_Modules> {
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "lab.FrontendConfig.Modules";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "beacon_chain_timings", kind: "message", T: FrontendConfig_BeaconChainTimingsModule },
     { no: 3, name: "beacon", kind: "message", T: FrontendConfig_BeaconModule },
   ]);
 
@@ -133,63 +127,6 @@ export class FrontendConfig_Modules extends Message<FrontendConfig_Modules> {
 
   static equals(a: FrontendConfig_Modules | PlainMessage<FrontendConfig_Modules> | undefined, b: FrontendConfig_Modules | PlainMessage<FrontendConfig_Modules> | undefined): boolean {
     return proto3.util.equals(FrontendConfig_Modules, a, b);
-  }
-}
-
-/**
- * BeaconChainTimingsModule represents the beacon chain timings module configuration
- *
- * @generated from message lab.FrontendConfig.BeaconChainTimingsModule
- */
-export class FrontendConfig_BeaconChainTimingsModule extends Message<FrontendConfig_BeaconChainTimingsModule> {
-  /**
-   * @generated from field: repeated string networks = 1;
-   */
-  networks: string[] = [];
-
-  /**
-   * @generated from field: repeated lab.FrontendConfig.TimeWindow time_windows = 2;
-   */
-  timeWindows: FrontendConfig_TimeWindow[] = [];
-
-  /**
-   * @generated from field: string path_prefix = 3;
-   */
-  pathPrefix = "";
-
-  /**
-   * @generated from field: bool enabled = 4;
-   */
-  enabled = false;
-
-  constructor(data?: PartialMessage<FrontendConfig_BeaconChainTimingsModule>) {
-    super();
-    proto3.util.initPartial(data, this);
-  }
-
-  static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "lab.FrontendConfig.BeaconChainTimingsModule";
-  static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "networks", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
-    { no: 2, name: "time_windows", kind: "message", T: FrontendConfig_TimeWindow, repeated: true },
-    { no: 3, name: "path_prefix", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 4, name: "enabled", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
-  ]);
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): FrontendConfig_BeaconChainTimingsModule {
-    return new FrontendConfig_BeaconChainTimingsModule().fromBinary(bytes, options);
-  }
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): FrontendConfig_BeaconChainTimingsModule {
-    return new FrontendConfig_BeaconChainTimingsModule().fromJson(jsonValue, options);
-  }
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): FrontendConfig_BeaconChainTimingsModule {
-    return new FrontendConfig_BeaconChainTimingsModule().fromJsonString(jsonString, options);
-  }
-
-  static equals(a: FrontendConfig_BeaconChainTimingsModule | PlainMessage<FrontendConfig_BeaconChainTimingsModule> | undefined, b: FrontendConfig_BeaconChainTimingsModule | PlainMessage<FrontendConfig_BeaconChainTimingsModule> | undefined): boolean {
-    return proto3.util.equals(FrontendConfig_BeaconChainTimingsModule, a, b);
   }
 }
 
@@ -247,63 +184,6 @@ export class FrontendConfig_BeaconModule extends Message<FrontendConfig_BeaconMo
 
   static equals(a: FrontendConfig_BeaconModule | PlainMessage<FrontendConfig_BeaconModule> | undefined, b: FrontendConfig_BeaconModule | PlainMessage<FrontendConfig_BeaconModule> | undefined): boolean {
     return proto3.util.equals(FrontendConfig_BeaconModule, a, b);
-  }
-}
-
-/**
- * TimeWindow represents a time window configuration
- *
- * @generated from message lab.FrontendConfig.TimeWindow
- */
-export class FrontendConfig_TimeWindow extends Message<FrontendConfig_TimeWindow> {
-  /**
-   * @generated from field: string file = 1;
-   */
-  file = "";
-
-  /**
-   * @generated from field: string step = 2;
-   */
-  step = "";
-
-  /**
-   * @generated from field: string label = 3;
-   */
-  label = "";
-
-  /**
-   * @generated from field: string range = 4;
-   */
-  range = "";
-
-  constructor(data?: PartialMessage<FrontendConfig_TimeWindow>) {
-    super();
-    proto3.util.initPartial(data, this);
-  }
-
-  static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "lab.FrontendConfig.TimeWindow";
-  static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "file", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "step", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "label", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 4, name: "range", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-  ]);
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): FrontendConfig_TimeWindow {
-    return new FrontendConfig_TimeWindow().fromBinary(bytes, options);
-  }
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): FrontendConfig_TimeWindow {
-    return new FrontendConfig_TimeWindow().fromJson(jsonValue, options);
-  }
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): FrontendConfig_TimeWindow {
-    return new FrontendConfig_TimeWindow().fromJsonString(jsonString, options);
-  }
-
-  static equals(a: FrontendConfig_TimeWindow | PlainMessage<FrontendConfig_TimeWindow> | undefined, b: FrontendConfig_TimeWindow | PlainMessage<FrontendConfig_TimeWindow> | undefined): boolean {
-    return proto3.util.equals(FrontendConfig_TimeWindow, a, b);
   }
 }
 

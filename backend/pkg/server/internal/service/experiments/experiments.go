@@ -10,6 +10,7 @@ import (
 	xatu_cbt_proto "github.com/ethpandaops/lab/backend/pkg/server/proto/xatu_cbt"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc/metadata"
+	"google.golang.org/protobuf/types/known/structpb"
 )
 
 // ServiceName is the name of the experiments service
@@ -50,8 +51,14 @@ func (s *ExperimentsService) Start(ctx context.Context) error {
 	enabledCount := 0
 
 	for i := range *s.config {
-		if (*s.config)[i].Enabled {
+		exp := &(*s.config)[i]
+		if exp.Enabled {
 			enabledCount++
+
+			s.log.WithFields(logrus.Fields{
+				"id":     exp.ID,
+				"config": exp.Config,
+			}).Debug("Loaded experiment config")
 		}
 	}
 
@@ -75,12 +82,30 @@ func (s *ExperimentsService) Name() string {
 	return ServiceName
 }
 
-// GetAllExperimentsConfig returns ALL experiments configuration without data availbility by default
-func (s *ExperimentsService) GetAllExperimentsConfig(ctx context.Context, includeDA bool) *config.ExperimentsConfig {
+// GetExperimentConfigByID returns the configuration for a specific experiment
+func (s *ExperimentsService) GetExperimentConfigByID(id string) (*ExperimentConfig, error) {
 	if s.config == nil {
+		return nil, fmt.Errorf("no experiments configured")
+	}
+
+	for i := range *s.config {
+		exp := &(*s.config)[i]
+		if exp.ID == id {
+			return exp, nil
+		}
+	}
+
+	return nil, fmt.Errorf("experiment %s not found", id)
+}
+
+// GetAllExperimentsConfig returns ALL experiments configuration without data availbility by default
+func (s *ExperimentsService) GetAllExperimentsConfig(ctx context.Context, includeDA bool) []*config.ExperimentConfig {
+	if s.config == nil {
+		s.log.Warn("GetAllExperimentsConfig called but config is nil")
 		return nil
 	}
 
+	s.log.WithField("num_experiments", len(*s.config)).Debug("GetAllExperimentsConfig called")
 	experiments := make([]*config.ExperimentConfig, 0, len(*s.config))
 
 	for i := range *s.config {
@@ -90,10 +115,32 @@ func (s *ExperimentsService) GetAllExperimentsConfig(ctx context.Context, includ
 			continue
 		}
 
+		s.log.WithFields(logrus.Fields{
+			"id":        exp.ID,
+			"enabled":   exp.Enabled,
+			"networks":  exp.Networks,
+			"hasConfig": exp.Config != nil,
+			"config":    exp.Config,
+		}).Debug("Processing experiment for API response")
+
 		expConfig := &config.ExperimentConfig{
 			Id:       exp.ID,
 			Enabled:  exp.Enabled,
 			Networks: exp.Networks,
+		}
+
+		// Convert config map to protobuf Struct
+		if exp.Config != nil {
+			s.log.WithField("experiment", exp.ID).WithField("config", exp.Config).Info("Converting experiment config to protobuf struct")
+
+			configStruct, err := structpb.NewStruct(exp.Config)
+			if err != nil {
+				s.log.WithError(err).WithField("experiment", exp.ID).Warn("Failed to convert config to struct")
+			} else {
+				expConfig.Config = configStruct
+			}
+		} else {
+			s.log.WithField("experiment", exp.ID).Debug("No config found for experiment")
 		}
 
 		if includeDA {
@@ -103,9 +150,7 @@ func (s *ExperimentsService) GetAllExperimentsConfig(ctx context.Context, includ
 		experiments = append(experiments, expConfig)
 	}
 
-	return &config.ExperimentsConfig{
-		Experiments: experiments,
-	}
+	return experiments
 }
 
 // GetExperimentConfig returns a single experiment's configuration with data availability.

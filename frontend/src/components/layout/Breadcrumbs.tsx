@@ -35,11 +35,6 @@ export const breadcrumbs = [
           { name: ':slot', path: '/beacon/slot/:slot' },
         ],
       },
-      {
-        name: 'Timings',
-        path: '/beacon/timings',
-        children: [{ name: 'Blocks', path: '/beacon/timings/blocks' }],
-      },
     ],
   },
 ];

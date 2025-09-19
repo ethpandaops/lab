@@ -4,7 +4,7 @@
 // @ts-nocheck
 
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
-import { Message, proto3, protoInt64 } from "@bufbuild/protobuf";
+import { Message, proto3, protoInt64, Struct } from "@bufbuild/protobuf";
 
 /**
  * ListNodesResponse is the v1 API response for listing nodes with pagination.
@@ -669,14 +669,9 @@ export class FrontendConfig extends Message<FrontendConfig> {
   ethereum?: EthereumConfig;
 
   /**
-   * @generated from field: api.v1.ModulesConfig modules = 2;
+   * @generated from field: repeated api.v1.ExperimentConfig experiments = 2;
    */
-  modules?: ModulesConfig;
-
-  /**
-   * @generated from field: api.v1.ExperimentsConfig experiments = 3;
-   */
-  experiments?: ExperimentsConfig;
+  experiments: ExperimentConfig[] = [];
 
   constructor(data?: PartialMessage<FrontendConfig>) {
     super();
@@ -687,8 +682,7 @@ export class FrontendConfig extends Message<FrontendConfig> {
   static readonly typeName = "api.v1.FrontendConfig";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "ethereum", kind: "message", T: EthereumConfig },
-    { no: 2, name: "modules", kind: "message", T: ModulesConfig },
-    { no: 3, name: "experiments", kind: "message", T: ExperimentsConfig },
+    { no: 2, name: "experiments", kind: "message", T: ExperimentConfig, repeated: true },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): FrontendConfig {
@@ -779,17 +773,12 @@ export class NetworkConfig extends Message<NetworkConfig> {
   genesisTime = protoInt64.zero;
 
   /**
-   * @generated from field: map<string, string> service_urls = 6;
-   */
-  serviceUrls: { [key: string]: string } = {};
-
-  /**
-   * @generated from field: api.v1.ForkConfig forks = 7;
+   * @generated from field: api.v1.ForkConfig forks = 6;
    */
   forks?: ForkConfig;
 
   /**
-   * @generated from field: string last_updated = 8;
+   * @generated from field: string last_updated = 7;
    */
   lastUpdated = "";
 
@@ -806,9 +795,8 @@ export class NetworkConfig extends Message<NetworkConfig> {
     { no: 3, name: "chain_id", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
     { no: 4, name: "description", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 5, name: "genesis_time", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
-    { no: 6, name: "service_urls", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "scalar", T: 9 /* ScalarType.STRING */} },
-    { no: 7, name: "forks", kind: "message", T: ForkConfig },
-    { no: 8, name: "last_updated", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 6, name: "forks", kind: "message", T: ForkConfig },
+    { no: 7, name: "last_updated", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): NetworkConfig {
@@ -952,324 +940,6 @@ export class ForkInfo extends Message<ForkInfo> {
 }
 
 /**
- * ModulesConfig contains all module configurations for public API consumption.
- *
- * @generated from message api.v1.ModulesConfig
- */
-export class ModulesConfig extends Message<ModulesConfig> {
-  /**
-   * @generated from field: api.v1.BeaconChainTimingsModule beacon_chain_timings = 1;
-   */
-  beaconChainTimings?: BeaconChainTimingsModule;
-
-  /**
-   * @generated from field: api.v1.XatuPublicContributorsModule xatu_public_contributors = 2;
-   */
-  xatuPublicContributors?: XatuPublicContributorsModule;
-
-  /**
-   * @generated from field: api.v1.BeaconModule beacon = 3;
-   */
-  beacon?: BeaconModule;
-
-  constructor(data?: PartialMessage<ModulesConfig>) {
-    super();
-    proto3.util.initPartial(data, this);
-  }
-
-  static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "api.v1.ModulesConfig";
-  static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "beacon_chain_timings", kind: "message", T: BeaconChainTimingsModule },
-    { no: 2, name: "xatu_public_contributors", kind: "message", T: XatuPublicContributorsModule },
-    { no: 3, name: "beacon", kind: "message", T: BeaconModule },
-  ]);
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ModulesConfig {
-    return new ModulesConfig().fromBinary(bytes, options);
-  }
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ModulesConfig {
-    return new ModulesConfig().fromJson(jsonValue, options);
-  }
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ModulesConfig {
-    return new ModulesConfig().fromJsonString(jsonString, options);
-  }
-
-  static equals(a: ModulesConfig | PlainMessage<ModulesConfig> | undefined, b: ModulesConfig | PlainMessage<ModulesConfig> | undefined): boolean {
-    return proto3.util.equals(ModulesConfig, a, b);
-  }
-}
-
-/**
- * BeaconChainTimingsModule configuration for public API consumption.
- *
- * @generated from message api.v1.BeaconChainTimingsModule
- */
-export class BeaconChainTimingsModule extends Message<BeaconChainTimingsModule> {
-  /**
-   * @generated from field: repeated string networks = 1;
-   */
-  networks: string[] = [];
-
-  /**
-   * @generated from field: repeated api.v1.TimeWindow time_windows = 2;
-   */
-  timeWindows: TimeWindow[] = [];
-
-  /**
-   * @generated from field: string path_prefix = 3;
-   */
-  pathPrefix = "";
-
-  constructor(data?: PartialMessage<BeaconChainTimingsModule>) {
-    super();
-    proto3.util.initPartial(data, this);
-  }
-
-  static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "api.v1.BeaconChainTimingsModule";
-  static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "networks", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
-    { no: 2, name: "time_windows", kind: "message", T: TimeWindow, repeated: true },
-    { no: 3, name: "path_prefix", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-  ]);
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): BeaconChainTimingsModule {
-    return new BeaconChainTimingsModule().fromBinary(bytes, options);
-  }
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): BeaconChainTimingsModule {
-    return new BeaconChainTimingsModule().fromJson(jsonValue, options);
-  }
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): BeaconChainTimingsModule {
-    return new BeaconChainTimingsModule().fromJsonString(jsonString, options);
-  }
-
-  static equals(a: BeaconChainTimingsModule | PlainMessage<BeaconChainTimingsModule> | undefined, b: BeaconChainTimingsModule | PlainMessage<BeaconChainTimingsModule> | undefined): boolean {
-    return proto3.util.equals(BeaconChainTimingsModule, a, b);
-  }
-}
-
-/**
- * XatuPublicContributorsModule configuration for public API consumption.
- *
- * @generated from message api.v1.XatuPublicContributorsModule
- */
-export class XatuPublicContributorsModule extends Message<XatuPublicContributorsModule> {
-  /**
-   * @generated from field: repeated string networks = 1;
-   */
-  networks: string[] = [];
-
-  /**
-   * @generated from field: repeated api.v1.TimeWindow time_windows = 2;
-   */
-  timeWindows: TimeWindow[] = [];
-
-  /**
-   * @generated from field: string path_prefix = 3;
-   */
-  pathPrefix = "";
-
-  /**
-   * @generated from field: bool enabled = 4;
-   */
-  enabled = false;
-
-  constructor(data?: PartialMessage<XatuPublicContributorsModule>) {
-    super();
-    proto3.util.initPartial(data, this);
-  }
-
-  static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "api.v1.XatuPublicContributorsModule";
-  static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "networks", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
-    { no: 2, name: "time_windows", kind: "message", T: TimeWindow, repeated: true },
-    { no: 3, name: "path_prefix", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 4, name: "enabled", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
-  ]);
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): XatuPublicContributorsModule {
-    return new XatuPublicContributorsModule().fromBinary(bytes, options);
-  }
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): XatuPublicContributorsModule {
-    return new XatuPublicContributorsModule().fromJson(jsonValue, options);
-  }
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): XatuPublicContributorsModule {
-    return new XatuPublicContributorsModule().fromJsonString(jsonString, options);
-  }
-
-  static equals(a: XatuPublicContributorsModule | PlainMessage<XatuPublicContributorsModule> | undefined, b: XatuPublicContributorsModule | PlainMessage<XatuPublicContributorsModule> | undefined): boolean {
-    return proto3.util.equals(XatuPublicContributorsModule, a, b);
-  }
-}
-
-/**
- * BeaconModule configuration for public API consumption.
- *
- * @generated from message api.v1.BeaconModule
- */
-export class BeaconModule extends Message<BeaconModule> {
-  /**
-   * @generated from field: bool enabled = 1;
-   */
-  enabled = false;
-
-  /**
-   * @generated from field: string description = 2;
-   */
-  description = "";
-
-  /**
-   * @generated from field: string path_prefix = 3;
-   */
-  pathPrefix = "";
-
-  /**
-   * @generated from field: map<string, api.v1.BeaconNetworkConfig> networks = 4;
-   */
-  networks: { [key: string]: BeaconNetworkConfig } = {};
-
-  constructor(data?: PartialMessage<BeaconModule>) {
-    super();
-    proto3.util.initPartial(data, this);
-  }
-
-  static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "api.v1.BeaconModule";
-  static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "enabled", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
-    { no: 2, name: "description", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "path_prefix", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 4, name: "networks", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "message", T: BeaconNetworkConfig} },
-  ]);
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): BeaconModule {
-    return new BeaconModule().fromBinary(bytes, options);
-  }
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): BeaconModule {
-    return new BeaconModule().fromJson(jsonValue, options);
-  }
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): BeaconModule {
-    return new BeaconModule().fromJsonString(jsonString, options);
-  }
-
-  static equals(a: BeaconModule | PlainMessage<BeaconModule> | undefined, b: BeaconModule | PlainMessage<BeaconModule> | undefined): boolean {
-    return proto3.util.equals(BeaconModule, a, b);
-  }
-}
-
-/**
- * BeaconNetworkConfig contains beacon-specific network configuration for public API consumption.
- *
- * @generated from message api.v1.BeaconNetworkConfig
- */
-export class BeaconNetworkConfig extends Message<BeaconNetworkConfig> {
-  /**
-   * @generated from field: int32 head_lag_slots = 1;
-   */
-  headLagSlots = 0;
-
-  /**
-   * @generated from field: int32 backlog_days = 2;
-   */
-  backlogDays = 0;
-
-  constructor(data?: PartialMessage<BeaconNetworkConfig>) {
-    super();
-    proto3.util.initPartial(data, this);
-  }
-
-  static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "api.v1.BeaconNetworkConfig";
-  static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "head_lag_slots", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
-    { no: 2, name: "backlog_days", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
-  ]);
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): BeaconNetworkConfig {
-    return new BeaconNetworkConfig().fromBinary(bytes, options);
-  }
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): BeaconNetworkConfig {
-    return new BeaconNetworkConfig().fromJson(jsonValue, options);
-  }
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): BeaconNetworkConfig {
-    return new BeaconNetworkConfig().fromJsonString(jsonString, options);
-  }
-
-  static equals(a: BeaconNetworkConfig | PlainMessage<BeaconNetworkConfig> | undefined, b: BeaconNetworkConfig | PlainMessage<BeaconNetworkConfig> | undefined): boolean {
-    return proto3.util.equals(BeaconNetworkConfig, a, b);
-  }
-}
-
-/**
- * TimeWindow represents a time window configuration for public API consumption.
- *
- * @generated from message api.v1.TimeWindow
- */
-export class TimeWindow extends Message<TimeWindow> {
-  /**
-   * @generated from field: string file = 1;
-   */
-  file = "";
-
-  /**
-   * @generated from field: string step = 2;
-   */
-  step = "";
-
-  /**
-   * @generated from field: string range = 3;
-   */
-  range = "";
-
-  /**
-   * @generated from field: string label = 4;
-   */
-  label = "";
-
-  constructor(data?: PartialMessage<TimeWindow>) {
-    super();
-    proto3.util.initPartial(data, this);
-  }
-
-  static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "api.v1.TimeWindow";
-  static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "file", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "step", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "range", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 4, name: "label", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-  ]);
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): TimeWindow {
-    return new TimeWindow().fromBinary(bytes, options);
-  }
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): TimeWindow {
-    return new TimeWindow().fromJson(jsonValue, options);
-  }
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): TimeWindow {
-    return new TimeWindow().fromJsonString(jsonString, options);
-  }
-
-  static equals(a: TimeWindow | PlainMessage<TimeWindow> | undefined, b: TimeWindow | PlainMessage<TimeWindow> | undefined): boolean {
-    return proto3.util.equals(TimeWindow, a, b);
-  }
-}
-
-/**
  * ExperimentsConfig contains all experiments configuration for public API consumption.
  *
  * @generated from message api.v1.ExperimentsConfig
@@ -1330,7 +1000,12 @@ export class ExperimentConfig extends Message<ExperimentConfig> {
   networks: string[] = [];
 
   /**
-   * @generated from field: map<string, api.v1.ExperimentDataAvailability> data_availability = 4;
+   * @generated from field: google.protobuf.Struct config = 4;
+   */
+  config?: Struct;
+
+  /**
+   * @generated from field: map<string, api.v1.ExperimentDataAvailability> data_availability = 5;
    */
   dataAvailability: { [key: string]: ExperimentDataAvailability } = {};
 
@@ -1345,7 +1020,8 @@ export class ExperimentConfig extends Message<ExperimentConfig> {
     { no: 1, name: "id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 2, name: "enabled", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
     { no: 3, name: "networks", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
-    { no: 4, name: "data_availability", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "message", T: ExperimentDataAvailability} },
+    { no: 4, name: "config", kind: "message", T: Struct },
+    { no: 5, name: "data_availability", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "message", T: ExperimentDataAvailability} },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ExperimentConfig {

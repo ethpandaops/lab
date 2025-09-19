@@ -11,5 +11,3 @@ type Service interface {
 	Start(ctx context.Context, server *grpc.Server) error
 	Name() string
 }
-
-var _ Service = &BeaconChainTimings{}

@@ -1,6 +1,8 @@
 syntax = "proto3";
 package api.v1;
 
+import "google/protobuf/struct.proto";
+
 option go_package = "github.com/ethpandaops/lab/backend/pkg/api/v1/proto";
 
 // This file defines the public REST API layer for all Lab data.
@@ -110,8 +112,7 @@ message GetConfigResponse {
 // FrontendConfig represents the complete frontend configuration for public API consumption.
 message FrontendConfig {
   EthereumConfig ethereum = 1;
-  ModulesConfig modules = 2;
-  ExperimentsConfig experiments = 3;
+  repeated ExperimentConfig experiments = 2;
 }
 
 // EthereumConfig contains Ethereum-related configuration for public API consumption.
@@ -126,9 +127,8 @@ message NetworkConfig {
   int64 chain_id = 3 [json_name = "chainId"];
   string description = 4;
   int64 genesis_time = 5 [json_name = "genesisTime"];
-  map<string, string> service_urls = 6 [json_name = "serviceUrls"];
-  ForkConfig forks = 7;
-  string last_updated = 8 [json_name = "lastUpdated"];
+  ForkConfig forks = 6;
+  string last_updated = 7 [json_name = "lastUpdated"];
 }
 
 // ForkConfig contains fork information for public API consumption.
@@ -147,49 +147,6 @@ message ForkInfo {
   map<string, string> min_client_versions = 2 [json_name = "minClientVersions"];
 }
 
-// ModulesConfig contains all module configurations for public API consumption.
-message ModulesConfig {
-  BeaconChainTimingsModule beacon_chain_timings = 1 [json_name = "beaconChainTimings"];
-  XatuPublicContributorsModule xatu_public_contributors = 2 [json_name = "xatuPublicContributors"];
-  BeaconModule beacon = 3;
-}
-
-// BeaconChainTimingsModule configuration for public API consumption.
-message BeaconChainTimingsModule {
-  repeated string networks = 1;
-  repeated TimeWindow time_windows = 2 [json_name = "timeWindows"];
-  string path_prefix = 3 [json_name = "pathPrefix"];
-}
-
-// XatuPublicContributorsModule configuration for public API consumption.
-message XatuPublicContributorsModule {
-  repeated string networks = 1;
-  repeated TimeWindow time_windows = 2 [json_name = "timeWindows"];
-  string path_prefix = 3 [json_name = "pathPrefix"];
-  bool enabled = 4;
-}
-
-// BeaconModule configuration for public API consumption.
-message BeaconModule {
-  bool enabled = 1;
-  string description = 2;
-  string path_prefix = 3 [json_name = "pathPrefix"];
-  map<string, BeaconNetworkConfig> networks = 4;
-}
-
-// BeaconNetworkConfig contains beacon-specific network configuration for public API consumption.
-message BeaconNetworkConfig {
-  int32 head_lag_slots = 1 [json_name = "headLagSlots"];
-  int32 backlog_days = 2 [json_name = "backlogDays"];
-}
-
-// TimeWindow represents a time window configuration for public API consumption.
-message TimeWindow {
-  string file = 1;
-  string step = 2;
-  string range = 3;
-  string label = 4;
-}
 
 // ExperimentsConfig contains all experiments configuration for public API consumption.
 message ExperimentsConfig {
@@ -201,7 +158,8 @@ message ExperimentConfig {
   string id = 1;
   bool enabled = 2;
   repeated string networks = 3;
-  map<string, ExperimentDataAvailability> data_availability = 4 [json_name = "dataAvailability"];
+  google.protobuf.Struct config = 4;
+  map<string, ExperimentDataAvailability> data_availability = 5 [json_name = "dataAvailability"];
 }
 
 // ExperimentDataAvailability contains data availability information for an experiment on a specific network.

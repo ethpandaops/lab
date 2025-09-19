@@ -55,23 +55,16 @@ export class Network extends Message<Network> {
   genesisConfig?: GenesisConfig;
 
   /**
-   * Service URLs for various network services (for static networks).
-   *
-   * @generated from field: map<string, string> service_urls = 7;
-   */
-  serviceUrls: { [key: string]: string } = {};
-
-  /**
    * Whether the network uses self-hosted DNS (for static networks).
    *
-   * @generated from field: bool self_hosted_dns = 8;
+   * @generated from field: bool self_hosted_dns = 7;
    */
   selfHostedDns = false;
 
   /**
    * Fork information (for static networks).
    *
-   * @generated from field: networks.Forks forks = 9;
+   * @generated from field: networks.Forks forks = 8;
    */
   forks?: Forks;
 
@@ -89,9 +82,8 @@ export class Network extends Message<Network> {
     { no: 4, name: "last_updated", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 5, name: "description", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 6, name: "genesis_config", kind: "message", T: GenesisConfig },
-    { no: 7, name: "service_urls", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "scalar", T: 9 /* ScalarType.STRING */} },
-    { no: 8, name: "self_hosted_dns", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
-    { no: 9, name: "forks", kind: "message", T: Forks },
+    { no: 7, name: "self_hosted_dns", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 8, name: "forks", kind: "message", T: Forks },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Network {
@@ -612,23 +604,16 @@ export class RawNetworkData extends Message<RawNetworkData> {
   genesisConfig?: GenesisConfig;
 
   /**
-   * Service URLs for various network services (for static networks).
-   *
-   * @generated from field: map<string, string> service_urls = 7;
-   */
-  serviceUrls: { [key: string]: string } = {};
-
-  /**
    * Whether the network uses self-hosted DNS (for static networks).
    *
-   * @generated from field: bool self_hosted_dns = 8;
+   * @generated from field: bool self_hosted_dns = 7;
    */
   selfHostedDns = false;
 
   /**
    * Fork information (for static networks).
    *
-   * @generated from field: networks.Forks forks = 9;
+   * @generated from field: networks.Forks forks = 8;
    */
   forks?: Forks;
 
@@ -646,9 +631,8 @@ export class RawNetworkData extends Message<RawNetworkData> {
     { no: 4, name: "chain_id", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
     { no: 5, name: "description", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 6, name: "genesis_config", kind: "message", T: GenesisConfig },
-    { no: 7, name: "service_urls", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "scalar", T: 9 /* ScalarType.STRING */} },
-    { no: 8, name: "self_hosted_dns", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
-    { no: 9, name: "forks", kind: "message", T: Forks },
+    { no: 7, name: "self_hosted_dns", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 8, name: "forks", kind: "message", T: Forks },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): RawNetworkData {

@@ -1,23 +1,62 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AlertTriangle, Search } from 'lucide-react';
+import { AlertTriangle, Search, AlertCircle } from 'lucide-react';
 import useNetwork from '@/contexts/network';
 import useBeacon from '@/contexts/beacon';
+import useConfig from '@/contexts/config';
 import { Card, CardBody } from '@/components/common/Card';
 
 function SlotLookup() {
   const navigate = useNavigate();
   const [slotNumber, setSlotNumber] = useState('');
   const { selectedNetwork } = useNetwork();
+  const { config } = useConfig();
   const { getBeaconClock } = useBeacon();
   const clock = getBeaconClock(selectedNetwork);
   const currentSlot = clock?.getCurrentSlot() || 0;
+
+  // Check if this experiment is available for the current network
+  const isExperimentAvailable = () => {
+    if (!config?.experiments) return true; // Default to available if no config
+    const experiment = config.experiments.find(exp => exp.id === 'historical-slots');
+    return experiment?.enabled && experiment?.networks?.includes(selectedNetwork);
+  };
+
+  // Get the networks that support this experiment
+  const getSupportedNetworks = () => {
+    if (!config?.experiments) return [];
+    const experiment = config.experiments.find(exp => exp.id === 'historical-slots');
+    return experiment?.enabled ? experiment?.networks || [] : [];
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!slotNumber) return;
     navigate(`${slotNumber}`);
   };
+
+  // Show not available message if experiment isn't enabled for this network
+  if (!isExperimentAvailable()) {
+    const supportedNetworks = getSupportedNetworks();
+    return (
+      <div className="flex-1 flex items-center justify-center min-h-[50vh]">
+        <div className="text-center max-w-md mx-auto">
+          <AlertCircle className="w-12 h-12 text-accent/60 mx-auto mb-4" />
+          <h2 className="text-xl font-sans font-bold text-primary mb-2">
+            Experiment Not Available
+          </h2>
+          <p className="text-sm font-mono text-secondary mb-4">
+            Historical Slots is not enabled for {selectedNetwork}
+          </p>
+          {supportedNetworks.length > 0 && (
+            <p className="text-xs font-mono text-tertiary">
+              Available on: {supportedNetworks.join(', ')}
+            </p>
+          )}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

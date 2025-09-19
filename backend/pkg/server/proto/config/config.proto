@@ -2,6 +2,8 @@ syntax = "proto3";
 
 package config;
 
+import "google/protobuf/struct.proto";
+
 option go_package = "github.com/ethpandaops/lab/backend/pkg/server/proto/config";
 
 // ConfigService provides configuration for the lab application.
@@ -26,10 +28,8 @@ message GetConfigResponse {
 message FrontendConfig {
   // Ethereum configuration including networks
   EthereumConfig ethereum = 1;
-  // Module configurations
-  ModulesConfig modules = 2;
-  // Experiments configuration
-  ExperimentsConfig experiments = 3;
+  // List of experiments
+  repeated ExperimentConfig experiments = 2;
 }
 
 // EthereumConfig contains Ethereum-related configuration
@@ -50,12 +50,10 @@ message NetworkConfig {
   string description = 4;
   // Genesis time as Unix timestamp
   int64 genesis_time = 5;
-  // Service URLs
-  map<string, string> service_urls = 6;
   // Fork information
-  ForkConfig forks = 7;
+  ForkConfig forks = 6;
   // Last updated timestamp
-  string last_updated = 8;
+  string last_updated = 7;
 }
 
 // ForkConfig contains fork information
@@ -78,55 +76,6 @@ message ForkInfo {
   map<string, string> min_client_versions = 2;
 }
 
-// ModulesConfig contains all module configurations
-message ModulesConfig {
-  // Beacon chain timings module
-  BeaconChainTimingsModule beacon_chain_timings = 1;
-  // Beacon module
-  BeaconModule beacon = 3;
-}
-
-// BeaconChainTimingsModule configuration
-message BeaconChainTimingsModule {
-  // List of networks this module supports
-  repeated string networks = 1;
-  // Time windows configuration
-  repeated TimeWindow time_windows = 2;
-  // Path prefix for data files
-  string path_prefix = 3;
-}
-
-// BeaconModule configuration
-message BeaconModule {
-  // Whether the module is enabled
-  bool enabled = 1;
-  // Description
-  string description = 2;
-  // Path prefix for data files
-  string path_prefix = 3;
-  // Per-network configuration
-  map<string, BeaconNetworkConfig> networks = 4;
-}
-
-// BeaconNetworkConfig contains beacon-specific network configuration
-message BeaconNetworkConfig {
-  // Head lag slots
-  int32 head_lag_slots = 1;
-  // Backlog days
-  int32 backlog_days = 2;
-}
-
-// TimeWindow represents a time window configuration
-message TimeWindow {
-  // File identifier
-  string file = 1;
-  // Step interval
-  string step = 2;
-  // Time range
-  string range = 3;
-  // Display label
-  string label = 4;
-}
 
 // ExperimentsConfig contains all experiments configuration
 message ExperimentsConfig {
@@ -144,6 +93,8 @@ message ExperimentConfig {
   repeated string networks = 3;
   // Data availability per network
   map<string, ExperimentDataAvailability> data_availability = 4;
+  // Experiment-specific configuration
+  google.protobuf.Struct config = 5;
 }
 
 // ExperimentDataAvailability contains data availability information for an experiment on a specific network

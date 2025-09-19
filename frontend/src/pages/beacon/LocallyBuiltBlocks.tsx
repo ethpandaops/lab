@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import useNetwork from '@/contexts/network';
 import useApi from '@/contexts/api';
+import useConfig from '@/contexts/config';
 import { GetRecentLocallyBuiltBlocksRequest } from '@/api/gen/backend/pkg/api/proto/lab_api_pb';
 import {
   LocallyBuiltSlotBlocks,
@@ -10,7 +11,7 @@ import {
   LocallyBuiltBlocksDetail,
   UnifiedBlocksTimeline,
 } from '@/components/beacon/LocallyBuiltBlocks';
-import { ChevronLeft, Clock } from 'lucide-react';
+import { ChevronLeft, Clock, AlertCircle } from 'lucide-react';
 import useBeacon from '@/contexts/beacon';
 
 // Refresh interval in milliseconds
@@ -20,6 +21,7 @@ const MAX_SLOTS = 64;
 
 export function LocallyBuiltBlocks() {
   const { selectedNetwork } = useNetwork();
+  const { config } = useConfig();
   const [data, setData] = useState<LocallyBuiltSlotBlocks[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [selectedBlock, setSelectedBlock] = useState<LocallyBuiltBlock | null>(null);
@@ -27,6 +29,20 @@ export function LocallyBuiltBlocks() {
   const [currentSlot, setCurrentSlot] = useState<number | null>(null);
   const { getBeaconClock } = useBeacon();
   const { client } = useApi();
+
+  // Check if this experiment is available for the current network
+  const isExperimentAvailable = () => {
+    if (!config?.experiments) return true; // Default to available if no config
+    const experiment = config.experiments.find(exp => exp.id === 'locally-built-blocks');
+    return experiment?.enabled && experiment?.networks?.includes(selectedNetwork);
+  };
+
+  // Get the networks that support this experiment
+  const getSupportedNetworks = () => {
+    if (!config?.experiments) return [];
+    const experiment = config.experiments.find(exp => exp.id === 'locally-built-blocks');
+    return experiment?.enabled ? experiment?.networks || [] : [];
+  };
 
   // Update current slot from wallclock
   useEffect(() => {
@@ -139,6 +155,29 @@ export function LocallyBuiltBlocks() {
   const formatLastUpdated = () => {
     return lastUpdated.toLocaleTimeString();
   };
+
+  // Show not available message if experiment isn't enabled for this network
+  if (!isExperimentAvailable()) {
+    const supportedNetworks = getSupportedNetworks();
+    return (
+      <div className="flex-1 flex items-center justify-center min-h-[50vh]">
+        <div className="text-center max-w-md mx-auto">
+          <AlertCircle className="w-12 h-12 text-accent/60 mx-auto mb-4" />
+          <h2 className="text-xl font-sans font-bold text-primary mb-2">
+            Experiment Not Available
+          </h2>
+          <p className="text-sm font-mono text-secondary mb-4">
+            Locally Built Blocks is not enabled for {selectedNetwork}
+          </p>
+          {supportedNetworks.length > 0 && (
+            <p className="text-xs font-mono text-tertiary">
+              Available on: {supportedNetworks.join(', ')}
+            </p>
+          )}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

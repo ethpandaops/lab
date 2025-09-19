@@ -3,7 +3,6 @@ import {
   ArrowRight,
   Activity,
   Search,
-  Clock,
   Layers,
   Globe,
   Users,
@@ -13,6 +12,8 @@ import {
 } from 'lucide-react';
 import { FaEthereum } from 'react-icons/fa';
 import { Card, CardBody } from '@/components/common/Card';
+import useNetwork from '@/contexts/network';
+import useConfig from '@/contexts/config';
 
 interface ExperimentItem {
   id: string;
@@ -109,20 +110,58 @@ const experiments: ExperimentItem[] = [
     href: '/beacon/locally-built-blocks',
     category: 'beacon',
   },
-  {
-    id: 'beacon-timings',
-    title: 'Chain Timings',
-    subtitle: 'Timing analysis',
-    description: 'Analyze timing patterns, block propagation, and network performance',
-    icon: Clock,
-    href: '/beacon/timings',
-    category: 'beacon',
-  },
 ];
 
 function Experiments(): React.ReactElement {
-  const xatuExperiments = experiments.filter(e => e.category === 'xatu');
-  const beaconExperiments = experiments.filter(e => e.category === 'beacon');
+  const { selectedNetwork } = useNetwork();
+  const { config } = useConfig();
+
+  // Filter experiments based on selected network
+  const availableExperimentIds = new Set<string>();
+  if (config?.experiments) {
+    config.experiments.forEach(exp => {
+      if (exp.enabled && exp.networks?.includes(selectedNetwork)) {
+        availableExperimentIds.add(exp.id);
+      }
+    });
+  }
+
+  // Map our experiment IDs to the ones from config
+  const experimentIdMapping: Record<string, string> = {
+    'xatu-overview': 'xatu-overview',
+    'beacon-live': 'live-slots',
+    'beacon-historical': 'historical-slots',
+    'beacon-production': 'block-production-flow',
+    'beacon-local-blocks': 'locally-built-blocks',
+  };
+
+  // Contributor experiments that are enabled by the "contributoors" config
+  const contributorExperiments = new Set([
+    'xatu-contributors',
+    'xatu-networks',
+    'xatu-geographical',
+    'xatu-fork-readiness',
+  ]);
+
+  // Filter based on available experiments for this network
+  const filteredExperiments = experiments.filter(e => {
+    // If no config available, show all experiments (backward compatibility)
+    if (!config?.experiments || config.experiments.length === 0) {
+      return true;
+    }
+
+    // Check if this is a contributor experiment
+    if (contributorExperiments.has(e.id)) {
+      return availableExperimentIds.has('contributoors');
+    }
+
+    // For other experiments, use direct mapping
+    const mappedId = experimentIdMapping[e.id];
+    return mappedId && availableExperimentIds.has(mappedId);
+  });
+
+  const xatuExperiments = filteredExperiments.filter(e => e.category === 'xatu');
+  const beaconExperiments = filteredExperiments.filter(e => e.category === 'beacon');
 
   return (
     <div className="min-h-[calc(100vh-10rem)] flex flex-col">
@@ -135,92 +174,122 @@ function Experiments(): React.ReactElement {
         </p>
       </div>
 
-      {/* Two Column Layout for Experiments */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Xatu Column */}
-        <div>
-          <div className="flex items-center gap-3 mb-4">
-            <img src="/xatu.png" alt="Xatu" className="w-8 h-8" />
-            <h2 className="text-xl font-sans font-bold text-primary">Xatu</h2>
-          </div>
-          <div className="space-y-4">
-            {xatuExperiments.map(experiment => (
-              <Card key={experiment.id} isInteractive className="relative">
-                <Link to={experiment.href} className="block w-full">
-                  <div className="absolute inset-0 bg-gradient-to-br from-accent/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-
-                  <CardBody className="relative">
-                    <div className="flex items-start gap-3">
-                      <div className="w-9 h-9 rounded-lg bg-accent/10 flex items-center justify-center flex-shrink-0">
-                        {experiment.id === 'xatu-overview' ? (
-                          <img src="/xatu.png" alt="Xatu" className="w-4 h-4" />
-                        ) : (
-                          <experiment.icon className="w-4 h-4 text-accent" />
-                        )}
-                      </div>
-
-                      <div className="flex-1 min-w-0">
-                        <h3 className="text-base font-sans font-bold text-primary group-hover:text-accent transition-colors mb-0.5">
-                          {experiment.title}
-                        </h3>
-                        <p className="text-xs font-mono text-tertiary truncate">
-                          {experiment.subtitle}
-                        </p>
-                      </div>
-
-                      <ArrowRight className="w-4 h-4 text-accent/50 group-hover:text-accent group-hover:translate-x-1 transition-all duration-300 mt-1" />
-                    </div>
-
-                    <p className="text-xs font-mono text-secondary group-hover:text-primary/90 transition-colors mt-3 line-clamp-2">
-                      {experiment.description}
-                    </p>
-                  </CardBody>
-                </Link>
-              </Card>
-            ))}
+      {/* Show message if no experiments available for this network */}
+      {filteredExperiments.length === 0 ? (
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-center">
+            <p className="text-lg font-mono text-secondary mb-2">
+              No experiments available for {selectedNetwork}
+            </p>
+            <p className="text-sm font-mono text-tertiary">
+              Switch to a different network to see available experiments
+            </p>
           </div>
         </div>
+      ) : (
+        /* Two Column Layout for Experiments */
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Xatu Column */}
+          <div>
+            <div className="flex items-center gap-3 mb-4">
+              <img src="/xatu.png" alt="Xatu" className="w-8 h-8" />
+              <h2 className="text-xl font-sans font-bold text-primary">Xatu</h2>
+            </div>
+            <div className="space-y-4">
+              {xatuExperiments.length > 0 ? (
+                xatuExperiments.map(experiment => (
+                  <Card key={experiment.id} isInteractive className="relative">
+                    <Link to={experiment.href} className="block w-full">
+                      <div className="absolute inset-0 bg-gradient-to-br from-accent/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
 
-        {/* Beacon Chain Column */}
-        <div>
-          <div className="flex items-center gap-3 mb-4">
-            <FaEthereum className="w-8 h-8 text-accent/80" />
-            <h2 className="text-xl font-sans font-bold text-primary">Beacon Chain</h2>
-          </div>
-          <div className="space-y-4">
-            {beaconExperiments.map(experiment => (
-              <Card key={experiment.id} isInteractive className="relative">
-                <Link to={experiment.href} className="block w-full">
-                  <div className="absolute inset-0 bg-gradient-to-br from-accent/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                      <CardBody className="relative">
+                        <div className="flex items-start gap-3">
+                          <div className="w-9 h-9 rounded-lg bg-accent/10 flex items-center justify-center flex-shrink-0">
+                            {experiment.id === 'xatu-overview' ? (
+                              <img src="/xatu.png" alt="Xatu" className="w-4 h-4" />
+                            ) : (
+                              <experiment.icon className="w-4 h-4 text-accent" />
+                            )}
+                          </div>
 
-                  <CardBody className="relative">
-                    <div className="flex items-start gap-3">
-                      <div className="w-9 h-9 rounded-lg bg-accent/10 flex items-center justify-center flex-shrink-0">
-                        <experiment.icon className="w-4 h-4 text-accent" />
-                      </div>
+                          <div className="flex-1 min-w-0">
+                            <h3 className="text-base font-sans font-bold text-primary group-hover:text-accent transition-colors mb-0.5">
+                              {experiment.title}
+                            </h3>
+                            <p className="text-xs font-mono text-tertiary truncate">
+                              {experiment.subtitle}
+                            </p>
+                          </div>
 
-                      <div className="flex-1 min-w-0">
-                        <h3 className="text-base font-sans font-bold text-primary group-hover:text-accent transition-colors mb-0.5">
-                          {experiment.title}
-                        </h3>
-                        <p className="text-xs font-mono text-tertiary truncate">
-                          {experiment.subtitle}
+                          <ArrowRight className="w-4 h-4 text-accent/50 group-hover:text-accent group-hover:translate-x-1 transition-all duration-300 mt-1" />
+                        </div>
+
+                        <p className="text-xs font-mono text-secondary group-hover:text-primary/90 transition-colors mt-3 line-clamp-2">
+                          {experiment.description}
                         </p>
-                      </div>
+                      </CardBody>
+                    </Link>
+                  </Card>
+                ))
+              ) : (
+                <div className="p-6 rounded-lg border border-dashed border-subtle bg-surface/10">
+                  <p className="text-sm font-mono text-secondary text-center">
+                    No Xatu experiments available for {selectedNetwork}
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
 
-                      <ArrowRight className="w-4 h-4 text-accent/50 group-hover:text-accent group-hover:translate-x-1 transition-all duration-300 mt-1" />
-                    </div>
+          {/* Beacon Chain Column */}
+          <div>
+            <div className="flex items-center gap-3 mb-4">
+              <FaEthereum className="w-8 h-8 text-accent/80" />
+              <h2 className="text-xl font-sans font-bold text-primary">Beacon Chain</h2>
+            </div>
+            <div className="space-y-4">
+              {beaconExperiments.length > 0 ? (
+                beaconExperiments.map(experiment => (
+                  <Card key={experiment.id} isInteractive className="relative">
+                    <Link to={experiment.href} className="block w-full">
+                      <div className="absolute inset-0 bg-gradient-to-br from-accent/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
 
-                    <p className="text-xs font-mono text-secondary group-hover:text-primary/90 transition-colors mt-3 line-clamp-2">
-                      {experiment.description}
-                    </p>
-                  </CardBody>
-                </Link>
-              </Card>
-            ))}
+                      <CardBody className="relative">
+                        <div className="flex items-start gap-3">
+                          <div className="w-9 h-9 rounded-lg bg-accent/10 flex items-center justify-center flex-shrink-0">
+                            <experiment.icon className="w-4 h-4 text-accent" />
+                          </div>
+
+                          <div className="flex-1 min-w-0">
+                            <h3 className="text-base font-sans font-bold text-primary group-hover:text-accent transition-colors mb-0.5">
+                              {experiment.title}
+                            </h3>
+                            <p className="text-xs font-mono text-tertiary truncate">
+                              {experiment.subtitle}
+                            </p>
+                          </div>
+
+                          <ArrowRight className="w-4 h-4 text-accent/50 group-hover:text-accent group-hover:translate-x-1 transition-all duration-300 mt-1" />
+                        </div>
+
+                        <p className="text-xs font-mono text-secondary group-hover:text-primary/90 transition-colors mt-3 line-clamp-2">
+                          {experiment.description}
+                        </p>
+                      </CardBody>
+                    </Link>
+                  </Card>
+                ))
+              ) : (
+                <div className="p-6 rounded-lg border border-dashed border-subtle bg-surface/10">
+                  <p className="text-sm font-mono text-secondary text-center">
+                    No Beacon Chain experiments available for {selectedNetwork}
+                  </p>
+                </div>
+              )}
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* Coming Soon Section */}
       <div className="mt-8">

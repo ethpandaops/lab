@@ -15,6 +15,7 @@ import (
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/metrics"
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/state"
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/storage"
+	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/experiments"
 	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/wallclock"
 	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/xatu_cbt"
 	bs_pb "github.com/ethpandaops/lab/backend/pkg/server/proto/beacon_slots"
@@ -36,7 +37,8 @@ const (
 type BeaconSlots struct {
 	log logrus.FieldLogger
 
-	config *Config
+	config             *Config
+	experimentsService *experiments.ExperimentsService
 
 	wallclockService  *wallclock.Service
 	xatuCBTService    *xatu_cbt.XatuCBT
@@ -74,6 +76,7 @@ const (
 func New(
 	log logrus.FieldLogger,
 	config *Config,
+	experimentsSvc *experiments.ExperimentsService,
 	wallclockSvc *wallclock.Service,
 	xatuCBTSvc *xatu_cbt.XatuCBT,
 	storageClient storage.Client,
@@ -93,18 +96,19 @@ func New(
 	}
 
 	return &BeaconSlots{
-		log:               log.WithField("component", "service/"+ServiceName),
-		config:            config,
-		wallclockService:  wallclockSvc,
-		xatuCBTService:    xatuCBTSvc,
-		storageClient:     storageClient,
-		cacheClient:       cacheClient,
-		lockerClient:      lockerClient,
-		baseDir:           ServiceName,
-		processCtx:        nil,
-		geolocationClient: geolocationClient,
-		metrics:           metricsSvc,
-		metricsCollector:  metricsCollector,
+		log:                log.WithField("component", "service/"+ServiceName),
+		config:             config,
+		experimentsService: experimentsSvc,
+		wallclockService:   wallclockSvc,
+		xatuCBTService:     xatuCBTSvc,
+		storageClient:      storageClient,
+		cacheClient:        cacheClient,
+		lockerClient:       lockerClient,
+		baseDir:            ServiceName,
+		processCtx:         nil,
+		geolocationClient:  geolocationClient,
+		metrics:            metricsSvc,
+		metricsCollector:   metricsCollector,
 	}, nil
 }
 
@@ -157,11 +161,12 @@ func (b *BeaconSlots) Start(ctx context.Context) error {
 	b.leaderClient = leaderClient
 
 	// Initialize and start the locally built blocks processor
-	if b.config.LocallyBuiltBlocksConfig.Enabled != nil && *b.config.LocallyBuiltBlocksConfig.Enabled {
+	locallyBuiltConfig := b.getLocallyBuiltBlocksConfig()
+	if locallyBuiltConfig.Enabled != nil && *locallyBuiltConfig.Enabled {
 		b.locallyBuiltBlocksProcessor = NewLocallyBuiltBlocksProcessor(
 			b.log,
-			&b.config.LocallyBuiltBlocksConfig,
-			b.config.HeadDelaySlots,
+			&locallyBuiltConfig,
+			b.getHeadDelaySlots(),
 			b.wallclockService,
 			b.xatuCBTService,
 			b.cacheClient,
@@ -350,8 +355,8 @@ func (b *BeaconSlots) FrontendModuleConfig() *pb.FrontendConfig_BeaconModule {
 
 	for _, networkName := range enabledNetworks {
 		networks[networkName] = &pb.FrontendConfig_BeaconNetworkConfig{
-			HeadLagSlots: int32(b.config.HeadDelaySlots), //nolint:gosec // no risk of overflow
-			BacklogDays:  int32(b.config.Backfill.Slots), //nolint:gosec // no risk of overflow
+			HeadLagSlots: int32(b.getHeadDelaySlots()), //nolint:gosec // no risk of overflow
+			BacklogDays:  int32(b.getBackfillSlots()),  //nolint:gosec // no risk of overflow
 		}
 	}
 
@@ -361,6 +366,79 @@ func (b *BeaconSlots) FrontendModuleConfig() *pb.FrontendConfig_BeaconModule {
 		PathPrefix:  b.baseDir,
 		Networks:    networks,
 	}
+}
+
+// getHeadDelaySlots returns the head delay slots configuration from experiments config
+func (b *BeaconSlots) getHeadDelaySlots() phase0.Slot {
+	if b.experimentsService != nil {
+		// Check all experiments that have head_delay_slots config
+		experimentIDs := []string{"live-slots", "block-production-flow", "historical-slots"}
+
+		for _, id := range experimentIDs {
+			if exp, err := b.experimentsService.GetExperimentConfigByID(id); err == nil && exp != nil && exp.Enabled && exp.Config != nil {
+				if headDelay, ok := exp.Config["head_delay_slots"].(float64); ok {
+					return phase0.Slot(headDelay)
+				}
+			}
+		}
+	}
+	// Default to 2 if not configured
+	return 2
+}
+
+// getBackfillSlots returns the backfill slots configuration from experiments config
+func (b *BeaconSlots) getBackfillSlots() int64 {
+	if b.experimentsService != nil {
+		// Check all experiments that have backfill_slots config
+		experimentIDs := []string{"live-slots", "block-production-flow", "historical-slots"}
+
+		for _, id := range experimentIDs {
+			if exp, err := b.experimentsService.GetExperimentConfigByID(id); err == nil && exp != nil && exp.Enabled && exp.Config != nil {
+				if backfill, ok := exp.Config["backfill_slots"].(float64); ok {
+					return int64(backfill)
+				}
+			}
+		}
+	}
+	// Default to 1000 if not configured
+	return 1000
+}
+
+// getLocallyBuiltBlocksConfig returns the locally built blocks configuration from experiments config
+func (b *BeaconSlots) getLocallyBuiltBlocksConfig() LocallyBuiltBlocksConfig {
+	config := LocallyBuiltBlocksConfig{
+		Slots: 16,            // Default
+		TTL:   6 * time.Hour, // Default
+	}
+
+	enabled := true
+	config.Enabled = &enabled // Default to enabled
+
+	if b.experimentsService != nil {
+		// Check locally-built-blocks experiment
+		if exp, err := b.experimentsService.GetExperimentConfigByID("locally-built-blocks"); err == nil && exp != nil {
+			if !exp.Enabled {
+				disabled := false
+				config.Enabled = &disabled
+
+				return config
+			}
+
+			if exp.Config != nil {
+				if slots, ok := exp.Config["slots"].(float64); ok {
+					config.Slots = int(slots)
+				}
+
+				if ttlStr, ok := exp.Config["ttl"].(string); ok {
+					if ttl, err := time.ParseDuration(ttlStr); err == nil {
+						config.TTL = ttl
+					}
+				}
+			}
+		}
+	}
+
+	return config
 }
 
 // sleepUntilNextSlot sleeps until the next slot for a network
@@ -446,7 +524,7 @@ func (b *BeaconSlots) processHead(ctx context.Context, networkName string) {
 			continue
 		}
 
-		targetSlot := currentSlot - b.config.HeadDelaySlots
+		targetSlot := currentSlot - b.getHeadDelaySlots()
 
 		if slotState.LastProcessedSlot == targetSlot {
 			b.sleepUntilNextSlot(ctx, networkName)
@@ -546,7 +624,7 @@ func (b *BeaconSlots) processTrailing(ctx context.Context, networkName string) {
 
 				// Start with appropriate delay
 				slotState = &ProcessorState{
-					LastProcessedSlot: wallclockSlot - b.config.HeadDelaySlots,
+					LastProcessedSlot: wallclockSlot - b.getHeadDelaySlots(),
 				}
 			} else {
 				logCtx.WithError(err).Warn("Failed to get state")
@@ -670,7 +748,7 @@ func (b *BeaconSlots) processBackfill(ctx context.Context, networkName string) {
 
 				// Add on our lag
 				slotState = &ProcessorState{
-					LastProcessedSlot: wallclockSlot + phase0.Slot(b.config.Backfill.Slots), //nolint:gosec // no risk of overflow
+					LastProcessedSlot: wallclockSlot + phase0.Slot(b.getBackfillSlots()), //nolint:gosec // no risk of overflow
 				}
 			} else {
 				logCtx.WithError(err).Warn("Failed to get state")
@@ -694,7 +772,7 @@ func (b *BeaconSlots) processBackfill(ctx context.Context, networkName string) {
 		}
 
 		//nolint:gosec // no risk of overflow
-		targetSlot := currentSlot - phase0.Slot(b.config.Backfill.Slots)
+		targetSlot := currentSlot - phase0.Slot(b.getBackfillSlots())
 
 		if slotState.LastProcessedSlot == targetSlot || targetSlot < 1 || slotState.LastProcessedSlot == 0 {
 			// Nothing to do, we are already at the target slot!

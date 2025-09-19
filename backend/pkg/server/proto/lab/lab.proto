@@ -15,18 +15,7 @@ message FrontendConfig {
 
   // Modules is the configuration for the modules
   message Modules {
-    BeaconChainTimingsModule beacon_chain_timings = 1;
     BeaconModule beacon = 3;
-  }
-
-  // BeaconChainTimingsModule represents the beacon chain timings module configuration
-  message BeaconChainTimingsModule {
-    repeated string networks = 1;
-    repeated TimeWindow time_windows = 2;
-
-    string path_prefix = 3;
-
-    bool enabled = 4;
   }
 
   // BeaconModule represents the beacon module configuration
@@ -35,14 +24,6 @@ message FrontendConfig {
     string description = 2;
     string path_prefix = 3;
     map<string, BeaconNetworkConfig> networks = 4;
-  }
-
-  // TimeWindow represents a time window configuration
-  message TimeWindow {
-    string file = 1;
-    string step = 2;
-    string label = 3;
-    string range = 4;
   }
 
   // BeaconNetworkConfig represents beacon network-specific configuration
