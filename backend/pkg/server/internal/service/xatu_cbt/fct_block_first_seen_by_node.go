@@ -8,6 +8,7 @@ import (
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/clickhouse"
 	cbtproto "github.com/ethpandaops/xatu-cbt/pkg/proto/clickhouse"
 	"github.com/prometheus/client_golang/prometheus"
+	"github.com/sirupsen/logrus"
 )
 
 const (
@@ -67,6 +68,13 @@ func (x *XatuCBT) ListFctBlockFirstSeenByNode(
 	if err != nil {
 		return nil, fmt.Errorf("failed to build query: %w", err)
 	}
+
+	// Log the generated query for debugging
+	x.log.WithFields(logrus.Fields{
+		"query":   sqlQuery.Query,
+		"args":    sqlQuery.Args,
+		"network": network,
+	}).Info("Generated SQL query for fct_block_first_seen_by_node")
 
 	if err = client.QueryWithScanner(ctx, sqlQuery.Query, func(scanner clickhouse.RowScanner) error {
 		node, scanErr := scanFctBlockFirstSeenByNode(scanner)

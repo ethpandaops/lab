@@ -79,28 +79,32 @@ func BuildListDimNodeQuery(req *ListDimNodeRequest, options ...QueryOption) (SQL
 	// Add filter for column: name
 	if req.Name != nil {
 		switch filter := req.Name.Filter.(type) {
-		case *StringFilter_Eq:
+		case *NullableStringFilter_Eq:
 			qb.AddCondition("name", "=", filter.Eq)
-		case *StringFilter_Ne:
+		case *NullableStringFilter_Ne:
 			qb.AddCondition("name", "!=", filter.Ne)
-		case *StringFilter_Contains:
+		case *NullableStringFilter_Contains:
 			qb.AddLikeCondition("name", "%" + filter.Contains + "%")
-		case *StringFilter_StartsWith:
+		case *NullableStringFilter_StartsWith:
 			qb.AddLikeCondition("name", filter.StartsWith + "%")
-		case *StringFilter_EndsWith:
+		case *NullableStringFilter_EndsWith:
 			qb.AddLikeCondition("name", "%" + filter.EndsWith)
-		case *StringFilter_Like:
+		case *NullableStringFilter_Like:
 			qb.AddLikeCondition("name", filter.Like)
-		case *StringFilter_NotLike:
+		case *NullableStringFilter_NotLike:
 			qb.AddNotLikeCondition("name", filter.NotLike)
-		case *StringFilter_In:
+		case *NullableStringFilter_In:
 			if len(filter.In.Values) > 0 {
 				qb.AddInCondition("name", StringSliceToInterface(filter.In.Values))
 			}
-		case *StringFilter_NotIn:
+		case *NullableStringFilter_NotIn:
 			if len(filter.NotIn.Values) > 0 {
 				qb.AddNotInCondition("name", StringSliceToInterface(filter.NotIn.Values))
 			}
+		case *NullableStringFilter_IsNull:
+			qb.AddIsNullCondition("name")
+		case *NullableStringFilter_IsNotNull:
+			qb.AddIsNotNullCondition("name")
 		default:
 			// Unsupported filter type
 		}
@@ -198,7 +202,7 @@ func BuildListDimNodeQuery(req *ListDimNodeRequest, options ...QueryOption) (SQL
 	// Handle custom ordering if provided
 	var orderByClause string
 	if req.OrderBy != "" {
-		validFields := []string{"updated_date_time", "name", "groups", "tags", "attributes", "validator_index", "source"}
+		validFields := []string{"updated_date_time", "validator_index", "name", "groups", "tags", "attributes", "source"}
 		orderFields, err := ParseOrderBy(req.OrderBy, validFields)
 		if err != nil {
 			return SQLQuery{}, fmt.Errorf("invalid order_by: %w", err)

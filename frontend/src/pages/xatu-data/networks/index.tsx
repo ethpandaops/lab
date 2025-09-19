@@ -65,8 +65,8 @@ export default function Networks() {
   if (!networkData) return <LoadingState message="Loading..." />;
 
   const metadata = NETWORK_METADATA[selectedNetwork as NetworkKey] || {
-    name: selectedNetwork.charAt(0).toUpperCase() + selectedNetwork.slice(1),
-    icon: '🔥',
+    name: selectedNetwork,
+    icon: '🧪',
     color: '#627EEA',
   };
 
@@ -106,7 +106,6 @@ export default function Networks() {
 
   return (
     <div className="space-y-6 max-w-5xl mx-auto">
-
       {/* Page Header */}
       <div className="relative z-10 bg-surface/50 backdrop-blur-sm rounded-lg border border-subtle p-4 shadow-sm overflow-visible">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
@@ -128,7 +127,7 @@ export default function Networks() {
           <NetworkSelector
             selectedNetwork={selectedNetwork}
             onNetworkChange={network => setSelectedNetwork(network, 'ui')}
-            className="w-48"
+            expandToFit={true}
           />
         </div>
       </div>

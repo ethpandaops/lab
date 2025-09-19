@@ -4,11 +4,11 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/ethpandaops/lab/backend/pkg/internal/lab/ethereum"
 	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/beacon_chain_timings"
 	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/beacon_slots"
 	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/cartographoor"
 	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/experiments"
+	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/xatu_cbt"
 	"github.com/ethpandaops/lab/backend/pkg/server/proto/config"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
@@ -18,7 +18,7 @@ import (
 type ConfigService struct {
 	config.UnimplementedConfigServiceServer
 	log                  logrus.FieldLogger
-	ethereumClient       *ethereum.Client
+	xatuCBTService       *xatu_cbt.XatuCBT
 	cartographoorService *cartographoor.Service
 	bctService           *beacon_chain_timings.BeaconChainTimings
 	bsService            *beacon_slots.BeaconSlots
@@ -28,7 +28,7 @@ type ConfigService struct {
 // NewConfigService creates a new ConfigService
 func NewConfigService(
 	log logrus.FieldLogger,
-	ethereumClient *ethereum.Client,
+	xatuCBTSvc *xatu_cbt.XatuCBT,
 	cartographoorService *cartographoor.Service,
 	bctService *beacon_chain_timings.BeaconChainTimings,
 	bsService *beacon_slots.BeaconSlots,
@@ -36,7 +36,7 @@ func NewConfigService(
 ) *ConfigService {
 	return &ConfigService{
 		log:                  log.WithField("grpc", "config"),
-		ethereumClient:       ethereumClient,
+		xatuCBTService:       xatuCBTSvc,
 		cartographoorService: cartographoorService,
 		bctService:           bctService,
 		bsService:            bsService,
@@ -71,50 +71,48 @@ func (c *ConfigService) GetConfig(
 	networksData := c.cartographoorService.GetNetworksData()
 	if networksData != nil && networksData.Networks != nil {
 		for _, network := range networksData.Networks {
-			// Only include networks that are configured in the lab
-			configured := false
-
-			for _, ethNetwork := range c.ethereumClient.Networks() {
-				if ethNetwork.Name == network.Name {
-					configured = true
-
-					break
-				}
+			// Only include networks that are enabled in xatu_cbt config
+			if c.xatuCBTService == nil || !c.xatuCBTService.IsNetworkEnabled(network.Name) {
+				continue
 			}
 
-			if configured {
-				netConfig := &config.NetworkConfig{
-					Name:        network.Name,
-					Status:      network.Status,
-					ChainId:     network.ChainId,
-					Description: network.Description,
-					LastUpdated: network.LastUpdated,
-				}
+			netConfig := &config.NetworkConfig{
+				Name:        network.Name,
+				Status:      network.Status,
+				ChainId:     network.ChainId,
+				Description: network.Description,
+				LastUpdated: network.LastUpdated,
+			}
 
-				// Add genesis time if available
-				if network.GenesisConfig != nil {
+			// Add genesis time - prefer xatu_cbt config override
+			if c.xatuCBTService != nil {
+				if overrideTime := c.xatuCBTService.GetNetworkGenesisTime(network.Name); overrideTime != nil {
+					netConfig.GenesisTime = *overrideTime
+				} else if network.GenesisConfig != nil {
 					netConfig.GenesisTime = network.GenesisConfig.GenesisTime
 				}
-
-				// Add service URLs if available
-				if len(network.ServiceUrls) > 0 {
-					netConfig.ServiceUrls = network.ServiceUrls
-				}
-
-				// Add fork information if available
-				if network.Forks != nil && network.Forks.Consensus != nil && network.Forks.Consensus.Electra != nil {
-					netConfig.Forks = &config.ForkConfig{
-						Consensus: &config.ConsensusForks{
-							Electra: &config.ForkInfo{
-								Epoch:             network.Forks.Consensus.Electra.Epoch,
-								MinClientVersions: network.Forks.Consensus.Electra.MinClientVersions,
-							},
-						},
-					}
-				}
-
-				networksConfig[network.Name] = netConfig
+			} else if network.GenesisConfig != nil {
+				netConfig.GenesisTime = network.GenesisConfig.GenesisTime
 			}
+
+			// Add service URLs if available
+			if len(network.ServiceUrls) > 0 {
+				netConfig.ServiceUrls = network.ServiceUrls
+			}
+
+			// Add fork information if available
+			if network.Forks != nil && network.Forks.Consensus != nil && network.Forks.Consensus.Electra != nil {
+				netConfig.Forks = &config.ForkConfig{
+					Consensus: &config.ConsensusForks{
+						Electra: &config.ForkInfo{
+							Epoch:             network.Forks.Consensus.Electra.Epoch,
+							MinClientVersions: network.Forks.Consensus.Electra.MinClientVersions,
+						},
+					},
+				}
+			}
+
+			networksConfig[network.Name] = netConfig
 		}
 	}
 

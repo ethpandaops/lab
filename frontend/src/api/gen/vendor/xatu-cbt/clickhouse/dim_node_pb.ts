@@ -4,8 +4,8 @@
 // @ts-nocheck
 
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
-import { Message, proto3 } from "@bufbuild/protobuf";
-import { MapStringStringFilter, StringFilter, UInt32Filter } from "./common_pb.js";
+import { Message, proto3, StringValue } from "@bufbuild/protobuf";
+import { MapStringStringFilter, NullableStringFilter, StringFilter, UInt32Filter } from "./common_pb.js";
 
 /**
  * @generated from message cbt.DimNode
@@ -19,42 +19,42 @@ export class DimNode extends Message<DimNode> {
   updatedDateTime = 0;
 
   /**
+   * The index of the validator
+   *
+   * @generated from field: uint32 validator_index = 12;
+   */
+  validatorIndex = 0;
+
+  /**
    * The name of the node
    *
-   * @generated from field: string name = 12;
+   * @generated from field: google.protobuf.StringValue name = 13;
    */
-  name = "";
+  name?: string;
 
   /**
    * Groups the node belongs to
    *
-   * @generated from field: repeated string groups = 13;
+   * @generated from field: repeated string groups = 14;
    */
   groups: string[] = [];
 
   /**
    * Tags associated with the node
    *
-   * @generated from field: repeated string tags = 14;
+   * @generated from field: repeated string tags = 15;
    */
   tags: string[] = [];
 
   /**
    * Additional attributes of the node
    *
-   * @generated from field: string attributes = 15;
+   * @generated from field: string attributes = 16;
    */
   attributes = "";
 
   /**
-   * The index of the validator
-   *
-   * @generated from field: uint32 validator_index = 16;
-   */
-  validatorIndex = 0;
-
-  /**
-   * The source of the node data
+   * The source entity of the node
    *
    * @generated from field: string source = 17;
    */
@@ -69,11 +69,11 @@ export class DimNode extends Message<DimNode> {
   static readonly typeName = "cbt.DimNode";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 11, name: "updated_date_time", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
-    { no: 12, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 13, name: "groups", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
-    { no: 14, name: "tags", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
-    { no: 15, name: "attributes", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 16, name: "validator_index", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
+    { no: 12, name: "validator_index", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
+    { no: 13, name: "name", kind: "message", T: StringValue },
+    { no: 14, name: "groups", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+    { no: 15, name: "tags", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+    { no: 16, name: "attributes", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 17, name: "source", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
@@ -117,9 +117,9 @@ export class ListDimNodeRequest extends Message<ListDimNodeRequest> {
   /**
    * Filter by name (optional)
    *
-   * @generated from field: cbt.StringFilter name = 3;
+   * @generated from field: cbt.NullableStringFilter name = 3;
    */
-  name?: StringFilter;
+  name?: NullableStringFilter;
 
   /**
    * Filter by groups (optional)
@@ -185,7 +185,7 @@ export class ListDimNodeRequest extends Message<ListDimNodeRequest> {
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "validator_index", kind: "message", T: UInt32Filter },
     { no: 2, name: "updated_date_time", kind: "message", T: UInt32Filter },
-    { no: 3, name: "name", kind: "message", T: StringFilter },
+    { no: 3, name: "name", kind: "message", T: NullableStringFilter },
     { no: 4, name: "groups", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
     { no: 5, name: "tags", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
     { no: 6, name: "attributes", kind: "message", T: MapStringStringFilter },

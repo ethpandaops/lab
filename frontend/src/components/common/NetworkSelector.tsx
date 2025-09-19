@@ -11,6 +11,7 @@ interface NetworkSelectorProps {
   onNetworkChange: (network: string) => void;
   availableNetworks?: string[];
   className?: string;
+  expandToFit?: boolean; // Allow the selector to expand to fit content
 }
 
 // Function to generate metadata for networks not defined in NETWORK_METADATA
@@ -19,10 +20,10 @@ const getNetworkMetadata = (network: string) => {
     return NETWORK_METADATA[network as NetworkKey];
   }
 
-  // Generate metadata for unknown networks
+  // Generate metadata for unknown networks (typically test/dev networks)
   return {
-    name: network.charAt(0).toUpperCase() + network.slice(1),
-    icon: '🔥',
+    name: network,
+    icon: '🧪',
     color: '#627EEA',
   };
 };
@@ -60,6 +61,7 @@ export function NetworkSelector({
   selectedNetwork,
   onNetworkChange,
   className = '',
+  expandToFit = false,
 }: NetworkSelectorProps) {
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -88,12 +90,21 @@ export function NetworkSelector({
     <div className={clsx('relative', className)} ref={dropdownRef}>
       <Listbox value={selectedNetwork} onChange={onNetworkChange}>
         <div className="relative">
-          <Listbox.Button className="relative w-full cursor-pointer rounded-lg bg-surface/30 backdrop-blur-sm py-2 pl-3 pr-10 text-left shadow-sm border border-subtle hover:bg-surface/50 transition-colors">
-            <span className="flex items-center justify-center gap-2">
-              <span className="w-5 h-5 flex items-center justify-center">
+          <Listbox.Button
+            className={clsx(
+              'relative cursor-pointer rounded-lg bg-surface/30 backdrop-blur-sm py-2 pl-3 pr-10 text-left shadow-sm border border-subtle hover:bg-surface/50 transition-colors',
+              expandToFit ? 'w-auto min-w-[140px]' : 'w-full',
+            )}
+          >
+            <span className="flex items-center gap-2">
+              <span className="w-5 h-5 flex items-center justify-center flex-shrink-0">
                 {selectedMetadata.icon}
               </span>
-              <span className="block truncate font-mono">{selectedMetadata.name}</span>
+              <span
+                className={clsx('block font-mono', expandToFit ? 'whitespace-nowrap' : 'truncate')}
+              >
+                {selectedMetadata.name}
+              </span>
             </span>
             <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
               <ChevronUpDownIcon className="h-5 w-5 text-tertiary" aria-hidden="true" />
@@ -105,7 +116,12 @@ export function NetworkSelector({
             leaveFrom="opacity-100"
             leaveTo="opacity-0"
           >
-            <Listbox.Options className="absolute z-[9999] mt-1 max-h-60 w-full overflow-auto rounded-lg bg-surface py-1 shadow-lg border border-subtle">
+            <Listbox.Options
+              className={clsx(
+                'absolute z-[9999] mt-1 max-h-60 overflow-auto rounded-lg bg-surface py-1 shadow-lg border border-subtle',
+                expandToFit ? 'min-w-full w-max' : 'w-full',
+              )}
+            >
               {networks.map(network => {
                 const metadata = getNetworkMetadata(network);
                 return (
@@ -121,10 +137,16 @@ export function NetworkSelector({
                   >
                     {({ selected }) => (
                       <span className="flex items-center gap-2">
-                        <span className="w-5 h-5 flex items-center justify-center">
+                        <span className="w-5 h-5 flex items-center justify-center flex-shrink-0">
                           {metadata.icon}
                         </span>
-                        <span className={clsx('block truncate', selected && 'text-accent')}>
+                        <span
+                          className={clsx(
+                            'block',
+                            expandToFit ? 'whitespace-nowrap' : 'truncate',
+                            selected && 'text-accent',
+                          )}
+                        >
                           {metadata.name}
                         </span>
                       </span>

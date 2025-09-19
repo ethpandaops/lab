@@ -9,14 +9,14 @@ import (
 
 	"github.com/attestantio/go-eth2-client/spec/phase0"
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/cache"
-	"github.com/ethpandaops/lab/backend/pkg/internal/lab/ethereum"
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/geolocation"
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/leader"
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/locker"
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/metrics"
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/state"
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/storage"
-	"github.com/ethpandaops/lab/backend/pkg/internal/lab/xatu"
+	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/wallclock"
+	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/xatu_cbt"
 	bs_pb "github.com/ethpandaops/lab/backend/pkg/server/proto/beacon_slots"
 	pb "github.com/ethpandaops/lab/backend/pkg/server/proto/lab"
 	"github.com/prometheus/client_golang/prometheus"
@@ -38,8 +38,8 @@ type BeaconSlots struct {
 
 	config *Config
 
-	ethereum          *ethereum.Client
-	xatuClient        *xatu.Client
+	wallclockService  *wallclock.Service
+	xatuCBTService    *xatu_cbt.XatuCBT
 	storageClient     storage.Client
 	cacheClient       cache.Client
 	lockerClient      locker.Locker
@@ -74,8 +74,8 @@ const (
 func New(
 	log logrus.FieldLogger,
 	config *Config,
-	xatuClient *xatu.Client,
-	eth *ethereum.Client,
+	wallclockSvc *wallclock.Service,
+	xatuCBTSvc *xatu_cbt.XatuCBT,
 	storageClient storage.Client,
 	cacheClient cache.Client,
 	lockerClient locker.Locker,
@@ -95,8 +95,8 @@ func New(
 	return &BeaconSlots{
 		log:               log.WithField("component", "service/"+ServiceName),
 		config:            config,
-		ethereum:          eth,
-		xatuClient:        xatuClient,
+		wallclockService:  wallclockSvc,
+		xatuCBTService:    xatuCBTSvc,
 		storageClient:     storageClient,
 		cacheClient:       cacheClient,
 		lockerClient:      lockerClient,
@@ -162,8 +162,8 @@ func (b *BeaconSlots) Start(ctx context.Context) error {
 			b.log,
 			&b.config.LocallyBuiltBlocksConfig,
 			b.config.HeadDelaySlots,
-			b.ethereum,
-			b.xatuClient,
+			b.wallclockService,
+			b.xatuCBTService,
 			b.cacheClient,
 			b.lockerClient,
 			b.metrics,
@@ -179,8 +179,8 @@ func (b *BeaconSlots) Start(ctx context.Context) error {
 
 func (b *BeaconSlots) FetchSlotData(ctx context.Context, network string, slot phase0.Slot) (*bs_pb.BeaconSlotData, error) {
 	// Check if this is a network that we support
-	if b.ethereum.GetNetwork(network) == nil {
-		return nil, fmt.Errorf("network %s not supported", network)
+	if !b.xatuCBTService.IsNetworkEnabled(network) {
+		return nil, fmt.Errorf("network %s not configured", network)
 	}
 
 	// Check if we've got the slot data in cache
@@ -201,7 +201,12 @@ func (b *BeaconSlots) FetchSlotData(ctx context.Context, network string, slot ph
 	}
 
 	// If the slot is "recent", cache the data
-	slotTime, _, err := b.ethereum.GetNetwork(network).GetWallclock().Now()
+	wc := b.wallclockService.GetWallclock(network)
+	if wc == nil {
+		return nil, fmt.Errorf("wallclock not available for network %s", network)
+	}
+
+	slotTime, _, err := wc.Now()
 	if err != nil {
 		return nil, fmt.Errorf("failed to get current slot for network %s: %w", network, err)
 	}
@@ -211,7 +216,7 @@ func (b *BeaconSlots) FetchSlotData(ctx context.Context, network string, slot ph
 		return nil, fmt.Errorf("failed to marshal slot data: %w", err)
 	}
 
-	if slotTime.TimeWindow().Start().Before(time.Now().Add(2 * time.Minute)) {
+	if slotTime.TimeWindow().Start().Before(time.Now().UTC().Add(2 * time.Minute)) {
 		err = b.cacheClient.Set(cacheKey, dataBytes, 2*time.Minute)
 		if err != nil {
 			// Don't return error, caching is best-effort
@@ -279,7 +284,8 @@ func (b *BeaconSlots) startProcessors(ctx context.Context) {
 	b.log.Info("Starting all processors")
 
 	// Process each network
-	for _, network := range b.ethereum.Networks() {
+	enabledNetworks := b.xatuCBTService.GetEnabledNetworks()
+	for _, networkName := range enabledNetworks {
 		// Process head (latest slots)
 		b.processWaitGroup.Add(1)
 
@@ -287,7 +293,7 @@ func (b *BeaconSlots) startProcessors(ctx context.Context) {
 			defer b.processWaitGroup.Done()
 
 			b.processHead(ctx, network)
-		}(network.Name)
+		}(networkName)
 
 		// Process trailing slots
 		b.processWaitGroup.Add(1)
@@ -296,7 +302,7 @@ func (b *BeaconSlots) startProcessors(ctx context.Context) {
 			defer b.processWaitGroup.Done()
 
 			b.processTrailing(ctx, network)
-		}(network.Name)
+		}(networkName)
 
 		// Process backfill (historical slots)
 		b.processWaitGroup.Add(1)
@@ -305,7 +311,7 @@ func (b *BeaconSlots) startProcessors(ctx context.Context) {
 			defer b.processWaitGroup.Done()
 
 			b.processBackfill(ctx, network)
-		}(network.Name)
+		}(networkName)
 	}
 
 	// Wait for context cancellation
@@ -340,8 +346,10 @@ func (b *BeaconSlots) slotHasBeenProcessed(ctx context.Context, network string, 
 
 func (b *BeaconSlots) FrontendModuleConfig() *pb.FrontendConfig_BeaconModule {
 	networks := make(map[string]*pb.FrontendConfig_BeaconNetworkConfig)
-	for _, network := range b.ethereum.Networks() {
-		networks[network.Name] = &pb.FrontendConfig_BeaconNetworkConfig{
+	enabledNetworks := b.xatuCBTService.GetEnabledNetworks()
+
+	for _, networkName := range enabledNetworks {
+		networks[networkName] = &pb.FrontendConfig_BeaconNetworkConfig{
 			HeadLagSlots: int32(b.config.HeadDelaySlots), //nolint:gosec // no risk of overflow
 			BacklogDays:  int32(b.config.Backfill.Slots), //nolint:gosec // no risk of overflow
 		}
@@ -357,7 +365,12 @@ func (b *BeaconSlots) FrontendModuleConfig() *pb.FrontendConfig_BeaconModule {
 
 // sleepUntilNextSlot sleeps until the next slot for a network
 func (b *BeaconSlots) sleepUntilNextSlot(ctx context.Context, network string) {
-	slot, _, err := b.ethereum.GetNetwork(network).GetWallclock().Now()
+	wc := b.wallclockService.GetWallclock(network)
+	if wc == nil {
+		return
+	}
+
+	slot, _, err := wc.Now()
 	if err != nil {
 		b.log.WithError(err).Warn("Failed to get current slot")
 
@@ -531,9 +544,9 @@ func (b *BeaconSlots) processTrailing(ctx context.Context, networkName string) {
 
 				logCtx.Info("No state found, initializing")
 
-				// Add on our lag
+				// Start with appropriate delay
 				slotState = &ProcessorState{
-					LastProcessedSlot: wallclockSlot + b.config.HeadDelaySlots,
+					LastProcessedSlot: wallclockSlot - b.config.HeadDelaySlots,
 				}
 			} else {
 				logCtx.WithError(err).Warn("Failed to get state")
@@ -748,7 +761,12 @@ func (b *BeaconSlots) processBackfill(ctx context.Context, networkName string) {
 
 // getCurrentSlot returns the current slot for a network
 func (b *BeaconSlots) getCurrentSlot(ctx context.Context, networkName string) (phase0.Slot, error) {
-	slot, _, err := b.ethereum.GetNetwork(networkName).GetWallclock().Now()
+	wc := b.wallclockService.GetWallclock(networkName)
+	if wc == nil {
+		return 0, fmt.Errorf("wallclock not available for network %s", networkName)
+	}
+
+	slot, _, err := wc.Now()
 	if err != nil {
 		return 0, fmt.Errorf("failed to get current slot: %w", err)
 	}

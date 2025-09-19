@@ -11,20 +11,19 @@ import (
 	"time"
 
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/cache"
-	"github.com/ethpandaops/lab/backend/pkg/internal/lab/ethereum"
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/geolocation"
 
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/locker"
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/logger"
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/metrics"
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/storage"
-	"github.com/ethpandaops/lab/backend/pkg/internal/lab/xatu"
 	"github.com/ethpandaops/lab/backend/pkg/server/internal/grpc"
 	"github.com/ethpandaops/lab/backend/pkg/server/internal/service"
 	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/beacon_chain_timings"
 	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/beacon_slots"
 	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/cartographoor"
 	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/experiments"
+	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/wallclock"
 	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/xatu_cbt"
 	"github.com/sirupsen/logrus"
 )
@@ -46,8 +45,7 @@ type Service struct {
 	services []service.Service
 
 	// Clients
-	ethereumClient       *ethereum.Client
-	xatuClient           *xatu.Client
+	wallclockService     *wallclock.Service
 	storageClient        storage.Client
 	cacheClient          cache.Client
 	lockerClient         locker.Locker
@@ -141,9 +139,9 @@ func (s *Service) Start(ctx context.Context) error {
 	grpcServices := []grpc.Service{
 		grpc.NewBeaconChainTimings(s.log, bctService),
 		grpc.NewBeaconSlotsHandler(s.log, bsService),
-		grpc.NewXatuCBT(s.log, s.xatuCBTService, s.ethereumClient),
-		grpc.NewCartographoorService(s.log, s.cartographoorService, s.ethereumClient),
-		grpc.NewConfigService(s.log, s.ethereumClient, s.cartographoorService, bctService, bsService, s.experimentsService),
+		grpc.NewXatuCBT(s.log, s.xatuCBTService, s.wallclockService),
+		grpc.NewCartographoorService(s.log, s.cartographoorService, s.xatuCBTService),
+		grpc.NewConfigService(s.log, s.xatuCBTService, s.cartographoorService, bctService, bsService, s.experimentsService),
 	}
 
 	// Create gRPC server
@@ -185,8 +183,7 @@ func (s *Service) initializeServices(ctx context.Context) error { // ctx is alre
 	bct, err := beacon_chain_timings.New(
 		s.log,
 		s.config.Modules["beacon_chain_timings"].BeaconChainTimings,
-		s.xatuClient,
-		s.config.Ethereum,
+		s.xatuCBTService,
 		s.storageClient,
 		s.cacheClient,
 		s.lockerClient,
@@ -199,8 +196,8 @@ func (s *Service) initializeServices(ctx context.Context) error { // ctx is alre
 	beaconSlotsService, err := beacon_slots.New(
 		s.log,
 		s.config.Modules["beacon_slots"].BeaconSlots,
-		s.xatuClient,
-		s.ethereumClient,
+		s.wallclockService,
+		s.xatuCBTService,
 		s.storageClient,
 		s.cacheClient,
 		s.lockerClient,
@@ -226,28 +223,46 @@ func (s *Service) initializeDependencies(ctx context.Context) error {
 	s.log.Info("Initializing metrics service")
 	s.metrics = metrics.NewMetricsService("lab", s.log)
 
-	// Initialize Ethereum client
-	s.log.Info("Initializing Ethereum client")
+	// Initialize Cartographoor service first (needed for wallclock)
+	s.log.Info("Initializing Cartographoor service")
 
-	ethereumClient := ethereum.NewClient(s.config.Ethereum, s.metrics)
-	if err := ethereumClient.Start(ctx); err != nil {
-		return fmt.Errorf("failed to start Ethereum client: %w", err)
-	}
-
-	s.ethereumClient = ethereumClient
-
-	// Initialize global XatuClickhouse
-	s.log.Info("Initializing per-network Xatu ClickHouse clients")
-
-	xatuClient, err := xatu.NewClient(s.log, s.config.GetXatuConfig(), s.metrics)
+	cartographoorSvc, err := cartographoor.New(s.log, s.config.Cartographoor)
 	if err != nil {
-		return fmt.Errorf("failed to initialize global Xatu ClickHouse client: %w", err)
+		return fmt.Errorf("failed to initialize Cartographoor service: %w", err)
 	}
 
-	// Start the Xatu client
-	if errr := xatuClient.Start(ctx); errr != nil {
-		return fmt.Errorf("failed to start Xatu client: %w", errr)
+	// Start cartographoor service
+	if err := cartographoorSvc.Start(ctx); err != nil {
+		return fmt.Errorf("failed to start Cartographoor service: %w", err)
 	}
+
+	s.cartographoorService = cartographoorSvc
+
+	// Initialize wallclock service (depends on cartographoor)
+	s.log.Info("Initializing wallclock service")
+
+	// Create NetworkDataAdapter using cartographoor service and xatu_cbt config for overrides
+	networkDataAdapter := NewNetworkDataAdapter(s.cartographoorService, s.config.XatuCBT)
+
+	// Build wallclock network configs from xatu_cbt config
+	wallclockNetworkConfigs := make(map[string]*wallclock.NetworkConfig)
+
+	for name, netConfig := range s.config.XatuCBT.NetworkConfigs {
+		if netConfig.Enabled {
+			wallclockNetworkConfigs[name] = &wallclock.NetworkConfig{
+				Name:           name,
+				GenesisTime:    netConfig.GenesisTime,
+				SecondsPerSlot: netConfig.SecondsPerSlot,
+			}
+		}
+	}
+
+	wallclockSvc := wallclock.New(s.log, wallclockNetworkConfigs, networkDataAdapter, s.metrics)
+	if err := wallclockSvc.Start(ctx); err != nil {
+		return fmt.Errorf("failed to start wallclock service: %w", err)
+	}
+
+	s.wallclockService = wallclockSvc
 
 	// Initialize S3 Storage
 	s.log.Info("Initializing S3 storage")
@@ -287,19 +302,6 @@ func (s *Service) initializeDependencies(ctx context.Context) error {
 		return fmt.Errorf("failed to start geolocation client: %w", err)
 	}
 
-	// Initialize Cartographoor service
-	s.log.Info("Initializing Cartographoor service")
-
-	cartographoorSvc, err := cartographoor.New(s.log, s.config.Cartographoor)
-	if err != nil {
-		return fmt.Errorf("failed to initialize Cartographoor service: %w", err)
-	}
-
-	// Start cartographoor service
-	if err := cartographoorSvc.Start(ctx); err != nil {
-		return fmt.Errorf("failed to start Cartographoor service: %w", err)
-	}
-
 	// Initialize Xatu CBT datasource
 	s.log.Info("Initializing Xatu CBT datasource")
 
@@ -308,8 +310,8 @@ func (s *Service) initializeDependencies(ctx context.Context) error {
 		s.config.XatuCBT,
 		cacheClient,
 		s.metrics,
-		cartographoorSvc,
-		ethereumClient,
+		s.cartographoorService,
+		s.wallclockService,
 	)
 	if err != nil {
 		return fmt.Errorf("failed to initialize Xatu CBT datasource: %w", err)
@@ -320,13 +322,11 @@ func (s *Service) initializeDependencies(ctx context.Context) error {
 		return fmt.Errorf("failed to start Xatu CBT datasource: %w", err)
 	}
 
-	s.xatuClient = xatuClient
 	s.storageClient = storageClient
 	s.cacheClient = cacheClient
 	s.lockerClient = lockerClient
 	s.geolocationClient = geolocationClient
 	s.xatuCBTService = xatuCBTService
-	s.cartographoorService = cartographoorSvc
 
 	// Initialize experiments service if configured
 	if s.config.Experiments != nil && len(*s.config.Experiments) > 0 {
@@ -409,20 +409,6 @@ func (s *Service) stop() {
 		s.log.WithField("service_name", serviceToStop.Name()).Info("Stopping service...")
 		serviceToStop.Stop()
 		s.log.WithField("service_name", serviceToStop.Name()).Info("Service stopped.")
-	}
-
-	if s.xatuClient != nil {
-		wg.Add(1)
-
-		go func() {
-			defer wg.Done()
-
-			s.log.Info("Stopping Xatu client...")
-
-			s.xatuClient.Stop()
-
-			s.log.Info("Xatu client stopped.")
-		}()
 	}
 
 	if s.storageClient != nil {

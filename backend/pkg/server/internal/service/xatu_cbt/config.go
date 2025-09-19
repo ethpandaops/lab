@@ -15,8 +15,11 @@ type Config struct {
 }
 
 type NetworkConfig struct {
-	Enabled    bool               `yaml:"enabled"`
-	ClickHouse *clickhouse.Config `yaml:"clickhouse"`
+	Enabled        bool               `yaml:"enabled"`
+	GenesisTime    *string            `yaml:"genesisTime"`    // Optional: RFC3339 time string (e.g. "2020-12-01T12:00:23Z")
+	SecondsPerSlot *uint64            `yaml:"secondsPerSlot"` // Optional: defaults to 12
+	ClickHouse     *clickhouse.Config `yaml:"clickhouse"`     // CBT tables
+	RawClickHouse  *clickhouse.Config `yaml:"raw_clickhouse"` // Raw xatu tables
 }
 
 func (c *Config) Validate() error {
@@ -38,9 +41,19 @@ func (c *Config) Validate() error {
 
 	// Validate each network's ClickHouse config
 	for network, cfg := range c.NetworkConfigs {
-		if cfg.Enabled && cfg.ClickHouse != nil {
-			if err := cfg.ClickHouse.Validate(); err != nil {
-				return fmt.Errorf("network %s clickhouse config: %w", network, err)
+		if cfg.Enabled {
+			// Validate CBT ClickHouse config if present
+			if cfg.ClickHouse != nil {
+				if err := cfg.ClickHouse.Validate(); err != nil {
+					return fmt.Errorf("network %s clickhouse config: %w", network, err)
+				}
+			}
+
+			// Validate raw ClickHouse config if present
+			if cfg.RawClickHouse != nil {
+				if err := cfg.RawClickHouse.Validate(); err != nil {
+					return fmt.Errorf("network %s raw_clickhouse config: %w", network, err)
+				}
 			}
 		}
 	}

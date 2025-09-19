@@ -4,8 +4,6 @@ import (
 	"fmt"
 
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/cache"
-	"github.com/ethpandaops/lab/backend/pkg/internal/lab/clickhouse"
-	"github.com/ethpandaops/lab/backend/pkg/internal/lab/ethereum"
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/geolocation"
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/storage"
 	"github.com/ethpandaops/lab/backend/pkg/server/internal/grpc"
@@ -19,7 +17,6 @@ import (
 type Config struct {
 	LogLevel      string                   `yaml:"logLevel" default:"info"`
 	Server        *grpc.Config             `yaml:"grpc"`
-	Ethereum      *ethereum.Config         `yaml:"ethereum"`
 	Storage       *storage.Config          `yaml:"storage"`
 	Modules       map[string]*ModuleConfig `yaml:"modules"`
 	Cache         *cache.Config            `yaml:"cache"`
@@ -35,14 +32,6 @@ type ModuleConfig struct {
 }
 
 func (x *Config) Validate() error {
-	if x.Ethereum == nil {
-		return fmt.Errorf("ethereum config is required")
-	}
-
-	if err := x.Ethereum.Validate(); err != nil {
-		return fmt.Errorf("ethereum config is invalid: %w", err)
-	}
-
 	if x.Modules == nil {
 		return fmt.Errorf("modules config is required")
 	}
@@ -59,30 +48,13 @@ func (x *Config) Validate() error {
 		return fmt.Errorf("xatu_cbt config is invalid: %w", err)
 	}
 
-	// Cartographoor config is optional, but validate if provided
-	if x.Cartographoor != nil {
-		if err := x.Cartographoor.Validate(); err != nil {
-			return fmt.Errorf("cartographoor config is invalid: %w", err)
-		}
-	} else {
-		// Provide default configuration
-		x.Cartographoor = &cartographoor.Config{}
-		if err := x.Cartographoor.Validate(); err != nil {
-			return fmt.Errorf("cartographoor default config validation failed: %w", err)
-		}
+	if x.Cartographoor == nil {
+		return fmt.Errorf("cartographoor config is required")
+	}
+
+	if err := x.Cartographoor.Validate(); err != nil {
+		return fmt.Errorf("cartographoor config is invalid: %w", err)
 	}
 
 	return nil
-}
-
-func (x *Config) GetXatuConfig() map[string]*clickhouse.Config {
-	xatuConfig := make(map[string]*clickhouse.Config)
-
-	for networkName, networkConfig := range x.Ethereum.Networks {
-		if networkConfig.Xatu != nil {
-			xatuConfig[networkName] = networkConfig.Xatu
-		}
-	}
-
-	return xatuConfig
 }

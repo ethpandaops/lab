@@ -6,16 +6,15 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/ethpandaops/lab/backend/pkg/internal/lab/ethereum"
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/storage"
 	pb "github.com/ethpandaops/lab/backend/pkg/server/proto/beacon_chain_timings"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
-func (b *BeaconChainTimings) processBlockTimings(ctx context.Context, network *ethereum.NetworkConfig, windowName string) error {
+func (b *BeaconChainTimings) processBlockTimings(ctx context.Context, networkName string, windowName string) error {
 	b.log.WithFields(logrus.Fields{
-		"network": network.Name,
+		"network": networkName,
 		"window":  windowName,
 	}).Info("Processing block timings")
 
@@ -28,7 +27,7 @@ func (b *BeaconChainTimings) processBlockTimings(ctx context.Context, network *e
 		[]string{"operation", "network", "window"},
 	)
 	if err == nil {
-		counter.WithLabelValues("block_timings", network.Name, windowName).Inc()
+		counter.WithLabelValues("block_timings", networkName, windowName).Inc()
 	}
 
 	// Get time window config
@@ -41,7 +40,7 @@ func (b *BeaconChainTimings) processBlockTimings(ctx context.Context, network *e
 			[]string{"operation", "network", "window"},
 		)
 		if metricErr == nil {
-			errorCounter.WithLabelValues("block_timings", network.Name, windowName).Inc()
+			errorCounter.WithLabelValues("block_timings", networkName, windowName).Inc()
 		}
 
 		return fmt.Errorf("failed to get time window config: %w", err)
@@ -57,14 +56,14 @@ func (b *BeaconChainTimings) processBlockTimings(ctx context.Context, network *e
 			[]string{"operation", "network", "window"},
 		)
 		if metricErr == nil {
-			errorCounter.WithLabelValues("block_timings", network.Name, windowName).Inc()
+			errorCounter.WithLabelValues("block_timings", networkName, windowName).Inc()
 		}
 
 		return fmt.Errorf("failed to get time range: %w", err)
 	}
 
 	// Process block timings
-	timingData, err := b.GetTimingData(ctx, network.Name, timeRange, timeWindow) // Pass config
+	timingData, err := b.GetTimingData(ctx, networkName, timeRange, timeWindow) // Pass config
 	if err != nil {
 		// Record error metric if available
 		errorCounter, metricErr := b.metricsCollector.NewCounterVec(
@@ -73,14 +72,14 @@ func (b *BeaconChainTimings) processBlockTimings(ctx context.Context, network *e
 			[]string{"operation", "network", "window"},
 		)
 		if metricErr == nil {
-			errorCounter.WithLabelValues("block_timings", network.Name, windowName).Inc()
+			errorCounter.WithLabelValues("block_timings", networkName, windowName).Inc()
 		}
 
 		return fmt.Errorf("failed to process block timings: %w", err)
 	}
 
 	// Store the results
-	if err := b.storeTimingData(ctx, network.Name, timeWindow.File, timingData); err != nil {
+	if err := b.storeTimingData(ctx, networkName, timeWindow.File, timingData); err != nil {
 		// Record error metric if available
 		errorCounter, metricErr := b.metricsCollector.NewCounterVec(
 			"processing_errors_total",
@@ -88,7 +87,7 @@ func (b *BeaconChainTimings) processBlockTimings(ctx context.Context, network *e
 			[]string{"operation", "network", "window"},
 		)
 		if metricErr == nil {
-			errorCounter.WithLabelValues("block_timings", network.Name, windowName).Inc()
+			errorCounter.WithLabelValues("block_timings", networkName, windowName).Inc()
 		}
 
 		return fmt.Errorf("failed to store timing data: %w", err)
@@ -104,7 +103,7 @@ func (b *BeaconChainTimings) processBlockTimings(ctx context.Context, network *e
 		nil,
 	)
 	if err == nil {
-		histogram.WithLabelValues("block_timings", network.Name, windowName).Observe(duration)
+		histogram.WithLabelValues("block_timings", networkName, windowName).Observe(duration)
 	}
 
 	return nil
@@ -200,7 +199,7 @@ func (b *BeaconChainTimings) GetTimingData(ctx context.Context, network string, 
 		ORDER BY time_slot ASC
 	`
 
-	ch, err := b.xatuClient.GetClickhouseClientForNetwork(network) // Assuming this returns a *sql.DB or similar
+	ch, err := b.xatuCBTService.GetRawClickHouseClient(network)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get ClickHouse client for network: %s", network)
 	}
