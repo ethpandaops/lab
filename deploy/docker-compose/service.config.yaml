@@ -16,36 +16,6 @@ storage:
   secure: false
   usePathStyle: true
 
-# Ethereum configuration
-ethereum:
-  networks:
-    mainnet:
-      configURL: "https://raw.githubusercontent.com/eth-clients/mainnet/refs/heads/main/metadata/config.yaml"
-      xatu:
-        dsn: "${XATU_CLICKHOUSE_URL}"
-        connection:
-          insecure_skip_verify: false  # Default: false
-          dial_timeout: 10s      # Default: 10s
-          read_timeout: 30s      # Default: 30s
-          write_timeout: 30s     # Default: 30s
-          max_execution_time: 60 # Default: 60 (seconds)
-          max_open_conns: 10     # Default: 10
-          max_idle_conns: 5      # Default: 5
-          conn_max_lifetime: 1h  # Default: 1h
-    hoodi:
-      configURL: "https://raw.githubusercontent.com/eth-clients/hoodi/refs/heads/main/metadata/config.yaml"
-      xatu:
-        dsn: "${XATU_CLICKHOUSE_URL}"
-        connection:
-          insecure_skip_verify: false  # Default: false
-          dial_timeout: 10s      # Default: 10s
-          read_timeout: 30s      # Default: 30s
-          write_timeout: 30s     # Default: 30s
-          max_execution_time: 60 # Default: 60 (seconds)
-          max_open_conns: 10     # Default: 10
-          max_idle_conns: 5      # Default: 5
-          conn_max_lifetime: 1h  # Default: 1h
-
 # Cache configuration
 cache:
   type: "redis"
@@ -57,57 +27,73 @@ geolocation:
   enabled: ${GEOLOCATION_ENABLED}
   databaseLocation: "${GEOLOCATION_DATABASE_LOCATION}"
 
-# Modules configuration
-modules:
-  beacon_slots:
-    beacon_slots:
+# Cartographoor configuration
+cartographoor:
+  refresh_interval: "1h"
+  request_timeout: "30s"
+  cache_ttl: "10m"
+
+# Xatu CBT datasource configuration
+xatu_cbt:
+  cache_ttl: "60s"
+  max_query_limit: 1000
+  default_limit: 100
+  network_configs:
+    mainnet:
       enabled: true
-      backfill:
-        enabled: true
-        slots: 1000
+      genesisTime: "2020-12-01T12:00:23Z"
+      clickhouse:
+        dsn: "${XATU_CBT_CLICKHOUSE_URL}"
+        insecure_skip_verify: false
+      raw_clickhouse:  # Raw xatu access (for non-CBT tables)
+        dsn: "${XATU_CLICKHOUSE_URL}"
+        protocol: "native"
+    sepolia:
+      enabled: true
+      genesisTime: "2022-06-20T12:00:00Z"
+      clickhouse:
+        dsn: "${XATU_CBT_CLICKHOUSE_URL}"
+        insecure_skip_verify: false
+      raw_clickhouse: # Raw xatu access (for non-CBT tables)
+        dsn: "${XATU_CLICKHOUSE_URL}"
+        protocol: "native"
+    hoodi:
+      enabled: true
+      genesisTime: "2025-03-17T12:10:00Z"
+      clickhouse:
+        dsn: "${XATU_CBT_CLICKHOUSE_URL}"
+        insecure_skip_verify: false
+      raw_clickhouse:  # Raw xatu access (for non-CBT tables)
+        dsn: "${XATU_CLICKHOUSE_URL}"
+        protocol: "native"
+
+# Experiments configuration
+experiments:
+  - id: "contributoors"
+    enabled: true
+    networks: [ "mainnet", "hoodi", "sepolia" ]
+  - id: "live-slots"
+    enabled: true
+    networks: ["mainnet", "hoodi"]
+    config:
       head_delay_slots: 2
-      locally_built_blocks:
-        enabled: true
-        slots: 16
-  beacon_chain_timings:
-    beacon_chain_timings:
-      enabled: true
-      interval: "1m"
-      time_windows:
-        - file: "last_1_hour.json"
-          step: "5m"
-          label: "Last hour"
-          range: "-1h"
-        - file: "last_1_day.json"
-          step: "30m"
-          label: "Last 24 hours"
-          range: "-24h"
-        - file: "last_7_days.json"
-          step: "6h"
-          label: "Last 7 days"
-          range: "-168h"
-        - file: "last_30_days.json"
-          step: "24h"
-          label: "Last 30 days"
-          range: "-720h"
-  xatu_public_contributors:
-    xatu_public_contributors:
-      enabled: true
-      redis_key_prefix: "lab_xatu_public_contributors"
-      interval: "2m"
-      time_windows:
-        - name: "1d"
-          duration: "24h"
-          file: "last_1_day.json"
-          step: "1h"
-          range: "-24h"
-        - name: "7d"
-          duration: "168h"
-          file: "last_7_days.json"
-          step: "1h"
-          range: "-168h"
-        - name: "30d"
-          duration: "720h"
-          file: "last_30_days.json"
-          step: "1h"
-          range: "-720h"
+      backfill_slots: 1000
+  - id: "block-production-flow"
+    enabled: true
+    networks: ["mainnet", "hoodi"]
+    config:
+      head_delay_slots: 2
+      backfill_slots: 1000
+  - id: "historical-slots"
+    enabled: true
+    networks: ["mainnet", "hoodi"]
+    config:
+      head_delay_slots: 2
+      backfill_slots: 1000
+  - id: "locally-built-blocks"
+    enabled: true
+    networks: ["mainnet", "hoodi"]
+    config:
+      slots: 16
+      ttl: "6h"
+
