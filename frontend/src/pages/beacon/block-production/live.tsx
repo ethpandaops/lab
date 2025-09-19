@@ -5,7 +5,9 @@ import { GetSlotDataRequest } from '@/api/gen/backend/pkg/api/proto/lab_api_pb';
 import useBeacon from '@/contexts/beacon';
 import SlotDataStore from '@/utils/SlotDataStore';
 import useNetwork from '@/contexts/network';
+import useConfig from '@/contexts/config';
 import { TimelineProvider } from '@/contexts/timeline';
+import { AlertCircle } from 'lucide-react';
 import {
   MobileBlockProductionView,
   DesktopBlockProductionView,
@@ -24,8 +26,23 @@ import { BeaconSlotData } from '@/api/gen/backend/pkg/server/proto/beacon_slots/
 export default function BlockProductionLivePage() {
   // Use network directly from NetworkContext - App.tsx handles URL updates
   const { selectedNetwork } = useNetwork();
+  const { config } = useConfig();
   const queryClient = useQueryClient();
   const { client: labApiClient } = useApi();
+
+  // Check if this experiment is available for the current network
+  const isExperimentAvailable = () => {
+    if (!config?.experiments) return true; // Default to available if no config
+    const experiment = config.experiments.find(exp => exp.id === 'block-production-flow');
+    return experiment?.enabled && experiment?.networks?.includes(selectedNetwork);
+  };
+
+  // Get the networks that support this experiment
+  const getSupportedNetworks = () => {
+    if (!config?.experiments) return [];
+    const experiment = config.experiments.find(exp => exp.id === 'block-production-flow');
+    return experiment?.enabled ? experiment?.networks || [] : [];
+  };
   // Add state to handle screen size with more granular breakpoints
   const [viewMode, setViewMode] = useState<'mobile' | 'tablet' | 'desktop'>('desktop');
 
@@ -359,7 +376,7 @@ export default function BlockProductionLivePage() {
     // Reset transition state
     setIsTransitioning(false);
   }, [headSlot, slotNumber, displaySlotOffset, headLagSlots, prefetchSlotData]);
-  
+
   const isNextDisabled = displaySlotOffset >= 0;
 
   const { data: slotData, isLoading: isSlotLoading } = useQuery<BeaconSlotData>({
@@ -525,7 +542,11 @@ export default function BlockProductionLivePage() {
 
     // No matching bid or delivered payloads found
     return null;
-  }, [slotData?.relayBids, slotData?.block?.executionPayloadBlockHash, slotData?.deliveredPayloads]);
+  }, [
+    slotData?.relayBids,
+    slotData?.block?.executionPayloadBlockHash,
+    slotData?.deliveredPayloads,
+  ]);
 
   // Determine if a block was locally built using the enhanced method
   const isLocallyBuilt = useMemo(() => {
@@ -605,6 +626,29 @@ export default function BlockProductionLivePage() {
   // Empty arrays for displaying when no real data
   const emptyBids: BidData[] = [];
   const emptyRelayColors = {};
+
+  // Show not available message if experiment isn't enabled for this network
+  if (!isExperimentAvailable()) {
+    const supportedNetworks = getSupportedNetworks();
+    return (
+      <div className="flex-1 flex items-center justify-center min-h-[50vh]">
+        <div className="text-center max-w-md mx-auto">
+          <AlertCircle className="w-12 h-12 text-accent/60 mx-auto mb-4" />
+          <h2 className="text-xl font-sans font-bold text-primary mb-2">
+            Experiment Not Available
+          </h2>
+          <p className="text-sm font-mono text-secondary mb-4">
+            Block Production Flow is not enabled for {selectedNetwork}
+          </p>
+          {supportedNetworks.length > 0 && (
+            <p className="text-xs font-mono text-tertiary">
+              Available on: {supportedNetworks.join(', ')}
+            </p>
+          )}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col h-full bg-base">

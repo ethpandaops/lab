@@ -208,12 +208,36 @@ export function useValue(props: ValueProps): State {
 
   // Function to get head lag slots for a network
   const getHeadLagSlots = (network: string): number => {
-    return config?.modules?.beacon?.networks?.[network]?.head_lag_slots ?? 4;
+    // Get from live-slots experiment config
+    if (config?.experiments) {
+      const liveSlots = config.experiments.find(exp => exp.id === 'live-slots');
+      if (liveSlots?.config?.fields?.head_delay_slots) {
+        const value = liveSlots.config.fields.head_delay_slots;
+        // Handle different protobuf struct value types
+        if (typeof value === 'object' && 'numberValue' in value) {
+          return value.numberValue;
+        }
+      }
+    }
+    // Default value
+    return 2;
   };
 
-  // Function to get backlog days for a network
+  // Function to get backlog days for a network  
   const getBacklogDays = (network: string): number => {
-    return config?.modules?.beacon?.networks?.[network]?.backlog_days ?? 3;
+    // Get from historical-slots experiment config
+    if (config?.experiments) {
+      const historicalSlots = config.experiments.find(exp => exp.id === 'historical-slots');
+      if (historicalSlots?.config?.fields?.backfill_slots) {
+        const value = historicalSlots.config.fields.backfill_slots;
+        // Handle different protobuf struct value types
+        if (typeof value === 'object' && 'numberValue' in value) {
+          return value.numberValue;
+        }
+      }
+    }
+    // Default value
+    return 1000;
   };
 
   return {

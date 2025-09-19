@@ -220,7 +220,6 @@ func (s *Service) fetchAndUpdateData(ctx context.Context) error {
 			LastUpdated:   rawNet.LastUpdated,
 			Description:   rawNet.Description,
 			GenesisConfig: rawNet.GenesisConfig,
-			ServiceUrls:   rawNet.ServiceUrls,
 			SelfHostedDns: rawNet.SelfHostedDns,
 			Forks:         rawNet.Forks,
 		}

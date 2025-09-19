@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/beacon_chain_timings"
 	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/beacon_slots"
 	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/cartographoor"
 	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/experiments"
@@ -20,7 +19,6 @@ type ConfigService struct {
 	log                  logrus.FieldLogger
 	xatuCBTService       *xatu_cbt.XatuCBT
 	cartographoorService *cartographoor.Service
-	bctService           *beacon_chain_timings.BeaconChainTimings
 	bsService            *beacon_slots.BeaconSlots
 	experimentsService   *experiments.ExperimentsService
 }
@@ -30,7 +28,7 @@ func NewConfigService(
 	log logrus.FieldLogger,
 	xatuCBTSvc *xatu_cbt.XatuCBT,
 	cartographoorService *cartographoor.Service,
-	bctService *beacon_chain_timings.BeaconChainTimings,
+	_ interface{}, // placeholder for removed bctService
 	bsService *beacon_slots.BeaconSlots,
 	experimentsService *experiments.ExperimentsService,
 ) *ConfigService {
@@ -38,7 +36,6 @@ func NewConfigService(
 		log:                  log.WithField("grpc", "config"),
 		xatuCBTService:       xatuCBTSvc,
 		cartographoorService: cartographoorService,
-		bctService:           bctService,
 		bsService:            bsService,
 		experimentsService:   experimentsService,
 	}
@@ -95,11 +92,6 @@ func (c *ConfigService) GetConfig(
 				netConfig.GenesisTime = network.GenesisConfig.GenesisTime
 			}
 
-			// Add service URLs if available
-			if len(network.ServiceUrls) > 0 {
-				netConfig.ServiceUrls = network.ServiceUrls
-			}
-
 			// Add fork information if available
 			if network.Forks != nil && network.Forks.Consensus != nil && network.Forks.Consensus.Electra != nil {
 				netConfig.Forks = &config.ForkConfig{
@@ -116,56 +108,10 @@ func (c *ConfigService) GetConfig(
 		}
 	}
 
-	// Build modules config
-	modulesConfig := &config.ModulesConfig{}
-
-	// Add beacon chain timings module config
-	if c.bctService != nil {
-		bctConfig := c.bctService.FrontendModuleConfig()
-		if bctConfig != nil {
-			timeWindows := make([]*config.TimeWindow, 0, len(bctConfig.TimeWindows))
-			for _, tw := range bctConfig.TimeWindows {
-				timeWindows = append(timeWindows, &config.TimeWindow{
-					File:  tw.File,
-					Step:  tw.Step,
-					Range: tw.Range,
-					Label: tw.Label,
-				})
-			}
-
-			modulesConfig.BeaconChainTimings = &config.BeaconChainTimingsModule{
-				Networks:    bctConfig.Networks,
-				TimeWindows: timeWindows,
-				PathPrefix:  bctConfig.PathPrefix,
-			}
-		}
-	}
-
-	// Add beacon module config
-	if c.bsService != nil {
-		bsConfig := c.bsService.FrontendModuleConfig()
-		if bsConfig != nil {
-			beaconNetworks := make(map[string]*config.BeaconNetworkConfig)
-			for name, netCfg := range bsConfig.Networks {
-				beaconNetworks[name] = &config.BeaconNetworkConfig{
-					HeadLagSlots: netCfg.HeadLagSlots,
-					BacklogDays:  netCfg.BacklogDays,
-				}
-			}
-
-			modulesConfig.Beacon = &config.BeaconModule{
-				Enabled:     bsConfig.Enabled,
-				Description: bsConfig.Description,
-				PathPrefix:  bsConfig.PathPrefix,
-				Networks:    beaconNetworks,
-			}
-		}
-	}
-
 	// Add experiments configuration
-	var experimentsConfig *config.ExperimentsConfig
+	var experimentConfigs []*config.ExperimentConfig
 	if c.experimentsService != nil {
-		experimentsConfig = c.experimentsService.GetAllExperimentsConfig(ctx, false)
+		experimentConfigs = c.experimentsService.GetAllExperimentsConfig(ctx, false)
 	}
 
 	return &config.GetConfigResponse{
@@ -173,8 +119,7 @@ func (c *ConfigService) GetConfig(
 			Ethereum: &config.EthereumConfig{
 				Networks: networksConfig,
 			},
-			Modules:     modulesConfig,
-			Experiments: experimentsConfig,
+			Experiments: experimentConfigs,
 		},
 	}, nil
 }

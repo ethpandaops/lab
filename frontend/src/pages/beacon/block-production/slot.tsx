@@ -3,7 +3,9 @@ import { useQuery } from '@tanstack/react-query';
 import { useParams, useSearchParams } from 'react-router-dom';
 import useApi from '@/contexts/api';
 import useNetwork from '@/contexts/network';
+import useConfig from '@/contexts/config';
 import { GetSlotDataRequest } from '@/api/gen/backend/pkg/api/proto/lab_api_pb';
+import { AlertCircle } from 'lucide-react';
 import {
   MobileBlockProductionView,
   DesktopBlockProductionView,
@@ -32,6 +34,21 @@ export default function BlockProductionSlotPage() {
   const [searchParams] = useSearchParams();
   const { client: labApiClient } = useApi();
   const { selectedNetwork } = useNetwork();
+  const { config } = useConfig();
+
+  // Check if this experiment is available for the current network
+  const isExperimentAvailable = () => {
+    if (!config?.experiments) return true; // Default to available if no config
+    const experiment = config.experiments.find(exp => exp.id === 'block-production-flow');
+    return experiment?.enabled && experiment?.networks?.includes(selectedNetwork);
+  };
+
+  // Get the networks that support this experiment
+  const getSupportedNetworks = () => {
+    if (!config?.experiments) return [];
+    const experiment = config.experiments.find(exp => exp.id === 'block-production-flow');
+    return experiment?.enabled ? experiment?.networks || [] : [];
+  };
 
   // Initial time value from URL query parameter, default to 0
   // Check both 'time' and 't' parameters for backward compatibility
@@ -213,7 +230,7 @@ export default function BlockProductionSlotPage() {
 
     // If no matching bid was found but we have delivered payloads
     if (deliveredRelays.length > 0) {
-        return {
+      return {
         blockHash: executionPayloadBlockHash,
         value: 0,
         relayName: deliveredRelays[0], // Use the first relay as primary
@@ -222,7 +239,11 @@ export default function BlockProductionSlotPage() {
     }
 
     return null;
-  }, [slotData?.relayBids, slotData?.block?.executionPayloadBlockHash, slotData?.deliveredPayloads]);
+  }, [
+    slotData?.relayBids,
+    slotData?.block?.executionPayloadBlockHash,
+    slotData?.deliveredPayloads,
+  ]);
 
   // Initial transformation of bids from the data
   const allTransformedBids = useMemo(() => {
@@ -346,6 +367,29 @@ export default function BlockProductionSlotPage() {
   // Empty arrays for displaying when no real data
   const emptyBids = [];
   const emptyRelayColors = {};
+
+  // Show not available message if experiment isn't enabled for this network
+  if (!isExperimentAvailable()) {
+    const supportedNetworks = getSupportedNetworks();
+    return (
+      <div className="flex-1 flex items-center justify-center min-h-[50vh]">
+        <div className="text-center max-w-md mx-auto">
+          <AlertCircle className="w-12 h-12 text-accent/60 mx-auto mb-4" />
+          <h2 className="text-xl font-sans font-bold text-primary mb-2">
+            Experiment Not Available
+          </h2>
+          <p className="text-sm font-mono text-secondary mb-4">
+            Block Production Flow is not enabled for {selectedNetwork}
+          </p>
+          {supportedNetworks.length > 0 && (
+            <p className="text-xs font-mono text-tertiary">
+              Available on: {supportedNetworks.join(', ')}
+            </p>
+          )}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col h-full">

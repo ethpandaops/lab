@@ -14,8 +14,6 @@ import XatuDataNetworks from '@/pages/xatu-data/networks';
 import XatuDataGeographicalChecklist from '@/pages/xatu-data/geographical-checklist';
 import XatuDataForkReadiness from '@/pages/xatu-data/fork-readiness';
 import Layout from '@/components/layout/Layout';
-import { BeaconChainTimings } from '@/pages/beacon/timings';
-import { BlockTimings } from '@/pages/beacon/timings/blocks';
 import { Beacon } from '@/pages/beacon';
 import { BeaconLive } from '@/pages/beacon/live';
 import { BeaconSlot } from '@/pages/beacon/slot';
@@ -139,9 +137,6 @@ function App() {
                 <Route index element={<SlotLookup />} />
                 <Route path="live" element={<BeaconLive />} />
                 <Route path=":slot" element={<BeaconSlot />} />
-              </Route>
-              <Route path="timings" element={<BeaconChainTimings />}>
-                <Route path="blocks" element={<BlockTimings />} />
               </Route>
               <Route path="locally-built-blocks" element={<LocallyBuiltBlocks />} />
               <Route

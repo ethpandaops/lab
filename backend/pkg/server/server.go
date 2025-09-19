@@ -19,7 +19,6 @@ import (
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/storage"
 	"github.com/ethpandaops/lab/backend/pkg/server/internal/grpc"
 	"github.com/ethpandaops/lab/backend/pkg/server/internal/service"
-	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/beacon_chain_timings"
 	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/beacon_slots"
 	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/cartographoor"
 	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/experiments"
@@ -121,13 +120,6 @@ func (s *Service) Start(ctx context.Context) error {
 	}
 
 	// Retrieve instantiated services for handlers
-	bctService, ok := s.getService(beacon_chain_timings.BeaconChainTimingsServiceName).(*beacon_chain_timings.BeaconChainTimings)
-	if !ok {
-		s.log.Error("Failed to get beacon chain timings service")
-
-		return fmt.Errorf("failed to get beacon chain timings service")
-	}
-
 	bsService, ok := s.getService(beacon_slots.ServiceName).(*beacon_slots.BeaconSlots)
 	if !ok {
 		s.log.Error("Failed to get beacon slots service")
@@ -137,11 +129,10 @@ func (s *Service) Start(ctx context.Context) error {
 
 	// Instantiate gRPC handlers
 	grpcServices := []grpc.Service{
-		grpc.NewBeaconChainTimings(s.log, bctService),
 		grpc.NewBeaconSlotsHandler(s.log, bsService),
 		grpc.NewXatuCBT(s.log, s.xatuCBTService, s.wallclockService),
 		grpc.NewCartographoorService(s.log, s.cartographoorService, s.xatuCBTService),
-		grpc.NewConfigService(s.log, s.xatuCBTService, s.cartographoorService, bctService, bsService, s.experimentsService),
+		grpc.NewConfigService(s.log, s.xatuCBTService, s.cartographoorService, nil, bsService, s.experimentsService),
 	}
 
 	// Create gRPC server
@@ -179,23 +170,43 @@ func (s *Service) Start(ctx context.Context) error {
 
 // initializeServices initializes all services, passing the main service context.
 func (s *Service) initializeServices(ctx context.Context) error { // ctx is already s.ctx passed from Start
-	// Initialize all our services
-	bct, err := beacon_chain_timings.New(
-		s.log,
-		s.config.Modules["beacon_chain_timings"].BeaconChainTimings,
-		s.xatuCBTService,
-		s.storageClient,
-		s.cacheClient,
-		s.lockerClient,
-		s.metrics,
-	)
-	if err != nil {
-		return fmt.Errorf("failed to initialize beacon chain timings service: %w", err)
+	// Determine if beacon_slots service should be enabled based on experiments
+	beaconSlotsEnabled := false
+
+	if s.experimentsService != nil && s.config.Experiments != nil {
+		// Check if any beacon-related experiments are enabled
+		for _, exp := range *s.config.Experiments {
+			if exp.Enabled && (exp.ID == "live-slots" ||
+				exp.ID == "historical-slots" ||
+				exp.ID == "block-production-flow" ||
+				exp.ID == "locally-built-blocks") {
+				beaconSlotsEnabled = true
+
+				break
+			}
+		}
+	}
+
+	// Initialize beacon_slots service with minimal config (actual values come from experiments)
+	defaultEnabled := true
+	beaconSlotsConfig := &beacon_slots.Config{
+		Enabled: beaconSlotsEnabled,
+		Backfill: beacon_slots.BackfillConfig{
+			Enabled: true,
+			Slots:   1000, // Overridden by experiments config
+		},
+		HeadDelaySlots: 2, // Overridden by experiments config
+		LocallyBuiltBlocksConfig: beacon_slots.LocallyBuiltBlocksConfig{
+			Enabled: &defaultEnabled, // Overridden by experiments config
+			Slots:   16,              // Overridden by experiments config
+			TTL:     6 * time.Hour,   // Overridden by experiments config
+		},
 	}
 
 	beaconSlotsService, err := beacon_slots.New(
 		s.log,
-		s.config.Modules["beacon_slots"].BeaconSlots,
+		beaconSlotsConfig,
+		s.experimentsService,
 		s.wallclockService,
 		s.xatuCBTService,
 		s.storageClient,
@@ -209,7 +220,6 @@ func (s *Service) initializeServices(ctx context.Context) error { // ctx is alre
 	}
 
 	s.services = []service.Service{
-		bct,
 		beaconSlotsService,
 		s.cartographoorService,
 	}

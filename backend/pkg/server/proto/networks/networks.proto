@@ -45,12 +45,10 @@ message Network {
   string description = 5;
   // Genesis configuration (for static networks).
   GenesisConfig genesis_config = 6;
-  // Service URLs for various network services (for static networks).
-  map<string, string> service_urls = 7;
   // Whether the network uses self-hosted DNS (for static networks).
-  bool self_hosted_dns = 8;
+  bool self_hosted_dns = 7;
   // Fork information (for static networks).
-  Forks forks = 9;
+  Forks forks = 8;
 }
 
 // GenesisConfig contains the genesis configuration for a network.
@@ -139,12 +137,10 @@ message RawNetworkData {
   string description = 5 [json_name = "description"];
   // Genesis configuration (for static networks).
   GenesisConfig genesis_config = 6 [json_name = "genesisConfig"];
-  // Service URLs for various network services (for static networks).
-  map<string, string> service_urls = 7 [json_name = "serviceUrls"];
   // Whether the network uses self-hosted DNS (for static networks).
-  bool self_hosted_dns = 8 [json_name = "selfHostedDns"];
+  bool self_hosted_dns = 7 [json_name = "selfHostedDns"];
   // Fork information (for static networks).
-  Forks forks = 9 [json_name = "forks"];
+  Forks forks = 8 [json_name = "forks"];
 }
 
 // CartographoorResponse represents the raw cartographoor API response.
