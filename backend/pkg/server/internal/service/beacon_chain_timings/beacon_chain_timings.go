@@ -7,13 +7,12 @@ import (
 	"time"
 
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/cache"
-	"github.com/ethpandaops/lab/backend/pkg/internal/lab/ethereum"
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/leader"
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/locker"
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/metrics"
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/state"
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/storage"
-	"github.com/ethpandaops/lab/backend/pkg/internal/lab/xatu"
+	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/xatu_cbt"
 	pb "github.com/ethpandaops/lab/backend/pkg/server/proto/beacon_chain_timings"
 	pb_lab "github.com/ethpandaops/lab/backend/pkg/server/proto/lab"
 	"github.com/prometheus/client_golang/prometheus"
@@ -41,8 +40,7 @@ type BeaconChainTimings struct {
 
 	config *Config
 
-	ethereumConfig   *ethereum.Config
-	xatuClient       *xatu.Client
+	xatuCBTService   *xatu_cbt.XatuCBT
 	storageClient    storage.Client
 	cacheClient      cache.Client
 	lockerClient     locker.Locker
@@ -68,8 +66,7 @@ type BeaconChainTimings struct {
 func New(
 	log logrus.FieldLogger,
 	config *Config,
-	xatuClient *xatu.Client,
-	ethereumConfig *ethereum.Config,
+	xatuCBTSvc *xatu_cbt.XatuCBT,
 	storageClient storage.Client,
 	cacheClient cache.Client,
 	lockerClient locker.Locker,
@@ -84,8 +81,7 @@ func New(
 	return &BeaconChainTimings{
 		log:              serviceLog,
 		config:           config,
-		ethereumConfig:   ethereumConfig,
-		xatuClient:       xatuClient,
+		xatuCBTService:   xatuCBTSvc,
 		storageClient:    storageClient,
 		cacheClient:      cacheClient,
 		lockerClient:     lockerClient,
@@ -272,10 +268,7 @@ func (b *BeaconChainTimings) Stop() {
 }
 
 func (b *BeaconChainTimings) FrontendModuleConfig() *pb_lab.FrontendConfig_BeaconChainTimingsModule {
-	networks := make([]string, 0, len(b.ethereumConfig.Networks))
-	for network := range b.ethereumConfig.Networks {
-		networks = append(networks, network)
-	}
+	networks := b.xatuCBTService.GetEnabledNetworks()
 
 	timeWindows := make([]*pb_lab.FrontendConfig_TimeWindow, 0, len(b.config.TimeWindows))
 	for _, window := range b.config.TimeWindows {
@@ -378,7 +371,8 @@ func (b *BeaconChainTimings) process(ctx context.Context) {
 	}
 
 	// Verify we have valid networks to process
-	if b.ethereumConfig == nil || len(b.ethereumConfig.Networks) == 0 {
+	enabledNetworks := b.xatuCBTService.GetEnabledNetworks()
+	if len(enabledNetworks) == 0 {
 		b.log.Warn("No networks configured to process, skipping")
 
 		return
@@ -392,10 +386,10 @@ func (b *BeaconChainTimings) process(ctx context.Context) {
 	}
 
 	// Process each network
-	for _, network := range b.ethereumConfig.Networks {
-		// Skip nil networks (shouldn't happen, but defensive)
-		if network == nil {
-			b.log.Warn("Encountered nil network, skipping")
+	for _, networkName := range enabledNetworks {
+		// Skip empty network names (shouldn't happen, but defensive)
+		if networkName == "" {
+			b.log.Warn("Encountered empty network name, skipping")
 
 			continue
 		}
@@ -410,7 +404,7 @@ func (b *BeaconChainTimings) process(ctx context.Context) {
 			}
 
 			// Create a unique state key for this network+window combination
-			stateKey := network.Name + "/" + window.File
+			stateKey := networkName + "/" + window.File
 
 			// Process block timings
 			lastProcessedTime := time.Time{}
@@ -418,16 +412,16 @@ func (b *BeaconChainTimings) process(ctx context.Context) {
 				lastProcessedTime = TimeFromTimestamp(ts)
 			}
 
-			shouldProcess, err := b.shouldProcess(network.Name, window.File, lastProcessedTime)
+			shouldProcess, err := b.shouldProcess(networkName, window.File, lastProcessedTime)
 			if err != nil {
-				b.log.WithError(err).Errorf("failed to check if should process block timings for network %s, window %s", network.Name, window.File)
+				b.log.WithError(err).Errorf("failed to check if should process block timings for network %s, window %s", networkName, window.File)
 
 				continue
 			}
 
 			if shouldProcess {
-				if err := b.processBlockTimings(b.processCtx, network, window.File); err != nil {
-					b.log.WithError(err).Errorf("failed to process block timings for network %s, window %s", network.Name, window.File)
+				if err := b.processBlockTimings(b.processCtx, networkName, window.File); err != nil {
+					b.log.WithError(err).Errorf("failed to process block timings for network %s, window %s", networkName, window.File)
 				} else {
 					// Update state
 					st.BlockTimings.LastProcessed[stateKey] = timestamppb.Now()
@@ -440,21 +434,21 @@ func (b *BeaconChainTimings) process(ctx context.Context) {
 				lastProcessedTime = TimeFromTimestamp(ts)
 			}
 
-			shouldProcess, err = b.shouldProcess(network.Name, window.File, lastProcessedTime)
+			shouldProcess, err = b.shouldProcess(networkName, window.File, lastProcessedTime)
 			if err != nil {
-				b.log.WithError(err).Errorf("failed to check if should process CDF for network %s, window %s", network.Name, window.File)
+				b.log.WithError(err).Errorf("failed to check if should process CDF for network %s, window %s", networkName, window.File)
 
 				continue
 			}
 
 			if shouldProcess {
-				if err := b.processSizeCDF(b.processCtx, network, &pb.TimeWindowConfig{
+				if err := b.processSizeCDF(b.processCtx, networkName, &pb.TimeWindowConfig{
 					Name:    window.Label,
 					File:    window.File,
 					RangeMs: window.GetRangeDuration().Milliseconds(),
 					StepMs:  window.GetStepDuration().Milliseconds(),
 				}); err != nil {
-					b.log.WithError(err).Errorf("failed to process size CDF for network %s, window %s", network.Name, window.File)
+					b.log.WithError(err).Errorf("failed to process size CDF for network %s, window %s", networkName, window.File)
 				} else {
 					// Update state
 					st.Cdf.LastProcessed[stateKey] = timestamppb.Now()

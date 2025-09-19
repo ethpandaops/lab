@@ -9,16 +9,15 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/ethpandaops/lab/backend/pkg/internal/lab/ethereum"
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/storage"
 	pb "github.com/ethpandaops/lab/backend/pkg/server/proto/beacon_chain_timings"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
-func (b *BeaconChainTimings) processSizeCDF(ctx context.Context, network *ethereum.NetworkConfig, window *pb.TimeWindowConfig) error {
+func (b *BeaconChainTimings) processSizeCDF(ctx context.Context, networkName string, window *pb.TimeWindowConfig) error {
 	b.log.WithFields(logrus.Fields{
-		"network":  network.Name,
+		"network":  networkName,
 		"window":   window.Name,
 		"file":     window.File,
 		"range_ms": window.RangeMs,
@@ -34,7 +33,7 @@ func (b *BeaconChainTimings) processSizeCDF(ctx context.Context, network *ethere
 		[]string{"operation", "network", "window"},
 	)
 	if err == nil {
-		counter.WithLabelValues("size_cdf", network.Name, window.File).Inc()
+		counter.WithLabelValues("size_cdf", networkName, window.File).Inc()
 	}
 
 	// Get time range for the window
@@ -47,7 +46,7 @@ func (b *BeaconChainTimings) processSizeCDF(ctx context.Context, network *ethere
 			[]string{"operation", "network", "window"},
 		)
 		if metricErr == nil {
-			errorCounter.WithLabelValues("size_cdf", network.Name, window.File).Inc()
+			errorCounter.WithLabelValues("size_cdf", networkName, window.File).Inc()
 		}
 
 		return fmt.Errorf("failed to get time range: %w", err)
@@ -59,7 +58,7 @@ func (b *BeaconChainTimings) processSizeCDF(ctx context.Context, network *ethere
 	}).Info("Time range for window")
 
 	// Process size CDF data
-	sizeCDFData, err := b.GetSizeCDFData(ctx, network.Name, timeRange)
+	sizeCDFData, err := b.GetSizeCDFData(ctx, networkName, timeRange)
 	if err != nil {
 		// Record error metric if available
 		errorCounter, metricErr := b.metricsCollector.NewCounterVec(
@@ -68,14 +67,14 @@ func (b *BeaconChainTimings) processSizeCDF(ctx context.Context, network *ethere
 			[]string{"operation", "network", "window"},
 		)
 		if metricErr == nil {
-			errorCounter.WithLabelValues("size_cdf", network.Name, window.File).Inc()
+			errorCounter.WithLabelValues("size_cdf", networkName, window.File).Inc()
 		}
 
 		return fmt.Errorf("failed to process size CDF data: %w", err)
 	}
 
 	// Store the results
-	if err := b.storeSizeCDFData(ctx, network.Name, window.File, sizeCDFData); err != nil {
+	if err := b.storeSizeCDFData(ctx, networkName, window.File, sizeCDFData); err != nil {
 		// Record error metric if available
 		errorCounter, metricErr := b.metricsCollector.NewCounterVec(
 			"processing_errors_total",
@@ -83,7 +82,7 @@ func (b *BeaconChainTimings) processSizeCDF(ctx context.Context, network *ethere
 			[]string{"operation", "network", "window"},
 		)
 		if metricErr == nil {
-			errorCounter.WithLabelValues("size_cdf", network.Name, window.File).Inc()
+			errorCounter.WithLabelValues("size_cdf", networkName, window.File).Inc()
 		}
 
 		return fmt.Errorf("failed to store size CDF data: %w", err)
@@ -99,11 +98,11 @@ func (b *BeaconChainTimings) processSizeCDF(ctx context.Context, network *ethere
 		nil,
 	)
 	if err == nil {
-		histogram.WithLabelValues("size_cdf", network.Name, window.File).Observe(duration)
+		histogram.WithLabelValues("size_cdf", networkName, window.File).Observe(duration)
 	}
 
 	b.log.WithFields(logrus.Fields{
-		"network": network.Name,
+		"network": networkName,
 		"window":  window.Name,
 		"file":    window.File,
 	}).Info("Successfully processed and stored size CDF data")
@@ -138,7 +137,7 @@ func (b *BeaconChainTimings) GetSizeCDFData(ctx context.Context, network string,
 		GROUP BY slot
 	`
 
-	ch, err := b.xatuClient.GetClickhouseClientForNetwork(network)
+	ch, err := b.xatuCBTService.GetRawClickHouseClient(network)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get ClickHouse client for network: %w", err)
 	}

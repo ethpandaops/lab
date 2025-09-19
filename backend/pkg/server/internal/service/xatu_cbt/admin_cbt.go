@@ -189,17 +189,12 @@ func (x *XatuCBT) calculateSlots(
 		return 0, 0, 0, 0, fmt.Errorf("failed to validate network: %w", err)
 	}
 
-	// Get ethereum network for wallclock access
-	if x.ethereumClient == nil {
-		return 0, 0, 0, 0, fmt.Errorf("ethereum client not available")
+	// Get wallclock for the network
+	if x.wallclockService == nil {
+		return 0, 0, 0, 0, fmt.Errorf("wallclock service not available")
 	}
 
-	ethNetwork := x.ethereumClient.GetNetwork(network.Name)
-	if ethNetwork == nil {
-		return 0, 0, 0, 0, fmt.Errorf("ethereum network %s not found", network.Name)
-	}
-
-	wallclock := ethNetwork.GetWallclock()
+	wallclock := x.wallclockService.GetWallclock(network.Name)
 	if wallclock == nil {
 		return 0, 0, 0, 0, fmt.Errorf("wallclock not available for network %s", network.Name)
 	}

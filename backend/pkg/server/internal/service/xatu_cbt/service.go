@@ -3,12 +3,13 @@ package xatu_cbt
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/cache"
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/clickhouse"
-	"github.com/ethpandaops/lab/backend/pkg/internal/lab/ethereum"
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/metrics"
 	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/cartographoor"
+	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/wallclock"
 	pb "github.com/ethpandaops/lab/backend/pkg/server/proto/xatu_cbt"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/sirupsen/logrus"
@@ -29,9 +30,10 @@ type XatuCBT struct {
 	config *Config
 
 	cbtClients           map[string]clickhouse.Client
+	rawClients           map[string]clickhouse.Client
 	cacheClient          cache.Client
 	cartographoorService *cartographoor.Service
-	ethereumClient       *ethereum.Client
+	wallclockService     *wallclock.Service
 
 	metrics          *metrics.Metrics
 	metricsCollector *metrics.Collector
@@ -49,7 +51,7 @@ func New(
 	cacheClient cache.Client,
 	metricsSvc *metrics.Metrics,
 	cartographoorService *cartographoor.Service,
-	ethereumClient *ethereum.Client,
+	wallclockSvc *wallclock.Service,
 ) (*XatuCBT, error) {
 	if err := config.Validate(); err != nil {
 		return nil, fmt.Errorf("invalid xatu_cbt config: %w", err)
@@ -69,8 +71,9 @@ func New(
 		metrics:              metricsSvc,
 		metricsCollector:     metricsCollector,
 		cartographoorService: cartographoorService,
-		ethereumClient:       ethereumClient,
+		wallclockService:     wallclockSvc,
 		cbtClients:           make(map[string]clickhouse.Client),
+		rawClients:           make(map[string]clickhouse.Client),
 	}, nil
 }
 
@@ -86,7 +89,7 @@ func (x *XatuCBT) Start(ctx context.Context) error {
 		return fmt.Errorf("failed to initialize metrics: %w", err)
 	}
 
-	// Initialize CBT clients for each network
+	// Initialize CBT and raw clients for each network
 	for networkName, networkConfig := range x.config.NetworkConfigs {
 		if !networkConfig.Enabled {
 			x.log.WithField("network", networkName).Debug("Network disabled, skipping")
@@ -94,34 +97,50 @@ func (x *XatuCBT) Start(ctx context.Context) error {
 			continue
 		}
 
-		// Validate ClickHouse config exists
-		if networkConfig.ClickHouse == nil {
-			x.log.WithField("network", networkName).Warn("No ClickHouse config provided, skipping network")
+		// Initialize CBT ClickHouse client if configured
+		if networkConfig.ClickHouse != nil {
+			client, err := clickhouse.New(networkConfig.ClickHouse, x.log, networkName, x.metrics)
+			if err != nil {
+				return fmt.Errorf("failed to create CBT ClickHouse client for network %s: %w", networkName, err)
+			}
 
-			continue
+			if err := client.Start(ctx); err != nil {
+				x.log.WithField("network", networkName).WithError(err).Warn("Failed to start CBT ClickHouse client")
+			} else {
+				x.cbtClients[networkName] = client
+				x.log.WithField("network", networkName).Info("Initialized CBT ClickHouse client")
+			}
 		}
 
-		client, err := clickhouse.New(networkConfig.ClickHouse, x.log, networkName, x.metrics)
-		if err != nil {
-			return fmt.Errorf("failed to create ClickHouse client for network %s: %w", networkName, err)
+		// Initialize raw ClickHouse client if configured
+		if networkConfig.RawClickHouse != nil {
+			client, err := clickhouse.New(networkConfig.RawClickHouse, x.log, networkName, x.metrics)
+			if err != nil {
+				return fmt.Errorf("failed to create raw ClickHouse client for network %s: %w", networkName, err)
+			}
+
+			if err := client.Start(ctx); err != nil {
+				x.log.WithField("network", networkName).WithError(err).Warn("Failed to start raw ClickHouse client")
+			} else {
+				x.rawClients[networkName] = client
+				x.log.WithField("network", networkName).Info("Initialized raw ClickHouse client")
+			}
 		}
 
-		if err := client.Start(ctx); err != nil {
-			x.log.WithField("network", networkName).WithError(err).Warn("Failed to start ClickHouse client, skipping network")
-
-			continue
+		// Warn if no clients were configured for an enabled network
+		if networkConfig.ClickHouse == nil && networkConfig.RawClickHouse == nil {
+			x.log.WithField("network", networkName).Warn("Network enabled but no ClickHouse configs provided")
 		}
-
-		x.cbtClients[networkName] = client
-
-		x.log.WithField("network", networkName).Info("Initialized ClickHouse client")
 	}
 
-	if len(x.cbtClients) == 0 {
-		return fmt.Errorf("no CBT clients were successfully initialized")
+	if len(x.cbtClients) == 0 && len(x.rawClients) == 0 {
+		return fmt.Errorf("no ClickHouse clients were successfully initialized")
 	}
 
-	x.log.WithField("networks", len(x.cbtClients)).Info("XatuCBT datasource started successfully")
+	x.log.WithFields(logrus.Fields{
+		"cbt_clients": len(x.cbtClients),
+		"raw_clients": len(x.rawClients),
+	}).Info("XatuCBT datasource started successfully")
 
 	return nil
 }
@@ -132,7 +151,14 @@ func (x *XatuCBT) Stop() error {
 	// Stop all CBT clients
 	for network, client := range x.cbtClients {
 		if err := client.Stop(); err != nil {
-			x.log.WithField("network", network).WithError(err).Warn("Failed to stop ClickHouse client")
+			x.log.WithField("network", network).WithError(err).Warn("Failed to stop CBT ClickHouse client")
+		}
+	}
+
+	// Stop all raw clients
+	for network, client := range x.rawClients {
+		if err := client.Stop(); err != nil {
+			x.log.WithField("network", network).WithError(err).Warn("Failed to stop raw ClickHouse client")
 		}
 	}
 
@@ -232,4 +258,79 @@ func (x *XatuCBT) extractNetworkFromMetadata(ctx context.Context) (string, error
 
 	// Fallback to original behavior if no validator is available
 	return network, nil
+}
+
+// GetClickHouseClient returns the CBT ClickHouse client for the specified network
+func (x *XatuCBT) GetClickHouseClient(network string) (clickhouse.Client, error) {
+	client, ok := x.cbtClients[network]
+	if !ok {
+		return nil, fmt.Errorf("CBT ClickHouse client not configured for network %s", network)
+	}
+
+	return client, nil
+}
+
+// GetRawClickHouseClient returns the raw ClickHouse client for the specified network
+func (x *XatuCBT) GetRawClickHouseClient(network string) (clickhouse.Client, error) {
+	client, ok := x.rawClients[network]
+	if !ok {
+		return nil, fmt.Errorf("raw ClickHouse client not configured for network %s", network)
+	}
+
+	return client, nil
+}
+
+// IsNetworkEnabled checks if a network is enabled in the xatu_cbt configuration
+func (x *XatuCBT) IsNetworkEnabled(network string) bool {
+	if x.config == nil || x.config.NetworkConfigs == nil {
+		return false
+	}
+
+	netConfig, ok := x.config.NetworkConfigs[network]
+	if !ok {
+		return false
+	}
+
+	return netConfig.Enabled
+}
+
+// GetEnabledNetworks returns a list of all enabled networks
+func (x *XatuCBT) GetEnabledNetworks() []string {
+	if x.config == nil || x.config.NetworkConfigs == nil {
+		return []string{}
+	}
+
+	networks := make([]string, 0)
+
+	for name, netConfig := range x.config.NetworkConfigs {
+		if netConfig.Enabled {
+			networks = append(networks, name)
+		}
+	}
+
+	return networks
+}
+
+// GetNetworkGenesisTime returns the genesis time override for a network if configured
+func (x *XatuCBT) GetNetworkGenesisTime(network string) *int64 {
+	if x.config == nil || x.config.NetworkConfigs == nil {
+		return nil
+	}
+
+	netConfig, exists := x.config.NetworkConfigs[network]
+	if !exists || !netConfig.Enabled || netConfig.GenesisTime == nil {
+		return nil
+	}
+
+	// Parse the RFC3339 string to get Unix timestamp
+	genesisTime, err := time.Parse(time.RFC3339, *netConfig.GenesisTime)
+	if err != nil {
+		x.log.WithError(err).WithField("network", network).Error("Failed to parse genesis time")
+
+		return nil
+	}
+
+	timestamp := genesisTime.Unix()
+
+	return &timestamp
 }

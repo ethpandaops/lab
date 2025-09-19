@@ -38,7 +38,7 @@ func (b *BeaconSlots) getProposerEntity(ctx context.Context, networkName string,
 	`
 
 	// Get the Clickhouse client for this network
-	ch, err := b.xatuClient.GetClickhouseClientForNetwork(networkName)
+	ch, err := b.xatuCBTService.GetRawClickHouseClient(networkName)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get ClickHouse client for network %s: %w", networkName, err)
 	}
@@ -121,7 +121,7 @@ func (b *BeaconSlots) getBlockSeenAtSlotTime(ctx context.Context, networkName st
 	`
 
 	// Get the Clickhouse client for this network
-	ch, err := b.xatuClient.GetClickhouseClientForNetwork(networkName)
+	ch, err := b.xatuCBTService.GetRawClickHouseClient(networkName)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get ClickHouse client for network %s: %w", networkName, err)
 	}
@@ -193,7 +193,7 @@ func (b *BeaconSlots) getBlobSeenAtSlotTime(ctx context.Context, networkName str
 		ORDER BY event_date_time ASC
 	`
 
-	ch, err := b.xatuClient.GetClickhouseClientForNetwork(networkName)
+	ch, err := b.xatuCBTService.GetRawClickHouseClient(networkName)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get ClickHouse client for network %s: %w", networkName, err)
 	}
@@ -270,7 +270,7 @@ func (b *BeaconSlots) getBlockFirstSeenInP2PSlotTime(ctx context.Context, networ
 	`
 
 	// Get the Clickhouse client for this network
-	ch, err := b.xatuClient.GetClickhouseClientForNetwork(networkName)
+	ch, err := b.xatuCBTService.GetRawClickHouseClient(networkName)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get ClickHouse client for network %s: %w", networkName, err)
 	}
@@ -339,7 +339,7 @@ func (b *BeaconSlots) getBlobFirstSeenInP2PSlotTime(ctx context.Context, network
 	`
 
 	// Get the Clickhouse client for this network
-	ch, err := b.xatuClient.GetClickhouseClientForNetwork(networkName)
+	ch, err := b.xatuCBTService.GetRawClickHouseClient(networkName)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get ClickHouse client for network %s: %w", networkName, err)
 	}
@@ -412,7 +412,7 @@ func (b *BeaconSlots) getMaximumAttestationVotes(ctx context.Context, networkNam
 	`
 
 	// Get the Clickhouse client for this network
-	ch, err := b.xatuClient.GetClickhouseClientForNetwork(networkName)
+	ch, err := b.xatuCBTService.GetRawClickHouseClient(networkName)
 	if err != nil {
 		return 0, fmt.Errorf("failed to get ClickHouse client for network %s: %w", networkName, err)
 	}
@@ -472,7 +472,7 @@ func (b *BeaconSlots) getAttestationVotes(ctx context.Context, networkName strin
 	`
 
 	// Get the Clickhouse client for this network
-	ch, err := b.xatuClient.GetClickhouseClientForNetwork(networkName)
+	ch, err := b.xatuCBTService.GetRawClickHouseClient(networkName)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get ClickHouse client for network %s: %w", networkName, err)
 	}
@@ -536,7 +536,7 @@ func (b *BeaconSlots) getBlockData(ctx context.Context, networkName string, slot
 	`
 
 	// Get the Clickhouse client for this network
-	ch, err := b.xatuClient.GetClickhouseClientForNetwork(networkName)
+	ch, err := b.xatuCBTService.GetRawClickHouseClient(networkName)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get ClickHouse client for network %s: %w", networkName, err)
 	}
@@ -551,8 +551,13 @@ func (b *BeaconSlots) getBlockData(ctx context.Context, networkName string, slot
 	}
 
 	// Calculate slot and epoch times
-	epoch := b.ethereum.GetNetwork(networkName).GetWallclock().Epochs().FromSlot(uint64(slot))
-	slotDetail := b.ethereum.GetNetwork(networkName).GetWallclock().Slots().FromNumber(uint64(slot))
+	wallclock := b.wallclockService.GetWallclock(networkName)
+	if wallclock == nil {
+		return nil, fmt.Errorf("wallclock not available for network %s", networkName)
+	}
+
+	epoch := wallclock.Epochs().FromSlot(uint64(slot))
+	slotDetail := wallclock.Slots().FromNumber(uint64(slot))
 
 	// Create a new BlockData object with all fields
 	blockData := &pb.BlockData{
@@ -679,7 +684,7 @@ func (b *BeaconSlots) getProposerData(ctx context.Context, networkName string, s
 		LIMIT 1
 	`
 
-	ch, err := b.xatuClient.GetClickhouseClientForNetwork(networkName)
+	ch, err := b.xatuCBTService.GetRawClickHouseClient(networkName)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get ClickHouse client for network %s: %w", networkName, err)
 	}
@@ -706,7 +711,12 @@ func (b *BeaconSlots) getProposerData(ctx context.Context, networkName string, s
 
 // getSlotWindow returns the start and end times for a slot with a 5 minute grace period
 func (b *BeaconSlots) getSlotWindow(ctx context.Context, networkName string, slot phase0.Slot) (time.Time, time.Time) {
-	slotDetail := b.ethereum.GetNetwork(networkName).GetWallclock().Slots().FromNumber(uint64(slot))
+	wallclock := b.wallclockService.GetWallclock(networkName)
+	if wallclock == nil {
+		return time.Time{}, time.Time{}
+	}
+
+	slotDetail := wallclock.Slots().FromNumber(uint64(slot))
 
 	startTime := slotDetail.TimeWindow().Start().Add(-5 * time.Minute)
 	endTime := slotDetail.TimeWindow().End().Add(5 * time.Minute)
@@ -717,7 +727,7 @@ func (b *BeaconSlots) getSlotWindow(ctx context.Context, networkName string, slo
 // getMevRelayBids fetches MEV relay bid traces for a given slot, wrapped per relay.
 // It returns the highest bid per relay per 50ms interval within the slot.
 func (b *BeaconSlots) getMevRelayBids(ctx context.Context, networkName string, slot phase0.Slot, slotStartTime time.Time, executionBlockHash string) (map[string]*pb.RelayBids, error) {
-	ch, err := b.xatuClient.GetClickhouseClientForNetwork(networkName)
+	ch, err := b.xatuCBTService.GetRawClickHouseClient(networkName)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get ClickHouse client for network %s: %w", networkName, err)
 	}
@@ -894,11 +904,21 @@ func (b *BeaconSlots) getMevRelayBids(ctx context.Context, networkName string, s
 			continue // Skip because slot_time is crucial
 		}
 
-		timeBucket, err := strconv.ParseInt(fmt.Sprintf("%v", row["time_bucket"]), 10, 64)
-		if err != nil {
-			log.WithError(err).WithFields(log.Fields{"slot": slot, "network": networkName, "relay": relayName, "field": "time_bucket", "value": row["time_bucket"]}).Warn("Failed to parse relay bid time_bucket")
+		// Parse time_bucket, handling scientific notation
+		var timeBucket int64
 
-			timeBucket = 0 // Default to 0 if parsing fails
+		timeBucketStr := fmt.Sprintf("%v", row["time_bucket"])
+		if floatVal, err := strconv.ParseFloat(timeBucketStr, 64); err == nil {
+			timeBucket = int64(floatVal)
+		} else {
+			// Try parsing as int directly if float parsing fails
+			if intVal, err := strconv.ParseInt(timeBucketStr, 10, 64); err == nil {
+				timeBucket = intVal
+			} else {
+				log.WithError(err).WithFields(log.Fields{"slot": slot, "network": networkName, "relay": relayName, "field": "time_bucket", "value": row["time_bucket"]}).Warn("Failed to parse relay bid time_bucket")
+
+				timeBucket = 0 // Default to 0 if parsing fails
+			}
 		}
 
 		bid := &pb.RelayBid{
@@ -995,7 +1015,7 @@ func (b *BeaconSlots) getMevRelayBids(ctx context.Context, networkName string, s
 
 // getMevDeliveredPayloads fetches MEV delivered payloads for a given slot, wrapped per relay.
 func (b *BeaconSlots) getMevDeliveredPayloads(ctx context.Context, networkName string, slot phase0.Slot, slotStartTime time.Time) (map[string]*pb.DeliveredPayloads, error) {
-	ch, err := b.xatuClient.GetClickhouseClientForNetwork(networkName)
+	ch, err := b.xatuCBTService.GetRawClickHouseClient(networkName)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get ClickHouse client for network %s: %w", networkName, err)
 	}

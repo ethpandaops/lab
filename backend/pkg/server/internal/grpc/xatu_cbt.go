@@ -3,7 +3,7 @@ package grpc
 import (
 	"context"
 
-	"github.com/ethpandaops/lab/backend/pkg/internal/lab/ethereum"
+	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/wallclock"
 	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/xatu_cbt"
 	pb "github.com/ethpandaops/lab/backend/pkg/server/proto/xatu_cbt"
 	cbtproto "github.com/ethpandaops/xatu-cbt/pkg/proto/clickhouse"
@@ -15,21 +15,21 @@ import (
 // XatuCBT implements the Xatu CBT gRPC service.
 type XatuCBT struct {
 	pb.UnimplementedXatuCBTServer
-	log            logrus.FieldLogger
-	service        *xatu_cbt.XatuCBT
-	ethereumClient *ethereum.Client
+	log              logrus.FieldLogger
+	service          *xatu_cbt.XatuCBT
+	wallclockService *wallclock.Service
 }
 
 // NewXatuCBT creates a new XatuCBT implementation.
 func NewXatuCBT(
 	log logrus.FieldLogger,
 	svc *xatu_cbt.XatuCBT,
-	ethereumClient *ethereum.Client,
+	wallclockSvc *wallclock.Service,
 ) *XatuCBT {
 	return &XatuCBT{
-		log:            log.WithField("component", "grpc/xatu_cbt"),
-		service:        svc,
-		ethereumClient: ethereumClient,
+		log:              log.WithField("component", "grpc/xatu_cbt"),
+		service:          svc,
+		wallclockService: wallclockSvc,
 	}
 }
 
@@ -93,8 +93,8 @@ func (x *XatuCBT) calculateSlotStartDateTime(
 	}
 
 	networks := md.Get("network")
-	if len(networks) == 0 || x.ethereumClient == nil {
-		x.log.Debug("No network in metadata or ethereum client unavailable, using fallback")
+	if len(networks) == 0 || x.wallclockService == nil {
+		x.log.Debug("No network in metadata or wallclock service unavailable, using fallback")
 
 		return fallback
 	}
@@ -124,16 +124,9 @@ func (x *XatuCBT) calculateSlotStartDateTime(
 		return fallback
 	}
 
-	// Try to get the network and calculate slot start time
-	networkObj := x.ethereumClient.GetNetwork(network)
-	if networkObj == nil {
-		x.log.WithField("network", network).Debug("Network not found, using fallback")
-
-		return fallback
-	}
-
-	wallclock := networkObj.GetWallclock()
-	if wallclock == nil {
+	// Try to get wallclock for the network and calculate slot start time
+	wc := x.wallclockService.GetWallclock(network)
+	if wc == nil {
 		x.log.WithField("network", network).Debug("Wallclock not available, using fallback")
 
 		return fallback
@@ -141,7 +134,7 @@ func (x *XatuCBT) calculateSlotStartDateTime(
 
 	// Calculate slot start time using wallclock
 	var (
-		slot              = wallclock.Slots().FromNumber(slotNumber)
+		slot              = wc.Slots().FromNumber(slotNumber)
 		startTime         = slot.TimeWindow().Start()
 		slotStartTimeUnix = startTime.Unix()
 		slotStartTime     = uint32(slotStartTimeUnix) //nolint:gosec // safe for slot times.

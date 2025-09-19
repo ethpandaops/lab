@@ -4,8 +4,8 @@ import (
 	"context"
 	"sort"
 
-	"github.com/ethpandaops/lab/backend/pkg/internal/lab/ethereum"
 	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/cartographoor"
+	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/xatu_cbt"
 	"github.com/ethpandaops/lab/backend/pkg/server/proto/networks"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
@@ -16,17 +16,21 @@ import (
 // CartographoorService provides gRPC API for network discovery
 type CartographoorService struct {
 	networks.UnimplementedNetworksServiceServer
-	log      logrus.FieldLogger
-	service  *cartographoor.Service
-	ethereum *ethereum.Client
+	log        logrus.FieldLogger
+	service    *cartographoor.Service
+	xatuCBTSvc *xatu_cbt.XatuCBT
 }
 
 // NewCartographoorService creates a new CartographoorService
-func NewCartographoorService(log logrus.FieldLogger, svc *cartographoor.Service, eth *ethereum.Client) *CartographoorService {
+func NewCartographoorService(
+	log logrus.FieldLogger,
+	svc *cartographoor.Service,
+	xatuCBTSvc *xatu_cbt.XatuCBT,
+) *CartographoorService {
 	return &CartographoorService{
-		log:      log.WithField("grpc", "cartographoor"),
-		service:  svc,
-		ethereum: eth,
+		log:        log.WithField("grpc", "cartographoor"),
+		service:    svc,
+		xatuCBTSvc: xatuCBTSvc,
 	}
 }
 
@@ -65,19 +69,9 @@ func (c *CartographoorService) ListNetworks(
 			continue
 		}
 
-		// Only include networks that are configured in the lab
-		if c.ethereum != nil {
-			configured := false
-
-			for _, ethNetwork := range c.ethereum.Networks() {
-				if ethNetwork.Name == network.Name {
-					configured = true
-
-					break
-				}
-			}
-
-			if !configured {
+		// Only include networks that are enabled in xatu_cbt config
+		if c.xatuCBTSvc != nil {
+			if !c.xatuCBTSvc.IsNetworkEnabled(network.Name) {
 				continue
 			}
 		}

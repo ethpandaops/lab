@@ -120,9 +120,11 @@ func (b *BeaconSlots) processSlot(ctx context.Context, networkName string, slot 
 		slotStartTime                  time.Time // New: Slot start time for MEV bids/payloads
 	)
 	// Get slot start time (needed for MEV bids query)
-	slotDetail := b.ethereum.GetNetwork(networkName).GetWallclock().Slots().FromNumber(uint64(slot))
-	// Removed nil check for slotDetail as it's an invalid comparison and likely redundant after getBlockData success.
-	slotStartTime = slotDetail.TimeWindow().Start()
+	wallclock := b.wallclockService.GetWallclock(networkName)
+	if wallclock != nil {
+		slotDetail := wallclock.Slots().FromNumber(uint64(slot))
+		slotStartTime = slotDetail.TimeWindow().Start()
+	}
 
 	// Initialize empty maps
 	blockSeenAtSlotTime = map[string]*pb.BlockArrivalTime{}

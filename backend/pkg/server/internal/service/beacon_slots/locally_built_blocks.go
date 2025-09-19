@@ -9,11 +9,11 @@ import (
 
 	"github.com/attestantio/go-eth2-client/spec/phase0"
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/cache"
-	"github.com/ethpandaops/lab/backend/pkg/internal/lab/ethereum"
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/leader"
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/locker"
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/metrics"
-	"github.com/ethpandaops/lab/backend/pkg/internal/lab/xatu"
+	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/wallclock"
+	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/xatu_cbt"
 	"github.com/ethpandaops/lab/backend/pkg/server/proto/beacon_slots"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc/codes"
@@ -26,8 +26,8 @@ type LocallyBuiltBlocksProcessor struct {
 	log               logrus.FieldLogger
 	config            *LocallyBuiltBlocksConfig
 	headDelaySlots    phase0.Slot
-	ethClient         *ethereum.Client
-	xatuClient        *xatu.Client
+	wallclockService  *wallclock.Service
+	xatuCBTService    *xatu_cbt.XatuCBT
 	cacheClient       cache.Client
 	lockerClient      locker.Locker
 	metricsSvc        *metrics.Metrics
@@ -41,8 +41,8 @@ func NewLocallyBuiltBlocksProcessor(
 	log logrus.FieldLogger,
 	config *LocallyBuiltBlocksConfig,
 	headDelaySlots phase0.Slot,
-	ethClient *ethereum.Client,
-	xatuClient *xatu.Client,
+	wallclockSvc *wallclock.Service,
+	xatuCBTSvc *xatu_cbt.XatuCBT,
 	cacheClient cache.Client,
 	lockerClient locker.Locker,
 	metricsSvc *metrics.Metrics,
@@ -51,8 +51,8 @@ func NewLocallyBuiltBlocksProcessor(
 		log:               log.WithField("processor", "locally_built_blocks"),
 		config:            config,
 		headDelaySlots:    headDelaySlots,
-		ethClient:         ethClient,
-		xatuClient:        xatuClient,
+		wallclockService:  wallclockSvc,
+		xatuCBTService:    xatuCBTSvc,
 		cacheClient:       cacheClient,
 		lockerClient:      lockerClient,
 		metricsSvc:        metricsSvc,
@@ -134,8 +134,11 @@ func (p *LocallyBuiltBlocksProcessor) startProcessing(ctx context.Context) {
 	p.log.Info("Starting locally built blocks processing")
 
 	// Process each network using the passed context
-	for _, network := range p.ethClient.Networks() {
-		go p.processNetworkBlocks(ctx, network.Name)
+	if p.xatuCBTService != nil {
+		enabledNetworks := p.xatuCBTService.GetEnabledNetworks()
+		for _, networkName := range enabledNetworks {
+			go p.processNetworkBlocks(ctx, networkName)
+		}
 	}
 
 	// Wait for context cancellation using the passed context
@@ -207,7 +210,12 @@ func (p *LocallyBuiltBlocksProcessor) getSlotRange(ctx context.Context, networkN
 
 // getCurrentSlot returns the current slot for a network
 func (p *LocallyBuiltBlocksProcessor) getCurrentSlot(ctx context.Context, networkName string) (phase0.Slot, error) {
-	slot, _, err := p.ethClient.GetNetwork(networkName).GetWallclock().Now()
+	wc := p.wallclockService.GetWallclock(networkName)
+	if wc == nil {
+		return 0, fmt.Errorf("wallclock not available for network %s", networkName)
+	}
+
+	slot, _, err := wc.Now()
 	if err != nil {
 		return 0, fmt.Errorf("failed to get current slot: %w", err)
 	}
@@ -267,8 +275,8 @@ func (p *LocallyBuiltBlocksProcessor) processLocallyBuiltBlocksForSlot(ctx conte
 
 	logCtx.Debug("Processing locally built blocks for slot")
 
-	// Get Clickhouse client for the network
-	ch, err := p.xatuClient.GetClickhouseClientForNetwork(networkName)
+	// Get raw Clickhouse client for the network (uses default database)
+	ch, err := p.xatuCBTService.GetRawClickHouseClient(networkName)
 	if err != nil {
 		logCtx.WithError(err).Error("Failed to get Clickhouse client")
 
@@ -489,8 +497,8 @@ func (b *BeaconSlots) FetchRecentLocallyBuiltBlocks(ctx context.Context, network
 		return nil, fmt.Errorf("locally built blocks feature is disabled")
 	}
 
-	if b.ethereum.GetNetwork(networkName) == nil {
-		return nil, fmt.Errorf("network not found")
+	if !b.xatuCBTService.IsNetworkEnabled(networkName) {
+		return nil, fmt.Errorf("network not configured")
 	}
 
 	logCtx := b.log.WithFields(logrus.Fields{
@@ -498,7 +506,12 @@ func (b *BeaconSlots) FetchRecentLocallyBuiltBlocks(ctx context.Context, network
 		"feature": "locally_built_blocks",
 	})
 
-	slotInfo, _, err := b.ethereum.GetNetwork(networkName).GetWallclock().Now()
+	wc := b.wallclockService.GetWallclock(networkName)
+	if wc == nil {
+		return nil, fmt.Errorf("wallclock not available for network %s", networkName)
+	}
+
+	slotInfo, _, err := wc.Now()
 	if err != nil {
 		return nil, fmt.Errorf("failed to get current time: %w", err)
 	}

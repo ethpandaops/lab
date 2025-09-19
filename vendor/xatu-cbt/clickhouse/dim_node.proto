@@ -3,6 +3,7 @@ syntax = "proto3";
 package cbt;
 
 import "vendor/xatu-cbt/clickhouse/common.proto";
+import "google/protobuf/wrappers.proto";
 
 option go_package = "github.com/ethpandaops/xatu-cbt/pkg/proto/clickhouse";
 // Node information for validators
@@ -10,17 +11,17 @@ option go_package = "github.com/ethpandaops/xatu-cbt/pkg/proto/clickhouse";
 message DimNode {
   // Timestamp when the record was last updated
   uint32 updated_date_time = 11;
-  // The name of the node
-  string name = 12;
-  // Groups the node belongs to
-  repeated string groups = 13;
-  // Tags associated with the node
-  repeated string tags = 14;
-  // Additional attributes of the node
-  string attributes = 15;
   // The index of the validator
-  uint32 validator_index = 16;
-  // The source of the node data
+  uint32 validator_index = 12;
+  // The name of the node
+  google.protobuf.StringValue name = 13;
+  // Groups the node belongs to
+  repeated string groups = 14;
+  // Tags associated with the node
+  repeated string tags = 15;
+  // Additional attributes of the node
+  string attributes = 16;
+  // The source entity of the node
   string source = 17;
 }
 
@@ -32,7 +33,7 @@ message ListDimNodeRequest {
   // Filter by updated_date_time (optional)
   UInt32Filter updated_date_time = 2;
   // Filter by name (optional)
-  StringFilter name = 3;
+  NullableStringFilter name = 3;
   // Filter by groups (optional)
   repeated string groups = 4;
   // Filter by tags (optional)

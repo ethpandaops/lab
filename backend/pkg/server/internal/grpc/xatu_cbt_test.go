@@ -12,10 +12,10 @@ import (
 )
 
 func TestCalculateSlotStartDateTime_Fallbacks(t *testing.T) {
-	// Create XatuCBT instance without ethereum client to test fallback behavior
+	// Create XatuCBT instance without wallclock service to test fallback behavior
 	x := &XatuCBT{
-		log:            logrus.New(),
-		ethereumClient: nil, // No ethereum client to force fallback behavior
+		log:              logrus.New(),
+		wallclockService: nil, // No wallclock service to force fallback behavior
 	}
 
 	// Expected fallback filter
@@ -59,7 +59,7 @@ func TestCalculateSlotStartDateTime_Fallbacks(t *testing.T) {
 			description: "Should return fallback when network not in metadata",
 		},
 		{
-			name: "nil ethereum client returns fallback",
+			name: "nil wallclock service returns fallback",
 			setupContext: func() context.Context {
 				md := metadata.New(map[string]string{"network": "mainnet"})
 				return metadata.NewIncomingContext(context.Background(), md)
@@ -67,7 +67,7 @@ func TestCalculateSlotStartDateTime_Fallbacks(t *testing.T) {
 			slotFilter: &cbtproto.UInt32Filter{
 				Filter: &cbtproto.UInt32Filter_Eq{Eq: 7500000},
 			},
-			description: "Should return fallback when ethereum client is nil",
+			description: "Should return fallback when wallclock service is nil",
 		},
 		{
 			name: "slot number 0 returns fallback",
@@ -148,13 +148,13 @@ func TestCalculateSlotStartDateTime_Fallbacks(t *testing.T) {
 
 func TestCalculateSlotStartDateTime_ExtractsSlotNumbers(t *testing.T) {
 	// Test that the function correctly extracts slot numbers from different filter types
-	// This test doesn't need a real ethereum client, just verifies the switch statement logic
+	// This test doesn't need a real wallclock service, just verifies the switch statement logic
 	x := &XatuCBT{
-		log:            logrus.New(),
-		ethereumClient: nil,
+		log:              logrus.New(),
+		wallclockService: nil,
 	}
 
-	// Create context with network (will still fallback due to nil ethereum client)
+	// Create context with network (will still fallback due to nil wallclock service)
 	md := metadata.New(map[string]string{"network": "mainnet"})
 	ctx := metadata.NewIncomingContext(context.Background(), md)
 
@@ -202,7 +202,7 @@ func TestCalculateSlotStartDateTime_ExtractsSlotNumbers(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			// Call the function (will return fallback due to nil ethereum client)
+			// Call the function (will return fallback due to nil wallclock service)
 			result := x.calculateSlotStartDateTime(ctx, tc.filter)
 
 			// We're really just testing that it doesn't panic and returns a valid fallback
