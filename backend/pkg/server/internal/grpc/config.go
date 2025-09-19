@@ -109,9 +109,9 @@ func (c *ConfigService) GetConfig(
 	}
 
 	// Add experiments configuration
-	var experiments []*config.ExperimentConfig
+	var experimentConfigs []*config.ExperimentConfig
 	if c.experimentsService != nil {
-		experiments = c.experimentsService.GetAllExperimentsConfig(ctx, false)
+		experimentConfigs = c.experimentsService.GetAllExperimentsConfig(ctx, false)
 	}
 
 	return &config.GetConfigResponse{
@@ -119,7 +119,7 @@ func (c *ConfigService) GetConfig(
 			Ethereum: &config.EthereumConfig{
 				Networks: networksConfig,
 			},
-			Experiments: experiments,
+			Experiments: experimentConfigs,
 		},
 	}, nil
 }

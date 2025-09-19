@@ -102,6 +102,7 @@ func (s *ExperimentsService) GetExperimentConfigByID(id string) (*ExperimentConf
 func (s *ExperimentsService) GetAllExperimentsConfig(ctx context.Context, includeDA bool) []*config.ExperimentConfig {
 	if s.config == nil {
 		s.log.Warn("GetAllExperimentsConfig called but config is nil")
+
 		return nil
 	}
 

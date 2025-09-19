@@ -24,7 +24,6 @@ type Config struct {
 }
 
 func (x *Config) Validate() error {
-
 	if x.Geolocation == nil {
 		return fmt.Errorf("geolocation config is required")
 	}
