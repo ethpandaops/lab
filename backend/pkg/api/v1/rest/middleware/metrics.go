@@ -3,47 +3,69 @@ package middleware
 import (
 	"net/http"
 	"strconv"
+	"sync"
 	"time"
 
+	"github.com/ethpandaops/lab/backend/pkg/internal/lab/metrics"
 	"github.com/prometheus/client_golang/prometheus"
-	"github.com/prometheus/client_golang/prometheus/promauto"
 )
 
 var (
-	// HTTPRequestsTotal counts total HTTP requests
-	HTTPRequestsTotal = promauto.NewCounterVec(
-		prometheus.CounterOpts{
-			Namespace: "lab",
-			Subsystem: "rest_api",
-			Name:      "requests_total",
-			Help:      "Total number of HTTP requests",
-		},
-		[]string{"method", "path", "status"},
-	)
+	metricsCollector *metrics.Collector
+	metricsOnce      sync.Once
 
-	// HTTPRequestDuration tracks request duration
-	HTTPRequestDuration = promauto.NewHistogramVec(
-		prometheus.HistogramOpts{
-			Namespace: "lab",
-			Subsystem: "rest_api",
-			Name:      "request_duration_seconds",
-			Help:      "Duration of HTTP requests in seconds",
-			Buckets:   prometheus.DefBuckets,
-		},
-		[]string{"method", "path", "status"},
-	)
-
-	// HTTPRequestsInFlight tracks concurrent requests
-	HTTPRequestsInFlight = promauto.NewGaugeVec(
-		prometheus.GaugeOpts{
-			Namespace: "lab",
-			Subsystem: "rest_api",
-			Name:      "requests_in_flight",
-			Help:      "Number of HTTP requests currently being processed",
-		},
-		[]string{"method", "path"},
-	)
+	httpRequestsTotal    *prometheus.CounterVec
+	httpRequestDuration  *prometheus.HistogramVec
+	httpRequestsInFlight *prometheus.GaugeVec
 )
+
+// InitializeMetrics must be called once with the metrics service
+func InitializeMetrics(m *metrics.Metrics) error {
+	var initErr error
+
+	metricsOnce.Do(func() {
+		metricsCollector = m.NewCollector("rest_api")
+
+		var err error
+
+		// Initialize metrics
+		httpRequestsTotal, err = metricsCollector.NewCounterVec(
+			"requests_total",
+			"Total number of HTTP requests",
+			[]string{"method", "path", "status"},
+		)
+		if err != nil {
+			initErr = err
+
+			return
+		}
+
+		httpRequestDuration, err = metricsCollector.NewHistogramVec(
+			"request_duration_seconds",
+			"Duration of HTTP requests in seconds",
+			[]string{"method", "path", "status"},
+			prometheus.DefBuckets,
+		)
+		if err != nil {
+			initErr = err
+
+			return
+		}
+
+		httpRequestsInFlight, err = metricsCollector.NewGaugeVec(
+			"requests_in_flight",
+			"Number of HTTP requests currently being processed",
+			[]string{"method", "path"},
+		)
+		if err != nil {
+			initErr = err
+
+			return
+		}
+	})
+
+	return initErr
+}
 
 // metricsResponseWriter wraps http.ResponseWriter to capture status code
 type metricsResponseWriter struct {
@@ -67,12 +89,19 @@ func (mrw *metricsResponseWriter) WriteHeader(code int) {
 func WithMetrics(pathTemplate string) func(http.HandlerFunc) http.HandlerFunc {
 	return func(next http.HandlerFunc) http.HandlerFunc {
 		return func(w http.ResponseWriter, r *http.Request) {
+			// Skip if metrics not initialized
+			if httpRequestsTotal == nil || httpRequestDuration == nil || httpRequestsInFlight == nil {
+				next(w, r)
+
+				return
+			}
+
 			start := time.Now()
 			wrapped := newMetricsResponseWriter(w)
 
 			// Track in-flight requests
-			HTTPRequestsInFlight.WithLabelValues(r.Method, pathTemplate).Inc()
-			defer HTTPRequestsInFlight.WithLabelValues(r.Method, pathTemplate).Dec()
+			httpRequestsInFlight.WithLabelValues(r.Method, pathTemplate).Inc()
+			defer httpRequestsInFlight.WithLabelValues(r.Method, pathTemplate).Dec()
 
 			// Process request
 			next(wrapped, r)
@@ -81,8 +110,8 @@ func WithMetrics(pathTemplate string) func(http.HandlerFunc) http.HandlerFunc {
 			duration := time.Since(start).Seconds()
 			status := strconv.Itoa(wrapped.statusCode)
 
-			HTTPRequestsTotal.WithLabelValues(r.Method, pathTemplate, status).Inc()
-			HTTPRequestDuration.WithLabelValues(r.Method, pathTemplate, status).Observe(duration)
+			httpRequestsTotal.WithLabelValues(r.Method, pathTemplate, status).Inc()
+			httpRequestDuration.WithLabelValues(r.Method, pathTemplate, status).Observe(duration)
 		}
 	}
 }

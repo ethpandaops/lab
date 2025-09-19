@@ -14,6 +14,7 @@ import (
 
 	apiconnect "github.com/ethpandaops/lab/backend/pkg/api/proto/protoconnect"
 	v1rest "github.com/ethpandaops/lab/backend/pkg/api/v1/rest"
+	"github.com/ethpandaops/lab/backend/pkg/api/v1/rest/middleware"
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/cache"
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/logger"
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/metrics"
@@ -60,6 +61,11 @@ func New(config *Config) (*Service, error) {
 	}
 
 	met := metrics.NewMetricsService("lab", log, "api")
+
+	// Initialize REST API middleware metrics
+	if err := middleware.InitializeMetrics(met); err != nil {
+		return nil, fmt.Errorf("failed to initialize REST API metrics: %w", err)
+	}
 
 	cacheClient, err := cache.New(config.Cache, met)
 	if err != nil {
