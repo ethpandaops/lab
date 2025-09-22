@@ -150,3 +150,107 @@ func (x *XatuCBT) calculateSlotStartDateTime(
 		Filter: &cbtproto.UInt32Filter_Eq{Eq: slotStartTime},
 	}
 }
+
+// ListFctAttestationFirstSeenChunked50Ms returns attestation timing data in 50ms chunks.
+func (x *XatuCBT) ListFctAttestationFirstSeenChunked50Ms(
+	ctx context.Context,
+	req *cbtproto.ListFctAttestationFirstSeenChunked50MsRequest,
+) (*cbtproto.ListFctAttestationFirstSeenChunked50MsResponse, error) {
+	// Calculate SlotStartDateTime if not already set for more efficient queries.
+	if req.SlotStartDateTime == nil && req.Slot != nil {
+		req.SlotStartDateTime = x.calculateSlotStartDateTime(ctx, req.Slot)
+	}
+
+	return x.service.ListFctAttestationFirstSeenChunked50ms(ctx, req)
+}
+
+// ListFctAttestationCorrectnessHead returns attestation correctness data for the head chain.
+func (x *XatuCBT) ListFctAttestationCorrectnessHead(
+	ctx context.Context,
+	req *cbtproto.ListFctAttestationCorrectnessHeadRequest,
+) (*cbtproto.ListFctAttestationCorrectnessHeadResponse, error) {
+	// Calculate SlotStartDateTime if not already set for more efficient queries.
+	if req.SlotStartDateTime == nil && req.Slot != nil {
+		req.SlotStartDateTime = x.calculateSlotStartDateTime(ctx, req.Slot)
+	}
+
+	return x.service.ListFctAttestationCorrectnessHead(ctx, req)
+}
+
+// ListFctMevBidCountByRelay returns MEV relay bid count data.
+func (x *XatuCBT) ListFctMevBidCountByRelay(
+	ctx context.Context,
+	req *cbtproto.ListFctMevBidCountByRelayRequest,
+) (*cbtproto.ListFctMevBidCountByRelayResponse, error) {
+	// Calculate SlotStartDateTime if not already set for more efficient queries.
+	if req.SlotStartDateTime == nil && req.Slot != nil {
+		req.SlotStartDateTime = x.calculateSlotStartDateTime(ctx, req.Slot)
+	}
+
+	return x.service.ListFctMevBidCountByRelay(ctx, req)
+}
+
+// ListIntBlockBlobCountHead returns blob count data for blocks in the unfinalized chain.
+func (x *XatuCBT) ListIntBlockBlobCountHead(
+	ctx context.Context,
+	req *cbtproto.ListIntBlockBlobCountHeadRequest,
+) (*cbtproto.ListIntBlockBlobCountHeadResponse, error) {
+	// Calculate SlotStartDateTime if not already set for more efficient queries.
+	if req.SlotStartDateTime == nil && req.Slot != nil {
+		req.SlotStartDateTime = x.calculateSlotStartDateTime(ctx, req.Slot)
+	}
+
+	return x.service.ListIntBlockBlobCountHead(ctx, req)
+}
+
+// ListFctBlockBlobFirstSeenByNode returns blob timing data from the fct_block_blob_first_seen_by_node table.
+func (x *XatuCBT) ListFctBlockBlobFirstSeenByNode(
+	ctx context.Context,
+	req *cbtproto.ListFctBlockBlobFirstSeenByNodeRequest,
+) (*cbtproto.ListFctBlockBlobFirstSeenByNodeResponse, error) {
+	// Calculate SlotStartDateTime if not already set for more efficient queries.
+	if req.SlotStartDateTime == nil && req.Slot != nil {
+		req.SlotStartDateTime = x.calculateSlotStartDateTime(ctx, req.Slot)
+	}
+
+	return x.service.ListFctBlockBlobFirstSeenByNode(ctx, req)
+}
+
+// ListIntBlockHead returns block data from the int_block_head table.
+func (x *XatuCBT) ListIntBlockHead(
+	ctx context.Context,
+	req *cbtproto.ListIntBlockHeadRequest,
+) (*cbtproto.ListIntBlockHeadResponse, error) {
+	// Calculate SlotStartDateTime if not already set for more efficient queries.
+	if req.SlotStartDateTime == nil && req.Slot != nil {
+		req.SlotStartDateTime = x.calculateSlotStartDateTime(ctx, req.Slot)
+	}
+
+	return x.service.ListIntBlockHead(ctx, req)
+}
+
+// ListIntBlockMevHead returns MEV block data for the unfinalized chain.
+func (x *XatuCBT) ListIntBlockMevHead(
+	ctx context.Context,
+	req *cbtproto.ListIntBlockMevHeadRequest,
+) (*cbtproto.ListIntBlockMevHeadResponse, error) {
+	// Calculate SlotStartDateTime if not already set for more efficient queries.
+	if req.SlotStartDateTime == nil && req.Slot != nil {
+		req.SlotStartDateTime = x.calculateSlotStartDateTime(ctx, req.Slot)
+	}
+
+	return x.service.ListIntBlockMevHead(ctx, req)
+}
+
+// ListFctMevBidValueByBuilder returns highest MEV bid values by builder for a slot.
+func (x *XatuCBT) ListFctMevBidValueByBuilder(
+	ctx context.Context,
+	req *cbtproto.ListFctMevBidValueByBuilderRequest,
+) (*cbtproto.ListFctMevBidValueByBuilderResponse, error) {
+	// Calculate SlotStartDateTime if not already set for more efficient queries.
+	if req.SlotStartDateTime == nil && req.Slot != nil {
+		req.SlotStartDateTime = x.calculateSlotStartDateTime(ctx, req.Slot)
+	}
+
+	return x.service.ListFctMevBidValueByBuilder(ctx, req)
+}

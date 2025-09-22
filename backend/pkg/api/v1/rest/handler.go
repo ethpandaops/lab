@@ -18,6 +18,13 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+// Common query parameter names used across REST API handlers
+const (
+	QueryParamPageSize  = "page_size"
+	QueryParamPageToken = "page_token"
+	QueryParamOrderBy   = "order_by"
+)
+
 // PublicRouter handles public REST API v1 requests for all Lab endpoints.
 type PublicRouter struct {
 	log           logrus.FieldLogger

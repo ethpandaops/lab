@@ -96,6 +96,58 @@ message NetworkFilterMetadata {
   int32 filtered_count = 3;             // Networks after filtering
 }
 
+// MevRelayBidCountResponse is the v1 API response for MEV relay bid counts by slot.
+message MevRelayBidCountResponse {
+  repeated MevRelayBidCount relays = 1;
+  PaginationMetadata pagination = 2;
+  FilterMetadata filters = 3;
+}
+
+// MevRelayBidCount represents MEV relay bid statistics for public API consumption.
+message MevRelayBidCount {
+  string relay_name = 1;               // Relay identifier
+  uint32 bid_count = 2;                // Total number of bids
+}
+
+// MevBlockResponse is the v1 API response for MEV block data by slot.
+message MevBlockResponse {
+  repeated MevBlock blocks = 1;
+  PaginationMetadata pagination = 2;
+  FilterMetadata filters = 3;
+}
+
+// MevBlock represents MEV block data for public API consumption.
+message MevBlock {
+  string block_root = 1;                // Block root hash
+  string block_hash = 2;                // Execution layer block hash
+  uint64 block_number = 3;              // Execution layer block number
+  string parent_hash = 4;               // Parent block hash
+  string builder_pubkey = 5;            // Builder public key
+  string proposer_pubkey = 6;           // Proposer public key
+  string proposer_fee_recipient = 7;    // Fee recipient address
+  uint64 gas_limit = 8;                 // Gas limit
+  uint64 gas_used = 9;                  // Gas used
+  string value = 10;                    // MEV value in wei
+  uint32 transaction_count = 11;        // Number of transactions
+  repeated string relay_names = 12;     // Relay names that delivered the payload
+  string earliest_bid_time = 13;        // Earliest bid timestamp (ISO 8601)
+}
+
+// MevBuilderBidResponse is the v1 API response for highest MEV builder bids by slot.
+message MevBuilderBidResponse {
+  repeated MevBuilderBid builders = 1;
+  PaginationMetadata pagination = 2;
+  FilterMetadata filters = 3;
+}
+
+// MevBuilderBid represents the highest MEV bid from a builder for a slot for public API consumption.
+message MevBuilderBid {
+  string block_hash = 1;                // Execution block hash
+  string value = 2;                     // Bid value in wei
+  repeated string relay_names = 3;      // Relays that received the bid
+  string earliest_bid_time = 4;         // Earliest bid timestamp (ISO 8601)
+}
+
 // Error response.
 message ErrorResponse {
   string error = 1;
@@ -194,7 +246,100 @@ message BlockTimingResponse {
 message BlockTimingNode {
   string node_id = 1;
   string username = 2;
-  int64 seen_diff_ms = 3;  // milliseconds from slot start
-  GeoInfo geo = 4;          // reuse existing GeoInfo type
-  ClientInfo client = 5;    // reuse existing ClientInfo type
+  uint32 seen_slot_start_diff = 3;  // milliseconds from slot start
+  GeoInfo geo = 4;                  // reuse existing GeoInfo type
+  ClientInfo client = 5;             // reuse existing ClientInfo type
+}
+
+// BlobTimingResponse is the v1 API response for blob timing data.
+message BlobTimingResponse {
+  repeated BlobTimingNode nodes = 1;
+  PaginationMetadata pagination = 2;
+  FilterMetadata filters = 3;
+}
+
+// BlobTimingNode represents a node that observed a blob.
+message BlobTimingNode {
+  string node_id = 1;
+  string username = 2;
+  uint32 seen_slot_start_diff = 3;  // milliseconds from slot start
+  uint32 blob_index = 4;             // blob index within the block
+  string block_root = 5;             // beacon block root hash
+  GeoInfo geo = 6;                   // reuse existing GeoInfo type
+  ClientInfo client = 7;              // reuse existing ClientInfo type
+}
+
+// AttestationTimingResponse is the v1 API response for attestation timing data.
+message AttestationTimingResponse {
+  repeated AttestationTimingChunk chunks = 1;
+  PaginationMetadata pagination = 2;
+  FilterMetadata filters = 3;
+}
+
+// AttestationTimingChunk represents attestation timing data in 50ms chunks.
+message AttestationTimingChunk {
+  string block_root = 1;           // beacon block root that was attested (empty if missed)
+  int64 chunk_start_ms = 2;        // milliseconds from slot start (e.g., 1500 for 1500-1550ms chunk)
+  uint32 attestation_count = 3;    // number of attestations in this chunk
+}
+
+// AttestationCorrectnessResponse is the v1 API response for attestation correctness data for a single slot.
+message AttestationCorrectnessResponse {
+  repeated AttestationCorrectness blocks = 1;  // Attestation correctness for blocks in the slot (may include forks)
+  FilterMetadata filters = 2;
+}
+
+// AttestationCorrectness represents attestation correctness data for a block in a slot.
+message AttestationCorrectness {
+  string block_root = 1;            // The beacon block root hash (may be empty for missed blocks)
+  uint32 votes_max = 2;             // Maximum possible attestations for this block
+  uint32 votes_actual = 3;          // Actual attestations received for this block
+  float correctness_percentage = 4; // Percentage of actual vs max votes
+}
+
+// BlobTotalResponse is the v1 API response for blob count data for a single slot.
+message BlobTotalResponse {
+  repeated BlobTotal blocks = 1;    // Blob counts for blocks in the slot (may include forks)
+  FilterMetadata filters = 2;
+}
+
+// BlobTotal represents the total blob count for a block in the unfinalized chain.
+message BlobTotal {
+  string block_root = 1;             // The beacon block root hash
+  uint32 blob_count = 2;             // The number of blobs in this block
+}
+
+// BeaconBlockResponse is the v1 API response for beacon block data for a specific slot.
+message BeaconBlockResponse {
+  repeated BeaconBlock blocks = 1;   // Block data for the slot (may include forks)
+  PaginationMetadata pagination = 2;
+  FilterMetadata filters = 3;
+}
+
+// BeaconBlock represents beacon block data from the unfinalized chain for public API consumption.
+message BeaconBlock {
+  // Core block identifiers
+  string block_root = 1;              // The root hash of the beacon block
+  string parent_root = 2;             // The root hash of the parent block
+  string state_root = 3;              // The root hash of the beacon state
+  
+  // Block metadata
+  uint32 proposer_index = 4;          // Validator index who proposed the block
+  string block_version = 5;           // Block version (e.g., phase0, altair, bellatrix)
+  uint32 block_total_bytes = 6;       // Total size of the block in bytes
+  uint32 block_total_bytes_compressed = 7; // Compressed size using snappy
+  
+  // Execution payload information
+  string execution_block_hash = 8;    // Execution layer block hash
+  uint32 execution_block_number = 9;  // Execution layer block number
+  string execution_fee_recipient = 10; // Address receiving execution fees
+  string execution_base_fee_per_gas = 11; // Base fee per gas
+  uint64 execution_gas_used = 12;     // Total gas used
+  uint64 execution_gas_limit = 13;    // Gas limit for the block
+  uint64 execution_blob_gas_used = 14; // Blob gas used (EIP-4844)
+  uint64 execution_excess_blob_gas = 15; // Excess blob gas (EIP-4844)
+  string execution_state_root = 16;   // Execution layer state root
+  string execution_parent_hash = 17;  // Parent hash in execution layer
+  uint32 execution_transactions_count = 18; // Number of transactions
+  uint32 execution_transactions_bytes = 19; // Total transaction bytes
 }

@@ -35,7 +35,7 @@ func (r *PublicRouter) GetRoutes() []RouteConfig {
 			Path:        "/experiments/{experimentId}/config",
 			Handler:     r.handleExperimentConfig,
 			Methods:     []string{http.MethodGet, http.MethodOptions},
-			Cache:       middleware.CacheConfigEndpoint,
+			Cache:       middleware.CacheBrowserShort,
 			Description: "Get experiment-specific configuration",
 		},
 
@@ -50,11 +50,69 @@ func (r *PublicRouter) GetRoutes() []RouteConfig {
 
 		// Beacon slot endpoints
 		{
+			Path:        "/{network}/beacon/slot/{slot}/block",
+			Handler:     r.handleBeaconBlock,
+			Methods:     []string{http.MethodGet, http.MethodOptions},
+			Cache:       middleware.CacheRealtime, // Real-time data for recent slots
+			Description: "Get beacon block data for a specific slot",
+		},
+		{
 			Path:        "/{network}/beacon/slot/{slot}/block/timing",
 			Handler:     r.handleBeaconBlockTiming,
 			Methods:     []string{http.MethodGet, http.MethodOptions},
 			Cache:       middleware.CacheRealtime, // Real-time data for recent slots
 			Description: "Get block timing data for a specific slot",
+		},
+		{
+			Path:        "/{network}/beacon/slot/{slot}/attestation/timing",
+			Handler:     r.handleBeaconAttestationTiming,
+			Methods:     []string{http.MethodGet, http.MethodOptions},
+			Cache:       middleware.CacheRealtime, // Real-time data for recent slots
+			Description: "Get attestation timing data in 50ms chunks for a specific slot",
+		},
+		{
+			Path:        "/{network}/beacon/slot/{slot}/attestation/correctness",
+			Handler:     r.handleBeaconAttestationCorrectness,
+			Methods:     []string{http.MethodGet, http.MethodOptions},
+			Cache:       middleware.CacheRealtime, // Real-time data for recent slots
+			Description: "Get attestation correctness data for a specific slot",
+		},
+		{
+			Path:        "/{network}/beacon/slot/{slot}/blob/total",
+			Handler:     r.handleBeaconBlobTotal,
+			Methods:     []string{http.MethodGet, http.MethodOptions},
+			Cache:       middleware.CacheRealtime, // Real-time data for recent slots
+			Description: "Get total blob count for blocks in a specific slot",
+		},
+		{
+			Path:        "/{network}/beacon/slot/{slot}/blob/timing",
+			Handler:     r.handleBeaconBlobTiming,
+			Methods:     []string{http.MethodGet, http.MethodOptions},
+			Cache:       middleware.CacheRealtime, // Real-time data for recent slots
+			Description: "Get blob timing data for a specific slot",
+		},
+
+		// MEV endpoints
+		{
+			Path:        "/{network}/beacon/slot/{slot}/mev",
+			Handler:     r.handleMevBlock,
+			Methods:     []string{http.MethodGet, http.MethodOptions},
+			Cache:       middleware.CacheRealtime, // Real-time data for recent slots
+			Description: "Get MEV block data for a specific slot",
+		},
+		{
+			Path:        "/{network}/beacon/slot/{slot}/mev/relay",
+			Handler:     r.handleMevRelayBidCount,
+			Methods:     []string{http.MethodGet, http.MethodOptions},
+			Cache:       middleware.CacheRealtime, // Real-time data for recent slots
+			Description: "Get MEV relay bid count statistics for a specific slot",
+		},
+		{
+			Path:        "/{network}/beacon/slot/{slot}/mev/builder",
+			Handler:     r.handleMevBuilderBid,
+			Methods:     []string{http.MethodGet, http.MethodOptions},
+			Cache:       middleware.CacheRealtime, // Real-time data for recent slots
+			Description: "Get highest MEV bid values by builder for a specific slot",
 		},
 	}
 }

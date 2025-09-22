@@ -40,6 +40,27 @@ const (
 	// XatuCBTListFctBlockFirstSeenByNodeProcedure is the fully-qualified name of the XatuCBT's
 	// ListFctBlockFirstSeenByNode RPC.
 	XatuCBTListFctBlockFirstSeenByNodeProcedure = "/xatu_cbt.XatuCBT/ListFctBlockFirstSeenByNode"
+	// XatuCBTListFctBlockBlobFirstSeenByNodeProcedure is the fully-qualified name of the XatuCBT's
+	// ListFctBlockBlobFirstSeenByNode RPC.
+	XatuCBTListFctBlockBlobFirstSeenByNodeProcedure = "/xatu_cbt.XatuCBT/ListFctBlockBlobFirstSeenByNode"
+	// XatuCBTListFctAttestationFirstSeenChunked50MsProcedure is the fully-qualified name of the
+	// XatuCBT's ListFctAttestationFirstSeenChunked50ms RPC.
+	XatuCBTListFctAttestationFirstSeenChunked50MsProcedure = "/xatu_cbt.XatuCBT/ListFctAttestationFirstSeenChunked50ms"
+	// XatuCBTListFctAttestationCorrectnessHeadProcedure is the fully-qualified name of the XatuCBT's
+	// ListFctAttestationCorrectnessHead RPC.
+	XatuCBTListFctAttestationCorrectnessHeadProcedure = "/xatu_cbt.XatuCBT/ListFctAttestationCorrectnessHead"
+	// XatuCBTListFctMevBidCountByRelayProcedure is the fully-qualified name of the XatuCBT's
+	// ListFctMevBidCountByRelay RPC.
+	XatuCBTListFctMevBidCountByRelayProcedure = "/xatu_cbt.XatuCBT/ListFctMevBidCountByRelay"
+	// XatuCBTListIntBlockBlobCountHeadProcedure is the fully-qualified name of the XatuCBT's
+	// ListIntBlockBlobCountHead RPC.
+	XatuCBTListIntBlockBlobCountHeadProcedure = "/xatu_cbt.XatuCBT/ListIntBlockBlobCountHead"
+	// XatuCBTListIntBlockHeadProcedure is the fully-qualified name of the XatuCBT's ListIntBlockHead
+	// RPC.
+	XatuCBTListIntBlockHeadProcedure = "/xatu_cbt.XatuCBT/ListIntBlockHead"
+	// XatuCBTListIntBlockMevHeadProcedure is the fully-qualified name of the XatuCBT's
+	// ListIntBlockMevHead RPC.
+	XatuCBTListIntBlockMevHeadProcedure = "/xatu_cbt.XatuCBT/ListIntBlockMevHead"
 	// XatuCBTGetDataAvailabilityProcedure is the fully-qualified name of the XatuCBT's
 	// GetDataAvailability RPC.
 	XatuCBTGetDataAvailabilityProcedure = "/xatu_cbt.XatuCBT/GetDataAvailability"
@@ -47,10 +68,17 @@ const (
 
 // These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
 var (
-	xatuCBTServiceDescriptor                           = xatu_cbt.File_backend_pkg_server_proto_xatu_cbt_xatu_cbt_proto.Services().ByName("XatuCBT")
-	xatuCBTListFctNodeActiveLast24HMethodDescriptor    = xatuCBTServiceDescriptor.Methods().ByName("ListFctNodeActiveLast24h")
-	xatuCBTListFctBlockFirstSeenByNodeMethodDescriptor = xatuCBTServiceDescriptor.Methods().ByName("ListFctBlockFirstSeenByNode")
-	xatuCBTGetDataAvailabilityMethodDescriptor         = xatuCBTServiceDescriptor.Methods().ByName("GetDataAvailability")
+	xatuCBTServiceDescriptor                                      = xatu_cbt.File_backend_pkg_server_proto_xatu_cbt_xatu_cbt_proto.Services().ByName("XatuCBT")
+	xatuCBTListFctNodeActiveLast24HMethodDescriptor               = xatuCBTServiceDescriptor.Methods().ByName("ListFctNodeActiveLast24h")
+	xatuCBTListFctBlockFirstSeenByNodeMethodDescriptor            = xatuCBTServiceDescriptor.Methods().ByName("ListFctBlockFirstSeenByNode")
+	xatuCBTListFctBlockBlobFirstSeenByNodeMethodDescriptor        = xatuCBTServiceDescriptor.Methods().ByName("ListFctBlockBlobFirstSeenByNode")
+	xatuCBTListFctAttestationFirstSeenChunked50MsMethodDescriptor = xatuCBTServiceDescriptor.Methods().ByName("ListFctAttestationFirstSeenChunked50ms")
+	xatuCBTListFctAttestationCorrectnessHeadMethodDescriptor      = xatuCBTServiceDescriptor.Methods().ByName("ListFctAttestationCorrectnessHead")
+	xatuCBTListFctMevBidCountByRelayMethodDescriptor              = xatuCBTServiceDescriptor.Methods().ByName("ListFctMevBidCountByRelay")
+	xatuCBTListIntBlockBlobCountHeadMethodDescriptor              = xatuCBTServiceDescriptor.Methods().ByName("ListIntBlockBlobCountHead")
+	xatuCBTListIntBlockHeadMethodDescriptor                       = xatuCBTServiceDescriptor.Methods().ByName("ListIntBlockHead")
+	xatuCBTListIntBlockMevHeadMethodDescriptor                    = xatuCBTServiceDescriptor.Methods().ByName("ListIntBlockMevHead")
+	xatuCBTGetDataAvailabilityMethodDescriptor                    = xatuCBTServiceDescriptor.Methods().ByName("GetDataAvailability")
 )
 
 // XatuCBTClient is a client for the xatu_cbt.XatuCBT service.
@@ -61,6 +89,27 @@ type XatuCBTClient interface {
 	// ListFctBlockFirstSeenByNode returns block timing data from the fct_block_first_seen_by_node table.
 	// This table contains information about when blocks were first seen by different nodes.
 	ListFctBlockFirstSeenByNode(context.Context, *connect.Request[clickhouse.ListFctBlockFirstSeenByNodeRequest]) (*connect.Response[clickhouse.ListFctBlockFirstSeenByNodeResponse], error)
+	// ListFctBlockBlobFirstSeenByNode returns blob timing data from the fct_block_blob_first_seen_by_node table.
+	// This table contains information about when blobs were first seen by different nodes.
+	ListFctBlockBlobFirstSeenByNode(context.Context, *connect.Request[clickhouse.ListFctBlockBlobFirstSeenByNodeRequest]) (*connect.Response[clickhouse.ListFctBlockBlobFirstSeenByNodeResponse], error)
+	// ListFctAttestationFirstSeenChunked50ms returns attestation timing data in 50ms chunks.
+	// This table contains attestations first seen on the unfinalized chain broken down by 50ms intervals.
+	ListFctAttestationFirstSeenChunked50Ms(context.Context, *connect.Request[clickhouse.ListFctAttestationFirstSeenChunked50MsRequest]) (*connect.Response[clickhouse.ListFctAttestationFirstSeenChunked50MsResponse], error)
+	// ListFctAttestationCorrectnessHead returns attestation correctness data for the head chain.
+	// This table contains voting statistics for blocks showing the actual vs expected attestations.
+	ListFctAttestationCorrectnessHead(context.Context, *connect.Request[clickhouse.ListFctAttestationCorrectnessHeadRequest]) (*connect.Response[clickhouse.ListFctAttestationCorrectnessHeadResponse], error)
+	// ListFctMevBidCountByRelay returns MEV relay bid count data.
+	// This table contains the total number of MEV relay bids for a slot by relay.
+	ListFctMevBidCountByRelay(context.Context, *connect.Request[clickhouse.ListFctMevBidCountByRelayRequest]) (*connect.Response[clickhouse.ListFctMevBidCountByRelayResponse], error)
+	// ListIntBlockBlobCountHead returns blob count data for blocks in the unfinalized chain.
+	// This table contains the number of blobs for each block, with forks potentially causing multiple blocks per slot.
+	ListIntBlockBlobCountHead(context.Context, *connect.Request[clickhouse.ListIntBlockBlobCountHeadRequest]) (*connect.Response[clickhouse.ListIntBlockBlobCountHeadResponse], error)
+	// ListIntBlockHead returns beacon block data from the int_block_head table.
+	// This table contains block details for the unfinalized chain, with potential multiple blocks per slot due to forks.
+	ListIntBlockHead(context.Context, *connect.Request[clickhouse.ListIntBlockHeadRequest]) (*connect.Response[clickhouse.ListIntBlockHeadResponse], error)
+	// ListIntBlockMevHead returns MEV block data for the unfinalized chain.
+	// This table contains MEV relay proposer payload delivered for blocks on the unfinalized chain.
+	ListIntBlockMevHead(context.Context, *connect.Request[clickhouse.ListIntBlockMevHeadRequest]) (*connect.Response[clickhouse.ListIntBlockMevHeadResponse], error)
 	// GetDataAvailability returns the common availability interval across a set of transformation tables.
 	// It calculates the overlapping data range for the specified tables and returns slot information.
 	GetDataAvailability(context.Context, *connect.Request[xatu_cbt.GetDataAvailabilityRequest]) (*connect.Response[xatu_cbt.GetDataAvailabilityResponse], error)
@@ -88,6 +137,48 @@ func NewXatuCBTClient(httpClient connect.HTTPClient, baseURL string, opts ...con
 			connect.WithSchema(xatuCBTListFctBlockFirstSeenByNodeMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
+		listFctBlockBlobFirstSeenByNode: connect.NewClient[clickhouse.ListFctBlockBlobFirstSeenByNodeRequest, clickhouse.ListFctBlockBlobFirstSeenByNodeResponse](
+			httpClient,
+			baseURL+XatuCBTListFctBlockBlobFirstSeenByNodeProcedure,
+			connect.WithSchema(xatuCBTListFctBlockBlobFirstSeenByNodeMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
+		listFctAttestationFirstSeenChunked50Ms: connect.NewClient[clickhouse.ListFctAttestationFirstSeenChunked50MsRequest, clickhouse.ListFctAttestationFirstSeenChunked50MsResponse](
+			httpClient,
+			baseURL+XatuCBTListFctAttestationFirstSeenChunked50MsProcedure,
+			connect.WithSchema(xatuCBTListFctAttestationFirstSeenChunked50MsMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
+		listFctAttestationCorrectnessHead: connect.NewClient[clickhouse.ListFctAttestationCorrectnessHeadRequest, clickhouse.ListFctAttestationCorrectnessHeadResponse](
+			httpClient,
+			baseURL+XatuCBTListFctAttestationCorrectnessHeadProcedure,
+			connect.WithSchema(xatuCBTListFctAttestationCorrectnessHeadMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
+		listFctMevBidCountByRelay: connect.NewClient[clickhouse.ListFctMevBidCountByRelayRequest, clickhouse.ListFctMevBidCountByRelayResponse](
+			httpClient,
+			baseURL+XatuCBTListFctMevBidCountByRelayProcedure,
+			connect.WithSchema(xatuCBTListFctMevBidCountByRelayMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
+		listIntBlockBlobCountHead: connect.NewClient[clickhouse.ListIntBlockBlobCountHeadRequest, clickhouse.ListIntBlockBlobCountHeadResponse](
+			httpClient,
+			baseURL+XatuCBTListIntBlockBlobCountHeadProcedure,
+			connect.WithSchema(xatuCBTListIntBlockBlobCountHeadMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
+		listIntBlockHead: connect.NewClient[clickhouse.ListIntBlockHeadRequest, clickhouse.ListIntBlockHeadResponse](
+			httpClient,
+			baseURL+XatuCBTListIntBlockHeadProcedure,
+			connect.WithSchema(xatuCBTListIntBlockHeadMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
+		listIntBlockMevHead: connect.NewClient[clickhouse.ListIntBlockMevHeadRequest, clickhouse.ListIntBlockMevHeadResponse](
+			httpClient,
+			baseURL+XatuCBTListIntBlockMevHeadProcedure,
+			connect.WithSchema(xatuCBTListIntBlockMevHeadMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
 		getDataAvailability: connect.NewClient[xatu_cbt.GetDataAvailabilityRequest, xatu_cbt.GetDataAvailabilityResponse](
 			httpClient,
 			baseURL+XatuCBTGetDataAvailabilityProcedure,
@@ -99,9 +190,16 @@ func NewXatuCBTClient(httpClient connect.HTTPClient, baseURL string, opts ...con
 
 // xatuCBTClient implements XatuCBTClient.
 type xatuCBTClient struct {
-	listFctNodeActiveLast24H    *connect.Client[clickhouse.ListFctNodeActiveLast24HRequest, clickhouse.ListFctNodeActiveLast24HResponse]
-	listFctBlockFirstSeenByNode *connect.Client[clickhouse.ListFctBlockFirstSeenByNodeRequest, clickhouse.ListFctBlockFirstSeenByNodeResponse]
-	getDataAvailability         *connect.Client[xatu_cbt.GetDataAvailabilityRequest, xatu_cbt.GetDataAvailabilityResponse]
+	listFctNodeActiveLast24H               *connect.Client[clickhouse.ListFctNodeActiveLast24HRequest, clickhouse.ListFctNodeActiveLast24HResponse]
+	listFctBlockFirstSeenByNode            *connect.Client[clickhouse.ListFctBlockFirstSeenByNodeRequest, clickhouse.ListFctBlockFirstSeenByNodeResponse]
+	listFctBlockBlobFirstSeenByNode        *connect.Client[clickhouse.ListFctBlockBlobFirstSeenByNodeRequest, clickhouse.ListFctBlockBlobFirstSeenByNodeResponse]
+	listFctAttestationFirstSeenChunked50Ms *connect.Client[clickhouse.ListFctAttestationFirstSeenChunked50MsRequest, clickhouse.ListFctAttestationFirstSeenChunked50MsResponse]
+	listFctAttestationCorrectnessHead      *connect.Client[clickhouse.ListFctAttestationCorrectnessHeadRequest, clickhouse.ListFctAttestationCorrectnessHeadResponse]
+	listFctMevBidCountByRelay              *connect.Client[clickhouse.ListFctMevBidCountByRelayRequest, clickhouse.ListFctMevBidCountByRelayResponse]
+	listIntBlockBlobCountHead              *connect.Client[clickhouse.ListIntBlockBlobCountHeadRequest, clickhouse.ListIntBlockBlobCountHeadResponse]
+	listIntBlockHead                       *connect.Client[clickhouse.ListIntBlockHeadRequest, clickhouse.ListIntBlockHeadResponse]
+	listIntBlockMevHead                    *connect.Client[clickhouse.ListIntBlockMevHeadRequest, clickhouse.ListIntBlockMevHeadResponse]
+	getDataAvailability                    *connect.Client[xatu_cbt.GetDataAvailabilityRequest, xatu_cbt.GetDataAvailabilityResponse]
 }
 
 // ListFctNodeActiveLast24H calls xatu_cbt.XatuCBT.ListFctNodeActiveLast24h.
@@ -112,6 +210,42 @@ func (c *xatuCBTClient) ListFctNodeActiveLast24H(ctx context.Context, req *conne
 // ListFctBlockFirstSeenByNode calls xatu_cbt.XatuCBT.ListFctBlockFirstSeenByNode.
 func (c *xatuCBTClient) ListFctBlockFirstSeenByNode(ctx context.Context, req *connect.Request[clickhouse.ListFctBlockFirstSeenByNodeRequest]) (*connect.Response[clickhouse.ListFctBlockFirstSeenByNodeResponse], error) {
 	return c.listFctBlockFirstSeenByNode.CallUnary(ctx, req)
+}
+
+// ListFctBlockBlobFirstSeenByNode calls xatu_cbt.XatuCBT.ListFctBlockBlobFirstSeenByNode.
+func (c *xatuCBTClient) ListFctBlockBlobFirstSeenByNode(ctx context.Context, req *connect.Request[clickhouse.ListFctBlockBlobFirstSeenByNodeRequest]) (*connect.Response[clickhouse.ListFctBlockBlobFirstSeenByNodeResponse], error) {
+	return c.listFctBlockBlobFirstSeenByNode.CallUnary(ctx, req)
+}
+
+// ListFctAttestationFirstSeenChunked50Ms calls
+// xatu_cbt.XatuCBT.ListFctAttestationFirstSeenChunked50ms.
+func (c *xatuCBTClient) ListFctAttestationFirstSeenChunked50Ms(ctx context.Context, req *connect.Request[clickhouse.ListFctAttestationFirstSeenChunked50MsRequest]) (*connect.Response[clickhouse.ListFctAttestationFirstSeenChunked50MsResponse], error) {
+	return c.listFctAttestationFirstSeenChunked50Ms.CallUnary(ctx, req)
+}
+
+// ListFctAttestationCorrectnessHead calls xatu_cbt.XatuCBT.ListFctAttestationCorrectnessHead.
+func (c *xatuCBTClient) ListFctAttestationCorrectnessHead(ctx context.Context, req *connect.Request[clickhouse.ListFctAttestationCorrectnessHeadRequest]) (*connect.Response[clickhouse.ListFctAttestationCorrectnessHeadResponse], error) {
+	return c.listFctAttestationCorrectnessHead.CallUnary(ctx, req)
+}
+
+// ListFctMevBidCountByRelay calls xatu_cbt.XatuCBT.ListFctMevBidCountByRelay.
+func (c *xatuCBTClient) ListFctMevBidCountByRelay(ctx context.Context, req *connect.Request[clickhouse.ListFctMevBidCountByRelayRequest]) (*connect.Response[clickhouse.ListFctMevBidCountByRelayResponse], error) {
+	return c.listFctMevBidCountByRelay.CallUnary(ctx, req)
+}
+
+// ListIntBlockBlobCountHead calls xatu_cbt.XatuCBT.ListIntBlockBlobCountHead.
+func (c *xatuCBTClient) ListIntBlockBlobCountHead(ctx context.Context, req *connect.Request[clickhouse.ListIntBlockBlobCountHeadRequest]) (*connect.Response[clickhouse.ListIntBlockBlobCountHeadResponse], error) {
+	return c.listIntBlockBlobCountHead.CallUnary(ctx, req)
+}
+
+// ListIntBlockHead calls xatu_cbt.XatuCBT.ListIntBlockHead.
+func (c *xatuCBTClient) ListIntBlockHead(ctx context.Context, req *connect.Request[clickhouse.ListIntBlockHeadRequest]) (*connect.Response[clickhouse.ListIntBlockHeadResponse], error) {
+	return c.listIntBlockHead.CallUnary(ctx, req)
+}
+
+// ListIntBlockMevHead calls xatu_cbt.XatuCBT.ListIntBlockMevHead.
+func (c *xatuCBTClient) ListIntBlockMevHead(ctx context.Context, req *connect.Request[clickhouse.ListIntBlockMevHeadRequest]) (*connect.Response[clickhouse.ListIntBlockMevHeadResponse], error) {
+	return c.listIntBlockMevHead.CallUnary(ctx, req)
 }
 
 // GetDataAvailability calls xatu_cbt.XatuCBT.GetDataAvailability.
@@ -127,6 +261,27 @@ type XatuCBTHandler interface {
 	// ListFctBlockFirstSeenByNode returns block timing data from the fct_block_first_seen_by_node table.
 	// This table contains information about when blocks were first seen by different nodes.
 	ListFctBlockFirstSeenByNode(context.Context, *connect.Request[clickhouse.ListFctBlockFirstSeenByNodeRequest]) (*connect.Response[clickhouse.ListFctBlockFirstSeenByNodeResponse], error)
+	// ListFctBlockBlobFirstSeenByNode returns blob timing data from the fct_block_blob_first_seen_by_node table.
+	// This table contains information about when blobs were first seen by different nodes.
+	ListFctBlockBlobFirstSeenByNode(context.Context, *connect.Request[clickhouse.ListFctBlockBlobFirstSeenByNodeRequest]) (*connect.Response[clickhouse.ListFctBlockBlobFirstSeenByNodeResponse], error)
+	// ListFctAttestationFirstSeenChunked50ms returns attestation timing data in 50ms chunks.
+	// This table contains attestations first seen on the unfinalized chain broken down by 50ms intervals.
+	ListFctAttestationFirstSeenChunked50Ms(context.Context, *connect.Request[clickhouse.ListFctAttestationFirstSeenChunked50MsRequest]) (*connect.Response[clickhouse.ListFctAttestationFirstSeenChunked50MsResponse], error)
+	// ListFctAttestationCorrectnessHead returns attestation correctness data for the head chain.
+	// This table contains voting statistics for blocks showing the actual vs expected attestations.
+	ListFctAttestationCorrectnessHead(context.Context, *connect.Request[clickhouse.ListFctAttestationCorrectnessHeadRequest]) (*connect.Response[clickhouse.ListFctAttestationCorrectnessHeadResponse], error)
+	// ListFctMevBidCountByRelay returns MEV relay bid count data.
+	// This table contains the total number of MEV relay bids for a slot by relay.
+	ListFctMevBidCountByRelay(context.Context, *connect.Request[clickhouse.ListFctMevBidCountByRelayRequest]) (*connect.Response[clickhouse.ListFctMevBidCountByRelayResponse], error)
+	// ListIntBlockBlobCountHead returns blob count data for blocks in the unfinalized chain.
+	// This table contains the number of blobs for each block, with forks potentially causing multiple blocks per slot.
+	ListIntBlockBlobCountHead(context.Context, *connect.Request[clickhouse.ListIntBlockBlobCountHeadRequest]) (*connect.Response[clickhouse.ListIntBlockBlobCountHeadResponse], error)
+	// ListIntBlockHead returns beacon block data from the int_block_head table.
+	// This table contains block details for the unfinalized chain, with potential multiple blocks per slot due to forks.
+	ListIntBlockHead(context.Context, *connect.Request[clickhouse.ListIntBlockHeadRequest]) (*connect.Response[clickhouse.ListIntBlockHeadResponse], error)
+	// ListIntBlockMevHead returns MEV block data for the unfinalized chain.
+	// This table contains MEV relay proposer payload delivered for blocks on the unfinalized chain.
+	ListIntBlockMevHead(context.Context, *connect.Request[clickhouse.ListIntBlockMevHeadRequest]) (*connect.Response[clickhouse.ListIntBlockMevHeadResponse], error)
 	// GetDataAvailability returns the common availability interval across a set of transformation tables.
 	// It calculates the overlapping data range for the specified tables and returns slot information.
 	GetDataAvailability(context.Context, *connect.Request[xatu_cbt.GetDataAvailabilityRequest]) (*connect.Response[xatu_cbt.GetDataAvailabilityResponse], error)
@@ -150,6 +305,48 @@ func NewXatuCBTHandler(svc XatuCBTHandler, opts ...connect.HandlerOption) (strin
 		connect.WithSchema(xatuCBTListFctBlockFirstSeenByNodeMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
+	xatuCBTListFctBlockBlobFirstSeenByNodeHandler := connect.NewUnaryHandler(
+		XatuCBTListFctBlockBlobFirstSeenByNodeProcedure,
+		svc.ListFctBlockBlobFirstSeenByNode,
+		connect.WithSchema(xatuCBTListFctBlockBlobFirstSeenByNodeMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
+	xatuCBTListFctAttestationFirstSeenChunked50MsHandler := connect.NewUnaryHandler(
+		XatuCBTListFctAttestationFirstSeenChunked50MsProcedure,
+		svc.ListFctAttestationFirstSeenChunked50Ms,
+		connect.WithSchema(xatuCBTListFctAttestationFirstSeenChunked50MsMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
+	xatuCBTListFctAttestationCorrectnessHeadHandler := connect.NewUnaryHandler(
+		XatuCBTListFctAttestationCorrectnessHeadProcedure,
+		svc.ListFctAttestationCorrectnessHead,
+		connect.WithSchema(xatuCBTListFctAttestationCorrectnessHeadMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
+	xatuCBTListFctMevBidCountByRelayHandler := connect.NewUnaryHandler(
+		XatuCBTListFctMevBidCountByRelayProcedure,
+		svc.ListFctMevBidCountByRelay,
+		connect.WithSchema(xatuCBTListFctMevBidCountByRelayMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
+	xatuCBTListIntBlockBlobCountHeadHandler := connect.NewUnaryHandler(
+		XatuCBTListIntBlockBlobCountHeadProcedure,
+		svc.ListIntBlockBlobCountHead,
+		connect.WithSchema(xatuCBTListIntBlockBlobCountHeadMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
+	xatuCBTListIntBlockHeadHandler := connect.NewUnaryHandler(
+		XatuCBTListIntBlockHeadProcedure,
+		svc.ListIntBlockHead,
+		connect.WithSchema(xatuCBTListIntBlockHeadMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
+	xatuCBTListIntBlockMevHeadHandler := connect.NewUnaryHandler(
+		XatuCBTListIntBlockMevHeadProcedure,
+		svc.ListIntBlockMevHead,
+		connect.WithSchema(xatuCBTListIntBlockMevHeadMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
 	xatuCBTGetDataAvailabilityHandler := connect.NewUnaryHandler(
 		XatuCBTGetDataAvailabilityProcedure,
 		svc.GetDataAvailability,
@@ -162,6 +359,20 @@ func NewXatuCBTHandler(svc XatuCBTHandler, opts ...connect.HandlerOption) (strin
 			xatuCBTListFctNodeActiveLast24HHandler.ServeHTTP(w, r)
 		case XatuCBTListFctBlockFirstSeenByNodeProcedure:
 			xatuCBTListFctBlockFirstSeenByNodeHandler.ServeHTTP(w, r)
+		case XatuCBTListFctBlockBlobFirstSeenByNodeProcedure:
+			xatuCBTListFctBlockBlobFirstSeenByNodeHandler.ServeHTTP(w, r)
+		case XatuCBTListFctAttestationFirstSeenChunked50MsProcedure:
+			xatuCBTListFctAttestationFirstSeenChunked50MsHandler.ServeHTTP(w, r)
+		case XatuCBTListFctAttestationCorrectnessHeadProcedure:
+			xatuCBTListFctAttestationCorrectnessHeadHandler.ServeHTTP(w, r)
+		case XatuCBTListFctMevBidCountByRelayProcedure:
+			xatuCBTListFctMevBidCountByRelayHandler.ServeHTTP(w, r)
+		case XatuCBTListIntBlockBlobCountHeadProcedure:
+			xatuCBTListIntBlockBlobCountHeadHandler.ServeHTTP(w, r)
+		case XatuCBTListIntBlockHeadProcedure:
+			xatuCBTListIntBlockHeadHandler.ServeHTTP(w, r)
+		case XatuCBTListIntBlockMevHeadProcedure:
+			xatuCBTListIntBlockMevHeadHandler.ServeHTTP(w, r)
 		case XatuCBTGetDataAvailabilityProcedure:
 			xatuCBTGetDataAvailabilityHandler.ServeHTTP(w, r)
 		default:
@@ -179,6 +390,34 @@ func (UnimplementedXatuCBTHandler) ListFctNodeActiveLast24H(context.Context, *co
 
 func (UnimplementedXatuCBTHandler) ListFctBlockFirstSeenByNode(context.Context, *connect.Request[clickhouse.ListFctBlockFirstSeenByNodeRequest]) (*connect.Response[clickhouse.ListFctBlockFirstSeenByNodeResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("xatu_cbt.XatuCBT.ListFctBlockFirstSeenByNode is not implemented"))
+}
+
+func (UnimplementedXatuCBTHandler) ListFctBlockBlobFirstSeenByNode(context.Context, *connect.Request[clickhouse.ListFctBlockBlobFirstSeenByNodeRequest]) (*connect.Response[clickhouse.ListFctBlockBlobFirstSeenByNodeResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("xatu_cbt.XatuCBT.ListFctBlockBlobFirstSeenByNode is not implemented"))
+}
+
+func (UnimplementedXatuCBTHandler) ListFctAttestationFirstSeenChunked50Ms(context.Context, *connect.Request[clickhouse.ListFctAttestationFirstSeenChunked50MsRequest]) (*connect.Response[clickhouse.ListFctAttestationFirstSeenChunked50MsResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("xatu_cbt.XatuCBT.ListFctAttestationFirstSeenChunked50ms is not implemented"))
+}
+
+func (UnimplementedXatuCBTHandler) ListFctAttestationCorrectnessHead(context.Context, *connect.Request[clickhouse.ListFctAttestationCorrectnessHeadRequest]) (*connect.Response[clickhouse.ListFctAttestationCorrectnessHeadResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("xatu_cbt.XatuCBT.ListFctAttestationCorrectnessHead is not implemented"))
+}
+
+func (UnimplementedXatuCBTHandler) ListFctMevBidCountByRelay(context.Context, *connect.Request[clickhouse.ListFctMevBidCountByRelayRequest]) (*connect.Response[clickhouse.ListFctMevBidCountByRelayResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("xatu_cbt.XatuCBT.ListFctMevBidCountByRelay is not implemented"))
+}
+
+func (UnimplementedXatuCBTHandler) ListIntBlockBlobCountHead(context.Context, *connect.Request[clickhouse.ListIntBlockBlobCountHeadRequest]) (*connect.Response[clickhouse.ListIntBlockBlobCountHeadResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("xatu_cbt.XatuCBT.ListIntBlockBlobCountHead is not implemented"))
+}
+
+func (UnimplementedXatuCBTHandler) ListIntBlockHead(context.Context, *connect.Request[clickhouse.ListIntBlockHeadRequest]) (*connect.Response[clickhouse.ListIntBlockHeadResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("xatu_cbt.XatuCBT.ListIntBlockHead is not implemented"))
+}
+
+func (UnimplementedXatuCBTHandler) ListIntBlockMevHead(context.Context, *connect.Request[clickhouse.ListIntBlockMevHeadRequest]) (*connect.Response[clickhouse.ListIntBlockMevHeadResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("xatu_cbt.XatuCBT.ListIntBlockMevHead is not implemented"))
 }
 
 func (UnimplementedXatuCBTHandler) GetDataAvailability(context.Context, *connect.Request[xatu_cbt.GetDataAvailabilityRequest]) (*connect.Response[xatu_cbt.GetDataAvailabilityResponse], error) {
