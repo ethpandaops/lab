@@ -5,6 +5,8 @@ import useApi from '@/contexts/api';
 import useNetwork from '@/contexts/network';
 import useConfig from '@/contexts/config';
 import { GetSlotDataRequest } from '@/api/gen/backend/pkg/api/proto/lab_api_pb';
+import { useBeaconSlotData } from '@/hooks/useBeaconSlotData';
+import useApiMode from '@/contexts/apiMode';
 import { AlertCircle } from 'lucide-react';
 import {
   MobileBlockProductionView,
@@ -104,12 +106,22 @@ export default function BlockProductionSlotPage() {
 
   const togglePlayPause = () => setIsPlaying(prev => !prev);
 
+  const { useRestApi } = useApiMode();
+
+  // REST API-based query
   const {
-    data: slotData,
-    isLoading: isSlotLoading,
-    error: slotError,
+    data: slotResponseRest,
+    isLoading: isLoadingRest,
+    error: errorRest,
+  } = useBeaconSlotData(selectedNetwork, slotNumber || undefined, false, useRestApi);
+
+  // gRPC-based query
+  const {
+    data: slotResponseGrpc,
+    isLoading: isLoadingGrpc,
+    error: errorGrpc,
   } = useQuery({
-    queryKey: ['block-production-slot', 'slot', selectedNetwork, slotNumber],
+    queryKey: ['block-production-slot-grpc', 'slot', selectedNetwork, slotNumber],
     queryFn: async () => {
       if (slotNumber === null) return null;
 
@@ -123,8 +135,13 @@ export default function BlockProductionSlotPage() {
     },
     staleTime: 60000, // Consider data fresh for 60 seconds to avoid refetching when viewing fixed slots
     retry: 2, // Retry failed requests twice
-    enabled: slotNumber !== null,
+    enabled: slotNumber !== null && !useRestApi,
   });
+
+  // Use REST or gRPC data based on mode
+  const slotData = useRestApi ? slotResponseRest?.data : slotResponseGrpc;
+  const isSlotLoading = useRestApi ? isLoadingRest : isLoadingGrpc;
+  const slotError = useRestApi ? errorRest : errorGrpc;
 
   // Timer effect for playback
   useEffect(() => {

@@ -3,6 +3,8 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import useApi from '@/contexts/api';
 import { GetSlotDataRequest } from '@/api/gen/backend/pkg/api/proto/lab_api_pb';
 import useBeacon from '@/contexts/beacon';
+import { useBeaconSlotData } from '@/hooks/useBeaconSlotData';
+import useApiMode from '@/contexts/apiMode';
 import SlotDataStore from '@/utils/SlotDataStore';
 import useNetwork from '@/contexts/network';
 import useConfig from '@/contexts/config';
@@ -29,6 +31,7 @@ export default function BlockProductionLivePage() {
   const { config } = useConfig();
   const queryClient = useQueryClient();
   const { client: labApiClient } = useApi();
+  const { useRestApi } = useApiMode();
 
   // Check if this experiment is available for the current network
   const isExperimentAvailable = () => {
@@ -159,23 +162,32 @@ export default function BlockProductionLivePage() {
       if (slotNumber < 0) return;
 
       try {
-        // First check the global slot data store
-        if (slotDataStore.hasSlotData(selectedNetwork, slotNumber)) {
+        // First check the global slot data store (only for gRPC)
+        if (!useRestApi && slotDataStore.hasSlotData(selectedNetwork, slotNumber)) {
           // Still need to update React Query cache with this data for the component to use it
           const storeData = slotDataStore.getSlotData(selectedNetwork, slotNumber);
-          const queryKey = ['block-production-live', 'slot', selectedNetwork, slotNumber];
+          const queryKey = ['block-production-live-grpc', 'slot', selectedNetwork, slotNumber];
           queryClient.setQueryData(queryKey, storeData);
           return;
         }
 
         // Create a query key for this slot - must match the key used in the main useQuery
-        const queryKey = ['block-production-live', 'slot', selectedNetwork, slotNumber];
+        const queryKey = useRestApi
+          ? ['slotData', selectedNetwork, slotNumber] // REST API key
+          : ['block-production-live-grpc', 'slot', selectedNetwork, slotNumber]; // gRPC key
 
         // Check if we already have data in React Query cache
         const existingData = queryClient.getQueryData(queryKey);
         if (existingData) {
-          // We already have this data in the cache, store it in our global store too
-          slotDataStore.storeSlotData(selectedNetwork, slotNumber, existingData);
+          // We already have this data in the cache, store it in our global store too (for gRPC)
+          if (!useRestApi) {
+            slotDataStore.storeSlotData(selectedNetwork, slotNumber, existingData);
+          }
+          return;
+        }
+
+        // For REST API, prefetch is handled by the hook itself
+        if (useRestApi) {
           return;
         }
 
@@ -205,7 +217,7 @@ export default function BlockProductionLivePage() {
         console.error(`[PREFETCH] Failed to prefetch data for slot ${slotNumber}:`, error);
       }
     },
-    [headSlot, selectedNetwork, queryClient, labApiClient, slotDataStore],
+    [headSlot, selectedNetwork, queryClient, labApiClient, slotDataStore, useRestApi],
   );
 
   // Prefetching next slot's data
@@ -379,8 +391,17 @@ export default function BlockProductionLivePage() {
 
   const isNextDisabled = displaySlotOffset >= 0;
 
-  const { data: slotData, isLoading: isSlotLoading } = useQuery<BeaconSlotData>({
-    queryKey: ['block-production-live', 'slot', selectedNetwork, slotNumber],
+  // REST API-based query
+  const { data: slotResponseRest, isLoading: isLoadingRest } = useBeaconSlotData(
+    selectedNetwork,
+    slotNumber || undefined,
+    true,
+    useRestApi,
+  );
+
+  // gRPC-based query with SlotDataStore
+  const { data: slotDataGrpc, isLoading: isLoadingGrpc } = useQuery<BeaconSlotData>({
+    queryKey: ['block-production-live-grpc', 'slot', selectedNetwork, slotNumber],
     queryFn: async () => {
       if (slotNumber === null) return null;
 
@@ -391,7 +412,7 @@ export default function BlockProductionLivePage() {
 
       // Next check if we already have this data cached in React Query
       const existingData = queryClient.getQueryData<BeaconSlotData>([
-        'block-production-live',
+        'block-production-live-grpc',
         'slot',
         selectedNetwork,
         slotNumber,
@@ -419,8 +440,12 @@ export default function BlockProductionLivePage() {
     refetchIntervalInBackground: true, // Refetch even if tab is not focused
     staleTime: 5 * 60 * 1000, // Consider data fresh for 5 minutes
     retry: 2, // Retry failed requests twice
-    enabled: slotNumber !== null,
+    enabled: slotNumber !== null && !useRestApi,
   });
+
+  // Use REST or gRPC data based on mode
+  const slotData = useRestApi ? slotResponseRest?.data : slotDataGrpc;
+  const isSlotLoading = useRestApi ? isLoadingRest : isLoadingGrpc;
 
   // Normal playback enablement
   useEffect(() => {
