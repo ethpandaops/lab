@@ -562,11 +562,11 @@ export class NetworkFilterMetadata extends Message<NetworkFilterMetadata> {
 }
 
 /**
- * MevRelayBidCountResponse is the v1 API response for MEV relay bid counts by slot.
+ * ListBeaconSlotMevRelayResponse is the v1 API response for MEV relay bid counts by slot.
  *
- * @generated from message api.v1.MevRelayBidCountResponse
+ * @generated from message api.v1.ListBeaconSlotMevRelayResponse
  */
-export class MevRelayBidCountResponse extends Message<MevRelayBidCountResponse> {
+export class ListBeaconSlotMevRelayResponse extends Message<ListBeaconSlotMevRelayResponse> {
   /**
    * @generated from field: repeated api.v1.MevRelayBidCount relays = 1;
    */
@@ -582,33 +582,33 @@ export class MevRelayBidCountResponse extends Message<MevRelayBidCountResponse> 
    */
   filters?: FilterMetadata;
 
-  constructor(data?: PartialMessage<MevRelayBidCountResponse>) {
+  constructor(data?: PartialMessage<ListBeaconSlotMevRelayResponse>) {
     super();
     proto3.util.initPartial(data, this);
   }
 
   static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "api.v1.MevRelayBidCountResponse";
+  static readonly typeName = "api.v1.ListBeaconSlotMevRelayResponse";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "relays", kind: "message", T: MevRelayBidCount, repeated: true },
     { no: 2, name: "pagination", kind: "message", T: PaginationMetadata },
     { no: 3, name: "filters", kind: "message", T: FilterMetadata },
   ]);
 
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): MevRelayBidCountResponse {
-    return new MevRelayBidCountResponse().fromBinary(bytes, options);
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ListBeaconSlotMevRelayResponse {
+    return new ListBeaconSlotMevRelayResponse().fromBinary(bytes, options);
   }
 
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): MevRelayBidCountResponse {
-    return new MevRelayBidCountResponse().fromJson(jsonValue, options);
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ListBeaconSlotMevRelayResponse {
+    return new ListBeaconSlotMevRelayResponse().fromJson(jsonValue, options);
   }
 
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): MevRelayBidCountResponse {
-    return new MevRelayBidCountResponse().fromJsonString(jsonString, options);
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ListBeaconSlotMevRelayResponse {
+    return new ListBeaconSlotMevRelayResponse().fromJsonString(jsonString, options);
   }
 
-  static equals(a: MevRelayBidCountResponse | PlainMessage<MevRelayBidCountResponse> | undefined, b: MevRelayBidCountResponse | PlainMessage<MevRelayBidCountResponse> | undefined): boolean {
-    return proto3.util.equals(MevRelayBidCountResponse, a, b);
+  static equals(a: ListBeaconSlotMevRelayResponse | PlainMessage<ListBeaconSlotMevRelayResponse> | undefined, b: ListBeaconSlotMevRelayResponse | PlainMessage<ListBeaconSlotMevRelayResponse> | undefined): boolean {
+    return proto3.util.equals(ListBeaconSlotMevRelayResponse, a, b);
   }
 }
 
@@ -662,11 +662,11 @@ export class MevRelayBidCount extends Message<MevRelayBidCount> {
 }
 
 /**
- * MevBlockResponse is the v1 API response for MEV block data by slot.
+ * ListBeaconSlotMevResponse is the v1 API response for MEV block data by slot.
  *
- * @generated from message api.v1.MevBlockResponse
+ * @generated from message api.v1.ListBeaconSlotMevResponse
  */
-export class MevBlockResponse extends Message<MevBlockResponse> {
+export class ListBeaconSlotMevResponse extends Message<ListBeaconSlotMevResponse> {
   /**
    * @generated from field: repeated api.v1.MevBlock blocks = 1;
    */
@@ -682,33 +682,33 @@ export class MevBlockResponse extends Message<MevBlockResponse> {
    */
   filters?: FilterMetadata;
 
-  constructor(data?: PartialMessage<MevBlockResponse>) {
+  constructor(data?: PartialMessage<ListBeaconSlotMevResponse>) {
     super();
     proto3.util.initPartial(data, this);
   }
 
   static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "api.v1.MevBlockResponse";
+  static readonly typeName = "api.v1.ListBeaconSlotMevResponse";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "blocks", kind: "message", T: MevBlock, repeated: true },
     { no: 2, name: "pagination", kind: "message", T: PaginationMetadata },
     { no: 3, name: "filters", kind: "message", T: FilterMetadata },
   ]);
 
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): MevBlockResponse {
-    return new MevBlockResponse().fromBinary(bytes, options);
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ListBeaconSlotMevResponse {
+    return new ListBeaconSlotMevResponse().fromBinary(bytes, options);
   }
 
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): MevBlockResponse {
-    return new MevBlockResponse().fromJson(jsonValue, options);
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ListBeaconSlotMevResponse {
+    return new ListBeaconSlotMevResponse().fromJson(jsonValue, options);
   }
 
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): MevBlockResponse {
-    return new MevBlockResponse().fromJsonString(jsonString, options);
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ListBeaconSlotMevResponse {
+    return new ListBeaconSlotMevResponse().fromJsonString(jsonString, options);
   }
 
-  static equals(a: MevBlockResponse | PlainMessage<MevBlockResponse> | undefined, b: MevBlockResponse | PlainMessage<MevBlockResponse> | undefined): boolean {
-    return proto3.util.equals(MevBlockResponse, a, b);
+  static equals(a: ListBeaconSlotMevResponse | PlainMessage<ListBeaconSlotMevResponse> | undefined, b: ListBeaconSlotMevResponse | PlainMessage<ListBeaconSlotMevResponse> | undefined): boolean {
+    return proto3.util.equals(ListBeaconSlotMevResponse, a, b);
   }
 }
 
@@ -850,11 +850,11 @@ export class MevBlock extends Message<MevBlock> {
 }
 
 /**
- * MevBuilderBidResponse is the v1 API response for highest MEV builder bids by slot.
+ * ListBeaconSlotMevBuilderResponse is the v1 API response for highest MEV builder bids by slot.
  *
- * @generated from message api.v1.MevBuilderBidResponse
+ * @generated from message api.v1.ListBeaconSlotMevBuilderResponse
  */
-export class MevBuilderBidResponse extends Message<MevBuilderBidResponse> {
+export class ListBeaconSlotMevBuilderResponse extends Message<ListBeaconSlotMevBuilderResponse> {
   /**
    * @generated from field: repeated api.v1.MevBuilderBid builders = 1;
    */
@@ -870,33 +870,33 @@ export class MevBuilderBidResponse extends Message<MevBuilderBidResponse> {
    */
   filters?: FilterMetadata;
 
-  constructor(data?: PartialMessage<MevBuilderBidResponse>) {
+  constructor(data?: PartialMessage<ListBeaconSlotMevBuilderResponse>) {
     super();
     proto3.util.initPartial(data, this);
   }
 
   static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "api.v1.MevBuilderBidResponse";
+  static readonly typeName = "api.v1.ListBeaconSlotMevBuilderResponse";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "builders", kind: "message", T: MevBuilderBid, repeated: true },
     { no: 2, name: "pagination", kind: "message", T: PaginationMetadata },
     { no: 3, name: "filters", kind: "message", T: FilterMetadata },
   ]);
 
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): MevBuilderBidResponse {
-    return new MevBuilderBidResponse().fromBinary(bytes, options);
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ListBeaconSlotMevBuilderResponse {
+    return new ListBeaconSlotMevBuilderResponse().fromBinary(bytes, options);
   }
 
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): MevBuilderBidResponse {
-    return new MevBuilderBidResponse().fromJson(jsonValue, options);
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ListBeaconSlotMevBuilderResponse {
+    return new ListBeaconSlotMevBuilderResponse().fromJson(jsonValue, options);
   }
 
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): MevBuilderBidResponse {
-    return new MevBuilderBidResponse().fromJsonString(jsonString, options);
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ListBeaconSlotMevBuilderResponse {
+    return new ListBeaconSlotMevBuilderResponse().fromJsonString(jsonString, options);
   }
 
-  static equals(a: MevBuilderBidResponse | PlainMessage<MevBuilderBidResponse> | undefined, b: MevBuilderBidResponse | PlainMessage<MevBuilderBidResponse> | undefined): boolean {
-    return proto3.util.equals(MevBuilderBidResponse, a, b);
+  static equals(a: ListBeaconSlotMevBuilderResponse | PlainMessage<ListBeaconSlotMevBuilderResponse> | undefined, b: ListBeaconSlotMevBuilderResponse | PlainMessage<ListBeaconSlotMevBuilderResponse> | undefined): boolean {
+    return proto3.util.equals(ListBeaconSlotMevBuilderResponse, a, b);
   }
 }
 
@@ -1599,11 +1599,11 @@ export class GetExperimentConfigResponse extends Message<GetExperimentConfigResp
 }
 
 /**
- * BlockTimingResponse is the v1 API response for block timing data.
+ * ListBeaconSlotBlockTimingResponse is the v1 API response for block timing data.
  *
- * @generated from message api.v1.BlockTimingResponse
+ * @generated from message api.v1.ListBeaconSlotBlockTimingResponse
  */
-export class BlockTimingResponse extends Message<BlockTimingResponse> {
+export class ListBeaconSlotBlockTimingResponse extends Message<ListBeaconSlotBlockTimingResponse> {
   /**
    * @generated from field: repeated api.v1.BlockTimingNode nodes = 1;
    */
@@ -1619,33 +1619,33 @@ export class BlockTimingResponse extends Message<BlockTimingResponse> {
    */
   filters?: FilterMetadata;
 
-  constructor(data?: PartialMessage<BlockTimingResponse>) {
+  constructor(data?: PartialMessage<ListBeaconSlotBlockTimingResponse>) {
     super();
     proto3.util.initPartial(data, this);
   }
 
   static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "api.v1.BlockTimingResponse";
+  static readonly typeName = "api.v1.ListBeaconSlotBlockTimingResponse";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "nodes", kind: "message", T: BlockTimingNode, repeated: true },
     { no: 2, name: "pagination", kind: "message", T: PaginationMetadata },
     { no: 3, name: "filters", kind: "message", T: FilterMetadata },
   ]);
 
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): BlockTimingResponse {
-    return new BlockTimingResponse().fromBinary(bytes, options);
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ListBeaconSlotBlockTimingResponse {
+    return new ListBeaconSlotBlockTimingResponse().fromBinary(bytes, options);
   }
 
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): BlockTimingResponse {
-    return new BlockTimingResponse().fromJson(jsonValue, options);
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ListBeaconSlotBlockTimingResponse {
+    return new ListBeaconSlotBlockTimingResponse().fromJson(jsonValue, options);
   }
 
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): BlockTimingResponse {
-    return new BlockTimingResponse().fromJsonString(jsonString, options);
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ListBeaconSlotBlockTimingResponse {
+    return new ListBeaconSlotBlockTimingResponse().fromJsonString(jsonString, options);
   }
 
-  static equals(a: BlockTimingResponse | PlainMessage<BlockTimingResponse> | undefined, b: BlockTimingResponse | PlainMessage<BlockTimingResponse> | undefined): boolean {
-    return proto3.util.equals(BlockTimingResponse, a, b);
+  static equals(a: ListBeaconSlotBlockTimingResponse | PlainMessage<ListBeaconSlotBlockTimingResponse> | undefined, b: ListBeaconSlotBlockTimingResponse | PlainMessage<ListBeaconSlotBlockTimingResponse> | undefined): boolean {
+    return proto3.util.equals(ListBeaconSlotBlockTimingResponse, a, b);
   }
 }
 
@@ -1719,11 +1719,11 @@ export class BlockTimingNode extends Message<BlockTimingNode> {
 }
 
 /**
- * BlobTimingResponse is the v1 API response for blob timing data.
+ * ListBeaconSlotBlobTimingResponse is the v1 API response for blob timing data.
  *
- * @generated from message api.v1.BlobTimingResponse
+ * @generated from message api.v1.ListBeaconSlotBlobTimingResponse
  */
-export class BlobTimingResponse extends Message<BlobTimingResponse> {
+export class ListBeaconSlotBlobTimingResponse extends Message<ListBeaconSlotBlobTimingResponse> {
   /**
    * @generated from field: repeated api.v1.BlobTimingNode nodes = 1;
    */
@@ -1739,33 +1739,33 @@ export class BlobTimingResponse extends Message<BlobTimingResponse> {
    */
   filters?: FilterMetadata;
 
-  constructor(data?: PartialMessage<BlobTimingResponse>) {
+  constructor(data?: PartialMessage<ListBeaconSlotBlobTimingResponse>) {
     super();
     proto3.util.initPartial(data, this);
   }
 
   static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "api.v1.BlobTimingResponse";
+  static readonly typeName = "api.v1.ListBeaconSlotBlobTimingResponse";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "nodes", kind: "message", T: BlobTimingNode, repeated: true },
     { no: 2, name: "pagination", kind: "message", T: PaginationMetadata },
     { no: 3, name: "filters", kind: "message", T: FilterMetadata },
   ]);
 
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): BlobTimingResponse {
-    return new BlobTimingResponse().fromBinary(bytes, options);
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ListBeaconSlotBlobTimingResponse {
+    return new ListBeaconSlotBlobTimingResponse().fromBinary(bytes, options);
   }
 
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): BlobTimingResponse {
-    return new BlobTimingResponse().fromJson(jsonValue, options);
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ListBeaconSlotBlobTimingResponse {
+    return new ListBeaconSlotBlobTimingResponse().fromJson(jsonValue, options);
   }
 
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): BlobTimingResponse {
-    return new BlobTimingResponse().fromJsonString(jsonString, options);
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ListBeaconSlotBlobTimingResponse {
+    return new ListBeaconSlotBlobTimingResponse().fromJsonString(jsonString, options);
   }
 
-  static equals(a: BlobTimingResponse | PlainMessage<BlobTimingResponse> | undefined, b: BlobTimingResponse | PlainMessage<BlobTimingResponse> | undefined): boolean {
-    return proto3.util.equals(BlobTimingResponse, a, b);
+  static equals(a: ListBeaconSlotBlobTimingResponse | PlainMessage<ListBeaconSlotBlobTimingResponse> | undefined, b: ListBeaconSlotBlobTimingResponse | PlainMessage<ListBeaconSlotBlobTimingResponse> | undefined): boolean {
+    return proto3.util.equals(ListBeaconSlotBlobTimingResponse, a, b);
   }
 }
 
@@ -1855,11 +1855,11 @@ export class BlobTimingNode extends Message<BlobTimingNode> {
 }
 
 /**
- * AttestationTimingResponse is the v1 API response for attestation timing data.
+ * ListBeaconSlotAttestationTimingResponse is the v1 API response for attestation timing data.
  *
- * @generated from message api.v1.AttestationTimingResponse
+ * @generated from message api.v1.ListBeaconSlotAttestationTimingResponse
  */
-export class AttestationTimingResponse extends Message<AttestationTimingResponse> {
+export class ListBeaconSlotAttestationTimingResponse extends Message<ListBeaconSlotAttestationTimingResponse> {
   /**
    * @generated from field: repeated api.v1.AttestationTimingChunk chunks = 1;
    */
@@ -1875,33 +1875,33 @@ export class AttestationTimingResponse extends Message<AttestationTimingResponse
    */
   filters?: FilterMetadata;
 
-  constructor(data?: PartialMessage<AttestationTimingResponse>) {
+  constructor(data?: PartialMessage<ListBeaconSlotAttestationTimingResponse>) {
     super();
     proto3.util.initPartial(data, this);
   }
 
   static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "api.v1.AttestationTimingResponse";
+  static readonly typeName = "api.v1.ListBeaconSlotAttestationTimingResponse";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "chunks", kind: "message", T: AttestationTimingChunk, repeated: true },
     { no: 2, name: "pagination", kind: "message", T: PaginationMetadata },
     { no: 3, name: "filters", kind: "message", T: FilterMetadata },
   ]);
 
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): AttestationTimingResponse {
-    return new AttestationTimingResponse().fromBinary(bytes, options);
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ListBeaconSlotAttestationTimingResponse {
+    return new ListBeaconSlotAttestationTimingResponse().fromBinary(bytes, options);
   }
 
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): AttestationTimingResponse {
-    return new AttestationTimingResponse().fromJson(jsonValue, options);
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ListBeaconSlotAttestationTimingResponse {
+    return new ListBeaconSlotAttestationTimingResponse().fromJson(jsonValue, options);
   }
 
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): AttestationTimingResponse {
-    return new AttestationTimingResponse().fromJsonString(jsonString, options);
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ListBeaconSlotAttestationTimingResponse {
+    return new ListBeaconSlotAttestationTimingResponse().fromJsonString(jsonString, options);
   }
 
-  static equals(a: AttestationTimingResponse | PlainMessage<AttestationTimingResponse> | undefined, b: AttestationTimingResponse | PlainMessage<AttestationTimingResponse> | undefined): boolean {
-    return proto3.util.equals(AttestationTimingResponse, a, b);
+  static equals(a: ListBeaconSlotAttestationTimingResponse | PlainMessage<ListBeaconSlotAttestationTimingResponse> | undefined, b: ListBeaconSlotAttestationTimingResponse | PlainMessage<ListBeaconSlotAttestationTimingResponse> | undefined): boolean {
+    return proto3.util.equals(ListBeaconSlotAttestationTimingResponse, a, b);
   }
 }
 
@@ -1963,11 +1963,11 @@ export class AttestationTimingChunk extends Message<AttestationTimingChunk> {
 }
 
 /**
- * AttestationCorrectnessResponse is the v1 API response for attestation correctness data for a single slot.
+ * ListBeaconSlotAttestationCorrectnessResponse is the v1 API response for attestation correctness data for a single slot.
  *
- * @generated from message api.v1.AttestationCorrectnessResponse
+ * @generated from message api.v1.ListBeaconSlotAttestationCorrectnessResponse
  */
-export class AttestationCorrectnessResponse extends Message<AttestationCorrectnessResponse> {
+export class ListBeaconSlotAttestationCorrectnessResponse extends Message<ListBeaconSlotAttestationCorrectnessResponse> {
   /**
    * Attestation correctness for blocks in the slot (may include forks)
    *
@@ -1980,32 +1980,32 @@ export class AttestationCorrectnessResponse extends Message<AttestationCorrectne
    */
   filters?: FilterMetadata;
 
-  constructor(data?: PartialMessage<AttestationCorrectnessResponse>) {
+  constructor(data?: PartialMessage<ListBeaconSlotAttestationCorrectnessResponse>) {
     super();
     proto3.util.initPartial(data, this);
   }
 
   static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "api.v1.AttestationCorrectnessResponse";
+  static readonly typeName = "api.v1.ListBeaconSlotAttestationCorrectnessResponse";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "blocks", kind: "message", T: AttestationCorrectness, repeated: true },
     { no: 2, name: "filters", kind: "message", T: FilterMetadata },
   ]);
 
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): AttestationCorrectnessResponse {
-    return new AttestationCorrectnessResponse().fromBinary(bytes, options);
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ListBeaconSlotAttestationCorrectnessResponse {
+    return new ListBeaconSlotAttestationCorrectnessResponse().fromBinary(bytes, options);
   }
 
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): AttestationCorrectnessResponse {
-    return new AttestationCorrectnessResponse().fromJson(jsonValue, options);
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ListBeaconSlotAttestationCorrectnessResponse {
+    return new ListBeaconSlotAttestationCorrectnessResponse().fromJson(jsonValue, options);
   }
 
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): AttestationCorrectnessResponse {
-    return new AttestationCorrectnessResponse().fromJsonString(jsonString, options);
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ListBeaconSlotAttestationCorrectnessResponse {
+    return new ListBeaconSlotAttestationCorrectnessResponse().fromJsonString(jsonString, options);
   }
 
-  static equals(a: AttestationCorrectnessResponse | PlainMessage<AttestationCorrectnessResponse> | undefined, b: AttestationCorrectnessResponse | PlainMessage<AttestationCorrectnessResponse> | undefined): boolean {
-    return proto3.util.equals(AttestationCorrectnessResponse, a, b);
+  static equals(a: ListBeaconSlotAttestationCorrectnessResponse | PlainMessage<ListBeaconSlotAttestationCorrectnessResponse> | undefined, b: ListBeaconSlotAttestationCorrectnessResponse | PlainMessage<ListBeaconSlotAttestationCorrectnessResponse> | undefined): boolean {
+    return proto3.util.equals(ListBeaconSlotAttestationCorrectnessResponse, a, b);
   }
 }
 
@@ -2075,11 +2075,11 @@ export class AttestationCorrectness extends Message<AttestationCorrectness> {
 }
 
 /**
- * BlobTotalResponse is the v1 API response for blob count data for a single slot.
+ * ListBeaconSlotBlobTotalResponse is the v1 API response for blob count data for a single slot.
  *
- * @generated from message api.v1.BlobTotalResponse
+ * @generated from message api.v1.ListBeaconSlotBlobTotalResponse
  */
-export class BlobTotalResponse extends Message<BlobTotalResponse> {
+export class ListBeaconSlotBlobTotalResponse extends Message<ListBeaconSlotBlobTotalResponse> {
   /**
    * Blob counts for blocks in the slot (may include forks)
    *
@@ -2092,32 +2092,32 @@ export class BlobTotalResponse extends Message<BlobTotalResponse> {
    */
   filters?: FilterMetadata;
 
-  constructor(data?: PartialMessage<BlobTotalResponse>) {
+  constructor(data?: PartialMessage<ListBeaconSlotBlobTotalResponse>) {
     super();
     proto3.util.initPartial(data, this);
   }
 
   static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "api.v1.BlobTotalResponse";
+  static readonly typeName = "api.v1.ListBeaconSlotBlobTotalResponse";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "blocks", kind: "message", T: BlobTotal, repeated: true },
     { no: 2, name: "filters", kind: "message", T: FilterMetadata },
   ]);
 
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): BlobTotalResponse {
-    return new BlobTotalResponse().fromBinary(bytes, options);
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ListBeaconSlotBlobTotalResponse {
+    return new ListBeaconSlotBlobTotalResponse().fromBinary(bytes, options);
   }
 
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): BlobTotalResponse {
-    return new BlobTotalResponse().fromJson(jsonValue, options);
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ListBeaconSlotBlobTotalResponse {
+    return new ListBeaconSlotBlobTotalResponse().fromJson(jsonValue, options);
   }
 
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): BlobTotalResponse {
-    return new BlobTotalResponse().fromJsonString(jsonString, options);
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ListBeaconSlotBlobTotalResponse {
+    return new ListBeaconSlotBlobTotalResponse().fromJsonString(jsonString, options);
   }
 
-  static equals(a: BlobTotalResponse | PlainMessage<BlobTotalResponse> | undefined, b: BlobTotalResponse | PlainMessage<BlobTotalResponse> | undefined): boolean {
-    return proto3.util.equals(BlobTotalResponse, a, b);
+  static equals(a: ListBeaconSlotBlobTotalResponse | PlainMessage<ListBeaconSlotBlobTotalResponse> | undefined, b: ListBeaconSlotBlobTotalResponse | PlainMessage<ListBeaconSlotBlobTotalResponse> | undefined): boolean {
+    return proto3.util.equals(ListBeaconSlotBlobTotalResponse, a, b);
   }
 }
 
@@ -2171,11 +2171,11 @@ export class BlobTotal extends Message<BlobTotal> {
 }
 
 /**
- * BeaconBlockResponse is the v1 API response for beacon block data for a specific slot.
+ * ListBeaconSlotBlockResponse is the v1 API response for beacon block data for a specific slot.
  *
- * @generated from message api.v1.BeaconBlockResponse
+ * @generated from message api.v1.ListBeaconSlotBlockResponse
  */
-export class BeaconBlockResponse extends Message<BeaconBlockResponse> {
+export class ListBeaconSlotBlockResponse extends Message<ListBeaconSlotBlockResponse> {
   /**
    * Block data for the slot (may include forks)
    *
@@ -2193,33 +2193,33 @@ export class BeaconBlockResponse extends Message<BeaconBlockResponse> {
    */
   filters?: FilterMetadata;
 
-  constructor(data?: PartialMessage<BeaconBlockResponse>) {
+  constructor(data?: PartialMessage<ListBeaconSlotBlockResponse>) {
     super();
     proto3.util.initPartial(data, this);
   }
 
   static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "api.v1.BeaconBlockResponse";
+  static readonly typeName = "api.v1.ListBeaconSlotBlockResponse";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "blocks", kind: "message", T: BeaconBlock, repeated: true },
     { no: 2, name: "pagination", kind: "message", T: PaginationMetadata },
     { no: 3, name: "filters", kind: "message", T: FilterMetadata },
   ]);
 
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): BeaconBlockResponse {
-    return new BeaconBlockResponse().fromBinary(bytes, options);
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ListBeaconSlotBlockResponse {
+    return new ListBeaconSlotBlockResponse().fromBinary(bytes, options);
   }
 
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): BeaconBlockResponse {
-    return new BeaconBlockResponse().fromJson(jsonValue, options);
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ListBeaconSlotBlockResponse {
+    return new ListBeaconSlotBlockResponse().fromJson(jsonValue, options);
   }
 
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): BeaconBlockResponse {
-    return new BeaconBlockResponse().fromJsonString(jsonString, options);
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ListBeaconSlotBlockResponse {
+    return new ListBeaconSlotBlockResponse().fromJsonString(jsonString, options);
   }
 
-  static equals(a: BeaconBlockResponse | PlainMessage<BeaconBlockResponse> | undefined, b: BeaconBlockResponse | PlainMessage<BeaconBlockResponse> | undefined): boolean {
-    return proto3.util.equals(BeaconBlockResponse, a, b);
+  static equals(a: ListBeaconSlotBlockResponse | PlainMessage<ListBeaconSlotBlockResponse> | undefined, b: ListBeaconSlotBlockResponse | PlainMessage<ListBeaconSlotBlockResponse> | undefined): boolean {
+    return proto3.util.equals(ListBeaconSlotBlockResponse, a, b);
   }
 }
 

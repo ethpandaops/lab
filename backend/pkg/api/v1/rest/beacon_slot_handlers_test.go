@@ -65,7 +65,7 @@ func TestHandleBeaconBlockTiming(t *testing.T) {
 			},
 			expectedStatus: http.StatusOK,
 			validateBody: func(t *testing.T, body []byte) {
-				var resp apiv1.BlockTimingResponse
+				var resp apiv1.ListBeaconSlotBlockTimingResponse
 				require.NoError(t, json.Unmarshal(body, &resp))
 
 				assert.Len(t, resp.Nodes, 2)
@@ -123,7 +123,7 @@ func TestHandleBeaconBlockTiming(t *testing.T) {
 			},
 			expectedStatus: http.StatusOK,
 			validateBody: func(t *testing.T, body []byte) {
-				var resp apiv1.BlockTimingResponse
+				var resp apiv1.ListBeaconSlotBlockTimingResponse
 				require.NoError(t, json.Unmarshal(body, &resp))
 				assert.Len(t, resp.Nodes, 0)
 				assert.Equal(t, "test-node", resp.Filters.AppliedFilters["node_id"])
@@ -160,7 +160,7 @@ func TestHandleBeaconBlockTiming(t *testing.T) {
 			},
 			expectedStatus: http.StatusOK,
 			validateBody: func(t *testing.T, body []byte) {
-				var resp apiv1.BlockTimingResponse
+				var resp apiv1.ListBeaconSlotBlockTimingResponse
 				require.NoError(t, json.Unmarshal(body, &resp))
 				assert.Len(t, resp.Nodes, 2)
 				// The mock response would represent data already ordered by username desc
@@ -283,7 +283,7 @@ func TestHandleBeaconBlock(t *testing.T) {
 			},
 			expectedStatus: http.StatusOK,
 			validateBody: func(t *testing.T, body []byte) {
-				var resp apiv1.BeaconBlockResponse
+				var resp apiv1.ListBeaconSlotBlockResponse
 				require.NoError(t, json.Unmarshal(body, &resp))
 
 				assert.Len(t, resp.Blocks, 1)
@@ -339,7 +339,7 @@ func TestHandleBeaconBlock(t *testing.T) {
 			},
 			expectedStatus: http.StatusOK,
 			validateBody: func(t *testing.T, body []byte) {
-				var resp apiv1.BeaconBlockResponse
+				var resp apiv1.ListBeaconSlotBlockResponse
 				require.NoError(t, json.Unmarshal(body, &resp))
 				assert.Len(t, resp.Blocks, 0)
 				assert.Equal(t, "0xspecificblock", resp.Filters.AppliedFilters["block_root"])
@@ -440,7 +440,7 @@ func TestHandleMevRelayBidCount(t *testing.T) {
 		queryParams    string
 		mockSetup      func()
 		expectedStatus int
-		validateResp   func(t *testing.T, resp *apiv1.MevRelayBidCountResponse)
+		validateResp   func(t *testing.T, resp *apiv1.ListBeaconSlotMevRelayResponse)
 	}{
 		{
 			name:        "valid request - single relay",
@@ -480,7 +480,7 @@ func TestHandleMevRelayBidCount(t *testing.T) {
 					})
 			},
 			expectedStatus: http.StatusOK,
-			validateResp: func(t *testing.T, resp *apiv1.MevRelayBidCountResponse) {
+			validateResp: func(t *testing.T, resp *apiv1.ListBeaconSlotMevRelayResponse) {
 				require.NotNil(t, resp)
 				require.Len(t, resp.Relays, 1)
 
@@ -530,7 +530,7 @@ func TestHandleMevRelayBidCount(t *testing.T) {
 					}, nil)
 			},
 			expectedStatus: http.StatusOK,
-			validateResp: func(t *testing.T, resp *apiv1.MevRelayBidCountResponse) {
+			validateResp: func(t *testing.T, resp *apiv1.ListBeaconSlotMevRelayResponse) {
 				require.NotNil(t, resp)
 				require.Len(t, resp.Relays, 2)
 				require.Equal(t, "flashbots", resp.Relays[0].RelayName)
@@ -594,7 +594,7 @@ func TestHandleMevRelayBidCount(t *testing.T) {
 					})
 			},
 			expectedStatus: http.StatusOK,
-			validateResp: func(t *testing.T, resp *apiv1.MevRelayBidCountResponse) {
+			validateResp: func(t *testing.T, resp *apiv1.ListBeaconSlotMevRelayResponse) {
 				require.NotNil(t, resp)
 				require.NotNil(t, resp.Pagination)
 				require.Equal(t, int32(10), resp.Pagination.PageSize)
@@ -626,7 +626,7 @@ func TestHandleMevRelayBidCount(t *testing.T) {
 
 			// Validate response if successful
 			if tt.expectedStatus == http.StatusOK && tt.validateResp != nil {
-				var resp apiv1.MevRelayBidCountResponse
+				var resp apiv1.ListBeaconSlotMevRelayResponse
 				err := json.NewDecoder(w.Body).Decode(&resp)
 				require.NoError(t, err)
 				tt.validateResp(t, &resp)
@@ -653,7 +653,7 @@ func TestHandleBeaconBlobTotal(t *testing.T) {
 		queryParams    string
 		mockSetup      func()
 		expectedStatus int
-		validateResp   func(t *testing.T, resp *apiv1.BlobTotalResponse)
+		validateResp   func(t *testing.T, resp *apiv1.ListBeaconSlotBlobTotalResponse)
 	}{
 		{
 			name:        "valid request - single block",
@@ -688,7 +688,7 @@ func TestHandleBeaconBlobTotal(t *testing.T) {
 					})
 			},
 			expectedStatus: http.StatusOK,
-			validateResp: func(t *testing.T, resp *apiv1.BlobTotalResponse) {
+			validateResp: func(t *testing.T, resp *apiv1.ListBeaconSlotBlobTotalResponse) {
 				require.NotNil(t, resp)
 				require.Len(t, resp.Blocks, 1)
 
@@ -736,7 +736,7 @@ func TestHandleBeaconBlobTotal(t *testing.T) {
 					}, nil)
 			},
 			expectedStatus: http.StatusOK,
-			validateResp: func(t *testing.T, resp *apiv1.BlobTotalResponse) {
+			validateResp: func(t *testing.T, resp *apiv1.ListBeaconSlotBlobTotalResponse) {
 				require.NotNil(t, resp)
 				require.Len(t, resp.Blocks, 2)
 				require.Equal(t, "0xabcd1234", resp.Blocks[0].BlockRoot)
@@ -776,7 +776,7 @@ func TestHandleBeaconBlobTotal(t *testing.T) {
 					})
 			},
 			expectedStatus: http.StatusOK,
-			validateResp: func(t *testing.T, resp *apiv1.BlobTotalResponse) {
+			validateResp: func(t *testing.T, resp *apiv1.ListBeaconSlotBlobTotalResponse) {
 				require.NotNil(t, resp)
 				require.Len(t, resp.Blocks, 1)
 				require.Equal(t, "0xspecific", resp.Blocks[0].BlockRoot)
@@ -838,7 +838,7 @@ func TestHandleBeaconBlobTotal(t *testing.T) {
 					})
 			},
 			expectedStatus: http.StatusOK,
-			validateResp: func(t *testing.T, resp *apiv1.BlobTotalResponse) {
+			validateResp: func(t *testing.T, resp *apiv1.ListBeaconSlotBlobTotalResponse) {
 				require.NotNil(t, resp)
 				require.Len(t, resp.Blocks, 1)
 			},
@@ -859,7 +859,7 @@ func TestHandleBeaconBlobTotal(t *testing.T) {
 					}, nil)
 			},
 			expectedStatus: http.StatusOK,
-			validateResp: func(t *testing.T, resp *apiv1.BlobTotalResponse) {
+			validateResp: func(t *testing.T, resp *apiv1.ListBeaconSlotBlobTotalResponse) {
 				require.NotNil(t, resp)
 				require.Len(t, resp.Blocks, 0)
 			},
@@ -887,7 +887,7 @@ func TestHandleBeaconBlobTotal(t *testing.T) {
 
 			// Validate response if successful
 			if tt.expectedStatus == http.StatusOK && tt.validateResp != nil {
-				var resp apiv1.BlobTotalResponse
+				var resp apiv1.ListBeaconSlotBlobTotalResponse
 				err := json.NewDecoder(w.Body).Decode(&resp)
 				require.NoError(t, err)
 				tt.validateResp(t, &resp)
@@ -905,7 +905,7 @@ func TestHandleBeaconBlobTiming(t *testing.T) {
 		mockResponse   *cbtproto.ListFctBlockBlobFirstSeenByNodeResponse
 		mockError      error
 		expectedStatus int
-		validateResp   func(t *testing.T, resp *apiv1.BlobTimingResponse)
+		validateResp   func(t *testing.T, resp *apiv1.ListBeaconSlotBlobTimingResponse)
 	}{
 		{
 			name:    "valid request with multiple nodes",
@@ -945,7 +945,7 @@ func TestHandleBeaconBlobTiming(t *testing.T) {
 				NextPageToken: "next-page",
 			},
 			expectedStatus: http.StatusOK,
-			validateResp: func(t *testing.T, resp *apiv1.BlobTimingResponse) {
+			validateResp: func(t *testing.T, resp *apiv1.ListBeaconSlotBlobTimingResponse) {
 				require.NotNil(t, resp)
 				require.Len(t, resp.Nodes, 2)
 
@@ -995,7 +995,7 @@ func TestHandleBeaconBlobTiming(t *testing.T) {
 				},
 			},
 			expectedStatus: http.StatusOK,
-			validateResp: func(t *testing.T, resp *apiv1.BlobTimingResponse) {
+			validateResp: func(t *testing.T, resp *apiv1.ListBeaconSlotBlobTimingResponse) {
 				require.NotNil(t, resp)
 				require.Len(t, resp.Nodes, 1)
 				assert.Equal(t, "specific-node", resp.Nodes[0].NodeId)
@@ -1014,7 +1014,7 @@ func TestHandleBeaconBlobTiming(t *testing.T) {
 				FctBlockBlobFirstSeenByNode: []*cbtproto.FctBlockBlobFirstSeenByNode{},
 			},
 			expectedStatus: http.StatusOK,
-			validateResp: func(t *testing.T, resp *apiv1.BlobTimingResponse) {
+			validateResp: func(t *testing.T, resp *apiv1.ListBeaconSlotBlobTimingResponse) {
 				// The test verifies that custom ordering can be specified
 				// The actual ordering verification happens in DoAndReturn above
 			},
@@ -1046,7 +1046,7 @@ func TestHandleBeaconBlobTiming(t *testing.T) {
 				FctBlockBlobFirstSeenByNode: []*cbtproto.FctBlockBlobFirstSeenByNode{},
 			},
 			expectedStatus: http.StatusOK,
-			validateResp: func(t *testing.T, resp *apiv1.BlobTimingResponse) {
+			validateResp: func(t *testing.T, resp *apiv1.ListBeaconSlotBlobTimingResponse) {
 				require.NotNil(t, resp)
 				require.Len(t, resp.Nodes, 0)
 			},
@@ -1109,7 +1109,7 @@ func TestHandleBeaconBlobTiming(t *testing.T) {
 
 			// Validate response if successful
 			if tt.expectedStatus == http.StatusOK && tt.validateResp != nil {
-				var resp apiv1.BlobTimingResponse
+				var resp apiv1.ListBeaconSlotBlobTimingResponse
 				err := json.NewDecoder(w.Body).Decode(&resp)
 				require.NoError(t, err)
 				tt.validateResp(t, &resp)
@@ -1160,7 +1160,7 @@ func TestHandleMevBuilderBid(t *testing.T) {
 			},
 			expectedStatus: http.StatusOK,
 			validateBody: func(t *testing.T, body []byte) {
-				var response apiv1.MevBuilderBidResponse
+				var response apiv1.ListBeaconSlotMevBuilderResponse
 				err := json.Unmarshal(body, &response)
 				require.NoError(t, err)
 
@@ -1246,7 +1246,7 @@ func TestHandleMevBuilderBid(t *testing.T) {
 			},
 			expectedStatus: http.StatusOK,
 			validateBody: func(t *testing.T, body []byte) {
-				var response apiv1.MevBuilderBidResponse
+				var response apiv1.ListBeaconSlotMevBuilderResponse
 				err := json.Unmarshal(body, &response)
 				require.NoError(t, err)
 

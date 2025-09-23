@@ -8,6 +8,23 @@
 export const API_V1_ENDPOINTS = {
   nodes: (network: string) => `/api/v1/${network}/nodes`,
   config: '/api/v1/config',
+  experimentConfig: (experimentId: string) => `/api/v1/experiments/${experimentId}/config`,
+  // Beacon slot endpoints
+  beaconBlock: (network: string, slot: number) => `/api/v1/${network}/beacon/slot/${slot}/block`,
+  beaconBlockTiming: (network: string, slot: number) =>
+    `/api/v1/${network}/beacon/slot/${slot}/block/timing`,
+  beaconBlobTiming: (network: string, slot: number) =>
+    `/api/v1/${network}/beacon/slot/${slot}/blob/timing`,
+  beaconBlobTotal: (network: string, slot: number) =>
+    `/api/v1/${network}/beacon/slot/${slot}/blob/total`,
+  beaconAttestationTiming: (network: string, slot: number) =>
+    `/api/v1/${network}/beacon/slot/${slot}/attestation/timing`,
+  beaconAttestationCorrectness: (network: string, slot: number) =>
+    `/api/v1/${network}/beacon/slot/${slot}/attestation/correctness`,
+  mevBlock: (network: string, slot: number) => `/api/v1/${network}/beacon/slot/${slot}/mev`,
+  mevRelay: (network: string, slot: number) => `/api/v1/${network}/beacon/slot/${slot}/mev/relay`,
+  mevBuilder: (network: string, slot: number) =>
+    `/api/v1/${network}/beacon/slot/${slot}/mev/builder`,
 };
 
 /**
@@ -81,4 +98,3 @@ export interface NodeFilters {
   page_token?: string;
   order_by?: string;
 }
-

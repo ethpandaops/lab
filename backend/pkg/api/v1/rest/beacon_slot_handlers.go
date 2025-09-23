@@ -133,7 +133,7 @@ func (r *PublicRouter) handleBeaconBlockTiming(w http.ResponseWriter, req *http.
 	}
 
 	// Write response
-	r.WriteJSONResponseOK(w, req, &apiv1.BlockTimingResponse{
+	r.WriteJSONResponseOK(w, req, &apiv1.ListBeaconSlotBlockTimingResponse{
 		Nodes: nodes,
 		Pagination: &apiv1.PaginationMetadata{
 			PageSize:      grpcReq.PageSize,
@@ -256,7 +256,7 @@ func (r *PublicRouter) handleBeaconAttestationTiming(w http.ResponseWriter, req 
 	}
 
 	// Write response
-	r.WriteJSONResponseOK(w, req, &apiv1.AttestationTimingResponse{
+	r.WriteJSONResponseOK(w, req, &apiv1.ListBeaconSlotAttestationTimingResponse{
 		Chunks: chunks,
 		Pagination: &apiv1.PaginationMetadata{
 			PageSize:      grpcReq.PageSize,
@@ -395,7 +395,7 @@ func (r *PublicRouter) handleBeaconAttestationCorrectness(w http.ResponseWriter,
 	}
 
 	// Write response with blocks array
-	r.WriteJSONResponseOK(w, req, &apiv1.AttestationCorrectnessResponse{
+	r.WriteJSONResponseOK(w, req, &apiv1.ListBeaconSlotAttestationCorrectnessResponse{
 		Blocks: blocks,
 		Filters: &apiv1.FilterMetadata{
 			Network:        network,
@@ -505,7 +505,7 @@ func (r *PublicRouter) handleMevRelayBidCount(w http.ResponseWriter, req *http.R
 		}
 	}
 
-	response := &apiv1.MevRelayBidCountResponse{
+	response := &apiv1.ListBeaconSlotMevRelayResponse{
 		Relays: relays,
 		Pagination: &apiv1.PaginationMetadata{
 			PageSize:      grpcReq.PageSize,
@@ -642,7 +642,7 @@ func (r *PublicRouter) handleMevBlock(w http.ResponseWriter, req *http.Request) 
 		}
 	}
 
-	response := &apiv1.MevBlockResponse{
+	response := &apiv1.ListBeaconSlotMevResponse{
 		Blocks: blocks,
 		Pagination: &apiv1.PaginationMetadata{
 			PageSize:      grpcReq.PageSize,
@@ -793,7 +793,7 @@ func (r *PublicRouter) handleMevBuilderBid(w http.ResponseWriter, req *http.Requ
 		}
 	}
 
-	response := &apiv1.MevBuilderBidResponse{
+	response := &apiv1.ListBeaconSlotMevBuilderResponse{
 		Builders: builders,
 		Pagination: &apiv1.PaginationMetadata{
 			PageSize:      grpcReq.PageSize,
@@ -924,7 +924,7 @@ func (r *PublicRouter) handleBeaconBlobTotal(w http.ResponseWriter, req *http.Re
 		}
 	}
 
-	response := &apiv1.BlobTotalResponse{
+	response := &apiv1.ListBeaconSlotBlobTotalResponse{
 		Blocks: blocks,
 		Filters: &apiv1.FilterMetadata{
 			Network:        network,
@@ -1058,7 +1058,7 @@ func (r *PublicRouter) handleBeaconBlobTiming(w http.ResponseWriter, req *http.R
 		}
 	}
 
-	response := &apiv1.BlobTimingResponse{
+	response := &apiv1.ListBeaconSlotBlobTimingResponse{
 		Nodes: nodes,
 		Pagination: &apiv1.PaginationMetadata{
 			PageSize:      grpcReq.PageSize,
@@ -1221,7 +1221,7 @@ func (r *PublicRouter) handleBeaconBlock(w http.ResponseWriter, req *http.Reques
 		}
 	}
 
-	response := &apiv1.BeaconBlockResponse{
+	response := &apiv1.ListBeaconSlotBlockResponse{
 		Blocks: blocks,
 		Pagination: &apiv1.PaginationMetadata{
 			PageSize:      grpcReq.PageSize,

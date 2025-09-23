@@ -96,8 +96,8 @@ message NetworkFilterMetadata {
   int32 filtered_count = 3;             // Networks after filtering
 }
 
-// MevRelayBidCountResponse is the v1 API response for MEV relay bid counts by slot.
-message MevRelayBidCountResponse {
+// ListBeaconSlotMevRelayResponse is the v1 API response for MEV relay bid counts by slot.
+message ListBeaconSlotMevRelayResponse {
   repeated MevRelayBidCount relays = 1;
   PaginationMetadata pagination = 2;
   FilterMetadata filters = 3;
@@ -109,8 +109,8 @@ message MevRelayBidCount {
   uint32 bid_count = 2;                // Total number of bids
 }
 
-// MevBlockResponse is the v1 API response for MEV block data by slot.
-message MevBlockResponse {
+// ListBeaconSlotMevResponse is the v1 API response for MEV block data by slot.
+message ListBeaconSlotMevResponse {
   repeated MevBlock blocks = 1;
   PaginationMetadata pagination = 2;
   FilterMetadata filters = 3;
@@ -133,8 +133,8 @@ message MevBlock {
   string earliest_bid_time = 13;        // Earliest bid timestamp (ISO 8601)
 }
 
-// MevBuilderBidResponse is the v1 API response for highest MEV builder bids by slot.
-message MevBuilderBidResponse {
+// ListBeaconSlotMevBuilderResponse is the v1 API response for highest MEV builder bids by slot.
+message ListBeaconSlotMevBuilderResponse {
   repeated MevBuilderBid builders = 1;
   PaginationMetadata pagination = 2;
   FilterMetadata filters = 3;
@@ -235,8 +235,8 @@ message GetExperimentConfigResponse {
   ExperimentConfig experiment = 1;
 }
 
-// BlockTimingResponse is the v1 API response for block timing data.
-message BlockTimingResponse {
+// ListBeaconSlotBlockTimingResponse is the v1 API response for block timing data.
+message ListBeaconSlotBlockTimingResponse {
   repeated BlockTimingNode nodes = 1;
   PaginationMetadata pagination = 2;
   FilterMetadata filters = 3;
@@ -251,8 +251,8 @@ message BlockTimingNode {
   ClientInfo client = 5;             // reuse existing ClientInfo type
 }
 
-// BlobTimingResponse is the v1 API response for blob timing data.
-message BlobTimingResponse {
+// ListBeaconSlotBlobTimingResponse is the v1 API response for blob timing data.
+message ListBeaconSlotBlobTimingResponse {
   repeated BlobTimingNode nodes = 1;
   PaginationMetadata pagination = 2;
   FilterMetadata filters = 3;
@@ -269,8 +269,8 @@ message BlobTimingNode {
   ClientInfo client = 7;              // reuse existing ClientInfo type
 }
 
-// AttestationTimingResponse is the v1 API response for attestation timing data.
-message AttestationTimingResponse {
+// ListBeaconSlotAttestationTimingResponse is the v1 API response for attestation timing data.
+message ListBeaconSlotAttestationTimingResponse {
   repeated AttestationTimingChunk chunks = 1;
   PaginationMetadata pagination = 2;
   FilterMetadata filters = 3;
@@ -283,8 +283,8 @@ message AttestationTimingChunk {
   uint32 attestation_count = 3;    // number of attestations in this chunk
 }
 
-// AttestationCorrectnessResponse is the v1 API response for attestation correctness data for a single slot.
-message AttestationCorrectnessResponse {
+// ListBeaconSlotAttestationCorrectnessResponse is the v1 API response for attestation correctness data for a single slot.
+message ListBeaconSlotAttestationCorrectnessResponse {
   repeated AttestationCorrectness blocks = 1;  // Attestation correctness for blocks in the slot (may include forks)
   FilterMetadata filters = 2;
 }
@@ -297,8 +297,8 @@ message AttestationCorrectness {
   float correctness_percentage = 4; // Percentage of actual vs max votes
 }
 
-// BlobTotalResponse is the v1 API response for blob count data for a single slot.
-message BlobTotalResponse {
+// ListBeaconSlotBlobTotalResponse is the v1 API response for blob count data for a single slot.
+message ListBeaconSlotBlobTotalResponse {
   repeated BlobTotal blocks = 1;    // Blob counts for blocks in the slot (may include forks)
   FilterMetadata filters = 2;
 }
@@ -309,8 +309,8 @@ message BlobTotal {
   uint32 blob_count = 2;             // The number of blobs in this block
 }
 
-// BeaconBlockResponse is the v1 API response for beacon block data for a specific slot.
-message BeaconBlockResponse {
+// ListBeaconSlotBlockResponse is the v1 API response for beacon block data for a specific slot.
+message ListBeaconSlotBlockResponse {
   repeated BeaconBlock blocks = 1;   // Block data for the slot (may include forks)
   PaginationMetadata pagination = 2;
   FilterMetadata filters = 3;
