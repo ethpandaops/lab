@@ -249,6 +249,7 @@ message BlockTimingNode {
   uint32 seen_slot_start_diff = 3;  // milliseconds from slot start
   GeoInfo geo = 4;                  // reuse existing GeoInfo type
   ClientInfo client = 5;             // reuse existing ClientInfo type
+  string source = 6;                 // source of the event (e.g., "xatu-sentry")
 }
 
 // ListBeaconSlotBlobTimingResponse is the v1 API response for blob timing data.
@@ -267,6 +268,7 @@ message BlobTimingNode {
   string block_root = 5;             // beacon block root hash
   GeoInfo geo = 6;                   // reuse existing GeoInfo type
   ClientInfo client = 7;              // reuse existing ClientInfo type
+  string source = 8;                 // source of the event (e.g., "xatu-sentry")
 }
 
 // ListBeaconSlotAttestationTimingResponse is the v1 API response for attestation timing data.
@@ -295,6 +297,7 @@ message AttestationCorrectness {
   uint32 votes_max = 2;             // Maximum possible attestations for this block
   uint32 votes_actual = 3;          // Actual attestations received for this block
   float correctness_percentage = 4; // Percentage of actual vs max votes
+  uint32 votes_other = 5;           // Number of votes for alternative blocks
 }
 
 // ListBeaconSlotBlobTotalResponse is the v1 API response for blob count data for a single slot.
@@ -342,4 +345,17 @@ message BeaconBlock {
   string execution_parent_hash = 17;  // Parent hash in execution layer
   uint32 execution_transactions_count = 18; // Number of transactions
   uint32 execution_transactions_bytes = 19; // Total transaction bytes
+}
+
+// ListBeaconSlotProposerEntityResponse is the v1 API response for block proposer entity data for a specific slot.
+message ListBeaconSlotProposerEntityResponse {
+  repeated ProposerEntity entities = 1;   // Proposer entities for the slot (may include forks)
+  PaginationMetadata pagination = 2;
+  FilterMetadata filters = 3;
+}
+
+// ProposerEntity represents the entity that proposed a block in the unfinalized chain for public API consumption.
+message ProposerEntity {
+  // Entity information
+  string entity = 1;                   // The entity that proposed the block (e.g., "Lido", "Coinbase")
 }

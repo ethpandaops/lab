@@ -17,6 +17,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/mock/gomock"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/metadata"
+	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
 func TestHandleBeaconBlockTiming(t *testing.T) {
@@ -251,7 +254,7 @@ func TestHandleBeaconBlock(t *testing.T) {
 		network        string
 		slot           string
 		queryParams    map[string]string
-		mockResponse   *cbtproto.ListIntBlockHeadResponse
+		mockResponse   *cbtproto.ListFctBlockHeadResponse
 		mockError      error
 		expectedStatus int
 		validateBody   func(t *testing.T, body []byte)
@@ -260,8 +263,8 @@ func TestHandleBeaconBlock(t *testing.T) {
 			name:    "successful request with single block",
 			network: "mainnet",
 			slot:    "123456",
-			mockResponse: &cbtproto.ListIntBlockHeadResponse{
-				IntBlockHead: []*cbtproto.IntBlockHead{
+			mockResponse: &cbtproto.ListFctBlockHeadResponse{
+				FctBlockHead: []*cbtproto.FctBlockHead{
 					{
 						BlockRoot:                    "0xblock1",
 						Slot:                         123456,
@@ -333,8 +336,8 @@ func TestHandleBeaconBlock(t *testing.T) {
 				"proposer_index": "100",
 				"page_size":      "10",
 			},
-			mockResponse: &cbtproto.ListIntBlockHeadResponse{
-				IntBlockHead:  []*cbtproto.IntBlockHead{},
+			mockResponse: &cbtproto.ListFctBlockHeadResponse{
+				FctBlockHead:  []*cbtproto.FctBlockHead{},
 				NextPageToken: "",
 			},
 			expectedStatus: http.StatusOK,
@@ -371,11 +374,11 @@ func TestHandleBeaconBlock(t *testing.T) {
 			// Setup mock expectations
 			if tt.mockError == nil && tt.mockResponse != nil {
 				mockClient.EXPECT().
-					ListIntBlockHead(gomock.Any(), gomock.Any()).
+					ListFctBlockHead(gomock.Any(), gomock.Any()).
 					Return(tt.mockResponse, nil)
 			} else if tt.mockError != nil {
 				mockClient.EXPECT().
-					ListIntBlockHead(gomock.Any(), gomock.Any()).
+					ListFctBlockHead(gomock.Any(), gomock.Any()).
 					Return(nil, tt.mockError)
 			}
 
@@ -662,17 +665,17 @@ func TestHandleBeaconBlobTotal(t *testing.T) {
 			queryParams: "",
 			mockSetup: func() {
 				mockClient.EXPECT().
-					ListIntBlockBlobCountHead(
+					ListFctBlockBlobCountHead(
 						gomock.Any(),
 						gomock.Any(),
 					).
-					DoAndReturn(func(ctx interface{}, req *cbtproto.ListIntBlockBlobCountHeadRequest, opts ...interface{}) (*cbtproto.ListIntBlockBlobCountHeadResponse, error) {
+					DoAndReturn(func(ctx interface{}, req *cbtproto.ListFctBlockBlobCountHeadRequest, opts ...interface{}) (*cbtproto.ListFctBlockBlobCountHeadResponse, error) {
 						// Verify request parameters
 						require.NotNil(t, req.Slot)
 						require.Equal(t, uint32(8000000), req.Slot.GetEq())
 
-						return &cbtproto.ListIntBlockBlobCountHeadResponse{
-							IntBlockBlobCountHead: []*cbtproto.IntBlockBlobCountHead{
+						return &cbtproto.ListFctBlockBlobCountHeadResponse{
+							FctBlockBlobCountHead: []*cbtproto.FctBlockBlobCountHead{
 								{
 									Slot:               8000000,
 									Epoch:              250000,
@@ -708,12 +711,12 @@ func TestHandleBeaconBlobTotal(t *testing.T) {
 			queryParams: "",
 			mockSetup: func() {
 				mockClient.EXPECT().
-					ListIntBlockBlobCountHead(
+					ListFctBlockBlobCountHead(
 						gomock.Any(),
 						gomock.Any(),
 					).
-					Return(&cbtproto.ListIntBlockBlobCountHeadResponse{
-						IntBlockBlobCountHead: []*cbtproto.IntBlockBlobCountHead{
+					Return(&cbtproto.ListFctBlockBlobCountHeadResponse{
+						FctBlockBlobCountHead: []*cbtproto.FctBlockBlobCountHead{
 							{
 								Slot:               8000000,
 								Epoch:              250000,
@@ -752,16 +755,16 @@ func TestHandleBeaconBlobTotal(t *testing.T) {
 			queryParams: "?block_root=0xspecific",
 			mockSetup: func() {
 				mockClient.EXPECT().
-					ListIntBlockBlobCountHead(
+					ListFctBlockBlobCountHead(
 						gomock.Any(),
 						gomock.Any(),
 					).
-					DoAndReturn(func(ctx interface{}, req *cbtproto.ListIntBlockBlobCountHeadRequest, opts ...interface{}) (*cbtproto.ListIntBlockBlobCountHeadResponse, error) {
+					DoAndReturn(func(ctx interface{}, req *cbtproto.ListFctBlockBlobCountHeadRequest, opts ...interface{}) (*cbtproto.ListFctBlockBlobCountHeadResponse, error) {
 						require.NotNil(t, req.BlockRoot)
 						require.Equal(t, "0xspecific", req.BlockRoot.GetEq())
 
-						return &cbtproto.ListIntBlockBlobCountHeadResponse{
-							IntBlockBlobCountHead: []*cbtproto.IntBlockBlobCountHead{
+						return &cbtproto.ListFctBlockBlobCountHeadResponse{
+							FctBlockBlobCountHead: []*cbtproto.FctBlockBlobCountHead{
 								{
 									Slot:               8000000,
 									Epoch:              250000,
@@ -798,7 +801,7 @@ func TestHandleBeaconBlobTotal(t *testing.T) {
 			queryParams: "",
 			mockSetup: func() {
 				mockClient.EXPECT().
-					ListIntBlockBlobCountHead(
+					ListFctBlockBlobCountHead(
 						gomock.Any(),
 						gomock.Any(),
 					).
@@ -813,16 +816,16 @@ func TestHandleBeaconBlobTotal(t *testing.T) {
 			queryParams: "?page_size=5&page_token=token123",
 			mockSetup: func() {
 				mockClient.EXPECT().
-					ListIntBlockBlobCountHead(
+					ListFctBlockBlobCountHead(
 						gomock.Any(),
 						gomock.Any(),
 					).
-					DoAndReturn(func(ctx interface{}, req *cbtproto.ListIntBlockBlobCountHeadRequest, opts ...interface{}) (*cbtproto.ListIntBlockBlobCountHeadResponse, error) {
+					DoAndReturn(func(ctx interface{}, req *cbtproto.ListFctBlockBlobCountHeadRequest, opts ...interface{}) (*cbtproto.ListFctBlockBlobCountHeadResponse, error) {
 						require.Equal(t, int32(5), req.PageSize)
 						require.Equal(t, "token123", req.PageToken)
 
-						return &cbtproto.ListIntBlockBlobCountHeadResponse{
-							IntBlockBlobCountHead: []*cbtproto.IntBlockBlobCountHead{
+						return &cbtproto.ListFctBlockBlobCountHeadResponse{
+							FctBlockBlobCountHead: []*cbtproto.FctBlockBlobCountHead{
 								{
 									Slot:               8000000,
 									Epoch:              250000,
@@ -850,12 +853,12 @@ func TestHandleBeaconBlobTotal(t *testing.T) {
 			queryParams: "",
 			mockSetup: func() {
 				mockClient.EXPECT().
-					ListIntBlockBlobCountHead(
+					ListFctBlockBlobCountHead(
 						gomock.Any(),
 						gomock.Any(),
 					).
-					Return(&cbtproto.ListIntBlockBlobCountHeadResponse{
-						IntBlockBlobCountHead: []*cbtproto.IntBlockBlobCountHead{},
+					Return(&cbtproto.ListFctBlockBlobCountHeadResponse{
+						FctBlockBlobCountHead: []*cbtproto.FctBlockBlobCountHead{},
 					}, nil)
 			},
 			expectedStatus: http.StatusOK,
@@ -1334,4 +1337,198 @@ func TestTransformCBTToAPIMevBuilderBid(t *testing.T) {
 	// Verify timestamp format is ISO 8601
 	assert.Contains(t, result.EarliestBidTime, "T")
 	assert.Contains(t, result.EarliestBidTime, "Z")
+}
+
+func TestHandleBeaconSlotProposerEntity(t *testing.T) {
+	tests := []struct {
+		name           string
+		network        string
+		slot           string
+		queryParams    string
+		mockSetup      func(*mock.MockXatuCBTClient)
+		expectedStatus int
+		validateResp   func(t *testing.T, resp *apiv1.ListBeaconSlotProposerEntityResponse)
+		wantErr        bool
+	}{
+		{
+			name:        "successful request",
+			network:     "mainnet",
+			slot:        "12345",
+			queryParams: "",
+			mockSetup: func(mockClient *mock.MockXatuCBTClient) {
+				mockClient.EXPECT().
+					ListFctBlockProposerEntity(
+						gomock.Any(),
+						gomock.Any(),
+						gomock.Any(),
+					).
+					DoAndReturn(func(ctx context.Context, req *cbtproto.ListFctBlockProposerEntityRequest, opts ...grpc.CallOption) (*cbtproto.ListFctBlockProposerEntityResponse, error) {
+						// Verify network is passed in metadata
+						md, _ := metadata.FromOutgoingContext(ctx)
+						networks := md.Get("network")
+						assert.Equal(t, "mainnet", networks[0])
+
+						// Verify slot filter
+						assert.NotNil(t, req.Slot)
+						assert.Equal(t, uint32(12345), req.Slot.GetEq())
+
+						return &cbtproto.ListFctBlockProposerEntityResponse{
+							FctBlockProposerEntity: []*cbtproto.FctBlockProposerEntity{
+								{
+									Slot:               12345,
+									Epoch:              386,
+									Entity:             &wrapperspb.StringValue{Value: "Lido"},
+									SlotStartDateTime:  1700000000,
+									EpochStartDateTime: 1700000000,
+									UpdatedDateTime:    1700000100,
+								},
+								{
+									Slot:               12345,
+									Epoch:              386,
+									Entity:             &wrapperspb.StringValue{Value: "Coinbase"},
+									SlotStartDateTime:  1700000000,
+									EpochStartDateTime: 1700000000,
+									UpdatedDateTime:    1700000100,
+								},
+							},
+							NextPageToken: "next-page",
+						}, nil
+					})
+			},
+			expectedStatus: http.StatusOK,
+			validateResp: func(t *testing.T, resp *apiv1.ListBeaconSlotProposerEntityResponse) {
+				assert.NotNil(t, resp)
+				assert.Len(t, resp.Entities, 2)
+
+				// Check first entity
+				assert.Equal(t, "Lido", resp.Entities[0].Entity)
+
+				// Check second entity
+				assert.Equal(t, "Coinbase", resp.Entities[1].Entity)
+
+				// Check pagination
+				assert.Equal(t, "next-page", resp.Pagination.NextPageToken)
+
+				// Check filters
+				assert.Equal(t, "mainnet", resp.Filters.Network)
+				assert.Equal(t, "12345", resp.Filters.AppliedFilters["slot"])
+			},
+		},
+		{
+			name:        "with pagination",
+			network:     "mainnet",
+			slot:        "12345",
+			queryParams: "?page_size=10&page_token=abc",
+			mockSetup: func(mockClient *mock.MockXatuCBTClient) {
+				mockClient.EXPECT().
+					ListFctBlockProposerEntity(
+						gomock.Any(),
+						gomock.Any(),
+						gomock.Any(),
+					).
+					DoAndReturn(func(ctx context.Context, req *cbtproto.ListFctBlockProposerEntityRequest, opts ...grpc.CallOption) (*cbtproto.ListFctBlockProposerEntityResponse, error) {
+						// Verify pagination params
+						assert.Equal(t, int32(10), req.PageSize)
+						assert.Equal(t, "abc", req.PageToken)
+
+						return &cbtproto.ListFctBlockProposerEntityResponse{
+							FctBlockProposerEntity: []*cbtproto.FctBlockProposerEntity{
+								{
+									Slot:              12345,
+									Epoch:             386,
+									Entity:            nil, // Test nil entity
+									SlotStartDateTime: 1700000000,
+								},
+							},
+						}, nil
+					})
+			},
+			expectedStatus: http.StatusOK,
+			validateResp: func(t *testing.T, resp *apiv1.ListBeaconSlotProposerEntityResponse) {
+				assert.NotNil(t, resp)
+				assert.Len(t, resp.Entities, 1)
+				// Check that nil entity is handled as "unknown"
+				assert.Equal(t, "unknown", resp.Entities[0].Entity)
+				assert.Equal(t, int32(10), resp.Pagination.PageSize)
+			},
+		},
+		{
+			name:        "invalid slot",
+			network:     "mainnet",
+			slot:        "invalid",
+			queryParams: "",
+			mockSetup: func(mockClient *mock.MockXatuCBTClient) {
+				// No mock expectations - should fail before calling service
+			},
+			expectedStatus: http.StatusBadRequest,
+			wantErr:        true,
+		},
+		{
+			name:        "missing network",
+			network:     "",
+			slot:        "12345",
+			queryParams: "",
+			mockSetup: func(mockClient *mock.MockXatuCBTClient) {
+				// No mock expectations - should fail before calling service
+			},
+			expectedStatus: http.StatusMovedPermanently, // Router redirects when network is empty
+			wantErr:        true,
+		},
+		{
+			name:        "service error",
+			network:     "mainnet",
+			slot:        "12345",
+			queryParams: "",
+			mockSetup: func(mockClient *mock.MockXatuCBTClient) {
+				mockClient.EXPECT().
+					ListFctBlockProposerEntity(gomock.Any(), gomock.Any(), gomock.Any()).
+					Return(nil, errors.New("database error"))
+			},
+			expectedStatus: http.StatusInternalServerError,
+			wantErr:        true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ctrl := gomock.NewController(t)
+			defer ctrl.Finish()
+
+			mockClient := mock.NewMockXatuCBTClient(ctrl)
+			if tt.mockSetup != nil {
+				tt.mockSetup(mockClient)
+			}
+
+			logger := logrus.New()
+			logger.SetLevel(logrus.DebugLevel)
+			r := &PublicRouter{
+				xatuCBTClient: mockClient,
+				log:           logger.WithField("test", "beacon_slot_proposer_entity"),
+			}
+
+			// Create request
+			path := "/api/v1/" + tt.network + "/beacon/slot/" + tt.slot + "/proposer/entity"
+			if tt.network == "" {
+				path = "/api/v1//beacon/slot/" + tt.slot + "/proposer/entity"
+			}
+			req := httptest.NewRequest("GET", path+tt.queryParams, nil)
+			w := httptest.NewRecorder()
+
+			// Set up router
+			router := mux.NewRouter()
+			router.HandleFunc("/api/v1/{network}/beacon/slot/{slot}/proposer/entity", r.handleBeaconSlotProposerEntity).Methods("GET")
+			router.ServeHTTP(w, req)
+
+			// Check status
+			assert.Equal(t, tt.expectedStatus, w.Code)
+
+			if !tt.wantErr && tt.validateResp != nil {
+				// Parse response
+				var resp apiv1.ListBeaconSlotProposerEntityResponse
+				err := json.NewDecoder(w.Body).Decode(&resp)
+				assert.NoError(t, err)
+				tt.validateResp(t, &resp)
+			}
+		})
+	}
 }

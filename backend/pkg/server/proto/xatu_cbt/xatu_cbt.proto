@@ -25,9 +25,10 @@ import "vendor/xatu-cbt/clickhouse/fct_attestation_first_seen_chunked_50ms.proto
 import "vendor/xatu-cbt/clickhouse/fct_attestation_correctness_head.proto";
 import "vendor/xatu-cbt/clickhouse/fct_mev_bid_count_by_relay.proto";
 import "vendor/xatu-cbt/clickhouse/fct_mev_bid_value_by_builder.proto";
-import "vendor/xatu-cbt/clickhouse/int_block_blob_count_head.proto";
-import "vendor/xatu-cbt/clickhouse/int_block_head.proto";
-import "vendor/xatu-cbt/clickhouse/int_block_mev_head.proto";
+import "vendor/xatu-cbt/clickhouse/fct_block_blob_count_head.proto";
+import "vendor/xatu-cbt/clickhouse/fct_block_head.proto";
+import "vendor/xatu-cbt/clickhouse/fct_block_mev_head.proto";
+import "vendor/xatu-cbt/clickhouse/fct_block_proposer_entity.proto";
 import "vendor/xatu-cbt/clickhouse/common.proto";
 
 // XatuCBT service provides access to CBT data from multiple ClickHouse instances.
@@ -61,17 +62,21 @@ service XatuCBT {
   // This table contains the highest value MEV relay bid for a slot by builder.
   rpc ListFctMevBidValueByBuilder(cbt.ListFctMevBidValueByBuilderRequest) returns (cbt.ListFctMevBidValueByBuilderResponse);
 
-  // ListIntBlockBlobCountHead returns blob count data for blocks in the unfinalized chain.
+  // ListFctBlockBlobCountHead returns blob count data for blocks in the unfinalized chain.
   // This table contains the number of blobs for each block, with forks potentially causing multiple blocks per slot.
-  rpc ListIntBlockBlobCountHead(cbt.ListIntBlockBlobCountHeadRequest) returns (cbt.ListIntBlockBlobCountHeadResponse);
+  rpc ListFctBlockBlobCountHead(cbt.ListFctBlockBlobCountHeadRequest) returns (cbt.ListFctBlockBlobCountHeadResponse);
 
-  // ListIntBlockHead returns beacon block data from the int_block_head table.
+  // ListFctBlockHead returns beacon block data from the fct_block_head table.
   // This table contains block details for the unfinalized chain, with potential multiple blocks per slot due to forks.
-  rpc ListIntBlockHead(cbt.ListIntBlockHeadRequest) returns (cbt.ListIntBlockHeadResponse);
+  rpc ListFctBlockHead(cbt.ListFctBlockHeadRequest) returns (cbt.ListFctBlockHeadResponse);
 
-  // ListIntBlockMevHead returns MEV block data for the unfinalized chain.
+  // ListFctBlockMevHead returns MEV block data for the unfinalized chain.
   // This table contains MEV relay proposer payload delivered for blocks on the unfinalized chain.
-  rpc ListIntBlockMevHead(cbt.ListIntBlockMevHeadRequest) returns (cbt.ListIntBlockMevHeadResponse);
+  rpc ListFctBlockMevHead(cbt.ListFctBlockMevHeadRequest) returns (cbt.ListFctBlockMevHeadResponse);
+
+  // ListFctBlockProposerEntity returns proposer entity data from the fct_block_proposer_entity table.
+  // This table contains information about entities that proposed blocks in the unfinalized chain.
+  rpc ListFctBlockProposerEntity(cbt.ListFctBlockProposerEntityRequest) returns (cbt.ListFctBlockProposerEntityResponse);
 
   // GetDataAvailability returns the common availability interval across a set of transformation tables.
   // It calculates the overlapping data range for the specified tables and returns slot information.

@@ -1,5 +1,6 @@
 import { Menu, Github, Twitter, ExternalLink } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import useApiMode from '@/contexts/apiMode';
 
 interface HeaderProps {
   onToggleSidebar: () => void;
@@ -24,6 +25,8 @@ const socialLinks = [
 ];
 
 export const Header = ({ onToggleSidebar }: HeaderProps) => {
+  const { useRestApi, toggleApiMode } = useApiMode();
+
   return (
     <header className="bg-white -b -gray-200">
       <div className="h-16 px-4 sm:px-6 lg:px-8">
@@ -47,8 +50,19 @@ export const Header = ({ onToggleSidebar }: HeaderProps) => {
             </Link>
           </div>
 
-          {/* Social Links */}
+          {/* Social Links and API Toggle */}
           <div className="flex items-center space-x-4">
+            {/* API Mode Toggle */}
+            <button
+              onClick={toggleApiMode}
+              className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded-md bg-secondary hover:bg-hover transition-colors"
+              title={`Switch to ${useRestApi ? 'gRPC' : 'REST'} API`}
+            >
+              <span
+                className={`inline-block w-2 h-2 rounded-full ${useRestApi ? 'bg-green-500' : 'bg-blue-500'}`}
+              />
+              {useRestApi ? 'REST' : 'gRPC'}
+            </button>
             {socialLinks.map(link => (
               <a
                 key={link.name}

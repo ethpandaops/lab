@@ -7,6 +7,7 @@ import {
   ListBeaconSlotAttestationCorrectnessResponse,
   ListBeaconSlotBlobTotalResponse,
   ListBeaconSlotBlockResponse,
+  ListBeaconSlotProposerEntityResponse,
   ListBeaconSlotMevRelayResponse,
   ListBeaconSlotMevResponse,
   ListBeaconSlotMevBuilderResponse,
@@ -360,6 +361,22 @@ export class RestApiClient {
     }`;
     const response = await this.fetchWithRetry<any>(url);
     return ListBeaconSlotAttestationCorrectnessResponse.fromJson(response);
+  }
+
+  /**
+   * Get proposer entity data for a specific slot
+   */
+  async getBeaconProposerEntity(
+    network: string,
+    slot: number,
+    params?: Record<string, any>,
+  ): Promise<ListBeaconSlotProposerEntityResponse> {
+    const queryString = params ? buildQueryString(params) : new URLSearchParams();
+    const url = `${this.baseUrl}${API_V1_ENDPOINTS.beaconProposerEntity(network, slot)}${
+      queryString.toString() ? `?${queryString.toString()}` : ''
+    }`;
+    const response = await this.fetchWithRetry<any>(url);
+    return ListBeaconSlotProposerEntityResponse.fromJson(response);
   }
 
   /**

@@ -114,5 +114,12 @@ func (r *PublicRouter) GetRoutes() []RouteConfig {
 			Cache:       middleware.CacheRealtime, // Real-time data for recent slots
 			Description: "Get highest MEV bid values by builder for a specific slot",
 		},
+		{
+			Path:        "/{network}/beacon/slot/{slot}/proposer/entity",
+			Handler:     r.handleBeaconSlotProposerEntity,
+			Methods:     []string{http.MethodGet, http.MethodOptions},
+			Cache:       middleware.CacheRealtime, // Real-time data for recent slots
+			Description: "Get block proposer entity information for a specific slot",
+		},
 	}
 }

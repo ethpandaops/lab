@@ -21,6 +21,8 @@ export const API_V1_ENDPOINTS = {
     `/api/v1/${network}/beacon/slot/${slot}/attestation/timing`,
   beaconAttestationCorrectness: (network: string, slot: number) =>
     `/api/v1/${network}/beacon/slot/${slot}/attestation/correctness`,
+  beaconProposerEntity: (network: string, slot: number) =>
+    `/api/v1/${network}/beacon/slot/${slot}/proposer/entity`,
   mevBlock: (network: string, slot: number) => `/api/v1/${network}/beacon/slot/${slot}/mev`,
   mevRelay: (network: string, slot: number) => `/api/v1/${network}/beacon/slot/${slot}/mev/relay`,
   mevBuilder: (network: string, slot: number) =>

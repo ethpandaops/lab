@@ -1686,6 +1686,13 @@ export class BlockTimingNode extends Message<BlockTimingNode> {
    */
   client?: ClientInfo;
 
+  /**
+   * source of the event (e.g., "xatu-sentry")
+   *
+   * @generated from field: string source = 6;
+   */
+  source = "";
+
   constructor(data?: PartialMessage<BlockTimingNode>) {
     super();
     proto3.util.initPartial(data, this);
@@ -1699,6 +1706,7 @@ export class BlockTimingNode extends Message<BlockTimingNode> {
     { no: 3, name: "seen_slot_start_diff", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
     { no: 4, name: "geo", kind: "message", T: GeoInfo },
     { no: 5, name: "client", kind: "message", T: ClientInfo },
+    { no: 6, name: "source", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): BlockTimingNode {
@@ -1820,6 +1828,13 @@ export class BlobTimingNode extends Message<BlobTimingNode> {
    */
   client?: ClientInfo;
 
+  /**
+   * source of the event (e.g., "xatu-sentry")
+   *
+   * @generated from field: string source = 8;
+   */
+  source = "";
+
   constructor(data?: PartialMessage<BlobTimingNode>) {
     super();
     proto3.util.initPartial(data, this);
@@ -1835,6 +1850,7 @@ export class BlobTimingNode extends Message<BlobTimingNode> {
     { no: 5, name: "block_root", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 6, name: "geo", kind: "message", T: GeoInfo },
     { no: 7, name: "client", kind: "message", T: ClientInfo },
+    { no: 8, name: "source", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): BlobTimingNode {
@@ -2043,6 +2059,13 @@ export class AttestationCorrectness extends Message<AttestationCorrectness> {
    */
   correctnessPercentage = 0;
 
+  /**
+   * Number of votes for alternative blocks
+   *
+   * @generated from field: uint32 votes_other = 5;
+   */
+  votesOther = 0;
+
   constructor(data?: PartialMessage<AttestationCorrectness>) {
     super();
     proto3.util.initPartial(data, this);
@@ -2055,6 +2078,7 @@ export class AttestationCorrectness extends Message<AttestationCorrectness> {
     { no: 2, name: "votes_max", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
     { no: 3, name: "votes_actual", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
     { no: 4, name: "correctness_percentage", kind: "scalar", T: 2 /* ScalarType.FLOAT */ },
+    { no: 5, name: "votes_other", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): AttestationCorrectness {
@@ -2411,6 +2435,102 @@ export class BeaconBlock extends Message<BeaconBlock> {
 
   static equals(a: BeaconBlock | PlainMessage<BeaconBlock> | undefined, b: BeaconBlock | PlainMessage<BeaconBlock> | undefined): boolean {
     return proto3.util.equals(BeaconBlock, a, b);
+  }
+}
+
+/**
+ * ListBeaconSlotProposerEntityResponse is the v1 API response for block proposer entity data for a specific slot.
+ *
+ * @generated from message api.v1.ListBeaconSlotProposerEntityResponse
+ */
+export class ListBeaconSlotProposerEntityResponse extends Message<ListBeaconSlotProposerEntityResponse> {
+  /**
+   * Proposer entities for the slot (may include forks)
+   *
+   * @generated from field: repeated api.v1.ProposerEntity entities = 1;
+   */
+  entities: ProposerEntity[] = [];
+
+  /**
+   * @generated from field: api.v1.PaginationMetadata pagination = 2;
+   */
+  pagination?: PaginationMetadata;
+
+  /**
+   * @generated from field: api.v1.FilterMetadata filters = 3;
+   */
+  filters?: FilterMetadata;
+
+  constructor(data?: PartialMessage<ListBeaconSlotProposerEntityResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.v1.ListBeaconSlotProposerEntityResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "entities", kind: "message", T: ProposerEntity, repeated: true },
+    { no: 2, name: "pagination", kind: "message", T: PaginationMetadata },
+    { no: 3, name: "filters", kind: "message", T: FilterMetadata },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ListBeaconSlotProposerEntityResponse {
+    return new ListBeaconSlotProposerEntityResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ListBeaconSlotProposerEntityResponse {
+    return new ListBeaconSlotProposerEntityResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ListBeaconSlotProposerEntityResponse {
+    return new ListBeaconSlotProposerEntityResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: ListBeaconSlotProposerEntityResponse | PlainMessage<ListBeaconSlotProposerEntityResponse> | undefined, b: ListBeaconSlotProposerEntityResponse | PlainMessage<ListBeaconSlotProposerEntityResponse> | undefined): boolean {
+    return proto3.util.equals(ListBeaconSlotProposerEntityResponse, a, b);
+  }
+}
+
+/**
+ * ProposerEntity represents the entity that proposed a block in the unfinalized chain for public API consumption.
+ *
+ * @generated from message api.v1.ProposerEntity
+ */
+export class ProposerEntity extends Message<ProposerEntity> {
+  /**
+   * Entity information
+   *
+   * The entity that proposed the block (e.g., "Lido", "Coinbase")
+   *
+   * @generated from field: string entity = 1;
+   */
+  entity = "";
+
+  constructor(data?: PartialMessage<ProposerEntity>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.v1.ProposerEntity";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "entity", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ProposerEntity {
+    return new ProposerEntity().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ProposerEntity {
+    return new ProposerEntity().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ProposerEntity {
+    return new ProposerEntity().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: ProposerEntity | PlainMessage<ProposerEntity> | undefined, b: ProposerEntity | PlainMessage<ProposerEntity> | undefined): boolean {
+    return proto3.util.equals(ProposerEntity, a, b);
   }
 }
 

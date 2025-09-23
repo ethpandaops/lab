@@ -8,16 +8,11 @@ import (
 )
 
 // BuildListIntBlockCanonicalQuery constructs a parameterized SQL query from a ListIntBlockCanonicalRequest
-//
-// Available projections:
-//   - p_by_slot (primary key: slot)
-//
-// Use WithProjection() option to select a specific projection.
 func BuildListIntBlockCanonicalQuery(req *ListIntBlockCanonicalRequest, options ...QueryOption) (SQLQuery, error) {
 	// Validate that at least one primary key is provided
 	// Primary keys can come from base table or projections
-	if req.Slot == nil && req.SlotStartDateTime == nil {
-		return SQLQuery{}, fmt.Errorf("at least one primary key field is required: slot, slot_start_date_time")
+	if req.SlotStartDateTime == nil {
+		return SQLQuery{}, fmt.Errorf("primary key field slot_start_date_time is required")
 	}
 
 	// Build query using QueryBuilder

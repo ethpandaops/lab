@@ -119,6 +119,7 @@ func (r *PublicRouter) handleBeaconBlockTiming(w http.ResponseWriter, req *http.
 				Version:        n.MetaClientVersion,
 				Implementation: n.MetaClientImplementation,
 			},
+			Source: n.Source,
 		})
 	}
 
@@ -197,9 +198,9 @@ func (r *PublicRouter) handleBeaconAttestationTiming(w http.ResponseWriter, req 
 		}
 	}
 
-	// Pagination - default to 240 (all chunks in a slot: 12000ms / 50ms = 240)
+	// Pagination - default to 5000 to ensure we get all data
 	// This can be overridden by query parameter
-	grpcReq.PageSize = 240
+	grpcReq.PageSize = 5000
 
 	if v := queryParams.Get("page_size"); v != "" {
 		if pageSize, err := strconv.ParseInt(v, 10, 32); err == nil {
@@ -322,13 +323,13 @@ func (r *PublicRouter) handleBeaconAttestationCorrectness(w http.ResponseWriter,
 		grpcReq.PageToken = v
 	}
 
-	// Order by votes_actual descending to show most correct blocks first
+	// Order by votes_head descending to show most correct blocks first
 	// Allow override via query parameter for custom ordering
 	if v := queryParams.Get("order_by"); v != "" {
 		grpcReq.OrderBy = v
 	} else {
-		// Default: order by votes_actual descending
-		grpcReq.OrderBy = "votes_actual DESC"
+		// Default: order by votes_head descending
+		grpcReq.OrderBy = "votes_head DESC"
 	}
 
 	// Set network in gRPC metadata
@@ -353,13 +354,13 @@ func (r *PublicRouter) handleBeaconAttestationCorrectness(w http.ResponseWriter,
 		var correctnessPercentage float32
 
 		if cbtItem.VotesMax > 0 {
-			votesActual := uint32(0)
+			votesHead := uint32(0)
 
-			if cbtItem.VotesActual != nil {
-				votesActual = cbtItem.VotesActual.Value
+			if cbtItem.VotesHead != nil {
+				votesHead = cbtItem.VotesHead.Value
 			}
 
-			correctnessPercentage = (float32(votesActual) / float32(cbtItem.VotesMax)) * 100
+			correctnessPercentage = (float32(votesHead) / float32(cbtItem.VotesMax)) * 100
 		}
 
 		// Handle nullable block root
@@ -368,17 +369,24 @@ func (r *PublicRouter) handleBeaconAttestationCorrectness(w http.ResponseWriter,
 			blockRoot = cbtItem.BlockRoot.Value
 		}
 
-		// Handle nullable votes actual
-		votesActual := uint32(0)
-		if cbtItem.VotesActual != nil {
-			votesActual = cbtItem.VotesActual.Value
+		// Handle nullable votes head (actual votes for the current slot's block)
+		votesHead := uint32(0)
+		if cbtItem.VotesHead != nil {
+			votesHead = cbtItem.VotesHead.Value
+		}
+
+		// Handle nullable votes other
+		votesOther := uint32(0)
+		if cbtItem.VotesOther != nil {
+			votesOther = cbtItem.VotesOther.Value
 		}
 
 		block := &apiv1.AttestationCorrectness{
 			BlockRoot:             blockRoot,
 			VotesMax:              cbtItem.VotesMax,
-			VotesActual:           votesActual,
+			VotesActual:           votesHead, // VotesHead represents actual votes for current slot's block
 			CorrectnessPercentage: correctnessPercentage,
+			VotesOther:            votesOther,
 		}
 
 		blocks = append(blocks, block)
@@ -566,7 +574,7 @@ func (r *PublicRouter) handleMevBlock(w http.ResponseWriter, req *http.Request) 
 	queryParams := req.URL.Query()
 
 	// Build CBT request.
-	grpcReq := &cbtproto.ListIntBlockMevHeadRequest{
+	grpcReq := &cbtproto.ListFctBlockMevHeadRequest{
 		Slot: &cbtproto.UInt32Filter{
 			Filter: &cbtproto.UInt32Filter_Eq{Eq: uint32(slot)},
 		},
@@ -613,7 +621,7 @@ func (r *PublicRouter) handleMevBlock(w http.ResponseWriter, req *http.Request) 
 	)
 
 	// Call the gRPC service.
-	grpcResp, err := r.xatuCBTClient.ListIntBlockMevHead(ctxWithMeta, grpcReq)
+	grpcResp, err := r.xatuCBTClient.ListFctBlockMevHead(ctxWithMeta, grpcReq)
 	if err != nil {
 		r.log.WithError(err).WithFields(logrus.Fields{
 			"network": network,
@@ -625,9 +633,9 @@ func (r *PublicRouter) handleMevBlock(w http.ResponseWriter, req *http.Request) 
 	}
 
 	// Transform CBT types to Public API types.
-	blocks := make([]*apiv1.MevBlock, 0, len(grpcResp.IntBlockMevHead))
+	blocks := make([]*apiv1.MevBlock, 0, len(grpcResp.FctBlockMevHead))
 
-	for _, cbtItem := range grpcResp.IntBlockMevHead {
+	for _, cbtItem := range grpcResp.FctBlockMevHead {
 		apiItem := transformCBTToAPIMevBlock(cbtItem)
 		blocks = append(blocks, apiItem)
 	}
@@ -659,7 +667,7 @@ func (r *PublicRouter) handleMevBlock(w http.ResponseWriter, req *http.Request) 
 }
 
 // transformCBTToAPIMevBlock transforms CBT types to public API types.
-func transformCBTToAPIMevBlock(cbt *cbtproto.IntBlockMevHead) *apiv1.MevBlock {
+func transformCBTToAPIMevBlock(cbt *cbtproto.FctBlockMevHead) *apiv1.MevBlock {
 	block := &apiv1.MevBlock{
 		BlockRoot:            cbt.BlockRoot,
 		BlockHash:            cbt.BlockHash,
@@ -849,7 +857,7 @@ func (r *PublicRouter) handleBeaconBlobTotal(w http.ResponseWriter, req *http.Re
 	queryParams := req.URL.Query()
 
 	// Build CBT request
-	grpcReq := &cbtproto.ListIntBlockBlobCountHeadRequest{
+	grpcReq := &cbtproto.ListFctBlockBlobCountHeadRequest{
 		// Set slot filter for the specific slot
 		Slot: &cbtproto.UInt32Filter{
 			Filter: &cbtproto.UInt32Filter_Eq{Eq: uint32(slot)},
@@ -895,7 +903,7 @@ func (r *PublicRouter) handleBeaconBlobTotal(w http.ResponseWriter, req *http.Re
 	)
 
 	// Call the gRPC service
-	grpcResp, err := r.xatuCBTClient.ListIntBlockBlobCountHead(ctxWithMeta, grpcReq)
+	grpcResp, err := r.xatuCBTClient.ListFctBlockBlobCountHead(ctxWithMeta, grpcReq)
 	if err != nil {
 		r.log.WithError(err).WithFields(logrus.Fields{
 			"network": network,
@@ -907,9 +915,9 @@ func (r *PublicRouter) handleBeaconBlobTotal(w http.ResponseWriter, req *http.Re
 	}
 
 	// Transform CBT types to Public API types
-	blocks := make([]*apiv1.BlobTotal, 0, len(grpcResp.IntBlockBlobCountHead))
+	blocks := make([]*apiv1.BlobTotal, 0, len(grpcResp.FctBlockBlobCountHead))
 
-	for _, cbtItem := range grpcResp.IntBlockBlobCountHead {
+	for _, cbtItem := range grpcResp.FctBlockBlobCountHead {
 		apiBlock := transformCBTToAPIBlobTotal(cbtItem)
 		blocks = append(blocks, apiBlock)
 	}
@@ -944,7 +952,7 @@ func (r *PublicRouter) handleBeaconBlobTotal(w http.ResponseWriter, req *http.Re
 
 // transformCBTToAPIBlobTotal transforms CBT types to public API types.
 // This is the ONLY place where transformation happens for blob total data.
-func transformCBTToAPIBlobTotal(cbt *cbtproto.IntBlockBlobCountHead) *apiv1.BlobTotal {
+func transformCBTToAPIBlobTotal(cbt *cbtproto.FctBlockBlobCountHead) *apiv1.BlobTotal {
 	return &apiv1.BlobTotal{
 		BlockRoot: cbt.BlockRoot,
 		BlobCount: cbt.BlobCount,
@@ -1108,6 +1116,7 @@ func transformCBTToAPIBlobTimingNode(cbt *cbtproto.FctBlockBlobFirstSeenByNode) 
 			Version:        cbt.MetaClientVersion,
 			Implementation: cbt.MetaClientImplementation,
 		},
+		Source: cbt.Source,
 	}
 }
 
@@ -1141,7 +1150,7 @@ func (r *PublicRouter) handleBeaconBlock(w http.ResponseWriter, req *http.Reques
 	queryParams := req.URL.Query()
 
 	// Build CBT request
-	grpcReq := &cbtproto.ListIntBlockHeadRequest{
+	grpcReq := &cbtproto.ListFctBlockHeadRequest{
 		// Set slot filter for the specific slot
 		Slot: &cbtproto.UInt32Filter{
 			Filter: &cbtproto.UInt32Filter_Eq{Eq: uint32(slot)},
@@ -1192,7 +1201,7 @@ func (r *PublicRouter) handleBeaconBlock(w http.ResponseWriter, req *http.Reques
 	)
 
 	// Call the gRPC service
-	grpcResp, err := r.xatuCBTClient.ListIntBlockHead(ctxWithMeta, grpcReq)
+	grpcResp, err := r.xatuCBTClient.ListFctBlockHead(ctxWithMeta, grpcReq)
 	if err != nil {
 		r.log.WithError(err).WithFields(logrus.Fields{
 			"network": network,
@@ -1204,9 +1213,9 @@ func (r *PublicRouter) handleBeaconBlock(w http.ResponseWriter, req *http.Reques
 	}
 
 	// Transform CBT types to Public API types
-	blocks := make([]*apiv1.BeaconBlock, 0, len(grpcResp.IntBlockHead))
+	blocks := make([]*apiv1.BeaconBlock, 0, len(grpcResp.FctBlockHead))
 
-	for _, cbtItem := range grpcResp.IntBlockHead {
+	for _, cbtItem := range grpcResp.FctBlockHead {
 		apiBlock := transformCBTToAPIBeaconBlock(cbtItem)
 		blocks = append(blocks, apiBlock)
 	}
@@ -1246,7 +1255,7 @@ func (r *PublicRouter) handleBeaconBlock(w http.ResponseWriter, req *http.Reques
 
 // transformCBTToAPIBeaconBlock transforms CBT types to public API types.
 // This is the ONLY place where transformation happens for beacon block data.
-func transformCBTToAPIBeaconBlock(cbt *cbtproto.IntBlockHead) *apiv1.BeaconBlock {
+func transformCBTToAPIBeaconBlock(cbt *cbtproto.FctBlockHead) *apiv1.BeaconBlock {
 	block := &apiv1.BeaconBlock{
 		// Core block identifiers
 		BlockRoot:     cbt.BlockRoot,
@@ -1301,4 +1310,120 @@ func transformCBTToAPIBeaconBlock(cbt *cbtproto.IntBlockHead) *apiv1.BeaconBlock
 	}
 
 	return block
+}
+
+// handleBeaconSlotProposerEntity handles GET /api/v1/{network}/beacon/slot/{slot}/proposer/entity
+func (r *PublicRouter) handleBeaconSlotProposerEntity(w http.ResponseWriter, req *http.Request) {
+	var (
+		ctx     = req.Context()
+		vars    = mux.Vars(req)
+		network = vars["network"]
+		slotStr = vars["slot"]
+	)
+
+	// Parse and validate slot number
+	slot, err := strconv.ParseUint(slotStr, 10, 32)
+	if err != nil {
+		r.WriteJSONResponseError(w, req, http.StatusBadRequest, "Invalid slot number")
+
+		return
+	}
+
+	// Validate network
+	if network == "" {
+		r.WriteJSONResponseError(w, req, http.StatusBadRequest, "Network parameter is required")
+
+		return
+	}
+
+	// Parse query parameters
+	queryParams := req.URL.Query()
+
+	// Build gRPC request with required slot filter
+	grpcReq := &cbtproto.ListFctBlockProposerEntityRequest{
+		// Set slot filter to get data for specific slot
+		Slot: &cbtproto.UInt32Filter{
+			Filter: &cbtproto.UInt32Filter_Eq{Eq: uint32(slot)},
+		},
+	}
+
+	// Apply pagination from query parameters
+	if v := queryParams.Get("page_size"); v != "" {
+		if pageSize, err := strconv.ParseInt(v, 10, 32); err == nil {
+			grpcReq.PageSize = int32(pageSize)
+		}
+	}
+
+	if v := queryParams.Get("page_token"); v != "" {
+		grpcReq.PageToken = v
+	}
+
+	r.log.WithFields(logrus.Fields{
+		"network": network,
+		"slot":    slot,
+	}).Debug("REST v1: BeaconSlotProposerEntity")
+
+	// Set network in gRPC metadata and call service
+	ctxWithMeta := metadata.NewOutgoingContext(
+		ctx,
+		metadata.New(map[string]string{"network": network}),
+	)
+
+	// Call the gRPC service
+	grpcResp, err := r.xatuCBTClient.ListFctBlockProposerEntity(ctxWithMeta, grpcReq)
+	if err != nil {
+		r.log.WithError(err).WithFields(logrus.Fields{
+			"network": network,
+			"slot":    slot,
+		}).Error("Failed to query fct_block_proposer_entity")
+		r.WriteJSONResponseError(w, req, http.StatusInternalServerError, "Failed to retrieve proposer entity data")
+
+		return
+	}
+
+	// Transform CBT types to Public API types
+	items := make([]*apiv1.ProposerEntity, 0, len(grpcResp.FctBlockProposerEntity))
+
+	for _, cbtItem := range grpcResp.FctBlockProposerEntity {
+		apiItem := transformCBTToAPIProposerEntity(cbtItem)
+		items = append(items, apiItem)
+	}
+
+	// Build applied filters map for metadata
+	appliedFilters := make(map[string]string)
+	appliedFilters["slot"] = slotStr
+
+	response := &apiv1.ListBeaconSlotProposerEntityResponse{
+		Entities: items,
+		Pagination: &apiv1.PaginationMetadata{
+			PageSize:      grpcReq.PageSize,
+			NextPageToken: grpcResp.NextPageToken,
+		},
+		Filters: &apiv1.FilterMetadata{
+			Network:        network,
+			AppliedFilters: appliedFilters,
+		},
+	}
+
+	// Set content type header (cache headers are handled by middleware)
+	w.Header().Set("Content-Type", "application/json")
+
+	// Write JSON response
+	if err := json.NewEncoder(w).Encode(response); err != nil {
+		r.log.WithError(err).Error("Failed to encode response")
+	}
+}
+
+// transformCBTToAPIProposerEntity transforms CBT proposer entity to public API types
+func transformCBTToAPIProposerEntity(cbt *cbtproto.FctBlockProposerEntity) *apiv1.ProposerEntity {
+	entity := &apiv1.ProposerEntity{}
+
+	// Handle nullable entity field
+	if cbt.Entity != nil && cbt.Entity.Value != "" {
+		entity.Entity = cbt.Entity.Value
+	} else {
+		entity.Entity = "unknown"
+	}
+
+	return entity
 }

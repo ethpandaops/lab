@@ -52,15 +52,21 @@ const (
 	// XatuCBTListFctMevBidCountByRelayProcedure is the fully-qualified name of the XatuCBT's
 	// ListFctMevBidCountByRelay RPC.
 	XatuCBTListFctMevBidCountByRelayProcedure = "/xatu_cbt.XatuCBT/ListFctMevBidCountByRelay"
-	// XatuCBTListIntBlockBlobCountHeadProcedure is the fully-qualified name of the XatuCBT's
-	// ListIntBlockBlobCountHead RPC.
-	XatuCBTListIntBlockBlobCountHeadProcedure = "/xatu_cbt.XatuCBT/ListIntBlockBlobCountHead"
-	// XatuCBTListIntBlockHeadProcedure is the fully-qualified name of the XatuCBT's ListIntBlockHead
+	// XatuCBTListFctMevBidValueByBuilderProcedure is the fully-qualified name of the XatuCBT's
+	// ListFctMevBidValueByBuilder RPC.
+	XatuCBTListFctMevBidValueByBuilderProcedure = "/xatu_cbt.XatuCBT/ListFctMevBidValueByBuilder"
+	// XatuCBTListFctBlockBlobCountHeadProcedure is the fully-qualified name of the XatuCBT's
+	// ListFctBlockBlobCountHead RPC.
+	XatuCBTListFctBlockBlobCountHeadProcedure = "/xatu_cbt.XatuCBT/ListFctBlockBlobCountHead"
+	// XatuCBTListFctBlockHeadProcedure is the fully-qualified name of the XatuCBT's ListFctBlockHead
 	// RPC.
-	XatuCBTListIntBlockHeadProcedure = "/xatu_cbt.XatuCBT/ListIntBlockHead"
-	// XatuCBTListIntBlockMevHeadProcedure is the fully-qualified name of the XatuCBT's
-	// ListIntBlockMevHead RPC.
-	XatuCBTListIntBlockMevHeadProcedure = "/xatu_cbt.XatuCBT/ListIntBlockMevHead"
+	XatuCBTListFctBlockHeadProcedure = "/xatu_cbt.XatuCBT/ListFctBlockHead"
+	// XatuCBTListFctBlockMevHeadProcedure is the fully-qualified name of the XatuCBT's
+	// ListFctBlockMevHead RPC.
+	XatuCBTListFctBlockMevHeadProcedure = "/xatu_cbt.XatuCBT/ListFctBlockMevHead"
+	// XatuCBTListFctBlockProposerEntityProcedure is the fully-qualified name of the XatuCBT's
+	// ListFctBlockProposerEntity RPC.
+	XatuCBTListFctBlockProposerEntityProcedure = "/xatu_cbt.XatuCBT/ListFctBlockProposerEntity"
 	// XatuCBTGetDataAvailabilityProcedure is the fully-qualified name of the XatuCBT's
 	// GetDataAvailability RPC.
 	XatuCBTGetDataAvailabilityProcedure = "/xatu_cbt.XatuCBT/GetDataAvailability"
@@ -75,9 +81,11 @@ var (
 	xatuCBTListFctAttestationFirstSeenChunked50MsMethodDescriptor = xatuCBTServiceDescriptor.Methods().ByName("ListFctAttestationFirstSeenChunked50ms")
 	xatuCBTListFctAttestationCorrectnessHeadMethodDescriptor      = xatuCBTServiceDescriptor.Methods().ByName("ListFctAttestationCorrectnessHead")
 	xatuCBTListFctMevBidCountByRelayMethodDescriptor              = xatuCBTServiceDescriptor.Methods().ByName("ListFctMevBidCountByRelay")
-	xatuCBTListIntBlockBlobCountHeadMethodDescriptor              = xatuCBTServiceDescriptor.Methods().ByName("ListIntBlockBlobCountHead")
-	xatuCBTListIntBlockHeadMethodDescriptor                       = xatuCBTServiceDescriptor.Methods().ByName("ListIntBlockHead")
-	xatuCBTListIntBlockMevHeadMethodDescriptor                    = xatuCBTServiceDescriptor.Methods().ByName("ListIntBlockMevHead")
+	xatuCBTListFctMevBidValueByBuilderMethodDescriptor            = xatuCBTServiceDescriptor.Methods().ByName("ListFctMevBidValueByBuilder")
+	xatuCBTListFctBlockBlobCountHeadMethodDescriptor              = xatuCBTServiceDescriptor.Methods().ByName("ListFctBlockBlobCountHead")
+	xatuCBTListFctBlockHeadMethodDescriptor                       = xatuCBTServiceDescriptor.Methods().ByName("ListFctBlockHead")
+	xatuCBTListFctBlockMevHeadMethodDescriptor                    = xatuCBTServiceDescriptor.Methods().ByName("ListFctBlockMevHead")
+	xatuCBTListFctBlockProposerEntityMethodDescriptor             = xatuCBTServiceDescriptor.Methods().ByName("ListFctBlockProposerEntity")
 	xatuCBTGetDataAvailabilityMethodDescriptor                    = xatuCBTServiceDescriptor.Methods().ByName("GetDataAvailability")
 )
 
@@ -101,15 +109,21 @@ type XatuCBTClient interface {
 	// ListFctMevBidCountByRelay returns MEV relay bid count data.
 	// This table contains the total number of MEV relay bids for a slot by relay.
 	ListFctMevBidCountByRelay(context.Context, *connect.Request[clickhouse.ListFctMevBidCountByRelayRequest]) (*connect.Response[clickhouse.ListFctMevBidCountByRelayResponse], error)
-	// ListIntBlockBlobCountHead returns blob count data for blocks in the unfinalized chain.
+	// ListFctMevBidValueByBuilder returns highest MEV bid values by builder for a slot.
+	// This table contains the highest value MEV relay bid for a slot by builder.
+	ListFctMevBidValueByBuilder(context.Context, *connect.Request[clickhouse.ListFctMevBidValueByBuilderRequest]) (*connect.Response[clickhouse.ListFctMevBidValueByBuilderResponse], error)
+	// ListFctBlockBlobCountHead returns blob count data for blocks in the unfinalized chain.
 	// This table contains the number of blobs for each block, with forks potentially causing multiple blocks per slot.
-	ListIntBlockBlobCountHead(context.Context, *connect.Request[clickhouse.ListIntBlockBlobCountHeadRequest]) (*connect.Response[clickhouse.ListIntBlockBlobCountHeadResponse], error)
-	// ListIntBlockHead returns beacon block data from the int_block_head table.
+	ListFctBlockBlobCountHead(context.Context, *connect.Request[clickhouse.ListFctBlockBlobCountHeadRequest]) (*connect.Response[clickhouse.ListFctBlockBlobCountHeadResponse], error)
+	// ListFctBlockHead returns beacon block data from the fct_block_head table.
 	// This table contains block details for the unfinalized chain, with potential multiple blocks per slot due to forks.
-	ListIntBlockHead(context.Context, *connect.Request[clickhouse.ListIntBlockHeadRequest]) (*connect.Response[clickhouse.ListIntBlockHeadResponse], error)
-	// ListIntBlockMevHead returns MEV block data for the unfinalized chain.
+	ListFctBlockHead(context.Context, *connect.Request[clickhouse.ListFctBlockHeadRequest]) (*connect.Response[clickhouse.ListFctBlockHeadResponse], error)
+	// ListFctBlockMevHead returns MEV block data for the unfinalized chain.
 	// This table contains MEV relay proposer payload delivered for blocks on the unfinalized chain.
-	ListIntBlockMevHead(context.Context, *connect.Request[clickhouse.ListIntBlockMevHeadRequest]) (*connect.Response[clickhouse.ListIntBlockMevHeadResponse], error)
+	ListFctBlockMevHead(context.Context, *connect.Request[clickhouse.ListFctBlockMevHeadRequest]) (*connect.Response[clickhouse.ListFctBlockMevHeadResponse], error)
+	// ListFctBlockProposerEntity returns proposer entity data from the fct_block_proposer_entity table.
+	// This table contains information about entities that proposed blocks in the unfinalized chain.
+	ListFctBlockProposerEntity(context.Context, *connect.Request[clickhouse.ListFctBlockProposerEntityRequest]) (*connect.Response[clickhouse.ListFctBlockProposerEntityResponse], error)
 	// GetDataAvailability returns the common availability interval across a set of transformation tables.
 	// It calculates the overlapping data range for the specified tables and returns slot information.
 	GetDataAvailability(context.Context, *connect.Request[xatu_cbt.GetDataAvailabilityRequest]) (*connect.Response[xatu_cbt.GetDataAvailabilityResponse], error)
@@ -161,22 +175,34 @@ func NewXatuCBTClient(httpClient connect.HTTPClient, baseURL string, opts ...con
 			connect.WithSchema(xatuCBTListFctMevBidCountByRelayMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
-		listIntBlockBlobCountHead: connect.NewClient[clickhouse.ListIntBlockBlobCountHeadRequest, clickhouse.ListIntBlockBlobCountHeadResponse](
+		listFctMevBidValueByBuilder: connect.NewClient[clickhouse.ListFctMevBidValueByBuilderRequest, clickhouse.ListFctMevBidValueByBuilderResponse](
 			httpClient,
-			baseURL+XatuCBTListIntBlockBlobCountHeadProcedure,
-			connect.WithSchema(xatuCBTListIntBlockBlobCountHeadMethodDescriptor),
+			baseURL+XatuCBTListFctMevBidValueByBuilderProcedure,
+			connect.WithSchema(xatuCBTListFctMevBidValueByBuilderMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
-		listIntBlockHead: connect.NewClient[clickhouse.ListIntBlockHeadRequest, clickhouse.ListIntBlockHeadResponse](
+		listFctBlockBlobCountHead: connect.NewClient[clickhouse.ListFctBlockBlobCountHeadRequest, clickhouse.ListFctBlockBlobCountHeadResponse](
 			httpClient,
-			baseURL+XatuCBTListIntBlockHeadProcedure,
-			connect.WithSchema(xatuCBTListIntBlockHeadMethodDescriptor),
+			baseURL+XatuCBTListFctBlockBlobCountHeadProcedure,
+			connect.WithSchema(xatuCBTListFctBlockBlobCountHeadMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
-		listIntBlockMevHead: connect.NewClient[clickhouse.ListIntBlockMevHeadRequest, clickhouse.ListIntBlockMevHeadResponse](
+		listFctBlockHead: connect.NewClient[clickhouse.ListFctBlockHeadRequest, clickhouse.ListFctBlockHeadResponse](
 			httpClient,
-			baseURL+XatuCBTListIntBlockMevHeadProcedure,
-			connect.WithSchema(xatuCBTListIntBlockMevHeadMethodDescriptor),
+			baseURL+XatuCBTListFctBlockHeadProcedure,
+			connect.WithSchema(xatuCBTListFctBlockHeadMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
+		listFctBlockMevHead: connect.NewClient[clickhouse.ListFctBlockMevHeadRequest, clickhouse.ListFctBlockMevHeadResponse](
+			httpClient,
+			baseURL+XatuCBTListFctBlockMevHeadProcedure,
+			connect.WithSchema(xatuCBTListFctBlockMevHeadMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
+		listFctBlockProposerEntity: connect.NewClient[clickhouse.ListFctBlockProposerEntityRequest, clickhouse.ListFctBlockProposerEntityResponse](
+			httpClient,
+			baseURL+XatuCBTListFctBlockProposerEntityProcedure,
+			connect.WithSchema(xatuCBTListFctBlockProposerEntityMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
 		getDataAvailability: connect.NewClient[xatu_cbt.GetDataAvailabilityRequest, xatu_cbt.GetDataAvailabilityResponse](
@@ -196,9 +222,11 @@ type xatuCBTClient struct {
 	listFctAttestationFirstSeenChunked50Ms *connect.Client[clickhouse.ListFctAttestationFirstSeenChunked50MsRequest, clickhouse.ListFctAttestationFirstSeenChunked50MsResponse]
 	listFctAttestationCorrectnessHead      *connect.Client[clickhouse.ListFctAttestationCorrectnessHeadRequest, clickhouse.ListFctAttestationCorrectnessHeadResponse]
 	listFctMevBidCountByRelay              *connect.Client[clickhouse.ListFctMevBidCountByRelayRequest, clickhouse.ListFctMevBidCountByRelayResponse]
-	listIntBlockBlobCountHead              *connect.Client[clickhouse.ListIntBlockBlobCountHeadRequest, clickhouse.ListIntBlockBlobCountHeadResponse]
-	listIntBlockHead                       *connect.Client[clickhouse.ListIntBlockHeadRequest, clickhouse.ListIntBlockHeadResponse]
-	listIntBlockMevHead                    *connect.Client[clickhouse.ListIntBlockMevHeadRequest, clickhouse.ListIntBlockMevHeadResponse]
+	listFctMevBidValueByBuilder            *connect.Client[clickhouse.ListFctMevBidValueByBuilderRequest, clickhouse.ListFctMevBidValueByBuilderResponse]
+	listFctBlockBlobCountHead              *connect.Client[clickhouse.ListFctBlockBlobCountHeadRequest, clickhouse.ListFctBlockBlobCountHeadResponse]
+	listFctBlockHead                       *connect.Client[clickhouse.ListFctBlockHeadRequest, clickhouse.ListFctBlockHeadResponse]
+	listFctBlockMevHead                    *connect.Client[clickhouse.ListFctBlockMevHeadRequest, clickhouse.ListFctBlockMevHeadResponse]
+	listFctBlockProposerEntity             *connect.Client[clickhouse.ListFctBlockProposerEntityRequest, clickhouse.ListFctBlockProposerEntityResponse]
 	getDataAvailability                    *connect.Client[xatu_cbt.GetDataAvailabilityRequest, xatu_cbt.GetDataAvailabilityResponse]
 }
 
@@ -233,19 +261,29 @@ func (c *xatuCBTClient) ListFctMevBidCountByRelay(ctx context.Context, req *conn
 	return c.listFctMevBidCountByRelay.CallUnary(ctx, req)
 }
 
-// ListIntBlockBlobCountHead calls xatu_cbt.XatuCBT.ListIntBlockBlobCountHead.
-func (c *xatuCBTClient) ListIntBlockBlobCountHead(ctx context.Context, req *connect.Request[clickhouse.ListIntBlockBlobCountHeadRequest]) (*connect.Response[clickhouse.ListIntBlockBlobCountHeadResponse], error) {
-	return c.listIntBlockBlobCountHead.CallUnary(ctx, req)
+// ListFctMevBidValueByBuilder calls xatu_cbt.XatuCBT.ListFctMevBidValueByBuilder.
+func (c *xatuCBTClient) ListFctMevBidValueByBuilder(ctx context.Context, req *connect.Request[clickhouse.ListFctMevBidValueByBuilderRequest]) (*connect.Response[clickhouse.ListFctMevBidValueByBuilderResponse], error) {
+	return c.listFctMevBidValueByBuilder.CallUnary(ctx, req)
 }
 
-// ListIntBlockHead calls xatu_cbt.XatuCBT.ListIntBlockHead.
-func (c *xatuCBTClient) ListIntBlockHead(ctx context.Context, req *connect.Request[clickhouse.ListIntBlockHeadRequest]) (*connect.Response[clickhouse.ListIntBlockHeadResponse], error) {
-	return c.listIntBlockHead.CallUnary(ctx, req)
+// ListFctBlockBlobCountHead calls xatu_cbt.XatuCBT.ListFctBlockBlobCountHead.
+func (c *xatuCBTClient) ListFctBlockBlobCountHead(ctx context.Context, req *connect.Request[clickhouse.ListFctBlockBlobCountHeadRequest]) (*connect.Response[clickhouse.ListFctBlockBlobCountHeadResponse], error) {
+	return c.listFctBlockBlobCountHead.CallUnary(ctx, req)
 }
 
-// ListIntBlockMevHead calls xatu_cbt.XatuCBT.ListIntBlockMevHead.
-func (c *xatuCBTClient) ListIntBlockMevHead(ctx context.Context, req *connect.Request[clickhouse.ListIntBlockMevHeadRequest]) (*connect.Response[clickhouse.ListIntBlockMevHeadResponse], error) {
-	return c.listIntBlockMevHead.CallUnary(ctx, req)
+// ListFctBlockHead calls xatu_cbt.XatuCBT.ListFctBlockHead.
+func (c *xatuCBTClient) ListFctBlockHead(ctx context.Context, req *connect.Request[clickhouse.ListFctBlockHeadRequest]) (*connect.Response[clickhouse.ListFctBlockHeadResponse], error) {
+	return c.listFctBlockHead.CallUnary(ctx, req)
+}
+
+// ListFctBlockMevHead calls xatu_cbt.XatuCBT.ListFctBlockMevHead.
+func (c *xatuCBTClient) ListFctBlockMevHead(ctx context.Context, req *connect.Request[clickhouse.ListFctBlockMevHeadRequest]) (*connect.Response[clickhouse.ListFctBlockMevHeadResponse], error) {
+	return c.listFctBlockMevHead.CallUnary(ctx, req)
+}
+
+// ListFctBlockProposerEntity calls xatu_cbt.XatuCBT.ListFctBlockProposerEntity.
+func (c *xatuCBTClient) ListFctBlockProposerEntity(ctx context.Context, req *connect.Request[clickhouse.ListFctBlockProposerEntityRequest]) (*connect.Response[clickhouse.ListFctBlockProposerEntityResponse], error) {
+	return c.listFctBlockProposerEntity.CallUnary(ctx, req)
 }
 
 // GetDataAvailability calls xatu_cbt.XatuCBT.GetDataAvailability.
@@ -273,15 +311,21 @@ type XatuCBTHandler interface {
 	// ListFctMevBidCountByRelay returns MEV relay bid count data.
 	// This table contains the total number of MEV relay bids for a slot by relay.
 	ListFctMevBidCountByRelay(context.Context, *connect.Request[clickhouse.ListFctMevBidCountByRelayRequest]) (*connect.Response[clickhouse.ListFctMevBidCountByRelayResponse], error)
-	// ListIntBlockBlobCountHead returns blob count data for blocks in the unfinalized chain.
+	// ListFctMevBidValueByBuilder returns highest MEV bid values by builder for a slot.
+	// This table contains the highest value MEV relay bid for a slot by builder.
+	ListFctMevBidValueByBuilder(context.Context, *connect.Request[clickhouse.ListFctMevBidValueByBuilderRequest]) (*connect.Response[clickhouse.ListFctMevBidValueByBuilderResponse], error)
+	// ListFctBlockBlobCountHead returns blob count data for blocks in the unfinalized chain.
 	// This table contains the number of blobs for each block, with forks potentially causing multiple blocks per slot.
-	ListIntBlockBlobCountHead(context.Context, *connect.Request[clickhouse.ListIntBlockBlobCountHeadRequest]) (*connect.Response[clickhouse.ListIntBlockBlobCountHeadResponse], error)
-	// ListIntBlockHead returns beacon block data from the int_block_head table.
+	ListFctBlockBlobCountHead(context.Context, *connect.Request[clickhouse.ListFctBlockBlobCountHeadRequest]) (*connect.Response[clickhouse.ListFctBlockBlobCountHeadResponse], error)
+	// ListFctBlockHead returns beacon block data from the fct_block_head table.
 	// This table contains block details for the unfinalized chain, with potential multiple blocks per slot due to forks.
-	ListIntBlockHead(context.Context, *connect.Request[clickhouse.ListIntBlockHeadRequest]) (*connect.Response[clickhouse.ListIntBlockHeadResponse], error)
-	// ListIntBlockMevHead returns MEV block data for the unfinalized chain.
+	ListFctBlockHead(context.Context, *connect.Request[clickhouse.ListFctBlockHeadRequest]) (*connect.Response[clickhouse.ListFctBlockHeadResponse], error)
+	// ListFctBlockMevHead returns MEV block data for the unfinalized chain.
 	// This table contains MEV relay proposer payload delivered for blocks on the unfinalized chain.
-	ListIntBlockMevHead(context.Context, *connect.Request[clickhouse.ListIntBlockMevHeadRequest]) (*connect.Response[clickhouse.ListIntBlockMevHeadResponse], error)
+	ListFctBlockMevHead(context.Context, *connect.Request[clickhouse.ListFctBlockMevHeadRequest]) (*connect.Response[clickhouse.ListFctBlockMevHeadResponse], error)
+	// ListFctBlockProposerEntity returns proposer entity data from the fct_block_proposer_entity table.
+	// This table contains information about entities that proposed blocks in the unfinalized chain.
+	ListFctBlockProposerEntity(context.Context, *connect.Request[clickhouse.ListFctBlockProposerEntityRequest]) (*connect.Response[clickhouse.ListFctBlockProposerEntityResponse], error)
 	// GetDataAvailability returns the common availability interval across a set of transformation tables.
 	// It calculates the overlapping data range for the specified tables and returns slot information.
 	GetDataAvailability(context.Context, *connect.Request[xatu_cbt.GetDataAvailabilityRequest]) (*connect.Response[xatu_cbt.GetDataAvailabilityResponse], error)
@@ -329,22 +373,34 @@ func NewXatuCBTHandler(svc XatuCBTHandler, opts ...connect.HandlerOption) (strin
 		connect.WithSchema(xatuCBTListFctMevBidCountByRelayMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
-	xatuCBTListIntBlockBlobCountHeadHandler := connect.NewUnaryHandler(
-		XatuCBTListIntBlockBlobCountHeadProcedure,
-		svc.ListIntBlockBlobCountHead,
-		connect.WithSchema(xatuCBTListIntBlockBlobCountHeadMethodDescriptor),
+	xatuCBTListFctMevBidValueByBuilderHandler := connect.NewUnaryHandler(
+		XatuCBTListFctMevBidValueByBuilderProcedure,
+		svc.ListFctMevBidValueByBuilder,
+		connect.WithSchema(xatuCBTListFctMevBidValueByBuilderMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
-	xatuCBTListIntBlockHeadHandler := connect.NewUnaryHandler(
-		XatuCBTListIntBlockHeadProcedure,
-		svc.ListIntBlockHead,
-		connect.WithSchema(xatuCBTListIntBlockHeadMethodDescriptor),
+	xatuCBTListFctBlockBlobCountHeadHandler := connect.NewUnaryHandler(
+		XatuCBTListFctBlockBlobCountHeadProcedure,
+		svc.ListFctBlockBlobCountHead,
+		connect.WithSchema(xatuCBTListFctBlockBlobCountHeadMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
-	xatuCBTListIntBlockMevHeadHandler := connect.NewUnaryHandler(
-		XatuCBTListIntBlockMevHeadProcedure,
-		svc.ListIntBlockMevHead,
-		connect.WithSchema(xatuCBTListIntBlockMevHeadMethodDescriptor),
+	xatuCBTListFctBlockHeadHandler := connect.NewUnaryHandler(
+		XatuCBTListFctBlockHeadProcedure,
+		svc.ListFctBlockHead,
+		connect.WithSchema(xatuCBTListFctBlockHeadMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
+	xatuCBTListFctBlockMevHeadHandler := connect.NewUnaryHandler(
+		XatuCBTListFctBlockMevHeadProcedure,
+		svc.ListFctBlockMevHead,
+		connect.WithSchema(xatuCBTListFctBlockMevHeadMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
+	xatuCBTListFctBlockProposerEntityHandler := connect.NewUnaryHandler(
+		XatuCBTListFctBlockProposerEntityProcedure,
+		svc.ListFctBlockProposerEntity,
+		connect.WithSchema(xatuCBTListFctBlockProposerEntityMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
 	xatuCBTGetDataAvailabilityHandler := connect.NewUnaryHandler(
@@ -367,12 +423,16 @@ func NewXatuCBTHandler(svc XatuCBTHandler, opts ...connect.HandlerOption) (strin
 			xatuCBTListFctAttestationCorrectnessHeadHandler.ServeHTTP(w, r)
 		case XatuCBTListFctMevBidCountByRelayProcedure:
 			xatuCBTListFctMevBidCountByRelayHandler.ServeHTTP(w, r)
-		case XatuCBTListIntBlockBlobCountHeadProcedure:
-			xatuCBTListIntBlockBlobCountHeadHandler.ServeHTTP(w, r)
-		case XatuCBTListIntBlockHeadProcedure:
-			xatuCBTListIntBlockHeadHandler.ServeHTTP(w, r)
-		case XatuCBTListIntBlockMevHeadProcedure:
-			xatuCBTListIntBlockMevHeadHandler.ServeHTTP(w, r)
+		case XatuCBTListFctMevBidValueByBuilderProcedure:
+			xatuCBTListFctMevBidValueByBuilderHandler.ServeHTTP(w, r)
+		case XatuCBTListFctBlockBlobCountHeadProcedure:
+			xatuCBTListFctBlockBlobCountHeadHandler.ServeHTTP(w, r)
+		case XatuCBTListFctBlockHeadProcedure:
+			xatuCBTListFctBlockHeadHandler.ServeHTTP(w, r)
+		case XatuCBTListFctBlockMevHeadProcedure:
+			xatuCBTListFctBlockMevHeadHandler.ServeHTTP(w, r)
+		case XatuCBTListFctBlockProposerEntityProcedure:
+			xatuCBTListFctBlockProposerEntityHandler.ServeHTTP(w, r)
 		case XatuCBTGetDataAvailabilityProcedure:
 			xatuCBTGetDataAvailabilityHandler.ServeHTTP(w, r)
 		default:
@@ -408,16 +468,24 @@ func (UnimplementedXatuCBTHandler) ListFctMevBidCountByRelay(context.Context, *c
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("xatu_cbt.XatuCBT.ListFctMevBidCountByRelay is not implemented"))
 }
 
-func (UnimplementedXatuCBTHandler) ListIntBlockBlobCountHead(context.Context, *connect.Request[clickhouse.ListIntBlockBlobCountHeadRequest]) (*connect.Response[clickhouse.ListIntBlockBlobCountHeadResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("xatu_cbt.XatuCBT.ListIntBlockBlobCountHead is not implemented"))
+func (UnimplementedXatuCBTHandler) ListFctMevBidValueByBuilder(context.Context, *connect.Request[clickhouse.ListFctMevBidValueByBuilderRequest]) (*connect.Response[clickhouse.ListFctMevBidValueByBuilderResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("xatu_cbt.XatuCBT.ListFctMevBidValueByBuilder is not implemented"))
 }
 
-func (UnimplementedXatuCBTHandler) ListIntBlockHead(context.Context, *connect.Request[clickhouse.ListIntBlockHeadRequest]) (*connect.Response[clickhouse.ListIntBlockHeadResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("xatu_cbt.XatuCBT.ListIntBlockHead is not implemented"))
+func (UnimplementedXatuCBTHandler) ListFctBlockBlobCountHead(context.Context, *connect.Request[clickhouse.ListFctBlockBlobCountHeadRequest]) (*connect.Response[clickhouse.ListFctBlockBlobCountHeadResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("xatu_cbt.XatuCBT.ListFctBlockBlobCountHead is not implemented"))
 }
 
-func (UnimplementedXatuCBTHandler) ListIntBlockMevHead(context.Context, *connect.Request[clickhouse.ListIntBlockMevHeadRequest]) (*connect.Response[clickhouse.ListIntBlockMevHeadResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("xatu_cbt.XatuCBT.ListIntBlockMevHead is not implemented"))
+func (UnimplementedXatuCBTHandler) ListFctBlockHead(context.Context, *connect.Request[clickhouse.ListFctBlockHeadRequest]) (*connect.Response[clickhouse.ListFctBlockHeadResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("xatu_cbt.XatuCBT.ListFctBlockHead is not implemented"))
+}
+
+func (UnimplementedXatuCBTHandler) ListFctBlockMevHead(context.Context, *connect.Request[clickhouse.ListFctBlockMevHeadRequest]) (*connect.Response[clickhouse.ListFctBlockMevHeadResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("xatu_cbt.XatuCBT.ListFctBlockMevHead is not implemented"))
+}
+
+func (UnimplementedXatuCBTHandler) ListFctBlockProposerEntity(context.Context, *connect.Request[clickhouse.ListFctBlockProposerEntityRequest]) (*connect.Response[clickhouse.ListFctBlockProposerEntityResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("xatu_cbt.XatuCBT.ListFctBlockProposerEntity is not implemented"))
 }
 
 func (UnimplementedXatuCBTHandler) GetDataAvailability(context.Context, *connect.Request[xatu_cbt.GetDataAvailabilityRequest]) (*connect.Response[xatu_cbt.GetDataAvailabilityResponse], error) {

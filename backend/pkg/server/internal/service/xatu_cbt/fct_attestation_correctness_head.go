@@ -121,7 +121,8 @@ func scanFctAttestationCorrectnessHead(
 		updatedDateTime, slotStartDateTime time.Time
 		epochStartDateTime                 time.Time
 		blockRoot                          *string
-		votesActual                        *uint32
+		votesHead                          *uint32
+		votesOther                         *uint32
 	)
 
 	if err := scanner.Scan(
@@ -132,7 +133,8 @@ func scanFctAttestationCorrectnessHead(
 		&epochStartDateTime,
 		&blockRoot,
 		&item.VotesMax,
-		&votesActual,
+		&votesHead,
+		&votesOther,
 	); err != nil {
 		return nil, fmt.Errorf("failed to scan row: %w", err)
 	}
@@ -145,8 +147,11 @@ func scanFctAttestationCorrectnessHead(
 	if blockRoot != nil {
 		item.BlockRoot = &wrapperspb.StringValue{Value: *blockRoot}
 	}
-	if votesActual != nil {
-		item.VotesActual = &wrapperspb.UInt32Value{Value: *votesActual}
+	if votesHead != nil {
+		item.VotesHead = &wrapperspb.UInt32Value{Value: *votesHead}
+	}
+	if votesOther != nil {
+		item.VotesOther = &wrapperspb.UInt32Value{Value: *votesOther}
 	}
 
 	return &item, nil

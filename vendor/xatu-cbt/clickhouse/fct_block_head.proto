@@ -1,0 +1,166 @@
+syntax = "proto3";
+
+package cbt;
+
+import "vendor/xatu-cbt/clickhouse/common.proto";
+import "google/protobuf/wrappers.proto";
+
+option go_package = "github.com/ethpandaops/xatu-cbt/pkg/proto/clickhouse";
+// Block details for the unfinalized chain. Forks in the chain may cause multiple block roots for the same slot to be present
+
+message FctBlockHead {
+  // Timestamp when the record was last updated
+  uint32 updated_date_time = 11;
+  // The slot number from beacon block payload
+  uint32 slot = 12;
+  // The wall clock time when the reorg slot started
+  uint32 slot_start_date_time = 13;
+  // The epoch number from beacon block payload
+  uint32 epoch = 14;
+  // The wall clock time when the epoch started
+  uint32 epoch_start_date_time = 15;
+  // The root hash of the beacon block
+  string block_root = 16;
+  // The version of the beacon block
+  string block_version = 17;
+  // The total bytes of the beacon block payload
+  google.protobuf.UInt32Value block_total_bytes = 18;
+  // The total bytes of the beacon block payload when compressed using snappy
+  google.protobuf.UInt32Value block_total_bytes_compressed = 19;
+  // The root hash of the parent beacon block
+  string parent_root = 20;
+  // The root hash of the beacon state at this block
+  string state_root = 21;
+  // The index of the validator that proposed the beacon block
+  uint32 proposer_index = 22;
+  // The block hash of the associated execution block
+  string eth1_data_block_hash = 23;
+  // The root of the deposit tree in the associated execution block
+  string eth1_data_deposit_root = 24;
+  // The block hash of the execution payload
+  string execution_payload_block_hash = 25;
+  // The block number of the execution payload
+  uint32 execution_payload_block_number = 26;
+  // The recipient of the fee for this execution payload
+  string execution_payload_fee_recipient = 27;
+  // Base fee per gas for execution payload
+  google.protobuf.StringValue execution_payload_base_fee_per_gas = 28;
+  // Gas used for blobs in execution payload
+  google.protobuf.UInt64Value execution_payload_blob_gas_used = 29;
+  // Excess gas used for blobs in execution payload
+  google.protobuf.UInt64Value execution_payload_excess_blob_gas = 30;
+  // Gas limit for execution payload
+  google.protobuf.UInt64Value execution_payload_gas_limit = 31;
+  // Gas used for execution payload
+  google.protobuf.UInt64Value execution_payload_gas_used = 32;
+  // The state root of the execution payload
+  string execution_payload_state_root = 33;
+  // The parent hash of the execution payload
+  string execution_payload_parent_hash = 34;
+  // The transaction count of the execution payload
+  google.protobuf.UInt32Value execution_payload_transactions_count = 35;
+  // The transaction total bytes of the execution payload
+  google.protobuf.UInt32Value execution_payload_transactions_total_bytes = 36;
+  // The transaction total bytes of the execution payload when compressed using snappy
+  google.protobuf.UInt32Value execution_payload_transactions_total_bytes_compressed = 37;
+}
+
+// ListFctBlockHeadRequest is the request message for listing fct_block_head records
+message ListFctBlockHeadRequest {
+  // Filter by slot_start_date_time (PRIMARY KEY - required)
+  UInt32Filter slot_start_date_time = 1;
+
+  // Filter by block_root (ORDER BY column 2 - optional)
+  StringFilter block_root = 2;
+
+  // Filter by updated_date_time (optional)
+  UInt32Filter updated_date_time = 3;
+  // Filter by slot (optional)
+  UInt32Filter slot = 4;
+  // Filter by epoch (optional)
+  UInt32Filter epoch = 5;
+  // Filter by epoch_start_date_time (optional)
+  UInt32Filter epoch_start_date_time = 6;
+  // Filter by block_version (optional)
+  StringFilter block_version = 7;
+  // Filter by block_total_bytes (optional)
+  NullableUInt32Filter block_total_bytes = 8;
+  // Filter by block_total_bytes_compressed (optional)
+  NullableUInt32Filter block_total_bytes_compressed = 9;
+  // Filter by parent_root (optional)
+  StringFilter parent_root = 10;
+  // Filter by state_root (optional)
+  StringFilter state_root = 11;
+  // Filter by proposer_index (optional)
+  UInt32Filter proposer_index = 12;
+  // Filter by eth1_data_block_hash (optional)
+  StringFilter eth1_data_block_hash = 13;
+  // Filter by eth1_data_deposit_root (optional)
+  StringFilter eth1_data_deposit_root = 14;
+  // Filter by execution_payload_block_hash (optional)
+  StringFilter execution_payload_block_hash = 15;
+  // Filter by execution_payload_block_number (optional)
+  UInt32Filter execution_payload_block_number = 16;
+  // Filter by execution_payload_fee_recipient (optional)
+  StringFilter execution_payload_fee_recipient = 17;
+  // Filter by execution_payload_base_fee_per_gas (optional)
+  NullableStringFilter execution_payload_base_fee_per_gas = 18;
+  // Filter by execution_payload_blob_gas_used (optional)
+  NullableUInt64Filter execution_payload_blob_gas_used = 19;
+  // Filter by execution_payload_excess_blob_gas (optional)
+  NullableUInt64Filter execution_payload_excess_blob_gas = 20;
+  // Filter by execution_payload_gas_limit (optional)
+  NullableUInt64Filter execution_payload_gas_limit = 21;
+  // Filter by execution_payload_gas_used (optional)
+  NullableUInt64Filter execution_payload_gas_used = 22;
+  // Filter by execution_payload_state_root (optional)
+  StringFilter execution_payload_state_root = 23;
+  // Filter by execution_payload_parent_hash (optional)
+  StringFilter execution_payload_parent_hash = 24;
+  // Filter by execution_payload_transactions_count (optional)
+  NullableUInt32Filter execution_payload_transactions_count = 25;
+  // Filter by execution_payload_transactions_total_bytes (optional)
+  NullableUInt32Filter execution_payload_transactions_total_bytes = 26;
+  // Filter by execution_payload_transactions_total_bytes_compressed (optional)
+  NullableUInt32Filter execution_payload_transactions_total_bytes_compressed = 27;
+
+  // The maximum number of fct_block_head to return.
+  // If unspecified, at most 100 items will be returned.
+  // The maximum value is 1000; values above 1000 will be coerced to 1000.
+  int32 page_size = 28;
+  // A page token, received from a previous `ListFctBlockHead` call.
+  // Provide this to retrieve the subsequent page.
+  string page_token = 29;
+  // The order of results. Format: comma-separated list of fields.
+  // Example: "foo,bar" or "foo desc,bar" for descending order on foo.
+  // If unspecified, results will be returned in the default order.
+  string order_by = 30;
+}
+
+// ListFctBlockHeadResponse is the response message for listing fct_block_head records
+message ListFctBlockHeadResponse {
+  // The list of fct_block_head.
+  repeated FctBlockHead fct_block_head = 1;
+  // A token, which can be sent as `page_token` to retrieve the next page.
+  // If this field is omitted, there are no subsequent pages.
+  string next_page_token = 2;
+}
+
+// GetFctBlockHeadRequest is the request message for getting a single fct_block_head record by primary key
+message GetFctBlockHeadRequest {
+  // The wall clock time when the reorg slot started
+  uint32 slot_start_date_time = 1; // Primary key (required)
+}
+
+// GetFctBlockHeadResponse is the response message for getting a single fct_block_head record
+message GetFctBlockHeadResponse {
+  FctBlockHead item = 1;
+}
+
+// FctBlockHeadService provides RPC methods for querying fct_block_head data
+service FctBlockHeadService {
+  // List returns paginated fct_block_head records
+  rpc List(ListFctBlockHeadRequest) returns (ListFctBlockHeadResponse);
+  // Get returns a single fct_block_head record by primary key
+  rpc Get(GetFctBlockHeadRequest) returns (GetFctBlockHeadResponse);
+}

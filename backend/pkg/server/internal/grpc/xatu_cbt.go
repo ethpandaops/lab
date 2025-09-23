@@ -190,17 +190,17 @@ func (x *XatuCBT) ListFctMevBidCountByRelay(
 	return x.service.ListFctMevBidCountByRelay(ctx, req)
 }
 
-// ListIntBlockBlobCountHead returns blob count data for blocks in the unfinalized chain.
-func (x *XatuCBT) ListIntBlockBlobCountHead(
+// ListFctBlockBlobCountHead returns blob count data for blocks in the unfinalized chain.
+func (x *XatuCBT) ListFctBlockBlobCountHead(
 	ctx context.Context,
-	req *cbtproto.ListIntBlockBlobCountHeadRequest,
-) (*cbtproto.ListIntBlockBlobCountHeadResponse, error) {
+	req *cbtproto.ListFctBlockBlobCountHeadRequest,
+) (*cbtproto.ListFctBlockBlobCountHeadResponse, error) {
 	// Calculate SlotStartDateTime if not already set for more efficient queries.
 	if req.SlotStartDateTime == nil && req.Slot != nil {
 		req.SlotStartDateTime = x.calculateSlotStartDateTime(ctx, req.Slot)
 	}
 
-	return x.service.ListIntBlockBlobCountHead(ctx, req)
+	return x.service.ListFctBlockBlobCountHead(ctx, req)
 }
 
 // ListFctBlockBlobFirstSeenByNode returns blob timing data from the fct_block_blob_first_seen_by_node table.
@@ -216,30 +216,30 @@ func (x *XatuCBT) ListFctBlockBlobFirstSeenByNode(
 	return x.service.ListFctBlockBlobFirstSeenByNode(ctx, req)
 }
 
-// ListIntBlockHead returns block data from the int_block_head table.
-func (x *XatuCBT) ListIntBlockHead(
+// ListFctBlockHead returns block data from the fct_block_head table.
+func (x *XatuCBT) ListFctBlockHead(
 	ctx context.Context,
-	req *cbtproto.ListIntBlockHeadRequest,
-) (*cbtproto.ListIntBlockHeadResponse, error) {
+	req *cbtproto.ListFctBlockHeadRequest,
+) (*cbtproto.ListFctBlockHeadResponse, error) {
 	// Calculate SlotStartDateTime if not already set for more efficient queries.
 	if req.SlotStartDateTime == nil && req.Slot != nil {
 		req.SlotStartDateTime = x.calculateSlotStartDateTime(ctx, req.Slot)
 	}
 
-	return x.service.ListIntBlockHead(ctx, req)
+	return x.service.ListFctBlockHead(ctx, req)
 }
 
-// ListIntBlockMevHead returns MEV block data for the unfinalized chain.
-func (x *XatuCBT) ListIntBlockMevHead(
+// ListFctBlockMevHead returns MEV block data for the unfinalized chain.
+func (x *XatuCBT) ListFctBlockMevHead(
 	ctx context.Context,
-	req *cbtproto.ListIntBlockMevHeadRequest,
-) (*cbtproto.ListIntBlockMevHeadResponse, error) {
+	req *cbtproto.ListFctBlockMevHeadRequest,
+) (*cbtproto.ListFctBlockMevHeadResponse, error) {
 	// Calculate SlotStartDateTime if not already set for more efficient queries.
 	if req.SlotStartDateTime == nil && req.Slot != nil {
 		req.SlotStartDateTime = x.calculateSlotStartDateTime(ctx, req.Slot)
 	}
 
-	return x.service.ListIntBlockMevHead(ctx, req)
+	return x.service.ListFctBlockMevHead(ctx, req)
 }
 
 // ListFctMevBidValueByBuilder returns highest MEV bid values by builder for a slot.
@@ -253,4 +253,17 @@ func (x *XatuCBT) ListFctMevBidValueByBuilder(
 	}
 
 	return x.service.ListFctMevBidValueByBuilder(ctx, req)
+}
+
+// ListFctBlockProposerEntity returns proposer entity data from the fct_block_proposer_entity table.
+func (x *XatuCBT) ListFctBlockProposerEntity(
+	ctx context.Context,
+	req *cbtproto.ListFctBlockProposerEntityRequest,
+) (*cbtproto.ListFctBlockProposerEntityResponse, error) {
+	// Calculate SlotStartDateTime if not already set for more efficient queries.
+	if req.SlotStartDateTime == nil && req.Slot != nil {
+		req.SlotStartDateTime = x.calculateSlotStartDateTime(ctx, req.Slot)
+	}
+
+	return x.service.ListFctBlockProposerEntity(ctx, req)
 }

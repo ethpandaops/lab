@@ -50,6 +50,9 @@ importers:
       '@types/topojson-client':
         specifier: 3.1.5
         version: 3.1.5
+      city-timezones:
+        specifier: ^1.3.2
+        version: 1.3.2
       clsx:
         specifier: 2.0.0
         version: 2.0.0
@@ -1904,6 +1907,9 @@ packages:
 
   chardet@0.7.0:
     resolution: {integrity: sha512-mT8iDcrh03qDGRRmoA2hmBJnxpllMR+0/0qlzjqZES6NdiWDcZkCNAk4rPFZ9Q85r27unkiNNg8ZOiwZXBHwcA==}
+
+  city-timezones@1.3.2:
+    resolution: {integrity: sha512-XztdL/2EWpfmgRIOzrKVOWFp6VdmaD9FNTZPINlez1etIn0mMNn01RMmSfOp6LUP/h1M2ZLX80N1O+WKwhzC+w==}
 
   classnames@2.5.1:
     resolution: {integrity: sha512-saHYOzhIQs6wy2sVxTM6bUDsQO4F50V9RQ22qBpEdCW+I+/Wmke2HOl6lS6dTpdxVhb88/I6+Hs+438c3lfUow==}
@@ -6142,6 +6148,10 @@ snapshots:
     optional: true
 
   chardet@0.7.0: {}
+
+  city-timezones@1.3.2:
+    dependencies:
+      lodash: 4.17.21
 
   classnames@2.5.1: {}
 

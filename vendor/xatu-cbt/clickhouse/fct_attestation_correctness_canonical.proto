@@ -23,8 +23,10 @@ message FctAttestationCorrectnessCanonical {
   google.protobuf.StringValue block_root = 16;
   // The maximum number of scheduled votes for the block
   uint32 votes_max = 17;
-  // The number of actual votes for the block
-  google.protobuf.UInt32Value votes_actual = 18;
+  // The number of votes for the block proposed in the current slot
+  google.protobuf.UInt32Value votes_head = 18;
+  // The number of votes for any blocks proposed in previous slots
+  google.protobuf.UInt32Value votes_other = 19;
 }
 
 // ListFctAttestationCorrectnessCanonicalRequest is the request message for listing fct_attestation_correctness_canonical records
@@ -44,20 +46,22 @@ message ListFctAttestationCorrectnessCanonicalRequest {
   NullableStringFilter block_root = 6;
   // Filter by votes_max (optional)
   UInt32Filter votes_max = 7;
-  // Filter by votes_actual (optional)
-  NullableUInt32Filter votes_actual = 8;
+  // Filter by votes_head (optional)
+  NullableUInt32Filter votes_head = 8;
+  // Filter by votes_other (optional)
+  NullableUInt32Filter votes_other = 9;
 
   // The maximum number of fct_attestation_correctness_canonical to return.
   // If unspecified, at most 100 items will be returned.
   // The maximum value is 1000; values above 1000 will be coerced to 1000.
-  int32 page_size = 9;
+  int32 page_size = 10;
   // A page token, received from a previous `ListFctAttestationCorrectnessCanonical` call.
   // Provide this to retrieve the subsequent page.
-  string page_token = 10;
+  string page_token = 11;
   // The order of results. Format: comma-separated list of fields.
   // Example: "foo,bar" or "foo desc,bar" for descending order on foo.
   // If unspecified, results will be returned in the default order.
-  string order_by = 11;
+  string order_by = 12;
 }
 
 // ListFctAttestationCorrectnessCanonicalResponse is the response message for listing fct_attestation_correctness_canonical records

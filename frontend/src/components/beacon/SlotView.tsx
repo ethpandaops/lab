@@ -9,6 +9,8 @@ import { useModal } from '@/contexts/ModalContext.tsx';
 import useApi from '@/contexts/api';
 import { GetSlotDataRequest } from '@/api/gen/backend/pkg/api/proto/lab_api_pb';
 import { useQuery } from '@tanstack/react-query';
+import { useBeaconSlotData } from '@/hooks/useBeaconSlotData';
+import useApiMode from '@/contexts/apiMode';
 
 interface SlotViewProps {
   slot?: number;
@@ -56,13 +58,16 @@ export function SlotView({
   const { showModal } = useModal();
   const { client } = useApi();
 
-  // Use the new RPC method to fetch slot data
+  // Use global API mode context
+  const { useRestApi } = useApiMode();
+
+  // Old gRPC-based implementation
   const {
-    data: slotResponse,
-    isLoading,
-    error,
+    data: slotResponseGrpc,
+    isLoading: isLoadingGrpc,
+    error: errorGrpc,
   } = useQuery({
-    queryKey: ['slotData', network, slot],
+    queryKey: ['slotData-grpc', network, slot], // Different key to avoid conflicts
     queryFn: async () => {
       if (!slot) {
         throw new Error('No slot provided');
@@ -75,15 +80,39 @@ export function SlotView({
 
       return client.getSlotData(request);
     },
-    enabled: !!slot,
+    enabled: !!slot && !useRestApi,
   });
+
+  // New REST-based implementation
+  const {
+    data: slotResponseRest,
+    isLoading: isLoadingRest,
+    error: errorRest,
+  } = useBeaconSlotData(network, slot, isLive, useRestApi);
+
+  // Choose which data to use based on the flag
+  const slotResponse = useRestApi ? slotResponseRest : slotResponseGrpc;
+  const isLoading = useRestApi ? isLoadingRest : isLoadingGrpc;
+  const error = useRestApi ? errorRest : errorGrpc;
 
   // Extract the data from the response
   const slotData = slotResponse?.data;
 
+  // Debug: Log the full payload with API type
+  useEffect(() => {
+    if (slotData) {
+      console.log(`=== ${useRestApi ? 'REST' : 'gRPC'} API Payload ===`);
+      console.log(`Slot: ${slot}`);
+      console.log(`Network: ${network}`);
+      console.log('Full payload:', JSON.stringify(slotData.toJson(), null, 2));
+      console.log(`=== End ${useRestApi ? 'REST' : 'gRPC'} Payload ===`);
+    }
+  }, [slotData, useRestApi, slot, network]);
+
   // Optimistically fetch next slot data when we're close to the end
+  // Prefetch for gRPC
   useQuery({
-    queryKey: ['slotData', network, slot ? slot + 1 : null],
+    queryKey: ['slotData-grpc', network, slot ? slot + 1 : null], // Use gRPC key
     queryFn: async () => {
       if (!slot) {
         throw new Error('No slot provided');
@@ -96,9 +125,17 @@ export function SlotView({
 
       return client.getSlotData(request);
     },
-    enabled: !!slot && currentTime >= 11000,
+    enabled: !!slot && currentTime >= 11000 && !useRestApi, // Check REST API flag
     retry: false,
   });
+
+  // Prefetch for REST API
+  useBeaconSlotData(
+    network,
+    slot ? slot + 1 : undefined,
+    false, // not live
+    !!slot && currentTime >= 11000 && useRestApi, // Only enabled when using REST API and close to end
+  );
 
   // Timer effect for playback
   useEffect(() => {
@@ -477,7 +514,7 @@ export function SlotView({
             <div className="p-1.5">
               {/* Slot Header - Compact */}
               <div className="flex items-center justify-between mb-1">
-                <div>
+                <div className="flex items-center gap-2">
                   <div className="text-xl font-sans font-black text-primary">
                     <a
                       href={`https://beaconcha.in/slot/${slot}`}
@@ -697,14 +734,8 @@ export function SlotView({
                         0,
                       ) || 0;
 
-                    // Calculate participation based on actual attestations
-                    const maxPossibleValidators = slotData.attestations?.maximumVotes
-                      ? Number(slotData.attestations.maximumVotes)
-                      : 0;
-                    const participation =
-                      maxPossibleValidators > 0
-                        ? (totalAttestations / maxPossibleValidators) * 100
-                        : null;
+                    // Use pre-calculated participation from transformer
+                    const participation = (slotData as any).participationRate || null;
 
                     const hasMevRelay =
                       slotData?.deliveredPayloads &&
@@ -958,15 +989,17 @@ export function SlotView({
               <div className="p-4 space-y-4">
                 {/* Slot Header */}
                 <div className="mb-3 p-2">
-                  <div className="text-4xl font-sans font-black text-primary mb-1">
-                    <a
-                      href={`https://beaconcha.in/slot/${slot}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="hover:text-accent"
-                    >
-                      {slot}
-                    </a>
+                  <div className="flex items-center gap-3">
+                    <div className="text-4xl font-sans font-black text-primary">
+                      <a
+                        href={`https://beaconcha.in/slot/${slot}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="hover:text-accent"
+                      >
+                        {slot}
+                      </a>
+                    </div>
                   </div>
                   <div className="text-sm font-mono">
                     <span className="text-tertiary">
@@ -1093,14 +1126,8 @@ export function SlotView({
                           0,
                         ) || 0;
 
-                      // Calculate participation based on actual attestations
-                      const maxPossibleValidators = slotData.attestations?.maximumVotes
-                        ? Number(slotData.attestations.maximumVotes)
-                        : 0;
-                      const participation =
-                        maxPossibleValidators > 0
-                          ? (totalAttestations / maxPossibleValidators) * 100
-                          : null;
+                      // Use pre-calculated participation from transformer
+                      const participation = (slotData as any).participationRate || null;
 
                       const hasMevRelay =
                         slotData?.deliveredPayloads &&
