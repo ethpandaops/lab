@@ -87,7 +87,8 @@ export function transformToBeaconSlotData(data: TransformData): BeaconSlotData {
           data.proposerEntityResult.value.entities.find(e => e.blockRoot === blockRoot) ||
           data.proposerEntityResult.value.entities[0];
 
-        slotData.entity = entity.entityName || 'Unknown';
+        // ProposerEntity has 'entity' field, not 'entityName'
+        slotData.entity = entity.entity || 'Unknown';
       } else {
         // Fallback to entity from block if available
         slotData.entity = block.entity || 'Unknown';
@@ -156,7 +157,9 @@ function transformBlockData(block: BeaconBlock, slot: number, genesisTime?: numb
     stateRoot: block.stateRoot,
     proposerIndex: BigInt(block.proposerIndex || 0),
 
-    // ETH1 data fields (may be missing in REST)
+    // ETH1 data fields - Not provided by REST API and not used in UI
+    // These fields track the deposit contract from pre-merge Ethereum
+    // Setting to empty strings as they're not displayed anywhere in the UI
     eth1DataBlockHash: block.eth1BlockHash || '',
     eth1DataDepositRoot: block.eth1DepositRoot || '',
 
@@ -325,10 +328,19 @@ function buildTimings(data: TransformData): SlimTimings {
           node.client?.name || `${node.username || 'unknown'}/${data.network}/${node.nodeId}`;
 
         // Use explicit source field to determine if P2P or API
-        if (node.source === 'libp2p_gossipsub_beacon_block') {
+        // Handle both exact matches and substring matches for flexibility
+        if (
+          node.source === 'libp2p_gossipsub_beacon_block' ||
+          node.source?.includes('libp2p') ||
+          node.source?.includes('gossipsub')
+        ) {
           // P2P block (will be shown in purple)
           timings.blockFirstSeenP2p[fullNodeName] = ms;
-        } else if (node.source === 'beacon_api_eth_v1_events_block') {
+        } else if (
+          node.source === 'beacon_api_eth_v1_events_block' ||
+          node.source === 'beacon_api_eth_v1_events_block_gossip' ||
+          node.source?.includes('beacon_api')
+        ) {
           // API block
           timings.blockSeen[fullNodeName] = ms;
         } else {
@@ -350,15 +362,21 @@ function buildTimings(data: TransformData): SlimTimings {
           return;
         }
 
-        // Build the node name consistently using username/network/node_id
-        const fullNodeName = `${node.username || 'unknown'}/${data.network}/${node.nodeId}`;
+        // Build the node name consistently - use client.name if available, otherwise fallback
+        const fullNodeName =
+          node.client?.name || `${node.username || 'unknown'}/${data.network}/${node.nodeId}`;
 
         // If blobIndex is undefined, it means this is the first blob seen timing
         // We should still record it but maybe with index 0 or handle differently
         const blobIndexStr = node.blobIndex !== undefined ? String(node.blobIndex) : '0';
 
         // Use explicit source field to determine if P2P or API
-        if (node.source === 'libp2p_gossipsub_blob_sidecar') {
+        // Handle both exact matches and substring matches for flexibility
+        if (
+          node.source === 'libp2p_gossipsub_blob_sidecar' ||
+          node.source?.includes('libp2p') ||
+          node.source?.includes('gossipsub')
+        ) {
           // P2P blob
           if (!timings.blobFirstSeenP2p[fullNodeName]) {
             timings.blobFirstSeenP2p[fullNodeName] = new BlobTimingMap({ timings: {} });
@@ -370,7 +388,10 @@ function buildTimings(data: TransformData): SlimTimings {
           ) {
             timings.blobFirstSeenP2p[fullNodeName].timings[blobIndexStr] = ms;
           }
-        } else if (node.source === 'beacon_api_eth_v1_events_blob_sidecar') {
+        } else if (
+          node.source === 'beacon_api_eth_v1_events_blob_sidecar' ||
+          node.source?.includes('beacon_api')
+        ) {
           // API blob
           if (!timings.blobSeen[fullNodeName]) {
             timings.blobSeen[fullNodeName] = new BlobTimingMap({ timings: {} });
