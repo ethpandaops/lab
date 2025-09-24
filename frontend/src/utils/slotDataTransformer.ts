@@ -509,39 +509,96 @@ function buildMevData(data: TransformData): {
   // Process MEV block data (delivered payloads)
   if (data.mevBlockResult.status === 'fulfilled') {
     data.mevBlockResult.value.blocks?.forEach(mevBlock => {
-      if (mevBlock.relay) {
-        if (!deliveredPayloads[mevBlock.relay]) {
-          deliveredPayloads[mevBlock.relay] = new DeliveredPayloads({ payloads: [] });
-        }
+      // MEV blocks have relay_names array, not single relay field
+      if (mevBlock.relayNames && mevBlock.relayNames.length > 0) {
+        // Add payload to each relay that delivered it
+        mevBlock.relayNames.forEach(relayName => {
+          if (!deliveredPayloads[relayName]) {
+            deliveredPayloads[relayName] = new DeliveredPayloads({ payloads: [] });
+          }
 
-        deliveredPayloads[mevBlock.relay].payloads.push(
-          new DeliveredPayload({
-            blockHash: mevBlock.blockHash,
-            builderPubkey: mevBlock.builderPubkey,
-            proposerPubkey: '', // Not available in this endpoint
-            proposerFeeRecipient: mevBlock.proposerFeeRecipient,
-            value: mevBlock.value,
-            gasUsed: BigInt(mevBlock.gasUsed || 0),
-            gasLimit: BigInt(mevBlock.gasLimit || 0),
-            blockNumber: BigInt(mevBlock.blockNumber || 0),
-            numTx: BigInt(mevBlock.transactionCount || 0),
-          }),
-        );
+          deliveredPayloads[relayName].payloads.push(
+            new DeliveredPayload({
+              blockHash: mevBlock.blockHash,
+              builderPubkey: mevBlock.builderPubkey,
+              proposerPubkey: mevBlock.proposerPubkey || '', // Use if available
+              proposerFeeRecipient: mevBlock.proposerFeeRecipient,
+              value: mevBlock.value,
+              gasUsed: BigInt(mevBlock.gasUsed || 0),
+              gasLimit: BigInt(mevBlock.gasLimit || 0),
+              blockNumber: BigInt(mevBlock.blockNumber || 0),
+              numTx: BigInt(mevBlock.transactionCount || 0),
+            }),
+          );
+        });
       }
     });
   }
 
-  // Process relay bid data
-  if (data.mevRelayResult.status === 'fulfilled') {
-    // TODO: Transform relay bid counts to bid data
-    // This endpoint provides aggregated counts, not individual bids
-    // May need to combine with builder data
+  // Process builder bid data to populate relay bids
+  if (data.mevBuilderResult.status === 'fulfilled') {
+    data.mevBuilderResult.value.builders?.forEach(builder => {
+      // Each builder bid can be associated with multiple relays
+      if (builder.relayNames && builder.relayNames.length > 0) {
+        builder.relayNames.forEach(relayName => {
+          if (!relayBids[relayName]) {
+            relayBids[relayName] = new RelayBids({ bids: [] });
+          }
+
+          // Calculate slotTime (relative time from slot start)
+          // NOTE: The REST API's earliestBidTime appears to be the slot start time,
+          // not the actual bid submission time. This is likely a backend data issue.
+          // The gRPC API has a proper slotTime field that shows the actual bid timing.
+          // Until this is fixed in the backend, MEV bid times will show as 0.00s.
+          let slotTime = 0;
+          if (builder.earliestBidTime) {
+            const bidTimeMs = new Date(builder.earliestBidTime).getTime();
+            const slotStartMs = calculateSlotStartTime(data.slot, data.genesisTime) * 1000; // Convert to ms
+            slotTime = bidTimeMs - slotStartMs;
+
+            // This will typically be 0 or very close to 0 due to the backend data issue
+            if (Math.abs(slotTime) < 100) {
+              // Less than 100ms difference
+              console.warn('MEV bid time appears to be slot start time, not actual bid time:', {
+                slot: data.slot,
+                earliestBidTime: builder.earliestBidTime,
+                slotTime,
+              });
+            }
+          }
+
+          // Convert timestamp to milliseconds if provided
+          const timestampMs = builder.earliestBidTime
+            ? BigInt(new Date(builder.earliestBidTime).getTime())
+            : BigInt(0);
+
+          relayBids[relayName].bids.push(
+            new RelayBid({
+              slot: BigInt(data.slot),
+              blockHash: builder.blockHash,
+              parentHash: '', // Not available in builder endpoint
+              builderPubkey: '', // Not available in builder endpoint
+              proposerPubkey: '', // Not available in builder endpoint
+              proposerFeeRecipient: '', // Not available in builder endpoint
+              value: builder.value,
+              gasUsed: BigInt(0), // Not available in builder endpoint
+              gasLimit: BigInt(0), // Not available in builder endpoint
+              numTx: BigInt(0), // Not available in builder endpoint
+              slotTime: slotTime,
+              timeBucket: 0, // Not used
+              timestamp: builder.earliestBidTime || '',
+              timestampMs: timestampMs,
+            }),
+          );
+        });
+      }
+    });
   }
 
-  // Process builder bid data
-  if (data.mevBuilderResult.status === 'fulfilled') {
-    // TODO: Transform builder bid data
-    // Combine with relay data to form complete bid picture
+  // Process relay bid count data (informational only)
+  if (data.mevRelayResult.status === 'fulfilled') {
+    // This endpoint provides aggregated bid counts per relay
+    // We use the builder endpoint above for actual bid details
   }
 
   return { relayBids, deliveredPayloads };
