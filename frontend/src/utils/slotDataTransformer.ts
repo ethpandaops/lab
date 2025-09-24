@@ -211,19 +211,27 @@ function extractNodesFromTiming(
       node.client?.name ||
       `${node.username || 'unknown'}/${timing.filters?.network || 'mainnet'}/${node.nodeId}`;
 
-    // Get coordinates from city lookup
+    // Get coordinates from city lookup (with country and continent fallbacks)
     let latitude: number | undefined;
     let longitude: number | undefined;
 
     if (node.geo?.city && node.geo?.country) {
+      // getCityCoordinates now handles city -> country -> undefined fallback
       const coords = getCityCoordinates(node.geo.city, node.geo.country);
+      if (coords) {
+        latitude = coords.lat;
+        longitude = coords.lng;
+      }
+    } else if (node.geo?.country) {
+      // No city provided, try country directly
+      const coords = getCityCoordinates('', node.geo.country);
       if (coords) {
         latitude = coords.lat;
         longitude = coords.lng;
       }
     }
 
-    // Fallback to continent coordinates if no city coords found
+    // Final fallback to continent coordinates if no city/country coords found
     if (!latitude && !longitude && node.geo?.continentCode) {
       const coords = getContinentCoordinates(node.geo.continentCode);
       latitude = coords.lat;

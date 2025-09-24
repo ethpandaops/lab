@@ -54,7 +54,7 @@ export function useBeaconSlotData(
       ] = await Promise.allSettled([
         client.getBeaconBlock(network, slot),
         client.getBeaconBlockTiming(network, slot),
-        client.getBeaconBlobTiming(network, slot),
+        client.getBeaconBlobTiming(network, slot, { limit: 1000 }), // Get all blob indices
         client.getBeaconBlobTotal(network, slot),
         client.getBeaconAttestationTiming(network, slot),
         client.getBeaconAttestationCorrectness(network, slot),
