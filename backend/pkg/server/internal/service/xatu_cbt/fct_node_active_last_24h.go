@@ -8,6 +8,7 @@ import (
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/clickhouse"
 	cbtproto "github.com/ethpandaops/xatu-cbt/pkg/proto/clickhouse"
 	"github.com/prometheus/client_golang/prometheus"
+	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
 const (
@@ -118,6 +119,10 @@ func scanFctNodeActiveLast24h(
 	var (
 		node                              cbtproto.FctNodeActiveLast24H
 		updatedDateTime, lastSeenDateTime time.Time
+		geoLongitude                      *float64
+		geoLatitude                       *float64
+		geoAsNumber                       *uint32
+		geoAsOrg                          *string
 	)
 
 	if err := scanner.Scan(
@@ -133,6 +138,10 @@ func scanFctNodeActiveLast24h(
 		&node.MetaClientGeoCountry,
 		&node.MetaClientGeoCountryCode,
 		&node.MetaClientGeoContinentCode,
+		&geoLongitude,
+		&geoLatitude,
+		&geoAsNumber,
+		&geoAsOrg,
 		&node.MetaConsensusVersion,
 		&node.MetaConsensusImplementation,
 	); err != nil {
@@ -141,6 +150,23 @@ func scanFctNodeActiveLast24h(
 
 	node.UpdatedDateTime = uint32(updatedDateTime.Unix())   //nolint:gosec // safe.
 	node.LastSeenDateTime = uint32(lastSeenDateTime.Unix()) //nolint:gosec // safe.
+
+	// Convert nullable fields to protobuf wrappers
+	if geoLongitude != nil {
+		node.MetaClientGeoLongitude = wrapperspb.Double(*geoLongitude)
+	}
+
+	if geoLatitude != nil {
+		node.MetaClientGeoLatitude = wrapperspb.Double(*geoLatitude)
+	}
+
+	if geoAsNumber != nil {
+		node.MetaClientGeoAutonomousSystemNumber = wrapperspb.UInt32(*geoAsNumber)
+	}
+
+	if geoAsOrg != nil {
+		node.MetaClientGeoAutonomousSystemOrganization = wrapperspb.String(*geoAsOrg)
+	}
 
 	return &node, nil
 }

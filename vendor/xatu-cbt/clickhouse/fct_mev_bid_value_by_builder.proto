@@ -35,24 +35,23 @@ message ListFctMevBidValueByBuilderRequest {
   // Filter by slot_start_date_time (PRIMARY KEY - required)
   UInt32Filter slot_start_date_time = 1;
 
-  // Filter by block_hash (ORDER BY column 2 - optional)
-  StringFilter block_hash = 2;
-
-  // Filter by builder_pubkey (ORDER BY column 3 - optional)
-  StringFilter builder_pubkey = 3;
+  // Filter by builder_pubkey (ORDER BY column 2 - optional)
+  StringFilter builder_pubkey = 2;
 
   // Filter by updated_date_time (optional)
-  UInt32Filter updated_date_time = 4;
+  UInt32Filter updated_date_time = 3;
   // Filter by slot (optional)
-  UInt32Filter slot = 5;
+  UInt32Filter slot = 4;
   // Filter by epoch (optional)
-  UInt32Filter epoch = 6;
+  UInt32Filter epoch = 5;
   // Filter by epoch_start_date_time (optional)
-  UInt32Filter epoch_start_date_time = 7;
+  UInt32Filter epoch_start_date_time = 6;
   // Filter by earliest_bid_date_time (optional)
-  UInt64Filter earliest_bid_date_time = 8;
+  UInt64Filter earliest_bid_date_time = 7;
   // Filter by relay_names (optional)
-  repeated string relay_names = 9;
+  repeated string relay_names = 8;
+  // Filter by block_hash (optional)
+  StringFilter block_hash = 9;
   // Filter by value (optional)
   StringFilter value = 10;
 

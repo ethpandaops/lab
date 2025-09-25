@@ -132,60 +132,60 @@ export class ListFctMevBidValueByBuilderRequest extends Message<ListFctMevBidVal
   slotStartDateTime?: UInt32Filter;
 
   /**
-   * Filter by block_hash (ORDER BY column 2 - optional)
+   * Filter by builder_pubkey (ORDER BY column 2 - optional)
    *
-   * @generated from field: cbt.StringFilter block_hash = 2;
-   */
-  blockHash?: StringFilter;
-
-  /**
-   * Filter by builder_pubkey (ORDER BY column 3 - optional)
-   *
-   * @generated from field: cbt.StringFilter builder_pubkey = 3;
+   * @generated from field: cbt.StringFilter builder_pubkey = 2;
    */
   builderPubkey?: StringFilter;
 
   /**
    * Filter by updated_date_time (optional)
    *
-   * @generated from field: cbt.UInt32Filter updated_date_time = 4;
+   * @generated from field: cbt.UInt32Filter updated_date_time = 3;
    */
   updatedDateTime?: UInt32Filter;
 
   /**
    * Filter by slot (optional)
    *
-   * @generated from field: cbt.UInt32Filter slot = 5;
+   * @generated from field: cbt.UInt32Filter slot = 4;
    */
   slot?: UInt32Filter;
 
   /**
    * Filter by epoch (optional)
    *
-   * @generated from field: cbt.UInt32Filter epoch = 6;
+   * @generated from field: cbt.UInt32Filter epoch = 5;
    */
   epoch?: UInt32Filter;
 
   /**
    * Filter by epoch_start_date_time (optional)
    *
-   * @generated from field: cbt.UInt32Filter epoch_start_date_time = 7;
+   * @generated from field: cbt.UInt32Filter epoch_start_date_time = 6;
    */
   epochStartDateTime?: UInt32Filter;
 
   /**
    * Filter by earliest_bid_date_time (optional)
    *
-   * @generated from field: cbt.UInt64Filter earliest_bid_date_time = 8;
+   * @generated from field: cbt.UInt64Filter earliest_bid_date_time = 7;
    */
   earliestBidDateTime?: UInt64Filter;
 
   /**
    * Filter by relay_names (optional)
    *
-   * @generated from field: repeated string relay_names = 9;
+   * @generated from field: repeated string relay_names = 8;
    */
   relayNames: string[] = [];
+
+  /**
+   * Filter by block_hash (optional)
+   *
+   * @generated from field: cbt.StringFilter block_hash = 9;
+   */
+  blockHash?: StringFilter;
 
   /**
    * Filter by value (optional)
@@ -229,14 +229,14 @@ export class ListFctMevBidValueByBuilderRequest extends Message<ListFctMevBidVal
   static readonly typeName = "cbt.ListFctMevBidValueByBuilderRequest";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "slot_start_date_time", kind: "message", T: UInt32Filter },
-    { no: 2, name: "block_hash", kind: "message", T: StringFilter },
-    { no: 3, name: "builder_pubkey", kind: "message", T: StringFilter },
-    { no: 4, name: "updated_date_time", kind: "message", T: UInt32Filter },
-    { no: 5, name: "slot", kind: "message", T: UInt32Filter },
-    { no: 6, name: "epoch", kind: "message", T: UInt32Filter },
-    { no: 7, name: "epoch_start_date_time", kind: "message", T: UInt32Filter },
-    { no: 8, name: "earliest_bid_date_time", kind: "message", T: UInt64Filter },
-    { no: 9, name: "relay_names", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+    { no: 2, name: "builder_pubkey", kind: "message", T: StringFilter },
+    { no: 3, name: "updated_date_time", kind: "message", T: UInt32Filter },
+    { no: 4, name: "slot", kind: "message", T: UInt32Filter },
+    { no: 5, name: "epoch", kind: "message", T: UInt32Filter },
+    { no: 6, name: "epoch_start_date_time", kind: "message", T: UInt32Filter },
+    { no: 7, name: "earliest_bid_date_time", kind: "message", T: UInt64Filter },
+    { no: 8, name: "relay_names", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+    { no: 9, name: "block_hash", kind: "message", T: StringFilter },
     { no: 10, name: "value", kind: "message", T: StringFilter },
     { no: 11, name: "page_size", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
     { no: 12, name: "page_token", kind: "scalar", T: 9 /* ScalarType.STRING */ },
