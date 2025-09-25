@@ -1045,11 +1045,11 @@ export class MevBuilderBid extends Message<MevBuilderBid> {
   builderPubkey = "";
 
   /**
-   * Earliest bid timestamp (ISO 8601)
+   * Milliseconds from slot start (negative if before slot, positive if after)
    *
-   * @generated from field: string earliest_bid_time = 5;
+   * @generated from field: int32 earliest_bid_from_slot_start = 5;
    */
-  earliestBidTime = "";
+  earliestBidFromSlotStart = 0;
 
   constructor(data?: PartialMessage<MevBuilderBid>) {
     super();
@@ -1063,7 +1063,7 @@ export class MevBuilderBid extends Message<MevBuilderBid> {
     { no: 2, name: "value", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 3, name: "relay_names", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
     { no: 4, name: "builder_pubkey", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 5, name: "earliest_bid_time", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 5, name: "earliest_bid_from_slot_start", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): MevBuilderBid {

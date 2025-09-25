@@ -1175,7 +1175,7 @@ func TestHandleMevBuilderBid(t *testing.T) {
 				assert.Len(t, response.Builders[0].RelayNames, 2)
 				assert.Contains(t, response.Builders[0].RelayNames, "flashbots")
 				assert.Contains(t, response.Builders[0].RelayNames, "bloxroute")
-				assert.NotEmpty(t, response.Builders[0].EarliestBidTime)
+				assert.Equal(t, int32(-877), response.Builders[0].EarliestBidFromSlotStart)
 
 				// Check second builder bid
 				assert.Equal(t, "0xabcdef1234567890", response.Builders[1].BlockHash)
@@ -1320,6 +1320,7 @@ func TestTransformCBTToAPIMevBuilderBid(t *testing.T) {
 		BlockHash:           "0xdeadbeef",
 		Value:               "200000000000000000",
 		RelayNames:          []string{"flashbots", "bloxroute", "ultrasound"},
+		SlotStartDateTime:   1734307488,
 		EarliestBidDateTime: 1734307487123,
 	}
 
@@ -1332,11 +1333,7 @@ func TestTransformCBTToAPIMevBuilderBid(t *testing.T) {
 	assert.Contains(t, result.RelayNames, "flashbots")
 	assert.Contains(t, result.RelayNames, "bloxroute")
 	assert.Contains(t, result.RelayNames, "ultrasound")
-	assert.NotEmpty(t, result.EarliestBidTime)
-
-	// Verify timestamp format is ISO 8601
-	assert.Contains(t, result.EarliestBidTime, "T")
-	assert.Contains(t, result.EarliestBidTime, "Z")
+	assert.Equal(t, int32(-877), result.EarliestBidFromSlotStart)
 }
 
 func TestHandleBeaconSlotProposerEntity(t *testing.T) {

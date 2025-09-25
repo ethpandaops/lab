@@ -964,11 +964,15 @@ func (r *PublicRouter) handleMevBuilderBid(w http.ResponseWriter, req *http.Requ
 
 // transformCBTToAPIMevBuilderBid transforms CBT types to public API types.
 func transformCBTToAPIMevBuilderBid(cbt *cbtproto.FctMevBidValueByBuilder) *apiv1.MevBuilderBid {
+	slotStartMs := int64(cbt.SlotStartDateTime) * 1000
+	earliestBidMs := int64(cbt.EarliestBidDateTime) //nolint:gosec // safe conversion, timestamp values are within int64 range
+	diffMs := int32(earliestBidMs - slotStartMs)    //nolint:gosec // safe conversion, diff is typically -4000 to +12000 ms
+
 	return &apiv1.MevBuilderBid{
-		BlockHash:       cbt.BlockHash,
-		Value:           cbt.Value,
-		RelayNames:      cbt.RelayNames,
-		EarliestBidTime: formatTimestamp(int64(cbt.EarliestBidDateTime)), //nolint:gosec // safe timestamp conversion
+		BlockHash:                cbt.BlockHash,
+		Value:                    cbt.Value,
+		RelayNames:               cbt.RelayNames,
+		EarliestBidFromSlotStart: diffMs,
 	}
 }
 
