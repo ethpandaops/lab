@@ -365,7 +365,7 @@ type ListFctBlockHeadRequest struct {
 	ExecutionPayloadTransactionsTotalBytesCompressed *NullableUInt32Filter `protobuf:"bytes,27,opt,name=execution_payload_transactions_total_bytes_compressed,json=executionPayloadTransactionsTotalBytesCompressed,proto3" json:"execution_payload_transactions_total_bytes_compressed,omitempty"`
 	// The maximum number of fct_block_head to return.
 	// If unspecified, at most 100 items will be returned.
-	// The maximum value is 1000; values above 1000 will be coerced to 1000.
+	// The maximum value is 10000; values above 10000 will be coerced to 10000.
 	PageSize int32 `protobuf:"varint,28,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
 	// A page token, received from a previous `ListFctBlockHead` call.
 	// Provide this to retrieve the subsequent page.

@@ -4,8 +4,8 @@
 // @ts-nocheck
 
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
-import { Message, proto3 } from "@bufbuild/protobuf";
-import { StringFilter, UInt32Filter } from "./common_pb.js";
+import { DoubleValue, Message, proto3, StringValue, UInt32Value } from "@bufbuild/protobuf";
+import { NullableStringFilter, NullableUInt32Filter, StringFilter, UInt32Filter } from "./common_pb.js";
 
 /**
  * @generated from message cbt.FctNodeActiveLast24h
@@ -96,16 +96,44 @@ export class FctNodeActiveLast24h extends Message<FctNodeActiveLast24h> {
   metaClientGeoContinentCode = "";
 
   /**
+   * Longitude of the client
+   *
+   * @generated from field: google.protobuf.DoubleValue meta_client_geo_longitude = 23;
+   */
+  metaClientGeoLongitude?: number;
+
+  /**
+   * Latitude of the client
+   *
+   * @generated from field: google.protobuf.DoubleValue meta_client_geo_latitude = 24;
+   */
+  metaClientGeoLatitude?: number;
+
+  /**
+   * Autonomous system number of the client
+   *
+   * @generated from field: google.protobuf.UInt32Value meta_client_geo_autonomous_system_number = 25;
+   */
+  metaClientGeoAutonomousSystemNumber?: number;
+
+  /**
+   * Autonomous system organization of the client
+   *
+   * @generated from field: google.protobuf.StringValue meta_client_geo_autonomous_system_organization = 26;
+   */
+  metaClientGeoAutonomousSystemOrganization?: string;
+
+  /**
    * Ethereum consensus client version
    *
-   * @generated from field: string meta_consensus_version = 23;
+   * @generated from field: string meta_consensus_version = 27;
    */
   metaConsensusVersion = "";
 
   /**
    * Ethereum consensus client implementation
    *
-   * @generated from field: string meta_consensus_implementation = 24;
+   * @generated from field: string meta_consensus_implementation = 28;
    */
   metaConsensusImplementation = "";
 
@@ -129,8 +157,12 @@ export class FctNodeActiveLast24h extends Message<FctNodeActiveLast24h> {
     { no: 20, name: "meta_client_geo_country", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 21, name: "meta_client_geo_country_code", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 22, name: "meta_client_geo_continent_code", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 23, name: "meta_consensus_version", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 24, name: "meta_consensus_implementation", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 23, name: "meta_client_geo_longitude", kind: "message", T: DoubleValue },
+    { no: 24, name: "meta_client_geo_latitude", kind: "message", T: DoubleValue },
+    { no: 25, name: "meta_client_geo_autonomous_system_number", kind: "message", T: UInt32Value },
+    { no: 26, name: "meta_client_geo_autonomous_system_organization", kind: "message", T: StringValue },
+    { no: 27, name: "meta_consensus_version", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 28, name: "meta_consensus_implementation", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): FctNodeActiveLast24h {
@@ -241,25 +273,53 @@ export class ListFctNodeActiveLast24hRequest extends Message<ListFctNodeActiveLa
   metaClientGeoContinentCode?: StringFilter;
 
   /**
+   * Filter by meta_client_geo_longitude (optional)
+   *
+   * @generated from field: google.protobuf.DoubleValue meta_client_geo_longitude = 13;
+   */
+  metaClientGeoLongitude?: number;
+
+  /**
+   * Filter by meta_client_geo_latitude (optional)
+   *
+   * @generated from field: google.protobuf.DoubleValue meta_client_geo_latitude = 14;
+   */
+  metaClientGeoLatitude?: number;
+
+  /**
+   * Filter by meta_client_geo_autonomous_system_number (optional)
+   *
+   * @generated from field: cbt.NullableUInt32Filter meta_client_geo_autonomous_system_number = 15;
+   */
+  metaClientGeoAutonomousSystemNumber?: NullableUInt32Filter;
+
+  /**
+   * Filter by meta_client_geo_autonomous_system_organization (optional)
+   *
+   * @generated from field: cbt.NullableStringFilter meta_client_geo_autonomous_system_organization = 16;
+   */
+  metaClientGeoAutonomousSystemOrganization?: NullableStringFilter;
+
+  /**
    * Filter by meta_consensus_version (optional)
    *
-   * @generated from field: cbt.StringFilter meta_consensus_version = 13;
+   * @generated from field: cbt.StringFilter meta_consensus_version = 17;
    */
   metaConsensusVersion?: StringFilter;
 
   /**
    * Filter by meta_consensus_implementation (optional)
    *
-   * @generated from field: cbt.StringFilter meta_consensus_implementation = 14;
+   * @generated from field: cbt.StringFilter meta_consensus_implementation = 18;
    */
   metaConsensusImplementation?: StringFilter;
 
   /**
    * The maximum number of fct_node_active_last_24h to return.
    * If unspecified, at most 100 items will be returned.
-   * The maximum value is 1000; values above 1000 will be coerced to 1000.
+   * The maximum value is 10000; values above 10000 will be coerced to 10000.
    *
-   * @generated from field: int32 page_size = 15;
+   * @generated from field: int32 page_size = 19;
    */
   pageSize = 0;
 
@@ -267,7 +327,7 @@ export class ListFctNodeActiveLast24hRequest extends Message<ListFctNodeActiveLa
    * A page token, received from a previous `ListFctNodeActiveLast24h` call.
    * Provide this to retrieve the subsequent page.
    *
-   * @generated from field: string page_token = 16;
+   * @generated from field: string page_token = 20;
    */
   pageToken = "";
 
@@ -276,7 +336,7 @@ export class ListFctNodeActiveLast24hRequest extends Message<ListFctNodeActiveLa
    * Example: "foo,bar" or "foo desc,bar" for descending order on foo.
    * If unspecified, results will be returned in the default order.
    *
-   * @generated from field: string order_by = 17;
+   * @generated from field: string order_by = 21;
    */
   orderBy = "";
 
@@ -300,11 +360,15 @@ export class ListFctNodeActiveLast24hRequest extends Message<ListFctNodeActiveLa
     { no: 10, name: "meta_client_geo_country", kind: "message", T: StringFilter },
     { no: 11, name: "meta_client_geo_country_code", kind: "message", T: StringFilter },
     { no: 12, name: "meta_client_geo_continent_code", kind: "message", T: StringFilter },
-    { no: 13, name: "meta_consensus_version", kind: "message", T: StringFilter },
-    { no: 14, name: "meta_consensus_implementation", kind: "message", T: StringFilter },
-    { no: 15, name: "page_size", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
-    { no: 16, name: "page_token", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 17, name: "order_by", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 13, name: "meta_client_geo_longitude", kind: "message", T: DoubleValue },
+    { no: 14, name: "meta_client_geo_latitude", kind: "message", T: DoubleValue },
+    { no: 15, name: "meta_client_geo_autonomous_system_number", kind: "message", T: NullableUInt32Filter },
+    { no: 16, name: "meta_client_geo_autonomous_system_organization", kind: "message", T: NullableStringFilter },
+    { no: 17, name: "meta_consensus_version", kind: "message", T: StringFilter },
+    { no: 18, name: "meta_consensus_implementation", kind: "message", T: StringFilter },
+    { no: 19, name: "page_size", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 20, name: "page_token", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 21, name: "order_by", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ListFctNodeActiveLast24hRequest {

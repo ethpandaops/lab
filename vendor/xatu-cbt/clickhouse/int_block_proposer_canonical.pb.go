@@ -156,7 +156,7 @@ type ListIntBlockProposerCanonicalRequest struct {
 	BlockRoot *NullableStringFilter `protobuf:"bytes,8,opt,name=block_root,json=blockRoot,proto3" json:"block_root,omitempty"`
 	// The maximum number of int_block_proposer_canonical to return.
 	// If unspecified, at most 100 items will be returned.
-	// The maximum value is 1000; values above 1000 will be coerced to 1000.
+	// The maximum value is 10000; values above 10000 will be coerced to 10000.
 	PageSize int32 `protobuf:"varint,9,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
 	// A page token, received from a previous `ListIntBlockProposerCanonical` call.
 	// Provide this to retrieve the subsequent page.

@@ -221,7 +221,7 @@ type ListIntAttestationAttestedHeadRequest struct {
 	PropagationDistance *UInt32Filter `protobuf:"bytes,14,opt,name=propagation_distance,json=propagationDistance,proto3" json:"propagation_distance,omitempty"`
 	// The maximum number of int_attestation_attested_head to return.
 	// If unspecified, at most 100 items will be returned.
-	// The maximum value is 1000; values above 1000 will be coerced to 1000.
+	// The maximum value is 10000; values above 10000 will be coerced to 10000.
 	PageSize int32 `protobuf:"varint,15,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
 	// A page token, received from a previous `ListIntAttestationAttestedHead` call.
 	// Provide this to retrieve the subsequent page.

@@ -145,7 +145,8 @@ message MevBuilderBid {
   string block_hash = 1;                // Execution block hash
   string value = 2;                     // Bid value in wei
   repeated string relay_names = 3;      // Relays that received the bid
-  string earliest_bid_time = 4;         // Earliest bid timestamp (ISO 8601)
+  string builder_pubkey = 4;
+  string earliest_bid_time = 5;         // Earliest bid timestamp (ISO 8601)
 }
 
 // Error response.
@@ -325,13 +326,13 @@ message BeaconBlock {
   string block_root = 1;              // The root hash of the beacon block
   string parent_root = 2;             // The root hash of the parent block
   string state_root = 3;              // The root hash of the beacon state
-  
+
   // Block metadata
   uint32 proposer_index = 4;          // Validator index who proposed the block
   string block_version = 5;           // Block version (e.g., phase0, altair, bellatrix)
   uint32 block_total_bytes = 6;       // Total size of the block in bytes
   uint32 block_total_bytes_compressed = 7; // Compressed size using snappy
-  
+
   // Execution payload information
   string execution_block_hash = 8;    // Execution layer block hash
   uint32 execution_block_number = 9;  // Execution layer block number

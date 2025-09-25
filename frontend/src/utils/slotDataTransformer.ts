@@ -585,7 +585,7 @@ function buildMevData(data: TransformData): {
             slot: BigInt(data.slot),
             parentHash: '', // Not available from builder endpoint
             blockHash: builderBid.blockHash || '',
-            builderPubkey: '', // Not available from builder endpoint
+            builderPubkey: builderBid.builderPubkey || builderBid.blockHash || '', // Use actual builder pubkey if available, otherwise fall back to block hash
             proposerPubkey: '', // Not available from builder endpoint
             proposerFeeRecipient: '', // Not available from builder endpoint
             value: builderBid.value || '0',
@@ -615,7 +615,7 @@ function buildMevData(data: TransformData): {
               slot: BigInt(data.slot),
               parentHash: '', // Not available from builder endpoint
               blockHash: builderBid.blockHash || '',
-              builderPubkey: '', // Not available from builder endpoint
+              builderPubkey: builderBid.builderPubkey || builderBid.blockHash || '', // Use actual builder pubkey if available, otherwise fall back to block hash
               proposerPubkey: '', // Not available from builder endpoint
               proposerFeeRecipient: '', // Not available from builder endpoint
               value: builderBid.value || '0',

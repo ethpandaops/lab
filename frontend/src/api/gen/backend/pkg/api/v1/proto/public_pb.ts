@@ -928,9 +928,14 @@ export class MevBuilderBid extends Message<MevBuilderBid> {
   relayNames: string[] = [];
 
   /**
+   * @generated from field: string builder_pubkey = 4;
+   */
+  builderPubkey = "";
+
+  /**
    * Earliest bid timestamp (ISO 8601)
    *
-   * @generated from field: string earliest_bid_time = 4;
+   * @generated from field: string earliest_bid_time = 5;
    */
   earliestBidTime = "";
 
@@ -945,7 +950,8 @@ export class MevBuilderBid extends Message<MevBuilderBid> {
     { no: 1, name: "block_hash", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 2, name: "value", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 3, name: "relay_names", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
-    { no: 4, name: "earliest_bid_time", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "builder_pubkey", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 5, name: "earliest_bid_time", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): MevBuilderBid {
