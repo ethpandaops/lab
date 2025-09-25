@@ -258,6 +258,16 @@ export class GeoInfo extends Message<GeoInfo> {
    */
   continentCode = "";
 
+  /**
+   * @generated from field: optional double latitude = 5;
+   */
+  latitude?: number;
+
+  /**
+   * @generated from field: optional double longitude = 6;
+   */
+  longitude?: number;
+
   constructor(data?: PartialMessage<GeoInfo>) {
     super();
     proto3.util.initPartial(data, this);
@@ -270,6 +280,8 @@ export class GeoInfo extends Message<GeoInfo> {
     { no: 2, name: "country", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 3, name: "country_code", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 4, name: "continent_code", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 5, name: "latitude", kind: "scalar", T: 1 /* ScalarType.DOUBLE */, opt: true },
+    { no: 6, name: "longitude", kind: "scalar", T: 1 /* ScalarType.DOUBLE */, opt: true },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GeoInfo {

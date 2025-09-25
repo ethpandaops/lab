@@ -57,6 +57,8 @@ message GeoInfo {
   string country = 2;
   string country_code = 3;
   string continent_code = 4;
+  optional double latitude = 5;
+  optional double longitude = 6;
 }
 
 // ConsensusInfo groups consensus client metadata.

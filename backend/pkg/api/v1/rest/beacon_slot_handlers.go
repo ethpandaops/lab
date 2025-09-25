@@ -104,16 +104,30 @@ func (r *PublicRouter) handleBeaconBlockTiming(w http.ResponseWriter, req *http.
 	nodes := make([]*apiv1.BlockTimingNode, 0, len(grpcResp.FctBlockFirstSeenByNode))
 
 	for _, n := range grpcResp.FctBlockFirstSeenByNode {
+		geo := &apiv1.GeoInfo{
+			City:          n.MetaClientGeoCity,
+			Country:       n.MetaClientGeoCountry,
+			CountryCode:   n.MetaClientGeoCountryCode,
+			ContinentCode: n.MetaClientGeoContinentCode,
+		}
+
+		// Add latitude if present
+		if n.MetaClientGeoLatitude != nil {
+			lat := n.MetaClientGeoLatitude.GetValue()
+			geo.Latitude = &lat
+		}
+
+		// Add longitude if present
+		if n.MetaClientGeoLongitude != nil {
+			lon := n.MetaClientGeoLongitude.GetValue()
+			geo.Longitude = &lon
+		}
+
 		nodes = append(nodes, &apiv1.BlockTimingNode{
 			NodeId:            n.NodeId,
 			Username:          n.Username,
 			SeenSlotStartDiff: n.SeenSlotStartDiff,
-			Geo: &apiv1.GeoInfo{
-				City:          n.MetaClientGeoCity,
-				Country:       n.MetaClientGeoCountry,
-				CountryCode:   n.MetaClientGeoCountryCode,
-				ContinentCode: n.MetaClientGeoContinentCode,
-			},
+			Geo:               geo,
 			Client: &apiv1.ClientInfo{
 				Name:           n.MetaClientName,
 				Version:        n.MetaClientVersion,
@@ -1099,18 +1113,32 @@ func (r *PublicRouter) handleBeaconBlobTiming(w http.ResponseWriter, req *http.R
 
 // transformCBTToAPIBlobTimingNode transforms CBT blob timing types to public API types
 func transformCBTToAPIBlobTimingNode(cbt *cbtproto.FctBlockBlobFirstSeenByNode) *apiv1.BlobTimingNode {
+	geo := &apiv1.GeoInfo{
+		City:          cbt.MetaClientGeoCity,
+		Country:       cbt.MetaClientGeoCountry,
+		CountryCode:   cbt.MetaClientGeoCountryCode,
+		ContinentCode: cbt.MetaClientGeoContinentCode,
+	}
+
+	// Add latitude if present
+	if cbt.MetaClientGeoLatitude != nil {
+		lat := cbt.MetaClientGeoLatitude.GetValue()
+		geo.Latitude = &lat
+	}
+
+	// Add longitude if present
+	if cbt.MetaClientGeoLongitude != nil {
+		lon := cbt.MetaClientGeoLongitude.GetValue()
+		geo.Longitude = &lon
+	}
+
 	return &apiv1.BlobTimingNode{
 		NodeId:            cbt.NodeId,
 		Username:          cbt.Username,
 		SeenSlotStartDiff: cbt.SeenSlotStartDiff,
 		BlobIndex:         cbt.BlobIndex,
 		BlockRoot:         cbt.BlockRoot,
-		Geo: &apiv1.GeoInfo{
-			City:          cbt.MetaClientGeoCity,
-			Country:       cbt.MetaClientGeoCountry,
-			CountryCode:   cbt.MetaClientGeoCountryCode,
-			ContinentCode: cbt.MetaClientGeoContinentCode,
-		},
+		Geo:               geo,
 		Client: &apiv1.ClientInfo{
 			Name:           cbt.MetaClientName,
 			Version:        cbt.MetaClientVersion,

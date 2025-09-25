@@ -32,7 +32,6 @@ import {
   MevBlock,
 } from '@/api/gen/backend/pkg/api/v1/proto/public_pb';
 import { protoInt64 } from '@bufbuild/protobuf';
-import { getCityCoordinates, getContinentCoordinates } from './cityCoordinates';
 
 interface TransformData {
   network: string;
@@ -196,9 +195,7 @@ function transformBlockData(block: BeaconBlock, slot: number, genesisTime?: numb
 
 /**
  * Extract nodes from block timing response
- * NOTE: REST API doesn't provide latitude/longitude coordinates in GeoInfo
- * This means the map visualization won't show nodes at correct positions
- * TODO: Need to get coordinate data from another source or update the API
+ * REST API now provides latitude/longitude coordinates in GeoInfo
  */
 function extractNodesFromTiming(
   timing: ListBeaconSlotBlockTimingResponse,
@@ -211,33 +208,6 @@ function extractNodesFromTiming(
       node.client?.name ||
       `${node.username || 'unknown'}/${timing.filters?.network || 'mainnet'}/${node.nodeId}`;
 
-    // Get coordinates from city lookup (with country and continent fallbacks)
-    let latitude: number | undefined;
-    let longitude: number | undefined;
-
-    if (node.geo?.city && node.geo?.country) {
-      // getCityCoordinates now handles city -> country -> undefined fallback
-      const coords = getCityCoordinates(node.geo.city, node.geo.country);
-      if (coords) {
-        latitude = coords.lat;
-        longitude = coords.lng;
-      }
-    } else if (node.geo?.country) {
-      // No city provided, try country directly
-      const coords = getCityCoordinates('', node.geo.country);
-      if (coords) {
-        latitude = coords.lat;
-        longitude = coords.lng;
-      }
-    }
-
-    // Final fallback to continent coordinates if no city/country coords found
-    if (!latitude && !longitude && node.geo?.continentCode) {
-      const coords = getContinentCoordinates(node.geo.continentCode);
-      latitude = coords.lat;
-      longitude = coords.lng;
-    }
-
     nodesMap[fullNodeName] = new Node({
       name: fullNodeName,
       username: node.username || '',
@@ -247,9 +217,9 @@ function extractNodesFromTiming(
             country: node.geo.country || '',
             // REST API uses continent_code, gRPC uses continent
             continent: node.geo.continentCode || '',
-            // Use looked up coordinates
-            latitude: latitude ?? undefined,
-            longitude: longitude ?? undefined,
+            // Use actual coordinates from the API response
+            latitude: node.geo.latitude ?? undefined,
+            longitude: node.geo.longitude ?? undefined,
           }
         : undefined,
     });
@@ -272,25 +242,6 @@ function extractNodesFromBlobTiming(
 
     // Add or update node with geo data from blob timing
     if (!nodesMap[fullNodeName] || !nodesMap[fullNodeName].geo) {
-      // Get coordinates from city lookup
-      let latitude: number | undefined;
-      let longitude: number | undefined;
-
-      if (node.geo?.city && node.geo?.country) {
-        const coords = getCityCoordinates(node.geo.city, node.geo.country);
-        if (coords) {
-          latitude = coords.lat;
-          longitude = coords.lng;
-        }
-      }
-
-      // Fallback to continent coordinates if no city coords found
-      if (!latitude && !longitude && node.geo?.continentCode) {
-        const coords = getContinentCoordinates(node.geo.continentCode);
-        latitude = coords.lat;
-        longitude = coords.lng;
-      }
-
       nodesMap[fullNodeName] = new Node({
         name: fullNodeName,
         username: node.username || '',
@@ -300,9 +251,9 @@ function extractNodesFromBlobTiming(
               country: node.geo.country || '',
               // REST API uses continent_code, gRPC uses continent
               continent: node.geo.continentCode || '',
-              // Use looked up coordinates
-              latitude: latitude as any,
-              longitude: longitude as any,
+              // Use actual coordinates from the API response
+              latitude: node.geo.latitude ?? undefined,
+              longitude: node.geo.longitude ?? undefined,
             }
           : undefined,
       });
