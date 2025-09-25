@@ -326,7 +326,7 @@ func BuildListFctMevBidValueByBuilderQuery(req *ListFctMevBidValueByBuilderReque
 		orderByClause = BuildOrderByClause(orderFields)
 	} else {
 		// Default sorting by primary key
-		orderByClause = " ORDER BY slot_start_date_time" + ", block_hash" + ", builder_pubkey"
+		orderByClause = " ORDER BY slot_start_date_time" + ", builder_pubkey"
 	}
 
 	return BuildParameterizedQuery("fct_mev_bid_value_by_builder", qb, orderByClause, limit, offset, options...), nil
@@ -344,7 +344,7 @@ func BuildGetFctMevBidValueByBuilderQuery(req *GetFctMevBidValueByBuilderRequest
 	qb.AddCondition("slot_start_date_time", "=", req.SlotStartDateTime)
 
 	// Build ORDER BY clause
-	orderByClause := " ORDER BY slot_start_date_time, block_hash, builder_pubkey"
+	orderByClause := " ORDER BY slot_start_date_time, builder_pubkey"
 
 	// Return single record
 	return BuildParameterizedQuery("fct_mev_bid_value_by_builder", qb, orderByClause, 1, 0, options...), nil
