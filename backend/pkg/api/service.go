@@ -40,6 +40,7 @@ type Service struct {
 	server        *http.Server
 	cacheClient   cache.Client
 	storageClient storage.Client
+	metrics       *metrics.Metrics
 
 	// gRPC connection to srv service
 	srvConn           *grpc.ClientConn
@@ -83,6 +84,7 @@ func New(config *Config) (*Service, error) {
 		router:        mux.NewRouter(),
 		cacheClient:   cacheClient,
 		storageClient: storageClient,
+		metrics:       met,
 	}, nil
 }
 
@@ -150,13 +152,14 @@ func (s *Service) Start(ctx context.Context) error {
 
 		// Create a custom router that will dispatch to public API routes, Connect handler, or legacy router
 		customHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			path := r.URL.Path
+
 			// Log the original request for debugging
 			s.log.WithFields(logrus.Fields{
-				"path":   r.URL.Path,
+				"path":   path,
 				"method": r.Method,
+				"prefix": prefix,
 			}).Debug("Received request")
-
-			path := r.URL.Path
 
 			// For public API routes (no prefix) - handle first
 			if strings.HasPrefix(path, "/api/v1/") {
@@ -187,6 +190,13 @@ func (s *Service) Start(ctx context.Context) error {
 				return
 			}
 
+			// Metrics endpoint (no prefix)
+			if path == "/metrics" {
+				s.metrics.Handler().ServeHTTP(w, r)
+
+				return
+			}
+
 			w.WriteHeader(http.StatusOK)
 
 			_, err := w.Write([]byte("OK"))
@@ -203,6 +213,9 @@ func (s *Service) Start(ctx context.Context) error {
 		rootMux.Handle("/api/", handler)         // Connect routes
 		rootMux.Handle("/", s.router)            // Legacy routes
 	}
+
+	// Add metrics endpoint
+	rootMux.Handle("/metrics", s.metrics.Handler())
 
 	// Create the server
 	s.server = &http.Server{
