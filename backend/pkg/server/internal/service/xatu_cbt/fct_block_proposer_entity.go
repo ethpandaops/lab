@@ -72,7 +72,7 @@ func (x *XatuCBT) ListFctBlockProposerEntity(
 	if err = client.QueryWithScanner(ctx, sqlQuery.Query, func(scanner clickhouse.RowScanner) error {
 		entity, scanErr := scanFctBlockProposerEntity(scanner)
 		if scanErr != nil {
-			x.log.WithError(scanErr).Error("Failed to scan row")
+			x.log.WithError(scanErr).Error("scanFctBlockProposerEntity: Failed to scan row")
 
 			return nil
 		}

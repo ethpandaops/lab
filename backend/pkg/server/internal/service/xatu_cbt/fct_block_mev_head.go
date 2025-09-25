@@ -73,7 +73,7 @@ func (x *XatuCBT) ListFctBlockMevHead(
 	if err = client.QueryWithScanner(ctx, sqlQuery.Query, func(scanner clickhouse.RowScanner) error {
 		block, scanErr := scanFctBlockMevHead(scanner)
 		if scanErr != nil {
-			x.log.WithError(scanErr).Error("Failed to scan row")
+			x.log.WithError(scanErr).Error("scanFctBlockMevHead: Failed to scan row")
 
 			return nil
 		}

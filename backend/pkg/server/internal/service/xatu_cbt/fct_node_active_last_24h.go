@@ -71,7 +71,7 @@ func (x *XatuCBT) ListFctNodeActiveLast24h(
 	if err = client.QueryWithScanner(ctx, sqlQuery.Query, func(scanner clickhouse.RowScanner) error {
 		node, scanErr := scanFctNodeActiveLast24h(scanner)
 		if scanErr != nil {
-			x.log.WithError(scanErr).Error("Failed to scan row")
+			x.log.WithError(scanErr).Error("scanFctNodeActiveLast24h: Failed to scan row")
 
 			return nil
 		}
