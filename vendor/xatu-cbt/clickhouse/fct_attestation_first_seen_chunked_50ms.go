@@ -297,7 +297,10 @@ func BuildListFctAttestationFirstSeenChunked50MsQuery(req *ListFctAttestationFir
 		orderByClause = " ORDER BY slot_start_date_time" + ", block_root" + ", chunk_slot_start_diff"
 	}
 
-	return BuildParameterizedQuery("fct_attestation_first_seen_chunked_50ms", qb, orderByClause, limit, offset, options...), nil
+	// Build column list
+	columns := []string{"updated_date_time", "slot", "slot_start_date_time", "epoch", "epoch_start_date_time", "block_root", "chunk_slot_start_diff", "attestation_count"}
+
+	return BuildParameterizedQuery("fct_attestation_first_seen_chunked_50ms", columns, qb, orderByClause, limit, offset, options...)
 }
 
 // BuildGetFctAttestationFirstSeenChunked50MsQuery constructs a parameterized SQL query from a GetFctAttestationFirstSeenChunked50MsRequest
@@ -314,6 +317,9 @@ func BuildGetFctAttestationFirstSeenChunked50MsQuery(req *GetFctAttestationFirst
 	// Build ORDER BY clause
 	orderByClause := " ORDER BY slot_start_date_time, block_root, chunk_slot_start_diff"
 
+	// Build column list
+	columns := []string{"updated_date_time", "slot", "slot_start_date_time", "epoch", "epoch_start_date_time", "block_root", "chunk_slot_start_diff", "attestation_count"}
+
 	// Return single record
-	return BuildParameterizedQuery("fct_attestation_first_seen_chunked_50ms", qb, orderByClause, 1, 0, options...), nil
+	return BuildParameterizedQuery("fct_attestation_first_seen_chunked_50ms", columns, qb, orderByClause, 1, 0, options...)
 }

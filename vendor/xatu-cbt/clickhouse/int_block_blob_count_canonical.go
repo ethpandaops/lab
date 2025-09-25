@@ -262,7 +262,10 @@ func BuildListIntBlockBlobCountCanonicalQuery(req *ListIntBlockBlobCountCanonica
 		orderByClause = " ORDER BY slot_start_date_time" + ", block_root"
 	}
 
-	return BuildParameterizedQuery("int_block_blob_count_canonical", qb, orderByClause, limit, offset, options...), nil
+	// Build column list
+	columns := []string{"updated_date_time", "slot", "slot_start_date_time", "epoch", "epoch_start_date_time", "block_root", "blob_count"}
+
+	return BuildParameterizedQuery("int_block_blob_count_canonical", columns, qb, orderByClause, limit, offset, options...)
 }
 
 // BuildGetIntBlockBlobCountCanonicalQuery constructs a parameterized SQL query from a GetIntBlockBlobCountCanonicalRequest
@@ -279,6 +282,9 @@ func BuildGetIntBlockBlobCountCanonicalQuery(req *GetIntBlockBlobCountCanonicalR
 	// Build ORDER BY clause
 	orderByClause := " ORDER BY slot_start_date_time, block_root"
 
+	// Build column list
+	columns := []string{"updated_date_time", "slot", "slot_start_date_time", "epoch", "epoch_start_date_time", "block_root", "blob_count"}
+
 	// Return single record
-	return BuildParameterizedQuery("int_block_blob_count_canonical", qb, orderByClause, 1, 0, options...), nil
+	return BuildParameterizedQuery("int_block_blob_count_canonical", columns, qb, orderByClause, 1, 0, options...)
 }

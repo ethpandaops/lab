@@ -472,7 +472,10 @@ func BuildListIntAttestationAttestedCanonicalQuery(req *ListIntAttestationAttest
 		orderByClause = " ORDER BY slot_start_date_time" + ", block_root" + ", attesting_validator_index"
 	}
 
-	return BuildParameterizedQuery("int_attestation_attested_canonical", qb, orderByClause, limit, offset, options...), nil
+	// Build column list
+	columns := []string{"updated_date_time", "slot", "slot_start_date_time", "epoch", "epoch_start_date_time", "source_epoch", "source_epoch_start_date_time", "source_root", "target_epoch", "target_epoch_start_date_time", "target_root", "block_root", "attesting_validator_index", "inclusion_distance"}
+
+	return BuildParameterizedQuery("int_attestation_attested_canonical", columns, qb, orderByClause, limit, offset, options...)
 }
 
 // BuildGetIntAttestationAttestedCanonicalQuery constructs a parameterized SQL query from a GetIntAttestationAttestedCanonicalRequest
@@ -489,6 +492,9 @@ func BuildGetIntAttestationAttestedCanonicalQuery(req *GetIntAttestationAttested
 	// Build ORDER BY clause
 	orderByClause := " ORDER BY slot_start_date_time, block_root, attesting_validator_index"
 
+	// Build column list
+	columns := []string{"updated_date_time", "slot", "slot_start_date_time", "epoch", "epoch_start_date_time", "source_epoch", "source_epoch_start_date_time", "source_root", "target_epoch", "target_epoch_start_date_time", "target_root", "block_root", "attesting_validator_index", "inclusion_distance"}
+
 	// Return single record
-	return BuildParameterizedQuery("int_attestation_attested_canonical", qb, orderByClause, 1, 0, options...), nil
+	return BuildParameterizedQuery("int_attestation_attested_canonical", columns, qb, orderByClause, 1, 0, options...)
 }
