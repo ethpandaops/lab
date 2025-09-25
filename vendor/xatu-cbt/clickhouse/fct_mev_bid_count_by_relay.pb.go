@@ -144,7 +144,7 @@ type ListFctMevBidCountByRelayRequest struct {
 	BidTotal *UInt32Filter `protobuf:"bytes,7,opt,name=bid_total,json=bidTotal,proto3" json:"bid_total,omitempty"`
 	// The maximum number of fct_mev_bid_count_by_relay to return.
 	// If unspecified, at most 100 items will be returned.
-	// The maximum value is 1000; values above 1000 will be coerced to 1000.
+	// The maximum value is 10000; values above 10000 will be coerced to 10000.
 	PageSize int32 `protobuf:"varint,8,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
 	// A page token, received from a previous `ListFctMevBidCountByRelay` call.
 	// Provide this to retrieve the subsequent page.

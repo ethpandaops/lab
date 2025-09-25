@@ -137,7 +137,7 @@ export class ListFctBlockProposerEntityRequest extends Message<ListFctBlockPropo
   /**
    * The maximum number of fct_block_proposer_entity to return.
    * If unspecified, at most 100 items will be returned.
-   * The maximum value is 1000; values above 1000 will be coerced to 1000.
+   * The maximum value is 10000; values above 10000 will be coerced to 10000.
    *
    * @generated from field: int32 page_size = 7;
    */

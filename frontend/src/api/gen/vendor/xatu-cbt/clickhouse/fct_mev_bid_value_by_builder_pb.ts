@@ -68,9 +68,16 @@ export class FctMevBidValueByBuilder extends Message<FctMevBidValueByBuilder> {
   blockHash = "";
 
   /**
+   * The builder pubkey of the bid
+   *
+   * @generated from field: string builder_pubkey = 19;
+   */
+  builderPubkey = "";
+
+  /**
    * The transaction value in wei
    *
-   * @generated from field: string value = 19;
+   * @generated from field: string value = 20;
    */
   value = "";
 
@@ -90,7 +97,8 @@ export class FctMevBidValueByBuilder extends Message<FctMevBidValueByBuilder> {
     { no: 16, name: "earliest_bid_date_time", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
     { no: 17, name: "relay_names", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
     { no: 18, name: "block_hash", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 19, name: "value", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 19, name: "builder_pubkey", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 20, name: "value", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): FctMevBidValueByBuilder {
@@ -131,60 +139,67 @@ export class ListFctMevBidValueByBuilderRequest extends Message<ListFctMevBidVal
   blockHash?: StringFilter;
 
   /**
+   * Filter by builder_pubkey (ORDER BY column 3 - optional)
+   *
+   * @generated from field: cbt.StringFilter builder_pubkey = 3;
+   */
+  builderPubkey?: StringFilter;
+
+  /**
    * Filter by updated_date_time (optional)
    *
-   * @generated from field: cbt.UInt32Filter updated_date_time = 3;
+   * @generated from field: cbt.UInt32Filter updated_date_time = 4;
    */
   updatedDateTime?: UInt32Filter;
 
   /**
    * Filter by slot (optional)
    *
-   * @generated from field: cbt.UInt32Filter slot = 4;
+   * @generated from field: cbt.UInt32Filter slot = 5;
    */
   slot?: UInt32Filter;
 
   /**
    * Filter by epoch (optional)
    *
-   * @generated from field: cbt.UInt32Filter epoch = 5;
+   * @generated from field: cbt.UInt32Filter epoch = 6;
    */
   epoch?: UInt32Filter;
 
   /**
    * Filter by epoch_start_date_time (optional)
    *
-   * @generated from field: cbt.UInt32Filter epoch_start_date_time = 6;
+   * @generated from field: cbt.UInt32Filter epoch_start_date_time = 7;
    */
   epochStartDateTime?: UInt32Filter;
 
   /**
    * Filter by earliest_bid_date_time (optional)
    *
-   * @generated from field: cbt.UInt64Filter earliest_bid_date_time = 7;
+   * @generated from field: cbt.UInt64Filter earliest_bid_date_time = 8;
    */
   earliestBidDateTime?: UInt64Filter;
 
   /**
    * Filter by relay_names (optional)
    *
-   * @generated from field: repeated string relay_names = 8;
+   * @generated from field: repeated string relay_names = 9;
    */
   relayNames: string[] = [];
 
   /**
    * Filter by value (optional)
    *
-   * @generated from field: cbt.StringFilter value = 9;
+   * @generated from field: cbt.StringFilter value = 10;
    */
   value?: StringFilter;
 
   /**
    * The maximum number of fct_mev_bid_value_by_builder to return.
    * If unspecified, at most 100 items will be returned.
-   * The maximum value is 1000; values above 1000 will be coerced to 1000.
+   * The maximum value is 10000; values above 10000 will be coerced to 10000.
    *
-   * @generated from field: int32 page_size = 10;
+   * @generated from field: int32 page_size = 11;
    */
   pageSize = 0;
 
@@ -192,7 +207,7 @@ export class ListFctMevBidValueByBuilderRequest extends Message<ListFctMevBidVal
    * A page token, received from a previous `ListFctMevBidValueByBuilder` call.
    * Provide this to retrieve the subsequent page.
    *
-   * @generated from field: string page_token = 11;
+   * @generated from field: string page_token = 12;
    */
   pageToken = "";
 
@@ -201,7 +216,7 @@ export class ListFctMevBidValueByBuilderRequest extends Message<ListFctMevBidVal
    * Example: "foo,bar" or "foo desc,bar" for descending order on foo.
    * If unspecified, results will be returned in the default order.
    *
-   * @generated from field: string order_by = 12;
+   * @generated from field: string order_by = 13;
    */
   orderBy = "";
 
@@ -215,16 +230,17 @@ export class ListFctMevBidValueByBuilderRequest extends Message<ListFctMevBidVal
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "slot_start_date_time", kind: "message", T: UInt32Filter },
     { no: 2, name: "block_hash", kind: "message", T: StringFilter },
-    { no: 3, name: "updated_date_time", kind: "message", T: UInt32Filter },
-    { no: 4, name: "slot", kind: "message", T: UInt32Filter },
-    { no: 5, name: "epoch", kind: "message", T: UInt32Filter },
-    { no: 6, name: "epoch_start_date_time", kind: "message", T: UInt32Filter },
-    { no: 7, name: "earliest_bid_date_time", kind: "message", T: UInt64Filter },
-    { no: 8, name: "relay_names", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
-    { no: 9, name: "value", kind: "message", T: StringFilter },
-    { no: 10, name: "page_size", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
-    { no: 11, name: "page_token", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 12, name: "order_by", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "builder_pubkey", kind: "message", T: StringFilter },
+    { no: 4, name: "updated_date_time", kind: "message", T: UInt32Filter },
+    { no: 5, name: "slot", kind: "message", T: UInt32Filter },
+    { no: 6, name: "epoch", kind: "message", T: UInt32Filter },
+    { no: 7, name: "epoch_start_date_time", kind: "message", T: UInt32Filter },
+    { no: 8, name: "earliest_bid_date_time", kind: "message", T: UInt64Filter },
+    { no: 9, name: "relay_names", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+    { no: 10, name: "value", kind: "message", T: StringFilter },
+    { no: 11, name: "page_size", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 12, name: "page_token", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 13, name: "order_by", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ListFctMevBidValueByBuilderRequest {

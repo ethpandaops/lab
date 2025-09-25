@@ -4,8 +4,8 @@
 // @ts-nocheck
 
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
-import { Message, proto3 } from "@bufbuild/protobuf";
-import { StringFilter, UInt32Filter } from "./common_pb.js";
+import { DoubleValue, Message, proto3, StringValue, UInt32Value } from "@bufbuild/protobuf";
+import { NullableStringFilter, NullableUInt32Filter, StringFilter, UInt32Filter } from "./common_pb.js";
 
 /**
  * @generated from message cbt.FctBlockBlobFirstSeenByNode
@@ -145,16 +145,44 @@ export class FctBlockBlobFirstSeenByNode extends Message<FctBlockBlobFirstSeenBy
   metaClientGeoContinentCode = "";
 
   /**
+   * Longitude of the client
+   *
+   * @generated from field: google.protobuf.DoubleValue meta_client_geo_longitude = 30;
+   */
+  metaClientGeoLongitude?: number;
+
+  /**
+   * Latitude of the client
+   *
+   * @generated from field: google.protobuf.DoubleValue meta_client_geo_latitude = 31;
+   */
+  metaClientGeoLatitude?: number;
+
+  /**
+   * Autonomous system number of the client
+   *
+   * @generated from field: google.protobuf.UInt32Value meta_client_geo_autonomous_system_number = 32;
+   */
+  metaClientGeoAutonomousSystemNumber?: number;
+
+  /**
+   * Autonomous system organization of the client
+   *
+   * @generated from field: google.protobuf.StringValue meta_client_geo_autonomous_system_organization = 33;
+   */
+  metaClientGeoAutonomousSystemOrganization?: string;
+
+  /**
    * Ethereum consensus client version
    *
-   * @generated from field: string meta_consensus_version = 30;
+   * @generated from field: string meta_consensus_version = 34;
    */
   metaConsensusVersion = "";
 
   /**
    * Ethereum consensus client implementation
    *
-   * @generated from field: string meta_consensus_implementation = 31;
+   * @generated from field: string meta_consensus_implementation = 35;
    */
   metaConsensusImplementation = "";
 
@@ -185,8 +213,12 @@ export class FctBlockBlobFirstSeenByNode extends Message<FctBlockBlobFirstSeenBy
     { no: 27, name: "meta_client_geo_country", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 28, name: "meta_client_geo_country_code", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 29, name: "meta_client_geo_continent_code", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 30, name: "meta_consensus_version", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 31, name: "meta_consensus_implementation", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 30, name: "meta_client_geo_longitude", kind: "message", T: DoubleValue },
+    { no: 31, name: "meta_client_geo_latitude", kind: "message", T: DoubleValue },
+    { no: 32, name: "meta_client_geo_autonomous_system_number", kind: "message", T: UInt32Value },
+    { no: 33, name: "meta_client_geo_autonomous_system_organization", kind: "message", T: StringValue },
+    { no: 34, name: "meta_consensus_version", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 35, name: "meta_consensus_implementation", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): FctBlockBlobFirstSeenByNode {
@@ -220,67 +252,67 @@ export class ListFctBlockBlobFirstSeenByNodeRequest extends Message<ListFctBlock
   slotStartDateTime?: UInt32Filter;
 
   /**
-   * Filter by meta_client_name (ORDER BY column 2 - optional)
+   * Filter by block_root (ORDER BY column 2 - optional)
    *
-   * @generated from field: cbt.StringFilter meta_client_name = 2;
+   * @generated from field: cbt.StringFilter block_root = 2;
+   */
+  blockRoot?: StringFilter;
+
+  /**
+   * Filter by blob_index (ORDER BY column 3 - optional)
+   *
+   * @generated from field: cbt.UInt32Filter blob_index = 3;
+   */
+  blobIndex?: UInt32Filter;
+
+  /**
+   * Filter by meta_client_name (ORDER BY column 4 - optional)
+   *
+   * @generated from field: cbt.StringFilter meta_client_name = 4;
    */
   metaClientName?: StringFilter;
 
   /**
    * Filter by updated_date_time (optional)
    *
-   * @generated from field: cbt.UInt32Filter updated_date_time = 3;
+   * @generated from field: cbt.UInt32Filter updated_date_time = 5;
    */
   updatedDateTime?: UInt32Filter;
 
   /**
    * Filter by source (optional)
    *
-   * @generated from field: cbt.StringFilter source = 4;
+   * @generated from field: cbt.StringFilter source = 6;
    */
   source?: StringFilter;
 
   /**
    * Filter by slot (optional)
    *
-   * @generated from field: cbt.UInt32Filter slot = 5;
+   * @generated from field: cbt.UInt32Filter slot = 7;
    */
   slot?: UInt32Filter;
 
   /**
    * Filter by epoch (optional)
    *
-   * @generated from field: cbt.UInt32Filter epoch = 6;
+   * @generated from field: cbt.UInt32Filter epoch = 8;
    */
   epoch?: UInt32Filter;
 
   /**
    * Filter by epoch_start_date_time (optional)
    *
-   * @generated from field: cbt.UInt32Filter epoch_start_date_time = 7;
+   * @generated from field: cbt.UInt32Filter epoch_start_date_time = 9;
    */
   epochStartDateTime?: UInt32Filter;
 
   /**
    * Filter by seen_slot_start_diff (optional)
    *
-   * @generated from field: cbt.UInt32Filter seen_slot_start_diff = 8;
+   * @generated from field: cbt.UInt32Filter seen_slot_start_diff = 10;
    */
   seenSlotStartDiff?: UInt32Filter;
-
-  /**
-   * Filter by block_root (optional)
-   *
-   * @generated from field: cbt.StringFilter block_root = 9;
-   */
-  blockRoot?: StringFilter;
-
-  /**
-   * Filter by blob_index (optional)
-   *
-   * @generated from field: cbt.UInt32Filter blob_index = 10;
-   */
-  blobIndex?: UInt32Filter;
 
   /**
    * Filter by username (optional)
@@ -346,25 +378,53 @@ export class ListFctBlockBlobFirstSeenByNodeRequest extends Message<ListFctBlock
   metaClientGeoContinentCode?: StringFilter;
 
   /**
+   * Filter by meta_client_geo_longitude (optional)
+   *
+   * @generated from field: google.protobuf.DoubleValue meta_client_geo_longitude = 20;
+   */
+  metaClientGeoLongitude?: number;
+
+  /**
+   * Filter by meta_client_geo_latitude (optional)
+   *
+   * @generated from field: google.protobuf.DoubleValue meta_client_geo_latitude = 21;
+   */
+  metaClientGeoLatitude?: number;
+
+  /**
+   * Filter by meta_client_geo_autonomous_system_number (optional)
+   *
+   * @generated from field: cbt.NullableUInt32Filter meta_client_geo_autonomous_system_number = 22;
+   */
+  metaClientGeoAutonomousSystemNumber?: NullableUInt32Filter;
+
+  /**
+   * Filter by meta_client_geo_autonomous_system_organization (optional)
+   *
+   * @generated from field: cbt.NullableStringFilter meta_client_geo_autonomous_system_organization = 23;
+   */
+  metaClientGeoAutonomousSystemOrganization?: NullableStringFilter;
+
+  /**
    * Filter by meta_consensus_version (optional)
    *
-   * @generated from field: cbt.StringFilter meta_consensus_version = 20;
+   * @generated from field: cbt.StringFilter meta_consensus_version = 24;
    */
   metaConsensusVersion?: StringFilter;
 
   /**
    * Filter by meta_consensus_implementation (optional)
    *
-   * @generated from field: cbt.StringFilter meta_consensus_implementation = 21;
+   * @generated from field: cbt.StringFilter meta_consensus_implementation = 25;
    */
   metaConsensusImplementation?: StringFilter;
 
   /**
    * The maximum number of fct_block_blob_first_seen_by_node to return.
    * If unspecified, at most 100 items will be returned.
-   * The maximum value is 1000; values above 1000 will be coerced to 1000.
+   * The maximum value is 10000; values above 10000 will be coerced to 10000.
    *
-   * @generated from field: int32 page_size = 22;
+   * @generated from field: int32 page_size = 26;
    */
   pageSize = 0;
 
@@ -372,7 +432,7 @@ export class ListFctBlockBlobFirstSeenByNodeRequest extends Message<ListFctBlock
    * A page token, received from a previous `ListFctBlockBlobFirstSeenByNode` call.
    * Provide this to retrieve the subsequent page.
    *
-   * @generated from field: string page_token = 23;
+   * @generated from field: string page_token = 27;
    */
   pageToken = "";
 
@@ -381,7 +441,7 @@ export class ListFctBlockBlobFirstSeenByNodeRequest extends Message<ListFctBlock
    * Example: "foo,bar" or "foo desc,bar" for descending order on foo.
    * If unspecified, results will be returned in the default order.
    *
-   * @generated from field: string order_by = 24;
+   * @generated from field: string order_by = 28;
    */
   orderBy = "";
 
@@ -394,15 +454,15 @@ export class ListFctBlockBlobFirstSeenByNodeRequest extends Message<ListFctBlock
   static readonly typeName = "cbt.ListFctBlockBlobFirstSeenByNodeRequest";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "slot_start_date_time", kind: "message", T: UInt32Filter },
-    { no: 2, name: "meta_client_name", kind: "message", T: StringFilter },
-    { no: 3, name: "updated_date_time", kind: "message", T: UInt32Filter },
-    { no: 4, name: "source", kind: "message", T: StringFilter },
-    { no: 5, name: "slot", kind: "message", T: UInt32Filter },
-    { no: 6, name: "epoch", kind: "message", T: UInt32Filter },
-    { no: 7, name: "epoch_start_date_time", kind: "message", T: UInt32Filter },
-    { no: 8, name: "seen_slot_start_diff", kind: "message", T: UInt32Filter },
-    { no: 9, name: "block_root", kind: "message", T: StringFilter },
-    { no: 10, name: "blob_index", kind: "message", T: UInt32Filter },
+    { no: 2, name: "block_root", kind: "message", T: StringFilter },
+    { no: 3, name: "blob_index", kind: "message", T: UInt32Filter },
+    { no: 4, name: "meta_client_name", kind: "message", T: StringFilter },
+    { no: 5, name: "updated_date_time", kind: "message", T: UInt32Filter },
+    { no: 6, name: "source", kind: "message", T: StringFilter },
+    { no: 7, name: "slot", kind: "message", T: UInt32Filter },
+    { no: 8, name: "epoch", kind: "message", T: UInt32Filter },
+    { no: 9, name: "epoch_start_date_time", kind: "message", T: UInt32Filter },
+    { no: 10, name: "seen_slot_start_diff", kind: "message", T: UInt32Filter },
     { no: 11, name: "username", kind: "message", T: StringFilter },
     { no: 12, name: "node_id", kind: "message", T: StringFilter },
     { no: 13, name: "classification", kind: "message", T: StringFilter },
@@ -412,11 +472,15 @@ export class ListFctBlockBlobFirstSeenByNodeRequest extends Message<ListFctBlock
     { no: 17, name: "meta_client_geo_country", kind: "message", T: StringFilter },
     { no: 18, name: "meta_client_geo_country_code", kind: "message", T: StringFilter },
     { no: 19, name: "meta_client_geo_continent_code", kind: "message", T: StringFilter },
-    { no: 20, name: "meta_consensus_version", kind: "message", T: StringFilter },
-    { no: 21, name: "meta_consensus_implementation", kind: "message", T: StringFilter },
-    { no: 22, name: "page_size", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
-    { no: 23, name: "page_token", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 24, name: "order_by", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 20, name: "meta_client_geo_longitude", kind: "message", T: DoubleValue },
+    { no: 21, name: "meta_client_geo_latitude", kind: "message", T: DoubleValue },
+    { no: 22, name: "meta_client_geo_autonomous_system_number", kind: "message", T: NullableUInt32Filter },
+    { no: 23, name: "meta_client_geo_autonomous_system_organization", kind: "message", T: NullableStringFilter },
+    { no: 24, name: "meta_consensus_version", kind: "message", T: StringFilter },
+    { no: 25, name: "meta_consensus_implementation", kind: "message", T: StringFilter },
+    { no: 26, name: "page_size", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 27, name: "page_token", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 28, name: "order_by", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ListFctBlockBlobFirstSeenByNodeRequest {

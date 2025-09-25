@@ -178,7 +178,7 @@ type ListFctAttestationCorrectnessByValidatorCanonicalRequest struct {
 	Status *StringFilter `protobuf:"bytes,10,opt,name=status,proto3" json:"status,omitempty"`
 	// The maximum number of fct_attestation_correctness_by_validator_canonical to return.
 	// If unspecified, at most 100 items will be returned.
-	// The maximum value is 1000; values above 1000 will be coerced to 1000.
+	// The maximum value is 10000; values above 10000 will be coerced to 10000.
 	PageSize int32 `protobuf:"varint,11,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
 	// A page token, received from a previous `ListFctAttestationCorrectnessByValidatorCanonical` call.
 	// Provide this to retrieve the subsequent page.

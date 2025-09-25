@@ -206,13 +206,18 @@ func BuildListFctBlockProposerEntityQuery(req *ListFctBlockProposerEntityRequest
 	}
 
 	// Handle pagination per AIP-132
+	// Validate page size
+	if req.PageSize < 0 {
+		return SQLQuery{}, fmt.Errorf("page_size must be non-negative, got %d", req.PageSize)
+	}
+	if req.PageSize > 10000 {
+		return SQLQuery{}, fmt.Errorf("page_size must not exceed %d, got %d", 10000, req.PageSize)
+	}
+
 	var limit, offset uint32
 	limit = 100 // Default page size
 	if req.PageSize > 0 {
 		limit = uint32(req.PageSize)
-		if limit > 1000 {
-			limit = 1000 // Maximum allowed
-		}
 	}
 	if req.PageToken != "" {
 		decodedOffset, err := DecodePageToken(req.PageToken)
