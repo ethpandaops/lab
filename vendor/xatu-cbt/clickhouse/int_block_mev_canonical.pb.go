@@ -266,7 +266,7 @@ type ListIntBlockMevCanonicalRequest struct {
 	TransactionCount *UInt32Filter `protobuf:"bytes,18,opt,name=transaction_count,json=transactionCount,proto3" json:"transaction_count,omitempty"`
 	// The maximum number of int_block_mev_canonical to return.
 	// If unspecified, at most 100 items will be returned.
-	// The maximum value is 1000; values above 1000 will be coerced to 1000.
+	// The maximum value is 10000; values above 10000 will be coerced to 10000.
 	PageSize int32 `protobuf:"varint,19,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
 	// A page token, received from a previous `ListIntBlockMevCanonical` call.
 	// Provide this to retrieve the subsequent page.

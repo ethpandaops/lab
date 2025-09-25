@@ -235,48 +235,87 @@ func BuildListFctAttestationCorrectnessHeadQuery(req *ListFctAttestationCorrectn
 		}
 	}
 
-	// Add filter for column: votes_actual
-	if req.VotesActual != nil {
-		switch filter := req.VotesActual.Filter.(type) {
+	// Add filter for column: votes_head
+	if req.VotesHead != nil {
+		switch filter := req.VotesHead.Filter.(type) {
 		case *NullableUInt32Filter_Eq:
-			qb.AddCondition("votes_actual", "=", filter.Eq)
+			qb.AddCondition("votes_head", "=", filter.Eq)
 		case *NullableUInt32Filter_Ne:
-			qb.AddCondition("votes_actual", "!=", filter.Ne)
+			qb.AddCondition("votes_head", "!=", filter.Ne)
 		case *NullableUInt32Filter_Lt:
-			qb.AddCondition("votes_actual", "<", filter.Lt)
+			qb.AddCondition("votes_head", "<", filter.Lt)
 		case *NullableUInt32Filter_Lte:
-			qb.AddCondition("votes_actual", "<=", filter.Lte)
+			qb.AddCondition("votes_head", "<=", filter.Lte)
 		case *NullableUInt32Filter_Gt:
-			qb.AddCondition("votes_actual", ">", filter.Gt)
+			qb.AddCondition("votes_head", ">", filter.Gt)
 		case *NullableUInt32Filter_Gte:
-			qb.AddCondition("votes_actual", ">=", filter.Gte)
+			qb.AddCondition("votes_head", ">=", filter.Gte)
 		case *NullableUInt32Filter_Between:
-			qb.AddBetweenCondition("votes_actual", filter.Between.Min, filter.Between.Max)
+			qb.AddBetweenCondition("votes_head", filter.Between.Min, filter.Between.Max)
 		case *NullableUInt32Filter_In:
 			if len(filter.In.Values) > 0 {
-				qb.AddInCondition("votes_actual", UInt32SliceToInterface(filter.In.Values))
+				qb.AddInCondition("votes_head", UInt32SliceToInterface(filter.In.Values))
 			}
 		case *NullableUInt32Filter_NotIn:
 			if len(filter.NotIn.Values) > 0 {
-				qb.AddNotInCondition("votes_actual", UInt32SliceToInterface(filter.NotIn.Values))
+				qb.AddNotInCondition("votes_head", UInt32SliceToInterface(filter.NotIn.Values))
 			}
 		case *NullableUInt32Filter_IsNull:
-			qb.AddIsNullCondition("votes_actual")
+			qb.AddIsNullCondition("votes_head")
 		case *NullableUInt32Filter_IsNotNull:
-			qb.AddIsNotNullCondition("votes_actual")
+			qb.AddIsNotNullCondition("votes_head")
+		default:
+			// Unsupported filter type
+		}
+	}
+
+	// Add filter for column: votes_other
+	if req.VotesOther != nil {
+		switch filter := req.VotesOther.Filter.(type) {
+		case *NullableUInt32Filter_Eq:
+			qb.AddCondition("votes_other", "=", filter.Eq)
+		case *NullableUInt32Filter_Ne:
+			qb.AddCondition("votes_other", "!=", filter.Ne)
+		case *NullableUInt32Filter_Lt:
+			qb.AddCondition("votes_other", "<", filter.Lt)
+		case *NullableUInt32Filter_Lte:
+			qb.AddCondition("votes_other", "<=", filter.Lte)
+		case *NullableUInt32Filter_Gt:
+			qb.AddCondition("votes_other", ">", filter.Gt)
+		case *NullableUInt32Filter_Gte:
+			qb.AddCondition("votes_other", ">=", filter.Gte)
+		case *NullableUInt32Filter_Between:
+			qb.AddBetweenCondition("votes_other", filter.Between.Min, filter.Between.Max)
+		case *NullableUInt32Filter_In:
+			if len(filter.In.Values) > 0 {
+				qb.AddInCondition("votes_other", UInt32SliceToInterface(filter.In.Values))
+			}
+		case *NullableUInt32Filter_NotIn:
+			if len(filter.NotIn.Values) > 0 {
+				qb.AddNotInCondition("votes_other", UInt32SliceToInterface(filter.NotIn.Values))
+			}
+		case *NullableUInt32Filter_IsNull:
+			qb.AddIsNullCondition("votes_other")
+		case *NullableUInt32Filter_IsNotNull:
+			qb.AddIsNotNullCondition("votes_other")
 		default:
 			// Unsupported filter type
 		}
 	}
 
 	// Handle pagination per AIP-132
+	// Validate page size
+	if req.PageSize < 0 {
+		return SQLQuery{}, fmt.Errorf("page_size must be non-negative, got %d", req.PageSize)
+	}
+	if req.PageSize > 10000 {
+		return SQLQuery{}, fmt.Errorf("page_size must not exceed %d, got %d", 10000, req.PageSize)
+	}
+
 	var limit, offset uint32
 	limit = 100 // Default page size
 	if req.PageSize > 0 {
 		limit = uint32(req.PageSize)
-		if limit > 1000 {
-			limit = 1000 // Maximum allowed
-		}
 	}
 	if req.PageToken != "" {
 		decodedOffset, err := DecodePageToken(req.PageToken)
@@ -289,7 +328,7 @@ func BuildListFctAttestationCorrectnessHeadQuery(req *ListFctAttestationCorrectn
 	// Handle custom ordering if provided
 	var orderByClause string
 	if req.OrderBy != "" {
-		validFields := []string{"updated_date_time", "slot", "slot_start_date_time", "epoch", "epoch_start_date_time", "block_root", "votes_max", "votes_actual"}
+		validFields := []string{"updated_date_time", "slot", "slot_start_date_time", "epoch", "epoch_start_date_time", "block_root", "votes_max", "votes_head", "votes_other"}
 		orderFields, err := ParseOrderBy(req.OrderBy, validFields)
 		if err != nil {
 			return SQLQuery{}, fmt.Errorf("invalid order_by: %w", err)

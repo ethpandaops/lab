@@ -130,7 +130,7 @@ message ListFctBlockRequest {
 
   // The maximum number of fct_block to return.
   // If unspecified, at most 100 items will be returned.
-  // The maximum value is 1000; values above 1000 will be coerced to 1000.
+  // The maximum value is 10000; values above 10000 will be coerced to 10000.
   int32 page_size = 29;
   // A page token, received from a previous `ListFctBlock` call.
   // Provide this to retrieve the subsequent page.

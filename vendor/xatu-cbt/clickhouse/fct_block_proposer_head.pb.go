@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.34.2
 // 	protoc        (unknown)
-// source: vendor/xatu-cbt/clickhouse/int_block_proposer_head.proto
+// source: vendor/xatu-cbt/clickhouse/fct_block_proposer_head.proto
 
 package clickhouse
 
@@ -21,7 +21,7 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-type IntBlockProposerHead struct {
+type FctBlockProposerHead struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
@@ -44,23 +44,23 @@ type IntBlockProposerHead struct {
 	BlockRoot *wrapperspb.StringValue `protobuf:"bytes,18,opt,name=block_root,json=blockRoot,proto3" json:"block_root,omitempty"`
 }
 
-func (x *IntBlockProposerHead) Reset() {
-	*x = IntBlockProposerHead{}
+func (x *FctBlockProposerHead) Reset() {
+	*x = FctBlockProposerHead{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_vendor_xatu_cbt_clickhouse_int_block_proposer_head_proto_msgTypes[0]
+		mi := &file_vendor_xatu_cbt_clickhouse_fct_block_proposer_head_proto_msgTypes[0]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
 }
 
-func (x *IntBlockProposerHead) String() string {
+func (x *FctBlockProposerHead) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*IntBlockProposerHead) ProtoMessage() {}
+func (*FctBlockProposerHead) ProtoMessage() {}
 
-func (x *IntBlockProposerHead) ProtoReflect() protoreflect.Message {
-	mi := &file_vendor_xatu_cbt_clickhouse_int_block_proposer_head_proto_msgTypes[0]
+func (x *FctBlockProposerHead) ProtoReflect() protoreflect.Message {
+	mi := &file_vendor_xatu_cbt_clickhouse_fct_block_proposer_head_proto_msgTypes[0]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -71,69 +71,69 @@ func (x *IntBlockProposerHead) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use IntBlockProposerHead.ProtoReflect.Descriptor instead.
-func (*IntBlockProposerHead) Descriptor() ([]byte, []int) {
-	return file_vendor_xatu_cbt_clickhouse_int_block_proposer_head_proto_rawDescGZIP(), []int{0}
+// Deprecated: Use FctBlockProposerHead.ProtoReflect.Descriptor instead.
+func (*FctBlockProposerHead) Descriptor() ([]byte, []int) {
+	return file_vendor_xatu_cbt_clickhouse_fct_block_proposer_head_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *IntBlockProposerHead) GetUpdatedDateTime() uint32 {
+func (x *FctBlockProposerHead) GetUpdatedDateTime() uint32 {
 	if x != nil {
 		return x.UpdatedDateTime
 	}
 	return 0
 }
 
-func (x *IntBlockProposerHead) GetSlot() uint32 {
+func (x *FctBlockProposerHead) GetSlot() uint32 {
 	if x != nil {
 		return x.Slot
 	}
 	return 0
 }
 
-func (x *IntBlockProposerHead) GetSlotStartDateTime() uint32 {
+func (x *FctBlockProposerHead) GetSlotStartDateTime() uint32 {
 	if x != nil {
 		return x.SlotStartDateTime
 	}
 	return 0
 }
 
-func (x *IntBlockProposerHead) GetEpoch() uint32 {
+func (x *FctBlockProposerHead) GetEpoch() uint32 {
 	if x != nil {
 		return x.Epoch
 	}
 	return 0
 }
 
-func (x *IntBlockProposerHead) GetEpochStartDateTime() uint32 {
+func (x *FctBlockProposerHead) GetEpochStartDateTime() uint32 {
 	if x != nil {
 		return x.EpochStartDateTime
 	}
 	return 0
 }
 
-func (x *IntBlockProposerHead) GetProposerValidatorIndex() uint32 {
+func (x *FctBlockProposerHead) GetProposerValidatorIndex() uint32 {
 	if x != nil {
 		return x.ProposerValidatorIndex
 	}
 	return 0
 }
 
-func (x *IntBlockProposerHead) GetProposerPubkey() string {
+func (x *FctBlockProposerHead) GetProposerPubkey() string {
 	if x != nil {
 		return x.ProposerPubkey
 	}
 	return ""
 }
 
-func (x *IntBlockProposerHead) GetBlockRoot() *wrapperspb.StringValue {
+func (x *FctBlockProposerHead) GetBlockRoot() *wrapperspb.StringValue {
 	if x != nil {
 		return x.BlockRoot
 	}
 	return nil
 }
 
-// ListIntBlockProposerHeadRequest is the request message for listing int_block_proposer_head records
-type ListIntBlockProposerHeadRequest struct {
+// ListFctBlockProposerHeadRequest is the request message for listing fct_block_proposer_head records
+type ListFctBlockProposerHeadRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
@@ -154,11 +154,11 @@ type ListIntBlockProposerHeadRequest struct {
 	ProposerPubkey *StringFilter `protobuf:"bytes,7,opt,name=proposer_pubkey,json=proposerPubkey,proto3" json:"proposer_pubkey,omitempty"`
 	// Filter by block_root (optional)
 	BlockRoot *NullableStringFilter `protobuf:"bytes,8,opt,name=block_root,json=blockRoot,proto3" json:"block_root,omitempty"`
-	// The maximum number of int_block_proposer_head to return.
+	// The maximum number of fct_block_proposer_head to return.
 	// If unspecified, at most 100 items will be returned.
-	// The maximum value is 1000; values above 1000 will be coerced to 1000.
+	// The maximum value is 10000; values above 10000 will be coerced to 10000.
 	PageSize int32 `protobuf:"varint,9,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
-	// A page token, received from a previous `ListIntBlockProposerHead` call.
+	// A page token, received from a previous `ListFctBlockProposerHead` call.
 	// Provide this to retrieve the subsequent page.
 	PageToken string `protobuf:"bytes,10,opt,name=page_token,json=pageToken,proto3" json:"page_token,omitempty"`
 	// The order of results. Format: comma-separated list of fields.
@@ -167,23 +167,23 @@ type ListIntBlockProposerHeadRequest struct {
 	OrderBy string `protobuf:"bytes,11,opt,name=order_by,json=orderBy,proto3" json:"order_by,omitempty"`
 }
 
-func (x *ListIntBlockProposerHeadRequest) Reset() {
-	*x = ListIntBlockProposerHeadRequest{}
+func (x *ListFctBlockProposerHeadRequest) Reset() {
+	*x = ListFctBlockProposerHeadRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_vendor_xatu_cbt_clickhouse_int_block_proposer_head_proto_msgTypes[1]
+		mi := &file_vendor_xatu_cbt_clickhouse_fct_block_proposer_head_proto_msgTypes[1]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
 }
 
-func (x *ListIntBlockProposerHeadRequest) String() string {
+func (x *ListFctBlockProposerHeadRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*ListIntBlockProposerHeadRequest) ProtoMessage() {}
+func (*ListFctBlockProposerHeadRequest) ProtoMessage() {}
 
-func (x *ListIntBlockProposerHeadRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_vendor_xatu_cbt_clickhouse_int_block_proposer_head_proto_msgTypes[1]
+func (x *ListFctBlockProposerHeadRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_vendor_xatu_cbt_clickhouse_fct_block_proposer_head_proto_msgTypes[1]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -194,118 +194,118 @@ func (x *ListIntBlockProposerHeadRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ListIntBlockProposerHeadRequest.ProtoReflect.Descriptor instead.
-func (*ListIntBlockProposerHeadRequest) Descriptor() ([]byte, []int) {
-	return file_vendor_xatu_cbt_clickhouse_int_block_proposer_head_proto_rawDescGZIP(), []int{1}
+// Deprecated: Use ListFctBlockProposerHeadRequest.ProtoReflect.Descriptor instead.
+func (*ListFctBlockProposerHeadRequest) Descriptor() ([]byte, []int) {
+	return file_vendor_xatu_cbt_clickhouse_fct_block_proposer_head_proto_rawDescGZIP(), []int{1}
 }
 
-func (x *ListIntBlockProposerHeadRequest) GetSlotStartDateTime() *UInt32Filter {
+func (x *ListFctBlockProposerHeadRequest) GetSlotStartDateTime() *UInt32Filter {
 	if x != nil {
 		return x.SlotStartDateTime
 	}
 	return nil
 }
 
-func (x *ListIntBlockProposerHeadRequest) GetProposerValidatorIndex() *UInt32Filter {
+func (x *ListFctBlockProposerHeadRequest) GetProposerValidatorIndex() *UInt32Filter {
 	if x != nil {
 		return x.ProposerValidatorIndex
 	}
 	return nil
 }
 
-func (x *ListIntBlockProposerHeadRequest) GetUpdatedDateTime() *UInt32Filter {
+func (x *ListFctBlockProposerHeadRequest) GetUpdatedDateTime() *UInt32Filter {
 	if x != nil {
 		return x.UpdatedDateTime
 	}
 	return nil
 }
 
-func (x *ListIntBlockProposerHeadRequest) GetSlot() *UInt32Filter {
+func (x *ListFctBlockProposerHeadRequest) GetSlot() *UInt32Filter {
 	if x != nil {
 		return x.Slot
 	}
 	return nil
 }
 
-func (x *ListIntBlockProposerHeadRequest) GetEpoch() *UInt32Filter {
+func (x *ListFctBlockProposerHeadRequest) GetEpoch() *UInt32Filter {
 	if x != nil {
 		return x.Epoch
 	}
 	return nil
 }
 
-func (x *ListIntBlockProposerHeadRequest) GetEpochStartDateTime() *UInt32Filter {
+func (x *ListFctBlockProposerHeadRequest) GetEpochStartDateTime() *UInt32Filter {
 	if x != nil {
 		return x.EpochStartDateTime
 	}
 	return nil
 }
 
-func (x *ListIntBlockProposerHeadRequest) GetProposerPubkey() *StringFilter {
+func (x *ListFctBlockProposerHeadRequest) GetProposerPubkey() *StringFilter {
 	if x != nil {
 		return x.ProposerPubkey
 	}
 	return nil
 }
 
-func (x *ListIntBlockProposerHeadRequest) GetBlockRoot() *NullableStringFilter {
+func (x *ListFctBlockProposerHeadRequest) GetBlockRoot() *NullableStringFilter {
 	if x != nil {
 		return x.BlockRoot
 	}
 	return nil
 }
 
-func (x *ListIntBlockProposerHeadRequest) GetPageSize() int32 {
+func (x *ListFctBlockProposerHeadRequest) GetPageSize() int32 {
 	if x != nil {
 		return x.PageSize
 	}
 	return 0
 }
 
-func (x *ListIntBlockProposerHeadRequest) GetPageToken() string {
+func (x *ListFctBlockProposerHeadRequest) GetPageToken() string {
 	if x != nil {
 		return x.PageToken
 	}
 	return ""
 }
 
-func (x *ListIntBlockProposerHeadRequest) GetOrderBy() string {
+func (x *ListFctBlockProposerHeadRequest) GetOrderBy() string {
 	if x != nil {
 		return x.OrderBy
 	}
 	return ""
 }
 
-// ListIntBlockProposerHeadResponse is the response message for listing int_block_proposer_head records
-type ListIntBlockProposerHeadResponse struct {
+// ListFctBlockProposerHeadResponse is the response message for listing fct_block_proposer_head records
+type ListFctBlockProposerHeadResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// The list of int_block_proposer_head.
-	IntBlockProposerHead []*IntBlockProposerHead `protobuf:"bytes,1,rep,name=int_block_proposer_head,json=intBlockProposerHead,proto3" json:"int_block_proposer_head,omitempty"`
+	// The list of fct_block_proposer_head.
+	FctBlockProposerHead []*FctBlockProposerHead `protobuf:"bytes,1,rep,name=fct_block_proposer_head,json=fctBlockProposerHead,proto3" json:"fct_block_proposer_head,omitempty"`
 	// A token, which can be sent as `page_token` to retrieve the next page.
 	// If this field is omitted, there are no subsequent pages.
 	NextPageToken string `protobuf:"bytes,2,opt,name=next_page_token,json=nextPageToken,proto3" json:"next_page_token,omitempty"`
 }
 
-func (x *ListIntBlockProposerHeadResponse) Reset() {
-	*x = ListIntBlockProposerHeadResponse{}
+func (x *ListFctBlockProposerHeadResponse) Reset() {
+	*x = ListFctBlockProposerHeadResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_vendor_xatu_cbt_clickhouse_int_block_proposer_head_proto_msgTypes[2]
+		mi := &file_vendor_xatu_cbt_clickhouse_fct_block_proposer_head_proto_msgTypes[2]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
 }
 
-func (x *ListIntBlockProposerHeadResponse) String() string {
+func (x *ListFctBlockProposerHeadResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*ListIntBlockProposerHeadResponse) ProtoMessage() {}
+func (*ListFctBlockProposerHeadResponse) ProtoMessage() {}
 
-func (x *ListIntBlockProposerHeadResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_vendor_xatu_cbt_clickhouse_int_block_proposer_head_proto_msgTypes[2]
+func (x *ListFctBlockProposerHeadResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_vendor_xatu_cbt_clickhouse_fct_block_proposer_head_proto_msgTypes[2]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -316,27 +316,27 @@ func (x *ListIntBlockProposerHeadResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ListIntBlockProposerHeadResponse.ProtoReflect.Descriptor instead.
-func (*ListIntBlockProposerHeadResponse) Descriptor() ([]byte, []int) {
-	return file_vendor_xatu_cbt_clickhouse_int_block_proposer_head_proto_rawDescGZIP(), []int{2}
+// Deprecated: Use ListFctBlockProposerHeadResponse.ProtoReflect.Descriptor instead.
+func (*ListFctBlockProposerHeadResponse) Descriptor() ([]byte, []int) {
+	return file_vendor_xatu_cbt_clickhouse_fct_block_proposer_head_proto_rawDescGZIP(), []int{2}
 }
 
-func (x *ListIntBlockProposerHeadResponse) GetIntBlockProposerHead() []*IntBlockProposerHead {
+func (x *ListFctBlockProposerHeadResponse) GetFctBlockProposerHead() []*FctBlockProposerHead {
 	if x != nil {
-		return x.IntBlockProposerHead
+		return x.FctBlockProposerHead
 	}
 	return nil
 }
 
-func (x *ListIntBlockProposerHeadResponse) GetNextPageToken() string {
+func (x *ListFctBlockProposerHeadResponse) GetNextPageToken() string {
 	if x != nil {
 		return x.NextPageToken
 	}
 	return ""
 }
 
-// GetIntBlockProposerHeadRequest is the request message for getting a single int_block_proposer_head record by primary key
-type GetIntBlockProposerHeadRequest struct {
+// GetFctBlockProposerHeadRequest is the request message for getting a single fct_block_proposer_head record by primary key
+type GetFctBlockProposerHeadRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
@@ -345,23 +345,23 @@ type GetIntBlockProposerHeadRequest struct {
 	SlotStartDateTime uint32 `protobuf:"varint,1,opt,name=slot_start_date_time,json=slotStartDateTime,proto3" json:"slot_start_date_time,omitempty"` // Primary key (required)
 }
 
-func (x *GetIntBlockProposerHeadRequest) Reset() {
-	*x = GetIntBlockProposerHeadRequest{}
+func (x *GetFctBlockProposerHeadRequest) Reset() {
+	*x = GetFctBlockProposerHeadRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_vendor_xatu_cbt_clickhouse_int_block_proposer_head_proto_msgTypes[3]
+		mi := &file_vendor_xatu_cbt_clickhouse_fct_block_proposer_head_proto_msgTypes[3]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
 }
 
-func (x *GetIntBlockProposerHeadRequest) String() string {
+func (x *GetFctBlockProposerHeadRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*GetIntBlockProposerHeadRequest) ProtoMessage() {}
+func (*GetFctBlockProposerHeadRequest) ProtoMessage() {}
 
-func (x *GetIntBlockProposerHeadRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_vendor_xatu_cbt_clickhouse_int_block_proposer_head_proto_msgTypes[3]
+func (x *GetFctBlockProposerHeadRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_vendor_xatu_cbt_clickhouse_fct_block_proposer_head_proto_msgTypes[3]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -372,44 +372,44 @@ func (x *GetIntBlockProposerHeadRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetIntBlockProposerHeadRequest.ProtoReflect.Descriptor instead.
-func (*GetIntBlockProposerHeadRequest) Descriptor() ([]byte, []int) {
-	return file_vendor_xatu_cbt_clickhouse_int_block_proposer_head_proto_rawDescGZIP(), []int{3}
+// Deprecated: Use GetFctBlockProposerHeadRequest.ProtoReflect.Descriptor instead.
+func (*GetFctBlockProposerHeadRequest) Descriptor() ([]byte, []int) {
+	return file_vendor_xatu_cbt_clickhouse_fct_block_proposer_head_proto_rawDescGZIP(), []int{3}
 }
 
-func (x *GetIntBlockProposerHeadRequest) GetSlotStartDateTime() uint32 {
+func (x *GetFctBlockProposerHeadRequest) GetSlotStartDateTime() uint32 {
 	if x != nil {
 		return x.SlotStartDateTime
 	}
 	return 0
 }
 
-// GetIntBlockProposerHeadResponse is the response message for getting a single int_block_proposer_head record
-type GetIntBlockProposerHeadResponse struct {
+// GetFctBlockProposerHeadResponse is the response message for getting a single fct_block_proposer_head record
+type GetFctBlockProposerHeadResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Item *IntBlockProposerHead `protobuf:"bytes,1,opt,name=item,proto3" json:"item,omitempty"`
+	Item *FctBlockProposerHead `protobuf:"bytes,1,opt,name=item,proto3" json:"item,omitempty"`
 }
 
-func (x *GetIntBlockProposerHeadResponse) Reset() {
-	*x = GetIntBlockProposerHeadResponse{}
+func (x *GetFctBlockProposerHeadResponse) Reset() {
+	*x = GetFctBlockProposerHeadResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_vendor_xatu_cbt_clickhouse_int_block_proposer_head_proto_msgTypes[4]
+		mi := &file_vendor_xatu_cbt_clickhouse_fct_block_proposer_head_proto_msgTypes[4]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
 }
 
-func (x *GetIntBlockProposerHeadResponse) String() string {
+func (x *GetFctBlockProposerHeadResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*GetIntBlockProposerHeadResponse) ProtoMessage() {}
+func (*GetFctBlockProposerHeadResponse) ProtoMessage() {}
 
-func (x *GetIntBlockProposerHeadResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_vendor_xatu_cbt_clickhouse_int_block_proposer_head_proto_msgTypes[4]
+func (x *GetFctBlockProposerHeadResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_vendor_xatu_cbt_clickhouse_fct_block_proposer_head_proto_msgTypes[4]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -420,30 +420,30 @@ func (x *GetIntBlockProposerHeadResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetIntBlockProposerHeadResponse.ProtoReflect.Descriptor instead.
-func (*GetIntBlockProposerHeadResponse) Descriptor() ([]byte, []int) {
-	return file_vendor_xatu_cbt_clickhouse_int_block_proposer_head_proto_rawDescGZIP(), []int{4}
+// Deprecated: Use GetFctBlockProposerHeadResponse.ProtoReflect.Descriptor instead.
+func (*GetFctBlockProposerHeadResponse) Descriptor() ([]byte, []int) {
+	return file_vendor_xatu_cbt_clickhouse_fct_block_proposer_head_proto_rawDescGZIP(), []int{4}
 }
 
-func (x *GetIntBlockProposerHeadResponse) GetItem() *IntBlockProposerHead {
+func (x *GetFctBlockProposerHeadResponse) GetItem() *FctBlockProposerHead {
 	if x != nil {
 		return x.Item
 	}
 	return nil
 }
 
-var File_vendor_xatu_cbt_clickhouse_int_block_proposer_head_proto protoreflect.FileDescriptor
+var File_vendor_xatu_cbt_clickhouse_fct_block_proposer_head_proto protoreflect.FileDescriptor
 
-var file_vendor_xatu_cbt_clickhouse_int_block_proposer_head_proto_rawDesc = []byte{
+var file_vendor_xatu_cbt_clickhouse_fct_block_proposer_head_proto_rawDesc = []byte{
 	0x0a, 0x38, 0x76, 0x65, 0x6e, 0x64, 0x6f, 0x72, 0x2f, 0x78, 0x61, 0x74, 0x75, 0x2d, 0x63, 0x62,
-	0x74, 0x2f, 0x63, 0x6c, 0x69, 0x63, 0x6b, 0x68, 0x6f, 0x75, 0x73, 0x65, 0x2f, 0x69, 0x6e, 0x74,
+	0x74, 0x2f, 0x63, 0x6c, 0x69, 0x63, 0x6b, 0x68, 0x6f, 0x75, 0x73, 0x65, 0x2f, 0x66, 0x63, 0x74,
 	0x5f, 0x62, 0x6c, 0x6f, 0x63, 0x6b, 0x5f, 0x70, 0x72, 0x6f, 0x70, 0x6f, 0x73, 0x65, 0x72, 0x5f,
 	0x68, 0x65, 0x61, 0x64, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x12, 0x03, 0x63, 0x62, 0x74, 0x1a,
 	0x27, 0x76, 0x65, 0x6e, 0x64, 0x6f, 0x72, 0x2f, 0x78, 0x61, 0x74, 0x75, 0x2d, 0x63, 0x62, 0x74,
 	0x2f, 0x63, 0x6c, 0x69, 0x63, 0x6b, 0x68, 0x6f, 0x75, 0x73, 0x65, 0x2f, 0x63, 0x6f, 0x6d, 0x6d,
 	0x6f, 0x6e, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x1e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65,
 	0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2f, 0x77, 0x72, 0x61, 0x70, 0x70, 0x65,
-	0x72, 0x73, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0xf0, 0x02, 0x0a, 0x14, 0x49, 0x6e, 0x74,
+	0x72, 0x73, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0xf0, 0x02, 0x0a, 0x14, 0x46, 0x63, 0x74,
 	0x42, 0x6c, 0x6f, 0x63, 0x6b, 0x50, 0x72, 0x6f, 0x70, 0x6f, 0x73, 0x65, 0x72, 0x48, 0x65, 0x61,
 	0x64, 0x12, 0x2a, 0x0a, 0x11, 0x75, 0x70, 0x64, 0x61, 0x74, 0x65, 0x64, 0x5f, 0x64, 0x61, 0x74,
 	0x65, 0x5f, 0x74, 0x69, 0x6d, 0x65, 0x18, 0x0b, 0x20, 0x01, 0x28, 0x0d, 0x52, 0x0f, 0x75, 0x70,
@@ -467,7 +467,7 @@ var file_vendor_xatu_cbt_clickhouse_int_block_proposer_head_proto_rawDesc = []by
 	0x28, 0x0b, 0x32, 0x1c, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74,
 	0x6f, 0x62, 0x75, 0x66, 0x2e, 0x53, 0x74, 0x72, 0x69, 0x6e, 0x67, 0x56, 0x61, 0x6c, 0x75, 0x65,
 	0x52, 0x09, 0x62, 0x6c, 0x6f, 0x63, 0x6b, 0x52, 0x6f, 0x6f, 0x74, 0x22, 0xd4, 0x04, 0x0a, 0x1f,
-	0x4c, 0x69, 0x73, 0x74, 0x49, 0x6e, 0x74, 0x42, 0x6c, 0x6f, 0x63, 0x6b, 0x50, 0x72, 0x6f, 0x70,
+	0x4c, 0x69, 0x73, 0x74, 0x46, 0x63, 0x74, 0x42, 0x6c, 0x6f, 0x63, 0x6b, 0x50, 0x72, 0x6f, 0x70,
 	0x6f, 0x73, 0x65, 0x72, 0x48, 0x65, 0x61, 0x64, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12,
 	0x42, 0x0a, 0x14, 0x73, 0x6c, 0x6f, 0x74, 0x5f, 0x73, 0x74, 0x61, 0x72, 0x74, 0x5f, 0x64, 0x61,
 	0x74, 0x65, 0x5f, 0x74, 0x69, 0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x11, 0x2e,
@@ -504,38 +504,38 @@ var file_vendor_xatu_cbt_clickhouse_int_block_proposer_head_proto_rawDesc = []by
 	0x5f, 0x74, 0x6f, 0x6b, 0x65, 0x6e, 0x18, 0x0a, 0x20, 0x01, 0x28, 0x09, 0x52, 0x09, 0x70, 0x61,
 	0x67, 0x65, 0x54, 0x6f, 0x6b, 0x65, 0x6e, 0x12, 0x19, 0x0a, 0x08, 0x6f, 0x72, 0x64, 0x65, 0x72,
 	0x5f, 0x62, 0x79, 0x18, 0x0b, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x6f, 0x72, 0x64, 0x65, 0x72,
-	0x42, 0x79, 0x22, 0x9c, 0x01, 0x0a, 0x20, 0x4c, 0x69, 0x73, 0x74, 0x49, 0x6e, 0x74, 0x42, 0x6c,
+	0x42, 0x79, 0x22, 0x9c, 0x01, 0x0a, 0x20, 0x4c, 0x69, 0x73, 0x74, 0x46, 0x63, 0x74, 0x42, 0x6c,
 	0x6f, 0x63, 0x6b, 0x50, 0x72, 0x6f, 0x70, 0x6f, 0x73, 0x65, 0x72, 0x48, 0x65, 0x61, 0x64, 0x52,
-	0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x50, 0x0a, 0x17, 0x69, 0x6e, 0x74, 0x5f, 0x62,
+	0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x50, 0x0a, 0x17, 0x66, 0x63, 0x74, 0x5f, 0x62,
 	0x6c, 0x6f, 0x63, 0x6b, 0x5f, 0x70, 0x72, 0x6f, 0x70, 0x6f, 0x73, 0x65, 0x72, 0x5f, 0x68, 0x65,
-	0x61, 0x64, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x19, 0x2e, 0x63, 0x62, 0x74, 0x2e, 0x49,
-	0x6e, 0x74, 0x42, 0x6c, 0x6f, 0x63, 0x6b, 0x50, 0x72, 0x6f, 0x70, 0x6f, 0x73, 0x65, 0x72, 0x48,
-	0x65, 0x61, 0x64, 0x52, 0x14, 0x69, 0x6e, 0x74, 0x42, 0x6c, 0x6f, 0x63, 0x6b, 0x50, 0x72, 0x6f,
+	0x61, 0x64, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x19, 0x2e, 0x63, 0x62, 0x74, 0x2e, 0x46,
+	0x63, 0x74, 0x42, 0x6c, 0x6f, 0x63, 0x6b, 0x50, 0x72, 0x6f, 0x70, 0x6f, 0x73, 0x65, 0x72, 0x48,
+	0x65, 0x61, 0x64, 0x52, 0x14, 0x66, 0x63, 0x74, 0x42, 0x6c, 0x6f, 0x63, 0x6b, 0x50, 0x72, 0x6f,
 	0x70, 0x6f, 0x73, 0x65, 0x72, 0x48, 0x65, 0x61, 0x64, 0x12, 0x26, 0x0a, 0x0f, 0x6e, 0x65, 0x78,
 	0x74, 0x5f, 0x70, 0x61, 0x67, 0x65, 0x5f, 0x74, 0x6f, 0x6b, 0x65, 0x6e, 0x18, 0x02, 0x20, 0x01,
 	0x28, 0x09, 0x52, 0x0d, 0x6e, 0x65, 0x78, 0x74, 0x50, 0x61, 0x67, 0x65, 0x54, 0x6f, 0x6b, 0x65,
-	0x6e, 0x22, 0x51, 0x0a, 0x1e, 0x47, 0x65, 0x74, 0x49, 0x6e, 0x74, 0x42, 0x6c, 0x6f, 0x63, 0x6b,
+	0x6e, 0x22, 0x51, 0x0a, 0x1e, 0x47, 0x65, 0x74, 0x46, 0x63, 0x74, 0x42, 0x6c, 0x6f, 0x63, 0x6b,
 	0x50, 0x72, 0x6f, 0x70, 0x6f, 0x73, 0x65, 0x72, 0x48, 0x65, 0x61, 0x64, 0x52, 0x65, 0x71, 0x75,
 	0x65, 0x73, 0x74, 0x12, 0x2f, 0x0a, 0x14, 0x73, 0x6c, 0x6f, 0x74, 0x5f, 0x73, 0x74, 0x61, 0x72,
 	0x74, 0x5f, 0x64, 0x61, 0x74, 0x65, 0x5f, 0x74, 0x69, 0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28,
 	0x0d, 0x52, 0x11, 0x73, 0x6c, 0x6f, 0x74, 0x53, 0x74, 0x61, 0x72, 0x74, 0x44, 0x61, 0x74, 0x65,
-	0x54, 0x69, 0x6d, 0x65, 0x22, 0x50, 0x0a, 0x1f, 0x47, 0x65, 0x74, 0x49, 0x6e, 0x74, 0x42, 0x6c,
+	0x54, 0x69, 0x6d, 0x65, 0x22, 0x50, 0x0a, 0x1f, 0x47, 0x65, 0x74, 0x46, 0x63, 0x74, 0x42, 0x6c,
 	0x6f, 0x63, 0x6b, 0x50, 0x72, 0x6f, 0x70, 0x6f, 0x73, 0x65, 0x72, 0x48, 0x65, 0x61, 0x64, 0x52,
 	0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x2d, 0x0a, 0x04, 0x69, 0x74, 0x65, 0x6d, 0x18,
-	0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x19, 0x2e, 0x63, 0x62, 0x74, 0x2e, 0x49, 0x6e, 0x74, 0x42,
+	0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x19, 0x2e, 0x63, 0x62, 0x74, 0x2e, 0x46, 0x63, 0x74, 0x42,
 	0x6c, 0x6f, 0x63, 0x6b, 0x50, 0x72, 0x6f, 0x70, 0x6f, 0x73, 0x65, 0x72, 0x48, 0x65, 0x61, 0x64,
-	0x52, 0x04, 0x69, 0x74, 0x65, 0x6d, 0x32, 0xc4, 0x01, 0x0a, 0x1b, 0x49, 0x6e, 0x74, 0x42, 0x6c,
+	0x52, 0x04, 0x69, 0x74, 0x65, 0x6d, 0x32, 0xc4, 0x01, 0x0a, 0x1b, 0x46, 0x63, 0x74, 0x42, 0x6c,
 	0x6f, 0x63, 0x6b, 0x50, 0x72, 0x6f, 0x70, 0x6f, 0x73, 0x65, 0x72, 0x48, 0x65, 0x61, 0x64, 0x53,
 	0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x12, 0x53, 0x0a, 0x04, 0x4c, 0x69, 0x73, 0x74, 0x12, 0x24,
-	0x2e, 0x63, 0x62, 0x74, 0x2e, 0x4c, 0x69, 0x73, 0x74, 0x49, 0x6e, 0x74, 0x42, 0x6c, 0x6f, 0x63,
+	0x2e, 0x63, 0x62, 0x74, 0x2e, 0x4c, 0x69, 0x73, 0x74, 0x46, 0x63, 0x74, 0x42, 0x6c, 0x6f, 0x63,
 	0x6b, 0x50, 0x72, 0x6f, 0x70, 0x6f, 0x73, 0x65, 0x72, 0x48, 0x65, 0x61, 0x64, 0x52, 0x65, 0x71,
-	0x75, 0x65, 0x73, 0x74, 0x1a, 0x25, 0x2e, 0x63, 0x62, 0x74, 0x2e, 0x4c, 0x69, 0x73, 0x74, 0x49,
-	0x6e, 0x74, 0x42, 0x6c, 0x6f, 0x63, 0x6b, 0x50, 0x72, 0x6f, 0x70, 0x6f, 0x73, 0x65, 0x72, 0x48,
+	0x75, 0x65, 0x73, 0x74, 0x1a, 0x25, 0x2e, 0x63, 0x62, 0x74, 0x2e, 0x4c, 0x69, 0x73, 0x74, 0x46,
+	0x63, 0x74, 0x42, 0x6c, 0x6f, 0x63, 0x6b, 0x50, 0x72, 0x6f, 0x70, 0x6f, 0x73, 0x65, 0x72, 0x48,
 	0x65, 0x61, 0x64, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x50, 0x0a, 0x03, 0x47,
-	0x65, 0x74, 0x12, 0x23, 0x2e, 0x63, 0x62, 0x74, 0x2e, 0x47, 0x65, 0x74, 0x49, 0x6e, 0x74, 0x42,
+	0x65, 0x74, 0x12, 0x23, 0x2e, 0x63, 0x62, 0x74, 0x2e, 0x47, 0x65, 0x74, 0x46, 0x63, 0x74, 0x42,
 	0x6c, 0x6f, 0x63, 0x6b, 0x50, 0x72, 0x6f, 0x70, 0x6f, 0x73, 0x65, 0x72, 0x48, 0x65, 0x61, 0x64,
 	0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x24, 0x2e, 0x63, 0x62, 0x74, 0x2e, 0x47, 0x65,
-	0x74, 0x49, 0x6e, 0x74, 0x42, 0x6c, 0x6f, 0x63, 0x6b, 0x50, 0x72, 0x6f, 0x70, 0x6f, 0x73, 0x65,
+	0x74, 0x46, 0x63, 0x74, 0x42, 0x6c, 0x6f, 0x63, 0x6b, 0x50, 0x72, 0x6f, 0x70, 0x6f, 0x73, 0x65,
 	0x72, 0x48, 0x65, 0x61, 0x64, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x42, 0x36, 0x5a,
 	0x34, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x65, 0x74, 0x68, 0x70,
 	0x61, 0x6e, 0x64, 0x61, 0x6f, 0x70, 0x73, 0x2f, 0x78, 0x61, 0x74, 0x75, 0x2d, 0x63, 0x62, 0x74,
@@ -544,45 +544,45 @@ var file_vendor_xatu_cbt_clickhouse_int_block_proposer_head_proto_rawDesc = []by
 }
 
 var (
-	file_vendor_xatu_cbt_clickhouse_int_block_proposer_head_proto_rawDescOnce sync.Once
-	file_vendor_xatu_cbt_clickhouse_int_block_proposer_head_proto_rawDescData = file_vendor_xatu_cbt_clickhouse_int_block_proposer_head_proto_rawDesc
+	file_vendor_xatu_cbt_clickhouse_fct_block_proposer_head_proto_rawDescOnce sync.Once
+	file_vendor_xatu_cbt_clickhouse_fct_block_proposer_head_proto_rawDescData = file_vendor_xatu_cbt_clickhouse_fct_block_proposer_head_proto_rawDesc
 )
 
-func file_vendor_xatu_cbt_clickhouse_int_block_proposer_head_proto_rawDescGZIP() []byte {
-	file_vendor_xatu_cbt_clickhouse_int_block_proposer_head_proto_rawDescOnce.Do(func() {
-		file_vendor_xatu_cbt_clickhouse_int_block_proposer_head_proto_rawDescData = protoimpl.X.CompressGZIP(file_vendor_xatu_cbt_clickhouse_int_block_proposer_head_proto_rawDescData)
+func file_vendor_xatu_cbt_clickhouse_fct_block_proposer_head_proto_rawDescGZIP() []byte {
+	file_vendor_xatu_cbt_clickhouse_fct_block_proposer_head_proto_rawDescOnce.Do(func() {
+		file_vendor_xatu_cbt_clickhouse_fct_block_proposer_head_proto_rawDescData = protoimpl.X.CompressGZIP(file_vendor_xatu_cbt_clickhouse_fct_block_proposer_head_proto_rawDescData)
 	})
-	return file_vendor_xatu_cbt_clickhouse_int_block_proposer_head_proto_rawDescData
+	return file_vendor_xatu_cbt_clickhouse_fct_block_proposer_head_proto_rawDescData
 }
 
-var file_vendor_xatu_cbt_clickhouse_int_block_proposer_head_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
-var file_vendor_xatu_cbt_clickhouse_int_block_proposer_head_proto_goTypes = []any{
-	(*IntBlockProposerHead)(nil),             // 0: cbt.IntBlockProposerHead
-	(*ListIntBlockProposerHeadRequest)(nil),  // 1: cbt.ListIntBlockProposerHeadRequest
-	(*ListIntBlockProposerHeadResponse)(nil), // 2: cbt.ListIntBlockProposerHeadResponse
-	(*GetIntBlockProposerHeadRequest)(nil),   // 3: cbt.GetIntBlockProposerHeadRequest
-	(*GetIntBlockProposerHeadResponse)(nil),  // 4: cbt.GetIntBlockProposerHeadResponse
+var file_vendor_xatu_cbt_clickhouse_fct_block_proposer_head_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
+var file_vendor_xatu_cbt_clickhouse_fct_block_proposer_head_proto_goTypes = []any{
+	(*FctBlockProposerHead)(nil),             // 0: cbt.FctBlockProposerHead
+	(*ListFctBlockProposerHeadRequest)(nil),  // 1: cbt.ListFctBlockProposerHeadRequest
+	(*ListFctBlockProposerHeadResponse)(nil), // 2: cbt.ListFctBlockProposerHeadResponse
+	(*GetFctBlockProposerHeadRequest)(nil),   // 3: cbt.GetFctBlockProposerHeadRequest
+	(*GetFctBlockProposerHeadResponse)(nil),  // 4: cbt.GetFctBlockProposerHeadResponse
 	(*wrapperspb.StringValue)(nil),           // 5: google.protobuf.StringValue
 	(*UInt32Filter)(nil),                     // 6: cbt.UInt32Filter
 	(*StringFilter)(nil),                     // 7: cbt.StringFilter
 	(*NullableStringFilter)(nil),             // 8: cbt.NullableStringFilter
 }
-var file_vendor_xatu_cbt_clickhouse_int_block_proposer_head_proto_depIdxs = []int32{
-	5,  // 0: cbt.IntBlockProposerHead.block_root:type_name -> google.protobuf.StringValue
-	6,  // 1: cbt.ListIntBlockProposerHeadRequest.slot_start_date_time:type_name -> cbt.UInt32Filter
-	6,  // 2: cbt.ListIntBlockProposerHeadRequest.proposer_validator_index:type_name -> cbt.UInt32Filter
-	6,  // 3: cbt.ListIntBlockProposerHeadRequest.updated_date_time:type_name -> cbt.UInt32Filter
-	6,  // 4: cbt.ListIntBlockProposerHeadRequest.slot:type_name -> cbt.UInt32Filter
-	6,  // 5: cbt.ListIntBlockProposerHeadRequest.epoch:type_name -> cbt.UInt32Filter
-	6,  // 6: cbt.ListIntBlockProposerHeadRequest.epoch_start_date_time:type_name -> cbt.UInt32Filter
-	7,  // 7: cbt.ListIntBlockProposerHeadRequest.proposer_pubkey:type_name -> cbt.StringFilter
-	8,  // 8: cbt.ListIntBlockProposerHeadRequest.block_root:type_name -> cbt.NullableStringFilter
-	0,  // 9: cbt.ListIntBlockProposerHeadResponse.int_block_proposer_head:type_name -> cbt.IntBlockProposerHead
-	0,  // 10: cbt.GetIntBlockProposerHeadResponse.item:type_name -> cbt.IntBlockProposerHead
-	1,  // 11: cbt.IntBlockProposerHeadService.List:input_type -> cbt.ListIntBlockProposerHeadRequest
-	3,  // 12: cbt.IntBlockProposerHeadService.Get:input_type -> cbt.GetIntBlockProposerHeadRequest
-	2,  // 13: cbt.IntBlockProposerHeadService.List:output_type -> cbt.ListIntBlockProposerHeadResponse
-	4,  // 14: cbt.IntBlockProposerHeadService.Get:output_type -> cbt.GetIntBlockProposerHeadResponse
+var file_vendor_xatu_cbt_clickhouse_fct_block_proposer_head_proto_depIdxs = []int32{
+	5,  // 0: cbt.FctBlockProposerHead.block_root:type_name -> google.protobuf.StringValue
+	6,  // 1: cbt.ListFctBlockProposerHeadRequest.slot_start_date_time:type_name -> cbt.UInt32Filter
+	6,  // 2: cbt.ListFctBlockProposerHeadRequest.proposer_validator_index:type_name -> cbt.UInt32Filter
+	6,  // 3: cbt.ListFctBlockProposerHeadRequest.updated_date_time:type_name -> cbt.UInt32Filter
+	6,  // 4: cbt.ListFctBlockProposerHeadRequest.slot:type_name -> cbt.UInt32Filter
+	6,  // 5: cbt.ListFctBlockProposerHeadRequest.epoch:type_name -> cbt.UInt32Filter
+	6,  // 6: cbt.ListFctBlockProposerHeadRequest.epoch_start_date_time:type_name -> cbt.UInt32Filter
+	7,  // 7: cbt.ListFctBlockProposerHeadRequest.proposer_pubkey:type_name -> cbt.StringFilter
+	8,  // 8: cbt.ListFctBlockProposerHeadRequest.block_root:type_name -> cbt.NullableStringFilter
+	0,  // 9: cbt.ListFctBlockProposerHeadResponse.fct_block_proposer_head:type_name -> cbt.FctBlockProposerHead
+	0,  // 10: cbt.GetFctBlockProposerHeadResponse.item:type_name -> cbt.FctBlockProposerHead
+	1,  // 11: cbt.FctBlockProposerHeadService.List:input_type -> cbt.ListFctBlockProposerHeadRequest
+	3,  // 12: cbt.FctBlockProposerHeadService.Get:input_type -> cbt.GetFctBlockProposerHeadRequest
+	2,  // 13: cbt.FctBlockProposerHeadService.List:output_type -> cbt.ListFctBlockProposerHeadResponse
+	4,  // 14: cbt.FctBlockProposerHeadService.Get:output_type -> cbt.GetFctBlockProposerHeadResponse
 	13, // [13:15] is the sub-list for method output_type
 	11, // [11:13] is the sub-list for method input_type
 	11, // [11:11] is the sub-list for extension type_name
@@ -590,15 +590,15 @@ var file_vendor_xatu_cbt_clickhouse_int_block_proposer_head_proto_depIdxs = []in
 	0,  // [0:11] is the sub-list for field type_name
 }
 
-func init() { file_vendor_xatu_cbt_clickhouse_int_block_proposer_head_proto_init() }
-func file_vendor_xatu_cbt_clickhouse_int_block_proposer_head_proto_init() {
-	if File_vendor_xatu_cbt_clickhouse_int_block_proposer_head_proto != nil {
+func init() { file_vendor_xatu_cbt_clickhouse_fct_block_proposer_head_proto_init() }
+func file_vendor_xatu_cbt_clickhouse_fct_block_proposer_head_proto_init() {
+	if File_vendor_xatu_cbt_clickhouse_fct_block_proposer_head_proto != nil {
 		return
 	}
 	file_vendor_xatu_cbt_clickhouse_common_proto_init()
 	if !protoimpl.UnsafeEnabled {
-		file_vendor_xatu_cbt_clickhouse_int_block_proposer_head_proto_msgTypes[0].Exporter = func(v any, i int) any {
-			switch v := v.(*IntBlockProposerHead); i {
+		file_vendor_xatu_cbt_clickhouse_fct_block_proposer_head_proto_msgTypes[0].Exporter = func(v any, i int) any {
+			switch v := v.(*FctBlockProposerHead); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -609,8 +609,8 @@ func file_vendor_xatu_cbt_clickhouse_int_block_proposer_head_proto_init() {
 				return nil
 			}
 		}
-		file_vendor_xatu_cbt_clickhouse_int_block_proposer_head_proto_msgTypes[1].Exporter = func(v any, i int) any {
-			switch v := v.(*ListIntBlockProposerHeadRequest); i {
+		file_vendor_xatu_cbt_clickhouse_fct_block_proposer_head_proto_msgTypes[1].Exporter = func(v any, i int) any {
+			switch v := v.(*ListFctBlockProposerHeadRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -621,8 +621,8 @@ func file_vendor_xatu_cbt_clickhouse_int_block_proposer_head_proto_init() {
 				return nil
 			}
 		}
-		file_vendor_xatu_cbt_clickhouse_int_block_proposer_head_proto_msgTypes[2].Exporter = func(v any, i int) any {
-			switch v := v.(*ListIntBlockProposerHeadResponse); i {
+		file_vendor_xatu_cbt_clickhouse_fct_block_proposer_head_proto_msgTypes[2].Exporter = func(v any, i int) any {
+			switch v := v.(*ListFctBlockProposerHeadResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -633,8 +633,8 @@ func file_vendor_xatu_cbt_clickhouse_int_block_proposer_head_proto_init() {
 				return nil
 			}
 		}
-		file_vendor_xatu_cbt_clickhouse_int_block_proposer_head_proto_msgTypes[3].Exporter = func(v any, i int) any {
-			switch v := v.(*GetIntBlockProposerHeadRequest); i {
+		file_vendor_xatu_cbt_clickhouse_fct_block_proposer_head_proto_msgTypes[3].Exporter = func(v any, i int) any {
+			switch v := v.(*GetFctBlockProposerHeadRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -645,8 +645,8 @@ func file_vendor_xatu_cbt_clickhouse_int_block_proposer_head_proto_init() {
 				return nil
 			}
 		}
-		file_vendor_xatu_cbt_clickhouse_int_block_proposer_head_proto_msgTypes[4].Exporter = func(v any, i int) any {
-			switch v := v.(*GetIntBlockProposerHeadResponse); i {
+		file_vendor_xatu_cbt_clickhouse_fct_block_proposer_head_proto_msgTypes[4].Exporter = func(v any, i int) any {
+			switch v := v.(*GetFctBlockProposerHeadResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -662,18 +662,18 @@ func file_vendor_xatu_cbt_clickhouse_int_block_proposer_head_proto_init() {
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: file_vendor_xatu_cbt_clickhouse_int_block_proposer_head_proto_rawDesc,
+			RawDescriptor: file_vendor_xatu_cbt_clickhouse_fct_block_proposer_head_proto_rawDesc,
 			NumEnums:      0,
 			NumMessages:   5,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
-		GoTypes:           file_vendor_xatu_cbt_clickhouse_int_block_proposer_head_proto_goTypes,
-		DependencyIndexes: file_vendor_xatu_cbt_clickhouse_int_block_proposer_head_proto_depIdxs,
-		MessageInfos:      file_vendor_xatu_cbt_clickhouse_int_block_proposer_head_proto_msgTypes,
+		GoTypes:           file_vendor_xatu_cbt_clickhouse_fct_block_proposer_head_proto_goTypes,
+		DependencyIndexes: file_vendor_xatu_cbt_clickhouse_fct_block_proposer_head_proto_depIdxs,
+		MessageInfos:      file_vendor_xatu_cbt_clickhouse_fct_block_proposer_head_proto_msgTypes,
 	}.Build()
-	File_vendor_xatu_cbt_clickhouse_int_block_proposer_head_proto = out.File
-	file_vendor_xatu_cbt_clickhouse_int_block_proposer_head_proto_rawDesc = nil
-	file_vendor_xatu_cbt_clickhouse_int_block_proposer_head_proto_goTypes = nil
-	file_vendor_xatu_cbt_clickhouse_int_block_proposer_head_proto_depIdxs = nil
+	File_vendor_xatu_cbt_clickhouse_fct_block_proposer_head_proto = out.File
+	file_vendor_xatu_cbt_clickhouse_fct_block_proposer_head_proto_rawDesc = nil
+	file_vendor_xatu_cbt_clickhouse_fct_block_proposer_head_proto_goTypes = nil
+	file_vendor_xatu_cbt_clickhouse_fct_block_proposer_head_proto_depIdxs = nil
 }

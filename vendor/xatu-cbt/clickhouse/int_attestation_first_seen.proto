@@ -3,6 +3,7 @@ syntax = "proto3";
 package cbt;
 
 import "vendor/xatu-cbt/clickhouse/common.proto";
+import "google/protobuf/wrappers.proto";
 
 option go_package = "github.com/ethpandaops/xatu-cbt/pkg/proto/clickhouse";
 // When the attestation was first seen on the network by a sentry node
@@ -48,10 +49,18 @@ message IntAttestationFirstSeen {
   string meta_client_geo_country_code = 29;
   // Continent code of the client
   string meta_client_geo_continent_code = 30;
+  // Longitude of the client
+  google.protobuf.DoubleValue meta_client_geo_longitude = 31;
+  // Latitude of the client
+  google.protobuf.DoubleValue meta_client_geo_latitude = 32;
+  // Autonomous system number of the client
+  google.protobuf.UInt32Value meta_client_geo_autonomous_system_number = 33;
+  // Autonomous system organization of the client
+  google.protobuf.StringValue meta_client_geo_autonomous_system_organization = 34;
   // Ethereum consensus client version
-  string meta_consensus_version = 31;
+  string meta_consensus_version = 35;
   // Ethereum consensus client implementation
-  string meta_consensus_implementation = 32;
+  string meta_consensus_implementation = 36;
 }
 
 // ListIntAttestationFirstSeenRequest is the request message for listing int_attestation_first_seen records
@@ -98,22 +107,30 @@ message ListIntAttestationFirstSeenRequest {
   StringFilter meta_client_geo_country_code = 19;
   // Filter by meta_client_geo_continent_code (optional)
   StringFilter meta_client_geo_continent_code = 20;
+  // Filter by meta_client_geo_longitude (optional)
+  google.protobuf.DoubleValue meta_client_geo_longitude = 21;
+  // Filter by meta_client_geo_latitude (optional)
+  google.protobuf.DoubleValue meta_client_geo_latitude = 22;
+  // Filter by meta_client_geo_autonomous_system_number (optional)
+  NullableUInt32Filter meta_client_geo_autonomous_system_number = 23;
+  // Filter by meta_client_geo_autonomous_system_organization (optional)
+  NullableStringFilter meta_client_geo_autonomous_system_organization = 24;
   // Filter by meta_consensus_version (optional)
-  StringFilter meta_consensus_version = 21;
+  StringFilter meta_consensus_version = 25;
   // Filter by meta_consensus_implementation (optional)
-  StringFilter meta_consensus_implementation = 22;
+  StringFilter meta_consensus_implementation = 26;
 
   // The maximum number of int_attestation_first_seen to return.
   // If unspecified, at most 100 items will be returned.
-  // The maximum value is 1000; values above 1000 will be coerced to 1000.
-  int32 page_size = 23;
+  // The maximum value is 10000; values above 10000 will be coerced to 10000.
+  int32 page_size = 27;
   // A page token, received from a previous `ListIntAttestationFirstSeen` call.
   // Provide this to retrieve the subsequent page.
-  string page_token = 24;
+  string page_token = 28;
   // The order of results. Format: comma-separated list of fields.
   // Example: "foo,bar" or "foo desc,bar" for descending order on foo.
   // If unspecified, results will be returned in the default order.
-  string order_by = 25;
+  string order_by = 29;
 }
 
 // ListIntAttestationFirstSeenResponse is the response message for listing int_attestation_first_seen records

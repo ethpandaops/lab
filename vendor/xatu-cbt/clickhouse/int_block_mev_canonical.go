@@ -8,16 +8,11 @@ import (
 )
 
 // BuildListIntBlockMevCanonicalQuery constructs a parameterized SQL query from a ListIntBlockMevCanonicalRequest
-//
-// Available projections:
-//   - p_by_slot (primary key: slot)
-//
-// Use WithProjection() option to select a specific projection.
 func BuildListIntBlockMevCanonicalQuery(req *ListIntBlockMevCanonicalRequest, options ...QueryOption) (SQLQuery, error) {
 	// Validate that at least one primary key is provided
 	// Primary keys can come from base table or projections
-	if req.Slot == nil && req.SlotStartDateTime == nil {
-		return SQLQuery{}, fmt.Errorf("at least one primary key field is required: slot, slot_start_date_time")
+	if req.SlotStartDateTime == nil {
+		return SQLQuery{}, fmt.Errorf("primary key field slot_start_date_time is required")
 	}
 
 	// Build query using QueryBuilder
@@ -542,13 +537,18 @@ func BuildListIntBlockMevCanonicalQuery(req *ListIntBlockMevCanonicalRequest, op
 	}
 
 	// Handle pagination per AIP-132
+	// Validate page size
+	if req.PageSize < 0 {
+		return SQLQuery{}, fmt.Errorf("page_size must be non-negative, got %d", req.PageSize)
+	}
+	if req.PageSize > 10000 {
+		return SQLQuery{}, fmt.Errorf("page_size must not exceed %d, got %d", 10000, req.PageSize)
+	}
+
 	var limit, offset uint32
 	limit = 100 // Default page size
 	if req.PageSize > 0 {
 		limit = uint32(req.PageSize)
-		if limit > 1000 {
-			limit = 1000 // Maximum allowed
-		}
 	}
 	if req.PageToken != "" {
 		decodedOffset, err := DecodePageToken(req.PageToken)

@@ -5,7 +5,7 @@ package cbt;
 import "vendor/xatu-cbt/clickhouse/common.proto";
 
 option go_package = "github.com/ethpandaops/xatu-cbt/pkg/proto/clickhouse";
-// Attestations first seen on the unfinalized chain broken down by 50ms chunks. Only includes attestations that were seen within 12000ms of the slot start time.
+// Attestations first seen on the unfinalized chain broken down by 50ms chunks. Only includes attestations that were seen within 12000ms of the slot start time. There can be multiple block roots + chunk_slot_start_diff for the same slot, it most likely means votes for prior slot blocks
 
 message FctAttestationFirstSeenChunked50ms {
   // Timestamp when the record was last updated
@@ -50,7 +50,7 @@ message ListFctAttestationFirstSeenChunked50msRequest {
 
   // The maximum number of fct_attestation_first_seen_chunked_50ms to return.
   // If unspecified, at most 100 items will be returned.
-  // The maximum value is 1000; values above 1000 will be coerced to 1000.
+  // The maximum value is 10000; values above 10000 will be coerced to 10000.
   int32 page_size = 9;
   // A page token, received from a previous `ListFctAttestationFirstSeenChunked50ms` call.
   // Provide this to retrieve the subsequent page.
