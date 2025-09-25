@@ -331,7 +331,10 @@ func BuildListFctBlockProposerQuery(req *ListFctBlockProposerRequest, options ..
 		orderByClause = " ORDER BY slot_start_date_time"
 	}
 
-	return BuildParameterizedQuery("fct_block_proposer", qb, orderByClause, limit, offset, options...), nil
+	// Build column list
+	columns := []string{"updated_date_time", "slot", "slot_start_date_time", "epoch", "epoch_start_date_time", "proposer_validator_index", "proposer_pubkey", "block_root", "status"}
+
+	return BuildParameterizedQuery("fct_block_proposer", columns, qb, orderByClause, limit, offset, options...)
 }
 
 // BuildGetFctBlockProposerQuery constructs a parameterized SQL query from a GetFctBlockProposerRequest
@@ -348,6 +351,9 @@ func BuildGetFctBlockProposerQuery(req *GetFctBlockProposerRequest, options ...Q
 	// Build ORDER BY clause
 	orderByClause := " ORDER BY slot_start_date_time"
 
+	// Build column list
+	columns := []string{"updated_date_time", "slot", "slot_start_date_time", "epoch", "epoch_start_date_time", "proposer_validator_index", "proposer_pubkey", "block_root", "status"}
+
 	// Return single record
-	return BuildParameterizedQuery("fct_block_proposer", qb, orderByClause, 1, 0, options...), nil
+	return BuildParameterizedQuery("fct_block_proposer", columns, qb, orderByClause, 1, 0, options...)
 }

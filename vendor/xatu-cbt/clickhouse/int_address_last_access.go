@@ -112,7 +112,10 @@ func BuildListIntAddressLastAccessQuery(req *ListIntAddressLastAccessRequest, op
 		orderByClause = " ORDER BY address"
 	}
 
-	return BuildParameterizedQuery("int_address_last_access", qb, orderByClause, limit, offset, options...), nil
+	// Build column list
+	columns := []string{"address", "block_number"}
+
+	return BuildParameterizedQuery("int_address_last_access", columns, qb, orderByClause, limit, offset, options...)
 }
 
 // BuildGetIntAddressLastAccessQuery constructs a parameterized SQL query from a GetIntAddressLastAccessRequest
@@ -129,6 +132,9 @@ func BuildGetIntAddressLastAccessQuery(req *GetIntAddressLastAccessRequest, opti
 	// Build ORDER BY clause
 	orderByClause := " ORDER BY address"
 
+	// Build column list
+	columns := []string{"address", "block_number"}
+
 	// Return single record
-	return BuildParameterizedQuery("int_address_last_access", qb, orderByClause, 1, 0, options...), nil
+	return BuildParameterizedQuery("int_address_last_access", columns, qb, orderByClause, 1, 0, options...)
 }

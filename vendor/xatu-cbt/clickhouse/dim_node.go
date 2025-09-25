@@ -218,7 +218,10 @@ func BuildListDimNodeQuery(req *ListDimNodeRequest, options ...QueryOption) (SQL
 		orderByClause = " ORDER BY validator_index"
 	}
 
-	return BuildParameterizedQuery("dim_node", qb, orderByClause, limit, offset, options...), nil
+	// Build column list
+	columns := []string{"updated_date_time", "validator_index", "name", "groups", "tags", "attributes", "source"}
+
+	return BuildParameterizedQuery("dim_node", columns, qb, orderByClause, limit, offset, options...)
 }
 
 // BuildGetDimNodeQuery constructs a parameterized SQL query from a GetDimNodeRequest
@@ -235,6 +238,9 @@ func BuildGetDimNodeQuery(req *GetDimNodeRequest, options ...QueryOption) (SQLQu
 	// Build ORDER BY clause
 	orderByClause := " ORDER BY validator_index"
 
+	// Build column list
+	columns := []string{"updated_date_time", "validator_index", "name", "groups", "tags", "attributes", "source"}
+
 	// Return single record
-	return BuildParameterizedQuery("dim_node", qb, orderByClause, 1, 0, options...), nil
+	return BuildParameterizedQuery("dim_node", columns, qb, orderByClause, 1, 0, options...)
 }

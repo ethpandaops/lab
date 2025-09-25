@@ -172,7 +172,10 @@ func BuildListIntAddressStorageSlotLastAccessQuery(req *ListIntAddressStorageSlo
 		orderByClause = " ORDER BY address" + ", slot_key"
 	}
 
-	return BuildParameterizedQuery("int_address_storage_slot_last_access", qb, orderByClause, limit, offset, options...), nil
+	// Build column list
+	columns := []string{"address", "slot_key", "block_number", "value"}
+
+	return BuildParameterizedQuery("int_address_storage_slot_last_access", columns, qb, orderByClause, limit, offset, options...)
 }
 
 // BuildGetIntAddressStorageSlotLastAccessQuery constructs a parameterized SQL query from a GetIntAddressStorageSlotLastAccessRequest
@@ -189,6 +192,9 @@ func BuildGetIntAddressStorageSlotLastAccessQuery(req *GetIntAddressStorageSlotL
 	// Build ORDER BY clause
 	orderByClause := " ORDER BY address, slot_key"
 
+	// Build column list
+	columns := []string{"address", "slot_key", "block_number", "value"}
+
 	// Return single record
-	return BuildParameterizedQuery("int_address_storage_slot_last_access", qb, orderByClause, 1, 0, options...), nil
+	return BuildParameterizedQuery("int_address_storage_slot_last_access", columns, qb, orderByClause, 1, 0, options...)
 }

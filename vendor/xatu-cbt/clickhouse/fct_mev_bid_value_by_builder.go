@@ -329,7 +329,10 @@ func BuildListFctMevBidValueByBuilderQuery(req *ListFctMevBidValueByBuilderReque
 		orderByClause = " ORDER BY slot_start_date_time" + ", builder_pubkey"
 	}
 
-	return BuildParameterizedQuery("fct_mev_bid_value_by_builder", qb, orderByClause, limit, offset, options...), nil
+	// Build column list
+	columns := []string{"updated_date_time", "slot", "slot_start_date_time", "epoch", "epoch_start_date_time", "earliest_bid_date_time", "relay_names", "block_hash", "builder_pubkey", "value"}
+
+	return BuildParameterizedQuery("fct_mev_bid_value_by_builder", columns, qb, orderByClause, limit, offset, options...)
 }
 
 // BuildGetFctMevBidValueByBuilderQuery constructs a parameterized SQL query from a GetFctMevBidValueByBuilderRequest
@@ -346,6 +349,9 @@ func BuildGetFctMevBidValueByBuilderQuery(req *GetFctMevBidValueByBuilderRequest
 	// Build ORDER BY clause
 	orderByClause := " ORDER BY slot_start_date_time, builder_pubkey"
 
+	// Build column list
+	columns := []string{"updated_date_time", "slot", "slot_start_date_time", "epoch", "epoch_start_date_time", "earliest_bid_date_time", "relay_names", "block_hash", "builder_pubkey", "value"}
+
 	// Return single record
-	return BuildParameterizedQuery("fct_mev_bid_value_by_builder", qb, orderByClause, 1, 0, options...), nil
+	return BuildParameterizedQuery("fct_mev_bid_value_by_builder", columns, qb, orderByClause, 1, 0, options...)
 }
