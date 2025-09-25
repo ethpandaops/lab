@@ -101,18 +101,25 @@ func (r *PublicRouter) GetRoutes() []RouteConfig {
 			Description: "Get MEV block data for a specific slot",
 		},
 		{
-			Path:        "/{network}/beacon/slot/{slot}/mev/relay",
+			Path:        "/{network}/beacon/slot/{slot}/mev/relay/count",
 			Handler:     r.handleMevRelayBidCount,
 			Methods:     []string{http.MethodGet, http.MethodOptions},
 			Cache:       middleware.CacheRealtime, // Real-time data for recent slots
 			Description: "Get MEV relay bid count statistics for a specific slot",
 		},
 		{
-			Path:        "/{network}/beacon/slot/{slot}/mev/builder",
+			Path:        "/{network}/beacon/slot/{slot}/mev/builder/value",
 			Handler:     r.handleMevBuilderBid,
 			Methods:     []string{http.MethodGet, http.MethodOptions},
 			Cache:       middleware.CacheRealtime, // Real-time data for recent slots
 			Description: "Get highest MEV bid values by builder for a specific slot",
+		},
+		{
+			Path:        "/{network}/beacon/slot/{slot}/mev/builder/count",
+			Handler:     r.handleMevBuilderBidCount,
+			Methods:     []string{http.MethodGet, http.MethodOptions},
+			Cache:       middleware.CacheRealtime, // Real-time data for recent slots
+			Description: "Get MEV builder bid count statistics for a specific slot",
 		},
 		{
 			Path:        "/{network}/beacon/slot/{slot}/proposer/entity",

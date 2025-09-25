@@ -111,6 +111,19 @@ message MevRelayBidCount {
   uint32 bid_count = 2;                // Total number of bids
 }
 
+// ListBeaconSlotMevBuilderCountResponse is the v1 API response for MEV builder bid counts by slot.
+message ListBeaconSlotMevBuilderCountResponse {
+  repeated MevBuilderBidCount builders = 1;
+  PaginationMetadata pagination = 2;
+  FilterMetadata filters = 3;
+}
+
+// MevBuilderBidCount represents MEV builder bid statistics for public API consumption.
+message MevBuilderBidCount {
+  string builder_pubkey = 1;           // Builder public key identifier
+  uint32 bid_count = 2;                // Total number of bids from this builder
+}
+
 // ListBeaconSlotMevResponse is the v1 API response for MEV block data by slot.
 message ListBeaconSlotMevResponse {
   repeated MevBlock blocks = 1;

@@ -92,6 +92,8 @@ github.com/ethpandaops/ethwallclock v0.4.0 h1:+sgnhf4pk6hLPukP076VxkiLloE4L0Yk1y
 github.com/ethpandaops/ethwallclock v0.4.0/go.mod h1:y0Cu+mhGLlem19vnAV2x0hpFS5KZ7oOi2SWYayv9l24=
 github.com/ethpandaops/xatu-cbt v0.0.0-20250925054105-39dbd17aff7c h1:84wisGvdRbNFy5EIXGEnp4Dj6bL8Sk2BFMDtvyNeXgY=
 github.com/ethpandaops/xatu-cbt v0.0.0-20250925054105-39dbd17aff7c/go.mod h1:iJpkfBEpE98rnSIb+6dBlrBXfy35VqhCxhwRFzefUsU=
+github.com/ethpandaops/xatu-cbt v0.0.0-20250925061206-b3dace14d73a h1:qlkhg3JthG58Pl27WD0gdyF8EX3lzTgO1xeiuVXrJ2M=
+github.com/ethpandaops/xatu-cbt v0.0.0-20250925061206-b3dace14d73a/go.mod h1:iJpkfBEpE98rnSIb+6dBlrBXfy35VqhCxhwRFzefUsU=
 github.com/felixge/httpsnoop v1.0.4 h1:NFTV2Zj1bL4mc9sqWACXbQFVBBg2W3GPvqp8/ESS2Wg=
 github.com/felixge/httpsnoop v1.0.4/go.mod h1:m8KPJKqk1gH5J9DgRY2ASl2lWCfGKXixSwevea8zH2U=
 github.com/ferranbt/fastssz v1.0.0 h1:9EXXYsracSqQRBQiHeaVsG/KQeYblPf40hsQPb9Dzk8=

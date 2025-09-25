@@ -60,8 +60,8 @@ export function useBeaconSlotData(
         client.getBeaconAttestationCorrectness(network, slot),
         client.getBeaconProposerEntity(network, slot),
         client.getMevBlock(network, slot),
-        client.getMevRelay(network, slot),
-        client.getMevBuilder(network, slot),
+        client.getMevRelayCount(network, slot),
+        client.getMevBuilderValue(network, slot),
       ]);
 
       // Log any failures for debugging

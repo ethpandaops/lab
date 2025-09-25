@@ -11,6 +11,7 @@ import {
   ListBeaconSlotMevRelayResponse,
   ListBeaconSlotMevResponse,
   ListBeaconSlotMevBuilderResponse,
+  ListBeaconSlotMevBuilderCountResponse,
   GetExperimentConfigResponse,
 } from '../gen/backend/pkg/api/v1/proto/public_pb';
 import { API_V1_ENDPOINTS, buildQueryString, NodeFilters } from './endpoints';
@@ -398,13 +399,13 @@ export class RestApiClient {
   /**
    * Get MEV relay bid counts for a specific slot
    */
-  async getMevRelay(
+  async getMevRelayCount(
     network: string,
     slot: number,
     params?: Record<string, any>,
   ): Promise<ListBeaconSlotMevRelayResponse> {
     const queryString = params ? buildQueryString(params) : new URLSearchParams();
-    const url = `${this.baseUrl}${API_V1_ENDPOINTS.mevRelay(network, slot)}${
+    const url = `${this.baseUrl}${API_V1_ENDPOINTS.mevRelayCount(network, slot)}${
       queryString.toString() ? `?${queryString.toString()}` : ''
     }`;
     const response = await this.fetchWithRetry<any>(url);
@@ -412,19 +413,35 @@ export class RestApiClient {
   }
 
   /**
-   * Get MEV builder bid data for a specific slot
+   * Get MEV builder bid values for a specific slot
    */
-  async getMevBuilder(
+  async getMevBuilderValue(
     network: string,
     slot: number,
     params?: Record<string, any>,
   ): Promise<ListBeaconSlotMevBuilderResponse> {
     const queryString = params ? buildQueryString(params) : new URLSearchParams();
-    const url = `${this.baseUrl}${API_V1_ENDPOINTS.mevBuilder(network, slot)}${
+    const url = `${this.baseUrl}${API_V1_ENDPOINTS.mevBuilderValue(network, slot)}${
       queryString.toString() ? `?${queryString.toString()}` : ''
     }`;
     const response = await this.fetchWithRetry<any>(url);
     return ListBeaconSlotMevBuilderResponse.fromJson(response);
+  }
+
+  /**
+   * Get MEV builder bid counts for a specific slot
+   */
+  async getMevBuilderCount(
+    network: string,
+    slot: number,
+    params?: Record<string, any>,
+  ): Promise<ListBeaconSlotMevBuilderCountResponse> {
+    const queryString = params ? buildQueryString(params) : new URLSearchParams();
+    const url = `${this.baseUrl}${API_V1_ENDPOINTS.mevBuilderCount(network, slot)}${
+      queryString.toString() ? `?${queryString.toString()}` : ''
+    }`;
+    const response = await this.fetchWithRetry<any>(url);
+    return ListBeaconSlotMevBuilderCountResponse.fromJson(response);
   }
 }
 

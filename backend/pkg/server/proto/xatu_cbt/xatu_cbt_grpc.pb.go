@@ -26,6 +26,7 @@ const (
 	XatuCBT_ListFctAttestationFirstSeenChunked50Ms_FullMethodName = "/xatu_cbt.XatuCBT/ListFctAttestationFirstSeenChunked50ms"
 	XatuCBT_ListFctAttestationCorrectnessHead_FullMethodName      = "/xatu_cbt.XatuCBT/ListFctAttestationCorrectnessHead"
 	XatuCBT_ListFctMevBidCountByRelay_FullMethodName              = "/xatu_cbt.XatuCBT/ListFctMevBidCountByRelay"
+	XatuCBT_ListFctMevBidCountByBuilder_FullMethodName            = "/xatu_cbt.XatuCBT/ListFctMevBidCountByBuilder"
 	XatuCBT_ListFctMevBidValueByBuilder_FullMethodName            = "/xatu_cbt.XatuCBT/ListFctMevBidValueByBuilder"
 	XatuCBT_ListFctBlockBlobCountHead_FullMethodName              = "/xatu_cbt.XatuCBT/ListFctBlockBlobCountHead"
 	XatuCBT_ListFctBlockHead_FullMethodName                       = "/xatu_cbt.XatuCBT/ListFctBlockHead"
@@ -59,6 +60,9 @@ type XatuCBTClient interface {
 	// ListFctMevBidCountByRelay returns MEV relay bid count data.
 	// This table contains the total number of MEV relay bids for a slot by relay.
 	ListFctMevBidCountByRelay(ctx context.Context, in *clickhouse.ListFctMevBidCountByRelayRequest, opts ...grpc.CallOption) (*clickhouse.ListFctMevBidCountByRelayResponse, error)
+	// ListFctMevBidCountByBuilder returns MEV builder bid count data.
+	// This table contains the total number of MEV bids for a slot by builder.
+	ListFctMevBidCountByBuilder(ctx context.Context, in *clickhouse.ListFctMevBidCountByBuilderRequest, opts ...grpc.CallOption) (*clickhouse.ListFctMevBidCountByBuilderResponse, error)
 	// ListFctMevBidValueByBuilder returns highest MEV bid values by builder for a slot.
 	// This table contains the highest value MEV relay bid for a slot by builder.
 	ListFctMevBidValueByBuilder(ctx context.Context, in *clickhouse.ListFctMevBidValueByBuilderRequest, opts ...grpc.CallOption) (*clickhouse.ListFctMevBidValueByBuilderResponse, error)
@@ -141,6 +145,16 @@ func (c *xatuCBTClient) ListFctMevBidCountByRelay(ctx context.Context, in *click
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(clickhouse.ListFctMevBidCountByRelayResponse)
 	err := c.cc.Invoke(ctx, XatuCBT_ListFctMevBidCountByRelay_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *xatuCBTClient) ListFctMevBidCountByBuilder(ctx context.Context, in *clickhouse.ListFctMevBidCountByBuilderRequest, opts ...grpc.CallOption) (*clickhouse.ListFctMevBidCountByBuilderResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(clickhouse.ListFctMevBidCountByBuilderResponse)
+	err := c.cc.Invoke(ctx, XatuCBT_ListFctMevBidCountByBuilder_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -232,6 +246,9 @@ type XatuCBTServer interface {
 	// ListFctMevBidCountByRelay returns MEV relay bid count data.
 	// This table contains the total number of MEV relay bids for a slot by relay.
 	ListFctMevBidCountByRelay(context.Context, *clickhouse.ListFctMevBidCountByRelayRequest) (*clickhouse.ListFctMevBidCountByRelayResponse, error)
+	// ListFctMevBidCountByBuilder returns MEV builder bid count data.
+	// This table contains the total number of MEV bids for a slot by builder.
+	ListFctMevBidCountByBuilder(context.Context, *clickhouse.ListFctMevBidCountByBuilderRequest) (*clickhouse.ListFctMevBidCountByBuilderResponse, error)
 	// ListFctMevBidValueByBuilder returns highest MEV bid values by builder for a slot.
 	// This table contains the highest value MEV relay bid for a slot by builder.
 	ListFctMevBidValueByBuilder(context.Context, *clickhouse.ListFctMevBidValueByBuilderRequest) (*clickhouse.ListFctMevBidValueByBuilderResponse, error)
@@ -274,6 +291,9 @@ func (UnimplementedXatuCBTServer) ListFctAttestationCorrectnessHead(context.Cont
 }
 func (UnimplementedXatuCBTServer) ListFctMevBidCountByRelay(context.Context, *clickhouse.ListFctMevBidCountByRelayRequest) (*clickhouse.ListFctMevBidCountByRelayResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListFctMevBidCountByRelay not implemented")
+}
+func (UnimplementedXatuCBTServer) ListFctMevBidCountByBuilder(context.Context, *clickhouse.ListFctMevBidCountByBuilderRequest) (*clickhouse.ListFctMevBidCountByBuilderResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListFctMevBidCountByBuilder not implemented")
 }
 func (UnimplementedXatuCBTServer) ListFctMevBidValueByBuilder(context.Context, *clickhouse.ListFctMevBidValueByBuilderRequest) (*clickhouse.ListFctMevBidValueByBuilderResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListFctMevBidValueByBuilder not implemented")
@@ -410,6 +430,24 @@ func _XatuCBT_ListFctMevBidCountByRelay_Handler(srv interface{}, ctx context.Con
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(XatuCBTServer).ListFctMevBidCountByRelay(ctx, req.(*clickhouse.ListFctMevBidCountByRelayRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _XatuCBT_ListFctMevBidCountByBuilder_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(clickhouse.ListFctMevBidCountByBuilderRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(XatuCBTServer).ListFctMevBidCountByBuilder(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: XatuCBT_ListFctMevBidCountByBuilder_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(XatuCBTServer).ListFctMevBidCountByBuilder(ctx, req.(*clickhouse.ListFctMevBidCountByBuilderRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -552,6 +590,10 @@ var XatuCBT_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListFctMevBidCountByRelay",
 			Handler:    _XatuCBT_ListFctMevBidCountByRelay_Handler,
+		},
+		{
+			MethodName: "ListFctMevBidCountByBuilder",
+			Handler:    _XatuCBT_ListFctMevBidCountByBuilder_Handler,
 		},
 		{
 			MethodName: "ListFctMevBidValueByBuilder",

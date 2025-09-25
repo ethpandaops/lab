@@ -24,9 +24,12 @@ export const API_V1_ENDPOINTS = {
   beaconProposerEntity: (network: string, slot: number) =>
     `/api/v1/${network}/beacon/slot/${slot}/proposer/entity`,
   mevBlock: (network: string, slot: number) => `/api/v1/${network}/beacon/slot/${slot}/mev`,
-  mevRelay: (network: string, slot: number) => `/api/v1/${network}/beacon/slot/${slot}/mev/relay`,
-  mevBuilder: (network: string, slot: number) =>
-    `/api/v1/${network}/beacon/slot/${slot}/mev/builder`,
+  mevRelayCount: (network: string, slot: number) =>
+    `/api/v1/${network}/beacon/slot/${slot}/mev/relay/count`,
+  mevBuilderValue: (network: string, slot: number) =>
+    `/api/v1/${network}/beacon/slot/${slot}/mev/builder/value`,
+  mevBuilderCount: (network: string, slot: number) =>
+    `/api/v1/${network}/beacon/slot/${slot}/mev/builder/count`,
 };
 
 /**
