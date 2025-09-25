@@ -8,7 +8,7 @@ import "google/protobuf/wrappers.proto";
 option go_package = "github.com/ethpandaops/xatu-cbt/pkg/proto/clickhouse";
 // Block proposers for the unfinalized chain
 
-message IntBlockProposerHead {
+message FctBlockProposerHead {
   // Timestamp when the record was last updated
   uint32 updated_date_time = 11;
   // The slot number
@@ -27,8 +27,8 @@ message IntBlockProposerHead {
   google.protobuf.StringValue block_root = 18;
 }
 
-// ListIntBlockProposerHeadRequest is the request message for listing int_block_proposer_head records
-message ListIntBlockProposerHeadRequest {
+// ListFctBlockProposerHeadRequest is the request message for listing fct_block_proposer_head records
+message ListFctBlockProposerHeadRequest {
   // Filter by slot_start_date_time (PRIMARY KEY - required)
   UInt32Filter slot_start_date_time = 1;
 
@@ -48,11 +48,11 @@ message ListIntBlockProposerHeadRequest {
   // Filter by block_root (optional)
   NullableStringFilter block_root = 8;
 
-  // The maximum number of int_block_proposer_head to return.
+  // The maximum number of fct_block_proposer_head to return.
   // If unspecified, at most 100 items will be returned.
-  // The maximum value is 1000; values above 1000 will be coerced to 1000.
+  // The maximum value is 10000; values above 10000 will be coerced to 10000.
   int32 page_size = 9;
-  // A page token, received from a previous `ListIntBlockProposerHead` call.
+  // A page token, received from a previous `ListFctBlockProposerHead` call.
   // Provide this to retrieve the subsequent page.
   string page_token = 10;
   // The order of results. Format: comma-separated list of fields.
@@ -61,30 +61,30 @@ message ListIntBlockProposerHeadRequest {
   string order_by = 11;
 }
 
-// ListIntBlockProposerHeadResponse is the response message for listing int_block_proposer_head records
-message ListIntBlockProposerHeadResponse {
-  // The list of int_block_proposer_head.
-  repeated IntBlockProposerHead int_block_proposer_head = 1;
+// ListFctBlockProposerHeadResponse is the response message for listing fct_block_proposer_head records
+message ListFctBlockProposerHeadResponse {
+  // The list of fct_block_proposer_head.
+  repeated FctBlockProposerHead fct_block_proposer_head = 1;
   // A token, which can be sent as `page_token` to retrieve the next page.
   // If this field is omitted, there are no subsequent pages.
   string next_page_token = 2;
 }
 
-// GetIntBlockProposerHeadRequest is the request message for getting a single int_block_proposer_head record by primary key
-message GetIntBlockProposerHeadRequest {
+// GetFctBlockProposerHeadRequest is the request message for getting a single fct_block_proposer_head record by primary key
+message GetFctBlockProposerHeadRequest {
   // The wall clock time when the slot started
   uint32 slot_start_date_time = 1; // Primary key (required)
 }
 
-// GetIntBlockProposerHeadResponse is the response message for getting a single int_block_proposer_head record
-message GetIntBlockProposerHeadResponse {
-  IntBlockProposerHead item = 1;
+// GetFctBlockProposerHeadResponse is the response message for getting a single fct_block_proposer_head record
+message GetFctBlockProposerHeadResponse {
+  FctBlockProposerHead item = 1;
 }
 
-// IntBlockProposerHeadService provides RPC methods for querying int_block_proposer_head data
-service IntBlockProposerHeadService {
-  // List returns paginated int_block_proposer_head records
-  rpc List(ListIntBlockProposerHeadRequest) returns (ListIntBlockProposerHeadResponse);
-  // Get returns a single int_block_proposer_head record by primary key
-  rpc Get(GetIntBlockProposerHeadRequest) returns (GetIntBlockProposerHeadResponse);
+// FctBlockProposerHeadService provides RPC methods for querying fct_block_proposer_head data
+service FctBlockProposerHeadService {
+  // List returns paginated fct_block_proposer_head records
+  rpc List(ListFctBlockProposerHeadRequest) returns (ListFctBlockProposerHeadResponse);
+  // Get returns a single fct_block_proposer_head record by primary key
+  rpc Get(GetFctBlockProposerHeadRequest) returns (GetFctBlockProposerHeadResponse);
 }

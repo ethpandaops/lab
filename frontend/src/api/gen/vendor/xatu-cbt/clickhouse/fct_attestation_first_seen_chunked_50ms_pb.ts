@@ -167,7 +167,7 @@ export class ListFctAttestationFirstSeenChunked50msRequest extends Message<ListF
   /**
    * The maximum number of fct_attestation_first_seen_chunked_50ms to return.
    * If unspecified, at most 100 items will be returned.
-   * The maximum value is 1000; values above 1000 will be coerced to 1000.
+   * The maximum value is 10000; values above 10000 will be coerced to 10000.
    *
    * @generated from field: int32 page_size = 9;
    */

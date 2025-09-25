@@ -5,9 +5,9 @@ package cbt;
 import "vendor/xatu-cbt/clickhouse/common.proto";
 
 option go_package = "github.com/ethpandaops/xatu-cbt/pkg/proto/clickhouse";
-// Blob count of a block for the unfinalized chain. Forks in the chain may cause multiple block roots for the same slot to be present
+// Blob count of a block for the finalized chain
 
-message IntBlockBlobCountHead {
+message IntBlockBlobCountCanonical {
   // Timestamp when the record was last updated
   uint32 updated_date_time = 11;
   // The slot number
@@ -24,8 +24,8 @@ message IntBlockBlobCountHead {
   uint32 blob_count = 17;
 }
 
-// ListIntBlockBlobCountHeadRequest is the request message for listing int_block_blob_count_head records
-message ListIntBlockBlobCountHeadRequest {
+// ListIntBlockBlobCountCanonicalRequest is the request message for listing int_block_blob_count_canonical records
+message ListIntBlockBlobCountCanonicalRequest {
   // Filter by slot_start_date_time (PRIMARY KEY - required)
   UInt32Filter slot_start_date_time = 1;
 
@@ -43,11 +43,11 @@ message ListIntBlockBlobCountHeadRequest {
   // Filter by blob_count (optional)
   UInt32Filter blob_count = 7;
 
-  // The maximum number of int_block_blob_count_head to return.
+  // The maximum number of int_block_blob_count_canonical to return.
   // If unspecified, at most 100 items will be returned.
-  // The maximum value is 1000; values above 1000 will be coerced to 1000.
+  // The maximum value is 10000; values above 10000 will be coerced to 10000.
   int32 page_size = 8;
-  // A page token, received from a previous `ListIntBlockBlobCountHead` call.
+  // A page token, received from a previous `ListIntBlockBlobCountCanonical` call.
   // Provide this to retrieve the subsequent page.
   string page_token = 9;
   // The order of results. Format: comma-separated list of fields.
@@ -56,30 +56,30 @@ message ListIntBlockBlobCountHeadRequest {
   string order_by = 10;
 }
 
-// ListIntBlockBlobCountHeadResponse is the response message for listing int_block_blob_count_head records
-message ListIntBlockBlobCountHeadResponse {
-  // The list of int_block_blob_count_head.
-  repeated IntBlockBlobCountHead int_block_blob_count_head = 1;
+// ListIntBlockBlobCountCanonicalResponse is the response message for listing int_block_blob_count_canonical records
+message ListIntBlockBlobCountCanonicalResponse {
+  // The list of int_block_blob_count_canonical.
+  repeated IntBlockBlobCountCanonical int_block_blob_count_canonical = 1;
   // A token, which can be sent as `page_token` to retrieve the next page.
   // If this field is omitted, there are no subsequent pages.
   string next_page_token = 2;
 }
 
-// GetIntBlockBlobCountHeadRequest is the request message for getting a single int_block_blob_count_head record by primary key
-message GetIntBlockBlobCountHeadRequest {
+// GetIntBlockBlobCountCanonicalRequest is the request message for getting a single int_block_blob_count_canonical record by primary key
+message GetIntBlockBlobCountCanonicalRequest {
   // The wall clock time when the slot started
   uint32 slot_start_date_time = 1; // Primary key (required)
 }
 
-// GetIntBlockBlobCountHeadResponse is the response message for getting a single int_block_blob_count_head record
-message GetIntBlockBlobCountHeadResponse {
-  IntBlockBlobCountHead item = 1;
+// GetIntBlockBlobCountCanonicalResponse is the response message for getting a single int_block_blob_count_canonical record
+message GetIntBlockBlobCountCanonicalResponse {
+  IntBlockBlobCountCanonical item = 1;
 }
 
-// IntBlockBlobCountHeadService provides RPC methods for querying int_block_blob_count_head data
-service IntBlockBlobCountHeadService {
-  // List returns paginated int_block_blob_count_head records
-  rpc List(ListIntBlockBlobCountHeadRequest) returns (ListIntBlockBlobCountHeadResponse);
-  // Get returns a single int_block_blob_count_head record by primary key
-  rpc Get(GetIntBlockBlobCountHeadRequest) returns (GetIntBlockBlobCountHeadResponse);
+// IntBlockBlobCountCanonicalService provides RPC methods for querying int_block_blob_count_canonical data
+service IntBlockBlobCountCanonicalService {
+  // List returns paginated int_block_blob_count_canonical records
+  rpc List(ListIntBlockBlobCountCanonicalRequest) returns (ListIntBlockBlobCountCanonicalResponse);
+  // Get returns a single int_block_blob_count_canonical record by primary key
+  rpc Get(GetIntBlockBlobCountCanonicalRequest) returns (GetIntBlockBlobCountCanonicalResponse);
 }

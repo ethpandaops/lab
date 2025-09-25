@@ -8,7 +8,7 @@ import "google/protobuf/wrappers.proto";
 option go_package = "github.com/ethpandaops/xatu-cbt/pkg/proto/clickhouse";
 // MEV relay proposer payload delivered for a block on the unfinalized chain
 
-message IntBlockMevHead {
+message FctBlockMevHead {
   // Timestamp when the record was last updated
   uint32 updated_date_time = 11;
   // Slot number within the block proposer payload
@@ -47,8 +47,8 @@ message IntBlockMevHead {
   uint32 transaction_count = 28;
 }
 
-// ListIntBlockMevHeadRequest is the request message for listing int_block_mev_head records
-message ListIntBlockMevHeadRequest {
+// ListFctBlockMevHeadRequest is the request message for listing fct_block_mev_head records
+message ListFctBlockMevHeadRequest {
   // Filter by slot_start_date_time (PRIMARY KEY - required)
   UInt32Filter slot_start_date_time = 1;
 
@@ -88,11 +88,11 @@ message ListIntBlockMevHeadRequest {
   // Filter by transaction_count (optional)
   UInt32Filter transaction_count = 18;
 
-  // The maximum number of int_block_mev_head to return.
+  // The maximum number of fct_block_mev_head to return.
   // If unspecified, at most 100 items will be returned.
-  // The maximum value is 1000; values above 1000 will be coerced to 1000.
+  // The maximum value is 10000; values above 10000 will be coerced to 10000.
   int32 page_size = 19;
-  // A page token, received from a previous `ListIntBlockMevHead` call.
+  // A page token, received from a previous `ListFctBlockMevHead` call.
   // Provide this to retrieve the subsequent page.
   string page_token = 20;
   // The order of results. Format: comma-separated list of fields.
@@ -101,30 +101,30 @@ message ListIntBlockMevHeadRequest {
   string order_by = 21;
 }
 
-// ListIntBlockMevHeadResponse is the response message for listing int_block_mev_head records
-message ListIntBlockMevHeadResponse {
-  // The list of int_block_mev_head.
-  repeated IntBlockMevHead int_block_mev_head = 1;
+// ListFctBlockMevHeadResponse is the response message for listing fct_block_mev_head records
+message ListFctBlockMevHeadResponse {
+  // The list of fct_block_mev_head.
+  repeated FctBlockMevHead fct_block_mev_head = 1;
   // A token, which can be sent as `page_token` to retrieve the next page.
   // If this field is omitted, there are no subsequent pages.
   string next_page_token = 2;
 }
 
-// GetIntBlockMevHeadRequest is the request message for getting a single int_block_mev_head record by primary key
-message GetIntBlockMevHeadRequest {
+// GetFctBlockMevHeadRequest is the request message for getting a single fct_block_mev_head record by primary key
+message GetFctBlockMevHeadRequest {
   // The start time for the slot that the proposer payload is for
   uint32 slot_start_date_time = 1; // Primary key (required)
 }
 
-// GetIntBlockMevHeadResponse is the response message for getting a single int_block_mev_head record
-message GetIntBlockMevHeadResponse {
-  IntBlockMevHead item = 1;
+// GetFctBlockMevHeadResponse is the response message for getting a single fct_block_mev_head record
+message GetFctBlockMevHeadResponse {
+  FctBlockMevHead item = 1;
 }
 
-// IntBlockMevHeadService provides RPC methods for querying int_block_mev_head data
-service IntBlockMevHeadService {
-  // List returns paginated int_block_mev_head records
-  rpc List(ListIntBlockMevHeadRequest) returns (ListIntBlockMevHeadResponse);
-  // Get returns a single int_block_mev_head record by primary key
-  rpc Get(GetIntBlockMevHeadRequest) returns (GetIntBlockMevHeadResponse);
+// FctBlockMevHeadService provides RPC methods for querying fct_block_mev_head data
+service FctBlockMevHeadService {
+  // List returns paginated fct_block_mev_head records
+  rpc List(ListFctBlockMevHeadRequest) returns (ListFctBlockMevHeadResponse);
+  // Get returns a single fct_block_mev_head record by primary key
+  rpc Get(GetFctBlockMevHeadRequest) returns (GetFctBlockMevHeadResponse);
 }

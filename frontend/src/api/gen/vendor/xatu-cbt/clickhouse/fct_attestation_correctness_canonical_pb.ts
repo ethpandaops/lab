@@ -61,11 +61,18 @@ export class FctAttestationCorrectnessCanonical extends Message<FctAttestationCo
   votesMax = 0;
 
   /**
-   * The number of actual votes for the block
+   * The number of votes for the block proposed in the current slot
    *
-   * @generated from field: google.protobuf.UInt32Value votes_actual = 18;
+   * @generated from field: google.protobuf.UInt32Value votes_head = 18;
    */
-  votesActual?: number;
+  votesHead?: number;
+
+  /**
+   * The number of votes for any blocks proposed in previous slots
+   *
+   * @generated from field: google.protobuf.UInt32Value votes_other = 19;
+   */
+  votesOther?: number;
 
   constructor(data?: PartialMessage<FctAttestationCorrectnessCanonical>) {
     super();
@@ -82,7 +89,8 @@ export class FctAttestationCorrectnessCanonical extends Message<FctAttestationCo
     { no: 15, name: "epoch_start_date_time", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
     { no: 16, name: "block_root", kind: "message", T: StringValue },
     { no: 17, name: "votes_max", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
-    { no: 18, name: "votes_actual", kind: "message", T: UInt32Value },
+    { no: 18, name: "votes_head", kind: "message", T: UInt32Value },
+    { no: 19, name: "votes_other", kind: "message", T: UInt32Value },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): FctAttestationCorrectnessCanonical {
@@ -158,18 +166,25 @@ export class ListFctAttestationCorrectnessCanonicalRequest extends Message<ListF
   votesMax?: UInt32Filter;
 
   /**
-   * Filter by votes_actual (optional)
+   * Filter by votes_head (optional)
    *
-   * @generated from field: cbt.NullableUInt32Filter votes_actual = 8;
+   * @generated from field: cbt.NullableUInt32Filter votes_head = 8;
    */
-  votesActual?: NullableUInt32Filter;
+  votesHead?: NullableUInt32Filter;
+
+  /**
+   * Filter by votes_other (optional)
+   *
+   * @generated from field: cbt.NullableUInt32Filter votes_other = 9;
+   */
+  votesOther?: NullableUInt32Filter;
 
   /**
    * The maximum number of fct_attestation_correctness_canonical to return.
    * If unspecified, at most 100 items will be returned.
-   * The maximum value is 1000; values above 1000 will be coerced to 1000.
+   * The maximum value is 10000; values above 10000 will be coerced to 10000.
    *
-   * @generated from field: int32 page_size = 9;
+   * @generated from field: int32 page_size = 10;
    */
   pageSize = 0;
 
@@ -177,7 +192,7 @@ export class ListFctAttestationCorrectnessCanonicalRequest extends Message<ListF
    * A page token, received from a previous `ListFctAttestationCorrectnessCanonical` call.
    * Provide this to retrieve the subsequent page.
    *
-   * @generated from field: string page_token = 10;
+   * @generated from field: string page_token = 11;
    */
   pageToken = "";
 
@@ -186,7 +201,7 @@ export class ListFctAttestationCorrectnessCanonicalRequest extends Message<ListF
    * Example: "foo,bar" or "foo desc,bar" for descending order on foo.
    * If unspecified, results will be returned in the default order.
    *
-   * @generated from field: string order_by = 11;
+   * @generated from field: string order_by = 12;
    */
   orderBy = "";
 
@@ -205,10 +220,11 @@ export class ListFctAttestationCorrectnessCanonicalRequest extends Message<ListF
     { no: 5, name: "epoch_start_date_time", kind: "message", T: UInt32Filter },
     { no: 6, name: "block_root", kind: "message", T: NullableStringFilter },
     { no: 7, name: "votes_max", kind: "message", T: UInt32Filter },
-    { no: 8, name: "votes_actual", kind: "message", T: NullableUInt32Filter },
-    { no: 9, name: "page_size", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
-    { no: 10, name: "page_token", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 11, name: "order_by", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 8, name: "votes_head", kind: "message", T: NullableUInt32Filter },
+    { no: 9, name: "votes_other", kind: "message", T: NullableUInt32Filter },
+    { no: 10, name: "page_size", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 11, name: "page_token", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 12, name: "order_by", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ListFctAttestationCorrectnessCanonicalRequest {

@@ -8,7 +8,7 @@ import "google/protobuf/wrappers.proto";
 option go_package = "github.com/ethpandaops/xatu-cbt/pkg/proto/clickhouse";
 // Block details for the unfinalized chain. Forks in the chain may cause multiple block roots for the same slot to be present
 
-message IntBlockHead {
+message FctBlockHead {
   // Timestamp when the record was last updated
   uint32 updated_date_time = 11;
   // The slot number from beacon block payload
@@ -65,8 +65,8 @@ message IntBlockHead {
   google.protobuf.UInt32Value execution_payload_transactions_total_bytes_compressed = 37;
 }
 
-// ListIntBlockHeadRequest is the request message for listing int_block_head records
-message ListIntBlockHeadRequest {
+// ListFctBlockHeadRequest is the request message for listing fct_block_head records
+message ListFctBlockHeadRequest {
   // Filter by slot_start_date_time (PRIMARY KEY - required)
   UInt32Filter slot_start_date_time = 1;
 
@@ -124,11 +124,11 @@ message ListIntBlockHeadRequest {
   // Filter by execution_payload_transactions_total_bytes_compressed (optional)
   NullableUInt32Filter execution_payload_transactions_total_bytes_compressed = 27;
 
-  // The maximum number of int_block_head to return.
+  // The maximum number of fct_block_head to return.
   // If unspecified, at most 100 items will be returned.
-  // The maximum value is 1000; values above 1000 will be coerced to 1000.
+  // The maximum value is 10000; values above 10000 will be coerced to 10000.
   int32 page_size = 28;
-  // A page token, received from a previous `ListIntBlockHead` call.
+  // A page token, received from a previous `ListFctBlockHead` call.
   // Provide this to retrieve the subsequent page.
   string page_token = 29;
   // The order of results. Format: comma-separated list of fields.
@@ -137,30 +137,30 @@ message ListIntBlockHeadRequest {
   string order_by = 30;
 }
 
-// ListIntBlockHeadResponse is the response message for listing int_block_head records
-message ListIntBlockHeadResponse {
-  // The list of int_block_head.
-  repeated IntBlockHead int_block_head = 1;
+// ListFctBlockHeadResponse is the response message for listing fct_block_head records
+message ListFctBlockHeadResponse {
+  // The list of fct_block_head.
+  repeated FctBlockHead fct_block_head = 1;
   // A token, which can be sent as `page_token` to retrieve the next page.
   // If this field is omitted, there are no subsequent pages.
   string next_page_token = 2;
 }
 
-// GetIntBlockHeadRequest is the request message for getting a single int_block_head record by primary key
-message GetIntBlockHeadRequest {
+// GetFctBlockHeadRequest is the request message for getting a single fct_block_head record by primary key
+message GetFctBlockHeadRequest {
   // The wall clock time when the reorg slot started
   uint32 slot_start_date_time = 1; // Primary key (required)
 }
 
-// GetIntBlockHeadResponse is the response message for getting a single int_block_head record
-message GetIntBlockHeadResponse {
-  IntBlockHead item = 1;
+// GetFctBlockHeadResponse is the response message for getting a single fct_block_head record
+message GetFctBlockHeadResponse {
+  FctBlockHead item = 1;
 }
 
-// IntBlockHeadService provides RPC methods for querying int_block_head data
-service IntBlockHeadService {
-  // List returns paginated int_block_head records
-  rpc List(ListIntBlockHeadRequest) returns (ListIntBlockHeadResponse);
-  // Get returns a single int_block_head record by primary key
-  rpc Get(GetIntBlockHeadRequest) returns (GetIntBlockHeadResponse);
+// FctBlockHeadService provides RPC methods for querying fct_block_head data
+service FctBlockHeadService {
+  // List returns paginated fct_block_head records
+  rpc List(ListFctBlockHeadRequest) returns (ListFctBlockHeadResponse);
+  // Get returns a single fct_block_head record by primary key
+  rpc Get(GetFctBlockHeadRequest) returns (GetFctBlockHeadResponse);
 }

@@ -561,6 +561,78 @@ func BuildListFctBlockFirstSeenByNodeQuery(req *ListFctBlockFirstSeenByNodeReque
 		}
 	}
 
+	// Add filter for column: meta_client_geo_longitude
+
+	// Add filter for column: meta_client_geo_latitude
+
+	// Add filter for column: meta_client_geo_autonomous_system_number
+	if req.MetaClientGeoAutonomousSystemNumber != nil {
+		switch filter := req.MetaClientGeoAutonomousSystemNumber.Filter.(type) {
+		case *NullableUInt32Filter_Eq:
+			qb.AddCondition("meta_client_geo_autonomous_system_number", "=", filter.Eq)
+		case *NullableUInt32Filter_Ne:
+			qb.AddCondition("meta_client_geo_autonomous_system_number", "!=", filter.Ne)
+		case *NullableUInt32Filter_Lt:
+			qb.AddCondition("meta_client_geo_autonomous_system_number", "<", filter.Lt)
+		case *NullableUInt32Filter_Lte:
+			qb.AddCondition("meta_client_geo_autonomous_system_number", "<=", filter.Lte)
+		case *NullableUInt32Filter_Gt:
+			qb.AddCondition("meta_client_geo_autonomous_system_number", ">", filter.Gt)
+		case *NullableUInt32Filter_Gte:
+			qb.AddCondition("meta_client_geo_autonomous_system_number", ">=", filter.Gte)
+		case *NullableUInt32Filter_Between:
+			qb.AddBetweenCondition("meta_client_geo_autonomous_system_number", filter.Between.Min, filter.Between.Max)
+		case *NullableUInt32Filter_In:
+			if len(filter.In.Values) > 0 {
+				qb.AddInCondition("meta_client_geo_autonomous_system_number", UInt32SliceToInterface(filter.In.Values))
+			}
+		case *NullableUInt32Filter_NotIn:
+			if len(filter.NotIn.Values) > 0 {
+				qb.AddNotInCondition("meta_client_geo_autonomous_system_number", UInt32SliceToInterface(filter.NotIn.Values))
+			}
+		case *NullableUInt32Filter_IsNull:
+			qb.AddIsNullCondition("meta_client_geo_autonomous_system_number")
+		case *NullableUInt32Filter_IsNotNull:
+			qb.AddIsNotNullCondition("meta_client_geo_autonomous_system_number")
+		default:
+			// Unsupported filter type
+		}
+	}
+
+	// Add filter for column: meta_client_geo_autonomous_system_organization
+	if req.MetaClientGeoAutonomousSystemOrganization != nil {
+		switch filter := req.MetaClientGeoAutonomousSystemOrganization.Filter.(type) {
+		case *NullableStringFilter_Eq:
+			qb.AddCondition("meta_client_geo_autonomous_system_organization", "=", filter.Eq)
+		case *NullableStringFilter_Ne:
+			qb.AddCondition("meta_client_geo_autonomous_system_organization", "!=", filter.Ne)
+		case *NullableStringFilter_Contains:
+			qb.AddLikeCondition("meta_client_geo_autonomous_system_organization", "%" + filter.Contains + "%")
+		case *NullableStringFilter_StartsWith:
+			qb.AddLikeCondition("meta_client_geo_autonomous_system_organization", filter.StartsWith + "%")
+		case *NullableStringFilter_EndsWith:
+			qb.AddLikeCondition("meta_client_geo_autonomous_system_organization", "%" + filter.EndsWith)
+		case *NullableStringFilter_Like:
+			qb.AddLikeCondition("meta_client_geo_autonomous_system_organization", filter.Like)
+		case *NullableStringFilter_NotLike:
+			qb.AddNotLikeCondition("meta_client_geo_autonomous_system_organization", filter.NotLike)
+		case *NullableStringFilter_In:
+			if len(filter.In.Values) > 0 {
+				qb.AddInCondition("meta_client_geo_autonomous_system_organization", StringSliceToInterface(filter.In.Values))
+			}
+		case *NullableStringFilter_NotIn:
+			if len(filter.NotIn.Values) > 0 {
+				qb.AddNotInCondition("meta_client_geo_autonomous_system_organization", StringSliceToInterface(filter.NotIn.Values))
+			}
+		case *NullableStringFilter_IsNull:
+			qb.AddIsNullCondition("meta_client_geo_autonomous_system_organization")
+		case *NullableStringFilter_IsNotNull:
+			qb.AddIsNotNullCondition("meta_client_geo_autonomous_system_organization")
+		default:
+			// Unsupported filter type
+		}
+	}
+
 	// Add filter for column: meta_consensus_version
 	if req.MetaConsensusVersion != nil {
 		switch filter := req.MetaConsensusVersion.Filter.(type) {
@@ -622,13 +694,18 @@ func BuildListFctBlockFirstSeenByNodeQuery(req *ListFctBlockFirstSeenByNodeReque
 	}
 
 	// Handle pagination per AIP-132
+	// Validate page size
+	if req.PageSize < 0 {
+		return SQLQuery{}, fmt.Errorf("page_size must be non-negative, got %d", req.PageSize)
+	}
+	if req.PageSize > 10000 {
+		return SQLQuery{}, fmt.Errorf("page_size must not exceed %d, got %d", 10000, req.PageSize)
+	}
+
 	var limit, offset uint32
 	limit = 100 // Default page size
 	if req.PageSize > 0 {
 		limit = uint32(req.PageSize)
-		if limit > 1000 {
-			limit = 1000 // Maximum allowed
-		}
 	}
 	if req.PageToken != "" {
 		decodedOffset, err := DecodePageToken(req.PageToken)
@@ -641,7 +718,7 @@ func BuildListFctBlockFirstSeenByNodeQuery(req *ListFctBlockFirstSeenByNodeReque
 	// Handle custom ordering if provided
 	var orderByClause string
 	if req.OrderBy != "" {
-		validFields := []string{"updated_date_time", "source", "slot", "slot_start_date_time", "epoch", "epoch_start_date_time", "seen_slot_start_diff", "block_root", "username", "node_id", "classification", "meta_client_name", "meta_client_version", "meta_client_implementation", "meta_client_geo_city", "meta_client_geo_country", "meta_client_geo_country_code", "meta_client_geo_continent_code", "meta_consensus_version", "meta_consensus_implementation"}
+		validFields := []string{"updated_date_time", "source", "slot", "slot_start_date_time", "epoch", "epoch_start_date_time", "seen_slot_start_diff", "block_root", "username", "node_id", "classification", "meta_client_name", "meta_client_version", "meta_client_implementation", "meta_client_geo_city", "meta_client_geo_country", "meta_client_geo_country_code", "meta_client_geo_continent_code", "meta_client_geo_longitude", "meta_client_geo_latitude", "meta_client_geo_autonomous_system_number", "meta_client_geo_autonomous_system_organization", "meta_consensus_version", "meta_consensus_implementation"}
 		orderFields, err := ParseOrderBy(req.OrderBy, validFields)
 		if err != nil {
 			return SQLQuery{}, fmt.Errorf("invalid order_by: %w", err)
@@ -649,7 +726,7 @@ func BuildListFctBlockFirstSeenByNodeQuery(req *ListFctBlockFirstSeenByNodeReque
 		orderByClause = BuildOrderByClause(orderFields)
 	} else {
 		// Default sorting by primary key
-		orderByClause = " ORDER BY slot_start_date_time" + ", meta_client_name"
+		orderByClause = " ORDER BY slot_start_date_time" + ", block_root" + ", meta_client_name"
 	}
 
 	return BuildParameterizedQuery("fct_block_first_seen_by_node", qb, orderByClause, limit, offset, options...), nil
@@ -667,7 +744,7 @@ func BuildGetFctBlockFirstSeenByNodeQuery(req *GetFctBlockFirstSeenByNodeRequest
 	qb.AddCondition("slot_start_date_time", "=", req.SlotStartDateTime)
 
 	// Build ORDER BY clause
-	orderByClause := " ORDER BY slot_start_date_time, meta_client_name"
+	orderByClause := " ORDER BY slot_start_date_time, block_root, meta_client_name"
 
 	// Return single record
 	return BuildParameterizedQuery("fct_block_first_seen_by_node", qb, orderByClause, 1, 0, options...), nil

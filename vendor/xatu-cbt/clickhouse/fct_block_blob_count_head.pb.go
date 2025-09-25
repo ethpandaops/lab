@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.34.2
 // 	protoc        (unknown)
-// source: vendor/xatu-cbt/clickhouse/int_block_blob_count_head.proto
+// source: vendor/xatu-cbt/clickhouse/fct_block_blob_count_head.proto
 
 package clickhouse
 
@@ -20,7 +20,7 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-type IntBlockBlobCountHead struct {
+type FctBlockBlobCountHead struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
@@ -41,23 +41,23 @@ type IntBlockBlobCountHead struct {
 	BlobCount uint32 `protobuf:"varint,17,opt,name=blob_count,json=blobCount,proto3" json:"blob_count,omitempty"`
 }
 
-func (x *IntBlockBlobCountHead) Reset() {
-	*x = IntBlockBlobCountHead{}
+func (x *FctBlockBlobCountHead) Reset() {
+	*x = FctBlockBlobCountHead{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_vendor_xatu_cbt_clickhouse_int_block_blob_count_head_proto_msgTypes[0]
+		mi := &file_vendor_xatu_cbt_clickhouse_fct_block_blob_count_head_proto_msgTypes[0]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
 }
 
-func (x *IntBlockBlobCountHead) String() string {
+func (x *FctBlockBlobCountHead) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*IntBlockBlobCountHead) ProtoMessage() {}
+func (*FctBlockBlobCountHead) ProtoMessage() {}
 
-func (x *IntBlockBlobCountHead) ProtoReflect() protoreflect.Message {
-	mi := &file_vendor_xatu_cbt_clickhouse_int_block_blob_count_head_proto_msgTypes[0]
+func (x *FctBlockBlobCountHead) ProtoReflect() protoreflect.Message {
+	mi := &file_vendor_xatu_cbt_clickhouse_fct_block_blob_count_head_proto_msgTypes[0]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -68,62 +68,62 @@ func (x *IntBlockBlobCountHead) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use IntBlockBlobCountHead.ProtoReflect.Descriptor instead.
-func (*IntBlockBlobCountHead) Descriptor() ([]byte, []int) {
-	return file_vendor_xatu_cbt_clickhouse_int_block_blob_count_head_proto_rawDescGZIP(), []int{0}
+// Deprecated: Use FctBlockBlobCountHead.ProtoReflect.Descriptor instead.
+func (*FctBlockBlobCountHead) Descriptor() ([]byte, []int) {
+	return file_vendor_xatu_cbt_clickhouse_fct_block_blob_count_head_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *IntBlockBlobCountHead) GetUpdatedDateTime() uint32 {
+func (x *FctBlockBlobCountHead) GetUpdatedDateTime() uint32 {
 	if x != nil {
 		return x.UpdatedDateTime
 	}
 	return 0
 }
 
-func (x *IntBlockBlobCountHead) GetSlot() uint32 {
+func (x *FctBlockBlobCountHead) GetSlot() uint32 {
 	if x != nil {
 		return x.Slot
 	}
 	return 0
 }
 
-func (x *IntBlockBlobCountHead) GetSlotStartDateTime() uint32 {
+func (x *FctBlockBlobCountHead) GetSlotStartDateTime() uint32 {
 	if x != nil {
 		return x.SlotStartDateTime
 	}
 	return 0
 }
 
-func (x *IntBlockBlobCountHead) GetEpoch() uint32 {
+func (x *FctBlockBlobCountHead) GetEpoch() uint32 {
 	if x != nil {
 		return x.Epoch
 	}
 	return 0
 }
 
-func (x *IntBlockBlobCountHead) GetEpochStartDateTime() uint32 {
+func (x *FctBlockBlobCountHead) GetEpochStartDateTime() uint32 {
 	if x != nil {
 		return x.EpochStartDateTime
 	}
 	return 0
 }
 
-func (x *IntBlockBlobCountHead) GetBlockRoot() string {
+func (x *FctBlockBlobCountHead) GetBlockRoot() string {
 	if x != nil {
 		return x.BlockRoot
 	}
 	return ""
 }
 
-func (x *IntBlockBlobCountHead) GetBlobCount() uint32 {
+func (x *FctBlockBlobCountHead) GetBlobCount() uint32 {
 	if x != nil {
 		return x.BlobCount
 	}
 	return 0
 }
 
-// ListIntBlockBlobCountHeadRequest is the request message for listing int_block_blob_count_head records
-type ListIntBlockBlobCountHeadRequest struct {
+// ListFctBlockBlobCountHeadRequest is the request message for listing fct_block_blob_count_head records
+type ListFctBlockBlobCountHeadRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
@@ -142,11 +142,11 @@ type ListIntBlockBlobCountHeadRequest struct {
 	EpochStartDateTime *UInt32Filter `protobuf:"bytes,6,opt,name=epoch_start_date_time,json=epochStartDateTime,proto3" json:"epoch_start_date_time,omitempty"`
 	// Filter by blob_count (optional)
 	BlobCount *UInt32Filter `protobuf:"bytes,7,opt,name=blob_count,json=blobCount,proto3" json:"blob_count,omitempty"`
-	// The maximum number of int_block_blob_count_head to return.
+	// The maximum number of fct_block_blob_count_head to return.
 	// If unspecified, at most 100 items will be returned.
-	// The maximum value is 1000; values above 1000 will be coerced to 1000.
+	// The maximum value is 10000; values above 10000 will be coerced to 10000.
 	PageSize int32 `protobuf:"varint,8,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
-	// A page token, received from a previous `ListIntBlockBlobCountHead` call.
+	// A page token, received from a previous `ListFctBlockBlobCountHead` call.
 	// Provide this to retrieve the subsequent page.
 	PageToken string `protobuf:"bytes,9,opt,name=page_token,json=pageToken,proto3" json:"page_token,omitempty"`
 	// The order of results. Format: comma-separated list of fields.
@@ -155,23 +155,23 @@ type ListIntBlockBlobCountHeadRequest struct {
 	OrderBy string `protobuf:"bytes,10,opt,name=order_by,json=orderBy,proto3" json:"order_by,omitempty"`
 }
 
-func (x *ListIntBlockBlobCountHeadRequest) Reset() {
-	*x = ListIntBlockBlobCountHeadRequest{}
+func (x *ListFctBlockBlobCountHeadRequest) Reset() {
+	*x = ListFctBlockBlobCountHeadRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_vendor_xatu_cbt_clickhouse_int_block_blob_count_head_proto_msgTypes[1]
+		mi := &file_vendor_xatu_cbt_clickhouse_fct_block_blob_count_head_proto_msgTypes[1]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
 }
 
-func (x *ListIntBlockBlobCountHeadRequest) String() string {
+func (x *ListFctBlockBlobCountHeadRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*ListIntBlockBlobCountHeadRequest) ProtoMessage() {}
+func (*ListFctBlockBlobCountHeadRequest) ProtoMessage() {}
 
-func (x *ListIntBlockBlobCountHeadRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_vendor_xatu_cbt_clickhouse_int_block_blob_count_head_proto_msgTypes[1]
+func (x *ListFctBlockBlobCountHeadRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_vendor_xatu_cbt_clickhouse_fct_block_blob_count_head_proto_msgTypes[1]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -182,111 +182,111 @@ func (x *ListIntBlockBlobCountHeadRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ListIntBlockBlobCountHeadRequest.ProtoReflect.Descriptor instead.
-func (*ListIntBlockBlobCountHeadRequest) Descriptor() ([]byte, []int) {
-	return file_vendor_xatu_cbt_clickhouse_int_block_blob_count_head_proto_rawDescGZIP(), []int{1}
+// Deprecated: Use ListFctBlockBlobCountHeadRequest.ProtoReflect.Descriptor instead.
+func (*ListFctBlockBlobCountHeadRequest) Descriptor() ([]byte, []int) {
+	return file_vendor_xatu_cbt_clickhouse_fct_block_blob_count_head_proto_rawDescGZIP(), []int{1}
 }
 
-func (x *ListIntBlockBlobCountHeadRequest) GetSlotStartDateTime() *UInt32Filter {
+func (x *ListFctBlockBlobCountHeadRequest) GetSlotStartDateTime() *UInt32Filter {
 	if x != nil {
 		return x.SlotStartDateTime
 	}
 	return nil
 }
 
-func (x *ListIntBlockBlobCountHeadRequest) GetBlockRoot() *StringFilter {
+func (x *ListFctBlockBlobCountHeadRequest) GetBlockRoot() *StringFilter {
 	if x != nil {
 		return x.BlockRoot
 	}
 	return nil
 }
 
-func (x *ListIntBlockBlobCountHeadRequest) GetUpdatedDateTime() *UInt32Filter {
+func (x *ListFctBlockBlobCountHeadRequest) GetUpdatedDateTime() *UInt32Filter {
 	if x != nil {
 		return x.UpdatedDateTime
 	}
 	return nil
 }
 
-func (x *ListIntBlockBlobCountHeadRequest) GetSlot() *UInt32Filter {
+func (x *ListFctBlockBlobCountHeadRequest) GetSlot() *UInt32Filter {
 	if x != nil {
 		return x.Slot
 	}
 	return nil
 }
 
-func (x *ListIntBlockBlobCountHeadRequest) GetEpoch() *UInt32Filter {
+func (x *ListFctBlockBlobCountHeadRequest) GetEpoch() *UInt32Filter {
 	if x != nil {
 		return x.Epoch
 	}
 	return nil
 }
 
-func (x *ListIntBlockBlobCountHeadRequest) GetEpochStartDateTime() *UInt32Filter {
+func (x *ListFctBlockBlobCountHeadRequest) GetEpochStartDateTime() *UInt32Filter {
 	if x != nil {
 		return x.EpochStartDateTime
 	}
 	return nil
 }
 
-func (x *ListIntBlockBlobCountHeadRequest) GetBlobCount() *UInt32Filter {
+func (x *ListFctBlockBlobCountHeadRequest) GetBlobCount() *UInt32Filter {
 	if x != nil {
 		return x.BlobCount
 	}
 	return nil
 }
 
-func (x *ListIntBlockBlobCountHeadRequest) GetPageSize() int32 {
+func (x *ListFctBlockBlobCountHeadRequest) GetPageSize() int32 {
 	if x != nil {
 		return x.PageSize
 	}
 	return 0
 }
 
-func (x *ListIntBlockBlobCountHeadRequest) GetPageToken() string {
+func (x *ListFctBlockBlobCountHeadRequest) GetPageToken() string {
 	if x != nil {
 		return x.PageToken
 	}
 	return ""
 }
 
-func (x *ListIntBlockBlobCountHeadRequest) GetOrderBy() string {
+func (x *ListFctBlockBlobCountHeadRequest) GetOrderBy() string {
 	if x != nil {
 		return x.OrderBy
 	}
 	return ""
 }
 
-// ListIntBlockBlobCountHeadResponse is the response message for listing int_block_blob_count_head records
-type ListIntBlockBlobCountHeadResponse struct {
+// ListFctBlockBlobCountHeadResponse is the response message for listing fct_block_blob_count_head records
+type ListFctBlockBlobCountHeadResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// The list of int_block_blob_count_head.
-	IntBlockBlobCountHead []*IntBlockBlobCountHead `protobuf:"bytes,1,rep,name=int_block_blob_count_head,json=intBlockBlobCountHead,proto3" json:"int_block_blob_count_head,omitempty"`
+	// The list of fct_block_blob_count_head.
+	FctBlockBlobCountHead []*FctBlockBlobCountHead `protobuf:"bytes,1,rep,name=fct_block_blob_count_head,json=fctBlockBlobCountHead,proto3" json:"fct_block_blob_count_head,omitempty"`
 	// A token, which can be sent as `page_token` to retrieve the next page.
 	// If this field is omitted, there are no subsequent pages.
 	NextPageToken string `protobuf:"bytes,2,opt,name=next_page_token,json=nextPageToken,proto3" json:"next_page_token,omitempty"`
 }
 
-func (x *ListIntBlockBlobCountHeadResponse) Reset() {
-	*x = ListIntBlockBlobCountHeadResponse{}
+func (x *ListFctBlockBlobCountHeadResponse) Reset() {
+	*x = ListFctBlockBlobCountHeadResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_vendor_xatu_cbt_clickhouse_int_block_blob_count_head_proto_msgTypes[2]
+		mi := &file_vendor_xatu_cbt_clickhouse_fct_block_blob_count_head_proto_msgTypes[2]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
 }
 
-func (x *ListIntBlockBlobCountHeadResponse) String() string {
+func (x *ListFctBlockBlobCountHeadResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*ListIntBlockBlobCountHeadResponse) ProtoMessage() {}
+func (*ListFctBlockBlobCountHeadResponse) ProtoMessage() {}
 
-func (x *ListIntBlockBlobCountHeadResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_vendor_xatu_cbt_clickhouse_int_block_blob_count_head_proto_msgTypes[2]
+func (x *ListFctBlockBlobCountHeadResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_vendor_xatu_cbt_clickhouse_fct_block_blob_count_head_proto_msgTypes[2]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -297,27 +297,27 @@ func (x *ListIntBlockBlobCountHeadResponse) ProtoReflect() protoreflect.Message 
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ListIntBlockBlobCountHeadResponse.ProtoReflect.Descriptor instead.
-func (*ListIntBlockBlobCountHeadResponse) Descriptor() ([]byte, []int) {
-	return file_vendor_xatu_cbt_clickhouse_int_block_blob_count_head_proto_rawDescGZIP(), []int{2}
+// Deprecated: Use ListFctBlockBlobCountHeadResponse.ProtoReflect.Descriptor instead.
+func (*ListFctBlockBlobCountHeadResponse) Descriptor() ([]byte, []int) {
+	return file_vendor_xatu_cbt_clickhouse_fct_block_blob_count_head_proto_rawDescGZIP(), []int{2}
 }
 
-func (x *ListIntBlockBlobCountHeadResponse) GetIntBlockBlobCountHead() []*IntBlockBlobCountHead {
+func (x *ListFctBlockBlobCountHeadResponse) GetFctBlockBlobCountHead() []*FctBlockBlobCountHead {
 	if x != nil {
-		return x.IntBlockBlobCountHead
+		return x.FctBlockBlobCountHead
 	}
 	return nil
 }
 
-func (x *ListIntBlockBlobCountHeadResponse) GetNextPageToken() string {
+func (x *ListFctBlockBlobCountHeadResponse) GetNextPageToken() string {
 	if x != nil {
 		return x.NextPageToken
 	}
 	return ""
 }
 
-// GetIntBlockBlobCountHeadRequest is the request message for getting a single int_block_blob_count_head record by primary key
-type GetIntBlockBlobCountHeadRequest struct {
+// GetFctBlockBlobCountHeadRequest is the request message for getting a single fct_block_blob_count_head record by primary key
+type GetFctBlockBlobCountHeadRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
@@ -326,23 +326,23 @@ type GetIntBlockBlobCountHeadRequest struct {
 	SlotStartDateTime uint32 `protobuf:"varint,1,opt,name=slot_start_date_time,json=slotStartDateTime,proto3" json:"slot_start_date_time,omitempty"` // Primary key (required)
 }
 
-func (x *GetIntBlockBlobCountHeadRequest) Reset() {
-	*x = GetIntBlockBlobCountHeadRequest{}
+func (x *GetFctBlockBlobCountHeadRequest) Reset() {
+	*x = GetFctBlockBlobCountHeadRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_vendor_xatu_cbt_clickhouse_int_block_blob_count_head_proto_msgTypes[3]
+		mi := &file_vendor_xatu_cbt_clickhouse_fct_block_blob_count_head_proto_msgTypes[3]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
 }
 
-func (x *GetIntBlockBlobCountHeadRequest) String() string {
+func (x *GetFctBlockBlobCountHeadRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*GetIntBlockBlobCountHeadRequest) ProtoMessage() {}
+func (*GetFctBlockBlobCountHeadRequest) ProtoMessage() {}
 
-func (x *GetIntBlockBlobCountHeadRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_vendor_xatu_cbt_clickhouse_int_block_blob_count_head_proto_msgTypes[3]
+func (x *GetFctBlockBlobCountHeadRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_vendor_xatu_cbt_clickhouse_fct_block_blob_count_head_proto_msgTypes[3]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -353,44 +353,44 @@ func (x *GetIntBlockBlobCountHeadRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetIntBlockBlobCountHeadRequest.ProtoReflect.Descriptor instead.
-func (*GetIntBlockBlobCountHeadRequest) Descriptor() ([]byte, []int) {
-	return file_vendor_xatu_cbt_clickhouse_int_block_blob_count_head_proto_rawDescGZIP(), []int{3}
+// Deprecated: Use GetFctBlockBlobCountHeadRequest.ProtoReflect.Descriptor instead.
+func (*GetFctBlockBlobCountHeadRequest) Descriptor() ([]byte, []int) {
+	return file_vendor_xatu_cbt_clickhouse_fct_block_blob_count_head_proto_rawDescGZIP(), []int{3}
 }
 
-func (x *GetIntBlockBlobCountHeadRequest) GetSlotStartDateTime() uint32 {
+func (x *GetFctBlockBlobCountHeadRequest) GetSlotStartDateTime() uint32 {
 	if x != nil {
 		return x.SlotStartDateTime
 	}
 	return 0
 }
 
-// GetIntBlockBlobCountHeadResponse is the response message for getting a single int_block_blob_count_head record
-type GetIntBlockBlobCountHeadResponse struct {
+// GetFctBlockBlobCountHeadResponse is the response message for getting a single fct_block_blob_count_head record
+type GetFctBlockBlobCountHeadResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Item *IntBlockBlobCountHead `protobuf:"bytes,1,opt,name=item,proto3" json:"item,omitempty"`
+	Item *FctBlockBlobCountHead `protobuf:"bytes,1,opt,name=item,proto3" json:"item,omitempty"`
 }
 
-func (x *GetIntBlockBlobCountHeadResponse) Reset() {
-	*x = GetIntBlockBlobCountHeadResponse{}
+func (x *GetFctBlockBlobCountHeadResponse) Reset() {
+	*x = GetFctBlockBlobCountHeadResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_vendor_xatu_cbt_clickhouse_int_block_blob_count_head_proto_msgTypes[4]
+		mi := &file_vendor_xatu_cbt_clickhouse_fct_block_blob_count_head_proto_msgTypes[4]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
 }
 
-func (x *GetIntBlockBlobCountHeadResponse) String() string {
+func (x *GetFctBlockBlobCountHeadResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*GetIntBlockBlobCountHeadResponse) ProtoMessage() {}
+func (*GetFctBlockBlobCountHeadResponse) ProtoMessage() {}
 
-func (x *GetIntBlockBlobCountHeadResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_vendor_xatu_cbt_clickhouse_int_block_blob_count_head_proto_msgTypes[4]
+func (x *GetFctBlockBlobCountHeadResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_vendor_xatu_cbt_clickhouse_fct_block_blob_count_head_proto_msgTypes[4]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -401,29 +401,29 @@ func (x *GetIntBlockBlobCountHeadResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetIntBlockBlobCountHeadResponse.ProtoReflect.Descriptor instead.
-func (*GetIntBlockBlobCountHeadResponse) Descriptor() ([]byte, []int) {
-	return file_vendor_xatu_cbt_clickhouse_int_block_blob_count_head_proto_rawDescGZIP(), []int{4}
+// Deprecated: Use GetFctBlockBlobCountHeadResponse.ProtoReflect.Descriptor instead.
+func (*GetFctBlockBlobCountHeadResponse) Descriptor() ([]byte, []int) {
+	return file_vendor_xatu_cbt_clickhouse_fct_block_blob_count_head_proto_rawDescGZIP(), []int{4}
 }
 
-func (x *GetIntBlockBlobCountHeadResponse) GetItem() *IntBlockBlobCountHead {
+func (x *GetFctBlockBlobCountHeadResponse) GetItem() *FctBlockBlobCountHead {
 	if x != nil {
 		return x.Item
 	}
 	return nil
 }
 
-var File_vendor_xatu_cbt_clickhouse_int_block_blob_count_head_proto protoreflect.FileDescriptor
+var File_vendor_xatu_cbt_clickhouse_fct_block_blob_count_head_proto protoreflect.FileDescriptor
 
-var file_vendor_xatu_cbt_clickhouse_int_block_blob_count_head_proto_rawDesc = []byte{
+var file_vendor_xatu_cbt_clickhouse_fct_block_blob_count_head_proto_rawDesc = []byte{
 	0x0a, 0x3a, 0x76, 0x65, 0x6e, 0x64, 0x6f, 0x72, 0x2f, 0x78, 0x61, 0x74, 0x75, 0x2d, 0x63, 0x62,
-	0x74, 0x2f, 0x63, 0x6c, 0x69, 0x63, 0x6b, 0x68, 0x6f, 0x75, 0x73, 0x65, 0x2f, 0x69, 0x6e, 0x74,
+	0x74, 0x2f, 0x63, 0x6c, 0x69, 0x63, 0x6b, 0x68, 0x6f, 0x75, 0x73, 0x65, 0x2f, 0x66, 0x63, 0x74,
 	0x5f, 0x62, 0x6c, 0x6f, 0x63, 0x6b, 0x5f, 0x62, 0x6c, 0x6f, 0x62, 0x5f, 0x63, 0x6f, 0x75, 0x6e,
 	0x74, 0x5f, 0x68, 0x65, 0x61, 0x64, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x12, 0x03, 0x63, 0x62,
 	0x74, 0x1a, 0x27, 0x76, 0x65, 0x6e, 0x64, 0x6f, 0x72, 0x2f, 0x78, 0x61, 0x74, 0x75, 0x2d, 0x63,
 	0x62, 0x74, 0x2f, 0x63, 0x6c, 0x69, 0x63, 0x6b, 0x68, 0x6f, 0x75, 0x73, 0x65, 0x2f, 0x63, 0x6f,
-	0x6d, 0x6d, 0x6f, 0x6e, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0x8f, 0x02, 0x0a, 0x15, 0x49,
-	0x6e, 0x74, 0x42, 0x6c, 0x6f, 0x63, 0x6b, 0x42, 0x6c, 0x6f, 0x62, 0x43, 0x6f, 0x75, 0x6e, 0x74,
+	0x6d, 0x6d, 0x6f, 0x6e, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0x8f, 0x02, 0x0a, 0x15, 0x46,
+	0x63, 0x74, 0x42, 0x6c, 0x6f, 0x63, 0x6b, 0x42, 0x6c, 0x6f, 0x62, 0x43, 0x6f, 0x75, 0x6e, 0x74,
 	0x48, 0x65, 0x61, 0x64, 0x12, 0x2a, 0x0a, 0x11, 0x75, 0x70, 0x64, 0x61, 0x74, 0x65, 0x64, 0x5f,
 	0x64, 0x61, 0x74, 0x65, 0x5f, 0x74, 0x69, 0x6d, 0x65, 0x18, 0x0b, 0x20, 0x01, 0x28, 0x0d, 0x52,
 	0x0f, 0x75, 0x70, 0x64, 0x61, 0x74, 0x65, 0x64, 0x44, 0x61, 0x74, 0x65, 0x54, 0x69, 0x6d, 0x65,
@@ -440,7 +440,7 @@ var file_vendor_xatu_cbt_clickhouse_int_block_blob_count_head_proto_rawDesc = []
 	0x28, 0x09, 0x52, 0x09, 0x62, 0x6c, 0x6f, 0x63, 0x6b, 0x52, 0x6f, 0x6f, 0x74, 0x12, 0x1d, 0x0a,
 	0x0a, 0x62, 0x6c, 0x6f, 0x62, 0x5f, 0x63, 0x6f, 0x75, 0x6e, 0x74, 0x18, 0x11, 0x20, 0x01, 0x28,
 	0x0d, 0x52, 0x09, 0x62, 0x6c, 0x6f, 0x62, 0x43, 0x6f, 0x75, 0x6e, 0x74, 0x22, 0xf6, 0x03, 0x0a,
-	0x20, 0x4c, 0x69, 0x73, 0x74, 0x49, 0x6e, 0x74, 0x42, 0x6c, 0x6f, 0x63, 0x6b, 0x42, 0x6c, 0x6f,
+	0x20, 0x4c, 0x69, 0x73, 0x74, 0x46, 0x63, 0x74, 0x42, 0x6c, 0x6f, 0x63, 0x6b, 0x42, 0x6c, 0x6f,
 	0x62, 0x43, 0x6f, 0x75, 0x6e, 0x74, 0x48, 0x65, 0x61, 0x64, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73,
 	0x74, 0x12, 0x42, 0x0a, 0x14, 0x73, 0x6c, 0x6f, 0x74, 0x5f, 0x73, 0x74, 0x61, 0x72, 0x74, 0x5f,
 	0x64, 0x61, 0x74, 0x65, 0x5f, 0x74, 0x69, 0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32,
@@ -471,39 +471,39 @@ var file_vendor_xatu_cbt_clickhouse_int_block_blob_count_head_proto_rawDesc = []
 	0x61, 0x67, 0x65, 0x5f, 0x74, 0x6f, 0x6b, 0x65, 0x6e, 0x18, 0x09, 0x20, 0x01, 0x28, 0x09, 0x52,
 	0x09, 0x70, 0x61, 0x67, 0x65, 0x54, 0x6f, 0x6b, 0x65, 0x6e, 0x12, 0x19, 0x0a, 0x08, 0x6f, 0x72,
 	0x64, 0x65, 0x72, 0x5f, 0x62, 0x79, 0x18, 0x0a, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x6f, 0x72,
-	0x64, 0x65, 0x72, 0x42, 0x79, 0x22, 0xa1, 0x01, 0x0a, 0x21, 0x4c, 0x69, 0x73, 0x74, 0x49, 0x6e,
+	0x64, 0x65, 0x72, 0x42, 0x79, 0x22, 0xa1, 0x01, 0x0a, 0x21, 0x4c, 0x69, 0x73, 0x74, 0x46, 0x63,
 	0x74, 0x42, 0x6c, 0x6f, 0x63, 0x6b, 0x42, 0x6c, 0x6f, 0x62, 0x43, 0x6f, 0x75, 0x6e, 0x74, 0x48,
-	0x65, 0x61, 0x64, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x54, 0x0a, 0x19, 0x69,
-	0x6e, 0x74, 0x5f, 0x62, 0x6c, 0x6f, 0x63, 0x6b, 0x5f, 0x62, 0x6c, 0x6f, 0x62, 0x5f, 0x63, 0x6f,
+	0x65, 0x61, 0x64, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x54, 0x0a, 0x19, 0x66,
+	0x63, 0x74, 0x5f, 0x62, 0x6c, 0x6f, 0x63, 0x6b, 0x5f, 0x62, 0x6c, 0x6f, 0x62, 0x5f, 0x63, 0x6f,
 	0x75, 0x6e, 0x74, 0x5f, 0x68, 0x65, 0x61, 0x64, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x1a,
-	0x2e, 0x63, 0x62, 0x74, 0x2e, 0x49, 0x6e, 0x74, 0x42, 0x6c, 0x6f, 0x63, 0x6b, 0x42, 0x6c, 0x6f,
-	0x62, 0x43, 0x6f, 0x75, 0x6e, 0x74, 0x48, 0x65, 0x61, 0x64, 0x52, 0x15, 0x69, 0x6e, 0x74, 0x42,
+	0x2e, 0x63, 0x62, 0x74, 0x2e, 0x46, 0x63, 0x74, 0x42, 0x6c, 0x6f, 0x63, 0x6b, 0x42, 0x6c, 0x6f,
+	0x62, 0x43, 0x6f, 0x75, 0x6e, 0x74, 0x48, 0x65, 0x61, 0x64, 0x52, 0x15, 0x66, 0x63, 0x74, 0x42,
 	0x6c, 0x6f, 0x63, 0x6b, 0x42, 0x6c, 0x6f, 0x62, 0x43, 0x6f, 0x75, 0x6e, 0x74, 0x48, 0x65, 0x61,
 	0x64, 0x12, 0x26, 0x0a, 0x0f, 0x6e, 0x65, 0x78, 0x74, 0x5f, 0x70, 0x61, 0x67, 0x65, 0x5f, 0x74,
 	0x6f, 0x6b, 0x65, 0x6e, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0d, 0x6e, 0x65, 0x78, 0x74,
 	0x50, 0x61, 0x67, 0x65, 0x54, 0x6f, 0x6b, 0x65, 0x6e, 0x22, 0x52, 0x0a, 0x1f, 0x47, 0x65, 0x74,
-	0x49, 0x6e, 0x74, 0x42, 0x6c, 0x6f, 0x63, 0x6b, 0x42, 0x6c, 0x6f, 0x62, 0x43, 0x6f, 0x75, 0x6e,
+	0x46, 0x63, 0x74, 0x42, 0x6c, 0x6f, 0x63, 0x6b, 0x42, 0x6c, 0x6f, 0x62, 0x43, 0x6f, 0x75, 0x6e,
 	0x74, 0x48, 0x65, 0x61, 0x64, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x2f, 0x0a, 0x14,
 	0x73, 0x6c, 0x6f, 0x74, 0x5f, 0x73, 0x74, 0x61, 0x72, 0x74, 0x5f, 0x64, 0x61, 0x74, 0x65, 0x5f,
 	0x74, 0x69, 0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0d, 0x52, 0x11, 0x73, 0x6c, 0x6f, 0x74,
 	0x53, 0x74, 0x61, 0x72, 0x74, 0x44, 0x61, 0x74, 0x65, 0x54, 0x69, 0x6d, 0x65, 0x22, 0x52, 0x0a,
-	0x20, 0x47, 0x65, 0x74, 0x49, 0x6e, 0x74, 0x42, 0x6c, 0x6f, 0x63, 0x6b, 0x42, 0x6c, 0x6f, 0x62,
+	0x20, 0x47, 0x65, 0x74, 0x46, 0x63, 0x74, 0x42, 0x6c, 0x6f, 0x63, 0x6b, 0x42, 0x6c, 0x6f, 0x62,
 	0x43, 0x6f, 0x75, 0x6e, 0x74, 0x48, 0x65, 0x61, 0x64, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73,
 	0x65, 0x12, 0x2e, 0x0a, 0x04, 0x69, 0x74, 0x65, 0x6d, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32,
-	0x1a, 0x2e, 0x63, 0x62, 0x74, 0x2e, 0x49, 0x6e, 0x74, 0x42, 0x6c, 0x6f, 0x63, 0x6b, 0x42, 0x6c,
+	0x1a, 0x2e, 0x63, 0x62, 0x74, 0x2e, 0x46, 0x63, 0x74, 0x42, 0x6c, 0x6f, 0x63, 0x6b, 0x42, 0x6c,
 	0x6f, 0x62, 0x43, 0x6f, 0x75, 0x6e, 0x74, 0x48, 0x65, 0x61, 0x64, 0x52, 0x04, 0x69, 0x74, 0x65,
-	0x6d, 0x32, 0xc9, 0x01, 0x0a, 0x1c, 0x49, 0x6e, 0x74, 0x42, 0x6c, 0x6f, 0x63, 0x6b, 0x42, 0x6c,
+	0x6d, 0x32, 0xc9, 0x01, 0x0a, 0x1c, 0x46, 0x63, 0x74, 0x42, 0x6c, 0x6f, 0x63, 0x6b, 0x42, 0x6c,
 	0x6f, 0x62, 0x43, 0x6f, 0x75, 0x6e, 0x74, 0x48, 0x65, 0x61, 0x64, 0x53, 0x65, 0x72, 0x76, 0x69,
 	0x63, 0x65, 0x12, 0x55, 0x0a, 0x04, 0x4c, 0x69, 0x73, 0x74, 0x12, 0x25, 0x2e, 0x63, 0x62, 0x74,
-	0x2e, 0x4c, 0x69, 0x73, 0x74, 0x49, 0x6e, 0x74, 0x42, 0x6c, 0x6f, 0x63, 0x6b, 0x42, 0x6c, 0x6f,
+	0x2e, 0x4c, 0x69, 0x73, 0x74, 0x46, 0x63, 0x74, 0x42, 0x6c, 0x6f, 0x63, 0x6b, 0x42, 0x6c, 0x6f,
 	0x62, 0x43, 0x6f, 0x75, 0x6e, 0x74, 0x48, 0x65, 0x61, 0x64, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73,
-	0x74, 0x1a, 0x26, 0x2e, 0x63, 0x62, 0x74, 0x2e, 0x4c, 0x69, 0x73, 0x74, 0x49, 0x6e, 0x74, 0x42,
+	0x74, 0x1a, 0x26, 0x2e, 0x63, 0x62, 0x74, 0x2e, 0x4c, 0x69, 0x73, 0x74, 0x46, 0x63, 0x74, 0x42,
 	0x6c, 0x6f, 0x63, 0x6b, 0x42, 0x6c, 0x6f, 0x62, 0x43, 0x6f, 0x75, 0x6e, 0x74, 0x48, 0x65, 0x61,
 	0x64, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x52, 0x0a, 0x03, 0x47, 0x65, 0x74,
-	0x12, 0x24, 0x2e, 0x63, 0x62, 0x74, 0x2e, 0x47, 0x65, 0x74, 0x49, 0x6e, 0x74, 0x42, 0x6c, 0x6f,
+	0x12, 0x24, 0x2e, 0x63, 0x62, 0x74, 0x2e, 0x47, 0x65, 0x74, 0x46, 0x63, 0x74, 0x42, 0x6c, 0x6f,
 	0x63, 0x6b, 0x42, 0x6c, 0x6f, 0x62, 0x43, 0x6f, 0x75, 0x6e, 0x74, 0x48, 0x65, 0x61, 0x64, 0x52,
 	0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x25, 0x2e, 0x63, 0x62, 0x74, 0x2e, 0x47, 0x65, 0x74,
-	0x49, 0x6e, 0x74, 0x42, 0x6c, 0x6f, 0x63, 0x6b, 0x42, 0x6c, 0x6f, 0x62, 0x43, 0x6f, 0x75, 0x6e,
+	0x46, 0x63, 0x74, 0x42, 0x6c, 0x6f, 0x63, 0x6b, 0x42, 0x6c, 0x6f, 0x62, 0x43, 0x6f, 0x75, 0x6e,
 	0x74, 0x48, 0x65, 0x61, 0x64, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x42, 0x36, 0x5a,
 	0x34, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x65, 0x74, 0x68, 0x70,
 	0x61, 0x6e, 0x64, 0x61, 0x6f, 0x70, 0x73, 0x2f, 0x78, 0x61, 0x74, 0x75, 0x2d, 0x63, 0x62, 0x74,
@@ -512,41 +512,41 @@ var file_vendor_xatu_cbt_clickhouse_int_block_blob_count_head_proto_rawDesc = []
 }
 
 var (
-	file_vendor_xatu_cbt_clickhouse_int_block_blob_count_head_proto_rawDescOnce sync.Once
-	file_vendor_xatu_cbt_clickhouse_int_block_blob_count_head_proto_rawDescData = file_vendor_xatu_cbt_clickhouse_int_block_blob_count_head_proto_rawDesc
+	file_vendor_xatu_cbt_clickhouse_fct_block_blob_count_head_proto_rawDescOnce sync.Once
+	file_vendor_xatu_cbt_clickhouse_fct_block_blob_count_head_proto_rawDescData = file_vendor_xatu_cbt_clickhouse_fct_block_blob_count_head_proto_rawDesc
 )
 
-func file_vendor_xatu_cbt_clickhouse_int_block_blob_count_head_proto_rawDescGZIP() []byte {
-	file_vendor_xatu_cbt_clickhouse_int_block_blob_count_head_proto_rawDescOnce.Do(func() {
-		file_vendor_xatu_cbt_clickhouse_int_block_blob_count_head_proto_rawDescData = protoimpl.X.CompressGZIP(file_vendor_xatu_cbt_clickhouse_int_block_blob_count_head_proto_rawDescData)
+func file_vendor_xatu_cbt_clickhouse_fct_block_blob_count_head_proto_rawDescGZIP() []byte {
+	file_vendor_xatu_cbt_clickhouse_fct_block_blob_count_head_proto_rawDescOnce.Do(func() {
+		file_vendor_xatu_cbt_clickhouse_fct_block_blob_count_head_proto_rawDescData = protoimpl.X.CompressGZIP(file_vendor_xatu_cbt_clickhouse_fct_block_blob_count_head_proto_rawDescData)
 	})
-	return file_vendor_xatu_cbt_clickhouse_int_block_blob_count_head_proto_rawDescData
+	return file_vendor_xatu_cbt_clickhouse_fct_block_blob_count_head_proto_rawDescData
 }
 
-var file_vendor_xatu_cbt_clickhouse_int_block_blob_count_head_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
-var file_vendor_xatu_cbt_clickhouse_int_block_blob_count_head_proto_goTypes = []any{
-	(*IntBlockBlobCountHead)(nil),             // 0: cbt.IntBlockBlobCountHead
-	(*ListIntBlockBlobCountHeadRequest)(nil),  // 1: cbt.ListIntBlockBlobCountHeadRequest
-	(*ListIntBlockBlobCountHeadResponse)(nil), // 2: cbt.ListIntBlockBlobCountHeadResponse
-	(*GetIntBlockBlobCountHeadRequest)(nil),   // 3: cbt.GetIntBlockBlobCountHeadRequest
-	(*GetIntBlockBlobCountHeadResponse)(nil),  // 4: cbt.GetIntBlockBlobCountHeadResponse
+var file_vendor_xatu_cbt_clickhouse_fct_block_blob_count_head_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
+var file_vendor_xatu_cbt_clickhouse_fct_block_blob_count_head_proto_goTypes = []any{
+	(*FctBlockBlobCountHead)(nil),             // 0: cbt.FctBlockBlobCountHead
+	(*ListFctBlockBlobCountHeadRequest)(nil),  // 1: cbt.ListFctBlockBlobCountHeadRequest
+	(*ListFctBlockBlobCountHeadResponse)(nil), // 2: cbt.ListFctBlockBlobCountHeadResponse
+	(*GetFctBlockBlobCountHeadRequest)(nil),   // 3: cbt.GetFctBlockBlobCountHeadRequest
+	(*GetFctBlockBlobCountHeadResponse)(nil),  // 4: cbt.GetFctBlockBlobCountHeadResponse
 	(*UInt32Filter)(nil),                      // 5: cbt.UInt32Filter
 	(*StringFilter)(nil),                      // 6: cbt.StringFilter
 }
-var file_vendor_xatu_cbt_clickhouse_int_block_blob_count_head_proto_depIdxs = []int32{
-	5,  // 0: cbt.ListIntBlockBlobCountHeadRequest.slot_start_date_time:type_name -> cbt.UInt32Filter
-	6,  // 1: cbt.ListIntBlockBlobCountHeadRequest.block_root:type_name -> cbt.StringFilter
-	5,  // 2: cbt.ListIntBlockBlobCountHeadRequest.updated_date_time:type_name -> cbt.UInt32Filter
-	5,  // 3: cbt.ListIntBlockBlobCountHeadRequest.slot:type_name -> cbt.UInt32Filter
-	5,  // 4: cbt.ListIntBlockBlobCountHeadRequest.epoch:type_name -> cbt.UInt32Filter
-	5,  // 5: cbt.ListIntBlockBlobCountHeadRequest.epoch_start_date_time:type_name -> cbt.UInt32Filter
-	5,  // 6: cbt.ListIntBlockBlobCountHeadRequest.blob_count:type_name -> cbt.UInt32Filter
-	0,  // 7: cbt.ListIntBlockBlobCountHeadResponse.int_block_blob_count_head:type_name -> cbt.IntBlockBlobCountHead
-	0,  // 8: cbt.GetIntBlockBlobCountHeadResponse.item:type_name -> cbt.IntBlockBlobCountHead
-	1,  // 9: cbt.IntBlockBlobCountHeadService.List:input_type -> cbt.ListIntBlockBlobCountHeadRequest
-	3,  // 10: cbt.IntBlockBlobCountHeadService.Get:input_type -> cbt.GetIntBlockBlobCountHeadRequest
-	2,  // 11: cbt.IntBlockBlobCountHeadService.List:output_type -> cbt.ListIntBlockBlobCountHeadResponse
-	4,  // 12: cbt.IntBlockBlobCountHeadService.Get:output_type -> cbt.GetIntBlockBlobCountHeadResponse
+var file_vendor_xatu_cbt_clickhouse_fct_block_blob_count_head_proto_depIdxs = []int32{
+	5,  // 0: cbt.ListFctBlockBlobCountHeadRequest.slot_start_date_time:type_name -> cbt.UInt32Filter
+	6,  // 1: cbt.ListFctBlockBlobCountHeadRequest.block_root:type_name -> cbt.StringFilter
+	5,  // 2: cbt.ListFctBlockBlobCountHeadRequest.updated_date_time:type_name -> cbt.UInt32Filter
+	5,  // 3: cbt.ListFctBlockBlobCountHeadRequest.slot:type_name -> cbt.UInt32Filter
+	5,  // 4: cbt.ListFctBlockBlobCountHeadRequest.epoch:type_name -> cbt.UInt32Filter
+	5,  // 5: cbt.ListFctBlockBlobCountHeadRequest.epoch_start_date_time:type_name -> cbt.UInt32Filter
+	5,  // 6: cbt.ListFctBlockBlobCountHeadRequest.blob_count:type_name -> cbt.UInt32Filter
+	0,  // 7: cbt.ListFctBlockBlobCountHeadResponse.fct_block_blob_count_head:type_name -> cbt.FctBlockBlobCountHead
+	0,  // 8: cbt.GetFctBlockBlobCountHeadResponse.item:type_name -> cbt.FctBlockBlobCountHead
+	1,  // 9: cbt.FctBlockBlobCountHeadService.List:input_type -> cbt.ListFctBlockBlobCountHeadRequest
+	3,  // 10: cbt.FctBlockBlobCountHeadService.Get:input_type -> cbt.GetFctBlockBlobCountHeadRequest
+	2,  // 11: cbt.FctBlockBlobCountHeadService.List:output_type -> cbt.ListFctBlockBlobCountHeadResponse
+	4,  // 12: cbt.FctBlockBlobCountHeadService.Get:output_type -> cbt.GetFctBlockBlobCountHeadResponse
 	11, // [11:13] is the sub-list for method output_type
 	9,  // [9:11] is the sub-list for method input_type
 	9,  // [9:9] is the sub-list for extension type_name
@@ -554,15 +554,15 @@ var file_vendor_xatu_cbt_clickhouse_int_block_blob_count_head_proto_depIdxs = []
 	0,  // [0:9] is the sub-list for field type_name
 }
 
-func init() { file_vendor_xatu_cbt_clickhouse_int_block_blob_count_head_proto_init() }
-func file_vendor_xatu_cbt_clickhouse_int_block_blob_count_head_proto_init() {
-	if File_vendor_xatu_cbt_clickhouse_int_block_blob_count_head_proto != nil {
+func init() { file_vendor_xatu_cbt_clickhouse_fct_block_blob_count_head_proto_init() }
+func file_vendor_xatu_cbt_clickhouse_fct_block_blob_count_head_proto_init() {
+	if File_vendor_xatu_cbt_clickhouse_fct_block_blob_count_head_proto != nil {
 		return
 	}
 	file_vendor_xatu_cbt_clickhouse_common_proto_init()
 	if !protoimpl.UnsafeEnabled {
-		file_vendor_xatu_cbt_clickhouse_int_block_blob_count_head_proto_msgTypes[0].Exporter = func(v any, i int) any {
-			switch v := v.(*IntBlockBlobCountHead); i {
+		file_vendor_xatu_cbt_clickhouse_fct_block_blob_count_head_proto_msgTypes[0].Exporter = func(v any, i int) any {
+			switch v := v.(*FctBlockBlobCountHead); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -573,8 +573,8 @@ func file_vendor_xatu_cbt_clickhouse_int_block_blob_count_head_proto_init() {
 				return nil
 			}
 		}
-		file_vendor_xatu_cbt_clickhouse_int_block_blob_count_head_proto_msgTypes[1].Exporter = func(v any, i int) any {
-			switch v := v.(*ListIntBlockBlobCountHeadRequest); i {
+		file_vendor_xatu_cbt_clickhouse_fct_block_blob_count_head_proto_msgTypes[1].Exporter = func(v any, i int) any {
+			switch v := v.(*ListFctBlockBlobCountHeadRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -585,8 +585,8 @@ func file_vendor_xatu_cbt_clickhouse_int_block_blob_count_head_proto_init() {
 				return nil
 			}
 		}
-		file_vendor_xatu_cbt_clickhouse_int_block_blob_count_head_proto_msgTypes[2].Exporter = func(v any, i int) any {
-			switch v := v.(*ListIntBlockBlobCountHeadResponse); i {
+		file_vendor_xatu_cbt_clickhouse_fct_block_blob_count_head_proto_msgTypes[2].Exporter = func(v any, i int) any {
+			switch v := v.(*ListFctBlockBlobCountHeadResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -597,8 +597,8 @@ func file_vendor_xatu_cbt_clickhouse_int_block_blob_count_head_proto_init() {
 				return nil
 			}
 		}
-		file_vendor_xatu_cbt_clickhouse_int_block_blob_count_head_proto_msgTypes[3].Exporter = func(v any, i int) any {
-			switch v := v.(*GetIntBlockBlobCountHeadRequest); i {
+		file_vendor_xatu_cbt_clickhouse_fct_block_blob_count_head_proto_msgTypes[3].Exporter = func(v any, i int) any {
+			switch v := v.(*GetFctBlockBlobCountHeadRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -609,8 +609,8 @@ func file_vendor_xatu_cbt_clickhouse_int_block_blob_count_head_proto_init() {
 				return nil
 			}
 		}
-		file_vendor_xatu_cbt_clickhouse_int_block_blob_count_head_proto_msgTypes[4].Exporter = func(v any, i int) any {
-			switch v := v.(*GetIntBlockBlobCountHeadResponse); i {
+		file_vendor_xatu_cbt_clickhouse_fct_block_blob_count_head_proto_msgTypes[4].Exporter = func(v any, i int) any {
+			switch v := v.(*GetFctBlockBlobCountHeadResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -626,18 +626,18 @@ func file_vendor_xatu_cbt_clickhouse_int_block_blob_count_head_proto_init() {
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: file_vendor_xatu_cbt_clickhouse_int_block_blob_count_head_proto_rawDesc,
+			RawDescriptor: file_vendor_xatu_cbt_clickhouse_fct_block_blob_count_head_proto_rawDesc,
 			NumEnums:      0,
 			NumMessages:   5,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
-		GoTypes:           file_vendor_xatu_cbt_clickhouse_int_block_blob_count_head_proto_goTypes,
-		DependencyIndexes: file_vendor_xatu_cbt_clickhouse_int_block_blob_count_head_proto_depIdxs,
-		MessageInfos:      file_vendor_xatu_cbt_clickhouse_int_block_blob_count_head_proto_msgTypes,
+		GoTypes:           file_vendor_xatu_cbt_clickhouse_fct_block_blob_count_head_proto_goTypes,
+		DependencyIndexes: file_vendor_xatu_cbt_clickhouse_fct_block_blob_count_head_proto_depIdxs,
+		MessageInfos:      file_vendor_xatu_cbt_clickhouse_fct_block_blob_count_head_proto_msgTypes,
 	}.Build()
-	File_vendor_xatu_cbt_clickhouse_int_block_blob_count_head_proto = out.File
-	file_vendor_xatu_cbt_clickhouse_int_block_blob_count_head_proto_rawDesc = nil
-	file_vendor_xatu_cbt_clickhouse_int_block_blob_count_head_proto_goTypes = nil
-	file_vendor_xatu_cbt_clickhouse_int_block_blob_count_head_proto_depIdxs = nil
+	File_vendor_xatu_cbt_clickhouse_fct_block_blob_count_head_proto = out.File
+	file_vendor_xatu_cbt_clickhouse_fct_block_blob_count_head_proto_rawDesc = nil
+	file_vendor_xatu_cbt_clickhouse_fct_block_blob_count_head_proto_goTypes = nil
+	file_vendor_xatu_cbt_clickhouse_fct_block_blob_count_head_proto_depIdxs = nil
 }

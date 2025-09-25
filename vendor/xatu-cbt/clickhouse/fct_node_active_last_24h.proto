@@ -3,6 +3,7 @@ syntax = "proto3";
 package cbt;
 
 import "vendor/xatu-cbt/clickhouse/common.proto";
+import "google/protobuf/wrappers.proto";
 
 option go_package = "github.com/ethpandaops/xatu-cbt/pkg/proto/clickhouse";
 // Active nodes for the network
@@ -32,10 +33,18 @@ message FctNodeActiveLast24h {
   string meta_client_geo_country_code = 21;
   // Continent code of the client
   string meta_client_geo_continent_code = 22;
+  // Longitude of the client
+  google.protobuf.DoubleValue meta_client_geo_longitude = 23;
+  // Latitude of the client
+  google.protobuf.DoubleValue meta_client_geo_latitude = 24;
+  // Autonomous system number of the client
+  google.protobuf.UInt32Value meta_client_geo_autonomous_system_number = 25;
+  // Autonomous system organization of the client
+  google.protobuf.StringValue meta_client_geo_autonomous_system_organization = 26;
   // Ethereum consensus client version
-  string meta_consensus_version = 23;
+  string meta_consensus_version = 27;
   // Ethereum consensus client implementation
-  string meta_consensus_implementation = 24;
+  string meta_consensus_implementation = 28;
 }
 
 // ListFctNodeActiveLast24hRequest is the request message for listing fct_node_active_last_24h records
@@ -65,22 +74,30 @@ message ListFctNodeActiveLast24hRequest {
   StringFilter meta_client_geo_country_code = 11;
   // Filter by meta_client_geo_continent_code (optional)
   StringFilter meta_client_geo_continent_code = 12;
+  // Filter by meta_client_geo_longitude (optional)
+  google.protobuf.DoubleValue meta_client_geo_longitude = 13;
+  // Filter by meta_client_geo_latitude (optional)
+  google.protobuf.DoubleValue meta_client_geo_latitude = 14;
+  // Filter by meta_client_geo_autonomous_system_number (optional)
+  NullableUInt32Filter meta_client_geo_autonomous_system_number = 15;
+  // Filter by meta_client_geo_autonomous_system_organization (optional)
+  NullableStringFilter meta_client_geo_autonomous_system_organization = 16;
   // Filter by meta_consensus_version (optional)
-  StringFilter meta_consensus_version = 13;
+  StringFilter meta_consensus_version = 17;
   // Filter by meta_consensus_implementation (optional)
-  StringFilter meta_consensus_implementation = 14;
+  StringFilter meta_consensus_implementation = 18;
 
   // The maximum number of fct_node_active_last_24h to return.
   // If unspecified, at most 100 items will be returned.
-  // The maximum value is 1000; values above 1000 will be coerced to 1000.
-  int32 page_size = 15;
+  // The maximum value is 10000; values above 10000 will be coerced to 10000.
+  int32 page_size = 19;
   // A page token, received from a previous `ListFctNodeActiveLast24h` call.
   // Provide this to retrieve the subsequent page.
-  string page_token = 16;
+  string page_token = 20;
   // The order of results. Format: comma-separated list of fields.
   // Example: "foo,bar" or "foo desc,bar" for descending order on foo.
   // If unspecified, results will be returned in the default order.
-  string order_by = 17;
+  string order_by = 21;
 }
 
 // ListFctNodeActiveLast24hResponse is the response message for listing fct_node_active_last_24h records
