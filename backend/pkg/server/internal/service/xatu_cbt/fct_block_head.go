@@ -73,7 +73,7 @@ func (x *XatuCBT) ListFctBlockHead(
 	if err = client.QueryWithScanner(ctx, sqlQuery.Query, func(scanner clickhouse.RowScanner) error {
 		block, scanErr := scanFctBlockHead(scanner)
 		if scanErr != nil {
-			x.log.WithError(scanErr).Error("Failed to scan row")
+			x.log.WithError(scanErr).Error("scanFctBlockHead: Failed to scan row")
 
 			return nil
 		}

@@ -71,7 +71,7 @@ func (x *XatuCBT) ListFctMevBidCountByRelay(
 	if err = client.QueryWithScanner(ctx, sqlQuery.Query, func(scanner clickhouse.RowScanner) error {
 		item, scanErr := scanFctMevBidCountByRelay(scanner)
 		if scanErr != nil {
-			x.log.WithError(scanErr).Error("Failed to scan row")
+			x.log.WithError(scanErr).Error("scanFctMevBidCountByRelay: Failed to scan row")
 
 			return nil
 		}

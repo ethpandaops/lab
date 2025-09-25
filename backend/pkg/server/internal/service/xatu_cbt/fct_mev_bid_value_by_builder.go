@@ -72,7 +72,7 @@ func (x *XatuCBT) ListFctMevBidValueByBuilder(
 	if err = client.QueryWithScanner(ctx, sqlQuery.Query, func(scanner clickhouse.RowScanner) error {
 		builder, scanErr := scanFctMevBidValueByBuilder(scanner)
 		if scanErr != nil {
-			x.log.WithError(scanErr).Error("Failed to scan row")
+			x.log.WithError(scanErr).Error("scanFctMevBidValueByBuilder: Failed to scan row")
 
 			return nil
 		}
@@ -134,6 +134,7 @@ func scanFctMevBidValueByBuilder(
 		&earliestBidDateTime,
 		&relayNames,
 		&builder.BlockHash,
+		&builder.BuilderPubkey,
 		&value,
 	); err != nil {
 		return nil, fmt.Errorf("failed to scan row: %w", err)

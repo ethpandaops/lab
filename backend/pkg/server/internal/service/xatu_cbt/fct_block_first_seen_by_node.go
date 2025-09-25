@@ -71,7 +71,7 @@ func (x *XatuCBT) ListFctBlockFirstSeenByNode(
 	if err = client.QueryWithScanner(ctx, sqlQuery.Query, func(scanner clickhouse.RowScanner) error {
 		node, scanErr := scanFctBlockFirstSeenByNode(scanner)
 		if scanErr != nil {
-			x.log.WithError(scanErr).Error("Failed to scan row")
+			x.log.WithError(scanErr).Error("scanFctBlockFirstSeenByNode: Failed to scan row")
 
 			return nil
 		}

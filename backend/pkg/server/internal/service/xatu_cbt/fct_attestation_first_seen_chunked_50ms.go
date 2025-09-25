@@ -71,7 +71,7 @@ func (x *XatuCBT) ListFctAttestationFirstSeenChunked50ms(
 	if err = client.QueryWithScanner(ctx, sqlQuery.Query, func(scanner clickhouse.RowScanner) error {
 		chunk, scanErr := scanFctAttestationFirstSeenChunked50ms(scanner)
 		if scanErr != nil {
-			x.log.WithError(scanErr).Error("Failed to scan row")
+			x.log.WithError(scanErr).Error("scanFctAttestationFirstSeenChunked50ms: Failed to scan row")
 
 			return nil
 		}
