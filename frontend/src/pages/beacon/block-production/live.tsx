@@ -2,11 +2,10 @@ import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import useBeacon from '@/contexts/beacon';
 import { useSlotData } from '@/hooks/useSlotData';
+import { useExperimentConfig } from '@/hooks/useExperimentConfig';
 import SlotDataStore from '@/utils/SlotDataStore';
 import useNetwork from '@/contexts/network';
-import useConfig from '@/contexts/config';
 import { TimelineProvider } from '@/contexts/timeline';
-import { AlertCircle } from 'lucide-react';
 import {
   MobileBlockProductionView,
   DesktopBlockProductionView,
@@ -14,6 +13,7 @@ import {
   getTransformedBids,
   BidData,
 } from '@/components/beacon/block_production';
+import { ExperimentGuard } from '@/components/common/ExperimentGuard';
 import { hasNonEmptyDeliveredPayloads } from '@/components/beacon/block_production/common/blockUtils';
 
 /**
@@ -24,22 +24,7 @@ import { hasNonEmptyDeliveredPayloads } from '@/components/beacon/block_producti
 export default function BlockProductionLivePage() {
   // Use network directly from NetworkContext - App.tsx handles URL updates
   const { selectedNetwork } = useNetwork();
-  const { config } = useConfig();
   const queryClient = useQueryClient();
-
-  // Check if this experiment is available for the current network
-  const isExperimentAvailable = () => {
-    if (!config?.experiments) return true; // Default to available if no config
-    const experiment = config.experiments.find(exp => exp.id === 'block-production-flow');
-    return experiment?.enabled && experiment?.networks?.includes(selectedNetwork);
-  };
-
-  // Get the networks that support this experiment
-  const getSupportedNetworks = () => {
-    if (!config?.experiments) return [];
-    const experiment = config.experiments.find(exp => exp.id === 'block-production-flow');
-    return experiment?.enabled ? experiment?.networks || [] : [];
-  };
   // Add state to handle screen size with more granular breakpoints
   const [viewMode, setViewMode] = useState<'mobile' | 'tablet' | 'desktop'>('desktop');
 
@@ -76,18 +61,34 @@ export default function BlockProductionLivePage() {
   const headLagSlots = getHeadLagSlots(selectedNetwork);
   const [headSlot, setHeadSlot] = useState<number | null>(clock ? clock.getCurrentSlot() : null);
 
+  // Fetch experiment config for data availability
+  const {
+    data: experimentConfig,
+    isLoading: isConfigLoading,
+    error: configError,
+    getNetworkAvailability,
+    getSafeSlot,
+    isSlotInRange,
+    getDataStaleness,
+    isSlotBeyondAvailableData,
+  } = useExperimentConfig('block-production-flow', selectedNetwork);
+
   // Reset state when network changes
   useEffect(() => {
     // Get updated clock for the selected network
     const updatedClock = getBeaconClock(selectedNetwork);
 
     if (updatedClock) {
-      // Reset head slot to the current slot of the new network
+      // Always use the actual head slot from the clock
       const newSlot = updatedClock.getCurrentSlot();
       setHeadSlot(newSlot);
 
       // Reset to live position
       setDisplaySlotOffset(0);
+      
+      // Reset initial slots for new network
+      setInitialSafeSlot(null);
+      setInitialHeadSlot(null);
 
       // Clear prefetched slots for the previous network
       prefetchedSlotsRef.current = new Set();
@@ -132,9 +133,48 @@ export default function BlockProductionLivePage() {
     isAtLivePositionRef.current = displaySlotOffset === 0;
   }, [displaySlotOffset]);
 
-  // Calculate the base slot with proper lag
-  // Adding extra 2 slots of lag for processing to match behavior in beacon/live.tsx
-  const baseSlot = headSlot ? headSlot - (headLagSlots + 2) : null;
+  // Use safe slot from backend config as starting point
+  // Backend already calculated this with head_delay_slots applied
+  const safeSlotFromBackend = getSafeSlot(selectedNetwork);
+  
+  // Track the initial slots when they first load - freeze these values for stable live progression
+  const [initialSafeSlot, setInitialSafeSlot] = useState<number | null>(null);
+  const [initialHeadSlot, setInitialHeadSlot] = useState<number | null>(null);
+  
+  // Set initial slots when backend data first becomes available
+  useEffect(() => {
+    const networkAvailability = getNetworkAvailability(selectedNetwork);
+    const backendHeadSlot = networkAvailability?.headSlot;
+    
+    if (safeSlotFromBackend !== null && initialSafeSlot === null) {
+      setInitialSafeSlot(safeSlotFromBackend);
+    }
+    
+    if (backendHeadSlot !== null && backendHeadSlot !== undefined && initialHeadSlot === null) {
+      setInitialHeadSlot(backendHeadSlot);
+    }
+  }, [safeSlotFromBackend, getNetworkAvailability, selectedNetwork, initialSafeSlot, initialHeadSlot]);
+  
+  // Calculate current slot position: start from initial safe slot and advance with blockchain
+  let baseSlot: number | null = null;
+  if (initialSafeSlot !== null && initialHeadSlot !== null && headSlot !== null) {
+    // Calculate how many slots have elapsed since we got the initial config
+    // This keeps us advancing with the live blockchain using frozen initial values
+    const slotsElapsed = headSlot - initialHeadSlot;
+    const calculatedSlot = initialSafeSlot + slotsElapsed;
+    
+    // Cap at max available data when in live mode to prevent showing empty slots
+    const networkAvailability = getNetworkAvailability(selectedNetwork);
+    if (displaySlotOffset === 0 && networkAvailability && calculatedSlot > networkAvailability.maxSlot) {
+      baseSlot = networkAvailability.maxSlot;
+    } else {
+      baseSlot = calculatedSlot;
+    }
+  } else {
+    // Fallback when we don't have the initial data yet
+    baseSlot = safeSlotFromBackend;
+  }
+  
   const slotNumber = baseSlot !== null ? baseSlot + displaySlotOffset : null;
 
   // Track if a slot transition is in progress to prevent double transitions
@@ -281,27 +321,26 @@ export default function BlockProductionLivePage() {
       const timeInSlot = slotProgress * slotDuration;
       const timeToNextSlot = slotDuration - timeInSlot;
 
-      // Calculate the next slot we'll need to display
-      const nextHeadSlot = (headSlot || 0) + 1;
-      // Adding extra 2 slots of lag for processing to match behavior in prefetch logic
-      const nextDisplaySlot = nextHeadSlot - (headLagSlots + 2);
+      // Calculate the next slot we'll need to display based on our baseSlot logic
+      const nextSlot = baseSlot !== null ? baseSlot + 1 : null;
+
 
       // Use the callback for prefetching based on timer thresholds
-      prefetchAtTimerThreshold(nextDisplaySlot, timeToNextSlot, timeInSlot);
+      if (nextSlot !== null) {
+        prefetchAtTimerThreshold(nextSlot, timeToNextSlot, timeInSlot);
+      }
     };
 
     // Run the check every 1000ms (reduced from 100ms since we're using TimelineProvider for animations)
     const intervalId = setInterval(checkAndPrefetch, 1000);
 
     // Initial prefetch of current and next slots when component mounts or network changes
-    if (headSlot !== null) {
-      const currentDisplaySlot = headSlot - (headLagSlots + 2);
-
+    if (baseSlot !== null) {
       // Clear any previously prefetched slots when network changes
       prefetchedSlotsRef.current = new Set();
 
       // Safely prefetch the initial slots for the current network
-      prefetchMultipleSlotsCallback(currentDisplaySlot, 2);
+      prefetchMultipleSlotsCallback(baseSlot, 2);
     }
 
     return () => {
@@ -310,8 +349,7 @@ export default function BlockProductionLivePage() {
   }, [
     selectedNetwork,
     clock,
-    headSlot,
-    headLagSlots,
+    baseSlot,
     prefetchNextSlotData,
     prefetchMultipleSlotsCallback,
     prefetchAtTimerThreshold,
@@ -321,11 +359,17 @@ export default function BlockProductionLivePage() {
   // Prefetch previous slot before navigating to reduce flash
   const goToPreviousSlot = React.useCallback(() => {
     if (slotNumber !== null) {
+      const prevSlot = slotNumber - 1;
+      // Check if previous slot is within available range (use default tolerance)
+      if (!isSlotInRange(prevSlot, selectedNetwork)) {
+        console.warn(`Cannot navigate to slot ${prevSlot}: outside available range`);
+        return;
+      }
       // Prefetch previous slot data before navigating
-      prefetchPreviousSlotData(slotNumber - 1);
+      prefetchPreviousSlotData(prevSlot);
     }
     setDisplaySlotOffset(prev => prev - 1);
-  }, [slotNumber, prefetchPreviousSlotData]);
+  }, [slotNumber, prefetchPreviousSlotData, isSlotInRange, selectedNetwork]);
 
   const goToNextSlot = React.useCallback(() => {
     // Prevent advancing if we're already transitioning
@@ -333,27 +377,41 @@ export default function BlockProductionLivePage() {
       return;
     }
 
+    if (slotNumber === null) return;
+
+    const nextSlot = slotNumber + 1;
+
+    // Check if next slot is within available range (use default tolerance)
+    if (!isSlotInRange(nextSlot, selectedNetwork)) {
+      console.warn(`Cannot navigate to slot ${nextSlot}: outside available range`);
+      return;
+    }
+
     // Only allow advancing to next slot if we're not already at the head slot
-    if (headSlot !== null && slotNumber !== null && slotNumber < headSlot) {
+    if (headSlot !== null && slotNumber < headSlot) {
       // Prefetch next slot data before navigating
-      prefetchNextSlotData(slotNumber + 1);
+      prefetchNextSlotData(nextSlot);
       setDisplaySlotOffset(prev => prev + 1);
     } else if (displaySlotOffset < 0) {
       // If we're on a historical slot, we can move forward even if we don't know the head yet
-      if (slotNumber !== null) {
-        prefetchNextSlotData(slotNumber + 1);
-      }
+      prefetchNextSlotData(nextSlot);
       setDisplaySlotOffset(prev => prev + 1);
     }
-  }, [headSlot, slotNumber, displaySlotOffset, isTransitioning, prefetchNextSlotData]);
+  }, [
+    headSlot,
+    slotNumber,
+    displaySlotOffset,
+    isTransitioning,
+    prefetchNextSlotData,
+    isSlotInRange,
+    selectedNetwork,
+  ]);
 
   const resetToCurrentSlot = React.useCallback(() => {
-    // If we have a head slot and we're not already at the current slot
-    if (headSlot !== null && slotNumber !== null && displaySlotOffset !== 0) {
-      // Calculate what the current slot would be - adding extra 2 slots of lag for processing
-      const currentSlot = headSlot - (headLagSlots + 2);
-      // Prefetch the current slot data before resetting
-      prefetchSlotData(currentSlot, 'next');
+    // If we have a base slot and we're not already at the current slot
+    if (baseSlot !== null && slotNumber !== null && displaySlotOffset !== 0) {
+      // Prefetch the current live slot data before resetting
+      prefetchSlotData(baseSlot, 'next');
     }
 
     // Reset to the live position
@@ -361,7 +419,7 @@ export default function BlockProductionLivePage() {
 
     // Reset transition state
     setIsTransitioning(false);
-  }, [headSlot, slotNumber, displaySlotOffset, headLagSlots, prefetchSlotData]);
+  }, [slotNumber, displaySlotOffset, prefetchSlotData, baseSlot]);
 
   const isNextDisabled = displaySlotOffset >= 0;
 
@@ -598,31 +656,12 @@ export default function BlockProductionLivePage() {
   const emptyBids: BidData[] = [];
   const emptyRelayColors = {};
 
-  // Show not available message if experiment isn't enabled for this network
-  if (!isExperimentAvailable()) {
-    const supportedNetworks = getSupportedNetworks();
-    return (
-      <div className="flex-1 flex items-center justify-center min-h-[50vh]">
-        <div className="text-center max-w-md mx-auto">
-          <AlertCircle className="w-12 h-12 text-accent/60 mx-auto mb-4" />
-          <h2 className="text-xl font-sans font-bold text-primary mb-2">
-            Experiment Not Available
-          </h2>
-          <p className="text-sm font-mono text-secondary mb-4">
-            Block Production Flow is not enabled for {selectedNetwork}
-          </p>
-          {supportedNetworks.length > 0 && (
-            <p className="text-xs font-mono text-tertiary">
-              Available on: {supportedNetworks.join(', ')}
-            </p>
-          )}
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="flex flex-col h-full bg-base">
+    <ExperimentGuard
+      experimentId="block-production-flow"
+      network={selectedNetwork}
+      currentSlot={slotNumber}
+    >
       {/* Wrap with TimelineProvider */}
       <TimelineProvider network={selectedNetwork} slotOffset={displaySlotOffset}>
         {/* Conditionally render mobile or desktop view based on screen size */}
@@ -728,6 +767,6 @@ export default function BlockProductionLivePage() {
           </div>
         )}
       </TimelineProvider>
-    </div>
+    </ExperimentGuard>
   );
 }
