@@ -373,6 +373,26 @@ export default function BlockProductionLivePage() {
     enabled: slotNumber !== null,
   });
 
+  // Also fetch previous slot data for the blockchain visualization
+  const { data: prevSlotData } = useSlotData({
+    network: selectedNetwork,
+    slot: slotNumber !== null ? slotNumber - 1 : undefined,
+    isLive: false,
+    enabled: slotNumber !== null && slotNumber > 0,
+  });
+
+  // Build combined slot data map for blockchain visualization
+  const slotDataCache = useMemo(() => {
+    const cache: Record<number, any> = {};
+    if (slotNumber !== null && slotData) {
+      cache[slotNumber] = slotData;
+    }
+    if (slotNumber !== null && prevSlotData && slotNumber > 0) {
+      cache[slotNumber - 1] = prevSlotData;
+    }
+    return cache;
+  }, [slotNumber, slotData, prevSlotData]);
+
   // Normal playback enablement
   useEffect(() => {
     if (slotNumber === null) return;
@@ -641,6 +661,7 @@ export default function BlockProductionLivePage() {
                     : {}
                 }
                 slotData={slotData} // Pass slot data with attestation info
+                slotDataCache={slotDataCache} // Pass the cache for adjacent slots
                 // Navigation controls
                 slotNumber={slotNumber}
                 headLagSlots={headLagSlots}
@@ -689,6 +710,7 @@ export default function BlockProductionLivePage() {
                     : {}
                 }
                 slotData={slotData}
+                slotDataCache={slotDataCache}
                 timeRange={timeRange}
                 valueRange={valueRange}
                 // Navigation controls
