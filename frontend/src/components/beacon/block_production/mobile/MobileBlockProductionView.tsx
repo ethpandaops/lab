@@ -18,6 +18,7 @@ interface MobileBlockProductionViewProps extends BlockProductionBaseProps {
   isNextDisabled: boolean;
   network: string; // Add network parameter for blockchain visualization
   slotData?: any; // Add slot data with attestation info (same as in desktop view)
+  slotDataCache?: Record<number, any>; // Cache of slot data for adjacent slots
   isLocallyBuilt?: boolean; // Flag to indicate if the block was locally built
 }
 
@@ -42,6 +43,7 @@ const MobileBlockProductionView: React.FC<MobileBlockProductionViewProps> = ({
   isNextDisabled,
   network,
   slotData,
+  slotDataCache, // Accept but don't use it for now since mobile view doesn't show adjacent slots
   isLocallyBuilt = false,
 }) => {
   // Get time and play state from context
