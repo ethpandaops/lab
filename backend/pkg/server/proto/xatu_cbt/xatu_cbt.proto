@@ -25,7 +25,7 @@ import "vendor/xatu-cbt/clickhouse/fct_attestation_first_seen_chunked_50ms.proto
 import "vendor/xatu-cbt/clickhouse/fct_attestation_correctness_head.proto";
 import "vendor/xatu-cbt/clickhouse/fct_mev_bid_count_by_relay.proto";
 import "vendor/xatu-cbt/clickhouse/fct_mev_bid_count_by_builder.proto";
-import "vendor/xatu-cbt/clickhouse/fct_mev_bid_value_by_builder.proto";
+import "vendor/xatu-cbt/clickhouse/fct_mev_bid_by_builder.proto";
 import "vendor/xatu-cbt/clickhouse/fct_block_blob_count_head.proto";
 import "vendor/xatu-cbt/clickhouse/fct_block_head.proto";
 import "vendor/xatu-cbt/clickhouse/fct_block_mev_head.proto";
@@ -63,9 +63,9 @@ service XatuCBT {
   // This table contains the total number of MEV bids for a slot by builder.
   rpc ListFctMevBidCountByBuilder(cbt.ListFctMevBidCountByBuilderRequest) returns (cbt.ListFctMevBidCountByBuilderResponse);
 
-  // ListFctMevBidValueByBuilder returns highest MEV bid values by builder for a slot.
+  // ListFctMevBidByBuilder returns highest MEV bid values by builder for a slot.
   // This table contains the highest value MEV relay bid for a slot by builder.
-  rpc ListFctMevBidValueByBuilder(cbt.ListFctMevBidValueByBuilderRequest) returns (cbt.ListFctMevBidValueByBuilderResponse);
+  rpc ListFctMevBidByBuilder(cbt.ListFctMevBidByBuilderRequest) returns (cbt.ListFctMevBidByBuilderResponse);
 
   // ListFctBlockBlobCountHead returns blob count data for blocks in the unfinalized chain.
   // This table contains the number of blobs for each block, with forks potentially causing multiple blocks per slot.

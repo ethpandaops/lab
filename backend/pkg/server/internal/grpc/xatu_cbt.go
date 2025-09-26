@@ -242,17 +242,17 @@ func (x *XatuCBT) ListFctBlockMevHead(
 	return x.service.ListFctBlockMevHead(ctx, req)
 }
 
-// ListFctMevBidValueByBuilder returns highest MEV bid values by builder for a slot.
-func (x *XatuCBT) ListFctMevBidValueByBuilder(
+// ListFctMevBidByBuilder returns highest MEV bid values by builder for a slot.
+func (x *XatuCBT) ListFctMevBidByBuilder(
 	ctx context.Context,
-	req *cbtproto.ListFctMevBidValueByBuilderRequest,
-) (*cbtproto.ListFctMevBidValueByBuilderResponse, error) {
+	req *cbtproto.ListFctMevBidByBuilderRequest,
+) (*cbtproto.ListFctMevBidByBuilderResponse, error) {
 	// Calculate SlotStartDateTime if not already set for more efficient queries.
 	if req.SlotStartDateTime == nil && req.Slot != nil {
 		req.SlotStartDateTime = x.calculateSlotStartDateTime(ctx, req.Slot)
 	}
 
-	return x.service.ListFctMevBidValueByBuilder(ctx, req)
+	return x.service.ListFctMevBidByBuilder(ctx, req)
 }
 
 // ListFctBlockProposerEntity returns proposer entity data from the fct_block_proposer_entity table.

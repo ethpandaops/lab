@@ -12,17 +12,17 @@ import (
 )
 
 const (
-	MethodListFctMevBidValueByBuilder = "ListFctMevBidValueByBuilder"
+	MethodListFctMevBidByBuilder = "ListFctMevBidByBuilder"
 )
 
-// ListFctMevBidValueByBuilder returns highest MEV bid values by builder from the fct_mev_bid_value_by_builder table.
-func (x *XatuCBT) ListFctMevBidValueByBuilder(
+// ListFctMevBidByBuilder returns highest MEV bid values by builder from the fct_mev_bid_by_builder table.
+func (x *XatuCBT) ListFctMevBidByBuilder(
 	ctx context.Context,
-	req *cbtproto.ListFctMevBidValueByBuilderRequest,
-) (resp *cbtproto.ListFctMevBidValueByBuilderResponse, err error) {
+	req *cbtproto.ListFctMevBidByBuilderRequest,
+) (resp *cbtproto.ListFctMevBidByBuilderResponse, err error) {
 	var (
 		network  string
-		builders []*cbtproto.FctMevBidValueByBuilder
+		builders []*cbtproto.FctMevBidByBuilder
 	)
 
 	defer func() {
@@ -31,7 +31,7 @@ func (x *XatuCBT) ListFctMevBidValueByBuilder(
 			status = StatusError
 		}
 
-		x.requestsTotal.WithLabelValues(MethodListFctMevBidValueByBuilder, network, status).Inc()
+		x.requestsTotal.WithLabelValues(MethodListFctMevBidByBuilder, network, status).Inc()
 	}()
 
 	// Get network and clickhouse client.
@@ -42,25 +42,25 @@ func (x *XatuCBT) ListFctMevBidValueByBuilder(
 
 	network = client.Network()
 
-	timer := prometheus.NewTimer(x.requestDuration.WithLabelValues(MethodListFctMevBidValueByBuilder, network))
+	timer := prometheus.NewTimer(x.requestDuration.WithLabelValues(MethodListFctMevBidByBuilder, network))
 	defer timer.ObserveDuration()
 
 	var (
-		cacheKey       = x.generateCacheKey("fct_mev_bid_value_by_builder", network, req)
-		cachedResponse = &cbtproto.ListFctMevBidValueByBuilderResponse{}
+		cacheKey       = x.generateCacheKey("fct_mev_bid_by_builder", network, req)
+		cachedResponse = &cbtproto.ListFctMevBidByBuilderResponse{}
 	)
 
 	// Check cache first.
 	if found, _ := x.tryCache(cacheKey, cachedResponse); found {
-		x.cacheHitsTotal.WithLabelValues(MethodListFctMevBidValueByBuilder, network).Inc()
+		x.cacheHitsTotal.WithLabelValues(MethodListFctMevBidByBuilder, network).Inc()
 
 		return cachedResponse, nil
 	}
 
-	x.cacheMissesTotal.WithLabelValues(MethodListFctMevBidValueByBuilder, network).Inc()
+	x.cacheMissesTotal.WithLabelValues(MethodListFctMevBidByBuilder, network).Inc()
 
 	// Use our clickhouse-proto-gen to handle building for us.
-	sqlQuery, err := cbtproto.BuildListFctMevBidValueByBuilderQuery(
+	sqlQuery, err := cbtproto.BuildListFctMevBidByBuilderQuery(
 		req,
 		cbtproto.WithFinal(),
 		cbtproto.WithDatabase(network),
@@ -70,9 +70,9 @@ func (x *XatuCBT) ListFctMevBidValueByBuilder(
 	}
 
 	if err = client.QueryWithScanner(ctx, sqlQuery.Query, func(scanner clickhouse.RowScanner) error {
-		builder, scanErr := scanFctMevBidValueByBuilder(scanner)
+		builder, scanErr := scanFctMevBidByBuilder(scanner)
 		if scanErr != nil {
-			x.log.WithError(scanErr).Error("scanFctMevBidValueByBuilder: Failed to scan row")
+			x.log.WithError(scanErr).Error("scanFctMevBidByBuilder: Failed to scan row")
 
 			return nil
 		}
@@ -81,7 +81,7 @@ func (x *XatuCBT) ListFctMevBidValueByBuilder(
 
 		return nil
 	}, sqlQuery.Args...); err != nil {
-		return nil, fmt.Errorf("failed to query fct_mev_bid_value_by_builder: %w", err)
+		return nil, fmt.Errorf("failed to query fct_mev_bid_by_builder: %w", err)
 	}
 
 	// Calculate pagination.
@@ -97,8 +97,8 @@ func (x *XatuCBT) ListFctMevBidValueByBuilder(
 	}
 
 	//nolint:gosec // conversion safe.
-	rsp := &cbtproto.ListFctMevBidValueByBuilderResponse{
-		FctMevBidValueByBuilder: builders,
+	rsp := &cbtproto.ListFctMevBidByBuilderResponse{
+		FctMevBidByBuilder: builders,
 		NextPageToken: cbtproto.CalculateNextPageToken(
 			currentOffset,
 			uint32(pageSize),
@@ -112,12 +112,12 @@ func (x *XatuCBT) ListFctMevBidValueByBuilder(
 	return rsp, nil
 }
 
-// scanFctMevBidValueByBuilder scans a single fct_mev_bid_value_by_builder row from the database.
-func scanFctMevBidValueByBuilder(
+// scanFctMevBidByBuilder scans a single fct_mev_bid_by_builder row from the database.
+func scanFctMevBidByBuilder(
 	scanner clickhouse.RowScanner,
-) (*cbtproto.FctMevBidValueByBuilder, error) {
+) (*cbtproto.FctMevBidByBuilder, error) {
 	var (
-		builder                            cbtproto.FctMevBidValueByBuilder
+		builder                            cbtproto.FctMevBidByBuilder
 		updatedDateTime, slotStartDateTime time.Time
 		epochStartDateTime                 time.Time
 		earliestBidDateTime                time.Time

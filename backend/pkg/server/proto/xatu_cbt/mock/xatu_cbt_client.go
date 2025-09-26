@@ -263,24 +263,24 @@ func (mr *MockXatuCBTClientMockRecorder) ListFctMevBidCountByRelay(ctx, in any, 
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListFctMevBidCountByRelay", reflect.TypeOf((*MockXatuCBTClient)(nil).ListFctMevBidCountByRelay), varargs...)
 }
 
-// ListFctMevBidValueByBuilder mocks base method.
-func (m *MockXatuCBTClient) ListFctMevBidValueByBuilder(ctx context.Context, in *clickhouse.ListFctMevBidValueByBuilderRequest, opts ...grpc.CallOption) (*clickhouse.ListFctMevBidValueByBuilderResponse, error) {
+// ListFctMevBidByBuilder mocks base method.
+func (m *MockXatuCBTClient) ListFctMevBidByBuilder(ctx context.Context, in *clickhouse.ListFctMevBidByBuilderRequest, opts ...grpc.CallOption) (*clickhouse.ListFctMevBidByBuilderResponse, error) {
 	m.ctrl.T.Helper()
 	varargs := []any{ctx, in}
 	for _, a := range opts {
 		varargs = append(varargs, a)
 	}
-	ret := m.ctrl.Call(m, "ListFctMevBidValueByBuilder", varargs...)
-	ret0, _ := ret[0].(*clickhouse.ListFctMevBidValueByBuilderResponse)
+	ret := m.ctrl.Call(m, "ListFctMevBidByBuilder", varargs...)
+	ret0, _ := ret[0].(*clickhouse.ListFctMevBidByBuilderResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// ListFctMevBidValueByBuilder indicates an expected call of ListFctMevBidValueByBuilder.
-func (mr *MockXatuCBTClientMockRecorder) ListFctMevBidValueByBuilder(ctx, in any, opts ...any) *gomock.Call {
+// ListFctMevBidByBuilder indicates an expected call of ListFctMevBidByBuilder.
+func (mr *MockXatuCBTClientMockRecorder) ListFctMevBidByBuilder(ctx, in any, opts ...any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]any{ctx, in}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListFctMevBidValueByBuilder", reflect.TypeOf((*MockXatuCBTClient)(nil).ListFctMevBidValueByBuilder), varargs...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListFctMevBidByBuilder", reflect.TypeOf((*MockXatuCBTClient)(nil).ListFctMevBidByBuilder), varargs...)
 }
 
 // ListFctNodeActiveLast24H mocks base method.

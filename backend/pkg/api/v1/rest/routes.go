@@ -94,7 +94,7 @@ func (r *PublicRouter) GetRoutes() []RouteConfig {
 
 		// MEV endpoints
 		{
-			Path:        "/{network}/beacon/slot/{slot}/mev",
+			Path:        "/{network}/beacon/slot/{slot}/mev/deployed",
 			Handler:     r.handleMevBlock,
 			Methods:     []string{http.MethodGet, http.MethodOptions},
 			Cache:       middleware.CacheRealtime, // Real-time data for recent slots
@@ -108,7 +108,7 @@ func (r *PublicRouter) GetRoutes() []RouteConfig {
 			Description: "Get MEV relay bid count statistics for a specific slot",
 		},
 		{
-			Path:        "/{network}/beacon/slot/{slot}/mev/builder/value",
+			Path:        "/{network}/beacon/slot/{slot}/mev/builder/bid",
 			Handler:     r.handleMevBuilderBid,
 			Methods:     []string{http.MethodGet, http.MethodOptions},
 			Cache:       middleware.CacheRealtime, // Real-time data for recent slots

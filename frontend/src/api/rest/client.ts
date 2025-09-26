@@ -415,13 +415,13 @@ export class RestApiClient {
   /**
    * Get MEV builder bid values for a specific slot
    */
-  async getMevBuilderValue(
+  async getMevBuilderBid(
     network: string,
     slot: number,
     params?: Record<string, any>,
   ): Promise<ListBeaconSlotMevBuilderResponse> {
     const queryString = params ? buildQueryString(params) : new URLSearchParams();
-    const url = `${this.baseUrl}${API_V1_ENDPOINTS.mevBuilderValue(network, slot)}${
+    const url = `${this.baseUrl}${API_V1_ENDPOINTS.mevBuilderBid(network, slot)}${
       queryString.toString() ? `?${queryString.toString()}` : ''
     }`;
     const response = await this.fetchWithRetry<any>(url);

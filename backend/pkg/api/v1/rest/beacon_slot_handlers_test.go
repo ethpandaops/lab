@@ -1127,7 +1127,7 @@ func TestHandleMevBuilderBid(t *testing.T) {
 		network        string
 		slot           string
 		queryParams    map[string]string
-		mockResponse   *cbtproto.ListFctMevBidValueByBuilderResponse
+		mockResponse   *cbtproto.ListFctMevBidByBuilderResponse
 		mockError      error
 		expectedStatus int
 		validateBody   func(t *testing.T, body []byte)
@@ -1136,8 +1136,8 @@ func TestHandleMevBuilderBid(t *testing.T) {
 			name:    "successful request",
 			network: "mainnet",
 			slot:    "8000000",
-			mockResponse: &cbtproto.ListFctMevBidValueByBuilderResponse{
-				FctMevBidValueByBuilder: []*cbtproto.FctMevBidValueByBuilder{
+			mockResponse: &cbtproto.ListFctMevBidByBuilderResponse{
+				FctMevBidByBuilder: []*cbtproto.FctMevBidByBuilder{
 					{
 						Slot:                10239024,
 						SlotStartDateTime:   1734307488,
@@ -1237,8 +1237,8 @@ func TestHandleMevBuilderBid(t *testing.T) {
 				"page_size":  "50",
 				"order_by":   "value asc",
 			},
-			mockResponse: &cbtproto.ListFctMevBidValueByBuilderResponse{
-				FctMevBidValueByBuilder: []*cbtproto.FctMevBidValueByBuilder{
+			mockResponse: &cbtproto.ListFctMevBidByBuilderResponse{
+				FctMevBidByBuilder: []*cbtproto.FctMevBidByBuilder{
 					{
 						BlockHash:           "0x123456",
 						Value:               "50000000000000000",
@@ -1274,7 +1274,7 @@ func TestHandleMevBuilderBid(t *testing.T) {
 			// Set up mock expectations
 			if tt.mockResponse != nil || tt.mockError != nil {
 				mockClient.EXPECT().
-					ListFctMevBidValueByBuilder(gomock.Any(), gomock.Any()).
+					ListFctMevBidByBuilder(gomock.Any(), gomock.Any()).
 					Return(tt.mockResponse, tt.mockError).
 					Times(1)
 			}
@@ -1316,7 +1316,7 @@ func TestHandleMevBuilderBid(t *testing.T) {
 }
 
 func TestTransformCBTToAPIMevBuilderBid(t *testing.T) {
-	cbtBid := &cbtproto.FctMevBidValueByBuilder{
+	cbtBid := &cbtproto.FctMevBidByBuilder{
 		BlockHash:           "0xdeadbeef",
 		Value:               "200000000000000000",
 		RelayNames:          []string{"flashbots", "bloxroute", "ultrasound"},

@@ -23,11 +23,12 @@ export const API_V1_ENDPOINTS = {
     `/api/v1/${network}/beacon/slot/${slot}/attestation/correctness`,
   beaconProposerEntity: (network: string, slot: number) =>
     `/api/v1/${network}/beacon/slot/${slot}/proposer/entity`,
-  mevBlock: (network: string, slot: number) => `/api/v1/${network}/beacon/slot/${slot}/mev`,
+  mevBlock: (network: string, slot: number) =>
+    `/api/v1/${network}/beacon/slot/${slot}/mev/deployed`,
   mevRelayCount: (network: string, slot: number) =>
     `/api/v1/${network}/beacon/slot/${slot}/mev/relay/count`,
-  mevBuilderValue: (network: string, slot: number) =>
-    `/api/v1/${network}/beacon/slot/${slot}/mev/builder/value`,
+  mevBuilderBid: (network: string, slot: number) =>
+    `/api/v1/${network}/beacon/slot/${slot}/mev/builder/bid`,
   mevBuilderCount: (network: string, slot: number) =>
     `/api/v1/${network}/beacon/slot/${slot}/mev/builder/count`,
 };
