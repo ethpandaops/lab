@@ -3,12 +3,14 @@ package xatu_cbt
 import (
 	"context"
 	"fmt"
+	"strconv"
 	"strings"
 	"time"
 
 	"github.com/attestantio/go-eth2-client/spec/phase0"
 	pb "github.com/ethpandaops/lab/backend/pkg/server/proto/xatu_cbt"
 	"github.com/prometheus/client_golang/prometheus"
+	"google.golang.org/grpc/metadata"
 )
 
 const (
@@ -40,6 +42,17 @@ func (x *XatuCBT) GetDataAvailability(
 	}
 
 	network = client.Network()
+
+	// Extract head_delay_slots from metadata
+	var headDelaySlots uint32 = 2 // default value
+
+	if md, ok := metadata.FromIncomingContext(ctx); ok {
+		if delaySlots := md.Get("head_delay_slots"); len(delaySlots) > 0 {
+			if parsed, err := strconv.ParseUint(delaySlots[0], 10, 32); err == nil {
+				headDelaySlots = uint32(parsed)
+			}
+		}
+	}
 
 	// Start metrics timer
 	var timer *prometheus.Timer
@@ -87,6 +100,10 @@ func (x *XatuCBT) GetDataAvailability(
 		availableFromTimestamp = &v
 	case *time.Time:
 		availableFromTimestamp = v
+	case nil:
+		return &pb.GetDataAvailabilityResponse{
+			HasData: false,
+		}, nil
 	default:
 		return nil, fmt.Errorf("unexpected type for available_from: %T", v)
 	}
@@ -96,6 +113,10 @@ func (x *XatuCBT) GetDataAvailability(
 		availableUntilTimestamp = &v
 	case *time.Time:
 		availableUntilTimestamp = v
+	case nil:
+		return &pb.GetDataAvailabilityResponse{
+			HasData: false,
+		}, nil
 	default:
 		return nil, fmt.Errorf("unexpected type for available_until: %T", v)
 	}
@@ -108,18 +129,43 @@ func (x *XatuCBT) GetDataAvailability(
 		}, nil
 	}
 
+	// Check if timestamps are Unix epoch (1970-01-01), which means no real data
+	// This happens when the database has no data and returns default values
+	if availableFromTimestamp.Unix() == 0 || availableUntilTimestamp.Unix() == 0 {
+		// When no data is available, don't return slot information as it's misleading
+		// There's no "safe" slot if no data exists to query
+		return &pb.GetDataAvailabilityResponse{
+			AvailableFromTimestamp:  0, // Explicitly set to 0
+			AvailableUntilTimestamp: 0, // Explicitly set to 0
+			MinSlot:                 0, // No data, so no min slot
+			MaxSlot:                 0, // No data, so no max slot
+			SafeSlot:                0, // No safe slot when no data available
+			HeadSlot:                0, // No meaningful head slot for data queries
+			HasData:                 false,
+		}, nil
+	}
+
 	// Calculate slots from timestamps using ethereum wallclock
-	minSlot, maxSlot, safeSlot, headSlot, err := x.calculateSlots(
+	minSlot, maxSlot, safeSlot, headSlot, err := x.calculateSlotsWithDelay(
 		ctx,
 		network,
 		*availableFromTimestamp,
 		*availableUntilTimestamp,
+		headDelaySlots,
 	)
 	if err != nil {
+		// If we get an error about Unix epoch timestamps, return no data
+		if strings.Contains(err.Error(), "Unix epoch") {
+			x.log.WithField("error", err).Debug("Unix epoch timestamps detected, no data available")
+
+			return &pb.GetDataAvailabilityResponse{
+				HasData: false,
+			}, nil
+		}
 		return nil, fmt.Errorf("failed to calculate slots: %w", err)
 	}
 
-	return &pb.GetDataAvailabilityResponse{
+	response := &pb.GetDataAvailabilityResponse{
 		AvailableFromTimestamp:  availableFromTimestamp.Unix(),
 		AvailableUntilTimestamp: availableUntilTimestamp.Unix(),
 		MinSlot:                 minSlot,
@@ -127,7 +173,9 @@ func (x *XatuCBT) GetDataAvailability(
 		SafeSlot:                safeSlot,
 		HeadSlot:                headSlot,
 		HasData:                 true,
-	}, nil
+	}
+
+	return response, nil
 }
 
 // buildDataAvailabilityQuery builds the SQL query for checking data availability.
@@ -171,12 +219,13 @@ FROM table_ranges`,
 	return query
 }
 
-// calculateSlots converts timestamps to slot numbers using the ethereum wallclock.
-func (x *XatuCBT) calculateSlots(
+// calculateSlotsWithDelay converts timestamps to slot numbers using the ethereum wallclock.
+func (x *XatuCBT) calculateSlotsWithDelay(
 	ctx context.Context,
 	networkName string,
 	availableFrom time.Time,
 	availableUntil time.Time,
+	headDelaySlots uint32,
 ) (minSlot, maxSlot, safeSlot, headSlot uint64, err error) {
 	// Get the ethereum network from cartographoor service
 	if x.cartographoorService == nil {
@@ -199,6 +248,11 @@ func (x *XatuCBT) calculateSlots(
 		return 0, 0, 0, 0, fmt.Errorf("wallclock not available for network %s", network.Name)
 	}
 
+	// Double-check we don't have Unix epoch timestamps (should be caught earlier)
+	if availableFrom.Unix() == 0 || availableUntil.Unix() == 0 {
+		return 0, 0, 0, 0, fmt.Errorf("cannot calculate slots from Unix epoch timestamps")
+	}
+
 	// Get slots for the timestamps
 	minSlotDetail := wallclock.Slots().FromTime(availableFrom)
 	maxSlotDetail := wallclock.Slots().FromTime(availableUntil)
@@ -208,15 +262,10 @@ func (x *XatuCBT) calculateSlots(
 	maxSlot = maxSlotDetail.Number()
 	headSlot = currentSlot.Number()
 
-	// Calculate safe slot (head - 2 slots for safety)
-	// Use the minimum of maxSlot and (headSlot - 2) to ensure we don't go beyond available data
-	if headSlot > 2 {
-		potentialSafeSlot := headSlot - 2
-		if potentialSafeSlot > maxSlot {
-			safeSlot = maxSlot
-		} else {
-			safeSlot = potentialSafeSlot
-		}
+	// Calculate safe slot (max - delay slots for safety)
+	// This ensures we only show slots we definitely have data for
+	if maxSlot > uint64(headDelaySlots) {
+		safeSlot = maxSlot - uint64(headDelaySlots)
 	} else {
 		safeSlot = 0
 	}

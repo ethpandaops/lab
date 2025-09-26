@@ -30,12 +30,14 @@ interface TimelineProviderProps {
   network: string;
   children: React.ReactNode;
   slotOffset?: number; // Optional offset from current slot
+  explicitSlot?: number | null; // Optional explicit slot to use instead of wallclock
 }
 
 export const TimelineProvider: React.FC<TimelineProviderProps> = ({
   network,
   children,
   slotOffset = 0,
+  explicitSlot,
 }) => {
   const { getBeaconClock } = useBeacon();
   const clock = getBeaconClock(network);
@@ -47,8 +49,9 @@ export const TimelineProvider: React.FC<TimelineProviderProps> = ({
   const [isPlaying, setIsPlaying] = useState<boolean>(true);
 
   // Store current slot for components that need it
+  // Use explicitSlot if provided, otherwise use wallclock
   const [currentSlot, setCurrentSlot] = useState<number | null>(
-    clock ? clock.getCurrentSlot() + slotOffset : null,
+    explicitSlot !== undefined ? explicitSlot : clock ? clock.getCurrentSlot() + slotOffset : null,
   );
 
   // For components that need current time in state
@@ -190,8 +193,8 @@ export const TimelineProvider: React.FC<TimelineProviderProps> = ({
           }
         }
 
-        // Update current slot if it's changed (only in live mode)
-        if (slotOffset === 0) {
+        // Update current slot if it's changed (only in live mode and not using explicit slot)
+        if (slotOffset === 0 && explicitSlot === undefined) {
           const newSlot = clock.getCurrentSlot() + slotOffset;
           if (newSlot !== currentSlot) {
             setCurrentSlot(newSlot);
@@ -230,41 +233,54 @@ export const TimelineProvider: React.FC<TimelineProviderProps> = ({
     return () => {
       clearInterval(intervalId);
     };
-  }, [clock, isPlaying, currentSlot, slotOffset]);
+  }, [clock, isPlaying, currentSlot, slotOffset, explicitSlot]);
 
   // Update slot offset when it changes externally
   useEffect(() => {
-    if (!clock) return;
-    setCurrentSlot(clock.getCurrentSlot() + slotOffset);
+    // Use explicit slot if provided, otherwise use wallclock
+    if (explicitSlot !== undefined) {
+      setCurrentSlot(explicitSlot);
 
-    // Reset simulated time when changing to a different slot
-    if (slotOffset !== 0) {
-      simulatedTimeRef.current = 0;
-      timeRef.current = 0;
-      setCurrentTimeMs(0);
-    } else {
-      // When returning to live mode, calculate our own high-precision progress
-      const currentSlot = clock.getCurrentSlot();
-      const slotStartSec = clock.getSlotStartTime(currentSlot);
-      const nowMs = Date.now();
-      const nowSec = nowMs / 1000;
-      const progressSec = nowSec - slotStartSec;
-      const progressPercent = Math.min(1, Math.max(0, progressSec / SECONDS_PER_SLOT));
-      const currentTime = progressPercent * SECONDS_PER_SLOT * 1000;
+      // Reset simulated time when slot changes - but not on initial mount or when going from null
+      // Only reset if we're actually changing between two different valid slots
+      if (currentSlot !== null && currentSlot !== explicitSlot && explicitSlot !== null) {
+        simulatedTimeRef.current = 0;
+        timeRef.current = 0;
+        setCurrentTimeMs(0);
+        setDisplayTimeMs(0);
+      }
+    } else if (clock) {
+      setCurrentSlot(clock.getCurrentSlot() + slotOffset);
 
-      simulatedTimeRef.current = currentTime;
-      timeRef.current = currentTime;
+      // Reset simulated time when changing to a different slot
+      if (slotOffset !== 0) {
+        simulatedTimeRef.current = 0;
+        timeRef.current = 0;
+        setCurrentTimeMs(0);
+      } else {
+        // When returning to live mode, calculate our own high-precision progress
+        const currentSlot = clock.getCurrentSlot();
+        const slotStartSec = clock.getSlotStartTime(currentSlot);
+        const nowMs = Date.now();
+        const nowSec = nowMs / 1000;
+        const progressSec = nowSec - slotStartSec;
+        const progressPercent = Math.min(1, Math.max(0, progressSec / SECONDS_PER_SLOT));
+        const currentTime = progressPercent * SECONDS_PER_SLOT * 1000;
 
-      // Always update state on initialization
-      setCurrentTimeMs(currentTime);
-      setDisplayTimeMs(currentTime);
-      lastStateUpdateRef.current = Date.now();
-      lastTimeDisplayUpdateRef.current = Date.now();
+        simulatedTimeRef.current = currentTime;
+        timeRef.current = currentTime;
+
+        // Always update state on initialization
+        setCurrentTimeMs(currentTime);
+        setDisplayTimeMs(currentTime);
+        lastStateUpdateRef.current = Date.now();
+        lastTimeDisplayUpdateRef.current = Date.now();
+      }
     }
 
     // Reset last update timestamp
     lastUpdateRef.current = Date.now();
-  }, [clock, slotOffset]);
+  }, [clock, slotOffset, explicitSlot, currentSlot]);
 
   // Provide context value
   const value = {

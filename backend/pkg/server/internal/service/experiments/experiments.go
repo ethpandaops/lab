@@ -226,8 +226,35 @@ func (s *ExperimentsService) getDataAvailabilityForExperiment(ctx context.Contex
 
 	// Query data availability for valid networks only
 	for _, network := range validNetworks {
-		// Add network to context metadata - use incoming context for internal service calls
-		md := metadata.New(map[string]string{"network": network})
+		// Extract head_delay_slots from experiment config
+		var headDelaySlots uint32 = 2 // default value
+
+		if exp.Config != nil {
+			if delay, ok := exp.Config["head_delay_slots"]; ok {
+				switch v := delay.(type) {
+				case float64:
+					if v >= 0 && v <= float64(^uint32(0)) {
+						headDelaySlots = uint32(v)
+					}
+				case int:
+					if v >= 0 && v <= int(^uint32(0)) {
+						headDelaySlots = uint32(v)
+					}
+				case int64:
+					if v >= 0 && v <= int64(^uint32(0)) {
+						headDelaySlots = uint32(v)
+					}
+				case uint32:
+					headDelaySlots = v
+				}
+			}
+		}
+
+		// Add network and head_delay_slots to context metadata - use incoming context for internal service calls
+		md := metadata.New(map[string]string{
+			"network":          network,
+			"head_delay_slots": fmt.Sprintf("%d", headDelaySlots),
+		})
 		ctxWithNetwork := metadata.NewIncomingContext(ctx, md)
 
 		// Query data availability
