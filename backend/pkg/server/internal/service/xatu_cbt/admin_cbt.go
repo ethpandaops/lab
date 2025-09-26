@@ -81,13 +81,6 @@ func (x *XatuCBT) GetDataAvailability(
 		return nil, fmt.Errorf("failed to query data availability: %w", err)
 	}
 
-	// Debug log the raw query results
-	x.log.WithFields(map[string]interface{}{
-		"network": network,
-		"row":     row,
-		"tables":  req.Tables,
-	}).Debug("Raw query results from ClickHouse")
-
 	// Parse results
 	var availableFromTimestamp, availableUntilTimestamp *time.Time
 
@@ -95,13 +88,6 @@ func (x *XatuCBT) GetDataAvailability(
 	availableUntilInterface, hasUntil := row["available_until"]
 
 	if !hasFrom || !hasUntil {
-		x.log.WithFields(map[string]interface{}{
-			"network":                 network,
-			"hasFrom":                 hasFrom,
-			"hasUntil":                hasUntil,
-			"availableFromInterface":  availableFromInterface,
-			"availableUntilInterface": availableUntilInterface,
-		}).Debug("No overlapping data - missing from/until timestamps")
 		// No overlapping data
 		return &pb.GetDataAvailabilityResponse{
 			HasData: false,
@@ -115,17 +101,10 @@ func (x *XatuCBT) GetDataAvailability(
 	case *time.Time:
 		availableFromTimestamp = v
 	case nil:
-		x.log.WithField("network", network).Debug("available_from is nil")
-
 		return &pb.GetDataAvailabilityResponse{
 			HasData: false,
 		}, nil
 	default:
-		x.log.WithFields(map[string]interface{}{
-			"network": network,
-			"type":    fmt.Sprintf("%T", v),
-			"value":   v,
-		}).Debug("Unexpected type for available_from")
 		return nil, fmt.Errorf("unexpected type for available_from: %T", v)
 	}
 
@@ -135,17 +114,10 @@ func (x *XatuCBT) GetDataAvailability(
 	case *time.Time:
 		availableUntilTimestamp = v
 	case nil:
-		x.log.WithField("network", network).Debug("available_until is nil")
-
 		return &pb.GetDataAvailabilityResponse{
 			HasData: false,
 		}, nil
 	default:
-		x.log.WithFields(map[string]interface{}{
-			"network": network,
-			"type":    fmt.Sprintf("%T", v),
-			"value":   v,
-		}).Debug("Unexpected type for available_until")
 		return nil, fmt.Errorf("unexpected type for available_until: %T", v)
 	}
 
@@ -160,12 +132,6 @@ func (x *XatuCBT) GetDataAvailability(
 	// Check if timestamps are Unix epoch (1970-01-01), which means no real data
 	// This happens when the database has no data and returns default values
 	if availableFromTimestamp.Unix() == 0 || availableUntilTimestamp.Unix() == 0 {
-		x.log.WithFields(map[string]interface{}{
-			"network":                 network,
-			"availableFromTimestamp":  availableFromTimestamp.Format(time.RFC3339),
-			"availableUntilTimestamp": availableUntilTimestamp.Format(time.RFC3339),
-		}).Debug("Timestamps are Unix epoch (no real data available)")
-
 		// When no data is available, don't return slot information as it's misleading
 		// There's no "safe" slot if no data exists to query
 		return &pb.GetDataAvailabilityResponse{
@@ -179,15 +145,6 @@ func (x *XatuCBT) GetDataAvailability(
 		}, nil
 	}
 
-	// Debug logging for timestamps from database
-	x.log.WithFields(map[string]interface{}{
-		"network":                 network,
-		"availableFromTimestamp":  availableFromTimestamp.Format(time.RFC3339),
-		"availableUntilTimestamp": availableUntilTimestamp.Format(time.RFC3339),
-		"availableFromUnix":       availableFromTimestamp.Unix(),
-		"availableUntilUnix":      availableUntilTimestamp.Unix(),
-	}).Debug("Retrieved timestamps from database")
-
 	// Calculate slots from timestamps using ethereum wallclock
 	minSlot, maxSlot, safeSlot, headSlot, err := x.calculateSlotsWithDelay(
 		ctx,
@@ -197,25 +154,15 @@ func (x *XatuCBT) GetDataAvailability(
 		headDelaySlots,
 	)
 	if err != nil {
+		// If we get an error about Unix epoch timestamps, return no data
+		if strings.Contains(err.Error(), "Unix epoch") {
+			x.log.WithField("error", err).Debug("Unix epoch timestamps detected, no data available")
+
+			return &pb.GetDataAvailabilityResponse{
+				HasData: false,
+			}, nil
+		}
 		return nil, fmt.Errorf("failed to calculate slots: %w", err)
-	}
-
-	// Validate slot numbers to prevent underflow
-	// The huge numbers like 18446744073564367166 indicate underflow
-	// This happens when timestamps are invalid or before genesis
-	if minSlot > 18446744073709551600 || maxSlot > 18446744073709551600 {
-		x.log.WithFields(map[string]interface{}{
-			"network":                 network,
-			"minSlot":                 minSlot,
-			"maxSlot":                 maxSlot,
-			"availableFromTimestamp":  availableFromTimestamp.Unix(),
-			"availableUntilTimestamp": availableUntilTimestamp.Unix(),
-		}).Warn("Slot calculation resulted in overflow/underflow, returning no data")
-
-		// Return no data available when we detect invalid slots
-		return &pb.GetDataAvailabilityResponse{
-			HasData: false,
-		}, nil
 	}
 
 	response := &pb.GetDataAvailabilityResponse{
@@ -227,11 +174,6 @@ func (x *XatuCBT) GetDataAvailability(
 		HeadSlot:                headSlot,
 		HasData:                 true,
 	}
-
-	x.log.WithFields(map[string]interface{}{
-		"network":  network,
-		"response": response,
-	}).Debug("Returning data availability response")
 
 	return response, nil
 }
@@ -306,9 +248,10 @@ func (x *XatuCBT) calculateSlotsWithDelay(
 		return 0, 0, 0, 0, fmt.Errorf("wallclock not available for network %s", network.Name)
 	}
 
-	// Note: The large slot numbers (like 18446744073564367166) suggest that the timestamps
-	// might be invalid or the slot calculation is experiencing underflow.
-	// This can happen when timestamps are before genesis time or invalid.
+	// Double-check we don't have Unix epoch timestamps (should be caught earlier)
+	if availableFrom.Unix() == 0 || availableUntil.Unix() == 0 {
+		return 0, 0, 0, 0, fmt.Errorf("cannot calculate slots from Unix epoch timestamps")
+	}
 
 	// Get slots for the timestamps
 	minSlotDetail := wallclock.Slots().FromTime(availableFrom)
@@ -318,18 +261,6 @@ func (x *XatuCBT) calculateSlotsWithDelay(
 	minSlot = minSlotDetail.Number()
 	maxSlot = maxSlotDetail.Number()
 	headSlot = currentSlot.Number()
-
-	// Debug logging for slot calculation
-	x.log.WithFields(map[string]interface{}{
-		"network":        networkName,
-		"availableFrom":  availableFrom.Format(time.RFC3339),
-		"availableUntil": availableUntil.Format(time.RFC3339),
-		"minSlot":        minSlot,
-		"maxSlot":        maxSlot,
-		"headSlot":       headSlot,
-		"minSlotTime":    minSlotDetail.TimeWindow().Start().Format(time.RFC3339),
-		"maxSlotTime":    maxSlotDetail.TimeWindow().Start().Format(time.RFC3339),
-	}).Debug("Calculated slots from timestamps with details")
 
 	// Calculate safe slot (max - delay slots for safety)
 	// This ensures we only show slots we definitely have data for

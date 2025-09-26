@@ -88,7 +88,6 @@ export function useExperimentConfig(experimentId: string, network?: string) {
     const availability = getNetworkAvailability(net || network);
     if (!availability) return true; // Allow if no data
 
-    // With smart polling, bounds should be fresh. Use tolerance for edge cases.
     const effectiveMaxSlot = availability.maxSlot + tolerance;
     return slot >= availability.minSlot && slot <= effectiveMaxSlot;
   };
