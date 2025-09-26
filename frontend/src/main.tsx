@@ -5,6 +5,7 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter } from 'react-router-dom';
+import { ApiModeProvider } from '@/contexts/apiMode';
 
 const MAX_RETRIES = 1;
 const queryClient = new QueryClient({
@@ -26,9 +27,11 @@ if (container) {
     <StrictMode>
       <ErrorBoundary>
         <QueryClientProvider client={queryClient}>
-          <BrowserRouter>
-            <App />
-          </BrowserRouter>
+          <ApiModeProvider>
+            <BrowserRouter>
+              <App />
+            </BrowserRouter>
+          </ApiModeProvider>
         </QueryClientProvider>
       </ErrorBoundary>
     </StrictMode>,

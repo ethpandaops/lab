@@ -1,5 +1,8 @@
 .PHONY: build proto vendor-protos clean-vendor run-srv run-api clean create-proto
 
+# Use bash instead of sh for better compatibility
+SHELL := /bin/bash
+
 # Pin upstream xatu-cbt commit/branch for proto vendoring
 XATU_CBT_COMMIT := master
 

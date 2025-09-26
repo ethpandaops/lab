@@ -267,7 +267,10 @@ func BuildListFctBlockBlobCountHeadQuery(req *ListFctBlockBlobCountHeadRequest, 
 		orderByClause = " ORDER BY slot_start_date_time" + ", block_root"
 	}
 
-	return BuildParameterizedQuery("fct_block_blob_count_head", qb, orderByClause, limit, offset, options...), nil
+	// Build column list
+	columns := []string{"updated_date_time", "slot", "slot_start_date_time", "epoch", "epoch_start_date_time", "block_root", "blob_count"}
+
+	return BuildParameterizedQuery("fct_block_blob_count_head", columns, qb, orderByClause, limit, offset, options...)
 }
 
 // BuildGetFctBlockBlobCountHeadQuery constructs a parameterized SQL query from a GetFctBlockBlobCountHeadRequest
@@ -284,6 +287,9 @@ func BuildGetFctBlockBlobCountHeadQuery(req *GetFctBlockBlobCountHeadRequest, op
 	// Build ORDER BY clause
 	orderByClause := " ORDER BY slot_start_date_time, block_root"
 
+	// Build column list
+	columns := []string{"updated_date_time", "slot", "slot_start_date_time", "epoch", "epoch_start_date_time", "block_root", "blob_count"}
+
 	// Return single record
-	return BuildParameterizedQuery("fct_block_blob_count_head", qb, orderByClause, 1, 0, options...), nil
+	return BuildParameterizedQuery("fct_block_blob_count_head", columns, qb, orderByClause, 1, 0, options...)
 }

@@ -6,9 +6,7 @@ import { DataAvailabilityPanel } from '@/components/beacon/DataAvailabilityPanel
 import { useNavigate } from 'react-router-dom';
 import clsx from 'clsx';
 import { useModal } from '@/contexts/ModalContext.tsx';
-import useApi from '@/contexts/api';
-import { GetSlotDataRequest } from '@/api/gen/backend/pkg/api/proto/lab_api_pb';
-import { useQuery } from '@tanstack/react-query';
+import { useSlotData } from '@/hooks/useSlotData';
 
 interface SlotViewProps {
   slot?: number;
@@ -54,50 +52,37 @@ export function SlotView({
   const [isTimelineCollapsed, setIsTimelineCollapsed] = useState(false);
   const navigate = useNavigate();
   const { showModal } = useModal();
-  const { client } = useApi();
 
-  // Use the new RPC method to fetch slot data
+  // Use the unified hook - it handles REST/gRPC switching internally
   const {
-    data: slotResponse,
+    data: slotData,
     isLoading,
     error,
-  } = useQuery({
-    queryKey: ['slotData', network, slot],
-    queryFn: async () => {
-      if (!slot) {
-        throw new Error('No slot provided');
-      }
-
-      const request = new GetSlotDataRequest({
-        network: network,
-        slot: BigInt(slot),
-      });
-
-      return client.getSlotData(request);
-    },
-    enabled: !!slot,
+  } = useSlotData({
+    network,
+    slot,
+    isLive,
+    enabled: true,
   });
 
-  // Extract the data from the response
-  const slotData = slotResponse?.data;
+  // Debug: Log the full payload
+  useEffect(() => {
+    if (slotData) {
+      console.log(`=== Slot Data Payload ===`);
+      console.log(`Slot: ${slot}`);
+      console.log(`Network: ${network}`);
+      console.log('Full payload:', JSON.stringify(slotData.toJson(), null, 2));
+      console.log(`=== End Slot Data Payload ===`);
+    }
+  }, [slotData, slot, network]);
 
   // Optimistically fetch next slot data when we're close to the end
-  useQuery({
-    queryKey: ['slotData', network, slot ? slot + 1 : null],
-    queryFn: async () => {
-      if (!slot) {
-        throw new Error('No slot provided');
-      }
-
-      const request = new GetSlotDataRequest({
-        network: network,
-        slot: BigInt(slot + 1),
-      });
-
-      return client.getSlotData(request);
-    },
+  // The unified hook will handle the prefetch internally based on API mode
+  useSlotData({
+    network,
+    slot: slot ? slot + 1 : undefined,
+    isLive: false,
     enabled: !!slot && currentTime >= 11000,
-    retry: false,
   });
 
   // Timer effect for playback
@@ -697,14 +682,8 @@ export function SlotView({
                         0,
                       ) || 0;
 
-                    // Calculate participation based on actual attestations
-                    const maxPossibleValidators = slotData.attestations?.maximumVotes
-                      ? Number(slotData.attestations.maximumVotes)
-                      : 0;
-                    const participation =
-                      maxPossibleValidators > 0
-                        ? (totalAttestations / maxPossibleValidators) * 100
-                        : null;
+                    // Use pre-calculated participation from transformer
+                    const participation = (slotData as any).participationRate || null;
 
                     const hasMevRelay =
                       slotData?.deliveredPayloads &&

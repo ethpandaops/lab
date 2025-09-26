@@ -339,7 +339,10 @@ func BuildListFctAttestationCorrectnessHeadQuery(req *ListFctAttestationCorrectn
 		orderByClause = " ORDER BY slot_start_date_time"
 	}
 
-	return BuildParameterizedQuery("fct_attestation_correctness_head", qb, orderByClause, limit, offset, options...), nil
+	// Build column list
+	columns := []string{"updated_date_time", "slot", "slot_start_date_time", "epoch", "epoch_start_date_time", "block_root", "votes_max", "votes_head", "votes_other"}
+
+	return BuildParameterizedQuery("fct_attestation_correctness_head", columns, qb, orderByClause, limit, offset, options...)
 }
 
 // BuildGetFctAttestationCorrectnessHeadQuery constructs a parameterized SQL query from a GetFctAttestationCorrectnessHeadRequest
@@ -356,6 +359,9 @@ func BuildGetFctAttestationCorrectnessHeadQuery(req *GetFctAttestationCorrectnes
 	// Build ORDER BY clause
 	orderByClause := " ORDER BY slot_start_date_time"
 
+	// Build column list
+	columns := []string{"updated_date_time", "slot", "slot_start_date_time", "epoch", "epoch_start_date_time", "block_root", "votes_max", "votes_head", "votes_other"}
+
 	// Return single record
-	return BuildParameterizedQuery("fct_attestation_correctness_head", qb, orderByClause, 1, 0, options...), nil
+	return BuildParameterizedQuery("fct_attestation_correctness_head", columns, qb, orderByClause, 1, 0, options...)
 }

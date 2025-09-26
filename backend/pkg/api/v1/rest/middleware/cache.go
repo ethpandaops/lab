@@ -40,6 +40,16 @@ var (
 		SMaxAge:              5 * time.Minute,
 		StaleWhileRevalidate: 30 * time.Second,
 	}
+	// CacheBrowserOnly for data that should only be cached by browsers, not CDNs
+	CacheBrowserOnly = CacheConfig{
+		MaxAge:  1 * time.Minute,
+		SMaxAge: 0, // No CDN caching
+	}
+	// CacheBrowserShort for data that should only be cached briefly in browsers
+	CacheBrowserShort = CacheConfig{
+		Private: true, // Prevent any CDN/proxy caching
+		MaxAge:  5 * time.Second,
+	}
 	// CachePrivate for user-specific data
 	CachePrivate = CacheConfig{
 		Private: true,

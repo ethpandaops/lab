@@ -27,6 +27,7 @@ const flowAnimations = `
 
 interface DesktopBlockProductionViewProps extends Omit<BlockProductionBaseProps, 'currentTime'> {
   slotData?: BeaconSlotData;
+  slotDataCache?: Record<number, BeaconSlotData>; // Cache of slot data for adjacent slots
   valueRange?: {
     min: number;
     max: number;
@@ -61,6 +62,7 @@ const DesktopBlockProductionView: React.FC<DesktopBlockProductionViewProps> = ({
   nodeBlockSeen = {},
   nodeBlockP2P = {},
   slotData,
+  slotDataCache = {},
   onPhaseChange,
   // Navigation controls
   slotNumber,
@@ -75,7 +77,7 @@ const DesktopBlockProductionView: React.FC<DesktopBlockProductionViewProps> = ({
 }) => {
   // Get currentTime from the timeline context
   const { currentTimeMs, isPlaying, togglePlayPause } = useTimeline();
-  
+
   // Get active status based on role and phase
   const isActive = (role: 'builder' | 'relay' | 'proposer' | 'node') => {
     // Determine transition point - when first node saw block or fallback to 5s
@@ -303,7 +305,14 @@ const DesktopBlockProductionView: React.FC<DesktopBlockProductionViewProps> = ({
             blockTime={blockTime}
             height="100%"
             width="100%"
-            slotData={slotData}
+            slotData={
+              slotNumber
+                ? {
+                    ...slotDataCache,
+                    ...(slotData ? { [slotNumber]: slotData } : {}),
+                  }
+                : undefined
+            }
           />
         </div>
 

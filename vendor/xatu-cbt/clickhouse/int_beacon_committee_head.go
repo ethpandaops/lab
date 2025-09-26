@@ -234,7 +234,10 @@ func BuildListIntBeaconCommitteeHeadQuery(req *ListIntBeaconCommitteeHeadRequest
 		orderByClause = " ORDER BY slot_start_date_time" + ", committee_index"
 	}
 
-	return BuildParameterizedQuery("int_beacon_committee_head", qb, orderByClause, limit, offset, options...), nil
+	// Build column list
+	columns := []string{"updated_date_time", "slot", "slot_start_date_time", "epoch", "epoch_start_date_time", "committee_index", "validators"}
+
+	return BuildParameterizedQuery("int_beacon_committee_head", columns, qb, orderByClause, limit, offset, options...)
 }
 
 // BuildGetIntBeaconCommitteeHeadQuery constructs a parameterized SQL query from a GetIntBeaconCommitteeHeadRequest
@@ -251,6 +254,9 @@ func BuildGetIntBeaconCommitteeHeadQuery(req *GetIntBeaconCommitteeHeadRequest, 
 	// Build ORDER BY clause
 	orderByClause := " ORDER BY slot_start_date_time, committee_index"
 
+	// Build column list
+	columns := []string{"updated_date_time", "slot", "slot_start_date_time", "epoch", "epoch_start_date_time", "committee_index", "validators"}
+
 	// Return single record
-	return BuildParameterizedQuery("int_beacon_committee_head", qb, orderByClause, 1, 0, options...), nil
+	return BuildParameterizedQuery("int_beacon_committee_head", columns, qb, orderByClause, 1, 0, options...)
 }

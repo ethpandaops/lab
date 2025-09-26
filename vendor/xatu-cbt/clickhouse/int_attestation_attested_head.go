@@ -472,7 +472,10 @@ func BuildListIntAttestationAttestedHeadQuery(req *ListIntAttestationAttestedHea
 		orderByClause = " ORDER BY slot_start_date_time" + ", block_root" + ", attesting_validator_index"
 	}
 
-	return BuildParameterizedQuery("int_attestation_attested_head", qb, orderByClause, limit, offset, options...), nil
+	// Build column list
+	columns := []string{"updated_date_time", "slot", "slot_start_date_time", "epoch", "epoch_start_date_time", "source_epoch", "source_epoch_start_date_time", "source_root", "target_epoch", "target_epoch_start_date_time", "target_root", "block_root", "attesting_validator_index", "propagation_distance"}
+
+	return BuildParameterizedQuery("int_attestation_attested_head", columns, qb, orderByClause, limit, offset, options...)
 }
 
 // BuildGetIntAttestationAttestedHeadQuery constructs a parameterized SQL query from a GetIntAttestationAttestedHeadRequest
@@ -489,6 +492,9 @@ func BuildGetIntAttestationAttestedHeadQuery(req *GetIntAttestationAttestedHeadR
 	// Build ORDER BY clause
 	orderByClause := " ORDER BY slot_start_date_time, block_root, attesting_validator_index"
 
+	// Build column list
+	columns := []string{"updated_date_time", "slot", "slot_start_date_time", "epoch", "epoch_start_date_time", "source_epoch", "source_epoch_start_date_time", "source_root", "target_epoch", "target_epoch_start_date_time", "target_root", "block_root", "attesting_validator_index", "propagation_distance"}
+
 	// Return single record
-	return BuildParameterizedQuery("int_attestation_attested_head", qb, orderByClause, 1, 0, options...), nil
+	return BuildParameterizedQuery("int_attestation_attested_head", columns, qb, orderByClause, 1, 0, options...)
 }

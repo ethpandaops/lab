@@ -334,7 +334,10 @@ func BuildListFctAttestationCorrectnessByValidatorHeadQuery(req *ListFctAttestat
 		orderByClause = " ORDER BY slot_start_date_time" + ", attesting_validator_index"
 	}
 
-	return BuildParameterizedQuery("fct_attestation_correctness_by_validator_head", qb, orderByClause, limit, offset, options...), nil
+	// Build column list
+	columns := []string{"updated_date_time", "slot", "slot_start_date_time", "epoch", "epoch_start_date_time", "attesting_validator_index", "block_root", "slot_distance", "propagation_distance"}
+
+	return BuildParameterizedQuery("fct_attestation_correctness_by_validator_head", columns, qb, orderByClause, limit, offset, options...)
 }
 
 // BuildGetFctAttestationCorrectnessByValidatorHeadQuery constructs a parameterized SQL query from a GetFctAttestationCorrectnessByValidatorHeadRequest
@@ -351,6 +354,9 @@ func BuildGetFctAttestationCorrectnessByValidatorHeadQuery(req *GetFctAttestatio
 	// Build ORDER BY clause
 	orderByClause := " ORDER BY slot_start_date_time, attesting_validator_index"
 
+	// Build column list
+	columns := []string{"updated_date_time", "slot", "slot_start_date_time", "epoch", "epoch_start_date_time", "attesting_validator_index", "block_root", "slot_distance", "propagation_distance"}
+
 	// Return single record
-	return BuildParameterizedQuery("fct_attestation_correctness_by_validator_head", qb, orderByClause, 1, 0, options...), nil
+	return BuildParameterizedQuery("fct_attestation_correctness_by_validator_head", columns, qb, orderByClause, 1, 0, options...)
 }

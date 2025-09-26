@@ -296,7 +296,10 @@ func BuildListIntBlockProposerCanonicalQuery(req *ListIntBlockProposerCanonicalR
 		orderByClause = " ORDER BY slot_start_date_time"
 	}
 
-	return BuildParameterizedQuery("int_block_proposer_canonical", qb, orderByClause, limit, offset, options...), nil
+	// Build column list
+	columns := []string{"updated_date_time", "slot", "slot_start_date_time", "epoch", "epoch_start_date_time", "proposer_validator_index", "proposer_pubkey", "block_root"}
+
+	return BuildParameterizedQuery("int_block_proposer_canonical", columns, qb, orderByClause, limit, offset, options...)
 }
 
 // BuildGetIntBlockProposerCanonicalQuery constructs a parameterized SQL query from a GetIntBlockProposerCanonicalRequest
@@ -313,6 +316,9 @@ func BuildGetIntBlockProposerCanonicalQuery(req *GetIntBlockProposerCanonicalReq
 	// Build ORDER BY clause
 	orderByClause := " ORDER BY slot_start_date_time"
 
+	// Build column list
+	columns := []string{"updated_date_time", "slot", "slot_start_date_time", "epoch", "epoch_start_date_time", "proposer_validator_index", "proposer_pubkey", "block_root"}
+
 	// Return single record
-	return BuildParameterizedQuery("int_block_proposer_canonical", qb, orderByClause, 1, 0, options...), nil
+	return BuildParameterizedQuery("int_block_proposer_canonical", columns, qb, orderByClause, 1, 0, options...)
 }

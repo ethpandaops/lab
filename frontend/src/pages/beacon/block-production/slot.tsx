@@ -1,10 +1,8 @@
 import { useState, useEffect, useMemo } from 'react';
-import { useQuery } from '@tanstack/react-query';
 import { useParams, useSearchParams } from 'react-router-dom';
-import useApi from '@/contexts/api';
 import useNetwork from '@/contexts/network';
 import useConfig from '@/contexts/config';
-import { GetSlotDataRequest } from '@/api/gen/backend/pkg/api/proto/lab_api_pb';
+import { useSlotData } from '@/hooks/useSlotData';
 import { AlertCircle } from 'lucide-react';
 import {
   MobileBlockProductionView,
@@ -32,7 +30,6 @@ const generateConsistentColor = (str: string): string => {
 export default function BlockProductionSlotPage() {
   const { slot: slotParam } = useParams<{ slot?: string }>();
   const [searchParams] = useSearchParams();
-  const { client: labApiClient } = useApi();
   const { selectedNetwork } = useNetwork();
   const { config } = useConfig();
 
@@ -104,25 +101,15 @@ export default function BlockProductionSlotPage() {
 
   const togglePlayPause = () => setIsPlaying(prev => !prev);
 
+  // Use unified hook for slot data
   const {
     data: slotData,
     isLoading: isSlotLoading,
     error: slotError,
-  } = useQuery({
-    queryKey: ['block-production-slot', 'slot', selectedNetwork, slotNumber],
-    queryFn: async () => {
-      if (slotNumber === null) return null;
-
-      const client = await labApiClient;
-      const req = new GetSlotDataRequest({
-        network: selectedNetwork,
-        slot: BigInt(slotNumber),
-      });
-      const res = await client.getSlotData(req);
-      return res.data;
-    },
-    staleTime: 60000, // Consider data fresh for 60 seconds to avoid refetching when viewing fixed slots
-    retry: 2, // Retry failed requests twice
+  } = useSlotData({
+    network: selectedNetwork,
+    slot: slotNumber || undefined,
+    isLive: false,
     enabled: slotNumber !== null,
   });
 

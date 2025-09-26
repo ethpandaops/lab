@@ -142,7 +142,10 @@ func BuildListIntAddressFirstAccessQuery(req *ListIntAddressFirstAccessRequest, 
 		orderByClause = " ORDER BY address"
 	}
 
-	return BuildParameterizedQuery("int_address_first_access", qb, orderByClause, limit, offset, options...), nil
+	// Build column list
+	columns := []string{"address", "block_number", "version"}
+
+	return BuildParameterizedQuery("int_address_first_access", columns, qb, orderByClause, limit, offset, options...)
 }
 
 // BuildGetIntAddressFirstAccessQuery constructs a parameterized SQL query from a GetIntAddressFirstAccessRequest
@@ -159,6 +162,9 @@ func BuildGetIntAddressFirstAccessQuery(req *GetIntAddressFirstAccessRequest, op
 	// Build ORDER BY clause
 	orderByClause := " ORDER BY address"
 
+	// Build column list
+	columns := []string{"address", "block_number", "version"}
+
 	// Return single record
-	return BuildParameterizedQuery("int_address_first_access", qb, orderByClause, 1, 0, options...), nil
+	return BuildParameterizedQuery("int_address_first_access", columns, qb, orderByClause, 1, 0, options...)
 }

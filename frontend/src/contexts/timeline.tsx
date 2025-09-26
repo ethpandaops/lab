@@ -32,25 +32,25 @@ interface TimelineProviderProps {
   slotOffset?: number; // Optional offset from current slot
 }
 
-export const TimelineProvider: React.FC<TimelineProviderProps> = ({ 
-  network, 
+export const TimelineProvider: React.FC<TimelineProviderProps> = ({
+  network,
   children,
   slotOffset = 0,
 }) => {
   const { getBeaconClock } = useBeacon();
   const clock = getBeaconClock(network);
-  
+
   // Store current time in a ref to avoid re-renders
   const timeRef = useRef<number>(0);
-  
+
   // Store playing state in state for components that need to show it
   const [isPlaying, setIsPlaying] = useState<boolean>(true);
-  
+
   // Store current slot for components that need it
   const [currentSlot, setCurrentSlot] = useState<number | null>(
-    clock ? clock.getCurrentSlot() + slotOffset : null
+    clock ? clock.getCurrentSlot() + slotOffset : null,
   );
-  
+
   // For components that need current time in state
   const [currentTimeMs, setCurrentTimeMs] = useState<number>(0);
 
@@ -70,18 +70,18 @@ export const TimelineProvider: React.FC<TimelineProviderProps> = ({
 
   // Track last log time (to avoid console spam)
   const lastLogTimeRef = useRef<number>(Date.now());
-  
+
   // Timeline control functions
   const play = useCallback(() => {
     setIsPlaying(true);
     // Reset last update timestamp when resuming playback
     lastUpdateRef.current = Date.now();
   }, []);
-  
+
   const pause = useCallback(() => {
     setIsPlaying(false);
   }, []);
-  
+
   const togglePlayPause = useCallback(() => {
     setIsPlaying(prev => {
       if (!prev) {
@@ -91,28 +91,28 @@ export const TimelineProvider: React.FC<TimelineProviderProps> = ({
       return !prev;
     });
   }, []);
-  
+
   // Function to get current time - can be called directly without re-renders
   const getCurrentTimeMs = useCallback(() => {
     return timeRef.current;
   }, []);
-  
+
   // Fast interval for updating time at 20ms intervals
   useEffect(() => {
     if (!clock) return;
-    
+
     // Initialize simulated time based on current slot progress
     if (simulatedTimeRef.current === 0) {
       const slotProgress = clock.getCurrentSlotProgress();
       simulatedTimeRef.current = Math.floor(slotProgress * 1000 * SECONDS_PER_SLOT);
     }
-    
+
     const updateTime = () => {
       if (isPlaying) {
         const now = Date.now();
         const elapsedMs = now - lastUpdateRef.current;
         lastUpdateRef.current = now;
-        
+
         // When in "live" mode with no display offset, calculate our own high-precision progress
         if (slotOffset === 0) {
           // Get the current slot
@@ -134,8 +134,6 @@ export const TimelineProvider: React.FC<TimelineProviderProps> = ({
 
           // Always update the ref with current time (for components that access time directly)
           timeRef.current = currentTime;
-
-          const now = Date.now();
 
           // Update display time on a frequent basis (every 10ms) for smooth time counter updates
           // But don't cause a re-render if the value hasn't meaningfully changed
@@ -177,8 +175,6 @@ export const TimelineProvider: React.FC<TimelineProviderProps> = ({
           // Always update the ref with simulated time (for components that access time directly)
           timeRef.current = simulatedTimeRef.current;
 
-          const now = Date.now();
-
           // Update display time on a frequent basis (every 10ms) for smooth time counter updates
           // But don't cause a re-render if the value hasn't meaningfully changed
           // Round to nearest 10ms to avoid unnecessary updates
@@ -193,13 +189,13 @@ export const TimelineProvider: React.FC<TimelineProviderProps> = ({
             lastStateUpdateRef.current = now;
           }
         }
-        
+
         // Update current slot if it's changed (only in live mode)
         if (slotOffset === 0) {
           const newSlot = clock.getCurrentSlot() + slotOffset;
           if (newSlot !== currentSlot) {
             setCurrentSlot(newSlot);
-            
+
             // Reset simulated time when slot changes
             simulatedTimeRef.current = 0;
 
@@ -214,7 +210,7 @@ export const TimelineProvider: React.FC<TimelineProviderProps> = ({
         }
       }
     };
-    
+
     // We use the lastLogTimeRef defined at the component level
 
     // Update time every 10ms for super-smooth animation
@@ -226,21 +222,21 @@ export const TimelineProvider: React.FC<TimelineProviderProps> = ({
 
       updateTime();
     }, 10); // Much more frequent updates for smoother animation
-    
+
     // Initial update
     updateTime();
-    
+
     // Clean up interval
     return () => {
       clearInterval(intervalId);
     };
   }, [clock, isPlaying, currentSlot, slotOffset]);
-  
+
   // Update slot offset when it changes externally
   useEffect(() => {
     if (!clock) return;
     setCurrentSlot(clock.getCurrentSlot() + slotOffset);
-    
+
     // Reset simulated time when changing to a different slot
     if (slotOffset !== 0) {
       simulatedTimeRef.current = 0;
@@ -265,11 +261,11 @@ export const TimelineProvider: React.FC<TimelineProviderProps> = ({
       lastStateUpdateRef.current = Date.now();
       lastTimeDisplayUpdateRef.current = Date.now();
     }
-    
+
     // Reset last update timestamp
     lastUpdateRef.current = Date.now();
   }, [clock, slotOffset]);
-  
+
   // Provide context value
   const value = {
     currentTimeMs,
@@ -281,12 +277,8 @@ export const TimelineProvider: React.FC<TimelineProviderProps> = ({
     togglePlayPause,
     getCurrentTimeMs,
   };
-  
-  return (
-    <TimelineContext.Provider value={value}>
-      {children}
-    </TimelineContext.Provider>
-  );
+
+  return <TimelineContext.Provider value={value}>{children}</TimelineContext.Provider>;
 };
 
 // Hook for consuming the timeline context

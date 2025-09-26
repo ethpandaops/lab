@@ -607,7 +607,10 @@ func BuildListFctBlockMevQuery(req *ListFctBlockMevRequest, options ...QueryOpti
 		orderByClause = " ORDER BY slot_start_date_time" + ", block_root"
 	}
 
-	return BuildParameterizedQuery("fct_block_mev", qb, orderByClause, limit, offset, options...), nil
+	// Build column list
+	columns := []string{"updated_date_time", "slot", "slot_start_date_time", "epoch", "epoch_start_date_time", "block_root", "earliest_bid_date_time", "relay_names", "parent_hash", "block_number", "block_hash", "builder_pubkey", "proposer_pubkey", "proposer_fee_recipient", "gas_limit", "gas_used", "value", "transaction_count", "status"}
+
+	return BuildParameterizedQuery("fct_block_mev", columns, qb, orderByClause, limit, offset, options...)
 }
 
 // BuildGetFctBlockMevQuery constructs a parameterized SQL query from a GetFctBlockMevRequest
@@ -624,6 +627,9 @@ func BuildGetFctBlockMevQuery(req *GetFctBlockMevRequest, options ...QueryOption
 	// Build ORDER BY clause
 	orderByClause := " ORDER BY slot_start_date_time, block_root"
 
+	// Build column list
+	columns := []string{"updated_date_time", "slot", "slot_start_date_time", "epoch", "epoch_start_date_time", "block_root", "earliest_bid_date_time", "relay_names", "parent_hash", "block_number", "block_hash", "builder_pubkey", "proposer_pubkey", "proposer_fee_recipient", "gas_limit", "gas_used", "value", "transaction_count", "status"}
+
 	// Return single record
-	return BuildParameterizedQuery("fct_block_mev", qb, orderByClause, 1, 0, options...), nil
+	return BuildParameterizedQuery("fct_block_mev", columns, qb, orderByClause, 1, 0, options...)
 }

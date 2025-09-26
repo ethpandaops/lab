@@ -10,6 +10,7 @@ import { Menu } from 'lucide-react';
 import { NETWORK_METADATA, type NetworkKey } from '@/constants/networks.tsx';
 import clsx from 'clsx';
 import { GoogleFormSystemAlert } from '@/components/common/SystemAlert';
+import useApiMode from '@/contexts/apiMode';
 
 function Layout() {
   const location = useLocation();
@@ -19,6 +20,7 @@ function Layout() {
   const [currentEpoch, setCurrentEpoch] = useState<number | null>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { getBeaconClock } = useBeacon();
+  const { useRestApi, toggleApiMode } = useApiMode();
 
   // Get network metadata
   const selectedMetadata = NETWORK_METADATA[selectedNetwork as NetworkKey] || {
@@ -82,8 +84,20 @@ function Layout() {
               />
             </div>
 
-            {/* Right - Slot/Epoch Info (hidden on mobile) */}
-            <div className="hidden lg:flex justify-end">
+            {/* Right - API Toggle and Slot/Epoch Info (hidden on mobile) */}
+            <div className="hidden lg:flex items-center gap-4 justify-end">
+              {/* API Mode Toggle */}
+              <button
+                onClick={toggleApiMode}
+                className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded-md bg-secondary hover:bg-hover transition-colors"
+                title={`Switch to ${useRestApi ? 'gRPC' : 'REST'} API`}
+              >
+                <span
+                  className={`inline-block w-2 h-2 rounded-full ${useRestApi ? 'bg-green-500' : 'bg-blue-500'}`}
+                />
+                {useRestApi ? 'REST' : 'gRPC'}
+              </button>
+
               {currentSlot !== null && currentEpoch !== null && (
                 <div className="text-sm font-mono">
                   <span className="text-tertiary">Slot </span>
@@ -146,13 +160,25 @@ function Layout() {
             )}
           >
             <div className="flex flex-col h-full">
-              {/* Network Selector */}
-              <div className="p-4 border-b border-subtle">
+              {/* Network Selector and API Toggle */}
+              <div className="p-4 border-b border-subtle space-y-3">
                 <NetworkSelector
                   selectedNetwork={selectedNetwork}
                   onNetworkChange={network => setSelectedNetwork(network, 'ui')}
                   className="w-full"
                 />
+
+                {/* API Mode Toggle for mobile */}
+                <button
+                  onClick={toggleApiMode}
+                  className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium rounded-md bg-secondary hover:bg-hover transition-colors"
+                  title={`Switch to ${useRestApi ? 'gRPC' : 'REST'} API`}
+                >
+                  <span
+                    className={`inline-block w-2 h-2 rounded-full ${useRestApi ? 'bg-green-500' : 'bg-blue-500'}`}
+                  />
+                  {useRestApi ? 'REST API' : 'gRPC API'}
+                </button>
               </div>
 
               {/* Mobile Navigation Content */}

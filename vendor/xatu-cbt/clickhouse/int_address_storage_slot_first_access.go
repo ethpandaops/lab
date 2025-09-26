@@ -202,7 +202,10 @@ func BuildListIntAddressStorageSlotFirstAccessQuery(req *ListIntAddressStorageSl
 		orderByClause = " ORDER BY address" + ", slot_key"
 	}
 
-	return BuildParameterizedQuery("int_address_storage_slot_first_access", qb, orderByClause, limit, offset, options...), nil
+	// Build column list
+	columns := []string{"address", "slot_key", "block_number", "value", "version"}
+
+	return BuildParameterizedQuery("int_address_storage_slot_first_access", columns, qb, orderByClause, limit, offset, options...)
 }
 
 // BuildGetIntAddressStorageSlotFirstAccessQuery constructs a parameterized SQL query from a GetIntAddressStorageSlotFirstAccessRequest
@@ -219,6 +222,9 @@ func BuildGetIntAddressStorageSlotFirstAccessQuery(req *GetIntAddressStorageSlot
 	// Build ORDER BY clause
 	orderByClause := " ORDER BY address, slot_key"
 
+	// Build column list
+	columns := []string{"address", "slot_key", "block_number", "value", "version"}
+
 	// Return single record
-	return BuildParameterizedQuery("int_address_storage_slot_first_access", qb, orderByClause, 1, 0, options...), nil
+	return BuildParameterizedQuery("int_address_storage_slot_first_access", columns, qb, orderByClause, 1, 0, options...)
 }

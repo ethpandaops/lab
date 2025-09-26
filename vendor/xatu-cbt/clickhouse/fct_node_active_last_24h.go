@@ -544,7 +544,10 @@ func BuildListFctNodeActiveLast24HQuery(req *ListFctNodeActiveLast24HRequest, op
 		orderByClause = " ORDER BY meta_client_name"
 	}
 
-	return BuildParameterizedQuery("fct_node_active_last_24h", qb, orderByClause, limit, offset, options...), nil
+	// Build column list
+	columns := []string{"updated_date_time", "last_seen_date_time", "username", "node_id", "classification", "meta_client_name", "meta_client_version", "meta_client_implementation", "meta_client_geo_city", "meta_client_geo_country", "meta_client_geo_country_code", "meta_client_geo_continent_code", "meta_client_geo_longitude", "meta_client_geo_latitude", "meta_client_geo_autonomous_system_number", "meta_client_geo_autonomous_system_organization", "meta_consensus_version", "meta_consensus_implementation"}
+
+	return BuildParameterizedQuery("fct_node_active_last_24h", columns, qb, orderByClause, limit, offset, options...)
 }
 
 // BuildGetFctNodeActiveLast24HQuery constructs a parameterized SQL query from a GetFctNodeActiveLast24HRequest
@@ -561,6 +564,9 @@ func BuildGetFctNodeActiveLast24HQuery(req *GetFctNodeActiveLast24HRequest, opti
 	// Build ORDER BY clause
 	orderByClause := " ORDER BY meta_client_name"
 
+	// Build column list
+	columns := []string{"updated_date_time", "last_seen_date_time", "username", "node_id", "classification", "meta_client_name", "meta_client_version", "meta_client_implementation", "meta_client_geo_city", "meta_client_geo_country", "meta_client_geo_country_code", "meta_client_geo_continent_code", "meta_client_geo_longitude", "meta_client_geo_latitude", "meta_client_geo_autonomous_system_number", "meta_client_geo_autonomous_system_organization", "meta_consensus_version", "meta_consensus_implementation"}
+
 	// Return single record
-	return BuildParameterizedQuery("fct_node_active_last_24h", qb, orderByClause, 1, 0, options...), nil
+	return BuildParameterizedQuery("fct_node_active_last_24h", columns, qb, orderByClause, 1, 0, options...)
 }

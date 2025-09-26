@@ -902,7 +902,10 @@ func BuildListIntBlockCanonicalQuery(req *ListIntBlockCanonicalRequest, options 
 		orderByClause = " ORDER BY slot_start_date_time" + ", block_root"
 	}
 
-	return BuildParameterizedQuery("int_block_canonical", qb, orderByClause, limit, offset, options...), nil
+	// Build column list
+	columns := []string{"updated_date_time", "slot", "slot_start_date_time", "epoch", "epoch_start_date_time", "block_root", "block_version", "block_total_bytes", "block_total_bytes_compressed", "parent_root", "state_root", "proposer_index", "eth1_data_block_hash", "eth1_data_deposit_root", "execution_payload_block_hash", "execution_payload_block_number", "execution_payload_fee_recipient", "execution_payload_base_fee_per_gas", "execution_payload_blob_gas_used", "execution_payload_excess_blob_gas", "execution_payload_gas_limit", "execution_payload_gas_used", "execution_payload_state_root", "execution_payload_parent_hash", "execution_payload_transactions_count", "execution_payload_transactions_total_bytes", "execution_payload_transactions_total_bytes_compressed"}
+
+	return BuildParameterizedQuery("int_block_canonical", columns, qb, orderByClause, limit, offset, options...)
 }
 
 // BuildGetIntBlockCanonicalQuery constructs a parameterized SQL query from a GetIntBlockCanonicalRequest
@@ -919,6 +922,9 @@ func BuildGetIntBlockCanonicalQuery(req *GetIntBlockCanonicalRequest, options ..
 	// Build ORDER BY clause
 	orderByClause := " ORDER BY slot_start_date_time, block_root"
 
+	// Build column list
+	columns := []string{"updated_date_time", "slot", "slot_start_date_time", "epoch", "epoch_start_date_time", "block_root", "block_version", "block_total_bytes", "block_total_bytes_compressed", "parent_root", "state_root", "proposer_index", "eth1_data_block_hash", "eth1_data_deposit_root", "execution_payload_block_hash", "execution_payload_block_number", "execution_payload_fee_recipient", "execution_payload_base_fee_per_gas", "execution_payload_blob_gas_used", "execution_payload_excess_blob_gas", "execution_payload_gas_limit", "execution_payload_gas_used", "execution_payload_state_root", "execution_payload_parent_hash", "execution_payload_transactions_count", "execution_payload_transactions_total_bytes", "execution_payload_transactions_total_bytes_compressed"}
+
 	// Return single record
-	return BuildParameterizedQuery("int_block_canonical", qb, orderByClause, 1, 0, options...), nil
+	return BuildParameterizedQuery("int_block_canonical", columns, qb, orderByClause, 1, 0, options...)
 }
