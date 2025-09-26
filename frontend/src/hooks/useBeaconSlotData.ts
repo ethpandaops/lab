@@ -54,14 +54,14 @@ export function useBeaconSlotData(
       ] = await Promise.allSettled([
         client.getBeaconBlock(network, slot),
         client.getBeaconBlockTiming(network, slot),
-        client.getBeaconBlobTiming(network, slot, { limit: 1000 }), // Get all blob indices
+        client.getBeaconBlobTiming(network, slot),
         client.getBeaconBlobTotal(network, slot),
         client.getBeaconAttestationTiming(network, slot),
         client.getBeaconAttestationCorrectness(network, slot),
         client.getBeaconProposerEntity(network, slot),
         client.getMevBlock(network, slot),
-        client.getMevRelay(network, slot),
-        client.getMevBuilder(network, slot),
+        client.getMevRelayCount(network, slot),
+        client.getMevBuilderBid(network, slot),
       ]);
 
       // Log any failures for debugging

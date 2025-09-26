@@ -613,13 +613,13 @@ func TestHandleMevRelayBidCount(t *testing.T) {
 			tt.mockSetup()
 
 			// Create request
-			url := "/api/v1/" + tt.network + "/beacon/slot/" + tt.slot + "/mev/relay" + tt.queryParams
+			url := "/api/v1/" + tt.network + "/beacon/slot/" + tt.slot + "/mev/relay/count" + tt.queryParams
 			req := httptest.NewRequest("GET", url, nil)
 			w := httptest.NewRecorder()
 
 			// Set up router
 			r := mux.NewRouter()
-			r.HandleFunc("/api/v1/{network}/beacon/slot/{slot}/mev/relay", router.handleMevRelayBidCount)
+			r.HandleFunc("/api/v1/{network}/beacon/slot/{slot}/mev/relay/count", router.handleMevRelayBidCount)
 
 			// Serve request
 			r.ServeHTTP(w, req)
@@ -1127,7 +1127,7 @@ func TestHandleMevBuilderBid(t *testing.T) {
 		network        string
 		slot           string
 		queryParams    map[string]string
-		mockResponse   *cbtproto.ListFctMevBidValueByBuilderResponse
+		mockResponse   *cbtproto.ListFctMevBidByBuilderResponse
 		mockError      error
 		expectedStatus int
 		validateBody   func(t *testing.T, body []byte)
@@ -1136,8 +1136,8 @@ func TestHandleMevBuilderBid(t *testing.T) {
 			name:    "successful request",
 			network: "mainnet",
 			slot:    "8000000",
-			mockResponse: &cbtproto.ListFctMevBidValueByBuilderResponse{
-				FctMevBidValueByBuilder: []*cbtproto.FctMevBidValueByBuilder{
+			mockResponse: &cbtproto.ListFctMevBidByBuilderResponse{
+				FctMevBidByBuilder: []*cbtproto.FctMevBidByBuilder{
 					{
 						Slot:                10239024,
 						SlotStartDateTime:   1734307488,
@@ -1175,7 +1175,7 @@ func TestHandleMevBuilderBid(t *testing.T) {
 				assert.Len(t, response.Builders[0].RelayNames, 2)
 				assert.Contains(t, response.Builders[0].RelayNames, "flashbots")
 				assert.Contains(t, response.Builders[0].RelayNames, "bloxroute")
-				assert.NotEmpty(t, response.Builders[0].EarliestBidTime)
+				assert.Equal(t, int32(-877), response.Builders[0].EarliestBidFromSlotStart)
 
 				// Check second builder bid
 				assert.Equal(t, "0xabcdef1234567890", response.Builders[1].BlockHash)
@@ -1237,8 +1237,8 @@ func TestHandleMevBuilderBid(t *testing.T) {
 				"page_size":  "50",
 				"order_by":   "value asc",
 			},
-			mockResponse: &cbtproto.ListFctMevBidValueByBuilderResponse{
-				FctMevBidValueByBuilder: []*cbtproto.FctMevBidValueByBuilder{
+			mockResponse: &cbtproto.ListFctMevBidByBuilderResponse{
+				FctMevBidByBuilder: []*cbtproto.FctMevBidByBuilder{
 					{
 						BlockHash:           "0x123456",
 						Value:               "50000000000000000",
@@ -1274,7 +1274,7 @@ func TestHandleMevBuilderBid(t *testing.T) {
 			// Set up mock expectations
 			if tt.mockResponse != nil || tt.mockError != nil {
 				mockClient.EXPECT().
-					ListFctMevBidValueByBuilder(gomock.Any(), gomock.Any()).
+					ListFctMevBidByBuilder(gomock.Any(), gomock.Any()).
 					Return(tt.mockResponse, tt.mockError).
 					Times(1)
 			}
@@ -1286,7 +1286,7 @@ func TestHandleMevBuilderBid(t *testing.T) {
 			}
 
 			// Create request
-			path := "/api/v1/" + tt.network + "/beacon/slot/" + tt.slot + "/mev/builder"
+			path := "/api/v1/" + tt.network + "/beacon/slot/" + tt.slot + "/mev/builder/value"
 			req := httptest.NewRequest("GET", path, nil)
 
 			// Add query parameters
@@ -1316,10 +1316,11 @@ func TestHandleMevBuilderBid(t *testing.T) {
 }
 
 func TestTransformCBTToAPIMevBuilderBid(t *testing.T) {
-	cbtBid := &cbtproto.FctMevBidValueByBuilder{
+	cbtBid := &cbtproto.FctMevBidByBuilder{
 		BlockHash:           "0xdeadbeef",
 		Value:               "200000000000000000",
 		RelayNames:          []string{"flashbots", "bloxroute", "ultrasound"},
+		SlotStartDateTime:   1734307488,
 		EarliestBidDateTime: 1734307487123,
 	}
 
@@ -1332,11 +1333,7 @@ func TestTransformCBTToAPIMevBuilderBid(t *testing.T) {
 	assert.Contains(t, result.RelayNames, "flashbots")
 	assert.Contains(t, result.RelayNames, "bloxroute")
 	assert.Contains(t, result.RelayNames, "ultrasound")
-	assert.NotEmpty(t, result.EarliestBidTime)
-
-	// Verify timestamp format is ISO 8601
-	assert.Contains(t, result.EarliestBidTime, "T")
-	assert.Contains(t, result.EarliestBidTime, "Z")
+	assert.Equal(t, int32(-877), result.EarliestBidFromSlotStart)
 }
 
 func TestHandleBeaconSlotProposerEntity(t *testing.T) {
@@ -1527,6 +1524,217 @@ func TestHandleBeaconSlotProposerEntity(t *testing.T) {
 				var resp apiv1.ListBeaconSlotProposerEntityResponse
 				err := json.NewDecoder(w.Body).Decode(&resp)
 				assert.NoError(t, err)
+				tt.validateResp(t, &resp)
+			}
+		})
+	}
+}
+
+func TestHandleMevBuilderBidCount(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockClient := mock.NewMockXatuCBTClient(ctrl)
+
+	router := &PublicRouter{
+		log:           logrus.NewEntry(logrus.New()),
+		xatuCBTClient: mockClient,
+	}
+
+	tests := []struct {
+		name           string
+		network        string
+		slot           string
+		queryParams    string
+		mockSetup      func()
+		expectedStatus int
+		validateResp   func(t *testing.T, resp *apiv1.ListBeaconSlotMevBuilderCountResponse)
+	}{
+		{
+			name:        "valid request - single builder",
+			network:     "mainnet",
+			slot:        "12345",
+			queryParams: "?builder_pubkey=0xabcd",
+			mockSetup: func() {
+				mockClient.EXPECT().
+					ListFctMevBidCountByBuilder(
+						gomock.Any(),
+						gomock.Any(),
+					).
+					DoAndReturn(func(ctx interface{}, req *cbtproto.ListFctMevBidCountByBuilderRequest, opts ...interface{}) (*cbtproto.ListFctMevBidCountByBuilderResponse, error) {
+						// Verify request parameters
+						if req.Slot != nil {
+							require.Equal(t, uint32(12345), req.Slot.GetEq())
+						}
+						if req.BuilderPubkey != nil {
+							require.Equal(t, "0xabcd", req.BuilderPubkey.GetEq())
+						}
+
+						return &cbtproto.ListFctMevBidCountByBuilderResponse{
+							FctMevBidCountByBuilder: []*cbtproto.FctMevBidCountByBuilder{
+								{
+									Slot:              12345,
+									Epoch:             385,
+									BuilderPubkey:     "0xabcd",
+									BidTotal:          42,
+									SlotStartDateTime: 1609459200, // 2021-01-01 00:00:00 UTC
+									UpdatedDateTime:   1609462800, // 2021-01-01 01:00:00 UTC
+								},
+							},
+							NextPageToken: "next-token",
+						}, nil
+					})
+			},
+			expectedStatus: http.StatusOK,
+			validateResp: func(t *testing.T, resp *apiv1.ListBeaconSlotMevBuilderCountResponse) {
+				require.NotNil(t, resp)
+				require.Len(t, resp.Builders, 1)
+
+				builder := resp.Builders[0]
+				require.Equal(t, "0xabcd", builder.BuilderPubkey)
+				require.Equal(t, uint32(42), builder.BidCount)
+
+				require.NotNil(t, resp.Pagination)
+				require.Equal(t, "next-token", resp.Pagination.NextPageToken)
+
+				require.NotNil(t, resp.Filters)
+				require.Equal(t, "mainnet", resp.Filters.Network)
+				require.Equal(t, "12345", resp.Filters.AppliedFilters["slot"])
+				require.Equal(t, "0xabcd", resp.Filters.AppliedFilters["builder_pubkey"])
+			},
+		},
+		{
+			name:        "all builders for slot",
+			network:     "mainnet",
+			slot:        "12345",
+			queryParams: "",
+			mockSetup: func() {
+				mockClient.EXPECT().
+					ListFctMevBidCountByBuilder(
+						gomock.Any(),
+						gomock.Any(),
+					).
+					Return(&cbtproto.ListFctMevBidCountByBuilderResponse{
+						FctMevBidCountByBuilder: []*cbtproto.FctMevBidCountByBuilder{
+							{
+								Slot:              12345,
+								Epoch:             385,
+								BuilderPubkey:     "0xabcd",
+								BidTotal:          42,
+								SlotStartDateTime: 1609459200,
+								UpdatedDateTime:   1609462800,
+							},
+							{
+								Slot:              12345,
+								Epoch:             385,
+								BuilderPubkey:     "0xefgh",
+								BidTotal:          35,
+								SlotStartDateTime: 1609459200,
+								UpdatedDateTime:   1609462800,
+							},
+						},
+					}, nil)
+			},
+			expectedStatus: http.StatusOK,
+			validateResp: func(t *testing.T, resp *apiv1.ListBeaconSlotMevBuilderCountResponse) {
+				require.NotNil(t, resp)
+				require.Len(t, resp.Builders, 2)
+				require.Equal(t, "0xabcd", resp.Builders[0].BuilderPubkey)
+				require.Equal(t, uint32(42), resp.Builders[0].BidCount)
+				require.Equal(t, "0xefgh", resp.Builders[1].BuilderPubkey)
+				require.Equal(t, uint32(35), resp.Builders[1].BidCount)
+			},
+		},
+		{
+			name:           "invalid slot number",
+			network:        "mainnet",
+			slot:           "not-a-number",
+			queryParams:    "",
+			mockSetup:      func() {},
+			expectedStatus: http.StatusBadRequest,
+		},
+		{
+			name:        "gRPC error",
+			network:     "mainnet",
+			slot:        "12345",
+			queryParams: "",
+			mockSetup: func() {
+				mockClient.EXPECT().
+					ListFctMevBidCountByBuilder(
+						gomock.Any(),
+						gomock.Any(),
+					).
+					Return(nil, errors.New("database error"))
+			},
+			expectedStatus: http.StatusInternalServerError,
+		},
+		{
+			name:        "with pagination",
+			network:     "mainnet",
+			slot:        "12345",
+			queryParams: "?page_size=10&page_token=abc&order_by=builder_pubkey%20desc",
+			mockSetup: func() {
+				mockClient.EXPECT().
+					ListFctMevBidCountByBuilder(
+						gomock.Any(),
+						gomock.Any(),
+					).
+					DoAndReturn(func(ctx interface{}, req *cbtproto.ListFctMevBidCountByBuilderRequest, opts ...interface{}) (*cbtproto.ListFctMevBidCountByBuilderResponse, error) {
+						require.Equal(t, int32(10), req.PageSize)
+						require.Equal(t, "abc", req.PageToken)
+						require.Equal(t, "builder_pubkey desc", req.OrderBy)
+
+						return &cbtproto.ListFctMevBidCountByBuilderResponse{
+							FctMevBidCountByBuilder: []*cbtproto.FctMevBidCountByBuilder{
+								{
+									Slot:              12345,
+									Epoch:             385,
+									BuilderPubkey:     "0xijkl",
+									BidTotal:          15,
+									SlotStartDateTime: 1609459200,
+									UpdatedDateTime:   1609462800,
+								},
+							},
+							NextPageToken: "def",
+						}, nil
+					})
+			},
+			expectedStatus: http.StatusOK,
+			validateResp: func(t *testing.T, resp *apiv1.ListBeaconSlotMevBuilderCountResponse) {
+				require.NotNil(t, resp)
+				require.NotNil(t, resp.Pagination)
+				require.Equal(t, int32(10), resp.Pagination.PageSize)
+				require.Equal(t, "abc", resp.Pagination.PageToken)
+				require.Equal(t, "def", resp.Pagination.NextPageToken)
+				require.Equal(t, "builder_pubkey desc", resp.Filters.OrderBy)
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tt.mockSetup()
+
+			// Create request
+			url := "/api/v1/" + tt.network + "/beacon/slot/" + tt.slot + "/mev/builder/count" + tt.queryParams
+			req := httptest.NewRequest("GET", url, nil)
+			w := httptest.NewRecorder()
+
+			// Set up router
+			r := mux.NewRouter()
+			r.HandleFunc("/api/v1/{network}/beacon/slot/{slot}/mev/builder/count", router.handleMevBuilderBidCount)
+
+			// Serve request
+			r.ServeHTTP(w, req)
+
+			// Check status
+			require.Equal(t, tt.expectedStatus, w.Code)
+
+			// Validate response if successful
+			if tt.expectedStatus == http.StatusOK && tt.validateResp != nil {
+				var resp apiv1.ListBeaconSlotMevBuilderCountResponse
+				err := json.NewDecoder(w.Body).Decode(&resp)
+				require.NoError(t, err)
 				tt.validateResp(t, &resp)
 			}
 		})

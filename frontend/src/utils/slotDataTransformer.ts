@@ -523,27 +523,22 @@ function buildMevData(data: TransformData): {
           relayBids[relayName] = new RelayBids({ bids: [] });
         }
 
-        // Calculate slot time from earliest bid time if available
-        let slotTime = 0;
-        if (builderBid.earliestBidTime && data.genesisTime) {
-          const bidTimestamp = new Date(builderBid.earliestBidTime).getTime() / 1000;
-          const slotStartTime = calculateSlotStartTime(data.slot, data.genesisTime);
-          slotTime = Math.floor((bidTimestamp - slotStartTime) * 1000); // Convert to ms
-        }
+        const slotTime = builderBid.earliestBidFromSlotStart || 0;
+        const timeBucket = Math.floor(slotTime / 50) * 50;
 
         relayBids[relayName].bids.push(
           new RelayBid({
             slot: BigInt(data.slot),
-            parentHash: '', // Not available from builder endpoint
+            parentHash: '',
             blockHash: builderBid.blockHash || '',
-            builderPubkey: builderBid.builderPubkey || builderBid.blockHash || '', // Use actual builder pubkey if available, otherwise fall back to block hash
-            proposerPubkey: '', // Not available from builder endpoint
-            proposerFeeRecipient: '', // Not available from builder endpoint
+            builderPubkey: builderBid.builderPubkey || builderBid.blockHash || '',
+            proposerPubkey: '',
+            proposerFeeRecipient: '',
             value: builderBid.value || '0',
-            gasLimit: protoInt64.zero, // Not available
-            gasUsed: protoInt64.zero, // Not available
+            gasLimit: protoInt64.zero,
+            gasUsed: protoInt64.zero,
             slotTime: slotTime,
-            timeBucket: 100, // Default 100ms bucket
+            timeBucket: timeBucket,
           }),
         );
       } else {
@@ -553,27 +548,22 @@ function buildMevData(data: TransformData): {
             relayBids[relayName] = new RelayBids({ bids: [] });
           }
 
-          // Calculate slot time from earliest bid time if available
-          let slotTime = 0;
-          if (builderBid.earliestBidTime && data.genesisTime) {
-            const bidTimestamp = new Date(builderBid.earliestBidTime).getTime() / 1000;
-            const slotStartTime = calculateSlotStartTime(data.slot, data.genesisTime);
-            slotTime = Math.floor((bidTimestamp - slotStartTime) * 1000); // Convert to ms
-          }
+          const slotTime = builderBid.earliestBidFromSlotStart || 0;
+          const timeBucket = Math.floor(slotTime / 50) * 50;
 
           relayBids[relayName].bids.push(
             new RelayBid({
               slot: BigInt(data.slot),
-              parentHash: '', // Not available from builder endpoint
+              parentHash: '',
               blockHash: builderBid.blockHash || '',
-              builderPubkey: builderBid.builderPubkey || builderBid.blockHash || '', // Use actual builder pubkey if available, otherwise fall back to block hash
-              proposerPubkey: '', // Not available from builder endpoint
-              proposerFeeRecipient: '', // Not available from builder endpoint
+              builderPubkey: builderBid.builderPubkey || builderBid.blockHash || '',
+              proposerPubkey: '',
+              proposerFeeRecipient: '',
               value: builderBid.value || '0',
-              gasLimit: protoInt64.zero, // Not available
-              gasUsed: protoInt64.zero, // Not available
+              gasLimit: protoInt64.zero,
+              gasUsed: protoInt64.zero,
               slotTime: slotTime,
-              timeBucket: 100, // Default 100ms bucket
+              timeBucket: timeBucket,
             }),
           );
         });
@@ -624,8 +614,6 @@ function buildMevData(data: TransformData): {
         if (existingBidIndex >= 0) {
           // Update existing bid with more complete data
           relayBids[relayName].bids[existingBidIndex] = bidToAdd;
-        } else {
-          relayBids[relayName].bids.push(bidToAdd);
         }
       } else {
         // Add/update the bid for each relay
@@ -642,8 +630,6 @@ function buildMevData(data: TransformData): {
           if (existingBidIndex >= 0) {
             // Update existing bid with more complete data
             relayBids[relayName].bids[existingBidIndex] = bidToAdd;
-          } else {
-            relayBids[relayName].bids.push(bidToAdd);
           }
         });
       }

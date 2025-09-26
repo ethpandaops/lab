@@ -5,9 +5,9 @@ package cbt;
 import "vendor/xatu-cbt/clickhouse/common.proto";
 
 option go_package = "github.com/ethpandaops/xatu-cbt/pkg/proto/clickhouse";
-// Highest value MEV relay bid for a slot by relay
+// All unique bids from builders for a slot
 
-message FctMevBidValueByBuilder {
+message FctMevBidByBuilder {
   // Timestamp when the record was last updated
   uint32 updated_date_time = 11;
   // Slot number within the block bid
@@ -30,36 +30,37 @@ message FctMevBidValueByBuilder {
   string value = 20;
 }
 
-// ListFctMevBidValueByBuilderRequest is the request message for listing fct_mev_bid_value_by_builder records
-message ListFctMevBidValueByBuilderRequest {
+// ListFctMevBidByBuilderRequest is the request message for listing fct_mev_bid_by_builder records
+message ListFctMevBidByBuilderRequest {
   // Filter by slot_start_date_time (PRIMARY KEY - required)
   UInt32Filter slot_start_date_time = 1;
 
-  // Filter by builder_pubkey (ORDER BY column 2 - optional)
-  StringFilter builder_pubkey = 2;
+  // Filter by block_hash (ORDER BY column 2 - optional)
+  StringFilter block_hash = 2;
+
+  // Filter by builder_pubkey (ORDER BY column 3 - optional)
+  StringFilter builder_pubkey = 3;
 
   // Filter by updated_date_time (optional)
-  UInt32Filter updated_date_time = 3;
+  UInt32Filter updated_date_time = 4;
   // Filter by slot (optional)
-  UInt32Filter slot = 4;
+  UInt32Filter slot = 5;
   // Filter by epoch (optional)
-  UInt32Filter epoch = 5;
+  UInt32Filter epoch = 6;
   // Filter by epoch_start_date_time (optional)
-  UInt32Filter epoch_start_date_time = 6;
+  UInt32Filter epoch_start_date_time = 7;
   // Filter by earliest_bid_date_time (optional)
-  UInt64Filter earliest_bid_date_time = 7;
+  UInt64Filter earliest_bid_date_time = 8;
   // Filter by relay_names (optional)
-  repeated string relay_names = 8;
-  // Filter by block_hash (optional)
-  StringFilter block_hash = 9;
+  repeated string relay_names = 9;
   // Filter by value (optional)
   StringFilter value = 10;
 
-  // The maximum number of fct_mev_bid_value_by_builder to return.
+  // The maximum number of fct_mev_bid_by_builder to return.
   // If unspecified, at most 100 items will be returned.
   // The maximum value is 10000; values above 10000 will be coerced to 10000.
   int32 page_size = 11;
-  // A page token, received from a previous `ListFctMevBidValueByBuilder` call.
+  // A page token, received from a previous `ListFctMevBidByBuilder` call.
   // Provide this to retrieve the subsequent page.
   string page_token = 12;
   // The order of results. Format: comma-separated list of fields.
@@ -68,30 +69,30 @@ message ListFctMevBidValueByBuilderRequest {
   string order_by = 13;
 }
 
-// ListFctMevBidValueByBuilderResponse is the response message for listing fct_mev_bid_value_by_builder records
-message ListFctMevBidValueByBuilderResponse {
-  // The list of fct_mev_bid_value_by_builder.
-  repeated FctMevBidValueByBuilder fct_mev_bid_value_by_builder = 1;
+// ListFctMevBidByBuilderResponse is the response message for listing fct_mev_bid_by_builder records
+message ListFctMevBidByBuilderResponse {
+  // The list of fct_mev_bid_by_builder.
+  repeated FctMevBidByBuilder fct_mev_bid_by_builder = 1;
   // A token, which can be sent as `page_token` to retrieve the next page.
   // If this field is omitted, there are no subsequent pages.
   string next_page_token = 2;
 }
 
-// GetFctMevBidValueByBuilderRequest is the request message for getting a single fct_mev_bid_value_by_builder record by primary key
-message GetFctMevBidValueByBuilderRequest {
+// GetFctMevBidByBuilderRequest is the request message for getting a single fct_mev_bid_by_builder record by primary key
+message GetFctMevBidByBuilderRequest {
   // The start time for the slot that the bid is for
   uint32 slot_start_date_time = 1; // Primary key (required)
 }
 
-// GetFctMevBidValueByBuilderResponse is the response message for getting a single fct_mev_bid_value_by_builder record
-message GetFctMevBidValueByBuilderResponse {
-  FctMevBidValueByBuilder item = 1;
+// GetFctMevBidByBuilderResponse is the response message for getting a single fct_mev_bid_by_builder record
+message GetFctMevBidByBuilderResponse {
+  FctMevBidByBuilder item = 1;
 }
 
-// FctMevBidValueByBuilderService provides RPC methods for querying fct_mev_bid_value_by_builder data
-service FctMevBidValueByBuilderService {
-  // List returns paginated fct_mev_bid_value_by_builder records
-  rpc List(ListFctMevBidValueByBuilderRequest) returns (ListFctMevBidValueByBuilderResponse);
-  // Get returns a single fct_mev_bid_value_by_builder record by primary key
-  rpc Get(GetFctMevBidValueByBuilderRequest) returns (GetFctMevBidValueByBuilderResponse);
+// FctMevBidByBuilderService provides RPC methods for querying fct_mev_bid_by_builder data
+service FctMevBidByBuilderService {
+  // List returns paginated fct_mev_bid_by_builder records
+  rpc List(ListFctMevBidByBuilderRequest) returns (ListFctMevBidByBuilderResponse);
+  // Get returns a single fct_mev_bid_by_builder record by primary key
+  rpc Get(GetFctMevBidByBuilderRequest) returns (GetFctMevBidByBuilderResponse);
 }

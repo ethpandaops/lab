@@ -674,6 +674,106 @@ export class MevRelayBidCount extends Message<MevRelayBidCount> {
 }
 
 /**
+ * ListBeaconSlotMevBuilderCountResponse is the v1 API response for MEV builder bid counts by slot.
+ *
+ * @generated from message api.v1.ListBeaconSlotMevBuilderCountResponse
+ */
+export class ListBeaconSlotMevBuilderCountResponse extends Message<ListBeaconSlotMevBuilderCountResponse> {
+  /**
+   * @generated from field: repeated api.v1.MevBuilderBidCount builders = 1;
+   */
+  builders: MevBuilderBidCount[] = [];
+
+  /**
+   * @generated from field: api.v1.PaginationMetadata pagination = 2;
+   */
+  pagination?: PaginationMetadata;
+
+  /**
+   * @generated from field: api.v1.FilterMetadata filters = 3;
+   */
+  filters?: FilterMetadata;
+
+  constructor(data?: PartialMessage<ListBeaconSlotMevBuilderCountResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.v1.ListBeaconSlotMevBuilderCountResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "builders", kind: "message", T: MevBuilderBidCount, repeated: true },
+    { no: 2, name: "pagination", kind: "message", T: PaginationMetadata },
+    { no: 3, name: "filters", kind: "message", T: FilterMetadata },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ListBeaconSlotMevBuilderCountResponse {
+    return new ListBeaconSlotMevBuilderCountResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ListBeaconSlotMevBuilderCountResponse {
+    return new ListBeaconSlotMevBuilderCountResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ListBeaconSlotMevBuilderCountResponse {
+    return new ListBeaconSlotMevBuilderCountResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: ListBeaconSlotMevBuilderCountResponse | PlainMessage<ListBeaconSlotMevBuilderCountResponse> | undefined, b: ListBeaconSlotMevBuilderCountResponse | PlainMessage<ListBeaconSlotMevBuilderCountResponse> | undefined): boolean {
+    return proto3.util.equals(ListBeaconSlotMevBuilderCountResponse, a, b);
+  }
+}
+
+/**
+ * MevBuilderBidCount represents MEV builder bid statistics for public API consumption.
+ *
+ * @generated from message api.v1.MevBuilderBidCount
+ */
+export class MevBuilderBidCount extends Message<MevBuilderBidCount> {
+  /**
+   * Builder public key identifier
+   *
+   * @generated from field: string builder_pubkey = 1;
+   */
+  builderPubkey = "";
+
+  /**
+   * Total number of bids from this builder
+   *
+   * @generated from field: uint32 bid_count = 2;
+   */
+  bidCount = 0;
+
+  constructor(data?: PartialMessage<MevBuilderBidCount>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.v1.MevBuilderBidCount";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "builder_pubkey", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "bid_count", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): MevBuilderBidCount {
+    return new MevBuilderBidCount().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): MevBuilderBidCount {
+    return new MevBuilderBidCount().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): MevBuilderBidCount {
+    return new MevBuilderBidCount().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: MevBuilderBidCount | PlainMessage<MevBuilderBidCount> | undefined, b: MevBuilderBidCount | PlainMessage<MevBuilderBidCount> | undefined): boolean {
+    return proto3.util.equals(MevBuilderBidCount, a, b);
+  }
+}
+
+/**
  * ListBeaconSlotMevResponse is the v1 API response for MEV block data by slot.
  *
  * @generated from message api.v1.ListBeaconSlotMevResponse
@@ -945,11 +1045,11 @@ export class MevBuilderBid extends Message<MevBuilderBid> {
   builderPubkey = "";
 
   /**
-   * Earliest bid timestamp (ISO 8601)
+   * Milliseconds from slot start (negative if before slot, positive if after)
    *
-   * @generated from field: string earliest_bid_time = 5;
+   * @generated from field: int32 earliest_bid_from_slot_start = 5;
    */
-  earliestBidTime = "";
+  earliestBidFromSlotStart = 0;
 
   constructor(data?: PartialMessage<MevBuilderBid>) {
     super();
@@ -963,7 +1063,7 @@ export class MevBuilderBid extends Message<MevBuilderBid> {
     { no: 2, name: "value", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 3, name: "relay_names", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
     { no: 4, name: "builder_pubkey", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 5, name: "earliest_bid_time", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 5, name: "earliest_bid_from_slot_start", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): MevBuilderBid {

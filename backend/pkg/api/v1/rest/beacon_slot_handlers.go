@@ -558,6 +558,137 @@ func transformCBTToAPIMevRelayBidCount(cbt *cbtproto.FctMevBidCountByRelay) *api
 	}
 }
 
+// handleMevBuilderBidCount handles GET /api/v1/{network}/beacon/slot/{slot}/mev/builder/count
+// Returns MEV builder bid count statistics for a given slot.
+func (r *PublicRouter) handleMevBuilderBidCount(w http.ResponseWriter, req *http.Request) {
+	var (
+		ctx     = req.Context()
+		vars    = mux.Vars(req)
+		network = vars["network"]
+	)
+
+	// Validate network.
+	if network == "" {
+		r.WriteJSONResponseError(w, req, http.StatusBadRequest, "Network parameter is required")
+
+		return
+	}
+
+	// Parse slot from path.
+	slotStr := vars["slot"]
+
+	slot, err := strconv.ParseUint(slotStr, 10, 32)
+	if err != nil {
+		r.WriteJSONResponseError(w, req, http.StatusBadRequest, "Invalid slot number")
+
+		return
+	}
+
+	// Parse query parameters.
+	queryParams := req.URL.Query()
+
+	// Build CBT request.
+	grpcReq := &cbtproto.ListFctMevBidCountByBuilderRequest{
+		Slot: &cbtproto.UInt32Filter{
+			Filter: &cbtproto.UInt32Filter_Eq{Eq: uint32(slot)},
+		},
+	}
+
+	// Apply builder filter if provided.
+	if builderPubkey := queryParams.Get("builder"); builderPubkey != "" {
+		grpcReq.BuilderPubkey = &cbtproto.StringFilter{
+			Filter: &cbtproto.StringFilter_Eq{Eq: builderPubkey},
+		}
+	}
+
+	// Apply pagination from query parameters.
+	if v := queryParams.Get(QueryParamPageSize); v != "" {
+		if pageSize, err := strconv.ParseInt(v, 10, 32); err == nil && pageSize > 0 {
+			grpcReq.PageSize = int32(pageSize)
+		}
+	}
+
+	if v := queryParams.Get(QueryParamPageToken); v != "" {
+		grpcReq.PageToken = v
+	}
+
+	// Apply ordering if specified.
+	if v := queryParams.Get(QueryParamOrderBy); v != "" {
+		grpcReq.OrderBy = v
+	}
+
+	r.log.WithFields(logrus.Fields{
+		"network": network,
+		"slot":    slot,
+	}).Debug("REST v1: MevBuilderBidCount")
+
+	// Set network in gRPC metadata and call service.
+	ctxWithMeta := metadata.NewOutgoingContext(
+		ctx,
+		metadata.New(map[string]string{"network": network}),
+	)
+
+	// Call the gRPC service.
+	grpcResp, err := r.xatuCBTClient.ListFctMevBidCountByBuilder(ctxWithMeta, grpcReq)
+	if err != nil {
+		r.log.WithError(err).WithFields(logrus.Fields{
+			"network": network,
+			"slot":    slot,
+		}).Error("Failed to query MEV bid count by builder")
+		r.HandleGRPCError(w, req, err)
+
+		return
+	}
+
+	// Transform CBT types to Public API types.
+	builders := make([]*apiv1.MevBuilderBidCount, 0, len(grpcResp.FctMevBidCountByBuilder))
+
+	for _, cbtItem := range grpcResp.FctMevBidCountByBuilder {
+		apiItem := transformCBTToAPIMevBuilderBidCount(cbtItem)
+		builders = append(builders, apiItem)
+	}
+
+	// Build applied filters map for metadata.
+	appliedFilters := make(map[string]string)
+	appliedFilters["slot"] = slotStr
+
+	for k, v := range queryParams {
+		if len(v) > 0 && v[0] != "" && k != QueryParamPageSize && k != QueryParamPageToken && k != QueryParamOrderBy {
+			appliedFilters[k] = v[0]
+		}
+	}
+
+	response := &apiv1.ListBeaconSlotMevBuilderCountResponse{
+		Builders: builders,
+		Pagination: &apiv1.PaginationMetadata{
+			PageSize:      grpcReq.PageSize,
+			PageToken:     grpcReq.PageToken,
+			NextPageToken: grpcResp.NextPageToken,
+		},
+		Filters: &apiv1.FilterMetadata{
+			Network:        network,
+			AppliedFilters: appliedFilters,
+			OrderBy:        grpcReq.OrderBy,
+		},
+	}
+
+	// Set content type header (cache headers are handled by middleware).
+	w.Header().Set("Content-Type", "application/json")
+
+	// Write JSON response.
+	if err := json.NewEncoder(w).Encode(response); err != nil {
+		r.log.WithError(err).Error("Failed to encode MEV builder bid count response")
+	}
+}
+
+// transformCBTToAPIMevBuilderBidCount transforms CBT types to public API types.
+func transformCBTToAPIMevBuilderBidCount(cbt *cbtproto.FctMevBidCountByBuilder) *apiv1.MevBuilderBidCount {
+	return &apiv1.MevBuilderBidCount{
+		BuilderPubkey: cbt.BuilderPubkey,
+		BidCount:      cbt.BidTotal,
+	}
+}
+
 // handleMevBlock handles GET /api/v1/{network}/beacon/slot/{slot}/mev
 // Returns MEV block data for a given slot.
 func (r *PublicRouter) handleMevBlock(w http.ResponseWriter, req *http.Request) {
@@ -708,7 +839,7 @@ func transformCBTToAPIMevBlock(cbt *cbtproto.FctBlockMevHead) *apiv1.MevBlock {
 	return block
 }
 
-// handleMevBuilderBid handles GET /api/v1/{network}/beacon/slot/{slot}/mev/builder
+// handleMevBuilderBid handles GET /api/v1/{network}/beacon/slot/{slot}/mev/builder/value
 // Returns highest MEV bid values by builder for a given slot.
 func (r *PublicRouter) handleMevBuilderBid(w http.ResponseWriter, req *http.Request) {
 	var (
@@ -737,7 +868,7 @@ func (r *PublicRouter) handleMevBuilderBid(w http.ResponseWriter, req *http.Requ
 	queryParams := req.URL.Query()
 
 	// Build CBT request.
-	grpcReq := &cbtproto.ListFctMevBidValueByBuilderRequest{
+	grpcReq := &cbtproto.ListFctMevBidByBuilderRequest{
 		Slot: &cbtproto.UInt32Filter{
 			Filter: &cbtproto.UInt32Filter_Eq{Eq: uint32(slot)},
 		},
@@ -786,7 +917,7 @@ func (r *PublicRouter) handleMevBuilderBid(w http.ResponseWriter, req *http.Requ
 	)
 
 	// Call the gRPC service.
-	grpcResp, err := r.xatuCBTClient.ListFctMevBidValueByBuilder(ctxWithMeta, grpcReq)
+	grpcResp, err := r.xatuCBTClient.ListFctMevBidByBuilder(ctxWithMeta, grpcReq)
 	if err != nil {
 		r.log.WithError(err).WithFields(logrus.Fields{
 			"network": network,
@@ -798,9 +929,9 @@ func (r *PublicRouter) handleMevBuilderBid(w http.ResponseWriter, req *http.Requ
 	}
 
 	// Transform CBT types to Public API types.
-	builders := make([]*apiv1.MevBuilderBid, 0, len(grpcResp.FctMevBidValueByBuilder))
+	builders := make([]*apiv1.MevBuilderBid, 0, len(grpcResp.FctMevBidByBuilder))
 
-	for _, cbtItem := range grpcResp.FctMevBidValueByBuilder {
+	for _, cbtItem := range grpcResp.FctMevBidByBuilder {
 		apiItem := transformCBTToAPIMevBuilderBid(cbtItem)
 		builders = append(builders, apiItem)
 	}
@@ -832,12 +963,16 @@ func (r *PublicRouter) handleMevBuilderBid(w http.ResponseWriter, req *http.Requ
 }
 
 // transformCBTToAPIMevBuilderBid transforms CBT types to public API types.
-func transformCBTToAPIMevBuilderBid(cbt *cbtproto.FctMevBidValueByBuilder) *apiv1.MevBuilderBid {
+func transformCBTToAPIMevBuilderBid(cbt *cbtproto.FctMevBidByBuilder) *apiv1.MevBuilderBid {
+	slotStartMs := int64(cbt.SlotStartDateTime) * 1000
+	earliestBidMs := int64(cbt.EarliestBidDateTime) //nolint:gosec // safe conversion, timestamp values are within int64 range
+	diffMs := int32(earliestBidMs - slotStartMs)    //nolint:gosec // safe conversion, diff is typically -4000 to +12000 ms
+
 	return &apiv1.MevBuilderBid{
-		BlockHash:       cbt.BlockHash,
-		Value:           cbt.Value,
-		RelayNames:      cbt.RelayNames,
-		EarliestBidTime: formatTimestamp(int64(cbt.EarliestBidDateTime)), //nolint:gosec // safe timestamp conversion
+		BlockHash:                cbt.BlockHash,
+		Value:                    cbt.Value,
+		RelayNames:               cbt.RelayNames,
+		EarliestBidFromSlotStart: diffMs,
 	}
 }
 
