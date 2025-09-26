@@ -85,13 +85,9 @@ export default function BlockProductionLivePage() {
 
       // Reset to live position
       setDisplaySlotOffset(0);
-      
+
       // Reset initial slots for new network
       setInitialSafeSlot(null);
-      setInitialHeadSlot(null);
-
-      // Clear prefetched slots for the previous network
-      prefetchedSlotsRef.current = new Set();
 
       // Invalidate queries for the previous network to force refetching
       queryClient.invalidateQueries({
@@ -107,9 +103,6 @@ export default function BlockProductionLivePage() {
   // Subscribe to slot changes
   useEffect(() => {
     if (!selectedNetwork) return;
-
-    // Reset state when network changes to ensure fresh data
-    prefetchedSlotsRef.current = new Set();
 
     // Create a slot change callback
     const slotChangeCallback = (_network: string, newSlot: number, _previousSlot: number) => {
@@ -133,49 +126,211 @@ export default function BlockProductionLivePage() {
     isAtLivePositionRef.current = displaySlotOffset === 0;
   }, [displaySlotOffset]);
 
-  // Use safe slot from backend config as starting point
-  // Backend already calculated this with head_delay_slots applied
+  // Backend config provides everything we need
   const safeSlotFromBackend = getSafeSlot(selectedNetwork);
-  
-  // Track the initial slots when they first load - freeze these values for stable live progression
+  const networkAvailability = getNetworkAvailability(selectedNetwork);
+  const maxSlotFromBackend = networkAvailability?.maxSlot;
+
+  // Freeze the initial safeSlot when first loaded (won't change with config refreshes)
   const [initialSafeSlot, setInitialSafeSlot] = useState<number | null>(null);
-  const [initialHeadSlot, setInitialHeadSlot] = useState<number | null>(null);
-  
-  // Set initial slots when backend data first becomes available
+
+  // Simple counter: how many slots we've advanced from initial position
+  const [slotsAdvanced, setSlotsAdvanced] = useState<number>(0);
+
+  // Use refs to track values that must survive re-renders/StrictMode
+  const slotsAdvancedRef = useRef<number>(0);
+  const actualInitialSlotRef = useRef<number | null>(null);
+
+  // Use ref for maxSlot to avoid timer restarts when config updates
+  const maxSlotRef = useRef<number | null>(maxSlotFromBackend);
   useEffect(() => {
-    const networkAvailability = getNetworkAvailability(selectedNetwork);
-    const backendHeadSlot = networkAvailability?.headSlot;
-    
-    if (safeSlotFromBackend !== null && initialSafeSlot === null) {
+    maxSlotRef.current = maxSlotFromBackend;
+  }, [maxSlotFromBackend]);
+
+  // Set initial safe slot ONCE when it first becomes available
+  useEffect(() => {
+    console.log('SafeSlot effect:', {
+      safeSlotFromBackend,
+      initialSafeSlot,
+      actualInitialSlot: actualInitialSlotRef.current,
+      slotsAdvanced: slotsAdvancedRef.current,
+      willSet:
+        safeSlotFromBackend !== null &&
+        actualInitialSlotRef.current === null &&
+        slotsAdvancedRef.current === 0,
+      timestamp: new Date().toISOString(),
+    });
+
+    // Only set initial slot if we haven't initialized yet
+    if (
+      safeSlotFromBackend !== null &&
+      actualInitialSlotRef.current === null &&
+      slotsAdvancedRef.current === 0
+    ) {
+      console.log(
+        'SETTING INITIAL SAFE SLOT:',
+        safeSlotFromBackend,
+        'at',
+        new Date().toISOString(),
+      );
+      actualInitialSlotRef.current = safeSlotFromBackend;
       setInitialSafeSlot(safeSlotFromBackend);
+      setSlotsAdvanced(0);
+    } else if (
+      actualInitialSlotRef.current !== null &&
+      (initialSafeSlot === null || slotsAdvanced !== slotsAdvancedRef.current)
+    ) {
+      // Restore from ref if state was lost (StrictMode)
+      console.log('RESTORING state from refs:', {
+        initialSlot: actualInitialSlotRef.current,
+        slotsAdvanced: slotsAdvancedRef.current,
+      });
+      setInitialSafeSlot(actualInitialSlotRef.current);
+      setSlotsAdvanced(slotsAdvancedRef.current);
     }
-    
-    if (backendHeadSlot !== null && backendHeadSlot !== undefined && initialHeadSlot === null) {
-      setInitialHeadSlot(backendHeadSlot);
-    }
-  }, [safeSlotFromBackend, getNetworkAvailability, selectedNetwork, initialSafeSlot, initialHeadSlot]);
-  
-  // Calculate current slot position: start from initial safe slot and advance with blockchain
-  let baseSlot: number | null = null;
-  if (initialSafeSlot !== null && initialHeadSlot !== null && headSlot !== null) {
-    // Calculate how many slots have elapsed since we got the initial config
-    // This keeps us advancing with the live blockchain using frozen initial values
-    const slotsElapsed = headSlot - initialHeadSlot;
-    const calculatedSlot = initialSafeSlot + slotsElapsed;
-    
-    // Cap at max available data when in live mode to prevent showing empty slots
-    const networkAvailability = getNetworkAvailability(selectedNetwork);
-    if (displaySlotOffset === 0 && networkAvailability && calculatedSlot > networkAvailability.maxSlot) {
-      baseSlot = networkAvailability.maxSlot;
-    } else {
-      baseSlot = calculatedSlot;
-    }
-  } else {
-    // Fallback when we don't have the initial data yet
-    baseSlot = safeSlotFromBackend;
-  }
-  
+  }, [safeSlotFromBackend, initialSafeSlot, slotsAdvanced]); // Check all values
+
+  // Reset when network changes
+  useEffect(() => {
+    console.log('NETWORK CHANGE DETECTED:', selectedNetwork);
+    setInitialSafeSlot(null);
+    setSlotsAdvanced(0);
+    slotsAdvancedRef.current = 0;
+    actualInitialSlotRef.current = null;
+  }, [selectedNetwork]);
+
+  // Track last advance time to prevent double-firing
+  const lastAdvanceTimeRef = useRef<number>(Date.now());
+
+  // Store initialSafeSlot in a ref so timer doesn't restart when it changes
+  const initialSafeSlotRef = useRef<number | null>(initialSafeSlot);
+  useEffect(() => {
+    initialSafeSlotRef.current = initialSafeSlot;
+  }, [initialSafeSlot]);
+
+  // Simple timer: advance by 1 slot every 12 seconds, synchronized with slot boundaries
+  useEffect(() => {
+    if (displaySlotOffset !== 0) return; // Only auto-advance in live mode
+    if (!clock) return; // Need clock for timing
+
+    console.log('CREATING TIMER at', new Date().toISOString());
+    const timerId = Math.random();
+
+    // Calculate time until next slot boundary
+    const slotProgress = clock.getCurrentSlotProgress();
+    const msIntoSlot = Math.floor(slotProgress * 12000);
+    const msUntilNextSlot = 12000 - msIntoSlot;
+
+    console.log(
+      `Timer ${timerId}: Current slot progress: ${slotProgress.toFixed(3)}, waiting ${msUntilNextSlot}ms until next slot`,
+    );
+
+    // Wait until the next slot boundary, then start regular interval
+    const initialTimeout = setTimeout(() => {
+      console.log(`Timer ${timerId}: Initial advance at slot boundary`);
+
+      // Do the first advance at the slot boundary
+      setSlotsAdvanced(current => {
+        if (initialSafeSlotRef.current === null) return current;
+
+        const currentSlot = initialSafeSlotRef.current + current;
+        const nextSlot = currentSlot + 1;
+
+        // Check against current maxSlot using ref (doesn't restart timer)
+        if (maxSlotRef.current && nextSlot > maxSlotRef.current) {
+          console.log('Reached max slot, pausing at:', currentSlot);
+          return current; // Don't advance
+        }
+
+        const newValue = current + 1;
+        console.log('TIMER ADVANCE (initial):', {
+          initialSafeSlot: initialSafeSlotRef.current,
+          currentSlotsAdvanced: current,
+          nextSlotsAdvanced: newValue,
+          currentSlot,
+          nextSlot,
+        });
+        lastAdvanceTimeRef.current = Date.now();
+        slotsAdvancedRef.current = newValue;
+        return newValue;
+      });
+
+      // Now start the regular interval, aligned with slot boundaries
+      const timer = setInterval(() => {
+        const now = Date.now();
+
+        // Skip if not ready
+        if (initialSafeSlotRef.current === null) {
+          console.log(`Timer ${timerId} fired but initialSafeSlot not ready yet`);
+          return;
+        }
+
+        // Protect against double-firing (React StrictMode can cause this)
+        if (now - lastAdvanceTimeRef.current < 11000) {
+          console.log(
+            `Timer ${timerId} skipping duplicate fire (last was ${now - lastAdvanceTimeRef.current}ms ago)`,
+          );
+          return;
+        }
+
+        console.log(`Timer ${timerId} firing at`, new Date().toISOString());
+        setSlotsAdvanced(current => {
+          if (initialSafeSlotRef.current === null) return current;
+
+          const currentSlot = initialSafeSlotRef.current + current;
+          const nextSlot = currentSlot + 1;
+
+          // Check against current maxSlot using ref (doesn't restart timer)
+          if (maxSlotRef.current && nextSlot > maxSlotRef.current) {
+            console.log('Reached max slot, pausing at:', currentSlot);
+            return current; // Don't advance
+          }
+
+          const newValue = current + 1;
+          console.log('TIMER ADVANCE:', {
+            initialSafeSlot: initialSafeSlotRef.current,
+            currentSlotsAdvanced: current,
+            nextSlotsAdvanced: newValue,
+            currentSlot,
+            nextSlot,
+          });
+          lastAdvanceTimeRef.current = now;
+          slotsAdvancedRef.current = newValue; // Update the ref too
+          return newValue;
+        });
+      }, 12000); // Every 12 seconds
+
+      // Store interval ID for cleanup
+      (window as any)[`timer_${timerId}`] = timer;
+    }, msUntilNextSlot);
+
+    return () => {
+      console.log(`DESTROYING TIMER ${timerId} at`, new Date().toISOString());
+      clearTimeout(initialTimeout);
+      const timer = (window as any)[`timer_${timerId}`];
+      if (timer) {
+        clearInterval(timer);
+        delete (window as any)[`timer_${timerId}`];
+      }
+    };
+  }, [displaySlotOffset, clock]); // Depend on clock too
+
+  // Calculate current slot: simple addition
+  const baseSlot = initialSafeSlot !== null ? initialSafeSlot + slotsAdvanced : null;
+
   const slotNumber = baseSlot !== null ? baseSlot + displaySlotOffset : null;
+
+  // Debug logging to track slot changes
+  useEffect(() => {
+    console.log('SLOT NUMBER CHANGED:', {
+      slotNumber,
+      initialSafeSlot,
+      slotsAdvanced,
+      displaySlotOffset,
+      baseSlot,
+      timestamp: new Date().toISOString(),
+    });
+  }, [slotNumber, initialSafeSlot, slotsAdvanced, displaySlotOffset, baseSlot]);
 
   // Track if a slot transition is in progress to prevent double transitions
   const [isTransitioning, setIsTransitioning] = useState<boolean>(false);
@@ -189,49 +344,71 @@ export default function BlockProductionLivePage() {
     async (slotNumber: number | null, direction: 'next' | 'previous') => {
       if (slotNumber === null) return;
 
-      // Don't try to prefetch slots that are too far in the future
-      if (direction === 'next' && headSlot !== null && slotNumber > headSlot + 1) return;
-
       // Don't prefetch negative slots
       if (slotNumber < 0) return;
 
       try {
-        // First check the global slot data store
-        if (slotDataStore.hasSlotData(selectedNetwork, slotNumber)) {
-          // Still need to update React Query cache with this data for the component to use it
-          const storeData = slotDataStore.getSlotData(selectedNetwork, slotNumber);
-          // The unified hook uses different query keys internally based on mode
-          // We'll set both potential keys to be safe
-          queryClient.setQueryData(['slotData', selectedNetwork, slotNumber], { data: storeData });
-          queryClient.setQueryData(['slotData-grpc', selectedNetwork, slotNumber], {
-            data: storeData,
-          });
-          return;
-        }
+        // Use React Query's prefetchQuery to actually trigger the fetch
+        // This will use the same query function as useSlotData
+        await queryClient.prefetchQuery({
+          queryKey: ['slotData', selectedNetwork, slotNumber],
+          queryFn: async () => {
+            const client = await import('@/api').then(m => m.getRestApiClient());
+            const api = await client;
 
-        // Create query keys for both REST and gRPC (the hook decides which to use)
-        const restKey = ['slotData', selectedNetwork, slotNumber];
-        const grpcKey = ['slotData-grpc', selectedNetwork, slotNumber];
+            // Fetch all data sources in parallel
+            const [
+              blockResult,
+              blockTimingResult,
+              blobTimingResult,
+              blobTotalResult,
+              attestationTimingResult,
+              attestationCorrectnessResult,
+              proposerEntityResult,
+              mevBlockResult,
+              mevRelayResult,
+              mevBuilderResult,
+            ] = await Promise.allSettled([
+              api.getBeaconBlock(selectedNetwork, slotNumber),
+              api.getBeaconBlockTiming(selectedNetwork, slotNumber),
+              api.getBeaconBlobTiming(selectedNetwork, slotNumber),
+              api.getBeaconBlobTotal(selectedNetwork, slotNumber),
+              api.getBeaconAttestationTiming(selectedNetwork, slotNumber),
+              api.getBeaconAttestationCorrectness(selectedNetwork, slotNumber),
+              api.getBeaconProposerEntity(selectedNetwork, slotNumber),
+              api.getMevBlock(selectedNetwork, slotNumber),
+              api.getMevRelayCount(selectedNetwork, slotNumber),
+              api.getMevBuilderBid(selectedNetwork, slotNumber),
+            ]);
 
-        // Check if we already have data in React Query cache
-        const existingRestData = queryClient.getQueryData(restKey);
-        const existingGrpcData = queryClient.getQueryData(grpcKey);
-        const existingData = existingRestData || existingGrpcData;
+            // Transform to BeaconSlotData format
+            const { transformToBeaconSlotData } = await import('@/utils/slotDataTransformer');
+            const slotData = transformToBeaconSlotData({
+              network: selectedNetwork,
+              slot: slotNumber,
+              blockResult,
+              blockTimingResult,
+              blobTimingResult,
+              blobTotalResult,
+              attestationTimingResult,
+              attestationCorrectnessResult,
+              proposerEntityResult,
+              mevBlockResult,
+              mevRelayResult,
+              mevBuilderResult,
+            });
 
-        if (existingData) {
-          // We already have this data in the cache, store it in our global store too
-          slotDataStore.storeSlotData(selectedNetwork, slotNumber, existingData);
-          return;
-        }
+            return { data: slotData };
+          },
+          staleTime: 5 * 60 * 1000, // 5 minutes
+        });
 
-        // Since we're using the unified hook, we can't directly prefetch
-        // The best approach is to let the hook handle its own prefetching
-        // The unified hook will decide whether to use REST or gRPC internally
+        console.log(`[PREFETCH] Successfully prefetched slot ${slotNumber}`);
       } catch (error) {
         console.error(`[PREFETCH] Failed to prefetch data for slot ${slotNumber}:`, error);
       }
     },
-    [headSlot, selectedNetwork, queryClient, slotDataStore],
+    [selectedNetwork, queryClient],
   );
 
   // Prefetching next slot's data
@@ -250,110 +427,24 @@ export default function BlockProductionLivePage() {
     [prefetchSlotData],
   );
 
-  // Reference for tracking prefetched slots (must be outside useEffect)
-  const prefetchedSlotsRef = useRef<Set<number>>(new Set());
-
-  // Helper function for prefetching multiple slots (defined outside of effects)
-  const prefetchMultipleSlotsCallback = React.useCallback(
-    (baseSlotNumber: number, count: number) => {
-      // Skip invalid inputs
-      if (baseSlotNumber === null || count <= 0) return;
-
-      // Prefetch 'count' slots ahead
-      for (let i = 0; i < count; i++) {
-        const slotToPrefetch = baseSlotNumber + i;
-
-        // Skip if we've already prefetched this slot in this cycle
-        if (prefetchedSlotsRef.current.has(slotToPrefetch)) continue;
-
-        // Mark as prefetched for this cycle
-        prefetchedSlotsRef.current.add(slotToPrefetch);
-
-        // Queue the prefetch with a small delay to avoid overwhelming the API
-        const delay = i * 200; // Stagger prefetches by 200ms
-
-        // Use setTimeout outside of the component rendering
-        setTimeout(() => {
-          prefetchNextSlotData(slotToPrefetch);
-        }, delay);
-      }
-    },
-    [prefetchNextSlotData],
-  );
-
-  // Staggered prefetching in response to timer thresholds
-  const prefetchAtTimerThreshold = React.useCallback(
-    (nextDisplaySlot: number, timeToNextSlot: number, timeInSlot: number) => {
-      // At 11s (start of slot), prefetch the next 3 slots
-      if (timeToNextSlot <= 11000 && timeToNextSlot > 10900) {
-        prefetchMultipleSlotsCallback(nextDisplaySlot, 3);
-      }
-      // At 10s, prefetch the next slot
-      else if (timeToNextSlot <= 10000 && timeToNextSlot > 9900) {
-        prefetchNextSlotData(nextDisplaySlot);
-      }
-      // At 5s, prefetch the next 2 slots again (refresh data)
-      else if (timeToNextSlot <= 5000 && timeToNextSlot > 4900) {
-        prefetchMultipleSlotsCallback(nextDisplaySlot, 2);
-      }
-      // At 1s, prefetch just the next slot (final refresh before transition)
-      else if (timeToNextSlot <= 1000 && timeToNextSlot > 900) {
-        prefetchNextSlotData(nextDisplaySlot);
-      }
-      // At the very start of a new slot, reset the prefetched slots tracker
-      else if (timeInSlot < 100) {
-        prefetchedSlotsRef.current = new Set();
-      }
-    },
-    [prefetchNextSlotData, prefetchMultipleSlotsCallback],
-  );
-
-  // Enhanced early prefetching at multiple time points and multiple slots ahead
+  // Simple prefetching: prefetch next slot 8 seconds before we need it
   useEffect(() => {
-    if (!selectedNetwork || !clock) return;
+    if (slotNumber === null || displaySlotOffset !== 0) return; // Only prefetch in live mode
+    if (!selectedNetwork) return;
 
-    // Function to check if we should prefetch - avoids calling hooks inside
-    const checkAndPrefetch = () => {
-      // Get current time in slot (milliseconds)
-      // Use the correct method from BeaconClock to calculate time in slot
-      const slotDuration = 12000; // 12 seconds in ms
-      const slotProgress = clock ? clock.getCurrentSlotProgress() : 0;
-      const timeInSlot = slotProgress * slotDuration;
-      const timeToNextSlot = slotDuration - timeInSlot;
+    // Set a timer for 4 seconds after slot starts (8 seconds before next slot)
+    const timer = setTimeout(() => {
+      const nextSlot = slotNumber + 1;
 
-      // Calculate the next slot we'll need to display based on our baseSlot logic
-      const nextSlot = baseSlot !== null ? baseSlot + 1 : null;
-
-
-      // Use the callback for prefetching based on timer thresholds
-      if (nextSlot !== null) {
-        prefetchAtTimerThreshold(nextSlot, timeToNextSlot, timeInSlot);
+      // Check if next slot is within bounds before prefetching
+      if (maxSlotRef.current && nextSlot <= maxSlotRef.current) {
+        console.log(`[PREFETCH] Prefetching slot ${nextSlot} for ${selectedNetwork}`);
+        prefetchNextSlotData(nextSlot);
       }
-    };
+    }, 4000); // 4 seconds into the current slot
 
-    // Run the check every 1000ms (reduced from 100ms since we're using TimelineProvider for animations)
-    const intervalId = setInterval(checkAndPrefetch, 1000);
-
-    // Initial prefetch of current and next slots when component mounts or network changes
-    if (baseSlot !== null) {
-      // Clear any previously prefetched slots when network changes
-      prefetchedSlotsRef.current = new Set();
-
-      // Safely prefetch the initial slots for the current network
-      prefetchMultipleSlotsCallback(baseSlot, 2);
-    }
-
-    return () => {
-      clearInterval(intervalId);
-    };
-  }, [
-    selectedNetwork,
-    clock,
-    baseSlot,
-    prefetchNextSlotData,
-    prefetchMultipleSlotsCallback,
-    prefetchAtTimerThreshold,
-  ]);
+    return () => clearTimeout(timer);
+  }, [slotNumber, displaySlotOffset, selectedNetwork, prefetchNextSlotData]);
 
   // Navigation and Playback functions - wrapped in useCallback for proper dependency tracking
   // Prefetch previous slot before navigating to reduce flash
@@ -424,10 +515,11 @@ export default function BlockProductionLivePage() {
   const isNextDisabled = displaySlotOffset >= 0;
 
   // Use unified hook for slot data
+  // We use isLive: false to prevent auto-refetching since we're manually prefetching
   const { data: slotData, isLoading: isSlotLoading } = useSlotData({
     network: selectedNetwork,
     slot: slotNumber || undefined,
-    isLive: true,
+    isLive: false, // Disable auto-refetch, we're handling prefetching manually
     enabled: slotNumber !== null,
   });
 
@@ -662,8 +754,12 @@ export default function BlockProductionLivePage() {
       network={selectedNetwork}
       currentSlot={slotNumber}
     >
-      {/* Wrap with TimelineProvider */}
-      <TimelineProvider network={selectedNetwork} slotOffset={displaySlotOffset}>
+      {/* Wrap with TimelineProvider - pass explicit slot to prevent wallclock jumping */}
+      <TimelineProvider
+        network={selectedNetwork}
+        slotOffset={displaySlotOffset}
+        explicitSlot={slotNumber}
+      >
         {/* Conditionally render mobile or desktop view based on screen size */}
         {isMobile ? (
           // Mobile View
