@@ -868,7 +868,7 @@ func (r *PublicRouter) handleMevBuilderBid(w http.ResponseWriter, req *http.Requ
 	queryParams := req.URL.Query()
 
 	// Build CBT request.
-	grpcReq := &cbtproto.ListFctMevBidByBuilderRequest{
+	grpcReq := &cbtproto.ListFctMevBidHighestValueByBuilderChunked50MsRequest{
 		Slot: &cbtproto.UInt32Filter{
 			Filter: &cbtproto.UInt32Filter_Eq{Eq: uint32(slot)},
 		},
@@ -917,7 +917,7 @@ func (r *PublicRouter) handleMevBuilderBid(w http.ResponseWriter, req *http.Requ
 	)
 
 	// Call the gRPC service.
-	grpcResp, err := r.xatuCBTClient.ListFctMevBidByBuilder(ctxWithMeta, grpcReq)
+	grpcResp, err := r.xatuCBTClient.ListFctMevBidHighestValueByBuilderChunked50Ms(ctxWithMeta, grpcReq)
 	if err != nil {
 		r.log.WithError(err).WithFields(logrus.Fields{
 			"network": network,
@@ -929,9 +929,9 @@ func (r *PublicRouter) handleMevBuilderBid(w http.ResponseWriter, req *http.Requ
 	}
 
 	// Transform CBT types to Public API types.
-	builders := make([]*apiv1.MevBuilderBid, 0, len(grpcResp.FctMevBidByBuilder))
+	builders := make([]*apiv1.MevBuilderBid, 0, len(grpcResp.FctMevBidHighestValueByBuilderChunked_50Ms))
 
-	for _, cbtItem := range grpcResp.FctMevBidByBuilder {
+	for _, cbtItem := range grpcResp.FctMevBidHighestValueByBuilderChunked_50Ms {
 		apiItem := transformCBTToAPIMevBuilderBid(cbtItem)
 		builders = append(builders, apiItem)
 	}
@@ -963,16 +963,13 @@ func (r *PublicRouter) handleMevBuilderBid(w http.ResponseWriter, req *http.Requ
 }
 
 // transformCBTToAPIMevBuilderBid transforms CBT types to public API types.
-func transformCBTToAPIMevBuilderBid(cbt *cbtproto.FctMevBidByBuilder) *apiv1.MevBuilderBid {
-	slotStartMs := int64(cbt.SlotStartDateTime) * 1000
-	earliestBidMs := int64(cbt.EarliestBidDateTime) //nolint:gosec // safe conversion, timestamp values are within int64 range
-	diffMs := int32(earliestBidMs - slotStartMs)    //nolint:gosec // safe conversion, diff is typically -4000 to +12000 ms
-
+func transformCBTToAPIMevBuilderBid(cbt *cbtproto.FctMevBidHighestValueByBuilderChunked50Ms) *apiv1.MevBuilderBid {
 	return &apiv1.MevBuilderBid{
-		BlockHash:                cbt.BlockHash,
-		Value:                    cbt.Value,
-		RelayNames:               cbt.RelayNames,
-		EarliestBidFromSlotStart: diffMs,
+		BlockHash:     cbt.BlockHash,
+		Value:         cbt.Value,
+		RelayNames:    cbt.RelayNames,
+		BuilderPubkey: cbt.BuilderPubkey,
+		ChunkStartMs:  cbt.ChunkSlotStartDiff,
 	}
 }
 

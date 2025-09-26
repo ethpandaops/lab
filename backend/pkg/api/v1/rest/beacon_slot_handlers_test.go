@@ -1127,7 +1127,7 @@ func TestHandleMevBuilderBid(t *testing.T) {
 		network        string
 		slot           string
 		queryParams    map[string]string
-		mockResponse   *cbtproto.ListFctMevBidByBuilderResponse
+		mockResponse   *cbtproto.ListFctMevBidHighestValueByBuilderChunked50MsResponse
 		mockError      error
 		expectedStatus int
 		validateBody   func(t *testing.T, body []byte)
@@ -1136,16 +1136,18 @@ func TestHandleMevBuilderBid(t *testing.T) {
 			name:    "successful request",
 			network: "mainnet",
 			slot:    "8000000",
-			mockResponse: &cbtproto.ListFctMevBidByBuilderResponse{
-				FctMevBidByBuilder: []*cbtproto.FctMevBidByBuilder{
+			mockResponse: &cbtproto.ListFctMevBidHighestValueByBuilderChunked50MsResponse{
+				FctMevBidHighestValueByBuilderChunked_50Ms: []*cbtproto.FctMevBidHighestValueByBuilderChunked50Ms{
 					{
 						Slot:                10239024,
 						SlotStartDateTime:   1734307488,
 						Epoch:               319969,
 						EpochStartDateTime:  1734303888,
+						ChunkSlotStartDiff:  -877,
 						EarliestBidDateTime: 1734307487123,
 						RelayNames:          []string{"flashbots", "bloxroute"},
 						BlockHash:           "0x1234567890abcdef",
+						BuilderPubkey:       "0xbuilder1",
 						Value:               "150000000000000000",
 					},
 					{
@@ -1153,9 +1155,11 @@ func TestHandleMevBuilderBid(t *testing.T) {
 						SlotStartDateTime:   1734307488,
 						Epoch:               319969,
 						EpochStartDateTime:  1734303888,
+						ChunkSlotStartDiff:  -544,
 						EarliestBidDateTime: 1734307487456,
 						RelayNames:          []string{"ultrasound"},
 						BlockHash:           "0xabcdef1234567890",
+						BuilderPubkey:       "0xbuilder2",
 						Value:               "100000000000000000",
 					},
 				},
@@ -1175,7 +1179,7 @@ func TestHandleMevBuilderBid(t *testing.T) {
 				assert.Len(t, response.Builders[0].RelayNames, 2)
 				assert.Contains(t, response.Builders[0].RelayNames, "flashbots")
 				assert.Contains(t, response.Builders[0].RelayNames, "bloxroute")
-				assert.Equal(t, int32(-877), response.Builders[0].EarliestBidFromSlotStart)
+				assert.Equal(t, int32(-877), response.Builders[0].ChunkStartMs)
 
 				// Check second builder bid
 				assert.Equal(t, "0xabcdef1234567890", response.Builders[1].BlockHash)
@@ -1237,13 +1241,16 @@ func TestHandleMevBuilderBid(t *testing.T) {
 				"page_size":  "50",
 				"order_by":   "value asc",
 			},
-			mockResponse: &cbtproto.ListFctMevBidByBuilderResponse{
-				FctMevBidByBuilder: []*cbtproto.FctMevBidByBuilder{
+			mockResponse: &cbtproto.ListFctMevBidHighestValueByBuilderChunked50MsResponse{
+				FctMevBidHighestValueByBuilderChunked_50Ms: []*cbtproto.FctMevBidHighestValueByBuilderChunked50Ms{
 					{
 						BlockHash:           "0x123456",
+						BuilderPubkey:       "0xbuilder3",
 						Value:               "50000000000000000",
 						RelayNames:          []string{"flashbots"},
+						ChunkSlotStartDiff:  -1000,
 						EarliestBidDateTime: 1734307487000,
+						SlotStartDateTime:   1734307488,
 					},
 				},
 			},
@@ -1274,7 +1281,7 @@ func TestHandleMevBuilderBid(t *testing.T) {
 			// Set up mock expectations
 			if tt.mockResponse != nil || tt.mockError != nil {
 				mockClient.EXPECT().
-					ListFctMevBidByBuilder(gomock.Any(), gomock.Any()).
+					ListFctMevBidHighestValueByBuilderChunked50Ms(gomock.Any(), gomock.Any()).
 					Return(tt.mockResponse, tt.mockError).
 					Times(1)
 			}
@@ -1316,11 +1323,13 @@ func TestHandleMevBuilderBid(t *testing.T) {
 }
 
 func TestTransformCBTToAPIMevBuilderBid(t *testing.T) {
-	cbtBid := &cbtproto.FctMevBidByBuilder{
+	cbtBid := &cbtproto.FctMevBidHighestValueByBuilderChunked50Ms{
 		BlockHash:           "0xdeadbeef",
+		BuilderPubkey:       "0xbuilder",
 		Value:               "200000000000000000",
 		RelayNames:          []string{"flashbots", "bloxroute", "ultrasound"},
 		SlotStartDateTime:   1734307488,
+		ChunkSlotStartDiff:  -877,
 		EarliestBidDateTime: 1734307487123,
 	}
 
@@ -1333,7 +1342,7 @@ func TestTransformCBTToAPIMevBuilderBid(t *testing.T) {
 	assert.Contains(t, result.RelayNames, "flashbots")
 	assert.Contains(t, result.RelayNames, "bloxroute")
 	assert.Contains(t, result.RelayNames, "ultrasound")
-	assert.Equal(t, int32(-877), result.EarliestBidFromSlotStart)
+	assert.Equal(t, int32(-877), result.ChunkStartMs)
 }
 
 func TestHandleBeaconSlotProposerEntity(t *testing.T) {

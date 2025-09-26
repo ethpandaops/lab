@@ -161,7 +161,7 @@ message MevBuilderBid {
   string value = 2;                     // Bid value in wei
   repeated string relay_names = 3;      // Relays that received the bid
   string builder_pubkey = 4;
-  int32 earliest_bid_from_slot_start = 5; // Milliseconds from slot start (negative if before slot, positive if after)
+  int32 chunk_start_ms = 5;             // 50ms chunk start time from slot start (e.g., 1500 for 1500-1550ms chunk)
 }
 
 // Error response.
