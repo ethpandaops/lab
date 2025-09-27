@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
 import { SlotView } from '@/components/beacon/SlotView';
-import useNetwork from '@/contexts/network';
+import { useNetwork, useConfig } from '@/stores/appStore';
 import useBeacon from '@/contexts/beacon';
-import useConfig from '@/contexts/config';
 import { AlertCircle } from 'lucide-react';
 
 function BeaconLive() {

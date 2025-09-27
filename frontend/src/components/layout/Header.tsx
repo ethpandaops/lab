@@ -1,5 +1,5 @@
 import { Menu, Github, Twitter, ExternalLink } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link } from '@tanstack/react-router';
 import useApiMode from '@/contexts/apiMode';
 
 interface HeaderProps {

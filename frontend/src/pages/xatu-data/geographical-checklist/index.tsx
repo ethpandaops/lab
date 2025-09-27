@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import useNetwork from '@/contexts/network';
+import { useNetwork } from '@/stores/appStore';
 import { LoadingState } from '@/components/common/LoadingState';
 import { ErrorState } from '@/components/common/ErrorState';
 import { formatDistanceToNow } from 'date-fns';
@@ -257,7 +257,6 @@ const GeographicalChecklist = () => {
 
   return (
     <div className="space-y-6 max-w-5xl mx-auto">
-
       {/* Header */}
       <div className="relative z-10 bg-surface/50 backdrop-blur-sm rounded-lg border border-subtle p-4 shadow-sm overflow-visible">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
@@ -272,7 +271,7 @@ const GeographicalChecklist = () => {
           </div>
           <NetworkSelector
             selectedNetwork={selectedNetwork}
-            onNetworkChange={network => setSelectedNetwork(network, 'ui')}
+            onNetworkChange={setSelectedNetwork}
             className="w-48"
           />
         </div>

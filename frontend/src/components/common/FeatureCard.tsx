@@ -1,5 +1,5 @@
 import React, { ReactNode } from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from '@tanstack/react-router';
 import { ChevronRight } from 'lucide-react';
 import { Card, CardBody } from '@/components/common/Card';
 

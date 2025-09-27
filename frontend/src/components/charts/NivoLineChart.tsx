@@ -43,11 +43,13 @@ export const NivoLineChart = ({
   pointBorderColor = { from: 'color', modifiers: [['darker', 0.3]] },
   enableSlices = 'x',
   theme = defaultNivoTheme,
+  data,
   ...rest
 }: NivoLineChartProps) => {
   return (
     <div style={{ height, width }}>
       <ThemedResponsiveLine
+        data={data}
         margin={margin}
         axisBottom={axisBottom}
         axisLeft={axisLeft}

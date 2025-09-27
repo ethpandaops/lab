@@ -1,5 +1,5 @@
 import { Share2, Database } from 'lucide-react';
-import { useLocation } from 'react-router-dom';
+import { useLocation } from '@tanstack/react-router';
 
 interface SystemAlertProps {
   title: string;

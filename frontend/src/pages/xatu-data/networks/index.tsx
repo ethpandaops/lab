@@ -3,7 +3,7 @@ import { NETWORK_METADATA, type NetworkKey } from '@/constants/networks.tsx';
 import { LoadingState } from '@/components/common/LoadingState';
 import { ErrorState } from '@/components/common/ErrorState';
 import { Card } from '@/components/common/Card';
-import useNetwork from '@/contexts/network';
+import { useNetwork } from '@/stores/appStore';
 import { getRestApiClient } from '@/api';
 import { useQuery } from '@tanstack/react-query';
 import {
@@ -126,7 +126,7 @@ export default function Networks() {
           </div>
           <NetworkSelector
             selectedNetwork={selectedNetwork}
-            onNetworkChange={network => setSelectedNetwork(network, 'ui')}
+            onNetworkChange={setSelectedNetwork}
             expandToFit={true}
           />
         </div>

@@ -1,10 +1,10 @@
-import { useParams } from 'react-router-dom';
+import { useParams } from '@tanstack/react-router';
 import { LoadingState } from '@/components/common/LoadingState';
 import { ErrorState } from '@/components/common/ErrorState';
 import { formatDistanceToNow } from 'date-fns';
 import { NETWORK_METADATA, type NetworkKey } from '@/constants/networks.tsx';
 import { Card } from '@/components/common/Card';
-import useNetwork from '@/contexts/network';
+import { useNetwork } from '@/stores/appStore';
 import { getRestApiClient } from '@/api';
 import { useQuery } from '@tanstack/react-query';
 import { transformNodeToContributor } from '@/utils/transformers';
@@ -190,7 +190,7 @@ function ContributorDetail() {
             </div>
             <NetworkSelector
               selectedNetwork={selectedNetwork}
-              onNetworkChange={network => setSelectedNetwork(network, 'ui')}
+              onNetworkChange={setSelectedNetwork}
               className="w-48"
             />
           </div>

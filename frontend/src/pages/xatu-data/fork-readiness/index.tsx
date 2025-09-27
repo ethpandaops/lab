@@ -6,8 +6,8 @@ import { formatNodeName } from '@/utils/format.ts';
 import { Card, CardHeader, CardBody } from '@/components/common/Card';
 import { LoadingState } from '@/components/common/LoadingState';
 import { ErrorState } from '@/components/common/ErrorState';
-import useNetwork from '@/contexts/network';
-import useConfig from '@/contexts/config';
+import { useNetwork } from '@/stores/appStore';
+import { useConfig } from '@/stores/appStore';
 import { getRestApiClient } from '@/api';
 import { useQuery } from '@tanstack/react-query';
 import { transformNodeToContributor } from '@/utils/transformers';
@@ -218,7 +218,7 @@ function ForkReadiness() {
                 <label className="block text-xs font-mono text-tertiary mb-1">Network</label>
                 <NetworkSelector
                   selectedNetwork={selectedNetwork}
-                  onNetworkChange={network => setSelectedNetwork(network, 'ui')}
+                  onNetworkChange={setSelectedNetwork}
                   className="min-w-[140px]"
                 />
               </div>

@@ -1,9 +1,9 @@
 import { LoadingState } from '@/components/common/LoadingState';
 import { ErrorState } from '@/components/common/ErrorState';
-import { Link } from 'react-router-dom';
+import { Link } from '@tanstack/react-router';
 import { formatDistanceToNow } from 'date-fns';
 import { Card } from '@/components/common/Card';
-import useNetwork from '@/contexts/network';
+import { useNetwork } from '@/stores/appStore';
 import { getRestApiClient } from '@/api';
 import { useQuery } from '@tanstack/react-query';
 import { aggregateContributorSummary } from '@/utils/transformers';
@@ -89,7 +89,6 @@ const ContributorsList = () => {
 
   return (
     <div className="space-y-8">
-
       {/* About Section */}
       <Card className="card-primary">
         <div className="card-body">
@@ -126,7 +125,7 @@ const ContributorsList = () => {
             </div>
             <NetworkSelector
               selectedNetwork={selectedNetwork}
-              onNetworkChange={network => setSelectedNetwork(network, 'ui')}
+              onNetworkChange={setSelectedNetwork}
               className="w-48"
             />
           </div>
@@ -143,7 +142,8 @@ const ContributorsList = () => {
                 return (
                   <Link
                     key={contributor.name}
-                    to={`/xatu-data/contributors/${contributor.name}`}
+                    to="/xatu-data/contributors/$name"
+                    params={{ name: contributor.name }}
                     className="block group"
                   >
                     <div className="relative bg-surface/20 hover:bg-surface/40 border border-subtle/30 hover:border-accent/40 rounded-xl p-5 transition-all duration-200 h-full overflow-hidden">

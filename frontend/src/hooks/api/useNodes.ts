@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { getRestApiClient, NodeFilters } from '@/api';
 import { transformNodesToUIFormat, aggregateNodesFromNetworks } from '@/utils/transformers';
-import useNetwork from '@/contexts/network';
+import { useNetwork } from '@/stores/appStore';
 
 /**
  * Hook to fetch nodes for a specific network

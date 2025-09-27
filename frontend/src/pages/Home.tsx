@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link } from '@tanstack/react-router';
 import { ArrowRight, ExternalLink, Zap } from 'lucide-react';
 import { useEffect, useState, useRef } from 'react';
 import FeatureCard from '@/components/common/FeatureCard';

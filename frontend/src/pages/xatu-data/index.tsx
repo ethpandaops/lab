@@ -1,9 +1,9 @@
-import { Link, Outlet, useLocation } from 'react-router-dom';
+import { Link, Outlet, useLocation } from '@tanstack/react-router';
 import { ArrowRight } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { useRef, useState, useEffect } from 'react';
 import { GlobeViz } from '@/components/xatu/GlobeViz';
-import useNetwork from '@/contexts/network';
+import { useNetwork } from '@/stores/appStore';
 import { getRestApiClient } from '@/api';
 import { useQuery } from '@tanstack/react-query';
 import {
@@ -125,7 +125,6 @@ function XatuData() {
 
   return (
     <div className="space-y-6 max-w-5xl mx-auto" ref={containerReference}>
-
       {/* Overview Header */}
       <div className="relative z-10 bg-surface/50 backdrop-blur-sm rounded-lg border border-subtle p-4 shadow-sm overflow-visible">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
@@ -146,7 +145,7 @@ function XatuData() {
             </div>
             <NetworkSelector
               selectedNetwork={selectedNetwork}
-              onNetworkChange={network => setSelectedNetwork(network, 'ui')}
+              onNetworkChange={setSelectedNetwork}
               className="w-48"
             />
           </div>

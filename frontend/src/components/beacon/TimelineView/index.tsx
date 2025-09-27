@@ -1,9 +1,9 @@
 import { useEffect, useRef } from 'react';
 import { Tooltip } from 'react-tooltip';
 import { FaPlay, FaPause, FaEthereum } from 'react-icons/fa';
-import useNetwork from '@/contexts/network';
+import { useNetwork } from '@/stores/appStore';
 import { formatEntityName } from '@/utils/format.ts';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from '@tanstack/react-router';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import clsx from 'clsx';
 
@@ -62,13 +62,21 @@ export function TimelineView({
 
   const handlePreviousSlot = () => {
     if (slot) {
-      navigate(`/beacon/slot/${slot - 1}?network=${selectedNetwork}`);
+      navigate({
+        to: '/beacon/slot/$slot',
+        params: { slot: String(slot - 1) },
+        search: { network: selectedNetwork },
+      });
     }
   };
 
   const handleNextSlot = () => {
     if (slot && !isLive) {
-      navigate(`/beacon/slot/${slot + 1}?network=${selectedNetwork}`);
+      navigate({
+        to: '/beacon/slot/$slot',
+        params: { slot: String(slot + 1) },
+        search: { network: selectedNetwork },
+      });
     }
   };
 

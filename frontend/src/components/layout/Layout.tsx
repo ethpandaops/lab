@@ -1,9 +1,9 @@
-import { Outlet, useLocation } from 'react-router-dom';
+import { Outlet, useLocation } from '@tanstack/react-router';
 import { Navigation } from '@/components/layout/Navigation';
 import { Breadcrumbs } from '@/components/layout/Breadcrumbs';
 import { NetworkSelector } from '@/components/common/NetworkSelector';
 import { useEffect, useState } from 'react';
-import useNetwork from '@/contexts/network';
+import { useNetwork } from '@/stores/appStore';
 import { Logo } from '@/components/layout/Logo';
 import useBeacon from '@/contexts/beacon';
 import { Menu } from 'lucide-react';
@@ -79,7 +79,7 @@ function Layout() {
             <div className="hidden lg:flex justify-center">
               <NetworkSelector
                 selectedNetwork={selectedNetwork}
-                onNetworkChange={network => setSelectedNetwork(network, 'ui')}
+                onNetworkChange={setSelectedNetwork}
                 expandToFit={true}
               />
             </div>
@@ -164,7 +164,7 @@ function Layout() {
               <div className="p-4 border-b border-subtle space-y-3">
                 <NetworkSelector
                   selectedNetwork={selectedNetwork}
-                  onNetworkChange={network => setSelectedNetwork(network, 'ui')}
+                  onNetworkChange={setSelectedNetwork}
                   className="w-full"
                 />
 

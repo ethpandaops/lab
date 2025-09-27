@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
-import useNetwork from '@/contexts/network';
+import { useNetwork, useConfig } from '@/stores/appStore';
 import useApi from '@/contexts/api';
-import useConfig from '@/contexts/config';
 import { GetRecentLocallyBuiltBlocksRequest } from '@/api/gen/backend/pkg/api/proto/lab_api_pb';
 import {
   LocallyBuiltSlotBlocks,

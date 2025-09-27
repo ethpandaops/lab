@@ -1,9 +1,9 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, useCallback } from 'react';
 import { GlobalMap } from '@/components/beacon/GlobalMap';
 import { EventTimeline } from '@/components/beacon/EventTimeline';
 import { BottomPanel } from '@/components/beacon/BottomPanel/index';
 import { DataAvailabilityPanel } from '@/components/beacon/DataAvailabilityPanel';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from '@tanstack/react-router';
 import clsx from 'clsx';
 import { useModal } from '@/contexts/ModalContext.tsx';
 import { useSlotData } from '@/hooks/useSlotData';
@@ -53,6 +53,35 @@ export function SlotView({
   const navigate = useNavigate();
   const { showModal } = useModal();
 
+  // Memoize timeline callbacks to prevent EventTimeline re-renders
+  const handlePlayPauseClick = useCallback(() => {
+    setIsPlaying(!isPlaying);
+  }, [isPlaying]);
+
+  const handlePreviousSlot = useCallback(() => {
+    if (slot) {
+      navigate({
+        to: '/beacon/slot/$slot',
+        params: { slot: String(slot - 1) },
+        search: { network },
+      });
+    }
+  }, [slot, network, navigate]);
+
+  const handleNextSlot = useCallback(() => {
+    if (slot && !isLive) {
+      navigate({
+        to: '/beacon/slot/$slot',
+        params: { slot: String(slot + 1) },
+        search: { network },
+      });
+    }
+  }, [slot, isLive, network, navigate]);
+
+  const handleToggleCollapse = useCallback(() => {
+    setIsTimelineCollapsed(!isTimelineCollapsed);
+  }, [isTimelineCollapsed]);
+
   // Use the unified hook - it handles REST/gRPC switching internally
   const {
     data: slotData,
@@ -64,17 +93,6 @@ export function SlotView({
     isLive,
     enabled: true,
   });
-
-  // Debug: Log the full payload
-  useEffect(() => {
-    if (slotData) {
-      console.log(`=== Slot Data Payload ===`);
-      console.log(`Slot: ${slot}`);
-      console.log(`Network: ${network}`);
-      console.log('Full payload:', JSON.stringify(slotData.toJson(), null, 2));
-      console.log(`=== End Slot Data Payload ===`);
-    }
-  }, [slotData, slot, network]);
 
   // Optimistically fetch next slot data when we're close to the end
   // The unified hook will handle the prefetch internally based on API mode
@@ -448,6 +466,62 @@ export function SlotView({
     );
   }, [slotData?.nodes]);
 
+  // Memoize blobTimings transformation to avoid recreation on every render
+  const blobTimings = useMemo(() => {
+    return {
+      blobSeen: slotData?.timings?.blobSeen
+        ? Object.fromEntries(
+            Object.entries(slotData.timings.blobSeen).map(([node, blobs]) => [
+              node,
+              'timings' in blobs
+                ? Object.fromEntries(
+                    Object.entries(blobs.timings).map(([idx, time]) => [idx, Number(time)]),
+                  )
+                : Object.fromEntries(
+                    Object.entries(blobs).map(([idx, time]) => [idx, Number(time)]),
+                  ),
+            ]),
+          )
+        : undefined,
+      blobFirstSeenP2p: slotData?.timings?.blobFirstSeenP2p
+        ? Object.fromEntries(
+            Object.entries(slotData.timings.blobFirstSeenP2p).map(([node, blobs]) => [
+              node,
+              'timings' in blobs
+                ? Object.fromEntries(
+                    Object.entries(blobs.timings).map(([idx, time]) => [idx, Number(time)]),
+                  )
+                : Object.fromEntries(
+                    Object.entries(blobs).map(([idx, time]) => [idx, Number(time)]),
+                  ),
+            ]),
+          )
+        : undefined,
+      blockSeen: slotData?.timings?.blockSeen
+        ? Object.fromEntries(
+            Object.entries(slotData.timings.blockSeen).map(([node, time]) => [node, Number(time)]),
+          )
+        : undefined,
+      blockFirstSeenP2p: slotData?.timings?.blockFirstSeenP2p
+        ? Object.fromEntries(
+            Object.entries(slotData.timings.blockFirstSeenP2p).map(([node, time]) => [
+              node,
+              Number(time),
+            ]),
+          )
+        : undefined,
+    };
+  }, [slotData?.timings]);
+
+  // Memoize attestationWindows transformation
+  const attestationWindows = useMemo(() => {
+    return slotData?.attestations?.windows?.map(window => ({
+      start_ms: Number(window.startMs),
+      end_ms: Number(window.endMs),
+      validator_indices: window.validatorIndices.map(Number),
+    }));
+  }, [slotData?.attestations?.windows]);
+
   return (
     <div className="w-full flex flex-col">
       {/* Main Content */}
@@ -502,66 +576,7 @@ export function SlotView({
                       <div className="w-full max-w-lg h-[80vh] overflow-y-auto p-4">
                         <div className="flex flex-col gap-8">
                           <DataAvailabilityPanel
-                            blobTimings={{
-                              blobSeen: slotData?.timings?.blobSeen
-                                ? Object.fromEntries(
-                                    Object.entries(slotData.timings.blobSeen).map(
-                                      ([node, blobs]) => [
-                                        node,
-                                        'timings' in blobs
-                                          ? Object.fromEntries(
-                                              Object.entries(blobs.timings).map(([idx, time]) => [
-                                                idx,
-                                                Number(time),
-                                              ]),
-                                            )
-                                          : Object.fromEntries(
-                                              Object.entries(blobs).map(([idx, time]) => [
-                                                idx,
-                                                Number(time),
-                                              ]),
-                                            ),
-                                      ],
-                                    ),
-                                  )
-                                : undefined,
-                              blobFirstSeenP2p: slotData?.timings?.blobFirstSeenP2p
-                                ? Object.fromEntries(
-                                    Object.entries(slotData.timings.blobFirstSeenP2p).map(
-                                      ([node, blobs]) => [
-                                        node,
-                                        'timings' in blobs
-                                          ? Object.fromEntries(
-                                              Object.entries(blobs.timings).map(([idx, time]) => [
-                                                idx,
-                                                Number(time),
-                                              ]),
-                                            )
-                                          : Object.fromEntries(
-                                              Object.entries(blobs).map(([idx, time]) => [
-                                                idx,
-                                                Number(time),
-                                              ]),
-                                            ),
-                                      ],
-                                    ),
-                                  )
-                                : undefined,
-                              blockSeen: slotData?.timings?.blockSeen
-                                ? Object.fromEntries(
-                                    Object.entries(slotData.timings.blockSeen).map(
-                                      ([node, time]) => [node, Number(time)],
-                                    ),
-                                  )
-                                : undefined,
-                              blockFirstSeenP2p: slotData?.timings?.blockFirstSeenP2p
-                                ? Object.fromEntries(
-                                    Object.entries(slotData.timings.blockFirstSeenP2p).map(
-                                      ([node, time]) => [node, Number(time)],
-                                    ),
-                                  )
-                                : undefined,
-                            }}
+                            blobTimings={blobTimings}
                             currentTime={currentTime}
                             nodes={dataAvailabilityNodes}
                           />
@@ -572,11 +587,7 @@ export function SlotView({
                             currentTime={currentTime}
                             loading={isLoading}
                             isMissing={isMissingData}
-                            attestationWindows={slotData?.attestations?.windows?.map(window => ({
-                              start_ms: Number(window.startMs),
-                              end_ms: Number(window.endMs),
-                              validator_indices: window.validatorIndices.map(Number),
-                            }))}
+                            attestationWindows={attestationWindows}
                             maxPossibleValidators={maxPossibleValidators}
                           />
                         </div>
@@ -908,21 +919,13 @@ export function SlotView({
               events={timelineEvents}
               loading={isLoading}
               isCollapsed={false}
-              onToggleCollapse={() => {}}
+              onToggleCollapse={handleToggleCollapse}
               currentTime={currentTime / 1000}
               isPlaying={isPlaying}
-              onPlayPauseClick={() => setIsPlaying(!isPlaying)}
+              onPlayPauseClick={handlePlayPauseClick}
               slot={slot}
-              onPreviousSlot={() => {
-                if (slot) {
-                  navigate(`/beacon/slot/${slot - 1}?network=${network}`);
-                }
-              }}
-              onNextSlot={() => {
-                if (slot && !isLive) {
-                  navigate(`/beacon/slot/${slot + 1}?network=${network}`);
-                }
-              }}
+              onPreviousSlot={handlePreviousSlot}
+              onNextSlot={handleNextSlot}
               isLive={isLive}
               className="h-full pb-4"
             />
@@ -1550,21 +1553,13 @@ export function SlotView({
               events={timelineEvents}
               loading={isLoading}
               isCollapsed={isTimelineCollapsed}
-              onToggleCollapse={() => setIsTimelineCollapsed(!isTimelineCollapsed)}
+              onToggleCollapse={handleToggleCollapse}
               currentTime={currentTime / 1000}
               isPlaying={isPlaying}
-              onPlayPauseClick={() => setIsPlaying(!isPlaying)}
+              onPlayPauseClick={handlePlayPauseClick}
               slot={slot}
-              onPreviousSlot={() => {
-                if (slot) {
-                  navigate(`/beacon/slot/${slot - 1}?network=${network}`);
-                }
-              }}
-              onNextSlot={() => {
-                if (slot && !isLive) {
-                  navigate(`/beacon/slot/${slot + 1}?network=${network}`);
-                }
-              }}
+              onPreviousSlot={handlePreviousSlot}
+              onNextSlot={handleNextSlot}
               isLive={isLive}
               className="flex-1 overflow-y-auto"
             />
@@ -1579,58 +1574,7 @@ export function SlotView({
             {/* Data Availability Section */}
             <div className="col-span-2 p-4 border-r border-subtle">
               <DataAvailabilityPanel
-                blobTimings={{
-                  blobSeen: slotData?.timings?.blobSeen
-                    ? Object.fromEntries(
-                        Object.entries(slotData.timings.blobSeen).map(([node, blobs]) => [
-                          node,
-                          'timings' in blobs
-                            ? Object.fromEntries(
-                                Object.entries(blobs.timings).map(([idx, time]) => [
-                                  idx,
-                                  Number(time),
-                                ]),
-                              )
-                            : Object.fromEntries(
-                                Object.entries(blobs).map(([idx, time]) => [idx, Number(time)]),
-                              ),
-                        ]),
-                      )
-                    : undefined,
-                  blobFirstSeenP2p: slotData?.timings?.blobFirstSeenP2p
-                    ? Object.fromEntries(
-                        Object.entries(slotData.timings.blobFirstSeenP2p).map(([node, blobs]) => [
-                          node,
-                          'timings' in blobs
-                            ? Object.fromEntries(
-                                Object.entries(blobs.timings).map(([idx, time]) => [
-                                  idx,
-                                  Number(time),
-                                ]),
-                              )
-                            : Object.fromEntries(
-                                Object.entries(blobs).map(([idx, time]) => [idx, Number(time)]),
-                              ),
-                        ]),
-                      )
-                    : undefined,
-                  blockSeen: slotData?.timings?.blockSeen
-                    ? Object.fromEntries(
-                        Object.entries(slotData.timings.blockSeen).map(([node, time]) => [
-                          node,
-                          Number(time),
-                        ]),
-                      )
-                    : undefined,
-                  blockFirstSeenP2p: slotData?.timings?.blockFirstSeenP2p
-                    ? Object.fromEntries(
-                        Object.entries(slotData.timings.blockFirstSeenP2p).map(([node, time]) => [
-                          node,
-                          Number(time),
-                        ]),
-                      )
-                    : undefined,
-                }}
+                blobTimings={blobTimings}
                 currentTime={currentTime}
                 nodes={dataAvailabilityNodes}
               />
@@ -1645,11 +1589,7 @@ export function SlotView({
                 currentTime={currentTime}
                 loading={isLoading}
                 isMissing={isMissingData}
-                attestationWindows={slotData?.attestations?.windows?.map(window => ({
-                  start_ms: Number(window.startMs),
-                  end_ms: Number(window.endMs),
-                  validator_indices: window.validatorIndices.map(Number),
-                }))}
+                attestationWindows={attestationWindows}
                 maxPossibleValidators={maxPossibleValidators}
               />
             </div>

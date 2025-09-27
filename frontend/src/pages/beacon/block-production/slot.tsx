@@ -1,7 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
-import { useParams, useSearchParams } from 'react-router-dom';
-import useNetwork from '@/contexts/network';
-import useConfig from '@/contexts/config';
+import { useParams, useSearch } from '@tanstack/react-router';
+import { useNetwork, useConfig } from '@/stores/appStore';
 import { useSlotData } from '@/hooks/useSlotData';
 import { AlertCircle } from 'lucide-react';
 import {
@@ -29,7 +28,7 @@ const generateConsistentColor = (str: string): string => {
  */
 export default function BlockProductionSlotPage() {
   const { slot: slotParam } = useParams<{ slot?: string }>();
-  const [searchParams] = useSearchParams();
+  const search = useSearch({ from: '__root__' });
   const { selectedNetwork } = useNetwork();
   const { config } = useConfig();
 
@@ -49,7 +48,7 @@ export default function BlockProductionSlotPage() {
 
   // Initial time value from URL query parameter, default to 0
   // Check both 'time' and 't' parameters for backward compatibility
-  const initialTimeParam = searchParams.get('time') || searchParams.get('t');
+  const initialTimeParam = search.time || search.t;
   const initialTimeMs = initialTimeParam ? parseFloat(initialTimeParam) * 1000 : 0;
   // Initialize with time parameter
 

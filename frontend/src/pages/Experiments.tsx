@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link } from '@tanstack/react-router';
 import {
   ArrowRight,
   Activity,
@@ -12,8 +12,7 @@ import {
 } from 'lucide-react';
 import { FaEthereum } from 'react-icons/fa';
 import { Card, CardBody } from '@/components/common/Card';
-import useNetwork from '@/contexts/network';
-import useConfig from '@/contexts/config';
+import { useNetwork, useConfig } from '@/stores/appStore';
 
 interface ExperimentItem {
   id: string;

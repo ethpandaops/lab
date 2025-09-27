@@ -1,4 +1,4 @@
-import { Link, Outlet, useLocation } from 'react-router-dom';
+import { Link, Outlet, useLocation } from '@tanstack/react-router';
 import { ArrowRight, Activity, Search, Layers } from 'lucide-react';
 import { FaEthereum } from 'react-icons/fa';
 import { Card, CardBody } from '@/components/common/Card';

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useMemo, useState } from 'react';
+import { useEffect, useRef, useMemo, useState, memo } from 'react';
 import { ChevronLeft, ChevronRight, Settings, X, Box, Radio, Layers, Network } from 'lucide-react';
 import { FaPlay, FaPause } from 'react-icons/fa';
 import { useModal } from '@/contexts/ModalContext.tsx';
@@ -44,9 +44,14 @@ interface EventTimelineProps {
   className?: string;
 }
 
-function EventItem({ event, currentTime }: { event: Event; currentTime: number }) {
+const EventItem = memo(function EventItem({
+  event,
+  isActive,
+}: {
+  event: Event;
+  isActive: boolean;
+}) {
   const eventTime = event.timestamp / 1000;
-  const isActive = currentTime >= eventTime;
 
   const getEventIcon = () => {
     switch (event.type) {
@@ -118,7 +123,7 @@ function EventItem({ event, currentTime }: { event: Event; currentTime: number }
       </div>
     </div>
   );
-}
+});
 
 function ConfigPanel({
   filters,
@@ -324,7 +329,7 @@ function ConfigPanel({
   );
 }
 
-export function EventTimeline({
+export const EventTimeline = memo(function EventTimeline({
   events,
   loading,
   isCollapsed,
@@ -354,6 +359,7 @@ export function EventTimeline({
   const timelineRef = useRef<HTMLDivElement>(null);
   const lastEventRef = useRef<HTMLDivElement>(null);
   const scrollTimeoutRef = useRef<number | undefined>(undefined);
+  const lastScrolledEventIdRef = useRef<string | null>(null);
 
   // Save filters to localStorage whenever they change
   useEffect(() => {
@@ -393,89 +399,110 @@ export function EventTimeline({
       .sort((a, b) => a.timestamp - b.timestamp);
   }, [events, filters]);
 
-  // Auto scroll effect
+  // Memoize which events are active based on currentTime
+  // Use binary search to find the cutoff index since events are sorted
+  const activeEventSet = useMemo(() => {
+    const set = new Set<string>();
+
+    // Binary search to find first event after currentTime
+    let left = 0;
+    let right = sortedEvents.length;
+    const currentTimeMs = currentTime * 1000;
+
+    while (left < right) {
+      const mid = Math.floor((left + right) / 2);
+      if (sortedEvents[mid].timestamp <= currentTimeMs) {
+        left = mid + 1;
+      } else {
+        right = mid;
+      }
+    }
+
+    // All events before 'left' are active
+    for (let i = 0; i < left; i++) {
+      set.add(sortedEvents[i].id);
+    }
+
+    return set;
+  }, [sortedEvents, currentTime]);
+
+  // Memoize target event calculation to reduce work on every tick
+  const targetEventId = useMemo(() => {
+    if (activeEventSet.size === 0) return null;
+
+    // Round currentTime to reduce recalculations
+    const roundedTime = Math.floor(currentTime * 10) / 10;
+
+    // Get active events (already filtered by activeEventSet)
+    const activeEvents = sortedEvents.filter(e => activeEventSet.has(e.id));
+
+    if (roundedTime < 1) {
+      return activeEvents[0].id;
+    } else if (roundedTime >= 11) {
+      return activeEvents[activeEvents.length - 1].id;
+    } else {
+      const closestEvent = activeEvents.reduce((prev, curr) => {
+        const prevDiff = Math.abs(prev.timestamp / 1000 - roundedTime);
+        const currDiff = Math.abs(curr.timestamp / 1000 - roundedTime);
+        return currDiff < prevDiff ? curr : prev;
+      });
+      return closestEvent.id;
+    }
+  }, [sortedEvents, currentTime, activeEventSet]);
+
+  // Auto scroll effect - simplified to use memoized targetEventId
   useEffect(() => {
     if (!timelineRef.current || loading || isCollapsed) return;
+
+    // Skip if we're already scrolled to this event
+    if (targetEventId === lastScrolledEventIdRef.current) return;
 
     // Clear any pending scroll timeout
     if (scrollTimeoutRef.current) {
       window.clearTimeout(scrollTimeoutRef.current);
     }
 
-    // Find active events (events that have occurred before or at the current time)
-    const activeEvents = sortedEvents.filter(event => currentTime >= event.timestamp / 1000);
-
     // Debounce scroll updates
     scrollTimeoutRef.current = window.setTimeout(
       () => {
         if (!timelineRef.current) return;
 
-        if (activeEvents.length > 0) {
-          // Find the event closest to the current time
-          // This ensures we're always focusing on the most relevant event
-          let targetEventId;
-
-          // If we're at the beginning, use the first event
-          if (currentTime < 1) {
-            targetEventId = activeEvents[0].id;
-          }
-          // If we're at the end, use the last event
-          else if (currentTime >= 11) {
-            targetEventId = activeEvents[activeEvents.length - 1].id;
-          }
-          // Otherwise, find the event closest to the current time
-          else {
-            // Find the event with timestamp closest to current time
-            const closestEvent = activeEvents.reduce((prev, curr) => {
-              const prevDiff = Math.abs(prev.timestamp / 1000 - currentTime);
-              const currDiff = Math.abs(curr.timestamp / 1000 - currentTime);
-              return currDiff < prevDiff ? curr : prev;
-            });
-            targetEventId = closestEvent.id;
-          }
-
+        if (targetEventId) {
           const targetElement = timelineRef.current.querySelector(
             `[data-event-id="${targetEventId}"]`,
           );
 
           if (targetElement) {
-            // Get the container's height
             const containerHeight = timelineRef.current.clientHeight;
-
-            // Position the active event at 50% of the container height
-            // This ensures we can see both previous and upcoming events
             const offset = containerHeight * 0.5;
-
-            // Get the element's position relative to the container
             const elementTop =
               targetElement.getBoundingClientRect().top -
               timelineRef.current.getBoundingClientRect().top;
-
-            // Calculate the target scroll position
             const targetScroll = timelineRef.current.scrollTop + elementTop - offset;
 
-            // Smooth scroll to position - use 'auto' for mobile to ensure it works reliably
             const isMobile = window.innerWidth < 768;
             timelineRef.current.scrollTo({
               top: targetScroll,
               behavior: isMobile ? 'auto' : isPlaying ? 'auto' : 'smooth',
             });
+
+            lastScrolledEventIdRef.current = targetEventId;
           }
         } else {
-          // Snap back to top when no active events (slot finished)
+          // Snap back to top when no active events
           timelineRef.current.scrollTo({ top: 0, behavior: 'instant' });
+          lastScrolledEventIdRef.current = null;
         }
       },
-      isPlaying ? 50 : 0,
-    ); // Small delay during playback, immediate during manual scrubbing
+      isPlaying ? 100 : 0,
+    );
 
-    // Cleanup timeout on unmount
     return () => {
       if (scrollTimeoutRef.current) {
         window.clearTimeout(scrollTimeoutRef.current);
       }
     };
-  }, [events, loading, isCollapsed, currentTime, sortedEvents, isPlaying]);
+  }, [loading, isCollapsed, targetEventId, isPlaying]);
 
   const handleOpenConfig = () => {
     showModal(
@@ -667,7 +694,7 @@ export function EventTimeline({
                 data-event-id={event.id}
                 ref={index === sortedEvents.length - 1 ? lastEventRef : null}
               >
-                <EventItem event={event} currentTime={currentTime} />
+                <EventItem event={event} isActive={activeEventSet.has(event.id)} />
               </div>
             ))
           )}
@@ -675,4 +702,4 @@ export function EventTimeline({
       </div>
     </div>
   );
-}
+});

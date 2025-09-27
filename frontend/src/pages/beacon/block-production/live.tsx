@@ -3,8 +3,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import useBeacon from '@/contexts/beacon';
 import { useSlotData } from '@/hooks/useSlotData';
 import SlotDataStore from '@/utils/SlotDataStore';
-import useNetwork from '@/contexts/network';
-import useConfig from '@/contexts/config';
+import { useNetwork, useConfig } from '@/stores/appStore';
 import { TimelineProvider } from '@/contexts/timeline';
 import { AlertCircle } from 'lucide-react';
 import {

@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from '@tanstack/react-router';
 
 interface RedirectProps {
   to: string;
@@ -12,7 +12,7 @@ const Redirect: React.FC<RedirectProps> = ({ to }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    navigate(to, { replace: true });
+    navigate({ to: to as any, replace: true });
   }, [navigate, to]);
 
   return null;

@@ -1,13 +1,12 @@
 import { useEffect } from 'react';
-import { useParams, useSearchParams } from 'react-router-dom';
+import { useParams, useSearch } from '@tanstack/react-router';
 import { SlotView } from '@/components/beacon/SlotView';
-import useNetwork from '@/contexts/network';
-import useConfig from '@/contexts/config';
+import { useNetwork, useConfig } from '@/stores/appStore';
 import { AlertCircle } from 'lucide-react';
 
 function BeaconSlot() {
   const { slot } = useParams<{ slot: string }>();
-  const [searchParams, setSearchParams] = useSearchParams();
+  const search = useSearch({ from: '__root__' });
   const { selectedNetwork } = useNetwork();
   const { config } = useConfig();
 
@@ -25,12 +24,7 @@ function BeaconSlot() {
     return experiment?.enabled ? experiment?.networks || [] : [];
   };
 
-  // Update URL when network changes
-  useEffect(() => {
-    const params = new URLSearchParams(searchParams);
-    params.set('network', selectedNetwork);
-    setSearchParams(params);
-  }, [selectedNetwork, setSearchParams, searchParams]);
+  // Network is managed by root route search params
 
   // Show not available message if experiment isn't enabled for this network
   if (!isExperimentAvailable()) {
