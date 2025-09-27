@@ -78,8 +78,9 @@ export function NetworkSelector({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Get available networks from props or config
-  const unsortedNetworks: string[] = [...(availableNetworksFromContext ?? ['mainnet'])];
+  // Get available networks from context
+  // Note: Root loader guarantees networks are loaded before this component renders
+  const unsortedNetworks: string[] = [...(availableNetworksFromContext ?? [])];
 
   // Sort networks according to the specified order
   const networks = sortNetworks(unsortedNetworks);

@@ -1,4 +1,5 @@
 import { createRootRoute, Outlet } from '@tanstack/react-router';
+import { useEffect } from 'react';
 import { z } from 'zod';
 import { TanStackRouterDevtools } from '@tanstack/router-devtools';
 import fetchBootstrap from '@/bootstrap';
@@ -12,7 +13,7 @@ import { useAppStore } from '@/stores/appStore';
 import ScrollToTop from '@/components/common/ScrollToTop';
 
 const searchSchema = z.object({
-  network: z.string().optional().default('mainnet'),
+  network: z.string().optional(),
 });
 
 export const Route = createRootRoute({
@@ -29,6 +30,11 @@ export const Route = createRootRoute({
     }
 
     const availableNetworks = Object.keys(response.config.ethereum?.networks || {});
+
+    if (availableNetworks.length === 0) {
+      throw new Error('No networks configured in API response');
+    }
+
     const client = createLabApiClient(bootstrap.backend.url);
 
     return {
@@ -40,22 +46,6 @@ export const Route = createRootRoute({
     };
   },
 
-  beforeLoad: ({ search, context }) => {
-    const { setConfig, setAvailableNetworks, setSelectedNetwork } = useAppStore.getState();
-
-    if (context.loaderData) {
-      const { config, availableNetworks } = context.loaderData;
-      setConfig(config);
-      setAvailableNetworks(availableNetworks);
-
-      if (search.network && availableNetworks.includes(search.network)) {
-        setSelectedNetwork(search.network);
-      } else if (!availableNetworks.includes(search.network)) {
-        setSelectedNetwork(availableNetworks[0] || 'mainnet');
-      }
-    }
-  },
-
   component: RootComponent,
   pendingComponent: () => <LoadingState message="Loading configuration..." />,
   errorComponent: ({ error }) => (
@@ -64,7 +54,35 @@ export const Route = createRootRoute({
 });
 
 function RootComponent() {
-  const { bootstrap, config, client, restApiUrl } = Route.useLoaderData();
+  const { bootstrap, config, availableNetworks, client, restApiUrl } = Route.useLoaderData();
+  const search = Route.useSearch();
+
+  // Populate Zustand store with loader data
+  useEffect(() => {
+    const { setConfig, setAvailableNetworks, setSelectedNetwork } = useAppStore.getState();
+
+    setConfig(config);
+    setAvailableNetworks(availableNetworks);
+
+    // Determine which network to select
+    let networkToSelect: string;
+
+    if (search.network && availableNetworks.includes(search.network)) {
+      // URL param is valid, use it
+      networkToSelect = search.network;
+    } else if (!search.network && availableNetworks.includes('mainnet')) {
+      // No URL param and mainnet exists → default to mainnet (don't show in URL)
+      networkToSelect = 'mainnet';
+    } else if (!search.network) {
+      // No URL param and no mainnet → default to first available
+      networkToSelect = availableNetworks[0];
+    } else {
+      // URL param exists but not in available networks → fallback to mainnet or first
+      networkToSelect = availableNetworks.includes('mainnet') ? 'mainnet' : availableNetworks[0];
+    }
+
+    setSelectedNetwork(networkToSelect);
+  }, [config, availableNetworks, search.network]);
 
   return (
     <ApplicationProvider

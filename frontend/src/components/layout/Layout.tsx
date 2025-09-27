@@ -1,4 +1,4 @@
-import { Outlet, useLocation } from '@tanstack/react-router';
+import { Outlet, useLocation, useNavigate } from '@tanstack/react-router';
 import { Navigation } from '@/components/layout/Navigation';
 import { Breadcrumbs } from '@/components/layout/Breadcrumbs';
 import { NetworkSelector } from '@/components/common/NetworkSelector';
@@ -14,6 +14,7 @@ import useApiMode from '@/contexts/apiMode';
 
 function Layout() {
   const location = useLocation();
+  const navigate = useNavigate();
   const isHome = location.pathname === '/';
   const { selectedNetwork, setSelectedNetwork } = useNetwork();
   const [currentSlot, setCurrentSlot] = useState<number | null>(null);
@@ -33,6 +34,17 @@ function Layout() {
   useEffect(() => {
     setIsMobileMenuOpen(false);
   }, [location]);
+
+  // Sync URL search params with selected network
+  useEffect(() => {
+    navigate({
+      search: prev => ({
+        ...prev,
+        network: selectedNetwork === 'mainnet' ? undefined : selectedNetwork,
+      }),
+      replace: true,
+    });
+  }, [selectedNetwork, navigate]);
 
   // Update slot and epoch every second
   useEffect(() => {

@@ -77,7 +77,7 @@ function isNodeOffline(node: ContributorNode, updatedAt: number): boolean {
 }
 
 function ContributorDetail() {
-  const { name } = useParams<{ name: string }>();
+  const { name } = useParams({ from: '/_layout/xatu-data/contributors/$name' });
   const { selectedNetwork, setSelectedNetwork } = useNetwork();
 
   // Fetch contributor data using REST API only - no conditionals!
