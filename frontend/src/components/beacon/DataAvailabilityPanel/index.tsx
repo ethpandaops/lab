@@ -1,4 +1,4 @@
-import { useMemo, memo } from 'react';
+import { useMemo, memo, useRef, useEffect } from 'react';
 import { ChartWithStats, NivoLineChart, NivoScatterChart } from '@/components/charts';
 import { CheckCircle2, XCircle, HelpCircle } from 'lucide-react';
 import { useModal } from '@/contexts/ModalContext.tsx';

@@ -26,9 +26,7 @@ export const IntegratedContextualHeader: React.FC<IntegratedContextualHeaderProp
             {/* Added truncate */}
             {title}
           </h2>
-          {description && (
-            <p className="text-sm font-mono text-secondary max-w-3xl">{description}</p>
-          )}
+          {description && <p className="text-sm font-mono text-secondary max-w-3xl">{description}</p>}
         </div>
         {/* Right: Controls/Actions */}
         {actions && (

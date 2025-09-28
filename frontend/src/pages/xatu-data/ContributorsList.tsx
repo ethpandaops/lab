@@ -95,8 +95,8 @@ const ContributorsList = () => {
           <div className="flex flex-col">
             <h2 className="text-xl font-sans font-bold text-primary mb-2">About</h2>
             <p className="text-base font-mono text-secondary">
-              These are the amazing contributors who are helping us monitor the Ethereum network.
-              All data is anonymized and no personally identifiable information is collected.
+              These are the amazing contributors who are helping us monitor the Ethereum network. All data is anonymized
+              and no personally identifiable information is collected.
             </p>
             <div className="text-sm font-mono text-tertiary mt-4">
               Last updated{' '}
@@ -123,11 +123,7 @@ const ContributorsList = () => {
                 {summaryData.contributors.length} active contributors on {selectedNetwork}
               </p>
             </div>
-            <NetworkSelector
-              selectedNetwork={selectedNetwork}
-              onNetworkChange={setSelectedNetwork}
-              className="w-48"
-            />
+            <NetworkSelector selectedNetwork={selectedNetwork} onNetworkChange={setSelectedNetwork} className="w-48" />
           </div>
         </div>
         <div className="card-body">
@@ -181,18 +177,14 @@ const ContributorsList = () => {
                               {contributor.name}
                             </h3>
                             <div className="flex items-baseline gap-1">
-                              <span className="text-lg font-bold text-accent">
-                                {contributor.node_count}
-                              </span>
+                              <span className="text-lg font-bold text-accent">{contributor.node_count}</span>
                               <span className="text-xs text-tertiary">
                                 node{contributor.node_count !== 1 ? 's' : ''}
                               </span>
                             </div>
                           </div>
 
-                          <div className="text-xs text-secondary">
-                            {formatTimestamp(contributor.updated_at)}
-                          </div>
+                          <div className="text-xs text-secondary">{formatTimestamp(contributor.updated_at)}</div>
                         </div>
                       </div>
                     </div>
@@ -206,8 +198,8 @@ const ContributorsList = () => {
       {/* Data Note */}
       <div className="text-center py-4">
         <p className="text-xs font-mono text-tertiary">
-          Note: This data represents only nodes sending data to the Xatu project and is not
-          representative of the total network.
+          Note: This data represents only nodes sending data to the Xatu project and is not representative of the total
+          network.
         </p>
       </div>
     </div>

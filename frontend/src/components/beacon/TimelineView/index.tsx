@@ -82,8 +82,7 @@ export function TimelineView({
 
   // Auto-scroll to keep current time position visible
   useEffect(() => {
-    if (!timelineRef.current || loading || !attestationWindows || attestationWindows.length === 0)
-      return;
+    if (!timelineRef.current || loading || !attestationWindows || attestationWindows.length === 0) return;
 
     const container = timelineRef.current;
     const containerHeight = container.clientHeight;
@@ -116,7 +115,7 @@ export function TimelineView({
       <div
         className={clsx(
           'relative backdrop-blur-lg bg-surface/40 ring-1 ring-inset ring-white/5 rounded-lg overflow-hidden',
-          loading && 'animate-pulse',
+          loading && 'animate-pulse'
         )}
       >
         {/* Header with info */}
@@ -132,9 +131,7 @@ export function TimelineView({
                 </>
               ) : (
                 <>
-                  <div className="text-3xl sm:text-4xl font-mono font-bold text-primary">
-                    {slot}
-                  </div>
+                  <div className="text-3xl sm:text-4xl font-mono font-bold text-primary">{slot}</div>
                   <div className="flex items-baseline gap-2">
                     <span className="text-tertiary/50 text-base sm:text-lg">by</span>
                     {entity ? (
@@ -154,9 +151,7 @@ export function TimelineView({
                         </span>
                       </a>
                     ) : (
-                      <span className="text-xl sm:text-2xl font-mono font-medium text-accent">
-                        Unknown
-                      </span>
+                      <span className="text-xl sm:text-2xl font-mono font-medium text-accent">Unknown</span>
                     )}
                   </div>
                 </>
@@ -180,7 +175,7 @@ export function TimelineView({
                     'w-12 h-12 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center transition-all border touch-manipulation',
                     isLive
                       ? 'opacity-50 cursor-not-allowed bg-surface/50 border-text-muted/50'
-                      : 'bg-surface hover:bg-hover border-text-muted',
+                      : 'bg-surface hover:bg-hover border-text-muted'
                   )}
                 >
                   <ChevronRight className="w-6 h-6 sm:w-5 sm:h-5" />
@@ -200,9 +195,7 @@ export function TimelineView({
                   )}
                 </button>
                 <div className="text-center">
-                  <span className="font-mono text-lg sm:text-xl text-primary">
-                    {(currentTime / 1000).toFixed(1)}s
-                  </span>
+                  <span className="font-mono text-lg sm:text-xl text-primary">{(currentTime / 1000).toFixed(1)}s</span>
                 </div>
               </div>
             </div>

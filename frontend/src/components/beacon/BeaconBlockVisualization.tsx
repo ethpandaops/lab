@@ -47,10 +47,7 @@ const BeaconBlockVisualization: React.FC<BeaconBlockVisualizationProps> = ({
 
   // A flowing data block approach - showing the block in transit
   return (
-    <div
-      className={`h-full w-full flex items-center justify-center ${className}`}
-      style={{ width, height }}
-    >
+    <div className={`h-full w-full flex items-center justify-center ${className}`} style={{ width, height }}>
       <div className="w-full max-w-2xl mx-auto h-full flex flex-col justify-center relative">
         {/* Flow indicators with animation showing data movement left-to-right */}
         <style>{`
@@ -144,11 +141,7 @@ const BeaconBlockVisualization: React.FC<BeaconBlockVisualizationProps> = ({
           {/* Arrow indicators for flow direction - larger arrows, positioned outside the block */}
           <div className="absolute top-1/2 -left-14 transform -translate-y-5 z-20">
             <div className="p-1 bg-gold/20 rounded-full border border-gold/30">
-              <svg
-                className="h-10 w-10 text-gold drop-shadow-lg"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-              >
+              <svg className="h-10 w-10 text-gold drop-shadow-lg" viewBox="0 0 20 20" fill="currentColor">
                 <path
                   fillRule="evenodd"
                   d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z"
@@ -159,11 +152,7 @@ const BeaconBlockVisualization: React.FC<BeaconBlockVisualizationProps> = ({
           </div>
           <div className="absolute top-1/2 -right-14 transform -translate-y-5 z-20">
             <div className="p-1 bg-gold/20 rounded-full border border-gold/30">
-              <svg
-                className="h-10 w-10 text-gold drop-shadow-lg"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-              >
+              <svg className="h-10 w-10 text-gold drop-shadow-lg" viewBox="0 0 20 20" fill="currentColor">
                 <path
                   fillRule="evenodd"
                   d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z"
@@ -176,27 +165,9 @@ const BeaconBlockVisualization: React.FC<BeaconBlockVisualizationProps> = ({
           <div className="p-4 border-b border-white/5 flex items-center justify-between">
             <div className="flex items-center">
               <div className="w-10 h-10 flex-shrink-0 mr-3 bg-gold/10 rounded-md border border-gold/20 flex items-center justify-center">
-                <svg
-                  className="w-5 h-5 text-gold"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <rect
-                    x="3"
-                    y="3"
-                    width="18"
-                    height="18"
-                    rx="2"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                  />
-                  <path
-                    d="M16 8H8M16 12H8M16 16H8"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                  />
+                <svg className="w-5 h-5 text-gold" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" strokeWidth="2" />
+                  <path d="M16 8H8M16 12H8M16 16H8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                 </svg>
               </div>
               <div>
@@ -207,8 +178,7 @@ const BeaconBlockVisualization: React.FC<BeaconBlockVisualizationProps> = ({
                 <p className="text-xs mt-0.5 flex items-center">
                   <span className="text-white/60">Proposer:</span>
                   <span className="text-white/80 ml-1 font-medium">
-                    {proposer_entity ||
-                      (proposer_index ? `Validator ${proposer_index}` : 'Unknown')}
+                    {proposer_entity || (proposer_index ? `Validator ${proposer_index}` : 'Unknown')}
                   </span>
                 </p>
               </div>
@@ -249,18 +219,14 @@ const BeaconBlockVisualization: React.FC<BeaconBlockVisualizationProps> = ({
             {/* Transaction count */}
             <div className="flex flex-col p-3 bg-surface/5">
               <span className="text-xs text-white/50 uppercase tracking-wider">Transactions</span>
-              <span className="text-sm font-medium text-amber-400 mt-1 font-mono">
-                {txCount.toLocaleString()}
-              </span>
+              <span className="text-sm font-medium text-amber-400 mt-1 font-mono">{txCount.toLocaleString()}</span>
             </div>
 
             {/* Blob count - only shown if there are blobs */}
             {blobsCount > 0 && (
               <div className="flex flex-col p-3 bg-surface/5">
                 <span className="text-xs text-white/50 uppercase tracking-wider">Blobs</span>
-                <span className="text-sm font-medium text-purple-400 mt-1 font-mono">
-                  {blobsCount}
-                </span>
+                <span className="text-sm font-medium text-purple-400 mt-1 font-mono">{blobsCount}</span>
               </div>
             )}
 
@@ -276,9 +242,7 @@ const BeaconBlockVisualization: React.FC<BeaconBlockVisualizationProps> = ({
           {/* Block contents section */}
           <div className="px-4 pb-1 pt-2">
             <div className="mb-2">
-              <h4 className="text-xs font-medium uppercase tracking-wider text-white/60">
-                Block Contents
-              </h4>
+              <h4 className="text-xs font-medium uppercase tracking-wider text-white/60">Block Contents</h4>
             </div>
 
             {/* Transaction section */}
@@ -316,8 +280,7 @@ const BeaconBlockVisualization: React.FC<BeaconBlockVisualizationProps> = ({
                         key={i}
                         className="w-2.5 h-2.5 rounded-full"
                         style={{
-                          backgroundColor:
-                            i % 5 === 0 ? 'rgba(245, 158, 11, 0.7)' : 'rgba(245, 158, 11, 0.5)',
+                          backgroundColor: i % 5 === 0 ? 'rgba(245, 158, 11, 0.7)' : 'rgba(245, 158, 11, 0.5)',
                         }}
                       />
                     ))}
@@ -333,9 +296,7 @@ const BeaconBlockVisualization: React.FC<BeaconBlockVisualizationProps> = ({
                   </div>
                 </div>
               ) : (
-                <div className="h-16 flex items-center justify-center text-white/30 text-sm p-3">
-                  No transactions
-                </div>
+                <div className="h-16 flex items-center justify-center text-white/30 text-sm p-3">No transactions</div>
               )}
             </div>
 

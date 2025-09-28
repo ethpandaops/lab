@@ -94,16 +94,12 @@ export function NetworkSelector({
           <Listbox.Button
             className={clsx(
               'relative cursor-pointer rounded-lg bg-surface/30 backdrop-blur-sm py-2 pl-3 pr-10 text-left shadow-sm border border-subtle hover:bg-surface/50 transition-colors',
-              expandToFit ? 'w-auto min-w-[140px]' : 'w-full',
+              expandToFit ? 'w-auto min-w-[140px]' : 'w-full'
             )}
           >
             <span className="flex items-center gap-2">
-              <span className="w-5 h-5 flex items-center justify-center flex-shrink-0">
-                {selectedMetadata.icon}
-              </span>
-              <span
-                className={clsx('block font-mono', expandToFit ? 'whitespace-nowrap' : 'truncate')}
-              >
+              <span className="w-5 h-5 flex items-center justify-center flex-shrink-0">{selectedMetadata.icon}</span>
+              <span className={clsx('block font-mono', expandToFit ? 'whitespace-nowrap' : 'truncate')}>
                 {selectedMetadata.name}
               </span>
             </span>
@@ -111,16 +107,11 @@ export function NetworkSelector({
               <ChevronUpDownIcon className="h-5 w-5 text-tertiary" aria-hidden="true" />
             </span>
           </Listbox.Button>
-          <Transition
-            as={Fragment}
-            leave="transition ease-in duration-100"
-            leaveFrom="opacity-100"
-            leaveTo="opacity-0"
-          >
+          <Transition as={Fragment} leave="transition ease-in duration-100" leaveFrom="opacity-100" leaveTo="opacity-0">
             <Listbox.Options
               className={clsx(
                 'absolute z-[9999] mt-1 max-h-60 overflow-auto rounded-lg bg-surface py-1 shadow-lg border border-subtle',
-                expandToFit ? 'min-w-full w-max' : 'w-full',
+                expandToFit ? 'min-w-full w-max' : 'w-full'
               )}
             >
               {networks.map(network => {
@@ -131,21 +122,19 @@ export function NetworkSelector({
                     className={({ active }) =>
                       clsx(
                         'relative cursor-pointer select-none py-2 pl-3 pr-9 font-mono bg-surface',
-                        active ? 'bg-hover text-accent' : 'text-primary',
+                        active ? 'bg-hover text-accent' : 'text-primary'
                       )
                     }
                     value={network}
                   >
                     {({ selected }) => (
                       <span className="flex items-center gap-2">
-                        <span className="w-5 h-5 flex items-center justify-center flex-shrink-0">
-                          {metadata.icon}
-                        </span>
+                        <span className="w-5 h-5 flex items-center justify-center flex-shrink-0">{metadata.icon}</span>
                         <span
                           className={clsx(
                             'block',
                             expandToFit ? 'whitespace-nowrap' : 'truncate',
-                            selected && 'text-accent',
+                            selected && 'text-accent'
                           )}
                         >
                           {metadata.name}

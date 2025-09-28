@@ -238,7 +238,8 @@ function Layout() {
             className={clsx(
               'w-full',
               location.pathname === '/beacon/slot/live' ||
-                /^\/beacon\/slot\/\d+$/.test(location.pathname)
+                /^\/beacon\/slot\/\d+$/.test(location.pathname) ||
+                /^\/experiments\/[^/]+$/.test(location.pathname)
                 ? 'h-[calc(100vh-56px)]'
                 : ['min-h-0', 'p-2 md:p-4 lg:p-6'],
             )}
@@ -247,7 +248,8 @@ function Layout() {
               className={clsx(
                 'relative',
                 location.pathname === '/beacon/slot/live' ||
-                  /^\/beacon\/slot\/\d+$/.test(location.pathname)
+                  /^\/beacon\/slot\/\d+$/.test(location.pathname) ||
+                  /^\/experiments\/[^/]+$/.test(location.pathname)
                   ? 'h-full'
                   : ['p-4 md:p-6 lg:p-8'],
               )}

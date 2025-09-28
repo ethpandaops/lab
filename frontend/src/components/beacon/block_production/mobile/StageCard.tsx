@@ -85,11 +85,7 @@ const StageCard: React.FC<StageCardProps> = ({
               : 'bg-surface/20 border border-subtle/50 opacity-50' // Inactive state
           }`}
         >
-          <div
-            className={`text-xl ${isActive ? 'opacity-70' : 'opacity-40'}`}
-            role="img"
-            aria-label={emojiLabel}
-          >
+          <div className={`text-xl ${isActive ? 'opacity-70' : 'opacity-40'}`} role="img" aria-label={emojiLabel}>
             {emoji}
           </div>
         </div>

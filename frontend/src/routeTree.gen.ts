@@ -16,11 +16,14 @@ import { Route as LayoutExperimentsRouteImport } from './routes/_layout.experime
 import { Route as LayoutBeaconRouteImport } from './routes/_layout.beacon'
 import { Route as LayoutAboutRouteImport } from './routes/_layout.about'
 import { Route as LayoutXatuDataIndexRouteImport } from './routes/_layout.xatu-data.index'
+import { Route as LayoutExperimentsIndexRouteImport } from './routes/_layout.experiments.index'
 import { Route as LayoutXatuDataNetworksRouteImport } from './routes/_layout.xatu-data.networks'
 import { Route as LayoutXatuDataGeographicalChecklistRouteImport } from './routes/_layout.xatu-data.geographical-checklist'
 import { Route as LayoutXatuDataForkReadinessRouteImport } from './routes/_layout.xatu-data.fork-readiness'
+import { Route as LayoutExperimentsExperimentIdRouteImport } from './routes/_layout.experiments.$experimentId'
 import { Route as LayoutBeaconLocallyBuiltBlocksRouteImport } from './routes/_layout.beacon.locally-built-blocks'
 import { Route as LayoutXatuDataContributorsIndexRouteImport } from './routes/_layout.xatu-data.contributors.index'
+import { Route as LayoutExperimentsExperimentIdIndexRouteImport } from './routes/_layout.experiments.$experimentId.index'
 import { Route as LayoutBeaconSlotIndexRouteImport } from './routes/_layout.beacon.slot.index'
 import { Route as LayoutBeaconBlockProductionIndexRouteImport } from './routes/_layout.beacon.block-production.index'
 import { Route as LayoutXatuDataContributorsNameRouteImport } from './routes/_layout.xatu-data.contributors.$name'
@@ -63,6 +66,11 @@ const LayoutXatuDataIndexRoute = LayoutXatuDataIndexRouteImport.update({
   path: '/xatu-data/',
   getParentRoute: () => LayoutRoute,
 } as any)
+const LayoutExperimentsIndexRoute = LayoutExperimentsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => LayoutExperimentsRoute,
+} as any)
 const LayoutXatuDataNetworksRoute = LayoutXatuDataNetworksRouteImport.update({
   id: '/xatu-data/networks',
   path: '/xatu-data/networks',
@@ -80,6 +88,12 @@ const LayoutXatuDataForkReadinessRoute =
     path: '/xatu-data/fork-readiness',
     getParentRoute: () => LayoutRoute,
   } as any)
+const LayoutExperimentsExperimentIdRoute =
+  LayoutExperimentsExperimentIdRouteImport.update({
+    id: '/$experimentId',
+    path: '/$experimentId',
+    getParentRoute: () => LayoutExperimentsRoute,
+  } as any)
 const LayoutBeaconLocallyBuiltBlocksRoute =
   LayoutBeaconLocallyBuiltBlocksRouteImport.update({
     id: '/locally-built-blocks',
@@ -91,6 +105,12 @@ const LayoutXatuDataContributorsIndexRoute =
     id: '/xatu-data/contributors/',
     path: '/xatu-data/contributors/',
     getParentRoute: () => LayoutRoute,
+  } as any)
+const LayoutExperimentsExperimentIdIndexRoute =
+  LayoutExperimentsExperimentIdIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => LayoutExperimentsExperimentIdRoute,
   } as any)
 const LayoutBeaconSlotIndexRoute = LayoutBeaconSlotIndexRouteImport.update({
   id: '/slot/',
@@ -135,13 +155,15 @@ const LayoutBeaconBlockProductionSlotRoute =
 export interface FileRoutesByFullPath {
   '/about': typeof LayoutAboutRoute
   '/beacon': typeof LayoutBeaconRouteWithChildren
-  '/experiments': typeof LayoutExperimentsRoute
+  '/experiments': typeof LayoutExperimentsRouteWithChildren
   '/xatu': typeof LayoutXatuRoute
   '/': typeof LayoutIndexRoute
   '/beacon/locally-built-blocks': typeof LayoutBeaconLocallyBuiltBlocksRoute
+  '/experiments/$experimentId': typeof LayoutExperimentsExperimentIdRouteWithChildren
   '/xatu-data/fork-readiness': typeof LayoutXatuDataForkReadinessRoute
   '/xatu-data/geographical-checklist': typeof LayoutXatuDataGeographicalChecklistRoute
   '/xatu-data/networks': typeof LayoutXatuDataNetworksRoute
+  '/experiments/': typeof LayoutExperimentsIndexRoute
   '/xatu-data': typeof LayoutXatuDataIndexRoute
   '/beacon/block-production/$slot': typeof LayoutBeaconBlockProductionSlotRoute
   '/beacon/block-production/live': typeof LayoutBeaconBlockProductionLiveRoute
@@ -150,18 +172,19 @@ export interface FileRoutesByFullPath {
   '/xatu-data/contributors/$name': typeof LayoutXatuDataContributorsNameRoute
   '/beacon/block-production': typeof LayoutBeaconBlockProductionIndexRoute
   '/beacon/slot': typeof LayoutBeaconSlotIndexRoute
+  '/experiments/$experimentId/': typeof LayoutExperimentsExperimentIdIndexRoute
   '/xatu-data/contributors': typeof LayoutXatuDataContributorsIndexRoute
 }
 export interface FileRoutesByTo {
   '/about': typeof LayoutAboutRoute
   '/beacon': typeof LayoutBeaconRouteWithChildren
-  '/experiments': typeof LayoutExperimentsRoute
   '/xatu': typeof LayoutXatuRoute
   '/': typeof LayoutIndexRoute
   '/beacon/locally-built-blocks': typeof LayoutBeaconLocallyBuiltBlocksRoute
   '/xatu-data/fork-readiness': typeof LayoutXatuDataForkReadinessRoute
   '/xatu-data/geographical-checklist': typeof LayoutXatuDataGeographicalChecklistRoute
   '/xatu-data/networks': typeof LayoutXatuDataNetworksRoute
+  '/experiments': typeof LayoutExperimentsIndexRoute
   '/xatu-data': typeof LayoutXatuDataIndexRoute
   '/beacon/block-production/$slot': typeof LayoutBeaconBlockProductionSlotRoute
   '/beacon/block-production/live': typeof LayoutBeaconBlockProductionLiveRoute
@@ -170,6 +193,7 @@ export interface FileRoutesByTo {
   '/xatu-data/contributors/$name': typeof LayoutXatuDataContributorsNameRoute
   '/beacon/block-production': typeof LayoutBeaconBlockProductionIndexRoute
   '/beacon/slot': typeof LayoutBeaconSlotIndexRoute
+  '/experiments/$experimentId': typeof LayoutExperimentsExperimentIdIndexRoute
   '/xatu-data/contributors': typeof LayoutXatuDataContributorsIndexRoute
 }
 export interface FileRoutesById {
@@ -177,13 +201,15 @@ export interface FileRoutesById {
   '/_layout': typeof LayoutRouteWithChildren
   '/_layout/about': typeof LayoutAboutRoute
   '/_layout/beacon': typeof LayoutBeaconRouteWithChildren
-  '/_layout/experiments': typeof LayoutExperimentsRoute
+  '/_layout/experiments': typeof LayoutExperimentsRouteWithChildren
   '/_layout/xatu': typeof LayoutXatuRoute
   '/_layout/': typeof LayoutIndexRoute
   '/_layout/beacon/locally-built-blocks': typeof LayoutBeaconLocallyBuiltBlocksRoute
+  '/_layout/experiments/$experimentId': typeof LayoutExperimentsExperimentIdRouteWithChildren
   '/_layout/xatu-data/fork-readiness': typeof LayoutXatuDataForkReadinessRoute
   '/_layout/xatu-data/geographical-checklist': typeof LayoutXatuDataGeographicalChecklistRoute
   '/_layout/xatu-data/networks': typeof LayoutXatuDataNetworksRoute
+  '/_layout/experiments/': typeof LayoutExperimentsIndexRoute
   '/_layout/xatu-data/': typeof LayoutXatuDataIndexRoute
   '/_layout/beacon/block-production/$slot': typeof LayoutBeaconBlockProductionSlotRoute
   '/_layout/beacon/block-production/live': typeof LayoutBeaconBlockProductionLiveRoute
@@ -192,6 +218,7 @@ export interface FileRoutesById {
   '/_layout/xatu-data/contributors/$name': typeof LayoutXatuDataContributorsNameRoute
   '/_layout/beacon/block-production/': typeof LayoutBeaconBlockProductionIndexRoute
   '/_layout/beacon/slot/': typeof LayoutBeaconSlotIndexRoute
+  '/_layout/experiments/$experimentId/': typeof LayoutExperimentsExperimentIdIndexRoute
   '/_layout/xatu-data/contributors/': typeof LayoutXatuDataContributorsIndexRoute
 }
 export interface FileRouteTypes {
@@ -203,9 +230,11 @@ export interface FileRouteTypes {
     | '/xatu'
     | '/'
     | '/beacon/locally-built-blocks'
+    | '/experiments/$experimentId'
     | '/xatu-data/fork-readiness'
     | '/xatu-data/geographical-checklist'
     | '/xatu-data/networks'
+    | '/experiments/'
     | '/xatu-data'
     | '/beacon/block-production/$slot'
     | '/beacon/block-production/live'
@@ -214,18 +243,19 @@ export interface FileRouteTypes {
     | '/xatu-data/contributors/$name'
     | '/beacon/block-production'
     | '/beacon/slot'
+    | '/experiments/$experimentId/'
     | '/xatu-data/contributors'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/about'
     | '/beacon'
-    | '/experiments'
     | '/xatu'
     | '/'
     | '/beacon/locally-built-blocks'
     | '/xatu-data/fork-readiness'
     | '/xatu-data/geographical-checklist'
     | '/xatu-data/networks'
+    | '/experiments'
     | '/xatu-data'
     | '/beacon/block-production/$slot'
     | '/beacon/block-production/live'
@@ -234,6 +264,7 @@ export interface FileRouteTypes {
     | '/xatu-data/contributors/$name'
     | '/beacon/block-production'
     | '/beacon/slot'
+    | '/experiments/$experimentId'
     | '/xatu-data/contributors'
   id:
     | '__root__'
@@ -244,9 +275,11 @@ export interface FileRouteTypes {
     | '/_layout/xatu'
     | '/_layout/'
     | '/_layout/beacon/locally-built-blocks'
+    | '/_layout/experiments/$experimentId'
     | '/_layout/xatu-data/fork-readiness'
     | '/_layout/xatu-data/geographical-checklist'
     | '/_layout/xatu-data/networks'
+    | '/_layout/experiments/'
     | '/_layout/xatu-data/'
     | '/_layout/beacon/block-production/$slot'
     | '/_layout/beacon/block-production/live'
@@ -255,6 +288,7 @@ export interface FileRouteTypes {
     | '/_layout/xatu-data/contributors/$name'
     | '/_layout/beacon/block-production/'
     | '/_layout/beacon/slot/'
+    | '/_layout/experiments/$experimentId/'
     | '/_layout/xatu-data/contributors/'
   fileRoutesById: FileRoutesById
 }
@@ -313,6 +347,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LayoutXatuDataIndexRouteImport
       parentRoute: typeof LayoutRoute
     }
+    '/_layout/experiments/': {
+      id: '/_layout/experiments/'
+      path: '/'
+      fullPath: '/experiments/'
+      preLoaderRoute: typeof LayoutExperimentsIndexRouteImport
+      parentRoute: typeof LayoutExperimentsRoute
+    }
     '/_layout/xatu-data/networks': {
       id: '/_layout/xatu-data/networks'
       path: '/xatu-data/networks'
@@ -334,6 +375,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LayoutXatuDataForkReadinessRouteImport
       parentRoute: typeof LayoutRoute
     }
+    '/_layout/experiments/$experimentId': {
+      id: '/_layout/experiments/$experimentId'
+      path: '/$experimentId'
+      fullPath: '/experiments/$experimentId'
+      preLoaderRoute: typeof LayoutExperimentsExperimentIdRouteImport
+      parentRoute: typeof LayoutExperimentsRoute
+    }
     '/_layout/beacon/locally-built-blocks': {
       id: '/_layout/beacon/locally-built-blocks'
       path: '/locally-built-blocks'
@@ -347,6 +395,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/xatu-data/contributors'
       preLoaderRoute: typeof LayoutXatuDataContributorsIndexRouteImport
       parentRoute: typeof LayoutRoute
+    }
+    '/_layout/experiments/$experimentId/': {
+      id: '/_layout/experiments/$experimentId/'
+      path: '/'
+      fullPath: '/experiments/$experimentId/'
+      preLoaderRoute: typeof LayoutExperimentsExperimentIdIndexRouteImport
+      parentRoute: typeof LayoutExperimentsExperimentIdRoute
     }
     '/_layout/beacon/slot/': {
       id: '/_layout/beacon/slot/'
@@ -424,10 +479,39 @@ const LayoutBeaconRouteWithChildren = LayoutBeaconRoute._addFileChildren(
   LayoutBeaconRouteChildren,
 )
 
+interface LayoutExperimentsExperimentIdRouteChildren {
+  LayoutExperimentsExperimentIdIndexRoute: typeof LayoutExperimentsExperimentIdIndexRoute
+}
+
+const LayoutExperimentsExperimentIdRouteChildren: LayoutExperimentsExperimentIdRouteChildren =
+  {
+    LayoutExperimentsExperimentIdIndexRoute:
+      LayoutExperimentsExperimentIdIndexRoute,
+  }
+
+const LayoutExperimentsExperimentIdRouteWithChildren =
+  LayoutExperimentsExperimentIdRoute._addFileChildren(
+    LayoutExperimentsExperimentIdRouteChildren,
+  )
+
+interface LayoutExperimentsRouteChildren {
+  LayoutExperimentsExperimentIdRoute: typeof LayoutExperimentsExperimentIdRouteWithChildren
+  LayoutExperimentsIndexRoute: typeof LayoutExperimentsIndexRoute
+}
+
+const LayoutExperimentsRouteChildren: LayoutExperimentsRouteChildren = {
+  LayoutExperimentsExperimentIdRoute:
+    LayoutExperimentsExperimentIdRouteWithChildren,
+  LayoutExperimentsIndexRoute: LayoutExperimentsIndexRoute,
+}
+
+const LayoutExperimentsRouteWithChildren =
+  LayoutExperimentsRoute._addFileChildren(LayoutExperimentsRouteChildren)
+
 interface LayoutRouteChildren {
   LayoutAboutRoute: typeof LayoutAboutRoute
   LayoutBeaconRoute: typeof LayoutBeaconRouteWithChildren
-  LayoutExperimentsRoute: typeof LayoutExperimentsRoute
+  LayoutExperimentsRoute: typeof LayoutExperimentsRouteWithChildren
   LayoutXatuRoute: typeof LayoutXatuRoute
   LayoutIndexRoute: typeof LayoutIndexRoute
   LayoutXatuDataForkReadinessRoute: typeof LayoutXatuDataForkReadinessRoute
@@ -441,7 +525,7 @@ interface LayoutRouteChildren {
 const LayoutRouteChildren: LayoutRouteChildren = {
   LayoutAboutRoute: LayoutAboutRoute,
   LayoutBeaconRoute: LayoutBeaconRouteWithChildren,
-  LayoutExperimentsRoute: LayoutExperimentsRoute,
+  LayoutExperimentsRoute: LayoutExperimentsRouteWithChildren,
   LayoutXatuRoute: LayoutXatuRoute,
   LayoutIndexRoute: LayoutIndexRoute,
   LayoutXatuDataForkReadinessRoute: LayoutXatuDataForkReadinessRoute,

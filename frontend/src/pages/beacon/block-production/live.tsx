@@ -190,7 +190,7 @@ export default function BlockProductionLivePage() {
         console.error(`[PREFETCH] Failed to prefetch data for slot ${slotNumber}:`, error);
       }
     },
-    [headSlot, selectedNetwork, queryClient, slotDataStore],
+    [headSlot, selectedNetwork, queryClient, slotDataStore]
   );
 
   // Prefetching next slot's data
@@ -198,7 +198,7 @@ export default function BlockProductionLivePage() {
     async (nextSlotNumber: number | null) => {
       await prefetchSlotData(nextSlotNumber, 'next');
     },
-    [prefetchSlotData],
+    [prefetchSlotData]
   );
 
   // Prefetching previous slot's data
@@ -206,7 +206,7 @@ export default function BlockProductionLivePage() {
     async (prevSlotNumber: number | null) => {
       await prefetchSlotData(prevSlotNumber, 'previous');
     },
-    [prefetchSlotData],
+    [prefetchSlotData]
   );
 
   // Reference for tracking prefetched slots (must be outside useEffect)
@@ -237,7 +237,7 @@ export default function BlockProductionLivePage() {
         }, delay);
       }
     },
-    [prefetchNextSlotData],
+    [prefetchNextSlotData]
   );
 
   // Staggered prefetching in response to timer thresholds
@@ -264,7 +264,7 @@ export default function BlockProductionLivePage() {
         prefetchedSlotsRef.current = new Set();
       }
     },
-    [prefetchNextSlotData, prefetchMultipleSlotsCallback],
+    [prefetchNextSlotData, prefetchMultipleSlotsCallback]
   );
 
   // Enhanced early prefetching at multiple time points and multiple slots ahead
@@ -512,11 +512,7 @@ export default function BlockProductionLivePage() {
 
     // No matching bid or delivered payloads found
     return null;
-  }, [
-    slotData?.relayBids,
-    slotData?.block?.executionPayloadBlockHash,
-    slotData?.deliveredPayloads,
-  ]);
+  }, [slotData?.relayBids, slotData?.block?.executionPayloadBlockHash, slotData?.deliveredPayloads]);
 
   // Determine if a block was locally built using the enhanced method
   const isLocallyBuilt = useMemo(() => {
@@ -604,16 +600,12 @@ export default function BlockProductionLivePage() {
       <div className="flex-1 flex items-center justify-center min-h-[50vh]">
         <div className="text-center max-w-md mx-auto">
           <AlertCircle className="w-12 h-12 text-accent/60 mx-auto mb-4" />
-          <h2 className="text-xl font-sans font-bold text-primary mb-2">
-            Experiment Not Available
-          </h2>
+          <h2 className="text-xl font-sans font-bold text-primary mb-2">Experiment Not Available</h2>
           <p className="text-sm font-mono text-secondary mb-4">
             Block Production Flow is not enabled for {selectedNetwork}
           </p>
           {supportedNetworks.length > 0 && (
-            <p className="text-xs font-mono text-tertiary">
-              Available on: {supportedNetworks.join(', ')}
-            </p>
+            <p className="text-xs font-mono text-tertiary">Available on: {supportedNetworks.join(', ')}</p>
           )}
         </div>
       </div>
@@ -628,9 +620,7 @@ export default function BlockProductionLivePage() {
         {isMobile ? (
           // Mobile View
           <div className="px-2 py-1">
-            <div
-              className={`transition-opacity duration-300 ${isSlotLoading ? 'opacity-70' : 'opacity-100'}`}
-            >
+            <div className={`transition-opacity duration-300 ${isSlotLoading ? 'opacity-70' : 'opacity-100'}`}>
               <MobileBlockProductionView
                 bids={slotData ? allTransformedBids : emptyBids}
                 relayColors={slotData ? relayColors : emptyRelayColors}
@@ -645,7 +635,7 @@ export default function BlockProductionLivePage() {
                         Object.entries(slotData.timings.blockSeen).map(([node, time]) => [
                           node,
                           typeof time === 'bigint' ? Number(time) : Number(time),
-                        ]),
+                        ])
                       )
                     : {}
                 }
@@ -655,7 +645,7 @@ export default function BlockProductionLivePage() {
                         Object.entries(slotData.timings.blockFirstSeenP2p).map(([node, time]) => [
                           node,
                           typeof time === 'bigint' ? Number(time) : Number(time),
-                        ]),
+                        ])
                       )
                     : {}
                 }
@@ -677,9 +667,7 @@ export default function BlockProductionLivePage() {
         ) : (
           // Desktop View
           <div className="h-full">
-            <div
-              className={`transition-opacity duration-300 h-full ${isSlotLoading ? 'opacity-70' : 'opacity-100'}`}
-            >
+            <div className={`transition-opacity duration-300 h-full ${isSlotLoading ? 'opacity-70' : 'opacity-100'}`}>
               <DesktopBlockProductionView
                 bids={slotData ? allTransformedBids : emptyBids}
                 relayColors={slotData ? relayColors : emptyRelayColors}
@@ -694,7 +682,7 @@ export default function BlockProductionLivePage() {
                         Object.entries(slotData.timings.blockSeen).map(([node, time]) => [
                           node,
                           typeof time === 'bigint' ? Number(time) : Number(time),
-                        ]),
+                        ])
                       )
                     : {}
                 }
@@ -704,7 +692,7 @@ export default function BlockProductionLivePage() {
                         Object.entries(slotData.timings.blockFirstSeenP2p).map(([node, time]) => [
                           node,
                           typeof time === 'bigint' ? Number(time) : Number(time),
-                        ]),
+                        ])
                       )
                     : {}
                 }

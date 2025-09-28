@@ -101,18 +101,14 @@ export const UnifiedBlocksTimeline: FC<UnifiedBlocksTimelineProps> = ({
         if (!clientName) return;
 
         // Find matching execution client
-        const matchingExecution = EXECUTION_CLIENTS.find(c =>
-          clientName.toLowerCase().includes(c.toLowerCase()),
-        );
+        const matchingExecution = EXECUTION_CLIENTS.find(c => clientName.toLowerCase().includes(c.toLowerCase()));
 
         if (matchingExecution) {
           executionCounts.set(matchingExecution, (executionCounts.get(matchingExecution) || 0) + 1);
         }
 
         // Find matching consensus client
-        const matchingConsensus = CONSENSUS_CLIENTS.find(c =>
-          clientName.toLowerCase().includes(c.toLowerCase()),
-        );
+        const matchingConsensus = CONSENSUS_CLIENTS.find(c => clientName.toLowerCase().includes(c.toLowerCase()));
 
         if (matchingConsensus) {
           consensusCounts.set(matchingConsensus, (consensusCounts.get(matchingConsensus) || 0) + 1);
@@ -155,9 +151,7 @@ export const UnifiedBlocksTimeline: FC<UnifiedBlocksTimelineProps> = ({
   // Calculate intensity based on count for cell coloring
   const getIntensity = (count: number) => {
     if (count === 0) return 'bg-surface/10';
-    return count === 1
-      ? 'bg-accent/30 border border-accent/20'
-      : 'bg-accent/60 border border-accent/40';
+    return count === 1 ? 'bg-accent/30 border border-accent/20' : 'bg-accent/60 border border-accent/40';
   };
 
   // Reverse the timeline blocks once for reuse
@@ -214,9 +208,7 @@ export const UnifiedBlocksTimeline: FC<UnifiedBlocksTimelineProps> = ({
                             }
                           `}
                         >
-                          <Database
-                            className={`w-5 h-5 ${isPending ? 'text-accent' : 'text-tertiary'}`}
-                          />
+                          <Database className={`w-5 h-5 ${isPending ? 'text-accent' : 'text-tertiary'}`} />
                         </div>
                         <div className="mt-1 text-center">
                           <div
@@ -248,9 +240,7 @@ export const UnifiedBlocksTimeline: FC<UnifiedBlocksTimelineProps> = ({
               {/* Execution clients */}
               {EXECUTION_CLIENTS.map(client => (
                 <tr key={`el-${client}`}>
-                  <td className="w-24 pr-3 text-right text-xs font-mono text-tertiary truncate py-1">
-                    {client}
-                  </td>
+                  <td className="w-24 pr-3 text-right text-xs font-mono text-tertiary truncate py-1">{client}</td>
                   {reversedBlocks.map(({ slot, executionClients, isPending }) => {
                     const clientData = executionClients.find(c => c.name === client);
                     const count = clientData?.count || 0;
@@ -261,11 +251,7 @@ export const UnifiedBlocksTimeline: FC<UnifiedBlocksTimelineProps> = ({
                           className={`h-6 rounded-sm ${getIntensity(count)} transition-colors duration-200 flex items-center justify-center ${isPending ? 'animate-pulse' : ''}`}
                           title={`${count} ${client} block${count !== 1 ? 's' : ''} in slot ${slot}`}
                         >
-                          {count > 0 && (
-                            <span className="text-xs font-mono font-bold text-primary">
-                              {count}
-                            </span>
-                          )}
+                          {count > 0 && <span className="text-xs font-mono font-bold text-primary">{count}</span>}
                         </div>
                       </td>
                     );
@@ -286,9 +272,7 @@ export const UnifiedBlocksTimeline: FC<UnifiedBlocksTimelineProps> = ({
               {/* Consensus clients */}
               {CONSENSUS_CLIENTS.map(client => (
                 <tr key={`cl-${client}`}>
-                  <td className="w-24 pr-3 text-right text-xs font-mono text-tertiary truncate py-1">
-                    {client}
-                  </td>
+                  <td className="w-24 pr-3 text-right text-xs font-mono text-tertiary truncate py-1">{client}</td>
                   {reversedBlocks.map(({ slot, consensusClients, isPending }) => {
                     const clientData = consensusClients.find(c => c.name === client);
                     const count = clientData?.count || 0;
@@ -299,11 +283,7 @@ export const UnifiedBlocksTimeline: FC<UnifiedBlocksTimelineProps> = ({
                           className={`h-6 rounded-sm ${getIntensity(count)} transition-colors duration-200 flex items-center justify-center ${isPending ? 'animate-pulse' : ''}`}
                           title={`${count} ${client} block${count !== 1 ? 's' : ''} in slot ${slot}`}
                         >
-                          {count > 0 && (
-                            <span className="text-xs font-mono font-bold text-primary">
-                              {count}
-                            </span>
-                          )}
+                          {count > 0 && <span className="text-xs font-mono font-bold text-primary">{count}</span>}
                         </div>
                       </td>
                     );

@@ -6,10 +6,7 @@ import {
   LocallyBuiltSlotBlocks,
   LocallyBuiltBlock,
 } from '@/api/gen/backend/pkg/server/proto/beacon_slots/beacon_slots_pb';
-import {
-  LocallyBuiltBlocksDetail,
-  UnifiedBlocksTimeline,
-} from '@/components/beacon/LocallyBuiltBlocks';
+import { LocallyBuiltBlocksDetail, UnifiedBlocksTimeline } from '@/components/beacon/LocallyBuiltBlocks';
 import { ChevronLeft, Clock, AlertCircle } from 'lucide-react';
 import useBeacon from '@/contexts/beacon';
 
@@ -89,9 +86,7 @@ export function LocallyBuiltBlocks() {
               if (existingSlot) {
                 // If the slot already exists, add any new blocks that aren't already there
                 const existingBlockIds = new Set(
-                  existingSlot.blocks.map(
-                    block => `${block.slot}-${block.metadata?.metaClientName}`,
-                  ),
+                  existingSlot.blocks.map(block => `${block.slot}-${block.metadata?.metaClientName}`)
                 );
 
                 newSlotBlock.blocks.forEach(newBlock => {
@@ -107,9 +102,7 @@ export function LocallyBuiltBlocks() {
             });
 
             // Convert the map values back to an array and sort by slot (most recent first)
-            const mergedData = Array.from(existingSlotMap.values()).sort(
-              (a, b) => Number(b.slot) - Number(a.slot),
-            );
+            const mergedData = Array.from(existingSlotMap.values()).sort((a, b) => Number(b.slot) - Number(a.slot));
 
             // Limit the size to prevent memory issues
             return mergedData.slice(0, MAX_SLOTS);
@@ -125,7 +118,7 @@ export function LocallyBuiltBlocks() {
         }
       }
     },
-    [selectedNetwork, data.length, client],
+    [selectedNetwork, data.length, client]
   ); // Added data.length dependency
 
   // Initial data fetch when network changes
@@ -162,16 +155,12 @@ export function LocallyBuiltBlocks() {
       <div className="flex-1 flex items-center justify-center min-h-[50vh]">
         <div className="text-center max-w-md mx-auto">
           <AlertCircle className="w-12 h-12 text-accent/60 mx-auto mb-4" />
-          <h2 className="text-xl font-sans font-bold text-primary mb-2">
-            Experiment Not Available
-          </h2>
+          <h2 className="text-xl font-sans font-bold text-primary mb-2">Experiment Not Available</h2>
           <p className="text-sm font-mono text-secondary mb-4">
             Locally Built Blocks is not enabled for {selectedNetwork}
           </p>
           {supportedNetworks.length > 0 && (
-            <p className="text-xs font-mono text-tertiary">
-              Available on: {supportedNetworks.join(', ')}
-            </p>
+            <p className="text-xs font-mono text-tertiary">Available on: {supportedNetworks.join(', ')}</p>
           )}
         </div>
       </div>
@@ -203,12 +192,10 @@ export function LocallyBuiltBlocks() {
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
               {/* Left: Title & Description */}
               <div>
-                <h2 className="text-xl font-sans font-bold text-primary mb-1">
-                  Locally Built Blocks
-                </h2>
+                <h2 className="text-xl font-sans font-bold text-primary mb-1">Locally Built Blocks</h2>
                 <p className="text-sm font-mono text-secondary max-w-3xl">
-                  Blocks locally built by sentry nodes (not necessarily canonical/broadcasted).
-                  Useful for analyzing client block building capabilities based on mempool contents.
+                  Blocks locally built by sentry nodes (not necessarily canonical/broadcasted). Useful for analyzing
+                  client block building capabilities based on mempool contents.
                 </p>
               </div>
               {/* Right: Controls/Actions */}

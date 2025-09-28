@@ -79,7 +79,7 @@ const experiments: ExperimentItem[] = [
     subtitle: 'Real-time slot monitoring',
     description: 'Watch slots as they happen in real-time with detailed metrics',
     icon: Activity,
-    href: '/beacon/slot/live',
+    href: '/experiments/live-slots',
     category: 'beacon',
   },
   {

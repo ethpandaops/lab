@@ -64,24 +64,6 @@ export function useBeaconSlotData(
         client.getMevBuilderBid(network, slot),
       ]);
 
-      // Log any failures for debugging
-      const logFailure = (name: string, result: PromiseSettledResult<any>) => {
-        if (result.status === 'rejected') {
-          console.warn(`${name} fetch failed for slot ${slot}:`, result.reason);
-        }
-      };
-
-      logFailure('Block data', blockResult);
-      logFailure('Block timing', blockTimingResult);
-      logFailure('Blob timing', blobTimingResult);
-      logFailure('Blob total', blobTotalResult);
-      logFailure('Attestation timing', attestationTimingResult);
-      logFailure('Attestation correctness', attestationCorrectnessResult);
-      logFailure('Proposer entity', proposerEntityResult);
-      logFailure('MEV block', mevBlockResult);
-      logFailure('MEV relay', mevRelayResult);
-      logFailure('MEV builder', mevBuilderResult);
-
       // Transform all the responses into the expected BeaconSlotData format
       const slotData = transformToBeaconSlotData({
         network,
@@ -103,10 +85,8 @@ export function useBeaconSlotData(
       return { data: slotData };
     },
     enabled: !!slot && enabled && useRestApi,
-    // Dynamic stale time based on whether viewing live or historical slots
-    staleTime: isLive ? 100 : 5 * 60 * 1000, // 100ms for live, 5 minutes for historical
-    // Only refetch for live slots
-    refetchInterval: isLive ? 12000 : false, // 12 seconds = 1 slot
+    staleTime: 11000,
+    refetchInterval: isLive ? 12000 : false,
     retry: (failureCount, error) => {
       // Don't retry if slot doesn't exist (404)
       if (error?.message?.includes('404')) {

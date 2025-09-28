@@ -72,17 +72,14 @@ export default function Networks() {
 
   // Calculate statistics
   const publicPercentage =
-    networkData.total_nodes > 0
-      ? (networkData.total_public_nodes / networkData.total_nodes) * 100
-      : 0;
+    networkData.total_nodes > 0 ? (networkData.total_public_nodes / networkData.total_nodes) * 100 : 0;
 
   // Get client distribution
   const clientDistribution = Object.entries(networkData.consensus_implementations || {})
     .map(([client, data]) => ({
       name: CLIENT_METADATA[client]?.name || client,
       value: data.total_nodes,
-      percentage:
-        networkData.total_nodes > 0 ? (data.total_nodes / networkData.total_nodes) * 100 : 0,
+      percentage: networkData.total_nodes > 0 ? (data.total_nodes / networkData.total_nodes) * 100 : 0,
     }))
     .sort((a, b) => b.value - a.value);
 
@@ -119,16 +116,11 @@ export default function Networks() {
             <div>
               <h2 className="text-xl font-sans font-bold text-primary">{metadata.name} Network</h2>
               <p className="text-xs font-mono text-secondary mt-1">
-                Last updated{' '}
-                {formatDistanceToNow(new Date(networkData.updated_at * 1000), { addSuffix: true })}
+                Last updated {formatDistanceToNow(new Date(networkData.updated_at * 1000), { addSuffix: true })}
               </p>
             </div>
           </div>
-          <NetworkSelector
-            selectedNetwork={selectedNetwork}
-            onNetworkChange={setSelectedNetwork}
-            expandToFit={true}
-          />
+          <NetworkSelector selectedNetwork={selectedNetwork} onNetworkChange={setSelectedNetwork} expandToFit={true} />
         </div>
       </div>
 
@@ -140,12 +132,8 @@ export default function Networks() {
               <Users className="w-5 h-5 text-accent" />
               <p className="text-xs font-mono text-tertiary">Total Nodes</p>
             </div>
-            <p className="text-2xl font-mono font-bold text-primary">
-              {networkData.total_nodes.toLocaleString()}
-            </p>
-            <p className="text-xs font-mono text-accent mt-1">
-              {publicPercentage.toFixed(1)}% community
-            </p>
+            <p className="text-2xl font-mono font-bold text-primary">{networkData.total_nodes.toLocaleString()}</p>
+            <p className="text-xs font-mono text-accent mt-1">{publicPercentage.toFixed(1)}% community</p>
           </div>
         </Card>
 
@@ -170,9 +158,7 @@ export default function Networks() {
               <MapPin className="w-5 h-5 text-accent" />
               <p className="text-xs font-mono text-tertiary">Cities</p>
             </div>
-            <p className="text-2xl font-mono font-bold text-primary">
-              {Object.keys(networkData.cities || {}).length}
-            </p>
+            <p className="text-2xl font-mono font-bold text-primary">{Object.keys(networkData.cities || {}).length}</p>
           </div>
         </Card>
 
@@ -296,9 +282,7 @@ export default function Networks() {
             </div>
             <div>
               <p className="text-xs font-mono text-tertiary mb-1">Client Diversity</p>
-              <p className="text-lg font-mono font-bold text-primary">
-                {clientDistribution.length} clients
-              </p>
+              <p className="text-lg font-mono font-bold text-primary">{clientDistribution.length} clients</p>
             </div>
           </div>
         </div>
@@ -307,8 +291,8 @@ export default function Networks() {
       {/* Data Note */}
       <div className="text-center py-4">
         <p className="text-xs font-mono text-tertiary">
-          Note: This data represents only nodes sending data to the Xatu project and is not
-          representative of the total network.
+          Note: This data represents only nodes sending data to the Xatu project and is not representative of the total
+          network.
         </p>
       </div>
     </div>

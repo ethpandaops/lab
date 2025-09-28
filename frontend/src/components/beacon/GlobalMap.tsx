@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect, useCallback } from 'react';
+import { useMemo, useState, useEffect, useCallback, memo, useRef } from 'react';
 import { ComposableMap, Geographies, Geography, Marker } from 'react-simple-maps';
 import { feature } from 'topojson-client';
 import { FeatureCollection, Geometry } from 'geojson';
@@ -168,7 +168,7 @@ const useMarkers = (
   }, [nodes, nodeCoordinates, filteredBlockEvents, currentTime]);
 };
 
-export function GlobalMap({
+export const GlobalMap = memo(function GlobalMap({
   nodes,
   currentTime,
   blockEvents,
@@ -562,4 +562,4 @@ export function GlobalMap({
       </Card>
     </div>
   );
-}
+});

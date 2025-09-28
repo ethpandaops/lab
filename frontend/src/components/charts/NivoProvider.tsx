@@ -23,7 +23,7 @@ export const NivoProvider = ({ children }: NivoProviderProps) => {
  */
 export function withNivoTheme<P extends object>(
   Component: React.ComponentType<P & { theme?: typeof defaultNivoTheme }>,
-  customTheme?: typeof defaultNivoTheme,
+  customTheme?: typeof defaultNivoTheme
 ) {
   const ThemedComponent = (props: P) => {
     const theme = customTheme || defaultNivoTheme;

@@ -48,9 +48,7 @@ interface BlocksTimelineProps {
 }
 
 export const BlocksTimeline: FC<BlocksTimelineProps> = ({ data, isLoading, onSelectBlock }) => {
-  const [timelineBlocks, setTimelineBlocks] = useState<
-    { block: LocallyBuiltBlock; isPending: boolean }[]
-  >([]);
+  const [timelineBlocks, setTimelineBlocks] = useState<{ block: LocallyBuiltBlock; isPending: boolean }[]>([]);
 
   // Process the most recent blocks for the timeline
   useEffect(() => {
@@ -134,9 +132,7 @@ export const BlocksTimeline: FC<BlocksTimelineProps> = ({ data, isLoading, onSel
                   <Database className={`w-6 h-6 ${isPending ? 'text-accent' : 'text-tertiary'}`} />
                 </div>
                 <div className="mt-2 text-center">
-                  <div
-                    className={`font-mono text-sm ${isPending ? 'text-accent font-bold' : 'text-secondary'}`}
-                  >
+                  <div className={`font-mono text-sm ${isPending ? 'text-accent font-bold' : 'text-secondary'}`}>
                     Slot {block.slot.toString()}
                   </div>
                   <div className="font-mono text-xs text-tertiary mt-1">

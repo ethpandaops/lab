@@ -141,9 +141,7 @@ const BuildersRelaysPanel: React.FC<BuildersRelaysPanelProps> = ({
             (winningBid?.deliveredRelays && winningBid.deliveredRelays.includes(relayName)) ||
             winningBid?.relayName === relayName,
           // Use highest value bid from this relay
-          value: uniqueRelays.has(relayName)
-            ? Math.max(uniqueRelays.get(relayName).value, bid.value)
-            : bid.value,
+          value: uniqueRelays.has(relayName) ? Math.max(uniqueRelays.get(relayName).value, bid.value) : bid.value,
           time: uniqueRelays.has(relayName)
             ? Math.min(uniqueRelays.get(relayName).time, bid.time) // Use earliest bid time
             : bid.time,
@@ -204,9 +202,7 @@ const BuildersRelaysPanel: React.FC<BuildersRelaysPanelProps> = ({
             <div className="w-2 h-2 rounded-full bg-accent mr-1.5"></div>
             <span className="text-sm font-medium text-primary">Builder bids</span>
           </div>
-          <div className="text-xs text-tertiary">
-            {builders.length > 0 ? `Top bid per builder` : ''}
-          </div>
+          <div className="text-xs text-tertiary">{builders.length > 0 ? `Top bid per builder` : ''}</div>
         </div>
         <div
           className="overflow-y-auto h-[calc(100%-2.5rem)] scrollbar-hide transition-colors duration-500"
@@ -263,9 +259,7 @@ const BuildersRelaysPanel: React.FC<BuildersRelaysPanelProps> = ({
               })}
               {/* Show count of hidden builders if there are more than 7 */}
               {builders.length > 7 && (
-                <div className="text-xs text-tertiary text-center pt-1 pb-1">
-                  + {builders.length - 7} more builders
-                </div>
+                <div className="text-xs text-tertiary text-center pt-1 pb-1">+ {builders.length - 7} more builders</div>
               )}
             </div>
           ) : (
@@ -326,9 +320,9 @@ const BuildersRelaysPanel: React.FC<BuildersRelaysPanelProps> = ({
                         >
                           {item.isDeliveredOnly
                             ? 'Delivered'
-                            : (item.bidCount !== undefined
+                            : item.bidCount !== undefined
                               ? `${item.bidCount} bid${item.bidCount !== 1 ? 's' : ''}`
-                              : '0 bids')}
+                              : '0 bids'}
                         </div>
                       </div>
                     </div>
@@ -337,9 +331,7 @@ const BuildersRelaysPanel: React.FC<BuildersRelaysPanelProps> = ({
               })}
               {/* Show count of hidden relays if there are more than 5 */}
               {relays.length > 5 && (
-                <div className="text-xs text-tertiary text-center pt-1 pb-1">
-                  + {relays.length - 5} more relays
-                </div>
+                <div className="text-xs text-tertiary text-center pt-1 pb-1">+ {relays.length - 5} more relays</div>
               )}
             </div>
           ) : (

@@ -103,42 +103,42 @@ export function normalizeBlockData(block?: BlockData): NormalizedBlockData | und
   result.executionPayloadBlockNumber = safeNumberConversion(
     block.execution_payload_block_number ||
       block.executionPayloadBlockNumber ||
-      (block.execution_payload && block.execution_payload.block_number),
+      (block.execution_payload && block.execution_payload.block_number)
   );
 
   // Handle execution payload transactions count
   result.executionPayloadTransactionsCount = safeNumberConversion(
     block.execution_payload_transactions_count ||
       block.executionPayloadTransactionsCount ||
-      (block.execution_payload && block.execution_payload.transactions_count),
+      (block.execution_payload && block.execution_payload.transactions_count)
   );
 
   // Handle execution payload gas used
   result.executionPayloadGasUsed = safeNumberConversion(
     block.execution_payload_gas_used ||
       block.executionPayloadGasUsed ||
-      (block.execution_payload && block.execution_payload.gas_used),
+      (block.execution_payload && block.execution_payload.gas_used)
   );
 
   // Handle execution payload gas limit
   result.executionPayloadGasLimit = safeNumberConversion(
     block.execution_payload_gas_limit ||
       block.executionPayloadGasLimit ||
-      (block.execution_payload && block.execution_payload.gas_limit),
+      (block.execution_payload && block.execution_payload.gas_limit)
   );
 
   // Handle execution payload blob gas used
   result.executionPayloadBlobGasUsed = safeNumberConversion(
     block.execution_payload_blob_gas_used ||
       block.executionPayloadBlobGasUsed ||
-      (block.execution_payload && block.execution_payload.blob_gas_used),
+      (block.execution_payload && block.execution_payload.blob_gas_used)
   );
 
   // Handle execution payload base fee per gas
   result.executionPayloadBaseFeePerGas = safeNumberConversion(
     block.execution_payload_base_fee_per_gas ||
       block.executionPayloadBaseFeePerGas ||
-      (block.execution_payload && block.execution_payload.base_fee_per_gas),
+      (block.execution_payload && block.execution_payload.base_fee_per_gas)
   );
 
   // Handle execution payload fee recipient
@@ -151,7 +151,7 @@ export function normalizeBlockData(block?: BlockData): NormalizedBlockData | und
   result.executionPayloadTimestamp = safeNumberConversion(
     block.execution_payload_timestamp ||
       block.executionPayloadTimestamp ||
-      (block.execution_payload && block.execution_payload.timestamp),
+      (block.execution_payload && block.execution_payload.timestamp)
   );
 
   // Handle execution payload parent hash
@@ -170,18 +170,18 @@ export function normalizeBlockData(block?: BlockData): NormalizedBlockData | und
   result.executionPayloadExcessBlobGas = safeNumberConversion(
     block.execution_payload_excess_blob_gas ||
       block.executionPayloadExcessBlobGas ||
-      (block.execution_payload && block.execution_payload.excess_blob_gas),
+      (block.execution_payload && block.execution_payload.excess_blob_gas)
   );
 
   // Handle size metrics
   result.blockTotalBytes = safeNumberConversion(block.blockTotalBytes || block.block_total_bytes);
   result.blockTotalBytesCompressed = safeNumberConversion(
-    block.blockTotalBytesCompressed || block.block_total_bytes_compressed,
+    block.blockTotalBytesCompressed || block.block_total_bytes_compressed
   );
   result.transactionsTotalBytes = safeNumberConversion(
     block.transactionsTotalBytes ||
       block.transactions_total_bytes ||
-      (block.execution_payload && block.execution_payload.transactions_total_bytes),
+      (block.execution_payload && block.execution_payload.transactions_total_bytes)
   );
 
   // Handle slot time

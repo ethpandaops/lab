@@ -93,9 +93,7 @@ function ContributorDetail() {
         username: { eq: name || '' },
       });
       // Transform nodes for selected network
-      const nodesWithNetwork = response.nodes.map(node =>
-        transformNodeToContributor(node, selectedNetwork),
-      );
+      const nodesWithNetwork = response.nodes.map(node => transformNodeToContributor(node, selectedNetwork));
       return {
         name: name || '',
         nodes: nodesWithNetwork,
@@ -120,14 +118,8 @@ function ContributorDetail() {
       <div className="flex flex-col items-center justify-center min-h-[200px] p-4">
         <ErrorState message={`No data available for this contributor on ${selectedNetwork}`} />
         <div className="flex flex-col items-center gap-2 -mt-2">
-          <p className="text-sm text-tertiary dark:text-secondary">
-            Try switching to a different network:
-          </p>
-          <NetworkSelector
-            selectedNetwork={selectedNetwork}
-            onNetworkChange={setSelectedNetwork}
-            className="w-48"
-          />
+          <p className="text-sm text-tertiary dark:text-secondary">Try switching to a different network:</p>
+          <NetworkSelector selectedNetwork={selectedNetwork} onNetworkChange={setSelectedNetwork} className="w-48" />
         </div>
       </div>
     );
@@ -172,9 +164,7 @@ function ContributorDetail() {
                 {initials}
               </div>
               <div className="flex-1">
-                <h1 className="text-2xl font-sans font-bold text-primary mb-2">
-                  {contributor.name}
-                </h1>
+                <h1 className="text-2xl font-sans font-bold text-primary mb-2">{contributor.name}</h1>
                 <div className="text-sm font-mono text-tertiary mb-4">
                   Last updated{' '}
                   <span
@@ -188,11 +178,7 @@ function ContributorDetail() {
                 </div>
               </div>
             </div>
-            <NetworkSelector
-              selectedNetwork={selectedNetwork}
-              onNetworkChange={setSelectedNetwork}
-              className="w-48"
-            />
+            <NetworkSelector selectedNetwork={selectedNetwork} onNetworkChange={setSelectedNetwork} className="w-48" />
           </div>
         </div>
       </Card>
@@ -222,9 +208,7 @@ function ContributorDetail() {
                   return (
                     <Card
                       key={node.client_name}
-                      className={`card-secondary ${
-                        offline ? 'border-error/30 hover:border-error/50' : ''
-                      }`}
+                      className={`card-secondary ${offline ? 'border-error/30 hover:border-error/50' : ''}`}
                     >
                       <div className="card-body">
                         <div className="flex items-center gap-3 mb-4">
@@ -238,9 +222,7 @@ function ContributorDetail() {
                             }}
                           />
                           <div className="min-w-0">
-                            <div className="font-mono font-medium text-primary truncate">
-                              {shortName}
-                            </div>
+                            <div className="font-mono font-medium text-primary truncate">{shortName}</div>
                             <div className="text-sm font-mono text-tertiary">
                               {capitalizeWords(node.consensus_client)} ({node.consensus_version})
                             </div>
@@ -280,8 +262,8 @@ function ContributorDetail() {
       {/* Data Note */}
       <div className="text-center py-4">
         <p className="text-xs font-mono text-tertiary">
-          Note: This data represents only nodes sending data to the Xatu project and is not
-          representative of the total network.
+          Note: This data represents only nodes sending data to the Xatu project and is not representative of the total
+          network.
         </p>
       </div>
     </div>

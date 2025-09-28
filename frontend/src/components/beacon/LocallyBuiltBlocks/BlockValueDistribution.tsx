@@ -85,12 +85,8 @@ export const BlockValueDistribution: FC<BlockValueDistributionProps> = ({ data, 
     data.forEach(slotBlocks => {
       slotBlocks.blocks.forEach(block => {
         const clientName = getClientName(block);
-        const execValue = block.executionPayloadValue
-          ? Number(block.executionPayloadValue.toString())
-          : 0;
-        const consValue = block.consensusPayloadValue
-          ? Number(block.consensusPayloadValue.toString())
-          : 0;
+        const execValue = block.executionPayloadValue ? Number(block.executionPayloadValue.toString()) : 0;
+        const consValue = block.consensusPayloadValue ? Number(block.consensusPayloadValue.toString()) : 0;
         const totalValue = execValue + consValue;
 
         const current = clientValueMap.get(clientName) || { value: 0, blockCount: 0 };
@@ -115,16 +111,7 @@ export const BlockValueDistribution: FC<BlockValueDistributionProps> = ({ data, 
   }, [data, isLoading]);
 
   // Colors for pie chart
-  const COLORS = [
-    '#6366f1',
-    '#8b5cf6',
-    '#ec4899',
-    '#f43f5e',
-    '#f97316',
-    '#eab308',
-    '#22c55e',
-    '#3b82f6',
-  ];
+  const COLORS = ['#6366f1', '#8b5cf6', '#ec4899', '#f43f5e', '#f97316', '#eab308', '#22c55e', '#3b82f6'];
 
   if (isLoading) {
     return (
@@ -149,9 +136,7 @@ export const BlockValueDistribution: FC<BlockValueDistributionProps> = ({ data, 
 
   return (
     <div className="space-y-4">
-      <h4 className="text-lg font-sans font-bold text-accent">
-        Block Value Distribution by Client
-      </h4>
+      <h4 className="text-lg font-sans font-bold text-accent">Block Value Distribution by Client</h4>
 
       <div className="h-[300px]">
         <ResponsiveContainer width="100%" height="100%">
@@ -206,9 +191,7 @@ export const BlockValueDistribution: FC<BlockValueDistributionProps> = ({ data, 
                 </td>
                 <td className="py-1.5 px-2 text-right text-primary">{entry.blockCount}</td>
                 <td className="py-1.5 px-2 text-right text-primary">{formatEther(entry.value)}</td>
-                <td className="py-1.5 px-2 text-right text-primary">
-                  {formatEther(entry.avgValue)}
-                </td>
+                <td className="py-1.5 px-2 text-right text-primary">{formatEther(entry.avgValue)}</td>
               </tr>
             ))}
           </tbody>

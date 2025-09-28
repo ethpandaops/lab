@@ -143,11 +143,7 @@ function XatuData() {
                 {networkData.total_nodes.toLocaleString()} nodes • {selectedNetwork}
               </span>
             </div>
-            <NetworkSelector
-              selectedNetwork={selectedNetwork}
-              onNetworkChange={setSelectedNetwork}
-              className="w-48"
-            />
+            <NetworkSelector selectedNetwork={selectedNetwork} onNetworkChange={setSelectedNetwork} className="w-48" />
           </div>
         </div>
       </div>
@@ -157,19 +153,13 @@ function XatuData() {
         <div className="lg:col-span-2 bg-surface/50 rounded-lg border border-subtle p-4 shadow-sm">
           <h3 className="text-sm font-sans font-medium text-primary mb-4">Global Distribution</h3>
           <div className="flex justify-center">
-            <GlobeViz
-              data={globeData}
-              width={Math.min(containerWidth - 40, GLOBE_WIDTH)}
-              height={300}
-            />
+            <GlobeViz data={globeData} width={Math.min(containerWidth - 40, GLOBE_WIDTH)} height={300} />
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-4">
             <div>
               <p className="text-xs font-mono text-tertiary">Total Nodes</p>
-              <p className="text-lg font-mono font-medium text-primary">
-                {networkData.total_nodes.toLocaleString()}
-              </p>
+              <p className="text-lg font-mono font-medium text-primary">{networkData.total_nodes.toLocaleString()}</p>
             </div>
             <div>
               <p className="text-xs font-mono text-tertiary">Public Nodes</p>
@@ -208,10 +198,7 @@ function XatuData() {
                 <div className="flex-1 flex items-center justify-between">
                   <span className="text-xs font-mono text-primary">{client.name}</span>
                   <span className="text-xs font-mono text-accent">
-                    {networkData.total_nodes > 0
-                      ? ((client.value / networkData.total_nodes) * 100).toFixed(1)
-                      : '0.0'}
-                    %
+                    {networkData.total_nodes > 0 ? ((client.value / networkData.total_nodes) * 100).toFixed(1) : '0.0'}%
                   </span>
                 </div>
               </div>
@@ -249,8 +236,8 @@ function XatuData() {
       {/* Data Note */}
       <div className="text-center py-4">
         <p className="text-xs font-mono text-tertiary">
-          Note: This data represents only nodes sending data to the Xatu project and is not
-          representative of the total network.
+          Note: This data represents only nodes sending data to the Xatu project and is not representative of the total
+          network.
         </p>
       </div>
     </div>

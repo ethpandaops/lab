@@ -84,7 +84,7 @@ export const LocallyBuiltBlocksTable: FC<LocallyBuiltBlocksTableProps> = ({
     slotBlocks.blocks.map(block => ({
       slotNumber: slotBlocks.slot.toString(),
       block,
-    })),
+    }))
   );
 
   // Filter data based on search term
@@ -127,20 +127,12 @@ export const LocallyBuiltBlocksTable: FC<LocallyBuiltBlocksTableProps> = ({
           : b.block.executionPayloadTransactionsCount - a.block.executionPayloadTransactionsCount;
       case 'client':
         return sortDirection === 'asc'
-          ? (a.block.metadata?.metaClientName || '').localeCompare(
-              b.block.metadata?.metaClientName || '',
-            )
-          : (b.block.metadata?.metaClientName || '').localeCompare(
-              a.block.metadata?.metaClientName || '',
-            );
+          ? (a.block.metadata?.metaClientName || '').localeCompare(b.block.metadata?.metaClientName || '')
+          : (b.block.metadata?.metaClientName || '').localeCompare(a.block.metadata?.metaClientName || '');
       case 'country':
         return sortDirection === 'asc'
-          ? (a.block.metadata?.metaClientGeoCountry || '').localeCompare(
-              b.block.metadata?.metaClientGeoCountry || '',
-            )
-          : (b.block.metadata?.metaClientGeoCountry || '').localeCompare(
-              a.block.metadata?.metaClientGeoCountry || '',
-            );
+          ? (a.block.metadata?.metaClientGeoCountry || '').localeCompare(b.block.metadata?.metaClientGeoCountry || '')
+          : (b.block.metadata?.metaClientGeoCountry || '').localeCompare(a.block.metadata?.metaClientGeoCountry || '');
       default:
         return 0;
     }
@@ -189,22 +181,10 @@ export const LocallyBuiltBlocksTable: FC<LocallyBuiltBlocksTableProps> = ({
 
   const SortIcon = ({ field }: { field: string }) => {
     if (sortField !== field) return null;
-    return sortDirection === 'desc' ? (
-      <ChevronDown className="w-3.5 h-3.5" />
-    ) : (
-      <ChevronUp className="w-3.5 h-3.5" />
-    );
+    return sortDirection === 'desc' ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronUp className="w-3.5 h-3.5" />;
   };
 
-  const SortHeader = ({
-    field,
-    label,
-    icon,
-  }: {
-    field: string;
-    label: string;
-    icon?: React.ReactNode;
-  }) => (
+  const SortHeader = ({ field, label, icon }: { field: string; label: string; icon?: React.ReactNode }) => (
     <th
       className="text-left py-2 px-3 text-xs font-mono text-tertiary hover:text-primary cursor-pointer transition-colors duration-200"
       onClick={() => handleSort(field)}
@@ -244,16 +224,8 @@ export const LocallyBuiltBlocksTable: FC<LocallyBuiltBlocksTableProps> = ({
               <SortHeader field="country" label="Location" icon={<Globe className="w-3 h-3" />} />
               <SortHeader field="blockSize" label="Size" icon={<FileDown className="w-3 h-3" />} />
               <SortHeader field="txCount" label="Txns" icon={<FileText className="w-3 h-3" />} />
-              <SortHeader
-                field="execValue"
-                label="Exec Value"
-                icon={<DollarSign className="w-3 h-3" />}
-              />
-              <SortHeader
-                field="consensusValue"
-                label="Consensus Value"
-                icon={<Zap className="w-3 h-3" />}
-              />
+              <SortHeader field="execValue" label="Exec Value" icon={<DollarSign className="w-3 h-3" />} />
+              <SortHeader field="consensusValue" label="Consensus Value" icon={<Zap className="w-3 h-3" />} />
               <th className="text-right py-2 px-3 text-xs font-mono text-tertiary">Version</th>
             </tr>
           </thead>
@@ -270,15 +242,13 @@ export const LocallyBuiltBlocksTable: FC<LocallyBuiltBlocksTableProps> = ({
                   key={`${slotNumber}-${index}`}
                   className={clsx(
                     'hover:bg-surface/40 group transition-colors duration-150 cursor-pointer',
-                    index % 2 === 0 ? 'bg-surface/10' : 'bg-transparent',
+                    index % 2 === 0 ? 'bg-surface/10' : 'bg-transparent'
                   )}
                   onClick={() => onSelectBlock?.(block)}
                 >
                   <td className="py-2.5 px-3 text-sm font-mono">
                     <div className="flex flex-col">
-                      <span className="text-primary group-hover:text-accent transition-colors">
-                        {slotNumber}
-                      </span>
+                      <span className="text-primary group-hover:text-accent transition-colors">{slotNumber}</span>
                       <span className="text-xs text-tertiary">
                         <FormattedTimestamp timestamp={block.slotStartDateTime} />
                       </span>
@@ -290,9 +260,7 @@ export const LocallyBuiltBlocksTable: FC<LocallyBuiltBlocksTableProps> = ({
                   <td className="py-2.5 px-3 text-sm font-mono text-primary">
                     {block.metadata?.metaClientGeoCountry || '-'}
                   </td>
-                  <td className="py-2.5 px-3 text-sm font-mono text-primary">
-                    {formatBytes(block.blockTotalBytes)}
-                  </td>
+                  <td className="py-2.5 px-3 text-sm font-mono text-primary">{formatBytes(block.blockTotalBytes)}</td>
                   <td className="py-2.5 px-3 text-sm font-mono text-primary">
                     {block.executionPayloadTransactionsCount}
                   </td>
@@ -302,9 +270,7 @@ export const LocallyBuiltBlocksTable: FC<LocallyBuiltBlocksTableProps> = ({
                   <td className="py-2.5 px-3 text-sm font-mono text-primary">
                     {formatEther(block.consensusPayloadValue)}
                   </td>
-                  <td className="py-2.5 px-3 text-sm font-mono text-tertiary text-right">
-                    {block.blockVersion}
-                  </td>
+                  <td className="py-2.5 px-3 text-sm font-mono text-tertiary text-right">{block.blockVersion}</td>
                 </tr>
               ))
             )}

@@ -40,6 +40,6 @@ if (container) {
           </ApiModeProvider>
         </QueryClientProvider>
       </ErrorBoundary>
-    </StrictMode>,
+    </StrictMode>
   );
 }

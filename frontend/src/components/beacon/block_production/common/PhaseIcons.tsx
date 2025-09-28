@@ -77,8 +77,7 @@ const phases = [
     id: 'accepted',
     icon: '🔒',
     title: 'Accepted',
-    description:
-      "Once 66% of the slot's attesters have voted for the block, it's unlikely to be re-orged out.",
+    description: "Once 66% of the slot's attesters have voted for the block, it's unlikely to be re-orged out.",
     color: 'green' as const,
     nextColor: '',
   },
@@ -152,9 +151,7 @@ const PhaseIcons: React.FC<PhaseIconsProps> = ({
     }, 0) || 0;
 
   // Use actual maximumVotes for expected attestations, with no default
-  const totalExpectedAttestations = attestationsData?.maximumVotes
-    ? Number(attestationsData.maximumVotes)
-    : 0;
+  const totalExpectedAttestations = attestationsData?.maximumVotes ? Number(attestationsData.maximumVotes) : 0;
 
   // Calculate the current phase
   const currentPhase = getCurrentPhase(
@@ -163,22 +160,18 @@ const PhaseIcons: React.FC<PhaseIconsProps> = ({
     nodeBlockP2P,
     blockTime,
     attestationsCount,
-    totalExpectedAttestations,
+    totalExpectedAttestations
   );
 
   // Calculate which relay is active
   const activeRelays = React.useMemo(() => {
-    const relaysSet = new Set(
-      bids.filter(bid => bid.time <= currentTime).map(bid => bid.relayName),
-    );
+    const relaysSet = new Set(bids.filter(bid => bid.time <= currentTime).map(bid => bid.relayName));
     return relaysSet.size;
   }, [bids, currentTime]);
 
   // Helper function to determine if an entity should be active in current phase
   // Modified to keep entities active once they've been activated
-  const isActiveInPhase = (
-    entity: 'builder' | 'relay' | 'proposer' | 'node' | 'attester' | 'accepted',
-  ) => {
+  const isActiveInPhase = (entity: 'builder' | 'relay' | 'proposer' | 'node' | 'attester' | 'accepted') => {
     // REQUIREMENT 1: If we don't have a phase (null), default to showing Building phase
     if (currentPhase === null) {
       // When no phase data is available, show builders and relays as active
@@ -243,15 +236,11 @@ const PhaseIcons: React.FC<PhaseIconsProps> = ({
             <div className="mt-1 text-xs truncate max-w-full">
               {slotData?.entity ? (
                 <span className="truncate block" title={`Validator: ${slotData.entity}`}>
-                  {slotData.entity.length > 12
-                    ? `${slotData.entity.substring(0, 10)}...`
-                    : slotData.entity}
+                  {slotData.entity.length > 12 ? `${slotData.entity.substring(0, 10)}...` : slotData.entity}
                 </span>
               ) : (
                 proposer.proposerValidatorIndex && (
-                  <span className="truncate block">
-                    Validator: {proposer.proposerValidatorIndex}
-                  </span>
+                  <span className="truncate block">Validator: {proposer.proposerValidatorIndex}</span>
                 )
               )}
             </div>
@@ -283,20 +272,12 @@ const PhaseIcons: React.FC<PhaseIconsProps> = ({
         })();
 
         // Get the maximum expected attestations from the slot data
-        const totalExpectedAttestations = attestationsData?.maximumVotes
-          ? Number(attestationsData.maximumVotes)
-          : 0;
+        const totalExpectedAttestations = attestationsData?.maximumVotes ? Number(attestationsData.maximumVotes) : 0;
 
         // Show percentage in attestation or accepted phase
-        if (
-          (isActiveInPhase('attester') || isActiveInPhase('accepted')) &&
-          totalExpectedAttestations > 0
-        ) {
+        if ((isActiveInPhase('attester') || isActiveInPhase('accepted')) && totalExpectedAttestations > 0) {
           // Calculate percentage
-          const percentage = Math.min(
-            100,
-            Math.round((visibleAttestationsCount / totalExpectedAttestations) * 100),
-          );
+          const percentage = Math.min(100, Math.round((visibleAttestationsCount / totalExpectedAttestations) * 100));
           return `${percentage}% of the attesters voted for this block`;
         }
 
@@ -307,9 +288,7 @@ const PhaseIcons: React.FC<PhaseIconsProps> = ({
         if (isActiveInPhase('accepted') && attestationsData?.windows) {
           // Calculate when it hit 66% attestations (acceptance time)
           let acceptanceTime = Infinity;
-          const totalExpectedAttestations = attestationsData?.maximumVotes
-            ? Number(attestationsData.maximumVotes)
-            : 0;
+          const totalExpectedAttestations = attestationsData?.maximumVotes ? Number(attestationsData.maximumVotes) : 0;
 
           if (totalExpectedAttestations > 0) {
             // Threshold for 66% of attestations
@@ -426,12 +405,8 @@ const PhaseIcons: React.FC<PhaseIconsProps> = ({
                 {getDynamicContent(phase.id) === 'Waiting...' ? (
                   /* Skeleton loader for waiting state */
                   <div className="flex flex-col items-center space-y-2">
-                    <div
-                      className={`h-2 w-3/4 rounded-full bg-${phase.color}-400/20 animate-pulse`}
-                    ></div>
-                    <div
-                      className={`h-2 w-2/3 rounded-full bg-${phase.color}-400/20 animate-pulse`}
-                    ></div>
+                    <div className={`h-2 w-3/4 rounded-full bg-${phase.color}-400/20 animate-pulse`}></div>
+                    <div className={`h-2 w-2/3 rounded-full bg-${phase.color}-400/20 animate-pulse`}></div>
                   </div>
                 ) : (
                   <span
@@ -441,13 +416,11 @@ const PhaseIcons: React.FC<PhaseIconsProps> = ({
                   </span>
                 )}
                 <div>{blockTime}</div>
-                {phase.id === 'proposer' &&
-                  currentPhase !== Phase.Building &&
-                  blockTime !== undefined && (
-                    <div className="text-xs font-mono text-success mt-1 whitespace-nowrap">
-                      {(blockTime / 1000).toFixed(1)}s
-                    </div>
-                  )}
+                {phase.id === 'proposer' && currentPhase !== Phase.Building && blockTime !== undefined && (
+                  <div className="text-xs font-mono text-success mt-1 whitespace-nowrap">
+                    {(blockTime / 1000).toFixed(1)}s
+                  </div>
+                )}
               </div>
             </div>
 

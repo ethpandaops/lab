@@ -48,9 +48,7 @@ export const Route = createRootRoute({
 
   component: RootComponent,
   pendingComponent: () => <LoadingState message="Loading configuration..." />,
-  errorComponent: ({ error }) => (
-    <ErrorState message="Failed to load application" error={error as Error} />
-  ),
+  errorComponent: ({ error }) => <ErrorState message="Failed to load application" error={error as Error} />,
 });
 
 function RootComponent() {
@@ -85,10 +83,7 @@ function RootComponent() {
   }, [config, availableNetworks, search.network]);
 
   return (
-    <ApplicationProvider
-      api={{ client, baseUrl: bootstrap.backend.url, restApiUrl }}
-      beacon={{ config }}
-    >
+    <ApplicationProvider api={{ client, baseUrl: bootstrap.backend.url, restApiUrl }} beacon={{ config }}>
       <ModalProvider>
         <ScrollToTop />
         <Outlet />

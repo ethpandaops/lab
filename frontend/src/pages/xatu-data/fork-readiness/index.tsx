@@ -79,9 +79,7 @@ function ForkReadiness() {
     const network = config.ethereum.networks[selectedNetwork];
     const nodes = nodesData.filter(n => selectedUser === 'all' || n.username === selectedUser);
 
-    const clientReadiness = Object.entries(
-      network.forks?.consensus?.electra?.min_client_versions || {},
-    )
+    const clientReadiness = Object.entries(network.forks?.consensus?.electra?.min_client_versions || {})
       .map(([clientName, minVersion]) => {
         const clientNodes = nodes.filter(n => n.consensus_client === clientName);
         const readyNodes = clientNodes.filter(n => {
@@ -105,8 +103,7 @@ function ForkReadiness() {
           name: clientName,
           totalNodes: clientNodes.length,
           readyNodes: readyNodes.length,
-          readyPercentage:
-            clientNodes.length === 0 ? 100 : (readyNodes.length / clientNodes.length) * 100,
+          readyPercentage: clientNodes.length === 0 ? 100 : (readyNodes.length / clientNodes.length) * 100,
           minVersion,
           nodes: clientNodes.map(n => ({
             name: n.client_name,
@@ -162,8 +159,8 @@ function ForkReadiness() {
             <div className="text-4xl mb-4">🎉</div>
             <h2 className="text-2xl font-sans font-bold text-primary mb-2">No Upcoming Forks</h2>
             <p className="text-sm font-mono text-secondary max-w-lg">
-              There are no upcoming forks configured for {selectedNetwork}. Check back later for
-              updates on future network upgrades.
+              There are no upcoming forks configured for {selectedNetwork}. Check back later for updates on future
+              network upgrades.
             </p>
           </CardBody>
         </Card>
@@ -171,8 +168,8 @@ function ForkReadiness() {
         {/* Data Note */}
         <div className="text-center py-4">
           <p className="text-xs font-mono text-tertiary">
-            Note: This data represents only nodes sending data to the Xatu project and is not
-            representative of the total network.
+            Note: This data represents only nodes sending data to the Xatu project and is not representative of the
+            total network.
           </p>
         </div>
       </div>
@@ -186,9 +183,7 @@ function ForkReadiness() {
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-2">
             <div>
               <div className="flex items-baseline space-x-2 mb-0.5">
-                <h2 className="text-xl sm:text-2xl font-sans font-bold text-primary">
-                  Fork Readiness
-                </h2>
+                <h2 className="text-xl sm:text-2xl font-sans font-bold text-primary">Fork Readiness</h2>
                 <span className="text-base sm:text-lg font-mono text-accent">Electra</span>
               </div>
               <span className="text-xs sm:text-sm font-mono text-secondary">
@@ -235,18 +230,13 @@ function ForkReadiness() {
                   <CardHeader className="border-b border-subtle/30">
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-2">
                       <div>
-                        <h3 className="text-xl sm:text-2xl font-sans font-bold text-primary mb-0.5">
-                          {network.name}
-                        </h3>
+                        <h3 className="text-xl sm:text-2xl font-sans font-bold text-primary mb-0.5">{network.name}</h3>
                         <div className="text-xs sm:text-sm font-mono">
                           <span className="text-secondary">Overall readiness: </span>
-                          <span className="text-primary font-bold">
-                            {network.readyPercentage.toFixed(1)}%
-                          </span>
+                          <span className="text-primary font-bold">{network.readyPercentage.toFixed(1)}%</span>
                           <span className="text-tertiary">
                             {' '}
-                            ({network.readyNodes}/{network.totalNodes}{' '}
-                            {network.totalNodes === 1 ? 'node' : 'nodes'})
+                            ({network.readyNodes}/{network.totalNodes} {network.totalNodes === 1 ? 'node' : 'nodes'})
                           </span>
                         </div>
                       </div>
@@ -254,18 +244,14 @@ function ForkReadiness() {
                         {network.timeUntilFork > 0 ? (
                           <div className="text-right">
                             <div className="text-accent text-base sm:text-lg font-medium mb-0.5">
-                              {formatDistanceToNow(
-                                new Date(Date.now() + network.timeUntilFork * 1000),
-                              )}
+                              {formatDistanceToNow(new Date(Date.now() + network.timeUntilFork * 1000))}
                             </div>
                             <div className="text-tertiary text-xs sm:text-sm">
                               until fork (epoch {network.forkEpoch})
                             </div>
                           </div>
                         ) : (
-                          <div className="text-success text-base sm:text-lg font-medium">
-                            Fork activated
-                          </div>
+                          <div className="text-success text-base sm:text-lg font-medium">Fork activated</div>
                         )}
                       </div>
                     </div>
@@ -300,8 +286,8 @@ function ForkReadiness() {
                                     {CLIENT_METADATA[client.name]?.name || client.name}
                                   </div>
                                   <div className="text-xs font-mono text-tertiary mt-0.5">
-                                    min v{client.minVersion} · {client.readyPercentage.toFixed(1)}%
-                                    ready ({client.readyNodes}/{client.totalNodes})
+                                    min v{client.minVersion} · {client.readyPercentage.toFixed(1)}% ready (
+                                    {client.readyNodes}/{client.totalNodes})
                                   </div>
                                 </div>
                               </div>
@@ -320,9 +306,7 @@ function ForkReadiness() {
                                     className="text-accent transition-all duration-500"
                                     strokeWidth="4"
                                     strokeDasharray={62.83} // 2 * pi * r
-                                    strokeDashoffset={
-                                      62.83 - (62.83 * client.readyPercentage) / 100
-                                    }
+                                    strokeDashoffset={62.83 - (62.83 * client.readyPercentage) / 100}
                                     strokeLinecap="round"
                                     stroke="currentColor"
                                     fill="transparent"
@@ -375,8 +359,8 @@ function ForkReadiness() {
       {/* Data Note */}
       <div className="text-center py-4">
         <p className="text-xs font-mono text-tertiary">
-          Note: This data represents only nodes sending data to the Xatu project and is not
-          representative of the total network.
+          Note: This data represents only nodes sending data to the Xatu project and is not representative of the total
+          network.
         </p>
       </div>
     </div>

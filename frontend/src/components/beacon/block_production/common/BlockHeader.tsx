@@ -58,21 +58,8 @@ const BlockHeader: React.FC<BlockHeaderProps> = ({
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
             >
-              <rect
-                x="3"
-                y="3"
-                width="18"
-                height="18"
-                rx="2"
-                stroke="currentColor"
-                strokeWidth="2"
-              />
-              <path
-                d="M16 8H8M16 12H8M16 16H8"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-              />
+              <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" strokeWidth="2" />
+              <path d="M16 8H8M16 12H8M16 16H8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
             </svg>
           </div>
           <div>
@@ -88,13 +75,9 @@ const BlockHeader: React.FC<BlockHeaderProps> = ({
               )}
 
               {/* Block Version - Try to get from any available source */}
-              {(blockData?.blockVersion ||
-                blockData?.raw?.block_version ||
-                blockData?.raw?.blockVersion) && (
+              {(blockData?.blockVersion || blockData?.raw?.block_version || blockData?.raw?.blockVersion) && (
                 <div className="ml-auto bg-cyber-neon/10 px-2 py-0.5 rounded text-xs font-semibold text-cyber-neon uppercase tracking-wide">
-                  {blockData?.blockVersion ||
-                    blockData?.raw?.block_version ||
-                    blockData?.raw?.blockVersion}
+                  {blockData?.blockVersion || blockData?.raw?.block_version || blockData?.raw?.blockVersion}
                 </div>
               )}
             </div>
@@ -111,12 +94,7 @@ const BlockHeader: React.FC<BlockHeaderProps> = ({
               xmlns="http://www.w3.org/2000/svg"
             >
               <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" />
-              <path
-                d="M12 6V18M16 10L8 14M8 10L16 14"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-              />
+              <path d="M12 6V18M16 10L8 14M8 10L16 14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
             </svg>
             <span className="relative z-10 font-semibold">{blockValue.toFixed(4)} ETH</span>
           </div>
@@ -132,9 +110,7 @@ const BlockHeader: React.FC<BlockHeaderProps> = ({
         <div className="flex justify-between items-center text-xs">
           <div className="flex items-center">
             <span className="text-text-tertiary mr-1">State Root:</span>
-            <span className="text-text-secondary font-mono">
-              {formatHash(blockData?.stateRoot)}
-            </span>
+            <span className="text-text-secondary font-mono">{formatHash(blockData?.stateRoot)}</span>
           </div>
 
           {proposerEntity && (
@@ -152,9 +128,7 @@ const BlockHeader: React.FC<BlockHeaderProps> = ({
           <div className="flex items-center">
             <span className="text-text-tertiary mr-1">Size:</span>
             <span className="text-text-secondary font-mono">
-              {blockData?.blockTotalBytes
-                ? `${(blockData.blockTotalBytes / 1024).toFixed(1)} KB`
-                : '—'}
+              {blockData?.blockTotalBytes ? `${(blockData.blockTotalBytes / 1024).toFixed(1)} KB` : '—'}
             </span>
           </div>
         </div>

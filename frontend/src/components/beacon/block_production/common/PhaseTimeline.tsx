@@ -39,7 +39,7 @@ const PhaseTimeline: React.FC<PhaseTimelineProps> = ({
 }) => {
   // Use timeline context
   const { currentTimeMs, displayTimeMs, isPlaying, togglePlayPause } = useTimeline();
-  
+
   // CRITICAL FIX: Use startMs/endMs instead of inclusionDelay!
   // Calculate which attestation windows have already happened by the current time
   const filteredAttestationWindows =
@@ -69,7 +69,7 @@ const PhaseTimeline: React.FC<PhaseTimelineProps> = ({
     nodeBlockP2P,
     blockTime,
     attestationsCount,
-    totalExpectedAttestations,
+    totalExpectedAttestations
   );
 
   // Notify parent component about the current phase if callback is provided
@@ -87,7 +87,7 @@ const PhaseTimeline: React.FC<PhaseTimelineProps> = ({
     const now = Date.now();
     const timeSinceLastRender = now - lastRenderRef.current;
 
-      // Update the last log time
+    // Update the last log time
     lastLogTimeRef.current = now;
 
     lastRenderRef.current = now;
@@ -107,7 +107,6 @@ const PhaseTimeline: React.FC<PhaseTimelineProps> = ({
 
   // Update previous time after checking for resets
   React.useEffect(() => {
-
     setPreviousTimeMs(currentTimeMs);
   }, [currentTimeMs, isReset]);
 
@@ -142,9 +141,7 @@ const PhaseTimeline: React.FC<PhaseTimelineProps> = ({
               <button
                 onClick={resetToCurrentSlot}
                 className={`px-2.5 py-1 rounded-md font-medium text-xs transition focus:outline-none focus:ring-1 focus:ring-accent/70 ${
-                  displaySlotOffset === 0
-                    ? 'bg-accent/20 text-accent'
-                    : 'text-secondary hover:bg-hover'
+                  displaySlotOffset === 0 ? 'bg-accent/20 text-accent' : 'text-secondary hover:bg-hover'
                 }`}
                 disabled={displaySlotOffset === 0}
                 title="Return to Current Slot"
@@ -174,14 +171,10 @@ const PhaseTimeline: React.FC<PhaseTimelineProps> = ({
               </button>
             </div>
 
-            <div
-              className={`font-mono text-primary flex flex-col ${isMobile ? 'text-xs' : 'text-sm'}`}
-            >
+            <div className={`font-mono text-primary flex flex-col ${isMobile ? 'text-xs' : 'text-sm'}`}>
               <div className="text-lg font-semibold">Slot: {slotNumber ?? '—'}</div>
               {slotNumber !== null && displaySlotOffset !== 0 && (
-                <div
-                  className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-secondary opacity-80`}
-                >
+                <div className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-secondary opacity-80`}>
                   Lag: {headLagSlots - displaySlotOffset}
                 </div>
               )}
@@ -202,9 +195,7 @@ const PhaseTimeline: React.FC<PhaseTimelineProps> = ({
             {/* Time display */}
             <div className="flex items-center gap-2 mt-1 mb-1">
               <div className="bg-surface/40 border border-subtle/50 px-3 py-1 rounded-md flex items-center">
-                <span className="font-mono text-base font-semibold text-primary">
-                  {formatTime(displayTimeMs)}
-                </span>
+                <span className="font-mono text-base font-semibold text-primary">{formatTime(displayTimeMs)}</span>
               </div>
               <button
                 onClick={togglePlayPause}
@@ -271,8 +262,7 @@ const PhaseTimeline: React.FC<PhaseTimelineProps> = ({
             <div
               className="w-5 h-5 bg-white rounded-full -translate-y-1/3 opacity-50"
               style={{
-                boxShadow:
-                  '0 0 10px 3px rgba(255, 255, 255, 0.5), 0 0 20px 5px rgba(255, 255, 255, 0.3)',
+                boxShadow: '0 0 10px 3px rgba(255, 255, 255, 0.5), 0 0 20px 5px rgba(255, 255, 255, 0.3)',
               }}
             ></div>
           </div>
@@ -374,14 +364,8 @@ const PhaseTimeline: React.FC<PhaseTimelineProps> = ({
 
   // Get percentages for phase transitions (as portion of the 12s slot)
   const propagationPercent = Math.min(98, Math.max(2, (propagationTime / 12000) * 100));
-  const attestationPercent = Math.min(
-    98,
-    Math.max(propagationPercent + 1, (attestationTime / 12000) * 100),
-  );
-  const acceptancePercent = Math.min(
-    98,
-    Math.max(attestationPercent + 1, (acceptanceTime / 12000) * 100),
-  );
+  const attestationPercent = Math.min(98, Math.max(propagationPercent + 1, (attestationTime / 12000) * 100));
+  const acceptancePercent = Math.min(98, Math.max(attestationPercent + 1, (acceptanceTime / 12000) * 100));
 
   return (
     <div className="w-full">
@@ -410,9 +394,7 @@ const PhaseTimeline: React.FC<PhaseTimelineProps> = ({
             <button
               onClick={resetToCurrentSlot}
               className={`px-2.5 py-1 rounded-md font-medium text-xs transition focus:outline-none focus:ring-1 focus:ring-accent/70 ${
-                displaySlotOffset === 0
-                  ? 'bg-accent/20 text-accent'
-                  : 'text-secondary hover:bg-hover'
+                displaySlotOffset === 0 ? 'bg-accent/20 text-accent' : 'text-secondary hover:bg-hover'
               }`}
               disabled={displaySlotOffset === 0}
               title="Return to Current Slot"
@@ -442,9 +424,7 @@ const PhaseTimeline: React.FC<PhaseTimelineProps> = ({
             </button>
           </div>
 
-          <div
-            className={`font-mono text-primary flex flex-col ${isMobile ? 'text-xs' : 'text-sm'}`}
-          >
+          <div className={`font-mono text-primary flex flex-col ${isMobile ? 'text-xs' : 'text-sm'}`}>
             <div className="text-lg font-semibold">Slot: {slotNumber ?? '—'}</div>
             {slotNumber !== null && displaySlotOffset !== 0 && (
               <div className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-secondary opacity-80`}>
@@ -485,9 +465,7 @@ const PhaseTimeline: React.FC<PhaseTimelineProps> = ({
           {/* Time display */}
           <div className="flex items-center gap-2 mt-1 mb-1">
             <div className="bg-surface/40 border border-subtle/50 px-3 py-1 rounded-md flex items-center">
-              <span className="font-mono text-base font-semibold text-primary">
-                {formatTime(displayTimeMs)}
-              </span>
+              <span className="font-mono text-base font-semibold text-primary">{formatTime(displayTimeMs)}</span>
             </div>
             <button
               onClick={togglePlayPause}

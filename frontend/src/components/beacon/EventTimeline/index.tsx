@@ -1,4 +1,4 @@
-import { useEffect, useRef, useMemo, useState, memo } from 'react';
+import { useEffect, useRef, useMemo, useState, memo, useCallback } from 'react';
 import { ChevronLeft, ChevronRight, Settings, X, Box, Radio, Layers, Network } from 'lucide-react';
 import { FaPlay, FaPause } from 'react-icons/fa';
 import { useModal } from '@/contexts/ModalContext.tsx';
@@ -42,6 +42,7 @@ interface EventTimelineProps {
   onNextSlot: () => void;
   isLive: boolean;
   className?: string;
+  onTimeSeek?: (time: number) => void;
 }
 
 const EventItem = memo(function EventItem({
@@ -340,6 +341,7 @@ export const EventTimeline = memo(function EventTimeline({
   onNextSlot,
   isLive,
   className,
+  onTimeSeek,
 }: EventTimelineProps) {
   const { showModal, hideModal } = useModal();
   const [filters, setFilters] = useState<EventFilter>(() => {
@@ -356,6 +358,70 @@ export const EventTimeline = memo(function EventTimeline({
           username: undefined,
         };
   });
+
+  const timelineBarRef = useRef<HTMLDivElement>(null);
+  const [isDragging, setIsDragging] = useState(false);
+
+  const handleTimelineInteraction = useCallback(
+    (clientX: number) => {
+      if (!timelineBarRef.current || !onTimeSeek) return;
+
+      const rect = timelineBarRef.current.getBoundingClientRect();
+      const x = clientX - rect.left;
+      const percentage = Math.max(0, Math.min(1, x / rect.width));
+      const time = percentage * 12;
+
+      onTimeSeek(time);
+    },
+    [onTimeSeek],
+  );
+
+  const handleMouseDown = useCallback(
+    (e: React.MouseEvent) => {
+      if (!onTimeSeek) return;
+      setIsDragging(true);
+      handleTimelineInteraction(e.clientX);
+    },
+    [onTimeSeek, handleTimelineInteraction],
+  );
+
+  const handleTouchStart = useCallback(
+    (e: React.TouchEvent) => {
+      if (!onTimeSeek || e.touches.length === 0) return;
+      setIsDragging(true);
+      handleTimelineInteraction(e.touches[0].clientX);
+    },
+    [onTimeSeek, handleTimelineInteraction],
+  );
+
+  useEffect(() => {
+    if (!isDragging) return;
+
+    const handleMouseMove = (e: MouseEvent) => {
+      handleTimelineInteraction(e.clientX);
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (e.touches.length === 0) return;
+      handleTimelineInteraction(e.touches[0].clientX);
+    };
+
+    const handleEnd = () => {
+      setIsDragging(false);
+    };
+
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleEnd);
+    document.addEventListener('touchmove', handleTouchMove);
+    document.addEventListener('touchend', handleEnd);
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleEnd);
+      document.removeEventListener('touchmove', handleTouchMove);
+      document.removeEventListener('touchend', handleEnd);
+    };
+  }, [isDragging, handleTimelineInteraction]);
   const timelineRef = useRef<HTMLDivElement>(null);
   const lastEventRef = useRef<HTMLDivElement>(null);
   const scrollTimeoutRef = useRef<number | undefined>(undefined);
@@ -610,7 +676,12 @@ export const EventTimeline = memo(function EventTimeline({
         {/* Timeline Bar */}
         <div className="px-2 md:px-3 pb-1.5 md:pb-3">
           {/* Timeline sections */}
-          <div className="relative h-6 md:h-12">
+          <div
+            ref={timelineBarRef}
+            className="relative h-6 md:h-12 cursor-pointer select-none touch-none"
+            onMouseDown={handleMouseDown}
+            onTouchStart={handleTouchStart}
+          >
             {/* Background sections */}
             <div className="absolute inset-0 flex rounded-lg overflow-hidden">
               <div className="w-1/3 bg-accent/10 border-r border-white/5" />

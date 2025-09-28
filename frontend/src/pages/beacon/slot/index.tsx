@@ -106,7 +106,7 @@ function SlotLookup() {
           {/* Quick Actions */}
           <div className="flex flex-wrap gap-3 mt-6">
             <button
-              onClick={() => navigate({ to: '/beacon/slot/live' })}
+              onClick={() => navigate({ to: '/experiments/live-slots' })}
               className="group flex items-center gap-2 px-4 py-2 bg-nav/50 backdrop-blur-sm border border-accent/20 rounded-lg text-sm font-mono text-accent hover:bg-accent/20 hover:border-accent transition-colors"
             >
               <span>View Live Slot</span>

@@ -13,9 +13,7 @@ export const generateConsistentColor = (str: string): string => {
 };
 
 // Helper function to count unique builder pubkeys from all bids
-export const countUniqueBuilderPubkeys = (
-  bids: Array<{ builderPubkey?: string; [key: string]: any }>,
-): number => {
+export const countUniqueBuilderPubkeys = (bids: Array<{ builderPubkey?: string; [key: string]: any }>): number => {
   const uniqueBuilderPubkeys = new Set();
   bids.forEach(bid => {
     if (bid.builderPubkey) {
@@ -41,7 +39,7 @@ export const ACCEPTANCE_DEFAULT_TIME = 8500; // 8.5s into slot
 export const getTransformedBids = (
   allBids: BidData[],
   currentTime: number,
-  winningBidData?: { blockHash: string } | null,
+  winningBidData?: { blockHash: string } | null
 ) => {
   // Only show bids that have occurred before the current time
   const timeFilteredBids = allBids.filter(bid => bid.time <= currentTime);

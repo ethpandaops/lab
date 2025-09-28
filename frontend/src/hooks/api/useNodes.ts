@@ -41,9 +41,7 @@ export function useAllNetworkNodes(filters?: NodeFilters) {
     queryFn: async () => {
       const client = await getRestApiClient();
       // Parallel fetch from all networks
-      const responses = await Promise.all(
-        availableNetworks.map(network => client.getNodes(network, filters)),
-      );
+      const responses = await Promise.all(availableNetworks.map(network => client.getNodes(network, filters)));
       // Aggregate and transform all responses
       return aggregateNodesFromNetworks(responses, availableNetworks);
     },

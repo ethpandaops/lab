@@ -1,10 +1,4 @@
-import {
-  useContext as reactUseContext,
-  createContext,
-  useState,
-  useEffect,
-  ReactNode,
-} from 'react';
+import { useContext as reactUseContext, createContext, useState, useEffect, ReactNode } from 'react';
 import { Config } from '@/api/client.ts';
 
 // Constants for beacon chain timing calculations

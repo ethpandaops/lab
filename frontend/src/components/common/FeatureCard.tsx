@@ -102,9 +102,7 @@ export const FeatureCard: React.FC<FeatureCardProps> = ({
           <div
             className={`flex-1 p-2 md:p-8 flex flex-col justify-center min-w-0 text-center ${logo || icon ? 'md:text-left' : ''}`}
           >
-            <div className="mb-1 text-xs font-mono text-accent/80 tracking-wide uppercase">
-              {subtitle}
-            </div>
+            <div className="mb-1 text-xs font-mono text-accent/80 tracking-wide uppercase">{subtitle}</div>
 
             <h3 className="text-xl md:text-2xl font-sans font-bold text-primary group-hover:text-accent transition-colors duration-300 mb-2">
               {title}

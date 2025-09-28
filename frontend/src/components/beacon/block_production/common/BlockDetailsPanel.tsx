@@ -81,9 +81,7 @@ const BlockDetailsPanel: React.FC<BlockDetailsPanelProps> = ({
     return (
       <div className={`${getContainerClasses()} border ${getBorderColor()}`}>
         {/* Colored indicator at top */}
-        <div
-          className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${getIndicatorColor()}`}
-        ></div>
+        <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${getIndicatorColor()}`}></div>
 
         {/* Simple header with slot number */}
         <div className="px-4 pt-3 pb-2 border-b border-border-subtle">
@@ -98,20 +96,8 @@ const BlockDetailsPanel: React.FC<BlockDetailsPanelProps> = ({
 
         {/* Empty state */}
         <div className="h-[calc(100%-2.5rem)] flex flex-col items-center justify-center space-y-3 text-text-tertiary">
-          <svg
-            className="w-10 h-10"
-            viewBox="0 0 24 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <circle
-              cx="12"
-              cy="12"
-              r="10"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeDasharray="4 4"
-            />
+          <svg className="w-10 h-10" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" strokeDasharray="4 4" />
             <path d="M12 6V12L16 14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
           </svg>
           <p className="text-xs font-mono">No block data</p>
@@ -134,9 +120,7 @@ const BlockDetailsPanel: React.FC<BlockDetailsPanelProps> = ({
     return (
       <div className={`${getContainerClasses()} border ${getBorderColor()}`}>
         {/* Colored indicator at top */}
-        <div
-          className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${getIndicatorColor()}`}
-        ></div>
+        <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${getIndicatorColor()}`}></div>
 
         {/* Simple header */}
         <div className="p-4 flex flex-col border-b border-border-subtle">
@@ -169,9 +153,7 @@ const BlockDetailsPanel: React.FC<BlockDetailsPanelProps> = ({
   return (
     <div className={`${getContainerClasses()} border ${getBorderColor()}`}>
       {/* Colored indicator at top */}
-      <div
-        className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${getIndicatorColor()}`}
-      ></div>
+      <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${getIndicatorColor()}`}></div>
 
       {/* Block header section */}
       {normalizedBlock && (

@@ -1,9 +1,5 @@
 import { Phase } from './types';
-import {
-  PROPAGATION_DEFAULT_TIME,
-  ATTESTATION_DEFAULT_TIME,
-  ACCEPTANCE_DEFAULT_TIME,
-} from './utils';
+import { PROPAGATION_DEFAULT_TIME, ATTESTATION_DEFAULT_TIME, ACCEPTANCE_DEFAULT_TIME } from './utils';
 
 // Helper function to determine the current phase
 export const getCurrentPhase = (
@@ -12,7 +8,7 @@ export const getCurrentPhase = (
   nodeBlockP2P: Record<string, number>,
   blockTime?: number,
   attestationsCount: number = 0,
-  totalExpectedAttestations: number = 0,
+  totalExpectedAttestations: number = 0
 ): Phase | null => {
   // REQUIREMENT 1: Always show Building phase even with no data (this prevents "Waiting for data...")
   // Check if we have at least one of: node seen times, node P2P times, or block time
@@ -59,9 +55,7 @@ export const getCurrentPhase = (
 
   // REQUIREMENT 4: Accepted phase starts at 66% attestations
   const is66PercentAttested =
-    hasAttestationData &&
-    hasExpectedAttestations &&
-    attestationsCount >= totalExpectedAttestations * 0.66;
+    hasAttestationData && hasExpectedAttestations && attestationsCount >= totalExpectedAttestations * 0.66;
 
   // If we have 66% of attestations, move to accepted phase
   if (is66PercentAttested) {
@@ -86,7 +80,7 @@ export const getCurrentPhase = (
 export const isInPropagationPhase = (
   currentTime: number,
   nodeBlockSeen: Record<string, number>,
-  nodeBlockP2P: Record<string, number>,
+  nodeBlockP2P: Record<string, number>
 ): boolean => {
   const phase = getCurrentPhase(currentTime, nodeBlockSeen, nodeBlockP2P);
   return phase !== Phase.Building;

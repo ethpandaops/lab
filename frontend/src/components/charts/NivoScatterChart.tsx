@@ -29,8 +29,7 @@ export interface NodeRenderProps {
   onClick: () => void;
 }
 
-export interface NivoScatterChartProps
-  extends Omit<ScatterPlotSvgProps<ScatterPlotDatum>, 'height' | 'width'> {
+export interface NivoScatterChartProps extends Omit<ScatterPlotSvgProps<ScatterPlotDatum>, 'height' | 'width'> {
   height?: number | string;
   width?: number | string;
   nodeComponent?: ComponentType<any>;

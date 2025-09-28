@@ -1,4 +1,4 @@
-import { useMemo, memo } from 'react';
+import { useMemo, memo, useRef, useEffect } from 'react';
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, ReferenceLine } from 'recharts';
 import { ChartWithStats } from '@/components/charts/ChartWithStats';
 import { HelpCircle } from 'lucide-react';

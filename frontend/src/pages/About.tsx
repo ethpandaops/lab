@@ -8,16 +8,11 @@ export const About = () => {
         <div className="absolute inset-0 bg-gradient-to-b from-accent/5 via-transparent to-transparent rounded-xl pointer-events-none" />
         <div className="relative">
           <div className="inline-flex items-center justify-center w-20 h-20 mb-6 bg-accent/10 rounded-full border border-accent/30 p-3">
-            <img
-              src="/ethpandaops.png"
-              alt="ethPandaOps logo"
-              className="w-full h-full object-contain"
-            />
+            <img src="/ethpandaops.png" alt="ethPandaOps logo" className="w-full h-full object-contain" />
           </div>
           <h1 className="text-4xl md:text-5xl font-sans font-bold text-primary mb-4">The Lab</h1>
           <p className="text-lg font-mono text-secondary max-w-2xl mx-auto">
-            An experimental platform providing deep insights into Ethereum through open data and
-            powerful visualizations
+            An experimental platform providing deep insights into Ethereum through open data and powerful visualizations
           </p>
         </div>
       </section>
@@ -28,9 +23,8 @@ export const About = () => {
           <div className="inline-flex items-center justify-center text-4xl mb-4">🐼</div>
           <h2 className="text-2xl font-sans font-bold text-primary mb-4">Built by ethPandaOps</h2>
           <p className="text-base font-mono text-secondary max-w-2xl mx-auto">
-            We're a team of DevOps engineers dedicated to supporting Ethereum through
-            infrastructure, tooling, and research. Our work spans testnets, monitoring, and protocol
-            testing.
+            We're a team of DevOps engineers dedicated to supporting Ethereum through infrastructure, tooling, and
+            research. Our work spans testnets, monitoring, and protocol testing.
           </p>
         </div>
 

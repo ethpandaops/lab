@@ -47,7 +47,7 @@ export function ModalProvider({ children }: ModalProviderProps) {
               {modalContent}
             </div>
           </div>,
-          document.body,
+          document.body
         )}
     </ModalContext.Provider>
   );

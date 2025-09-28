@@ -22,7 +22,7 @@ export const Card: React.FC<CardProps> = ({
         'card',
         isPrimary ? 'card-primary' : 'card-secondary',
         isInteractive && 'card-interactive',
-        className,
+        className
       )}
       onClick={isInteractive ? onClick : undefined}
     >
