@@ -1,4 +1,4 @@
-import { Link, Outlet, useLocation } from 'react-router-dom';
+import { Link, Outlet, useLocation } from '@tanstack/react-router';
 import { ArrowRight, Activity, Search, Layers } from 'lucide-react';
 import { FaEthereum } from 'react-icons/fa';
 import { Card, CardBody } from '@/components/common/Card';
@@ -18,12 +18,10 @@ function Beacon() {
         <div className="absolute inset-0 bg-gradient-to-br from-accent/5 via-transparent to-transparent" />
         <CardBody className="relative flex items-center gap-8">
           <div className="flex-1">
-            <h1 className="text-3xl md:text-4xl font-sans font-bold text-primary mb-3">
-              Beacon Chain Explorer
-            </h1>
+            <h1 className="text-3xl md:text-4xl font-sans font-bold text-primary mb-3">Beacon Chain Explorer</h1>
             <p className="text-base md:text-lg font-mono text-secondary max-w-3xl">
-              Explore detailed information about individual slots on the Ethereum beacon chain,
-              including timing data, attestations, and network propagation metrics.
+              Explore detailed information about individual slots on the Ethereum beacon chain, including timing data,
+              attestations, and network propagation metrics.
             </p>
           </div>
           <FaEthereum className="w-24 h-24 text-accent/20" />
@@ -51,9 +49,7 @@ function Beacon() {
                       <h3 className="text-lg font-sans font-bold text-primary group-hover:text-accent transition-colors mb-1">
                         Live View
                       </h3>
-                      <p className="text-sm font-mono text-tertiary truncate">
-                        Real-time slot monitoring
-                      </p>
+                      <p className="text-sm font-mono text-tertiary truncate">Real-time slot monitoring</p>
                     </div>
 
                     <ArrowRight className="w-5 h-5 text-accent/50 group-hover:text-accent group-hover:translate-x-1 transition-all duration-300" />
@@ -109,9 +105,7 @@ function Beacon() {
                       <h3 className="text-lg font-sans font-bold text-primary group-hover:text-accent transition-colors mb-1">
                         Block Production Flow
                       </h3>
-                      <p className="text-sm font-mono text-tertiary truncate">
-                        Real-time production visualization
-                      </p>
+                      <p className="text-sm font-mono text-tertiary truncate">Real-time production visualization</p>
                     </div>
 
                     <ArrowRight className="w-5 h-5 text-accent/50 group-hover:text-accent group-hover:translate-x-1 transition-all duration-300" />
@@ -139,9 +133,7 @@ function Beacon() {
                       <h3 className="text-lg font-sans font-bold text-primary group-hover:text-accent transition-colors mb-1">
                         Locally Built Blocks
                       </h3>
-                      <p className="text-sm font-mono text-tertiary truncate">
-                        Analyze block production
-                      </p>
+                      <p className="text-sm font-mono text-tertiary truncate">Analyze block production</p>
                     </div>
 
                     <ArrowRight className="w-5 h-5 text-accent/50 group-hover:text-accent group-hover:translate-x-1 transition-all duration-300" />
@@ -155,7 +147,6 @@ function Beacon() {
             </Card>
           </div>
         </div>
-
       </div>
     </div>
   );

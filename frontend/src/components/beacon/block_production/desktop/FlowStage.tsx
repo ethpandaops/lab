@@ -64,14 +64,8 @@ const FlowStage: React.FC<FlowStageProps> = ({
         // If we have timing data for nodes that have seen the block, sort by that
         return [...items]
           .sort((a, b) => {
-            const aTime =
-              a.earliestTime !== undefined && a.earliestTime <= currentTime
-                ? a.earliestTime
-                : Infinity;
-            const bTime =
-              b.earliestTime !== undefined && b.earliestTime <= currentTime
-                ? b.earliestTime
-                : Infinity;
+            const aTime = a.earliestTime !== undefined && a.earliestTime <= currentTime ? a.earliestTime : Infinity;
+            const bTime = b.earliestTime !== undefined && b.earliestTime <= currentTime ? b.earliestTime : Infinity;
 
             // If both have no timing or timing hasn't reached current time, sort by count
             if (aTime === Infinity && bTime === Infinity) {
@@ -93,9 +87,7 @@ const FlowStage: React.FC<FlowStageProps> = ({
   }, [items, maxItems, stageType, currentTime]);
 
   return (
-    <div
-      className={`flex flex-col h-full transition-opacity duration-700 ${isActive ? 'opacity-100' : 'opacity-40'}`}
-    >
+    <div className={`flex flex-col h-full transition-opacity duration-700 ${isActive ? 'opacity-100' : 'opacity-40'}`}>
       <div className="text-sm font-medium mb-1 text-primary">{title}</div>
 
       <div
@@ -142,17 +134,13 @@ const FlowStage: React.FC<FlowStageProps> = ({
                     marginBottom: '0.25rem', // Reduce spacing between items
                   }),
                   ...(stageType === 'builder' && {
-                    backgroundColor: item.isWinning
-                      ? 'rgba(255, 215, 0, 0.05)'
-                      : 'rgba(230, 126, 34, 0.05)',
+                    backgroundColor: item.isWinning ? 'rgba(255, 215, 0, 0.05)' : 'rgba(230, 126, 34, 0.05)',
                     boxShadow: item.isWinning ? 'inset 0 0 0 1px rgba(255, 215, 0, 0.2)' : 'none',
                     marginBottom: '0.075rem', // Minimal spacing for builders to fit more
                     fontSize: '0.65rem', // Slightly smaller text to fit more builders
                   }),
                   ...(stageType === 'relay' && {
-                    backgroundColor: item.isWinning
-                      ? 'rgba(255, 215, 0, 0.05)'
-                      : 'rgba(46, 204, 113, 0.05)',
+                    backgroundColor: item.isWinning ? 'rgba(255, 215, 0, 0.05)' : 'rgba(46, 204, 113, 0.05)',
                     boxShadow: item.isWinning ? 'inset 0 0 0 1px rgba(255, 215, 0, 0.2)' : 'none',
                     marginBottom: '0.125rem', // Even smaller spacing for relays
                   }),
@@ -233,9 +221,7 @@ const FlowStage: React.FC<FlowStageProps> = ({
 
                         {/* Time pill with fixed height/width */}
                         <span className="font-mono text-[10px] font-medium bg-gray-800/40 px-1 py-0.5 rounded min-w-[40px] text-center">
-                          {item.earliestTime &&
-                          item.earliestTime <= currentTime &&
-                          item.formattedTime
+                          {item.earliestTime && item.earliestTime <= currentTime && item.formattedTime
                             ? item.formattedTime
                             : 'Waiting...'}
                         </span>
@@ -277,9 +263,7 @@ const FlowStage: React.FC<FlowStageProps> = ({
                   stageType !== 'node' &&
                   showValue &&
                   item.value !== undefined && (
-                    <div className="mt-1.5 text-[11px] font-mono text-tertiary">
-                      Value: {item.value.toFixed(6)} ETH
-                    </div>
+                    <div className="mt-1.5 text-[11px] font-mono text-tertiary">Value: {item.value.toFixed(6)} ETH</div>
                   )}
               </div>
             ))}

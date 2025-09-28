@@ -20,9 +20,7 @@ export const ClientPresenceHeatmap: FC<ClientPresenceHeatmapProps> = ({ data, is
 
     // Get the last 20 slots
     const SLOTS_TO_SHOW = 20;
-    const sortedData = [...data]
-      .sort((a, b) => Number(b.slot) - Number(a.slot))
-      .slice(0, SLOTS_TO_SHOW);
+    const sortedData = [...data].sort((a, b) => Number(b.slot) - Number(a.slot)).slice(0, SLOTS_TO_SHOW);
 
     const slots = sortedData.map(d => d.slot.toString());
 
@@ -44,9 +42,7 @@ export const ClientPresenceHeatmap: FC<ClientPresenceHeatmapProps> = ({ data, is
 
         // For execution clients
         if (clientType === 'execution') {
-          const matchingClient = EXECUTION_CLIENTS.find(c =>
-            clientName.toLowerCase().includes(c.toLowerCase()),
-          );
+          const matchingClient = EXECUTION_CLIENTS.find(c => clientName.toLowerCase().includes(c.toLowerCase()));
           if (matchingClient) {
             clientsFound.add(matchingClient);
             clientCounts.set(matchingClient, (clientCounts.get(matchingClient) || 0) + 1);
@@ -54,9 +50,7 @@ export const ClientPresenceHeatmap: FC<ClientPresenceHeatmapProps> = ({ data, is
         }
         // For consensus clients
         else {
-          const matchingClient = CONSENSUS_CLIENTS.find(c =>
-            clientName.toLowerCase().includes(c.toLowerCase()),
-          );
+          const matchingClient = CONSENSUS_CLIENTS.find(c => clientName.toLowerCase().includes(c.toLowerCase()));
           if (matchingClient) {
             clientsFound.add(matchingClient);
             clientCounts.set(matchingClient, (clientCounts.get(matchingClient) || 0) + 1);
@@ -159,9 +153,7 @@ export const ClientPresenceHeatmap: FC<ClientPresenceHeatmapProps> = ({ data, is
             <div className="space-y-1">
               {presenceData.clients.map(client => (
                 <div key={client} className="flex items-center">
-                  <div className="w-28 pr-2 text-right text-sm font-mono text-tertiary truncate">
-                    {client}
-                  </div>
+                  <div className="w-28 pr-2 text-right text-sm font-mono text-tertiary truncate">{client}</div>
                   {presenceData.slots.map(slot => {
                     const count = presenceData.presenceMap.get(slot)?.get(client) || 0;
                     return (

@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { getRestApiClient, NodeFilters } from '@/api';
 import { transformNodesToUIFormat, aggregateNodesFromNetworks } from '@/utils/transformers';
-import useNetwork from '@/contexts/network';
+import { useNetwork } from '@/stores/appStore';
 
 /**
  * Hook to fetch nodes for a specific network
@@ -41,9 +41,7 @@ export function useAllNetworkNodes(filters?: NodeFilters) {
     queryFn: async () => {
       const client = await getRestApiClient();
       // Parallel fetch from all networks
-      const responses = await Promise.all(
-        availableNetworks.map(network => client.getNodes(network, filters)),
-      );
+      const responses = await Promise.all(availableNetworks.map(network => client.getNodes(network, filters)));
       // Aggregate and transform all responses
       return aggregateNodesFromNetworks(responses, availableNetworks);
     },

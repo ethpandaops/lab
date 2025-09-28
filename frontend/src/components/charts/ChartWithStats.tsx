@@ -57,16 +57,12 @@ export const ChartWithStats = ({
         className={clsx(
           'font-sans font-bold text-primary',
           headerSize === 'large' ? 'text-2xl' : 'text-lg',
-          titleClassName,
+          titleClassName
         )}
       >
         {title}
       </h2>
-      {description && (
-        <p className={clsx('text-sm font-mono text-tertiary', descriptionClassName)}>
-          {description}
-        </p>
-      )}
+      {description && <p className={clsx('text-sm font-mono text-tertiary', descriptionClassName)}>{description}</p>}
     </div>
   );
 
@@ -84,9 +80,7 @@ export const ChartWithStats = ({
             {/* Chart container with title inside if specified */}
             <div className="relative" style={{ height: `${height}px` }}>
               {titlePlacement === 'inside' && showHeader && (
-                <div className="absolute top-2 left-0 right-0 z-10 flex justify-center">
-                  {titleContent}
-                </div>
+                <div className="absolute top-2 left-0 right-0 z-10 flex justify-center">{titleContent}</div>
               )}
               <div className="h-full flex items-center justify-center">{chart}</div>
             </div>
@@ -99,7 +93,7 @@ export const ChartWithStats = ({
                 <div
                   className={clsx(
                     'font-mono text-tertiary sticky top-0 z-10 flex border-b border-subtle',
-                    compactSeries ? 'text-xs p-1.5' : 'text-xs p-2.5',
+                    compactSeries ? 'text-xs p-1.5' : 'text-xs p-2.5'
                   )}
                 >
                   <div className="flex-1 font-medium">Series</div>
@@ -115,7 +109,7 @@ export const ChartWithStats = ({
                         compactSeries ? 'px-1.5 py-1' : 'px-2.5 py-1.5',
                         item.isHidden ? 'opacity-50' : '',
                         item.isHighlighted ? 'bg-prominent' : '',
-                        'hover:bg-hover',
+                        'hover:bg-hover'
                       )}
                       title={`Min: ${typeof item.min === 'number' ? item.min.toFixed(2) : item.min}${item.unit || ''}
 Avg: ${typeof item.avg === 'number' ? item.avg.toFixed(2) : item.avg}${item.unit || ''}
@@ -123,17 +117,11 @@ Max: ${typeof item.max === 'number' ? item.max.toFixed(2) : item.max}${item.unit
                     >
                       <div className="flex-1 flex items-center gap-2 min-w-0">
                         <div
-                          className={clsx(
-                            'rounded-full flex-shrink-0',
-                            compactSeries ? 'w-2.5 h-2.5' : 'w-3 h-3',
-                          )}
+                          className={clsx('rounded-full flex-shrink-0', compactSeries ? 'w-2.5 h-2.5' : 'w-3 h-3')}
                           style={{ backgroundColor: item.color }}
                         />
                         <span
-                          className={clsx(
-                            'font-mono text-primary truncate',
-                            compactSeries ? 'text-xs' : 'text-sm',
-                          )}
+                          className={clsx('font-mono text-primary truncate', compactSeries ? 'text-xs' : 'text-sm')}
                         >
                           {item.name}
                         </span>
@@ -141,12 +129,10 @@ Max: ${typeof item.max === 'number' ? item.max.toFixed(2) : item.max}${item.unit
                       <div
                         className={clsx(
                           'font-mono font-medium text-secondary whitespace-nowrap w-20 text-right',
-                          compactSeries ? 'text-xs' : 'text-sm',
+                          compactSeries ? 'text-xs' : 'text-sm'
                         )}
                       >
-                        {typeof item.last === 'number'
-                          ? `${item.last.toFixed(1)}${item.unit || ''}`
-                          : item.last}
+                        {typeof item.last === 'number' ? `${item.last.toFixed(1)}${item.unit || ''}` : item.last}
                       </div>
                     </button>
                   ))}
@@ -157,9 +143,7 @@ Max: ${typeof item.max === 'number' ? item.max.toFixed(2) : item.max}${item.unit
         </div>
 
         {/* Notes Section */}
-        {notes && (
-          <div className="text-sm font-mono text-tertiary border-t border-subtle pt-3">{notes}</div>
-        )}
+        {notes && <div className="text-sm font-mono text-tertiary border-t border-subtle pt-3">{notes}</div>}
       </div>
     </div>
   );

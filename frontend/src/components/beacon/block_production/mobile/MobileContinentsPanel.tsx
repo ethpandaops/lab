@@ -84,10 +84,7 @@ const MobileContinentsPanel: React.FC<MobileContinentsPanelProps> = ({
         continentsMap[continentCode].nodesThatHaveSeenBlock += 1;
 
         // Track the earliest time for this continent
-        continentsMap[continentCode].earliestTime = Math.min(
-          continentsMap[continentCode].earliestTime,
-          nodeTime,
-        );
+        continentsMap[continentCode].earliestTime = Math.min(continentsMap[continentCode].earliestTime, nodeTime);
 
         // Add to propagation time totals
         continentsMap[continentCode].totalPropagationTime += nodeTime;
@@ -100,8 +97,7 @@ const MobileContinentsPanel: React.FC<MobileContinentsPanelProps> = ({
       Object.entries(continentsMap)
         .map(([code, data]) => {
           // Calculate average propagation time if we have at least one node
-          const avgPropagationTime =
-            data.nodesSeen > 0 ? data.totalPropagationTime / data.nodesSeen : 0;
+          const avgPropagationTime = data.nodesSeen > 0 ? data.totalPropagationTime / data.nodesSeen : 0;
 
           return {
             name: continentFullNames[code] || code,
@@ -176,8 +172,8 @@ const MobileContinentsPanel: React.FC<MobileContinentsPanelProps> = ({
             Continents: {continentData.filter(c => c.seen > 0).length}/{continentData.length}
           </div>
           <div>
-            {continentData.reduce((sum, c) => sum + c.seen, 0)}/
-            {continentData.reduce((sum, c) => sum + c.count, 0)} nodes
+            {continentData.reduce((sum, c) => sum + c.seen, 0)}/{continentData.reduce((sum, c) => sum + c.count, 0)}{' '}
+            nodes
           </div>
         </div>
       )}

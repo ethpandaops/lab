@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, memo, useRef, useEffect } from 'react';
 import { ChartWithStats, NivoLineChart, NivoScatterChart } from '@/components/charts';
 import { CheckCircle2, XCircle, HelpCircle } from 'lucide-react';
 import { useModal } from '@/contexts/ModalContext.tsx';
@@ -144,7 +144,7 @@ const LabeledScatterPlot = ({
   );
 };
 
-export function DataAvailabilityPanel({
+export const DataAvailabilityPanel = memo(function DataAvailabilityPanel({
   blobTimings,
   currentTime,
   nodes,
@@ -406,8 +406,8 @@ export function DataAvailabilityPanel({
 
     const arrivalData = Array.from({ length: currentBinIndex + 1 }, (_, i) => ({
       time: i * 0.05, // Convert bin index to seconds
-      blocks: blockBins[i],
-      blobs: blobBins[i],
+      blocks: blockBins[i] ?? 0,
+      blobs: blobBins[i] ?? 0,
     }));
 
     return {
@@ -523,11 +523,15 @@ export function DataAvailabilityPanel({
                   data={[
                     {
                       id: 'Block Arrivals',
-                      data: arrivalData.map(d => ({ x: d.time, y: d.blocks })),
+                      data: arrivalData
+                        .filter(d => d.time != null && d.blocks != null)
+                        .map(d => ({ x: d.time, y: d.blocks })),
                     },
                     {
                       id: 'Blob Arrivals',
-                      data: arrivalData.map(d => ({ x: d.time, y: d.blobs })),
+                      data: arrivalData
+                        .filter(d => d.time != null && d.blobs != null)
+                        .map(d => ({ x: d.time, y: d.blobs })),
                     },
                   ]}
                   margin={{ top: 16, right: 8, left: 36, bottom: 24 }}
@@ -611,7 +615,9 @@ export function DataAvailabilityPanel({
                 <NivoLineChart
                   data={continentalData.map(continent => ({
                     id: CONTINENT_NAMES[continent.continent] || continent.continent,
-                    data: continent.points.map(p => ({ x: p.time, y: p.percentage })),
+                    data: continent.points
+                      .filter(p => p.time != null && p.percentage != null)
+                      .map(p => ({ x: p.time, y: p.percentage })),
                   }))}
                   margin={{ top: 16, right: 8, left: 36, bottom: 24 }}
                   xScale={{
@@ -672,4 +678,4 @@ export function DataAvailabilityPanel({
       </div>
     </div>
   );
-}
+});

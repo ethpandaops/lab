@@ -4,8 +4,8 @@ import reactHooks from 'eslint-plugin-react-hooks';
 import reactRefresh from 'eslint-plugin-react-refresh';
 import tseslint from 'typescript-eslint';
 import prettier from 'eslint-plugin-prettier/recommended';
-import css from "@eslint/css";
-import { tailwindSyntax } from "@eslint/css/syntax";
+import css from '@eslint/css';
+import { tailwindSyntax } from '@eslint/css/syntax';
 
 export default tseslint.config(
   {
@@ -17,7 +17,7 @@ export default tseslint.config(
       'craco.config.js',
       'node_modules',
       'coverage',
-      'eslint_report.json'
+      'eslint_report.json',
     ],
   },
   {
@@ -55,19 +55,19 @@ export default tseslint.config(
     },
   },
   {
-    files: ["**/*.css"],
+    files: ['**/*.css'],
     plugins: {
-        css,
+      css,
     },
-    language: "css/css",
+    language: 'css/css',
     languageOptions: {
-        customSyntax: tailwindSyntax,
-        tolerant: true,
+      customSyntax: tailwindSyntax,
+      tolerant: true,
     },
     rules: {
-        "css/no-empty-blocks": "error",
-        "css/no-invalid-at-rules": "off", // disabled for now as tailwind not fully supported
+      'css/no-empty-blocks': 'error',
+      'css/no-invalid-at-rules': 'off', // disabled for now as tailwind not fully supported
     },
     extends: [css.configs.recommended, ...tseslint.configs.recommended, prettier],
-  },
+  }
 );

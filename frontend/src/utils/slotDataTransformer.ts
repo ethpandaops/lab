@@ -24,12 +24,6 @@ import {
   ListBeaconSlotMevRelayResponse,
   ListBeaconSlotMevBuilderResponse,
   BeaconBlock,
-  BlockTimingNode,
-  BlobTimingNode,
-  AttestationTimingChunk,
-  AttestationCorrectness,
-  ProposerEntity,
-  MevBlock,
 } from '@/api/gen/backend/pkg/api/v1/proto/public_pb';
 import { protoInt64 } from '@bufbuild/protobuf';
 

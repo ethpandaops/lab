@@ -12,11 +12,7 @@ const ConnectionLine: React.FC<ConnectionLineProps> = ({ isActive, isWinning = f
       <div className="h-4 w-full max-w-[8rem] lg:max-w-[12rem] xl:max-w-[18rem] relative">
         <div
           className={`absolute top-1/2 -translate-y-1/2 h-[1px] w-full transition-colors duration-300 ${
-            !isActive
-              ? 'bg-tertiary/20 opacity-50'
-              : isWinning
-                ? 'bg-accent/70'
-                : 'bg-border-subtle'
+            !isActive ? 'bg-tertiary/20 opacity-50' : isWinning ? 'bg-accent/70' : 'bg-border-subtle'
           }`}
         />
 

@@ -3,11 +3,7 @@
     "baseUrl": ".",
     "target": "ES2020", // Different from "target": "ESNext"
     "useDefineForClassFields": true, // Same
-    "lib": [
-      "DOM",
-      "DOM.Iterable",
-      "ESNext"
-    ], // Same
+    "lib": ["DOM", "DOM.Iterable", "ESNext"], // Same
     "allowJs": false, // Same
     "skipLibCheck": true, // Same
     "esModuleInterop": false, // Same
@@ -26,12 +22,10 @@
     "noEmit": true, // Same
     "jsx": "react-jsx", // Same
     "paths": {
-			"@/*": ["src/*"]
+      "@/*": ["src/*"]
     }
     // Missing "verbatimModuleSyntax": true from reference config
   },
-  "include": [
-    "src"
-  ],
+  "include": ["src"],
   "exclude": []
 }

@@ -62,8 +62,7 @@ export const LocallyBuiltBlocksVisualization: FC<LocallyBuiltBlocksVisualization
 }) => {
   // Process data for last 16 slots client presence
   const last16SlotsPresence = useMemo(() => {
-    if (isLoading || isError || data.length === 0)
-      return { execution: [], consensus: [], slotsShown: 0 };
+    if (isLoading || isError || data.length === 0) return { execution: [], consensus: [], slotsShown: 0 };
 
     const SLOTS_TO_SHOW = 16; // Define the number of slots
 
@@ -179,7 +178,7 @@ export const LocallyBuiltBlocksVisualization: FC<LocallyBuiltBlocksVisualization
     if (isLoading || isError || data.length === 0) return [];
 
     const txCounts = data.flatMap(slotBlocks =>
-      slotBlocks.blocks.map(block => block.executionPayloadTransactionsCount),
+      slotBlocks.blocks.map(block => block.executionPayloadTransactionsCount)
     );
 
     // Create count buckets
@@ -213,7 +212,7 @@ export const LocallyBuiltBlocksVisualization: FC<LocallyBuiltBlocksVisualization
         x: block.executionPayloadTransactionsCount, // Transaction Count
         y: block.blockTotalBytes, // Block Size
         z: block.metadata?.metaClientName || 'Unknown', // Client Name for color/tooltip
-      })),
+      }))
     );
   }, [data, isLoading, isError]);
 
@@ -294,9 +293,7 @@ export const LocallyBuiltBlocksVisualization: FC<LocallyBuiltBlocksVisualization
       <Card>
         <CardBody>
           <div className="text-center py-6">
-            <p className="text-error font-mono">
-              Error loading visualization data. Please try again.
-            </p>
+            <p className="text-error font-mono">Error loading visualization data. Please try again.</p>
           </div>
         </CardBody>
       </Card>

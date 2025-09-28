@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation } from '@tanstack/react-router';
 
 /**
  * Redirect component that automatically redirects from /xatu/* to /xatu-data/*
@@ -16,7 +16,7 @@ const XatuRedirect: React.FC = () => {
     // Preserve the search params
     const targetPath = newPath + location.search + location.hash;
 
-    navigate(targetPath, { replace: true });
+    navigate({ to: targetPath as any, replace: true });
   }, [navigate, location]);
 
   return null;

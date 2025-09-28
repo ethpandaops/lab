@@ -32,11 +32,7 @@ interface TimelineProviderProps {
   slotOffset?: number; // Optional offset from current slot
 }
 
-export const TimelineProvider: React.FC<TimelineProviderProps> = ({
-  network,
-  children,
-  slotOffset = 0,
-}) => {
+export const TimelineProvider: React.FC<TimelineProviderProps> = ({ network, children, slotOffset = 0 }) => {
   const { getBeaconClock } = useBeacon();
   const clock = getBeaconClock(network);
 
@@ -47,9 +43,7 @@ export const TimelineProvider: React.FC<TimelineProviderProps> = ({
   const [isPlaying, setIsPlaying] = useState<boolean>(true);
 
   // Store current slot for components that need it
-  const [currentSlot, setCurrentSlot] = useState<number | null>(
-    clock ? clock.getCurrentSlot() + slotOffset : null,
-  );
+  const [currentSlot, setCurrentSlot] = useState<number | null>(clock ? clock.getCurrentSlot() + slotOffset : null);
 
   // For components that need current time in state
   const [currentTimeMs, setCurrentTimeMs] = useState<number>(0);

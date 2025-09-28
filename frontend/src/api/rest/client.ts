@@ -448,7 +448,7 @@ export class RestApiClient {
 /**
  * Parameters for getNetworks API call
  */
-export interface NetworksParams extends NetworkFilters {}
+export interface NetworksParams {}
 
 /**
  * Parameters for getNodes API call

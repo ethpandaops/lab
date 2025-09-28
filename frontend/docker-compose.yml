@@ -5,6 +5,6 @@ services:
       context: ..
       dockerfile: frontend/Dockerfile
     ports:
-      - "8080:80"
+      - '8080:80'
     volumes:
-      - ../config.yaml:/usr/share/nginx/html/config.yaml:ro 
+      - ../config.yaml:/usr/share/nginx/html/config.yaml:ro

@@ -1,9 +1,9 @@
-import { Outlet, useLocation } from 'react-router-dom';
+import { Outlet, useLocation, useNavigate } from '@tanstack/react-router';
 import { Navigation } from '@/components/layout/Navigation';
 import { Breadcrumbs } from '@/components/layout/Breadcrumbs';
 import { NetworkSelector } from '@/components/common/NetworkSelector';
 import { useEffect, useState } from 'react';
-import useNetwork from '@/contexts/network';
+import { useNetwork } from '@/stores/appStore';
 import { Logo } from '@/components/layout/Logo';
 import useBeacon from '@/contexts/beacon';
 import { Menu } from 'lucide-react';
@@ -14,6 +14,7 @@ import useApiMode from '@/contexts/apiMode';
 
 function Layout() {
   const location = useLocation();
+  const navigate = useNavigate();
   const isHome = location.pathname === '/';
   const { selectedNetwork, setSelectedNetwork } = useNetwork();
   const [currentSlot, setCurrentSlot] = useState<number | null>(null);
@@ -33,6 +34,17 @@ function Layout() {
   useEffect(() => {
     setIsMobileMenuOpen(false);
   }, [location]);
+
+  // Sync URL search params with selected network
+  useEffect(() => {
+    navigate({
+      search: prev => ({
+        ...prev,
+        network: selectedNetwork === 'mainnet' ? undefined : selectedNetwork,
+      }),
+      replace: true,
+    });
+  }, [selectedNetwork, navigate]);
 
   // Update slot and epoch every second
   useEffect(() => {
@@ -79,7 +91,7 @@ function Layout() {
             <div className="hidden lg:flex justify-center">
               <NetworkSelector
                 selectedNetwork={selectedNetwork}
-                onNetworkChange={network => setSelectedNetwork(network, 'ui')}
+                onNetworkChange={setSelectedNetwork}
                 expandToFit={true}
               />
             </div>
@@ -164,7 +176,7 @@ function Layout() {
               <div className="p-4 border-b border-subtle space-y-3">
                 <NetworkSelector
                   selectedNetwork={selectedNetwork}
-                  onNetworkChange={network => setSelectedNetwork(network, 'ui')}
+                  onNetworkChange={setSelectedNetwork}
                   className="w-full"
                 />
 
@@ -226,7 +238,8 @@ function Layout() {
             className={clsx(
               'w-full',
               location.pathname === '/beacon/slot/live' ||
-                /^\/beacon\/slot\/\d+$/.test(location.pathname)
+                /^\/beacon\/slot\/\d+$/.test(location.pathname) ||
+                /^\/experiments\/[^/]+$/.test(location.pathname)
                 ? 'h-[calc(100vh-56px)]'
                 : ['min-h-0', 'p-2 md:p-4 lg:p-6'],
             )}
@@ -235,7 +248,8 @@ function Layout() {
               className={clsx(
                 'relative',
                 location.pathname === '/beacon/slot/live' ||
-                  /^\/beacon\/slot\/\d+$/.test(location.pathname)
+                  /^\/beacon\/slot\/\d+$/.test(location.pathname) ||
+                  /^\/experiments\/[^/]+$/.test(location.pathname)
                   ? 'h-full'
                   : ['p-4 md:p-6 lg:p-8'],
               )}

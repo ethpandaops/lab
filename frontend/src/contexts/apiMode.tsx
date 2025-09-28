@@ -30,11 +30,7 @@ export const ApiModeProvider = ({ children }: { children: ReactNode }) => {
     console.log('API mode initialized:', useRestApi ? 'REST' : 'gRPC');
   }, []);
 
-  return (
-    <ApiModeContext.Provider value={{ useRestApi, toggleApiMode }}>
-      {children}
-    </ApiModeContext.Provider>
-  );
+  return <ApiModeContext.Provider value={{ useRestApi, toggleApiMode }}>{children}</ApiModeContext.Provider>;
 };
 
 export const useApiMode = () => {

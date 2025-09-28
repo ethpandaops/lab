@@ -1,3 +1,4 @@
+import { memo, useRef, useEffect } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import clsx from 'clsx';
 import { FaEthereum } from 'react-icons/fa';
@@ -17,7 +18,7 @@ interface BlockDetailsProps {
   onToggleCollapse: () => void;
 }
 
-export function BlockDetailsOverlay({
+export const BlockDetailsOverlay = memo(function BlockDetailsOverlay({
   slot,
   proposer,
   proposerIndex,
@@ -155,4 +156,4 @@ export function BlockDetailsOverlay({
       )}
     </div>
   );
-}
+});

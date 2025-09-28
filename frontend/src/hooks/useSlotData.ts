@@ -44,16 +44,12 @@ export function useSlotData({ network, slot, isLive = false, enabled = true }: U
       return client.getSlotData(request);
     },
     enabled: !!slot && enabled && !useRestApi,
-    // Dynamic stale time based on whether viewing live or historical slots
-    staleTime: isLive ? 100 : 5 * 60 * 1000, // 100ms for live, 5 minutes for historical
-    // Only refetch for live slots
-    refetchInterval: isLive ? 12000 : false, // 12 seconds = 1 slot
+    staleTime: 11000,
+    refetchInterval: isLive ? 12000 : false,
     retry: (failureCount, error) => {
-      // Don't retry if slot doesn't exist (404)
       if (error?.message?.includes('404')) {
         return false;
       }
-      // Retry up to 2 times for other errors
       return failureCount < 2;
     },
   });

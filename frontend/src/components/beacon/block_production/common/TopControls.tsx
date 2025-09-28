@@ -76,11 +76,7 @@ const TopControls: React.FC<TopControlsProps> = ({
         className="bg-surface/70 p-1.5 rounded-md border border-subtle hover:bg-hover transition focus:outline-none focus:ring-1 focus:ring-accent/70"
         title={isPlaying ? 'Pause' : 'Play'}
       >
-        {isPlaying ? (
-          <Pause className="h-4 w-4 text-primary" />
-        ) : (
-          <Play className="h-4 w-4 text-primary" />
-        )}
+        {isPlaying ? <Pause className="h-4 w-4 text-primary" /> : <Play className="h-4 w-4 text-primary" />}
       </button>
     </div>
   );

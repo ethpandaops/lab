@@ -1,13 +1,9 @@
 import { useState, useEffect, useMemo } from 'react';
-import { useParams, useSearchParams } from 'react-router-dom';
-import useNetwork from '@/contexts/network';
-import useConfig from '@/contexts/config';
+import { useParams, useSearch } from '@tanstack/react-router';
+import { useNetwork, useConfig } from '@/stores/appStore';
 import { useSlotData } from '@/hooks/useSlotData';
 import { AlertCircle } from 'lucide-react';
-import {
-  MobileBlockProductionView,
-  DesktopBlockProductionView,
-} from '@/components/beacon/block_production';
+import { MobileBlockProductionView, DesktopBlockProductionView } from '@/components/beacon/block_production';
 import { hasNonEmptyDeliveredPayloads } from '@/components/beacon/block_production/common/blockUtils';
 
 // Simple hash function to generate a color from a string (e.g., relay name)
@@ -29,7 +25,7 @@ const generateConsistentColor = (str: string): string => {
  */
 export default function BlockProductionSlotPage() {
   const { slot: slotParam } = useParams<{ slot?: string }>();
-  const [searchParams] = useSearchParams();
+  const search = useSearch({ from: '__root__' });
   const { selectedNetwork } = useNetwork();
   const { config } = useConfig();
 
@@ -49,7 +45,7 @@ export default function BlockProductionSlotPage() {
 
   // Initial time value from URL query parameter, default to 0
   // Check both 'time' and 't' parameters for backward compatibility
-  const initialTimeParam = searchParams.get('time') || searchParams.get('t');
+  const initialTimeParam = search.time || search.t;
   const initialTimeMs = initialTimeParam ? parseFloat(initialTimeParam) * 1000 : 0;
   // Initialize with time parameter
 
@@ -182,10 +178,7 @@ export default function BlockProductionSlotPage() {
       if (!relayData.bids || !Array.isArray(relayData.bids)) continue;
 
       const matchingBid = relayData.bids.find(
-        bid =>
-          bid.blockHash &&
-          typeof bid.blockHash === 'string' &&
-          bid.blockHash === executionPayloadBlockHash,
+        bid => bid.blockHash && typeof bid.blockHash === 'string' && bid.blockHash === executionPayloadBlockHash
       );
 
       if (matchingBid) {
@@ -226,11 +219,7 @@ export default function BlockProductionSlotPage() {
     }
 
     return null;
-  }, [
-    slotData?.relayBids,
-    slotData?.block?.executionPayloadBlockHash,
-    slotData?.deliveredPayloads,
-  ]);
+  }, [slotData?.relayBids, slotData?.block?.executionPayloadBlockHash, slotData?.deliveredPayloads]);
 
   // Initial transformation of bids from the data
   const allTransformedBids = useMemo(() => {
@@ -335,9 +324,7 @@ export default function BlockProductionSlotPage() {
     // Add more attestations if we're past 8.5 seconds to trigger the Accepted phase
     if (initialTimeMs >= 8500 && preparedData.attestations) {
       // Only add if it doesn't already have attestations at this time point
-      const hasLateAttestations = preparedData.attestations.windows?.some(
-        (window: any) => window.startMs >= 8500,
-      );
+      const hasLateAttestations = preparedData.attestations.windows?.some((window: any) => window.startMs >= 8500);
 
       if (!hasLateAttestations) {
         preparedData.attestations.windows.push({
@@ -362,16 +349,12 @@ export default function BlockProductionSlotPage() {
       <div className="flex-1 flex items-center justify-center min-h-[50vh]">
         <div className="text-center max-w-md mx-auto">
           <AlertCircle className="w-12 h-12 text-accent/60 mx-auto mb-4" />
-          <h2 className="text-xl font-sans font-bold text-primary mb-2">
-            Experiment Not Available
-          </h2>
+          <h2 className="text-xl font-sans font-bold text-primary mb-2">Experiment Not Available</h2>
           <p className="text-sm font-mono text-secondary mb-4">
             Block Production Flow is not enabled for {selectedNetwork}
           </p>
           {supportedNetworks.length > 0 && (
-            <p className="text-xs font-mono text-tertiary">
-              Available on: {supportedNetworks.join(', ')}
-            </p>
+            <p className="text-xs font-mono text-tertiary">Available on: {supportedNetworks.join(', ')}</p>
           )}
         </div>
       </div>
@@ -384,9 +367,7 @@ export default function BlockProductionSlotPage() {
       {isMobile ? (
         // Mobile View
         <div className="px-2 pt-1">
-          <div
-            className={`transition-opacity duration-300 ${isSlotLoading ? 'opacity-70' : 'opacity-100'}`}
-          >
+          <div className={`transition-opacity duration-300 ${isSlotLoading ? 'opacity-70' : 'opacity-100'}`}>
             <MobileBlockProductionView
               bids={slotData ? transformedBids : emptyBids}
               currentTime={currentTime}
@@ -403,7 +384,7 @@ export default function BlockProductionSlotPage() {
                       Object.entries(displayData.timings.blockSeen).map(([node, time]) => [
                         node,
                         typeof time === 'bigint' ? Number(time) : Number(time),
-                      ]),
+                      ])
                     )
                   : {}
               }
@@ -413,16 +394,14 @@ export default function BlockProductionSlotPage() {
                       Object.entries(displayData.timings.blockFirstSeenP2p).map(([node, time]) => [
                         node,
                         typeof time === 'bigint' ? Number(time) : Number(time),
-                      ]),
+                      ])
                     )
                   : {}
               }
               block={displayData.block}
               slotData={displayData}
               network={selectedNetwork || 'mainnet'}
-              isLocallyBuilt={
-                displayData ? !hasNonEmptyDeliveredPayloads(displayData.block, displayData) : false
-              }
+              isLocallyBuilt={displayData ? !hasNonEmptyDeliveredPayloads(displayData.block, displayData) : false}
             />
           </div>
 
@@ -443,9 +422,7 @@ export default function BlockProductionSlotPage() {
             </div>
           )}
 
-          <div
-            className={`transition-opacity duration-300 flex-1 ${isSlotLoading ? 'opacity-70' : 'opacity-100'}`}
-          >
+          <div className={`transition-opacity duration-300 flex-1 ${isSlotLoading ? 'opacity-70' : 'opacity-100'}`}>
             <DesktopBlockProductionView
               bids={slotData ? transformedBids : emptyBids}
               currentTime={currentTime}
@@ -462,7 +439,7 @@ export default function BlockProductionSlotPage() {
                       Object.entries(displayData.timings.blockSeen).map(([node, time]) => [
                         node,
                         typeof time === 'bigint' ? Number(time) : Number(time),
-                      ]),
+                      ])
                     )
                   : {}
               }
@@ -472,7 +449,7 @@ export default function BlockProductionSlotPage() {
                       Object.entries(displayData.timings.blockFirstSeenP2p).map(([node, time]) => [
                         node,
                         typeof time === 'bigint' ? Number(time) : Number(time),
-                      ]),
+                      ])
                     )
                   : {}
               }
@@ -491,9 +468,7 @@ export default function BlockProductionSlotPage() {
               togglePlayPause={togglePlayPause}
               isNextDisabled={false}
               network={selectedNetwork || 'mainnet'}
-              isLocallyBuilt={
-                displayData ? !hasNonEmptyDeliveredPayloads(displayData.block, displayData) : false
-              }
+              isLocallyBuilt={displayData ? !hasNonEmptyDeliveredPayloads(displayData.block, displayData) : false}
             />
           </div>
         </div>

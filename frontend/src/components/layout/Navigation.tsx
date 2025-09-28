@@ -1,5 +1,4 @@
-import { Link } from 'react-router-dom';
-import { useLocation } from 'react-router-dom';
+import { Link, useLocation } from '@tanstack/react-router';
 import { BeakerIcon, HomeIcon, InformationCircleIcon } from '@heroicons/react/24/outline';
 
 interface NavigationProps {

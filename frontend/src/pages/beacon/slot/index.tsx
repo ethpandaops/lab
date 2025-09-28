@@ -1,9 +1,8 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from '@tanstack/react-router';
 import { AlertTriangle, Search, AlertCircle } from 'lucide-react';
-import useNetwork from '@/contexts/network';
+import { useNetwork, useConfig } from '@/stores/appStore';
 import useBeacon from '@/contexts/beacon';
-import useConfig from '@/contexts/config';
 import { Card, CardBody } from '@/components/common/Card';
 
 function SlotLookup() {
@@ -32,7 +31,7 @@ function SlotLookup() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!slotNumber) return;
-    navigate(`${slotNumber}`);
+    navigate({ to: '/beacon/slot/$slot', params: { slot: slotNumber } });
   };
 
   // Show not available message if experiment isn't enabled for this network
@@ -107,14 +106,16 @@ function SlotLookup() {
           {/* Quick Actions */}
           <div className="flex flex-wrap gap-3 mt-6">
             <button
-              onClick={() => navigate('live')}
+              onClick={() => navigate({ to: '/experiments/live-slots' })}
               className="group flex items-center gap-2 px-4 py-2 bg-nav/50 backdrop-blur-sm border border-accent/20 rounded-lg text-sm font-mono text-accent hover:bg-accent/20 hover:border-accent transition-colors"
             >
               <span>View Live Slot</span>
               <div className="w-1.5 h-1.5 rounded-full bg-success animate-pulse" />
             </button>
             <button
-              onClick={() => navigate(`${currentSlot}`)}
+              onClick={() =>
+                navigate({ to: '/beacon/slot/$slot', params: { slot: String(currentSlot) } })
+              }
               className="flex items-center gap-2 px-4 py-2 bg-nav/50 backdrop-blur-sm border border-subtle rounded-lg text-sm font-mono text-tertiary hover:text-primary hover:border-white/20 transition-colors"
             >
               <span>Current Slot</span>

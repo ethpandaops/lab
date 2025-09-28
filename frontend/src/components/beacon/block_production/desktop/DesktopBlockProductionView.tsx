@@ -165,14 +165,11 @@ const DesktopBlockProductionView: React.FC<DesktopBlockProductionViewProps> = ({
       Object.entries(nodeBlockSeen).map(([node, time]) => [
         node,
         typeof time === 'bigint' ? Number(time) : Number(time),
-      ]),
+      ])
     );
 
     const nodeBlockP2P1 = Object.fromEntries(
-      Object.entries(nodeBlockP2P).map(([node, time]) => [
-        node,
-        typeof time === 'bigint' ? Number(time) : Number(time),
-      ]),
+      Object.entries(nodeBlockP2P).map(([node, time]) => [node, typeof time === 'bigint' ? Number(time) : Number(time)])
     );
 
     // Get earliest node timings grouped by continent
@@ -265,11 +262,7 @@ const DesktopBlockProductionView: React.FC<DesktopBlockProductionViewProps> = ({
             blockTime={blockTime}
             bids={bids}
             winningBid={winningBid}
-            proposer={
-              proposer
-                ? { proposerValidatorIndex: Number(proposer.proposerValidatorIndex) }
-                : undefined
-            }
+            proposer={proposer ? { proposerValidatorIndex: Number(proposer.proposerValidatorIndex) } : undefined}
             nodes={nodes}
             slotData={slotData}
             firstContinentToSeeBlock={firstContinentToSeeBlock}
