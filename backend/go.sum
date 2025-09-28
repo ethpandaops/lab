@@ -96,6 +96,8 @@ github.com/ethpandaops/xatu-cbt v0.0.0-20250925061206-b3dace14d73a h1:qlkhg3JthG
 github.com/ethpandaops/xatu-cbt v0.0.0-20250925061206-b3dace14d73a/go.mod h1:iJpkfBEpE98rnSIb+6dBlrBXfy35VqhCxhwRFzefUsU=
 github.com/ethpandaops/xatu-cbt v0.0.0-20250926001931-d069681d0904 h1:Is/C7EWS9j/s37HCDyDDbLNwUXQ9SDDqIJJcbAFtK5c=
 github.com/ethpandaops/xatu-cbt v0.0.0-20250926001931-d069681d0904/go.mod h1:iJpkfBEpE98rnSIb+6dBlrBXfy35VqhCxhwRFzefUsU=
+github.com/ethpandaops/xatu-cbt v0.0.0-20250926053734-075db6c4ebb3 h1:HJ/gIBtqPBJShdQc6iEmDGwUGnXo0NzehrtMi1efRxA=
+github.com/ethpandaops/xatu-cbt v0.0.0-20250926053734-075db6c4ebb3/go.mod h1:iJpkfBEpE98rnSIb+6dBlrBXfy35VqhCxhwRFzefUsU=
 github.com/felixge/httpsnoop v1.0.4 h1:NFTV2Zj1bL4mc9sqWACXbQFVBBg2W3GPvqp8/ESS2Wg=
 github.com/felixge/httpsnoop v1.0.4/go.mod h1:m8KPJKqk1gH5J9DgRY2ASl2lWCfGKXixSwevea8zH2U=
 github.com/ferranbt/fastssz v1.0.0 h1:9EXXYsracSqQRBQiHeaVsG/KQeYblPf40hsQPb9Dzk8=

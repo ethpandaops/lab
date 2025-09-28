@@ -20,19 +20,19 @@ import (
 const _ = grpc.SupportPackageIsVersion8
 
 const (
-	XatuCBT_ListFctNodeActiveLast24H_FullMethodName               = "/xatu_cbt.XatuCBT/ListFctNodeActiveLast24h"
-	XatuCBT_ListFctBlockFirstSeenByNode_FullMethodName            = "/xatu_cbt.XatuCBT/ListFctBlockFirstSeenByNode"
-	XatuCBT_ListFctBlockBlobFirstSeenByNode_FullMethodName        = "/xatu_cbt.XatuCBT/ListFctBlockBlobFirstSeenByNode"
-	XatuCBT_ListFctAttestationFirstSeenChunked50Ms_FullMethodName = "/xatu_cbt.XatuCBT/ListFctAttestationFirstSeenChunked50ms"
-	XatuCBT_ListFctAttestationCorrectnessHead_FullMethodName      = "/xatu_cbt.XatuCBT/ListFctAttestationCorrectnessHead"
-	XatuCBT_ListFctMevBidCountByRelay_FullMethodName              = "/xatu_cbt.XatuCBT/ListFctMevBidCountByRelay"
-	XatuCBT_ListFctMevBidCountByBuilder_FullMethodName            = "/xatu_cbt.XatuCBT/ListFctMevBidCountByBuilder"
-	XatuCBT_ListFctMevBidByBuilder_FullMethodName                 = "/xatu_cbt.XatuCBT/ListFctMevBidByBuilder"
-	XatuCBT_ListFctBlockBlobCountHead_FullMethodName              = "/xatu_cbt.XatuCBT/ListFctBlockBlobCountHead"
-	XatuCBT_ListFctBlockHead_FullMethodName                       = "/xatu_cbt.XatuCBT/ListFctBlockHead"
-	XatuCBT_ListFctBlockMevHead_FullMethodName                    = "/xatu_cbt.XatuCBT/ListFctBlockMevHead"
-	XatuCBT_ListFctBlockProposerEntity_FullMethodName             = "/xatu_cbt.XatuCBT/ListFctBlockProposerEntity"
-	XatuCBT_GetDataAvailability_FullMethodName                    = "/xatu_cbt.XatuCBT/GetDataAvailability"
+	XatuCBT_ListFctNodeActiveLast24H_FullMethodName                      = "/xatu_cbt.XatuCBT/ListFctNodeActiveLast24h"
+	XatuCBT_ListFctBlockFirstSeenByNode_FullMethodName                   = "/xatu_cbt.XatuCBT/ListFctBlockFirstSeenByNode"
+	XatuCBT_ListFctBlockBlobFirstSeenByNode_FullMethodName               = "/xatu_cbt.XatuCBT/ListFctBlockBlobFirstSeenByNode"
+	XatuCBT_ListFctAttestationFirstSeenChunked50Ms_FullMethodName        = "/xatu_cbt.XatuCBT/ListFctAttestationFirstSeenChunked50ms"
+	XatuCBT_ListFctAttestationCorrectnessHead_FullMethodName             = "/xatu_cbt.XatuCBT/ListFctAttestationCorrectnessHead"
+	XatuCBT_ListFctMevBidCountByRelay_FullMethodName                     = "/xatu_cbt.XatuCBT/ListFctMevBidCountByRelay"
+	XatuCBT_ListFctMevBidCountByBuilder_FullMethodName                   = "/xatu_cbt.XatuCBT/ListFctMevBidCountByBuilder"
+	XatuCBT_ListFctMevBidHighestValueByBuilderChunked50Ms_FullMethodName = "/xatu_cbt.XatuCBT/ListFctMevBidHighestValueByBuilderChunked50ms"
+	XatuCBT_ListFctBlockBlobCountHead_FullMethodName                     = "/xatu_cbt.XatuCBT/ListFctBlockBlobCountHead"
+	XatuCBT_ListFctBlockHead_FullMethodName                              = "/xatu_cbt.XatuCBT/ListFctBlockHead"
+	XatuCBT_ListFctBlockMevHead_FullMethodName                           = "/xatu_cbt.XatuCBT/ListFctBlockMevHead"
+	XatuCBT_ListFctBlockProposerEntity_FullMethodName                    = "/xatu_cbt.XatuCBT/ListFctBlockProposerEntity"
+	XatuCBT_GetDataAvailability_FullMethodName                           = "/xatu_cbt.XatuCBT/GetDataAvailability"
 )
 
 // XatuCBTClient is the client API for XatuCBT service.
@@ -63,9 +63,9 @@ type XatuCBTClient interface {
 	// ListFctMevBidCountByBuilder returns MEV builder bid count data.
 	// This table contains the total number of MEV bids for a slot by builder.
 	ListFctMevBidCountByBuilder(ctx context.Context, in *clickhouse.ListFctMevBidCountByBuilderRequest, opts ...grpc.CallOption) (*clickhouse.ListFctMevBidCountByBuilderResponse, error)
-	// ListFctMevBidByBuilder returns highest MEV bid values by builder for a slot.
-	// This table contains the highest value MEV relay bid for a slot by builder.
-	ListFctMevBidByBuilder(ctx context.Context, in *clickhouse.ListFctMevBidByBuilderRequest, opts ...grpc.CallOption) (*clickhouse.ListFctMevBidByBuilderResponse, error)
+	// ListFctMevBidHighestValueByBuilderChunked50ms returns highest MEV bid values by builder for a slot in 50ms chunks.
+	// This table contains the highest value MEV relay bid for a slot by builder broken down by 50ms time chunks.
+	ListFctMevBidHighestValueByBuilderChunked50Ms(ctx context.Context, in *clickhouse.ListFctMevBidHighestValueByBuilderChunked50MsRequest, opts ...grpc.CallOption) (*clickhouse.ListFctMevBidHighestValueByBuilderChunked50MsResponse, error)
 	// ListFctBlockBlobCountHead returns blob count data for blocks in the unfinalized chain.
 	// This table contains the number of blobs for each block, with forks potentially causing multiple blocks per slot.
 	ListFctBlockBlobCountHead(ctx context.Context, in *clickhouse.ListFctBlockBlobCountHeadRequest, opts ...grpc.CallOption) (*clickhouse.ListFctBlockBlobCountHeadResponse, error)
@@ -161,10 +161,10 @@ func (c *xatuCBTClient) ListFctMevBidCountByBuilder(ctx context.Context, in *cli
 	return out, nil
 }
 
-func (c *xatuCBTClient) ListFctMevBidByBuilder(ctx context.Context, in *clickhouse.ListFctMevBidByBuilderRequest, opts ...grpc.CallOption) (*clickhouse.ListFctMevBidByBuilderResponse, error) {
+func (c *xatuCBTClient) ListFctMevBidHighestValueByBuilderChunked50Ms(ctx context.Context, in *clickhouse.ListFctMevBidHighestValueByBuilderChunked50MsRequest, opts ...grpc.CallOption) (*clickhouse.ListFctMevBidHighestValueByBuilderChunked50MsResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(clickhouse.ListFctMevBidByBuilderResponse)
-	err := c.cc.Invoke(ctx, XatuCBT_ListFctMevBidByBuilder_FullMethodName, in, out, cOpts...)
+	out := new(clickhouse.ListFctMevBidHighestValueByBuilderChunked50MsResponse)
+	err := c.cc.Invoke(ctx, XatuCBT_ListFctMevBidHighestValueByBuilderChunked50Ms_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -249,9 +249,9 @@ type XatuCBTServer interface {
 	// ListFctMevBidCountByBuilder returns MEV builder bid count data.
 	// This table contains the total number of MEV bids for a slot by builder.
 	ListFctMevBidCountByBuilder(context.Context, *clickhouse.ListFctMevBidCountByBuilderRequest) (*clickhouse.ListFctMevBidCountByBuilderResponse, error)
-	// ListFctMevBidByBuilder returns highest MEV bid values by builder for a slot.
-	// This table contains the highest value MEV relay bid for a slot by builder.
-	ListFctMevBidByBuilder(context.Context, *clickhouse.ListFctMevBidByBuilderRequest) (*clickhouse.ListFctMevBidByBuilderResponse, error)
+	// ListFctMevBidHighestValueByBuilderChunked50ms returns highest MEV bid values by builder for a slot in 50ms chunks.
+	// This table contains the highest value MEV relay bid for a slot by builder broken down by 50ms time chunks.
+	ListFctMevBidHighestValueByBuilderChunked50Ms(context.Context, *clickhouse.ListFctMevBidHighestValueByBuilderChunked50MsRequest) (*clickhouse.ListFctMevBidHighestValueByBuilderChunked50MsResponse, error)
 	// ListFctBlockBlobCountHead returns blob count data for blocks in the unfinalized chain.
 	// This table contains the number of blobs for each block, with forks potentially causing multiple blocks per slot.
 	ListFctBlockBlobCountHead(context.Context, *clickhouse.ListFctBlockBlobCountHeadRequest) (*clickhouse.ListFctBlockBlobCountHeadResponse, error)
@@ -295,8 +295,8 @@ func (UnimplementedXatuCBTServer) ListFctMevBidCountByRelay(context.Context, *cl
 func (UnimplementedXatuCBTServer) ListFctMevBidCountByBuilder(context.Context, *clickhouse.ListFctMevBidCountByBuilderRequest) (*clickhouse.ListFctMevBidCountByBuilderResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListFctMevBidCountByBuilder not implemented")
 }
-func (UnimplementedXatuCBTServer) ListFctMevBidByBuilder(context.Context, *clickhouse.ListFctMevBidByBuilderRequest) (*clickhouse.ListFctMevBidByBuilderResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ListFctMevBidByBuilder not implemented")
+func (UnimplementedXatuCBTServer) ListFctMevBidHighestValueByBuilderChunked50Ms(context.Context, *clickhouse.ListFctMevBidHighestValueByBuilderChunked50MsRequest) (*clickhouse.ListFctMevBidHighestValueByBuilderChunked50MsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListFctMevBidHighestValueByBuilderChunked50Ms not implemented")
 }
 func (UnimplementedXatuCBTServer) ListFctBlockBlobCountHead(context.Context, *clickhouse.ListFctBlockBlobCountHeadRequest) (*clickhouse.ListFctBlockBlobCountHeadResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListFctBlockBlobCountHead not implemented")
@@ -452,20 +452,20 @@ func _XatuCBT_ListFctMevBidCountByBuilder_Handler(srv interface{}, ctx context.C
 	return interceptor(ctx, in, info, handler)
 }
 
-func _XatuCBT_ListFctMevBidByBuilder_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(clickhouse.ListFctMevBidByBuilderRequest)
+func _XatuCBT_ListFctMevBidHighestValueByBuilderChunked50Ms_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(clickhouse.ListFctMevBidHighestValueByBuilderChunked50MsRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(XatuCBTServer).ListFctMevBidByBuilder(ctx, in)
+		return srv.(XatuCBTServer).ListFctMevBidHighestValueByBuilderChunked50Ms(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: XatuCBT_ListFctMevBidByBuilder_FullMethodName,
+		FullMethod: XatuCBT_ListFctMevBidHighestValueByBuilderChunked50Ms_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(XatuCBTServer).ListFctMevBidByBuilder(ctx, req.(*clickhouse.ListFctMevBidByBuilderRequest))
+		return srv.(XatuCBTServer).ListFctMevBidHighestValueByBuilderChunked50Ms(ctx, req.(*clickhouse.ListFctMevBidHighestValueByBuilderChunked50MsRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -596,8 +596,8 @@ var XatuCBT_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _XatuCBT_ListFctMevBidCountByBuilder_Handler,
 		},
 		{
-			MethodName: "ListFctMevBidByBuilder",
-			Handler:    _XatuCBT_ListFctMevBidByBuilder_Handler,
+			MethodName: "ListFctMevBidHighestValueByBuilderChunked50ms",
+			Handler:    _XatuCBT_ListFctMevBidHighestValueByBuilderChunked50Ms_Handler,
 		},
 		{
 			MethodName: "ListFctBlockBlobCountHead",

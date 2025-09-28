@@ -523,8 +523,9 @@ function buildMevData(data: TransformData): {
           relayBids[relayName] = new RelayBids({ bids: [] });
         }
 
-        const slotTime = builderBid.earliestBidFromSlotStart || 0;
-        const timeBucket = Math.floor(slotTime / 50) * 50;
+        // Use chunkStartMs field which represents the 50ms chunk start from slot start
+        const slotTime = builderBid.chunkStartMs || 0;
+        const timeBucket = builderBid.chunkStartMs || 0;
 
         relayBids[relayName].bids.push(
           new RelayBid({
@@ -548,8 +549,9 @@ function buildMevData(data: TransformData): {
             relayBids[relayName] = new RelayBids({ bids: [] });
           }
 
-          const slotTime = builderBid.earliestBidFromSlotStart || 0;
-          const timeBucket = Math.floor(slotTime / 50) * 50;
+          // Use chunkStartMs field which represents the 50ms chunk start from slot start
+          const slotTime = builderBid.chunkStartMs || 0;
+          const timeBucket = builderBid.chunkStartMs || 0;
 
           relayBids[relayName].bids.push(
             new RelayBid({
