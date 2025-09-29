@@ -361,15 +361,27 @@ export const EventTimeline = memo(function EventTimeline({
 
   const timelineBarRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
+  const lastSeekTimeRef = useRef<number>(0);
+  const throttleDelayMs = 50; // Throttle to max 20 updates per second
 
   const handleTimelineInteraction = useCallback(
     (clientX: number) => {
       if (!timelineBarRef.current || !onTimeSeek) return;
 
+      // Throttle the seek calls to prevent maximum update depth error
+      const now = Date.now();
+      if (now - lastSeekTimeRef.current < throttleDelayMs) {
+        return;
+      }
+      lastSeekTimeRef.current = now;
+
       const rect = timelineBarRef.current.getBoundingClientRect();
       const x = clientX - rect.left;
       const percentage = Math.max(0, Math.min(1, x / rect.width));
-      const time = percentage * 12;
+      const rawTime = percentage * 12;
+
+      // Round to nearest 0.1 second (100ms) for consistency with slot system updates
+      const time = Math.round(rawTime * 10) / 10;
 
       onTimeSeek(time);
     },

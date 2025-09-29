@@ -2,6 +2,9 @@ import { Outlet, useLocation, useNavigate } from '@tanstack/react-router';
 import { Navigation } from '@/components/layout/Navigation';
 import { Breadcrumbs } from '@/components/layout/Breadcrumbs';
 import { NetworkSelector } from '@/components/common/NetworkSelector';
+import { SlotStatusBar } from '@/components/slot/SlotStatusBar';
+import { ApiModeDebugSection } from '@/components/debug/ApiModeDebugSection';
+import { SlotDataDebugSection } from '@/components/debug/SlotDataDebugSection';
 import { useEffect, useState } from 'react';
 import { useNetwork } from '@/stores/appStore';
 import { Logo } from '@/components/layout/Logo';
@@ -10,7 +13,6 @@ import { Menu } from 'lucide-react';
 import { NETWORK_METADATA, type NetworkKey } from '@/constants/networks.tsx';
 import clsx from 'clsx';
 import { GoogleFormSystemAlert } from '@/components/common/SystemAlert';
-import useApiMode from '@/contexts/apiMode';
 
 function Layout() {
   const location = useLocation();
@@ -21,7 +23,6 @@ function Layout() {
   const [currentEpoch, setCurrentEpoch] = useState<number | null>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { getBeaconClock } = useBeacon();
-  const { useRestApi, toggleApiMode } = useApiMode();
 
   // Get network metadata
   const selectedMetadata = NETWORK_METADATA[selectedNetwork as NetworkKey] || {
@@ -65,6 +66,11 @@ function Layout() {
 
   return (
     <div className="relative min-h-screen text-primary font-mono bg-gradient-to-b from-[rgb(var(--bg-base))] via-[rgb(var(--bg-base))] to-[rgb(var(--bg-base))]">
+      {/* Register debug sections */}
+      <SlotStatusBar />
+      <ApiModeDebugSection />
+      <SlotDataDebugSection />
+
       {/* Integrated Background Effects */}
       <div className="absolute inset-0 bg-gradient-to-b from-accent/5 via-transparent to-transparent pointer-events-none" />
       <div className="absolute inset-0 bg-gradient-to-t from-error/5 via-transparent to-transparent pointer-events-none" />
@@ -96,20 +102,8 @@ function Layout() {
               />
             </div>
 
-            {/* Right - API Toggle and Slot/Epoch Info (hidden on mobile) */}
+            {/* Right - Slot/Epoch Info (hidden on mobile) */}
             <div className="hidden lg:flex items-center gap-4 justify-end">
-              {/* API Mode Toggle */}
-              <button
-                onClick={toggleApiMode}
-                className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded-md bg-secondary hover:bg-hover transition-colors"
-                title={`Switch to ${useRestApi ? 'gRPC' : 'REST'} API`}
-              >
-                <span
-                  className={`inline-block w-2 h-2 rounded-full ${useRestApi ? 'bg-green-500' : 'bg-blue-500'}`}
-                />
-                {useRestApi ? 'REST' : 'gRPC'}
-              </button>
-
               {currentSlot !== null && currentEpoch !== null && (
                 <div className="text-sm font-mono">
                   <span className="text-tertiary">Slot </span>
@@ -172,25 +166,13 @@ function Layout() {
             )}
           >
             <div className="flex flex-col h-full">
-              {/* Network Selector and API Toggle */}
-              <div className="p-4 border-b border-subtle space-y-3">
+              {/* Network Selector */}
+              <div className="p-4 border-b border-subtle">
                 <NetworkSelector
                   selectedNetwork={selectedNetwork}
                   onNetworkChange={setSelectedNetwork}
                   className="w-full"
                 />
-
-                {/* API Mode Toggle for mobile */}
-                <button
-                  onClick={toggleApiMode}
-                  className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium rounded-md bg-secondary hover:bg-hover transition-colors"
-                  title={`Switch to ${useRestApi ? 'gRPC' : 'REST'} API`}
-                >
-                  <span
-                    className={`inline-block w-2 h-2 rounded-full ${useRestApi ? 'bg-green-500' : 'bg-blue-500'}`}
-                  />
-                  {useRestApi ? 'REST API' : 'gRPC API'}
-                </button>
               </div>
 
               {/* Mobile Navigation Content */}

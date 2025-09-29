@@ -4,6 +4,7 @@ import { GetSlotDataRequest } from '@/api/gen/backend/pkg/api/proto/lab_api_pb';
 import { useBeaconSlotData } from './useBeaconSlotData';
 import useApiMode from '@/contexts/apiMode';
 import useApi from '@/contexts/api';
+import { useSlotDataTracker } from '@/contexts/slotDataTracker';
 
 interface UseSlotDataOptions {
   network: string;
@@ -24,6 +25,7 @@ interface SlotDataResponse {
 export function useSlotData({ network, slot, isLive = false, enabled = true }: UseSlotDataOptions) {
   const { useRestApi } = useApiMode();
   const { client } = useApi();
+  const { trackRequest, updateRequest } = useSlotDataTracker();
 
   // REST-based implementation
   const restQuery = useBeaconSlotData(network, slot, isLive, enabled && useRestApi);
@@ -36,12 +38,34 @@ export function useSlotData({ network, slot, isLive = false, enabled = true }: U
         throw new Error('No slot provided');
       }
 
-      const request = new GetSlotDataRequest({
-        network: network,
-        slot: BigInt(slot),
+      // Track the request
+      const requestId = trackRequest({
+        slot,
+        network,
+        apiMode: 'gRPC',
       });
 
-      return client.getSlotData(request);
+      try {
+        const request = new GetSlotDataRequest({
+          network: network,
+          slot: BigInt(slot),
+        });
+
+        const response = await client.getSlotData(request);
+
+        // Update with success
+        updateRequest(requestId, {
+          payload: response.data?.toJson(),
+        });
+
+        return response;
+      } catch (error) {
+        // Update with error
+        updateRequest(requestId, {
+          error: error instanceof Error ? error.message : 'Unknown error',
+        });
+        throw error;
+      }
     },
     enabled: !!slot && enabled && !useRestApi,
     staleTime: 11000,
