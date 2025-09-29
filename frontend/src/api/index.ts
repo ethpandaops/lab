@@ -31,4 +31,6 @@ export {
   FilterMetadata,
   NetworkFilterMetadata,
   ErrorResponse,
+  ListPreparedBlocksResponse,
+  PreparedBlock,
 } from './gen/backend/pkg/api/v1/proto/public_pb';

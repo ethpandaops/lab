@@ -13,6 +13,7 @@ import {
   ListBeaconSlotMevBuilderResponse,
   ListBeaconSlotMevBuilderCountResponse,
   GetExperimentConfigResponse,
+  ListPreparedBlocksResponse,
 } from '../gen/backend/pkg/api/v1/proto/public_pb';
 import { API_V1_ENDPOINTS, buildQueryString, NodeFilters } from './endpoints';
 
@@ -442,6 +443,24 @@ export class RestApiClient {
     }`;
     const response = await this.fetchWithRetry<any>(url);
     return ListBeaconSlotMevBuilderCountResponse.fromJson(response);
+  }
+
+  /**
+   * Get prepared blocks (formerly locally built blocks) with optional slot filtering
+   * @param network Network name
+   * @param params Query parameters including slot filter
+   * @returns Response with prepared blocks data
+   */
+  async getPreparedBlocks(
+    network: string,
+    params?: { slot?: number[]; page_size?: number; page_token?: string },
+  ): Promise<ListPreparedBlocksResponse> {
+    const queryString = params ? buildQueryString(params) : new URLSearchParams();
+    const url = `${this.baseUrl}${API_V1_ENDPOINTS.preparedBlocks(network)}${
+      queryString.toString() ? `?${queryString.toString()}` : ''
+    }`;
+    const response = await this.fetchWithRetry<any>(url);
+    return ListPreparedBlocksResponse.fromJson(response);
   }
 }
 
