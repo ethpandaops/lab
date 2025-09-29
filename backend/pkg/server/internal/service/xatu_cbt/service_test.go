@@ -181,7 +181,7 @@ func setupClickHouseContainer(t *testing.T, ctx context.Context) (string, string
 
 	clickhousePort := "8123/tcp"
 	req := testcontainers.ContainerRequest{
-		Image:        "clickhouse/clickhouse-server:latest",
+		Image:        "clickhouse/clickhouse-server:25.6.3.116",
 		ExposedPorts: []string{clickhousePort},
 		Env: map[string]string{
 			"CLICKHOUSE_USER":     "default",
