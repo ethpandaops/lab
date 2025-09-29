@@ -375,3 +375,51 @@ message ProposerEntity {
   // Entity information
   string entity = 1;                   // The entity that proposed the block (e.g., "Lido", "Coinbase")
 }
+
+// ListPreparedBlocksResponse is the v1 API response for listing prepared blocks.
+message ListPreparedBlocksResponse {
+  repeated PreparedBlock prepared_blocks = 1;
+  PaginationMetadata pagination = 2;
+  PreparedBlockFilterMetadata filters = 3;
+}
+
+// PreparedBlock represents a transformed view of prepared block data for public consumption.
+// This shows what would have been built if the validator had been selected as proposer.
+message PreparedBlock {
+  uint32 slot = 1;
+  string slot_start_time = 2;  // ISO 8601 formatted
+  string event_time = 3;       // ISO 8601 formatted
+  ClientInfo client = 4;       // reuse existing ClientInfo type
+  ConsensusInfo consensus = 5; // reuse existing ConsensusInfo type
+  GeoInfo geo = 6;            // reuse existing GeoInfo type
+  BlockMetrics block_metrics = 7;
+  ExecutionPayloadMetrics execution_metrics = 8;
+  string last_updated = 9;    // ISO 8601 formatted
+}
+
+// BlockMetrics groups block-related metrics.
+message BlockMetrics {
+  string version = 1;
+  uint32 total_bytes = 2;
+  uint32 total_bytes_compressed = 3;
+}
+
+// ExecutionPayloadMetrics groups execution payload metrics.
+message ExecutionPayloadMetrics {
+  uint64 value_wei = 1;
+  uint64 consensus_value_wei = 2;
+  uint32 block_number = 3;
+  uint64 gas_limit = 4;
+  uint64 gas_used = 5;
+  uint32 transactions_count = 6;
+  uint32 transactions_total_bytes = 7;
+}
+
+// PreparedBlockFilterMetadata shows filtering information for prepared block queries.
+message PreparedBlockFilterMetadata {
+  string network = 1;
+  uint32 slot = 2;
+  string client_name = 3;
+  map<string, string> applied_filters = 4;  // All filters including time filters
+  string order_by = 5;
+}

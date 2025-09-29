@@ -63,6 +63,7 @@ func (r *PublicRouter) GetRoutes() []RouteConfig {
 			Cache:       middleware.CacheRealtime, // Real-time data for recent slots
 			Description: "Get block timing data for a specific slot",
 		},
+<<<<<<< Updated upstream
 		{
 			Path:        "/{network}/beacon/slot/{slot}/attestation/timing",
 			Handler:     r.handleBeaconAttestationTiming,
@@ -127,6 +128,23 @@ func (r *PublicRouter) GetRoutes() []RouteConfig {
 			Methods:     []string{http.MethodGet, http.MethodOptions},
 			Cache:       middleware.CacheRealtime, // Real-time data for recent slots
 			Description: "Get block proposer entity information for a specific slot",
+=======
+
+		// Prepared block endpoints
+		{
+			Path:        "/{network}/prepared/blocks",
+			Handler:     r.handleListPreparedBlocks,
+			Methods:     []string{http.MethodGet, http.MethodOptions},
+			Cache:       middleware.CacheNearRealtime, // Near real-time as blocks are continuously being built
+			Description: "List prepared blocks showing what would have been built",
+		},
+		{
+			Path:        "/{network}/prepared/blocks/{slot}",
+			Handler:     r.handlePreparedBlockBySlot,
+			Methods:     []string{http.MethodGet, http.MethodOptions},
+			Cache:       middleware.CacheRealtime, // Real-time data for recent slots
+			Description: "Get prepared blocks for a specific slot",
+>>>>>>> Stashed changes
 		},
 	}
 }

@@ -2652,3 +2652,345 @@ export class ProposerEntity extends Message<ProposerEntity> {
   }
 }
 
+/**
+ * ListPreparedBlocksResponse is the v1 API response for listing prepared blocks.
+ *
+ * @generated from message api.v1.ListPreparedBlocksResponse
+ */
+export class ListPreparedBlocksResponse extends Message<ListPreparedBlocksResponse> {
+  /**
+   * @generated from field: repeated api.v1.PreparedBlock prepared_blocks = 1;
+   */
+  preparedBlocks: PreparedBlock[] = [];
+
+  /**
+   * @generated from field: api.v1.PaginationMetadata pagination = 2;
+   */
+  pagination?: PaginationMetadata;
+
+  /**
+   * @generated from field: api.v1.PreparedBlockFilterMetadata filters = 3;
+   */
+  filters?: PreparedBlockFilterMetadata;
+
+  constructor(data?: PartialMessage<ListPreparedBlocksResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.v1.ListPreparedBlocksResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "prepared_blocks", kind: "message", T: PreparedBlock, repeated: true },
+    { no: 2, name: "pagination", kind: "message", T: PaginationMetadata },
+    { no: 3, name: "filters", kind: "message", T: PreparedBlockFilterMetadata },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ListPreparedBlocksResponse {
+    return new ListPreparedBlocksResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ListPreparedBlocksResponse {
+    return new ListPreparedBlocksResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ListPreparedBlocksResponse {
+    return new ListPreparedBlocksResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: ListPreparedBlocksResponse | PlainMessage<ListPreparedBlocksResponse> | undefined, b: ListPreparedBlocksResponse | PlainMessage<ListPreparedBlocksResponse> | undefined): boolean {
+    return proto3.util.equals(ListPreparedBlocksResponse, a, b);
+  }
+}
+
+/**
+ * PreparedBlock represents a transformed view of prepared block data for public consumption.
+ * This shows what would have been built if the validator had been selected as proposer.
+ *
+ * @generated from message api.v1.PreparedBlock
+ */
+export class PreparedBlock extends Message<PreparedBlock> {
+  /**
+   * @generated from field: uint32 slot = 1;
+   */
+  slot = 0;
+
+  /**
+   * ISO 8601 formatted
+   *
+   * @generated from field: string slot_start_time = 2;
+   */
+  slotStartTime = "";
+
+  /**
+   * ISO 8601 formatted
+   *
+   * @generated from field: string event_time = 3;
+   */
+  eventTime = "";
+
+  /**
+   * reuse existing ClientInfo type
+   *
+   * @generated from field: api.v1.ClientInfo client = 4;
+   */
+  client?: ClientInfo;
+
+  /**
+   * reuse existing ConsensusInfo type
+   *
+   * @generated from field: api.v1.ConsensusInfo consensus = 5;
+   */
+  consensus?: ConsensusInfo;
+
+  /**
+   * reuse existing GeoInfo type
+   *
+   * @generated from field: api.v1.GeoInfo geo = 6;
+   */
+  geo?: GeoInfo;
+
+  /**
+   * @generated from field: api.v1.BlockMetrics block_metrics = 7;
+   */
+  blockMetrics?: BlockMetrics;
+
+  /**
+   * @generated from field: api.v1.ExecutionPayloadMetrics execution_metrics = 8;
+   */
+  executionMetrics?: ExecutionPayloadMetrics;
+
+  /**
+   * ISO 8601 formatted
+   *
+   * @generated from field: string last_updated = 9;
+   */
+  lastUpdated = "";
+
+  constructor(data?: PartialMessage<PreparedBlock>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.v1.PreparedBlock";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "slot", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
+    { no: 2, name: "slot_start_time", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "event_time", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "client", kind: "message", T: ClientInfo },
+    { no: 5, name: "consensus", kind: "message", T: ConsensusInfo },
+    { no: 6, name: "geo", kind: "message", T: GeoInfo },
+    { no: 7, name: "block_metrics", kind: "message", T: BlockMetrics },
+    { no: 8, name: "execution_metrics", kind: "message", T: ExecutionPayloadMetrics },
+    { no: 9, name: "last_updated", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): PreparedBlock {
+    return new PreparedBlock().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): PreparedBlock {
+    return new PreparedBlock().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): PreparedBlock {
+    return new PreparedBlock().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: PreparedBlock | PlainMessage<PreparedBlock> | undefined, b: PreparedBlock | PlainMessage<PreparedBlock> | undefined): boolean {
+    return proto3.util.equals(PreparedBlock, a, b);
+  }
+}
+
+/**
+ * BlockMetrics groups block-related metrics.
+ *
+ * @generated from message api.v1.BlockMetrics
+ */
+export class BlockMetrics extends Message<BlockMetrics> {
+  /**
+   * @generated from field: string version = 1;
+   */
+  version = "";
+
+  /**
+   * @generated from field: uint32 total_bytes = 2;
+   */
+  totalBytes = 0;
+
+  /**
+   * @generated from field: uint32 total_bytes_compressed = 3;
+   */
+  totalBytesCompressed = 0;
+
+  constructor(data?: PartialMessage<BlockMetrics>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.v1.BlockMetrics";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "version", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "total_bytes", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
+    { no: 3, name: "total_bytes_compressed", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): BlockMetrics {
+    return new BlockMetrics().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): BlockMetrics {
+    return new BlockMetrics().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): BlockMetrics {
+    return new BlockMetrics().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: BlockMetrics | PlainMessage<BlockMetrics> | undefined, b: BlockMetrics | PlainMessage<BlockMetrics> | undefined): boolean {
+    return proto3.util.equals(BlockMetrics, a, b);
+  }
+}
+
+/**
+ * ExecutionPayloadMetrics groups execution payload metrics.
+ *
+ * @generated from message api.v1.ExecutionPayloadMetrics
+ */
+export class ExecutionPayloadMetrics extends Message<ExecutionPayloadMetrics> {
+  /**
+   * @generated from field: uint64 value_wei = 1;
+   */
+  valueWei = protoInt64.zero;
+
+  /**
+   * @generated from field: uint64 consensus_value_wei = 2;
+   */
+  consensusValueWei = protoInt64.zero;
+
+  /**
+   * @generated from field: uint32 block_number = 3;
+   */
+  blockNumber = 0;
+
+  /**
+   * @generated from field: uint64 gas_limit = 4;
+   */
+  gasLimit = protoInt64.zero;
+
+  /**
+   * @generated from field: uint64 gas_used = 5;
+   */
+  gasUsed = protoInt64.zero;
+
+  /**
+   * @generated from field: uint32 transactions_count = 6;
+   */
+  transactionsCount = 0;
+
+  /**
+   * @generated from field: uint32 transactions_total_bytes = 7;
+   */
+  transactionsTotalBytes = 0;
+
+  constructor(data?: PartialMessage<ExecutionPayloadMetrics>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.v1.ExecutionPayloadMetrics";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "value_wei", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
+    { no: 2, name: "consensus_value_wei", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
+    { no: 3, name: "block_number", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
+    { no: 4, name: "gas_limit", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
+    { no: 5, name: "gas_used", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
+    { no: 6, name: "transactions_count", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
+    { no: 7, name: "transactions_total_bytes", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ExecutionPayloadMetrics {
+    return new ExecutionPayloadMetrics().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ExecutionPayloadMetrics {
+    return new ExecutionPayloadMetrics().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ExecutionPayloadMetrics {
+    return new ExecutionPayloadMetrics().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: ExecutionPayloadMetrics | PlainMessage<ExecutionPayloadMetrics> | undefined, b: ExecutionPayloadMetrics | PlainMessage<ExecutionPayloadMetrics> | undefined): boolean {
+    return proto3.util.equals(ExecutionPayloadMetrics, a, b);
+  }
+}
+
+/**
+ * PreparedBlockFilterMetadata shows filtering information for prepared block queries.
+ *
+ * @generated from message api.v1.PreparedBlockFilterMetadata
+ */
+export class PreparedBlockFilterMetadata extends Message<PreparedBlockFilterMetadata> {
+  /**
+   * @generated from field: string network = 1;
+   */
+  network = "";
+
+  /**
+   * @generated from field: uint32 slot = 2;
+   */
+  slot = 0;
+
+  /**
+   * @generated from field: string client_name = 3;
+   */
+  clientName = "";
+
+  /**
+   * All filters including time filters
+   *
+   * @generated from field: map<string, string> applied_filters = 4;
+   */
+  appliedFilters: { [key: string]: string } = {};
+
+  /**
+   * @generated from field: string order_by = 5;
+   */
+  orderBy = "";
+
+  constructor(data?: PartialMessage<PreparedBlockFilterMetadata>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.v1.PreparedBlockFilterMetadata";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "network", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "slot", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
+    { no: 3, name: "client_name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "applied_filters", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "scalar", T: 9 /* ScalarType.STRING */} },
+    { no: 5, name: "order_by", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): PreparedBlockFilterMetadata {
+    return new PreparedBlockFilterMetadata().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): PreparedBlockFilterMetadata {
+    return new PreparedBlockFilterMetadata().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): PreparedBlockFilterMetadata {
+    return new PreparedBlockFilterMetadata().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: PreparedBlockFilterMetadata | PlainMessage<PreparedBlockFilterMetadata> | undefined, b: PreparedBlockFilterMetadata | PlainMessage<PreparedBlockFilterMetadata> | undefined): boolean {
+    return proto3.util.equals(PreparedBlockFilterMetadata, a, b);
+  }
+}
+
