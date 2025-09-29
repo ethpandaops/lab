@@ -218,7 +218,8 @@ func (r *PublicRouter) handleListPreparedBlocks(w http.ResponseWriter, req *http
 
 	// Populate applied filters
 	if v := queryParams.Get("slot"); v != "" {
-		filters.Slot, _ = strconv.ParseUint(v, 10, 32)
+		slot, _ := strconv.ParseUint(v, 10, 32)
+		filters.Slot = uint32(slot)
 		filters.AppliedFilters["slot"] = v
 	}
 	if v := queryParams.Get("client_name"); v != "" {
