@@ -1,11 +1,11 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useCallback } from 'react';
 import { BlockProductionBaseProps } from '../common/types';
 import { isInPropagationPhase } from '../common/PhaseUtils';
 import { countUniqueBuilderPubkeys } from '../common/utils';
 import MobileTimelineBar from './MobileTimelineBar';
 import StageCard from './StageCard';
 import MobileContinentsPanel from './MobileContinentsPanel';
-import useTimeline from '@/contexts/timeline';
+import { useSlotProgress, useSlotState, useSlotActions } from '@/hooks/useSlot';
 
 interface MobileBlockProductionViewProps extends BlockProductionBaseProps {
   // Navigation controls for merged timeline
@@ -46,9 +46,21 @@ const MobileBlockProductionView: React.FC<MobileBlockProductionViewProps> = ({
   slotDataCache, // Accept but don't use it for now since mobile view doesn't show adjacent slots
   isLocallyBuilt = false,
 }) => {
-  // Get time and play state from context
-  const { currentTimeMs, isPlaying, togglePlayPause } = useTimeline();
+  // Get time and play state from slot context
+  const { slotProgress } = useSlotProgress();
+  const slotState = useSlotState();
+  const slotActions = useSlotActions();
+
+  const currentTimeMs = slotProgress;
   currentTime = currentTimeMs;
+  const isPlaying = slotState.isPlaying;
+  const togglePlayPause = useCallback(() => {
+    if (isPlaying) {
+      slotActions.pause();
+    } else {
+      slotActions.play();
+    }
+  }, [isPlaying, slotActions]);
   // Get active status based on role and phase
   const isActive = (role: 'builder' | 'relay' | 'proposer' | 'node' | 'attester') => {
     // Determine transition point - when first node saw block or fallback to 5s
@@ -91,7 +103,9 @@ const MobileBlockProductionView: React.FC<MobileBlockProductionViewProps> = ({
       Array.isArray(slotData.attestations.windows) &&
       slotData.attestations.windows.some(
         (window: any) =>
-          window.startMs !== undefined && Number(window.startMs) <= currentTime && window.validatorIndices?.length > 0
+          window.startMs !== undefined &&
+          Number(window.startMs) <= currentTime &&
+          window.validatorIndices?.length > 0,
       );
 
     // For each role, determine if it's active based on the phase
@@ -124,7 +138,9 @@ const MobileBlockProductionView: React.FC<MobileBlockProductionViewProps> = ({
 
   // Count unique relays
   const activeRelays = useMemo(() => {
-    const relaysSet = new Set(bids.filter(bid => bid.time <= currentTime).map(bid => bid.relayName));
+    const relaysSet = new Set(
+      bids.filter(bid => bid.time <= currentTime).map(bid => bid.relayName),
+    );
     return relaysSet.size;
   }, [bids, currentTime]);
 
@@ -195,7 +211,9 @@ const MobileBlockProductionView: React.FC<MobileBlockProductionViewProps> = ({
     }
 
     // Get the maximum expected attestations from the slot data
-    const maxExpectedAttestations = slotData.attestations.maximumVotes ? Number(slotData.attestations.maximumVotes) : 0;
+    const maxExpectedAttestations = slotData.attestations.maximumVotes
+      ? Number(slotData.attestations.maximumVotes)
+      : 0;
 
     return {
       attestationsCount: visibleAttestationsCount,
@@ -321,7 +339,9 @@ const MobileBlockProductionView: React.FC<MobileBlockProductionViewProps> = ({
                 )}
               </div>
               {blockTime !== undefined && (
-                <div className="text-xs font-mono text-success">{(blockTime / 1000).toFixed(1)}s</div>
+                <div className="text-xs font-mono text-success">
+                  {(blockTime / 1000).toFixed(1)}s
+                </div>
               )}
             </div>
           </div>
@@ -366,7 +386,9 @@ const MobileBlockProductionView: React.FC<MobileBlockProductionViewProps> = ({
               <div className="flex-1">
                 <div className="font-medium text-sm">Network</div>
                 <div className="text-xs text-tertiary">
-                  {firstContinentToSeeBlock ? `First in ${firstContinentToSeeBlock}` : 'Waiting for propagation...'}
+                  {firstContinentToSeeBlock
+                    ? `First in ${firstContinentToSeeBlock}`
+                    : 'Waiting for propagation...'}
                 </div>
               </div>
             </div>

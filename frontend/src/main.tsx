@@ -5,6 +5,9 @@ import { createRoot } from 'react-dom/client';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { RouterProvider, createRouter } from '@tanstack/react-router';
 import { ApiModeProvider } from '@/contexts/apiMode';
+import { DebugProvider } from '@/contexts/debug';
+import { GlobalDebugPanel } from '@/components/debug/GlobalDebugPanel';
+import { SlotDataTrackerProvider } from '@/contexts/slotDataTracker';
 import { routeTree } from './routeTree.gen';
 
 const MAX_RETRIES = 1;
@@ -36,10 +39,15 @@ if (container) {
       <ErrorBoundary>
         <QueryClientProvider client={queryClient}>
           <ApiModeProvider>
-            <RouterProvider router={router} />
+            <SlotDataTrackerProvider>
+              <DebugProvider>
+                <RouterProvider router={router} />
+                <GlobalDebugPanel />
+              </DebugProvider>
+            </SlotDataTrackerProvider>
           </ApiModeProvider>
         </QueryClientProvider>
       </ErrorBoundary>
-    </StrictMode>
+    </StrictMode>,
   );
 }

@@ -2,10 +2,11 @@ import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import useBeacon from '@/contexts/beacon';
 import { useSlotData } from '@/hooks/useSlotData';
+import { useSlotDataWithPreload } from '@/hooks/useSlotDataWithPreload';
+import { useSlotState, useSlotConfig, useSlotActions } from '@/hooks/useSlot';
+import { useDebugSection } from '@/hooks/useDebugSection';
 import SlotDataStore from '@/utils/SlotDataStore';
-import { useNetwork, useConfig } from '@/stores/appStore';
-import { TimelineProvider } from '@/contexts/timeline';
-import { AlertCircle } from 'lucide-react';
+import { useNetwork } from '@/stores/appStore';
 import {
   MobileBlockProductionView,
   DesktopBlockProductionView,
@@ -20,25 +21,20 @@ import { hasNonEmptyDeliveredPayloads } from '@/components/beacon/block_producti
  * across four key stages: Block Builders, MEV Relays, Block Proposers, and Network Nodes.
  * The visualization tracks the flow of blocks through the system in real-time.
  */
-export default function BlockProductionLivePage() {
-  // Use network directly from NetworkContext - App.tsx handles URL updates
+function BlockProductionLivePage() {
+  // Use network directly from NetworkContext
   const { selectedNetwork } = useNetwork();
-  const { config } = useConfig();
   const queryClient = useQueryClient();
 
-  // Check if this experiment is available for the current network
-  const isExperimentAvailable = () => {
-    if (!config?.experiments) return true; // Default to available if no config
-    const experiment = config.experiments.find(exp => exp.id === 'block-production-flow');
-    return experiment?.enabled && experiment?.networks?.includes(selectedNetwork);
-  };
+  // Use centralized slot management
+  const { currentSlot, isPlaying, mode } = useSlotState();
+  const { minSlot, maxSlot, safeSlot, headSlot } = useSlotConfig();
+  const actions = useSlotActions();
 
-  // Get the networks that support this experiment
-  const getSupportedNetworks = () => {
-    if (!config?.experiments) return [];
-    const experiment = config.experiments.find(exp => exp.id === 'block-production-flow');
-    return experiment?.enabled ? experiment?.networks || [] : [];
-  };
+  // Block production uses extra 2 slots of lag for processing
+  const EXTRA_LAG = 2;
+  const displaySlot = currentSlot - EXTRA_LAG;
+
   // Add state to handle screen size with more granular breakpoints
   const [viewMode, setViewMode] = useState<'mobile' | 'tablet' | 'desktop'>('desktop');
 
@@ -69,81 +65,16 @@ export default function BlockProductionLivePage() {
   // Only use mobile view for real mobile devices, use desktop view for tablets
   const isMobile = viewMode === 'mobile';
 
-  const { getBeaconClock, getHeadLagSlots, subscribeToSlotChanges } = useBeacon();
-  // Use BeaconClockManager for slot timing
+  const { getBeaconClock } = useBeacon();
   const clock = getBeaconClock(selectedNetwork);
-  const headLagSlots = getHeadLagSlots(selectedNetwork);
-  const [headSlot, setHeadSlot] = useState<number | null>(clock ? clock.getCurrentSlot() : null);
 
-  // Reset state when network changes
-  useEffect(() => {
-    // Get updated clock for the selected network
-    const updatedClock = getBeaconClock(selectedNetwork);
-
-    if (updatedClock) {
-      // Reset head slot to the current slot of the new network
-      const newSlot = updatedClock.getCurrentSlot();
-      setHeadSlot(newSlot);
-
-      // Reset to live position
-      setDisplaySlotOffset(0);
-
-      // Clear prefetched slots for the previous network
-      prefetchedSlotsRef.current = new Set();
-
-      // Invalidate queries for the previous network to force refetching
-      queryClient.invalidateQueries({
-        queryKey: ['block-production-live', 'slot'],
-      });
-    }
-  }, [selectedNetwork, getBeaconClock, queryClient]);
-
-  // Use a ref to track if we're at the "live" position
-  // This will help determine if we should auto-update when slots change
-  const isAtLivePositionRef = useRef<boolean>(true);
-
-  // Subscribe to slot changes
-  useEffect(() => {
-    if (!selectedNetwork) return;
-
-    // Reset state when network changes to ensure fresh data
-    prefetchedSlotsRef.current = new Set();
-
-    // Create a slot change callback
-    const slotChangeCallback = (_network: string, newSlot: number, _previousSlot: number) => {
-      // Update the head slot
-      setHeadSlot(newSlot);
-    };
-
-    // Subscribe to slot changes
-    const unsubscribe = subscribeToSlotChanges(selectedNetwork, slotChangeCallback);
-
-    // Clean up subscription when component unmounts or network changes
-    return () => {
-      unsubscribe();
-    };
-  }, [selectedNetwork, getBeaconClock, getHeadLagSlots, subscribeToSlotChanges]);
-
-  const [displaySlotOffset, setDisplaySlotOffset] = useState<number>(0); // 0 is current, -1 is previous, etc.
-
-  // Update the isAtLivePositionRef whenever displaySlotOffset changes
-  useEffect(() => {
-    isAtLivePositionRef.current = displaySlotOffset === 0;
-  }, [displaySlotOffset]);
-
-  // Calculate the base slot with proper lag
-  // Adding extra 2 slots of lag for processing to match behavior in beacon/live.tsx
-  const baseSlot = headSlot ? headSlot - (headLagSlots + 2) : null;
-  const slotNumber = baseSlot !== null ? baseSlot + displaySlotOffset : null;
-
-  // Track if a slot transition is in progress to prevent double transitions
-  const [isTransitioning, setIsTransitioning] = useState<boolean>(false);
-
-  // Define prefetch helpers with useCallback to avoid unnecessary recreations
-  // Get the slot data store instance
+  // Get the slot data store instance for extra prefetching
   const slotDataStore = useMemo(() => SlotDataStore.getInstance(), []);
 
-  // Enhanced data prefetching function with global storage
+  // Reference for tracking prefetched slots
+  const prefetchedSlotsRef = useRef<Set<number>>(new Set());
+
+  // Extra prefetching function for block production's specific needs
   const prefetchSlotData = React.useCallback(
     async (slotNumber: number | null, direction: 'next' | 'previous') => {
       if (slotNumber === null) return;
@@ -190,7 +121,7 @@ export default function BlockProductionLivePage() {
         console.error(`[PREFETCH] Failed to prefetch data for slot ${slotNumber}:`, error);
       }
     },
-    [headSlot, selectedNetwork, queryClient, slotDataStore]
+    [headSlot, selectedNetwork, queryClient, slotDataStore],
   );
 
   // Prefetching next slot's data
@@ -198,7 +129,7 @@ export default function BlockProductionLivePage() {
     async (nextSlotNumber: number | null) => {
       await prefetchSlotData(nextSlotNumber, 'next');
     },
-    [prefetchSlotData]
+    [prefetchSlotData],
   );
 
   // Prefetching previous slot's data
@@ -206,11 +137,8 @@ export default function BlockProductionLivePage() {
     async (prevSlotNumber: number | null) => {
       await prefetchSlotData(prevSlotNumber, 'previous');
     },
-    [prefetchSlotData]
+    [prefetchSlotData],
   );
-
-  // Reference for tracking prefetched slots (must be outside useEffect)
-  const prefetchedSlotsRef = useRef<Set<number>>(new Set());
 
   // Helper function for prefetching multiple slots (defined outside of effects)
   const prefetchMultipleSlotsCallback = React.useCallback(
@@ -237,7 +165,7 @@ export default function BlockProductionLivePage() {
         }, delay);
       }
     },
-    [prefetchNextSlotData]
+    [prefetchNextSlotData],
   );
 
   // Staggered prefetching in response to timer thresholds
@@ -264,7 +192,7 @@ export default function BlockProductionLivePage() {
         prefetchedSlotsRef.current = new Set();
       }
     },
-    [prefetchNextSlotData, prefetchMultipleSlotsCallback]
+    [prefetchNextSlotData, prefetchMultipleSlotsCallback],
   );
 
   // Enhanced early prefetching at multiple time points and multiple slots ahead
@@ -281,26 +209,22 @@ export default function BlockProductionLivePage() {
       const timeToNextSlot = slotDuration - timeInSlot;
 
       // Calculate the next slot we'll need to display
-      const nextHeadSlot = (headSlot || 0) + 1;
-      // Adding extra 2 slots of lag for processing to match behavior in prefetch logic
-      const nextDisplaySlot = nextHeadSlot - (headLagSlots + 2);
+      const nextDisplaySlot = (displaySlot || 0) + 1;
 
       // Use the callback for prefetching based on timer thresholds
       prefetchAtTimerThreshold(nextDisplaySlot, timeToNextSlot, timeInSlot);
     };
 
-    // Run the check every 1000ms (reduced from 100ms since we're using TimelineProvider for animations)
+    // Run the check every 1000ms
     const intervalId = setInterval(checkAndPrefetch, 1000);
 
     // Initial prefetch of current and next slots when component mounts or network changes
-    if (headSlot !== null) {
-      const currentDisplaySlot = headSlot - (headLagSlots + 2);
-
+    if (displaySlot !== null && displaySlot >= 0) {
       // Clear any previously prefetched slots when network changes
       prefetchedSlotsRef.current = new Set();
 
       // Safely prefetch the initial slots for the current network
-      prefetchMultipleSlotsCallback(currentDisplaySlot, 2);
+      prefetchMultipleSlotsCallback(displaySlot, 2);
     }
 
     return () => {
@@ -309,96 +233,41 @@ export default function BlockProductionLivePage() {
   }, [
     selectedNetwork,
     clock,
-    headSlot,
-    headLagSlots,
+    displaySlot,
     prefetchNextSlotData,
     prefetchMultipleSlotsCallback,
     prefetchAtTimerThreshold,
   ]);
 
-  // Navigation and Playback functions - wrapped in useCallback for proper dependency tracking
-  // Prefetch previous slot before navigating to reduce flash
-  const goToPreviousSlot = React.useCallback(() => {
-    if (slotNumber !== null) {
-      // Prefetch previous slot data before navigating
-      prefetchPreviousSlotData(slotNumber - 1);
-    }
-    setDisplaySlotOffset(prev => prev - 1);
-  }, [slotNumber, prefetchPreviousSlotData]);
+  // Check if we can navigate forward - disable when currentSlot can't advance further
+  // The nextSlot action in slot context won't advance past maxSlot
+  const isNextDisabled = currentSlot >= maxSlot;
 
-  const goToNextSlot = React.useCallback(() => {
-    // Prevent advancing if we're already transitioning
-    if (isTransitioning) {
-      return;
-    }
-
-    // Only allow advancing to next slot if we're not already at the head slot
-    if (headSlot !== null && slotNumber !== null && slotNumber < headSlot) {
-      // Prefetch next slot data before navigating
-      prefetchNextSlotData(slotNumber + 1);
-      setDisplaySlotOffset(prev => prev + 1);
-    } else if (displaySlotOffset < 0) {
-      // If we're on a historical slot, we can move forward even if we don't know the head yet
-      if (slotNumber !== null) {
-        prefetchNextSlotData(slotNumber + 1);
-      }
-      setDisplaySlotOffset(prev => prev + 1);
-    }
-  }, [headSlot, slotNumber, displaySlotOffset, isTransitioning, prefetchNextSlotData]);
-
-  const resetToCurrentSlot = React.useCallback(() => {
-    // If we have a head slot and we're not already at the current slot
-    if (headSlot !== null && slotNumber !== null && displaySlotOffset !== 0) {
-      // Calculate what the current slot would be - adding extra 2 slots of lag for processing
-      const currentSlot = headSlot - (headLagSlots + 2);
-      // Prefetch the current slot data before resetting
-      prefetchSlotData(currentSlot, 'next');
-    }
-
-    // Reset to the live position
-    setDisplaySlotOffset(0);
-
-    // Reset transition state
-    setIsTransitioning(false);
-  }, [headSlot, slotNumber, displaySlotOffset, headLagSlots, prefetchSlotData]);
-
-  const isNextDisabled = displaySlotOffset >= 0;
-
-  // Use unified hook for slot data
-  const { data: slotData, isLoading: isSlotLoading } = useSlotData({
-    network: selectedNetwork,
-    slot: slotNumber || undefined,
-    isLive: true,
-    enabled: slotNumber !== null,
-  });
+  // Use slot data with preload for current display slot
+  const { data: slotData, isLoading: isSlotLoading } = useSlotDataWithPreload(
+    selectedNetwork,
+    displaySlot !== null && displaySlot >= 0,
+  );
 
   // Also fetch previous slot data for the blockchain visualization
   const { data: prevSlotData } = useSlotData({
     network: selectedNetwork,
-    slot: slotNumber !== null ? slotNumber - 1 : undefined,
+    slot: displaySlot !== null ? displaySlot - 1 : undefined,
     isLive: false,
-    enabled: slotNumber !== null && slotNumber > 0,
+    enabled: displaySlot !== null && displaySlot > 0,
   });
 
   // Build combined slot data map for blockchain visualization
   const slotDataCache = useMemo(() => {
     const cache: Record<number, any> = {};
-    if (slotNumber !== null && slotData) {
-      cache[slotNumber] = slotData;
+    if (displaySlot !== null && slotData) {
+      cache[displaySlot] = slotData;
     }
-    if (slotNumber !== null && prevSlotData && slotNumber > 0) {
-      cache[slotNumber - 1] = prevSlotData;
+    if (displaySlot !== null && prevSlotData && displaySlot > 0) {
+      cache[displaySlot - 1] = prevSlotData;
     }
     return cache;
-  }, [slotNumber, slotData, prevSlotData]);
-
-  // Normal playback enablement
-  useEffect(() => {
-    if (slotNumber === null) return;
-
-    // Reset transition state
-    setIsTransitioning(false);
-  }, [slotNumber]);
+  }, [displaySlot, slotData, prevSlotData]);
 
   // --- Data Transformation ---
 
@@ -512,7 +381,11 @@ export default function BlockProductionLivePage() {
 
     // No matching bid or delivered payloads found
     return null;
-  }, [slotData?.relayBids, slotData?.block?.executionPayloadBlockHash, slotData?.deliveredPayloads]);
+  }, [
+    slotData?.relayBids,
+    slotData?.block?.executionPayloadBlockHash,
+    slotData?.deliveredPayloads,
+  ]);
 
   // Determine if a block was locally built using the enhanced method
   const isLocallyBuilt = useMemo(() => {
@@ -593,128 +466,209 @@ export default function BlockProductionLivePage() {
   const emptyBids: BidData[] = [];
   const emptyRelayColors = {};
 
-  // Show not available message if experiment isn't enabled for this network
-  if (!isExperimentAvailable()) {
-    const supportedNetworks = getSupportedNetworks();
-    return (
-      <div className="flex-1 flex items-center justify-center min-h-[50vh]">
-        <div className="text-center max-w-md mx-auto">
-          <AlertCircle className="w-12 h-12 text-accent/60 mx-auto mb-4" />
-          <h2 className="text-xl font-sans font-bold text-primary mb-2">Experiment Not Available</h2>
-          <p className="text-sm font-mono text-secondary mb-4">
-            Block Production Flow is not enabled for {selectedNetwork}
-          </p>
-          {supportedNetworks.length > 0 && (
-            <p className="text-xs font-mono text-tertiary">Available on: {supportedNetworks.join(', ')}</p>
-          )}
+  // Register debug section for block production navigation
+  useDebugSection(
+    'block-production-nav',
+    'Block Production Navigation',
+    () => {
+      const lagFromHead = headSlot - currentSlot;
+      const canNavigateForward = !isNextDisabled;
+      const slotsUntilMax = maxSlot - currentSlot;
+
+      return (
+        <div className="font-mono text-xs space-y-3">
+          {/* Visualization State */}
+          <div>
+            <div className="text-orange-400 text-[10px] font-semibold mb-1 uppercase tracking-wider">
+              Visualization State
+            </div>
+            <div className="grid grid-cols-2 gap-x-6 gap-y-0.5 pl-2">
+              <div>
+                <span className="text-tertiary">Display:</span>{' '}
+                <span className="text-primary font-semibold">{displaySlot ?? 'null'}</span>
+              </div>
+              <div>
+                <span className="text-tertiary">Current:</span>{' '}
+                <span className="text-primary">{currentSlot}</span>
+              </div>
+              <div className="col-span-2">
+                <span className="text-tertiary">Lag Applied:</span>{' '}
+                <span className="text-orange-400 font-semibold">{EXTRA_LAG} slots</span>
+                <span className="text-tertiary text-[10px]"> (for data completeness)</span>
+              </div>
+              <div className="col-span-2 text-[10px] text-blue-400">
+                Formula: displaySlot ({displaySlot}) = currentSlot ({currentSlot}) - {EXTRA_LAG}
+              </div>
+            </div>
+          </div>
+
+          {/* Navigation Boundaries */}
+          <div>
+            <div className="text-purple-400 text-[10px] font-semibold mb-1 uppercase tracking-wider">
+              Navigation Boundaries
+            </div>
+            <div className="grid grid-cols-2 gap-x-6 gap-y-0.5 pl-2">
+              <div>
+                <span className="text-tertiary">Head:</span>{' '}
+                <span className="text-primary">{headSlot}</span>
+              </div>
+              <div>
+                <span className="text-tertiary">Max:</span>{' '}
+                <span className="text-primary">{maxSlot}</span>
+              </div>
+              <div>
+                <span className="text-tertiary">Safe:</span>{' '}
+                <span className="text-primary">{safeSlot}</span>
+              </div>
+              <div>
+                <span className="text-tertiary">Behind Head:</span>{' '}
+                <span className={lagFromHead > 0 ? 'text-yellow-400' : 'text-green-400'}>
+                  {lagFromHead} slots
+                </span>
+              </div>
+              <div className="col-span-2 mt-1">
+                <span className="text-tertiary">Until Max:</span>{' '}
+                <span className="text-primary text-[10px]">{slotsUntilMax} slots remaining</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Navigation Controls */}
+          <div>
+            <div className="text-cyan-400 text-[10px] font-semibold mb-1 uppercase tracking-wider">
+              Navigation Controls
+            </div>
+            <div className="pl-2 space-y-1">
+              <div>
+                <span className="text-tertiary">Next Button:</span>{' '}
+                {canNavigateForward ? (
+                  <span className="text-green-500">✓ Enabled</span>
+                ) : (
+                  <span className="text-red-500">✗ Disabled</span>
+                )}
+              </div>
+              <div className="text-[10px] text-gray-400">
+                Condition: currentSlot ({currentSlot}) {'>='} maxSlot ({maxSlot}) ={' '}
+                {String(!canNavigateForward)}
+              </div>
+              <div className="text-[10px] text-yellow-300">
+                Disables at: Slot {maxSlot - EXTRA_LAG} (display) / {maxSlot} (current)
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
-    );
-  }
+      );
+    },
+    [currentSlot, displaySlot, maxSlot, headSlot, safeSlot, isNextDisabled, EXTRA_LAG],
+    10, // Priority - show this early
+  );
 
   return (
     <div className="flex flex-col h-full bg-base">
-      {/* Wrap with TimelineProvider */}
-      <TimelineProvider network={selectedNetwork} slotOffset={displaySlotOffset}>
-        {/* Conditionally render mobile or desktop view based on screen size */}
-        {isMobile ? (
-          // Mobile View
-          <div className="px-2 py-1">
-            <div className={`transition-opacity duration-300 ${isSlotLoading ? 'opacity-70' : 'opacity-100'}`}>
-              <MobileBlockProductionView
-                bids={slotData ? allTransformedBids : emptyBids}
-                relayColors={slotData ? relayColors : emptyRelayColors}
-                winningBid={slotData ? winningBidData : null}
-                slot={slotNumber || undefined}
-                proposer={slotData?.proposer}
-                proposerEntity="TODO"
-                nodes={slotData?.nodes || {}}
-                nodeBlockSeen={
-                  slotData?.timings?.blockSeen
-                    ? Object.fromEntries(
-                        Object.entries(slotData.timings.blockSeen).map(([node, time]) => [
-                          node,
-                          typeof time === 'bigint' ? Number(time) : Number(time),
-                        ])
-                      )
-                    : {}
-                }
-                nodeBlockP2P={
-                  slotData?.timings?.blockFirstSeenP2p
-                    ? Object.fromEntries(
-                        Object.entries(slotData.timings.blockFirstSeenP2p).map(([node, time]) => [
-                          node,
-                          typeof time === 'bigint' ? Number(time) : Number(time),
-                        ])
-                      )
-                    : {}
-                }
-                slotData={slotData} // Pass slot data with attestation info
-                slotDataCache={slotDataCache} // Pass the cache for adjacent slots
-                // Navigation controls
-                slotNumber={slotNumber}
-                headLagSlots={headLagSlots}
-                displaySlotOffset={displaySlotOffset}
-                goToPreviousSlot={goToPreviousSlot}
-                goToNextSlot={goToNextSlot}
-                resetToCurrentSlot={resetToCurrentSlot}
-                isNextDisabled={isNextDisabled}
-                network={selectedNetwork}
-                isLocallyBuilt={isLocallyBuilt}
-              />
-            </div>
+      {/* Conditionally render mobile or desktop view based on screen size */}
+      {isMobile ? (
+        // Mobile View
+        <div className="px-2 py-1">
+          <div
+            className={`transition-opacity duration-300 ${isSlotLoading ? 'opacity-70' : 'opacity-100'}`}
+          >
+            <MobileBlockProductionView
+              bids={slotData ? allTransformedBids : emptyBids}
+              relayColors={slotData ? relayColors : emptyRelayColors}
+              winningBid={slotData ? winningBidData : null}
+              slot={displaySlot !== null && displaySlot >= 0 ? displaySlot : undefined}
+              proposer={slotData?.proposer}
+              proposerEntity="TODO"
+              nodes={slotData?.nodes || {}}
+              nodeBlockSeen={
+                slotData?.timings?.blockSeen
+                  ? Object.fromEntries(
+                      Object.entries(slotData.timings.blockSeen).map(([node, time]) => [
+                        node,
+                        typeof time === 'bigint' ? Number(time) : Number(time),
+                      ]),
+                    )
+                  : {}
+              }
+              nodeBlockP2P={
+                slotData?.timings?.blockFirstSeenP2p
+                  ? Object.fromEntries(
+                      Object.entries(slotData.timings.blockFirstSeenP2p).map(([node, time]) => [
+                        node,
+                        typeof time === 'bigint' ? Number(time) : Number(time),
+                      ]),
+                    )
+                  : {}
+              }
+              slotData={slotData} // Pass slot data with attestation info
+              slotDataCache={slotDataCache} // Pass the cache for adjacent slots
+              // Navigation controls
+              slotNumber={displaySlot}
+              headLagSlots={0} // Already accounted for in displaySlot
+              displaySlotOffset={displaySlot - currentSlot}
+              goToPreviousSlot={actions.previousSlot}
+              goToNextSlot={actions.nextSlot}
+              resetToCurrentSlot={() => actions.goToSlot(headSlot - EXTRA_LAG)}
+              isNextDisabled={isNextDisabled}
+              network={selectedNetwork}
+              isLocallyBuilt={isLocallyBuilt}
+            />
           </div>
-        ) : (
-          // Desktop View
-          <div className="h-full">
-            <div className={`transition-opacity duration-300 h-full ${isSlotLoading ? 'opacity-70' : 'opacity-100'}`}>
-              <DesktopBlockProductionView
-                bids={slotData ? allTransformedBids : emptyBids}
-                relayColors={slotData ? relayColors : emptyRelayColors}
-                winningBid={slotData ? winningBidData : null}
-                slot={slotNumber || undefined}
-                proposer={slotData?.proposer}
-                proposerEntity="TODO"
-                nodes={slotData?.nodes || {}}
-                nodeBlockSeen={
-                  slotData?.timings?.blockSeen
-                    ? Object.fromEntries(
-                        Object.entries(slotData.timings.blockSeen).map(([node, time]) => [
-                          node,
-                          typeof time === 'bigint' ? Number(time) : Number(time),
-                        ])
-                      )
-                    : {}
-                }
-                nodeBlockP2P={
-                  slotData?.timings?.blockFirstSeenP2p
-                    ? Object.fromEntries(
-                        Object.entries(slotData.timings.blockFirstSeenP2p).map(([node, time]) => [
-                          node,
-                          typeof time === 'bigint' ? Number(time) : Number(time),
-                        ])
-                      )
-                    : {}
-                }
-                slotData={slotData}
-                slotDataCache={slotDataCache}
-                timeRange={timeRange}
-                valueRange={valueRange}
-                // Navigation controls
-                slotNumber={slotNumber}
-                headLagSlots={headLagSlots}
-                displaySlotOffset={displaySlotOffset}
-                goToPreviousSlot={goToPreviousSlot}
-                goToNextSlot={goToNextSlot}
-                resetToCurrentSlot={resetToCurrentSlot}
-                isNextDisabled={isNextDisabled}
-                network={selectedNetwork}
-                isLocallyBuilt={isLocallyBuilt}
-              />
-            </div>
+        </div>
+      ) : (
+        // Desktop View
+        <div className="h-full">
+          <div
+            className={`transition-opacity duration-300 h-full ${isSlotLoading ? 'opacity-70' : 'opacity-100'}`}
+          >
+            <DesktopBlockProductionView
+              bids={slotData ? allTransformedBids : emptyBids}
+              relayColors={slotData ? relayColors : emptyRelayColors}
+              winningBid={slotData ? winningBidData : null}
+              slot={displaySlot !== null && displaySlot >= 0 ? displaySlot : undefined}
+              proposer={slotData?.proposer}
+              proposerEntity="TODO"
+              nodes={slotData?.nodes || {}}
+              nodeBlockSeen={
+                slotData?.timings?.blockSeen
+                  ? Object.fromEntries(
+                      Object.entries(slotData.timings.blockSeen).map(([node, time]) => [
+                        node,
+                        typeof time === 'bigint' ? Number(time) : Number(time),
+                      ]),
+                    )
+                  : {}
+              }
+              nodeBlockP2P={
+                slotData?.timings?.blockFirstSeenP2p
+                  ? Object.fromEntries(
+                      Object.entries(slotData.timings.blockFirstSeenP2p).map(([node, time]) => [
+                        node,
+                        typeof time === 'bigint' ? Number(time) : Number(time),
+                      ]),
+                    )
+                  : {}
+              }
+              slotData={slotData}
+              slotDataCache={slotDataCache}
+              timeRange={timeRange}
+              valueRange={valueRange}
+              // Navigation controls
+              slotNumber={displaySlot}
+              headLagSlots={0} // Already accounted for in displaySlot
+              displaySlotOffset={displaySlot - currentSlot}
+              goToPreviousSlot={actions.previousSlot}
+              goToNextSlot={actions.nextSlot}
+              resetToCurrentSlot={() => actions.goToSlot(headSlot - EXTRA_LAG)}
+              isNextDisabled={isNextDisabled}
+              network={selectedNetwork}
+              isLocallyBuilt={isLocallyBuilt}
+            />
           </div>
-        )}
-      </TimelineProvider>
+        </div>
+      )}
     </div>
   );
 }
+
+export default BlockProductionLivePage;

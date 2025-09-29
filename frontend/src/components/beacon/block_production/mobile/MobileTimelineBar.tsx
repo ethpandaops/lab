@@ -1,7 +1,7 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useCallback } from 'react';
 import { getCurrentPhase } from '../common/PhaseUtils';
 import { Phase } from '../common/types';
-import useTimeline from '@/contexts/timeline';
+import { useSlotProgress, useSlotState, useSlotActions } from '@/hooks/useSlot';
 
 interface MobileTimelineBarProps {
   currentTime: number;
@@ -38,9 +38,22 @@ const MobileTimelineBar: React.FC<MobileTimelineBarProps> = ({
   resetToCurrentSlot,
   isNextDisabled,
 }) => {
-  // Get timeline state from context
-  const { currentTimeMs, displayTimeMs, isPlaying, togglePlayPause } = useTimeline();
+  // Get timeline state from slot context
+  const { slotProgress } = useSlotProgress();
+  const slotState = useSlotState();
+  const slotActions = useSlotActions();
+
+  const currentTimeMs = slotProgress;
+  const displayTimeMs = slotProgress;
   currentTime = currentTimeMs;
+  const isPlaying = slotState.isPlaying;
+  const togglePlayPause = useCallback(() => {
+    if (isPlaying) {
+      slotActions.pause();
+    } else {
+      slotActions.play();
+    }
+  }, [isPlaying, slotActions]);
 
   // Track previous time for reset detection
   const [previousTimeMs, setPreviousTimeMs] = React.useState(currentTimeMs);
@@ -58,9 +71,16 @@ const MobileTimelineBar: React.FC<MobileTimelineBarProps> = ({
       nodeBlockP2P,
       blockTime,
       attestationsCount,
-      totalExpectedAttestations
+      totalExpectedAttestations,
     );
-  }, [currentTime, nodeBlockSeen, nodeBlockP2P, blockTime, attestationsCount, totalExpectedAttestations]);
+  }, [
+    currentTime,
+    nodeBlockSeen,
+    nodeBlockP2P,
+    blockTime,
+    attestationsCount,
+    totalExpectedAttestations,
+  ]);
 
   // Get more descriptive phase text and colors based on the current phase
   const { phaseText, phaseColors } = useMemo(() => {
@@ -156,7 +176,11 @@ const MobileTimelineBar: React.FC<MobileTimelineBarProps> = ({
 
       // Find first window with attestations
       for (const window of sortedWindows) {
-        if (window.startMs !== undefined && window.validatorIndices?.length && window.validatorIndices.length > 0) {
+        if (
+          window.startMs !== undefined &&
+          window.validatorIndices?.length &&
+          window.validatorIndices.length > 0
+        ) {
           attestationTime = Number(window.startMs);
           break;
         }
@@ -355,7 +379,9 @@ const MobileTimelineBar: React.FC<MobileTimelineBarProps> = ({
       <div className="flex justify-between items-center mb-2">
         <div className="flex items-center text-xs">
           <span className="mr-1">Phase:</span>
-          <span className={`font-medium px-1.5 py-0.5 rounded-full ${phaseColors}`}>{phaseText}</span>
+          <span className={`font-medium px-1.5 py-0.5 rounded-full ${phaseColors}`}>
+            {phaseText}
+          </span>
         </div>
         <div className="font-mono text-xs text-white">{(displayTimeMs / 1000).toFixed(1)}s</div>
       </div>
@@ -378,7 +404,9 @@ const MobileTimelineBar: React.FC<MobileTimelineBarProps> = ({
           >
             <span className="text-xs">🤖</span>
           </div>
-          <span className={`text-[8px] ${currentPhase === Phase.Building ? 'text-orange-300' : 'text-primary/50'}`}>
+          <span
+            className={`text-[8px] ${currentPhase === Phase.Building ? 'text-orange-300' : 'text-primary/50'}`}
+          >
             Building
           </span>
         </div>
@@ -401,7 +429,9 @@ const MobileTimelineBar: React.FC<MobileTimelineBarProps> = ({
           >
             <span className="text-xs">🔄</span>
           </div>
-          <span className={`text-[8px] ${currentPhase === Phase.Propagating ? 'text-purple-300' : 'text-primary/50'}`}>
+          <span
+            className={`text-[8px] ${currentPhase === Phase.Propagating ? 'text-purple-300' : 'text-primary/50'}`}
+          >
             Relaying
           </span>
         </div>
@@ -424,7 +454,9 @@ const MobileTimelineBar: React.FC<MobileTimelineBarProps> = ({
           >
             <span className="text-xs">✓</span>
           </div>
-          <span className={`text-[8px] ${currentPhase === Phase.Attesting ? 'text-blue-300' : 'text-primary/50'}`}>
+          <span
+            className={`text-[8px] ${currentPhase === Phase.Attesting ? 'text-blue-300' : 'text-primary/50'}`}
+          >
             Attesting
           </span>
         </div>
@@ -445,7 +477,9 @@ const MobileTimelineBar: React.FC<MobileTimelineBarProps> = ({
           >
             <span className="text-xs">🔒</span>
           </div>
-          <span className={`text-[8px] ${currentPhase === Phase.Accepted ? 'text-green-300' : 'text-primary/50'}`}>
+          <span
+            className={`text-[8px] ${currentPhase === Phase.Accepted ? 'text-green-300' : 'text-primary/50'}`}
+          >
             Accepted
           </span>
         </div>

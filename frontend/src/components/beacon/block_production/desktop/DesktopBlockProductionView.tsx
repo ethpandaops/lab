@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useCallback } from 'react';
 import { Phase, BlockProductionBaseProps } from '../common/types';
 import BlockchainVisualization from '@/components/beacon/BlockchainVisualization';
 import { getCurrentPhase } from '../common/PhaseUtils';
@@ -7,7 +7,7 @@ import PhaseIcons from '../common/PhaseIcons';
 import BuildersRelaysPanel from './BuildersRelaysPanel';
 import ContinentsList from './ContinentsList';
 import { BeaconSlotData } from '@/api/gen/backend/pkg/server/proto/beacon_slots/beacon_slots_pb';
-import useTimeline from '@/contexts/timeline';
+import { useSlotProgress, useSlotState, useSlotActions } from '@/hooks/useSlot';
 
 // Define the flow animation styles
 const flowAnimations = `
@@ -75,8 +75,20 @@ const DesktopBlockProductionView: React.FC<DesktopBlockProductionViewProps> = ({
   network,
   isLocallyBuilt = false,
 }) => {
-  // Get currentTime from the timeline context
-  const { currentTimeMs, isPlaying, togglePlayPause } = useTimeline();
+  // Get currentTime from the slot context
+  const { slotProgress } = useSlotProgress();
+  const slotState = useSlotState();
+  const slotActions = useSlotActions();
+
+  const currentTimeMs = slotProgress;
+  const isPlaying = slotState.isPlaying;
+  const togglePlayPause = useCallback(() => {
+    if (isPlaying) {
+      slotActions.pause();
+    } else {
+      slotActions.play();
+    }
+  }, [isPlaying, slotActions]);
 
   // Get active status based on role and phase
   const isActive = (role: 'builder' | 'relay' | 'proposer' | 'node') => {
@@ -165,11 +177,14 @@ const DesktopBlockProductionView: React.FC<DesktopBlockProductionViewProps> = ({
       Object.entries(nodeBlockSeen).map(([node, time]) => [
         node,
         typeof time === 'bigint' ? Number(time) : Number(time),
-      ])
+      ]),
     );
 
     const nodeBlockP2P1 = Object.fromEntries(
-      Object.entries(nodeBlockP2P).map(([node, time]) => [node, typeof time === 'bigint' ? Number(time) : Number(time)])
+      Object.entries(nodeBlockP2P).map(([node, time]) => [
+        node,
+        typeof time === 'bigint' ? Number(time) : Number(time),
+      ]),
     );
 
     // Get earliest node timings grouped by continent
@@ -262,7 +277,11 @@ const DesktopBlockProductionView: React.FC<DesktopBlockProductionViewProps> = ({
             blockTime={blockTime}
             bids={bids}
             winningBid={winningBid}
-            proposer={proposer ? { proposerValidatorIndex: Number(proposer.proposerValidatorIndex) } : undefined}
+            proposer={
+              proposer
+                ? { proposerValidatorIndex: Number(proposer.proposerValidatorIndex) }
+                : undefined
+            }
             nodes={nodes}
             slotData={slotData}
             firstContinentToSeeBlock={firstContinentToSeeBlock}

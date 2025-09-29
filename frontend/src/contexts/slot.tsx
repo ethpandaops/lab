@@ -11,14 +11,14 @@ import { useNavigate } from '@tanstack/react-router';
 import { useBeaconClock } from '@/hooks/useBeaconClock';
 import type { SlotMode, SlotContextValue, SlotProviderProps, SlotActions } from '@/types/slot';
 
-const SlotProgressContext = createContext<
+export const SlotProgressContext = createContext<
   | {
       slotProgress: number;
     }
   | undefined
 >(undefined);
 
-const SlotStateContext = createContext<
+export const SlotStateContext = createContext<
   | {
       currentSlot: number;
       isPlaying: boolean;
@@ -30,7 +30,7 @@ const SlotStateContext = createContext<
   | undefined
 >(undefined);
 
-const SlotConfigContext = createContext<
+export const SlotConfigContext = createContext<
   | {
       slotDuration: number;
       playbackSpeed: number;
@@ -42,7 +42,7 @@ const SlotConfigContext = createContext<
   | undefined
 >(undefined);
 
-const SlotActionsContext = createContext<SlotActions | undefined>(undefined);
+export const SlotActionsContext = createContext<SlotActions | undefined>(undefined);
 
 export function SlotProvider({
   children,
@@ -59,7 +59,7 @@ export function SlotProvider({
 
   const getInitialSlot = () => {
     if (initialSlot !== undefined) return initialSlot;
-    if (safeSlot > 0) return safeSlot;
+    if (safeSlot > 0) return Math.max(minSlot, safeSlot - 1);
     if (beaconClock) {
       const currentClockSlot = beaconClock.getCurrentSlot();
       return Math.max(minSlot, currentClockSlot - 2);
