@@ -22,6 +22,7 @@ func (r *PublicRouter) handleListPreparedBlocks(w http.ResponseWriter, req *http
 	// Validate network
 	if network == "" {
 		r.WriteJSONResponseError(w, req, http.StatusBadRequest, "Network parameter is required")
+
 		return
 	}
 
@@ -32,89 +33,15 @@ func (r *PublicRouter) handleListPreparedBlocks(w http.ResponseWriter, req *http
 	grpcReq := &cbtproto.ListFctPreparedBlockRequest{}
 
 	// Apply filters from query parameters
-	// Slot filter
-	if v := queryParams.Get("slot"); v != "" {
-		slot, err := strconv.ParseUint(v, 10, 32)
-		if err != nil {
-			r.WriteJSONResponseError(w, req, http.StatusBadRequest, "Invalid slot number")
-			return
-		}
-		grpcReq.Slot = &cbtproto.UInt32Filter{
-			Filter: &cbtproto.UInt32Filter_Eq{Eq: uint32(slot)},
-		}
-	}
+	if err := r.buildPreparedBlockFilters(queryParams, grpcReq); err != nil {
+		r.WriteJSONResponseError(w, req, http.StatusBadRequest, err.Error())
 
-	// Slot range filters
-	if v := queryParams.Get("slot_gte"); v != "" {
-		slot, err := strconv.ParseUint(v, 10, 32)
-		if err != nil {
-			r.WriteJSONResponseError(w, req, http.StatusBadRequest, "Invalid slot_gte number")
-			return
-		}
-		grpcReq.Slot = &cbtproto.UInt32Filter{
-			Filter: &cbtproto.UInt32Filter_Gte{Gte: uint32(slot)},
-		}
-	}
-
-	if v := queryParams.Get("slot_lte"); v != "" {
-		slot, err := strconv.ParseUint(v, 10, 32)
-		if err != nil {
-			r.WriteJSONResponseError(w, req, http.StatusBadRequest, "Invalid slot_lte number")
-			return
-		}
-		grpcReq.Slot = &cbtproto.UInt32Filter{
-			Filter: &cbtproto.UInt32Filter_Lte{Lte: uint32(slot)},
-		}
-	}
-
-	// Client name filter
-	if v := queryParams.Get("client_name"); v != "" {
-		grpcReq.MetaClientName = &cbtproto.StringFilter{
-			Filter: &cbtproto.StringFilter_Eq{Eq: v},
-		}
-	}
-
-	// Client implementation filter
-	if v := queryParams.Get("client_implementation"); v != "" {
-		grpcReq.MetaClientImplementation = &cbtproto.StringFilter{
-			Filter: &cbtproto.StringFilter_Eq{Eq: v},
-		}
-	}
-
-	// Consensus implementation filter
-	if v := queryParams.Get("consensus_implementation"); v != "" {
-		grpcReq.MetaConsensusImplementation = &cbtproto.StringFilter{
-			Filter: &cbtproto.StringFilter_Eq{Eq: v},
-		}
-	}
-
-	// Time range filters using slot_start_date_time
-	if v := queryParams.Get("from"); v != "" {
-		// Parse ISO 8601 timestamp
-		t, err := time.Parse(time.RFC3339, v)
-		if err != nil {
-			r.WriteJSONResponseError(w, req, http.StatusBadRequest, "Invalid 'from' timestamp format. Use ISO 8601 (RFC3339)")
-			return
-		}
-		grpcReq.SlotStartDateTime = &cbtproto.UInt32Filter{
-			Filter: &cbtproto.UInt32Filter_Gte{Gte: uint32(t.Unix())},
-		}
-	}
-
-	if v := queryParams.Get("to"); v != "" {
-		// Parse ISO 8601 timestamp
-		t, err := time.Parse(time.RFC3339, v)
-		if err != nil {
-			r.WriteJSONResponseError(w, req, http.StatusBadRequest, "Invalid 'to' timestamp format. Use ISO 8601 (RFC3339)")
-			return
-		}
-		grpcReq.SlotStartDateTime = &cbtproto.UInt32Filter{
-			Filter: &cbtproto.UInt32Filter_Lte{Lte: uint32(t.Unix())},
-		}
+		return
 	}
 
 	// Pagination
 	pageSize := int32(100) // Default page size
+
 	if v := queryParams.Get("page_size"); v != "" {
 		if ps, err := strconv.ParseInt(v, 10, 32); err == nil {
 			pageSize = int32(ps)
@@ -123,6 +50,7 @@ func (r *PublicRouter) handleListPreparedBlocks(w http.ResponseWriter, req *http
 			}
 		}
 	}
+
 	grpcReq.PageSize = pageSize
 
 	if v := queryParams.Get("page_token"); v != "" {
@@ -144,6 +72,7 @@ func (r *PublicRouter) handleListPreparedBlocks(w http.ResponseWriter, req *http
 	grpcResp, err := r.xatuCBTClient.ListFctPreparedBlock(ctxWithMeta, grpcReq)
 	if err != nil {
 		r.HandleGRPCError(w, req, err)
+
 		return
 	}
 
@@ -182,6 +111,7 @@ func (r *PublicRouter) handleListPreparedBlocks(w http.ResponseWriter, req *http
 		if vb.BlockTotalBytes != nil {
 			block.BlockMetrics.TotalBytes = vb.BlockTotalBytes.GetValue()
 		}
+
 		if vb.BlockTotalBytesCompressed != nil {
 			block.BlockMetrics.TotalBytesCompressed = vb.BlockTotalBytesCompressed.GetValue()
 		}
@@ -190,18 +120,23 @@ func (r *PublicRouter) handleListPreparedBlocks(w http.ResponseWriter, req *http
 		if vb.ExecutionPayloadValue != nil {
 			block.ExecutionMetrics.ValueWei = vb.ExecutionPayloadValue.GetValue()
 		}
+
 		if vb.ConsensusPayloadValue != nil {
 			block.ExecutionMetrics.ConsensusValueWei = vb.ConsensusPayloadValue.GetValue()
 		}
+
 		if vb.ExecutionPayloadGasLimit != nil {
 			block.ExecutionMetrics.GasLimit = vb.ExecutionPayloadGasLimit.GetValue()
 		}
+
 		if vb.ExecutionPayloadGasUsed != nil {
 			block.ExecutionMetrics.GasUsed = vb.ExecutionPayloadGasUsed.GetValue()
 		}
+
 		if vb.ExecutionPayloadTransactionsCount != nil {
 			block.ExecutionMetrics.TransactionsCount = vb.ExecutionPayloadTransactionsCount.GetValue()
 		}
+
 		if vb.ExecutionPayloadTransactionsTotalBytes != nil {
 			block.ExecutionMetrics.TransactionsTotalBytes = vb.ExecutionPayloadTransactionsTotalBytes.GetValue()
 		}
@@ -222,13 +157,16 @@ func (r *PublicRouter) handleListPreparedBlocks(w http.ResponseWriter, req *http
 		filters.Slot = uint32(slot)
 		filters.AppliedFilters["slot"] = v
 	}
+
 	if v := queryParams.Get("client_name"); v != "" {
 		filters.ClientName = v
 		filters.AppliedFilters["client_name"] = v
 	}
+
 	if v := queryParams.Get("from"); v != "" {
 		filters.AppliedFilters["from"] = v
 	}
+
 	if v := queryParams.Get("to"); v != "" {
 		filters.AppliedFilters["to"] = v
 	}
@@ -261,12 +199,14 @@ func (r *PublicRouter) handlePreparedBlockBySlot(w http.ResponseWriter, req *htt
 	slot, err := strconv.ParseUint(slotStr, 10, 32)
 	if err != nil {
 		r.WriteJSONResponseError(w, req, http.StatusBadRequest, "Invalid slot number")
+
 		return
 	}
 
 	// Validate network
 	if network == "" {
 		r.WriteJSONResponseError(w, req, http.StatusBadRequest, "Network parameter is required")
+
 		return
 	}
 
@@ -288,6 +228,7 @@ func (r *PublicRouter) handlePreparedBlockBySlot(w http.ResponseWriter, req *htt
 	grpcResp, err := r.xatuCBTClient.ListFctPreparedBlock(ctxWithMeta, grpcReq)
 	if err != nil {
 		r.HandleGRPCError(w, req, err)
+
 		return
 	}
 
@@ -326,6 +267,7 @@ func (r *PublicRouter) handlePreparedBlockBySlot(w http.ResponseWriter, req *htt
 		if vb.BlockTotalBytes != nil {
 			block.BlockMetrics.TotalBytes = vb.BlockTotalBytes.GetValue()
 		}
+
 		if vb.BlockTotalBytesCompressed != nil {
 			block.BlockMetrics.TotalBytesCompressed = vb.BlockTotalBytesCompressed.GetValue()
 		}
@@ -334,18 +276,23 @@ func (r *PublicRouter) handlePreparedBlockBySlot(w http.ResponseWriter, req *htt
 		if vb.ExecutionPayloadValue != nil {
 			block.ExecutionMetrics.ValueWei = vb.ExecutionPayloadValue.GetValue()
 		}
+
 		if vb.ConsensusPayloadValue != nil {
 			block.ExecutionMetrics.ConsensusValueWei = vb.ConsensusPayloadValue.GetValue()
 		}
+
 		if vb.ExecutionPayloadGasLimit != nil {
 			block.ExecutionMetrics.GasLimit = vb.ExecutionPayloadGasLimit.GetValue()
 		}
+
 		if vb.ExecutionPayloadGasUsed != nil {
 			block.ExecutionMetrics.GasUsed = vb.ExecutionPayloadGasUsed.GetValue()
 		}
+
 		if vb.ExecutionPayloadTransactionsCount != nil {
 			block.ExecutionMetrics.TransactionsCount = vb.ExecutionPayloadTransactionsCount.GetValue()
 		}
+
 		if vb.ExecutionPayloadTransactionsTotalBytes != nil {
 			block.ExecutionMetrics.TransactionsTotalBytes = vb.ExecutionPayloadTransactionsTotalBytes.GetValue()
 		}
@@ -374,4 +321,81 @@ func (r *PublicRouter) handlePreparedBlockBySlot(w http.ResponseWriter, req *htt
 
 	// Write response
 	r.WriteJSONResponseOK(w, req, response)
+}
+
+// buildPreparedBlockFilters builds gRPC filters from query parameters
+func (r *PublicRouter) buildPreparedBlockFilters(queryParams map[string][]string, grpcReq *cbtproto.ListFctPreparedBlockRequest) error {
+	// Slot filters
+	if v := queryParams["slot"]; len(v) > 0 && v[0] != "" {
+		slot, err := strconv.ParseUint(v[0], 10, 32)
+		if err != nil {
+			return err
+		}
+
+		grpcReq.Slot = &cbtproto.UInt32Filter{
+			Filter: &cbtproto.UInt32Filter_Eq{Eq: uint32(slot)},
+		}
+	} else if v := queryParams["slot_gte"]; len(v) > 0 && v[0] != "" {
+		slot, err := strconv.ParseUint(v[0], 10, 32)
+		if err != nil {
+			return err
+		}
+
+		grpcReq.Slot = &cbtproto.UInt32Filter{
+			Filter: &cbtproto.UInt32Filter_Gte{Gte: uint32(slot)},
+		}
+	} else if v := queryParams["slot_lte"]; len(v) > 0 && v[0] != "" {
+		slot, err := strconv.ParseUint(v[0], 10, 32)
+		if err != nil {
+			return err
+		}
+
+		grpcReq.Slot = &cbtproto.UInt32Filter{
+			Filter: &cbtproto.UInt32Filter_Lte{Lte: uint32(slot)},
+		}
+	}
+
+	// Client filters
+	if v := queryParams["client_name"]; len(v) > 0 && v[0] != "" {
+		grpcReq.MetaClientName = &cbtproto.StringFilter{
+			Filter: &cbtproto.StringFilter_Eq{Eq: v[0]},
+		}
+	}
+
+	if v := queryParams["client_implementation"]; len(v) > 0 && v[0] != "" {
+		grpcReq.MetaClientImplementation = &cbtproto.StringFilter{
+			Filter: &cbtproto.StringFilter_Eq{Eq: v[0]},
+		}
+	}
+
+	if v := queryParams["consensus_implementation"]; len(v) > 0 && v[0] != "" {
+		grpcReq.MetaConsensusImplementation = &cbtproto.StringFilter{
+			Filter: &cbtproto.StringFilter_Eq{Eq: v[0]},
+		}
+	}
+
+	// Time filters
+	if v := queryParams["from"]; len(v) > 0 && v[0] != "" {
+		t, err := time.Parse(time.RFC3339, v[0])
+		if err != nil {
+			return err
+		}
+
+		grpcReq.SlotStartDateTime = &cbtproto.UInt32Filter{
+			Filter: &cbtproto.UInt32Filter_Gte{Gte: uint32(t.Unix())}, //nolint:gosec // timestamp conversion
+		}
+	}
+
+	if v := queryParams["to"]; len(v) > 0 && v[0] != "" {
+		t, err := time.Parse(time.RFC3339, v[0])
+		if err != nil {
+			return err
+		}
+
+		grpcReq.SlotStartDateTime = &cbtproto.UInt32Filter{
+			Filter: &cbtproto.UInt32Filter_Lte{Lte: uint32(t.Unix())}, //nolint:gosec // timestamp conversion
+		}
+	}
+
+	return nil
 }
