@@ -14,7 +14,7 @@ import { ChevronLeft, Clock, AlertCircle } from 'lucide-react';
 import useBeacon from '@/contexts/beacon';
 import { extractSlotBounds } from '@/types/slot';
 
-const SLOTS_TO_FETCH = 10; // Number of slots to fetch for REST API
+const SLOTS_TO_FETCH = 7; // Number of slots to fetch for REST API (matches UI display)
 
 export function LocallyBuiltBlocks() {
   const { selectedNetwork } = useNetwork();
@@ -25,10 +25,13 @@ export function LocallyBuiltBlocks() {
   const { getBeaconClock } = useBeacon();
 
   // Fetch experiment config to get data availability bounds
-  const { data: experimentConfig } = useExperimentConfig('locally-built-blocks', {
-    refetchInterval: 10_000,
-    staleTime: 10_000,
-  });
+  const { data: experimentConfig, isLoading: isLoadingConfig } = useExperimentConfig(
+    'locally-built-blocks',
+    {
+      refetchInterval: 10_000,
+      staleTime: 10_000,
+    },
+  );
 
   // Extract slot bounds from experiment config
   const slotBounds = useMemo(() => {
@@ -112,6 +115,17 @@ export function LocallyBuiltBlocks() {
   const formatLastUpdated = () => {
     return lastUpdated.toLocaleTimeString();
   };
+
+  // Show loading state while configuration is being fetched
+  if (isLoadingConfig) {
+    return (
+      <div className="flex-1 flex items-center justify-center min-h-[50vh]">
+        <div className="text-center">
+          <div className="text-sm font-mono text-secondary">Loading configuration...</div>
+        </div>
+      </div>
+    );
+  }
 
   // Show not available message if experiment isn't enabled
   if (!isExperimentAvailable()) {
