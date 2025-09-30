@@ -66,6 +66,8 @@ message ForkConfig {
 message ConsensusForks {
   // Electra fork info
   ForkInfo electra = 1;
+  // Fusaka fork info
+  ForkInfo fusaka = 2;
 }
 
 // ForkInfo contains information about a specific fork

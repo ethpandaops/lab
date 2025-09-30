@@ -260,14 +260,32 @@ func convertConfigToAPIProto(config *configpb.FrontendConfig) *apiv1.FrontendCon
 			}
 
 			// Add forks if present
-			if network.Forks != nil && network.Forks.Consensus != nil && network.Forks.Consensus.Electra != nil {
-				networkConfig.Forks = &apiv1.ForkConfig{
-					Consensus: &apiv1.ConsensusForks{
-						Electra: &apiv1.ForkInfo{
-							Epoch:             network.Forks.Consensus.Electra.Epoch,
-							MinClientVersions: network.Forks.Consensus.Electra.MinClientVersions,
-						},
-					},
+			if network.Forks != nil && network.Forks.Consensus != nil {
+				consensusForks := &apiv1.ConsensusForks{}
+				hasForks := false
+
+				// Add Electra fork if present
+				if network.Forks.Consensus.Electra != nil {
+					consensusForks.Electra = &apiv1.ForkInfo{
+						Epoch:             network.Forks.Consensus.Electra.Epoch,
+						MinClientVersions: network.Forks.Consensus.Electra.MinClientVersions,
+					}
+					hasForks = true
+				}
+
+				// Add Fusaka fork if present
+				if network.Forks.Consensus.Fusaka != nil {
+					consensusForks.Fusaka = &apiv1.ForkInfo{
+						Epoch:             network.Forks.Consensus.Fusaka.Epoch,
+						MinClientVersions: network.Forks.Consensus.Fusaka.MinClientVersions,
+					}
+					hasForks = true
+				}
+
+				if hasForks {
+					networkConfig.Forks = &apiv1.ForkConfig{
+						Consensus: consensusForks,
+					}
 				}
 			}
 
