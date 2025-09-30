@@ -139,6 +139,7 @@ message ForkConfig {
 // ConsensusForks contains consensus layer fork information for public API consumption.
 message ConsensusForks {
   ForkInfo electra = 1;
+  ForkInfo fusaka = 2;
 }
 
 // ForkInfo contains information about a specific fork for public API consumption.

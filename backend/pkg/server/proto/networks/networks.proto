@@ -67,6 +67,8 @@ message Forks {
 message ConsensusForks {
   // Electra fork information.
   ForkInfo electra = 1 [json_name = "electra"];
+  // Fusaka fork information.
+  ForkInfo fusaka = 2 [json_name = "fusaka"];
 }
 
 // ForkInfo contains information about a specific fork.

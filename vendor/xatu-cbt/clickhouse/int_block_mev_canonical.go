@@ -572,7 +572,10 @@ func BuildListIntBlockMevCanonicalQuery(req *ListIntBlockMevCanonicalRequest, op
 		orderByClause = " ORDER BY slot_start_date_time" + ", block_root"
 	}
 
-	return BuildParameterizedQuery("int_block_mev_canonical", qb, orderByClause, limit, offset, options...), nil
+	// Build column list
+	columns := []string{"updated_date_time", "slot", "slot_start_date_time", "epoch", "epoch_start_date_time", "block_root", "earliest_bid_date_time", "relay_names", "parent_hash", "block_number", "block_hash", "builder_pubkey", "proposer_pubkey", "proposer_fee_recipient", "gas_limit", "gas_used", "value", "transaction_count"}
+
+	return BuildParameterizedQuery("int_block_mev_canonical", columns, qb, orderByClause, limit, offset, options...)
 }
 
 // BuildGetIntBlockMevCanonicalQuery constructs a parameterized SQL query from a GetIntBlockMevCanonicalRequest
@@ -589,6 +592,9 @@ func BuildGetIntBlockMevCanonicalQuery(req *GetIntBlockMevCanonicalRequest, opti
 	// Build ORDER BY clause
 	orderByClause := " ORDER BY slot_start_date_time, block_root"
 
+	// Build column list
+	columns := []string{"updated_date_time", "slot", "slot_start_date_time", "epoch", "epoch_start_date_time", "block_root", "earliest_bid_date_time", "relay_names", "parent_hash", "block_number", "block_hash", "builder_pubkey", "proposer_pubkey", "proposer_fee_recipient", "gas_limit", "gas_used", "value", "transaction_count"}
+
 	// Return single record
-	return BuildParameterizedQuery("int_block_mev_canonical", qb, orderByClause, 1, 0, options...), nil
+	return BuildParameterizedQuery("int_block_mev_canonical", columns, qb, orderByClause, 1, 0, options...)
 }

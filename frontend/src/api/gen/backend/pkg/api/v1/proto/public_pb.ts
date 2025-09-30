@@ -866,6 +866,11 @@ export class ConsensusForks extends Message<ConsensusForks> {
    */
   electra?: ForkInfo;
 
+  /**
+   * @generated from field: api.v1.ForkInfo fusaka = 2;
+   */
+  fusaka?: ForkInfo;
+
   constructor(data?: PartialMessage<ConsensusForks>) {
     super();
     proto3.util.initPartial(data, this);
@@ -875,6 +880,7 @@ export class ConsensusForks extends Message<ConsensusForks> {
   static readonly typeName = "api.v1.ConsensusForks";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "electra", kind: "message", T: ForkInfo },
+    { no: 2, name: "fusaka", kind: "message", T: ForkInfo },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ConsensusForks {

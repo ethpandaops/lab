@@ -93,14 +93,32 @@ func (c *ConfigService) GetConfig(
 			}
 
 			// Add fork information if available
-			if network.Forks != nil && network.Forks.Consensus != nil && network.Forks.Consensus.Electra != nil {
-				netConfig.Forks = &config.ForkConfig{
-					Consensus: &config.ConsensusForks{
-						Electra: &config.ForkInfo{
-							Epoch:             network.Forks.Consensus.Electra.Epoch,
-							MinClientVersions: network.Forks.Consensus.Electra.MinClientVersions,
-						},
-					},
+			if network.Forks != nil && network.Forks.Consensus != nil {
+				consensusForks := &config.ConsensusForks{}
+				hasForks := false
+
+				// Add Electra fork if present
+				if network.Forks.Consensus.Electra != nil {
+					consensusForks.Electra = &config.ForkInfo{
+						Epoch:             network.Forks.Consensus.Electra.Epoch,
+						MinClientVersions: network.Forks.Consensus.Electra.MinClientVersions,
+					}
+					hasForks = true
+				}
+
+				// Add Fusaka fork if present
+				if network.Forks.Consensus.Fusaka != nil {
+					consensusForks.Fusaka = &config.ForkInfo{
+						Epoch:             network.Forks.Consensus.Fusaka.Epoch,
+						MinClientVersions: network.Forks.Consensus.Fusaka.MinClientVersions,
+					}
+					hasForks = true
+				}
+
+				if hasForks {
+					netConfig.Forks = &config.ForkConfig{
+						Consensus: consensusForks,
+					}
 				}
 			}
 
