@@ -5,7 +5,7 @@ import { useNetwork, useConfig } from '@/stores/appStore';
 import { AlertCircle } from 'lucide-react';
 
 function BeaconSlot() {
-  const { slot } = useParams<{ slot: string }>();
+  const { slot } = useParams({ from: '/_layout/beacon/slot/$slot' });
   const search = useSearch({ from: '__root__' });
   const { selectedNetwork } = useNetwork();
   const { config } = useConfig();
@@ -33,10 +33,16 @@ function BeaconSlot() {
       <div className="flex-1 flex items-center justify-center min-h-[50vh]">
         <div className="text-center max-w-md mx-auto">
           <AlertCircle className="w-12 h-12 text-accent/60 mx-auto mb-4" />
-          <h2 className="text-xl font-sans font-bold text-primary mb-2">Experiment Not Available</h2>
-          <p className="text-sm font-mono text-secondary mb-4">Historical Slots is not enabled for {selectedNetwork}</p>
+          <h2 className="text-xl font-sans font-bold text-primary mb-2">
+            Experiment Not Available
+          </h2>
+          <p className="text-sm font-mono text-secondary mb-4">
+            Historical Slots is not enabled for {selectedNetwork}
+          </p>
           {supportedNetworks.length > 0 && (
-            <p className="text-xs font-mono text-tertiary">Available on: {supportedNetworks.join(', ')}</p>
+            <p className="text-xs font-mono text-tertiary">
+              Available on: {supportedNetworks.join(', ')}
+            </p>
           )}
         </div>
       </div>
