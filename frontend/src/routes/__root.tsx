@@ -48,7 +48,9 @@ export const Route = createRootRoute({
 
   component: RootComponent,
   pendingComponent: () => <LoadingState message="Loading configuration..." />,
-  errorComponent: ({ error }) => <ErrorState message="Failed to load application" error={error as Error} />,
+  errorComponent: ({ error }) => (
+    <ErrorState message="Failed to load application" error={error as Error} />
+  ),
 });
 
 function RootComponent() {
@@ -57,7 +59,8 @@ function RootComponent() {
 
   // Populate Zustand store with loader data
   useEffect(() => {
-    const { setConfig, setAvailableNetworks, setSelectedNetwork } = useAppStore.getState();
+    const { setConfig, setAvailableNetworks, setSelectedNetwork, selectedNetwork } =
+      useAppStore.getState();
 
     setConfig(config);
     setAvailableNetworks(availableNetworks);
@@ -68,22 +71,34 @@ function RootComponent() {
     if (search.network && availableNetworks.includes(search.network)) {
       // URL param is valid, use it
       networkToSelect = search.network;
-    } else if (!search.network && availableNetworks.includes('mainnet')) {
-      // No URL param and mainnet exists → default to mainnet (don't show in URL)
-      networkToSelect = 'mainnet';
     } else if (!search.network) {
-      // No URL param and no mainnet → default to first available
-      networkToSelect = availableNetworks[0];
+      // No URL param - check if current stored network is valid
+      if (availableNetworks.includes(selectedNetwork)) {
+        // Stored network is valid, keep it
+        networkToSelect = selectedNetwork;
+      } else if (availableNetworks.includes('mainnet')) {
+        // Stored network invalid, default to mainnet
+        networkToSelect = 'mainnet';
+      } else {
+        // No mainnet available, use first available
+        networkToSelect = availableNetworks[0];
+      }
     } else {
       // URL param exists but not in available networks → fallback to mainnet or first
       networkToSelect = availableNetworks.includes('mainnet') ? 'mainnet' : availableNetworks[0];
     }
 
-    setSelectedNetwork(networkToSelect);
+    // Only update if different from current selection
+    if (networkToSelect !== selectedNetwork) {
+      setSelectedNetwork(networkToSelect);
+    }
   }, [config, availableNetworks, search.network]);
 
   return (
-    <ApplicationProvider api={{ client, baseUrl: bootstrap.backend.url, restApiUrl }} beacon={{ config }}>
+    <ApplicationProvider
+      api={{ client, baseUrl: bootstrap.backend.url, restApiUrl }}
+      beacon={{ config }}
+    >
       <ModalProvider>
         <ScrollToTop />
         <Outlet />

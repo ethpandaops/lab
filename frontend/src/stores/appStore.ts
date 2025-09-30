@@ -15,10 +15,25 @@ interface ConfigState {
 
 interface AppState extends NetworkState, ConfigState {}
 
+const NETWORK_STORAGE_KEY = 'selectedNetwork';
+
+const getStoredNetwork = (): string => {
+  if (typeof window !== 'undefined') {
+    const stored = localStorage.getItem(NETWORK_STORAGE_KEY);
+    return stored || 'mainnet';
+  }
+  return 'mainnet';
+};
+
 export const useAppStore = create<AppState>(set => ({
-  selectedNetwork: 'mainnet',
+  selectedNetwork: getStoredNetwork(),
   availableNetworks: [],
-  setSelectedNetwork: (network: string) => set(() => ({ selectedNetwork: network })),
+  setSelectedNetwork: (network: string) => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(NETWORK_STORAGE_KEY, network);
+    }
+    set(() => ({ selectedNetwork: network }));
+  },
   setAvailableNetworks: (networks: string[]) => set(() => ({ availableNetworks: networks })),
 
   config: null,
