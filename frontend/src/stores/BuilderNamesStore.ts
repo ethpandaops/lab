@@ -27,7 +27,21 @@ class BuilderNamesStore {
           const response = await fetch(`/data/${network}-builders.json`);
 
           if (!response.ok) {
+            // If file doesn't exist, just skip loading without error
+            if (response.status === 404) {
+              console.log(`Builder names file not found for network: ${network}`);
+              resolve();
+              return;
+            }
             throw new Error(`Failed to fetch builder names: ${response.status}`);
+          }
+
+          // Check if response is JSON before parsing
+          const contentType = response.headers.get('content-type');
+          if (!contentType || !contentType.includes('application/json')) {
+            console.warn(`Builder names file is not JSON for network: ${network}`);
+            resolve();
+            return;
           }
 
           const data = await response.json();
