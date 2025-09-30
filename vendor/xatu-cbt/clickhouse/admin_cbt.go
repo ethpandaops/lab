@@ -202,7 +202,10 @@ func BuildListAdminCbtQuery(req *ListAdminCbtRequest, options ...QueryOption) (S
 		orderByClause = " ORDER BY database" + ", `table`" + ", position"
 	}
 
-	return BuildParameterizedQuery("admin_cbt", qb, orderByClause, limit, offset, options...), nil
+	// Build column list
+	columns := []string{"updated_date_time", "database", "table", "position", "interval"}
+
+	return BuildParameterizedQuery("admin_cbt", columns, qb, orderByClause, limit, offset, options...)
 }
 
 // BuildGetAdminCbtQuery constructs a parameterized SQL query from a GetAdminCbtRequest
@@ -219,6 +222,9 @@ func BuildGetAdminCbtQuery(req *GetAdminCbtRequest, options ...QueryOption) (SQL
 	// Build ORDER BY clause
 	orderByClause := " ORDER BY database, `table`, position"
 
+	// Build column list
+	columns := []string{"updated_date_time", "database", "table", "position", "interval"}
+
 	// Return single record
-	return BuildParameterizedQuery("admin_cbt", qb, orderByClause, 1, 0, options...), nil
+	return BuildParameterizedQuery("admin_cbt", columns, qb, orderByClause, 1, 0, options...)
 }
