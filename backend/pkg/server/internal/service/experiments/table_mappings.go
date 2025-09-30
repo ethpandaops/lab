@@ -31,7 +31,7 @@ var ExperimentTableMapping = map[string][]string{
 		"fct_block",
 	},
 	"locally-built-blocks": {
-		"fct_block",
+		"fct_prepared_block",
 	},
 }
 

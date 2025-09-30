@@ -327,13 +327,41 @@ func (r *PublicRouter) handlePreparedBlockBySlot(w http.ResponseWriter, req *htt
 func (r *PublicRouter) buildPreparedBlockFilters(queryParams map[string][]string, grpcReq *cbtproto.ListFctPreparedBlockRequest) error {
 	// Slot filters
 	if v := queryParams["slot"]; len(v) > 0 && v[0] != "" {
-		slot, err := strconv.ParseUint(v[0], 10, 32)
-		if err != nil {
-			return err
-		}
+		// Check if multiple slots are provided
+		if len(v) > 1 {
+			// Use IN filter for multiple slots
+			var slots []uint32
 
-		grpcReq.Slot = &cbtproto.UInt32Filter{
-			Filter: &cbtproto.UInt32Filter_Eq{Eq: uint32(slot)},
+			for _, slotStr := range v {
+				if slotStr != "" {
+					slot, err := strconv.ParseUint(slotStr, 10, 32)
+					if err != nil {
+						return err
+					}
+
+					slots = append(slots, uint32(slot))
+				}
+			}
+
+			if len(slots) > 0 {
+				grpcReq.Slot = &cbtproto.UInt32Filter{
+					Filter: &cbtproto.UInt32Filter_In{
+						In: &cbtproto.UInt32List{
+							Values: slots,
+						},
+					},
+				}
+			}
+		} else {
+			// Single slot - use EQ filter
+			slot, err := strconv.ParseUint(v[0], 10, 32)
+			if err != nil {
+				return err
+			}
+
+			grpcReq.Slot = &cbtproto.UInt32Filter{
+				Filter: &cbtproto.UInt32Filter_Eq{Eq: uint32(slot)},
+			}
 		}
 	} else if v := queryParams["slot_gte"]; len(v) > 0 && v[0] != "" {
 		slot, err := strconv.ParseUint(v[0], 10, 32)
