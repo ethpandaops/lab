@@ -45,20 +45,6 @@ func (x *XatuCBT) ListFctPreparedBlock(
 	timer := prometheus.NewTimer(x.requestDuration.WithLabelValues(MethodListFctPreparedBlock, network))
 	defer timer.ObserveDuration()
 
-	var (
-		cacheKey       = x.generateCacheKey("fct_prepared_block", network, req)
-		cachedResponse = &cbtproto.ListFctPreparedBlockResponse{}
-	)
-
-	// Check cache first.
-	if found, _ := x.tryCache(cacheKey, cachedResponse); found {
-		x.cacheHitsTotal.WithLabelValues(MethodListFctPreparedBlock, network).Inc()
-
-		return cachedResponse, nil
-	}
-
-	x.cacheMissesTotal.WithLabelValues(MethodListFctPreparedBlock, network).Inc()
-
 	// Use our clickhouse-proto-gen to handle building for us.
 	sqlQuery, err := cbtproto.BuildListFctPreparedBlockQuery(
 		req,
@@ -97,19 +83,14 @@ func (x *XatuCBT) ListFctPreparedBlock(
 	}
 
 	//nolint:gosec // conversion safe.
-	rsp := &cbtproto.ListFctPreparedBlockResponse{
+	return &cbtproto.ListFctPreparedBlockResponse{
 		FctPreparedBlock: blocks,
 		NextPageToken: cbtproto.CalculateNextPageToken(
 			currentOffset,
 			uint32(pageSize),
 			uint32(len(blocks)),
 		),
-	}
-
-	// Store in cache.
-	x.storeInCache(cacheKey, rsp, x.config.CacheTTL)
-
-	return rsp, nil
+	}, nil
 }
 
 // scanFctPreparedBlock scans a single fct_prepared_block row from the database.

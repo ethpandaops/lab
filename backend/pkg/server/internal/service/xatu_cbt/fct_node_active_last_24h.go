@@ -45,20 +45,6 @@ func (x *XatuCBT) ListFctNodeActiveLast24h(
 	timer := prometheus.NewTimer(x.requestDuration.WithLabelValues(MethodListFctNodeActiveLast24h, network))
 	defer timer.ObserveDuration()
 
-	var (
-		cacheKey       = x.generateCacheKey("fct_node_active_last_24h", network, req)
-		cachedResponse = &cbtproto.ListFctNodeActiveLast24HResponse{}
-	)
-
-	// Check cache first.
-	if found, _ := x.tryCache(cacheKey, cachedResponse); found {
-		x.cacheHitsTotal.WithLabelValues(MethodListFctNodeActiveLast24h, network).Inc()
-
-		return cachedResponse, nil
-	}
-
-	x.cacheMissesTotal.WithLabelValues(MethodListFctNodeActiveLast24h, network).Inc()
-
 	// Use our clickhouse-proto-gen to handle building for us.
 	sqlQuery, err := cbtproto.BuildListFctNodeActiveLast24HQuery(
 		req,
@@ -97,19 +83,14 @@ func (x *XatuCBT) ListFctNodeActiveLast24h(
 	}
 
 	//nolint:gosec // conversion safe.
-	rsp := &cbtproto.ListFctNodeActiveLast24HResponse{
+	return &cbtproto.ListFctNodeActiveLast24HResponse{
 		FctNodeActiveLast_24H: nodes,
 		NextPageToken: cbtproto.CalculateNextPageToken(
 			currentOffset,
 			uint32(pageSize),
 			uint32(len(nodes)),
 		),
-	}
-
-	// Store in cache.
-	x.storeInCache(cacheKey, rsp, x.config.CacheTTL)
-
-	return rsp, nil
+	}, nil
 }
 
 // scanFctNodeActiveLast24h scans a single fct_node_active_last_24h row from the database.

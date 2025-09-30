@@ -45,20 +45,6 @@ func (x *XatuCBT) ListFctBlockProposerEntity(
 	timer := prometheus.NewTimer(x.requestDuration.WithLabelValues(MethodListFctBlockProposerEntity, network))
 	defer timer.ObserveDuration()
 
-	var (
-		cacheKey       = x.generateCacheKey("fct_block_proposer_entity", network, req)
-		cachedResponse = &cbtproto.ListFctBlockProposerEntityResponse{}
-	)
-
-	// Check cache first.
-	if found, _ := x.tryCache(cacheKey, cachedResponse); found {
-		x.cacheHitsTotal.WithLabelValues(MethodListFctBlockProposerEntity, network).Inc()
-
-		return cachedResponse, nil
-	}
-
-	x.cacheMissesTotal.WithLabelValues(MethodListFctBlockProposerEntity, network).Inc()
-
 	// Use our clickhouse-proto-gen to handle building for us.
 	sqlQuery, err := cbtproto.BuildListFctBlockProposerEntityQuery(
 		req,
@@ -97,19 +83,14 @@ func (x *XatuCBT) ListFctBlockProposerEntity(
 	}
 
 	//nolint:gosec // conversion safe.
-	rsp := &cbtproto.ListFctBlockProposerEntityResponse{
+	return &cbtproto.ListFctBlockProposerEntityResponse{
 		FctBlockProposerEntity: entities,
 		NextPageToken: cbtproto.CalculateNextPageToken(
 			currentOffset,
 			uint32(pageSize),
 			uint32(len(entities)),
 		),
-	}
-
-	// Store in cache.
-	x.storeInCache(cacheKey, rsp, x.config.CacheTTL)
-
-	return rsp, nil
+	}, nil
 }
 
 // scanFctBlockProposerEntity scans a single fct_block_proposer_entity row from the database.

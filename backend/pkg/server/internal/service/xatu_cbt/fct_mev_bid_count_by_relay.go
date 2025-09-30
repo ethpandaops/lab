@@ -44,20 +44,6 @@ func (x *XatuCBT) ListFctMevBidCountByRelay(
 	timer := prometheus.NewTimer(x.requestDuration.WithLabelValues(MethodListFctMevBidCountByRelay, network))
 	defer timer.ObserveDuration()
 
-	var (
-		cacheKey       = x.generateCacheKey("fct_mev_bid_count_by_relay", network, req)
-		cachedResponse = &cbtproto.ListFctMevBidCountByRelayResponse{}
-	)
-
-	// Check cache first.
-	if found, _ := x.tryCache(cacheKey, cachedResponse); found {
-		x.cacheHitsTotal.WithLabelValues(MethodListFctMevBidCountByRelay, network).Inc()
-
-		return cachedResponse, nil
-	}
-
-	x.cacheMissesTotal.WithLabelValues(MethodListFctMevBidCountByRelay, network).Inc()
-
 	// Use our clickhouse-proto-gen to handle building for us.
 	sqlQuery, err := cbtproto.BuildListFctMevBidCountByRelayQuery(
 		req,
@@ -96,19 +82,14 @@ func (x *XatuCBT) ListFctMevBidCountByRelay(
 	}
 
 	//nolint:gosec // conversion safe.
-	rsp := &cbtproto.ListFctMevBidCountByRelayResponse{
+	return &cbtproto.ListFctMevBidCountByRelayResponse{
 		FctMevBidCountByRelay: items,
 		NextPageToken: cbtproto.CalculateNextPageToken(
 			currentOffset,
 			uint32(pageSize),
 			uint32(len(items)),
 		),
-	}
-
-	// Store in cache.
-	x.storeInCache(cacheKey, rsp, x.config.CacheTTL)
-
-	return rsp, nil
+	}, nil
 }
 
 // scanFctMevBidCountByRelay scans a single fct_mev_bid_count_by_relay row from the database.

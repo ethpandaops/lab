@@ -44,20 +44,6 @@ func (x *XatuCBT) ListFctAttestationFirstSeenChunked50ms(
 	timer := prometheus.NewTimer(x.requestDuration.WithLabelValues(MethodListFctAttestationFirstSeenChunked50ms, network))
 	defer timer.ObserveDuration()
 
-	var (
-		cacheKey       = x.generateCacheKey("fct_attestation_first_seen_chunked_50ms", network, req)
-		cachedResponse = &cbtproto.ListFctAttestationFirstSeenChunked50MsResponse{}
-	)
-
-	// Check cache first.
-	if found, _ := x.tryCache(cacheKey, cachedResponse); found {
-		x.cacheHitsTotal.WithLabelValues(MethodListFctAttestationFirstSeenChunked50ms, network).Inc()
-
-		return cachedResponse, nil
-	}
-
-	x.cacheMissesTotal.WithLabelValues(MethodListFctAttestationFirstSeenChunked50ms, network).Inc()
-
 	// Use our clickhouse-proto-gen to handle building for us.
 	sqlQuery, err := cbtproto.BuildListFctAttestationFirstSeenChunked50MsQuery(
 		req,
@@ -96,19 +82,14 @@ func (x *XatuCBT) ListFctAttestationFirstSeenChunked50ms(
 	}
 
 	//nolint:gosec // conversion safe.
-	rsp := &cbtproto.ListFctAttestationFirstSeenChunked50MsResponse{
+	return &cbtproto.ListFctAttestationFirstSeenChunked50MsResponse{
 		FctAttestationFirstSeenChunked_50Ms: chunks,
 		NextPageToken: cbtproto.CalculateNextPageToken(
 			currentOffset,
 			uint32(pageSize),
 			uint32(len(chunks)),
 		),
-	}
-
-	// Store in cache.
-	x.storeInCache(cacheKey, rsp, x.config.CacheTTL)
-
-	return rsp, nil
+	}, nil
 }
 
 // scanFctAttestationFirstSeenChunked50ms scans a single fct_attestation_first_seen_chunked_50ms row from the database.

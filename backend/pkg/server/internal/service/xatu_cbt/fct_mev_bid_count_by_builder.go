@@ -44,20 +44,6 @@ func (x *XatuCBT) ListFctMevBidCountByBuilder(
 	timer := prometheus.NewTimer(x.requestDuration.WithLabelValues(MethodListFctMevBidCountByBuilder, network))
 	defer timer.ObserveDuration()
 
-	var (
-		cacheKey       = x.generateCacheKey("fct_mev_bid_count_by_builder", network, req)
-		cachedResponse = &cbtproto.ListFctMevBidCountByBuilderResponse{}
-	)
-
-	// Check cache first.
-	if found, _ := x.tryCache(cacheKey, cachedResponse); found {
-		x.cacheHitsTotal.WithLabelValues(MethodListFctMevBidCountByBuilder, network).Inc()
-
-		return cachedResponse, nil
-	}
-
-	x.cacheMissesTotal.WithLabelValues(MethodListFctMevBidCountByBuilder, network).Inc()
-
 	// Use our clickhouse-proto-gen to handle building for us.
 	sqlQuery, err := cbtproto.BuildListFctMevBidCountByBuilderQuery(
 		req,
@@ -96,19 +82,14 @@ func (x *XatuCBT) ListFctMevBidCountByBuilder(
 	}
 
 	//nolint:gosec // conversion safe.
-	rsp := &cbtproto.ListFctMevBidCountByBuilderResponse{
+	return &cbtproto.ListFctMevBidCountByBuilderResponse{
 		FctMevBidCountByBuilder: items,
 		NextPageToken: cbtproto.CalculateNextPageToken(
 			currentOffset,
 			uint32(pageSize),
 			uint32(len(items)),
 		),
-	}
-
-	// Store in cache.
-	x.storeInCache(cacheKey, rsp, x.config.CacheTTL)
-
-	return rsp, nil
+	}, nil
 }
 
 // scanFctMevBidCountByBuilder scans a single fct_mev_bid_count_by_builder row from the database.

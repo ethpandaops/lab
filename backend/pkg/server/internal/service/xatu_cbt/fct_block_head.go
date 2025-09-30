@@ -46,20 +46,6 @@ func (x *XatuCBT) ListFctBlockHead(
 	timer := prometheus.NewTimer(x.requestDuration.WithLabelValues(MethodListFctBlockHead, network))
 	defer timer.ObserveDuration()
 
-	var (
-		cacheKey       = x.generateCacheKey("int_block_head", network, req)
-		cachedResponse = &cbtproto.ListFctBlockHeadResponse{}
-	)
-
-	// Check cache first.
-	if found, _ := x.tryCache(cacheKey, cachedResponse); found {
-		x.cacheHitsTotal.WithLabelValues(MethodListFctBlockHead, network).Inc()
-
-		return cachedResponse, nil
-	}
-
-	x.cacheMissesTotal.WithLabelValues(MethodListFctBlockHead, network).Inc()
-
 	// Use our clickhouse-proto-gen to handle building for us.
 	sqlQuery, err := cbtproto.BuildListFctBlockHeadQuery(
 		req,
@@ -98,19 +84,14 @@ func (x *XatuCBT) ListFctBlockHead(
 	}
 
 	//nolint:gosec // conversion safe.
-	rsp := &cbtproto.ListFctBlockHeadResponse{
+	return &cbtproto.ListFctBlockHeadResponse{
 		FctBlockHead: blocks,
 		NextPageToken: cbtproto.CalculateNextPageToken(
 			currentOffset,
 			uint32(pageSize),
 			uint32(len(blocks)),
 		),
-	}
-
-	// Store in cache.
-	x.storeInCache(cacheKey, rsp, x.config.CacheTTL)
-
-	return rsp, nil
+	}, nil
 }
 
 // scanFctBlockHead scans a single int_block_head row from the database.

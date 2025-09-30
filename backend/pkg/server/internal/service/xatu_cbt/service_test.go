@@ -34,7 +34,6 @@ func TestNew(t *testing.T) {
 		{
 			name: "valid config",
 			config: &xatu_cbt.Config{
-				CacheTTL:      60 * time.Second,
 				MaxQueryLimit: 1000,
 				DefaultLimit:  100,
 				NetworkConfigs: map[string]*xatu_cbt.NetworkConfig{
@@ -61,7 +60,7 @@ func TestNew(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			svc, err := xatu_cbt.New(logger, tt.config, nil, metricsSvc, nil, nil)
+			svc, err := xatu_cbt.New(logger, tt.config, metricsSvc, nil, nil)
 			if tt.wantErr {
 				require.Error(t, err)
 				assert.Contains(t, err.Error(), tt.errMsg)
@@ -90,7 +89,6 @@ func TestServiceLifecycle(t *testing.T) {
 	defer cleanup()
 
 	config := &xatu_cbt.Config{
-		CacheTTL:      60 * time.Second,
 		MaxQueryLimit: 1000,
 		DefaultLimit:  100,
 		NetworkConfigs: map[string]*xatu_cbt.NetworkConfig{
@@ -103,7 +101,7 @@ func TestServiceLifecycle(t *testing.T) {
 		},
 	}
 
-	svc, err := xatu_cbt.New(logger, config, nil, metricsSvc, nil, nil)
+	svc, err := xatu_cbt.New(logger, config, metricsSvc, nil, nil)
 	require.NoError(t, err)
 	require.NotNil(t, svc)
 
@@ -131,7 +129,6 @@ func TestListFctNodeActiveLast24hValidation(t *testing.T) {
 	defer cleanup()
 
 	config := &xatu_cbt.Config{
-		CacheTTL:      60 * time.Second,
 		MaxQueryLimit: 1000,
 		DefaultLimit:  100,
 		NetworkConfigs: map[string]*xatu_cbt.NetworkConfig{
@@ -144,7 +141,7 @@ func TestListFctNodeActiveLast24hValidation(t *testing.T) {
 		},
 	}
 
-	svc, err := xatu_cbt.New(logger, config, nil, metricsSvc, nil, nil)
+	svc, err := xatu_cbt.New(logger, config, metricsSvc, nil, nil)
 	require.NoError(t, err)
 	require.NotNil(t, svc)
 
@@ -241,5 +238,4 @@ func TestConfigDefaults(t *testing.T) {
 	// Check defaults were applied
 	assert.Equal(t, uint64(1000), config.MaxQueryLimit)
 	assert.Equal(t, uint64(100), config.DefaultLimit)
-	assert.Equal(t, 60*time.Second, config.CacheTTL)
 }

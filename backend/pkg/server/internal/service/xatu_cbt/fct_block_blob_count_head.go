@@ -44,20 +44,6 @@ func (x *XatuCBT) ListFctBlockBlobCountHead(
 	timer := prometheus.NewTimer(x.requestDuration.WithLabelValues(MethodListFctBlockBlobCountHead, network))
 	defer timer.ObserveDuration()
 
-	var (
-		cacheKey       = x.generateCacheKey("int_block_blob_count_head", network, req)
-		cachedResponse = &cbtproto.ListFctBlockBlobCountHeadResponse{}
-	)
-
-	// Check cache first.
-	if found, _ := x.tryCache(cacheKey, cachedResponse); found {
-		x.cacheHitsTotal.WithLabelValues(MethodListFctBlockBlobCountHead, network).Inc()
-
-		return cachedResponse, nil
-	}
-
-	x.cacheMissesTotal.WithLabelValues(MethodListFctBlockBlobCountHead, network).Inc()
-
 	// Use our clickhouse-proto-gen to handle building for us.
 	sqlQuery, err := cbtproto.BuildListFctBlockBlobCountHeadQuery(
 		req,
@@ -96,19 +82,14 @@ func (x *XatuCBT) ListFctBlockBlobCountHead(
 	}
 
 	//nolint:gosec // conversion safe.
-	rsp := &cbtproto.ListFctBlockBlobCountHeadResponse{
+	return &cbtproto.ListFctBlockBlobCountHeadResponse{
 		FctBlockBlobCountHead: items,
 		NextPageToken: cbtproto.CalculateNextPageToken(
 			currentOffset,
 			uint32(pageSize),
 			uint32(len(items)),
 		),
-	}
-
-	// Store in cache.
-	x.storeInCache(cacheKey, rsp, x.config.CacheTTL)
-
-	return rsp, nil
+	}, nil
 }
 
 // scanFctBlockBlobCountHead scans a single fct_block_blob_count_head row from the database.

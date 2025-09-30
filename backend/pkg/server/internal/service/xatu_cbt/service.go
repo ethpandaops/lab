@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/ethpandaops/lab/backend/pkg/internal/lab/cache"
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/clickhouse"
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/metrics"
 	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/cartographoor"
@@ -31,7 +30,6 @@ type XatuCBT struct {
 
 	cbtClients           map[string]clickhouse.Client
 	rawClients           map[string]clickhouse.Client
-	cacheClient          cache.Client
 	cartographoorService *cartographoor.Service
 	wallclockService     *wallclock.Service
 
@@ -39,16 +37,13 @@ type XatuCBT struct {
 	metricsCollector *metrics.Collector
 
 	// Metric collectors
-	requestsTotal    *prometheus.CounterVec
-	requestDuration  *prometheus.HistogramVec
-	cacheHitsTotal   *prometheus.CounterVec
-	cacheMissesTotal *prometheus.CounterVec
+	requestsTotal   *prometheus.CounterVec
+	requestDuration *prometheus.HistogramVec
 }
 
 func New(
 	log logrus.FieldLogger,
 	config *Config,
-	cacheClient cache.Client,
 	metricsSvc *metrics.Metrics,
 	cartographoorService *cartographoor.Service,
 	wallclockSvc *wallclock.Service,
@@ -67,7 +62,6 @@ func New(
 	return &XatuCBT{
 		log:                  log.WithField("component", "service/"+ServiceName),
 		config:               config,
-		cacheClient:          cacheClient,
 		metrics:              metricsSvc,
 		metricsCollector:     metricsCollector,
 		cartographoorService: cartographoorService,
@@ -191,24 +185,6 @@ func (x *XatuCBT) initializeMetrics() error {
 	)
 	if err != nil {
 		return fmt.Errorf("failed to create request_duration metric: %w", err)
-	}
-
-	x.cacheHitsTotal, err = x.metricsCollector.NewCounterVec(
-		"cache_hits_total",
-		"Total number of cache hits",
-		[]string{"method", "network"},
-	)
-	if err != nil {
-		return fmt.Errorf("failed to create cache_hits_total metric: %w", err)
-	}
-
-	x.cacheMissesTotal, err = x.metricsCollector.NewCounterVec(
-		"cache_misses_total",
-		"Total number of cache misses",
-		[]string{"method", "network"},
-	)
-	if err != nil {
-		return fmt.Errorf("failed to create cache_misses_total metric: %w", err)
 	}
 
 	return nil

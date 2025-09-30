@@ -45,20 +45,6 @@ func (x *XatuCBT) ListFctBlockBlobFirstSeenByNode(
 	timer := prometheus.NewTimer(x.requestDuration.WithLabelValues(MethodListFctBlockBlobFirstSeenByNode, network))
 	defer timer.ObserveDuration()
 
-	var (
-		cacheKey       = x.generateCacheKey("fct_block_blob_first_seen_by_node", network, req)
-		cachedResponse = &cbtproto.ListFctBlockBlobFirstSeenByNodeResponse{}
-	)
-
-	// Check cache first.
-	if found, _ := x.tryCache(cacheKey, cachedResponse); found {
-		x.cacheHitsTotal.WithLabelValues(MethodListFctBlockBlobFirstSeenByNode, network).Inc()
-
-		return cachedResponse, nil
-	}
-
-	x.cacheMissesTotal.WithLabelValues(MethodListFctBlockBlobFirstSeenByNode, network).Inc()
-
 	// Use our clickhouse-proto-gen to handle building for us.
 	sqlQuery, err := cbtproto.BuildListFctBlockBlobFirstSeenByNodeQuery(
 		req,
@@ -97,19 +83,14 @@ func (x *XatuCBT) ListFctBlockBlobFirstSeenByNode(
 	}
 
 	//nolint:gosec // conversion safe.
-	rsp := &cbtproto.ListFctBlockBlobFirstSeenByNodeResponse{
+	return &cbtproto.ListFctBlockBlobFirstSeenByNodeResponse{
 		FctBlockBlobFirstSeenByNode: nodes,
 		NextPageToken: cbtproto.CalculateNextPageToken(
 			currentOffset,
 			uint32(pageSize),
 			uint32(len(nodes)),
 		),
-	}
-
-	// Store in cache.
-	x.storeInCache(cacheKey, rsp, x.config.CacheTTL)
-
-	return rsp, nil
+	}, nil
 }
 
 // scanFctBlockBlobFirstSeenByNode scans a single fct_block_blob_first_seen_by_node row from the database.
