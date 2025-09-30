@@ -30,7 +30,7 @@ func TestClickHouseIntegration(t *testing.T) {
 	// Define the ClickHouse container
 	clickhousePort := "8123/tcp"
 	req := testcontainers.ContainerRequest{
-		Image:        "clickhouse/clickhouse-server:latest",
+		Image:        "clickhouse/clickhouse-server:25.6.3.116",
 		ExposedPorts: []string{clickhousePort},
 		Env: map[string]string{
 			"CLICKHOUSE_USER":     "default",
@@ -416,8 +416,8 @@ func testDataTypes(t *testing.T, ctx context.Context, client clickhouse.Client) 
 	// Insert test data
 	err = client.Exec(ctx, `
 		INSERT INTO test_data_types (
-			int_val, uint_val, float_val, string_val, 
-			date_val, datetime_val, bool_val, nullable_val, 
+			int_val, uint_val, float_val, string_val,
+			date_val, datetime_val, bool_val, nullable_val,
 			array_int_val, decimal_val
 		) VALUES (
 			?, ?, ?, ?,
@@ -441,8 +441,8 @@ func testDataTypes(t *testing.T, ctx context.Context, client clickhouse.Client) 
 	// Insert another row with different values
 	err = client.Exec(ctx, `
 		INSERT INTO test_data_types (
-			int_val, uint_val, float_val, string_val, 
-			date_val, datetime_val, bool_val, nullable_val, 
+			int_val, uint_val, float_val, string_val,
+			date_val, datetime_val, bool_val, nullable_val,
 			array_int_val, decimal_val
 		) VALUES (
 			?, ?, ?, ?,

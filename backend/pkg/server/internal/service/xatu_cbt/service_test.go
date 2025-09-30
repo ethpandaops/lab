@@ -94,7 +94,7 @@ func TestServiceLifecycle(t *testing.T) {
 		MaxQueryLimit: 1000,
 		DefaultLimit:  100,
 		NetworkConfigs: map[string]*xatu_cbt.NetworkConfig{
-			"mainnet": {
+			"test": {
 				Enabled: true,
 				ClickHouse: &clickhouse.Config{
 					DSN: fmt.Sprintf("http://default:password@%s:%s/test", host, port),
@@ -135,7 +135,7 @@ func TestListFctNodeActiveLast24hValidation(t *testing.T) {
 		MaxQueryLimit: 1000,
 		DefaultLimit:  100,
 		NetworkConfigs: map[string]*xatu_cbt.NetworkConfig{
-			"mainnet": {
+			"test": {
 				Enabled: true,
 				ClickHouse: &clickhouse.Config{
 					DSN: fmt.Sprintf("http://default:password@%s:%s/test", host, port),
@@ -181,7 +181,7 @@ func setupClickHouseContainer(t *testing.T, ctx context.Context) (string, string
 
 	clickhousePort := "8123/tcp"
 	req := testcontainers.ContainerRequest{
-		Image:        "clickhouse/clickhouse-server:latest",
+		Image:        "clickhouse/clickhouse-server:25.6.3.116",
 		ExposedPorts: []string{clickhousePort},
 		Env: map[string]string{
 			"CLICKHOUSE_USER":     "default",
@@ -226,7 +226,7 @@ func setupClickHouseContainer(t *testing.T, ctx context.Context) (string, string
 func TestConfigDefaults(t *testing.T) {
 	config := &xatu_cbt.Config{
 		NetworkConfigs: map[string]*xatu_cbt.NetworkConfig{
-			"mainnet": {
+			"test": {
 				Enabled: true,
 				ClickHouse: &clickhouse.Config{
 					DSN: "http://localhost:8123/default",

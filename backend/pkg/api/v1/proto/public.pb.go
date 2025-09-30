@@ -3164,6 +3164,423 @@ func (x *ProposerEntity) GetEntity() string {
 	return ""
 }
 
+// ListPreparedBlocksResponse is the v1 API response for listing prepared blocks.
+type ListPreparedBlocksResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	PreparedBlocks []*PreparedBlock             `protobuf:"bytes,1,rep,name=prepared_blocks,json=preparedBlocks,proto3" json:"prepared_blocks,omitempty"`
+	Pagination     *PaginationMetadata          `protobuf:"bytes,2,opt,name=pagination,proto3" json:"pagination,omitempty"`
+	Filters        *PreparedBlockFilterMetadata `protobuf:"bytes,3,opt,name=filters,proto3" json:"filters,omitempty"`
+}
+
+func (x *ListPreparedBlocksResponse) Reset() {
+	*x = ListPreparedBlocksResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_backend_pkg_api_v1_proto_public_proto_msgTypes[45]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *ListPreparedBlocksResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListPreparedBlocksResponse) ProtoMessage() {}
+
+func (x *ListPreparedBlocksResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_backend_pkg_api_v1_proto_public_proto_msgTypes[45]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListPreparedBlocksResponse.ProtoReflect.Descriptor instead.
+func (*ListPreparedBlocksResponse) Descriptor() ([]byte, []int) {
+	return file_backend_pkg_api_v1_proto_public_proto_rawDescGZIP(), []int{45}
+}
+
+func (x *ListPreparedBlocksResponse) GetPreparedBlocks() []*PreparedBlock {
+	if x != nil {
+		return x.PreparedBlocks
+	}
+	return nil
+}
+
+func (x *ListPreparedBlocksResponse) GetPagination() *PaginationMetadata {
+	if x != nil {
+		return x.Pagination
+	}
+	return nil
+}
+
+func (x *ListPreparedBlocksResponse) GetFilters() *PreparedBlockFilterMetadata {
+	if x != nil {
+		return x.Filters
+	}
+	return nil
+}
+
+// PreparedBlock represents a transformed view of prepared block data for public consumption.
+// This shows what would have been built if the validator had been selected as proposer.
+type PreparedBlock struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Slot             uint32                   `protobuf:"varint,1,opt,name=slot,proto3" json:"slot,omitempty"`
+	SlotStartTime    string                   `protobuf:"bytes,2,opt,name=slot_start_time,json=slotStartTime,proto3" json:"slot_start_time,omitempty"` // ISO 8601 formatted
+	EventTime        string                   `protobuf:"bytes,3,opt,name=event_time,json=eventTime,proto3" json:"event_time,omitempty"`               // ISO 8601 formatted
+	Client           *ClientInfo              `protobuf:"bytes,4,opt,name=client,proto3" json:"client,omitempty"`                                      // reuse existing ClientInfo type
+	Consensus        *ConsensusInfo           `protobuf:"bytes,5,opt,name=consensus,proto3" json:"consensus,omitempty"`                                // reuse existing ConsensusInfo type
+	Geo              *GeoInfo                 `protobuf:"bytes,6,opt,name=geo,proto3" json:"geo,omitempty"`                                            // reuse existing GeoInfo type
+	BlockMetrics     *BlockMetrics            `protobuf:"bytes,7,opt,name=block_metrics,json=blockMetrics,proto3" json:"block_metrics,omitempty"`
+	ExecutionMetrics *ExecutionPayloadMetrics `protobuf:"bytes,8,opt,name=execution_metrics,json=executionMetrics,proto3" json:"execution_metrics,omitempty"`
+	LastUpdated      string                   `protobuf:"bytes,9,opt,name=last_updated,json=lastUpdated,proto3" json:"last_updated,omitempty"` // ISO 8601 formatted
+}
+
+func (x *PreparedBlock) Reset() {
+	*x = PreparedBlock{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_backend_pkg_api_v1_proto_public_proto_msgTypes[46]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *PreparedBlock) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*PreparedBlock) ProtoMessage() {}
+
+func (x *PreparedBlock) ProtoReflect() protoreflect.Message {
+	mi := &file_backend_pkg_api_v1_proto_public_proto_msgTypes[46]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use PreparedBlock.ProtoReflect.Descriptor instead.
+func (*PreparedBlock) Descriptor() ([]byte, []int) {
+	return file_backend_pkg_api_v1_proto_public_proto_rawDescGZIP(), []int{46}
+}
+
+func (x *PreparedBlock) GetSlot() uint32 {
+	if x != nil {
+		return x.Slot
+	}
+	return 0
+}
+
+func (x *PreparedBlock) GetSlotStartTime() string {
+	if x != nil {
+		return x.SlotStartTime
+	}
+	return ""
+}
+
+func (x *PreparedBlock) GetEventTime() string {
+	if x != nil {
+		return x.EventTime
+	}
+	return ""
+}
+
+func (x *PreparedBlock) GetClient() *ClientInfo {
+	if x != nil {
+		return x.Client
+	}
+	return nil
+}
+
+func (x *PreparedBlock) GetConsensus() *ConsensusInfo {
+	if x != nil {
+		return x.Consensus
+	}
+	return nil
+}
+
+func (x *PreparedBlock) GetGeo() *GeoInfo {
+	if x != nil {
+		return x.Geo
+	}
+	return nil
+}
+
+func (x *PreparedBlock) GetBlockMetrics() *BlockMetrics {
+	if x != nil {
+		return x.BlockMetrics
+	}
+	return nil
+}
+
+func (x *PreparedBlock) GetExecutionMetrics() *ExecutionPayloadMetrics {
+	if x != nil {
+		return x.ExecutionMetrics
+	}
+	return nil
+}
+
+func (x *PreparedBlock) GetLastUpdated() string {
+	if x != nil {
+		return x.LastUpdated
+	}
+	return ""
+}
+
+// BlockMetrics groups block-related metrics.
+type BlockMetrics struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Version              string `protobuf:"bytes,1,opt,name=version,proto3" json:"version,omitempty"`
+	TotalBytes           uint32 `protobuf:"varint,2,opt,name=total_bytes,json=totalBytes,proto3" json:"total_bytes,omitempty"`
+	TotalBytesCompressed uint32 `protobuf:"varint,3,opt,name=total_bytes_compressed,json=totalBytesCompressed,proto3" json:"total_bytes_compressed,omitempty"`
+}
+
+func (x *BlockMetrics) Reset() {
+	*x = BlockMetrics{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_backend_pkg_api_v1_proto_public_proto_msgTypes[47]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *BlockMetrics) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BlockMetrics) ProtoMessage() {}
+
+func (x *BlockMetrics) ProtoReflect() protoreflect.Message {
+	mi := &file_backend_pkg_api_v1_proto_public_proto_msgTypes[47]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BlockMetrics.ProtoReflect.Descriptor instead.
+func (*BlockMetrics) Descriptor() ([]byte, []int) {
+	return file_backend_pkg_api_v1_proto_public_proto_rawDescGZIP(), []int{47}
+}
+
+func (x *BlockMetrics) GetVersion() string {
+	if x != nil {
+		return x.Version
+	}
+	return ""
+}
+
+func (x *BlockMetrics) GetTotalBytes() uint32 {
+	if x != nil {
+		return x.TotalBytes
+	}
+	return 0
+}
+
+func (x *BlockMetrics) GetTotalBytesCompressed() uint32 {
+	if x != nil {
+		return x.TotalBytesCompressed
+	}
+	return 0
+}
+
+// ExecutionPayloadMetrics groups execution payload metrics.
+type ExecutionPayloadMetrics struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	ValueWei               uint64 `protobuf:"varint,1,opt,name=value_wei,json=valueWei,proto3" json:"value_wei,omitempty"`
+	ConsensusValueWei      uint64 `protobuf:"varint,2,opt,name=consensus_value_wei,json=consensusValueWei,proto3" json:"consensus_value_wei,omitempty"`
+	BlockNumber            uint32 `protobuf:"varint,3,opt,name=block_number,json=blockNumber,proto3" json:"block_number,omitempty"`
+	GasLimit               uint64 `protobuf:"varint,4,opt,name=gas_limit,json=gasLimit,proto3" json:"gas_limit,omitempty"`
+	GasUsed                uint64 `protobuf:"varint,5,opt,name=gas_used,json=gasUsed,proto3" json:"gas_used,omitempty"`
+	TransactionsCount      uint32 `protobuf:"varint,6,opt,name=transactions_count,json=transactionsCount,proto3" json:"transactions_count,omitempty"`
+	TransactionsTotalBytes uint32 `protobuf:"varint,7,opt,name=transactions_total_bytes,json=transactionsTotalBytes,proto3" json:"transactions_total_bytes,omitempty"`
+}
+
+func (x *ExecutionPayloadMetrics) Reset() {
+	*x = ExecutionPayloadMetrics{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_backend_pkg_api_v1_proto_public_proto_msgTypes[48]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *ExecutionPayloadMetrics) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ExecutionPayloadMetrics) ProtoMessage() {}
+
+func (x *ExecutionPayloadMetrics) ProtoReflect() protoreflect.Message {
+	mi := &file_backend_pkg_api_v1_proto_public_proto_msgTypes[48]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ExecutionPayloadMetrics.ProtoReflect.Descriptor instead.
+func (*ExecutionPayloadMetrics) Descriptor() ([]byte, []int) {
+	return file_backend_pkg_api_v1_proto_public_proto_rawDescGZIP(), []int{48}
+}
+
+func (x *ExecutionPayloadMetrics) GetValueWei() uint64 {
+	if x != nil {
+		return x.ValueWei
+	}
+	return 0
+}
+
+func (x *ExecutionPayloadMetrics) GetConsensusValueWei() uint64 {
+	if x != nil {
+		return x.ConsensusValueWei
+	}
+	return 0
+}
+
+func (x *ExecutionPayloadMetrics) GetBlockNumber() uint32 {
+	if x != nil {
+		return x.BlockNumber
+	}
+	return 0
+}
+
+func (x *ExecutionPayloadMetrics) GetGasLimit() uint64 {
+	if x != nil {
+		return x.GasLimit
+	}
+	return 0
+}
+
+func (x *ExecutionPayloadMetrics) GetGasUsed() uint64 {
+	if x != nil {
+		return x.GasUsed
+	}
+	return 0
+}
+
+func (x *ExecutionPayloadMetrics) GetTransactionsCount() uint32 {
+	if x != nil {
+		return x.TransactionsCount
+	}
+	return 0
+}
+
+func (x *ExecutionPayloadMetrics) GetTransactionsTotalBytes() uint32 {
+	if x != nil {
+		return x.TransactionsTotalBytes
+	}
+	return 0
+}
+
+// PreparedBlockFilterMetadata shows filtering information for prepared block queries.
+type PreparedBlockFilterMetadata struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Network        string            `protobuf:"bytes,1,opt,name=network,proto3" json:"network,omitempty"`
+	Slot           uint32            `protobuf:"varint,2,opt,name=slot,proto3" json:"slot,omitempty"`
+	ClientName     string            `protobuf:"bytes,3,opt,name=client_name,json=clientName,proto3" json:"client_name,omitempty"`
+	AppliedFilters map[string]string `protobuf:"bytes,4,rep,name=applied_filters,json=appliedFilters,proto3" json:"applied_filters,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"` // All filters including time filters
+	OrderBy        string            `protobuf:"bytes,5,opt,name=order_by,json=orderBy,proto3" json:"order_by,omitempty"`
+}
+
+func (x *PreparedBlockFilterMetadata) Reset() {
+	*x = PreparedBlockFilterMetadata{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_backend_pkg_api_v1_proto_public_proto_msgTypes[49]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *PreparedBlockFilterMetadata) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*PreparedBlockFilterMetadata) ProtoMessage() {}
+
+func (x *PreparedBlockFilterMetadata) ProtoReflect() protoreflect.Message {
+	mi := &file_backend_pkg_api_v1_proto_public_proto_msgTypes[49]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use PreparedBlockFilterMetadata.ProtoReflect.Descriptor instead.
+func (*PreparedBlockFilterMetadata) Descriptor() ([]byte, []int) {
+	return file_backend_pkg_api_v1_proto_public_proto_rawDescGZIP(), []int{49}
+}
+
+func (x *PreparedBlockFilterMetadata) GetNetwork() string {
+	if x != nil {
+		return x.Network
+	}
+	return ""
+}
+
+func (x *PreparedBlockFilterMetadata) GetSlot() uint32 {
+	if x != nil {
+		return x.Slot
+	}
+	return 0
+}
+
+func (x *PreparedBlockFilterMetadata) GetClientName() string {
+	if x != nil {
+		return x.ClientName
+	}
+	return ""
+}
+
+func (x *PreparedBlockFilterMetadata) GetAppliedFilters() map[string]string {
+	if x != nil {
+		return x.AppliedFilters
+	}
+	return nil
+}
+
+func (x *PreparedBlockFilterMetadata) GetOrderBy() string {
+	if x != nil {
+		return x.OrderBy
+	}
+	return ""
+}
+
 var File_backend_pkg_api_v1_proto_public_proto protoreflect.FileDescriptor
 
 var file_backend_pkg_api_v1_proto_public_proto_rawDesc = []byte{
@@ -3690,11 +4107,96 @@ var file_backend_pkg_api_v1_proto_public_proto_rawDesc = []byte{
 	0x61, 0x52, 0x07, 0x66, 0x69, 0x6c, 0x74, 0x65, 0x72, 0x73, 0x22, 0x28, 0x0a, 0x0e, 0x50, 0x72,
 	0x6f, 0x70, 0x6f, 0x73, 0x65, 0x72, 0x45, 0x6e, 0x74, 0x69, 0x74, 0x79, 0x12, 0x16, 0x0a, 0x06,
 	0x65, 0x6e, 0x74, 0x69, 0x74, 0x79, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x65, 0x6e,
-	0x74, 0x69, 0x74, 0x79, 0x42, 0x35, 0x5a, 0x33, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63,
-	0x6f, 0x6d, 0x2f, 0x65, 0x74, 0x68, 0x70, 0x61, 0x6e, 0x64, 0x61, 0x6f, 0x70, 0x73, 0x2f, 0x6c,
-	0x61, 0x62, 0x2f, 0x62, 0x61, 0x63, 0x6b, 0x65, 0x6e, 0x64, 0x2f, 0x70, 0x6b, 0x67, 0x2f, 0x61,
-	0x70, 0x69, 0x2f, 0x76, 0x31, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x06, 0x70, 0x72, 0x6f,
-	0x74, 0x6f, 0x33,
+	0x74, 0x69, 0x74, 0x79, 0x22, 0xd7, 0x01, 0x0a, 0x1a, 0x4c, 0x69, 0x73, 0x74, 0x50, 0x72, 0x65,
+	0x70, 0x61, 0x72, 0x65, 0x64, 0x42, 0x6c, 0x6f, 0x63, 0x6b, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f,
+	0x6e, 0x73, 0x65, 0x12, 0x3e, 0x0a, 0x0f, 0x70, 0x72, 0x65, 0x70, 0x61, 0x72, 0x65, 0x64, 0x5f,
+	0x62, 0x6c, 0x6f, 0x63, 0x6b, 0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x15, 0x2e, 0x61,
+	0x70, 0x69, 0x2e, 0x76, 0x31, 0x2e, 0x50, 0x72, 0x65, 0x70, 0x61, 0x72, 0x65, 0x64, 0x42, 0x6c,
+	0x6f, 0x63, 0x6b, 0x52, 0x0e, 0x70, 0x72, 0x65, 0x70, 0x61, 0x72, 0x65, 0x64, 0x42, 0x6c, 0x6f,
+	0x63, 0x6b, 0x73, 0x12, 0x3a, 0x0a, 0x0a, 0x70, 0x61, 0x67, 0x69, 0x6e, 0x61, 0x74, 0x69, 0x6f,
+	0x6e, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x76, 0x31,
+	0x2e, 0x50, 0x61, 0x67, 0x69, 0x6e, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x4d, 0x65, 0x74, 0x61, 0x64,
+	0x61, 0x74, 0x61, 0x52, 0x0a, 0x70, 0x61, 0x67, 0x69, 0x6e, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x12,
+	0x3d, 0x0a, 0x07, 0x66, 0x69, 0x6c, 0x74, 0x65, 0x72, 0x73, 0x18, 0x03, 0x20, 0x01, 0x28, 0x0b,
+	0x32, 0x23, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x76, 0x31, 0x2e, 0x50, 0x72, 0x65, 0x70, 0x61, 0x72,
+	0x65, 0x64, 0x42, 0x6c, 0x6f, 0x63, 0x6b, 0x46, 0x69, 0x6c, 0x74, 0x65, 0x72, 0x4d, 0x65, 0x74,
+	0x61, 0x64, 0x61, 0x74, 0x61, 0x52, 0x07, 0x66, 0x69, 0x6c, 0x74, 0x65, 0x72, 0x73, 0x22, 0x9a,
+	0x03, 0x0a, 0x0d, 0x50, 0x72, 0x65, 0x70, 0x61, 0x72, 0x65, 0x64, 0x42, 0x6c, 0x6f, 0x63, 0x6b,
+	0x12, 0x12, 0x0a, 0x04, 0x73, 0x6c, 0x6f, 0x74, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0d, 0x52, 0x04,
+	0x73, 0x6c, 0x6f, 0x74, 0x12, 0x26, 0x0a, 0x0f, 0x73, 0x6c, 0x6f, 0x74, 0x5f, 0x73, 0x74, 0x61,
+	0x72, 0x74, 0x5f, 0x74, 0x69, 0x6d, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0d, 0x73,
+	0x6c, 0x6f, 0x74, 0x53, 0x74, 0x61, 0x72, 0x74, 0x54, 0x69, 0x6d, 0x65, 0x12, 0x1d, 0x0a, 0x0a,
+	0x65, 0x76, 0x65, 0x6e, 0x74, 0x5f, 0x74, 0x69, 0x6d, 0x65, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09,
+	0x52, 0x09, 0x65, 0x76, 0x65, 0x6e, 0x74, 0x54, 0x69, 0x6d, 0x65, 0x12, 0x2a, 0x0a, 0x06, 0x63,
+	0x6c, 0x69, 0x65, 0x6e, 0x74, 0x18, 0x04, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x12, 0x2e, 0x61, 0x70,
+	0x69, 0x2e, 0x76, 0x31, 0x2e, 0x43, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x49, 0x6e, 0x66, 0x6f, 0x52,
+	0x06, 0x63, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x12, 0x33, 0x0a, 0x09, 0x63, 0x6f, 0x6e, 0x73, 0x65,
+	0x6e, 0x73, 0x75, 0x73, 0x18, 0x05, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x15, 0x2e, 0x61, 0x70, 0x69,
+	0x2e, 0x76, 0x31, 0x2e, 0x43, 0x6f, 0x6e, 0x73, 0x65, 0x6e, 0x73, 0x75, 0x73, 0x49, 0x6e, 0x66,
+	0x6f, 0x52, 0x09, 0x63, 0x6f, 0x6e, 0x73, 0x65, 0x6e, 0x73, 0x75, 0x73, 0x12, 0x21, 0x0a, 0x03,
+	0x67, 0x65, 0x6f, 0x18, 0x06, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x0f, 0x2e, 0x61, 0x70, 0x69, 0x2e,
+	0x76, 0x31, 0x2e, 0x47, 0x65, 0x6f, 0x49, 0x6e, 0x66, 0x6f, 0x52, 0x03, 0x67, 0x65, 0x6f, 0x12,
+	0x39, 0x0a, 0x0d, 0x62, 0x6c, 0x6f, 0x63, 0x6b, 0x5f, 0x6d, 0x65, 0x74, 0x72, 0x69, 0x63, 0x73,
+	0x18, 0x07, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x14, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x76, 0x31, 0x2e,
+	0x42, 0x6c, 0x6f, 0x63, 0x6b, 0x4d, 0x65, 0x74, 0x72, 0x69, 0x63, 0x73, 0x52, 0x0c, 0x62, 0x6c,
+	0x6f, 0x63, 0x6b, 0x4d, 0x65, 0x74, 0x72, 0x69, 0x63, 0x73, 0x12, 0x4c, 0x0a, 0x11, 0x65, 0x78,
+	0x65, 0x63, 0x75, 0x74, 0x69, 0x6f, 0x6e, 0x5f, 0x6d, 0x65, 0x74, 0x72, 0x69, 0x63, 0x73, 0x18,
+	0x08, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1f, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x76, 0x31, 0x2e, 0x45,
+	0x78, 0x65, 0x63, 0x75, 0x74, 0x69, 0x6f, 0x6e, 0x50, 0x61, 0x79, 0x6c, 0x6f, 0x61, 0x64, 0x4d,
+	0x65, 0x74, 0x72, 0x69, 0x63, 0x73, 0x52, 0x10, 0x65, 0x78, 0x65, 0x63, 0x75, 0x74, 0x69, 0x6f,
+	0x6e, 0x4d, 0x65, 0x74, 0x72, 0x69, 0x63, 0x73, 0x12, 0x21, 0x0a, 0x0c, 0x6c, 0x61, 0x73, 0x74,
+	0x5f, 0x75, 0x70, 0x64, 0x61, 0x74, 0x65, 0x64, 0x18, 0x09, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0b,
+	0x6c, 0x61, 0x73, 0x74, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x64, 0x22, 0x7f, 0x0a, 0x0c, 0x42,
+	0x6c, 0x6f, 0x63, 0x6b, 0x4d, 0x65, 0x74, 0x72, 0x69, 0x63, 0x73, 0x12, 0x18, 0x0a, 0x07, 0x76,
+	0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x76, 0x65,
+	0x72, 0x73, 0x69, 0x6f, 0x6e, 0x12, 0x1f, 0x0a, 0x0b, 0x74, 0x6f, 0x74, 0x61, 0x6c, 0x5f, 0x62,
+	0x79, 0x74, 0x65, 0x73, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0d, 0x52, 0x0a, 0x74, 0x6f, 0x74, 0x61,
+	0x6c, 0x42, 0x79, 0x74, 0x65, 0x73, 0x12, 0x34, 0x0a, 0x16, 0x74, 0x6f, 0x74, 0x61, 0x6c, 0x5f,
+	0x62, 0x79, 0x74, 0x65, 0x73, 0x5f, 0x63, 0x6f, 0x6d, 0x70, 0x72, 0x65, 0x73, 0x73, 0x65, 0x64,
+	0x18, 0x03, 0x20, 0x01, 0x28, 0x0d, 0x52, 0x14, 0x74, 0x6f, 0x74, 0x61, 0x6c, 0x42, 0x79, 0x74,
+	0x65, 0x73, 0x43, 0x6f, 0x6d, 0x70, 0x72, 0x65, 0x73, 0x73, 0x65, 0x64, 0x22, 0xaa, 0x02, 0x0a,
+	0x17, 0x45, 0x78, 0x65, 0x63, 0x75, 0x74, 0x69, 0x6f, 0x6e, 0x50, 0x61, 0x79, 0x6c, 0x6f, 0x61,
+	0x64, 0x4d, 0x65, 0x74, 0x72, 0x69, 0x63, 0x73, 0x12, 0x1b, 0x0a, 0x09, 0x76, 0x61, 0x6c, 0x75,
+	0x65, 0x5f, 0x77, 0x65, 0x69, 0x18, 0x01, 0x20, 0x01, 0x28, 0x04, 0x52, 0x08, 0x76, 0x61, 0x6c,
+	0x75, 0x65, 0x57, 0x65, 0x69, 0x12, 0x2e, 0x0a, 0x13, 0x63, 0x6f, 0x6e, 0x73, 0x65, 0x6e, 0x73,
+	0x75, 0x73, 0x5f, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x5f, 0x77, 0x65, 0x69, 0x18, 0x02, 0x20, 0x01,
+	0x28, 0x04, 0x52, 0x11, 0x63, 0x6f, 0x6e, 0x73, 0x65, 0x6e, 0x73, 0x75, 0x73, 0x56, 0x61, 0x6c,
+	0x75, 0x65, 0x57, 0x65, 0x69, 0x12, 0x21, 0x0a, 0x0c, 0x62, 0x6c, 0x6f, 0x63, 0x6b, 0x5f, 0x6e,
+	0x75, 0x6d, 0x62, 0x65, 0x72, 0x18, 0x03, 0x20, 0x01, 0x28, 0x0d, 0x52, 0x0b, 0x62, 0x6c, 0x6f,
+	0x63, 0x6b, 0x4e, 0x75, 0x6d, 0x62, 0x65, 0x72, 0x12, 0x1b, 0x0a, 0x09, 0x67, 0x61, 0x73, 0x5f,
+	0x6c, 0x69, 0x6d, 0x69, 0x74, 0x18, 0x04, 0x20, 0x01, 0x28, 0x04, 0x52, 0x08, 0x67, 0x61, 0x73,
+	0x4c, 0x69, 0x6d, 0x69, 0x74, 0x12, 0x19, 0x0a, 0x08, 0x67, 0x61, 0x73, 0x5f, 0x75, 0x73, 0x65,
+	0x64, 0x18, 0x05, 0x20, 0x01, 0x28, 0x04, 0x52, 0x07, 0x67, 0x61, 0x73, 0x55, 0x73, 0x65, 0x64,
+	0x12, 0x2d, 0x0a, 0x12, 0x74, 0x72, 0x61, 0x6e, 0x73, 0x61, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x73,
+	0x5f, 0x63, 0x6f, 0x75, 0x6e, 0x74, 0x18, 0x06, 0x20, 0x01, 0x28, 0x0d, 0x52, 0x11, 0x74, 0x72,
+	0x61, 0x6e, 0x73, 0x61, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x43, 0x6f, 0x75, 0x6e, 0x74, 0x12,
+	0x38, 0x0a, 0x18, 0x74, 0x72, 0x61, 0x6e, 0x73, 0x61, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x5f,
+	0x74, 0x6f, 0x74, 0x61, 0x6c, 0x5f, 0x62, 0x79, 0x74, 0x65, 0x73, 0x18, 0x07, 0x20, 0x01, 0x28,
+	0x0d, 0x52, 0x16, 0x74, 0x72, 0x61, 0x6e, 0x73, 0x61, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x54,
+	0x6f, 0x74, 0x61, 0x6c, 0x42, 0x79, 0x74, 0x65, 0x73, 0x22, 0xac, 0x02, 0x0a, 0x1b, 0x50, 0x72,
+	0x65, 0x70, 0x61, 0x72, 0x65, 0x64, 0x42, 0x6c, 0x6f, 0x63, 0x6b, 0x46, 0x69, 0x6c, 0x74, 0x65,
+	0x72, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0x12, 0x18, 0x0a, 0x07, 0x6e, 0x65, 0x74,
+	0x77, 0x6f, 0x72, 0x6b, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x6e, 0x65, 0x74, 0x77,
+	0x6f, 0x72, 0x6b, 0x12, 0x12, 0x0a, 0x04, 0x73, 0x6c, 0x6f, 0x74, 0x18, 0x02, 0x20, 0x01, 0x28,
+	0x0d, 0x52, 0x04, 0x73, 0x6c, 0x6f, 0x74, 0x12, 0x1f, 0x0a, 0x0b, 0x63, 0x6c, 0x69, 0x65, 0x6e,
+	0x74, 0x5f, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0a, 0x63, 0x6c,
+	0x69, 0x65, 0x6e, 0x74, 0x4e, 0x61, 0x6d, 0x65, 0x12, 0x60, 0x0a, 0x0f, 0x61, 0x70, 0x70, 0x6c,
+	0x69, 0x65, 0x64, 0x5f, 0x66, 0x69, 0x6c, 0x74, 0x65, 0x72, 0x73, 0x18, 0x04, 0x20, 0x03, 0x28,
+	0x0b, 0x32, 0x37, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x76, 0x31, 0x2e, 0x50, 0x72, 0x65, 0x70, 0x61,
+	0x72, 0x65, 0x64, 0x42, 0x6c, 0x6f, 0x63, 0x6b, 0x46, 0x69, 0x6c, 0x74, 0x65, 0x72, 0x4d, 0x65,
+	0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0x2e, 0x41, 0x70, 0x70, 0x6c, 0x69, 0x65, 0x64, 0x46, 0x69,
+	0x6c, 0x74, 0x65, 0x72, 0x73, 0x45, 0x6e, 0x74, 0x72, 0x79, 0x52, 0x0e, 0x61, 0x70, 0x70, 0x6c,
+	0x69, 0x65, 0x64, 0x46, 0x69, 0x6c, 0x74, 0x65, 0x72, 0x73, 0x12, 0x19, 0x0a, 0x08, 0x6f, 0x72,
+	0x64, 0x65, 0x72, 0x5f, 0x62, 0x79, 0x18, 0x05, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x6f, 0x72,
+	0x64, 0x65, 0x72, 0x42, 0x79, 0x1a, 0x41, 0x0a, 0x13, 0x41, 0x70, 0x70, 0x6c, 0x69, 0x65, 0x64,
+	0x46, 0x69, 0x6c, 0x74, 0x65, 0x72, 0x73, 0x45, 0x6e, 0x74, 0x72, 0x79, 0x12, 0x10, 0x0a, 0x03,
+	0x6b, 0x65, 0x79, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x03, 0x6b, 0x65, 0x79, 0x12, 0x14,
+	0x0a, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x76,
+	0x61, 0x6c, 0x75, 0x65, 0x3a, 0x02, 0x38, 0x01, 0x42, 0x35, 0x5a, 0x33, 0x67, 0x69, 0x74, 0x68,
+	0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x65, 0x74, 0x68, 0x70, 0x61, 0x6e, 0x64, 0x61, 0x6f,
+	0x70, 0x73, 0x2f, 0x6c, 0x61, 0x62, 0x2f, 0x62, 0x61, 0x63, 0x6b, 0x65, 0x6e, 0x64, 0x2f, 0x70,
+	0x6b, 0x67, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x76, 0x31, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62,
+	0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -3709,7 +4211,7 @@ func file_backend_pkg_api_v1_proto_public_proto_rawDescGZIP() []byte {
 	return file_backend_pkg_api_v1_proto_public_proto_rawDescData
 }
 
-var file_backend_pkg_api_v1_proto_public_proto_msgTypes = make([]protoimpl.MessageInfo, 49)
+var file_backend_pkg_api_v1_proto_public_proto_msgTypes = make([]protoimpl.MessageInfo, 55)
 var file_backend_pkg_api_v1_proto_public_proto_goTypes = []any{
 	(*ListNodesResponse)(nil),                            // 0: api.v1.ListNodesResponse
 	(*ListNetworksResponse)(nil),                         // 1: api.v1.ListNetworksResponse
@@ -3756,11 +4258,17 @@ var file_backend_pkg_api_v1_proto_public_proto_goTypes = []any{
 	(*BeaconBlock)(nil),                                  // 42: api.v1.BeaconBlock
 	(*ListBeaconSlotProposerEntityResponse)(nil),         // 43: api.v1.ListBeaconSlotProposerEntityResponse
 	(*ProposerEntity)(nil),                               // 44: api.v1.ProposerEntity
-	nil,                                                  // 45: api.v1.FilterMetadata.AppliedFiltersEntry
-	nil,                                                  // 46: api.v1.EthereumConfig.NetworksEntry
-	nil,                                                  // 47: api.v1.ForkInfo.MinClientVersionsEntry
-	nil,                                                  // 48: api.v1.ExperimentConfig.DataAvailabilityEntry
-	(*structpb.Struct)(nil),                              // 49: google.protobuf.Struct
+	(*ListPreparedBlocksResponse)(nil),                   // 45: api.v1.ListPreparedBlocksResponse
+	(*PreparedBlock)(nil),                                // 46: api.v1.PreparedBlock
+	(*BlockMetrics)(nil),                                 // 47: api.v1.BlockMetrics
+	(*ExecutionPayloadMetrics)(nil),                      // 48: api.v1.ExecutionPayloadMetrics
+	(*PreparedBlockFilterMetadata)(nil),                  // 49: api.v1.PreparedBlockFilterMetadata
+	nil,                                                  // 50: api.v1.FilterMetadata.AppliedFiltersEntry
+	nil,                                                  // 51: api.v1.EthereumConfig.NetworksEntry
+	nil,                                                  // 52: api.v1.ForkInfo.MinClientVersionsEntry
+	nil,                                                  // 53: api.v1.ExperimentConfig.DataAvailabilityEntry
+	nil,                                                  // 54: api.v1.PreparedBlockFilterMetadata.AppliedFiltersEntry
+	(*structpb.Struct)(nil),                              // 55: google.protobuf.Struct
 }
 var file_backend_pkg_api_v1_proto_public_proto_depIdxs = []int32{
 	2,  // 0: api.v1.ListNodesResponse.nodes:type_name -> api.v1.Node
@@ -3771,7 +4279,7 @@ var file_backend_pkg_api_v1_proto_public_proto_depIdxs = []int32{
 	3,  // 5: api.v1.Node.client:type_name -> api.v1.ClientInfo
 	4,  // 6: api.v1.Node.geo:type_name -> api.v1.GeoInfo
 	5,  // 7: api.v1.Node.consensus:type_name -> api.v1.ConsensusInfo
-	45, // 8: api.v1.FilterMetadata.applied_filters:type_name -> api.v1.FilterMetadata.AppliedFiltersEntry
+	50, // 8: api.v1.FilterMetadata.applied_filters:type_name -> api.v1.FilterMetadata.AppliedFiltersEntry
 	11, // 9: api.v1.ListBeaconSlotMevRelayResponse.relays:type_name -> api.v1.MevRelayBidCount
 	6,  // 10: api.v1.ListBeaconSlotMevRelayResponse.pagination:type_name -> api.v1.PaginationMetadata
 	7,  // 11: api.v1.ListBeaconSlotMevRelayResponse.filters:type_name -> api.v1.FilterMetadata
@@ -3787,14 +4295,14 @@ var file_backend_pkg_api_v1_proto_public_proto_depIdxs = []int32{
 	20, // 21: api.v1.GetConfigResponse.config:type_name -> api.v1.FrontendConfig
 	21, // 22: api.v1.FrontendConfig.ethereum:type_name -> api.v1.EthereumConfig
 	27, // 23: api.v1.FrontendConfig.experiments:type_name -> api.v1.ExperimentConfig
-	46, // 24: api.v1.EthereumConfig.networks:type_name -> api.v1.EthereumConfig.NetworksEntry
+	51, // 24: api.v1.EthereumConfig.networks:type_name -> api.v1.EthereumConfig.NetworksEntry
 	23, // 25: api.v1.NetworkConfig.forks:type_name -> api.v1.ForkConfig
 	24, // 26: api.v1.ForkConfig.consensus:type_name -> api.v1.ConsensusForks
 	25, // 27: api.v1.ConsensusForks.electra:type_name -> api.v1.ForkInfo
-	47, // 28: api.v1.ForkInfo.min_client_versions:type_name -> api.v1.ForkInfo.MinClientVersionsEntry
+	52, // 28: api.v1.ForkInfo.min_client_versions:type_name -> api.v1.ForkInfo.MinClientVersionsEntry
 	27, // 29: api.v1.ExperimentsConfig.experiments:type_name -> api.v1.ExperimentConfig
-	49, // 30: api.v1.ExperimentConfig.config:type_name -> google.protobuf.Struct
-	48, // 31: api.v1.ExperimentConfig.data_availability:type_name -> api.v1.ExperimentConfig.DataAvailabilityEntry
+	55, // 30: api.v1.ExperimentConfig.config:type_name -> google.protobuf.Struct
+	53, // 31: api.v1.ExperimentConfig.data_availability:type_name -> api.v1.ExperimentConfig.DataAvailabilityEntry
 	27, // 32: api.v1.GetExperimentConfigResponse.experiment:type_name -> api.v1.ExperimentConfig
 	32, // 33: api.v1.ListBeaconSlotBlockTimingResponse.nodes:type_name -> api.v1.BlockTimingNode
 	6,  // 34: api.v1.ListBeaconSlotBlockTimingResponse.pagination:type_name -> api.v1.PaginationMetadata
@@ -3819,13 +4327,22 @@ var file_backend_pkg_api_v1_proto_public_proto_depIdxs = []int32{
 	44, // 53: api.v1.ListBeaconSlotProposerEntityResponse.entities:type_name -> api.v1.ProposerEntity
 	6,  // 54: api.v1.ListBeaconSlotProposerEntityResponse.pagination:type_name -> api.v1.PaginationMetadata
 	7,  // 55: api.v1.ListBeaconSlotProposerEntityResponse.filters:type_name -> api.v1.FilterMetadata
-	22, // 56: api.v1.EthereumConfig.NetworksEntry.value:type_name -> api.v1.NetworkConfig
-	28, // 57: api.v1.ExperimentConfig.DataAvailabilityEntry.value:type_name -> api.v1.ExperimentDataAvailability
-	58, // [58:58] is the sub-list for method output_type
-	58, // [58:58] is the sub-list for method input_type
-	58, // [58:58] is the sub-list for extension type_name
-	58, // [58:58] is the sub-list for extension extendee
-	0,  // [0:58] is the sub-list for field type_name
+	46, // 56: api.v1.ListPreparedBlocksResponse.prepared_blocks:type_name -> api.v1.PreparedBlock
+	6,  // 57: api.v1.ListPreparedBlocksResponse.pagination:type_name -> api.v1.PaginationMetadata
+	49, // 58: api.v1.ListPreparedBlocksResponse.filters:type_name -> api.v1.PreparedBlockFilterMetadata
+	3,  // 59: api.v1.PreparedBlock.client:type_name -> api.v1.ClientInfo
+	5,  // 60: api.v1.PreparedBlock.consensus:type_name -> api.v1.ConsensusInfo
+	4,  // 61: api.v1.PreparedBlock.geo:type_name -> api.v1.GeoInfo
+	47, // 62: api.v1.PreparedBlock.block_metrics:type_name -> api.v1.BlockMetrics
+	48, // 63: api.v1.PreparedBlock.execution_metrics:type_name -> api.v1.ExecutionPayloadMetrics
+	54, // 64: api.v1.PreparedBlockFilterMetadata.applied_filters:type_name -> api.v1.PreparedBlockFilterMetadata.AppliedFiltersEntry
+	22, // 65: api.v1.EthereumConfig.NetworksEntry.value:type_name -> api.v1.NetworkConfig
+	28, // 66: api.v1.ExperimentConfig.DataAvailabilityEntry.value:type_name -> api.v1.ExperimentDataAvailability
+	67, // [67:67] is the sub-list for method output_type
+	67, // [67:67] is the sub-list for method input_type
+	67, // [67:67] is the sub-list for extension type_name
+	67, // [67:67] is the sub-list for extension extendee
+	0,  // [0:67] is the sub-list for field type_name
 }
 
 func init() { file_backend_pkg_api_v1_proto_public_proto_init() }
@@ -4374,6 +4891,66 @@ func file_backend_pkg_api_v1_proto_public_proto_init() {
 				return nil
 			}
 		}
+		file_backend_pkg_api_v1_proto_public_proto_msgTypes[45].Exporter = func(v any, i int) any {
+			switch v := v.(*ListPreparedBlocksResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_backend_pkg_api_v1_proto_public_proto_msgTypes[46].Exporter = func(v any, i int) any {
+			switch v := v.(*PreparedBlock); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_backend_pkg_api_v1_proto_public_proto_msgTypes[47].Exporter = func(v any, i int) any {
+			switch v := v.(*BlockMetrics); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_backend_pkg_api_v1_proto_public_proto_msgTypes[48].Exporter = func(v any, i int) any {
+			switch v := v.(*ExecutionPayloadMetrics); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_backend_pkg_api_v1_proto_public_proto_msgTypes[49].Exporter = func(v any, i int) any {
+			switch v := v.(*PreparedBlockFilterMetadata); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
 	}
 	file_backend_pkg_api_v1_proto_public_proto_msgTypes[4].OneofWrappers = []any{}
 	type x struct{}
@@ -4382,7 +4959,7 @@ func file_backend_pkg_api_v1_proto_public_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_backend_pkg_api_v1_proto_public_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   49,
+			NumMessages:   55,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

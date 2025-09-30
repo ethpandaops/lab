@@ -32,6 +32,7 @@ const (
 	XatuCBT_ListFctBlockHead_FullMethodName                              = "/xatu_cbt.XatuCBT/ListFctBlockHead"
 	XatuCBT_ListFctBlockMevHead_FullMethodName                           = "/xatu_cbt.XatuCBT/ListFctBlockMevHead"
 	XatuCBT_ListFctBlockProposerEntity_FullMethodName                    = "/xatu_cbt.XatuCBT/ListFctBlockProposerEntity"
+	XatuCBT_ListFctPreparedBlock_FullMethodName                          = "/xatu_cbt.XatuCBT/ListFctPreparedBlock"
 	XatuCBT_GetDataAvailability_FullMethodName                           = "/xatu_cbt.XatuCBT/GetDataAvailability"
 )
 
@@ -78,6 +79,9 @@ type XatuCBTClient interface {
 	// ListFctBlockProposerEntity returns proposer entity data from the fct_block_proposer_entity table.
 	// This table contains information about entities that proposed blocks in the unfinalized chain.
 	ListFctBlockProposerEntity(ctx context.Context, in *clickhouse.ListFctBlockProposerEntityRequest, opts ...grpc.CallOption) (*clickhouse.ListFctBlockProposerEntityResponse, error)
+	// ListFctPreparedBlock returns prepared blocks for a specific slot.
+	// This table contains locally built blocks that validators would have proposed.
+	ListFctPreparedBlock(ctx context.Context, in *clickhouse.ListFctPreparedBlockRequest, opts ...grpc.CallOption) (*clickhouse.ListFctPreparedBlockResponse, error)
 	// GetDataAvailability returns the common availability interval across a set of transformation tables.
 	// It calculates the overlapping data range for the specified tables and returns slot information.
 	GetDataAvailability(ctx context.Context, in *GetDataAvailabilityRequest, opts ...grpc.CallOption) (*GetDataAvailabilityResponse, error)
@@ -211,6 +215,16 @@ func (c *xatuCBTClient) ListFctBlockProposerEntity(ctx context.Context, in *clic
 	return out, nil
 }
 
+func (c *xatuCBTClient) ListFctPreparedBlock(ctx context.Context, in *clickhouse.ListFctPreparedBlockRequest, opts ...grpc.CallOption) (*clickhouse.ListFctPreparedBlockResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(clickhouse.ListFctPreparedBlockResponse)
+	err := c.cc.Invoke(ctx, XatuCBT_ListFctPreparedBlock_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *xatuCBTClient) GetDataAvailability(ctx context.Context, in *GetDataAvailabilityRequest, opts ...grpc.CallOption) (*GetDataAvailabilityResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(GetDataAvailabilityResponse)
@@ -264,6 +278,9 @@ type XatuCBTServer interface {
 	// ListFctBlockProposerEntity returns proposer entity data from the fct_block_proposer_entity table.
 	// This table contains information about entities that proposed blocks in the unfinalized chain.
 	ListFctBlockProposerEntity(context.Context, *clickhouse.ListFctBlockProposerEntityRequest) (*clickhouse.ListFctBlockProposerEntityResponse, error)
+	// ListFctPreparedBlock returns prepared blocks for a specific slot.
+	// This table contains locally built blocks that validators would have proposed.
+	ListFctPreparedBlock(context.Context, *clickhouse.ListFctPreparedBlockRequest) (*clickhouse.ListFctPreparedBlockResponse, error)
 	// GetDataAvailability returns the common availability interval across a set of transformation tables.
 	// It calculates the overlapping data range for the specified tables and returns slot information.
 	GetDataAvailability(context.Context, *GetDataAvailabilityRequest) (*GetDataAvailabilityResponse, error)
@@ -309,6 +326,9 @@ func (UnimplementedXatuCBTServer) ListFctBlockMevHead(context.Context, *clickhou
 }
 func (UnimplementedXatuCBTServer) ListFctBlockProposerEntity(context.Context, *clickhouse.ListFctBlockProposerEntityRequest) (*clickhouse.ListFctBlockProposerEntityResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListFctBlockProposerEntity not implemented")
+}
+func (UnimplementedXatuCBTServer) ListFctPreparedBlock(context.Context, *clickhouse.ListFctPreparedBlockRequest) (*clickhouse.ListFctPreparedBlockResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListFctPreparedBlock not implemented")
 }
 func (UnimplementedXatuCBTServer) GetDataAvailability(context.Context, *GetDataAvailabilityRequest) (*GetDataAvailabilityResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetDataAvailability not implemented")
@@ -542,6 +562,24 @@ func _XatuCBT_ListFctBlockProposerEntity_Handler(srv interface{}, ctx context.Co
 	return interceptor(ctx, in, info, handler)
 }
 
+func _XatuCBT_ListFctPreparedBlock_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(clickhouse.ListFctPreparedBlockRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(XatuCBTServer).ListFctPreparedBlock(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: XatuCBT_ListFctPreparedBlock_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(XatuCBTServer).ListFctPreparedBlock(ctx, req.(*clickhouse.ListFctPreparedBlockRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _XatuCBT_GetDataAvailability_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetDataAvailabilityRequest)
 	if err := dec(in); err != nil {
@@ -614,6 +652,10 @@ var XatuCBT_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListFctBlockProposerEntity",
 			Handler:    _XatuCBT_ListFctBlockProposerEntity_Handler,
+		},
+		{
+			MethodName: "ListFctPreparedBlock",
+			Handler:    _XatuCBT_ListFctPreparedBlock_Handler,
 		},
 		{
 			MethodName: "GetDataAvailability",

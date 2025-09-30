@@ -68,6 +68,24 @@ func (x *XatuCBT) ListFctBlockFirstSeenByNode(
 	return x.service.ListFctBlockFirstSeenByNode(ctx, req)
 }
 
+// ListFctPreparedBlock returns prepared blocks for a specific slot.
+func (x *XatuCBT) ListFctPreparedBlock(
+	ctx context.Context,
+	req *cbtproto.ListFctPreparedBlockRequest,
+) (*cbtproto.ListFctPreparedBlockResponse, error) {
+	// Calculate SlotStartDateTime if not already set, more efficient queries.
+	if req.SlotStartDateTime == nil && req.Slot != nil {
+		req.SlotStartDateTime = x.calculateSlotStartDateTime(ctx, req.Slot)
+	}
+
+	x.log.WithFields(logrus.Fields{
+		"slot":            req.Slot,
+		"slot_start_time": req.SlotStartDateTime,
+	}).Debug("ListFctPreparedBlock request")
+
+	return x.service.ListFctPreparedBlock(ctx, req)
+}
+
 // calculateSlotStartDateTime calculates the SlotStartDateTime filter for a given slot filter.
 // This enables efficient queries using the primary key in ClickHouse.
 // Returns a filter that can be used by any CBT method that needs slot-based filtering.

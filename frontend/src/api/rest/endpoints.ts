@@ -11,18 +11,28 @@ export const API_V1_ENDPOINTS = {
   experimentConfig: (experimentId: string) => `/api/v1/experiments/${experimentId}/config`,
   // Beacon slot endpoints
   beaconBlock: (network: string, slot: number) => `/api/v1/${network}/beacon/slot/${slot}/block`,
-  beaconBlockTiming: (network: string, slot: number) => `/api/v1/${network}/beacon/slot/${slot}/block/timing`,
-  beaconBlobTiming: (network: string, slot: number) => `/api/v1/${network}/beacon/slot/${slot}/blob/timing`,
-  beaconBlobTotal: (network: string, slot: number) => `/api/v1/${network}/beacon/slot/${slot}/blob/total`,
+  beaconBlockTiming: (network: string, slot: number) =>
+    `/api/v1/${network}/beacon/slot/${slot}/block/timing`,
+  beaconBlobTiming: (network: string, slot: number) =>
+    `/api/v1/${network}/beacon/slot/${slot}/blob/timing`,
+  beaconBlobTotal: (network: string, slot: number) =>
+    `/api/v1/${network}/beacon/slot/${slot}/blob/total`,
   beaconAttestationTiming: (network: string, slot: number) =>
     `/api/v1/${network}/beacon/slot/${slot}/attestation/timing`,
   beaconAttestationCorrectness: (network: string, slot: number) =>
     `/api/v1/${network}/beacon/slot/${slot}/attestation/correctness`,
-  beaconProposerEntity: (network: string, slot: number) => `/api/v1/${network}/beacon/slot/${slot}/proposer/entity`,
-  mevBlock: (network: string, slot: number) => `/api/v1/${network}/beacon/slot/${slot}/mev/deployed`,
-  mevRelayCount: (network: string, slot: number) => `/api/v1/${network}/beacon/slot/${slot}/mev/relay/count`,
-  mevBuilderBid: (network: string, slot: number) => `/api/v1/${network}/beacon/slot/${slot}/mev/builder/bid`,
-  mevBuilderCount: (network: string, slot: number) => `/api/v1/${network}/beacon/slot/${slot}/mev/builder/count`,
+  beaconProposerEntity: (network: string, slot: number) =>
+    `/api/v1/${network}/beacon/slot/${slot}/proposer/entity`,
+  mevBlock: (network: string, slot: number) =>
+    `/api/v1/${network}/beacon/slot/${slot}/mev/deployed`,
+  mevRelayCount: (network: string, slot: number) =>
+    `/api/v1/${network}/beacon/slot/${slot}/mev/relay/count`,
+  mevBuilderBid: (network: string, slot: number) =>
+    `/api/v1/${network}/beacon/slot/${slot}/mev/builder/bid`,
+  mevBuilderCount: (network: string, slot: number) =>
+    `/api/v1/${network}/beacon/slot/${slot}/mev/builder/count`,
+  // Prepared blocks endpoint (formerly locally built blocks)
+  preparedBlocks: (network: string) => `/api/v1/${network}/prepared/blocks`,
 };
 
 /**

@@ -30,6 +30,7 @@ import "vendor/xatu-cbt/clickhouse/fct_block_blob_count_head.proto";
 import "vendor/xatu-cbt/clickhouse/fct_block_head.proto";
 import "vendor/xatu-cbt/clickhouse/fct_block_mev_head.proto";
 import "vendor/xatu-cbt/clickhouse/fct_block_proposer_entity.proto";
+import "vendor/xatu-cbt/clickhouse/fct_prepared_block.proto";
 import "vendor/xatu-cbt/clickhouse/common.proto";
 
 // XatuCBT service provides access to CBT data from multiple ClickHouse instances.
@@ -82,6 +83,10 @@ service XatuCBT {
   // ListFctBlockProposerEntity returns proposer entity data from the fct_block_proposer_entity table.
   // This table contains information about entities that proposed blocks in the unfinalized chain.
   rpc ListFctBlockProposerEntity(cbt.ListFctBlockProposerEntityRequest) returns (cbt.ListFctBlockProposerEntityResponse);
+
+  // ListFctPreparedBlock returns prepared blocks for a specific slot.
+  // This table contains locally built blocks that validators would have proposed.
+  rpc ListFctPreparedBlock(cbt.ListFctPreparedBlockRequest) returns (cbt.ListFctPreparedBlockResponse);
 
   // GetDataAvailability returns the common availability interval across a set of transformation tables.
   // It calculates the overlapping data range for the specified tables and returns slot information.

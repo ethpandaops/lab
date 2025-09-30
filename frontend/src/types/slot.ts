@@ -24,6 +24,7 @@ export function extractSlotBounds(
     maxSlot: Number(dataAvailability.maxSlot ?? 0),
     safeSlot: Number(dataAvailability.safeSlot ?? 0),
     headSlot: Number(dataAvailability.headSlot ?? 0),
+    hasData: Boolean(dataAvailability.hasData ?? false),
   };
 }
 
@@ -66,6 +67,7 @@ export interface SlotBounds {
   maxSlot: number;
   safeSlot: number;
   headSlot: number;
+  hasData?: boolean;
 }
 
 export interface SlotProviderProps {
