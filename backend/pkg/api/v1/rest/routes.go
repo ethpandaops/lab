@@ -133,14 +133,14 @@ func (r *PublicRouter) GetRoutes() []RouteConfig {
 			Path:        "/{network}/prepared/blocks",
 			Handler:     r.handleListPreparedBlocks,
 			Methods:     []string{http.MethodGet, http.MethodOptions},
-			Cache:       middleware.CacheNearRealtime, // Near real-time as blocks are continuously being built
+			Cache:       middleware.CacheRealtime,
 			Description: "List prepared blocks showing what would have been built",
 		},
 		{
 			Path:        "/{network}/prepared/blocks/{slot}",
 			Handler:     r.handlePreparedBlockBySlot,
 			Methods:     []string{http.MethodGet, http.MethodOptions},
-			Cache:       middleware.CacheRealtime, // Real-time data for recent slots
+			Cache:       middleware.CacheRealtime,
 			Description: "Get prepared blocks for a specific slot",
 		},
 	}
