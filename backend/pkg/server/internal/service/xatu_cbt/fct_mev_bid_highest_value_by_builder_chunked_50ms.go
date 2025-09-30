@@ -45,20 +45,6 @@ func (x *XatuCBT) ListFctMevBidHighestValueByBuilderChunked50ms(
 	timer := prometheus.NewTimer(x.requestDuration.WithLabelValues(MethodListFctMevBidHighestValueByBuilderChunked50ms, network))
 	defer timer.ObserveDuration()
 
-	var (
-		cacheKey       = x.generateCacheKey("fct_mev_bid_highest_value_by_builder_chunked_50ms", network, req)
-		cachedResponse = &cbtproto.ListFctMevBidHighestValueByBuilderChunked50MsResponse{}
-	)
-
-	// Check cache first.
-	if found, _ := x.tryCache(cacheKey, cachedResponse); found {
-		x.cacheHitsTotal.WithLabelValues(MethodListFctMevBidHighestValueByBuilderChunked50ms, network).Inc()
-
-		return cachedResponse, nil
-	}
-
-	x.cacheMissesTotal.WithLabelValues(MethodListFctMevBidHighestValueByBuilderChunked50ms, network).Inc()
-
 	// Use our clickhouse-proto-gen to handle building for us.
 	sqlQuery, err := cbtproto.BuildListFctMevBidHighestValueByBuilderChunked50MsQuery(
 		req,
@@ -97,19 +83,14 @@ func (x *XatuCBT) ListFctMevBidHighestValueByBuilderChunked50ms(
 	}
 
 	//nolint:gosec // conversion safe.
-	rsp := &cbtproto.ListFctMevBidHighestValueByBuilderChunked50MsResponse{
+	return &cbtproto.ListFctMevBidHighestValueByBuilderChunked50MsResponse{
 		FctMevBidHighestValueByBuilderChunked_50Ms: builders,
 		NextPageToken: cbtproto.CalculateNextPageToken(
 			currentOffset,
 			uint32(pageSize),
 			uint32(len(builders)),
 		),
-	}
-
-	// Store in cache.
-	x.storeInCache(cacheKey, rsp, x.config.CacheTTL)
-
-	return rsp, nil
+	}, nil
 }
 
 // scanFctMevBidHighestValueByBuilderChunked50ms scans a single fct_mev_bid_highest_value_by_builder_chunked_50ms row from the database.

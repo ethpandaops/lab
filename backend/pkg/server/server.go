@@ -318,7 +318,6 @@ func (s *Service) initializeDependencies(ctx context.Context) error {
 	xatuCBTService, err := xatu_cbt.New(
 		s.log,
 		s.config.XatuCBT,
-		cacheClient,
 		s.metrics,
 		s.cartographoorService,
 		s.wallclockService,

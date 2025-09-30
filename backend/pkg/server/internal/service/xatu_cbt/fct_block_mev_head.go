@@ -46,20 +46,6 @@ func (x *XatuCBT) ListFctBlockMevHead(
 	timer := prometheus.NewTimer(x.requestDuration.WithLabelValues(MethodListFctBlockMevHead, network))
 	defer timer.ObserveDuration()
 
-	var (
-		cacheKey       = x.generateCacheKey("int_block_mev_head", network, req)
-		cachedResponse = &cbtproto.ListFctBlockMevHeadResponse{}
-	)
-
-	// Check cache first.
-	if found, _ := x.tryCache(cacheKey, cachedResponse); found {
-		x.cacheHitsTotal.WithLabelValues(MethodListFctBlockMevHead, network).Inc()
-
-		return cachedResponse, nil
-	}
-
-	x.cacheMissesTotal.WithLabelValues(MethodListFctBlockMevHead, network).Inc()
-
 	// Use our clickhouse-proto-gen to handle building for us.
 	sqlQuery, err := cbtproto.BuildListFctBlockMevHeadQuery(
 		req,
@@ -98,19 +84,14 @@ func (x *XatuCBT) ListFctBlockMevHead(
 	}
 
 	//nolint:gosec // conversion safe.
-	rsp := &cbtproto.ListFctBlockMevHeadResponse{
+	return &cbtproto.ListFctBlockMevHeadResponse{
 		FctBlockMevHead: blocks,
 		NextPageToken: cbtproto.CalculateNextPageToken(
 			currentOffset,
 			uint32(pageSize),
 			uint32(len(blocks)),
 		),
-	}
-
-	// Store in cache.
-	x.storeInCache(cacheKey, rsp, x.config.CacheTTL)
-
-	return rsp, nil
+	}, nil
 }
 
 // scanFctBlockMevHead scans a single int_block_mev_head row from the database.

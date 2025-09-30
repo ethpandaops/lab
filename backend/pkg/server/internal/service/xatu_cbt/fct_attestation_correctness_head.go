@@ -45,20 +45,6 @@ func (x *XatuCBT) ListFctAttestationCorrectnessHead(
 	timer := prometheus.NewTimer(x.requestDuration.WithLabelValues(MethodListFctAttestationCorrectnessHead, network))
 	defer timer.ObserveDuration()
 
-	var (
-		cacheKey       = x.generateCacheKey("fct_attestation_correctness_head", network, req)
-		cachedResponse = &cbtproto.ListFctAttestationCorrectnessHeadResponse{}
-	)
-
-	// Check cache first.
-	if found, _ := x.tryCache(cacheKey, cachedResponse); found {
-		x.cacheHitsTotal.WithLabelValues(MethodListFctAttestationCorrectnessHead, network).Inc()
-
-		return cachedResponse, nil
-	}
-
-	x.cacheMissesTotal.WithLabelValues(MethodListFctAttestationCorrectnessHead, network).Inc()
-
 	// Use our clickhouse-proto-gen to handle building for us.
 	sqlQuery, err := cbtproto.BuildListFctAttestationCorrectnessHeadQuery(
 		req,
@@ -97,19 +83,14 @@ func (x *XatuCBT) ListFctAttestationCorrectnessHead(
 	}
 
 	//nolint:gosec // conversion safe.
-	rsp := &cbtproto.ListFctAttestationCorrectnessHeadResponse{
+	return &cbtproto.ListFctAttestationCorrectnessHeadResponse{
 		FctAttestationCorrectnessHead: items,
 		NextPageToken: cbtproto.CalculateNextPageToken(
 			currentOffset,
 			uint32(pageSize),
 			uint32(len(items)),
 		),
-	}
-
-	// Store in cache.
-	x.storeInCache(cacheKey, rsp, x.config.CacheTTL)
-
-	return rsp, nil
+	}, nil
 }
 
 // scanFctAttestationCorrectnessHead scans a single fct_attestation_correctness_head row from the database.
