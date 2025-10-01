@@ -58,7 +58,7 @@ export function SlotProvider({
   const getInitialSlot = () => {
     if (initialSlot !== undefined) return initialSlot;
     // Use maxSlot as the safe default (what safeSlot used to be)
-    if (maxSlot > 0) return Math.max(minSlot, maxSlot - 1);
+    if (maxSlot > 0) return Math.max(minSlot, maxSlot);
     if (beaconClock) {
       const currentClockSlot = beaconClock.getCurrentSlot();
       return Math.max(minSlot, currentClockSlot - 2);

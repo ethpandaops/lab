@@ -20,9 +20,10 @@ export function extractSlotBounds(
     return null;
   }
 
+  const maxSlot = Number(dataAvailability.maxSlot ?? 0);
   return {
     minSlot: Number(dataAvailability.minSlot ?? 0),
-    maxSlot: Number(dataAvailability.maxSlot ?? 0),
+    maxSlot: maxSlot > 0 ? maxSlot - 2 : maxSlot,
   };
 }
 
