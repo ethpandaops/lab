@@ -317,7 +317,6 @@ func convertConfigToAPIProto(config *configpb.FrontendConfig) *apiv1.FrontendCon
 					expConfig.DataAvailability[network] = &apiv1.ExperimentDataAvailability{
 						MinSlot: da.MinSlot,
 						MaxSlot: da.MaxSlot,
-						HasData: da.HasData,
 					}
 				}
 			}

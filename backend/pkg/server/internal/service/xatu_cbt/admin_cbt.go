@@ -47,12 +47,6 @@ func (x *XatuCBT) GetDataAvailability(
 		defer timer.ObserveDuration()
 	}
 
-	// Default position field if not specified
-	positionField := req.PositionField
-	if positionField == "" {
-		positionField = "slot_start_date_time"
-	}
-
 	// Validate tables
 	if len(req.Tables) == 0 {
 		return nil, fmt.Errorf("no tables specified")
@@ -66,7 +60,7 @@ func (x *XatuCBT) GetDataAvailability(
 
 	// Build the SQL query with slot calculation
 	secondsPerSlot := int64(12) // Hardcoded for now, can be made configurable later
-	query := x.buildDataAvailabilityQuery(network, req.Tables, positionField, genesisTime, secondsPerSlot)
+	query := x.buildDataAvailabilityQuery(network, req.Tables, genesisTime, secondsPerSlot)
 
 	// Execute query
 	row, err := client.QueryRow(ctx, query)
@@ -79,10 +73,8 @@ func (x *XatuCBT) GetDataAvailability(
 	maxSlotInterface, hasMaxSlot := row["max_slot"]
 
 	if !hasMinSlot || !hasMaxSlot {
-		// No overlapping data
-		return &pb.GetDataAvailabilityResponse{
-			HasData: false,
-		}, nil
+		// No overlapping data - return empty response
+		return &pb.GetDataAvailabilityResponse{}, nil
 	}
 
 	// Convert to uint64
@@ -133,12 +125,11 @@ func (x *XatuCBT) GetDataAvailability(
 	return &pb.GetDataAvailabilityResponse{
 		MinSlot: minSlot,
 		MaxSlot: maxSlot,
-		HasData: true,
 	}, nil
 }
 
 // buildDataAvailabilityQuery builds the SQL query for checking data availability.
-func (x *XatuCBT) buildDataAvailabilityQuery(network string, tables []string, positionField string, genesisTime int64, secondsPerSlot int64) string {
+func (x *XatuCBT) buildDataAvailabilityQuery(network string, tables []string, genesisTime int64, secondsPerSlot int64) string {
 	// Build the table list for the IN clause
 	tableList := make([]string, len(tables))
 	for i, table := range tables {
@@ -146,7 +137,7 @@ func (x *XatuCBT) buildDataAvailabilityQuery(network string, tables []string, po
 		tableList[i] = fmt.Sprintf("('%s', '%s')", network, table)
 	}
 
-	// Use position as the field name, but handle special cases
+	// admin_cbt table always uses "position" and "interval" columns
 	positionColumn := "position"
 	intervalColumn := "interval"
 
@@ -218,8 +209,7 @@ func (x *XatuCBT) GetDataAvailabilityForSlot(
 
 	// Create request
 	req := &pb.GetDataAvailabilityRequest{
-		Tables:        tables,
-		PositionField: "slot_start_date_time",
+		Tables: tables,
 	}
 
 	// Get availability
@@ -228,7 +218,8 @@ func (x *XatuCBT) GetDataAvailabilityForSlot(
 		return false, fmt.Errorf("failed to get data availability: %w", err)
 	}
 
-	if !resp.HasData {
+	// No data if both slots are 0
+	if resp.MinSlot == 0 && resp.MaxSlot == 0 {
 		return false, nil
 	}
 

@@ -98,11 +98,6 @@ message GetDataAvailabilityRequest {
   // List of transformation tables to check for availability.
   // Format: table names without the network prefix (e.g., "fct_attestation_correctness_head").
   repeated string tables = 1;
-
-  // The position field name to use for min/max calculation.
-  // Common values: "slot_start_date_time", "block_number", etc.
-  // If empty, defaults to "slot_start_date_time".
-  string position_field = 2;
 }
 
 // GetDataAvailabilityResponse returns the data availability information.
@@ -112,7 +107,4 @@ message GetDataAvailabilityResponse {
 
   // Latest available slot number.
   uint64 max_slot = 2;
-
-  // Indicates if data is available (overlapping interval exists).
-  bool has_data = 3;
 }

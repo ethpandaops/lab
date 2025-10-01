@@ -1585,11 +1585,6 @@ export class ExperimentDataAvailability extends Message<ExperimentDataAvailabili
    */
   maxSlot = protoInt64.zero;
 
-  /**
-   * @generated from field: bool has_data = 3;
-   */
-  hasData = false;
-
   constructor(data?: PartialMessage<ExperimentDataAvailability>) {
     super();
     proto3.util.initPartial(data, this);
@@ -1600,7 +1595,6 @@ export class ExperimentDataAvailability extends Message<ExperimentDataAvailabili
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "min_slot", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
     { no: 2, name: "max_slot", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
-    { no: 3, name: "has_data", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ExperimentDataAvailability {

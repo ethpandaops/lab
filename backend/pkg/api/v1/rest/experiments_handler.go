@@ -37,7 +37,6 @@ func (r *PublicRouter) handleExperimentConfig(w http.ResponseWriter, req *http.R
 		dataAvailability[network] = &apiv1.ExperimentDataAvailability{
 			MinSlot: availability.MinSlot,
 			MaxSlot: availability.MaxSlot,
-			HasData: availability.HasData,
 		}
 	}
 

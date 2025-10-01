@@ -20,15 +20,6 @@ export class GetDataAvailabilityRequest extends Message<GetDataAvailabilityReque
    */
   tables: string[] = [];
 
-  /**
-   * The position field name to use for min/max calculation.
-   * Common values: "slot_start_date_time", "block_number", etc.
-   * If empty, defaults to "slot_start_date_time".
-   *
-   * @generated from field: string position_field = 2;
-   */
-  positionField = "";
-
   constructor(data?: PartialMessage<GetDataAvailabilityRequest>) {
     super();
     proto3.util.initPartial(data, this);
@@ -38,7 +29,6 @@ export class GetDataAvailabilityRequest extends Message<GetDataAvailabilityReque
   static readonly typeName = "xatu_cbt.GetDataAvailabilityRequest";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "tables", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
-    { no: 2, name: "position_field", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetDataAvailabilityRequest {
@@ -78,13 +68,6 @@ export class GetDataAvailabilityResponse extends Message<GetDataAvailabilityResp
    */
   maxSlot = protoInt64.zero;
 
-  /**
-   * Indicates if data is available (overlapping interval exists).
-   *
-   * @generated from field: bool has_data = 3;
-   */
-  hasData = false;
-
   constructor(data?: PartialMessage<GetDataAvailabilityResponse>) {
     super();
     proto3.util.initPartial(data, this);
@@ -95,7 +78,6 @@ export class GetDataAvailabilityResponse extends Message<GetDataAvailabilityResp
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "min_slot", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
     { no: 2, name: "max_slot", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
-    { no: 3, name: "has_data", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetDataAvailabilityResponse {

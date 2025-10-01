@@ -105,8 +105,6 @@ message ExperimentDataAvailability {
   uint64 min_slot = 1;
   // Latest available slot number
   uint64 max_slot = 2;
-  // Indicates if data is available (overlapping interval exists)
-  bool has_data = 3;
 }
 
 // GetExperimentConfigRequest defines the request for getting a single experiment's configuration.

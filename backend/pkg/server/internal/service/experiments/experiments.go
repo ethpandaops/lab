@@ -232,8 +232,7 @@ func (s *ExperimentsService) getDataAvailabilityForExperiment(ctx context.Contex
 
 		// Query data availability
 		req := &xatu_cbt_proto.GetDataAvailabilityRequest{
-			Tables:        tables,
-			PositionField: "slot_start_date_time",
+			Tables: tables,
 		}
 
 		resp, err := s.xatuCBTService.GetDataAvailability(ctxWithNetwork, req)
@@ -250,7 +249,6 @@ func (s *ExperimentsService) getDataAvailabilityForExperiment(ctx context.Contex
 		dataAvailability[network] = &config.ExperimentDataAvailability{
 			MinSlot: resp.MinSlot,
 			MaxSlot: resp.MaxSlot,
-			HasData: resp.HasData,
 		}
 	}
 

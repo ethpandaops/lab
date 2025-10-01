@@ -235,7 +235,6 @@ message ExperimentConfig {
 message ExperimentDataAvailability {
   uint64 min_slot = 1 [json_name = "minSlot"];
   uint64 max_slot = 2 [json_name = "maxSlot"];
-  bool has_data = 3 [json_name = "hasData"];
 }
 
 // GetExperimentConfigRequest defines the request for getting a single experiment's configuration.
