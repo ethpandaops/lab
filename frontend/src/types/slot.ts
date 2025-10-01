@@ -20,10 +20,9 @@ export function extractSlotBounds(
     return null;
   }
 
-  const maxSlot = Number(dataAvailability.maxSlot ?? 0);
   return {
     minSlot: Number(dataAvailability.minSlot ?? 0),
-    maxSlot: maxSlot > 0 ? maxSlot - 2 : maxSlot,
+    maxSlot: Number(dataAvailability.maxSlot ?? 0),
   };
 }
 
@@ -39,6 +38,7 @@ export interface SlotContextValue {
   isStalled: boolean;
   isStale: boolean;
   staleBehindSlots: number;
+  isLive: boolean;
   actions: SlotActions;
 }
 
@@ -57,6 +57,7 @@ export interface SlotActions {
   setPlaybackSpeed(speed: number): void;
   markStalled(): void;
   clearStalled(): void;
+  jumpToLive(): void;
 }
 
 export interface SlotBounds {

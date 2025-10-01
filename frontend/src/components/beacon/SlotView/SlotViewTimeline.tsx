@@ -22,6 +22,9 @@ interface SlotViewTimelineProps {
   onPreviousSlot: () => void;
   onNextSlot: () => void;
   isLive: boolean;
+  isPrevDisabled?: boolean;
+  isNextDisabled?: boolean;
+  onJumpToLive?: () => void;
   className?: string;
   onTimeSeek: (timeInSeconds: number) => void;
 }

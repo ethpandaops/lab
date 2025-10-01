@@ -9,7 +9,7 @@ function BeaconLive() {
   return (
     <div className="flex h-full flex-col">
       <div className="flex-1 overflow-hidden">
-        <SlotView slot={currentSlot} network={selectedNetwork} isLive={true} />
+        <SlotView slot={currentSlot} network={selectedNetwork} />
       </div>
     </div>
   );

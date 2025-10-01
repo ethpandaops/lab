@@ -108,7 +108,6 @@ export default function BlockProductionSlotPage() {
   } = useSlotData({
     network: selectedNetwork,
     slot: slotNumber || undefined,
-    isLive: false,
     enabled: slotNumber !== null,
   });
 

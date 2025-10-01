@@ -41,6 +41,9 @@ interface EventTimelineProps {
   onPreviousSlot: () => void;
   onNextSlot: () => void;
   isLive: boolean;
+  isPrevDisabled?: boolean;
+  isNextDisabled?: boolean;
+  onJumpToLive?: () => void;
   className?: string;
   onTimeSeek?: (time: number) => void;
 }
@@ -340,6 +343,9 @@ export const EventTimeline = memo(function EventTimeline({
   onPreviousSlot,
   onNextSlot,
   isLive,
+  isPrevDisabled = false,
+  isNextDisabled = false,
+  onJumpToLive,
   className,
   onTimeSeek,
 }: EventTimelineProps) {
@@ -650,7 +656,13 @@ export const EventTimeline = memo(function EventTimeline({
           <div className="flex items-center gap-1 md:gap-1.5">
             <button
               onClick={onPreviousSlot}
-              className="w-6 h-6 md:w-7 md:h-7 rounded-lg flex items-center justify-center bg-surface hover:bg-hover transition-all border border-text-muted touch-manipulation"
+              disabled={isPrevDisabled}
+              className={clsx(
+                'w-6 h-6 md:w-7 md:h-7 rounded-lg flex items-center justify-center transition-all border touch-manipulation',
+                isPrevDisabled
+                  ? 'opacity-50 cursor-not-allowed bg-surface/50 border-text-muted/50'
+                  : 'bg-surface hover:bg-hover border-text-muted',
+              )}
             >
               <ChevronLeft className="w-3 h-3 md:w-4 md:h-4" />
             </button>
@@ -666,17 +678,35 @@ export const EventTimeline = memo(function EventTimeline({
             </button>
             <button
               onClick={onNextSlot}
-              disabled={isLive}
+              disabled={isNextDisabled}
               className={clsx(
                 'w-6 h-6 md:w-7 md:h-7 rounded-lg flex items-center justify-center transition-all border touch-manipulation',
-                isLive
+                isNextDisabled
                   ? 'opacity-50 cursor-not-allowed bg-surface/50 border-text-muted/50'
                   : 'bg-surface hover:bg-hover border-text-muted',
               )}
             >
               <ChevronRight className="w-3 h-3 md:w-4 md:h-4" />
             </button>
+
+            {/* Live indicator / Go Live button - moved here */}
+            {isLive ? (
+              <div className="flex items-center gap-1.5 px-2 py-1 ml-1 rounded-md bg-success/10">
+                <div className="w-1.5 h-1.5 rounded-full bg-success animate-pulse" />
+                <span className="text-xs font-medium text-success">Live</span>
+              </div>
+            ) : onJumpToLive ? (
+              <button
+                onClick={onJumpToLive}
+                className="flex items-center gap-1.5 px-2 py-1 ml-1 rounded-md bg-surface/30 hover:bg-surface/50 transition-all"
+              >
+                <div className="w-1.5 h-1.5 rounded-full bg-yellow-500" />
+                <span className="text-xs font-medium text-tertiary">Live</span>
+              </button>
+            ) : null}
           </div>
+
+          {/* Time display */}
           <div className="flex items-baseline gap-1 md:gap-1.5">
             <span className="font-mono text-xl md:text-2xl font-medium text-primary">
               {currentTime.toFixed(1)}

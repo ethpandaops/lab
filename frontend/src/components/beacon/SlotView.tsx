@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState, useCallback } from 'react';
 import { useNavigate } from '@tanstack/react-router';
 import { useModal } from '@/contexts/ModalContext.tsx';
 import { useSlotData } from '@/hooks/useSlotData';
-import { useSlotProgress, useSlotState, useSlotActions } from '@/hooks/useSlot';
+import { useSlotProgress, useSlotState, useSlotActions, useSlotConfig } from '@/hooks/useSlot';
 import { SlotViewMobileDetails } from './SlotView/SlotViewMobileDetails';
 import { SlotViewDesktopDetails } from './SlotView/SlotViewDesktopDetails';
 import { SlotViewMap } from './SlotView/SlotViewMap';
@@ -13,7 +13,6 @@ import type { WinningBid } from './SlotView/types';
 interface SlotViewProps {
   slot?: number;
   network?: string;
-  isLive?: boolean;
   onSlotComplete?: () => void;
   slotProgress?: number;
   showMap?: boolean;
@@ -51,7 +50,6 @@ interface Event {
 export function SlotView({
   slot,
   network = 'mainnet',
-  isLive = false,
   onSlotComplete,
   slotProgress,
   showMap = true,
@@ -59,66 +57,34 @@ export function SlotView({
   showBottomPanel = true,
   showDetails = true,
 }: SlotViewProps) {
-  const [currentTime, setCurrentTime] = useState<number>(0);
-  const [isPlaying, setIsPlaying] = useState<boolean>(isLive);
   const [isTimelineCollapsed, setIsTimelineCollapsed] = useState(false);
-  const [hasManuallySeek, setHasManuallySeek] = useState(false);
   const navigate = useNavigate();
   const { showModal } = useModal();
 
-  let slotState = null;
-  let slotProgressContext = null;
-  let slotActions = null;
-  try {
-    slotState = useSlotState();
-    slotProgressContext = useSlotProgress();
-    slotActions = useSlotActions();
-  } catch {
-    // Not in SlotProvider
-  }
+  // Always use context now - no standalone mode
+  const slotState = useSlotState();
+  const slotProgressContext = useSlotProgress();
+  const slotActions = useSlotActions();
+  const slotConfig = useSlotConfig();
 
-  const usingSlotContext = isLive && slotState !== null;
-  const effectiveIsPlaying = usingSlotContext ? slotState.isPlaying : isPlaying;
-  const contextSlotProgress = slotProgressContext?.slotProgress;
-  const effectiveTime = usingSlotContext
-    ? (contextSlotProgress ?? 0)
-    : hasManuallySeek
-      ? currentTime
-      : slotProgress !== undefined
-        ? slotProgress
-        : currentTime;
+  // Get isLive and isPlaying from context
+  const { isLive, isPlaying, currentSlot } = slotState;
+  const { minSlot, maxSlot } = slotConfig;
+  const effectiveIsPlaying = isPlaying;
+  const contextSlotProgress = slotProgressContext.slotProgress;
+  const effectiveTime = slotProgress !== undefined ? slotProgress : contextSlotProgress;
 
   const handlePlayPauseClick = useCallback(() => {
-    if (slotActions) {
-      slotActions.toggle();
-    } else {
-      setIsPlaying(!isPlaying);
-    }
-  }, [slotActions, isPlaying]);
+    slotActions.toggle();
+  }, [slotActions]);
 
   const handlePreviousSlot = useCallback(() => {
-    if (slotActions) {
-      slotActions.previousSlot();
-    } else if (slot) {
-      navigate({
-        to: '/beacon/slot/$slot',
-        params: { slot: String(slot - 1) },
-        search: { network },
-      });
-    }
-  }, [slotActions, slot, network, navigate]);
+    slotActions.previousSlot();
+  }, [slotActions]);
 
   const handleNextSlot = useCallback(() => {
-    if (slotActions) {
-      slotActions.nextSlot();
-    } else if (slot && !isLive) {
-      navigate({
-        to: '/beacon/slot/$slot',
-        params: { slot: String(slot + 1) },
-        search: { network },
-      });
-    }
-  }, [slotActions, slot, isLive, network, navigate]);
+    slotActions.nextSlot();
+  }, [slotActions]);
 
   const handleToggleCollapse = useCallback(() => {
     setIsTimelineCollapsed(!isTimelineCollapsed);
@@ -126,14 +92,8 @@ export function SlotView({
 
   const handleTimeSeek = useCallback(
     (timeInSeconds: number) => {
-      if (slotActions) {
-        slotActions.pause();
-        slotActions.seekToTime(timeInSeconds * 1000);
-      } else {
-        setIsPlaying(false);
-        setHasManuallySeek(true);
-        setCurrentTime(timeInSeconds * 1000);
-      }
+      slotActions.pause();
+      slotActions.seekToTime(timeInSeconds * 1000);
     },
     [slotActions],
   );
@@ -145,38 +105,12 @@ export function SlotView({
   } = useSlotData({
     network,
     slot,
-    isLive,
     enabled: true,
     prefetchNext: isLive, // Enable prefetch for live mode
     prefetchAt: 8000, // Trigger prefetch at 8000ms into the slot
   });
 
-  useEffect(() => {
-    if (usingSlotContext) return;
-    if (slotProgress !== undefined) return;
-    if (!effectiveIsPlaying) return;
-
-    const interval = setInterval(() => {
-      setCurrentTime(prev => {
-        const next = Math.floor((prev + 100) / 100) * 100;
-        if (next >= 12000) {
-          clearInterval(interval);
-          onSlotComplete?.();
-          setIsPlaying(false);
-          return 12000;
-        }
-        return next;
-      });
-    }, 100);
-
-    return () => clearInterval(interval);
-  }, [usingSlotContext, effectiveIsPlaying, onSlotComplete, slotProgress]);
-
-  useEffect(() => {
-    setCurrentTime(0);
-    setIsPlaying(isLive);
-    setHasManuallySeek(false);
-  }, [slot, isLive]);
+  // Remove local timer effects since we always use context now
 
   const totalValidators =
     slotData?.attestations?.windows?.reduce(
@@ -562,7 +496,10 @@ export function SlotView({
                 slot={slot}
                 onPreviousSlot={handlePreviousSlot}
                 onNextSlot={handleNextSlot}
-                isLive={isLive}
+                isLive={isLive} // Shows live status (within 10 slots of head)
+                isPrevDisabled={currentSlot <= minSlot}
+                isNextDisabled={currentSlot >= maxSlot}
+                onJumpToLive={slotActions.jumpToLive}
                 className="h-full pb-4"
                 onTimeSeek={handleTimeSeek}
               />
@@ -609,7 +546,10 @@ export function SlotView({
                 slot={slot}
                 onPreviousSlot={handlePreviousSlot}
                 onNextSlot={handleNextSlot}
-                isLive={isLive}
+                isLive={isLive} // Shows live status (within 10 slots of head)
+                isPrevDisabled={currentSlot <= minSlot}
+                isNextDisabled={currentSlot >= maxSlot}
+                onJumpToLive={slotActions.jumpToLive}
                 className="flex-1 overflow-y-auto"
                 onTimeSeek={handleTimeSeek}
               />

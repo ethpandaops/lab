@@ -1,9 +1,19 @@
-import { Play, Pause, SkipBack, SkipForward, RotateCcw, FastForward } from 'lucide-react';
+import { Play, Pause, SkipBack, SkipForward, RotateCcw, FastForward, Radio } from 'lucide-react';
 import { useSlot } from '@/hooks/useSlot';
 
 export function SlotControls() {
-  const { currentSlot, slotProgress, slotDuration, isPlaying, mode, playbackSpeed, minSlot, maxSlot, actions } =
-    useSlot();
+  const {
+    currentSlot,
+    slotProgress,
+    slotDuration,
+    isPlaying,
+    mode,
+    playbackSpeed,
+    minSlot,
+    maxSlot,
+    isLive,
+    actions,
+  } = useSlot();
 
   const progressPercent = (slotProgress / slotDuration) * 100;
   const progressSeconds = (slotProgress / 1000).toFixed(1);
@@ -19,7 +29,10 @@ export function SlotControls() {
           </span>
         </div>
         <div className="h-2 overflow-hidden rounded-sm bg-surface">
-          <div className="h-full bg-accent transition-all duration-100" style={{ width: `${progressPercent}%` }} />
+          <div
+            className="h-full bg-accent transition-all duration-100"
+            style={{ width: `${progressPercent}%` }}
+          />
         </div>
       </div>
 
@@ -69,6 +82,24 @@ export function SlotControls() {
         </div>
 
         <div className="flex items-center gap-4">
+          {!isLive && (
+            <button
+              onClick={actions.jumpToLive}
+              className="flex items-center gap-2 rounded-sm bg-accent px-3 py-1.5 text-sm/6 hover:bg-accent/80"
+              aria-label="Go live"
+            >
+              <Radio className="size-4" />
+              Go Live
+            </button>
+          )}
+
+          {isLive && (
+            <div className="flex items-center gap-2 rounded-sm bg-surface px-3 py-1.5 text-sm/6">
+              <div className="size-2 rounded-full bg-green-500 animate-pulse" />
+              <span>Live</span>
+            </div>
+          )}
+
           <select
             value={playbackSpeed}
             onChange={e => actions.setPlaybackSpeed(Number(e.target.value))}

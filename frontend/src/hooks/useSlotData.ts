@@ -11,7 +11,6 @@ import { useSlotProgress, useSlotState } from '@/hooks/useSlot';
 interface UseSlotDataOptions {
   network: string;
   slot?: number;
-  isLive?: boolean;
   enabled?: boolean;
   prefetchNext?: boolean; // Enable prefetch of next slot
   prefetchAt?: number; // When to trigger prefetch (ms into slot)
@@ -31,7 +30,6 @@ interface SlotDataResponse {
 export function useSlotData({
   network,
   slot,
-  isLive = false,
   enabled = true,
   prefetchNext = false,
   prefetchAt = 8000, // Default to 8 seconds into slot
@@ -43,7 +41,7 @@ export function useSlotData({
 
   // Get slot timing info for prefetch logic
   const { slotProgress } = useSlotProgress();
-  const { isPlaying, mode } = useSlotState();
+  const { isPlaying, mode, isLive } = useSlotState();
   const hasPrefetchedRef = useRef(false);
 
   // REST-based implementation

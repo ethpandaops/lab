@@ -57,13 +57,9 @@ export function SlotProvider({
 
   const getInitialSlot = () => {
     if (initialSlot !== undefined) return initialSlot;
-    // Use maxSlot as the safe default (what safeSlot used to be)
-    if (maxSlot > 0) return Math.max(minSlot, maxSlot);
-    if (beaconClock) {
-      const currentClockSlot = beaconClock.getCurrentSlot();
-      return Math.max(minSlot, currentClockSlot - 2);
-    }
-    return maxSlot;
+    // Use maxSlot minus 2 as the safe default to avoid data availability issues
+    const safeSlot = maxSlot > 2 ? maxSlot - 2 : maxSlot;
+    return safeSlot;
   };
 
   const [currentSlot, setCurrentSlot] = useState<number>(getInitialSlot());
@@ -101,13 +97,7 @@ export function SlotProvider({
     }
   }, [network, minSlot, maxSlot]); // Don't include getInitialSlot as it's defined inline
 
-  useEffect(() => {
-    if (initialSlot === undefined && beaconClock && currentSlot === maxSlot) {
-      const currentClockSlot = beaconClock.getCurrentSlot();
-      const calculatedSlot = Math.max(minSlot, currentClockSlot - 2);
-      setCurrentSlot(calculatedSlot);
-    }
-  }, [beaconClock, initialSlot, currentSlot, maxSlot, minSlot]);
+  // Removed effect - no need to recalculate, maxSlot already has the buffer
 
   useEffect(() => {
     if (
@@ -127,6 +117,12 @@ export function SlotProvider({
   );
   const staleBehindSlots = wallClockSlot - currentSlot;
   const isStale = staleBehindSlots > 10;
+
+  // isLive means we're within 10 slots of the safe max slot (near the blockchain head with buffer)
+  const isLive = useMemo(() => {
+    const safeMaxSlot = maxSlot > 2 ? maxSlot - 2 : maxSlot;
+    return safeMaxSlot - currentSlot <= 10;
+  }, [maxSlot, currentSlot]);
 
   useEffect(() => {
     stateRef.current = {
@@ -193,6 +189,11 @@ export function SlotProvider({
   const actions = useMemo(
     () => ({
       play: () => {
+        // In single mode, if we're at the end of the slot, restart from beginning
+        if (mode === 'single' && slotProgressRef.current >= slotDuration) {
+          slotProgressRef.current = 0;
+          setSlotProgress(0);
+        }
         setIsPlaying(true);
         setPauseReason(null);
       },
@@ -202,6 +203,11 @@ export function SlotProvider({
       },
       toggle: () => {
         setIsPlaying(prev => {
+          // If we're about to play and in single mode at the end, restart
+          if (!prev && mode === 'single' && slotProgressRef.current >= slotDuration) {
+            slotProgressRef.current = 0;
+            setSlotProgress(0);
+          }
           setPauseReason(prev ? 'manual' : null);
           return !prev;
         });
@@ -249,8 +255,17 @@ export function SlotProvider({
         setIsPlaying(false);
       },
       clearStalled: () => setIsStalled(false),
+      jumpToLive: () => {
+        // Jump to maxSlot - 2 for safety buffer
+        const targetSlot = maxSlot > 2 ? maxSlot - 2 : maxSlot;
+        setCurrentSlot(targetSlot);
+        slotProgressRef.current = 0;
+        setSlotProgress(0);
+        setIsPlaying(true);
+        setPauseReason(null);
+      },
     }),
-    [minSlot, maxSlot, slotDuration],
+    [minSlot, maxSlot, slotDuration, mode],
   );
 
   const progressValue = useMemo(
@@ -268,8 +283,9 @@ export function SlotProvider({
       isStalled,
       isStale,
       staleBehindSlots,
+      isLive,
     }),
-    [currentSlot, isPlaying, mode, isStalled, isStale, staleBehindSlots],
+    [currentSlot, isPlaying, mode, isStalled, isStale, staleBehindSlots, isLive],
   );
 
   const configValue = useMemo(

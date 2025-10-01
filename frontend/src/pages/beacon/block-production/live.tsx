@@ -69,7 +69,6 @@ function BlockProductionLivePage() {
   const { data: slotData, isLoading: isSlotLoading } = useSlotData({
     network: selectedNetwork,
     slot: displaySlot !== null && displaySlot >= 0 ? displaySlot : undefined,
-    isLive: true,
     enabled: displaySlot !== null && displaySlot >= 0,
     prefetchNext: true, // Enable prefetch at 8s mark for smooth transitions
     prefetchAt: 8000, // Trigger prefetch at 8000ms into the slot
@@ -79,7 +78,6 @@ function BlockProductionLivePage() {
   const { data: prevSlotData } = useSlotData({
     network: selectedNetwork,
     slot: displaySlot !== null ? displaySlot - 1 : undefined,
-    isLive: false,
     enabled: displaySlot !== null && displaySlot > 0,
   });
 
@@ -419,7 +417,7 @@ function BlockProductionLivePage() {
               displaySlotOffset={displaySlot - currentSlot}
               goToPreviousSlot={actions.previousSlot}
               goToNextSlot={actions.nextSlot}
-              resetToCurrentSlot={() => actions.goToSlot(maxSlot)}
+              resetToCurrentSlot={() => actions.jumpToLive()}
               isNextDisabled={isNextDisabled}
               network={selectedNetwork}
               isLocallyBuilt={isLocallyBuilt}
@@ -470,7 +468,7 @@ function BlockProductionLivePage() {
               displaySlotOffset={displaySlot - currentSlot}
               goToPreviousSlot={actions.previousSlot}
               goToNextSlot={actions.nextSlot}
-              resetToCurrentSlot={() => actions.goToSlot(maxSlot)}
+              resetToCurrentSlot={() => actions.jumpToLive()}
               isNextDisabled={isNextDisabled}
               network={selectedNetwork}
               isLocallyBuilt={isLocallyBuilt}
