@@ -1,6 +1,6 @@
 import { createFileRoute, Outlet } from '@tanstack/react-router';
 import { z } from 'zod';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { getRestApiClient } from '@/api';
 import { SlotProvider } from '@/contexts/slot';
 import { useSlotActions } from '@/hooks/useSlot';
@@ -121,7 +121,13 @@ function ExperimentLayout() {
     );
   }
 
-  const bounds = extractSlotBounds(activeConfig, selectedNetwork);
+  // Memoize bounds to prevent unnecessary re-renders when config refetches
+  const bounds = useMemo(() => {
+    return extractSlotBounds(activeConfig, selectedNetwork);
+  }, [
+    activeConfig.experiment?.dataAvailability,
+    selectedNetwork,
+  ]);
 
   if (!bounds) {
     return (

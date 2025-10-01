@@ -7,7 +7,7 @@ import PhaseIcons from '../common/PhaseIcons';
 import BuildersRelaysPanel from './BuildersRelaysPanel';
 import ContinentsList from './ContinentsList';
 import { BeaconSlotData } from '@/api/gen/backend/pkg/server/proto/beacon_slots/beacon_slots_pb';
-import { useSlotProgress, useSlotState, useSlotActions } from '@/hooks/useSlot';
+import { useSlotProgress, useSlotState, useSlotConfig, useSlotActions } from '@/hooks/useSlot';
 
 // Define the flow animation styles
 const flowAnimations = `
@@ -42,8 +42,6 @@ interface DesktopBlockProductionViewProps extends Omit<BlockProductionBaseProps,
 
   // Navigation controls for merged timeline
   slotNumber: number | null;
-  headLagSlots: number;
-  displaySlotOffset: number;
   goToPreviousSlot: () => void;
   goToNextSlot: () => void;
   resetToCurrentSlot: () => void;
@@ -66,8 +64,6 @@ const DesktopBlockProductionView: React.FC<DesktopBlockProductionViewProps> = ({
   onPhaseChange,
   // Navigation controls
   slotNumber,
-  headLagSlots,
-  displaySlotOffset,
   goToPreviousSlot,
   goToNextSlot,
   resetToCurrentSlot,
@@ -78,6 +74,7 @@ const DesktopBlockProductionView: React.FC<DesktopBlockProductionViewProps> = ({
   // Get currentTime from the slot context
   const { slotProgress } = useSlotProgress();
   const slotState = useSlotState();
+  const slotConfig = useSlotConfig();
   const slotActions = useSlotActions();
 
   const currentTimeMs = slotProgress;
@@ -257,12 +254,11 @@ const DesktopBlockProductionView: React.FC<DesktopBlockProductionViewProps> = ({
               onPhaseChange={onPhaseChange}
               // Navigation controls
               slotNumber={slotNumber}
-              headLagSlots={headLagSlots}
-              displaySlotOffset={displaySlotOffset}
               isMobile={false} // Desktop view is never mobile
               goToPreviousSlot={goToPreviousSlot}
               goToNextSlot={goToNextSlot}
               resetToCurrentSlot={resetToCurrentSlot}
+              isPrevDisabled={slotState.currentSlot <= slotConfig.minSlot}
               isNextDisabled={isNextDisabled}
             />
           </div>

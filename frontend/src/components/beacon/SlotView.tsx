@@ -147,6 +147,8 @@ export function SlotView({
     slot,
     isLive,
     enabled: true,
+    prefetchNext: isLive, // Enable prefetch for live mode
+    prefetchAt: 8000, // Trigger prefetch at 8000ms into the slot
   });
 
   useEffect(() => {
@@ -502,6 +504,7 @@ export function SlotView({
             isMissing={isMissingData}
             attestationWindows={attestationWindows}
             maxPossibleValidators={maxPossibleValidators}
+            isInModal={true}
           />
         </div>
       </div>,

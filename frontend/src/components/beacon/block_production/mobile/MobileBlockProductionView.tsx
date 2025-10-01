@@ -5,13 +5,11 @@ import { countUniqueBuilderPubkeys } from '../common/utils';
 import MobileTimelineBar from './MobileTimelineBar';
 import StageCard from './StageCard';
 import MobileContinentsPanel from './MobileContinentsPanel';
-import { useSlotProgress, useSlotState, useSlotActions } from '@/hooks/useSlot';
+import { useSlotProgress, useSlotState, useSlotConfig, useSlotActions } from '@/hooks/useSlot';
 
 interface MobileBlockProductionViewProps extends BlockProductionBaseProps {
   // Navigation controls for merged timeline
   slotNumber: number | null;
-  headLagSlots: number;
-  displaySlotOffset: number;
   goToPreviousSlot: () => void;
   goToNextSlot: () => void;
   resetToCurrentSlot: () => void;
@@ -35,8 +33,6 @@ const MobileBlockProductionView: React.FC<MobileBlockProductionViewProps> = ({
   block,
   // Navigation controls
   slotNumber,
-  headLagSlots,
-  displaySlotOffset,
   goToPreviousSlot,
   goToNextSlot,
   resetToCurrentSlot,
@@ -49,11 +45,21 @@ const MobileBlockProductionView: React.FC<MobileBlockProductionViewProps> = ({
   // Get time and play state from slot context
   const { slotProgress } = useSlotProgress();
   const slotState = useSlotState();
+  const slotConfig = useSlotConfig();
   const slotActions = useSlotActions();
 
   const currentTimeMs = slotProgress;
   currentTime = currentTimeMs;
   const isPlaying = slotState.isPlaying;
+
+  // Debug: Log when slotData changes
+  React.useEffect(() => {
+    console.log(
+      `[MOBILE VIEW] Received slotData for slot ${slotNumber}:`,
+      slotData ? 'present' : 'null/undefined',
+      slotData ? `(attestations: ${slotData.attestations ? 'yes' : 'no'})` : '',
+    );
+  }, [slotData, slotNumber]);
   const togglePlayPause = useCallback(() => {
     if (isPlaying) {
       slotActions.pause();
@@ -243,13 +249,12 @@ const MobileBlockProductionView: React.FC<MobileBlockProductionViewProps> = ({
           slotData={slotData}
           // Navigation controls
           slotNumber={slotNumber}
-          headLagSlots={headLagSlots}
-          displaySlotOffset={displaySlotOffset}
           isPlaying={isPlaying}
           goToPreviousSlot={goToPreviousSlot}
           goToNextSlot={goToNextSlot}
           resetToCurrentSlot={resetToCurrentSlot}
           togglePlayPause={togglePlayPause}
+          isPrevDisabled={slotState.currentSlot <= slotConfig.minSlot}
           isNextDisabled={isNextDisabled}
         />
 

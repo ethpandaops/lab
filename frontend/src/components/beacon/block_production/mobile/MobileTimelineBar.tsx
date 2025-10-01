@@ -1,4 +1,4 @@
-import React, { useMemo, useCallback } from 'react';
+import React, { useMemo, useCallback, useRef, useState, useEffect } from 'react';
 import { getCurrentPhase } from '../common/PhaseUtils';
 import { Phase } from '../common/types';
 import { useSlotProgress, useSlotState, useSlotActions } from '@/hooks/useSlot';
@@ -14,11 +14,10 @@ interface MobileTimelineBarProps {
 
   // Navigation controls
   slotNumber: number | null;
-  headLagSlots: number;
-  displaySlotOffset: number;
   goToPreviousSlot: () => void;
   goToNextSlot: () => void;
   resetToCurrentSlot: () => void;
+  isPrevDisabled: boolean;
   isNextDisabled: boolean;
 }
 
@@ -32,10 +31,10 @@ const MobileTimelineBar: React.FC<MobileTimelineBarProps> = ({
   slotData,
   // Navigation controls
   slotNumber,
-  displaySlotOffset,
   goToPreviousSlot,
   goToNextSlot,
   resetToCurrentSlot,
+  isPrevDisabled,
   isNextDisabled,
 }) => {
   // Get timeline state from slot context
@@ -45,7 +44,6 @@ const MobileTimelineBar: React.FC<MobileTimelineBarProps> = ({
 
   const currentTimeMs = slotProgress;
   const displayTimeMs = slotProgress;
-  currentTime = currentTimeMs;
   const isPlaying = slotState.isPlaying;
   const togglePlayPause = useCallback(() => {
     if (isPlaying) {
@@ -54,6 +52,92 @@ const MobileTimelineBar: React.FC<MobileTimelineBarProps> = ({
       slotActions.play();
     }
   }, [isPlaying, slotActions]);
+
+  // Timeline interaction refs and state
+  const timelineBarRef = useRef<HTMLDivElement>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const lastSeekTimeRef = useRef<number>(0);
+  const throttleDelayMs = 50; // Throttle to max 20 updates per second
+
+  // Handle timeline click/drag to seek time
+  const handleTimelineInteraction = useCallback(
+    (clientX: number) => {
+      if (!timelineBarRef.current) return;
+
+      // Throttle the seek calls to prevent maximum update depth error
+      const now = Date.now();
+      if (now - lastSeekTimeRef.current < throttleDelayMs) {
+        return;
+      }
+      lastSeekTimeRef.current = now;
+
+      const rect = timelineBarRef.current.getBoundingClientRect();
+      const x = clientX - rect.left;
+      const percentage = Math.max(0, Math.min(1, x / rect.width));
+      const rawTimeMs = percentage * 12000; // 12 seconds slot
+
+      // Round to nearest 100ms interval for consistency with slot system updates
+      const timeMs = Math.round(rawTimeMs / 100) * 100;
+
+      // Only seek, don't pause here (pause happens on mouse down)
+      slotActions.seekToTime(timeMs);
+    },
+    [slotActions],
+  );
+
+  const handleMouseDown = useCallback(
+    (e: React.MouseEvent) => {
+      setIsDragging(true);
+      // Pause only once when starting to drag
+      if (isPlaying) {
+        slotActions.pause();
+      }
+      handleTimelineInteraction(e.clientX);
+    },
+    [handleTimelineInteraction, isPlaying, slotActions],
+  );
+
+  const handleTouchStart = useCallback(
+    (e: React.TouchEvent) => {
+      if (e.touches.length === 0) return;
+      setIsDragging(true);
+      // Pause only once when starting to drag
+      if (isPlaying) {
+        slotActions.pause();
+      }
+      handleTimelineInteraction(e.touches[0].clientX);
+    },
+    [handleTimelineInteraction, isPlaying, slotActions],
+  );
+
+  useEffect(() => {
+    if (!isDragging) return;
+
+    const handleMouseMove = (e: MouseEvent) => {
+      handleTimelineInteraction(e.clientX);
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (e.touches.length === 0) return;
+      handleTimelineInteraction(e.touches[0].clientX);
+    };
+
+    const handleEnd = () => {
+      setIsDragging(false);
+    };
+
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleEnd);
+    document.addEventListener('touchmove', handleTouchMove);
+    document.addEventListener('touchend', handleEnd);
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleEnd);
+      document.removeEventListener('touchmove', handleTouchMove);
+      document.removeEventListener('touchend', handleEnd);
+    };
+  }, [isDragging, handleTimelineInteraction]);
 
   // Track previous time for reset detection
   const [previousTimeMs, setPreviousTimeMs] = React.useState(currentTimeMs);
@@ -66,7 +150,7 @@ const MobileTimelineBar: React.FC<MobileTimelineBarProps> = ({
   // Get the current phase
   const currentPhase = useMemo(() => {
     return getCurrentPhase(
-      currentTime,
+      currentTimeMs,
       nodeBlockSeen,
       nodeBlockP2P,
       blockTime,
@@ -74,7 +158,7 @@ const MobileTimelineBar: React.FC<MobileTimelineBarProps> = ({
       totalExpectedAttestations,
     );
   }, [
-    currentTime,
+    currentTimeMs,
     nodeBlockSeen,
     nodeBlockP2P,
     blockTime,
@@ -157,7 +241,7 @@ const MobileTimelineBar: React.FC<MobileTimelineBarProps> = ({
       propagationTime = blockTime;
     } else {
       // No fallback - if no block data, use the current time
-      propagationTime = currentTime;
+      propagationTime = currentTimeMs;
     }
 
     // --- Find attestation transition time ---
@@ -190,7 +274,7 @@ const MobileTimelineBar: React.FC<MobileTimelineBarProps> = ({
     // No fallbacks - only use real data
     if (attestationTime === null) {
       // If no attestation data, use current time
-      attestationTime = currentTime;
+      attestationTime = currentTimeMs;
     }
 
     // --- Find acceptance transition time (66% attestations) ---
@@ -227,7 +311,7 @@ const MobileTimelineBar: React.FC<MobileTimelineBarProps> = ({
     // No fallbacks - only use real data
     if (acceptanceTime === null) {
       // If no acceptance data, use current time
-      acceptanceTime = currentTime;
+      acceptanceTime = currentTimeMs;
     }
 
     // Ensure transitions are in proper order (but don't force specific times)
@@ -277,7 +361,7 @@ const MobileTimelineBar: React.FC<MobileTimelineBarProps> = ({
         accepted: acceptedWidth,
       },
     };
-  }, [nodeBlockSeen, nodeBlockP2P, blockTime, slotData, totalExpectedAttestations, currentTime]);
+  }, [nodeBlockSeen, nodeBlockP2P, blockTime, slotData, totalExpectedAttestations, currentTimeMs]);
 
   return (
     <div className="p-3 pb-4">
@@ -286,7 +370,10 @@ const MobileTimelineBar: React.FC<MobileTimelineBarProps> = ({
         <div className="flex items-center gap-1.5">
           <button
             onClick={goToPreviousSlot}
-            className="bg-surface p-1 rounded border border-subtle hover:bg-hover transition"
+            className={`bg-surface p-1 rounded border border-subtle transition ${
+              isPrevDisabled ? 'opacity-50 cursor-not-allowed' : 'hover:bg-hover'
+            }`}
+            disabled={isPrevDisabled}
             title="Previous Slot"
           >
             <svg
@@ -304,13 +391,8 @@ const MobileTimelineBar: React.FC<MobileTimelineBarProps> = ({
 
           <button
             onClick={resetToCurrentSlot}
-            className={`px-1.5 py-0.5 rounded border font-medium text-xs ${
-              displaySlotOffset === 0
-                ? 'bg-accent/20 border-accent/50 text-accent'
-                : 'bg-surface border-subtle text-secondary hover:bg-hover'
-            } transition`}
-            disabled={displaySlotOffset === 0}
-            title="Return to Current Slot"
+            className="px-1.5 py-0.5 rounded border font-medium text-xs bg-surface border-subtle text-secondary hover:bg-hover transition"
+            title="Return to Head Slot"
           >
             Live
           </button>
@@ -391,7 +473,7 @@ const MobileTimelineBar: React.FC<MobileTimelineBarProps> = ({
         {/* Building phase icon - Always shows as active during building, completed after */}
         <div
           className={`flex flex-col items-center transition-opacity duration-300 ${
-            currentTime < transitionTimes.propagation ? 'opacity-100' : 'opacity-80'
+            currentTimeMs < transitionTimes.propagation ? 'opacity-100' : 'opacity-80'
           }`}
         >
           <div
@@ -414,7 +496,7 @@ const MobileTimelineBar: React.FC<MobileTimelineBarProps> = ({
         {/* Relaying phase icon - Active during propagating, dimmed otherwise */}
         <div
           className={`flex flex-col items-center transition-opacity duration-300 ${
-            currentTime >= transitionTimes.propagation ? 'opacity-100' : 'opacity-60'
+            currentTimeMs >= transitionTimes.propagation ? 'opacity-100' : 'opacity-60'
           }`}
         >
           <div
@@ -439,7 +521,7 @@ const MobileTimelineBar: React.FC<MobileTimelineBarProps> = ({
         {/* Attesting phase icon - Active during attesting, dimmed before, completed after */}
         <div
           className={`flex flex-col items-center transition-opacity duration-300 ${
-            currentTime >= transitionTimes.attestation ? 'opacity-100' : 'opacity-60'
+            currentTimeMs >= transitionTimes.attestation ? 'opacity-100' : 'opacity-60'
           }`}
         >
           <div
@@ -464,7 +546,7 @@ const MobileTimelineBar: React.FC<MobileTimelineBarProps> = ({
         {/* Accepted phase icon - Only active during acceptance phase */}
         <div
           className={`flex flex-col items-center transition-opacity duration-300 ${
-            currentTime >= transitionTimes.acceptance ? 'opacity-100' : 'opacity-60'
+            currentTimeMs >= transitionTimes.acceptance ? 'opacity-100' : 'opacity-60'
           }`}
         >
           <div
@@ -487,7 +569,12 @@ const MobileTimelineBar: React.FC<MobileTimelineBarProps> = ({
 
       {/* Enhanced progress bar with all phases */}
       <div className="relative pt-2 pb-4">
-        <div className="h-2 mb-2 flex rounded-lg overflow-hidden border border-subtle relative">
+        <div
+          ref={timelineBarRef}
+          className="h-2 mb-2 flex rounded-lg overflow-hidden border border-subtle relative cursor-pointer"
+          onMouseDown={handleMouseDown}
+          onTouchStart={handleTouchStart}
+        >
           {/* Building phase */}
           <div
             className="border-r border-white/5 transition-colors duration-300"
@@ -574,7 +661,7 @@ const MobileTimelineBar: React.FC<MobileTimelineBarProps> = ({
           className="absolute top-2 h-2 bg-white"
           style={{
             width: '2px',
-            left: `${(currentTime / (slotData?.network?.config?.SECONDS_PER_SLOT ? slotData.network.config.SECONDS_PER_SLOT * 1000 : 12000)) * 100}%`,
+            left: `${(currentTimeMs / (slotData?.network?.config?.SECONDS_PER_SLOT ? slotData.network.config.SECONDS_PER_SLOT * 1000 : 12000)) * 100}%`,
             boxShadow: '0 0 5px rgba(255, 255, 255, 0.8)',
             transition: isReset ? 'none' : 'left 50ms linear',
           }}
