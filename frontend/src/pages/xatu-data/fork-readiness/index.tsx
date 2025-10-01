@@ -22,7 +22,7 @@ const CLIENT_METADATA: Record<string, { name: string; logo?: string }> = {
   lighthouse: { name: 'Lighthouse' },
   lodestar: { name: 'Lodestar' },
   nimbus: { name: 'Nimbus' },
-  grandine: { name: 'Grandine' },
+  grandine: { name: 'Grandine', logo: 'jpg' },
   tysm: { name: 'Tysm', logo: 'jpg' },
 };
 
