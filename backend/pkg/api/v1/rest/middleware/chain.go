@@ -36,5 +36,6 @@ func DefaultChain(log logrus.FieldLogger, path string) Chain {
 		WithRecovery(log),
 		WithLogging(log),
 		WithMetrics(path),
+		WithGzip(log),
 	)
 }
