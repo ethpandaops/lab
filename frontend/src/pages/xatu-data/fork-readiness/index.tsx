@@ -105,7 +105,10 @@ function ForkReadiness() {
     return (
       availableForks
         .map(fork => {
-          const clientReadiness = Object.entries(fork.data.min_client_versions || {})
+          const knownClientNames = Object.keys(fork.data.min_client_versions || {});
+
+          // Process known clients
+          const knownClientReadiness = Object.entries(fork.data.min_client_versions || {})
             .map(([clientName, minVersion]) => {
               const clientNodes = nodes.filter(n => n.consensus_client === clientName);
               const readyNodes = clientNodes.filter(n => {
@@ -139,8 +142,47 @@ function ForkReadiness() {
                 })),
               };
             })
-            .filter(client => client.totalNodes > 0) // Only show clients with nodes
-            .sort((a, b) => b.totalNodes - a.totalNodes);
+            .filter(client => client.totalNodes > 0); // Only show clients with nodes
+
+          // Find and group unknown clients
+          const unknownNodes = nodes.filter(n => !knownClientNames.includes(n.consensus_client));
+          const unknownClientGroups = {};
+
+          // Group unknown nodes by consensus_client
+          unknownNodes.forEach(node => {
+            if (!unknownClientGroups[node.consensus_client]) {
+              unknownClientGroups[node.consensus_client] = [];
+            }
+            unknownClientGroups[node.consensus_client].push(node);
+          });
+
+          // Create readiness entries for unknown clients
+          const unknownClientReadiness = Object.entries(unknownClientGroups).map(
+            ([clientName, clientNodes]) => ({
+              name: clientName,
+              totalNodes: clientNodes.length,
+              readyNodes: 0, // Unknown clients are never ready
+              readyPercentage: 0, // Always 0% ready
+              minVersion: 'Not configured',
+              isUnknown: true, // Flag to identify unknown clients
+              nodes: clientNodes.map(n => ({
+                name: n.client_name,
+                version: n.consensus_version,
+                isReady: false, // Always not ready
+              })),
+            }),
+          );
+
+          // Combine and sort all clients (unknown clients always last)
+          const clientReadiness = [...knownClientReadiness, ...unknownClientReadiness].sort(
+            (a, b) => {
+              // Unknown clients always come after known clients
+              if (a.isUnknown && !b.isUnknown) return 1;
+              if (!a.isUnknown && b.isUnknown) return -1;
+              // Within the same category, sort by total nodes
+              return b.totalNodes - a.totalNodes;
+            },
+          );
 
           const totalNodes = clientReadiness.reduce((acc, client) => acc + client.totalNodes, 0);
           const readyNodes = clientReadiness.reduce((acc, client) => acc + client.readyNodes, 0);
@@ -354,8 +396,18 @@ function ForkReadiness() {
                                     {CLIENT_METADATA[client.name]?.name || client.name}
                                   </div>
                                   <div className="text-xs font-mono text-tertiary mt-0.5">
-                                    min v{client.minVersion} · {client.readyPercentage.toFixed(1)}%
-                                    ready ({client.readyNodes}/{client.totalNodes})
+                                    {client.isUnknown ? (
+                                      <>
+                                        <span className="text-warning">Not configured</span> · 0%
+                                        ready ({client.readyNodes}/{client.totalNodes})
+                                      </>
+                                    ) : (
+                                      <>
+                                        min v{client.minVersion} ·{' '}
+                                        {client.readyPercentage.toFixed(1)}% ready (
+                                        {client.readyNodes}/{client.totalNodes})
+                                      </>
+                                    )}
                                   </div>
                                 </div>
                               </div>
@@ -504,9 +556,18 @@ function ForkReadiness() {
                                             {CLIENT_METADATA[client.name]?.name || client.name}
                                           </div>
                                           <div className="text-xs font-mono text-tertiary mt-0.5">
-                                            min v{client.minVersion} ·{' '}
-                                            {client.readyPercentage.toFixed(1)}% ready (
-                                            {client.readyNodes}/{client.totalNodes})
+                                            {client.isUnknown ? (
+                                              <>
+                                                <span className="text-warning">Not configured</span>{' '}
+                                                · 0% ready ({client.readyNodes}/{client.totalNodes})
+                                              </>
+                                            ) : (
+                                              <>
+                                                min v{client.minVersion} ·{' '}
+                                                {client.readyPercentage.toFixed(1)}% ready (
+                                                {client.readyNodes}/{client.totalNodes})
+                                              </>
+                                            )}
                                           </div>
                                         </div>
                                       </div>
