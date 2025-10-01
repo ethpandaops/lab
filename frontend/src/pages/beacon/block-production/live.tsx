@@ -1,17 +1,13 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
+import React, { useState, useEffect, useMemo } from 'react';
 import useBeacon from '@/contexts/beacon';
 import { useSlotData } from '@/hooks/useSlotData';
-import { useSlotDataWithPreload } from '@/hooks/useSlotDataWithPreload';
 import { useSlotState, useSlotConfig, useSlotActions } from '@/hooks/useSlot';
 import { useDebugSection } from '@/hooks/useDebugSection';
-import SlotDataStore from '@/utils/SlotDataStore';
 import { useNetwork } from '@/stores/appStore';
 import {
   MobileBlockProductionView,
   DesktopBlockProductionView,
   generateConsistentColor,
-  getTransformedBids,
   BidData,
 } from '@/components/beacon/block_production';
 import { hasNonEmptyDeliveredPayloads } from '@/components/beacon/block_production/common/blockUtils';
@@ -24,7 +20,6 @@ import { hasNonEmptyDeliveredPayloads } from '@/components/beacon/block_producti
 function BlockProductionLivePage() {
   // Use network directly from NetworkContext
   const { selectedNetwork } = useNetwork();
-  const queryClient = useQueryClient();
 
   // Use centralized slot management
   const { currentSlot, isPlaying, mode } = useSlotState();
@@ -68,186 +63,18 @@ function BlockProductionLivePage() {
   const { getBeaconClock } = useBeacon();
   const clock = getBeaconClock(selectedNetwork);
 
-  // Get the slot data store instance for extra prefetching
-  const slotDataStore = useMemo(() => SlotDataStore.getInstance(), []);
-
-  // Reference for tracking prefetched slots
-  const prefetchedSlotsRef = useRef<Set<number>>(new Set());
-
-  // Extra prefetching function for block production's specific needs
-  const prefetchSlotData = React.useCallback(
-    async (slotNumber: number | null, direction: 'next' | 'previous') => {
-      if (slotNumber === null) return;
-
-      // Don't try to prefetch slots that are too far in the future
-      if (direction === 'next' && headSlot !== null && slotNumber > headSlot + 1) return;
-
-      // Don't prefetch negative slots
-      if (slotNumber < 0) return;
-
-      try {
-        // First check the global slot data store
-        if (slotDataStore.hasSlotData(selectedNetwork, slotNumber)) {
-          // Still need to update React Query cache with this data for the component to use it
-          const storeData = slotDataStore.getSlotData(selectedNetwork, slotNumber);
-          // The unified hook uses different query keys internally based on mode
-          // We'll set both potential keys to be safe
-          queryClient.setQueryData(['slotData', selectedNetwork, slotNumber], { data: storeData });
-          queryClient.setQueryData(['slotData-grpc', selectedNetwork, slotNumber], {
-            data: storeData,
-          });
-          return;
-        }
-
-        // Create query keys for both REST and gRPC (the hook decides which to use)
-        const restKey = ['slotData', selectedNetwork, slotNumber];
-        const grpcKey = ['slotData-grpc', selectedNetwork, slotNumber];
-
-        // Check if we already have data in React Query cache
-        const existingRestData = queryClient.getQueryData(restKey);
-        const existingGrpcData = queryClient.getQueryData(grpcKey);
-        const existingData = existingRestData || existingGrpcData;
-
-        if (existingData) {
-          // We already have this data in the cache, store it in our global store too
-          slotDataStore.storeSlotData(selectedNetwork, slotNumber, existingData);
-          return;
-        }
-
-        // Since we're using the unified hook, we can't directly prefetch
-        // The best approach is to let the hook handle its own prefetching
-        // The unified hook will decide whether to use REST or gRPC internally
-      } catch (error) {
-        console.error(`[PREFETCH] Failed to prefetch data for slot ${slotNumber}:`, error);
-      }
-    },
-    [headSlot, selectedNetwork, queryClient, slotDataStore],
-  );
-
-  // Prefetching next slot's data
-  const prefetchNextSlotData = React.useCallback(
-    async (nextSlotNumber: number | null) => {
-      await prefetchSlotData(nextSlotNumber, 'next');
-    },
-    [prefetchSlotData],
-  );
-
-  // Prefetching previous slot's data
-  const prefetchPreviousSlotData = React.useCallback(
-    async (prevSlotNumber: number | null) => {
-      await prefetchSlotData(prevSlotNumber, 'previous');
-    },
-    [prefetchSlotData],
-  );
-
-  // Helper function for prefetching multiple slots (defined outside of effects)
-  const prefetchMultipleSlotsCallback = React.useCallback(
-    (baseSlotNumber: number, count: number) => {
-      // Skip invalid inputs
-      if (baseSlotNumber === null || count <= 0) return;
-
-      // Prefetch 'count' slots ahead
-      for (let i = 0; i < count; i++) {
-        const slotToPrefetch = baseSlotNumber + i;
-
-        // Skip if we've already prefetched this slot in this cycle
-        if (prefetchedSlotsRef.current.has(slotToPrefetch)) continue;
-
-        // Mark as prefetched for this cycle
-        prefetchedSlotsRef.current.add(slotToPrefetch);
-
-        // Queue the prefetch with a small delay to avoid overwhelming the API
-        const delay = i * 200; // Stagger prefetches by 200ms
-
-        // Use setTimeout outside of the component rendering
-        setTimeout(() => {
-          prefetchNextSlotData(slotToPrefetch);
-        }, delay);
-      }
-    },
-    [prefetchNextSlotData],
-  );
-
-  // Staggered prefetching in response to timer thresholds
-  const prefetchAtTimerThreshold = React.useCallback(
-    (nextDisplaySlot: number, timeToNextSlot: number, timeInSlot: number) => {
-      // At 11s (start of slot), prefetch the next 3 slots
-      if (timeToNextSlot <= 11000 && timeToNextSlot > 10900) {
-        prefetchMultipleSlotsCallback(nextDisplaySlot, 3);
-      }
-      // At 10s, prefetch the next slot
-      else if (timeToNextSlot <= 10000 && timeToNextSlot > 9900) {
-        prefetchNextSlotData(nextDisplaySlot);
-      }
-      // At 5s, prefetch the next 2 slots again (refresh data)
-      else if (timeToNextSlot <= 5000 && timeToNextSlot > 4900) {
-        prefetchMultipleSlotsCallback(nextDisplaySlot, 2);
-      }
-      // At 1s, prefetch just the next slot (final refresh before transition)
-      else if (timeToNextSlot <= 1000 && timeToNextSlot > 900) {
-        prefetchNextSlotData(nextDisplaySlot);
-      }
-      // At the very start of a new slot, reset the prefetched slots tracker
-      else if (timeInSlot < 100) {
-        prefetchedSlotsRef.current = new Set();
-      }
-    },
-    [prefetchNextSlotData, prefetchMultipleSlotsCallback],
-  );
-
-  // Enhanced early prefetching at multiple time points and multiple slots ahead
-  useEffect(() => {
-    if (!selectedNetwork || !clock) return;
-
-    // Function to check if we should prefetch - avoids calling hooks inside
-    const checkAndPrefetch = () => {
-      // Get current time in slot (milliseconds)
-      // Use the correct method from BeaconClock to calculate time in slot
-      const slotDuration = 12000; // 12 seconds in ms
-      const slotProgress = clock ? clock.getCurrentSlotProgress() : 0;
-      const timeInSlot = slotProgress * slotDuration;
-      const timeToNextSlot = slotDuration - timeInSlot;
-
-      // Calculate the next slot we'll need to display
-      const nextDisplaySlot = (displaySlot || 0) + 1;
-
-      // Use the callback for prefetching based on timer thresholds
-      prefetchAtTimerThreshold(nextDisplaySlot, timeToNextSlot, timeInSlot);
-    };
-
-    // Run the check every 1000ms
-    const intervalId = setInterval(checkAndPrefetch, 1000);
-
-    // Initial prefetch of current and next slots when component mounts or network changes
-    if (displaySlot !== null && displaySlot >= 0) {
-      // Clear any previously prefetched slots when network changes
-      prefetchedSlotsRef.current = new Set();
-
-      // Safely prefetch the initial slots for the current network
-      prefetchMultipleSlotsCallback(displaySlot, 2);
-    }
-
-    return () => {
-      clearInterval(intervalId);
-    };
-  }, [
-    selectedNetwork,
-    clock,
-    displaySlot,
-    prefetchNextSlotData,
-    prefetchMultipleSlotsCallback,
-    prefetchAtTimerThreshold,
-  ]);
-
   // Check if we can navigate forward - disable when currentSlot can't advance further
-  // The nextSlot action in slot context won't advance past maxSlot
   const isNextDisabled = currentSlot >= maxSlot;
 
-  // Use slot data with preload for current display slot
-  const { data: slotData, isLoading: isSlotLoading } = useSlotDataWithPreload(
-    selectedNetwork,
-    displaySlot !== null && displaySlot >= 0,
-  );
+  // Use slot data for current display slot with prefetch at 8 seconds
+  const { data: slotData, isLoading: isSlotLoading } = useSlotData({
+    network: selectedNetwork,
+    slot: displaySlot !== null && displaySlot >= 0 ? displaySlot : undefined,
+    isLive: true,
+    enabled: displaySlot !== null && displaySlot >= 0,
+    prefetchNext: true, // Enable prefetch at 8s mark for smooth transitions
+    prefetchAt: 8000, // Trigger prefetch at 8000ms into the slot
+  });
 
   // Also fetch previous slot data for the blockchain visualization
   const { data: prevSlotData } = useSlotData({

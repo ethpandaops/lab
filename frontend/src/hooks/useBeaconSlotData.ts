@@ -119,8 +119,9 @@ export function useBeaconSlotData(
       }
     },
     enabled: !!slot && enabled && useRestApi,
-    staleTime: 11000,
-    refetchInterval: isLive ? 12000 : false,
+    staleTime: 60000, // 60s - data stays fresh longer than refetch interval
+    refetchInterval: isLive ? 20000 : false, // 20s - less aggressive polling
+    placeholderData: previousData => previousData, // Keep showing previous data while refetching
     retry: (failureCount, error) => {
       // Don't retry if slot doesn't exist (404)
       if (error?.message?.includes('404')) {
