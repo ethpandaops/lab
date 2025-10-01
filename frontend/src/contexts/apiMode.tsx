@@ -12,25 +12,29 @@ const ApiModeContext = createContext<ApiModeContextType>({
 
 export const ApiModeProvider = ({ children }: { children: ReactNode }) => {
   const [useRestApi, setUseRestApi] = useState(() => {
-    const stored = localStorage.getItem('useRestApiGlobal');
-    return stored === 'true';
+    const stored = localStorage.getItem('useLegacyAPI');
+    return stored !== 'true'; // Default to REST (true), only false if explicitly set to legacy
   });
 
   const toggleApiMode = () => {
     setUseRestApi(prev => {
       const newValue = !prev;
-      localStorage.setItem('useRestApiGlobal', String(newValue));
-      console.log('API mode toggled to:', newValue ? 'REST' : 'gRPC');
+      localStorage.setItem('useLegacyAPI', String(!newValue)); // Store inverted value
+      console.log('API mode toggled to:', newValue ? 'REST' : 'gRPC (legacy)');
       return newValue;
     });
   };
 
   useEffect(() => {
     // Log current API mode on mount
-    console.log('API mode initialized:', useRestApi ? 'REST' : 'gRPC');
+    console.log('API mode initialized:', useRestApi ? 'REST (default)' : 'gRPC (legacy)');
   }, []);
 
-  return <ApiModeContext.Provider value={{ useRestApi, toggleApiMode }}>{children}</ApiModeContext.Provider>;
+  return (
+    <ApiModeContext.Provider value={{ useRestApi, toggleApiMode }}>
+      {children}
+    </ApiModeContext.Provider>
+  );
 };
 
 export const useApiMode = () => {

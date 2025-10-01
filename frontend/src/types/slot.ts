@@ -11,6 +11,7 @@ export function extractSlotBounds(
   config: GetExperimentConfigResponse,
   network: string,
 ): SlotBounds | null {
+  // With network-specific config, dataAvailability should only have one network's data
   const dataAvailability = config.experiment?.dataAvailability
     ? (config.experiment.dataAvailability as Record<string, unknown>)[network]
     : undefined;

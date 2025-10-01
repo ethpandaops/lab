@@ -26,6 +26,7 @@ export function LocallyBuiltBlocks() {
 
   // Fetch experiment config to get data availability bounds
   const { data: experimentConfig, isLoading: isLoadingConfig } = useExperimentConfig(
+    selectedNetwork,
     'locally-built-blocks',
     {
       refetchInterval: 10_000,

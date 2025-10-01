@@ -58,12 +58,16 @@ export class RestApiClient {
   }
 
   /**
-   * Get experiment configuration
+   * Get experiment configuration for a specific network
+   * @param network Network name
    * @param experimentId Experiment identifier
    * @returns GetExperimentConfigResponse
    */
-  async getExperimentConfig(experimentId: string): Promise<GetExperimentConfigResponse> {
-    const url = `${this.baseUrl}${API_V1_ENDPOINTS.experimentConfig(experimentId)}`;
+  async getExperimentConfig(
+    network: string,
+    experimentId: string,
+  ): Promise<GetExperimentConfigResponse> {
+    const url = `${this.baseUrl}${API_V1_ENDPOINTS.experimentConfig(network, experimentId)}`;
 
     console.log('Fetching experiment config from:', url);
     const response = await this.fetchWithRetry<any>(url);

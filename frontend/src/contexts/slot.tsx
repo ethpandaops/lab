@@ -76,6 +76,7 @@ export function SlotProvider({
   const [isStalled, setIsStalled] = useState<boolean>(false);
   const [pauseReason, setPauseReason] = useState<'manual' | 'boundary' | null>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const prevNetworkRef = useRef<string>(network);
   const stateRef = useRef({
     isPlaying,
     slotDuration,
@@ -84,6 +85,21 @@ export function SlotProvider({
     playbackSpeed,
     currentSlot,
   });
+
+  // Reset slot when network changes
+  useEffect(() => {
+    if (network !== prevNetworkRef.current) {
+      prevNetworkRef.current = network;
+      const newInitialSlot = getInitialSlot();
+      setCurrentSlot(newInitialSlot);
+      setSlotProgress(0);
+      slotProgressRef.current = 0;
+      // Keep playing state if it was playing
+      if (isPlaying && initialPlaying) {
+        setIsPlaying(true);
+      }
+    }
+  }, [network, minSlot, maxSlot]); // Don't include getInitialSlot as it's defined inline
 
   useEffect(() => {
     if (initialSlot === undefined && beaconClock && currentSlot === maxSlot) {

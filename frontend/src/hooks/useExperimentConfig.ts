@@ -9,16 +9,17 @@ interface UseExperimentConfigOptions {
 }
 
 export function useExperimentConfig(
+  network: string,
   experimentId: string,
   options: UseExperimentConfigOptions = {},
 ) {
   const { enabled = true, refetchInterval = false, staleTime = 10_000 } = options;
 
   return useQuery<GetExperimentConfigResponse>({
-    queryKey: ['experimentConfig', experimentId],
+    queryKey: ['experimentConfig', network, experimentId],
     queryFn: async () => {
       const client = await getRestApiClient();
-      return client.getExperimentConfig(experimentId);
+      return client.getExperimentConfig(network, experimentId);
     },
     enabled,
     staleTime,

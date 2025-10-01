@@ -8,7 +8,8 @@
 export const API_V1_ENDPOINTS = {
   nodes: (network: string) => `/api/v1/${network}/nodes`,
   config: '/api/v1/config',
-  experimentConfig: (experimentId: string) => `/api/v1/experiments/${experimentId}/config`,
+  experimentConfig: (network: string, experimentId: string) =>
+    `/api/v1/${network}/experiments/${experimentId}/config`,
   // Beacon slot endpoints
   beaconBlock: (network: string, slot: number) => `/api/v1/${network}/beacon/slot/${slot}/block`,
   beaconBlockTiming: (network: string, slot: number) =>

@@ -21,7 +21,8 @@ export const Route = createFileRoute('/_layout/experiments/$experimentId')({
   validateSearch: experimentSearchSchema,
   loader: async ({ params }) => {
     const client = await getRestApiClient();
-    const experimentConfig = await client.getExperimentConfig(params.experimentId);
+    // Use mainnet as default for initial load, component will fetch correct network
+    const experimentConfig = await client.getExperimentConfig('mainnet', params.experimentId);
     return {
       experimentId: params.experimentId,
       experimentConfig,
@@ -82,15 +83,26 @@ function ExperimentLayout() {
   const search = Route.useSearch();
   const { selectedNetwork } = useNetwork();
 
-  const { data: experimentConfig } = useExperimentConfig(experimentId, {
+  const { data: experimentConfig } = useExperimentConfig(selectedNetwork, experimentId, {
     refetchInterval: 10_000,
     staleTime: 10_000,
   });
 
   const activeConfig = experimentConfig ?? loaderConfig;
 
-  const availableNetworks = activeConfig.experiment?.networks ?? [];
-  const isNetworkAvailable = availableNetworks.includes(selectedNetwork);
+  // Memoize bounds to prevent unnecessary re-renders when config refetches
+  // MUST be called before any conditional returns to satisfy React rules of hooks
+  const bounds = useMemo(() => {
+    return extractSlotBounds(activeConfig, selectedNetwork);
+  }, [
+    activeConfig.experiment?.dataAvailability,
+    selectedNetwork,
+  ]);
+
+  // With network-specific config, if we have data_availability for this network, it's available
+  const hasDataAvailability = activeConfig.experiment?.dataAvailability &&
+    Object.keys(activeConfig.experiment.dataAvailability).includes(selectedNetwork);
+  const isNetworkAvailable = hasDataAvailability && activeConfig.experiment?.enabled;
 
   if (!isNetworkAvailable) {
     return (
@@ -102,9 +114,11 @@ function ExperimentLayout() {
             <p className="text-sm/6 text-secondary">
               Experiment "{experimentId}" is not available for network "{selectedNetwork}".
             </p>
-            <p className="text-sm/6 text-secondary">
-              Available networks: {availableNetworks.join(', ')}
-            </p>
+            {activeConfig.experiment?.dataAvailability && (
+              <p className="text-sm/6 text-secondary">
+                Available networks: {Object.keys(activeConfig.experiment.dataAvailability).join(', ')}
+              </p>
+            )}
           </div>
         </div>
       </div>
@@ -120,14 +134,6 @@ function ExperimentLayout() {
       </div>
     );
   }
-
-  // Memoize bounds to prevent unnecessary re-renders when config refetches
-  const bounds = useMemo(() => {
-    return extractSlotBounds(activeConfig, selectedNetwork);
-  }, [
-    activeConfig.experiment?.dataAvailability,
-    selectedNetwork,
-  ]);
 
   if (!bounds) {
     return (
