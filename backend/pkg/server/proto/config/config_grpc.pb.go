@@ -19,8 +19,9 @@ import (
 const _ = grpc.SupportPackageIsVersion8
 
 const (
-	ConfigService_GetConfig_FullMethodName           = "/config.ConfigService/GetConfig"
-	ConfigService_GetExperimentConfig_FullMethodName = "/config.ConfigService/GetExperimentConfig"
+	ConfigService_GetConfig_FullMethodName                  = "/config.ConfigService/GetConfig"
+	ConfigService_GetExperimentConfig_FullMethodName        = "/config.ConfigService/GetExperimentConfig"
+	ConfigService_GetNetworkExperimentConfig_FullMethodName = "/config.ConfigService/GetNetworkExperimentConfig"
 )
 
 // ConfigServiceClient is the client API for ConfigService service.
@@ -34,6 +35,8 @@ type ConfigServiceClient interface {
 	GetConfig(ctx context.Context, in *GetConfigRequest, opts ...grpc.CallOption) (*GetConfigResponse, error)
 	// GetExperimentConfig returns a single experiment's configuration with data availability.
 	GetExperimentConfig(ctx context.Context, in *GetExperimentConfigRequest, opts ...grpc.CallOption) (*GetExperimentConfigResponse, error)
+	// GetNetworkExperimentConfig returns a single experiment's configuration with data availability for a specific network.
+	GetNetworkExperimentConfig(ctx context.Context, in *GetNetworkExperimentConfigRequest, opts ...grpc.CallOption) (*GetExperimentConfigResponse, error)
 }
 
 type configServiceClient struct {
@@ -64,6 +67,16 @@ func (c *configServiceClient) GetExperimentConfig(ctx context.Context, in *GetEx
 	return out, nil
 }
 
+func (c *configServiceClient) GetNetworkExperimentConfig(ctx context.Context, in *GetNetworkExperimentConfigRequest, opts ...grpc.CallOption) (*GetExperimentConfigResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetExperimentConfigResponse)
+	err := c.cc.Invoke(ctx, ConfigService_GetNetworkExperimentConfig_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ConfigServiceServer is the server API for ConfigService service.
 // All implementations must embed UnimplementedConfigServiceServer
 // for forward compatibility
@@ -75,6 +88,8 @@ type ConfigServiceServer interface {
 	GetConfig(context.Context, *GetConfigRequest) (*GetConfigResponse, error)
 	// GetExperimentConfig returns a single experiment's configuration with data availability.
 	GetExperimentConfig(context.Context, *GetExperimentConfigRequest) (*GetExperimentConfigResponse, error)
+	// GetNetworkExperimentConfig returns a single experiment's configuration with data availability for a specific network.
+	GetNetworkExperimentConfig(context.Context, *GetNetworkExperimentConfigRequest) (*GetExperimentConfigResponse, error)
 	mustEmbedUnimplementedConfigServiceServer()
 }
 
@@ -87,6 +102,9 @@ func (UnimplementedConfigServiceServer) GetConfig(context.Context, *GetConfigReq
 }
 func (UnimplementedConfigServiceServer) GetExperimentConfig(context.Context, *GetExperimentConfigRequest) (*GetExperimentConfigResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetExperimentConfig not implemented")
+}
+func (UnimplementedConfigServiceServer) GetNetworkExperimentConfig(context.Context, *GetNetworkExperimentConfigRequest) (*GetExperimentConfigResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetNetworkExperimentConfig not implemented")
 }
 func (UnimplementedConfigServiceServer) mustEmbedUnimplementedConfigServiceServer() {}
 
@@ -137,6 +155,24 @@ func _ConfigService_GetExperimentConfig_Handler(srv interface{}, ctx context.Con
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ConfigService_GetNetworkExperimentConfig_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetNetworkExperimentConfigRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ConfigServiceServer).GetNetworkExperimentConfig(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ConfigService_GetNetworkExperimentConfig_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ConfigServiceServer).GetNetworkExperimentConfig(ctx, req.(*GetNetworkExperimentConfigRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ConfigService_ServiceDesc is the grpc.ServiceDesc for ConfigService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -151,6 +187,10 @@ var ConfigService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetExperimentConfig",
 			Handler:    _ConfigService_GetExperimentConfig_Handler,
+		},
+		{
+			MethodName: "GetNetworkExperimentConfig",
+			Handler:    _ConfigService_GetNetworkExperimentConfig_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

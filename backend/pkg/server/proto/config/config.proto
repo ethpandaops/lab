@@ -13,6 +13,8 @@ service ConfigService {
   rpc GetConfig(GetConfigRequest) returns (GetConfigResponse);
   // GetExperimentConfig returns a single experiment's configuration with data availability.
   rpc GetExperimentConfig(GetExperimentConfigRequest) returns (GetExperimentConfigResponse);
+  // GetNetworkExperimentConfig returns a single experiment's configuration with data availability for a specific network.
+  rpc GetNetworkExperimentConfig(GetNetworkExperimentConfigRequest) returns (GetExperimentConfigResponse);
 }
 
 // GetConfigRequest is empty for now but allows future expansion
@@ -111,6 +113,14 @@ message ExperimentDataAvailability {
 message GetExperimentConfigRequest {
   // The experiment ID to get configuration for
   string experiment_id = 1;
+}
+
+// GetNetworkExperimentConfigRequest defines the request for getting a single experiment's configuration for a specific network.
+message GetNetworkExperimentConfigRequest {
+  // The experiment ID to get configuration for
+  string experiment_id = 1;
+  // The network to get configuration for
+  string network = 2;
 }
 
 // GetExperimentConfigResponse returns a single experiment's full configuration with data availability.

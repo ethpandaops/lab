@@ -164,3 +164,46 @@ func (c *ConfigService) GetExperimentConfig(ctx context.Context, req *config.Get
 		Experiment: experimentConfig,
 	}, nil
 }
+
+// GetNetworkExperimentConfig returns a single experiment's configuration with data availability for a specific network
+func (c *ConfigService) GetNetworkExperimentConfig(ctx context.Context, req *config.GetNetworkExperimentConfigRequest) (*config.GetExperimentConfigResponse, error) {
+	c.log.WithFields(logrus.Fields{
+		"experiment_id": req.ExperimentId,
+		"network":       req.Network,
+	}).Debug("GetNetworkExperimentConfig called")
+
+	// Validate request parameters
+	if req.ExperimentId == "" {
+		return nil, fmt.Errorf("experiment_id is required")
+	}
+
+	if req.Network == "" {
+		return nil, fmt.Errorf("network is required")
+	}
+
+	if c.experimentsService == nil {
+		return nil, fmt.Errorf("experiments service not available")
+	}
+
+	// Get experiment config with data availability for specific network
+	experimentConfig, err := c.experimentsService.GetNetworkExperimentConfig(ctx, req.ExperimentId, req.Network)
+	if err != nil {
+		c.log.WithError(err).
+			WithFields(logrus.Fields{
+				"experiment_id": req.ExperimentId,
+				"network":       req.Network,
+			}).
+			Error("Failed to get network experiment config")
+
+		return nil, fmt.Errorf("failed to get network experiment config: %w", err)
+	}
+
+	// Remove the Networks field for network-specific response
+	// This is done by not setting it in the response, which effectively removes it from the JSON output
+	// as protobuf omits zero/nil values in JSON marshaling
+	experimentConfig.Networks = nil
+
+	return &config.GetExperimentConfigResponse{
+		Experiment: experimentConfig,
+	}, nil
+}
