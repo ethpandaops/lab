@@ -153,7 +153,9 @@ const GeographicalChecklist = () => {
       // Check if any country in this continent matches
       const matchesCountry = Object.keys(networkData.countries || {}).some(country => {
         const countryContinent = COUNTRY_TO_CONTINENT[country];
-        return countryContinent === continent && country.toLowerCase().includes(searchTerm.toLowerCase());
+        return (
+          countryContinent === continent && country.toLowerCase().includes(searchTerm.toLowerCase())
+        );
       });
 
       if ((matchesContinent || matchesCountry) && !newExpandedContinents.has(continent)) {
@@ -209,13 +211,19 @@ const GeographicalChecklist = () => {
 
       // Check if any country in this continent matches
       return countriesByContinent[continent].some(country =>
-        country.name.toLowerCase().includes(searchTerm.toLowerCase())
+        country.name.toLowerCase().includes(searchTerm.toLowerCase()),
       );
     })
     .sort((a, b) => {
       // Sort by total nodes (sum of all countries in continent)
-      const totalNodesA = countriesByContinent[a].reduce((sum, country) => sum + country.data.total_nodes, 0);
-      const totalNodesB = countriesByContinent[b].reduce((sum, country) => sum + country.data.total_nodes, 0);
+      const totalNodesA = countriesByContinent[a].reduce(
+        (sum, country) => sum + country.data.total_nodes,
+        0,
+      );
+      const totalNodesB = countriesByContinent[b].reduce(
+        (sum, country) => sum + country.data.total_nodes,
+        0,
+      );
       return totalNodesB - totalNodesA;
     });
 
@@ -234,7 +242,10 @@ const GeographicalChecklist = () => {
   const totalContinents = Object.keys(CONTINENT_METADATA).length;
   const coveredContinents = Object.keys(CONTINENT_METADATA).filter(continent => {
     const totalNodesInContinent =
-      countriesByContinent[continent]?.reduce((sum, country) => sum + country.data.total_nodes, 0) || 0;
+      countriesByContinent[continent]?.reduce(
+        (sum, country) => sum + country.data.total_nodes,
+        0,
+      ) || 0;
     return totalNodesInContinent > 0;
   }).length;
   const continentCoverage = (coveredContinents / totalContinents) * 100;
@@ -258,7 +269,11 @@ const GeographicalChecklist = () => {
               })}
             </p>
           </div>
-          <NetworkSelector selectedNetwork={selectedNetwork} onNetworkChange={setSelectedNetwork} className="w-48" />
+          <NetworkSelector
+            selectedNetwork={selectedNetwork}
+            onNetworkChange={setSelectedNetwork}
+            className="w-48"
+          />
         </div>
       </div>
 
@@ -279,7 +294,9 @@ const GeographicalChecklist = () => {
                 className="w-full rounded-lg bg-white/10 backdrop-blur-sm border border-subtle pl-11 pr-4 py-3 text-sm font-mono text-white placeholder-secondary/60 focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent transition-all duration-200 hover:bg-white/15 hover:border-subtle/70"
               />
             </div>
-            <div className="mt-2 text-xs font-mono text-tertiary/50 pl-1">Search by country or continent name</div>
+            <div className="mt-2 text-xs font-mono text-tertiary/50 pl-1">
+              Search by country or continent name
+            </div>
           </div>
         </div>
 
@@ -293,7 +310,9 @@ const GeographicalChecklist = () => {
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-2">
                     <MapPin className="h-4 w-4 text-accent/70" />
-                    <p className="text-xs font-mono text-tertiary uppercase tracking-wider">Country Coverage</p>
+                    <p className="text-xs font-mono text-tertiary uppercase tracking-wider">
+                      Country Coverage
+                    </p>
                   </div>
                   <div className="flex items-baseline gap-2">
                     <span className="text-2xl font-mono font-bold bg-gradient-to-r from-accent to-accent/70 bg-clip-text text-transparent">
@@ -325,7 +344,9 @@ const GeographicalChecklist = () => {
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-2">
                     <Globe className="h-4 w-4 text-success/70" />
-                    <p className="text-xs font-mono text-tertiary uppercase tracking-wider">Continent Coverage</p>
+                    <p className="text-xs font-mono text-tertiary uppercase tracking-wider">
+                      Continent Coverage
+                    </p>
                   </div>
                   <div className="flex items-baseline gap-2">
                     <span className="text-2xl font-mono font-bold bg-gradient-to-r from-success to-success/70 bg-clip-text text-transparent">
@@ -373,13 +394,22 @@ const GeographicalChecklist = () => {
           filteredContinents.map(continent => {
             const continentData = countriesByContinent[continent] || [];
             const isExpanded = expandedContinents.has(continent);
-            const continentMeta = CONTINENT_METADATA[continent];
-            const totalNodesInContinent = continentData.reduce((sum, country) => sum + country.data.total_nodes, 0);
+            const continentMeta = CONTINENT_METADATA[continent] || {
+              name: continent,
+              emoji: '🌐',
+              color: 'hsl(200, 60%, 50%)',
+            };
+            const totalNodesInContinent = continentData.reduce(
+              (sum, country) => sum + country.data.total_nodes,
+              0,
+            );
             const hasCoverage = totalNodesInContinent > 0;
 
             // Filter countries based on search term
             const filteredCountries = searchTerm
-              ? continentData.filter(country => country.name.toLowerCase().includes(searchTerm.toLowerCase()))
+              ? continentData.filter(country =>
+                  country.name.toLowerCase().includes(searchTerm.toLowerCase()),
+                )
               : continentData;
 
             // For expanded continents with search, only show top covered countries and those matching search
@@ -424,12 +454,16 @@ const GeographicalChecklist = () => {
                       <div className="flex items-center gap-3 mt-1">
                         <div className="flex items-center gap-1 text-xs font-mono text-tertiary">
                           <MapPin className="h-3 w-3" />
-                          <span>{continentData.filter(country => country.data.total_nodes > 0).length} countries</span>
+                          <span>
+                            {continentData.filter(country => country.data.total_nodes > 0).length}{' '}
+                            countries
+                          </span>
                         </div>
                         <div className="flex items-center gap-1 text-xs font-mono text-accent">
                           <Users className="h-3 w-3" />
                           <span>
-                            {totalNodesInContinent.toLocaleString()} {totalNodesInContinent === 1 ? 'node' : 'nodes'}
+                            {totalNodesInContinent.toLocaleString()}{' '}
+                            {totalNodesInContinent === 1 ? 'node' : 'nodes'}
                           </span>
                         </div>
                       </div>
@@ -479,7 +513,8 @@ const GeographicalChecklist = () => {
                                     <div className="flex items-center gap-1">
                                       <div className="w-1.5 h-1.5 rounded-full bg-success animate-pulse" />
                                       <span className="text-xs font-mono text-accent">
-                                        {country.data.total_nodes} {country.data.total_nodes === 1 ? 'node' : 'nodes'}
+                                        {country.data.total_nodes}{' '}
+                                        {country.data.total_nodes === 1 ? 'node' : 'nodes'}
                                       </span>
                                     </div>
                                   </div>
@@ -504,8 +539,8 @@ const GeographicalChecklist = () => {
       {/* Data Note */}
       <div className="text-center py-4">
         <p className="text-xs font-mono text-tertiary">
-          Note: This data represents only nodes sending data to the Xatu project and is not representative of the total
-          network.
+          Note: This data represents only nodes sending data to the Xatu project and is not
+          representative of the total network.
         </p>
       </div>
     </div>
