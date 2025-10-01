@@ -1576,37 +1576,17 @@ export class ExperimentConfig extends Message<ExperimentConfig> {
  */
 export class ExperimentDataAvailability extends Message<ExperimentDataAvailability> {
   /**
-   * @generated from field: int64 available_from_timestamp = 1;
-   */
-  availableFromTimestamp = protoInt64.zero;
-
-  /**
-   * @generated from field: int64 available_until_timestamp = 2;
-   */
-  availableUntilTimestamp = protoInt64.zero;
-
-  /**
-   * @generated from field: uint64 min_slot = 3;
+   * @generated from field: uint64 min_slot = 1;
    */
   minSlot = protoInt64.zero;
 
   /**
-   * @generated from field: uint64 max_slot = 4;
+   * @generated from field: uint64 max_slot = 2;
    */
   maxSlot = protoInt64.zero;
 
   /**
-   * @generated from field: uint64 safe_slot = 5;
-   */
-  safeSlot = protoInt64.zero;
-
-  /**
-   * @generated from field: uint64 head_slot = 6;
-   */
-  headSlot = protoInt64.zero;
-
-  /**
-   * @generated from field: bool has_data = 7;
+   * @generated from field: bool has_data = 3;
    */
   hasData = false;
 
@@ -1618,13 +1598,9 @@ export class ExperimentDataAvailability extends Message<ExperimentDataAvailabili
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "api.v1.ExperimentDataAvailability";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "available_from_timestamp", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
-    { no: 2, name: "available_until_timestamp", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
-    { no: 3, name: "min_slot", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
-    { no: 4, name: "max_slot", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
-    { no: 5, name: "safe_slot", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
-    { no: 6, name: "head_slot", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
-    { no: 7, name: "has_data", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 1, name: "min_slot", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
+    { no: 2, name: "max_slot", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
+    { no: 3, name: "has_data", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ExperimentDataAvailability {

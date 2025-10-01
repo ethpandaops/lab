@@ -35,13 +35,9 @@ func (r *PublicRouter) handleExperimentConfig(w http.ResponseWriter, req *http.R
 	dataAvailability := make(map[string]*apiv1.ExperimentDataAvailability)
 	for network, availability := range grpcResp.Experiment.DataAvailability {
 		dataAvailability[network] = &apiv1.ExperimentDataAvailability{
-			AvailableFromTimestamp:  availability.AvailableFromTimestamp,
-			AvailableUntilTimestamp: availability.AvailableUntilTimestamp,
-			MinSlot:                 availability.MinSlot,
-			MaxSlot:                 availability.MaxSlot,
-			SafeSlot:                availability.SafeSlot,
-			HeadSlot:                availability.HeadSlot,
-			HasData:                 availability.HasData,
+			MinSlot: availability.MinSlot,
+			MaxSlot: availability.MaxSlot,
+			HasData: availability.HasData,
 		}
 	}
 

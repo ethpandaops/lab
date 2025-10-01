@@ -75,7 +75,7 @@ export class FctAttestationCorrectnessByValidatorCanonical extends Message<FctAt
   inclusionDistance?: number;
 
   /**
-   * Can be "canonical", "orphaned" or "missed"
+   * Can be "canonical", "orphaned", "missed" or "unknown" (validator attested but block data not available)
    *
    * @generated from field: string status = 20;
    */

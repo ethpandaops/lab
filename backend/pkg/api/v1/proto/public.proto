@@ -233,13 +233,9 @@ message ExperimentConfig {
 
 // ExperimentDataAvailability contains data availability information for an experiment on a specific network.
 message ExperimentDataAvailability {
-  int64 available_from_timestamp = 1 [json_name = "availableFromTimestamp"];
-  int64 available_until_timestamp = 2 [json_name = "availableUntilTimestamp"];
-  uint64 min_slot = 3 [json_name = "minSlot"];
-  uint64 max_slot = 4 [json_name = "maxSlot"];
-  uint64 safe_slot = 5 [json_name = "safeSlot"];
-  uint64 head_slot = 6 [json_name = "headSlot"];
-  bool has_data = 7 [json_name = "hasData"];
+  uint64 min_slot = 1 [json_name = "minSlot"];
+  uint64 max_slot = 2 [json_name = "maxSlot"];
+  bool has_data = 3 [json_name = "hasData"];
 }
 
 // GetExperimentConfigRequest defines the request for getting a single experiment's configuration.

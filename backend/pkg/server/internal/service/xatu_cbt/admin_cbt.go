@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"strings"
-	"time"
 
 	"github.com/attestantio/go-eth2-client/spec/phase0"
 	pb "github.com/ethpandaops/lab/backend/pkg/server/proto/xatu_cbt"
@@ -59,8 +58,15 @@ func (x *XatuCBT) GetDataAvailability(
 		return nil, fmt.Errorf("no tables specified")
 	}
 
-	// Build the SQL query
-	query := x.buildDataAvailabilityQuery(network, req.Tables, positionField)
+	// Get genesis time for the network
+	genesisTime, err := x.getNetworkGenesisTime(ctx, network)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get genesis time: %w", err)
+	}
+
+	// Build the SQL query with slot calculation
+	secondsPerSlot := int64(12) // Hardcoded for now, can be made configurable later
+	query := x.buildDataAvailabilityQuery(network, req.Tables, positionField, genesisTime, secondsPerSlot)
 
 	// Execute query
 	row, err := client.QueryRow(ctx, query)
@@ -69,69 +75,70 @@ func (x *XatuCBT) GetDataAvailability(
 	}
 
 	// Parse results
-	var availableFromTimestamp, availableUntilTimestamp *time.Time
+	minSlotInterface, hasMinSlot := row["min_slot"]
+	maxSlotInterface, hasMaxSlot := row["max_slot"]
 
-	availableFromInterface, hasFrom := row["available_from"]
-	availableUntilInterface, hasUntil := row["available_until"]
-
-	if !hasFrom || !hasUntil {
+	if !hasMinSlot || !hasMaxSlot {
 		// No overlapping data
 		return &pb.GetDataAvailabilityResponse{
 			HasData: false,
 		}, nil
 	}
 
-	// Convert to time.Time
-	switch v := availableFromInterface.(type) {
-	case time.Time:
-		availableFromTimestamp = &v
-	case *time.Time:
-		availableFromTimestamp = v
+	// Convert to uint64
+	var minSlot, maxSlot uint64
+
+	switch v := minSlotInterface.(type) {
+	case uint64:
+		minSlot = v
+	case int64:
+		if v < 0 {
+			return nil, fmt.Errorf("negative min_slot: %d", v)
+		}
+
+		minSlot = uint64(v)
+	case uint32:
+		minSlot = uint64(v)
+	case int32:
+		if v < 0 {
+			return nil, fmt.Errorf("negative min_slot: %d", v)
+		}
+
+		minSlot = uint64(v)
 	default:
-		return nil, fmt.Errorf("unexpected type for available_from: %T", v)
+		return nil, fmt.Errorf("unexpected type for min_slot: %T", v)
 	}
 
-	switch v := availableUntilInterface.(type) {
-	case time.Time:
-		availableUntilTimestamp = &v
-	case *time.Time:
-		availableUntilTimestamp = v
+	switch v := maxSlotInterface.(type) {
+	case uint64:
+		maxSlot = v
+	case int64:
+		if v < 0 {
+			return nil, fmt.Errorf("negative max_slot: %d", v)
+		}
+
+		maxSlot = uint64(v)
+	case uint32:
+		maxSlot = uint64(v)
+	case int32:
+		if v < 0 {
+			return nil, fmt.Errorf("negative max_slot: %d", v)
+		}
+
+		maxSlot = uint64(v)
 	default:
-		return nil, fmt.Errorf("unexpected type for available_until: %T", v)
-	}
-
-	// Check if we actually have data
-	if availableFromTimestamp == nil || availableUntilTimestamp == nil ||
-		availableFromTimestamp.IsZero() || availableUntilTimestamp.IsZero() {
-		return &pb.GetDataAvailabilityResponse{
-			HasData: false,
-		}, nil
-	}
-
-	// Calculate slots from timestamps using ethereum wallclock
-	minSlot, maxSlot, safeSlot, headSlot, err := x.calculateSlots(
-		ctx,
-		network,
-		*availableFromTimestamp,
-		*availableUntilTimestamp,
-	)
-	if err != nil {
-		return nil, fmt.Errorf("failed to calculate slots: %w", err)
+		return nil, fmt.Errorf("unexpected type for max_slot: %T", v)
 	}
 
 	return &pb.GetDataAvailabilityResponse{
-		AvailableFromTimestamp:  availableFromTimestamp.Unix(),
-		AvailableUntilTimestamp: availableUntilTimestamp.Unix(),
-		MinSlot:                 minSlot,
-		MaxSlot:                 maxSlot,
-		SafeSlot:                safeSlot,
-		HeadSlot:                headSlot,
-		HasData:                 true,
+		MinSlot: minSlot,
+		MaxSlot: maxSlot,
+		HasData: true,
 	}, nil
 }
 
 // buildDataAvailabilityQuery builds the SQL query for checking data availability.
-func (x *XatuCBT) buildDataAvailabilityQuery(network string, tables []string, positionField string) string {
+func (x *XatuCBT) buildDataAvailabilityQuery(network string, tables []string, positionField string, genesisTime int64, secondsPerSlot int64) string {
 	// Build the table list for the IN clause
 	tableList := make([]string, len(tables))
 	for i, table := range tables {
@@ -143,23 +150,26 @@ func (x *XatuCBT) buildDataAvailabilityQuery(network string, tables []string, po
 	positionColumn := "position"
 	intervalColumn := "interval"
 
-	// If positionField is "slot_start_date_time", we're dealing with time-based positions
-	// These are Unix timestamps, so we can directly use them
+	// Build query that calculates slots directly
 	query := fmt.Sprintf(`
-WITH table_ranges AS (
+WITH
+    %d AS genesis_time,
+    %d AS seconds_per_slot
+SELECT
+    intDiv(max(min_position) - genesis_time, seconds_per_slot) AS min_slot,
+    intDiv(min(max_position_end) - genesis_time, seconds_per_slot) AS max_slot
+FROM (
     SELECT
         database,
         table,
-        min(%s) AS min_pos,
-        max(%s) + argMax(%s, %s) AS max_pos_end
+        min(%s) AS min_position,
+        max(%s) + argMax(%s, %s) AS max_position_end
     FROM %s.admin_cbt FINAL
     WHERE (database, table) IN (%s)
     GROUP BY database, table
-)
-SELECT
-    fromUnixTimestamp(max(min_pos)) AS available_from,
-    fromUnixTimestamp(min(max_pos_end)) AS available_until
-FROM table_ranges`,
+)`,
+		genesisTime,
+		secondsPerSlot,
 		positionColumn,
 		positionColumn, intervalColumn, positionColumn,
 		network,
@@ -171,64 +181,29 @@ FROM table_ranges`,
 	return query
 }
 
-// calculateSlots converts timestamps to slot numbers using the ethereum wallclock.
-func (x *XatuCBT) calculateSlots(
-	ctx context.Context,
-	networkName string,
-	availableFrom time.Time,
-	availableUntil time.Time,
-) (minSlot, maxSlot, safeSlot, headSlot uint64, err error) {
-	// Get the ethereum network from cartographoor service
+// getNetworkGenesisTime retrieves the genesis time for a network.
+// It first checks for an override in xatu_cbt config, then falls back to cartographoor.
+func (x *XatuCBT) getNetworkGenesisTime(ctx context.Context, networkName string) (int64, error) {
+	// First check for config override
+	if genesisTimePtr := x.GetNetworkGenesisTime(networkName); genesisTimePtr != nil {
+		return *genesisTimePtr, nil
+	}
+
+	// Fall back to cartographoor
 	if x.cartographoorService == nil {
-		return 0, 0, 0, 0, fmt.Errorf("cartographoor service not available")
+		return 0, fmt.Errorf("cartographoor service not available")
 	}
 
-	// Validate network
-	network, err := x.cartographoorService.ValidateNetwork(ctx, networkName)
-	if err != nil {
-		return 0, 0, 0, 0, fmt.Errorf("failed to validate network: %w", err)
+	network := x.cartographoorService.GetNetwork(networkName)
+	if network == nil {
+		return 0, fmt.Errorf("network %s not found", networkName)
 	}
 
-	// Get wallclock for the network
-	if x.wallclockService == nil {
-		return 0, 0, 0, 0, fmt.Errorf("wallclock service not available")
+	if network.GenesisConfig == nil {
+		return 0, fmt.Errorf("genesis config not available for network %s", networkName)
 	}
 
-	wallclock := x.wallclockService.GetWallclock(network.Name)
-	if wallclock == nil {
-		return 0, 0, 0, 0, fmt.Errorf("wallclock not available for network %s", network.Name)
-	}
-
-	// Get slots for the timestamps
-	minSlotDetail := wallclock.Slots().FromTime(availableFrom)
-	maxSlotDetail := wallclock.Slots().FromTime(availableUntil)
-	currentSlot := wallclock.Slots().Current()
-
-	minSlot = minSlotDetail.Number()
-	maxSlot = maxSlotDetail.Number()
-	headSlot = currentSlot.Number()
-
-	// Calculate safe slot (head - 2 slots for safety)
-	// Use the minimum of maxSlot and (headSlot - 2) to ensure we don't go beyond available data
-	if headSlot > 2 {
-		potentialSafeSlot := headSlot - 2
-		if potentialSafeSlot > maxSlot {
-			safeSlot = maxSlot
-		} else {
-			safeSlot = potentialSafeSlot
-		}
-	} else {
-		safeSlot = 0
-	}
-
-	x.log.WithField("network", networkName).
-		WithField("min_slot", minSlot).
-		WithField("max_slot", maxSlot).
-		WithField("safe_slot", safeSlot).
-		WithField("head_slot", headSlot).
-		Debug("Calculated slots from timestamps")
-
-	return minSlot, maxSlot, safeSlot, headSlot, nil
+	return network.GenesisConfig.GenesisTime, nil
 }
 
 // GetDataAvailabilityForSlot is a helper method to check if a specific slot has data available.

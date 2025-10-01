@@ -107,24 +107,12 @@ message GetDataAvailabilityRequest {
 
 // GetDataAvailabilityResponse returns the data availability information.
 message GetDataAvailabilityResponse {
-  // Unix timestamp (seconds) of the earliest available data across all tables.
-  int64 available_from_timestamp = 1;
+  // Earliest available slot number.
+  uint64 min_slot = 1;
 
-  // Unix timestamp (seconds) of the latest available data across all tables.
-  int64 available_until_timestamp = 2;
-
-  // Earliest available slot number (calculated from available_from_timestamp).
-  uint64 min_slot = 3;
-
-  // Latest available slot number (calculated from available_until_timestamp).
-  uint64 max_slot = 4;
-
-  // Safe slot for "live" view (head - 2 slots from max_slot).
-  uint64 safe_slot = 5;
-
-  // The current head slot of the network.
-  uint64 head_slot = 6;
+  // Latest available slot number.
+  uint64 max_slot = 2;
 
   // Indicates if data is available (overlapping interval exists).
-  bool has_data = 7;
+  bool has_data = 3;
 }

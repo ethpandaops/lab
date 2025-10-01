@@ -34,7 +34,7 @@ type FctNodeActiveLast24H struct {
 	Username string `protobuf:"bytes,13,opt,name=username,proto3" json:"username,omitempty"`
 	// ID of the node
 	NodeId string `protobuf:"bytes,14,opt,name=node_id,json=nodeId,proto3" json:"node_id,omitempty"`
-	// Classification of the node, e.g. "individual", "institution", "internal" (aka ethPandaOps) or "unclassified"
+	// Classification of the node, e.g. "individual", "corporate", "internal" (aka ethPandaOps) or "unclassified"
 	Classification string `protobuf:"bytes,15,opt,name=classification,proto3" json:"classification,omitempty"`
 	// Name of the client
 	MetaClientName string `protobuf:"bytes,16,opt,name=meta_client_name,json=metaClientName,proto3" json:"meta_client_name,omitempty"`

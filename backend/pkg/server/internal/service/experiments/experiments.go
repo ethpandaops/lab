@@ -248,13 +248,9 @@ func (s *ExperimentsService) getDataAvailabilityForExperiment(ctx context.Contex
 
 		// Convert to config proto format
 		dataAvailability[network] = &config.ExperimentDataAvailability{
-			AvailableFromTimestamp:  resp.AvailableFromTimestamp,
-			AvailableUntilTimestamp: resp.AvailableUntilTimestamp,
-			MinSlot:                 resp.MinSlot,
-			MaxSlot:                 resp.MaxSlot,
-			SafeSlot:                resp.SafeSlot,
-			HeadSlot:                resp.HeadSlot,
-			HasData:                 resp.HasData,
+			MinSlot: resp.MinSlot,
+			MaxSlot: resp.MaxSlot,
+			HasData: resp.HasData,
 		}
 	}
 
