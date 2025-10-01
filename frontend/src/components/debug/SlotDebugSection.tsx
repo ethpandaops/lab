@@ -36,8 +36,6 @@ export function SlotDebugSection() {
     playbackSpeed,
     minSlot,
     maxSlot,
-    safeSlot,
-    headSlot,
     isStalled,
     isStale,
     staleBehindSlots,
@@ -84,14 +82,6 @@ export function SlotDebugSection() {
             <span className="text-primary">{maxSlot}</span>
           </div>
           <div>
-            <span className="text-tertiary">safeSlot:</span>{' '}
-            <span className="text-primary">{safeSlot}</span>
-          </div>
-          <div>
-            <span className="text-tertiary">headSlot:</span>{' '}
-            <span className="text-primary">{headSlot}</span>
-          </div>
-          <div>
             <span className="text-tertiary">isStalled:</span>{' '}
             <span className={isStalled ? 'text-yellow-500' : 'text-green-500'}>
               {isStalled.toString()}
@@ -134,8 +124,6 @@ export function SlotDebugSection() {
       playbackSpeed,
       minSlot,
       maxSlot,
-      safeSlot,
-      headSlot,
       isStalled,
       isStale,
       staleBehindSlots,

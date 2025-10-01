@@ -23,12 +23,11 @@ function BlockProductionLivePage() {
 
   // Use centralized slot management
   const { currentSlot, isPlaying, mode } = useSlotState();
-  const { minSlot, maxSlot, safeSlot, headSlot } = useSlotConfig();
+  const { minSlot, maxSlot } = useSlotConfig();
   const actions = useSlotActions();
 
-  // Block production uses extra 2 slots of lag for processing
-  const EXTRA_LAG = 2;
-  const displaySlot = currentSlot - EXTRA_LAG;
+  // Use current slot directly without lag
+  const displaySlot = currentSlot;
 
   // Add state to handle screen size with more granular breakpoints
   const [viewMode, setViewMode] = useState<'mobile' | 'tablet' | 'desktop'>('desktop');
@@ -298,7 +297,7 @@ function BlockProductionLivePage() {
     'block-production-nav',
     'Block Production Navigation',
     () => {
-      const lagFromHead = headSlot - currentSlot;
+      const lagFromHead = maxSlot - currentSlot;
       const canNavigateForward = !isNextDisabled;
       const slotsUntilMax = maxSlot - currentSlot;
 
@@ -318,13 +317,8 @@ function BlockProductionLivePage() {
                 <span className="text-tertiary">Current:</span>{' '}
                 <span className="text-primary">{currentSlot}</span>
               </div>
-              <div className="col-span-2">
-                <span className="text-tertiary">Lag Applied:</span>{' '}
-                <span className="text-orange-400 font-semibold">{EXTRA_LAG} slots</span>
-                <span className="text-tertiary text-[10px]"> (for data completeness)</span>
-              </div>
               <div className="col-span-2 text-[10px] text-blue-400">
-                Formula: displaySlot ({displaySlot}) = currentSlot ({currentSlot}) - {EXTRA_LAG}
+                Display slot: {displaySlot} (same as current slot)
               </div>
             </div>
           </div>
@@ -336,16 +330,8 @@ function BlockProductionLivePage() {
             </div>
             <div className="grid grid-cols-2 gap-x-6 gap-y-0.5 pl-2">
               <div>
-                <span className="text-tertiary">Head:</span>{' '}
-                <span className="text-primary">{headSlot}</span>
-              </div>
-              <div>
                 <span className="text-tertiary">Max:</span>{' '}
                 <span className="text-primary">{maxSlot}</span>
-              </div>
-              <div>
-                <span className="text-tertiary">Safe:</span>{' '}
-                <span className="text-primary">{safeSlot}</span>
               </div>
               <div>
                 <span className="text-tertiary">Behind Head:</span>{' '}
@@ -378,15 +364,13 @@ function BlockProductionLivePage() {
                 Condition: currentSlot ({currentSlot}) {'>='} maxSlot ({maxSlot}) ={' '}
                 {String(!canNavigateForward)}
               </div>
-              <div className="text-[10px] text-yellow-300">
-                Disables at: Slot {maxSlot - EXTRA_LAG} (display) / {maxSlot} (current)
-              </div>
+              <div className="text-[10px] text-yellow-300">Disables at: Slot {maxSlot}</div>
             </div>
           </div>
         </div>
       );
     },
-    [currentSlot, displaySlot, maxSlot, headSlot, safeSlot, isNextDisabled, EXTRA_LAG],
+    [currentSlot, displaySlot, maxSlot, isNextDisabled],
     10, // Priority - show this early
   );
 
@@ -435,7 +419,7 @@ function BlockProductionLivePage() {
               displaySlotOffset={displaySlot - currentSlot}
               goToPreviousSlot={actions.previousSlot}
               goToNextSlot={actions.nextSlot}
-              resetToCurrentSlot={() => actions.goToSlot(headSlot - EXTRA_LAG)}
+              resetToCurrentSlot={() => actions.goToSlot(maxSlot)}
               isNextDisabled={isNextDisabled}
               network={selectedNetwork}
               isLocallyBuilt={isLocallyBuilt}
@@ -486,7 +470,7 @@ function BlockProductionLivePage() {
               displaySlotOffset={displaySlot - currentSlot}
               goToPreviousSlot={actions.previousSlot}
               goToNextSlot={actions.nextSlot}
-              resetToCurrentSlot={() => actions.goToSlot(headSlot - EXTRA_LAG)}
+              resetToCurrentSlot={() => actions.goToSlot(maxSlot)}
               isNextDisabled={isNextDisabled}
               network={selectedNetwork}
               isLocallyBuilt={isLocallyBuilt}

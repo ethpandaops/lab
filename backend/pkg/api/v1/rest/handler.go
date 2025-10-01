@@ -315,13 +315,8 @@ func convertConfigToAPIProto(config *configpb.FrontendConfig) *apiv1.FrontendCon
 				expConfig.DataAvailability = make(map[string]*apiv1.ExperimentDataAvailability)
 				for network, da := range exp.DataAvailability {
 					expConfig.DataAvailability[network] = &apiv1.ExperimentDataAvailability{
-						AvailableFromTimestamp:  da.AvailableFromTimestamp,
-						AvailableUntilTimestamp: da.AvailableUntilTimestamp,
-						MinSlot:                 da.MinSlot,
-						MaxSlot:                 da.MaxSlot,
-						SafeSlot:                da.SafeSlot,
-						HeadSlot:                da.HeadSlot,
-						HasData:                 da.HasData,
+						MinSlot: da.MinSlot,
+						MaxSlot: da.MaxSlot,
 					}
 				}
 			}

@@ -36,8 +36,6 @@ export const SlotConfigContext = createContext<
       playbackSpeed: number;
       minSlot: number;
       maxSlot: number;
-      safeSlot: number;
-      headSlot: number;
     }
   | undefined
 >(undefined);
@@ -55,11 +53,12 @@ export function SlotProvider({
   const beaconClock = useBeaconClock(network);
   const navigate = useNavigate();
 
-  const { minSlot, maxSlot, safeSlot, headSlot } = bounds;
+  const { minSlot, maxSlot } = bounds;
 
   const getInitialSlot = () => {
     if (initialSlot !== undefined) return initialSlot;
-    if (safeSlot > 0) return Math.max(minSlot, safeSlot - 1);
+    // Use maxSlot as the safe default (what safeSlot used to be)
+    if (maxSlot > 0) return Math.max(minSlot, maxSlot - 1);
     if (beaconClock) {
       const currentClockSlot = beaconClock.getCurrentSlot();
       return Math.max(minSlot, currentClockSlot - 2);
@@ -87,12 +86,12 @@ export function SlotProvider({
   });
 
   useEffect(() => {
-    if (initialSlot === undefined && safeSlot === 0 && beaconClock && currentSlot === maxSlot) {
+    if (initialSlot === undefined && beaconClock && currentSlot === maxSlot) {
       const currentClockSlot = beaconClock.getCurrentSlot();
       const calculatedSlot = Math.max(minSlot, currentClockSlot - 2);
       setCurrentSlot(calculatedSlot);
     }
-  }, [beaconClock, initialSlot, safeSlot, currentSlot, maxSlot, minSlot]);
+  }, [beaconClock, initialSlot, currentSlot, maxSlot, minSlot]);
 
   useEffect(() => {
     if (
@@ -107,8 +106,8 @@ export function SlotProvider({
   }, [maxSlot, currentSlot, isPlaying, pauseReason, mode]);
 
   const wallClockSlot = useMemo(
-    () => beaconClock?.getCurrentSlot() ?? headSlot,
-    [beaconClock, headSlot],
+    () => beaconClock?.getCurrentSlot() ?? maxSlot,
+    [beaconClock, maxSlot],
   );
   const staleBehindSlots = wallClockSlot - currentSlot;
   const isStale = staleBehindSlots > 10;
@@ -263,10 +262,8 @@ export function SlotProvider({
       playbackSpeed,
       minSlot,
       maxSlot,
-      safeSlot,
-      headSlot,
     }),
-    [slotDuration, playbackSpeed, minSlot, maxSlot, safeSlot, headSlot],
+    [slotDuration, playbackSpeed, minSlot, maxSlot],
   );
 
   return (

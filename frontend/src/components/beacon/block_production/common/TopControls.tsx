@@ -63,11 +63,6 @@ const TopControls: React.FC<TopControlsProps> = ({
 
         <div className={`font-mono text-primary flex flex-col ${isMobile ? 'text-xs' : 'text-sm'}`}>
           <div className="font-semibold text-base">Slot: {slotNumber ?? '—'}</div>
-          {slotNumber !== null && displaySlotOffset !== 0 && (
-            <div className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-secondary opacity-80`}>
-              Lag: {headLagSlots - displaySlotOffset}
-            </div>
-          )}
         </div>
       </div>
 
@@ -76,7 +71,11 @@ const TopControls: React.FC<TopControlsProps> = ({
         className="bg-surface/70 p-1.5 rounded-md border border-subtle hover:bg-hover transition focus:outline-none focus:ring-1 focus:ring-accent/70"
         title={isPlaying ? 'Pause' : 'Play'}
       >
-        {isPlaying ? <Pause className="h-4 w-4 text-primary" /> : <Play className="h-4 w-4 text-primary" />}
+        {isPlaying ? (
+          <Pause className="h-4 w-4 text-primary" />
+        ) : (
+          <Play className="h-4 w-4 text-primary" />
+        )}
       </button>
     </div>
   );
