@@ -31,7 +31,13 @@ function SlotLookup() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!slotNumber) return;
-    navigate({ to: '/beacon/slot/$slot', params: { slot: slotNumber } });
+    navigate({
+      to: '/experiments/live-slots',
+      search: {
+        slot: parseInt(slotNumber),
+        mode: 'single',
+      },
+    });
   };
 
   // Show not available message if experiment isn't enabled for this network
@@ -114,7 +120,13 @@ function SlotLookup() {
             </button>
             <button
               onClick={() =>
-                navigate({ to: '/beacon/slot/$slot', params: { slot: String(currentSlot) } })
+                navigate({
+                  to: '/experiments/live-slots',
+                  search: {
+                    slot: currentSlot,
+                    mode: 'single',
+                  },
+                })
               }
               className="flex items-center gap-2 px-4 py-2 bg-nav/50 backdrop-blur-sm border border-subtle rounded-lg text-sm font-mono text-tertiary hover:text-primary hover:border-white/20 transition-colors"
             >

@@ -1,6 +1,14 @@
-import { createFileRoute } from '@tanstack/react-router';
-import { BeaconSlot } from '@/pages/beacon/slot';
+import { createFileRoute, redirect } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/_layout/beacon/slot/$slot')({
-  component: BeaconSlot,
+  beforeLoad: ({ params }) => {
+    // Redirect to live-slots with the slot in query params
+    throw redirect({
+      to: '/experiments/live-slots',
+      search: {
+        slot: parseInt(params.slot),
+        mode: 'single',
+      },
+    });
+  },
 });
