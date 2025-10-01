@@ -182,11 +182,103 @@ func (s *ExperimentsService) GetExperimentConfig(ctx context.Context, experiment
 	// Get data availability for this experiment
 	dataAvailability := s.getDataAvailabilityForExperiment(ctx, experiment)
 
+	// Convert config map to protobuf Struct
+
+	var configStruct *structpb.Struct
+
+	if experiment.Config != nil {
+		var err error
+
+		configStruct, err = structpb.NewStruct(experiment.Config)
+		if err != nil {
+			s.log.WithError(err).WithField("experiment", experiment.ID).Warn("Failed to convert config to struct")
+		}
+	}
+
 	return &config.ExperimentConfig{
 		Id:               experiment.ID,
 		Enabled:          experiment.Enabled,
 		Networks:         experiment.Networks,
 		DataAvailability: dataAvailability,
+		Config:           configStruct,
+	}, nil
+}
+
+// GetNetworkExperimentConfig returns a single experiment's configuration with data availability filtered for a specific network.
+func (s *ExperimentsService) GetNetworkExperimentConfig(ctx context.Context, experimentID string, network string) (*config.ExperimentConfig, error) {
+	if s.config == nil {
+		return nil, fmt.Errorf("experiments service not configured")
+	}
+
+	if network == "" {
+		return nil, fmt.Errorf("network parameter cannot be empty")
+	}
+
+	// Find the experiment
+	var experiment *ExperimentConfig
+
+	for i := range *s.config {
+		if (*s.config)[i].ID == experimentID {
+			experiment = &(*s.config)[i]
+
+			break
+		}
+	}
+
+	if experiment == nil {
+		return nil, fmt.Errorf("experiment not found: %s", experimentID)
+	}
+
+	if !experiment.Enabled {
+		return nil, fmt.Errorf("experiment disabled: %s", experimentID)
+	}
+
+	// Validate network is in experiment's network list
+	validNetwork := false
+
+	for _, expNetwork := range experiment.Networks {
+		if expNetwork == network {
+			validNetwork = true
+
+			break
+		}
+	}
+
+	if !validNetwork {
+		return nil, fmt.Errorf("network %s not supported by experiment %s", network, experimentID)
+	}
+
+	// Get data availability only for specified network
+	dataAvailability := make(map[string]*config.ExperimentDataAvailability)
+
+	networkDA, err := s.getDataAvailabilityForNetwork(ctx, experiment, network)
+	if err != nil {
+		s.log.WithError(err).
+			WithField("experiment_id", experimentID).
+			WithField("network", network).
+			Warn("Failed to get data availability for network")
+	} else if networkDA != nil {
+		dataAvailability[network] = networkDA
+	}
+
+	// Convert config map to protobuf Struct
+	var configStruct *structpb.Struct
+
+	if experiment.Config != nil {
+		var err error
+
+		configStruct, err = structpb.NewStruct(experiment.Config)
+		if err != nil {
+			s.log.WithError(err).WithField("experiment", experiment.ID).Warn("Failed to convert config to struct")
+		}
+	}
+
+	return &config.ExperimentConfig{
+		Id:               experiment.ID,
+		Enabled:          experiment.Enabled,
+		Networks:         experiment.Networks,
+		DataAvailability: dataAvailability,
+		Config:           configStruct,
 	}, nil
 }
 
@@ -265,4 +357,50 @@ func (s *ExperimentsService) getDataAvailabilityForExperiment(ctx context.Contex
 		Debug("Completed data availability queries for experiment")
 
 	return dataAvailability
+}
+
+// getDataAvailabilityForNetwork queries data availability for a single network of an experiment
+func (s *ExperimentsService) getDataAvailabilityForNetwork(ctx context.Context, exp *ExperimentConfig, network string) (*config.ExperimentDataAvailability, error) {
+	if s.xatuCBTService == nil || s.cartographoorService == nil {
+		return nil, fmt.Errorf("required services not available")
+	}
+
+	// Validate network exists in cartographoor
+	if s.cartographoorService.GetNetwork(network) == nil {
+		return nil, fmt.Errorf("network %s not found in cartographoor", network)
+	}
+
+	// Get tables for experiment
+	tables := GetTablesForExperiment(exp.ID)
+	if len(tables) == 0 {
+		s.log.WithField("experiment_id", exp.ID).Debug("No tables defined for experiment")
+
+		return nil, fmt.Errorf("no tables defined for experiment %s", exp.ID)
+	}
+
+	// Add network to context metadata - use incoming context for internal service calls
+	md := metadata.New(map[string]string{"network": network})
+	ctxWithNetwork := metadata.NewIncomingContext(ctx, md)
+
+	// Query data availability for the specific network
+	req := &xatu_cbt_proto.GetDataAvailabilityRequest{
+		Tables:        tables,
+		PositionField: "slot_start_date_time",
+	}
+
+	resp, err := s.xatuCBTService.GetDataAvailability(ctxWithNetwork, req)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get data availability for network %s: %w", network, err)
+	}
+
+	// Convert to config proto format
+	return &config.ExperimentDataAvailability{
+		AvailableFromTimestamp:  resp.AvailableFromTimestamp,
+		AvailableUntilTimestamp: resp.AvailableUntilTimestamp,
+		MinSlot:                 resp.MinSlot,
+		MaxSlot:                 resp.MaxSlot,
+		SafeSlot:                resp.SafeSlot,
+		HeadSlot:                resp.HeadSlot,
+		HasData:                 resp.HasData,
+	}, nil
 }

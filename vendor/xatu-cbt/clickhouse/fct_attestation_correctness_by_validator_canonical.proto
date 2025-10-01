@@ -27,7 +27,7 @@ message FctAttestationCorrectnessByValidatorCanonical {
   google.protobuf.UInt32Value slot_distance = 18;
   // The distance from the slot when the attestation was included in a block
   google.protobuf.UInt32Value inclusion_distance = 19;
-  // Can be "canonical", "orphaned" or "missed"
+  // Can be "canonical", "orphaned", "missed" or "unknown" (validator attested but block data not available)
   string status = 20;
 }
 

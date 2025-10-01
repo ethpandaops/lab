@@ -33,7 +33,7 @@ message IntAttestationFirstSeen {
   string username = 21;
   // ID of the node
   string node_id = 22;
-  // Classification of the node, e.g. "individual", "institution", "internal" (aka ethPandaOps) or "unclassified"
+  // Classification of the node, e.g. "individual", "corporate", "internal" (aka ethPandaOps) or "unclassified"
   string classification = 23;
   // Name of the client
   string meta_client_name = 24;

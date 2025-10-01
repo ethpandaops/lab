@@ -55,3 +55,59 @@ func (r *PublicRouter) handleExperimentConfig(w http.ResponseWriter, req *http.R
 		},
 	})
 }
+
+// handleNetworkExperimentConfig handles GET /api/v1/{network}/experiments/{experimentId}/config
+func (r *PublicRouter) handleNetworkExperimentConfig(w http.ResponseWriter, req *http.Request) {
+	ctx := req.Context()
+	vars := mux.Vars(req)
+	network := vars["network"]
+	experimentID := vars["experimentId"]
+
+	// Validate parameters
+	if network == "" {
+		r.WriteJSONResponseError(w, req, http.StatusBadRequest, "Network is required")
+
+		return
+	}
+
+	if experimentID == "" {
+		r.WriteJSONResponseError(w, req, http.StatusBadRequest, "Experiment id is required")
+
+		return
+	}
+
+	// Call the config service to get the network-specific experiment configuration
+	grpcResp, err := r.configClient.GetNetworkExperimentConfig(ctx, &configpb.GetNetworkExperimentConfigRequest{
+		ExperimentId: experimentID,
+		Network:      network,
+	})
+	if err != nil {
+		r.HandleGRPCError(w, req, err)
+
+		return
+	}
+
+	// Convert the internal config proto to public API proto
+	dataAvailability := make(map[string]*apiv1.ExperimentDataAvailability)
+	for networkName, availability := range grpcResp.Experiment.DataAvailability {
+		dataAvailability[networkName] = &apiv1.ExperimentDataAvailability{
+			AvailableFromTimestamp:  availability.AvailableFromTimestamp,
+			AvailableUntilTimestamp: availability.AvailableUntilTimestamp,
+			MinSlot:                 availability.MinSlot,
+			MaxSlot:                 availability.MaxSlot,
+			SafeSlot:                availability.SafeSlot,
+			HeadSlot:                availability.HeadSlot,
+			HasData:                 availability.HasData,
+		}
+	}
+
+	// Write response - for network-specific endpoint, omit Networks field as specified in plan
+	r.WriteJSONResponseOK(w, req, &apiv1.GetExperimentConfigResponse{
+		Experiment: &apiv1.ExperimentConfig{
+			Id:               grpcResp.Experiment.Id,
+			Enabled:          grpcResp.Experiment.Enabled,
+			Networks:         nil, // Omit networks field for network-specific responses
+			DataAvailability: dataAvailability,
+		},
+	})
+}

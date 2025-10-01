@@ -11,6 +11,8 @@ import (
 	"github.com/ethpandaops/lab/backend/pkg/server/proto/config"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 // ConfigService provides gRPC API for frontend configuration
@@ -158,6 +160,60 @@ func (c *ConfigService) GetExperimentConfig(ctx context.Context, req *config.Get
 			Error("Failed to get experiment config")
 
 		return nil, fmt.Errorf("failed to get experiment config: %w", err)
+	}
+
+	return &config.GetExperimentConfigResponse{
+		Experiment: experimentConfig,
+	}, nil
+}
+
+// GetNetworkExperimentConfig returns a single experiment's configuration with data availability filtered for a specific network
+func (c *ConfigService) GetNetworkExperimentConfig(ctx context.Context, req *config.GetNetworkExperimentConfigRequest) (*config.GetExperimentConfigResponse, error) {
+	c.log.WithFields(logrus.Fields{
+		"experiment_id": req.ExperimentId,
+		"network":       req.Network,
+	}).Debug("GetNetworkExperimentConfig called")
+
+	// Validate request parameters
+	if req.ExperimentId == "" {
+		return nil, status.Error(codes.InvalidArgument, "experiment_id cannot be empty")
+	}
+
+	if req.Network == "" {
+		return nil, status.Error(codes.InvalidArgument, "network cannot be empty")
+	}
+
+	if c.experimentsService == nil {
+		return nil, status.Error(codes.Internal, "experiments service not available")
+	}
+
+	// Get experiment config with data availability for specific network
+	experimentConfig, err := c.experimentsService.GetNetworkExperimentConfig(ctx, req.ExperimentId, req.Network)
+	if err != nil {
+		c.log.WithError(err).
+			WithFields(logrus.Fields{
+				"experiment_id": req.ExperimentId,
+				"network":       req.Network,
+			}).
+			Error("Failed to get network experiment config")
+
+		// Convert service errors to appropriate gRPC status codes
+		if err.Error() == fmt.Sprintf("experiment not found: %s", req.ExperimentId) ||
+			err.Error() == fmt.Sprintf("experiment disabled: %s", req.ExperimentId) {
+			return nil, status.Error(codes.NotFound, err.Error())
+		}
+
+		if err.Error() == fmt.Sprintf("network %s not supported by experiment %s", req.Network, req.ExperimentId) {
+			return nil, status.Error(codes.InvalidArgument, err.Error())
+		}
+
+		return nil, status.Error(codes.Internal, fmt.Sprintf("failed to get network experiment config: %v", err))
+	}
+
+	// Transform response to remove "networks" field by setting it to nil
+	// The protobuf response will exclude the field when it's nil
+	if experimentConfig != nil {
+		experimentConfig.Networks = nil
 	}
 
 	return &config.GetExperimentConfigResponse{

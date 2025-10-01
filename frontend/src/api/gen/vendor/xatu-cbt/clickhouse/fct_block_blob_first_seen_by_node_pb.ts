@@ -89,7 +89,7 @@ export class FctBlockBlobFirstSeenByNode extends Message<FctBlockBlobFirstSeenBy
   nodeId = "";
 
   /**
-   * Classification of the node, e.g. "individual", "institution", "internal" (aka ethPandaOps) or "unclassified"
+   * Classification of the node, e.g. "individual", "corporate", "internal" (aka ethPandaOps) or "unclassified"
    *
    * @generated from field: string classification = 22;
    */

@@ -38,6 +38,13 @@ func (r *PublicRouter) GetRoutes() []RouteConfig {
 			Cache:       middleware.CacheBrowserShort,
 			Description: "Get experiment-specific configuration",
 		},
+		{
+			Path:        "/{network}/experiments/{experimentId}/config",
+			Handler:     r.handleNetworkExperimentConfig,
+			Methods:     []string{http.MethodGet, http.MethodOptions},
+			Cache:       middleware.CacheBrowserShort,
+			Description: "Get experiment configuration for specific network",
+		},
 
 		// Node endpoints
 		{

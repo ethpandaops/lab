@@ -44,7 +44,7 @@ type FctAttestationCorrectnessByValidatorCanonical struct {
 	SlotDistance *wrapperspb.UInt32Value `protobuf:"bytes,18,opt,name=slot_distance,json=slotDistance,proto3" json:"slot_distance,omitempty"`
 	// The distance from the slot when the attestation was included in a block
 	InclusionDistance *wrapperspb.UInt32Value `protobuf:"bytes,19,opt,name=inclusion_distance,json=inclusionDistance,proto3" json:"inclusion_distance,omitempty"`
-	// Can be "canonical", "orphaned" or "missed"
+	// Can be "canonical", "orphaned", "missed" or "unknown" (validator attested but block data not available)
 	Status string `protobuf:"bytes,20,opt,name=status,proto3" json:"status,omitempty"`
 }
 
