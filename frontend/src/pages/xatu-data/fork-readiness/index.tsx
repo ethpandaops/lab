@@ -16,13 +16,14 @@ import { ChevronDown, ChevronUp } from 'lucide-react';
 
 const SLOTS_PER_EPOCH = 32;
 
-const CLIENT_METADATA: Record<string, { name: string }> = {
+const CLIENT_METADATA: Record<string, { name: string; logo?: string }> = {
   prysm: { name: 'Prysm' },
   teku: { name: 'Teku' },
   lighthouse: { name: 'Lighthouse' },
   lodestar: { name: 'Lodestar' },
   nimbus: { name: 'Nimbus' },
   grandine: { name: 'Grandine' },
+  tysm: { name: 'Tysm', logo: 'jpg' },
 };
 
 interface ForkNode {
@@ -86,7 +87,7 @@ function ForkReadiness() {
     // Get all forks from consensus
     const availableForks = [];
     const consensusForks = network.forks.consensus;
-    
+
     // Check for each fork type
     if (consensusForks.electra) {
       availableForks.push({ name: 'Electra', data: consensusForks.electra });
@@ -101,77 +102,80 @@ function ForkReadiness() {
     }
 
     // Process each fork
-    return availableForks.map(fork => {
-      const clientReadiness = Object.entries(fork.data.min_client_versions || {})
-        .map(([clientName, minVersion]) => {
-          const clientNodes = nodes.filter(n => n.consensus_client === clientName);
-          const readyNodes = clientNodes.filter(n => {
-            const currentVersion = n.consensus_version.replace('v', '');
-            const minVersionParts = minVersion.split('.');
-            const currentVersionParts = currentVersion.split('.');
+    return (
+      availableForks
+        .map(fork => {
+          const clientReadiness = Object.entries(fork.data.min_client_versions || {})
+            .map(([clientName, minVersion]) => {
+              const clientNodes = nodes.filter(n => n.consensus_client === clientName);
+              const readyNodes = clientNodes.filter(n => {
+                const currentVersion = n.consensus_version.replace('v', '');
+                const minVersionParts = minVersion.split('.');
+                const currentVersionParts = currentVersion.split('.');
 
-            // Compare major version
-            if (parseInt(currentVersionParts[0]) > parseInt(minVersionParts[0])) return true;
-            if (parseInt(currentVersionParts[0]) < parseInt(minVersionParts[0])) return false;
+                // Compare major version
+                if (parseInt(currentVersionParts[0]) > parseInt(minVersionParts[0])) return true;
+                if (parseInt(currentVersionParts[0]) < parseInt(minVersionParts[0])) return false;
 
-            // Compare minor version
-            if (parseInt(currentVersionParts[1]) > parseInt(minVersionParts[1])) return true;
-            if (parseInt(currentVersionParts[1]) < parseInt(minVersionParts[1])) return false;
+                // Compare minor version
+                if (parseInt(currentVersionParts[1]) > parseInt(minVersionParts[1])) return true;
+                if (parseInt(currentVersionParts[1]) < parseInt(minVersionParts[1])) return false;
 
-            // Compare patch version
-            return parseInt(currentVersionParts[2]) >= parseInt(minVersionParts[2]);
-          });
+                // Compare patch version
+                return parseInt(currentVersionParts[2]) >= parseInt(minVersionParts[2]);
+              });
+
+              return {
+                name: clientName,
+                totalNodes: clientNodes.length,
+                readyNodes: readyNodes.length,
+                readyPercentage:
+                  clientNodes.length === 0 ? 100 : (readyNodes.length / clientNodes.length) * 100,
+                minVersion,
+                nodes: clientNodes.map(n => ({
+                  name: n.client_name,
+                  version: n.consensus_version,
+                  isReady: readyNodes.includes(n),
+                })),
+              };
+            })
+            .filter(client => client.totalNodes > 0) // Only show clients with nodes
+            .sort((a, b) => b.totalNodes - a.totalNodes);
+
+          const totalNodes = clientReadiness.reduce((acc, client) => acc + client.totalNodes, 0);
+          const readyNodes = clientReadiness.reduce((acc, client) => acc + client.readyNodes, 0);
+
+          // Calculate time until fork
+          const forkEpoch = fork.data.epoch || 0;
+          const epochsUntilFork = Number(forkEpoch) - Number(currentEpoch);
+          const timeUntilFork = epochsUntilFork * SLOTS_PER_EPOCH * 12; // 12 seconds per slot
 
           return {
-            name: clientName,
-            totalNodes: clientNodes.length,
-            readyNodes: readyNodes.length,
-            readyPercentage:
-              clientNodes.length === 0 ? 100 : (readyNodes.length / clientNodes.length) * 100,
-            minVersion,
-            nodes: clientNodes.map(n => ({
-              name: n.client_name,
-              version: n.consensus_version,
-              isReady: readyNodes.includes(n),
-            })),
+            name: fork.name,
+            networkName: selectedNetwork,
+            totalNodes,
+            readyNodes,
+            readyPercentage: totalNodes === 0 ? 100 : (readyNodes / totalNodes) * 100,
+            clients: clientReadiness,
+            forkEpoch,
+            timeUntilFork,
+            currentEpoch,
           };
         })
-        .filter(client => client.totalNodes > 0) // Only show clients with nodes
-        .sort((a, b) => b.totalNodes - a.totalNodes);
+        // Sort forks: unactivated first, activated last
+        .sort((a, b) => {
+          const aActivated = a.timeUntilFork <= 0;
+          const bActivated = b.timeUntilFork <= 0;
 
-      const totalNodes = clientReadiness.reduce((acc, client) => acc + client.totalNodes, 0);
-      const readyNodes = clientReadiness.reduce((acc, client) => acc + client.readyNodes, 0);
+          if (aActivated === bActivated) {
+            // If both are same status, sort by epoch (earlier first for upcoming, later first for activated)
+            return aActivated ? b.forkEpoch - a.forkEpoch : a.forkEpoch - b.forkEpoch;
+          }
 
-      // Calculate time until fork
-      const forkEpoch = fork.data.epoch || 0;
-      const epochsUntilFork = Number(forkEpoch) - Number(currentEpoch);
-      const timeUntilFork = epochsUntilFork * SLOTS_PER_EPOCH * 12; // 12 seconds per slot
-
-      return {
-        name: fork.name,
-        networkName: selectedNetwork,
-        totalNodes,
-        readyNodes,
-        readyPercentage: totalNodes === 0 ? 100 : (readyNodes / totalNodes) * 100,
-        clients: clientReadiness,
-        forkEpoch,
-        timeUntilFork,
-        currentEpoch,
-      };
-    })
-    // Sort forks: unactivated first, activated last
-    .sort((a, b) => {
-      const aActivated = a.timeUntilFork <= 0;
-      const bActivated = b.timeUntilFork <= 0;
-
-      if (aActivated === bActivated) {
-        // If both are same status, sort by epoch (earlier first for upcoming, later first for activated)
-        return aActivated ? b.forkEpoch - a.forkEpoch : a.forkEpoch - b.forkEpoch;
-      }
-
-      // Unactivated forks come first
-      return aActivated ? 1 : -1;
-    });
+          // Unactivated forks come first
+          return aActivated ? 1 : -1;
+        })
+    );
   }, [nodesData, config, selectedUser, selectedNetwork, getBeaconClock]);
 
   // Separate activated and unactivated forks
@@ -191,9 +195,10 @@ function ForkReadiness() {
   }
 
   // Check if there are any forks available
-  const hasForks = config?.ethereum?.networks[selectedNetwork]?.forks?.consensus &&
+  const hasForks =
+    config?.ethereum?.networks[selectedNetwork]?.forks?.consensus &&
     (config.ethereum.networks[selectedNetwork].forks.consensus.electra ||
-     config.ethereum.networks[selectedNetwork].forks.consensus.fusaka);
+      config.ethereum.networks[selectedNetwork].forks.consensus.fusaka);
 
   if (!hasForks) {
     return (
@@ -203,8 +208,8 @@ function ForkReadiness() {
             <div className="text-4xl mb-4">🎉</div>
             <h2 className="text-2xl font-sans font-bold text-primary mb-2">No Upcoming Forks</h2>
             <p className="text-sm font-mono text-secondary max-w-lg">
-              There are no upcoming forks configured for {selectedNetwork}. Check back later for updates on future
-              network upgrades.
+              There are no upcoming forks configured for {selectedNetwork}. Check back later for
+              updates on future network upgrades.
             </p>
           </CardBody>
         </Card>
@@ -212,8 +217,8 @@ function ForkReadiness() {
         {/* Data Note */}
         <div className="text-center py-4">
           <p className="text-xs font-mono text-tertiary">
-            Note: This data represents only nodes sending data to the Xatu project and is not representative of the
-            total network.
+            Note: This data represents only nodes sending data to the Xatu project and is not
+            representative of the total network.
           </p>
         </div>
       </div>
@@ -231,7 +236,9 @@ function ForkReadiness() {
                   Fork Readiness
                 </h2>
                 {unactivatedForks.length === 1 && (
-                  <span className="text-base sm:text-lg font-mono text-accent">{unactivatedForks[0].name}</span>
+                  <span className="text-base sm:text-lg font-mono text-accent">
+                    {unactivatedForks[0].name}
+                  </span>
                 )}
                 {unactivatedForks.length > 1 && (
                   <span className="text-base sm:text-lg font-mono text-accent">Multiple Forks</span>
@@ -310,7 +317,9 @@ function ForkReadiness() {
                             </div>
                           </div>
                         ) : (
-                          <div className="text-success text-base sm:text-lg font-medium">Fork activated</div>
+                          <div className="text-success text-base sm:text-lg font-medium">
+                            Fork activated
+                          </div>
                         )}
                       </div>
                     </div>
@@ -332,7 +341,7 @@ function ForkReadiness() {
                             <div className="flex items-center justify-between mb-2">
                               <div className="flex items-center space-x-2">
                                 <img
-                                  src={`/clients/${client.name}.png`}
+                                  src={`/clients/${client.name}.${CLIENT_METADATA[client.name]?.logo || 'png'}`}
                                   alt={`${client.name} logo`}
                                   className="w-5 h-5 sm:w-6 sm:h-6 object-contain opacity-90"
                                   onError={e => {
@@ -345,8 +354,8 @@ function ForkReadiness() {
                                     {CLIENT_METADATA[client.name]?.name || client.name}
                                   </div>
                                   <div className="text-xs font-mono text-tertiary mt-0.5">
-                                    min v{client.minVersion} · {client.readyPercentage.toFixed(1)}% ready (
-                                    {client.readyNodes}/{client.totalNodes})
+                                    min v{client.minVersion} · {client.readyPercentage.toFixed(1)}%
+                                    ready ({client.readyNodes}/{client.totalNodes})
                                   </div>
                                 </div>
                               </div>
@@ -365,7 +374,9 @@ function ForkReadiness() {
                                     className="text-accent transition-all duration-500"
                                     strokeWidth="4"
                                     strokeDasharray={62.83} // 2 * pi * r
-                                    strokeDashoffset={62.83 - (62.83 * client.readyPercentage) / 100}
+                                    strokeDashoffset={
+                                      62.83 - (62.83 * client.readyPercentage) / 100
+                                    }
                                     strokeLinecap="round"
                                     stroke="currentColor"
                                     fill="transparent"
@@ -480,7 +491,7 @@ function ForkReadiness() {
                                     <div className="flex items-center justify-between mb-2">
                                       <div className="flex items-center space-x-2">
                                         <img
-                                          src={`/clients/${client.name}.png`}
+                                          src={`/clients/${client.name}.${CLIENT_METADATA[client.name]?.logo || 'png'}`}
                                           alt={`${client.name} logo`}
                                           className="w-5 h-5 sm:w-6 sm:h-6 object-contain opacity-90"
                                           onError={e => {
@@ -493,8 +504,9 @@ function ForkReadiness() {
                                             {CLIENT_METADATA[client.name]?.name || client.name}
                                           </div>
                                           <div className="text-xs font-mono text-tertiary mt-0.5">
-                                            min v{client.minVersion} · {client.readyPercentage.toFixed(1)}%
-                                            ready ({client.readyNodes}/{client.totalNodes})
+                                            min v{client.minVersion} ·{' '}
+                                            {client.readyPercentage.toFixed(1)}% ready (
+                                            {client.readyNodes}/{client.totalNodes})
                                           </div>
                                         </div>
                                       </div>
@@ -530,21 +542,30 @@ function ForkReadiness() {
                                     {client.nodes.length > 0 && (
                                       <div className="mt-1 space-y-0.5">
                                         {client.nodes.map((node, idx) => {
-                                          const { user, node: nodeName } = formatNodeName(node.name);
+                                          const { user, node: nodeName } = formatNodeName(
+                                            node.name,
+                                          );
                                           return (
                                             <div
                                               key={idx}
                                               className="flex items-center justify-between text-xs font-mono py-0.5 px-1.5 rounded hover:bg-surface/40"
                                             >
                                               <div className="flex items-center space-x-2 min-w-0">
-                                                <span className="text-tertiary truncate">{user}</span>
-                                                <span className="text-primary truncate" title={nodeName}>
+                                                <span className="text-tertiary truncate">
+                                                  {user}
+                                                </span>
+                                                <span
+                                                  className="text-primary truncate"
+                                                  title={nodeName}
+                                                >
                                                   {nodeName}
                                                 </span>
                                               </div>
                                               <span
                                                 className={`flex-shrink-0 ${node.isReady ? 'text-success' : 'text-error'}`}
-                                                title={node.isReady ? 'Ready for fork' : 'Needs update'}
+                                                title={
+                                                  node.isReady ? 'Ready for fork' : 'Needs update'
+                                                }
                                               >
                                                 {node.version}
                                               </span>
@@ -572,8 +593,8 @@ function ForkReadiness() {
       {/* Data Note */}
       <div className="text-center py-4">
         <p className="text-xs font-mono text-tertiary">
-          Note: This data represents only nodes sending data to the Xatu project and is not representative of the total
-          network.
+          Note: This data represents only nodes sending data to the Xatu project and is not
+          representative of the total network.
         </p>
       </div>
     </div>
