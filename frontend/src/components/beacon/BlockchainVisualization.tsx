@@ -1,5 +1,4 @@
 import React, { useMemo } from 'react';
-import SlotDataStore from '@/utils/SlotDataStore';
 import { getCurrentPhase } from '@/components/beacon/block_production/common/PhaseUtils';
 import { Phase } from '@/components/beacon/block_production/common/types';
 import BlockDetailsPanel from '@/components/beacon/block_production/common/BlockDetailsPanel';
@@ -63,9 +62,6 @@ const BlockchainVisualization: React.FC<BlockchainVisualizationProps> = ({
     return getCurrentPhase(currentTime, nodeBlockSeen, nodeBlockP2P, blockTime);
   }, [currentTime, nodeBlockSeen, nodeBlockP2P, blockTime]);
 
-  // Get the slot data store
-  const slotDataStore = useMemo(() => SlotDataStore.getInstance(), []);
-
   // Calculate the slots to display: 1 previous, current, and 1 next
   const displaySlots = useMemo(() => {
     if (currentSlot === null) return [];
@@ -83,8 +79,8 @@ const BlockchainVisualization: React.FC<BlockchainVisualizationProps> = ({
   // Process data for each slot
   const blockData: BlockDisplayData[] = useMemo(() => {
     return displaySlots.map(slot => {
-      // Prefer passed-in slot data, fall back to store if needed
-      const slotDataForSlot = (slotData && slotData[slot]) || slotDataStore.getSlotData(network, slot);
+      // Use passed-in slot data
+      const slotDataForSlot = slotData && slotData[slot];
       const isPast = slot < (currentSlot || 0);
       const isFuture = slot > (currentSlot || 0);
       const isCurrentSlot = slot === currentSlot;
@@ -92,7 +88,8 @@ const BlockchainVisualization: React.FC<BlockchainVisualizationProps> = ({
 
       // Only show building/pending for future slots and for current slot in Building phase
       // But if slotData is directly provided for the current slot, don't mark as building
-      const isBuilding = isFuture || (isCurrentSlot && currentPhase === Phase.Building && !slotData?.[slot]);
+      const isBuilding =
+        isFuture || (isCurrentSlot && currentPhase === Phase.Building && !slotData?.[slot]);
 
       // If we have data for this slot, extract relevant information
       if (slotDataForSlot) {
@@ -176,7 +173,7 @@ const BlockchainVisualization: React.FC<BlockchainVisualizationProps> = ({
         if (slotDataForSlot.relayBids) {
           // Find winning bids from all relays (bids marked as winning)
           const winningBids = Object.values(slotDataForSlot.relayBids).flatMap(
-            relay => relay.bids?.filter(bid => bid.isWinning) || []
+            relay => relay.bids?.filter(bid => bid.isWinning) || [],
           );
 
           // Use the first winning bid for value display
@@ -212,8 +209,7 @@ const BlockchainVisualization: React.FC<BlockchainVisualizationProps> = ({
 
       // For future slots, check for bids with negative time and extract detailed bid information
       if (isFuture) {
-        const previousSlotData =
-          (slotData && slotData[currentSlot || 0]) || slotDataStore.getSlotData(network, currentSlot || 0);
+        const previousSlotData = slotData && slotData[currentSlot || 0];
         let futureBidsCount = 0;
         const futureBids: Array<{ value: number; relayName: string; builderName?: string }> = [];
 
@@ -274,8 +270,8 @@ const BlockchainVisualization: React.FC<BlockchainVisualizationProps> = ({
         // Sort future bids by value (highest first)
         futureBids.sort((a, b) => b.value - a.value);
 
-        // Try to get prefetched data for the future slot
-        const prefetchedData = (slotData && slotData[slot]) || slotDataStore.getSlotData(network, slot);
+        // Try to get data for the future slot
+        const prefetchedData = slotData && slotData[slot];
         if (prefetchedData) {
           // We have prefetched data for this future slot
           const proposerEntity = prefetchedData.proposerEntity;
@@ -317,10 +313,13 @@ const BlockchainVisualization: React.FC<BlockchainVisualizationProps> = ({
         isBuilding: isCurrentSlot, // If current slot with no data, it's likely in building phase
       };
     });
-  }, [displaySlots, slotDataStore, network, currentSlot, currentPhase, slotData]);
+  }, [displaySlots, network, currentSlot, currentPhase, slotData]);
 
   return (
-    <div className={`w-full h-full flex flex-col items-center justify-center ${className}`} style={{ width, height }}>
+    <div
+      className={`w-full h-full flex flex-col items-center justify-center ${className}`}
+      style={{ width, height }}
+    >
       <div className="w-full h-full flex flex-col justify-center">
         <div className="text-sm font-medium mb-3 text-primary flex items-center justify-between backdrop-blur-sm bg-surface/30 rounded-lg px-3 py-2">
           <div className="flex items-center">
@@ -362,9 +361,10 @@ const BlockchainVisualization: React.FC<BlockchainVisualizationProps> = ({
                       slot={block.slot}
                       epoch={Math.floor(block.slot / 32)}
                       proposerEntity={block.proposerEntity}
-                      slotDataStore={slotDataStore}
                       network={network}
                       currentTime={currentTime}
+                      slotData={slotData?.[block.slot]}
+                      previousSlotData={slotData?.[block.slot - 1]}
                     />
                   </div>
                 );

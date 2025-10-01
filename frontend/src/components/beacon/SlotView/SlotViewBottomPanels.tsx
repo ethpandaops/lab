@@ -34,6 +34,7 @@ interface SlotViewBottomPanelsProps {
     validator_indices: number[];
   }>;
   maxPossibleValidators: number;
+  isInModal?: boolean;
 }
 
 function SlotViewBottomPanelsComponent({
@@ -47,13 +48,14 @@ function SlotViewBottomPanelsComponent({
   isMissing,
   attestationWindows,
   maxPossibleValidators,
+  isInModal = false,
 }: SlotViewBottomPanelsProps) {
   return (
-    <div className="hidden h-[calc(25vh)] md:flex flex-col">
+    <div className={`flex h-[calc(25vh)] flex-col ${isInModal ? '' : 'hidden md:flex'}`}>
       <div className="h-full border-t border-subtle bg-surface/90 backdrop-blur-md">
-        <div className="grid h-full w-full grid-cols-3">
+        <div className="grid h-full w-full grid-cols-1 md:grid-cols-3">
           {/* Data Availability Section */}
-          <div className="col-span-2 border-r border-subtle p-4">
+          <div className="col-span-1 md:col-span-2 border-r border-subtle p-4">
             <DataAvailabilityPanel
               blobTimings={blobTimings}
               currentTime={currentTime}
@@ -92,5 +94,6 @@ export const SlotViewBottomPanels = memo(
     prev.loading === next.loading &&
     prev.isMissing === next.isMissing &&
     prev.attestationWindows === next.attestationWindows &&
-    prev.maxPossibleValidators === next.maxPossibleValidators,
+    prev.maxPossibleValidators === next.maxPossibleValidators &&
+    prev.isInModal === next.isInModal,
 );
