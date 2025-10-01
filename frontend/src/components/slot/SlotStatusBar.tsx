@@ -36,8 +36,6 @@ function SlotStatusBar() {
     playbackSpeed,
     minSlot,
     maxSlot,
-    safeSlot,
-    headSlot,
     isStalled,
     isStale,
     staleBehindSlots,
@@ -62,9 +60,9 @@ function SlotStatusBar() {
               <div>
                 <span className="text-tertiary">Slot:</span>{' '}
                 <span className="text-primary font-semibold">{currentSlot}</span>
-                {currentSlot === safeSlot && (
+                {currentSlot === maxSlot && (
                   <span className="ml-2 px-1.5 py-0.5 bg-yellow-500/30 text-yellow-500 text-[9px] font-bold rounded uppercase">
-                    LIMIT
+                    MAX
                   </span>
                 )}
               </div>
@@ -123,14 +121,6 @@ function SlotStatusBar() {
                 <span className="text-tertiary">Max:</span>{' '}
                 <span className="text-primary">{maxSlot}</span>
               </div>
-              <div>
-                <span className="text-tertiary">Safe:</span>{' '}
-                <span className="text-primary">{safeSlot}</span>
-              </div>
-              <div>
-                <span className="text-tertiary">Head:</span>{' '}
-                <span className="text-primary">{headSlot}</span>
-              </div>
               <div className="col-span-2 mt-1">
                 <span className="text-tertiary">Range:</span>{' '}
                 <span className="text-primary text-[10px]">
@@ -180,8 +170,6 @@ function SlotStatusBar() {
       playbackSpeed,
       minSlot,
       maxSlot,
-      safeSlot,
-      headSlot,
       isStalled,
       isStale,
       staleBehindSlots,

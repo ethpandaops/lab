@@ -279,13 +279,6 @@ const PhaseTimeline: React.FC<PhaseTimelineProps> = ({
               className={`font-mono text-primary flex flex-col ${isMobile ? 'text-xs' : 'text-sm'}`}
             >
               <div className="text-lg font-semibold">Slot: {slotNumber ?? '—'}</div>
-              {slotNumber !== null && displaySlotOffset !== 0 && (
-                <div
-                  className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-secondary opacity-80`}
-                >
-                  Lag: {headLagSlots - displaySlotOffset}
-                </div>
-              )}
             </div>
           </div>
 
@@ -552,11 +545,6 @@ const PhaseTimeline: React.FC<PhaseTimelineProps> = ({
             className={`font-mono text-primary flex flex-col ${isMobile ? 'text-xs' : 'text-sm'}`}
           >
             <div className="text-lg font-semibold">Slot: {slotNumber ?? '—'}</div>
-            {slotNumber !== null && displaySlotOffset !== 0 && (
-              <div className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-secondary opacity-80`}>
-                Lag: {headLagSlots - displaySlotOffset}
-              </div>
-            )}
           </div>
         </div>
 

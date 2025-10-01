@@ -43,8 +43,8 @@ export function LocallyBuiltBlocks() {
   const slotsToFetch = useMemo(() => {
     if (!slotBounds) return [];
 
-    // Use safeSlot from experiment config if available, otherwise use headSlot
-    const latestAvailableSlot = slotBounds.safeSlot > 0 ? slotBounds.safeSlot : slotBounds.headSlot;
+    // Use maxSlot as the latest available slot
+    const latestAvailableSlot = slotBounds.maxSlot;
 
     if (latestAvailableSlot === 0) {
       // If we don't have data availability info yet, fall back to current slot
@@ -151,7 +151,7 @@ export function LocallyBuiltBlocks() {
   }
 
   // Show message if no data is available yet
-  if (!slotBounds || !slotBounds.hasData) {
+  if (!slotBounds || slotBounds.maxSlot === 0) {
     return (
       <div className="flex-1 flex items-center justify-center min-h-[50vh]">
         <div className="text-center max-w-md mx-auto">

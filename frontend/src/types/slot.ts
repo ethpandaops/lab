@@ -22,9 +22,6 @@ export function extractSlotBounds(
   return {
     minSlot: Number(dataAvailability.minSlot ?? 0),
     maxSlot: Number(dataAvailability.maxSlot ?? 0),
-    safeSlot: Number(dataAvailability.safeSlot ?? 0),
-    headSlot: Number(dataAvailability.headSlot ?? 0),
-    hasData: Boolean(dataAvailability.hasData ?? false),
   };
 }
 
@@ -37,8 +34,6 @@ export interface SlotContextValue {
   playbackSpeed: number;
   minSlot: number;
   maxSlot: number;
-  safeSlot: number;
-  headSlot: number;
   isStalled: boolean;
   isStale: boolean;
   staleBehindSlots: number;
@@ -65,9 +60,6 @@ export interface SlotActions {
 export interface SlotBounds {
   minSlot: number;
   maxSlot: number;
-  safeSlot: number;
-  headSlot: number;
-  hasData?: boolean;
 }
 
 export interface SlotProviderProps {
