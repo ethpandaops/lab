@@ -603,6 +603,55 @@ export class GetExperimentConfigRequest extends Message<GetExperimentConfigReque
 }
 
 /**
+ * GetNetworkExperimentConfigRequest defines the request for getting a single experiment's configuration for a specific network.
+ *
+ * @generated from message config.GetNetworkExperimentConfigRequest
+ */
+export class GetNetworkExperimentConfigRequest extends Message<GetNetworkExperimentConfigRequest> {
+  /**
+   * The experiment ID to get configuration for
+   *
+   * @generated from field: string experiment_id = 1;
+   */
+  experimentId = "";
+
+  /**
+   * The network to get configuration for
+   *
+   * @generated from field: string network = 2;
+   */
+  network = "";
+
+  constructor(data?: PartialMessage<GetNetworkExperimentConfigRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "config.GetNetworkExperimentConfigRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "experiment_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "network", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetNetworkExperimentConfigRequest {
+    return new GetNetworkExperimentConfigRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): GetNetworkExperimentConfigRequest {
+    return new GetNetworkExperimentConfigRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): GetNetworkExperimentConfigRequest {
+    return new GetNetworkExperimentConfigRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: GetNetworkExperimentConfigRequest | PlainMessage<GetNetworkExperimentConfigRequest> | undefined, b: GetNetworkExperimentConfigRequest | PlainMessage<GetNetworkExperimentConfigRequest> | undefined): boolean {
+    return proto3.util.equals(GetNetworkExperimentConfigRequest, a, b);
+  }
+}
+
+/**
  * GetExperimentConfigResponse returns a single experiment's full configuration with data availability.
  *
  * @generated from message config.GetExperimentConfigResponse
