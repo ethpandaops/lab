@@ -25,12 +25,14 @@ This React-based frontend application provides a user interface for exploring an
 ## Installation
 
 1. Clone the repository:
+
    ```bash
    git clone https://github.com/ethpandaops/lab.git
    cd lab/frontend
    ```
 
 2. Install dependencies:
+
    ```bash
    pnpm install
    ```
@@ -59,6 +61,7 @@ By default, the frontend connects to the backend API through a Vite proxy config
 The frontend supports two separate backend URLs:
 
 1. **Legacy Backend URL** (`VITE_BACKEND_URL`): Used for gRPC endpoints and static JSON files. This URL typically includes the `/lab-data` suffix.
+
    ```
    VITE_BACKEND_URL=https://lab-api.primary.production.platform.ethpandaops.io/lab-data
    ```
@@ -71,6 +74,7 @@ The frontend supports two separate backend URLs:
 If `VITE_REST_API_URL` is not set, the system will fall back to using `VITE_BACKEND_URL` (automatically stripping `/lab-data` if present).
 
 This dual-URL configuration allows you to:
+
 - Point to different servers for legacy and new endpoints
 - Gradually migrate from static data to REST APIs
 - Support different deployment scenarios

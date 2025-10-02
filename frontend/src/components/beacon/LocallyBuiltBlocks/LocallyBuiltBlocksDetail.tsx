@@ -84,21 +84,14 @@ export const LocallyBuiltBlocksDetail: FC<LocallyBuiltBlocksDetailProps> = ({ bl
   }
 
   // Calculate total value directly
-  const executionValue = block.executionPayloadValue
-    ? Number(block.executionPayloadValue.toString())
-    : 0;
-  const consensusValue = block.consensusPayloadValue
-    ? Number(block.consensusPayloadValue.toString())
-    : 0;
+  const executionValue = block.executionPayloadValue ? Number(block.executionPayloadValue.toString()) : 0;
+  const consensusValue = block.consensusPayloadValue ? Number(block.consensusPayloadValue.toString()) : 0;
   const totalValue = executionValue + consensusValue;
 
   // Calculate gas percentage
   const gasPercentage =
     Number(block.executionPayloadGasLimit) > 0
-      ? (
-          (Number(block.executionPayloadGasUsed) / Number(block.executionPayloadGasLimit)) *
-          100
-        ).toFixed(2)
+      ? ((Number(block.executionPayloadGasUsed) / Number(block.executionPayloadGasLimit)) * 100).toFixed(2)
       : '0.00';
 
   return (
@@ -132,11 +125,7 @@ export const LocallyBuiltBlocksDetail: FC<LocallyBuiltBlocksDetailProps> = ({ bl
                 subvalue={<FormattedTimestamp timestamp={block.slotStartDateTime} />}
               />
 
-              <InfoItem
-                icon={<Hash className="w-4 h-4" />}
-                label="Block Version"
-                value={block.blockVersion}
-              />
+              <InfoItem icon={<Hash className="w-4 h-4" />} label="Block Version" value={block.blockVersion} />
 
               <InfoItem
                 icon={<ArrowDownToLine className="w-4 h-4" />}
@@ -158,8 +147,7 @@ export const LocallyBuiltBlocksDetail: FC<LocallyBuiltBlocksDetailProps> = ({ bl
                 value={
                   <div className="flex items-center gap-2">
                     <span>
-                      {block.executionPayloadGasUsed.toString()} /{' '}
-                      {block.executionPayloadGasLimit.toString()}
+                      {block.executionPayloadGasUsed.toString()} / {block.executionPayloadGasLimit.toString()}
                     </span>
                     <div className="relative h-1.5 w-24 bg-surface/30 rounded-full overflow-hidden">
                       <div
@@ -209,9 +197,7 @@ export const LocallyBuiltBlocksDetail: FC<LocallyBuiltBlocksDetailProps> = ({ bl
                 icon={<Globe className="w-4 h-4" />}
                 label="Location"
                 value={
-                  <div className="flex items-center gap-2">
-                    {block.metadata?.metaClientGeoCountry || 'Unknown'}
-                  </div>
+                  <div className="flex items-center gap-2">{block.metadata?.metaClientGeoCountry || 'Unknown'}</div>
                 }
                 subvalue={block.metadata?.metaClientGeoCity}
               />
@@ -264,11 +250,7 @@ export const LocallyBuiltBlocksDetail: FC<LocallyBuiltBlocksDetailProps> = ({ bl
                   <InfoItem
                     icon={<Zap className="w-4 h-4" />}
                     label="Total Value"
-                    value={
-                      <div className="text-lg font-mono font-medium text-accent">
-                        {formatEther(totalValue)}
-                      </div>
-                    }
+                    value={<div className="text-lg font-mono font-medium text-accent">{formatEther(totalValue)}</div>}
                   />
                 </div>
               </div>
@@ -278,11 +260,10 @@ export const LocallyBuiltBlocksDetail: FC<LocallyBuiltBlocksDetailProps> = ({ bl
             <div className="bg-surface/20 p-4 rounded-lg border border-subtle/10">
               <h5 className="text-sm font-mono font-medium text-primary mb-2">Block Context</h5>
               <p className="text-xs font-mono text-tertiary leading-relaxed">
-                This block was built locally by a node running{' '}
-                {block.metadata?.metaClientName || 'Unknown'}. It represents what the node would
-                have proposed if selected as a block proposer for slot {block.slot.toString()}. This
-                data is useful for comparing different client implementations and their transaction
-                selection strategies.
+                This block was built locally by a node running {block.metadata?.metaClientName || 'Unknown'}. It
+                represents what the node would have proposed if selected as a block proposer for slot{' '}
+                {block.slot.toString()}. This data is useful for comparing different client implementations and their
+                transaction selection strategies.
               </p>
             </div>
           </div>

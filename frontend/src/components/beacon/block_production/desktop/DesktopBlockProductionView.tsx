@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useCallback } from 'react';
 import { Phase, BlockProductionBaseProps } from '../common/types';
 import BlockchainVisualization from '@/components/beacon/BlockchainVisualization';
 import { getCurrentPhase } from '../common/PhaseUtils';
@@ -7,7 +7,7 @@ import PhaseIcons from '../common/PhaseIcons';
 import BuildersRelaysPanel from './BuildersRelaysPanel';
 import ContinentsList from './ContinentsList';
 import { BeaconSlotData } from '@/api/gen/backend/pkg/server/proto/beacon_slots/beacon_slots_pb';
-import useTimeline from '@/contexts/timeline';
+import { useSlotProgress, useSlotState, useSlotConfig, useSlotActions } from '@/hooks/useSlot';
 
 // Define the flow animation styles
 const flowAnimations = `
@@ -27,6 +27,7 @@ const flowAnimations = `
 
 interface DesktopBlockProductionViewProps extends Omit<BlockProductionBaseProps, 'currentTime'> {
   slotData?: BeaconSlotData;
+  slotDataCache?: Record<number, BeaconSlotData>; // Cache of slot data for adjacent slots
   valueRange?: {
     min: number;
     max: number;
@@ -41,8 +42,6 @@ interface DesktopBlockProductionViewProps extends Omit<BlockProductionBaseProps,
 
   // Navigation controls for merged timeline
   slotNumber: number | null;
-  headLagSlots: number;
-  displaySlotOffset: number;
   goToPreviousSlot: () => void;
   goToNextSlot: () => void;
   resetToCurrentSlot: () => void;
@@ -61,11 +60,10 @@ const DesktopBlockProductionView: React.FC<DesktopBlockProductionViewProps> = ({
   nodeBlockSeen = {},
   nodeBlockP2P = {},
   slotData,
+  slotDataCache = {},
   onPhaseChange,
   // Navigation controls
   slotNumber,
-  headLagSlots,
-  displaySlotOffset,
   goToPreviousSlot,
   goToNextSlot,
   resetToCurrentSlot,
@@ -73,9 +71,22 @@ const DesktopBlockProductionView: React.FC<DesktopBlockProductionViewProps> = ({
   network,
   isLocallyBuilt = false,
 }) => {
-  // Get currentTime from the timeline context
-  const { currentTimeMs, isPlaying, togglePlayPause } = useTimeline();
-  
+  // Get currentTime from the slot context
+  const { slotProgress } = useSlotProgress();
+  const slotState = useSlotState();
+  const slotConfig = useSlotConfig();
+  const slotActions = useSlotActions();
+
+  const currentTimeMs = slotProgress;
+  const isPlaying = slotState.isPlaying;
+  const togglePlayPause = useCallback(() => {
+    if (isPlaying) {
+      slotActions.pause();
+    } else {
+      slotActions.play();
+    }
+  }, [isPlaying, slotActions]);
+
   // Get active status based on role and phase
   const isActive = (role: 'builder' | 'relay' | 'proposer' | 'node') => {
     // Determine transition point - when first node saw block or fallback to 5s
@@ -243,12 +254,11 @@ const DesktopBlockProductionView: React.FC<DesktopBlockProductionViewProps> = ({
               onPhaseChange={onPhaseChange}
               // Navigation controls
               slotNumber={slotNumber}
-              headLagSlots={headLagSlots}
-              displaySlotOffset={displaySlotOffset}
               isMobile={false} // Desktop view is never mobile
               goToPreviousSlot={goToPreviousSlot}
               goToNextSlot={goToNextSlot}
               resetToCurrentSlot={resetToCurrentSlot}
+              isPrevDisabled={slotState.currentSlot <= slotConfig.minSlot}
               isNextDisabled={isNextDisabled}
             />
           </div>
@@ -303,7 +313,14 @@ const DesktopBlockProductionView: React.FC<DesktopBlockProductionViewProps> = ({
             blockTime={blockTime}
             height="100%"
             width="100%"
-            slotData={slotData}
+            slotData={
+              slotNumber
+                ? {
+                    ...slotDataCache,
+                    ...(slotData ? { [slotNumber]: slotData } : {}),
+                  }
+                : undefined
+            }
           />
         </div>
 

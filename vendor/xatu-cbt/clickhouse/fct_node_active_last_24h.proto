@@ -17,7 +17,7 @@ message FctNodeActiveLast24h {
   string username = 13;
   // ID of the node
   string node_id = 14;
-  // Classification of the node, e.g. "individual", "institution", "internal" (aka ethPandaOps) or "unclassified"
+  // Classification of the node, e.g. "individual", "corporate", "internal" (aka ethPandaOps) or "unclassified"
   string classification = 15;
   // Name of the client
   string meta_client_name = 16;

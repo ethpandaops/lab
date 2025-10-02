@@ -1,4 +1,4 @@
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation } from '@tanstack/react-router';
 import { ChevronRight } from 'lucide-react';
 
 interface NavItem {
@@ -20,20 +20,6 @@ export const breadcrumbs = [
         name: 'Contributors',
         path: '/xatu/contributors',
         children: [{ name: ':name', path: '/xatu/contributors/:name' }],
-      },
-    ],
-  },
-  {
-    name: 'Beacon',
-    path: '/beacon',
-    children: [
-      {
-        name: 'Slot',
-        path: '/beacon/slot',
-        children: [
-          { name: 'Live View', path: '/beacon/slot/live' },
-          { name: ':slot', path: '/beacon/slot/:slot' },
-        ],
       },
     ],
   },

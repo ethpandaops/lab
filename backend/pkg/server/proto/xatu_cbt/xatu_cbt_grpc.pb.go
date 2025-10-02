@@ -20,9 +20,20 @@ import (
 const _ = grpc.SupportPackageIsVersion8
 
 const (
-	XatuCBT_ListFctNodeActiveLast24H_FullMethodName    = "/xatu_cbt.XatuCBT/ListFctNodeActiveLast24h"
-	XatuCBT_ListFctBlockFirstSeenByNode_FullMethodName = "/xatu_cbt.XatuCBT/ListFctBlockFirstSeenByNode"
-	XatuCBT_GetDataAvailability_FullMethodName         = "/xatu_cbt.XatuCBT/GetDataAvailability"
+	XatuCBT_ListFctNodeActiveLast24H_FullMethodName                      = "/xatu_cbt.XatuCBT/ListFctNodeActiveLast24h"
+	XatuCBT_ListFctBlockFirstSeenByNode_FullMethodName                   = "/xatu_cbt.XatuCBT/ListFctBlockFirstSeenByNode"
+	XatuCBT_ListFctBlockBlobFirstSeenByNode_FullMethodName               = "/xatu_cbt.XatuCBT/ListFctBlockBlobFirstSeenByNode"
+	XatuCBT_ListFctAttestationFirstSeenChunked50Ms_FullMethodName        = "/xatu_cbt.XatuCBT/ListFctAttestationFirstSeenChunked50ms"
+	XatuCBT_ListFctAttestationCorrectnessHead_FullMethodName             = "/xatu_cbt.XatuCBT/ListFctAttestationCorrectnessHead"
+	XatuCBT_ListFctMevBidCountByRelay_FullMethodName                     = "/xatu_cbt.XatuCBT/ListFctMevBidCountByRelay"
+	XatuCBT_ListFctMevBidCountByBuilder_FullMethodName                   = "/xatu_cbt.XatuCBT/ListFctMevBidCountByBuilder"
+	XatuCBT_ListFctMevBidHighestValueByBuilderChunked50Ms_FullMethodName = "/xatu_cbt.XatuCBT/ListFctMevBidHighestValueByBuilderChunked50ms"
+	XatuCBT_ListFctBlockBlobCountHead_FullMethodName                     = "/xatu_cbt.XatuCBT/ListFctBlockBlobCountHead"
+	XatuCBT_ListFctBlockHead_FullMethodName                              = "/xatu_cbt.XatuCBT/ListFctBlockHead"
+	XatuCBT_ListFctBlockMevHead_FullMethodName                           = "/xatu_cbt.XatuCBT/ListFctBlockMevHead"
+	XatuCBT_ListFctBlockProposerEntity_FullMethodName                    = "/xatu_cbt.XatuCBT/ListFctBlockProposerEntity"
+	XatuCBT_ListFctPreparedBlock_FullMethodName                          = "/xatu_cbt.XatuCBT/ListFctPreparedBlock"
+	XatuCBT_GetDataAvailability_FullMethodName                           = "/xatu_cbt.XatuCBT/GetDataAvailability"
 )
 
 // XatuCBTClient is the client API for XatuCBT service.
@@ -38,6 +49,39 @@ type XatuCBTClient interface {
 	// ListFctBlockFirstSeenByNode returns block timing data from the fct_block_first_seen_by_node table.
 	// This table contains information about when blocks were first seen by different nodes.
 	ListFctBlockFirstSeenByNode(ctx context.Context, in *clickhouse.ListFctBlockFirstSeenByNodeRequest, opts ...grpc.CallOption) (*clickhouse.ListFctBlockFirstSeenByNodeResponse, error)
+	// ListFctBlockBlobFirstSeenByNode returns blob timing data from the fct_block_blob_first_seen_by_node table.
+	// This table contains information about when blobs were first seen by different nodes.
+	ListFctBlockBlobFirstSeenByNode(ctx context.Context, in *clickhouse.ListFctBlockBlobFirstSeenByNodeRequest, opts ...grpc.CallOption) (*clickhouse.ListFctBlockBlobFirstSeenByNodeResponse, error)
+	// ListFctAttestationFirstSeenChunked50ms returns attestation timing data in 50ms chunks.
+	// This table contains attestations first seen on the unfinalized chain broken down by 50ms intervals.
+	ListFctAttestationFirstSeenChunked50Ms(ctx context.Context, in *clickhouse.ListFctAttestationFirstSeenChunked50MsRequest, opts ...grpc.CallOption) (*clickhouse.ListFctAttestationFirstSeenChunked50MsResponse, error)
+	// ListFctAttestationCorrectnessHead returns attestation correctness data for the head chain.
+	// This table contains voting statistics for blocks showing the actual vs expected attestations.
+	ListFctAttestationCorrectnessHead(ctx context.Context, in *clickhouse.ListFctAttestationCorrectnessHeadRequest, opts ...grpc.CallOption) (*clickhouse.ListFctAttestationCorrectnessHeadResponse, error)
+	// ListFctMevBidCountByRelay returns MEV relay bid count data.
+	// This table contains the total number of MEV relay bids for a slot by relay.
+	ListFctMevBidCountByRelay(ctx context.Context, in *clickhouse.ListFctMevBidCountByRelayRequest, opts ...grpc.CallOption) (*clickhouse.ListFctMevBidCountByRelayResponse, error)
+	// ListFctMevBidCountByBuilder returns MEV builder bid count data.
+	// This table contains the total number of MEV bids for a slot by builder.
+	ListFctMevBidCountByBuilder(ctx context.Context, in *clickhouse.ListFctMevBidCountByBuilderRequest, opts ...grpc.CallOption) (*clickhouse.ListFctMevBidCountByBuilderResponse, error)
+	// ListFctMevBidHighestValueByBuilderChunked50ms returns highest MEV bid values by builder for a slot in 50ms chunks.
+	// This table contains the highest value MEV relay bid for a slot by builder broken down by 50ms time chunks.
+	ListFctMevBidHighestValueByBuilderChunked50Ms(ctx context.Context, in *clickhouse.ListFctMevBidHighestValueByBuilderChunked50MsRequest, opts ...grpc.CallOption) (*clickhouse.ListFctMevBidHighestValueByBuilderChunked50MsResponse, error)
+	// ListFctBlockBlobCountHead returns blob count data for blocks in the unfinalized chain.
+	// This table contains the number of blobs for each block, with forks potentially causing multiple blocks per slot.
+	ListFctBlockBlobCountHead(ctx context.Context, in *clickhouse.ListFctBlockBlobCountHeadRequest, opts ...grpc.CallOption) (*clickhouse.ListFctBlockBlobCountHeadResponse, error)
+	// ListFctBlockHead returns beacon block data from the fct_block_head table.
+	// This table contains block details for the unfinalized chain, with potential multiple blocks per slot due to forks.
+	ListFctBlockHead(ctx context.Context, in *clickhouse.ListFctBlockHeadRequest, opts ...grpc.CallOption) (*clickhouse.ListFctBlockHeadResponse, error)
+	// ListFctBlockMevHead returns MEV block data for the unfinalized chain.
+	// This table contains MEV relay proposer payload delivered for blocks on the unfinalized chain.
+	ListFctBlockMevHead(ctx context.Context, in *clickhouse.ListFctBlockMevHeadRequest, opts ...grpc.CallOption) (*clickhouse.ListFctBlockMevHeadResponse, error)
+	// ListFctBlockProposerEntity returns proposer entity data from the fct_block_proposer_entity table.
+	// This table contains information about entities that proposed blocks in the unfinalized chain.
+	ListFctBlockProposerEntity(ctx context.Context, in *clickhouse.ListFctBlockProposerEntityRequest, opts ...grpc.CallOption) (*clickhouse.ListFctBlockProposerEntityResponse, error)
+	// ListFctPreparedBlock returns prepared blocks for a specific slot.
+	// This table contains locally built blocks that validators would have proposed.
+	ListFctPreparedBlock(ctx context.Context, in *clickhouse.ListFctPreparedBlockRequest, opts ...grpc.CallOption) (*clickhouse.ListFctPreparedBlockResponse, error)
 	// GetDataAvailability returns the common availability interval across a set of transformation tables.
 	// It calculates the overlapping data range for the specified tables and returns slot information.
 	GetDataAvailability(ctx context.Context, in *GetDataAvailabilityRequest, opts ...grpc.CallOption) (*GetDataAvailabilityResponse, error)
@@ -71,6 +115,116 @@ func (c *xatuCBTClient) ListFctBlockFirstSeenByNode(ctx context.Context, in *cli
 	return out, nil
 }
 
+func (c *xatuCBTClient) ListFctBlockBlobFirstSeenByNode(ctx context.Context, in *clickhouse.ListFctBlockBlobFirstSeenByNodeRequest, opts ...grpc.CallOption) (*clickhouse.ListFctBlockBlobFirstSeenByNodeResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(clickhouse.ListFctBlockBlobFirstSeenByNodeResponse)
+	err := c.cc.Invoke(ctx, XatuCBT_ListFctBlockBlobFirstSeenByNode_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *xatuCBTClient) ListFctAttestationFirstSeenChunked50Ms(ctx context.Context, in *clickhouse.ListFctAttestationFirstSeenChunked50MsRequest, opts ...grpc.CallOption) (*clickhouse.ListFctAttestationFirstSeenChunked50MsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(clickhouse.ListFctAttestationFirstSeenChunked50MsResponse)
+	err := c.cc.Invoke(ctx, XatuCBT_ListFctAttestationFirstSeenChunked50Ms_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *xatuCBTClient) ListFctAttestationCorrectnessHead(ctx context.Context, in *clickhouse.ListFctAttestationCorrectnessHeadRequest, opts ...grpc.CallOption) (*clickhouse.ListFctAttestationCorrectnessHeadResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(clickhouse.ListFctAttestationCorrectnessHeadResponse)
+	err := c.cc.Invoke(ctx, XatuCBT_ListFctAttestationCorrectnessHead_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *xatuCBTClient) ListFctMevBidCountByRelay(ctx context.Context, in *clickhouse.ListFctMevBidCountByRelayRequest, opts ...grpc.CallOption) (*clickhouse.ListFctMevBidCountByRelayResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(clickhouse.ListFctMevBidCountByRelayResponse)
+	err := c.cc.Invoke(ctx, XatuCBT_ListFctMevBidCountByRelay_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *xatuCBTClient) ListFctMevBidCountByBuilder(ctx context.Context, in *clickhouse.ListFctMevBidCountByBuilderRequest, opts ...grpc.CallOption) (*clickhouse.ListFctMevBidCountByBuilderResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(clickhouse.ListFctMevBidCountByBuilderResponse)
+	err := c.cc.Invoke(ctx, XatuCBT_ListFctMevBidCountByBuilder_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *xatuCBTClient) ListFctMevBidHighestValueByBuilderChunked50Ms(ctx context.Context, in *clickhouse.ListFctMevBidHighestValueByBuilderChunked50MsRequest, opts ...grpc.CallOption) (*clickhouse.ListFctMevBidHighestValueByBuilderChunked50MsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(clickhouse.ListFctMevBidHighestValueByBuilderChunked50MsResponse)
+	err := c.cc.Invoke(ctx, XatuCBT_ListFctMevBidHighestValueByBuilderChunked50Ms_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *xatuCBTClient) ListFctBlockBlobCountHead(ctx context.Context, in *clickhouse.ListFctBlockBlobCountHeadRequest, opts ...grpc.CallOption) (*clickhouse.ListFctBlockBlobCountHeadResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(clickhouse.ListFctBlockBlobCountHeadResponse)
+	err := c.cc.Invoke(ctx, XatuCBT_ListFctBlockBlobCountHead_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *xatuCBTClient) ListFctBlockHead(ctx context.Context, in *clickhouse.ListFctBlockHeadRequest, opts ...grpc.CallOption) (*clickhouse.ListFctBlockHeadResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(clickhouse.ListFctBlockHeadResponse)
+	err := c.cc.Invoke(ctx, XatuCBT_ListFctBlockHead_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *xatuCBTClient) ListFctBlockMevHead(ctx context.Context, in *clickhouse.ListFctBlockMevHeadRequest, opts ...grpc.CallOption) (*clickhouse.ListFctBlockMevHeadResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(clickhouse.ListFctBlockMevHeadResponse)
+	err := c.cc.Invoke(ctx, XatuCBT_ListFctBlockMevHead_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *xatuCBTClient) ListFctBlockProposerEntity(ctx context.Context, in *clickhouse.ListFctBlockProposerEntityRequest, opts ...grpc.CallOption) (*clickhouse.ListFctBlockProposerEntityResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(clickhouse.ListFctBlockProposerEntityResponse)
+	err := c.cc.Invoke(ctx, XatuCBT_ListFctBlockProposerEntity_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *xatuCBTClient) ListFctPreparedBlock(ctx context.Context, in *clickhouse.ListFctPreparedBlockRequest, opts ...grpc.CallOption) (*clickhouse.ListFctPreparedBlockResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(clickhouse.ListFctPreparedBlockResponse)
+	err := c.cc.Invoke(ctx, XatuCBT_ListFctPreparedBlock_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *xatuCBTClient) GetDataAvailability(ctx context.Context, in *GetDataAvailabilityRequest, opts ...grpc.CallOption) (*GetDataAvailabilityResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(GetDataAvailabilityResponse)
@@ -94,6 +248,39 @@ type XatuCBTServer interface {
 	// ListFctBlockFirstSeenByNode returns block timing data from the fct_block_first_seen_by_node table.
 	// This table contains information about when blocks were first seen by different nodes.
 	ListFctBlockFirstSeenByNode(context.Context, *clickhouse.ListFctBlockFirstSeenByNodeRequest) (*clickhouse.ListFctBlockFirstSeenByNodeResponse, error)
+	// ListFctBlockBlobFirstSeenByNode returns blob timing data from the fct_block_blob_first_seen_by_node table.
+	// This table contains information about when blobs were first seen by different nodes.
+	ListFctBlockBlobFirstSeenByNode(context.Context, *clickhouse.ListFctBlockBlobFirstSeenByNodeRequest) (*clickhouse.ListFctBlockBlobFirstSeenByNodeResponse, error)
+	// ListFctAttestationFirstSeenChunked50ms returns attestation timing data in 50ms chunks.
+	// This table contains attestations first seen on the unfinalized chain broken down by 50ms intervals.
+	ListFctAttestationFirstSeenChunked50Ms(context.Context, *clickhouse.ListFctAttestationFirstSeenChunked50MsRequest) (*clickhouse.ListFctAttestationFirstSeenChunked50MsResponse, error)
+	// ListFctAttestationCorrectnessHead returns attestation correctness data for the head chain.
+	// This table contains voting statistics for blocks showing the actual vs expected attestations.
+	ListFctAttestationCorrectnessHead(context.Context, *clickhouse.ListFctAttestationCorrectnessHeadRequest) (*clickhouse.ListFctAttestationCorrectnessHeadResponse, error)
+	// ListFctMevBidCountByRelay returns MEV relay bid count data.
+	// This table contains the total number of MEV relay bids for a slot by relay.
+	ListFctMevBidCountByRelay(context.Context, *clickhouse.ListFctMevBidCountByRelayRequest) (*clickhouse.ListFctMevBidCountByRelayResponse, error)
+	// ListFctMevBidCountByBuilder returns MEV builder bid count data.
+	// This table contains the total number of MEV bids for a slot by builder.
+	ListFctMevBidCountByBuilder(context.Context, *clickhouse.ListFctMevBidCountByBuilderRequest) (*clickhouse.ListFctMevBidCountByBuilderResponse, error)
+	// ListFctMevBidHighestValueByBuilderChunked50ms returns highest MEV bid values by builder for a slot in 50ms chunks.
+	// This table contains the highest value MEV relay bid for a slot by builder broken down by 50ms time chunks.
+	ListFctMevBidHighestValueByBuilderChunked50Ms(context.Context, *clickhouse.ListFctMevBidHighestValueByBuilderChunked50MsRequest) (*clickhouse.ListFctMevBidHighestValueByBuilderChunked50MsResponse, error)
+	// ListFctBlockBlobCountHead returns blob count data for blocks in the unfinalized chain.
+	// This table contains the number of blobs for each block, with forks potentially causing multiple blocks per slot.
+	ListFctBlockBlobCountHead(context.Context, *clickhouse.ListFctBlockBlobCountHeadRequest) (*clickhouse.ListFctBlockBlobCountHeadResponse, error)
+	// ListFctBlockHead returns beacon block data from the fct_block_head table.
+	// This table contains block details for the unfinalized chain, with potential multiple blocks per slot due to forks.
+	ListFctBlockHead(context.Context, *clickhouse.ListFctBlockHeadRequest) (*clickhouse.ListFctBlockHeadResponse, error)
+	// ListFctBlockMevHead returns MEV block data for the unfinalized chain.
+	// This table contains MEV relay proposer payload delivered for blocks on the unfinalized chain.
+	ListFctBlockMevHead(context.Context, *clickhouse.ListFctBlockMevHeadRequest) (*clickhouse.ListFctBlockMevHeadResponse, error)
+	// ListFctBlockProposerEntity returns proposer entity data from the fct_block_proposer_entity table.
+	// This table contains information about entities that proposed blocks in the unfinalized chain.
+	ListFctBlockProposerEntity(context.Context, *clickhouse.ListFctBlockProposerEntityRequest) (*clickhouse.ListFctBlockProposerEntityResponse, error)
+	// ListFctPreparedBlock returns prepared blocks for a specific slot.
+	// This table contains locally built blocks that validators would have proposed.
+	ListFctPreparedBlock(context.Context, *clickhouse.ListFctPreparedBlockRequest) (*clickhouse.ListFctPreparedBlockResponse, error)
 	// GetDataAvailability returns the common availability interval across a set of transformation tables.
 	// It calculates the overlapping data range for the specified tables and returns slot information.
 	GetDataAvailability(context.Context, *GetDataAvailabilityRequest) (*GetDataAvailabilityResponse, error)
@@ -109,6 +296,39 @@ func (UnimplementedXatuCBTServer) ListFctNodeActiveLast24H(context.Context, *cli
 }
 func (UnimplementedXatuCBTServer) ListFctBlockFirstSeenByNode(context.Context, *clickhouse.ListFctBlockFirstSeenByNodeRequest) (*clickhouse.ListFctBlockFirstSeenByNodeResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListFctBlockFirstSeenByNode not implemented")
+}
+func (UnimplementedXatuCBTServer) ListFctBlockBlobFirstSeenByNode(context.Context, *clickhouse.ListFctBlockBlobFirstSeenByNodeRequest) (*clickhouse.ListFctBlockBlobFirstSeenByNodeResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListFctBlockBlobFirstSeenByNode not implemented")
+}
+func (UnimplementedXatuCBTServer) ListFctAttestationFirstSeenChunked50Ms(context.Context, *clickhouse.ListFctAttestationFirstSeenChunked50MsRequest) (*clickhouse.ListFctAttestationFirstSeenChunked50MsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListFctAttestationFirstSeenChunked50Ms not implemented")
+}
+func (UnimplementedXatuCBTServer) ListFctAttestationCorrectnessHead(context.Context, *clickhouse.ListFctAttestationCorrectnessHeadRequest) (*clickhouse.ListFctAttestationCorrectnessHeadResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListFctAttestationCorrectnessHead not implemented")
+}
+func (UnimplementedXatuCBTServer) ListFctMevBidCountByRelay(context.Context, *clickhouse.ListFctMevBidCountByRelayRequest) (*clickhouse.ListFctMevBidCountByRelayResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListFctMevBidCountByRelay not implemented")
+}
+func (UnimplementedXatuCBTServer) ListFctMevBidCountByBuilder(context.Context, *clickhouse.ListFctMevBidCountByBuilderRequest) (*clickhouse.ListFctMevBidCountByBuilderResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListFctMevBidCountByBuilder not implemented")
+}
+func (UnimplementedXatuCBTServer) ListFctMevBidHighestValueByBuilderChunked50Ms(context.Context, *clickhouse.ListFctMevBidHighestValueByBuilderChunked50MsRequest) (*clickhouse.ListFctMevBidHighestValueByBuilderChunked50MsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListFctMevBidHighestValueByBuilderChunked50Ms not implemented")
+}
+func (UnimplementedXatuCBTServer) ListFctBlockBlobCountHead(context.Context, *clickhouse.ListFctBlockBlobCountHeadRequest) (*clickhouse.ListFctBlockBlobCountHeadResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListFctBlockBlobCountHead not implemented")
+}
+func (UnimplementedXatuCBTServer) ListFctBlockHead(context.Context, *clickhouse.ListFctBlockHeadRequest) (*clickhouse.ListFctBlockHeadResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListFctBlockHead not implemented")
+}
+func (UnimplementedXatuCBTServer) ListFctBlockMevHead(context.Context, *clickhouse.ListFctBlockMevHeadRequest) (*clickhouse.ListFctBlockMevHeadResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListFctBlockMevHead not implemented")
+}
+func (UnimplementedXatuCBTServer) ListFctBlockProposerEntity(context.Context, *clickhouse.ListFctBlockProposerEntityRequest) (*clickhouse.ListFctBlockProposerEntityResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListFctBlockProposerEntity not implemented")
+}
+func (UnimplementedXatuCBTServer) ListFctPreparedBlock(context.Context, *clickhouse.ListFctPreparedBlockRequest) (*clickhouse.ListFctPreparedBlockResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListFctPreparedBlock not implemented")
 }
 func (UnimplementedXatuCBTServer) GetDataAvailability(context.Context, *GetDataAvailabilityRequest) (*GetDataAvailabilityResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetDataAvailability not implemented")
@@ -162,6 +382,204 @@ func _XatuCBT_ListFctBlockFirstSeenByNode_Handler(srv interface{}, ctx context.C
 	return interceptor(ctx, in, info, handler)
 }
 
+func _XatuCBT_ListFctBlockBlobFirstSeenByNode_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(clickhouse.ListFctBlockBlobFirstSeenByNodeRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(XatuCBTServer).ListFctBlockBlobFirstSeenByNode(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: XatuCBT_ListFctBlockBlobFirstSeenByNode_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(XatuCBTServer).ListFctBlockBlobFirstSeenByNode(ctx, req.(*clickhouse.ListFctBlockBlobFirstSeenByNodeRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _XatuCBT_ListFctAttestationFirstSeenChunked50Ms_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(clickhouse.ListFctAttestationFirstSeenChunked50MsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(XatuCBTServer).ListFctAttestationFirstSeenChunked50Ms(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: XatuCBT_ListFctAttestationFirstSeenChunked50Ms_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(XatuCBTServer).ListFctAttestationFirstSeenChunked50Ms(ctx, req.(*clickhouse.ListFctAttestationFirstSeenChunked50MsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _XatuCBT_ListFctAttestationCorrectnessHead_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(clickhouse.ListFctAttestationCorrectnessHeadRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(XatuCBTServer).ListFctAttestationCorrectnessHead(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: XatuCBT_ListFctAttestationCorrectnessHead_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(XatuCBTServer).ListFctAttestationCorrectnessHead(ctx, req.(*clickhouse.ListFctAttestationCorrectnessHeadRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _XatuCBT_ListFctMevBidCountByRelay_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(clickhouse.ListFctMevBidCountByRelayRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(XatuCBTServer).ListFctMevBidCountByRelay(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: XatuCBT_ListFctMevBidCountByRelay_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(XatuCBTServer).ListFctMevBidCountByRelay(ctx, req.(*clickhouse.ListFctMevBidCountByRelayRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _XatuCBT_ListFctMevBidCountByBuilder_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(clickhouse.ListFctMevBidCountByBuilderRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(XatuCBTServer).ListFctMevBidCountByBuilder(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: XatuCBT_ListFctMevBidCountByBuilder_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(XatuCBTServer).ListFctMevBidCountByBuilder(ctx, req.(*clickhouse.ListFctMevBidCountByBuilderRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _XatuCBT_ListFctMevBidHighestValueByBuilderChunked50Ms_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(clickhouse.ListFctMevBidHighestValueByBuilderChunked50MsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(XatuCBTServer).ListFctMevBidHighestValueByBuilderChunked50Ms(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: XatuCBT_ListFctMevBidHighestValueByBuilderChunked50Ms_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(XatuCBTServer).ListFctMevBidHighestValueByBuilderChunked50Ms(ctx, req.(*clickhouse.ListFctMevBidHighestValueByBuilderChunked50MsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _XatuCBT_ListFctBlockBlobCountHead_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(clickhouse.ListFctBlockBlobCountHeadRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(XatuCBTServer).ListFctBlockBlobCountHead(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: XatuCBT_ListFctBlockBlobCountHead_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(XatuCBTServer).ListFctBlockBlobCountHead(ctx, req.(*clickhouse.ListFctBlockBlobCountHeadRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _XatuCBT_ListFctBlockHead_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(clickhouse.ListFctBlockHeadRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(XatuCBTServer).ListFctBlockHead(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: XatuCBT_ListFctBlockHead_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(XatuCBTServer).ListFctBlockHead(ctx, req.(*clickhouse.ListFctBlockHeadRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _XatuCBT_ListFctBlockMevHead_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(clickhouse.ListFctBlockMevHeadRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(XatuCBTServer).ListFctBlockMevHead(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: XatuCBT_ListFctBlockMevHead_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(XatuCBTServer).ListFctBlockMevHead(ctx, req.(*clickhouse.ListFctBlockMevHeadRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _XatuCBT_ListFctBlockProposerEntity_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(clickhouse.ListFctBlockProposerEntityRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(XatuCBTServer).ListFctBlockProposerEntity(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: XatuCBT_ListFctBlockProposerEntity_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(XatuCBTServer).ListFctBlockProposerEntity(ctx, req.(*clickhouse.ListFctBlockProposerEntityRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _XatuCBT_ListFctPreparedBlock_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(clickhouse.ListFctPreparedBlockRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(XatuCBTServer).ListFctPreparedBlock(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: XatuCBT_ListFctPreparedBlock_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(XatuCBTServer).ListFctPreparedBlock(ctx, req.(*clickhouse.ListFctPreparedBlockRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _XatuCBT_GetDataAvailability_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetDataAvailabilityRequest)
 	if err := dec(in); err != nil {
@@ -194,6 +612,50 @@ var XatuCBT_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListFctBlockFirstSeenByNode",
 			Handler:    _XatuCBT_ListFctBlockFirstSeenByNode_Handler,
+		},
+		{
+			MethodName: "ListFctBlockBlobFirstSeenByNode",
+			Handler:    _XatuCBT_ListFctBlockBlobFirstSeenByNode_Handler,
+		},
+		{
+			MethodName: "ListFctAttestationFirstSeenChunked50ms",
+			Handler:    _XatuCBT_ListFctAttestationFirstSeenChunked50Ms_Handler,
+		},
+		{
+			MethodName: "ListFctAttestationCorrectnessHead",
+			Handler:    _XatuCBT_ListFctAttestationCorrectnessHead_Handler,
+		},
+		{
+			MethodName: "ListFctMevBidCountByRelay",
+			Handler:    _XatuCBT_ListFctMevBidCountByRelay_Handler,
+		},
+		{
+			MethodName: "ListFctMevBidCountByBuilder",
+			Handler:    _XatuCBT_ListFctMevBidCountByBuilder_Handler,
+		},
+		{
+			MethodName: "ListFctMevBidHighestValueByBuilderChunked50ms",
+			Handler:    _XatuCBT_ListFctMevBidHighestValueByBuilderChunked50Ms_Handler,
+		},
+		{
+			MethodName: "ListFctBlockBlobCountHead",
+			Handler:    _XatuCBT_ListFctBlockBlobCountHead_Handler,
+		},
+		{
+			MethodName: "ListFctBlockHead",
+			Handler:    _XatuCBT_ListFctBlockHead_Handler,
+		},
+		{
+			MethodName: "ListFctBlockMevHead",
+			Handler:    _XatuCBT_ListFctBlockMevHead_Handler,
+		},
+		{
+			MethodName: "ListFctBlockProposerEntity",
+			Handler:    _XatuCBT_ListFctBlockProposerEntity_Handler,
+		},
+		{
+			MethodName: "ListFctPreparedBlock",
+			Handler:    _XatuCBT_ListFctPreparedBlock_Handler,
 		},
 		{
 			MethodName: "GetDataAvailability",

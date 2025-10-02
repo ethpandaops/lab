@@ -1,10 +1,4 @@
-import {
-  useContext as reactUseContext,
-  createContext,
-  useState,
-  useEffect,
-  ReactNode,
-} from 'react';
+import { useContext as reactUseContext, createContext, useState, useEffect, ReactNode } from 'react';
 import { Config } from '@/api/client.ts';
 
 // Constants for beacon chain timing calculations
@@ -91,7 +85,6 @@ export interface State {
   setConfig: (config: Config) => void;
   clocks: Map<string, BeaconClock>;
   currentSlots: Map<string, number>;
-  availableNetworks: string[];
   subscribeToSlotChanges: (network: string, callback: SlotChangeCallback) => () => void;
   getBeaconClock: (network: string) => BeaconClock | null;
   getHeadLagSlots: (network: string) => number;
@@ -121,13 +114,11 @@ export function useValue(props: ValueProps): State {
   const [clocks, setClocks] = useState<Map<string, BeaconClock>>(new Map());
   const [currentSlots, setCurrentSlots] = useState<Map<string, number>>(new Map());
   const [slotChangeCallbacks] = useState<Map<string, SlotChangeCallback[]>>(new Map());
-  const [availableNetworks, setAvailableNetworks] = useState<string[]>([]);
 
   // Initialize clocks when config changes
   useEffect(() => {
     const newClocks = new Map<string, BeaconClock>();
     const newCurrentSlots = new Map<string, number>();
-    const networks: string[] = [];
 
     if (config?.ethereum?.networks) {
       Object.entries(config.ethereum.networks).forEach(([network, networkConfig]) => {
@@ -137,7 +128,6 @@ export function useValue(props: ValueProps): State {
             const clock = new BeaconClock(genesisTime);
             newClocks.set(network, clock);
             newCurrentSlots.set(network, clock.getCurrentSlot());
-            networks.push(network);
           }
         }
       });
@@ -145,7 +135,6 @@ export function useValue(props: ValueProps): State {
 
     setClocks(newClocks);
     setCurrentSlots(newCurrentSlots);
-    setAvailableNetworks(networks);
   }, [config]);
 
   // Set up slot monitoring
@@ -223,7 +212,7 @@ export function useValue(props: ValueProps): State {
     return 2;
   };
 
-  // Function to get backlog days for a network  
+  // Function to get backlog days for a network
   const getBacklogDays = (network: string): number => {
     // Get from historical-slots experiment config
     if (config?.experiments) {
@@ -245,7 +234,6 @@ export function useValue(props: ValueProps): State {
     setConfig,
     clocks,
     currentSlots,
-    availableNetworks,
     subscribeToSlotChanges,
     getBeaconClock,
     getHeadLagSlots,

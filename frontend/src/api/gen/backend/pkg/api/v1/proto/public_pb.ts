@@ -258,6 +258,16 @@ export class GeoInfo extends Message<GeoInfo> {
    */
   continentCode = "";
 
+  /**
+   * @generated from field: optional double latitude = 5;
+   */
+  latitude?: number;
+
+  /**
+   * @generated from field: optional double longitude = 6;
+   */
+  longitude?: number;
+
   constructor(data?: PartialMessage<GeoInfo>) {
     super();
     proto3.util.initPartial(data, this);
@@ -270,6 +280,8 @@ export class GeoInfo extends Message<GeoInfo> {
     { no: 2, name: "country", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 3, name: "country_code", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 4, name: "continent_code", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 5, name: "latitude", kind: "scalar", T: 1 /* ScalarType.DOUBLE */, opt: true },
+    { no: 6, name: "longitude", kind: "scalar", T: 1 /* ScalarType.DOUBLE */, opt: true },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GeoInfo {
@@ -558,6 +570,516 @@ export class NetworkFilterMetadata extends Message<NetworkFilterMetadata> {
 
   static equals(a: NetworkFilterMetadata | PlainMessage<NetworkFilterMetadata> | undefined, b: NetworkFilterMetadata | PlainMessage<NetworkFilterMetadata> | undefined): boolean {
     return proto3.util.equals(NetworkFilterMetadata, a, b);
+  }
+}
+
+/**
+ * ListBeaconSlotMevRelayResponse is the v1 API response for MEV relay bid counts by slot.
+ *
+ * @generated from message api.v1.ListBeaconSlotMevRelayResponse
+ */
+export class ListBeaconSlotMevRelayResponse extends Message<ListBeaconSlotMevRelayResponse> {
+  /**
+   * @generated from field: repeated api.v1.MevRelayBidCount relays = 1;
+   */
+  relays: MevRelayBidCount[] = [];
+
+  /**
+   * @generated from field: api.v1.PaginationMetadata pagination = 2;
+   */
+  pagination?: PaginationMetadata;
+
+  /**
+   * @generated from field: api.v1.FilterMetadata filters = 3;
+   */
+  filters?: FilterMetadata;
+
+  constructor(data?: PartialMessage<ListBeaconSlotMevRelayResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.v1.ListBeaconSlotMevRelayResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "relays", kind: "message", T: MevRelayBidCount, repeated: true },
+    { no: 2, name: "pagination", kind: "message", T: PaginationMetadata },
+    { no: 3, name: "filters", kind: "message", T: FilterMetadata },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ListBeaconSlotMevRelayResponse {
+    return new ListBeaconSlotMevRelayResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ListBeaconSlotMevRelayResponse {
+    return new ListBeaconSlotMevRelayResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ListBeaconSlotMevRelayResponse {
+    return new ListBeaconSlotMevRelayResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: ListBeaconSlotMevRelayResponse | PlainMessage<ListBeaconSlotMevRelayResponse> | undefined, b: ListBeaconSlotMevRelayResponse | PlainMessage<ListBeaconSlotMevRelayResponse> | undefined): boolean {
+    return proto3.util.equals(ListBeaconSlotMevRelayResponse, a, b);
+  }
+}
+
+/**
+ * MevRelayBidCount represents MEV relay bid statistics for public API consumption.
+ *
+ * @generated from message api.v1.MevRelayBidCount
+ */
+export class MevRelayBidCount extends Message<MevRelayBidCount> {
+  /**
+   * Relay identifier
+   *
+   * @generated from field: string relay_name = 1;
+   */
+  relayName = "";
+
+  /**
+   * Total number of bids
+   *
+   * @generated from field: uint32 bid_count = 2;
+   */
+  bidCount = 0;
+
+  constructor(data?: PartialMessage<MevRelayBidCount>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.v1.MevRelayBidCount";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "relay_name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "bid_count", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): MevRelayBidCount {
+    return new MevRelayBidCount().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): MevRelayBidCount {
+    return new MevRelayBidCount().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): MevRelayBidCount {
+    return new MevRelayBidCount().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: MevRelayBidCount | PlainMessage<MevRelayBidCount> | undefined, b: MevRelayBidCount | PlainMessage<MevRelayBidCount> | undefined): boolean {
+    return proto3.util.equals(MevRelayBidCount, a, b);
+  }
+}
+
+/**
+ * ListBeaconSlotMevBuilderCountResponse is the v1 API response for MEV builder bid counts by slot.
+ *
+ * @generated from message api.v1.ListBeaconSlotMevBuilderCountResponse
+ */
+export class ListBeaconSlotMevBuilderCountResponse extends Message<ListBeaconSlotMevBuilderCountResponse> {
+  /**
+   * @generated from field: repeated api.v1.MevBuilderBidCount builders = 1;
+   */
+  builders: MevBuilderBidCount[] = [];
+
+  /**
+   * @generated from field: api.v1.PaginationMetadata pagination = 2;
+   */
+  pagination?: PaginationMetadata;
+
+  /**
+   * @generated from field: api.v1.FilterMetadata filters = 3;
+   */
+  filters?: FilterMetadata;
+
+  constructor(data?: PartialMessage<ListBeaconSlotMevBuilderCountResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.v1.ListBeaconSlotMevBuilderCountResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "builders", kind: "message", T: MevBuilderBidCount, repeated: true },
+    { no: 2, name: "pagination", kind: "message", T: PaginationMetadata },
+    { no: 3, name: "filters", kind: "message", T: FilterMetadata },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ListBeaconSlotMevBuilderCountResponse {
+    return new ListBeaconSlotMevBuilderCountResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ListBeaconSlotMevBuilderCountResponse {
+    return new ListBeaconSlotMevBuilderCountResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ListBeaconSlotMevBuilderCountResponse {
+    return new ListBeaconSlotMevBuilderCountResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: ListBeaconSlotMevBuilderCountResponse | PlainMessage<ListBeaconSlotMevBuilderCountResponse> | undefined, b: ListBeaconSlotMevBuilderCountResponse | PlainMessage<ListBeaconSlotMevBuilderCountResponse> | undefined): boolean {
+    return proto3.util.equals(ListBeaconSlotMevBuilderCountResponse, a, b);
+  }
+}
+
+/**
+ * MevBuilderBidCount represents MEV builder bid statistics for public API consumption.
+ *
+ * @generated from message api.v1.MevBuilderBidCount
+ */
+export class MevBuilderBidCount extends Message<MevBuilderBidCount> {
+  /**
+   * Builder public key identifier
+   *
+   * @generated from field: string builder_pubkey = 1;
+   */
+  builderPubkey = "";
+
+  /**
+   * Total number of bids from this builder
+   *
+   * @generated from field: uint32 bid_count = 2;
+   */
+  bidCount = 0;
+
+  constructor(data?: PartialMessage<MevBuilderBidCount>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.v1.MevBuilderBidCount";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "builder_pubkey", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "bid_count", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): MevBuilderBidCount {
+    return new MevBuilderBidCount().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): MevBuilderBidCount {
+    return new MevBuilderBidCount().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): MevBuilderBidCount {
+    return new MevBuilderBidCount().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: MevBuilderBidCount | PlainMessage<MevBuilderBidCount> | undefined, b: MevBuilderBidCount | PlainMessage<MevBuilderBidCount> | undefined): boolean {
+    return proto3.util.equals(MevBuilderBidCount, a, b);
+  }
+}
+
+/**
+ * ListBeaconSlotMevResponse is the v1 API response for MEV block data by slot.
+ *
+ * @generated from message api.v1.ListBeaconSlotMevResponse
+ */
+export class ListBeaconSlotMevResponse extends Message<ListBeaconSlotMevResponse> {
+  /**
+   * @generated from field: repeated api.v1.MevBlock blocks = 1;
+   */
+  blocks: MevBlock[] = [];
+
+  /**
+   * @generated from field: api.v1.PaginationMetadata pagination = 2;
+   */
+  pagination?: PaginationMetadata;
+
+  /**
+   * @generated from field: api.v1.FilterMetadata filters = 3;
+   */
+  filters?: FilterMetadata;
+
+  constructor(data?: PartialMessage<ListBeaconSlotMevResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.v1.ListBeaconSlotMevResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "blocks", kind: "message", T: MevBlock, repeated: true },
+    { no: 2, name: "pagination", kind: "message", T: PaginationMetadata },
+    { no: 3, name: "filters", kind: "message", T: FilterMetadata },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ListBeaconSlotMevResponse {
+    return new ListBeaconSlotMevResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ListBeaconSlotMevResponse {
+    return new ListBeaconSlotMevResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ListBeaconSlotMevResponse {
+    return new ListBeaconSlotMevResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: ListBeaconSlotMevResponse | PlainMessage<ListBeaconSlotMevResponse> | undefined, b: ListBeaconSlotMevResponse | PlainMessage<ListBeaconSlotMevResponse> | undefined): boolean {
+    return proto3.util.equals(ListBeaconSlotMevResponse, a, b);
+  }
+}
+
+/**
+ * MevBlock represents MEV block data for public API consumption.
+ *
+ * @generated from message api.v1.MevBlock
+ */
+export class MevBlock extends Message<MevBlock> {
+  /**
+   * Block root hash
+   *
+   * @generated from field: string block_root = 1;
+   */
+  blockRoot = "";
+
+  /**
+   * Execution layer block hash
+   *
+   * @generated from field: string block_hash = 2;
+   */
+  blockHash = "";
+
+  /**
+   * Execution layer block number
+   *
+   * @generated from field: uint64 block_number = 3;
+   */
+  blockNumber = protoInt64.zero;
+
+  /**
+   * Parent block hash
+   *
+   * @generated from field: string parent_hash = 4;
+   */
+  parentHash = "";
+
+  /**
+   * Builder public key
+   *
+   * @generated from field: string builder_pubkey = 5;
+   */
+  builderPubkey = "";
+
+  /**
+   * Proposer public key
+   *
+   * @generated from field: string proposer_pubkey = 6;
+   */
+  proposerPubkey = "";
+
+  /**
+   * Fee recipient address
+   *
+   * @generated from field: string proposer_fee_recipient = 7;
+   */
+  proposerFeeRecipient = "";
+
+  /**
+   * Gas limit
+   *
+   * @generated from field: uint64 gas_limit = 8;
+   */
+  gasLimit = protoInt64.zero;
+
+  /**
+   * Gas used
+   *
+   * @generated from field: uint64 gas_used = 9;
+   */
+  gasUsed = protoInt64.zero;
+
+  /**
+   * MEV value in wei
+   *
+   * @generated from field: string value = 10;
+   */
+  value = "";
+
+  /**
+   * Number of transactions
+   *
+   * @generated from field: uint32 transaction_count = 11;
+   */
+  transactionCount = 0;
+
+  /**
+   * Relay names that delivered the payload
+   *
+   * @generated from field: repeated string relay_names = 12;
+   */
+  relayNames: string[] = [];
+
+  /**
+   * Earliest bid timestamp (ISO 8601)
+   *
+   * @generated from field: string earliest_bid_time = 13;
+   */
+  earliestBidTime = "";
+
+  constructor(data?: PartialMessage<MevBlock>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.v1.MevBlock";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "block_root", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "block_hash", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "block_number", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
+    { no: 4, name: "parent_hash", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 5, name: "builder_pubkey", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 6, name: "proposer_pubkey", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 7, name: "proposer_fee_recipient", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 8, name: "gas_limit", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
+    { no: 9, name: "gas_used", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
+    { no: 10, name: "value", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 11, name: "transaction_count", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
+    { no: 12, name: "relay_names", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+    { no: 13, name: "earliest_bid_time", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): MevBlock {
+    return new MevBlock().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): MevBlock {
+    return new MevBlock().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): MevBlock {
+    return new MevBlock().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: MevBlock | PlainMessage<MevBlock> | undefined, b: MevBlock | PlainMessage<MevBlock> | undefined): boolean {
+    return proto3.util.equals(MevBlock, a, b);
+  }
+}
+
+/**
+ * ListBeaconSlotMevBuilderResponse is the v1 API response for highest MEV builder bids by slot.
+ *
+ * @generated from message api.v1.ListBeaconSlotMevBuilderResponse
+ */
+export class ListBeaconSlotMevBuilderResponse extends Message<ListBeaconSlotMevBuilderResponse> {
+  /**
+   * @generated from field: repeated api.v1.MevBuilderBid builders = 1;
+   */
+  builders: MevBuilderBid[] = [];
+
+  /**
+   * @generated from field: api.v1.PaginationMetadata pagination = 2;
+   */
+  pagination?: PaginationMetadata;
+
+  /**
+   * @generated from field: api.v1.FilterMetadata filters = 3;
+   */
+  filters?: FilterMetadata;
+
+  constructor(data?: PartialMessage<ListBeaconSlotMevBuilderResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.v1.ListBeaconSlotMevBuilderResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "builders", kind: "message", T: MevBuilderBid, repeated: true },
+    { no: 2, name: "pagination", kind: "message", T: PaginationMetadata },
+    { no: 3, name: "filters", kind: "message", T: FilterMetadata },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ListBeaconSlotMevBuilderResponse {
+    return new ListBeaconSlotMevBuilderResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ListBeaconSlotMevBuilderResponse {
+    return new ListBeaconSlotMevBuilderResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ListBeaconSlotMevBuilderResponse {
+    return new ListBeaconSlotMevBuilderResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: ListBeaconSlotMevBuilderResponse | PlainMessage<ListBeaconSlotMevBuilderResponse> | undefined, b: ListBeaconSlotMevBuilderResponse | PlainMessage<ListBeaconSlotMevBuilderResponse> | undefined): boolean {
+    return proto3.util.equals(ListBeaconSlotMevBuilderResponse, a, b);
+  }
+}
+
+/**
+ * MevBuilderBid represents the highest MEV bid from a builder for a slot for public API consumption.
+ *
+ * @generated from message api.v1.MevBuilderBid
+ */
+export class MevBuilderBid extends Message<MevBuilderBid> {
+  /**
+   * Execution block hash
+   *
+   * @generated from field: string block_hash = 1;
+   */
+  blockHash = "";
+
+  /**
+   * Bid value in wei
+   *
+   * @generated from field: string value = 2;
+   */
+  value = "";
+
+  /**
+   * Relays that received the bid
+   *
+   * @generated from field: repeated string relay_names = 3;
+   */
+  relayNames: string[] = [];
+
+  /**
+   * @generated from field: string builder_pubkey = 4;
+   */
+  builderPubkey = "";
+
+  /**
+   * 50ms chunk start time from slot start (e.g., 1500 for 1500-1550ms chunk)
+   *
+   * @generated from field: int32 chunk_start_ms = 5;
+   */
+  chunkStartMs = 0;
+
+  constructor(data?: PartialMessage<MevBuilderBid>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.v1.MevBuilderBid";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "block_hash", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "value", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "relay_names", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+    { no: 4, name: "builder_pubkey", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 5, name: "chunk_start_ms", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): MevBuilderBid {
+    return new MevBuilderBid().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): MevBuilderBid {
+    return new MevBuilderBid().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): MevBuilderBid {
+    return new MevBuilderBid().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: MevBuilderBid | PlainMessage<MevBuilderBid> | undefined, b: MevBuilderBid | PlainMessage<MevBuilderBid> | undefined): boolean {
+    return proto3.util.equals(MevBuilderBid, a, b);
   }
 }
 
@@ -1054,39 +1576,14 @@ export class ExperimentConfig extends Message<ExperimentConfig> {
  */
 export class ExperimentDataAvailability extends Message<ExperimentDataAvailability> {
   /**
-   * @generated from field: int64 available_from_timestamp = 1;
-   */
-  availableFromTimestamp = protoInt64.zero;
-
-  /**
-   * @generated from field: int64 available_until_timestamp = 2;
-   */
-  availableUntilTimestamp = protoInt64.zero;
-
-  /**
-   * @generated from field: uint64 min_slot = 3;
+   * @generated from field: uint64 min_slot = 1;
    */
   minSlot = protoInt64.zero;
 
   /**
-   * @generated from field: uint64 max_slot = 4;
+   * @generated from field: uint64 max_slot = 2;
    */
   maxSlot = protoInt64.zero;
-
-  /**
-   * @generated from field: uint64 safe_slot = 5;
-   */
-  safeSlot = protoInt64.zero;
-
-  /**
-   * @generated from field: uint64 head_slot = 6;
-   */
-  headSlot = protoInt64.zero;
-
-  /**
-   * @generated from field: bool has_data = 7;
-   */
-  hasData = false;
 
   constructor(data?: PartialMessage<ExperimentDataAvailability>) {
     super();
@@ -1096,13 +1593,8 @@ export class ExperimentDataAvailability extends Message<ExperimentDataAvailabili
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "api.v1.ExperimentDataAvailability";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "available_from_timestamp", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
-    { no: 2, name: "available_until_timestamp", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
-    { no: 3, name: "min_slot", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
-    { no: 4, name: "max_slot", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
-    { no: 5, name: "safe_slot", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
-    { no: 6, name: "head_slot", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
-    { no: 7, name: "has_data", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 1, name: "min_slot", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
+    { no: 2, name: "max_slot", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ExperimentDataAvailability {
@@ -1201,11 +1693,11 @@ export class GetExperimentConfigResponse extends Message<GetExperimentConfigResp
 }
 
 /**
- * BlockTimingResponse is the v1 API response for block timing data.
+ * ListBeaconSlotBlockTimingResponse is the v1 API response for block timing data.
  *
- * @generated from message api.v1.BlockTimingResponse
+ * @generated from message api.v1.ListBeaconSlotBlockTimingResponse
  */
-export class BlockTimingResponse extends Message<BlockTimingResponse> {
+export class ListBeaconSlotBlockTimingResponse extends Message<ListBeaconSlotBlockTimingResponse> {
   /**
    * @generated from field: repeated api.v1.BlockTimingNode nodes = 1;
    */
@@ -1221,33 +1713,33 @@ export class BlockTimingResponse extends Message<BlockTimingResponse> {
    */
   filters?: FilterMetadata;
 
-  constructor(data?: PartialMessage<BlockTimingResponse>) {
+  constructor(data?: PartialMessage<ListBeaconSlotBlockTimingResponse>) {
     super();
     proto3.util.initPartial(data, this);
   }
 
   static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "api.v1.BlockTimingResponse";
+  static readonly typeName = "api.v1.ListBeaconSlotBlockTimingResponse";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "nodes", kind: "message", T: BlockTimingNode, repeated: true },
     { no: 2, name: "pagination", kind: "message", T: PaginationMetadata },
     { no: 3, name: "filters", kind: "message", T: FilterMetadata },
   ]);
 
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): BlockTimingResponse {
-    return new BlockTimingResponse().fromBinary(bytes, options);
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ListBeaconSlotBlockTimingResponse {
+    return new ListBeaconSlotBlockTimingResponse().fromBinary(bytes, options);
   }
 
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): BlockTimingResponse {
-    return new BlockTimingResponse().fromJson(jsonValue, options);
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ListBeaconSlotBlockTimingResponse {
+    return new ListBeaconSlotBlockTimingResponse().fromJson(jsonValue, options);
   }
 
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): BlockTimingResponse {
-    return new BlockTimingResponse().fromJsonString(jsonString, options);
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ListBeaconSlotBlockTimingResponse {
+    return new ListBeaconSlotBlockTimingResponse().fromJsonString(jsonString, options);
   }
 
-  static equals(a: BlockTimingResponse | PlainMessage<BlockTimingResponse> | undefined, b: BlockTimingResponse | PlainMessage<BlockTimingResponse> | undefined): boolean {
-    return proto3.util.equals(BlockTimingResponse, a, b);
+  static equals(a: ListBeaconSlotBlockTimingResponse | PlainMessage<ListBeaconSlotBlockTimingResponse> | undefined, b: ListBeaconSlotBlockTimingResponse | PlainMessage<ListBeaconSlotBlockTimingResponse> | undefined): boolean {
+    return proto3.util.equals(ListBeaconSlotBlockTimingResponse, a, b);
   }
 }
 
@@ -1270,9 +1762,9 @@ export class BlockTimingNode extends Message<BlockTimingNode> {
   /**
    * milliseconds from slot start
    *
-   * @generated from field: int64 seen_diff_ms = 3;
+   * @generated from field: uint32 seen_slot_start_diff = 3;
    */
-  seenDiffMs = protoInt64.zero;
+  seenSlotStartDiff = 0;
 
   /**
    * reuse existing GeoInfo type
@@ -1288,6 +1780,13 @@ export class BlockTimingNode extends Message<BlockTimingNode> {
    */
   client?: ClientInfo;
 
+  /**
+   * source of the event (e.g., "xatu-sentry")
+   *
+   * @generated from field: string source = 6;
+   */
+  source = "";
+
   constructor(data?: PartialMessage<BlockTimingNode>) {
     super();
     proto3.util.initPartial(data, this);
@@ -1298,9 +1797,10 @@ export class BlockTimingNode extends Message<BlockTimingNode> {
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "node_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 2, name: "username", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "seen_diff_ms", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
+    { no: 3, name: "seen_slot_start_diff", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
     { no: 4, name: "geo", kind: "message", T: GeoInfo },
     { no: 5, name: "client", kind: "message", T: ClientInfo },
+    { no: 6, name: "source", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): BlockTimingNode {
@@ -1317,6 +1817,1156 @@ export class BlockTimingNode extends Message<BlockTimingNode> {
 
   static equals(a: BlockTimingNode | PlainMessage<BlockTimingNode> | undefined, b: BlockTimingNode | PlainMessage<BlockTimingNode> | undefined): boolean {
     return proto3.util.equals(BlockTimingNode, a, b);
+  }
+}
+
+/**
+ * ListBeaconSlotBlobTimingResponse is the v1 API response for blob timing data.
+ *
+ * @generated from message api.v1.ListBeaconSlotBlobTimingResponse
+ */
+export class ListBeaconSlotBlobTimingResponse extends Message<ListBeaconSlotBlobTimingResponse> {
+  /**
+   * @generated from field: repeated api.v1.BlobTimingNode nodes = 1;
+   */
+  nodes: BlobTimingNode[] = [];
+
+  /**
+   * @generated from field: api.v1.PaginationMetadata pagination = 2;
+   */
+  pagination?: PaginationMetadata;
+
+  /**
+   * @generated from field: api.v1.FilterMetadata filters = 3;
+   */
+  filters?: FilterMetadata;
+
+  constructor(data?: PartialMessage<ListBeaconSlotBlobTimingResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.v1.ListBeaconSlotBlobTimingResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "nodes", kind: "message", T: BlobTimingNode, repeated: true },
+    { no: 2, name: "pagination", kind: "message", T: PaginationMetadata },
+    { no: 3, name: "filters", kind: "message", T: FilterMetadata },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ListBeaconSlotBlobTimingResponse {
+    return new ListBeaconSlotBlobTimingResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ListBeaconSlotBlobTimingResponse {
+    return new ListBeaconSlotBlobTimingResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ListBeaconSlotBlobTimingResponse {
+    return new ListBeaconSlotBlobTimingResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: ListBeaconSlotBlobTimingResponse | PlainMessage<ListBeaconSlotBlobTimingResponse> | undefined, b: ListBeaconSlotBlobTimingResponse | PlainMessage<ListBeaconSlotBlobTimingResponse> | undefined): boolean {
+    return proto3.util.equals(ListBeaconSlotBlobTimingResponse, a, b);
+  }
+}
+
+/**
+ * BlobTimingNode represents a node that observed a blob.
+ *
+ * @generated from message api.v1.BlobTimingNode
+ */
+export class BlobTimingNode extends Message<BlobTimingNode> {
+  /**
+   * @generated from field: string node_id = 1;
+   */
+  nodeId = "";
+
+  /**
+   * @generated from field: string username = 2;
+   */
+  username = "";
+
+  /**
+   * milliseconds from slot start
+   *
+   * @generated from field: uint32 seen_slot_start_diff = 3;
+   */
+  seenSlotStartDiff = 0;
+
+  /**
+   * blob index within the block
+   *
+   * @generated from field: uint32 blob_index = 4;
+   */
+  blobIndex = 0;
+
+  /**
+   * beacon block root hash
+   *
+   * @generated from field: string block_root = 5;
+   */
+  blockRoot = "";
+
+  /**
+   * reuse existing GeoInfo type
+   *
+   * @generated from field: api.v1.GeoInfo geo = 6;
+   */
+  geo?: GeoInfo;
+
+  /**
+   * reuse existing ClientInfo type
+   *
+   * @generated from field: api.v1.ClientInfo client = 7;
+   */
+  client?: ClientInfo;
+
+  /**
+   * source of the event (e.g., "xatu-sentry")
+   *
+   * @generated from field: string source = 8;
+   */
+  source = "";
+
+  constructor(data?: PartialMessage<BlobTimingNode>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.v1.BlobTimingNode";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "node_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "username", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "seen_slot_start_diff", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
+    { no: 4, name: "blob_index", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
+    { no: 5, name: "block_root", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 6, name: "geo", kind: "message", T: GeoInfo },
+    { no: 7, name: "client", kind: "message", T: ClientInfo },
+    { no: 8, name: "source", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): BlobTimingNode {
+    return new BlobTimingNode().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): BlobTimingNode {
+    return new BlobTimingNode().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): BlobTimingNode {
+    return new BlobTimingNode().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: BlobTimingNode | PlainMessage<BlobTimingNode> | undefined, b: BlobTimingNode | PlainMessage<BlobTimingNode> | undefined): boolean {
+    return proto3.util.equals(BlobTimingNode, a, b);
+  }
+}
+
+/**
+ * ListBeaconSlotAttestationTimingResponse is the v1 API response for attestation timing data.
+ *
+ * @generated from message api.v1.ListBeaconSlotAttestationTimingResponse
+ */
+export class ListBeaconSlotAttestationTimingResponse extends Message<ListBeaconSlotAttestationTimingResponse> {
+  /**
+   * @generated from field: repeated api.v1.AttestationTimingChunk chunks = 1;
+   */
+  chunks: AttestationTimingChunk[] = [];
+
+  /**
+   * @generated from field: api.v1.PaginationMetadata pagination = 2;
+   */
+  pagination?: PaginationMetadata;
+
+  /**
+   * @generated from field: api.v1.FilterMetadata filters = 3;
+   */
+  filters?: FilterMetadata;
+
+  constructor(data?: PartialMessage<ListBeaconSlotAttestationTimingResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.v1.ListBeaconSlotAttestationTimingResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "chunks", kind: "message", T: AttestationTimingChunk, repeated: true },
+    { no: 2, name: "pagination", kind: "message", T: PaginationMetadata },
+    { no: 3, name: "filters", kind: "message", T: FilterMetadata },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ListBeaconSlotAttestationTimingResponse {
+    return new ListBeaconSlotAttestationTimingResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ListBeaconSlotAttestationTimingResponse {
+    return new ListBeaconSlotAttestationTimingResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ListBeaconSlotAttestationTimingResponse {
+    return new ListBeaconSlotAttestationTimingResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: ListBeaconSlotAttestationTimingResponse | PlainMessage<ListBeaconSlotAttestationTimingResponse> | undefined, b: ListBeaconSlotAttestationTimingResponse | PlainMessage<ListBeaconSlotAttestationTimingResponse> | undefined): boolean {
+    return proto3.util.equals(ListBeaconSlotAttestationTimingResponse, a, b);
+  }
+}
+
+/**
+ * AttestationTimingChunk represents attestation timing data in 50ms chunks.
+ *
+ * @generated from message api.v1.AttestationTimingChunk
+ */
+export class AttestationTimingChunk extends Message<AttestationTimingChunk> {
+  /**
+   * beacon block root that was attested (empty if missed)
+   *
+   * @generated from field: string block_root = 1;
+   */
+  blockRoot = "";
+
+  /**
+   * milliseconds from slot start (e.g., 1500 for 1500-1550ms chunk)
+   *
+   * @generated from field: int64 chunk_start_ms = 2;
+   */
+  chunkStartMs = protoInt64.zero;
+
+  /**
+   * number of attestations in this chunk
+   *
+   * @generated from field: uint32 attestation_count = 3;
+   */
+  attestationCount = 0;
+
+  constructor(data?: PartialMessage<AttestationTimingChunk>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.v1.AttestationTimingChunk";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "block_root", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "chunk_start_ms", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
+    { no: 3, name: "attestation_count", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): AttestationTimingChunk {
+    return new AttestationTimingChunk().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): AttestationTimingChunk {
+    return new AttestationTimingChunk().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): AttestationTimingChunk {
+    return new AttestationTimingChunk().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: AttestationTimingChunk | PlainMessage<AttestationTimingChunk> | undefined, b: AttestationTimingChunk | PlainMessage<AttestationTimingChunk> | undefined): boolean {
+    return proto3.util.equals(AttestationTimingChunk, a, b);
+  }
+}
+
+/**
+ * ListBeaconSlotAttestationCorrectnessResponse is the v1 API response for attestation correctness data for a single slot.
+ *
+ * @generated from message api.v1.ListBeaconSlotAttestationCorrectnessResponse
+ */
+export class ListBeaconSlotAttestationCorrectnessResponse extends Message<ListBeaconSlotAttestationCorrectnessResponse> {
+  /**
+   * Attestation correctness for blocks in the slot (may include forks)
+   *
+   * @generated from field: repeated api.v1.AttestationCorrectness blocks = 1;
+   */
+  blocks: AttestationCorrectness[] = [];
+
+  /**
+   * @generated from field: api.v1.FilterMetadata filters = 2;
+   */
+  filters?: FilterMetadata;
+
+  constructor(data?: PartialMessage<ListBeaconSlotAttestationCorrectnessResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.v1.ListBeaconSlotAttestationCorrectnessResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "blocks", kind: "message", T: AttestationCorrectness, repeated: true },
+    { no: 2, name: "filters", kind: "message", T: FilterMetadata },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ListBeaconSlotAttestationCorrectnessResponse {
+    return new ListBeaconSlotAttestationCorrectnessResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ListBeaconSlotAttestationCorrectnessResponse {
+    return new ListBeaconSlotAttestationCorrectnessResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ListBeaconSlotAttestationCorrectnessResponse {
+    return new ListBeaconSlotAttestationCorrectnessResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: ListBeaconSlotAttestationCorrectnessResponse | PlainMessage<ListBeaconSlotAttestationCorrectnessResponse> | undefined, b: ListBeaconSlotAttestationCorrectnessResponse | PlainMessage<ListBeaconSlotAttestationCorrectnessResponse> | undefined): boolean {
+    return proto3.util.equals(ListBeaconSlotAttestationCorrectnessResponse, a, b);
+  }
+}
+
+/**
+ * AttestationCorrectness represents attestation correctness data for a block in a slot.
+ *
+ * @generated from message api.v1.AttestationCorrectness
+ */
+export class AttestationCorrectness extends Message<AttestationCorrectness> {
+  /**
+   * The beacon block root hash (may be empty for missed blocks)
+   *
+   * @generated from field: string block_root = 1;
+   */
+  blockRoot = "";
+
+  /**
+   * Maximum possible attestations for this block
+   *
+   * @generated from field: uint32 votes_max = 2;
+   */
+  votesMax = 0;
+
+  /**
+   * Actual attestations received for this block
+   *
+   * @generated from field: uint32 votes_actual = 3;
+   */
+  votesActual = 0;
+
+  /**
+   * Percentage of actual vs max votes
+   *
+   * @generated from field: float correctness_percentage = 4;
+   */
+  correctnessPercentage = 0;
+
+  /**
+   * Number of votes for alternative blocks
+   *
+   * @generated from field: uint32 votes_other = 5;
+   */
+  votesOther = 0;
+
+  constructor(data?: PartialMessage<AttestationCorrectness>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.v1.AttestationCorrectness";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "block_root", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "votes_max", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
+    { no: 3, name: "votes_actual", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
+    { no: 4, name: "correctness_percentage", kind: "scalar", T: 2 /* ScalarType.FLOAT */ },
+    { no: 5, name: "votes_other", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): AttestationCorrectness {
+    return new AttestationCorrectness().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): AttestationCorrectness {
+    return new AttestationCorrectness().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): AttestationCorrectness {
+    return new AttestationCorrectness().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: AttestationCorrectness | PlainMessage<AttestationCorrectness> | undefined, b: AttestationCorrectness | PlainMessage<AttestationCorrectness> | undefined): boolean {
+    return proto3.util.equals(AttestationCorrectness, a, b);
+  }
+}
+
+/**
+ * ListBeaconSlotBlobTotalResponse is the v1 API response for blob count data for a single slot.
+ *
+ * @generated from message api.v1.ListBeaconSlotBlobTotalResponse
+ */
+export class ListBeaconSlotBlobTotalResponse extends Message<ListBeaconSlotBlobTotalResponse> {
+  /**
+   * Blob counts for blocks in the slot (may include forks)
+   *
+   * @generated from field: repeated api.v1.BlobTotal blocks = 1;
+   */
+  blocks: BlobTotal[] = [];
+
+  /**
+   * @generated from field: api.v1.FilterMetadata filters = 2;
+   */
+  filters?: FilterMetadata;
+
+  constructor(data?: PartialMessage<ListBeaconSlotBlobTotalResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.v1.ListBeaconSlotBlobTotalResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "blocks", kind: "message", T: BlobTotal, repeated: true },
+    { no: 2, name: "filters", kind: "message", T: FilterMetadata },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ListBeaconSlotBlobTotalResponse {
+    return new ListBeaconSlotBlobTotalResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ListBeaconSlotBlobTotalResponse {
+    return new ListBeaconSlotBlobTotalResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ListBeaconSlotBlobTotalResponse {
+    return new ListBeaconSlotBlobTotalResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: ListBeaconSlotBlobTotalResponse | PlainMessage<ListBeaconSlotBlobTotalResponse> | undefined, b: ListBeaconSlotBlobTotalResponse | PlainMessage<ListBeaconSlotBlobTotalResponse> | undefined): boolean {
+    return proto3.util.equals(ListBeaconSlotBlobTotalResponse, a, b);
+  }
+}
+
+/**
+ * BlobTotal represents the total blob count for a block in the unfinalized chain.
+ *
+ * @generated from message api.v1.BlobTotal
+ */
+export class BlobTotal extends Message<BlobTotal> {
+  /**
+   * The beacon block root hash
+   *
+   * @generated from field: string block_root = 1;
+   */
+  blockRoot = "";
+
+  /**
+   * The number of blobs in this block
+   *
+   * @generated from field: uint32 blob_count = 2;
+   */
+  blobCount = 0;
+
+  constructor(data?: PartialMessage<BlobTotal>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.v1.BlobTotal";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "block_root", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "blob_count", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): BlobTotal {
+    return new BlobTotal().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): BlobTotal {
+    return new BlobTotal().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): BlobTotal {
+    return new BlobTotal().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: BlobTotal | PlainMessage<BlobTotal> | undefined, b: BlobTotal | PlainMessage<BlobTotal> | undefined): boolean {
+    return proto3.util.equals(BlobTotal, a, b);
+  }
+}
+
+/**
+ * ListBeaconSlotBlockResponse is the v1 API response for beacon block data for a specific slot.
+ *
+ * @generated from message api.v1.ListBeaconSlotBlockResponse
+ */
+export class ListBeaconSlotBlockResponse extends Message<ListBeaconSlotBlockResponse> {
+  /**
+   * Block data for the slot (may include forks)
+   *
+   * @generated from field: repeated api.v1.BeaconBlock blocks = 1;
+   */
+  blocks: BeaconBlock[] = [];
+
+  /**
+   * @generated from field: api.v1.PaginationMetadata pagination = 2;
+   */
+  pagination?: PaginationMetadata;
+
+  /**
+   * @generated from field: api.v1.FilterMetadata filters = 3;
+   */
+  filters?: FilterMetadata;
+
+  constructor(data?: PartialMessage<ListBeaconSlotBlockResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.v1.ListBeaconSlotBlockResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "blocks", kind: "message", T: BeaconBlock, repeated: true },
+    { no: 2, name: "pagination", kind: "message", T: PaginationMetadata },
+    { no: 3, name: "filters", kind: "message", T: FilterMetadata },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ListBeaconSlotBlockResponse {
+    return new ListBeaconSlotBlockResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ListBeaconSlotBlockResponse {
+    return new ListBeaconSlotBlockResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ListBeaconSlotBlockResponse {
+    return new ListBeaconSlotBlockResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: ListBeaconSlotBlockResponse | PlainMessage<ListBeaconSlotBlockResponse> | undefined, b: ListBeaconSlotBlockResponse | PlainMessage<ListBeaconSlotBlockResponse> | undefined): boolean {
+    return proto3.util.equals(ListBeaconSlotBlockResponse, a, b);
+  }
+}
+
+/**
+ * BeaconBlock represents beacon block data from the unfinalized chain for public API consumption.
+ *
+ * @generated from message api.v1.BeaconBlock
+ */
+export class BeaconBlock extends Message<BeaconBlock> {
+  /**
+   * Core block identifiers
+   *
+   * The root hash of the beacon block
+   *
+   * @generated from field: string block_root = 1;
+   */
+  blockRoot = "";
+
+  /**
+   * The root hash of the parent block
+   *
+   * @generated from field: string parent_root = 2;
+   */
+  parentRoot = "";
+
+  /**
+   * The root hash of the beacon state
+   *
+   * @generated from field: string state_root = 3;
+   */
+  stateRoot = "";
+
+  /**
+   * Block metadata
+   *
+   * Validator index who proposed the block
+   *
+   * @generated from field: uint32 proposer_index = 4;
+   */
+  proposerIndex = 0;
+
+  /**
+   * Block version (e.g., phase0, altair, bellatrix)
+   *
+   * @generated from field: string block_version = 5;
+   */
+  blockVersion = "";
+
+  /**
+   * Total size of the block in bytes
+   *
+   * @generated from field: uint32 block_total_bytes = 6;
+   */
+  blockTotalBytes = 0;
+
+  /**
+   * Compressed size using snappy
+   *
+   * @generated from field: uint32 block_total_bytes_compressed = 7;
+   */
+  blockTotalBytesCompressed = 0;
+
+  /**
+   * Execution payload information
+   *
+   * Execution layer block hash
+   *
+   * @generated from field: string execution_block_hash = 8;
+   */
+  executionBlockHash = "";
+
+  /**
+   * Execution layer block number
+   *
+   * @generated from field: uint32 execution_block_number = 9;
+   */
+  executionBlockNumber = 0;
+
+  /**
+   * Address receiving execution fees
+   *
+   * @generated from field: string execution_fee_recipient = 10;
+   */
+  executionFeeRecipient = "";
+
+  /**
+   * Base fee per gas
+   *
+   * @generated from field: string execution_base_fee_per_gas = 11;
+   */
+  executionBaseFeePerGas = "";
+
+  /**
+   * Total gas used
+   *
+   * @generated from field: uint64 execution_gas_used = 12;
+   */
+  executionGasUsed = protoInt64.zero;
+
+  /**
+   * Gas limit for the block
+   *
+   * @generated from field: uint64 execution_gas_limit = 13;
+   */
+  executionGasLimit = protoInt64.zero;
+
+  /**
+   * Blob gas used (EIP-4844)
+   *
+   * @generated from field: uint64 execution_blob_gas_used = 14;
+   */
+  executionBlobGasUsed = protoInt64.zero;
+
+  /**
+   * Excess blob gas (EIP-4844)
+   *
+   * @generated from field: uint64 execution_excess_blob_gas = 15;
+   */
+  executionExcessBlobGas = protoInt64.zero;
+
+  /**
+   * Execution layer state root
+   *
+   * @generated from field: string execution_state_root = 16;
+   */
+  executionStateRoot = "";
+
+  /**
+   * Parent hash in execution layer
+   *
+   * @generated from field: string execution_parent_hash = 17;
+   */
+  executionParentHash = "";
+
+  /**
+   * Number of transactions
+   *
+   * @generated from field: uint32 execution_transactions_count = 18;
+   */
+  executionTransactionsCount = 0;
+
+  /**
+   * Total transaction bytes
+   *
+   * @generated from field: uint32 execution_transactions_bytes = 19;
+   */
+  executionTransactionsBytes = 0;
+
+  constructor(data?: PartialMessage<BeaconBlock>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.v1.BeaconBlock";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "block_root", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "parent_root", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "state_root", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "proposer_index", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
+    { no: 5, name: "block_version", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 6, name: "block_total_bytes", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
+    { no: 7, name: "block_total_bytes_compressed", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
+    { no: 8, name: "execution_block_hash", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 9, name: "execution_block_number", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
+    { no: 10, name: "execution_fee_recipient", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 11, name: "execution_base_fee_per_gas", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 12, name: "execution_gas_used", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
+    { no: 13, name: "execution_gas_limit", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
+    { no: 14, name: "execution_blob_gas_used", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
+    { no: 15, name: "execution_excess_blob_gas", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
+    { no: 16, name: "execution_state_root", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 17, name: "execution_parent_hash", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 18, name: "execution_transactions_count", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
+    { no: 19, name: "execution_transactions_bytes", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): BeaconBlock {
+    return new BeaconBlock().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): BeaconBlock {
+    return new BeaconBlock().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): BeaconBlock {
+    return new BeaconBlock().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: BeaconBlock | PlainMessage<BeaconBlock> | undefined, b: BeaconBlock | PlainMessage<BeaconBlock> | undefined): boolean {
+    return proto3.util.equals(BeaconBlock, a, b);
+  }
+}
+
+/**
+ * ListBeaconSlotProposerEntityResponse is the v1 API response for block proposer entity data for a specific slot.
+ *
+ * @generated from message api.v1.ListBeaconSlotProposerEntityResponse
+ */
+export class ListBeaconSlotProposerEntityResponse extends Message<ListBeaconSlotProposerEntityResponse> {
+  /**
+   * Proposer entities for the slot (may include forks)
+   *
+   * @generated from field: repeated api.v1.ProposerEntity entities = 1;
+   */
+  entities: ProposerEntity[] = [];
+
+  /**
+   * @generated from field: api.v1.PaginationMetadata pagination = 2;
+   */
+  pagination?: PaginationMetadata;
+
+  /**
+   * @generated from field: api.v1.FilterMetadata filters = 3;
+   */
+  filters?: FilterMetadata;
+
+  constructor(data?: PartialMessage<ListBeaconSlotProposerEntityResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.v1.ListBeaconSlotProposerEntityResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "entities", kind: "message", T: ProposerEntity, repeated: true },
+    { no: 2, name: "pagination", kind: "message", T: PaginationMetadata },
+    { no: 3, name: "filters", kind: "message", T: FilterMetadata },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ListBeaconSlotProposerEntityResponse {
+    return new ListBeaconSlotProposerEntityResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ListBeaconSlotProposerEntityResponse {
+    return new ListBeaconSlotProposerEntityResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ListBeaconSlotProposerEntityResponse {
+    return new ListBeaconSlotProposerEntityResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: ListBeaconSlotProposerEntityResponse | PlainMessage<ListBeaconSlotProposerEntityResponse> | undefined, b: ListBeaconSlotProposerEntityResponse | PlainMessage<ListBeaconSlotProposerEntityResponse> | undefined): boolean {
+    return proto3.util.equals(ListBeaconSlotProposerEntityResponse, a, b);
+  }
+}
+
+/**
+ * ProposerEntity represents the entity that proposed a block in the unfinalized chain for public API consumption.
+ *
+ * @generated from message api.v1.ProposerEntity
+ */
+export class ProposerEntity extends Message<ProposerEntity> {
+  /**
+   * Entity information
+   *
+   * The entity that proposed the block (e.g., "Lido", "Coinbase")
+   *
+   * @generated from field: string entity = 1;
+   */
+  entity = "";
+
+  constructor(data?: PartialMessage<ProposerEntity>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.v1.ProposerEntity";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "entity", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ProposerEntity {
+    return new ProposerEntity().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ProposerEntity {
+    return new ProposerEntity().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ProposerEntity {
+    return new ProposerEntity().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: ProposerEntity | PlainMessage<ProposerEntity> | undefined, b: ProposerEntity | PlainMessage<ProposerEntity> | undefined): boolean {
+    return proto3.util.equals(ProposerEntity, a, b);
+  }
+}
+
+/**
+ * ListPreparedBlocksResponse is the v1 API response for listing prepared blocks.
+ *
+ * @generated from message api.v1.ListPreparedBlocksResponse
+ */
+export class ListPreparedBlocksResponse extends Message<ListPreparedBlocksResponse> {
+  /**
+   * @generated from field: repeated api.v1.PreparedBlock prepared_blocks = 1;
+   */
+  preparedBlocks: PreparedBlock[] = [];
+
+  /**
+   * @generated from field: api.v1.PaginationMetadata pagination = 2;
+   */
+  pagination?: PaginationMetadata;
+
+  /**
+   * @generated from field: api.v1.PreparedBlockFilterMetadata filters = 3;
+   */
+  filters?: PreparedBlockFilterMetadata;
+
+  constructor(data?: PartialMessage<ListPreparedBlocksResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.v1.ListPreparedBlocksResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "prepared_blocks", kind: "message", T: PreparedBlock, repeated: true },
+    { no: 2, name: "pagination", kind: "message", T: PaginationMetadata },
+    { no: 3, name: "filters", kind: "message", T: PreparedBlockFilterMetadata },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ListPreparedBlocksResponse {
+    return new ListPreparedBlocksResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ListPreparedBlocksResponse {
+    return new ListPreparedBlocksResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ListPreparedBlocksResponse {
+    return new ListPreparedBlocksResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: ListPreparedBlocksResponse | PlainMessage<ListPreparedBlocksResponse> | undefined, b: ListPreparedBlocksResponse | PlainMessage<ListPreparedBlocksResponse> | undefined): boolean {
+    return proto3.util.equals(ListPreparedBlocksResponse, a, b);
+  }
+}
+
+/**
+ * PreparedBlock represents a transformed view of prepared block data for public consumption.
+ * This shows what would have been built if the validator had been selected as proposer.
+ *
+ * @generated from message api.v1.PreparedBlock
+ */
+export class PreparedBlock extends Message<PreparedBlock> {
+  /**
+   * @generated from field: uint32 slot = 1;
+   */
+  slot = 0;
+
+  /**
+   * ISO 8601 formatted
+   *
+   * @generated from field: string slot_start_time = 2;
+   */
+  slotStartTime = "";
+
+  /**
+   * ISO 8601 formatted
+   *
+   * @generated from field: string event_time = 3;
+   */
+  eventTime = "";
+
+  /**
+   * reuse existing ClientInfo type
+   *
+   * @generated from field: api.v1.ClientInfo client = 4;
+   */
+  client?: ClientInfo;
+
+  /**
+   * reuse existing ConsensusInfo type
+   *
+   * @generated from field: api.v1.ConsensusInfo consensus = 5;
+   */
+  consensus?: ConsensusInfo;
+
+  /**
+   * reuse existing GeoInfo type
+   *
+   * @generated from field: api.v1.GeoInfo geo = 6;
+   */
+  geo?: GeoInfo;
+
+  /**
+   * @generated from field: api.v1.BlockMetrics block_metrics = 7;
+   */
+  blockMetrics?: BlockMetrics;
+
+  /**
+   * @generated from field: api.v1.ExecutionPayloadMetrics execution_metrics = 8;
+   */
+  executionMetrics?: ExecutionPayloadMetrics;
+
+  /**
+   * ISO 8601 formatted
+   *
+   * @generated from field: string last_updated = 9;
+   */
+  lastUpdated = "";
+
+  constructor(data?: PartialMessage<PreparedBlock>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.v1.PreparedBlock";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "slot", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
+    { no: 2, name: "slot_start_time", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "event_time", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "client", kind: "message", T: ClientInfo },
+    { no: 5, name: "consensus", kind: "message", T: ConsensusInfo },
+    { no: 6, name: "geo", kind: "message", T: GeoInfo },
+    { no: 7, name: "block_metrics", kind: "message", T: BlockMetrics },
+    { no: 8, name: "execution_metrics", kind: "message", T: ExecutionPayloadMetrics },
+    { no: 9, name: "last_updated", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): PreparedBlock {
+    return new PreparedBlock().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): PreparedBlock {
+    return new PreparedBlock().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): PreparedBlock {
+    return new PreparedBlock().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: PreparedBlock | PlainMessage<PreparedBlock> | undefined, b: PreparedBlock | PlainMessage<PreparedBlock> | undefined): boolean {
+    return proto3.util.equals(PreparedBlock, a, b);
+  }
+}
+
+/**
+ * BlockMetrics groups block-related metrics.
+ *
+ * @generated from message api.v1.BlockMetrics
+ */
+export class BlockMetrics extends Message<BlockMetrics> {
+  /**
+   * @generated from field: string version = 1;
+   */
+  version = "";
+
+  /**
+   * @generated from field: uint32 total_bytes = 2;
+   */
+  totalBytes = 0;
+
+  /**
+   * @generated from field: uint32 total_bytes_compressed = 3;
+   */
+  totalBytesCompressed = 0;
+
+  constructor(data?: PartialMessage<BlockMetrics>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.v1.BlockMetrics";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "version", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "total_bytes", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
+    { no: 3, name: "total_bytes_compressed", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): BlockMetrics {
+    return new BlockMetrics().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): BlockMetrics {
+    return new BlockMetrics().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): BlockMetrics {
+    return new BlockMetrics().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: BlockMetrics | PlainMessage<BlockMetrics> | undefined, b: BlockMetrics | PlainMessage<BlockMetrics> | undefined): boolean {
+    return proto3.util.equals(BlockMetrics, a, b);
+  }
+}
+
+/**
+ * ExecutionPayloadMetrics groups execution payload metrics.
+ *
+ * @generated from message api.v1.ExecutionPayloadMetrics
+ */
+export class ExecutionPayloadMetrics extends Message<ExecutionPayloadMetrics> {
+  /**
+   * @generated from field: uint64 value_wei = 1;
+   */
+  valueWei = protoInt64.zero;
+
+  /**
+   * @generated from field: uint64 consensus_value_wei = 2;
+   */
+  consensusValueWei = protoInt64.zero;
+
+  /**
+   * @generated from field: uint32 block_number = 3;
+   */
+  blockNumber = 0;
+
+  /**
+   * @generated from field: uint64 gas_limit = 4;
+   */
+  gasLimit = protoInt64.zero;
+
+  /**
+   * @generated from field: uint64 gas_used = 5;
+   */
+  gasUsed = protoInt64.zero;
+
+  /**
+   * @generated from field: uint32 transactions_count = 6;
+   */
+  transactionsCount = 0;
+
+  /**
+   * @generated from field: uint32 transactions_total_bytes = 7;
+   */
+  transactionsTotalBytes = 0;
+
+  constructor(data?: PartialMessage<ExecutionPayloadMetrics>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.v1.ExecutionPayloadMetrics";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "value_wei", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
+    { no: 2, name: "consensus_value_wei", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
+    { no: 3, name: "block_number", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
+    { no: 4, name: "gas_limit", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
+    { no: 5, name: "gas_used", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
+    { no: 6, name: "transactions_count", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
+    { no: 7, name: "transactions_total_bytes", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ExecutionPayloadMetrics {
+    return new ExecutionPayloadMetrics().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ExecutionPayloadMetrics {
+    return new ExecutionPayloadMetrics().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ExecutionPayloadMetrics {
+    return new ExecutionPayloadMetrics().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: ExecutionPayloadMetrics | PlainMessage<ExecutionPayloadMetrics> | undefined, b: ExecutionPayloadMetrics | PlainMessage<ExecutionPayloadMetrics> | undefined): boolean {
+    return proto3.util.equals(ExecutionPayloadMetrics, a, b);
+  }
+}
+
+/**
+ * PreparedBlockFilterMetadata shows filtering information for prepared block queries.
+ *
+ * @generated from message api.v1.PreparedBlockFilterMetadata
+ */
+export class PreparedBlockFilterMetadata extends Message<PreparedBlockFilterMetadata> {
+  /**
+   * @generated from field: string network = 1;
+   */
+  network = "";
+
+  /**
+   * @generated from field: uint32 slot = 2;
+   */
+  slot = 0;
+
+  /**
+   * @generated from field: string client_name = 3;
+   */
+  clientName = "";
+
+  /**
+   * All filters including time filters
+   *
+   * @generated from field: map<string, string> applied_filters = 4;
+   */
+  appliedFilters: { [key: string]: string } = {};
+
+  /**
+   * @generated from field: string order_by = 5;
+   */
+  orderBy = "";
+
+  constructor(data?: PartialMessage<PreparedBlockFilterMetadata>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.v1.PreparedBlockFilterMetadata";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "network", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "slot", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
+    { no: 3, name: "client_name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "applied_filters", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "scalar", T: 9 /* ScalarType.STRING */} },
+    { no: 5, name: "order_by", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): PreparedBlockFilterMetadata {
+    return new PreparedBlockFilterMetadata().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): PreparedBlockFilterMetadata {
+    return new PreparedBlockFilterMetadata().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): PreparedBlockFilterMetadata {
+    return new PreparedBlockFilterMetadata().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: PreparedBlockFilterMetadata | PlainMessage<PreparedBlockFilterMetadata> | undefined, b: PreparedBlockFilterMetadata | PlainMessage<PreparedBlockFilterMetadata> | undefined): boolean {
+    return proto3.util.equals(PreparedBlockFilterMetadata, a, b);
   }
 }
 

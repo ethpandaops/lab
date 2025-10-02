@@ -208,15 +208,7 @@ const BuildersRelaysPanel: React.FC<BuildersRelaysPanelProps> = ({
             {builders.length > 0 ? `Top bid per builder` : ''}
           </div>
         </div>
-        <div
-          className="overflow-y-auto h-[calc(100%-2.5rem)] scrollbar-hide transition-colors duration-500"
-          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-        >
-          <style jsx>{`
-            .scrollbar-hide::-webkit-scrollbar {
-              display: none;
-            }
-          `}</style>
+        <div className="overflow-y-auto h-[calc(100%-2.5rem)] scrollbar-hide transition-colors duration-500">
           {builders.length > 0 ? (
             <div className="space-y-1.5 p-2">
               {/* Show top 7 builders */}
@@ -287,10 +279,7 @@ const BuildersRelaysPanel: React.FC<BuildersRelaysPanelProps> = ({
             {relays.length > 0 ? `${relays.length} relay${relays.length !== 1 ? 's' : ''}` : ''}
           </div>
         </div>
-        <div
-          className="overflow-y-auto h-[calc(100%-2.5rem)] scrollbar-hide transition-colors duration-500"
-          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-        >
+        <div className="overflow-y-auto h-[calc(100%-2.5rem)] scrollbar-hide transition-colors duration-500">
           {relays.length > 0 ? (
             <div className="space-y-1.5 p-2">
               {relays.slice(0, 5).map(item => {
@@ -326,9 +315,9 @@ const BuildersRelaysPanel: React.FC<BuildersRelaysPanelProps> = ({
                         >
                           {item.isDeliveredOnly
                             ? 'Delivered'
-                            : (item.bidCount !== undefined
+                            : item.bidCount !== undefined
                               ? `${item.bidCount} bid${item.bidCount !== 1 ? 's' : ''}`
-                              : '0 bids')}
+                              : '0 bids'}
                         </div>
                       </div>
                     </div>

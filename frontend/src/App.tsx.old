@@ -1,5 +1,6 @@
 import { Routes, Route, Outlet, useSearchParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
+import { useAppStore } from '@/stores/appStore';
 import { LoadingState } from '@/components/common/LoadingState';
 import { ErrorState } from '@/components/common/ErrorState';
 import ScrollToTop from '@/components/common/ScrollToTop';
@@ -32,11 +33,18 @@ function App() {
   const [bootstrap, setBootstrap] = useState<Bootstrap | null>(null);
   const [client, setClient] = useState<LabApiClient | null>(null);
   const [restClient, setRestClient] = useState<RestApiClient | null>(null);
-  const [config, setConfig] = useState<Config | null>(null);
   const [configError, setConfigError] = useState<Error | null>(null);
   const [bootstrapError, setBootstrapError] = useState<Error | null>(null);
-  const [selectedNetwork, setSelectedNetwork] = useState('mainnet');
   const [searchParams, setSearchParams] = useSearchParams();
+
+  const {
+    config,
+    setConfig,
+    selectedNetwork,
+    setSelectedNetwork,
+    availableNetworks,
+    setAvailableNetworks,
+  } = useAppStore();
 
   useEffect(() => {
     fetchBootstrap().then(setBootstrap).catch(setBootstrapError);
@@ -56,11 +64,31 @@ function App() {
       restClient
         .getConfig()
         .then(response => {
-          setConfig(response.config || null);
+          if (response.config) {
+            setConfig(response.config);
+            const networks = Object.keys(response.config.ethereum?.networks || {});
+            setAvailableNetworks(networks);
+          }
         })
         .catch(setConfigError);
     }
-  }, [restClient]);
+  }, [restClient, setConfig, setAvailableNetworks]);
+
+  useEffect(() => {
+    if (availableNetworks.length > 0) {
+      // Get network from URL or use mainnet as default
+      const networkFromUrl = searchParams.get('network');
+
+      if (networkFromUrl && availableNetworks.includes(networkFromUrl)) {
+        if (selectedNetwork !== networkFromUrl) {
+          setSelectedNetwork(networkFromUrl);
+        }
+      } else if (!availableNetworks.includes(selectedNetwork)) {
+        // If current network is not in available networks, switch to first available
+        setSelectedNetwork(availableNetworks[0]);
+      }
+    }
+  }, [availableNetworks, searchParams, selectedNetwork, setSelectedNetwork]);
 
   useEffect(() => {
     if (config) {
@@ -70,19 +98,7 @@ function App() {
       } else {
         newParams.set('network', selectedNetwork);
       }
-
       setSearchParams(newParams, { replace: true });
-
-      // Get network from URL or use mainnet as default
-      const networkFromUrl = searchParams.get('network');
-      const availableNetworks = Object.keys(config.ethereum?.networks || {});
-
-      if (networkFromUrl && availableNetworks.includes(networkFromUrl)) {
-        setSelectedNetwork(networkFromUrl);
-      } else if (availableNetworks.length > 0 && !availableNetworks.includes(selectedNetwork)) {
-        // If current network is not in available networks, switch to first available
-        setSelectedNetwork(availableNetworks[0]);
-      }
     }
   }, [config, selectedNetwork, searchParams, setSearchParams]);
 
@@ -106,12 +122,8 @@ function App() {
     return <LoadingState message="Loading bootstrap..." />;
   }
 
-  const availableNetworks = Object.keys(config.ethereum?.networks || {});
-
   return (
     <ApplicationProvider
-      network={{ selectedNetwork, availableNetworks }}
-      config={{ config }}
       api={{ client, baseUrl: bootstrap.backend.url, restApiUrl: bootstrap.backend.restApiUrl }}
       beacon={{ config }}
     >

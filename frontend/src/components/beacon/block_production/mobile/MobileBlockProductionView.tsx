@@ -1,23 +1,22 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useCallback } from 'react';
 import { BlockProductionBaseProps } from '../common/types';
 import { isInPropagationPhase } from '../common/PhaseUtils';
 import { countUniqueBuilderPubkeys } from '../common/utils';
 import MobileTimelineBar from './MobileTimelineBar';
 import StageCard from './StageCard';
 import MobileContinentsPanel from './MobileContinentsPanel';
-import useTimeline from '@/contexts/timeline';
+import { useSlotProgress, useSlotState, useSlotConfig, useSlotActions } from '@/hooks/useSlot';
 
 interface MobileBlockProductionViewProps extends BlockProductionBaseProps {
   // Navigation controls for merged timeline
   slotNumber: number | null;
-  headLagSlots: number;
-  displaySlotOffset: number;
   goToPreviousSlot: () => void;
   goToNextSlot: () => void;
   resetToCurrentSlot: () => void;
   isNextDisabled: boolean;
   network: string; // Add network parameter for blockchain visualization
   slotData?: any; // Add slot data with attestation info (same as in desktop view)
+  slotDataCache?: Record<number, any>; // Cache of slot data for adjacent slots
   isLocallyBuilt?: boolean; // Flag to indicate if the block was locally built
 }
 
@@ -34,19 +33,40 @@ const MobileBlockProductionView: React.FC<MobileBlockProductionViewProps> = ({
   block,
   // Navigation controls
   slotNumber,
-  headLagSlots,
-  displaySlotOffset,
   goToPreviousSlot,
   goToNextSlot,
   resetToCurrentSlot,
   isNextDisabled,
   network,
   slotData,
+  slotDataCache, // Accept but don't use it for now since mobile view doesn't show adjacent slots
   isLocallyBuilt = false,
 }) => {
-  // Get time and play state from context
-  const { currentTimeMs, isPlaying, togglePlayPause } = useTimeline();
+  // Get time and play state from slot context
+  const { slotProgress } = useSlotProgress();
+  const slotState = useSlotState();
+  const slotConfig = useSlotConfig();
+  const slotActions = useSlotActions();
+
+  const currentTimeMs = slotProgress;
   currentTime = currentTimeMs;
+  const isPlaying = slotState.isPlaying;
+
+  // Debug: Log when slotData changes
+  React.useEffect(() => {
+    console.log(
+      `[MOBILE VIEW] Received slotData for slot ${slotNumber}:`,
+      slotData ? 'present' : 'null/undefined',
+      slotData ? `(attestations: ${slotData.attestations ? 'yes' : 'no'})` : '',
+    );
+  }, [slotData, slotNumber]);
+  const togglePlayPause = useCallback(() => {
+    if (isPlaying) {
+      slotActions.pause();
+    } else {
+      slotActions.play();
+    }
+  }, [isPlaying, slotActions]);
   // Get active status based on role and phase
   const isActive = (role: 'builder' | 'relay' | 'proposer' | 'node' | 'attester') => {
     // Determine transition point - when first node saw block or fallback to 5s
@@ -229,13 +249,12 @@ const MobileBlockProductionView: React.FC<MobileBlockProductionViewProps> = ({
           slotData={slotData}
           // Navigation controls
           slotNumber={slotNumber}
-          headLagSlots={headLagSlots}
-          displaySlotOffset={displaySlotOffset}
           isPlaying={isPlaying}
           goToPreviousSlot={goToPreviousSlot}
           goToNextSlot={goToNextSlot}
           resetToCurrentSlot={resetToCurrentSlot}
           togglePlayPause={togglePlayPause}
+          isPrevDisabled={slotState.currentSlot <= slotConfig.minSlot}
           isNextDisabled={isNextDisabled}
         />
 

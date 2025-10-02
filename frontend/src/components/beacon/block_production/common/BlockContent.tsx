@@ -69,25 +69,16 @@ const BlockContent: React.FC<BlockContentProps> = ({
       <div className="px-4 pt-2 overflow-y-auto max-h-[80px]">
         <div className="space-y-2">
           {futureBids.slice(0, 5).map((bid, i) => (
-            <div
-              key={i}
-              className="flex justify-between items-center py-1.5 px-3 bg-bg-surface-raised rounded"
-            >
+            <div key={i} className="flex justify-between items-center py-1.5 px-3 bg-bg-surface-raised rounded">
               <div className="flex items-center">
                 <div className="w-1 h-5 bg-accent-muted/20 rounded-full mr-2"></div>
-                <div className="text-xs text-text-secondary truncate">
-                  {bid.builderName || bid.relayName}
-                </div>
+                <div className="text-xs text-text-secondary truncate">{bid.builderName || bid.relayName}</div>
               </div>
-              <div className="text-xs font-mono text-success font-medium">
-                {bid.value.toFixed(4)} ETH
-              </div>
+              <div className="text-xs font-mono text-success font-medium">{bid.value.toFixed(4)} ETH</div>
             </div>
           ))}
           {futureBids.length > 5 && (
-            <div className="text-[10px] text-center text-text-tertiary mt-1">
-              +{futureBids.length - 5} more bids
-            </div>
+            <div className="text-[10px] text-center text-text-tertiary mt-1">+{futureBids.length - 5} more bids</div>
           )}
         </div>
       </div>
@@ -98,20 +89,8 @@ const BlockContent: React.FC<BlockContentProps> = ({
   if (!blockData?.blockRoot && !blockData?.executionPayloadBlockHash) {
     return (
       <div className="h-[calc(100%-4rem)] flex flex-col items-center justify-center space-y-3 text-text-tertiary">
-        <svg
-          className="w-12 h-12 animate-pulse"
-          viewBox="0 0 24 24"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <circle
-            cx="12"
-            cy="12"
-            r="10"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeDasharray="4 4"
-          />
+        <svg className="w-12 h-12 animate-pulse" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" strokeDasharray="4 4" />
           <path d="M12 6V12L16 14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
         </svg>
         <p className="text-sm font-mono">Waiting for block data...</p>

@@ -1,6 +1,19 @@
 import {
   ListNodesResponse,
   ErrorResponse,
+  ListBeaconSlotBlockTimingResponse,
+  ListBeaconSlotBlobTimingResponse,
+  ListBeaconSlotAttestationTimingResponse,
+  ListBeaconSlotAttestationCorrectnessResponse,
+  ListBeaconSlotBlobTotalResponse,
+  ListBeaconSlotBlockResponse,
+  ListBeaconSlotProposerEntityResponse,
+  ListBeaconSlotMevRelayResponse,
+  ListBeaconSlotMevResponse,
+  ListBeaconSlotMevBuilderResponse,
+  ListBeaconSlotMevBuilderCountResponse,
+  GetExperimentConfigResponse,
+  ListPreparedBlocksResponse,
 } from '../gen/backend/pkg/api/v1/proto/public_pb';
 import { API_V1_ENDPOINTS, buildQueryString, NodeFilters } from './endpoints';
 
@@ -42,6 +55,24 @@ export class RestApiClient {
     const response = await this.fetchWithRetry<any>(url);
 
     return response;
+  }
+
+  /**
+   * Get experiment configuration for a specific network
+   * @param network Network name
+   * @param experimentId Experiment identifier
+   * @returns GetExperimentConfigResponse
+   */
+  async getExperimentConfig(
+    network: string,
+    experimentId: string,
+  ): Promise<GetExperimentConfigResponse> {
+    const url = `${this.baseUrl}${API_V1_ENDPOINTS.experimentConfig(network, experimentId)}`;
+
+    console.log('Fetching experiment config from:', url);
+    const response = await this.fetchWithRetry<any>(url);
+
+    return GetExperimentConfigResponse.fromJson(response);
   }
 
   /**
@@ -241,12 +272,206 @@ export class RestApiClient {
   private delay(ms: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
+
+  /**
+   * Get beacon block timing data for a specific slot
+   */
+  async getBeaconBlockTiming(
+    network: string,
+    slot: number,
+    params?: Record<string, any>,
+  ): Promise<ListBeaconSlotBlockTimingResponse> {
+    const queryString = params ? buildQueryString(params) : new URLSearchParams();
+    const url = `${this.baseUrl}${API_V1_ENDPOINTS.beaconBlockTiming(network, slot)}${
+      queryString.toString() ? `?${queryString.toString()}` : ''
+    }`;
+    const response = await this.fetchWithRetry<any>(url);
+    return ListBeaconSlotBlockTimingResponse.fromJson(response);
+  }
+
+  /**
+   * Get beacon block data for a specific slot
+   */
+  async getBeaconBlock(
+    network: string,
+    slot: number,
+    params?: Record<string, any>,
+  ): Promise<ListBeaconSlotBlockResponse> {
+    const queryString = params ? buildQueryString(params) : new URLSearchParams();
+    const url = `${this.baseUrl}${API_V1_ENDPOINTS.beaconBlock(network, slot)}${
+      queryString.toString() ? `?${queryString.toString()}` : ''
+    }`;
+    const response = await this.fetchWithRetry<any>(url);
+    return ListBeaconSlotBlockResponse.fromJson(response);
+  }
+
+  /**
+   * Get blob timing data for a specific slot
+   */
+  async getBeaconBlobTiming(
+    network: string,
+    slot: number,
+    params?: Record<string, any>,
+  ): Promise<ListBeaconSlotBlobTimingResponse> {
+    const queryString = params ? buildQueryString(params) : new URLSearchParams();
+    const url = `${this.baseUrl}${API_V1_ENDPOINTS.beaconBlobTiming(network, slot)}${
+      queryString.toString() ? `?${queryString.toString()}` : ''
+    }`;
+    const response = await this.fetchWithRetry<any>(url);
+    return ListBeaconSlotBlobTimingResponse.fromJson(response);
+  }
+
+  /**
+   * Get blob total data for a specific slot
+   */
+  async getBeaconBlobTotal(
+    network: string,
+    slot: number,
+    params?: Record<string, any>,
+  ): Promise<ListBeaconSlotBlobTotalResponse> {
+    const queryString = params ? buildQueryString(params) : new URLSearchParams();
+    const url = `${this.baseUrl}${API_V1_ENDPOINTS.beaconBlobTotal(network, slot)}${
+      queryString.toString() ? `?${queryString.toString()}` : ''
+    }`;
+    const response = await this.fetchWithRetry<any>(url);
+    return ListBeaconSlotBlobTotalResponse.fromJson(response);
+  }
+
+  /**
+   * Get attestation timing data for a specific slot
+   */
+  async getBeaconAttestationTiming(
+    network: string,
+    slot: number,
+    params?: Record<string, any>,
+  ): Promise<ListBeaconSlotAttestationTimingResponse> {
+    const queryString = params ? buildQueryString(params) : new URLSearchParams();
+    const url = `${this.baseUrl}${API_V1_ENDPOINTS.beaconAttestationTiming(network, slot)}${
+      queryString.toString() ? `?${queryString.toString()}` : ''
+    }`;
+    const response = await this.fetchWithRetry<any>(url);
+    return ListBeaconSlotAttestationTimingResponse.fromJson(response);
+  }
+
+  /**
+   * Get attestation correctness data for a specific slot
+   */
+  async getBeaconAttestationCorrectness(
+    network: string,
+    slot: number,
+    params?: Record<string, any>,
+  ): Promise<ListBeaconSlotAttestationCorrectnessResponse> {
+    const queryString = params ? buildQueryString(params) : new URLSearchParams();
+    const url = `${this.baseUrl}${API_V1_ENDPOINTS.beaconAttestationCorrectness(network, slot)}${
+      queryString.toString() ? `?${queryString.toString()}` : ''
+    }`;
+    const response = await this.fetchWithRetry<any>(url);
+    return ListBeaconSlotAttestationCorrectnessResponse.fromJson(response);
+  }
+
+  /**
+   * Get proposer entity data for a specific slot
+   */
+  async getBeaconProposerEntity(
+    network: string,
+    slot: number,
+    params?: Record<string, any>,
+  ): Promise<ListBeaconSlotProposerEntityResponse> {
+    const queryString = params ? buildQueryString(params) : new URLSearchParams();
+    const url = `${this.baseUrl}${API_V1_ENDPOINTS.beaconProposerEntity(network, slot)}${
+      queryString.toString() ? `?${queryString.toString()}` : ''
+    }`;
+    const response = await this.fetchWithRetry<any>(url);
+    return ListBeaconSlotProposerEntityResponse.fromJson(response);
+  }
+
+  /**
+   * Get MEV block data for a specific slot
+   */
+  async getMevBlock(
+    network: string,
+    slot: number,
+    params?: Record<string, any>,
+  ): Promise<ListBeaconSlotMevResponse> {
+    const queryString = params ? buildQueryString(params) : new URLSearchParams();
+    const url = `${this.baseUrl}${API_V1_ENDPOINTS.mevBlock(network, slot)}${
+      queryString.toString() ? `?${queryString.toString()}` : ''
+    }`;
+    const response = await this.fetchWithRetry<any>(url);
+    return ListBeaconSlotMevResponse.fromJson(response);
+  }
+
+  /**
+   * Get MEV relay bid counts for a specific slot
+   */
+  async getMevRelayCount(
+    network: string,
+    slot: number,
+    params?: Record<string, any>,
+  ): Promise<ListBeaconSlotMevRelayResponse> {
+    const queryString = params ? buildQueryString(params) : new URLSearchParams();
+    const url = `${this.baseUrl}${API_V1_ENDPOINTS.mevRelayCount(network, slot)}${
+      queryString.toString() ? `?${queryString.toString()}` : ''
+    }`;
+    const response = await this.fetchWithRetry<any>(url);
+    return ListBeaconSlotMevRelayResponse.fromJson(response);
+  }
+
+  /**
+   * Get MEV builder bid values for a specific slot
+   */
+  async getMevBuilderBid(
+    network: string,
+    slot: number,
+    params?: Record<string, any>,
+  ): Promise<ListBeaconSlotMevBuilderResponse> {
+    const queryString = params ? buildQueryString(params) : new URLSearchParams();
+    const url = `${this.baseUrl}${API_V1_ENDPOINTS.mevBuilderBid(network, slot)}${
+      queryString.toString() ? `?${queryString.toString()}` : ''
+    }`;
+    const response = await this.fetchWithRetry<any>(url);
+    return ListBeaconSlotMevBuilderResponse.fromJson(response);
+  }
+
+  /**
+   * Get MEV builder bid counts for a specific slot
+   */
+  async getMevBuilderCount(
+    network: string,
+    slot: number,
+    params?: Record<string, any>,
+  ): Promise<ListBeaconSlotMevBuilderCountResponse> {
+    const queryString = params ? buildQueryString(params) : new URLSearchParams();
+    const url = `${this.baseUrl}${API_V1_ENDPOINTS.mevBuilderCount(network, slot)}${
+      queryString.toString() ? `?${queryString.toString()}` : ''
+    }`;
+    const response = await this.fetchWithRetry<any>(url);
+    return ListBeaconSlotMevBuilderCountResponse.fromJson(response);
+  }
+
+  /**
+   * Get prepared blocks (formerly locally built blocks) with optional slot filtering
+   * @param network Network name
+   * @param params Query parameters including slot filter
+   * @returns Response with prepared blocks data
+   */
+  async getPreparedBlocks(
+    network: string,
+    params?: { slot?: number[]; page_size?: number; page_token?: string },
+  ): Promise<ListPreparedBlocksResponse> {
+    const queryString = params ? buildQueryString(params) : new URLSearchParams();
+    const url = `${this.baseUrl}${API_V1_ENDPOINTS.preparedBlocks(network)}${
+      queryString.toString() ? `?${queryString.toString()}` : ''
+    }`;
+    const response = await this.fetchWithRetry<any>(url);
+    return ListPreparedBlocksResponse.fromJson(response);
+  }
 }
 
 /**
  * Parameters for getNetworks API call
  */
-export interface NetworksParams extends NetworkFilters {}
+export interface NetworksParams {}
 
 /**
  * Parameters for getNodes API call

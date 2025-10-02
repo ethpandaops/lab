@@ -232,8 +232,7 @@ func (s *ExperimentsService) getDataAvailabilityForExperiment(ctx context.Contex
 
 		// Query data availability
 		req := &xatu_cbt_proto.GetDataAvailabilityRequest{
-			Tables:        tables,
-			PositionField: "slot_start_date_time",
+			Tables: tables,
 		}
 
 		resp, err := s.xatuCBTService.GetDataAvailability(ctxWithNetwork, req)
@@ -248,13 +247,8 @@ func (s *ExperimentsService) getDataAvailabilityForExperiment(ctx context.Contex
 
 		// Convert to config proto format
 		dataAvailability[network] = &config.ExperimentDataAvailability{
-			AvailableFromTimestamp:  resp.AvailableFromTimestamp,
-			AvailableUntilTimestamp: resp.AvailableUntilTimestamp,
-			MinSlot:                 resp.MinSlot,
-			MaxSlot:                 resp.MaxSlot,
-			SafeSlot:                resp.SafeSlot,
-			HeadSlot:                resp.HeadSlot,
-			HasData:                 resp.HasData,
+			MinSlot: resp.MinSlot,
+			MaxSlot: resp.MaxSlot,
 		}
 	}
 
@@ -263,6 +257,116 @@ func (s *ExperimentsService) getDataAvailabilityForExperiment(ctx context.Contex
 		WithField("valid_networks", len(validNetworks)).
 		WithField("successful_queries", len(dataAvailability)).
 		Debug("Completed data availability queries for experiment")
+
+	return dataAvailability
+}
+
+// GetNetworkExperimentConfig returns a single experiment's configuration with data availability for a specific network.
+func (s *ExperimentsService) GetNetworkExperimentConfig(ctx context.Context, experimentID string, network string) (*config.ExperimentConfig, error) {
+	if s.config == nil {
+		return nil, fmt.Errorf("experiments service not configured")
+	}
+
+	// Find the experiment
+	var experiment *ExperimentConfig
+
+	for i := range *s.config {
+		if (*s.config)[i].ID == experimentID {
+			experiment = &(*s.config)[i]
+
+			break
+		}
+	}
+
+	if experiment == nil {
+		return nil, fmt.Errorf("experiment not found: %s", experimentID)
+	}
+
+	if !experiment.Enabled {
+		return nil, fmt.Errorf("experiment disabled: %s", experimentID)
+	}
+
+	// Validate network is in experiment's network list
+	networkFound := false
+
+	for _, expNetwork := range experiment.Networks {
+		if expNetwork == network {
+			networkFound = true
+
+			break
+		}
+	}
+
+	if !networkFound {
+		return nil, fmt.Errorf("network %s not configured for experiment %s", network, experimentID)
+	}
+
+	// Get data availability for this specific network only
+	dataAvailability := s.getDataAvailabilityForNetwork(ctx, experiment, network)
+
+	// Return config with single network data availability
+	return &config.ExperimentConfig{
+		Id:               experiment.ID,
+		Enabled:          experiment.Enabled,
+		Networks:         experiment.Networks,
+		DataAvailability: dataAvailability,
+	}, nil
+}
+
+// getDataAvailabilityForNetwork queries data availability for a single network of an experiment
+func (s *ExperimentsService) getDataAvailabilityForNetwork(ctx context.Context, exp *ExperimentConfig, network string) map[string]*config.ExperimentDataAvailability {
+	if s.xatuCBTService == nil || s.cartographoorService == nil {
+		return nil
+	}
+
+	dataAvailability := make(map[string]*config.ExperimentDataAvailability)
+	tables := GetTablesForExperiment(exp.ID)
+
+	if len(tables) == 0 {
+		s.log.WithField("experiment_id", exp.ID).Debug("No tables defined for experiment")
+
+		return dataAvailability
+	}
+
+	// Validate network exists in cartographoor
+	if s.cartographoorService.GetNetwork(network) == nil {
+		s.log.WithField("experiment_id", exp.ID).
+			WithField("network", network).
+			Warn("Network not found in cartographoor")
+
+		return dataAvailability
+	}
+
+	// Add network to context metadata - use incoming context for internal service calls
+	md := metadata.New(map[string]string{"network": network})
+	ctxWithNetwork := metadata.NewIncomingContext(ctx, md)
+
+	// Query data availability
+	req := &xatu_cbt_proto.GetDataAvailabilityRequest{
+		Tables: tables,
+	}
+
+	resp, err := s.xatuCBTService.GetDataAvailability(ctxWithNetwork, req)
+	if err != nil {
+		s.log.WithError(err).
+			WithField("experiment_id", exp.ID).
+			WithField("network", network).
+			Warn("Failed to get data availability for network")
+
+		return dataAvailability
+	}
+
+	// Convert to config proto format with just min_slot and max_slot
+	dataAvailability[network] = &config.ExperimentDataAvailability{
+		MinSlot: resp.MinSlot,
+		MaxSlot: resp.MaxSlot,
+	}
+
+	s.log.WithField("experiment_id", exp.ID).
+		WithField("network", network).
+		WithField("min_slot", resp.MinSlot).
+		WithField("max_slot", resp.MaxSlot).
+		Debug("Retrieved data availability for network")
 
 	return dataAvailability
 }

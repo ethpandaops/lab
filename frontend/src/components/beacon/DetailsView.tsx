@@ -160,13 +160,10 @@ export function DetailsView({ loading, isMissing, slotData }: DetailsViewProps) 
               <p className="text-sm font-mono font-medium text-primary">
                 {(() => {
                   if (!slotData) return 0;
-                  const maxBlobIndex = Object.values(slotData.timings.blob_seen || {}).reduce(
-                    (max, obj) => {
-                      const indices = Object.keys(obj).map(Number);
-                      return indices.length ? Math.max(max, Math.max(...indices)) : max;
-                    },
-                    -1,
-                  );
+                  const maxBlobIndex = Object.values(slotData.timings.blob_seen || {}).reduce((max, obj) => {
+                    const indices = Object.keys(obj).map(Number);
+                    return indices.length ? Math.max(max, Math.max(...indices)) : max;
+                  }, -1);
                   return maxBlobIndex + 1;
                 })()}
               </p>
@@ -182,8 +179,7 @@ export function DetailsView({ loading, isMissing, slotData }: DetailsViewProps) 
             <div className="col-span-2">
               <h4 className="text-xs font-mono text-tertiary">Gas / Limit</h4>
               <p className="text-sm font-mono font-medium text-primary">
-                {slotData?.block.execution_payload_gas_used &&
-                slotData?.block.execution_payload_gas_limit
+                {slotData?.block.execution_payload_gas_used && slotData?.block.execution_payload_gas_limit
                   ? `${(slotData.block.execution_payload_gas_used / 1e6).toFixed(1)}M / ${(slotData.block.execution_payload_gas_limit / 1e6).toFixed(1)}M`
                   : 'Unknown'}
               </p>
@@ -197,8 +193,7 @@ export function DetailsView({ loading, isMissing, slotData }: DetailsViewProps) 
                       <span className="text-purple-500">P2P: </span>
                       {firstSeenLocations.p2p.country}
                       <span className="text-tertiary ml-2">
-                        ({firstSeenLocations.p2p.continent}) at{' '}
-                        {(firstSeenLocations.p2p.time / 1000).toFixed(2)}s
+                        ({firstSeenLocations.p2p.continent}) at {(firstSeenLocations.p2p.time / 1000).toFixed(2)}s
                       </span>
                     </>
                   ) : (
@@ -211,8 +206,7 @@ export function DetailsView({ loading, isMissing, slotData }: DetailsViewProps) 
                       <span className="text-accent">API: </span>
                       {firstSeenLocations.api.country}
                       <span className="text-tertiary ml-2">
-                        ({firstSeenLocations.api.continent}) at{' '}
-                        {(firstSeenLocations.api.time / 1000).toFixed(2)}s
+                        ({firstSeenLocations.api.continent}) at {(firstSeenLocations.api.time / 1000).toFixed(2)}s
                       </span>
                     </>
                   ) : (

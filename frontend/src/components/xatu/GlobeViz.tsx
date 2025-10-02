@@ -252,9 +252,7 @@ export const GlobeViz = ({ data, width = 600, height = 400 }: Props) => {
       const coords = COUNTRY_COORDS[countryName];
       if (coords) {
         // Hash the country name to get a consistent hue value between 0 and 360
-        const hash = countryName
-          .split('')
-          .reduce((acc, char) => char.charCodeAt(0) + ((acc << 5) - acc), 0);
+        const hash = countryName.split('').reduce((acc, char) => char.charCodeAt(0) + ((acc << 5) - acc), 0);
         const hue = Math.abs(hash % 360);
         const color = `hsla(${hue}, 70%, 50%, 0.8)`;
 
@@ -316,7 +314,7 @@ export const GlobeViz = ({ data, width = 600, height = 400 }: Props) => {
           <div class="text-accent font-medium">${(point as Point).name}</div>
           <div class="text-primary">${(point as Point).nodes} nodes</div>
         </div>
-      `,
+      `
       );
 
     // Configure controls
@@ -355,11 +353,7 @@ export const GlobeViz = ({ data, width = 600, height = 400 }: Props) => {
   useEffect(() => {
     if (!globeRef.current || !containerRef.current) return;
 
-    globeRef.current
-      .width(containerRef.current.clientWidth)
-      .height(height)
-      .arcsData(arcs)
-      .pointsData(points);
+    globeRef.current.width(containerRef.current.clientWidth).height(height).arcsData(arcs).pointsData(points);
   }, [height, arcs, points]);
 
   return (

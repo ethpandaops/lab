@@ -20,7 +20,7 @@ const pendingFetches: Record<string, Promise<BuilderNameMap>> = {};
 export function useBuilderNames(network: string): BuilderNameMap {
   const [builderNames, setBuilderNames] = useState<BuilderNameMap>(
     // Initialize from cache if available
-    builderNamesCache[network.toLowerCase()] || {},
+    builderNamesCache[network.toLowerCase()] || {}
   );
 
   useEffect(() => {
@@ -37,8 +37,7 @@ export function useBuilderNames(network: string): BuilderNameMap {
         // Define all the common builders from known sources
         const knownBuilders = {
           // Standard builders
-          Titan:
-            '0x84e78cb2ad883861c9eeeb7d1b22a8e02069320e86e57c88590841efc1a2a3e2937c3a9ca118d7add71d0be0b14788bb',
+          Titan: '0x84e78cb2ad883861c9eeeb7d1b22a8e02069320e86e57c88590841efc1a2a3e2937c3a9ca118d7add71d0be0b14788bb',
           Builder0x69:
             '0x945fc51bf63613257792926c9155d7ae32db73155dc13bdfe61cd476f1fd2297b66601e8721b723cef11e4e6682e9d87',
           Flashbots:
@@ -50,8 +49,7 @@ export function useBuilderNames(network: string): BuilderNameMap {
           beepending:
             '0x94a76d5a922b9a7bbb0bae8890b29b5e818c42ec07cd853a1b8f3183b39061f79e6911e10d5b8657de9364bf9e251334',
           Eden: '0x8b8edce58fafe098763e4fabdeb318d347f9238845f42b44fca8d5a8129d2a98b0647a2e3a3730f3b05b48e86436e224',
-          'eth-builder.com':
-            '0xac6e77dfe25ecd6110b8e780608cce0dab71fdd5ebea22a16c0205200d4f3c4745be59f4854a3ef37',
+          'eth-builder.com': '0xac6e77dfe25ecd6110b8e780608cce0dab71fdd5ebea22a16c0205200d4f3c4745be59f4854a3ef37',
 
           // Common builders from relay data
           'BloXroute Max Profit':
@@ -175,8 +173,7 @@ export function useBuilderNames(network: string): BuilderNameMap {
 
     // If there's an existing fetch, use it, otherwise create a new one
     const fetchPromise =
-      pendingFetches[formattedNetwork] ||
-      (pendingFetches[formattedNetwork] = fetchAndProcessBuilderNames());
+      pendingFetches[formattedNetwork] || (pendingFetches[formattedNetwork] = fetchAndProcessBuilderNames());
 
     // Use the fetch promise
     fetchPromise.then(names => {

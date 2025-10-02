@@ -61,11 +61,7 @@ export function isBlockLocallyBuilt(block: any): boolean {
   }
 
   // Check for payloadsDelivered array
-  if (
-    block.payloadsDelivered &&
-    Array.isArray(block.payloadsDelivered) &&
-    block.payloadsDelivered.length > 0
-  ) {
+  if (block.payloadsDelivered && Array.isArray(block.payloadsDelivered) && block.payloadsDelivered.length > 0) {
     return false; // NOT locally built
   }
 
@@ -78,11 +74,7 @@ export function isBlockLocallyBuilt(block: any): boolean {
     return false; // NOT locally built
   }
 
-  if (
-    block.payloads_delivered &&
-    Array.isArray(block.payloads_delivered) &&
-    block.payloads_delivered.length > 0
-  ) {
+  if (block.payloads_delivered && Array.isArray(block.payloads_delivered) && block.payloads_delivered.length > 0) {
     return false; // NOT locally built
   }
 

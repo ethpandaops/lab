@@ -136,6 +136,7 @@ const CONTINENT_TO_COUNTRIES: Record<string, string[]> = {
     'Monaco',
     'Montenegro',
     'Netherlands',
+    'The Netherlands',
     'North Macedonia',
     'Norway',
     'Poland',

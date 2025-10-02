@@ -63,6 +63,86 @@ func (mr *MockXatuCBTClientMockRecorder) GetDataAvailability(ctx, in any, opts .
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDataAvailability", reflect.TypeOf((*MockXatuCBTClient)(nil).GetDataAvailability), varargs...)
 }
 
+// ListFctAttestationCorrectnessHead mocks base method.
+func (m *MockXatuCBTClient) ListFctAttestationCorrectnessHead(ctx context.Context, in *clickhouse.ListFctAttestationCorrectnessHeadRequest, opts ...grpc.CallOption) (*clickhouse.ListFctAttestationCorrectnessHeadResponse, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "ListFctAttestationCorrectnessHead", varargs...)
+	ret0, _ := ret[0].(*clickhouse.ListFctAttestationCorrectnessHeadResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListFctAttestationCorrectnessHead indicates an expected call of ListFctAttestationCorrectnessHead.
+func (mr *MockXatuCBTClientMockRecorder) ListFctAttestationCorrectnessHead(ctx, in any, opts ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListFctAttestationCorrectnessHead", reflect.TypeOf((*MockXatuCBTClient)(nil).ListFctAttestationCorrectnessHead), varargs...)
+}
+
+// ListFctAttestationFirstSeenChunked50Ms mocks base method.
+func (m *MockXatuCBTClient) ListFctAttestationFirstSeenChunked50Ms(ctx context.Context, in *clickhouse.ListFctAttestationFirstSeenChunked50MsRequest, opts ...grpc.CallOption) (*clickhouse.ListFctAttestationFirstSeenChunked50MsResponse, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "ListFctAttestationFirstSeenChunked50Ms", varargs...)
+	ret0, _ := ret[0].(*clickhouse.ListFctAttestationFirstSeenChunked50MsResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListFctAttestationFirstSeenChunked50Ms indicates an expected call of ListFctAttestationFirstSeenChunked50Ms.
+func (mr *MockXatuCBTClientMockRecorder) ListFctAttestationFirstSeenChunked50Ms(ctx, in any, opts ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListFctAttestationFirstSeenChunked50Ms", reflect.TypeOf((*MockXatuCBTClient)(nil).ListFctAttestationFirstSeenChunked50Ms), varargs...)
+}
+
+// ListFctBlockBlobCountHead mocks base method.
+func (m *MockXatuCBTClient) ListFctBlockBlobCountHead(ctx context.Context, in *clickhouse.ListFctBlockBlobCountHeadRequest, opts ...grpc.CallOption) (*clickhouse.ListFctBlockBlobCountHeadResponse, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "ListFctBlockBlobCountHead", varargs...)
+	ret0, _ := ret[0].(*clickhouse.ListFctBlockBlobCountHeadResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListFctBlockBlobCountHead indicates an expected call of ListFctBlockBlobCountHead.
+func (mr *MockXatuCBTClientMockRecorder) ListFctBlockBlobCountHead(ctx, in any, opts ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListFctBlockBlobCountHead", reflect.TypeOf((*MockXatuCBTClient)(nil).ListFctBlockBlobCountHead), varargs...)
+}
+
+// ListFctBlockBlobFirstSeenByNode mocks base method.
+func (m *MockXatuCBTClient) ListFctBlockBlobFirstSeenByNode(ctx context.Context, in *clickhouse.ListFctBlockBlobFirstSeenByNodeRequest, opts ...grpc.CallOption) (*clickhouse.ListFctBlockBlobFirstSeenByNodeResponse, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "ListFctBlockBlobFirstSeenByNode", varargs...)
+	ret0, _ := ret[0].(*clickhouse.ListFctBlockBlobFirstSeenByNodeResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListFctBlockBlobFirstSeenByNode indicates an expected call of ListFctBlockBlobFirstSeenByNode.
+func (mr *MockXatuCBTClientMockRecorder) ListFctBlockBlobFirstSeenByNode(ctx, in any, opts ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListFctBlockBlobFirstSeenByNode", reflect.TypeOf((*MockXatuCBTClient)(nil).ListFctBlockBlobFirstSeenByNode), varargs...)
+}
+
 // ListFctBlockFirstSeenByNode mocks base method.
 func (m *MockXatuCBTClient) ListFctBlockFirstSeenByNode(ctx context.Context, in *clickhouse.ListFctBlockFirstSeenByNodeRequest, opts ...grpc.CallOption) (*clickhouse.ListFctBlockFirstSeenByNodeResponse, error) {
 	m.ctrl.T.Helper()
@@ -83,6 +163,126 @@ func (mr *MockXatuCBTClientMockRecorder) ListFctBlockFirstSeenByNode(ctx, in any
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListFctBlockFirstSeenByNode", reflect.TypeOf((*MockXatuCBTClient)(nil).ListFctBlockFirstSeenByNode), varargs...)
 }
 
+// ListFctBlockHead mocks base method.
+func (m *MockXatuCBTClient) ListFctBlockHead(ctx context.Context, in *clickhouse.ListFctBlockHeadRequest, opts ...grpc.CallOption) (*clickhouse.ListFctBlockHeadResponse, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "ListFctBlockHead", varargs...)
+	ret0, _ := ret[0].(*clickhouse.ListFctBlockHeadResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListFctBlockHead indicates an expected call of ListFctBlockHead.
+func (mr *MockXatuCBTClientMockRecorder) ListFctBlockHead(ctx, in any, opts ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListFctBlockHead", reflect.TypeOf((*MockXatuCBTClient)(nil).ListFctBlockHead), varargs...)
+}
+
+// ListFctBlockMevHead mocks base method.
+func (m *MockXatuCBTClient) ListFctBlockMevHead(ctx context.Context, in *clickhouse.ListFctBlockMevHeadRequest, opts ...grpc.CallOption) (*clickhouse.ListFctBlockMevHeadResponse, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "ListFctBlockMevHead", varargs...)
+	ret0, _ := ret[0].(*clickhouse.ListFctBlockMevHeadResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListFctBlockMevHead indicates an expected call of ListFctBlockMevHead.
+func (mr *MockXatuCBTClientMockRecorder) ListFctBlockMevHead(ctx, in any, opts ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListFctBlockMevHead", reflect.TypeOf((*MockXatuCBTClient)(nil).ListFctBlockMevHead), varargs...)
+}
+
+// ListFctBlockProposerEntity mocks base method.
+func (m *MockXatuCBTClient) ListFctBlockProposerEntity(ctx context.Context, in *clickhouse.ListFctBlockProposerEntityRequest, opts ...grpc.CallOption) (*clickhouse.ListFctBlockProposerEntityResponse, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "ListFctBlockProposerEntity", varargs...)
+	ret0, _ := ret[0].(*clickhouse.ListFctBlockProposerEntityResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListFctBlockProposerEntity indicates an expected call of ListFctBlockProposerEntity.
+func (mr *MockXatuCBTClientMockRecorder) ListFctBlockProposerEntity(ctx, in any, opts ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListFctBlockProposerEntity", reflect.TypeOf((*MockXatuCBTClient)(nil).ListFctBlockProposerEntity), varargs...)
+}
+
+// ListFctMevBidCountByBuilder mocks base method.
+func (m *MockXatuCBTClient) ListFctMevBidCountByBuilder(ctx context.Context, in *clickhouse.ListFctMevBidCountByBuilderRequest, opts ...grpc.CallOption) (*clickhouse.ListFctMevBidCountByBuilderResponse, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "ListFctMevBidCountByBuilder", varargs...)
+	ret0, _ := ret[0].(*clickhouse.ListFctMevBidCountByBuilderResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListFctMevBidCountByBuilder indicates an expected call of ListFctMevBidCountByBuilder.
+func (mr *MockXatuCBTClientMockRecorder) ListFctMevBidCountByBuilder(ctx, in any, opts ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListFctMevBidCountByBuilder", reflect.TypeOf((*MockXatuCBTClient)(nil).ListFctMevBidCountByBuilder), varargs...)
+}
+
+// ListFctMevBidCountByRelay mocks base method.
+func (m *MockXatuCBTClient) ListFctMevBidCountByRelay(ctx context.Context, in *clickhouse.ListFctMevBidCountByRelayRequest, opts ...grpc.CallOption) (*clickhouse.ListFctMevBidCountByRelayResponse, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "ListFctMevBidCountByRelay", varargs...)
+	ret0, _ := ret[0].(*clickhouse.ListFctMevBidCountByRelayResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListFctMevBidCountByRelay indicates an expected call of ListFctMevBidCountByRelay.
+func (mr *MockXatuCBTClientMockRecorder) ListFctMevBidCountByRelay(ctx, in any, opts ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListFctMevBidCountByRelay", reflect.TypeOf((*MockXatuCBTClient)(nil).ListFctMevBidCountByRelay), varargs...)
+}
+
+// ListFctMevBidHighestValueByBuilderChunked50Ms mocks base method.
+func (m *MockXatuCBTClient) ListFctMevBidHighestValueByBuilderChunked50Ms(ctx context.Context, in *clickhouse.ListFctMevBidHighestValueByBuilderChunked50MsRequest, opts ...grpc.CallOption) (*clickhouse.ListFctMevBidHighestValueByBuilderChunked50MsResponse, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "ListFctMevBidHighestValueByBuilderChunked50Ms", varargs...)
+	ret0, _ := ret[0].(*clickhouse.ListFctMevBidHighestValueByBuilderChunked50MsResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListFctMevBidHighestValueByBuilderChunked50Ms indicates an expected call of ListFctMevBidHighestValueByBuilderChunked50Ms.
+func (mr *MockXatuCBTClientMockRecorder) ListFctMevBidHighestValueByBuilderChunked50Ms(ctx, in any, opts ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListFctMevBidHighestValueByBuilderChunked50Ms", reflect.TypeOf((*MockXatuCBTClient)(nil).ListFctMevBidHighestValueByBuilderChunked50Ms), varargs...)
+}
+
 // ListFctNodeActiveLast24H mocks base method.
 func (m *MockXatuCBTClient) ListFctNodeActiveLast24H(ctx context.Context, in *clickhouse.ListFctNodeActiveLast24HRequest, opts ...grpc.CallOption) (*clickhouse.ListFctNodeActiveLast24HResponse, error) {
 	m.ctrl.T.Helper()
@@ -101,4 +301,24 @@ func (mr *MockXatuCBTClientMockRecorder) ListFctNodeActiveLast24H(ctx, in any, o
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]any{ctx, in}, opts...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListFctNodeActiveLast24H", reflect.TypeOf((*MockXatuCBTClient)(nil).ListFctNodeActiveLast24H), varargs...)
+}
+
+// ListFctPreparedBlock mocks base method.
+func (m *MockXatuCBTClient) ListFctPreparedBlock(ctx context.Context, in *clickhouse.ListFctPreparedBlockRequest, opts ...grpc.CallOption) (*clickhouse.ListFctPreparedBlockResponse, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "ListFctPreparedBlock", varargs...)
+	ret0, _ := ret[0].(*clickhouse.ListFctPreparedBlockResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListFctPreparedBlock indicates an expected call of ListFctPreparedBlock.
+func (mr *MockXatuCBTClientMockRecorder) ListFctPreparedBlock(ctx, in any, opts ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListFctPreparedBlock", reflect.TypeOf((*MockXatuCBTClient)(nil).ListFctPreparedBlock), varargs...)
 }

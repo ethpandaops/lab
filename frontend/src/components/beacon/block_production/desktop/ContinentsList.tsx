@@ -121,8 +121,7 @@ const ContinentsList: React.FC<ContinentsListProps> = ({
       const latestTime = timings.length > 0 ? timings[timings.length - 1] : undefined;
 
       // Format the earliest time as a readable time if it exists
-      const formattedTime =
-        earliestTime !== undefined ? `${(earliestTime / 1000).toFixed(2)}s` : undefined;
+      const formattedTime = earliestTime !== undefined ? `${(earliestTime / 1000).toFixed(2)}s` : undefined;
 
       return {
         id: continentCode,
@@ -191,14 +190,9 @@ const ContinentsList: React.FC<ContinentsListProps> = ({
               >
                 <div className="flex justify-between items-center">
                   <div className="font-medium flex items-center text-sm">
-                    {item.rank > 0 &&
-                      item.rank <= 3 &&
-                      item.earliestTime &&
-                      item.earliestTime <= currentTime && (
-                        <span className="text-xs mr-2">
-                          {item.rank === 1 ? '🥇' : item.rank === 2 ? '🥈' : '🥉'}
-                        </span>
-                      )}
+                    {item.rank > 0 && item.rank <= 3 && item.earliestTime && item.earliestTime <= currentTime && (
+                      <span className="text-xs mr-2">{item.rank === 1 ? '🥇' : item.rank === 2 ? '🥈' : '🥉'}</span>
+                    )}
                     {item.label}
                   </div>
 

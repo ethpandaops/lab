@@ -2,13 +2,11 @@ package xatu_cbt
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/clickhouse"
 )
 
 type Config struct {
-	CacheTTL       time.Duration             `yaml:"cache_ttl"`
 	NetworkConfigs map[string]*NetworkConfig `yaml:"network_configs"`
 	MaxQueryLimit  uint64                    `yaml:"max_query_limit"`
 	DefaultLimit   uint64                    `yaml:"default_limit"`
@@ -29,10 +27,6 @@ func (c *Config) Validate() error {
 
 	if c.DefaultLimit == 0 {
 		c.DefaultLimit = 100
-	}
-
-	if c.CacheTTL == 0 {
-		c.CacheTTL = 60 * time.Second
 	}
 
 	if len(c.NetworkConfigs) == 0 {

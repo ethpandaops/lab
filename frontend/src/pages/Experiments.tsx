@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link } from '@tanstack/react-router';
 import {
   ArrowRight,
   Activity,
@@ -12,8 +12,7 @@ import {
 } from 'lucide-react';
 import { FaEthereum } from 'react-icons/fa';
 import { Card, CardBody } from '@/components/common/Card';
-import useNetwork from '@/contexts/network';
-import useConfig from '@/contexts/config';
+import { useNetwork, useConfig } from '@/stores/appStore';
 
 interface ExperimentItem {
   id: string;
@@ -80,7 +79,7 @@ const experiments: ExperimentItem[] = [
     subtitle: 'Real-time slot monitoring',
     description: 'Watch slots as they happen in real-time with detailed metrics',
     icon: Activity,
-    href: '/beacon/slot/live',
+    href: '/experiments/live-slots',
     category: 'beacon',
   },
   {
@@ -89,7 +88,7 @@ const experiments: ExperimentItem[] = [
     subtitle: 'Look up past slots',
     description: 'Search for specific slots by number and analyze historical data',
     icon: Search,
-    href: '/beacon/slot',
+    href: '/experiments/historical-slots',
     category: 'beacon',
   },
   {

@@ -203,7 +203,7 @@ func (c *client) Start(ctx context.Context) error {
 
 	// Test the connection to ensure it's working.
 	// This works regardless of whether a database is specified.
-	c.log.Debug("Testing ClickHouse connection")
+	c.log.Info("Testing ClickHouse connection")
 
 	if err := conn.PingContext(ctx); err != nil {
 		// If ping fails, close the connection and return error.
@@ -215,7 +215,31 @@ func (c *client) Start(ctx context.Context) error {
 		return fmt.Errorf("failed to ping ClickHouse: %w", err)
 	}
 
-	c.log.Debug("ClickHouse connection test successful")
+	c.log.Info("ClickHouse connection test successful")
+
+	// If network is specified, verify the network database exists
+	if c.network != "" {
+		// Check if the network database exists by querying the system.databases table
+		// This ensures we can actually access the network-specific data
+		c.log.WithField("database", c.network).Info("Verifying network database exists")
+
+		var exists uint8
+
+		query := "SELECT 1 FROM system.databases WHERE name = ? LIMIT 1"
+		row := c.conn.QueryRowContext(ctx, query, c.network)
+
+		if err := row.Scan(&exists); err != nil {
+			// Database doesn't exist or we can't access it
+			_ = conn.Close()
+
+			c.connectionStatus.WithLabelValues(c.metricsDatabase, "error").Set(1)
+			c.connectionStatus.WithLabelValues(c.metricsDatabase, "active").Set(0)
+
+			return fmt.Errorf("network database '%s' does not exist or is not accessible: %w", c.network, err)
+		}
+
+		c.log.WithField("database", c.network).Info("Network database verified")
+	}
 
 	// Update metrics to reflect successful initialization.
 	c.connectionStatus.WithLabelValues(c.metricsDatabase, "active").Set(1)

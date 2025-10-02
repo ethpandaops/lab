@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Phase } from './types';
-import useTimeline from '@/contexts/timeline';
 import { getCurrentPhase } from './PhaseUtils';
+import { useSlotProgress, useSlotState, useSlotActions } from '@/hooks/useSlot';
 
 interface PhaseTimelineProps {
   nodeBlockSeen: Record<string, number>;
@@ -37,9 +37,111 @@ const PhaseTimeline: React.FC<PhaseTimelineProps> = ({
   resetToCurrentSlot,
   isNextDisabled,
 }) => {
-  // Use timeline context
-  const { currentTimeMs, displayTimeMs, isPlaying, togglePlayPause } = useTimeline();
-  
+  // Use slot context for everything
+  const { slotProgress } = useSlotProgress();
+  const slotState = useSlotState();
+  const slotActions = useSlotActions();
+
+  // Convert slotProgress to currentTimeMs for compatibility
+  const currentTimeMs = slotProgress;
+  const displayTimeMs = slotProgress;
+  const isPlaying = slotState.isPlaying;
+
+  // Toggle play/pause using slot context
+  const togglePlayPause = useCallback(() => {
+    if (isPlaying) {
+      slotActions.pause();
+    } else {
+      slotActions.play();
+    }
+  }, [isPlaying, slotActions]);
+
+  // Timeline interaction refs and state
+  const timelineBarRef = useRef<HTMLDivElement>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const lastSeekTimeRef = useRef<number>(0);
+  const throttleDelayMs = 50; // Throttle to max 20 updates per second
+
+  // Handle timeline click/drag to seek time
+  const handleTimelineInteraction = useCallback(
+    (clientX: number) => {
+      if (!timelineBarRef.current) return;
+
+      // Throttle the seek calls to prevent maximum update depth error
+      const now = Date.now();
+      if (now - lastSeekTimeRef.current < throttleDelayMs) {
+        return;
+      }
+      lastSeekTimeRef.current = now;
+
+      const rect = timelineBarRef.current.getBoundingClientRect();
+      const x = clientX - rect.left;
+      const percentage = Math.max(0, Math.min(1, x / rect.width));
+      const rawTimeMs = percentage * 12000; // 12 seconds slot
+
+      // Round to nearest 100ms interval for consistency with slot system updates
+      const timeMs = Math.round(rawTimeMs / 100) * 100;
+
+      // Only seek, don't pause here (pause happens on mouse down)
+      slotActions.seekToTime(timeMs);
+    },
+    [slotActions],
+  );
+
+  const handleMouseDown = useCallback(
+    (e: React.MouseEvent) => {
+      setIsDragging(true);
+      // Pause only once when starting to drag
+      if (isPlaying) {
+        slotActions.pause();
+      }
+      handleTimelineInteraction(e.clientX);
+    },
+    [handleTimelineInteraction, isPlaying, slotActions],
+  );
+
+  const handleTouchStart = useCallback(
+    (e: React.TouchEvent) => {
+      if (e.touches.length === 0) return;
+      setIsDragging(true);
+      // Pause only once when starting to drag
+      if (isPlaying) {
+        slotActions.pause();
+      }
+      handleTimelineInteraction(e.touches[0].clientX);
+    },
+    [handleTimelineInteraction, isPlaying, slotActions],
+  );
+
+  useEffect(() => {
+    if (!isDragging) return;
+
+    const handleMouseMove = (e: MouseEvent) => {
+      handleTimelineInteraction(e.clientX);
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (e.touches.length === 0) return;
+      handleTimelineInteraction(e.touches[0].clientX);
+    };
+
+    const handleEnd = () => {
+      setIsDragging(false);
+    };
+
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleEnd);
+    document.addEventListener('touchmove', handleTouchMove);
+    document.addEventListener('touchend', handleEnd);
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleEnd);
+      document.removeEventListener('touchmove', handleTouchMove);
+      document.removeEventListener('touchend', handleEnd);
+    };
+  }, [isDragging, handleTimelineInteraction]);
+
   // CRITICAL FIX: Use startMs/endMs instead of inclusionDelay!
   // Calculate which attestation windows have already happened by the current time
   const filteredAttestationWindows =
@@ -87,7 +189,7 @@ const PhaseTimeline: React.FC<PhaseTimelineProps> = ({
     const now = Date.now();
     const timeSinceLastRender = now - lastRenderRef.current;
 
-      // Update the last log time
+    // Update the last log time
     lastLogTimeRef.current = now;
 
     lastRenderRef.current = now;
@@ -107,7 +209,6 @@ const PhaseTimeline: React.FC<PhaseTimelineProps> = ({
 
   // Update previous time after checking for resets
   React.useEffect(() => {
-
     setPreviousTimeMs(currentTimeMs);
   }, [currentTimeMs, isReset]);
 
@@ -178,13 +279,6 @@ const PhaseTimeline: React.FC<PhaseTimelineProps> = ({
               className={`font-mono text-primary flex flex-col ${isMobile ? 'text-xs' : 'text-sm'}`}
             >
               <div className="text-lg font-semibold">Slot: {slotNumber ?? '—'}</div>
-              {slotNumber !== null && displaySlotOffset !== 0 && (
-                <div
-                  className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-secondary opacity-80`}
-                >
-                  Lag: {headLagSlots - displaySlotOffset}
-                </div>
-              )}
             </div>
           </div>
 
@@ -244,14 +338,19 @@ const PhaseTimeline: React.FC<PhaseTimelineProps> = ({
 
         <div className="relative mt-2">
           {/* Empty timeline bar - but colored for building phase */}
-          <div className="h-3 mb-2 rounded-lg overflow-hidden border border-border shadow-inner bg-surface relative">
+          <div
+            ref={timelineBarRef}
+            className="h-3 mb-2 rounded-lg overflow-hidden border border-border shadow-inner bg-surface relative cursor-pointer"
+            onMouseDown={handleMouseDown}
+            onTouchStart={handleTouchStart}
+          >
             {/* Building phase colored background */}
-            <div className="h-full bg-orange-500/15 w-full"></div>
+            <div className="h-full bg-orange-500/15 w-full pointer-events-none"></div>
           </div>
 
           {/* Progress overlay - showing time with building phase color */}
           <div
-            className="absolute top-0 h-3 bg-orange-500/30 rounded-l-lg border-r-2 border-white/40"
+            className="absolute top-0 h-3 bg-orange-500/30 rounded-l-lg border-r-2 border-white/40 pointer-events-none"
             style={{
               width: `${(currentTimeMs / 12000) * 100}%`,
               maxWidth: 'calc(100% - 4px)', // Stay within container boundaries
@@ -261,7 +360,7 @@ const PhaseTimeline: React.FC<PhaseTimelineProps> = ({
 
           {/* Current time indicator with glowing dot */}
           <div
-            className="absolute top-0 h-3"
+            className="absolute top-0 h-3 pointer-events-none"
             style={{
               left: `${(currentTimeMs / 12000) * 100}%`,
               transform: 'translateX(-50%)',
@@ -446,11 +545,6 @@ const PhaseTimeline: React.FC<PhaseTimelineProps> = ({
             className={`font-mono text-primary flex flex-col ${isMobile ? 'text-xs' : 'text-sm'}`}
           >
             <div className="text-lg font-semibold">Slot: {slotNumber ?? '—'}</div>
-            {slotNumber !== null && displaySlotOffset !== 0 && (
-              <div className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-secondary opacity-80`}>
-                Lag: {headLagSlots - displaySlotOffset}
-              </div>
-            )}
           </div>
         </div>
 
@@ -527,10 +621,15 @@ const PhaseTimeline: React.FC<PhaseTimelineProps> = ({
 
       <div className="relative mt-2">
         {/* Four-phase progress bar: Building → Propagating → Attesting → Accepted */}
-        <div className="h-3 mb-2 flex rounded-lg overflow-hidden border border-border/30 shadow-inner relative">
+        <div
+          ref={timelineBarRef}
+          className="h-3 mb-2 flex rounded-lg overflow-hidden border border-border/30 shadow-inner relative cursor-pointer"
+          onMouseDown={handleMouseDown}
+          onTouchStart={handleTouchStart}
+        >
           {/* Building phase */}
           <div
-            className="border-r border-white/10 shadow-inner"
+            className="border-r border-white/10 shadow-inner pointer-events-none"
             style={{
               width: `${propagationPercent}%`,
               backgroundColor:
@@ -542,7 +641,7 @@ const PhaseTimeline: React.FC<PhaseTimelineProps> = ({
 
           {/* Propagating phase */}
           <div
-            className="border-r border-white/10 shadow-inner"
+            className="border-r border-white/10 shadow-inner pointer-events-none"
             style={{
               width: `${attestationPercent - propagationPercent}%`,
               backgroundColor:
@@ -554,7 +653,7 @@ const PhaseTimeline: React.FC<PhaseTimelineProps> = ({
 
           {/* Attesting phase */}
           <div
-            className="border-r border-white/10 shadow-inner"
+            className="border-r border-white/10 shadow-inner pointer-events-none"
             style={{
               width: `${acceptancePercent - attestationPercent}%`,
               backgroundColor:
@@ -566,7 +665,7 @@ const PhaseTimeline: React.FC<PhaseTimelineProps> = ({
 
           {/* Accepted phase */}
           <div
-            className="shadow-inner"
+            className="shadow-inner pointer-events-none"
             style={{
               width: `${100 - acceptancePercent}%`,
               backgroundColor:
@@ -578,7 +677,7 @@ const PhaseTimeline: React.FC<PhaseTimelineProps> = ({
 
           {/* Phase transition markers - no transitions for crisp movement */}
           <div
-            className="absolute top-0 bottom-0 w-1"
+            className="absolute top-0 bottom-0 w-1 pointer-events-none"
             style={{
               left: `${propagationPercent}%`,
               backgroundColor: 'rgba(255, 255, 255, 0.7)',
@@ -586,7 +685,7 @@ const PhaseTimeline: React.FC<PhaseTimelineProps> = ({
             }}
           />
           <div
-            className="absolute top-0 bottom-0 w-1"
+            className="absolute top-0 bottom-0 w-1 pointer-events-none"
             style={{
               left: `${attestationPercent}%`,
               backgroundColor: 'rgba(255, 255, 255, 0.7)',
@@ -594,7 +693,7 @@ const PhaseTimeline: React.FC<PhaseTimelineProps> = ({
             }}
           />
           <div
-            className="absolute top-0 bottom-0 w-1"
+            className="absolute top-0 bottom-0 w-1 pointer-events-none"
             style={{
               left: `${acceptancePercent}%`,
               backgroundColor: 'rgba(255, 255, 255, 0.7)',
@@ -605,7 +704,7 @@ const PhaseTimeline: React.FC<PhaseTimelineProps> = ({
 
         {/* Time indicator tick */}
         <div
-          className="absolute top-0 h-3 bg-white"
+          className="absolute top-0 h-3 bg-white pointer-events-none"
           style={{
             width: '4px',
             left: `calc(${(currentTimeMs / 12000) * 100}% - 2px)`,

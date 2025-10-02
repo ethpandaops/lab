@@ -1,9 +1,12 @@
-import { Outlet, useLocation } from 'react-router-dom';
+import { Outlet, useLocation, useNavigate, useParams } from '@tanstack/react-router';
 import { Navigation } from '@/components/layout/Navigation';
 import { Breadcrumbs } from '@/components/layout/Breadcrumbs';
 import { NetworkSelector } from '@/components/common/NetworkSelector';
+import { SlotStatusBar } from '@/components/slot/SlotStatusBar';
+import { ApiModeDebugSection } from '@/components/debug/ApiModeDebugSection';
+import { SlotDataDebugSection } from '@/components/debug/SlotDataDebugSection';
 import { useEffect, useState } from 'react';
-import useNetwork from '@/contexts/network';
+import { useNetwork } from '@/stores/appStore';
 import { Logo } from '@/components/layout/Logo';
 import useBeacon from '@/contexts/beacon';
 import { Menu } from 'lucide-react';
@@ -13,12 +16,19 @@ import { GoogleFormSystemAlert } from '@/components/common/SystemAlert';
 
 function Layout() {
   const location = useLocation();
+  const navigate = useNavigate();
+  const params = useParams({ strict: false });
   const isHome = location.pathname === '/';
   const { selectedNetwork, setSelectedNetwork } = useNetwork();
   const [currentSlot, setCurrentSlot] = useState<number | null>(null);
   const [currentEpoch, setCurrentEpoch] = useState<number | null>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { getBeaconClock } = useBeacon();
+
+  // Check if we're in a full-height experiment
+  const isFullHeightExperiment =
+    'experimentId' in params &&
+    (params.experimentId === 'live-slots' || params.experimentId === 'block-production-flow');
 
   // Get network metadata
   const selectedMetadata = NETWORK_METADATA[selectedNetwork as NetworkKey] || {
@@ -31,6 +41,17 @@ function Layout() {
   useEffect(() => {
     setIsMobileMenuOpen(false);
   }, [location]);
+
+  // Sync URL search params with selected network
+  useEffect(() => {
+    navigate({
+      search: prev => ({
+        ...prev,
+        network: selectedNetwork === 'mainnet' ? undefined : selectedNetwork,
+      }),
+      replace: true,
+    });
+  }, [selectedNetwork, navigate]);
 
   // Update slot and epoch every second
   useEffect(() => {
@@ -51,6 +72,11 @@ function Layout() {
 
   return (
     <div className="relative min-h-screen text-primary font-mono bg-gradient-to-b from-[rgb(var(--bg-base))] via-[rgb(var(--bg-base))] to-[rgb(var(--bg-base))]">
+      {/* Register debug sections */}
+      <SlotStatusBar />
+      <ApiModeDebugSection />
+      <SlotDataDebugSection />
+
       {/* Integrated Background Effects */}
       <div className="absolute inset-0 bg-gradient-to-b from-accent/5 via-transparent to-transparent pointer-events-none" />
       <div className="absolute inset-0 bg-gradient-to-t from-error/5 via-transparent to-transparent pointer-events-none" />
@@ -77,13 +103,13 @@ function Layout() {
             <div className="hidden lg:flex justify-center">
               <NetworkSelector
                 selectedNetwork={selectedNetwork}
-                onNetworkChange={network => setSelectedNetwork(network, 'ui')}
+                onNetworkChange={setSelectedNetwork}
                 expandToFit={true}
               />
             </div>
 
             {/* Right - Slot/Epoch Info (hidden on mobile) */}
-            <div className="hidden lg:flex justify-end">
+            <div className="hidden lg:flex items-center gap-4 justify-end">
               {currentSlot !== null && currentEpoch !== null && (
                 <div className="text-sm font-mono">
                   <span className="text-tertiary">Slot </span>
@@ -150,7 +176,7 @@ function Layout() {
               <div className="p-4 border-b border-subtle">
                 <NetworkSelector
                   selectedNetwork={selectedNetwork}
-                  onNetworkChange={network => setSelectedNetwork(network, 'ui')}
+                  onNetworkChange={setSelectedNetwork}
                   className="w-full"
                 />
               </div>
@@ -199,19 +225,13 @@ function Layout() {
           <div
             className={clsx(
               'w-full',
-              location.pathname === '/beacon/slot/live' ||
-                /^\/beacon\/slot\/\d+$/.test(location.pathname)
-                ? 'h-[calc(100vh-56px)]'
-                : ['min-h-0', 'p-2 md:p-4 lg:p-6'],
+              isFullHeightExperiment ? 'h-[calc(100vh-56px)]' : ['min-h-0', 'p-2 md:p-4 lg:p-6'],
             )}
           >
             <div
               className={clsx(
                 'relative',
-                location.pathname === '/beacon/slot/live' ||
-                  /^\/beacon\/slot\/\d+$/.test(location.pathname)
-                  ? 'h-full'
-                  : ['p-4 md:p-6 lg:p-8'],
+                isFullHeightExperiment ? 'h-full' : ['p-4 md:p-6 lg:p-8'],
               )}
             >
               <Outlet />

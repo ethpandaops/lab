@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, memo, useRef, useEffect } from 'react';
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, ReferenceLine } from 'recharts';
 import { ChartWithStats } from '@/components/charts/ChartWithStats';
 import { HelpCircle } from 'lucide-react';
@@ -24,7 +24,7 @@ interface BottomPanelProps {
   }>;
 }
 
-export function BottomPanel({
+const BottomPanel = memo(function BottomPanel({
   attestationProgress,
   attestationThreshold,
   currentTime,
@@ -135,7 +135,7 @@ export function BottomPanel({
 
   // Calculate max Y value for arrivals chart based on bin size
   const maxArrivalsPerBin = useMemo(() => {
-    if (!attestationWindows?.length) return 0;
+    if (!attestationWindows?.length) return 100;
 
     // Group attestations into 50ms bins
     const bins = new Map<number, number>();
@@ -144,9 +144,10 @@ export function BottomPanel({
       bins.set(binIndex, (bins.get(binIndex) || 0) + window.validator_indices.length);
     });
 
-    // Get max bin size and add 20% buffer
+    // Get max bin size and add 20% buffer, with minimum of 100
+    if (bins.size === 0) return 100;
     const maxBin = Math.max(...bins.values());
-    return Math.ceil(maxBin * 1.2);
+    return Math.max(100, Math.ceil(maxBin * 1.2));
   }, [attestationWindows]);
 
   const handleInfoClick = () => {
@@ -241,49 +242,42 @@ export function BottomPanel({
               height={140}
               titlePlacement="inside"
               chart={
-                loading ? (
-                  <div className="w-full h-[140px] bg-surface/50 rounded animate-pulse" />
-                ) : (
-                  <ResponsiveContainer width="100%" height={140}>
-                    <LineChart
-                      data={arrivalData}
-                      margin={{ top: 16, right: 8, left: 0, bottom: 4 }}
-                    >
-                      <XAxis
-                        dataKey="time"
-                        stroke="currentColor"
-                        tick={{ fontSize: 8 }}
-                        ticks={[0, 4, 8, 12]}
-                        domain={[0, 12]}
-                        type="number"
-                        allowDataOverflow
-                        tickSize={2}
-                        strokeWidth={1}
-                      />
-                      <YAxis
-                        stroke="currentColor"
-                        tick={{ fontSize: 8 }}
-                        domain={[0, maxArrivalsPerBin]}
-                        ticks={[0, Math.floor(maxArrivalsPerBin / 2), maxArrivalsPerBin]}
-                        allowDataOverflow
-                        tickSize={2}
-                        width={25}
-                        strokeWidth={1}
-                        tickCount={3}
-                        tickFormatter={value => Math.floor(value).toString()}
-                      />
-                      <Line
-                        type="monotone"
-                        dataKey="count"
-                        className="text-success"
-                        stroke="currentColor"
-                        strokeWidth={1}
-                        dot={false}
-                        isAnimationActive={false}
-                      />
-                    </LineChart>
-                  </ResponsiveContainer>
-                )
+                <ResponsiveContainer width="100%" height={140}>
+                  <LineChart data={arrivalData} margin={{ top: 16, right: 8, left: 0, bottom: 4 }}>
+                    <XAxis
+                      dataKey="time"
+                      stroke="currentColor"
+                      tick={{ fontSize: 8 }}
+                      ticks={[0, 4, 8, 12]}
+                      domain={[0, 12]}
+                      type="number"
+                      allowDataOverflow
+                      tickSize={2}
+                      strokeWidth={1}
+                    />
+                    <YAxis
+                      stroke="currentColor"
+                      tick={{ fontSize: 8 }}
+                      domain={[0, maxArrivalsPerBin]}
+                      ticks={[0, Math.floor(maxArrivalsPerBin / 2), maxArrivalsPerBin]}
+                      allowDataOverflow
+                      tickSize={2}
+                      width={25}
+                      strokeWidth={1}
+                      tickCount={3}
+                      tickFormatter={value => Math.floor(value).toString()}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="count"
+                      className="text-success"
+                      stroke="currentColor"
+                      strokeWidth={1}
+                      dot={false}
+                      isAnimationActive={false}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
               }
               series={arrivalStats}
               showSeriesTable={false}
@@ -301,52 +295,48 @@ export function BottomPanel({
               height={140}
               titlePlacement="inside"
               chart={
-                loading ? (
-                  <div className="w-full h-[140px] bg-surface/50 rounded animate-pulse" />
-                ) : (
-                  <ResponsiveContainer width="100%" height={140}>
-                    <LineChart data={cdfData} margin={{ top: 16, right: 8, left: 0, bottom: 4 }}>
-                      <XAxis
-                        dataKey="time"
-                        stroke="currentColor"
-                        tick={{ fontSize: 8 }}
-                        ticks={[0, 4, 8, 12]}
-                        domain={[0, 12]}
-                        type="number"
-                        allowDataOverflow
-                        tickSize={2}
-                        strokeWidth={1}
-                      />
-                      <YAxis
-                        stroke="currentColor"
-                        tick={{ fontSize: 8 }}
-                        domain={[0, 100]}
-                        ticks={[0, 33, 66, 100]}
-                        allowDataOverflow
-                        tickSize={2}
-                        width={25}
-                        strokeWidth={1}
-                        tickCount={4}
-                        tickFormatter={value => value.toString()}
-                      />
-                      <ReferenceLine
-                        y={66}
-                        stroke="currentColor"
-                        strokeDasharray="3 3"
-                        strokeOpacity={0.3}
-                      />
-                      <Line
-                        type="monotone"
-                        dataKey="percentage"
-                        className="text-success"
-                        stroke="currentColor"
-                        strokeWidth={1}
-                        dot={false}
-                        isAnimationActive={false}
-                      />
-                    </LineChart>
-                  </ResponsiveContainer>
-                )
+                <ResponsiveContainer width="100%" height={140}>
+                  <LineChart data={cdfData} margin={{ top: 16, right: 8, left: 0, bottom: 4 }}>
+                    <XAxis
+                      dataKey="time"
+                      stroke="currentColor"
+                      tick={{ fontSize: 8 }}
+                      ticks={[0, 4, 8, 12]}
+                      domain={[0, 12]}
+                      type="number"
+                      allowDataOverflow
+                      tickSize={2}
+                      strokeWidth={1}
+                    />
+                    <YAxis
+                      stroke="currentColor"
+                      tick={{ fontSize: 8 }}
+                      domain={[0, 100]}
+                      ticks={[0, 33, 66, 100]}
+                      allowDataOverflow
+                      tickSize={2}
+                      width={25}
+                      strokeWidth={1}
+                      tickCount={4}
+                      tickFormatter={value => value.toString()}
+                    />
+                    <ReferenceLine
+                      y={66}
+                      stroke="currentColor"
+                      strokeDasharray="3 3"
+                      strokeOpacity={0.3}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="percentage"
+                      className="text-success"
+                      stroke="currentColor"
+                      strokeWidth={1}
+                      dot={false}
+                      isAnimationActive={false}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
               }
               series={cdfStats}
               showSeriesTable={false}
@@ -356,6 +346,7 @@ export function BottomPanel({
       </div>
     </div>
   );
-}
+});
 
+export { BottomPanel };
 export default BottomPanel;

@@ -2,7 +2,7 @@ import { Fragment } from 'react';
 import { Listbox, Transition } from '@headlessui/react';
 import { ChevronUpDownIcon } from '@heroicons/react/24/outline';
 import clsx from 'clsx';
-import useNetwork from '@/contexts/network';
+import { useNetwork } from '@/stores/appStore';
 import { useEffect, useRef } from 'react';
 import { NETWORK_METADATA, type NetworkKey } from '@/constants/networks.tsx';
 
@@ -29,7 +29,7 @@ const getNetworkMetadata = (network: string) => {
 };
 
 // Network order priority (lower index = higher priority)
-const NETWORK_ORDER = ['mainnet', 'sepolia', 'hoodi'];
+const NETWORK_ORDER = ['mainnet', 'holesky', 'sepolia', 'hoodi'];
 
 // Sort networks based on predefined order
 const sortNetworks = (networks: string[]): string[] => {
@@ -78,8 +78,9 @@ export function NetworkSelector({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Get available networks from props or config
-  const unsortedNetworks: string[] = [...(availableNetworksFromContext ?? ['mainnet'])];
+  // Get available networks from context
+  // Note: Root loader guarantees networks are loaded before this component renders
+  const unsortedNetworks: string[] = [...(availableNetworksFromContext ?? [])];
 
   // Sort networks according to the specified order
   const networks = sortNetworks(unsortedNetworks);

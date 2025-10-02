@@ -4,9 +4,10 @@ interface PendingBlockProps {
   slot: number;
   epoch: number;
   proposerEntity?: string;
-  slotDataStore?: any;
   network?: string;
   currentTime?: number; // Add currentTime to filter bids by time interval
+  slotData?: any; // Direct slot data
+  previousSlotData?: any; // Previous slot data for negative time bids
 }
 
 /**
@@ -17,25 +18,19 @@ const PendingBlock: React.FC<PendingBlockProps> = ({
   slot,
   epoch,
   proposerEntity,
-  slotDataStore,
   network,
   currentTime = 0, // Default to 0 if not provided
+  slotData,
+  previousSlotData,
 }) => {
-  // Process bid data from the slot data store with time filtering
+  // Process bid data from the passed slot data with time filtering
   const { bids, highestBid, bidCount } = React.useMemo(() => {
-    if (!slotDataStore || !network) {
-      return { bids: [], highestBid: null, bidCount: 0 };
-    }
-
     // Try to find bids from both approaches:
     // 1. Direct bids for this future slot
-    // 2. Negative time bids from current slot
+    // 2. Negative time bids from previous slot
 
-    // Get data for this slot from the store (direct future slot data)
-    const slotData = slotDataStore.getSlotData(network, slot);
-    // Get data for current slot (to check for negative time bids)
-    const currentSlot = slot - 1;
-    const currentSlotData = slotDataStore.getSlotData(network, currentSlot);
+    // Use the directly passed slot data
+    const currentSlotData = previousSlotData;
 
     // Storage for all processed bids
     let processedBids: Array<{
@@ -207,7 +202,7 @@ const PendingBlock: React.FC<PendingBlockProps> = ({
       highestBid: timeFilteredBids.length > 0 ? timeFilteredBids[0] : null,
       bidCount: totalBidsCount, // Return total count before time filtering
     };
-  }, [slot, network, slotDataStore, currentTime]); // Add currentTime as a dependency
+  }, [slot, network, slotData, previousSlotData, currentTime]); // Add currentTime as a dependency
 
   return (
     <div className="bg-slate-900 rounded-lg overflow-hidden shadow-[0_0_15px_rgba(56,189,248,0.2)] w-full h-[140px] transition-all duration-300 relative border border-cyan-600/30">

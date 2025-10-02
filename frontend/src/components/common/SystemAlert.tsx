@@ -1,5 +1,5 @@
 import { Share2, Database } from 'lucide-react';
-import { useLocation } from 'react-router-dom';
+import { useLocation } from '@tanstack/react-router';
 
 interface SystemAlertProps {
   title: string;
@@ -9,12 +9,7 @@ interface SystemAlertProps {
   showOnPaths?: string[];
 }
 
-export const SystemAlert = ({
-  title,
-  buttonText,
-  buttonLink,
-  showOnPaths = ['/beacon'],
-}: SystemAlertProps) => {
+export const SystemAlert = ({ title, buttonText, buttonLink, showOnPaths = ['/beacon'] }: SystemAlertProps) => {
   const location = useLocation();
 
   // Check if current path starts with any of the paths in showOnPaths
@@ -61,9 +56,7 @@ export const GoogleFormSystemAlert = () => {
     <div className="flex items-center gap-2">
       <Database className="hidden xl:block h-4 w-4 text-accent" />
       <div className="flex-1 min-w-0 hidden xl:block">
-        <p className="text-xs font-medium text-primary whitespace-nowrap">
-          Add your node to The Lab
-        </p>
+        <p className="text-xs font-medium text-primary whitespace-nowrap">Add your node to The Lab</p>
       </div>
       <a
         href="https://ethpandaops.io/contribute-data/"

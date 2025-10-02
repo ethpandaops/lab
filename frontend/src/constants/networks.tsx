@@ -6,6 +6,11 @@ export const NETWORK_METADATA = {
     icon: <FaEthereum className="w-5 h-5 text-white" />,
     color: '#627EEA',
   },
+  holesky: {
+    name: 'Holesky',
+    icon: '🦊',
+    color: '#D2691E',
+  },
   sepolia: {
     name: 'Sepolia',
     icon: '🐬',

@@ -519,53 +519,18 @@ export class ExperimentConfig extends Message<ExperimentConfig> {
  */
 export class ExperimentDataAvailability extends Message<ExperimentDataAvailability> {
   /**
-   * Unix timestamp (seconds) of the earliest available data
-   *
-   * @generated from field: int64 available_from_timestamp = 1;
-   */
-  availableFromTimestamp = protoInt64.zero;
-
-  /**
-   * Unix timestamp (seconds) of the latest available data
-   *
-   * @generated from field: int64 available_until_timestamp = 2;
-   */
-  availableUntilTimestamp = protoInt64.zero;
-
-  /**
    * Earliest available slot number
    *
-   * @generated from field: uint64 min_slot = 3;
+   * @generated from field: uint64 min_slot = 1;
    */
   minSlot = protoInt64.zero;
 
   /**
    * Latest available slot number
    *
-   * @generated from field: uint64 max_slot = 4;
+   * @generated from field: uint64 max_slot = 2;
    */
   maxSlot = protoInt64.zero;
-
-  /**
-   * Safe slot for "live" view (head - 2 slots)
-   *
-   * @generated from field: uint64 safe_slot = 5;
-   */
-  safeSlot = protoInt64.zero;
-
-  /**
-   * The current head slot of the network
-   *
-   * @generated from field: uint64 head_slot = 6;
-   */
-  headSlot = protoInt64.zero;
-
-  /**
-   * Indicates if data is available (overlapping interval exists)
-   *
-   * @generated from field: bool has_data = 7;
-   */
-  hasData = false;
 
   constructor(data?: PartialMessage<ExperimentDataAvailability>) {
     super();
@@ -575,13 +540,8 @@ export class ExperimentDataAvailability extends Message<ExperimentDataAvailabili
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "config.ExperimentDataAvailability";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "available_from_timestamp", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
-    { no: 2, name: "available_until_timestamp", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
-    { no: 3, name: "min_slot", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
-    { no: 4, name: "max_slot", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
-    { no: 5, name: "safe_slot", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
-    { no: 6, name: "head_slot", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
-    { no: 7, name: "has_data", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 1, name: "min_slot", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
+    { no: 2, name: "max_slot", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ExperimentDataAvailability {
@@ -639,6 +599,55 @@ export class GetExperimentConfigRequest extends Message<GetExperimentConfigReque
 
   static equals(a: GetExperimentConfigRequest | PlainMessage<GetExperimentConfigRequest> | undefined, b: GetExperimentConfigRequest | PlainMessage<GetExperimentConfigRequest> | undefined): boolean {
     return proto3.util.equals(GetExperimentConfigRequest, a, b);
+  }
+}
+
+/**
+ * GetNetworkExperimentConfigRequest defines the request for getting a single experiment's configuration for a specific network.
+ *
+ * @generated from message config.GetNetworkExperimentConfigRequest
+ */
+export class GetNetworkExperimentConfigRequest extends Message<GetNetworkExperimentConfigRequest> {
+  /**
+   * The experiment ID to get configuration for
+   *
+   * @generated from field: string experiment_id = 1;
+   */
+  experimentId = "";
+
+  /**
+   * The network to get configuration for
+   *
+   * @generated from field: string network = 2;
+   */
+  network = "";
+
+  constructor(data?: PartialMessage<GetNetworkExperimentConfigRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "config.GetNetworkExperimentConfigRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "experiment_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "network", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetNetworkExperimentConfigRequest {
+    return new GetNetworkExperimentConfigRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): GetNetworkExperimentConfigRequest {
+    return new GetNetworkExperimentConfigRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): GetNetworkExperimentConfigRequest {
+    return new GetNetworkExperimentConfigRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: GetNetworkExperimentConfigRequest | PlainMessage<GetNetworkExperimentConfigRequest> | undefined, b: GetNetworkExperimentConfigRequest | PlainMessage<GetNetworkExperimentConfigRequest> | undefined): boolean {
+    return proto3.util.equals(GetNetworkExperimentConfigRequest, a, b);
   }
 }
 

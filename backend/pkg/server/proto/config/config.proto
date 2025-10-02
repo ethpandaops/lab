@@ -13,6 +13,8 @@ service ConfigService {
   rpc GetConfig(GetConfigRequest) returns (GetConfigResponse);
   // GetExperimentConfig returns a single experiment's configuration with data availability.
   rpc GetExperimentConfig(GetExperimentConfigRequest) returns (GetExperimentConfigResponse);
+  // GetNetworkExperimentConfig returns a single experiment's configuration with data availability for a specific network.
+  rpc GetNetworkExperimentConfig(GetNetworkExperimentConfigRequest) returns (GetExperimentConfigResponse);
 }
 
 // GetConfigRequest is empty for now but allows future expansion
@@ -101,26 +103,24 @@ message ExperimentConfig {
 
 // ExperimentDataAvailability contains data availability information for an experiment on a specific network
 message ExperimentDataAvailability {
-  // Unix timestamp (seconds) of the earliest available data
-  int64 available_from_timestamp = 1;
-  // Unix timestamp (seconds) of the latest available data
-  int64 available_until_timestamp = 2;
   // Earliest available slot number
-  uint64 min_slot = 3;
+  uint64 min_slot = 1;
   // Latest available slot number
-  uint64 max_slot = 4;
-  // Safe slot for "live" view (head - 2 slots)
-  uint64 safe_slot = 5;
-  // The current head slot of the network
-  uint64 head_slot = 6;
-  // Indicates if data is available (overlapping interval exists)
-  bool has_data = 7;
+  uint64 max_slot = 2;
 }
 
 // GetExperimentConfigRequest defines the request for getting a single experiment's configuration.
 message GetExperimentConfigRequest {
   // The experiment ID to get configuration for
   string experiment_id = 1;
+}
+
+// GetNetworkExperimentConfigRequest defines the request for getting a single experiment's configuration for a specific network.
+message GetNetworkExperimentConfigRequest {
+  // The experiment ID to get configuration for
+  string experiment_id = 1;
+  // The network to get configuration for
+  string network = 2;
 }
 
 // GetExperimentConfigResponse returns a single experiment's full configuration with data availability.

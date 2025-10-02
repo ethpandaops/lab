@@ -31,7 +31,7 @@ message FctBlockBlobFirstSeenByNode {
   string username = 20;
   // ID of the node
   string node_id = 21;
-  // Classification of the node, e.g. "individual", "institution", "internal" (aka ethPandaOps) or "unclassified"
+  // Classification of the node, e.g. "individual", "corporate", "internal" (aka ethPandaOps) or "unclassified"
   string classification = 22;
   // Name of the client
   string meta_client_name = 23;

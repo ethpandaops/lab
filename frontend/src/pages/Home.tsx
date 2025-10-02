@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link } from '@tanstack/react-router';
 import { ArrowRight, ExternalLink, Zap } from 'lucide-react';
 import { useEffect, useState, useRef } from 'react';
 import FeatureCard from '@/components/common/FeatureCard';
@@ -23,7 +23,7 @@ const featuredExperiments = [
     subtitle: 'Beacon Chain',
     description: 'Explore live slot data.',
     logo: '/ethereum.png',
-    href: '/beacon/slot/live',
+    href: '/experiments/live-slots',
     accentColor: {
       light: 'rgba(56, 189, 248, 0.05)',
       medium: 'rgba(56, 189, 248, 0.15)',

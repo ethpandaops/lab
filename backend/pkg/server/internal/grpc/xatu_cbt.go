@@ -68,6 +68,24 @@ func (x *XatuCBT) ListFctBlockFirstSeenByNode(
 	return x.service.ListFctBlockFirstSeenByNode(ctx, req)
 }
 
+// ListFctPreparedBlock returns prepared blocks for a specific slot.
+func (x *XatuCBT) ListFctPreparedBlock(
+	ctx context.Context,
+	req *cbtproto.ListFctPreparedBlockRequest,
+) (*cbtproto.ListFctPreparedBlockResponse, error) {
+	// Calculate SlotStartDateTime if not already set, more efficient queries.
+	if req.SlotStartDateTime == nil && req.Slot != nil {
+		req.SlotStartDateTime = x.calculateSlotStartDateTime(ctx, req.Slot)
+	}
+
+	x.log.WithFields(logrus.Fields{
+		"slot":            req.Slot,
+		"slot_start_time": req.SlotStartDateTime,
+	}).Debug("ListFctPreparedBlock request")
+
+	return x.service.ListFctPreparedBlock(ctx, req)
+}
+
 // calculateSlotStartDateTime calculates the SlotStartDateTime filter for a given slot filter.
 // This enables efficient queries using the primary key in ClickHouse.
 // Returns a filter that can be used by any CBT method that needs slot-based filtering.
@@ -149,4 +167,121 @@ func (x *XatuCBT) calculateSlotStartDateTime(
 	return &cbtproto.UInt32Filter{
 		Filter: &cbtproto.UInt32Filter_Eq{Eq: slotStartTime},
 	}
+}
+
+// ListFctAttestationFirstSeenChunked50Ms returns attestation timing data in 50ms chunks.
+func (x *XatuCBT) ListFctAttestationFirstSeenChunked50Ms(
+	ctx context.Context,
+	req *cbtproto.ListFctAttestationFirstSeenChunked50MsRequest,
+) (*cbtproto.ListFctAttestationFirstSeenChunked50MsResponse, error) {
+	// Calculate SlotStartDateTime if not already set for more efficient queries.
+	if req.SlotStartDateTime == nil && req.Slot != nil {
+		req.SlotStartDateTime = x.calculateSlotStartDateTime(ctx, req.Slot)
+	}
+
+	return x.service.ListFctAttestationFirstSeenChunked50ms(ctx, req)
+}
+
+// ListFctAttestationCorrectnessHead returns attestation correctness data for the head chain.
+func (x *XatuCBT) ListFctAttestationCorrectnessHead(
+	ctx context.Context,
+	req *cbtproto.ListFctAttestationCorrectnessHeadRequest,
+) (*cbtproto.ListFctAttestationCorrectnessHeadResponse, error) {
+	// Calculate SlotStartDateTime if not already set for more efficient queries.
+	if req.SlotStartDateTime == nil && req.Slot != nil {
+		req.SlotStartDateTime = x.calculateSlotStartDateTime(ctx, req.Slot)
+	}
+
+	return x.service.ListFctAttestationCorrectnessHead(ctx, req)
+}
+
+// ListFctMevBidCountByRelay returns MEV relay bid count data.
+func (x *XatuCBT) ListFctMevBidCountByRelay(
+	ctx context.Context,
+	req *cbtproto.ListFctMevBidCountByRelayRequest,
+) (*cbtproto.ListFctMevBidCountByRelayResponse, error) {
+	// Calculate SlotStartDateTime if not already set for more efficient queries.
+	if req.SlotStartDateTime == nil && req.Slot != nil {
+		req.SlotStartDateTime = x.calculateSlotStartDateTime(ctx, req.Slot)
+	}
+
+	return x.service.ListFctMevBidCountByRelay(ctx, req)
+}
+
+// ListFctBlockBlobCountHead returns blob count data for blocks in the unfinalized chain.
+func (x *XatuCBT) ListFctBlockBlobCountHead(
+	ctx context.Context,
+	req *cbtproto.ListFctBlockBlobCountHeadRequest,
+) (*cbtproto.ListFctBlockBlobCountHeadResponse, error) {
+	// Calculate SlotStartDateTime if not already set for more efficient queries.
+	if req.SlotStartDateTime == nil && req.Slot != nil {
+		req.SlotStartDateTime = x.calculateSlotStartDateTime(ctx, req.Slot)
+	}
+
+	return x.service.ListFctBlockBlobCountHead(ctx, req)
+}
+
+// ListFctBlockBlobFirstSeenByNode returns blob timing data from the fct_block_blob_first_seen_by_node table.
+func (x *XatuCBT) ListFctBlockBlobFirstSeenByNode(
+	ctx context.Context,
+	req *cbtproto.ListFctBlockBlobFirstSeenByNodeRequest,
+) (*cbtproto.ListFctBlockBlobFirstSeenByNodeResponse, error) {
+	// Calculate SlotStartDateTime if not already set for more efficient queries.
+	if req.SlotStartDateTime == nil && req.Slot != nil {
+		req.SlotStartDateTime = x.calculateSlotStartDateTime(ctx, req.Slot)
+	}
+
+	return x.service.ListFctBlockBlobFirstSeenByNode(ctx, req)
+}
+
+// ListFctBlockHead returns block data from the fct_block_head table.
+func (x *XatuCBT) ListFctBlockHead(
+	ctx context.Context,
+	req *cbtproto.ListFctBlockHeadRequest,
+) (*cbtproto.ListFctBlockHeadResponse, error) {
+	// Calculate SlotStartDateTime if not already set for more efficient queries.
+	if req.SlotStartDateTime == nil && req.Slot != nil {
+		req.SlotStartDateTime = x.calculateSlotStartDateTime(ctx, req.Slot)
+	}
+
+	return x.service.ListFctBlockHead(ctx, req)
+}
+
+// ListFctBlockMevHead returns MEV block data for the unfinalized chain.
+func (x *XatuCBT) ListFctBlockMevHead(
+	ctx context.Context,
+	req *cbtproto.ListFctBlockMevHeadRequest,
+) (*cbtproto.ListFctBlockMevHeadResponse, error) {
+	// Calculate SlotStartDateTime if not already set for more efficient queries.
+	if req.SlotStartDateTime == nil && req.Slot != nil {
+		req.SlotStartDateTime = x.calculateSlotStartDateTime(ctx, req.Slot)
+	}
+
+	return x.service.ListFctBlockMevHead(ctx, req)
+}
+
+// ListFctMevBidHighestValueByBuilderChunked50Ms returns highest MEV bid values by builder for a slot in 50ms chunks.
+func (x *XatuCBT) ListFctMevBidHighestValueByBuilderChunked50Ms(
+	ctx context.Context,
+	req *cbtproto.ListFctMevBidHighestValueByBuilderChunked50MsRequest,
+) (*cbtproto.ListFctMevBidHighestValueByBuilderChunked50MsResponse, error) {
+	// Calculate SlotStartDateTime if not already set for more efficient queries.
+	if req.SlotStartDateTime == nil && req.Slot != nil {
+		req.SlotStartDateTime = x.calculateSlotStartDateTime(ctx, req.Slot)
+	}
+
+	return x.service.ListFctMevBidHighestValueByBuilderChunked50ms(ctx, req)
+}
+
+// ListFctBlockProposerEntity returns proposer entity data from the fct_block_proposer_entity table.
+func (x *XatuCBT) ListFctBlockProposerEntity(
+	ctx context.Context,
+	req *cbtproto.ListFctBlockProposerEntityRequest,
+) (*cbtproto.ListFctBlockProposerEntityResponse, error) {
+	// Calculate SlotStartDateTime if not already set for more efficient queries.
+	if req.SlotStartDateTime == nil && req.Slot != nil {
+		req.SlotStartDateTime = x.calculateSlotStartDateTime(ctx, req.Slot)
+	}
+
+	return x.service.ListFctBlockProposerEntity(ctx, req)
 }
