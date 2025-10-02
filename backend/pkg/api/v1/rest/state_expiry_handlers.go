@@ -1,7 +1,6 @@
 package rest
 
 import (
-	"encoding/json"
 	"net/http"
 	"strconv"
 
@@ -23,7 +22,7 @@ func (r *PublicRouter) handleStateExpiryAccessHistory(w http.ResponseWriter, req
 
 	// 1. Validate network
 	if network == "" {
-		r.writeError(w, http.StatusBadRequest, "Network parameter is required")
+		r.WriteJSONResponseError(w, req, http.StatusBadRequest, "Network parameter is required")
 
 		return
 	}
@@ -78,7 +77,7 @@ func (r *PublicRouter) handleStateExpiryAccessHistory(w http.ResponseWriter, req
 		r.log.WithError(err).WithFields(logrus.Fields{
 			"network": network,
 		}).Error("Failed to query address access chunked data")
-		r.handleGRPCError(w, err)
+		r.HandleGRPCError(w, req, err)
 
 		return
 	}
@@ -100,7 +99,8 @@ func (r *PublicRouter) handleStateExpiryAccessHistory(w http.ResponseWriter, req
 		}
 	}
 
-	response := &apiv1.StateExpiryAccessHistoryResponse{
+	// 6. Write response using the standard helper
+	r.WriteJSONResponseOK(w, req, &apiv1.StateExpiryAccessHistoryResponse{
 		Items: items,
 		Pagination: &apiv1.PaginationMetadata{
 			PageSize:      grpcReq.PageSize,
@@ -111,15 +111,7 @@ func (r *PublicRouter) handleStateExpiryAccessHistory(w http.ResponseWriter, req
 			AppliedFilters: appliedFilters,
 			OrderBy:        grpcReq.OrderBy,
 		},
-	}
-
-	// 6. Set content type header (cache headers are handled by middleware)
-	w.Header().Set("Content-Type", "application/json")
-
-	// 7. Write JSON response
-	if err := json.NewEncoder(w).Encode(response); err != nil {
-		r.log.WithError(err).Error("Failed to encode response")
-	}
+	})
 }
 
 // transformCBTToAPIStateExpiryAccessHistory transforms CBT types to public API types.
@@ -143,7 +135,7 @@ func (r *PublicRouter) handleStateExpiryStorageHistory(w http.ResponseWriter, re
 
 	// 1. Validate network
 	if network == "" {
-		r.writeError(w, http.StatusBadRequest, "Network parameter is required")
+		r.WriteJSONResponseError(w, req, http.StatusBadRequest, "Network parameter is required")
 
 		return
 	}
@@ -198,7 +190,7 @@ func (r *PublicRouter) handleStateExpiryStorageHistory(w http.ResponseWriter, re
 		r.log.WithError(err).WithFields(logrus.Fields{
 			"network": network,
 		}).Error("Failed to query storage slot chunked data")
-		r.handleGRPCError(w, err)
+		r.HandleGRPCError(w, req, err)
 
 		return
 	}
@@ -220,7 +212,8 @@ func (r *PublicRouter) handleStateExpiryStorageHistory(w http.ResponseWriter, re
 		}
 	}
 
-	response := &apiv1.StateExpiryStorageHistoryResponse{
+	// 6. Write response using the standard helper
+	r.WriteJSONResponseOK(w, req, &apiv1.StateExpiryStorageHistoryResponse{
 		Items: items,
 		Pagination: &apiv1.PaginationMetadata{
 			PageSize:      grpcReq.PageSize,
@@ -231,15 +224,7 @@ func (r *PublicRouter) handleStateExpiryStorageHistory(w http.ResponseWriter, re
 			AppliedFilters: appliedFilters,
 			OrderBy:        grpcReq.OrderBy,
 		},
-	}
-
-	// 6. Set content type header (cache headers are handled by middleware)
-	w.Header().Set("Content-Type", "application/json")
-
-	// 7. Write JSON response
-	if err := json.NewEncoder(w).Encode(response); err != nil {
-		r.log.WithError(err).Error("Failed to encode response")
-	}
+	})
 }
 
 // transformCBTToAPIStateExpiryStorageHistory transforms CBT types to public API types.
@@ -263,7 +248,7 @@ func (r *PublicRouter) handleStateExpiryAccessTotal(w http.ResponseWriter, req *
 
 	// 1. Validate network
 	if network == "" {
-		r.writeError(w, http.StatusBadRequest, "Network parameter is required")
+		r.WriteJSONResponseError(w, req, http.StatusBadRequest, "Network parameter is required")
 
 		return
 	}
@@ -286,7 +271,7 @@ func (r *PublicRouter) handleStateExpiryAccessTotal(w http.ResponseWriter, req *
 		r.log.WithError(err).WithFields(logrus.Fields{
 			"network": network,
 		}).Error("Failed to query address access total")
-		r.handleGRPCError(w, err)
+		r.HandleGRPCError(w, req, err)
 
 		return
 	}
@@ -297,21 +282,14 @@ func (r *PublicRouter) handleStateExpiryAccessTotal(w http.ResponseWriter, req *
 	// Build applied filters map for metadata (empty for this endpoint)
 	appliedFilters := make(map[string]string)
 
-	response := &apiv1.StateExpiryAccessTotalResponse{
+	// 4. Write response using the standard helper
+	r.WriteJSONResponseOK(w, req, &apiv1.StateExpiryAccessTotalResponse{
 		Item: apiItem,
 		Filters: &apiv1.FilterMetadata{
 			Network:        network,
 			AppliedFilters: appliedFilters,
 		},
-	}
-
-	// 4. Set content type header (cache headers are handled by middleware)
-	w.Header().Set("Content-Type", "application/json")
-
-	// 5. Write JSON response
-	if err := json.NewEncoder(w).Encode(response); err != nil {
-		r.log.WithError(err).Error("Failed to encode response")
-	}
+	})
 }
 
 // transformCBTToAPIStateExpiryAccessTotal transforms CBT types to public API types.
@@ -336,7 +314,7 @@ func (r *PublicRouter) handleStateExpiryStorageExpiredTop(w http.ResponseWriter,
 
 	// 1. Validate network
 	if network == "" {
-		r.writeError(w, http.StatusBadRequest, "Network parameter is required")
+		r.WriteJSONResponseError(w, req, http.StatusBadRequest, "Network parameter is required")
 
 		return
 	}
@@ -359,7 +337,7 @@ func (r *PublicRouter) handleStateExpiryStorageExpiredTop(w http.ResponseWriter,
 		r.log.WithError(err).WithFields(logrus.Fields{
 			"network": network,
 		}).Error("Failed to query expired storage slot top 100")
-		r.handleGRPCError(w, err)
+		r.HandleGRPCError(w, req, err)
 
 		return
 	}
@@ -375,21 +353,14 @@ func (r *PublicRouter) handleStateExpiryStorageExpiredTop(w http.ResponseWriter,
 	// Build applied filters map for metadata (empty for this endpoint)
 	appliedFilters := make(map[string]string)
 
-	response := &apiv1.StateExpiryStorageExpiredTopResponse{
+	// 4. Write response using the standard helper
+	r.WriteJSONResponseOK(w, req, &apiv1.StateExpiryStorageExpiredTopResponse{
 		Items: items,
 		Filters: &apiv1.FilterMetadata{
 			Network:        network,
 			AppliedFilters: appliedFilters,
 		},
-	}
-
-	// 4. Set content type header (cache headers are handled by middleware)
-	w.Header().Set("Content-Type", "application/json")
-
-	// 5. Write JSON response
-	if err := json.NewEncoder(w).Encode(response); err != nil {
-		r.log.WithError(err).Error("Failed to encode response")
-	}
+	})
 }
 
 // transformCBTToAPIStateExpiryStorageExpiredTop transforms CBT types to public API types.
@@ -413,7 +384,7 @@ func (r *PublicRouter) handleStateExpiryStorageTop(w http.ResponseWriter, req *h
 
 	// 1. Validate network
 	if network == "" {
-		r.writeError(w, http.StatusBadRequest, "Network parameter is required")
+		r.WriteJSONResponseError(w, req, http.StatusBadRequest, "Network parameter is required")
 
 		return
 	}
@@ -436,7 +407,7 @@ func (r *PublicRouter) handleStateExpiryStorageTop(w http.ResponseWriter, req *h
 		r.log.WithError(err).WithFields(logrus.Fields{
 			"network": network,
 		}).Error("Failed to query storage slot top 100")
-		r.handleGRPCError(w, err)
+		r.HandleGRPCError(w, req, err)
 
 		return
 	}
@@ -452,21 +423,14 @@ func (r *PublicRouter) handleStateExpiryStorageTop(w http.ResponseWriter, req *h
 	// Build applied filters map for metadata (empty for this endpoint)
 	appliedFilters := make(map[string]string)
 
-	response := &apiv1.StateExpiryStorageTopResponse{
+	// 4. Write response using the standard helper
+	r.WriteJSONResponseOK(w, req, &apiv1.StateExpiryStorageTopResponse{
 		Items: items,
 		Filters: &apiv1.FilterMetadata{
 			Network:        network,
 			AppliedFilters: appliedFilters,
 		},
-	}
-
-	// 4. Set content type header (cache headers are handled by middleware)
-	w.Header().Set("Content-Type", "application/json")
-
-	// 5. Write JSON response
-	if err := json.NewEncoder(w).Encode(response); err != nil {
-		r.log.WithError(err).Error("Failed to encode response")
-	}
+	})
 }
 
 // transformCBTToAPIStateExpiryStorageTop transforms CBT types to public API types.
@@ -490,7 +454,7 @@ func (r *PublicRouter) handleStateExpiryStorageTotal(w http.ResponseWriter, req 
 
 	// 1. Validate network
 	if network == "" {
-		r.writeError(w, http.StatusBadRequest, "Network parameter is required")
+		r.WriteJSONResponseError(w, req, http.StatusBadRequest, "Network parameter is required")
 
 		return
 	}
@@ -514,7 +478,7 @@ func (r *PublicRouter) handleStateExpiryStorageTotal(w http.ResponseWriter, req 
 		r.log.WithError(err).WithFields(logrus.Fields{
 			"network": network,
 		}).Error("Failed to query storage slot totals")
-		r.handleGRPCError(w, err)
+		r.HandleGRPCError(w, req, err)
 
 		return
 	}
@@ -525,21 +489,14 @@ func (r *PublicRouter) handleStateExpiryStorageTotal(w http.ResponseWriter, req 
 	// Build applied filters map for metadata (empty for this endpoint)
 	appliedFilters := make(map[string]string)
 
-	response := &apiv1.StateExpiryStorageTotalResponse{
+	// 4. Write response using the standard helper
+	r.WriteJSONResponseOK(w, req, &apiv1.StateExpiryStorageTotalResponse{
 		Item: apiItem,
 		Filters: &apiv1.FilterMetadata{
 			Network:        network,
 			AppliedFilters: appliedFilters,
 		},
-	}
-
-	// 4. Set content type header (cache headers are handled by middleware)
-	w.Header().Set("Content-Type", "application/json")
-
-	// 5. Write JSON response
-	if err := json.NewEncoder(w).Encode(response); err != nil {
-		r.log.WithError(err).Error("Failed to encode response")
-	}
+	})
 }
 
 // transformCBTToAPIStateExpiryStorageTotal transforms CBT types to public API types.
