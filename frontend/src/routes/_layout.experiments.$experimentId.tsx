@@ -19,10 +19,18 @@ const experimentSearchSchema = z
 
 export const Route = createFileRoute('/_layout/experiments/$experimentId')({
   validateSearch: experimentSearchSchema,
-  loader: async ({ params }) => {
+  loader: async ({ params, location }) => {
     const client = await getRestApiClient();
-    // Use mainnet as default for initial load, component will fetch correct network
-    const experimentConfig = await client.getExperimentConfig('mainnet', params.experimentId);
+
+    // Get network from URL search params or localStorage to load the correct config upfront, defaulting to mainnet.
+    const searchParams = new URLSearchParams(location.search);
+    const networkFromUrl = searchParams.get('network');
+    const networkFromStorage = typeof window !== 'undefined'
+      ? localStorage.getItem('selectedNetwork')
+      : null;
+    const network = networkFromUrl || networkFromStorage || 'mainnet';
+
+    const experimentConfig = await client.getExperimentConfig(network, params.experimentId);
     return {
       experimentId: params.experimentId,
       experimentConfig,
@@ -83,12 +91,20 @@ function ExperimentLayout() {
   const search = Route.useSearch();
   const { selectedNetwork } = useNetwork();
 
-  const { data: experimentConfig } = useExperimentConfig(selectedNetwork, experimentId, {
+  // Check if loader already has the correct network config
+  const loaderHasCorrectNetwork = loaderConfig?.experiment?.dataAvailability?.[selectedNetwork];
+
+  // Only fetch if we don't have the correct network config from loader
+  const { data: experimentConfig, isLoading } = useExperimentConfig(selectedNetwork, experimentId, {
+    enabled: !loaderHasCorrectNetwork,
     refetchInterval: 10_000,
     staleTime: 10_000,
   });
 
   const activeConfig = experimentConfig ?? loaderConfig;
+
+  // Check if we're still loading the correct network config
+  const isLoadingNetworkConfig = !loaderHasCorrectNetwork && !experimentConfig;
 
   // Memoize bounds to prevent unnecessary re-renders when config refetches
   // MUST be called before any conditional returns to satisfy React rules of hooks
@@ -104,6 +120,23 @@ function ExperimentLayout() {
     Object.keys(activeConfig.experiment.dataAvailability).includes(selectedNetwork);
   const isNetworkAvailable = hasDataAvailability && activeConfig.experiment?.enabled;
 
+  // Show loading state while fetching the correct network config
+  if (isLoadingNetworkConfig) {
+    return (
+      <div className="flex min-h-dvh items-center justify-center">
+        <div className="flex items-center gap-4 rounded-sm bg-surface p-6">
+          <div className="size-8 animate-spin rounded-full border-2 border-accent border-t-transparent" />
+          <div>
+            <h2 className="text-lg/7 font-semibold">Loading configuration</h2>
+            <p className="text-sm/6 text-secondary">
+              Fetching experiment configuration for {selectedNetwork}...
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (!isNetworkAvailable) {
     return (
       <div className="flex min-h-dvh items-center justify-center">
@@ -114,11 +147,6 @@ function ExperimentLayout() {
             <p className="text-sm/6 text-secondary">
               Experiment "{experimentId}" is not available for network "{selectedNetwork}".
             </p>
-            {activeConfig.experiment?.dataAvailability && (
-              <p className="text-sm/6 text-secondary">
-                Available networks: {Object.keys(activeConfig.experiment.dataAvailability).join(', ')}
-              </p>
-            )}
           </div>
         </div>
       </div>

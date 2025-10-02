@@ -88,7 +88,7 @@ const experiments: ExperimentItem[] = [
     subtitle: 'Look up past slots',
     description: 'Search for specific slots by number and analyze historical data',
     icon: Search,
-    href: '/beacon/slot',
+    href: '/experiments/historical-slots',
     category: 'beacon',
   },
   {

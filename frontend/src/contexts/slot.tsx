@@ -73,6 +73,7 @@ export function SlotProvider({
   const [pauseReason, setPauseReason] = useState<'manual' | 'boundary' | null>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const prevNetworkRef = useRef<string>(network);
+  const prevInitialSlotRef = useRef<number | undefined>(initialSlot);
   const stateRef = useRef({
     isPlaying,
     slotDuration,
@@ -96,6 +97,18 @@ export function SlotProvider({
       }
     }
   }, [network, minSlot, maxSlot]); // Don't include getInitialSlot as it's defined inline
+
+  // Update slot when initialSlot prop changes (e.g., navigation from historical-slots)
+  useEffect(() => {
+    if (initialSlot !== undefined && initialSlot !== prevInitialSlotRef.current) {
+      prevInitialSlotRef.current = initialSlot;
+      setCurrentSlot(initialSlot);
+      setSlotProgress(0);
+      slotProgressRef.current = 0;
+      setMode(initialMode);
+      setIsPlaying(initialPlaying);
+    }
+  }, [initialSlot, initialMode, initialPlaying]);
 
   // Removed effect - no need to recalculate, maxSlot already has the buffer
 

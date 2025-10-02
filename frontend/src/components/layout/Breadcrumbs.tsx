@@ -23,20 +23,6 @@ export const breadcrumbs = [
       },
     ],
   },
-  {
-    name: 'Beacon',
-    path: '/beacon',
-    children: [
-      {
-        name: 'Slot',
-        path: '/beacon/slot',
-        children: [
-          { name: 'Live View', path: '/experiments/live-slots' },
-          { name: ':slot', path: '/beacon/slot/:slot' },
-        ],
-      },
-    ],
-  },
 ];
 
 function findActivePath(pathname: string, items: NavItem[]): NavItem[] {
