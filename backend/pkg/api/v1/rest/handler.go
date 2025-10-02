@@ -329,27 +329,3 @@ func convertConfigToAPIProto(config *configpb.FrontendConfig) *apiv1.FrontendCon
 
 	return result
 }
-
-// writeError writes a JSON error response to the HTTP response writer.
-func (r *PublicRouter) writeError(w http.ResponseWriter, statusCode int, message string) {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(statusCode)
-
-	errorResponse := struct {
-		Error string `json:"error"`
-	}{
-		Error: message,
-	}
-
-	if err := json.NewEncoder(w).Encode(errorResponse); err != nil {
-		r.log.WithError(err).Error("Failed to write error response")
-	}
-}
-
-// handleGRPCError handles gRPC errors and converts them to appropriate HTTP responses.
-func (r *PublicRouter) handleGRPCError(w http.ResponseWriter, err error) {
-	// For now, treat all gRPC errors as internal server errors
-	// In the future, we can map specific gRPC status codes to HTTP status codes
-	r.log.WithError(err).Error("gRPC call failed")
-	r.writeError(w, http.StatusInternalServerError, "Internal server error")
-}
