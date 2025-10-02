@@ -11,12 +11,12 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as LayoutRouteImport } from './routes/_layout'
 import { Route as LayoutIndexRouteImport } from './routes/_layout.index'
-import { Route as LayoutXatuRouteImport } from './routes/_layout.xatu'
 import { Route as LayoutExperimentsRouteImport } from './routes/_layout.experiments'
 import { Route as LayoutBeaconRouteImport } from './routes/_layout.beacon'
 import { Route as LayoutAboutRouteImport } from './routes/_layout.about'
 import { Route as LayoutXatuDataIndexRouteImport } from './routes/_layout.xatu-data.index'
 import { Route as LayoutExperimentsIndexRouteImport } from './routes/_layout.experiments.index'
+import { Route as LayoutXatuSplatRouteImport } from './routes/_layout.xatu.$'
 import { Route as LayoutXatuDataNetworksRouteImport } from './routes/_layout.xatu-data.networks'
 import { Route as LayoutXatuDataGeographicalChecklistRouteImport } from './routes/_layout.xatu-data.geographical-checklist'
 import { Route as LayoutXatuDataForkReadinessRouteImport } from './routes/_layout.xatu-data.fork-readiness'
@@ -36,11 +36,6 @@ const LayoutRoute = LayoutRouteImport.update({
 const LayoutIndexRoute = LayoutIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => LayoutRoute,
-} as any)
-const LayoutXatuRoute = LayoutXatuRouteImport.update({
-  id: '/xatu',
-  path: '/xatu',
   getParentRoute: () => LayoutRoute,
 } as any)
 const LayoutExperimentsRoute = LayoutExperimentsRouteImport.update({
@@ -67,6 +62,11 @@ const LayoutExperimentsIndexRoute = LayoutExperimentsIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => LayoutExperimentsRoute,
+} as any)
+const LayoutXatuSplatRoute = LayoutXatuSplatRouteImport.update({
+  id: '/xatu/$',
+  path: '/xatu/$',
+  getParentRoute: () => LayoutRoute,
 } as any)
 const LayoutXatuDataNetworksRoute = LayoutXatuDataNetworksRouteImport.update({
   id: '/xatu-data/networks',
@@ -138,13 +138,13 @@ export interface FileRoutesByFullPath {
   '/about': typeof LayoutAboutRoute
   '/beacon': typeof LayoutBeaconRouteWithChildren
   '/experiments': typeof LayoutExperimentsRouteWithChildren
-  '/xatu': typeof LayoutXatuRoute
   '/': typeof LayoutIndexRoute
   '/beacon/locally-built-blocks': typeof LayoutBeaconLocallyBuiltBlocksRoute
   '/experiments/$experimentId': typeof LayoutExperimentsExperimentIdRouteWithChildren
   '/xatu-data/fork-readiness': typeof LayoutXatuDataForkReadinessRoute
   '/xatu-data/geographical-checklist': typeof LayoutXatuDataGeographicalChecklistRoute
   '/xatu-data/networks': typeof LayoutXatuDataNetworksRoute
+  '/xatu/$': typeof LayoutXatuSplatRoute
   '/experiments/': typeof LayoutExperimentsIndexRoute
   '/xatu-data': typeof LayoutXatuDataIndexRoute
   '/beacon/block-production/$slot': typeof LayoutBeaconBlockProductionSlotRoute
@@ -157,12 +157,12 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/about': typeof LayoutAboutRoute
   '/beacon': typeof LayoutBeaconRouteWithChildren
-  '/xatu': typeof LayoutXatuRoute
   '/': typeof LayoutIndexRoute
   '/beacon/locally-built-blocks': typeof LayoutBeaconLocallyBuiltBlocksRoute
   '/xatu-data/fork-readiness': typeof LayoutXatuDataForkReadinessRoute
   '/xatu-data/geographical-checklist': typeof LayoutXatuDataGeographicalChecklistRoute
   '/xatu-data/networks': typeof LayoutXatuDataNetworksRoute
+  '/xatu/$': typeof LayoutXatuSplatRoute
   '/experiments': typeof LayoutExperimentsIndexRoute
   '/xatu-data': typeof LayoutXatuDataIndexRoute
   '/beacon/block-production/$slot': typeof LayoutBeaconBlockProductionSlotRoute
@@ -178,13 +178,13 @@ export interface FileRoutesById {
   '/_layout/about': typeof LayoutAboutRoute
   '/_layout/beacon': typeof LayoutBeaconRouteWithChildren
   '/_layout/experiments': typeof LayoutExperimentsRouteWithChildren
-  '/_layout/xatu': typeof LayoutXatuRoute
   '/_layout/': typeof LayoutIndexRoute
   '/_layout/beacon/locally-built-blocks': typeof LayoutBeaconLocallyBuiltBlocksRoute
   '/_layout/experiments/$experimentId': typeof LayoutExperimentsExperimentIdRouteWithChildren
   '/_layout/xatu-data/fork-readiness': typeof LayoutXatuDataForkReadinessRoute
   '/_layout/xatu-data/geographical-checklist': typeof LayoutXatuDataGeographicalChecklistRoute
   '/_layout/xatu-data/networks': typeof LayoutXatuDataNetworksRoute
+  '/_layout/xatu/$': typeof LayoutXatuSplatRoute
   '/_layout/experiments/': typeof LayoutExperimentsIndexRoute
   '/_layout/xatu-data/': typeof LayoutXatuDataIndexRoute
   '/_layout/beacon/block-production/$slot': typeof LayoutBeaconBlockProductionSlotRoute
@@ -200,13 +200,13 @@ export interface FileRouteTypes {
     | '/about'
     | '/beacon'
     | '/experiments'
-    | '/xatu'
     | '/'
     | '/beacon/locally-built-blocks'
     | '/experiments/$experimentId'
     | '/xatu-data/fork-readiness'
     | '/xatu-data/geographical-checklist'
     | '/xatu-data/networks'
+    | '/xatu/$'
     | '/experiments/'
     | '/xatu-data'
     | '/beacon/block-production/$slot'
@@ -219,12 +219,12 @@ export interface FileRouteTypes {
   to:
     | '/about'
     | '/beacon'
-    | '/xatu'
     | '/'
     | '/beacon/locally-built-blocks'
     | '/xatu-data/fork-readiness'
     | '/xatu-data/geographical-checklist'
     | '/xatu-data/networks'
+    | '/xatu/$'
     | '/experiments'
     | '/xatu-data'
     | '/beacon/block-production/$slot'
@@ -239,13 +239,13 @@ export interface FileRouteTypes {
     | '/_layout/about'
     | '/_layout/beacon'
     | '/_layout/experiments'
-    | '/_layout/xatu'
     | '/_layout/'
     | '/_layout/beacon/locally-built-blocks'
     | '/_layout/experiments/$experimentId'
     | '/_layout/xatu-data/fork-readiness'
     | '/_layout/xatu-data/geographical-checklist'
     | '/_layout/xatu-data/networks'
+    | '/_layout/xatu/$'
     | '/_layout/experiments/'
     | '/_layout/xatu-data/'
     | '/_layout/beacon/block-production/$slot'
@@ -274,13 +274,6 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof LayoutIndexRouteImport
-      parentRoute: typeof LayoutRoute
-    }
-    '/_layout/xatu': {
-      id: '/_layout/xatu'
-      path: '/xatu'
-      fullPath: '/xatu'
-      preLoaderRoute: typeof LayoutXatuRouteImport
       parentRoute: typeof LayoutRoute
     }
     '/_layout/experiments': {
@@ -317,6 +310,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/experiments/'
       preLoaderRoute: typeof LayoutExperimentsIndexRouteImport
       parentRoute: typeof LayoutExperimentsRoute
+    }
+    '/_layout/xatu/$': {
+      id: '/_layout/xatu/$'
+      path: '/xatu/$'
+      fullPath: '/xatu/$'
+      preLoaderRoute: typeof LayoutXatuSplatRouteImport
+      parentRoute: typeof LayoutRoute
     }
     '/_layout/xatu-data/networks': {
       id: '/_layout/xatu-data/networks'
@@ -449,11 +449,11 @@ interface LayoutRouteChildren {
   LayoutAboutRoute: typeof LayoutAboutRoute
   LayoutBeaconRoute: typeof LayoutBeaconRouteWithChildren
   LayoutExperimentsRoute: typeof LayoutExperimentsRouteWithChildren
-  LayoutXatuRoute: typeof LayoutXatuRoute
   LayoutIndexRoute: typeof LayoutIndexRoute
   LayoutXatuDataForkReadinessRoute: typeof LayoutXatuDataForkReadinessRoute
   LayoutXatuDataGeographicalChecklistRoute: typeof LayoutXatuDataGeographicalChecklistRoute
   LayoutXatuDataNetworksRoute: typeof LayoutXatuDataNetworksRoute
+  LayoutXatuSplatRoute: typeof LayoutXatuSplatRoute
   LayoutXatuDataIndexRoute: typeof LayoutXatuDataIndexRoute
   LayoutXatuDataContributorsNameRoute: typeof LayoutXatuDataContributorsNameRoute
   LayoutXatuDataContributorsIndexRoute: typeof LayoutXatuDataContributorsIndexRoute
@@ -463,12 +463,12 @@ const LayoutRouteChildren: LayoutRouteChildren = {
   LayoutAboutRoute: LayoutAboutRoute,
   LayoutBeaconRoute: LayoutBeaconRouteWithChildren,
   LayoutExperimentsRoute: LayoutExperimentsRouteWithChildren,
-  LayoutXatuRoute: LayoutXatuRoute,
   LayoutIndexRoute: LayoutIndexRoute,
   LayoutXatuDataForkReadinessRoute: LayoutXatuDataForkReadinessRoute,
   LayoutXatuDataGeographicalChecklistRoute:
     LayoutXatuDataGeographicalChecklistRoute,
   LayoutXatuDataNetworksRoute: LayoutXatuDataNetworksRoute,
+  LayoutXatuSplatRoute: LayoutXatuSplatRoute,
   LayoutXatuDataIndexRoute: LayoutXatuDataIndexRoute,
   LayoutXatuDataContributorsNameRoute: LayoutXatuDataContributorsNameRoute,
   LayoutXatuDataContributorsIndexRoute: LayoutXatuDataContributorsIndexRoute,

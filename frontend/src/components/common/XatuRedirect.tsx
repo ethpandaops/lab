@@ -13,10 +13,11 @@ const XatuRedirect: React.FC = () => {
     // Replace /xatu with /xatu-data in the pathname
     const newPath = location.pathname.replace(/^\/xatu(?=$|\/)/, '/xatu-data');
 
-    // Preserve the search params
-    const targetPath = newPath + location.search + location.hash;
-
-    navigate({ to: targetPath as any, replace: true });
+    // Navigate with proper path and preserve search params
+    navigate({
+      to: newPath,
+      replace: true,
+    });
   }, [navigate, location]);
 
   return null;
