@@ -81,6 +81,24 @@ message FilterMetadata {
   string order_by = 3;
 }
 
+// StateExpiryAccessTotalResponse is the v1 API response for state expiry access totals.
+message StateExpiryAccessTotalResponse {
+  StateExpiryAccessTotal item = 1;
+  FilterMetadata filters = 2;
+}
+
+// StateExpiryAccessTotal represents state expiry access statistics for public API consumption.
+message StateExpiryAccessTotal {
+  // Total number of accounts accessed in last 365 days
+  uint64 total_accounts = 1;
+  // Number of expired accounts (not accessed in last 365 days)
+  uint64 expired_accounts = 2;
+  // Total number of contract accounts accessed in last 365 days
+  uint64 total_contracts = 3;
+  // Number of expired contracts (not accessed in last 365 days)
+  uint64 expired_contracts = 4;
+}
+
 
 // Network represents an Ethereum network for public API consumption.
 // This provides essential network metadata needed by clients.
@@ -119,6 +137,29 @@ message StateExpiryAccessHistory {
   // Number of unique accounts whose most recent access was in this chunk
   // These addresses haven't been accessed in any later chunks
   uint32 last_accessed_accounts = 3;
+}
+
+// StateExpiryStorageHistoryResponse is the v1 API response for state expiry storage slot history data.
+// This endpoint provides aggregated data about Ethereum storage slot access patterns chunked by 10000 blocks.
+message StateExpiryStorageHistoryResponse {
+  repeated StateExpiryStorageHistory items = 1;
+  PaginationMetadata pagination = 2;
+  FilterMetadata filters = 3;
+}
+
+// StateExpiryStorageHistory represents storage slot statistics for a 10000-block chunk.
+// This data is useful for analyzing state expiry patterns and understanding storage slot activity over time.
+message StateExpiryStorageHistory {
+  // The starting block number of this 10000-block chunk
+  uint32 chunk_start_block_number = 1;
+
+  // Number of storage slots that were accessed for the first time in this chunk
+  // These are slots that had never been accessed before this chunk
+  uint32 first_accessed_slots = 2;
+
+  // Number of storage slots whose most recent access was in this chunk
+  // These slots haven't been accessed in any later chunks
+  uint32 last_accessed_slots = 3;
 }
 
 // ListBeaconSlotMevRelayResponse is the v1 API response for MEV relay bid counts by slot.

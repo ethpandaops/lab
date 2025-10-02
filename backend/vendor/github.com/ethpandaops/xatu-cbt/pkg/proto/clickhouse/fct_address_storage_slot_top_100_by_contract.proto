@@ -1,0 +1,72 @@
+syntax = "proto3";
+
+package cbt;
+
+import "common.proto";
+
+option go_package = "github.com/ethpandaops/xatu-cbt/pkg/proto/clickhouse";
+// Top 100 contracts by storage slots
+
+message FctAddressStorageSlotTop100ByContract {
+  // Timestamp when the record was last updated
+  uint32 updated_date_time = 11;
+  // Rank by total storage slots (1=highest)
+  uint32 rank = 12;
+  // The contract address
+  string contract_address = 13;
+  // Total number of storage slots for this contract
+  uint64 total_storage_slots = 14;
+}
+
+// ListFctAddressStorageSlotTop100ByContractRequest is the request message for listing fct_address_storage_slot_top_100_by_contract records
+message ListFctAddressStorageSlotTop100ByContractRequest {
+  // Filter by rank (PRIMARY KEY - required)
+  UInt32Filter rank = 1;
+
+  // Filter by updated_date_time (optional)
+  UInt32Filter updated_date_time = 2;
+  // Filter by contract_address (optional)
+  StringFilter contract_address = 3;
+  // Filter by total_storage_slots (optional)
+  UInt64Filter total_storage_slots = 4;
+
+  // The maximum number of fct_address_storage_slot_top_100_by_contract to return.
+  // If unspecified, at most 100 items will be returned.
+  // The maximum value is 10000; values above 10000 will be coerced to 10000.
+  int32 page_size = 5;
+  // A page token, received from a previous `ListFctAddressStorageSlotTop100ByContract` call.
+  // Provide this to retrieve the subsequent page.
+  string page_token = 6;
+  // The order of results. Format: comma-separated list of fields.
+  // Example: "foo,bar" or "foo desc,bar" for descending order on foo.
+  // If unspecified, results will be returned in the default order.
+  string order_by = 7;
+}
+
+// ListFctAddressStorageSlotTop100ByContractResponse is the response message for listing fct_address_storage_slot_top_100_by_contract records
+message ListFctAddressStorageSlotTop100ByContractResponse {
+  // The list of fct_address_storage_slot_top_100_by_contract.
+  repeated FctAddressStorageSlotTop100ByContract fct_address_storage_slot_top_100_by_contract = 1;
+  // A token, which can be sent as `page_token` to retrieve the next page.
+  // If this field is omitted, there are no subsequent pages.
+  string next_page_token = 2;
+}
+
+// GetFctAddressStorageSlotTop100ByContractRequest is the request message for getting a single fct_address_storage_slot_top_100_by_contract record by primary key
+message GetFctAddressStorageSlotTop100ByContractRequest {
+  // Rank by total storage slots (1=highest)
+  uint32 rank = 1; // Primary key (required)
+}
+
+// GetFctAddressStorageSlotTop100ByContractResponse is the response message for getting a single fct_address_storage_slot_top_100_by_contract record
+message GetFctAddressStorageSlotTop100ByContractResponse {
+  FctAddressStorageSlotTop100ByContract item = 1;
+}
+
+// FctAddressStorageSlotTop100ByContractService provides RPC methods for querying fct_address_storage_slot_top_100_by_contract data
+service FctAddressStorageSlotTop100ByContractService {
+  // List returns paginated fct_address_storage_slot_top_100_by_contract records
+  rpc List(ListFctAddressStorageSlotTop100ByContractRequest) returns (ListFctAddressStorageSlotTop100ByContractResponse);
+  // Get returns a single fct_address_storage_slot_top_100_by_contract record by primary key
+  rpc Get(GetFctAddressStorageSlotTop100ByContractRequest) returns (GetFctAddressStorageSlotTop100ByContractResponse);
+}

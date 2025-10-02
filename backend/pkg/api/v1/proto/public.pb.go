@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.36.8
 // 	protoc        v6.32.0
-// source: public.proto
+// source: pkg/api/v1/proto/public.proto
 
 package proto
 
@@ -34,7 +34,7 @@ type ListNodesResponse struct {
 
 func (x *ListNodesResponse) Reset() {
 	*x = ListNodesResponse{}
-	mi := &file_public_proto_msgTypes[0]
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -46,7 +46,7 @@ func (x *ListNodesResponse) String() string {
 func (*ListNodesResponse) ProtoMessage() {}
 
 func (x *ListNodesResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_public_proto_msgTypes[0]
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -59,7 +59,7 @@ func (x *ListNodesResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListNodesResponse.ProtoReflect.Descriptor instead.
 func (*ListNodesResponse) Descriptor() ([]byte, []int) {
-	return file_public_proto_rawDescGZIP(), []int{0}
+	return file_pkg_api_v1_proto_public_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *ListNodesResponse) GetNodes() []*Node {
@@ -94,7 +94,7 @@ type ListNetworksResponse struct {
 
 func (x *ListNetworksResponse) Reset() {
 	*x = ListNetworksResponse{}
-	mi := &file_public_proto_msgTypes[1]
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -106,7 +106,7 @@ func (x *ListNetworksResponse) String() string {
 func (*ListNetworksResponse) ProtoMessage() {}
 
 func (x *ListNetworksResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_public_proto_msgTypes[1]
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -119,7 +119,7 @@ func (x *ListNetworksResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListNetworksResponse.ProtoReflect.Descriptor instead.
 func (*ListNetworksResponse) Descriptor() ([]byte, []int) {
-	return file_public_proto_rawDescGZIP(), []int{1}
+	return file_pkg_api_v1_proto_public_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *ListNetworksResponse) GetNetworks() []*Network {
@@ -154,7 +154,7 @@ type Node struct {
 
 func (x *Node) Reset() {
 	*x = Node{}
-	mi := &file_public_proto_msgTypes[2]
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -166,7 +166,7 @@ func (x *Node) String() string {
 func (*Node) ProtoMessage() {}
 
 func (x *Node) ProtoReflect() protoreflect.Message {
-	mi := &file_public_proto_msgTypes[2]
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -179,7 +179,7 @@ func (x *Node) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Node.ProtoReflect.Descriptor instead.
 func (*Node) Descriptor() ([]byte, []int) {
-	return file_public_proto_rawDescGZIP(), []int{2}
+	return file_pkg_api_v1_proto_public_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *Node) GetUsername() string {
@@ -243,7 +243,7 @@ type ClientInfo struct {
 
 func (x *ClientInfo) Reset() {
 	*x = ClientInfo{}
-	mi := &file_public_proto_msgTypes[3]
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -255,7 +255,7 @@ func (x *ClientInfo) String() string {
 func (*ClientInfo) ProtoMessage() {}
 
 func (x *ClientInfo) ProtoReflect() protoreflect.Message {
-	mi := &file_public_proto_msgTypes[3]
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -268,7 +268,7 @@ func (x *ClientInfo) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ClientInfo.ProtoReflect.Descriptor instead.
 func (*ClientInfo) Descriptor() ([]byte, []int) {
-	return file_public_proto_rawDescGZIP(), []int{3}
+	return file_pkg_api_v1_proto_public_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *ClientInfo) GetName() string {
@@ -307,7 +307,7 @@ type GeoInfo struct {
 
 func (x *GeoInfo) Reset() {
 	*x = GeoInfo{}
-	mi := &file_public_proto_msgTypes[4]
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -319,7 +319,7 @@ func (x *GeoInfo) String() string {
 func (*GeoInfo) ProtoMessage() {}
 
 func (x *GeoInfo) ProtoReflect() protoreflect.Message {
-	mi := &file_public_proto_msgTypes[4]
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -332,7 +332,7 @@ func (x *GeoInfo) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GeoInfo.ProtoReflect.Descriptor instead.
 func (*GeoInfo) Descriptor() ([]byte, []int) {
-	return file_public_proto_rawDescGZIP(), []int{4}
+	return file_pkg_api_v1_proto_public_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *GeoInfo) GetCity() string {
@@ -388,7 +388,7 @@ type ConsensusInfo struct {
 
 func (x *ConsensusInfo) Reset() {
 	*x = ConsensusInfo{}
-	mi := &file_public_proto_msgTypes[5]
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -400,7 +400,7 @@ func (x *ConsensusInfo) String() string {
 func (*ConsensusInfo) ProtoMessage() {}
 
 func (x *ConsensusInfo) ProtoReflect() protoreflect.Message {
-	mi := &file_public_proto_msgTypes[5]
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -413,7 +413,7 @@ func (x *ConsensusInfo) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ConsensusInfo.ProtoReflect.Descriptor instead.
 func (*ConsensusInfo) Descriptor() ([]byte, []int) {
-	return file_public_proto_rawDescGZIP(), []int{5}
+	return file_pkg_api_v1_proto_public_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *ConsensusInfo) GetVersion() string {
@@ -442,7 +442,7 @@ type PaginationMetadata struct {
 
 func (x *PaginationMetadata) Reset() {
 	*x = PaginationMetadata{}
-	mi := &file_public_proto_msgTypes[6]
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -454,7 +454,7 @@ func (x *PaginationMetadata) String() string {
 func (*PaginationMetadata) ProtoMessage() {}
 
 func (x *PaginationMetadata) ProtoReflect() protoreflect.Message {
-	mi := &file_public_proto_msgTypes[6]
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -467,7 +467,7 @@ func (x *PaginationMetadata) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PaginationMetadata.ProtoReflect.Descriptor instead.
 func (*PaginationMetadata) Descriptor() ([]byte, []int) {
-	return file_public_proto_rawDescGZIP(), []int{6}
+	return file_pkg_api_v1_proto_public_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *PaginationMetadata) GetPageSize() int32 {
@@ -503,7 +503,7 @@ type FilterMetadata struct {
 
 func (x *FilterMetadata) Reset() {
 	*x = FilterMetadata{}
-	mi := &file_public_proto_msgTypes[7]
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -515,7 +515,7 @@ func (x *FilterMetadata) String() string {
 func (*FilterMetadata) ProtoMessage() {}
 
 func (x *FilterMetadata) ProtoReflect() protoreflect.Message {
-	mi := &file_public_proto_msgTypes[7]
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -528,7 +528,7 @@ func (x *FilterMetadata) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use FilterMetadata.ProtoReflect.Descriptor instead.
 func (*FilterMetadata) Descriptor() ([]byte, []int) {
-	return file_public_proto_rawDescGZIP(), []int{7}
+	return file_pkg_api_v1_proto_public_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *FilterMetadata) GetNetwork() string {
@@ -552,6 +552,132 @@ func (x *FilterMetadata) GetOrderBy() string {
 	return ""
 }
 
+// StateExpiryAccessTotalResponse is the v1 API response for state expiry access totals.
+type StateExpiryAccessTotalResponse struct {
+	state         protoimpl.MessageState  `protogen:"open.v1"`
+	Item          *StateExpiryAccessTotal `protobuf:"bytes,1,opt,name=item,proto3" json:"item,omitempty"`
+	Filters       *FilterMetadata         `protobuf:"bytes,2,opt,name=filters,proto3" json:"filters,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *StateExpiryAccessTotalResponse) Reset() {
+	*x = StateExpiryAccessTotalResponse{}
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *StateExpiryAccessTotalResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*StateExpiryAccessTotalResponse) ProtoMessage() {}
+
+func (x *StateExpiryAccessTotalResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use StateExpiryAccessTotalResponse.ProtoReflect.Descriptor instead.
+func (*StateExpiryAccessTotalResponse) Descriptor() ([]byte, []int) {
+	return file_pkg_api_v1_proto_public_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *StateExpiryAccessTotalResponse) GetItem() *StateExpiryAccessTotal {
+	if x != nil {
+		return x.Item
+	}
+	return nil
+}
+
+func (x *StateExpiryAccessTotalResponse) GetFilters() *FilterMetadata {
+	if x != nil {
+		return x.Filters
+	}
+	return nil
+}
+
+// StateExpiryAccessTotal represents state expiry access statistics for public API consumption.
+type StateExpiryAccessTotal struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Total number of accounts accessed in last 365 days
+	TotalAccounts uint64 `protobuf:"varint,1,opt,name=total_accounts,json=totalAccounts,proto3" json:"total_accounts,omitempty"`
+	// Number of expired accounts (not accessed in last 365 days)
+	ExpiredAccounts uint64 `protobuf:"varint,2,opt,name=expired_accounts,json=expiredAccounts,proto3" json:"expired_accounts,omitempty"`
+	// Total number of contract accounts accessed in last 365 days
+	TotalContracts uint64 `protobuf:"varint,3,opt,name=total_contracts,json=totalContracts,proto3" json:"total_contracts,omitempty"`
+	// Number of expired contracts (not accessed in last 365 days)
+	ExpiredContracts uint64 `protobuf:"varint,4,opt,name=expired_contracts,json=expiredContracts,proto3" json:"expired_contracts,omitempty"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
+}
+
+func (x *StateExpiryAccessTotal) Reset() {
+	*x = StateExpiryAccessTotal{}
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *StateExpiryAccessTotal) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*StateExpiryAccessTotal) ProtoMessage() {}
+
+func (x *StateExpiryAccessTotal) ProtoReflect() protoreflect.Message {
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use StateExpiryAccessTotal.ProtoReflect.Descriptor instead.
+func (*StateExpiryAccessTotal) Descriptor() ([]byte, []int) {
+	return file_pkg_api_v1_proto_public_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *StateExpiryAccessTotal) GetTotalAccounts() uint64 {
+	if x != nil {
+		return x.TotalAccounts
+	}
+	return 0
+}
+
+func (x *StateExpiryAccessTotal) GetExpiredAccounts() uint64 {
+	if x != nil {
+		return x.ExpiredAccounts
+	}
+	return 0
+}
+
+func (x *StateExpiryAccessTotal) GetTotalContracts() uint64 {
+	if x != nil {
+		return x.TotalContracts
+	}
+	return 0
+}
+
+func (x *StateExpiryAccessTotal) GetExpiredContracts() uint64 {
+	if x != nil {
+		return x.ExpiredContracts
+	}
+	return 0
+}
+
 // Network represents an Ethereum network for public API consumption.
 // This provides essential network metadata needed by clients.
 type Network struct {
@@ -566,7 +692,7 @@ type Network struct {
 
 func (x *Network) Reset() {
 	*x = Network{}
-	mi := &file_public_proto_msgTypes[8]
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -578,7 +704,7 @@ func (x *Network) String() string {
 func (*Network) ProtoMessage() {}
 
 func (x *Network) ProtoReflect() protoreflect.Message {
-	mi := &file_public_proto_msgTypes[8]
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -591,7 +717,7 @@ func (x *Network) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Network.ProtoReflect.Descriptor instead.
 func (*Network) Descriptor() ([]byte, []int) {
-	return file_public_proto_rawDescGZIP(), []int{8}
+	return file_pkg_api_v1_proto_public_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *Network) GetName() string {
@@ -634,7 +760,7 @@ type NetworkFilterMetadata struct {
 
 func (x *NetworkFilterMetadata) Reset() {
 	*x = NetworkFilterMetadata{}
-	mi := &file_public_proto_msgTypes[9]
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -646,7 +772,7 @@ func (x *NetworkFilterMetadata) String() string {
 func (*NetworkFilterMetadata) ProtoMessage() {}
 
 func (x *NetworkFilterMetadata) ProtoReflect() protoreflect.Message {
-	mi := &file_public_proto_msgTypes[9]
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -659,7 +785,7 @@ func (x *NetworkFilterMetadata) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use NetworkFilterMetadata.ProtoReflect.Descriptor instead.
 func (*NetworkFilterMetadata) Descriptor() ([]byte, []int) {
-	return file_public_proto_rawDescGZIP(), []int{9}
+	return file_pkg_api_v1_proto_public_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *NetworkFilterMetadata) GetAppliedFilters() []string {
@@ -696,7 +822,7 @@ type StateExpiryAccessHistoryResponse struct {
 
 func (x *StateExpiryAccessHistoryResponse) Reset() {
 	*x = StateExpiryAccessHistoryResponse{}
-	mi := &file_public_proto_msgTypes[10]
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -708,7 +834,7 @@ func (x *StateExpiryAccessHistoryResponse) String() string {
 func (*StateExpiryAccessHistoryResponse) ProtoMessage() {}
 
 func (x *StateExpiryAccessHistoryResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_public_proto_msgTypes[10]
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -721,7 +847,7 @@ func (x *StateExpiryAccessHistoryResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use StateExpiryAccessHistoryResponse.ProtoReflect.Descriptor instead.
 func (*StateExpiryAccessHistoryResponse) Descriptor() ([]byte, []int) {
-	return file_public_proto_rawDescGZIP(), []int{10}
+	return file_pkg_api_v1_proto_public_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *StateExpiryAccessHistoryResponse) GetItems() []*StateExpiryAccessHistory {
@@ -763,7 +889,7 @@ type StateExpiryAccessHistory struct {
 
 func (x *StateExpiryAccessHistory) Reset() {
 	*x = StateExpiryAccessHistory{}
-	mi := &file_public_proto_msgTypes[11]
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -775,7 +901,7 @@ func (x *StateExpiryAccessHistory) String() string {
 func (*StateExpiryAccessHistory) ProtoMessage() {}
 
 func (x *StateExpiryAccessHistory) ProtoReflect() protoreflect.Message {
-	mi := &file_public_proto_msgTypes[11]
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -788,7 +914,7 @@ func (x *StateExpiryAccessHistory) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use StateExpiryAccessHistory.ProtoReflect.Descriptor instead.
 func (*StateExpiryAccessHistory) Descriptor() ([]byte, []int) {
-	return file_public_proto_rawDescGZIP(), []int{11}
+	return file_pkg_api_v1_proto_public_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *StateExpiryAccessHistory) GetChunkStartBlockNumber() uint32 {
@@ -812,6 +938,135 @@ func (x *StateExpiryAccessHistory) GetLastAccessedAccounts() uint32 {
 	return 0
 }
 
+// StateExpiryStorageHistoryResponse is the v1 API response for state expiry storage slot history data.
+// This endpoint provides aggregated data about Ethereum storage slot access patterns chunked by 10000 blocks.
+type StateExpiryStorageHistoryResponse struct {
+	state         protoimpl.MessageState       `protogen:"open.v1"`
+	Items         []*StateExpiryStorageHistory `protobuf:"bytes,1,rep,name=items,proto3" json:"items,omitempty"`
+	Pagination    *PaginationMetadata          `protobuf:"bytes,2,opt,name=pagination,proto3" json:"pagination,omitempty"`
+	Filters       *FilterMetadata              `protobuf:"bytes,3,opt,name=filters,proto3" json:"filters,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *StateExpiryStorageHistoryResponse) Reset() {
+	*x = StateExpiryStorageHistoryResponse{}
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[14]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *StateExpiryStorageHistoryResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*StateExpiryStorageHistoryResponse) ProtoMessage() {}
+
+func (x *StateExpiryStorageHistoryResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[14]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use StateExpiryStorageHistoryResponse.ProtoReflect.Descriptor instead.
+func (*StateExpiryStorageHistoryResponse) Descriptor() ([]byte, []int) {
+	return file_pkg_api_v1_proto_public_proto_rawDescGZIP(), []int{14}
+}
+
+func (x *StateExpiryStorageHistoryResponse) GetItems() []*StateExpiryStorageHistory {
+	if x != nil {
+		return x.Items
+	}
+	return nil
+}
+
+func (x *StateExpiryStorageHistoryResponse) GetPagination() *PaginationMetadata {
+	if x != nil {
+		return x.Pagination
+	}
+	return nil
+}
+
+func (x *StateExpiryStorageHistoryResponse) GetFilters() *FilterMetadata {
+	if x != nil {
+		return x.Filters
+	}
+	return nil
+}
+
+// StateExpiryStorageHistory represents storage slot statistics for a 10000-block chunk.
+// This data is useful for analyzing state expiry patterns and understanding storage slot activity over time.
+type StateExpiryStorageHistory struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The starting block number of this 10000-block chunk
+	ChunkStartBlockNumber uint32 `protobuf:"varint,1,opt,name=chunk_start_block_number,json=chunkStartBlockNumber,proto3" json:"chunk_start_block_number,omitempty"`
+	// Number of storage slots that were accessed for the first time in this chunk
+	// These are slots that had never been accessed before this chunk
+	FirstAccessedSlots uint32 `protobuf:"varint,2,opt,name=first_accessed_slots,json=firstAccessedSlots,proto3" json:"first_accessed_slots,omitempty"`
+	// Number of storage slots whose most recent access was in this chunk
+	// These slots haven't been accessed in any later chunks
+	LastAccessedSlots uint32 `protobuf:"varint,3,opt,name=last_accessed_slots,json=lastAccessedSlots,proto3" json:"last_accessed_slots,omitempty"`
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
+}
+
+func (x *StateExpiryStorageHistory) Reset() {
+	*x = StateExpiryStorageHistory{}
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[15]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *StateExpiryStorageHistory) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*StateExpiryStorageHistory) ProtoMessage() {}
+
+func (x *StateExpiryStorageHistory) ProtoReflect() protoreflect.Message {
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[15]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use StateExpiryStorageHistory.ProtoReflect.Descriptor instead.
+func (*StateExpiryStorageHistory) Descriptor() ([]byte, []int) {
+	return file_pkg_api_v1_proto_public_proto_rawDescGZIP(), []int{15}
+}
+
+func (x *StateExpiryStorageHistory) GetChunkStartBlockNumber() uint32 {
+	if x != nil {
+		return x.ChunkStartBlockNumber
+	}
+	return 0
+}
+
+func (x *StateExpiryStorageHistory) GetFirstAccessedSlots() uint32 {
+	if x != nil {
+		return x.FirstAccessedSlots
+	}
+	return 0
+}
+
+func (x *StateExpiryStorageHistory) GetLastAccessedSlots() uint32 {
+	if x != nil {
+		return x.LastAccessedSlots
+	}
+	return 0
+}
+
 // ListBeaconSlotMevRelayResponse is the v1 API response for MEV relay bid counts by slot.
 type ListBeaconSlotMevRelayResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
@@ -824,7 +1079,7 @@ type ListBeaconSlotMevRelayResponse struct {
 
 func (x *ListBeaconSlotMevRelayResponse) Reset() {
 	*x = ListBeaconSlotMevRelayResponse{}
-	mi := &file_public_proto_msgTypes[12]
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[16]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -836,7 +1091,7 @@ func (x *ListBeaconSlotMevRelayResponse) String() string {
 func (*ListBeaconSlotMevRelayResponse) ProtoMessage() {}
 
 func (x *ListBeaconSlotMevRelayResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_public_proto_msgTypes[12]
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[16]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -849,7 +1104,7 @@ func (x *ListBeaconSlotMevRelayResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListBeaconSlotMevRelayResponse.ProtoReflect.Descriptor instead.
 func (*ListBeaconSlotMevRelayResponse) Descriptor() ([]byte, []int) {
-	return file_public_proto_rawDescGZIP(), []int{12}
+	return file_pkg_api_v1_proto_public_proto_rawDescGZIP(), []int{16}
 }
 
 func (x *ListBeaconSlotMevRelayResponse) GetRelays() []*MevRelayBidCount {
@@ -884,7 +1139,7 @@ type MevRelayBidCount struct {
 
 func (x *MevRelayBidCount) Reset() {
 	*x = MevRelayBidCount{}
-	mi := &file_public_proto_msgTypes[13]
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[17]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -896,7 +1151,7 @@ func (x *MevRelayBidCount) String() string {
 func (*MevRelayBidCount) ProtoMessage() {}
 
 func (x *MevRelayBidCount) ProtoReflect() protoreflect.Message {
-	mi := &file_public_proto_msgTypes[13]
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[17]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -909,7 +1164,7 @@ func (x *MevRelayBidCount) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MevRelayBidCount.ProtoReflect.Descriptor instead.
 func (*MevRelayBidCount) Descriptor() ([]byte, []int) {
-	return file_public_proto_rawDescGZIP(), []int{13}
+	return file_pkg_api_v1_proto_public_proto_rawDescGZIP(), []int{17}
 }
 
 func (x *MevRelayBidCount) GetRelayName() string {
@@ -938,7 +1193,7 @@ type ListBeaconSlotMevBuilderCountResponse struct {
 
 func (x *ListBeaconSlotMevBuilderCountResponse) Reset() {
 	*x = ListBeaconSlotMevBuilderCountResponse{}
-	mi := &file_public_proto_msgTypes[14]
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[18]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -950,7 +1205,7 @@ func (x *ListBeaconSlotMevBuilderCountResponse) String() string {
 func (*ListBeaconSlotMevBuilderCountResponse) ProtoMessage() {}
 
 func (x *ListBeaconSlotMevBuilderCountResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_public_proto_msgTypes[14]
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[18]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -963,7 +1218,7 @@ func (x *ListBeaconSlotMevBuilderCountResponse) ProtoReflect() protoreflect.Mess
 
 // Deprecated: Use ListBeaconSlotMevBuilderCountResponse.ProtoReflect.Descriptor instead.
 func (*ListBeaconSlotMevBuilderCountResponse) Descriptor() ([]byte, []int) {
-	return file_public_proto_rawDescGZIP(), []int{14}
+	return file_pkg_api_v1_proto_public_proto_rawDescGZIP(), []int{18}
 }
 
 func (x *ListBeaconSlotMevBuilderCountResponse) GetBuilders() []*MevBuilderBidCount {
@@ -998,7 +1253,7 @@ type MevBuilderBidCount struct {
 
 func (x *MevBuilderBidCount) Reset() {
 	*x = MevBuilderBidCount{}
-	mi := &file_public_proto_msgTypes[15]
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[19]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1010,7 +1265,7 @@ func (x *MevBuilderBidCount) String() string {
 func (*MevBuilderBidCount) ProtoMessage() {}
 
 func (x *MevBuilderBidCount) ProtoReflect() protoreflect.Message {
-	mi := &file_public_proto_msgTypes[15]
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[19]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1023,7 +1278,7 @@ func (x *MevBuilderBidCount) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MevBuilderBidCount.ProtoReflect.Descriptor instead.
 func (*MevBuilderBidCount) Descriptor() ([]byte, []int) {
-	return file_public_proto_rawDescGZIP(), []int{15}
+	return file_pkg_api_v1_proto_public_proto_rawDescGZIP(), []int{19}
 }
 
 func (x *MevBuilderBidCount) GetBuilderPubkey() string {
@@ -1052,7 +1307,7 @@ type ListBeaconSlotMevResponse struct {
 
 func (x *ListBeaconSlotMevResponse) Reset() {
 	*x = ListBeaconSlotMevResponse{}
-	mi := &file_public_proto_msgTypes[16]
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[20]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1064,7 +1319,7 @@ func (x *ListBeaconSlotMevResponse) String() string {
 func (*ListBeaconSlotMevResponse) ProtoMessage() {}
 
 func (x *ListBeaconSlotMevResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_public_proto_msgTypes[16]
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[20]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1077,7 +1332,7 @@ func (x *ListBeaconSlotMevResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListBeaconSlotMevResponse.ProtoReflect.Descriptor instead.
 func (*ListBeaconSlotMevResponse) Descriptor() ([]byte, []int) {
-	return file_public_proto_rawDescGZIP(), []int{16}
+	return file_pkg_api_v1_proto_public_proto_rawDescGZIP(), []int{20}
 }
 
 func (x *ListBeaconSlotMevResponse) GetBlocks() []*MevBlock {
@@ -1123,7 +1378,7 @@ type MevBlock struct {
 
 func (x *MevBlock) Reset() {
 	*x = MevBlock{}
-	mi := &file_public_proto_msgTypes[17]
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[21]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1135,7 +1390,7 @@ func (x *MevBlock) String() string {
 func (*MevBlock) ProtoMessage() {}
 
 func (x *MevBlock) ProtoReflect() protoreflect.Message {
-	mi := &file_public_proto_msgTypes[17]
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[21]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1148,7 +1403,7 @@ func (x *MevBlock) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MevBlock.ProtoReflect.Descriptor instead.
 func (*MevBlock) Descriptor() ([]byte, []int) {
-	return file_public_proto_rawDescGZIP(), []int{17}
+	return file_pkg_api_v1_proto_public_proto_rawDescGZIP(), []int{21}
 }
 
 func (x *MevBlock) GetBlockRoot() string {
@@ -1254,7 +1509,7 @@ type ListBeaconSlotMevBuilderResponse struct {
 
 func (x *ListBeaconSlotMevBuilderResponse) Reset() {
 	*x = ListBeaconSlotMevBuilderResponse{}
-	mi := &file_public_proto_msgTypes[18]
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[22]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1266,7 +1521,7 @@ func (x *ListBeaconSlotMevBuilderResponse) String() string {
 func (*ListBeaconSlotMevBuilderResponse) ProtoMessage() {}
 
 func (x *ListBeaconSlotMevBuilderResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_public_proto_msgTypes[18]
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[22]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1279,7 +1534,7 @@ func (x *ListBeaconSlotMevBuilderResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListBeaconSlotMevBuilderResponse.ProtoReflect.Descriptor instead.
 func (*ListBeaconSlotMevBuilderResponse) Descriptor() ([]byte, []int) {
-	return file_public_proto_rawDescGZIP(), []int{18}
+	return file_pkg_api_v1_proto_public_proto_rawDescGZIP(), []int{22}
 }
 
 func (x *ListBeaconSlotMevBuilderResponse) GetBuilders() []*MevBuilderBid {
@@ -1317,7 +1572,7 @@ type MevBuilderBid struct {
 
 func (x *MevBuilderBid) Reset() {
 	*x = MevBuilderBid{}
-	mi := &file_public_proto_msgTypes[19]
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[23]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1329,7 +1584,7 @@ func (x *MevBuilderBid) String() string {
 func (*MevBuilderBid) ProtoMessage() {}
 
 func (x *MevBuilderBid) ProtoReflect() protoreflect.Message {
-	mi := &file_public_proto_msgTypes[19]
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[23]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1342,7 +1597,7 @@ func (x *MevBuilderBid) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MevBuilderBid.ProtoReflect.Descriptor instead.
 func (*MevBuilderBid) Descriptor() ([]byte, []int) {
-	return file_public_proto_rawDescGZIP(), []int{19}
+	return file_pkg_api_v1_proto_public_proto_rawDescGZIP(), []int{23}
 }
 
 func (x *MevBuilderBid) GetBlockHash() string {
@@ -1393,7 +1648,7 @@ type ErrorResponse struct {
 
 func (x *ErrorResponse) Reset() {
 	*x = ErrorResponse{}
-	mi := &file_public_proto_msgTypes[20]
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[24]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1405,7 +1660,7 @@ func (x *ErrorResponse) String() string {
 func (*ErrorResponse) ProtoMessage() {}
 
 func (x *ErrorResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_public_proto_msgTypes[20]
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[24]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1418,7 +1673,7 @@ func (x *ErrorResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ErrorResponse.ProtoReflect.Descriptor instead.
 func (*ErrorResponse) Descriptor() ([]byte, []int) {
-	return file_public_proto_rawDescGZIP(), []int{20}
+	return file_pkg_api_v1_proto_public_proto_rawDescGZIP(), []int{24}
 }
 
 func (x *ErrorResponse) GetError() string {
@@ -1459,7 +1714,7 @@ type GetConfigResponse struct {
 
 func (x *GetConfigResponse) Reset() {
 	*x = GetConfigResponse{}
-	mi := &file_public_proto_msgTypes[21]
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[25]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1471,7 +1726,7 @@ func (x *GetConfigResponse) String() string {
 func (*GetConfigResponse) ProtoMessage() {}
 
 func (x *GetConfigResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_public_proto_msgTypes[21]
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[25]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1484,7 +1739,7 @@ func (x *GetConfigResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetConfigResponse.ProtoReflect.Descriptor instead.
 func (*GetConfigResponse) Descriptor() ([]byte, []int) {
-	return file_public_proto_rawDescGZIP(), []int{21}
+	return file_pkg_api_v1_proto_public_proto_rawDescGZIP(), []int{25}
 }
 
 func (x *GetConfigResponse) GetConfig() *FrontendConfig {
@@ -1505,7 +1760,7 @@ type FrontendConfig struct {
 
 func (x *FrontendConfig) Reset() {
 	*x = FrontendConfig{}
-	mi := &file_public_proto_msgTypes[22]
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[26]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1517,7 +1772,7 @@ func (x *FrontendConfig) String() string {
 func (*FrontendConfig) ProtoMessage() {}
 
 func (x *FrontendConfig) ProtoReflect() protoreflect.Message {
-	mi := &file_public_proto_msgTypes[22]
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[26]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1530,7 +1785,7 @@ func (x *FrontendConfig) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use FrontendConfig.ProtoReflect.Descriptor instead.
 func (*FrontendConfig) Descriptor() ([]byte, []int) {
-	return file_public_proto_rawDescGZIP(), []int{22}
+	return file_pkg_api_v1_proto_public_proto_rawDescGZIP(), []int{26}
 }
 
 func (x *FrontendConfig) GetEthereum() *EthereumConfig {
@@ -1557,7 +1812,7 @@ type EthereumConfig struct {
 
 func (x *EthereumConfig) Reset() {
 	*x = EthereumConfig{}
-	mi := &file_public_proto_msgTypes[23]
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[27]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1569,7 +1824,7 @@ func (x *EthereumConfig) String() string {
 func (*EthereumConfig) ProtoMessage() {}
 
 func (x *EthereumConfig) ProtoReflect() protoreflect.Message {
-	mi := &file_public_proto_msgTypes[23]
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[27]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1582,7 +1837,7 @@ func (x *EthereumConfig) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use EthereumConfig.ProtoReflect.Descriptor instead.
 func (*EthereumConfig) Descriptor() ([]byte, []int) {
-	return file_public_proto_rawDescGZIP(), []int{23}
+	return file_pkg_api_v1_proto_public_proto_rawDescGZIP(), []int{27}
 }
 
 func (x *EthereumConfig) GetNetworks() map[string]*NetworkConfig {
@@ -1608,7 +1863,7 @@ type NetworkConfig struct {
 
 func (x *NetworkConfig) Reset() {
 	*x = NetworkConfig{}
-	mi := &file_public_proto_msgTypes[24]
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[28]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1620,7 +1875,7 @@ func (x *NetworkConfig) String() string {
 func (*NetworkConfig) ProtoMessage() {}
 
 func (x *NetworkConfig) ProtoReflect() protoreflect.Message {
-	mi := &file_public_proto_msgTypes[24]
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[28]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1633,7 +1888,7 @@ func (x *NetworkConfig) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use NetworkConfig.ProtoReflect.Descriptor instead.
 func (*NetworkConfig) Descriptor() ([]byte, []int) {
-	return file_public_proto_rawDescGZIP(), []int{24}
+	return file_pkg_api_v1_proto_public_proto_rawDescGZIP(), []int{28}
 }
 
 func (x *NetworkConfig) GetName() string {
@@ -1695,7 +1950,7 @@ type ForkConfig struct {
 
 func (x *ForkConfig) Reset() {
 	*x = ForkConfig{}
-	mi := &file_public_proto_msgTypes[25]
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[29]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1707,7 +1962,7 @@ func (x *ForkConfig) String() string {
 func (*ForkConfig) ProtoMessage() {}
 
 func (x *ForkConfig) ProtoReflect() protoreflect.Message {
-	mi := &file_public_proto_msgTypes[25]
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[29]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1720,7 +1975,7 @@ func (x *ForkConfig) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ForkConfig.ProtoReflect.Descriptor instead.
 func (*ForkConfig) Descriptor() ([]byte, []int) {
-	return file_public_proto_rawDescGZIP(), []int{25}
+	return file_pkg_api_v1_proto_public_proto_rawDescGZIP(), []int{29}
 }
 
 func (x *ForkConfig) GetConsensus() *ConsensusForks {
@@ -1741,7 +1996,7 @@ type ConsensusForks struct {
 
 func (x *ConsensusForks) Reset() {
 	*x = ConsensusForks{}
-	mi := &file_public_proto_msgTypes[26]
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[30]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1753,7 +2008,7 @@ func (x *ConsensusForks) String() string {
 func (*ConsensusForks) ProtoMessage() {}
 
 func (x *ConsensusForks) ProtoReflect() protoreflect.Message {
-	mi := &file_public_proto_msgTypes[26]
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[30]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1766,7 +2021,7 @@ func (x *ConsensusForks) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ConsensusForks.ProtoReflect.Descriptor instead.
 func (*ConsensusForks) Descriptor() ([]byte, []int) {
-	return file_public_proto_rawDescGZIP(), []int{26}
+	return file_pkg_api_v1_proto_public_proto_rawDescGZIP(), []int{30}
 }
 
 func (x *ConsensusForks) GetElectra() *ForkInfo {
@@ -1794,7 +2049,7 @@ type ForkInfo struct {
 
 func (x *ForkInfo) Reset() {
 	*x = ForkInfo{}
-	mi := &file_public_proto_msgTypes[27]
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[31]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1806,7 +2061,7 @@ func (x *ForkInfo) String() string {
 func (*ForkInfo) ProtoMessage() {}
 
 func (x *ForkInfo) ProtoReflect() protoreflect.Message {
-	mi := &file_public_proto_msgTypes[27]
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[31]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1819,7 +2074,7 @@ func (x *ForkInfo) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ForkInfo.ProtoReflect.Descriptor instead.
 func (*ForkInfo) Descriptor() ([]byte, []int) {
-	return file_public_proto_rawDescGZIP(), []int{27}
+	return file_pkg_api_v1_proto_public_proto_rawDescGZIP(), []int{31}
 }
 
 func (x *ForkInfo) GetEpoch() int64 {
@@ -1846,7 +2101,7 @@ type ExperimentsConfig struct {
 
 func (x *ExperimentsConfig) Reset() {
 	*x = ExperimentsConfig{}
-	mi := &file_public_proto_msgTypes[28]
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[32]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1858,7 +2113,7 @@ func (x *ExperimentsConfig) String() string {
 func (*ExperimentsConfig) ProtoMessage() {}
 
 func (x *ExperimentsConfig) ProtoReflect() protoreflect.Message {
-	mi := &file_public_proto_msgTypes[28]
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[32]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1871,7 +2126,7 @@ func (x *ExperimentsConfig) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ExperimentsConfig.ProtoReflect.Descriptor instead.
 func (*ExperimentsConfig) Descriptor() ([]byte, []int) {
-	return file_public_proto_rawDescGZIP(), []int{28}
+	return file_pkg_api_v1_proto_public_proto_rawDescGZIP(), []int{32}
 }
 
 func (x *ExperimentsConfig) GetExperiments() []*ExperimentConfig {
@@ -1895,7 +2150,7 @@ type ExperimentConfig struct {
 
 func (x *ExperimentConfig) Reset() {
 	*x = ExperimentConfig{}
-	mi := &file_public_proto_msgTypes[29]
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[33]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1907,7 +2162,7 @@ func (x *ExperimentConfig) String() string {
 func (*ExperimentConfig) ProtoMessage() {}
 
 func (x *ExperimentConfig) ProtoReflect() protoreflect.Message {
-	mi := &file_public_proto_msgTypes[29]
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[33]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1920,7 +2175,7 @@ func (x *ExperimentConfig) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ExperimentConfig.ProtoReflect.Descriptor instead.
 func (*ExperimentConfig) Descriptor() ([]byte, []int) {
-	return file_public_proto_rawDescGZIP(), []int{29}
+	return file_pkg_api_v1_proto_public_proto_rawDescGZIP(), []int{33}
 }
 
 func (x *ExperimentConfig) GetId() string {
@@ -1969,7 +2224,7 @@ type ExperimentDataAvailability struct {
 
 func (x *ExperimentDataAvailability) Reset() {
 	*x = ExperimentDataAvailability{}
-	mi := &file_public_proto_msgTypes[30]
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[34]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1981,7 +2236,7 @@ func (x *ExperimentDataAvailability) String() string {
 func (*ExperimentDataAvailability) ProtoMessage() {}
 
 func (x *ExperimentDataAvailability) ProtoReflect() protoreflect.Message {
-	mi := &file_public_proto_msgTypes[30]
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[34]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1994,7 +2249,7 @@ func (x *ExperimentDataAvailability) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ExperimentDataAvailability.ProtoReflect.Descriptor instead.
 func (*ExperimentDataAvailability) Descriptor() ([]byte, []int) {
-	return file_public_proto_rawDescGZIP(), []int{30}
+	return file_pkg_api_v1_proto_public_proto_rawDescGZIP(), []int{34}
 }
 
 func (x *ExperimentDataAvailability) GetMinSlot() uint64 {
@@ -2021,7 +2276,7 @@ type GetExperimentConfigRequest struct {
 
 func (x *GetExperimentConfigRequest) Reset() {
 	*x = GetExperimentConfigRequest{}
-	mi := &file_public_proto_msgTypes[31]
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[35]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2033,7 +2288,7 @@ func (x *GetExperimentConfigRequest) String() string {
 func (*GetExperimentConfigRequest) ProtoMessage() {}
 
 func (x *GetExperimentConfigRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_public_proto_msgTypes[31]
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[35]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2046,7 +2301,7 @@ func (x *GetExperimentConfigRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetExperimentConfigRequest.ProtoReflect.Descriptor instead.
 func (*GetExperimentConfigRequest) Descriptor() ([]byte, []int) {
-	return file_public_proto_rawDescGZIP(), []int{31}
+	return file_pkg_api_v1_proto_public_proto_rawDescGZIP(), []int{35}
 }
 
 func (x *GetExperimentConfigRequest) GetExperimentId() string {
@@ -2066,7 +2321,7 @@ type GetExperimentConfigResponse struct {
 
 func (x *GetExperimentConfigResponse) Reset() {
 	*x = GetExperimentConfigResponse{}
-	mi := &file_public_proto_msgTypes[32]
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[36]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2078,7 +2333,7 @@ func (x *GetExperimentConfigResponse) String() string {
 func (*GetExperimentConfigResponse) ProtoMessage() {}
 
 func (x *GetExperimentConfigResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_public_proto_msgTypes[32]
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[36]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2091,7 +2346,7 @@ func (x *GetExperimentConfigResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetExperimentConfigResponse.ProtoReflect.Descriptor instead.
 func (*GetExperimentConfigResponse) Descriptor() ([]byte, []int) {
-	return file_public_proto_rawDescGZIP(), []int{32}
+	return file_pkg_api_v1_proto_public_proto_rawDescGZIP(), []int{36}
 }
 
 func (x *GetExperimentConfigResponse) GetExperiment() *ExperimentConfig {
@@ -2113,7 +2368,7 @@ type ListBeaconSlotBlockTimingResponse struct {
 
 func (x *ListBeaconSlotBlockTimingResponse) Reset() {
 	*x = ListBeaconSlotBlockTimingResponse{}
-	mi := &file_public_proto_msgTypes[33]
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[37]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2125,7 +2380,7 @@ func (x *ListBeaconSlotBlockTimingResponse) String() string {
 func (*ListBeaconSlotBlockTimingResponse) ProtoMessage() {}
 
 func (x *ListBeaconSlotBlockTimingResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_public_proto_msgTypes[33]
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[37]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2138,7 +2393,7 @@ func (x *ListBeaconSlotBlockTimingResponse) ProtoReflect() protoreflect.Message 
 
 // Deprecated: Use ListBeaconSlotBlockTimingResponse.ProtoReflect.Descriptor instead.
 func (*ListBeaconSlotBlockTimingResponse) Descriptor() ([]byte, []int) {
-	return file_public_proto_rawDescGZIP(), []int{33}
+	return file_pkg_api_v1_proto_public_proto_rawDescGZIP(), []int{37}
 }
 
 func (x *ListBeaconSlotBlockTimingResponse) GetNodes() []*BlockTimingNode {
@@ -2177,7 +2432,7 @@ type BlockTimingNode struct {
 
 func (x *BlockTimingNode) Reset() {
 	*x = BlockTimingNode{}
-	mi := &file_public_proto_msgTypes[34]
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[38]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2189,7 +2444,7 @@ func (x *BlockTimingNode) String() string {
 func (*BlockTimingNode) ProtoMessage() {}
 
 func (x *BlockTimingNode) ProtoReflect() protoreflect.Message {
-	mi := &file_public_proto_msgTypes[34]
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[38]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2202,7 +2457,7 @@ func (x *BlockTimingNode) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BlockTimingNode.ProtoReflect.Descriptor instead.
 func (*BlockTimingNode) Descriptor() ([]byte, []int) {
-	return file_public_proto_rawDescGZIP(), []int{34}
+	return file_pkg_api_v1_proto_public_proto_rawDescGZIP(), []int{38}
 }
 
 func (x *BlockTimingNode) GetNodeId() string {
@@ -2259,7 +2514,7 @@ type ListBeaconSlotBlobTimingResponse struct {
 
 func (x *ListBeaconSlotBlobTimingResponse) Reset() {
 	*x = ListBeaconSlotBlobTimingResponse{}
-	mi := &file_public_proto_msgTypes[35]
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[39]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2271,7 +2526,7 @@ func (x *ListBeaconSlotBlobTimingResponse) String() string {
 func (*ListBeaconSlotBlobTimingResponse) ProtoMessage() {}
 
 func (x *ListBeaconSlotBlobTimingResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_public_proto_msgTypes[35]
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[39]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2284,7 +2539,7 @@ func (x *ListBeaconSlotBlobTimingResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListBeaconSlotBlobTimingResponse.ProtoReflect.Descriptor instead.
 func (*ListBeaconSlotBlobTimingResponse) Descriptor() ([]byte, []int) {
-	return file_public_proto_rawDescGZIP(), []int{35}
+	return file_pkg_api_v1_proto_public_proto_rawDescGZIP(), []int{39}
 }
 
 func (x *ListBeaconSlotBlobTimingResponse) GetNodes() []*BlobTimingNode {
@@ -2325,7 +2580,7 @@ type BlobTimingNode struct {
 
 func (x *BlobTimingNode) Reset() {
 	*x = BlobTimingNode{}
-	mi := &file_public_proto_msgTypes[36]
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[40]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2337,7 +2592,7 @@ func (x *BlobTimingNode) String() string {
 func (*BlobTimingNode) ProtoMessage() {}
 
 func (x *BlobTimingNode) ProtoReflect() protoreflect.Message {
-	mi := &file_public_proto_msgTypes[36]
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[40]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2350,7 +2605,7 @@ func (x *BlobTimingNode) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BlobTimingNode.ProtoReflect.Descriptor instead.
 func (*BlobTimingNode) Descriptor() ([]byte, []int) {
-	return file_public_proto_rawDescGZIP(), []int{36}
+	return file_pkg_api_v1_proto_public_proto_rawDescGZIP(), []int{40}
 }
 
 func (x *BlobTimingNode) GetNodeId() string {
@@ -2421,7 +2676,7 @@ type ListBeaconSlotAttestationTimingResponse struct {
 
 func (x *ListBeaconSlotAttestationTimingResponse) Reset() {
 	*x = ListBeaconSlotAttestationTimingResponse{}
-	mi := &file_public_proto_msgTypes[37]
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[41]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2433,7 +2688,7 @@ func (x *ListBeaconSlotAttestationTimingResponse) String() string {
 func (*ListBeaconSlotAttestationTimingResponse) ProtoMessage() {}
 
 func (x *ListBeaconSlotAttestationTimingResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_public_proto_msgTypes[37]
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[41]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2446,7 +2701,7 @@ func (x *ListBeaconSlotAttestationTimingResponse) ProtoReflect() protoreflect.Me
 
 // Deprecated: Use ListBeaconSlotAttestationTimingResponse.ProtoReflect.Descriptor instead.
 func (*ListBeaconSlotAttestationTimingResponse) Descriptor() ([]byte, []int) {
-	return file_public_proto_rawDescGZIP(), []int{37}
+	return file_pkg_api_v1_proto_public_proto_rawDescGZIP(), []int{41}
 }
 
 func (x *ListBeaconSlotAttestationTimingResponse) GetChunks() []*AttestationTimingChunk {
@@ -2482,7 +2737,7 @@ type AttestationTimingChunk struct {
 
 func (x *AttestationTimingChunk) Reset() {
 	*x = AttestationTimingChunk{}
-	mi := &file_public_proto_msgTypes[38]
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[42]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2494,7 +2749,7 @@ func (x *AttestationTimingChunk) String() string {
 func (*AttestationTimingChunk) ProtoMessage() {}
 
 func (x *AttestationTimingChunk) ProtoReflect() protoreflect.Message {
-	mi := &file_public_proto_msgTypes[38]
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[42]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2507,7 +2762,7 @@ func (x *AttestationTimingChunk) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AttestationTimingChunk.ProtoReflect.Descriptor instead.
 func (*AttestationTimingChunk) Descriptor() ([]byte, []int) {
-	return file_public_proto_rawDescGZIP(), []int{38}
+	return file_pkg_api_v1_proto_public_proto_rawDescGZIP(), []int{42}
 }
 
 func (x *AttestationTimingChunk) GetBlockRoot() string {
@@ -2542,7 +2797,7 @@ type ListBeaconSlotAttestationCorrectnessResponse struct {
 
 func (x *ListBeaconSlotAttestationCorrectnessResponse) Reset() {
 	*x = ListBeaconSlotAttestationCorrectnessResponse{}
-	mi := &file_public_proto_msgTypes[39]
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[43]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2554,7 +2809,7 @@ func (x *ListBeaconSlotAttestationCorrectnessResponse) String() string {
 func (*ListBeaconSlotAttestationCorrectnessResponse) ProtoMessage() {}
 
 func (x *ListBeaconSlotAttestationCorrectnessResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_public_proto_msgTypes[39]
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[43]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2567,7 +2822,7 @@ func (x *ListBeaconSlotAttestationCorrectnessResponse) ProtoReflect() protorefle
 
 // Deprecated: Use ListBeaconSlotAttestationCorrectnessResponse.ProtoReflect.Descriptor instead.
 func (*ListBeaconSlotAttestationCorrectnessResponse) Descriptor() ([]byte, []int) {
-	return file_public_proto_rawDescGZIP(), []int{39}
+	return file_pkg_api_v1_proto_public_proto_rawDescGZIP(), []int{43}
 }
 
 func (x *ListBeaconSlotAttestationCorrectnessResponse) GetBlocks() []*AttestationCorrectness {
@@ -2598,7 +2853,7 @@ type AttestationCorrectness struct {
 
 func (x *AttestationCorrectness) Reset() {
 	*x = AttestationCorrectness{}
-	mi := &file_public_proto_msgTypes[40]
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[44]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2610,7 +2865,7 @@ func (x *AttestationCorrectness) String() string {
 func (*AttestationCorrectness) ProtoMessage() {}
 
 func (x *AttestationCorrectness) ProtoReflect() protoreflect.Message {
-	mi := &file_public_proto_msgTypes[40]
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[44]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2623,7 +2878,7 @@ func (x *AttestationCorrectness) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AttestationCorrectness.ProtoReflect.Descriptor instead.
 func (*AttestationCorrectness) Descriptor() ([]byte, []int) {
-	return file_public_proto_rawDescGZIP(), []int{40}
+	return file_pkg_api_v1_proto_public_proto_rawDescGZIP(), []int{44}
 }
 
 func (x *AttestationCorrectness) GetBlockRoot() string {
@@ -2672,7 +2927,7 @@ type ListBeaconSlotBlobTotalResponse struct {
 
 func (x *ListBeaconSlotBlobTotalResponse) Reset() {
 	*x = ListBeaconSlotBlobTotalResponse{}
-	mi := &file_public_proto_msgTypes[41]
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[45]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2684,7 +2939,7 @@ func (x *ListBeaconSlotBlobTotalResponse) String() string {
 func (*ListBeaconSlotBlobTotalResponse) ProtoMessage() {}
 
 func (x *ListBeaconSlotBlobTotalResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_public_proto_msgTypes[41]
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[45]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2697,7 +2952,7 @@ func (x *ListBeaconSlotBlobTotalResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListBeaconSlotBlobTotalResponse.ProtoReflect.Descriptor instead.
 func (*ListBeaconSlotBlobTotalResponse) Descriptor() ([]byte, []int) {
-	return file_public_proto_rawDescGZIP(), []int{41}
+	return file_pkg_api_v1_proto_public_proto_rawDescGZIP(), []int{45}
 }
 
 func (x *ListBeaconSlotBlobTotalResponse) GetBlocks() []*BlobTotal {
@@ -2725,7 +2980,7 @@ type BlobTotal struct {
 
 func (x *BlobTotal) Reset() {
 	*x = BlobTotal{}
-	mi := &file_public_proto_msgTypes[42]
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[46]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2737,7 +2992,7 @@ func (x *BlobTotal) String() string {
 func (*BlobTotal) ProtoMessage() {}
 
 func (x *BlobTotal) ProtoReflect() protoreflect.Message {
-	mi := &file_public_proto_msgTypes[42]
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[46]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2750,7 +3005,7 @@ func (x *BlobTotal) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BlobTotal.ProtoReflect.Descriptor instead.
 func (*BlobTotal) Descriptor() ([]byte, []int) {
-	return file_public_proto_rawDescGZIP(), []int{42}
+	return file_pkg_api_v1_proto_public_proto_rawDescGZIP(), []int{46}
 }
 
 func (x *BlobTotal) GetBlockRoot() string {
@@ -2779,7 +3034,7 @@ type ListBeaconSlotBlockResponse struct {
 
 func (x *ListBeaconSlotBlockResponse) Reset() {
 	*x = ListBeaconSlotBlockResponse{}
-	mi := &file_public_proto_msgTypes[43]
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[47]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2791,7 +3046,7 @@ func (x *ListBeaconSlotBlockResponse) String() string {
 func (*ListBeaconSlotBlockResponse) ProtoMessage() {}
 
 func (x *ListBeaconSlotBlockResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_public_proto_msgTypes[43]
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[47]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2804,7 +3059,7 @@ func (x *ListBeaconSlotBlockResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListBeaconSlotBlockResponse.ProtoReflect.Descriptor instead.
 func (*ListBeaconSlotBlockResponse) Descriptor() ([]byte, []int) {
-	return file_public_proto_rawDescGZIP(), []int{43}
+	return file_pkg_api_v1_proto_public_proto_rawDescGZIP(), []int{47}
 }
 
 func (x *ListBeaconSlotBlockResponse) GetBlocks() []*BeaconBlock {
@@ -2859,7 +3114,7 @@ type BeaconBlock struct {
 
 func (x *BeaconBlock) Reset() {
 	*x = BeaconBlock{}
-	mi := &file_public_proto_msgTypes[44]
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[48]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2871,7 +3126,7 @@ func (x *BeaconBlock) String() string {
 func (*BeaconBlock) ProtoMessage() {}
 
 func (x *BeaconBlock) ProtoReflect() protoreflect.Message {
-	mi := &file_public_proto_msgTypes[44]
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[48]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2884,7 +3139,7 @@ func (x *BeaconBlock) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BeaconBlock.ProtoReflect.Descriptor instead.
 func (*BeaconBlock) Descriptor() ([]byte, []int) {
-	return file_public_proto_rawDescGZIP(), []int{44}
+	return file_pkg_api_v1_proto_public_proto_rawDescGZIP(), []int{48}
 }
 
 func (x *BeaconBlock) GetBlockRoot() string {
@@ -3032,7 +3287,7 @@ type ListBeaconSlotProposerEntityResponse struct {
 
 func (x *ListBeaconSlotProposerEntityResponse) Reset() {
 	*x = ListBeaconSlotProposerEntityResponse{}
-	mi := &file_public_proto_msgTypes[45]
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[49]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3044,7 +3299,7 @@ func (x *ListBeaconSlotProposerEntityResponse) String() string {
 func (*ListBeaconSlotProposerEntityResponse) ProtoMessage() {}
 
 func (x *ListBeaconSlotProposerEntityResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_public_proto_msgTypes[45]
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[49]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3057,7 +3312,7 @@ func (x *ListBeaconSlotProposerEntityResponse) ProtoReflect() protoreflect.Messa
 
 // Deprecated: Use ListBeaconSlotProposerEntityResponse.ProtoReflect.Descriptor instead.
 func (*ListBeaconSlotProposerEntityResponse) Descriptor() ([]byte, []int) {
-	return file_public_proto_rawDescGZIP(), []int{45}
+	return file_pkg_api_v1_proto_public_proto_rawDescGZIP(), []int{49}
 }
 
 func (x *ListBeaconSlotProposerEntityResponse) GetEntities() []*ProposerEntity {
@@ -3092,7 +3347,7 @@ type ProposerEntity struct {
 
 func (x *ProposerEntity) Reset() {
 	*x = ProposerEntity{}
-	mi := &file_public_proto_msgTypes[46]
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[50]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3104,7 +3359,7 @@ func (x *ProposerEntity) String() string {
 func (*ProposerEntity) ProtoMessage() {}
 
 func (x *ProposerEntity) ProtoReflect() protoreflect.Message {
-	mi := &file_public_proto_msgTypes[46]
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[50]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3117,7 +3372,7 @@ func (x *ProposerEntity) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ProposerEntity.ProtoReflect.Descriptor instead.
 func (*ProposerEntity) Descriptor() ([]byte, []int) {
-	return file_public_proto_rawDescGZIP(), []int{46}
+	return file_pkg_api_v1_proto_public_proto_rawDescGZIP(), []int{50}
 }
 
 func (x *ProposerEntity) GetEntity() string {
@@ -3139,7 +3394,7 @@ type ListPreparedBlocksResponse struct {
 
 func (x *ListPreparedBlocksResponse) Reset() {
 	*x = ListPreparedBlocksResponse{}
-	mi := &file_public_proto_msgTypes[47]
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[51]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3151,7 +3406,7 @@ func (x *ListPreparedBlocksResponse) String() string {
 func (*ListPreparedBlocksResponse) ProtoMessage() {}
 
 func (x *ListPreparedBlocksResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_public_proto_msgTypes[47]
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[51]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3164,7 +3419,7 @@ func (x *ListPreparedBlocksResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListPreparedBlocksResponse.ProtoReflect.Descriptor instead.
 func (*ListPreparedBlocksResponse) Descriptor() ([]byte, []int) {
-	return file_public_proto_rawDescGZIP(), []int{47}
+	return file_pkg_api_v1_proto_public_proto_rawDescGZIP(), []int{51}
 }
 
 func (x *ListPreparedBlocksResponse) GetPreparedBlocks() []*PreparedBlock {
@@ -3207,7 +3462,7 @@ type PreparedBlock struct {
 
 func (x *PreparedBlock) Reset() {
 	*x = PreparedBlock{}
-	mi := &file_public_proto_msgTypes[48]
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[52]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3219,7 +3474,7 @@ func (x *PreparedBlock) String() string {
 func (*PreparedBlock) ProtoMessage() {}
 
 func (x *PreparedBlock) ProtoReflect() protoreflect.Message {
-	mi := &file_public_proto_msgTypes[48]
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[52]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3232,7 +3487,7 @@ func (x *PreparedBlock) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PreparedBlock.ProtoReflect.Descriptor instead.
 func (*PreparedBlock) Descriptor() ([]byte, []int) {
-	return file_public_proto_rawDescGZIP(), []int{48}
+	return file_pkg_api_v1_proto_public_proto_rawDescGZIP(), []int{52}
 }
 
 func (x *PreparedBlock) GetSlot() uint32 {
@@ -3310,7 +3565,7 @@ type BlockMetrics struct {
 
 func (x *BlockMetrics) Reset() {
 	*x = BlockMetrics{}
-	mi := &file_public_proto_msgTypes[49]
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[53]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3322,7 +3577,7 @@ func (x *BlockMetrics) String() string {
 func (*BlockMetrics) ProtoMessage() {}
 
 func (x *BlockMetrics) ProtoReflect() protoreflect.Message {
-	mi := &file_public_proto_msgTypes[49]
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[53]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3335,7 +3590,7 @@ func (x *BlockMetrics) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BlockMetrics.ProtoReflect.Descriptor instead.
 func (*BlockMetrics) Descriptor() ([]byte, []int) {
-	return file_public_proto_rawDescGZIP(), []int{49}
+	return file_pkg_api_v1_proto_public_proto_rawDescGZIP(), []int{53}
 }
 
 func (x *BlockMetrics) GetVersion() string {
@@ -3375,7 +3630,7 @@ type ExecutionPayloadMetrics struct {
 
 func (x *ExecutionPayloadMetrics) Reset() {
 	*x = ExecutionPayloadMetrics{}
-	mi := &file_public_proto_msgTypes[50]
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[54]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3387,7 +3642,7 @@ func (x *ExecutionPayloadMetrics) String() string {
 func (*ExecutionPayloadMetrics) ProtoMessage() {}
 
 func (x *ExecutionPayloadMetrics) ProtoReflect() protoreflect.Message {
-	mi := &file_public_proto_msgTypes[50]
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[54]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3400,7 +3655,7 @@ func (x *ExecutionPayloadMetrics) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ExecutionPayloadMetrics.ProtoReflect.Descriptor instead.
 func (*ExecutionPayloadMetrics) Descriptor() ([]byte, []int) {
-	return file_public_proto_rawDescGZIP(), []int{50}
+	return file_pkg_api_v1_proto_public_proto_rawDescGZIP(), []int{54}
 }
 
 func (x *ExecutionPayloadMetrics) GetValueWei() uint64 {
@@ -3466,7 +3721,7 @@ type PreparedBlockFilterMetadata struct {
 
 func (x *PreparedBlockFilterMetadata) Reset() {
 	*x = PreparedBlockFilterMetadata{}
-	mi := &file_public_proto_msgTypes[51]
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[55]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3478,7 +3733,7 @@ func (x *PreparedBlockFilterMetadata) String() string {
 func (*PreparedBlockFilterMetadata) ProtoMessage() {}
 
 func (x *PreparedBlockFilterMetadata) ProtoReflect() protoreflect.Message {
-	mi := &file_public_proto_msgTypes[51]
+	mi := &file_pkg_api_v1_proto_public_proto_msgTypes[55]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3491,7 +3746,7 @@ func (x *PreparedBlockFilterMetadata) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PreparedBlockFilterMetadata.ProtoReflect.Descriptor instead.
 func (*PreparedBlockFilterMetadata) Descriptor() ([]byte, []int) {
-	return file_public_proto_rawDescGZIP(), []int{51}
+	return file_pkg_api_v1_proto_public_proto_rawDescGZIP(), []int{55}
 }
 
 func (x *PreparedBlockFilterMetadata) GetNetwork() string {
@@ -3529,11 +3784,11 @@ func (x *PreparedBlockFilterMetadata) GetOrderBy() string {
 	return ""
 }
 
-var File_public_proto protoreflect.FileDescriptor
+var File_pkg_api_v1_proto_public_proto protoreflect.FileDescriptor
 
-const file_public_proto_rawDesc = "" +
+const file_pkg_api_v1_proto_public_proto_rawDesc = "" +
 	"\n" +
-	"\fpublic.proto\x12\x06api.v1\x1a\x1cgoogle/protobuf/struct.proto\"\xa5\x01\n" +
+	"\x1dpkg/api/v1/proto/public.proto\x12\x06api.v1\x1a\x1cgoogle/protobuf/struct.proto\"\xa5\x01\n" +
 	"\x11ListNodesResponse\x12\"\n" +
 	"\x05nodes\x18\x01 \x03(\v2\f.api.v1.NodeR\x05nodes\x12:\n" +
 	"\n" +
@@ -3580,7 +3835,15 @@ const file_public_proto_rawDesc = "" +
 	"\border_by\x18\x03 \x01(\tR\aorderBy\x1aA\n" +
 	"\x13AppliedFiltersEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"s\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\x86\x01\n" +
+	"\x1eStateExpiryAccessTotalResponse\x122\n" +
+	"\x04item\x18\x01 \x01(\v2\x1e.api.v1.StateExpiryAccessTotalR\x04item\x120\n" +
+	"\afilters\x18\x02 \x01(\v2\x16.api.v1.FilterMetadataR\afilters\"\xc0\x01\n" +
+	"\x16StateExpiryAccessTotal\x12%\n" +
+	"\x0etotal_accounts\x18\x01 \x01(\x04R\rtotalAccounts\x12)\n" +
+	"\x10expired_accounts\x18\x02 \x01(\x04R\x0fexpiredAccounts\x12'\n" +
+	"\x0ftotal_contracts\x18\x03 \x01(\x04R\x0etotalContracts\x12+\n" +
+	"\x11expired_contracts\x18\x04 \x01(\x04R\x10expiredContracts\"s\n" +
 	"\aNetwork\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12\x16\n" +
 	"\x06status\x18\x02 \x01(\tR\x06status\x12\x19\n" +
@@ -3600,7 +3863,17 @@ const file_public_proto_rawDesc = "" +
 	"\x18StateExpiryAccessHistory\x127\n" +
 	"\x18chunk_start_block_number\x18\x01 \x01(\rR\x15chunkStartBlockNumber\x126\n" +
 	"\x17first_accessed_accounts\x18\x02 \x01(\rR\x15firstAccessedAccounts\x124\n" +
-	"\x16last_accessed_accounts\x18\x03 \x01(\rR\x14lastAccessedAccounts\"\xc0\x01\n" +
+	"\x16last_accessed_accounts\x18\x03 \x01(\rR\x14lastAccessedAccounts\"\xca\x01\n" +
+	"!StateExpiryStorageHistoryResponse\x127\n" +
+	"\x05items\x18\x01 \x03(\v2!.api.v1.StateExpiryStorageHistoryR\x05items\x12:\n" +
+	"\n" +
+	"pagination\x18\x02 \x01(\v2\x1a.api.v1.PaginationMetadataR\n" +
+	"pagination\x120\n" +
+	"\afilters\x18\x03 \x01(\v2\x16.api.v1.FilterMetadataR\afilters\"\xb6\x01\n" +
+	"\x19StateExpiryStorageHistory\x127\n" +
+	"\x18chunk_start_block_number\x18\x01 \x01(\rR\x15chunkStartBlockNumber\x120\n" +
+	"\x14first_accessed_slots\x18\x02 \x01(\rR\x12firstAccessedSlots\x12.\n" +
+	"\x13last_accessed_slots\x18\x03 \x01(\rR\x11lastAccessedSlots\"\xc0\x01\n" +
 	"\x1eListBeaconSlotMevRelayResponse\x120\n" +
 	"\x06relays\x18\x01 \x03(\v2\x18.api.v1.MevRelayBidCountR\x06relays\x12:\n" +
 	"\n" +
@@ -3855,19 +4128,19 @@ const file_public_proto_rawDesc = "" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01B5Z3github.com/ethpandaops/lab/backend/pkg/api/v1/protob\x06proto3"
 
 var (
-	file_public_proto_rawDescOnce sync.Once
-	file_public_proto_rawDescData []byte
+	file_pkg_api_v1_proto_public_proto_rawDescOnce sync.Once
+	file_pkg_api_v1_proto_public_proto_rawDescData []byte
 )
 
-func file_public_proto_rawDescGZIP() []byte {
-	file_public_proto_rawDescOnce.Do(func() {
-		file_public_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_public_proto_rawDesc), len(file_public_proto_rawDesc)))
+func file_pkg_api_v1_proto_public_proto_rawDescGZIP() []byte {
+	file_pkg_api_v1_proto_public_proto_rawDescOnce.Do(func() {
+		file_pkg_api_v1_proto_public_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_pkg_api_v1_proto_public_proto_rawDesc), len(file_pkg_api_v1_proto_public_proto_rawDesc)))
 	})
-	return file_public_proto_rawDescData
+	return file_pkg_api_v1_proto_public_proto_rawDescData
 }
 
-var file_public_proto_msgTypes = make([]protoimpl.MessageInfo, 57)
-var file_public_proto_goTypes = []any{
+var file_pkg_api_v1_proto_public_proto_msgTypes = make([]protoimpl.MessageInfo, 61)
+var file_pkg_api_v1_proto_public_proto_goTypes = []any{
 	(*ListNodesResponse)(nil),                            // 0: api.v1.ListNodesResponse
 	(*ListNetworksResponse)(nil),                         // 1: api.v1.ListNetworksResponse
 	(*Node)(nil),                                         // 2: api.v1.Node
@@ -3876,157 +4149,166 @@ var file_public_proto_goTypes = []any{
 	(*ConsensusInfo)(nil),                                // 5: api.v1.ConsensusInfo
 	(*PaginationMetadata)(nil),                           // 6: api.v1.PaginationMetadata
 	(*FilterMetadata)(nil),                               // 7: api.v1.FilterMetadata
-	(*Network)(nil),                                      // 8: api.v1.Network
-	(*NetworkFilterMetadata)(nil),                        // 9: api.v1.NetworkFilterMetadata
-	(*StateExpiryAccessHistoryResponse)(nil),             // 10: api.v1.StateExpiryAccessHistoryResponse
-	(*StateExpiryAccessHistory)(nil),                     // 11: api.v1.StateExpiryAccessHistory
-	(*ListBeaconSlotMevRelayResponse)(nil),               // 12: api.v1.ListBeaconSlotMevRelayResponse
-	(*MevRelayBidCount)(nil),                             // 13: api.v1.MevRelayBidCount
-	(*ListBeaconSlotMevBuilderCountResponse)(nil),        // 14: api.v1.ListBeaconSlotMevBuilderCountResponse
-	(*MevBuilderBidCount)(nil),                           // 15: api.v1.MevBuilderBidCount
-	(*ListBeaconSlotMevResponse)(nil),                    // 16: api.v1.ListBeaconSlotMevResponse
-	(*MevBlock)(nil),                                     // 17: api.v1.MevBlock
-	(*ListBeaconSlotMevBuilderResponse)(nil),             // 18: api.v1.ListBeaconSlotMevBuilderResponse
-	(*MevBuilderBid)(nil),                                // 19: api.v1.MevBuilderBid
-	(*ErrorResponse)(nil),                                // 20: api.v1.ErrorResponse
-	(*GetConfigResponse)(nil),                            // 21: api.v1.GetConfigResponse
-	(*FrontendConfig)(nil),                               // 22: api.v1.FrontendConfig
-	(*EthereumConfig)(nil),                               // 23: api.v1.EthereumConfig
-	(*NetworkConfig)(nil),                                // 24: api.v1.NetworkConfig
-	(*ForkConfig)(nil),                                   // 25: api.v1.ForkConfig
-	(*ConsensusForks)(nil),                               // 26: api.v1.ConsensusForks
-	(*ForkInfo)(nil),                                     // 27: api.v1.ForkInfo
-	(*ExperimentsConfig)(nil),                            // 28: api.v1.ExperimentsConfig
-	(*ExperimentConfig)(nil),                             // 29: api.v1.ExperimentConfig
-	(*ExperimentDataAvailability)(nil),                   // 30: api.v1.ExperimentDataAvailability
-	(*GetExperimentConfigRequest)(nil),                   // 31: api.v1.GetExperimentConfigRequest
-	(*GetExperimentConfigResponse)(nil),                  // 32: api.v1.GetExperimentConfigResponse
-	(*ListBeaconSlotBlockTimingResponse)(nil),            // 33: api.v1.ListBeaconSlotBlockTimingResponse
-	(*BlockTimingNode)(nil),                              // 34: api.v1.BlockTimingNode
-	(*ListBeaconSlotBlobTimingResponse)(nil),             // 35: api.v1.ListBeaconSlotBlobTimingResponse
-	(*BlobTimingNode)(nil),                               // 36: api.v1.BlobTimingNode
-	(*ListBeaconSlotAttestationTimingResponse)(nil),      // 37: api.v1.ListBeaconSlotAttestationTimingResponse
-	(*AttestationTimingChunk)(nil),                       // 38: api.v1.AttestationTimingChunk
-	(*ListBeaconSlotAttestationCorrectnessResponse)(nil), // 39: api.v1.ListBeaconSlotAttestationCorrectnessResponse
-	(*AttestationCorrectness)(nil),                       // 40: api.v1.AttestationCorrectness
-	(*ListBeaconSlotBlobTotalResponse)(nil),              // 41: api.v1.ListBeaconSlotBlobTotalResponse
-	(*BlobTotal)(nil),                                    // 42: api.v1.BlobTotal
-	(*ListBeaconSlotBlockResponse)(nil),                  // 43: api.v1.ListBeaconSlotBlockResponse
-	(*BeaconBlock)(nil),                                  // 44: api.v1.BeaconBlock
-	(*ListBeaconSlotProposerEntityResponse)(nil),         // 45: api.v1.ListBeaconSlotProposerEntityResponse
-	(*ProposerEntity)(nil),                               // 46: api.v1.ProposerEntity
-	(*ListPreparedBlocksResponse)(nil),                   // 47: api.v1.ListPreparedBlocksResponse
-	(*PreparedBlock)(nil),                                // 48: api.v1.PreparedBlock
-	(*BlockMetrics)(nil),                                 // 49: api.v1.BlockMetrics
-	(*ExecutionPayloadMetrics)(nil),                      // 50: api.v1.ExecutionPayloadMetrics
-	(*PreparedBlockFilterMetadata)(nil),                  // 51: api.v1.PreparedBlockFilterMetadata
-	nil,                                                  // 52: api.v1.FilterMetadata.AppliedFiltersEntry
-	nil,                                                  // 53: api.v1.EthereumConfig.NetworksEntry
-	nil,                                                  // 54: api.v1.ForkInfo.MinClientVersionsEntry
-	nil,                                                  // 55: api.v1.ExperimentConfig.DataAvailabilityEntry
-	nil,                                                  // 56: api.v1.PreparedBlockFilterMetadata.AppliedFiltersEntry
-	(*structpb.Struct)(nil),                              // 57: google.protobuf.Struct
+	(*StateExpiryAccessTotalResponse)(nil),               // 8: api.v1.StateExpiryAccessTotalResponse
+	(*StateExpiryAccessTotal)(nil),                       // 9: api.v1.StateExpiryAccessTotal
+	(*Network)(nil),                                      // 10: api.v1.Network
+	(*NetworkFilterMetadata)(nil),                        // 11: api.v1.NetworkFilterMetadata
+	(*StateExpiryAccessHistoryResponse)(nil),             // 12: api.v1.StateExpiryAccessHistoryResponse
+	(*StateExpiryAccessHistory)(nil),                     // 13: api.v1.StateExpiryAccessHistory
+	(*StateExpiryStorageHistoryResponse)(nil),            // 14: api.v1.StateExpiryStorageHistoryResponse
+	(*StateExpiryStorageHistory)(nil),                    // 15: api.v1.StateExpiryStorageHistory
+	(*ListBeaconSlotMevRelayResponse)(nil),               // 16: api.v1.ListBeaconSlotMevRelayResponse
+	(*MevRelayBidCount)(nil),                             // 17: api.v1.MevRelayBidCount
+	(*ListBeaconSlotMevBuilderCountResponse)(nil),        // 18: api.v1.ListBeaconSlotMevBuilderCountResponse
+	(*MevBuilderBidCount)(nil),                           // 19: api.v1.MevBuilderBidCount
+	(*ListBeaconSlotMevResponse)(nil),                    // 20: api.v1.ListBeaconSlotMevResponse
+	(*MevBlock)(nil),                                     // 21: api.v1.MevBlock
+	(*ListBeaconSlotMevBuilderResponse)(nil),             // 22: api.v1.ListBeaconSlotMevBuilderResponse
+	(*MevBuilderBid)(nil),                                // 23: api.v1.MevBuilderBid
+	(*ErrorResponse)(nil),                                // 24: api.v1.ErrorResponse
+	(*GetConfigResponse)(nil),                            // 25: api.v1.GetConfigResponse
+	(*FrontendConfig)(nil),                               // 26: api.v1.FrontendConfig
+	(*EthereumConfig)(nil),                               // 27: api.v1.EthereumConfig
+	(*NetworkConfig)(nil),                                // 28: api.v1.NetworkConfig
+	(*ForkConfig)(nil),                                   // 29: api.v1.ForkConfig
+	(*ConsensusForks)(nil),                               // 30: api.v1.ConsensusForks
+	(*ForkInfo)(nil),                                     // 31: api.v1.ForkInfo
+	(*ExperimentsConfig)(nil),                            // 32: api.v1.ExperimentsConfig
+	(*ExperimentConfig)(nil),                             // 33: api.v1.ExperimentConfig
+	(*ExperimentDataAvailability)(nil),                   // 34: api.v1.ExperimentDataAvailability
+	(*GetExperimentConfigRequest)(nil),                   // 35: api.v1.GetExperimentConfigRequest
+	(*GetExperimentConfigResponse)(nil),                  // 36: api.v1.GetExperimentConfigResponse
+	(*ListBeaconSlotBlockTimingResponse)(nil),            // 37: api.v1.ListBeaconSlotBlockTimingResponse
+	(*BlockTimingNode)(nil),                              // 38: api.v1.BlockTimingNode
+	(*ListBeaconSlotBlobTimingResponse)(nil),             // 39: api.v1.ListBeaconSlotBlobTimingResponse
+	(*BlobTimingNode)(nil),                               // 40: api.v1.BlobTimingNode
+	(*ListBeaconSlotAttestationTimingResponse)(nil),      // 41: api.v1.ListBeaconSlotAttestationTimingResponse
+	(*AttestationTimingChunk)(nil),                       // 42: api.v1.AttestationTimingChunk
+	(*ListBeaconSlotAttestationCorrectnessResponse)(nil), // 43: api.v1.ListBeaconSlotAttestationCorrectnessResponse
+	(*AttestationCorrectness)(nil),                       // 44: api.v1.AttestationCorrectness
+	(*ListBeaconSlotBlobTotalResponse)(nil),              // 45: api.v1.ListBeaconSlotBlobTotalResponse
+	(*BlobTotal)(nil),                                    // 46: api.v1.BlobTotal
+	(*ListBeaconSlotBlockResponse)(nil),                  // 47: api.v1.ListBeaconSlotBlockResponse
+	(*BeaconBlock)(nil),                                  // 48: api.v1.BeaconBlock
+	(*ListBeaconSlotProposerEntityResponse)(nil),         // 49: api.v1.ListBeaconSlotProposerEntityResponse
+	(*ProposerEntity)(nil),                               // 50: api.v1.ProposerEntity
+	(*ListPreparedBlocksResponse)(nil),                   // 51: api.v1.ListPreparedBlocksResponse
+	(*PreparedBlock)(nil),                                // 52: api.v1.PreparedBlock
+	(*BlockMetrics)(nil),                                 // 53: api.v1.BlockMetrics
+	(*ExecutionPayloadMetrics)(nil),                      // 54: api.v1.ExecutionPayloadMetrics
+	(*PreparedBlockFilterMetadata)(nil),                  // 55: api.v1.PreparedBlockFilterMetadata
+	nil,                                                  // 56: api.v1.FilterMetadata.AppliedFiltersEntry
+	nil,                                                  // 57: api.v1.EthereumConfig.NetworksEntry
+	nil,                                                  // 58: api.v1.ForkInfo.MinClientVersionsEntry
+	nil,                                                  // 59: api.v1.ExperimentConfig.DataAvailabilityEntry
+	nil,                                                  // 60: api.v1.PreparedBlockFilterMetadata.AppliedFiltersEntry
+	(*structpb.Struct)(nil),                              // 61: google.protobuf.Struct
 }
-var file_public_proto_depIdxs = []int32{
+var file_pkg_api_v1_proto_public_proto_depIdxs = []int32{
 	2,  // 0: api.v1.ListNodesResponse.nodes:type_name -> api.v1.Node
 	6,  // 1: api.v1.ListNodesResponse.pagination:type_name -> api.v1.PaginationMetadata
 	7,  // 2: api.v1.ListNodesResponse.filters:type_name -> api.v1.FilterMetadata
-	8,  // 3: api.v1.ListNetworksResponse.networks:type_name -> api.v1.Network
-	9,  // 4: api.v1.ListNetworksResponse.filters:type_name -> api.v1.NetworkFilterMetadata
+	10, // 3: api.v1.ListNetworksResponse.networks:type_name -> api.v1.Network
+	11, // 4: api.v1.ListNetworksResponse.filters:type_name -> api.v1.NetworkFilterMetadata
 	3,  // 5: api.v1.Node.client:type_name -> api.v1.ClientInfo
 	4,  // 6: api.v1.Node.geo:type_name -> api.v1.GeoInfo
 	5,  // 7: api.v1.Node.consensus:type_name -> api.v1.ConsensusInfo
-	52, // 8: api.v1.FilterMetadata.applied_filters:type_name -> api.v1.FilterMetadata.AppliedFiltersEntry
-	11, // 9: api.v1.StateExpiryAccessHistoryResponse.items:type_name -> api.v1.StateExpiryAccessHistory
-	6,  // 10: api.v1.StateExpiryAccessHistoryResponse.pagination:type_name -> api.v1.PaginationMetadata
-	7,  // 11: api.v1.StateExpiryAccessHistoryResponse.filters:type_name -> api.v1.FilterMetadata
-	13, // 12: api.v1.ListBeaconSlotMevRelayResponse.relays:type_name -> api.v1.MevRelayBidCount
-	6,  // 13: api.v1.ListBeaconSlotMevRelayResponse.pagination:type_name -> api.v1.PaginationMetadata
-	7,  // 14: api.v1.ListBeaconSlotMevRelayResponse.filters:type_name -> api.v1.FilterMetadata
-	15, // 15: api.v1.ListBeaconSlotMevBuilderCountResponse.builders:type_name -> api.v1.MevBuilderBidCount
-	6,  // 16: api.v1.ListBeaconSlotMevBuilderCountResponse.pagination:type_name -> api.v1.PaginationMetadata
-	7,  // 17: api.v1.ListBeaconSlotMevBuilderCountResponse.filters:type_name -> api.v1.FilterMetadata
-	17, // 18: api.v1.ListBeaconSlotMevResponse.blocks:type_name -> api.v1.MevBlock
-	6,  // 19: api.v1.ListBeaconSlotMevResponse.pagination:type_name -> api.v1.PaginationMetadata
-	7,  // 20: api.v1.ListBeaconSlotMevResponse.filters:type_name -> api.v1.FilterMetadata
-	19, // 21: api.v1.ListBeaconSlotMevBuilderResponse.builders:type_name -> api.v1.MevBuilderBid
-	6,  // 22: api.v1.ListBeaconSlotMevBuilderResponse.pagination:type_name -> api.v1.PaginationMetadata
-	7,  // 23: api.v1.ListBeaconSlotMevBuilderResponse.filters:type_name -> api.v1.FilterMetadata
-	22, // 24: api.v1.GetConfigResponse.config:type_name -> api.v1.FrontendConfig
-	23, // 25: api.v1.FrontendConfig.ethereum:type_name -> api.v1.EthereumConfig
-	29, // 26: api.v1.FrontendConfig.experiments:type_name -> api.v1.ExperimentConfig
-	53, // 27: api.v1.EthereumConfig.networks:type_name -> api.v1.EthereumConfig.NetworksEntry
-	25, // 28: api.v1.NetworkConfig.forks:type_name -> api.v1.ForkConfig
-	26, // 29: api.v1.ForkConfig.consensus:type_name -> api.v1.ConsensusForks
-	27, // 30: api.v1.ConsensusForks.electra:type_name -> api.v1.ForkInfo
-	27, // 31: api.v1.ConsensusForks.fusaka:type_name -> api.v1.ForkInfo
-	54, // 32: api.v1.ForkInfo.min_client_versions:type_name -> api.v1.ForkInfo.MinClientVersionsEntry
-	29, // 33: api.v1.ExperimentsConfig.experiments:type_name -> api.v1.ExperimentConfig
-	57, // 34: api.v1.ExperimentConfig.config:type_name -> google.protobuf.Struct
-	55, // 35: api.v1.ExperimentConfig.data_availability:type_name -> api.v1.ExperimentConfig.DataAvailabilityEntry
-	29, // 36: api.v1.GetExperimentConfigResponse.experiment:type_name -> api.v1.ExperimentConfig
-	34, // 37: api.v1.ListBeaconSlotBlockTimingResponse.nodes:type_name -> api.v1.BlockTimingNode
-	6,  // 38: api.v1.ListBeaconSlotBlockTimingResponse.pagination:type_name -> api.v1.PaginationMetadata
-	7,  // 39: api.v1.ListBeaconSlotBlockTimingResponse.filters:type_name -> api.v1.FilterMetadata
-	4,  // 40: api.v1.BlockTimingNode.geo:type_name -> api.v1.GeoInfo
-	3,  // 41: api.v1.BlockTimingNode.client:type_name -> api.v1.ClientInfo
-	36, // 42: api.v1.ListBeaconSlotBlobTimingResponse.nodes:type_name -> api.v1.BlobTimingNode
-	6,  // 43: api.v1.ListBeaconSlotBlobTimingResponse.pagination:type_name -> api.v1.PaginationMetadata
-	7,  // 44: api.v1.ListBeaconSlotBlobTimingResponse.filters:type_name -> api.v1.FilterMetadata
-	4,  // 45: api.v1.BlobTimingNode.geo:type_name -> api.v1.GeoInfo
-	3,  // 46: api.v1.BlobTimingNode.client:type_name -> api.v1.ClientInfo
-	38, // 47: api.v1.ListBeaconSlotAttestationTimingResponse.chunks:type_name -> api.v1.AttestationTimingChunk
-	6,  // 48: api.v1.ListBeaconSlotAttestationTimingResponse.pagination:type_name -> api.v1.PaginationMetadata
-	7,  // 49: api.v1.ListBeaconSlotAttestationTimingResponse.filters:type_name -> api.v1.FilterMetadata
-	40, // 50: api.v1.ListBeaconSlotAttestationCorrectnessResponse.blocks:type_name -> api.v1.AttestationCorrectness
-	7,  // 51: api.v1.ListBeaconSlotAttestationCorrectnessResponse.filters:type_name -> api.v1.FilterMetadata
-	42, // 52: api.v1.ListBeaconSlotBlobTotalResponse.blocks:type_name -> api.v1.BlobTotal
-	7,  // 53: api.v1.ListBeaconSlotBlobTotalResponse.filters:type_name -> api.v1.FilterMetadata
-	44, // 54: api.v1.ListBeaconSlotBlockResponse.blocks:type_name -> api.v1.BeaconBlock
-	6,  // 55: api.v1.ListBeaconSlotBlockResponse.pagination:type_name -> api.v1.PaginationMetadata
-	7,  // 56: api.v1.ListBeaconSlotBlockResponse.filters:type_name -> api.v1.FilterMetadata
-	46, // 57: api.v1.ListBeaconSlotProposerEntityResponse.entities:type_name -> api.v1.ProposerEntity
-	6,  // 58: api.v1.ListBeaconSlotProposerEntityResponse.pagination:type_name -> api.v1.PaginationMetadata
-	7,  // 59: api.v1.ListBeaconSlotProposerEntityResponse.filters:type_name -> api.v1.FilterMetadata
-	48, // 60: api.v1.ListPreparedBlocksResponse.prepared_blocks:type_name -> api.v1.PreparedBlock
-	6,  // 61: api.v1.ListPreparedBlocksResponse.pagination:type_name -> api.v1.PaginationMetadata
-	51, // 62: api.v1.ListPreparedBlocksResponse.filters:type_name -> api.v1.PreparedBlockFilterMetadata
-	3,  // 63: api.v1.PreparedBlock.client:type_name -> api.v1.ClientInfo
-	5,  // 64: api.v1.PreparedBlock.consensus:type_name -> api.v1.ConsensusInfo
-	4,  // 65: api.v1.PreparedBlock.geo:type_name -> api.v1.GeoInfo
-	49, // 66: api.v1.PreparedBlock.block_metrics:type_name -> api.v1.BlockMetrics
-	50, // 67: api.v1.PreparedBlock.execution_metrics:type_name -> api.v1.ExecutionPayloadMetrics
-	56, // 68: api.v1.PreparedBlockFilterMetadata.applied_filters:type_name -> api.v1.PreparedBlockFilterMetadata.AppliedFiltersEntry
-	24, // 69: api.v1.EthereumConfig.NetworksEntry.value:type_name -> api.v1.NetworkConfig
-	30, // 70: api.v1.ExperimentConfig.DataAvailabilityEntry.value:type_name -> api.v1.ExperimentDataAvailability
-	71, // [71:71] is the sub-list for method output_type
-	71, // [71:71] is the sub-list for method input_type
-	71, // [71:71] is the sub-list for extension type_name
-	71, // [71:71] is the sub-list for extension extendee
-	0,  // [0:71] is the sub-list for field type_name
+	56, // 8: api.v1.FilterMetadata.applied_filters:type_name -> api.v1.FilterMetadata.AppliedFiltersEntry
+	9,  // 9: api.v1.StateExpiryAccessTotalResponse.item:type_name -> api.v1.StateExpiryAccessTotal
+	7,  // 10: api.v1.StateExpiryAccessTotalResponse.filters:type_name -> api.v1.FilterMetadata
+	13, // 11: api.v1.StateExpiryAccessHistoryResponse.items:type_name -> api.v1.StateExpiryAccessHistory
+	6,  // 12: api.v1.StateExpiryAccessHistoryResponse.pagination:type_name -> api.v1.PaginationMetadata
+	7,  // 13: api.v1.StateExpiryAccessHistoryResponse.filters:type_name -> api.v1.FilterMetadata
+	15, // 14: api.v1.StateExpiryStorageHistoryResponse.items:type_name -> api.v1.StateExpiryStorageHistory
+	6,  // 15: api.v1.StateExpiryStorageHistoryResponse.pagination:type_name -> api.v1.PaginationMetadata
+	7,  // 16: api.v1.StateExpiryStorageHistoryResponse.filters:type_name -> api.v1.FilterMetadata
+	17, // 17: api.v1.ListBeaconSlotMevRelayResponse.relays:type_name -> api.v1.MevRelayBidCount
+	6,  // 18: api.v1.ListBeaconSlotMevRelayResponse.pagination:type_name -> api.v1.PaginationMetadata
+	7,  // 19: api.v1.ListBeaconSlotMevRelayResponse.filters:type_name -> api.v1.FilterMetadata
+	19, // 20: api.v1.ListBeaconSlotMevBuilderCountResponse.builders:type_name -> api.v1.MevBuilderBidCount
+	6,  // 21: api.v1.ListBeaconSlotMevBuilderCountResponse.pagination:type_name -> api.v1.PaginationMetadata
+	7,  // 22: api.v1.ListBeaconSlotMevBuilderCountResponse.filters:type_name -> api.v1.FilterMetadata
+	21, // 23: api.v1.ListBeaconSlotMevResponse.blocks:type_name -> api.v1.MevBlock
+	6,  // 24: api.v1.ListBeaconSlotMevResponse.pagination:type_name -> api.v1.PaginationMetadata
+	7,  // 25: api.v1.ListBeaconSlotMevResponse.filters:type_name -> api.v1.FilterMetadata
+	23, // 26: api.v1.ListBeaconSlotMevBuilderResponse.builders:type_name -> api.v1.MevBuilderBid
+	6,  // 27: api.v1.ListBeaconSlotMevBuilderResponse.pagination:type_name -> api.v1.PaginationMetadata
+	7,  // 28: api.v1.ListBeaconSlotMevBuilderResponse.filters:type_name -> api.v1.FilterMetadata
+	26, // 29: api.v1.GetConfigResponse.config:type_name -> api.v1.FrontendConfig
+	27, // 30: api.v1.FrontendConfig.ethereum:type_name -> api.v1.EthereumConfig
+	33, // 31: api.v1.FrontendConfig.experiments:type_name -> api.v1.ExperimentConfig
+	57, // 32: api.v1.EthereumConfig.networks:type_name -> api.v1.EthereumConfig.NetworksEntry
+	29, // 33: api.v1.NetworkConfig.forks:type_name -> api.v1.ForkConfig
+	30, // 34: api.v1.ForkConfig.consensus:type_name -> api.v1.ConsensusForks
+	31, // 35: api.v1.ConsensusForks.electra:type_name -> api.v1.ForkInfo
+	31, // 36: api.v1.ConsensusForks.fusaka:type_name -> api.v1.ForkInfo
+	58, // 37: api.v1.ForkInfo.min_client_versions:type_name -> api.v1.ForkInfo.MinClientVersionsEntry
+	33, // 38: api.v1.ExperimentsConfig.experiments:type_name -> api.v1.ExperimentConfig
+	61, // 39: api.v1.ExperimentConfig.config:type_name -> google.protobuf.Struct
+	59, // 40: api.v1.ExperimentConfig.data_availability:type_name -> api.v1.ExperimentConfig.DataAvailabilityEntry
+	33, // 41: api.v1.GetExperimentConfigResponse.experiment:type_name -> api.v1.ExperimentConfig
+	38, // 42: api.v1.ListBeaconSlotBlockTimingResponse.nodes:type_name -> api.v1.BlockTimingNode
+	6,  // 43: api.v1.ListBeaconSlotBlockTimingResponse.pagination:type_name -> api.v1.PaginationMetadata
+	7,  // 44: api.v1.ListBeaconSlotBlockTimingResponse.filters:type_name -> api.v1.FilterMetadata
+	4,  // 45: api.v1.BlockTimingNode.geo:type_name -> api.v1.GeoInfo
+	3,  // 46: api.v1.BlockTimingNode.client:type_name -> api.v1.ClientInfo
+	40, // 47: api.v1.ListBeaconSlotBlobTimingResponse.nodes:type_name -> api.v1.BlobTimingNode
+	6,  // 48: api.v1.ListBeaconSlotBlobTimingResponse.pagination:type_name -> api.v1.PaginationMetadata
+	7,  // 49: api.v1.ListBeaconSlotBlobTimingResponse.filters:type_name -> api.v1.FilterMetadata
+	4,  // 50: api.v1.BlobTimingNode.geo:type_name -> api.v1.GeoInfo
+	3,  // 51: api.v1.BlobTimingNode.client:type_name -> api.v1.ClientInfo
+	42, // 52: api.v1.ListBeaconSlotAttestationTimingResponse.chunks:type_name -> api.v1.AttestationTimingChunk
+	6,  // 53: api.v1.ListBeaconSlotAttestationTimingResponse.pagination:type_name -> api.v1.PaginationMetadata
+	7,  // 54: api.v1.ListBeaconSlotAttestationTimingResponse.filters:type_name -> api.v1.FilterMetadata
+	44, // 55: api.v1.ListBeaconSlotAttestationCorrectnessResponse.blocks:type_name -> api.v1.AttestationCorrectness
+	7,  // 56: api.v1.ListBeaconSlotAttestationCorrectnessResponse.filters:type_name -> api.v1.FilterMetadata
+	46, // 57: api.v1.ListBeaconSlotBlobTotalResponse.blocks:type_name -> api.v1.BlobTotal
+	7,  // 58: api.v1.ListBeaconSlotBlobTotalResponse.filters:type_name -> api.v1.FilterMetadata
+	48, // 59: api.v1.ListBeaconSlotBlockResponse.blocks:type_name -> api.v1.BeaconBlock
+	6,  // 60: api.v1.ListBeaconSlotBlockResponse.pagination:type_name -> api.v1.PaginationMetadata
+	7,  // 61: api.v1.ListBeaconSlotBlockResponse.filters:type_name -> api.v1.FilterMetadata
+	50, // 62: api.v1.ListBeaconSlotProposerEntityResponse.entities:type_name -> api.v1.ProposerEntity
+	6,  // 63: api.v1.ListBeaconSlotProposerEntityResponse.pagination:type_name -> api.v1.PaginationMetadata
+	7,  // 64: api.v1.ListBeaconSlotProposerEntityResponse.filters:type_name -> api.v1.FilterMetadata
+	52, // 65: api.v1.ListPreparedBlocksResponse.prepared_blocks:type_name -> api.v1.PreparedBlock
+	6,  // 66: api.v1.ListPreparedBlocksResponse.pagination:type_name -> api.v1.PaginationMetadata
+	55, // 67: api.v1.ListPreparedBlocksResponse.filters:type_name -> api.v1.PreparedBlockFilterMetadata
+	3,  // 68: api.v1.PreparedBlock.client:type_name -> api.v1.ClientInfo
+	5,  // 69: api.v1.PreparedBlock.consensus:type_name -> api.v1.ConsensusInfo
+	4,  // 70: api.v1.PreparedBlock.geo:type_name -> api.v1.GeoInfo
+	53, // 71: api.v1.PreparedBlock.block_metrics:type_name -> api.v1.BlockMetrics
+	54, // 72: api.v1.PreparedBlock.execution_metrics:type_name -> api.v1.ExecutionPayloadMetrics
+	60, // 73: api.v1.PreparedBlockFilterMetadata.applied_filters:type_name -> api.v1.PreparedBlockFilterMetadata.AppliedFiltersEntry
+	28, // 74: api.v1.EthereumConfig.NetworksEntry.value:type_name -> api.v1.NetworkConfig
+	34, // 75: api.v1.ExperimentConfig.DataAvailabilityEntry.value:type_name -> api.v1.ExperimentDataAvailability
+	76, // [76:76] is the sub-list for method output_type
+	76, // [76:76] is the sub-list for method input_type
+	76, // [76:76] is the sub-list for extension type_name
+	76, // [76:76] is the sub-list for extension extendee
+	0,  // [0:76] is the sub-list for field type_name
 }
 
-func init() { file_public_proto_init() }
-func file_public_proto_init() {
-	if File_public_proto != nil {
+func init() { file_pkg_api_v1_proto_public_proto_init() }
+func file_pkg_api_v1_proto_public_proto_init() {
+	if File_pkg_api_v1_proto_public_proto != nil {
 		return
 	}
-	file_public_proto_msgTypes[4].OneofWrappers = []any{}
+	file_pkg_api_v1_proto_public_proto_msgTypes[4].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_public_proto_rawDesc), len(file_public_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_pkg_api_v1_proto_public_proto_rawDesc), len(file_pkg_api_v1_proto_public_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   57,
+			NumMessages:   61,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
-		GoTypes:           file_public_proto_goTypes,
-		DependencyIndexes: file_public_proto_depIdxs,
-		MessageInfos:      file_public_proto_msgTypes,
+		GoTypes:           file_pkg_api_v1_proto_public_proto_goTypes,
+		DependencyIndexes: file_pkg_api_v1_proto_public_proto_depIdxs,
+		MessageInfos:      file_pkg_api_v1_proto_public_proto_msgTypes,
 	}.Build()
-	File_public_proto = out.File
-	file_public_proto_goTypes = nil
-	file_public_proto_depIdxs = nil
+	File_pkg_api_v1_proto_public_proto = out.File
+	file_pkg_api_v1_proto_public_proto_goTypes = nil
+	file_pkg_api_v1_proto_public_proto_depIdxs = nil
 }

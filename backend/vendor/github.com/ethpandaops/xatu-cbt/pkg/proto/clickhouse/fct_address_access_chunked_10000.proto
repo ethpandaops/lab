@@ -1,0 +1,72 @@
+syntax = "proto3";
+
+package cbt;
+
+import "common.proto";
+
+option go_package = "github.com/ethpandaops/xatu-cbt/pkg/proto/clickhouse";
+// Address access totals chunked by 10000 blocks
+
+message FctAddressAccessChunked10000 {
+  // Timestamp when the record was last updated
+  uint32 updated_date_time = 11;
+  // Start block number of the chunk
+  uint32 chunk_start_block_number = 12;
+  // Number of accounts first accessed in the chunk
+  uint32 first_accessed_accounts = 13;
+  // Number of accounts last accessed in the chunk
+  uint32 last_accessed_accounts = 14;
+}
+
+// ListFctAddressAccessChunked10000Request is the request message for listing fct_address_access_chunked_10000 records
+message ListFctAddressAccessChunked10000Request {
+  // Filter by chunk_start_block_number (PRIMARY KEY - required)
+  UInt32Filter chunk_start_block_number = 1;
+
+  // Filter by updated_date_time (optional)
+  UInt32Filter updated_date_time = 2;
+  // Filter by first_accessed_accounts (optional)
+  UInt32Filter first_accessed_accounts = 3;
+  // Filter by last_accessed_accounts (optional)
+  UInt32Filter last_accessed_accounts = 4;
+
+  // The maximum number of fct_address_access_chunked_10000 to return.
+  // If unspecified, at most 100 items will be returned.
+  // The maximum value is 10000; values above 10000 will be coerced to 10000.
+  int32 page_size = 5;
+  // A page token, received from a previous `ListFctAddressAccessChunked10000` call.
+  // Provide this to retrieve the subsequent page.
+  string page_token = 6;
+  // The order of results. Format: comma-separated list of fields.
+  // Example: "foo,bar" or "foo desc,bar" for descending order on foo.
+  // If unspecified, results will be returned in the default order.
+  string order_by = 7;
+}
+
+// ListFctAddressAccessChunked10000Response is the response message for listing fct_address_access_chunked_10000 records
+message ListFctAddressAccessChunked10000Response {
+  // The list of fct_address_access_chunked_10000.
+  repeated FctAddressAccessChunked10000 fct_address_access_chunked_10000 = 1;
+  // A token, which can be sent as `page_token` to retrieve the next page.
+  // If this field is omitted, there are no subsequent pages.
+  string next_page_token = 2;
+}
+
+// GetFctAddressAccessChunked10000Request is the request message for getting a single fct_address_access_chunked_10000 record by primary key
+message GetFctAddressAccessChunked10000Request {
+  // Start block number of the chunk
+  uint32 chunk_start_block_number = 1; // Primary key (required)
+}
+
+// GetFctAddressAccessChunked10000Response is the response message for getting a single fct_address_access_chunked_10000 record
+message GetFctAddressAccessChunked10000Response {
+  FctAddressAccessChunked10000 item = 1;
+}
+
+// FctAddressAccessChunked10000Service provides RPC methods for querying fct_address_access_chunked_10000 data
+service FctAddressAccessChunked10000Service {
+  // List returns paginated fct_address_access_chunked_10000 records
+  rpc List(ListFctAddressAccessChunked10000Request) returns (ListFctAddressAccessChunked10000Response);
+  // Get returns a single fct_address_access_chunked_10000 record by primary key
+  rpc Get(GetFctAddressAccessChunked10000Request) returns (GetFctAddressAccessChunked10000Response);
+}

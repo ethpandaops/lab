@@ -1,0 +1,28 @@
+{
+  "nilness": {
+    "exclude_files": {
+      "external/*": "Third party code"
+    }
+  },
+  "composites": {
+    "exclude_files": {
+      "external/*": "Third party code"
+    } 
+  }, 
+  "assign": {
+    "exclude_files": {
+      "external/*": "Third party code"
+    }
+  },
+  "shadow": {
+    "exclude_files": {
+      "external/*": "Third party code"
+    }
+  },
+  "unreachable": {
+    "exclude_files": {
+      "external/*": "Third party code"
+    }
+  }
+}
+

@@ -24,6 +24,7 @@ func (r *PublicRouter) handleStateExpiryAccessHistory(w http.ResponseWriter, req
 	// 1. Validate network
 	if network == "" {
 		r.writeError(w, http.StatusBadRequest, "Network parameter is required")
+
 		return
 	}
 
@@ -34,23 +35,25 @@ func (r *PublicRouter) handleStateExpiryAccessHistory(w http.ResponseWriter, req
 	grpcReq := &cbtproto.ListFctAddressAccessChunked10000Request{}
 
 	// Apply pagination from query parameters
-	if v := queryParams.Get("page_size"); v != "" {
+	if v := queryParams.Get(QueryParamPageSize); v != "" {
 		if pageSize, err := strconv.ParseInt(v, 10, 32); err == nil {
 			if pageSize > 10000 {
 				pageSize = 10000 // Cap at maximum
 			}
+
 			grpcReq.PageSize = int32(pageSize)
 		}
 	} else {
 		// Default page size
 		grpcReq.PageSize = 10000
 	}
-	if v := queryParams.Get("page_token"); v != "" {
+
+	if v := queryParams.Get(QueryParamPageToken); v != "" {
 		grpcReq.PageToken = v
 	}
 
 	// Apply ordering if specified
-	if v := queryParams.Get("order_by"); v != "" {
+	if v := queryParams.Get(QueryParamOrderBy); v != "" {
 		grpcReq.OrderBy = v
 	} else {
 		// Default to ascending order by chunk_start_block_number
@@ -76,6 +79,7 @@ func (r *PublicRouter) handleStateExpiryAccessHistory(w http.ResponseWriter, req
 			"network": network,
 		}).Error("Failed to query address access chunked data")
 		r.handleGRPCError(w, err)
+
 		return
 	}
 
@@ -89,8 +93,9 @@ func (r *PublicRouter) handleStateExpiryAccessHistory(w http.ResponseWriter, req
 
 	// Build applied filters map for metadata
 	appliedFilters := make(map[string]string)
+
 	for k, v := range queryParams {
-		if v[0] != "" && k != "page_size" && k != "page_token" && k != "order_by" {
+		if v[0] != "" && k != QueryParamPageSize && k != QueryParamPageToken && k != QueryParamOrderBy {
 			appliedFilters[k] = v[0]
 		}
 	}
@@ -124,5 +129,198 @@ func transformCBTToAPIStateExpiryAccessHistory(cbt *cbtproto.FctAddressAccessChu
 		ChunkStartBlockNumber: cbt.ChunkStartBlockNumber,
 		FirstAccessedAccounts: cbt.FirstAccessedAccounts,
 		LastAccessedAccounts:  cbt.LastAccessedAccounts,
+	}
+}
+
+// handleStateExpiryStorageHistory handles GET /api/v1/{network}/state-expiry/storage/history
+// This endpoint returns storage slot data chunked by 10000 blocks for state expiry analysis.
+func (r *PublicRouter) handleStateExpiryStorageHistory(w http.ResponseWriter, req *http.Request) {
+	var (
+		ctx     = req.Context()
+		vars    = mux.Vars(req)
+		network = vars["network"]
+	)
+
+	// 1. Validate network
+	if network == "" {
+		r.writeError(w, http.StatusBadRequest, "Network parameter is required")
+
+		return
+	}
+
+	// 2. Parse query parameters
+	queryParams := req.URL.Query()
+
+	// 3. Build CBT request - no special filters needed for this endpoint
+	grpcReq := &cbtproto.ListFctAddressStorageSlotChunked10000Request{}
+
+	// Apply pagination from query parameters
+	if v := queryParams.Get(QueryParamPageSize); v != "" {
+		if pageSize, err := strconv.ParseInt(v, 10, 32); err == nil {
+			if pageSize > 10000 {
+				pageSize = 10000 // Cap at maximum
+			}
+
+			grpcReq.PageSize = int32(pageSize)
+		}
+	} else {
+		// Default page size
+		grpcReq.PageSize = 10000
+	}
+
+	if v := queryParams.Get(QueryParamPageToken); v != "" {
+		grpcReq.PageToken = v
+	}
+
+	// Apply ordering if specified
+	if v := queryParams.Get(QueryParamOrderBy); v != "" {
+		grpcReq.OrderBy = v
+	} else {
+		// Default to ascending order by chunk_start_block_number
+		grpcReq.OrderBy = "chunk_start_block_number asc"
+	}
+
+	r.log.WithFields(logrus.Fields{
+		"network":    network,
+		"page_size":  grpcReq.PageSize,
+		"page_token": grpcReq.PageToken,
+	}).Debug("REST v1: StateExpiryStorageHistory")
+
+	// 4. Set network in gRPC metadata and call service
+	ctxWithMeta := metadata.NewOutgoingContext(
+		ctx,
+		metadata.New(map[string]string{"network": network}),
+	)
+
+	// Call the gRPC service
+	grpcResp, err := r.xatuCBTClient.ListFctAddressStorageSlotChunked10000(ctxWithMeta, grpcReq)
+	if err != nil {
+		r.log.WithError(err).WithFields(logrus.Fields{
+			"network": network,
+		}).Error("Failed to query storage slot chunked data")
+		r.handleGRPCError(w, err)
+
+		return
+	}
+
+	// 5. TRANSFORM CBT types → Public API types
+	items := make([]*apiv1.StateExpiryStorageHistory, 0, len(grpcResp.FctAddressStorageSlotChunked_10000))
+
+	for _, cbtItem := range grpcResp.FctAddressStorageSlotChunked_10000 {
+		apiItem := transformCBTToAPIStateExpiryStorageHistory(cbtItem)
+		items = append(items, apiItem)
+	}
+
+	// Build applied filters map for metadata
+	appliedFilters := make(map[string]string)
+
+	for k, v := range queryParams {
+		if v[0] != "" && k != QueryParamPageSize && k != QueryParamPageToken && k != QueryParamOrderBy {
+			appliedFilters[k] = v[0]
+		}
+	}
+
+	response := &apiv1.StateExpiryStorageHistoryResponse{
+		Items: items,
+		Pagination: &apiv1.PaginationMetadata{
+			PageSize:      grpcReq.PageSize,
+			NextPageToken: grpcResp.NextPageToken,
+		},
+		Filters: &apiv1.FilterMetadata{
+			Network:        network,
+			AppliedFilters: appliedFilters,
+			OrderBy:        grpcReq.OrderBy,
+		},
+	}
+
+	// 6. Set content type header (cache headers are handled by middleware)
+	w.Header().Set("Content-Type", "application/json")
+
+	// 7. Write JSON response
+	if err := json.NewEncoder(w).Encode(response); err != nil {
+		r.log.WithError(err).Error("Failed to encode response")
+	}
+}
+
+// transformCBTToAPIStateExpiryStorageHistory transforms CBT types to public API types.
+// This is the ONLY place where transformation happens for state expiry storage history.
+func transformCBTToAPIStateExpiryStorageHistory(cbt *cbtproto.FctAddressStorageSlotChunked10000) *apiv1.StateExpiryStorageHistory {
+	return &apiv1.StateExpiryStorageHistory{
+		ChunkStartBlockNumber: cbt.ChunkStartBlockNumber,
+		FirstAccessedSlots:    cbt.FirstAccessedSlots,
+		LastAccessedSlots:     cbt.LastAccessedSlots,
+	}
+}
+
+// handleStateExpiryAccessTotal handles GET /api/v1/{network}/state-expiry/access/total
+// This endpoint returns the latest total address access statistics for state expiry analysis.
+func (r *PublicRouter) handleStateExpiryAccessTotal(w http.ResponseWriter, req *http.Request) {
+	var (
+		ctx     = req.Context()
+		vars    = mux.Vars(req)
+		network = vars["network"]
+	)
+
+	// 1. Validate network
+	if network == "" {
+		r.writeError(w, http.StatusBadRequest, "Network parameter is required")
+
+		return
+	}
+
+	r.log.WithFields(logrus.Fields{
+		"network": network,
+	}).Debug("REST v1: StateExpiryAccessTotal")
+
+	// 2. Set network in gRPC metadata and call service
+	ctxWithMeta := metadata.NewOutgoingContext(
+		ctx,
+		metadata.New(map[string]string{"network": network}),
+	)
+
+	// Call the gRPC service to get the latest totals (no specific timestamp)
+	grpcReq := &cbtproto.GetFctAddressAccessTotalRequest{}
+
+	grpcResp, err := r.xatuCBTClient.GetFctAddressAccessTotal(ctxWithMeta, grpcReq)
+	if err != nil {
+		r.log.WithError(err).WithFields(logrus.Fields{
+			"network": network,
+		}).Error("Failed to query address access total")
+		r.handleGRPCError(w, err)
+
+		return
+	}
+
+	// 3. TRANSFORM CBT types → Public API types
+	apiItem := transformCBTToAPIStateExpiryAccessTotal(grpcResp.Item)
+
+	// Build applied filters map for metadata (empty for this endpoint)
+	appliedFilters := make(map[string]string)
+
+	response := &apiv1.StateExpiryAccessTotalResponse{
+		Item: apiItem,
+		Filters: &apiv1.FilterMetadata{
+			Network:        network,
+			AppliedFilters: appliedFilters,
+		},
+	}
+
+	// 4. Set content type header (cache headers are handled by middleware)
+	w.Header().Set("Content-Type", "application/json")
+
+	// 5. Write JSON response
+	if err := json.NewEncoder(w).Encode(response); err != nil {
+		r.log.WithError(err).Error("Failed to encode response")
+	}
+}
+
+// transformCBTToAPIStateExpiryAccessTotal transforms CBT types to public API types.
+// This is the ONLY place where transformation happens for state expiry access totals.
+func transformCBTToAPIStateExpiryAccessTotal(cbt *cbtproto.FctAddressAccessTotal) *apiv1.StateExpiryAccessTotal {
+	return &apiv1.StateExpiryAccessTotal{
+		TotalAccounts:    cbt.TotalAccounts,
+		ExpiredAccounts:  cbt.ExpiredAccounts,
+		TotalContracts:   cbt.TotalContractAccounts,
+		ExpiredContracts: cbt.ExpiredContracts,
 	}
 }

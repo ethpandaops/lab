@@ -1,0 +1,68 @@
+syntax = "proto3";
+
+package cbt;
+
+import "common.proto";
+
+option go_package = "github.com/ethpandaops/xatu-cbt/pkg/proto/clickhouse";
+// Storage slot totals and expiry statistics
+
+message FctAddressStorageSlotTotal {
+  // Timestamp when the record was last updated
+  uint32 updated_date_time = 11;
+  // Total number of storage slots accessed in last 365 days
+  uint64 total_storage_slots = 12;
+  // Number of expired storage slots (not accessed in last 365 days)
+  uint64 expired_storage_slots = 13;
+}
+
+// ListFctAddressStorageSlotTotalRequest is the request message for listing fct_address_storage_slot_total records
+message ListFctAddressStorageSlotTotalRequest {
+  // Filter by updated_date_time (PRIMARY KEY - required)
+  UInt32Filter updated_date_time = 1;
+
+  // Filter by total_storage_slots (optional)
+  UInt64Filter total_storage_slots = 2;
+  // Filter by expired_storage_slots (optional)
+  UInt64Filter expired_storage_slots = 3;
+
+  // The maximum number of fct_address_storage_slot_total to return.
+  // If unspecified, at most 100 items will be returned.
+  // The maximum value is 10000; values above 10000 will be coerced to 10000.
+  int32 page_size = 4;
+  // A page token, received from a previous `ListFctAddressStorageSlotTotal` call.
+  // Provide this to retrieve the subsequent page.
+  string page_token = 5;
+  // The order of results. Format: comma-separated list of fields.
+  // Example: "foo,bar" or "foo desc,bar" for descending order on foo.
+  // If unspecified, results will be returned in the default order.
+  string order_by = 6;
+}
+
+// ListFctAddressStorageSlotTotalResponse is the response message for listing fct_address_storage_slot_total records
+message ListFctAddressStorageSlotTotalResponse {
+  // The list of fct_address_storage_slot_total.
+  repeated FctAddressStorageSlotTotal fct_address_storage_slot_total = 1;
+  // A token, which can be sent as `page_token` to retrieve the next page.
+  // If this field is omitted, there are no subsequent pages.
+  string next_page_token = 2;
+}
+
+// GetFctAddressStorageSlotTotalRequest is the request message for getting a single fct_address_storage_slot_total record by primary key
+message GetFctAddressStorageSlotTotalRequest {
+  // Timestamp when the record was last updated
+  uint32 updated_date_time = 1; // Primary key (required)
+}
+
+// GetFctAddressStorageSlotTotalResponse is the response message for getting a single fct_address_storage_slot_total record
+message GetFctAddressStorageSlotTotalResponse {
+  FctAddressStorageSlotTotal item = 1;
+}
+
+// FctAddressStorageSlotTotalService provides RPC methods for querying fct_address_storage_slot_total data
+service FctAddressStorageSlotTotalService {
+  // List returns paginated fct_address_storage_slot_total records
+  rpc List(ListFctAddressStorageSlotTotalRequest) returns (ListFctAddressStorageSlotTotalResponse);
+  // Get returns a single fct_address_storage_slot_total record by primary key
+  rpc Get(GetFctAddressStorageSlotTotalRequest) returns (GetFctAddressStorageSlotTotalResponse);
+}

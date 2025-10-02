@@ -304,3 +304,42 @@ func (x *XatuCBT) ListFctAddressAccessChunked10000(
 
 	return x.service.ListFctAddressAccessChunked10000(ctx, req)
 }
+
+// GetFctAddressAccessTotal returns the latest address access totals.
+func (x *XatuCBT) GetFctAddressAccessTotal(
+	ctx context.Context,
+	req *cbtproto.GetFctAddressAccessTotalRequest,
+) (*cbtproto.GetFctAddressAccessTotalResponse, error) {
+	// No PK enrichment needed since this table doesn't use slot-based primary keys.
+	// The primary key is updated_date_time which we can query directly or get the latest.
+	return x.service.GetFctAddressAccessTotal(ctx, req)
+}
+
+// ListFctAddressAccessTotal returns address access totals.
+func (x *XatuCBT) ListFctAddressAccessTotal(
+	ctx context.Context,
+	req *cbtproto.ListFctAddressAccessTotalRequest,
+) (*cbtproto.ListFctAddressAccessTotalResponse, error) {
+	// No PK enrichment needed since this table doesn't use slot-based primary keys.
+	// The primary key is updated_date_time which we can query directly.
+	return x.service.ListFctAddressAccessTotal(ctx, req)
+}
+
+// ListFctAddressStorageSlotChunked10000 returns storage slot data chunked by 10000 blocks.
+func (x *XatuCBT) ListFctAddressStorageSlotChunked10000(
+	ctx context.Context,
+	req *cbtproto.ListFctAddressStorageSlotChunked10000Request,
+) (*cbtproto.ListFctAddressStorageSlotChunked10000Response, error) {
+	// No PK enrichment needed since this table doesn't use slot-based primary keys.
+	// The primary key is chunk_start_block_number which we'll query directly.
+
+	// Set default filter if not provided to avoid full table scan
+	if req.ChunkStartBlockNumber == nil {
+		// Query all chunks by default (with pagination)
+		req.ChunkStartBlockNumber = &cbtproto.UInt32Filter{
+			Filter: &cbtproto.UInt32Filter_Gte{Gte: 0},
+		}
+	}
+
+	return x.service.ListFctAddressStorageSlotChunked10000(ctx, req)
+}

@@ -1,0 +1,72 @@
+syntax = "proto3";
+
+package cbt;
+
+import "common.proto";
+
+option go_package = "github.com/ethpandaops/xatu-cbt/pkg/proto/clickhouse";
+// Storage slot totals chunked by 10000 blocks
+
+message FctAddressStorageSlotChunked10000 {
+  // Timestamp when the record was last updated
+  uint32 updated_date_time = 11;
+  // Start block number of the chunk
+  uint32 chunk_start_block_number = 12;
+  // Number of slots first accessed in the chunk
+  uint32 first_accessed_slots = 13;
+  // Number of slots last accessed in the chunk
+  uint32 last_accessed_slots = 14;
+}
+
+// ListFctAddressStorageSlotChunked10000Request is the request message for listing fct_address_storage_slot_chunked_10000 records
+message ListFctAddressStorageSlotChunked10000Request {
+  // Filter by chunk_start_block_number (PRIMARY KEY - required)
+  UInt32Filter chunk_start_block_number = 1;
+
+  // Filter by updated_date_time (optional)
+  UInt32Filter updated_date_time = 2;
+  // Filter by first_accessed_slots (optional)
+  UInt32Filter first_accessed_slots = 3;
+  // Filter by last_accessed_slots (optional)
+  UInt32Filter last_accessed_slots = 4;
+
+  // The maximum number of fct_address_storage_slot_chunked_10000 to return.
+  // If unspecified, at most 100 items will be returned.
+  // The maximum value is 10000; values above 10000 will be coerced to 10000.
+  int32 page_size = 5;
+  // A page token, received from a previous `ListFctAddressStorageSlotChunked10000` call.
+  // Provide this to retrieve the subsequent page.
+  string page_token = 6;
+  // The order of results. Format: comma-separated list of fields.
+  // Example: "foo,bar" or "foo desc,bar" for descending order on foo.
+  // If unspecified, results will be returned in the default order.
+  string order_by = 7;
+}
+
+// ListFctAddressStorageSlotChunked10000Response is the response message for listing fct_address_storage_slot_chunked_10000 records
+message ListFctAddressStorageSlotChunked10000Response {
+  // The list of fct_address_storage_slot_chunked_10000.
+  repeated FctAddressStorageSlotChunked10000 fct_address_storage_slot_chunked_10000 = 1;
+  // A token, which can be sent as `page_token` to retrieve the next page.
+  // If this field is omitted, there are no subsequent pages.
+  string next_page_token = 2;
+}
+
+// GetFctAddressStorageSlotChunked10000Request is the request message for getting a single fct_address_storage_slot_chunked_10000 record by primary key
+message GetFctAddressStorageSlotChunked10000Request {
+  // Start block number of the chunk
+  uint32 chunk_start_block_number = 1; // Primary key (required)
+}
+
+// GetFctAddressStorageSlotChunked10000Response is the response message for getting a single fct_address_storage_slot_chunked_10000 record
+message GetFctAddressStorageSlotChunked10000Response {
+  FctAddressStorageSlotChunked10000 item = 1;
+}
+
+// FctAddressStorageSlotChunked10000Service provides RPC methods for querying fct_address_storage_slot_chunked_10000 data
+service FctAddressStorageSlotChunked10000Service {
+  // List returns paginated fct_address_storage_slot_chunked_10000 records
+  rpc List(ListFctAddressStorageSlotChunked10000Request) returns (ListFctAddressStorageSlotChunked10000Response);
+  // Get returns a single fct_address_storage_slot_chunked_10000 record by primary key
+  rpc Get(GetFctAddressStorageSlotChunked10000Request) returns (GetFctAddressStorageSlotChunked10000Response);
+}

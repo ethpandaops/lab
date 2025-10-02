@@ -1,0 +1,75 @@
+syntax = "proto3";
+
+package cbt;
+
+import "common.proto";
+
+option go_package = "github.com/ethpandaops/xatu-cbt/pkg/proto/clickhouse";
+
+message AdminCbt {
+  uint64 updated_date_time = 11;
+  // The database name
+  string database = 12;
+  // The table name
+  string table = 13;
+  // The starting position of the processed interval
+  uint64 position = 14;
+  // The size of the interval processed
+  uint64 interval = 15;
+}
+
+// ListAdminCbtRequest is the request message for listing admin_cbt records
+message ListAdminCbtRequest {
+  // Filter by database (PRIMARY KEY - required)
+  StringFilter database = 1;
+
+  // Filter by position (ORDER BY column 3 - optional)
+  UInt64Filter position = 2;
+
+  // Filter by updated_date_time (optional)
+  UInt64Filter updated_date_time = 3;
+  // Filter by table (optional)
+  StringFilter table = 4;
+  // Filter by interval (optional)
+  UInt64Filter interval = 5;
+
+  // The maximum number of admin_cbt to return.
+  // If unspecified, at most 100 items will be returned.
+  // The maximum value is 10000; values above 10000 will be coerced to 10000.
+  int32 page_size = 6;
+  // A page token, received from a previous `ListAdminCbt` call.
+  // Provide this to retrieve the subsequent page.
+  string page_token = 7;
+  // The order of results. Format: comma-separated list of fields.
+  // Example: "foo,bar" or "foo desc,bar" for descending order on foo.
+  // If unspecified, results will be returned in the default order.
+  string order_by = 8;
+}
+
+// ListAdminCbtResponse is the response message for listing admin_cbt records
+message ListAdminCbtResponse {
+  // The list of admin_cbt.
+  repeated AdminCbt admin_cbt = 1;
+  // A token, which can be sent as `page_token` to retrieve the next page.
+  // If this field is omitted, there are no subsequent pages.
+  string next_page_token = 2;
+}
+
+// GetAdminCbtRequest is the request message for getting a single admin_cbt record by primary key
+message GetAdminCbtRequest {
+  // The database name
+  string database = 1; // Primary key (required)
+}
+
+// GetAdminCbtResponse is the response message for getting a single admin_cbt record
+message GetAdminCbtResponse {
+  AdminCbt item = 1;
+}
+
+// AdminCbtService provides RPC methods for querying admin_cbt data
+service AdminCbtService {
+  // List returns paginated admin_cbt records
+  rpc List(ListAdminCbtRequest) returns (ListAdminCbtResponse);
+  // Get returns a single admin_cbt record by primary key
+  rpc Get(GetAdminCbtRequest) returns (GetAdminCbtResponse);
+}

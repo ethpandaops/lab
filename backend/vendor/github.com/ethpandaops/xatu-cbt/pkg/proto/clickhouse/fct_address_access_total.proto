@@ -1,0 +1,76 @@
+syntax = "proto3";
+
+package cbt;
+
+import "common.proto";
+
+option go_package = "github.com/ethpandaops/xatu-cbt/pkg/proto/clickhouse";
+// Address access totals and expiry statistics
+
+message FctAddressAccessTotal {
+  // Timestamp when the record was last updated
+  uint32 updated_date_time = 11;
+  // Total number of accounts accessed in last 365 days
+  uint64 total_accounts = 12;
+  // Number of expired accounts (not accessed in last 365 days)
+  uint64 expired_accounts = 13;
+  // Total number of contract accounts accessed in last 365 days
+  uint64 total_contract_accounts = 14;
+  // Number of expired contracts (not accessed in last 365 days)
+  uint64 expired_contracts = 15;
+}
+
+// ListFctAddressAccessTotalRequest is the request message for listing fct_address_access_total records
+message ListFctAddressAccessTotalRequest {
+  // Filter by updated_date_time (PRIMARY KEY - required)
+  UInt32Filter updated_date_time = 1;
+
+  // Filter by total_accounts (optional)
+  UInt64Filter total_accounts = 2;
+  // Filter by expired_accounts (optional)
+  UInt64Filter expired_accounts = 3;
+  // Filter by total_contract_accounts (optional)
+  UInt64Filter total_contract_accounts = 4;
+  // Filter by expired_contracts (optional)
+  UInt64Filter expired_contracts = 5;
+
+  // The maximum number of fct_address_access_total to return.
+  // If unspecified, at most 100 items will be returned.
+  // The maximum value is 10000; values above 10000 will be coerced to 10000.
+  int32 page_size = 6;
+  // A page token, received from a previous `ListFctAddressAccessTotal` call.
+  // Provide this to retrieve the subsequent page.
+  string page_token = 7;
+  // The order of results. Format: comma-separated list of fields.
+  // Example: "foo,bar" or "foo desc,bar" for descending order on foo.
+  // If unspecified, results will be returned in the default order.
+  string order_by = 8;
+}
+
+// ListFctAddressAccessTotalResponse is the response message for listing fct_address_access_total records
+message ListFctAddressAccessTotalResponse {
+  // The list of fct_address_access_total.
+  repeated FctAddressAccessTotal fct_address_access_total = 1;
+  // A token, which can be sent as `page_token` to retrieve the next page.
+  // If this field is omitted, there are no subsequent pages.
+  string next_page_token = 2;
+}
+
+// GetFctAddressAccessTotalRequest is the request message for getting a single fct_address_access_total record by primary key
+message GetFctAddressAccessTotalRequest {
+  // Timestamp when the record was last updated
+  uint32 updated_date_time = 1; // Primary key (required)
+}
+
+// GetFctAddressAccessTotalResponse is the response message for getting a single fct_address_access_total record
+message GetFctAddressAccessTotalResponse {
+  FctAddressAccessTotal item = 1;
+}
+
+// FctAddressAccessTotalService provides RPC methods for querying fct_address_access_total data
+service FctAddressAccessTotalService {
+  // List returns paginated fct_address_access_total records
+  rpc List(ListFctAddressAccessTotalRequest) returns (ListFctAddressAccessTotalResponse);
+  // Get returns a single fct_address_access_total record by primary key
+  rpc Get(GetFctAddressAccessTotalRequest) returns (GetFctAddressAccessTotalResponse);
+}

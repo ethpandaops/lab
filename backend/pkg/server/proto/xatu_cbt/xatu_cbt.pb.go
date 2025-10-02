@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.36.8
 // 	protoc        v6.32.0
-// source: backend/pkg/server/proto/xatu_cbt/xatu_cbt.proto
+// source: pkg/server/proto/xatu_cbt/xatu_cbt.proto
 
 package xatu_cbt
 
@@ -34,7 +34,7 @@ type GetDataAvailabilityRequest struct {
 
 func (x *GetDataAvailabilityRequest) Reset() {
 	*x = GetDataAvailabilityRequest{}
-	mi := &file_backend_pkg_server_proto_xatu_cbt_xatu_cbt_proto_msgTypes[0]
+	mi := &file_pkg_server_proto_xatu_cbt_xatu_cbt_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -46,7 +46,7 @@ func (x *GetDataAvailabilityRequest) String() string {
 func (*GetDataAvailabilityRequest) ProtoMessage() {}
 
 func (x *GetDataAvailabilityRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_backend_pkg_server_proto_xatu_cbt_xatu_cbt_proto_msgTypes[0]
+	mi := &file_pkg_server_proto_xatu_cbt_xatu_cbt_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -59,7 +59,7 @@ func (x *GetDataAvailabilityRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetDataAvailabilityRequest.ProtoReflect.Descriptor instead.
 func (*GetDataAvailabilityRequest) Descriptor() ([]byte, []int) {
-	return file_backend_pkg_server_proto_xatu_cbt_xatu_cbt_proto_rawDescGZIP(), []int{0}
+	return file_pkg_server_proto_xatu_cbt_xatu_cbt_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *GetDataAvailabilityRequest) GetTables() []string {
@@ -82,7 +82,7 @@ type GetDataAvailabilityResponse struct {
 
 func (x *GetDataAvailabilityResponse) Reset() {
 	*x = GetDataAvailabilityResponse{}
-	mi := &file_backend_pkg_server_proto_xatu_cbt_xatu_cbt_proto_msgTypes[1]
+	mi := &file_pkg_server_proto_xatu_cbt_xatu_cbt_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -94,7 +94,7 @@ func (x *GetDataAvailabilityResponse) String() string {
 func (*GetDataAvailabilityResponse) ProtoMessage() {}
 
 func (x *GetDataAvailabilityResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_backend_pkg_server_proto_xatu_cbt_xatu_cbt_proto_msgTypes[1]
+	mi := &file_pkg_server_proto_xatu_cbt_xatu_cbt_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -107,7 +107,7 @@ func (x *GetDataAvailabilityResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetDataAvailabilityResponse.ProtoReflect.Descriptor instead.
 func (*GetDataAvailabilityResponse) Descriptor() ([]byte, []int) {
-	return file_backend_pkg_server_proto_xatu_cbt_xatu_cbt_proto_rawDescGZIP(), []int{1}
+	return file_pkg_server_proto_xatu_cbt_xatu_cbt_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *GetDataAvailabilityResponse) GetMinSlot() uint64 {
@@ -124,16 +124,16 @@ func (x *GetDataAvailabilityResponse) GetMaxSlot() uint64 {
 	return 0
 }
 
-var File_backend_pkg_server_proto_xatu_cbt_xatu_cbt_proto protoreflect.FileDescriptor
+var File_pkg_server_proto_xatu_cbt_xatu_cbt_proto protoreflect.FileDescriptor
 
-const file_backend_pkg_server_proto_xatu_cbt_xatu_cbt_proto_rawDesc = "" +
+const file_pkg_server_proto_xatu_cbt_xatu_cbt_proto_rawDesc = "" +
 	"\n" +
-	"0backend/pkg/server/proto/xatu_cbt/xatu_cbt.proto\x12\bxatu_cbt\x1a9vendor/xatu-cbt/clickhouse/fct_node_active_last_24h.proto\x1a=vendor/xatu-cbt/clickhouse/fct_block_first_seen_by_node.proto\x1aBvendor/xatu-cbt/clickhouse/fct_block_blob_first_seen_by_node.proto\x1aHvendor/xatu-cbt/clickhouse/fct_attestation_first_seen_chunked_50ms.proto\x1aAvendor/xatu-cbt/clickhouse/fct_attestation_correctness_head.proto\x1a;vendor/xatu-cbt/clickhouse/fct_mev_bid_count_by_relay.proto\x1a=vendor/xatu-cbt/clickhouse/fct_mev_bid_count_by_builder.proto\x1aRvendor/xatu-cbt/clickhouse/fct_mev_bid_highest_value_by_builder_chunked_50ms.proto\x1a:vendor/xatu-cbt/clickhouse/fct_block_blob_count_head.proto\x1a/vendor/xatu-cbt/clickhouse/fct_block_head.proto\x1a3vendor/xatu-cbt/clickhouse/fct_block_mev_head.proto\x1a:vendor/xatu-cbt/clickhouse/fct_block_proposer_entity.proto\x1a3vendor/xatu-cbt/clickhouse/fct_prepared_block.proto\x1aAvendor/xatu-cbt/clickhouse/fct_address_access_chunked_10000.proto\x1a'vendor/xatu-cbt/clickhouse/common.proto\"4\n" +
+	"(pkg/server/proto/xatu_cbt/xatu_cbt.proto\x12\bxatu_cbt\x1a9vendor/xatu-cbt/clickhouse/fct_node_active_last_24h.proto\x1a=vendor/xatu-cbt/clickhouse/fct_block_first_seen_by_node.proto\x1aBvendor/xatu-cbt/clickhouse/fct_block_blob_first_seen_by_node.proto\x1aHvendor/xatu-cbt/clickhouse/fct_attestation_first_seen_chunked_50ms.proto\x1aAvendor/xatu-cbt/clickhouse/fct_attestation_correctness_head.proto\x1a;vendor/xatu-cbt/clickhouse/fct_mev_bid_count_by_relay.proto\x1a=vendor/xatu-cbt/clickhouse/fct_mev_bid_count_by_builder.proto\x1aRvendor/xatu-cbt/clickhouse/fct_mev_bid_highest_value_by_builder_chunked_50ms.proto\x1a:vendor/xatu-cbt/clickhouse/fct_block_blob_count_head.proto\x1a/vendor/xatu-cbt/clickhouse/fct_block_head.proto\x1a3vendor/xatu-cbt/clickhouse/fct_block_mev_head.proto\x1a:vendor/xatu-cbt/clickhouse/fct_block_proposer_entity.proto\x1a3vendor/xatu-cbt/clickhouse/fct_prepared_block.proto\x1aAvendor/xatu-cbt/clickhouse/fct_address_access_chunked_10000.proto\x1aGvendor/xatu-cbt/clickhouse/fct_address_storage_slot_chunked_10000.proto\x1a'vendor/xatu-cbt/clickhouse/common.proto\"4\n" +
 	"\x1aGetDataAvailabilityRequest\x12\x16\n" +
 	"\x06tables\x18\x01 \x03(\tR\x06tables\"S\n" +
 	"\x1bGetDataAvailabilityResponse\x12\x19\n" +
 	"\bmin_slot\x18\x01 \x01(\x04R\aminSlot\x12\x19\n" +
-	"\bmax_slot\x18\x02 \x01(\x04R\amaxSlot2\xca\r\n" +
+	"\bmax_slot\x18\x02 \x01(\x04R\amaxSlot2\xdb\x0e\n" +
 	"\aXatuCBT\x12g\n" +
 	"\x18ListFctNodeActiveLast24h\x12$.cbt.ListFctNodeActiveLast24hRequest\x1a%.cbt.ListFctNodeActiveLast24hResponse\x12p\n" +
 	"\x1bListFctBlockFirstSeenByNode\x12'.cbt.ListFctBlockFirstSeenByNodeRequest\x1a(.cbt.ListFctBlockFirstSeenByNodeResponse\x12|\n" +
@@ -148,23 +148,24 @@ const file_backend_pkg_server_proto_xatu_cbt_xatu_cbt_proto_rawDesc = "" +
 	"\x13ListFctBlockMevHead\x12\x1f.cbt.ListFctBlockMevHeadRequest\x1a .cbt.ListFctBlockMevHeadResponse\x12m\n" +
 	"\x1aListFctBlockProposerEntity\x12&.cbt.ListFctBlockProposerEntityRequest\x1a'.cbt.ListFctBlockProposerEntityResponse\x12[\n" +
 	"\x14ListFctPreparedBlock\x12 .cbt.ListFctPreparedBlockRequest\x1a!.cbt.ListFctPreparedBlockResponse\x12\x7f\n" +
-	" ListFctAddressAccessChunked10000\x12,.cbt.ListFctAddressAccessChunked10000Request\x1a-.cbt.ListFctAddressAccessChunked10000Response\x12b\n" +
+	" ListFctAddressAccessChunked10000\x12,.cbt.ListFctAddressAccessChunked10000Request\x1a-.cbt.ListFctAddressAccessChunked10000Response\x12\x8e\x01\n" +
+	"%ListFctAddressStorageSlotChunked10000\x121.cbt.ListFctAddressStorageSlotChunked10000Request\x1a2.cbt.ListFctAddressStorageSlotChunked10000Response\x12b\n" +
 	"\x13GetDataAvailability\x12$.xatu_cbt.GetDataAvailabilityRequest\x1a%.xatu_cbt.GetDataAvailabilityResponseB>Z<github.com/ethpandaops/lab/backend/pkg/server/proto/xatu_cbtb\x06proto3"
 
 var (
-	file_backend_pkg_server_proto_xatu_cbt_xatu_cbt_proto_rawDescOnce sync.Once
-	file_backend_pkg_server_proto_xatu_cbt_xatu_cbt_proto_rawDescData []byte
+	file_pkg_server_proto_xatu_cbt_xatu_cbt_proto_rawDescOnce sync.Once
+	file_pkg_server_proto_xatu_cbt_xatu_cbt_proto_rawDescData []byte
 )
 
-func file_backend_pkg_server_proto_xatu_cbt_xatu_cbt_proto_rawDescGZIP() []byte {
-	file_backend_pkg_server_proto_xatu_cbt_xatu_cbt_proto_rawDescOnce.Do(func() {
-		file_backend_pkg_server_proto_xatu_cbt_xatu_cbt_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_backend_pkg_server_proto_xatu_cbt_xatu_cbt_proto_rawDesc), len(file_backend_pkg_server_proto_xatu_cbt_xatu_cbt_proto_rawDesc)))
+func file_pkg_server_proto_xatu_cbt_xatu_cbt_proto_rawDescGZIP() []byte {
+	file_pkg_server_proto_xatu_cbt_xatu_cbt_proto_rawDescOnce.Do(func() {
+		file_pkg_server_proto_xatu_cbt_xatu_cbt_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_pkg_server_proto_xatu_cbt_xatu_cbt_proto_rawDesc), len(file_pkg_server_proto_xatu_cbt_xatu_cbt_proto_rawDesc)))
 	})
-	return file_backend_pkg_server_proto_xatu_cbt_xatu_cbt_proto_rawDescData
+	return file_pkg_server_proto_xatu_cbt_xatu_cbt_proto_rawDescData
 }
 
-var file_backend_pkg_server_proto_xatu_cbt_xatu_cbt_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
-var file_backend_pkg_server_proto_xatu_cbt_xatu_cbt_proto_goTypes = []any{
+var file_pkg_server_proto_xatu_cbt_xatu_cbt_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_pkg_server_proto_xatu_cbt_xatu_cbt_proto_goTypes = []any{
 	(*GetDataAvailabilityRequest)(nil),                                       // 0: xatu_cbt.GetDataAvailabilityRequest
 	(*GetDataAvailabilityResponse)(nil),                                      // 1: xatu_cbt.GetDataAvailabilityResponse
 	(*clickhouse.ListFctNodeActiveLast24HRequest)(nil),                       // 2: cbt.ListFctNodeActiveLast24hRequest
@@ -181,22 +182,24 @@ var file_backend_pkg_server_proto_xatu_cbt_xatu_cbt_proto_goTypes = []any{
 	(*clickhouse.ListFctBlockProposerEntityRequest)(nil),                     // 13: cbt.ListFctBlockProposerEntityRequest
 	(*clickhouse.ListFctPreparedBlockRequest)(nil),                           // 14: cbt.ListFctPreparedBlockRequest
 	(*clickhouse.ListFctAddressAccessChunked10000Request)(nil),               // 15: cbt.ListFctAddressAccessChunked10000Request
-	(*clickhouse.ListFctNodeActiveLast24HResponse)(nil),                      // 16: cbt.ListFctNodeActiveLast24hResponse
-	(*clickhouse.ListFctBlockFirstSeenByNodeResponse)(nil),                   // 17: cbt.ListFctBlockFirstSeenByNodeResponse
-	(*clickhouse.ListFctBlockBlobFirstSeenByNodeResponse)(nil),               // 18: cbt.ListFctBlockBlobFirstSeenByNodeResponse
-	(*clickhouse.ListFctAttestationFirstSeenChunked50MsResponse)(nil),        // 19: cbt.ListFctAttestationFirstSeenChunked50msResponse
-	(*clickhouse.ListFctAttestationCorrectnessHeadResponse)(nil),             // 20: cbt.ListFctAttestationCorrectnessHeadResponse
-	(*clickhouse.ListFctMevBidCountByRelayResponse)(nil),                     // 21: cbt.ListFctMevBidCountByRelayResponse
-	(*clickhouse.ListFctMevBidCountByBuilderResponse)(nil),                   // 22: cbt.ListFctMevBidCountByBuilderResponse
-	(*clickhouse.ListFctMevBidHighestValueByBuilderChunked50MsResponse)(nil), // 23: cbt.ListFctMevBidHighestValueByBuilderChunked50msResponse
-	(*clickhouse.ListFctBlockBlobCountHeadResponse)(nil),                     // 24: cbt.ListFctBlockBlobCountHeadResponse
-	(*clickhouse.ListFctBlockHeadResponse)(nil),                              // 25: cbt.ListFctBlockHeadResponse
-	(*clickhouse.ListFctBlockMevHeadResponse)(nil),                           // 26: cbt.ListFctBlockMevHeadResponse
-	(*clickhouse.ListFctBlockProposerEntityResponse)(nil),                    // 27: cbt.ListFctBlockProposerEntityResponse
-	(*clickhouse.ListFctPreparedBlockResponse)(nil),                          // 28: cbt.ListFctPreparedBlockResponse
-	(*clickhouse.ListFctAddressAccessChunked10000Response)(nil),              // 29: cbt.ListFctAddressAccessChunked10000Response
+	(*clickhouse.ListFctAddressStorageSlotChunked10000Request)(nil),          // 16: cbt.ListFctAddressStorageSlotChunked10000Request
+	(*clickhouse.ListFctNodeActiveLast24HResponse)(nil),                      // 17: cbt.ListFctNodeActiveLast24hResponse
+	(*clickhouse.ListFctBlockFirstSeenByNodeResponse)(nil),                   // 18: cbt.ListFctBlockFirstSeenByNodeResponse
+	(*clickhouse.ListFctBlockBlobFirstSeenByNodeResponse)(nil),               // 19: cbt.ListFctBlockBlobFirstSeenByNodeResponse
+	(*clickhouse.ListFctAttestationFirstSeenChunked50MsResponse)(nil),        // 20: cbt.ListFctAttestationFirstSeenChunked50msResponse
+	(*clickhouse.ListFctAttestationCorrectnessHeadResponse)(nil),             // 21: cbt.ListFctAttestationCorrectnessHeadResponse
+	(*clickhouse.ListFctMevBidCountByRelayResponse)(nil),                     // 22: cbt.ListFctMevBidCountByRelayResponse
+	(*clickhouse.ListFctMevBidCountByBuilderResponse)(nil),                   // 23: cbt.ListFctMevBidCountByBuilderResponse
+	(*clickhouse.ListFctMevBidHighestValueByBuilderChunked50MsResponse)(nil), // 24: cbt.ListFctMevBidHighestValueByBuilderChunked50msResponse
+	(*clickhouse.ListFctBlockBlobCountHeadResponse)(nil),                     // 25: cbt.ListFctBlockBlobCountHeadResponse
+	(*clickhouse.ListFctBlockHeadResponse)(nil),                              // 26: cbt.ListFctBlockHeadResponse
+	(*clickhouse.ListFctBlockMevHeadResponse)(nil),                           // 27: cbt.ListFctBlockMevHeadResponse
+	(*clickhouse.ListFctBlockProposerEntityResponse)(nil),                    // 28: cbt.ListFctBlockProposerEntityResponse
+	(*clickhouse.ListFctPreparedBlockResponse)(nil),                          // 29: cbt.ListFctPreparedBlockResponse
+	(*clickhouse.ListFctAddressAccessChunked10000Response)(nil),              // 30: cbt.ListFctAddressAccessChunked10000Response
+	(*clickhouse.ListFctAddressStorageSlotChunked10000Response)(nil),         // 31: cbt.ListFctAddressStorageSlotChunked10000Response
 }
-var file_backend_pkg_server_proto_xatu_cbt_xatu_cbt_proto_depIdxs = []int32{
+var file_pkg_server_proto_xatu_cbt_xatu_cbt_proto_depIdxs = []int32{
 	2,  // 0: xatu_cbt.XatuCBT.ListFctNodeActiveLast24h:input_type -> cbt.ListFctNodeActiveLast24hRequest
 	3,  // 1: xatu_cbt.XatuCBT.ListFctBlockFirstSeenByNode:input_type -> cbt.ListFctBlockFirstSeenByNodeRequest
 	4,  // 2: xatu_cbt.XatuCBT.ListFctBlockBlobFirstSeenByNode:input_type -> cbt.ListFctBlockBlobFirstSeenByNodeRequest
@@ -211,49 +214,51 @@ var file_backend_pkg_server_proto_xatu_cbt_xatu_cbt_proto_depIdxs = []int32{
 	13, // 11: xatu_cbt.XatuCBT.ListFctBlockProposerEntity:input_type -> cbt.ListFctBlockProposerEntityRequest
 	14, // 12: xatu_cbt.XatuCBT.ListFctPreparedBlock:input_type -> cbt.ListFctPreparedBlockRequest
 	15, // 13: xatu_cbt.XatuCBT.ListFctAddressAccessChunked10000:input_type -> cbt.ListFctAddressAccessChunked10000Request
-	0,  // 14: xatu_cbt.XatuCBT.GetDataAvailability:input_type -> xatu_cbt.GetDataAvailabilityRequest
-	16, // 15: xatu_cbt.XatuCBT.ListFctNodeActiveLast24h:output_type -> cbt.ListFctNodeActiveLast24hResponse
-	17, // 16: xatu_cbt.XatuCBT.ListFctBlockFirstSeenByNode:output_type -> cbt.ListFctBlockFirstSeenByNodeResponse
-	18, // 17: xatu_cbt.XatuCBT.ListFctBlockBlobFirstSeenByNode:output_type -> cbt.ListFctBlockBlobFirstSeenByNodeResponse
-	19, // 18: xatu_cbt.XatuCBT.ListFctAttestationFirstSeenChunked50ms:output_type -> cbt.ListFctAttestationFirstSeenChunked50msResponse
-	20, // 19: xatu_cbt.XatuCBT.ListFctAttestationCorrectnessHead:output_type -> cbt.ListFctAttestationCorrectnessHeadResponse
-	21, // 20: xatu_cbt.XatuCBT.ListFctMevBidCountByRelay:output_type -> cbt.ListFctMevBidCountByRelayResponse
-	22, // 21: xatu_cbt.XatuCBT.ListFctMevBidCountByBuilder:output_type -> cbt.ListFctMevBidCountByBuilderResponse
-	23, // 22: xatu_cbt.XatuCBT.ListFctMevBidHighestValueByBuilderChunked50ms:output_type -> cbt.ListFctMevBidHighestValueByBuilderChunked50msResponse
-	24, // 23: xatu_cbt.XatuCBT.ListFctBlockBlobCountHead:output_type -> cbt.ListFctBlockBlobCountHeadResponse
-	25, // 24: xatu_cbt.XatuCBT.ListFctBlockHead:output_type -> cbt.ListFctBlockHeadResponse
-	26, // 25: xatu_cbt.XatuCBT.ListFctBlockMevHead:output_type -> cbt.ListFctBlockMevHeadResponse
-	27, // 26: xatu_cbt.XatuCBT.ListFctBlockProposerEntity:output_type -> cbt.ListFctBlockProposerEntityResponse
-	28, // 27: xatu_cbt.XatuCBT.ListFctPreparedBlock:output_type -> cbt.ListFctPreparedBlockResponse
-	29, // 28: xatu_cbt.XatuCBT.ListFctAddressAccessChunked10000:output_type -> cbt.ListFctAddressAccessChunked10000Response
-	1,  // 29: xatu_cbt.XatuCBT.GetDataAvailability:output_type -> xatu_cbt.GetDataAvailabilityResponse
-	15, // [15:30] is the sub-list for method output_type
-	0,  // [0:15] is the sub-list for method input_type
+	16, // 14: xatu_cbt.XatuCBT.ListFctAddressStorageSlotChunked10000:input_type -> cbt.ListFctAddressStorageSlotChunked10000Request
+	0,  // 15: xatu_cbt.XatuCBT.GetDataAvailability:input_type -> xatu_cbt.GetDataAvailabilityRequest
+	17, // 16: xatu_cbt.XatuCBT.ListFctNodeActiveLast24h:output_type -> cbt.ListFctNodeActiveLast24hResponse
+	18, // 17: xatu_cbt.XatuCBT.ListFctBlockFirstSeenByNode:output_type -> cbt.ListFctBlockFirstSeenByNodeResponse
+	19, // 18: xatu_cbt.XatuCBT.ListFctBlockBlobFirstSeenByNode:output_type -> cbt.ListFctBlockBlobFirstSeenByNodeResponse
+	20, // 19: xatu_cbt.XatuCBT.ListFctAttestationFirstSeenChunked50ms:output_type -> cbt.ListFctAttestationFirstSeenChunked50msResponse
+	21, // 20: xatu_cbt.XatuCBT.ListFctAttestationCorrectnessHead:output_type -> cbt.ListFctAttestationCorrectnessHeadResponse
+	22, // 21: xatu_cbt.XatuCBT.ListFctMevBidCountByRelay:output_type -> cbt.ListFctMevBidCountByRelayResponse
+	23, // 22: xatu_cbt.XatuCBT.ListFctMevBidCountByBuilder:output_type -> cbt.ListFctMevBidCountByBuilderResponse
+	24, // 23: xatu_cbt.XatuCBT.ListFctMevBidHighestValueByBuilderChunked50ms:output_type -> cbt.ListFctMevBidHighestValueByBuilderChunked50msResponse
+	25, // 24: xatu_cbt.XatuCBT.ListFctBlockBlobCountHead:output_type -> cbt.ListFctBlockBlobCountHeadResponse
+	26, // 25: xatu_cbt.XatuCBT.ListFctBlockHead:output_type -> cbt.ListFctBlockHeadResponse
+	27, // 26: xatu_cbt.XatuCBT.ListFctBlockMevHead:output_type -> cbt.ListFctBlockMevHeadResponse
+	28, // 27: xatu_cbt.XatuCBT.ListFctBlockProposerEntity:output_type -> cbt.ListFctBlockProposerEntityResponse
+	29, // 28: xatu_cbt.XatuCBT.ListFctPreparedBlock:output_type -> cbt.ListFctPreparedBlockResponse
+	30, // 29: xatu_cbt.XatuCBT.ListFctAddressAccessChunked10000:output_type -> cbt.ListFctAddressAccessChunked10000Response
+	31, // 30: xatu_cbt.XatuCBT.ListFctAddressStorageSlotChunked10000:output_type -> cbt.ListFctAddressStorageSlotChunked10000Response
+	1,  // 31: xatu_cbt.XatuCBT.GetDataAvailability:output_type -> xatu_cbt.GetDataAvailabilityResponse
+	16, // [16:32] is the sub-list for method output_type
+	0,  // [0:16] is the sub-list for method input_type
 	0,  // [0:0] is the sub-list for extension type_name
 	0,  // [0:0] is the sub-list for extension extendee
 	0,  // [0:0] is the sub-list for field type_name
 }
 
-func init() { file_backend_pkg_server_proto_xatu_cbt_xatu_cbt_proto_init() }
-func file_backend_pkg_server_proto_xatu_cbt_xatu_cbt_proto_init() {
-	if File_backend_pkg_server_proto_xatu_cbt_xatu_cbt_proto != nil {
+func init() { file_pkg_server_proto_xatu_cbt_xatu_cbt_proto_init() }
+func file_pkg_server_proto_xatu_cbt_xatu_cbt_proto_init() {
+	if File_pkg_server_proto_xatu_cbt_xatu_cbt_proto != nil {
 		return
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_backend_pkg_server_proto_xatu_cbt_xatu_cbt_proto_rawDesc), len(file_backend_pkg_server_proto_xatu_cbt_xatu_cbt_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_pkg_server_proto_xatu_cbt_xatu_cbt_proto_rawDesc), len(file_pkg_server_proto_xatu_cbt_xatu_cbt_proto_rawDesc)),
 			NumEnums:      0,
 			NumMessages:   2,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
-		GoTypes:           file_backend_pkg_server_proto_xatu_cbt_xatu_cbt_proto_goTypes,
-		DependencyIndexes: file_backend_pkg_server_proto_xatu_cbt_xatu_cbt_proto_depIdxs,
-		MessageInfos:      file_backend_pkg_server_proto_xatu_cbt_xatu_cbt_proto_msgTypes,
+		GoTypes:           file_pkg_server_proto_xatu_cbt_xatu_cbt_proto_goTypes,
+		DependencyIndexes: file_pkg_server_proto_xatu_cbt_xatu_cbt_proto_depIdxs,
+		MessageInfos:      file_pkg_server_proto_xatu_cbt_xatu_cbt_proto_msgTypes,
 	}.Build()
-	File_backend_pkg_server_proto_xatu_cbt_xatu_cbt_proto = out.File
-	file_backend_pkg_server_proto_xatu_cbt_xatu_cbt_proto_goTypes = nil
-	file_backend_pkg_server_proto_xatu_cbt_xatu_cbt_proto_depIdxs = nil
+	File_pkg_server_proto_xatu_cbt_xatu_cbt_proto = out.File
+	file_pkg_server_proto_xatu_cbt_xatu_cbt_proto_goTypes = nil
+	file_pkg_server_proto_xatu_cbt_xatu_cbt_proto_depIdxs = nil
 }

@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.5.1
 // - protoc             v6.32.0
-// source: backend/pkg/server/proto/xatu_cbt/xatu_cbt.proto
+// source: pkg/server/proto/xatu_cbt/xatu_cbt.proto
 
 package xatu_cbt
 
@@ -34,6 +34,9 @@ const (
 	XatuCBT_ListFctBlockProposerEntity_FullMethodName                    = "/xatu_cbt.XatuCBT/ListFctBlockProposerEntity"
 	XatuCBT_ListFctPreparedBlock_FullMethodName                          = "/xatu_cbt.XatuCBT/ListFctPreparedBlock"
 	XatuCBT_ListFctAddressAccessChunked10000_FullMethodName              = "/xatu_cbt.XatuCBT/ListFctAddressAccessChunked10000"
+	XatuCBT_ListFctAddressStorageSlotChunked10000_FullMethodName         = "/xatu_cbt.XatuCBT/ListFctAddressStorageSlotChunked10000"
+	XatuCBT_GetFctAddressAccessTotal_FullMethodName                      = "/xatu_cbt.XatuCBT/GetFctAddressAccessTotal"
+	XatuCBT_ListFctAddressAccessTotal_FullMethodName                     = "/xatu_cbt.XatuCBT/ListFctAddressAccessTotal"
 	XatuCBT_GetDataAvailability_FullMethodName                           = "/xatu_cbt.XatuCBT/GetDataAvailability"
 )
 
@@ -86,6 +89,15 @@ type XatuCBTClient interface {
 	// ListFctAddressAccessChunked10000 returns address access data chunked by 10000 blocks.
 	// This table contains aggregated data about Ethereum address access patterns for state expiry analysis.
 	ListFctAddressAccessChunked10000(ctx context.Context, in *clickhouse.ListFctAddressAccessChunked10000Request, opts ...grpc.CallOption) (*clickhouse.ListFctAddressAccessChunked10000Response, error)
+	// ListFctAddressStorageSlotChunked10000 returns storage slot data chunked by 10000 blocks.
+	// This table contains aggregated data about Ethereum storage slot access patterns for state expiry analysis.
+	ListFctAddressStorageSlotChunked10000(ctx context.Context, in *clickhouse.ListFctAddressStorageSlotChunked10000Request, opts ...grpc.CallOption) (*clickhouse.ListFctAddressStorageSlotChunked10000Response, error)
+	// GetFctAddressAccessTotal returns the latest total address access statistics.
+	// This table contains aggregated totals of accounts and contracts accessed/expired for state expiry analysis.
+	GetFctAddressAccessTotal(ctx context.Context, in *clickhouse.GetFctAddressAccessTotalRequest, opts ...grpc.CallOption) (*clickhouse.GetFctAddressAccessTotalResponse, error)
+	// ListFctAddressAccessTotal returns address access totals.
+	// This table contains aggregated totals of accounts and contracts accessed/expired for state expiry analysis.
+	ListFctAddressAccessTotal(ctx context.Context, in *clickhouse.ListFctAddressAccessTotalRequest, opts ...grpc.CallOption) (*clickhouse.ListFctAddressAccessTotalResponse, error)
 	// GetDataAvailability returns the common availability interval across a set of transformation tables.
 	// It calculates the overlapping data range for the specified tables and returns slot information.
 	GetDataAvailability(ctx context.Context, in *GetDataAvailabilityRequest, opts ...grpc.CallOption) (*GetDataAvailabilityResponse, error)
@@ -239,6 +251,36 @@ func (c *xatuCBTClient) ListFctAddressAccessChunked10000(ctx context.Context, in
 	return out, nil
 }
 
+func (c *xatuCBTClient) ListFctAddressStorageSlotChunked10000(ctx context.Context, in *clickhouse.ListFctAddressStorageSlotChunked10000Request, opts ...grpc.CallOption) (*clickhouse.ListFctAddressStorageSlotChunked10000Response, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(clickhouse.ListFctAddressStorageSlotChunked10000Response)
+	err := c.cc.Invoke(ctx, XatuCBT_ListFctAddressStorageSlotChunked10000_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *xatuCBTClient) GetFctAddressAccessTotal(ctx context.Context, in *clickhouse.GetFctAddressAccessTotalRequest, opts ...grpc.CallOption) (*clickhouse.GetFctAddressAccessTotalResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(clickhouse.GetFctAddressAccessTotalResponse)
+	err := c.cc.Invoke(ctx, XatuCBT_GetFctAddressAccessTotal_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *xatuCBTClient) ListFctAddressAccessTotal(ctx context.Context, in *clickhouse.ListFctAddressAccessTotalRequest, opts ...grpc.CallOption) (*clickhouse.ListFctAddressAccessTotalResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(clickhouse.ListFctAddressAccessTotalResponse)
+	err := c.cc.Invoke(ctx, XatuCBT_ListFctAddressAccessTotal_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *xatuCBTClient) GetDataAvailability(ctx context.Context, in *GetDataAvailabilityRequest, opts ...grpc.CallOption) (*GetDataAvailabilityResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(GetDataAvailabilityResponse)
@@ -298,6 +340,15 @@ type XatuCBTServer interface {
 	// ListFctAddressAccessChunked10000 returns address access data chunked by 10000 blocks.
 	// This table contains aggregated data about Ethereum address access patterns for state expiry analysis.
 	ListFctAddressAccessChunked10000(context.Context, *clickhouse.ListFctAddressAccessChunked10000Request) (*clickhouse.ListFctAddressAccessChunked10000Response, error)
+	// ListFctAddressStorageSlotChunked10000 returns storage slot data chunked by 10000 blocks.
+	// This table contains aggregated data about Ethereum storage slot access patterns for state expiry analysis.
+	ListFctAddressStorageSlotChunked10000(context.Context, *clickhouse.ListFctAddressStorageSlotChunked10000Request) (*clickhouse.ListFctAddressStorageSlotChunked10000Response, error)
+	// GetFctAddressAccessTotal returns the latest total address access statistics.
+	// This table contains aggregated totals of accounts and contracts accessed/expired for state expiry analysis.
+	GetFctAddressAccessTotal(context.Context, *clickhouse.GetFctAddressAccessTotalRequest) (*clickhouse.GetFctAddressAccessTotalResponse, error)
+	// ListFctAddressAccessTotal returns address access totals.
+	// This table contains aggregated totals of accounts and contracts accessed/expired for state expiry analysis.
+	ListFctAddressAccessTotal(context.Context, *clickhouse.ListFctAddressAccessTotalRequest) (*clickhouse.ListFctAddressAccessTotalResponse, error)
 	// GetDataAvailability returns the common availability interval across a set of transformation tables.
 	// It calculates the overlapping data range for the specified tables and returns slot information.
 	GetDataAvailability(context.Context, *GetDataAvailabilityRequest) (*GetDataAvailabilityResponse, error)
@@ -352,6 +403,15 @@ func (UnimplementedXatuCBTServer) ListFctPreparedBlock(context.Context, *clickho
 }
 func (UnimplementedXatuCBTServer) ListFctAddressAccessChunked10000(context.Context, *clickhouse.ListFctAddressAccessChunked10000Request) (*clickhouse.ListFctAddressAccessChunked10000Response, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListFctAddressAccessChunked10000 not implemented")
+}
+func (UnimplementedXatuCBTServer) ListFctAddressStorageSlotChunked10000(context.Context, *clickhouse.ListFctAddressStorageSlotChunked10000Request) (*clickhouse.ListFctAddressStorageSlotChunked10000Response, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListFctAddressStorageSlotChunked10000 not implemented")
+}
+func (UnimplementedXatuCBTServer) GetFctAddressAccessTotal(context.Context, *clickhouse.GetFctAddressAccessTotalRequest) (*clickhouse.GetFctAddressAccessTotalResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetFctAddressAccessTotal not implemented")
+}
+func (UnimplementedXatuCBTServer) ListFctAddressAccessTotal(context.Context, *clickhouse.ListFctAddressAccessTotalRequest) (*clickhouse.ListFctAddressAccessTotalResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListFctAddressAccessTotal not implemented")
 }
 func (UnimplementedXatuCBTServer) GetDataAvailability(context.Context, *GetDataAvailabilityRequest) (*GetDataAvailabilityResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetDataAvailability not implemented")
@@ -629,6 +689,60 @@ func _XatuCBT_ListFctAddressAccessChunked10000_Handler(srv interface{}, ctx cont
 	return interceptor(ctx, in, info, handler)
 }
 
+func _XatuCBT_ListFctAddressStorageSlotChunked10000_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(clickhouse.ListFctAddressStorageSlotChunked10000Request)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(XatuCBTServer).ListFctAddressStorageSlotChunked10000(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: XatuCBT_ListFctAddressStorageSlotChunked10000_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(XatuCBTServer).ListFctAddressStorageSlotChunked10000(ctx, req.(*clickhouse.ListFctAddressStorageSlotChunked10000Request))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _XatuCBT_GetFctAddressAccessTotal_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(clickhouse.GetFctAddressAccessTotalRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(XatuCBTServer).GetFctAddressAccessTotal(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: XatuCBT_GetFctAddressAccessTotal_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(XatuCBTServer).GetFctAddressAccessTotal(ctx, req.(*clickhouse.GetFctAddressAccessTotalRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _XatuCBT_ListFctAddressAccessTotal_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(clickhouse.ListFctAddressAccessTotalRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(XatuCBTServer).ListFctAddressAccessTotal(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: XatuCBT_ListFctAddressAccessTotal_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(XatuCBTServer).ListFctAddressAccessTotal(ctx, req.(*clickhouse.ListFctAddressAccessTotalRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _XatuCBT_GetDataAvailability_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetDataAvailabilityRequest)
 	if err := dec(in); err != nil {
@@ -711,10 +825,22 @@ var XatuCBT_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _XatuCBT_ListFctAddressAccessChunked10000_Handler,
 		},
 		{
+			MethodName: "ListFctAddressStorageSlotChunked10000",
+			Handler:    _XatuCBT_ListFctAddressStorageSlotChunked10000_Handler,
+		},
+		{
+			MethodName: "GetFctAddressAccessTotal",
+			Handler:    _XatuCBT_GetFctAddressAccessTotal_Handler,
+		},
+		{
+			MethodName: "ListFctAddressAccessTotal",
+			Handler:    _XatuCBT_ListFctAddressAccessTotal_Handler,
+		},
+		{
 			MethodName: "GetDataAvailability",
 			Handler:    _XatuCBT_GetDataAvailability_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "backend/pkg/server/proto/xatu_cbt/xatu_cbt.proto",
+	Metadata: "pkg/server/proto/xatu_cbt/xatu_cbt.proto",
 }

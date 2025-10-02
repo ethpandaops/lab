@@ -101,10 +101,9 @@ func scanFctAddressAccessChunked10000(
 	var (
 		item            cbtproto.FctAddressAccessChunked10000
 		updatedDateTime time.Time
-		err             error
 	)
 
-	if err = scanner.Scan(
+	if err := scanner.Scan(
 		&updatedDateTime,
 		&item.ChunkStartBlockNumber,
 		&item.FirstAccessedAccounts,
