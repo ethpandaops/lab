@@ -24,11 +24,8 @@ import { Route as LayoutExperimentsExperimentIdRouteImport } from './routes/_lay
 import { Route as LayoutBeaconLocallyBuiltBlocksRouteImport } from './routes/_layout.beacon.locally-built-blocks'
 import { Route as LayoutXatuDataContributorsIndexRouteImport } from './routes/_layout.xatu-data.contributors.index'
 import { Route as LayoutExperimentsExperimentIdIndexRouteImport } from './routes/_layout.experiments.$experimentId.index'
-import { Route as LayoutBeaconSlotIndexRouteImport } from './routes/_layout.beacon.slot.index'
 import { Route as LayoutBeaconBlockProductionIndexRouteImport } from './routes/_layout.beacon.block-production.index'
 import { Route as LayoutXatuDataContributorsNameRouteImport } from './routes/_layout.xatu-data.contributors.$name'
-import { Route as LayoutBeaconSlotLiveRouteImport } from './routes/_layout.beacon.slot.live'
-import { Route as LayoutBeaconSlotSlotRouteImport } from './routes/_layout.beacon.slot.$slot'
 import { Route as LayoutBeaconBlockProductionLiveRouteImport } from './routes/_layout.beacon.block-production.live'
 import { Route as LayoutBeaconBlockProductionSlotRouteImport } from './routes/_layout.beacon.block-production.$slot'
 
@@ -112,11 +109,6 @@ const LayoutExperimentsExperimentIdIndexRoute =
     path: '/',
     getParentRoute: () => LayoutExperimentsExperimentIdRoute,
   } as any)
-const LayoutBeaconSlotIndexRoute = LayoutBeaconSlotIndexRouteImport.update({
-  id: '/slot/',
-  path: '/slot/',
-  getParentRoute: () => LayoutBeaconRoute,
-} as any)
 const LayoutBeaconBlockProductionIndexRoute =
   LayoutBeaconBlockProductionIndexRouteImport.update({
     id: '/block-production/',
@@ -129,16 +121,6 @@ const LayoutXatuDataContributorsNameRoute =
     path: '/xatu-data/contributors/$name',
     getParentRoute: () => LayoutRoute,
   } as any)
-const LayoutBeaconSlotLiveRoute = LayoutBeaconSlotLiveRouteImport.update({
-  id: '/slot/live',
-  path: '/slot/live',
-  getParentRoute: () => LayoutBeaconRoute,
-} as any)
-const LayoutBeaconSlotSlotRoute = LayoutBeaconSlotSlotRouteImport.update({
-  id: '/slot/$slot',
-  path: '/slot/$slot',
-  getParentRoute: () => LayoutBeaconRoute,
-} as any)
 const LayoutBeaconBlockProductionLiveRoute =
   LayoutBeaconBlockProductionLiveRouteImport.update({
     id: '/block-production/live',
@@ -167,11 +149,8 @@ export interface FileRoutesByFullPath {
   '/xatu-data': typeof LayoutXatuDataIndexRoute
   '/beacon/block-production/$slot': typeof LayoutBeaconBlockProductionSlotRoute
   '/beacon/block-production/live': typeof LayoutBeaconBlockProductionLiveRoute
-  '/beacon/slot/$slot': typeof LayoutBeaconSlotSlotRoute
-  '/beacon/slot/live': typeof LayoutBeaconSlotLiveRoute
   '/xatu-data/contributors/$name': typeof LayoutXatuDataContributorsNameRoute
   '/beacon/block-production': typeof LayoutBeaconBlockProductionIndexRoute
-  '/beacon/slot': typeof LayoutBeaconSlotIndexRoute
   '/experiments/$experimentId/': typeof LayoutExperimentsExperimentIdIndexRoute
   '/xatu-data/contributors': typeof LayoutXatuDataContributorsIndexRoute
 }
@@ -188,11 +167,8 @@ export interface FileRoutesByTo {
   '/xatu-data': typeof LayoutXatuDataIndexRoute
   '/beacon/block-production/$slot': typeof LayoutBeaconBlockProductionSlotRoute
   '/beacon/block-production/live': typeof LayoutBeaconBlockProductionLiveRoute
-  '/beacon/slot/$slot': typeof LayoutBeaconSlotSlotRoute
-  '/beacon/slot/live': typeof LayoutBeaconSlotLiveRoute
   '/xatu-data/contributors/$name': typeof LayoutXatuDataContributorsNameRoute
   '/beacon/block-production': typeof LayoutBeaconBlockProductionIndexRoute
-  '/beacon/slot': typeof LayoutBeaconSlotIndexRoute
   '/experiments/$experimentId': typeof LayoutExperimentsExperimentIdIndexRoute
   '/xatu-data/contributors': typeof LayoutXatuDataContributorsIndexRoute
 }
@@ -213,11 +189,8 @@ export interface FileRoutesById {
   '/_layout/xatu-data/': typeof LayoutXatuDataIndexRoute
   '/_layout/beacon/block-production/$slot': typeof LayoutBeaconBlockProductionSlotRoute
   '/_layout/beacon/block-production/live': typeof LayoutBeaconBlockProductionLiveRoute
-  '/_layout/beacon/slot/$slot': typeof LayoutBeaconSlotSlotRoute
-  '/_layout/beacon/slot/live': typeof LayoutBeaconSlotLiveRoute
   '/_layout/xatu-data/contributors/$name': typeof LayoutXatuDataContributorsNameRoute
   '/_layout/beacon/block-production/': typeof LayoutBeaconBlockProductionIndexRoute
-  '/_layout/beacon/slot/': typeof LayoutBeaconSlotIndexRoute
   '/_layout/experiments/$experimentId/': typeof LayoutExperimentsExperimentIdIndexRoute
   '/_layout/xatu-data/contributors/': typeof LayoutXatuDataContributorsIndexRoute
 }
@@ -238,11 +211,8 @@ export interface FileRouteTypes {
     | '/xatu-data'
     | '/beacon/block-production/$slot'
     | '/beacon/block-production/live'
-    | '/beacon/slot/$slot'
-    | '/beacon/slot/live'
     | '/xatu-data/contributors/$name'
     | '/beacon/block-production'
-    | '/beacon/slot'
     | '/experiments/$experimentId/'
     | '/xatu-data/contributors'
   fileRoutesByTo: FileRoutesByTo
@@ -259,11 +229,8 @@ export interface FileRouteTypes {
     | '/xatu-data'
     | '/beacon/block-production/$slot'
     | '/beacon/block-production/live'
-    | '/beacon/slot/$slot'
-    | '/beacon/slot/live'
     | '/xatu-data/contributors/$name'
     | '/beacon/block-production'
-    | '/beacon/slot'
     | '/experiments/$experimentId'
     | '/xatu-data/contributors'
   id:
@@ -283,11 +250,8 @@ export interface FileRouteTypes {
     | '/_layout/xatu-data/'
     | '/_layout/beacon/block-production/$slot'
     | '/_layout/beacon/block-production/live'
-    | '/_layout/beacon/slot/$slot'
-    | '/_layout/beacon/slot/live'
     | '/_layout/xatu-data/contributors/$name'
     | '/_layout/beacon/block-production/'
-    | '/_layout/beacon/slot/'
     | '/_layout/experiments/$experimentId/'
     | '/_layout/xatu-data/contributors/'
   fileRoutesById: FileRoutesById
@@ -403,13 +367,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LayoutExperimentsExperimentIdIndexRouteImport
       parentRoute: typeof LayoutExperimentsExperimentIdRoute
     }
-    '/_layout/beacon/slot/': {
-      id: '/_layout/beacon/slot/'
-      path: '/slot'
-      fullPath: '/beacon/slot'
-      preLoaderRoute: typeof LayoutBeaconSlotIndexRouteImport
-      parentRoute: typeof LayoutBeaconRoute
-    }
     '/_layout/beacon/block-production/': {
       id: '/_layout/beacon/block-production/'
       path: '/block-production'
@@ -423,20 +380,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/xatu-data/contributors/$name'
       preLoaderRoute: typeof LayoutXatuDataContributorsNameRouteImport
       parentRoute: typeof LayoutRoute
-    }
-    '/_layout/beacon/slot/live': {
-      id: '/_layout/beacon/slot/live'
-      path: '/slot/live'
-      fullPath: '/beacon/slot/live'
-      preLoaderRoute: typeof LayoutBeaconSlotLiveRouteImport
-      parentRoute: typeof LayoutBeaconRoute
-    }
-    '/_layout/beacon/slot/$slot': {
-      id: '/_layout/beacon/slot/$slot'
-      path: '/slot/$slot'
-      fullPath: '/beacon/slot/$slot'
-      preLoaderRoute: typeof LayoutBeaconSlotSlotRouteImport
-      parentRoute: typeof LayoutBeaconRoute
     }
     '/_layout/beacon/block-production/live': {
       id: '/_layout/beacon/block-production/live'
@@ -459,20 +402,14 @@ interface LayoutBeaconRouteChildren {
   LayoutBeaconLocallyBuiltBlocksRoute: typeof LayoutBeaconLocallyBuiltBlocksRoute
   LayoutBeaconBlockProductionSlotRoute: typeof LayoutBeaconBlockProductionSlotRoute
   LayoutBeaconBlockProductionLiveRoute: typeof LayoutBeaconBlockProductionLiveRoute
-  LayoutBeaconSlotSlotRoute: typeof LayoutBeaconSlotSlotRoute
-  LayoutBeaconSlotLiveRoute: typeof LayoutBeaconSlotLiveRoute
   LayoutBeaconBlockProductionIndexRoute: typeof LayoutBeaconBlockProductionIndexRoute
-  LayoutBeaconSlotIndexRoute: typeof LayoutBeaconSlotIndexRoute
 }
 
 const LayoutBeaconRouteChildren: LayoutBeaconRouteChildren = {
   LayoutBeaconLocallyBuiltBlocksRoute: LayoutBeaconLocallyBuiltBlocksRoute,
   LayoutBeaconBlockProductionSlotRoute: LayoutBeaconBlockProductionSlotRoute,
   LayoutBeaconBlockProductionLiveRoute: LayoutBeaconBlockProductionLiveRoute,
-  LayoutBeaconSlotSlotRoute: LayoutBeaconSlotSlotRoute,
-  LayoutBeaconSlotLiveRoute: LayoutBeaconSlotLiveRoute,
   LayoutBeaconBlockProductionIndexRoute: LayoutBeaconBlockProductionIndexRoute,
-  LayoutBeaconSlotIndexRoute: LayoutBeaconSlotIndexRoute,
 }
 
 const LayoutBeaconRouteWithChildren = LayoutBeaconRoute._addFileChildren(

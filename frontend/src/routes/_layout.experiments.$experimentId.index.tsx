@@ -2,6 +2,7 @@ import { createFileRoute } from '@tanstack/react-router';
 import { BeaconLive } from '@/pages/beacon/live';
 import BlockProductionLivePage from '@/pages/beacon/block-production/live';
 import { LocallyBuiltBlocks } from '@/pages/beacon/LocallyBuiltBlocks';
+import { SlotLookup } from '@/pages/beacon/slot/index';
 import { SlotStatusBar } from '@/components/slot/SlotStatusBar';
 
 export const Route = createFileRoute('/_layout/experiments/$experimentId/')({
@@ -17,6 +18,10 @@ const EXPERIMENTS: Record<string, ExperimentConfig> = {
   'live-slots': {
     component: BeaconLive,
     type: 'slot',
+  },
+
+  'historical-slots': {
+    component: SlotLookup,
   },
 
   'block-production-flow': {

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from '@tanstack/react-router';
 import { AlertTriangle, Search, AlertCircle } from 'lucide-react';
 import { useNetwork, useConfig } from '@/stores/appStore';
-import useBeacon from '@/contexts/beacon';
+import { useExperimentConfig } from '@/hooks/useExperimentConfig';
 import { Card, CardBody } from '@/components/common/Card';
 
 function SlotLookup() {
@@ -10,9 +10,14 @@ function SlotLookup() {
   const [slotNumber, setSlotNumber] = useState('');
   const { selectedNetwork } = useNetwork();
   const { config } = useConfig();
-  const { getBeaconClock } = useBeacon();
-  const clock = getBeaconClock(selectedNetwork);
-  const currentSlot = clock?.getCurrentSlot() || 0;
+
+  // Fetch experiment config to get max_slot
+  const { data: experimentConfig } = useExperimentConfig(selectedNetwork, 'historical-slots', {
+    refetchInterval: 10_000,
+    staleTime: 10_000,
+  });
+
+  const maxSlot = experimentConfig?.experiment?.dataAvailability?.[selectedNetwork]?.maxSlot || 0;
 
   // Check if this experiment is available for the current network
   const isExperimentAvailable = () => {
@@ -93,8 +98,8 @@ function SlotLookup() {
                   type="number"
                   value={slotNumber}
                   onChange={e => setSlotNumber(e.target.value)}
-                  placeholder={`Current slot: ${currentSlot.toLocaleString()}`}
-                  className="w-full bg-nav/50 backdrop-blur-sm border border-subtle rounded-lg pl-4 pr-32 py-3 text-lg font-mono text-primary placeholder:text-tertiary focus:border-accent focus:outline-none transition-colors [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                  placeholder={`Latest available: ${maxSlot.toLocaleString()}`}
+                  className="w-full bg-slate-800/50 backdrop-blur-sm border border-subtle rounded-lg pl-4 pr-32 py-3 text-lg font-mono text-slate-100 placeholder:text-tertiary focus:border-accent focus:outline-none transition-colors [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                 />
                 <div className="absolute right-3 top-1/2 -translate-y-1/2">
                   <button
@@ -123,15 +128,15 @@ function SlotLookup() {
                 navigate({
                   to: '/experiments/live-slots',
                   search: {
-                    slot: currentSlot,
+                    slot: maxSlot,
                     mode: 'single',
                   },
                 })
               }
               className="flex items-center gap-2 px-4 py-2 bg-nav/50 backdrop-blur-sm border border-subtle rounded-lg text-sm font-mono text-tertiary hover:text-primary hover:border-white/20 transition-colors"
             >
-              <span>Current Slot</span>
-              <span className="text-primary">{currentSlot.toLocaleString()}</span>
+              <span>Latest Slot</span>
+              <span className="text-primary">{maxSlot.toLocaleString()}</span>
             </button>
           </div>
         </CardBody>

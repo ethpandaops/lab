@@ -1,4 +1,4 @@
-import { Outlet, useLocation, useNavigate } from '@tanstack/react-router';
+import { Outlet, useLocation, useNavigate, useParams } from '@tanstack/react-router';
 import { Navigation } from '@/components/layout/Navigation';
 import { Breadcrumbs } from '@/components/layout/Breadcrumbs';
 import { NetworkSelector } from '@/components/common/NetworkSelector';
@@ -17,12 +17,18 @@ import { GoogleFormSystemAlert } from '@/components/common/SystemAlert';
 function Layout() {
   const location = useLocation();
   const navigate = useNavigate();
+  const params = useParams({ strict: false });
   const isHome = location.pathname === '/';
   const { selectedNetwork, setSelectedNetwork } = useNetwork();
   const [currentSlot, setCurrentSlot] = useState<number | null>(null);
   const [currentEpoch, setCurrentEpoch] = useState<number | null>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { getBeaconClock } = useBeacon();
+
+  // Check if we're in a full-height experiment
+  const isFullHeightExperiment =
+    'experimentId' in params &&
+    (params.experimentId === 'live-slots' || params.experimentId === 'block-production-flow');
 
   // Get network metadata
   const selectedMetadata = NETWORK_METADATA[selectedNetwork as NetworkKey] || {
@@ -219,21 +225,13 @@ function Layout() {
           <div
             className={clsx(
               'w-full',
-              location.pathname === '/beacon/slot/live' ||
-                /^\/beacon\/slot\/\d+$/.test(location.pathname) ||
-                /^\/experiments\/[^/]+$/.test(location.pathname)
-                ? 'h-[calc(100vh-56px)]'
-                : ['min-h-0', 'p-2 md:p-4 lg:p-6'],
+              isFullHeightExperiment ? 'h-[calc(100vh-56px)]' : ['min-h-0', 'p-2 md:p-4 lg:p-6'],
             )}
           >
             <div
               className={clsx(
                 'relative',
-                location.pathname === '/beacon/slot/live' ||
-                  /^\/beacon\/slot\/\d+$/.test(location.pathname) ||
-                  /^\/experiments\/[^/]+$/.test(location.pathname)
-                  ? 'h-full'
-                  : ['p-4 md:p-6 lg:p-8'],
+                isFullHeightExperiment ? 'h-full' : ['p-4 md:p-6 lg:p-8'],
               )}
             >
               <Outlet />

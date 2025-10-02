@@ -30,7 +30,17 @@ var ExperimentTableMapping = map[string][]string{
 		// "fct_mev_bid_value_by_builder",
 	},
 	"historical-slots": {
-		"fct_block",
+		"fct_block_head",
+		"fct_block_first_seen_by_node",
+		"fct_attestation_first_seen_chunked_50ms",
+		"fct_attestation_correctness_head",
+		"fct_block_proposer_entity",
+		// Optional deps
+		// "fct_block_blob_first_seen_by_node",
+		// "fct_block_blob_count_head",
+		// "fct_block_mev_head",
+		// "fct_mev_bid_count_by_relay",
+		// "fct_mev_bid_value_by_builder",
 	},
 	"locally-built-blocks": {
 		"fct_prepared_block",
