@@ -18,23 +18,26 @@ option go_package = "github.com/ethpandaops/lab/backend/pkg/server/proto/xatu_cb
 // 4. Returns raw CBT data using upstream types
 // 5. REST layer transforms CBT types to public API types
 
-import "vendor/github.com/ethpandaops/xatu-cbt/pkg/proto/clickhouse/fct_node_active_last_24h.proto";
-import "vendor/github.com/ethpandaops/xatu-cbt/pkg/proto/clickhouse/fct_block_first_seen_by_node.proto";
-import "vendor/github.com/ethpandaops/xatu-cbt/pkg/proto/clickhouse/fct_block_blob_first_seen_by_node.proto";
-import "vendor/github.com/ethpandaops/xatu-cbt/pkg/proto/clickhouse/fct_attestation_first_seen_chunked_50ms.proto";
-import "vendor/github.com/ethpandaops/xatu-cbt/pkg/proto/clickhouse/fct_attestation_correctness_head.proto";
-import "vendor/github.com/ethpandaops/xatu-cbt/pkg/proto/clickhouse/fct_mev_bid_count_by_relay.proto";
-import "vendor/github.com/ethpandaops/xatu-cbt/pkg/proto/clickhouse/fct_mev_bid_count_by_builder.proto";
-import "vendor/github.com/ethpandaops/xatu-cbt/pkg/proto/clickhouse/fct_mev_bid_highest_value_by_builder_chunked_50ms.proto";
-import "vendor/github.com/ethpandaops/xatu-cbt/pkg/proto/clickhouse/fct_block_blob_count_head.proto";
-import "vendor/github.com/ethpandaops/xatu-cbt/pkg/proto/clickhouse/fct_block_head.proto";
-import "vendor/github.com/ethpandaops/xatu-cbt/pkg/proto/clickhouse/fct_block_mev_head.proto";
-import "vendor/github.com/ethpandaops/xatu-cbt/pkg/proto/clickhouse/fct_block_proposer_entity.proto";
-import "vendor/github.com/ethpandaops/xatu-cbt/pkg/proto/clickhouse/fct_prepared_block.proto";
-import "vendor/github.com/ethpandaops/xatu-cbt/pkg/proto/clickhouse/fct_address_access_chunked_10000.proto";
-import "vendor/github.com/ethpandaops/xatu-cbt/pkg/proto/clickhouse/fct_address_access_total.proto";
-import "vendor/github.com/ethpandaops/xatu-cbt/pkg/proto/clickhouse/fct_address_storage_slot_chunked_10000.proto";
-import "vendor/github.com/ethpandaops/xatu-cbt/pkg/proto/clickhouse/common.proto";
+import "vendor/xatu-cbt/clickhouse/fct_node_active_last_24h.proto";
+import "vendor/xatu-cbt/clickhouse/fct_block_first_seen_by_node.proto";
+import "vendor/xatu-cbt/clickhouse/fct_block_blob_first_seen_by_node.proto";
+import "vendor/xatu-cbt/clickhouse/fct_attestation_first_seen_chunked_50ms.proto";
+import "vendor/xatu-cbt/clickhouse/fct_attestation_correctness_head.proto";
+import "vendor/xatu-cbt/clickhouse/fct_mev_bid_count_by_relay.proto";
+import "vendor/xatu-cbt/clickhouse/fct_mev_bid_count_by_builder.proto";
+import "vendor/xatu-cbt/clickhouse/fct_mev_bid_highest_value_by_builder_chunked_50ms.proto";
+import "vendor/xatu-cbt/clickhouse/fct_block_blob_count_head.proto";
+import "vendor/xatu-cbt/clickhouse/fct_block_head.proto";
+import "vendor/xatu-cbt/clickhouse/fct_block_mev_head.proto";
+import "vendor/xatu-cbt/clickhouse/fct_block_proposer_entity.proto";
+import "vendor/xatu-cbt/clickhouse/fct_prepared_block.proto";
+import "vendor/xatu-cbt/clickhouse/fct_address_access_chunked_10000.proto";
+import "vendor/xatu-cbt/clickhouse/fct_address_access_total.proto";
+import "vendor/xatu-cbt/clickhouse/fct_address_storage_slot_chunked_10000.proto";
+import "vendor/xatu-cbt/clickhouse/fct_address_storage_slot_expired_top_100_by_contract.proto";
+import "vendor/xatu-cbt/clickhouse/fct_address_storage_slot_top_100_by_contract.proto";
+import "vendor/xatu-cbt/clickhouse/fct_address_storage_slot_total.proto";
+import "vendor/xatu-cbt/clickhouse/common.proto";
 
 // XatuCBT service provides access to CBT data from multiple ClickHouse instances.
 // Each RPC corresponds to a specific CBT table/view and uses upstream request/response types.
@@ -106,6 +109,22 @@ service XatuCBT {
   // ListFctAddressAccessTotal returns address access totals.
   // This table contains aggregated totals of accounts and contracts accessed/expired for state expiry analysis.
   rpc ListFctAddressAccessTotal(cbt.ListFctAddressAccessTotalRequest) returns (cbt.ListFctAddressAccessTotalResponse);
+
+  // ListFctAddressStorageSlotExpiredTop100ByContract returns the top 100 contracts by expired storage slots.
+  // This table contains contracts ranked by the number of storage slots not accessed in the last 365 days.
+  rpc ListFctAddressStorageSlotExpiredTop100ByContract(cbt.ListFctAddressStorageSlotExpiredTop100ByContractRequest) returns (cbt.ListFctAddressStorageSlotExpiredTop100ByContractResponse);
+
+  // ListFctAddressStorageSlotTop100ByContract returns the top 100 contracts by total storage slots.
+  // This table contains contracts ranked by the total number of storage slots.
+  rpc ListFctAddressStorageSlotTop100ByContract(cbt.ListFctAddressStorageSlotTop100ByContractRequest) returns (cbt.ListFctAddressStorageSlotTop100ByContractResponse);
+
+  // GetFctAddressStorageSlotTotal returns the latest storage slot totals.
+  // This table contains aggregated totals of storage slots accessed/expired for state expiry analysis.
+  rpc GetFctAddressStorageSlotTotal(cbt.GetFctAddressStorageSlotTotalRequest) returns (cbt.GetFctAddressStorageSlotTotalResponse);
+
+  // ListFctAddressStorageSlotTotal returns storage slot totals.
+  // This table contains aggregated totals of storage slots accessed/expired for state expiry analysis.
+  rpc ListFctAddressStorageSlotTotal(cbt.ListFctAddressStorageSlotTotalRequest) returns (cbt.ListFctAddressStorageSlotTotalResponse);
 
   // GetDataAvailability returns the common availability interval across a set of transformation tables.
   // It calculates the overlapping data range for the specified tables and returns slot information.

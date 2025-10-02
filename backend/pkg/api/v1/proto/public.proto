@@ -99,6 +99,21 @@ message StateExpiryAccessTotal {
   uint64 expired_contracts = 4;
 }
 
+// StateExpiryStorageTotalResponse is the v1 API response for storage slot totals.
+// This endpoint provides the latest total storage slot statistics for state expiry analysis.
+message StateExpiryStorageTotalResponse {
+  StateExpiryStorageTotal item = 1;
+  FilterMetadata filters = 2;
+}
+
+// StateExpiryStorageTotal represents state expiry storage slot statistics for public API consumption.
+message StateExpiryStorageTotal {
+  // Total number of storage slots accessed in last 365 days
+  uint64 total_storage_slots = 1;
+  // Number of expired storage slots (not accessed in last 365 days)
+  uint64 expired_storage_slots = 2;
+}
+
 
 // Network represents an Ethereum network for public API consumption.
 // This provides essential network metadata needed by clients.
@@ -160,6 +175,40 @@ message StateExpiryStorageHistory {
   // Number of storage slots whose most recent access was in this chunk
   // These slots haven't been accessed in any later chunks
   uint32 last_accessed_slots = 3;
+}
+
+// StateExpiryStorageExpiredTopResponse is the v1 API response for top contracts by expired storage slots.
+// This endpoint provides the top 100 contracts ranked by the number of expired storage slots (not accessed in last 365 days).
+message StateExpiryStorageExpiredTopResponse {
+  repeated StateExpiryStorageExpiredTop items = 1;
+  FilterMetadata filters = 2;
+}
+
+// StateExpiryStorageExpiredTop represents a contract ranked by expired storage slots for public API consumption.
+message StateExpiryStorageExpiredTop {
+  // Rank by expired storage slots (1=highest)
+  uint32 rank = 1;
+  // The contract address
+  string contract_address = 2;
+  // Number of expired storage slots for this contract (not accessed in last 365 days)
+  uint64 expired_slots = 3;
+}
+
+// StateExpiryStorageTopResponse is the v1 API response for top contracts by total storage slots.
+// This endpoint provides the top 100 contracts ranked by the total number of storage slots.
+message StateExpiryStorageTopResponse {
+  repeated StateExpiryStorageTop items = 1;
+  FilterMetadata filters = 2;
+}
+
+// StateExpiryStorageTop represents a contract ranked by total storage slots for public API consumption.
+message StateExpiryStorageTop {
+  // Rank by total storage slots (1=highest)
+  uint32 rank = 1;
+  // The contract address
+  string contract_address = 2;
+  // Total number of storage slots for this contract
+  uint64 total_storage_slots = 3;
 }
 
 // ListBeaconSlotMevRelayResponse is the v1 API response for MEV relay bid counts by slot.

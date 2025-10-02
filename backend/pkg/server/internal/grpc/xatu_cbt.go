@@ -343,3 +343,43 @@ func (x *XatuCBT) ListFctAddressStorageSlotChunked10000(
 
 	return x.service.ListFctAddressStorageSlotChunked10000(ctx, req)
 }
+
+// ListFctAddressStorageSlotExpiredTop100ByContract returns the top 100 contracts by expired storage slots.
+func (x *XatuCBT) ListFctAddressStorageSlotExpiredTop100ByContract(
+	ctx context.Context,
+	req *cbtproto.ListFctAddressStorageSlotExpiredTop100ByContractRequest,
+) (*cbtproto.ListFctAddressStorageSlotExpiredTop100ByContractResponse, error) {
+	// No PK enrichment needed since this table doesn't use slot-based primary keys.
+	// The primary key is rank which we'll query directly.
+	return x.service.ListFctAddressStorageSlotExpiredTop100ByContract(ctx, req)
+}
+
+// ListFctAddressStorageSlotTop100ByContract returns the top 100 contracts by total storage slots.
+func (x *XatuCBT) ListFctAddressStorageSlotTop100ByContract(
+	ctx context.Context,
+	req *cbtproto.ListFctAddressStorageSlotTop100ByContractRequest,
+) (*cbtproto.ListFctAddressStorageSlotTop100ByContractResponse, error) {
+	// No PK enrichment needed since this table doesn't use slot-based primary keys.
+	// The primary key is rank which we'll query directly.
+	return x.service.ListFctAddressStorageSlotTop100ByContract(ctx, req)
+}
+
+// GetFctAddressStorageSlotTotal returns the latest storage slot totals.
+func (x *XatuCBT) GetFctAddressStorageSlotTotal(
+	ctx context.Context,
+	req *cbtproto.GetFctAddressStorageSlotTotalRequest,
+) (*cbtproto.GetFctAddressStorageSlotTotalResponse, error) {
+	// No PK enrichment needed since this table doesn't use slot-based primary keys.
+	// The primary key is updated_date_time which we'll query directly.
+	return x.service.GetFctAddressStorageSlotTotal(ctx, req)
+}
+
+// ListFctAddressStorageSlotTotal returns storage slot totals.
+func (x *XatuCBT) ListFctAddressStorageSlotTotal(
+	ctx context.Context,
+	req *cbtproto.ListFctAddressStorageSlotTotalRequest,
+) (*cbtproto.ListFctAddressStorageSlotTotalResponse, error) {
+	// No PK enrichment needed since this table doesn't use slot-based primary keys.
+	// The primary key is updated_date_time which we'll query directly.
+	return x.service.ListFctAddressStorageSlotTotal(ctx, req)
+}

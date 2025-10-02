@@ -324,3 +324,229 @@ func transformCBTToAPIStateExpiryAccessTotal(cbt *cbtproto.FctAddressAccessTotal
 		ExpiredContracts: cbt.ExpiredContracts,
 	}
 }
+
+// handleStateExpiryStorageExpiredTop handles GET /api/v1/{network}/state-expiry/storage/expired/top
+// This endpoint returns the top 100 contracts ranked by expired storage slots for state expiry analysis.
+func (r *PublicRouter) handleStateExpiryStorageExpiredTop(w http.ResponseWriter, req *http.Request) {
+	var (
+		ctx     = req.Context()
+		vars    = mux.Vars(req)
+		network = vars["network"]
+	)
+
+	// 1. Validate network
+	if network == "" {
+		r.writeError(w, http.StatusBadRequest, "Network parameter is required")
+
+		return
+	}
+
+	r.log.WithFields(logrus.Fields{
+		"network": network,
+	}).Debug("REST v1: StateExpiryStorageExpiredTop")
+
+	// 2. Set network in gRPC metadata and call service
+	ctxWithMeta := metadata.NewOutgoingContext(
+		ctx,
+		metadata.New(map[string]string{"network": network}),
+	)
+
+	// Call the service to get the top 100 contracts - no filters needed
+	grpcReq := &cbtproto.ListFctAddressStorageSlotExpiredTop100ByContractRequest{}
+
+	grpcResp, err := r.xatuCBTClient.ListFctAddressStorageSlotExpiredTop100ByContract(ctxWithMeta, grpcReq)
+	if err != nil {
+		r.log.WithError(err).WithFields(logrus.Fields{
+			"network": network,
+		}).Error("Failed to query expired storage slot top 100")
+		r.handleGRPCError(w, err)
+
+		return
+	}
+
+	// 3. TRANSFORM CBT types → Public API types
+	items := make([]*apiv1.StateExpiryStorageExpiredTop, 0, len(grpcResp.FctAddressStorageSlotExpiredTop_100ByContract))
+
+	for _, cbtItem := range grpcResp.FctAddressStorageSlotExpiredTop_100ByContract {
+		apiItem := transformCBTToAPIStateExpiryStorageExpiredTop(cbtItem)
+		items = append(items, apiItem)
+	}
+
+	// Build applied filters map for metadata (empty for this endpoint)
+	appliedFilters := make(map[string]string)
+
+	response := &apiv1.StateExpiryStorageExpiredTopResponse{
+		Items: items,
+		Filters: &apiv1.FilterMetadata{
+			Network:        network,
+			AppliedFilters: appliedFilters,
+		},
+	}
+
+	// 4. Set content type header (cache headers are handled by middleware)
+	w.Header().Set("Content-Type", "application/json")
+
+	// 5. Write JSON response
+	if err := json.NewEncoder(w).Encode(response); err != nil {
+		r.log.WithError(err).Error("Failed to encode response")
+	}
+}
+
+// transformCBTToAPIStateExpiryStorageExpiredTop transforms CBT types to public API types.
+// This is the ONLY place where transformation happens for state expiry expired storage top 100.
+func transformCBTToAPIStateExpiryStorageExpiredTop(cbt *cbtproto.FctAddressStorageSlotExpiredTop100ByContract) *apiv1.StateExpiryStorageExpiredTop {
+	return &apiv1.StateExpiryStorageExpiredTop{
+		Rank:            cbt.Rank,
+		ContractAddress: cbt.ContractAddress,
+		ExpiredSlots:    cbt.ExpiredSlots,
+	}
+}
+
+// handleStateExpiryStorageTop handles GET /api/v1/{network}/state-expiry/storage/top
+// This endpoint returns the top 100 contracts ranked by total storage slots for state expiry analysis.
+func (r *PublicRouter) handleStateExpiryStorageTop(w http.ResponseWriter, req *http.Request) {
+	var (
+		ctx     = req.Context()
+		vars    = mux.Vars(req)
+		network = vars["network"]
+	)
+
+	// 1. Validate network
+	if network == "" {
+		r.writeError(w, http.StatusBadRequest, "Network parameter is required")
+
+		return
+	}
+
+	r.log.WithFields(logrus.Fields{
+		"network": network,
+	}).Debug("REST v1: StateExpiryStorageTop")
+
+	// 2. Set network in gRPC metadata and call service
+	ctxWithMeta := metadata.NewOutgoingContext(
+		ctx,
+		metadata.New(map[string]string{"network": network}),
+	)
+
+	// Call the service to get the top 100 contracts - no filters needed
+	grpcReq := &cbtproto.ListFctAddressStorageSlotTop100ByContractRequest{}
+
+	grpcResp, err := r.xatuCBTClient.ListFctAddressStorageSlotTop100ByContract(ctxWithMeta, grpcReq)
+	if err != nil {
+		r.log.WithError(err).WithFields(logrus.Fields{
+			"network": network,
+		}).Error("Failed to query storage slot top 100")
+		r.handleGRPCError(w, err)
+
+		return
+	}
+
+	// 3. TRANSFORM CBT types → Public API types
+	items := make([]*apiv1.StateExpiryStorageTop, 0, len(grpcResp.FctAddressStorageSlotTop_100ByContract))
+
+	for _, cbtItem := range grpcResp.FctAddressStorageSlotTop_100ByContract {
+		apiItem := transformCBTToAPIStateExpiryStorageTop(cbtItem)
+		items = append(items, apiItem)
+	}
+
+	// Build applied filters map for metadata (empty for this endpoint)
+	appliedFilters := make(map[string]string)
+
+	response := &apiv1.StateExpiryStorageTopResponse{
+		Items: items,
+		Filters: &apiv1.FilterMetadata{
+			Network:        network,
+			AppliedFilters: appliedFilters,
+		},
+	}
+
+	// 4. Set content type header (cache headers are handled by middleware)
+	w.Header().Set("Content-Type", "application/json")
+
+	// 5. Write JSON response
+	if err := json.NewEncoder(w).Encode(response); err != nil {
+		r.log.WithError(err).Error("Failed to encode response")
+	}
+}
+
+// transformCBTToAPIStateExpiryStorageTop transforms CBT types to public API types.
+// This is the ONLY place where transformation happens for state expiry storage top 100.
+func transformCBTToAPIStateExpiryStorageTop(cbt *cbtproto.FctAddressStorageSlotTop100ByContract) *apiv1.StateExpiryStorageTop {
+	return &apiv1.StateExpiryStorageTop{
+		Rank:              cbt.Rank,
+		ContractAddress:   cbt.ContractAddress,
+		TotalStorageSlots: cbt.TotalStorageSlots,
+	}
+}
+
+// handleStateExpiryStorageTotal handles GET /api/v1/{network}/state-expiry/storage/total
+// This endpoint returns the latest storage slot totals for state expiry analysis.
+func (r *PublicRouter) handleStateExpiryStorageTotal(w http.ResponseWriter, req *http.Request) {
+	var (
+		ctx     = req.Context()
+		vars    = mux.Vars(req)
+		network = vars["network"]
+	)
+
+	// 1. Validate network
+	if network == "" {
+		r.writeError(w, http.StatusBadRequest, "Network parameter is required")
+
+		return
+	}
+
+	r.log.WithFields(logrus.Fields{
+		"network": network,
+	}).Debug("REST v1: StateExpiryStorageTotal")
+
+	// 2. Set network in gRPC metadata and call service
+	ctxWithMeta := metadata.NewOutgoingContext(
+		ctx,
+		metadata.New(map[string]string{"network": network}),
+	)
+
+	// Call the service to get the latest storage slot totals
+	// Using Get method to retrieve the most recent record
+	grpcReq := &cbtproto.GetFctAddressStorageSlotTotalRequest{}
+
+	grpcResp, err := r.xatuCBTClient.GetFctAddressStorageSlotTotal(ctxWithMeta, grpcReq)
+	if err != nil {
+		r.log.WithError(err).WithFields(logrus.Fields{
+			"network": network,
+		}).Error("Failed to query storage slot totals")
+		r.handleGRPCError(w, err)
+
+		return
+	}
+
+	// 3. TRANSFORM CBT types → Public API types
+	apiItem := transformCBTToAPIStateExpiryStorageTotal(grpcResp.Item)
+
+	// Build applied filters map for metadata (empty for this endpoint)
+	appliedFilters := make(map[string]string)
+
+	response := &apiv1.StateExpiryStorageTotalResponse{
+		Item: apiItem,
+		Filters: &apiv1.FilterMetadata{
+			Network:        network,
+			AppliedFilters: appliedFilters,
+		},
+	}
+
+	// 4. Set content type header (cache headers are handled by middleware)
+	w.Header().Set("Content-Type", "application/json")
+
+	// 5. Write JSON response
+	if err := json.NewEncoder(w).Encode(response); err != nil {
+		r.log.WithError(err).Error("Failed to encode response")
+	}
+}
+
+// transformCBTToAPIStateExpiryStorageTotal transforms CBT types to public API types.
+// This is the ONLY place where transformation happens for state expiry storage totals.
+func transformCBTToAPIStateExpiryStorageTotal(cbt *cbtproto.FctAddressStorageSlotTotal) *apiv1.StateExpiryStorageTotal {
+	return &apiv1.StateExpiryStorageTotal{
+		TotalStorageSlots:   cbt.TotalStorageSlots,
+		ExpiredStorageSlots: cbt.ExpiredStorageSlots,
+	}
+}

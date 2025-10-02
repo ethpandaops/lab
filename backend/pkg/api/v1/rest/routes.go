@@ -173,5 +173,26 @@ func (r *PublicRouter) GetRoutes() []RouteConfig {
 			Cache:       middleware.CacheNearRealtime,
 			Description: "Get total address access statistics for state expiry analysis",
 		},
+		{
+			Path:        "/{network}/state-expiry/storage/expired/top",
+			Handler:     r.handleStateExpiryStorageExpiredTop,
+			Methods:     []string{http.MethodGet, http.MethodOptions},
+			Cache:       middleware.CacheNearRealtime,
+			Description: "Get top 100 contracts by expired storage slots for state expiry analysis",
+		},
+		{
+			Path:        "/{network}/state-expiry/storage/top",
+			Handler:     r.handleStateExpiryStorageTop,
+			Methods:     []string{http.MethodGet, http.MethodOptions},
+			Cache:       middleware.CacheNearRealtime,
+			Description: "Get top 100 contracts by total storage slots for state expiry analysis",
+		},
+		{
+			Path:        "/{network}/state-expiry/storage/total",
+			Handler:     r.handleStateExpiryStorageTotal,
+			Methods:     []string{http.MethodGet, http.MethodOptions},
+			Cache:       middleware.CacheNearRealtime,
+			Description: "Get total storage slot statistics for state expiry analysis",
+		},
 	}
 }
