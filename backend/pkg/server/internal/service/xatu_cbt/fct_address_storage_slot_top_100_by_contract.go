@@ -48,25 +48,35 @@ func (x *XatuCBT) ListFctAddressStorageSlotTop100ByContract(
 	// Since this is a top 100 list, we'll typically want all records
 	// If no filters are provided, get all 100 records ordered by rank
 
+	// Create a copy of the request to avoid mutating the original
+	reqCopy := &cbtproto.ListFctAddressStorageSlotTop100ByContractRequest{
+		Rank:              req.Rank,
+		ContractAddress:   req.ContractAddress,
+		TotalStorageSlots: req.TotalStorageSlots,
+		PageSize:          req.PageSize,
+		PageToken:         req.PageToken,
+		OrderBy:           req.OrderBy,
+	}
+
 	// Set default rank filter if not provided (required as primary key)
-	if req.Rank == nil {
+	if reqCopy.Rank == nil {
 		// Get all ranks from 1 to 100
-		req.Rank = &cbtproto.UInt32Filter{
+		reqCopy.Rank = &cbtproto.UInt32Filter{
 			Filter: &cbtproto.UInt32Filter_Lte{Lte: 100},
 		}
 	}
 
-	if req.PageSize == 0 {
-		req.PageSize = 100 // Default to getting all top 100
+	if reqCopy.PageSize == 0 {
+		reqCopy.PageSize = 100 // Default to getting all top 100
 	}
 
-	if req.OrderBy == "" {
-		req.OrderBy = "rank asc" // Default ordering by rank
+	if reqCopy.OrderBy == "" {
+		reqCopy.OrderBy = "rank asc" // Default ordering by rank
 	}
 
 	// Use our clickhouse-proto-gen to handle building for us.
 	sqlQuery, err := cbtproto.BuildListFctAddressStorageSlotTop100ByContractQuery(
-		req,
+		reqCopy,
 		cbtproto.WithFinal(),
 		cbtproto.WithDatabase(network),
 	)
@@ -91,13 +101,13 @@ func (x *XatuCBT) ListFctAddressStorageSlotTop100ByContract(
 	}
 
 	// Calculate pagination.
-	pageSize := req.PageSize
+	pageSize := reqCopy.PageSize
 	if pageSize == 0 {
 		pageSize = 100
 	}
 
 	// Get current offset from token.
-	currentOffset, err := cbtproto.DecodePageToken(req.PageToken)
+	currentOffset, err := cbtproto.DecodePageToken(reqCopy.PageToken)
 	if err != nil {
 		return nil, fmt.Errorf("failed to decode page token: %w", err)
 	}
