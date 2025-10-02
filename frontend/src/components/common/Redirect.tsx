@@ -12,7 +12,7 @@ const Redirect: React.FC<RedirectProps> = ({ to }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    navigate({ to: to as any, replace: true });
+    navigate({ to, replace: true });
   }, [navigate, to]);
 
   return null;
