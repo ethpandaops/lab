@@ -98,6 +98,29 @@ message NetworkFilterMetadata {
   int32 filtered_count = 3;             // Networks after filtering
 }
 
+// StateExpiryAccessHistoryResponse is the v1 API response for state expiry access history data.
+// This endpoint provides aggregated data about Ethereum address access patterns chunked by 10000 blocks.
+message StateExpiryAccessHistoryResponse {
+  repeated StateExpiryAccessHistory items = 1;
+  PaginationMetadata pagination = 2;
+  FilterMetadata filters = 3;
+}
+
+// StateExpiryAccessHistory represents address access statistics for a 10000-block chunk.
+// This data is useful for analyzing state expiry patterns and understanding address activity over time.
+message StateExpiryAccessHistory {
+  // The starting block number of this 10000-block chunk
+  uint32 chunk_start_block_number = 1;
+
+  // Number of unique accounts that were accessed for the first time in this chunk
+  // These are addresses that had never been accessed before this chunk
+  uint32 first_accessed_accounts = 2;
+
+  // Number of unique accounts whose most recent access was in this chunk
+  // These addresses haven't been accessed in any later chunks
+  uint32 last_accessed_accounts = 3;
+}
+
 // ListBeaconSlotMevRelayResponse is the v1 API response for MEV relay bid counts by slot.
 message ListBeaconSlotMevRelayResponse {
   repeated MevRelayBidCount relays = 1;

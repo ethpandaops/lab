@@ -63,6 +63,26 @@ func (mr *MockXatuCBTClientMockRecorder) GetDataAvailability(ctx, in any, opts .
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDataAvailability", reflect.TypeOf((*MockXatuCBTClient)(nil).GetDataAvailability), varargs...)
 }
 
+// ListFctAddressAccessChunked10000 mocks base method.
+func (m *MockXatuCBTClient) ListFctAddressAccessChunked10000(ctx context.Context, in *clickhouse.ListFctAddressAccessChunked10000Request, opts ...grpc.CallOption) (*clickhouse.ListFctAddressAccessChunked10000Response, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "ListFctAddressAccessChunked10000", varargs...)
+	ret0, _ := ret[0].(*clickhouse.ListFctAddressAccessChunked10000Response)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListFctAddressAccessChunked10000 indicates an expected call of ListFctAddressAccessChunked10000.
+func (mr *MockXatuCBTClientMockRecorder) ListFctAddressAccessChunked10000(ctx, in any, opts ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListFctAddressAccessChunked10000", reflect.TypeOf((*MockXatuCBTClient)(nil).ListFctAddressAccessChunked10000), varargs...)
+}
+
 // ListFctAttestationCorrectnessHead mocks base method.
 func (m *MockXatuCBTClient) ListFctAttestationCorrectnessHead(ctx context.Context, in *clickhouse.ListFctAttestationCorrectnessHeadRequest, opts ...grpc.CallOption) (*clickhouse.ListFctAttestationCorrectnessHeadResponse, error) {
 	m.ctrl.T.Helper()

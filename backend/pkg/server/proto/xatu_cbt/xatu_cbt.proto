@@ -31,6 +31,7 @@ import "vendor/xatu-cbt/clickhouse/fct_block_head.proto";
 import "vendor/xatu-cbt/clickhouse/fct_block_mev_head.proto";
 import "vendor/xatu-cbt/clickhouse/fct_block_proposer_entity.proto";
 import "vendor/xatu-cbt/clickhouse/fct_prepared_block.proto";
+import "vendor/xatu-cbt/clickhouse/fct_address_access_chunked_10000.proto";
 import "vendor/xatu-cbt/clickhouse/common.proto";
 
 // XatuCBT service provides access to CBT data from multiple ClickHouse instances.
@@ -87,6 +88,10 @@ service XatuCBT {
   // ListFctPreparedBlock returns prepared blocks for a specific slot.
   // This table contains locally built blocks that validators would have proposed.
   rpc ListFctPreparedBlock(cbt.ListFctPreparedBlockRequest) returns (cbt.ListFctPreparedBlockResponse);
+
+  // ListFctAddressAccessChunked10000 returns address access data chunked by 10000 blocks.
+  // This table contains aggregated data about Ethereum address access patterns for state expiry analysis.
+  rpc ListFctAddressAccessChunked10000(cbt.ListFctAddressAccessChunked10000Request) returns (cbt.ListFctAddressAccessChunked10000Response);
 
   // GetDataAvailability returns the common availability interval across a set of transformation tables.
   // It calculates the overlapping data range for the specified tables and returns slot information.

@@ -150,5 +150,14 @@ func (r *PublicRouter) GetRoutes() []RouteConfig {
 			Cache:       middleware.CacheRealtime,
 			Description: "Get prepared blocks for a specific slot",
 		},
+
+		// State expiry endpoints
+		{
+			Path:        "/{network}/state-expiry/access/history",
+			Handler:     r.handleStateExpiryAccessHistory,
+			Methods:     []string{http.MethodGet, http.MethodOptions},
+			Cache:       middleware.CacheNearRealtime,
+			Description: "Get address access history chunked by 10000 blocks for state expiry analysis",
+		},
 	}
 }

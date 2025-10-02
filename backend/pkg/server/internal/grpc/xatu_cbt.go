@@ -285,3 +285,22 @@ func (x *XatuCBT) ListFctBlockProposerEntity(
 
 	return x.service.ListFctBlockProposerEntity(ctx, req)
 }
+
+// ListFctAddressAccessChunked10000 returns address access data chunked by 10000 blocks.
+func (x *XatuCBT) ListFctAddressAccessChunked10000(
+	ctx context.Context,
+	req *cbtproto.ListFctAddressAccessChunked10000Request,
+) (*cbtproto.ListFctAddressAccessChunked10000Response, error) {
+	// No PK enrichment needed since this table doesn't use slot-based primary keys.
+	// The primary key is chunk_start_block_number which we'll query directly.
+
+	// Set default filter if not provided to avoid full table scan
+	if req.ChunkStartBlockNumber == nil {
+		// Query all chunks by default (with pagination)
+		req.ChunkStartBlockNumber = &cbtproto.UInt32Filter{
+			Filter: &cbtproto.UInt32Filter_Gte{Gte: 0},
+		}
+	}
+
+	return x.service.ListFctAddressAccessChunked10000(ctx, req)
+}
