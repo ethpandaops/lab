@@ -9,6 +9,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc/metadata"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 // handleStateExpiryAccessHistory handles GET /api/v1/{network}/state-expiry/access/history
@@ -505,5 +506,76 @@ func transformCBTToAPIStateExpiryStorageTotal(cbt *cbtproto.FctAddressStorageSlo
 	return &apiv1.StateExpiryStorageTotal{
 		TotalStorageSlots:   cbt.TotalStorageSlots,
 		ExpiredStorageSlots: cbt.ExpiredStorageSlots,
+	}
+}
+
+// handleStateExpiryBlock handles GET /api/v1/{network}/state-expiry/expiry/block
+// This endpoint returns the execution layer block number from approximately 1 year ago,
+// which is used as the boundary for state expiry calculations.
+func (r *PublicRouter) handleStateExpiryBlock(w http.ResponseWriter, req *http.Request) {
+	var (
+		ctx     = req.Context()
+		vars    = mux.Vars(req)
+		network = vars["network"]
+	)
+
+	// 1. Validate network
+	if network == "" {
+		r.WriteJSONResponseError(w, req, http.StatusBadRequest, "Network parameter is required")
+
+		return
+	}
+
+	r.log.WithFields(logrus.Fields{
+		"network": network,
+	}).Debug("REST v1: StateExpiryBlock")
+
+	// 2. Set network in gRPC metadata and call service
+	ctxWithMeta := metadata.NewOutgoingContext(
+		ctx,
+		metadata.New(map[string]string{"network": network}),
+	)
+
+	// Call the special gRPC service method with an empty request
+	grpcResp, err := r.xatuCBTClient.ListFctBlockForStateExpiry(ctxWithMeta, &emptypb.Empty{})
+	if err != nil {
+		r.log.WithError(err).WithFields(logrus.Fields{
+			"network": network,
+		}).Error("Failed to query state expiry block")
+		r.HandleGRPCError(w, req, err)
+
+		return
+	}
+
+	// 3. TRANSFORM CBT types → Public API types
+	// We expect exactly one block from the service
+	var apiItem *apiv1.StateExpiryBlock
+	if len(grpcResp.FctBlock) > 0 {
+		apiItem = transformCBTToAPIStateExpiryBlock(grpcResp.FctBlock[0])
+	} else {
+		// No block found in the time range
+		r.WriteJSONResponseError(w, req, http.StatusNotFound, "No block found for state expiry time range")
+
+		return
+	}
+
+	// Build applied filters map for metadata (empty for this endpoint)
+	appliedFilters := make(map[string]string)
+
+	// 4. Write response using the standard helper
+	r.WriteJSONResponseOK(w, req, &apiv1.StateExpiryBlockResponse{
+		Item: apiItem,
+		Filters: &apiv1.FilterMetadata{
+			Network:        network,
+			AppliedFilters: appliedFilters,
+		},
+	})
+}
+
+// transformCBTToAPIStateExpiryBlock transforms CBT types to public API types.
+// This is the ONLY place where transformation happens for state expiry block.
+func transformCBTToAPIStateExpiryBlock(cbt *cbtproto.FctBlock) *apiv1.StateExpiryBlock {
+	return &apiv1.StateExpiryBlock{
+		BlockNumber: cbt.ExecutionPayloadBlockNumber,
 	}
 }

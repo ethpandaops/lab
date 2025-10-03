@@ -37,7 +37,9 @@ import "vendor/xatu-cbt/clickhouse/fct_address_storage_slot_chunked_10000.proto"
 import "vendor/xatu-cbt/clickhouse/fct_address_storage_slot_expired_top_100_by_contract.proto";
 import "vendor/xatu-cbt/clickhouse/fct_address_storage_slot_top_100_by_contract.proto";
 import "vendor/xatu-cbt/clickhouse/fct_address_storage_slot_total.proto";
+import "vendor/xatu-cbt/clickhouse/fct_block.proto";
 import "vendor/xatu-cbt/clickhouse/common.proto";
+import "google/protobuf/empty.proto";
 
 // XatuCBT service provides access to CBT data from multiple ClickHouse instances.
 // Each RPC corresponds to a specific CBT table/view and uses upstream request/response types.
@@ -125,6 +127,11 @@ service XatuCBT {
   // ListFctAddressStorageSlotTotal returns storage slot totals.
   // This table contains aggregated totals of storage slots accessed/expired for state expiry analysis.
   rpc ListFctAddressStorageSlotTotal(cbt.ListFctAddressStorageSlotTotalRequest) returns (cbt.ListFctAddressStorageSlotTotalResponse);
+
+  // ListFctBlockForStateExpiry returns the execution block number from approximately 1 year ago.
+  // This is a special endpoint for state expiry that queries fct_block with a specific time range.
+  // It returns the block from 1 year ago (minus 11 days) which serves as the boundary for state expiry calculations.
+  rpc ListFctBlockForStateExpiry(google.protobuf.Empty) returns (cbt.ListFctBlockResponse);
 
   // GetDataAvailability returns the common availability interval across a set of transformation tables.
   // It calculates the overlapping data range for the specified tables and returns slot information.

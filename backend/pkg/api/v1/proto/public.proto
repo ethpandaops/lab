@@ -99,6 +99,21 @@ message StateExpiryAccessTotal {
   uint64 expired_contracts = 4;
 }
 
+// StateExpiryBlockResponse is the v1 API response for state expiry block information.
+// Returns the execution layer block number from approximately 1 year ago, which is
+// used as the expiry boundary for state expiry calculations.
+message StateExpiryBlockResponse {
+  StateExpiryBlock item = 1;
+  FilterMetadata filters = 2;
+}
+
+// StateExpiryBlock represents the execution block from approximately 1 year ago
+// that serves as the boundary for state expiry calculations.
+message StateExpiryBlock {
+  // The execution layer block number from approximately 1 year ago
+  uint32 block_number = 1;
+}
+
 // StateExpiryStorageTotalResponse is the v1 API response for storage slot totals.
 // This endpoint provides the latest total storage slot statistics for state expiry analysis.
 message StateExpiryStorageTotalResponse {

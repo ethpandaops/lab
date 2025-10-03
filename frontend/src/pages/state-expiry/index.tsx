@@ -4,6 +4,7 @@ import { ErrorState } from '@/components/common/ErrorState';
 import { IntegratedContextualHeader } from '@/components/layout/IntegratedContextualHeader';
 import { ChartWithStats, NivoLineChart, NivoPieChart } from '@/components/charts';
 import { getRestApiClient } from '@/api/singleton';
+import { useNetwork } from '@/stores/appStore';
 
 interface StateExpiryData {
   totalEOAAccounts: number;
@@ -87,7 +88,7 @@ export default function StateExpiryPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<StateExpiryData | null>(null);
-  const [network] = useState('mainnet');
+  const { selectedNetwork } = useNetwork();
 
   useEffect(() => {
     const fetchStateExpiryData = async () => {
@@ -104,12 +105,12 @@ export default function StateExpiryPage() {
           accessHistory,
           storageHistory,
         ] = await Promise.all([
-          restClient.getStateExpiryAccessTotal(network),
-          restClient.getStateExpiryStorageTotal(network),
-          restClient.getStateExpiryStorageTop(network),
-          restClient.getStateExpiryStorageExpiredTop(network),
-          restClient.getStateExpiryAccessHistory(network),
-          restClient.getStateExpiryStorageHistory(network),
+          restClient.getStateExpiryAccessTotal(selectedNetwork),
+          restClient.getStateExpiryStorageTotal(selectedNetwork),
+          restClient.getStateExpiryStorageTop(selectedNetwork),
+          restClient.getStateExpiryStorageExpiredTop(selectedNetwork),
+          restClient.getStateExpiryAccessHistory(selectedNetwork),
+          restClient.getStateExpiryStorageHistory(selectedNetwork),
         ]);
 
         // Process the data
@@ -239,7 +240,7 @@ export default function StateExpiryPage() {
     };
 
     fetchStateExpiryData();
-  }, [network]);
+  }, [selectedNetwork]);
 
   if (loading) {
     return <LoadingState />;

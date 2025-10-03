@@ -383,3 +383,12 @@ func (x *XatuCBT) ListFctAddressStorageSlotTotal(
 	// The primary key is updated_date_time which we'll query directly.
 	return x.service.ListFctAddressStorageSlotTotal(ctx, req)
 }
+
+// ListFctBlockForStateExpiry returns the execution block number from approximately 1 year ago
+// for state expiry calculations. This is a special endpoint that doesn't take parameters.
+func (x *XatuCBT) ListFctBlockForStateExpiry(
+	ctx context.Context,
+) (*cbtproto.ListFctBlockResponse, error) {
+	// No request parameters needed - the service method handles the time calculation internally
+	return x.service.ListFctBlockForStateExpiry(ctx)
+}
