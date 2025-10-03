@@ -10,6 +10,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 // XatuCBT implements the Xatu CBT gRPC service.
@@ -388,6 +389,7 @@ func (x *XatuCBT) ListFctAddressStorageSlotTotal(
 // for state expiry calculations. This is a special endpoint that doesn't take parameters.
 func (x *XatuCBT) ListFctBlockForStateExpiry(
 	ctx context.Context,
+	req *emptypb.Empty,
 ) (*cbtproto.ListFctBlockResponse, error) {
 	// No request parameters needed - the service method handles the time calculation internally
 	return x.service.ListFctBlockForStateExpiry(ctx)
