@@ -16,6 +16,50 @@ import { ChevronDown, ChevronUp } from 'lucide-react';
 
 const SLOTS_PER_EPOCH = 32;
 
+// Helper function to determine fork status and colors
+const getForkStatus = (fork: any) => {
+  const { readyPercentage, timeUntilFork } = fork;
+  const daysUntilFork = timeUntilFork / (24 * 60 * 60);
+
+  // For activated forks (timeUntilFork <= 0)
+  if (timeUntilFork <= 0) {
+    return {
+      status: 'activated',
+      borderColor: 'border-green-500/50',
+      progressGradient: 'from-green-500 to-green-400',
+      backgroundColor: 'bg-green-500/10',
+    };
+  }
+
+  // Critical: Less than 7 days and low readiness
+  if (daysUntilFork <= 7 && readyPercentage < 70) {
+    return {
+      status: 'critical',
+      borderColor: 'border-red-500/70',
+      progressGradient: 'from-red-500 to-orange-400',
+      backgroundColor: 'bg-red-500/10',
+    };
+  }
+
+  // Warning: Less than 14 days or low readiness
+  if (daysUntilFork <= 14 || readyPercentage < 80) {
+    return {
+      status: 'warning',
+      borderColor: 'border-yellow-500/60',
+      progressGradient: 'from-yellow-500 to-orange-400',
+      backgroundColor: 'bg-yellow-500/10',
+    };
+  }
+
+  // Ready: Good readiness percentage
+  return {
+    status: 'ready',
+    borderColor: 'border-green-500/50',
+    progressGradient: 'from-green-500 to-green-400',
+    backgroundColor: 'bg-green-500/10',
+  };
+};
+
 const CLIENT_METADATA: Record<string, { name: string; logo?: string }> = {
   prysm: { name: 'Prysm' },
   teku: { name: 'Teku' },
@@ -336,156 +380,161 @@ function ForkReadiness() {
         <CardBody>
           <div className="space-y-4">
             {/* Upcoming forks */}
-            {upcomingForks.map(fork => (
-              <div key={fork.name} className="space-y-2">
-                <Card className="card-secondary">
-                  {/* Fork Header */}
-                  <CardHeader className="border-b border-subtle/30">
-                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-2">
-                      <div>
-                        <h3 className="text-xl sm:text-2xl font-sans font-bold text-primary mb-0.5">
-                          {fork.name} Fork
-                        </h3>
-                        <div className="text-xs sm:text-sm font-mono">
-                          <span className="text-secondary">Overall readiness: </span>
-                          <span className="text-primary font-bold">
-                            {fork.readyPercentage.toFixed(1)}%
-                          </span>
-                          <span className="text-tertiary">
-                            {' '}
-                            ({fork.readyNodes}/{fork.totalNodes}{' '}
-                            {fork.totalNodes === 1 ? 'node' : 'nodes'})
-                          </span>
+            {upcomingForks.map(fork => {
+              const forkStatus = getForkStatus(fork);
+              return (
+                <div key={fork.name} className="space-y-2">
+                  <Card
+                    className={`card-secondary border-2 ${forkStatus.borderColor} ${forkStatus.backgroundColor}`}
+                  >
+                    {/* Fork Header */}
+                    <CardHeader className="border-b border-subtle/30">
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-2">
+                        <div>
+                          <h3 className="text-xl sm:text-2xl font-sans font-bold text-primary mb-0.5">
+                            {fork.name} Fork
+                          </h3>
+                          <div className="text-xs sm:text-sm font-mono">
+                            <span className="text-secondary">Overall readiness: </span>
+                            <span className="text-primary font-bold">
+                              {fork.readyPercentage.toFixed(1)}%
+                            </span>
+                            <span className="text-tertiary">
+                              {' '}
+                              ({fork.readyNodes}/{fork.totalNodes}{' '}
+                              {fork.totalNodes === 1 ? 'node' : 'nodes'})
+                            </span>
+                          </div>
+                        </div>
+                        <div className="text-sm font-mono text-secondary">
+                          {fork.timeUntilFork > 0 ? (
+                            <div className="text-right">
+                              <div className="text-accent text-base sm:text-lg font-medium mb-0.5">
+                                {formatDistanceToNow(
+                                  new Date(Date.now() + fork.timeUntilFork * 1000),
+                                )}
+                              </div>
+                              <div className="text-tertiary text-xs sm:text-sm">
+                                until fork (epoch {fork.forkEpoch})
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="text-success text-base sm:text-lg font-medium">
+                              Live Fork
+                            </div>
+                          )}
                         </div>
                       </div>
-                      <div className="text-sm font-mono text-secondary">
-                        {fork.timeUntilFork > 0 ? (
-                          <div className="text-right">
-                            <div className="text-accent text-base sm:text-lg font-medium mb-0.5">
-                              {formatDistanceToNow(
-                                new Date(Date.now() + fork.timeUntilFork * 1000),
-                              )}
-                            </div>
-                            <div className="text-tertiary text-xs sm:text-sm">
-                              until fork (epoch {fork.forkEpoch})
-                            </div>
-                          </div>
-                        ) : (
-                          <div className="text-success text-base sm:text-lg font-medium">
-                            Live Fork
-                          </div>
-                        )}
+
+                      <div className="relative h-2 sm:h-3 bg-surface/30 rounded-full overflow-hidden">
+                        <div
+                          className={`absolute inset-y-0 left-0 bg-gradient-to-r ${forkStatus.progressGradient} transition-all duration-500`}
+                          style={{ width: `${fork.readyPercentage}%` }}
+                        />
                       </div>
-                    </div>
+                    </CardHeader>
 
-                    <div className="relative h-2 sm:h-3 bg-surface/30 rounded-full overflow-hidden">
-                      <div
-                        className="absolute inset-y-0 left-0 bg-gradient-to-r from-accent to-accent/70 transition-all duration-500"
-                        style={{ width: `${fork.readyPercentage}%` }}
-                      />
-                    </div>
-                  </CardHeader>
-
-                  {/* Client Grid */}
-                  <CardBody className="bg-surface/40">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                      {fork.clients.map(client => (
-                        <Card key={client.name} className="border border-subtle/10">
-                          <CardBody>
-                            <div className="flex items-center justify-between mb-2">
-                              <div className="flex items-center space-x-2">
-                                <img
-                                  src={`/clients/${client.name}.${CLIENT_METADATA[client.name]?.logo || 'png'}`}
-                                  alt={`${client.name} logo`}
-                                  className="w-5 h-5 sm:w-6 sm:h-6 object-contain opacity-90"
-                                  onError={e => {
-                                    const target = e.currentTarget;
-                                    target.style.display = 'none';
-                                  }}
-                                />
-                                <div>
-                                  <div className="font-mono font-medium text-primary text-sm sm:text-base">
-                                    {CLIENT_METADATA[client.name]?.name || client.name}
-                                  </div>
-                                  <div className="text-xs font-mono text-tertiary mt-0.5">
-                                    {client.isUnknown ? (
-                                      <>
-                                        <span className="text-warning">Not configured</span> · 0%
-                                        ready ({client.readyNodes}/{client.totalNodes})
-                                      </>
-                                    ) : (
-                                      <>
-                                        min v{client.minVersion} ·{' '}
-                                        {client.readyPercentage.toFixed(1)}% ready (
-                                        {client.readyNodes}/{client.totalNodes})
-                                      </>
-                                    )}
+                    {/* Client Grid */}
+                    <CardBody className="bg-surface/40">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                        {fork.clients.map(client => (
+                          <Card key={client.name} className="border border-subtle/10">
+                            <CardBody>
+                              <div className="flex items-center justify-between mb-2">
+                                <div className="flex items-center space-x-2">
+                                  <img
+                                    src={`/clients/${client.name}.${CLIENT_METADATA[client.name]?.logo || 'png'}`}
+                                    alt={`${client.name} logo`}
+                                    className="w-5 h-5 sm:w-6 sm:h-6 object-contain opacity-90"
+                                    onError={e => {
+                                      const target = e.currentTarget;
+                                      target.style.display = 'none';
+                                    }}
+                                  />
+                                  <div>
+                                    <div className="font-mono font-medium text-primary text-sm sm:text-base">
+                                      {CLIENT_METADATA[client.name]?.name || client.name}
+                                    </div>
+                                    <div className="text-xs font-mono text-tertiary mt-0.5">
+                                      {client.isUnknown ? (
+                                        <>
+                                          <span className="text-warning">Not configured</span> · 0%
+                                          ready ({client.readyNodes}/{client.totalNodes})
+                                        </>
+                                      ) : (
+                                        <>
+                                          min v{client.minVersion} ·{' '}
+                                          {client.readyPercentage.toFixed(1)}% ready (
+                                          {client.readyNodes}/{client.totalNodes})
+                                        </>
+                                      )}
+                                    </div>
                                   </div>
                                 </div>
+                                <div className="relative w-6 h-6 sm:w-8 sm:h-8">
+                                  <svg className="w-6 h-6 sm:w-8 sm:h-8 transform -rotate-90">
+                                    <circle
+                                      className="text-accent/20"
+                                      strokeWidth="4"
+                                      stroke="currentColor"
+                                      fill="transparent"
+                                      r="10"
+                                      cx="12"
+                                      cy="12"
+                                    />
+                                    <circle
+                                      className="text-accent transition-all duration-500"
+                                      strokeWidth="4"
+                                      strokeDasharray={62.83} // 2 * pi * r
+                                      strokeDashoffset={
+                                        62.83 - (62.83 * client.readyPercentage) / 100
+                                      }
+                                      strokeLinecap="round"
+                                      stroke="currentColor"
+                                      fill="transparent"
+                                      r="10"
+                                      cx="12"
+                                      cy="12"
+                                    />
+                                  </svg>
+                                </div>
                               </div>
-                              <div className="relative w-6 h-6 sm:w-8 sm:h-8">
-                                <svg className="w-6 h-6 sm:w-8 sm:h-8 transform -rotate-90">
-                                  <circle
-                                    className="text-accent/20"
-                                    strokeWidth="4"
-                                    stroke="currentColor"
-                                    fill="transparent"
-                                    r="10"
-                                    cx="12"
-                                    cy="12"
-                                  />
-                                  <circle
-                                    className="text-accent transition-all duration-500"
-                                    strokeWidth="4"
-                                    strokeDasharray={62.83} // 2 * pi * r
-                                    strokeDashoffset={
-                                      62.83 - (62.83 * client.readyPercentage) / 100
-                                    }
-                                    strokeLinecap="round"
-                                    stroke="currentColor"
-                                    fill="transparent"
-                                    r="10"
-                                    cx="12"
-                                    cy="12"
-                                  />
-                                </svg>
-                              </div>
-                            </div>
 
-                            {client.nodes.length > 0 && (
-                              <div className="mt-1 space-y-0.5">
-                                {client.nodes.map((node, idx) => {
-                                  const { user, node: nodeName } = formatNodeName(node.name);
-                                  return (
-                                    <div
-                                      key={idx}
-                                      className="flex items-center justify-between text-xs font-mono py-0.5 px-1.5 rounded hover:bg-surface/40"
-                                    >
-                                      <div className="flex items-center space-x-2 min-w-0">
-                                        <span className="text-tertiary truncate">{user}</span>
-                                        <span className="text-primary truncate" title={nodeName}>
-                                          {nodeName}
+                              {client.nodes.length > 0 && (
+                                <div className="mt-1 space-y-0.5">
+                                  {client.nodes.map((node, idx) => {
+                                    const { user, node: nodeName } = formatNodeName(node.name);
+                                    return (
+                                      <div
+                                        key={idx}
+                                        className="flex items-center justify-between text-xs font-mono py-0.5 px-1.5 rounded hover:bg-surface/40"
+                                      >
+                                        <div className="flex items-center space-x-2 min-w-0">
+                                          <span className="text-tertiary truncate">{user}</span>
+                                          <span className="text-primary truncate" title={nodeName}>
+                                            {nodeName}
+                                          </span>
+                                        </div>
+                                        <span
+                                          className={`flex-shrink-0 ${node.isReady ? 'text-success' : 'text-error'}`}
+                                          title={node.isReady ? 'Ready for fork' : 'Needs update'}
+                                        >
+                                          {node.version}
                                         </span>
                                       </div>
-                                      <span
-                                        className={`flex-shrink-0 ${node.isReady ? 'text-success' : 'text-error'}`}
-                                        title={node.isReady ? 'Ready for fork' : 'Needs update'}
-                                      >
-                                        {node.version}
-                                      </span>
-                                    </div>
-                                  );
-                                })}
-                              </div>
-                            )}
-                          </CardBody>
-                        </Card>
-                      ))}
-                    </div>
-                  </CardBody>
-                </Card>
-              </div>
-            ))}
+                                    );
+                                  })}
+                                </div>
+                              )}
+                            </CardBody>
+                          </Card>
+                        ))}
+                      </div>
+                    </CardBody>
+                  </Card>
+                </div>
+              );
+            })}
 
             {/* Recently activated forks section */}
             {recentlyActivatedForks.length > 0 && (
@@ -506,159 +555,167 @@ function ForkReadiness() {
 
                 {showRecentlyActivatedForks && (
                   <div className="mt-4 space-y-4">
-                    {recentlyActivatedForks.map(fork => (
-                      <div key={fork.name} className="space-y-2 opacity-75">
-                        <Card className="card-secondary">
-                          {/* Fork Header */}
-                          <CardHeader className="border-b border-subtle/30">
-                            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-2">
-                              <div>
-                                <h3 className="text-xl sm:text-2xl font-sans font-bold text-primary mb-0.5">
-                                  {fork.name} Fork
-                                </h3>
-                                <div className="text-xs sm:text-sm font-mono">
-                                  <span className="text-secondary">Overall readiness: </span>
-                                  <span className="text-primary font-bold">
-                                    {fork.readyPercentage.toFixed(1)}%
-                                  </span>
-                                  <span className="text-tertiary">
-                                    {' '}
-                                    ({fork.readyNodes}/{fork.totalNodes}{' '}
-                                    {fork.totalNodes === 1 ? 'node' : 'nodes'})
-                                  </span>
+                    {recentlyActivatedForks.map(fork => {
+                      const forkStatus = getForkStatus(fork);
+                      return (
+                        <div key={fork.name} className="space-y-2 opacity-75">
+                          <Card
+                            className={`card-secondary border-2 ${forkStatus.borderColor} ${forkStatus.backgroundColor}`}
+                          >
+                            {/* Fork Header */}
+                            <CardHeader className="border-b border-subtle/30">
+                              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-2">
+                                <div>
+                                  <h3 className="text-xl sm:text-2xl font-sans font-bold text-primary mb-0.5">
+                                    {fork.name} Fork
+                                  </h3>
+                                  <div className="text-xs sm:text-sm font-mono">
+                                    <span className="text-secondary">Overall readiness: </span>
+                                    <span className="text-primary font-bold">
+                                      {fork.readyPercentage.toFixed(1)}%
+                                    </span>
+                                    <span className="text-tertiary">
+                                      {' '}
+                                      ({fork.readyNodes}/{fork.totalNodes}{' '}
+                                      {fork.totalNodes === 1 ? 'node' : 'nodes'})
+                                    </span>
+                                  </div>
+                                </div>
+                                <div className="text-sm font-mono text-secondary">
+                                  <div className="text-success text-base sm:text-lg font-medium">
+                                    Recently Activated
+                                  </div>
+                                  <div className="text-tertiary text-xs sm:text-sm">
+                                    {formatDistanceToNow(
+                                      new Date(Date.now() + fork.timeUntilFork * 1000),
+                                      { addSuffix: true },
+                                    )}{' '}
+                                    (epoch {fork.forkEpoch})
+                                  </div>
                                 </div>
                               </div>
-                              <div className="text-sm font-mono text-secondary">
-                                <div className="text-success text-base sm:text-lg font-medium">
-                                  Recently Activated
-                                </div>
-                                <div className="text-tertiary text-xs sm:text-sm">
-                                  {formatDistanceToNow(
-                                    new Date(Date.now() + fork.timeUntilFork * 1000),
-                                    { addSuffix: true },
-                                  )}{' '}
-                                  (epoch {fork.forkEpoch})
-                                </div>
+
+                              <div className="relative h-2 sm:h-3 bg-surface/30 rounded-full overflow-hidden">
+                                <div
+                                  className={`absolute inset-y-0 left-0 bg-gradient-to-r ${forkStatus.progressGradient} transition-all duration-500`}
+                                  style={{ width: `${fork.readyPercentage}%` }}
+                                />
                               </div>
-                            </div>
+                            </CardHeader>
 
-                            <div className="relative h-2 sm:h-3 bg-surface/30 rounded-full overflow-hidden">
-                              <div
-                                className="absolute inset-y-0 left-0 bg-gradient-to-r from-accent to-accent/70 transition-all duration-500"
-                                style={{ width: `${fork.readyPercentage}%` }}
-                              />
-                            </div>
-                          </CardHeader>
-
-                          {/* Client Grid */}
-                          <CardBody className="bg-surface/40">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                              {fork.clients.map(client => (
-                                <Card key={client.name} className="border border-subtle/10">
-                                  <CardBody>
-                                    <div className="flex items-center justify-between mb-2">
-                                      <div className="flex items-center space-x-2">
-                                        <img
-                                          src={`/clients/${client.name}.${CLIENT_METADATA[client.name]?.logo || 'png'}`}
-                                          alt={`${client.name} logo`}
-                                          className="w-5 h-5 sm:w-6 sm:h-6 object-contain opacity-90"
-                                          onError={e => {
-                                            const target = e.currentTarget;
-                                            target.style.display = 'none';
-                                          }}
-                                        />
-                                        <div>
-                                          <div className="font-mono font-medium text-primary text-sm sm:text-base">
-                                            {CLIENT_METADATA[client.name]?.name || client.name}
-                                          </div>
-                                          <div className="text-xs font-mono text-tertiary mt-0.5">
-                                            {client.isUnknown ? (
-                                              <>
-                                                <span className="text-warning">Not configured</span>{' '}
-                                                · 0% ready ({client.readyNodes}/{client.totalNodes})
-                                              </>
-                                            ) : (
-                                              <>
-                                                min v{client.minVersion} ·{' '}
-                                                {client.readyPercentage.toFixed(1)}% ready (
-                                                {client.readyNodes}/{client.totalNodes})
-                                              </>
-                                            )}
+                            {/* Client Grid */}
+                            <CardBody className="bg-surface/40">
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                                {fork.clients.map(client => (
+                                  <Card key={client.name} className="border border-subtle/10">
+                                    <CardBody>
+                                      <div className="flex items-center justify-between mb-2">
+                                        <div className="flex items-center space-x-2">
+                                          <img
+                                            src={`/clients/${client.name}.${CLIENT_METADATA[client.name]?.logo || 'png'}`}
+                                            alt={`${client.name} logo`}
+                                            className="w-5 h-5 sm:w-6 sm:h-6 object-contain opacity-90"
+                                            onError={e => {
+                                              const target = e.currentTarget;
+                                              target.style.display = 'none';
+                                            }}
+                                          />
+                                          <div>
+                                            <div className="font-mono font-medium text-primary text-sm sm:text-base">
+                                              {CLIENT_METADATA[client.name]?.name || client.name}
+                                            </div>
+                                            <div className="text-xs font-mono text-tertiary mt-0.5">
+                                              {client.isUnknown ? (
+                                                <>
+                                                  <span className="text-warning">
+                                                    Not configured
+                                                  </span>{' '}
+                                                  · 0% ready ({client.readyNodes}/
+                                                  {client.totalNodes})
+                                                </>
+                                              ) : (
+                                                <>
+                                                  min v{client.minVersion} ·{' '}
+                                                  {client.readyPercentage.toFixed(1)}% ready (
+                                                  {client.readyNodes}/{client.totalNodes})
+                                                </>
+                                              )}
+                                            </div>
                                           </div>
                                         </div>
+                                        <div className="relative w-6 h-6 sm:w-8 sm:h-8">
+                                          <svg className="w-6 h-6 sm:w-8 sm:h-8 transform -rotate-90">
+                                            <circle
+                                              className="text-accent/20"
+                                              strokeWidth="4"
+                                              stroke="currentColor"
+                                              fill="transparent"
+                                              r="10"
+                                              cx="12"
+                                              cy="12"
+                                            />
+                                            <circle
+                                              className="text-accent transition-all duration-500"
+                                              strokeWidth="4"
+                                              strokeDasharray={62.83} // 2 * pi * r
+                                              strokeDashoffset={
+                                                62.83 - (62.83 * client.readyPercentage) / 100
+                                              }
+                                              strokeLinecap="round"
+                                              stroke="currentColor"
+                                              fill="transparent"
+                                              r="10"
+                                              cx="12"
+                                              cy="12"
+                                            />
+                                          </svg>
+                                        </div>
                                       </div>
-                                      <div className="relative w-6 h-6 sm:w-8 sm:h-8">
-                                        <svg className="w-6 h-6 sm:w-8 sm:h-8 transform -rotate-90">
-                                          <circle
-                                            className="text-accent/20"
-                                            strokeWidth="4"
-                                            stroke="currentColor"
-                                            fill="transparent"
-                                            r="10"
-                                            cx="12"
-                                            cy="12"
-                                          />
-                                          <circle
-                                            className="text-accent transition-all duration-500"
-                                            strokeWidth="4"
-                                            strokeDasharray={62.83} // 2 * pi * r
-                                            strokeDashoffset={
-                                              62.83 - (62.83 * client.readyPercentage) / 100
-                                            }
-                                            strokeLinecap="round"
-                                            stroke="currentColor"
-                                            fill="transparent"
-                                            r="10"
-                                            cx="12"
-                                            cy="12"
-                                          />
-                                        </svg>
-                                      </div>
-                                    </div>
 
-                                    {client.nodes.length > 0 && (
-                                      <div className="mt-1 space-y-0.5">
-                                        {client.nodes.map((node, idx) => {
-                                          const { user, node: nodeName } = formatNodeName(
-                                            node.name,
-                                          );
-                                          return (
-                                            <div
-                                              key={idx}
-                                              className="flex items-center justify-between text-xs font-mono py-0.5 px-1.5 rounded hover:bg-surface/40"
-                                            >
-                                              <div className="flex items-center space-x-2 min-w-0">
-                                                <span className="text-tertiary truncate">
-                                                  {user}
-                                                </span>
+                                      {client.nodes.length > 0 && (
+                                        <div className="mt-1 space-y-0.5">
+                                          {client.nodes.map((node, idx) => {
+                                            const { user, node: nodeName } = formatNodeName(
+                                              node.name,
+                                            );
+                                            return (
+                                              <div
+                                                key={idx}
+                                                className="flex items-center justify-between text-xs font-mono py-0.5 px-1.5 rounded hover:bg-surface/40"
+                                              >
+                                                <div className="flex items-center space-x-2 min-w-0">
+                                                  <span className="text-tertiary truncate">
+                                                    {user}
+                                                  </span>
+                                                  <span
+                                                    className="text-primary truncate"
+                                                    title={nodeName}
+                                                  >
+                                                    {nodeName}
+                                                  </span>
+                                                </div>
                                                 <span
-                                                  className="text-primary truncate"
-                                                  title={nodeName}
+                                                  className={`flex-shrink-0 ${node.isReady ? 'text-success' : 'text-error'}`}
+                                                  title={
+                                                    node.isReady ? 'Ready for fork' : 'Needs update'
+                                                  }
                                                 >
-                                                  {nodeName}
+                                                  {node.version}
                                                 </span>
                                               </div>
-                                              <span
-                                                className={`flex-shrink-0 ${node.isReady ? 'text-success' : 'text-error'}`}
-                                                title={
-                                                  node.isReady ? 'Ready for fork' : 'Needs update'
-                                                }
-                                              >
-                                                {node.version}
-                                              </span>
-                                            </div>
-                                          );
-                                        })}
-                                      </div>
-                                    )}
-                                  </CardBody>
-                                </Card>
-                              ))}
-                            </div>
-                          </CardBody>
-                        </Card>
-                      </div>
-                    ))}
+                                            );
+                                          })}
+                                        </div>
+                                      )}
+                                    </CardBody>
+                                  </Card>
+                                ))}
+                              </div>
+                            </CardBody>
+                          </Card>
+                        </div>
+                      );
+                    })}
                   </div>
                 )}
               </div>
@@ -683,159 +740,167 @@ function ForkReadiness() {
 
                 {showOlderActivatedForks && (
                   <div className="mt-4 space-y-4">
-                    {olderActivatedForks.map(fork => (
-                      <div key={fork.name} className="space-y-2 opacity-50">
-                        <Card className="card-secondary">
-                          {/* Fork Header */}
-                          <CardHeader className="border-b border-subtle/30">
-                            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-2">
-                              <div>
-                                <h3 className="text-xl sm:text-2xl font-sans font-bold text-primary mb-0.5">
-                                  {fork.name} Fork
-                                </h3>
-                                <div className="text-xs sm:text-sm font-mono">
-                                  <span className="text-secondary">Overall readiness: </span>
-                                  <span className="text-primary font-bold">
-                                    {fork.readyPercentage.toFixed(1)}%
-                                  </span>
-                                  <span className="text-tertiary">
-                                    {' '}
-                                    ({fork.readyNodes}/{fork.totalNodes}{' '}
-                                    {fork.totalNodes === 1 ? 'node' : 'nodes'})
-                                  </span>
+                    {olderActivatedForks.map(fork => {
+                      const forkStatus = getForkStatus(fork);
+                      return (
+                        <div key={fork.name} className="space-y-2 opacity-50">
+                          <Card
+                            className={`card-secondary border-2 ${forkStatus.borderColor} ${forkStatus.backgroundColor}`}
+                          >
+                            {/* Fork Header */}
+                            <CardHeader className="border-b border-subtle/30">
+                              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-2">
+                                <div>
+                                  <h3 className="text-xl sm:text-2xl font-sans font-bold text-primary mb-0.5">
+                                    {fork.name} Fork
+                                  </h3>
+                                  <div className="text-xs sm:text-sm font-mono">
+                                    <span className="text-secondary">Overall readiness: </span>
+                                    <span className="text-primary font-bold">
+                                      {fork.readyPercentage.toFixed(1)}%
+                                    </span>
+                                    <span className="text-tertiary">
+                                      {' '}
+                                      ({fork.readyNodes}/{fork.totalNodes}{' '}
+                                      {fork.totalNodes === 1 ? 'node' : 'nodes'})
+                                    </span>
+                                  </div>
+                                </div>
+                                <div className="text-sm font-mono text-secondary">
+                                  <div className="text-success text-base sm:text-lg font-medium">
+                                    Previous Fork
+                                  </div>
+                                  <div className="text-tertiary text-xs sm:text-sm">
+                                    {formatDistanceToNow(
+                                      new Date(Date.now() + fork.timeUntilFork * 1000),
+                                      { addSuffix: true },
+                                    )}{' '}
+                                    (epoch {fork.forkEpoch})
+                                  </div>
                                 </div>
                               </div>
-                              <div className="text-sm font-mono text-secondary">
-                                <div className="text-success text-base sm:text-lg font-medium">
-                                  Previous Fork
-                                </div>
-                                <div className="text-tertiary text-xs sm:text-sm">
-                                  {formatDistanceToNow(
-                                    new Date(Date.now() + fork.timeUntilFork * 1000),
-                                    { addSuffix: true },
-                                  )}{' '}
-                                  (epoch {fork.forkEpoch})
-                                </div>
+
+                              <div className="relative h-2 sm:h-3 bg-surface/30 rounded-full overflow-hidden">
+                                <div
+                                  className={`absolute inset-y-0 left-0 bg-gradient-to-r ${forkStatus.progressGradient} transition-all duration-500`}
+                                  style={{ width: `${fork.readyPercentage}%` }}
+                                />
                               </div>
-                            </div>
+                            </CardHeader>
 
-                            <div className="relative h-2 sm:h-3 bg-surface/30 rounded-full overflow-hidden">
-                              <div
-                                className="absolute inset-y-0 left-0 bg-gradient-to-r from-accent to-accent/70 transition-all duration-500"
-                                style={{ width: `${fork.readyPercentage}%` }}
-                              />
-                            </div>
-                          </CardHeader>
-
-                          {/* Client Grid */}
-                          <CardBody className="bg-surface/40">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                              {fork.clients.map(client => (
-                                <Card key={client.name} className="border border-subtle/10">
-                                  <CardBody>
-                                    <div className="flex items-center justify-between mb-2">
-                                      <div className="flex items-center space-x-2">
-                                        <img
-                                          src={`/clients/${client.name}.${CLIENT_METADATA[client.name]?.logo || 'png'}`}
-                                          alt={`${client.name} logo`}
-                                          className="w-5 h-5 sm:w-6 sm:h-6 object-contain opacity-90"
-                                          onError={e => {
-                                            const target = e.currentTarget;
-                                            target.style.display = 'none';
-                                          }}
-                                        />
-                                        <div>
-                                          <div className="font-mono font-medium text-primary text-sm sm:text-base">
-                                            {CLIENT_METADATA[client.name]?.name || client.name}
-                                          </div>
-                                          <div className="text-xs font-mono text-tertiary mt-0.5">
-                                            {client.isUnknown ? (
-                                              <>
-                                                <span className="text-warning">Not configured</span>{' '}
-                                                · 0% ready ({client.readyNodes}/{client.totalNodes})
-                                              </>
-                                            ) : (
-                                              <>
-                                                min v{client.minVersion} ·{' '}
-                                                {client.readyPercentage.toFixed(1)}% ready (
-                                                {client.readyNodes}/{client.totalNodes})
-                                              </>
-                                            )}
+                            {/* Client Grid */}
+                            <CardBody className="bg-surface/40">
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                                {fork.clients.map(client => (
+                                  <Card key={client.name} className="border border-subtle/10">
+                                    <CardBody>
+                                      <div className="flex items-center justify-between mb-2">
+                                        <div className="flex items-center space-x-2">
+                                          <img
+                                            src={`/clients/${client.name}.${CLIENT_METADATA[client.name]?.logo || 'png'}`}
+                                            alt={`${client.name} logo`}
+                                            className="w-5 h-5 sm:w-6 sm:h-6 object-contain opacity-90"
+                                            onError={e => {
+                                              const target = e.currentTarget;
+                                              target.style.display = 'none';
+                                            }}
+                                          />
+                                          <div>
+                                            <div className="font-mono font-medium text-primary text-sm sm:text-base">
+                                              {CLIENT_METADATA[client.name]?.name || client.name}
+                                            </div>
+                                            <div className="text-xs font-mono text-tertiary mt-0.5">
+                                              {client.isUnknown ? (
+                                                <>
+                                                  <span className="text-warning">
+                                                    Not configured
+                                                  </span>{' '}
+                                                  · 0% ready ({client.readyNodes}/
+                                                  {client.totalNodes})
+                                                </>
+                                              ) : (
+                                                <>
+                                                  min v{client.minVersion} ·{' '}
+                                                  {client.readyPercentage.toFixed(1)}% ready (
+                                                  {client.readyNodes}/{client.totalNodes})
+                                                </>
+                                              )}
+                                            </div>
                                           </div>
                                         </div>
+                                        <div className="relative w-6 h-6 sm:w-8 sm:h-8">
+                                          <svg className="w-6 h-6 sm:w-8 sm:h-8 transform -rotate-90">
+                                            <circle
+                                              className="text-accent/20"
+                                              strokeWidth="4"
+                                              stroke="currentColor"
+                                              fill="transparent"
+                                              r="10"
+                                              cx="12"
+                                              cy="12"
+                                            />
+                                            <circle
+                                              className="text-accent transition-all duration-500"
+                                              strokeWidth="4"
+                                              strokeDasharray={62.83} // 2 * pi * r
+                                              strokeDashoffset={
+                                                62.83 - (62.83 * client.readyPercentage) / 100
+                                              }
+                                              strokeLinecap="round"
+                                              stroke="currentColor"
+                                              fill="transparent"
+                                              r="10"
+                                              cx="12"
+                                              cy="12"
+                                            />
+                                          </svg>
+                                        </div>
                                       </div>
-                                      <div className="relative w-6 h-6 sm:w-8 sm:h-8">
-                                        <svg className="w-6 h-6 sm:w-8 sm:h-8 transform -rotate-90">
-                                          <circle
-                                            className="text-accent/20"
-                                            strokeWidth="4"
-                                            stroke="currentColor"
-                                            fill="transparent"
-                                            r="10"
-                                            cx="12"
-                                            cy="12"
-                                          />
-                                          <circle
-                                            className="text-accent transition-all duration-500"
-                                            strokeWidth="4"
-                                            strokeDasharray={62.83} // 2 * pi * r
-                                            strokeDashoffset={
-                                              62.83 - (62.83 * client.readyPercentage) / 100
-                                            }
-                                            strokeLinecap="round"
-                                            stroke="currentColor"
-                                            fill="transparent"
-                                            r="10"
-                                            cx="12"
-                                            cy="12"
-                                          />
-                                        </svg>
-                                      </div>
-                                    </div>
 
-                                    {client.nodes.length > 0 && (
-                                      <div className="mt-1 space-y-0.5">
-                                        {client.nodes.map((node, idx) => {
-                                          const { user, node: nodeName } = formatNodeName(
-                                            node.name,
-                                          );
-                                          return (
-                                            <div
-                                              key={idx}
-                                              className="flex items-center justify-between text-xs font-mono py-0.5 px-1.5 rounded hover:bg-surface/40"
-                                            >
-                                              <div className="flex items-center space-x-2 min-w-0">
-                                                <span className="text-tertiary truncate">
-                                                  {user}
-                                                </span>
+                                      {client.nodes.length > 0 && (
+                                        <div className="mt-1 space-y-0.5">
+                                          {client.nodes.map((node, idx) => {
+                                            const { user, node: nodeName } = formatNodeName(
+                                              node.name,
+                                            );
+                                            return (
+                                              <div
+                                                key={idx}
+                                                className="flex items-center justify-between text-xs font-mono py-0.5 px-1.5 rounded hover:bg-surface/40"
+                                              >
+                                                <div className="flex items-center space-x-2 min-w-0">
+                                                  <span className="text-tertiary truncate">
+                                                    {user}
+                                                  </span>
+                                                  <span
+                                                    className="text-primary truncate"
+                                                    title={nodeName}
+                                                  >
+                                                    {nodeName}
+                                                  </span>
+                                                </div>
                                                 <span
-                                                  className="text-primary truncate"
-                                                  title={nodeName}
+                                                  className={`flex-shrink-0 ${node.isReady ? 'text-success' : 'text-error'}`}
+                                                  title={
+                                                    node.isReady ? 'Ready for fork' : 'Needs update'
+                                                  }
                                                 >
-                                                  {nodeName}
+                                                  {node.version}
                                                 </span>
                                               </div>
-                                              <span
-                                                className={`flex-shrink-0 ${node.isReady ? 'text-success' : 'text-error'}`}
-                                                title={
-                                                  node.isReady ? 'Ready for fork' : 'Needs update'
-                                                }
-                                              >
-                                                {node.version}
-                                              </span>
-                                            </div>
-                                          );
-                                        })}
-                                      </div>
-                                    )}
-                                  </CardBody>
-                                </Card>
-                              ))}
-                            </div>
-                          </CardBody>
-                        </Card>
-                      </div>
-                    ))}
+                                            );
+                                          })}
+                                        </div>
+                                      )}
+                                    </CardBody>
+                                  </Card>
+                                ))}
+                              </div>
+                            </CardBody>
+                          </Card>
+                        </div>
+                      );
+                    })}
                   </div>
                 )}
               </div>
