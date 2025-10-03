@@ -561,6 +561,95 @@ export class StateExpiryAccessTotal extends Message<StateExpiryAccessTotal> {
 }
 
 /**
+ * StateExpiryBlockResponse is the v1 API response for state expiry block information.
+ * Returns the execution layer block number from approximately 1 year ago, which is
+ * used as the expiry boundary for state expiry calculations.
+ *
+ * @generated from message api.v1.StateExpiryBlockResponse
+ */
+export class StateExpiryBlockResponse extends Message<StateExpiryBlockResponse> {
+  /**
+   * @generated from field: api.v1.StateExpiryBlock item = 1;
+   */
+  item?: StateExpiryBlock;
+
+  /**
+   * @generated from field: api.v1.FilterMetadata filters = 2;
+   */
+  filters?: FilterMetadata;
+
+  constructor(data?: PartialMessage<StateExpiryBlockResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.v1.StateExpiryBlockResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "item", kind: "message", T: StateExpiryBlock },
+    { no: 2, name: "filters", kind: "message", T: FilterMetadata },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): StateExpiryBlockResponse {
+    return new StateExpiryBlockResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): StateExpiryBlockResponse {
+    return new StateExpiryBlockResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): StateExpiryBlockResponse {
+    return new StateExpiryBlockResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: StateExpiryBlockResponse | PlainMessage<StateExpiryBlockResponse> | undefined, b: StateExpiryBlockResponse | PlainMessage<StateExpiryBlockResponse> | undefined): boolean {
+    return proto3.util.equals(StateExpiryBlockResponse, a, b);
+  }
+}
+
+/**
+ * StateExpiryBlock represents the execution block from approximately 1 year ago
+ * that serves as the boundary for state expiry calculations.
+ *
+ * @generated from message api.v1.StateExpiryBlock
+ */
+export class StateExpiryBlock extends Message<StateExpiryBlock> {
+  /**
+   * The execution layer block number from approximately 1 year ago
+   *
+   * @generated from field: uint32 block_number = 1;
+   */
+  blockNumber = 0;
+
+  constructor(data?: PartialMessage<StateExpiryBlock>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.v1.StateExpiryBlock";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "block_number", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): StateExpiryBlock {
+    return new StateExpiryBlock().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): StateExpiryBlock {
+    return new StateExpiryBlock().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): StateExpiryBlock {
+    return new StateExpiryBlock().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: StateExpiryBlock | PlainMessage<StateExpiryBlock> | undefined, b: StateExpiryBlock | PlainMessage<StateExpiryBlock> | undefined): boolean {
+    return proto3.util.equals(StateExpiryBlock, a, b);
+  }
+}
+
+/**
  * StateExpiryStorageTotalResponse is the v1 API response for storage slot totals.
  * This endpoint provides the latest total storage slot statistics for state expiry analysis.
  *

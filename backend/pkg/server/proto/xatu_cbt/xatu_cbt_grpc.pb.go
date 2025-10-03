@@ -12,6 +12,7 @@ import (
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -41,6 +42,7 @@ const (
 	XatuCBT_ListFctAddressStorageSlotTop100ByContract_FullMethodName        = "/xatu_cbt.XatuCBT/ListFctAddressStorageSlotTop100ByContract"
 	XatuCBT_GetFctAddressStorageSlotTotal_FullMethodName                    = "/xatu_cbt.XatuCBT/GetFctAddressStorageSlotTotal"
 	XatuCBT_ListFctAddressStorageSlotTotal_FullMethodName                   = "/xatu_cbt.XatuCBT/ListFctAddressStorageSlotTotal"
+	XatuCBT_ListFctBlockForStateExpiry_FullMethodName                       = "/xatu_cbt.XatuCBT/ListFctBlockForStateExpiry"
 	XatuCBT_GetDataAvailability_FullMethodName                              = "/xatu_cbt.XatuCBT/GetDataAvailability"
 )
 
@@ -114,6 +116,10 @@ type XatuCBTClient interface {
 	// ListFctAddressStorageSlotTotal returns storage slot totals.
 	// This table contains aggregated totals of storage slots accessed/expired for state expiry analysis.
 	ListFctAddressStorageSlotTotal(ctx context.Context, in *clickhouse.ListFctAddressStorageSlotTotalRequest, opts ...grpc.CallOption) (*clickhouse.ListFctAddressStorageSlotTotalResponse, error)
+	// ListFctBlockForStateExpiry returns the execution block number from approximately 1 year ago.
+	// This is a special endpoint for state expiry that queries fct_block with a specific time range.
+	// It returns the block from 1 year ago (minus 11 days) which serves as the boundary for state expiry calculations.
+	ListFctBlockForStateExpiry(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*clickhouse.ListFctBlockResponse, error)
 	// GetDataAvailability returns the common availability interval across a set of transformation tables.
 	// It calculates the overlapping data range for the specified tables and returns slot information.
 	GetDataAvailability(ctx context.Context, in *GetDataAvailabilityRequest, opts ...grpc.CallOption) (*GetDataAvailabilityResponse, error)
@@ -337,6 +343,16 @@ func (c *xatuCBTClient) ListFctAddressStorageSlotTotal(ctx context.Context, in *
 	return out, nil
 }
 
+func (c *xatuCBTClient) ListFctBlockForStateExpiry(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*clickhouse.ListFctBlockResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(clickhouse.ListFctBlockResponse)
+	err := c.cc.Invoke(ctx, XatuCBT_ListFctBlockForStateExpiry_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *xatuCBTClient) GetDataAvailability(ctx context.Context, in *GetDataAvailabilityRequest, opts ...grpc.CallOption) (*GetDataAvailabilityResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(GetDataAvailabilityResponse)
@@ -417,6 +433,10 @@ type XatuCBTServer interface {
 	// ListFctAddressStorageSlotTotal returns storage slot totals.
 	// This table contains aggregated totals of storage slots accessed/expired for state expiry analysis.
 	ListFctAddressStorageSlotTotal(context.Context, *clickhouse.ListFctAddressStorageSlotTotalRequest) (*clickhouse.ListFctAddressStorageSlotTotalResponse, error)
+	// ListFctBlockForStateExpiry returns the execution block number from approximately 1 year ago.
+	// This is a special endpoint for state expiry that queries fct_block with a specific time range.
+	// It returns the block from 1 year ago (minus 11 days) which serves as the boundary for state expiry calculations.
+	ListFctBlockForStateExpiry(context.Context, *emptypb.Empty) (*clickhouse.ListFctBlockResponse, error)
 	// GetDataAvailability returns the common availability interval across a set of transformation tables.
 	// It calculates the overlapping data range for the specified tables and returns slot information.
 	GetDataAvailability(context.Context, *GetDataAvailabilityRequest) (*GetDataAvailabilityResponse, error)
@@ -489,6 +509,9 @@ func (UnimplementedXatuCBTServer) GetFctAddressStorageSlotTotal(context.Context,
 }
 func (UnimplementedXatuCBTServer) ListFctAddressStorageSlotTotal(context.Context, *clickhouse.ListFctAddressStorageSlotTotalRequest) (*clickhouse.ListFctAddressStorageSlotTotalResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListFctAddressStorageSlotTotal not implemented")
+}
+func (UnimplementedXatuCBTServer) ListFctBlockForStateExpiry(context.Context, *emptypb.Empty) (*clickhouse.ListFctBlockResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListFctBlockForStateExpiry not implemented")
 }
 func (UnimplementedXatuCBTServer) GetDataAvailability(context.Context, *GetDataAvailabilityRequest) (*GetDataAvailabilityResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetDataAvailability not implemented")
@@ -884,6 +907,24 @@ func _XatuCBT_ListFctAddressStorageSlotTotal_Handler(srv interface{}, ctx contex
 	return interceptor(ctx, in, info, handler)
 }
 
+func _XatuCBT_ListFctBlockForStateExpiry_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(emptypb.Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(XatuCBTServer).ListFctBlockForStateExpiry(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: XatuCBT_ListFctBlockForStateExpiry_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(XatuCBTServer).ListFctBlockForStateExpiry(ctx, req.(*emptypb.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _XatuCBT_GetDataAvailability_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetDataAvailabilityRequest)
 	if err := dec(in); err != nil {
@@ -992,6 +1033,10 @@ var XatuCBT_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListFctAddressStorageSlotTotal",
 			Handler:    _XatuCBT_ListFctAddressStorageSlotTotal_Handler,
+		},
+		{
+			MethodName: "ListFctBlockForStateExpiry",
+			Handler:    _XatuCBT_ListFctBlockForStateExpiry_Handler,
 		},
 		{
 			MethodName: "GetDataAvailability",
