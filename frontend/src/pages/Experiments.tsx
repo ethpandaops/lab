@@ -25,6 +25,17 @@ interface ExperimentItem {
 }
 
 const experiments: ExperimentItem[] = [
+  // State Expiry
+  {
+    id: 'state-expiry',
+    title: 'State Expiry',
+    subtitle: 'State growth analysis',
+    description:
+      'Analyze Ethereum state expiry metrics including account statistics, storage utilization, and access patterns',
+    icon: Layers,
+    href: '/state-expiry',
+    category: 'beacon',
+  },
   // Xatu overview
   {
     id: 'xatu-overview',

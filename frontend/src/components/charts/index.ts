@@ -5,3 +5,4 @@ export * from '@/components/charts/NivoScatterChart';
 export * from '@/components/charts/NivoTreemapChart';
 export * from '@/components/charts/NivoProvider';
 export * from '@/components/charts/NivoTheme.ts';
+export * from '@/components/charts/NivoPieChart';

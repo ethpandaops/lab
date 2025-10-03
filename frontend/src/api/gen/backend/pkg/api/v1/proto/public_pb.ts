@@ -451,6 +451,300 @@ export class FilterMetadata extends Message<FilterMetadata> {
 }
 
 /**
+ * StateExpiryAccessTotalResponse is the v1 API response for state expiry access totals.
+ *
+ * @generated from message api.v1.StateExpiryAccessTotalResponse
+ */
+export class StateExpiryAccessTotalResponse extends Message<StateExpiryAccessTotalResponse> {
+  /**
+   * @generated from field: api.v1.StateExpiryAccessTotal item = 1;
+   */
+  item?: StateExpiryAccessTotal;
+
+  /**
+   * @generated from field: api.v1.FilterMetadata filters = 2;
+   */
+  filters?: FilterMetadata;
+
+  constructor(data?: PartialMessage<StateExpiryAccessTotalResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.v1.StateExpiryAccessTotalResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "item", kind: "message", T: StateExpiryAccessTotal },
+    { no: 2, name: "filters", kind: "message", T: FilterMetadata },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): StateExpiryAccessTotalResponse {
+    return new StateExpiryAccessTotalResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): StateExpiryAccessTotalResponse {
+    return new StateExpiryAccessTotalResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): StateExpiryAccessTotalResponse {
+    return new StateExpiryAccessTotalResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: StateExpiryAccessTotalResponse | PlainMessage<StateExpiryAccessTotalResponse> | undefined, b: StateExpiryAccessTotalResponse | PlainMessage<StateExpiryAccessTotalResponse> | undefined): boolean {
+    return proto3.util.equals(StateExpiryAccessTotalResponse, a, b);
+  }
+}
+
+/**
+ * StateExpiryAccessTotal represents state expiry access statistics for public API consumption.
+ *
+ * @generated from message api.v1.StateExpiryAccessTotal
+ */
+export class StateExpiryAccessTotal extends Message<StateExpiryAccessTotal> {
+  /**
+   * Total number of accounts accessed in last 365 days
+   *
+   * @generated from field: uint64 total_accounts = 1;
+   */
+  totalAccounts = protoInt64.zero;
+
+  /**
+   * Number of expired accounts (not accessed in last 365 days)
+   *
+   * @generated from field: uint64 expired_accounts = 2;
+   */
+  expiredAccounts = protoInt64.zero;
+
+  /**
+   * Total number of contract accounts accessed in last 365 days
+   *
+   * @generated from field: uint64 total_contracts = 3;
+   */
+  totalContracts = protoInt64.zero;
+
+  /**
+   * Number of expired contracts (not accessed in last 365 days)
+   *
+   * @generated from field: uint64 expired_contracts = 4;
+   */
+  expiredContracts = protoInt64.zero;
+
+  constructor(data?: PartialMessage<StateExpiryAccessTotal>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.v1.StateExpiryAccessTotal";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "total_accounts", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
+    { no: 2, name: "expired_accounts", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
+    { no: 3, name: "total_contracts", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
+    { no: 4, name: "expired_contracts", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): StateExpiryAccessTotal {
+    return new StateExpiryAccessTotal().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): StateExpiryAccessTotal {
+    return new StateExpiryAccessTotal().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): StateExpiryAccessTotal {
+    return new StateExpiryAccessTotal().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: StateExpiryAccessTotal | PlainMessage<StateExpiryAccessTotal> | undefined, b: StateExpiryAccessTotal | PlainMessage<StateExpiryAccessTotal> | undefined): boolean {
+    return proto3.util.equals(StateExpiryAccessTotal, a, b);
+  }
+}
+
+/**
+ * StateExpiryBlockResponse is the v1 API response for state expiry block information.
+ * Returns the execution layer block number from approximately 1 year ago, which is
+ * used as the expiry boundary for state expiry calculations.
+ *
+ * @generated from message api.v1.StateExpiryBlockResponse
+ */
+export class StateExpiryBlockResponse extends Message<StateExpiryBlockResponse> {
+  /**
+   * @generated from field: api.v1.StateExpiryBlock item = 1;
+   */
+  item?: StateExpiryBlock;
+
+  /**
+   * @generated from field: api.v1.FilterMetadata filters = 2;
+   */
+  filters?: FilterMetadata;
+
+  constructor(data?: PartialMessage<StateExpiryBlockResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.v1.StateExpiryBlockResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "item", kind: "message", T: StateExpiryBlock },
+    { no: 2, name: "filters", kind: "message", T: FilterMetadata },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): StateExpiryBlockResponse {
+    return new StateExpiryBlockResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): StateExpiryBlockResponse {
+    return new StateExpiryBlockResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): StateExpiryBlockResponse {
+    return new StateExpiryBlockResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: StateExpiryBlockResponse | PlainMessage<StateExpiryBlockResponse> | undefined, b: StateExpiryBlockResponse | PlainMessage<StateExpiryBlockResponse> | undefined): boolean {
+    return proto3.util.equals(StateExpiryBlockResponse, a, b);
+  }
+}
+
+/**
+ * StateExpiryBlock represents the execution block from approximately 1 year ago
+ * that serves as the boundary for state expiry calculations.
+ *
+ * @generated from message api.v1.StateExpiryBlock
+ */
+export class StateExpiryBlock extends Message<StateExpiryBlock> {
+  /**
+   * The execution layer block number from approximately 1 year ago
+   *
+   * @generated from field: uint32 block_number = 1;
+   */
+  blockNumber = 0;
+
+  constructor(data?: PartialMessage<StateExpiryBlock>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.v1.StateExpiryBlock";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "block_number", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): StateExpiryBlock {
+    return new StateExpiryBlock().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): StateExpiryBlock {
+    return new StateExpiryBlock().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): StateExpiryBlock {
+    return new StateExpiryBlock().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: StateExpiryBlock | PlainMessage<StateExpiryBlock> | undefined, b: StateExpiryBlock | PlainMessage<StateExpiryBlock> | undefined): boolean {
+    return proto3.util.equals(StateExpiryBlock, a, b);
+  }
+}
+
+/**
+ * StateExpiryStorageTotalResponse is the v1 API response for storage slot totals.
+ * This endpoint provides the latest total storage slot statistics for state expiry analysis.
+ *
+ * @generated from message api.v1.StateExpiryStorageTotalResponse
+ */
+export class StateExpiryStorageTotalResponse extends Message<StateExpiryStorageTotalResponse> {
+  /**
+   * @generated from field: api.v1.StateExpiryStorageTotal item = 1;
+   */
+  item?: StateExpiryStorageTotal;
+
+  /**
+   * @generated from field: api.v1.FilterMetadata filters = 2;
+   */
+  filters?: FilterMetadata;
+
+  constructor(data?: PartialMessage<StateExpiryStorageTotalResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.v1.StateExpiryStorageTotalResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "item", kind: "message", T: StateExpiryStorageTotal },
+    { no: 2, name: "filters", kind: "message", T: FilterMetadata },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): StateExpiryStorageTotalResponse {
+    return new StateExpiryStorageTotalResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): StateExpiryStorageTotalResponse {
+    return new StateExpiryStorageTotalResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): StateExpiryStorageTotalResponse {
+    return new StateExpiryStorageTotalResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: StateExpiryStorageTotalResponse | PlainMessage<StateExpiryStorageTotalResponse> | undefined, b: StateExpiryStorageTotalResponse | PlainMessage<StateExpiryStorageTotalResponse> | undefined): boolean {
+    return proto3.util.equals(StateExpiryStorageTotalResponse, a, b);
+  }
+}
+
+/**
+ * StateExpiryStorageTotal represents state expiry storage slot statistics for public API consumption.
+ *
+ * @generated from message api.v1.StateExpiryStorageTotal
+ */
+export class StateExpiryStorageTotal extends Message<StateExpiryStorageTotal> {
+  /**
+   * Total number of storage slots accessed in last 365 days
+   *
+   * @generated from field: uint64 total_storage_slots = 1;
+   */
+  totalStorageSlots = protoInt64.zero;
+
+  /**
+   * Number of expired storage slots (not accessed in last 365 days)
+   *
+   * @generated from field: uint64 expired_storage_slots = 2;
+   */
+  expiredStorageSlots = protoInt64.zero;
+
+  constructor(data?: PartialMessage<StateExpiryStorageTotal>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.v1.StateExpiryStorageTotal";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "total_storage_slots", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
+    { no: 2, name: "expired_storage_slots", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): StateExpiryStorageTotal {
+    return new StateExpiryStorageTotal().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): StateExpiryStorageTotal {
+    return new StateExpiryStorageTotal().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): StateExpiryStorageTotal {
+    return new StateExpiryStorageTotal().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: StateExpiryStorageTotal | PlainMessage<StateExpiryStorageTotal> | undefined, b: StateExpiryStorageTotal | PlainMessage<StateExpiryStorageTotal> | undefined): boolean {
+    return proto3.util.equals(StateExpiryStorageTotal, a, b);
+  }
+}
+
+/**
  * Network represents an Ethereum network for public API consumption.
  * This provides essential network metadata needed by clients.
  *
@@ -570,6 +864,436 @@ export class NetworkFilterMetadata extends Message<NetworkFilterMetadata> {
 
   static equals(a: NetworkFilterMetadata | PlainMessage<NetworkFilterMetadata> | undefined, b: NetworkFilterMetadata | PlainMessage<NetworkFilterMetadata> | undefined): boolean {
     return proto3.util.equals(NetworkFilterMetadata, a, b);
+  }
+}
+
+/**
+ * StateExpiryAccessHistoryResponse is the v1 API response for state expiry access history data.
+ * This endpoint provides aggregated data about Ethereum address access patterns chunked by 10000 blocks.
+ *
+ * @generated from message api.v1.StateExpiryAccessHistoryResponse
+ */
+export class StateExpiryAccessHistoryResponse extends Message<StateExpiryAccessHistoryResponse> {
+  /**
+   * @generated from field: repeated api.v1.StateExpiryAccessHistory items = 1;
+   */
+  items: StateExpiryAccessHistory[] = [];
+
+  /**
+   * @generated from field: api.v1.PaginationMetadata pagination = 2;
+   */
+  pagination?: PaginationMetadata;
+
+  /**
+   * @generated from field: api.v1.FilterMetadata filters = 3;
+   */
+  filters?: FilterMetadata;
+
+  constructor(data?: PartialMessage<StateExpiryAccessHistoryResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.v1.StateExpiryAccessHistoryResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "items", kind: "message", T: StateExpiryAccessHistory, repeated: true },
+    { no: 2, name: "pagination", kind: "message", T: PaginationMetadata },
+    { no: 3, name: "filters", kind: "message", T: FilterMetadata },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): StateExpiryAccessHistoryResponse {
+    return new StateExpiryAccessHistoryResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): StateExpiryAccessHistoryResponse {
+    return new StateExpiryAccessHistoryResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): StateExpiryAccessHistoryResponse {
+    return new StateExpiryAccessHistoryResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: StateExpiryAccessHistoryResponse | PlainMessage<StateExpiryAccessHistoryResponse> | undefined, b: StateExpiryAccessHistoryResponse | PlainMessage<StateExpiryAccessHistoryResponse> | undefined): boolean {
+    return proto3.util.equals(StateExpiryAccessHistoryResponse, a, b);
+  }
+}
+
+/**
+ * StateExpiryAccessHistory represents address access statistics for a 10000-block chunk.
+ * This data is useful for analyzing state expiry patterns and understanding address activity over time.
+ *
+ * @generated from message api.v1.StateExpiryAccessHistory
+ */
+export class StateExpiryAccessHistory extends Message<StateExpiryAccessHistory> {
+  /**
+   * The starting block number of this 10000-block chunk
+   *
+   * @generated from field: uint32 chunk_start_block_number = 1;
+   */
+  chunkStartBlockNumber = 0;
+
+  /**
+   * Number of unique accounts that were accessed for the first time in this chunk
+   * These are addresses that had never been accessed before this chunk
+   *
+   * @generated from field: uint32 first_accessed_accounts = 2;
+   */
+  firstAccessedAccounts = 0;
+
+  /**
+   * Number of unique accounts whose most recent access was in this chunk
+   * These addresses haven't been accessed in any later chunks
+   *
+   * @generated from field: uint32 last_accessed_accounts = 3;
+   */
+  lastAccessedAccounts = 0;
+
+  constructor(data?: PartialMessage<StateExpiryAccessHistory>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.v1.StateExpiryAccessHistory";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "chunk_start_block_number", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
+    { no: 2, name: "first_accessed_accounts", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
+    { no: 3, name: "last_accessed_accounts", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): StateExpiryAccessHistory {
+    return new StateExpiryAccessHistory().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): StateExpiryAccessHistory {
+    return new StateExpiryAccessHistory().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): StateExpiryAccessHistory {
+    return new StateExpiryAccessHistory().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: StateExpiryAccessHistory | PlainMessage<StateExpiryAccessHistory> | undefined, b: StateExpiryAccessHistory | PlainMessage<StateExpiryAccessHistory> | undefined): boolean {
+    return proto3.util.equals(StateExpiryAccessHistory, a, b);
+  }
+}
+
+/**
+ * StateExpiryStorageHistoryResponse is the v1 API response for state expiry storage slot history data.
+ * This endpoint provides aggregated data about Ethereum storage slot access patterns chunked by 10000 blocks.
+ *
+ * @generated from message api.v1.StateExpiryStorageHistoryResponse
+ */
+export class StateExpiryStorageHistoryResponse extends Message<StateExpiryStorageHistoryResponse> {
+  /**
+   * @generated from field: repeated api.v1.StateExpiryStorageHistory items = 1;
+   */
+  items: StateExpiryStorageHistory[] = [];
+
+  /**
+   * @generated from field: api.v1.PaginationMetadata pagination = 2;
+   */
+  pagination?: PaginationMetadata;
+
+  /**
+   * @generated from field: api.v1.FilterMetadata filters = 3;
+   */
+  filters?: FilterMetadata;
+
+  constructor(data?: PartialMessage<StateExpiryStorageHistoryResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.v1.StateExpiryStorageHistoryResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "items", kind: "message", T: StateExpiryStorageHistory, repeated: true },
+    { no: 2, name: "pagination", kind: "message", T: PaginationMetadata },
+    { no: 3, name: "filters", kind: "message", T: FilterMetadata },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): StateExpiryStorageHistoryResponse {
+    return new StateExpiryStorageHistoryResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): StateExpiryStorageHistoryResponse {
+    return new StateExpiryStorageHistoryResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): StateExpiryStorageHistoryResponse {
+    return new StateExpiryStorageHistoryResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: StateExpiryStorageHistoryResponse | PlainMessage<StateExpiryStorageHistoryResponse> | undefined, b: StateExpiryStorageHistoryResponse | PlainMessage<StateExpiryStorageHistoryResponse> | undefined): boolean {
+    return proto3.util.equals(StateExpiryStorageHistoryResponse, a, b);
+  }
+}
+
+/**
+ * StateExpiryStorageHistory represents storage slot statistics for a 10000-block chunk.
+ * This data is useful for analyzing state expiry patterns and understanding storage slot activity over time.
+ *
+ * @generated from message api.v1.StateExpiryStorageHistory
+ */
+export class StateExpiryStorageHistory extends Message<StateExpiryStorageHistory> {
+  /**
+   * The starting block number of this 10000-block chunk
+   *
+   * @generated from field: uint32 chunk_start_block_number = 1;
+   */
+  chunkStartBlockNumber = 0;
+
+  /**
+   * Number of storage slots that were accessed for the first time in this chunk
+   * These are slots that had never been accessed before this chunk
+   *
+   * @generated from field: uint32 first_accessed_slots = 2;
+   */
+  firstAccessedSlots = 0;
+
+  /**
+   * Number of storage slots whose most recent access was in this chunk
+   * These slots haven't been accessed in any later chunks
+   *
+   * @generated from field: uint32 last_accessed_slots = 3;
+   */
+  lastAccessedSlots = 0;
+
+  constructor(data?: PartialMessage<StateExpiryStorageHistory>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.v1.StateExpiryStorageHistory";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "chunk_start_block_number", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
+    { no: 2, name: "first_accessed_slots", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
+    { no: 3, name: "last_accessed_slots", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): StateExpiryStorageHistory {
+    return new StateExpiryStorageHistory().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): StateExpiryStorageHistory {
+    return new StateExpiryStorageHistory().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): StateExpiryStorageHistory {
+    return new StateExpiryStorageHistory().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: StateExpiryStorageHistory | PlainMessage<StateExpiryStorageHistory> | undefined, b: StateExpiryStorageHistory | PlainMessage<StateExpiryStorageHistory> | undefined): boolean {
+    return proto3.util.equals(StateExpiryStorageHistory, a, b);
+  }
+}
+
+/**
+ * StateExpiryStorageExpiredTopResponse is the v1 API response for top contracts by expired storage slots.
+ * This endpoint provides the top 100 contracts ranked by the number of expired storage slots (not accessed in last 365 days).
+ *
+ * @generated from message api.v1.StateExpiryStorageExpiredTopResponse
+ */
+export class StateExpiryStorageExpiredTopResponse extends Message<StateExpiryStorageExpiredTopResponse> {
+  /**
+   * @generated from field: repeated api.v1.StateExpiryStorageExpiredTop items = 1;
+   */
+  items: StateExpiryStorageExpiredTop[] = [];
+
+  /**
+   * @generated from field: api.v1.FilterMetadata filters = 2;
+   */
+  filters?: FilterMetadata;
+
+  constructor(data?: PartialMessage<StateExpiryStorageExpiredTopResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.v1.StateExpiryStorageExpiredTopResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "items", kind: "message", T: StateExpiryStorageExpiredTop, repeated: true },
+    { no: 2, name: "filters", kind: "message", T: FilterMetadata },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): StateExpiryStorageExpiredTopResponse {
+    return new StateExpiryStorageExpiredTopResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): StateExpiryStorageExpiredTopResponse {
+    return new StateExpiryStorageExpiredTopResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): StateExpiryStorageExpiredTopResponse {
+    return new StateExpiryStorageExpiredTopResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: StateExpiryStorageExpiredTopResponse | PlainMessage<StateExpiryStorageExpiredTopResponse> | undefined, b: StateExpiryStorageExpiredTopResponse | PlainMessage<StateExpiryStorageExpiredTopResponse> | undefined): boolean {
+    return proto3.util.equals(StateExpiryStorageExpiredTopResponse, a, b);
+  }
+}
+
+/**
+ * StateExpiryStorageExpiredTop represents a contract ranked by expired storage slots for public API consumption.
+ *
+ * @generated from message api.v1.StateExpiryStorageExpiredTop
+ */
+export class StateExpiryStorageExpiredTop extends Message<StateExpiryStorageExpiredTop> {
+  /**
+   * Rank by expired storage slots (1=highest)
+   *
+   * @generated from field: uint32 rank = 1;
+   */
+  rank = 0;
+
+  /**
+   * The contract address
+   *
+   * @generated from field: string contract_address = 2;
+   */
+  contractAddress = "";
+
+  /**
+   * Number of expired storage slots for this contract (not accessed in last 365 days)
+   *
+   * @generated from field: uint64 expired_slots = 3;
+   */
+  expiredSlots = protoInt64.zero;
+
+  constructor(data?: PartialMessage<StateExpiryStorageExpiredTop>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.v1.StateExpiryStorageExpiredTop";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "rank", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
+    { no: 2, name: "contract_address", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "expired_slots", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): StateExpiryStorageExpiredTop {
+    return new StateExpiryStorageExpiredTop().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): StateExpiryStorageExpiredTop {
+    return new StateExpiryStorageExpiredTop().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): StateExpiryStorageExpiredTop {
+    return new StateExpiryStorageExpiredTop().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: StateExpiryStorageExpiredTop | PlainMessage<StateExpiryStorageExpiredTop> | undefined, b: StateExpiryStorageExpiredTop | PlainMessage<StateExpiryStorageExpiredTop> | undefined): boolean {
+    return proto3.util.equals(StateExpiryStorageExpiredTop, a, b);
+  }
+}
+
+/**
+ * StateExpiryStorageTopResponse is the v1 API response for top contracts by total storage slots.
+ * This endpoint provides the top 100 contracts ranked by the total number of storage slots.
+ *
+ * @generated from message api.v1.StateExpiryStorageTopResponse
+ */
+export class StateExpiryStorageTopResponse extends Message<StateExpiryStorageTopResponse> {
+  /**
+   * @generated from field: repeated api.v1.StateExpiryStorageTop items = 1;
+   */
+  items: StateExpiryStorageTop[] = [];
+
+  /**
+   * @generated from field: api.v1.FilterMetadata filters = 2;
+   */
+  filters?: FilterMetadata;
+
+  constructor(data?: PartialMessage<StateExpiryStorageTopResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.v1.StateExpiryStorageTopResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "items", kind: "message", T: StateExpiryStorageTop, repeated: true },
+    { no: 2, name: "filters", kind: "message", T: FilterMetadata },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): StateExpiryStorageTopResponse {
+    return new StateExpiryStorageTopResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): StateExpiryStorageTopResponse {
+    return new StateExpiryStorageTopResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): StateExpiryStorageTopResponse {
+    return new StateExpiryStorageTopResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: StateExpiryStorageTopResponse | PlainMessage<StateExpiryStorageTopResponse> | undefined, b: StateExpiryStorageTopResponse | PlainMessage<StateExpiryStorageTopResponse> | undefined): boolean {
+    return proto3.util.equals(StateExpiryStorageTopResponse, a, b);
+  }
+}
+
+/**
+ * StateExpiryStorageTop represents a contract ranked by total storage slots for public API consumption.
+ *
+ * @generated from message api.v1.StateExpiryStorageTop
+ */
+export class StateExpiryStorageTop extends Message<StateExpiryStorageTop> {
+  /**
+   * Rank by total storage slots (1=highest)
+   *
+   * @generated from field: uint32 rank = 1;
+   */
+  rank = 0;
+
+  /**
+   * The contract address
+   *
+   * @generated from field: string contract_address = 2;
+   */
+  contractAddress = "";
+
+  /**
+   * Total number of storage slots for this contract
+   *
+   * @generated from field: uint64 total_storage_slots = 3;
+   */
+  totalStorageSlots = protoInt64.zero;
+
+  constructor(data?: PartialMessage<StateExpiryStorageTop>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.v1.StateExpiryStorageTop";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "rank", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
+    { no: 2, name: "contract_address", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "total_storage_slots", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): StateExpiryStorageTop {
+    return new StateExpiryStorageTop().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): StateExpiryStorageTop {
+    return new StateExpiryStorageTop().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): StateExpiryStorageTop {
+    return new StateExpiryStorageTop().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: StateExpiryStorageTop | PlainMessage<StateExpiryStorageTop> | undefined, b: StateExpiryStorageTop | PlainMessage<StateExpiryStorageTop> | undefined): boolean {
+    return proto3.util.equals(StateExpiryStorageTop, a, b);
   }
 }
 
