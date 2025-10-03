@@ -34,6 +34,14 @@ export const API_V1_ENDPOINTS = {
     `/api/v1/${network}/beacon/slot/${slot}/mev/builder/count`,
   // Prepared blocks endpoint (formerly locally built blocks)
   preparedBlocks: (network: string) => `/api/v1/${network}/prepared/blocks`,
+  // State expiry endpoints
+  stateExpiryAccessHistory: (network: string) => `/api/v1/${network}/state-expiry/access/history`,
+  stateExpiryStorageHistory: (network: string) => `/api/v1/${network}/state-expiry/storage/history`,
+  stateExpiryAccessTotal: (network: string) => `/api/v1/${network}/state-expiry/access/total`,
+  stateExpiryStorageExpiredTop: (network: string) =>
+    `/api/v1/${network}/state-expiry/storage/expired/top`,
+  stateExpiryStorageTop: (network: string) => `/api/v1/${network}/state-expiry/storage/top`,
+  stateExpiryStorageTotal: (network: string) => `/api/v1/${network}/state-expiry/storage/total`,
 };
 
 /**
