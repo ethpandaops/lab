@@ -212,7 +212,7 @@ export default function StateExpiryPage() {
         const storageAccessSeries = aggregateToHundredK(storageHistory.items || [], true);
 
         // Default expiry block window (can be configured or calculated based on your requirements)
-        const expiryBlockWindow = 18000000; // Default value, adjust as needed
+        const expiryBlockWindow = 20900000; // Hardcoded expiry threshold (rounded to 100k)
 
         const transformedData: StateExpiryData = {
           totalEOAAccounts,
