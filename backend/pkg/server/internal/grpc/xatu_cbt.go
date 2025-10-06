@@ -10,7 +10,6 @@ import (
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
-	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 // XatuCBT implements the Xatu CBT gRPC service.
@@ -385,12 +384,15 @@ func (x *XatuCBT) ListFctAddressStorageSlotTotal(
 	return x.service.ListFctAddressStorageSlotTotal(ctx, req)
 }
 
-// ListFctBlockForStateExpiry returns the execution block number from approximately 1 year ago
-// for state expiry calculations. This is a special endpoint that doesn't take parameters.
-func (x *XatuCBT) ListFctBlockForStateExpiry(
+// ListFctBlock returns blocks from the fct_block table.
+func (x *XatuCBT) ListFctBlock(
 	ctx context.Context,
-	req *emptypb.Empty,
+	req *cbtproto.ListFctBlockRequest,
 ) (*cbtproto.ListFctBlockResponse, error) {
-	// No request parameters needed - the service method handles the time calculation internally
-	return x.service.ListFctBlockForStateExpiry(ctx)
+	// Calculate SlotStartDateTime if not already set for more efficient queries.
+	if req.SlotStartDateTime == nil && req.Slot != nil {
+		req.SlotStartDateTime = x.calculateSlotStartDateTime(ctx, req.Slot)
+	}
+
+	return x.service.ListFctBlock(ctx, req)
 }

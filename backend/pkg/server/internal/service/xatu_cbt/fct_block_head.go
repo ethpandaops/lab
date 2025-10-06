@@ -9,6 +9,7 @@ import (
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/clickhouse"
 	cbtproto "github.com/ethpandaops/xatu-cbt/pkg/proto/clickhouse"
 	"github.com/prometheus/client_golang/prometheus"
+	"github.com/sirupsen/logrus"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
@@ -55,6 +56,13 @@ func (x *XatuCBT) ListFctBlockHead(
 	if err != nil {
 		return nil, fmt.Errorf("failed to build query: %w", err)
 	}
+
+	// Log the actual SQL query and arguments for debugging
+	x.log.WithFields(logrus.Fields{
+		"query":   sqlQuery.Query,
+		"args":    sqlQuery.Args,
+		"network": network,
+	}).Debug("FctBlockHead SQL Query")
 
 	if err = client.QueryWithScanner(ctx, sqlQuery.Query, func(scanner clickhouse.RowScanner) error {
 		block, scanErr := scanFctBlockHead(scanner)

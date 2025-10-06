@@ -62,7 +62,7 @@ func BuildListIntAddressFirstAccessQuery(req *ListIntAddressFirstAccessRequest, 
 		case *UInt32Filter_Gte:
 			qb.AddCondition("block_number", ">=", filter.Gte)
 		case *UInt32Filter_Between:
-			qb.AddBetweenCondition("block_number", filter.Between.Min, filter.Between.Max)
+			qb.AddBetweenCondition("block_number", filter.Between.Min, filter.Between.Max.GetValue())
 		case *UInt32Filter_In:
 			if len(filter.In.Values) > 0 {
 				qb.AddInCondition("block_number", UInt32SliceToInterface(filter.In.Values))
@@ -92,7 +92,7 @@ func BuildListIntAddressFirstAccessQuery(req *ListIntAddressFirstAccessRequest, 
 		case *UInt32Filter_Gte:
 			qb.AddCondition("version", ">=", filter.Gte)
 		case *UInt32Filter_Between:
-			qb.AddBetweenCondition("version", filter.Between.Min, filter.Between.Max)
+			qb.AddBetweenCondition("version", filter.Between.Min, filter.Between.Max.GetValue())
 		case *UInt32Filter_In:
 			if len(filter.In.Values) > 0 {
 				qb.AddInCondition("version", UInt32SliceToInterface(filter.In.Values))

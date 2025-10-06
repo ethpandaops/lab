@@ -194,5 +194,12 @@ func (r *PublicRouter) GetRoutes() []RouteConfig {
 			Cache:       middleware.CacheNearRealtime,
 			Description: "Get total storage slot statistics for state expiry analysis",
 		},
+		{
+			Path:        "/{network}/state-expiry/expiry/block",
+			Handler:     r.handleStateExpiryBlock,
+			Methods:     []string{http.MethodGet, http.MethodOptions},
+			Cache:       middleware.CacheNearRealtime,
+			Description: "Get the execution block number from approximately 1 year ago for state expiry boundary",
+		},
 	}
 }

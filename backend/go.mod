@@ -13,7 +13,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/config v1.31.8
 	github.com/aws/aws-sdk-go-v2/credentials v1.18.12
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.88.1
-	github.com/ethpandaops/xatu-cbt v0.0.0-20251002045836-dd848db7f6e4
+	github.com/ethpandaops/xatu-cbt v0.0.0-20251006034352-249e0b1b2404
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/prometheus/client_golang v1.23.2
 	github.com/rs/cors v1.11.1

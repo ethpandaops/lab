@@ -104,6 +104,7 @@ export default function StateExpiryPage() {
           storageExpiredTop,
           accessHistory,
           storageHistory,
+          expiryBlock,
         ] = await Promise.all([
           restClient.getStateExpiryAccessTotal(selectedNetwork),
           restClient.getStateExpiryStorageTotal(selectedNetwork),
@@ -111,6 +112,7 @@ export default function StateExpiryPage() {
           restClient.getStateExpiryStorageExpiredTop(selectedNetwork),
           restClient.getStateExpiryAccessHistory(selectedNetwork),
           restClient.getStateExpiryStorageHistory(selectedNetwork),
+          restClient.getStateExpiryBlock(selectedNetwork),
         ]);
 
         // Process the data
@@ -212,8 +214,9 @@ export default function StateExpiryPage() {
         const accountsAccessSeries = aggregateToHundredK(accessHistory.items || [], false);
         const storageAccessSeries = aggregateToHundredK(storageHistory.items || [], true);
 
-        // Default expiry block window (can be configured or calculated based on your requirements)
-        const expiryBlockWindow = 20900000; // Hardcoded expiry threshold (rounded to 100k)
+        // Get expiry block from API and round to nearest 100k
+        const rawExpiryBlock = Number(expiryBlock.item?.block_number || 0);
+        const expiryBlockWindow = Math.round(rawExpiryBlock / 100000) * 100000;
 
         const transformedData: StateExpiryData = {
           totalEOAAccounts,
@@ -415,7 +418,7 @@ export default function StateExpiryPage() {
               <div className="space-y-3">
                 {data.topContractsBySlots.map((contract, index) => (
                   <div
-                    key={contract.address}
+                    key={`total-${index}`}
                     className="flex justify-between items-center p-3 bg-surface/50 rounded-lg"
                   >
                     <div>
@@ -443,7 +446,7 @@ export default function StateExpiryPage() {
               <div className="space-y-3">
                 {data.topContractsByExpiredSlots.map((contract, index) => (
                   <div
-                    key={contract.address}
+                    key={`expired-${index}`}
                     className="flex justify-between items-center p-3 bg-surface/50 rounded-lg"
                   >
                     <div>

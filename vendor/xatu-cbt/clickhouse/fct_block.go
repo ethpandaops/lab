@@ -27,26 +27,34 @@ func BuildListFctBlockQuery(req *ListFctBlockRequest, options ...QueryOption) (S
 	// Add primary key filter
 	switch filter := req.SlotStartDateTime.Filter.(type) {
 	case *UInt32Filter_Eq:
-		qb.AddCondition("slot_start_date_time", "=", filter.Eq)
+		qb.AddCondition("slot_start_date_time", "=", DateTimeValue{filter.Eq})
 	case *UInt32Filter_Ne:
-		qb.AddCondition("slot_start_date_time", "!=", filter.Ne)
+		qb.AddCondition("slot_start_date_time", "!=", DateTimeValue{filter.Ne})
 	case *UInt32Filter_Lt:
-		qb.AddCondition("slot_start_date_time", "<", filter.Lt)
+		qb.AddCondition("slot_start_date_time", "<", DateTimeValue{filter.Lt})
 	case *UInt32Filter_Lte:
-		qb.AddCondition("slot_start_date_time", "<=", filter.Lte)
+		qb.AddCondition("slot_start_date_time", "<=", DateTimeValue{filter.Lte})
 	case *UInt32Filter_Gt:
-		qb.AddCondition("slot_start_date_time", ">", filter.Gt)
+		qb.AddCondition("slot_start_date_time", ">", DateTimeValue{filter.Gt})
 	case *UInt32Filter_Gte:
-		qb.AddCondition("slot_start_date_time", ">=", filter.Gte)
+		qb.AddCondition("slot_start_date_time", ">=", DateTimeValue{filter.Gte})
 	case *UInt32Filter_Between:
-		qb.AddBetweenCondition("slot_start_date_time", filter.Between.Min, filter.Between.Max)
+		qb.AddBetweenCondition("slot_start_date_time", DateTimeValue{filter.Between.Min}, DateTimeValue{filter.Between.Max.GetValue()})
 	case *UInt32Filter_In:
 		if len(filter.In.Values) > 0 {
-			qb.AddInCondition("slot_start_date_time", UInt32SliceToInterface(filter.In.Values))
+			converted := make([]interface{}, len(filter.In.Values))
+			for i, v := range filter.In.Values {
+				converted[i] = DateTimeValue{v}
+			}
+			qb.AddInCondition("slot_start_date_time", converted)
 		}
 	case *UInt32Filter_NotIn:
 		if len(filter.NotIn.Values) > 0 {
-			qb.AddNotInCondition("slot_start_date_time", UInt32SliceToInterface(filter.NotIn.Values))
+			converted := make([]interface{}, len(filter.NotIn.Values))
+			for i, v := range filter.NotIn.Values {
+				converted[i] = DateTimeValue{v}
+			}
+			qb.AddNotInCondition("slot_start_date_time", converted)
 		}
 	default:
 		// Unsupported filter type
@@ -56,26 +64,34 @@ func BuildListFctBlockQuery(req *ListFctBlockRequest, options ...QueryOption) (S
 	if req.UpdatedDateTime != nil {
 		switch filter := req.UpdatedDateTime.Filter.(type) {
 		case *UInt32Filter_Eq:
-			qb.AddCondition("updated_date_time", "=", filter.Eq)
+			qb.AddCondition("updated_date_time", "=", DateTimeValue{filter.Eq})
 		case *UInt32Filter_Ne:
-			qb.AddCondition("updated_date_time", "!=", filter.Ne)
+			qb.AddCondition("updated_date_time", "!=", DateTimeValue{filter.Ne})
 		case *UInt32Filter_Lt:
-			qb.AddCondition("updated_date_time", "<", filter.Lt)
+			qb.AddCondition("updated_date_time", "<", DateTimeValue{filter.Lt})
 		case *UInt32Filter_Lte:
-			qb.AddCondition("updated_date_time", "<=", filter.Lte)
+			qb.AddCondition("updated_date_time", "<=", DateTimeValue{filter.Lte})
 		case *UInt32Filter_Gt:
-			qb.AddCondition("updated_date_time", ">", filter.Gt)
+			qb.AddCondition("updated_date_time", ">", DateTimeValue{filter.Gt})
 		case *UInt32Filter_Gte:
-			qb.AddCondition("updated_date_time", ">=", filter.Gte)
+			qb.AddCondition("updated_date_time", ">=", DateTimeValue{filter.Gte})
 		case *UInt32Filter_Between:
-			qb.AddBetweenCondition("updated_date_time", filter.Between.Min, filter.Between.Max)
+			qb.AddBetweenCondition("updated_date_time", DateTimeValue{filter.Between.Min}, DateTimeValue{filter.Between.Max.GetValue()})
 		case *UInt32Filter_In:
 			if len(filter.In.Values) > 0 {
-				qb.AddInCondition("updated_date_time", UInt32SliceToInterface(filter.In.Values))
+				converted := make([]interface{}, len(filter.In.Values))
+				for i, v := range filter.In.Values {
+					converted[i] = DateTimeValue{v}
+				}
+				qb.AddInCondition("updated_date_time", converted)
 			}
 		case *UInt32Filter_NotIn:
 			if len(filter.NotIn.Values) > 0 {
-				qb.AddNotInCondition("updated_date_time", UInt32SliceToInterface(filter.NotIn.Values))
+				converted := make([]interface{}, len(filter.NotIn.Values))
+				for i, v := range filter.NotIn.Values {
+					converted[i] = DateTimeValue{v}
+				}
+				qb.AddNotInCondition("updated_date_time", converted)
 			}
 		default:
 			// Unsupported filter type
@@ -98,7 +114,7 @@ func BuildListFctBlockQuery(req *ListFctBlockRequest, options ...QueryOption) (S
 		case *UInt32Filter_Gte:
 			qb.AddCondition("slot", ">=", filter.Gte)
 		case *UInt32Filter_Between:
-			qb.AddBetweenCondition("slot", filter.Between.Min, filter.Between.Max)
+			qb.AddBetweenCondition("slot", filter.Between.Min, filter.Between.Max.GetValue())
 		case *UInt32Filter_In:
 			if len(filter.In.Values) > 0 {
 				qb.AddInCondition("slot", UInt32SliceToInterface(filter.In.Values))
@@ -128,7 +144,7 @@ func BuildListFctBlockQuery(req *ListFctBlockRequest, options ...QueryOption) (S
 		case *UInt32Filter_Gte:
 			qb.AddCondition("epoch", ">=", filter.Gte)
 		case *UInt32Filter_Between:
-			qb.AddBetweenCondition("epoch", filter.Between.Min, filter.Between.Max)
+			qb.AddBetweenCondition("epoch", filter.Between.Min, filter.Between.Max.GetValue())
 		case *UInt32Filter_In:
 			if len(filter.In.Values) > 0 {
 				qb.AddInCondition("epoch", UInt32SliceToInterface(filter.In.Values))
@@ -146,26 +162,34 @@ func BuildListFctBlockQuery(req *ListFctBlockRequest, options ...QueryOption) (S
 	if req.EpochStartDateTime != nil {
 		switch filter := req.EpochStartDateTime.Filter.(type) {
 		case *UInt32Filter_Eq:
-			qb.AddCondition("epoch_start_date_time", "=", filter.Eq)
+			qb.AddCondition("epoch_start_date_time", "=", DateTimeValue{filter.Eq})
 		case *UInt32Filter_Ne:
-			qb.AddCondition("epoch_start_date_time", "!=", filter.Ne)
+			qb.AddCondition("epoch_start_date_time", "!=", DateTimeValue{filter.Ne})
 		case *UInt32Filter_Lt:
-			qb.AddCondition("epoch_start_date_time", "<", filter.Lt)
+			qb.AddCondition("epoch_start_date_time", "<", DateTimeValue{filter.Lt})
 		case *UInt32Filter_Lte:
-			qb.AddCondition("epoch_start_date_time", "<=", filter.Lte)
+			qb.AddCondition("epoch_start_date_time", "<=", DateTimeValue{filter.Lte})
 		case *UInt32Filter_Gt:
-			qb.AddCondition("epoch_start_date_time", ">", filter.Gt)
+			qb.AddCondition("epoch_start_date_time", ">", DateTimeValue{filter.Gt})
 		case *UInt32Filter_Gte:
-			qb.AddCondition("epoch_start_date_time", ">=", filter.Gte)
+			qb.AddCondition("epoch_start_date_time", ">=", DateTimeValue{filter.Gte})
 		case *UInt32Filter_Between:
-			qb.AddBetweenCondition("epoch_start_date_time", filter.Between.Min, filter.Between.Max)
+			qb.AddBetweenCondition("epoch_start_date_time", DateTimeValue{filter.Between.Min}, DateTimeValue{filter.Between.Max.GetValue()})
 		case *UInt32Filter_In:
 			if len(filter.In.Values) > 0 {
-				qb.AddInCondition("epoch_start_date_time", UInt32SliceToInterface(filter.In.Values))
+				converted := make([]interface{}, len(filter.In.Values))
+				for i, v := range filter.In.Values {
+					converted[i] = DateTimeValue{v}
+				}
+				qb.AddInCondition("epoch_start_date_time", converted)
 			}
 		case *UInt32Filter_NotIn:
 			if len(filter.NotIn.Values) > 0 {
-				qb.AddNotInCondition("epoch_start_date_time", UInt32SliceToInterface(filter.NotIn.Values))
+				converted := make([]interface{}, len(filter.NotIn.Values))
+				for i, v := range filter.NotIn.Values {
+					converted[i] = DateTimeValue{v}
+				}
+				qb.AddNotInCondition("epoch_start_date_time", converted)
 			}
 		default:
 			// Unsupported filter type
@@ -248,7 +272,7 @@ func BuildListFctBlockQuery(req *ListFctBlockRequest, options ...QueryOption) (S
 		case *NullableUInt32Filter_Gte:
 			qb.AddCondition("block_total_bytes", ">=", filter.Gte)
 		case *NullableUInt32Filter_Between:
-			qb.AddBetweenCondition("block_total_bytes", filter.Between.Min, filter.Between.Max)
+			qb.AddBetweenCondition("block_total_bytes", filter.Between.Min, filter.Between.Max.GetValue())
 		case *NullableUInt32Filter_In:
 			if len(filter.In.Values) > 0 {
 				qb.AddInCondition("block_total_bytes", UInt32SliceToInterface(filter.In.Values))
@@ -282,7 +306,7 @@ func BuildListFctBlockQuery(req *ListFctBlockRequest, options ...QueryOption) (S
 		case *NullableUInt32Filter_Gte:
 			qb.AddCondition("block_total_bytes_compressed", ">=", filter.Gte)
 		case *NullableUInt32Filter_Between:
-			qb.AddBetweenCondition("block_total_bytes_compressed", filter.Between.Min, filter.Between.Max)
+			qb.AddBetweenCondition("block_total_bytes_compressed", filter.Between.Min, filter.Between.Max.GetValue())
 		case *NullableUInt32Filter_In:
 			if len(filter.In.Values) > 0 {
 				qb.AddInCondition("block_total_bytes_compressed", UInt32SliceToInterface(filter.In.Values))
@@ -376,7 +400,7 @@ func BuildListFctBlockQuery(req *ListFctBlockRequest, options ...QueryOption) (S
 		case *UInt32Filter_Gte:
 			qb.AddCondition("proposer_index", ">=", filter.Gte)
 		case *UInt32Filter_Between:
-			qb.AddBetweenCondition("proposer_index", filter.Between.Min, filter.Between.Max)
+			qb.AddBetweenCondition("proposer_index", filter.Between.Min, filter.Between.Max.GetValue())
 		case *UInt32Filter_In:
 			if len(filter.In.Values) > 0 {
 				qb.AddInCondition("proposer_index", UInt32SliceToInterface(filter.In.Values))
@@ -496,7 +520,7 @@ func BuildListFctBlockQuery(req *ListFctBlockRequest, options ...QueryOption) (S
 		case *UInt32Filter_Gte:
 			qb.AddCondition("execution_payload_block_number", ">=", filter.Gte)
 		case *UInt32Filter_Between:
-			qb.AddBetweenCondition("execution_payload_block_number", filter.Between.Min, filter.Between.Max)
+			qb.AddBetweenCondition("execution_payload_block_number", filter.Between.Min, filter.Between.Max.GetValue())
 		case *UInt32Filter_In:
 			if len(filter.In.Values) > 0 {
 				qb.AddInCondition("execution_payload_block_number", UInt32SliceToInterface(filter.In.Values))
@@ -590,7 +614,7 @@ func BuildListFctBlockQuery(req *ListFctBlockRequest, options ...QueryOption) (S
 		case *NullableUInt64Filter_Gte:
 			qb.AddCondition("execution_payload_blob_gas_used", ">=", filter.Gte)
 		case *NullableUInt64Filter_Between:
-			qb.AddBetweenCondition("execution_payload_blob_gas_used", filter.Between.Min, filter.Between.Max)
+			qb.AddBetweenCondition("execution_payload_blob_gas_used", filter.Between.Min, filter.Between.Max.GetValue())
 		case *NullableUInt64Filter_In:
 			if len(filter.In.Values) > 0 {
 				qb.AddInCondition("execution_payload_blob_gas_used", UInt64SliceToInterface(filter.In.Values))
@@ -624,7 +648,7 @@ func BuildListFctBlockQuery(req *ListFctBlockRequest, options ...QueryOption) (S
 		case *NullableUInt64Filter_Gte:
 			qb.AddCondition("execution_payload_excess_blob_gas", ">=", filter.Gte)
 		case *NullableUInt64Filter_Between:
-			qb.AddBetweenCondition("execution_payload_excess_blob_gas", filter.Between.Min, filter.Between.Max)
+			qb.AddBetweenCondition("execution_payload_excess_blob_gas", filter.Between.Min, filter.Between.Max.GetValue())
 		case *NullableUInt64Filter_In:
 			if len(filter.In.Values) > 0 {
 				qb.AddInCondition("execution_payload_excess_blob_gas", UInt64SliceToInterface(filter.In.Values))
@@ -658,7 +682,7 @@ func BuildListFctBlockQuery(req *ListFctBlockRequest, options ...QueryOption) (S
 		case *NullableUInt64Filter_Gte:
 			qb.AddCondition("execution_payload_gas_limit", ">=", filter.Gte)
 		case *NullableUInt64Filter_Between:
-			qb.AddBetweenCondition("execution_payload_gas_limit", filter.Between.Min, filter.Between.Max)
+			qb.AddBetweenCondition("execution_payload_gas_limit", filter.Between.Min, filter.Between.Max.GetValue())
 		case *NullableUInt64Filter_In:
 			if len(filter.In.Values) > 0 {
 				qb.AddInCondition("execution_payload_gas_limit", UInt64SliceToInterface(filter.In.Values))
@@ -692,7 +716,7 @@ func BuildListFctBlockQuery(req *ListFctBlockRequest, options ...QueryOption) (S
 		case *NullableUInt64Filter_Gte:
 			qb.AddCondition("execution_payload_gas_used", ">=", filter.Gte)
 		case *NullableUInt64Filter_Between:
-			qb.AddBetweenCondition("execution_payload_gas_used", filter.Between.Min, filter.Between.Max)
+			qb.AddBetweenCondition("execution_payload_gas_used", filter.Between.Min, filter.Between.Max.GetValue())
 		case *NullableUInt64Filter_In:
 			if len(filter.In.Values) > 0 {
 				qb.AddInCondition("execution_payload_gas_used", UInt64SliceToInterface(filter.In.Values))
@@ -786,7 +810,7 @@ func BuildListFctBlockQuery(req *ListFctBlockRequest, options ...QueryOption) (S
 		case *NullableUInt32Filter_Gte:
 			qb.AddCondition("execution_payload_transactions_count", ">=", filter.Gte)
 		case *NullableUInt32Filter_Between:
-			qb.AddBetweenCondition("execution_payload_transactions_count", filter.Between.Min, filter.Between.Max)
+			qb.AddBetweenCondition("execution_payload_transactions_count", filter.Between.Min, filter.Between.Max.GetValue())
 		case *NullableUInt32Filter_In:
 			if len(filter.In.Values) > 0 {
 				qb.AddInCondition("execution_payload_transactions_count", UInt32SliceToInterface(filter.In.Values))
@@ -820,7 +844,7 @@ func BuildListFctBlockQuery(req *ListFctBlockRequest, options ...QueryOption) (S
 		case *NullableUInt32Filter_Gte:
 			qb.AddCondition("execution_payload_transactions_total_bytes", ">=", filter.Gte)
 		case *NullableUInt32Filter_Between:
-			qb.AddBetweenCondition("execution_payload_transactions_total_bytes", filter.Between.Min, filter.Between.Max)
+			qb.AddBetweenCondition("execution_payload_transactions_total_bytes", filter.Between.Min, filter.Between.Max.GetValue())
 		case *NullableUInt32Filter_In:
 			if len(filter.In.Values) > 0 {
 				qb.AddInCondition("execution_payload_transactions_total_bytes", UInt32SliceToInterface(filter.In.Values))
@@ -854,7 +878,7 @@ func BuildListFctBlockQuery(req *ListFctBlockRequest, options ...QueryOption) (S
 		case *NullableUInt32Filter_Gte:
 			qb.AddCondition("execution_payload_transactions_total_bytes_compressed", ">=", filter.Gte)
 		case *NullableUInt32Filter_Between:
-			qb.AddBetweenCondition("execution_payload_transactions_total_bytes_compressed", filter.Between.Min, filter.Between.Max)
+			qb.AddBetweenCondition("execution_payload_transactions_total_bytes_compressed", filter.Between.Min, filter.Between.Max.GetValue())
 		case *NullableUInt32Filter_In:
 			if len(filter.In.Values) > 0 {
 				qb.AddInCondition("execution_payload_transactions_total_bytes_compressed", UInt32SliceToInterface(filter.In.Values))

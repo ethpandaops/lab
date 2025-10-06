@@ -75,6 +75,16 @@ type SQLQuery struct {
 	Args   []interface{}
 }
 
+// DateTimeValue wraps a uint32 Unix timestamp for proper DateTime handling in ClickHouse
+type DateTimeValue struct {
+	Timestamp uint32
+}
+
+// DateTime64Value wraps a uint64 Unix timestamp for proper DateTime64 handling in ClickHouse
+type DateTime64Value struct {
+	Timestamp uint64
+}
+
 // QueryBuilder helps construct parameterized SQL queries safely
 type QueryBuilder struct {
 	conditions []string
@@ -116,8 +126,22 @@ func (qb *QueryBuilder) formatVariable(index int) string {
 // AddCondition adds a condition with a parameterized value
 func (qb *QueryBuilder) AddCondition(column, operator string, value interface{}) {
 	placeholder := qb.formatVariable(qb.argCounter)
-	qb.conditions = append(qb.conditions, fmt.Sprintf("%s %s %s", column, operator, placeholder))
-	qb.args = append(qb.args, value)
+
+	// Check if value is a DateTime wrapper and handle accordingly
+	switch v := value.(type) {
+	case DateTimeValue:
+		// For DateTime values, wrap with fromUnixTimestamp
+		qb.conditions = append(qb.conditions, fmt.Sprintf("%s %s fromUnixTimestamp(%s)", column, operator, placeholder))
+		qb.args = append(qb.args, v.Timestamp)
+	case DateTime64Value:
+		// For DateTime64 values, wrap with fromUnixTimestamp64Micro
+		qb.conditions = append(qb.conditions, fmt.Sprintf("%s %s fromUnixTimestamp64Micro(%s)", column, operator, placeholder))
+		qb.args = append(qb.args, v.Timestamp)
+	default:
+		// Regular value
+		qb.conditions = append(qb.conditions, fmt.Sprintf("%s %s %s", column, operator, placeholder))
+		qb.args = append(qb.args, value)
+	}
 	qb.argCounter++
 }
 
@@ -127,8 +151,25 @@ func (qb *QueryBuilder) AddBetweenCondition(column string, minValue, maxValue in
 	qb.argCounter++
 	placeholderMax := qb.formatVariable(qb.argCounter)
 	qb.argCounter++
-	qb.conditions = append(qb.conditions, fmt.Sprintf("%s BETWEEN %s AND %s", column, placeholderMin, placeholderMax))
-	qb.args = append(qb.args, minValue, maxValue)
+
+	// Check if values are DateTime wrappers
+	switch minValue.(type) {
+	case DateTimeValue:
+		minV := minValue.(DateTimeValue)
+		maxV := maxValue.(DateTimeValue)
+		qb.conditions = append(qb.conditions, fmt.Sprintf("%s BETWEEN fromUnixTimestamp(%s) AND fromUnixTimestamp(%s)",
+			column, placeholderMin, placeholderMax))
+		qb.args = append(qb.args, minV.Timestamp, maxV.Timestamp)
+	case DateTime64Value:
+		minV := minValue.(DateTime64Value)
+		maxV := maxValue.(DateTime64Value)
+		qb.conditions = append(qb.conditions, fmt.Sprintf("%s BETWEEN fromUnixTimestamp64Micro(%s) AND fromUnixTimestamp64Micro(%s)",
+			column, placeholderMin, placeholderMax))
+		qb.args = append(qb.args, minV.Timestamp, maxV.Timestamp)
+	default:
+		qb.conditions = append(qb.conditions, fmt.Sprintf("%s BETWEEN %s AND %s", column, placeholderMin, placeholderMax))
+		qb.args = append(qb.args, minValue, maxValue)
+	}
 }
 
 // AddInCondition adds an IN condition
@@ -136,6 +177,34 @@ func (qb *QueryBuilder) AddInCondition(column string, values []interface{}) {
 	if len(values) == 0 {
 		return
 	}
+
+	// Check if first value is a DateTime wrapper to determine handling
+	if len(values) > 0 {
+		switch values[0].(type) {
+		case DateTimeValue:
+			placeholders := make([]string, len(values))
+			for i, v := range values {
+				dt := v.(DateTimeValue)
+				placeholders[i] = fmt.Sprintf("fromUnixTimestamp(%s)", qb.formatVariable(qb.argCounter))
+				qb.args = append(qb.args, dt.Timestamp)
+				qb.argCounter++
+			}
+			qb.conditions = append(qb.conditions, fmt.Sprintf("%s IN (%s)", column, strings.Join(placeholders, ", ")))
+			return
+		case DateTime64Value:
+			placeholders := make([]string, len(values))
+			for i, v := range values {
+				dt := v.(DateTime64Value)
+				placeholders[i] = fmt.Sprintf("fromUnixTimestamp64Micro(%s)", qb.formatVariable(qb.argCounter))
+				qb.args = append(qb.args, dt.Timestamp)
+				qb.argCounter++
+			}
+			qb.conditions = append(qb.conditions, fmt.Sprintf("%s IN (%s)", column, strings.Join(placeholders, ", ")))
+			return
+		}
+	}
+
+	// Regular values
 	placeholders := make([]string, len(values))
 	for i, v := range values {
 		placeholders[i] = qb.formatVariable(qb.argCounter)
@@ -150,6 +219,34 @@ func (qb *QueryBuilder) AddNotInCondition(column string, values []interface{}) {
 	if len(values) == 0 {
 		return
 	}
+
+	// Check if first value is a DateTime wrapper to determine handling
+	if len(values) > 0 {
+		switch values[0].(type) {
+		case DateTimeValue:
+			placeholders := make([]string, len(values))
+			for i, v := range values {
+				dt := v.(DateTimeValue)
+				placeholders[i] = fmt.Sprintf("fromUnixTimestamp(%s)", qb.formatVariable(qb.argCounter))
+				qb.args = append(qb.args, dt.Timestamp)
+				qb.argCounter++
+			}
+			qb.conditions = append(qb.conditions, fmt.Sprintf("%s NOT IN (%s)", column, strings.Join(placeholders, ", ")))
+			return
+		case DateTime64Value:
+			placeholders := make([]string, len(values))
+			for i, v := range values {
+				dt := v.(DateTime64Value)
+				placeholders[i] = fmt.Sprintf("fromUnixTimestamp64Micro(%s)", qb.formatVariable(qb.argCounter))
+				qb.args = append(qb.args, dt.Timestamp)
+				qb.argCounter++
+			}
+			qb.conditions = append(qb.conditions, fmt.Sprintf("%s NOT IN (%s)", column, strings.Join(placeholders, ", ")))
+			return
+		}
+	}
+
+	// Regular values
 	placeholders := make([]string, len(values))
 	for i, v := range values {
 		placeholders[i] = qb.formatVariable(qb.argCounter)
@@ -245,6 +342,105 @@ func (qb *QueryBuilder) AddMapContainsAnyCondition(column string, keys []string)
 	}
 	// Join with OR for any match
 	qb.conditions = append(qb.conditions, fmt.Sprintf("(%s)", strings.Join(conditions, " OR ")))
+}
+
+// DateTime-specific condition methods
+
+// AddDateTimeCondition adds a condition for DateTime columns (converts Unix timestamp to DateTime)
+func (qb *QueryBuilder) AddDateTimeCondition(column, operator string, unixTimestamp uint32) {
+	placeholder := qb.formatVariable(qb.argCounter)
+	qb.conditions = append(qb.conditions, fmt.Sprintf("%s %s fromUnixTimestamp(%s)", column, operator, placeholder))
+	qb.args = append(qb.args, unixTimestamp)
+	qb.argCounter++
+}
+
+// AddDateTimeBetweenCondition adds a BETWEEN condition for DateTime columns
+func (qb *QueryBuilder) AddDateTimeBetweenCondition(column string, minTimestamp, maxTimestamp uint32) {
+	placeholderMin := qb.formatVariable(qb.argCounter)
+	qb.argCounter++
+	placeholderMax := qb.formatVariable(qb.argCounter)
+	qb.argCounter++
+	qb.conditions = append(qb.conditions, fmt.Sprintf("%s BETWEEN fromUnixTimestamp(%s) AND fromUnixTimestamp(%s)",
+		column, placeholderMin, placeholderMax))
+	qb.args = append(qb.args, minTimestamp, maxTimestamp)
+}
+
+// AddDateTimeInCondition adds an IN condition for DateTime columns
+func (qb *QueryBuilder) AddDateTimeInCondition(column string, timestamps []uint32) {
+	if len(timestamps) == 0 {
+		return
+	}
+	placeholders := make([]string, len(timestamps))
+	for i, ts := range timestamps {
+		placeholders[i] = fmt.Sprintf("fromUnixTimestamp(%s)", qb.formatVariable(qb.argCounter))
+		qb.args = append(qb.args, ts)
+		qb.argCounter++
+	}
+	qb.conditions = append(qb.conditions, fmt.Sprintf("%s IN (%s)", column, strings.Join(placeholders, ", ")))
+}
+
+// AddDateTimeNotInCondition adds a NOT IN condition for DateTime columns
+func (qb *QueryBuilder) AddDateTimeNotInCondition(column string, timestamps []uint32) {
+	if len(timestamps) == 0 {
+		return
+	}
+	placeholders := make([]string, len(timestamps))
+	for i, ts := range timestamps {
+		placeholders[i] = fmt.Sprintf("fromUnixTimestamp(%s)", qb.formatVariable(qb.argCounter))
+		qb.args = append(qb.args, ts)
+		qb.argCounter++
+	}
+	qb.conditions = append(qb.conditions, fmt.Sprintf("%s NOT IN (%s)", column, strings.Join(placeholders, ", ")))
+}
+
+// DateTime64-specific condition methods (for microsecond precision timestamps)
+
+// AddDateTime64Condition adds a condition for DateTime64 columns (converts Unix timestamp to DateTime64)
+func (qb *QueryBuilder) AddDateTime64Condition(column, operator string, unixTimestamp uint64) {
+	placeholder := qb.formatVariable(qb.argCounter)
+	// DateTime64 with microsecond precision needs division by 1000000
+	qb.conditions = append(qb.conditions, fmt.Sprintf("%s %s fromUnixTimestamp64Micro(%s)", column, operator, placeholder))
+	qb.args = append(qb.args, unixTimestamp)
+	qb.argCounter++
+}
+
+// AddDateTime64BetweenCondition adds a BETWEEN condition for DateTime64 columns
+func (qb *QueryBuilder) AddDateTime64BetweenCondition(column string, minTimestamp, maxTimestamp uint64) {
+	placeholderMin := qb.formatVariable(qb.argCounter)
+	qb.argCounter++
+	placeholderMax := qb.formatVariable(qb.argCounter)
+	qb.argCounter++
+	qb.conditions = append(qb.conditions, fmt.Sprintf("%s BETWEEN fromUnixTimestamp64Micro(%s) AND fromUnixTimestamp64Micro(%s)",
+		column, placeholderMin, placeholderMax))
+	qb.args = append(qb.args, minTimestamp, maxTimestamp)
+}
+
+// AddDateTime64InCondition adds an IN condition for DateTime64 columns
+func (qb *QueryBuilder) AddDateTime64InCondition(column string, timestamps []uint64) {
+	if len(timestamps) == 0 {
+		return
+	}
+	placeholders := make([]string, len(timestamps))
+	for i, ts := range timestamps {
+		placeholders[i] = fmt.Sprintf("fromUnixTimestamp64Micro(%s)", qb.formatVariable(qb.argCounter))
+		qb.args = append(qb.args, ts)
+		qb.argCounter++
+	}
+	qb.conditions = append(qb.conditions, fmt.Sprintf("%s IN (%s)", column, strings.Join(placeholders, ", ")))
+}
+
+// AddDateTime64NotInCondition adds a NOT IN condition for DateTime64 columns
+func (qb *QueryBuilder) AddDateTime64NotInCondition(column string, timestamps []uint64) {
+	if len(timestamps) == 0 {
+		return
+	}
+	placeholders := make([]string, len(timestamps))
+	for i, ts := range timestamps {
+		placeholders[i] = fmt.Sprintf("fromUnixTimestamp64Micro(%s)", qb.formatVariable(qb.argCounter))
+		qb.args = append(qb.args, ts)
+		qb.argCounter++
+	}
+	qb.conditions = append(qb.conditions, fmt.Sprintf("%s NOT IN (%s)", column, strings.Join(placeholders, ", ")))
 }
 
 // GetWhereClause returns the WHERE clause if conditions exist

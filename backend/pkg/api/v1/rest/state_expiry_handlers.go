@@ -3,13 +3,14 @@ package rest
 import (
 	"net/http"
 	"strconv"
+	"time"
 
 	apiv1 "github.com/ethpandaops/lab/backend/pkg/api/v1/proto"
 	cbtproto "github.com/ethpandaops/xatu-cbt/pkg/proto/clickhouse"
 	"github.com/gorilla/mux"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc/metadata"
-	"google.golang.org/protobuf/types/known/emptypb"
+	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
 // handleStateExpiryAccessHistory handles GET /api/v1/{network}/state-expiry/access/history
@@ -514,7 +515,6 @@ func transformCBTToAPIStateExpiryStorageTotal(cbt *cbtproto.FctAddressStorageSlo
 // which is used as the boundary for state expiry calculations.
 func (r *PublicRouter) handleStateExpiryBlock(w http.ResponseWriter, req *http.Request) {
 	var (
-		ctx     = req.Context()
 		vars    = mux.Vars(req)
 		network = vars["network"]
 	)
@@ -532,12 +532,51 @@ func (r *PublicRouter) handleStateExpiryBlock(w http.ResponseWriter, req *http.R
 
 	// 2. Set network in gRPC metadata and call service
 	ctxWithMeta := metadata.NewOutgoingContext(
-		ctx,
+		req.Context(),
 		metadata.New(map[string]string{"network": network}),
 	)
 
-	// Call the special gRPC service method with an empty request
-	grpcResp, err := r.xatuCBTClient.ListFctBlockForStateExpiry(ctxWithMeta, &emptypb.Empty{})
+	// Call ListFctBlock to get the block from 1 year ago
+	// Calculate the time range: NOW() - INTERVAL '1 YEAR' to NOW() - INTERVAL '354 DAY'
+	now := time.Now().UTC()
+	oneYearAgo := now.Add(-365 * 24 * time.Hour)
+	threeFiveFourDaysAgo := now.Add(-354 * 24 * time.Hour)
+
+	// Safely convert Unix timestamps to uint32
+	oneYearAgoUnix := oneYearAgo.Unix()
+	threeFiveFourDaysAgoUnix := threeFiveFourDaysAgo.Unix()
+
+	// Validate timestamps are within uint32 range
+	if oneYearAgoUnix < 0 || oneYearAgoUnix > int64(^uint32(0)) {
+		r.WriteJSONResponseError(w, req, http.StatusInternalServerError, "Invalid timestamp range")
+
+		return
+	}
+
+	if threeFiveFourDaysAgoUnix < 0 || threeFiveFourDaysAgoUnix > int64(^uint32(0)) {
+		r.WriteJSONResponseError(w, req, http.StatusInternalServerError, "Invalid timestamp range")
+
+		return
+	}
+
+	// Safe to convert after validation
+	minTimestamp := uint32(oneYearAgoUnix)           // #nosec G115 - validated above
+	maxTimestamp := uint32(threeFiveFourDaysAgoUnix) // #nosec G115 - validated above
+
+	grpcReq := &cbtproto.ListFctBlockRequest{
+		SlotStartDateTime: &cbtproto.UInt32Filter{
+			Filter: &cbtproto.UInt32Filter_Between{
+				Between: &cbtproto.UInt32Range{
+					Min: minTimestamp,
+					Max: wrapperspb.UInt32(maxTimestamp),
+				},
+			},
+		},
+		PageSize: 1,
+		OrderBy:  "slot_start_date_time ASC",
+	}
+
+	grpcResp, err := r.xatuCBTClient.ListFctBlock(ctxWithMeta, grpcReq)
 	if err != nil {
 		r.log.WithError(err).WithFields(logrus.Fields{
 			"network": network,
@@ -548,18 +587,18 @@ func (r *PublicRouter) handleStateExpiryBlock(w http.ResponseWriter, req *http.R
 	}
 
 	// 3. TRANSFORM CBT types → Public API types
-	// We expect exactly one block from the service
 	var apiItem *apiv1.StateExpiryBlock
 	if len(grpcResp.FctBlock) > 0 {
-		apiItem = transformCBTToAPIStateExpiryBlock(grpcResp.FctBlock[0])
+		apiItem = &apiv1.StateExpiryBlock{
+			BlockNumber: grpcResp.FctBlock[0].ExecutionPayloadBlockNumber,
+		}
 	} else {
-		// No block found in the time range
 		r.WriteJSONResponseError(w, req, http.StatusNotFound, "No block found for state expiry time range")
 
 		return
 	}
 
-	// Build applied filters map for metadata (empty for this endpoint)
+	// Build applied filters map for metadata
 	appliedFilters := make(map[string]string)
 
 	// 4. Write response using the standard helper
@@ -570,12 +609,4 @@ func (r *PublicRouter) handleStateExpiryBlock(w http.ResponseWriter, req *http.R
 			AppliedFilters: appliedFilters,
 		},
 	})
-}
-
-// transformCBTToAPIStateExpiryBlock transforms CBT types to public API types.
-// This is the ONLY place where transformation happens for state expiry block.
-func transformCBTToAPIStateExpiryBlock(cbt *cbtproto.FctBlock) *apiv1.StateExpiryBlock {
-	return &apiv1.StateExpiryBlock{
-		BlockNumber: cbt.ExecutionPayloadBlockNumber,
-	}
 }

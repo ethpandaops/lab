@@ -128,10 +128,8 @@ service XatuCBT {
   // This table contains aggregated totals of storage slots accessed/expired for state expiry analysis.
   rpc ListFctAddressStorageSlotTotal(cbt.ListFctAddressStorageSlotTotalRequest) returns (cbt.ListFctAddressStorageSlotTotalResponse);
 
-  // ListFctBlockForStateExpiry returns the execution block number from approximately 1 year ago.
-  // This is a special endpoint for state expiry that queries fct_block with a specific time range.
-  // It returns the block from 1 year ago (minus 11 days) which serves as the boundary for state expiry calculations.
-  rpc ListFctBlockForStateExpiry(google.protobuf.Empty) returns (cbt.ListFctBlockResponse);
+  // ListFctBlock returns blocks from the fct_block table.
+  rpc ListFctBlock(cbt.ListFctBlockRequest) returns (cbt.ListFctBlockResponse);
 
   // GetDataAvailability returns the common availability interval across a set of transformation tables.
   // It calculates the overlapping data range for the specified tables and returns slot information.

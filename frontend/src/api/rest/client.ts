@@ -534,6 +534,16 @@ export class RestApiClient {
     const url = `${this.baseUrl}${API_V1_ENDPOINTS.stateExpiryStorageTotal(network)}`;
     return await this.fetchWithRetry<any>(url);
   }
+
+  /**
+   * Get state expiry block number
+   * @param network Network name
+   * @returns Response with the execution block number from approximately 1 year ago
+   */
+  async getStateExpiryBlock(network: string): Promise<any> {
+    const url = `${this.baseUrl}${API_V1_ENDPOINTS.stateExpiryBlock(network)}`;
+    return await this.fetchWithRetry<any>(url);
+  }
 }
 
 /**

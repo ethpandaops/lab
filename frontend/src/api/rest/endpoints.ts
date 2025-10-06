@@ -42,6 +42,7 @@ export const API_V1_ENDPOINTS = {
     `/api/v1/${network}/state-expiry/storage/expired/top`,
   stateExpiryStorageTop: (network: string) => `/api/v1/${network}/state-expiry/storage/top`,
   stateExpiryStorageTotal: (network: string) => `/api/v1/${network}/state-expiry/storage/total`,
+  stateExpiryBlock: (network: string) => `/api/v1/${network}/state-expiry/expiry/block`,
 };
 
 /**

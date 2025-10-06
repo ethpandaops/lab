@@ -3,6 +3,7 @@ package xatu_cbt
 import (
 	"context"
 	"fmt"
+	"math/big"
 	"time"
 
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/clickhouse"
@@ -12,13 +13,13 @@ import (
 )
 
 const (
-	MethodListFctBlockForStateExpiry = "ListFctBlockForStateExpiry"
+	MethodListFctBlock = "ListFctBlock"
 )
 
-// ListFctBlockForStateExpiry returns the execution block number from approximately 1 year ago.
-// This is a special query for state expiry that finds a block from 1 year ago (minus 11 days).
-func (x *XatuCBT) ListFctBlockForStateExpiry(
+// ListFctBlock returns blocks from the fct_block table.
+func (x *XatuCBT) ListFctBlock(
 	ctx context.Context,
+	req *cbtproto.ListFctBlockRequest,
 ) (resp *cbtproto.ListFctBlockResponse, err error) {
 	var (
 		network string
@@ -31,7 +32,7 @@ func (x *XatuCBT) ListFctBlockForStateExpiry(
 			status = StatusError
 		}
 
-		x.requestsTotal.WithLabelValues(MethodListFctBlockForStateExpiry, network, status).Inc()
+		x.requestsTotal.WithLabelValues(MethodListFctBlock, network, status).Inc()
 	}()
 
 	// Get network and clickhouse client.
@@ -42,33 +43,10 @@ func (x *XatuCBT) ListFctBlockForStateExpiry(
 
 	network = client.Network()
 
-	timer := prometheus.NewTimer(x.requestDuration.WithLabelValues(MethodListFctBlockForStateExpiry, network))
+	timer := prometheus.NewTimer(x.requestDuration.WithLabelValues(MethodListFctBlock, network))
 	defer timer.ObserveDuration()
 
-	// Calculate the time range: from 1 year ago to 354 days ago (1 year - 11 days)
-	now := time.Now().UTC()
-	oneYearAgo := now.Add(-365 * 24 * time.Hour)
-	threeFiveFourDaysAgo := now.Add(-354 * 24 * time.Hour)
-
-	// Convert to Unix timestamps
-	startTime := uint32(oneYearAgo.Unix())         //nolint:gosec // safe for slot times
-	endTime := uint32(threeFiveFourDaysAgo.Unix()) //nolint:gosec // safe for slot times
-
-	// Build the special request for state expiry
-	req := &cbtproto.ListFctBlockRequest{
-		SlotStartDateTime: &cbtproto.UInt32Filter{
-			Filter: &cbtproto.UInt32Filter_Between{
-				Between: &cbtproto.UInt32Range{
-					Min: startTime,
-					Max: wrapperspb.UInt32(endTime),
-				},
-			},
-		},
-		PageSize: 1,                          // Only need one block
-		OrderBy:  "slot_start_date_time ASC", // Get the oldest block in the range
-	}
-
-	// Use our clickhouse-proto-gen to handle building for us.
+	// Normal query handling using the proto query builder
 	sqlQuery, err := cbtproto.BuildListFctBlockQuery(
 		req,
 		cbtproto.WithFinal(),
@@ -90,7 +68,7 @@ func (x *XatuCBT) ListFctBlockForStateExpiry(
 
 		return nil
 	}, sqlQuery.Args...); err != nil {
-		return nil, fmt.Errorf("failed to query fct_block for state expiry: %w", err)
+		return nil, fmt.Errorf("failed to query fct_block: %w", err)
 	}
 
 	return &cbtproto.ListFctBlockResponse{
@@ -103,9 +81,11 @@ func scanFctBlock(scanner clickhouse.RowScanner) (*cbtproto.FctBlock, error) {
 	block := &cbtproto.FctBlock{}
 
 	var (
+		updatedDateTime, slotStartDateTime               time.Time
+		epochStartDateTime                               time.Time
 		blockTotalBytes                                  *uint32
 		blockTotalBytesCompressed                        *uint32
-		executionPayloadBaseFeePerGas                    *string
+		executionPayloadBaseFeePerGas                    *big.Int
 		executionPayloadBlobGasUsed                      *uint64
 		executionPayloadExcessBlobGas                    *uint64
 		executionPayloadGasLimit                         *uint64
@@ -116,11 +96,11 @@ func scanFctBlock(scanner clickhouse.RowScanner) (*cbtproto.FctBlock, error) {
 	)
 
 	err := scanner.Scan(
-		&block.UpdatedDateTime,
+		&updatedDateTime,
 		&block.Slot,
-		&block.SlotStartDateTime,
+		&slotStartDateTime,
 		&block.Epoch,
-		&block.EpochStartDateTime,
+		&epochStartDateTime,
 		&block.BlockRoot,
 		&block.BlockVersion,
 		&blockTotalBytes,
@@ -149,6 +129,10 @@ func scanFctBlock(scanner clickhouse.RowScanner) (*cbtproto.FctBlock, error) {
 		return nil, fmt.Errorf("failed to scan fct_block: %w", err)
 	}
 
+	block.UpdatedDateTime = uint32(updatedDateTime.Unix())       //nolint:gosec // safe.
+	block.SlotStartDateTime = uint32(slotStartDateTime.Unix())   //nolint:gosec // safe.
+	block.EpochStartDateTime = uint32(epochStartDateTime.Unix()) //nolint:gosec // safe.
+
 	// Handle nullable fields
 	if blockTotalBytes != nil {
 		block.BlockTotalBytes = wrapperspb.UInt32(*blockTotalBytes)
@@ -159,7 +143,7 @@ func scanFctBlock(scanner clickhouse.RowScanner) (*cbtproto.FctBlock, error) {
 	}
 
 	if executionPayloadBaseFeePerGas != nil {
-		block.ExecutionPayloadBaseFeePerGas = wrapperspb.String(*executionPayloadBaseFeePerGas)
+		block.ExecutionPayloadBaseFeePerGas = wrapperspb.String(executionPayloadBaseFeePerGas.String())
 	}
 
 	if executionPayloadBlobGasUsed != nil {

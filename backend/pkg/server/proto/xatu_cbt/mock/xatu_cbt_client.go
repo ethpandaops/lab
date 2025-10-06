@@ -263,6 +263,26 @@ func (mr *MockXatuCBTClientMockRecorder) ListFctAttestationFirstSeenChunked50Ms(
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListFctAttestationFirstSeenChunked50Ms", reflect.TypeOf((*MockXatuCBTClient)(nil).ListFctAttestationFirstSeenChunked50Ms), varargs...)
 }
 
+// ListFctBlock mocks base method.
+func (m *MockXatuCBTClient) ListFctBlock(ctx context.Context, in *clickhouse.ListFctBlockRequest, opts ...grpc.CallOption) (*clickhouse.ListFctBlockResponse, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "ListFctBlock", varargs...)
+	ret0, _ := ret[0].(*clickhouse.ListFctBlockResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListFctBlock indicates an expected call of ListFctBlock.
+func (mr *MockXatuCBTClientMockRecorder) ListFctBlock(ctx, in any, opts ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListFctBlock", reflect.TypeOf((*MockXatuCBTClient)(nil).ListFctBlock), varargs...)
+}
+
 // ListFctBlockBlobCountHead mocks base method.
 func (m *MockXatuCBTClient) ListFctBlockBlobCountHead(ctx context.Context, in *clickhouse.ListFctBlockBlobCountHeadRequest, opts ...grpc.CallOption) (*clickhouse.ListFctBlockBlobCountHeadResponse, error) {
 	m.ctrl.T.Helper()

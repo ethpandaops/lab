@@ -50,26 +50,34 @@ func BuildListAdminCbtQuery(req *ListAdminCbtRequest, options ...QueryOption) (S
 	if req.UpdatedDateTime != nil {
 		switch filter := req.UpdatedDateTime.Filter.(type) {
 		case *UInt64Filter_Eq:
-			qb.AddCondition("updated_date_time", "=", filter.Eq)
+			qb.AddCondition("updated_date_time", "=", DateTime64Value{filter.Eq})
 		case *UInt64Filter_Ne:
-			qb.AddCondition("updated_date_time", "!=", filter.Ne)
+			qb.AddCondition("updated_date_time", "!=", DateTime64Value{filter.Ne})
 		case *UInt64Filter_Lt:
-			qb.AddCondition("updated_date_time", "<", filter.Lt)
+			qb.AddCondition("updated_date_time", "<", DateTime64Value{filter.Lt})
 		case *UInt64Filter_Lte:
-			qb.AddCondition("updated_date_time", "<=", filter.Lte)
+			qb.AddCondition("updated_date_time", "<=", DateTime64Value{filter.Lte})
 		case *UInt64Filter_Gt:
-			qb.AddCondition("updated_date_time", ">", filter.Gt)
+			qb.AddCondition("updated_date_time", ">", DateTime64Value{filter.Gt})
 		case *UInt64Filter_Gte:
-			qb.AddCondition("updated_date_time", ">=", filter.Gte)
+			qb.AddCondition("updated_date_time", ">=", DateTime64Value{filter.Gte})
 		case *UInt64Filter_Between:
-			qb.AddBetweenCondition("updated_date_time", filter.Between.Min, filter.Between.Max)
+			qb.AddBetweenCondition("updated_date_time", DateTime64Value{filter.Between.Min}, DateTime64Value{filter.Between.Max.GetValue()})
 		case *UInt64Filter_In:
 			if len(filter.In.Values) > 0 {
-				qb.AddInCondition("updated_date_time", UInt64SliceToInterface(filter.In.Values))
+				converted := make([]interface{}, len(filter.In.Values))
+				for i, v := range filter.In.Values {
+					converted[i] = DateTime64Value{v}
+				}
+				qb.AddInCondition("updated_date_time", converted)
 			}
 		case *UInt64Filter_NotIn:
 			if len(filter.NotIn.Values) > 0 {
-				qb.AddNotInCondition("updated_date_time", UInt64SliceToInterface(filter.NotIn.Values))
+				converted := make([]interface{}, len(filter.NotIn.Values))
+				for i, v := range filter.NotIn.Values {
+					converted[i] = DateTime64Value{v}
+				}
+				qb.AddNotInCondition("updated_date_time", converted)
 			}
 		default:
 			// Unsupported filter type
@@ -122,7 +130,7 @@ func BuildListAdminCbtQuery(req *ListAdminCbtRequest, options ...QueryOption) (S
 		case *UInt64Filter_Gte:
 			qb.AddCondition("position", ">=", filter.Gte)
 		case *UInt64Filter_Between:
-			qb.AddBetweenCondition("position", filter.Between.Min, filter.Between.Max)
+			qb.AddBetweenCondition("position", filter.Between.Min, filter.Between.Max.GetValue())
 		case *UInt64Filter_In:
 			if len(filter.In.Values) > 0 {
 				qb.AddInCondition("position", UInt64SliceToInterface(filter.In.Values))
@@ -152,7 +160,7 @@ func BuildListAdminCbtQuery(req *ListAdminCbtRequest, options ...QueryOption) (S
 		case *UInt64Filter_Gte:
 			qb.AddCondition("interval", ">=", filter.Gte)
 		case *UInt64Filter_Between:
-			qb.AddBetweenCondition("interval", filter.Between.Min, filter.Between.Max)
+			qb.AddBetweenCondition("interval", filter.Between.Min, filter.Between.Max.GetValue())
 		case *UInt64Filter_In:
 			if len(filter.In.Values) > 0 {
 				qb.AddInCondition("interval", UInt64SliceToInterface(filter.In.Values))
