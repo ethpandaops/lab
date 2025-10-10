@@ -833,7 +833,7 @@ func transformCBTToAPIMevBlock(cbt *cbtproto.FctBlockMevHead) *apiv1.MevBlock {
 	}
 
 	if cbt.EarliestBidDateTime != nil {
-		block.EarliestBidTime = formatTimestamp(int64(cbt.EarliestBidDateTime.Value)) //nolint:gosec // safe timestamp conversion
+		block.EarliestBidTime = formatTimestamp(cbt.EarliestBidDateTime.Value)
 	}
 
 	return block
