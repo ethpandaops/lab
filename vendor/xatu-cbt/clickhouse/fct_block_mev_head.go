@@ -24,57 +24,75 @@ func BuildListFctBlockMevHeadQuery(req *ListFctBlockMevHeadRequest, options ...Q
 	qb := NewQueryBuilder()
 
 	// Add primary key filter
-	switch filter := req.SlotStartDateTime.Filter.(type) {
-	case *UInt32Filter_Eq:
-		qb.AddCondition("slot_start_date_time", "=", filter.Eq)
-	case *UInt32Filter_Ne:
-		qb.AddCondition("slot_start_date_time", "!=", filter.Ne)
-	case *UInt32Filter_Lt:
-		qb.AddCondition("slot_start_date_time", "<", filter.Lt)
-	case *UInt32Filter_Lte:
-		qb.AddCondition("slot_start_date_time", "<=", filter.Lte)
-	case *UInt32Filter_Gt:
-		qb.AddCondition("slot_start_date_time", ">", filter.Gt)
-	case *UInt32Filter_Gte:
-		qb.AddCondition("slot_start_date_time", ">=", filter.Gte)
-	case *UInt32Filter_Between:
-		qb.AddBetweenCondition("slot_start_date_time", filter.Between.Min, filter.Between.Max)
-	case *UInt32Filter_In:
-		if len(filter.In.Values) > 0 {
-			qb.AddInCondition("slot_start_date_time", UInt32SliceToInterface(filter.In.Values))
+	if req.SlotStartDateTime != nil {
+		switch filter := req.SlotStartDateTime.Filter.(type) {
+		case *UInt32Filter_Eq:
+			qb.AddCondition("slot_start_date_time", "=", DateTimeValue{filter.Eq})
+		case *UInt32Filter_Ne:
+			qb.AddCondition("slot_start_date_time", "!=", DateTimeValue{filter.Ne})
+		case *UInt32Filter_Lt:
+			qb.AddCondition("slot_start_date_time", "<", DateTimeValue{filter.Lt})
+		case *UInt32Filter_Lte:
+			qb.AddCondition("slot_start_date_time", "<=", DateTimeValue{filter.Lte})
+		case *UInt32Filter_Gt:
+			qb.AddCondition("slot_start_date_time", ">", DateTimeValue{filter.Gt})
+		case *UInt32Filter_Gte:
+			qb.AddCondition("slot_start_date_time", ">=", DateTimeValue{filter.Gte})
+		case *UInt32Filter_Between:
+			qb.AddBetweenCondition("slot_start_date_time", DateTimeValue{filter.Between.Min}, DateTimeValue{filter.Between.Max.GetValue()})
+		case *UInt32Filter_In:
+			if len(filter.In.Values) > 0 {
+				converted := make([]interface{}, len(filter.In.Values))
+				for i, v := range filter.In.Values {
+					converted[i] = DateTimeValue{v}
+				}
+				qb.AddInCondition("slot_start_date_time", converted)
+			}
+		case *UInt32Filter_NotIn:
+			if len(filter.NotIn.Values) > 0 {
+				converted := make([]interface{}, len(filter.NotIn.Values))
+				for i, v := range filter.NotIn.Values {
+					converted[i] = DateTimeValue{v}
+				}
+				qb.AddNotInCondition("slot_start_date_time", converted)
+			}
+		default:
+			// Unsupported filter type
 		}
-	case *UInt32Filter_NotIn:
-		if len(filter.NotIn.Values) > 0 {
-			qb.AddNotInCondition("slot_start_date_time", UInt32SliceToInterface(filter.NotIn.Values))
-		}
-	default:
-		// Unsupported filter type
 	}
 
 	// Add filter for column: updated_date_time
 	if req.UpdatedDateTime != nil {
 		switch filter := req.UpdatedDateTime.Filter.(type) {
 		case *UInt32Filter_Eq:
-			qb.AddCondition("updated_date_time", "=", filter.Eq)
+			qb.AddCondition("updated_date_time", "=", DateTimeValue{filter.Eq})
 		case *UInt32Filter_Ne:
-			qb.AddCondition("updated_date_time", "!=", filter.Ne)
+			qb.AddCondition("updated_date_time", "!=", DateTimeValue{filter.Ne})
 		case *UInt32Filter_Lt:
-			qb.AddCondition("updated_date_time", "<", filter.Lt)
+			qb.AddCondition("updated_date_time", "<", DateTimeValue{filter.Lt})
 		case *UInt32Filter_Lte:
-			qb.AddCondition("updated_date_time", "<=", filter.Lte)
+			qb.AddCondition("updated_date_time", "<=", DateTimeValue{filter.Lte})
 		case *UInt32Filter_Gt:
-			qb.AddCondition("updated_date_time", ">", filter.Gt)
+			qb.AddCondition("updated_date_time", ">", DateTimeValue{filter.Gt})
 		case *UInt32Filter_Gte:
-			qb.AddCondition("updated_date_time", ">=", filter.Gte)
+			qb.AddCondition("updated_date_time", ">=", DateTimeValue{filter.Gte})
 		case *UInt32Filter_Between:
-			qb.AddBetweenCondition("updated_date_time", filter.Between.Min, filter.Between.Max)
+			qb.AddBetweenCondition("updated_date_time", DateTimeValue{filter.Between.Min}, DateTimeValue{filter.Between.Max.GetValue()})
 		case *UInt32Filter_In:
 			if len(filter.In.Values) > 0 {
-				qb.AddInCondition("updated_date_time", UInt32SliceToInterface(filter.In.Values))
+				converted := make([]interface{}, len(filter.In.Values))
+				for i, v := range filter.In.Values {
+					converted[i] = DateTimeValue{v}
+				}
+				qb.AddInCondition("updated_date_time", converted)
 			}
 		case *UInt32Filter_NotIn:
 			if len(filter.NotIn.Values) > 0 {
-				qb.AddNotInCondition("updated_date_time", UInt32SliceToInterface(filter.NotIn.Values))
+				converted := make([]interface{}, len(filter.NotIn.Values))
+				for i, v := range filter.NotIn.Values {
+					converted[i] = DateTimeValue{v}
+				}
+				qb.AddNotInCondition("updated_date_time", converted)
 			}
 		default:
 			// Unsupported filter type
@@ -97,7 +115,7 @@ func BuildListFctBlockMevHeadQuery(req *ListFctBlockMevHeadRequest, options ...Q
 		case *UInt32Filter_Gte:
 			qb.AddCondition("slot", ">=", filter.Gte)
 		case *UInt32Filter_Between:
-			qb.AddBetweenCondition("slot", filter.Between.Min, filter.Between.Max)
+			qb.AddBetweenCondition("slot", filter.Between.Min, filter.Between.Max.GetValue())
 		case *UInt32Filter_In:
 			if len(filter.In.Values) > 0 {
 				qb.AddInCondition("slot", UInt32SliceToInterface(filter.In.Values))
@@ -127,7 +145,7 @@ func BuildListFctBlockMevHeadQuery(req *ListFctBlockMevHeadRequest, options ...Q
 		case *UInt32Filter_Gte:
 			qb.AddCondition("epoch", ">=", filter.Gte)
 		case *UInt32Filter_Between:
-			qb.AddBetweenCondition("epoch", filter.Between.Min, filter.Between.Max)
+			qb.AddBetweenCondition("epoch", filter.Between.Min, filter.Between.Max.GetValue())
 		case *UInt32Filter_In:
 			if len(filter.In.Values) > 0 {
 				qb.AddInCondition("epoch", UInt32SliceToInterface(filter.In.Values))
@@ -145,26 +163,34 @@ func BuildListFctBlockMevHeadQuery(req *ListFctBlockMevHeadRequest, options ...Q
 	if req.EpochStartDateTime != nil {
 		switch filter := req.EpochStartDateTime.Filter.(type) {
 		case *UInt32Filter_Eq:
-			qb.AddCondition("epoch_start_date_time", "=", filter.Eq)
+			qb.AddCondition("epoch_start_date_time", "=", DateTimeValue{filter.Eq})
 		case *UInt32Filter_Ne:
-			qb.AddCondition("epoch_start_date_time", "!=", filter.Ne)
+			qb.AddCondition("epoch_start_date_time", "!=", DateTimeValue{filter.Ne})
 		case *UInt32Filter_Lt:
-			qb.AddCondition("epoch_start_date_time", "<", filter.Lt)
+			qb.AddCondition("epoch_start_date_time", "<", DateTimeValue{filter.Lt})
 		case *UInt32Filter_Lte:
-			qb.AddCondition("epoch_start_date_time", "<=", filter.Lte)
+			qb.AddCondition("epoch_start_date_time", "<=", DateTimeValue{filter.Lte})
 		case *UInt32Filter_Gt:
-			qb.AddCondition("epoch_start_date_time", ">", filter.Gt)
+			qb.AddCondition("epoch_start_date_time", ">", DateTimeValue{filter.Gt})
 		case *UInt32Filter_Gte:
-			qb.AddCondition("epoch_start_date_time", ">=", filter.Gte)
+			qb.AddCondition("epoch_start_date_time", ">=", DateTimeValue{filter.Gte})
 		case *UInt32Filter_Between:
-			qb.AddBetweenCondition("epoch_start_date_time", filter.Between.Min, filter.Between.Max)
+			qb.AddBetweenCondition("epoch_start_date_time", DateTimeValue{filter.Between.Min}, DateTimeValue{filter.Between.Max.GetValue()})
 		case *UInt32Filter_In:
 			if len(filter.In.Values) > 0 {
-				qb.AddInCondition("epoch_start_date_time", UInt32SliceToInterface(filter.In.Values))
+				converted := make([]interface{}, len(filter.In.Values))
+				for i, v := range filter.In.Values {
+					converted[i] = DateTimeValue{v}
+				}
+				qb.AddInCondition("epoch_start_date_time", converted)
 			}
 		case *UInt32Filter_NotIn:
 			if len(filter.NotIn.Values) > 0 {
-				qb.AddNotInCondition("epoch_start_date_time", UInt32SliceToInterface(filter.NotIn.Values))
+				converted := make([]interface{}, len(filter.NotIn.Values))
+				for i, v := range filter.NotIn.Values {
+					converted[i] = DateTimeValue{v}
+				}
+				qb.AddNotInCondition("epoch_start_date_time", converted)
 			}
 		default:
 			// Unsupported filter type
@@ -204,32 +230,40 @@ func BuildListFctBlockMevHeadQuery(req *ListFctBlockMevHeadRequest, options ...Q
 	// Add filter for column: earliest_bid_date_time
 	if req.EarliestBidDateTime != nil {
 		switch filter := req.EarliestBidDateTime.Filter.(type) {
-		case *NullableUInt64Filter_Eq:
-			qb.AddCondition("earliest_bid_date_time", "=", filter.Eq)
-		case *NullableUInt64Filter_Ne:
-			qb.AddCondition("earliest_bid_date_time", "!=", filter.Ne)
-		case *NullableUInt64Filter_Lt:
-			qb.AddCondition("earliest_bid_date_time", "<", filter.Lt)
-		case *NullableUInt64Filter_Lte:
-			qb.AddCondition("earliest_bid_date_time", "<=", filter.Lte)
-		case *NullableUInt64Filter_Gt:
-			qb.AddCondition("earliest_bid_date_time", ">", filter.Gt)
-		case *NullableUInt64Filter_Gte:
-			qb.AddCondition("earliest_bid_date_time", ">=", filter.Gte)
-		case *NullableUInt64Filter_Between:
-			qb.AddBetweenCondition("earliest_bid_date_time", filter.Between.Min, filter.Between.Max)
-		case *NullableUInt64Filter_In:
-			if len(filter.In.Values) > 0 {
-				qb.AddInCondition("earliest_bid_date_time", UInt64SliceToInterface(filter.In.Values))
-			}
-		case *NullableUInt64Filter_NotIn:
-			if len(filter.NotIn.Values) > 0 {
-				qb.AddNotInCondition("earliest_bid_date_time", UInt64SliceToInterface(filter.NotIn.Values))
-			}
-		case *NullableUInt64Filter_IsNull:
+		case *NullableInt64Filter_IsNull:
 			qb.AddIsNullCondition("earliest_bid_date_time")
-		case *NullableUInt64Filter_IsNotNull:
+		case *NullableInt64Filter_IsNotNull:
 			qb.AddIsNotNullCondition("earliest_bid_date_time")
+		case *NullableInt64Filter_Eq:
+			qb.AddCondition("earliest_bid_date_time", "=", DateTime64Value{uint64(filter.Eq)})
+		case *NullableInt64Filter_Ne:
+			qb.AddCondition("earliest_bid_date_time", "!=", DateTime64Value{uint64(filter.Ne)})
+		case *NullableInt64Filter_Lt:
+			qb.AddCondition("earliest_bid_date_time", "<", DateTime64Value{uint64(filter.Lt)})
+		case *NullableInt64Filter_Lte:
+			qb.AddCondition("earliest_bid_date_time", "<=", DateTime64Value{uint64(filter.Lte)})
+		case *NullableInt64Filter_Gt:
+			qb.AddCondition("earliest_bid_date_time", ">", DateTime64Value{uint64(filter.Gt)})
+		case *NullableInt64Filter_Gte:
+			qb.AddCondition("earliest_bid_date_time", ">=", DateTime64Value{uint64(filter.Gte)})
+		case *NullableInt64Filter_Between:
+			qb.AddBetweenCondition("earliest_bid_date_time", DateTime64Value{uint64(filter.Between.Min)}, DateTime64Value{uint64(filter.Between.Max.GetValue())})
+		case *NullableInt64Filter_In:
+			if len(filter.In.Values) > 0 {
+				converted := make([]interface{}, len(filter.In.Values))
+				for i, v := range filter.In.Values {
+					converted[i] = DateTime64Value{uint64(v)}
+				}
+				qb.AddInCondition("earliest_bid_date_time", converted)
+			}
+		case *NullableInt64Filter_NotIn:
+			if len(filter.NotIn.Values) > 0 {
+				converted := make([]interface{}, len(filter.NotIn.Values))
+				for i, v := range filter.NotIn.Values {
+					converted[i] = DateTime64Value{uint64(v)}
+				}
+				qb.AddNotInCondition("earliest_bid_date_time", converted)
+			}
 		default:
 			// Unsupported filter type
 		}
@@ -283,7 +317,7 @@ func BuildListFctBlockMevHeadQuery(req *ListFctBlockMevHeadRequest, options ...Q
 		case *UInt64Filter_Gte:
 			qb.AddCondition("block_number", ">=", filter.Gte)
 		case *UInt64Filter_Between:
-			qb.AddBetweenCondition("block_number", filter.Between.Min, filter.Between.Max)
+			qb.AddBetweenCondition("block_number", filter.Between.Min, filter.Between.Max.GetValue())
 		case *UInt64Filter_In:
 			if len(filter.In.Values) > 0 {
 				qb.AddInCondition("block_number", UInt64SliceToInterface(filter.In.Values))
@@ -433,7 +467,7 @@ func BuildListFctBlockMevHeadQuery(req *ListFctBlockMevHeadRequest, options ...Q
 		case *UInt64Filter_Gte:
 			qb.AddCondition("gas_limit", ">=", filter.Gte)
 		case *UInt64Filter_Between:
-			qb.AddBetweenCondition("gas_limit", filter.Between.Min, filter.Between.Max)
+			qb.AddBetweenCondition("gas_limit", filter.Between.Min, filter.Between.Max.GetValue())
 		case *UInt64Filter_In:
 			if len(filter.In.Values) > 0 {
 				qb.AddInCondition("gas_limit", UInt64SliceToInterface(filter.In.Values))
@@ -463,7 +497,7 @@ func BuildListFctBlockMevHeadQuery(req *ListFctBlockMevHeadRequest, options ...Q
 		case *UInt64Filter_Gte:
 			qb.AddCondition("gas_used", ">=", filter.Gte)
 		case *UInt64Filter_Between:
-			qb.AddBetweenCondition("gas_used", filter.Between.Min, filter.Between.Max)
+			qb.AddBetweenCondition("gas_used", filter.Between.Min, filter.Between.Max.GetValue())
 		case *UInt64Filter_In:
 			if len(filter.In.Values) > 0 {
 				qb.AddInCondition("gas_used", UInt64SliceToInterface(filter.In.Values))
@@ -527,7 +561,7 @@ func BuildListFctBlockMevHeadQuery(req *ListFctBlockMevHeadRequest, options ...Q
 		case *UInt32Filter_Gte:
 			qb.AddCondition("transaction_count", ">=", filter.Gte)
 		case *UInt32Filter_Between:
-			qb.AddBetweenCondition("transaction_count", filter.Between.Min, filter.Between.Max)
+			qb.AddBetweenCondition("transaction_count", filter.Between.Min, filter.Between.Max.GetValue())
 		case *UInt32Filter_In:
 			if len(filter.In.Values) > 0 {
 				qb.AddInCondition("transaction_count", UInt32SliceToInterface(filter.In.Values))
@@ -578,7 +612,7 @@ func BuildListFctBlockMevHeadQuery(req *ListFctBlockMevHeadRequest, options ...Q
 	}
 
 	// Build column list
-	columns := []string{"updated_date_time", "slot", "slot_start_date_time", "epoch", "epoch_start_date_time", "block_root", "earliest_bid_date_time", "relay_names", "parent_hash", "block_number", "block_hash", "builder_pubkey", "proposer_pubkey", "proposer_fee_recipient", "gas_limit", "gas_used", "value", "transaction_count"}
+	columns := []string{"toUnixTimestamp(`updated_date_time`) AS `updated_date_time`", "slot", "toUnixTimestamp(`slot_start_date_time`) AS `slot_start_date_time`", "epoch", "toUnixTimestamp(`epoch_start_date_time`) AS `epoch_start_date_time`", "block_root", "toUnixTimestamp64Micro(`earliest_bid_date_time`) AS `earliest_bid_date_time`", "relay_names", "parent_hash", "block_number", "block_hash", "builder_pubkey", "proposer_pubkey", "proposer_fee_recipient", "gas_limit", "gas_used", "toString(`value`) AS `value`", "transaction_count"}
 
 	return BuildParameterizedQuery("fct_block_mev_head", columns, qb, orderByClause, limit, offset, options...)
 }
@@ -598,7 +632,7 @@ func BuildGetFctBlockMevHeadQuery(req *GetFctBlockMevHeadRequest, options ...Que
 	orderByClause := " ORDER BY slot_start_date_time, block_root"
 
 	// Build column list
-	columns := []string{"updated_date_time", "slot", "slot_start_date_time", "epoch", "epoch_start_date_time", "block_root", "earliest_bid_date_time", "relay_names", "parent_hash", "block_number", "block_hash", "builder_pubkey", "proposer_pubkey", "proposer_fee_recipient", "gas_limit", "gas_used", "value", "transaction_count"}
+	columns := []string{"toUnixTimestamp(`updated_date_time`) AS `updated_date_time`", "slot", "toUnixTimestamp(`slot_start_date_time`) AS `slot_start_date_time`", "epoch", "toUnixTimestamp(`epoch_start_date_time`) AS `epoch_start_date_time`", "block_root", "toUnixTimestamp64Micro(`earliest_bid_date_time`) AS `earliest_bid_date_time`", "relay_names", "parent_hash", "block_number", "block_hash", "builder_pubkey", "proposer_pubkey", "proposer_fee_recipient", "gas_limit", "gas_used", "toString(`value`) AS `value`", "transaction_count"}
 
 	// Return single record
 	return BuildParameterizedQuery("fct_block_mev_head", columns, qb, orderByClause, 1, 0, options...)

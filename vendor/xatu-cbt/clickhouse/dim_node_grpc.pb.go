@@ -27,11 +27,11 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// DimNodeService provides RPC methods for querying dim_node data
+// Query dim_node data
 type DimNodeServiceClient interface {
-	// List returns paginated dim_node records
+	// List records | Retrieve paginated results with optional filtering
 	List(ctx context.Context, in *ListDimNodeRequest, opts ...grpc.CallOption) (*ListDimNodeResponse, error)
-	// Get returns a single dim_node record by primary key
+	// Get record | Retrieve a single record by primary key
 	Get(ctx context.Context, in *GetDimNodeRequest, opts ...grpc.CallOption) (*GetDimNodeResponse, error)
 }
 
@@ -67,11 +67,11 @@ func (c *dimNodeServiceClient) Get(ctx context.Context, in *GetDimNodeRequest, o
 // All implementations must embed UnimplementedDimNodeServiceServer
 // for forward compatibility
 //
-// DimNodeService provides RPC methods for querying dim_node data
+// Query dim_node data
 type DimNodeServiceServer interface {
-	// List returns paginated dim_node records
+	// List records | Retrieve paginated results with optional filtering
 	List(context.Context, *ListDimNodeRequest) (*ListDimNodeResponse, error)
-	// Get returns a single dim_node record by primary key
+	// Get record | Retrieve a single record by primary key
 	Get(context.Context, *GetDimNodeRequest) (*GetDimNodeResponse, error)
 	mustEmbedUnimplementedDimNodeServiceServer()
 }

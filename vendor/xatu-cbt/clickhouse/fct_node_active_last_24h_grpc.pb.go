@@ -27,11 +27,11 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// FctNodeActiveLast24hService provides RPC methods for querying fct_node_active_last_24h data
+// Query fct_node_active_last_24h data
 type FctNodeActiveLast24HServiceClient interface {
-	// List returns paginated fct_node_active_last_24h records
+	// List records | Retrieve paginated results with optional filtering
 	List(ctx context.Context, in *ListFctNodeActiveLast24HRequest, opts ...grpc.CallOption) (*ListFctNodeActiveLast24HResponse, error)
-	// Get returns a single fct_node_active_last_24h record by primary key
+	// Get record | Retrieve a single record by meta_client_name
 	Get(ctx context.Context, in *GetFctNodeActiveLast24HRequest, opts ...grpc.CallOption) (*GetFctNodeActiveLast24HResponse, error)
 }
 
@@ -67,11 +67,11 @@ func (c *fctNodeActiveLast24HServiceClient) Get(ctx context.Context, in *GetFctN
 // All implementations must embed UnimplementedFctNodeActiveLast24HServiceServer
 // for forward compatibility
 //
-// FctNodeActiveLast24hService provides RPC methods for querying fct_node_active_last_24h data
+// Query fct_node_active_last_24h data
 type FctNodeActiveLast24HServiceServer interface {
-	// List returns paginated fct_node_active_last_24h records
+	// List records | Retrieve paginated results with optional filtering
 	List(context.Context, *ListFctNodeActiveLast24HRequest) (*ListFctNodeActiveLast24HResponse, error)
-	// Get returns a single fct_node_active_last_24h record by primary key
+	// Get record | Retrieve a single record by meta_client_name
 	Get(context.Context, *GetFctNodeActiveLast24HRequest) (*GetFctNodeActiveLast24HResponse, error)
 	mustEmbedUnimplementedFctNodeActiveLast24HServiceServer()
 }

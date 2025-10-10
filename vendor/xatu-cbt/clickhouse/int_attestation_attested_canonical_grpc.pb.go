@@ -27,11 +27,11 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// IntAttestationAttestedCanonicalService provides RPC methods for querying int_attestation_attested_canonical data
+// Query int_attestation_attested_canonical data
 type IntAttestationAttestedCanonicalServiceClient interface {
-	// List returns paginated int_attestation_attested_canonical records
+	// List records | Retrieve paginated results with optional filtering
 	List(ctx context.Context, in *ListIntAttestationAttestedCanonicalRequest, opts ...grpc.CallOption) (*ListIntAttestationAttestedCanonicalResponse, error)
-	// Get returns a single int_attestation_attested_canonical record by primary key
+	// Get record | Retrieve a single record by primary key
 	Get(ctx context.Context, in *GetIntAttestationAttestedCanonicalRequest, opts ...grpc.CallOption) (*GetIntAttestationAttestedCanonicalResponse, error)
 }
 
@@ -67,11 +67,11 @@ func (c *intAttestationAttestedCanonicalServiceClient) Get(ctx context.Context, 
 // All implementations must embed UnimplementedIntAttestationAttestedCanonicalServiceServer
 // for forward compatibility
 //
-// IntAttestationAttestedCanonicalService provides RPC methods for querying int_attestation_attested_canonical data
+// Query int_attestation_attested_canonical data
 type IntAttestationAttestedCanonicalServiceServer interface {
-	// List returns paginated int_attestation_attested_canonical records
+	// List records | Retrieve paginated results with optional filtering
 	List(context.Context, *ListIntAttestationAttestedCanonicalRequest) (*ListIntAttestationAttestedCanonicalResponse, error)
-	// Get returns a single int_attestation_attested_canonical record by primary key
+	// Get record | Retrieve a single record by primary key
 	Get(context.Context, *GetIntAttestationAttestedCanonicalRequest) (*GetIntAttestationAttestedCanonicalResponse, error)
 	mustEmbedUnimplementedIntAttestationAttestedCanonicalServiceServer()
 }

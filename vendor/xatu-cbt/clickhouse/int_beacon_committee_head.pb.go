@@ -122,25 +122,25 @@ func (x *IntBeaconCommitteeHead) GetValidators() []uint32 {
 	return nil
 }
 
-// ListIntBeaconCommitteeHeadRequest is the request message for listing int_beacon_committee_head records
+// Request for listing int_beacon_committee_head records
 type ListIntBeaconCommitteeHeadRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Filter by slot_start_date_time (PRIMARY KEY - required)
+	// Filter by slot_start_date_time - The wall clock time when the slot started (PRIMARY KEY - required)
 	SlotStartDateTime *UInt32Filter `protobuf:"bytes,1,opt,name=slot_start_date_time,json=slotStartDateTime,proto3" json:"slot_start_date_time,omitempty"`
-	// Filter by committee_index (ORDER BY column 2 - optional)
+	// Filter by committee_index - The committee index in the beacon API committee payload (ORDER BY column 2 - optional)
 	CommitteeIndex *StringFilter `protobuf:"bytes,2,opt,name=committee_index,json=committeeIndex,proto3" json:"committee_index,omitempty"`
-	// Filter by updated_date_time (optional)
+	// Filter by updated_date_time - Timestamp when the record was last updated (optional)
 	UpdatedDateTime *UInt32Filter `protobuf:"bytes,3,opt,name=updated_date_time,json=updatedDateTime,proto3" json:"updated_date_time,omitempty"`
-	// Filter by slot (optional)
+	// Filter by slot - The slot number (optional)
 	Slot *UInt32Filter `protobuf:"bytes,4,opt,name=slot,proto3" json:"slot,omitempty"`
-	// Filter by epoch (optional)
+	// Filter by epoch - The epoch number containing the slot (optional)
 	Epoch *UInt32Filter `protobuf:"bytes,5,opt,name=epoch,proto3" json:"epoch,omitempty"`
-	// Filter by epoch_start_date_time (optional)
+	// Filter by epoch_start_date_time - The wall clock time when the epoch started (optional)
 	EpochStartDateTime *UInt32Filter `protobuf:"bytes,6,opt,name=epoch_start_date_time,json=epochStartDateTime,proto3" json:"epoch_start_date_time,omitempty"`
-	// Filter by validators (optional)
+	// Filter by validators - The validator indices in the beacon API committee payload (optional)
 	Validators []uint32 `protobuf:"varint,7,rep,packed,name=validators,proto3" json:"validators,omitempty"`
 	// The maximum number of int_beacon_committee_head to return.
 	// If unspecified, at most 100 items will be returned.
@@ -257,7 +257,7 @@ func (x *ListIntBeaconCommitteeHeadRequest) GetOrderBy() string {
 	return ""
 }
 
-// ListIntBeaconCommitteeHeadResponse is the response message for listing int_beacon_committee_head records
+// Response for listing int_beacon_committee_head records
 type ListIntBeaconCommitteeHeadResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -316,7 +316,7 @@ func (x *ListIntBeaconCommitteeHeadResponse) GetNextPageToken() string {
 	return ""
 }
 
-// GetIntBeaconCommitteeHeadRequest is the request message for getting a single int_beacon_committee_head record by primary key
+// Request for getting a single int_beacon_committee_head record by primary key
 type GetIntBeaconCommitteeHeadRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -365,7 +365,7 @@ func (x *GetIntBeaconCommitteeHeadRequest) GetSlotStartDateTime() uint32 {
 	return 0
 }
 
-// GetIntBeaconCommitteeHeadResponse is the response message for getting a single int_beacon_committee_head record
+// Response for getting a single int_beacon_committee_head record
 type GetIntBeaconCommitteeHeadResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache

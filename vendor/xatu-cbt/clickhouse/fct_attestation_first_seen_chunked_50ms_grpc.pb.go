@@ -27,11 +27,11 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// FctAttestationFirstSeenChunked50msService provides RPC methods for querying fct_attestation_first_seen_chunked_50ms data
+// Query fct_attestation_first_seen_chunked_50ms data
 type FctAttestationFirstSeenChunked50MsServiceClient interface {
-	// List returns paginated fct_attestation_first_seen_chunked_50ms records
+	// List records | Retrieve paginated results with optional filtering
 	List(ctx context.Context, in *ListFctAttestationFirstSeenChunked50MsRequest, opts ...grpc.CallOption) (*ListFctAttestationFirstSeenChunked50MsResponse, error)
-	// Get returns a single fct_attestation_first_seen_chunked_50ms record by primary key
+	// Get record | Retrieve a single record by slot_start_date_time
 	Get(ctx context.Context, in *GetFctAttestationFirstSeenChunked50MsRequest, opts ...grpc.CallOption) (*GetFctAttestationFirstSeenChunked50MsResponse, error)
 }
 
@@ -67,11 +67,11 @@ func (c *fctAttestationFirstSeenChunked50MsServiceClient) Get(ctx context.Contex
 // All implementations must embed UnimplementedFctAttestationFirstSeenChunked50MsServiceServer
 // for forward compatibility
 //
-// FctAttestationFirstSeenChunked50msService provides RPC methods for querying fct_attestation_first_seen_chunked_50ms data
+// Query fct_attestation_first_seen_chunked_50ms data
 type FctAttestationFirstSeenChunked50MsServiceServer interface {
-	// List returns paginated fct_attestation_first_seen_chunked_50ms records
+	// List records | Retrieve paginated results with optional filtering
 	List(context.Context, *ListFctAttestationFirstSeenChunked50MsRequest) (*ListFctAttestationFirstSeenChunked50MsResponse, error)
-	// Get returns a single fct_attestation_first_seen_chunked_50ms record by primary key
+	// Get record | Retrieve a single record by slot_start_date_time
 	Get(context.Context, *GetFctAttestationFirstSeenChunked50MsRequest) (*GetFctAttestationFirstSeenChunked50MsResponse, error)
 	mustEmbedUnimplementedFctAttestationFirstSeenChunked50MsServiceServer()
 }

@@ -27,11 +27,11 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// FctAttestationCorrectnessHeadService provides RPC methods for querying fct_attestation_correctness_head data
+// Query fct_attestation_correctness_head data
 type FctAttestationCorrectnessHeadServiceClient interface {
-	// List returns paginated fct_attestation_correctness_head records
+	// List records | Retrieve paginated results with optional filtering
 	List(ctx context.Context, in *ListFctAttestationCorrectnessHeadRequest, opts ...grpc.CallOption) (*ListFctAttestationCorrectnessHeadResponse, error)
-	// Get returns a single fct_attestation_correctness_head record by primary key
+	// Get record | Retrieve a single record by slot_start_date_time
 	Get(ctx context.Context, in *GetFctAttestationCorrectnessHeadRequest, opts ...grpc.CallOption) (*GetFctAttestationCorrectnessHeadResponse, error)
 }
 
@@ -67,11 +67,11 @@ func (c *fctAttestationCorrectnessHeadServiceClient) Get(ctx context.Context, in
 // All implementations must embed UnimplementedFctAttestationCorrectnessHeadServiceServer
 // for forward compatibility
 //
-// FctAttestationCorrectnessHeadService provides RPC methods for querying fct_attestation_correctness_head data
+// Query fct_attestation_correctness_head data
 type FctAttestationCorrectnessHeadServiceServer interface {
-	// List returns paginated fct_attestation_correctness_head records
+	// List records | Retrieve paginated results with optional filtering
 	List(context.Context, *ListFctAttestationCorrectnessHeadRequest) (*ListFctAttestationCorrectnessHeadResponse, error)
-	// Get returns a single fct_attestation_correctness_head record by primary key
+	// Get record | Retrieve a single record by slot_start_date_time
 	Get(context.Context, *GetFctAttestationCorrectnessHeadRequest) (*GetFctAttestationCorrectnessHeadResponse, error)
 	mustEmbedUnimplementedFctAttestationCorrectnessHeadServiceServer()
 }

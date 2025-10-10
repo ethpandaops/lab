@@ -5,6 +5,8 @@ go 1.24.6
 // Until we bump ch-proxy: https://github.com/ClickHouse/clickhouse-go/issues/674
 replace github.com/ClickHouse/clickhouse-go/v2 => github.com/ClickHouse/clickhouse-go/v2 v2.36.1-0.20250616170804-ac33f72aba3a
 
+replace github.com/ethpandaops/xatu-cbt => /Users/matty/go/src/github.com/ethpandaops/xatu-cbt
+
 require (
 	connectrpc.com/connect v1.18.1
 	github.com/ClickHouse/clickhouse-go/v2 v2.40.1
@@ -23,7 +25,10 @@ require (
 	gopkg.in/yaml.v3 v3.0.1
 )
 
-require go.yaml.in/yaml/v2 v2.4.2 // indirect
+require (
+	go.yaml.in/yaml/v2 v2.4.2 // indirect
+	google.golang.org/genproto/googleapis/api v0.0.0-20250707201910-8d1bb00bc6a7 // indirect
+)
 
 require (
 	dario.cat/mergo v1.0.2 // indirect

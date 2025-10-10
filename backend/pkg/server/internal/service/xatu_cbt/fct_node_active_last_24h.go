@@ -3,7 +3,6 @@ package xatu_cbt
 import (
 	"context"
 	"fmt"
-	"time"
 
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/clickhouse"
 	cbtproto "github.com/ethpandaops/xatu-cbt/pkg/proto/clickhouse"
@@ -98,17 +97,16 @@ func scanFctNodeActiveLast24h(
 	scanner clickhouse.RowScanner,
 ) (*cbtproto.FctNodeActiveLast24H, error) {
 	var (
-		node                              cbtproto.FctNodeActiveLast24H
-		updatedDateTime, lastSeenDateTime time.Time
-		geoLongitude                      *float64
-		geoLatitude                       *float64
-		geoAsNumber                       *uint32
-		geoAsOrg                          *string
+		node         cbtproto.FctNodeActiveLast24H
+		geoLongitude *float64
+		geoLatitude  *float64
+		geoAsNumber  *uint32
+		geoAsOrg     *string
 	)
 
 	if err := scanner.Scan(
-		&updatedDateTime,
-		&lastSeenDateTime,
+		&node.UpdatedDateTime,
+		&node.LastSeenDateTime,
 		&node.Username,
 		&node.NodeId,
 		&node.Classification,
@@ -128,9 +126,6 @@ func scanFctNodeActiveLast24h(
 	); err != nil {
 		return nil, fmt.Errorf("failed to scan row: %w", err)
 	}
-
-	node.UpdatedDateTime = uint32(updatedDateTime.Unix())   //nolint:gosec // safe.
-	node.LastSeenDateTime = uint32(lastSeenDateTime.Unix()) //nolint:gosec // safe.
 
 	// Convert nullable fields to protobuf wrappers
 	if geoLongitude != nil {

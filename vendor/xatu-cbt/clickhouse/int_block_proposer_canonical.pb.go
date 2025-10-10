@@ -132,27 +132,27 @@ func (x *IntBlockProposerCanonical) GetBlockRoot() *wrapperspb.StringValue {
 	return nil
 }
 
-// ListIntBlockProposerCanonicalRequest is the request message for listing int_block_proposer_canonical records
+// Request for listing int_block_proposer_canonical records
 type ListIntBlockProposerCanonicalRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Filter by slot_start_date_time (PRIMARY KEY - required)
+	// Filter by slot_start_date_time - The wall clock time when the slot started (PRIMARY KEY - required)
 	SlotStartDateTime *UInt32Filter `protobuf:"bytes,1,opt,name=slot_start_date_time,json=slotStartDateTime,proto3" json:"slot_start_date_time,omitempty"`
-	// Filter by updated_date_time (optional)
+	// Filter by updated_date_time - Timestamp when the record was last updated (optional)
 	UpdatedDateTime *UInt32Filter `protobuf:"bytes,2,opt,name=updated_date_time,json=updatedDateTime,proto3" json:"updated_date_time,omitempty"`
-	// Filter by slot (optional)
+	// Filter by slot - The slot number (optional)
 	Slot *UInt32Filter `protobuf:"bytes,3,opt,name=slot,proto3" json:"slot,omitempty"`
-	// Filter by epoch (optional)
+	// Filter by epoch - The epoch number containing the slot (optional)
 	Epoch *UInt32Filter `protobuf:"bytes,4,opt,name=epoch,proto3" json:"epoch,omitempty"`
-	// Filter by epoch_start_date_time (optional)
+	// Filter by epoch_start_date_time - The wall clock time when the epoch started (optional)
 	EpochStartDateTime *UInt32Filter `protobuf:"bytes,5,opt,name=epoch_start_date_time,json=epochStartDateTime,proto3" json:"epoch_start_date_time,omitempty"`
-	// Filter by proposer_validator_index (optional)
+	// Filter by proposer_validator_index - The validator index of the proposer for the slot (optional)
 	ProposerValidatorIndex *UInt32Filter `protobuf:"bytes,6,opt,name=proposer_validator_index,json=proposerValidatorIndex,proto3" json:"proposer_validator_index,omitempty"`
-	// Filter by proposer_pubkey (optional)
+	// Filter by proposer_pubkey - The public key of the validator proposer (optional)
 	ProposerPubkey *StringFilter `protobuf:"bytes,7,opt,name=proposer_pubkey,json=proposerPubkey,proto3" json:"proposer_pubkey,omitempty"`
-	// Filter by block_root (optional)
+	// Filter by block_root - The beacon block root hash. Null if a slot was missed (optional)
 	BlockRoot *NullableStringFilter `protobuf:"bytes,8,opt,name=block_root,json=blockRoot,proto3" json:"block_root,omitempty"`
 	// The maximum number of int_block_proposer_canonical to return.
 	// If unspecified, at most 100 items will be returned.
@@ -276,7 +276,7 @@ func (x *ListIntBlockProposerCanonicalRequest) GetOrderBy() string {
 	return ""
 }
 
-// ListIntBlockProposerCanonicalResponse is the response message for listing int_block_proposer_canonical records
+// Response for listing int_block_proposer_canonical records
 type ListIntBlockProposerCanonicalResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -335,7 +335,7 @@ func (x *ListIntBlockProposerCanonicalResponse) GetNextPageToken() string {
 	return ""
 }
 
-// GetIntBlockProposerCanonicalRequest is the request message for getting a single int_block_proposer_canonical record by primary key
+// Request for getting a single int_block_proposer_canonical record by primary key
 type GetIntBlockProposerCanonicalRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -384,7 +384,7 @@ func (x *GetIntBlockProposerCanonicalRequest) GetSlotStartDateTime() uint32 {
 	return 0
 }
 
-// GetIntBlockProposerCanonicalResponse is the response message for getting a single int_block_proposer_canonical record
+// Response for getting a single int_block_proposer_canonical record
 type GetIntBlockProposerCanonicalResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache

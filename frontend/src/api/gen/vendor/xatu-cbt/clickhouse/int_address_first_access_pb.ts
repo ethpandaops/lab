@@ -63,27 +63,27 @@ export class IntAddressFirstAccess extends Message<IntAddressFirstAccess> {
 }
 
 /**
- * ListIntAddressFirstAccessRequest is the request message for listing int_address_first_access records
+ * Request for listing int_address_first_access records
  *
  * @generated from message cbt.ListIntAddressFirstAccessRequest
  */
 export class ListIntAddressFirstAccessRequest extends Message<ListIntAddressFirstAccessRequest> {
   /**
-   * Filter by address (PRIMARY KEY - required)
+   * Filter by address - The address of the account (PRIMARY KEY - required)
    *
    * @generated from field: cbt.StringFilter address = 1;
    */
   address?: StringFilter;
 
   /**
-   * Filter by block_number (optional)
+   * Filter by block_number - The block number of the first access (optional)
    *
    * @generated from field: cbt.UInt32Filter block_number = 2;
    */
   blockNumber?: UInt32Filter;
 
   /**
-   * Filter by version (optional)
+   * Filter by version - Version for this address, for internal use in clickhouse to keep first access (optional)
    *
    * @generated from field: cbt.UInt32Filter version = 3;
    */
@@ -149,7 +149,7 @@ export class ListIntAddressFirstAccessRequest extends Message<ListIntAddressFirs
 }
 
 /**
- * ListIntAddressFirstAccessResponse is the response message for listing int_address_first_access records
+ * Response for listing int_address_first_access records
  *
  * @generated from message cbt.ListIntAddressFirstAccessResponse
  */
@@ -199,7 +199,7 @@ export class ListIntAddressFirstAccessResponse extends Message<ListIntAddressFir
 }
 
 /**
- * GetIntAddressFirstAccessRequest is the request message for getting a single int_address_first_access record by primary key
+ * Request for getting a single int_address_first_access record by primary key
  *
  * @generated from message cbt.GetIntAddressFirstAccessRequest
  */
@@ -242,7 +242,7 @@ export class GetIntAddressFirstAccessRequest extends Message<GetIntAddressFirstA
 }
 
 /**
- * GetIntAddressFirstAccessResponse is the response message for getting a single int_address_first_access record
+ * Response for getting a single int_address_first_access record
  *
  * @generated from message cbt.GetIntAddressFirstAccessResponse
  */

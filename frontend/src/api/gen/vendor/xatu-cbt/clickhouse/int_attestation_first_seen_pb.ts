@@ -247,188 +247,188 @@ export class IntAttestationFirstSeen extends Message<IntAttestationFirstSeen> {
 }
 
 /**
- * ListIntAttestationFirstSeenRequest is the request message for listing int_attestation_first_seen records
+ * Request for listing int_attestation_first_seen records
  *
  * @generated from message cbt.ListIntAttestationFirstSeenRequest
  */
 export class ListIntAttestationFirstSeenRequest extends Message<ListIntAttestationFirstSeenRequest> {
   /**
-   * Filter by slot_start_date_time (PRIMARY KEY - required)
+   * Filter by slot_start_date_time - The wall clock time when the slot started (PRIMARY KEY - required)
    *
    * @generated from field: cbt.UInt32Filter slot_start_date_time = 1;
    */
   slotStartDateTime?: UInt32Filter;
 
   /**
-   * Filter by attesting_validator_index (ORDER BY column 2 - optional)
+   * Filter by attesting_validator_index - The index of the validator attesting (ORDER BY column 2 - optional)
    *
    * @generated from field: cbt.UInt32Filter attesting_validator_index = 2;
    */
   attestingValidatorIndex?: UInt32Filter;
 
   /**
-   * Filter by updated_date_time (optional)
+   * Filter by updated_date_time - Timestamp when the record was last updated (optional)
    *
    * @generated from field: cbt.UInt32Filter updated_date_time = 3;
    */
   updatedDateTime?: UInt32Filter;
 
   /**
-   * Filter by source (optional)
+   * Filter by source - Source of the event (optional)
    *
    * @generated from field: cbt.StringFilter source = 4;
    */
   source?: StringFilter;
 
   /**
-   * Filter by slot (optional)
+   * Filter by slot - The slot number (optional)
    *
    * @generated from field: cbt.UInt32Filter slot = 5;
    */
   slot?: UInt32Filter;
 
   /**
-   * Filter by epoch (optional)
+   * Filter by epoch - The epoch number containing the slot (optional)
    *
    * @generated from field: cbt.UInt32Filter epoch = 6;
    */
   epoch?: UInt32Filter;
 
   /**
-   * Filter by epoch_start_date_time (optional)
+   * Filter by epoch_start_date_time - The wall clock time when the epoch started (optional)
    *
    * @generated from field: cbt.UInt32Filter epoch_start_date_time = 7;
    */
   epochStartDateTime?: UInt32Filter;
 
   /**
-   * Filter by seen_slot_start_diff (optional)
+   * Filter by seen_slot_start_diff - The time from slot start for the client to see the block (optional)
    *
    * @generated from field: cbt.UInt32Filter seen_slot_start_diff = 8;
    */
   seenSlotStartDiff?: UInt32Filter;
 
   /**
-   * Filter by block_root (optional)
+   * Filter by block_root - The beacon block root hash (optional)
    *
    * @generated from field: cbt.StringFilter block_root = 9;
    */
   blockRoot?: StringFilter;
 
   /**
-   * Filter by attesting_validator_committee_index (optional)
+   * Filter by attesting_validator_committee_index - The committee index of the attesting validator (optional)
    *
    * @generated from field: cbt.StringFilter attesting_validator_committee_index = 10;
    */
   attestingValidatorCommitteeIndex?: StringFilter;
 
   /**
-   * Filter by username (optional)
+   * Filter by username - Username of the node (optional)
    *
    * @generated from field: cbt.StringFilter username = 11;
    */
   username?: StringFilter;
 
   /**
-   * Filter by node_id (optional)
+   * Filter by node_id - ID of the node (optional)
    *
    * @generated from field: cbt.StringFilter node_id = 12;
    */
   nodeId?: StringFilter;
 
   /**
-   * Filter by classification (optional)
+   * Filter by classification - Classification of the node, e.g. "individual", "corporate", "internal" (aka ethPandaOps) or "unclassified" (optional)
    *
    * @generated from field: cbt.StringFilter classification = 13;
    */
   classification?: StringFilter;
 
   /**
-   * Filter by meta_client_name (optional)
+   * Filter by meta_client_name - Name of the client (optional)
    *
    * @generated from field: cbt.StringFilter meta_client_name = 14;
    */
   metaClientName?: StringFilter;
 
   /**
-   * Filter by meta_client_version (optional)
+   * Filter by meta_client_version - Version of the client (optional)
    *
    * @generated from field: cbt.StringFilter meta_client_version = 15;
    */
   metaClientVersion?: StringFilter;
 
   /**
-   * Filter by meta_client_implementation (optional)
+   * Filter by meta_client_implementation - Implementation of the client (optional)
    *
    * @generated from field: cbt.StringFilter meta_client_implementation = 16;
    */
   metaClientImplementation?: StringFilter;
 
   /**
-   * Filter by meta_client_geo_city (optional)
+   * Filter by meta_client_geo_city - City of the client (optional)
    *
    * @generated from field: cbt.StringFilter meta_client_geo_city = 17;
    */
   metaClientGeoCity?: StringFilter;
 
   /**
-   * Filter by meta_client_geo_country (optional)
+   * Filter by meta_client_geo_country - Country of the client (optional)
    *
    * @generated from field: cbt.StringFilter meta_client_geo_country = 18;
    */
   metaClientGeoCountry?: StringFilter;
 
   /**
-   * Filter by meta_client_geo_country_code (optional)
+   * Filter by meta_client_geo_country_code - Country code of the client (optional)
    *
    * @generated from field: cbt.StringFilter meta_client_geo_country_code = 19;
    */
   metaClientGeoCountryCode?: StringFilter;
 
   /**
-   * Filter by meta_client_geo_continent_code (optional)
+   * Filter by meta_client_geo_continent_code - Continent code of the client (optional)
    *
    * @generated from field: cbt.StringFilter meta_client_geo_continent_code = 20;
    */
   metaClientGeoContinentCode?: StringFilter;
 
   /**
-   * Filter by meta_client_geo_longitude (optional)
+   * Filter by meta_client_geo_longitude - Longitude of the client (optional)
    *
    * @generated from field: google.protobuf.DoubleValue meta_client_geo_longitude = 21;
    */
   metaClientGeoLongitude?: number;
 
   /**
-   * Filter by meta_client_geo_latitude (optional)
+   * Filter by meta_client_geo_latitude - Latitude of the client (optional)
    *
    * @generated from field: google.protobuf.DoubleValue meta_client_geo_latitude = 22;
    */
   metaClientGeoLatitude?: number;
 
   /**
-   * Filter by meta_client_geo_autonomous_system_number (optional)
+   * Filter by meta_client_geo_autonomous_system_number - Autonomous system number of the client (optional)
    *
    * @generated from field: cbt.NullableUInt32Filter meta_client_geo_autonomous_system_number = 23;
    */
   metaClientGeoAutonomousSystemNumber?: NullableUInt32Filter;
 
   /**
-   * Filter by meta_client_geo_autonomous_system_organization (optional)
+   * Filter by meta_client_geo_autonomous_system_organization - Autonomous system organization of the client (optional)
    *
    * @generated from field: cbt.NullableStringFilter meta_client_geo_autonomous_system_organization = 24;
    */
   metaClientGeoAutonomousSystemOrganization?: NullableStringFilter;
 
   /**
-   * Filter by meta_consensus_version (optional)
+   * Filter by meta_consensus_version - Ethereum consensus client version (optional)
    *
    * @generated from field: cbt.StringFilter meta_consensus_version = 25;
    */
   metaConsensusVersion?: StringFilter;
 
   /**
-   * Filter by meta_consensus_implementation (optional)
+   * Filter by meta_consensus_implementation - Ethereum consensus client implementation (optional)
    *
    * @generated from field: cbt.StringFilter meta_consensus_implementation = 26;
    */
@@ -517,7 +517,7 @@ export class ListIntAttestationFirstSeenRequest extends Message<ListIntAttestati
 }
 
 /**
- * ListIntAttestationFirstSeenResponse is the response message for listing int_attestation_first_seen records
+ * Response for listing int_attestation_first_seen records
  *
  * @generated from message cbt.ListIntAttestationFirstSeenResponse
  */
@@ -567,7 +567,7 @@ export class ListIntAttestationFirstSeenResponse extends Message<ListIntAttestat
 }
 
 /**
- * GetIntAttestationFirstSeenRequest is the request message for getting a single int_attestation_first_seen record by primary key
+ * Request for getting a single int_attestation_first_seen record by primary key
  *
  * @generated from message cbt.GetIntAttestationFirstSeenRequest
  */
@@ -610,7 +610,7 @@ export class GetIntAttestationFirstSeenRequest extends Message<GetIntAttestation
 }
 
 /**
- * GetIntAttestationFirstSeenResponse is the response message for getting a single int_attestation_first_seen record
+ * Response for getting a single int_attestation_first_seen record
  *
  * @generated from message cbt.GetIntAttestationFirstSeenResponse
  */

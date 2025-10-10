@@ -3,8 +3,6 @@ package xatu_cbt
 import (
 	"context"
 	"fmt"
-	"math/big"
-	"time"
 
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/clickhouse"
 	cbtproto "github.com/ethpandaops/xatu-cbt/pkg/proto/clickhouse"
@@ -99,20 +97,18 @@ func scanFctBlockMevHead(
 	scanner clickhouse.RowScanner,
 ) (*cbtproto.FctBlockMevHead, error) {
 	var (
-		block                              cbtproto.FctBlockMevHead
-		updatedDateTime, slotStartDateTime time.Time
-		epochStartDateTime                 time.Time
-		relayNames                         []string
-		earliestBidDateTime                *time.Time
-		value                              *big.Int
+		block               cbtproto.FctBlockMevHead
+		relayNames          []string
+		earliestBidDateTime *int64
+		value               *string
 	)
 
 	if err := scanner.Scan(
-		&updatedDateTime,
+		&block.UpdatedDateTime,
 		&block.Slot,
-		&slotStartDateTime,
+		&block.SlotStartDateTime,
 		&block.Epoch,
-		&epochStartDateTime,
+		&block.EpochStartDateTime,
 		&block.BlockRoot,
 		&earliestBidDateTime,
 		&relayNames,
@@ -130,23 +126,15 @@ func scanFctBlockMevHead(
 		return nil, fmt.Errorf("failed to scan row: %w", err)
 	}
 
-	block.UpdatedDateTime = uint32(updatedDateTime.Unix())       //nolint:gosec // safe.
-	block.SlotStartDateTime = uint32(slotStartDateTime.Unix())   //nolint:gosec // safe.
-	block.EpochStartDateTime = uint32(epochStartDateTime.Unix()) //nolint:gosec // safe.
 	block.RelayNames = relayNames
 
 	// Handle nullable fields.
 	if earliestBidDateTime != nil {
-		// Convert time to milliseconds
-		millis := earliestBidDateTime.UnixMilli()
-		if millis >= 0 {
-			block.EarliestBidDateTime = wrapperspb.UInt64(uint64(millis))
-		}
+		block.EarliestBidDateTime = wrapperspb.Int64(*earliestBidDateTime)
 	}
 
 	if value != nil {
-		// Convert big.Int to string
-		block.Value = wrapperspb.String(value.String())
+		block.Value = wrapperspb.String(*value)
 	}
 
 	return &block, nil

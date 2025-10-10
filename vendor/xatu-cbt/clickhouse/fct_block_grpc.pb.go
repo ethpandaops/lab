@@ -27,11 +27,11 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// FctBlockService provides RPC methods for querying fct_block data
+// Query fct_block data
 type FctBlockServiceClient interface {
-	// List returns paginated fct_block records
+	// List records | Retrieve paginated results with optional filtering
 	List(ctx context.Context, in *ListFctBlockRequest, opts ...grpc.CallOption) (*ListFctBlockResponse, error)
-	// Get returns a single fct_block record by primary key
+	// Get record | Retrieve a single record by slot_start_date_time
 	Get(ctx context.Context, in *GetFctBlockRequest, opts ...grpc.CallOption) (*GetFctBlockResponse, error)
 }
 
@@ -67,11 +67,11 @@ func (c *fctBlockServiceClient) Get(ctx context.Context, in *GetFctBlockRequest,
 // All implementations must embed UnimplementedFctBlockServiceServer
 // for forward compatibility
 //
-// FctBlockService provides RPC methods for querying fct_block data
+// Query fct_block data
 type FctBlockServiceServer interface {
-	// List returns paginated fct_block records
+	// List records | Retrieve paginated results with optional filtering
 	List(context.Context, *ListFctBlockRequest) (*ListFctBlockResponse, error)
-	// Get returns a single fct_block record by primary key
+	// Get record | Retrieve a single record by slot_start_date_time
 	Get(context.Context, *GetFctBlockRequest) (*GetFctBlockResponse, error)
 	mustEmbedUnimplementedFctBlockServiceServer()
 }

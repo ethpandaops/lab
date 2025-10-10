@@ -27,11 +27,11 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// IntAddressStorageSlotLastAccessService provides RPC methods for querying int_address_storage_slot_last_access data
+// Query int_address_storage_slot_last_access data
 type IntAddressStorageSlotLastAccessServiceClient interface {
-	// List returns paginated int_address_storage_slot_last_access records
+	// List records | Retrieve paginated results with optional filtering
 	List(ctx context.Context, in *ListIntAddressStorageSlotLastAccessRequest, opts ...grpc.CallOption) (*ListIntAddressStorageSlotLastAccessResponse, error)
-	// Get returns a single int_address_storage_slot_last_access record by primary key
+	// Get record | Retrieve a single record by primary key
 	Get(ctx context.Context, in *GetIntAddressStorageSlotLastAccessRequest, opts ...grpc.CallOption) (*GetIntAddressStorageSlotLastAccessResponse, error)
 }
 
@@ -67,11 +67,11 @@ func (c *intAddressStorageSlotLastAccessServiceClient) Get(ctx context.Context, 
 // All implementations must embed UnimplementedIntAddressStorageSlotLastAccessServiceServer
 // for forward compatibility
 //
-// IntAddressStorageSlotLastAccessService provides RPC methods for querying int_address_storage_slot_last_access data
+// Query int_address_storage_slot_last_access data
 type IntAddressStorageSlotLastAccessServiceServer interface {
-	// List returns paginated int_address_storage_slot_last_access records
+	// List records | Retrieve paginated results with optional filtering
 	List(context.Context, *ListIntAddressStorageSlotLastAccessRequest) (*ListIntAddressStorageSlotLastAccessResponse, error)
-	// Get returns a single int_address_storage_slot_last_access record by primary key
+	// Get record | Retrieve a single record by primary key
 	Get(context.Context, *GetIntAddressStorageSlotLastAccessRequest) (*GetIntAddressStorageSlotLastAccessResponse, error)
 	mustEmbedUnimplementedIntAddressStorageSlotLastAccessServiceServer()
 }

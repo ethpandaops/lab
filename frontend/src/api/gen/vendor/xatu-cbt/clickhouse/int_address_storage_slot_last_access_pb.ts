@@ -71,34 +71,34 @@ export class IntAddressStorageSlotLastAccess extends Message<IntAddressStorageSl
 }
 
 /**
- * ListIntAddressStorageSlotLastAccessRequest is the request message for listing int_address_storage_slot_last_access records
+ * Request for listing int_address_storage_slot_last_access records
  *
  * @generated from message cbt.ListIntAddressStorageSlotLastAccessRequest
  */
 export class ListIntAddressStorageSlotLastAccessRequest extends Message<ListIntAddressStorageSlotLastAccessRequest> {
   /**
-   * Filter by address (PRIMARY KEY - required)
+   * Filter by address - The address of the account (PRIMARY KEY - required)
    *
    * @generated from field: cbt.StringFilter address = 1;
    */
   address?: StringFilter;
 
   /**
-   * Filter by slot_key (ORDER BY column 2 - optional)
+   * Filter by slot_key - The slot key of the storage (ORDER BY column 2 - optional)
    *
    * @generated from field: cbt.StringFilter slot_key = 2;
    */
   slotKey?: StringFilter;
 
   /**
-   * Filter by block_number (optional)
+   * Filter by block_number - The block number of the last access (optional)
    *
    * @generated from field: cbt.UInt32Filter block_number = 3;
    */
   blockNumber?: UInt32Filter;
 
   /**
-   * Filter by value (optional)
+   * Filter by value - The value of the storage (optional)
    *
    * @generated from field: cbt.StringFilter value = 4;
    */
@@ -165,7 +165,7 @@ export class ListIntAddressStorageSlotLastAccessRequest extends Message<ListIntA
 }
 
 /**
- * ListIntAddressStorageSlotLastAccessResponse is the response message for listing int_address_storage_slot_last_access records
+ * Response for listing int_address_storage_slot_last_access records
  *
  * @generated from message cbt.ListIntAddressStorageSlotLastAccessResponse
  */
@@ -215,7 +215,7 @@ export class ListIntAddressStorageSlotLastAccessResponse extends Message<ListInt
 }
 
 /**
- * GetIntAddressStorageSlotLastAccessRequest is the request message for getting a single int_address_storage_slot_last_access record by primary key
+ * Request for getting a single int_address_storage_slot_last_access record by primary key
  *
  * @generated from message cbt.GetIntAddressStorageSlotLastAccessRequest
  */
@@ -258,7 +258,7 @@ export class GetIntAddressStorageSlotLastAccessRequest extends Message<GetIntAdd
 }
 
 /**
- * GetIntAddressStorageSlotLastAccessResponse is the response message for getting a single int_address_storage_slot_last_access record
+ * Response for getting a single int_address_storage_slot_last_access record
  *
  * @generated from message cbt.GetIntAddressStorageSlotLastAccessResponse
  */

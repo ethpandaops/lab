@@ -151,104 +151,104 @@ export class IntAttestationAttestedCanonical extends Message<IntAttestationAttes
 }
 
 /**
- * ListIntAttestationAttestedCanonicalRequest is the request message for listing int_attestation_attested_canonical records
+ * Request for listing int_attestation_attested_canonical records
  *
  * @generated from message cbt.ListIntAttestationAttestedCanonicalRequest
  */
 export class ListIntAttestationAttestedCanonicalRequest extends Message<ListIntAttestationAttestedCanonicalRequest> {
   /**
-   * Filter by slot_start_date_time (PRIMARY KEY - required)
+   * Filter by slot_start_date_time - The wall clock time when the slot started (PRIMARY KEY - required)
    *
    * @generated from field: cbt.UInt32Filter slot_start_date_time = 1;
    */
   slotStartDateTime?: UInt32Filter;
 
   /**
-   * Filter by block_root (ORDER BY column 2 - optional)
+   * Filter by block_root - The beacon block root hash (ORDER BY column 2 - optional)
    *
    * @generated from field: cbt.StringFilter block_root = 2;
    */
   blockRoot?: StringFilter;
 
   /**
-   * Filter by attesting_validator_index (ORDER BY column 3 - optional)
+   * Filter by attesting_validator_index - The index of the validator attesting (ORDER BY column 3 - optional)
    *
    * @generated from field: cbt.UInt32Filter attesting_validator_index = 3;
    */
   attestingValidatorIndex?: UInt32Filter;
 
   /**
-   * Filter by updated_date_time (optional)
+   * Filter by updated_date_time - Timestamp when the record was last updated (optional)
    *
    * @generated from field: cbt.UInt32Filter updated_date_time = 4;
    */
   updatedDateTime?: UInt32Filter;
 
   /**
-   * Filter by slot (optional)
+   * Filter by slot - The slot number (optional)
    *
    * @generated from field: cbt.UInt32Filter slot = 5;
    */
   slot?: UInt32Filter;
 
   /**
-   * Filter by epoch (optional)
+   * Filter by epoch - The epoch number containing the slot (optional)
    *
    * @generated from field: cbt.UInt32Filter epoch = 6;
    */
   epoch?: UInt32Filter;
 
   /**
-   * Filter by epoch_start_date_time (optional)
+   * Filter by epoch_start_date_time - The wall clock time when the epoch started (optional)
    *
    * @generated from field: cbt.UInt32Filter epoch_start_date_time = 7;
    */
   epochStartDateTime?: UInt32Filter;
 
   /**
-   * Filter by source_epoch (optional)
+   * Filter by source_epoch - The source epoch number in the attestation group (optional)
    *
    * @generated from field: cbt.UInt32Filter source_epoch = 8;
    */
   sourceEpoch?: UInt32Filter;
 
   /**
-   * Filter by source_epoch_start_date_time (optional)
+   * Filter by source_epoch_start_date_time - The wall clock time when the source epoch started (optional)
    *
    * @generated from field: cbt.UInt32Filter source_epoch_start_date_time = 9;
    */
   sourceEpochStartDateTime?: UInt32Filter;
 
   /**
-   * Filter by source_root (optional)
+   * Filter by source_root - The source beacon block root hash in the attestation group (optional)
    *
    * @generated from field: cbt.StringFilter source_root = 10;
    */
   sourceRoot?: StringFilter;
 
   /**
-   * Filter by target_epoch (optional)
+   * Filter by target_epoch - The target epoch number in the attestation group (optional)
    *
    * @generated from field: cbt.UInt32Filter target_epoch = 11;
    */
   targetEpoch?: UInt32Filter;
 
   /**
-   * Filter by target_epoch_start_date_time (optional)
+   * Filter by target_epoch_start_date_time - The wall clock time when the target epoch started (optional)
    *
    * @generated from field: cbt.UInt32Filter target_epoch_start_date_time = 12;
    */
   targetEpochStartDateTime?: UInt32Filter;
 
   /**
-   * Filter by target_root (optional)
+   * Filter by target_root - The target beacon block root hash in the attestation group (optional)
    *
    * @generated from field: cbt.StringFilter target_root = 13;
    */
   targetRoot?: StringFilter;
 
   /**
-   * Filter by inclusion_distance (optional)
+   * Filter by inclusion_distance - The distance from the slot when the attestation was included (optional)
    *
    * @generated from field: cbt.UInt32Filter inclusion_distance = 14;
    */
@@ -325,7 +325,7 @@ export class ListIntAttestationAttestedCanonicalRequest extends Message<ListIntA
 }
 
 /**
- * ListIntAttestationAttestedCanonicalResponse is the response message for listing int_attestation_attested_canonical records
+ * Response for listing int_attestation_attested_canonical records
  *
  * @generated from message cbt.ListIntAttestationAttestedCanonicalResponse
  */
@@ -375,7 +375,7 @@ export class ListIntAttestationAttestedCanonicalResponse extends Message<ListInt
 }
 
 /**
- * GetIntAttestationAttestedCanonicalRequest is the request message for getting a single int_attestation_attested_canonical record by primary key
+ * Request for getting a single int_attestation_attested_canonical record by primary key
  *
  * @generated from message cbt.GetIntAttestationAttestedCanonicalRequest
  */
@@ -418,7 +418,7 @@ export class GetIntAttestationAttestedCanonicalRequest extends Message<GetIntAtt
 }
 
 /**
- * GetIntAttestationAttestedCanonicalResponse is the response message for getting a single int_attestation_attested_canonical record
+ * Response for getting a single int_attestation_attested_canonical record
  *
  * @generated from message cbt.GetIntAttestationAttestedCanonicalResponse
  */

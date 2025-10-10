@@ -294,63 +294,63 @@ func (x *IntAttestationFirstSeen) GetMetaConsensusImplementation() string {
 	return ""
 }
 
-// ListIntAttestationFirstSeenRequest is the request message for listing int_attestation_first_seen records
+// Request for listing int_attestation_first_seen records
 type ListIntAttestationFirstSeenRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Filter by slot_start_date_time (PRIMARY KEY - required)
+	// Filter by slot_start_date_time - The wall clock time when the slot started (PRIMARY KEY - required)
 	SlotStartDateTime *UInt32Filter `protobuf:"bytes,1,opt,name=slot_start_date_time,json=slotStartDateTime,proto3" json:"slot_start_date_time,omitempty"`
-	// Filter by attesting_validator_index (ORDER BY column 2 - optional)
+	// Filter by attesting_validator_index - The index of the validator attesting (ORDER BY column 2 - optional)
 	AttestingValidatorIndex *UInt32Filter `protobuf:"bytes,2,opt,name=attesting_validator_index,json=attestingValidatorIndex,proto3" json:"attesting_validator_index,omitempty"`
-	// Filter by updated_date_time (optional)
+	// Filter by updated_date_time - Timestamp when the record was last updated (optional)
 	UpdatedDateTime *UInt32Filter `protobuf:"bytes,3,opt,name=updated_date_time,json=updatedDateTime,proto3" json:"updated_date_time,omitempty"`
-	// Filter by source (optional)
+	// Filter by source - Source of the event (optional)
 	Source *StringFilter `protobuf:"bytes,4,opt,name=source,proto3" json:"source,omitempty"`
-	// Filter by slot (optional)
+	// Filter by slot - The slot number (optional)
 	Slot *UInt32Filter `protobuf:"bytes,5,opt,name=slot,proto3" json:"slot,omitempty"`
-	// Filter by epoch (optional)
+	// Filter by epoch - The epoch number containing the slot (optional)
 	Epoch *UInt32Filter `protobuf:"bytes,6,opt,name=epoch,proto3" json:"epoch,omitempty"`
-	// Filter by epoch_start_date_time (optional)
+	// Filter by epoch_start_date_time - The wall clock time when the epoch started (optional)
 	EpochStartDateTime *UInt32Filter `protobuf:"bytes,7,opt,name=epoch_start_date_time,json=epochStartDateTime,proto3" json:"epoch_start_date_time,omitempty"`
-	// Filter by seen_slot_start_diff (optional)
+	// Filter by seen_slot_start_diff - The time from slot start for the client to see the block (optional)
 	SeenSlotStartDiff *UInt32Filter `protobuf:"bytes,8,opt,name=seen_slot_start_diff,json=seenSlotStartDiff,proto3" json:"seen_slot_start_diff,omitempty"`
-	// Filter by block_root (optional)
+	// Filter by block_root - The beacon block root hash (optional)
 	BlockRoot *StringFilter `protobuf:"bytes,9,opt,name=block_root,json=blockRoot,proto3" json:"block_root,omitempty"`
-	// Filter by attesting_validator_committee_index (optional)
+	// Filter by attesting_validator_committee_index - The committee index of the attesting validator (optional)
 	AttestingValidatorCommitteeIndex *StringFilter `protobuf:"bytes,10,opt,name=attesting_validator_committee_index,json=attestingValidatorCommitteeIndex,proto3" json:"attesting_validator_committee_index,omitempty"`
-	// Filter by username (optional)
+	// Filter by username - Username of the node (optional)
 	Username *StringFilter `protobuf:"bytes,11,opt,name=username,proto3" json:"username,omitempty"`
-	// Filter by node_id (optional)
+	// Filter by node_id - ID of the node (optional)
 	NodeId *StringFilter `protobuf:"bytes,12,opt,name=node_id,json=nodeId,proto3" json:"node_id,omitempty"`
-	// Filter by classification (optional)
+	// Filter by classification - Classification of the node, e.g. "individual", "corporate", "internal" (aka ethPandaOps) or "unclassified" (optional)
 	Classification *StringFilter `protobuf:"bytes,13,opt,name=classification,proto3" json:"classification,omitempty"`
-	// Filter by meta_client_name (optional)
+	// Filter by meta_client_name - Name of the client (optional)
 	MetaClientName *StringFilter `protobuf:"bytes,14,opt,name=meta_client_name,json=metaClientName,proto3" json:"meta_client_name,omitempty"`
-	// Filter by meta_client_version (optional)
+	// Filter by meta_client_version - Version of the client (optional)
 	MetaClientVersion *StringFilter `protobuf:"bytes,15,opt,name=meta_client_version,json=metaClientVersion,proto3" json:"meta_client_version,omitempty"`
-	// Filter by meta_client_implementation (optional)
+	// Filter by meta_client_implementation - Implementation of the client (optional)
 	MetaClientImplementation *StringFilter `protobuf:"bytes,16,opt,name=meta_client_implementation,json=metaClientImplementation,proto3" json:"meta_client_implementation,omitempty"`
-	// Filter by meta_client_geo_city (optional)
+	// Filter by meta_client_geo_city - City of the client (optional)
 	MetaClientGeoCity *StringFilter `protobuf:"bytes,17,opt,name=meta_client_geo_city,json=metaClientGeoCity,proto3" json:"meta_client_geo_city,omitempty"`
-	// Filter by meta_client_geo_country (optional)
+	// Filter by meta_client_geo_country - Country of the client (optional)
 	MetaClientGeoCountry *StringFilter `protobuf:"bytes,18,opt,name=meta_client_geo_country,json=metaClientGeoCountry,proto3" json:"meta_client_geo_country,omitempty"`
-	// Filter by meta_client_geo_country_code (optional)
+	// Filter by meta_client_geo_country_code - Country code of the client (optional)
 	MetaClientGeoCountryCode *StringFilter `protobuf:"bytes,19,opt,name=meta_client_geo_country_code,json=metaClientGeoCountryCode,proto3" json:"meta_client_geo_country_code,omitempty"`
-	// Filter by meta_client_geo_continent_code (optional)
+	// Filter by meta_client_geo_continent_code - Continent code of the client (optional)
 	MetaClientGeoContinentCode *StringFilter `protobuf:"bytes,20,opt,name=meta_client_geo_continent_code,json=metaClientGeoContinentCode,proto3" json:"meta_client_geo_continent_code,omitempty"`
-	// Filter by meta_client_geo_longitude (optional)
+	// Filter by meta_client_geo_longitude - Longitude of the client (optional)
 	MetaClientGeoLongitude *wrapperspb.DoubleValue `protobuf:"bytes,21,opt,name=meta_client_geo_longitude,json=metaClientGeoLongitude,proto3" json:"meta_client_geo_longitude,omitempty"`
-	// Filter by meta_client_geo_latitude (optional)
+	// Filter by meta_client_geo_latitude - Latitude of the client (optional)
 	MetaClientGeoLatitude *wrapperspb.DoubleValue `protobuf:"bytes,22,opt,name=meta_client_geo_latitude,json=metaClientGeoLatitude,proto3" json:"meta_client_geo_latitude,omitempty"`
-	// Filter by meta_client_geo_autonomous_system_number (optional)
+	// Filter by meta_client_geo_autonomous_system_number - Autonomous system number of the client (optional)
 	MetaClientGeoAutonomousSystemNumber *NullableUInt32Filter `protobuf:"bytes,23,opt,name=meta_client_geo_autonomous_system_number,json=metaClientGeoAutonomousSystemNumber,proto3" json:"meta_client_geo_autonomous_system_number,omitempty"`
-	// Filter by meta_client_geo_autonomous_system_organization (optional)
+	// Filter by meta_client_geo_autonomous_system_organization - Autonomous system organization of the client (optional)
 	MetaClientGeoAutonomousSystemOrganization *NullableStringFilter `protobuf:"bytes,24,opt,name=meta_client_geo_autonomous_system_organization,json=metaClientGeoAutonomousSystemOrganization,proto3" json:"meta_client_geo_autonomous_system_organization,omitempty"`
-	// Filter by meta_consensus_version (optional)
+	// Filter by meta_consensus_version - Ethereum consensus client version (optional)
 	MetaConsensusVersion *StringFilter `protobuf:"bytes,25,opt,name=meta_consensus_version,json=metaConsensusVersion,proto3" json:"meta_consensus_version,omitempty"`
-	// Filter by meta_consensus_implementation (optional)
+	// Filter by meta_consensus_implementation - Ethereum consensus client implementation (optional)
 	MetaConsensusImplementation *StringFilter `protobuf:"bytes,26,opt,name=meta_consensus_implementation,json=metaConsensusImplementation,proto3" json:"meta_consensus_implementation,omitempty"`
 	// The maximum number of int_attestation_first_seen to return.
 	// If unspecified, at most 100 items will be returned.
@@ -600,7 +600,7 @@ func (x *ListIntAttestationFirstSeenRequest) GetOrderBy() string {
 	return ""
 }
 
-// ListIntAttestationFirstSeenResponse is the response message for listing int_attestation_first_seen records
+// Response for listing int_attestation_first_seen records
 type ListIntAttestationFirstSeenResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -659,7 +659,7 @@ func (x *ListIntAttestationFirstSeenResponse) GetNextPageToken() string {
 	return ""
 }
 
-// GetIntAttestationFirstSeenRequest is the request message for getting a single int_attestation_first_seen record by primary key
+// Request for getting a single int_attestation_first_seen record by primary key
 type GetIntAttestationFirstSeenRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -708,7 +708,7 @@ func (x *GetIntAttestationFirstSeenRequest) GetSlotStartDateTime() uint32 {
 	return 0
 }
 
-// GetIntAttestationFirstSeenResponse is the response message for getting a single int_attestation_first_seen record
+// Response for getting a single int_attestation_first_seen record
 type GetIntAttestationFirstSeenResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache

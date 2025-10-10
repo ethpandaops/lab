@@ -27,11 +27,11 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// IntAddressLastAccessService provides RPC methods for querying int_address_last_access data
+// Query int_address_last_access data
 type IntAddressLastAccessServiceClient interface {
-	// List returns paginated int_address_last_access records
+	// List records | Retrieve paginated results with optional filtering
 	List(ctx context.Context, in *ListIntAddressLastAccessRequest, opts ...grpc.CallOption) (*ListIntAddressLastAccessResponse, error)
-	// Get returns a single int_address_last_access record by primary key
+	// Get record | Retrieve a single record by primary key
 	Get(ctx context.Context, in *GetIntAddressLastAccessRequest, opts ...grpc.CallOption) (*GetIntAddressLastAccessResponse, error)
 }
 
@@ -67,11 +67,11 @@ func (c *intAddressLastAccessServiceClient) Get(ctx context.Context, in *GetIntA
 // All implementations must embed UnimplementedIntAddressLastAccessServiceServer
 // for forward compatibility
 //
-// IntAddressLastAccessService provides RPC methods for querying int_address_last_access data
+// Query int_address_last_access data
 type IntAddressLastAccessServiceServer interface {
-	// List returns paginated int_address_last_access records
+	// List records | Retrieve paginated results with optional filtering
 	List(context.Context, *ListIntAddressLastAccessRequest) (*ListIntAddressLastAccessResponse, error)
-	// Get returns a single int_address_last_access record by primary key
+	// Get record | Retrieve a single record by primary key
 	Get(context.Context, *GetIntAddressLastAccessRequest) (*GetIntAddressLastAccessResponse, error)
 	mustEmbedUnimplementedIntAddressLastAccessServiceServer()
 }

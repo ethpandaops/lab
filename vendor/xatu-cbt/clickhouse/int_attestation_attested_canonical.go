@@ -21,26 +21,34 @@ func BuildListIntAttestationAttestedCanonicalQuery(req *ListIntAttestationAttest
 	// Add primary key filter
 	switch filter := req.SlotStartDateTime.Filter.(type) {
 	case *UInt32Filter_Eq:
-		qb.AddCondition("slot_start_date_time", "=", filter.Eq)
+		qb.AddCondition("slot_start_date_time", "=", DateTimeValue{filter.Eq})
 	case *UInt32Filter_Ne:
-		qb.AddCondition("slot_start_date_time", "!=", filter.Ne)
+		qb.AddCondition("slot_start_date_time", "!=", DateTimeValue{filter.Ne})
 	case *UInt32Filter_Lt:
-		qb.AddCondition("slot_start_date_time", "<", filter.Lt)
+		qb.AddCondition("slot_start_date_time", "<", DateTimeValue{filter.Lt})
 	case *UInt32Filter_Lte:
-		qb.AddCondition("slot_start_date_time", "<=", filter.Lte)
+		qb.AddCondition("slot_start_date_time", "<=", DateTimeValue{filter.Lte})
 	case *UInt32Filter_Gt:
-		qb.AddCondition("slot_start_date_time", ">", filter.Gt)
+		qb.AddCondition("slot_start_date_time", ">", DateTimeValue{filter.Gt})
 	case *UInt32Filter_Gte:
-		qb.AddCondition("slot_start_date_time", ">=", filter.Gte)
+		qb.AddCondition("slot_start_date_time", ">=", DateTimeValue{filter.Gte})
 	case *UInt32Filter_Between:
-		qb.AddBetweenCondition("slot_start_date_time", filter.Between.Min, filter.Between.Max)
+		qb.AddBetweenCondition("slot_start_date_time", DateTimeValue{filter.Between.Min}, DateTimeValue{filter.Between.Max.GetValue()})
 	case *UInt32Filter_In:
 		if len(filter.In.Values) > 0 {
-			qb.AddInCondition("slot_start_date_time", UInt32SliceToInterface(filter.In.Values))
+			converted := make([]interface{}, len(filter.In.Values))
+			for i, v := range filter.In.Values {
+				converted[i] = DateTimeValue{v}
+			}
+			qb.AddInCondition("slot_start_date_time", converted)
 		}
 	case *UInt32Filter_NotIn:
 		if len(filter.NotIn.Values) > 0 {
-			qb.AddNotInCondition("slot_start_date_time", UInt32SliceToInterface(filter.NotIn.Values))
+			converted := make([]interface{}, len(filter.NotIn.Values))
+			for i, v := range filter.NotIn.Values {
+				converted[i] = DateTimeValue{v}
+			}
+			qb.AddNotInCondition("slot_start_date_time", converted)
 		}
 	default:
 		// Unsupported filter type
@@ -50,26 +58,34 @@ func BuildListIntAttestationAttestedCanonicalQuery(req *ListIntAttestationAttest
 	if req.UpdatedDateTime != nil {
 		switch filter := req.UpdatedDateTime.Filter.(type) {
 		case *UInt32Filter_Eq:
-			qb.AddCondition("updated_date_time", "=", filter.Eq)
+			qb.AddCondition("updated_date_time", "=", DateTimeValue{filter.Eq})
 		case *UInt32Filter_Ne:
-			qb.AddCondition("updated_date_time", "!=", filter.Ne)
+			qb.AddCondition("updated_date_time", "!=", DateTimeValue{filter.Ne})
 		case *UInt32Filter_Lt:
-			qb.AddCondition("updated_date_time", "<", filter.Lt)
+			qb.AddCondition("updated_date_time", "<", DateTimeValue{filter.Lt})
 		case *UInt32Filter_Lte:
-			qb.AddCondition("updated_date_time", "<=", filter.Lte)
+			qb.AddCondition("updated_date_time", "<=", DateTimeValue{filter.Lte})
 		case *UInt32Filter_Gt:
-			qb.AddCondition("updated_date_time", ">", filter.Gt)
+			qb.AddCondition("updated_date_time", ">", DateTimeValue{filter.Gt})
 		case *UInt32Filter_Gte:
-			qb.AddCondition("updated_date_time", ">=", filter.Gte)
+			qb.AddCondition("updated_date_time", ">=", DateTimeValue{filter.Gte})
 		case *UInt32Filter_Between:
-			qb.AddBetweenCondition("updated_date_time", filter.Between.Min, filter.Between.Max)
+			qb.AddBetweenCondition("updated_date_time", DateTimeValue{filter.Between.Min}, DateTimeValue{filter.Between.Max.GetValue()})
 		case *UInt32Filter_In:
 			if len(filter.In.Values) > 0 {
-				qb.AddInCondition("updated_date_time", UInt32SliceToInterface(filter.In.Values))
+				converted := make([]interface{}, len(filter.In.Values))
+				for i, v := range filter.In.Values {
+					converted[i] = DateTimeValue{v}
+				}
+				qb.AddInCondition("updated_date_time", converted)
 			}
 		case *UInt32Filter_NotIn:
 			if len(filter.NotIn.Values) > 0 {
-				qb.AddNotInCondition("updated_date_time", UInt32SliceToInterface(filter.NotIn.Values))
+				converted := make([]interface{}, len(filter.NotIn.Values))
+				for i, v := range filter.NotIn.Values {
+					converted[i] = DateTimeValue{v}
+				}
+				qb.AddNotInCondition("updated_date_time", converted)
 			}
 		default:
 			// Unsupported filter type
@@ -92,7 +108,7 @@ func BuildListIntAttestationAttestedCanonicalQuery(req *ListIntAttestationAttest
 		case *UInt32Filter_Gte:
 			qb.AddCondition("slot", ">=", filter.Gte)
 		case *UInt32Filter_Between:
-			qb.AddBetweenCondition("slot", filter.Between.Min, filter.Between.Max)
+			qb.AddBetweenCondition("slot", filter.Between.Min, filter.Between.Max.GetValue())
 		case *UInt32Filter_In:
 			if len(filter.In.Values) > 0 {
 				qb.AddInCondition("slot", UInt32SliceToInterface(filter.In.Values))
@@ -122,7 +138,7 @@ func BuildListIntAttestationAttestedCanonicalQuery(req *ListIntAttestationAttest
 		case *UInt32Filter_Gte:
 			qb.AddCondition("epoch", ">=", filter.Gte)
 		case *UInt32Filter_Between:
-			qb.AddBetweenCondition("epoch", filter.Between.Min, filter.Between.Max)
+			qb.AddBetweenCondition("epoch", filter.Between.Min, filter.Between.Max.GetValue())
 		case *UInt32Filter_In:
 			if len(filter.In.Values) > 0 {
 				qb.AddInCondition("epoch", UInt32SliceToInterface(filter.In.Values))
@@ -140,26 +156,34 @@ func BuildListIntAttestationAttestedCanonicalQuery(req *ListIntAttestationAttest
 	if req.EpochStartDateTime != nil {
 		switch filter := req.EpochStartDateTime.Filter.(type) {
 		case *UInt32Filter_Eq:
-			qb.AddCondition("epoch_start_date_time", "=", filter.Eq)
+			qb.AddCondition("epoch_start_date_time", "=", DateTimeValue{filter.Eq})
 		case *UInt32Filter_Ne:
-			qb.AddCondition("epoch_start_date_time", "!=", filter.Ne)
+			qb.AddCondition("epoch_start_date_time", "!=", DateTimeValue{filter.Ne})
 		case *UInt32Filter_Lt:
-			qb.AddCondition("epoch_start_date_time", "<", filter.Lt)
+			qb.AddCondition("epoch_start_date_time", "<", DateTimeValue{filter.Lt})
 		case *UInt32Filter_Lte:
-			qb.AddCondition("epoch_start_date_time", "<=", filter.Lte)
+			qb.AddCondition("epoch_start_date_time", "<=", DateTimeValue{filter.Lte})
 		case *UInt32Filter_Gt:
-			qb.AddCondition("epoch_start_date_time", ">", filter.Gt)
+			qb.AddCondition("epoch_start_date_time", ">", DateTimeValue{filter.Gt})
 		case *UInt32Filter_Gte:
-			qb.AddCondition("epoch_start_date_time", ">=", filter.Gte)
+			qb.AddCondition("epoch_start_date_time", ">=", DateTimeValue{filter.Gte})
 		case *UInt32Filter_Between:
-			qb.AddBetweenCondition("epoch_start_date_time", filter.Between.Min, filter.Between.Max)
+			qb.AddBetweenCondition("epoch_start_date_time", DateTimeValue{filter.Between.Min}, DateTimeValue{filter.Between.Max.GetValue()})
 		case *UInt32Filter_In:
 			if len(filter.In.Values) > 0 {
-				qb.AddInCondition("epoch_start_date_time", UInt32SliceToInterface(filter.In.Values))
+				converted := make([]interface{}, len(filter.In.Values))
+				for i, v := range filter.In.Values {
+					converted[i] = DateTimeValue{v}
+				}
+				qb.AddInCondition("epoch_start_date_time", converted)
 			}
 		case *UInt32Filter_NotIn:
 			if len(filter.NotIn.Values) > 0 {
-				qb.AddNotInCondition("epoch_start_date_time", UInt32SliceToInterface(filter.NotIn.Values))
+				converted := make([]interface{}, len(filter.NotIn.Values))
+				for i, v := range filter.NotIn.Values {
+					converted[i] = DateTimeValue{v}
+				}
+				qb.AddNotInCondition("epoch_start_date_time", converted)
 			}
 		default:
 			// Unsupported filter type
@@ -182,7 +206,7 @@ func BuildListIntAttestationAttestedCanonicalQuery(req *ListIntAttestationAttest
 		case *UInt32Filter_Gte:
 			qb.AddCondition("source_epoch", ">=", filter.Gte)
 		case *UInt32Filter_Between:
-			qb.AddBetweenCondition("source_epoch", filter.Between.Min, filter.Between.Max)
+			qb.AddBetweenCondition("source_epoch", filter.Between.Min, filter.Between.Max.GetValue())
 		case *UInt32Filter_In:
 			if len(filter.In.Values) > 0 {
 				qb.AddInCondition("source_epoch", UInt32SliceToInterface(filter.In.Values))
@@ -200,26 +224,34 @@ func BuildListIntAttestationAttestedCanonicalQuery(req *ListIntAttestationAttest
 	if req.SourceEpochStartDateTime != nil {
 		switch filter := req.SourceEpochStartDateTime.Filter.(type) {
 		case *UInt32Filter_Eq:
-			qb.AddCondition("source_epoch_start_date_time", "=", filter.Eq)
+			qb.AddCondition("source_epoch_start_date_time", "=", DateTimeValue{filter.Eq})
 		case *UInt32Filter_Ne:
-			qb.AddCondition("source_epoch_start_date_time", "!=", filter.Ne)
+			qb.AddCondition("source_epoch_start_date_time", "!=", DateTimeValue{filter.Ne})
 		case *UInt32Filter_Lt:
-			qb.AddCondition("source_epoch_start_date_time", "<", filter.Lt)
+			qb.AddCondition("source_epoch_start_date_time", "<", DateTimeValue{filter.Lt})
 		case *UInt32Filter_Lte:
-			qb.AddCondition("source_epoch_start_date_time", "<=", filter.Lte)
+			qb.AddCondition("source_epoch_start_date_time", "<=", DateTimeValue{filter.Lte})
 		case *UInt32Filter_Gt:
-			qb.AddCondition("source_epoch_start_date_time", ">", filter.Gt)
+			qb.AddCondition("source_epoch_start_date_time", ">", DateTimeValue{filter.Gt})
 		case *UInt32Filter_Gte:
-			qb.AddCondition("source_epoch_start_date_time", ">=", filter.Gte)
+			qb.AddCondition("source_epoch_start_date_time", ">=", DateTimeValue{filter.Gte})
 		case *UInt32Filter_Between:
-			qb.AddBetweenCondition("source_epoch_start_date_time", filter.Between.Min, filter.Between.Max)
+			qb.AddBetweenCondition("source_epoch_start_date_time", DateTimeValue{filter.Between.Min}, DateTimeValue{filter.Between.Max.GetValue()})
 		case *UInt32Filter_In:
 			if len(filter.In.Values) > 0 {
-				qb.AddInCondition("source_epoch_start_date_time", UInt32SliceToInterface(filter.In.Values))
+				converted := make([]interface{}, len(filter.In.Values))
+				for i, v := range filter.In.Values {
+					converted[i] = DateTimeValue{v}
+				}
+				qb.AddInCondition("source_epoch_start_date_time", converted)
 			}
 		case *UInt32Filter_NotIn:
 			if len(filter.NotIn.Values) > 0 {
-				qb.AddNotInCondition("source_epoch_start_date_time", UInt32SliceToInterface(filter.NotIn.Values))
+				converted := make([]interface{}, len(filter.NotIn.Values))
+				for i, v := range filter.NotIn.Values {
+					converted[i] = DateTimeValue{v}
+				}
+				qb.AddNotInCondition("source_epoch_start_date_time", converted)
 			}
 		default:
 			// Unsupported filter type
@@ -272,7 +304,7 @@ func BuildListIntAttestationAttestedCanonicalQuery(req *ListIntAttestationAttest
 		case *UInt32Filter_Gte:
 			qb.AddCondition("target_epoch", ">=", filter.Gte)
 		case *UInt32Filter_Between:
-			qb.AddBetweenCondition("target_epoch", filter.Between.Min, filter.Between.Max)
+			qb.AddBetweenCondition("target_epoch", filter.Between.Min, filter.Between.Max.GetValue())
 		case *UInt32Filter_In:
 			if len(filter.In.Values) > 0 {
 				qb.AddInCondition("target_epoch", UInt32SliceToInterface(filter.In.Values))
@@ -290,26 +322,34 @@ func BuildListIntAttestationAttestedCanonicalQuery(req *ListIntAttestationAttest
 	if req.TargetEpochStartDateTime != nil {
 		switch filter := req.TargetEpochStartDateTime.Filter.(type) {
 		case *UInt32Filter_Eq:
-			qb.AddCondition("target_epoch_start_date_time", "=", filter.Eq)
+			qb.AddCondition("target_epoch_start_date_time", "=", DateTimeValue{filter.Eq})
 		case *UInt32Filter_Ne:
-			qb.AddCondition("target_epoch_start_date_time", "!=", filter.Ne)
+			qb.AddCondition("target_epoch_start_date_time", "!=", DateTimeValue{filter.Ne})
 		case *UInt32Filter_Lt:
-			qb.AddCondition("target_epoch_start_date_time", "<", filter.Lt)
+			qb.AddCondition("target_epoch_start_date_time", "<", DateTimeValue{filter.Lt})
 		case *UInt32Filter_Lte:
-			qb.AddCondition("target_epoch_start_date_time", "<=", filter.Lte)
+			qb.AddCondition("target_epoch_start_date_time", "<=", DateTimeValue{filter.Lte})
 		case *UInt32Filter_Gt:
-			qb.AddCondition("target_epoch_start_date_time", ">", filter.Gt)
+			qb.AddCondition("target_epoch_start_date_time", ">", DateTimeValue{filter.Gt})
 		case *UInt32Filter_Gte:
-			qb.AddCondition("target_epoch_start_date_time", ">=", filter.Gte)
+			qb.AddCondition("target_epoch_start_date_time", ">=", DateTimeValue{filter.Gte})
 		case *UInt32Filter_Between:
-			qb.AddBetweenCondition("target_epoch_start_date_time", filter.Between.Min, filter.Between.Max)
+			qb.AddBetweenCondition("target_epoch_start_date_time", DateTimeValue{filter.Between.Min}, DateTimeValue{filter.Between.Max.GetValue()})
 		case *UInt32Filter_In:
 			if len(filter.In.Values) > 0 {
-				qb.AddInCondition("target_epoch_start_date_time", UInt32SliceToInterface(filter.In.Values))
+				converted := make([]interface{}, len(filter.In.Values))
+				for i, v := range filter.In.Values {
+					converted[i] = DateTimeValue{v}
+				}
+				qb.AddInCondition("target_epoch_start_date_time", converted)
 			}
 		case *UInt32Filter_NotIn:
 			if len(filter.NotIn.Values) > 0 {
-				qb.AddNotInCondition("target_epoch_start_date_time", UInt32SliceToInterface(filter.NotIn.Values))
+				converted := make([]interface{}, len(filter.NotIn.Values))
+				for i, v := range filter.NotIn.Values {
+					converted[i] = DateTimeValue{v}
+				}
+				qb.AddNotInCondition("target_epoch_start_date_time", converted)
 			}
 		default:
 			// Unsupported filter type
@@ -392,7 +432,7 @@ func BuildListIntAttestationAttestedCanonicalQuery(req *ListIntAttestationAttest
 		case *UInt32Filter_Gte:
 			qb.AddCondition("attesting_validator_index", ">=", filter.Gte)
 		case *UInt32Filter_Between:
-			qb.AddBetweenCondition("attesting_validator_index", filter.Between.Min, filter.Between.Max)
+			qb.AddBetweenCondition("attesting_validator_index", filter.Between.Min, filter.Between.Max.GetValue())
 		case *UInt32Filter_In:
 			if len(filter.In.Values) > 0 {
 				qb.AddInCondition("attesting_validator_index", UInt32SliceToInterface(filter.In.Values))
@@ -422,7 +462,7 @@ func BuildListIntAttestationAttestedCanonicalQuery(req *ListIntAttestationAttest
 		case *UInt32Filter_Gte:
 			qb.AddCondition("inclusion_distance", ">=", filter.Gte)
 		case *UInt32Filter_Between:
-			qb.AddBetweenCondition("inclusion_distance", filter.Between.Min, filter.Between.Max)
+			qb.AddBetweenCondition("inclusion_distance", filter.Between.Min, filter.Between.Max.GetValue())
 		case *UInt32Filter_In:
 			if len(filter.In.Values) > 0 {
 				qb.AddInCondition("inclusion_distance", UInt32SliceToInterface(filter.In.Values))
@@ -473,7 +513,7 @@ func BuildListIntAttestationAttestedCanonicalQuery(req *ListIntAttestationAttest
 	}
 
 	// Build column list
-	columns := []string{"updated_date_time", "slot", "slot_start_date_time", "epoch", "epoch_start_date_time", "source_epoch", "source_epoch_start_date_time", "source_root", "target_epoch", "target_epoch_start_date_time", "target_root", "block_root", "attesting_validator_index", "inclusion_distance"}
+	columns := []string{"toUnixTimestamp(`updated_date_time`) AS `updated_date_time`", "slot", "toUnixTimestamp(`slot_start_date_time`) AS `slot_start_date_time`", "epoch", "toUnixTimestamp(`epoch_start_date_time`) AS `epoch_start_date_time`", "source_epoch", "toUnixTimestamp(`source_epoch_start_date_time`) AS `source_epoch_start_date_time`", "source_root", "target_epoch", "toUnixTimestamp(`target_epoch_start_date_time`) AS `target_epoch_start_date_time`", "target_root", "block_root", "attesting_validator_index", "inclusion_distance"}
 
 	return BuildParameterizedQuery("int_attestation_attested_canonical", columns, qb, orderByClause, limit, offset, options...)
 }
@@ -493,7 +533,7 @@ func BuildGetIntAttestationAttestedCanonicalQuery(req *GetIntAttestationAttested
 	orderByClause := " ORDER BY slot_start_date_time, block_root, attesting_validator_index"
 
 	// Build column list
-	columns := []string{"updated_date_time", "slot", "slot_start_date_time", "epoch", "epoch_start_date_time", "source_epoch", "source_epoch_start_date_time", "source_root", "target_epoch", "target_epoch_start_date_time", "target_root", "block_root", "attesting_validator_index", "inclusion_distance"}
+	columns := []string{"toUnixTimestamp(`updated_date_time`) AS `updated_date_time`", "slot", "toUnixTimestamp(`slot_start_date_time`) AS `slot_start_date_time`", "epoch", "toUnixTimestamp(`epoch_start_date_time`) AS `epoch_start_date_time`", "source_epoch", "toUnixTimestamp(`source_epoch_start_date_time`) AS `source_epoch_start_date_time`", "source_root", "target_epoch", "toUnixTimestamp(`target_epoch_start_date_time`) AS `target_epoch_start_date_time`", "target_root", "block_root", "attesting_validator_index", "inclusion_distance"}
 
 	// Return single record
 	return BuildParameterizedQuery("int_attestation_attested_canonical", columns, qb, orderByClause, 1, 0, options...)

@@ -27,11 +27,11 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// FctBlockProposerHeadService provides RPC methods for querying fct_block_proposer_head data
+// Query fct_block_proposer_head data
 type FctBlockProposerHeadServiceClient interface {
-	// List returns paginated fct_block_proposer_head records
+	// List records | Retrieve paginated results with optional filtering
 	List(ctx context.Context, in *ListFctBlockProposerHeadRequest, opts ...grpc.CallOption) (*ListFctBlockProposerHeadResponse, error)
-	// Get returns a single fct_block_proposer_head record by primary key
+	// Get record | Retrieve a single record by slot_start_date_time
 	Get(ctx context.Context, in *GetFctBlockProposerHeadRequest, opts ...grpc.CallOption) (*GetFctBlockProposerHeadResponse, error)
 }
 
@@ -67,11 +67,11 @@ func (c *fctBlockProposerHeadServiceClient) Get(ctx context.Context, in *GetFctB
 // All implementations must embed UnimplementedFctBlockProposerHeadServiceServer
 // for forward compatibility
 //
-// FctBlockProposerHeadService provides RPC methods for querying fct_block_proposer_head data
+// Query fct_block_proposer_head data
 type FctBlockProposerHeadServiceServer interface {
-	// List returns paginated fct_block_proposer_head records
+	// List records | Retrieve paginated results with optional filtering
 	List(context.Context, *ListFctBlockProposerHeadRequest) (*ListFctBlockProposerHeadResponse, error)
-	// Get returns a single fct_block_proposer_head record by primary key
+	// Get record | Retrieve a single record by slot_start_date_time
 	Get(context.Context, *GetFctBlockProposerHeadRequest) (*GetFctBlockProposerHeadResponse, error)
 	mustEmbedUnimplementedFctBlockProposerHeadServiceServer()
 }

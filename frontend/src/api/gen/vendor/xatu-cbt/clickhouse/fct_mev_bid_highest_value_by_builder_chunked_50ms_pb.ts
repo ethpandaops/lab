@@ -5,7 +5,7 @@
 
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
 import { Message, proto3, protoInt64 } from "@bufbuild/protobuf";
-import { Int32Filter, StringFilter, UInt32Filter, UInt64Filter } from "./common_pb.js";
+import { Int32Filter, Int64Filter, StringFilter, UInt32Filter } from "./common_pb.js";
 
 /**
  * @generated from message cbt.FctMevBidHighestValueByBuilderChunked50ms
@@ -56,7 +56,7 @@ export class FctMevBidHighestValueByBuilderChunked50ms extends Message<FctMevBid
   /**
    * The timestamp of the earliest bid for this block_hash from this builder
    *
-   * @generated from field: uint64 earliest_bid_date_time = 17;
+   * @generated from field: int64 earliest_bid_date_time = 17;
    */
   earliestBidDateTime = protoInt64.zero;
 
@@ -102,7 +102,7 @@ export class FctMevBidHighestValueByBuilderChunked50ms extends Message<FctMevBid
     { no: 14, name: "epoch", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
     { no: 15, name: "epoch_start_date_time", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
     { no: 16, name: "chunk_slot_start_diff", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
-    { no: 17, name: "earliest_bid_date_time", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
+    { no: 17, name: "earliest_bid_date_time", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
     { no: 18, name: "relay_names", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
     { no: 19, name: "block_hash", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 20, name: "builder_pubkey", kind: "scalar", T: 9 /* ScalarType.STRING */ },
@@ -127,83 +127,83 @@ export class FctMevBidHighestValueByBuilderChunked50ms extends Message<FctMevBid
 }
 
 /**
- * ListFctMevBidHighestValueByBuilderChunked50msRequest is the request message for listing fct_mev_bid_highest_value_by_builder_chunked_50ms records
+ * Request for listing fct_mev_bid_highest_value_by_builder_chunked_50ms records
  *
  * @generated from message cbt.ListFctMevBidHighestValueByBuilderChunked50msRequest
  */
 export class ListFctMevBidHighestValueByBuilderChunked50msRequest extends Message<ListFctMevBidHighestValueByBuilderChunked50msRequest> {
   /**
-   * Filter by slot_start_date_time (PRIMARY KEY - required)
+   * Filter by slot_start_date_time - The start time for the slot that the bid is for (PRIMARY KEY - required unless using alternatives: slot)
    *
    * @generated from field: cbt.UInt32Filter slot_start_date_time = 1;
    */
   slotStartDateTime?: UInt32Filter;
 
   /**
-   * Filter by chunk_slot_start_diff (ORDER BY column 2 - optional)
+   * Filter by chunk_slot_start_diff - The difference between the chunk start time and slot_start_date_time. "1500" would mean the earliest bid for this block_hash was between 1500ms and 1550ms into the slot. Negative values indicate bids received before slot start (ORDER BY column 2 - optional)
    *
    * @generated from field: cbt.Int32Filter chunk_slot_start_diff = 2;
    */
   chunkSlotStartDiff?: Int32Filter;
 
   /**
-   * Filter by builder_pubkey (ORDER BY column 3 - optional)
+   * Filter by builder_pubkey - The builder pubkey of the bid (ORDER BY column 3 - optional)
    *
    * @generated from field: cbt.StringFilter builder_pubkey = 3;
    */
   builderPubkey?: StringFilter;
 
   /**
-   * Filter by updated_date_time (optional)
+   * Filter by updated_date_time - Timestamp when the record was last updated (optional)
    *
    * @generated from field: cbt.UInt32Filter updated_date_time = 4;
    */
   updatedDateTime?: UInt32Filter;
 
   /**
-   * Filter by slot (optional)
+   * Filter by slot - Slot number within the block bid (PROJECTION: p_by_slot - alternative to slot_start_date_time)
    *
    * @generated from field: cbt.UInt32Filter slot = 5;
    */
   slot?: UInt32Filter;
 
   /**
-   * Filter by epoch (optional)
+   * Filter by epoch - Epoch number derived from the slot that the bid is for (optional)
    *
    * @generated from field: cbt.UInt32Filter epoch = 6;
    */
   epoch?: UInt32Filter;
 
   /**
-   * Filter by epoch_start_date_time (optional)
+   * Filter by epoch_start_date_time - The start time for the epoch that the bid is for (optional)
    *
    * @generated from field: cbt.UInt32Filter epoch_start_date_time = 7;
    */
   epochStartDateTime?: UInt32Filter;
 
   /**
-   * Filter by earliest_bid_date_time (optional)
+   * Filter by earliest_bid_date_time - The timestamp of the earliest bid for this block_hash from this builder (optional)
    *
-   * @generated from field: cbt.UInt64Filter earliest_bid_date_time = 8;
+   * @generated from field: cbt.Int64Filter earliest_bid_date_time = 8;
    */
-  earliestBidDateTime?: UInt64Filter;
+  earliestBidDateTime?: Int64Filter;
 
   /**
-   * Filter by relay_names (optional)
+   * Filter by relay_names - The relay that the bid was fetched from (optional)
    *
    * @generated from field: repeated string relay_names = 9;
    */
   relayNames: string[] = [];
 
   /**
-   * Filter by block_hash (optional)
+   * Filter by block_hash - The execution block hash of the bid (optional)
    *
    * @generated from field: cbt.StringFilter block_hash = 10;
    */
   blockHash?: StringFilter;
 
   /**
-   * Filter by value (optional)
+   * Filter by value - The transaction value in wei (optional)
    *
    * @generated from field: cbt.StringFilter value = 11;
    */
@@ -250,7 +250,7 @@ export class ListFctMevBidHighestValueByBuilderChunked50msRequest extends Messag
     { no: 5, name: "slot", kind: "message", T: UInt32Filter },
     { no: 6, name: "epoch", kind: "message", T: UInt32Filter },
     { no: 7, name: "epoch_start_date_time", kind: "message", T: UInt32Filter },
-    { no: 8, name: "earliest_bid_date_time", kind: "message", T: UInt64Filter },
+    { no: 8, name: "earliest_bid_date_time", kind: "message", T: Int64Filter },
     { no: 9, name: "relay_names", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
     { no: 10, name: "block_hash", kind: "message", T: StringFilter },
     { no: 11, name: "value", kind: "message", T: StringFilter },
@@ -277,7 +277,7 @@ export class ListFctMevBidHighestValueByBuilderChunked50msRequest extends Messag
 }
 
 /**
- * ListFctMevBidHighestValueByBuilderChunked50msResponse is the response message for listing fct_mev_bid_highest_value_by_builder_chunked_50ms records
+ * Response for listing fct_mev_bid_highest_value_by_builder_chunked_50ms records
  *
  * @generated from message cbt.ListFctMevBidHighestValueByBuilderChunked50msResponse
  */
@@ -327,7 +327,7 @@ export class ListFctMevBidHighestValueByBuilderChunked50msResponse extends Messa
 }
 
 /**
- * GetFctMevBidHighestValueByBuilderChunked50msRequest is the request message for getting a single fct_mev_bid_highest_value_by_builder_chunked_50ms record by primary key
+ * Request for getting a single fct_mev_bid_highest_value_by_builder_chunked_50ms record by primary key
  *
  * @generated from message cbt.GetFctMevBidHighestValueByBuilderChunked50msRequest
  */
@@ -370,7 +370,7 @@ export class GetFctMevBidHighestValueByBuilderChunked50msRequest extends Message
 }
 
 /**
- * GetFctMevBidHighestValueByBuilderChunked50msResponse is the response message for getting a single fct_mev_bid_highest_value_by_builder_chunked_50ms record
+ * Response for getting a single fct_mev_bid_highest_value_by_builder_chunked_50ms record
  *
  * @generated from message cbt.GetFctMevBidHighestValueByBuilderChunked50msResponse
  */

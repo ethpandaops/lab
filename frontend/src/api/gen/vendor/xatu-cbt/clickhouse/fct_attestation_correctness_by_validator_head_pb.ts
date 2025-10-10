@@ -111,69 +111,69 @@ export class FctAttestationCorrectnessByValidatorHead extends Message<FctAttesta
 }
 
 /**
- * ListFctAttestationCorrectnessByValidatorHeadRequest is the request message for listing fct_attestation_correctness_by_validator_head records
+ * Request for listing fct_attestation_correctness_by_validator_head records
  *
  * @generated from message cbt.ListFctAttestationCorrectnessByValidatorHeadRequest
  */
 export class ListFctAttestationCorrectnessByValidatorHeadRequest extends Message<ListFctAttestationCorrectnessByValidatorHeadRequest> {
   /**
-   * Filter by slot_start_date_time (PRIMARY KEY - required)
+   * Filter by slot_start_date_time - The wall clock time when the slot started (PRIMARY KEY - required)
    *
    * @generated from field: cbt.UInt32Filter slot_start_date_time = 1;
    */
   slotStartDateTime?: UInt32Filter;
 
   /**
-   * Filter by attesting_validator_index (ORDER BY column 2 - optional)
+   * Filter by attesting_validator_index - The index of the validator attesting (ORDER BY column 2 - optional)
    *
    * @generated from field: cbt.UInt32Filter attesting_validator_index = 2;
    */
   attestingValidatorIndex?: UInt32Filter;
 
   /**
-   * Filter by updated_date_time (optional)
+   * Filter by updated_date_time - Timestamp when the record was last updated (optional)
    *
    * @generated from field: cbt.UInt32Filter updated_date_time = 3;
    */
   updatedDateTime?: UInt32Filter;
 
   /**
-   * Filter by slot (optional)
+   * Filter by slot - The slot number (optional)
    *
    * @generated from field: cbt.UInt32Filter slot = 4;
    */
   slot?: UInt32Filter;
 
   /**
-   * Filter by epoch (optional)
+   * Filter by epoch - The epoch number containing the slot (optional)
    *
    * @generated from field: cbt.UInt32Filter epoch = 5;
    */
   epoch?: UInt32Filter;
 
   /**
-   * Filter by epoch_start_date_time (optional)
+   * Filter by epoch_start_date_time - The wall clock time when the epoch started (optional)
    *
    * @generated from field: cbt.UInt32Filter epoch_start_date_time = 6;
    */
   epochStartDateTime?: UInt32Filter;
 
   /**
-   * Filter by block_root (optional)
+   * Filter by block_root - The beacon block root hash that was attested, null means the attestation was missed (optional)
    *
    * @generated from field: cbt.NullableStringFilter block_root = 7;
    */
   blockRoot?: NullableStringFilter;
 
   /**
-   * Filter by slot_distance (optional)
+   * Filter by slot_distance - The distance from the slot to the attested block. If the attested block is the same as the slot, the distance is 0, if the attested block is the previous slot, the distance is 1, etc. If null, the attestation was missed, the block was orphaned and never seen by a sentry or the block was more than 64 slots ago (optional)
    *
    * @generated from field: cbt.NullableUInt32Filter slot_distance = 8;
    */
   slotDistance?: NullableUInt32Filter;
 
   /**
-   * Filter by propagation_distance (optional)
+   * Filter by propagation_distance - The distance from the slot when the attestation was propagated. 0 means the attestation was propagated within the same slot as its duty was assigned, 1 means the attestation was propagated within the next slot, etc. (optional)
    *
    * @generated from field: cbt.NullableUInt32Filter propagation_distance = 9;
    */
@@ -245,7 +245,7 @@ export class ListFctAttestationCorrectnessByValidatorHeadRequest extends Message
 }
 
 /**
- * ListFctAttestationCorrectnessByValidatorHeadResponse is the response message for listing fct_attestation_correctness_by_validator_head records
+ * Response for listing fct_attestation_correctness_by_validator_head records
  *
  * @generated from message cbt.ListFctAttestationCorrectnessByValidatorHeadResponse
  */
@@ -295,7 +295,7 @@ export class ListFctAttestationCorrectnessByValidatorHeadResponse extends Messag
 }
 
 /**
- * GetFctAttestationCorrectnessByValidatorHeadRequest is the request message for getting a single fct_attestation_correctness_by_validator_head record by primary key
+ * Request for getting a single fct_attestation_correctness_by_validator_head record by primary key
  *
  * @generated from message cbt.GetFctAttestationCorrectnessByValidatorHeadRequest
  */
@@ -338,7 +338,7 @@ export class GetFctAttestationCorrectnessByValidatorHeadRequest extends Message<
 }
 
 /**
- * GetFctAttestationCorrectnessByValidatorHeadResponse is the response message for getting a single fct_attestation_correctness_by_validator_head record
+ * Response for getting a single fct_attestation_correctness_by_validator_head record
  *
  * @generated from message cbt.GetFctAttestationCorrectnessByValidatorHeadResponse
  */

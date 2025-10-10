@@ -95,55 +95,55 @@ export class IntBeaconCommitteeHead extends Message<IntBeaconCommitteeHead> {
 }
 
 /**
- * ListIntBeaconCommitteeHeadRequest is the request message for listing int_beacon_committee_head records
+ * Request for listing int_beacon_committee_head records
  *
  * @generated from message cbt.ListIntBeaconCommitteeHeadRequest
  */
 export class ListIntBeaconCommitteeHeadRequest extends Message<ListIntBeaconCommitteeHeadRequest> {
   /**
-   * Filter by slot_start_date_time (PRIMARY KEY - required)
+   * Filter by slot_start_date_time - The wall clock time when the slot started (PRIMARY KEY - required)
    *
    * @generated from field: cbt.UInt32Filter slot_start_date_time = 1;
    */
   slotStartDateTime?: UInt32Filter;
 
   /**
-   * Filter by committee_index (ORDER BY column 2 - optional)
+   * Filter by committee_index - The committee index in the beacon API committee payload (ORDER BY column 2 - optional)
    *
    * @generated from field: cbt.StringFilter committee_index = 2;
    */
   committeeIndex?: StringFilter;
 
   /**
-   * Filter by updated_date_time (optional)
+   * Filter by updated_date_time - Timestamp when the record was last updated (optional)
    *
    * @generated from field: cbt.UInt32Filter updated_date_time = 3;
    */
   updatedDateTime?: UInt32Filter;
 
   /**
-   * Filter by slot (optional)
+   * Filter by slot - The slot number (optional)
    *
    * @generated from field: cbt.UInt32Filter slot = 4;
    */
   slot?: UInt32Filter;
 
   /**
-   * Filter by epoch (optional)
+   * Filter by epoch - The epoch number containing the slot (optional)
    *
    * @generated from field: cbt.UInt32Filter epoch = 5;
    */
   epoch?: UInt32Filter;
 
   /**
-   * Filter by epoch_start_date_time (optional)
+   * Filter by epoch_start_date_time - The wall clock time when the epoch started (optional)
    *
    * @generated from field: cbt.UInt32Filter epoch_start_date_time = 6;
    */
   epochStartDateTime?: UInt32Filter;
 
   /**
-   * Filter by validators (optional)
+   * Filter by validators - The validator indices in the beacon API committee payload (optional)
    *
    * @generated from field: repeated uint32 validators = 7;
    */
@@ -213,7 +213,7 @@ export class ListIntBeaconCommitteeHeadRequest extends Message<ListIntBeaconComm
 }
 
 /**
- * ListIntBeaconCommitteeHeadResponse is the response message for listing int_beacon_committee_head records
+ * Response for listing int_beacon_committee_head records
  *
  * @generated from message cbt.ListIntBeaconCommitteeHeadResponse
  */
@@ -263,7 +263,7 @@ export class ListIntBeaconCommitteeHeadResponse extends Message<ListIntBeaconCom
 }
 
 /**
- * GetIntBeaconCommitteeHeadRequest is the request message for getting a single int_beacon_committee_head record by primary key
+ * Request for getting a single int_beacon_committee_head record by primary key
  *
  * @generated from message cbt.GetIntBeaconCommitteeHeadRequest
  */
@@ -306,7 +306,7 @@ export class GetIntBeaconCommitteeHeadRequest extends Message<GetIntBeaconCommit
 }
 
 /**
- * GetIntBeaconCommitteeHeadResponse is the response message for getting a single int_beacon_committee_head record
+ * Response for getting a single int_beacon_committee_head record
  *
  * @generated from message cbt.GetIntBeaconCommitteeHeadResponse
  */
