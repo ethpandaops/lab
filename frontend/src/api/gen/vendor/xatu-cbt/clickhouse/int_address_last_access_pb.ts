@@ -55,20 +55,20 @@ export class IntAddressLastAccess extends Message<IntAddressLastAccess> {
 }
 
 /**
- * ListIntAddressLastAccessRequest is the request message for listing int_address_last_access records
+ * Request for listing int_address_last_access records
  *
  * @generated from message cbt.ListIntAddressLastAccessRequest
  */
 export class ListIntAddressLastAccessRequest extends Message<ListIntAddressLastAccessRequest> {
   /**
-   * Filter by address (PRIMARY KEY - required)
+   * Filter by address - The address of the account (PRIMARY KEY - required)
    *
    * @generated from field: cbt.StringFilter address = 1;
    */
   address?: StringFilter;
 
   /**
-   * Filter by block_number (optional)
+   * Filter by block_number - The block number of the last access (optional)
    *
    * @generated from field: cbt.UInt32Filter block_number = 2;
    */
@@ -133,7 +133,7 @@ export class ListIntAddressLastAccessRequest extends Message<ListIntAddressLastA
 }
 
 /**
- * ListIntAddressLastAccessResponse is the response message for listing int_address_last_access records
+ * Response for listing int_address_last_access records
  *
  * @generated from message cbt.ListIntAddressLastAccessResponse
  */
@@ -183,7 +183,7 @@ export class ListIntAddressLastAccessResponse extends Message<ListIntAddressLast
 }
 
 /**
- * GetIntAddressLastAccessRequest is the request message for getting a single int_address_last_access record by primary key
+ * Request for getting a single int_address_last_access record by primary key
  *
  * @generated from message cbt.GetIntAddressLastAccessRequest
  */
@@ -226,7 +226,7 @@ export class GetIntAddressLastAccessRequest extends Message<GetIntAddressLastAcc
 }
 
 /**
- * GetIntAddressLastAccessResponse is the response message for getting a single int_address_last_access record
+ * Response for getting a single int_address_last_access record
  *
  * @generated from message cbt.GetIntAddressLastAccessResponse
  */

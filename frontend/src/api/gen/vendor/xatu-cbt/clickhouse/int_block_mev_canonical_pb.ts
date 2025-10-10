@@ -4,8 +4,8 @@
 // @ts-nocheck
 
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
-import { Message, proto3, protoInt64, StringValue, UInt64Value } from "@bufbuild/protobuf";
-import { NullableStringFilter, NullableUInt64Filter, StringFilter, UInt32Filter, UInt64Filter } from "./common_pb.js";
+import { Int64Value, Message, proto3, protoInt64, StringValue } from "@bufbuild/protobuf";
+import { NullableInt64Filter, NullableStringFilter, StringFilter, UInt32Filter, UInt64Filter } from "./common_pb.js";
 
 /**
  * @generated from message cbt.IntBlockMevCanonical
@@ -56,7 +56,7 @@ export class IntBlockMevCanonical extends Message<IntBlockMevCanonical> {
   /**
    * The earliest timestamp of the accepted bid in milliseconds
    *
-   * @generated from field: google.protobuf.UInt64Value earliest_bid_date_time = 17;
+   * @generated from field: google.protobuf.Int64Value earliest_bid_date_time = 17;
    */
   earliestBidDateTime?: bigint;
 
@@ -151,7 +151,7 @@ export class IntBlockMevCanonical extends Message<IntBlockMevCanonical> {
     { no: 14, name: "epoch", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
     { no: 15, name: "epoch_start_date_time", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
     { no: 16, name: "block_root", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 17, name: "earliest_bid_date_time", kind: "message", T: UInt64Value },
+    { no: 17, name: "earliest_bid_date_time", kind: "message", T: Int64Value },
     { no: 18, name: "relay_names", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
     { no: 19, name: "parent_hash", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 20, name: "block_number", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
@@ -183,132 +183,132 @@ export class IntBlockMevCanonical extends Message<IntBlockMevCanonical> {
 }
 
 /**
- * ListIntBlockMevCanonicalRequest is the request message for listing int_block_mev_canonical records
+ * Request for listing int_block_mev_canonical records
  *
  * @generated from message cbt.ListIntBlockMevCanonicalRequest
  */
 export class ListIntBlockMevCanonicalRequest extends Message<ListIntBlockMevCanonicalRequest> {
   /**
-   * Filter by slot_start_date_time (PRIMARY KEY - required)
+   * Filter by slot_start_date_time - The start time for the slot that the proposer payload is for (PRIMARY KEY - required)
    *
    * @generated from field: cbt.UInt32Filter slot_start_date_time = 1;
    */
   slotStartDateTime?: UInt32Filter;
 
   /**
-   * Filter by block_root (ORDER BY column 2 - optional)
+   * Filter by block_root - The root hash of the beacon block (ORDER BY column 2 - optional)
    *
    * @generated from field: cbt.StringFilter block_root = 2;
    */
   blockRoot?: StringFilter;
 
   /**
-   * Filter by updated_date_time (optional)
+   * Filter by updated_date_time - Timestamp when the record was last updated (optional)
    *
    * @generated from field: cbt.UInt32Filter updated_date_time = 3;
    */
   updatedDateTime?: UInt32Filter;
 
   /**
-   * Filter by slot (optional)
+   * Filter by slot - Slot number within the block proposer payload (optional)
    *
    * @generated from field: cbt.UInt32Filter slot = 4;
    */
   slot?: UInt32Filter;
 
   /**
-   * Filter by epoch (optional)
+   * Filter by epoch - Epoch number derived from the slot that the proposer payload is for (optional)
    *
    * @generated from field: cbt.UInt32Filter epoch = 5;
    */
   epoch?: UInt32Filter;
 
   /**
-   * Filter by epoch_start_date_time (optional)
+   * Filter by epoch_start_date_time - The start time for the epoch that the proposer payload is for (optional)
    *
    * @generated from field: cbt.UInt32Filter epoch_start_date_time = 6;
    */
   epochStartDateTime?: UInt32Filter;
 
   /**
-   * Filter by earliest_bid_date_time (optional)
+   * Filter by earliest_bid_date_time - The earliest timestamp of the accepted bid in milliseconds (optional)
    *
-   * @generated from field: cbt.NullableUInt64Filter earliest_bid_date_time = 7;
+   * @generated from field: cbt.NullableInt64Filter earliest_bid_date_time = 7;
    */
-  earliestBidDateTime?: NullableUInt64Filter;
+  earliestBidDateTime?: NullableInt64Filter;
 
   /**
-   * Filter by relay_names (optional)
+   * Filter by relay_names - The relay names that delivered the proposer payload (optional)
    *
    * @generated from field: repeated string relay_names = 8;
    */
   relayNames: string[] = [];
 
   /**
-   * Filter by parent_hash (optional)
+   * Filter by parent_hash - The parent hash of the proposer payload (optional)
    *
    * @generated from field: cbt.StringFilter parent_hash = 9;
    */
   parentHash?: StringFilter;
 
   /**
-   * Filter by block_number (optional)
+   * Filter by block_number - The block number of the proposer payload (optional)
    *
    * @generated from field: cbt.UInt64Filter block_number = 10;
    */
   blockNumber?: UInt64Filter;
 
   /**
-   * Filter by block_hash (optional)
+   * Filter by block_hash - The block hash of the proposer payload (optional)
    *
    * @generated from field: cbt.StringFilter block_hash = 11;
    */
   blockHash?: StringFilter;
 
   /**
-   * Filter by builder_pubkey (optional)
+   * Filter by builder_pubkey - The builder pubkey of the proposer payload (optional)
    *
    * @generated from field: cbt.StringFilter builder_pubkey = 12;
    */
   builderPubkey?: StringFilter;
 
   /**
-   * Filter by proposer_pubkey (optional)
+   * Filter by proposer_pubkey - The proposer pubkey of the proposer payload (optional)
    *
    * @generated from field: cbt.StringFilter proposer_pubkey = 13;
    */
   proposerPubkey?: StringFilter;
 
   /**
-   * Filter by proposer_fee_recipient (optional)
+   * Filter by proposer_fee_recipient - The proposer fee recipient of the proposer payload (optional)
    *
    * @generated from field: cbt.StringFilter proposer_fee_recipient = 14;
    */
   proposerFeeRecipient?: StringFilter;
 
   /**
-   * Filter by gas_limit (optional)
+   * Filter by gas_limit - The gas limit of the proposer payload (optional)
    *
    * @generated from field: cbt.UInt64Filter gas_limit = 15;
    */
   gasLimit?: UInt64Filter;
 
   /**
-   * Filter by gas_used (optional)
+   * Filter by gas_used - The gas used of the proposer payload (optional)
    *
    * @generated from field: cbt.UInt64Filter gas_used = 16;
    */
   gasUsed?: UInt64Filter;
 
   /**
-   * Filter by value (optional)
+   * Filter by value - The transaction value in wei (optional)
    *
    * @generated from field: cbt.NullableStringFilter value = 17;
    */
   value?: NullableStringFilter;
 
   /**
-   * Filter by transaction_count (optional)
+   * Filter by transaction_count - The number of transactions in the proposer payload (optional)
    *
    * @generated from field: cbt.UInt32Filter transaction_count = 18;
    */
@@ -354,7 +354,7 @@ export class ListIntBlockMevCanonicalRequest extends Message<ListIntBlockMevCano
     { no: 4, name: "slot", kind: "message", T: UInt32Filter },
     { no: 5, name: "epoch", kind: "message", T: UInt32Filter },
     { no: 6, name: "epoch_start_date_time", kind: "message", T: UInt32Filter },
-    { no: 7, name: "earliest_bid_date_time", kind: "message", T: NullableUInt64Filter },
+    { no: 7, name: "earliest_bid_date_time", kind: "message", T: NullableInt64Filter },
     { no: 8, name: "relay_names", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
     { no: 9, name: "parent_hash", kind: "message", T: StringFilter },
     { no: 10, name: "block_number", kind: "message", T: UInt64Filter },
@@ -389,7 +389,7 @@ export class ListIntBlockMevCanonicalRequest extends Message<ListIntBlockMevCano
 }
 
 /**
- * ListIntBlockMevCanonicalResponse is the response message for listing int_block_mev_canonical records
+ * Response for listing int_block_mev_canonical records
  *
  * @generated from message cbt.ListIntBlockMevCanonicalResponse
  */
@@ -439,7 +439,7 @@ export class ListIntBlockMevCanonicalResponse extends Message<ListIntBlockMevCan
 }
 
 /**
- * GetIntBlockMevCanonicalRequest is the request message for getting a single int_block_mev_canonical record by primary key
+ * Request for getting a single int_block_mev_canonical record by primary key
  *
  * @generated from message cbt.GetIntBlockMevCanonicalRequest
  */
@@ -482,7 +482,7 @@ export class GetIntBlockMevCanonicalRequest extends Message<GetIntBlockMevCanoni
 }
 
 /**
- * GetIntBlockMevCanonicalResponse is the response message for getting a single int_block_mev_canonical record
+ * Response for getting a single int_block_mev_canonical record
  *
  * @generated from message cbt.GetIntBlockMevCanonicalResponse
  */

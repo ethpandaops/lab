@@ -3,8 +3,6 @@ package xatu_cbt
 import (
 	"context"
 	"fmt"
-	"math/big"
-	"time"
 
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/clickhouse"
 	cbtproto "github.com/ethpandaops/xatu-cbt/pkg/proto/clickhouse"
@@ -98,40 +96,27 @@ func scanFctMevBidHighestValueByBuilderChunked50ms(
 	scanner clickhouse.RowScanner,
 ) (*cbtproto.FctMevBidHighestValueByBuilderChunked50Ms, error) {
 	var (
-		builder                            cbtproto.FctMevBidHighestValueByBuilderChunked50Ms
-		updatedDateTime, slotStartDateTime time.Time
-		epochStartDateTime                 time.Time
-		earliestBidDateTime                time.Time
-		relayNames                         []string
-		value                              *big.Int
+		builder    cbtproto.FctMevBidHighestValueByBuilderChunked50Ms
+		relayNames []string
 	)
 
 	if err := scanner.Scan(
-		&updatedDateTime,
+		&builder.UpdatedDateTime,
 		&builder.Slot,
-		&slotStartDateTime,
+		&builder.SlotStartDateTime,
 		&builder.Epoch,
-		&epochStartDateTime,
+		&builder.EpochStartDateTime,
 		&builder.ChunkSlotStartDiff,
-		&earliestBidDateTime,
+		&builder.EarliestBidDateTime,
 		&relayNames,
 		&builder.BlockHash,
 		&builder.BuilderPubkey,
-		&value,
+		&builder.Value,
 	); err != nil {
 		return nil, fmt.Errorf("failed to scan row: %w", err)
 	}
 
-	builder.UpdatedDateTime = uint32(updatedDateTime.Unix())              //nolint:gosec // safe.
-	builder.SlotStartDateTime = uint32(slotStartDateTime.Unix())          //nolint:gosec // safe.
-	builder.EpochStartDateTime = uint32(epochStartDateTime.Unix())        //nolint:gosec // safe.
-	builder.EarliestBidDateTime = uint64(earliestBidDateTime.UnixMilli()) //nolint:gosec // safe.
 	builder.RelayNames = relayNames
-
-	// Convert big.Int to string
-	if value != nil {
-		builder.Value = value.String()
-	}
 
 	return &builder, nil
 }

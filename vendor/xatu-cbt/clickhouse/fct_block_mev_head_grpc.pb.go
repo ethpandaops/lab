@@ -27,11 +27,11 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// FctBlockMevHeadService provides RPC methods for querying fct_block_mev_head data
+// Query fct_block_mev_head data
 type FctBlockMevHeadServiceClient interface {
-	// List returns paginated fct_block_mev_head records
+	// List records | Retrieve paginated results with optional filtering
 	List(ctx context.Context, in *ListFctBlockMevHeadRequest, opts ...grpc.CallOption) (*ListFctBlockMevHeadResponse, error)
-	// Get returns a single fct_block_mev_head record by primary key
+	// Get record | Retrieve a single record by slot_start_date_time
 	Get(ctx context.Context, in *GetFctBlockMevHeadRequest, opts ...grpc.CallOption) (*GetFctBlockMevHeadResponse, error)
 }
 
@@ -67,11 +67,11 @@ func (c *fctBlockMevHeadServiceClient) Get(ctx context.Context, in *GetFctBlockM
 // All implementations must embed UnimplementedFctBlockMevHeadServiceServer
 // for forward compatibility
 //
-// FctBlockMevHeadService provides RPC methods for querying fct_block_mev_head data
+// Query fct_block_mev_head data
 type FctBlockMevHeadServiceServer interface {
-	// List returns paginated fct_block_mev_head records
+	// List records | Retrieve paginated results with optional filtering
 	List(context.Context, *ListFctBlockMevHeadRequest) (*ListFctBlockMevHeadResponse, error)
-	// Get returns a single fct_block_mev_head record by primary key
+	// Get record | Retrieve a single record by slot_start_date_time
 	Get(context.Context, *GetFctBlockMevHeadRequest) (*GetFctBlockMevHeadResponse, error)
 	mustEmbedUnimplementedFctBlockMevHeadServiceServer()
 }

@@ -49,27 +49,35 @@ func BuildListAdminCbtQuery(req *ListAdminCbtRequest, options ...QueryOption) (S
 	// Add filter for column: updated_date_time
 	if req.UpdatedDateTime != nil {
 		switch filter := req.UpdatedDateTime.Filter.(type) {
-		case *UInt64Filter_Eq:
-			qb.AddCondition("updated_date_time", "=", filter.Eq)
-		case *UInt64Filter_Ne:
-			qb.AddCondition("updated_date_time", "!=", filter.Ne)
-		case *UInt64Filter_Lt:
-			qb.AddCondition("updated_date_time", "<", filter.Lt)
-		case *UInt64Filter_Lte:
-			qb.AddCondition("updated_date_time", "<=", filter.Lte)
-		case *UInt64Filter_Gt:
-			qb.AddCondition("updated_date_time", ">", filter.Gt)
-		case *UInt64Filter_Gte:
-			qb.AddCondition("updated_date_time", ">=", filter.Gte)
-		case *UInt64Filter_Between:
-			qb.AddBetweenCondition("updated_date_time", filter.Between.Min, filter.Between.Max)
-		case *UInt64Filter_In:
+		case *Int64Filter_Eq:
+			qb.AddCondition("updated_date_time", "=", DateTime64Value{uint64(filter.Eq)})
+		case *Int64Filter_Ne:
+			qb.AddCondition("updated_date_time", "!=", DateTime64Value{uint64(filter.Ne)})
+		case *Int64Filter_Lt:
+			qb.AddCondition("updated_date_time", "<", DateTime64Value{uint64(filter.Lt)})
+		case *Int64Filter_Lte:
+			qb.AddCondition("updated_date_time", "<=", DateTime64Value{uint64(filter.Lte)})
+		case *Int64Filter_Gt:
+			qb.AddCondition("updated_date_time", ">", DateTime64Value{uint64(filter.Gt)})
+		case *Int64Filter_Gte:
+			qb.AddCondition("updated_date_time", ">=", DateTime64Value{uint64(filter.Gte)})
+		case *Int64Filter_Between:
+			qb.AddBetweenCondition("updated_date_time", DateTime64Value{uint64(filter.Between.Min)}, DateTime64Value{uint64(filter.Between.Max.GetValue())})
+		case *Int64Filter_In:
 			if len(filter.In.Values) > 0 {
-				qb.AddInCondition("updated_date_time", UInt64SliceToInterface(filter.In.Values))
+				converted := make([]interface{}, len(filter.In.Values))
+				for i, v := range filter.In.Values {
+					converted[i] = DateTime64Value{uint64(v)}
+				}
+				qb.AddInCondition("updated_date_time", converted)
 			}
-		case *UInt64Filter_NotIn:
+		case *Int64Filter_NotIn:
 			if len(filter.NotIn.Values) > 0 {
-				qb.AddNotInCondition("updated_date_time", UInt64SliceToInterface(filter.NotIn.Values))
+				converted := make([]interface{}, len(filter.NotIn.Values))
+				for i, v := range filter.NotIn.Values {
+					converted[i] = DateTime64Value{uint64(v)}
+				}
+				qb.AddNotInCondition("updated_date_time", converted)
 			}
 		default:
 			// Unsupported filter type
@@ -122,7 +130,7 @@ func BuildListAdminCbtQuery(req *ListAdminCbtRequest, options ...QueryOption) (S
 		case *UInt64Filter_Gte:
 			qb.AddCondition("position", ">=", filter.Gte)
 		case *UInt64Filter_Between:
-			qb.AddBetweenCondition("position", filter.Between.Min, filter.Between.Max)
+			qb.AddBetweenCondition("position", filter.Between.Min, filter.Between.Max.GetValue())
 		case *UInt64Filter_In:
 			if len(filter.In.Values) > 0 {
 				qb.AddInCondition("position", UInt64SliceToInterface(filter.In.Values))
@@ -152,7 +160,7 @@ func BuildListAdminCbtQuery(req *ListAdminCbtRequest, options ...QueryOption) (S
 		case *UInt64Filter_Gte:
 			qb.AddCondition("interval", ">=", filter.Gte)
 		case *UInt64Filter_Between:
-			qb.AddBetweenCondition("interval", filter.Between.Min, filter.Between.Max)
+			qb.AddBetweenCondition("interval", filter.Between.Min, filter.Between.Max.GetValue())
 		case *UInt64Filter_In:
 			if len(filter.In.Values) > 0 {
 				qb.AddInCondition("interval", UInt64SliceToInterface(filter.In.Values))
@@ -203,7 +211,7 @@ func BuildListAdminCbtQuery(req *ListAdminCbtRequest, options ...QueryOption) (S
 	}
 
 	// Build column list
-	columns := []string{"updated_date_time", "database", "table", "position", "interval"}
+	columns := []string{"toUnixTimestamp64Micro(`updated_date_time`) AS `updated_date_time`", "database", "table", "position", "interval"}
 
 	return BuildParameterizedQuery("admin_cbt", columns, qb, orderByClause, limit, offset, options...)
 }
@@ -223,7 +231,7 @@ func BuildGetAdminCbtQuery(req *GetAdminCbtRequest, options ...QueryOption) (SQL
 	orderByClause := " ORDER BY database, `table`, position"
 
 	// Build column list
-	columns := []string{"updated_date_time", "database", "table", "position", "interval"}
+	columns := []string{"toUnixTimestamp64Micro(`updated_date_time`) AS `updated_date_time`", "database", "table", "position", "interval"}
 
 	// Return single record
 	return BuildParameterizedQuery("admin_cbt", columns, qb, orderByClause, 1, 0, options...)

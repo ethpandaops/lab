@@ -27,11 +27,11 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// FctMevBidCountByRelayService provides RPC methods for querying fct_mev_bid_count_by_relay data
+// Query fct_mev_bid_count_by_relay data
 type FctMevBidCountByRelayServiceClient interface {
-	// List returns paginated fct_mev_bid_count_by_relay records
+	// List records | Retrieve paginated results with optional filtering
 	List(ctx context.Context, in *ListFctMevBidCountByRelayRequest, opts ...grpc.CallOption) (*ListFctMevBidCountByRelayResponse, error)
-	// Get returns a single fct_mev_bid_count_by_relay record by primary key
+	// Get record | Retrieve a single record by slot_start_date_time
 	Get(ctx context.Context, in *GetFctMevBidCountByRelayRequest, opts ...grpc.CallOption) (*GetFctMevBidCountByRelayResponse, error)
 }
 
@@ -67,11 +67,11 @@ func (c *fctMevBidCountByRelayServiceClient) Get(ctx context.Context, in *GetFct
 // All implementations must embed UnimplementedFctMevBidCountByRelayServiceServer
 // for forward compatibility
 //
-// FctMevBidCountByRelayService provides RPC methods for querying fct_mev_bid_count_by_relay data
+// Query fct_mev_bid_count_by_relay data
 type FctMevBidCountByRelayServiceServer interface {
-	// List returns paginated fct_mev_bid_count_by_relay records
+	// List records | Retrieve paginated results with optional filtering
 	List(context.Context, *ListFctMevBidCountByRelayRequest) (*ListFctMevBidCountByRelayResponse, error)
-	// Get returns a single fct_mev_bid_count_by_relay record by primary key
+	// Get record | Retrieve a single record by slot_start_date_time
 	Get(context.Context, *GetFctMevBidCountByRelayRequest) (*GetFctMevBidCountByRelayResponse, error)
 	mustEmbedUnimplementedFctMevBidCountByRelayServiceServer()
 }

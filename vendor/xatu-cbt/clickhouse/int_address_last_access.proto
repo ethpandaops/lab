@@ -14,12 +14,12 @@ message IntAddressLastAccess {
   uint32 block_number = 12;
 }
 
-// ListIntAddressLastAccessRequest is the request message for listing int_address_last_access records
+// Request for listing int_address_last_access records
 message ListIntAddressLastAccessRequest {
-  // Filter by address (PRIMARY KEY - required)
+  // Filter by address - The address of the account (PRIMARY KEY - required)
   StringFilter address = 1;
 
-  // Filter by block_number (optional)
+  // Filter by block_number - The block number of the last access (optional)
   UInt32Filter block_number = 2;
 
   // The maximum number of int_address_last_access to return.
@@ -35,7 +35,7 @@ message ListIntAddressLastAccessRequest {
   string order_by = 5;
 }
 
-// ListIntAddressLastAccessResponse is the response message for listing int_address_last_access records
+// Response for listing int_address_last_access records
 message ListIntAddressLastAccessResponse {
   // The list of int_address_last_access.
   repeated IntAddressLastAccess int_address_last_access = 1;
@@ -44,21 +44,21 @@ message ListIntAddressLastAccessResponse {
   string next_page_token = 2;
 }
 
-// GetIntAddressLastAccessRequest is the request message for getting a single int_address_last_access record by primary key
+// Request for getting a single int_address_last_access record by primary key
 message GetIntAddressLastAccessRequest {
   // The address of the account
   string address = 1; // Primary key (required)
 }
 
-// GetIntAddressLastAccessResponse is the response message for getting a single int_address_last_access record
+// Response for getting a single int_address_last_access record
 message GetIntAddressLastAccessResponse {
   IntAddressLastAccess item = 1;
 }
 
-// IntAddressLastAccessService provides RPC methods for querying int_address_last_access data
+// Query int_address_last_access data
 service IntAddressLastAccessService {
-  // List returns paginated int_address_last_access records
+  // List records | Retrieve paginated results with optional filtering
   rpc List(ListIntAddressLastAccessRequest) returns (ListIntAddressLastAccessResponse);
-  // Get returns a single int_address_last_access record by primary key
+  // Get record | Retrieve a single record by primary key
   rpc Get(GetIntAddressLastAccessRequest) returns (GetIntAddressLastAccessResponse);
 }

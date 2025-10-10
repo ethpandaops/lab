@@ -16,14 +16,14 @@ message IntAddressFirstAccess {
   uint32 version = 13;
 }
 
-// ListIntAddressFirstAccessRequest is the request message for listing int_address_first_access records
+// Request for listing int_address_first_access records
 message ListIntAddressFirstAccessRequest {
-  // Filter by address (PRIMARY KEY - required)
+  // Filter by address - The address of the account (PRIMARY KEY - required)
   StringFilter address = 1;
 
-  // Filter by block_number (optional)
+  // Filter by block_number - The block number of the first access (optional)
   UInt32Filter block_number = 2;
-  // Filter by version (optional)
+  // Filter by version - Version for this address, for internal use in clickhouse to keep first access (optional)
   UInt32Filter version = 3;
 
   // The maximum number of int_address_first_access to return.
@@ -39,7 +39,7 @@ message ListIntAddressFirstAccessRequest {
   string order_by = 6;
 }
 
-// ListIntAddressFirstAccessResponse is the response message for listing int_address_first_access records
+// Response for listing int_address_first_access records
 message ListIntAddressFirstAccessResponse {
   // The list of int_address_first_access.
   repeated IntAddressFirstAccess int_address_first_access = 1;
@@ -48,21 +48,21 @@ message ListIntAddressFirstAccessResponse {
   string next_page_token = 2;
 }
 
-// GetIntAddressFirstAccessRequest is the request message for getting a single int_address_first_access record by primary key
+// Request for getting a single int_address_first_access record by primary key
 message GetIntAddressFirstAccessRequest {
   // The address of the account
   string address = 1; // Primary key (required)
 }
 
-// GetIntAddressFirstAccessResponse is the response message for getting a single int_address_first_access record
+// Response for getting a single int_address_first_access record
 message GetIntAddressFirstAccessResponse {
   IntAddressFirstAccess item = 1;
 }
 
-// IntAddressFirstAccessService provides RPC methods for querying int_address_first_access data
+// Query int_address_first_access data
 service IntAddressFirstAccessService {
-  // List returns paginated int_address_first_access records
+  // List records | Retrieve paginated results with optional filtering
   rpc List(ListIntAddressFirstAccessRequest) returns (ListIntAddressFirstAccessResponse);
-  // Get returns a single int_address_first_access record by primary key
+  // Get record | Retrieve a single record by primary key
   rpc Get(GetIntAddressFirstAccessRequest) returns (GetIntAddressFirstAccessResponse);
 }

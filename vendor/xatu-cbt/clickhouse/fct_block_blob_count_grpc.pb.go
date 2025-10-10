@@ -27,11 +27,11 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// FctBlockBlobCountService provides RPC methods for querying fct_block_blob_count data
+// Query fct_block_blob_count data
 type FctBlockBlobCountServiceClient interface {
-	// List returns paginated fct_block_blob_count records
+	// List records | Retrieve paginated results with optional filtering
 	List(ctx context.Context, in *ListFctBlockBlobCountRequest, opts ...grpc.CallOption) (*ListFctBlockBlobCountResponse, error)
-	// Get returns a single fct_block_blob_count record by primary key
+	// Get record | Retrieve a single record by slot_start_date_time
 	Get(ctx context.Context, in *GetFctBlockBlobCountRequest, opts ...grpc.CallOption) (*GetFctBlockBlobCountResponse, error)
 }
 
@@ -67,11 +67,11 @@ func (c *fctBlockBlobCountServiceClient) Get(ctx context.Context, in *GetFctBloc
 // All implementations must embed UnimplementedFctBlockBlobCountServiceServer
 // for forward compatibility
 //
-// FctBlockBlobCountService provides RPC methods for querying fct_block_blob_count data
+// Query fct_block_blob_count data
 type FctBlockBlobCountServiceServer interface {
-	// List returns paginated fct_block_blob_count records
+	// List records | Retrieve paginated results with optional filtering
 	List(context.Context, *ListFctBlockBlobCountRequest) (*ListFctBlockBlobCountResponse, error)
-	// Get returns a single fct_block_blob_count record by primary key
+	// Get record | Retrieve a single record by slot_start_date_time
 	Get(context.Context, *GetFctBlockBlobCountRequest) (*GetFctBlockBlobCountResponse, error)
 	mustEmbedUnimplementedFctBlockBlobCountServiceServer()
 }

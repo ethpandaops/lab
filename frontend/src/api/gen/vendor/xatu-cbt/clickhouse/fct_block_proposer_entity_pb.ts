@@ -87,48 +87,48 @@ export class FctBlockProposerEntity extends Message<FctBlockProposerEntity> {
 }
 
 /**
- * ListFctBlockProposerEntityRequest is the request message for listing fct_block_proposer_entity records
+ * Request for listing fct_block_proposer_entity records
  *
  * @generated from message cbt.ListFctBlockProposerEntityRequest
  */
 export class ListFctBlockProposerEntityRequest extends Message<ListFctBlockProposerEntityRequest> {
   /**
-   * Filter by slot_start_date_time (PRIMARY KEY - required)
+   * Filter by slot_start_date_time - The wall clock time when the slot started (PRIMARY KEY - required unless using alternatives: slot)
    *
    * @generated from field: cbt.UInt32Filter slot_start_date_time = 1;
    */
   slotStartDateTime?: UInt32Filter;
 
   /**
-   * Filter by updated_date_time (optional)
+   * Filter by updated_date_time - Timestamp when the record was last updated (optional)
    *
    * @generated from field: cbt.UInt32Filter updated_date_time = 2;
    */
   updatedDateTime?: UInt32Filter;
 
   /**
-   * Filter by slot (optional)
+   * Filter by slot - The slot number (PROJECTION: p_by_slot - alternative to slot_start_date_time)
    *
    * @generated from field: cbt.UInt32Filter slot = 3;
    */
   slot?: UInt32Filter;
 
   /**
-   * Filter by epoch (optional)
+   * Filter by epoch - The epoch number containing the slot (optional)
    *
    * @generated from field: cbt.UInt32Filter epoch = 4;
    */
   epoch?: UInt32Filter;
 
   /**
-   * Filter by epoch_start_date_time (optional)
+   * Filter by epoch_start_date_time - The wall clock time when the epoch started (optional)
    *
    * @generated from field: cbt.UInt32Filter epoch_start_date_time = 5;
    */
   epochStartDateTime?: UInt32Filter;
 
   /**
-   * Filter by entity (optional)
+   * Filter by entity - The entity that proposed the block (optional)
    *
    * @generated from field: cbt.NullableStringFilter entity = 6;
    */
@@ -197,7 +197,7 @@ export class ListFctBlockProposerEntityRequest extends Message<ListFctBlockPropo
 }
 
 /**
- * ListFctBlockProposerEntityResponse is the response message for listing fct_block_proposer_entity records
+ * Response for listing fct_block_proposer_entity records
  *
  * @generated from message cbt.ListFctBlockProposerEntityResponse
  */
@@ -247,7 +247,7 @@ export class ListFctBlockProposerEntityResponse extends Message<ListFctBlockProp
 }
 
 /**
- * GetFctBlockProposerEntityRequest is the request message for getting a single fct_block_proposer_entity record by primary key
+ * Request for getting a single fct_block_proposer_entity record by primary key
  *
  * @generated from message cbt.GetFctBlockProposerEntityRequest
  */
@@ -290,7 +290,7 @@ export class GetFctBlockProposerEntityRequest extends Message<GetFctBlockPropose
 }
 
 /**
- * GetFctBlockProposerEntityResponse is the response message for getting a single fct_block_proposer_entity record
+ * Response for getting a single fct_block_proposer_entity record
  *
  * @generated from message cbt.GetFctBlockProposerEntityResponse
  */

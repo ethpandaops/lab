@@ -27,11 +27,11 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// FctMevBidHighestValueByBuilderChunked50msService provides RPC methods for querying fct_mev_bid_highest_value_by_builder_chunked_50ms data
+// Query fct_mev_bid_highest_value_by_builder_chunked_50ms data
 type FctMevBidHighestValueByBuilderChunked50MsServiceClient interface {
-	// List returns paginated fct_mev_bid_highest_value_by_builder_chunked_50ms records
+	// List records | Retrieve paginated results with optional filtering
 	List(ctx context.Context, in *ListFctMevBidHighestValueByBuilderChunked50MsRequest, opts ...grpc.CallOption) (*ListFctMevBidHighestValueByBuilderChunked50MsResponse, error)
-	// Get returns a single fct_mev_bid_highest_value_by_builder_chunked_50ms record by primary key
+	// Get record | Retrieve a single record by slot_start_date_time
 	Get(ctx context.Context, in *GetFctMevBidHighestValueByBuilderChunked50MsRequest, opts ...grpc.CallOption) (*GetFctMevBidHighestValueByBuilderChunked50MsResponse, error)
 }
 
@@ -67,11 +67,11 @@ func (c *fctMevBidHighestValueByBuilderChunked50MsServiceClient) Get(ctx context
 // All implementations must embed UnimplementedFctMevBidHighestValueByBuilderChunked50MsServiceServer
 // for forward compatibility
 //
-// FctMevBidHighestValueByBuilderChunked50msService provides RPC methods for querying fct_mev_bid_highest_value_by_builder_chunked_50ms data
+// Query fct_mev_bid_highest_value_by_builder_chunked_50ms data
 type FctMevBidHighestValueByBuilderChunked50MsServiceServer interface {
-	// List returns paginated fct_mev_bid_highest_value_by_builder_chunked_50ms records
+	// List records | Retrieve paginated results with optional filtering
 	List(context.Context, *ListFctMevBidHighestValueByBuilderChunked50MsRequest) (*ListFctMevBidHighestValueByBuilderChunked50MsResponse, error)
-	// Get returns a single fct_mev_bid_highest_value_by_builder_chunked_50ms record by primary key
+	// Get record | Retrieve a single record by slot_start_date_time
 	Get(context.Context, *GetFctMevBidHighestValueByBuilderChunked50MsRequest) (*GetFctMevBidHighestValueByBuilderChunked50MsResponse, error)
 	mustEmbedUnimplementedFctMevBidHighestValueByBuilderChunked50MsServiceServer()
 }

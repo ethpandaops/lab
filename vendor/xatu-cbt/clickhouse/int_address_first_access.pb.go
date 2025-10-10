@@ -86,17 +86,17 @@ func (x *IntAddressFirstAccess) GetVersion() uint32 {
 	return 0
 }
 
-// ListIntAddressFirstAccessRequest is the request message for listing int_address_first_access records
+// Request for listing int_address_first_access records
 type ListIntAddressFirstAccessRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Filter by address (PRIMARY KEY - required)
+	// Filter by address - The address of the account (PRIMARY KEY - required)
 	Address *StringFilter `protobuf:"bytes,1,opt,name=address,proto3" json:"address,omitempty"`
-	// Filter by block_number (optional)
+	// Filter by block_number - The block number of the first access (optional)
 	BlockNumber *UInt32Filter `protobuf:"bytes,2,opt,name=block_number,json=blockNumber,proto3" json:"block_number,omitempty"`
-	// Filter by version (optional)
+	// Filter by version - Version for this address, for internal use in clickhouse to keep first access (optional)
 	Version *UInt32Filter `protobuf:"bytes,3,opt,name=version,proto3" json:"version,omitempty"`
 	// The maximum number of int_address_first_access to return.
 	// If unspecified, at most 100 items will be returned.
@@ -185,7 +185,7 @@ func (x *ListIntAddressFirstAccessRequest) GetOrderBy() string {
 	return ""
 }
 
-// ListIntAddressFirstAccessResponse is the response message for listing int_address_first_access records
+// Response for listing int_address_first_access records
 type ListIntAddressFirstAccessResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -244,7 +244,7 @@ func (x *ListIntAddressFirstAccessResponse) GetNextPageToken() string {
 	return ""
 }
 
-// GetIntAddressFirstAccessRequest is the request message for getting a single int_address_first_access record by primary key
+// Request for getting a single int_address_first_access record by primary key
 type GetIntAddressFirstAccessRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -293,7 +293,7 @@ func (x *GetIntAddressFirstAccessRequest) GetAddress() string {
 	return ""
 }
 
-// GetIntAddressFirstAccessResponse is the response message for getting a single int_address_first_access record
+// Response for getting a single int_address_first_access record
 type GetIntAddressFirstAccessResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache

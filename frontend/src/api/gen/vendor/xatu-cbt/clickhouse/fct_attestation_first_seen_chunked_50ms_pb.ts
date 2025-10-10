@@ -103,62 +103,62 @@ export class FctAttestationFirstSeenChunked50ms extends Message<FctAttestationFi
 }
 
 /**
- * ListFctAttestationFirstSeenChunked50msRequest is the request message for listing fct_attestation_first_seen_chunked_50ms records
+ * Request for listing fct_attestation_first_seen_chunked_50ms records
  *
  * @generated from message cbt.ListFctAttestationFirstSeenChunked50msRequest
  */
 export class ListFctAttestationFirstSeenChunked50msRequest extends Message<ListFctAttestationFirstSeenChunked50msRequest> {
   /**
-   * Filter by slot_start_date_time (PRIMARY KEY - required)
+   * Filter by slot_start_date_time - The wall clock time when the slot started (PRIMARY KEY - required unless using alternatives: slot)
    *
    * @generated from field: cbt.UInt32Filter slot_start_date_time = 1;
    */
   slotStartDateTime?: UInt32Filter;
 
   /**
-   * Filter by block_root (ORDER BY column 2 - optional)
+   * Filter by block_root - The beacon block root hash that was attested, null means the attestation was missed (ORDER BY column 2 - optional)
    *
    * @generated from field: cbt.StringFilter block_root = 2;
    */
   blockRoot?: StringFilter;
 
   /**
-   * Filter by chunk_slot_start_diff (ORDER BY column 3 - optional)
+   * Filter by chunk_slot_start_diff - The different between the chunk start time and slot_start_date_time. "1500" would mean this chunk contains attestations first seen between 1500ms 1550ms into the slot (ORDER BY column 3 - optional)
    *
    * @generated from field: cbt.UInt32Filter chunk_slot_start_diff = 3;
    */
   chunkSlotStartDiff?: UInt32Filter;
 
   /**
-   * Filter by updated_date_time (optional)
+   * Filter by updated_date_time - Timestamp when the record was last updated (optional)
    *
    * @generated from field: cbt.UInt32Filter updated_date_time = 4;
    */
   updatedDateTime?: UInt32Filter;
 
   /**
-   * Filter by slot (optional)
+   * Filter by slot - The slot number (PROJECTION: p_by_slot - alternative to slot_start_date_time)
    *
    * @generated from field: cbt.UInt32Filter slot = 5;
    */
   slot?: UInt32Filter;
 
   /**
-   * Filter by epoch (optional)
+   * Filter by epoch - The epoch number containing the slot (optional)
    *
    * @generated from field: cbt.UInt32Filter epoch = 6;
    */
   epoch?: UInt32Filter;
 
   /**
-   * Filter by epoch_start_date_time (optional)
+   * Filter by epoch_start_date_time - The wall clock time when the epoch started (optional)
    *
    * @generated from field: cbt.UInt32Filter epoch_start_date_time = 7;
    */
   epochStartDateTime?: UInt32Filter;
 
   /**
-   * Filter by attestation_count (optional)
+   * Filter by attestation_count - The number of attestations in this chunk (optional)
    *
    * @generated from field: cbt.UInt32Filter attestation_count = 8;
    */
@@ -229,7 +229,7 @@ export class ListFctAttestationFirstSeenChunked50msRequest extends Message<ListF
 }
 
 /**
- * ListFctAttestationFirstSeenChunked50msResponse is the response message for listing fct_attestation_first_seen_chunked_50ms records
+ * Response for listing fct_attestation_first_seen_chunked_50ms records
  *
  * @generated from message cbt.ListFctAttestationFirstSeenChunked50msResponse
  */
@@ -279,7 +279,7 @@ export class ListFctAttestationFirstSeenChunked50msResponse extends Message<List
 }
 
 /**
- * GetFctAttestationFirstSeenChunked50msRequest is the request message for getting a single fct_attestation_first_seen_chunked_50ms record by primary key
+ * Request for getting a single fct_attestation_first_seen_chunked_50ms record by primary key
  *
  * @generated from message cbt.GetFctAttestationFirstSeenChunked50msRequest
  */
@@ -322,7 +322,7 @@ export class GetFctAttestationFirstSeenChunked50msRequest extends Message<GetFct
 }
 
 /**
- * GetFctAttestationFirstSeenChunked50msResponse is the response message for getting a single fct_attestation_first_seen_chunked_50ms record
+ * Response for getting a single fct_attestation_first_seen_chunked_50ms record
  *
  * @generated from message cbt.GetFctAttestationFirstSeenChunked50msResponse
  */

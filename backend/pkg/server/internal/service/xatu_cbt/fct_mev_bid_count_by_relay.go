@@ -3,7 +3,6 @@ package xatu_cbt
 import (
 	"context"
 	"fmt"
-	"time"
 
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/clickhouse"
 	cbtproto "github.com/ethpandaops/xatu-cbt/pkg/proto/clickhouse"
@@ -97,26 +96,20 @@ func scanFctMevBidCountByRelay(
 	scanner clickhouse.RowScanner,
 ) (*cbtproto.FctMevBidCountByRelay, error) {
 	var (
-		item                               cbtproto.FctMevBidCountByRelay
-		updatedDateTime, slotStartDateTime time.Time
-		epochStartDateTime                 time.Time
+		item cbtproto.FctMevBidCountByRelay
 	)
 
 	if err := scanner.Scan(
-		&updatedDateTime,
+		&item.UpdatedDateTime,
 		&item.Slot,
-		&slotStartDateTime,
+		&item.SlotStartDateTime,
 		&item.Epoch,
-		&epochStartDateTime,
+		&item.EpochStartDateTime,
 		&item.RelayName,
 		&item.BidTotal,
 	); err != nil {
 		return nil, fmt.Errorf("failed to scan row: %w", err)
 	}
-
-	item.UpdatedDateTime = uint32(updatedDateTime.Unix())       //nolint:gosec // safe.
-	item.SlotStartDateTime = uint32(slotStartDateTime.Unix())   //nolint:gosec // safe.
-	item.EpochStartDateTime = uint32(epochStartDateTime.Unix()) //nolint:gosec // safe.
 
 	return &item, nil
 }

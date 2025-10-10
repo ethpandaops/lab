@@ -185,39 +185,39 @@ func (x *IntAttestationAttestedCanonical) GetInclusionDistance() uint32 {
 	return 0
 }
 
-// ListIntAttestationAttestedCanonicalRequest is the request message for listing int_attestation_attested_canonical records
+// Request for listing int_attestation_attested_canonical records
 type ListIntAttestationAttestedCanonicalRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Filter by slot_start_date_time (PRIMARY KEY - required)
+	// Filter by slot_start_date_time - The wall clock time when the slot started (PRIMARY KEY - required)
 	SlotStartDateTime *UInt32Filter `protobuf:"bytes,1,opt,name=slot_start_date_time,json=slotStartDateTime,proto3" json:"slot_start_date_time,omitempty"`
-	// Filter by block_root (ORDER BY column 2 - optional)
+	// Filter by block_root - The beacon block root hash (ORDER BY column 2 - optional)
 	BlockRoot *StringFilter `protobuf:"bytes,2,opt,name=block_root,json=blockRoot,proto3" json:"block_root,omitempty"`
-	// Filter by attesting_validator_index (ORDER BY column 3 - optional)
+	// Filter by attesting_validator_index - The index of the validator attesting (ORDER BY column 3 - optional)
 	AttestingValidatorIndex *UInt32Filter `protobuf:"bytes,3,opt,name=attesting_validator_index,json=attestingValidatorIndex,proto3" json:"attesting_validator_index,omitempty"`
-	// Filter by updated_date_time (optional)
+	// Filter by updated_date_time - Timestamp when the record was last updated (optional)
 	UpdatedDateTime *UInt32Filter `protobuf:"bytes,4,opt,name=updated_date_time,json=updatedDateTime,proto3" json:"updated_date_time,omitempty"`
-	// Filter by slot (optional)
+	// Filter by slot - The slot number (optional)
 	Slot *UInt32Filter `protobuf:"bytes,5,opt,name=slot,proto3" json:"slot,omitempty"`
-	// Filter by epoch (optional)
+	// Filter by epoch - The epoch number containing the slot (optional)
 	Epoch *UInt32Filter `protobuf:"bytes,6,opt,name=epoch,proto3" json:"epoch,omitempty"`
-	// Filter by epoch_start_date_time (optional)
+	// Filter by epoch_start_date_time - The wall clock time when the epoch started (optional)
 	EpochStartDateTime *UInt32Filter `protobuf:"bytes,7,opt,name=epoch_start_date_time,json=epochStartDateTime,proto3" json:"epoch_start_date_time,omitempty"`
-	// Filter by source_epoch (optional)
+	// Filter by source_epoch - The source epoch number in the attestation group (optional)
 	SourceEpoch *UInt32Filter `protobuf:"bytes,8,opt,name=source_epoch,json=sourceEpoch,proto3" json:"source_epoch,omitempty"`
-	// Filter by source_epoch_start_date_time (optional)
+	// Filter by source_epoch_start_date_time - The wall clock time when the source epoch started (optional)
 	SourceEpochStartDateTime *UInt32Filter `protobuf:"bytes,9,opt,name=source_epoch_start_date_time,json=sourceEpochStartDateTime,proto3" json:"source_epoch_start_date_time,omitempty"`
-	// Filter by source_root (optional)
+	// Filter by source_root - The source beacon block root hash in the attestation group (optional)
 	SourceRoot *StringFilter `protobuf:"bytes,10,opt,name=source_root,json=sourceRoot,proto3" json:"source_root,omitempty"`
-	// Filter by target_epoch (optional)
+	// Filter by target_epoch - The target epoch number in the attestation group (optional)
 	TargetEpoch *UInt32Filter `protobuf:"bytes,11,opt,name=target_epoch,json=targetEpoch,proto3" json:"target_epoch,omitempty"`
-	// Filter by target_epoch_start_date_time (optional)
+	// Filter by target_epoch_start_date_time - The wall clock time when the target epoch started (optional)
 	TargetEpochStartDateTime *UInt32Filter `protobuf:"bytes,12,opt,name=target_epoch_start_date_time,json=targetEpochStartDateTime,proto3" json:"target_epoch_start_date_time,omitempty"`
-	// Filter by target_root (optional)
+	// Filter by target_root - The target beacon block root hash in the attestation group (optional)
 	TargetRoot *StringFilter `protobuf:"bytes,13,opt,name=target_root,json=targetRoot,proto3" json:"target_root,omitempty"`
-	// Filter by inclusion_distance (optional)
+	// Filter by inclusion_distance - The distance from the slot when the attestation was included (optional)
 	InclusionDistance *UInt32Filter `protobuf:"bytes,14,opt,name=inclusion_distance,json=inclusionDistance,proto3" json:"inclusion_distance,omitempty"`
 	// The maximum number of int_attestation_attested_canonical to return.
 	// If unspecified, at most 100 items will be returned.
@@ -383,7 +383,7 @@ func (x *ListIntAttestationAttestedCanonicalRequest) GetOrderBy() string {
 	return ""
 }
 
-// ListIntAttestationAttestedCanonicalResponse is the response message for listing int_attestation_attested_canonical records
+// Response for listing int_attestation_attested_canonical records
 type ListIntAttestationAttestedCanonicalResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -442,7 +442,7 @@ func (x *ListIntAttestationAttestedCanonicalResponse) GetNextPageToken() string 
 	return ""
 }
 
-// GetIntAttestationAttestedCanonicalRequest is the request message for getting a single int_attestation_attested_canonical record by primary key
+// Request for getting a single int_attestation_attested_canonical record by primary key
 type GetIntAttestationAttestedCanonicalRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -491,7 +491,7 @@ func (x *GetIntAttestationAttestedCanonicalRequest) GetSlotStartDateTime() uint3
 	return 0
 }
 
-// GetIntAttestationAttestedCanonicalResponse is the response message for getting a single int_attestation_attested_canonical record
+// Response for getting a single int_attestation_attested_canonical record
 type GetIntAttestationAttestedCanonicalResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache

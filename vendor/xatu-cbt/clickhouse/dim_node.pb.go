@@ -123,25 +123,25 @@ func (x *DimNode) GetSource() string {
 	return ""
 }
 
-// ListDimNodeRequest is the request message for listing dim_node records
+// Request for listing dim_node records
 type ListDimNodeRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Filter by validator_index (PRIMARY KEY - required)
+	// Filter by validator_index - The index of the validator (PRIMARY KEY - required)
 	ValidatorIndex *UInt32Filter `protobuf:"bytes,1,opt,name=validator_index,json=validatorIndex,proto3" json:"validator_index,omitempty"`
-	// Filter by updated_date_time (optional)
+	// Filter by updated_date_time - Timestamp when the record was last updated (optional)
 	UpdatedDateTime *UInt32Filter `protobuf:"bytes,2,opt,name=updated_date_time,json=updatedDateTime,proto3" json:"updated_date_time,omitempty"`
-	// Filter by name (optional)
+	// Filter by name - The name of the node (optional)
 	Name *NullableStringFilter `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
-	// Filter by groups (optional)
+	// Filter by groups - Groups the node belongs to (optional)
 	Groups []string `protobuf:"bytes,4,rep,name=groups,proto3" json:"groups,omitempty"`
-	// Filter by tags (optional)
+	// Filter by tags - Tags associated with the node (optional)
 	Tags []string `protobuf:"bytes,5,rep,name=tags,proto3" json:"tags,omitempty"`
-	// Filter by attributes (optional)
+	// Filter by attributes - Additional attributes of the node (optional)
 	Attributes *MapStringStringFilter `protobuf:"bytes,6,opt,name=attributes,proto3" json:"attributes,omitempty"`
-	// Filter by source (optional)
+	// Filter by source - The source entity of the node (optional)
 	Source *StringFilter `protobuf:"bytes,7,opt,name=source,proto3" json:"source,omitempty"`
 	// The maximum number of dim_node to return.
 	// If unspecified, at most 100 items will be returned.
@@ -258,7 +258,7 @@ func (x *ListDimNodeRequest) GetOrderBy() string {
 	return ""
 }
 
-// ListDimNodeResponse is the response message for listing dim_node records
+// Response for listing dim_node records
 type ListDimNodeResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -317,7 +317,7 @@ func (x *ListDimNodeResponse) GetNextPageToken() string {
 	return ""
 }
 
-// GetDimNodeRequest is the request message for getting a single dim_node record by primary key
+// Request for getting a single dim_node record by primary key
 type GetDimNodeRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -366,7 +366,7 @@ func (x *GetDimNodeRequest) GetValidatorIndex() uint32 {
 	return 0
 }
 
-// GetDimNodeResponse is the response message for getting a single dim_node record
+// Response for getting a single dim_node record
 type GetDimNodeResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache

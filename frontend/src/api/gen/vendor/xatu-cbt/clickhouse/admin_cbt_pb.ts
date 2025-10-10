@@ -5,14 +5,14 @@
 
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
 import { Message, proto3, protoInt64 } from "@bufbuild/protobuf";
-import { StringFilter, UInt64Filter } from "./common_pb.js";
+import { Int64Filter, StringFilter, UInt64Filter } from "./common_pb.js";
 
 /**
  * @generated from message cbt.AdminCbt
  */
 export class AdminCbt extends Message<AdminCbt> {
   /**
-   * @generated from field: uint64 updated_date_time = 11;
+   * @generated from field: int64 updated_date_time = 11;
    */
   updatedDateTime = protoInt64.zero;
 
@@ -52,7 +52,7 @@ export class AdminCbt extends Message<AdminCbt> {
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "cbt.AdminCbt";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 11, name: "updated_date_time", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
+    { no: 11, name: "updated_date_time", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
     { no: 12, name: "database", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 13, name: "table", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 14, name: "position", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
@@ -77,20 +77,20 @@ export class AdminCbt extends Message<AdminCbt> {
 }
 
 /**
- * ListAdminCbtRequest is the request message for listing admin_cbt records
+ * Request for listing admin_cbt records
  *
  * @generated from message cbt.ListAdminCbtRequest
  */
 export class ListAdminCbtRequest extends Message<ListAdminCbtRequest> {
   /**
-   * Filter by database (PRIMARY KEY - required)
+   * Filter by database - The database name (PRIMARY KEY - required)
    *
    * @generated from field: cbt.StringFilter database = 1;
    */
   database?: StringFilter;
 
   /**
-   * Filter by position (ORDER BY column 3 - optional)
+   * Filter by position - The starting position of the processed interval (ORDER BY column 3 - optional)
    *
    * @generated from field: cbt.UInt64Filter position = 2;
    */
@@ -99,19 +99,19 @@ export class ListAdminCbtRequest extends Message<ListAdminCbtRequest> {
   /**
    * Filter by updated_date_time (optional)
    *
-   * @generated from field: cbt.UInt64Filter updated_date_time = 3;
+   * @generated from field: cbt.Int64Filter updated_date_time = 3;
    */
-  updatedDateTime?: UInt64Filter;
+  updatedDateTime?: Int64Filter;
 
   /**
-   * Filter by table (optional)
+   * Filter by table - The table name (optional)
    *
    * @generated from field: cbt.StringFilter table = 4;
    */
   table?: StringFilter;
 
   /**
-   * Filter by interval (optional)
+   * Filter by interval - The size of the interval processed (optional)
    *
    * @generated from field: cbt.UInt64Filter interval = 5;
    */
@@ -153,7 +153,7 @@ export class ListAdminCbtRequest extends Message<ListAdminCbtRequest> {
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "database", kind: "message", T: StringFilter },
     { no: 2, name: "position", kind: "message", T: UInt64Filter },
-    { no: 3, name: "updated_date_time", kind: "message", T: UInt64Filter },
+    { no: 3, name: "updated_date_time", kind: "message", T: Int64Filter },
     { no: 4, name: "table", kind: "message", T: StringFilter },
     { no: 5, name: "interval", kind: "message", T: UInt64Filter },
     { no: 6, name: "page_size", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
@@ -179,7 +179,7 @@ export class ListAdminCbtRequest extends Message<ListAdminCbtRequest> {
 }
 
 /**
- * ListAdminCbtResponse is the response message for listing admin_cbt records
+ * Response for listing admin_cbt records
  *
  * @generated from message cbt.ListAdminCbtResponse
  */
@@ -229,7 +229,7 @@ export class ListAdminCbtResponse extends Message<ListAdminCbtResponse> {
 }
 
 /**
- * GetAdminCbtRequest is the request message for getting a single admin_cbt record by primary key
+ * Request for getting a single admin_cbt record by primary key
  *
  * @generated from message cbt.GetAdminCbtRequest
  */
@@ -272,7 +272,7 @@ export class GetAdminCbtRequest extends Message<GetAdminCbtRequest> {
 }
 
 /**
- * GetAdminCbtResponse is the response message for getting a single admin_cbt record
+ * Response for getting a single admin_cbt record
  *
  * @generated from message cbt.GetAdminCbtResponse
  */

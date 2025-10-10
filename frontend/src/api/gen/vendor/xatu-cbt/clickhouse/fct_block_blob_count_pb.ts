@@ -103,62 +103,62 @@ export class FctBlockBlobCount extends Message<FctBlockBlobCount> {
 }
 
 /**
- * ListFctBlockBlobCountRequest is the request message for listing fct_block_blob_count records
+ * Request for listing fct_block_blob_count records
  *
  * @generated from message cbt.ListFctBlockBlobCountRequest
  */
 export class ListFctBlockBlobCountRequest extends Message<ListFctBlockBlobCountRequest> {
   /**
-   * Filter by slot_start_date_time (PRIMARY KEY - required)
+   * Filter by slot_start_date_time - The wall clock time when the slot started (PRIMARY KEY - required unless using alternatives: slot)
    *
    * @generated from field: cbt.UInt32Filter slot_start_date_time = 1;
    */
   slotStartDateTime?: UInt32Filter;
 
   /**
-   * Filter by block_root (ORDER BY column 2 - optional)
+   * Filter by block_root - The beacon block root hash (ORDER BY column 2 - optional)
    *
    * @generated from field: cbt.StringFilter block_root = 2;
    */
   blockRoot?: StringFilter;
 
   /**
-   * Filter by updated_date_time (optional)
+   * Filter by updated_date_time - Timestamp when the record was last updated (optional)
    *
    * @generated from field: cbt.UInt32Filter updated_date_time = 3;
    */
   updatedDateTime?: UInt32Filter;
 
   /**
-   * Filter by slot (optional)
+   * Filter by slot - The slot number (PROJECTION: p_by_slot - alternative to slot_start_date_time)
    *
    * @generated from field: cbt.UInt32Filter slot = 4;
    */
   slot?: UInt32Filter;
 
   /**
-   * Filter by epoch (optional)
+   * Filter by epoch - The epoch number containing the slot (optional)
    *
    * @generated from field: cbt.UInt32Filter epoch = 5;
    */
   epoch?: UInt32Filter;
 
   /**
-   * Filter by epoch_start_date_time (optional)
+   * Filter by epoch_start_date_time - The wall clock time when the epoch started (optional)
    *
    * @generated from field: cbt.UInt32Filter epoch_start_date_time = 6;
    */
   epochStartDateTime?: UInt32Filter;
 
   /**
-   * Filter by blob_count (optional)
+   * Filter by blob_count - The number of blobs in the block (optional)
    *
    * @generated from field: cbt.UInt32Filter blob_count = 7;
    */
   blobCount?: UInt32Filter;
 
   /**
-   * Filter by status (optional)
+   * Filter by status - Can be "canonical" or "orphaned" (optional)
    *
    * @generated from field: cbt.StringFilter status = 8;
    */
@@ -229,7 +229,7 @@ export class ListFctBlockBlobCountRequest extends Message<ListFctBlockBlobCountR
 }
 
 /**
- * ListFctBlockBlobCountResponse is the response message for listing fct_block_blob_count records
+ * Response for listing fct_block_blob_count records
  *
  * @generated from message cbt.ListFctBlockBlobCountResponse
  */
@@ -279,7 +279,7 @@ export class ListFctBlockBlobCountResponse extends Message<ListFctBlockBlobCount
 }
 
 /**
- * GetFctBlockBlobCountRequest is the request message for getting a single fct_block_blob_count record by primary key
+ * Request for getting a single fct_block_blob_count record by primary key
  *
  * @generated from message cbt.GetFctBlockBlobCountRequest
  */
@@ -322,7 +322,7 @@ export class GetFctBlockBlobCountRequest extends Message<GetFctBlockBlobCountReq
 }
 
 /**
- * GetFctBlockBlobCountResponse is the response message for getting a single fct_block_blob_count record
+ * Response for getting a single fct_block_blob_count record
  *
  * @generated from message cbt.GetFctBlockBlobCountResponse
  */

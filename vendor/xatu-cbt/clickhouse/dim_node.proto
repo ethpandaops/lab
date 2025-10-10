@@ -25,22 +25,22 @@ message DimNode {
   string source = 17;
 }
 
-// ListDimNodeRequest is the request message for listing dim_node records
+// Request for listing dim_node records
 message ListDimNodeRequest {
-  // Filter by validator_index (PRIMARY KEY - required)
+  // Filter by validator_index - The index of the validator (PRIMARY KEY - required)
   UInt32Filter validator_index = 1;
 
-  // Filter by updated_date_time (optional)
+  // Filter by updated_date_time - Timestamp when the record was last updated (optional)
   UInt32Filter updated_date_time = 2;
-  // Filter by name (optional)
+  // Filter by name - The name of the node (optional)
   NullableStringFilter name = 3;
-  // Filter by groups (optional)
+  // Filter by groups - Groups the node belongs to (optional)
   repeated string groups = 4;
-  // Filter by tags (optional)
+  // Filter by tags - Tags associated with the node (optional)
   repeated string tags = 5;
-  // Filter by attributes (optional)
+  // Filter by attributes - Additional attributes of the node (optional)
   MapStringStringFilter attributes = 6;
-  // Filter by source (optional)
+  // Filter by source - The source entity of the node (optional)
   StringFilter source = 7;
 
   // The maximum number of dim_node to return.
@@ -56,7 +56,7 @@ message ListDimNodeRequest {
   string order_by = 10;
 }
 
-// ListDimNodeResponse is the response message for listing dim_node records
+// Response for listing dim_node records
 message ListDimNodeResponse {
   // The list of dim_node.
   repeated DimNode dim_node = 1;
@@ -65,21 +65,21 @@ message ListDimNodeResponse {
   string next_page_token = 2;
 }
 
-// GetDimNodeRequest is the request message for getting a single dim_node record by primary key
+// Request for getting a single dim_node record by primary key
 message GetDimNodeRequest {
   // The index of the validator
   uint32 validator_index = 1; // Primary key (required)
 }
 
-// GetDimNodeResponse is the response message for getting a single dim_node record
+// Response for getting a single dim_node record
 message GetDimNodeResponse {
   DimNode item = 1;
 }
 
-// DimNodeService provides RPC methods for querying dim_node data
+// Query dim_node data
 service DimNodeService {
-  // List returns paginated dim_node records
+  // List records | Retrieve paginated results with optional filtering
   rpc List(ListDimNodeRequest) returns (ListDimNodeResponse);
-  // Get returns a single dim_node record by primary key
+  // Get record | Retrieve a single record by primary key
   rpc Get(GetDimNodeRequest) returns (GetDimNodeResponse);
 }

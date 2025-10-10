@@ -4,6 +4,9 @@ package cbt;
 
 import "vendor/xatu-cbt/clickhouse/common.proto";
 import "google/protobuf/wrappers.proto";
+import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
+import "vendor/xatu-cbt/clickhouse/clickhouse/annotations.proto";
 
 option go_package = "github.com/ethpandaops/xatu-cbt/pkg/proto/clickhouse";
 // MEV relay proposer payload delivered for a block on the unfinalized chain
@@ -22,7 +25,7 @@ message FctBlockMevHead {
   // The root hash of the beacon block
   string block_root = 16;
   // The earliest timestamp of the accepted bid in milliseconds
-  google.protobuf.UInt64Value earliest_bid_date_time = 17;
+  google.protobuf.Int64Value earliest_bid_date_time = 17;
   // The relay names that delivered the proposer payload
   repeated string relay_names = 18;
   // The parent hash of the proposer payload
@@ -47,61 +50,61 @@ message FctBlockMevHead {
   uint32 transaction_count = 28;
 }
 
-// ListFctBlockMevHeadRequest is the request message for listing fct_block_mev_head records
+// Request for listing fct_block_mev_head records
 message ListFctBlockMevHeadRequest {
-  // Filter by slot_start_date_time (PRIMARY KEY - required)
-  UInt32Filter slot_start_date_time = 1;
+  // Filter by slot_start_date_time - The start time for the slot that the proposer payload is for (PRIMARY KEY - required unless using alternatives: slot)
+  UInt32Filter slot_start_date_time = 1 [(google.api.field_behavior) = OPTIONAL, (clickhouse.v1.required_group) = "primary_key"];
 
-  // Filter by block_root (ORDER BY column 2 - optional)
-  StringFilter block_root = 2;
+  // Filter by block_root - The root hash of the beacon block (ORDER BY column 2 - optional)
+  StringFilter block_root = 2 [(google.api.field_behavior) = OPTIONAL];
 
-  // Filter by updated_date_time (optional)
-  UInt32Filter updated_date_time = 3;
-  // Filter by slot (optional)
-  UInt32Filter slot = 4;
-  // Filter by epoch (optional)
-  UInt32Filter epoch = 5;
-  // Filter by epoch_start_date_time (optional)
-  UInt32Filter epoch_start_date_time = 6;
-  // Filter by earliest_bid_date_time (optional)
-  NullableUInt64Filter earliest_bid_date_time = 7;
-  // Filter by relay_names (optional)
+  // Filter by updated_date_time - Timestamp when the record was last updated (optional)
+  UInt32Filter updated_date_time = 3 [(google.api.field_behavior) = OPTIONAL];
+  // Filter by slot - Slot number within the block proposer payload (PROJECTION: p_by_slot - alternative to slot_start_date_time)
+  UInt32Filter slot = 4 [(google.api.field_behavior) = OPTIONAL, (clickhouse.v1.projection_name) = "p_by_slot", (clickhouse.v1.projection_alternative_for) = "slot_start_date_time", (clickhouse.v1.required_group) = "primary_key"];
+  // Filter by epoch - Epoch number derived from the slot that the proposer payload is for (optional)
+  UInt32Filter epoch = 5 [(google.api.field_behavior) = OPTIONAL];
+  // Filter by epoch_start_date_time - The start time for the epoch that the proposer payload is for (optional)
+  UInt32Filter epoch_start_date_time = 6 [(google.api.field_behavior) = OPTIONAL];
+  // Filter by earliest_bid_date_time - The earliest timestamp of the accepted bid in milliseconds (optional)
+  NullableInt64Filter earliest_bid_date_time = 7 [(google.api.field_behavior) = OPTIONAL];
+  // Filter by relay_names - The relay names that delivered the proposer payload (optional)
   repeated string relay_names = 8;
-  // Filter by parent_hash (optional)
-  StringFilter parent_hash = 9;
-  // Filter by block_number (optional)
-  UInt64Filter block_number = 10;
-  // Filter by block_hash (optional)
-  StringFilter block_hash = 11;
-  // Filter by builder_pubkey (optional)
-  StringFilter builder_pubkey = 12;
-  // Filter by proposer_pubkey (optional)
-  StringFilter proposer_pubkey = 13;
-  // Filter by proposer_fee_recipient (optional)
-  StringFilter proposer_fee_recipient = 14;
-  // Filter by gas_limit (optional)
-  UInt64Filter gas_limit = 15;
-  // Filter by gas_used (optional)
-  UInt64Filter gas_used = 16;
-  // Filter by value (optional)
-  NullableStringFilter value = 17;
-  // Filter by transaction_count (optional)
-  UInt32Filter transaction_count = 18;
+  // Filter by parent_hash - The parent hash of the proposer payload (optional)
+  StringFilter parent_hash = 9 [(google.api.field_behavior) = OPTIONAL];
+  // Filter by block_number - The block number of the proposer payload (optional)
+  UInt64Filter block_number = 10 [(google.api.field_behavior) = OPTIONAL];
+  // Filter by block_hash - The block hash of the proposer payload (optional)
+  StringFilter block_hash = 11 [(google.api.field_behavior) = OPTIONAL];
+  // Filter by builder_pubkey - The builder pubkey of the proposer payload (optional)
+  StringFilter builder_pubkey = 12 [(google.api.field_behavior) = OPTIONAL];
+  // Filter by proposer_pubkey - The proposer pubkey of the proposer payload (optional)
+  StringFilter proposer_pubkey = 13 [(google.api.field_behavior) = OPTIONAL];
+  // Filter by proposer_fee_recipient - The proposer fee recipient of the proposer payload (optional)
+  StringFilter proposer_fee_recipient = 14 [(google.api.field_behavior) = OPTIONAL];
+  // Filter by gas_limit - The gas limit of the proposer payload (optional)
+  UInt64Filter gas_limit = 15 [(google.api.field_behavior) = OPTIONAL];
+  // Filter by gas_used - The gas used of the proposer payload (optional)
+  UInt64Filter gas_used = 16 [(google.api.field_behavior) = OPTIONAL];
+  // Filter by value - The transaction value in wei (optional)
+  NullableStringFilter value = 17 [(google.api.field_behavior) = OPTIONAL];
+  // Filter by transaction_count - The number of transactions in the proposer payload (optional)
+  UInt32Filter transaction_count = 18 [(google.api.field_behavior) = OPTIONAL];
 
   // The maximum number of fct_block_mev_head to return.
   // If unspecified, at most 100 items will be returned.
   // The maximum value is 10000; values above 10000 will be coerced to 10000.
-  int32 page_size = 19;
+  int32 page_size = 19 [(google.api.field_behavior) = OPTIONAL];
   // A page token, received from a previous `ListFctBlockMevHead` call.
   // Provide this to retrieve the subsequent page.
-  string page_token = 20;
+  string page_token = 20 [(google.api.field_behavior) = OPTIONAL];
   // The order of results. Format: comma-separated list of fields.
   // Example: "foo,bar" or "foo desc,bar" for descending order on foo.
   // If unspecified, results will be returned in the default order.
-  string order_by = 21;
+  string order_by = 21 [(google.api.field_behavior) = OPTIONAL];
 }
 
-// ListFctBlockMevHeadResponse is the response message for listing fct_block_mev_head records
+// Response for listing fct_block_mev_head records
 message ListFctBlockMevHeadResponse {
   // The list of fct_block_mev_head.
   repeated FctBlockMevHead fct_block_mev_head = 1;
@@ -110,21 +113,29 @@ message ListFctBlockMevHeadResponse {
   string next_page_token = 2;
 }
 
-// GetFctBlockMevHeadRequest is the request message for getting a single fct_block_mev_head record by primary key
+// Request for getting a single fct_block_mev_head record by primary key
 message GetFctBlockMevHeadRequest {
   // The start time for the slot that the proposer payload is for
   uint32 slot_start_date_time = 1; // Primary key (required)
 }
 
-// GetFctBlockMevHeadResponse is the response message for getting a single fct_block_mev_head record
+// Response for getting a single fct_block_mev_head record
 message GetFctBlockMevHeadResponse {
   FctBlockMevHead item = 1;
 }
 
-// FctBlockMevHeadService provides RPC methods for querying fct_block_mev_head data
+// Query fct_block_mev_head data
 service FctBlockMevHeadService {
-  // List returns paginated fct_block_mev_head records
-  rpc List(ListFctBlockMevHeadRequest) returns (ListFctBlockMevHeadResponse);
-  // Get returns a single fct_block_mev_head record by primary key
-  rpc Get(GetFctBlockMevHeadRequest) returns (GetFctBlockMevHeadResponse);
+  // List records | Retrieve paginated results with optional filtering
+  rpc List(ListFctBlockMevHeadRequest) returns (ListFctBlockMevHeadResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/fct_block_mev_head"
+    };
+  }
+  // Get record | Retrieve a single record by slot_start_date_time
+  rpc Get(GetFctBlockMevHeadRequest) returns (GetFctBlockMevHeadResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/fct_block_mev_head/{slot_start_date_time}"
+    };
+  }
 }

@@ -27,11 +27,11 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// IntAddressStorageSlotFirstAccessService provides RPC methods for querying int_address_storage_slot_first_access data
+// Query int_address_storage_slot_first_access data
 type IntAddressStorageSlotFirstAccessServiceClient interface {
-	// List returns paginated int_address_storage_slot_first_access records
+	// List records | Retrieve paginated results with optional filtering
 	List(ctx context.Context, in *ListIntAddressStorageSlotFirstAccessRequest, opts ...grpc.CallOption) (*ListIntAddressStorageSlotFirstAccessResponse, error)
-	// Get returns a single int_address_storage_slot_first_access record by primary key
+	// Get record | Retrieve a single record by primary key
 	Get(ctx context.Context, in *GetIntAddressStorageSlotFirstAccessRequest, opts ...grpc.CallOption) (*GetIntAddressStorageSlotFirstAccessResponse, error)
 }
 
@@ -67,11 +67,11 @@ func (c *intAddressStorageSlotFirstAccessServiceClient) Get(ctx context.Context,
 // All implementations must embed UnimplementedIntAddressStorageSlotFirstAccessServiceServer
 // for forward compatibility
 //
-// IntAddressStorageSlotFirstAccessService provides RPC methods for querying int_address_storage_slot_first_access data
+// Query int_address_storage_slot_first_access data
 type IntAddressStorageSlotFirstAccessServiceServer interface {
-	// List returns paginated int_address_storage_slot_first_access records
+	// List records | Retrieve paginated results with optional filtering
 	List(context.Context, *ListIntAddressStorageSlotFirstAccessRequest) (*ListIntAddressStorageSlotFirstAccessResponse, error)
-	// Get returns a single int_address_storage_slot_first_access record by primary key
+	// Get record | Retrieve a single record by primary key
 	Get(context.Context, *GetIntAddressStorageSlotFirstAccessRequest) (*GetIntAddressStorageSlotFirstAccessResponse, error)
 	mustEmbedUnimplementedIntAddressStorageSlotFirstAccessServiceServer()
 }

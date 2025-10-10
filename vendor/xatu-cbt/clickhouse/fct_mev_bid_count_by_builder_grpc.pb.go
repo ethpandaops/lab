@@ -27,11 +27,11 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// FctMevBidCountByBuilderService provides RPC methods for querying fct_mev_bid_count_by_builder data
+// Query fct_mev_bid_count_by_builder data
 type FctMevBidCountByBuilderServiceClient interface {
-	// List returns paginated fct_mev_bid_count_by_builder records
+	// List records | Retrieve paginated results with optional filtering
 	List(ctx context.Context, in *ListFctMevBidCountByBuilderRequest, opts ...grpc.CallOption) (*ListFctMevBidCountByBuilderResponse, error)
-	// Get returns a single fct_mev_bid_count_by_builder record by primary key
+	// Get record | Retrieve a single record by slot_start_date_time
 	Get(ctx context.Context, in *GetFctMevBidCountByBuilderRequest, opts ...grpc.CallOption) (*GetFctMevBidCountByBuilderResponse, error)
 }
 
@@ -67,11 +67,11 @@ func (c *fctMevBidCountByBuilderServiceClient) Get(ctx context.Context, in *GetF
 // All implementations must embed UnimplementedFctMevBidCountByBuilderServiceServer
 // for forward compatibility
 //
-// FctMevBidCountByBuilderService provides RPC methods for querying fct_mev_bid_count_by_builder data
+// Query fct_mev_bid_count_by_builder data
 type FctMevBidCountByBuilderServiceServer interface {
-	// List returns paginated fct_mev_bid_count_by_builder records
+	// List records | Retrieve paginated results with optional filtering
 	List(context.Context, *ListFctMevBidCountByBuilderRequest) (*ListFctMevBidCountByBuilderResponse, error)
-	// Get returns a single fct_mev_bid_count_by_builder record by primary key
+	// Get record | Retrieve a single record by slot_start_date_time
 	Get(context.Context, *GetFctMevBidCountByBuilderRequest) (*GetFctMevBidCountByBuilderResponse, error)
 	mustEmbedUnimplementedFctMevBidCountByBuilderServiceServer()
 }

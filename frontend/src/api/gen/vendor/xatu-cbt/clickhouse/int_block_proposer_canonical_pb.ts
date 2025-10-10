@@ -103,62 +103,62 @@ export class IntBlockProposerCanonical extends Message<IntBlockProposerCanonical
 }
 
 /**
- * ListIntBlockProposerCanonicalRequest is the request message for listing int_block_proposer_canonical records
+ * Request for listing int_block_proposer_canonical records
  *
  * @generated from message cbt.ListIntBlockProposerCanonicalRequest
  */
 export class ListIntBlockProposerCanonicalRequest extends Message<ListIntBlockProposerCanonicalRequest> {
   /**
-   * Filter by slot_start_date_time (PRIMARY KEY - required)
+   * Filter by slot_start_date_time - The wall clock time when the slot started (PRIMARY KEY - required)
    *
    * @generated from field: cbt.UInt32Filter slot_start_date_time = 1;
    */
   slotStartDateTime?: UInt32Filter;
 
   /**
-   * Filter by updated_date_time (optional)
+   * Filter by updated_date_time - Timestamp when the record was last updated (optional)
    *
    * @generated from field: cbt.UInt32Filter updated_date_time = 2;
    */
   updatedDateTime?: UInt32Filter;
 
   /**
-   * Filter by slot (optional)
+   * Filter by slot - The slot number (optional)
    *
    * @generated from field: cbt.UInt32Filter slot = 3;
    */
   slot?: UInt32Filter;
 
   /**
-   * Filter by epoch (optional)
+   * Filter by epoch - The epoch number containing the slot (optional)
    *
    * @generated from field: cbt.UInt32Filter epoch = 4;
    */
   epoch?: UInt32Filter;
 
   /**
-   * Filter by epoch_start_date_time (optional)
+   * Filter by epoch_start_date_time - The wall clock time when the epoch started (optional)
    *
    * @generated from field: cbt.UInt32Filter epoch_start_date_time = 5;
    */
   epochStartDateTime?: UInt32Filter;
 
   /**
-   * Filter by proposer_validator_index (optional)
+   * Filter by proposer_validator_index - The validator index of the proposer for the slot (optional)
    *
    * @generated from field: cbt.UInt32Filter proposer_validator_index = 6;
    */
   proposerValidatorIndex?: UInt32Filter;
 
   /**
-   * Filter by proposer_pubkey (optional)
+   * Filter by proposer_pubkey - The public key of the validator proposer (optional)
    *
    * @generated from field: cbt.StringFilter proposer_pubkey = 7;
    */
   proposerPubkey?: StringFilter;
 
   /**
-   * Filter by block_root (optional)
+   * Filter by block_root - The beacon block root hash. Null if a slot was missed (optional)
    *
    * @generated from field: cbt.NullableStringFilter block_root = 8;
    */
@@ -229,7 +229,7 @@ export class ListIntBlockProposerCanonicalRequest extends Message<ListIntBlockPr
 }
 
 /**
- * ListIntBlockProposerCanonicalResponse is the response message for listing int_block_proposer_canonical records
+ * Response for listing int_block_proposer_canonical records
  *
  * @generated from message cbt.ListIntBlockProposerCanonicalResponse
  */
@@ -279,7 +279,7 @@ export class ListIntBlockProposerCanonicalResponse extends Message<ListIntBlockP
 }
 
 /**
- * GetIntBlockProposerCanonicalRequest is the request message for getting a single int_block_proposer_canonical record by primary key
+ * Request for getting a single int_block_proposer_canonical record by primary key
  *
  * @generated from message cbt.GetIntBlockProposerCanonicalRequest
  */
@@ -322,7 +322,7 @@ export class GetIntBlockProposerCanonicalRequest extends Message<GetIntBlockProp
 }
 
 /**
- * GetIntBlockProposerCanonicalResponse is the response message for getting a single int_block_proposer_canonical record
+ * Response for getting a single int_block_proposer_canonical record
  *
  * @generated from message cbt.GetIntBlockProposerCanonicalResponse
  */

@@ -183,132 +183,132 @@ export class FctNodeActiveLast24h extends Message<FctNodeActiveLast24h> {
 }
 
 /**
- * ListFctNodeActiveLast24hRequest is the request message for listing fct_node_active_last_24h records
+ * Request for listing fct_node_active_last_24h records
  *
  * @generated from message cbt.ListFctNodeActiveLast24hRequest
  */
 export class ListFctNodeActiveLast24hRequest extends Message<ListFctNodeActiveLast24hRequest> {
   /**
-   * Filter by meta_client_name (PRIMARY KEY - required)
+   * Filter by meta_client_name - Name of the client (PRIMARY KEY - required)
    *
    * @generated from field: cbt.StringFilter meta_client_name = 1;
    */
   metaClientName?: StringFilter;
 
   /**
-   * Filter by updated_date_time (optional)
+   * Filter by updated_date_time - Timestamp when the record was last updated (optional)
    *
    * @generated from field: cbt.UInt32Filter updated_date_time = 2;
    */
   updatedDateTime?: UInt32Filter;
 
   /**
-   * Filter by last_seen_date_time (optional)
+   * Filter by last_seen_date_time - Timestamp when the node was last seen (optional)
    *
    * @generated from field: cbt.UInt32Filter last_seen_date_time = 3;
    */
   lastSeenDateTime?: UInt32Filter;
 
   /**
-   * Filter by username (optional)
+   * Filter by username - Username of the node (optional)
    *
    * @generated from field: cbt.StringFilter username = 4;
    */
   username?: StringFilter;
 
   /**
-   * Filter by node_id (optional)
+   * Filter by node_id - ID of the node (optional)
    *
    * @generated from field: cbt.StringFilter node_id = 5;
    */
   nodeId?: StringFilter;
 
   /**
-   * Filter by classification (optional)
+   * Filter by classification - Classification of the node, e.g. "individual", "corporate", "internal" (aka ethPandaOps) or "unclassified" (optional)
    *
    * @generated from field: cbt.StringFilter classification = 6;
    */
   classification?: StringFilter;
 
   /**
-   * Filter by meta_client_version (optional)
+   * Filter by meta_client_version - Version of the client (optional)
    *
    * @generated from field: cbt.StringFilter meta_client_version = 7;
    */
   metaClientVersion?: StringFilter;
 
   /**
-   * Filter by meta_client_implementation (optional)
+   * Filter by meta_client_implementation - Implementation of the client (optional)
    *
    * @generated from field: cbt.StringFilter meta_client_implementation = 8;
    */
   metaClientImplementation?: StringFilter;
 
   /**
-   * Filter by meta_client_geo_city (optional)
+   * Filter by meta_client_geo_city - City of the client (optional)
    *
    * @generated from field: cbt.StringFilter meta_client_geo_city = 9;
    */
   metaClientGeoCity?: StringFilter;
 
   /**
-   * Filter by meta_client_geo_country (optional)
+   * Filter by meta_client_geo_country - Country of the client (optional)
    *
    * @generated from field: cbt.StringFilter meta_client_geo_country = 10;
    */
   metaClientGeoCountry?: StringFilter;
 
   /**
-   * Filter by meta_client_geo_country_code (optional)
+   * Filter by meta_client_geo_country_code - Country code of the client (optional)
    *
    * @generated from field: cbt.StringFilter meta_client_geo_country_code = 11;
    */
   metaClientGeoCountryCode?: StringFilter;
 
   /**
-   * Filter by meta_client_geo_continent_code (optional)
+   * Filter by meta_client_geo_continent_code - Continent code of the client (optional)
    *
    * @generated from field: cbt.StringFilter meta_client_geo_continent_code = 12;
    */
   metaClientGeoContinentCode?: StringFilter;
 
   /**
-   * Filter by meta_client_geo_longitude (optional)
+   * Filter by meta_client_geo_longitude - Longitude of the client (optional)
    *
    * @generated from field: google.protobuf.DoubleValue meta_client_geo_longitude = 13;
    */
   metaClientGeoLongitude?: number;
 
   /**
-   * Filter by meta_client_geo_latitude (optional)
+   * Filter by meta_client_geo_latitude - Latitude of the client (optional)
    *
    * @generated from field: google.protobuf.DoubleValue meta_client_geo_latitude = 14;
    */
   metaClientGeoLatitude?: number;
 
   /**
-   * Filter by meta_client_geo_autonomous_system_number (optional)
+   * Filter by meta_client_geo_autonomous_system_number - Autonomous system number of the client (optional)
    *
    * @generated from field: cbt.NullableUInt32Filter meta_client_geo_autonomous_system_number = 15;
    */
   metaClientGeoAutonomousSystemNumber?: NullableUInt32Filter;
 
   /**
-   * Filter by meta_client_geo_autonomous_system_organization (optional)
+   * Filter by meta_client_geo_autonomous_system_organization - Autonomous system organization of the client (optional)
    *
    * @generated from field: cbt.NullableStringFilter meta_client_geo_autonomous_system_organization = 16;
    */
   metaClientGeoAutonomousSystemOrganization?: NullableStringFilter;
 
   /**
-   * Filter by meta_consensus_version (optional)
+   * Filter by meta_consensus_version - Ethereum consensus client version (optional)
    *
    * @generated from field: cbt.StringFilter meta_consensus_version = 17;
    */
   metaConsensusVersion?: StringFilter;
 
   /**
-   * Filter by meta_consensus_implementation (optional)
+   * Filter by meta_consensus_implementation - Ethereum consensus client implementation (optional)
    *
    * @generated from field: cbt.StringFilter meta_consensus_implementation = 18;
    */
@@ -389,7 +389,7 @@ export class ListFctNodeActiveLast24hRequest extends Message<ListFctNodeActiveLa
 }
 
 /**
- * ListFctNodeActiveLast24hResponse is the response message for listing fct_node_active_last_24h records
+ * Response for listing fct_node_active_last_24h records
  *
  * @generated from message cbt.ListFctNodeActiveLast24hResponse
  */
@@ -439,7 +439,7 @@ export class ListFctNodeActiveLast24hResponse extends Message<ListFctNodeActiveL
 }
 
 /**
- * GetFctNodeActiveLast24hRequest is the request message for getting a single fct_node_active_last_24h record by primary key
+ * Request for getting a single fct_node_active_last_24h record by primary key
  *
  * @generated from message cbt.GetFctNodeActiveLast24hRequest
  */
@@ -482,7 +482,7 @@ export class GetFctNodeActiveLast24hRequest extends Message<GetFctNodeActiveLast
 }
 
 /**
- * GetFctNodeActiveLast24hResponse is the response message for getting a single fct_node_active_last_24h record
+ * Response for getting a single fct_node_active_last_24h record
  *
  * @generated from message cbt.GetFctNodeActiveLast24hResponse
  */

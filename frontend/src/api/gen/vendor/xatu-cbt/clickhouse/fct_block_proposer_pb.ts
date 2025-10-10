@@ -111,69 +111,69 @@ export class FctBlockProposer extends Message<FctBlockProposer> {
 }
 
 /**
- * ListFctBlockProposerRequest is the request message for listing fct_block_proposer records
+ * Request for listing fct_block_proposer records
  *
  * @generated from message cbt.ListFctBlockProposerRequest
  */
 export class ListFctBlockProposerRequest extends Message<ListFctBlockProposerRequest> {
   /**
-   * Filter by slot_start_date_time (PRIMARY KEY - required)
+   * Filter by slot_start_date_time - The wall clock time when the slot started (PRIMARY KEY - required unless using alternatives: slot)
    *
    * @generated from field: cbt.UInt32Filter slot_start_date_time = 1;
    */
   slotStartDateTime?: UInt32Filter;
 
   /**
-   * Filter by updated_date_time (optional)
+   * Filter by updated_date_time - Timestamp when the record was last updated (optional)
    *
    * @generated from field: cbt.UInt32Filter updated_date_time = 2;
    */
   updatedDateTime?: UInt32Filter;
 
   /**
-   * Filter by slot (optional)
+   * Filter by slot - The slot number (PROJECTION: p_by_slot - alternative to slot_start_date_time)
    *
    * @generated from field: cbt.UInt32Filter slot = 3;
    */
   slot?: UInt32Filter;
 
   /**
-   * Filter by epoch (optional)
+   * Filter by epoch - The epoch number containing the slot (optional)
    *
    * @generated from field: cbt.UInt32Filter epoch = 4;
    */
   epoch?: UInt32Filter;
 
   /**
-   * Filter by epoch_start_date_time (optional)
+   * Filter by epoch_start_date_time - The wall clock time when the epoch started (optional)
    *
    * @generated from field: cbt.UInt32Filter epoch_start_date_time = 5;
    */
   epochStartDateTime?: UInt32Filter;
 
   /**
-   * Filter by proposer_validator_index (optional)
+   * Filter by proposer_validator_index - The validator index of the proposer for the slot (optional)
    *
    * @generated from field: cbt.UInt32Filter proposer_validator_index = 6;
    */
   proposerValidatorIndex?: UInt32Filter;
 
   /**
-   * Filter by proposer_pubkey (optional)
+   * Filter by proposer_pubkey - The public key of the validator proposer (optional)
    *
    * @generated from field: cbt.StringFilter proposer_pubkey = 7;
    */
   proposerPubkey?: StringFilter;
 
   /**
-   * Filter by block_root (optional)
+   * Filter by block_root - The beacon block root hash. Null if a block was never seen by a sentry, aka "missed" (optional)
    *
    * @generated from field: cbt.NullableStringFilter block_root = 8;
    */
   blockRoot?: NullableStringFilter;
 
   /**
-   * Filter by status (optional)
+   * Filter by status - Can be "canonical", "orphaned" or "missed" (optional)
    *
    * @generated from field: cbt.StringFilter status = 9;
    */
@@ -245,7 +245,7 @@ export class ListFctBlockProposerRequest extends Message<ListFctBlockProposerReq
 }
 
 /**
- * ListFctBlockProposerResponse is the response message for listing fct_block_proposer records
+ * Response for listing fct_block_proposer records
  *
  * @generated from message cbt.ListFctBlockProposerResponse
  */
@@ -295,7 +295,7 @@ export class ListFctBlockProposerResponse extends Message<ListFctBlockProposerRe
 }
 
 /**
- * GetFctBlockProposerRequest is the request message for getting a single fct_block_proposer record by primary key
+ * Request for getting a single fct_block_proposer record by primary key
  *
  * @generated from message cbt.GetFctBlockProposerRequest
  */
@@ -338,7 +338,7 @@ export class GetFctBlockProposerRequest extends Message<GetFctBlockProposerReque
 }
 
 /**
- * GetFctBlockProposerResponse is the response message for getting a single fct_block_proposer record
+ * Response for getting a single fct_block_proposer record
  *
  * @generated from message cbt.GetFctBlockProposerResponse
  */

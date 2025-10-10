@@ -3,7 +3,6 @@ package xatu_cbt
 import (
 	"context"
 	"fmt"
-	"time"
 
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/clickhouse"
 	cbtproto "github.com/ethpandaops/xatu-cbt/pkg/proto/clickhouse"
@@ -99,8 +98,6 @@ func scanFctPreparedBlock(
 ) (*cbtproto.FctPreparedBlock, error) {
 	var (
 		block                                  cbtproto.FctPreparedBlock
-		updatedDateTime, slotStartDateTime     time.Time
-		eventDateTime                          time.Time
 		blockTotalBytes                        *uint32
 		blockTotalBytesCompressed              *uint32
 		executionPayloadValue                  *uint64
@@ -112,10 +109,10 @@ func scanFctPreparedBlock(
 	)
 
 	if err := scanner.Scan(
-		&updatedDateTime,
+		&block.UpdatedDateTime,
 		&block.Slot,
-		&slotStartDateTime,
-		&eventDateTime,
+		&block.SlotStartDateTime,
+		&block.EventDateTime,
 		&block.MetaClientName,
 		&block.MetaClientVersion,
 		&block.MetaClientImplementation,
@@ -137,10 +134,6 @@ func scanFctPreparedBlock(
 	); err != nil {
 		return nil, fmt.Errorf("failed to scan row: %w", err)
 	}
-
-	block.UpdatedDateTime = uint32(updatedDateTime.Unix())     //nolint:gosec // safe.
-	block.SlotStartDateTime = uint32(slotStartDateTime.Unix()) //nolint:gosec // safe.
-	block.EventDateTime = uint32(eventDateTime.Unix())         //nolint:gosec // safe.
 
 	// Convert nullable fields to protobuf wrappers
 	if blockTotalBytes != nil {

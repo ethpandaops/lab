@@ -27,11 +27,11 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// IntBeaconCommitteeHeadService provides RPC methods for querying int_beacon_committee_head data
+// Query int_beacon_committee_head data
 type IntBeaconCommitteeHeadServiceClient interface {
-	// List returns paginated int_beacon_committee_head records
+	// List records | Retrieve paginated results with optional filtering
 	List(ctx context.Context, in *ListIntBeaconCommitteeHeadRequest, opts ...grpc.CallOption) (*ListIntBeaconCommitteeHeadResponse, error)
-	// Get returns a single int_beacon_committee_head record by primary key
+	// Get record | Retrieve a single record by primary key
 	Get(ctx context.Context, in *GetIntBeaconCommitteeHeadRequest, opts ...grpc.CallOption) (*GetIntBeaconCommitteeHeadResponse, error)
 }
 
@@ -67,11 +67,11 @@ func (c *intBeaconCommitteeHeadServiceClient) Get(ctx context.Context, in *GetIn
 // All implementations must embed UnimplementedIntBeaconCommitteeHeadServiceServer
 // for forward compatibility
 //
-// IntBeaconCommitteeHeadService provides RPC methods for querying int_beacon_committee_head data
+// Query int_beacon_committee_head data
 type IntBeaconCommitteeHeadServiceServer interface {
-	// List returns paginated int_beacon_committee_head records
+	// List records | Retrieve paginated results with optional filtering
 	List(context.Context, *ListIntBeaconCommitteeHeadRequest) (*ListIntBeaconCommitteeHeadResponse, error)
-	// Get returns a single int_beacon_committee_head record by primary key
+	// Get record | Retrieve a single record by primary key
 	Get(context.Context, *GetIntBeaconCommitteeHeadRequest) (*GetIntBeaconCommitteeHeadResponse, error)
 	mustEmbedUnimplementedIntBeaconCommitteeHeadServiceServer()
 }

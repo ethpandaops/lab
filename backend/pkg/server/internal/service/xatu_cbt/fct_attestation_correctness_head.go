@@ -3,7 +3,6 @@ package xatu_cbt
 import (
 	"context"
 	"fmt"
-	"time"
 
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/clickhouse"
 	cbtproto "github.com/ethpandaops/xatu-cbt/pkg/proto/clickhouse"
@@ -98,20 +97,18 @@ func scanFctAttestationCorrectnessHead(
 	scanner clickhouse.RowScanner,
 ) (*cbtproto.FctAttestationCorrectnessHead, error) {
 	var (
-		item                               cbtproto.FctAttestationCorrectnessHead
-		updatedDateTime, slotStartDateTime time.Time
-		epochStartDateTime                 time.Time
-		blockRoot                          *string
-		votesHead                          *uint32
-		votesOther                         *uint32
+		item       cbtproto.FctAttestationCorrectnessHead
+		blockRoot  *string
+		votesHead  *uint32
+		votesOther *uint32
 	)
 
 	if err := scanner.Scan(
-		&updatedDateTime,
+		&item.UpdatedDateTime,
 		&item.Slot,
-		&slotStartDateTime,
+		&item.SlotStartDateTime,
 		&item.Epoch,
-		&epochStartDateTime,
+		&item.EpochStartDateTime,
 		&blockRoot,
 		&item.VotesMax,
 		&votesHead,
@@ -119,10 +116,6 @@ func scanFctAttestationCorrectnessHead(
 	); err != nil {
 		return nil, fmt.Errorf("failed to scan row: %w", err)
 	}
-
-	item.UpdatedDateTime = uint32(updatedDateTime.Unix())       //nolint:gosec // safe.
-	item.SlotStartDateTime = uint32(slotStartDateTime.Unix())   //nolint:gosec // safe.
-	item.EpochStartDateTime = uint32(epochStartDateTime.Unix()) //nolint:gosec // safe.
 
 	// Handle nullable fields
 	if blockRoot != nil {

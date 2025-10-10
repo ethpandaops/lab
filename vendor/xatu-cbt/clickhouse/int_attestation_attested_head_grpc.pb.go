@@ -27,11 +27,11 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// IntAttestationAttestedHeadService provides RPC methods for querying int_attestation_attested_head data
+// Query int_attestation_attested_head data
 type IntAttestationAttestedHeadServiceClient interface {
-	// List returns paginated int_attestation_attested_head records
+	// List records | Retrieve paginated results with optional filtering
 	List(ctx context.Context, in *ListIntAttestationAttestedHeadRequest, opts ...grpc.CallOption) (*ListIntAttestationAttestedHeadResponse, error)
-	// Get returns a single int_attestation_attested_head record by primary key
+	// Get record | Retrieve a single record by primary key
 	Get(ctx context.Context, in *GetIntAttestationAttestedHeadRequest, opts ...grpc.CallOption) (*GetIntAttestationAttestedHeadResponse, error)
 }
 
@@ -67,11 +67,11 @@ func (c *intAttestationAttestedHeadServiceClient) Get(ctx context.Context, in *G
 // All implementations must embed UnimplementedIntAttestationAttestedHeadServiceServer
 // for forward compatibility
 //
-// IntAttestationAttestedHeadService provides RPC methods for querying int_attestation_attested_head data
+// Query int_attestation_attested_head data
 type IntAttestationAttestedHeadServiceServer interface {
-	// List returns paginated int_attestation_attested_head records
+	// List records | Retrieve paginated results with optional filtering
 	List(context.Context, *ListIntAttestationAttestedHeadRequest) (*ListIntAttestationAttestedHeadResponse, error)
-	// Get returns a single int_attestation_attested_head record by primary key
+	// Get record | Retrieve a single record by primary key
 	Get(context.Context, *GetIntAttestationAttestedHeadRequest) (*GetIntAttestationAttestedHeadResponse, error)
 	mustEmbedUnimplementedIntAttestationAttestedHeadServiceServer()
 }

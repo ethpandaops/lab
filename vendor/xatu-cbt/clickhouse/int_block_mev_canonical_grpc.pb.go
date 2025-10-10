@@ -27,11 +27,11 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// IntBlockMevCanonicalService provides RPC methods for querying int_block_mev_canonical data
+// Query int_block_mev_canonical data
 type IntBlockMevCanonicalServiceClient interface {
-	// List returns paginated int_block_mev_canonical records
+	// List records | Retrieve paginated results with optional filtering
 	List(ctx context.Context, in *ListIntBlockMevCanonicalRequest, opts ...grpc.CallOption) (*ListIntBlockMevCanonicalResponse, error)
-	// Get returns a single int_block_mev_canonical record by primary key
+	// Get record | Retrieve a single record by primary key
 	Get(ctx context.Context, in *GetIntBlockMevCanonicalRequest, opts ...grpc.CallOption) (*GetIntBlockMevCanonicalResponse, error)
 }
 
@@ -67,11 +67,11 @@ func (c *intBlockMevCanonicalServiceClient) Get(ctx context.Context, in *GetIntB
 // All implementations must embed UnimplementedIntBlockMevCanonicalServiceServer
 // for forward compatibility
 //
-// IntBlockMevCanonicalService provides RPC methods for querying int_block_mev_canonical data
+// Query int_block_mev_canonical data
 type IntBlockMevCanonicalServiceServer interface {
-	// List returns paginated int_block_mev_canonical records
+	// List records | Retrieve paginated results with optional filtering
 	List(context.Context, *ListIntBlockMevCanonicalRequest) (*ListIntBlockMevCanonicalResponse, error)
-	// Get returns a single int_block_mev_canonical record by primary key
+	// Get record | Retrieve a single record by primary key
 	Get(context.Context, *GetIntBlockMevCanonicalRequest) (*GetIntBlockMevCanonicalResponse, error)
 	mustEmbedUnimplementedIntBlockMevCanonicalServiceServer()
 }

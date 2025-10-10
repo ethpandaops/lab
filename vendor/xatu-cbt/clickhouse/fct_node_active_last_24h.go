@@ -50,26 +50,34 @@ func BuildListFctNodeActiveLast24HQuery(req *ListFctNodeActiveLast24HRequest, op
 	if req.UpdatedDateTime != nil {
 		switch filter := req.UpdatedDateTime.Filter.(type) {
 		case *UInt32Filter_Eq:
-			qb.AddCondition("updated_date_time", "=", filter.Eq)
+			qb.AddCondition("updated_date_time", "=", DateTimeValue{filter.Eq})
 		case *UInt32Filter_Ne:
-			qb.AddCondition("updated_date_time", "!=", filter.Ne)
+			qb.AddCondition("updated_date_time", "!=", DateTimeValue{filter.Ne})
 		case *UInt32Filter_Lt:
-			qb.AddCondition("updated_date_time", "<", filter.Lt)
+			qb.AddCondition("updated_date_time", "<", DateTimeValue{filter.Lt})
 		case *UInt32Filter_Lte:
-			qb.AddCondition("updated_date_time", "<=", filter.Lte)
+			qb.AddCondition("updated_date_time", "<=", DateTimeValue{filter.Lte})
 		case *UInt32Filter_Gt:
-			qb.AddCondition("updated_date_time", ">", filter.Gt)
+			qb.AddCondition("updated_date_time", ">", DateTimeValue{filter.Gt})
 		case *UInt32Filter_Gte:
-			qb.AddCondition("updated_date_time", ">=", filter.Gte)
+			qb.AddCondition("updated_date_time", ">=", DateTimeValue{filter.Gte})
 		case *UInt32Filter_Between:
-			qb.AddBetweenCondition("updated_date_time", filter.Between.Min, filter.Between.Max)
+			qb.AddBetweenCondition("updated_date_time", DateTimeValue{filter.Between.Min}, DateTimeValue{filter.Between.Max.GetValue()})
 		case *UInt32Filter_In:
 			if len(filter.In.Values) > 0 {
-				qb.AddInCondition("updated_date_time", UInt32SliceToInterface(filter.In.Values))
+				converted := make([]interface{}, len(filter.In.Values))
+				for i, v := range filter.In.Values {
+					converted[i] = DateTimeValue{v}
+				}
+				qb.AddInCondition("updated_date_time", converted)
 			}
 		case *UInt32Filter_NotIn:
 			if len(filter.NotIn.Values) > 0 {
-				qb.AddNotInCondition("updated_date_time", UInt32SliceToInterface(filter.NotIn.Values))
+				converted := make([]interface{}, len(filter.NotIn.Values))
+				for i, v := range filter.NotIn.Values {
+					converted[i] = DateTimeValue{v}
+				}
+				qb.AddNotInCondition("updated_date_time", converted)
 			}
 		default:
 			// Unsupported filter type
@@ -80,26 +88,34 @@ func BuildListFctNodeActiveLast24HQuery(req *ListFctNodeActiveLast24HRequest, op
 	if req.LastSeenDateTime != nil {
 		switch filter := req.LastSeenDateTime.Filter.(type) {
 		case *UInt32Filter_Eq:
-			qb.AddCondition("last_seen_date_time", "=", filter.Eq)
+			qb.AddCondition("last_seen_date_time", "=", DateTimeValue{filter.Eq})
 		case *UInt32Filter_Ne:
-			qb.AddCondition("last_seen_date_time", "!=", filter.Ne)
+			qb.AddCondition("last_seen_date_time", "!=", DateTimeValue{filter.Ne})
 		case *UInt32Filter_Lt:
-			qb.AddCondition("last_seen_date_time", "<", filter.Lt)
+			qb.AddCondition("last_seen_date_time", "<", DateTimeValue{filter.Lt})
 		case *UInt32Filter_Lte:
-			qb.AddCondition("last_seen_date_time", "<=", filter.Lte)
+			qb.AddCondition("last_seen_date_time", "<=", DateTimeValue{filter.Lte})
 		case *UInt32Filter_Gt:
-			qb.AddCondition("last_seen_date_time", ">", filter.Gt)
+			qb.AddCondition("last_seen_date_time", ">", DateTimeValue{filter.Gt})
 		case *UInt32Filter_Gte:
-			qb.AddCondition("last_seen_date_time", ">=", filter.Gte)
+			qb.AddCondition("last_seen_date_time", ">=", DateTimeValue{filter.Gte})
 		case *UInt32Filter_Between:
-			qb.AddBetweenCondition("last_seen_date_time", filter.Between.Min, filter.Between.Max)
+			qb.AddBetweenCondition("last_seen_date_time", DateTimeValue{filter.Between.Min}, DateTimeValue{filter.Between.Max.GetValue()})
 		case *UInt32Filter_In:
 			if len(filter.In.Values) > 0 {
-				qb.AddInCondition("last_seen_date_time", UInt32SliceToInterface(filter.In.Values))
+				converted := make([]interface{}, len(filter.In.Values))
+				for i, v := range filter.In.Values {
+					converted[i] = DateTimeValue{v}
+				}
+				qb.AddInCondition("last_seen_date_time", converted)
 			}
 		case *UInt32Filter_NotIn:
 			if len(filter.NotIn.Values) > 0 {
-				qb.AddNotInCondition("last_seen_date_time", UInt32SliceToInterface(filter.NotIn.Values))
+				converted := make([]interface{}, len(filter.NotIn.Values))
+				for i, v := range filter.NotIn.Values {
+					converted[i] = DateTimeValue{v}
+				}
+				qb.AddNotInCondition("last_seen_date_time", converted)
 			}
 		default:
 			// Unsupported filter type
@@ -396,7 +412,7 @@ func BuildListFctNodeActiveLast24HQuery(req *ListFctNodeActiveLast24HRequest, op
 		case *NullableUInt32Filter_Gte:
 			qb.AddCondition("meta_client_geo_autonomous_system_number", ">=", filter.Gte)
 		case *NullableUInt32Filter_Between:
-			qb.AddBetweenCondition("meta_client_geo_autonomous_system_number", filter.Between.Min, filter.Between.Max)
+			qb.AddBetweenCondition("meta_client_geo_autonomous_system_number", filter.Between.Min, filter.Between.Max.GetValue())
 		case *NullableUInt32Filter_In:
 			if len(filter.In.Values) > 0 {
 				qb.AddInCondition("meta_client_geo_autonomous_system_number", UInt32SliceToInterface(filter.In.Values))
@@ -545,7 +561,7 @@ func BuildListFctNodeActiveLast24HQuery(req *ListFctNodeActiveLast24HRequest, op
 	}
 
 	// Build column list
-	columns := []string{"updated_date_time", "last_seen_date_time", "username", "node_id", "classification", "meta_client_name", "meta_client_version", "meta_client_implementation", "meta_client_geo_city", "meta_client_geo_country", "meta_client_geo_country_code", "meta_client_geo_continent_code", "meta_client_geo_longitude", "meta_client_geo_latitude", "meta_client_geo_autonomous_system_number", "meta_client_geo_autonomous_system_organization", "meta_consensus_version", "meta_consensus_implementation"}
+	columns := []string{"toUnixTimestamp(`updated_date_time`) AS `updated_date_time`", "toUnixTimestamp(`last_seen_date_time`) AS `last_seen_date_time`", "username", "node_id", "classification", "meta_client_name", "meta_client_version", "meta_client_implementation", "meta_client_geo_city", "meta_client_geo_country", "meta_client_geo_country_code", "meta_client_geo_continent_code", "meta_client_geo_longitude", "meta_client_geo_latitude", "meta_client_geo_autonomous_system_number", "meta_client_geo_autonomous_system_organization", "meta_consensus_version", "meta_consensus_implementation"}
 
 	return BuildParameterizedQuery("fct_node_active_last_24h", columns, qb, orderByClause, limit, offset, options...)
 }
@@ -565,7 +581,7 @@ func BuildGetFctNodeActiveLast24HQuery(req *GetFctNodeActiveLast24HRequest, opti
 	orderByClause := " ORDER BY meta_client_name"
 
 	// Build column list
-	columns := []string{"updated_date_time", "last_seen_date_time", "username", "node_id", "classification", "meta_client_name", "meta_client_version", "meta_client_implementation", "meta_client_geo_city", "meta_client_geo_country", "meta_client_geo_country_code", "meta_client_geo_continent_code", "meta_client_geo_longitude", "meta_client_geo_latitude", "meta_client_geo_autonomous_system_number", "meta_client_geo_autonomous_system_organization", "meta_consensus_version", "meta_consensus_implementation"}
+	columns := []string{"toUnixTimestamp(`updated_date_time`) AS `updated_date_time`", "toUnixTimestamp(`last_seen_date_time`) AS `last_seen_date_time`", "username", "node_id", "classification", "meta_client_name", "meta_client_version", "meta_client_implementation", "meta_client_geo_city", "meta_client_geo_country", "meta_client_geo_country_code", "meta_client_geo_continent_code", "meta_client_geo_longitude", "meta_client_geo_latitude", "meta_client_geo_autonomous_system_number", "meta_client_geo_autonomous_system_organization", "meta_consensus_version", "meta_consensus_implementation"}
 
 	// Return single record
 	return BuildParameterizedQuery("fct_node_active_last_24h", columns, qb, orderByClause, 1, 0, options...)

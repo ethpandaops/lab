@@ -95,55 +95,55 @@ export class FctMevBidCountByBuilder extends Message<FctMevBidCountByBuilder> {
 }
 
 /**
- * ListFctMevBidCountByBuilderRequest is the request message for listing fct_mev_bid_count_by_builder records
+ * Request for listing fct_mev_bid_count_by_builder records
  *
  * @generated from message cbt.ListFctMevBidCountByBuilderRequest
  */
 export class ListFctMevBidCountByBuilderRequest extends Message<ListFctMevBidCountByBuilderRequest> {
   /**
-   * Filter by slot_start_date_time (PRIMARY KEY - required)
+   * Filter by slot_start_date_time - The start time for the slot that the bid is for (PRIMARY KEY - required unless using alternatives: slot)
    *
    * @generated from field: cbt.UInt32Filter slot_start_date_time = 1;
    */
   slotStartDateTime?: UInt32Filter;
 
   /**
-   * Filter by builder_pubkey (ORDER BY column 2 - optional)
+   * Filter by builder_pubkey - The relay that the bid was fetched from (ORDER BY column 2 - optional)
    *
    * @generated from field: cbt.StringFilter builder_pubkey = 2;
    */
   builderPubkey?: StringFilter;
 
   /**
-   * Filter by updated_date_time (optional)
+   * Filter by updated_date_time - Timestamp when the record was last updated (optional)
    *
    * @generated from field: cbt.UInt32Filter updated_date_time = 3;
    */
   updatedDateTime?: UInt32Filter;
 
   /**
-   * Filter by slot (optional)
+   * Filter by slot - Slot number within the block bid (PROJECTION: p_by_slot - alternative to slot_start_date_time)
    *
    * @generated from field: cbt.UInt32Filter slot = 4;
    */
   slot?: UInt32Filter;
 
   /**
-   * Filter by epoch (optional)
+   * Filter by epoch - Epoch number derived from the slot that the bid is for (optional)
    *
    * @generated from field: cbt.UInt32Filter epoch = 5;
    */
   epoch?: UInt32Filter;
 
   /**
-   * Filter by epoch_start_date_time (optional)
+   * Filter by epoch_start_date_time - The start time for the epoch that the bid is for (optional)
    *
    * @generated from field: cbt.UInt32Filter epoch_start_date_time = 6;
    */
   epochStartDateTime?: UInt32Filter;
 
   /**
-   * Filter by bid_total (optional)
+   * Filter by bid_total - The total number of bids from the builder (optional)
    *
    * @generated from field: cbt.UInt32Filter bid_total = 7;
    */
@@ -213,7 +213,7 @@ export class ListFctMevBidCountByBuilderRequest extends Message<ListFctMevBidCou
 }
 
 /**
- * ListFctMevBidCountByBuilderResponse is the response message for listing fct_mev_bid_count_by_builder records
+ * Response for listing fct_mev_bid_count_by_builder records
  *
  * @generated from message cbt.ListFctMevBidCountByBuilderResponse
  */
@@ -263,7 +263,7 @@ export class ListFctMevBidCountByBuilderResponse extends Message<ListFctMevBidCo
 }
 
 /**
- * GetFctMevBidCountByBuilderRequest is the request message for getting a single fct_mev_bid_count_by_builder record by primary key
+ * Request for getting a single fct_mev_bid_count_by_builder record by primary key
  *
  * @generated from message cbt.GetFctMevBidCountByBuilderRequest
  */
@@ -306,7 +306,7 @@ export class GetFctMevBidCountByBuilderRequest extends Message<GetFctMevBidCount
 }
 
 /**
- * GetFctMevBidCountByBuilderResponse is the response message for getting a single fct_mev_bid_count_by_builder record
+ * Response for getting a single fct_mev_bid_count_by_builder record
  *
  * @generated from message cbt.GetFctMevBidCountByBuilderResponse
  */
