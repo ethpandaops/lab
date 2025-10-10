@@ -5,8 +5,6 @@ go 1.24.6
 // Until we bump ch-proxy: https://github.com/ClickHouse/clickhouse-go/issues/674
 replace github.com/ClickHouse/clickhouse-go/v2 => github.com/ClickHouse/clickhouse-go/v2 v2.36.1-0.20250616170804-ac33f72aba3a
 
-replace github.com/ethpandaops/xatu-cbt => /Users/matty/go/src/github.com/ethpandaops/xatu-cbt
-
 require (
 	connectrpc.com/connect v1.18.1
 	github.com/ClickHouse/clickhouse-go/v2 v2.40.1
@@ -15,7 +13,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/config v1.31.8
 	github.com/aws/aws-sdk-go-v2/credentials v1.18.12
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.88.1
-	github.com/ethpandaops/xatu-cbt v0.0.0-20250929035327-330cd2152dea
+	github.com/ethpandaops/xatu-cbt v0.0.0-20251010004931-782d9d468e26
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/prometheus/client_golang v1.23.2
 	github.com/rs/cors v1.11.1
