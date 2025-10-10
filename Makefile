@@ -4,7 +4,7 @@
 SHELL := /bin/bash
 
 # Pin upstream xatu-cbt commit/branch for proto vendoring
-XATU_CBT_COMMIT := 782d9d468e26aecb145e383a957d89a138ec889b
+XATU_CBT_COMMIT := master
 
 # Vendor upstream proto files
 vendor-protos:
