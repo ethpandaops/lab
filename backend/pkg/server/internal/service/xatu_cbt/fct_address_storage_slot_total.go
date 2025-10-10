@@ -55,7 +55,7 @@ func (x *XatuCBT) GetFctAddressStorageSlotTotal(
 		// Get specific record by primary key
 		query = fmt.Sprintf(`
 			SELECT
-				updated_date_time,
+				toUnixTimestamp(updated_date_time) AS updated_date_time,
 				total_storage_slots,
 				expired_storage_slots
 			FROM %s.fct_address_storage_slot_total FINAL
@@ -67,7 +67,7 @@ func (x *XatuCBT) GetFctAddressStorageSlotTotal(
 		// Get the most recent record
 		query = fmt.Sprintf(`
 			SELECT
-				updated_date_time,
+				toUnixTimestamp(updated_date_time) AS updated_date_time,
 				total_storage_slots,
 				expired_storage_slots
 			FROM %s.fct_address_storage_slot_total FINAL

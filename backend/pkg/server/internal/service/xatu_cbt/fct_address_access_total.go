@@ -55,7 +55,7 @@ func (x *XatuCBT) GetFctAddressAccessTotal(
 		// Get specific record by primary key
 		query = fmt.Sprintf(`
 			SELECT
-				updated_date_time,
+				toUnixTimestamp(updated_date_time) AS updated_date_time,
 				total_accounts,
 				expired_accounts,
 				total_contract_accounts,
@@ -69,7 +69,7 @@ func (x *XatuCBT) GetFctAddressAccessTotal(
 		// Get the most recent record
 		query = fmt.Sprintf(`
 			SELECT
-				updated_date_time,
+				toUnixTimestamp(updated_date_time) AS updated_date_time,
 				total_accounts,
 				expired_accounts,
 				total_contract_accounts,

@@ -3,7 +3,6 @@ package xatu_cbt
 import (
 	"context"
 	"fmt"
-	"math/big"
 
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/clickhouse"
 	cbtproto "github.com/ethpandaops/xatu-cbt/pkg/proto/clickhouse"
@@ -82,7 +81,7 @@ func scanFctBlock(scanner clickhouse.RowScanner) (*cbtproto.FctBlock, error) {
 	var (
 		blockTotalBytes                                  *uint32
 		blockTotalBytesCompressed                        *uint32
-		executionPayloadBaseFeePerGas                    *big.Int
+		executionPayloadBaseFeePerGas                    *string
 		executionPayloadBlobGasUsed                      *uint64
 		executionPayloadExcessBlobGas                    *uint64
 		executionPayloadGasLimit                         *uint64
@@ -136,7 +135,7 @@ func scanFctBlock(scanner clickhouse.RowScanner) (*cbtproto.FctBlock, error) {
 	}
 
 	if executionPayloadBaseFeePerGas != nil {
-		block.ExecutionPayloadBaseFeePerGas = wrapperspb.String(executionPayloadBaseFeePerGas.String())
+		block.ExecutionPayloadBaseFeePerGas = wrapperspb.String(*executionPayloadBaseFeePerGas)
 	}
 
 	if executionPayloadBlobGasUsed != nil {
