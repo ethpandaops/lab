@@ -663,14 +663,15 @@ func BuildParameterizedQuery(table string, columns []string, qb *QueryBuilder, o
 
 	escapedColumns := make([]string, 0, len(columns))
 	for _, col := range columns {
-		if !isValidColumnName(col) {
-			return SQLQuery{}, fmt.Errorf("invalid column name: %s", col)
-		}
-
-		// Escape column names with backticks if they contain dots (for nested fields)
-		// or if they might be reserved words.
-		if strings.Contains(col, ".") {
-			// For nested fields like "abc.xyz", escape each part.
+		// Check if this is an expression (contains function calls or AS keyword)
+		if strings.Contains(col, "(") || strings.Contains(strings.ToUpper(col), " AS ") {
+			// It's an expression - use as-is (already contains proper escaping)
+			escapedColumns = append(escapedColumns, col)
+		} else if strings.Contains(col, ".") {
+			// Nested field - validate and escape each part
+			if !isValidColumnName(col) {
+				return SQLQuery{}, fmt.Errorf("invalid column name: %s", col)
+			}
 			parts := strings.Split(col, ".")
 			escapedParts := make([]string, len(parts))
 			for i, part := range parts {
@@ -678,6 +679,10 @@ func BuildParameterizedQuery(table string, columns []string, qb *QueryBuilder, o
 			}
 			escapedColumns = append(escapedColumns, strings.Join(escapedParts, "."))
 		} else {
+			// Simple column name - validate and escape it
+			if !isValidColumnName(col) {
+				return SQLQuery{}, fmt.Errorf("invalid column name: %s", col)
+			}
 			escapedColumns = append(escapedColumns, fmt.Sprintf("`%s`", col))
 		}
 	}

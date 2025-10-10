@@ -111,69 +111,69 @@ export class FctAttestationCorrectnessCanonical extends Message<FctAttestationCo
 }
 
 /**
- * ListFctAttestationCorrectnessCanonicalRequest is the request message for listing fct_attestation_correctness_canonical records
+ * Request for listing fct_attestation_correctness_canonical records
  *
  * @generated from message cbt.ListFctAttestationCorrectnessCanonicalRequest
  */
 export class ListFctAttestationCorrectnessCanonicalRequest extends Message<ListFctAttestationCorrectnessCanonicalRequest> {
   /**
-   * Filter by slot_start_date_time (PRIMARY KEY - required)
+   * Filter by slot_start_date_time - The wall clock time when the slot started (PRIMARY KEY - required unless using alternatives: slot)
    *
    * @generated from field: cbt.UInt32Filter slot_start_date_time = 1;
    */
   slotStartDateTime?: UInt32Filter;
 
   /**
-   * Filter by updated_date_time (optional)
+   * Filter by updated_date_time - Timestamp when the record was last updated (optional)
    *
    * @generated from field: cbt.UInt32Filter updated_date_time = 2;
    */
   updatedDateTime?: UInt32Filter;
 
   /**
-   * Filter by slot (optional)
+   * Filter by slot - The slot number (PROJECTION: p_by_slot - alternative to slot_start_date_time)
    *
    * @generated from field: cbt.UInt32Filter slot = 3;
    */
   slot?: UInt32Filter;
 
   /**
-   * Filter by epoch (optional)
+   * Filter by epoch - The epoch number containing the slot (optional)
    *
    * @generated from field: cbt.UInt32Filter epoch = 4;
    */
   epoch?: UInt32Filter;
 
   /**
-   * Filter by epoch_start_date_time (optional)
+   * Filter by epoch_start_date_time - The wall clock time when the epoch started (optional)
    *
    * @generated from field: cbt.UInt32Filter epoch_start_date_time = 5;
    */
   epochStartDateTime?: UInt32Filter;
 
   /**
-   * Filter by block_root (optional)
+   * Filter by block_root - The beacon block root hash (optional)
    *
    * @generated from field: cbt.NullableStringFilter block_root = 6;
    */
   blockRoot?: NullableStringFilter;
 
   /**
-   * Filter by votes_max (optional)
+   * Filter by votes_max - The maximum number of scheduled votes for the block (optional)
    *
    * @generated from field: cbt.UInt32Filter votes_max = 7;
    */
   votesMax?: UInt32Filter;
 
   /**
-   * Filter by votes_head (optional)
+   * Filter by votes_head - The number of votes for the block proposed in the current slot (optional)
    *
    * @generated from field: cbt.NullableUInt32Filter votes_head = 8;
    */
   votesHead?: NullableUInt32Filter;
 
   /**
-   * Filter by votes_other (optional)
+   * Filter by votes_other - The number of votes for any blocks proposed in previous slots (optional)
    *
    * @generated from field: cbt.NullableUInt32Filter votes_other = 9;
    */
@@ -245,7 +245,7 @@ export class ListFctAttestationCorrectnessCanonicalRequest extends Message<ListF
 }
 
 /**
- * ListFctAttestationCorrectnessCanonicalResponse is the response message for listing fct_attestation_correctness_canonical records
+ * Response for listing fct_attestation_correctness_canonical records
  *
  * @generated from message cbt.ListFctAttestationCorrectnessCanonicalResponse
  */
@@ -295,7 +295,7 @@ export class ListFctAttestationCorrectnessCanonicalResponse extends Message<List
 }
 
 /**
- * GetFctAttestationCorrectnessCanonicalRequest is the request message for getting a single fct_attestation_correctness_canonical record by primary key
+ * Request for getting a single fct_attestation_correctness_canonical record by primary key
  *
  * @generated from message cbt.GetFctAttestationCorrectnessCanonicalRequest
  */
@@ -338,7 +338,7 @@ export class GetFctAttestationCorrectnessCanonicalRequest extends Message<GetFct
 }
 
 /**
- * GetFctAttestationCorrectnessCanonicalResponse is the response message for getting a single fct_attestation_correctness_canonical record
+ * Response for getting a single fct_attestation_correctness_canonical record
  *
  * @generated from message cbt.GetFctAttestationCorrectnessCanonicalResponse
  */

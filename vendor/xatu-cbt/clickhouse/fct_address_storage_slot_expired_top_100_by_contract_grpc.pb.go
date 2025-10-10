@@ -27,11 +27,11 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// FctAddressStorageSlotExpiredTop100ByContractService provides RPC methods for querying fct_address_storage_slot_expired_top_100_by_contract data
+// Query fct_address_storage_slot_expired_top_100_by_contract data
 type FctAddressStorageSlotExpiredTop100ByContractServiceClient interface {
-	// List returns paginated fct_address_storage_slot_expired_top_100_by_contract records
+	// List records | Retrieve paginated results with optional filtering
 	List(ctx context.Context, in *ListFctAddressStorageSlotExpiredTop100ByContractRequest, opts ...grpc.CallOption) (*ListFctAddressStorageSlotExpiredTop100ByContractResponse, error)
-	// Get returns a single fct_address_storage_slot_expired_top_100_by_contract record by primary key
+	// Get record | Retrieve a single record by rank
 	Get(ctx context.Context, in *GetFctAddressStorageSlotExpiredTop100ByContractRequest, opts ...grpc.CallOption) (*GetFctAddressStorageSlotExpiredTop100ByContractResponse, error)
 }
 
@@ -67,11 +67,11 @@ func (c *fctAddressStorageSlotExpiredTop100ByContractServiceClient) Get(ctx cont
 // All implementations must embed UnimplementedFctAddressStorageSlotExpiredTop100ByContractServiceServer
 // for forward compatibility
 //
-// FctAddressStorageSlotExpiredTop100ByContractService provides RPC methods for querying fct_address_storage_slot_expired_top_100_by_contract data
+// Query fct_address_storage_slot_expired_top_100_by_contract data
 type FctAddressStorageSlotExpiredTop100ByContractServiceServer interface {
-	// List returns paginated fct_address_storage_slot_expired_top_100_by_contract records
+	// List records | Retrieve paginated results with optional filtering
 	List(context.Context, *ListFctAddressStorageSlotExpiredTop100ByContractRequest) (*ListFctAddressStorageSlotExpiredTop100ByContractResponse, error)
-	// Get returns a single fct_address_storage_slot_expired_top_100_by_contract record by primary key
+	// Get record | Retrieve a single record by rank
 	Get(context.Context, *GetFctAddressStorageSlotExpiredTop100ByContractRequest) (*GetFctAddressStorageSlotExpiredTop100ByContractResponse, error)
 	mustEmbedUnimplementedFctAddressStorageSlotExpiredTop100ByContractServiceServer()
 }

@@ -151,7 +151,7 @@ func BuildListFctAddressStorageSlotTotalQuery(req *ListFctAddressStorageSlotTota
 	}
 
 	// Build column list
-	columns := []string{"updated_date_time", "total_storage_slots", "expired_storage_slots"}
+	columns := []string{"toUnixTimestamp(`updated_date_time`) AS `updated_date_time`", "total_storage_slots", "expired_storage_slots"}
 
 	return BuildParameterizedQuery("fct_address_storage_slot_total", columns, qb, orderByClause, limit, offset, options...)
 }
@@ -171,7 +171,7 @@ func BuildGetFctAddressStorageSlotTotalQuery(req *GetFctAddressStorageSlotTotalR
 	orderByClause := " ORDER BY updated_date_time"
 
 	// Build column list
-	columns := []string{"updated_date_time", "total_storage_slots", "expired_storage_slots"}
+	columns := []string{"toUnixTimestamp(`updated_date_time`) AS `updated_date_time`", "total_storage_slots", "expired_storage_slots"}
 
 	// Return single record
 	return BuildParameterizedQuery("fct_address_storage_slot_total", columns, qb, orderByClause, 1, 0, options...)

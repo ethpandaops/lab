@@ -303,65 +303,65 @@ func (x *IntBlockCanonical) GetExecutionPayloadTransactionsTotalBytesCompressed(
 	return nil
 }
 
-// ListIntBlockCanonicalRequest is the request message for listing int_block_canonical records
+// Request for listing int_block_canonical records
 type ListIntBlockCanonicalRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Filter by slot_start_date_time (PRIMARY KEY - required)
+	// Filter by slot_start_date_time - The wall clock time when the reorg slot started (PRIMARY KEY - required)
 	SlotStartDateTime *UInt32Filter `protobuf:"bytes,1,opt,name=slot_start_date_time,json=slotStartDateTime,proto3" json:"slot_start_date_time,omitempty"`
-	// Filter by block_root (ORDER BY column 2 - optional)
+	// Filter by block_root - The root hash of the beacon block (ORDER BY column 2 - optional)
 	BlockRoot *StringFilter `protobuf:"bytes,2,opt,name=block_root,json=blockRoot,proto3" json:"block_root,omitempty"`
-	// Filter by updated_date_time (optional)
+	// Filter by updated_date_time - Timestamp when the record was last updated (optional)
 	UpdatedDateTime *UInt32Filter `protobuf:"bytes,3,opt,name=updated_date_time,json=updatedDateTime,proto3" json:"updated_date_time,omitempty"`
-	// Filter by slot (optional)
+	// Filter by slot - The slot number from beacon block payload (optional)
 	Slot *UInt32Filter `protobuf:"bytes,4,opt,name=slot,proto3" json:"slot,omitempty"`
-	// Filter by epoch (optional)
+	// Filter by epoch - The epoch number from beacon block payload (optional)
 	Epoch *UInt32Filter `protobuf:"bytes,5,opt,name=epoch,proto3" json:"epoch,omitempty"`
-	// Filter by epoch_start_date_time (optional)
+	// Filter by epoch_start_date_time - The wall clock time when the epoch started (optional)
 	EpochStartDateTime *UInt32Filter `protobuf:"bytes,6,opt,name=epoch_start_date_time,json=epochStartDateTime,proto3" json:"epoch_start_date_time,omitempty"`
-	// Filter by block_version (optional)
+	// Filter by block_version - The version of the beacon block (optional)
 	BlockVersion *StringFilter `protobuf:"bytes,7,opt,name=block_version,json=blockVersion,proto3" json:"block_version,omitempty"`
-	// Filter by block_total_bytes (optional)
+	// Filter by block_total_bytes - The total bytes of the beacon block payload (optional)
 	BlockTotalBytes *NullableUInt32Filter `protobuf:"bytes,8,opt,name=block_total_bytes,json=blockTotalBytes,proto3" json:"block_total_bytes,omitempty"`
-	// Filter by block_total_bytes_compressed (optional)
+	// Filter by block_total_bytes_compressed - The total bytes of the beacon block payload when compressed using snappy (optional)
 	BlockTotalBytesCompressed *NullableUInt32Filter `protobuf:"bytes,9,opt,name=block_total_bytes_compressed,json=blockTotalBytesCompressed,proto3" json:"block_total_bytes_compressed,omitempty"`
-	// Filter by parent_root (optional)
+	// Filter by parent_root - The root hash of the parent beacon block (optional)
 	ParentRoot *StringFilter `protobuf:"bytes,10,opt,name=parent_root,json=parentRoot,proto3" json:"parent_root,omitempty"`
-	// Filter by state_root (optional)
+	// Filter by state_root - The root hash of the beacon state at this block (optional)
 	StateRoot *StringFilter `protobuf:"bytes,11,opt,name=state_root,json=stateRoot,proto3" json:"state_root,omitempty"`
-	// Filter by proposer_index (optional)
+	// Filter by proposer_index - The index of the validator that proposed the beacon block (optional)
 	ProposerIndex *UInt32Filter `protobuf:"bytes,12,opt,name=proposer_index,json=proposerIndex,proto3" json:"proposer_index,omitempty"`
-	// Filter by eth1_data_block_hash (optional)
+	// Filter by eth1_data_block_hash - The block hash of the associated execution block (optional)
 	Eth1DataBlockHash *StringFilter `protobuf:"bytes,13,opt,name=eth1_data_block_hash,json=eth1DataBlockHash,proto3" json:"eth1_data_block_hash,omitempty"`
-	// Filter by eth1_data_deposit_root (optional)
+	// Filter by eth1_data_deposit_root - The root of the deposit tree in the associated execution block (optional)
 	Eth1DataDepositRoot *StringFilter `protobuf:"bytes,14,opt,name=eth1_data_deposit_root,json=eth1DataDepositRoot,proto3" json:"eth1_data_deposit_root,omitempty"`
-	// Filter by execution_payload_block_hash (optional)
+	// Filter by execution_payload_block_hash - The block hash of the execution payload (optional)
 	ExecutionPayloadBlockHash *StringFilter `protobuf:"bytes,15,opt,name=execution_payload_block_hash,json=executionPayloadBlockHash,proto3" json:"execution_payload_block_hash,omitempty"`
-	// Filter by execution_payload_block_number (optional)
+	// Filter by execution_payload_block_number - The block number of the execution payload (optional)
 	ExecutionPayloadBlockNumber *UInt32Filter `protobuf:"bytes,16,opt,name=execution_payload_block_number,json=executionPayloadBlockNumber,proto3" json:"execution_payload_block_number,omitempty"`
-	// Filter by execution_payload_fee_recipient (optional)
+	// Filter by execution_payload_fee_recipient - The recipient of the fee for this execution payload (optional)
 	ExecutionPayloadFeeRecipient *StringFilter `protobuf:"bytes,17,opt,name=execution_payload_fee_recipient,json=executionPayloadFeeRecipient,proto3" json:"execution_payload_fee_recipient,omitempty"`
-	// Filter by execution_payload_base_fee_per_gas (optional)
+	// Filter by execution_payload_base_fee_per_gas - Base fee per gas for execution payload (optional)
 	ExecutionPayloadBaseFeePerGas *NullableStringFilter `protobuf:"bytes,18,opt,name=execution_payload_base_fee_per_gas,json=executionPayloadBaseFeePerGas,proto3" json:"execution_payload_base_fee_per_gas,omitempty"`
-	// Filter by execution_payload_blob_gas_used (optional)
+	// Filter by execution_payload_blob_gas_used - Gas used for blobs in execution payload (optional)
 	ExecutionPayloadBlobGasUsed *NullableUInt64Filter `protobuf:"bytes,19,opt,name=execution_payload_blob_gas_used,json=executionPayloadBlobGasUsed,proto3" json:"execution_payload_blob_gas_used,omitempty"`
-	// Filter by execution_payload_excess_blob_gas (optional)
+	// Filter by execution_payload_excess_blob_gas - Excess gas used for blobs in execution payload (optional)
 	ExecutionPayloadExcessBlobGas *NullableUInt64Filter `protobuf:"bytes,20,opt,name=execution_payload_excess_blob_gas,json=executionPayloadExcessBlobGas,proto3" json:"execution_payload_excess_blob_gas,omitempty"`
-	// Filter by execution_payload_gas_limit (optional)
+	// Filter by execution_payload_gas_limit - Gas limit for execution payload (optional)
 	ExecutionPayloadGasLimit *NullableUInt64Filter `protobuf:"bytes,21,opt,name=execution_payload_gas_limit,json=executionPayloadGasLimit,proto3" json:"execution_payload_gas_limit,omitempty"`
-	// Filter by execution_payload_gas_used (optional)
+	// Filter by execution_payload_gas_used - Gas used for execution payload (optional)
 	ExecutionPayloadGasUsed *NullableUInt64Filter `protobuf:"bytes,22,opt,name=execution_payload_gas_used,json=executionPayloadGasUsed,proto3" json:"execution_payload_gas_used,omitempty"`
-	// Filter by execution_payload_state_root (optional)
+	// Filter by execution_payload_state_root - The state root of the execution payload (optional)
 	ExecutionPayloadStateRoot *StringFilter `protobuf:"bytes,23,opt,name=execution_payload_state_root,json=executionPayloadStateRoot,proto3" json:"execution_payload_state_root,omitempty"`
-	// Filter by execution_payload_parent_hash (optional)
+	// Filter by execution_payload_parent_hash - The parent hash of the execution payload (optional)
 	ExecutionPayloadParentHash *StringFilter `protobuf:"bytes,24,opt,name=execution_payload_parent_hash,json=executionPayloadParentHash,proto3" json:"execution_payload_parent_hash,omitempty"`
-	// Filter by execution_payload_transactions_count (optional)
+	// Filter by execution_payload_transactions_count - The transaction count of the execution payload (optional)
 	ExecutionPayloadTransactionsCount *NullableUInt32Filter `protobuf:"bytes,25,opt,name=execution_payload_transactions_count,json=executionPayloadTransactionsCount,proto3" json:"execution_payload_transactions_count,omitempty"`
-	// Filter by execution_payload_transactions_total_bytes (optional)
+	// Filter by execution_payload_transactions_total_bytes - The transaction total bytes of the execution payload (optional)
 	ExecutionPayloadTransactionsTotalBytes *NullableUInt32Filter `protobuf:"bytes,26,opt,name=execution_payload_transactions_total_bytes,json=executionPayloadTransactionsTotalBytes,proto3" json:"execution_payload_transactions_total_bytes,omitempty"`
-	// Filter by execution_payload_transactions_total_bytes_compressed (optional)
+	// Filter by execution_payload_transactions_total_bytes_compressed - The transaction total bytes of the execution payload when compressed using snappy (optional)
 	ExecutionPayloadTransactionsTotalBytesCompressed *NullableUInt32Filter `protobuf:"bytes,27,opt,name=execution_payload_transactions_total_bytes_compressed,json=executionPayloadTransactionsTotalBytesCompressed,proto3" json:"execution_payload_transactions_total_bytes_compressed,omitempty"`
 	// The maximum number of int_block_canonical to return.
 	// If unspecified, at most 100 items will be returned.
@@ -618,7 +618,7 @@ func (x *ListIntBlockCanonicalRequest) GetOrderBy() string {
 	return ""
 }
 
-// ListIntBlockCanonicalResponse is the response message for listing int_block_canonical records
+// Response for listing int_block_canonical records
 type ListIntBlockCanonicalResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -677,7 +677,7 @@ func (x *ListIntBlockCanonicalResponse) GetNextPageToken() string {
 	return ""
 }
 
-// GetIntBlockCanonicalRequest is the request message for getting a single int_block_canonical record by primary key
+// Request for getting a single int_block_canonical record by primary key
 type GetIntBlockCanonicalRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -726,7 +726,7 @@ func (x *GetIntBlockCanonicalRequest) GetSlotStartDateTime() uint32 {
 	return 0
 }
 
-// GetIntBlockCanonicalResponse is the response message for getting a single int_block_canonical record
+// Response for getting a single int_block_canonical record
 type GetIntBlockCanonicalResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache

@@ -27,11 +27,11 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// FctAttestationCorrectnessByValidatorHeadService provides RPC methods for querying fct_attestation_correctness_by_validator_head data
+// Query fct_attestation_correctness_by_validator_head data
 type FctAttestationCorrectnessByValidatorHeadServiceClient interface {
-	// List returns paginated fct_attestation_correctness_by_validator_head records
+	// List records | Retrieve paginated results with optional filtering
 	List(ctx context.Context, in *ListFctAttestationCorrectnessByValidatorHeadRequest, opts ...grpc.CallOption) (*ListFctAttestationCorrectnessByValidatorHeadResponse, error)
-	// Get returns a single fct_attestation_correctness_by_validator_head record by primary key
+	// Get record | Retrieve a single record by slot_start_date_time
 	Get(ctx context.Context, in *GetFctAttestationCorrectnessByValidatorHeadRequest, opts ...grpc.CallOption) (*GetFctAttestationCorrectnessByValidatorHeadResponse, error)
 }
 
@@ -67,11 +67,11 @@ func (c *fctAttestationCorrectnessByValidatorHeadServiceClient) Get(ctx context.
 // All implementations must embed UnimplementedFctAttestationCorrectnessByValidatorHeadServiceServer
 // for forward compatibility
 //
-// FctAttestationCorrectnessByValidatorHeadService provides RPC methods for querying fct_attestation_correctness_by_validator_head data
+// Query fct_attestation_correctness_by_validator_head data
 type FctAttestationCorrectnessByValidatorHeadServiceServer interface {
-	// List returns paginated fct_attestation_correctness_by_validator_head records
+	// List records | Retrieve paginated results with optional filtering
 	List(context.Context, *ListFctAttestationCorrectnessByValidatorHeadRequest) (*ListFctAttestationCorrectnessByValidatorHeadResponse, error)
-	// Get returns a single fct_attestation_correctness_by_validator_head record by primary key
+	// Get record | Retrieve a single record by slot_start_date_time
 	Get(context.Context, *GetFctAttestationCorrectnessByValidatorHeadRequest) (*GetFctAttestationCorrectnessByValidatorHeadResponse, error)
 	mustEmbedUnimplementedFctAttestationCorrectnessByValidatorHeadServiceServer()
 }

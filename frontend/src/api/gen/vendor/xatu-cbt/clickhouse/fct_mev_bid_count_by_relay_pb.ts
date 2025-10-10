@@ -95,55 +95,55 @@ export class FctMevBidCountByRelay extends Message<FctMevBidCountByRelay> {
 }
 
 /**
- * ListFctMevBidCountByRelayRequest is the request message for listing fct_mev_bid_count_by_relay records
+ * Request for listing fct_mev_bid_count_by_relay records
  *
  * @generated from message cbt.ListFctMevBidCountByRelayRequest
  */
 export class ListFctMevBidCountByRelayRequest extends Message<ListFctMevBidCountByRelayRequest> {
   /**
-   * Filter by slot_start_date_time (PRIMARY KEY - required)
+   * Filter by slot_start_date_time - The start time for the slot that the bid is for (PRIMARY KEY - required unless using alternatives: slot)
    *
    * @generated from field: cbt.UInt32Filter slot_start_date_time = 1;
    */
   slotStartDateTime?: UInt32Filter;
 
   /**
-   * Filter by relay_name (ORDER BY column 2 - optional)
+   * Filter by relay_name - The relay that the bid was fetched from (ORDER BY column 2 - optional)
    *
    * @generated from field: cbt.StringFilter relay_name = 2;
    */
   relayName?: StringFilter;
 
   /**
-   * Filter by updated_date_time (optional)
+   * Filter by updated_date_time - Timestamp when the record was last updated (optional)
    *
    * @generated from field: cbt.UInt32Filter updated_date_time = 3;
    */
   updatedDateTime?: UInt32Filter;
 
   /**
-   * Filter by slot (optional)
+   * Filter by slot - Slot number within the block bid (PROJECTION: p_by_slot - alternative to slot_start_date_time)
    *
    * @generated from field: cbt.UInt32Filter slot = 4;
    */
   slot?: UInt32Filter;
 
   /**
-   * Filter by epoch (optional)
+   * Filter by epoch - Epoch number derived from the slot that the bid is for (optional)
    *
    * @generated from field: cbt.UInt32Filter epoch = 5;
    */
   epoch?: UInt32Filter;
 
   /**
-   * Filter by epoch_start_date_time (optional)
+   * Filter by epoch_start_date_time - The start time for the epoch that the bid is for (optional)
    *
    * @generated from field: cbt.UInt32Filter epoch_start_date_time = 6;
    */
   epochStartDateTime?: UInt32Filter;
 
   /**
-   * Filter by bid_total (optional)
+   * Filter by bid_total - The total number of bids for the relay (optional)
    *
    * @generated from field: cbt.UInt32Filter bid_total = 7;
    */
@@ -213,7 +213,7 @@ export class ListFctMevBidCountByRelayRequest extends Message<ListFctMevBidCount
 }
 
 /**
- * ListFctMevBidCountByRelayResponse is the response message for listing fct_mev_bid_count_by_relay records
+ * Response for listing fct_mev_bid_count_by_relay records
  *
  * @generated from message cbt.ListFctMevBidCountByRelayResponse
  */
@@ -263,7 +263,7 @@ export class ListFctMevBidCountByRelayResponse extends Message<ListFctMevBidCoun
 }
 
 /**
- * GetFctMevBidCountByRelayRequest is the request message for getting a single fct_mev_bid_count_by_relay record by primary key
+ * Request for getting a single fct_mev_bid_count_by_relay record by primary key
  *
  * @generated from message cbt.GetFctMevBidCountByRelayRequest
  */
@@ -306,7 +306,7 @@ export class GetFctMevBidCountByRelayRequest extends Message<GetFctMevBidCountBy
 }
 
 /**
- * GetFctMevBidCountByRelayResponse is the response message for getting a single fct_mev_bid_count_by_relay record
+ * Response for getting a single fct_mev_bid_count_by_relay record
  *
  * @generated from message cbt.GetFctMevBidCountByRelayResponse
  */

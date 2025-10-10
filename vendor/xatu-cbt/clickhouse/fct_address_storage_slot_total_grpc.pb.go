@@ -27,11 +27,11 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// FctAddressStorageSlotTotalService provides RPC methods for querying fct_address_storage_slot_total data
+// Query fct_address_storage_slot_total data
 type FctAddressStorageSlotTotalServiceClient interface {
-	// List returns paginated fct_address_storage_slot_total records
+	// List records | Retrieve paginated results with optional filtering
 	List(ctx context.Context, in *ListFctAddressStorageSlotTotalRequest, opts ...grpc.CallOption) (*ListFctAddressStorageSlotTotalResponse, error)
-	// Get returns a single fct_address_storage_slot_total record by primary key
+	// Get record | Retrieve a single record by updated_date_time
 	Get(ctx context.Context, in *GetFctAddressStorageSlotTotalRequest, opts ...grpc.CallOption) (*GetFctAddressStorageSlotTotalResponse, error)
 }
 
@@ -67,11 +67,11 @@ func (c *fctAddressStorageSlotTotalServiceClient) Get(ctx context.Context, in *G
 // All implementations must embed UnimplementedFctAddressStorageSlotTotalServiceServer
 // for forward compatibility
 //
-// FctAddressStorageSlotTotalService provides RPC methods for querying fct_address_storage_slot_total data
+// Query fct_address_storage_slot_total data
 type FctAddressStorageSlotTotalServiceServer interface {
-	// List returns paginated fct_address_storage_slot_total records
+	// List records | Retrieve paginated results with optional filtering
 	List(context.Context, *ListFctAddressStorageSlotTotalRequest) (*ListFctAddressStorageSlotTotalResponse, error)
-	// Get returns a single fct_address_storage_slot_total record by primary key
+	// Get record | Retrieve a single record by updated_date_time
 	Get(context.Context, *GetFctAddressStorageSlotTotalRequest) (*GetFctAddressStorageSlotTotalResponse, error)
 	mustEmbedUnimplementedFctAddressStorageSlotTotalServiceServer()
 }

@@ -263,202 +263,202 @@ export class FctBlock extends Message<FctBlock> {
 }
 
 /**
- * ListFctBlockRequest is the request message for listing fct_block records
+ * Request for listing fct_block records
  *
  * @generated from message cbt.ListFctBlockRequest
  */
 export class ListFctBlockRequest extends Message<ListFctBlockRequest> {
   /**
-   * Filter by slot_start_date_time (PRIMARY KEY - required)
+   * Filter by slot_start_date_time - The wall clock time when the reorg slot started (PRIMARY KEY - required unless using alternatives: block_root, slot)
    *
    * @generated from field: cbt.UInt32Filter slot_start_date_time = 1;
    */
   slotStartDateTime?: UInt32Filter;
 
   /**
-   * Filter by block_root (ORDER BY column 2 - optional)
+   * Filter by block_root - The root hash of the beacon block (ORDER BY column 2 - optional)
    *
    * @generated from field: cbt.StringFilter block_root = 2;
    */
   blockRoot?: StringFilter;
 
   /**
-   * Filter by updated_date_time (optional)
+   * Filter by updated_date_time - Timestamp when the record was last updated (optional)
    *
    * @generated from field: cbt.UInt32Filter updated_date_time = 3;
    */
   updatedDateTime?: UInt32Filter;
 
   /**
-   * Filter by slot (optional)
+   * Filter by slot - The slot number from beacon block payload (PROJECTION: p_by_slot - alternative to slot_start_date_time)
    *
    * @generated from field: cbt.UInt32Filter slot = 4;
    */
   slot?: UInt32Filter;
 
   /**
-   * Filter by epoch (optional)
+   * Filter by epoch - The epoch number from beacon block payload (optional)
    *
    * @generated from field: cbt.UInt32Filter epoch = 5;
    */
   epoch?: UInt32Filter;
 
   /**
-   * Filter by epoch_start_date_time (optional)
+   * Filter by epoch_start_date_time - The wall clock time when the epoch started (optional)
    *
    * @generated from field: cbt.UInt32Filter epoch_start_date_time = 6;
    */
   epochStartDateTime?: UInt32Filter;
 
   /**
-   * Filter by block_version (optional)
+   * Filter by block_version - The version of the beacon block (optional)
    *
    * @generated from field: cbt.StringFilter block_version = 7;
    */
   blockVersion?: StringFilter;
 
   /**
-   * Filter by block_total_bytes (optional)
+   * Filter by block_total_bytes - The total bytes of the beacon block payload (optional)
    *
    * @generated from field: cbt.NullableUInt32Filter block_total_bytes = 8;
    */
   blockTotalBytes?: NullableUInt32Filter;
 
   /**
-   * Filter by block_total_bytes_compressed (optional)
+   * Filter by block_total_bytes_compressed - The total bytes of the beacon block payload when compressed using snappy (optional)
    *
    * @generated from field: cbt.NullableUInt32Filter block_total_bytes_compressed = 9;
    */
   blockTotalBytesCompressed?: NullableUInt32Filter;
 
   /**
-   * Filter by parent_root (optional)
+   * Filter by parent_root - The root hash of the parent beacon block (optional)
    *
    * @generated from field: cbt.StringFilter parent_root = 10;
    */
   parentRoot?: StringFilter;
 
   /**
-   * Filter by state_root (optional)
+   * Filter by state_root - The root hash of the beacon state at this block (optional)
    *
    * @generated from field: cbt.StringFilter state_root = 11;
    */
   stateRoot?: StringFilter;
 
   /**
-   * Filter by proposer_index (optional)
+   * Filter by proposer_index - The index of the validator that proposed the beacon block (optional)
    *
    * @generated from field: cbt.UInt32Filter proposer_index = 12;
    */
   proposerIndex?: UInt32Filter;
 
   /**
-   * Filter by eth1_data_block_hash (optional)
+   * Filter by eth1_data_block_hash - The block hash of the associated execution block (optional)
    *
    * @generated from field: cbt.StringFilter eth1_data_block_hash = 13;
    */
   eth1DataBlockHash?: StringFilter;
 
   /**
-   * Filter by eth1_data_deposit_root (optional)
+   * Filter by eth1_data_deposit_root - The root of the deposit tree in the associated execution block (optional)
    *
    * @generated from field: cbt.StringFilter eth1_data_deposit_root = 14;
    */
   eth1DataDepositRoot?: StringFilter;
 
   /**
-   * Filter by execution_payload_block_hash (optional)
+   * Filter by execution_payload_block_hash - The block hash of the execution payload (optional)
    *
    * @generated from field: cbt.StringFilter execution_payload_block_hash = 15;
    */
   executionPayloadBlockHash?: StringFilter;
 
   /**
-   * Filter by execution_payload_block_number (optional)
+   * Filter by execution_payload_block_number - The block number of the execution payload (optional)
    *
    * @generated from field: cbt.UInt32Filter execution_payload_block_number = 16;
    */
   executionPayloadBlockNumber?: UInt32Filter;
 
   /**
-   * Filter by execution_payload_fee_recipient (optional)
+   * Filter by execution_payload_fee_recipient - The recipient of the fee for this execution payload (optional)
    *
    * @generated from field: cbt.StringFilter execution_payload_fee_recipient = 17;
    */
   executionPayloadFeeRecipient?: StringFilter;
 
   /**
-   * Filter by execution_payload_base_fee_per_gas (optional)
+   * Filter by execution_payload_base_fee_per_gas - Base fee per gas for execution payload (optional)
    *
    * @generated from field: cbt.NullableStringFilter execution_payload_base_fee_per_gas = 18;
    */
   executionPayloadBaseFeePerGas?: NullableStringFilter;
 
   /**
-   * Filter by execution_payload_blob_gas_used (optional)
+   * Filter by execution_payload_blob_gas_used - Gas used for blobs in execution payload (optional)
    *
    * @generated from field: cbt.NullableUInt64Filter execution_payload_blob_gas_used = 19;
    */
   executionPayloadBlobGasUsed?: NullableUInt64Filter;
 
   /**
-   * Filter by execution_payload_excess_blob_gas (optional)
+   * Filter by execution_payload_excess_blob_gas - Excess gas used for blobs in execution payload (optional)
    *
    * @generated from field: cbt.NullableUInt64Filter execution_payload_excess_blob_gas = 20;
    */
   executionPayloadExcessBlobGas?: NullableUInt64Filter;
 
   /**
-   * Filter by execution_payload_gas_limit (optional)
+   * Filter by execution_payload_gas_limit - Gas limit for execution payload (optional)
    *
    * @generated from field: cbt.NullableUInt64Filter execution_payload_gas_limit = 21;
    */
   executionPayloadGasLimit?: NullableUInt64Filter;
 
   /**
-   * Filter by execution_payload_gas_used (optional)
+   * Filter by execution_payload_gas_used - Gas used for execution payload (optional)
    *
    * @generated from field: cbt.NullableUInt64Filter execution_payload_gas_used = 22;
    */
   executionPayloadGasUsed?: NullableUInt64Filter;
 
   /**
-   * Filter by execution_payload_state_root (optional)
+   * Filter by execution_payload_state_root - The state root of the execution payload (optional)
    *
    * @generated from field: cbt.StringFilter execution_payload_state_root = 23;
    */
   executionPayloadStateRoot?: StringFilter;
 
   /**
-   * Filter by execution_payload_parent_hash (optional)
+   * Filter by execution_payload_parent_hash - The parent hash of the execution payload (optional)
    *
    * @generated from field: cbt.StringFilter execution_payload_parent_hash = 24;
    */
   executionPayloadParentHash?: StringFilter;
 
   /**
-   * Filter by execution_payload_transactions_count (optional)
+   * Filter by execution_payload_transactions_count - The transaction count of the execution payload (optional)
    *
    * @generated from field: cbt.NullableUInt32Filter execution_payload_transactions_count = 25;
    */
   executionPayloadTransactionsCount?: NullableUInt32Filter;
 
   /**
-   * Filter by execution_payload_transactions_total_bytes (optional)
+   * Filter by execution_payload_transactions_total_bytes - The transaction total bytes of the execution payload (optional)
    *
    * @generated from field: cbt.NullableUInt32Filter execution_payload_transactions_total_bytes = 26;
    */
   executionPayloadTransactionsTotalBytes?: NullableUInt32Filter;
 
   /**
-   * Filter by execution_payload_transactions_total_bytes_compressed (optional)
+   * Filter by execution_payload_transactions_total_bytes_compressed - The transaction total bytes of the execution payload when compressed using snappy (optional)
    *
    * @generated from field: cbt.NullableUInt32Filter execution_payload_transactions_total_bytes_compressed = 27;
    */
   executionPayloadTransactionsTotalBytesCompressed?: NullableUInt32Filter;
 
   /**
-   * Filter by status (optional)
+   * Filter by status - Can be "canonical" or "orphaned" (optional)
    *
    * @generated from field: cbt.StringFilter status = 28;
    */
@@ -549,7 +549,7 @@ export class ListFctBlockRequest extends Message<ListFctBlockRequest> {
 }
 
 /**
- * ListFctBlockResponse is the response message for listing fct_block records
+ * Response for listing fct_block records
  *
  * @generated from message cbt.ListFctBlockResponse
  */
@@ -599,7 +599,7 @@ export class ListFctBlockResponse extends Message<ListFctBlockResponse> {
 }
 
 /**
- * GetFctBlockRequest is the request message for getting a single fct_block record by primary key
+ * Request for getting a single fct_block record by primary key
  *
  * @generated from message cbt.GetFctBlockRequest
  */
@@ -642,7 +642,7 @@ export class GetFctBlockRequest extends Message<GetFctBlockRequest> {
 }
 
 /**
- * GetFctBlockResponse is the response message for getting a single fct_block record
+ * Response for getting a single fct_block record
  *
  * @generated from message cbt.GetFctBlockResponse
  */

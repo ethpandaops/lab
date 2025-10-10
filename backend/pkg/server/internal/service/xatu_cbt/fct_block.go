@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"math/big"
-	"time"
 
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/clickhouse"
 	cbtproto "github.com/ethpandaops/xatu-cbt/pkg/proto/clickhouse"
@@ -81,8 +80,6 @@ func scanFctBlock(scanner clickhouse.RowScanner) (*cbtproto.FctBlock, error) {
 	block := &cbtproto.FctBlock{}
 
 	var (
-		updatedDateTime, slotStartDateTime               time.Time
-		epochStartDateTime                               time.Time
 		blockTotalBytes                                  *uint32
 		blockTotalBytesCompressed                        *uint32
 		executionPayloadBaseFeePerGas                    *big.Int
@@ -96,11 +93,11 @@ func scanFctBlock(scanner clickhouse.RowScanner) (*cbtproto.FctBlock, error) {
 	)
 
 	err := scanner.Scan(
-		&updatedDateTime,
+		&block.UpdatedDateTime,
 		&block.Slot,
-		&slotStartDateTime,
+		&block.SlotStartDateTime,
 		&block.Epoch,
-		&epochStartDateTime,
+		&block.EpochStartDateTime,
 		&block.BlockRoot,
 		&block.BlockVersion,
 		&blockTotalBytes,
@@ -128,10 +125,6 @@ func scanFctBlock(scanner clickhouse.RowScanner) (*cbtproto.FctBlock, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to scan fct_block: %w", err)
 	}
-
-	block.UpdatedDateTime = uint32(updatedDateTime.Unix())       //nolint:gosec // safe.
-	block.SlotStartDateTime = uint32(slotStartDateTime.Unix())   //nolint:gosec // safe.
-	block.EpochStartDateTime = uint32(epochStartDateTime.Unix()) //nolint:gosec // safe.
 
 	// Handle nullable fields
 	if blockTotalBytes != nil {

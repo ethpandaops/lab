@@ -18,17 +18,17 @@ message IntAddressStorageSlotLastAccess {
   string value = 14;
 }
 
-// ListIntAddressStorageSlotLastAccessRequest is the request message for listing int_address_storage_slot_last_access records
+// Request for listing int_address_storage_slot_last_access records
 message ListIntAddressStorageSlotLastAccessRequest {
-  // Filter by address (PRIMARY KEY - required)
+  // Filter by address - The address of the account (PRIMARY KEY - required)
   StringFilter address = 1;
 
-  // Filter by slot_key (ORDER BY column 2 - optional)
+  // Filter by slot_key - The slot key of the storage (ORDER BY column 2 - optional)
   StringFilter slot_key = 2;
 
-  // Filter by block_number (optional)
+  // Filter by block_number - The block number of the last access (optional)
   UInt32Filter block_number = 3;
-  // Filter by value (optional)
+  // Filter by value - The value of the storage (optional)
   StringFilter value = 4;
 
   // The maximum number of int_address_storage_slot_last_access to return.
@@ -44,7 +44,7 @@ message ListIntAddressStorageSlotLastAccessRequest {
   string order_by = 7;
 }
 
-// ListIntAddressStorageSlotLastAccessResponse is the response message for listing int_address_storage_slot_last_access records
+// Response for listing int_address_storage_slot_last_access records
 message ListIntAddressStorageSlotLastAccessResponse {
   // The list of int_address_storage_slot_last_access.
   repeated IntAddressStorageSlotLastAccess int_address_storage_slot_last_access = 1;
@@ -53,21 +53,21 @@ message ListIntAddressStorageSlotLastAccessResponse {
   string next_page_token = 2;
 }
 
-// GetIntAddressStorageSlotLastAccessRequest is the request message for getting a single int_address_storage_slot_last_access record by primary key
+// Request for getting a single int_address_storage_slot_last_access record by primary key
 message GetIntAddressStorageSlotLastAccessRequest {
   // The address of the account
   string address = 1; // Primary key (required)
 }
 
-// GetIntAddressStorageSlotLastAccessResponse is the response message for getting a single int_address_storage_slot_last_access record
+// Response for getting a single int_address_storage_slot_last_access record
 message GetIntAddressStorageSlotLastAccessResponse {
   IntAddressStorageSlotLastAccess item = 1;
 }
 
-// IntAddressStorageSlotLastAccessService provides RPC methods for querying int_address_storage_slot_last_access data
+// Query int_address_storage_slot_last_access data
 service IntAddressStorageSlotLastAccessService {
-  // List returns paginated int_address_storage_slot_last_access records
+  // List records | Retrieve paginated results with optional filtering
   rpc List(ListIntAddressStorageSlotLastAccessRequest) returns (ListIntAddressStorageSlotLastAccessResponse);
-  // Get returns a single int_address_storage_slot_last_access record by primary key
+  // Get record | Retrieve a single record by primary key
   rpc Get(GetIntAddressStorageSlotLastAccessRequest) returns (GetIntAddressStorageSlotLastAccessResponse);
 }

@@ -215,160 +215,160 @@ export class FctPreparedBlock extends Message<FctPreparedBlock> {
 }
 
 /**
- * ListFctPreparedBlockRequest is the request message for listing fct_prepared_block records
+ * Request for listing fct_prepared_block records
  *
  * @generated from message cbt.ListFctPreparedBlockRequest
  */
 export class ListFctPreparedBlockRequest extends Message<ListFctPreparedBlockRequest> {
   /**
-   * Filter by slot_start_date_time (PRIMARY KEY - required)
+   * Filter by slot_start_date_time - The wall clock time when the slot started (PRIMARY KEY - required unless using alternatives: meta_client_name, slot)
    *
    * @generated from field: cbt.UInt32Filter slot_start_date_time = 1;
    */
   slotStartDateTime?: UInt32Filter;
 
   /**
-   * Filter by slot (ORDER BY column 2 - optional)
+   * Filter by slot - The slot number from beacon block (ORDER BY column 2 - optional)
    *
    * @generated from field: cbt.UInt32Filter slot = 2;
    */
   slot?: UInt32Filter;
 
   /**
-   * Filter by meta_client_name (ORDER BY column 3 - optional)
+   * Filter by meta_client_name - Name of the client that generated the event (ORDER BY column 3 - optional)
    *
    * @generated from field: cbt.StringFilter meta_client_name = 3;
    */
   metaClientName?: StringFilter;
 
   /**
-   * Filter by event_date_time (ORDER BY column 4 - optional)
+   * Filter by event_date_time - The wall clock time when the event was received (ORDER BY column 4 - optional)
    *
    * @generated from field: cbt.UInt32Filter event_date_time = 4;
    */
   eventDateTime?: UInt32Filter;
 
   /**
-   * Filter by updated_date_time (optional)
+   * Filter by updated_date_time - Timestamp when the record was last updated (optional)
    *
    * @generated from field: cbt.UInt32Filter updated_date_time = 5;
    */
   updatedDateTime?: UInt32Filter;
 
   /**
-   * Filter by meta_client_version (optional)
+   * Filter by meta_client_version - Version of the client that generated the event (optional)
    *
    * @generated from field: cbt.StringFilter meta_client_version = 6;
    */
   metaClientVersion?: StringFilter;
 
   /**
-   * Filter by meta_client_implementation (optional)
+   * Filter by meta_client_implementation - Implementation of the client that generated the event (optional)
    *
    * @generated from field: cbt.StringFilter meta_client_implementation = 7;
    */
   metaClientImplementation?: StringFilter;
 
   /**
-   * Filter by meta_consensus_implementation (optional)
+   * Filter by meta_consensus_implementation - Consensus implementation of the validator (optional)
    *
    * @generated from field: cbt.StringFilter meta_consensus_implementation = 8;
    */
   metaConsensusImplementation?: StringFilter;
 
   /**
-   * Filter by meta_consensus_version (optional)
+   * Filter by meta_consensus_version - Consensus version of the validator (optional)
    *
    * @generated from field: cbt.StringFilter meta_consensus_version = 9;
    */
   metaConsensusVersion?: StringFilter;
 
   /**
-   * Filter by meta_client_geo_city (optional)
+   * Filter by meta_client_geo_city - City of the client that generated the event (optional)
    *
    * @generated from field: cbt.StringFilter meta_client_geo_city = 10;
    */
   metaClientGeoCity?: StringFilter;
 
   /**
-   * Filter by meta_client_geo_country (optional)
+   * Filter by meta_client_geo_country - Country of the client that generated the event (optional)
    *
    * @generated from field: cbt.StringFilter meta_client_geo_country = 11;
    */
   metaClientGeoCountry?: StringFilter;
 
   /**
-   * Filter by meta_client_geo_country_code (optional)
+   * Filter by meta_client_geo_country_code - Country code of the client that generated the event (optional)
    *
    * @generated from field: cbt.StringFilter meta_client_geo_country_code = 12;
    */
   metaClientGeoCountryCode?: StringFilter;
 
   /**
-   * Filter by block_version (optional)
+   * Filter by block_version - The version of the beacon block (optional)
    *
    * @generated from field: cbt.StringFilter block_version = 13;
    */
   blockVersion?: StringFilter;
 
   /**
-   * Filter by block_total_bytes (optional)
+   * Filter by block_total_bytes - The total bytes of the beacon block payload (optional)
    *
    * @generated from field: cbt.NullableUInt32Filter block_total_bytes = 14;
    */
   blockTotalBytes?: NullableUInt32Filter;
 
   /**
-   * Filter by block_total_bytes_compressed (optional)
+   * Filter by block_total_bytes_compressed - The total bytes of the beacon block payload when compressed using snappy (optional)
    *
    * @generated from field: cbt.NullableUInt32Filter block_total_bytes_compressed = 15;
    */
   blockTotalBytesCompressed?: NullableUInt32Filter;
 
   /**
-   * Filter by execution_payload_value (optional)
+   * Filter by execution_payload_value - The value of the execution payload in wei (optional)
    *
    * @generated from field: cbt.NullableUInt64Filter execution_payload_value = 16;
    */
   executionPayloadValue?: NullableUInt64Filter;
 
   /**
-   * Filter by consensus_payload_value (optional)
+   * Filter by consensus_payload_value - The value of the consensus payload in wei (optional)
    *
    * @generated from field: cbt.NullableUInt64Filter consensus_payload_value = 17;
    */
   consensusPayloadValue?: NullableUInt64Filter;
 
   /**
-   * Filter by execution_payload_block_number (optional)
+   * Filter by execution_payload_block_number - The block number of the execution payload (optional)
    *
    * @generated from field: cbt.UInt32Filter execution_payload_block_number = 18;
    */
   executionPayloadBlockNumber?: UInt32Filter;
 
   /**
-   * Filter by execution_payload_gas_limit (optional)
+   * Filter by execution_payload_gas_limit - Gas limit for execution payload (optional)
    *
    * @generated from field: cbt.NullableUInt64Filter execution_payload_gas_limit = 19;
    */
   executionPayloadGasLimit?: NullableUInt64Filter;
 
   /**
-   * Filter by execution_payload_gas_used (optional)
+   * Filter by execution_payload_gas_used - Gas used for execution payload (optional)
    *
    * @generated from field: cbt.NullableUInt64Filter execution_payload_gas_used = 20;
    */
   executionPayloadGasUsed?: NullableUInt64Filter;
 
   /**
-   * Filter by execution_payload_transactions_count (optional)
+   * Filter by execution_payload_transactions_count - The transaction count of the execution payload (optional)
    *
    * @generated from field: cbt.NullableUInt32Filter execution_payload_transactions_count = 21;
    */
   executionPayloadTransactionsCount?: NullableUInt32Filter;
 
   /**
-   * Filter by execution_payload_transactions_total_bytes (optional)
+   * Filter by execution_payload_transactions_total_bytes - The transaction total bytes of the execution payload (optional)
    *
    * @generated from field: cbt.NullableUInt32Filter execution_payload_transactions_total_bytes = 22;
    */
@@ -453,7 +453,7 @@ export class ListFctPreparedBlockRequest extends Message<ListFctPreparedBlockReq
 }
 
 /**
- * ListFctPreparedBlockResponse is the response message for listing fct_prepared_block records
+ * Response for listing fct_prepared_block records
  *
  * @generated from message cbt.ListFctPreparedBlockResponse
  */
@@ -503,7 +503,7 @@ export class ListFctPreparedBlockResponse extends Message<ListFctPreparedBlockRe
 }
 
 /**
- * GetFctPreparedBlockRequest is the request message for getting a single fct_prepared_block record by primary key
+ * Request for getting a single fct_prepared_block record by primary key
  *
  * @generated from message cbt.GetFctPreparedBlockRequest
  */
@@ -546,7 +546,7 @@ export class GetFctPreparedBlockRequest extends Message<GetFctPreparedBlockReque
 }
 
 /**
- * GetFctPreparedBlockResponse is the response message for getting a single fct_prepared_block record
+ * Response for getting a single fct_prepared_block record
  *
  * @generated from message cbt.GetFctPreparedBlockResponse
  */

@@ -71,34 +71,34 @@ export class FctAddressStorageSlotExpiredTop100ByContract extends Message<FctAdd
 }
 
 /**
- * ListFctAddressStorageSlotExpiredTop100ByContractRequest is the request message for listing fct_address_storage_slot_expired_top_100_by_contract records
+ * Request for listing fct_address_storage_slot_expired_top_100_by_contract records
  *
  * @generated from message cbt.ListFctAddressStorageSlotExpiredTop100ByContractRequest
  */
 export class ListFctAddressStorageSlotExpiredTop100ByContractRequest extends Message<ListFctAddressStorageSlotExpiredTop100ByContractRequest> {
   /**
-   * Filter by rank (PRIMARY KEY - required)
+   * Filter by rank - Rank by expired storage slots (1=highest) (PRIMARY KEY - required)
    *
    * @generated from field: cbt.UInt32Filter rank = 1;
    */
   rank?: UInt32Filter;
 
   /**
-   * Filter by updated_date_time (optional)
+   * Filter by updated_date_time - Timestamp when the record was last updated (optional)
    *
    * @generated from field: cbt.UInt32Filter updated_date_time = 2;
    */
   updatedDateTime?: UInt32Filter;
 
   /**
-   * Filter by contract_address (optional)
+   * Filter by contract_address - The contract address (optional)
    *
    * @generated from field: cbt.StringFilter contract_address = 3;
    */
   contractAddress?: StringFilter;
 
   /**
-   * Filter by expired_slots (optional)
+   * Filter by expired_slots - Number of expired storage slots for this contract (optional)
    *
    * @generated from field: cbt.UInt64Filter expired_slots = 4;
    */
@@ -165,7 +165,7 @@ export class ListFctAddressStorageSlotExpiredTop100ByContractRequest extends Mes
 }
 
 /**
- * ListFctAddressStorageSlotExpiredTop100ByContractResponse is the response message for listing fct_address_storage_slot_expired_top_100_by_contract records
+ * Response for listing fct_address_storage_slot_expired_top_100_by_contract records
  *
  * @generated from message cbt.ListFctAddressStorageSlotExpiredTop100ByContractResponse
  */
@@ -215,7 +215,7 @@ export class ListFctAddressStorageSlotExpiredTop100ByContractResponse extends Me
 }
 
 /**
- * GetFctAddressStorageSlotExpiredTop100ByContractRequest is the request message for getting a single fct_address_storage_slot_expired_top_100_by_contract record by primary key
+ * Request for getting a single fct_address_storage_slot_expired_top_100_by_contract record by primary key
  *
  * @generated from message cbt.GetFctAddressStorageSlotExpiredTop100ByContractRequest
  */
@@ -258,7 +258,7 @@ export class GetFctAddressStorageSlotExpiredTop100ByContractRequest extends Mess
 }
 
 /**
- * GetFctAddressStorageSlotExpiredTop100ByContractResponse is the response message for getting a single fct_address_storage_slot_expired_top_100_by_contract record
+ * Response for getting a single fct_address_storage_slot_expired_top_100_by_contract record
  *
  * @generated from message cbt.GetFctAddressStorageSlotExpiredTop100ByContractResponse
  */

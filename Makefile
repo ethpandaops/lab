@@ -28,6 +28,7 @@ vendor-protos:
 		rm -rf xatu-cbt-temp
 	@echo "  → Patching import paths..."
 	@sed -i.bak 's|import "common.proto"|import "vendor/xatu-cbt/clickhouse/common.proto"|g' vendor/xatu-cbt/clickhouse/*.proto 2>/dev/null
+	@sed -i.bak 's|import "clickhouse/annotations.proto"|import "vendor/xatu-cbt/clickhouse/clickhouse/annotations.proto"|g' vendor/xatu-cbt/clickhouse/*.proto 2>/dev/null
 	@rm -f vendor/xatu-cbt/clickhouse/*.proto.bak
 	@echo "  ✅ Vendored successfully!"
 	@echo ""

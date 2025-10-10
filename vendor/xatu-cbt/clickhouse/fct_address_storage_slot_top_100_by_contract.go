@@ -181,7 +181,7 @@ func BuildListFctAddressStorageSlotTop100ByContractQuery(req *ListFctAddressStor
 	}
 
 	// Build column list
-	columns := []string{"updated_date_time", "rank", "contract_address", "total_storage_slots"}
+	columns := []string{"toUnixTimestamp(`updated_date_time`) AS `updated_date_time`", "rank", "contract_address", "total_storage_slots"}
 
 	return BuildParameterizedQuery("fct_address_storage_slot_top_100_by_contract", columns, qb, orderByClause, limit, offset, options...)
 }
@@ -201,7 +201,7 @@ func BuildGetFctAddressStorageSlotTop100ByContractQuery(req *GetFctAddressStorag
 	orderByClause := " ORDER BY rank"
 
 	// Build column list
-	columns := []string{"updated_date_time", "rank", "contract_address", "total_storage_slots"}
+	columns := []string{"toUnixTimestamp(`updated_date_time`) AS `updated_date_time`", "rank", "contract_address", "total_storage_slots"}
 
 	// Return single record
 	return BuildParameterizedQuery("fct_address_storage_slot_top_100_by_contract", columns, qb, orderByClause, 1, 0, options...)

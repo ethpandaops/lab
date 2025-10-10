@@ -27,11 +27,11 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// FctAddressAccessTotalService provides RPC methods for querying fct_address_access_total data
+// Query fct_address_access_total data
 type FctAddressAccessTotalServiceClient interface {
-	// List returns paginated fct_address_access_total records
+	// List records | Retrieve paginated results with optional filtering
 	List(ctx context.Context, in *ListFctAddressAccessTotalRequest, opts ...grpc.CallOption) (*ListFctAddressAccessTotalResponse, error)
-	// Get returns a single fct_address_access_total record by primary key
+	// Get record | Retrieve a single record by updated_date_time
 	Get(ctx context.Context, in *GetFctAddressAccessTotalRequest, opts ...grpc.CallOption) (*GetFctAddressAccessTotalResponse, error)
 }
 
@@ -67,11 +67,11 @@ func (c *fctAddressAccessTotalServiceClient) Get(ctx context.Context, in *GetFct
 // All implementations must embed UnimplementedFctAddressAccessTotalServiceServer
 // for forward compatibility
 //
-// FctAddressAccessTotalService provides RPC methods for querying fct_address_access_total data
+// Query fct_address_access_total data
 type FctAddressAccessTotalServiceServer interface {
-	// List returns paginated fct_address_access_total records
+	// List records | Retrieve paginated results with optional filtering
 	List(context.Context, *ListFctAddressAccessTotalRequest) (*ListFctAddressAccessTotalResponse, error)
-	// Get returns a single fct_address_access_total record by primary key
+	// Get record | Retrieve a single record by updated_date_time
 	Get(context.Context, *GetFctAddressAccessTotalRequest) (*GetFctAddressAccessTotalResponse, error)
 	mustEmbedUnimplementedFctAddressAccessTotalServiceServer()
 }

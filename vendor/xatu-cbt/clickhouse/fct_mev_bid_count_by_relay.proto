@@ -3,6 +3,9 @@ syntax = "proto3";
 package cbt;
 
 import "vendor/xatu-cbt/clickhouse/common.proto";
+import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
+import "vendor/xatu-cbt/clickhouse/clickhouse/annotations.proto";
 
 option go_package = "github.com/ethpandaops/xatu-cbt/pkg/proto/clickhouse";
 // Total number of MEV relay bids for a slot by relay
@@ -24,39 +27,39 @@ message FctMevBidCountByRelay {
   uint32 bid_total = 17;
 }
 
-// ListFctMevBidCountByRelayRequest is the request message for listing fct_mev_bid_count_by_relay records
+// Request for listing fct_mev_bid_count_by_relay records
 message ListFctMevBidCountByRelayRequest {
-  // Filter by slot_start_date_time (PRIMARY KEY - required)
-  UInt32Filter slot_start_date_time = 1;
+  // Filter by slot_start_date_time - The start time for the slot that the bid is for (PRIMARY KEY - required unless using alternatives: slot)
+  UInt32Filter slot_start_date_time = 1 [(google.api.field_behavior) = OPTIONAL, (clickhouse.v1.required_group) = "primary_key"];
 
-  // Filter by relay_name (ORDER BY column 2 - optional)
-  StringFilter relay_name = 2;
+  // Filter by relay_name - The relay that the bid was fetched from (ORDER BY column 2 - optional)
+  StringFilter relay_name = 2 [(google.api.field_behavior) = OPTIONAL];
 
-  // Filter by updated_date_time (optional)
-  UInt32Filter updated_date_time = 3;
-  // Filter by slot (optional)
-  UInt32Filter slot = 4;
-  // Filter by epoch (optional)
-  UInt32Filter epoch = 5;
-  // Filter by epoch_start_date_time (optional)
-  UInt32Filter epoch_start_date_time = 6;
-  // Filter by bid_total (optional)
-  UInt32Filter bid_total = 7;
+  // Filter by updated_date_time - Timestamp when the record was last updated (optional)
+  UInt32Filter updated_date_time = 3 [(google.api.field_behavior) = OPTIONAL];
+  // Filter by slot - Slot number within the block bid (PROJECTION: p_by_slot - alternative to slot_start_date_time)
+  UInt32Filter slot = 4 [(google.api.field_behavior) = OPTIONAL, (clickhouse.v1.projection_name) = "p_by_slot", (clickhouse.v1.projection_alternative_for) = "slot_start_date_time", (clickhouse.v1.required_group) = "primary_key"];
+  // Filter by epoch - Epoch number derived from the slot that the bid is for (optional)
+  UInt32Filter epoch = 5 [(google.api.field_behavior) = OPTIONAL];
+  // Filter by epoch_start_date_time - The start time for the epoch that the bid is for (optional)
+  UInt32Filter epoch_start_date_time = 6 [(google.api.field_behavior) = OPTIONAL];
+  // Filter by bid_total - The total number of bids for the relay (optional)
+  UInt32Filter bid_total = 7 [(google.api.field_behavior) = OPTIONAL];
 
   // The maximum number of fct_mev_bid_count_by_relay to return.
   // If unspecified, at most 100 items will be returned.
   // The maximum value is 10000; values above 10000 will be coerced to 10000.
-  int32 page_size = 8;
+  int32 page_size = 8 [(google.api.field_behavior) = OPTIONAL];
   // A page token, received from a previous `ListFctMevBidCountByRelay` call.
   // Provide this to retrieve the subsequent page.
-  string page_token = 9;
+  string page_token = 9 [(google.api.field_behavior) = OPTIONAL];
   // The order of results. Format: comma-separated list of fields.
   // Example: "foo,bar" or "foo desc,bar" for descending order on foo.
   // If unspecified, results will be returned in the default order.
-  string order_by = 10;
+  string order_by = 10 [(google.api.field_behavior) = OPTIONAL];
 }
 
-// ListFctMevBidCountByRelayResponse is the response message for listing fct_mev_bid_count_by_relay records
+// Response for listing fct_mev_bid_count_by_relay records
 message ListFctMevBidCountByRelayResponse {
   // The list of fct_mev_bid_count_by_relay.
   repeated FctMevBidCountByRelay fct_mev_bid_count_by_relay = 1;
@@ -65,21 +68,29 @@ message ListFctMevBidCountByRelayResponse {
   string next_page_token = 2;
 }
 
-// GetFctMevBidCountByRelayRequest is the request message for getting a single fct_mev_bid_count_by_relay record by primary key
+// Request for getting a single fct_mev_bid_count_by_relay record by primary key
 message GetFctMevBidCountByRelayRequest {
   // The start time for the slot that the bid is for
   uint32 slot_start_date_time = 1; // Primary key (required)
 }
 
-// GetFctMevBidCountByRelayResponse is the response message for getting a single fct_mev_bid_count_by_relay record
+// Response for getting a single fct_mev_bid_count_by_relay record
 message GetFctMevBidCountByRelayResponse {
   FctMevBidCountByRelay item = 1;
 }
 
-// FctMevBidCountByRelayService provides RPC methods for querying fct_mev_bid_count_by_relay data
+// Query fct_mev_bid_count_by_relay data
 service FctMevBidCountByRelayService {
-  // List returns paginated fct_mev_bid_count_by_relay records
-  rpc List(ListFctMevBidCountByRelayRequest) returns (ListFctMevBidCountByRelayResponse);
-  // Get returns a single fct_mev_bid_count_by_relay record by primary key
-  rpc Get(GetFctMevBidCountByRelayRequest) returns (GetFctMevBidCountByRelayResponse);
+  // List records | Retrieve paginated results with optional filtering
+  rpc List(ListFctMevBidCountByRelayRequest) returns (ListFctMevBidCountByRelayResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/fct_mev_bid_count_by_relay"
+    };
+  }
+  // Get record | Retrieve a single record by slot_start_date_time
+  rpc Get(GetFctMevBidCountByRelayRequest) returns (GetFctMevBidCountByRelayResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/fct_mev_bid_count_by_relay/{slot_start_date_time}"
+    };
+  }
 }

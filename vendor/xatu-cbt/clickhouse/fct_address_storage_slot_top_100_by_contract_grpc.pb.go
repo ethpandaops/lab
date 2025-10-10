@@ -27,11 +27,11 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// FctAddressStorageSlotTop100ByContractService provides RPC methods for querying fct_address_storage_slot_top_100_by_contract data
+// Query fct_address_storage_slot_top_100_by_contract data
 type FctAddressStorageSlotTop100ByContractServiceClient interface {
-	// List returns paginated fct_address_storage_slot_top_100_by_contract records
+	// List records | Retrieve paginated results with optional filtering
 	List(ctx context.Context, in *ListFctAddressStorageSlotTop100ByContractRequest, opts ...grpc.CallOption) (*ListFctAddressStorageSlotTop100ByContractResponse, error)
-	// Get returns a single fct_address_storage_slot_top_100_by_contract record by primary key
+	// Get record | Retrieve a single record by rank
 	Get(ctx context.Context, in *GetFctAddressStorageSlotTop100ByContractRequest, opts ...grpc.CallOption) (*GetFctAddressStorageSlotTop100ByContractResponse, error)
 }
 
@@ -67,11 +67,11 @@ func (c *fctAddressStorageSlotTop100ByContractServiceClient) Get(ctx context.Con
 // All implementations must embed UnimplementedFctAddressStorageSlotTop100ByContractServiceServer
 // for forward compatibility
 //
-// FctAddressStorageSlotTop100ByContractService provides RPC methods for querying fct_address_storage_slot_top_100_by_contract data
+// Query fct_address_storage_slot_top_100_by_contract data
 type FctAddressStorageSlotTop100ByContractServiceServer interface {
-	// List returns paginated fct_address_storage_slot_top_100_by_contract records
+	// List records | Retrieve paginated results with optional filtering
 	List(context.Context, *ListFctAddressStorageSlotTop100ByContractRequest) (*ListFctAddressStorageSlotTop100ByContractResponse, error)
-	// Get returns a single fct_address_storage_slot_top_100_by_contract record by primary key
+	// Get record | Retrieve a single record by rank
 	Get(context.Context, *GetFctAddressStorageSlotTop100ByContractRequest) (*GetFctAddressStorageSlotTop100ByContractResponse, error)
 	mustEmbedUnimplementedFctAddressStorageSlotTop100ByContractServiceServer()
 }

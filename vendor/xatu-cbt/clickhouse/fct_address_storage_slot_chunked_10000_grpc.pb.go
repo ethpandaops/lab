@@ -27,11 +27,11 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// FctAddressStorageSlotChunked10000Service provides RPC methods for querying fct_address_storage_slot_chunked_10000 data
+// Query fct_address_storage_slot_chunked_10000 data
 type FctAddressStorageSlotChunked10000ServiceClient interface {
-	// List returns paginated fct_address_storage_slot_chunked_10000 records
+	// List records | Retrieve paginated results with optional filtering
 	List(ctx context.Context, in *ListFctAddressStorageSlotChunked10000Request, opts ...grpc.CallOption) (*ListFctAddressStorageSlotChunked10000Response, error)
-	// Get returns a single fct_address_storage_slot_chunked_10000 record by primary key
+	// Get record | Retrieve a single record by chunk_start_block_number
 	Get(ctx context.Context, in *GetFctAddressStorageSlotChunked10000Request, opts ...grpc.CallOption) (*GetFctAddressStorageSlotChunked10000Response, error)
 }
 
@@ -67,11 +67,11 @@ func (c *fctAddressStorageSlotChunked10000ServiceClient) Get(ctx context.Context
 // All implementations must embed UnimplementedFctAddressStorageSlotChunked10000ServiceServer
 // for forward compatibility
 //
-// FctAddressStorageSlotChunked10000Service provides RPC methods for querying fct_address_storage_slot_chunked_10000 data
+// Query fct_address_storage_slot_chunked_10000 data
 type FctAddressStorageSlotChunked10000ServiceServer interface {
-	// List returns paginated fct_address_storage_slot_chunked_10000 records
+	// List records | Retrieve paginated results with optional filtering
 	List(context.Context, *ListFctAddressStorageSlotChunked10000Request) (*ListFctAddressStorageSlotChunked10000Response, error)
-	// Get returns a single fct_address_storage_slot_chunked_10000 record by primary key
+	// Get record | Retrieve a single record by chunk_start_block_number
 	Get(context.Context, *GetFctAddressStorageSlotChunked10000Request) (*GetFctAddressStorageSlotChunked10000Response, error)
 	mustEmbedUnimplementedFctAddressStorageSlotChunked10000ServiceServer()
 }

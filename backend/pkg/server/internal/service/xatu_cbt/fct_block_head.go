@@ -3,8 +3,6 @@ package xatu_cbt
 import (
 	"context"
 	"fmt"
-	"math/big"
-	"time"
 
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/clickhouse"
 	cbtproto "github.com/ethpandaops/xatu-cbt/pkg/proto/clickhouse"
@@ -107,14 +105,12 @@ func scanFctBlockHead(
 	scanner clickhouse.RowScanner,
 ) (*cbtproto.FctBlockHead, error) {
 	var (
-		block                              cbtproto.FctBlockHead
-		updatedDateTime, slotStartDateTime time.Time
-		epochStartDateTime                 time.Time
+		block cbtproto.FctBlockHead
 
 		// Nullable fields
 		blockTotalBytes                                  *uint32
 		blockTotalBytesCompressed                        *uint32
-		executionPayloadBaseFeePerGas                    *big.Int
+		executionPayloadBaseFeePerGas                    *string
 		executionPayloadBlobGasUsed                      *uint64
 		executionPayloadExcessBlobGas                    *uint64
 		executionPayloadGasLimit                         *uint64
@@ -125,11 +121,11 @@ func scanFctBlockHead(
 	)
 
 	if err := scanner.Scan(
-		&updatedDateTime,
+		&block.UpdatedDateTime,
 		&block.Slot,
-		&slotStartDateTime,
+		&block.SlotStartDateTime,
 		&block.Epoch,
-		&epochStartDateTime,
+		&block.EpochStartDateTime,
 		&block.BlockRoot,
 		&block.BlockVersion,
 		&blockTotalBytes,
@@ -156,10 +152,6 @@ func scanFctBlockHead(
 		return nil, fmt.Errorf("failed to scan row: %w", err)
 	}
 
-	block.UpdatedDateTime = uint32(updatedDateTime.Unix())       //nolint:gosec // safe.
-	block.SlotStartDateTime = uint32(slotStartDateTime.Unix())   //nolint:gosec // safe.
-	block.EpochStartDateTime = uint32(epochStartDateTime.Unix()) //nolint:gosec // safe.
-
 	// Handle nullable fields
 	if blockTotalBytes != nil {
 		block.BlockTotalBytes = wrapperspb.UInt32(*blockTotalBytes)
@@ -170,7 +162,7 @@ func scanFctBlockHead(
 	}
 
 	if executionPayloadBaseFeePerGas != nil {
-		block.ExecutionPayloadBaseFeePerGas = wrapperspb.String(executionPayloadBaseFeePerGas.String())
+		block.ExecutionPayloadBaseFeePerGas = wrapperspb.String(*executionPayloadBaseFeePerGas)
 	}
 
 	if executionPayloadBlobGasUsed != nil {

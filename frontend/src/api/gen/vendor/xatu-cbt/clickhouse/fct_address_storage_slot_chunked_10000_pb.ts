@@ -71,34 +71,34 @@ export class FctAddressStorageSlotChunked10000 extends Message<FctAddressStorage
 }
 
 /**
- * ListFctAddressStorageSlotChunked10000Request is the request message for listing fct_address_storage_slot_chunked_10000 records
+ * Request for listing fct_address_storage_slot_chunked_10000 records
  *
  * @generated from message cbt.ListFctAddressStorageSlotChunked10000Request
  */
 export class ListFctAddressStorageSlotChunked10000Request extends Message<ListFctAddressStorageSlotChunked10000Request> {
   /**
-   * Filter by chunk_start_block_number (PRIMARY KEY - required)
+   * Filter by chunk_start_block_number - Start block number of the chunk (PRIMARY KEY - required)
    *
    * @generated from field: cbt.UInt32Filter chunk_start_block_number = 1;
    */
   chunkStartBlockNumber?: UInt32Filter;
 
   /**
-   * Filter by updated_date_time (optional)
+   * Filter by updated_date_time - Timestamp when the record was last updated (optional)
    *
    * @generated from field: cbt.UInt32Filter updated_date_time = 2;
    */
   updatedDateTime?: UInt32Filter;
 
   /**
-   * Filter by first_accessed_slots (optional)
+   * Filter by first_accessed_slots - Number of slots first accessed in the chunk (optional)
    *
    * @generated from field: cbt.UInt32Filter first_accessed_slots = 3;
    */
   firstAccessedSlots?: UInt32Filter;
 
   /**
-   * Filter by last_accessed_slots (optional)
+   * Filter by last_accessed_slots - Number of slots last accessed in the chunk (optional)
    *
    * @generated from field: cbt.UInt32Filter last_accessed_slots = 4;
    */
@@ -165,7 +165,7 @@ export class ListFctAddressStorageSlotChunked10000Request extends Message<ListFc
 }
 
 /**
- * ListFctAddressStorageSlotChunked10000Response is the response message for listing fct_address_storage_slot_chunked_10000 records
+ * Response for listing fct_address_storage_slot_chunked_10000 records
  *
  * @generated from message cbt.ListFctAddressStorageSlotChunked10000Response
  */
@@ -215,7 +215,7 @@ export class ListFctAddressStorageSlotChunked10000Response extends Message<ListF
 }
 
 /**
- * GetFctAddressStorageSlotChunked10000Request is the request message for getting a single fct_address_storage_slot_chunked_10000 record by primary key
+ * Request for getting a single fct_address_storage_slot_chunked_10000 record by primary key
  *
  * @generated from message cbt.GetFctAddressStorageSlotChunked10000Request
  */
@@ -258,7 +258,7 @@ export class GetFctAddressStorageSlotChunked10000Request extends Message<GetFctA
 }
 
 /**
- * GetFctAddressStorageSlotChunked10000Response is the response message for getting a single fct_address_storage_slot_chunked_10000 record
+ * Response for getting a single fct_address_storage_slot_chunked_10000 record
  *
  * @generated from message cbt.GetFctAddressStorageSlotChunked10000Response
  */

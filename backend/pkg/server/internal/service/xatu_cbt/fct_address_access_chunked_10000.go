@@ -3,7 +3,6 @@ package xatu_cbt
 import (
 	"context"
 	"fmt"
-	"time"
 
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/clickhouse"
 	cbtproto "github.com/ethpandaops/xatu-cbt/pkg/proto/clickhouse"
@@ -98,13 +97,10 @@ func (x *XatuCBT) ListFctAddressAccessChunked10000(
 func scanFctAddressAccessChunked10000(
 	scanner clickhouse.RowScanner,
 ) (*cbtproto.FctAddressAccessChunked10000, error) {
-	var (
-		item            cbtproto.FctAddressAccessChunked10000
-		updatedDateTime time.Time
-	)
+	item := &cbtproto.FctAddressAccessChunked10000{}
 
 	if err := scanner.Scan(
-		&updatedDateTime,
+		&item.UpdatedDateTime,
 		&item.ChunkStartBlockNumber,
 		&item.FirstAccessedAccounts,
 		&item.LastAccessedAccounts,
@@ -112,8 +108,5 @@ func scanFctAddressAccessChunked10000(
 		return nil, err
 	}
 
-	// Convert time.Time to uint32 Unix timestamp
-	item.UpdatedDateTime = uint32(updatedDateTime.Unix()) //nolint:gosec // safe for timestamps within uint32 range
-
-	return &item, nil
+	return item, nil
 }

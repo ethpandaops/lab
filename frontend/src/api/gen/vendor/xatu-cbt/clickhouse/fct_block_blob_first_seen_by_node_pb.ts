@@ -239,181 +239,181 @@ export class FctBlockBlobFirstSeenByNode extends Message<FctBlockBlobFirstSeenBy
 }
 
 /**
- * ListFctBlockBlobFirstSeenByNodeRequest is the request message for listing fct_block_blob_first_seen_by_node records
+ * Request for listing fct_block_blob_first_seen_by_node records
  *
  * @generated from message cbt.ListFctBlockBlobFirstSeenByNodeRequest
  */
 export class ListFctBlockBlobFirstSeenByNodeRequest extends Message<ListFctBlockBlobFirstSeenByNodeRequest> {
   /**
-   * Filter by slot_start_date_time (PRIMARY KEY - required)
+   * Filter by slot_start_date_time - The wall clock time when the slot started (PRIMARY KEY - required unless using alternatives: slot)
    *
    * @generated from field: cbt.UInt32Filter slot_start_date_time = 1;
    */
   slotStartDateTime?: UInt32Filter;
 
   /**
-   * Filter by block_root (ORDER BY column 2 - optional)
+   * Filter by block_root - The beacon block root hash (ORDER BY column 2 - optional)
    *
    * @generated from field: cbt.StringFilter block_root = 2;
    */
   blockRoot?: StringFilter;
 
   /**
-   * Filter by blob_index (ORDER BY column 3 - optional)
+   * Filter by blob_index - The blob index (ORDER BY column 3 - optional)
    *
    * @generated from field: cbt.UInt32Filter blob_index = 3;
    */
   blobIndex?: UInt32Filter;
 
   /**
-   * Filter by meta_client_name (ORDER BY column 4 - optional)
+   * Filter by meta_client_name - Name of the client (ORDER BY column 4 - optional)
    *
    * @generated from field: cbt.StringFilter meta_client_name = 4;
    */
   metaClientName?: StringFilter;
 
   /**
-   * Filter by updated_date_time (optional)
+   * Filter by updated_date_time - Timestamp when the record was last updated (optional)
    *
    * @generated from field: cbt.UInt32Filter updated_date_time = 5;
    */
   updatedDateTime?: UInt32Filter;
 
   /**
-   * Filter by source (optional)
+   * Filter by source - Source of the event (optional)
    *
    * @generated from field: cbt.StringFilter source = 6;
    */
   source?: StringFilter;
 
   /**
-   * Filter by slot (optional)
+   * Filter by slot - The slot number (PROJECTION: p_by_slot - alternative to slot_start_date_time)
    *
    * @generated from field: cbt.UInt32Filter slot = 7;
    */
   slot?: UInt32Filter;
 
   /**
-   * Filter by epoch (optional)
+   * Filter by epoch - The epoch number containing the slot (optional)
    *
    * @generated from field: cbt.UInt32Filter epoch = 8;
    */
   epoch?: UInt32Filter;
 
   /**
-   * Filter by epoch_start_date_time (optional)
+   * Filter by epoch_start_date_time - The wall clock time when the epoch started (optional)
    *
    * @generated from field: cbt.UInt32Filter epoch_start_date_time = 9;
    */
   epochStartDateTime?: UInt32Filter;
 
   /**
-   * Filter by seen_slot_start_diff (optional)
+   * Filter by seen_slot_start_diff - The time from slot start for the client to see the block (optional)
    *
    * @generated from field: cbt.UInt32Filter seen_slot_start_diff = 10;
    */
   seenSlotStartDiff?: UInt32Filter;
 
   /**
-   * Filter by username (optional)
+   * Filter by username - Username of the node (optional)
    *
    * @generated from field: cbt.StringFilter username = 11;
    */
   username?: StringFilter;
 
   /**
-   * Filter by node_id (optional)
+   * Filter by node_id - ID of the node (optional)
    *
    * @generated from field: cbt.StringFilter node_id = 12;
    */
   nodeId?: StringFilter;
 
   /**
-   * Filter by classification (optional)
+   * Filter by classification - Classification of the node, e.g. "individual", "corporate", "internal" (aka ethPandaOps) or "unclassified" (optional)
    *
    * @generated from field: cbt.StringFilter classification = 13;
    */
   classification?: StringFilter;
 
   /**
-   * Filter by meta_client_version (optional)
+   * Filter by meta_client_version - Version of the client (optional)
    *
    * @generated from field: cbt.StringFilter meta_client_version = 14;
    */
   metaClientVersion?: StringFilter;
 
   /**
-   * Filter by meta_client_implementation (optional)
+   * Filter by meta_client_implementation - Implementation of the client (optional)
    *
    * @generated from field: cbt.StringFilter meta_client_implementation = 15;
    */
   metaClientImplementation?: StringFilter;
 
   /**
-   * Filter by meta_client_geo_city (optional)
+   * Filter by meta_client_geo_city - City of the client (optional)
    *
    * @generated from field: cbt.StringFilter meta_client_geo_city = 16;
    */
   metaClientGeoCity?: StringFilter;
 
   /**
-   * Filter by meta_client_geo_country (optional)
+   * Filter by meta_client_geo_country - Country of the client (optional)
    *
    * @generated from field: cbt.StringFilter meta_client_geo_country = 17;
    */
   metaClientGeoCountry?: StringFilter;
 
   /**
-   * Filter by meta_client_geo_country_code (optional)
+   * Filter by meta_client_geo_country_code - Country code of the client (optional)
    *
    * @generated from field: cbt.StringFilter meta_client_geo_country_code = 18;
    */
   metaClientGeoCountryCode?: StringFilter;
 
   /**
-   * Filter by meta_client_geo_continent_code (optional)
+   * Filter by meta_client_geo_continent_code - Continent code of the client (optional)
    *
    * @generated from field: cbt.StringFilter meta_client_geo_continent_code = 19;
    */
   metaClientGeoContinentCode?: StringFilter;
 
   /**
-   * Filter by meta_client_geo_longitude (optional)
+   * Filter by meta_client_geo_longitude - Longitude of the client (optional)
    *
    * @generated from field: google.protobuf.DoubleValue meta_client_geo_longitude = 20;
    */
   metaClientGeoLongitude?: number;
 
   /**
-   * Filter by meta_client_geo_latitude (optional)
+   * Filter by meta_client_geo_latitude - Latitude of the client (optional)
    *
    * @generated from field: google.protobuf.DoubleValue meta_client_geo_latitude = 21;
    */
   metaClientGeoLatitude?: number;
 
   /**
-   * Filter by meta_client_geo_autonomous_system_number (optional)
+   * Filter by meta_client_geo_autonomous_system_number - Autonomous system number of the client (optional)
    *
    * @generated from field: cbt.NullableUInt32Filter meta_client_geo_autonomous_system_number = 22;
    */
   metaClientGeoAutonomousSystemNumber?: NullableUInt32Filter;
 
   /**
-   * Filter by meta_client_geo_autonomous_system_organization (optional)
+   * Filter by meta_client_geo_autonomous_system_organization - Autonomous system organization of the client (optional)
    *
    * @generated from field: cbt.NullableStringFilter meta_client_geo_autonomous_system_organization = 23;
    */
   metaClientGeoAutonomousSystemOrganization?: NullableStringFilter;
 
   /**
-   * Filter by meta_consensus_version (optional)
+   * Filter by meta_consensus_version - Ethereum consensus client version (optional)
    *
    * @generated from field: cbt.StringFilter meta_consensus_version = 24;
    */
   metaConsensusVersion?: StringFilter;
 
   /**
-   * Filter by meta_consensus_implementation (optional)
+   * Filter by meta_consensus_implementation - Ethereum consensus client implementation (optional)
    *
    * @generated from field: cbt.StringFilter meta_consensus_implementation = 25;
    */
@@ -501,7 +501,7 @@ export class ListFctBlockBlobFirstSeenByNodeRequest extends Message<ListFctBlock
 }
 
 /**
- * ListFctBlockBlobFirstSeenByNodeResponse is the response message for listing fct_block_blob_first_seen_by_node records
+ * Response for listing fct_block_blob_first_seen_by_node records
  *
  * @generated from message cbt.ListFctBlockBlobFirstSeenByNodeResponse
  */
@@ -551,7 +551,7 @@ export class ListFctBlockBlobFirstSeenByNodeResponse extends Message<ListFctBloc
 }
 
 /**
- * GetFctBlockBlobFirstSeenByNodeRequest is the request message for getting a single fct_block_blob_first_seen_by_node record by primary key
+ * Request for getting a single fct_block_blob_first_seen_by_node record by primary key
  *
  * @generated from message cbt.GetFctBlockBlobFirstSeenByNodeRequest
  */
@@ -594,7 +594,7 @@ export class GetFctBlockBlobFirstSeenByNodeRequest extends Message<GetFctBlockBl
 }
 
 /**
- * GetFctBlockBlobFirstSeenByNodeResponse is the response message for getting a single fct_block_blob_first_seen_by_node record
+ * Response for getting a single fct_block_blob_first_seen_by_node record
  *
  * @generated from message cbt.GetFctBlockBlobFirstSeenByNodeResponse
  */

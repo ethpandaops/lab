@@ -27,11 +27,11 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// FctAttestationCorrectnessCanonicalService provides RPC methods for querying fct_attestation_correctness_canonical data
+// Query fct_attestation_correctness_canonical data
 type FctAttestationCorrectnessCanonicalServiceClient interface {
-	// List returns paginated fct_attestation_correctness_canonical records
+	// List records | Retrieve paginated results with optional filtering
 	List(ctx context.Context, in *ListFctAttestationCorrectnessCanonicalRequest, opts ...grpc.CallOption) (*ListFctAttestationCorrectnessCanonicalResponse, error)
-	// Get returns a single fct_attestation_correctness_canonical record by primary key
+	// Get record | Retrieve a single record by slot_start_date_time
 	Get(ctx context.Context, in *GetFctAttestationCorrectnessCanonicalRequest, opts ...grpc.CallOption) (*GetFctAttestationCorrectnessCanonicalResponse, error)
 }
 
@@ -67,11 +67,11 @@ func (c *fctAttestationCorrectnessCanonicalServiceClient) Get(ctx context.Contex
 // All implementations must embed UnimplementedFctAttestationCorrectnessCanonicalServiceServer
 // for forward compatibility
 //
-// FctAttestationCorrectnessCanonicalService provides RPC methods for querying fct_attestation_correctness_canonical data
+// Query fct_attestation_correctness_canonical data
 type FctAttestationCorrectnessCanonicalServiceServer interface {
-	// List returns paginated fct_attestation_correctness_canonical records
+	// List records | Retrieve paginated results with optional filtering
 	List(context.Context, *ListFctAttestationCorrectnessCanonicalRequest) (*ListFctAttestationCorrectnessCanonicalResponse, error)
-	// Get returns a single fct_attestation_correctness_canonical record by primary key
+	// Get record | Retrieve a single record by slot_start_date_time
 	Get(context.Context, *GetFctAttestationCorrectnessCanonicalRequest) (*GetFctAttestationCorrectnessCanonicalResponse, error)
 	mustEmbedUnimplementedFctAttestationCorrectnessCanonicalServiceServer()
 }

@@ -3,7 +3,6 @@ package xatu_cbt
 import (
 	"context"
 	"fmt"
-	"time"
 
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/clickhouse"
 	cbtproto "github.com/ethpandaops/xatu-cbt/pkg/proto/clickhouse"
@@ -190,24 +189,13 @@ func scanFctAddressStorageSlotTotal(
 ) (*cbtproto.FctAddressStorageSlotTotal, error) {
 	item := &cbtproto.FctAddressStorageSlotTotal{}
 
-	var (
-		updatedDateTime     time.Time
-		totalStorageSlots   uint64
-		expiredStorageSlots uint64
-	)
-
 	if err := scanner.Scan(
-		&updatedDateTime,
-		&totalStorageSlots,
-		&expiredStorageSlots,
+		&item.UpdatedDateTime,
+		&item.TotalStorageSlots,
+		&item.ExpiredStorageSlots,
 	); err != nil {
 		return nil, fmt.Errorf("failed to scan fct_address_storage_slot_total: %w", err)
 	}
-
-	// Convert time to uint32 Unix timestamp
-	item.UpdatedDateTime = uint32(updatedDateTime.Unix()) //nolint:gosec // conversion safe for timestamps
-	item.TotalStorageSlots = totalStorageSlots
-	item.ExpiredStorageSlots = expiredStorageSlots
 
 	return item, nil
 }

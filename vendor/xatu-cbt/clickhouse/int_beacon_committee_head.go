@@ -259,7 +259,7 @@ func BuildListIntBeaconCommitteeHeadQuery(req *ListIntBeaconCommitteeHeadRequest
 	}
 
 	// Build column list
-	columns := []string{"updated_date_time", "slot", "slot_start_date_time", "epoch", "epoch_start_date_time", "committee_index", "validators"}
+	columns := []string{"toUnixTimestamp(`updated_date_time`) AS `updated_date_time`", "slot", "toUnixTimestamp(`slot_start_date_time`) AS `slot_start_date_time`", "epoch", "toUnixTimestamp(`epoch_start_date_time`) AS `epoch_start_date_time`", "committee_index", "validators"}
 
 	return BuildParameterizedQuery("int_beacon_committee_head", columns, qb, orderByClause, limit, offset, options...)
 }
@@ -279,7 +279,7 @@ func BuildGetIntBeaconCommitteeHeadQuery(req *GetIntBeaconCommitteeHeadRequest, 
 	orderByClause := " ORDER BY slot_start_date_time, committee_index"
 
 	// Build column list
-	columns := []string{"updated_date_time", "slot", "slot_start_date_time", "epoch", "epoch_start_date_time", "committee_index", "validators"}
+	columns := []string{"toUnixTimestamp(`updated_date_time`) AS `updated_date_time`", "slot", "toUnixTimestamp(`slot_start_date_time`) AS `slot_start_date_time`", "epoch", "toUnixTimestamp(`epoch_start_date_time`) AS `epoch_start_date_time`", "committee_index", "validators"}
 
 	// Return single record
 	return BuildParameterizedQuery("int_beacon_committee_head", columns, qb, orderByClause, 1, 0, options...)

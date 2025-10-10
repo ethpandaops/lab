@@ -119,76 +119,76 @@ export class FctAttestationCorrectnessByValidatorCanonical extends Message<FctAt
 }
 
 /**
- * ListFctAttestationCorrectnessByValidatorCanonicalRequest is the request message for listing fct_attestation_correctness_by_validator_canonical records
+ * Request for listing fct_attestation_correctness_by_validator_canonical records
  *
  * @generated from message cbt.ListFctAttestationCorrectnessByValidatorCanonicalRequest
  */
 export class ListFctAttestationCorrectnessByValidatorCanonicalRequest extends Message<ListFctAttestationCorrectnessByValidatorCanonicalRequest> {
   /**
-   * Filter by slot_start_date_time (PRIMARY KEY - required)
+   * Filter by slot_start_date_time - The wall clock time when the slot started (PRIMARY KEY - required)
    *
    * @generated from field: cbt.UInt32Filter slot_start_date_time = 1;
    */
   slotStartDateTime?: UInt32Filter;
 
   /**
-   * Filter by attesting_validator_index (ORDER BY column 2 - optional)
+   * Filter by attesting_validator_index - The index of the validator attesting (ORDER BY column 2 - optional)
    *
    * @generated from field: cbt.UInt32Filter attesting_validator_index = 2;
    */
   attestingValidatorIndex?: UInt32Filter;
 
   /**
-   * Filter by updated_date_time (optional)
+   * Filter by updated_date_time - Timestamp when the record was last updated (optional)
    *
    * @generated from field: cbt.UInt32Filter updated_date_time = 3;
    */
   updatedDateTime?: UInt32Filter;
 
   /**
-   * Filter by slot (optional)
+   * Filter by slot - The slot number (optional)
    *
    * @generated from field: cbt.UInt32Filter slot = 4;
    */
   slot?: UInt32Filter;
 
   /**
-   * Filter by epoch (optional)
+   * Filter by epoch - The epoch number containing the slot (optional)
    *
    * @generated from field: cbt.UInt32Filter epoch = 5;
    */
   epoch?: UInt32Filter;
 
   /**
-   * Filter by epoch_start_date_time (optional)
+   * Filter by epoch_start_date_time - The wall clock time when the epoch started (optional)
    *
    * @generated from field: cbt.UInt32Filter epoch_start_date_time = 6;
    */
   epochStartDateTime?: UInt32Filter;
 
   /**
-   * Filter by block_root (optional)
+   * Filter by block_root - The beacon block root hash that was attested (optional)
    *
    * @generated from field: cbt.NullableStringFilter block_root = 7;
    */
   blockRoot?: NullableStringFilter;
 
   /**
-   * Filter by slot_distance (optional)
+   * Filter by slot_distance - The distance from the slot to the attested block. If the attested block is the same as the slot, the distance is 0, if the attested block is the previous slot, the distance is 1, etc. If null, the attestation was missed, the block was orphaned and never seen by a sentry or the block was more than 64 slots ago (optional)
    *
    * @generated from field: cbt.NullableUInt32Filter slot_distance = 8;
    */
   slotDistance?: NullableUInt32Filter;
 
   /**
-   * Filter by inclusion_distance (optional)
+   * Filter by inclusion_distance - The distance from the slot when the attestation was included in a block (optional)
    *
    * @generated from field: cbt.NullableUInt32Filter inclusion_distance = 9;
    */
   inclusionDistance?: NullableUInt32Filter;
 
   /**
-   * Filter by status (optional)
+   * Filter by status - Can be "canonical", "orphaned", "missed" or "unknown" (validator attested but block data not available) (optional)
    *
    * @generated from field: cbt.StringFilter status = 10;
    */
@@ -261,7 +261,7 @@ export class ListFctAttestationCorrectnessByValidatorCanonicalRequest extends Me
 }
 
 /**
- * ListFctAttestationCorrectnessByValidatorCanonicalResponse is the response message for listing fct_attestation_correctness_by_validator_canonical records
+ * Response for listing fct_attestation_correctness_by_validator_canonical records
  *
  * @generated from message cbt.ListFctAttestationCorrectnessByValidatorCanonicalResponse
  */
@@ -311,7 +311,7 @@ export class ListFctAttestationCorrectnessByValidatorCanonicalResponse extends M
 }
 
 /**
- * GetFctAttestationCorrectnessByValidatorCanonicalRequest is the request message for getting a single fct_attestation_correctness_by_validator_canonical record by primary key
+ * Request for getting a single fct_attestation_correctness_by_validator_canonical record by primary key
  *
  * @generated from message cbt.GetFctAttestationCorrectnessByValidatorCanonicalRequest
  */
@@ -354,7 +354,7 @@ export class GetFctAttestationCorrectnessByValidatorCanonicalRequest extends Mes
 }
 
 /**
- * GetFctAttestationCorrectnessByValidatorCanonicalResponse is the response message for getting a single fct_attestation_correctness_by_validator_canonical record
+ * Response for getting a single fct_attestation_correctness_by_validator_canonical record
  *
  * @generated from message cbt.GetFctAttestationCorrectnessByValidatorCanonicalResponse
  */

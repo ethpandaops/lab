@@ -27,11 +27,11 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// IntAddressFirstAccessService provides RPC methods for querying int_address_first_access data
+// Query int_address_first_access data
 type IntAddressFirstAccessServiceClient interface {
-	// List returns paginated int_address_first_access records
+	// List records | Retrieve paginated results with optional filtering
 	List(ctx context.Context, in *ListIntAddressFirstAccessRequest, opts ...grpc.CallOption) (*ListIntAddressFirstAccessResponse, error)
-	// Get returns a single int_address_first_access record by primary key
+	// Get record | Retrieve a single record by primary key
 	Get(ctx context.Context, in *GetIntAddressFirstAccessRequest, opts ...grpc.CallOption) (*GetIntAddressFirstAccessResponse, error)
 }
 
@@ -67,11 +67,11 @@ func (c *intAddressFirstAccessServiceClient) Get(ctx context.Context, in *GetInt
 // All implementations must embed UnimplementedIntAddressFirstAccessServiceServer
 // for forward compatibility
 //
-// IntAddressFirstAccessService provides RPC methods for querying int_address_first_access data
+// Query int_address_first_access data
 type IntAddressFirstAccessServiceServer interface {
-	// List returns paginated int_address_first_access records
+	// List records | Retrieve paginated results with optional filtering
 	List(context.Context, *ListIntAddressFirstAccessRequest) (*ListIntAddressFirstAccessResponse, error)
-	// Get returns a single int_address_first_access record by primary key
+	// Get record | Retrieve a single record by primary key
 	Get(context.Context, *GetIntAddressFirstAccessRequest) (*GetIntAddressFirstAccessResponse, error)
 	mustEmbedUnimplementedIntAddressFirstAccessServiceServer()
 }

@@ -27,11 +27,11 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// AdminCbtService provides RPC methods for querying admin_cbt data
+// Query admin_cbt data
 type AdminCbtServiceClient interface {
-	// List returns paginated admin_cbt records
+	// List records | Retrieve paginated results with optional filtering
 	List(ctx context.Context, in *ListAdminCbtRequest, opts ...grpc.CallOption) (*ListAdminCbtResponse, error)
-	// Get returns a single admin_cbt record by primary key
+	// Get record | Retrieve a single record by primary key
 	Get(ctx context.Context, in *GetAdminCbtRequest, opts ...grpc.CallOption) (*GetAdminCbtResponse, error)
 }
 
@@ -67,11 +67,11 @@ func (c *adminCbtServiceClient) Get(ctx context.Context, in *GetAdminCbtRequest,
 // All implementations must embed UnimplementedAdminCbtServiceServer
 // for forward compatibility
 //
-// AdminCbtService provides RPC methods for querying admin_cbt data
+// Query admin_cbt data
 type AdminCbtServiceServer interface {
-	// List returns paginated admin_cbt records
+	// List records | Retrieve paginated results with optional filtering
 	List(context.Context, *ListAdminCbtRequest) (*ListAdminCbtResponse, error)
-	// Get returns a single admin_cbt record by primary key
+	// Get record | Retrieve a single record by primary key
 	Get(context.Context, *GetAdminCbtRequest) (*GetAdminCbtResponse, error)
 	mustEmbedUnimplementedAdminCbtServiceServer()
 }

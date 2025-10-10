@@ -27,11 +27,11 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// FctBlockFirstSeenByNodeService provides RPC methods for querying fct_block_first_seen_by_node data
+// Query fct_block_first_seen_by_node data
 type FctBlockFirstSeenByNodeServiceClient interface {
-	// List returns paginated fct_block_first_seen_by_node records
+	// List records | Retrieve paginated results with optional filtering
 	List(ctx context.Context, in *ListFctBlockFirstSeenByNodeRequest, opts ...grpc.CallOption) (*ListFctBlockFirstSeenByNodeResponse, error)
-	// Get returns a single fct_block_first_seen_by_node record by primary key
+	// Get record | Retrieve a single record by slot_start_date_time
 	Get(ctx context.Context, in *GetFctBlockFirstSeenByNodeRequest, opts ...grpc.CallOption) (*GetFctBlockFirstSeenByNodeResponse, error)
 }
 
@@ -67,11 +67,11 @@ func (c *fctBlockFirstSeenByNodeServiceClient) Get(ctx context.Context, in *GetF
 // All implementations must embed UnimplementedFctBlockFirstSeenByNodeServiceServer
 // for forward compatibility
 //
-// FctBlockFirstSeenByNodeService provides RPC methods for querying fct_block_first_seen_by_node data
+// Query fct_block_first_seen_by_node data
 type FctBlockFirstSeenByNodeServiceServer interface {
-	// List returns paginated fct_block_first_seen_by_node records
+	// List records | Retrieve paginated results with optional filtering
 	List(context.Context, *ListFctBlockFirstSeenByNodeRequest) (*ListFctBlockFirstSeenByNodeResponse, error)
-	// Get returns a single fct_block_first_seen_by_node record by primary key
+	// Get record | Retrieve a single record by slot_start_date_time
 	Get(context.Context, *GetFctBlockFirstSeenByNodeRequest) (*GetFctBlockFirstSeenByNodeResponse, error)
 	mustEmbedUnimplementedFctBlockFirstSeenByNodeServiceServer()
 }

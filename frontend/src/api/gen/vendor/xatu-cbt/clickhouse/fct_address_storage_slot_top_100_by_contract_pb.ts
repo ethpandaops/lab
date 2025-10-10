@@ -71,34 +71,34 @@ export class FctAddressStorageSlotTop100ByContract extends Message<FctAddressSto
 }
 
 /**
- * ListFctAddressStorageSlotTop100ByContractRequest is the request message for listing fct_address_storage_slot_top_100_by_contract records
+ * Request for listing fct_address_storage_slot_top_100_by_contract records
  *
  * @generated from message cbt.ListFctAddressStorageSlotTop100ByContractRequest
  */
 export class ListFctAddressStorageSlotTop100ByContractRequest extends Message<ListFctAddressStorageSlotTop100ByContractRequest> {
   /**
-   * Filter by rank (PRIMARY KEY - required)
+   * Filter by rank - Rank by total storage slots (1=highest) (PRIMARY KEY - required)
    *
    * @generated from field: cbt.UInt32Filter rank = 1;
    */
   rank?: UInt32Filter;
 
   /**
-   * Filter by updated_date_time (optional)
+   * Filter by updated_date_time - Timestamp when the record was last updated (optional)
    *
    * @generated from field: cbt.UInt32Filter updated_date_time = 2;
    */
   updatedDateTime?: UInt32Filter;
 
   /**
-   * Filter by contract_address (optional)
+   * Filter by contract_address - The contract address (optional)
    *
    * @generated from field: cbt.StringFilter contract_address = 3;
    */
   contractAddress?: StringFilter;
 
   /**
-   * Filter by total_storage_slots (optional)
+   * Filter by total_storage_slots - Total number of storage slots for this contract (optional)
    *
    * @generated from field: cbt.UInt64Filter total_storage_slots = 4;
    */
@@ -165,7 +165,7 @@ export class ListFctAddressStorageSlotTop100ByContractRequest extends Message<Li
 }
 
 /**
- * ListFctAddressStorageSlotTop100ByContractResponse is the response message for listing fct_address_storage_slot_top_100_by_contract records
+ * Response for listing fct_address_storage_slot_top_100_by_contract records
  *
  * @generated from message cbt.ListFctAddressStorageSlotTop100ByContractResponse
  */
@@ -215,7 +215,7 @@ export class ListFctAddressStorageSlotTop100ByContractResponse extends Message<L
 }
 
 /**
- * GetFctAddressStorageSlotTop100ByContractRequest is the request message for getting a single fct_address_storage_slot_top_100_by_contract record by primary key
+ * Request for getting a single fct_address_storage_slot_top_100_by_contract record by primary key
  *
  * @generated from message cbt.GetFctAddressStorageSlotTop100ByContractRequest
  */
@@ -258,7 +258,7 @@ export class GetFctAddressStorageSlotTop100ByContractRequest extends Message<Get
 }
 
 /**
- * GetFctAddressStorageSlotTop100ByContractResponse is the response message for getting a single fct_address_storage_slot_top_100_by_contract record
+ * Response for getting a single fct_address_storage_slot_top_100_by_contract record
  *
  * @generated from message cbt.GetFctAddressStorageSlotTop100ByContractResponse
  */

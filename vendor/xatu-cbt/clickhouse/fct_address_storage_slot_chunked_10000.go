@@ -181,7 +181,7 @@ func BuildListFctAddressStorageSlotChunked10000Query(req *ListFctAddressStorageS
 	}
 
 	// Build column list
-	columns := []string{"updated_date_time", "chunk_start_block_number", "first_accessed_slots", "last_accessed_slots"}
+	columns := []string{"toUnixTimestamp(`updated_date_time`) AS `updated_date_time`", "chunk_start_block_number", "first_accessed_slots", "last_accessed_slots"}
 
 	return BuildParameterizedQuery("fct_address_storage_slot_chunked_10000", columns, qb, orderByClause, limit, offset, options...)
 }
@@ -201,7 +201,7 @@ func BuildGetFctAddressStorageSlotChunked10000Query(req *GetFctAddressStorageSlo
 	orderByClause := " ORDER BY chunk_start_block_number"
 
 	// Build column list
-	columns := []string{"updated_date_time", "chunk_start_block_number", "first_accessed_slots", "last_accessed_slots"}
+	columns := []string{"toUnixTimestamp(`updated_date_time`) AS `updated_date_time`", "chunk_start_block_number", "first_accessed_slots", "last_accessed_slots"}
 
 	// Return single record
 	return BuildParameterizedQuery("fct_address_storage_slot_chunked_10000", columns, qb, orderByClause, 1, 0, options...)

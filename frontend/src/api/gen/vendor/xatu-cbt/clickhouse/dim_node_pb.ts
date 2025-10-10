@@ -95,55 +95,55 @@ export class DimNode extends Message<DimNode> {
 }
 
 /**
- * ListDimNodeRequest is the request message for listing dim_node records
+ * Request for listing dim_node records
  *
  * @generated from message cbt.ListDimNodeRequest
  */
 export class ListDimNodeRequest extends Message<ListDimNodeRequest> {
   /**
-   * Filter by validator_index (PRIMARY KEY - required)
+   * Filter by validator_index - The index of the validator (PRIMARY KEY - required)
    *
    * @generated from field: cbt.UInt32Filter validator_index = 1;
    */
   validatorIndex?: UInt32Filter;
 
   /**
-   * Filter by updated_date_time (optional)
+   * Filter by updated_date_time - Timestamp when the record was last updated (optional)
    *
    * @generated from field: cbt.UInt32Filter updated_date_time = 2;
    */
   updatedDateTime?: UInt32Filter;
 
   /**
-   * Filter by name (optional)
+   * Filter by name - The name of the node (optional)
    *
    * @generated from field: cbt.NullableStringFilter name = 3;
    */
   name?: NullableStringFilter;
 
   /**
-   * Filter by groups (optional)
+   * Filter by groups - Groups the node belongs to (optional)
    *
    * @generated from field: repeated string groups = 4;
    */
   groups: string[] = [];
 
   /**
-   * Filter by tags (optional)
+   * Filter by tags - Tags associated with the node (optional)
    *
    * @generated from field: repeated string tags = 5;
    */
   tags: string[] = [];
 
   /**
-   * Filter by attributes (optional)
+   * Filter by attributes - Additional attributes of the node (optional)
    *
    * @generated from field: cbt.MapStringStringFilter attributes = 6;
    */
   attributes?: MapStringStringFilter;
 
   /**
-   * Filter by source (optional)
+   * Filter by source - The source entity of the node (optional)
    *
    * @generated from field: cbt.StringFilter source = 7;
    */
@@ -213,7 +213,7 @@ export class ListDimNodeRequest extends Message<ListDimNodeRequest> {
 }
 
 /**
- * ListDimNodeResponse is the response message for listing dim_node records
+ * Response for listing dim_node records
  *
  * @generated from message cbt.ListDimNodeResponse
  */
@@ -263,7 +263,7 @@ export class ListDimNodeResponse extends Message<ListDimNodeResponse> {
 }
 
 /**
- * GetDimNodeRequest is the request message for getting a single dim_node record by primary key
+ * Request for getting a single dim_node record by primary key
  *
  * @generated from message cbt.GetDimNodeRequest
  */
@@ -306,7 +306,7 @@ export class GetDimNodeRequest extends Message<GetDimNodeRequest> {
 }
 
 /**
- * GetDimNodeResponse is the response message for getting a single dim_node record
+ * Response for getting a single dim_node record
  *
  * @generated from message cbt.GetDimNodeResponse
  */

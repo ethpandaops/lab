@@ -27,11 +27,11 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// FctAttestationCorrectnessByValidatorCanonicalService provides RPC methods for querying fct_attestation_correctness_by_validator_canonical data
+// Query fct_attestation_correctness_by_validator_canonical data
 type FctAttestationCorrectnessByValidatorCanonicalServiceClient interface {
-	// List returns paginated fct_attestation_correctness_by_validator_canonical records
+	// List records | Retrieve paginated results with optional filtering
 	List(ctx context.Context, in *ListFctAttestationCorrectnessByValidatorCanonicalRequest, opts ...grpc.CallOption) (*ListFctAttestationCorrectnessByValidatorCanonicalResponse, error)
-	// Get returns a single fct_attestation_correctness_by_validator_canonical record by primary key
+	// Get record | Retrieve a single record by slot_start_date_time
 	Get(ctx context.Context, in *GetFctAttestationCorrectnessByValidatorCanonicalRequest, opts ...grpc.CallOption) (*GetFctAttestationCorrectnessByValidatorCanonicalResponse, error)
 }
 
@@ -67,11 +67,11 @@ func (c *fctAttestationCorrectnessByValidatorCanonicalServiceClient) Get(ctx con
 // All implementations must embed UnimplementedFctAttestationCorrectnessByValidatorCanonicalServiceServer
 // for forward compatibility
 //
-// FctAttestationCorrectnessByValidatorCanonicalService provides RPC methods for querying fct_attestation_correctness_by_validator_canonical data
+// Query fct_attestation_correctness_by_validator_canonical data
 type FctAttestationCorrectnessByValidatorCanonicalServiceServer interface {
-	// List returns paginated fct_attestation_correctness_by_validator_canonical records
+	// List records | Retrieve paginated results with optional filtering
 	List(context.Context, *ListFctAttestationCorrectnessByValidatorCanonicalRequest) (*ListFctAttestationCorrectnessByValidatorCanonicalResponse, error)
-	// Get returns a single fct_attestation_correctness_by_validator_canonical record by primary key
+	// Get record | Retrieve a single record by slot_start_date_time
 	Get(context.Context, *GetFctAttestationCorrectnessByValidatorCanonicalRequest) (*GetFctAttestationCorrectnessByValidatorCanonicalResponse, error)
 	mustEmbedUnimplementedFctAttestationCorrectnessByValidatorCanonicalServiceServer()
 }

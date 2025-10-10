@@ -27,11 +27,11 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// IntAttestationFirstSeenService provides RPC methods for querying int_attestation_first_seen data
+// Query int_attestation_first_seen data
 type IntAttestationFirstSeenServiceClient interface {
-	// List returns paginated int_attestation_first_seen records
+	// List records | Retrieve paginated results with optional filtering
 	List(ctx context.Context, in *ListIntAttestationFirstSeenRequest, opts ...grpc.CallOption) (*ListIntAttestationFirstSeenResponse, error)
-	// Get returns a single int_attestation_first_seen record by primary key
+	// Get record | Retrieve a single record by primary key
 	Get(ctx context.Context, in *GetIntAttestationFirstSeenRequest, opts ...grpc.CallOption) (*GetIntAttestationFirstSeenResponse, error)
 }
 
@@ -67,11 +67,11 @@ func (c *intAttestationFirstSeenServiceClient) Get(ctx context.Context, in *GetI
 // All implementations must embed UnimplementedIntAttestationFirstSeenServiceServer
 // for forward compatibility
 //
-// IntAttestationFirstSeenService provides RPC methods for querying int_attestation_first_seen data
+// Query int_attestation_first_seen data
 type IntAttestationFirstSeenServiceServer interface {
-	// List returns paginated int_attestation_first_seen records
+	// List records | Retrieve paginated results with optional filtering
 	List(context.Context, *ListIntAttestationFirstSeenRequest) (*ListIntAttestationFirstSeenResponse, error)
-	// Get returns a single int_attestation_first_seen record by primary key
+	// Get record | Retrieve a single record by primary key
 	Get(context.Context, *GetIntAttestationFirstSeenRequest) (*GetIntAttestationFirstSeenResponse, error)
 	mustEmbedUnimplementedIntAttestationFirstSeenServiceServer()
 }

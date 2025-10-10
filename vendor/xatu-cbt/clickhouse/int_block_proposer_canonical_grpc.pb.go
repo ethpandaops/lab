@@ -27,11 +27,11 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// IntBlockProposerCanonicalService provides RPC methods for querying int_block_proposer_canonical data
+// Query int_block_proposer_canonical data
 type IntBlockProposerCanonicalServiceClient interface {
-	// List returns paginated int_block_proposer_canonical records
+	// List records | Retrieve paginated results with optional filtering
 	List(ctx context.Context, in *ListIntBlockProposerCanonicalRequest, opts ...grpc.CallOption) (*ListIntBlockProposerCanonicalResponse, error)
-	// Get returns a single int_block_proposer_canonical record by primary key
+	// Get record | Retrieve a single record by primary key
 	Get(ctx context.Context, in *GetIntBlockProposerCanonicalRequest, opts ...grpc.CallOption) (*GetIntBlockProposerCanonicalResponse, error)
 }
 
@@ -67,11 +67,11 @@ func (c *intBlockProposerCanonicalServiceClient) Get(ctx context.Context, in *Ge
 // All implementations must embed UnimplementedIntBlockProposerCanonicalServiceServer
 // for forward compatibility
 //
-// IntBlockProposerCanonicalService provides RPC methods for querying int_block_proposer_canonical data
+// Query int_block_proposer_canonical data
 type IntBlockProposerCanonicalServiceServer interface {
-	// List returns paginated int_block_proposer_canonical records
+	// List records | Retrieve paginated results with optional filtering
 	List(context.Context, *ListIntBlockProposerCanonicalRequest) (*ListIntBlockProposerCanonicalResponse, error)
-	// Get returns a single int_block_proposer_canonical record by primary key
+	// Get record | Retrieve a single record by primary key
 	Get(context.Context, *GetIntBlockProposerCanonicalRequest) (*GetIntBlockProposerCanonicalResponse, error)
 	mustEmbedUnimplementedIntBlockProposerCanonicalServiceServer()
 }

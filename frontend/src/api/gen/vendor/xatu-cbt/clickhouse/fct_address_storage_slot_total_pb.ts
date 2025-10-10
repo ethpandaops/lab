@@ -63,27 +63,27 @@ export class FctAddressStorageSlotTotal extends Message<FctAddressStorageSlotTot
 }
 
 /**
- * ListFctAddressStorageSlotTotalRequest is the request message for listing fct_address_storage_slot_total records
+ * Request for listing fct_address_storage_slot_total records
  *
  * @generated from message cbt.ListFctAddressStorageSlotTotalRequest
  */
 export class ListFctAddressStorageSlotTotalRequest extends Message<ListFctAddressStorageSlotTotalRequest> {
   /**
-   * Filter by updated_date_time (PRIMARY KEY - required)
+   * Filter by updated_date_time - Timestamp when the record was last updated (PRIMARY KEY - required)
    *
    * @generated from field: cbt.UInt32Filter updated_date_time = 1;
    */
   updatedDateTime?: UInt32Filter;
 
   /**
-   * Filter by total_storage_slots (optional)
+   * Filter by total_storage_slots - Total number of storage slots accessed in last 365 days (optional)
    *
    * @generated from field: cbt.UInt64Filter total_storage_slots = 2;
    */
   totalStorageSlots?: UInt64Filter;
 
   /**
-   * Filter by expired_storage_slots (optional)
+   * Filter by expired_storage_slots - Number of expired storage slots (not accessed in last 365 days) (optional)
    *
    * @generated from field: cbt.UInt64Filter expired_storage_slots = 3;
    */
@@ -149,7 +149,7 @@ export class ListFctAddressStorageSlotTotalRequest extends Message<ListFctAddres
 }
 
 /**
- * ListFctAddressStorageSlotTotalResponse is the response message for listing fct_address_storage_slot_total records
+ * Response for listing fct_address_storage_slot_total records
  *
  * @generated from message cbt.ListFctAddressStorageSlotTotalResponse
  */
@@ -199,7 +199,7 @@ export class ListFctAddressStorageSlotTotalResponse extends Message<ListFctAddre
 }
 
 /**
- * GetFctAddressStorageSlotTotalRequest is the request message for getting a single fct_address_storage_slot_total record by primary key
+ * Request for getting a single fct_address_storage_slot_total record by primary key
  *
  * @generated from message cbt.GetFctAddressStorageSlotTotalRequest
  */
@@ -242,7 +242,7 @@ export class GetFctAddressStorageSlotTotalRequest extends Message<GetFctAddressS
 }
 
 /**
- * GetFctAddressStorageSlotTotalResponse is the response message for getting a single fct_address_storage_slot_total record
+ * Response for getting a single fct_address_storage_slot_total record
  *
  * @generated from message cbt.GetFctAddressStorageSlotTotalResponse
  */

@@ -3,7 +3,6 @@ package xatu_cbt
 import (
 	"context"
 	"fmt"
-	"time"
 
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/clickhouse"
 	cbtproto "github.com/ethpandaops/xatu-cbt/pkg/proto/clickhouse"
@@ -98,26 +97,20 @@ func scanFctBlockProposerEntity(
 	scanner clickhouse.RowScanner,
 ) (*cbtproto.FctBlockProposerEntity, error) {
 	var (
-		entity                             cbtproto.FctBlockProposerEntity
-		updatedDateTime, slotStartDateTime time.Time
-		epochStartDateTime                 time.Time
-		entityName                         *string // nullable field
+		entity     cbtproto.FctBlockProposerEntity
+		entityName *string // nullable field
 	)
 
 	if err := scanner.Scan(
-		&updatedDateTime,
+		&entity.UpdatedDateTime,
 		&entity.Slot,
-		&slotStartDateTime,
+		&entity.SlotStartDateTime,
 		&entity.Epoch,
-		&epochStartDateTime,
+		&entity.EpochStartDateTime,
 		&entityName,
 	); err != nil {
 		return nil, fmt.Errorf("failed to scan row: %w", err)
 	}
-
-	entity.UpdatedDateTime = uint32(updatedDateTime.Unix())       //nolint:gosec // safe.
-	entity.SlotStartDateTime = uint32(slotStartDateTime.Unix())   //nolint:gosec // safe.
-	entity.EpochStartDateTime = uint32(epochStartDateTime.Unix()) //nolint:gosec // safe.
 
 	// Handle nullable entity field
 	if entityName != nil {

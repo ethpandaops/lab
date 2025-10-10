@@ -71,34 +71,34 @@ export class FctAddressAccessChunked10000 extends Message<FctAddressAccessChunke
 }
 
 /**
- * ListFctAddressAccessChunked10000Request is the request message for listing fct_address_access_chunked_10000 records
+ * Request for listing fct_address_access_chunked_10000 records
  *
  * @generated from message cbt.ListFctAddressAccessChunked10000Request
  */
 export class ListFctAddressAccessChunked10000Request extends Message<ListFctAddressAccessChunked10000Request> {
   /**
-   * Filter by chunk_start_block_number (PRIMARY KEY - required)
+   * Filter by chunk_start_block_number - Start block number of the chunk (PRIMARY KEY - required)
    *
    * @generated from field: cbt.UInt32Filter chunk_start_block_number = 1;
    */
   chunkStartBlockNumber?: UInt32Filter;
 
   /**
-   * Filter by updated_date_time (optional)
+   * Filter by updated_date_time - Timestamp when the record was last updated (optional)
    *
    * @generated from field: cbt.UInt32Filter updated_date_time = 2;
    */
   updatedDateTime?: UInt32Filter;
 
   /**
-   * Filter by first_accessed_accounts (optional)
+   * Filter by first_accessed_accounts - Number of accounts first accessed in the chunk (optional)
    *
    * @generated from field: cbt.UInt32Filter first_accessed_accounts = 3;
    */
   firstAccessedAccounts?: UInt32Filter;
 
   /**
-   * Filter by last_accessed_accounts (optional)
+   * Filter by last_accessed_accounts - Number of accounts last accessed in the chunk (optional)
    *
    * @generated from field: cbt.UInt32Filter last_accessed_accounts = 4;
    */
@@ -165,7 +165,7 @@ export class ListFctAddressAccessChunked10000Request extends Message<ListFctAddr
 }
 
 /**
- * ListFctAddressAccessChunked10000Response is the response message for listing fct_address_access_chunked_10000 records
+ * Response for listing fct_address_access_chunked_10000 records
  *
  * @generated from message cbt.ListFctAddressAccessChunked10000Response
  */
@@ -215,7 +215,7 @@ export class ListFctAddressAccessChunked10000Response extends Message<ListFctAdd
 }
 
 /**
- * GetFctAddressAccessChunked10000Request is the request message for getting a single fct_address_access_chunked_10000 record by primary key
+ * Request for getting a single fct_address_access_chunked_10000 record by primary key
  *
  * @generated from message cbt.GetFctAddressAccessChunked10000Request
  */
@@ -258,7 +258,7 @@ export class GetFctAddressAccessChunked10000Request extends Message<GetFctAddres
 }
 
 /**
- * GetFctAddressAccessChunked10000Response is the response message for getting a single fct_address_access_chunked_10000 record
+ * Response for getting a single fct_address_access_chunked_10000 record
  *
  * @generated from message cbt.GetFctAddressAccessChunked10000Response
  */

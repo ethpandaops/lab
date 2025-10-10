@@ -211,7 +211,7 @@ func BuildListFctAddressAccessTotalQuery(req *ListFctAddressAccessTotalRequest, 
 	}
 
 	// Build column list
-	columns := []string{"updated_date_time", "total_accounts", "expired_accounts", "total_contract_accounts", "expired_contracts"}
+	columns := []string{"toUnixTimestamp(`updated_date_time`) AS `updated_date_time`", "total_accounts", "expired_accounts", "total_contract_accounts", "expired_contracts"}
 
 	return BuildParameterizedQuery("fct_address_access_total", columns, qb, orderByClause, limit, offset, options...)
 }
@@ -231,7 +231,7 @@ func BuildGetFctAddressAccessTotalQuery(req *GetFctAddressAccessTotalRequest, op
 	orderByClause := " ORDER BY updated_date_time"
 
 	// Build column list
-	columns := []string{"updated_date_time", "total_accounts", "expired_accounts", "total_contract_accounts", "expired_contracts"}
+	columns := []string{"toUnixTimestamp(`updated_date_time`) AS `updated_date_time`", "total_accounts", "expired_accounts", "total_contract_accounts", "expired_contracts"}
 
 	// Return single record
 	return BuildParameterizedQuery("fct_address_access_total", columns, qb, orderByClause, 1, 0, options...)

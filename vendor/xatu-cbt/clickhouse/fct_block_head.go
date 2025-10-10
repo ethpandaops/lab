@@ -24,39 +24,41 @@ func BuildListFctBlockHeadQuery(req *ListFctBlockHeadRequest, options ...QueryOp
 	qb := NewQueryBuilder()
 
 	// Add primary key filter
-	switch filter := req.SlotStartDateTime.Filter.(type) {
-	case *UInt32Filter_Eq:
-		qb.AddCondition("slot_start_date_time", "=", DateTimeValue{filter.Eq})
-	case *UInt32Filter_Ne:
-		qb.AddCondition("slot_start_date_time", "!=", DateTimeValue{filter.Ne})
-	case *UInt32Filter_Lt:
-		qb.AddCondition("slot_start_date_time", "<", DateTimeValue{filter.Lt})
-	case *UInt32Filter_Lte:
-		qb.AddCondition("slot_start_date_time", "<=", DateTimeValue{filter.Lte})
-	case *UInt32Filter_Gt:
-		qb.AddCondition("slot_start_date_time", ">", DateTimeValue{filter.Gt})
-	case *UInt32Filter_Gte:
-		qb.AddCondition("slot_start_date_time", ">=", DateTimeValue{filter.Gte})
-	case *UInt32Filter_Between:
-		qb.AddBetweenCondition("slot_start_date_time", DateTimeValue{filter.Between.Min}, DateTimeValue{filter.Between.Max.GetValue()})
-	case *UInt32Filter_In:
-		if len(filter.In.Values) > 0 {
-			converted := make([]interface{}, len(filter.In.Values))
-			for i, v := range filter.In.Values {
-				converted[i] = DateTimeValue{v}
+	if req.SlotStartDateTime != nil {
+		switch filter := req.SlotStartDateTime.Filter.(type) {
+		case *UInt32Filter_Eq:
+			qb.AddCondition("slot_start_date_time", "=", DateTimeValue{filter.Eq})
+		case *UInt32Filter_Ne:
+			qb.AddCondition("slot_start_date_time", "!=", DateTimeValue{filter.Ne})
+		case *UInt32Filter_Lt:
+			qb.AddCondition("slot_start_date_time", "<", DateTimeValue{filter.Lt})
+		case *UInt32Filter_Lte:
+			qb.AddCondition("slot_start_date_time", "<=", DateTimeValue{filter.Lte})
+		case *UInt32Filter_Gt:
+			qb.AddCondition("slot_start_date_time", ">", DateTimeValue{filter.Gt})
+		case *UInt32Filter_Gte:
+			qb.AddCondition("slot_start_date_time", ">=", DateTimeValue{filter.Gte})
+		case *UInt32Filter_Between:
+			qb.AddBetweenCondition("slot_start_date_time", DateTimeValue{filter.Between.Min}, DateTimeValue{filter.Between.Max.GetValue()})
+		case *UInt32Filter_In:
+			if len(filter.In.Values) > 0 {
+				converted := make([]interface{}, len(filter.In.Values))
+				for i, v := range filter.In.Values {
+					converted[i] = DateTimeValue{v}
+				}
+				qb.AddInCondition("slot_start_date_time", converted)
 			}
-			qb.AddInCondition("slot_start_date_time", converted)
-		}
-	case *UInt32Filter_NotIn:
-		if len(filter.NotIn.Values) > 0 {
-			converted := make([]interface{}, len(filter.NotIn.Values))
-			for i, v := range filter.NotIn.Values {
-				converted[i] = DateTimeValue{v}
+		case *UInt32Filter_NotIn:
+			if len(filter.NotIn.Values) > 0 {
+				converted := make([]interface{}, len(filter.NotIn.Values))
+				for i, v := range filter.NotIn.Values {
+					converted[i] = DateTimeValue{v}
+				}
+				qb.AddNotInCondition("slot_start_date_time", converted)
 			}
-			qb.AddNotInCondition("slot_start_date_time", converted)
+		default:
+			// Unsupported filter type
 		}
-	default:
-		// Unsupported filter type
 	}
 
 	// Add filter for column: updated_date_time
@@ -932,7 +934,7 @@ func BuildListFctBlockHeadQuery(req *ListFctBlockHeadRequest, options ...QueryOp
 	}
 
 	// Build column list
-	columns := []string{"updated_date_time", "slot", "slot_start_date_time", "epoch", "epoch_start_date_time", "block_root", "block_version", "block_total_bytes", "block_total_bytes_compressed", "parent_root", "state_root", "proposer_index", "eth1_data_block_hash", "eth1_data_deposit_root", "execution_payload_block_hash", "execution_payload_block_number", "execution_payload_fee_recipient", "execution_payload_base_fee_per_gas", "execution_payload_blob_gas_used", "execution_payload_excess_blob_gas", "execution_payload_gas_limit", "execution_payload_gas_used", "execution_payload_state_root", "execution_payload_parent_hash", "execution_payload_transactions_count", "execution_payload_transactions_total_bytes", "execution_payload_transactions_total_bytes_compressed"}
+	columns := []string{"toUnixTimestamp(`updated_date_time`) AS `updated_date_time`", "slot", "toUnixTimestamp(`slot_start_date_time`) AS `slot_start_date_time`", "epoch", "toUnixTimestamp(`epoch_start_date_time`) AS `epoch_start_date_time`", "block_root", "block_version", "block_total_bytes", "block_total_bytes_compressed", "parent_root", "state_root", "proposer_index", "eth1_data_block_hash", "eth1_data_deposit_root", "execution_payload_block_hash", "execution_payload_block_number", "execution_payload_fee_recipient", "toString(`execution_payload_base_fee_per_gas`) AS `execution_payload_base_fee_per_gas`", "execution_payload_blob_gas_used", "execution_payload_excess_blob_gas", "execution_payload_gas_limit", "execution_payload_gas_used", "execution_payload_state_root", "execution_payload_parent_hash", "execution_payload_transactions_count", "execution_payload_transactions_total_bytes", "execution_payload_transactions_total_bytes_compressed"}
 
 	return BuildParameterizedQuery("fct_block_head", columns, qb, orderByClause, limit, offset, options...)
 }
@@ -952,7 +954,7 @@ func BuildGetFctBlockHeadQuery(req *GetFctBlockHeadRequest, options ...QueryOpti
 	orderByClause := " ORDER BY slot_start_date_time, block_root"
 
 	// Build column list
-	columns := []string{"updated_date_time", "slot", "slot_start_date_time", "epoch", "epoch_start_date_time", "block_root", "block_version", "block_total_bytes", "block_total_bytes_compressed", "parent_root", "state_root", "proposer_index", "eth1_data_block_hash", "eth1_data_deposit_root", "execution_payload_block_hash", "execution_payload_block_number", "execution_payload_fee_recipient", "execution_payload_base_fee_per_gas", "execution_payload_blob_gas_used", "execution_payload_excess_blob_gas", "execution_payload_gas_limit", "execution_payload_gas_used", "execution_payload_state_root", "execution_payload_parent_hash", "execution_payload_transactions_count", "execution_payload_transactions_total_bytes", "execution_payload_transactions_total_bytes_compressed"}
+	columns := []string{"toUnixTimestamp(`updated_date_time`) AS `updated_date_time`", "slot", "toUnixTimestamp(`slot_start_date_time`) AS `slot_start_date_time`", "epoch", "toUnixTimestamp(`epoch_start_date_time`) AS `epoch_start_date_time`", "block_root", "block_version", "block_total_bytes", "block_total_bytes_compressed", "parent_root", "state_root", "proposer_index", "eth1_data_block_hash", "eth1_data_deposit_root", "execution_payload_block_hash", "execution_payload_block_number", "execution_payload_fee_recipient", "toString(`execution_payload_base_fee_per_gas`) AS `execution_payload_base_fee_per_gas`", "execution_payload_blob_gas_used", "execution_payload_excess_blob_gas", "execution_payload_gas_limit", "execution_payload_gas_used", "execution_payload_state_root", "execution_payload_parent_hash", "execution_payload_transactions_count", "execution_payload_transactions_total_bytes", "execution_payload_transactions_total_bytes_compressed"}
 
 	// Return single record
 	return BuildParameterizedQuery("fct_block_head", columns, qb, orderByClause, 1, 0, options...)

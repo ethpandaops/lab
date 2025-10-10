@@ -77,15 +77,15 @@ func (x *IntAddressLastAccess) GetBlockNumber() uint32 {
 	return 0
 }
 
-// ListIntAddressLastAccessRequest is the request message for listing int_address_last_access records
+// Request for listing int_address_last_access records
 type ListIntAddressLastAccessRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Filter by address (PRIMARY KEY - required)
+	// Filter by address - The address of the account (PRIMARY KEY - required)
 	Address *StringFilter `protobuf:"bytes,1,opt,name=address,proto3" json:"address,omitempty"`
-	// Filter by block_number (optional)
+	// Filter by block_number - The block number of the last access (optional)
 	BlockNumber *UInt32Filter `protobuf:"bytes,2,opt,name=block_number,json=blockNumber,proto3" json:"block_number,omitempty"`
 	// The maximum number of int_address_last_access to return.
 	// If unspecified, at most 100 items will be returned.
@@ -167,7 +167,7 @@ func (x *ListIntAddressLastAccessRequest) GetOrderBy() string {
 	return ""
 }
 
-// ListIntAddressLastAccessResponse is the response message for listing int_address_last_access records
+// Response for listing int_address_last_access records
 type ListIntAddressLastAccessResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -226,7 +226,7 @@ func (x *ListIntAddressLastAccessResponse) GetNextPageToken() string {
 	return ""
 }
 
-// GetIntAddressLastAccessRequest is the request message for getting a single int_address_last_access record by primary key
+// Request for getting a single int_address_last_access record by primary key
 type GetIntAddressLastAccessRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -275,7 +275,7 @@ func (x *GetIntAddressLastAccessRequest) GetAddress() string {
 	return ""
 }
 
-// GetIntAddressLastAccessResponse is the response message for getting a single int_address_last_access record
+// Response for getting a single int_address_last_access record
 type GetIntAddressLastAccessResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache

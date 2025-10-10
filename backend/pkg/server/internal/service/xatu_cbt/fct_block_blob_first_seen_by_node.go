@@ -3,7 +3,6 @@ package xatu_cbt
 import (
 	"context"
 	"fmt"
-	"time"
 
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/clickhouse"
 	cbtproto "github.com/ethpandaops/xatu-cbt/pkg/proto/clickhouse"
@@ -98,22 +97,20 @@ func scanFctBlockBlobFirstSeenByNode(
 	scanner clickhouse.RowScanner,
 ) (*cbtproto.FctBlockBlobFirstSeenByNode, error) {
 	var (
-		node                               cbtproto.FctBlockBlobFirstSeenByNode
-		updatedDateTime, slotStartDateTime time.Time
-		epochStartDateTime                 time.Time
-		geoLongitude                       *float64
-		geoLatitude                        *float64
-		geoAsNumber                        *uint32
-		geoAsOrg                           *string
+		node         cbtproto.FctBlockBlobFirstSeenByNode
+		geoLongitude *float64
+		geoLatitude  *float64
+		geoAsNumber  *uint32
+		geoAsOrg     *string
 	)
 
 	if err := scanner.Scan(
-		&updatedDateTime,
+		&node.UpdatedDateTime,
 		&node.Source,
 		&node.Slot,
-		&slotStartDateTime,
+		&node.SlotStartDateTime,
 		&node.Epoch,
-		&epochStartDateTime,
+		&node.EpochStartDateTime,
 		&node.SeenSlotStartDiff,
 		&node.BlockRoot,
 		&node.BlobIndex,
@@ -136,10 +133,6 @@ func scanFctBlockBlobFirstSeenByNode(
 	); err != nil {
 		return nil, fmt.Errorf("failed to scan row: %w", err)
 	}
-
-	node.UpdatedDateTime = uint32(updatedDateTime.Unix())       //nolint:gosec // safe.
-	node.SlotStartDateTime = uint32(slotStartDateTime.Unix())   //nolint:gosec // safe.
-	node.EpochStartDateTime = uint32(epochStartDateTime.Unix()) //nolint:gosec // safe.
 
 	// Convert nullable fields to protobuf wrappers
 	if geoLongitude != nil {

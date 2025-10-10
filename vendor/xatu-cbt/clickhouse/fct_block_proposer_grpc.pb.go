@@ -27,11 +27,11 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// FctBlockProposerService provides RPC methods for querying fct_block_proposer data
+// Query fct_block_proposer data
 type FctBlockProposerServiceClient interface {
-	// List returns paginated fct_block_proposer records
+	// List records | Retrieve paginated results with optional filtering
 	List(ctx context.Context, in *ListFctBlockProposerRequest, opts ...grpc.CallOption) (*ListFctBlockProposerResponse, error)
-	// Get returns a single fct_block_proposer record by primary key
+	// Get record | Retrieve a single record by slot_start_date_time
 	Get(ctx context.Context, in *GetFctBlockProposerRequest, opts ...grpc.CallOption) (*GetFctBlockProposerResponse, error)
 }
 
@@ -67,11 +67,11 @@ func (c *fctBlockProposerServiceClient) Get(ctx context.Context, in *GetFctBlock
 // All implementations must embed UnimplementedFctBlockProposerServiceServer
 // for forward compatibility
 //
-// FctBlockProposerService provides RPC methods for querying fct_block_proposer data
+// Query fct_block_proposer data
 type FctBlockProposerServiceServer interface {
-	// List returns paginated fct_block_proposer records
+	// List records | Retrieve paginated results with optional filtering
 	List(context.Context, *ListFctBlockProposerRequest) (*ListFctBlockProposerResponse, error)
-	// Get returns a single fct_block_proposer record by primary key
+	// Get record | Retrieve a single record by slot_start_date_time
 	Get(context.Context, *GetFctBlockProposerRequest) (*GetFctBlockProposerResponse, error)
 	mustEmbedUnimplementedFctBlockProposerServiceServer()
 }

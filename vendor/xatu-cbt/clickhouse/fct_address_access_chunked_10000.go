@@ -181,7 +181,7 @@ func BuildListFctAddressAccessChunked10000Query(req *ListFctAddressAccessChunked
 	}
 
 	// Build column list
-	columns := []string{"updated_date_time", "chunk_start_block_number", "first_accessed_accounts", "last_accessed_accounts"}
+	columns := []string{"toUnixTimestamp(`updated_date_time`) AS `updated_date_time`", "chunk_start_block_number", "first_accessed_accounts", "last_accessed_accounts"}
 
 	return BuildParameterizedQuery("fct_address_access_chunked_10000", columns, qb, orderByClause, limit, offset, options...)
 }
@@ -201,7 +201,7 @@ func BuildGetFctAddressAccessChunked10000Query(req *GetFctAddressAccessChunked10
 	orderByClause := " ORDER BY chunk_start_block_number"
 
 	// Build column list
-	columns := []string{"updated_date_time", "chunk_start_block_number", "first_accessed_accounts", "last_accessed_accounts"}
+	columns := []string{"toUnixTimestamp(`updated_date_time`) AS `updated_date_time`", "chunk_start_block_number", "first_accessed_accounts", "last_accessed_accounts"}
 
 	// Return single record
 	return BuildParameterizedQuery("fct_address_access_chunked_10000", columns, qb, orderByClause, 1, 0, options...)

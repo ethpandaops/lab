@@ -513,7 +513,7 @@ func BuildListIntAttestationAttestedHeadQuery(req *ListIntAttestationAttestedHea
 	}
 
 	// Build column list
-	columns := []string{"updated_date_time", "slot", "slot_start_date_time", "epoch", "epoch_start_date_time", "source_epoch", "source_epoch_start_date_time", "source_root", "target_epoch", "target_epoch_start_date_time", "target_root", "block_root", "attesting_validator_index", "propagation_distance"}
+	columns := []string{"toUnixTimestamp(`updated_date_time`) AS `updated_date_time`", "slot", "toUnixTimestamp(`slot_start_date_time`) AS `slot_start_date_time`", "epoch", "toUnixTimestamp(`epoch_start_date_time`) AS `epoch_start_date_time`", "source_epoch", "toUnixTimestamp(`source_epoch_start_date_time`) AS `source_epoch_start_date_time`", "source_root", "target_epoch", "toUnixTimestamp(`target_epoch_start_date_time`) AS `target_epoch_start_date_time`", "target_root", "block_root", "attesting_validator_index", "propagation_distance"}
 
 	return BuildParameterizedQuery("int_attestation_attested_head", columns, qb, orderByClause, limit, offset, options...)
 }
@@ -533,7 +533,7 @@ func BuildGetIntAttestationAttestedHeadQuery(req *GetIntAttestationAttestedHeadR
 	orderByClause := " ORDER BY slot_start_date_time, block_root, attesting_validator_index"
 
 	// Build column list
-	columns := []string{"updated_date_time", "slot", "slot_start_date_time", "epoch", "epoch_start_date_time", "source_epoch", "source_epoch_start_date_time", "source_root", "target_epoch", "target_epoch_start_date_time", "target_root", "block_root", "attesting_validator_index", "propagation_distance"}
+	columns := []string{"toUnixTimestamp(`updated_date_time`) AS `updated_date_time`", "slot", "toUnixTimestamp(`slot_start_date_time`) AS `slot_start_date_time`", "epoch", "toUnixTimestamp(`epoch_start_date_time`) AS `epoch_start_date_time`", "source_epoch", "toUnixTimestamp(`source_epoch_start_date_time`) AS `source_epoch_start_date_time`", "source_root", "target_epoch", "toUnixTimestamp(`target_epoch_start_date_time`) AS `target_epoch_start_date_time`", "target_root", "block_root", "attesting_validator_index", "propagation_distance"}
 
 	// Return single record
 	return BuildParameterizedQuery("int_attestation_attested_head", columns, qb, orderByClause, 1, 0, options...)

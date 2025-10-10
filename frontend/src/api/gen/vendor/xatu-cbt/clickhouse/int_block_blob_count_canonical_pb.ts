@@ -95,55 +95,55 @@ export class IntBlockBlobCountCanonical extends Message<IntBlockBlobCountCanonic
 }
 
 /**
- * ListIntBlockBlobCountCanonicalRequest is the request message for listing int_block_blob_count_canonical records
+ * Request for listing int_block_blob_count_canonical records
  *
  * @generated from message cbt.ListIntBlockBlobCountCanonicalRequest
  */
 export class ListIntBlockBlobCountCanonicalRequest extends Message<ListIntBlockBlobCountCanonicalRequest> {
   /**
-   * Filter by slot_start_date_time (PRIMARY KEY - required)
+   * Filter by slot_start_date_time - The wall clock time when the slot started (PRIMARY KEY - required)
    *
    * @generated from field: cbt.UInt32Filter slot_start_date_time = 1;
    */
   slotStartDateTime?: UInt32Filter;
 
   /**
-   * Filter by block_root (ORDER BY column 2 - optional)
+   * Filter by block_root - The beacon block root hash (ORDER BY column 2 - optional)
    *
    * @generated from field: cbt.StringFilter block_root = 2;
    */
   blockRoot?: StringFilter;
 
   /**
-   * Filter by updated_date_time (optional)
+   * Filter by updated_date_time - Timestamp when the record was last updated (optional)
    *
    * @generated from field: cbt.UInt32Filter updated_date_time = 3;
    */
   updatedDateTime?: UInt32Filter;
 
   /**
-   * Filter by slot (optional)
+   * Filter by slot - The slot number (optional)
    *
    * @generated from field: cbt.UInt32Filter slot = 4;
    */
   slot?: UInt32Filter;
 
   /**
-   * Filter by epoch (optional)
+   * Filter by epoch - The epoch number containing the slot (optional)
    *
    * @generated from field: cbt.UInt32Filter epoch = 5;
    */
   epoch?: UInt32Filter;
 
   /**
-   * Filter by epoch_start_date_time (optional)
+   * Filter by epoch_start_date_time - The wall clock time when the epoch started (optional)
    *
    * @generated from field: cbt.UInt32Filter epoch_start_date_time = 6;
    */
   epochStartDateTime?: UInt32Filter;
 
   /**
-   * Filter by blob_count (optional)
+   * Filter by blob_count - The number of blobs in the block (optional)
    *
    * @generated from field: cbt.UInt32Filter blob_count = 7;
    */
@@ -213,7 +213,7 @@ export class ListIntBlockBlobCountCanonicalRequest extends Message<ListIntBlockB
 }
 
 /**
- * ListIntBlockBlobCountCanonicalResponse is the response message for listing int_block_blob_count_canonical records
+ * Response for listing int_block_blob_count_canonical records
  *
  * @generated from message cbt.ListIntBlockBlobCountCanonicalResponse
  */
@@ -263,7 +263,7 @@ export class ListIntBlockBlobCountCanonicalResponse extends Message<ListIntBlock
 }
 
 /**
- * GetIntBlockBlobCountCanonicalRequest is the request message for getting a single int_block_blob_count_canonical record by primary key
+ * Request for getting a single int_block_blob_count_canonical record by primary key
  *
  * @generated from message cbt.GetIntBlockBlobCountCanonicalRequest
  */
@@ -306,7 +306,7 @@ export class GetIntBlockBlobCountCanonicalRequest extends Message<GetIntBlockBlo
 }
 
 /**
- * GetIntBlockBlobCountCanonicalResponse is the response message for getting a single int_block_blob_count_canonical record
+ * Response for getting a single int_block_blob_count_canonical record
  *
  * @generated from message cbt.GetIntBlockBlobCountCanonicalResponse
  */

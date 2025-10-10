@@ -27,11 +27,11 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// FctPreparedBlockService provides RPC methods for querying fct_prepared_block data
+// Query fct_prepared_block data
 type FctPreparedBlockServiceClient interface {
-	// List returns paginated fct_prepared_block records
+	// List records | Retrieve paginated results with optional filtering
 	List(ctx context.Context, in *ListFctPreparedBlockRequest, opts ...grpc.CallOption) (*ListFctPreparedBlockResponse, error)
-	// Get returns a single fct_prepared_block record by primary key
+	// Get record | Retrieve a single record by slot_start_date_time
 	Get(ctx context.Context, in *GetFctPreparedBlockRequest, opts ...grpc.CallOption) (*GetFctPreparedBlockResponse, error)
 }
 
@@ -67,11 +67,11 @@ func (c *fctPreparedBlockServiceClient) Get(ctx context.Context, in *GetFctPrepa
 // All implementations must embed UnimplementedFctPreparedBlockServiceServer
 // for forward compatibility
 //
-// FctPreparedBlockService provides RPC methods for querying fct_prepared_block data
+// Query fct_prepared_block data
 type FctPreparedBlockServiceServer interface {
-	// List returns paginated fct_prepared_block records
+	// List records | Retrieve paginated results with optional filtering
 	List(context.Context, *ListFctPreparedBlockRequest) (*ListFctPreparedBlockResponse, error)
-	// Get returns a single fct_prepared_block record by primary key
+	// Get record | Retrieve a single record by slot_start_date_time
 	Get(context.Context, *GetFctPreparedBlockRequest) (*GetFctPreparedBlockResponse, error)
 	mustEmbedUnimplementedFctPreparedBlockServiceServer()
 }

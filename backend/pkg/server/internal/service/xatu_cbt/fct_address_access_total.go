@@ -3,7 +3,6 @@ package xatu_cbt
 import (
 	"context"
 	"fmt"
-	"time"
 
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/clickhouse"
 	cbtproto "github.com/ethpandaops/xatu-cbt/pkg/proto/clickhouse"
@@ -194,30 +193,15 @@ func scanFctAddressAccessTotal(
 ) (*cbtproto.FctAddressAccessTotal, error) {
 	item := &cbtproto.FctAddressAccessTotal{}
 
-	var (
-		updatedDateTime       time.Time
-		totalAccounts         uint64
-		expiredAccounts       uint64
-		totalContractAccounts uint64
-		expiredContracts      uint64
-	)
-
 	if err := scanner.Scan(
-		&updatedDateTime,
-		&totalAccounts,
-		&expiredAccounts,
-		&totalContractAccounts,
-		&expiredContracts,
+		&item.UpdatedDateTime,
+		&item.TotalAccounts,
+		&item.ExpiredAccounts,
+		&item.TotalContractAccounts,
+		&item.ExpiredContracts,
 	); err != nil {
 		return nil, fmt.Errorf("failed to scan fct_address_access_total: %w", err)
 	}
-
-	// Convert time to uint32 Unix timestamp
-	item.UpdatedDateTime = uint32(updatedDateTime.Unix()) //nolint:gosec // conversion safe for timestamps
-	item.TotalAccounts = totalAccounts
-	item.ExpiredAccounts = expiredAccounts
-	item.TotalContractAccounts = totalContractAccounts
-	item.ExpiredContracts = expiredContracts
 
 	return item, nil
 }

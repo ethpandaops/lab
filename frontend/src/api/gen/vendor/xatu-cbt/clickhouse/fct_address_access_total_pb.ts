@@ -79,41 +79,41 @@ export class FctAddressAccessTotal extends Message<FctAddressAccessTotal> {
 }
 
 /**
- * ListFctAddressAccessTotalRequest is the request message for listing fct_address_access_total records
+ * Request for listing fct_address_access_total records
  *
  * @generated from message cbt.ListFctAddressAccessTotalRequest
  */
 export class ListFctAddressAccessTotalRequest extends Message<ListFctAddressAccessTotalRequest> {
   /**
-   * Filter by updated_date_time (PRIMARY KEY - required)
+   * Filter by updated_date_time - Timestamp when the record was last updated (PRIMARY KEY - required)
    *
    * @generated from field: cbt.UInt32Filter updated_date_time = 1;
    */
   updatedDateTime?: UInt32Filter;
 
   /**
-   * Filter by total_accounts (optional)
+   * Filter by total_accounts - Total number of accounts accessed in last 365 days (optional)
    *
    * @generated from field: cbt.UInt64Filter total_accounts = 2;
    */
   totalAccounts?: UInt64Filter;
 
   /**
-   * Filter by expired_accounts (optional)
+   * Filter by expired_accounts - Number of expired accounts (not accessed in last 365 days) (optional)
    *
    * @generated from field: cbt.UInt64Filter expired_accounts = 3;
    */
   expiredAccounts?: UInt64Filter;
 
   /**
-   * Filter by total_contract_accounts (optional)
+   * Filter by total_contract_accounts - Total number of contract accounts accessed in last 365 days (optional)
    *
    * @generated from field: cbt.UInt64Filter total_contract_accounts = 4;
    */
   totalContractAccounts?: UInt64Filter;
 
   /**
-   * Filter by expired_contracts (optional)
+   * Filter by expired_contracts - Number of expired contracts (not accessed in last 365 days) (optional)
    *
    * @generated from field: cbt.UInt64Filter expired_contracts = 5;
    */
@@ -181,7 +181,7 @@ export class ListFctAddressAccessTotalRequest extends Message<ListFctAddressAcce
 }
 
 /**
- * ListFctAddressAccessTotalResponse is the response message for listing fct_address_access_total records
+ * Response for listing fct_address_access_total records
  *
  * @generated from message cbt.ListFctAddressAccessTotalResponse
  */
@@ -231,7 +231,7 @@ export class ListFctAddressAccessTotalResponse extends Message<ListFctAddressAcc
 }
 
 /**
- * GetFctAddressAccessTotalRequest is the request message for getting a single fct_address_access_total record by primary key
+ * Request for getting a single fct_address_access_total record by primary key
  *
  * @generated from message cbt.GetFctAddressAccessTotalRequest
  */
@@ -274,7 +274,7 @@ export class GetFctAddressAccessTotalRequest extends Message<GetFctAddressAccess
 }
 
 /**
- * GetFctAddressAccessTotalResponse is the response message for getting a single fct_address_access_total record
+ * Response for getting a single fct_address_access_total record
  *
  * @generated from message cbt.GetFctAddressAccessTotalResponse
  */

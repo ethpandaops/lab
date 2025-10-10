@@ -27,11 +27,11 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// FctAddressAccessChunked10000Service provides RPC methods for querying fct_address_access_chunked_10000 data
+// Query fct_address_access_chunked_10000 data
 type FctAddressAccessChunked10000ServiceClient interface {
-	// List returns paginated fct_address_access_chunked_10000 records
+	// List records | Retrieve paginated results with optional filtering
 	List(ctx context.Context, in *ListFctAddressAccessChunked10000Request, opts ...grpc.CallOption) (*ListFctAddressAccessChunked10000Response, error)
-	// Get returns a single fct_address_access_chunked_10000 record by primary key
+	// Get record | Retrieve a single record by chunk_start_block_number
 	Get(ctx context.Context, in *GetFctAddressAccessChunked10000Request, opts ...grpc.CallOption) (*GetFctAddressAccessChunked10000Response, error)
 }
 
@@ -67,11 +67,11 @@ func (c *fctAddressAccessChunked10000ServiceClient) Get(ctx context.Context, in 
 // All implementations must embed UnimplementedFctAddressAccessChunked10000ServiceServer
 // for forward compatibility
 //
-// FctAddressAccessChunked10000Service provides RPC methods for querying fct_address_access_chunked_10000 data
+// Query fct_address_access_chunked_10000 data
 type FctAddressAccessChunked10000ServiceServer interface {
-	// List returns paginated fct_address_access_chunked_10000 records
+	// List records | Retrieve paginated results with optional filtering
 	List(context.Context, *ListFctAddressAccessChunked10000Request) (*ListFctAddressAccessChunked10000Response, error)
-	// Get returns a single fct_address_access_chunked_10000 record by primary key
+	// Get record | Retrieve a single record by chunk_start_block_number
 	Get(context.Context, *GetFctAddressAccessChunked10000Request) (*GetFctAddressAccessChunked10000Response, error)
 	mustEmbedUnimplementedFctAddressAccessChunked10000ServiceServer()
 }

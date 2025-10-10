@@ -24,39 +24,41 @@ func BuildListFctBlockFirstSeenByNodeQuery(req *ListFctBlockFirstSeenByNodeReque
 	qb := NewQueryBuilder()
 
 	// Add primary key filter
-	switch filter := req.SlotStartDateTime.Filter.(type) {
-	case *UInt32Filter_Eq:
-		qb.AddCondition("slot_start_date_time", "=", DateTimeValue{filter.Eq})
-	case *UInt32Filter_Ne:
-		qb.AddCondition("slot_start_date_time", "!=", DateTimeValue{filter.Ne})
-	case *UInt32Filter_Lt:
-		qb.AddCondition("slot_start_date_time", "<", DateTimeValue{filter.Lt})
-	case *UInt32Filter_Lte:
-		qb.AddCondition("slot_start_date_time", "<=", DateTimeValue{filter.Lte})
-	case *UInt32Filter_Gt:
-		qb.AddCondition("slot_start_date_time", ">", DateTimeValue{filter.Gt})
-	case *UInt32Filter_Gte:
-		qb.AddCondition("slot_start_date_time", ">=", DateTimeValue{filter.Gte})
-	case *UInt32Filter_Between:
-		qb.AddBetweenCondition("slot_start_date_time", DateTimeValue{filter.Between.Min}, DateTimeValue{filter.Between.Max.GetValue()})
-	case *UInt32Filter_In:
-		if len(filter.In.Values) > 0 {
-			converted := make([]interface{}, len(filter.In.Values))
-			for i, v := range filter.In.Values {
-				converted[i] = DateTimeValue{v}
+	if req.SlotStartDateTime != nil {
+		switch filter := req.SlotStartDateTime.Filter.(type) {
+		case *UInt32Filter_Eq:
+			qb.AddCondition("slot_start_date_time", "=", DateTimeValue{filter.Eq})
+		case *UInt32Filter_Ne:
+			qb.AddCondition("slot_start_date_time", "!=", DateTimeValue{filter.Ne})
+		case *UInt32Filter_Lt:
+			qb.AddCondition("slot_start_date_time", "<", DateTimeValue{filter.Lt})
+		case *UInt32Filter_Lte:
+			qb.AddCondition("slot_start_date_time", "<=", DateTimeValue{filter.Lte})
+		case *UInt32Filter_Gt:
+			qb.AddCondition("slot_start_date_time", ">", DateTimeValue{filter.Gt})
+		case *UInt32Filter_Gte:
+			qb.AddCondition("slot_start_date_time", ">=", DateTimeValue{filter.Gte})
+		case *UInt32Filter_Between:
+			qb.AddBetweenCondition("slot_start_date_time", DateTimeValue{filter.Between.Min}, DateTimeValue{filter.Between.Max.GetValue()})
+		case *UInt32Filter_In:
+			if len(filter.In.Values) > 0 {
+				converted := make([]interface{}, len(filter.In.Values))
+				for i, v := range filter.In.Values {
+					converted[i] = DateTimeValue{v}
+				}
+				qb.AddInCondition("slot_start_date_time", converted)
 			}
-			qb.AddInCondition("slot_start_date_time", converted)
-		}
-	case *UInt32Filter_NotIn:
-		if len(filter.NotIn.Values) > 0 {
-			converted := make([]interface{}, len(filter.NotIn.Values))
-			for i, v := range filter.NotIn.Values {
-				converted[i] = DateTimeValue{v}
+		case *UInt32Filter_NotIn:
+			if len(filter.NotIn.Values) > 0 {
+				converted := make([]interface{}, len(filter.NotIn.Values))
+				for i, v := range filter.NotIn.Values {
+					converted[i] = DateTimeValue{v}
+				}
+				qb.AddNotInCondition("slot_start_date_time", converted)
 			}
-			qb.AddNotInCondition("slot_start_date_time", converted)
+		default:
+			// Unsupported filter type
 		}
-	default:
-		// Unsupported filter type
 	}
 
 	// Add filter for column: updated_date_time
@@ -754,7 +756,7 @@ func BuildListFctBlockFirstSeenByNodeQuery(req *ListFctBlockFirstSeenByNodeReque
 	}
 
 	// Build column list
-	columns := []string{"updated_date_time", "source", "slot", "slot_start_date_time", "epoch", "epoch_start_date_time", "seen_slot_start_diff", "block_root", "username", "node_id", "classification", "meta_client_name", "meta_client_version", "meta_client_implementation", "meta_client_geo_city", "meta_client_geo_country", "meta_client_geo_country_code", "meta_client_geo_continent_code", "meta_client_geo_longitude", "meta_client_geo_latitude", "meta_client_geo_autonomous_system_number", "meta_client_geo_autonomous_system_organization", "meta_consensus_version", "meta_consensus_implementation"}
+	columns := []string{"toUnixTimestamp(`updated_date_time`) AS `updated_date_time`", "source", "slot", "toUnixTimestamp(`slot_start_date_time`) AS `slot_start_date_time`", "epoch", "toUnixTimestamp(`epoch_start_date_time`) AS `epoch_start_date_time`", "seen_slot_start_diff", "block_root", "username", "node_id", "classification", "meta_client_name", "meta_client_version", "meta_client_implementation", "meta_client_geo_city", "meta_client_geo_country", "meta_client_geo_country_code", "meta_client_geo_continent_code", "meta_client_geo_longitude", "meta_client_geo_latitude", "meta_client_geo_autonomous_system_number", "meta_client_geo_autonomous_system_organization", "meta_consensus_version", "meta_consensus_implementation"}
 
 	return BuildParameterizedQuery("fct_block_first_seen_by_node", columns, qb, orderByClause, limit, offset, options...)
 }
@@ -774,7 +776,7 @@ func BuildGetFctBlockFirstSeenByNodeQuery(req *GetFctBlockFirstSeenByNodeRequest
 	orderByClause := " ORDER BY slot_start_date_time, block_root, meta_client_name"
 
 	// Build column list
-	columns := []string{"updated_date_time", "source", "slot", "slot_start_date_time", "epoch", "epoch_start_date_time", "seen_slot_start_diff", "block_root", "username", "node_id", "classification", "meta_client_name", "meta_client_version", "meta_client_implementation", "meta_client_geo_city", "meta_client_geo_country", "meta_client_geo_country_code", "meta_client_geo_continent_code", "meta_client_geo_longitude", "meta_client_geo_latitude", "meta_client_geo_autonomous_system_number", "meta_client_geo_autonomous_system_organization", "meta_consensus_version", "meta_consensus_implementation"}
+	columns := []string{"toUnixTimestamp(`updated_date_time`) AS `updated_date_time`", "source", "slot", "toUnixTimestamp(`slot_start_date_time`) AS `slot_start_date_time`", "epoch", "toUnixTimestamp(`epoch_start_date_time`) AS `epoch_start_date_time`", "seen_slot_start_diff", "block_root", "username", "node_id", "classification", "meta_client_name", "meta_client_version", "meta_client_implementation", "meta_client_geo_city", "meta_client_geo_country", "meta_client_geo_country_code", "meta_client_geo_continent_code", "meta_client_geo_longitude", "meta_client_geo_latitude", "meta_client_geo_autonomous_system_number", "meta_client_geo_autonomous_system_organization", "meta_consensus_version", "meta_consensus_implementation"}
 
 	// Return single record
 	return BuildParameterizedQuery("fct_block_first_seen_by_node", columns, qb, orderByClause, 1, 0, options...)

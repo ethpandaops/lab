@@ -3,7 +3,6 @@ package xatu_cbt
 import (
 	"context"
 	"fmt"
-	"time"
 
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/clickhouse"
 	cbtproto "github.com/ethpandaops/xatu-cbt/pkg/proto/clickhouse"
@@ -97,27 +96,21 @@ func scanFctAttestationFirstSeenChunked50ms(
 	scanner clickhouse.RowScanner,
 ) (*cbtproto.FctAttestationFirstSeenChunked50Ms, error) {
 	var (
-		chunk                              cbtproto.FctAttestationFirstSeenChunked50Ms
-		updatedDateTime, slotStartDateTime time.Time
-		epochStartDateTime                 time.Time
+		chunk cbtproto.FctAttestationFirstSeenChunked50Ms
 	)
 
 	if err := scanner.Scan(
-		&updatedDateTime,
+		&chunk.UpdatedDateTime,
 		&chunk.Slot,
-		&slotStartDateTime,
+		&chunk.SlotStartDateTime,
 		&chunk.Epoch,
-		&epochStartDateTime,
+		&chunk.EpochStartDateTime,
 		&chunk.BlockRoot,
 		&chunk.ChunkSlotStartDiff,
 		&chunk.AttestationCount,
 	); err != nil {
 		return nil, fmt.Errorf("failed to scan row: %w", err)
 	}
-
-	chunk.UpdatedDateTime = uint32(updatedDateTime.Unix())       //nolint:gosec // safe.
-	chunk.SlotStartDateTime = uint32(slotStartDateTime.Unix())   //nolint:gosec // safe.
-	chunk.EpochStartDateTime = uint32(epochStartDateTime.Unix()) //nolint:gosec // safe.
 
 	return &chunk, nil
 }
