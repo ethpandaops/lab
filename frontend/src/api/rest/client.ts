@@ -466,6 +466,84 @@ export class RestApiClient {
     const response = await this.fetchWithRetry<any>(url);
     return ListPreparedBlocksResponse.fromJson(response);
   }
+
+  /**
+   * Get state expiry access history data
+   * @param network Network name
+   * @param params Query parameters
+   * @returns Response with access history data
+   */
+  async getStateExpiryAccessHistory(network: string, params?: Record<string, any>): Promise<any> {
+    const queryString = params ? buildQueryString(params) : new URLSearchParams();
+    const url = `${this.baseUrl}${API_V1_ENDPOINTS.stateExpiryAccessHistory(network)}${
+      queryString.toString() ? `?${queryString.toString()}` : ''
+    }`;
+    return await this.fetchWithRetry<any>(url);
+  }
+
+  /**
+   * Get state expiry storage history data
+   * @param network Network name
+   * @param params Query parameters
+   * @returns Response with storage history data
+   */
+  async getStateExpiryStorageHistory(network: string, params?: Record<string, any>): Promise<any> {
+    const queryString = params ? buildQueryString(params) : new URLSearchParams();
+    const url = `${this.baseUrl}${API_V1_ENDPOINTS.stateExpiryStorageHistory(network)}${
+      queryString.toString() ? `?${queryString.toString()}` : ''
+    }`;
+    return await this.fetchWithRetry<any>(url);
+  }
+
+  /**
+   * Get state expiry access total data
+   * @param network Network name
+   * @returns Response with access total data
+   */
+  async getStateExpiryAccessTotal(network: string): Promise<any> {
+    const url = `${this.baseUrl}${API_V1_ENDPOINTS.stateExpiryAccessTotal(network)}`;
+    return await this.fetchWithRetry<any>(url);
+  }
+
+  /**
+   * Get state expiry storage expired top contracts
+   * @param network Network name
+   * @returns Response with expired top contracts data
+   */
+  async getStateExpiryStorageExpiredTop(network: string): Promise<any> {
+    const url = `${this.baseUrl}${API_V1_ENDPOINTS.stateExpiryStorageExpiredTop(network)}`;
+    return await this.fetchWithRetry<any>(url);
+  }
+
+  /**
+   * Get state expiry storage top contracts
+   * @param network Network name
+   * @returns Response with top contracts data
+   */
+  async getStateExpiryStorageTop(network: string): Promise<any> {
+    const url = `${this.baseUrl}${API_V1_ENDPOINTS.stateExpiryStorageTop(network)}`;
+    return await this.fetchWithRetry<any>(url);
+  }
+
+  /**
+   * Get state expiry storage total data
+   * @param network Network name
+   * @returns Response with storage total data
+   */
+  async getStateExpiryStorageTotal(network: string): Promise<any> {
+    const url = `${this.baseUrl}${API_V1_ENDPOINTS.stateExpiryStorageTotal(network)}`;
+    return await this.fetchWithRetry<any>(url);
+  }
+
+  /**
+   * Get state expiry block number
+   * @param network Network name
+   * @returns Response with the execution block number from approximately 1 year ago
+   */
+  async getStateExpiryBlock(network: string): Promise<any> {
+    const url = `${this.baseUrl}${API_V1_ENDPOINTS.stateExpiryBlock(network)}`;
+    return await this.fetchWithRetry<any>(url);
+  }
 }
 
 /**

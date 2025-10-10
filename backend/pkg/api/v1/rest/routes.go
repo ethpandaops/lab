@@ -150,5 +150,56 @@ func (r *PublicRouter) GetRoutes() []RouteConfig {
 			Cache:       middleware.CacheRealtime,
 			Description: "Get prepared blocks for a specific slot",
 		},
+
+		// State expiry endpoints
+		{
+			Path:        "/{network}/state-expiry/access/history",
+			Handler:     r.handleStateExpiryAccessHistory,
+			Methods:     []string{http.MethodGet, http.MethodOptions},
+			Cache:       middleware.CacheNearRealtime,
+			Description: "Get address access history chunked by 10000 blocks for state expiry analysis",
+		},
+		{
+			Path:        "/{network}/state-expiry/storage/history",
+			Handler:     r.handleStateExpiryStorageHistory,
+			Methods:     []string{http.MethodGet, http.MethodOptions},
+			Cache:       middleware.CacheNearRealtime,
+			Description: "Get storage slot history chunked by 10000 blocks for state expiry analysis",
+		},
+		{
+			Path:        "/{network}/state-expiry/access/total",
+			Handler:     r.handleStateExpiryAccessTotal,
+			Methods:     []string{http.MethodGet, http.MethodOptions},
+			Cache:       middleware.CacheNearRealtime,
+			Description: "Get total address access statistics for state expiry analysis",
+		},
+		{
+			Path:        "/{network}/state-expiry/storage/expired/top",
+			Handler:     r.handleStateExpiryStorageExpiredTop,
+			Methods:     []string{http.MethodGet, http.MethodOptions},
+			Cache:       middleware.CacheNearRealtime,
+			Description: "Get top 100 contracts by expired storage slots for state expiry analysis",
+		},
+		{
+			Path:        "/{network}/state-expiry/storage/top",
+			Handler:     r.handleStateExpiryStorageTop,
+			Methods:     []string{http.MethodGet, http.MethodOptions},
+			Cache:       middleware.CacheNearRealtime,
+			Description: "Get top 100 contracts by total storage slots for state expiry analysis",
+		},
+		{
+			Path:        "/{network}/state-expiry/storage/total",
+			Handler:     r.handleStateExpiryStorageTotal,
+			Methods:     []string{http.MethodGet, http.MethodOptions},
+			Cache:       middleware.CacheNearRealtime,
+			Description: "Get total storage slot statistics for state expiry analysis",
+		},
+		{
+			Path:        "/{network}/state-expiry/expiry/block",
+			Handler:     r.handleStateExpiryBlock,
+			Methods:     []string{http.MethodGet, http.MethodOptions},
+			Cache:       middleware.CacheNearRealtime,
+			Description: "Get the execution block number from approximately 1 year ago for state expiry boundary",
+		},
 	}
 }

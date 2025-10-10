@@ -3,26 +3,26 @@ package xatu_cbt
 import (
 	"context"
 	"fmt"
+	"math/big"
 
 	"github.com/ethpandaops/lab/backend/pkg/internal/lab/clickhouse"
 	cbtproto "github.com/ethpandaops/xatu-cbt/pkg/proto/clickhouse"
 	"github.com/prometheus/client_golang/prometheus"
-	"github.com/sirupsen/logrus"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
 const (
-	MethodListFctBlockHead = "ListFctBlockHead"
+	MethodListFctBlock = "ListFctBlock"
 )
 
-// ListFctBlockHead returns block data from the fct_block_head table.
-func (x *XatuCBT) ListFctBlockHead(
+// ListFctBlock returns blocks from the fct_block table.
+func (x *XatuCBT) ListFctBlock(
 	ctx context.Context,
-	req *cbtproto.ListFctBlockHeadRequest,
-) (resp *cbtproto.ListFctBlockHeadResponse, err error) {
+	req *cbtproto.ListFctBlockRequest,
+) (resp *cbtproto.ListFctBlockResponse, err error) {
 	var (
 		network string
-		blocks  []*cbtproto.FctBlockHead
+		blocks  []*cbtproto.FctBlock
 	)
 
 	defer func() {
@@ -31,7 +31,7 @@ func (x *XatuCBT) ListFctBlockHead(
 			status = StatusError
 		}
 
-		x.requestsTotal.WithLabelValues(MethodListFctBlockHead, network, status).Inc()
+		x.requestsTotal.WithLabelValues(MethodListFctBlock, network, status).Inc()
 	}()
 
 	// Get network and clickhouse client.
@@ -42,11 +42,11 @@ func (x *XatuCBT) ListFctBlockHead(
 
 	network = client.Network()
 
-	timer := prometheus.NewTimer(x.requestDuration.WithLabelValues(MethodListFctBlockHead, network))
+	timer := prometheus.NewTimer(x.requestDuration.WithLabelValues(MethodListFctBlock, network))
 	defer timer.ObserveDuration()
 
-	// Use our clickhouse-proto-gen to handle building for us.
-	sqlQuery, err := cbtproto.BuildListFctBlockHeadQuery(
+	// Normal query handling using the proto query builder
+	sqlQuery, err := cbtproto.BuildListFctBlockQuery(
 		req,
 		cbtproto.WithFinal(),
 		cbtproto.WithDatabase(network),
@@ -55,17 +55,10 @@ func (x *XatuCBT) ListFctBlockHead(
 		return nil, fmt.Errorf("failed to build query: %w", err)
 	}
 
-	// Log the actual SQL query and arguments for debugging
-	x.log.WithFields(logrus.Fields{
-		"query":   sqlQuery.Query,
-		"args":    sqlQuery.Args,
-		"network": network,
-	}).Debug("FctBlockHead SQL Query")
-
 	if err = client.QueryWithScanner(ctx, sqlQuery.Query, func(scanner clickhouse.RowScanner) error {
-		block, scanErr := scanFctBlockHead(scanner)
+		block, scanErr := scanFctBlock(scanner)
 		if scanErr != nil {
-			x.log.WithError(scanErr).Error("scanFctBlockHead: Failed to scan row")
+			x.log.WithError(scanErr).Error("scanFctBlock: Failed to scan row")
 
 			return nil
 		}
@@ -74,43 +67,22 @@ func (x *XatuCBT) ListFctBlockHead(
 
 		return nil
 	}, sqlQuery.Args...); err != nil {
-		return nil, fmt.Errorf("failed to query int_block_head: %w", err)
+		return nil, fmt.Errorf("failed to query fct_block: %w", err)
 	}
 
-	// Calculate pagination.
-	pageSize := req.PageSize
-	if pageSize == 0 {
-		pageSize = DefaultPageSize
-	}
-
-	// Get current offset from token.
-	currentOffset, err := cbtproto.DecodePageToken(req.PageToken)
-	if err != nil {
-		return nil, fmt.Errorf("failed to decode page token: %w", err)
-	}
-
-	//nolint:gosec // conversion safe.
-	return &cbtproto.ListFctBlockHeadResponse{
-		FctBlockHead: blocks,
-		NextPageToken: cbtproto.CalculateNextPageToken(
-			currentOffset,
-			uint32(pageSize),
-			uint32(len(blocks)),
-		),
+	return &cbtproto.ListFctBlockResponse{
+		FctBlock: blocks,
 	}, nil
 }
 
-// scanFctBlockHead scans a single int_block_head row from the database.
-func scanFctBlockHead(
-	scanner clickhouse.RowScanner,
-) (*cbtproto.FctBlockHead, error) {
-	var (
-		block cbtproto.FctBlockHead
+// scanFctBlock scans a row from the fct_block table
+func scanFctBlock(scanner clickhouse.RowScanner) (*cbtproto.FctBlock, error) {
+	block := &cbtproto.FctBlock{}
 
-		// Nullable fields
+	var (
 		blockTotalBytes                                  *uint32
 		blockTotalBytesCompressed                        *uint32
-		executionPayloadBaseFeePerGas                    *string
+		executionPayloadBaseFeePerGas                    *big.Int
 		executionPayloadBlobGasUsed                      *uint64
 		executionPayloadExcessBlobGas                    *uint64
 		executionPayloadGasLimit                         *uint64
@@ -120,7 +92,7 @@ func scanFctBlockHead(
 		executionPayloadTransactionsTotalBytesCompressed *uint32
 	)
 
-	if err := scanner.Scan(
+	err := scanner.Scan(
 		&block.UpdatedDateTime,
 		&block.Slot,
 		&block.SlotStartDateTime,
@@ -148,8 +120,10 @@ func scanFctBlockHead(
 		&executionPayloadTransactionsCount,
 		&executionPayloadTransactionsTotalBytes,
 		&executionPayloadTransactionsTotalBytesCompressed,
-	); err != nil {
-		return nil, fmt.Errorf("failed to scan row: %w", err)
+		&block.Status,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("failed to scan fct_block: %w", err)
 	}
 
 	// Handle nullable fields
@@ -162,7 +136,7 @@ func scanFctBlockHead(
 	}
 
 	if executionPayloadBaseFeePerGas != nil {
-		block.ExecutionPayloadBaseFeePerGas = wrapperspb.String(*executionPayloadBaseFeePerGas)
+		block.ExecutionPayloadBaseFeePerGas = wrapperspb.String(executionPayloadBaseFeePerGas.String())
 	}
 
 	if executionPayloadBlobGasUsed != nil {
@@ -193,5 +167,5 @@ func scanFctBlockHead(
 		block.ExecutionPayloadTransactionsTotalBytesCompressed = wrapperspb.UInt32(*executionPayloadTransactionsTotalBytesCompressed)
 	}
 
-	return &block, nil
+	return block, nil
 }

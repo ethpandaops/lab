@@ -28,6 +28,7 @@
     "@nivo/sankey": "0.93.0",
     "@nivo/scatterplot": "0.93.0",
     "@nivo/treemap": "0.93.0",
+    "@nivo/pie": "0.93.0",
     "@tailwindcss/vite": "4.1.5",
     "@tanstack/react-query": "5.29.2",
     "@tanstack/react-router": "^1.132.7",
