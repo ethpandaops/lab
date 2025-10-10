@@ -1,9 +1,0 @@
-/*.yaml
-  Content-Type: text/yaml
-  Access-Control-Allow-Origin: *
-  Cache-Control: no-cache
-
-/*.yml
-  Content-Type: text/yaml
-  Access-Control-Allow-Origin: *
-  Cache-Control: no-cache 
