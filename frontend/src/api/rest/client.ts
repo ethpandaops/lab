@@ -21,7 +21,7 @@ import { API_V1_ENDPOINTS, buildQueryString, NodeFilters } from './endpoints';
  * REST API client for v1 endpoints
  *
  * Note: The getNodes() method automatically filters for xatu public nodes
- * (meta_client_name starting with 'pub-' or 'ethpandaops').
+ * (meta_client_name starting with 'pub-', 'ethpandaops', or 'corp-').
  * Use getAllNodes() if you need to fetch all nodes without this filter.
  */
 export class RestApiClient {
@@ -77,10 +77,10 @@ export class RestApiClient {
 
   /**
    * Get list of xatu public nodes for a specific network
-   * Automatically filters for nodes with meta_client_name starting with 'pub-' or 'ethpandaops'
+   * Automatically filters for nodes with meta_client_name starting with 'pub-', 'ethpandaops', or 'corp-'
    * @param network Network name
    * @param filters Optional additional filters for nodes
-   * @returns ListNodesResponse with combined results from both filters
+   * @returns ListNodesResponse with combined results from all filters
    */
   async getNodes(network: string, filters?: NodeFilters): Promise<ListNodesResponse> {
     // Always add the meta_client_name filter for xatu public nodes
@@ -109,23 +109,55 @@ export class RestApiClient {
       console.log(`Fetched ${nodes.nodes.length} ethpandaops nodes`);
       return nodes;
     } else if (username) {
-      // For other specific users, only fetch nodes with pub- prefix
+      // For other specific users, fetch nodes from all prefixes (pub-, corp-)
+      // This ensures we find the user regardless of their prefix
       const pubFilters = {
         ...baseFilters,
         meta_client_name: { starts_with: 'pub-' },
       };
-      const queryString = buildQueryString(pubFilters);
-      const url = `${this.baseUrl}${API_V1_ENDPOINTS.nodes(network)}${
-        queryString.toString() ? `?${queryString.toString()}` : ''
+      const pubQueryString = buildQueryString(pubFilters);
+      const pubUrl = `${this.baseUrl}${API_V1_ENDPOINTS.nodes(network)}${
+        pubQueryString.toString() ? `?${pubQueryString.toString()}` : ''
       }`;
 
-      console.log('Fetching pub- nodes from:', url);
-      const response = await this.fetchWithRetry<any>(url);
-      const nodes = ListNodesResponse.fromJson(response);
-      console.log(`Fetched ${nodes.nodes.length} pub- nodes`);
-      return nodes;
+      const corpFilters = {
+        ...baseFilters,
+        meta_client_name: { starts_with: 'corp-' },
+      };
+      const corpQueryString = buildQueryString(corpFilters);
+      const corpUrl = `${this.baseUrl}${API_V1_ENDPOINTS.nodes(network)}${
+        corpQueryString.toString() ? `?${corpQueryString.toString()}` : ''
+      }`;
+
+      console.log('Fetching nodes for specific user with meta_client_name filters:');
+      console.log('  - pub- nodes from:', pubUrl);
+      console.log('  - corp- nodes from:', corpUrl);
+
+      // Execute both requests in parallel
+      const [pubResponse, corpResponse] = await Promise.all([
+        this.fetchWithRetry<any>(pubUrl),
+        this.fetchWithRetry<any>(corpUrl),
+      ]);
+
+      // Parse responses
+      const pubNodes = ListNodesResponse.fromJson(pubResponse);
+      const corpNodes = ListNodesResponse.fromJson(corpResponse);
+
+      // Combine the results
+      const combinedNodes = [...pubNodes.nodes, ...corpNodes.nodes];
+
+      console.log(
+        `Fetched ${pubNodes.nodes.length} pub- nodes and ${corpNodes.nodes.length} corp- nodes (total: ${combinedNodes.length})`,
+      );
+
+      // Create a combined response
+      return new ListNodesResponse({
+        nodes: combinedNodes,
+        pagination: pubNodes.pagination, // Use pagination from first response
+        filters: pubNodes.filters,
+      });
     } else {
-      // For general queries (no specific user), fetch both pub- and ethpandaops nodes
+      // For general queries (no specific user), fetch pub-, ethpandaops, and corp- nodes
       // This is used for the main xatu page showing all nodes
       const pubFilters = {
         ...baseFilters,
@@ -145,25 +177,37 @@ export class RestApiClient {
         ethpandaopsQueryString.toString() ? `?${ethpandaopsQueryString.toString()}` : ''
       }`;
 
+      const corpFilters = {
+        ...baseFilters,
+        meta_client_name: { starts_with: 'corp-' },
+      };
+      const corpQueryString = buildQueryString(corpFilters);
+      const corpUrl = `${this.baseUrl}${API_V1_ENDPOINTS.nodes(network)}${
+        corpQueryString.toString() ? `?${corpQueryString.toString()}` : ''
+      }`;
+
       console.log('Fetching nodes with meta_client_name filters:');
       console.log('  - pub- nodes from:', pubUrl);
       console.log('  - ethpandaops nodes from:', ethpandaopsUrl);
+      console.log('  - corp- nodes from:', corpUrl);
 
-      // Execute both requests in parallel for better performance
-      const [pubResponse, ethpandaopsResponse] = await Promise.all([
+      // Execute all three requests in parallel for better performance
+      const [pubResponse, ethpandaopsResponse, corpResponse] = await Promise.all([
         this.fetchWithRetry<any>(pubUrl),
         this.fetchWithRetry<any>(ethpandaopsUrl),
+        this.fetchWithRetry<any>(corpUrl),
       ]);
 
       // Parse responses
       const pubNodes = ListNodesResponse.fromJson(pubResponse);
       const ethpandaopsNodes = ListNodesResponse.fromJson(ethpandaopsResponse);
+      const corpNodes = ListNodesResponse.fromJson(corpResponse);
 
       // Combine the results
-      const combinedNodes = [...pubNodes.nodes, ...ethpandaopsNodes.nodes];
+      const combinedNodes = [...pubNodes.nodes, ...ethpandaopsNodes.nodes, ...corpNodes.nodes];
 
       console.log(
-        `Fetched ${pubNodes.nodes.length} pub- nodes and ${ethpandaopsNodes.nodes.length} ethpandaops nodes (total: ${combinedNodes.length})`,
+        `Fetched ${pubNodes.nodes.length} pub- nodes, ${ethpandaopsNodes.nodes.length} ethpandaops nodes, and ${corpNodes.nodes.length} corp- nodes (total: ${combinedNodes.length})`,
       );
 
       // Create a combined response with public node count
