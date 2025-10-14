@@ -155,7 +155,7 @@ FROM (
         table,
         min(%s) AS min_position,
         max(%s) + argMax(%s, %s) AS max_position_end
-    FROM %s.admin_cbt FINAL
+    FROM %s.admin_cbt_incremental FINAL
     WHERE (database, table) IN (%s)
     GROUP BY database, table
 )`,
