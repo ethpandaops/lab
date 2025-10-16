@@ -23,9 +23,6 @@ export default defineConfig({
       filename: 'build/stats.html',
     }),
   ],
-  optimizeDeps: {
-    include: ['react-syntax-highlighter'],
-  },
   server: {
     proxy: {
       '/api': {
