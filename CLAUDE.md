@@ -89,7 +89,6 @@ src/
   main.tsx
 ```
 
-
 ## React
 
 - When creating a new component, create a storybook story for it
