@@ -43,14 +43,14 @@ export function BlockList(): JSX.Element {
         {data.fct_block.map(block => (
           <div
             key={block.slot}
-            className="flex flex-col gap-2 rounded-lg bg-slate-800/50 p-6 shadow-sm outline outline-1 -outline-offset-1 outline-slate-600/50 backdrop-blur-sm transition-all hover:bg-slate-800/70 hover:shadow-md sm:flex-row sm:items-center sm:justify-between"
+            className="flex flex-col gap-2 rounded-lg bg-slate-800/50 p-6 shadow-sm outline-1 -outline-offset-1 outline-slate-600/50 backdrop-blur-sm transition-all hover:bg-slate-800/70 hover:shadow-md sm:flex-row sm:items-center sm:justify-between"
           >
             <div className="flex flex-col gap-1">
-              <div className="text-xs/5 font-semibold uppercase tracking-wide text-slate-400">Slot</div>
+              <div className="text-xs/5 font-semibold tracking-wide text-slate-400 uppercase">Slot</div>
               <div className="text-lg/7 font-bold text-slate-100">{block.slot}</div>
             </div>
             <div className="flex flex-col gap-1 sm:flex-1 sm:text-right">
-              <div className="text-xs/5 font-semibold uppercase tracking-wide text-slate-400">Block Root</div>
+              <div className="text-xs/5 font-semibold tracking-wide text-slate-400 uppercase">Block Root</div>
               <div className="font-mono text-sm/6 text-slate-300">{block.block_root}</div>
             </div>
           </div>
