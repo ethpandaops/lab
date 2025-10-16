@@ -1,6 +1,6 @@
 import { type JSX } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { fctBlockServiceListOptions } from '@api/@tanstack/react-query.gen';
+import { fctBlockServiceListOptions } from '@/api/@tanstack/react-query.gen';
 
 export function BlockList(): JSX.Element {
   const { data, error, isLoading } = useQuery(

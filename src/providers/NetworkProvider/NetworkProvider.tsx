@@ -1,7 +1,7 @@
 import { type JSX, type ReactNode, useEffect, useMemo, useState } from 'react';
 import { useConfig } from '@/hooks/useConfig';
-import type { Network } from '@/types/config';
-import { NetworkContext, type NetworkContextValue } from '@contexts/NetworkContext';
+import type { Network } from '@/hooks/useNetwork';
+import { NetworkContext, type NetworkContextValue } from '@/contexts/NetworkContext';
 
 interface NetworkProviderProps {
   children: ReactNode;

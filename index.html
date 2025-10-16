@@ -8,8 +8,66 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <title>Lab</title>
+    <style>
+      /* Critical CSS - Inline for instant rendering */
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: system-ui, -apple-system, sans-serif;
+        background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 50%, #2563eb 100%);
+        min-height: 100vh;
+        overflow: hidden;
+      }
+
+      #loading-screen {
+        position: fixed;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 2rem;
+        background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 50%, #2563eb 100%);
+        z-index: 9999;
+      }
+
+      #loading-logo {
+        width: 120px;
+        height: 120px;
+        animation: spin 2s linear infinite;
+      }
+
+      #loading-text {
+        color: white;
+        font-size: 1.25rem;
+        font-weight: 600;
+        opacity: 0.9;
+      }
+
+      @keyframes spin {
+        from {
+          transform: rotate(0deg);
+        }
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* Hide loading screen when React takes over */
+      .react-loaded #loading-screen {
+        display: none;
+      }
+    </style>
   </head>
   <body>
+    <div id="loading-screen">
+      <img id="loading-logo" src="/logo.png" alt="Loading..." />
+      <div id="loading-text">Loading Lab...</div>
+    </div>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

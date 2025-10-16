@@ -23,12 +23,6 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],
-      "@components/*": ["./src/components/*"],
-      "@pages/*": ["./src/pages/*"],
-      "@hooks/*": ["./src/hooks/*"],
-      "@utils/*": ["./src/utils/*"],
-      "@api/*": ["./src/api/*"],
-      "@assets/*": ["./src/assets/*"]
     }
   },
   "include": ["vite.config.ts"],

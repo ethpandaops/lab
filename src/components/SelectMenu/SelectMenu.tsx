@@ -1,57 +1,8 @@
-import { type JSX, type ReactNode } from 'react';
+import { type JSX } from 'react';
 import { Label, Listbox, ListboxButton, ListboxOption, ListboxOptions } from '@headlessui/react';
 import { ChevronUpDownIcon } from '@heroicons/react/16/solid';
 import { CheckIcon } from '@heroicons/react/20/solid';
-
-export interface SelectMenuOption<T> {
-  value: T;
-  label: string;
-  icon?: ReactNode;
-}
-
-interface SelectMenuProps<T> {
-  /**
-   * Currently selected option
-   */
-  value: T;
-
-  /**
-   * Callback when selection changes
-   */
-  onChange: (value: T) => void;
-
-  /**
-   * Array of options to display
-   */
-  options: SelectMenuOption<T>[];
-
-  /**
-   * Whether to show the label above the selector
-   * @default false
-   */
-  showLabel?: boolean;
-
-  /**
-   * Label text
-   */
-  label?: string;
-
-  /**
-   * Placeholder when no value is selected
-   */
-  placeholder?: string;
-
-  /**
-   * Custom class name for the container
-   */
-  className?: string;
-
-  /**
-   * Whether the select is disabled
-   * @default false
-   */
-  disabled?: boolean;
-}
+import type { SelectMenuProps } from './SelectMenu.types';
 
 /**
  * Generic select menu component using Headless UI Listbox.

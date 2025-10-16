@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
-import { SelectMenu, type SelectMenuOption } from '@/components/SelectMenu';
+import { SelectMenu } from './SelectMenu';
+import type { SelectMenuOption } from './SelectMenu.types';
 import { GlobeAltIcon, UserIcon, CogIcon } from '@heroicons/react/16/solid';
 
 const meta: Meta = {

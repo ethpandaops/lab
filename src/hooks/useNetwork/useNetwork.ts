@@ -1,5 +1,5 @@
 import { useContext } from 'react';
-import { NetworkContext, type NetworkContextValue } from '@contexts/NetworkContext';
+import { NetworkContext, type NetworkContextValue } from '@/contexts/NetworkContext/index';
 
 /**
  * Hook to access the current network and switch between networks.

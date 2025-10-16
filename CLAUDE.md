@@ -27,23 +27,68 @@ pnpm storybook
 
 ## Project Structure
 
-- vite.config.ts - Vite configuration
-- package.json - Dependencies and scripts
-- public - Public assets
-- .storybook - Storybook configuration
-- src/ - Source code
-  - api/ - Generated API openapi code
-    - @tanstack/react-query.gen.ts - Generated tanstack query code
-  - components/ - React components (PascalCase.tsx)
-  - contexts/ - React contexts (PascalCase.ts)
-  - providers/ - React providers (PascalCase.tsx)
-  - hooks/ - Custom hooks (camelCase.ts)
-  - routes/ - Routes
-  - stories/ - Storybook stories
-  - types/ - TypeScript types (kebab-case.ts)
-  - utils/ - Utilities (kebab-case.ts)
-  - index.css - Global styles
-  - main.tsx - Entry point
+```bash
+vite.config.ts                        # Vite configuration
+package.json                          # Dependencies and scripts
+public/                               # Public assets
+.storybook/                           # Storybook configuration
+src/
+  routes/                             # TanStack route modules only
+    __root.tsx                        # app shell/providers/outlet
+    index.tsx                         # "/"
+    experiments/
+      index.tsx                       # "/experiments"
+      $slug.tsx                       # "/experiments/:slug"
+  pages/                              # Route-level components (screens)
+    index/
+      IndexPage.tsx
+    experiments/
+      ExperimentsPage.tsx
+      hooks/                          # Hooks used ONLY by this page
+        useExperiments/
+          useExperiments.ts
+          index.ts
+      components/                     # Components used ONLY by this page
+        ExperimentList/
+          ExperimentList.tsx
+          index.ts
+      LiveSlot/                       # Live slot page (/experiments/live-slot)
+        LiveSlot.tsx
+        components/
+          SlotDetail/
+            SlotDetail.tsx
+            index.ts
+  components/                         # Shared, generic, design-system components
+    Select/
+      Select.tsx
+      Select.types.ts
+      Select.stories.tsx
+      index.ts
+  providers/                          # Global or feature-specific context providers
+    NetworkProvider/
+      NetworkProvider.tsx
+      NetworkProvider.types.ts
+      index.ts
+  contexts/                           # React Context definitions
+    NetworkContext/
+      NetworkContext.tsx
+      NetworkContext.types.ts
+      index.ts
+  hooks/                              # Truly generic hooks
+    useConfig/
+      useConfig.ts
+      useConfig.types.ts
+      index.ts
+    useNetwork/
+      useNetwork.ts
+      useNetwork.types.ts
+      index.ts
+  lib/                                # Utilities, constants, helpers, services
+    api-config.ts
+  assets/
+  main.tsx
+```
+
 
 ## React
 
@@ -59,7 +104,9 @@ pnpm storybook
 
 ### Naming Conventions
 
-- **Components** (`.tsx`): PascalCase - `NetworkSelector.tsx`, `SelectMenu.tsx`
+- **Routes** (`.tsx`): PascalCase - `index.tsx`, `users.tsx`, `users/$userId.tsx`
+- **Pages** (`.tsx`, `.ts`): PascalCase - `UsersPage.tsx`, `UserTable.tsx`
+- **Components** (`.tsx`, `.ts`): PascalCase - `NetworkSelector.tsx`, `SelectMenu.tsx`
 - **Providers** (`.tsx`): PascalCase - `NetworkProvider.tsx` (in `src/providers/`)
 - **Context** (`.ts`): PascalCase - `NetworkContext.ts` (in `src/contexts/`)
 - **Hooks** (`.ts`): camelCase starting with `use` - `useNetwork.ts`, `useConfig.ts`

@@ -1,6 +1,6 @@
 import { type UseQueryResult, useQuery } from '@tanstack/react-query';
 import { baseUrl } from '@/utils/api-config';
-import type { Config } from '@/types/config';
+import type { Config } from './useConfig.types';
 
 const REFETCH_INTERVAL = 10_000; // 10 seconds
 

@@ -1,22 +1,8 @@
 import { type JSX, useMemo } from 'react';
 import { GlobeAltIcon } from '@heroicons/react/16/solid';
-import { useNetwork } from '@/hooks/useNetwork';
+import { useNetwork, type Network } from '@/hooks/useNetwork';
 import { SelectMenu, type SelectMenuOption } from '@/components/SelectMenu';
-import type { Network } from '@/types/config';
-
-interface NetworkSelectorProps {
-  /**
-   * Whether to show the label above the selector
-   * @default true
-   */
-  showLabel?: boolean;
-
-  /**
-   * Custom label text
-   * @default "Network"
-   */
-  label?: string;
-}
+import type { NetworkSelectorProps } from './NetworkSelector.types';
 
 /**
  * Network selector dropdown component.
