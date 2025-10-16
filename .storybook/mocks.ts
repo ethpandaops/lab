@@ -50,8 +50,8 @@ const mockConfig: Config = {
 };
 
 // MSW handlers for Storybook
-export const handlers = [
-  http.get('*/config', () => {
+export const handlers = {
+  config: http.get('*/config', () => {
     return HttpResponse.json(mockConfig);
   }),
-];
+};

@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { http, HttpResponse, delay } from 'msw';
 import { ConfigGate } from './ConfigGate';
+import { BASE_URL, PATH_PREFIX } from '@/utils/api-config';
 
 const meta: Meta = {
   title: 'Components/ConfigGate',
@@ -36,11 +37,11 @@ export const Success: Story = {
 export const Loading: Story = {
   parameters: {
     msw: {
-      handlers: [
-        http.get('*/config', async () => {
+      handlers: {
+        config: http.get(`${BASE_URL}${PATH_PREFIX}/config`, async () => {
           await delay('infinite');
         }),
-      ],
+      },
     },
   },
   render: () => (
@@ -60,14 +61,14 @@ export const Loading: Story = {
 export const Error: Story = {
   parameters: {
     msw: {
-      handlers: [
-        http.get('*/config', () => {
+      handlers: {
+        config: http.get(`${BASE_URL}${PATH_PREFIX}/config`, () => {
           return HttpResponse.json(
             { error: 'Internal Server Error' },
             { status: 500, statusText: 'Internal Server Error' }
           );
         }),
-      ],
+      },
     },
   },
   render: () => (
@@ -87,11 +88,11 @@ export const Error: Story = {
 export const NetworkError: Story = {
   parameters: {
     msw: {
-      handlers: [
-        http.get('*/config', () => {
+      handlers: {
+        config: http.get(`${BASE_URL}${PATH_PREFIX}/config`, () => {
           return HttpResponse.error();
         }),
-      ],
+      },
     },
   },
   render: () => (

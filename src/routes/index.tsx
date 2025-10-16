@@ -3,11 +3,7 @@ import { createFileRoute } from '@tanstack/react-router';
 import { IndexPage } from '@/pages/index/IndexPage';
 
 function IndexComponent(): JSX.Element {
-  return (
-    <div className="space-y-12">
-      <IndexPage />
-    </div>
-  );
+  return <IndexPage />;
 }
 
 export const Route = createFileRoute('/')({

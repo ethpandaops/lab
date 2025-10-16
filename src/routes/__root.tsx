@@ -81,10 +81,10 @@ function RootComponent(): JSX.Element {
                       <Link to="/" className="group inline-flex items-baseline gap-3 transition-all">
                         <h1 className="bg-linear-to-r from-orange-400 via-amber-400 to-orange-400 bg-clip-text text-2xl font-black tracking-tight text-transparent transition-all group-hover:from-orange-300 group-hover:via-amber-300 group-hover:to-orange-300 sm:text-3xl">
                           <span className="md:hidden">Lab</span>
-                          <span className="hidden md:inline">Lab Dashboard</span>
+                          <span className="hidden md:inline">The Lab</span>
                         </h1>
                       </Link>
-                      <p className="mt-1.5 hidden text-sm/6 font-medium text-slate-400 lg:block">Lab</p>
+                      <p className="mt-1.5 hidden text-sm/6 font-medium text-slate-400 lg:block">by ethPandaOps</p>
                     </div>
                     <div className="w-48">
                       <NetworkSelector showLabel={false} />
