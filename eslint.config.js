@@ -11,7 +11,7 @@ import prettier from 'eslint-plugin-prettier/recommended';
 
 export default tseslint.config(
   {
-    ignores: ['build', 'node_modules', 'coverage', 'eslint_report.json', 'src/api'],
+    ignores: ['build', 'node_modules', 'coverage', 'eslint_report.json', 'src/api', 'storybook-static'],
   },
   js.configs.recommended,
   ...tseslint.configs.recommended,
@@ -56,5 +56,17 @@ export default tseslint.config(
       },
     },
   },
-  storybook.configs['flat/recommended']
+  storybook.configs['flat/recommended'],
+  {
+    files: ['**/.storybook/**/*.{js,ts}'],
+    rules: {
+      'storybook/no-uninstalled-addons': [
+        'error',
+        {
+          packageJsonLocation: './package.json',
+          ignore: ['storybook/viewport'],
+        },
+      ],
+    },
+  }
 );

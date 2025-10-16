@@ -19,7 +19,7 @@ export type CreateClientConfig<T extends ClientOptions = ClientOptions2> = (
 export const client = createClient(
   createClientConfig(
     createConfig<ClientOptions2>({
-      baseUrl: 'http://localhost:8080',
+      baseUrl: 'https://cbt-api-hoodi.primary.production.platform.ethpandaops.io',
     })
   )
 );

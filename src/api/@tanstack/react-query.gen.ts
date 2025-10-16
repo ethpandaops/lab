@@ -162,6 +162,7 @@ export const fctAddressAccessChunked10000ServiceListQueryKey = (
 
 /**
  * List records
+ *
  * Retrieve paginated results with optional filtering
  */
 export const fctAddressAccessChunked10000ServiceListOptions = (
@@ -187,6 +188,7 @@ export const fctAddressAccessChunked10000ServiceGetQueryKey = (
 
 /**
  * Get record
+ *
  * Retrieve a single record by chunk_start_block_number
  */
 export const fctAddressAccessChunked10000ServiceGetOptions = (
@@ -211,6 +213,7 @@ export const fctAddressAccessTotalServiceListQueryKey = (options?: Options<FctAd
 
 /**
  * List records
+ *
  * Retrieve paginated results with optional filtering
  */
 export const fctAddressAccessTotalServiceListOptions = (options?: Options<FctAddressAccessTotalServiceListData>) => {
@@ -233,6 +236,7 @@ export const fctAddressAccessTotalServiceGetQueryKey = (options: Options<FctAddr
 
 /**
  * Get record
+ *
  * Retrieve a single record by updated_date_time
  */
 export const fctAddressAccessTotalServiceGetOptions = (options: Options<FctAddressAccessTotalServiceGetData>) => {
@@ -256,6 +260,7 @@ export const fctAddressStorageSlotChunked10000ServiceListQueryKey = (
 
 /**
  * List records
+ *
  * Retrieve paginated results with optional filtering
  */
 export const fctAddressStorageSlotChunked10000ServiceListOptions = (
@@ -281,6 +286,7 @@ export const fctAddressStorageSlotChunked10000ServiceGetQueryKey = (
 
 /**
  * Get record
+ *
  * Retrieve a single record by chunk_start_block_number
  */
 export const fctAddressStorageSlotChunked10000ServiceGetOptions = (
@@ -306,6 +312,7 @@ export const fctAddressStorageSlotExpiredTop100ByContractServiceListQueryKey = (
 
 /**
  * List records
+ *
  * Retrieve paginated results with optional filtering
  */
 export const fctAddressStorageSlotExpiredTop100ByContractServiceListOptions = (
@@ -331,6 +338,7 @@ export const fctAddressStorageSlotExpiredTop100ByContractServiceGetQueryKey = (
 
 /**
  * Get record
+ *
  * Retrieve a single record by rank
  */
 export const fctAddressStorageSlotExpiredTop100ByContractServiceGetOptions = (
@@ -356,6 +364,7 @@ export const fctAddressStorageSlotTop100ByContractServiceListQueryKey = (
 
 /**
  * List records
+ *
  * Retrieve paginated results with optional filtering
  */
 export const fctAddressStorageSlotTop100ByContractServiceListOptions = (
@@ -381,6 +390,7 @@ export const fctAddressStorageSlotTop100ByContractServiceGetQueryKey = (
 
 /**
  * Get record
+ *
  * Retrieve a single record by rank
  */
 export const fctAddressStorageSlotTop100ByContractServiceGetOptions = (
@@ -406,6 +416,7 @@ export const fctAddressStorageSlotTotalServiceListQueryKey = (
 
 /**
  * List records
+ *
  * Retrieve paginated results with optional filtering
  */
 export const fctAddressStorageSlotTotalServiceListOptions = (
@@ -431,6 +442,7 @@ export const fctAddressStorageSlotTotalServiceGetQueryKey = (
 
 /**
  * Get record
+ *
  * Retrieve a single record by updated_date_time
  */
 export const fctAddressStorageSlotTotalServiceGetOptions = (
@@ -456,6 +468,7 @@ export const fctAttestationCorrectnessByValidatorCanonicalServiceListQueryKey = 
 
 /**
  * List records
+ *
  * Retrieve paginated results with optional filtering
  */
 export const fctAttestationCorrectnessByValidatorCanonicalServiceListOptions = (
@@ -481,6 +494,7 @@ export const fctAttestationCorrectnessByValidatorCanonicalServiceGetQueryKey = (
 
 /**
  * Get record
+ *
  * Retrieve a single record by slot_start_date_time
  */
 export const fctAttestationCorrectnessByValidatorCanonicalServiceGetOptions = (
@@ -506,6 +520,7 @@ export const fctAttestationCorrectnessByValidatorHeadServiceListQueryKey = (
 
 /**
  * List records
+ *
  * Retrieve paginated results with optional filtering
  */
 export const fctAttestationCorrectnessByValidatorHeadServiceListOptions = (
@@ -531,6 +546,7 @@ export const fctAttestationCorrectnessByValidatorHeadServiceGetQueryKey = (
 
 /**
  * Get record
+ *
  * Retrieve a single record by slot_start_date_time
  */
 export const fctAttestationCorrectnessByValidatorHeadServiceGetOptions = (
@@ -556,6 +572,7 @@ export const fctAttestationCorrectnessCanonicalServiceListQueryKey = (
 
 /**
  * List records
+ *
  * Retrieve paginated results with optional filtering
  */
 export const fctAttestationCorrectnessCanonicalServiceListOptions = (
@@ -581,6 +598,7 @@ export const fctAttestationCorrectnessCanonicalServiceGetQueryKey = (
 
 /**
  * Get record
+ *
  * Retrieve a single record by slot_start_date_time
  */
 export const fctAttestationCorrectnessCanonicalServiceGetOptions = (
@@ -606,6 +624,7 @@ export const fctAttestationCorrectnessHeadServiceListQueryKey = (
 
 /**
  * List records
+ *
  * Retrieve paginated results with optional filtering
  */
 export const fctAttestationCorrectnessHeadServiceListOptions = (
@@ -631,6 +650,7 @@ export const fctAttestationCorrectnessHeadServiceGetQueryKey = (
 
 /**
  * Get record
+ *
  * Retrieve a single record by slot_start_date_time
  */
 export const fctAttestationCorrectnessHeadServiceGetOptions = (
@@ -656,6 +676,7 @@ export const fctAttestationFirstSeenChunked50MsServiceListQueryKey = (
 
 /**
  * List records
+ *
  * Retrieve paginated results with optional filtering
  */
 export const fctAttestationFirstSeenChunked50MsServiceListOptions = (
@@ -681,6 +702,7 @@ export const fctAttestationFirstSeenChunked50MsServiceGetQueryKey = (
 
 /**
  * Get record
+ *
  * Retrieve a single record by slot_start_date_time
  */
 export const fctAttestationFirstSeenChunked50MsServiceGetOptions = (
@@ -705,6 +727,7 @@ export const fctBlockServiceListQueryKey = (options?: Options<FctBlockServiceLis
 
 /**
  * List records
+ *
  * Retrieve paginated results with optional filtering
  */
 export const fctBlockServiceListOptions = (options?: Options<FctBlockServiceListData>) => {
@@ -727,6 +750,7 @@ export const fctBlockServiceGetQueryKey = (options: Options<FctBlockServiceGetDa
 
 /**
  * Get record
+ *
  * Retrieve a single record by slot_start_date_time
  */
 export const fctBlockServiceGetOptions = (options: Options<FctBlockServiceGetData>) => {
@@ -749,6 +773,7 @@ export const fctBlockBlobCountServiceListQueryKey = (options?: Options<FctBlockB
 
 /**
  * List records
+ *
  * Retrieve paginated results with optional filtering
  */
 export const fctBlockBlobCountServiceListOptions = (options?: Options<FctBlockBlobCountServiceListData>) => {
@@ -771,6 +796,7 @@ export const fctBlockBlobCountServiceGetQueryKey = (options: Options<FctBlockBlo
 
 /**
  * Get record
+ *
  * Retrieve a single record by slot_start_date_time
  */
 export const fctBlockBlobCountServiceGetOptions = (options: Options<FctBlockBlobCountServiceGetData>) => {
@@ -793,6 +819,7 @@ export const fctBlockBlobCountHeadServiceListQueryKey = (options?: Options<FctBl
 
 /**
  * List records
+ *
  * Retrieve paginated results with optional filtering
  */
 export const fctBlockBlobCountHeadServiceListOptions = (options?: Options<FctBlockBlobCountHeadServiceListData>) => {
@@ -815,6 +842,7 @@ export const fctBlockBlobCountHeadServiceGetQueryKey = (options: Options<FctBloc
 
 /**
  * Get record
+ *
  * Retrieve a single record by slot_start_date_time
  */
 export const fctBlockBlobCountHeadServiceGetOptions = (options: Options<FctBlockBlobCountHeadServiceGetData>) => {
@@ -838,6 +866,7 @@ export const fctBlockBlobFirstSeenByNodeServiceListQueryKey = (
 
 /**
  * List records
+ *
  * Retrieve paginated results with optional filtering
  */
 export const fctBlockBlobFirstSeenByNodeServiceListOptions = (
@@ -863,6 +892,7 @@ export const fctBlockBlobFirstSeenByNodeServiceGetQueryKey = (
 
 /**
  * Get record
+ *
  * Retrieve a single record by slot_start_date_time
  */
 export const fctBlockBlobFirstSeenByNodeServiceGetOptions = (
@@ -887,6 +917,7 @@ export const fctBlockFirstSeenByNodeServiceListQueryKey = (options?: Options<Fct
 
 /**
  * List records
+ *
  * Retrieve paginated results with optional filtering
  */
 export const fctBlockFirstSeenByNodeServiceListOptions = (
@@ -911,6 +942,7 @@ export const fctBlockFirstSeenByNodeServiceGetQueryKey = (options: Options<FctBl
 
 /**
  * Get record
+ *
  * Retrieve a single record by slot_start_date_time
  */
 export const fctBlockFirstSeenByNodeServiceGetOptions = (options: Options<FctBlockFirstSeenByNodeServiceGetData>) => {
@@ -933,6 +965,7 @@ export const fctBlockHeadServiceListQueryKey = (options?: Options<FctBlockHeadSe
 
 /**
  * List records
+ *
  * Retrieve paginated results with optional filtering
  */
 export const fctBlockHeadServiceListOptions = (options?: Options<FctBlockHeadServiceListData>) => {
@@ -955,6 +988,7 @@ export const fctBlockHeadServiceGetQueryKey = (options: Options<FctBlockHeadServ
 
 /**
  * Get record
+ *
  * Retrieve a single record by slot_start_date_time
  */
 export const fctBlockHeadServiceGetOptions = (options: Options<FctBlockHeadServiceGetData>) => {
@@ -977,6 +1011,7 @@ export const fctBlockMevServiceListQueryKey = (options?: Options<FctBlockMevServ
 
 /**
  * List records
+ *
  * Retrieve paginated results with optional filtering
  */
 export const fctBlockMevServiceListOptions = (options?: Options<FctBlockMevServiceListData>) => {
@@ -999,6 +1034,7 @@ export const fctBlockMevServiceGetQueryKey = (options: Options<FctBlockMevServic
 
 /**
  * Get record
+ *
  * Retrieve a single record by slot_start_date_time
  */
 export const fctBlockMevServiceGetOptions = (options: Options<FctBlockMevServiceGetData>) => {
@@ -1021,6 +1057,7 @@ export const fctBlockMevHeadServiceListQueryKey = (options?: Options<FctBlockMev
 
 /**
  * List records
+ *
  * Retrieve paginated results with optional filtering
  */
 export const fctBlockMevHeadServiceListOptions = (options?: Options<FctBlockMevHeadServiceListData>) => {
@@ -1043,6 +1080,7 @@ export const fctBlockMevHeadServiceGetQueryKey = (options: Options<FctBlockMevHe
 
 /**
  * Get record
+ *
  * Retrieve a single record by slot_start_date_time
  */
 export const fctBlockMevHeadServiceGetOptions = (options: Options<FctBlockMevHeadServiceGetData>) => {
@@ -1065,6 +1103,7 @@ export const fctBlockProposerServiceListQueryKey = (options?: Options<FctBlockPr
 
 /**
  * List records
+ *
  * Retrieve paginated results with optional filtering
  */
 export const fctBlockProposerServiceListOptions = (options?: Options<FctBlockProposerServiceListData>) => {
@@ -1087,6 +1126,7 @@ export const fctBlockProposerServiceGetQueryKey = (options: Options<FctBlockProp
 
 /**
  * Get record
+ *
  * Retrieve a single record by slot_start_date_time
  */
 export const fctBlockProposerServiceGetOptions = (options: Options<FctBlockProposerServiceGetData>) => {
@@ -1109,6 +1149,7 @@ export const fctBlockProposerEntityServiceListQueryKey = (options?: Options<FctB
 
 /**
  * List records
+ *
  * Retrieve paginated results with optional filtering
  */
 export const fctBlockProposerEntityServiceListOptions = (options?: Options<FctBlockProposerEntityServiceListData>) => {
@@ -1131,6 +1172,7 @@ export const fctBlockProposerEntityServiceGetQueryKey = (options: Options<FctBlo
 
 /**
  * Get record
+ *
  * Retrieve a single record by slot_start_date_time
  */
 export const fctBlockProposerEntityServiceGetOptions = (options: Options<FctBlockProposerEntityServiceGetData>) => {
@@ -1153,6 +1195,7 @@ export const fctBlockProposerHeadServiceListQueryKey = (options?: Options<FctBlo
 
 /**
  * List records
+ *
  * Retrieve paginated results with optional filtering
  */
 export const fctBlockProposerHeadServiceListOptions = (options?: Options<FctBlockProposerHeadServiceListData>) => {
@@ -1175,6 +1218,7 @@ export const fctBlockProposerHeadServiceGetQueryKey = (options: Options<FctBlock
 
 /**
  * Get record
+ *
  * Retrieve a single record by slot_start_date_time
  */
 export const fctBlockProposerHeadServiceGetOptions = (options: Options<FctBlockProposerHeadServiceGetData>) => {
@@ -1197,6 +1241,7 @@ export const fctMevBidCountByBuilderServiceListQueryKey = (options?: Options<Fct
 
 /**
  * List records
+ *
  * Retrieve paginated results with optional filtering
  */
 export const fctMevBidCountByBuilderServiceListOptions = (
@@ -1221,6 +1266,7 @@ export const fctMevBidCountByBuilderServiceGetQueryKey = (options: Options<FctMe
 
 /**
  * Get record
+ *
  * Retrieve a single record by slot_start_date_time
  */
 export const fctMevBidCountByBuilderServiceGetOptions = (options: Options<FctMevBidCountByBuilderServiceGetData>) => {
@@ -1243,6 +1289,7 @@ export const fctMevBidCountByRelayServiceListQueryKey = (options?: Options<FctMe
 
 /**
  * List records
+ *
  * Retrieve paginated results with optional filtering
  */
 export const fctMevBidCountByRelayServiceListOptions = (options?: Options<FctMevBidCountByRelayServiceListData>) => {
@@ -1265,6 +1312,7 @@ export const fctMevBidCountByRelayServiceGetQueryKey = (options: Options<FctMevB
 
 /**
  * Get record
+ *
  * Retrieve a single record by slot_start_date_time
  */
 export const fctMevBidCountByRelayServiceGetOptions = (options: Options<FctMevBidCountByRelayServiceGetData>) => {
@@ -1288,6 +1336,7 @@ export const fctMevBidHighestValueByBuilderChunked50MsServiceListQueryKey = (
 
 /**
  * List records
+ *
  * Retrieve paginated results with optional filtering
  */
 export const fctMevBidHighestValueByBuilderChunked50MsServiceListOptions = (
@@ -1313,6 +1362,7 @@ export const fctMevBidHighestValueByBuilderChunked50MsServiceGetQueryKey = (
 
 /**
  * Get record
+ *
  * Retrieve a single record by slot_start_date_time
  */
 export const fctMevBidHighestValueByBuilderChunked50MsServiceGetOptions = (
@@ -1337,6 +1387,7 @@ export const fctNodeActiveLast24hServiceListQueryKey = (options?: Options<FctNod
 
 /**
  * List records
+ *
  * Retrieve paginated results with optional filtering
  */
 export const fctNodeActiveLast24hServiceListOptions = (options?: Options<FctNodeActiveLast24hServiceListData>) => {
@@ -1359,6 +1410,7 @@ export const fctNodeActiveLast24hServiceGetQueryKey = (options: Options<FctNodeA
 
 /**
  * Get record
+ *
  * Retrieve a single record by meta_client_name
  */
 export const fctNodeActiveLast24hServiceGetOptions = (options: Options<FctNodeActiveLast24hServiceGetData>) => {
@@ -1381,6 +1433,7 @@ export const fctPreparedBlockServiceListQueryKey = (options?: Options<FctPrepare
 
 /**
  * List records
+ *
  * Retrieve paginated results with optional filtering
  */
 export const fctPreparedBlockServiceListOptions = (options?: Options<FctPreparedBlockServiceListData>) => {
@@ -1403,6 +1456,7 @@ export const fctPreparedBlockServiceGetQueryKey = (options: Options<FctPreparedB
 
 /**
  * Get record
+ *
  * Retrieve a single record by slot_start_date_time
  */
 export const fctPreparedBlockServiceGetOptions = (options: Options<FctPreparedBlockServiceGetData>) => {

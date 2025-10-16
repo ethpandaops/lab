@@ -14,9 +14,12 @@ dist-ssr
 
 # production
 /build/frontend
+/build/stats.html
+storybook-static
 
-# TanStack Router
-routeTree.gen.ts
+# Environment variables
+.env
+.env.local
 
 # Editor directories and files
 .vscode/*
@@ -28,4 +31,9 @@ routeTree.gen.ts
 *.njsproj
 *.sln
 *.sw?
+
+# Playwright
+.playwright-mcp
+
+# Tanstack
 .tanstack

@@ -26,14 +26,15 @@
     "paths": {
       "@/*": ["./src/*"],
       "@components/*": ["./src/components/*"],
+      "@contexts/*": ["./src/contexts/*"],
+      "@providers/*": ["./src/providers/*"],
       "@pages/*": ["./src/pages/*"],
       "@hooks/*": ["./src/hooks/*"],
       "@utils/*": ["./src/utils/*"],
       "@api/*": ["./src/api/*"],
-      "@types/*": ["./src/types/*"],
       "@assets/*": ["./src/assets/*"]
     }
   },
-  "include": ["src"],
+  "include": ["src", "src/routeTree.gen.ts"],
   "exclude": ["src/api/generated"]
 }

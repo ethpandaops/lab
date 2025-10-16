@@ -1,7 +1,10 @@
 import { defineConfig } from '@hey-api/openapi-ts';
 
+const OPENAPI_INPUT =
+  process.env.OPENAPI_INPUT || 'https://cbt-api-mainnet.primary.production.platform.ethpandaops.io/openapi.yaml';
+
 export default defineConfig({
-  input: 'http://localhost:8080/openapi.yaml',
+  input: OPENAPI_INPUT,
   output: {
     path: 'src/api',
     format: 'prettier',
@@ -13,8 +16,9 @@ export default defineConfig({
       runtimeConfigPath: '../utils/api-config.ts',
     },
     {
-      metadata: true,
       name: 'zod',
+      compatibilityVersion: 'mini',
+      metadata: false,
     },
     '@tanstack/react-query',
     {

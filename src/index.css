@@ -1,1 +1,141 @@
 @import 'tailwindcss';
+
+@theme {
+  --animate-border-glimmer: border-glimmer 3s linear infinite;
+  --animate-glow-pulse: glow-pulse 2s ease-in-out infinite;
+  --animate-glow-orbit-slow: glow-orbit-slow 25s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  --animate-glow-orbit-medium: glow-orbit-medium 20s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  --animate-glow-orbit-fast: glow-orbit-fast 15s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  --animate-soft-glow: soft-glow 6s ease-in-out infinite;
+  --animate-shimmer: shimmer 2s ease-in-out infinite;
+}
+
+@keyframes border-glimmer {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes sweep-right {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(200%);
+  }
+}
+
+@keyframes glow-pulse {
+  0%, 100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* Conic gradient for border glimmer effect */
+.glimmer-border {
+  background: conic-gradient(
+    from var(--angle, 0deg),
+    transparent 0deg,
+    transparent 60deg,
+    rgba(34, 211, 238, 0.5) 90deg,
+    rgba(168, 85, 247, 0.8) 120deg,
+    rgba(236, 72, 153, 0.5) 150deg,
+    transparent 180deg,
+    transparent 360deg
+  );
+  animation: rotate-gradient 3s linear infinite;
+}
+
+@keyframes rotate-gradient {
+  0% {
+    --angle: 0deg;
+  }
+  100% {
+    --angle: 360deg;
+  }
+}
+
+/* CSS property animation for smooth rotation */
+@property --angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+/* Smooth, graceful orbit animations */
+@keyframes glow-orbit-slow {
+  0% {
+    transform: rotate(0deg) translateX(120%) rotate(0deg);
+    opacity: 0.2;
+  }
+  25% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 0.3;
+  }
+  75% {
+    opacity: 0.5;
+  }
+  100% {
+    transform: rotate(360deg) translateX(120%) rotate(-360deg);
+    opacity: 0.2;
+  }
+}
+
+@keyframes glow-orbit-medium {
+  0% {
+    transform: rotate(0deg) translateX(110%) rotate(0deg);
+    opacity: 0.15;
+  }
+  33% {
+    opacity: 0.35;
+  }
+  66% {
+    opacity: 0.25;
+  }
+  100% {
+    transform: rotate(360deg) translateX(110%) rotate(-360deg);
+    opacity: 0.15;
+  }
+}
+
+@keyframes glow-orbit-fast {
+  0% {
+    transform: rotate(0deg) translateX(100%) rotate(0deg);
+    opacity: 0.25;
+  }
+  50% {
+    opacity: 0.45;
+  }
+  100% {
+    transform: rotate(360deg) translateX(100%) rotate(-360deg);
+    opacity: 0.25;
+  }
+}
+
+@keyframes soft-glow {
+  0%, 100% {
+    opacity: 0.1;
+    filter: blur(30px);
+  }
+  50% {
+    opacity: 0.2;
+    filter: blur(20px);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}

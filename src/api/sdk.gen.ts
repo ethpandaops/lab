@@ -296,6 +296,7 @@ export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends 
 
 /**
  * List records
+ *
  * Retrieve paginated results with optional filtering
  */
 export const fctAddressAccessChunked10000ServiceList = <ThrowOnError extends boolean = false>(
@@ -319,6 +320,7 @@ export const fctAddressAccessChunked10000ServiceList = <ThrowOnError extends boo
 
 /**
  * Get record
+ *
  * Retrieve a single record by chunk_start_block_number
  */
 export const fctAddressAccessChunked10000ServiceGet = <ThrowOnError extends boolean = false>(
@@ -342,6 +344,7 @@ export const fctAddressAccessChunked10000ServiceGet = <ThrowOnError extends bool
 
 /**
  * List records
+ *
  * Retrieve paginated results with optional filtering
  */
 export const fctAddressAccessTotalServiceList = <ThrowOnError extends boolean = false>(
@@ -365,6 +368,7 @@ export const fctAddressAccessTotalServiceList = <ThrowOnError extends boolean = 
 
 /**
  * Get record
+ *
  * Retrieve a single record by updated_date_time
  */
 export const fctAddressAccessTotalServiceGet = <ThrowOnError extends boolean = false>(
@@ -388,6 +392,7 @@ export const fctAddressAccessTotalServiceGet = <ThrowOnError extends boolean = f
 
 /**
  * List records
+ *
  * Retrieve paginated results with optional filtering
  */
 export const fctAddressStorageSlotChunked10000ServiceList = <ThrowOnError extends boolean = false>(
@@ -411,6 +416,7 @@ export const fctAddressStorageSlotChunked10000ServiceList = <ThrowOnError extend
 
 /**
  * Get record
+ *
  * Retrieve a single record by chunk_start_block_number
  */
 export const fctAddressStorageSlotChunked10000ServiceGet = <ThrowOnError extends boolean = false>(
@@ -434,6 +440,7 @@ export const fctAddressStorageSlotChunked10000ServiceGet = <ThrowOnError extends
 
 /**
  * List records
+ *
  * Retrieve paginated results with optional filtering
  */
 export const fctAddressStorageSlotExpiredTop100ByContractServiceList = <ThrowOnError extends boolean = false>(
@@ -457,6 +464,7 @@ export const fctAddressStorageSlotExpiredTop100ByContractServiceList = <ThrowOnE
 
 /**
  * Get record
+ *
  * Retrieve a single record by rank
  */
 export const fctAddressStorageSlotExpiredTop100ByContractServiceGet = <ThrowOnError extends boolean = false>(
@@ -480,6 +488,7 @@ export const fctAddressStorageSlotExpiredTop100ByContractServiceGet = <ThrowOnEr
 
 /**
  * List records
+ *
  * Retrieve paginated results with optional filtering
  */
 export const fctAddressStorageSlotTop100ByContractServiceList = <ThrowOnError extends boolean = false>(
@@ -503,6 +512,7 @@ export const fctAddressStorageSlotTop100ByContractServiceList = <ThrowOnError ex
 
 /**
  * Get record
+ *
  * Retrieve a single record by rank
  */
 export const fctAddressStorageSlotTop100ByContractServiceGet = <ThrowOnError extends boolean = false>(
@@ -526,6 +536,7 @@ export const fctAddressStorageSlotTop100ByContractServiceGet = <ThrowOnError ext
 
 /**
  * List records
+ *
  * Retrieve paginated results with optional filtering
  */
 export const fctAddressStorageSlotTotalServiceList = <ThrowOnError extends boolean = false>(
@@ -549,6 +560,7 @@ export const fctAddressStorageSlotTotalServiceList = <ThrowOnError extends boole
 
 /**
  * Get record
+ *
  * Retrieve a single record by updated_date_time
  */
 export const fctAddressStorageSlotTotalServiceGet = <ThrowOnError extends boolean = false>(
@@ -572,6 +584,7 @@ export const fctAddressStorageSlotTotalServiceGet = <ThrowOnError extends boolea
 
 /**
  * List records
+ *
  * Retrieve paginated results with optional filtering
  */
 export const fctAttestationCorrectnessByValidatorCanonicalServiceList = <ThrowOnError extends boolean = false>(
@@ -595,6 +608,7 @@ export const fctAttestationCorrectnessByValidatorCanonicalServiceList = <ThrowOn
 
 /**
  * Get record
+ *
  * Retrieve a single record by slot_start_date_time
  */
 export const fctAttestationCorrectnessByValidatorCanonicalServiceGet = <ThrowOnError extends boolean = false>(
@@ -618,6 +632,7 @@ export const fctAttestationCorrectnessByValidatorCanonicalServiceGet = <ThrowOnE
 
 /**
  * List records
+ *
  * Retrieve paginated results with optional filtering
  */
 export const fctAttestationCorrectnessByValidatorHeadServiceList = <ThrowOnError extends boolean = false>(
@@ -641,6 +656,7 @@ export const fctAttestationCorrectnessByValidatorHeadServiceList = <ThrowOnError
 
 /**
  * Get record
+ *
  * Retrieve a single record by slot_start_date_time
  */
 export const fctAttestationCorrectnessByValidatorHeadServiceGet = <ThrowOnError extends boolean = false>(
@@ -664,6 +680,7 @@ export const fctAttestationCorrectnessByValidatorHeadServiceGet = <ThrowOnError 
 
 /**
  * List records
+ *
  * Retrieve paginated results with optional filtering
  */
 export const fctAttestationCorrectnessCanonicalServiceList = <ThrowOnError extends boolean = false>(
@@ -687,6 +704,7 @@ export const fctAttestationCorrectnessCanonicalServiceList = <ThrowOnError exten
 
 /**
  * Get record
+ *
  * Retrieve a single record by slot_start_date_time
  */
 export const fctAttestationCorrectnessCanonicalServiceGet = <ThrowOnError extends boolean = false>(
@@ -710,6 +728,7 @@ export const fctAttestationCorrectnessCanonicalServiceGet = <ThrowOnError extend
 
 /**
  * List records
+ *
  * Retrieve paginated results with optional filtering
  */
 export const fctAttestationCorrectnessHeadServiceList = <ThrowOnError extends boolean = false>(
@@ -733,6 +752,7 @@ export const fctAttestationCorrectnessHeadServiceList = <ThrowOnError extends bo
 
 /**
  * Get record
+ *
  * Retrieve a single record by slot_start_date_time
  */
 export const fctAttestationCorrectnessHeadServiceGet = <ThrowOnError extends boolean = false>(
@@ -756,6 +776,7 @@ export const fctAttestationCorrectnessHeadServiceGet = <ThrowOnError extends boo
 
 /**
  * List records
+ *
  * Retrieve paginated results with optional filtering
  */
 export const fctAttestationFirstSeenChunked50MsServiceList = <ThrowOnError extends boolean = false>(
@@ -779,6 +800,7 @@ export const fctAttestationFirstSeenChunked50MsServiceList = <ThrowOnError exten
 
 /**
  * Get record
+ *
  * Retrieve a single record by slot_start_date_time
  */
 export const fctAttestationFirstSeenChunked50MsServiceGet = <ThrowOnError extends boolean = false>(
@@ -802,6 +824,7 @@ export const fctAttestationFirstSeenChunked50MsServiceGet = <ThrowOnError extend
 
 /**
  * List records
+ *
  * Retrieve paginated results with optional filtering
  */
 export const fctBlockServiceList = <ThrowOnError extends boolean = false>(
@@ -821,6 +844,7 @@ export const fctBlockServiceList = <ThrowOnError extends boolean = false>(
 
 /**
  * Get record
+ *
  * Retrieve a single record by slot_start_date_time
  */
 export const fctBlockServiceGet = <ThrowOnError extends boolean = false>(
@@ -840,6 +864,7 @@ export const fctBlockServiceGet = <ThrowOnError extends boolean = false>(
 
 /**
  * List records
+ *
  * Retrieve paginated results with optional filtering
  */
 export const fctBlockBlobCountServiceList = <ThrowOnError extends boolean = false>(
@@ -863,6 +888,7 @@ export const fctBlockBlobCountServiceList = <ThrowOnError extends boolean = fals
 
 /**
  * Get record
+ *
  * Retrieve a single record by slot_start_date_time
  */
 export const fctBlockBlobCountServiceGet = <ThrowOnError extends boolean = false>(
@@ -886,6 +912,7 @@ export const fctBlockBlobCountServiceGet = <ThrowOnError extends boolean = false
 
 /**
  * List records
+ *
  * Retrieve paginated results with optional filtering
  */
 export const fctBlockBlobCountHeadServiceList = <ThrowOnError extends boolean = false>(
@@ -909,6 +936,7 @@ export const fctBlockBlobCountHeadServiceList = <ThrowOnError extends boolean = 
 
 /**
  * Get record
+ *
  * Retrieve a single record by slot_start_date_time
  */
 export const fctBlockBlobCountHeadServiceGet = <ThrowOnError extends boolean = false>(
@@ -932,6 +960,7 @@ export const fctBlockBlobCountHeadServiceGet = <ThrowOnError extends boolean = f
 
 /**
  * List records
+ *
  * Retrieve paginated results with optional filtering
  */
 export const fctBlockBlobFirstSeenByNodeServiceList = <ThrowOnError extends boolean = false>(
@@ -955,6 +984,7 @@ export const fctBlockBlobFirstSeenByNodeServiceList = <ThrowOnError extends bool
 
 /**
  * Get record
+ *
  * Retrieve a single record by slot_start_date_time
  */
 export const fctBlockBlobFirstSeenByNodeServiceGet = <ThrowOnError extends boolean = false>(
@@ -978,6 +1008,7 @@ export const fctBlockBlobFirstSeenByNodeServiceGet = <ThrowOnError extends boole
 
 /**
  * List records
+ *
  * Retrieve paginated results with optional filtering
  */
 export const fctBlockFirstSeenByNodeServiceList = <ThrowOnError extends boolean = false>(
@@ -1001,6 +1032,7 @@ export const fctBlockFirstSeenByNodeServiceList = <ThrowOnError extends boolean 
 
 /**
  * Get record
+ *
  * Retrieve a single record by slot_start_date_time
  */
 export const fctBlockFirstSeenByNodeServiceGet = <ThrowOnError extends boolean = false>(
@@ -1024,6 +1056,7 @@ export const fctBlockFirstSeenByNodeServiceGet = <ThrowOnError extends boolean =
 
 /**
  * List records
+ *
  * Retrieve paginated results with optional filtering
  */
 export const fctBlockHeadServiceList = <ThrowOnError extends boolean = false>(
@@ -1045,6 +1078,7 @@ export const fctBlockHeadServiceList = <ThrowOnError extends boolean = false>(
 
 /**
  * Get record
+ *
  * Retrieve a single record by slot_start_date_time
  */
 export const fctBlockHeadServiceGet = <ThrowOnError extends boolean = false>(
@@ -1064,6 +1098,7 @@ export const fctBlockHeadServiceGet = <ThrowOnError extends boolean = false>(
 
 /**
  * List records
+ *
  * Retrieve paginated results with optional filtering
  */
 export const fctBlockMevServiceList = <ThrowOnError extends boolean = false>(
@@ -1083,6 +1118,7 @@ export const fctBlockMevServiceList = <ThrowOnError extends boolean = false>(
 
 /**
  * Get record
+ *
  * Retrieve a single record by slot_start_date_time
  */
 export const fctBlockMevServiceGet = <ThrowOnError extends boolean = false>(
@@ -1102,6 +1138,7 @@ export const fctBlockMevServiceGet = <ThrowOnError extends boolean = false>(
 
 /**
  * List records
+ *
  * Retrieve paginated results with optional filtering
  */
 export const fctBlockMevHeadServiceList = <ThrowOnError extends boolean = false>(
@@ -1125,6 +1162,7 @@ export const fctBlockMevHeadServiceList = <ThrowOnError extends boolean = false>
 
 /**
  * Get record
+ *
  * Retrieve a single record by slot_start_date_time
  */
 export const fctBlockMevHeadServiceGet = <ThrowOnError extends boolean = false>(
@@ -1148,6 +1186,7 @@ export const fctBlockMevHeadServiceGet = <ThrowOnError extends boolean = false>(
 
 /**
  * List records
+ *
  * Retrieve paginated results with optional filtering
  */
 export const fctBlockProposerServiceList = <ThrowOnError extends boolean = false>(
@@ -1171,6 +1210,7 @@ export const fctBlockProposerServiceList = <ThrowOnError extends boolean = false
 
 /**
  * Get record
+ *
  * Retrieve a single record by slot_start_date_time
  */
 export const fctBlockProposerServiceGet = <ThrowOnError extends boolean = false>(
@@ -1194,6 +1234,7 @@ export const fctBlockProposerServiceGet = <ThrowOnError extends boolean = false>
 
 /**
  * List records
+ *
  * Retrieve paginated results with optional filtering
  */
 export const fctBlockProposerEntityServiceList = <ThrowOnError extends boolean = false>(
@@ -1217,6 +1258,7 @@ export const fctBlockProposerEntityServiceList = <ThrowOnError extends boolean =
 
 /**
  * Get record
+ *
  * Retrieve a single record by slot_start_date_time
  */
 export const fctBlockProposerEntityServiceGet = <ThrowOnError extends boolean = false>(
@@ -1240,6 +1282,7 @@ export const fctBlockProposerEntityServiceGet = <ThrowOnError extends boolean = 
 
 /**
  * List records
+ *
  * Retrieve paginated results with optional filtering
  */
 export const fctBlockProposerHeadServiceList = <ThrowOnError extends boolean = false>(
@@ -1263,6 +1306,7 @@ export const fctBlockProposerHeadServiceList = <ThrowOnError extends boolean = f
 
 /**
  * Get record
+ *
  * Retrieve a single record by slot_start_date_time
  */
 export const fctBlockProposerHeadServiceGet = <ThrowOnError extends boolean = false>(
@@ -1286,6 +1330,7 @@ export const fctBlockProposerHeadServiceGet = <ThrowOnError extends boolean = fa
 
 /**
  * List records
+ *
  * Retrieve paginated results with optional filtering
  */
 export const fctMevBidCountByBuilderServiceList = <ThrowOnError extends boolean = false>(
@@ -1309,6 +1354,7 @@ export const fctMevBidCountByBuilderServiceList = <ThrowOnError extends boolean 
 
 /**
  * Get record
+ *
  * Retrieve a single record by slot_start_date_time
  */
 export const fctMevBidCountByBuilderServiceGet = <ThrowOnError extends boolean = false>(
@@ -1332,6 +1378,7 @@ export const fctMevBidCountByBuilderServiceGet = <ThrowOnError extends boolean =
 
 /**
  * List records
+ *
  * Retrieve paginated results with optional filtering
  */
 export const fctMevBidCountByRelayServiceList = <ThrowOnError extends boolean = false>(
@@ -1355,6 +1402,7 @@ export const fctMevBidCountByRelayServiceList = <ThrowOnError extends boolean = 
 
 /**
  * Get record
+ *
  * Retrieve a single record by slot_start_date_time
  */
 export const fctMevBidCountByRelayServiceGet = <ThrowOnError extends boolean = false>(
@@ -1378,6 +1426,7 @@ export const fctMevBidCountByRelayServiceGet = <ThrowOnError extends boolean = f
 
 /**
  * List records
+ *
  * Retrieve paginated results with optional filtering
  */
 export const fctMevBidHighestValueByBuilderChunked50MsServiceList = <ThrowOnError extends boolean = false>(
@@ -1401,6 +1450,7 @@ export const fctMevBidHighestValueByBuilderChunked50MsServiceList = <ThrowOnErro
 
 /**
  * Get record
+ *
  * Retrieve a single record by slot_start_date_time
  */
 export const fctMevBidHighestValueByBuilderChunked50MsServiceGet = <ThrowOnError extends boolean = false>(
@@ -1424,6 +1474,7 @@ export const fctMevBidHighestValueByBuilderChunked50MsServiceGet = <ThrowOnError
 
 /**
  * List records
+ *
  * Retrieve paginated results with optional filtering
  */
 export const fctNodeActiveLast24hServiceList = <ThrowOnError extends boolean = false>(
@@ -1447,6 +1498,7 @@ export const fctNodeActiveLast24hServiceList = <ThrowOnError extends boolean = f
 
 /**
  * Get record
+ *
  * Retrieve a single record by meta_client_name
  */
 export const fctNodeActiveLast24hServiceGet = <ThrowOnError extends boolean = false>(
@@ -1470,6 +1522,7 @@ export const fctNodeActiveLast24hServiceGet = <ThrowOnError extends boolean = fa
 
 /**
  * List records
+ *
  * Retrieve paginated results with optional filtering
  */
 export const fctPreparedBlockServiceList = <ThrowOnError extends boolean = false>(
@@ -1493,6 +1546,7 @@ export const fctPreparedBlockServiceList = <ThrowOnError extends boolean = false
 
 /**
  * Get record
+ *
  * Retrieve a single record by slot_start_date_time
  */
 export const fctPreparedBlockServiceGet = <ThrowOnError extends boolean = false>(

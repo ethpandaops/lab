@@ -1,48 +1,6 @@
-.PHONY: default generate-api dev build test clean install
+.DEFAULT_GOAL := generate-api-types
 
-# Default target
-default: generate-api
+.PHONY: generate-api-types
 
-# Generate API client from OpenAPI spec
-generate-api:
-	pnpm generate:api
-
-# Start development server
-dev:
-	pnpm dev
-
-# Build for production
-build:
-	pnpm build
-
-# Run tests
-test:
-	pnpm test
-
-# Type check
-typecheck:
-	pnpm typecheck
-
-# Lint code
-lint:
-	pnpm lint
-
-# Format code
-format:
-	pnpm format
-
-# Clean build artifacts
-clean:
-	pnpm clean
-
-# Install dependencies
-install:
-	pnpm install
-
-# Run Storybook
-storybook:
-	pnpm storybook
-
-# Build Storybook
-build-storybook:
-	pnpm build-storybook
+generate-api-types:
+	@pnpm run generate:api
