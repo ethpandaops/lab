@@ -1,62 +1,16 @@
-import { type JSX, useEffect } from 'react';
+import { type JSX } from 'react';
 import { createRootRoute, Outlet, Link } from '@tanstack/react-router';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { useConfig } from '@/hooks/useConfig';
 import { NetworkProvider } from '@/providers/NetworkProvider';
 import { NetworkSelector } from '@/components/NetworkSelector';
-import { LoadingScreen } from '@/components/LoadingScreen';
+import { ConfigGate } from '@/components/ConfigGate';
 import Logo from '/logo.png';
 
 const queryClient = new QueryClient();
 
-// BackgroundPoller: Runs all critical background tasks app wide
-// This component is always mounted inside the QueryClientProvider
-function BackgroundPoller(): null {
-  // Initialize config fetching and polling (fetches on mount + every 10s)
-  // The data is cached in TanStack Query and accessible anywhere via useConfig()
-  useConfig();
-
-  return null;
-}
-
-// ConfigGate: Gates the entire app until config is successfully loaded
-function ConfigGate({ children }: { children: React.ReactNode }): JSX.Element {
-  const { data: config, isLoading, error } = useConfig();
-
-  useEffect(() => {
-    // Once React has mounted, hide the initial HTML loading screen
-    document.body.classList.add('react-loaded');
-  }, []);
-
-  // Show loading screen while fetching initial config
-  if (isLoading && !config) {
-    return <LoadingScreen />;
-  }
-
-  // Show error state if initial config fetch failed
-  if (error && !config) {
-    return (
-      <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center gap-4 bg-gradient-to-br from-red-900 via-red-800 to-red-700 p-8">
-        <div className="text-2xl font-bold text-white">Failed to Load Configuration</div>
-        <div className="max-w-md text-center text-white/80">{error.message}</div>
-        <button
-          onClick={() => window.location.reload()}
-          className="mt-4 rounded-lg bg-white/20 px-6 py-3 font-semibold text-white backdrop-blur transition-colors hover:bg-white/30"
-        >
-          Retry
-        </button>
-      </div>
-    );
-  }
-
-  // Config loaded successfully - render the app
-  return <>{children}</>;
-}
-
 function RootComponent(): JSX.Element {
   return (
     <QueryClientProvider client={queryClient}>
-      <BackgroundPoller />
       <ConfigGate>
         <NetworkProvider>
           <div className="relative min-h-dvh bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">

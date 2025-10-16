@@ -4,6 +4,10 @@ import { queryOptions } from '@tanstack/react-query';
 
 import { client } from '../client.gen';
 import {
+  adminCbtIncrementalServiceGet,
+  adminCbtIncrementalServiceList,
+  dimNodeServiceGet,
+  dimNodeServiceList,
   fctAddressAccessChunked10000ServiceGet,
   fctAddressAccessChunked10000ServiceList,
   fctAddressAccessTotalServiceGet,
@@ -58,9 +62,37 @@ import {
   fctNodeActiveLast24hServiceList,
   fctPreparedBlockServiceGet,
   fctPreparedBlockServiceList,
+  intAddressFirstAccessServiceGet,
+  intAddressFirstAccessServiceList,
+  intAddressLastAccessServiceGet,
+  intAddressLastAccessServiceList,
+  intAddressStorageSlotFirstAccessServiceGet,
+  intAddressStorageSlotFirstAccessServiceList,
+  intAddressStorageSlotLastAccessServiceGet,
+  intAddressStorageSlotLastAccessServiceList,
+  intAttestationAttestedCanonicalServiceGet,
+  intAttestationAttestedCanonicalServiceList,
+  intAttestationAttestedHeadServiceGet,
+  intAttestationAttestedHeadServiceList,
+  intAttestationFirstSeenServiceGet,
+  intAttestationFirstSeenServiceList,
+  intBeaconCommitteeHeadServiceGet,
+  intBeaconCommitteeHeadServiceList,
+  intBlockBlobCountCanonicalServiceGet,
+  intBlockBlobCountCanonicalServiceList,
+  intBlockCanonicalServiceGet,
+  intBlockCanonicalServiceList,
+  intBlockMevCanonicalServiceGet,
+  intBlockMevCanonicalServiceList,
+  intBlockProposerCanonicalServiceGet,
+  intBlockProposerCanonicalServiceList,
   type Options,
 } from '../sdk.gen';
 import type {
+  AdminCbtIncrementalServiceGetData,
+  AdminCbtIncrementalServiceListData,
+  DimNodeServiceGetData,
+  DimNodeServiceListData,
   FctAddressAccessChunked10000ServiceGetData,
   FctAddressAccessChunked10000ServiceListData,
   FctAddressAccessTotalServiceGetData,
@@ -115,6 +147,30 @@ import type {
   FctNodeActiveLast24hServiceListData,
   FctPreparedBlockServiceGetData,
   FctPreparedBlockServiceListData,
+  IntAddressFirstAccessServiceGetData,
+  IntAddressFirstAccessServiceListData,
+  IntAddressLastAccessServiceGetData,
+  IntAddressLastAccessServiceListData,
+  IntAddressStorageSlotFirstAccessServiceGetData,
+  IntAddressStorageSlotFirstAccessServiceListData,
+  IntAddressStorageSlotLastAccessServiceGetData,
+  IntAddressStorageSlotLastAccessServiceListData,
+  IntAttestationAttestedCanonicalServiceGetData,
+  IntAttestationAttestedCanonicalServiceListData,
+  IntAttestationAttestedHeadServiceGetData,
+  IntAttestationAttestedHeadServiceListData,
+  IntAttestationFirstSeenServiceGetData,
+  IntAttestationFirstSeenServiceListData,
+  IntBeaconCommitteeHeadServiceGetData,
+  IntBeaconCommitteeHeadServiceListData,
+  IntBlockBlobCountCanonicalServiceGetData,
+  IntBlockBlobCountCanonicalServiceListData,
+  IntBlockCanonicalServiceGetData,
+  IntBlockCanonicalServiceListData,
+  IntBlockMevCanonicalServiceGetData,
+  IntBlockMevCanonicalServiceListData,
+  IntBlockProposerCanonicalServiceGetData,
+  IntBlockProposerCanonicalServiceListData,
 } from '../types.gen';
 
 export type QueryKey<TOptions extends Options> = [
@@ -154,6 +210,98 @@ const createQueryKey = <TOptions extends Options>(
     params.query = options.query;
   }
   return [params];
+};
+
+export const adminCbtIncrementalServiceListQueryKey = (options?: Options<AdminCbtIncrementalServiceListData>) =>
+  createQueryKey('adminCbtIncrementalServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const adminCbtIncrementalServiceListOptions = (options?: Options<AdminCbtIncrementalServiceListData>) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await adminCbtIncrementalServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: adminCbtIncrementalServiceListQueryKey(options),
+  });
+};
+
+export const adminCbtIncrementalServiceGetQueryKey = (options: Options<AdminCbtIncrementalServiceGetData>) =>
+  createQueryKey('adminCbtIncrementalServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by database
+ */
+export const adminCbtIncrementalServiceGetOptions = (options: Options<AdminCbtIncrementalServiceGetData>) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await adminCbtIncrementalServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: adminCbtIncrementalServiceGetQueryKey(options),
+  });
+};
+
+export const dimNodeServiceListQueryKey = (options?: Options<DimNodeServiceListData>) =>
+  createQueryKey('dimNodeServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const dimNodeServiceListOptions = (options?: Options<DimNodeServiceListData>) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await dimNodeServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: dimNodeServiceListQueryKey(options),
+  });
+};
+
+export const dimNodeServiceGetQueryKey = (options: Options<DimNodeServiceGetData>) =>
+  createQueryKey('dimNodeServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by validator_index
+ */
+export const dimNodeServiceGetOptions = (options: Options<DimNodeServiceGetData>) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await dimNodeServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: dimNodeServiceGetQueryKey(options),
+  });
 };
 
 export const fctAddressAccessChunked10000ServiceListQueryKey = (
@@ -1471,5 +1619,595 @@ export const fctPreparedBlockServiceGetOptions = (options: Options<FctPreparedBl
       return data;
     },
     queryKey: fctPreparedBlockServiceGetQueryKey(options),
+  });
+};
+
+export const intAddressFirstAccessServiceListQueryKey = (options?: Options<IntAddressFirstAccessServiceListData>) =>
+  createQueryKey('intAddressFirstAccessServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const intAddressFirstAccessServiceListOptions = (options?: Options<IntAddressFirstAccessServiceListData>) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await intAddressFirstAccessServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: intAddressFirstAccessServiceListQueryKey(options),
+  });
+};
+
+export const intAddressFirstAccessServiceGetQueryKey = (options: Options<IntAddressFirstAccessServiceGetData>) =>
+  createQueryKey('intAddressFirstAccessServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by address
+ */
+export const intAddressFirstAccessServiceGetOptions = (options: Options<IntAddressFirstAccessServiceGetData>) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await intAddressFirstAccessServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: intAddressFirstAccessServiceGetQueryKey(options),
+  });
+};
+
+export const intAddressLastAccessServiceListQueryKey = (options?: Options<IntAddressLastAccessServiceListData>) =>
+  createQueryKey('intAddressLastAccessServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const intAddressLastAccessServiceListOptions = (options?: Options<IntAddressLastAccessServiceListData>) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await intAddressLastAccessServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: intAddressLastAccessServiceListQueryKey(options),
+  });
+};
+
+export const intAddressLastAccessServiceGetQueryKey = (options: Options<IntAddressLastAccessServiceGetData>) =>
+  createQueryKey('intAddressLastAccessServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by address
+ */
+export const intAddressLastAccessServiceGetOptions = (options: Options<IntAddressLastAccessServiceGetData>) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await intAddressLastAccessServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: intAddressLastAccessServiceGetQueryKey(options),
+  });
+};
+
+export const intAddressStorageSlotFirstAccessServiceListQueryKey = (
+  options?: Options<IntAddressStorageSlotFirstAccessServiceListData>
+) => createQueryKey('intAddressStorageSlotFirstAccessServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const intAddressStorageSlotFirstAccessServiceListOptions = (
+  options?: Options<IntAddressStorageSlotFirstAccessServiceListData>
+) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await intAddressStorageSlotFirstAccessServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: intAddressStorageSlotFirstAccessServiceListQueryKey(options),
+  });
+};
+
+export const intAddressStorageSlotFirstAccessServiceGetQueryKey = (
+  options: Options<IntAddressStorageSlotFirstAccessServiceGetData>
+) => createQueryKey('intAddressStorageSlotFirstAccessServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by address
+ */
+export const intAddressStorageSlotFirstAccessServiceGetOptions = (
+  options: Options<IntAddressStorageSlotFirstAccessServiceGetData>
+) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await intAddressStorageSlotFirstAccessServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: intAddressStorageSlotFirstAccessServiceGetQueryKey(options),
+  });
+};
+
+export const intAddressStorageSlotLastAccessServiceListQueryKey = (
+  options?: Options<IntAddressStorageSlotLastAccessServiceListData>
+) => createQueryKey('intAddressStorageSlotLastAccessServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const intAddressStorageSlotLastAccessServiceListOptions = (
+  options?: Options<IntAddressStorageSlotLastAccessServiceListData>
+) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await intAddressStorageSlotLastAccessServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: intAddressStorageSlotLastAccessServiceListQueryKey(options),
+  });
+};
+
+export const intAddressStorageSlotLastAccessServiceGetQueryKey = (
+  options: Options<IntAddressStorageSlotLastAccessServiceGetData>
+) => createQueryKey('intAddressStorageSlotLastAccessServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by address
+ */
+export const intAddressStorageSlotLastAccessServiceGetOptions = (
+  options: Options<IntAddressStorageSlotLastAccessServiceGetData>
+) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await intAddressStorageSlotLastAccessServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: intAddressStorageSlotLastAccessServiceGetQueryKey(options),
+  });
+};
+
+export const intAttestationAttestedCanonicalServiceListQueryKey = (
+  options?: Options<IntAttestationAttestedCanonicalServiceListData>
+) => createQueryKey('intAttestationAttestedCanonicalServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const intAttestationAttestedCanonicalServiceListOptions = (
+  options?: Options<IntAttestationAttestedCanonicalServiceListData>
+) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await intAttestationAttestedCanonicalServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: intAttestationAttestedCanonicalServiceListQueryKey(options),
+  });
+};
+
+export const intAttestationAttestedCanonicalServiceGetQueryKey = (
+  options: Options<IntAttestationAttestedCanonicalServiceGetData>
+) => createQueryKey('intAttestationAttestedCanonicalServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by slot_start_date_time
+ */
+export const intAttestationAttestedCanonicalServiceGetOptions = (
+  options: Options<IntAttestationAttestedCanonicalServiceGetData>
+) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await intAttestationAttestedCanonicalServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: intAttestationAttestedCanonicalServiceGetQueryKey(options),
+  });
+};
+
+export const intAttestationAttestedHeadServiceListQueryKey = (
+  options?: Options<IntAttestationAttestedHeadServiceListData>
+) => createQueryKey('intAttestationAttestedHeadServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const intAttestationAttestedHeadServiceListOptions = (
+  options?: Options<IntAttestationAttestedHeadServiceListData>
+) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await intAttestationAttestedHeadServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: intAttestationAttestedHeadServiceListQueryKey(options),
+  });
+};
+
+export const intAttestationAttestedHeadServiceGetQueryKey = (
+  options: Options<IntAttestationAttestedHeadServiceGetData>
+) => createQueryKey('intAttestationAttestedHeadServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by slot_start_date_time
+ */
+export const intAttestationAttestedHeadServiceGetOptions = (
+  options: Options<IntAttestationAttestedHeadServiceGetData>
+) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await intAttestationAttestedHeadServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: intAttestationAttestedHeadServiceGetQueryKey(options),
+  });
+};
+
+export const intAttestationFirstSeenServiceListQueryKey = (options?: Options<IntAttestationFirstSeenServiceListData>) =>
+  createQueryKey('intAttestationFirstSeenServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const intAttestationFirstSeenServiceListOptions = (
+  options?: Options<IntAttestationFirstSeenServiceListData>
+) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await intAttestationFirstSeenServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: intAttestationFirstSeenServiceListQueryKey(options),
+  });
+};
+
+export const intAttestationFirstSeenServiceGetQueryKey = (options: Options<IntAttestationFirstSeenServiceGetData>) =>
+  createQueryKey('intAttestationFirstSeenServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by slot_start_date_time
+ */
+export const intAttestationFirstSeenServiceGetOptions = (options: Options<IntAttestationFirstSeenServiceGetData>) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await intAttestationFirstSeenServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: intAttestationFirstSeenServiceGetQueryKey(options),
+  });
+};
+
+export const intBeaconCommitteeHeadServiceListQueryKey = (options?: Options<IntBeaconCommitteeHeadServiceListData>) =>
+  createQueryKey('intBeaconCommitteeHeadServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const intBeaconCommitteeHeadServiceListOptions = (options?: Options<IntBeaconCommitteeHeadServiceListData>) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await intBeaconCommitteeHeadServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: intBeaconCommitteeHeadServiceListQueryKey(options),
+  });
+};
+
+export const intBeaconCommitteeHeadServiceGetQueryKey = (options: Options<IntBeaconCommitteeHeadServiceGetData>) =>
+  createQueryKey('intBeaconCommitteeHeadServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by slot_start_date_time
+ */
+export const intBeaconCommitteeHeadServiceGetOptions = (options: Options<IntBeaconCommitteeHeadServiceGetData>) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await intBeaconCommitteeHeadServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: intBeaconCommitteeHeadServiceGetQueryKey(options),
+  });
+};
+
+export const intBlockBlobCountCanonicalServiceListQueryKey = (
+  options?: Options<IntBlockBlobCountCanonicalServiceListData>
+) => createQueryKey('intBlockBlobCountCanonicalServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const intBlockBlobCountCanonicalServiceListOptions = (
+  options?: Options<IntBlockBlobCountCanonicalServiceListData>
+) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await intBlockBlobCountCanonicalServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: intBlockBlobCountCanonicalServiceListQueryKey(options),
+  });
+};
+
+export const intBlockBlobCountCanonicalServiceGetQueryKey = (
+  options: Options<IntBlockBlobCountCanonicalServiceGetData>
+) => createQueryKey('intBlockBlobCountCanonicalServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by slot_start_date_time
+ */
+export const intBlockBlobCountCanonicalServiceGetOptions = (
+  options: Options<IntBlockBlobCountCanonicalServiceGetData>
+) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await intBlockBlobCountCanonicalServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: intBlockBlobCountCanonicalServiceGetQueryKey(options),
+  });
+};
+
+export const intBlockCanonicalServiceListQueryKey = (options?: Options<IntBlockCanonicalServiceListData>) =>
+  createQueryKey('intBlockCanonicalServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const intBlockCanonicalServiceListOptions = (options?: Options<IntBlockCanonicalServiceListData>) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await intBlockCanonicalServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: intBlockCanonicalServiceListQueryKey(options),
+  });
+};
+
+export const intBlockCanonicalServiceGetQueryKey = (options: Options<IntBlockCanonicalServiceGetData>) =>
+  createQueryKey('intBlockCanonicalServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by slot_start_date_time
+ */
+export const intBlockCanonicalServiceGetOptions = (options: Options<IntBlockCanonicalServiceGetData>) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await intBlockCanonicalServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: intBlockCanonicalServiceGetQueryKey(options),
+  });
+};
+
+export const intBlockMevCanonicalServiceListQueryKey = (options?: Options<IntBlockMevCanonicalServiceListData>) =>
+  createQueryKey('intBlockMevCanonicalServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const intBlockMevCanonicalServiceListOptions = (options?: Options<IntBlockMevCanonicalServiceListData>) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await intBlockMevCanonicalServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: intBlockMevCanonicalServiceListQueryKey(options),
+  });
+};
+
+export const intBlockMevCanonicalServiceGetQueryKey = (options: Options<IntBlockMevCanonicalServiceGetData>) =>
+  createQueryKey('intBlockMevCanonicalServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by slot_start_date_time
+ */
+export const intBlockMevCanonicalServiceGetOptions = (options: Options<IntBlockMevCanonicalServiceGetData>) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await intBlockMevCanonicalServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: intBlockMevCanonicalServiceGetQueryKey(options),
+  });
+};
+
+export const intBlockProposerCanonicalServiceListQueryKey = (
+  options?: Options<IntBlockProposerCanonicalServiceListData>
+) => createQueryKey('intBlockProposerCanonicalServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const intBlockProposerCanonicalServiceListOptions = (
+  options?: Options<IntBlockProposerCanonicalServiceListData>
+) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await intBlockProposerCanonicalServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: intBlockProposerCanonicalServiceListQueryKey(options),
+  });
+};
+
+export const intBlockProposerCanonicalServiceGetQueryKey = (
+  options: Options<IntBlockProposerCanonicalServiceGetData>
+) => createQueryKey('intBlockProposerCanonicalServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by slot_start_date_time
+ */
+export const intBlockProposerCanonicalServiceGetOptions = (
+  options: Options<IntBlockProposerCanonicalServiceGetData>
+) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await intBlockProposerCanonicalServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: intBlockProposerCanonicalServiceGetQueryKey(options),
   });
 };

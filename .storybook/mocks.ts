@@ -1,5 +1,5 @@
 import { http, HttpResponse } from 'msw';
-import type { Config } from '@/types/config';
+import type { Config } from '../src/hooks/useConfig';
 
 // Mock config data for Storybook
 const mockConfig: Config = {

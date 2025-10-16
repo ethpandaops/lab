@@ -3,6 +3,18 @@
 import type { Client, Options as Options2, TDataShape } from './client';
 import { client } from './client.gen';
 import type {
+  AdminCbtIncrementalServiceGetData,
+  AdminCbtIncrementalServiceGetErrors,
+  AdminCbtIncrementalServiceGetResponses,
+  AdminCbtIncrementalServiceListData,
+  AdminCbtIncrementalServiceListErrors,
+  AdminCbtIncrementalServiceListResponses,
+  DimNodeServiceGetData,
+  DimNodeServiceGetErrors,
+  DimNodeServiceGetResponses,
+  DimNodeServiceListData,
+  DimNodeServiceListErrors,
+  DimNodeServiceListResponses,
   FctAddressAccessChunked10000ServiceGetData,
   FctAddressAccessChunked10000ServiceGetErrors,
   FctAddressAccessChunked10000ServiceGetResponses,
@@ -165,8 +177,88 @@ import type {
   FctPreparedBlockServiceListData,
   FctPreparedBlockServiceListErrors,
   FctPreparedBlockServiceListResponses,
+  IntAddressFirstAccessServiceGetData,
+  IntAddressFirstAccessServiceGetErrors,
+  IntAddressFirstAccessServiceGetResponses,
+  IntAddressFirstAccessServiceListData,
+  IntAddressFirstAccessServiceListErrors,
+  IntAddressFirstAccessServiceListResponses,
+  IntAddressLastAccessServiceGetData,
+  IntAddressLastAccessServiceGetErrors,
+  IntAddressLastAccessServiceGetResponses,
+  IntAddressLastAccessServiceListData,
+  IntAddressLastAccessServiceListErrors,
+  IntAddressLastAccessServiceListResponses,
+  IntAddressStorageSlotFirstAccessServiceGetData,
+  IntAddressStorageSlotFirstAccessServiceGetErrors,
+  IntAddressStorageSlotFirstAccessServiceGetResponses,
+  IntAddressStorageSlotFirstAccessServiceListData,
+  IntAddressStorageSlotFirstAccessServiceListErrors,
+  IntAddressStorageSlotFirstAccessServiceListResponses,
+  IntAddressStorageSlotLastAccessServiceGetData,
+  IntAddressStorageSlotLastAccessServiceGetErrors,
+  IntAddressStorageSlotLastAccessServiceGetResponses,
+  IntAddressStorageSlotLastAccessServiceListData,
+  IntAddressStorageSlotLastAccessServiceListErrors,
+  IntAddressStorageSlotLastAccessServiceListResponses,
+  IntAttestationAttestedCanonicalServiceGetData,
+  IntAttestationAttestedCanonicalServiceGetErrors,
+  IntAttestationAttestedCanonicalServiceGetResponses,
+  IntAttestationAttestedCanonicalServiceListData,
+  IntAttestationAttestedCanonicalServiceListErrors,
+  IntAttestationAttestedCanonicalServiceListResponses,
+  IntAttestationAttestedHeadServiceGetData,
+  IntAttestationAttestedHeadServiceGetErrors,
+  IntAttestationAttestedHeadServiceGetResponses,
+  IntAttestationAttestedHeadServiceListData,
+  IntAttestationAttestedHeadServiceListErrors,
+  IntAttestationAttestedHeadServiceListResponses,
+  IntAttestationFirstSeenServiceGetData,
+  IntAttestationFirstSeenServiceGetErrors,
+  IntAttestationFirstSeenServiceGetResponses,
+  IntAttestationFirstSeenServiceListData,
+  IntAttestationFirstSeenServiceListErrors,
+  IntAttestationFirstSeenServiceListResponses,
+  IntBeaconCommitteeHeadServiceGetData,
+  IntBeaconCommitteeHeadServiceGetErrors,
+  IntBeaconCommitteeHeadServiceGetResponses,
+  IntBeaconCommitteeHeadServiceListData,
+  IntBeaconCommitteeHeadServiceListErrors,
+  IntBeaconCommitteeHeadServiceListResponses,
+  IntBlockBlobCountCanonicalServiceGetData,
+  IntBlockBlobCountCanonicalServiceGetErrors,
+  IntBlockBlobCountCanonicalServiceGetResponses,
+  IntBlockBlobCountCanonicalServiceListData,
+  IntBlockBlobCountCanonicalServiceListErrors,
+  IntBlockBlobCountCanonicalServiceListResponses,
+  IntBlockCanonicalServiceGetData,
+  IntBlockCanonicalServiceGetErrors,
+  IntBlockCanonicalServiceGetResponses,
+  IntBlockCanonicalServiceListData,
+  IntBlockCanonicalServiceListErrors,
+  IntBlockCanonicalServiceListResponses,
+  IntBlockMevCanonicalServiceGetData,
+  IntBlockMevCanonicalServiceGetErrors,
+  IntBlockMevCanonicalServiceGetResponses,
+  IntBlockMevCanonicalServiceListData,
+  IntBlockMevCanonicalServiceListErrors,
+  IntBlockMevCanonicalServiceListResponses,
+  IntBlockProposerCanonicalServiceGetData,
+  IntBlockProposerCanonicalServiceGetErrors,
+  IntBlockProposerCanonicalServiceGetResponses,
+  IntBlockProposerCanonicalServiceListData,
+  IntBlockProposerCanonicalServiceListErrors,
+  IntBlockProposerCanonicalServiceListResponses,
 } from './types.gen';
 import {
+  zAdminCbtIncrementalServiceGetData,
+  zAdminCbtIncrementalServiceGetResponse,
+  zAdminCbtIncrementalServiceListData,
+  zAdminCbtIncrementalServiceListResponse,
+  zDimNodeServiceGetData,
+  zDimNodeServiceGetResponse,
+  zDimNodeServiceListData,
+  zDimNodeServiceListResponse,
   zFctAddressAccessChunked10000ServiceGetData,
   zFctAddressAccessChunked10000ServiceGetResponse,
   zFctAddressAccessChunked10000ServiceListData,
@@ -275,6 +367,54 @@ import {
   zFctPreparedBlockServiceGetResponse,
   zFctPreparedBlockServiceListData,
   zFctPreparedBlockServiceListResponse,
+  zIntAddressFirstAccessServiceGetData,
+  zIntAddressFirstAccessServiceGetResponse,
+  zIntAddressFirstAccessServiceListData,
+  zIntAddressFirstAccessServiceListResponse,
+  zIntAddressLastAccessServiceGetData,
+  zIntAddressLastAccessServiceGetResponse,
+  zIntAddressLastAccessServiceListData,
+  zIntAddressLastAccessServiceListResponse,
+  zIntAddressStorageSlotFirstAccessServiceGetData,
+  zIntAddressStorageSlotFirstAccessServiceGetResponse,
+  zIntAddressStorageSlotFirstAccessServiceListData,
+  zIntAddressStorageSlotFirstAccessServiceListResponse,
+  zIntAddressStorageSlotLastAccessServiceGetData,
+  zIntAddressStorageSlotLastAccessServiceGetResponse,
+  zIntAddressStorageSlotLastAccessServiceListData,
+  zIntAddressStorageSlotLastAccessServiceListResponse,
+  zIntAttestationAttestedCanonicalServiceGetData,
+  zIntAttestationAttestedCanonicalServiceGetResponse,
+  zIntAttestationAttestedCanonicalServiceListData,
+  zIntAttestationAttestedCanonicalServiceListResponse,
+  zIntAttestationAttestedHeadServiceGetData,
+  zIntAttestationAttestedHeadServiceGetResponse,
+  zIntAttestationAttestedHeadServiceListData,
+  zIntAttestationAttestedHeadServiceListResponse,
+  zIntAttestationFirstSeenServiceGetData,
+  zIntAttestationFirstSeenServiceGetResponse,
+  zIntAttestationFirstSeenServiceListData,
+  zIntAttestationFirstSeenServiceListResponse,
+  zIntBeaconCommitteeHeadServiceGetData,
+  zIntBeaconCommitteeHeadServiceGetResponse,
+  zIntBeaconCommitteeHeadServiceListData,
+  zIntBeaconCommitteeHeadServiceListResponse,
+  zIntBlockBlobCountCanonicalServiceGetData,
+  zIntBlockBlobCountCanonicalServiceGetResponse,
+  zIntBlockBlobCountCanonicalServiceListData,
+  zIntBlockBlobCountCanonicalServiceListResponse,
+  zIntBlockCanonicalServiceGetData,
+  zIntBlockCanonicalServiceGetResponse,
+  zIntBlockCanonicalServiceListData,
+  zIntBlockCanonicalServiceListResponse,
+  zIntBlockMevCanonicalServiceGetData,
+  zIntBlockMevCanonicalServiceGetResponse,
+  zIntBlockMevCanonicalServiceListData,
+  zIntBlockMevCanonicalServiceListResponse,
+  zIntBlockProposerCanonicalServiceGetData,
+  zIntBlockProposerCanonicalServiceGetResponse,
+  zIntBlockProposerCanonicalServiceListData,
+  zIntBlockProposerCanonicalServiceListResponse,
 } from './zod.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> = Options2<
@@ -292,6 +432,94 @@ export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends 
    * used to access values that aren't defined as part of the SDK function.
    */
   meta?: Record<string, unknown>;
+};
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const adminCbtIncrementalServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<AdminCbtIncrementalServiceListData, ThrowOnError>
+) => {
+  return (options?.client ?? client).get<
+    AdminCbtIncrementalServiceListResponses,
+    AdminCbtIncrementalServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => {
+      return await zAdminCbtIncrementalServiceListData.parseAsync(data);
+    },
+    responseValidator: async data => {
+      return await zAdminCbtIncrementalServiceListResponse.parseAsync(data);
+    },
+    url: '/api/v1/admin_cbt_incremental',
+    ...options,
+  });
+};
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by database
+ */
+export const adminCbtIncrementalServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<AdminCbtIncrementalServiceGetData, ThrowOnError>
+) => {
+  return (options.client ?? client).get<
+    AdminCbtIncrementalServiceGetResponses,
+    AdminCbtIncrementalServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => {
+      return await zAdminCbtIncrementalServiceGetData.parseAsync(data);
+    },
+    responseValidator: async data => {
+      return await zAdminCbtIncrementalServiceGetResponse.parseAsync(data);
+    },
+    url: '/api/v1/admin_cbt_incremental/{database}',
+    ...options,
+  });
+};
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const dimNodeServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<DimNodeServiceListData, ThrowOnError>
+) => {
+  return (options?.client ?? client).get<DimNodeServiceListResponses, DimNodeServiceListErrors, ThrowOnError>({
+    requestValidator: async data => {
+      return await zDimNodeServiceListData.parseAsync(data);
+    },
+    responseValidator: async data => {
+      return await zDimNodeServiceListResponse.parseAsync(data);
+    },
+    url: '/api/v1/dim_node',
+    ...options,
+  });
+};
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by validator_index
+ */
+export const dimNodeServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<DimNodeServiceGetData, ThrowOnError>
+) => {
+  return (options.client ?? client).get<DimNodeServiceGetResponses, DimNodeServiceGetErrors, ThrowOnError>({
+    requestValidator: async data => {
+      return await zDimNodeServiceGetData.parseAsync(data);
+    },
+    responseValidator: async data => {
+      return await zDimNodeServiceGetResponse.parseAsync(data);
+    },
+    url: '/api/v1/dim_node/{validator_index}',
+    ...options,
+  });
 };
 
 /**
@@ -1564,6 +1792,582 @@ export const fctPreparedBlockServiceGet = <ThrowOnError extends boolean = false>
       return await zFctPreparedBlockServiceGetResponse.parseAsync(data);
     },
     url: '/api/v1/fct_prepared_block/{slot_start_date_time}',
+    ...options,
+  });
+};
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const intAddressFirstAccessServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<IntAddressFirstAccessServiceListData, ThrowOnError>
+) => {
+  return (options?.client ?? client).get<
+    IntAddressFirstAccessServiceListResponses,
+    IntAddressFirstAccessServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => {
+      return await zIntAddressFirstAccessServiceListData.parseAsync(data);
+    },
+    responseValidator: async data => {
+      return await zIntAddressFirstAccessServiceListResponse.parseAsync(data);
+    },
+    url: '/api/v1/int_address_first_access',
+    ...options,
+  });
+};
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by address
+ */
+export const intAddressFirstAccessServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<IntAddressFirstAccessServiceGetData, ThrowOnError>
+) => {
+  return (options.client ?? client).get<
+    IntAddressFirstAccessServiceGetResponses,
+    IntAddressFirstAccessServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => {
+      return await zIntAddressFirstAccessServiceGetData.parseAsync(data);
+    },
+    responseValidator: async data => {
+      return await zIntAddressFirstAccessServiceGetResponse.parseAsync(data);
+    },
+    url: '/api/v1/int_address_first_access/{address}',
+    ...options,
+  });
+};
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const intAddressLastAccessServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<IntAddressLastAccessServiceListData, ThrowOnError>
+) => {
+  return (options?.client ?? client).get<
+    IntAddressLastAccessServiceListResponses,
+    IntAddressLastAccessServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => {
+      return await zIntAddressLastAccessServiceListData.parseAsync(data);
+    },
+    responseValidator: async data => {
+      return await zIntAddressLastAccessServiceListResponse.parseAsync(data);
+    },
+    url: '/api/v1/int_address_last_access',
+    ...options,
+  });
+};
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by address
+ */
+export const intAddressLastAccessServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<IntAddressLastAccessServiceGetData, ThrowOnError>
+) => {
+  return (options.client ?? client).get<
+    IntAddressLastAccessServiceGetResponses,
+    IntAddressLastAccessServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => {
+      return await zIntAddressLastAccessServiceGetData.parseAsync(data);
+    },
+    responseValidator: async data => {
+      return await zIntAddressLastAccessServiceGetResponse.parseAsync(data);
+    },
+    url: '/api/v1/int_address_last_access/{address}',
+    ...options,
+  });
+};
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const intAddressStorageSlotFirstAccessServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<IntAddressStorageSlotFirstAccessServiceListData, ThrowOnError>
+) => {
+  return (options?.client ?? client).get<
+    IntAddressStorageSlotFirstAccessServiceListResponses,
+    IntAddressStorageSlotFirstAccessServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => {
+      return await zIntAddressStorageSlotFirstAccessServiceListData.parseAsync(data);
+    },
+    responseValidator: async data => {
+      return await zIntAddressStorageSlotFirstAccessServiceListResponse.parseAsync(data);
+    },
+    url: '/api/v1/int_address_storage_slot_first_access',
+    ...options,
+  });
+};
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by address
+ */
+export const intAddressStorageSlotFirstAccessServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<IntAddressStorageSlotFirstAccessServiceGetData, ThrowOnError>
+) => {
+  return (options.client ?? client).get<
+    IntAddressStorageSlotFirstAccessServiceGetResponses,
+    IntAddressStorageSlotFirstAccessServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => {
+      return await zIntAddressStorageSlotFirstAccessServiceGetData.parseAsync(data);
+    },
+    responseValidator: async data => {
+      return await zIntAddressStorageSlotFirstAccessServiceGetResponse.parseAsync(data);
+    },
+    url: '/api/v1/int_address_storage_slot_first_access/{address}',
+    ...options,
+  });
+};
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const intAddressStorageSlotLastAccessServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<IntAddressStorageSlotLastAccessServiceListData, ThrowOnError>
+) => {
+  return (options?.client ?? client).get<
+    IntAddressStorageSlotLastAccessServiceListResponses,
+    IntAddressStorageSlotLastAccessServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => {
+      return await zIntAddressStorageSlotLastAccessServiceListData.parseAsync(data);
+    },
+    responseValidator: async data => {
+      return await zIntAddressStorageSlotLastAccessServiceListResponse.parseAsync(data);
+    },
+    url: '/api/v1/int_address_storage_slot_last_access',
+    ...options,
+  });
+};
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by address
+ */
+export const intAddressStorageSlotLastAccessServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<IntAddressStorageSlotLastAccessServiceGetData, ThrowOnError>
+) => {
+  return (options.client ?? client).get<
+    IntAddressStorageSlotLastAccessServiceGetResponses,
+    IntAddressStorageSlotLastAccessServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => {
+      return await zIntAddressStorageSlotLastAccessServiceGetData.parseAsync(data);
+    },
+    responseValidator: async data => {
+      return await zIntAddressStorageSlotLastAccessServiceGetResponse.parseAsync(data);
+    },
+    url: '/api/v1/int_address_storage_slot_last_access/{address}',
+    ...options,
+  });
+};
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const intAttestationAttestedCanonicalServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<IntAttestationAttestedCanonicalServiceListData, ThrowOnError>
+) => {
+  return (options?.client ?? client).get<
+    IntAttestationAttestedCanonicalServiceListResponses,
+    IntAttestationAttestedCanonicalServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => {
+      return await zIntAttestationAttestedCanonicalServiceListData.parseAsync(data);
+    },
+    responseValidator: async data => {
+      return await zIntAttestationAttestedCanonicalServiceListResponse.parseAsync(data);
+    },
+    url: '/api/v1/int_attestation_attested_canonical',
+    ...options,
+  });
+};
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by slot_start_date_time
+ */
+export const intAttestationAttestedCanonicalServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<IntAttestationAttestedCanonicalServiceGetData, ThrowOnError>
+) => {
+  return (options.client ?? client).get<
+    IntAttestationAttestedCanonicalServiceGetResponses,
+    IntAttestationAttestedCanonicalServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => {
+      return await zIntAttestationAttestedCanonicalServiceGetData.parseAsync(data);
+    },
+    responseValidator: async data => {
+      return await zIntAttestationAttestedCanonicalServiceGetResponse.parseAsync(data);
+    },
+    url: '/api/v1/int_attestation_attested_canonical/{slot_start_date_time}',
+    ...options,
+  });
+};
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const intAttestationAttestedHeadServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<IntAttestationAttestedHeadServiceListData, ThrowOnError>
+) => {
+  return (options?.client ?? client).get<
+    IntAttestationAttestedHeadServiceListResponses,
+    IntAttestationAttestedHeadServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => {
+      return await zIntAttestationAttestedHeadServiceListData.parseAsync(data);
+    },
+    responseValidator: async data => {
+      return await zIntAttestationAttestedHeadServiceListResponse.parseAsync(data);
+    },
+    url: '/api/v1/int_attestation_attested_head',
+    ...options,
+  });
+};
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by slot_start_date_time
+ */
+export const intAttestationAttestedHeadServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<IntAttestationAttestedHeadServiceGetData, ThrowOnError>
+) => {
+  return (options.client ?? client).get<
+    IntAttestationAttestedHeadServiceGetResponses,
+    IntAttestationAttestedHeadServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => {
+      return await zIntAttestationAttestedHeadServiceGetData.parseAsync(data);
+    },
+    responseValidator: async data => {
+      return await zIntAttestationAttestedHeadServiceGetResponse.parseAsync(data);
+    },
+    url: '/api/v1/int_attestation_attested_head/{slot_start_date_time}',
+    ...options,
+  });
+};
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const intAttestationFirstSeenServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<IntAttestationFirstSeenServiceListData, ThrowOnError>
+) => {
+  return (options?.client ?? client).get<
+    IntAttestationFirstSeenServiceListResponses,
+    IntAttestationFirstSeenServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => {
+      return await zIntAttestationFirstSeenServiceListData.parseAsync(data);
+    },
+    responseValidator: async data => {
+      return await zIntAttestationFirstSeenServiceListResponse.parseAsync(data);
+    },
+    url: '/api/v1/int_attestation_first_seen',
+    ...options,
+  });
+};
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by slot_start_date_time
+ */
+export const intAttestationFirstSeenServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<IntAttestationFirstSeenServiceGetData, ThrowOnError>
+) => {
+  return (options.client ?? client).get<
+    IntAttestationFirstSeenServiceGetResponses,
+    IntAttestationFirstSeenServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => {
+      return await zIntAttestationFirstSeenServiceGetData.parseAsync(data);
+    },
+    responseValidator: async data => {
+      return await zIntAttestationFirstSeenServiceGetResponse.parseAsync(data);
+    },
+    url: '/api/v1/int_attestation_first_seen/{slot_start_date_time}',
+    ...options,
+  });
+};
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const intBeaconCommitteeHeadServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<IntBeaconCommitteeHeadServiceListData, ThrowOnError>
+) => {
+  return (options?.client ?? client).get<
+    IntBeaconCommitteeHeadServiceListResponses,
+    IntBeaconCommitteeHeadServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => {
+      return await zIntBeaconCommitteeHeadServiceListData.parseAsync(data);
+    },
+    responseValidator: async data => {
+      return await zIntBeaconCommitteeHeadServiceListResponse.parseAsync(data);
+    },
+    url: '/api/v1/int_beacon_committee_head',
+    ...options,
+  });
+};
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by slot_start_date_time
+ */
+export const intBeaconCommitteeHeadServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<IntBeaconCommitteeHeadServiceGetData, ThrowOnError>
+) => {
+  return (options.client ?? client).get<
+    IntBeaconCommitteeHeadServiceGetResponses,
+    IntBeaconCommitteeHeadServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => {
+      return await zIntBeaconCommitteeHeadServiceGetData.parseAsync(data);
+    },
+    responseValidator: async data => {
+      return await zIntBeaconCommitteeHeadServiceGetResponse.parseAsync(data);
+    },
+    url: '/api/v1/int_beacon_committee_head/{slot_start_date_time}',
+    ...options,
+  });
+};
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const intBlockBlobCountCanonicalServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<IntBlockBlobCountCanonicalServiceListData, ThrowOnError>
+) => {
+  return (options?.client ?? client).get<
+    IntBlockBlobCountCanonicalServiceListResponses,
+    IntBlockBlobCountCanonicalServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => {
+      return await zIntBlockBlobCountCanonicalServiceListData.parseAsync(data);
+    },
+    responseValidator: async data => {
+      return await zIntBlockBlobCountCanonicalServiceListResponse.parseAsync(data);
+    },
+    url: '/api/v1/int_block_blob_count_canonical',
+    ...options,
+  });
+};
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by slot_start_date_time
+ */
+export const intBlockBlobCountCanonicalServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<IntBlockBlobCountCanonicalServiceGetData, ThrowOnError>
+) => {
+  return (options.client ?? client).get<
+    IntBlockBlobCountCanonicalServiceGetResponses,
+    IntBlockBlobCountCanonicalServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => {
+      return await zIntBlockBlobCountCanonicalServiceGetData.parseAsync(data);
+    },
+    responseValidator: async data => {
+      return await zIntBlockBlobCountCanonicalServiceGetResponse.parseAsync(data);
+    },
+    url: '/api/v1/int_block_blob_count_canonical/{slot_start_date_time}',
+    ...options,
+  });
+};
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const intBlockCanonicalServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<IntBlockCanonicalServiceListData, ThrowOnError>
+) => {
+  return (options?.client ?? client).get<
+    IntBlockCanonicalServiceListResponses,
+    IntBlockCanonicalServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => {
+      return await zIntBlockCanonicalServiceListData.parseAsync(data);
+    },
+    responseValidator: async data => {
+      return await zIntBlockCanonicalServiceListResponse.parseAsync(data);
+    },
+    url: '/api/v1/int_block_canonical',
+    ...options,
+  });
+};
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by slot_start_date_time
+ */
+export const intBlockCanonicalServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<IntBlockCanonicalServiceGetData, ThrowOnError>
+) => {
+  return (options.client ?? client).get<
+    IntBlockCanonicalServiceGetResponses,
+    IntBlockCanonicalServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => {
+      return await zIntBlockCanonicalServiceGetData.parseAsync(data);
+    },
+    responseValidator: async data => {
+      return await zIntBlockCanonicalServiceGetResponse.parseAsync(data);
+    },
+    url: '/api/v1/int_block_canonical/{slot_start_date_time}',
+    ...options,
+  });
+};
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const intBlockMevCanonicalServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<IntBlockMevCanonicalServiceListData, ThrowOnError>
+) => {
+  return (options?.client ?? client).get<
+    IntBlockMevCanonicalServiceListResponses,
+    IntBlockMevCanonicalServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => {
+      return await zIntBlockMevCanonicalServiceListData.parseAsync(data);
+    },
+    responseValidator: async data => {
+      return await zIntBlockMevCanonicalServiceListResponse.parseAsync(data);
+    },
+    url: '/api/v1/int_block_mev_canonical',
+    ...options,
+  });
+};
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by slot_start_date_time
+ */
+export const intBlockMevCanonicalServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<IntBlockMevCanonicalServiceGetData, ThrowOnError>
+) => {
+  return (options.client ?? client).get<
+    IntBlockMevCanonicalServiceGetResponses,
+    IntBlockMevCanonicalServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => {
+      return await zIntBlockMevCanonicalServiceGetData.parseAsync(data);
+    },
+    responseValidator: async data => {
+      return await zIntBlockMevCanonicalServiceGetResponse.parseAsync(data);
+    },
+    url: '/api/v1/int_block_mev_canonical/{slot_start_date_time}',
+    ...options,
+  });
+};
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const intBlockProposerCanonicalServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<IntBlockProposerCanonicalServiceListData, ThrowOnError>
+) => {
+  return (options?.client ?? client).get<
+    IntBlockProposerCanonicalServiceListResponses,
+    IntBlockProposerCanonicalServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => {
+      return await zIntBlockProposerCanonicalServiceListData.parseAsync(data);
+    },
+    responseValidator: async data => {
+      return await zIntBlockProposerCanonicalServiceListResponse.parseAsync(data);
+    },
+    url: '/api/v1/int_block_proposer_canonical',
+    ...options,
+  });
+};
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by slot_start_date_time
+ */
+export const intBlockProposerCanonicalServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<IntBlockProposerCanonicalServiceGetData, ThrowOnError>
+) => {
+  return (options.client ?? client).get<
+    IntBlockProposerCanonicalServiceGetResponses,
+    IntBlockProposerCanonicalServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => {
+      return await zIntBlockProposerCanonicalServiceGetData.parseAsync(data);
+    },
+    responseValidator: async data => {
+      return await zIntBlockProposerCanonicalServiceGetResponse.parseAsync(data);
+    },
+    url: '/api/v1/int_block_proposer_canonical/{slot_start_date_time}',
     ...options,
   });
 };

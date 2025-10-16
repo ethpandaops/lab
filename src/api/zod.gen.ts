@@ -2,6 +2,24 @@
 
 import * as z from 'zod/mini';
 
+export const zAdminCbtIncremental = z.object({
+  database: z.optional(z.string()),
+  interval: z.optional(z.int()),
+  position: z.optional(z.int()),
+  table: z.optional(z.string()),
+  updated_date_time: z.optional(z.coerce.bigint()),
+});
+
+export const zDimNode = z.object({
+  attributes: z.optional(z.record(z.string(), z.string())),
+  groups: z.optional(z.array(z.string())),
+  name: z.optional(z.union([z.string(), z.null()])),
+  source: z.optional(z.string()),
+  tags: z.optional(z.array(z.string())),
+  updated_date_time: z.optional(z.int()),
+  validator_index: z.optional(z.int()),
+});
+
 export const zFctAddressAccessChunked10000 = z.object({
   chunk_start_block_number: z.optional(z.int()),
   first_accessed_accounts: z.optional(z.int()),
@@ -397,6 +415,20 @@ export const zFctPreparedBlock = z.object({
 });
 
 /**
+ * Response for getting a single admin_cbt_incremental record
+ */
+export const zGetAdminCbtIncrementalResponse = z.object({
+  item: z.optional(zAdminCbtIncremental),
+});
+
+/**
+ * Response for getting a single dim_node record
+ */
+export const zGetDimNodeResponse = z.object({
+  item: z.optional(zDimNode),
+});
+
+/**
  * Response for getting a single fct_address_access_chunked_10000 record
  */
 export const zGetFctAddressAccessChunked10000Response = z.object({
@@ -585,11 +617,282 @@ export const zGetFctPreparedBlockResponse = z.object({
   item: z.optional(zFctPreparedBlock),
 });
 
+export const zIntAddressFirstAccess = z.object({
+  address: z.optional(z.string()),
+  block_number: z.optional(z.int()),
+  version: z.optional(z.int()),
+});
+
+/**
+ * Response for getting a single int_address_first_access record
+ */
+export const zGetIntAddressFirstAccessResponse = z.object({
+  item: z.optional(zIntAddressFirstAccess),
+});
+
+export const zIntAddressLastAccess = z.object({
+  address: z.optional(z.string()),
+  block_number: z.optional(z.int()),
+});
+
+/**
+ * Response for getting a single int_address_last_access record
+ */
+export const zGetIntAddressLastAccessResponse = z.object({
+  item: z.optional(zIntAddressLastAccess),
+});
+
+export const zIntAddressStorageSlotFirstAccess = z.object({
+  address: z.optional(z.string()),
+  block_number: z.optional(z.int()),
+  slot_key: z.optional(z.string()),
+  value: z.optional(z.string()),
+  version: z.optional(z.int()),
+});
+
+/**
+ * Response for getting a single int_address_storage_slot_first_access record
+ */
+export const zGetIntAddressStorageSlotFirstAccessResponse = z.object({
+  item: z.optional(zIntAddressStorageSlotFirstAccess),
+});
+
+export const zIntAddressStorageSlotLastAccess = z.object({
+  address: z.optional(z.string()),
+  block_number: z.optional(z.int()),
+  slot_key: z.optional(z.string()),
+  value: z.optional(z.string()),
+});
+
+/**
+ * Response for getting a single int_address_storage_slot_last_access record
+ */
+export const zGetIntAddressStorageSlotLastAccessResponse = z.object({
+  item: z.optional(zIntAddressStorageSlotLastAccess),
+});
+
+export const zIntAttestationAttestedCanonical = z.object({
+  attesting_validator_index: z.optional(z.int()),
+  block_root: z.optional(z.string()),
+  epoch: z.optional(z.int()),
+  epoch_start_date_time: z.optional(z.int()),
+  inclusion_distance: z.optional(z.int()),
+  slot: z.optional(z.int()),
+  slot_start_date_time: z.optional(z.int()),
+  source_epoch: z.optional(z.int()),
+  source_epoch_start_date_time: z.optional(z.int()),
+  source_root: z.optional(z.string()),
+  target_epoch: z.optional(z.int()),
+  target_epoch_start_date_time: z.optional(z.int()),
+  target_root: z.optional(z.string()),
+  updated_date_time: z.optional(z.int()),
+});
+
+/**
+ * Response for getting a single int_attestation_attested_canonical record
+ */
+export const zGetIntAttestationAttestedCanonicalResponse = z.object({
+  item: z.optional(zIntAttestationAttestedCanonical),
+});
+
+export const zIntAttestationAttestedHead = z.object({
+  attesting_validator_index: z.optional(z.int()),
+  block_root: z.optional(z.string()),
+  epoch: z.optional(z.int()),
+  epoch_start_date_time: z.optional(z.int()),
+  propagation_distance: z.optional(z.int()),
+  slot: z.optional(z.int()),
+  slot_start_date_time: z.optional(z.int()),
+  source_epoch: z.optional(z.int()),
+  source_epoch_start_date_time: z.optional(z.int()),
+  source_root: z.optional(z.string()),
+  target_epoch: z.optional(z.int()),
+  target_epoch_start_date_time: z.optional(z.int()),
+  target_root: z.optional(z.string()),
+  updated_date_time: z.optional(z.int()),
+});
+
+/**
+ * Response for getting a single int_attestation_attested_head record
+ */
+export const zGetIntAttestationAttestedHeadResponse = z.object({
+  item: z.optional(zIntAttestationAttestedHead),
+});
+
+export const zIntAttestationFirstSeen = z.object({
+  attesting_validator_committee_index: z.optional(z.string()),
+  attesting_validator_index: z.optional(z.int()),
+  block_root: z.optional(z.string()),
+  classification: z.optional(z.string()),
+  epoch: z.optional(z.int()),
+  epoch_start_date_time: z.optional(z.int()),
+  meta_client_geo_autonomous_system_number: z.optional(z.union([z.int(), z.null()])),
+  meta_client_geo_autonomous_system_organization: z.optional(z.union([z.string(), z.null()])),
+  meta_client_geo_city: z.optional(z.string()),
+  meta_client_geo_continent_code: z.optional(z.string()),
+  meta_client_geo_country: z.optional(z.string()),
+  meta_client_geo_country_code: z.optional(z.string()),
+  meta_client_geo_latitude: z.optional(z.union([z.number(), z.null()])),
+  meta_client_geo_longitude: z.optional(z.union([z.number(), z.null()])),
+  meta_client_implementation: z.optional(z.string()),
+  meta_client_name: z.optional(z.string()),
+  meta_client_version: z.optional(z.string()),
+  meta_consensus_implementation: z.optional(z.string()),
+  meta_consensus_version: z.optional(z.string()),
+  node_id: z.optional(z.string()),
+  seen_slot_start_diff: z.optional(z.int()),
+  slot: z.optional(z.int()),
+  slot_start_date_time: z.optional(z.int()),
+  source: z.optional(z.string()),
+  updated_date_time: z.optional(z.int()),
+  username: z.optional(z.string()),
+});
+
+/**
+ * Response for getting a single int_attestation_first_seen record
+ */
+export const zGetIntAttestationFirstSeenResponse = z.object({
+  item: z.optional(zIntAttestationFirstSeen),
+});
+
+export const zIntBeaconCommitteeHead = z.object({
+  committee_index: z.optional(z.string()),
+  epoch: z.optional(z.int()),
+  epoch_start_date_time: z.optional(z.int()),
+  slot: z.optional(z.int()),
+  slot_start_date_time: z.optional(z.int()),
+  updated_date_time: z.optional(z.int()),
+  validators: z.optional(z.array(z.int())),
+});
+
+/**
+ * Response for getting a single int_beacon_committee_head record
+ */
+export const zGetIntBeaconCommitteeHeadResponse = z.object({
+  item: z.optional(zIntBeaconCommitteeHead),
+});
+
+export const zIntBlockBlobCountCanonical = z.object({
+  blob_count: z.optional(z.int()),
+  block_root: z.optional(z.string()),
+  epoch: z.optional(z.int()),
+  epoch_start_date_time: z.optional(z.int()),
+  slot: z.optional(z.int()),
+  slot_start_date_time: z.optional(z.int()),
+  updated_date_time: z.optional(z.int()),
+});
+
+/**
+ * Response for getting a single int_block_blob_count_canonical record
+ */
+export const zGetIntBlockBlobCountCanonicalResponse = z.object({
+  item: z.optional(zIntBlockBlobCountCanonical),
+});
+
+export const zIntBlockCanonical = z.object({
+  block_root: z.optional(z.string()),
+  block_total_bytes: z.optional(z.union([z.int(), z.null()])),
+  block_total_bytes_compressed: z.optional(z.union([z.int(), z.null()])),
+  block_version: z.optional(z.string()),
+  epoch: z.optional(z.int()),
+  epoch_start_date_time: z.optional(z.int()),
+  eth1_data_block_hash: z.optional(z.string()),
+  eth1_data_deposit_root: z.optional(z.string()),
+  execution_payload_base_fee_per_gas: z.optional(z.union([z.string(), z.null()])),
+  execution_payload_blob_gas_used: z.optional(z.union([z.int(), z.null()])),
+  execution_payload_block_hash: z.optional(z.string()),
+  execution_payload_block_number: z.optional(z.int()),
+  execution_payload_excess_blob_gas: z.optional(z.union([z.int(), z.null()])),
+  execution_payload_fee_recipient: z.optional(z.string()),
+  execution_payload_gas_limit: z.optional(z.union([z.int(), z.null()])),
+  execution_payload_gas_used: z.optional(z.union([z.int(), z.null()])),
+  execution_payload_parent_hash: z.optional(z.string()),
+  execution_payload_state_root: z.optional(z.string()),
+  execution_payload_transactions_count: z.optional(z.union([z.int(), z.null()])),
+  execution_payload_transactions_total_bytes: z.optional(z.union([z.int(), z.null()])),
+  execution_payload_transactions_total_bytes_compressed: z.optional(z.union([z.int(), z.null()])),
+  parent_root: z.optional(z.string()),
+  proposer_index: z.optional(z.int()),
+  slot: z.optional(z.int()),
+  slot_start_date_time: z.optional(z.int()),
+  state_root: z.optional(z.string()),
+  updated_date_time: z.optional(z.int()),
+});
+
+/**
+ * Response for getting a single int_block_canonical record
+ */
+export const zGetIntBlockCanonicalResponse = z.object({
+  item: z.optional(zIntBlockCanonical),
+});
+
+export const zIntBlockMevCanonical = z.object({
+  block_hash: z.optional(z.string()),
+  block_number: z.optional(z.int()),
+  block_root: z.optional(z.string()),
+  builder_pubkey: z.optional(z.string()),
+  earliest_bid_date_time: z.optional(z.union([z.coerce.bigint(), z.null()])),
+  epoch: z.optional(z.int()),
+  epoch_start_date_time: z.optional(z.int()),
+  gas_limit: z.optional(z.int()),
+  gas_used: z.optional(z.int()),
+  parent_hash: z.optional(z.string()),
+  proposer_fee_recipient: z.optional(z.string()),
+  proposer_pubkey: z.optional(z.string()),
+  relay_names: z.optional(z.array(z.string())),
+  slot: z.optional(z.int()),
+  slot_start_date_time: z.optional(z.int()),
+  transaction_count: z.optional(z.int()),
+  updated_date_time: z.optional(z.int()),
+  value: z.optional(z.union([z.string(), z.null()])),
+});
+
+/**
+ * Response for getting a single int_block_mev_canonical record
+ */
+export const zGetIntBlockMevCanonicalResponse = z.object({
+  item: z.optional(zIntBlockMevCanonical),
+});
+
+export const zIntBlockProposerCanonical = z.object({
+  block_root: z.optional(z.union([z.string(), z.null()])),
+  epoch: z.optional(z.int()),
+  epoch_start_date_time: z.optional(z.int()),
+  proposer_pubkey: z.optional(z.string()),
+  proposer_validator_index: z.optional(z.int()),
+  slot: z.optional(z.int()),
+  slot_start_date_time: z.optional(z.int()),
+  updated_date_time: z.optional(z.int()),
+});
+
+/**
+ * Response for getting a single int_block_proposer_canonical record
+ */
+export const zGetIntBlockProposerCanonicalResponse = z.object({
+  item: z.optional(zIntBlockProposerCanonical),
+});
+
 /**
  * Contains an arbitrary serialized message along with a @type that describes the type of the serialized message.
  */
 export const zGoogleProtobufAny = z.object({
   '@type': z.optional(z.string()),
+});
+
+/**
+ * Response for listing admin_cbt_incremental records
+ */
+export const zListAdminCbtIncrementalResponse = z.object({
+  admin_cbt_incremental: z.optional(z.array(zAdminCbtIncremental)),
+  next_page_token: z.optional(z.string()),
+});
+
+/**
+ * Response for listing dim_node records
+ */
+export const zListDimNodeResponse = z.object({
+  dim_node: z.optional(z.array(zDimNode)),
+  next_page_token: z.optional(z.string()),
 });
 
 /**
@@ -813,6 +1116,102 @@ export const zListFctPreparedBlockResponse = z.object({
 });
 
 /**
+ * Response for listing int_address_first_access records
+ */
+export const zListIntAddressFirstAccessResponse = z.object({
+  int_address_first_access: z.optional(z.array(zIntAddressFirstAccess)),
+  next_page_token: z.optional(z.string()),
+});
+
+/**
+ * Response for listing int_address_last_access records
+ */
+export const zListIntAddressLastAccessResponse = z.object({
+  int_address_last_access: z.optional(z.array(zIntAddressLastAccess)),
+  next_page_token: z.optional(z.string()),
+});
+
+/**
+ * Response for listing int_address_storage_slot_first_access records
+ */
+export const zListIntAddressStorageSlotFirstAccessResponse = z.object({
+  int_address_storage_slot_first_access: z.optional(z.array(zIntAddressStorageSlotFirstAccess)),
+  next_page_token: z.optional(z.string()),
+});
+
+/**
+ * Response for listing int_address_storage_slot_last_access records
+ */
+export const zListIntAddressStorageSlotLastAccessResponse = z.object({
+  int_address_storage_slot_last_access: z.optional(z.array(zIntAddressStorageSlotLastAccess)),
+  next_page_token: z.optional(z.string()),
+});
+
+/**
+ * Response for listing int_attestation_attested_canonical records
+ */
+export const zListIntAttestationAttestedCanonicalResponse = z.object({
+  int_attestation_attested_canonical: z.optional(z.array(zIntAttestationAttestedCanonical)),
+  next_page_token: z.optional(z.string()),
+});
+
+/**
+ * Response for listing int_attestation_attested_head records
+ */
+export const zListIntAttestationAttestedHeadResponse = z.object({
+  int_attestation_attested_head: z.optional(z.array(zIntAttestationAttestedHead)),
+  next_page_token: z.optional(z.string()),
+});
+
+/**
+ * Response for listing int_attestation_first_seen records
+ */
+export const zListIntAttestationFirstSeenResponse = z.object({
+  int_attestation_first_seen: z.optional(z.array(zIntAttestationFirstSeen)),
+  next_page_token: z.optional(z.string()),
+});
+
+/**
+ * Response for listing int_beacon_committee_head records
+ */
+export const zListIntBeaconCommitteeHeadResponse = z.object({
+  int_beacon_committee_head: z.optional(z.array(zIntBeaconCommitteeHead)),
+  next_page_token: z.optional(z.string()),
+});
+
+/**
+ * Response for listing int_block_blob_count_canonical records
+ */
+export const zListIntBlockBlobCountCanonicalResponse = z.object({
+  int_block_blob_count_canonical: z.optional(z.array(zIntBlockBlobCountCanonical)),
+  next_page_token: z.optional(z.string()),
+});
+
+/**
+ * Response for listing int_block_canonical records
+ */
+export const zListIntBlockCanonicalResponse = z.object({
+  int_block_canonical: z.optional(z.array(zIntBlockCanonical)),
+  next_page_token: z.optional(z.string()),
+});
+
+/**
+ * Response for listing int_block_mev_canonical records
+ */
+export const zListIntBlockMevCanonicalResponse = z.object({
+  int_block_mev_canonical: z.optional(z.array(zIntBlockMevCanonical)),
+  next_page_token: z.optional(z.string()),
+});
+
+/**
+ * Response for listing int_block_proposer_canonical records
+ */
+export const zListIntBlockProposerCanonicalResponse = z.object({
+  int_block_proposer_canonical: z.optional(z.array(zIntBlockProposerCanonical)),
+  next_page_token: z.optional(z.string()),
+});
+
+/**
  * The `Status` type defines a logical error model that is suitable for different programming environments, including REST APIs and RPC APIs. It is used by [gRPC](https://github.com/grpc). Each `Status` message contains three pieces of data: error code, error message, and error details. You can find out more about this error model and how to work with it in the [API Design Guide](https://cloud.google.com/apis/design/errors).
  */
 export const zStatus = z.object({
@@ -820,6 +1219,166 @@ export const zStatus = z.object({
   details: z.optional(z.array(zGoogleProtobufAny)),
   message: z.optional(z.string()),
 });
+
+export const zAdminCbtIncrementalServiceListData = z.object({
+  body: z.optional(z.never()),
+  path: z.optional(z.never()),
+  query: z.optional(
+    z.object({
+      database_eq: z.optional(z.string()),
+      database_ne: z.optional(z.string()),
+      database_contains: z.optional(z.string()),
+      database_starts_with: z.optional(z.string()),
+      database_ends_with: z.optional(z.string()),
+      database_like: z.optional(z.string()),
+      database_not_like: z.optional(z.string()),
+      database_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      database_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      position_eq: z.optional(z.int()),
+      position_ne: z.optional(z.int()),
+      position_lt: z.optional(z.int()),
+      position_lte: z.optional(z.int()),
+      position_gt: z.optional(z.int()),
+      position_gte: z.optional(z.int()),
+      position_between_min: z.optional(z.int()),
+      position_between_max_value: z.optional(z.int()),
+      position_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      position_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      updated_date_time_eq: z.optional(z.coerce.bigint()),
+      updated_date_time_ne: z.optional(z.coerce.bigint()),
+      updated_date_time_lt: z.optional(z.coerce.bigint()),
+      updated_date_time_lte: z.optional(z.coerce.bigint()),
+      updated_date_time_gt: z.optional(z.coerce.bigint()),
+      updated_date_time_gte: z.optional(z.coerce.bigint()),
+      updated_date_time_between_min: z.optional(z.coerce.bigint()),
+      updated_date_time_between_max_value: z.optional(z.coerce.bigint()),
+      updated_date_time_in_values: z.optional(z.string().check(z.regex(/^-?\d+(,-?\d+)*$/))),
+      updated_date_time_not_in_values: z.optional(z.string().check(z.regex(/^-?\d+(,-?\d+)*$/))),
+      table_eq: z.optional(z.string()),
+      table_ne: z.optional(z.string()),
+      table_contains: z.optional(z.string()),
+      table_starts_with: z.optional(z.string()),
+      table_ends_with: z.optional(z.string()),
+      table_like: z.optional(z.string()),
+      table_not_like: z.optional(z.string()),
+      table_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      table_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      interval_eq: z.optional(z.int()),
+      interval_ne: z.optional(z.int()),
+      interval_lt: z.optional(z.int()),
+      interval_lte: z.optional(z.int()),
+      interval_gt: z.optional(z.int()),
+      interval_gte: z.optional(z.int()),
+      interval_between_min: z.optional(z.int()),
+      interval_between_max_value: z.optional(z.int()),
+      interval_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      interval_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      page_size: z.optional(z.int()),
+      page_token: z.optional(z.string()),
+      order_by: z.optional(z.string()),
+    })
+  ),
+});
+
+/**
+ * OK
+ */
+export const zAdminCbtIncrementalServiceListResponse = zListAdminCbtIncrementalResponse;
+
+export const zAdminCbtIncrementalServiceGetData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    database: z.string(),
+  }),
+  query: z.optional(z.never()),
+});
+
+/**
+ * OK
+ */
+export const zAdminCbtIncrementalServiceGetResponse = zGetAdminCbtIncrementalResponse;
+
+export const zDimNodeServiceListData = z.object({
+  body: z.optional(z.never()),
+  path: z.optional(z.never()),
+  query: z.optional(
+    z.object({
+      validator_index_eq: z.optional(z.int()),
+      validator_index_ne: z.optional(z.int()),
+      validator_index_lt: z.optional(z.int()),
+      validator_index_lte: z.optional(z.int()),
+      validator_index_gt: z.optional(z.int()),
+      validator_index_gte: z.optional(z.int()),
+      validator_index_between_min: z.optional(z.int()),
+      validator_index_between_max_value: z.optional(z.int()),
+      validator_index_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      validator_index_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      updated_date_time_eq: z.optional(z.int()),
+      updated_date_time_ne: z.optional(z.int()),
+      updated_date_time_lt: z.optional(z.int()),
+      updated_date_time_lte: z.optional(z.int()),
+      updated_date_time_gt: z.optional(z.int()),
+      updated_date_time_gte: z.optional(z.int()),
+      updated_date_time_between_min: z.optional(z.int()),
+      updated_date_time_between_max_value: z.optional(z.int()),
+      updated_date_time_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      updated_date_time_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      name_eq: z.optional(z.string()),
+      name_ne: z.optional(z.string()),
+      name_contains: z.optional(z.string()),
+      name_starts_with: z.optional(z.string()),
+      name_ends_with: z.optional(z.string()),
+      name_like: z.optional(z.string()),
+      name_not_like: z.optional(z.string()),
+      name_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      name_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      groups: z.optional(z.array(z.string())),
+      tags: z.optional(z.array(z.string())),
+      attributes_key_value_key: z.optional(z.string()),
+      attributes_key_value_value_filter_eq: z.optional(z.string()),
+      attributes_key_value_value_filter_ne: z.optional(z.string()),
+      attributes_key_value_value_filter_contains: z.optional(z.string()),
+      attributes_key_value_value_filter_starts_with: z.optional(z.string()),
+      attributes_key_value_value_filter_ends_with: z.optional(z.string()),
+      attributes_key_value_value_filter_like: z.optional(z.string()),
+      attributes_key_value_value_filter_not_like: z.optional(z.string()),
+      attributes_key_value_value_filter_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      attributes_key_value_value_filter_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      attributes_has_key: z.optional(z.string()),
+      attributes_not_has_key: z.optional(z.string()),
+      source_eq: z.optional(z.string()),
+      source_ne: z.optional(z.string()),
+      source_contains: z.optional(z.string()),
+      source_starts_with: z.optional(z.string()),
+      source_ends_with: z.optional(z.string()),
+      source_like: z.optional(z.string()),
+      source_not_like: z.optional(z.string()),
+      source_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      source_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      page_size: z.optional(z.int()),
+      page_token: z.optional(z.string()),
+      order_by: z.optional(z.string()),
+    })
+  ),
+});
+
+/**
+ * OK
+ */
+export const zDimNodeServiceListResponse = zListDimNodeResponse;
+
+export const zDimNodeServiceGetData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    validator_index: z.int(),
+  }),
+  query: z.optional(z.never()),
+});
+
+/**
+ * OK
+ */
+export const zDimNodeServiceGetResponse = zGetDimNodeResponse;
 
 export const zFctAddressAccessChunked10000ServiceListData = z.object({
   body: z.optional(z.never()),
@@ -4597,3 +5156,1633 @@ export const zFctPreparedBlockServiceGetData = z.object({
  * OK
  */
 export const zFctPreparedBlockServiceGetResponse = zGetFctPreparedBlockResponse;
+
+export const zIntAddressFirstAccessServiceListData = z.object({
+  body: z.optional(z.never()),
+  path: z.optional(z.never()),
+  query: z.optional(
+    z.object({
+      address_eq: z.optional(z.string()),
+      address_ne: z.optional(z.string()),
+      address_contains: z.optional(z.string()),
+      address_starts_with: z.optional(z.string()),
+      address_ends_with: z.optional(z.string()),
+      address_like: z.optional(z.string()),
+      address_not_like: z.optional(z.string()),
+      address_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      address_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      block_number_eq: z.optional(z.int()),
+      block_number_ne: z.optional(z.int()),
+      block_number_lt: z.optional(z.int()),
+      block_number_lte: z.optional(z.int()),
+      block_number_gt: z.optional(z.int()),
+      block_number_gte: z.optional(z.int()),
+      block_number_between_min: z.optional(z.int()),
+      block_number_between_max_value: z.optional(z.int()),
+      block_number_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      block_number_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      version_eq: z.optional(z.int()),
+      version_ne: z.optional(z.int()),
+      version_lt: z.optional(z.int()),
+      version_lte: z.optional(z.int()),
+      version_gt: z.optional(z.int()),
+      version_gte: z.optional(z.int()),
+      version_between_min: z.optional(z.int()),
+      version_between_max_value: z.optional(z.int()),
+      version_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      version_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      page_size: z.optional(z.int()),
+      page_token: z.optional(z.string()),
+      order_by: z.optional(z.string()),
+    })
+  ),
+});
+
+/**
+ * OK
+ */
+export const zIntAddressFirstAccessServiceListResponse = zListIntAddressFirstAccessResponse;
+
+export const zIntAddressFirstAccessServiceGetData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    address: z.string(),
+  }),
+  query: z.optional(z.never()),
+});
+
+/**
+ * OK
+ */
+export const zIntAddressFirstAccessServiceGetResponse = zGetIntAddressFirstAccessResponse;
+
+export const zIntAddressLastAccessServiceListData = z.object({
+  body: z.optional(z.never()),
+  path: z.optional(z.never()),
+  query: z.optional(
+    z.object({
+      address_eq: z.optional(z.string()),
+      address_ne: z.optional(z.string()),
+      address_contains: z.optional(z.string()),
+      address_starts_with: z.optional(z.string()),
+      address_ends_with: z.optional(z.string()),
+      address_like: z.optional(z.string()),
+      address_not_like: z.optional(z.string()),
+      address_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      address_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      block_number_eq: z.optional(z.int()),
+      block_number_ne: z.optional(z.int()),
+      block_number_lt: z.optional(z.int()),
+      block_number_lte: z.optional(z.int()),
+      block_number_gt: z.optional(z.int()),
+      block_number_gte: z.optional(z.int()),
+      block_number_between_min: z.optional(z.int()),
+      block_number_between_max_value: z.optional(z.int()),
+      block_number_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      block_number_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      page_size: z.optional(z.int()),
+      page_token: z.optional(z.string()),
+      order_by: z.optional(z.string()),
+    })
+  ),
+});
+
+/**
+ * OK
+ */
+export const zIntAddressLastAccessServiceListResponse = zListIntAddressLastAccessResponse;
+
+export const zIntAddressLastAccessServiceGetData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    address: z.string(),
+  }),
+  query: z.optional(z.never()),
+});
+
+/**
+ * OK
+ */
+export const zIntAddressLastAccessServiceGetResponse = zGetIntAddressLastAccessResponse;
+
+export const zIntAddressStorageSlotFirstAccessServiceListData = z.object({
+  body: z.optional(z.never()),
+  path: z.optional(z.never()),
+  query: z.optional(
+    z.object({
+      address_eq: z.optional(z.string()),
+      address_ne: z.optional(z.string()),
+      address_contains: z.optional(z.string()),
+      address_starts_with: z.optional(z.string()),
+      address_ends_with: z.optional(z.string()),
+      address_like: z.optional(z.string()),
+      address_not_like: z.optional(z.string()),
+      address_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      address_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      slot_key_eq: z.optional(z.string()),
+      slot_key_ne: z.optional(z.string()),
+      slot_key_contains: z.optional(z.string()),
+      slot_key_starts_with: z.optional(z.string()),
+      slot_key_ends_with: z.optional(z.string()),
+      slot_key_like: z.optional(z.string()),
+      slot_key_not_like: z.optional(z.string()),
+      slot_key_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      slot_key_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      block_number_eq: z.optional(z.int()),
+      block_number_ne: z.optional(z.int()),
+      block_number_lt: z.optional(z.int()),
+      block_number_lte: z.optional(z.int()),
+      block_number_gt: z.optional(z.int()),
+      block_number_gte: z.optional(z.int()),
+      block_number_between_min: z.optional(z.int()),
+      block_number_between_max_value: z.optional(z.int()),
+      block_number_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      block_number_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      value_eq: z.optional(z.string()),
+      value_ne: z.optional(z.string()),
+      value_contains: z.optional(z.string()),
+      value_starts_with: z.optional(z.string()),
+      value_ends_with: z.optional(z.string()),
+      value_like: z.optional(z.string()),
+      value_not_like: z.optional(z.string()),
+      value_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      value_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      version_eq: z.optional(z.int()),
+      version_ne: z.optional(z.int()),
+      version_lt: z.optional(z.int()),
+      version_lte: z.optional(z.int()),
+      version_gt: z.optional(z.int()),
+      version_gte: z.optional(z.int()),
+      version_between_min: z.optional(z.int()),
+      version_between_max_value: z.optional(z.int()),
+      version_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      version_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      page_size: z.optional(z.int()),
+      page_token: z.optional(z.string()),
+      order_by: z.optional(z.string()),
+    })
+  ),
+});
+
+/**
+ * OK
+ */
+export const zIntAddressStorageSlotFirstAccessServiceListResponse = zListIntAddressStorageSlotFirstAccessResponse;
+
+export const zIntAddressStorageSlotFirstAccessServiceGetData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    address: z.string(),
+  }),
+  query: z.optional(z.never()),
+});
+
+/**
+ * OK
+ */
+export const zIntAddressStorageSlotFirstAccessServiceGetResponse = zGetIntAddressStorageSlotFirstAccessResponse;
+
+export const zIntAddressStorageSlotLastAccessServiceListData = z.object({
+  body: z.optional(z.never()),
+  path: z.optional(z.never()),
+  query: z.optional(
+    z.object({
+      address_eq: z.optional(z.string()),
+      address_ne: z.optional(z.string()),
+      address_contains: z.optional(z.string()),
+      address_starts_with: z.optional(z.string()),
+      address_ends_with: z.optional(z.string()),
+      address_like: z.optional(z.string()),
+      address_not_like: z.optional(z.string()),
+      address_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      address_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      slot_key_eq: z.optional(z.string()),
+      slot_key_ne: z.optional(z.string()),
+      slot_key_contains: z.optional(z.string()),
+      slot_key_starts_with: z.optional(z.string()),
+      slot_key_ends_with: z.optional(z.string()),
+      slot_key_like: z.optional(z.string()),
+      slot_key_not_like: z.optional(z.string()),
+      slot_key_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      slot_key_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      block_number_eq: z.optional(z.int()),
+      block_number_ne: z.optional(z.int()),
+      block_number_lt: z.optional(z.int()),
+      block_number_lte: z.optional(z.int()),
+      block_number_gt: z.optional(z.int()),
+      block_number_gte: z.optional(z.int()),
+      block_number_between_min: z.optional(z.int()),
+      block_number_between_max_value: z.optional(z.int()),
+      block_number_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      block_number_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      value_eq: z.optional(z.string()),
+      value_ne: z.optional(z.string()),
+      value_contains: z.optional(z.string()),
+      value_starts_with: z.optional(z.string()),
+      value_ends_with: z.optional(z.string()),
+      value_like: z.optional(z.string()),
+      value_not_like: z.optional(z.string()),
+      value_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      value_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      page_size: z.optional(z.int()),
+      page_token: z.optional(z.string()),
+      order_by: z.optional(z.string()),
+    })
+  ),
+});
+
+/**
+ * OK
+ */
+export const zIntAddressStorageSlotLastAccessServiceListResponse = zListIntAddressStorageSlotLastAccessResponse;
+
+export const zIntAddressStorageSlotLastAccessServiceGetData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    address: z.string(),
+  }),
+  query: z.optional(z.never()),
+});
+
+/**
+ * OK
+ */
+export const zIntAddressStorageSlotLastAccessServiceGetResponse = zGetIntAddressStorageSlotLastAccessResponse;
+
+export const zIntAttestationAttestedCanonicalServiceListData = z.object({
+  body: z.optional(z.never()),
+  path: z.optional(z.never()),
+  query: z.optional(
+    z.object({
+      slot_start_date_time_eq: z.optional(z.int()),
+      slot_start_date_time_ne: z.optional(z.int()),
+      slot_start_date_time_lt: z.optional(z.int()),
+      slot_start_date_time_lte: z.optional(z.int()),
+      slot_start_date_time_gt: z.optional(z.int()),
+      slot_start_date_time_gte: z.optional(z.int()),
+      slot_start_date_time_between_min: z.optional(z.int()),
+      slot_start_date_time_between_max_value: z.optional(z.int()),
+      slot_start_date_time_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      slot_start_date_time_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      block_root_eq: z.optional(z.string()),
+      block_root_ne: z.optional(z.string()),
+      block_root_contains: z.optional(z.string()),
+      block_root_starts_with: z.optional(z.string()),
+      block_root_ends_with: z.optional(z.string()),
+      block_root_like: z.optional(z.string()),
+      block_root_not_like: z.optional(z.string()),
+      block_root_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      block_root_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      attesting_validator_index_eq: z.optional(z.int()),
+      attesting_validator_index_ne: z.optional(z.int()),
+      attesting_validator_index_lt: z.optional(z.int()),
+      attesting_validator_index_lte: z.optional(z.int()),
+      attesting_validator_index_gt: z.optional(z.int()),
+      attesting_validator_index_gte: z.optional(z.int()),
+      attesting_validator_index_between_min: z.optional(z.int()),
+      attesting_validator_index_between_max_value: z.optional(z.int()),
+      attesting_validator_index_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      attesting_validator_index_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      updated_date_time_eq: z.optional(z.int()),
+      updated_date_time_ne: z.optional(z.int()),
+      updated_date_time_lt: z.optional(z.int()),
+      updated_date_time_lte: z.optional(z.int()),
+      updated_date_time_gt: z.optional(z.int()),
+      updated_date_time_gte: z.optional(z.int()),
+      updated_date_time_between_min: z.optional(z.int()),
+      updated_date_time_between_max_value: z.optional(z.int()),
+      updated_date_time_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      updated_date_time_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      slot_eq: z.optional(z.int()),
+      slot_ne: z.optional(z.int()),
+      slot_lt: z.optional(z.int()),
+      slot_lte: z.optional(z.int()),
+      slot_gt: z.optional(z.int()),
+      slot_gte: z.optional(z.int()),
+      slot_between_min: z.optional(z.int()),
+      slot_between_max_value: z.optional(z.int()),
+      slot_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      slot_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      epoch_eq: z.optional(z.int()),
+      epoch_ne: z.optional(z.int()),
+      epoch_lt: z.optional(z.int()),
+      epoch_lte: z.optional(z.int()),
+      epoch_gt: z.optional(z.int()),
+      epoch_gte: z.optional(z.int()),
+      epoch_between_min: z.optional(z.int()),
+      epoch_between_max_value: z.optional(z.int()),
+      epoch_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      epoch_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      epoch_start_date_time_eq: z.optional(z.int()),
+      epoch_start_date_time_ne: z.optional(z.int()),
+      epoch_start_date_time_lt: z.optional(z.int()),
+      epoch_start_date_time_lte: z.optional(z.int()),
+      epoch_start_date_time_gt: z.optional(z.int()),
+      epoch_start_date_time_gte: z.optional(z.int()),
+      epoch_start_date_time_between_min: z.optional(z.int()),
+      epoch_start_date_time_between_max_value: z.optional(z.int()),
+      epoch_start_date_time_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      epoch_start_date_time_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      source_epoch_eq: z.optional(z.int()),
+      source_epoch_ne: z.optional(z.int()),
+      source_epoch_lt: z.optional(z.int()),
+      source_epoch_lte: z.optional(z.int()),
+      source_epoch_gt: z.optional(z.int()),
+      source_epoch_gte: z.optional(z.int()),
+      source_epoch_between_min: z.optional(z.int()),
+      source_epoch_between_max_value: z.optional(z.int()),
+      source_epoch_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      source_epoch_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      source_epoch_start_date_time_eq: z.optional(z.int()),
+      source_epoch_start_date_time_ne: z.optional(z.int()),
+      source_epoch_start_date_time_lt: z.optional(z.int()),
+      source_epoch_start_date_time_lte: z.optional(z.int()),
+      source_epoch_start_date_time_gt: z.optional(z.int()),
+      source_epoch_start_date_time_gte: z.optional(z.int()),
+      source_epoch_start_date_time_between_min: z.optional(z.int()),
+      source_epoch_start_date_time_between_max_value: z.optional(z.int()),
+      source_epoch_start_date_time_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      source_epoch_start_date_time_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      source_root_eq: z.optional(z.string()),
+      source_root_ne: z.optional(z.string()),
+      source_root_contains: z.optional(z.string()),
+      source_root_starts_with: z.optional(z.string()),
+      source_root_ends_with: z.optional(z.string()),
+      source_root_like: z.optional(z.string()),
+      source_root_not_like: z.optional(z.string()),
+      source_root_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      source_root_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      target_epoch_eq: z.optional(z.int()),
+      target_epoch_ne: z.optional(z.int()),
+      target_epoch_lt: z.optional(z.int()),
+      target_epoch_lte: z.optional(z.int()),
+      target_epoch_gt: z.optional(z.int()),
+      target_epoch_gte: z.optional(z.int()),
+      target_epoch_between_min: z.optional(z.int()),
+      target_epoch_between_max_value: z.optional(z.int()),
+      target_epoch_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      target_epoch_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      target_epoch_start_date_time_eq: z.optional(z.int()),
+      target_epoch_start_date_time_ne: z.optional(z.int()),
+      target_epoch_start_date_time_lt: z.optional(z.int()),
+      target_epoch_start_date_time_lte: z.optional(z.int()),
+      target_epoch_start_date_time_gt: z.optional(z.int()),
+      target_epoch_start_date_time_gte: z.optional(z.int()),
+      target_epoch_start_date_time_between_min: z.optional(z.int()),
+      target_epoch_start_date_time_between_max_value: z.optional(z.int()),
+      target_epoch_start_date_time_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      target_epoch_start_date_time_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      target_root_eq: z.optional(z.string()),
+      target_root_ne: z.optional(z.string()),
+      target_root_contains: z.optional(z.string()),
+      target_root_starts_with: z.optional(z.string()),
+      target_root_ends_with: z.optional(z.string()),
+      target_root_like: z.optional(z.string()),
+      target_root_not_like: z.optional(z.string()),
+      target_root_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      target_root_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      inclusion_distance_eq: z.optional(z.int()),
+      inclusion_distance_ne: z.optional(z.int()),
+      inclusion_distance_lt: z.optional(z.int()),
+      inclusion_distance_lte: z.optional(z.int()),
+      inclusion_distance_gt: z.optional(z.int()),
+      inclusion_distance_gte: z.optional(z.int()),
+      inclusion_distance_between_min: z.optional(z.int()),
+      inclusion_distance_between_max_value: z.optional(z.int()),
+      inclusion_distance_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      inclusion_distance_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      page_size: z.optional(z.int()),
+      page_token: z.optional(z.string()),
+      order_by: z.optional(z.string()),
+    })
+  ),
+});
+
+/**
+ * OK
+ */
+export const zIntAttestationAttestedCanonicalServiceListResponse = zListIntAttestationAttestedCanonicalResponse;
+
+export const zIntAttestationAttestedCanonicalServiceGetData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    slot_start_date_time: z.int(),
+  }),
+  query: z.optional(z.never()),
+});
+
+/**
+ * OK
+ */
+export const zIntAttestationAttestedCanonicalServiceGetResponse = zGetIntAttestationAttestedCanonicalResponse;
+
+export const zIntAttestationAttestedHeadServiceListData = z.object({
+  body: z.optional(z.never()),
+  path: z.optional(z.never()),
+  query: z.optional(
+    z.object({
+      slot_start_date_time_eq: z.optional(z.int()),
+      slot_start_date_time_ne: z.optional(z.int()),
+      slot_start_date_time_lt: z.optional(z.int()),
+      slot_start_date_time_lte: z.optional(z.int()),
+      slot_start_date_time_gt: z.optional(z.int()),
+      slot_start_date_time_gte: z.optional(z.int()),
+      slot_start_date_time_between_min: z.optional(z.int()),
+      slot_start_date_time_between_max_value: z.optional(z.int()),
+      slot_start_date_time_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      slot_start_date_time_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      block_root_eq: z.optional(z.string()),
+      block_root_ne: z.optional(z.string()),
+      block_root_contains: z.optional(z.string()),
+      block_root_starts_with: z.optional(z.string()),
+      block_root_ends_with: z.optional(z.string()),
+      block_root_like: z.optional(z.string()),
+      block_root_not_like: z.optional(z.string()),
+      block_root_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      block_root_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      attesting_validator_index_eq: z.optional(z.int()),
+      attesting_validator_index_ne: z.optional(z.int()),
+      attesting_validator_index_lt: z.optional(z.int()),
+      attesting_validator_index_lte: z.optional(z.int()),
+      attesting_validator_index_gt: z.optional(z.int()),
+      attesting_validator_index_gte: z.optional(z.int()),
+      attesting_validator_index_between_min: z.optional(z.int()),
+      attesting_validator_index_between_max_value: z.optional(z.int()),
+      attesting_validator_index_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      attesting_validator_index_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      updated_date_time_eq: z.optional(z.int()),
+      updated_date_time_ne: z.optional(z.int()),
+      updated_date_time_lt: z.optional(z.int()),
+      updated_date_time_lte: z.optional(z.int()),
+      updated_date_time_gt: z.optional(z.int()),
+      updated_date_time_gte: z.optional(z.int()),
+      updated_date_time_between_min: z.optional(z.int()),
+      updated_date_time_between_max_value: z.optional(z.int()),
+      updated_date_time_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      updated_date_time_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      slot_eq: z.optional(z.int()),
+      slot_ne: z.optional(z.int()),
+      slot_lt: z.optional(z.int()),
+      slot_lte: z.optional(z.int()),
+      slot_gt: z.optional(z.int()),
+      slot_gte: z.optional(z.int()),
+      slot_between_min: z.optional(z.int()),
+      slot_between_max_value: z.optional(z.int()),
+      slot_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      slot_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      epoch_eq: z.optional(z.int()),
+      epoch_ne: z.optional(z.int()),
+      epoch_lt: z.optional(z.int()),
+      epoch_lte: z.optional(z.int()),
+      epoch_gt: z.optional(z.int()),
+      epoch_gte: z.optional(z.int()),
+      epoch_between_min: z.optional(z.int()),
+      epoch_between_max_value: z.optional(z.int()),
+      epoch_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      epoch_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      epoch_start_date_time_eq: z.optional(z.int()),
+      epoch_start_date_time_ne: z.optional(z.int()),
+      epoch_start_date_time_lt: z.optional(z.int()),
+      epoch_start_date_time_lte: z.optional(z.int()),
+      epoch_start_date_time_gt: z.optional(z.int()),
+      epoch_start_date_time_gte: z.optional(z.int()),
+      epoch_start_date_time_between_min: z.optional(z.int()),
+      epoch_start_date_time_between_max_value: z.optional(z.int()),
+      epoch_start_date_time_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      epoch_start_date_time_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      source_epoch_eq: z.optional(z.int()),
+      source_epoch_ne: z.optional(z.int()),
+      source_epoch_lt: z.optional(z.int()),
+      source_epoch_lte: z.optional(z.int()),
+      source_epoch_gt: z.optional(z.int()),
+      source_epoch_gte: z.optional(z.int()),
+      source_epoch_between_min: z.optional(z.int()),
+      source_epoch_between_max_value: z.optional(z.int()),
+      source_epoch_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      source_epoch_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      source_epoch_start_date_time_eq: z.optional(z.int()),
+      source_epoch_start_date_time_ne: z.optional(z.int()),
+      source_epoch_start_date_time_lt: z.optional(z.int()),
+      source_epoch_start_date_time_lte: z.optional(z.int()),
+      source_epoch_start_date_time_gt: z.optional(z.int()),
+      source_epoch_start_date_time_gte: z.optional(z.int()),
+      source_epoch_start_date_time_between_min: z.optional(z.int()),
+      source_epoch_start_date_time_between_max_value: z.optional(z.int()),
+      source_epoch_start_date_time_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      source_epoch_start_date_time_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      source_root_eq: z.optional(z.string()),
+      source_root_ne: z.optional(z.string()),
+      source_root_contains: z.optional(z.string()),
+      source_root_starts_with: z.optional(z.string()),
+      source_root_ends_with: z.optional(z.string()),
+      source_root_like: z.optional(z.string()),
+      source_root_not_like: z.optional(z.string()),
+      source_root_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      source_root_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      target_epoch_eq: z.optional(z.int()),
+      target_epoch_ne: z.optional(z.int()),
+      target_epoch_lt: z.optional(z.int()),
+      target_epoch_lte: z.optional(z.int()),
+      target_epoch_gt: z.optional(z.int()),
+      target_epoch_gte: z.optional(z.int()),
+      target_epoch_between_min: z.optional(z.int()),
+      target_epoch_between_max_value: z.optional(z.int()),
+      target_epoch_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      target_epoch_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      target_epoch_start_date_time_eq: z.optional(z.int()),
+      target_epoch_start_date_time_ne: z.optional(z.int()),
+      target_epoch_start_date_time_lt: z.optional(z.int()),
+      target_epoch_start_date_time_lte: z.optional(z.int()),
+      target_epoch_start_date_time_gt: z.optional(z.int()),
+      target_epoch_start_date_time_gte: z.optional(z.int()),
+      target_epoch_start_date_time_between_min: z.optional(z.int()),
+      target_epoch_start_date_time_between_max_value: z.optional(z.int()),
+      target_epoch_start_date_time_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      target_epoch_start_date_time_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      target_root_eq: z.optional(z.string()),
+      target_root_ne: z.optional(z.string()),
+      target_root_contains: z.optional(z.string()),
+      target_root_starts_with: z.optional(z.string()),
+      target_root_ends_with: z.optional(z.string()),
+      target_root_like: z.optional(z.string()),
+      target_root_not_like: z.optional(z.string()),
+      target_root_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      target_root_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      propagation_distance_eq: z.optional(z.int()),
+      propagation_distance_ne: z.optional(z.int()),
+      propagation_distance_lt: z.optional(z.int()),
+      propagation_distance_lte: z.optional(z.int()),
+      propagation_distance_gt: z.optional(z.int()),
+      propagation_distance_gte: z.optional(z.int()),
+      propagation_distance_between_min: z.optional(z.int()),
+      propagation_distance_between_max_value: z.optional(z.int()),
+      propagation_distance_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      propagation_distance_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      page_size: z.optional(z.int()),
+      page_token: z.optional(z.string()),
+      order_by: z.optional(z.string()),
+    })
+  ),
+});
+
+/**
+ * OK
+ */
+export const zIntAttestationAttestedHeadServiceListResponse = zListIntAttestationAttestedHeadResponse;
+
+export const zIntAttestationAttestedHeadServiceGetData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    slot_start_date_time: z.int(),
+  }),
+  query: z.optional(z.never()),
+});
+
+/**
+ * OK
+ */
+export const zIntAttestationAttestedHeadServiceGetResponse = zGetIntAttestationAttestedHeadResponse;
+
+export const zIntAttestationFirstSeenServiceListData = z.object({
+  body: z.optional(z.never()),
+  path: z.optional(z.never()),
+  query: z.optional(
+    z.object({
+      slot_start_date_time_eq: z.optional(z.int()),
+      slot_start_date_time_ne: z.optional(z.int()),
+      slot_start_date_time_lt: z.optional(z.int()),
+      slot_start_date_time_lte: z.optional(z.int()),
+      slot_start_date_time_gt: z.optional(z.int()),
+      slot_start_date_time_gte: z.optional(z.int()),
+      slot_start_date_time_between_min: z.optional(z.int()),
+      slot_start_date_time_between_max_value: z.optional(z.int()),
+      slot_start_date_time_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      slot_start_date_time_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      attesting_validator_index_eq: z.optional(z.int()),
+      attesting_validator_index_ne: z.optional(z.int()),
+      attesting_validator_index_lt: z.optional(z.int()),
+      attesting_validator_index_lte: z.optional(z.int()),
+      attesting_validator_index_gt: z.optional(z.int()),
+      attesting_validator_index_gte: z.optional(z.int()),
+      attesting_validator_index_between_min: z.optional(z.int()),
+      attesting_validator_index_between_max_value: z.optional(z.int()),
+      attesting_validator_index_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      attesting_validator_index_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      updated_date_time_eq: z.optional(z.int()),
+      updated_date_time_ne: z.optional(z.int()),
+      updated_date_time_lt: z.optional(z.int()),
+      updated_date_time_lte: z.optional(z.int()),
+      updated_date_time_gt: z.optional(z.int()),
+      updated_date_time_gte: z.optional(z.int()),
+      updated_date_time_between_min: z.optional(z.int()),
+      updated_date_time_between_max_value: z.optional(z.int()),
+      updated_date_time_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      updated_date_time_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      source_eq: z.optional(z.string()),
+      source_ne: z.optional(z.string()),
+      source_contains: z.optional(z.string()),
+      source_starts_with: z.optional(z.string()),
+      source_ends_with: z.optional(z.string()),
+      source_like: z.optional(z.string()),
+      source_not_like: z.optional(z.string()),
+      source_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      source_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      slot_eq: z.optional(z.int()),
+      slot_ne: z.optional(z.int()),
+      slot_lt: z.optional(z.int()),
+      slot_lte: z.optional(z.int()),
+      slot_gt: z.optional(z.int()),
+      slot_gte: z.optional(z.int()),
+      slot_between_min: z.optional(z.int()),
+      slot_between_max_value: z.optional(z.int()),
+      slot_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      slot_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      epoch_eq: z.optional(z.int()),
+      epoch_ne: z.optional(z.int()),
+      epoch_lt: z.optional(z.int()),
+      epoch_lte: z.optional(z.int()),
+      epoch_gt: z.optional(z.int()),
+      epoch_gte: z.optional(z.int()),
+      epoch_between_min: z.optional(z.int()),
+      epoch_between_max_value: z.optional(z.int()),
+      epoch_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      epoch_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      epoch_start_date_time_eq: z.optional(z.int()),
+      epoch_start_date_time_ne: z.optional(z.int()),
+      epoch_start_date_time_lt: z.optional(z.int()),
+      epoch_start_date_time_lte: z.optional(z.int()),
+      epoch_start_date_time_gt: z.optional(z.int()),
+      epoch_start_date_time_gte: z.optional(z.int()),
+      epoch_start_date_time_between_min: z.optional(z.int()),
+      epoch_start_date_time_between_max_value: z.optional(z.int()),
+      epoch_start_date_time_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      epoch_start_date_time_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      seen_slot_start_diff_eq: z.optional(z.int()),
+      seen_slot_start_diff_ne: z.optional(z.int()),
+      seen_slot_start_diff_lt: z.optional(z.int()),
+      seen_slot_start_diff_lte: z.optional(z.int()),
+      seen_slot_start_diff_gt: z.optional(z.int()),
+      seen_slot_start_diff_gte: z.optional(z.int()),
+      seen_slot_start_diff_between_min: z.optional(z.int()),
+      seen_slot_start_diff_between_max_value: z.optional(z.int()),
+      seen_slot_start_diff_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      seen_slot_start_diff_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      block_root_eq: z.optional(z.string()),
+      block_root_ne: z.optional(z.string()),
+      block_root_contains: z.optional(z.string()),
+      block_root_starts_with: z.optional(z.string()),
+      block_root_ends_with: z.optional(z.string()),
+      block_root_like: z.optional(z.string()),
+      block_root_not_like: z.optional(z.string()),
+      block_root_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      block_root_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      attesting_validator_committee_index_eq: z.optional(z.string()),
+      attesting_validator_committee_index_ne: z.optional(z.string()),
+      attesting_validator_committee_index_contains: z.optional(z.string()),
+      attesting_validator_committee_index_starts_with: z.optional(z.string()),
+      attesting_validator_committee_index_ends_with: z.optional(z.string()),
+      attesting_validator_committee_index_like: z.optional(z.string()),
+      attesting_validator_committee_index_not_like: z.optional(z.string()),
+      attesting_validator_committee_index_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      attesting_validator_committee_index_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      username_eq: z.optional(z.string()),
+      username_ne: z.optional(z.string()),
+      username_contains: z.optional(z.string()),
+      username_starts_with: z.optional(z.string()),
+      username_ends_with: z.optional(z.string()),
+      username_like: z.optional(z.string()),
+      username_not_like: z.optional(z.string()),
+      username_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      username_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      node_id_eq: z.optional(z.string()),
+      node_id_ne: z.optional(z.string()),
+      node_id_contains: z.optional(z.string()),
+      node_id_starts_with: z.optional(z.string()),
+      node_id_ends_with: z.optional(z.string()),
+      node_id_like: z.optional(z.string()),
+      node_id_not_like: z.optional(z.string()),
+      node_id_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      node_id_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      classification_eq: z.optional(z.string()),
+      classification_ne: z.optional(z.string()),
+      classification_contains: z.optional(z.string()),
+      classification_starts_with: z.optional(z.string()),
+      classification_ends_with: z.optional(z.string()),
+      classification_like: z.optional(z.string()),
+      classification_not_like: z.optional(z.string()),
+      classification_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      classification_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      meta_client_name_eq: z.optional(z.string()),
+      meta_client_name_ne: z.optional(z.string()),
+      meta_client_name_contains: z.optional(z.string()),
+      meta_client_name_starts_with: z.optional(z.string()),
+      meta_client_name_ends_with: z.optional(z.string()),
+      meta_client_name_like: z.optional(z.string()),
+      meta_client_name_not_like: z.optional(z.string()),
+      meta_client_name_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      meta_client_name_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      meta_client_version_eq: z.optional(z.string()),
+      meta_client_version_ne: z.optional(z.string()),
+      meta_client_version_contains: z.optional(z.string()),
+      meta_client_version_starts_with: z.optional(z.string()),
+      meta_client_version_ends_with: z.optional(z.string()),
+      meta_client_version_like: z.optional(z.string()),
+      meta_client_version_not_like: z.optional(z.string()),
+      meta_client_version_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      meta_client_version_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      meta_client_implementation_eq: z.optional(z.string()),
+      meta_client_implementation_ne: z.optional(z.string()),
+      meta_client_implementation_contains: z.optional(z.string()),
+      meta_client_implementation_starts_with: z.optional(z.string()),
+      meta_client_implementation_ends_with: z.optional(z.string()),
+      meta_client_implementation_like: z.optional(z.string()),
+      meta_client_implementation_not_like: z.optional(z.string()),
+      meta_client_implementation_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      meta_client_implementation_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      meta_client_geo_city_eq: z.optional(z.string()),
+      meta_client_geo_city_ne: z.optional(z.string()),
+      meta_client_geo_city_contains: z.optional(z.string()),
+      meta_client_geo_city_starts_with: z.optional(z.string()),
+      meta_client_geo_city_ends_with: z.optional(z.string()),
+      meta_client_geo_city_like: z.optional(z.string()),
+      meta_client_geo_city_not_like: z.optional(z.string()),
+      meta_client_geo_city_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      meta_client_geo_city_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      meta_client_geo_country_eq: z.optional(z.string()),
+      meta_client_geo_country_ne: z.optional(z.string()),
+      meta_client_geo_country_contains: z.optional(z.string()),
+      meta_client_geo_country_starts_with: z.optional(z.string()),
+      meta_client_geo_country_ends_with: z.optional(z.string()),
+      meta_client_geo_country_like: z.optional(z.string()),
+      meta_client_geo_country_not_like: z.optional(z.string()),
+      meta_client_geo_country_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      meta_client_geo_country_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      meta_client_geo_country_code_eq: z.optional(z.string()),
+      meta_client_geo_country_code_ne: z.optional(z.string()),
+      meta_client_geo_country_code_contains: z.optional(z.string()),
+      meta_client_geo_country_code_starts_with: z.optional(z.string()),
+      meta_client_geo_country_code_ends_with: z.optional(z.string()),
+      meta_client_geo_country_code_like: z.optional(z.string()),
+      meta_client_geo_country_code_not_like: z.optional(z.string()),
+      meta_client_geo_country_code_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      meta_client_geo_country_code_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      meta_client_geo_continent_code_eq: z.optional(z.string()),
+      meta_client_geo_continent_code_ne: z.optional(z.string()),
+      meta_client_geo_continent_code_contains: z.optional(z.string()),
+      meta_client_geo_continent_code_starts_with: z.optional(z.string()),
+      meta_client_geo_continent_code_ends_with: z.optional(z.string()),
+      meta_client_geo_continent_code_like: z.optional(z.string()),
+      meta_client_geo_continent_code_not_like: z.optional(z.string()),
+      meta_client_geo_continent_code_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      meta_client_geo_continent_code_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      meta_client_geo_longitude_value: z.optional(z.number()),
+      meta_client_geo_latitude_value: z.optional(z.number()),
+      meta_client_geo_autonomous_system_number_eq: z.optional(z.int()),
+      meta_client_geo_autonomous_system_number_ne: z.optional(z.int()),
+      meta_client_geo_autonomous_system_number_lt: z.optional(z.int()),
+      meta_client_geo_autonomous_system_number_lte: z.optional(z.int()),
+      meta_client_geo_autonomous_system_number_gt: z.optional(z.int()),
+      meta_client_geo_autonomous_system_number_gte: z.optional(z.int()),
+      meta_client_geo_autonomous_system_number_between_min: z.optional(z.int()),
+      meta_client_geo_autonomous_system_number_between_max_value: z.optional(z.int()),
+      meta_client_geo_autonomous_system_number_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      meta_client_geo_autonomous_system_number_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      meta_client_geo_autonomous_system_organization_eq: z.optional(z.string()),
+      meta_client_geo_autonomous_system_organization_ne: z.optional(z.string()),
+      meta_client_geo_autonomous_system_organization_contains: z.optional(z.string()),
+      meta_client_geo_autonomous_system_organization_starts_with: z.optional(z.string()),
+      meta_client_geo_autonomous_system_organization_ends_with: z.optional(z.string()),
+      meta_client_geo_autonomous_system_organization_like: z.optional(z.string()),
+      meta_client_geo_autonomous_system_organization_not_like: z.optional(z.string()),
+      meta_client_geo_autonomous_system_organization_in_values: z.optional(
+        z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))
+      ),
+      meta_client_geo_autonomous_system_organization_not_in_values: z.optional(
+        z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))
+      ),
+      meta_consensus_version_eq: z.optional(z.string()),
+      meta_consensus_version_ne: z.optional(z.string()),
+      meta_consensus_version_contains: z.optional(z.string()),
+      meta_consensus_version_starts_with: z.optional(z.string()),
+      meta_consensus_version_ends_with: z.optional(z.string()),
+      meta_consensus_version_like: z.optional(z.string()),
+      meta_consensus_version_not_like: z.optional(z.string()),
+      meta_consensus_version_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      meta_consensus_version_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      meta_consensus_implementation_eq: z.optional(z.string()),
+      meta_consensus_implementation_ne: z.optional(z.string()),
+      meta_consensus_implementation_contains: z.optional(z.string()),
+      meta_consensus_implementation_starts_with: z.optional(z.string()),
+      meta_consensus_implementation_ends_with: z.optional(z.string()),
+      meta_consensus_implementation_like: z.optional(z.string()),
+      meta_consensus_implementation_not_like: z.optional(z.string()),
+      meta_consensus_implementation_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      meta_consensus_implementation_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      page_size: z.optional(z.int()),
+      page_token: z.optional(z.string()),
+      order_by: z.optional(z.string()),
+    })
+  ),
+});
+
+/**
+ * OK
+ */
+export const zIntAttestationFirstSeenServiceListResponse = zListIntAttestationFirstSeenResponse;
+
+export const zIntAttestationFirstSeenServiceGetData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    slot_start_date_time: z.int(),
+  }),
+  query: z.optional(z.never()),
+});
+
+/**
+ * OK
+ */
+export const zIntAttestationFirstSeenServiceGetResponse = zGetIntAttestationFirstSeenResponse;
+
+export const zIntBeaconCommitteeHeadServiceListData = z.object({
+  body: z.optional(z.never()),
+  path: z.optional(z.never()),
+  query: z.optional(
+    z.object({
+      slot_start_date_time_eq: z.optional(z.int()),
+      slot_start_date_time_ne: z.optional(z.int()),
+      slot_start_date_time_lt: z.optional(z.int()),
+      slot_start_date_time_lte: z.optional(z.int()),
+      slot_start_date_time_gt: z.optional(z.int()),
+      slot_start_date_time_gte: z.optional(z.int()),
+      slot_start_date_time_between_min: z.optional(z.int()),
+      slot_start_date_time_between_max_value: z.optional(z.int()),
+      slot_start_date_time_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      slot_start_date_time_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      committee_index_eq: z.optional(z.string()),
+      committee_index_ne: z.optional(z.string()),
+      committee_index_contains: z.optional(z.string()),
+      committee_index_starts_with: z.optional(z.string()),
+      committee_index_ends_with: z.optional(z.string()),
+      committee_index_like: z.optional(z.string()),
+      committee_index_not_like: z.optional(z.string()),
+      committee_index_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      committee_index_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      updated_date_time_eq: z.optional(z.int()),
+      updated_date_time_ne: z.optional(z.int()),
+      updated_date_time_lt: z.optional(z.int()),
+      updated_date_time_lte: z.optional(z.int()),
+      updated_date_time_gt: z.optional(z.int()),
+      updated_date_time_gte: z.optional(z.int()),
+      updated_date_time_between_min: z.optional(z.int()),
+      updated_date_time_between_max_value: z.optional(z.int()),
+      updated_date_time_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      updated_date_time_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      slot_eq: z.optional(z.int()),
+      slot_ne: z.optional(z.int()),
+      slot_lt: z.optional(z.int()),
+      slot_lte: z.optional(z.int()),
+      slot_gt: z.optional(z.int()),
+      slot_gte: z.optional(z.int()),
+      slot_between_min: z.optional(z.int()),
+      slot_between_max_value: z.optional(z.int()),
+      slot_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      slot_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      epoch_eq: z.optional(z.int()),
+      epoch_ne: z.optional(z.int()),
+      epoch_lt: z.optional(z.int()),
+      epoch_lte: z.optional(z.int()),
+      epoch_gt: z.optional(z.int()),
+      epoch_gte: z.optional(z.int()),
+      epoch_between_min: z.optional(z.int()),
+      epoch_between_max_value: z.optional(z.int()),
+      epoch_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      epoch_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      epoch_start_date_time_eq: z.optional(z.int()),
+      epoch_start_date_time_ne: z.optional(z.int()),
+      epoch_start_date_time_lt: z.optional(z.int()),
+      epoch_start_date_time_lte: z.optional(z.int()),
+      epoch_start_date_time_gt: z.optional(z.int()),
+      epoch_start_date_time_gte: z.optional(z.int()),
+      epoch_start_date_time_between_min: z.optional(z.int()),
+      epoch_start_date_time_between_max_value: z.optional(z.int()),
+      epoch_start_date_time_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      epoch_start_date_time_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      validators: z.optional(z.array(z.int())),
+      page_size: z.optional(z.int()),
+      page_token: z.optional(z.string()),
+      order_by: z.optional(z.string()),
+    })
+  ),
+});
+
+/**
+ * OK
+ */
+export const zIntBeaconCommitteeHeadServiceListResponse = zListIntBeaconCommitteeHeadResponse;
+
+export const zIntBeaconCommitteeHeadServiceGetData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    slot_start_date_time: z.int(),
+  }),
+  query: z.optional(z.never()),
+});
+
+/**
+ * OK
+ */
+export const zIntBeaconCommitteeHeadServiceGetResponse = zGetIntBeaconCommitteeHeadResponse;
+
+export const zIntBlockBlobCountCanonicalServiceListData = z.object({
+  body: z.optional(z.never()),
+  path: z.optional(z.never()),
+  query: z.optional(
+    z.object({
+      slot_start_date_time_eq: z.optional(z.int()),
+      slot_start_date_time_ne: z.optional(z.int()),
+      slot_start_date_time_lt: z.optional(z.int()),
+      slot_start_date_time_lte: z.optional(z.int()),
+      slot_start_date_time_gt: z.optional(z.int()),
+      slot_start_date_time_gte: z.optional(z.int()),
+      slot_start_date_time_between_min: z.optional(z.int()),
+      slot_start_date_time_between_max_value: z.optional(z.int()),
+      slot_start_date_time_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      slot_start_date_time_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      block_root_eq: z.optional(z.string()),
+      block_root_ne: z.optional(z.string()),
+      block_root_contains: z.optional(z.string()),
+      block_root_starts_with: z.optional(z.string()),
+      block_root_ends_with: z.optional(z.string()),
+      block_root_like: z.optional(z.string()),
+      block_root_not_like: z.optional(z.string()),
+      block_root_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      block_root_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      updated_date_time_eq: z.optional(z.int()),
+      updated_date_time_ne: z.optional(z.int()),
+      updated_date_time_lt: z.optional(z.int()),
+      updated_date_time_lte: z.optional(z.int()),
+      updated_date_time_gt: z.optional(z.int()),
+      updated_date_time_gte: z.optional(z.int()),
+      updated_date_time_between_min: z.optional(z.int()),
+      updated_date_time_between_max_value: z.optional(z.int()),
+      updated_date_time_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      updated_date_time_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      slot_eq: z.optional(z.int()),
+      slot_ne: z.optional(z.int()),
+      slot_lt: z.optional(z.int()),
+      slot_lte: z.optional(z.int()),
+      slot_gt: z.optional(z.int()),
+      slot_gte: z.optional(z.int()),
+      slot_between_min: z.optional(z.int()),
+      slot_between_max_value: z.optional(z.int()),
+      slot_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      slot_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      epoch_eq: z.optional(z.int()),
+      epoch_ne: z.optional(z.int()),
+      epoch_lt: z.optional(z.int()),
+      epoch_lte: z.optional(z.int()),
+      epoch_gt: z.optional(z.int()),
+      epoch_gte: z.optional(z.int()),
+      epoch_between_min: z.optional(z.int()),
+      epoch_between_max_value: z.optional(z.int()),
+      epoch_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      epoch_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      epoch_start_date_time_eq: z.optional(z.int()),
+      epoch_start_date_time_ne: z.optional(z.int()),
+      epoch_start_date_time_lt: z.optional(z.int()),
+      epoch_start_date_time_lte: z.optional(z.int()),
+      epoch_start_date_time_gt: z.optional(z.int()),
+      epoch_start_date_time_gte: z.optional(z.int()),
+      epoch_start_date_time_between_min: z.optional(z.int()),
+      epoch_start_date_time_between_max_value: z.optional(z.int()),
+      epoch_start_date_time_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      epoch_start_date_time_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      blob_count_eq: z.optional(z.int()),
+      blob_count_ne: z.optional(z.int()),
+      blob_count_lt: z.optional(z.int()),
+      blob_count_lte: z.optional(z.int()),
+      blob_count_gt: z.optional(z.int()),
+      blob_count_gte: z.optional(z.int()),
+      blob_count_between_min: z.optional(z.int()),
+      blob_count_between_max_value: z.optional(z.int()),
+      blob_count_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      blob_count_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      page_size: z.optional(z.int()),
+      page_token: z.optional(z.string()),
+      order_by: z.optional(z.string()),
+    })
+  ),
+});
+
+/**
+ * OK
+ */
+export const zIntBlockBlobCountCanonicalServiceListResponse = zListIntBlockBlobCountCanonicalResponse;
+
+export const zIntBlockBlobCountCanonicalServiceGetData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    slot_start_date_time: z.int(),
+  }),
+  query: z.optional(z.never()),
+});
+
+/**
+ * OK
+ */
+export const zIntBlockBlobCountCanonicalServiceGetResponse = zGetIntBlockBlobCountCanonicalResponse;
+
+export const zIntBlockCanonicalServiceListData = z.object({
+  body: z.optional(z.never()),
+  path: z.optional(z.never()),
+  query: z.optional(
+    z.object({
+      slot_start_date_time_eq: z.optional(z.int()),
+      slot_start_date_time_ne: z.optional(z.int()),
+      slot_start_date_time_lt: z.optional(z.int()),
+      slot_start_date_time_lte: z.optional(z.int()),
+      slot_start_date_time_gt: z.optional(z.int()),
+      slot_start_date_time_gte: z.optional(z.int()),
+      slot_start_date_time_between_min: z.optional(z.int()),
+      slot_start_date_time_between_max_value: z.optional(z.int()),
+      slot_start_date_time_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      slot_start_date_time_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      block_root_eq: z.optional(z.string()),
+      block_root_ne: z.optional(z.string()),
+      block_root_contains: z.optional(z.string()),
+      block_root_starts_with: z.optional(z.string()),
+      block_root_ends_with: z.optional(z.string()),
+      block_root_like: z.optional(z.string()),
+      block_root_not_like: z.optional(z.string()),
+      block_root_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      block_root_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      updated_date_time_eq: z.optional(z.int()),
+      updated_date_time_ne: z.optional(z.int()),
+      updated_date_time_lt: z.optional(z.int()),
+      updated_date_time_lte: z.optional(z.int()),
+      updated_date_time_gt: z.optional(z.int()),
+      updated_date_time_gte: z.optional(z.int()),
+      updated_date_time_between_min: z.optional(z.int()),
+      updated_date_time_between_max_value: z.optional(z.int()),
+      updated_date_time_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      updated_date_time_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      slot_eq: z.optional(z.int()),
+      slot_ne: z.optional(z.int()),
+      slot_lt: z.optional(z.int()),
+      slot_lte: z.optional(z.int()),
+      slot_gt: z.optional(z.int()),
+      slot_gte: z.optional(z.int()),
+      slot_between_min: z.optional(z.int()),
+      slot_between_max_value: z.optional(z.int()),
+      slot_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      slot_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      epoch_eq: z.optional(z.int()),
+      epoch_ne: z.optional(z.int()),
+      epoch_lt: z.optional(z.int()),
+      epoch_lte: z.optional(z.int()),
+      epoch_gt: z.optional(z.int()),
+      epoch_gte: z.optional(z.int()),
+      epoch_between_min: z.optional(z.int()),
+      epoch_between_max_value: z.optional(z.int()),
+      epoch_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      epoch_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      epoch_start_date_time_eq: z.optional(z.int()),
+      epoch_start_date_time_ne: z.optional(z.int()),
+      epoch_start_date_time_lt: z.optional(z.int()),
+      epoch_start_date_time_lte: z.optional(z.int()),
+      epoch_start_date_time_gt: z.optional(z.int()),
+      epoch_start_date_time_gte: z.optional(z.int()),
+      epoch_start_date_time_between_min: z.optional(z.int()),
+      epoch_start_date_time_between_max_value: z.optional(z.int()),
+      epoch_start_date_time_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      epoch_start_date_time_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      block_version_eq: z.optional(z.string()),
+      block_version_ne: z.optional(z.string()),
+      block_version_contains: z.optional(z.string()),
+      block_version_starts_with: z.optional(z.string()),
+      block_version_ends_with: z.optional(z.string()),
+      block_version_like: z.optional(z.string()),
+      block_version_not_like: z.optional(z.string()),
+      block_version_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      block_version_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      block_total_bytes_eq: z.optional(z.int()),
+      block_total_bytes_ne: z.optional(z.int()),
+      block_total_bytes_lt: z.optional(z.int()),
+      block_total_bytes_lte: z.optional(z.int()),
+      block_total_bytes_gt: z.optional(z.int()),
+      block_total_bytes_gte: z.optional(z.int()),
+      block_total_bytes_between_min: z.optional(z.int()),
+      block_total_bytes_between_max_value: z.optional(z.int()),
+      block_total_bytes_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      block_total_bytes_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      block_total_bytes_compressed_eq: z.optional(z.int()),
+      block_total_bytes_compressed_ne: z.optional(z.int()),
+      block_total_bytes_compressed_lt: z.optional(z.int()),
+      block_total_bytes_compressed_lte: z.optional(z.int()),
+      block_total_bytes_compressed_gt: z.optional(z.int()),
+      block_total_bytes_compressed_gte: z.optional(z.int()),
+      block_total_bytes_compressed_between_min: z.optional(z.int()),
+      block_total_bytes_compressed_between_max_value: z.optional(z.int()),
+      block_total_bytes_compressed_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      block_total_bytes_compressed_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      parent_root_eq: z.optional(z.string()),
+      parent_root_ne: z.optional(z.string()),
+      parent_root_contains: z.optional(z.string()),
+      parent_root_starts_with: z.optional(z.string()),
+      parent_root_ends_with: z.optional(z.string()),
+      parent_root_like: z.optional(z.string()),
+      parent_root_not_like: z.optional(z.string()),
+      parent_root_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      parent_root_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      state_root_eq: z.optional(z.string()),
+      state_root_ne: z.optional(z.string()),
+      state_root_contains: z.optional(z.string()),
+      state_root_starts_with: z.optional(z.string()),
+      state_root_ends_with: z.optional(z.string()),
+      state_root_like: z.optional(z.string()),
+      state_root_not_like: z.optional(z.string()),
+      state_root_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      state_root_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      proposer_index_eq: z.optional(z.int()),
+      proposer_index_ne: z.optional(z.int()),
+      proposer_index_lt: z.optional(z.int()),
+      proposer_index_lte: z.optional(z.int()),
+      proposer_index_gt: z.optional(z.int()),
+      proposer_index_gte: z.optional(z.int()),
+      proposer_index_between_min: z.optional(z.int()),
+      proposer_index_between_max_value: z.optional(z.int()),
+      proposer_index_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      proposer_index_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      eth1_data_block_hash_eq: z.optional(z.string()),
+      eth1_data_block_hash_ne: z.optional(z.string()),
+      eth1_data_block_hash_contains: z.optional(z.string()),
+      eth1_data_block_hash_starts_with: z.optional(z.string()),
+      eth1_data_block_hash_ends_with: z.optional(z.string()),
+      eth1_data_block_hash_like: z.optional(z.string()),
+      eth1_data_block_hash_not_like: z.optional(z.string()),
+      eth1_data_block_hash_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      eth1_data_block_hash_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      eth1_data_deposit_root_eq: z.optional(z.string()),
+      eth1_data_deposit_root_ne: z.optional(z.string()),
+      eth1_data_deposit_root_contains: z.optional(z.string()),
+      eth1_data_deposit_root_starts_with: z.optional(z.string()),
+      eth1_data_deposit_root_ends_with: z.optional(z.string()),
+      eth1_data_deposit_root_like: z.optional(z.string()),
+      eth1_data_deposit_root_not_like: z.optional(z.string()),
+      eth1_data_deposit_root_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      eth1_data_deposit_root_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      execution_payload_block_hash_eq: z.optional(z.string()),
+      execution_payload_block_hash_ne: z.optional(z.string()),
+      execution_payload_block_hash_contains: z.optional(z.string()),
+      execution_payload_block_hash_starts_with: z.optional(z.string()),
+      execution_payload_block_hash_ends_with: z.optional(z.string()),
+      execution_payload_block_hash_like: z.optional(z.string()),
+      execution_payload_block_hash_not_like: z.optional(z.string()),
+      execution_payload_block_hash_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      execution_payload_block_hash_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      execution_payload_block_number_eq: z.optional(z.int()),
+      execution_payload_block_number_ne: z.optional(z.int()),
+      execution_payload_block_number_lt: z.optional(z.int()),
+      execution_payload_block_number_lte: z.optional(z.int()),
+      execution_payload_block_number_gt: z.optional(z.int()),
+      execution_payload_block_number_gte: z.optional(z.int()),
+      execution_payload_block_number_between_min: z.optional(z.int()),
+      execution_payload_block_number_between_max_value: z.optional(z.int()),
+      execution_payload_block_number_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      execution_payload_block_number_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      execution_payload_fee_recipient_eq: z.optional(z.string()),
+      execution_payload_fee_recipient_ne: z.optional(z.string()),
+      execution_payload_fee_recipient_contains: z.optional(z.string()),
+      execution_payload_fee_recipient_starts_with: z.optional(z.string()),
+      execution_payload_fee_recipient_ends_with: z.optional(z.string()),
+      execution_payload_fee_recipient_like: z.optional(z.string()),
+      execution_payload_fee_recipient_not_like: z.optional(z.string()),
+      execution_payload_fee_recipient_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      execution_payload_fee_recipient_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      execution_payload_base_fee_per_gas_eq: z.optional(z.string()),
+      execution_payload_base_fee_per_gas_ne: z.optional(z.string()),
+      execution_payload_base_fee_per_gas_contains: z.optional(z.string()),
+      execution_payload_base_fee_per_gas_starts_with: z.optional(z.string()),
+      execution_payload_base_fee_per_gas_ends_with: z.optional(z.string()),
+      execution_payload_base_fee_per_gas_like: z.optional(z.string()),
+      execution_payload_base_fee_per_gas_not_like: z.optional(z.string()),
+      execution_payload_base_fee_per_gas_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      execution_payload_base_fee_per_gas_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      execution_payload_blob_gas_used_eq: z.optional(z.int()),
+      execution_payload_blob_gas_used_ne: z.optional(z.int()),
+      execution_payload_blob_gas_used_lt: z.optional(z.int()),
+      execution_payload_blob_gas_used_lte: z.optional(z.int()),
+      execution_payload_blob_gas_used_gt: z.optional(z.int()),
+      execution_payload_blob_gas_used_gte: z.optional(z.int()),
+      execution_payload_blob_gas_used_between_min: z.optional(z.int()),
+      execution_payload_blob_gas_used_between_max_value: z.optional(z.int()),
+      execution_payload_blob_gas_used_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      execution_payload_blob_gas_used_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      execution_payload_excess_blob_gas_eq: z.optional(z.int()),
+      execution_payload_excess_blob_gas_ne: z.optional(z.int()),
+      execution_payload_excess_blob_gas_lt: z.optional(z.int()),
+      execution_payload_excess_blob_gas_lte: z.optional(z.int()),
+      execution_payload_excess_blob_gas_gt: z.optional(z.int()),
+      execution_payload_excess_blob_gas_gte: z.optional(z.int()),
+      execution_payload_excess_blob_gas_between_min: z.optional(z.int()),
+      execution_payload_excess_blob_gas_between_max_value: z.optional(z.int()),
+      execution_payload_excess_blob_gas_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      execution_payload_excess_blob_gas_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      execution_payload_gas_limit_eq: z.optional(z.int()),
+      execution_payload_gas_limit_ne: z.optional(z.int()),
+      execution_payload_gas_limit_lt: z.optional(z.int()),
+      execution_payload_gas_limit_lte: z.optional(z.int()),
+      execution_payload_gas_limit_gt: z.optional(z.int()),
+      execution_payload_gas_limit_gte: z.optional(z.int()),
+      execution_payload_gas_limit_between_min: z.optional(z.int()),
+      execution_payload_gas_limit_between_max_value: z.optional(z.int()),
+      execution_payload_gas_limit_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      execution_payload_gas_limit_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      execution_payload_gas_used_eq: z.optional(z.int()),
+      execution_payload_gas_used_ne: z.optional(z.int()),
+      execution_payload_gas_used_lt: z.optional(z.int()),
+      execution_payload_gas_used_lte: z.optional(z.int()),
+      execution_payload_gas_used_gt: z.optional(z.int()),
+      execution_payload_gas_used_gte: z.optional(z.int()),
+      execution_payload_gas_used_between_min: z.optional(z.int()),
+      execution_payload_gas_used_between_max_value: z.optional(z.int()),
+      execution_payload_gas_used_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      execution_payload_gas_used_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      execution_payload_state_root_eq: z.optional(z.string()),
+      execution_payload_state_root_ne: z.optional(z.string()),
+      execution_payload_state_root_contains: z.optional(z.string()),
+      execution_payload_state_root_starts_with: z.optional(z.string()),
+      execution_payload_state_root_ends_with: z.optional(z.string()),
+      execution_payload_state_root_like: z.optional(z.string()),
+      execution_payload_state_root_not_like: z.optional(z.string()),
+      execution_payload_state_root_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      execution_payload_state_root_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      execution_payload_parent_hash_eq: z.optional(z.string()),
+      execution_payload_parent_hash_ne: z.optional(z.string()),
+      execution_payload_parent_hash_contains: z.optional(z.string()),
+      execution_payload_parent_hash_starts_with: z.optional(z.string()),
+      execution_payload_parent_hash_ends_with: z.optional(z.string()),
+      execution_payload_parent_hash_like: z.optional(z.string()),
+      execution_payload_parent_hash_not_like: z.optional(z.string()),
+      execution_payload_parent_hash_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      execution_payload_parent_hash_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      execution_payload_transactions_count_eq: z.optional(z.int()),
+      execution_payload_transactions_count_ne: z.optional(z.int()),
+      execution_payload_transactions_count_lt: z.optional(z.int()),
+      execution_payload_transactions_count_lte: z.optional(z.int()),
+      execution_payload_transactions_count_gt: z.optional(z.int()),
+      execution_payload_transactions_count_gte: z.optional(z.int()),
+      execution_payload_transactions_count_between_min: z.optional(z.int()),
+      execution_payload_transactions_count_between_max_value: z.optional(z.int()),
+      execution_payload_transactions_count_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      execution_payload_transactions_count_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      execution_payload_transactions_total_bytes_eq: z.optional(z.int()),
+      execution_payload_transactions_total_bytes_ne: z.optional(z.int()),
+      execution_payload_transactions_total_bytes_lt: z.optional(z.int()),
+      execution_payload_transactions_total_bytes_lte: z.optional(z.int()),
+      execution_payload_transactions_total_bytes_gt: z.optional(z.int()),
+      execution_payload_transactions_total_bytes_gte: z.optional(z.int()),
+      execution_payload_transactions_total_bytes_between_min: z.optional(z.int()),
+      execution_payload_transactions_total_bytes_between_max_value: z.optional(z.int()),
+      execution_payload_transactions_total_bytes_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      execution_payload_transactions_total_bytes_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      execution_payload_transactions_total_bytes_compressed_eq: z.optional(z.int()),
+      execution_payload_transactions_total_bytes_compressed_ne: z.optional(z.int()),
+      execution_payload_transactions_total_bytes_compressed_lt: z.optional(z.int()),
+      execution_payload_transactions_total_bytes_compressed_lte: z.optional(z.int()),
+      execution_payload_transactions_total_bytes_compressed_gt: z.optional(z.int()),
+      execution_payload_transactions_total_bytes_compressed_gte: z.optional(z.int()),
+      execution_payload_transactions_total_bytes_compressed_between_min: z.optional(z.int()),
+      execution_payload_transactions_total_bytes_compressed_between_max_value: z.optional(z.int()),
+      execution_payload_transactions_total_bytes_compressed_in_values: z.optional(
+        z.string().check(z.regex(/^\d+(,\d+)*$/))
+      ),
+      execution_payload_transactions_total_bytes_compressed_not_in_values: z.optional(
+        z.string().check(z.regex(/^\d+(,\d+)*$/))
+      ),
+      page_size: z.optional(z.int()),
+      page_token: z.optional(z.string()),
+      order_by: z.optional(z.string()),
+    })
+  ),
+});
+
+/**
+ * OK
+ */
+export const zIntBlockCanonicalServiceListResponse = zListIntBlockCanonicalResponse;
+
+export const zIntBlockCanonicalServiceGetData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    slot_start_date_time: z.int(),
+  }),
+  query: z.optional(z.never()),
+});
+
+/**
+ * OK
+ */
+export const zIntBlockCanonicalServiceGetResponse = zGetIntBlockCanonicalResponse;
+
+export const zIntBlockMevCanonicalServiceListData = z.object({
+  body: z.optional(z.never()),
+  path: z.optional(z.never()),
+  query: z.optional(
+    z.object({
+      slot_start_date_time_eq: z.optional(z.int()),
+      slot_start_date_time_ne: z.optional(z.int()),
+      slot_start_date_time_lt: z.optional(z.int()),
+      slot_start_date_time_lte: z.optional(z.int()),
+      slot_start_date_time_gt: z.optional(z.int()),
+      slot_start_date_time_gte: z.optional(z.int()),
+      slot_start_date_time_between_min: z.optional(z.int()),
+      slot_start_date_time_between_max_value: z.optional(z.int()),
+      slot_start_date_time_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      slot_start_date_time_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      block_root_eq: z.optional(z.string()),
+      block_root_ne: z.optional(z.string()),
+      block_root_contains: z.optional(z.string()),
+      block_root_starts_with: z.optional(z.string()),
+      block_root_ends_with: z.optional(z.string()),
+      block_root_like: z.optional(z.string()),
+      block_root_not_like: z.optional(z.string()),
+      block_root_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      block_root_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      updated_date_time_eq: z.optional(z.int()),
+      updated_date_time_ne: z.optional(z.int()),
+      updated_date_time_lt: z.optional(z.int()),
+      updated_date_time_lte: z.optional(z.int()),
+      updated_date_time_gt: z.optional(z.int()),
+      updated_date_time_gte: z.optional(z.int()),
+      updated_date_time_between_min: z.optional(z.int()),
+      updated_date_time_between_max_value: z.optional(z.int()),
+      updated_date_time_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      updated_date_time_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      slot_eq: z.optional(z.int()),
+      slot_ne: z.optional(z.int()),
+      slot_lt: z.optional(z.int()),
+      slot_lte: z.optional(z.int()),
+      slot_gt: z.optional(z.int()),
+      slot_gte: z.optional(z.int()),
+      slot_between_min: z.optional(z.int()),
+      slot_between_max_value: z.optional(z.int()),
+      slot_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      slot_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      epoch_eq: z.optional(z.int()),
+      epoch_ne: z.optional(z.int()),
+      epoch_lt: z.optional(z.int()),
+      epoch_lte: z.optional(z.int()),
+      epoch_gt: z.optional(z.int()),
+      epoch_gte: z.optional(z.int()),
+      epoch_between_min: z.optional(z.int()),
+      epoch_between_max_value: z.optional(z.int()),
+      epoch_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      epoch_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      epoch_start_date_time_eq: z.optional(z.int()),
+      epoch_start_date_time_ne: z.optional(z.int()),
+      epoch_start_date_time_lt: z.optional(z.int()),
+      epoch_start_date_time_lte: z.optional(z.int()),
+      epoch_start_date_time_gt: z.optional(z.int()),
+      epoch_start_date_time_gte: z.optional(z.int()),
+      epoch_start_date_time_between_min: z.optional(z.int()),
+      epoch_start_date_time_between_max_value: z.optional(z.int()),
+      epoch_start_date_time_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      epoch_start_date_time_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      earliest_bid_date_time_eq: z.optional(z.coerce.bigint()),
+      earliest_bid_date_time_ne: z.optional(z.coerce.bigint()),
+      earliest_bid_date_time_lt: z.optional(z.coerce.bigint()),
+      earliest_bid_date_time_lte: z.optional(z.coerce.bigint()),
+      earliest_bid_date_time_gt: z.optional(z.coerce.bigint()),
+      earliest_bid_date_time_gte: z.optional(z.coerce.bigint()),
+      earliest_bid_date_time_between_min: z.optional(z.coerce.bigint()),
+      earliest_bid_date_time_between_max_value: z.optional(z.coerce.bigint()),
+      earliest_bid_date_time_in_values: z.optional(z.string().check(z.regex(/^-?\d+(,-?\d+)*$/))),
+      earliest_bid_date_time_not_in_values: z.optional(z.string().check(z.regex(/^-?\d+(,-?\d+)*$/))),
+      relay_names: z.optional(z.array(z.string())),
+      parent_hash_eq: z.optional(z.string()),
+      parent_hash_ne: z.optional(z.string()),
+      parent_hash_contains: z.optional(z.string()),
+      parent_hash_starts_with: z.optional(z.string()),
+      parent_hash_ends_with: z.optional(z.string()),
+      parent_hash_like: z.optional(z.string()),
+      parent_hash_not_like: z.optional(z.string()),
+      parent_hash_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      parent_hash_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      block_number_eq: z.optional(z.int()),
+      block_number_ne: z.optional(z.int()),
+      block_number_lt: z.optional(z.int()),
+      block_number_lte: z.optional(z.int()),
+      block_number_gt: z.optional(z.int()),
+      block_number_gte: z.optional(z.int()),
+      block_number_between_min: z.optional(z.int()),
+      block_number_between_max_value: z.optional(z.int()),
+      block_number_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      block_number_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      block_hash_eq: z.optional(z.string()),
+      block_hash_ne: z.optional(z.string()),
+      block_hash_contains: z.optional(z.string()),
+      block_hash_starts_with: z.optional(z.string()),
+      block_hash_ends_with: z.optional(z.string()),
+      block_hash_like: z.optional(z.string()),
+      block_hash_not_like: z.optional(z.string()),
+      block_hash_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      block_hash_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      builder_pubkey_eq: z.optional(z.string()),
+      builder_pubkey_ne: z.optional(z.string()),
+      builder_pubkey_contains: z.optional(z.string()),
+      builder_pubkey_starts_with: z.optional(z.string()),
+      builder_pubkey_ends_with: z.optional(z.string()),
+      builder_pubkey_like: z.optional(z.string()),
+      builder_pubkey_not_like: z.optional(z.string()),
+      builder_pubkey_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      builder_pubkey_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      proposer_pubkey_eq: z.optional(z.string()),
+      proposer_pubkey_ne: z.optional(z.string()),
+      proposer_pubkey_contains: z.optional(z.string()),
+      proposer_pubkey_starts_with: z.optional(z.string()),
+      proposer_pubkey_ends_with: z.optional(z.string()),
+      proposer_pubkey_like: z.optional(z.string()),
+      proposer_pubkey_not_like: z.optional(z.string()),
+      proposer_pubkey_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      proposer_pubkey_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      proposer_fee_recipient_eq: z.optional(z.string()),
+      proposer_fee_recipient_ne: z.optional(z.string()),
+      proposer_fee_recipient_contains: z.optional(z.string()),
+      proposer_fee_recipient_starts_with: z.optional(z.string()),
+      proposer_fee_recipient_ends_with: z.optional(z.string()),
+      proposer_fee_recipient_like: z.optional(z.string()),
+      proposer_fee_recipient_not_like: z.optional(z.string()),
+      proposer_fee_recipient_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      proposer_fee_recipient_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      gas_limit_eq: z.optional(z.int()),
+      gas_limit_ne: z.optional(z.int()),
+      gas_limit_lt: z.optional(z.int()),
+      gas_limit_lte: z.optional(z.int()),
+      gas_limit_gt: z.optional(z.int()),
+      gas_limit_gte: z.optional(z.int()),
+      gas_limit_between_min: z.optional(z.int()),
+      gas_limit_between_max_value: z.optional(z.int()),
+      gas_limit_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      gas_limit_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      gas_used_eq: z.optional(z.int()),
+      gas_used_ne: z.optional(z.int()),
+      gas_used_lt: z.optional(z.int()),
+      gas_used_lte: z.optional(z.int()),
+      gas_used_gt: z.optional(z.int()),
+      gas_used_gte: z.optional(z.int()),
+      gas_used_between_min: z.optional(z.int()),
+      gas_used_between_max_value: z.optional(z.int()),
+      gas_used_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      gas_used_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      value_eq: z.optional(z.string()),
+      value_ne: z.optional(z.string()),
+      value_contains: z.optional(z.string()),
+      value_starts_with: z.optional(z.string()),
+      value_ends_with: z.optional(z.string()),
+      value_like: z.optional(z.string()),
+      value_not_like: z.optional(z.string()),
+      value_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      value_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      transaction_count_eq: z.optional(z.int()),
+      transaction_count_ne: z.optional(z.int()),
+      transaction_count_lt: z.optional(z.int()),
+      transaction_count_lte: z.optional(z.int()),
+      transaction_count_gt: z.optional(z.int()),
+      transaction_count_gte: z.optional(z.int()),
+      transaction_count_between_min: z.optional(z.int()),
+      transaction_count_between_max_value: z.optional(z.int()),
+      transaction_count_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      transaction_count_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      page_size: z.optional(z.int()),
+      page_token: z.optional(z.string()),
+      order_by: z.optional(z.string()),
+    })
+  ),
+});
+
+/**
+ * OK
+ */
+export const zIntBlockMevCanonicalServiceListResponse = zListIntBlockMevCanonicalResponse;
+
+export const zIntBlockMevCanonicalServiceGetData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    slot_start_date_time: z.int(),
+  }),
+  query: z.optional(z.never()),
+});
+
+/**
+ * OK
+ */
+export const zIntBlockMevCanonicalServiceGetResponse = zGetIntBlockMevCanonicalResponse;
+
+export const zIntBlockProposerCanonicalServiceListData = z.object({
+  body: z.optional(z.never()),
+  path: z.optional(z.never()),
+  query: z.optional(
+    z.object({
+      slot_start_date_time_eq: z.optional(z.int()),
+      slot_start_date_time_ne: z.optional(z.int()),
+      slot_start_date_time_lt: z.optional(z.int()),
+      slot_start_date_time_lte: z.optional(z.int()),
+      slot_start_date_time_gt: z.optional(z.int()),
+      slot_start_date_time_gte: z.optional(z.int()),
+      slot_start_date_time_between_min: z.optional(z.int()),
+      slot_start_date_time_between_max_value: z.optional(z.int()),
+      slot_start_date_time_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      slot_start_date_time_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      updated_date_time_eq: z.optional(z.int()),
+      updated_date_time_ne: z.optional(z.int()),
+      updated_date_time_lt: z.optional(z.int()),
+      updated_date_time_lte: z.optional(z.int()),
+      updated_date_time_gt: z.optional(z.int()),
+      updated_date_time_gte: z.optional(z.int()),
+      updated_date_time_between_min: z.optional(z.int()),
+      updated_date_time_between_max_value: z.optional(z.int()),
+      updated_date_time_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      updated_date_time_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      slot_eq: z.optional(z.int()),
+      slot_ne: z.optional(z.int()),
+      slot_lt: z.optional(z.int()),
+      slot_lte: z.optional(z.int()),
+      slot_gt: z.optional(z.int()),
+      slot_gte: z.optional(z.int()),
+      slot_between_min: z.optional(z.int()),
+      slot_between_max_value: z.optional(z.int()),
+      slot_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      slot_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      epoch_eq: z.optional(z.int()),
+      epoch_ne: z.optional(z.int()),
+      epoch_lt: z.optional(z.int()),
+      epoch_lte: z.optional(z.int()),
+      epoch_gt: z.optional(z.int()),
+      epoch_gte: z.optional(z.int()),
+      epoch_between_min: z.optional(z.int()),
+      epoch_between_max_value: z.optional(z.int()),
+      epoch_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      epoch_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      epoch_start_date_time_eq: z.optional(z.int()),
+      epoch_start_date_time_ne: z.optional(z.int()),
+      epoch_start_date_time_lt: z.optional(z.int()),
+      epoch_start_date_time_lte: z.optional(z.int()),
+      epoch_start_date_time_gt: z.optional(z.int()),
+      epoch_start_date_time_gte: z.optional(z.int()),
+      epoch_start_date_time_between_min: z.optional(z.int()),
+      epoch_start_date_time_between_max_value: z.optional(z.int()),
+      epoch_start_date_time_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      epoch_start_date_time_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      proposer_validator_index_eq: z.optional(z.int()),
+      proposer_validator_index_ne: z.optional(z.int()),
+      proposer_validator_index_lt: z.optional(z.int()),
+      proposer_validator_index_lte: z.optional(z.int()),
+      proposer_validator_index_gt: z.optional(z.int()),
+      proposer_validator_index_gte: z.optional(z.int()),
+      proposer_validator_index_between_min: z.optional(z.int()),
+      proposer_validator_index_between_max_value: z.optional(z.int()),
+      proposer_validator_index_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      proposer_validator_index_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      proposer_pubkey_eq: z.optional(z.string()),
+      proposer_pubkey_ne: z.optional(z.string()),
+      proposer_pubkey_contains: z.optional(z.string()),
+      proposer_pubkey_starts_with: z.optional(z.string()),
+      proposer_pubkey_ends_with: z.optional(z.string()),
+      proposer_pubkey_like: z.optional(z.string()),
+      proposer_pubkey_not_like: z.optional(z.string()),
+      proposer_pubkey_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      proposer_pubkey_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      block_root_eq: z.optional(z.string()),
+      block_root_ne: z.optional(z.string()),
+      block_root_contains: z.optional(z.string()),
+      block_root_starts_with: z.optional(z.string()),
+      block_root_ends_with: z.optional(z.string()),
+      block_root_like: z.optional(z.string()),
+      block_root_not_like: z.optional(z.string()),
+      block_root_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      block_root_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      page_size: z.optional(z.int()),
+      page_token: z.optional(z.string()),
+      order_by: z.optional(z.string()),
+    })
+  ),
+});
+
+/**
+ * OK
+ */
+export const zIntBlockProposerCanonicalServiceListResponse = zListIntBlockProposerCanonicalResponse;
+
+export const zIntBlockProposerCanonicalServiceGetData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    slot_start_date_time: z.int(),
+  }),
+  query: z.optional(z.never()),
+});
+
+/**
+ * OK
+ */
+export const zIntBlockProposerCanonicalServiceGetResponse = zGetIntBlockProposerCanonicalResponse;

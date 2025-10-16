@@ -1,11 +1,11 @@
 import { type UseQueryResult, useQuery } from '@tanstack/react-query';
-import { baseUrl } from '@/utils/api-config';
 import type { Config } from './useConfig.types';
+import { BASE_URL, PATH_PREFIX } from '@/utils/api-config';
 
 const REFETCH_INTERVAL = 10_000; // 10 seconds
 
 async function fetchConfig(): Promise<Config> {
-  const response = await fetch(`${baseUrl}/config`);
+  const response = await fetch(`${BASE_URL}${PATH_PREFIX}/config`);
 
   if (!response.ok) {
     throw new Error(`Failed to fetch config: ${response.statusText}`);
