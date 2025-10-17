@@ -16,15 +16,8 @@ declare global {
   }
 }
 
-// Create QueryClient and hydrate with global config if available
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      // With hydrated data, prevent immediate refetch on mount
-      staleTime: 60 * 1000, // 60 seconds
-    },
-  },
-});
+// Create QueryClient for hydrated data
+const queryClient = new QueryClient();
 
 // Hydrate the config query if the global variable exists
 if (typeof window !== 'undefined' && window.__CONFIG__) {
