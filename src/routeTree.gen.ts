@@ -9,38 +9,120 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as AppRouteRouteImport } from './routes/_app/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ExperimentsHeroDemoRouteImport } from './routes/experiments.hero-demo'
+import { Route as AppAboutRouteImport } from './routes/_app/about'
+import { Route as AppExperimentsIndexRouteImport } from './routes/_app/experiments/index'
+import { Route as AppExperimentsWithSelectorRouteImport } from './routes/_app/experiments.with-selector'
+import { Route as AppExperimentsNavbarOnlyRouteImport } from './routes/_app/experiments.navbar-only'
 
+const AppRouteRoute = AppRouteRouteImport.update({
+  id: '/_app',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ExperimentsHeroDemoRoute = ExperimentsHeroDemoRouteImport.update({
+  id: '/experiments/hero-demo',
+  path: '/experiments/hero-demo',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppAboutRoute = AppAboutRouteImport.update({
+  id: '/about',
+  path: '/about',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppExperimentsIndexRoute = AppExperimentsIndexRouteImport.update({
+  id: '/experiments/',
+  path: '/experiments/',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppExperimentsWithSelectorRoute =
+  AppExperimentsWithSelectorRouteImport.update({
+    id: '/experiments/with-selector',
+    path: '/experiments/with-selector',
+    getParentRoute: () => AppRouteRoute,
+  } as any)
+const AppExperimentsNavbarOnlyRoute =
+  AppExperimentsNavbarOnlyRouteImport.update({
+    id: '/experiments/navbar-only',
+    path: '/experiments/navbar-only',
+    getParentRoute: () => AppRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/about': typeof AppAboutRoute
+  '/experiments/hero-demo': typeof ExperimentsHeroDemoRoute
+  '/experiments/navbar-only': typeof AppExperimentsNavbarOnlyRoute
+  '/experiments/with-selector': typeof AppExperimentsWithSelectorRoute
+  '/experiments': typeof AppExperimentsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/about': typeof AppAboutRoute
+  '/experiments/hero-demo': typeof ExperimentsHeroDemoRoute
+  '/experiments/navbar-only': typeof AppExperimentsNavbarOnlyRoute
+  '/experiments/with-selector': typeof AppExperimentsWithSelectorRoute
+  '/experiments': typeof AppExperimentsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_app': typeof AppRouteRouteWithChildren
+  '/_app/about': typeof AppAboutRoute
+  '/experiments/hero-demo': typeof ExperimentsHeroDemoRoute
+  '/_app/experiments/navbar-only': typeof AppExperimentsNavbarOnlyRoute
+  '/_app/experiments/with-selector': typeof AppExperimentsWithSelectorRoute
+  '/_app/experiments/': typeof AppExperimentsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/about'
+    | '/experiments/hero-demo'
+    | '/experiments/navbar-only'
+    | '/experiments/with-selector'
+    | '/experiments'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/about'
+    | '/experiments/hero-demo'
+    | '/experiments/navbar-only'
+    | '/experiments/with-selector'
+    | '/experiments'
+  id:
+    | '__root__'
+    | '/'
+    | '/_app'
+    | '/_app/about'
+    | '/experiments/hero-demo'
+    | '/_app/experiments/navbar-only'
+    | '/_app/experiments/with-selector'
+    | '/_app/experiments/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AppRouteRoute: typeof AppRouteRouteWithChildren
+  ExperimentsHeroDemoRoute: typeof ExperimentsHeroDemoRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/_app': {
+      id: '/_app'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof AppRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,11 +130,66 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/experiments/hero-demo': {
+      id: '/experiments/hero-demo'
+      path: '/experiments/hero-demo'
+      fullPath: '/experiments/hero-demo'
+      preLoaderRoute: typeof ExperimentsHeroDemoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_app/about': {
+      id: '/_app/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AppAboutRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/_app/experiments/': {
+      id: '/_app/experiments/'
+      path: '/experiments'
+      fullPath: '/experiments'
+      preLoaderRoute: typeof AppExperimentsIndexRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/_app/experiments/with-selector': {
+      id: '/_app/experiments/with-selector'
+      path: '/experiments/with-selector'
+      fullPath: '/experiments/with-selector'
+      preLoaderRoute: typeof AppExperimentsWithSelectorRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/_app/experiments/navbar-only': {
+      id: '/_app/experiments/navbar-only'
+      path: '/experiments/navbar-only'
+      fullPath: '/experiments/navbar-only'
+      preLoaderRoute: typeof AppExperimentsNavbarOnlyRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
   }
 }
 
+interface AppRouteRouteChildren {
+  AppAboutRoute: typeof AppAboutRoute
+  AppExperimentsNavbarOnlyRoute: typeof AppExperimentsNavbarOnlyRoute
+  AppExperimentsWithSelectorRoute: typeof AppExperimentsWithSelectorRoute
+  AppExperimentsIndexRoute: typeof AppExperimentsIndexRoute
+}
+
+const AppRouteRouteChildren: AppRouteRouteChildren = {
+  AppAboutRoute: AppAboutRoute,
+  AppExperimentsNavbarOnlyRoute: AppExperimentsNavbarOnlyRoute,
+  AppExperimentsWithSelectorRoute: AppExperimentsWithSelectorRoute,
+  AppExperimentsIndexRoute: AppExperimentsIndexRoute,
+}
+
+const AppRouteRouteWithChildren = AppRouteRoute._addFileChildren(
+  AppRouteRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AppRouteRoute: AppRouteRouteWithChildren,
+  ExperimentsHeroDemoRoute: ExperimentsHeroDemoRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
