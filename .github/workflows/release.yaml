@@ -35,10 +35,10 @@ jobs:
 
       - name: Create build archive
         run: |
-          cd dist
-          tar -czf ../lab-${{ github.event.release.tag_name }}.tar.gz .
-          cd ..
-          zip -r lab-${{ github.event.release.tag_name }}.zip dist
+          cd build/frontend
+          tar -czf ../../lab-${{ github.event.release.tag_name }}.tar.gz .
+          cd ../..
+          zip -r lab-${{ github.event.release.tag_name }}.zip build/frontend
 
       - name: Upload tar.gz to release
         uses: actions/upload-release-asset@v1
