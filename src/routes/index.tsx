@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { HeroPage } from '@/pages/index';
+import { Root } from '@/pages/root';
 
 export const Route = createFileRoute('/')({
-  component: HeroPage,
+  component: Root,
 });

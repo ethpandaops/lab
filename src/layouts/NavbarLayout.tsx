@@ -1,14 +1,12 @@
-import { type JSX } from 'react';
-import { createFileRoute, Outlet, Link, useMatches } from '@tanstack/react-router';
-import { NetworkSelector } from '@/components/NetworkSelector';
+import { type JSX, type ReactNode } from 'react';
+import { Link } from '@tanstack/react-router';
 
-function AppLayout(): JSX.Element {
-  // Get all matched routes and check their staticData
-  const matches = useMatches();
+interface NavbarLayoutProps {
+  children: ReactNode;
+  rightContent?: ReactNode;
+}
 
-  // Show network selector if any matched route has it enabled in staticData
-  const shouldShowNetworkSelector = matches.some(match => match.staticData?.showNetworkSelector === true);
-
+export function NavbarLayout({ children, rightContent }: NavbarLayoutProps): JSX.Element {
   return (
     <div className="min-h-screen bg-slate-900">
       {/* Navbar */}
@@ -38,24 +36,14 @@ function AppLayout(): JSX.Element {
               </div>
             </div>
 
-            {/* Network Selector - conditionally rendered */}
-            {shouldShowNetworkSelector && (
-              <div className="w-48">
-                <NetworkSelector showLabel={false} />
-              </div>
-            )}
+            {/* Right content slot (e.g., NetworkSelector) */}
+            {rightContent}
           </div>
         </div>
       </nav>
 
       {/* Main Content */}
-      <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        <Outlet />
-      </main>
+      <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">{children}</main>
     </div>
   );
 }
-
-export const Route = createFileRoute('/_app')({
-  component: AppLayout,
-});

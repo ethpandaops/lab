@@ -9,16 +9,14 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as AppRouteRouteImport } from './routes/_app/route'
+import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as ExperimentsHeroDemoRouteImport } from './routes/experiments.hero-demo'
-import { Route as AppAboutRouteImport } from './routes/_app/about'
-import { Route as AppExperimentsIndexRouteImport } from './routes/_app/experiments/index'
-import { Route as AppExperimentsWithSelectorRouteImport } from './routes/_app/experiments.with-selector'
-import { Route as AppExperimentsNavbarOnlyRouteImport } from './routes/_app/experiments.navbar-only'
+import { Route as ExperimentsIndexRouteImport } from './routes/experiments/index'
+import { Route as ExperimentsIdRouteImport } from './routes/experiments/$id'
 
-const AppRouteRoute = AppRouteRouteImport.update({
-  id: '/_app',
+const AboutRoute = AboutRouteImport.update({
+  id: '/about',
+  path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -26,101 +24,58 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ExperimentsHeroDemoRoute = ExperimentsHeroDemoRouteImport.update({
-  id: '/experiments/hero-demo',
-  path: '/experiments/hero-demo',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AppAboutRoute = AppAboutRouteImport.update({
-  id: '/about',
-  path: '/about',
-  getParentRoute: () => AppRouteRoute,
-} as any)
-const AppExperimentsIndexRoute = AppExperimentsIndexRouteImport.update({
+const ExperimentsIndexRoute = ExperimentsIndexRouteImport.update({
   id: '/experiments/',
   path: '/experiments/',
-  getParentRoute: () => AppRouteRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-const AppExperimentsWithSelectorRoute =
-  AppExperimentsWithSelectorRouteImport.update({
-    id: '/experiments/with-selector',
-    path: '/experiments/with-selector',
-    getParentRoute: () => AppRouteRoute,
-  } as any)
-const AppExperimentsNavbarOnlyRoute =
-  AppExperimentsNavbarOnlyRouteImport.update({
-    id: '/experiments/navbar-only',
-    path: '/experiments/navbar-only',
-    getParentRoute: () => AppRouteRoute,
-  } as any)
+const ExperimentsIdRoute = ExperimentsIdRouteImport.update({
+  id: '/experiments/$id',
+  path: '/experiments/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/about': typeof AppAboutRoute
-  '/experiments/hero-demo': typeof ExperimentsHeroDemoRoute
-  '/experiments/navbar-only': typeof AppExperimentsNavbarOnlyRoute
-  '/experiments/with-selector': typeof AppExperimentsWithSelectorRoute
-  '/experiments': typeof AppExperimentsIndexRoute
+  '/about': typeof AboutRoute
+  '/experiments/$id': typeof ExperimentsIdRoute
+  '/experiments': typeof ExperimentsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/about': typeof AppAboutRoute
-  '/experiments/hero-demo': typeof ExperimentsHeroDemoRoute
-  '/experiments/navbar-only': typeof AppExperimentsNavbarOnlyRoute
-  '/experiments/with-selector': typeof AppExperimentsWithSelectorRoute
-  '/experiments': typeof AppExperimentsIndexRoute
+  '/about': typeof AboutRoute
+  '/experiments/$id': typeof ExperimentsIdRoute
+  '/experiments': typeof ExperimentsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/_app': typeof AppRouteRouteWithChildren
-  '/_app/about': typeof AppAboutRoute
-  '/experiments/hero-demo': typeof ExperimentsHeroDemoRoute
-  '/_app/experiments/navbar-only': typeof AppExperimentsNavbarOnlyRoute
-  '/_app/experiments/with-selector': typeof AppExperimentsWithSelectorRoute
-  '/_app/experiments/': typeof AppExperimentsIndexRoute
+  '/about': typeof AboutRoute
+  '/experiments/$id': typeof ExperimentsIdRoute
+  '/experiments/': typeof ExperimentsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths:
-    | '/'
-    | '/about'
-    | '/experiments/hero-demo'
-    | '/experiments/navbar-only'
-    | '/experiments/with-selector'
-    | '/experiments'
+  fullPaths: '/' | '/about' | '/experiments/$id' | '/experiments'
   fileRoutesByTo: FileRoutesByTo
-  to:
-    | '/'
-    | '/about'
-    | '/experiments/hero-demo'
-    | '/experiments/navbar-only'
-    | '/experiments/with-selector'
-    | '/experiments'
-  id:
-    | '__root__'
-    | '/'
-    | '/_app'
-    | '/_app/about'
-    | '/experiments/hero-demo'
-    | '/_app/experiments/navbar-only'
-    | '/_app/experiments/with-selector'
-    | '/_app/experiments/'
+  to: '/' | '/about' | '/experiments/$id' | '/experiments'
+  id: '__root__' | '/' | '/about' | '/experiments/$id' | '/experiments/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AppRouteRoute: typeof AppRouteRouteWithChildren
-  ExperimentsHeroDemoRoute: typeof ExperimentsHeroDemoRoute
+  AboutRoute: typeof AboutRoute
+  ExperimentsIdRoute: typeof ExperimentsIdRoute
+  ExperimentsIndexRoute: typeof ExperimentsIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/_app': {
-      id: '/_app'
-      path: ''
-      fullPath: ''
-      preLoaderRoute: typeof AppRouteRouteImport
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -130,66 +85,28 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/experiments/hero-demo': {
-      id: '/experiments/hero-demo'
-      path: '/experiments/hero-demo'
-      fullPath: '/experiments/hero-demo'
-      preLoaderRoute: typeof ExperimentsHeroDemoRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_app/about': {
-      id: '/_app/about'
-      path: '/about'
-      fullPath: '/about'
-      preLoaderRoute: typeof AppAboutRouteImport
-      parentRoute: typeof AppRouteRoute
-    }
-    '/_app/experiments/': {
-      id: '/_app/experiments/'
+    '/experiments/': {
+      id: '/experiments/'
       path: '/experiments'
       fullPath: '/experiments'
-      preLoaderRoute: typeof AppExperimentsIndexRouteImport
-      parentRoute: typeof AppRouteRoute
+      preLoaderRoute: typeof ExperimentsIndexRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/_app/experiments/with-selector': {
-      id: '/_app/experiments/with-selector'
-      path: '/experiments/with-selector'
-      fullPath: '/experiments/with-selector'
-      preLoaderRoute: typeof AppExperimentsWithSelectorRouteImport
-      parentRoute: typeof AppRouteRoute
-    }
-    '/_app/experiments/navbar-only': {
-      id: '/_app/experiments/navbar-only'
-      path: '/experiments/navbar-only'
-      fullPath: '/experiments/navbar-only'
-      preLoaderRoute: typeof AppExperimentsNavbarOnlyRouteImport
-      parentRoute: typeof AppRouteRoute
+    '/experiments/$id': {
+      id: '/experiments/$id'
+      path: '/experiments/$id'
+      fullPath: '/experiments/$id'
+      preLoaderRoute: typeof ExperimentsIdRouteImport
+      parentRoute: typeof rootRouteImport
     }
   }
 }
 
-interface AppRouteRouteChildren {
-  AppAboutRoute: typeof AppAboutRoute
-  AppExperimentsNavbarOnlyRoute: typeof AppExperimentsNavbarOnlyRoute
-  AppExperimentsWithSelectorRoute: typeof AppExperimentsWithSelectorRoute
-  AppExperimentsIndexRoute: typeof AppExperimentsIndexRoute
-}
-
-const AppRouteRouteChildren: AppRouteRouteChildren = {
-  AppAboutRoute: AppAboutRoute,
-  AppExperimentsNavbarOnlyRoute: AppExperimentsNavbarOnlyRoute,
-  AppExperimentsWithSelectorRoute: AppExperimentsWithSelectorRoute,
-  AppExperimentsIndexRoute: AppExperimentsIndexRoute,
-}
-
-const AppRouteRouteWithChildren = AppRouteRoute._addFileChildren(
-  AppRouteRouteChildren,
-)
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AppRouteRoute: AppRouteRouteWithChildren,
-  ExperimentsHeroDemoRoute: ExperimentsHeroDemoRoute,
+  AboutRoute: AboutRoute,
+  ExperimentsIdRoute: ExperimentsIdRoute,
+  ExperimentsIndexRoute: ExperimentsIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

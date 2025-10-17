@@ -1,7 +1,7 @@
 import { type JSX } from 'react';
 import { Link } from '@tanstack/react-router';
 
-export function HeroDemoPage(): JSX.Element {
+export function HeroDemo(): JSX.Element {
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900">
       <div className="text-center">

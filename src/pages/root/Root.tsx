@@ -1,7 +1,7 @@
 import { type JSX } from 'react';
 import { Link } from '@tanstack/react-router';
 
-export function HeroPage(): JSX.Element {
+export function Root(): JSX.Element {
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
       <div className="text-center">
