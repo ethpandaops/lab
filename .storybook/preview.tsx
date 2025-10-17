@@ -7,9 +7,13 @@ import { initialize, mswLoader } from 'msw-storybook-addon';
 import { handlers } from './mocks';
 import '../src/index.css';
 
-// Initialize MSW
+// Initialize MSW with correct service worker URL for GitHub Pages
 initialize({
   onUnhandledRequest: 'bypass',
+  serviceWorker: {
+    // Use relative path that works both locally and on GitHub Pages
+    url: process.env.NODE_ENV === 'production' ? '/lab/mockServiceWorker.js' : '/mockServiceWorker.js',
+  },
 });
 
 const preview: Preview = {

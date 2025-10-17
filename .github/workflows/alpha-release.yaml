@@ -72,10 +72,8 @@ jobs:
 
       - name: Create build archives
         run: |
-          cd build/frontend
-          tar -czf ../../lab-${{ steps.version.outputs.new_tag }}.tar.gz .
-          cd ../..
-          zip -r lab-${{ steps.version.outputs.new_tag }}.zip build/frontend
+          tar -czf lab-${{ steps.version.outputs.new_tag }}.tar.gz -C build/frontend .
+          cd build/frontend && zip -r ../../lab-${{ steps.version.outputs.new_tag }}.zip . && cd ../..
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
