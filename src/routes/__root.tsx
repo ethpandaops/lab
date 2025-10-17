@@ -4,9 +4,39 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { NetworkProvider } from '@/providers/NetworkProvider';
 import { NetworkSelector } from '@/components/NetworkSelector';
 import { ConfigGate } from '@/components/ConfigGate';
+import type { Config } from '@/hooks/useConfig';
+import type { Bounds } from '@/hooks/useBounds';
 import Logo from '/logo.png';
 
-const queryClient = new QueryClient();
+// Extend Window interface for type safety
+declare global {
+  interface Window {
+    __CONFIG__?: Config;
+    __BOUNDS__?: Record<string, Bounds>;
+  }
+}
+
+// Create QueryClient and hydrate with global config if available
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      // With hydrated data, prevent immediate refetch on mount
+      staleTime: 60 * 1000, // 60 seconds
+    },
+  },
+});
+
+// Hydrate the config query if the global variable exists
+if (typeof window !== 'undefined' && window.__CONFIG__) {
+  queryClient.setQueryData(['config'], window.__CONFIG__);
+}
+
+// Hydrate bounds queries for each network if the global variable exists
+if (typeof window !== 'undefined' && window.__BOUNDS__) {
+  Object.entries(window.__BOUNDS__).forEach(([networkName, boundsData]) => {
+    queryClient.setQueryData(['bounds', networkName], boundsData);
+  });
+}
 
 function RootComponent(): JSX.Element {
   return (
