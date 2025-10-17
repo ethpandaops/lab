@@ -39,7 +39,7 @@ export default defineConfig({
     conditions: ['import', 'module', 'browser', 'default'],
   },
   build: {
-    outDir: 'build/frontend',
+    outDir: 'dist',
     commonjsOptions: {
       transformMixedEsModules: true, // Handle packages with mixed ESM/CommonJS
     },
