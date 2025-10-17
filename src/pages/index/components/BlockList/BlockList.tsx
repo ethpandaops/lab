@@ -1,16 +1,21 @@
 import { type JSX } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { fctBlockServiceListOptions } from '@/api/@tanstack/react-query.gen';
+import { useTableBounds } from '@/hooks/useBounds';
 
 export function BlockList(): JSX.Element {
-  const { data, error, isLoading } = useQuery(
-    fctBlockServiceListOptions({
+  const { data: blockBounds } = useTableBounds('fct_block');
+
+  const { data, error, isLoading } = useQuery({
+    ...fctBlockServiceListOptions({
       query: {
-        slot_gt: 1000000,
+        slot_start_date_time_gt: blockBounds ? blockBounds.max - 12 * 100 : 0,
         page_size: 10,
+        order_by: 'slot_start_date_time DESC',
       },
-    })
-  );
+    }),
+    enabled: !!blockBounds,
+  });
 
   if (isLoading) {
     return (

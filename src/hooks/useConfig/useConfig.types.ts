@@ -15,5 +15,4 @@ export interface Experiment {
 export interface Config {
   networks: Network[];
   experiments: Record<string, Experiment>;
-  bounds: Record<string, unknown>;
 }

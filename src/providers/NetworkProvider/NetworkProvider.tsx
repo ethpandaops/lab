@@ -1,6 +1,7 @@
 import { type JSX, type ReactNode, useEffect, useMemo, useRef, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useConfig } from '@/hooks/useConfig';
+import { useBounds } from '@/hooks/useBounds';
 import type { Network } from '@/hooks/useNetwork';
 import { NetworkContext, type NetworkContextValue } from '@/contexts/NetworkContext';
 import { client } from '@/api/client.gen';
@@ -8,6 +9,15 @@ import { BASE_URL, PATH_PREFIX, isRootPath } from '@/utils/api-config';
 
 interface NetworkProviderProps {
   children: ReactNode;
+}
+
+/**
+ * Internal component that fetches bounds data for the current network.
+ * This runs at the app-wide level to keep bounds fresh in the cache.
+ */
+function BoundsLoader(): null {
+  useBounds(); // Fetch and cache bounds, don't use the data here
+  return null;
 }
 
 /**
@@ -131,5 +141,10 @@ export function NetworkProvider({ children }: NetworkProviderProps): JSX.Element
     return null;
   }
 
-  return <NetworkContext.Provider value={value}>{children}</NetworkContext.Provider>;
+  return (
+    <NetworkContext.Provider value={value}>
+      <BoundsLoader />
+      {children}
+    </NetworkContext.Provider>
+  );
 }
