@@ -3,7 +3,4 @@ export interface TableBounds {
   max: number;
 }
 
-export interface Bounds {
-  tables: Record<string, TableBounds>;
-  last_updated: string;
-}
+export type Bounds = Record<string, TableBounds>;

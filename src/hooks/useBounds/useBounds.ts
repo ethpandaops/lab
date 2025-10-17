@@ -43,8 +43,7 @@ interface UseBoundsOptions<TData = Bounds> {
  *
  *   return (
  *     <div>
- *       <p>Last updated: {bounds.last_updated}</p>
- *       <p>Block range: {bounds.tables.fct_block?.min} - {bounds.tables.fct_block?.max}</p>
+ *       <p>Block range: {bounds.fct_block?.min} - {bounds.fct_block?.max}</p>
  *     </div>
  *   );
  * }
@@ -52,7 +51,7 @@ interface UseBoundsOptions<TData = Bounds> {
  * // Select specific data using selector
  * function BlockComponent() {
  *   const { data: blockBounds } = useBounds({
- *     select: (bounds) => bounds.tables.fct_block,
+ *     select: (bounds) => bounds.fct_block,
  *   });
  *
  *   return <div>{blockBounds?.min} - {blockBounds?.max}</div>;
@@ -93,7 +92,7 @@ export function useBounds<TData = Bounds>(options?: UseBoundsOptions<TData>): Us
  */
 export function useTableBounds(tableName: string): UseQueryResult<TableBounds | undefined, Error> {
   return useBounds({
-    select: bounds => bounds.tables[tableName],
+    select: bounds => bounds[tableName],
   });
 }
 
@@ -123,8 +122,8 @@ export function useTablesBounds(tableNames: string[]): UseQueryResult<Record<str
     select: bounds =>
       tableNames.reduce(
         (acc, name) => {
-          if (bounds.tables[name]) {
-            acc[name] = bounds.tables[name];
+          if (bounds[name]) {
+            acc[name] = bounds[name];
           }
           return acc;
         },
