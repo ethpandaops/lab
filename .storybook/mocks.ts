@@ -43,10 +43,6 @@ const mockConfig: Config = {
       description: 'EIP-4844 blob scaling improvements',
     },
   },
-  bounds: {
-    max_blob_count: 6,
-    target_blob_count: 3,
-  },
 };
 
 // MSW handlers for Storybook
