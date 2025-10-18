@@ -1,9 +1,16 @@
+import { type JSX } from 'react';
 import { createFileRoute } from '@tanstack/react-router';
 import { Experiments } from '@/pages/experiments';
+import { Standard } from '@/layouts/Standard';
 
 export const Route = createFileRoute('/experiments/')({
-  component: Experiments,
-  staticData: {
-    showNetworkSelector: true,
-  },
+  component: ExperimentsWithLayout,
 });
+
+function ExperimentsWithLayout(): JSX.Element {
+  return (
+    <Standard showNavbar showNetworkSelector>
+      <Experiments />
+    </Standard>
+  );
+}

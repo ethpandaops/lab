@@ -1,0 +1,1 @@
+export { TwoColumnFullWidth } from './TwoColumnFullWidth';

@@ -33,42 +33,45 @@ package.json                          # Dependencies and scripts
 public/                               # Public assets
 .storybook/                           # Storybook configuration
 src/
-  routes/                             # THIN - TanStack route config only (3-6 lines each)
-    __root.tsx                        # Minimal providers only (QueryClient, ConfigGate, NetworkProvider)
-    index.tsx                         # "/" - imports HeroPage
-    _app/                             # Pathless layout WITH navbar
-      route.tsx                       # Navbar layout component
-      about.tsx                       # "/about" - imports AboutPage
-      experiments/
-        index.tsx                     # "/experiments" - imports ExperimentsPage
-      experiments.navbar-only.tsx     # "/experiments/navbar-only" - imports NavbarOnlyPage
-      experiments.with-selector.tsx   # "/experiments/with-selector" - imports WithSelectorPage
-    experiments.hero-demo.tsx         # "/experiments/hero-demo" - imports HeroDemoPage (no navbar)
-
-  pages/                              # FAT - Route-level components (actual implementations)
-    index/
-      HeroPage.tsx                    # Landing page hero
-      IndexPage.tsx                   # Original index (uses BlockList)
-      components/                     # Components ONLY for this page
-        BlockList/
-          BlockList.tsx
-          index.ts
-    about/
-      AboutPage.tsx                   # About page implementation
+  routes/                             # Route definitions - wrap pages in layouts
+    __root.tsx                        # Minimal providers only
+    index.tsx                         # "/" - Root landing page
+    about.tsx                         # "/about" - wraps AboutPage in Standard layout
     experiments/
-      ExperimentsPage.tsx             # Experiments list page
-      HeroDemoPage.tsx                # Hero layout experiment
-      NavbarOnlyPage.tsx              # Navbar-only experiment
-      WithSelectorPage/               # Experiment with controls
-        WithSelectorPage.tsx          # Main component
+      index.tsx                       # "/experiments" - experiments list
+      $id.tsx                         # "/experiments/$id" - dynamic experiment route
+      -experiments.config.ts          # Config for all experiments
+
+  layouts/                            # Layout components
+    Standard/                         # Single column layout
+      Standard.tsx
+      Standard.types.ts
+      index.ts
+    Sidebar/                          # Two column layout (main + sidebar)
+      Sidebar.tsx
+      Sidebar.types.ts
+      index.ts
+    NavbarLayout.tsx                  # Legacy layout (deprecated)
+    index.ts
+
+  pages/                              # Page implementations (pure content)
+    root/
+      Root.tsx                        # Landing page
+    about/
+      AboutPage.tsx                   # About page content
+    experiments/
+      Experiments.tsx                 # Experiments list
+      FullWidth/
+        FullWidth.tsx                 # Full width experiment
+      NavbarOnly/
+        NavbarOnly.tsx                # Navbar-only experiment
+      WithSelector/
+        WithSelector.tsx              # With network selector
         components/                   # Page-specific components
-          BlockList/                  # Moved from index
-            BlockList.tsx
-            index.ts
-        hooks/                        # Page-specific hooks (when needed)
-          useExperiment/
-            useExperiment.ts
-            index.ts
+          BlockList/
+      TwoColumnBasic/
+        TwoColumnBasic.tsx            # Two column example
+      ... (other experiments)
 
   components/                         # Shared, generic, design-system components
     Select/
@@ -114,164 +117,77 @@ src/
 
 ## Routes and Layouts
 
-### Route Pattern: Thin Routes, Fat Pages
+### Layout System
 
-Routes should be **THIN** (3-6 lines) - just import the page component and configure routing options:
+**Available Layouts:**
+- `Standard` - Single column layout (navbar optional, network selector optional, fullWidth optional)
+- `Sidebar` - Two column layout with main content + sidebar (same options as Standard)
 
+**How it works:**
+- Routes wrap page components in layout components
+- Layouts accept props: `showNavbar`, `showNetworkSelector`, `fullWidth`
+- Pages are pure content - no layout imports
+- `__root.tsx` provides minimal providers only (QueryClient, ConfigGate, NetworkProvider)
+
+**Example Route:**
 ```tsx
-// routes/_app/experiments/index.tsx
-import { createFileRoute } from '@tanstack/react-router';
-import { ExperimentsPage } from '@/pages/experiments';
+// routes/about.tsx
+import { Standard } from '@/layouts/Standard';
+import { AboutPage } from '@/pages/about';
 
-export const Route = createFileRoute('/_app/experiments/')({
-  component: ExperimentsPage,
-  staticData: {
-    showNetworkSelector: true,
-  },
+export const Route = createFileRoute('/about')({
+  component: () => (
+    <Standard showNavbar>
+      <AboutPage />
+    </Standard>
+  ),
 });
 ```
 
-Pages should be **FAT** - contain the actual implementation, hooks, and page-specific components:
-
+**Example Page:**
 ```tsx
-// pages/experiments/ExperimentsPage.tsx
-import { type JSX } from 'react';
-import { Link } from '@tanstack/react-router';
-
-export function ExperimentsPage(): JSX.Element {
-  // Implementation here
-  return <div>...</div>;
+// pages/about/AboutPage.tsx
+export function AboutPage() {
+  return <div>Content here - no layout wrapper needed</div>;
 }
 ```
 
-### Layout Composition with Pathless Routes
+### Experiments System
 
-Use pathless routes (prefixed with `_`) to compose layouts without affecting the URL:
-
-**`__root.tsx`** - Minimal providers only:
-```tsx
-<QueryClientProvider>
-  <ConfigGate>
-    <NetworkProvider>
-      <Outlet /> {/* No UI wrapper */}
-    </NetworkProvider>
-  </ConfigGate>
-</QueryClientProvider>
-```
-
-**`_app/route.tsx`** - Navbar layout:
-```tsx
-<div>
-  <nav>
-    <Logo />
-    <NavLinks />
-    {shouldShowNetworkSelector && <NetworkSelector />}
-  </nav>
-  <main>
-    <Outlet /> {/* Child routes render here */}
-  </main>
-</div>
-```
-
-Routes opt into layouts by their file location:
-- `routes/index.tsx` → No layout (just providers)
-- `routes/_app/about.tsx` → Navbar layout
-- `routes/_app/_withSidebar/experiment.tsx` → Navbar + Sidebar layout
-
-### Route Configuration with staticData
-
-Use `staticData` to configure route-specific features that layouts read:
+Experiments use a config-driven approach in `routes/experiments/-experiments.config.ts`:
 
 ```tsx
-// Route declares what it needs
-export const Route = createFileRoute('/_app/experiments/')({
-  component: ExperimentsPage,
-  staticData: {
-    showNetworkSelector: true,  // ✅ Opt in
+export const experiments = {
+  'my-experiment': {
+    id: 'my-experiment',
+    title: 'My Experiment',
+    description: 'Description here',
+    color: 'border-blue-500',
+    component: MyExperimentPage,
+    layout: {
+      type: 'standard',  // or 'sidebar' or 'none'
+      showNavbar: true,
+      showNetworkSelector: false,
+      fullWidth: false,
+    },
   },
-});
+};
+```
 
-// Layout reads staticData from matched routes
-function AppLayout() {
-  const matches = useMatches();
-  const shouldShowNetworkSelector = matches.some(
-    (match) => match.staticData?.showNetworkSelector === true,
-  );
+The `experiments/$id` route dynamically wraps the page in the correct layout based on config.
 
+**For Sidebar layouts**, pages export multiple parts:
+```tsx
+// pages/experiments/TwoColumnExample.tsx
+export function TwoColumnExample() {
   return (
-    <div>
-      <nav>
-        {shouldShowNetworkSelector && <NetworkSelector />}
-      </nav>
-      <Outlet />
-    </div>
+    <>
+      <div>Main content</div>
+      <aside>Sidebar content</aside>
+    </>
   );
 }
 ```
-
-**Benefits:**
-- Declarative - routes declare what they need
-- Type-safe - can extend `StaticDataRouteOption` interface
-- Layout-agnostic - routes don't need to know about layout implementation
-
-### Experiment Layout Patterns
-
-Different experiments can have different layouts by their route location:
-
-1. **Hero Layout** (no navbar):
-   ```
-   routes/experiments.hero-demo.tsx
-   pages/experiments/HeroDemoPage.tsx
-   ```
-   Full-screen experience, no chrome.
-
-2. **Navbar Only**:
-   ```
-   routes/_app/experiments.navbar-only.tsx
-   pages/experiments/NavbarOnlyPage.tsx
-   ```
-   Has navbar, no network selector.
-
-3. **Navbar + Network Selector**:
-   ```
-   routes/_app/experiments.with-selector.tsx
-   pages/experiments/WithSelectorPage/
-     WithSelectorPage.tsx
-     components/
-       BlockList/
-   ```
-   Uses `staticData: { showNetworkSelector: true }`
-
-**Creating a New Experiment:**
-
-1. Choose layout by file location:
-   - No layout: `routes/experiments.my-experiment.tsx`
-   - With navbar: `routes/_app/experiments.my-experiment.tsx`
-
-2. Create page implementation:
-   ```bash
-   pages/experiments/MyExperimentPage.tsx
-   ```
-
-3. Configure features in route:
-   ```tsx
-   export const Route = createFileRoute('/_app/experiments/my-experiment')({
-     component: MyExperimentPage,
-     staticData: {
-       showNetworkSelector: true,  // If needed
-     },
-   });
-   ```
-
-4. Add page-specific components/hooks:
-   ```bash
-   pages/experiments/MyExperimentPage/
-     MyExperimentPage.tsx
-     components/
-       MyControl/
-     hooks/
-       useMyData/
-   ```
 
 ## React
 

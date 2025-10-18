@@ -1,30 +1,25 @@
-import { type ComponentType } from 'react';
-import { HeroDemo } from '@/pages/experiments/HeroDemo';
+import { FullWidth } from '@/pages/experiments/FullWidth';
+import { FullWidthNavbar } from '@/pages/experiments/FullWidthNavbar';
 import { NavbarOnly } from '@/pages/experiments/NavbarOnly';
+import { SidebarRight } from '@/pages/experiments/SidebarRight';
+import { TwoColumnBasic } from '@/pages/experiments/TwoColumnBasic';
+import { TwoColumnFullWidth } from '@/pages/experiments/TwoColumnFullWidth';
+import { TwoColumnNavbar } from '@/pages/experiments/TwoColumnNavbar';
 import { WithSelector } from '@/pages/experiments/WithSelector';
-
-export interface ExperimentConfig {
-  id: string;
-  title: string;
-  description: string;
-  color: string;
-  component: ComponentType;
-  layout: {
-    showNavbar: boolean;
-    showNetworkSelector: boolean;
-  };
-}
+import type { ExperimentConfig } from './-experiments.types';
 
 export const experiments: Record<string, ExperimentConfig> = {
   'hero-demo': {
     id: 'hero-demo',
-    title: 'Hero Layout',
-    description: 'Full page hero - NO navbar, NO network selector',
+    title: 'Full Width Layout',
+    description: 'Full page - NO navbar, NO network selector',
     color: 'border-pink-500',
-    component: HeroDemo,
+    component: FullWidth,
     layout: {
+      type: 'none',
       showNavbar: false,
       showNetworkSelector: false,
+      fullWidth: true,
     },
   },
   'navbar-only': {
@@ -34,8 +29,10 @@ export const experiments: Record<string, ExperimentConfig> = {
     color: 'border-slate-500',
     component: NavbarOnly,
     layout: {
+      type: 'standard',
       showNavbar: true,
       showNetworkSelector: false,
+      fullWidth: false,
     },
   },
   'with-selector': {
@@ -45,8 +42,77 @@ export const experiments: Record<string, ExperimentConfig> = {
     color: 'border-green-500',
     component: WithSelector,
     layout: {
+      type: 'standard',
       showNavbar: true,
       showNetworkSelector: true,
+      fullWidth: false,
+    },
+  },
+  'fullwidth-navbar': {
+    id: 'fullwidth-navbar',
+    title: 'Full Width + Navbar',
+    description: 'Full width layout with navbar',
+    color: 'border-blue-500',
+    component: FullWidthNavbar,
+    layout: {
+      type: 'standard',
+      showNavbar: true,
+      showNetworkSelector: false,
+      fullWidth: true,
+    },
+  },
+  'two-column-basic': {
+    id: 'two-column-basic',
+    title: 'Two Column Basic',
+    description: 'Two columns - NO navbar, NO network selector',
+    color: 'border-cyan-500',
+    component: TwoColumnBasic,
+    layout: {
+      type: 'sidebar',
+      showNavbar: false,
+      showNetworkSelector: false,
+      fullWidth: false,
+      sidebarPosition: 'left',
+    },
+  },
+  'two-column-fullwidth': {
+    id: 'two-column-fullwidth',
+    title: 'Two Column Full Width',
+    description: 'Two columns spanning full viewport width',
+    color: 'border-orange-500',
+    component: TwoColumnFullWidth,
+    layout: {
+      type: 'sidebar',
+      showNavbar: false,
+      showNetworkSelector: false,
+      fullWidth: true,
+    },
+  },
+  'two-column-navbar': {
+    id: 'two-column-navbar',
+    title: 'Two Column + Navbar',
+    description: 'Two columns with navbar navigation',
+    color: 'border-purple-500',
+    component: TwoColumnNavbar,
+    layout: {
+      type: 'sidebar',
+      showNavbar: true,
+      showNetworkSelector: false,
+      fullWidth: false,
+    },
+  },
+  'sidebar-right': {
+    id: 'sidebar-right',
+    title: 'Sidebar Right',
+    description: 'Two columns with sidebar on the RIGHT side',
+    color: 'border-indigo-500',
+    component: SidebarRight,
+    layout: {
+      type: 'sidebar',
+      showNavbar: false,
+      showNetworkSelector: false,
+      fullWidth: false,
+      sidebarPosition: 'right',
     },
   },
 };
