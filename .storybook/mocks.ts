@@ -6,44 +6,147 @@ import type { Bounds } from '../src/hooks/useBounds';
 export const mockConfig: Config = {
   networks: [
     {
-      name: 'mainnet',
-      display_name: 'Mainnet',
-      enabled: true,
-      status: 'active',
-    },
-    {
       name: 'holesky',
       display_name: 'Holesky',
-      enabled: true,
-      status: 'active',
+      chain_id: 17000,
+      genesis_time: 1695902100,
+      genesis_delay: 300,
+      forks: {
+        consensus: {
+          electra: {
+            epoch: 115968,
+            min_client_versions: {
+              grandine: '1.0.0',
+              lighthouse: '7.0.0-beta.0',
+              lodestar: '1.27.0',
+              nimbus: '25.2.0',
+              prysm: '5.3.0',
+              teku: '25.2.0',
+            },
+          },
+          fusaka: {
+            epoch: 165120,
+            min_client_versions: {
+              grandine: '2.0.0.rc0',
+              lighthouse: '8.0.0-rc.0',
+              lodestar: '1.35.0-rc.1',
+              nimbus: '25.9.2',
+              prysm: '6.1.0',
+              teku: '25.9.3',
+              tysm: '0.43.0',
+            },
+          },
+        },
+      },
+    },
+    {
+      name: 'hoodi',
+      display_name: 'Hoodi',
+      chain_id: 560048,
+      genesis_time: 1742212800,
+      genesis_delay: 600,
+      forks: {
+        consensus: {
+          electra: {
+            epoch: 2048,
+            min_client_versions: {
+              grandine: '1.0.0',
+              lighthouse: '7.0.0-beta.0',
+              lodestar: '1.27.0',
+              nimbus: '25.2.0',
+              prysm: '5.3.0',
+              teku: '25.2.0',
+            },
+          },
+          fusaka: {
+            epoch: 50688,
+            min_client_versions: {
+              grandine: '2.0.0.rc0',
+              lighthouse: '8.0.0-rc.0',
+              lodestar: '1.35.0-rc.1',
+              nimbus: '25.9.2',
+              prysm: '6.1.0',
+              teku: '25.9.3',
+              tysm: '0.43.0',
+            },
+          },
+        },
+      },
+    },
+    {
+      name: 'mainnet',
+      display_name: 'Mainnet',
+      chain_id: 1,
+      genesis_time: 1606824000,
+      genesis_delay: 604800,
+      forks: {
+        consensus: {
+          electra: {
+            epoch: 364032,
+            min_client_versions: {
+              grandine: '1.1.0',
+              lighthouse: '7.0.0',
+              lodestar: '1.29.0',
+              nimbus: '25.4.1',
+              prysm: '6.0.0',
+              teku: '25.4.1',
+            },
+          },
+        },
+      },
     },
     {
       name: 'sepolia',
       display_name: 'Sepolia',
-      enabled: true,
-      status: 'active',
-    },
-    {
-      name: 'devnet-1',
-      display_name: 'Devnet 1',
-      enabled: false,
-      status: 'inactive',
+      chain_id: 11155111,
+      genesis_time: 1655647200,
+      genesis_delay: 86400,
+      forks: {
+        consensus: {
+          electra: {
+            epoch: 222464,
+            min_client_versions: {
+              grandine: '1.0.0',
+              lighthouse: '7.0.0-beta.0',
+              lodestar: '1.27.0',
+              nimbus: '25.2.0',
+              prysm: '5.3.0',
+              teku: '25.2.0',
+            },
+          },
+          fusaka: {
+            epoch: 272640,
+            min_client_versions: {
+              grandine: '2.0.0.rc0',
+              lighthouse: '8.0.0-rc.0',
+              lodestar: '1.35.0-rc.1',
+              nimbus: '25.9.2',
+              prysm: '6.1.0',
+              teku: '25.9.3',
+              tysm: '0.43.0',
+            },
+          },
+        },
+      },
     },
   ],
-  experiments: {
-    'state-expiry': {
-      name: 'State Expiry',
+  experiments: [
+    {
+      name: 'attestation-performance',
       enabled: true,
-      networks: ['mainnet', 'holesky'],
-      description: 'Ethereum state expiry experiment',
+      networks: [],
     },
-    'blob-scaling': {
-      name: 'Blob Scaling',
+    {
+      name: 'block-production',
+      enabled: false,
+      networks: [],
+    },
+    {
+      name: 'live-slots',
       enabled: true,
-      networks: ['mainnet', 'sepolia', 'holesky'],
-      description: 'EIP-4844 blob scaling improvements',
+      networks: ['mainnet'],
     },
-  },
+  ],
 };
 
 // Mock bounds data for Storybook
