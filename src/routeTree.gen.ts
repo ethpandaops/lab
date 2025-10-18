@@ -12,7 +12,14 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ExperimentsIndexRouteImport } from './routes/experiments/index'
-import { Route as ExperimentsIdRouteImport } from './routes/experiments/$id'
+import { Route as ExperimentsWithSelectorRouteImport } from './routes/experiments/with-selector'
+import { Route as ExperimentsTwoColumnNavbarRouteImport } from './routes/experiments/two-column-navbar'
+import { Route as ExperimentsTwoColumnFullwidthRouteImport } from './routes/experiments/two-column-fullwidth'
+import { Route as ExperimentsTwoColumnBasicRouteImport } from './routes/experiments/two-column-basic'
+import { Route as ExperimentsSidebarRightRouteImport } from './routes/experiments/sidebar-right'
+import { Route as ExperimentsNavbarOnlyRouteImport } from './routes/experiments/navbar-only'
+import { Route as ExperimentsHeroDemoRouteImport } from './routes/experiments/hero-demo'
+import { Route as ExperimentsFullwidthNavbarRouteImport } from './routes/experiments/fullwidth-navbar'
 
 const AboutRoute = AboutRouteImport.update({
   id: '/about',
@@ -29,43 +36,144 @@ const ExperimentsIndexRoute = ExperimentsIndexRouteImport.update({
   path: '/experiments/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ExperimentsIdRoute = ExperimentsIdRouteImport.update({
-  id: '/experiments/$id',
-  path: '/experiments/$id',
+const ExperimentsWithSelectorRoute = ExperimentsWithSelectorRouteImport.update({
+  id: '/experiments/with-selector',
+  path: '/experiments/with-selector',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ExperimentsTwoColumnNavbarRoute =
+  ExperimentsTwoColumnNavbarRouteImport.update({
+    id: '/experiments/two-column-navbar',
+    path: '/experiments/two-column-navbar',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ExperimentsTwoColumnFullwidthRoute =
+  ExperimentsTwoColumnFullwidthRouteImport.update({
+    id: '/experiments/two-column-fullwidth',
+    path: '/experiments/two-column-fullwidth',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ExperimentsTwoColumnBasicRoute =
+  ExperimentsTwoColumnBasicRouteImport.update({
+    id: '/experiments/two-column-basic',
+    path: '/experiments/two-column-basic',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ExperimentsSidebarRightRoute = ExperimentsSidebarRightRouteImport.update({
+  id: '/experiments/sidebar-right',
+  path: '/experiments/sidebar-right',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ExperimentsNavbarOnlyRoute = ExperimentsNavbarOnlyRouteImport.update({
+  id: '/experiments/navbar-only',
+  path: '/experiments/navbar-only',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ExperimentsHeroDemoRoute = ExperimentsHeroDemoRouteImport.update({
+  id: '/experiments/hero-demo',
+  path: '/experiments/hero-demo',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ExperimentsFullwidthNavbarRoute =
+  ExperimentsFullwidthNavbarRouteImport.update({
+    id: '/experiments/fullwidth-navbar',
+    path: '/experiments/fullwidth-navbar',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/experiments/$id': typeof ExperimentsIdRoute
+  '/experiments/fullwidth-navbar': typeof ExperimentsFullwidthNavbarRoute
+  '/experiments/hero-demo': typeof ExperimentsHeroDemoRoute
+  '/experiments/navbar-only': typeof ExperimentsNavbarOnlyRoute
+  '/experiments/sidebar-right': typeof ExperimentsSidebarRightRoute
+  '/experiments/two-column-basic': typeof ExperimentsTwoColumnBasicRoute
+  '/experiments/two-column-fullwidth': typeof ExperimentsTwoColumnFullwidthRoute
+  '/experiments/two-column-navbar': typeof ExperimentsTwoColumnNavbarRoute
+  '/experiments/with-selector': typeof ExperimentsWithSelectorRoute
   '/experiments': typeof ExperimentsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/experiments/$id': typeof ExperimentsIdRoute
+  '/experiments/fullwidth-navbar': typeof ExperimentsFullwidthNavbarRoute
+  '/experiments/hero-demo': typeof ExperimentsHeroDemoRoute
+  '/experiments/navbar-only': typeof ExperimentsNavbarOnlyRoute
+  '/experiments/sidebar-right': typeof ExperimentsSidebarRightRoute
+  '/experiments/two-column-basic': typeof ExperimentsTwoColumnBasicRoute
+  '/experiments/two-column-fullwidth': typeof ExperimentsTwoColumnFullwidthRoute
+  '/experiments/two-column-navbar': typeof ExperimentsTwoColumnNavbarRoute
+  '/experiments/with-selector': typeof ExperimentsWithSelectorRoute
   '/experiments': typeof ExperimentsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/experiments/$id': typeof ExperimentsIdRoute
+  '/experiments/fullwidth-navbar': typeof ExperimentsFullwidthNavbarRoute
+  '/experiments/hero-demo': typeof ExperimentsHeroDemoRoute
+  '/experiments/navbar-only': typeof ExperimentsNavbarOnlyRoute
+  '/experiments/sidebar-right': typeof ExperimentsSidebarRightRoute
+  '/experiments/two-column-basic': typeof ExperimentsTwoColumnBasicRoute
+  '/experiments/two-column-fullwidth': typeof ExperimentsTwoColumnFullwidthRoute
+  '/experiments/two-column-navbar': typeof ExperimentsTwoColumnNavbarRoute
+  '/experiments/with-selector': typeof ExperimentsWithSelectorRoute
   '/experiments/': typeof ExperimentsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about' | '/experiments/$id' | '/experiments'
+  fullPaths:
+    | '/'
+    | '/about'
+    | '/experiments/fullwidth-navbar'
+    | '/experiments/hero-demo'
+    | '/experiments/navbar-only'
+    | '/experiments/sidebar-right'
+    | '/experiments/two-column-basic'
+    | '/experiments/two-column-fullwidth'
+    | '/experiments/two-column-navbar'
+    | '/experiments/with-selector'
+    | '/experiments'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/experiments/$id' | '/experiments'
-  id: '__root__' | '/' | '/about' | '/experiments/$id' | '/experiments/'
+  to:
+    | '/'
+    | '/about'
+    | '/experiments/fullwidth-navbar'
+    | '/experiments/hero-demo'
+    | '/experiments/navbar-only'
+    | '/experiments/sidebar-right'
+    | '/experiments/two-column-basic'
+    | '/experiments/two-column-fullwidth'
+    | '/experiments/two-column-navbar'
+    | '/experiments/with-selector'
+    | '/experiments'
+  id:
+    | '__root__'
+    | '/'
+    | '/about'
+    | '/experiments/fullwidth-navbar'
+    | '/experiments/hero-demo'
+    | '/experiments/navbar-only'
+    | '/experiments/sidebar-right'
+    | '/experiments/two-column-basic'
+    | '/experiments/two-column-fullwidth'
+    | '/experiments/two-column-navbar'
+    | '/experiments/with-selector'
+    | '/experiments/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
-  ExperimentsIdRoute: typeof ExperimentsIdRoute
+  ExperimentsFullwidthNavbarRoute: typeof ExperimentsFullwidthNavbarRoute
+  ExperimentsHeroDemoRoute: typeof ExperimentsHeroDemoRoute
+  ExperimentsNavbarOnlyRoute: typeof ExperimentsNavbarOnlyRoute
+  ExperimentsSidebarRightRoute: typeof ExperimentsSidebarRightRoute
+  ExperimentsTwoColumnBasicRoute: typeof ExperimentsTwoColumnBasicRoute
+  ExperimentsTwoColumnFullwidthRoute: typeof ExperimentsTwoColumnFullwidthRoute
+  ExperimentsTwoColumnNavbarRoute: typeof ExperimentsTwoColumnNavbarRoute
+  ExperimentsWithSelectorRoute: typeof ExperimentsWithSelectorRoute
   ExperimentsIndexRoute: typeof ExperimentsIndexRoute
 }
 
@@ -92,11 +200,60 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ExperimentsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/experiments/$id': {
-      id: '/experiments/$id'
-      path: '/experiments/$id'
-      fullPath: '/experiments/$id'
-      preLoaderRoute: typeof ExperimentsIdRouteImport
+    '/experiments/with-selector': {
+      id: '/experiments/with-selector'
+      path: '/experiments/with-selector'
+      fullPath: '/experiments/with-selector'
+      preLoaderRoute: typeof ExperimentsWithSelectorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/experiments/two-column-navbar': {
+      id: '/experiments/two-column-navbar'
+      path: '/experiments/two-column-navbar'
+      fullPath: '/experiments/two-column-navbar'
+      preLoaderRoute: typeof ExperimentsTwoColumnNavbarRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/experiments/two-column-fullwidth': {
+      id: '/experiments/two-column-fullwidth'
+      path: '/experiments/two-column-fullwidth'
+      fullPath: '/experiments/two-column-fullwidth'
+      preLoaderRoute: typeof ExperimentsTwoColumnFullwidthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/experiments/two-column-basic': {
+      id: '/experiments/two-column-basic'
+      path: '/experiments/two-column-basic'
+      fullPath: '/experiments/two-column-basic'
+      preLoaderRoute: typeof ExperimentsTwoColumnBasicRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/experiments/sidebar-right': {
+      id: '/experiments/sidebar-right'
+      path: '/experiments/sidebar-right'
+      fullPath: '/experiments/sidebar-right'
+      preLoaderRoute: typeof ExperimentsSidebarRightRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/experiments/navbar-only': {
+      id: '/experiments/navbar-only'
+      path: '/experiments/navbar-only'
+      fullPath: '/experiments/navbar-only'
+      preLoaderRoute: typeof ExperimentsNavbarOnlyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/experiments/hero-demo': {
+      id: '/experiments/hero-demo'
+      path: '/experiments/hero-demo'
+      fullPath: '/experiments/hero-demo'
+      preLoaderRoute: typeof ExperimentsHeroDemoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/experiments/fullwidth-navbar': {
+      id: '/experiments/fullwidth-navbar'
+      path: '/experiments/fullwidth-navbar'
+      fullPath: '/experiments/fullwidth-navbar'
+      preLoaderRoute: typeof ExperimentsFullwidthNavbarRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -105,7 +262,14 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
-  ExperimentsIdRoute: ExperimentsIdRoute,
+  ExperimentsFullwidthNavbarRoute: ExperimentsFullwidthNavbarRoute,
+  ExperimentsHeroDemoRoute: ExperimentsHeroDemoRoute,
+  ExperimentsNavbarOnlyRoute: ExperimentsNavbarOnlyRoute,
+  ExperimentsSidebarRightRoute: ExperimentsSidebarRightRoute,
+  ExperimentsTwoColumnBasicRoute: ExperimentsTwoColumnBasicRoute,
+  ExperimentsTwoColumnFullwidthRoute: ExperimentsTwoColumnFullwidthRoute,
+  ExperimentsTwoColumnNavbarRoute: ExperimentsTwoColumnNavbarRoute,
+  ExperimentsWithSelectorRoute: ExperimentsWithSelectorRoute,
   ExperimentsIndexRoute: ExperimentsIndexRoute,
 }
 export const routeTree = rootRouteImport
