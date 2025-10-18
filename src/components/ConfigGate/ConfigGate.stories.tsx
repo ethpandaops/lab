@@ -49,6 +49,7 @@ export const Success: Story = {
  */
 export const Loading: Story = {
   parameters: {
+    hydration: false, // Disable hydration to show loading state
     msw: {
       handlers: {
         config: http.get(`${BASE_URL}${PATH_PREFIX}/config`, async () => {
@@ -74,6 +75,7 @@ export const Loading: Story = {
  */
 export const Error: Story = {
   parameters: {
+    hydration: false, // Disable hydration to show error state
     msw: {
       handlers: {
         config: http.get(`${BASE_URL}${PATH_PREFIX}/config`, () => {
@@ -107,6 +109,7 @@ export const Error: Story = {
  */
 export const NetworkError: Story = {
   parameters: {
+    hydration: false, // Disable hydration to show error state
     msw: {
       handlers: {
         config: http.get(`${BASE_URL}${PATH_PREFIX}/config`, () => {
@@ -137,6 +140,7 @@ export const NetworkError: Story = {
  */
 export const ErrorWithRetries: Story = {
   parameters: {
+    hydration: false, // Disable hydration to show error state
     msw: {
       handlers: {
         config: http.get(`${BASE_URL}${PATH_PREFIX}/config`, () => {

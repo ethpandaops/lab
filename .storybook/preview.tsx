@@ -5,7 +5,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { NetworkProvider } from '../src/providers/NetworkProvider';
 import { ConfigGate } from '../src/components/ConfigGate';
 import { initialize, mswLoader } from 'msw-storybook-addon';
-import { handlers } from './mocks';
+import { handlers, mockConfig, mockBounds } from './mocks';
 import '../src/index.css';
 
 // Initialize MSW with correct service worker URL for GitHub Pages
@@ -34,6 +34,18 @@ const preview: Preview = {
           },
         },
       });
+
+      // Hydrate the QueryClient with mock data (unless story opts out via parameters.hydration = false)
+      // This mirrors the hydration pattern in __root.tsx
+      if (context.parameters.hydration !== false) {
+        // Hydrate config
+        queryClient.setQueryData(['config'], mockConfig);
+
+        // Hydrate bounds for each network
+        mockConfig.networks.forEach(network => {
+          queryClient.setQueryData(['bounds', network.name], mockBounds);
+        });
+      }
 
       // Create a simple root route that just renders the Story
       const rootRoute = createRootRoute({

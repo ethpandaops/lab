@@ -3,7 +3,7 @@ import type { Config } from '../src/hooks/useConfig';
 import type { Bounds } from '../src/hooks/useBounds';
 
 // Mock config data for Storybook
-const mockConfig: Config = {
+export const mockConfig: Config = {
   networks: [
     {
       name: 'mainnet',
@@ -47,7 +47,7 @@ const mockConfig: Config = {
 };
 
 // Mock bounds data for Storybook
-const mockBounds: Bounds = {
+export const mockBounds: Bounds = {
   fct_block: {
     min: 1000000,
     max: 2000000,
