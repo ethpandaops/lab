@@ -9,6 +9,9 @@ import { generateHeadPlugin } from './vite-plugins/generate-head-plugin';
 // https://vite.dev/config/
 export default defineConfig({
   base: '/',
+  define: {
+    'import.meta.env.VITE_BASE_TITLE': JSON.stringify('The Lab by ethPandaOps'),
+  },
   plugins: [
     tanstackRouter({
       routesDirectory: './src/routes',

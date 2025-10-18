@@ -53,12 +53,52 @@ export const Route = createRootRoute({
   component: RootComponent,
   head: () => ({
     meta: [
-      { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+      { title: import.meta.env.VITE_BASE_TITLE },
       { charSet: 'utf-8' },
-      { property: 'og:site_name', content: 'Lab' },
-      { property: 'og:type', content: 'website' },
-      { property: 'og:locale', content: 'en_US' },
+      { httpEquiv: 'X-UA-Compatible', content: 'IE=edge' },
+      {
+        name: 'viewport',
+        content:
+          'width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, maximum-scale=1.0, minimal-ui',
+      },
+      { name: 'description', content: 'Experimental platform for exploring Ethereum data and network statistics.' },
+
+      // Schema.org (For Google+)
+      { itemProp: 'name', content: import.meta.env.VITE_BASE_TITLE },
+      {
+        itemProp: 'description',
+        content: 'Experimental platform for exploring Ethereum data and network statistics.',
+      },
+      { itemProp: 'image', content: '/images/header.png' },
+
+      // Twitter Card markup
       { name: 'twitter:card', content: 'summary_large_image' },
+      { name: 'twitter:creator', content: '@ethpandaops' },
+      { name: 'twitter:url', content: 'https://lab.ethpandaops.io' },
+      { name: 'twitter:title', content: import.meta.env.VITE_BASE_TITLE },
+      {
+        name: 'twitter:description',
+        content: 'Experimental platform for exploring Ethereum data and network statistics.',
+      },
+      { name: 'twitter:site', content: '@ethpandaops' },
+      { name: 'twitter:image', content: '/images/header.png' },
+      { name: 'twitter:image:alt', content: import.meta.env.VITE_BASE_TITLE },
+
+      // Open Graph markup (Facebook)
+      { property: 'og:url', content: 'https://lab.ethpandaops.io/' },
+      { property: 'og:type', content: 'website' },
+      { property: 'og:title', content: import.meta.env.VITE_BASE_TITLE },
+      {
+        property: 'og:description',
+        content: 'Experimental platform for exploring Ethereum data and network statistics.',
+      },
+      { property: 'og:image', content: '/images/header.png' },
+      { property: 'og:locale', content: 'en_US' },
+      { property: 'og:site_name', content: import.meta.env.VITE_BASE_TITLE },
+    ],
+    links: [
+      { rel: 'canonical', href: 'https://lab.ethpandaops.io' },
+      { rel: 'icon', type: 'image/png', href: '/images/lab.png' },
     ],
   }),
 });
