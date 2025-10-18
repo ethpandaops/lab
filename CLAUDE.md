@@ -51,7 +51,6 @@ src/
       Sidebar.tsx
       Sidebar.types.ts
       index.ts
-    NavbarLayout.tsx                  # Legacy layout (deprecated)
     index.ts
 
   pages/                              # Page implementations (pure content)
