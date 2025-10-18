@@ -9,7 +9,7 @@ export const Route = createFileRoute('/about')({
 
 function AboutWithLayout(): JSX.Element {
   return (
-    <Standard showNavbar>
+    <Standard showHeader>
       <AboutPage />
     </Standard>
   );

@@ -8,7 +8,7 @@ export interface ExperimentConfig {
   component: ComponentType;
   layout: {
     type: 'standard' | 'sidebar' | 'none';
-    showNavbar: boolean;
+    showHeader: boolean;
     showNetworkSelector: boolean;
     fullWidth?: boolean;
     sidebarPosition?: 'left' | 'right';

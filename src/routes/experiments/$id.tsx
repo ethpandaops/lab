@@ -28,7 +28,7 @@ function ExperimentComponent(): JSX.Element {
 
   return (
     <LayoutWrapper
-      showNavbar={layout.showNavbar}
+      showHeader={layout.showHeader}
       showNetworkSelector={layout.showNetworkSelector}
       fullWidth={layout.fullWidth}
       sidebarPosition={layout.sidebarPosition}
@@ -44,7 +44,7 @@ function NoLayout({ children }: { children: ReactNode }): JSX.Element {
 
 function getLayoutComponent(type: 'standard' | 'sidebar' | 'none'): ComponentType<{
   children: ReactNode;
-  showNavbar?: boolean;
+  showHeader?: boolean;
   showNetworkSelector?: boolean;
   fullWidth?: boolean;
   sidebarPosition?: 'left' | 'right';
