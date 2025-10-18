@@ -15,7 +15,14 @@ declare global {
 }
 
 // Create QueryClient for hydrated data
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 3, // Retry failed requests up to 3 times
+      retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 30000), // Exponential backoff
+    },
+  },
+});
 
 // Hydrate the config query if the global variable exists
 if (typeof window !== 'undefined' && window.__CONFIG__) {

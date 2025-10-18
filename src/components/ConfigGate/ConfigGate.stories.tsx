@@ -57,6 +57,8 @@ export const Loading: Story = {
 
 /**
  * ConfigGate shows error state when config fetch fails
+ * Note: We keep the default retry: false from preview.tsx
+ * to show the error state immediately without retrying
  */
 export const Error: Story = {
   parameters: {
@@ -84,6 +86,8 @@ export const Error: Story = {
 
 /**
  * ConfigGate shows error state when network request fails
+ * Note: We keep the default retry: false from preview.tsx
+ * to show the error state immediately without retrying
  */
 export const NetworkError: Story = {
   parameters: {
@@ -92,6 +96,41 @@ export const NetworkError: Story = {
         config: http.get(`${BASE_URL}${PATH_PREFIX}/config`, () => {
           return HttpResponse.error();
         }),
+      },
+    },
+  },
+  render: () => (
+    <ConfigGate>
+      <div className="flex min-h-screen items-center justify-center bg-slate-900">
+        <div className="text-center">
+          <h1 className="text-3xl font-bold text-white">This should not be visible</h1>
+        </div>
+      </div>
+    </ConfigGate>
+  ),
+};
+
+/**
+ * Example: Error state WITH retries enabled (takes ~7 seconds to show error)
+ * This demonstrates how to override the global retry: false on a per-story basis
+ */
+export const ErrorWithRetries: Story = {
+  parameters: {
+    msw: {
+      handlers: {
+        config: http.get(`${BASE_URL}${PATH_PREFIX}/config`, () => {
+          return HttpResponse.json(
+            { error: 'Internal Server Error' },
+            { status: 500, statusText: 'Internal Server Error' }
+          );
+        }),
+      },
+    },
+    // Override global retry settings for this story
+    tanstackQuery: {
+      queries: {
+        retry: 3,
+        retryDelay: (attemptIndex: number) => Math.min(1000 * 2 ** attemptIndex, 30000),
       },
     },
   },

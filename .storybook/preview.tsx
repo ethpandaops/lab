@@ -19,13 +19,17 @@ initialize({
 const preview: Preview = {
   loaders: [mswLoader],
   decorators: [
-    Story => {
+    (Story, context) => {
+      // Allow stories to override query options via parameters.tanstackQuery
+      const queryOptions = context.parameters.tanstackQuery?.queries || {};
+
       // Create QueryClient inside decorator for proper isolation per story
       const queryClient = new QueryClient({
         defaultOptions: {
           queries: {
             retry: false,
             staleTime: Infinity,
+            ...queryOptions, // Story-level overrides
           },
         },
       });

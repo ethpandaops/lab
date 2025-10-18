@@ -68,8 +68,8 @@ export function useBounds<TData = Bounds>(options?: UseBoundsOptions<TData>): Us
     refetchInterval: REFETCH_INTERVALS.BOUNDS,
     staleTime: Infinity, // Never consider data stale - always use cached data if available
     gcTime: Infinity, // Keep cached data forever
-    retry: 3, // Retry failed requests up to 3 times
-    retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 30000), // Exponential backoff
+    retry: Infinity, // Keep trying forever - bounds are critical for app functionality
+    // retryDelay inherited from QueryClient: exponential backoff capped at 30s
     select: options?.select,
   });
 }
