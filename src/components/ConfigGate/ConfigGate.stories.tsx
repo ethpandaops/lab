@@ -8,7 +8,20 @@ const meta: Meta = {
   component: ConfigGate,
   parameters: {
     layout: 'fullscreen',
+    docs: {
+      story: {
+        inline: false,
+        iframeHeight: 600,
+      },
+    },
   },
+  decorators: [
+    Story => (
+      <div className="relative h-[600px] w-full">
+        <Story />
+      </div>
+    ),
+  ],
   tags: ['autodocs'],
 };
 
