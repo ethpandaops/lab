@@ -43,7 +43,5 @@ export function useConfig(): UseQueryResult<Config, Error> {
     refetchInterval: REFETCH_INTERVALS.CONFIG,
     staleTime: Infinity, // Never consider data stale - always use cached data if available
     gcTime: Infinity, // Keep cached data forever
-    retry: Infinity, // Keep trying forever - config is critical for app functionality
-    // retryDelay inherited from QueryClient: exponential backoff capped at 30s
   });
 }

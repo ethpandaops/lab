@@ -1,6 +1,5 @@
 import { type JSX, useEffect } from 'react';
 import { useConfig } from '@/hooks/useConfig';
-import Logo from '/logo.png';
 
 interface ConfigGateProps {
   children: React.ReactNode;
@@ -19,7 +18,7 @@ export function ConfigGate({ children }: ConfigGateProps): JSX.Element {
   if (isLoading && !config) {
     return (
       <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-slate-950">
-        <img src={Logo} className="h-72 w-72 animate-spin object-contain" alt="Loading..." />
+        <img src="/logo.png" className="h-72 w-72 animate-spin object-contain" alt="Loading..." />
         <p className="mt-8 text-2xl text-slate-400">Loading Lab...</p>
       </div>
     );
@@ -31,7 +30,7 @@ export function ConfigGate({ children }: ConfigGateProps): JSX.Element {
 
     return (
       <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-slate-950">
-        <img src={Logo} className="h-72 w-72 rotate-180 object-contain" alt="Lab Logo" />
+        <img src="/logo.png" className="h-72 w-72 rotate-180 object-contain" alt="Lab Logo" />
         <h1 className="mt-6 text-2xl text-red-400">Failed to Load Configuration</h1>
         {error && <p className="mt-2 text-sm text-slate-400">{error.message}</p>}
         <button

@@ -18,8 +18,8 @@ declare global {
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      retry: 3, // Retry failed requests up to 3 times
-      retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 30000), // Exponential backoff
+      retry: Infinity, // Keep retrying forever - critical queries like config/bounds need to succeed
+      retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 30000), // Exponential backoff, max 30s
     },
   },
 });

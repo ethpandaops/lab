@@ -57,8 +57,7 @@ export const Loading: Story = {
 
 /**
  * ConfigGate shows error state when config fetch fails
- * Note: We keep the default retry: false from preview.tsx
- * to show the error state immediately without retrying
+ * Note: We explicitly set retry: 0 to show the error state immediately without retrying
  */
 export const Error: Story = {
   parameters: {
@@ -70,6 +69,11 @@ export const Error: Story = {
             { status: 500, statusText: 'Internal Server Error' }
           );
         }),
+      },
+    },
+    tanstackQuery: {
+      queries: {
+        retry: 0,
       },
     },
   },
@@ -86,8 +90,7 @@ export const Error: Story = {
 
 /**
  * ConfigGate shows error state when network request fails
- * Note: We keep the default retry: false from preview.tsx
- * to show the error state immediately without retrying
+ * Note: We explicitly set retry: 0 to show the error state immediately without retrying
  */
 export const NetworkError: Story = {
   parameters: {
@@ -96,6 +99,11 @@ export const NetworkError: Story = {
         config: http.get(`${BASE_URL}${PATH_PREFIX}/config`, () => {
           return HttpResponse.error();
         }),
+      },
+    },
+    tanstackQuery: {
+      queries: {
+        retry: 0,
       },
     },
   },
