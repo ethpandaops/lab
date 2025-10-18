@@ -7,3 +7,7 @@ export interface SidebarProps {
   fullWidth?: boolean;
   sidebarPosition?: 'left' | 'right';
 }
+
+export interface SidebarSlotProps {
+  children: ReactNode;
+}

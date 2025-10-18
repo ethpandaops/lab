@@ -11,9 +11,23 @@ const meta = {
         component:
           'Two column layout with main content and sidebar. Supports optional header, network selector, and configurable sidebar position.',
       },
+      story: {
+        inline: false,
+        iframeHeight: 600,
+      },
     },
   },
+  decorators: [
+    Story => (
+      <div className="relative h-[600px] w-full">
+        <Story />
+      </div>
+    ),
+  ],
   argTypes: {
+    children: {
+      table: { disable: true },
+    },
     showHeader: {
       control: 'boolean',
       description: 'Show the header with navigation',
@@ -32,23 +46,27 @@ const meta = {
       description: 'Position of the sidebar',
     },
   },
+  tags: ['autodocs'],
 } satisfies Meta<typeof Sidebar>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
 /**
- * Default two-column layout with left sidebar
+ * Default two-column layout with left sidebar using compound components pattern
  */
 export const Default: Story = {
   args: {
+    children: <></>,
     showHeader: false,
     showNetworkSelector: false,
     fullWidth: false,
     sidebarPosition: 'left',
-    children: (
-      <>
-        <aside className="rounded-lg border border-slate-700 bg-slate-800 p-6">
+  },
+  render: args => (
+    <Sidebar {...args}>
+      <Sidebar.Aside>
+        <div className="rounded-lg border border-slate-700 bg-slate-800 p-6">
           <h2 className="mb-4 text-xl font-semibold text-white">Sidebar</h2>
           <nav className="space-y-2">
             <a href="#" className="block rounded-md px-3 py-2 text-slate-300 hover:bg-slate-700">
@@ -61,32 +79,39 @@ export const Default: Story = {
               Navigation Item 3
             </a>
           </nav>
-        </aside>
-        <main className="rounded-lg border border-slate-700 bg-slate-800 p-8">
+        </div>
+      </Sidebar.Aside>
+      <Sidebar.Main>
+        <div className="rounded-lg border border-slate-700 bg-slate-800 p-8">
           <h1 className="mb-4 text-3xl font-bold text-white">Main Content</h1>
           <p className="text-slate-300">This is the main content area with sidebar on the left.</p>
-        </main>
-      </>
-    ),
-  },
+        </div>
+      </Sidebar.Main>
+    </Sidebar>
+  ),
 };
 
 /**
- * Two-column layout with right sidebar
+ * Two-column layout with right sidebar using compound components pattern
  */
 export const RightSidebar: Story = {
   args: {
+    children: <></>,
     showHeader: false,
     showNetworkSelector: false,
     fullWidth: false,
     sidebarPosition: 'right',
-    children: (
-      <>
-        <main className="rounded-lg border border-slate-700 bg-slate-800 p-8">
+  },
+  render: args => (
+    <Sidebar {...args}>
+      <Sidebar.Main>
+        <div className="rounded-lg border border-slate-700 bg-slate-800 p-8">
           <h1 className="mb-4 text-3xl font-bold text-white">Main Content</h1>
           <p className="text-slate-300">This is the main content area with sidebar on the right.</p>
-        </main>
-        <aside className="rounded-lg border border-slate-700 bg-slate-800 p-6">
+        </div>
+      </Sidebar.Main>
+      <Sidebar.Aside>
+        <div className="rounded-lg border border-slate-700 bg-slate-800 p-6">
           <h2 className="mb-4 text-xl font-semibold text-white">Sidebar</h2>
           <div className="space-y-4">
             <div className="rounded-md bg-slate-700 p-4">
@@ -96,24 +121,27 @@ export const RightSidebar: Story = {
               <p className="text-sm text-slate-300">Widget 2</p>
             </div>
           </div>
-        </aside>
-      </>
-    ),
-  },
+        </div>
+      </Sidebar.Aside>
+    </Sidebar>
+  ),
 };
 
 /**
- * Layout with header and left sidebar
+ * Layout with header and left sidebar using compound components pattern
  */
 export const WithHeader: Story = {
   args: {
+    children: <></>,
     showHeader: true,
     showNetworkSelector: false,
     fullWidth: false,
     sidebarPosition: 'left',
-    children: (
-      <>
-        <aside className="rounded-lg border border-slate-700 bg-slate-800 p-6">
+  },
+  render: args => (
+    <Sidebar {...args}>
+      <Sidebar.Aside>
+        <div className="rounded-lg border border-slate-700 bg-slate-800 p-6">
           <h2 className="mb-4 text-xl font-semibold text-white">Sidebar</h2>
           <nav className="space-y-2">
             <a href="#" className="block rounded-md px-3 py-2 text-slate-300 hover:bg-slate-700">
@@ -123,28 +151,33 @@ export const WithHeader: Story = {
               Navigation Item 2
             </a>
           </nav>
-        </aside>
-        <main className="rounded-lg border border-slate-700 bg-slate-800 p-8">
+        </div>
+      </Sidebar.Aside>
+      <Sidebar.Main>
+        <div className="rounded-lg border border-slate-700 bg-slate-800 p-8">
           <h1 className="mb-4 text-3xl font-bold text-white">Page with Header</h1>
           <p className="text-slate-300">This layout includes the header with navigation.</p>
-        </main>
-      </>
-    ),
-  },
+        </div>
+      </Sidebar.Main>
+    </Sidebar>
+  ),
 };
 
 /**
- * Layout with header and network selector
+ * Layout with header and network selector using compound components pattern
  */
 export const WithHeaderAndNetworkSelector: Story = {
   args: {
+    children: <></>,
     showHeader: true,
     showNetworkSelector: true,
     fullWidth: false,
     sidebarPosition: 'left',
-    children: (
-      <>
-        <aside className="rounded-lg border border-slate-700 bg-slate-800 p-6">
+  },
+  render: args => (
+    <Sidebar {...args}>
+      <Sidebar.Aside>
+        <div className="rounded-lg border border-slate-700 bg-slate-800 p-6">
           <h2 className="mb-4 text-xl font-semibold text-white">Filters</h2>
           <div className="space-y-4">
             <div>
@@ -156,52 +189,62 @@ export const WithHeaderAndNetworkSelector: Story = {
               </select>
             </div>
           </div>
-        </aside>
-        <main className="rounded-lg border border-slate-700 bg-slate-800 p-8">
+        </div>
+      </Sidebar.Aside>
+      <Sidebar.Main>
+        <div className="rounded-lg border border-slate-700 bg-slate-800 p-8">
           <h1 className="mb-4 text-3xl font-bold text-white">Content with Network Selector</h1>
           <p className="text-slate-300">This layout includes both header and network selector.</p>
-        </main>
-      </>
-    ),
-  },
+        </div>
+      </Sidebar.Main>
+    </Sidebar>
+  ),
 };
 
 /**
- * Full width two-column layout
+ * Full width two-column layout using compound components pattern
  */
 export const FullWidth: Story = {
   args: {
+    children: <></>,
     showHeader: true,
     showNetworkSelector: false,
     fullWidth: true,
     sidebarPosition: 'left',
-    children: (
-      <>
-        <aside className="rounded-lg border border-slate-700 bg-slate-800 p-6">
+  },
+  render: args => (
+    <Sidebar {...args}>
+      <Sidebar.Aside>
+        <div className="rounded-lg border border-slate-700 bg-slate-800 p-6">
           <h2 className="mb-4 text-xl font-semibold text-white">Sidebar</h2>
           <p className="text-slate-300">Fixed width sidebar</p>
-        </aside>
-        <main className="rounded-lg border border-slate-700 bg-slate-800 p-8">
+        </div>
+      </Sidebar.Aside>
+      <Sidebar.Main>
+        <div className="rounded-lg border border-slate-700 bg-slate-800 p-8">
           <h1 className="mb-4 text-3xl font-bold text-white">Full Width Layout</h1>
           <p className="text-slate-300">This layout uses full viewport width.</p>
-        </main>
-      </>
-    ),
-  },
+        </div>
+      </Sidebar.Main>
+    </Sidebar>
+  ),
 };
 
 /**
- * Complex content with data visualization
+ * Complex content with data visualization using compound components pattern
  */
 export const WithComplexContent: Story = {
   args: {
+    children: <></>,
     showHeader: true,
     showNetworkSelector: true,
     fullWidth: false,
     sidebarPosition: 'right',
-    children: (
-      <>
-        <main className="space-y-6">
+  },
+  render: args => (
+    <Sidebar {...args}>
+      <Sidebar.Main>
+        <div className="space-y-6">
           <div className="rounded-lg border border-slate-700 bg-slate-800 p-8">
             <h1 className="mb-4 text-3xl font-bold text-white">Dashboard</h1>
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -214,8 +257,10 @@ export const WithComplexContent: Story = {
               ))}
             </div>
           </div>
-        </main>
-        <aside className="space-y-4">
+        </div>
+      </Sidebar.Main>
+      <Sidebar.Aside>
+        <div className="space-y-4">
           <div className="rounded-lg border border-slate-700 bg-slate-800 p-6">
             <h2 className="mb-4 text-xl font-semibold text-white">Activity Feed</h2>
             <div className="space-y-3">
@@ -227,8 +272,8 @@ export const WithComplexContent: Story = {
               ))}
             </div>
           </div>
-        </aside>
-      </>
-    ),
-  },
+        </div>
+      </Sidebar.Aside>
+    </Sidebar>
+  ),
 };

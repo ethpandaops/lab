@@ -10,8 +10,19 @@ const meta = {
       description: {
         component: 'Single column layout with optional header and network selector. Supports full-width content.',
       },
+      story: {
+        inline: false,
+        iframeHeight: 600,
+      },
     },
   },
+  decorators: [
+    Story => (
+      <div className="relative h-[600px] w-full">
+        <Story />
+      </div>
+    ),
+  ],
   argTypes: {
     showHeader: {
       control: 'boolean',
@@ -26,6 +37,7 @@ const meta = {
       description: 'Use full width instead of max-width container',
     },
   },
+  tags: ['autodocs'],
 } satisfies Meta<typeof Standard>;
 
 export default meta;
