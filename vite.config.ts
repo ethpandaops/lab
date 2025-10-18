@@ -4,6 +4,7 @@ import tailwindcss from '@tailwindcss/vite';
 import { tanstackRouter } from '@tanstack/router-plugin/vite';
 import { visualizer } from 'rollup-plugin-visualizer';
 import path from 'path';
+import { generateHeadPlugin } from './vite-plugins/generate-head-plugin';
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -22,6 +23,7 @@ export default defineConfig({
       brotliSize: true,
       filename: 'build/stats.html',
     }),
+    generateHeadPlugin(),
   ],
   server: {
     proxy: {

@@ -1,5 +1,5 @@
 import { type JSX } from 'react';
-import { createRootRoute, Outlet } from '@tanstack/react-router';
+import { createRootRoute, Outlet, HeadContent } from '@tanstack/react-router';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { NetworkProvider } from '@/providers/NetworkProvider';
 import { ConfigGate } from '@/components/ConfigGate';
@@ -41,6 +41,7 @@ function RootComponent(): JSX.Element {
     <QueryClientProvider client={queryClient}>
       <ConfigGate>
         <NetworkProvider>
+          <HeadContent />
           <Outlet />
         </NetworkProvider>
       </ConfigGate>
@@ -50,4 +51,14 @@ function RootComponent(): JSX.Element {
 
 export const Route = createRootRoute({
   component: RootComponent,
+  head: () => ({
+    meta: [
+      { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+      { charSet: 'utf-8' },
+      { property: 'og:site_name', content: 'Lab' },
+      { property: 'og:type', content: 'website' },
+      { property: 'og:locale', content: 'en_US' },
+      { name: 'twitter:card', content: 'summary_large_image' },
+    ],
+  }),
 });
