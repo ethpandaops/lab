@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { NetworkIcon } from './NetworkIcon';
 
 const meta = {
-  title: 'Components/NetworkIcon',
+  title: 'Components/Network/NetworkIcon',
   component: NetworkIcon,
   parameters: {
     layout: 'centered',

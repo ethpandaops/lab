@@ -4,7 +4,7 @@ import { ConfigGate } from './ConfigGate';
 import { BASE_URL, PATH_PREFIX } from '@/utils/api-config';
 
 const meta: Meta = {
-  title: 'Components/ConfigGate',
+  title: 'Components/Layout/ConfigGate',
   component: ConfigGate,
   parameters: {
     layout: 'fullscreen',

@@ -1,7 +1,7 @@
 import { type JSX, useMemo } from 'react';
 import { useNetwork, type Network } from '@/hooks/useNetwork';
-import { SelectMenu, type SelectMenuOption } from '@/components/SelectMenu';
-import { NetworkIcon } from '@/components/NetworkIcon';
+import { SelectMenu, type SelectMenuOption } from '@/components/Form/SelectMenu';
+import { NetworkIcon } from '@/components/Network/NetworkIcon';
 import type { NetworkSelectorProps } from './NetworkSelector.types';
 
 const NETWORK_ORDER = ['mainnet', 'holesky', 'sepolia', 'hoodi'];

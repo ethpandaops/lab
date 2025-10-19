@@ -1,6 +1,6 @@
 import { type JSX } from 'react';
-import { Breadcrumbs } from '@/components/Breadcrumbs';
-import { NavLinks } from '@/components/NavLinks';
+import { Breadcrumbs } from '@/components/Navigation/Breadcrumbs';
+import { NavLinks } from '@/components/Navigation/NavLinks';
 import { type NavBarProps } from './NavBar.types';
 
 export function NavBar({ showBreadcrumbs = true, showNavLinks = true }: NavBarProps): JSX.Element {

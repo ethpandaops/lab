@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Header } from './Header';
 
 const meta = {
-  title: 'Components/Header',
+  title: 'Components/Layout/Header',
   component: Header,
   parameters: {
     layout: 'fullscreen',

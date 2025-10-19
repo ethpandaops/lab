@@ -2,7 +2,7 @@ import { type JSX } from 'react';
 import { createRootRouteWithContext, Outlet, HeadContent } from '@tanstack/react-router';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { NetworkProvider } from '@/providers/NetworkProvider';
-import { ConfigGate } from '@/components/ConfigGate';
+import { ConfigGate } from '@/components/Layout/ConfigGate';
 import type { Config } from '@/hooks/useConfig';
 import type { Bounds } from '@/hooks/useBounds';
 

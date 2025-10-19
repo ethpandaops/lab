@@ -13,7 +13,7 @@ interface MyRouterContext {
 }
 
 const meta = {
-  title: 'Components/NavBar',
+  title: 'Components/Navigation/NavBar',
   component: NavBar,
   parameters: {
     layout: 'fullscreen',

@@ -5,7 +5,7 @@ import { ChevronRightIcon } from '@heroicons/react/20/solid';
 import { Breadcrumbs } from './Breadcrumbs';
 
 const meta: Meta<typeof Breadcrumbs> = {
-  title: 'Components/Breadcrumbs',
+  title: 'Components/Navigation/Breadcrumbs',
   component: Breadcrumbs,
   parameters: {
     layout: 'padded',

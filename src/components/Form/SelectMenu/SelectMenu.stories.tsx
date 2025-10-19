@@ -5,7 +5,7 @@ import type { SelectMenuOption } from './SelectMenu.types';
 import { GlobeAltIcon, UserIcon, CogIcon } from '@heroicons/react/16/solid';
 
 const meta: Meta = {
-  title: 'Components/SelectMenu',
+  title: 'Components/Form/SelectMenu',
   component: SelectMenu,
   parameters: {
     layout: 'centered',

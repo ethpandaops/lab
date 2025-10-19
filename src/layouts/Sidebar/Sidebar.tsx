@@ -1,6 +1,6 @@
 import { Children, type JSX, type ReactElement } from 'react';
 import { clsx } from 'clsx';
-import { Header } from '@/components/Header';
+import { Header } from '@/components/Layout/Header';
 import { type SidebarProps, type SidebarSlotProps } from './Sidebar.types';
 
 // Slot components - automatically wrap with semantic HTML tags

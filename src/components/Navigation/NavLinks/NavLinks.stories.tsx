@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { NavLinks } from './NavLinks';
 
 const meta: Meta<typeof NavLinks> = {
-  title: 'Components/NavLinks',
+  title: 'Components/Navigation/NavLinks',
   component: NavLinks,
   parameters: {
     layout: 'padded',

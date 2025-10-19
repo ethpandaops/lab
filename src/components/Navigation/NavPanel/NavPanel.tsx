@@ -1,9 +1,9 @@
 import { type JSX } from 'react';
 import { Dialog, DialogBackdrop, DialogPanel } from '@headlessui/react';
-import { NetworkSelector } from '@/components/NetworkSelector';
-import { Breadcrumbs } from '@/components/Breadcrumbs';
-import { NavLinks } from '@/components/NavLinks';
-import { NetworkSummary } from '@/components/NetworkSummary';
+import { NetworkSelector } from '@/components/Network/NetworkSelector';
+import { Breadcrumbs } from '@/components/Navigation/Breadcrumbs';
+import { NavLinks } from '@/components/Navigation/NavLinks';
+import { NetworkSummary } from '@/components/Network/NetworkSummary';
 import { type NavPanelProps } from './NavPanel.types';
 
 /**

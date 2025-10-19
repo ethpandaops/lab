@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { NetworkSummary } from './NetworkSummary';
 
 const meta = {
-  title: 'Components/NetworkSummary',
+  title: 'Components/Network/NetworkSummary',
   component: NetworkSummary,
   parameters: {
     layout: 'centered',

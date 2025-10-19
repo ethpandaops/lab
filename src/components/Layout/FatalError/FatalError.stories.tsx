@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { FatalError } from './FatalError';
 
 const meta: Meta = {
-  title: 'Components/FatalError',
+  title: 'Components/Layout/FatalError',
   component: FatalError,
   parameters: {
     layout: 'fullscreen',
