@@ -5,6 +5,11 @@ import { SidebarRight } from '@/pages/experiments/SidebarRight';
 
 export const Route = createFileRoute('/experiments/sidebar-right')({
   component: SidebarRightPage,
+  beforeLoad: () => {
+    return {
+      getTitle: () => 'Sidebar Right',
+    };
+  },
 });
 
 function SidebarRightPage(): JSX.Element {

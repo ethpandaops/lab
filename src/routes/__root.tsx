@@ -1,10 +1,15 @@
 import { type JSX } from 'react';
-import { createRootRoute, Outlet, HeadContent } from '@tanstack/react-router';
+import { createRootRouteWithContext, Outlet, HeadContent } from '@tanstack/react-router';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { NetworkProvider } from '@/providers/NetworkProvider';
 import { ConfigGate } from '@/components/ConfigGate';
 import type { Config } from '@/hooks/useConfig';
 import type { Bounds } from '@/hooks/useBounds';
+
+// Define router context interface
+interface MyRouterContext {
+  getTitle?: () => string;
+}
 
 // Extend Window interface for type safety
 declare global {
@@ -49,7 +54,7 @@ function RootComponent(): JSX.Element {
   );
 }
 
-export const Route = createRootRoute({
+export const Route = createRootRouteWithContext<MyRouterContext>()({
   component: RootComponent,
   head: () => ({
     meta: [

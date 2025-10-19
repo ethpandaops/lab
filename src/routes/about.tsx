@@ -5,6 +5,11 @@ import { Standard } from '@/layouts/Standard';
 
 export const Route = createFileRoute('/about')({
   component: AboutWithLayout,
+  beforeLoad: () => {
+    return {
+      getTitle: () => 'About',
+    };
+  },
   head: () => ({
     meta: [{ title: `${import.meta.env.VITE_BASE_TITLE} - About` }],
   }),

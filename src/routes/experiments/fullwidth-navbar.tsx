@@ -5,6 +5,11 @@ import { FullWidthNavbar } from '@/pages/experiments/FullWidthNavbar';
 
 export const Route = createFileRoute('/experiments/fullwidth-navbar')({
   component: FullWidthNavbarPage,
+  beforeLoad: () => {
+    return {
+      getTitle: () => 'Fullwidth Navbar',
+    };
+  },
 });
 
 function FullWidthNavbarPage(): JSX.Element {

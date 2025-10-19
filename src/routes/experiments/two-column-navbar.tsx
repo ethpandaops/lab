@@ -5,6 +5,11 @@ import { TwoColumnNavbar } from '@/pages/experiments/TwoColumnNavbar';
 
 export const Route = createFileRoute('/experiments/two-column-navbar')({
   component: TwoColumnNavbarPage,
+  beforeLoad: () => {
+    return {
+      getTitle: () => 'Two Column Navbar',
+    };
+  },
 });
 
 function TwoColumnNavbarPage(): JSX.Element {

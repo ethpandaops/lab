@@ -41,13 +41,16 @@ export function BlockList(): JSX.Element {
     );
   }
 
+  // Deduplicate blocks by block_root
+  const uniqueBlocks = Array.from(new Map(data.fct_block.map(block => [block.block_root, block])).values());
+
   return (
     <div className="mx-auto max-w-4xl">
       <h2 className="mb-6 text-2xl/8 font-bold text-slate-100">Recent Blocks</h2>
       <div className="flex flex-col gap-3">
-        {data.fct_block.map(block => (
+        {uniqueBlocks.map(block => (
           <div
-            key={block.slot}
+            key={block.block_root}
             className="flex flex-col gap-2 rounded-lg bg-slate-800/50 p-6 shadow-sm outline-1 -outline-offset-1 outline-slate-600/50 backdrop-blur-sm transition-all hover:bg-slate-800/70 hover:shadow-md sm:flex-row sm:items-center sm:justify-between"
           >
             <div className="flex flex-col gap-1">
