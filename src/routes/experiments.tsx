@@ -7,4 +7,7 @@ export const Route = createFileRoute('/experiments')({
       getTitle: () => 'Experiments',
     };
   },
+  head: () => ({
+    meta: [{ title: `${import.meta.env.VITE_BASE_TITLE} - Experiments` }],
+  }),
 });
