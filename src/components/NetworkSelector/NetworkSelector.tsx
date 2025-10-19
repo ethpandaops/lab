@@ -1,44 +1,10 @@
 import { type JSX, useMemo } from 'react';
 import { useNetwork, type Network } from '@/hooks/useNetwork';
 import { SelectMenu, type SelectMenuOption } from '@/components/SelectMenu';
+import { NetworkIcon } from '@/components/NetworkIcon';
 import type { NetworkSelectorProps } from './NetworkSelector.types';
 
 const NETWORK_ORDER = ['mainnet', 'holesky', 'sepolia', 'hoodi'];
-
-/**
- * Network icon mapping - emojis and custom icons per network
- */
-const NETWORK_ICONS: Record<string, JSX.Element> = {
-  mainnet: <img src="/images/ethereum.svg" alt="Ethereum" className="size-5" aria-hidden="true" />,
-  holesky: (
-    <span className="text-base" aria-hidden="true">
-      🦊
-    </span>
-  ),
-  sepolia: (
-    <span className="text-base" aria-hidden="true">
-      🐬
-    </span>
-  ),
-  hoodi: (
-    <span className="text-base" aria-hidden="true">
-      🦚
-    </span>
-  ),
-};
-
-/**
- * Get the icon for a network, with fallback to test tube emoji
- */
-function getNetworkIcon(networkName: string): JSX.Element {
-  return (
-    NETWORK_ICONS[networkName] ?? (
-      <span className="text-base" aria-hidden="true">
-        🧪
-      </span>
-    )
-  );
-}
 
 /**
  * Sorts networks by the predefined order, then alphabetically for any remaining networks.
@@ -76,12 +42,7 @@ function sortNetworks(networks: Network[]): Network[] {
  *
  * Features:
  * - Defaults to "mainnet" if available, otherwise the first network
- * - Shows network display name with custom icons:
- *   - Mainnet: Ethereum logo
- *   - Holesky: 🦊
- *   - Sepolia: 🐬
- *   - Hoodi: 🦚
- *   - Unknown networks: 🧪
+ * - Shows network display name with NetworkIcon component
  * - Highlights currently selected network with a checkmark
  * - Networks ordered by priority: mainnet, holesky, sepolia, hoodi, then alphabetically
  * - Keyboard accessible
@@ -107,7 +68,7 @@ export function NetworkSelector({ showLabel = true, label = 'Network' }: Network
       sortNetworks(networks).map((network: Network) => ({
         value: network,
         label: network.display_name,
-        icon: getNetworkIcon(network.name),
+        icon: <NetworkIcon networkName={network.name} />,
       })),
     [networks]
   );

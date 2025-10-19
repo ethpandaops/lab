@@ -2,7 +2,9 @@ import { type JSX } from 'react';
 import { Link } from '@tanstack/react-router';
 import { NetworkSelector } from '@/components/NetworkSelector';
 import { NetworkSummary } from '@/components/NetworkSummary';
+import { NetworkIcon } from '@/components/NetworkIcon';
 import { NavBar } from '@/components/NavBar';
+import { useNetwork } from '@/hooks/useNetwork';
 import { type HeaderProps } from './Header.types';
 
 export function Header({
@@ -13,38 +15,58 @@ export function Header({
 }: HeaderProps): JSX.Element {
   // Show NavBar if either breadcrumbs or nav links are enabled
   const showNavBar = showBreadcrumbs || showNavLinks;
+  const { currentNetwork } = useNetwork();
 
   return (
-    <>
-      <nav className="border-b border-slate-700 bg-slate-800">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="flex h-16 items-center">
-            {/* Left: Logo */}
-            <div className="flex items-center">
-              <Link to="/" className="text-xl font-bold text-white hover:text-slate-300">
-                Lab
-              </Link>
+    <header className="sticky top-0 z-50 border-b border-slate-700/30 bg-slate-800">
+      {/* Top Header Content */}
+      <div className="w-full px-4 py-2 md:px-6 lg:px-8 xl:px-12 2xl:px-16">
+        <div className="flex items-center justify-between">
+          {/* Left: Logo */}
+          <Link to="/" className="flex items-center gap-3">
+            <img alt="The Lab Logo" className="size-10 object-contain" src="/images/lab.png" />
+            <div className="flex flex-col justify-center">
+              <span className="bg-linear-to-r from-indigo-400 via-purple-400 to-indigo-400 bg-clip-text font-sans text-2xl font-black text-transparent">
+                The Lab
+              </span>
+              <div className="-mt-1 flex flex-col font-mono">
+                <span className="text-[12px] text-slate-400">lab.ethpandaops.io</span>
+              </div>
             </div>
+          </Link>
 
-            {/* Middle: Network Selector - conditional */}
-            {showNetworkSelector && (
-              <div className="flex flex-1 justify-center">
-                <div className="w-48">
-                  <NetworkSelector showLabel={false} />
-                </div>
-              </div>
-            )}
+          {/* Mobile: Network Icon with Name - visible < lg, hidden >= lg, right-aligned */}
+          {showNetworkSelector && currentNetwork && (
+            <div className="flex flex-col items-center gap-1 lg:hidden">
+              <NetworkIcon networkName={currentNetwork.name} className="size-8" />
+              <span className="font-mono text-xs text-slate-300">{currentNetwork.display_name}</span>
+            </div>
+          )}
 
-            {/* Right: Network Summary - conditional, always pushed to the right */}
-            {showNetworkSummary && (
-              <div className="ml-auto flex">
-                <NetworkSummary />
+          {/* Middle: Network Selector - hidden < lg, visible >= lg */}
+          {showNetworkSelector && (
+            <div className="hidden flex-1 justify-center lg:flex">
+              <div className="w-48">
+                <NetworkSelector showLabel={false} />
               </div>
-            )}
-          </div>
+            </div>
+          )}
+
+          {/* Right: Network Summary - hidden < lg, visible >= lg */}
+          {showNetworkSummary && (
+            <div className="hidden lg:flex">
+              <NetworkSummary />
+            </div>
+          )}
         </div>
-      </nav>
-      {showNavBar && <NavBar showBreadcrumbs={showBreadcrumbs} showNavLinks={showNavLinks} />}
-    </>
+      </div>
+
+      {/* NavBar - hidden on mobile, visible on lg+ */}
+      {showNavBar && (
+        <div className="hidden w-full border-t border-slate-700/20 px-4 py-2 md:px-6 lg:block lg:px-8 xl:px-12 2xl:px-16">
+          <NavBar showBreadcrumbs={showBreadcrumbs} showNavLinks={showNavLinks} />
+        </div>
+      )}
+    </header>
   );
 }
