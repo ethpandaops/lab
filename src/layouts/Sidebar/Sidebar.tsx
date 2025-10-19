@@ -14,8 +14,11 @@ function SidebarAside({ children }: SidebarSlotProps): JSX.Element {
 // Main Sidebar component
 function SidebarComponent({
   children,
-  showHeader = false,
-  showNetworkSelector = false,
+  showHeader = true,
+  showNetworkSelector = true,
+  showNetworkSummary = true,
+  showBreadcrumbs = true,
+  showNavLinks = true,
   fullWidth = false,
   sidebarPosition = 'left',
 }: SidebarProps): JSX.Element {
@@ -34,7 +37,14 @@ function SidebarComponent({
   return (
     <div className="min-h-dvh bg-slate-900">
       {/* Header - conditional */}
-      {showHeader && <Header showNetworkSelector={showNetworkSelector} />}
+      {showHeader && (
+        <Header
+          showNetworkSelector={showNetworkSelector}
+          showNetworkSummary={showNetworkSummary}
+          showBreadcrumbs={showBreadcrumbs}
+          showNavLinks={showNavLinks}
+        />
+      )}
 
       {/* Two Column Grid */}
       <div className={fullWidth ? 'px-4 py-8' : 'mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8'}>

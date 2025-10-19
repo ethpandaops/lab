@@ -13,7 +13,7 @@ export const Route = createFileRoute('/experiments/two-column-basic')({
 
 function TwoColumnBasicPage(): JSX.Element {
   return (
-    <Sidebar sidebarPosition="left">
+    <Sidebar showHeader={false} sidebarPosition="left">
       <Sidebar.Aside>
         <div className="rounded-sm border border-cyan-700 bg-slate-800 p-6">
           <h2 className="mb-4 text-xl font-bold text-cyan-400">Sidebar (Left)</h2>

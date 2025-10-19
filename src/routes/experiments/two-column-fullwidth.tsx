@@ -13,7 +13,7 @@ export const Route = createFileRoute('/experiments/two-column-fullwidth')({
 
 function TwoColumnFullWidthPage(): JSX.Element {
   return (
-    <Sidebar fullWidth>
+    <Sidebar showHeader={false} fullWidth>
       <Sidebar.Main>
         <div className="rounded-sm border border-orange-700 bg-slate-800 p-8">
           <h1 className="mb-4 text-4xl font-bold text-orange-400">Two Column Full Width</h1>

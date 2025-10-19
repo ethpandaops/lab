@@ -14,7 +14,7 @@ export const Route = createFileRoute('/experiments/with-selector')({
 
 function WithSelectorPage(): JSX.Element {
   return (
-    <Standard showHeader showNetworkSelector>
+    <Standard>
       <WithSelector />
     </Standard>
   );

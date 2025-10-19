@@ -8,7 +8,8 @@ const meta = {
     layout: 'fullscreen',
     docs: {
       description: {
-        component: 'Single column layout with optional header and network selector. Supports full-width content.',
+        component:
+          'Single column layout with header (enabled by default). Header includes network selector, network summary, breadcrumbs, and navigation links (all enabled by default). Supports full-width content.',
       },
       story: {
         inline: false,
@@ -32,6 +33,18 @@ const meta = {
       control: 'boolean',
       description: 'Show network selector in header (only works if showHeader is true)',
     },
+    showNetworkSummary: {
+      control: 'boolean',
+      description: 'Show network summary in header (only works if showHeader is true)',
+    },
+    showBreadcrumbs: {
+      control: 'boolean',
+      description: 'Show breadcrumbs in navbar (only works if showHeader is true)',
+    },
+    showNavLinks: {
+      control: 'boolean',
+      description: 'Show navigation links in navbar (only works if showHeader is true)',
+    },
     fullWidth: {
       control: 'boolean',
       description: 'Use full width instead of max-width container',
@@ -44,51 +57,50 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /**
- * Default layout with minimal content
+ * Default layout with all features enabled
  */
 export const Default: Story = {
   args: {
-    showHeader: false,
-    showNetworkSelector: false,
-    fullWidth: false,
     children: (
       <div className="rounded-lg border border-slate-700 bg-slate-800 p-8">
         <h1 className="mb-4 text-3xl font-bold text-white">Page Content</h1>
-        <p className="text-slate-300">This is the default Standard layout with no header and constrained width.</p>
+        <p className="text-slate-300">
+          This is the default Standard layout with header, network selector, network summary, breadcrumbs, and
+          navigation links all enabled.
+        </p>
       </div>
     ),
   },
 };
 
 /**
- * Layout with header navigation
+ * Minimal layout without header
  */
-export const WithHeader: Story = {
+export const WithoutHeader: Story = {
   args: {
-    showHeader: true,
+    showHeader: false,
+    children: (
+      <div className="rounded-lg border border-slate-700 bg-slate-800 p-8">
+        <h1 className="mb-4 text-3xl font-bold text-white">Page Content</h1>
+        <p className="text-slate-300">This layout has no header - just content in a constrained width container.</p>
+      </div>
+    ),
+  },
+};
+
+/**
+ * Layout with header but without network features
+ */
+export const WithoutNetworkFeatures: Story = {
+  args: {
     showNetworkSelector: false,
-    fullWidth: false,
+    showNetworkSummary: false,
     children: (
       <div className="rounded-lg border border-slate-700 bg-slate-800 p-8">
-        <h1 className="mb-4 text-3xl font-bold text-white">Page with Header</h1>
-        <p className="text-slate-300">This layout includes the header with navigation links.</p>
-      </div>
-    ),
-  },
-};
-
-/**
- * Layout with header and network selector
- */
-export const WithHeaderAndNetworkSelector: Story = {
-  args: {
-    showHeader: true,
-    showNetworkSelector: true,
-    fullWidth: false,
-    children: (
-      <div className="rounded-lg border border-slate-700 bg-slate-800 p-8">
-        <h1 className="mb-4 text-3xl font-bold text-white">Page with Network Selector</h1>
-        <p className="text-slate-300">This layout includes both the header and network selector.</p>
+        <h1 className="mb-4 text-3xl font-bold text-white">Page without Network Features</h1>
+        <p className="text-slate-300">
+          This layout has header with breadcrumbs and nav links, but no network selector or summary.
+        </p>
       </div>
     ),
   },
@@ -99,8 +111,6 @@ export const WithHeaderAndNetworkSelector: Story = {
  */
 export const FullWidth: Story = {
   args: {
-    showHeader: true,
-    showNetworkSelector: false,
     fullWidth: true,
     children: (
       <div className="rounded-lg border border-slate-700 bg-slate-800 p-8">
@@ -118,9 +128,6 @@ export const FullWidth: Story = {
  */
 export const WithComplexContent: Story = {
   args: {
-    showHeader: true,
-    showNetworkSelector: true,
-    fullWidth: false,
     children: (
       <div className="space-y-6">
         <div className="rounded-lg border border-slate-700 bg-slate-800 p-8">
@@ -135,6 +142,56 @@ export const WithComplexContent: Story = {
             </div>
           ))}
         </div>
+      </div>
+    ),
+  },
+};
+
+/**
+ * Layout with only breadcrumbs (no nav links)
+ */
+export const BreadcrumbsOnly: Story = {
+  args: {
+    showNavLinks: false,
+    showNetworkSelector: false,
+    showNetworkSummary: false,
+    children: (
+      <div className="rounded-lg border border-slate-700 bg-slate-800 p-8">
+        <h1 className="mb-4 text-3xl font-bold text-white">Page with Breadcrumbs Only</h1>
+        <p className="text-slate-300">This layout shows only breadcrumbs in the navbar, no navigation links.</p>
+      </div>
+    ),
+  },
+};
+
+/**
+ * Layout with only nav links (no breadcrumbs)
+ */
+export const NavLinksOnly: Story = {
+  args: {
+    showBreadcrumbs: false,
+    showNetworkSelector: false,
+    showNetworkSummary: false,
+    children: (
+      <div className="rounded-lg border border-slate-700 bg-slate-800 p-8">
+        <h1 className="mb-4 text-3xl font-bold text-white">Page with Nav Links Only</h1>
+        <p className="text-slate-300">This layout shows only navigation links in the navbar, no breadcrumbs.</p>
+      </div>
+    ),
+  },
+};
+
+/**
+ * Layout with network summary but no selector
+ */
+export const WithNetworkSummaryOnly: Story = {
+  args: {
+    showNetworkSelector: false,
+    showNetworkSummary: true,
+    children: (
+      <div className="rounded-lg border border-slate-700 bg-slate-800 p-8">
+        <h1 className="mb-4 text-3xl font-bold text-white">Page with Network Summary</h1>
+        <p className="text-slate-300">This layout shows the network summary but not the selector.</p>
       </div>
     ),
   },

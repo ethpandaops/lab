@@ -14,7 +14,7 @@ export const Route = createFileRoute('/experiments/navbar-only')({
 
 function NavbarOnlyPage(): JSX.Element {
   return (
-    <Standard showHeader>
+    <Standard showNetworkSelector={false} showNetworkSummary={false}>
       <NavbarOnly />
     </Standard>
   );

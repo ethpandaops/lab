@@ -9,7 +9,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'Two column layout with main content and sidebar. Supports optional header, network selector, and configurable sidebar position.',
+          'Two column layout with main content and sidebar. Header enabled by default with network selector, network summary, breadcrumbs, and navigation links (all enabled by default). Configurable sidebar position (left or right).',
       },
       story: {
         inline: false,
@@ -36,6 +36,18 @@ const meta = {
       control: 'boolean',
       description: 'Show network selector in header (only works if showHeader is true)',
     },
+    showNetworkSummary: {
+      control: 'boolean',
+      description: 'Show network summary in header (only works if showHeader is true)',
+    },
+    showBreadcrumbs: {
+      control: 'boolean',
+      description: 'Show breadcrumbs in navbar (only works if showHeader is true)',
+    },
+    showNavLinks: {
+      control: 'boolean',
+      description: 'Show navigation links in navbar (only works if showHeader is true)',
+    },
     fullWidth: {
       control: 'boolean',
       description: 'Use full width instead of max-width container',
@@ -53,14 +65,11 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /**
- * Default two-column layout with left sidebar using compound components pattern
+ * Default two-column layout with all features enabled
  */
 export const Default: Story = {
   args: {
     children: <></>,
-    showHeader: false,
-    showNetworkSelector: false,
-    fullWidth: false,
     sidebarPosition: 'left',
   },
   render: args => (
@@ -92,14 +101,11 @@ export const Default: Story = {
 };
 
 /**
- * Two-column layout with right sidebar using compound components pattern
+ * Two-column layout with all features and right sidebar
  */
 export const RightSidebar: Story = {
   args: {
     children: <></>,
-    showHeader: false,
-    showNetworkSelector: false,
-    fullWidth: false,
     sidebarPosition: 'right',
   },
   render: args => (
@@ -128,14 +134,12 @@ export const RightSidebar: Story = {
 };
 
 /**
- * Layout with header and left sidebar using compound components pattern
+ * Layout without header - minimal two-column layout
  */
-export const WithHeader: Story = {
+export const WithoutHeader: Story = {
   args: {
     children: <></>,
-    showHeader: true,
-    showNetworkSelector: false,
-    fullWidth: false,
+    showHeader: false,
     sidebarPosition: 'left',
   },
   render: args => (
@@ -155,8 +159,8 @@ export const WithHeader: Story = {
       </Sidebar.Aside>
       <Sidebar.Main>
         <div className="rounded-lg border border-slate-700 bg-slate-800 p-8">
-          <h1 className="mb-4 text-3xl font-bold text-white">Page with Header</h1>
-          <p className="text-slate-300">This layout includes the header with navigation.</p>
+          <h1 className="mb-4 text-3xl font-bold text-white">Minimal Layout</h1>
+          <p className="text-slate-300">This layout has no header - just two columns.</p>
         </div>
       </Sidebar.Main>
     </Sidebar>
@@ -164,14 +168,13 @@ export const WithHeader: Story = {
 };
 
 /**
- * Layout with header and network selector using compound components pattern
+ * Layout without network features
  */
-export const WithHeaderAndNetworkSelector: Story = {
+export const WithoutNetworkFeatures: Story = {
   args: {
     children: <></>,
-    showHeader: true,
-    showNetworkSelector: true,
-    fullWidth: false,
+    showNetworkSelector: false,
+    showNetworkSummary: false,
     sidebarPosition: 'left',
   },
   render: args => (
@@ -193,8 +196,10 @@ export const WithHeaderAndNetworkSelector: Story = {
       </Sidebar.Aside>
       <Sidebar.Main>
         <div className="rounded-lg border border-slate-700 bg-slate-800 p-8">
-          <h1 className="mb-4 text-3xl font-bold text-white">Content with Network Selector</h1>
-          <p className="text-slate-300">This layout includes both header and network selector.</p>
+          <h1 className="mb-4 text-3xl font-bold text-white">Content without Network Features</h1>
+          <p className="text-slate-300">
+            This layout has header with breadcrumbs and nav links, but no network selector or summary.
+          </p>
         </div>
       </Sidebar.Main>
     </Sidebar>
@@ -207,8 +212,6 @@ export const WithHeaderAndNetworkSelector: Story = {
 export const FullWidth: Story = {
   args: {
     children: <></>,
-    showHeader: true,
-    showNetworkSelector: false,
     fullWidth: true,
     sidebarPosition: 'left',
   },
@@ -236,9 +239,6 @@ export const FullWidth: Story = {
 export const WithComplexContent: Story = {
   args: {
     children: <></>,
-    showHeader: true,
-    showNetworkSelector: true,
-    fullWidth: false,
     sidebarPosition: 'right',
   },
   render: args => (

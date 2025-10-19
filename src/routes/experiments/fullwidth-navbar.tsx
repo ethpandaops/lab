@@ -14,7 +14,7 @@ export const Route = createFileRoute('/experiments/fullwidth-navbar')({
 
 function FullWidthNavbarPage(): JSX.Element {
   return (
-    <Standard showHeader fullWidth>
+    <Standard fullWidth>
       <FullWidthNavbar />
     </Standard>
   );

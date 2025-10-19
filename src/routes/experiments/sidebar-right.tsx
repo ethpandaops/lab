@@ -13,7 +13,7 @@ export const Route = createFileRoute('/experiments/sidebar-right')({
 
 function SidebarRightPage(): JSX.Element {
   return (
-    <Sidebar sidebarPosition="right">
+    <Sidebar showHeader={false} sidebarPosition="right">
       <Sidebar.Main>
         <div className="rounded-sm border border-indigo-700 bg-slate-800 p-8">
           <h1 className="mb-4 text-4xl font-bold text-indigo-400">Sidebar Right Example</h1>

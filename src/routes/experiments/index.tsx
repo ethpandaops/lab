@@ -9,7 +9,7 @@ export const Route = createFileRoute('/experiments/')({
 
 function ExperimentsWithLayout(): JSX.Element {
   return (
-    <Standard showHeader showNetworkSelector>
+    <Standard>
       <Experiments />
     </Standard>
   );
