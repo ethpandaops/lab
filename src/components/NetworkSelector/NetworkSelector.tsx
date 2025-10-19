@@ -1,8 +1,72 @@
 import { type JSX, useMemo } from 'react';
-import { GlobeAltIcon } from '@heroicons/react/16/solid';
 import { useNetwork, type Network } from '@/hooks/useNetwork';
 import { SelectMenu, type SelectMenuOption } from '@/components/SelectMenu';
 import type { NetworkSelectorProps } from './NetworkSelector.types';
+
+const NETWORK_ORDER = ['mainnet', 'holesky', 'sepolia', 'hoodi'];
+
+/**
+ * Network icon mapping - emojis and custom icons per network
+ */
+const NETWORK_ICONS: Record<string, JSX.Element> = {
+  mainnet: <img src="/images/ethereum.svg" alt="Ethereum" className="size-5" aria-hidden="true" />,
+  holesky: (
+    <span className="text-base" aria-hidden="true">
+      🦊
+    </span>
+  ),
+  sepolia: (
+    <span className="text-base" aria-hidden="true">
+      🐬
+    </span>
+  ),
+  hoodi: (
+    <span className="text-base" aria-hidden="true">
+      🦚
+    </span>
+  ),
+};
+
+/**
+ * Get the icon for a network, with fallback to test tube emoji
+ */
+function getNetworkIcon(networkName: string): JSX.Element {
+  return (
+    NETWORK_ICONS[networkName] ?? (
+      <span className="text-base" aria-hidden="true">
+        🧪
+      </span>
+    )
+  );
+}
+
+/**
+ * Sorts networks by the predefined order, then alphabetically for any remaining networks.
+ */
+function sortNetworks(networks: Network[]): Network[] {
+  return [...networks].sort((a, b) => {
+    const aIndex = NETWORK_ORDER.indexOf(a.name);
+    const bIndex = NETWORK_ORDER.indexOf(b.name);
+
+    // Both in the priority list - sort by their position
+    if (aIndex !== -1 && bIndex !== -1) {
+      return aIndex - bIndex;
+    }
+
+    // Only a is in the priority list - a comes first
+    if (aIndex !== -1) {
+      return -1;
+    }
+
+    // Only b is in the priority list - b comes first
+    if (bIndex !== -1) {
+      return 1;
+    }
+
+    // Neither in priority list - sort alphabetically by name
+    return a.name.localeCompare(b.name);
+  });
+}
 
 /**
  * Network selector dropdown component.
@@ -12,8 +76,14 @@ import type { NetworkSelectorProps } from './NetworkSelector.types';
  *
  * Features:
  * - Defaults to "mainnet" if available, otherwise the first network
- * - Shows network display name with a globe icon
+ * - Shows network display name with custom icons:
+ *   - Mainnet: Ethereum logo
+ *   - Holesky: 🦊
+ *   - Sepolia: 🐬
+ *   - Hoodi: 🦚
+ *   - Unknown networks: 🧪
  * - Highlights currently selected network with a checkmark
+ * - Networks ordered by priority: mainnet, holesky, sepolia, hoodi, then alphabetically
  * - Keyboard accessible
  * - Dark mode support
  *
@@ -34,10 +104,10 @@ export function NetworkSelector({ showLabel = true, label = 'Network' }: Network
 
   const options: SelectMenuOption<Network>[] = useMemo(
     () =>
-      networks.map((network: Network) => ({
+      sortNetworks(networks).map((network: Network) => ({
         value: network,
         label: network.display_name,
-        icon: <GlobeAltIcon className="size-5 text-indigo-400 group-data-focus:text-indigo-200" aria-hidden="true" />,
+        icon: getNetworkIcon(network.name),
       })),
     [networks]
   );
