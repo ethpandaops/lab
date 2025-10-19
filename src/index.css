@@ -368,13 +368,21 @@ select {
     border: none;
   }
 
-  /* Cyber effect */
+  /* Cyber effect - radial gradients only */
   .bg-cyber {
     background-size: 100px 100px;
     background-image:
       radial-gradient(circle at 20% 30%, rgb(0 255 159 / 5%) 0%, transparent 50%),
       radial-gradient(circle at 80% 70%, rgb(0 242 255 / 5%) 0%, transparent 50%),
       radial-gradient(circle at 50% 50%, rgb(255 0 102 / 5%) 0%, transparent 70%);
+  }
+
+  /* Cyber grid - grid pattern only */
+  .bg-cyber-grid {
+    background-size: 100px 100px;
+    background-image:
+      linear-gradient(0deg, transparent 24%, rgba(0, 255, 159, .05) 25%, rgba(0, 255, 159, .05) 26%, transparent 27%, transparent 74%, rgba(0, 255, 159, .05) 75%, rgba(0, 255, 159, .05) 76%, transparent 77%, transparent),
+      linear-gradient(90deg, transparent 24%, rgba(0, 255, 159, .05) 25%, rgba(0, 255, 159, .05) 26%, transparent 27%, transparent 74%, rgba(0, 255, 159, .05) 75%, rgba(0, 255, 159, .05) 76%, transparent 77%, transparent);
   }
 
   /* Noise texture */
