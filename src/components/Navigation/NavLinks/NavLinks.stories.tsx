@@ -5,8 +5,17 @@ const meta: Meta<typeof NavLinks> = {
   title: 'Components/Navigation/NavLinks',
   component: NavLinks,
   parameters: {
-    layout: 'padded',
+    layout: 'fullscreen',
   },
+  decorators: [
+    Story => (
+      <div className="border-b border-slate-700/30 bg-slate-800">
+        <div className="w-full border-t border-slate-700/20 px-4 py-2 md:px-6 lg:px-8 xl:px-12 2xl:px-16">
+          <Story />
+        </div>
+      </div>
+    ),
+  ],
   tags: ['autodocs'],
 };
 
@@ -29,4 +38,11 @@ export const Vertical: Story = {
   args: {
     orientation: 'vertical',
   },
+  decorators: [
+    Story => (
+      <div className="w-72">
+        <Story />
+      </div>
+    ),
+  ],
 };

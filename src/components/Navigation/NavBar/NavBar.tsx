@@ -5,7 +5,7 @@ import { type NavBarProps } from './NavBar.types';
 
 export function NavBar({ showBreadcrumbs = true, showNavLinks = true }: NavBarProps): JSX.Element {
   return (
-    <div className="flex items-center">
+    <div className="flex min-h-8 items-center">
       {/* Left: Breadcrumbs */}
       {showBreadcrumbs && <Breadcrumbs />}
 
