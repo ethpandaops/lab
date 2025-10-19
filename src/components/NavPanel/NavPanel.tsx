@@ -1,5 +1,5 @@
 import { type JSX } from 'react';
-import { Dialog, DialogBackdrop, DialogPanel, Transition, TransitionChild } from '@headlessui/react';
+import { Dialog, DialogBackdrop, DialogPanel } from '@headlessui/react';
 import { NetworkSelector } from '@/components/NetworkSelector';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
 import { NavLinks } from '@/components/NavLinks';
@@ -41,63 +41,49 @@ export function NavPanel({
   showNetworkSummary = false,
 }: NavPanelProps): JSX.Element {
   return (
-    <Transition show={isOpen}>
-      <Dialog onClose={onClose} className="relative z-50 lg:hidden">
-        {/* Backdrop */}
-        <TransitionChild
-          enter="ease-out duration-300"
-          enterFrom="opacity-0"
-          enterTo="opacity-100"
-          leave="ease-in duration-200"
-          leaveFrom="opacity-100"
-          leaveTo="opacity-0"
-        >
-          <DialogBackdrop className="fixed top-[64px] right-0 bottom-0 left-0 bg-black/50" />
-        </TransitionChild>
+    <Dialog open={isOpen} onClose={onClose} transition className="relative z-50 lg:hidden">
+      {/* Backdrop */}
+      <DialogBackdrop
+        transition
+        className="fixed top-[64px] right-0 bottom-0 left-0 bg-black/50 transition duration-300 ease-out data-[closed]:opacity-0"
+      />
 
-        {/* Panel */}
-        <TransitionChild
-          enter="transition ease-in-out duration-300"
-          enterFrom="-translate-x-full"
-          enterTo="translate-x-0"
-          leave="transition ease-in-out duration-300"
-          leaveFrom="translate-x-0"
-          leaveTo="-translate-x-full"
-        >
-          <DialogPanel className="fixed top-[64px] left-0 flex h-[calc(100%-64px)] w-72 flex-col bg-slate-800 shadow-xl">
-            {/* Content area */}
-            <div className="flex flex-1 flex-col overflow-y-auto">
-              {/* Network Selector */}
-              {showNetworkSelector && (
-                <div className="border-b border-slate-700/30 px-4 py-4">
-                  <NetworkSelector showLabel={false} />
-                </div>
-              )}
-
-              {/* Breadcrumbs */}
-              {showBreadcrumbs && (
-                <div className="border-b border-slate-700/30 px-4 py-4">
-                  <Breadcrumbs />
-                </div>
-              )}
-
-              {/* Navigation Links */}
-              {showNavLinks && (
-                <div className="flex-1 border-b border-slate-700/30 px-4 py-4">
-                  <NavLinks orientation="vertical" />
-                </div>
-              )}
-
-              {/* Network Summary at bottom */}
-              {showNetworkSummary && (
-                <div className="mt-auto">
-                  <NetworkSummary />
-                </div>
-              )}
+      {/* Panel */}
+      <DialogPanel
+        transition
+        className="fixed top-[64px] left-0 flex h-[calc(100%-64px)] w-72 flex-col bg-slate-800 shadow-xl transition duration-300 ease-in-out data-[closed]:-translate-x-full"
+      >
+        {/* Content area */}
+        <div className="flex flex-1 flex-col overflow-y-auto">
+          {/* Network Selector */}
+          {showNetworkSelector && (
+            <div className="border-b border-slate-700/30 px-4 py-4">
+              <NetworkSelector showLabel={false} />
             </div>
-          </DialogPanel>
-        </TransitionChild>
-      </Dialog>
-    </Transition>
+          )}
+
+          {/* Breadcrumbs */}
+          {showBreadcrumbs && (
+            <div className="border-b border-slate-700/30 px-4 py-4">
+              <Breadcrumbs />
+            </div>
+          )}
+
+          {/* Navigation Links */}
+          {showNavLinks && (
+            <div className="flex-1 border-b border-slate-700/30 px-4 py-4">
+              <NavLinks orientation="vertical" />
+            </div>
+          )}
+
+          {/* Network Summary at bottom */}
+          {showNetworkSummary && (
+            <div className="mt-auto">
+              <NetworkSummary orientation="vertical" />
+            </div>
+          )}
+        </div>
+      </DialogPanel>
+    </Dialog>
   );
 }

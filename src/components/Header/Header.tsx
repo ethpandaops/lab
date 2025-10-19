@@ -32,7 +32,7 @@ export function Header({
             {/* Hamburger Menu - visible < lg, hidden >= lg */}
             {showNavPanel && (
               <button
-                onClick={() => setIsPanelOpen(!isPanelOpen)}
+                onClick={() => setIsPanelOpen(prev => !prev)}
                 className="rounded-sm p-2 text-slate-400 hover:bg-slate-700 hover:text-white lg:hidden"
                 aria-label="Toggle navigation menu"
               >
