@@ -1,4 +1,5 @@
 import { type JSX } from 'react';
+import { clsx } from 'clsx';
 import { Label, Listbox, ListboxButton, ListboxOption, ListboxOptions } from '@headlessui/react';
 import { ChevronUpDownIcon } from '@heroicons/react/16/solid';
 import { CheckIcon } from '@heroicons/react/20/solid';
@@ -45,7 +46,7 @@ export function SelectMenu<T>({
   return (
     <Listbox value={value} onChange={onChange} disabled={disabled}>
       {showLabel && label && <Label className="block text-sm/6 font-medium text-slate-200">{label}</Label>}
-      <div className={showLabel ? `relative mt-2 ${className}` : `relative ${className}`}>
+      <div className={clsx('relative', showLabel && 'mt-2', className)}>
         <ListboxButton
           className="grid w-full cursor-default grid-cols-1 rounded-md bg-slate-800/50 py-1.5 pr-2 pl-3 text-left text-slate-100 outline-1 -outline-offset-1 outline-slate-600/50 transition-all hover:bg-slate-800/70 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-indigo-500 disabled:cursor-not-allowed disabled:opacity-50 sm:text-sm/6"
           data-disabled={disabled || undefined}
@@ -73,7 +74,10 @@ export function SelectMenu<T>({
               <div className="flex items-center">
                 {option.icon && <span className="shrink-0">{option.icon}</span>}
                 <span
-                  className={`block truncate font-normal group-data-selected:font-semibold ${option.icon ? 'ml-3' : ''}`}
+                  className={clsx(
+                    'block truncate font-normal group-data-selected:font-semibold',
+                    option.icon && 'ml-3'
+                  )}
                 >
                   {option.label}
                 </span>

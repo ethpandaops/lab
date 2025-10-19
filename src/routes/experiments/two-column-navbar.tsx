@@ -13,7 +13,7 @@ export const Route = createFileRoute('/experiments/two-column-navbar')({
 
 function TwoColumnNavbarPage(): JSX.Element {
   return (
-    <Sidebar>
+    <Sidebar fullWidth>
       <Sidebar.Main>
         <div className="rounded-sm border border-purple-700 bg-slate-800 p-8">
           <h1 className="mb-4 text-4xl font-bold text-purple-400">Two Column + Navbar</h1>

@@ -61,6 +61,7 @@ type Story = StoryObj<typeof meta>;
  */
 export const Default: Story = {
   args: {
+    fullWidth: true,
     children: (
       <div className="rounded-lg border border-slate-700 bg-slate-800 p-8">
         <h1 className="mb-4 text-3xl font-bold text-white">Page Content</h1>
@@ -79,10 +80,11 @@ export const Default: Story = {
 export const WithoutHeader: Story = {
   args: {
     showHeader: false,
+    fullWidth: true,
     children: (
       <div className="rounded-lg border border-slate-700 bg-slate-800 p-8">
         <h1 className="mb-4 text-3xl font-bold text-white">Page Content</h1>
-        <p className="text-slate-300">This layout has no header - just content in a constrained width container.</p>
+        <p className="text-slate-300">This layout has no header - just content in a full width container.</p>
       </div>
     ),
   },
@@ -95,6 +97,7 @@ export const WithoutNetworkFeatures: Story = {
   args: {
     showNetworkSelector: false,
     showNetworkSummary: false,
+    fullWidth: true,
     children: (
       <div className="rounded-lg border border-slate-700 bg-slate-800 p-8">
         <h1 className="mb-4 text-3xl font-bold text-white">Page without Network Features</h1>
@@ -128,6 +131,7 @@ export const FullWidth: Story = {
  */
 export const WithComplexContent: Story = {
   args: {
+    fullWidth: true,
     children: (
       <div className="space-y-6">
         <div className="rounded-lg border border-slate-700 bg-slate-800 p-8">
@@ -155,6 +159,7 @@ export const BreadcrumbsOnly: Story = {
     showNavLinks: false,
     showNetworkSelector: false,
     showNetworkSummary: false,
+    fullWidth: true,
     children: (
       <div className="rounded-lg border border-slate-700 bg-slate-800 p-8">
         <h1 className="mb-4 text-3xl font-bold text-white">Page with Breadcrumbs Only</h1>
@@ -172,6 +177,7 @@ export const NavLinksOnly: Story = {
     showBreadcrumbs: false,
     showNetworkSelector: false,
     showNetworkSummary: false,
+    fullWidth: true,
     children: (
       <div className="rounded-lg border border-slate-700 bg-slate-800 p-8">
         <h1 className="mb-4 text-3xl font-bold text-white">Page with Nav Links Only</h1>
@@ -188,6 +194,7 @@ export const WithNetworkSummaryOnly: Story = {
   args: {
     showNetworkSelector: false,
     showNetworkSummary: true,
+    fullWidth: true,
     children: (
       <div className="rounded-lg border border-slate-700 bg-slate-800 p-8">
         <h1 className="mb-4 text-3xl font-bold text-white">Page with Network Summary</h1>

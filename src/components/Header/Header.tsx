@@ -56,7 +56,7 @@ export function Header({
           {/* Mobile: Network Icon with Name - visible < lg, hidden >= lg, right-aligned */}
           {showNetworkSelector && currentNetwork && (
             <div className="flex flex-col items-center gap-1 lg:hidden">
-              <NetworkIcon networkName={currentNetwork.name} className="size-8" />
+              <NetworkIcon networkName={currentNetwork.name} />
               <span className="font-mono text-xs text-slate-300">{currentNetwork.display_name}</span>
             </div>
           )}

@@ -1,4 +1,5 @@
 import { type JSX } from 'react';
+import { clsx } from 'clsx';
 import { Header } from '@/components/Header';
 import { type StandardProps } from './Standard.types';
 
@@ -9,7 +10,7 @@ export function Standard({
   showNetworkSummary = true,
   showBreadcrumbs = true,
   showNavLinks = true,
-  fullWidth = false,
+  fullWidth = true,
 }: StandardProps): JSX.Element {
   return (
     <div className="min-h-dvh bg-slate-900">
@@ -24,7 +25,14 @@ export function Standard({
       )}
 
       {/* Main Content */}
-      <main className={fullWidth ? 'px-4 py-8' : 'mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8'}>{children}</main>
+      <main
+        className={clsx('py-8', {
+          'px-4 md:px-6 lg:px-8 xl:px-12 2xl:px-16': showHeader,
+          'mx-auto max-w-7xl': !fullWidth,
+        })}
+      >
+        {children}
+      </main>
     </div>
   );
 }

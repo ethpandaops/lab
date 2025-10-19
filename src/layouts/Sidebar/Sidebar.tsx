@@ -1,4 +1,5 @@
 import { Children, type JSX, type ReactElement } from 'react';
+import { clsx } from 'clsx';
 import { Header } from '@/components/Header';
 import { type SidebarProps, type SidebarSlotProps } from './Sidebar.types';
 
@@ -19,7 +20,7 @@ function SidebarComponent({
   showNetworkSummary = true,
   showBreadcrumbs = true,
   showNavLinks = true,
-  fullWidth = false,
+  fullWidth = true,
   sidebarPosition = 'left',
 }: SidebarProps): JSX.Element {
   // Filter children to find Main and Aside slots
@@ -47,8 +48,13 @@ function SidebarComponent({
       )}
 
       {/* Two Column Grid */}
-      <div className={fullWidth ? 'px-4 py-8' : 'mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8'}>
-        <div className={`grid ${gridCols} gap-6`}>
+      <div
+        className={clsx('py-8', {
+          'px-4 md:px-6 lg:px-8 xl:px-12 2xl:px-16': showHeader,
+          'mx-auto max-w-7xl': !fullWidth,
+        })}
+      >
+        <div className={clsx('grid gap-6', gridCols)}>
           {leftContent}
           {rightContent}
         </div>

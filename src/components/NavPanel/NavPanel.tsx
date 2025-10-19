@@ -52,7 +52,7 @@ export function NavPanel({
           leaveFrom="opacity-100"
           leaveTo="opacity-0"
         >
-          <DialogBackdrop className="fixed top-[69px] right-0 bottom-0 left-0 bg-black/50" />
+          <DialogBackdrop className="fixed top-[64px] right-0 bottom-0 left-0 bg-black/50" />
         </TransitionChild>
 
         {/* Panel */}
@@ -64,7 +64,7 @@ export function NavPanel({
           leaveFrom="translate-x-0"
           leaveTo="-translate-x-full"
         >
-          <DialogPanel className="fixed top-[69px] left-0 flex h-[calc(100%-69px)] w-72 flex-col bg-slate-800 shadow-xl">
+          <DialogPanel className="fixed top-[64px] left-0 flex h-[calc(100%-64px)] w-72 flex-col bg-slate-800 shadow-xl">
             {/* Content area */}
             <div className="flex flex-1 flex-col overflow-y-auto">
               {/* Network Selector */}

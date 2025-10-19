@@ -17,7 +17,7 @@ export const Route = createFileRoute('/about')({
 
 function AboutWithLayout(): JSX.Element {
   return (
-    <Standard showNetworkSelector={false} showNetworkSummary={false}>
+    <Standard showNetworkSelector={false} showNetworkSummary={false} fullWidth>
       <AboutPage />
     </Standard>
   );

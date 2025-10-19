@@ -71,6 +71,7 @@ export const Default: Story = {
   args: {
     children: <></>,
     sidebarPosition: 'left',
+    fullWidth: true,
   },
   render: args => (
     <Sidebar {...args}>
@@ -107,6 +108,7 @@ export const RightSidebar: Story = {
   args: {
     children: <></>,
     sidebarPosition: 'right',
+    fullWidth: true,
   },
   render: args => (
     <Sidebar {...args}>
@@ -141,6 +143,7 @@ export const WithoutHeader: Story = {
     children: <></>,
     showHeader: false,
     sidebarPosition: 'left',
+    fullWidth: true,
   },
   render: args => (
     <Sidebar {...args}>
@@ -176,6 +179,7 @@ export const WithoutNetworkFeatures: Story = {
     showNetworkSelector: false,
     showNetworkSummary: false,
     sidebarPosition: 'left',
+    fullWidth: true,
   },
   render: args => (
     <Sidebar {...args}>
@@ -240,6 +244,7 @@ export const WithComplexContent: Story = {
   args: {
     children: <></>,
     sidebarPosition: 'right',
+    fullWidth: true,
   },
   render: args => (
     <Sidebar {...args}>
