@@ -28,7 +28,7 @@ import type { NavLinksProps } from './NavLinks.types';
 export function NavLinks({ orientation = 'horizontal' }: NavLinksProps): JSX.Element {
   const links = [
     { to: '/', icon: HomeIcon, label: 'Home' },
-    { to: '/experiments', icon: BeakerIcon, label: 'Experiments' },
+    { to: '/explore', icon: BeakerIcon, label: 'Experiments' },
     { to: '/about', icon: InformationCircleIcon, label: 'About' },
   ];
 

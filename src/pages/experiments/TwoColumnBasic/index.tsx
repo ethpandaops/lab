@@ -1,1 +1,0 @@
-export { TwoColumnBasic } from './TwoColumnBasic';

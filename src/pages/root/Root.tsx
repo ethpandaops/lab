@@ -13,7 +13,7 @@ const featuredExperiments = [
     subtitle: 'Beacon Chain',
     description: 'Visualize the entire Ethereum block production process in real-time.',
     logo: '/images/ethereum.png',
-    href: '/experiments',
+    href: '/experiments/block-production-flow',
     accentColor: {
       light: 'rgba(34, 211, 238, 0.05)',
       medium: 'rgba(34, 211, 238, 0.15)',
@@ -25,7 +25,7 @@ const featuredExperiments = [
     subtitle: 'Beacon Chain',
     description: 'Explore live slot data.',
     logo: '/images/ethereum.png',
-    href: '/experiments',
+    href: '/experiments/live-slots',
     accentColor: {
       light: 'rgba(56, 189, 248, 0.05)',
       medium: 'rgba(56, 189, 248, 0.15)',
@@ -171,7 +171,7 @@ export function Root(): JSX.Element {
                 {/* CTA Buttons with enhanced styling */}
                 <div className="mb-8 flex flex-wrap justify-center gap-4">
                   <Link
-                    to="/experiments"
+                    to="/explore"
                     className="group text-accent-foreground hover:bg-accent-hover inline-flex items-center justify-center rounded-lg bg-accent px-6 py-3 font-bold transition-all duration-300 hover:-translate-y-1 hover:shadow-neon"
                   >
                     Explore All
@@ -232,7 +232,7 @@ export function Root(): JSX.Element {
                 {/* View All Link with enhanced styling */}
                 <div className="text-center">
                   <Link
-                    to="/experiments"
+                    to="/explore"
                     className="group border-default inline-flex items-center justify-center rounded-lg border bg-surface/30 px-6 py-3 font-bold text-primary backdrop-blur-sm transition-all duration-300 hover:border-accent/30 hover:bg-surface/50 hover:shadow-sm hover:shadow-accent/5"
                   >
                     View all experiments

@@ -9,19 +9,32 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as XatuDataRouteImport } from './routes/xatu-data'
+import { Route as ExploreRouteImport } from './routes/explore'
 import { Route as ExperimentsRouteImport } from './routes/experiments'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as XatuDataIndexRouteImport } from './routes/xatu-data/index'
 import { Route as ExperimentsIndexRouteImport } from './routes/experiments/index'
-import { Route as ExperimentsWithSelectorRouteImport } from './routes/experiments/with-selector'
-import { Route as ExperimentsTwoColumnNavbarRouteImport } from './routes/experiments/two-column-navbar'
-import { Route as ExperimentsTwoColumnFullwidthRouteImport } from './routes/experiments/two-column-fullwidth'
-import { Route as ExperimentsTwoColumnBasicRouteImport } from './routes/experiments/two-column-basic'
-import { Route as ExperimentsSidebarRightRouteImport } from './routes/experiments/sidebar-right'
-import { Route as ExperimentsNavbarOnlyRouteImport } from './routes/experiments/navbar-only'
-import { Route as ExperimentsHeroDemoRouteImport } from './routes/experiments/hero-demo'
-import { Route as ExperimentsFullwidthNavbarRouteImport } from './routes/experiments/fullwidth-navbar'
+import { Route as XatuDataNetworksRouteImport } from './routes/xatu-data/networks'
+import { Route as XatuDataGeographicalChecklistRouteImport } from './routes/xatu-data/geographical-checklist'
+import { Route as XatuDataForkReadinessRouteImport } from './routes/xatu-data/fork-readiness'
+import { Route as XatuDataContributorsRouteImport } from './routes/xatu-data/contributors'
+import { Route as ExperimentsLocallyBuiltBlocksRouteImport } from './routes/experiments/locally-built-blocks'
+import { Route as ExperimentsLiveSlotsRouteImport } from './routes/experiments/live-slots'
+import { Route as ExperimentsBlockProductionFlowRouteImport } from './routes/experiments/block-production-flow'
+import { Route as XatuDataContributorsIdRouteImport } from './routes/xatu-data/contributors/$id'
 
+const XatuDataRoute = XatuDataRouteImport.update({
+  id: '/xatu-data',
+  path: '/xatu-data',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ExploreRoute = ExploreRouteImport.update({
+  id: '/explore',
+  path: '/explore',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ExperimentsRoute = ExperimentsRouteImport.update({
   id: '/experiments',
   path: '/experiments',
@@ -37,97 +50,109 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const XatuDataIndexRoute = XatuDataIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => XatuDataRoute,
+} as any)
 const ExperimentsIndexRoute = ExperimentsIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => ExperimentsRoute,
 } as any)
-const ExperimentsWithSelectorRoute = ExperimentsWithSelectorRouteImport.update({
-  id: '/with-selector',
-  path: '/with-selector',
-  getParentRoute: () => ExperimentsRoute,
+const XatuDataNetworksRoute = XatuDataNetworksRouteImport.update({
+  id: '/networks',
+  path: '/networks',
+  getParentRoute: () => XatuDataRoute,
 } as any)
-const ExperimentsTwoColumnNavbarRoute =
-  ExperimentsTwoColumnNavbarRouteImport.update({
-    id: '/two-column-navbar',
-    path: '/two-column-navbar',
+const XatuDataGeographicalChecklistRoute =
+  XatuDataGeographicalChecklistRouteImport.update({
+    id: '/geographical-checklist',
+    path: '/geographical-checklist',
+    getParentRoute: () => XatuDataRoute,
+  } as any)
+const XatuDataForkReadinessRoute = XatuDataForkReadinessRouteImport.update({
+  id: '/fork-readiness',
+  path: '/fork-readiness',
+  getParentRoute: () => XatuDataRoute,
+} as any)
+const XatuDataContributorsRoute = XatuDataContributorsRouteImport.update({
+  id: '/contributors',
+  path: '/contributors',
+  getParentRoute: () => XatuDataRoute,
+} as any)
+const ExperimentsLocallyBuiltBlocksRoute =
+  ExperimentsLocallyBuiltBlocksRouteImport.update({
+    id: '/locally-built-blocks',
+    path: '/locally-built-blocks',
     getParentRoute: () => ExperimentsRoute,
   } as any)
-const ExperimentsTwoColumnFullwidthRoute =
-  ExperimentsTwoColumnFullwidthRouteImport.update({
-    id: '/two-column-fullwidth',
-    path: '/two-column-fullwidth',
-    getParentRoute: () => ExperimentsRoute,
-  } as any)
-const ExperimentsTwoColumnBasicRoute =
-  ExperimentsTwoColumnBasicRouteImport.update({
-    id: '/two-column-basic',
-    path: '/two-column-basic',
-    getParentRoute: () => ExperimentsRoute,
-  } as any)
-const ExperimentsSidebarRightRoute = ExperimentsSidebarRightRouteImport.update({
-  id: '/sidebar-right',
-  path: '/sidebar-right',
+const ExperimentsLiveSlotsRoute = ExperimentsLiveSlotsRouteImport.update({
+  id: '/live-slots',
+  path: '/live-slots',
   getParentRoute: () => ExperimentsRoute,
 } as any)
-const ExperimentsNavbarOnlyRoute = ExperimentsNavbarOnlyRouteImport.update({
-  id: '/navbar-only',
-  path: '/navbar-only',
-  getParentRoute: () => ExperimentsRoute,
-} as any)
-const ExperimentsHeroDemoRoute = ExperimentsHeroDemoRouteImport.update({
-  id: '/hero-demo',
-  path: '/hero-demo',
-  getParentRoute: () => ExperimentsRoute,
-} as any)
-const ExperimentsFullwidthNavbarRoute =
-  ExperimentsFullwidthNavbarRouteImport.update({
-    id: '/fullwidth-navbar',
-    path: '/fullwidth-navbar',
+const ExperimentsBlockProductionFlowRoute =
+  ExperimentsBlockProductionFlowRouteImport.update({
+    id: '/block-production-flow',
+    path: '/block-production-flow',
     getParentRoute: () => ExperimentsRoute,
   } as any)
+const XatuDataContributorsIdRoute = XatuDataContributorsIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => XatuDataContributorsRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/experiments': typeof ExperimentsRouteWithChildren
-  '/experiments/fullwidth-navbar': typeof ExperimentsFullwidthNavbarRoute
-  '/experiments/hero-demo': typeof ExperimentsHeroDemoRoute
-  '/experiments/navbar-only': typeof ExperimentsNavbarOnlyRoute
-  '/experiments/sidebar-right': typeof ExperimentsSidebarRightRoute
-  '/experiments/two-column-basic': typeof ExperimentsTwoColumnBasicRoute
-  '/experiments/two-column-fullwidth': typeof ExperimentsTwoColumnFullwidthRoute
-  '/experiments/two-column-navbar': typeof ExperimentsTwoColumnNavbarRoute
-  '/experiments/with-selector': typeof ExperimentsWithSelectorRoute
+  '/explore': typeof ExploreRoute
+  '/xatu-data': typeof XatuDataRouteWithChildren
+  '/experiments/block-production-flow': typeof ExperimentsBlockProductionFlowRoute
+  '/experiments/live-slots': typeof ExperimentsLiveSlotsRoute
+  '/experiments/locally-built-blocks': typeof ExperimentsLocallyBuiltBlocksRoute
+  '/xatu-data/contributors': typeof XatuDataContributorsRouteWithChildren
+  '/xatu-data/fork-readiness': typeof XatuDataForkReadinessRoute
+  '/xatu-data/geographical-checklist': typeof XatuDataGeographicalChecklistRoute
+  '/xatu-data/networks': typeof XatuDataNetworksRoute
   '/experiments/': typeof ExperimentsIndexRoute
+  '/xatu-data/': typeof XatuDataIndexRoute
+  '/xatu-data/contributors/$id': typeof XatuDataContributorsIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/experiments/fullwidth-navbar': typeof ExperimentsFullwidthNavbarRoute
-  '/experiments/hero-demo': typeof ExperimentsHeroDemoRoute
-  '/experiments/navbar-only': typeof ExperimentsNavbarOnlyRoute
-  '/experiments/sidebar-right': typeof ExperimentsSidebarRightRoute
-  '/experiments/two-column-basic': typeof ExperimentsTwoColumnBasicRoute
-  '/experiments/two-column-fullwidth': typeof ExperimentsTwoColumnFullwidthRoute
-  '/experiments/two-column-navbar': typeof ExperimentsTwoColumnNavbarRoute
-  '/experiments/with-selector': typeof ExperimentsWithSelectorRoute
+  '/explore': typeof ExploreRoute
+  '/experiments/block-production-flow': typeof ExperimentsBlockProductionFlowRoute
+  '/experiments/live-slots': typeof ExperimentsLiveSlotsRoute
+  '/experiments/locally-built-blocks': typeof ExperimentsLocallyBuiltBlocksRoute
+  '/xatu-data/contributors': typeof XatuDataContributorsRouteWithChildren
+  '/xatu-data/fork-readiness': typeof XatuDataForkReadinessRoute
+  '/xatu-data/geographical-checklist': typeof XatuDataGeographicalChecklistRoute
+  '/xatu-data/networks': typeof XatuDataNetworksRoute
   '/experiments': typeof ExperimentsIndexRoute
+  '/xatu-data': typeof XatuDataIndexRoute
+  '/xatu-data/contributors/$id': typeof XatuDataContributorsIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/experiments': typeof ExperimentsRouteWithChildren
-  '/experiments/fullwidth-navbar': typeof ExperimentsFullwidthNavbarRoute
-  '/experiments/hero-demo': typeof ExperimentsHeroDemoRoute
-  '/experiments/navbar-only': typeof ExperimentsNavbarOnlyRoute
-  '/experiments/sidebar-right': typeof ExperimentsSidebarRightRoute
-  '/experiments/two-column-basic': typeof ExperimentsTwoColumnBasicRoute
-  '/experiments/two-column-fullwidth': typeof ExperimentsTwoColumnFullwidthRoute
-  '/experiments/two-column-navbar': typeof ExperimentsTwoColumnNavbarRoute
-  '/experiments/with-selector': typeof ExperimentsWithSelectorRoute
+  '/explore': typeof ExploreRoute
+  '/xatu-data': typeof XatuDataRouteWithChildren
+  '/experiments/block-production-flow': typeof ExperimentsBlockProductionFlowRoute
+  '/experiments/live-slots': typeof ExperimentsLiveSlotsRoute
+  '/experiments/locally-built-blocks': typeof ExperimentsLocallyBuiltBlocksRoute
+  '/xatu-data/contributors': typeof XatuDataContributorsRouteWithChildren
+  '/xatu-data/fork-readiness': typeof XatuDataForkReadinessRoute
+  '/xatu-data/geographical-checklist': typeof XatuDataGeographicalChecklistRoute
+  '/xatu-data/networks': typeof XatuDataNetworksRoute
   '/experiments/': typeof ExperimentsIndexRoute
+  '/xatu-data/': typeof XatuDataIndexRoute
+  '/xatu-data/contributors/$id': typeof XatuDataContributorsIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -135,52 +160,76 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/experiments'
-    | '/experiments/fullwidth-navbar'
-    | '/experiments/hero-demo'
-    | '/experiments/navbar-only'
-    | '/experiments/sidebar-right'
-    | '/experiments/two-column-basic'
-    | '/experiments/two-column-fullwidth'
-    | '/experiments/two-column-navbar'
-    | '/experiments/with-selector'
+    | '/explore'
+    | '/xatu-data'
+    | '/experiments/block-production-flow'
+    | '/experiments/live-slots'
+    | '/experiments/locally-built-blocks'
+    | '/xatu-data/contributors'
+    | '/xatu-data/fork-readiness'
+    | '/xatu-data/geographical-checklist'
+    | '/xatu-data/networks'
     | '/experiments/'
+    | '/xatu-data/'
+    | '/xatu-data/contributors/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/about'
-    | '/experiments/fullwidth-navbar'
-    | '/experiments/hero-demo'
-    | '/experiments/navbar-only'
-    | '/experiments/sidebar-right'
-    | '/experiments/two-column-basic'
-    | '/experiments/two-column-fullwidth'
-    | '/experiments/two-column-navbar'
-    | '/experiments/with-selector'
+    | '/explore'
+    | '/experiments/block-production-flow'
+    | '/experiments/live-slots'
+    | '/experiments/locally-built-blocks'
+    | '/xatu-data/contributors'
+    | '/xatu-data/fork-readiness'
+    | '/xatu-data/geographical-checklist'
+    | '/xatu-data/networks'
     | '/experiments'
+    | '/xatu-data'
+    | '/xatu-data/contributors/$id'
   id:
     | '__root__'
     | '/'
     | '/about'
     | '/experiments'
-    | '/experiments/fullwidth-navbar'
-    | '/experiments/hero-demo'
-    | '/experiments/navbar-only'
-    | '/experiments/sidebar-right'
-    | '/experiments/two-column-basic'
-    | '/experiments/two-column-fullwidth'
-    | '/experiments/two-column-navbar'
-    | '/experiments/with-selector'
+    | '/explore'
+    | '/xatu-data'
+    | '/experiments/block-production-flow'
+    | '/experiments/live-slots'
+    | '/experiments/locally-built-blocks'
+    | '/xatu-data/contributors'
+    | '/xatu-data/fork-readiness'
+    | '/xatu-data/geographical-checklist'
+    | '/xatu-data/networks'
     | '/experiments/'
+    | '/xatu-data/'
+    | '/xatu-data/contributors/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   ExperimentsRoute: typeof ExperimentsRouteWithChildren
+  ExploreRoute: typeof ExploreRoute
+  XatuDataRoute: typeof XatuDataRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/xatu-data': {
+      id: '/xatu-data'
+      path: '/xatu-data'
+      fullPath: '/xatu-data'
+      preLoaderRoute: typeof XatuDataRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/explore': {
+      id: '/explore'
+      path: '/explore'
+      fullPath: '/explore'
+      preLoaderRoute: typeof ExploreRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/experiments': {
       id: '/experiments'
       path: '/experiments'
@@ -202,6 +251,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/xatu-data/': {
+      id: '/xatu-data/'
+      path: '/'
+      fullPath: '/xatu-data/'
+      preLoaderRoute: typeof XatuDataIndexRouteImport
+      parentRoute: typeof XatuDataRoute
+    }
     '/experiments/': {
       id: '/experiments/'
       path: '/'
@@ -209,86 +265,76 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ExperimentsIndexRouteImport
       parentRoute: typeof ExperimentsRoute
     }
-    '/experiments/with-selector': {
-      id: '/experiments/with-selector'
-      path: '/with-selector'
-      fullPath: '/experiments/with-selector'
-      preLoaderRoute: typeof ExperimentsWithSelectorRouteImport
+    '/xatu-data/networks': {
+      id: '/xatu-data/networks'
+      path: '/networks'
+      fullPath: '/xatu-data/networks'
+      preLoaderRoute: typeof XatuDataNetworksRouteImport
+      parentRoute: typeof XatuDataRoute
+    }
+    '/xatu-data/geographical-checklist': {
+      id: '/xatu-data/geographical-checklist'
+      path: '/geographical-checklist'
+      fullPath: '/xatu-data/geographical-checklist'
+      preLoaderRoute: typeof XatuDataGeographicalChecklistRouteImport
+      parentRoute: typeof XatuDataRoute
+    }
+    '/xatu-data/fork-readiness': {
+      id: '/xatu-data/fork-readiness'
+      path: '/fork-readiness'
+      fullPath: '/xatu-data/fork-readiness'
+      preLoaderRoute: typeof XatuDataForkReadinessRouteImport
+      parentRoute: typeof XatuDataRoute
+    }
+    '/xatu-data/contributors': {
+      id: '/xatu-data/contributors'
+      path: '/contributors'
+      fullPath: '/xatu-data/contributors'
+      preLoaderRoute: typeof XatuDataContributorsRouteImport
+      parentRoute: typeof XatuDataRoute
+    }
+    '/experiments/locally-built-blocks': {
+      id: '/experiments/locally-built-blocks'
+      path: '/locally-built-blocks'
+      fullPath: '/experiments/locally-built-blocks'
+      preLoaderRoute: typeof ExperimentsLocallyBuiltBlocksRouteImport
       parentRoute: typeof ExperimentsRoute
     }
-    '/experiments/two-column-navbar': {
-      id: '/experiments/two-column-navbar'
-      path: '/two-column-navbar'
-      fullPath: '/experiments/two-column-navbar'
-      preLoaderRoute: typeof ExperimentsTwoColumnNavbarRouteImport
+    '/experiments/live-slots': {
+      id: '/experiments/live-slots'
+      path: '/live-slots'
+      fullPath: '/experiments/live-slots'
+      preLoaderRoute: typeof ExperimentsLiveSlotsRouteImport
       parentRoute: typeof ExperimentsRoute
     }
-    '/experiments/two-column-fullwidth': {
-      id: '/experiments/two-column-fullwidth'
-      path: '/two-column-fullwidth'
-      fullPath: '/experiments/two-column-fullwidth'
-      preLoaderRoute: typeof ExperimentsTwoColumnFullwidthRouteImport
+    '/experiments/block-production-flow': {
+      id: '/experiments/block-production-flow'
+      path: '/block-production-flow'
+      fullPath: '/experiments/block-production-flow'
+      preLoaderRoute: typeof ExperimentsBlockProductionFlowRouteImport
       parentRoute: typeof ExperimentsRoute
     }
-    '/experiments/two-column-basic': {
-      id: '/experiments/two-column-basic'
-      path: '/two-column-basic'
-      fullPath: '/experiments/two-column-basic'
-      preLoaderRoute: typeof ExperimentsTwoColumnBasicRouteImport
-      parentRoute: typeof ExperimentsRoute
-    }
-    '/experiments/sidebar-right': {
-      id: '/experiments/sidebar-right'
-      path: '/sidebar-right'
-      fullPath: '/experiments/sidebar-right'
-      preLoaderRoute: typeof ExperimentsSidebarRightRouteImport
-      parentRoute: typeof ExperimentsRoute
-    }
-    '/experiments/navbar-only': {
-      id: '/experiments/navbar-only'
-      path: '/navbar-only'
-      fullPath: '/experiments/navbar-only'
-      preLoaderRoute: typeof ExperimentsNavbarOnlyRouteImport
-      parentRoute: typeof ExperimentsRoute
-    }
-    '/experiments/hero-demo': {
-      id: '/experiments/hero-demo'
-      path: '/hero-demo'
-      fullPath: '/experiments/hero-demo'
-      preLoaderRoute: typeof ExperimentsHeroDemoRouteImport
-      parentRoute: typeof ExperimentsRoute
-    }
-    '/experiments/fullwidth-navbar': {
-      id: '/experiments/fullwidth-navbar'
-      path: '/fullwidth-navbar'
-      fullPath: '/experiments/fullwidth-navbar'
-      preLoaderRoute: typeof ExperimentsFullwidthNavbarRouteImport
-      parentRoute: typeof ExperimentsRoute
+    '/xatu-data/contributors/$id': {
+      id: '/xatu-data/contributors/$id'
+      path: '/$id'
+      fullPath: '/xatu-data/contributors/$id'
+      preLoaderRoute: typeof XatuDataContributorsIdRouteImport
+      parentRoute: typeof XatuDataContributorsRoute
     }
   }
 }
 
 interface ExperimentsRouteChildren {
-  ExperimentsFullwidthNavbarRoute: typeof ExperimentsFullwidthNavbarRoute
-  ExperimentsHeroDemoRoute: typeof ExperimentsHeroDemoRoute
-  ExperimentsNavbarOnlyRoute: typeof ExperimentsNavbarOnlyRoute
-  ExperimentsSidebarRightRoute: typeof ExperimentsSidebarRightRoute
-  ExperimentsTwoColumnBasicRoute: typeof ExperimentsTwoColumnBasicRoute
-  ExperimentsTwoColumnFullwidthRoute: typeof ExperimentsTwoColumnFullwidthRoute
-  ExperimentsTwoColumnNavbarRoute: typeof ExperimentsTwoColumnNavbarRoute
-  ExperimentsWithSelectorRoute: typeof ExperimentsWithSelectorRoute
+  ExperimentsBlockProductionFlowRoute: typeof ExperimentsBlockProductionFlowRoute
+  ExperimentsLiveSlotsRoute: typeof ExperimentsLiveSlotsRoute
+  ExperimentsLocallyBuiltBlocksRoute: typeof ExperimentsLocallyBuiltBlocksRoute
   ExperimentsIndexRoute: typeof ExperimentsIndexRoute
 }
 
 const ExperimentsRouteChildren: ExperimentsRouteChildren = {
-  ExperimentsFullwidthNavbarRoute: ExperimentsFullwidthNavbarRoute,
-  ExperimentsHeroDemoRoute: ExperimentsHeroDemoRoute,
-  ExperimentsNavbarOnlyRoute: ExperimentsNavbarOnlyRoute,
-  ExperimentsSidebarRightRoute: ExperimentsSidebarRightRoute,
-  ExperimentsTwoColumnBasicRoute: ExperimentsTwoColumnBasicRoute,
-  ExperimentsTwoColumnFullwidthRoute: ExperimentsTwoColumnFullwidthRoute,
-  ExperimentsTwoColumnNavbarRoute: ExperimentsTwoColumnNavbarRoute,
-  ExperimentsWithSelectorRoute: ExperimentsWithSelectorRoute,
+  ExperimentsBlockProductionFlowRoute: ExperimentsBlockProductionFlowRoute,
+  ExperimentsLiveSlotsRoute: ExperimentsLiveSlotsRoute,
+  ExperimentsLocallyBuiltBlocksRoute: ExperimentsLocallyBuiltBlocksRoute,
   ExperimentsIndexRoute: ExperimentsIndexRoute,
 }
 
@@ -296,10 +342,43 @@ const ExperimentsRouteWithChildren = ExperimentsRoute._addFileChildren(
   ExperimentsRouteChildren,
 )
 
+interface XatuDataContributorsRouteChildren {
+  XatuDataContributorsIdRoute: typeof XatuDataContributorsIdRoute
+}
+
+const XatuDataContributorsRouteChildren: XatuDataContributorsRouteChildren = {
+  XatuDataContributorsIdRoute: XatuDataContributorsIdRoute,
+}
+
+const XatuDataContributorsRouteWithChildren =
+  XatuDataContributorsRoute._addFileChildren(XatuDataContributorsRouteChildren)
+
+interface XatuDataRouteChildren {
+  XatuDataContributorsRoute: typeof XatuDataContributorsRouteWithChildren
+  XatuDataForkReadinessRoute: typeof XatuDataForkReadinessRoute
+  XatuDataGeographicalChecklistRoute: typeof XatuDataGeographicalChecklistRoute
+  XatuDataNetworksRoute: typeof XatuDataNetworksRoute
+  XatuDataIndexRoute: typeof XatuDataIndexRoute
+}
+
+const XatuDataRouteChildren: XatuDataRouteChildren = {
+  XatuDataContributorsRoute: XatuDataContributorsRouteWithChildren,
+  XatuDataForkReadinessRoute: XatuDataForkReadinessRoute,
+  XatuDataGeographicalChecklistRoute: XatuDataGeographicalChecklistRoute,
+  XatuDataNetworksRoute: XatuDataNetworksRoute,
+  XatuDataIndexRoute: XatuDataIndexRoute,
+}
+
+const XatuDataRouteWithChildren = XatuDataRoute._addFileChildren(
+  XatuDataRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   ExperimentsRoute: ExperimentsRouteWithChildren,
+  ExploreRoute: ExploreRoute,
+  XatuDataRoute: XatuDataRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

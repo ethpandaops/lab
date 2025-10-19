@@ -1,0 +1,1 @@
+export { XatuDataPage } from './XatuDataPage';
