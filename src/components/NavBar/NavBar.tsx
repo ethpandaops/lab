@@ -1,6 +1,7 @@
 import { type JSX } from 'react';
 import { Link, useRouterState } from '@tanstack/react-router';
 import { ChevronRightIcon } from '@heroicons/react/20/solid';
+import { HomeIcon, BeakerIcon, InformationCircleIcon } from '@heroicons/react/24/outline';
 import { type NavBarProps } from './NavBar.types';
 
 export function NavBar({ showBreadcrumbs = true, showNavLinks = true }: NavBarProps): JSX.Element {
@@ -48,17 +49,27 @@ export function NavBar({ showBreadcrumbs = true, showNavLinks = true }: NavBarPr
           {showNavLinks && (
             <div className="ml-auto flex gap-4">
               <Link
-                to="/experiments"
-                className="rounded-sm px-3 py-2 text-sm/6 font-medium text-slate-300 hover:bg-slate-700 hover:text-white"
+                to="/"
+                className="flex items-center gap-2 rounded-sm px-3 py-2 text-sm/6 font-medium text-slate-300 hover:bg-slate-700 hover:text-white"
                 activeProps={{ className: 'bg-slate-700 text-white' }}
               >
+                <HomeIcon className="size-4" />
+                Home
+              </Link>
+              <Link
+                to="/experiments"
+                className="flex items-center gap-2 rounded-sm px-3 py-2 text-sm/6 font-medium text-slate-300 hover:bg-slate-700 hover:text-white"
+                activeProps={{ className: 'bg-slate-700 text-white' }}
+              >
+                <BeakerIcon className="size-4" />
                 Experiments
               </Link>
               <Link
                 to="/about"
-                className="rounded-sm px-3 py-2 text-sm/6 font-medium text-slate-300 hover:bg-slate-700 hover:text-white"
+                className="flex items-center gap-2 rounded-sm px-3 py-2 text-sm/6 font-medium text-slate-300 hover:bg-slate-700 hover:text-white"
                 activeProps={{ className: 'bg-slate-700 text-white' }}
               >
+                <InformationCircleIcon className="size-4" />
                 About
               </Link>
             </div>
