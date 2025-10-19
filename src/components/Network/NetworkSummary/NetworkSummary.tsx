@@ -51,29 +51,33 @@ export function NetworkSummary({ orientation = 'horizontal' }: NetworkSummaryPro
   }, [currentNetwork]);
 
   if (!currentNetwork) {
-    return <div className="bg-[#1e293b] px-4 py-2 text-sm/6 text-slate-500">Loading...</div>;
+    return <div className="bg-card px-4 py-2 text-sm/6 text-muted">Loading...</div>;
   }
 
   if (orientation === 'vertical') {
     return (
-      <div className="bg-[#1e293b] px-4 py-3 font-mono text-sm/6">
-        <div className="flex items-center justify-between pb-2">
-          <span className="text-slate-400">Slot</span>
-          <span className="text-white">{slot}</span>
-        </div>
-        <div className="flex items-center justify-between">
-          <span className="text-slate-400">Epoch</span>
-          <span className="text-white">{epoch}</span>
+      <div className="mt-auto border-t border-accent/20 bg-surface p-4">
+        <div className="space-y-2 font-mono text-sm">
+          <div className="flex items-center justify-between">
+            <span className="text-tertiary">Slot</span>
+            <span className="font-medium text-primary">{slot}</span>
+          </div>
+          <div className="flex items-center justify-between">
+            <span className="text-tertiary">Epoch</span>
+            <span className="font-medium text-primary">{epoch}</span>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="bg-[#1e293b] px-4 py-2 font-mono text-sm/6">
-      <span className="text-slate-400">Slot</span> <span className="text-white">{slot}</span>
-      <span className="text-slate-500"> · </span>
-      <span className="text-slate-400">Epoch</span> <span className="text-white">{epoch}</span>
+    <div className="font-mono text-sm">
+      <span className="text-tertiary">Slot </span>
+      <span className="text-primary">{slot}</span>
+      <span className="mx-2 text-tertiary">·</span>
+      <span className="text-tertiary">Epoch </span>
+      <span className="text-primary">{epoch}</span>
     </div>
   );
 }

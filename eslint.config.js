@@ -13,7 +13,7 @@ import betterTailwindcss from 'eslint-plugin-better-tailwindcss';
 
 export default tseslint.config(
   {
-    ignores: ['dist', 'node_modules', 'coverage', 'eslint_report.json', 'src/api', 'storybook-static'],
+    ignores: ['dist', 'node_modules', 'coverage', 'eslint_report.json', 'src/api', 'storybook-static', 'lab'],
   },
   js.configs.recommended,
   ...tseslint.configs.recommended,
@@ -67,7 +67,8 @@ export default tseslint.config(
       // Correctness rules only - no styling/sorting rules
       'better-tailwindcss/no-conflicting-classes': 'error',
       'better-tailwindcss/no-duplicate-classes': 'error',
-      'better-tailwindcss/no-unregistered-classes': ['warn'],
+      // Disabled: Custom component classes in @layer components are intentional
+      'better-tailwindcss/no-unregistered-classes': 'off',
       'better-tailwindcss/no-deprecated-classes': 'warn',
       // Disable all stylistic rules (Prettier handles these)
       'better-tailwindcss/multiline': 'off',

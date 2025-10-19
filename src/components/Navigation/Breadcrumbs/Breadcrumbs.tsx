@@ -37,23 +37,23 @@ export function Breadcrumbs(): JSX.Element {
 
   return (
     <nav
-      className="flex items-center gap-2 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+      className="flex items-center gap-2 overflow-x-auto font-mono [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       aria-label="Breadcrumb"
     >
-      <Link to="/" className="shrink-0 text-sm/6 font-medium text-slate-400 hover:text-white">
+      <Link to="/" className="shrink-0 text-sm/6 font-medium text-tertiary hover:text-primary">
         Home
       </Link>
       {breadcrumbs.map((crumb, index) => (
         <div key={crumb.path} className="flex shrink-0 items-center gap-2">
-          <ChevronRightIcon className="size-4 shrink-0 text-slate-600" />
+          <ChevronRightIcon className="size-4 shrink-0 text-muted" />
           {index === breadcrumbs.length - 1 ? (
-            <span className="text-sm/6 font-medium whitespace-nowrap text-white" title={crumb.title}>
+            <span className="text-sm/6 font-medium whitespace-nowrap text-primary" title={crumb.title}>
               {crumb.title}
             </span>
           ) : (
             <Link
               to={crumb.path}
-              className="text-sm/6 font-medium whitespace-nowrap text-slate-400 hover:text-white"
+              className="text-sm/6 font-medium whitespace-nowrap text-tertiary hover:text-primary"
               title={crumb.title}
             >
               {crumb.title}

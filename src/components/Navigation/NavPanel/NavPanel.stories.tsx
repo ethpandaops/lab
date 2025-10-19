@@ -20,16 +20,16 @@ function NavPanelDemo(props: Omit<NavPanelProps, 'isOpen' | 'onClose'>): JSX.Ele
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div className="min-h-dvh bg-slate-900">
-      <div className="flex items-center gap-4 border-b border-slate-700/30 bg-slate-800 p-4">
+    <div className="min-h-dvh bg-surface">
+      <div className="border-subtle/30 flex items-center gap-4 border-b bg-card p-4">
         <button
           onClick={() => setIsOpen(true)}
-          className="rounded-sm p-2 text-slate-400 hover:bg-slate-700 hover:text-white"
+          className="rounded-sm p-2 text-muted hover:bg-hover hover:text-white"
           aria-label="Open navigation menu"
         >
           <Bars3Icon className="size-6" />
         </button>
-        <span className="text-sm/6 text-slate-300">Click the hamburger icon to open the panel</span>
+        <span className="text-sm/6 text-secondary">Click the hamburger icon to open the panel</span>
       </div>
 
       <NavPanel isOpen={isOpen} onClose={() => setIsOpen(false)} {...props} />

@@ -55,8 +55,8 @@ export function Experiments(): JSX.Element {
 
   return (
     <div>
-      <h1 className="mb-6 text-3xl font-bold text-white">Layout Experiments</h1>
-      <p className="mb-8 text-slate-400">
+      <h1 className="mb-6 text-3xl font-bold text-primary">Layout Experiments</h1>
+      <p className="mb-8 text-secondary">
         Test different layout configurations - each route opts into different UI features
       </p>
 
@@ -65,10 +65,10 @@ export function Experiments(): JSX.Element {
           <Link
             key={variant.path}
             to={variant.path}
-            className={`block rounded-sm border ${variant.color} bg-slate-800 p-6 hover:bg-slate-700`}
+            className={`card-interactive card-primary block rounded-sm border ${variant.color} p-6`}
           >
-            <h2 className="mb-2 text-xl font-semibold text-white">{variant.title}</h2>
-            <p className="text-slate-400">{variant.description}</p>
+            <h2 className="mb-2 text-xl font-semibold text-primary">{variant.title}</h2>
+            <p className="text-secondary">{variant.description}</p>
           </Link>
         ))}
       </div>

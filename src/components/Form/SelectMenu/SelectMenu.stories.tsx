@@ -12,7 +12,7 @@ const meta: Meta = {
   },
   decorators: [
     Story => (
-      <div className="min-w-80 rounded-lg bg-slate-900 p-6">
+      <div className="min-w-80 rounded-lg bg-surface p-6">
         <Story />
       </div>
     ),
@@ -90,7 +90,7 @@ type Role = 'admin' | 'user' | 'guest';
 const roles: SelectMenuOption<Role>[] = [
   { value: 'admin', label: 'Administrator', icon: <CogIcon className="size-5 text-indigo-400" /> },
   { value: 'user', label: 'User', icon: <UserIcon className="size-5 text-indigo-400" /> },
-  { value: 'guest', label: 'Guest', icon: <UserIcon className="size-5 text-slate-400" /> },
+  { value: 'guest', label: 'Guest', icon: <UserIcon className="size-5 text-muted" /> },
 ];
 
 /**

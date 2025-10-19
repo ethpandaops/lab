@@ -10,4 +10,10 @@ export interface NetworkSelectorProps {
    * @default "Network"
    */
   label?: string;
+
+  /**
+   * Whether to expand the selector to fit the width of the container
+   * @default false
+   */
+  expandToFit?: boolean;
 }

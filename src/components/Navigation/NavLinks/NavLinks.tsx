@@ -1,6 +1,7 @@
 import { type JSX } from 'react';
 import { Link } from '@tanstack/react-router';
 import { HomeIcon, BeakerIcon, InformationCircleIcon } from '@heroicons/react/24/outline';
+import clsx from 'clsx';
 import type { NavLinksProps } from './NavLinks.types';
 
 /**
@@ -31,24 +32,28 @@ export function NavLinks({ orientation = 'horizontal' }: NavLinksProps): JSX.Ele
     { to: '/about', icon: InformationCircleIcon, label: 'About' },
   ];
 
-  const containerClass =
-    orientation === 'vertical' ? 'flex flex-col gap-2' : 'flex lg:flex-row flex-col lg:items-center gap-2';
-
-  const linkClass =
-    orientation === 'vertical'
-      ? 'flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-slate-300 transition-colors w-full hover:bg-slate-700 hover:text-white'
-      : 'flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-slate-300 transition-colors hover:bg-slate-700 hover:text-white';
-
-  const activeClass = 'bg-slate-700 text-white';
-
   return (
-    <div className={containerClass}>
+    <nav
+      className={clsx('flex gap-2 font-mono', {
+        'flex-col': orientation === 'vertical',
+        'flex-col lg:flex-row lg:items-center': orientation === 'horizontal',
+      })}
+    >
       {links.map(link => (
-        <Link key={link.to} to={link.to} className={linkClass} activeProps={{ className: activeClass }}>
-          <link.icon className="size-4" />
+        <Link
+          key={link.to}
+          to={link.to}
+          className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-primary transition-colors hover:bg-hover hover:text-accent"
+          activeProps={{
+            className: 'bg-active text-accent active',
+            'data-status': 'active',
+            'aria-current': 'page',
+          }}
+        >
+          <link.icon className="h-4 w-4" />
           {link.label}
         </Link>
       ))}
-    </div>
+    </nav>
   );
 }

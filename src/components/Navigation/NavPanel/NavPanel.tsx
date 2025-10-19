@@ -51,27 +51,27 @@ export function NavPanel({
       {/* Panel */}
       <DialogPanel
         transition
-        className="fixed top-[64px] left-0 flex h-[calc(100%-64px)] w-72 flex-col bg-slate-800 shadow-xl transition duration-300 ease-in-out data-[closed]:-translate-x-full"
+        className="bg-nav fixed top-[64px] left-0 flex h-[calc(100%-64px)] w-72 flex-col shadow-xl transition duration-300 ease-in-out data-[closed]:-translate-x-full"
       >
         {/* Content area */}
         <div className="flex flex-1 flex-col overflow-y-auto">
           {/* Network Selector */}
           {showNetworkSelector && (
-            <div className="border-b border-slate-700/30 px-4 py-4">
+            <div className="border-subtle border-b px-4 py-4">
               <NetworkSelector showLabel={false} />
             </div>
           )}
 
           {/* Breadcrumbs */}
           {showBreadcrumbs && (
-            <div className="border-b border-slate-700/30 px-4 py-4">
+            <div className="border-subtle border-b px-4 py-4">
               <Breadcrumbs />
             </div>
           )}
 
           {/* Navigation Links */}
           {showNavLinks && (
-            <div className="flex-1 border-b border-slate-700/30 px-4 py-4">
+            <div className="border-subtle flex-1 border-b px-4 py-4">
               <NavLinks orientation="vertical" />
             </div>
           )}

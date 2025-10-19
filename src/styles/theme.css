@@ -1,0 +1,63 @@
+/**
+ * Tailwind CSS v4 Theme Configuration
+ *
+ * This file defines the design system using the @theme directive.
+ * All variables defined here automatically become utility classes.
+ *
+ * Reference: https://tailwindcss.com/docs/theme
+ */
+
+/* Static cyber colors - these don't change with theme */
+@theme {
+  /* Cyber color palette - fixed cyberpunk colors */
+  --color-cyber-black: oklch(0.122 0.038 253);    /* #000614 */
+  --color-cyber-deep: oklch(0.159 0.062 259);     /* #000B27 */
+  --color-cyber-darker: oklch(0.197 0.079 260);   /* #001238 */
+  --color-cyber-dark: oklch(0.242 0.109 262);     /* #001952 */
+  --color-cyber-neon: oklch(0.880 0.208 157);     /* #00FF9F */
+  --color-cyber-cyan: oklch(0.875 0.149 202);     /* #00F2FF */
+  --color-cyber-blue: oklch(0.563 0.241 261);     /* #0066FF */
+  --color-cyber-pink: oklch(0.639 0.255 11);      /* #FF0066 */
+  --color-cyber-yellow: oklch(0.885 0.182 95);    /* #FFD600 */
+
+  /* Gold color for special elements */
+  --color-gold: oklch(0.887 0.182 95);            /* #FFD700 */
+}
+
+/* Dynamic theme colors - these reference CSS variables for theming support */
+@theme inline {
+  /* Text color palette - for text-* utilities */
+  --color-primary: var(--text-primary-rgb);
+  --color-secondary: var(--text-secondary-rgb);
+  --color-tertiary: var(--text-tertiary-rgb);
+  --color-muted: var(--text-muted-rgb);
+
+  /* Surface color palette - for bg-* utilities */
+  --color-base: var(--bg-base-rgb);
+  --color-surface: var(--bg-surface-rgb);
+  --color-surface-raised: var(--bg-surface-raised-rgb);
+  --color-hover: var(--bg-hover-rgb);
+  --color-active: var(--bg-active-rgb);
+  --color-card: var(--bg-card-rgb);
+
+  /* Border color palette - semantic names matching original v3 behavior
+   * Note: We can't auto-generate border utilities because they conflict with
+   * Tailwind's color system. All border utilities are manually defined in @layer utilities. */
+
+  /* Accent color palette */
+  --color-accent: var(--accent-rgb);
+  --color-accent-muted: var(--accent-muted-rgb);
+
+  /* Status color palette */
+  --color-success: var(--success-rgb);
+  --color-warning: var(--warning-rgb);
+  --color-error: var(--error-rgb);
+
+  /* Data visualization color palette */
+  --color-data-blue-1: var(--data-blue-1);
+  --color-data-blue-2: var(--data-blue-2);
+  --color-data-green-1: var(--data-green-1);
+  --color-data-green-2: var(--data-green-2);
+  --color-data-yellow: var(--data-yellow);
+  --color-data-orange: var(--data-orange);
+}

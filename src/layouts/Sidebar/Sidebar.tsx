@@ -36,7 +36,7 @@ function SidebarComponent({
   const rightContent = sidebarPosition === 'left' ? mainSlot : asideSlot;
 
   return (
-    <div className="min-h-dvh bg-slate-900">
+    <div className="min-h-dvh bg-base">
       {/* Header - conditional */}
       {showHeader && (
         <Header

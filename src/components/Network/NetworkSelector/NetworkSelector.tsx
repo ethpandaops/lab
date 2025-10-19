@@ -60,7 +60,11 @@ function sortNetworks(networks: Network[]): Network[] {
  * <NetworkSelector label="Select Network" />
  * ```
  */
-export function NetworkSelector({ showLabel = true, label = 'Network' }: NetworkSelectorProps): JSX.Element {
+export function NetworkSelector({
+  showLabel = true,
+  label = 'Network',
+  expandToFit = false,
+}: NetworkSelectorProps): JSX.Element {
   const { currentNetwork, setCurrentNetwork, networks } = useNetwork();
 
   const options: SelectMenuOption<Network>[] = useMemo(
@@ -74,7 +78,7 @@ export function NetworkSelector({ showLabel = true, label = 'Network' }: Network
   );
 
   if (!currentNetwork) {
-    return <div className="text-sm text-slate-400">Loading networks...</div>;
+    return <></>;
   }
 
   return (
@@ -85,6 +89,7 @@ export function NetworkSelector({ showLabel = true, label = 'Network' }: Network
       showLabel={showLabel}
       label={label}
       placeholder="Select network"
+      expandToFit={expandToFit}
     />
   );
 }

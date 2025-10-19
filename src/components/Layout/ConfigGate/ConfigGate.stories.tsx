@@ -34,10 +34,10 @@ type Story = StoryObj;
 export const Success: Story = {
   render: () => (
     <ConfigGate>
-      <div className="flex min-h-screen items-center justify-center bg-slate-900">
+      <div className="flex min-h-screen items-center justify-center bg-surface">
         <div className="text-center">
           <h1 className="text-3xl font-bold text-white">App Loaded Successfully</h1>
-          <p className="mt-2 text-slate-400">Configuration has been loaded</p>
+          <p className="mt-2 text-muted">Configuration has been loaded</p>
         </div>
       </div>
     </ConfigGate>
@@ -60,7 +60,7 @@ export const Loading: Story = {
   },
   render: () => (
     <ConfigGate>
-      <div className="flex min-h-screen items-center justify-center bg-slate-900">
+      <div className="flex min-h-screen items-center justify-center bg-surface">
         <div className="text-center">
           <h1 className="text-3xl font-bold text-white">This should not be visible</h1>
         </div>
@@ -94,7 +94,7 @@ export const Error: Story = {
   },
   render: () => (
     <ConfigGate>
-      <div className="flex min-h-screen items-center justify-center bg-slate-900">
+      <div className="flex min-h-screen items-center justify-center bg-surface">
         <div className="text-center">
           <h1 className="text-3xl font-bold text-white">This should not be visible</h1>
         </div>
@@ -125,7 +125,7 @@ export const NetworkError: Story = {
   },
   render: () => (
     <ConfigGate>
-      <div className="flex min-h-screen items-center justify-center bg-slate-900">
+      <div className="flex min-h-screen items-center justify-center bg-surface">
         <div className="text-center">
           <h1 className="text-3xl font-bold text-white">This should not be visible</h1>
         </div>
@@ -161,7 +161,7 @@ export const ErrorWithRetries: Story = {
   },
   render: () => (
     <ConfigGate>
-      <div className="flex min-h-screen items-center justify-center bg-slate-900">
+      <div className="flex min-h-screen items-center justify-center bg-surface">
         <div className="text-center">
           <h1 className="text-3xl font-bold text-white">This should not be visible</h1>
         </div>

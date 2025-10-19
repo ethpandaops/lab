@@ -63,9 +63,9 @@ export const Default: Story = {
   args: {
     fullWidth: true,
     children: (
-      <div className="rounded-lg border border-slate-700 bg-slate-800 p-8">
+      <div className="border-subtle rounded-lg border bg-card p-8">
         <h1 className="mb-4 text-3xl font-bold text-white">Page Content</h1>
-        <p className="text-slate-300">
+        <p className="text-secondary">
           This is the default Standard layout with header, network selector, network summary, breadcrumbs, and
           navigation links all enabled.
         </p>
@@ -82,9 +82,9 @@ export const WithoutHeader: Story = {
     showHeader: false,
     fullWidth: true,
     children: (
-      <div className="rounded-lg border border-slate-700 bg-slate-800 p-8">
+      <div className="border-subtle rounded-lg border bg-card p-8">
         <h1 className="mb-4 text-3xl font-bold text-white">Page Content</h1>
-        <p className="text-slate-300">This layout has no header - just content in a full width container.</p>
+        <p className="text-secondary">This layout has no header - just content in a full width container.</p>
       </div>
     ),
   },
@@ -99,9 +99,9 @@ export const WithoutNetworkFeatures: Story = {
     showNetworkSummary: false,
     fullWidth: true,
     children: (
-      <div className="rounded-lg border border-slate-700 bg-slate-800 p-8">
+      <div className="border-subtle rounded-lg border bg-card p-8">
         <h1 className="mb-4 text-3xl font-bold text-white">Page without Network Features</h1>
-        <p className="text-slate-300">
+        <p className="text-secondary">
           This layout has header with breadcrumbs and nav links, but no network selector or summary.
         </p>
       </div>
@@ -116,9 +116,9 @@ export const FullWidth: Story = {
   args: {
     fullWidth: true,
     children: (
-      <div className="rounded-lg border border-slate-700 bg-slate-800 p-8">
+      <div className="border-subtle rounded-lg border bg-card p-8">
         <h1 className="mb-4 text-3xl font-bold text-white">Full Width Layout</h1>
-        <p className="text-slate-300">
+        <p className="text-secondary">
           This layout uses the full width of the viewport instead of a max-width container.
         </p>
       </div>
@@ -134,15 +134,15 @@ export const WithComplexContent: Story = {
     fullWidth: true,
     children: (
       <div className="space-y-6">
-        <div className="rounded-lg border border-slate-700 bg-slate-800 p-8">
+        <div className="border-subtle rounded-lg border bg-card p-8">
           <h1 className="mb-4 text-3xl font-bold text-white">Main Section</h1>
-          <p className="text-slate-300">This demonstrates the Standard layout with more complex content structure.</p>
+          <p className="text-secondary">This demonstrates the Standard layout with more complex content structure.</p>
         </div>
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
           {[1, 2, 3].map(i => (
-            <div key={i} className="rounded-lg border border-slate-700 bg-slate-800 p-6">
+            <div key={i} className="border-subtle rounded-lg border bg-card p-6">
               <h3 className="mb-2 text-lg font-semibold text-white">Card {i}</h3>
-              <p className="text-slate-400">Sample card content</p>
+              <p className="text-muted">Sample card content</p>
             </div>
           ))}
         </div>
@@ -161,9 +161,9 @@ export const BreadcrumbsOnly: Story = {
     showNetworkSummary: false,
     fullWidth: true,
     children: (
-      <div className="rounded-lg border border-slate-700 bg-slate-800 p-8">
+      <div className="border-subtle rounded-lg border bg-card p-8">
         <h1 className="mb-4 text-3xl font-bold text-white">Page with Breadcrumbs Only</h1>
-        <p className="text-slate-300">This layout shows only breadcrumbs in the navbar, no navigation links.</p>
+        <p className="text-secondary">This layout shows only breadcrumbs in the navbar, no navigation links.</p>
       </div>
     ),
   },
@@ -179,9 +179,9 @@ export const NavLinksOnly: Story = {
     showNetworkSummary: false,
     fullWidth: true,
     children: (
-      <div className="rounded-lg border border-slate-700 bg-slate-800 p-8">
+      <div className="border-subtle rounded-lg border bg-card p-8">
         <h1 className="mb-4 text-3xl font-bold text-white">Page with Nav Links Only</h1>
-        <p className="text-slate-300">This layout shows only navigation links in the navbar, no breadcrumbs.</p>
+        <p className="text-secondary">This layout shows only navigation links in the navbar, no breadcrumbs.</p>
       </div>
     ),
   },
@@ -196,9 +196,9 @@ export const WithNetworkSummaryOnly: Story = {
     showNetworkSummary: true,
     fullWidth: true,
     children: (
-      <div className="rounded-lg border border-slate-700 bg-slate-800 p-8">
+      <div className="border-subtle rounded-lg border bg-card p-8">
         <h1 className="mb-4 text-3xl font-bold text-white">Page with Network Summary</h1>
-        <p className="text-slate-300">This layout shows the network summary but not the selector.</p>
+        <p className="text-secondary">This layout shows the network summary but not the selector.</p>
       </div>
     ),
   },

@@ -48,4 +48,10 @@ export interface SelectMenuProps<T> {
    * @default false
    */
   disabled?: boolean;
+
+  /**
+   * Allow the selector to expand to fit content instead of full width
+   * @default false
+   */
+  expandToFit?: boolean;
 }

@@ -47,7 +47,11 @@ function RootComponent(): JSX.Element {
       <ConfigGate>
         <NetworkProvider>
           <HeadContent />
-          <Outlet />
+          <div className="relative min-h-screen bg-gradient-to-b from-[rgb(var(--bg-base))] via-[rgb(var(--bg-base))] to-[rgb(var(--bg-base))] font-mono text-primary">
+            <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-accent/5 via-transparent to-transparent"></div>
+            <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-error/5 via-transparent to-transparent"></div>
+            <Outlet />
+          </div>
         </NetworkProvider>
       </ConfigGate>
     </QueryClientProvider>

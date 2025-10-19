@@ -9,8 +9,8 @@ const meta: Meta<typeof NavLinks> = {
   },
   decorators: [
     Story => (
-      <div className="border-b border-slate-700/30 bg-slate-800">
-        <div className="w-full border-t border-slate-700/20 px-4 py-2 md:px-6 lg:px-8 xl:px-12 2xl:px-16">
+      <div className="border-subtle/30 border-b bg-card">
+        <div className="border-subtle/20 w-full border-t px-4 py-2 md:px-6 lg:px-8 xl:px-12 2xl:px-16">
           <Story />
         </div>
       </div>

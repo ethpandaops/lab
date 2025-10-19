@@ -17,9 +17,9 @@ export function ConfigGate({ children }: ConfigGateProps): JSX.Element {
   // Show loading screen while fetching initial config
   if (isLoading && !config) {
     return (
-      <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-slate-950">
+      <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-base">
         <img src="/images/lab.png" className="h-72 w-72 animate-spin object-contain" alt="Loading..." />
-        <p className="mt-8 text-2xl text-slate-400">Loading Lab...</p>
+        <p className="mt-8 text-2xl text-secondary">Loading Lab...</p>
       </div>
     );
   }
@@ -29,13 +29,13 @@ export function ConfigGate({ children }: ConfigGateProps): JSX.Element {
     console.error('Config error:', error);
 
     return (
-      <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-slate-950">
+      <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-base">
         <img src="/images/lab.png" className="h-72 w-72 rotate-180 object-contain" alt="Lab Logo" />
-        <h1 className="mt-6 text-2xl text-red-400">Failed to Load Configuration</h1>
-        {error && <p className="mt-2 text-sm text-slate-400">{error.message}</p>}
+        <h1 className="mt-6 text-2xl text-error">Failed to Load Configuration</h1>
+        {error && <p className="mt-2 text-sm text-muted">{error.message}</p>}
         <button
           onClick={() => window.location.reload()}
-          className="mt-4 rounded-lg bg-red-500/20 px-6 py-2 text-sm text-red-300 transition-colors hover:bg-red-500/30"
+          className="btn btn-error mt-4 rounded-lg px-6 py-2 text-sm transition-colors"
         >
           Reload Page
         </button>
