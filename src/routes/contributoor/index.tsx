@@ -4,7 +4,7 @@ import { ContributoorsPage } from '@/pages/contributoor/ContributoorsPage';
 
 export const Route = createFileRoute('/contributoor/')({
   component: () => (
-    <Standard showNavbar>
+    <Standard showHeader>
       <ContributoorsPage />
     </Standard>
   ),

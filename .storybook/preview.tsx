@@ -3,7 +3,7 @@ import { INITIAL_VIEWPORTS } from 'storybook/viewport';
 import { RouterProvider, createMemoryHistory, createRootRoute, createRouter } from '@tanstack/react-router';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { NetworkProvider } from '../src/providers/NetworkProvider';
-import { ConfigGate } from '../src/components/Layout/ConfigGate';
+import { ConfigGate } from '../src/components/ConfigGate';
 import { initialize, mswLoader } from 'msw-storybook-addon';
 import { handlers, mockConfig, mockBounds } from './mocks';
 import '../src/index.css';
