@@ -64,7 +64,9 @@ function processNodes(nodes: FctNodeActiveLast24h[]): Contributor[] {
         primaryCountryCode: node.meta_client_geo_country_code || null,
         primaryCity: node.meta_client_geo_city || null,
         versions: new Set(node.meta_client_version ? [node.meta_client_version] : []),
-        consensusImplementations: new Set(node.meta_consensus_implementation ? [node.meta_consensus_implementation] : []),
+        consensusImplementations: new Set(
+          node.meta_consensus_implementation ? [node.meta_consensus_implementation] : []
+        ),
         countryCount,
       });
     }
@@ -87,10 +89,14 @@ function getDisplayVersion(versions: Set<string>): string | undefined {
   return 'Multi Versions';
 }
 
-export function ContributoorsPage() {
+export function ContributoorsPage(): JSX.Element {
   const navigate = useNavigate();
 
-  const { data: pubData, error: pubError, isLoading: pubLoading } = useQuery({
+  const {
+    data: pubData,
+    error: pubError,
+    isLoading: pubLoading,
+  } = useQuery({
     ...fctNodeActiveLast24hServiceListOptions({
       query: {
         meta_client_name_starts_with: 'pub-',
@@ -99,7 +105,11 @@ export function ContributoorsPage() {
     }),
   });
 
-  const { data: corpData, error: corpError, isLoading: corpLoading } = useQuery({
+  const {
+    data: corpData,
+    error: corpError,
+    isLoading: corpLoading,
+  } = useQuery({
     ...fctNodeActiveLast24hServiceListOptions({
       query: {
         meta_client_name_starts_with: 'corp-',
@@ -108,7 +118,11 @@ export function ContributoorsPage() {
     }),
   });
 
-  const { data: ethData, error: ethError, isLoading: ethLoading } = useQuery({
+  const {
+    data: ethData,
+    error: ethError,
+    isLoading: ethLoading,
+  } = useQuery({
     ...fctNodeActiveLast24hServiceListOptions({
       query: {
         meta_client_name_starts_with: 'ethpandaops',
@@ -147,7 +161,7 @@ export function ContributoorsPage() {
 
   const totalCount = publicContributors.length + corporateContributors.length + internalContributors.length;
 
-  const renderContributorSection = (title: string, contributors: Contributor[]) => {
+  const renderContributorSection = (title: string, contributors: Contributor[]): JSX.Element | null => {
     if (contributors.length === 0) return null;
 
     return (
@@ -184,7 +198,7 @@ export function ContributoorsPage() {
       {renderContributorSection('Internal (ethPandaOps)', internalContributors)}
 
       {totalCount === 0 && (
-        <div className="rounded-lg border border-border bg-surface-secondary p-8 text-center text-secondary">
+        <div className="border-border bg-surface-secondary rounded-lg border p-8 text-center text-secondary">
           No active contributors found in the last 24 hours.
         </div>
       )}

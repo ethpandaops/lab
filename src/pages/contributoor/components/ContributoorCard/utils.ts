@@ -80,4 +80,3 @@ export function getClassificationColor(classification: string): string {
       return 'text-gray-600';
   }
 }
-

@@ -6,11 +6,15 @@ import { ClientLogo } from '@/components/ClientLogo';
 import type { ContributorClassification } from './components/ContributoorCard';
 import { getBorderColor, getClassificationLabel, getClassificationColor } from './components/ContributoorCard/utils';
 
-export function ContributoorDetailPage() {
+export function ContributoorDetailPage(): JSX.Element {
   const { id } = useParams({ from: '/contributoor/$id' });
 
   // Query all three categories since we don't know which one the username belongs to
-  const { data: pubData, error: pubError, isLoading: pubLoading } = useQuery({
+  const {
+    data: pubData,
+    error: pubError,
+    isLoading: pubLoading,
+  } = useQuery({
     ...fctNodeActiveLast24hServiceListOptions({
       query: {
         username_eq: id,
@@ -21,7 +25,11 @@ export function ContributoorDetailPage() {
     }),
   });
 
-  const { data: corpData, error: corpError, isLoading: corpLoading } = useQuery({
+  const {
+    data: corpData,
+    error: corpError,
+    isLoading: corpLoading,
+  } = useQuery({
     ...fctNodeActiveLast24hServiceListOptions({
       query: {
         username_eq: id,
@@ -32,7 +40,11 @@ export function ContributoorDetailPage() {
     }),
   });
 
-  const { data: ethData, error: ethError, isLoading: ethLoading } = useQuery({
+  const {
+    data: ethData,
+    error: ethError,
+    isLoading: ethLoading,
+  } = useQuery({
     ...fctNodeActiveLast24hServiceListOptions({
       query: {
         username_eq: id,
@@ -165,7 +177,7 @@ export function ContributoorDetailPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-border bg-surface-secondary text-left">
+                <tr className="border-border bg-surface-secondary border-b text-left">
                   <th className="px-4 py-3 font-semibold text-primary">Location</th>
                   <th className="px-4 py-3 font-semibold text-primary">Implementation</th>
                   <th className="px-4 py-3 font-semibold text-primary">Consensus</th>
@@ -175,7 +187,7 @@ export function ContributoorDetailPage() {
               </thead>
               <tbody>
                 {nodes.slice(0, 50).map((node, idx) => (
-                  <tr key={idx} className="border-b border-border hover:bg-surface-secondary">
+                  <tr key={idx} className="border-border hover:bg-surface-secondary border-b">
                     <td className="px-4 py-3 text-secondary">
                       {node.meta_client_geo_city && node.meta_client_geo_country ? (
                         <span>
@@ -193,18 +205,14 @@ export function ContributoorDetailPage() {
                     <td className="px-4 py-3 text-secondary">{node.meta_consensus_implementation || '-'}</td>
                     <td className="px-4 py-3 text-xs text-tertiary">{node.meta_consensus_version || '-'}</td>
                     <td className="px-4 py-3 text-xs text-tertiary">
-                      {node.last_seen_date_time
-                        ? new Date(node.last_seen_date_time * 1000).toLocaleString()
-                        : '-'}
+                      {node.last_seen_date_time ? new Date(node.last_seen_date_time * 1000).toLocaleString() : '-'}
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
             {nodes.length > 50 && (
-              <div className="mt-4 text-center text-sm text-tertiary">
-                Showing 50 of {nodes.length} nodes
-              </div>
+              <div className="mt-4 text-center text-sm text-tertiary">Showing 50 of {nodes.length} nodes</div>
             )}
           </div>
         </CardBody>

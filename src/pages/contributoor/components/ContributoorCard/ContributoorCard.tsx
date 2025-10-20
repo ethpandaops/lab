@@ -15,24 +15,19 @@ export function ContributoorCard({
   clientVersion,
   consensusImplementations,
   onClick,
-}: ContributoorCardProps) {
+}: ContributoorCardProps): JSX.Element {
   const countryFlag = primaryCountry ? getCountryFlag(primaryCountry) : '';
   const hasClients = consensusImplementations && consensusImplementations.length > 0;
 
   return (
-    <Card
-      isInteractive={!!onClick}
-      onClick={onClick}
-      className={`border-l-4 ${getBorderColor(classification)}`}
-    >
+    <Card isInteractive={!!onClick} onClick={onClick} className={`border-l-4 ${getBorderColor(classification)}`}>
       <CardBody>
         <div className="flex items-start gap-3">
-          <div className="flex-1 min-w-0">
-            <h3 className="text-lg font-bold text-primary truncate">{username}</h3>
+          <div className="min-w-0 flex-1">
+            <h3 className="truncate text-lg font-bold text-primary">{username}</h3>
             {(clientVersion || hasClients) && (
               <div className="mt-1 flex items-center gap-2">
-                {hasClients &&
-                  consensusImplementations.map(client => <ClientLogo key={client} client={client} />)}
+                {hasClients && consensusImplementations.map(client => <ClientLogo key={client} client={client} />)}
                 {clientVersion && <VersionBadge version={clientVersion} />}
               </div>
             )}
@@ -62,7 +57,7 @@ export function ContributoorCard({
               </>
             ) : null}
           </div>
-          <div className="text-xs text-tertiary whitespace-nowrap">{getRelativeTime(lastSeen)}</div>
+          <div className="text-xs whitespace-nowrap text-tertiary">{getRelativeTime(lastSeen)}</div>
         </div>
       </CardBody>
     </Card>
