@@ -12,8 +12,14 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as ExperimentsRouteImport } from './routes/experiments'
 import { Route as ContributorsRouteImport } from './routes/contributors'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ExperimentsIndexRouteImport } from './routes/experiments/index'
 import { Route as ContributorsIndexRouteImport } from './routes/contributors/index'
-import { Route as ExperimentsInedxRouteImport } from './routes/experiments/inedx'
+import { Route as ExperimentsNetworksRouteImport } from './routes/experiments/networks'
+import { Route as ExperimentsLocallyBuiltBlocksRouteImport } from './routes/experiments/locally-built-blocks'
+import { Route as ExperimentsLiveSlotsRouteImport } from './routes/experiments/live-slots'
+import { Route as ExperimentsGeographicalChecklistRouteImport } from './routes/experiments/geographical-checklist'
+import { Route as ExperimentsForkReadinessRouteImport } from './routes/experiments/fork-readiness'
+import { Route as ExperimentsBlockProductionFlowRouteImport } from './routes/experiments/block-production-flow'
 import { Route as ContributorsIdRouteImport } from './routes/contributors/$id'
 
 const ExperimentsRoute = ExperimentsRouteImport.update({
@@ -31,16 +37,50 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ExperimentsIndexRoute = ExperimentsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => ExperimentsRoute,
+} as any)
 const ContributorsIndexRoute = ContributorsIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => ContributorsRoute,
 } as any)
-const ExperimentsInedxRoute = ExperimentsInedxRouteImport.update({
-  id: '/inedx',
-  path: '/inedx',
+const ExperimentsNetworksRoute = ExperimentsNetworksRouteImport.update({
+  id: '/networks',
+  path: '/networks',
   getParentRoute: () => ExperimentsRoute,
 } as any)
+const ExperimentsLocallyBuiltBlocksRoute =
+  ExperimentsLocallyBuiltBlocksRouteImport.update({
+    id: '/locally-built-blocks',
+    path: '/locally-built-blocks',
+    getParentRoute: () => ExperimentsRoute,
+  } as any)
+const ExperimentsLiveSlotsRoute = ExperimentsLiveSlotsRouteImport.update({
+  id: '/live-slots',
+  path: '/live-slots',
+  getParentRoute: () => ExperimentsRoute,
+} as any)
+const ExperimentsGeographicalChecklistRoute =
+  ExperimentsGeographicalChecklistRouteImport.update({
+    id: '/geographical-checklist',
+    path: '/geographical-checklist',
+    getParentRoute: () => ExperimentsRoute,
+  } as any)
+const ExperimentsForkReadinessRoute =
+  ExperimentsForkReadinessRouteImport.update({
+    id: '/fork-readiness',
+    path: '/fork-readiness',
+    getParentRoute: () => ExperimentsRoute,
+  } as any)
+const ExperimentsBlockProductionFlowRoute =
+  ExperimentsBlockProductionFlowRouteImport.update({
+    id: '/block-production-flow',
+    path: '/block-production-flow',
+    getParentRoute: () => ExperimentsRoute,
+  } as any)
 const ContributorsIdRoute = ContributorsIdRouteImport.update({
   id: '/$id',
   path: '/$id',
@@ -52,15 +92,26 @@ export interface FileRoutesByFullPath {
   '/contributors': typeof ContributorsRouteWithChildren
   '/experiments': typeof ExperimentsRouteWithChildren
   '/contributors/$id': typeof ContributorsIdRoute
-  '/experiments/inedx': typeof ExperimentsInedxRoute
+  '/experiments/block-production-flow': typeof ExperimentsBlockProductionFlowRoute
+  '/experiments/fork-readiness': typeof ExperimentsForkReadinessRoute
+  '/experiments/geographical-checklist': typeof ExperimentsGeographicalChecklistRoute
+  '/experiments/live-slots': typeof ExperimentsLiveSlotsRoute
+  '/experiments/locally-built-blocks': typeof ExperimentsLocallyBuiltBlocksRoute
+  '/experiments/networks': typeof ExperimentsNetworksRoute
   '/contributors/': typeof ContributorsIndexRoute
+  '/experiments/': typeof ExperimentsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/experiments': typeof ExperimentsRouteWithChildren
   '/contributors/$id': typeof ContributorsIdRoute
-  '/experiments/inedx': typeof ExperimentsInedxRoute
+  '/experiments/block-production-flow': typeof ExperimentsBlockProductionFlowRoute
+  '/experiments/fork-readiness': typeof ExperimentsForkReadinessRoute
+  '/experiments/geographical-checklist': typeof ExperimentsGeographicalChecklistRoute
+  '/experiments/live-slots': typeof ExperimentsLiveSlotsRoute
+  '/experiments/locally-built-blocks': typeof ExperimentsLocallyBuiltBlocksRoute
+  '/experiments/networks': typeof ExperimentsNetworksRoute
   '/contributors': typeof ContributorsIndexRoute
+  '/experiments': typeof ExperimentsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -68,8 +119,14 @@ export interface FileRoutesById {
   '/contributors': typeof ContributorsRouteWithChildren
   '/experiments': typeof ExperimentsRouteWithChildren
   '/contributors/$id': typeof ContributorsIdRoute
-  '/experiments/inedx': typeof ExperimentsInedxRoute
+  '/experiments/block-production-flow': typeof ExperimentsBlockProductionFlowRoute
+  '/experiments/fork-readiness': typeof ExperimentsForkReadinessRoute
+  '/experiments/geographical-checklist': typeof ExperimentsGeographicalChecklistRoute
+  '/experiments/live-slots': typeof ExperimentsLiveSlotsRoute
+  '/experiments/locally-built-blocks': typeof ExperimentsLocallyBuiltBlocksRoute
+  '/experiments/networks': typeof ExperimentsNetworksRoute
   '/contributors/': typeof ContributorsIndexRoute
+  '/experiments/': typeof ExperimentsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -78,23 +135,40 @@ export interface FileRouteTypes {
     | '/contributors'
     | '/experiments'
     | '/contributors/$id'
-    | '/experiments/inedx'
+    | '/experiments/block-production-flow'
+    | '/experiments/fork-readiness'
+    | '/experiments/geographical-checklist'
+    | '/experiments/live-slots'
+    | '/experiments/locally-built-blocks'
+    | '/experiments/networks'
     | '/contributors/'
+    | '/experiments/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/experiments'
     | '/contributors/$id'
-    | '/experiments/inedx'
+    | '/experiments/block-production-flow'
+    | '/experiments/fork-readiness'
+    | '/experiments/geographical-checklist'
+    | '/experiments/live-slots'
+    | '/experiments/locally-built-blocks'
+    | '/experiments/networks'
     | '/contributors'
+    | '/experiments'
   id:
     | '__root__'
     | '/'
     | '/contributors'
     | '/experiments'
     | '/contributors/$id'
-    | '/experiments/inedx'
+    | '/experiments/block-production-flow'
+    | '/experiments/fork-readiness'
+    | '/experiments/geographical-checklist'
+    | '/experiments/live-slots'
+    | '/experiments/locally-built-blocks'
+    | '/experiments/networks'
     | '/contributors/'
+    | '/experiments/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -126,6 +200,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/experiments/': {
+      id: '/experiments/'
+      path: '/'
+      fullPath: '/experiments/'
+      preLoaderRoute: typeof ExperimentsIndexRouteImport
+      parentRoute: typeof ExperimentsRoute
+    }
     '/contributors/': {
       id: '/contributors/'
       path: '/'
@@ -133,11 +214,46 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ContributorsIndexRouteImport
       parentRoute: typeof ContributorsRoute
     }
-    '/experiments/inedx': {
-      id: '/experiments/inedx'
-      path: '/inedx'
-      fullPath: '/experiments/inedx'
-      preLoaderRoute: typeof ExperimentsInedxRouteImport
+    '/experiments/networks': {
+      id: '/experiments/networks'
+      path: '/networks'
+      fullPath: '/experiments/networks'
+      preLoaderRoute: typeof ExperimentsNetworksRouteImport
+      parentRoute: typeof ExperimentsRoute
+    }
+    '/experiments/locally-built-blocks': {
+      id: '/experiments/locally-built-blocks'
+      path: '/locally-built-blocks'
+      fullPath: '/experiments/locally-built-blocks'
+      preLoaderRoute: typeof ExperimentsLocallyBuiltBlocksRouteImport
+      parentRoute: typeof ExperimentsRoute
+    }
+    '/experiments/live-slots': {
+      id: '/experiments/live-slots'
+      path: '/live-slots'
+      fullPath: '/experiments/live-slots'
+      preLoaderRoute: typeof ExperimentsLiveSlotsRouteImport
+      parentRoute: typeof ExperimentsRoute
+    }
+    '/experiments/geographical-checklist': {
+      id: '/experiments/geographical-checklist'
+      path: '/geographical-checklist'
+      fullPath: '/experiments/geographical-checklist'
+      preLoaderRoute: typeof ExperimentsGeographicalChecklistRouteImport
+      parentRoute: typeof ExperimentsRoute
+    }
+    '/experiments/fork-readiness': {
+      id: '/experiments/fork-readiness'
+      path: '/fork-readiness'
+      fullPath: '/experiments/fork-readiness'
+      preLoaderRoute: typeof ExperimentsForkReadinessRouteImport
+      parentRoute: typeof ExperimentsRoute
+    }
+    '/experiments/block-production-flow': {
+      id: '/experiments/block-production-flow'
+      path: '/block-production-flow'
+      fullPath: '/experiments/block-production-flow'
+      preLoaderRoute: typeof ExperimentsBlockProductionFlowRouteImport
       parentRoute: typeof ExperimentsRoute
     }
     '/contributors/$id': {
@@ -165,11 +281,23 @@ const ContributorsRouteWithChildren = ContributorsRoute._addFileChildren(
 )
 
 interface ExperimentsRouteChildren {
-  ExperimentsInedxRoute: typeof ExperimentsInedxRoute
+  ExperimentsBlockProductionFlowRoute: typeof ExperimentsBlockProductionFlowRoute
+  ExperimentsForkReadinessRoute: typeof ExperimentsForkReadinessRoute
+  ExperimentsGeographicalChecklistRoute: typeof ExperimentsGeographicalChecklistRoute
+  ExperimentsLiveSlotsRoute: typeof ExperimentsLiveSlotsRoute
+  ExperimentsLocallyBuiltBlocksRoute: typeof ExperimentsLocallyBuiltBlocksRoute
+  ExperimentsNetworksRoute: typeof ExperimentsNetworksRoute
+  ExperimentsIndexRoute: typeof ExperimentsIndexRoute
 }
 
 const ExperimentsRouteChildren: ExperimentsRouteChildren = {
-  ExperimentsInedxRoute: ExperimentsInedxRoute,
+  ExperimentsBlockProductionFlowRoute: ExperimentsBlockProductionFlowRoute,
+  ExperimentsForkReadinessRoute: ExperimentsForkReadinessRoute,
+  ExperimentsGeographicalChecklistRoute: ExperimentsGeographicalChecklistRoute,
+  ExperimentsLiveSlotsRoute: ExperimentsLiveSlotsRoute,
+  ExperimentsLocallyBuiltBlocksRoute: ExperimentsLocallyBuiltBlocksRoute,
+  ExperimentsNetworksRoute: ExperimentsNetworksRoute,
+  ExperimentsIndexRoute: ExperimentsIndexRoute,
 }
 
 const ExperimentsRouteWithChildren = ExperimentsRoute._addFileChildren(

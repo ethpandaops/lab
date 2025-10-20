@@ -4,8 +4,9 @@ import type { FctNodeActiveLast24h } from '@/api/types.gen';
 import { fctNodeActiveLast24hServiceListOptions } from '@/api/@tanstack/react-query.gen';
 import { Container } from '@/components/Layout/Container';
 import { Header } from '@/components/Layout/Header';
-import { ContributoorCard } from './components/ContributoorCard';
-import type { ContributorClassification } from './components/ContributoorCard';
+import { ContributorCard } from './components/ContributorCard';
+import { ContributorLoading } from './components/ContributorLoading';
+import type { ContributorClassification } from './components/ContributorCard';
 
 interface Contributor {
   username: string;
@@ -160,7 +161,7 @@ export function IndexPage(): JSX.Element {
         <h2 className="mb-6 text-xl/7 font-semibold text-foreground">{title}</h2>
         <ul role="list" className="md: grid grid-cols-1 gap-6 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
           {contributors.map(contributor => (
-            <ContributoorCard
+            <ContributorCard
               key={contributor.clientName}
               username={contributor.username}
               classification={contributor.classification}
@@ -182,8 +183,14 @@ export function IndexPage(): JSX.Element {
   if (isLoading) {
     return (
       <Container>
-        <div className="flex items-center justify-center">
-          <div className="text-muted">Loading contributors...</div>
+        <Header title="Contributoors" description="Active node operators in the last 24 hours" />
+        <div className="mb-12">
+          <h2 className="mb-6 text-xl/7 font-semibold text-foreground">Public Contributors</h2>
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
+            {Array.from({ length: 9 }).map((_, index) => (
+              <ContributorLoading key={index} />
+            ))}
+          </div>
         </div>
       </Container>
     );

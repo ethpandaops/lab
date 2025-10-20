@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { ContributoorCard } from './ContributoorCard';
+import { ContributorCard } from './ContributorCard';
 
 const meta = {
-  title: 'Pages/Contributors/ContributoorCard',
-  component: ContributoorCard,
+  title: 'Pages/Contributors/ContributorCard',
+  component: ContributorCard,
   parameters: {
     layout: 'padded',
   },
@@ -15,7 +15,7 @@ const meta = {
     ),
   ],
   tags: ['autodocs'],
-} satisfies Meta<typeof ContributoorCard>;
+} satisfies Meta<typeof ContributorCard>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
@@ -170,7 +170,7 @@ export const GridLayout: Story = {
   },
   render: () => (
     <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-      <ContributoorCard
+      <ContributorCard
         username="abstractdrank74"
         classification="individual"
         nodeCount={1}
@@ -181,7 +181,7 @@ export const GridLayout: Story = {
         clientVersion="v0.0.70-7195855"
         consensusImplementations={['lighthouse']}
       />
-      <ContributoorCard
+      <ContributorCard
         username="besiegedclimber34"
         classification="individual"
         nodeCount={1}
@@ -192,7 +192,7 @@ export const GridLayout: Story = {
         clientVersion="v0.0.69-abc123"
         consensusImplementations={['prysm']}
       />
-      <ContributoorCard
+      <ContributorCard
         username="bonniesetup9"
         classification="individual"
         nodeCount={1}
@@ -203,7 +203,7 @@ export const GridLayout: Story = {
         clientVersion="v0.0.68-xyz789"
         consensusImplementations={['teku']}
       />
-      <ContributoorCard
+      <ContributorCard
         username="techcorp"
         classification="corporate"
         nodeCount={8}
@@ -212,7 +212,7 @@ export const GridLayout: Story = {
         clientVersion="v0.0.71-corp"
         consensusImplementations={['nimbus']}
       />
-      <ContributoorCard
+      <ContributorCard
         username="ethpandaops"
         classification="internal"
         nodeCount={25}
@@ -221,7 +221,7 @@ export const GridLayout: Story = {
         clientVersion="v0.0.72-main"
         consensusImplementations={['lodestar']}
       />
-      <ContributoorCard
+      <ContributorCard
         username="unknown"
         classification="unclassified"
         nodeCount={1}

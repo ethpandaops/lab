@@ -1,6 +1,6 @@
 export type ContributorClassification = 'individual' | 'corporate' | 'internal' | 'unclassified';
 
-export interface ContributoorCardProps {
+export interface ContributorCardProps {
   /**
    * The contributor's username (e.g., "sparingparsley27")
    */

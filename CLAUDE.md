@@ -182,3 +182,17 @@ Theme is defined in `src/index.css` using Tailwind CSS v4's `@theme inline` dire
 **Dark mode:** Automatically switches when `.dark` class is on `<html>` element.
 
 **To modify theme:** Edit `@layer base` in `src/index.css` - change `:root` for light mode or `html.dark` for dark mode.
+
+## Storybook
+
+- when creating a new story, add the following decorators:
+```tsx
+decorators: [
+  Story => (
+    <div className="min-w-[600px] rounded-sm bg-surface p-6">
+      <Story />
+    </div>
+  ),
+],
+```
+- When choosing a title, use the full nested path to the story, e.g. `Components/Layout/Container`

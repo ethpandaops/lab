@@ -10,7 +10,7 @@ export function Stats({ stats, title, className }: StatsProps): JSX.Element {
     <div className={className}>
       {title && <h3 className="text-base font-semibold text-foreground">{title}</h3>}
 
-      <dl className={clsx('grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3', title && 'mt-5')}>
+      <dl className={clsx('grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4', title && 'mt-5')}>
         {stats.map(item => (
           <Card
             key={item.id}

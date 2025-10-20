@@ -1,0 +1,1 @@
+export { ContributorDetailsLoader } from './ContributorDetailsLoader';

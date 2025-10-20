@@ -10,8 +10,9 @@ import { Header } from '@/components/Layout/Header';
 import { Stats } from '@/components/DataDisplay/Stats';
 import { Table } from '@/components/Lists/Table';
 import type { Column } from '@/components/Lists/Table';
-import type { ContributorClassification } from './components/ContributoorCard/ContributoorCard.types';
-import { getBorderColor, getClassificationLabel, getClassificationColor } from './components/ContributoorCard/utils';
+import { ContributorDetailsLoader } from './components/ContributorDetailsLoader';
+import type { ContributorClassification } from './components/ContributorCard/ContributorCard.types';
+import { getBorderColor, getClassificationLabel, getClassificationColor } from './components/ContributorCard/utils';
 
 export function DetailPage(): JSX.Element {
   const { id } = useParams({ from: '/contributors/$id' });
@@ -78,9 +79,7 @@ export function DetailPage(): JSX.Element {
     return (
       <Container>
         <Header title="Contributor Details" description="Detailed contribution metrics and activity" />
-        <div className="flex items-center justify-center py-12">
-          <div className="text-muted">Loading contributor details...</div>
-        </div>
+        <ContributorDetailsLoader />
       </Container>
     );
   }
