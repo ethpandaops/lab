@@ -1,6 +1,6 @@
 import { type JSX } from 'react';
 import { clsx } from 'clsx';
-import { Header } from '@/components/Layout/Header';
+import { Header } from '@/components/Header';
 import { type StandardProps } from './Standard.types';
 
 export function Standard({

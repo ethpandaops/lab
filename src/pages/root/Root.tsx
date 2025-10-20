@@ -3,7 +3,7 @@ import { ArrowTopRightOnSquareIcon } from '@heroicons/react/24/solid';
 import { BoltIcon } from '@heroicons/react/24/outline';
 import { ArrowRightIcon } from '@heroicons/react/20/solid';
 import { useEffect, useState, useRef, type JSX } from 'react';
-import { FeatureCard } from '@/components/Layout/FeatureCard';
+import { FeatureCard } from '@/components/FeatureCard';
 
 // Featured experiments with dummy links
 const featuredExperiments = [

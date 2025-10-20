@@ -8,7 +8,7 @@ import './styles/globals.css';
 import { routeTree } from './routeTree.gen';
 
 // Import custom error component
-import { FatalError } from '@/components/Layout/FatalError';
+import { FatalError } from '@/components/FatalError';
 
 // Create a new router instance with custom error component
 const router = createRouter({

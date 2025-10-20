@@ -1,10 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { type JSX, useState } from 'react';
 import { Bars3Icon } from '@heroicons/react/24/outline';
-import { NavPanel, type NavPanelProps } from '@/components/Navigation/NavPanel';
+import { NavPanel, type NavPanelProps } from '@/components/NavPanel';
 
 const meta = {
-  title: 'Components/Navigation/NavPanel',
+  title: 'Components/NavPanel',
   component: NavPanel,
   parameters: {
     layout: 'fullscreen',

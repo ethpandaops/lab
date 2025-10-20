@@ -1,11 +1,11 @@
 import { type JSX, useState } from 'react';
 import { Link } from '@tanstack/react-router';
 import { Bars3Icon } from '@heroicons/react/24/outline';
-import { NetworkSelector } from '@/components/Network/NetworkSelector';
-import { NetworkSummary } from '@/components/Network/NetworkSummary';
-import { NetworkIcon } from '@/components/Network/NetworkIcon';
-import { NavBar } from '@/components/Navigation/NavBar';
-import { NavPanel } from '@/components/Navigation/NavPanel';
+import { NetworkSelector } from '@/components/NetworkSelector';
+import { NetworkSummary } from '@/components/NetworkSummary';
+import { NetworkIcon } from '@/components/NetworkIcon';
+import { NavBar } from '@/components/NavBar';
+import { NavPanel } from '@/components/NavPanel';
 import { useNetwork } from '@/hooks/useNetwork';
 import { type HeaderProps } from './Header.types';
 

@@ -1,7 +1,7 @@
 import { type JSX } from 'react';
 import { Link } from '@tanstack/react-router';
 import { ChevronRightIcon } from '@heroicons/react/20/solid';
-import { Card, CardBody } from '@/components/Layout/Card';
+import { Card, CardBody } from '@/components/Card';
 import type { FeatureCardProps } from './FeatureCard.types';
 
 export function FeatureCard({

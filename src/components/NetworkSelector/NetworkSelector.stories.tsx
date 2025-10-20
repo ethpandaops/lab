@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { NetworkSelector } from '@/components/Network/NetworkSelector';
+import { NetworkSelector } from '@/components/NetworkSelector';
 
 const meta: Meta<typeof NetworkSelector> = {
-  title: 'Components/Network/NetworkSelector',
+  title: 'Components/NetworkSelector',
   component: NetworkSelector,
   parameters: {
     layout: 'centered',
