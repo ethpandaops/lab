@@ -2,13 +2,12 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { RouterProvider, createRouter } from '@tanstack/react-router';
 import './index.css';
-import './styles/globals.css';
 
 // Import the generated route tree
 import { routeTree } from './routeTree.gen';
 
 // Import custom error component
-import { FatalError } from '@/components/FatalError';
+import { FatalError } from '@/components/Overlays/FatalError';
 
 // Create a new router instance with custom error component
 const router = createRouter({

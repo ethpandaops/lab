@@ -42,6 +42,14 @@ export default tseslint.config(
         },
       ],
       '@typescript-eslint/no-explicit-any': 'error',
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector: 'TSAnyKeyword',
+          message:
+            'The `any` type defeats the purpose of TypeScript. Use proper types instead or `unknown` if the type is truly unknown.',
+        },
+      ],
       '@typescript-eslint/explicit-function-return-type': [
         'warn',
         {

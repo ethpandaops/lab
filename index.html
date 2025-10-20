@@ -1,12 +1,6 @@
 <!doctype html>
 <html lang="en" itemscope="" itemtype="http://schema.org/Webpage">
   <head>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@100;200;300;400;500;600;700&family=Orbitron:wght@400;500;600;700;800;900&display=swap"
-      rel="stylesheet"
-    />
     <style>
       /* Critical CSS - Inline for instant rendering */
       body:not(.react-loaded) * {
@@ -33,6 +27,20 @@
         z-index: 50;
       }
     </style>
+    <script>
+      // Initialize theme before React mounts to prevent FOUC
+      (function () {
+        const theme = localStorage.getItem('theme');
+        const isDark =
+          theme === 'dark' ||
+          (theme !== 'light' &&
+            window.matchMedia('(prefers-color-scheme: dark)').matches);
+
+        if (isDark) {
+          document.documentElement.classList.add('dark');
+        }
+      })();
+    </script>
   </head>
   <body>
     <div id="loading-screen"></div>

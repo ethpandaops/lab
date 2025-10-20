@@ -63,6 +63,9 @@ importers:
       '@storybook/addon-docs':
         specifier: 9.1.13
         version: 9.1.13(@types/react@19.2.2)(storybook@9.1.13(@testing-library/dom@10.4.1)(msw@2.11.5(@types/node@24.8.1)(typescript@5.9.3))(prettier@3.6.2)(vite@7.1.10(@types/node@24.8.1)(jiti@2.6.1)(lightningcss@1.30.1)(tsx@4.20.6)))
+      '@storybook/addon-themes':
+        specifier: ^9.1.13
+        version: 9.1.13(storybook@9.1.13(@testing-library/dom@10.4.1)(msw@2.11.5(@types/node@24.8.1)(typescript@5.9.3))(prettier@3.6.2)(vite@7.1.10(@types/node@24.8.1)(jiti@2.6.1)(lightningcss@1.30.1)(tsx@4.20.6)))
       '@storybook/addon-vitest':
         specifier: 9.1.13
         version: 9.1.13(@vitest/browser@3.2.4)(@vitest/runner@3.2.4)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(storybook@9.1.13(@testing-library/dom@10.4.1)(msw@2.11.5(@types/node@24.8.1)(typescript@5.9.3))(prettier@3.6.2)(vite@7.1.10(@types/node@24.8.1)(jiti@2.6.1)(lightningcss@1.30.1)(tsx@4.20.6)))(vitest@3.2.4)
@@ -994,6 +997,11 @@ packages:
 
   '@storybook/addon-docs@9.1.13':
     resolution: {integrity: sha512-V1nCo7bfC3kQ5VNVq0VDcHsIhQf507m+BxMA5SIYiwdJHljH2BXpW2fL3FFn9gv9Wp57AEEzhm+wh4zANaJgkg==}
+    peerDependencies:
+      storybook: ^9.1.13
+
+  '@storybook/addon-themes@9.1.13':
+    resolution: {integrity: sha512-0ewLnwpoeOzOxDYg4VBlcnWiJz2jXvbZgEsQnqDXcK6y+WwK5MdupRFzSSJb+h470h3MnINAQrskPgGMKmI44A==}
     peerDependencies:
       storybook: ^9.1.13
 
@@ -4605,6 +4613,11 @@ snapshots:
       ts-dedent: 2.2.0
     transitivePeerDependencies:
       - '@types/react'
+
+  '@storybook/addon-themes@9.1.13(storybook@9.1.13(@testing-library/dom@10.4.1)(msw@2.11.5(@types/node@24.8.1)(typescript@5.9.3))(prettier@3.6.2)(vite@7.1.10(@types/node@24.8.1)(jiti@2.6.1)(lightningcss@1.30.1)(tsx@4.20.6)))':
+    dependencies:
+      storybook: 9.1.13(@testing-library/dom@10.4.1)(msw@2.11.5(@types/node@24.8.1)(typescript@5.9.3))(prettier@3.6.2)(vite@7.1.10(@types/node@24.8.1)(jiti@2.6.1)(lightningcss@1.30.1)(tsx@4.20.6))
+      ts-dedent: 2.2.0
 
   '@storybook/addon-vitest@9.1.13(@vitest/browser@3.2.4)(@vitest/runner@3.2.4)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(storybook@9.1.13(@testing-library/dom@10.4.1)(msw@2.11.5(@types/node@24.8.1)(typescript@5.9.3))(prettier@3.6.2)(vite@7.1.10(@types/node@24.8.1)(jiti@2.6.1)(lightningcss@1.30.1)(tsx@4.20.6)))(vitest@3.2.4)':
     dependencies:

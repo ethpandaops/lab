@@ -3,8 +3,9 @@ import { INITIAL_VIEWPORTS } from 'storybook/viewport';
 import { RouterProvider, createMemoryHistory, createRootRoute, createRouter } from '@tanstack/react-router';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { NetworkProvider } from '../src/providers/NetworkProvider';
-import { ConfigGate } from '../src/components/Layout/ConfigGate';
+import { ConfigGate } from '../src/components/Overlays/ConfigGate';
 import { initialize, mswLoader } from 'msw-storybook-addon';
+import { withThemeByClassName } from '@storybook/addon-themes';
 import { handlers, mockConfig, mockBounds } from './mocks';
 import '../src/index.css';
 
@@ -20,6 +21,13 @@ initialize({
 const preview: Preview = {
   loaders: [mswLoader],
   decorators: [
+    withThemeByClassName<ReactRenderer>({
+      themes: {
+        light: '',
+        dark: 'dark',
+      },
+      defaultTheme: 'dark',
+    }),
     (Story, context) => {
       // Allow stories to override query options via parameters.tanstackQuery
       const queryOptions = context.parameters.tanstackQuery?.queries || {};

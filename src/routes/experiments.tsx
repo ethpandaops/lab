@@ -8,6 +8,6 @@ export const Route = createFileRoute('/experiments')({
     };
   },
   head: () => ({
-    meta: [{ title: `${import.meta.env.VITE_BASE_TITLE} - Experiments` }],
+    meta: [{ title: `Experiments | ${import.meta.env.VITE_BASE_TITLE}` }],
   }),
 });

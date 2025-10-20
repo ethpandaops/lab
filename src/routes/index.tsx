@@ -1,16 +1,6 @@
-import { type JSX } from 'react';
 import { createFileRoute } from '@tanstack/react-router';
-import { Root } from '@/pages/root';
-import { Standard } from '@/layouts/Standard';
+import { IndexPage } from '@/pages/IndexPage';
 
 export const Route = createFileRoute('/')({
-  component: RootWithLayout,
+  component: IndexPage,
 });
-
-function RootWithLayout(): JSX.Element {
-  return (
-    <Standard showBreadcrumbs={false} showNavLinks={false}>
-      <Root />
-    </Standard>
-  );
-}

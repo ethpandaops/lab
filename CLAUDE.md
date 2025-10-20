@@ -33,25 +33,15 @@ package.json                          # Dependencies and scripts
 public/                               # Public assets
 .storybook/                           # Storybook configuration
 src/
-  routes/                             # Route definitions - wrap pages in layouts
-    __root.tsx                        # Minimal providers only
+  routes/                             # Route definitions - reference page components directly
+    __root.tsx                        # Root layout with sidebar, providers, navigation
     index.tsx                         # "/" - Root landing page
-    about.tsx                         # "/about" - wraps AboutPage in Standard layout
+    about.tsx                         # "/about" - About page
     experiments/
       index.tsx                       # "/experiments" - experiments list
-      $id.tsx                         # "/experiments/$id" - dynamic experiment route
-      -experiments.config.ts          # Config for all experiments
-
-  layouts/                            # Layout components
-    Standard/                         # Single column layout
-      Standard.tsx
-      Standard.types.ts
-      index.ts
-    Sidebar/                          # Two column layout (main + sidebar)
-      Sidebar.tsx
-      Sidebar.types.ts
-      index.ts
-    index.ts
+      block-production-flow.tsx       # Experiment routes
+      live-slots.tsx
+      locally-built-blocks.tsx
 
   pages/                              # Page implementations (pure content)
     root/
@@ -60,16 +50,12 @@ src/
       AboutPage.tsx                   # About page content
     experiments/
       Experiments.tsx                 # Experiments list
-      FullWidth/
-        FullWidth.tsx                 # Full width experiment
-      NavbarOnly/
-        NavbarOnly.tsx                # Navbar-only experiment
-      WithSelector/
-        WithSelector.tsx              # With network selector
-        components/                   # Page-specific components
-          BlockList/
-      TwoColumnBasic/
-        TwoColumnBasic.tsx            # Two column example
+      BlockProductionFlow/
+        BlockProductionFlow.tsx
+      LiveSlots/
+        LiveSlots.tsx
+      LocallyBuiltBlocks/
+        LocallyBuiltBlocks.tsx
       ... (other experiments)
 
   components/                         # Shared, generic, design-system components
@@ -114,32 +100,33 @@ src/
   main.tsx
 ```
 
-## Routes and Layouts
+## Routes and Layout
 
 ### Layout System
 
-**Available Layouts:**
-- `Standard` - Single column layout (navbar optional, network selector optional, fullWidth optional)
-- `Sidebar` - Two column layout with main content + sidebar (same options as Standard)
+**Architecture:**
+- **`__root.tsx`** - Contains the global sidebar layout with:
+  - Logo and branding
+  - Navigation links (Home, Experiments, About)
+  - Network selector
+  - Mobile responsive sidebar (drawer on mobile, fixed on desktop)
+  - Global providers (QueryClient, ConfigGate, NetworkProvider)
+  - `<Outlet />` for page content
 
 **How it works:**
-- Routes wrap page components in layout components
-- Layouts accept props: `showNavbar`, `showNetworkSelector`, `fullWidth`
-- Pages are pure content - no layout imports
-- `__root.tsx` provides minimal providers only (QueryClient, ConfigGate, NetworkProvider)
+- All routes render into the `<Outlet />` in `__root.tsx`
+- Routes reference page components directly - no layout wrappers needed
+- Pages are pure content components
+- Sidebar navigation is consistent across all pages
 
 **Example Route:**
 ```tsx
 // routes/about.tsx
-import { Standard } from '@/layouts/Standard';
+import { createFileRoute } from '@tanstack/react-router';
 import { AboutPage } from '@/pages/about';
 
 export const Route = createFileRoute('/about')({
-  component: () => (
-    <Standard showNavbar>
-      <AboutPage />
-    </Standard>
-  ),
+  component: AboutPage,
 });
 ```
 
@@ -147,46 +134,16 @@ export const Route = createFileRoute('/about')({
 ```tsx
 // pages/about/AboutPage.tsx
 export function AboutPage() {
-  return <div>Content here - no layout wrapper needed</div>;
-}
-```
-
-### Experiments System
-
-Experiments use a config-driven approach in `routes/experiments/-experiments.config.ts`:
-
-```tsx
-export const experiments = {
-  'my-experiment': {
-    id: 'my-experiment',
-    title: 'My Experiment',
-    description: 'Description here',
-    color: 'border-blue-500',
-    component: MyExperimentPage,
-    layout: {
-      type: 'standard',  // or 'sidebar' or 'none'
-      showNavbar: true,
-      showNetworkSelector: false,
-      fullWidth: false,
-    },
-  },
-};
-```
-
-The `experiments/$id` route dynamically wraps the page in the correct layout based on config.
-
-**For Sidebar layouts**, pages export multiple parts:
-```tsx
-// pages/experiments/TwoColumnExample.tsx
-export function TwoColumnExample() {
   return (
-    <>
-      <div>Main content</div>
-      <aside>Sidebar content</aside>
-    </>
+    <div className="px-4 py-8 sm:px-6 lg:px-8">
+      <h1>About</h1>
+      <p>Page content here</p>
+    </div>
   );
 }
 ```
+
+**Note:** Pages should add their own padding/spacing as needed. The main content area has `lg:pl-72` to account for the fixed sidebar on desktop.
 
 ## React
 
@@ -210,3 +167,18 @@ export function TwoColumnExample() {
 - **Hooks** (`.ts`): camelCase starting with `use` - `useNetwork.ts`, `useConfig.ts`
 - **Utils/Services** (`.ts`): kebab-case - `api-config.ts`, `auth-service.ts`
 - **Types** (`.ts`): kebab-case - `config.ts`, `network.ts`
+
+## Theming
+
+Theme is defined in `src/index.css` using Tailwind CSS v4's `@theme inline` directive with semantic color tokens.
+
+**Available semantic colors:**
+- `primary`, `secondary`, `accent` - Brand colors (cyan/sky palette)
+- `background`, `surface`, `foreground`, `muted`, `border` - UI colors
+- `success`, `warning`, `error` - State colors
+
+**Usage:** `bg-primary`, `text-foreground`, `border-border`, etc.
+
+**Dark mode:** Automatically switches when `.dark` class is on `<html>` element.
+
+**To modify theme:** Edit `@layer base` in `src/index.css` - change `:root` for light mode or `html.dark` for dark mode.

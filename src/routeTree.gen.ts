@@ -9,42 +9,21 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as XatuDataRouteImport } from './routes/xatu-data'
-import { Route as ExploreRouteImport } from './routes/explore'
 import { Route as ExperimentsRouteImport } from './routes/experiments'
-import { Route as AboutRouteImport } from './routes/about'
+import { Route as ContributorsRouteImport } from './routes/contributors'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as XatuDataIndexRouteImport } from './routes/xatu-data/index'
-import { Route as ExperimentsIndexRouteImport } from './routes/experiments/index'
-import { Route as ContributoorIndexRouteImport } from './routes/contributoor/index'
-import { Route as XatuDataNetworksRouteImport } from './routes/xatu-data/networks'
-import { Route as XatuDataGeographicalChecklistRouteImport } from './routes/xatu-data/geographical-checklist'
-import { Route as XatuDataForkReadinessRouteImport } from './routes/xatu-data/fork-readiness'
-import { Route as XatuDataContributorsRouteImport } from './routes/xatu-data/contributors'
-import { Route as ExperimentsLocallyBuiltBlocksRouteImport } from './routes/experiments/locally-built-blocks'
-import { Route as ExperimentsLiveSlotsRouteImport } from './routes/experiments/live-slots'
-import { Route as ExperimentsBlockProductionFlowRouteImport } from './routes/experiments/block-production-flow'
-import { Route as ContributoorIdRouteImport } from './routes/contributoor/$id'
-import { Route as XatuDataContributorsIdRouteImport } from './routes/xatu-data/contributors/$id'
+import { Route as ContributorsIndexRouteImport } from './routes/contributors/index'
+import { Route as ExperimentsInedxRouteImport } from './routes/experiments/inedx'
+import { Route as ContributorsIdRouteImport } from './routes/contributors/$id'
 
-const XatuDataRoute = XatuDataRouteImport.update({
-  id: '/xatu-data',
-  path: '/xatu-data',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ExploreRoute = ExploreRouteImport.update({
-  id: '/explore',
-  path: '/explore',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ExperimentsRoute = ExperimentsRouteImport.update({
   id: '/experiments',
   path: '/experiments',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AboutRoute = AboutRouteImport.update({
-  id: '/about',
-  path: '/about',
+const ContributorsRoute = ContributorsRouteImport.update({
+  id: '/contributors',
+  path: '/contributors',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -52,210 +31,80 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const XatuDataIndexRoute = XatuDataIndexRouteImport.update({
+const ContributorsIndexRoute = ContributorsIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => XatuDataRoute,
+  getParentRoute: () => ContributorsRoute,
 } as any)
-const ExperimentsIndexRoute = ExperimentsIndexRouteImport.update({
-  id: '/',
-  path: '/',
+const ExperimentsInedxRoute = ExperimentsInedxRouteImport.update({
+  id: '/inedx',
+  path: '/inedx',
   getParentRoute: () => ExperimentsRoute,
 } as any)
-const ContributoorIndexRoute = ContributoorIndexRouteImport.update({
-  id: '/contributoor/',
-  path: '/contributoor/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const XatuDataNetworksRoute = XatuDataNetworksRouteImport.update({
-  id: '/networks',
-  path: '/networks',
-  getParentRoute: () => XatuDataRoute,
-} as any)
-const XatuDataGeographicalChecklistRoute =
-  XatuDataGeographicalChecklistRouteImport.update({
-    id: '/geographical-checklist',
-    path: '/geographical-checklist',
-    getParentRoute: () => XatuDataRoute,
-  } as any)
-const XatuDataForkReadinessRoute = XatuDataForkReadinessRouteImport.update({
-  id: '/fork-readiness',
-  path: '/fork-readiness',
-  getParentRoute: () => XatuDataRoute,
-} as any)
-const XatuDataContributorsRoute = XatuDataContributorsRouteImport.update({
-  id: '/contributors',
-  path: '/contributors',
-  getParentRoute: () => XatuDataRoute,
-} as any)
-const ExperimentsLocallyBuiltBlocksRoute =
-  ExperimentsLocallyBuiltBlocksRouteImport.update({
-    id: '/locally-built-blocks',
-    path: '/locally-built-blocks',
-    getParentRoute: () => ExperimentsRoute,
-  } as any)
-const ExperimentsLiveSlotsRoute = ExperimentsLiveSlotsRouteImport.update({
-  id: '/live-slots',
-  path: '/live-slots',
-  getParentRoute: () => ExperimentsRoute,
-} as any)
-const ExperimentsBlockProductionFlowRoute =
-  ExperimentsBlockProductionFlowRouteImport.update({
-    id: '/block-production-flow',
-    path: '/block-production-flow',
-    getParentRoute: () => ExperimentsRoute,
-  } as any)
-const ContributoorIdRoute = ContributoorIdRouteImport.update({
-  id: '/contributoor/$id',
-  path: '/contributoor/$id',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const XatuDataContributorsIdRoute = XatuDataContributorsIdRouteImport.update({
+const ContributorsIdRoute = ContributorsIdRouteImport.update({
   id: '/$id',
   path: '/$id',
-  getParentRoute: () => XatuDataContributorsRoute,
+  getParentRoute: () => ContributorsRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/about': typeof AboutRoute
+  '/contributors': typeof ContributorsRouteWithChildren
   '/experiments': typeof ExperimentsRouteWithChildren
-  '/explore': typeof ExploreRoute
-  '/xatu-data': typeof XatuDataRouteWithChildren
-  '/contributoor/$id': typeof ContributoorIdRoute
-  '/experiments/block-production-flow': typeof ExperimentsBlockProductionFlowRoute
-  '/experiments/live-slots': typeof ExperimentsLiveSlotsRoute
-  '/experiments/locally-built-blocks': typeof ExperimentsLocallyBuiltBlocksRoute
-  '/xatu-data/contributors': typeof XatuDataContributorsRouteWithChildren
-  '/xatu-data/fork-readiness': typeof XatuDataForkReadinessRoute
-  '/xatu-data/geographical-checklist': typeof XatuDataGeographicalChecklistRoute
-  '/xatu-data/networks': typeof XatuDataNetworksRoute
-  '/contributoor': typeof ContributoorIndexRoute
-  '/experiments/': typeof ExperimentsIndexRoute
-  '/xatu-data/': typeof XatuDataIndexRoute
-  '/xatu-data/contributors/$id': typeof XatuDataContributorsIdRoute
+  '/contributors/$id': typeof ContributorsIdRoute
+  '/experiments/inedx': typeof ExperimentsInedxRoute
+  '/contributors/': typeof ContributorsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/about': typeof AboutRoute
-  '/explore': typeof ExploreRoute
-  '/contributoor/$id': typeof ContributoorIdRoute
-  '/experiments/block-production-flow': typeof ExperimentsBlockProductionFlowRoute
-  '/experiments/live-slots': typeof ExperimentsLiveSlotsRoute
-  '/experiments/locally-built-blocks': typeof ExperimentsLocallyBuiltBlocksRoute
-  '/xatu-data/contributors': typeof XatuDataContributorsRouteWithChildren
-  '/xatu-data/fork-readiness': typeof XatuDataForkReadinessRoute
-  '/xatu-data/geographical-checklist': typeof XatuDataGeographicalChecklistRoute
-  '/xatu-data/networks': typeof XatuDataNetworksRoute
-  '/contributoor': typeof ContributoorIndexRoute
-  '/experiments': typeof ExperimentsIndexRoute
-  '/xatu-data': typeof XatuDataIndexRoute
-  '/xatu-data/contributors/$id': typeof XatuDataContributorsIdRoute
+  '/experiments': typeof ExperimentsRouteWithChildren
+  '/contributors/$id': typeof ContributorsIdRoute
+  '/experiments/inedx': typeof ExperimentsInedxRoute
+  '/contributors': typeof ContributorsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/about': typeof AboutRoute
+  '/contributors': typeof ContributorsRouteWithChildren
   '/experiments': typeof ExperimentsRouteWithChildren
-  '/explore': typeof ExploreRoute
-  '/xatu-data': typeof XatuDataRouteWithChildren
-  '/contributoor/$id': typeof ContributoorIdRoute
-  '/experiments/block-production-flow': typeof ExperimentsBlockProductionFlowRoute
-  '/experiments/live-slots': typeof ExperimentsLiveSlotsRoute
-  '/experiments/locally-built-blocks': typeof ExperimentsLocallyBuiltBlocksRoute
-  '/xatu-data/contributors': typeof XatuDataContributorsRouteWithChildren
-  '/xatu-data/fork-readiness': typeof XatuDataForkReadinessRoute
-  '/xatu-data/geographical-checklist': typeof XatuDataGeographicalChecklistRoute
-  '/xatu-data/networks': typeof XatuDataNetworksRoute
-  '/contributoor/': typeof ContributoorIndexRoute
-  '/experiments/': typeof ExperimentsIndexRoute
-  '/xatu-data/': typeof XatuDataIndexRoute
-  '/xatu-data/contributors/$id': typeof XatuDataContributorsIdRoute
+  '/contributors/$id': typeof ContributorsIdRoute
+  '/experiments/inedx': typeof ExperimentsInedxRoute
+  '/contributors/': typeof ContributorsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/about'
+    | '/contributors'
     | '/experiments'
-    | '/explore'
-    | '/xatu-data'
-    | '/contributoor/$id'
-    | '/experiments/block-production-flow'
-    | '/experiments/live-slots'
-    | '/experiments/locally-built-blocks'
-    | '/xatu-data/contributors'
-    | '/xatu-data/fork-readiness'
-    | '/xatu-data/geographical-checklist'
-    | '/xatu-data/networks'
-    | '/contributoor'
-    | '/experiments/'
-    | '/xatu-data/'
-    | '/xatu-data/contributors/$id'
+    | '/contributors/$id'
+    | '/experiments/inedx'
+    | '/contributors/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/about'
-    | '/explore'
-    | '/contributoor/$id'
-    | '/experiments/block-production-flow'
-    | '/experiments/live-slots'
-    | '/experiments/locally-built-blocks'
-    | '/xatu-data/contributors'
-    | '/xatu-data/fork-readiness'
-    | '/xatu-data/geographical-checklist'
-    | '/xatu-data/networks'
-    | '/contributoor'
     | '/experiments'
-    | '/xatu-data'
-    | '/xatu-data/contributors/$id'
+    | '/contributors/$id'
+    | '/experiments/inedx'
+    | '/contributors'
   id:
     | '__root__'
     | '/'
-    | '/about'
+    | '/contributors'
     | '/experiments'
-    | '/explore'
-    | '/xatu-data'
-    | '/contributoor/$id'
-    | '/experiments/block-production-flow'
-    | '/experiments/live-slots'
-    | '/experiments/locally-built-blocks'
-    | '/xatu-data/contributors'
-    | '/xatu-data/fork-readiness'
-    | '/xatu-data/geographical-checklist'
-    | '/xatu-data/networks'
-    | '/contributoor/'
-    | '/experiments/'
-    | '/xatu-data/'
-    | '/xatu-data/contributors/$id'
+    | '/contributors/$id'
+    | '/experiments/inedx'
+    | '/contributors/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AboutRoute: typeof AboutRoute
+  ContributorsRoute: typeof ContributorsRouteWithChildren
   ExperimentsRoute: typeof ExperimentsRouteWithChildren
-  ExploreRoute: typeof ExploreRoute
-  XatuDataRoute: typeof XatuDataRouteWithChildren
-  ContributoorIdRoute: typeof ContributoorIdRoute
-  ContributoorIndexRoute: typeof ContributoorIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/xatu-data': {
-      id: '/xatu-data'
-      path: '/xatu-data'
-      fullPath: '/xatu-data'
-      preLoaderRoute: typeof XatuDataRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/explore': {
-      id: '/explore'
-      path: '/explore'
-      fullPath: '/explore'
-      preLoaderRoute: typeof ExploreRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/experiments': {
       id: '/experiments'
       path: '/experiments'
@@ -263,11 +112,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ExperimentsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/about': {
-      id: '/about'
-      path: '/about'
-      fullPath: '/about'
-      preLoaderRoute: typeof AboutRouteImport
+    '/contributors': {
+      id: '/contributors'
+      path: '/contributors'
+      fullPath: '/contributors'
+      preLoaderRoute: typeof ContributorsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -277,150 +126,60 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/xatu-data/': {
-      id: '/xatu-data/'
+    '/contributors/': {
+      id: '/contributors/'
       path: '/'
-      fullPath: '/xatu-data/'
-      preLoaderRoute: typeof XatuDataIndexRouteImport
-      parentRoute: typeof XatuDataRoute
+      fullPath: '/contributors/'
+      preLoaderRoute: typeof ContributorsIndexRouteImport
+      parentRoute: typeof ContributorsRoute
     }
-    '/experiments/': {
-      id: '/experiments/'
-      path: '/'
-      fullPath: '/experiments/'
-      preLoaderRoute: typeof ExperimentsIndexRouteImport
+    '/experiments/inedx': {
+      id: '/experiments/inedx'
+      path: '/inedx'
+      fullPath: '/experiments/inedx'
+      preLoaderRoute: typeof ExperimentsInedxRouteImport
       parentRoute: typeof ExperimentsRoute
     }
-    '/contributoor/': {
-      id: '/contributoor/'
-      path: '/contributoor'
-      fullPath: '/contributoor'
-      preLoaderRoute: typeof ContributoorIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/xatu-data/networks': {
-      id: '/xatu-data/networks'
-      path: '/networks'
-      fullPath: '/xatu-data/networks'
-      preLoaderRoute: typeof XatuDataNetworksRouteImport
-      parentRoute: typeof XatuDataRoute
-    }
-    '/xatu-data/geographical-checklist': {
-      id: '/xatu-data/geographical-checklist'
-      path: '/geographical-checklist'
-      fullPath: '/xatu-data/geographical-checklist'
-      preLoaderRoute: typeof XatuDataGeographicalChecklistRouteImport
-      parentRoute: typeof XatuDataRoute
-    }
-    '/xatu-data/fork-readiness': {
-      id: '/xatu-data/fork-readiness'
-      path: '/fork-readiness'
-      fullPath: '/xatu-data/fork-readiness'
-      preLoaderRoute: typeof XatuDataForkReadinessRouteImport
-      parentRoute: typeof XatuDataRoute
-    }
-    '/xatu-data/contributors': {
-      id: '/xatu-data/contributors'
-      path: '/contributors'
-      fullPath: '/xatu-data/contributors'
-      preLoaderRoute: typeof XatuDataContributorsRouteImport
-      parentRoute: typeof XatuDataRoute
-    }
-    '/experiments/locally-built-blocks': {
-      id: '/experiments/locally-built-blocks'
-      path: '/locally-built-blocks'
-      fullPath: '/experiments/locally-built-blocks'
-      preLoaderRoute: typeof ExperimentsLocallyBuiltBlocksRouteImport
-      parentRoute: typeof ExperimentsRoute
-    }
-    '/experiments/live-slots': {
-      id: '/experiments/live-slots'
-      path: '/live-slots'
-      fullPath: '/experiments/live-slots'
-      preLoaderRoute: typeof ExperimentsLiveSlotsRouteImport
-      parentRoute: typeof ExperimentsRoute
-    }
-    '/experiments/block-production-flow': {
-      id: '/experiments/block-production-flow'
-      path: '/block-production-flow'
-      fullPath: '/experiments/block-production-flow'
-      preLoaderRoute: typeof ExperimentsBlockProductionFlowRouteImport
-      parentRoute: typeof ExperimentsRoute
-    }
-    '/contributoor/$id': {
-      id: '/contributoor/$id'
-      path: '/contributoor/$id'
-      fullPath: '/contributoor/$id'
-      preLoaderRoute: typeof ContributoorIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/xatu-data/contributors/$id': {
-      id: '/xatu-data/contributors/$id'
+    '/contributors/$id': {
+      id: '/contributors/$id'
       path: '/$id'
-      fullPath: '/xatu-data/contributors/$id'
-      preLoaderRoute: typeof XatuDataContributorsIdRouteImport
-      parentRoute: typeof XatuDataContributorsRoute
+      fullPath: '/contributors/$id'
+      preLoaderRoute: typeof ContributorsIdRouteImport
+      parentRoute: typeof ContributorsRoute
     }
   }
 }
 
+interface ContributorsRouteChildren {
+  ContributorsIdRoute: typeof ContributorsIdRoute
+  ContributorsIndexRoute: typeof ContributorsIndexRoute
+}
+
+const ContributorsRouteChildren: ContributorsRouteChildren = {
+  ContributorsIdRoute: ContributorsIdRoute,
+  ContributorsIndexRoute: ContributorsIndexRoute,
+}
+
+const ContributorsRouteWithChildren = ContributorsRoute._addFileChildren(
+  ContributorsRouteChildren,
+)
+
 interface ExperimentsRouteChildren {
-  ExperimentsBlockProductionFlowRoute: typeof ExperimentsBlockProductionFlowRoute
-  ExperimentsLiveSlotsRoute: typeof ExperimentsLiveSlotsRoute
-  ExperimentsLocallyBuiltBlocksRoute: typeof ExperimentsLocallyBuiltBlocksRoute
-  ExperimentsIndexRoute: typeof ExperimentsIndexRoute
+  ExperimentsInedxRoute: typeof ExperimentsInedxRoute
 }
 
 const ExperimentsRouteChildren: ExperimentsRouteChildren = {
-  ExperimentsBlockProductionFlowRoute: ExperimentsBlockProductionFlowRoute,
-  ExperimentsLiveSlotsRoute: ExperimentsLiveSlotsRoute,
-  ExperimentsLocallyBuiltBlocksRoute: ExperimentsLocallyBuiltBlocksRoute,
-  ExperimentsIndexRoute: ExperimentsIndexRoute,
+  ExperimentsInedxRoute: ExperimentsInedxRoute,
 }
 
 const ExperimentsRouteWithChildren = ExperimentsRoute._addFileChildren(
   ExperimentsRouteChildren,
 )
 
-interface XatuDataContributorsRouteChildren {
-  XatuDataContributorsIdRoute: typeof XatuDataContributorsIdRoute
-}
-
-const XatuDataContributorsRouteChildren: XatuDataContributorsRouteChildren = {
-  XatuDataContributorsIdRoute: XatuDataContributorsIdRoute,
-}
-
-const XatuDataContributorsRouteWithChildren =
-  XatuDataContributorsRoute._addFileChildren(XatuDataContributorsRouteChildren)
-
-interface XatuDataRouteChildren {
-  XatuDataContributorsRoute: typeof XatuDataContributorsRouteWithChildren
-  XatuDataForkReadinessRoute: typeof XatuDataForkReadinessRoute
-  XatuDataGeographicalChecklistRoute: typeof XatuDataGeographicalChecklistRoute
-  XatuDataNetworksRoute: typeof XatuDataNetworksRoute
-  XatuDataIndexRoute: typeof XatuDataIndexRoute
-}
-
-const XatuDataRouteChildren: XatuDataRouteChildren = {
-  XatuDataContributorsRoute: XatuDataContributorsRouteWithChildren,
-  XatuDataForkReadinessRoute: XatuDataForkReadinessRoute,
-  XatuDataGeographicalChecklistRoute: XatuDataGeographicalChecklistRoute,
-  XatuDataNetworksRoute: XatuDataNetworksRoute,
-  XatuDataIndexRoute: XatuDataIndexRoute,
-}
-
-const XatuDataRouteWithChildren = XatuDataRoute._addFileChildren(
-  XatuDataRouteChildren,
-)
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AboutRoute: AboutRoute,
+  ContributorsRoute: ContributorsRouteWithChildren,
   ExperimentsRoute: ExperimentsRouteWithChildren,
-  ExploreRoute: ExploreRoute,
-  XatuDataRoute: XatuDataRouteWithChildren,
-  ContributoorIdRoute: ContributoorIdRoute,
-  ContributoorIndexRoute: ContributoorIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
