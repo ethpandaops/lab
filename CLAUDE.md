@@ -57,14 +57,22 @@ src/
       [experiment-name]/              # Individual experiment pages (most development happens here)
         IndexPage.tsx
         index.tsx
-        components/                   # Experiment-specific components (optional)
+        components/                   # Page-specific components (optional)
           [ComponentName]/
+        hooks/                        # Page-specific hooks (optional)
+          use[HookName].ts
+        contexts/                     # Page-specific contexts (optional)
+          [ContextName].tsx
+        providers/                    # Page-specific providers (optional)
+          [ProviderName].tsx
     [other-section]/                  # Other page sections (rarely used)
       IndexPage.tsx                   # Section list/index page
       DetailPage.tsx                  # Detail page (if applicable)
       index.tsx                       # Barrel exports
-      components/                     # Page-scoped components (optional)
-        [ComponentName]/              # Same structure as core components
+      components/                     # Page-specific components (optional)
+      hooks/                          # Page-specific hooks (optional)
+      contexts/                       # Page-specific contexts (optional)
+      providers/                      # Page-specific providers (optional)
 
   components/                         # Core, app-wide reusable UI components
     [Category]/                       # Component category folder
@@ -109,19 +117,20 @@ src/
 
 ## Architecture Patterns
 
-### Component Philosophy
-**Core Components** (`src/components/`):
+### Component & State Philosophy
+**Core/Shared** (`src/components/`, `src/hooks/`, `src/contexts/`):
 - App-wide reusable building blocks
 - Generic and configurable
 - Work in any context without page logic
-- Compose from other core components when logical
-- Always include Storybook stories
+- Compose from other core items when logical
+- Core components include Storybook stories
 
-**Page-Scoped Components** (`src/pages/[section]/components/`):
+**Page-Scoped** (`src/pages/[section]/components|hooks|contexts|providers/`):
 - Used within specific page/section only
-- Compose core components for page needs
+- Compose/extend core items for page needs
 - Contain page-specific business logic
 - Specialized for page requirements
+- Keep complex page state isolated
 
 ### Core Component Categories
 Current categories in `src/components/`:
@@ -176,13 +185,16 @@ ComponentName/
 - **Other route**: Route in `src/routes/[section]/`, page in `src/pages/[section]/`
 - **Core component**: `src/components/[category]/[ComponentName]/` - reusable, generic
 - **Page-scoped component**: `src/pages/[section]/components/[ComponentName]/` - page-specific
-- **Custom hook**: `src/hooks/use[Name]/` with types and barrel export
-- **Context**: Definition in `src/contexts/`, provider in `src/providers/`
+- **Core hook**: `src/hooks/use[Name]/` - app-wide logic
+- **Page-scoped hook**: `src/pages/[section]/hooks/use[Name].ts` - page-specific logic
+- **Core context**: `src/contexts/` with provider in `src/providers/`
+- **Page-scoped context**: `src/pages/[section]/contexts/` with local provider
 
-### Component Placement
-- Used across pages → `src/components/`
-- Composes core components for specific page → `src/pages/[section]/components/`
-- Contains page-specific logic → `src/pages/[section]/components/`
+### Placement Decision
+**Components/Hooks/Contexts:**
+- Used across pages → Core (`src/components/`, `src/hooks/`, `src/contexts/`)
+- Page-specific logic → Page-scoped (`src/pages/[section]/components|hooks|contexts/`)
+- Complex page state → Page-scoped providers
 
 ### Best Practices
 - Storybook stories for all core components
