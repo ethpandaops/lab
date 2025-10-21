@@ -1,11 +1,11 @@
 import type { JSX } from 'react';
 import clsx from 'clsx';
-import { SlotViewTimeline } from '@/pages/experiments/live-slots/components/SlotViewTimeline';
+import { SlotViewTimeline } from '@/pages/experiments/slot-view/components/SlotViewTimeline';
 import { ScrollingTimeline } from '@/components/Lists/ScrollingTimeline';
 import type { SlotViewSidebarProps } from './SlotViewSidebar.types';
 
 /**
- * SlotViewSidebar - A page-specific sidebar component for the live-slots page.
+ * SlotViewSidebar - A page-specific sidebar component for the slot-view page.
  *
  * Combines SlotViewTimeline and ScrollingTimeline components, coordinating
  * their shared currentTime prop. SlotViewTimeline is displayed above

@@ -39,7 +39,7 @@ const ATTESTATION_DATA = generateAttestationData();
 const TOTAL_EXPECTED = ATTESTATION_DATA.reduce((sum, point) => sum + point.count, 0);
 
 const meta = {
-  title: 'Pages/Experiments/LiveSlots/AttestationArrivals',
+  title: 'Pages/Experiments/SlotView/AttestationArrivals',
   component: AttestationArrivals,
   parameters: {
     layout: 'padded',

@@ -6,7 +6,7 @@ import type { TimelineItem } from '@/components/Lists/ScrollingTimeline/Scrollin
 import { Badge } from '@/components/Elements/Badge';
 
 const meta = {
-  title: 'Pages/Experiments/LiveSlots/SlotViewSidebar',
+  title: 'Pages/Experiments/SlotView/SlotViewSidebar',
   component: SlotViewSidebar,
   parameters: {
     layout: 'padded',

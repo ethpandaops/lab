@@ -5,7 +5,7 @@ import { Header } from '@/components/Layout/Header';
 export function IndexPage(): JSX.Element {
   return (
     <Container>
-      <Header title="Live Slots" />
+      <Header title="Slot View" />
 
       {/* Coming soon card */}
       <div className="rounded-xl border border-border bg-surface/50 p-12 text-center backdrop-blur-sm">

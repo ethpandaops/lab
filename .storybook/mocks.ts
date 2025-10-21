@@ -143,7 +143,7 @@ export const mockConfig: Config = {
       networks: [],
     },
     {
-      name: 'live-slots',
+      name: 'slot-view',
       enabled: true,
       networks: ['mainnet'],
     },

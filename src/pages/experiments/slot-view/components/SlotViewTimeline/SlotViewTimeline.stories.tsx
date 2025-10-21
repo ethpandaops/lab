@@ -4,7 +4,7 @@ import { SlotViewTimeline } from './SlotViewTimeline';
 import { DEFAULT_BEACON_SLOT_PHASES } from '@/utils/beacon';
 
 const meta = {
-  title: 'Pages/Experiments/LiveSlots/SlotViewTimeline',
+  title: 'Pages/Experiments/SlotView/SlotViewTimeline',
   component: SlotViewTimeline,
   parameters: {
     layout: 'padded',
