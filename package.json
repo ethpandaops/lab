@@ -15,7 +15,8 @@
     "clean": "rm -rf dist node_modules",
     "generate:api": "openapi-ts",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "build-storybook:gh-pages": "STORYBOOK_BASE_PATH=/lab storybook build"
   },
   "dependencies": {
     "@fontsource/ibm-plex-mono": "^5.2.7",

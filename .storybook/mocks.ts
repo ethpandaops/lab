@@ -1,6 +1,7 @@
 import { http, HttpResponse } from 'msw';
 import type { Config } from '../src/hooks/useConfig';
 import type { Bounds } from '../src/hooks/useBounds';
+import { createCatchAllAssetHandler } from './assetHandlers';
 
 // Mock config data for Storybook
 export const mockConfig: Config = {
@@ -166,11 +167,14 @@ export const mockBounds: Bounds = {
 };
 
 // MSW handlers for Storybook
-export const handlers = {
-  config: http.get('*/config', () => {
+export const handlers = [
+  // API handlers
+  http.get('*/config', () => {
     return HttpResponse.json(mockConfig);
   }),
-  bounds: http.get('*/bounds', () => {
+  http.get('*/bounds', () => {
     return HttpResponse.json(mockBounds);
   }),
-};
+  // Asset handlers for GitHub Pages (only active when STORYBOOK_BASE_PATH is set)
+  ...createCatchAllAssetHandler(),
+];

@@ -10,9 +10,9 @@ import { Header } from '@/components/Layout/Header';
 import { Stats } from '@/components/DataDisplay/Stats';
 import { Table } from '@/components/Lists/Table';
 import type { Column } from '@/components/Lists/Table';
-import { ContributorDetailsLoader } from './components/ContributorDetailsLoader';
-import type { ContributorClassification } from './components/ContributorCard/ContributorCard.types';
-import { getBorderColor, getClassificationLabel, getClassificationColor } from './components/ContributorCard/utils';
+import { UserDetailsSkeleton } from './components/UserDetailsSkeleton';
+import type { UserClassification } from './components/UserCard/UserCard.types';
+import { getBorderColor, getClassificationLabel, getClassificationColor } from './components/UserCard/utils';
 
 export function DetailPage(): JSX.Element {
   const { id } = useParams({ from: '/contributors/$id' });
@@ -79,7 +79,7 @@ export function DetailPage(): JSX.Element {
     return (
       <Container>
         <Header title="Contributor Details" description="Detailed contribution metrics and activity" />
-        <ContributorDetailsLoader />
+        <UserDetailsSkeleton />
       </Container>
     );
   }
@@ -117,7 +117,7 @@ export function DetailPage(): JSX.Element {
 
   const contributoor = nodes[0];
   const username = contributoor.username || id;
-  const classification = (contributoor.classification || 'unclassified') as ContributorClassification;
+  const classification = (contributoor.classification || 'unclassified') as UserClassification;
 
   // Aggregate statistics
   const uniqueLocations = new Set(nodes.map(n => n.meta_client_geo_country).filter(Boolean));
@@ -129,9 +129,15 @@ export function DetailPage(): JSX.Element {
     {
       header: 'Location',
       accessor: (node: FctNodeActiveLast24h) => {
+        // Show city + country if both available
         if (node.meta_client_geo_city && node.meta_client_geo_country) {
           return `${node.meta_client_geo_city}, ${node.meta_client_geo_country}`;
         }
+        // Otherwise show just country if available
+        if (node.meta_client_geo_country) {
+          return node.meta_client_geo_country;
+        }
+        // No location data
         return <span className="text-muted/60">Unknown</span>;
       },
     },

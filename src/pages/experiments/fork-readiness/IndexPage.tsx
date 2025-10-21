@@ -1,26 +1,70 @@
-import { type JSX } from 'react';
+import type { JSX } from 'react';
 import { Container } from '@/components/Layout/Container';
 import { Header } from '@/components/Layout/Header';
+import { Alert } from '@/components/Feedback/Alert';
+import { Disclosure } from '@/components/Layout/Disclosure';
+import { useForkReadiness } from './hooks';
+import { ForkSection, ForkReadinessLoading } from './components';
 
 export function IndexPage(): JSX.Element {
+  const { upcomingForks, pastForks, isLoading, error } = useForkReadiness();
+
+  if (isLoading) {
+    return (
+      <Container>
+        <Header title="Fork Readiness" description="Track node readiness for upcoming Ethereum consensus layer forks" />
+        <ForkReadinessLoading />
+      </Container>
+    );
+  }
+
+  if (error) {
+    return (
+      <Container>
+        <Header title="Fork Readiness" />
+        <Alert
+          variant="error"
+          title="Failed to load fork readiness data"
+          description={error.message ?? 'Unable to fetch data'}
+        />
+      </Container>
+    );
+  }
+
   return (
     <Container>
-      <Header title="Fork Readiness" />
+      <Header title="Fork Readiness" description="Track node readiness for upcoming Ethereum consensus layer forks" />
 
-      {/* Coming soon card */}
-      <div className="rounded-xl border border-border bg-surface/50 p-12 text-center backdrop-blur-sm">
-        <div className="mx-auto max-w-md">
-          <div className="mb-4 inline-flex rounded-full bg-primary/10 p-4">
-            <svg className="size-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-              />
-            </svg>
-          </div>
-          <h2 className="mb-2 text-2xl/8 font-bold text-foreground">Coming Soon</h2>
-        </div>
+      <div className="space-y-4">
+        {upcomingForks.length > 0 ? (
+          <Disclosure
+            title={`Upcoming Forks (${upcomingForks.length})`}
+            defaultOpen
+            className="overflow-hidden rounded-lg border border-border"
+          >
+            <div className="space-y-8">
+              {upcomingForks.map(fork => (
+                <ForkSection key={fork.forkName} fork={fork} />
+              ))}
+            </div>
+          </Disclosure>
+        ) : (
+          <Alert
+            variant="info"
+            title="No upcoming forks"
+            description="There are no upcoming forks configured at this time."
+          />
+        )}
+
+        {pastForks.map(fork => (
+          <Disclosure
+            key={fork.forkName}
+            title={`Past: ${fork.forkName.charAt(0).toUpperCase()}${fork.forkName.slice(1)}`}
+            className="overflow-hidden rounded-lg border border-border"
+          >
+            <ForkSection fork={fork} />
+          </Disclosure>
+        ))}
       </div>
     </Container>
   );
