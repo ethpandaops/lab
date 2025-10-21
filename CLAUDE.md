@@ -183,7 +183,7 @@ ComponentName/
 ### Quick Reference
 - **New experiment**: Route in `src/routes/experiments/`, page in `src/pages/experiments/[name]/`
 - **Experiment image**: `public/images/experiments/[name].png` for social sharing
-- **Loading component**: `src/pages/[section]/components/[PageName]Loader/` using `LoadingContainer`
+- **Skeleton component**: `src/pages/[section]/components/[PageName]Skeleton/` using `LoadingContainer`
 - **Other route**: Route in `src/routes/[section]/`, page in `src/pages/[section]/`
 - **Core component**: `src/components/[category]/[ComponentName]/` - reusable, generic
 - **Page-scoped component**: `src/pages/[section]/components/[ComponentName]/` - page-specific
@@ -224,9 +224,9 @@ ComponentName/
 
 ## Loading States
 
-### Shimmer Loading Pattern
+### Shimmer/Skeleton Loading Pattern
 - Use `LoadingContainer` from `src/components/Layout/LoadingContainer/` as base
-- Create page-specific loaders: `[PageName]Loading` or `[ComponentName]Loading`
+- Create page-specific skeletons: `[PageName]Skeleton` or `[ComponentName]Skeleton`
 - Place in `pages/[section]/components/` alongside other page components
 - Show skeleton UI that matches actual content structure
 
