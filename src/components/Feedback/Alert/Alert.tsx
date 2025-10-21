@@ -131,12 +131,8 @@ export function Alert({
           {title && !link && <h3 className={`text-sm/5 font-medium ${config.title}`}>{title}</h3>}
 
           {description && (
-            <div className={`${title && !link ? 'mt-2' : ''} text-sm/5 ${link ? descriptionClasses : ''}`}>
-              {typeof description === 'string' ? (
-                <p className={!link ? descriptionClasses : ''}>{description}</p>
-              ) : (
-                description
-              )}
+            <div className={`${title && !link ? 'mt-2' : ''} text-sm/5 ${descriptionClasses}`}>
+              {typeof description === 'string' ? <p>{description}</p> : description}
             </div>
           )}
 
