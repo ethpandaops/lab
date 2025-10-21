@@ -102,7 +102,7 @@ export function MapChart({
       value: [...point.coords, point.value || 1],
     }));
 
-    const series: any[] = [];
+    const series: Array<Record<string, unknown>> = [];
 
     // Add routes series if there are routes
     if (routes.length > 0) {
@@ -155,16 +155,21 @@ export function MapChart({
       backgroundColor: environment,
       tooltip: {
         show: true,
-        formatter: (params: any) => {
-          if (params.seriesType === 'scatter3D' && params.data) {
-            const name = params.data.name || 'Unknown';
-            const value = params.data.value?.[2] || params.data.value || 0;
-            return `<strong>${name}</strong>: ${value}`;
+        formatter: (params: Record<string, unknown>) => {
+          const seriesType = params.seriesType as string | undefined;
+          const data = params.data as Record<string, unknown> | undefined;
+          const name = params.name as string | undefined;
+
+          if (seriesType === 'scatter3D' && data) {
+            const pointName = (data.name as string) || 'Unknown';
+            const valueArray = data.value as number[] | undefined;
+            const value = valueArray?.[2] ?? (data.value as number) ?? 0;
+            return `<strong>${pointName}</strong>: ${value}`;
           }
-          if (params.seriesType === 'lines3D' && params.data) {
-            return params.data.name || 'Route';
+          if (seriesType === 'lines3D' && data) {
+            return (data.name as string) || 'Route';
           }
-          return params.name || '';
+          return name || '';
         },
       },
       title: title
