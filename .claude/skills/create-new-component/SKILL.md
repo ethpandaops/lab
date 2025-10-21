@@ -58,9 +58,7 @@ Only proceed after understanding the requirements.
 - Use `ls` to list the components in the `src/components/` directory.
 
 ### Page Sections (src/pages/)
-- **experiments**: Main section (95% of page-scoped components)
-- **contributors**: Contributor pages
-- Others as needed
+- Use `ls` to list the pages in the `src/pages/` directory.
 
 ## Standard Component Structure
 
