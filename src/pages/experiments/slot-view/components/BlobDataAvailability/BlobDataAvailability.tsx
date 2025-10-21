@@ -78,6 +78,13 @@ export function BlobDataAvailability({
     };
   });
 
+  // Calculate max values for Y-axis (using all data, not just visible)
+  // This prevents the chart from re-scaling during animations
+  const availabilityRateMax = useMemo(() => {
+    const nodeCounts = availabilityRateData.map(p => p.nodes);
+    return nodeCounts.length > 0 ? Math.max(...nodeCounts) : 30;
+  }, [availabilityRateData]);
+
   // Prepare First Seen scatter chart data - only show blobs seen up to current time
   const firstSeenOption = useMemo(() => {
     const visibleData = firstSeenData.filter(point => point.time <= effectiveCurrentTime);
@@ -258,6 +265,7 @@ export function BlobDataAvailability({
           color: themeColors.muted,
           fontSize: 11,
         },
+        max: availabilityRateMax,
         axisLine: {
           show: false,
         },
@@ -332,7 +340,7 @@ export function BlobDataAvailability({
         left: 'center',
       },
     };
-  }, [availabilityRateData, themeColors, maxTime, effectiveCurrentTime]);
+  }, [availabilityRateData, themeColors, maxTime, effectiveCurrentTime, availabilityRateMax]);
 
   // Prepare Continental Propagation chart data - CDF per continent, only show data up to current time
   const continentalPropagationOption = useMemo(() => {
