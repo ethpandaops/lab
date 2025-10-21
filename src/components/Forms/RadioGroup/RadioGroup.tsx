@@ -40,8 +40,9 @@ export function RadioGroup({
                 name={name}
                 type="radio"
                 value={option.value ?? option.id}
-                defaultChecked={defaultValue === (option.value ?? option.id)}
-                checked={value === (option.value ?? option.id)}
+                {...(value !== undefined
+                  ? { checked: value === (option.value ?? option.id) }
+                  : { defaultChecked: defaultValue === (option.value ?? option.id) })}
                 onChange={handleChange}
                 disabled={option.disabled}
                 className={baseRadioStyles}
@@ -70,8 +71,9 @@ export function RadioGroup({
                 name={name}
                 type="radio"
                 value={option.value ?? option.id}
-                defaultChecked={defaultValue === (option.value ?? option.id)}
-                checked={value === (option.value ?? option.id)}
+                {...(value !== undefined
+                  ? { checked: value === (option.value ?? option.id) }
+                  : { defaultChecked: defaultValue === (option.value ?? option.id) })}
                 onChange={handleChange}
                 disabled={option.disabled}
                 className={baseRadioStyles}
@@ -101,8 +103,9 @@ export function RadioGroup({
                   name={name}
                   type="radio"
                   value={option.value ?? option.id}
-                  defaultChecked={defaultValue === (option.value ?? option.id)}
-                  checked={value === (option.value ?? option.id)}
+                  {...(value !== undefined
+                    ? { checked: value === (option.value ?? option.id) }
+                    : { defaultChecked: defaultValue === (option.value ?? option.id) })}
                   onChange={handleChange}
                   disabled={option.disabled}
                   aria-describedby={option.description ? `${option.id}-description` : undefined}
@@ -141,8 +144,9 @@ export function RadioGroup({
                   name={name}
                   type="radio"
                   value={option.value ?? option.id}
-                  defaultChecked={defaultValue === (option.value ?? option.id)}
-                  checked={value === (option.value ?? option.id)}
+                  {...(value !== undefined
+                    ? { checked: value === (option.value ?? option.id) }
+                    : { defaultChecked: defaultValue === (option.value ?? option.id) })}
                   onChange={handleChange}
                   disabled={option.disabled}
                   aria-describedby={option.description ? `${option.id}-description` : undefined}
@@ -191,8 +195,9 @@ export function RadioGroup({
                   name={name}
                   type="radio"
                   value={option.value ?? option.id}
-                  defaultChecked={defaultValue === (option.value ?? option.id)}
-                  checked={value === (option.value ?? option.id)}
+                  {...(value !== undefined
+                    ? { checked: value === (option.value ?? option.id) }
+                    : { defaultChecked: defaultValue === (option.value ?? option.id) })}
                   onChange={handleChange}
                   disabled={option.disabled}
                   aria-describedby={option.description ? `${option.id}-description` : undefined}
@@ -226,8 +231,9 @@ export function RadioGroup({
                   name={name}
                   type="radio"
                   value={option.value ?? option.id}
-                  defaultChecked={defaultValue === (option.value ?? option.id)}
-                  checked={value === (option.value ?? option.id)}
+                  {...(value !== undefined
+                    ? { checked: value === (option.value ?? option.id) }
+                    : { defaultChecked: defaultValue === (option.value ?? option.id) })}
                   onChange={handleChange}
                   disabled={option.disabled}
                   className={baseRadioStyles}
@@ -261,8 +267,9 @@ export function RadioGroup({
                 name={name}
                 type="radio"
                 value={option.value ?? option.id}
-                defaultChecked={defaultValue === (option.value ?? option.id)}
-                checked={value === (option.value ?? option.id)}
+                {...(value !== undefined
+                  ? { checked: value === (option.value ?? option.id) }
+                  : { defaultChecked: defaultValue === (option.value ?? option.id) })}
                 onChange={handleChange}
                 disabled={option.disabled}
                 className={baseRadioStyles}
@@ -313,8 +320,9 @@ export function RadioGroup({
               name={name}
               type="radio"
               value={option.value ?? option.id}
-              defaultChecked={defaultValue === (option.value ?? option.id)}
-              checked={value === (option.value ?? option.id)}
+              {...(value !== undefined
+                ? { checked: value === (option.value ?? option.id) }
+                : { defaultChecked: defaultValue === (option.value ?? option.id) })}
               onChange={handleChange}
               disabled={option.disabled}
               className="relative mt-0.5 size-4 shrink-0 appearance-none rounded-full border border-border bg-background before:absolute before:inset-1 before:rounded-full before:bg-background not-checked:before:hidden checked:border-primary checked:bg-primary checked:before:bg-background focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:border-border/50 disabled:bg-surface disabled:before:bg-muted dark:border-zinc-600 forced-colors:appearance-auto forced-colors:before:hidden"
@@ -348,8 +356,9 @@ export function RadioGroup({
                 name={name}
                 type="radio"
                 value={option.value ?? option.id}
-                defaultChecked={defaultValue === (option.value ?? option.id)}
-                checked={value === (option.value ?? option.id)}
+                {...(value !== undefined
+                  ? { checked: value === (option.value ?? option.id) }
+                  : { defaultChecked: defaultValue === (option.value ?? option.id) })}
                 onChange={handleChange}
                 disabled={option.disabled}
                 aria-label={option.name}
@@ -383,8 +392,9 @@ export function RadioGroup({
                 name={name}
                 type="radio"
                 value={option.value ?? option.id}
-                defaultChecked={defaultValue === (option.value ?? option.id)}
-                checked={value === (option.value ?? option.id)}
+                {...(value !== undefined
+                  ? { checked: value === (option.value ?? option.id) }
+                  : { defaultChecked: defaultValue === (option.value ?? option.id) })}
                 onChange={handleChange}
                 disabled={option.disabled}
                 className="absolute inset-0 cursor-pointer appearance-none opacity-0 focus:outline-hidden"
@@ -463,8 +473,9 @@ export function RadioGroup({
                 name={name}
                 type="radio"
                 value={option.value ?? option.id}
-                defaultChecked={defaultValue === (option.value ?? option.id)}
-                checked={value === (option.value ?? option.id)}
+                {...(value !== undefined
+                  ? { checked: value === (option.value ?? option.id) }
+                  : { defaultChecked: defaultValue === (option.value ?? option.id) })}
                 onChange={handleChange}
                 disabled={option.disabled}
                 className="absolute inset-0 cursor-pointer appearance-none opacity-0 focus:outline-hidden"
