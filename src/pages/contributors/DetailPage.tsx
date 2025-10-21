@@ -129,9 +129,15 @@ export function DetailPage(): JSX.Element {
     {
       header: 'Location',
       accessor: (node: FctNodeActiveLast24h) => {
+        // Show city + country if both available
         if (node.meta_client_geo_city && node.meta_client_geo_country) {
           return `${node.meta_client_geo_city}, ${node.meta_client_geo_country}`;
         }
+        // Otherwise show just country if available
+        if (node.meta_client_geo_country) {
+          return node.meta_client_geo_country;
+        }
+        // No location data
         return <span className="text-muted/60">Unknown</span>;
       },
     },
