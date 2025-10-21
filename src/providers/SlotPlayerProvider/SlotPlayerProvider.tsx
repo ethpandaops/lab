@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useLayoutEffect, useMemo, useCallback, useRef } from 'react';
 import { useTablesBounds } from '@/hooks/useBounds';
 import { useBeaconClock } from '@/hooks/useBeaconClock';
+import { useNetwork } from '@/hooks/useNetwork';
 import { SECONDS_PER_SLOT } from '@/utils/beacon';
 import {
   SlotPlayerProgressContext,
@@ -20,94 +21,311 @@ import type {
 /**
  * Provider for slot player functionality.
  *
- * Manages the state and playback of Ethereum consensus layer slots,
- * providing a player-like interface for navigating through historical slots.
+ * A high-performance React provider that manages Ethereum consensus layer slot playback,
+ * offering a media-player-like interface for navigating historical blockchain data.
+ * Fetches slot bounds from API, handles playback state, and provides five optimized
+ * contexts for minimal re-renders.
+ *
+ * ## Features
+ *
+ * - **Multi-table bounds aggregation**: Fetches bounds from multiple tables and uses earliest min / latest max
+ * - **Media player controls**: Play, pause, seek, skip, speed control
+ * - **Live edge detection**: Auto-detects when within 10 slots of blockchain head
+ * - **Staleness tracking**: Monitors if playback falls behind wall clock
+ * - **Network change handling**: Auto-jumps to live edge when network switches
+ * - **60fps smooth playback**: RequestAnimationFrame-based animation loop
+ * - **Context splitting**: Five separate contexts minimize re-renders
+ *
+ * ## Architecture
+ *
+ * ### State Management Flow
+ *
+ * ```
+ * SlotPlayerProvider
+ *   ├─ API Call (useTablesBounds) → aggregate.minOfMins, aggregate.maxOfMaxes
+ *   ├─ Transform bounds to slot numbers (one-time, on load)
+ *   ├─ Animation Loop (useLayoutEffect + requestAnimationFrame)
+ *   │   └─ Updates slotProgress at 60fps
+ *   ├─ State Management (useState + useRef)
+ *   │   ├─ currentSlot (actual slot number, not timestamp)
+ *   │   ├─ isPlaying
+ *   │   ├─ mode (continuous | single)
+ *   │   ├─ slotProgress (0 to SECONDS_PER_SLOT * 1000 ms)
+ *   │   └─ derived states (isLive, isStale, etc.)
+ *   └─ Context Providers (5 separate, ordered by stability)
+ *       ├─ MetaContext → isLoading, error
+ *       ├─ ActionsContext → memoized functions (never changes)
+ *       ├─ ConfigContext → playbackSpeed, minSlot, maxSlot
+ *       ├─ StateContext → currentSlot, isPlaying, mode, etc.
+ *       └─ ProgressContext → slotProgress (60fps updates)
+ * ```
+ *
+ * ### Context Nesting Order
+ *
+ * Contexts are nested by stability (most stable on outside) to optimize rendering:
+ * 1. **Meta** (isLoading, error) - Infrequent updates during mount/API changes
+ * 2. **Actions** - Never changes (memoized functions)
+ * 3. **Config** - Rare updates (bounds, speed settings)
+ * 4. **State** - Medium updates (slot changes, play state)
+ * 5. **Progress** - High-frequency updates (60fps animation)
  *
  * ## Performance Optimizations
  *
- * This provider uses several performance optimizations:
- * - **Context splitting** - Separates frequently-updating values (progress) from stable ones
- * - **useCallback** - All actions are memoized to prevent child re-renders
- * - **useLayoutEffect** - Animation loop cleanup happens synchronously before re-paint
- * - **requestAnimationFrame** - Smooth 60fps playback tied to browser refresh rate
+ * ### Context Splitting
+ * Five separate contexts ensure components only re-render when consumed values change:
+ * - `ProgressContext` (60fps) - Only progress bars subscribe
+ * - `StateContext` (on change) - Slot displays subscribe
+ * - `ConfigContext` (rare) - Settings UI subscribes
+ * - `ActionsContext` (never) - Control bars subscribe
+ * - `MetaContext` (mount/error) - Loading UI subscribes
  *
- * ## Callback Stability
+ * ### Callback Stability
  *
- * **IMPORTANT**: For optimal performance, wrap all callbacks in `useCallback` or use
- * `useStableCallback` for even better ergonomics:
+ * **CRITICAL**: Callbacks MUST be stable to avoid restarting the animation loop!
  *
  * ```tsx
  * import { useStableCallback } from '@/hooks/useSlotPlayer';
  *
- * // Option 1: useStableCallback (recommended - stable reference, fresh state)
- * const handleSlotChange = useStableCallback((slot: number) => {
- *   console.log('Slot changed:', slot);
- * });
- *
- * const callbacks = useMemo(() => ({
- *   onSlotChange: handleSlotChange,
- * }), [handleSlotChange]);
- *
- * // Option 2: useCallback (manual dependency management)
- * const handleSlotChange = useCallback((slot: number) => {
- *   console.log('Slot changed:', slot);
- * }, []);
- *
- * const callbacks = useMemo(() => ({
- *   onSlotChange: handleSlotChange,
- * }), [handleSlotChange]);
- * ```
- *
- * Without memoization, passing unstable callbacks will cause the animation loop
- * to restart on every render, degrading performance.
- *
- * ## Error Handling
- *
- * **Production Recommendation**: Wrap this provider in an Error Boundary to handle
- * API failures gracefully. The provider exposes loading/error states via
- * `useSlotPlayerMeta()` for custom error UI.
- *
- * ```tsx
- * <ErrorBoundary fallback={<ErrorPage />}>
- *   <SlotPlayerProvider>
- *     <App />
- *   </SlotPlayerProvider>
- * </ErrorBoundary>
- * ```
- *
- * ## Testing
- *
- * When testing components that use this provider, wrap them in a test provider:
- *
- * ```tsx
- * import { render } from '@testing-library/react';
- * import { SlotPlayerProvider } from '@/providers/SlotPlayerProvider';
- *
- * const wrapper = ({ children }) => (
- *   <SlotPlayerProvider initialSlot={100} tables={['fct_slot']}>
- *     {children}
- *   </SlotPlayerProvider>
- * );
- *
- * test('my component', () => {
- *   render(<MyComponent />, { wrapper });
- * });
- * ```
- *
- * @example
- * ```tsx
+ * // ✅ RECOMMENDED: useStableCallback (stable ref, fresh state, no deps!)
  * function App() {
+ *   const [logs, setLogs] = useState<string[]>([]);
+ *
+ *   const handleSlotChange = useStableCallback((slot: number) => {
+ *     console.log('Slot:', slot);
+ *     setLogs(prev => [...prev, `Slot: ${slot}`]); // Always fresh!
+ *   });
+ *
+ *   const callbacks = useMemo(() => ({
+ *     onSlotChange: handleSlotChange,
+ *   }), [handleSlotChange]);
+ *
+ *   return <SlotPlayerProvider tables={['fct_block']} callbacks={callbacks} />;
+ * }
+ *
+ * // ⚠️ MANUAL: useCallback (requires dependency tracking)
+ * function App() {
+ *   const handleSlotChange = useCallback((slot: number) => {
+ *     console.log('Slot:', slot);
+ *   }, []); // Empty deps = stable
+ *
+ *   const callbacks = useMemo(() => ({
+ *     onSlotChange: handleSlotChange,
+ *   }), [handleSlotChange]);
+ *
+ *   return <SlotPlayerProvider tables={['fct_block']} callbacks={callbacks} />;
+ * }
+ *
+ * // ❌ BROKEN: Unstable callbacks restart animation loop every render!
+ * function App() {
+ *   return (
+ *     <SlotPlayerProvider
+ *       tables={['fct_block']}
+ *       callbacks={{ onSlotChange: (slot) => console.log(slot) }}
+ *     />
+ *   );
+ * }
+ * ```
+ *
+ * ### Animation Loop
+ *
+ * Uses `useLayoutEffect` + `requestAnimationFrame` for 60fps playback:
+ * - **useLayoutEffect**: Cleanup happens synchronously before re-paint, preventing frames from "escaping"
+ * - **requestAnimationFrame**: Tied to browser refresh rate for smooth animation
+ * - **Dual state tracking**: Ref for reads (avoid stale closures), state for React updates
+ *
+ * See: [Using requestAnimationFrame with React Hooks](https://css-tricks.com/using-requestanimationframe-with-react-hooks/)
+ *
+ * ### Zero-Overhead Slot Numbers
+ *
+ * All slot values are actual beacon chain slot numbers (not timestamps):
+ * - Bounds transformed once on load (timestamp → slot)
+ * - Zero repeated conversions in components
+ * - Direct comparison with wall clock slot
+ * - No performance overhead for consumers
+ *
+ * ## Usage
+ *
+ * ### Basic Setup
+ *
+ * ```tsx
+ * import { SlotPlayerProvider } from '@/providers/SlotPlayerProvider';
+ * import { useSlotPlayer } from '@/hooks/useSlotPlayer';
+ *
+ * function App() {
+ *   return (
+ *     <SlotPlayerProvider tables={['fct_block', 'fct_attestation']}>
+ *       <SlotViewer />
+ *     </SlotPlayerProvider>
+ *   );
+ * }
+ *
+ * function SlotViewer() {
+ *   const { currentSlot, isPlaying, actions, isLoading, error } = useSlotPlayer();
+ *
+ *   if (isLoading) return <div>Loading...</div>;
+ *   if (error) return <div>Error: {error.message}</div>;
+ *
+ *   return (
+ *     <div>
+ *       <h1>Slot {currentSlot}</h1>
+ *       <button onClick={actions.toggle}>
+ *         {isPlaying ? 'Pause' : 'Play'}
+ *       </button>
+ *     </div>
+ *   );
+ * }
+ * ```
+ *
+ * ### Multiple Tables
+ *
+ * Provider aggregates bounds across all specified tables:
+ *
+ * ```tsx
+ * <SlotPlayerProvider
+ *   tables={['fct_block', 'fct_attestation', 'fct_validator_balance']}
+ * >
+ *   <App />
+ * </SlotPlayerProvider>
+ * ```
+ *
+ * Uses earliest `min` and latest `max` across all tables for full data range.
+ *
+ * ### With Callbacks
+ *
+ * ```tsx
+ * import { useStableCallback } from '@/hooks/useSlotPlayer';
+ *
+ * function App() {
+ *   const handleSlotChange = useStableCallback((slot: number) => {
+ *     console.log('Moved to slot:', slot);
+ *   });
+ *
+ *   const handlePlayStateChange = useStableCallback((isPlaying: boolean, reason: PauseReason) => {
+ *     console.log('Playback:', isPlaying ? 'started' : 'stopped', 'Reason:', reason);
+ *   });
+ *
+ *   const callbacks = useMemo(() => ({
+ *     onSlotChange: handleSlotChange,
+ *     onPlayStateChange: handlePlayStateChange,
+ *   }), [handleSlotChange, handlePlayStateChange]);
+ *
  *   return (
  *     <SlotPlayerProvider
  *       tables={['fct_block', 'fct_attestation']}
  *       initialPlaying={true}
  *       initialMode="continuous"
+ *       playbackSpeed={2}
+ *       callbacks={callbacks}
  *     >
  *       <SlotViewer />
  *     </SlotPlayerProvider>
  *   );
  * }
  * ```
+ *
+ * ## Error Handling
+ *
+ * **Production Recommendation**: Wrap in an Error Boundary:
+ *
+ * ```tsx
+ * import { ErrorBoundary } from 'react-error-boundary';
+ *
+ * function App() {
+ *   return (
+ *     <ErrorBoundary fallback={<ErrorPage />}>
+ *       <SlotPlayerProvider tables={['fct_block']}>
+ *         <SlotViewer />
+ *       </SlotPlayerProvider>
+ *     </ErrorBoundary>
+ *   );
+ * }
+ * ```
+ *
+ * Or handle errors inline:
+ *
+ * ```tsx
+ * function SlotViewer() {
+ *   const { isLoading, error } = useSlotPlayerMeta();
+ *
+ *   if (isLoading) return <LoadingSpinner />;
+ *   if (error) return <ErrorMessage error={error} />;
+ *
+ *   return <SlotDisplay />;
+ * }
+ * ```
+ *
+ * ## Testing
+ *
+ * Wrap components in test provider:
+ *
+ * ```tsx
+ * import { render } from '@testing-library/react';
+ * import { SlotPlayerProvider } from '@/providers/SlotPlayerProvider';
+ *
+ * const wrapper = ({ children }) => (
+ *   <SlotPlayerProvider tables={['fct_block']} initialSlot={100}>
+ *     {children}
+ *   </SlotPlayerProvider>
+ * );
+ *
+ * test('displays slot', () => {
+ *   render(<MyComponent />, { wrapper });
+ * });
+ * ```
+ *
+ * Or mock hooks:
+ *
+ * ```tsx
+ * vi.mock('@/hooks/useSlotPlayer', () => ({
+ *   useSlotPlayerState: () => ({
+ *     currentSlot: 12345,
+ *     isPlaying: false,
+ *     isLive: true,
+ *   }),
+ * }));
+ * ```
+ *
+ * ## Implementation Details
+ *
+ * ### Dual Progress Tracking
+ *
+ * Both ref and state are used for `slotProgress` intentionally:
+ * - `slotProgressRef` - Read by animation loop (avoid stale closures)
+ * - `slotProgress` state - Trigger React re-renders for UI
+ *
+ * This is required for requestAnimationFrame loops to work correctly with React.
+ *
+ * ### State Ref Pattern
+ *
+ * `stateRef.current` captures latest state for animation loop without recreating
+ * the effect when state changes. Essential for smooth 60fps playback.
+ *
+ * ### Auto-Resume Logic
+ *
+ * In continuous mode, when paused at boundary and new data arrives (maxSlot increases),
+ * automatically resumes playback. Handles live blockchain data gracefully.
+ *
+ * ### Network Change Handling
+ *
+ * When network changes, automatically jumps to live edge (maxSlot - 2) to avoid
+ * showing stale data from previous network.
+ *
+ * ### Bounds Clamping
+ *
+ * When bounds update, clamps currentSlot to valid range to handle race conditions
+ * between slot updates and bounds fetches.
+ *
+ * ### Safety Buffer
+ *
+ * Uses `maxSlot - 2` (not maxSlot) as "safe" max to avoid data availability issues
+ * at the blockchain head. The latest 1-2 slots may have incomplete data.
+ *
+ * @see useSlotPlayer - Main hook for accessing all context
+ * @see useSlotPlayerProgress - For 60fps progress updates
+ * @see useSlotPlayerState - For slot and playback state
+ * @see useSlotPlayerConfig - For settings and bounds
+ * @see useSlotPlayerActions - For control functions
+ * @see useSlotPlayerMeta - For loading/error state
  */
 export function SlotPlayerProvider({
   children,
@@ -115,35 +333,51 @@ export function SlotPlayerProvider({
   initialSlot,
   initialMode = 'continuous',
   initialPlaying = false,
-  slotDuration: initialSlotDuration = SECONDS_PER_SLOT * 1000,
   playbackSpeed: initialPlaybackSpeed = 1,
   callbacks,
 }: SlotPlayerProviderProps): React.ReactElement {
+  /**
+   * Slot duration is determined by the SECONDS_PER_SLOT constant (beacon chain slot time).
+   * This adheres to the actual beacon chain slot duration and is not configurable via props.
+   * For Ethereum mainnet, this is typically 12 seconds (12000ms), but may vary for other networks.
+   */
+  const slotDuration = SECONDS_PER_SLOT * 1000;
+
+  // Get network for genesis_time (required for timestamp to slot conversion)
+  const { currentNetwork } = useNetwork();
+
   // Get slot bounds from the API (TanStack Query handles retries internally)
   const { data: boundsData, isLoading, error } = useTablesBounds(tables);
 
   // Get current wall clock slot for staleness checking
   const { slot: wallClockSlot } = useBeaconClock();
 
-  // Extract aggregated min/max from bounds data
-  const minSlot = useMemo(() => boundsData?.aggregate.minOfMins ?? 0, [boundsData]);
-  const maxSlot = useMemo(() => boundsData?.aggregate.maxOfMaxes ?? 0, [boundsData]);
+  // Transform timestamp bounds to actual slot numbers
+  // This transformation happens once when bounds load, not on every render
+  const minSlot = useMemo(() => {
+    if (!boundsData?.aggregate?.minOfMins || !currentNetwork) return 0;
+    return Math.floor((boundsData.aggregate.minOfMins - currentNetwork.genesis_time) / SECONDS_PER_SLOT);
+  }, [boundsData, currentNetwork]);
 
-  // Calculate initial slot
+  const maxSlot = useMemo(() => {
+    if (!boundsData?.aggregate?.maxOfMaxes || !currentNetwork) return 0;
+    return Math.floor((boundsData.aggregate.maxOfMaxes - currentNetwork.genesis_time) / SECONDS_PER_SLOT);
+  }, [boundsData, currentNetwork]);
+
+  // Calculate initial slot (returns actual slot number)
   const getInitialSlot = useCallback(() => {
     if (initialSlot !== undefined) return initialSlot;
-    // Use maxSlot minus 2 as the safe default to avoid data availability issues
+    // Use maxSlot minus 2 slots as the safe default to avoid data availability issues
     const safeSlot = maxSlot > 2 ? maxSlot - 2 : maxSlot;
     return safeSlot;
   }, [initialSlot, maxSlot]);
 
   // State management
-  const [currentSlot, setCurrentSlot] = useState<number>(getInitialSlot());
+  // NOTE: currentSlot stores actual beacon chain slot numbers, NOT timestamps
+  const [currentSlot, setCurrentSlot] = useState<number>(0);
   const [isPlaying, setIsPlaying] = useState<boolean>(initialPlaying);
   const [mode, setMode] = useState<SlotMode>(initialMode);
   const [playbackSpeed, setPlaybackSpeed] = useState<number>(initialPlaybackSpeed);
-  const [slotDuration, setSlotDuration] = useState<number>(initialSlotDuration);
-  const [isStalled, setIsStalled] = useState<boolean>(false);
   const [pauseReason, setPauseReason] = useState<PauseReason>(null);
 
   /**
@@ -182,9 +416,10 @@ export function SlotPlayerProvider({
     currentSlot,
   };
 
-  // Reset to initial slot when bounds change and we don't have a valid slot
+  // Initialize currentSlot when bounds data is loaded
+  // Only run if currentSlot is still 0 (not yet initialized) and no explicit initialSlot was provided
   useEffect(() => {
-    if (boundsData && currentSlot === 0 && !initialSlot) {
+    if (boundsData && currentSlot === 0 && initialSlot === undefined) {
       const newInitialSlot = getInitialSlot();
       setCurrentSlot(newInitialSlot);
       setSlotProgress(0);
@@ -193,8 +428,9 @@ export function SlotPlayerProvider({
   }, [boundsData, currentSlot, initialSlot, getInitialSlot]);
 
   // Handle bounds update race conditions - clamp currentSlot to valid range
+  // Skip clamping if currentSlot is 0 (waiting for initialization)
   useEffect(() => {
-    if (boundsData) {
+    if (boundsData && currentSlot !== 0) {
       if (currentSlot < minSlot) {
         setCurrentSlot(minSlot);
         setSlotProgress(0);
@@ -207,6 +443,25 @@ export function SlotPlayerProvider({
     }
   }, [boundsData, currentSlot, minSlot, maxSlot]);
 
+  // Jump to live when network changes
+  // Use a ref to track the previous network to detect changes
+  const prevNetworkRef = useRef(currentNetwork);
+  useEffect(() => {
+    // Only jump if network actually changed and we have valid data
+    if (
+      currentNetwork &&
+      prevNetworkRef.current &&
+      prevNetworkRef.current.name !== currentNetwork.name &&
+      maxSlot > 0
+    ) {
+      const targetSlot = maxSlot > 2 ? maxSlot - 2 : maxSlot;
+      setCurrentSlot(targetSlot);
+      setSlotProgress(0);
+      slotProgressRef.current = 0;
+    }
+    prevNetworkRef.current = currentNetwork;
+  }, [currentNetwork, maxSlot]);
+
   // Auto-resume when reaching the live edge boundary in continuous mode
   useEffect(() => {
     if (!isPlaying && pauseReason === 'boundary' && mode === 'continuous' && currentSlot < maxSlot) {
@@ -216,6 +471,7 @@ export function SlotPlayerProvider({
   }, [maxSlot, currentSlot, isPlaying, pauseReason, mode]);
 
   // Calculate derived state
+  // Both wallClockSlot and currentSlot are now actual slot numbers - direct comparison
   const staleBehindSlots = wallClockSlot - currentSlot;
   const isStale = staleBehindSlots > 10;
 
@@ -245,19 +501,22 @@ export function SlotPlayerProvider({
 
         if (nextProgress >= state.slotDuration) {
           if (state.mode === 'continuous') {
-            setCurrentSlot(current => {
-              const nextSlot = current + 1;
-              if (nextSlot > state.maxSlot) {
-                setIsPlaying(false);
-                setPauseReason('boundary');
-                callbacks?.onPlayStateChange?.(false, 'boundary');
-                return current;
-              }
+            // Check if we can advance before resetting progress
+            const nextSlot = state.currentSlot + 1;
+            if (nextSlot > state.maxSlot) {
+              // Hit boundary - pause and keep progress at end
+              setIsPlaying(false);
+              setPauseReason('boundary');
+              callbacks?.onPlayStateChange?.(false, 'boundary');
+              slotProgressRef.current = state.slotDuration;
+              setSlotProgress(state.slotDuration);
+            } else {
+              // Can advance - move to next slot and reset progress
+              setCurrentSlot(nextSlot);
               callbacks?.onSlotChange?.(nextSlot);
-              return nextSlot;
-            });
-            slotProgressRef.current = 0;
-            setSlotProgress(0);
+              slotProgressRef.current = 0;
+              setSlotProgress(0);
+            }
           } else {
             // Single mode - stop at end of slot
             setIsPlaying(false);
@@ -380,33 +639,13 @@ export function SlotPlayerProvider({
     [slotDuration]
   );
 
-  const setSlotDurationAction = useCallback((ms: number) => {
-    const newDuration = Math.max(1000, Math.min(60000, ms)); // Clamp between 1s and 60s
-    setSlotDuration(newDuration);
-    // Reset progress if current progress exceeds new duration
-    if (slotProgressRef.current > newDuration) {
-      slotProgressRef.current = 0;
-      setSlotProgress(0);
-    }
-  }, []);
-
   const setPlaybackSpeedAction = useCallback((speed: number) => {
     const clampedSpeed = Math.max(0.1, Math.min(10, speed)); // Clamp between 0.1x and 10x
     setPlaybackSpeed(clampedSpeed);
   }, []);
 
-  const markStalled = useCallback(() => {
-    setIsStalled(true);
-    setIsPlaying(false);
-    callbacks?.onStalled?.();
-  }, [callbacks]);
-
-  const clearStalled = useCallback(() => {
-    setIsStalled(false);
-  }, []);
-
   const jumpToLive = useCallback(() => {
-    // Jump to maxSlot - 2 for safety buffer
+    // Jump to maxSlot - 2 slots for safety buffer
     const targetSlot = maxSlot > 2 ? maxSlot - 2 : maxSlot;
     setCurrentSlot(targetSlot);
     slotProgressRef.current = 0;
@@ -430,10 +669,7 @@ export function SlotPlayerProvider({
       rewind,
       fastForward,
       seekToTime,
-      setSlotDuration: setSlotDurationAction,
       setPlaybackSpeed: setPlaybackSpeedAction,
-      markStalled,
-      clearStalled,
       jumpToLive,
     }),
     [
@@ -447,10 +683,7 @@ export function SlotPlayerProvider({
       rewind,
       fastForward,
       seekToTime,
-      setSlotDurationAction,
       setPlaybackSpeedAction,
-      markStalled,
-      clearStalled,
       jumpToLive,
     ]
   );
@@ -468,23 +701,21 @@ export function SlotPlayerProvider({
       currentSlot,
       isPlaying,
       mode,
-      isStalled,
       isStale,
       staleBehindSlots,
       isLive,
       pauseReason,
     }),
-    [currentSlot, isPlaying, mode, isStalled, isStale, staleBehindSlots, isLive, pauseReason]
+    [currentSlot, isPlaying, mode, isStale, staleBehindSlots, isLive, pauseReason]
   );
 
   const configValue = useMemo(
     () => ({
-      slotDuration,
       playbackSpeed,
       minSlot,
       maxSlot,
     }),
-    [slotDuration, playbackSpeed, minSlot, maxSlot]
+    [playbackSpeed, minSlot, maxSlot]
   );
 
   const metaValue = useMemo<SlotPlayerMetaContextValue>(
