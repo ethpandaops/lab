@@ -189,6 +189,10 @@ export const LiveSlot: Story = {
 // Multiple timelines comparison
 export const MultipleSlots: Story = {
   name: 'Multiple Slots Comparison',
+  args: {
+    phases: DEFAULT_BEACON_SLOT_PHASES,
+    currentTime: 0,
+  },
   render: () => (
     <div className="flex flex-col gap-8">
       <div>
@@ -222,7 +226,7 @@ export const MultipleSlots: Story = {
       <div className="flex gap-4 border-t border-border pt-4">
         {DEFAULT_BEACON_SLOT_PHASES.map((phase, index) => (
           <div key={`legend-${index}`} className="flex items-center gap-2">
-            <div className={`size-3 rounded-xs border border-border ${phase.color}`} />
+            <div className={`size-3 rounded-xs border border-border ${phase.className}`} />
             <span className="text-xs/4 text-muted">{phase.label}</span>
           </div>
         ))}
