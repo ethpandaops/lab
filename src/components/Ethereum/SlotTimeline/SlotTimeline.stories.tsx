@@ -32,7 +32,6 @@ export const BeaconSlot: Story = {
 };
 
 export const WithClickHandler: Story = {
-  name: 'With Click Handler',
   args: {
     phases: DEFAULT_BEACON_SLOT_PHASES,
     currentTime: 5.5,
@@ -43,7 +42,6 @@ export const WithClickHandler: Story = {
 };
 
 export const WithInlineLabels: Story = {
-  name: 'With Inline Labels',
   args: {
     phases: DEFAULT_BEACON_SLOT_PHASES,
     currentTime: 6,
@@ -103,7 +101,6 @@ export const Complete: Story = {
 };
 
 export const WithCurrentTimeLabel: Story = {
-  name: 'With Current Time Label',
   args: {
     phases: DEFAULT_BEACON_SLOT_PHASES,
     currentTime: 6,
@@ -113,7 +110,6 @@ export const WithCurrentTimeLabel: Story = {
 };
 
 export const WithTimeLabels: Story = {
-  name: 'With Time Labels',
   args: {
     phases: DEFAULT_BEACON_SLOT_PHASES,
     currentTime: 6,
@@ -133,7 +129,6 @@ export const WithoutLabels: Story = {
 };
 
 export const WithTimeCutovers: Story = {
-  name: 'With Time Cutovers (Default)',
   args: {
     phases: DEFAULT_BEACON_SLOT_PHASES,
     currentTime: 6,
@@ -143,7 +138,6 @@ export const WithTimeCutovers: Story = {
 };
 
 export const WithoutTimeCutovers: Story = {
-  name: 'Without Time Cutovers',
   args: {
     phases: DEFAULT_BEACON_SLOT_PHASES,
     currentTime: 6,
@@ -164,7 +158,6 @@ export const TallTimeline: Story = {
 };
 
 export const ShortTimeline: Story = {
-  name: 'Short Timeline',
   args: {
     phases: DEFAULT_BEACON_SLOT_PHASES,
     currentTime: 6,
@@ -176,7 +169,6 @@ export const ShortTimeline: Story = {
 
 // Custom phases example
 export const CustomPhases: Story = {
-  name: 'Custom Phases',
   args: {
     phases: [
       { label: 'Init', duration: 2, className: 'bg-primary', textClassName: 'text-white' },
@@ -191,7 +183,6 @@ export const CustomPhases: Story = {
 
 // Custom text colors example
 export const CustomTextColors: Story = {
-  name: 'Custom Text Colors',
   args: {
     phases: [
       {
