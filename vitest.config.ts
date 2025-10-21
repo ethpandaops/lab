@@ -36,4 +36,7 @@ export default defineConfig({
       '@assets': path.resolve(__dirname, './src/assets'),
     },
   },
+  optimizeDeps: {
+    include: ['react-dom/client', 'zod/mini'],
+  },
 });
