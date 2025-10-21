@@ -1,0 +1,87 @@
+/**
+ * Main CSS Entry Point
+ *
+ * Import order:
+ * 1. Tailwind base
+ * 2. CSS Variables (dynamic theming)
+ * 3. Theme configuration (@theme directive)
+ * 4. Custom styles
+ */
+
+@import 'tailwindcss';
+
+/* Tailwind CSS v4 plugins via @plugin directive */
+@plugin "@tailwindcss/forms";
+
+/* Enable class-based dark mode */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Semantic theme tokens - Tailwind generates utilities from these */
+@theme inline {
+  /* Brand colors */
+  --color-primary: var(--primary-value);
+  --color-secondary: var(--secondary-value);
+  --color-accent: var(--accent-value);
+
+  /* Surface colors */
+  --color-background: var(--background-value);
+  --color-surface: var(--surface-value);
+  --color-foreground: var(--foreground-value);
+  --color-muted: var(--muted-value);
+  --color-border: var(--border-value);
+
+  /* State colors */
+  --color-success: var(--color-green-500);
+  --color-warning: var(--color-amber-500);
+  --color-danger: var(--color-red-500);
+
+  /* Custom animations */
+  --animate-shimmer: shimmer 2s linear infinite;
+
+  @keyframes shimmer {
+    0% {
+      background-position: -200% 0;
+    }
+    100% {
+      background-position: 200% 0;
+    }
+  }
+}
+
+/* Light and dark mode values */
+@layer base {
+  :root {
+    /* Light mode - futuristic cyan theme */
+    --primary-value: var(--color-cyan-500);
+    --secondary-value: var(--color-sky-500);
+    --accent-value: var(--color-cyan-400);
+    --background-value: white;
+    --surface-value: var(--color-gray-50);
+    --foreground-value: var(--color-zinc-950);
+    --muted-value: var(--color-zinc-600);
+    --border-value: var(--color-zinc-200);
+  }
+
+  html.dark {
+    /* Dark mode - softer cyan for better contrast */
+    --primary-value: var(--color-cyan-400);
+    --secondary-value: var(--color-sky-400);
+    --accent-value: var(--color-cyan-300);
+    --background-value: var(--color-zinc-950);
+    --surface-value: var(--color-zinc-900);
+    --foreground-value: var(--color-zinc-50);
+    --muted-value: var(--color-zinc-400);
+    --border-value: var(--color-zinc-800);
+  }
+
+  /* Apply IBM Plex Mono globally for tech/data aesthetic */
+  body {
+    font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  }
+
+  /* Global focus styles - use cyan primary color */
+  *:focus-visible {
+    outline: 2px solid var(--primary-value);
+    outline-offset: 2px;
+  }
+}

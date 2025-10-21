@@ -1,0 +1,89 @@
+name: Alpha Release
+
+on:
+  push:
+    branches:
+      - 'release/**'
+
+permissions:
+  contents: write
+
+jobs:
+  alpha-release:
+    name: Build and Create Alpha Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          fetch-depth: 0
+
+      - name: Extract release name from branch
+        id: extract
+        run: |
+          BRANCH_NAME="${GITHUB_REF#refs/heads/release/}"
+          echo "release_name=$BRANCH_NAME" >> $GITHUB_OUTPUT
+
+      - name: Get latest tag version
+        id: version
+        run: |
+          RELEASE_NAME="${{ steps.extract.outputs.release_name }}"
+          # Get the latest tag for this release name
+          LATEST_TAG=$(git tag -l "${RELEASE_NAME}-v*" | sort -V | tail -n 1)
+
+          if [ -z "$LATEST_TAG" ]; then
+            # No existing tags, start at v0.0.1
+            NEW_VERSION="0.0.1"
+          else
+            # Extract version number and increment patch
+            VERSION="${LATEST_TAG#${RELEASE_NAME}-v}"
+            IFS='.' read -r major minor patch <<< "$VERSION"
+            NEW_VERSION="${major}.${minor}.$((patch + 1))"
+          fi
+
+          NEW_TAG="${RELEASE_NAME}-v${NEW_VERSION}"
+          echo "new_tag=$NEW_TAG" >> $GITHUB_OUTPUT
+          echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+
+      - name: Create and push tag
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag ${{ steps.version.outputs.new_tag }}
+          git push origin ${{ steps.version.outputs.new_tag }}
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Set up Node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 22
+          cache: 'pnpm'
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build project
+        run: pnpm build
+
+      - name: Create build archives
+        run: |
+          tar -czf lab-${{ steps.version.outputs.new_tag }}.tar.gz -C dist .
+          cd dist && zip -r ../lab-${{ steps.version.outputs.new_tag }}.zip . && cd ..
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.version.outputs.new_tag }}
+          name: ${{ steps.extract.outputs.release_name }} ${{ steps.version.outputs.new_version }} (Alpha)
+          prerelease: true
+          generate_release_notes: true
+          files: |
+            lab-${{ steps.version.outputs.new_tag }}.tar.gz
+            lab-${{ steps.version.outputs.new_tag }}.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

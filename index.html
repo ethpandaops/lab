@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en" itemscope="" itemtype="http://schema.org/Webpage">
+  <head>
+    <style>
+      /* Critical CSS - Inline for instant rendering */
+      body:not(.react-loaded) * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body:not(.react-loaded) {
+        font-family: system-ui, -apple-system, sans-serif;
+        background: rgb(10, 18, 40);
+        min-height: 100vh;
+        overflow: hidden;
+      }
+
+      body:not(.react-loaded) #loading-screen {
+        position: fixed;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background: rgb(10, 18, 40);
+        z-index: 50;
+      }
+    </style>
+    <script>
+      // Initialize theme before React mounts to prevent FOUC
+      (function () {
+        const theme = localStorage.getItem('theme');
+        const isDark =
+          theme === 'dark' ||
+          (theme !== 'light' &&
+            window.matchMedia('(prefers-color-scheme: dark)').matches);
+
+        if (isDark) {
+          document.documentElement.classList.add('dark');
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="loading-screen"></div>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

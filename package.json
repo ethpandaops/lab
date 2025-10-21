@@ -1,0 +1,97 @@
+{
+  "name": "lab",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build --mode production",
+    "preview": "vite preview",
+    "test": "vitest run --passWithNoTests",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest --coverage",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "format": "prettier --write \"src/**/*.{ts,tsx}\"",
+    "clean": "rm -rf dist node_modules",
+    "generate:api": "openapi-ts",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build",
+    "build-storybook:gh-pages": "STORYBOOK_BASE_PATH=/lab storybook build"
+  },
+  "dependencies": {
+    "@fontsource/ibm-plex-mono": "^5.2.7",
+    "@headlessui/react": "2.2.9",
+    "@heroicons/react": "2.2.0",
+    "@tailwindcss/vite": "4.1.15",
+    "@tanstack/react-query": "5.90.5",
+    "@tanstack/react-router": "1.133.15",
+    "@tanstack/router-plugin": "1.133.15",
+    "clsx": "2.1.1",
+    "echarts": "6.0.0",
+    "echarts-for-react": "3.0.4",
+    "echarts-gl": "2.0.9",
+    "react": "19.2.0",
+    "react-dom": "19.2.0",
+    "react-hook-form": "7.65.0",
+    "zod": "4.1.12"
+  },
+  "devDependencies": {
+    "@chromatic-com/storybook": "4.1.1",
+    "@commitlint/cli": "20.1.0",
+    "@commitlint/config-conventional": "20.0.0",
+    "@eslint/compat": "1.4.0",
+    "@eslint/css": "0.13.0",
+    "@eslint/js": "9.38.0",
+    "@hey-api/openapi-ts": "0.86.1",
+    "@storybook/addon-docs": "9.1.13",
+    "@storybook/addon-themes": "9.1.13",
+    "@storybook/addon-vitest": "9.1.13",
+    "@storybook/builder-vite": "9.1.13",
+    "@storybook/react-vite": "9.1.13",
+    "@tailwindcss/forms": "0.5.10",
+    "@testing-library/jest-dom": "6.9.1",
+    "@testing-library/react": "16.3.0",
+    "@types/node": "24.8.1",
+    "@types/react": "19.2.2",
+    "@types/react-dom": "19.2.2",
+    "@vitejs/plugin-react": "5.0.4",
+    "@vitest/browser": "3.2.4",
+    "@vitest/ui": "3.2.4",
+    "cron-parser": "4.9.0",
+    "eslint": "9.38.0",
+    "eslint-config-prettier": "10.1.8",
+    "eslint-plugin-better-tailwindcss": "3.7.10",
+    "eslint-plugin-n": "17.23.1",
+    "eslint-plugin-prettier": "5.5.4",
+    "eslint-plugin-react": "7.37.5",
+    "eslint-plugin-react-hooks": "7.0.0",
+    "eslint-plugin-react-refresh": "0.4.24",
+    "eslint-plugin-storybook": "9.1.13",
+    "globals": "16.4.0",
+    "jsdom": "27.0.1",
+    "msw": "2.11.6",
+    "msw-storybook-addon": "2.0.6",
+    "playwright": "1.56.1",
+    "prettier": "3.6.2",
+    "prettier-plugin-tailwindcss": "0.7.1",
+    "rollup-plugin-visualizer": "6.0.5",
+    "storybook": "9.1.13",
+    "tailwindcss": "4.1.15",
+    "typescript": "5.9.3",
+    "typescript-eslint": "8.46.1",
+    "vite": "7.1.11",
+    "vitest": "3.2.4"
+  },
+  "msw": {
+    "workerDirectory": [
+      "public"
+    ]
+  },
+  "pnpm": {
+    "peerDependencyRules": {
+      "ignoreMissing": [
+        "echarts@^5.1.2"
+      ]
+    }
+  }
+}
