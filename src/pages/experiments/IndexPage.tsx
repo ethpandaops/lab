@@ -25,7 +25,7 @@ export function IndexPage(): JSX.Element {
           </Card>
         </Link>
         <Link to="/experiments/live-slots" className="block">
-          <Card>
+          <Card featureImage={<img src="/images/expirements/live-slots.png" alt="Live Slots" />}>
             <div className="flex flex-col gap-3">
               <h3 className="text-lg/7 font-semibold text-foreground">Live Slots</h3>
             </div>
