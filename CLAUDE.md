@@ -24,6 +24,11 @@ pnpm storybook
 - heroicons v2
 - headlessui v2
 - storybook v9
+- react-hook-form v7
+- echarts v6
+- echarts-for-react v3
+- echarts-gl v2
+- clsx v2
 
 ## Project Structure
 
@@ -99,51 +104,6 @@ src/
   assets/
   main.tsx
 ```
-
-## Routes and Layout
-
-### Layout System
-
-**Architecture:**
-- **`__root.tsx`** - Contains the global sidebar layout with:
-  - Logo and branding
-  - Navigation links (Home, Experiments, About)
-  - Network selector
-  - Mobile responsive sidebar (drawer on mobile, fixed on desktop)
-  - Global providers (QueryClient, ConfigGate, NetworkProvider)
-  - `<Outlet />` for page content
-
-**How it works:**
-- All routes render into the `<Outlet />` in `__root.tsx`
-- Routes reference page components directly - no layout wrappers needed
-- Pages are pure content components
-- Sidebar navigation is consistent across all pages
-
-**Example Route:**
-```tsx
-// routes/about.tsx
-import { createFileRoute } from '@tanstack/react-router';
-import { AboutPage } from '@/pages/about';
-
-export const Route = createFileRoute('/about')({
-  component: AboutPage,
-});
-```
-
-**Example Page:**
-```tsx
-// pages/about/AboutPage.tsx
-export function AboutPage() {
-  return (
-    <div className="px-4 py-8 sm:px-6 lg:px-8">
-      <h1>About</h1>
-      <p>Page content here</p>
-    </div>
-  );
-}
-```
-
-**Note:** Pages should add their own padding/spacing as needed. The main content area has `lg:pl-72` to account for the fixed sidebar on desktop.
 
 ## React
 
