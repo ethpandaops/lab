@@ -183,6 +183,7 @@ ComponentName/
 ### Quick Reference
 - **New experiment**: Route in `src/routes/experiments/`, page in `src/pages/experiments/[name]/`
 - **Experiment image**: `public/images/experiments/[name].png` for social sharing
+- **Loading component**: `src/pages/[section]/components/[PageName]Loader/` using `LoadingContainer`
 - **Other route**: Route in `src/routes/[section]/`, page in `src/pages/[section]/`
 - **Core component**: `src/components/[category]/[ComponentName]/` - reusable, generic
 - **Page-scoped component**: `src/pages/[section]/components/[ComponentName]/` - page-specific
@@ -220,6 +221,20 @@ ComponentName/
 - **Context** (`.ts`): PascalCase - `NetworkContext.ts` (in `src/contexts/`)
 - **Hooks** (`.ts`): camelCase starting with `use` - `useNetwork.ts`, `useConfig.ts`
 - **Utils** (`.ts`): kebab-case - `api-config.ts`, `auth-service.ts`
+
+## Loading States
+
+### Shimmer Loading Pattern
+- Use `LoadingContainer` from `src/components/Layout/LoadingContainer/` as base
+- Create page-specific loaders: `[PageName]Loading` or `[ComponentName]Loading`
+- Place in `pages/[section]/components/` alongside other page components
+- Show skeleton UI that matches actual content structure
+
+### Best Practices
+- Match loading skeleton to actual content layout
+- Don't overuse - only for significant data fetches
+- Keep loading states brief and informative
+- Consider error states alongside loading
 
 ## Form Management
 
