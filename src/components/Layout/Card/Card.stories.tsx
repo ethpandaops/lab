@@ -400,3 +400,255 @@ export const AllVariants: Story = {
     </div>
   ),
 };
+
+/**
+ * Card with a feature image background.
+ * The image covers the full card with transparency.
+ */
+export const WithFeatureImage: Story = {
+  args: {
+    header: <h3 className="text-base/7 font-semibold text-foreground">Lab Experiments</h3>,
+    children: (
+      <div>
+        <p className="text-3xl/9 font-bold text-foreground">42</p>
+        <p className="mt-1 text-sm/6 text-muted">Active experiments running</p>
+      </div>
+    ),
+    footer: <span className="text-sm/6 text-muted">Last updated: 2 min ago</span>,
+    featureImage: <img src="/images/lab.png" alt="Lab" />,
+  },
+};
+
+/**
+ * Interactive card with feature image.
+ * Click the card to see the interaction.
+ */
+export const InteractiveWithFeatureImage: Story = {
+  args: {
+    isInteractive: true,
+    onClick: () => alert('Card clicked!'),
+    header: <h3 className="text-base/7 font-semibold text-foreground">ethPandaOps Lab</h3>,
+    children: (
+      <div>
+        <p className="text-lg/7 font-semibold text-foreground">Discover More</p>
+        <p className="mt-1 text-sm/6 text-muted">Click to explore experiments and data visualizations</p>
+      </div>
+    ),
+    footer: <span className="text-sm/6 text-primary">Learn more →</span>,
+    featureImage: <img src="/images/lab.png" alt="Lab" />,
+  },
+};
+
+/**
+ * Feature image with different variants.
+ * Shows how the transparent background works with different card variants.
+ */
+export const FeatureImageVariants: Story = {
+  args: {
+    children: null,
+  },
+  decorators: [
+    Story => (
+      <div className="min-w-[1200px] rounded-sm bg-background p-8">
+        <Story />
+      </div>
+    ),
+  ],
+  render: () => (
+    <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+      <Card
+        variant="default"
+        header={<h3 className="text-base/7 font-semibold text-foreground">Default Variant</h3>}
+        featureImage={<img src="/images/lab.png" alt="Lab" />}
+      >
+        <p className="text-sm/6 text-muted">Feature image with default card background</p>
+      </Card>
+
+      <Card
+        variant="muted"
+        header={<h3 className="text-base/7 font-semibold text-foreground">Muted Variant</h3>}
+        footer={<span className="text-sm/6 text-muted">Footer section</span>}
+        featureImage={<img src="/images/lab.png" alt="Lab" />}
+      >
+        <p className="text-sm/6 text-muted">Feature image with muted variant backgrounds</p>
+      </Card>
+
+      <Card
+        variant="primary"
+        header={<h3 className="text-base/7 font-semibold text-foreground">Primary Variant</h3>}
+        featureImage={<img src="/images/lab.png" alt="Lab" />}
+      >
+        <p className="text-sm/6 text-muted">Feature image with primary color header</p>
+      </Card>
+
+      <Card
+        variant="accent"
+        header={<h3 className="text-base/7 font-semibold text-foreground">Accent Variant</h3>}
+        footer={<span className="text-sm/6 text-muted">Footer section</span>}
+        featureImage={<img src="/images/lab.png" alt="Lab" />}
+      >
+        <p className="text-sm/6 text-muted">Feature image with accent color backgrounds</p>
+      </Card>
+    </div>
+  ),
+};
+
+/**
+ * Tall card with feature image.
+ * Demonstrates how object-cover prioritizes height in tall cards.
+ */
+export const TallCard: Story = {
+  args: {
+    header: <h3 className="text-base/7 font-semibold text-foreground">Fork Readiness</h3>,
+    children: (
+      <div className="space-y-4">
+        <div>
+          <p className="text-3xl/9 font-bold text-foreground">98.5%</p>
+          <p className="mt-1 text-sm/6 text-muted">Clients ready for next fork</p>
+        </div>
+        <div className="space-y-2">
+          <div className="flex justify-between text-sm/6">
+            <span className="text-muted">Lighthouse</span>
+            <span className="font-medium text-foreground">100%</span>
+          </div>
+          <div className="flex justify-between text-sm/6">
+            <span className="text-muted">Prysm</span>
+            <span className="font-medium text-foreground">100%</span>
+          </div>
+          <div className="flex justify-between text-sm/6">
+            <span className="text-muted">Teku</span>
+            <span className="font-medium text-foreground">97%</span>
+          </div>
+          <div className="flex justify-between text-sm/6">
+            <span className="text-muted">Nimbus</span>
+            <span className="font-medium text-foreground">95%</span>
+          </div>
+        </div>
+      </div>
+    ),
+    footer: (
+      <div className="flex items-center justify-between">
+        <span className="text-sm/6 text-muted">Updated 5 min ago</span>
+        <button className="text-sm/6 font-semibold text-primary hover:text-accent">View details →</button>
+      </div>
+    ),
+    featureImage: <img src="/images/expirements/fork-readiness.png" alt="Fork Readiness" />,
+  },
+  decorators: [
+    Story => (
+      <div className="flex min-w-96 items-center justify-center rounded-sm bg-background p-8">
+        <div className="w-80">
+          <Story />
+        </div>
+      </div>
+    ),
+  ],
+};
+
+/**
+ * Wide card with feature image.
+ * Demonstrates how object-cover prioritizes width in wide cards.
+ */
+export const WideCard: Story = {
+  args: {
+    header: (
+      <div className="flex items-center justify-between">
+        <h3 className="text-base/7 font-semibold text-foreground">Block Production Flow</h3>
+        <span className="rounded-sm bg-success/10 px-2 py-1 text-xs/5 font-semibold text-success">Live</span>
+      </div>
+    ),
+    children: (
+      <div className="flex items-center gap-6">
+        <div>
+          <p className="text-3xl/9 font-bold text-foreground">2.3s</p>
+          <p className="mt-1 text-sm/6 text-muted">Avg block time</p>
+        </div>
+        <div>
+          <p className="text-3xl/9 font-bold text-foreground">45</p>
+          <p className="mt-1 text-sm/6 text-muted">Proposers</p>
+        </div>
+        <div>
+          <p className="text-3xl/9 font-bold text-foreground">12.4k</p>
+          <p className="mt-1 text-sm/6 text-muted">Blocks/day</p>
+        </div>
+      </div>
+    ),
+    footer: <span className="text-sm/6 text-muted">Real-time data from beacon chain</span>,
+    featureImage: <img src="/images/expirements/block-production-flow.png" alt="Block Production Flow" />,
+  },
+  decorators: [
+    Story => (
+      <div className="min-w-[800px] rounded-sm bg-background p-8">
+        <Story />
+      </div>
+    ),
+  ],
+};
+
+/**
+ * Multiple cards with different images.
+ * Shows various experiment images in a grid.
+ */
+export const MultipleExperimentImages: Story = {
+  args: {
+    children: null,
+  },
+  decorators: [
+    Story => (
+      <div className="min-w-[1200px] rounded-sm bg-background p-8">
+        <Story />
+      </div>
+    ),
+  ],
+  render: () => (
+    <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+      <Card
+        header={<h3 className="text-base/7 font-semibold text-foreground">Networks</h3>}
+        featureImage={<img src="/images/expirements/networks.png" alt="Networks" />}
+      >
+        <p className="text-3xl/9 font-bold text-foreground">12</p>
+        <p className="mt-1 text-sm/6 text-muted">Active networks</p>
+      </Card>
+
+      <Card
+        header={<h3 className="text-base/7 font-semibold text-foreground">Live Slots</h3>}
+        featureImage={<img src="/images/expirements/live-slots.png" alt="Live Slots" />}
+      >
+        <p className="text-3xl/9 font-bold text-foreground">8,234</p>
+        <p className="mt-1 text-sm/6 text-muted">Current slot</p>
+      </Card>
+
+      <Card
+        header={<h3 className="text-base/7 font-semibold text-foreground">Locally Built Blocks</h3>}
+        featureImage={<img src="/images/expirements/locally-built-blocks.png" alt="Locally Built Blocks" />}
+      >
+        <p className="text-3xl/9 font-bold text-foreground">67%</p>
+        <p className="mt-1 text-sm/6 text-muted">Local block rate</p>
+      </Card>
+
+      <Card
+        header={<h3 className="text-base/7 font-semibold text-foreground">Block Production</h3>}
+        featureImage={<img src="/images/expirements/block-production-flow.png" alt="Block Production Flow" />}
+      >
+        <p className="text-3xl/9 font-bold text-foreground">2.1s</p>
+        <p className="mt-1 text-sm/6 text-muted">Block time</p>
+      </Card>
+
+      <Card
+        header={<h3 className="text-base/7 font-semibold text-foreground">Fork Readiness</h3>}
+        featureImage={<img src="/images/expirements/fork-readiness.png" alt="Fork Readiness" />}
+      >
+        <p className="text-3xl/9 font-bold text-foreground">98.5%</p>
+        <p className="mt-1 text-sm/6 text-muted">Clients ready</p>
+      </Card>
+
+      <Card
+        header={<h3 className="text-base/7 font-semibold text-foreground">Lab Overview</h3>}
+        featureImage={<img src="/images/expirements.png" alt="ethPandaOps Lab" />}
+      >
+        <p className="text-3xl/9 font-bold text-foreground">42</p>
+        <p className="mt-1 text-sm/6 text-muted">Active experiments</p>
+      </Card>
+    </div>
+  ),
+};
