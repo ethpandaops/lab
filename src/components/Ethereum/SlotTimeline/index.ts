@@ -1,2 +1,2 @@
 export { SlotTimeline } from './SlotTimeline';
-export type { SlotTimelineProps, SlotPhase } from './SlotTimeline.types';
+export type { SlotTimelineProps } from './SlotTimeline.types';

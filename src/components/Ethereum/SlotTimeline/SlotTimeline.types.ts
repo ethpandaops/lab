@@ -1,13 +1,4 @@
-export interface SlotPhase {
-  /** Label for this phase (e.g., "Block Proposal", "Attestation") */
-  label: string;
-  /** Duration of this phase in seconds */
-  duration: number;
-  /** Tailwind background color class (e.g., 'bg-primary', 'bg-success') */
-  color: string;
-  /** Optional description for accessibility */
-  description?: string;
-}
+import type { SlotPhase } from '@/utils/beacon';
 
 export interface SlotTimelineProps {
   /** Array of phases that make up the slot */

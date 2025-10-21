@@ -1,10 +1,22 @@
-import type { SlotPhase } from '@/components/Ethereum/SlotTimeline';
-
 /**
  * Beacon chain timing constants
  */
 export const SECONDS_PER_SLOT = 12;
 export const SLOTS_PER_EPOCH = 32;
+
+/**
+ * Represents a phase within a beacon chain slot
+ */
+export interface SlotPhase {
+  /** Label for this phase (e.g., "Block Proposal", "Attestation") */
+  label: string;
+  /** Duration of this phase in seconds */
+  duration: number;
+  /** Tailwind background color class (e.g., 'bg-primary', 'bg-success') */
+  color: string;
+  /** Optional description for accessibility */
+  description?: string;
+}
 
 /**
  * Default Ethereum beacon chain slot phases (12 seconds total).
