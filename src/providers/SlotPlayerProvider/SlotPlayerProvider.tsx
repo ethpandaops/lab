@@ -11,6 +11,7 @@ import {
 } from '@/contexts/SlotPlayerContext';
 import type {
   SlotMode,
+  PauseReason,
   SlotPlayerProviderProps,
   SlotPlayerActions,
   SlotPlayerMetaContextValue,
@@ -38,11 +39,13 @@ export function SlotPlayerProvider({
   initialSlot,
   initialMode = 'continuous',
   initialPlaying = false,
-  slotDuration = SECONDS_PER_SLOT * 1000,
+  slotDuration: initialSlotDuration = SECONDS_PER_SLOT * 1000,
   playbackSpeed: initialPlaybackSpeed = 1,
   tableName = 'fct_slot',
+  targetFps = 60,
+  callbacks,
 }: SlotPlayerProviderProps): React.ReactElement {
-  // Get slot bounds from the API
+  // Get slot bounds from the API (TanStack Query handles retries internally)
   const { data: bounds, isLoading, error } = useTableBounds(tableName);
 
   // Get current wall clock slot for staleness checking
@@ -67,11 +70,12 @@ export function SlotPlayerProvider({
   const [isPlaying, setIsPlaying] = useState<boolean>(initialPlaying);
   const [mode, setMode] = useState<SlotMode>(initialMode);
   const [playbackSpeed, setPlaybackSpeed] = useState<number>(initialPlaybackSpeed);
+  const [slotDuration, setSlotDuration] = useState<number>(initialSlotDuration);
   const [isStalled, setIsStalled] = useState<boolean>(false);
-  const [pauseReason, setPauseReason] = useState<'manual' | 'boundary' | null>(null);
+  const [pauseReason, setPauseReason] = useState<PauseReason>(null);
 
-  // Refs for interval management
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  // Refs for animation frame management
+  const animationFrameRef = useRef<number | null>(null);
   const stateRef = useRef({
     isPlaying,
     slotDuration,
@@ -93,6 +97,19 @@ export function SlotPlayerProvider({
     };
   });
 
+  // AbortController for cleanup of async operations
+  const abortControllerRef = useRef<AbortController | null>(null);
+
+  // Initialize AbortController
+  useEffect(() => {
+    abortControllerRef.current = new AbortController();
+
+    return () => {
+      abortControllerRef.current?.abort();
+      abortControllerRef.current = null;
+    };
+  }, []);
+
   // Reset to initial slot when bounds change and we don't have a valid slot
   useEffect(() => {
     if (bounds && currentSlot === 0 && !initialSlot) {
@@ -102,6 +119,21 @@ export function SlotPlayerProvider({
       slotProgressRef.current = 0;
     }
   }, [bounds, currentSlot, initialSlot, getInitialSlot]);
+
+  // Handle bounds update race conditions - clamp currentSlot to valid range
+  useEffect(() => {
+    if (bounds) {
+      if (currentSlot < minSlot) {
+        setCurrentSlot(minSlot);
+        setSlotProgress(0);
+        slotProgressRef.current = 0;
+      } else if (currentSlot > maxSlot) {
+        setCurrentSlot(maxSlot);
+        setSlotProgress(0);
+        slotProgressRef.current = 0;
+      }
+    }
+  }, [bounds, currentSlot, minSlot, maxSlot]);
 
   // Auto-resume when reaching the live edge boundary in continuous mode
   useEffect(() => {
@@ -121,50 +153,71 @@ export function SlotPlayerProvider({
     return safeMaxSlot - currentSlot <= 10;
   }, [maxSlot, currentSlot]);
 
-  // Main playback interval
+  // Main playback loop using requestAnimationFrame
   useEffect(() => {
-    intervalRef.current = setInterval(() => {
+    const frameInterval = 1000 / targetFps; // Target interval between frames
+    let lastProcessedTime = performance.now();
+
+    const animate = (currentTime: number): void => {
       const state = stateRef.current;
 
-      if (!state.isPlaying) {
-        return;
-      }
+      // Calculate time delta since last processed frame
+      const deltaTime = currentTime - lastProcessedTime;
 
-      const currentProgress = slotProgressRef.current;
-      const nextProgress = currentProgress + 100 * state.playbackSpeed;
+      // Only process if enough time has passed for target FPS
+      if (deltaTime >= frameInterval) {
+        if (state.isPlaying) {
+          const currentProgress = slotProgressRef.current;
+          const progressDelta = deltaTime * state.playbackSpeed;
+          const nextProgress = currentProgress + progressDelta;
 
-      if (nextProgress >= state.slotDuration) {
-        if (state.mode === 'continuous') {
-          setCurrentSlot(current => {
-            const nextSlot = current + 1;
-            if (nextSlot > state.maxSlot) {
+          if (nextProgress >= state.slotDuration) {
+            if (state.mode === 'continuous') {
+              setCurrentSlot(current => {
+                const nextSlot = current + 1;
+                if (nextSlot > state.maxSlot) {
+                  setIsPlaying(false);
+                  setPauseReason('boundary');
+                  callbacks?.onPlayStateChange?.(false, 'boundary');
+                  return current;
+                }
+                callbacks?.onSlotChange?.(nextSlot);
+                return nextSlot;
+              });
+              slotProgressRef.current = 0;
+              setSlotProgress(0);
+            } else {
+              // Single mode - stop at end of slot
               setIsPlaying(false);
-              setPauseReason('boundary');
-              return current;
+              setPauseReason(null);
+              callbacks?.onPlayStateChange?.(false, null);
+              slotProgressRef.current = state.slotDuration;
+              setSlotProgress(state.slotDuration);
             }
-            return nextSlot;
-          });
-          slotProgressRef.current = 0;
-          setSlotProgress(0);
-        } else {
-          // Single mode - stop at end of slot
-          setIsPlaying(false);
-          slotProgressRef.current = state.slotDuration;
-          setSlotProgress(state.slotDuration);
+          } else {
+            slotProgressRef.current = nextProgress;
+            setSlotProgress(nextProgress);
+          }
         }
-      } else {
-        slotProgressRef.current = nextProgress;
-        setSlotProgress(nextProgress);
-      }
-    }, 100);
 
+        lastProcessedTime = currentTime;
+      }
+
+      // Continue animation loop
+      animationFrameRef.current = requestAnimationFrame(animate);
+    };
+
+    // Start animation loop
+    animationFrameRef.current = requestAnimationFrame(animate);
+
+    // Cleanup
     return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-        intervalRef.current = null;
+      if (animationFrameRef.current !== null) {
+        cancelAnimationFrame(animationFrameRef.current);
+        animationFrameRef.current = null;
       }
     };
-  }, []);
+  }, [targetFps, callbacks]);
 
   // Define actions
   const actions = useMemo<SlotPlayerActions>(
@@ -177,11 +230,13 @@ export function SlotPlayerProvider({
         }
         setIsPlaying(true);
         setPauseReason(null);
+        callbacks?.onPlayStateChange?.(true, null);
       },
 
       pause: () => {
         setIsPlaying(false);
         setPauseReason('manual');
+        callbacks?.onPlayStateChange?.(false, 'manual');
       },
 
       toggle: () => {
@@ -191,7 +246,9 @@ export function SlotPlayerProvider({
             slotProgressRef.current = 0;
             setSlotProgress(0);
           }
-          setPauseReason(prev ? 'manual' : null);
+          const newPauseReason = prev ? 'manual' : null;
+          setPauseReason(newPauseReason);
+          callbacks?.onPlayStateChange?.(!prev, newPauseReason);
           return !prev;
         });
       },
@@ -203,12 +260,17 @@ export function SlotPlayerProvider({
         setCurrentSlot(bounded);
         slotProgressRef.current = 0;
         setSlotProgress(0);
+        callbacks?.onSlotChange?.(bounded);
       },
 
       nextSlot: () => {
         setCurrentSlot(prev => {
           const next = prev + 1;
-          return next > maxSlot ? prev : next;
+          const newSlot = next > maxSlot ? prev : next;
+          if (newSlot !== prev) {
+            callbacks?.onSlotChange?.(newSlot);
+          }
+          return newSlot;
         });
         slotProgressRef.current = 0;
         setSlotProgress(0);
@@ -217,7 +279,11 @@ export function SlotPlayerProvider({
       previousSlot: () => {
         setCurrentSlot(prev => {
           const next = prev - 1;
-          return next < minSlot ? prev : next;
+          const newSlot = next < minSlot ? prev : next;
+          if (newSlot !== prev) {
+            callbacks?.onSlotChange?.(newSlot);
+          }
+          return newSlot;
         });
         slotProgressRef.current = 0;
         setSlotProgress(0);
@@ -239,17 +305,25 @@ export function SlotPlayerProvider({
         setSlotProgress(bounded);
       },
 
-      setSlotDuration: (_ms: number) => {
-        // Note: In this implementation, slotDuration is fixed at initialization
-        // If you need dynamic duration changes, you'd need to add state for it
-        console.warn('Dynamic slot duration changes not implemented yet');
+      setSlotDuration: (ms: number) => {
+        const newDuration = Math.max(1000, Math.min(60000, ms)); // Clamp between 1s and 60s
+        setSlotDuration(newDuration);
+        // Reset progress if current progress exceeds new duration
+        if (slotProgressRef.current > newDuration) {
+          slotProgressRef.current = 0;
+          setSlotProgress(0);
+        }
       },
 
-      setPlaybackSpeed: (speed: number) => setPlaybackSpeed(speed),
+      setPlaybackSpeed: (speed: number) => {
+        const clampedSpeed = Math.max(0.1, Math.min(10, speed)); // Clamp between 0.1x and 10x
+        setPlaybackSpeed(clampedSpeed);
+      },
 
       markStalled: () => {
         setIsStalled(true);
         setIsPlaying(false);
+        callbacks?.onStalled?.();
       },
 
       clearStalled: () => setIsStalled(false),
@@ -262,9 +336,11 @@ export function SlotPlayerProvider({
         setSlotProgress(0);
         setIsPlaying(true);
         setPauseReason(null);
+        callbacks?.onSlotChange?.(targetSlot);
+        callbacks?.onPlayStateChange?.(true, null);
       },
     }),
-    [minSlot, maxSlot, slotDuration, mode]
+    [minSlot, maxSlot, slotDuration, mode, callbacks]
   );
 
   // Memoize context values
@@ -284,8 +360,9 @@ export function SlotPlayerProvider({
       isStale,
       staleBehindSlots,
       isLive,
+      pauseReason,
     }),
-    [currentSlot, isPlaying, mode, isStalled, isStale, staleBehindSlots, isLive]
+    [currentSlot, isPlaying, mode, isStalled, isStale, staleBehindSlots, isLive, pauseReason]
   );
 
   const configValue = useMemo(

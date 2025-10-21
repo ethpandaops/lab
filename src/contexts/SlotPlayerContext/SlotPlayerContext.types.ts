@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 
 export type SlotMode = 'continuous' | 'single';
+export type PauseReason = 'manual' | 'boundary' | null;
 
 export interface SlotPlayerProgressContextValue {
   slotProgress: number;
@@ -14,6 +15,7 @@ export interface SlotPlayerStateContextValue {
   isStale: boolean;
   staleBehindSlots: number;
   isLive: boolean;
+  pauseReason: PauseReason;
 }
 
 export interface SlotPlayerConfigContextValue {
@@ -50,6 +52,15 @@ export interface SlotPlayerActions {
   jumpToLive: () => void;
 }
 
+export interface SlotPlayerCallbacks {
+  // Called when the current slot changes
+  onSlotChange?: (slot: number) => void;
+  // Called when play state changes
+  onPlayStateChange?: (isPlaying: boolean, reason: PauseReason) => void;
+  // Called when playback becomes stalled
+  onStalled?: () => void;
+}
+
 export interface SlotPlayerProviderProps {
   children: ReactNode;
   // Initial slot to start at (defaults to maxSlot - 2)
@@ -64,6 +75,10 @@ export interface SlotPlayerProviderProps {
   playbackSpeed?: number;
   // Table name to get bounds from (default: 'fct_slot')
   tableName?: string;
+  // Target frame rate for playback updates (default: 60 fps)
+  targetFps?: number;
+  // Event callbacks
+  callbacks?: SlotPlayerCallbacks;
 }
 
 export interface SlotPlayerMetaContextValue {
