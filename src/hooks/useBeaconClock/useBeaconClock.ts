@@ -1,9 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNetwork } from '@/hooks/useNetwork';
+import { SECONDS_PER_SLOT, SLOTS_PER_EPOCH } from '@/utils/beacon';
 import type { SlotEpochData } from './useBeaconClock.types';
-
-const SECONDS_PER_SLOT = 12;
-const SLOTS_PER_EPOCH = 32;
 
 /**
  * Hook to access the Beacon Chain clock (current slot and epoch).

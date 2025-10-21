@@ -74,6 +74,11 @@
     --border-value: var(--color-zinc-800);
   }
 
+  /* Apply IBM Plex Mono globally for tech/data aesthetic */
+  body {
+    font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  }
+
   /* Global focus styles - use cyan primary color */
   *:focus-visible {
     outline: 2px solid var(--primary-value);
