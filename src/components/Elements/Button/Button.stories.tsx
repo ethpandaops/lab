@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import React from 'react';
 import { Button } from './Button';
 import { CheckCircleIcon, PlusIcon } from '@heroicons/react/20/solid';
 
@@ -512,4 +513,31 @@ export const FullWidth: Story = {
       </Button>
     </div>
   ),
+};
+
+// Interactive example with Headless UI features
+export const Interactive: Story = {
+  render: () => {
+    const [clicks, setClicks] = React.useState(0);
+
+    return (
+      <div className="flex flex-col gap-4">
+        <div className="text-sm text-muted">
+          Click count: {clicks} - Button uses Headless UI for accessibility and keyboard navigation
+        </div>
+        <div className="flex items-center gap-4">
+          <Button variant="primary" onClick={() => setClicks(c => c + 1)} leadingIcon={<PlusIcon />}>
+            Click me
+          </Button>
+          <Button variant="secondary" onClick={() => setClicks(0)}>
+            Reset
+          </Button>
+          <Button variant="outline" disabled={clicks === 0} onClick={() => setClicks(c => c - 1)}>
+            Decrement
+          </Button>
+        </div>
+        <div className="text-xs text-muted">Try using Tab to navigate and Space/Enter to activate buttons</div>
+      </div>
+    );
+  },
 };
