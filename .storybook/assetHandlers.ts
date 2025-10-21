@@ -7,7 +7,7 @@ const basePath = import.meta.env.STORYBOOK_BASE_PATH || '';
  * Creates MSW handlers to intercept and rewrite asset paths when running on GitHub Pages
  * Create a single catch-all handler for non-API requests
  */
-export function createCatchAllAssetHandler(): void {
+export function createCatchAllAssetHandler(): ReturnType<typeof http.get>[] {
   // Only create handler if we have a base path
   if (!basePath) {
     return [];
