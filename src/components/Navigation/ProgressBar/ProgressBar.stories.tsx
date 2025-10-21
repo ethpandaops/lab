@@ -121,6 +121,7 @@ export const Complete: Story = {
   args: {
     progress: 100,
     statusMessage: 'Deployment complete!',
+    fillColor: 'bg-success',
     segments: [
       { label: 'Copying files' },
       { label: 'Migrating database' },
@@ -140,5 +141,35 @@ export const Starting: Story = {
       { label: 'Compiling assets' },
       { label: 'Deployed' },
     ],
+  },
+};
+
+export const CustomColors: Story = {
+  name: 'Custom Fill Colors',
+  args: {
+    progress: 75,
+    statusMessage: 'Warning state (orange)',
+    fillColor: 'bg-warning',
+    backgroundColor: 'bg-zinc-800',
+  },
+};
+
+export const SuccessColor: Story = {
+  name: 'Success (Green)',
+  args: {
+    progress: 100,
+    statusMessage: 'All nodes ready!',
+    fillColor: 'bg-success',
+    backgroundColor: 'bg-zinc-800',
+  },
+};
+
+export const DangerColor: Story = {
+  name: 'Danger (Red)',
+  args: {
+    progress: 25,
+    statusMessage: 'Critical issues detected',
+    fillColor: 'bg-danger',
+    backgroundColor: 'bg-zinc-800',
   },
 };

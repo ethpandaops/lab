@@ -18,4 +18,8 @@ export interface ProgressBarProps {
   segments?: ProgressBarSegment[];
   /** Optional aria-label for accessibility */
   ariaLabel?: string;
+  /** Optional Tailwind background color class for the progress fill (e.g., 'bg-success', 'bg-warning'). Defaults to 'bg-primary' */
+  fillColor?: string;
+  /** Optional Tailwind background color class for the progress bar background. Defaults to 'bg-border' */
+  backgroundColor?: string;
 }
