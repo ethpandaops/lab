@@ -53,7 +53,7 @@ src/
     IndexPage.tsx                     # Landing page component
     experiments/                      # Main page directory - 95% of new pages go here
       IndexPage.tsx                   # Experiments list page
-      index.tsx                       # Barrel exports
+      index.ts                        # Barrel exports
       [experiment-name]/              # Individual experiment pages (most development happens here)
         IndexPage.tsx
         index.tsx
@@ -68,7 +68,7 @@ src/
     [other-section]/                  # Other page sections (rarely used)
       IndexPage.tsx                   # Section list/index page
       DetailPage.tsx                  # Detail page (if applicable)
-      index.tsx                       # Barrel exports
+      index.ts                        # Barrel exports
       components/                     # Page-specific components (optional)
       hooks/                          # Page-specific hooks (optional)
       contexts/                       # Page-specific contexts (optional)
@@ -85,7 +85,7 @@ src/
   providers/                          # React Context Providers
     [ProviderName]/                   # e.g., NetworkProvider, ThemeProvider
       [ProviderName].tsx
-      index.tsx
+      index.ts
 
   contexts/                           # React Context definitions
     [ContextName]/                    # e.g., NetworkContext, ThemeContext
