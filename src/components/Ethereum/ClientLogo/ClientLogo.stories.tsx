@@ -8,6 +8,13 @@ const meta = {
     layout: 'centered',
   },
   tags: ['autodocs'],
+  decorators: [
+    Story => (
+      <div className="min-w-[600px] rounded-sm bg-surface p-6">
+        <Story />
+      </div>
+    ),
+  ],
 } satisfies Meta<typeof ClientLogo>;
 
 export default meta;
@@ -59,6 +66,24 @@ export const Lodestar: Story = {
 };
 
 /**
+ * Tysm consensus client logo
+ */
+export const Tysm: Story = {
+  args: {
+    client: 'tysm',
+  },
+};
+
+/**
+ * Grandine consensus client logo
+ */
+export const Grandine: Story = {
+  args: {
+    client: 'grandine',
+  },
+};
+
+/**
  * Larger logo (32px)
  */
 export const Large: Story = {
@@ -92,6 +117,8 @@ export const MultipleClients: Story = {
       <ClientLogo client="teku" />
       <ClientLogo client="nimbus" />
       <ClientLogo client="lodestar" />
+      <ClientLogo client="tysm" />
+      <ClientLogo client="grandine" />
     </div>
   ),
 };
