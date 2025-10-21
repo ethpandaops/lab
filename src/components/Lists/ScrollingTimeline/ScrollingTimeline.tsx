@@ -109,7 +109,7 @@ export function ScrollingTimeline({
                 </div>
 
                 {/* Timeline dot */}
-                <div className="relative flex-shrink-0 pt-1.5">
+                <div className="relative flex h-6 flex-shrink-0 items-center">
                   <div
                     className={clsx(
                       'size-2 rounded-full transition-all duration-300',
@@ -124,7 +124,7 @@ export function ScrollingTimeline({
                 {item.icon && (
                   <div
                     className={clsx(
-                      'flex-shrink-0 pt-0.5',
+                      'flex h-6 flex-shrink-0 items-center',
                       status === 'active' && 'text-primary',
                       status === 'completed' && 'text-foreground dark:text-zinc-400',
                       status === 'pending' && 'text-muted dark:text-zinc-600'
@@ -135,7 +135,7 @@ export function ScrollingTimeline({
                 )}
 
                 {/* Content */}
-                <div className="min-w-0 flex-1 pt-0.5">
+                <div className="min-w-0 flex-1">
                   <div
                     className={clsx(
                       'text-sm/6 transition-colors duration-300',
