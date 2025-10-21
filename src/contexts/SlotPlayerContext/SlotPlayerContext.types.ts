@@ -63,6 +63,8 @@ export interface SlotPlayerCallbacks {
 
 export interface SlotPlayerProviderProps {
   children: ReactNode;
+  // Tables to get bounds from (e.g., ['fct_block', 'fct_attestation'])
+  tables: string[];
   // Initial slot to start at (defaults to maxSlot - 2)
   initialSlot?: number;
   // Initial playback mode
@@ -73,10 +75,6 @@ export interface SlotPlayerProviderProps {
   slotDuration?: number;
   // Initial playback speed
   playbackSpeed?: number;
-  // Table name to get bounds from (default: 'fct_slot')
-  tableName?: string;
-  // Target frame rate for playback updates (default: 60 fps)
-  targetFps?: number;
   // Event callbacks
   callbacks?: SlotPlayerCallbacks;
 }

@@ -1,5 +1,5 @@
 import { type UseQueryResult, useQuery } from '@tanstack/react-query';
-import type { Bounds, TableBounds } from './useBounds.types';
+import type { Bounds, TableBounds, TablesBoundsResult, AggregateBounds } from './useBounds.types';
 import { BASE_URL, PATH_PREFIX, REFETCH_INTERVALS } from '@/utils/api-config';
 import { useNetwork } from '@/hooks/useNetwork';
 
@@ -95,30 +95,33 @@ export function useTableBounds(tableName: string): UseQueryResult<TableBounds | 
 }
 
 /**
- * Get bounds for multiple tables.
+ * Get bounds for multiple tables with aggregated statistics.
  *
- * Uses the same cached bounds data, just filters to specified tables.
+ * Uses the same cached bounds data, filters to specified tables, and computes
+ * aggregate statistics across all tables.
  *
  * @example
  * ```tsx
  * function MultiTableStats() {
- *   const { data: tableBounds } = useTablesBounds(['fct_block', 'fct_attestation']);
+ *   const { data } = useTablesBounds(['fct_block', 'fct_attestation']);
  *
- *   if (!tableBounds) return null;
+ *   if (!data) return null;
  *
  *   return (
  *     <div>
- *       <div>Blocks: {tableBounds.fct_block?.min}</div>
- *       <div>Attestations: {tableBounds.fct_attestation?.min}</div>
+ *       <div>Blocks: {data.tables.fct_block?.min} - {data.tables.fct_block?.max}</div>
+ *       <div>Attestations: {data.tables.fct_attestation?.min} - {data.tables.fct_attestation?.max}</div>
+ *       <div>Overall range: {data.aggregate.minOfMins} - {data.aggregate.maxOfMaxes}</div>
+ *       <div>Intersection: {data.aggregate.maxOfMins} - {data.aggregate.minOfMaxes}</div>
  *     </div>
  *   );
  * }
  * ```
  */
-export function useTablesBounds(tableNames: string[]): UseQueryResult<Record<string, TableBounds>, Error> {
+export function useTablesBounds(tableNames: string[]): UseQueryResult<TablesBoundsResult, Error> {
   return useBounds({
-    select: bounds =>
-      tableNames.reduce(
+    select: bounds => {
+      const tables = tableNames.reduce(
         (acc, name) => {
           if (bounds[name]) {
             acc[name] = bounds[name];
@@ -126,6 +129,21 @@ export function useTablesBounds(tableNames: string[]): UseQueryResult<Record<str
           return acc;
         },
         {} as Record<string, TableBounds>
-      ),
+      );
+
+      const boundsArray = Object.values(tables);
+
+      const aggregate: AggregateBounds = {
+        minOfMins: boundsArray.length > 0 ? Math.min(...boundsArray.map(b => b.min)) : undefined,
+        maxOfMaxes: boundsArray.length > 0 ? Math.max(...boundsArray.map(b => b.max)) : undefined,
+        maxOfMins: boundsArray.length > 0 ? Math.max(...boundsArray.map(b => b.min)) : undefined,
+        minOfMaxes: boundsArray.length > 0 ? Math.min(...boundsArray.map(b => b.max)) : undefined,
+      };
+
+      return {
+        tables,
+        aggregate,
+      };
+    },
   });
 }

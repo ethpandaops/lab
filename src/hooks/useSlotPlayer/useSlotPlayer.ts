@@ -16,22 +16,29 @@ import type {
 } from '@/contexts/SlotPlayerContext';
 
 /**
- * PERFORMANCE OPTIMIZATION NOTE:
+ * PERFORMANCE OPTIMIZATION GUIDE
  *
- * This hook implementation uses context splitting to minimize re-renders.
- * For even finer-grained control, you can integrate use-context-selector:
+ * ## Context Splitting (Current Implementation)
  *
- * 1. Install: pnpm add use-context-selector
- * 2. Import: import { createContext, useContextSelector } from 'use-context-selector'
- * 3. Update context creation to use the library's createContext
- * 4. Use selectors in hooks:
- *    const currentSlot = useContextSelector(SlotPlayerStateContext, s => s.currentSlot)
+ * This hook uses context splitting to minimize re-renders by separating:
+ * - `SlotPlayerProgressContext` - Updates every frame (slotProgress)
+ * - `SlotPlayerStateContext` - Updates on state changes (currentSlot, isPlaying, etc.)
+ * - `SlotPlayerConfigContext` - Rarely changes (slotDuration, playbackSpeed, bounds)
+ * - `SlotPlayerActionsContext` - Stable actions (play, pause, goToSlot, etc.)
+ * - `SlotPlayerMetaContext` - Loading/error states
  *
- * This would allow components to subscribe to individual fields and only re-render
- * when that specific field changes, reducing re-renders by an additional 30-50%.
+ * **Best Practice**: Use individual hooks instead of `useSlotPlayer()` when possible:
  *
- * However, the current context splitting pattern already provides excellent performance
- * for most use cases, so this optimization is optional.
+ * ```tsx
+ * // ❌ Don't subscribe to everything if you only need actions
+ * const { actions } = useSlotPlayer();
+ *
+ * // ✅ Do subscribe only to what you need
+ * const actions = useSlotPlayerActions();
+ * ```
+ *
+ * This approach provides excellent performance by ensuring components only re-render
+ * when the specific context values they consume actually change.
  */
 
 /**

@@ -19,3 +19,6 @@ export type {
   SlotPlayerCallbacks,
   SlotPlayerContextValue,
 } from '@/contexts/SlotPlayerContext';
+
+// Re-export stable callback utility for convenience with SlotPlayer
+export { useStableCallback, hasUseEffectEvent } from '@/hooks/useStableCallback';
