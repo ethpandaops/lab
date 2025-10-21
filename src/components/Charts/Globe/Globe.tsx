@@ -35,6 +35,8 @@ export function GlobeChart({
   environment,
   lineColor = '#ff4683',
   pointColor = '#06b6d4',
+  pointSize = 2,
+  pointOpacity = 0.2,
 }: GlobeChartProps): React.JSX.Element {
   const [echartsInstance, setEchartsInstance] = useState<ECharts | null>(null);
 
@@ -72,22 +74,34 @@ export function GlobeChart({
 
     // Add scatter3D series for points
     if (points.length > 0) {
-      // Points data should be simple array of coordinates: [[lon, lat], [lon, lat], ...]
+      // Points data with name and value for tooltips
       series.push({
         type: 'scatter3D',
         coordinateSystem: 'globe',
         blendMode: 'lighter',
-        symbolSize: 2,
+        symbolSize: pointSize,
         itemStyle: {
           color: pointColor,
-          opacity: 0.2,
+          opacity: pointOpacity,
         },
-        data: points.map(point => point.coord),
+        data: points.map(point => ({
+          name: point.name,
+          value: [...point.coord, point.value || 0],
+        })),
       });
     }
 
     const chartOption = {
       backgroundColor: '#000',
+      tooltip: {
+        show: true,
+        formatter: (params: { name?: string; value?: number[] }) => {
+          if (params.name) {
+            return params.name;
+          }
+          return '';
+        },
+      },
       title: title
         ? {
             text: title,
@@ -125,7 +139,7 @@ export function GlobeChart({
     };
 
     return chartOption;
-  }, [lines, points, title, autoRotate, showEffect, baseTexture, heightTexture, environment, lineColor, pointColor]);
+  }, [lines, points, title, autoRotate, showEffect, baseTexture, heightTexture, environment, lineColor, pointColor, pointSize, pointOpacity]);
 
   useEffect(() => {
     if (echartsInstance) {
