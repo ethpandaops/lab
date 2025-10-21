@@ -111,17 +111,17 @@ src/
 
 ### Component Philosophy
 **Core Components** (`src/components/`):
-- App-wide, reusable UI building blocks
-- Generic and configurable for multiple use cases
-- Should work in any context without page-specific logic
-- Compose from other core components when logical (e.g., ButtonGroup uses Button, Divider uses Button/ButtonGroup)
-- Always have Storybook stories for documentation
+- App-wide reusable building blocks
+- Generic and configurable
+- Work in any context without page logic
+- Compose from other core components when logical
+- Always include Storybook stories
 
 **Page-Scoped Components** (`src/pages/[section]/components/`):
-- Only used within a specific page/section
-- Often compose multiple core components into page-specific aggregations
-- Highly specialized for that page's requirements
-- May contain business logic specific to that page
+- Used within specific page/section only
+- Compose core components for page needs
+- Contain page-specific business logic
+- Specialized for page requirements
 
 ### Core Component Categories
 Current categories in `src/components/`:
@@ -152,51 +152,51 @@ ComponentName/
   index.ts                              # Barrel export
 ```
 
-### Routing & Page Pattern
-- **Route files** (`src/routes/`): Thin route definitions using TanStack Router
-- **Page components** (`src/pages/`): Actual UI implementations
-- **Page-scoped components**: Located in `pages/[section]/components/` with same structure as shared components
-- **Dynamic routes**: Use `$param.tsx` syntax (e.g., `$id.tsx`)
-- **Page exports**: Always use barrel exports via `index.tsx`
+### Routing & Pages
+- Route files in `src/routes/` - thin TanStack Router definitions
+- Page components in `src/pages/` - UI implementations
+- Page-scoped components in `pages/[section]/components/`
+- Dynamic routes use `$param.tsx` syntax
+- Always barrel export via `index.tsx`
 
-### State Management Pattern
-- **Contexts** (`src/contexts/`): React Context definitions with types
-- **Providers** (`src/providers/`): Context providers that wrap the app/features
-- **Hooks** (`src/hooks/`): Custom hooks for accessing context and shared logic
+### State Management
+- Contexts in `src/contexts/` with types
+- Providers in `src/providers/` wrap app/features
+- Hooks in `src/hooks/` for context access and shared logic
 
 ### API Integration
-- All API code is auto-generated in `src/api/` (do not manually edit)
-- **Always use hooks from `src/api/@tanstack/react-query.gen.ts`** for API calls
-- These hooks handle fetching, caching, and state management automatically
+- Auto-generated code in `src/api/` - do not edit
+- Use hooks from `@/api/@tanstack/react-query.gen.ts`
+- Hooks handle fetching, caching, state management
 
 ## Development Guidelines
 
 ### Quick Reference
-- **Add new experiment**: Create route in `src/routes/experiments/`, page in `src/pages/experiments/[name]/`
-- **Add other route**: Create in `src/routes/[section]/`, reference page from `src/pages/[section]/`
-- **Add core component**: Place in `src/components/[category]/[ComponentName]/` (must be reusable, generic)
-- **Add page-scoped component**: Place in `src/pages/[section]/components/[ComponentName]/` (page-specific aggregations)
-- **Add new hook**: Create in `src/hooks/use[Name]/` with types and barrel export
-- **Add context**: Define in `src/contexts/`, implement provider in `src/providers/`
+- **New experiment**: Route in `src/routes/experiments/`, page in `src/pages/experiments/[name]/`
+- **Other route**: Route in `src/routes/[section]/`, page in `src/pages/[section]/`
+- **Core component**: `src/components/[category]/[ComponentName]/` - reusable, generic
+- **Page-scoped component**: `src/pages/[section]/components/[ComponentName]/` - page-specific
+- **Custom hook**: `src/hooks/use[Name]/` with types and barrel export
+- **Context**: Definition in `src/contexts/`, provider in `src/providers/`
 
-**Component Decision Tree**:
-- Will it be used across multiple pages? → Core component (`src/components/`)
-- Is it composing core components for a specific page? → Page-scoped (`src/pages/[section]/components/`)
-- Does it contain page-specific business logic? → Page-scoped (`src/pages/[section]/components/`)
+### Component Placement
+- Used across pages → `src/components/`
+- Composes core components for specific page → `src/pages/[section]/components/`
+- Contains page-specific logic → `src/pages/[section]/components/`
 
 ### Best Practices
-- Create Storybook stories for all core components (not needed for page-scoped)
-- Keep core components generic and reusable without page-specific logic
-- Compose core components in page-scoped components for specialized UI
-- Use `pnpm storybook` with Playwright MCP for rapid iteration
-- Write tests using Vitest for components and utilities
-- Use Tailwind CSS classes for styling (v4 syntax)
-- **Always use semantic color tokens from theme in `src/index.css`** (e.g., `bg-primary`, `text-foreground`)
+- Storybook stories for all core components
+- Keep core components generic and reusable
+- Compose core components in page-scoped components
+- Use `pnpm storybook` with Playwright MCP for iteration
+- Write Vitest tests for components and utilities
+- Use Tailwind v4 classes
+- Use semantic color tokens from `src/index.css` theme
 - Use TanStack Router for navigation
-- **Always use hooks from `@/api/@tanstack/react-query.gen.ts` for API calls** (never raw fetch)
-- Use path aliases (`@components/`, `@hooks/`, etc.) instead of relative imports
+- Use `@/api/@tanstack/react-query.gen.ts` hooks for API calls
+- Use path aliases over relative imports
 - Run `pnpm lint` and `pnpm build` before committing
-- use `clsx` for conditional class names
+- Use `clsx` for conditional classes
 
 ### Naming Conventions
 
@@ -211,11 +211,11 @@ ComponentName/
 ## Form Management
 
 ### Form Architecture
-- **One form context per page**: Each experiment page has its own FormProvider
-- **Reusable filter components**: Generic filter forms can be shared across experiments
-- **Page-scoped form logic**: Form state and submission handlers stay in the page component
+- One FormProvider per page
+- Reusable filter components across experiments
+- Form state and handlers in page component
 
-### Implementation Pattern
+### Implementation
 ```tsx
 // In experiment page (e.g., pages/experiments/[name]/IndexPage.tsx)
 const methods = useForm<FormData>({ defaultValues });
@@ -229,10 +229,10 @@ const { register, watch } = useFormContext(); // Access parent form
 ```
 
 ### Best Practices
-- Use single `useForm()` instance per page, pass via FormProvider
-- Access form in child components with `useFormContext()`
-- Keep validation schemas with form types (e.g., `FormData.types.ts`)
-- Generic filters go in `components/Forms/`, page-specific in `pages/[section]/components/`
+- Single `useForm()` per page via FormProvider
+- Child components use `useFormContext()`
+- Validation schemas with types in `FormData.types.ts`
+- Generic filters in `components/Forms/`, page-specific in `pages/[section]/components/`
 
 ## Theming
 
