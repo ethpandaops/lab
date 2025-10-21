@@ -293,7 +293,15 @@ export const InputGroup = forwardRef<HTMLInputElement, InputGroupProps>(
                 {trailingAddon}
               </div>
             )}
-            {trailingButton && <div className="-ml-px">{trailingButton}</div>}
+            {trailingButton && (
+              <div className="-ml-px flex">
+                {isValidElement(trailingButton)
+                  ? cloneElement(trailingButton, {
+                      className: clsx((trailingButton.props as { className?: string }).className, 'h-full'),
+                    } as Record<string, unknown>)
+                  : trailingButton}
+              </div>
+            )}
           </div>
         );
       }
