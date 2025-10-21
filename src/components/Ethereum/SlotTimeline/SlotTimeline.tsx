@@ -117,7 +117,7 @@ export function SlotTimeline({
             <div
               key={`${phase.label}-${index}`}
               className={clsx(
-                phase.color,
+                phase.className,
                 'relative transition-colors duration-200',
                 index < phasePositions.length - 1 && 'border-r border-border/50'
               )}
@@ -178,7 +178,7 @@ export function SlotTimeline({
               className="flex items-center gap-2"
             >
               {/* Color indicator */}
-              <div className={clsx('size-3 rounded-xs border border-border', phase.color)} />
+              <div className={clsx('size-3 rounded-xs border border-border', phase.className)} />
               {/* Phase label */}
               <span className="text-xs/4 text-muted">
                 {phase.label}

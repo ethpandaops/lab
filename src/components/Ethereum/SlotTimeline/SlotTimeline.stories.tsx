@@ -149,10 +149,10 @@ export const CustomPhases: Story = {
   name: 'Custom Phases',
   args: {
     phases: [
-      { label: 'Init', duration: 2, color: 'bg-primary' },
-      { label: 'Process', duration: 5, color: 'bg-secondary' },
-      { label: 'Validate', duration: 2, color: 'bg-success' },
-      { label: 'Finalize', duration: 1, color: 'bg-accent' },
+      { label: 'Init', duration: 2, className: 'bg-primary' },
+      { label: 'Process', duration: 5, className: 'bg-secondary' },
+      { label: 'Validate', duration: 2, className: 'bg-success' },
+      { label: 'Finalize', duration: 1, className: 'bg-accent' },
     ],
     currentTime: 4.5,
     showPhaseLabels: true,
