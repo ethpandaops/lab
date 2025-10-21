@@ -9,12 +9,15 @@ import { withThemeByClassName } from '@storybook/addon-themes';
 import { handlers, mockConfig, mockBounds } from './mocks';
 import '../src/index.css';
 
+// Get the base path from environment
+const basePath = import.meta.env.STORYBOOK_BASE_PATH || '';
+
 // Initialize MSW with correct service worker URL for GitHub Pages
 initialize({
   onUnhandledRequest: 'bypass',
   serviceWorker: {
-    // Use relative path that works both locally and on GitHub Pages
-    url: process.env.NODE_ENV === 'production' ? '/lab/mockServiceWorker.js' : '/mockServiceWorker.js',
+    // Use base path for service worker URL
+    url: basePath ? `${basePath}/mockServiceWorker.js` : '/mockServiceWorker.js',
   },
 });
 
@@ -81,7 +84,7 @@ const preview: Preview = {
   ] as ReactRenderer['decorators'],
   parameters: {
     msw: {
-      handlers,
+      handlers: handlers,
     },
     viewport: {
       viewports: INITIAL_VIEWPORTS,
