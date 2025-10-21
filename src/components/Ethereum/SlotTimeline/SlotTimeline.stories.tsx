@@ -102,6 +102,16 @@ export const Complete: Story = {
   },
 };
 
+export const WithCurrentTimeLabel: Story = {
+  name: 'With Current Time Label',
+  args: {
+    phases: DEFAULT_BEACON_SLOT_PHASES,
+    currentTime: 6,
+    showCurrentTime: true,
+    showPhaseLabels: true,
+  },
+};
+
 export const WithTimeLabels: Story = {
   name: 'With Time Labels',
   args: {

@@ -25,6 +25,7 @@ export function SlotTimeline({
   showTimeLabels = false,
   showPhaseLabels = false,
   showInlineLabels = true,
+  showCurrentTime = false,
   ariaLabel = 'Slot Timeline',
   height = 48,
   onTimeClick,
@@ -159,12 +160,14 @@ export function SlotTimeline({
         </div>
 
         {/* Current time label */}
-        <div
-          className="pointer-events-none absolute -top-6 transition-all duration-300"
-          style={{ left: `${currentTimePercent}%`, transform: 'translateX(-50%)' }}
-        >
-          <span className="text-xs/4 font-semibold text-foreground">{currentTime.toFixed(1)}s</span>
-        </div>
+        {showCurrentTime && (
+          <div
+            className="pointer-events-none absolute -top-6 transition-all duration-300"
+            style={{ left: `${currentTimePercent}%`, transform: 'translateX(-50%)' }}
+          >
+            <span className="text-xs/4 font-semibold text-foreground">{currentTime.toFixed(1)}s</span>
+          </div>
+        )}
       </div>
 
       {/* Phase labels below timeline */}

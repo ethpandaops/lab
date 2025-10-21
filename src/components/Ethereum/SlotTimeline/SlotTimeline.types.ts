@@ -13,6 +13,8 @@ export interface SlotTimelineProps {
   showPhaseLabels?: boolean;
   /** Show phase labels inside the timeline bars */
   showInlineLabels?: boolean;
+  /** Show current time indicator above the timeline */
+  showCurrentTime?: boolean;
   /** Optional aria-label for accessibility */
   ariaLabel?: string;
   /** Height of the timeline bar in pixels */
