@@ -22,7 +22,11 @@ export function IndexPage(): JSX.Element {
     return (
       <Container>
         <Header title="Fork Readiness" />
-        <Alert variant="error" title="Failed to load fork readiness data" description={error.message ?? 'Unable to fetch data'} />
+        <Alert
+          variant="error"
+          title="Failed to load fork readiness data"
+          description={error.message ?? 'Unable to fetch data'}
+        />
       </Container>
     );
   }
@@ -33,7 +37,11 @@ export function IndexPage(): JSX.Element {
 
       <div className="space-y-4">
         {upcomingForks.length > 0 ? (
-          <Disclosure title={`Upcoming Forks (${upcomingForks.length})`} defaultOpen className="overflow-hidden rounded-lg border border-border">
+          <Disclosure
+            title={`Upcoming Forks (${upcomingForks.length})`}
+            defaultOpen
+            className="overflow-hidden rounded-lg border border-border"
+          >
             <div className="space-y-8">
               {upcomingForks.map(fork => (
                 <ForkSection key={fork.forkName} fork={fork} />
@@ -41,7 +49,11 @@ export function IndexPage(): JSX.Element {
             </div>
           </Disclosure>
         ) : (
-          <Alert variant="info" title="No upcoming forks" description="There are no upcoming forks configured at this time." />
+          <Alert
+            variant="info"
+            title="No upcoming forks"
+            description="There are no upcoming forks configured at this time."
+          />
         )}
 
         {pastForks.map(fork => (

@@ -37,7 +37,10 @@ export function ProgressBar({
       {statusMessage && <p className="text-sm font-medium text-foreground">{statusMessage}</p>}
       <div aria-hidden="true" className="mt-6">
         <div className={clsx('relative overflow-hidden rounded-full', backgroundColor)}>
-          <div style={{ width: `${progress}%` }} className={clsx('h-2 rounded-full transition-all duration-300', fillColor)} />
+          <div
+            style={{ width: `${progress}%` }}
+            className={clsx('h-2 rounded-full transition-all duration-300', fillColor)}
+          />
 
           {processedSegments.map((segment, index) => {
             if (!segment.showMark) return null;
@@ -53,7 +56,12 @@ export function ProgressBar({
         </div>
 
         {processedSegments.length > 0 && (
-          <div className={clsx('mt-6 hidden text-sm font-medium text-muted sm:grid', `grid-cols-${processedSegments.length}`)}>
+          <div
+            className={clsx(
+              'mt-6 hidden text-sm font-medium text-muted sm:grid',
+              `grid-cols-${processedSegments.length}`
+            )}
+          >
             {processedSegments.map((segment, index) => (
               <div
                 key={`${segment.label}-label-${index}`}

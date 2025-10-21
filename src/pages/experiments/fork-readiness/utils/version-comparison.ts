@@ -43,9 +43,7 @@ export function parseVersion(version: string): VersionComponents {
  */
 function isActualPrerelease(prerelease: string): boolean {
   const lowerPrerelease = prerelease.toLowerCase();
-  return lowerPrerelease.startsWith('alpha') ||
-         lowerPrerelease.startsWith('beta') ||
-         lowerPrerelease.startsWith('rc');
+  return lowerPrerelease.startsWith('alpha') || lowerPrerelease.startsWith('beta') || lowerPrerelease.startsWith('rc');
 }
 
 /**

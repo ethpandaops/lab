@@ -63,26 +63,20 @@ export const GroupedDisclosures: Story = {
       <Disclosure
         title="Upcoming Forks (1)"
         defaultOpen={true}
-        className="border border-border rounded-lg overflow-hidden"
+        className="overflow-hidden rounded-lg border border-border"
       >
         <div className="space-y-2">
           <p className="text-foreground">Fusaka - Epoch 50688</p>
           <p className="text-muted">7 days remaining</p>
         </div>
       </Disclosure>
-      <Disclosure
-        title="Past: Electra"
-        className="border border-border rounded-lg overflow-hidden"
-      >
+      <Disclosure title="Past: Electra" className="overflow-hidden rounded-lg border border-border">
         <div className="space-y-2">
           <p className="text-foreground">Activated at epoch 2048</p>
           <p className="text-success">All nodes upgraded ✓</p>
         </div>
       </Disclosure>
-      <Disclosure
-        title="Past: Deneb"
-        className="border border-border rounded-lg overflow-hidden"
-      >
+      <Disclosure title="Past: Deneb" className="overflow-hidden rounded-lg border border-border">
         <div className="space-y-2">
           <p className="text-foreground">Activated at epoch 1024</p>
           <p className="text-success">All nodes upgraded ✓</p>

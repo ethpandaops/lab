@@ -43,10 +43,10 @@ export function ClientReadinessCard({ data }: ClientReadinessCardProps): JSX.Ele
       <div className="mt-4 space-y-2 border-t border-border pt-4">
         {nodes.map(node => (
           <div key={node.nodeName} className="flex items-center gap-3 text-xs/5">
-            <span className="min-w-0 flex-1 truncate font-mono text-foreground pr-8">
+            <span className="min-w-0 flex-1 truncate pr-8 font-mono text-foreground">
               {formatNodeName(node.nodeName)}
             </span>
-            <span className="flex-shrink-0">
+            <span className="shrink-0">
               <Badge color={node.isReady ? 'green' : 'red'} variant="flat">
                 {node.version}
               </Badge>
