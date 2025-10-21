@@ -139,7 +139,20 @@ export function GlobeChart({
     };
 
     return chartOption;
-  }, [lines, points, title, autoRotate, showEffect, baseTexture, heightTexture, environment, lineColor, pointColor, pointSize, pointOpacity]);
+  }, [
+    lines,
+    points,
+    title,
+    autoRotate,
+    showEffect,
+    baseTexture,
+    heightTexture,
+    environment,
+    lineColor,
+    pointColor,
+    pointSize,
+    pointOpacity,
+  ]);
 
   useEffect(() => {
     if (echartsInstance) {
