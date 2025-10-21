@@ -182,6 +182,7 @@ ComponentName/
 
 ### Quick Reference
 - **New experiment**: Route in `src/routes/experiments/`, page in `src/pages/experiments/[name]/`
+- **Experiment image**: `public/images/experiments/[name].png` for social sharing
 - **Other route**: Route in `src/routes/[section]/`, page in `src/pages/[section]/`
 - **Core component**: `src/components/[category]/[ComponentName]/` - reusable, generic
 - **Page-scoped component**: `src/pages/[section]/components/[ComponentName]/` - page-specific
@@ -245,6 +246,42 @@ const { register, watch } = useFormContext(); // Access parent form
 - Child components use `useFormContext()`
 - Validation schemas with types in `FormData.types.ts`
 - Generic filters in `components/Forms/`, page-specific in `pages/[section]/components/`
+
+## Head Meta & SEO
+
+### Meta Hierarchy
+- Base meta tags defined in `src/routes/__root.tsx`
+- Routes override with `head: () => ({ meta: [...] })`
+- Child routes inherit and can extend parent meta
+- **No variables in head**: Only use literals and `import.meta.env.VITE_*` (processed by build plugin)
+
+### Experiment Feature Images
+**Standard**: Each experiment should have a feature image at:
+```
+public/images/experiments/[experiment-name].png
+```
+
+**Route Implementation**:
+```tsx
+// In routes/experiments/[experiment-name].tsx
+head: () => ({
+  meta: [
+    { title: `Experiment Name | ${import.meta.env.VITE_BASE_TITLE}` },
+    { name: 'description', content: 'Unique description of what this experiment does' },
+    { property: 'og:image', content: '/images/experiments/[experiment-name].png' },
+    { property: 'og:description', content: 'Unique description of what this experiment does' },
+    { name: 'twitter:image', content: '/images/experiments/[experiment-name].png' },
+    { name: 'twitter:description', content: 'Unique description of what this experiment does' },
+  ],
+})
+```
+
+### Best Practices
+- Always include experiment-specific title
+- Write unique description for each experiment
+- Update all three descriptions (meta, og:description, twitter:description)
+- Provide unique feature image per experiment
+- Set og:image and twitter:image for social sharing
 
 ## Theming
 
