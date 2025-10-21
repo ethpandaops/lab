@@ -22,4 +22,6 @@ export interface ProgressBarProps {
   fillColor?: string;
   /** Optional Tailwind background color class for the progress bar background. Defaults to 'bg-border' */
   backgroundColor?: string;
+  /** Disable CSS transitions for high-frequency updates (60fps animations). Defaults to false */
+  disableTransition?: boolean;
 }
