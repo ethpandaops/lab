@@ -25,9 +25,9 @@ export function SlotViewTimeline({
   return (
     <div className="w-full">
       {/* Header with title, controls, and current time */}
-      <div className="mb-4 flex items-center justify-between">
-        {/* Title and Live indicator */}
-        <div className="flex items-center gap-3">
+      <div className="mb-4 flex items-center justify-between gap-6">
+        {/* Left: Title and Live indicator */}
+        <div className="flex min-w-0 flex-1 items-center gap-3">
           <h2 className="text-xl font-semibold text-foreground">{title}</h2>
           {isLive && (
             <div className="flex items-center gap-2">
@@ -37,8 +37,8 @@ export function SlotViewTimeline({
           )}
         </div>
 
-        {/* Playback controls */}
-        <div className="flex items-center gap-2">
+        {/* Center: Playback controls */}
+        <div className="flex shrink-0 items-center gap-2">
           {/* Backward button */}
           <button
             type="button"
@@ -73,8 +73,8 @@ export function SlotViewTimeline({
           </button>
         </div>
 
-        {/* Current time display */}
-        <div className="flex items-center gap-2">
+        {/* Right: Current time display */}
+        <div className="ml-auto flex items-center gap-2">
           <span className="text-2xl font-semibold text-foreground">{currentTime.toFixed(1)}</span>
           <span className="text-sm text-muted">sec</span>
         </div>
