@@ -69,6 +69,7 @@ export function Dialog({
   showCloseButton = true,
   footer,
   className = '',
+  allowContentOverflow = false,
 }: DialogProps): JSX.Element {
   return (
     <Transition show={open} as={Fragment}>
@@ -99,7 +100,8 @@ export function Dialog({
           >
             <DialogPanel
               className={clsx(
-                'divide-y divide-border overflow-hidden rounded-sm bg-white shadow-xl dark:divide-white/10 dark:bg-zinc-800/50 dark:shadow-none dark:outline dark:-outline-offset-1 dark:outline-white/10',
+                'divide-y divide-border rounded-sm bg-white shadow-xl dark:divide-white/10 dark:bg-zinc-800/50 dark:shadow-none dark:outline dark:-outline-offset-1 dark:outline-white/10',
+                allowContentOverflow ? 'overflow-visible' : 'overflow-hidden',
                 sizeClasses[size],
                 className
               )}

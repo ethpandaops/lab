@@ -39,4 +39,8 @@ export interface DialogProps {
    * Additional CSS classes for the dialog panel
    */
   className?: string;
+  /**
+   * Whether content should overflow (useful for dropdowns/selects) (default: false)
+   */
+  allowContentOverflow?: boolean;
 }

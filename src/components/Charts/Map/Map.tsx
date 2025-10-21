@@ -24,11 +24,14 @@ import { resolveCssColorToHex } from '@/utils/colour';
  */
 export function MapChart({
   routes = [],
+  points = [],
   title,
   height = 600,
   showEffect = true,
   environment = '#333',
   lineColor,
+  pointColor,
+  pointSize = 4,
   mapColor = '#000',
   distance = 70,
   alpha = 89,
@@ -70,7 +73,7 @@ export function MapChart({
     const loadWorldMap = async (): Promise<void> => {
       try {
         // Fetch world map GeoJSON from local public directory
-        const response = await fetch('/images/echarts/world.json');
+        const response = await fetch('/data/maps/world.json');
         const worldGeoJson = await response.json();
 
         // Register the map with echarts
@@ -78,6 +81,7 @@ export function MapChart({
         setMapLoaded(true);
       } catch (error) {
         console.error('Failed to load world map:', error);
+        setMapLoaded(false);
       }
     };
 
@@ -92,8 +96,77 @@ export function MapChart({
       name: route.name,
     }));
 
+    // Prepare point data for scatter3D
+    const pointData = points.map(point => ({
+      name: point.name,
+      value: [...point.coords, point.value || 1],
+    }));
+
+    const series: any[] = [];
+
+    // Add routes series if there are routes
+    if (routes.length > 0) {
+      series.push({
+        type: 'lines3D',
+        coordinateSystem: 'geo3D',
+        effect: showEffect
+          ? {
+              show: true,
+              trailWidth: 1,
+              trailOpacity: 0.5,
+              trailLength: 0.2,
+              constantSpeed: 5,
+            }
+          : undefined,
+        blendMode: 'lighter',
+        lineStyle: {
+          width: 0.2,
+          color: lineColor || themeColors.primary,
+          opacity: 0.05,
+        },
+        data: routeData,
+      });
+    }
+
+    // Add points series if there are points
+    if (points.length > 0) {
+      series.push({
+        type: 'scatter3D',
+        coordinateSystem: 'geo3D',
+        symbol: 'circle',
+        symbolSize: pointSize,
+        itemStyle: {
+          color: pointColor || themeColors.primary,
+          opacity: 0.8,
+        },
+        label: {
+          show: false,
+        },
+        emphasis: {
+          label: {
+            show: false,
+          },
+        },
+        data: pointData,
+      });
+    }
+
     return {
       backgroundColor: environment,
+      tooltip: {
+        show: true,
+        formatter: (params: any) => {
+          if (params.seriesType === 'scatter3D' && params.data) {
+            const name = params.data.name || 'Unknown';
+            const value = params.data.value?.[2] || params.data.value || 0;
+            return `<strong>${name}</strong>: ${value}`;
+          }
+          if (params.seriesType === 'lines3D' && params.data) {
+            return params.data.name || 'Route';
+          }
+          return params.name || '';
+        },
+      },
       title: title
         ? {
             text: title,
@@ -141,30 +214,23 @@ export function MapChart({
         },
         regionHeight: regionHeight,
       },
-      series: [
-        {
-          type: 'lines3D',
-          coordinateSystem: 'geo3D',
-          effect: showEffect
-            ? {
-                show: true,
-                trailWidth: 1,
-                trailOpacity: 0.5,
-                trailLength: 0.2,
-                constantSpeed: 5,
-              }
-            : undefined,
-          blendMode: 'lighter',
-          lineStyle: {
-            width: 0.2,
-            color: lineColor || themeColors.primary,
-            opacity: 0.05,
-          },
-          data: routeData,
-        },
-      ],
+      series,
     };
-  }, [routes, title, showEffect, environment, lineColor, mapColor, distance, alpha, regionHeight, themeColors]);
+  }, [
+    routes,
+    points,
+    title,
+    showEffect,
+    environment,
+    lineColor,
+    pointColor,
+    pointSize,
+    mapColor,
+    distance,
+    alpha,
+    regionHeight,
+    themeColors,
+  ]);
 
   useEffect(() => {
     if (echartsInstance) {
