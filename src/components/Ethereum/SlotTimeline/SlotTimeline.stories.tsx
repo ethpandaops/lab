@@ -36,7 +36,7 @@ export const WithClickHandler: Story = {
   args: {
     phases: DEFAULT_BEACON_SLOT_PHASES,
     currentTime: 5.5,
-    onTimeClick: (timeMs) => {
+    onTimeClick: timeMs => {
       alert(`Clicked at ${timeMs}ms (${(timeMs / 1000).toFixed(2)}s)`);
     },
   },
@@ -149,13 +149,49 @@ export const CustomPhases: Story = {
   name: 'Custom Phases',
   args: {
     phases: [
-      { label: 'Init', duration: 2, className: 'bg-primary' },
-      { label: 'Process', duration: 5, className: 'bg-secondary' },
-      { label: 'Validate', duration: 2, className: 'bg-success' },
-      { label: 'Finalize', duration: 1, className: 'bg-accent' },
+      { label: 'Init', duration: 2, className: 'bg-primary', textClassName: 'text-white' },
+      { label: 'Process', duration: 5, className: 'bg-secondary', textClassName: 'text-white' },
+      { label: 'Validate', duration: 2, className: 'bg-success', textClassName: 'text-white' },
+      { label: 'Finalize', duration: 1, className: 'bg-accent', textClassName: 'text-white' },
     ],
     currentTime: 4.5,
     showPhaseLabels: true,
+  },
+};
+
+// Custom text colors example
+export const CustomTextColors: Story = {
+  name: 'Custom Text Colors',
+  args: {
+    phases: [
+      {
+        label: 'Light Phase',
+        duration: 3,
+        className: 'bg-white border border-border',
+        textClassName: 'text-foreground',
+      },
+      {
+        label: 'Dark Phase',
+        duration: 3,
+        className: 'bg-slate-900',
+        textClassName: 'text-white',
+      },
+      {
+        label: 'Accent Phase',
+        duration: 3,
+        className: 'bg-amber-200',
+        textClassName: 'text-amber-900',
+      },
+      {
+        label: 'Primary Phase',
+        duration: 3,
+        className: 'bg-cyan-500',
+        textClassName: 'text-cyan-50',
+      },
+    ],
+    currentTime: 6,
+    showPhaseLabels: true,
+    showInlineLabels: true,
   },
 };
 

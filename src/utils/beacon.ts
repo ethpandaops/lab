@@ -12,8 +12,10 @@ export interface SlotPhase {
   label: string;
   /** Duration of this phase in seconds */
   duration: number;
-  /** Tailwind classes to apply to this phase (e.g., 'bg-primary', 'bg-success border-2') */
+  /** Tailwind classes to apply to this phase background (e.g., 'bg-primary', 'bg-success border-2') */
   className: string;
+  /** Tailwind classes to apply to the phase text (e.g., 'text-white', 'text-foreground') */
+  textClassName?: string;
   /** Optional description for accessibility */
   description?: string;
 }
@@ -30,19 +32,22 @@ export const DEFAULT_BEACON_SLOT_PHASES: SlotPhase[] = [
   {
     label: 'Block Proposal',
     duration: 4,
-    className: 'bg-primary',
+    className: 'bg-cyan-500',
+    textClassName: 'text-cyan-950 font-bold',
     description: 'Proposer broadcasts block',
   },
   {
     label: 'Attestations',
     duration: 4,
-    className: 'bg-success',
+    className: 'bg-green-500',
+    textClassName: 'text-green-950 font-bold',
     description: 'Validators attest to block',
   },
   {
     label: 'Aggregations',
     duration: 4,
-    className: 'bg-warning',
+    className: 'bg-amber-500',
+    textClassName: 'text-amber-950 font-bold',
     description: 'Attestations aggregated',
   },
 ];

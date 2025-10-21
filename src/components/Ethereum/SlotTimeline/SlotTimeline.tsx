@@ -105,7 +105,7 @@ export function SlotTimeline({
           onClick={handleTimelineClick}
           onMouseMove={handleMouseMove}
           onMouseLeave={handleMouseLeave}
-          onKeyDown={(e) => {
+          onKeyDown={e => {
             if (e.key === 'Enter' || e.key === ' ') {
               e.preventDefault();
               handleTimelineClick(e as unknown as React.MouseEvent<HTMLDivElement>);
@@ -127,7 +127,7 @@ export function SlotTimeline({
               {/* Inline phase labels */}
               {showInlineLabels && (
                 <div className="absolute inset-0 flex items-center justify-center px-2">
-                  <span className="truncate text-xs/4 font-medium text-background/90">
+                  <span className={clsx('truncate text-xs/4', phase.textClassName ?? 'font-medium text-background/90')}>
                     {phase.label}
                   </span>
                 </div>
@@ -135,7 +135,7 @@ export function SlotTimeline({
               {/* Optional time labels inside segments */}
               {showTimeLabels && !showInlineLabels && (
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-2xs/4 font-medium text-background/80">
+                  <span className={clsx('text-2xs/4', phase.textClassName ?? 'font-medium text-background/80')}>
                     {phase.startTime}s
                   </span>
                 </div>
@@ -163,9 +163,7 @@ export function SlotTimeline({
           className="pointer-events-none absolute -top-6 transition-all duration-300"
           style={{ left: `${currentTimePercent}%`, transform: 'translateX(-50%)' }}
         >
-          <span className="text-xs/4 font-semibold text-foreground">
-            {currentTime.toFixed(1)}s
-          </span>
+          <span className="text-xs/4 font-semibold text-foreground">{currentTime.toFixed(1)}s</span>
         </div>
       </div>
 
@@ -173,20 +171,13 @@ export function SlotTimeline({
       {showPhaseLabels && phases.length > 0 && (
         <div className="mt-8 flex gap-4">
           {phasePositions.map((phase, index) => (
-            <div
-              key={`${phase.label}-label-${index}`}
-              className="flex items-center gap-2"
-            >
+            <div key={`${phase.label}-label-${index}`} className="flex items-center gap-2">
               {/* Color indicator */}
               <div className={clsx('size-3 rounded-xs border border-border', phase.className)} />
               {/* Phase label */}
               <span className="text-xs/4 text-muted">
                 {phase.label}
-                {showTimeLabels && (
-                  <span className="ml-1 text-2xs/4 text-muted/70">
-                    ({phase.duration}s)
-                  </span>
-                )}
+                {showTimeLabels && <span className="text-2xs/4 ml-1 text-muted/70">({phase.duration}s)</span>}
               </span>
             </div>
           ))}
