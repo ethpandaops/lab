@@ -114,7 +114,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     );
 
     // Render icon with appropriate styles
-    const renderIcon = (icon: React.ReactNode, position: 'leading' | 'trailing') => {
+    const renderIcon = (icon: React.ReactNode, position: 'leading' | 'trailing'): React.ReactNode | null => {
       if (!icon || !isValidElement(icon)) return null;
 
       return cloneElement(icon, {
