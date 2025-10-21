@@ -3,10 +3,10 @@ import { Card } from '@/components/Layout/Card';
 import { LoadingContainer } from '@/components/Layout/LoadingContainer';
 
 /**
- * Loading skeleton for contributor cards
+ * Loading skeleton for user cards
  * Simplified version that suggests the layout without excessive detail
  */
-export function ContributorLoading(): JSX.Element {
+export function UserCardSkeleton(): JSX.Element {
   return (
     <Card>
       <div className="flex w-full items-center justify-between gap-x-6">

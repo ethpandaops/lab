@@ -1,11 +1,11 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Container } from '@/components/Layout/Container';
 import { Header } from '@/components/Layout/Header';
-import { ContributorDetailsLoader } from './ContributorDetailsLoader';
+import { UserDetailsSkeleton } from './UserDetailsSkeleton';
 
 const meta = {
-  title: 'Pages/Contributors/ContributorDetailsLoader',
-  component: ContributorDetailsLoader,
+  title: 'Pages/Contributors/UserDetailsSkeleton',
+  component: UserDetailsSkeleton,
   parameters: {
     layout: 'fullscreen',
   },
@@ -20,7 +20,7 @@ const meta = {
     ),
   ],
   tags: ['autodocs'],
-} satisfies Meta<typeof ContributorDetailsLoader>;
+} satisfies Meta<typeof UserDetailsSkeleton>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;

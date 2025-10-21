@@ -4,10 +4,10 @@ import { Card } from '@/components/Layout/Card';
 import { ClientLogo } from '@/components/Ethereum/ClientLogo';
 import { MapPinIcon, ServerIcon } from '@heroicons/react/20/solid';
 import { Badge } from '@/components/Elements/Badge';
-import type { ContributorCardProps } from './ContributorCard.types';
+import type { UserCardProps } from './UserCard.types';
 import { getClassificationBadgeColor, getCountryFlag, getRelativeTime } from './utils';
 
-export function ContributorCard({
+export function UserCard({
   username,
   classification,
   nodeCount,
@@ -18,7 +18,7 @@ export function ContributorCard({
   clientVersion,
   consensusImplementations,
   to,
-}: ContributorCardProps): JSX.Element {
+}: UserCardProps): JSX.Element {
   const countryFlag = primaryCountry ? getCountryFlag(primaryCountry) : '';
   const hasClients = consensusImplementations && consensusImplementations.length > 0;
   const badgeColor = getClassificationBadgeColor(classification);

@@ -3,10 +3,10 @@ import { Card } from '@/components/Layout/Card';
 import { LoadingContainer } from '@/components/Layout/LoadingContainer';
 
 /**
- * Loading skeleton for contributor detail page
+ * Loading skeleton for user detail page
  * Mirrors the structure of the DetailPage component
  */
-export function ContributorDetailsLoader(): JSX.Element {
+export function UserDetailsSkeleton(): JSX.Element {
   return (
     <>
       {/* Back link */}

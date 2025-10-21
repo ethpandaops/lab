@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { ContributorLoading } from './ContributorLoading';
+import { UserCardSkeleton } from './UserCardSkeleton';
 
 const meta = {
-  title: 'Pages/Contributors/ContributorLoading',
-  component: ContributorLoading,
+  title: 'Pages/Contributors/UserCardSkeleton',
+  component: UserCardSkeleton,
   parameters: {
     layout: 'centered',
   },
@@ -15,7 +15,7 @@ const meta = {
     ),
   ],
   tags: ['autodocs'],
-} satisfies Meta<typeof ContributorLoading>;
+} satisfies Meta<typeof UserCardSkeleton>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
@@ -25,10 +25,10 @@ export const Default: Story = {};
 export const Multiple: Story = {
   render: () => (
     <div className="space-y-4">
-      <ContributorLoading />
-      <ContributorLoading />
-      <ContributorLoading />
-      <ContributorLoading />
+      <UserCardSkeleton />
+      <UserCardSkeleton />
+      <UserCardSkeleton />
+      <UserCardSkeleton />
     </div>
   ),
 };
@@ -36,10 +36,10 @@ export const Multiple: Story = {
 export const InGrid: Story = {
   render: () => (
     <div className="grid gap-4 sm:grid-cols-1 lg:grid-cols-2">
-      <ContributorLoading />
-      <ContributorLoading />
-      <ContributorLoading />
-      <ContributorLoading />
+      <UserCardSkeleton />
+      <UserCardSkeleton />
+      <UserCardSkeleton />
+      <UserCardSkeleton />
     </div>
   ),
 };

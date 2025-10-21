@@ -1,6 +1,6 @@
-export type ContributorClassification = 'individual' | 'corporate' | 'internal' | 'unclassified';
+export type UserClassification = 'individual' | 'corporate' | 'internal' | 'unclassified';
 
-export interface ContributorCardProps {
+export interface UserCardProps {
   /**
    * The contributor's username (e.g., "sparingparsley27")
    */
@@ -8,7 +8,7 @@ export interface ContributorCardProps {
   /**
    * Classification of the contributor
    */
-  classification: ContributorClassification;
+  classification: UserClassification;
   /**
    * Number of active nodes
    */
