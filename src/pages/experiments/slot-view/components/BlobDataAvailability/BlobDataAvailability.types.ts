@@ -56,6 +56,12 @@ export interface BlobDataAvailabilityProps {
    */
   continentalPropagationData?: ContinentalPropagationSeries[];
   /**
+   * Current time in seconds from slot start (0-12)
+   * Only data up to this time will be rendered
+   * @default maxTime (shows all data)
+   */
+  currentTime?: number;
+  /**
    * Maximum time value for x-axis (in seconds)
    * @default 12
    */

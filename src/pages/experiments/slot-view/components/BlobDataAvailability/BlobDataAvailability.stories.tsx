@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { useEffect, useState } from 'react';
 import { BlobDataAvailability } from './BlobDataAvailability';
 
 const meta: Meta<typeof BlobDataAvailability> = {
@@ -110,7 +111,76 @@ const allContinentsPropagationData = [
 ];
 
 /**
- * Default story with all continents showing blob data propagation
+ * Default story with all continents showing blob data propagation up to 2.5s
+ */
+export const Default: Story = {
+  args: {
+    currentTime: 2.5,
+    firstSeenData: sampleFirstSeenData,
+    availabilityRateData: sampleAvailabilityRateData,
+    continentalPropagationData: allContinentsPropagationData,
+  },
+};
+
+/**
+ * Interactive story with auto-progress - simulates live slot progression
+ */
+export const Interactive: Story = {
+  name: 'Interactive with Auto-Progress',
+  render: () => {
+    const [currentTime, setCurrentTime] = useState(0);
+    const [isPlaying, setIsPlaying] = useState(true);
+
+    // Auto-increment when playing
+    useEffect(() => {
+      if (!isPlaying) return;
+
+      const interval = setInterval(() => {
+        setCurrentTime(prev => {
+          const next = prev + 0.1;
+          if (next >= 12) {
+            setIsPlaying(false);
+            return 12;
+          }
+          return next;
+        });
+      }, 100);
+
+      return () => clearInterval(interval);
+    }, [isPlaying]);
+
+    return (
+      <div className="space-y-4">
+        <div className="flex items-center gap-4">
+          <button
+            type="button"
+            onClick={() => setIsPlaying(!isPlaying)}
+            className="rounded-sm border border-border bg-surface px-4 py-2 text-sm font-medium text-foreground hover:bg-muted"
+          >
+            {isPlaying ? 'Pause' : 'Play'}
+          </button>
+          <button
+            type="button"
+            onClick={() => setCurrentTime(0)}
+            className="rounded-sm border border-border bg-surface px-4 py-2 text-sm font-medium text-foreground hover:bg-muted"
+          >
+            Reset
+          </button>
+          <span className="text-sm text-muted">Current time: {currentTime.toFixed(1)}s</span>
+        </div>
+        <BlobDataAvailability
+          currentTime={currentTime}
+          firstSeenData={sampleFirstSeenData}
+          availabilityRateData={sampleAvailabilityRateData}
+          continentalPropagationData={allContinentsPropagationData}
+        />
+      </div>
+    );
+  },
+};
+
+/**
+ * All continents showing full blob data propagation
  */
 export const AllContinents: Story = {
   args: {
@@ -376,5 +446,57 @@ export const NoPropagationData: Story = {
     firstSeenData: sampleFirstSeenData,
     availabilityRateData: sampleAvailabilityRateData,
     continentalPropagationData: [],
+  },
+};
+
+/**
+ * Early phase - showing data up to 1 second
+ */
+export const EarlyPhase: Story = {
+  name: 'Early Phase (1s)',
+  args: {
+    currentTime: 1.0,
+    firstSeenData: sampleFirstSeenData,
+    availabilityRateData: sampleAvailabilityRateData,
+    continentalPropagationData: allContinentsPropagationData,
+  },
+};
+
+/**
+ * Peak phase - showing data up to 1.5 seconds
+ */
+export const PeakPhase: Story = {
+  name: 'Peak Phase (1.5s)',
+  args: {
+    currentTime: 1.5,
+    firstSeenData: sampleFirstSeenData,
+    availabilityRateData: sampleAvailabilityRateData,
+    continentalPropagationData: allContinentsPropagationData,
+  },
+};
+
+/**
+ * Complete phase - all data visible
+ */
+export const CompletePhase: Story = {
+  name: 'Complete Phase (12s)',
+  args: {
+    currentTime: 12.0,
+    firstSeenData: sampleFirstSeenData,
+    availabilityRateData: sampleAvailabilityRateData,
+    continentalPropagationData: allContinentsPropagationData,
+  },
+};
+
+/**
+ * Very early - no blobs seen yet
+ */
+export const VeryEarly: Story = {
+  name: 'Very Early (0.5s)',
+  args: {
+    currentTime: 0.5,
+    firstSeenData: sampleFirstSeenData,
+    availabilityRateData: sampleAvailabilityRateData,
+    continentalPropagationData: allContinentsPropagationData,
   },
 };

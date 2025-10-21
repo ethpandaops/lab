@@ -13,9 +13,12 @@ import type { BlobDataAvailabilityProps } from './BlobDataAvailability.types';
  * 2. Data is Available Rate - Line chart showing node availability over time
  * 3. Continental Proportion - Step chart showing cumulative distribution
  *
+ * Charts only render data up to the current slot time, simulating live progression.
+ *
  * @example
  * ```tsx
  * <BlobDataAvailability
+ *   currentTime={4.5}
  *   firstSeenData={[{ time: 1.42, blobId: '0', color: '#06b6d4' }]}
  *   availabilityRateData={[{ time: 0, nodes: 0 }, { time: 1, nodes: 25 }]}
  *   continentalPropagationData={[
@@ -29,9 +32,12 @@ export function BlobDataAvailability({
   firstSeenData = [],
   availabilityRateData = [],
   continentalPropagationData = [],
+  currentTime,
   maxTime = 12,
   className,
 }: BlobDataAvailabilityProps): JSX.Element {
+  // Default currentTime to maxTime to show all data if not specified
+  const effectiveCurrentTime = currentTime ?? maxTime;
   const [themeColors] = useState(() => {
     const root = document.documentElement;
     const computedStyle = getComputedStyle(root);
@@ -72,9 +78,10 @@ export function BlobDataAvailability({
     };
   });
 
-  // Prepare First Seen scatter chart data
+  // Prepare First Seen scatter chart data - only show blobs seen up to current time
   const firstSeenOption = useMemo(() => {
-    const scatterData = firstSeenData.map(point => [point.time, point.blobId, point.color]);
+    const visibleData = firstSeenData.filter(point => point.time <= effectiveCurrentTime);
+    const scatterData = visibleData.map(point => [point.time, point.blobId, point.color]);
     const uniqueBlobIds = [...new Set(firstSeenData.map(p => p.blobId))].sort();
 
     return {
@@ -185,12 +192,13 @@ export function BlobDataAvailability({
         left: 'center',
       },
     };
-  }, [firstSeenData, themeColors, maxTime]);
+  }, [firstSeenData, themeColors, maxTime, effectiveCurrentTime]);
 
-  // Prepare Data is Available Rate line chart data
+  // Prepare Data is Available Rate line chart data - only show data up to current time
   const availabilityRateOption = useMemo(() => {
-    const times = availabilityRateData.map(p => p.time);
-    const nodes = availabilityRateData.map(p => p.nodes);
+    const visibleData = availabilityRateData.filter(point => point.time <= effectiveCurrentTime);
+    const times = visibleData.map(p => p.time);
+    const nodes = visibleData.map(p => p.nodes);
 
     return {
       animation: false,
@@ -324,9 +332,9 @@ export function BlobDataAvailability({
         left: 'center',
       },
     };
-  }, [availabilityRateData, themeColors, maxTime]);
+  }, [availabilityRateData, themeColors, maxTime, effectiveCurrentTime]);
 
-  // Prepare Continental Propagation chart data - CDF per continent
+  // Prepare Continental Propagation chart data - CDF per continent, only show data up to current time
   const continentalPropagationOption = useMemo(() => {
     // Default colors for continents
     const defaultColors = [
@@ -337,6 +345,12 @@ export function BlobDataAvailability({
       '#3b82f6', // blue
       '#a855f7', // purple
     ];
+
+    // Filter each continent's data to only show points up to current time
+    const visiblePropagationData = continentalPropagationData.map(continent => ({
+      ...continent,
+      data: continent.data.filter(point => point.time <= effectiveCurrentTime),
+    }));
 
     return {
       animation: false,
@@ -417,7 +431,7 @@ export function BlobDataAvailability({
           formatter: '{value}%',
         },
       },
-      series: continentalPropagationData.map((continent, idx) => ({
+      series: visiblePropagationData.map((continent, idx) => ({
         name: continent.continent,
         data: continent.data.map(point => [point.time, point.percentage]),
         type: 'line',
@@ -430,7 +444,7 @@ export function BlobDataAvailability({
         },
       })),
       legend: {
-        show: continentalPropagationData.length > 0,
+        show: visiblePropagationData.length > 0,
         orient: 'horizontal',
         bottom: 8,
         left: 'center',
@@ -460,7 +474,7 @@ export function BlobDataAvailability({
         },
       },
     };
-  }, [continentalPropagationData, themeColors, maxTime]);
+  }, [continentalPropagationData, themeColors, maxTime, effectiveCurrentTime]);
 
   return (
     <div className={clsx('grid grid-cols-12 gap-4', className)}>
