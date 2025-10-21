@@ -1,38 +1,20 @@
 import { defineConfig } from 'vitest/config';
-import { storybookTest } from '@storybook/addon-vitest/vitest-plugin';
 import react from '@vitejs/plugin-react';
 import path from 'path';
 
 /**
- * Vitest config for Storybook tests
+ * Vitest config for unit tests only
  *
- * This is the original working config restored. The storybookTest plugin MUST be
- * at the root plugins level, not nested inside test.projects (known Storybook limitation).
- *
- * For unit tests, see vitest.config.unit.ts
- * Both configs are orchestrated via vitest.workspace.ts
+ * This runs in jsdom (fast, lightweight) and excludes Storybook stories.
  */
 export default defineConfig({
-  plugins: [
-    react(),
-    storybookTest({
-      configDir: path.join(__dirname, '.storybook'),
-    }),
-  ],
+  plugins: [react()],
   test: {
-    name: 'storybook',
+    name: 'unit',
     globals: true,
     environment: 'jsdom',
-    browser: {
-      enabled: true,
-      provider: 'playwright',
-      headless: true,
-      instances: [
-        {
-          browser: 'chromium',
-        },
-      ],
-    },
+    include: ['src/**/*.test.{ts,tsx}'],
+    exclude: ['src/**/*.stories.{ts,tsx}', 'node_modules'],
     setupFiles: ['./.storybook/vitest-setup.ts'],
     // Vitest 3: Explicitly configure fake timers to avoid queueMicrotask OOM issues
     // See: https://github.com/vitest-dev/vitest/issues/7288

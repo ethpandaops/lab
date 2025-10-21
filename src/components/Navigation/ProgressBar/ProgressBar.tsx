@@ -20,6 +20,7 @@ export function ProgressBar({
   ariaLabel = 'Progress',
   fillColor = 'bg-primary',
   backgroundColor = 'bg-border',
+  disableTransition = false,
 }: ProgressBarProps): JSX.Element {
   const processedSegments = segments ? calculateSegmentPercentages(segments) : [];
 
@@ -39,7 +40,7 @@ export function ProgressBar({
         <div className={clsx('relative overflow-hidden rounded-full', backgroundColor)}>
           <div
             style={{ width: `${progress}%` }}
-            className={clsx('h-2 rounded-full transition-all duration-300', fillColor)}
+            className={clsx('h-2 rounded-full', !disableTransition && 'transition-all duration-300', fillColor)}
           />
 
           {processedSegments.map((segment, index) => {
