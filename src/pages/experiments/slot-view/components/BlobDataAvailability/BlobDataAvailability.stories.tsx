@@ -32,20 +32,54 @@ const sampleFirstSeenData = [
   { time: 0.9, blobId: 'B', color: '#ef4444' },
 ];
 
-const sampleAvailabilityRateData = [
-  { time: 0, nodes: 0 },
-  { time: 0.5, nodes: 2 },
-  { time: 1.0, nodes: 24 },
-  { time: 1.2, nodes: 25 },
-  { time: 1.5, nodes: 18 },
-  { time: 2.0, nodes: 12 },
-  { time: 3.0, nodes: 8 },
-  { time: 4.0, nodes: 5 },
-  { time: 6.0, nodes: 3 },
-  { time: 8.0, nodes: 2 },
-  { time: 10.0, nodes: 1 },
-  { time: 12.0, nodes: 0 },
-];
+// Generate availability rate data with smooth curve - data point every 50ms
+const generateAvailabilityRateData = () => {
+  const data = [];
+  const interval = 0.05; // 50ms intervals
+  const maxTime = 12.0;
+
+  for (let time = 0; time <= maxTime; time += interval) {
+    let nodes = 0;
+
+    // Smooth curve: rapid rise to peak at ~1s, then gradual decay
+    if (time < 0.5) {
+      // Slow start
+      nodes = Math.round(time * 4);
+    } else if (time < 1.0) {
+      // Rapid rise
+      nodes = Math.round(2 + (time - 0.5) * 44);
+    } else if (time < 1.2) {
+      // Peak plateau
+      nodes = 25;
+    } else if (time < 2.0) {
+      // Initial decay
+      nodes = Math.round(25 - ((time - 1.2) / 0.8) * 13);
+    } else if (time < 4.0) {
+      // Gradual decay
+      nodes = Math.round(12 - ((time - 2.0) / 2.0) * 7);
+    } else if (time < 8.0) {
+      // Slow decay
+      nodes = Math.round(5 - ((time - 4.0) / 4.0) * 3);
+    } else if (time < 10.0) {
+      // Very slow decay
+      nodes = 2;
+    } else if (time < 12.0) {
+      // Final decay
+      nodes = 1;
+    } else {
+      nodes = 0;
+    }
+
+    data.push({
+      time: Number(time.toFixed(2)),
+      nodes: Math.max(0, nodes),
+    });
+  }
+
+  return data;
+};
+
+const sampleAvailabilityRateData = generateAvailabilityRateData();
 
 const allContinentsPropagationData = [
   {
