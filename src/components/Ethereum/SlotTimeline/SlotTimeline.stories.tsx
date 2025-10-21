@@ -132,6 +132,26 @@ export const WithoutLabels: Story = {
   },
 };
 
+export const WithTimeCutovers: Story = {
+  name: 'With Time Cutovers (Default)',
+  args: {
+    phases: DEFAULT_BEACON_SLOT_PHASES,
+    currentTime: 6,
+    showTimeCutovers: true,
+    showPhaseLabels: true,
+  },
+};
+
+export const WithoutTimeCutovers: Story = {
+  name: 'Without Time Cutovers',
+  args: {
+    phases: DEFAULT_BEACON_SLOT_PHASES,
+    currentTime: 6,
+    showTimeCutovers: false,
+    showPhaseLabels: true,
+  },
+};
+
 export const TallTimeline: Story = {
   name: 'Tall Timeline with Inline Labels',
   args: {

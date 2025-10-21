@@ -15,6 +15,8 @@ export interface SlotTimelineProps {
   showInlineLabels?: boolean;
   /** Show current time indicator above the timeline */
   showCurrentTime?: boolean;
+  /** Show time cutover markers at phase boundaries */
+  showTimeCutovers?: boolean;
   /** Optional aria-label for accessibility */
   ariaLabel?: string;
   /** Height of the timeline bar in pixels */

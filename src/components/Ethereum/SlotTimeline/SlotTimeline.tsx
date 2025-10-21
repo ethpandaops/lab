@@ -7,12 +7,14 @@ import type { SlotTimelineProps } from './SlotTimeline.types';
  *
  * Perfect for visualizing Ethereum beacon chain slot progression or any time-based multi-phase process.
  *
+ * Features time cutover markers showing phase boundaries (0-4s for Block Proposal shows "0" at start and "4" at the boundary).
+ *
  * @example
  * ```tsx
  * const phases = [
- *   { label: 'Block Proposal', duration: 1, color: 'bg-primary' },
- *   { label: 'Attestation', duration: 4, color: 'bg-success' },
- *   { label: 'Aggregation', duration: 7, color: 'bg-warning' },
+ *   { label: 'Block Proposal', duration: 4, className: 'bg-primary' },
+ *   { label: 'Attestation', duration: 4, className: 'bg-success' },
+ *   { label: 'Aggregation', duration: 4, className: 'bg-warning' },
  * ];
  *
  * <SlotTimeline phases={phases} currentTime={5.5} />
@@ -26,6 +28,7 @@ export function SlotTimeline({
   showPhaseLabels = false,
   showInlineLabels = true,
   showCurrentTime = false,
+  showTimeCutovers = true,
   ariaLabel = 'Slot Timeline',
   height = 48,
   onTimeClick,
@@ -158,6 +161,18 @@ export function SlotTimeline({
             style={{ left: `${currentTimePercent}%` }}
           />
         </div>
+
+        {/* Time cutover markers */}
+        {showTimeCutovers && (
+          <div className="mt-1 flex w-full justify-between">
+            <span className="text-xs text-muted">0s</span>
+            {phasePositions.map((phase, index) => (
+              <span key={`cutover-${phase.label}-${index}`} className="text-xs text-muted">
+                {phase.endTime}s
+              </span>
+            ))}
+          </div>
+        )}
 
         {/* Current time label */}
         {showCurrentTime && (
