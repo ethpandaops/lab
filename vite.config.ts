@@ -49,4 +49,7 @@ export default defineConfig({
       transformMixedEsModules: true, // Handle packages with mixed ESM/CommonJS
     },
   },
+  optimizeDeps: {
+    include: ['react-dom/client', 'zod/mini'],
+  },
 });
