@@ -1,4 +1,5 @@
 import type { ComponentPropsWithoutRef, ReactNode } from 'react';
+import type { Button as HeadlessButton } from '@headlessui/react';
 
 export type ButtonVariant = 'primary' | 'secondary' | 'soft' | 'outline' | 'danger' | 'blank';
 
@@ -6,7 +7,7 @@ export type ButtonSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 
 export type ButtonRounded = 'normal' | 'full';
 
-export interface ButtonProps extends Omit<ComponentPropsWithoutRef<'button'>, 'children'> {
+export interface ButtonProps extends ComponentPropsWithoutRef<typeof HeadlessButton> {
   /**
    * The visual style variant of the button
    * @default 'primary'
@@ -21,7 +22,7 @@ export interface ButtonProps extends Omit<ComponentPropsWithoutRef<'button'>, 'c
 
   /**
    * The border radius style
-   * - 'normal': Uses rounded-sm or rounded-md
+   * - 'normal': Uses rounded-xs or rounded-md
    * - 'full': Uses rounded-full for pill-shaped buttons
    * @default 'normal'
    */
