@@ -7,6 +7,7 @@ export function CheckboxGroup({
   options,
   variant = 'list',
   className = '',
+  rounded = false,
 }: CheckboxGroupProps): React.JSX.Element {
   // Refs for indeterminate state management
   const checkboxRefs = useRef<Map<string, HTMLInputElement>>(new Map());
@@ -49,7 +50,7 @@ export function CheckboxGroup({
                   type="checkbox"
                   disabled={option.disabled}
                   aria-describedby={descriptionId}
-                  className="col-start-1 row-start-1 appearance-none rounded-sm border border-border bg-background checked:border-primary checked:bg-primary indeterminate:border-primary indeterminate:bg-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:border-border disabled:bg-surface disabled:checked:bg-surface dark:border-zinc-600 dark:bg-zinc-950 dark:checked:border-primary dark:checked:bg-primary dark:indeterminate:border-primary dark:indeterminate:bg-primary dark:focus-visible:outline-primary dark:disabled:border-zinc-800 dark:disabled:bg-zinc-900 dark:disabled:checked:bg-zinc-900 forced-colors:appearance-auto"
+                  className={`col-start-1 row-start-1 appearance-none ${rounded ? 'rounded-sm' : ''} border border-border bg-background checked:border-primary checked:bg-primary indeterminate:border-primary indeterminate:bg-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:border-border disabled:bg-surface disabled:checked:bg-surface dark:border-zinc-600 dark:bg-zinc-950 dark:checked:border-primary dark:checked:bg-primary dark:indeterminate:border-primary dark:indeterminate:bg-primary dark:focus-visible:outline-primary dark:disabled:border-zinc-800 dark:disabled:bg-zinc-900 dark:disabled:checked:bg-zinc-900 forced-colors:appearance-auto`}
                 />
                 <svg
                   fill="none"
@@ -101,7 +102,7 @@ export function CheckboxGroup({
                   type="checkbox"
                   disabled={option.disabled}
                   aria-describedby={descriptionId}
-                  className="col-start-1 row-start-1 appearance-none rounded-sm border border-border bg-background checked:border-primary checked:bg-primary indeterminate:border-primary indeterminate:bg-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:border-border disabled:bg-surface disabled:checked:bg-surface dark:border-zinc-600 dark:bg-zinc-950 dark:checked:border-primary dark:checked:bg-primary dark:indeterminate:border-primary dark:indeterminate:bg-primary dark:focus-visible:outline-primary dark:disabled:border-zinc-800 dark:disabled:bg-zinc-900 dark:disabled:checked:bg-zinc-900 forced-colors:appearance-auto"
+                  className={`col-start-1 row-start-1 appearance-none ${rounded ? 'rounded-sm' : ''} border border-border bg-background checked:border-primary checked:bg-primary indeterminate:border-primary indeterminate:bg-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:border-border disabled:bg-surface disabled:checked:bg-surface dark:border-zinc-600 dark:bg-zinc-950 dark:checked:border-primary dark:checked:bg-primary dark:indeterminate:border-primary dark:indeterminate:bg-primary dark:focus-visible:outline-primary dark:disabled:border-zinc-800 dark:disabled:bg-zinc-900 dark:disabled:checked:bg-zinc-900 forced-colors:appearance-auto`}
                 />
                 <svg
                   fill="none"
@@ -164,7 +165,7 @@ export function CheckboxGroup({
                   type="checkbox"
                   disabled={option.disabled}
                   aria-describedby={descriptionId}
-                  className="col-start-1 row-start-1 appearance-none rounded-sm border border-border bg-background checked:border-primary checked:bg-primary indeterminate:border-primary indeterminate:bg-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:border-border disabled:bg-surface disabled:checked:bg-surface dark:border-zinc-600 dark:bg-zinc-950 dark:checked:border-primary dark:checked:bg-primary dark:indeterminate:border-primary dark:indeterminate:bg-primary dark:focus-visible:outline-primary dark:disabled:border-zinc-800 dark:disabled:bg-zinc-900 dark:disabled:checked:bg-zinc-900 forced-colors:appearance-auto"
+                  className={`col-start-1 row-start-1 appearance-none ${rounded ? 'rounded-sm' : ''} border border-border bg-background checked:border-primary checked:bg-primary indeterminate:border-primary indeterminate:bg-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:border-border disabled:bg-surface disabled:checked:bg-surface dark:border-zinc-600 dark:bg-zinc-950 dark:checked:border-primary dark:checked:bg-primary dark:indeterminate:border-primary dark:indeterminate:bg-primary dark:focus-visible:outline-primary dark:disabled:border-zinc-800 dark:disabled:bg-zinc-900 dark:disabled:checked:bg-zinc-900 forced-colors:appearance-auto`}
                 />
                 <svg
                   fill="none"
@@ -210,7 +211,7 @@ export function CheckboxGroup({
                   name={option.name}
                   type="checkbox"
                   disabled={option.disabled}
-                  className="col-start-1 row-start-1 appearance-none rounded-sm border border-border bg-background checked:border-primary checked:bg-primary indeterminate:border-primary indeterminate:bg-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:border-border disabled:bg-surface disabled:checked:bg-surface dark:border-zinc-600 dark:bg-zinc-950 dark:checked:border-primary dark:checked:bg-primary dark:indeterminate:border-primary dark:indeterminate:bg-primary dark:focus-visible:outline-primary dark:disabled:border-zinc-800 dark:disabled:bg-zinc-900 dark:disabled:checked:bg-zinc-900 forced-colors:appearance-auto"
+                  className={`col-start-1 row-start-1 appearance-none ${rounded ? 'rounded-sm' : ''} border border-border bg-background checked:border-primary checked:bg-primary indeterminate:border-primary indeterminate:bg-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:border-border disabled:bg-surface disabled:checked:bg-surface dark:border-zinc-600 dark:bg-zinc-950 dark:checked:border-primary dark:checked:bg-primary dark:indeterminate:border-primary dark:indeterminate:bg-primary dark:focus-visible:outline-primary dark:disabled:border-zinc-800 dark:disabled:bg-zinc-900 dark:disabled:checked:bg-zinc-900 forced-colors:appearance-auto`}
                 />
                 <svg
                   fill="none"

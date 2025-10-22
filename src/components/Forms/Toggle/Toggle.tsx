@@ -12,6 +12,7 @@ export function Toggle({
   rightColor = 'text-gray-600',
   srLabel = 'Toggle',
   size = 'default',
+  rounded = false,
 }: ToggleProps): JSX.Element {
   // Size-specific classes
   const sizeClasses = {
@@ -30,7 +31,8 @@ export function Toggle({
       checked={checked}
       onChange={onChange}
       className={clsx(
-        'group relative inline-flex shrink-0 cursor-pointer items-center rounded-lg',
+        'group relative inline-flex shrink-0 cursor-pointer items-center',
+        rounded && 'rounded-lg',
         'bg-zinc-300 transition-colors duration-200 ease-in-out',
         'dark:bg-zinc-700',
         'focus:outline-2 focus:outline-offset-2 focus:outline-primary',
@@ -65,7 +67,8 @@ export function Toggle({
       <span
         className={clsx(
           'pointer-events-none relative inline-flex transform items-center justify-center',
-          'rounded-md bg-surface shadow-sm ring-1 ring-border/20 transition-all duration-200 ease-in-out',
+          rounded && 'rounded-md',
+          'bg-surface shadow-sm ring-1 ring-border/20 transition-all duration-200 ease-in-out',
           'group-data-[checked]:ring-primary/50',
           sizeClasses.knob,
           sizeClasses.knobTranslate
