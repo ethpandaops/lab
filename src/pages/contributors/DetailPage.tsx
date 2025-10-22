@@ -140,6 +140,7 @@ export function DetailPage(): JSX.Element {
         // No location data
         return <span className="text-muted/60">Unknown</span>;
       },
+      cellClassName: 'text-xs/5 text-muted',
     },
     {
       header: 'Implementation',
@@ -154,6 +155,7 @@ export function DetailPage(): JSX.Element {
     {
       header: 'Consensus',
       accessor: (node: FctNodeActiveLast24h) => node.meta_consensus_implementation || '-',
+      cellClassName: 'text-xs/5 text-muted',
     },
     {
       header: 'Consensus Version',
