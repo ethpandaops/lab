@@ -39,6 +39,15 @@ export function HeatmapChart({
   showVisualMap = true,
   animationDuration = 300,
   formatValue,
+  showCellBorders = false,
+  xAxisTitle,
+  yAxisTitle,
+  visualMapType = 'continuous',
+  piecewisePieces,
+  tooltipFormatter,
+  headerActions,
+  xAxisShowOnlyMinMax = false,
+  yAxisShowOnlyMinMax = false,
 }: HeatmapChartProps): React.JSX.Element {
   const [themeColors] = useState(() => {
     // Get computed CSS variables from the root element on initial render
@@ -77,7 +86,7 @@ export function HeatmapChart({
     animation: true,
     animationDuration,
     animationEasing: 'cubicOut',
-    title: title
+    title: title && !headerActions
       ? {
           text: title,
           textStyle: {
@@ -90,7 +99,7 @@ export function HeatmapChart({
         }
       : undefined,
     grid: {
-      top: title ? 48 : 16,
+      top: title && !headerActions ? 48 : 16,
       right: showVisualMap ? 100 : 24,
       bottom: 32,
       left: 80,
@@ -99,8 +108,16 @@ export function HeatmapChart({
     xAxis: {
       type: 'category',
       data: xLabels,
+      name: xAxisTitle,
+      nameLocation: 'middle',
+      nameGap: 25,
+      nameTextStyle: {
+        color: themeColors.foreground,
+        fontSize: 12,
+        fontWeight: 600,
+      },
       splitArea: {
-        show: true,
+        show: false,
       },
       axisLine: {
         lineStyle: {
@@ -110,13 +127,24 @@ export function HeatmapChart({
       axisLabel: {
         color: themeColors.muted,
         fontSize: 12,
+        interval: xAxisShowOnlyMinMax
+          ? (index: number) => index === 0 || index === xLabels.length - 1
+          : undefined,
       },
     },
     yAxis: {
       type: 'category',
       data: yLabels,
+      name: yAxisTitle,
+      nameLocation: 'middle',
+      nameGap: 50,
+      nameTextStyle: {
+        color: themeColors.foreground,
+        fontSize: 12,
+        fontWeight: 600,
+      },
       splitArea: {
-        show: true,
+        show: false,
       },
       axisLine: {
         lineStyle: {
@@ -126,24 +154,40 @@ export function HeatmapChart({
       axisLabel: {
         color: themeColors.muted,
         fontSize: 12,
+        interval: yAxisShowOnlyMinMax
+          ? (index: number) => index === 0 || index === yLabels.length - 1
+          : undefined,
       },
     },
     visualMap: showVisualMap
-      ? {
-          min: min ?? Math.min(...data.map(d => d[2])),
-          max: max ?? Math.max(...data.map(d => d[2])),
-          calculable: true,
-          orient: 'vertical',
-          right: 10,
-          top: 'center',
-          inRange: {
-            color: colorGradient,
-          },
-          textStyle: {
-            color: themeColors.foreground,
-            fontSize: 12,
-          },
-        }
+      ? visualMapType === 'piecewise' && piecewisePieces
+        ? {
+            type: 'piecewise',
+            pieces: piecewisePieces,
+            orient: 'vertical',
+            right: 10,
+            top: 'center',
+            textStyle: {
+              color: themeColors.foreground,
+              fontSize: 12,
+            },
+          }
+        : {
+            type: 'continuous',
+            min: min ?? Math.min(...data.map(d => d[2])),
+            max: max ?? Math.max(...data.map(d => d[2])),
+            calculable: true,
+            orient: 'vertical',
+            right: 10,
+            top: 'center',
+            inRange: {
+              color: colorGradient,
+            },
+            textStyle: {
+              color: themeColors.foreground,
+              fontSize: 12,
+            },
+          }
       : undefined,
     series: [
       {
@@ -154,7 +198,15 @@ export function HeatmapChart({
           show: showLabel,
           color: themeColors.foreground,
           fontSize: 12,
-          formatter: formatValue ? (params: { value: [number, number, number] }) => formatValue(params.value[2]) : undefined,
+          formatter: formatValue
+            ? (params: { value: [number, number, number] }) => formatValue(params.value[2])
+            : undefined,
+        },
+        itemStyle: {
+          ...(showCellBorders && {
+            borderColor: themeColors.border,
+            borderWidth: 1,
+          }),
         },
         emphasis: {
           itemStyle: {
@@ -173,16 +225,24 @@ export function HeatmapChart({
         color: themeColors.foreground,
         fontSize: 12,
       },
-      formatter: (params: { value: [number, number, number] }) => {
-        const [x, y, value] = params.value;
-        const formattedValue = formatValue ? formatValue(value) : value;
-        return `${xLabels[x]} - ${yLabels[y]}<br/>Value: ${formattedValue}`;
-      },
+      formatter: tooltipFormatter
+        ? (params: { value: [number, number, number] }) => tooltipFormatter(params, xLabels, yLabels)
+        : (params: { value: [number, number, number] }) => {
+            const [x, y, value] = params.value;
+            const formattedValue = formatValue ? formatValue(value) : value;
+            return `${xLabels[x]} - ${yLabels[y]}<br/>Value: ${formattedValue}`;
+          },
     },
   };
 
   return (
     <div className="w-full">
+      {(title || headerActions) && (
+        <div className="mb-4 flex items-center justify-between">
+          {title && <h3 className="font-mono text-base font-semibold text-foreground">{title}</h3>}
+          {headerActions && <div>{headerActions}</div>}
+        </div>
+      )}
       <ReactECharts option={option} style={{ height, width: '100%', minHeight: height }} />
     </div>
   );

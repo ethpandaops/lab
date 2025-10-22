@@ -52,4 +52,62 @@ export interface HeatmapChartProps {
    * Format function for tooltip and labels
    */
   formatValue?: (value: number) => string;
+  /**
+   * Show cell borders for better visual distinction
+   * @default false
+   */
+  showCellBorders?: boolean;
+  /**
+   * X-axis title
+   */
+  xAxisTitle?: string;
+  /**
+   * Y-axis title
+   */
+  yAxisTitle?: string;
+  /**
+   * Visual map type: 'continuous' for gradient, 'piecewise' for discrete ranges
+   * @default 'continuous'
+   */
+  visualMapType?: 'continuous' | 'piecewise';
+  /**
+   * Piecewise color ranges for visualMap (only used when visualMapType is 'piecewise')
+   * @example [
+   *   { min: 0, max: 1000, color: '#22c55e' },
+   *   { min: 1000, max: 2000, color: '#84cc16' },
+   *   { min: 4000, color: '#ef4444' }
+   * ]
+   */
+  piecewisePieces?: Array<{
+    min?: number;
+    max?: number;
+    color: string;
+    label?: string;
+  }>;
+  /**
+   * Custom tooltip formatter function
+   * @param params ECharts tooltip params with value [x, y, value]
+   * @param xLabels X-axis labels
+   * @param yLabels Y-axis labels
+   * @returns Formatted tooltip HTML string
+   */
+  tooltipFormatter?: (
+    params: { value: [number, number, number] },
+    xLabels: string[],
+    yLabels: string[]
+  ) => string;
+  /**
+   * Optional content to render on the right side of the header (e.g., status indicators, badges)
+   */
+  headerActions?: React.ReactNode;
+  /**
+   * Show only min and max labels on X-axis
+   * @default false
+   */
+  xAxisShowOnlyMinMax?: boolean;
+  /**
+   * Show only min and max labels on Y-axis
+   * @default false
+   */
+  yAxisShowOnlyMinMax?: boolean;
 }
