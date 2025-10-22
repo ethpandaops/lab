@@ -23,47 +23,47 @@ type Story = StoryObj<typeof BlobDataAvailability>;
 
 // Sample data for stories
 const sampleFirstSeenData = [
-  { time: 1.42, blobId: '0', color: '#06b6d4' },
-  { time: 1.37, blobId: '1', color: '#ec4899' },
-  { time: 1.37, blobId: '2', color: '#22c55e' },
-  { time: 1.6, blobId: '3', color: '#3b82f6' },
-  { time: 1.8, blobId: '4', color: '#a855f7' },
-  { time: 1.2, blobId: '5', color: '#f59e0b' },
-  { time: 0.9, blobId: 'B', color: '#ef4444' },
+  { time: 1420, blobId: '0', color: '#06b6d4' },
+  { time: 1370, blobId: '1', color: '#ec4899' },
+  { time: 1370, blobId: '2', color: '#22c55e' },
+  { time: 1600, blobId: '3', color: '#3b82f6' },
+  { time: 1800, blobId: '4', color: '#a855f7' },
+  { time: 1200, blobId: '5', color: '#f59e0b' },
+  { time: 900, blobId: 'B', color: '#ef4444' },
 ];
 
 // Generate availability rate data with smooth curve - data point every 50ms
 const generateAvailabilityRateData = (): Array<{ time: number; nodes: number }> => {
   const data = [];
-  const interval = 0.05; // 50ms intervals
-  const maxTime = 12.0;
+  const interval = 50; // 50ms intervals
+  const maxTime = 12000;
 
   for (let time = 0; time <= maxTime; time += interval) {
     let nodes = 0;
 
     // Smooth curve: rapid rise to peak at ~1s, then gradual decay
-    if (time < 0.5) {
+    if (time < 500) {
       // Slow start
-      nodes = Math.round(time * 4);
-    } else if (time < 1.0) {
+      nodes = Math.round((time / 1000) * 4);
+    } else if (time < 1000) {
       // Rapid rise
-      nodes = Math.round(2 + (time - 0.5) * 44);
-    } else if (time < 1.2) {
+      nodes = Math.round(2 + ((time - 500) / 1000) * 44);
+    } else if (time < 1200) {
       // Peak plateau
       nodes = 25;
-    } else if (time < 2.0) {
+    } else if (time < 2000) {
       // Initial decay
-      nodes = Math.round(25 - ((time - 1.2) / 0.8) * 13);
-    } else if (time < 4.0) {
+      nodes = Math.round(25 - ((time - 1200) / 800) * 13);
+    } else if (time < 4000) {
       // Gradual decay
-      nodes = Math.round(12 - ((time - 2.0) / 2.0) * 7);
-    } else if (time < 8.0) {
+      nodes = Math.round(12 - ((time - 2000) / 2000) * 7);
+    } else if (time < 8000) {
       // Slow decay
-      nodes = Math.round(5 - ((time - 4.0) / 4.0) * 3);
-    } else if (time < 10.0) {
+      nodes = Math.round(5 - ((time - 4000) / 4000) * 3);
+    } else if (time < 10000) {
       // Very slow decay
       nodes = 2;
-    } else if (time < 12.0) {
+    } else if (time < 12000) {
       // Final decay
       nodes = 1;
     } else {
@@ -71,7 +71,7 @@ const generateAvailabilityRateData = (): Array<{ time: number; nodes: number }> 
     }
 
     data.push({
-      time: Number(time.toFixed(2)),
+      time,
       nodes: Math.max(0, nodes),
     });
   }
@@ -86,60 +86,60 @@ const allContinentsPropagationData = [
     continent: 'EU',
     color: '#ec4899',
     data: [
-      { time: 0.9, percentage: 0 },
-      { time: 1.2, percentage: 75 },
-      { time: 1.4, percentage: 100 },
-      { time: 2.3, percentage: 100 },
+      { time: 900, percentage: 0 },
+      { time: 1200, percentage: 75 },
+      { time: 1400, percentage: 100 },
+      { time: 2300, percentage: 100 },
     ],
   },
   {
     continent: 'NA',
     color: '#22c55e',
     data: [
-      { time: 0.9, percentage: 0 },
-      { time: 1.3, percentage: 60 },
-      { time: 1.5, percentage: 100 },
-      { time: 2.3, percentage: 100 },
+      { time: 900, percentage: 0 },
+      { time: 1300, percentage: 60 },
+      { time: 1500, percentage: 100 },
+      { time: 2300, percentage: 100 },
     ],
   },
   {
     continent: 'AS',
     color: '#06b6d4',
     data: [
-      { time: 0.9, percentage: 0 },
-      { time: 1.4, percentage: 45 },
-      { time: 1.7, percentage: 100 },
-      { time: 2.3, percentage: 100 },
+      { time: 900, percentage: 0 },
+      { time: 1400, percentage: 45 },
+      { time: 1700, percentage: 100 },
+      { time: 2300, percentage: 100 },
     ],
   },
   {
     continent: 'OC',
     color: '#3b82f6',
     data: [
-      { time: 0.9, percentage: 0 },
-      { time: 1.6, percentage: 30 },
-      { time: 1.9, percentage: 100 },
-      { time: 2.3, percentage: 100 },
+      { time: 900, percentage: 0 },
+      { time: 1600, percentage: 30 },
+      { time: 1900, percentage: 100 },
+      { time: 2300, percentage: 100 },
     ],
   },
   {
     continent: 'SA',
     color: '#f59e0b',
     data: [
-      { time: 0.9, percentage: 0 },
-      { time: 1.5, percentage: 40 },
-      { time: 1.8, percentage: 100 },
-      { time: 2.3, percentage: 100 },
+      { time: 900, percentage: 0 },
+      { time: 1500, percentage: 40 },
+      { time: 1800, percentage: 100 },
+      { time: 2300, percentage: 100 },
     ],
   },
   {
     continent: 'AF',
     color: '#a855f7',
     data: [
-      { time: 0.9, percentage: 0 },
-      { time: 1.7, percentage: 25 },
-      { time: 2.0, percentage: 100 },
-      { time: 2.3, percentage: 100 },
+      { time: 900, percentage: 0 },
+      { time: 1700, percentage: 25 },
+      { time: 2000, percentage: 100 },
+      { time: 2300, percentage: 100 },
     ],
   },
 ];
@@ -149,7 +149,7 @@ const allContinentsPropagationData = [
  */
 export const Default: Story = {
   args: {
-    currentTime: 2.5,
+    currentTime: 2500,
     firstSeenData: sampleFirstSeenData,
     availabilityRateData: sampleAvailabilityRateData,
     continentalPropagationData: allContinentsPropagationData,
@@ -171,10 +171,10 @@ export const Interactive: Story = {
 
       const interval = setInterval(() => {
         setCurrentTime(prev => {
-          const next = prev + 0.1;
-          if (next >= 12) {
+          const next = prev + 100;
+          if (next >= 12000) {
             setIsPlaying(false);
-            return 12;
+            return 12000;
           }
           return next;
         });
@@ -200,7 +200,7 @@ export const Interactive: Story = {
           >
             Reset
           </button>
-          <span className="text-sm text-muted">Current time: {currentTime.toFixed(1)}s</span>
+          <span className="text-sm text-muted">Current time: {(currentTime / 1000).toFixed(1)}s</span>
         </div>
         <BlobDataAvailability
           currentTime={currentTime}
@@ -241,9 +241,9 @@ export const Empty: Story = {
 export const SingleContinent: Story = {
   args: {
     firstSeenData: [
-      { time: 1.42, blobId: '0', color: '#06b6d4' },
-      { time: 1.37, blobId: '1', color: '#ec4899' },
-      { time: 1.37, blobId: '2', color: '#22c55e' },
+      { time: 1420, blobId: '0', color: '#06b6d4' },
+      { time: 1370, blobId: '1', color: '#ec4899' },
+      { time: 1370, blobId: '2', color: '#22c55e' },
     ],
     availabilityRateData: sampleAvailabilityRateData,
     continentalPropagationData: [
@@ -251,10 +251,10 @@ export const SingleContinent: Story = {
         continent: 'EU',
         color: '#ec4899',
         data: [
-          { time: 0.9, percentage: 0 },
-          { time: 1.2, percentage: 50 },
-          { time: 1.4, percentage: 100 },
-          { time: 2.3, percentage: 100 },
+          { time: 900, percentage: 0 },
+          { time: 1200, percentage: 50 },
+          { time: 1400, percentage: 100 },
+          { time: 2300, percentage: 100 },
         ],
       },
     ],
@@ -273,18 +273,18 @@ export const TwoContinents: Story = {
         continent: 'EU',
         color: '#ec4899',
         data: [
-          { time: 0.9, percentage: 0 },
-          { time: 1.2, percentage: 100 },
-          { time: 2.3, percentage: 100 },
+          { time: 900, percentage: 0 },
+          { time: 1200, percentage: 100 },
+          { time: 2300, percentage: 100 },
         ],
       },
       {
         continent: 'AS',
         color: '#06b6d4',
         data: [
-          { time: 0.9, percentage: 0 },
-          { time: 1.8, percentage: 100 },
-          { time: 2.3, percentage: 100 },
+          { time: 900, percentage: 0 },
+          { time: 1800, percentage: 100 },
+          { time: 2300, percentage: 100 },
         ],
       },
     ],
@@ -302,25 +302,25 @@ export const FastPropagation: Story = {
       {
         continent: 'EU',
         data: [
-          { time: 0.9, percentage: 0 },
-          { time: 1.1, percentage: 100 },
-          { time: 2.3, percentage: 100 },
+          { time: 900, percentage: 0 },
+          { time: 1100, percentage: 100 },
+          { time: 2300, percentage: 100 },
         ],
       },
       {
         continent: 'NA',
         data: [
-          { time: 0.9, percentage: 0 },
-          { time: 1.15, percentage: 100 },
-          { time: 2.3, percentage: 100 },
+          { time: 900, percentage: 0 },
+          { time: 1150, percentage: 100 },
+          { time: 2300, percentage: 100 },
         ],
       },
       {
         continent: 'AS',
         data: [
-          { time: 0.9, percentage: 0 },
-          { time: 1.2, percentage: 100 },
-          { time: 2.3, percentage: 100 },
+          { time: 900, percentage: 0 },
+          { time: 1200, percentage: 100 },
+          { time: 2300, percentage: 100 },
         ],
       },
     ],
@@ -338,21 +338,21 @@ export const SlowPropagation: Story = {
       {
         continent: 'EU',
         data: [
-          { time: 0.9, percentage: 0 },
-          { time: 1.5, percentage: 25 },
-          { time: 1.8, percentage: 50 },
-          { time: 2.0, percentage: 100 },
-          { time: 2.3, percentage: 100 },
+          { time: 900, percentage: 0 },
+          { time: 1500, percentage: 25 },
+          { time: 1800, percentage: 50 },
+          { time: 2000, percentage: 100 },
+          { time: 2300, percentage: 100 },
         ],
       },
       {
         continent: 'NA',
         data: [
-          { time: 0.9, percentage: 0 },
-          { time: 1.6, percentage: 20 },
-          { time: 1.9, percentage: 60 },
-          { time: 2.1, percentage: 100 },
-          { time: 2.3, percentage: 100 },
+          { time: 900, percentage: 0 },
+          { time: 1600, percentage: 20 },
+          { time: 1900, percentage: 60 },
+          { time: 2100, percentage: 100 },
+          { time: 2300, percentage: 100 },
         ],
       },
     ],
@@ -370,28 +370,28 @@ export const SynchronizedPropagation: Story = {
       {
         continent: 'EU',
         data: [
-          { time: 0.9, percentage: 0 },
-          { time: 1.4, percentage: 50 },
-          { time: 1.6, percentage: 100 },
-          { time: 2.3, percentage: 100 },
+          { time: 900, percentage: 0 },
+          { time: 1400, percentage: 50 },
+          { time: 1600, percentage: 100 },
+          { time: 2300, percentage: 100 },
         ],
       },
       {
         continent: 'NA',
         data: [
-          { time: 0.9, percentage: 0 },
-          { time: 1.4, percentage: 50 },
-          { time: 1.6, percentage: 100 },
-          { time: 2.3, percentage: 100 },
+          { time: 900, percentage: 0 },
+          { time: 1400, percentage: 50 },
+          { time: 1600, percentage: 100 },
+          { time: 2300, percentage: 100 },
         ],
       },
       {
         continent: 'AS',
         data: [
-          { time: 0.9, percentage: 0 },
-          { time: 1.4, percentage: 50 },
-          { time: 1.6, percentage: 100 },
-          { time: 2.3, percentage: 100 },
+          { time: 900, percentage: 0 },
+          { time: 1400, percentage: 50 },
+          { time: 1600, percentage: 100 },
+          { time: 2300, percentage: 100 },
         ],
       },
     ],
@@ -409,27 +409,27 @@ export const StaggeredStart: Story = {
       {
         continent: 'EU',
         data: [
-          { time: 0.9, percentage: 0 },
-          { time: 1.0, percentage: 100 },
-          { time: 2.3, percentage: 100 },
+          { time: 900, percentage: 0 },
+          { time: 1000, percentage: 100 },
+          { time: 2300, percentage: 100 },
         ],
       },
       {
         continent: 'NA',
         data: [
-          { time: 0.9, percentage: 0 },
-          { time: 1.3, percentage: 0 },
-          { time: 1.5, percentage: 100 },
-          { time: 2.3, percentage: 100 },
+          { time: 900, percentage: 0 },
+          { time: 1300, percentage: 0 },
+          { time: 1500, percentage: 100 },
+          { time: 2300, percentage: 100 },
         ],
       },
       {
         continent: 'AS',
         data: [
-          { time: 0.9, percentage: 0 },
-          { time: 1.6, percentage: 0 },
-          { time: 1.9, percentage: 100 },
-          { time: 2.3, percentage: 100 },
+          { time: 900, percentage: 0 },
+          { time: 1600, percentage: 0 },
+          { time: 1900, percentage: 100 },
+          { time: 2300, percentage: 100 },
         ],
       },
     ],
@@ -447,25 +447,25 @@ export const PartialCompletion: Story = {
       {
         continent: 'EU',
         data: [
-          { time: 0.9, percentage: 0 },
-          { time: 1.4, percentage: 100 },
-          { time: 2.3, percentage: 100 },
+          { time: 900, percentage: 0 },
+          { time: 1400, percentage: 100 },
+          { time: 2300, percentage: 100 },
         ],
       },
       {
         continent: 'NA',
         data: [
-          { time: 0.9, percentage: 0 },
-          { time: 1.6, percentage: 75 },
-          { time: 2.3, percentage: 75 },
+          { time: 900, percentage: 0 },
+          { time: 1600, percentage: 75 },
+          { time: 2300, percentage: 75 },
         ],
       },
       {
         continent: 'OC',
         data: [
-          { time: 0.9, percentage: 0 },
-          { time: 1.8, percentage: 50 },
-          { time: 2.3, percentage: 50 },
+          { time: 900, percentage: 0 },
+          { time: 1800, percentage: 50 },
+          { time: 2300, percentage: 50 },
         ],
       },
     ],
@@ -489,7 +489,7 @@ export const NoPropagationData: Story = {
 export const EarlyPhase: Story = {
   name: 'Early Phase (1s)',
   args: {
-    currentTime: 1.0,
+    currentTime: 1000,
     firstSeenData: sampleFirstSeenData,
     availabilityRateData: sampleAvailabilityRateData,
     continentalPropagationData: allContinentsPropagationData,
@@ -502,7 +502,7 @@ export const EarlyPhase: Story = {
 export const PeakPhase: Story = {
   name: 'Peak Phase (1.5s)',
   args: {
-    currentTime: 1.5,
+    currentTime: 1500,
     firstSeenData: sampleFirstSeenData,
     availabilityRateData: sampleAvailabilityRateData,
     continentalPropagationData: allContinentsPropagationData,
@@ -515,7 +515,7 @@ export const PeakPhase: Story = {
 export const CompletePhase: Story = {
   name: 'Complete Phase (12s)',
   args: {
-    currentTime: 12.0,
+    currentTime: 12000,
     firstSeenData: sampleFirstSeenData,
     availabilityRateData: sampleAvailabilityRateData,
     continentalPropagationData: allContinentsPropagationData,
@@ -528,7 +528,7 @@ export const CompletePhase: Story = {
 export const VeryEarly: Story = {
   name: 'Very Early (0.5s)',
   args: {
-    currentTime: 0.5,
+    currentTime: 500,
     firstSeenData: sampleFirstSeenData,
     availabilityRateData: sampleAvailabilityRateData,
     continentalPropagationData: allContinentsPropagationData,

@@ -1,6 +1,6 @@
 export interface BlobDataPoint {
   /**
-   * Time in seconds
+   * Time in milliseconds
    */
   time: number;
   /**
@@ -15,7 +15,7 @@ export interface BlobDataPoint {
 
 export interface DataAvailabilityRatePoint {
   /**
-   * Time in seconds
+   * Time in milliseconds
    */
   time: number;
   /**
@@ -56,14 +56,14 @@ export interface BlobDataAvailabilityProps {
    */
   continentalPropagationData?: ContinentalPropagationSeries[];
   /**
-   * Current time in seconds from slot start (0-12)
+   * Current time in milliseconds from slot start (0-12000)
    * Only data up to this time will be rendered
    * @default maxTime (shows all data)
    */
   currentTime?: number;
   /**
-   * Maximum time value for x-axis (in seconds)
-   * @default 12
+   * Maximum time value for x-axis (in milliseconds)
+   * @default 12000
    */
   maxTime?: number;
   /**

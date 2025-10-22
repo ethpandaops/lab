@@ -4,9 +4,9 @@ import type { TimelineItem } from '@/components/Lists/ScrollingTimeline/Scrollin
 export interface SidebarProps {
   /** Array of phases that make up the slot */
   phases: SlotPhase[];
-  /** Current time position in seconds (0 to total duration) */
+  /** Current time position in milliseconds (0 to total duration) */
   currentTime: number;
-  /** Total slot duration in seconds (defaults to sum of phase durations) */
+  /** Total slot duration in milliseconds (defaults to sum of phase durations) */
   slotDuration?: number;
   /** Timeline items for the scrolling timeline */
   items: TimelineItem[];

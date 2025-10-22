@@ -38,7 +38,7 @@ const ethereumEvents: TimelineItem[] = [
   },
   {
     id: '2',
-    timestamp: 1.2,
+    timestamp: 1200,
     content: (
       <div className="flex items-center gap-2">
         <span>Blob 2 in</span>
@@ -48,7 +48,7 @@ const ethereumEvents: TimelineItem[] = [
   },
   {
     id: '3',
-    timestamp: 1.4,
+    timestamp: 1400,
     content: (
       <div className="flex items-center gap-2">
         <span>Blob 1 in</span>
@@ -58,7 +58,7 @@ const ethereumEvents: TimelineItem[] = [
   },
   {
     id: '4',
-    timestamp: 1.6,
+    timestamp: 1600,
     content: (
       <div className="flex items-center gap-2">
         <span>Blob 5 in</span>
@@ -68,7 +68,7 @@ const ethereumEvents: TimelineItem[] = [
   },
   {
     id: '5',
-    timestamp: 2.1,
+    timestamp: 2100,
     content: (
       <div className="flex items-center gap-2">
         <span>Blob 3 in</span>
@@ -78,7 +78,7 @@ const ethereumEvents: TimelineItem[] = [
   },
   {
     id: '6',
-    timestamp: 3.5,
+    timestamp: 3500,
     content: (
       <div className="flex items-center gap-2">
         <span>Blob 6 in</span>
@@ -88,7 +88,7 @@ const ethereumEvents: TimelineItem[] = [
   },
   {
     id: '7',
-    timestamp: 4.2,
+    timestamp: 4200,
     content: (
       <div className="flex items-center gap-2">
         <Badge color="blue" variant="border" size="small">
@@ -101,7 +101,7 @@ const ethereumEvents: TimelineItem[] = [
   },
   {
     id: '8',
-    timestamp: 4.8,
+    timestamp: 4800,
     content: (
       <div className="flex items-center gap-2">
         <Badge color="green" variant="border" size="small">
@@ -114,7 +114,7 @@ const ethereumEvents: TimelineItem[] = [
   },
   {
     id: '9',
-    timestamp: 6.5,
+    timestamp: 6500,
     content: (
       <div className="flex items-center gap-2">
         <Badge color="purple" variant="border" size="small">
@@ -127,7 +127,7 @@ const ethereumEvents: TimelineItem[] = [
   },
   {
     id: '10',
-    timestamp: 8.3,
+    timestamp: 8300,
     content: (
       <div className="flex items-center gap-2">
         <Badge color="yellow" variant="border" size="small">
@@ -140,7 +140,7 @@ const ethereumEvents: TimelineItem[] = [
   },
   {
     id: '11',
-    timestamp: 9.1,
+    timestamp: 9100,
     content: (
       <div className="flex items-center gap-2">
         <span>Blob 4 in</span>
@@ -150,7 +150,7 @@ const ethereumEvents: TimelineItem[] = [
   },
   {
     id: '12',
-    timestamp: 10.5,
+    timestamp: 10500,
     content: (
       <div className="flex items-center gap-2">
         <Badge color="indigo" variant="border" size="small">
@@ -166,7 +166,7 @@ const ethereumEvents: TimelineItem[] = [
 export const Default: Story = {
   args: {
     phases: DEFAULT_BEACON_SLOT_PHASES,
-    currentTime: 6.0,
+    currentTime: 6000,
     items: ethereumEvents,
     isPlaying: false,
     isLive: true,
@@ -179,7 +179,7 @@ export const Interactive: Story = {
   name: 'Interactive with Controls',
   args: {
     phases: DEFAULT_BEACON_SLOT_PHASES,
-    currentTime: 4.0,
+    currentTime: 4000,
     items: ethereumEvents,
     isPlaying: false,
     isLive: true,
@@ -187,7 +187,7 @@ export const Interactive: Story = {
     scrollingTimelineHeight: '400px',
   },
   render: () => {
-    const [currentTime, setCurrentTime] = useState(4.0);
+    const [currentTime, setCurrentTime] = useState(4000);
     const [isPlaying, setIsPlaying] = useState(false);
 
     const handlePlayPause = (): void => {
@@ -195,15 +195,15 @@ export const Interactive: Story = {
     };
 
     const handleBackward = (): void => {
-      setCurrentTime(prev => Math.max(0, prev - 1));
+      setCurrentTime(prev => Math.max(0, prev - 1000));
     };
 
     const handleForward = (): void => {
-      setCurrentTime(prev => Math.min(12, prev + 1));
+      setCurrentTime(prev => Math.min(12000, prev + 1000));
     };
 
     const handleTimeClick = (timeMs: number): void => {
-      setCurrentTime(timeMs / 1000);
+      setCurrentTime(timeMs);
       setIsPlaying(false);
     };
 
@@ -213,10 +213,10 @@ export const Interactive: Story = {
 
       const interval = setInterval(() => {
         setCurrentTime(prev => {
-          const next = prev + 0.1;
-          if (next >= 12) {
+          const next = prev + 100;
+          if (next >= 12000) {
             setIsPlaying(false);
-            return 12;
+            return 12000;
           }
           return next;
         });
@@ -247,7 +247,7 @@ export const EarlyPhase: Story = {
   name: 'Early Phase (Block Proposal)',
   args: {
     phases: DEFAULT_BEACON_SLOT_PHASES,
-    currentTime: 2.0,
+    currentTime: 2000,
     items: ethereumEvents,
     isPlaying: false,
     isLive: true,
@@ -260,7 +260,7 @@ export const MidPhase: Story = {
   name: 'Mid Phase (Attestation)',
   args: {
     phases: DEFAULT_BEACON_SLOT_PHASES,
-    currentTime: 6.5,
+    currentTime: 6500,
     items: ethereumEvents,
     isPlaying: false,
     isLive: true,
@@ -273,7 +273,7 @@ export const LatePhase: Story = {
   name: 'Late Phase (Aggregation)',
   args: {
     phases: DEFAULT_BEACON_SLOT_PHASES,
-    currentTime: 10.5,
+    currentTime: 10500,
     items: ethereumEvents,
     isPlaying: false,
     isLive: true,
@@ -285,7 +285,7 @@ export const LatePhase: Story = {
 export const NotLive: Story = {
   args: {
     phases: DEFAULT_BEACON_SLOT_PHASES,
-    currentTime: 5.5,
+    currentTime: 5500,
     items: ethereumEvents,
     isPlaying: false,
     isLive: false,
@@ -297,7 +297,7 @@ export const NotLive: Story = {
 export const Playing: Story = {
   args: {
     phases: DEFAULT_BEACON_SLOT_PHASES,
-    currentTime: 6.3,
+    currentTime: 6300,
     items: ethereumEvents,
     isPlaying: true,
     isLive: true,
@@ -310,7 +310,7 @@ export const TallTimeline: Story = {
   name: 'Tall Scrolling Timeline',
   args: {
     phases: DEFAULT_BEACON_SLOT_PHASES,
-    currentTime: 6.0,
+    currentTime: 6000,
     items: ethereumEvents,
     isPlaying: false,
     isLive: true,
@@ -323,7 +323,7 @@ export const ShortTimeline: Story = {
   name: 'Short Scrolling Timeline',
   args: {
     phases: DEFAULT_BEACON_SLOT_PHASES,
-    currentTime: 6.0,
+    currentTime: 6000,
     items: ethereumEvents,
     isPlaying: false,
     isLive: true,

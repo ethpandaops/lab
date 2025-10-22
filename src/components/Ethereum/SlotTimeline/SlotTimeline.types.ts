@@ -3,9 +3,9 @@ import type { SlotPhase } from '@/utils/beacon';
 export interface SlotTimelineProps {
   /** Array of phases that make up the slot */
   phases: SlotPhase[];
-  /** Current time position in seconds (0 to total duration) */
+  /** Current time position in milliseconds (0 to total duration) */
   currentTime: number;
-  /** Total slot duration in seconds (defaults to sum of phase durations) */
+  /** Total slot duration in milliseconds (defaults to sum of phase durations) */
   slotDuration?: number;
   /** Show time labels on the timeline */
   showTimeLabels?: boolean;

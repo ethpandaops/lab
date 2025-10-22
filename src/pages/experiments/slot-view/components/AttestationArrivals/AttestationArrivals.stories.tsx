@@ -7,31 +7,31 @@ import type { AttestationDataPoint } from './AttestationArrivals.types';
 // Most attestations arrive in the first 4 seconds, with a long tail
 const generateAttestationData = (): AttestationDataPoint[] => {
   return [
-    { time: 0.0, count: 0 },
-    { time: 0.5, count: 150 },
-    { time: 1.0, count: 800 },
-    { time: 1.5, count: 1200 },
-    { time: 2.0, count: 1500 },
-    { time: 2.5, count: 1100 },
-    { time: 3.0, count: 800 },
-    { time: 3.5, count: 500 },
-    { time: 4.0, count: 300 },
-    { time: 4.5, count: 200 },
-    { time: 5.0, count: 150 },
-    { time: 5.5, count: 100 },
-    { time: 6.0, count: 80 },
-    { time: 6.5, count: 60 },
-    { time: 7.0, count: 40 },
-    { time: 7.5, count: 30 },
-    { time: 8.0, count: 20 },
-    { time: 8.5, count: 15 },
-    { time: 9.0, count: 10 },
-    { time: 9.5, count: 8 },
-    { time: 10.0, count: 5 },
-    { time: 10.5, count: 3 },
-    { time: 11.0, count: 2 },
-    { time: 11.5, count: 1 },
-    { time: 12.0, count: 0 },
+    { time: 0, count: 0 },
+    { time: 500, count: 150 },
+    { time: 1000, count: 800 },
+    { time: 1500, count: 1200 },
+    { time: 2000, count: 1500 },
+    { time: 2500, count: 1100 },
+    { time: 3000, count: 800 },
+    { time: 3500, count: 500 },
+    { time: 4000, count: 300 },
+    { time: 4500, count: 200 },
+    { time: 5000, count: 150 },
+    { time: 5500, count: 100 },
+    { time: 6000, count: 80 },
+    { time: 6500, count: 60 },
+    { time: 7000, count: 40 },
+    { time: 7500, count: 30 },
+    { time: 8000, count: 20 },
+    { time: 8500, count: 15 },
+    { time: 9000, count: 10 },
+    { time: 9500, count: 8 },
+    { time: 10000, count: 5 },
+    { time: 10500, count: 3 },
+    { time: 11000, count: 2 },
+    { time: 11500, count: 1 },
+    { time: 12000, count: 0 },
   ];
 };
 
@@ -59,7 +59,7 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   args: {
-    currentTime: 4.0,
+    currentTime: 4000,
     data: ATTESTATION_DATA,
     totalExpected: TOTAL_EXPECTED,
   },
@@ -82,10 +82,10 @@ export const Interactive: Story = {
 
       const interval = setInterval(() => {
         setCurrentTime(prev => {
-          const next = prev + 0.1;
-          if (next >= 12) {
+          const next = prev + 100;
+          if (next >= 12000) {
             setIsPlaying(false);
-            return 12;
+            return 12000;
           }
           return next;
         });
@@ -111,7 +111,7 @@ export const Interactive: Story = {
           >
             Reset
           </button>
-          <span className="text-sm text-muted">Current time: {currentTime.toFixed(1)}s</span>
+          <span className="text-sm text-muted">Current time: {(currentTime / 1000).toFixed(1)}s</span>
         </div>
         <AttestationArrivals currentTime={currentTime} data={ATTESTATION_DATA} totalExpected={TOTAL_EXPECTED} />
       </div>
@@ -122,7 +122,7 @@ export const Interactive: Story = {
 export const EarlyPhase: Story = {
   name: 'Early Phase (1s)',
   args: {
-    currentTime: 1.0,
+    currentTime: 1000,
     data: ATTESTATION_DATA,
     totalExpected: TOTAL_EXPECTED,
   },
@@ -131,7 +131,7 @@ export const EarlyPhase: Story = {
 export const PeakPhase: Story = {
   name: 'Peak Phase (2s)',
   args: {
-    currentTime: 2.0,
+    currentTime: 2000,
     data: ATTESTATION_DATA,
     totalExpected: TOTAL_EXPECTED,
   },
@@ -140,7 +140,7 @@ export const PeakPhase: Story = {
 export const MidPhase: Story = {
   name: 'Mid Phase (4s)',
   args: {
-    currentTime: 4.0,
+    currentTime: 4000,
     data: ATTESTATION_DATA,
     totalExpected: TOTAL_EXPECTED,
   },
@@ -149,7 +149,7 @@ export const MidPhase: Story = {
 export const LatePhase: Story = {
   name: 'Late Phase (8s)',
   args: {
-    currentTime: 8.0,
+    currentTime: 8000,
     data: ATTESTATION_DATA,
     totalExpected: TOTAL_EXPECTED,
   },
@@ -158,7 +158,7 @@ export const LatePhase: Story = {
 export const Complete: Story = {
   name: 'Slot Complete (12s)',
   args: {
-    currentTime: 12.0,
+    currentTime: 12000,
     data: ATTESTATION_DATA,
     totalExpected: TOTAL_EXPECTED,
   },
@@ -167,7 +167,7 @@ export const Complete: Story = {
 export const VeryEarly: Story = {
   name: 'Very Early (0.5s)',
   args: {
-    currentTime: 0.5,
+    currentTime: 500,
     data: ATTESTATION_DATA,
     totalExpected: TOTAL_EXPECTED,
   },
@@ -176,7 +176,7 @@ export const VeryEarly: Story = {
 export const NoData: Story = {
   name: 'No Attestations Yet',
   args: {
-    currentTime: 0.0,
+    currentTime: 0,
     data: ATTESTATION_DATA,
     totalExpected: TOTAL_EXPECTED,
   },
