@@ -89,4 +89,14 @@ export interface MapChartProps {
    * @default 0.5
    */
   regionHeight?: number;
+  /**
+   * Minimum camera distance (max zoom in)
+   * @default 40
+   */
+  minDistance?: number;
+  /**
+   * Maximum camera distance (max zoom out)
+   * @default 150
+   */
+  maxDistance?: number;
 }

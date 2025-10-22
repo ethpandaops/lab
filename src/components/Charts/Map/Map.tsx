@@ -36,6 +36,8 @@ export function MapChart({
   distance = 70,
   alpha = 89,
   regionHeight = 0.5,
+  minDistance = 40,
+  maxDistance = 150,
 }: MapChartProps): React.JSX.Element {
   const [themeColors] = useState(() => {
     // Get computed CSS variables from the root element on initial render
@@ -211,8 +213,12 @@ export function MapChart({
         viewControl: {
           distance: distance,
           alpha: alpha,
+          minDistance: minDistance,
+          maxDistance: maxDistance,
           panMouseButton: 'left',
           rotateMouseButton: 'right',
+          autoRotate: false,
+          zoomSensitivity: 1,
         },
         itemStyle: {
           color: mapColor,
@@ -234,6 +240,8 @@ export function MapChart({
     distance,
     alpha,
     regionHeight,
+    minDistance,
+    maxDistance,
     themeColors,
   ]);
 
