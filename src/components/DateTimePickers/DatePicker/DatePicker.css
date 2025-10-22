@@ -1,0 +1,74 @@
+/**
+ * DatePicker CSS Overrides
+ *
+ * Minimal overrides to match @grafana/ui DatePicker with Lab's theme.
+ * Uses semantic color tokens for proper light/dark mode support.
+ */
+
+/* Light mode - override Grafana's dark theme default */
+.grafana-date-picker [class*="calendar-"],
+.grafana-date-picker [class*="react-calendar"],
+.grafana-date-picker [class*="body"],
+.grafana-date-picker [class*="month-view"] {
+  background: white !important;
+  color: var(--foreground-value) !important;
+}
+
+.grafana-date-picker button[class*="day"],
+.grafana-date-picker [class*="tile"] {
+  color: var(--foreground-value) !important;
+}
+
+/* Weekday labels */
+.grafana-date-picker [class*="weekday"],
+.grafana-date-picker abbr[title] {
+  color: var(--muted-value) !important;
+  text-decoration: none !important;
+}
+
+/* Hide broken Grafana icon images */
+.grafana-date-picker img[src*="/public/build/img/icons/"] {
+  display: none !important;
+}
+
+/* Style navigation buttons with CSS arrows instead */
+.grafana-date-picker button[class*="navigation"],
+.grafana-date-picker button[aria-label*="Previous"],
+.grafana-date-picker button[aria-label*="Next"] {
+  font-size: 1.25rem !important;
+  line-height: 1 !important;
+}
+
+/* Dark mode */
+html.dark .grafana-date-picker [class*="calendar-"],
+html.dark .grafana-date-picker [class*="react-calendar"],
+html.dark .grafana-date-picker [class*="body"],
+html.dark .grafana-date-picker [class*="month-view"] {
+  background: var(--surface-value) !important;
+  color: var(--foreground-value) !important;
+}
+
+html.dark .grafana-date-picker button[class*="day"],
+html.dark .grafana-date-picker [class*="tile"] {
+  color: var(--foreground-value) !important;
+}
+
+html.dark .grafana-date-picker [class*="weekday"],
+html.dark .grafana-date-picker abbr[title] {
+  color: var(--muted-value) !important;
+}
+
+/* Selected/active day - use our secondary brand color */
+.grafana-date-picker button[class*="day"][class*="active"],
+.grafana-date-picker button[class*="day"][class*="selected"],
+.grafana-date-picker [class*="tile"][class*="active"],
+.grafana-date-picker [class*="tile--active"] {
+  background: var(--secondary-value) !important;
+  color: white !important;
+}
+
+/* Today indicator dot */
+.grafana-date-picker button[class*="day"][class*="now"]:not([class*="active"])::after,
+.grafana-date-picker [class*="tile"][class*="now"]:not([class*="active"])::after {
+  background: var(--secondary-value) !important;
+}
