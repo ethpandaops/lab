@@ -45,7 +45,6 @@ export function HeatmapChart({
   visualMapType = 'continuous',
   piecewisePieces,
   tooltipFormatter,
-  headerActions,
   xAxisShowOnlyMinMax = false,
   yAxisShowOnlyMinMax = false,
 }: HeatmapChartProps): React.JSX.Element {
@@ -86,7 +85,7 @@ export function HeatmapChart({
     animation: true,
     animationDuration,
     animationEasing: 'cubicOut',
-    title: title && !headerActions
+    title: title
       ? {
           text: title,
           textStyle: {
@@ -99,7 +98,7 @@ export function HeatmapChart({
         }
       : undefined,
     grid: {
-      top: title && !headerActions ? 48 : 16,
+      top: title ? 48 : 16,
       right: showVisualMap ? 100 : 24,
       bottom: 32,
       left: 80,
@@ -237,12 +236,6 @@ export function HeatmapChart({
 
   return (
     <div className="w-full">
-      {(title || headerActions) && (
-        <div className="mb-4 flex items-center justify-between">
-          {title && <h3 className="font-mono text-base font-semibold text-foreground">{title}</h3>}
-          {headerActions && <div>{headerActions}</div>}
-        </div>
-      )}
       <ReactECharts option={option} style={{ height, width: '100%', minHeight: height }} />
     </div>
   );

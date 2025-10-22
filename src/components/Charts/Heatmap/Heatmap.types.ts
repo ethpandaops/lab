@@ -13,7 +13,7 @@ export interface HeatmapChartProps {
    */
   yLabels?: string[];
   /**
-   * Chart title
+   * Chart title (displayed in ECharts)
    */
   title?: string;
   /**
@@ -96,10 +96,6 @@ export interface HeatmapChartProps {
     xLabels: string[],
     yLabels: string[]
   ) => string;
-  /**
-   * Optional content to render on the right side of the header (e.g., status indicators, badges)
-   */
-  headerActions?: React.ReactNode;
   /**
    * Show only min and max labels on X-axis
    * @default false

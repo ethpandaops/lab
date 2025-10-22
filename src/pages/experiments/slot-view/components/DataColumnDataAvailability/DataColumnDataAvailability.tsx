@@ -92,11 +92,20 @@ export function DataColumnDataAvailability({
 
   return (
     <div className={clsx('rounded-sm border border-border bg-surface p-3', className)}>
+      <div className="mb-4 flex items-center justify-between">
+        <h3 className="font-mono text-base font-semibold text-foreground">Data Column Availability</h3>
+        <div className="flex flex-col items-end gap-1.5">
+          <span className={clsx('font-mono text-sm font-medium', isDataAvailable ? 'text-success' : 'text-danger')}>
+            {isDataAvailable ? '✓' : '✗'} Data available
+          </span>
+          <span className="font-mono text-sm text-muted">{onTimeColumnCount} columns published on time</span>
+        </div>
+      </div>
       <HeatmapChart
         data={heatmapData}
         xLabels={xLabels}
         yLabels={yLabels}
-        title="DATA COLUMN AVAILABILITY"
+        title="First Seen At"
         xAxisTitle="Data Columns"
         yAxisTitle="Blobs"
         xAxisShowOnlyMinMax={true}
@@ -121,14 +130,6 @@ export function DataColumnDataAvailability({
           const [x, y, value] = params.value;
           return `<strong>Data Column:</strong> ${xLabels[x]}<br/><strong>Blob:</strong> ${yLabels[y]}<br/><strong>First Seen:</strong> ${value.toFixed(0)}ms`;
         }}
-        headerActions={
-          <div className="flex flex-col items-end gap-1.5">
-            <span className={clsx('font-mono text-sm font-medium', isDataAvailable ? 'text-success' : 'text-danger')}>
-              {isDataAvailable ? '✓' : '✗'} Data available
-            </span>
-            <span className="font-mono text-sm text-muted">{onTimeColumnCount} columns published on time</span>
-          </div>
-        }
       />
     </div>
   );
