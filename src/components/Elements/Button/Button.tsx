@@ -51,11 +51,11 @@ const variantStyles = {
 
 const sizeStyles = {
   normal: {
-    xs: 'rounded-xs px-2 py-1 text-xs gap-1.5',
-    sm: 'rounded-xs px-2 py-1 text-sm gap-1.5',
-    md: 'rounded-md px-2.5 py-1.5 text-sm gap-1.5',
-    lg: 'rounded-md px-3 py-2 text-sm gap-1.5',
-    xl: 'rounded-md px-3.5 py-2.5 text-sm gap-2',
+    xs: 'rounded-none px-2 py-1 text-xs gap-1.5',
+    sm: 'rounded-none px-2 py-1 text-sm gap-1.5',
+    md: 'rounded-none px-2.5 py-1.5 text-sm gap-1.5',
+    lg: 'rounded-none px-3 py-2 text-sm gap-1.5',
+    xl: 'rounded-none px-3.5 py-2.5 text-sm gap-2',
   },
   full: {
     xs: 'rounded-full px-2.5 py-1 text-xs gap-1.5',
