@@ -196,3 +196,43 @@ export const AllVariantsComparison: Story = {
     </div>
   ),
 };
+
+/**
+ * CheckboxGroup with rounded corners.
+ * Uses the `rounded` prop to apply rounded-sm class to all checkboxes.
+ */
+export const Rounded: Story = {
+  args: {
+    legend: 'Notifications',
+    srOnlyLegend: true,
+    options: notificationOptions,
+    variant: 'list',
+    rounded: true,
+  },
+};
+
+/**
+ * Comparison of rounded vs non-rounded checkbox groups.
+ */
+export const RoundedComparison: Story = {
+  args: {} as never,
+  render: () => (
+    <div className="space-y-8">
+      <div>
+        <h3 className="mb-4 text-base font-semibold text-foreground">No Rounded Corners</h3>
+        <CheckboxGroup legend="Notifications" srOnlyLegend={true} options={notificationOptions} variant="list" />
+      </div>
+
+      <div>
+        <h3 className="mb-4 text-base font-semibold text-foreground">With Rounded Corners</h3>
+        <CheckboxGroup
+          legend="Notifications"
+          srOnlyLegend={true}
+          options={notificationOptions}
+          variant="list"
+          rounded
+        />
+      </div>
+    </div>
+  ),
+};

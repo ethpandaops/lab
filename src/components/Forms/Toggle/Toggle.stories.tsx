@@ -119,3 +119,53 @@ export const SizeComparison: Story = {
     </div>
   ),
 };
+
+/**
+ * Toggle with rounded corners.
+ * Uses the `rounded` prop to apply rounded-lg to switch and rounded-md to knob.
+ */
+export const Rounded: Story = {
+  args: {} as never,
+  render: () => (
+    <ToggleWrapper
+      leftIcon={<SunIcon />}
+      rightIcon={<MoonIcon />}
+      leftColor="text-amber-500"
+      rightColor="text-primary"
+      srLabel="Toggle theme"
+      rounded
+    />
+  ),
+};
+
+/**
+ * Comparison of rounded vs non-rounded toggles.
+ */
+export const RoundedComparison: Story = {
+  args: {} as never,
+  render: () => (
+    <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-2">
+        <p className="text-sm text-muted">No Rounded Corners:</p>
+        <ToggleWrapper
+          leftIcon={<SunIcon />}
+          rightIcon={<MoonIcon />}
+          leftColor="text-amber-500"
+          rightColor="text-primary"
+          srLabel="Toggle without rounded"
+        />
+      </div>
+      <div className="flex flex-col gap-2">
+        <p className="text-sm text-muted">With Rounded Corners:</p>
+        <ToggleWrapper
+          leftIcon={<SunIcon />}
+          rightIcon={<MoonIcon />}
+          leftColor="text-amber-500"
+          rightColor="text-primary"
+          srLabel="Toggle with rounded"
+          rounded
+        />
+      </div>
+    </div>
+  ),
+};

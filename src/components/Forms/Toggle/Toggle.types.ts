@@ -9,4 +9,8 @@ export interface ToggleProps {
   rightColor?: string;
   srLabel?: string;
   size?: 'default' | 'small';
+  /**
+   * Apply rounded corners (rounded-lg for switch, rounded-md for knob). Default: false
+   */
+  rounded?: boolean;
 }
