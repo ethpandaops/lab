@@ -78,6 +78,7 @@ src/
     [Category]/                       # Component category folder
       [ComponentName]/                # Individual component folder
         [ComponentName].tsx           # Component implementation
+        [ComponentName].test.tsx      # Vitest tests
         [ComponentName].types.ts      # TypeScript types (optional)
         [ComponentName].stories.tsx   # Storybook stories (optional)
         index.ts                      # Barrel export
@@ -96,6 +97,7 @@ src/
   hooks/                              # Custom React hooks
     use[HookName]/                    # e.g., useNetwork, useConfig, useBeaconClock
       use[HookName].ts
+      use[HookName].test.ts           # Vitest tests
       use[HookName].types.ts          # Optional: for complex hooks
       index.ts
 
@@ -105,9 +107,9 @@ src/
     [other generated files]           # Auto-generated client, types, schemas, etc.
 
   utils/                              # Utility functions and helpers
-    api-config.ts                     # API configuration
-    colour.ts                         # Color utilities
-    index.ts                          # Utility exports
+    [UtilName].ts                     # API configuration
+    [UtilName].test.ts                # Vitest tests
+    index.ts                          # Barrel export
 
   main.tsx                            # Application entry point
   index.css                           # Global styles and Tailwind config
@@ -118,7 +120,9 @@ src/
 ## Architecture Patterns
 
 ### Component & State Philosophy
+
 **Core/Shared** (`src/components/`, `src/hooks/`, `src/contexts/`):
+
 - App-wide reusable building blocks
 - Generic and configurable
 - Work in any context without page logic
@@ -126,6 +130,7 @@ src/
 - Core components include Storybook stories
 
 **Page-Scoped** (`src/pages/[section]/components|hooks|contexts|providers/`):
+
 - Used within specific page/section only
 - Compose/extend core items for page needs
 - Contain page-specific business logic
@@ -133,7 +138,9 @@ src/
 - Keep complex page state isolated
 
 ### Core Component Categories
+
 Current categories in `src/components/`:
+
 - **Charts**: Data visualization (Globe, Line, Map)
 - **DataDisplay**: Data presentation (Stats)
 - **Elements**: Basic UI building blocks (Badge, Button, ButtonGroup)
@@ -146,22 +153,27 @@ Current categories in `src/components/`:
 - **Overlays**: Modals and overlays (ConfigGate, FatalError)
 
 ### Page Sections
+
 Current page sections in `src/pages/`:
+
 - **experiments**: Main section for experiment pages - most new pages will be added here
   - Current experiments: block-production-flow, slot-view, networks, geographical-checklist, fork-readiness, locally-built-blocks
   - Future experiments should follow the same pattern
 - **contributors**: Contributor list and detail pages with page-scoped components
 
 ### Standard Component Structure
+
 ```
 ComponentName/
   ComponentName.tsx                     # Main implementation
+  ComponentName.test.tsx                # Vitest tests
   ComponentName.types.ts                # TypeScript types (when needed)
-  ComponentName.stories.tsx             # Storybook stories (for components)
+  ComponentName.stories.tsx             # Storybook stories
   index.ts                              # Barrel export
 ```
 
 ### Routing & Pages
+
 - Route files in `src/routes/` - thin TanStack Router definitions
 - Page components in `src/pages/` - UI implementations
 - Page-scoped components in `pages/[section]/components/`
@@ -169,11 +181,13 @@ ComponentName/
 - Always barrel export via `index.tsx`
 
 ### State Management
+
 - Contexts in `src/contexts/` with types
 - Providers in `src/providers/` wrap app/features
 - Hooks in `src/hooks/` for context access and shared logic
 
 ### API Integration
+
 - Auto-generated code in `src/api/` - do not edit
 - Use hooks from `@/api/@tanstack/react-query.gen.ts`
 - Hooks handle fetching, caching, state management
@@ -181,6 +195,7 @@ ComponentName/
 ## Development Guidelines
 
 ### Quick Reference
+
 - **New experiment**: Route in `src/routes/experiments/`, page in `src/pages/experiments/[name]/`
 - **Experiment image**: `public/images/experiments/[name].png` for social sharing
 - **Skeleton component**: `src/pages/[section]/components/[PageName]Skeleton/` using `LoadingContainer`
@@ -189,21 +204,26 @@ ComponentName/
 - **Page-scoped component**: `src/pages/[section]/components/[ComponentName]/` - page-specific
 - **Core hook**: `src/hooks/use[Name]/` - app-wide logic
 - **Page-scoped hook**: `src/pages/[section]/hooks/use[Name].ts` - page-specific logic
+- **Utility function**: `src/utils/[name].ts` - helper functions
 - **Core context**: `src/contexts/` with provider in `src/providers/`
 - **Page-scoped context**: `src/pages/[section]/contexts/` with local provider
 
 ### Placement Decision
+
 **Components/Hooks/Contexts:**
+
 - Used across pages → Core (`src/components/`, `src/hooks/`, `src/contexts/`)
 - Page-specific logic → Page-scoped (`src/pages/[section]/components|hooks|contexts/`)
 - Complex page state → Page-scoped providers
 
 ### Best Practices
+
 - Storybook stories for all core components
 - Keep core components generic and reusable
 - Compose core components in page-scoped components
 - Use `pnpm storybook` with Playwright MCP for iteration
-- Write Vitest tests for components and utilities
+- Write Vitest tests for all components, hooks, and utilities
+- Use JSDoc style comments for functions, components, hooks, and complex types
 - Use Tailwind v4 classes
 - Use semantic color tokens from `src/index.css` theme
 - Use TanStack Router for navigation
@@ -221,16 +241,27 @@ ComponentName/
 - **Context** (`.ts`): PascalCase - `NetworkContext.ts` (in `src/contexts/`)
 - **Hooks** (`.ts`): camelCase starting with `use` - `useNetwork.ts`, `useConfig.ts`
 - **Utils** (`.ts`): kebab-case - `api-config.ts`, `auth-service.ts`
+- **Tests** (`.test.ts(x)`): Match source file name - `useNetwork.test.ts`, `colour.test.ts`
+
+### Testing
+
+- **Required for**: All hooks, utilities, and core components
+- **Framework**: Vitest with React Testing Library for components
+- **Location**: Co-located with source files (`.test.ts` or `.test.tsx`)
+- **Coverage**: Aim for high coverage of business logic and edge cases
+- **Naming**: Test files match source files with `.test.ts(x)` extension
 
 ## Loading States
 
 ### Shimmer/Skeleton Loading Pattern
+
 - Use `LoadingContainer` from `src/components/Layout/LoadingContainer/` as base
 - Create page-specific skeletons: `[PageName]Skeleton` or `[ComponentName]Skeleton`
 - Place in `pages/[section]/components/` alongside other page components
 - Show skeleton UI that matches actual content structure
 
 ### Best Practices
+
 - Match loading skeleton to actual content layout
 - Don't overuse - only for significant data fetches
 - Keep loading states brief and informative
@@ -239,11 +270,13 @@ ComponentName/
 ## Form Management
 
 ### Form Architecture
+
 - One FormProvider per page
 - Reusable filter components across experiments
 - Form state and handlers in page component
 
 ### Implementation
+
 ```tsx
 // In experiment page (e.g., pages/experiments/[name]/IndexPage.tsx)
 const methods = useForm<FormData>({ defaultValues });
@@ -257,6 +290,7 @@ const { register, watch } = useFormContext(); // Access parent form
 ```
 
 ### Best Practices
+
 - Single `useForm()` per page via FormProvider
 - Child components use `useFormContext()`
 - Validation schemas with types in `FormData.types.ts`
@@ -265,18 +299,22 @@ const { register, watch } = useFormContext(); // Access parent form
 ## Head Meta & SEO
 
 ### Meta Hierarchy
+
 - Base meta tags defined in `src/routes/__root.tsx`
 - Routes override with `head: () => ({ meta: [...] })`
 - Child routes inherit and can extend parent meta
 - **No variables in head**: Only use literals and `import.meta.env.VITE_*` (processed by build plugin)
 
 ### Experiment Feature Images
+
 **Standard**: Each experiment should have a feature image at:
+
 ```
 public/images/experiments/[experiment-name].png
 ```
 
 **Route Implementation**:
+
 ```tsx
 // In routes/experiments/[experiment-name].tsx
 head: () => ({
@@ -292,6 +330,7 @@ head: () => ({
 ```
 
 ### Best Practices
+
 - Always include experiment-specific title
 - Write unique description for each experiment
 - Update all three descriptions (meta, og:description, twitter:description)
@@ -303,6 +342,7 @@ head: () => ({
 Theme is defined in `src/index.css` using Tailwind CSS v4's `@theme inline` directive with semantic color tokens.
 
 **Available semantic colors:**
+
 - `primary`, `secondary`, `accent` - Brand colors (cyan/sky palette)
 - `background`, `surface`, `foreground`, `muted`, `border` - UI colors
 - `success`, `warning`, `error` - State colors
@@ -316,6 +356,7 @@ Theme is defined in `src/index.css` using Tailwind CSS v4's `@theme inline` dire
 ## Storybook
 
 - when creating a new story, add the following decorators:
+
 ```tsx
 decorators: [
   Story => (
@@ -325,4 +366,5 @@ decorators: [
   ),
 ],
 ```
+
 - When choosing a title, use the full nested path to the story, e.g. `Components/Layout/Container`
