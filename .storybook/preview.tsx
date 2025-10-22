@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import type { Preview, ReactRenderer } from '@storybook/react-vite';
 import { useEffect } from 'react';
 import { INITIAL_VIEWPORTS } from 'storybook/viewport';
@@ -26,7 +27,7 @@ initialize({
 });
 
 // Inject CSS variables from TypeScript source of truth
-function InjectThemeVariables() {
+function InjectThemeVariables(): null {
   useEffect(() => {
     const styleId = 'theme-variables';
     let style = document.getElementById(styleId) as HTMLStyleElement;
@@ -37,7 +38,7 @@ function InjectThemeVariables() {
       document.head.appendChild(style);
     }
 
-    const generateCssVars = (colors: typeof LIGHT_COLORS) =>
+    const generateCssVars = (colors: typeof LIGHT_COLORS): string =>
       Object.entries(colors)
         .map(([key, value]) => `--color-${key.replace(/([A-Z])/g, '-$1').toLowerCase()}: ${value};`)
         .join('\n    ');

@@ -36,7 +36,7 @@ export function useThemeColors(): ThemeColors {
       return () => observer.disconnect();
     },
     () => document.documentElement.classList.contains('dark'),
-    () => document.documentElement.classList.contains('dark'),
+    () => document.documentElement.classList.contains('dark')
   );
 
   return useMemo(() => (isDark ? DARK_COLORS : LIGHT_COLORS), [isDark]);

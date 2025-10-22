@@ -75,7 +75,7 @@ export function Timeline({
 
         {/* Right: Current time display */}
         <div className="ml-auto flex items-center gap-2">
-          <span className="text-2xl font-semibold text-foreground">{currentTime.toFixed(1)}</span>
+          <span className="text-2xl font-semibold text-foreground">{(currentTime / 1000).toFixed(1)}</span>
           <span className="text-sm text-muted">sec</span>
         </div>
       </div>
