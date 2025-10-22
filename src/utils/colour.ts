@@ -76,3 +76,35 @@ export function resolveCssColorToHex(color: string, fallback = '#000000'): strin
   // If parsing failed, return fallback
   return fallback;
 }
+
+/**
+ * Convert hex color to rgba format with alpha channel
+ *
+ * Useful for canvas operations (like ECharts gradients) that require rgba format
+ *
+ * @param color - Any CSS color (will be resolved to hex first)
+ * @param alpha - Alpha/opacity value between 0 (transparent) and 1 (opaque)
+ * @param fallback - Fallback hex color if resolution fails
+ * @returns RGBA color string (e.g., 'rgba(6, 182, 212, 0.5)')
+ *
+ * @example
+ * ```ts
+ * hexToRgba('#06b6d4', 0.5) // 'rgba(6, 182, 212, 0.5)'
+ * hexToRgba('oklch(78.9% 0.154 211.53)', 0.25) // 'rgba(6, 182, 212, 0.25)'
+ * hexToRgba('rgb(255, 0, 0)', 0.8) // 'rgba(255, 0, 0, 0.8)'
+ * ```
+ */
+export function hexToRgba(color: string, alpha: number, fallback = '#06b6d4'): string {
+  // Clamp alpha between 0 and 1
+  const clampedAlpha = Math.max(0, Math.min(1, alpha));
+
+  // Resolve to hex first
+  const hex = resolveCssColorToHex(color, fallback);
+
+  // Convert hex to rgb
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+
+  return `rgba(${r}, ${g}, ${b}, ${clampedAlpha})`;
+}

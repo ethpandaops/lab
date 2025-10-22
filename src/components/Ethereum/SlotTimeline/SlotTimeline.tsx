@@ -68,8 +68,7 @@ export function SlotTimeline({
     const rect = event.currentTarget.getBoundingClientRect();
     const clickX = event.clientX - rect.left;
     const percentClicked = (clickX / rect.width) * 100;
-    const timeSeconds = (percentClicked / 100) * totalDuration;
-    const timeMs = Math.round(timeSeconds * 1000);
+    const timeMs = Math.round((percentClicked / 100) * totalDuration);
 
     onTimeClick(timeMs);
   };
@@ -140,7 +139,7 @@ export function SlotTimeline({
               {showTimeLabels && !showInlineLabels && (
                 <div className="absolute inset-0 flex items-center justify-center">
                   <span className={clsx('text-2xs/4', phase.textClassName ?? 'font-medium text-background/80')}>
-                    {phase.startTime}s
+                    {phase.startTime / 1000}s
                   </span>
                 </div>
               )}
@@ -168,7 +167,7 @@ export function SlotTimeline({
             <span className="text-xs text-muted">0s</span>
             {phasePositions.map((phase, index) => (
               <span key={`cutover-${phase.label}-${index}`} className="text-xs text-muted">
-                {phase.endTime}s
+                {(phase.endTime / 1000).toFixed(0)}s
               </span>
             ))}
           </div>
@@ -180,7 +179,7 @@ export function SlotTimeline({
             className="pointer-events-none absolute -top-6 transition-all duration-300"
             style={{ left: `${currentTimePercent}%`, transform: 'translateX(-50%)' }}
           >
-            <span className="text-xs/4 font-semibold text-foreground">{currentTime.toFixed(1)}s</span>
+            <span className="text-xs/4 font-semibold text-foreground">{(currentTime / 1000).toFixed(1)}s</span>
           </div>
         )}
       </div>
@@ -195,7 +194,7 @@ export function SlotTimeline({
               {/* Phase label */}
               <span className="text-xs/4 text-muted">
                 {phase.label}
-                {showTimeLabels && <span className="text-2xs/4 ml-1 text-muted/70">({phase.duration}s)</span>}
+                {showTimeLabels && <span className="text-2xs/4 ml-1 text-muted/70">({phase.duration / 1000}s)</span>}
               </span>
             </div>
           ))}

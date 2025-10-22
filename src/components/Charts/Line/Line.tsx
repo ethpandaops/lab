@@ -1,7 +1,7 @@
 import type React from 'react';
 import { useState } from 'react';
 import ReactECharts from 'echarts-for-react';
-import { addOpacity } from '@/utils';
+import { hexToRgba } from '@/utils';
 import type { LineChartProps } from './Line.types';
 
 /**
@@ -24,6 +24,9 @@ export function LineChart({
   smooth = true,
   showArea = false,
   color,
+  yMax,
+  connectNulls = false,
+  animationDuration = 300,
 }: LineChartProps): React.JSX.Element {
   const [themeColors] = useState(() => {
     // Get computed CSS variables from the root element on initial render
@@ -64,6 +67,9 @@ export function LineChart({
   });
 
   const option = {
+    animation: true,
+    animationDuration,
+    animationEasing: 'cubicOut',
     title: title
       ? {
           text: title,
@@ -99,6 +105,7 @@ export function LineChart({
     },
     yAxis: {
       type: 'value',
+      max: yMax,
       axisLine: {
         show: false,
       },
@@ -121,13 +128,9 @@ export function LineChart({
         data,
         type: 'line',
         smooth,
-        symbol: 'circle',
-        symbolSize: 8,
-        itemStyle: {
-          color: color || themeColors.primary,
-          borderWidth: 2,
-          borderColor: themeColors.background,
-        },
+        connectNulls,
+        symbol: 'none',
+        showSymbol: false,
         lineStyle: {
           color: color || themeColors.primary,
           width: 3,
@@ -143,29 +146,19 @@ export function LineChart({
                 colorStops: [
                   {
                     offset: 0,
-                    color: addOpacity(color || themeColors.primary, 0.5), // 50% opacity
+                    color: hexToRgba(color || themeColors.primary, 0.5),
                   },
                   {
                     offset: 1,
-                    color: addOpacity(color || themeColors.primary, 0.06), // 6% opacity
+                    color: hexToRgba(color || themeColors.primary, 0.06),
                   },
                 ],
               },
             }
           : undefined,
         emphasis: {
-          scale: true,
-          scaleSize: 12,
-          itemStyle: {
-            color: color || themeColors.primary,
-            borderWidth: 3,
-            borderColor: themeColors.background,
-            shadowBlur: 10,
-            shadowColor: addOpacity(color || themeColors.primary, 0.25), // 25% opacity
-          },
           lineStyle: {
-            color: color || themeColors.primary,
-            width: 3,
+            width: 4,
           },
         },
       },

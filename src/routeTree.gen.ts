@@ -14,9 +14,9 @@ import { Route as ContributorsRouteImport } from './routes/contributors'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ExperimentsIndexRouteImport } from './routes/experiments/index'
 import { Route as ContributorsIndexRouteImport } from './routes/contributors/index'
+import { Route as ExperimentsSlotViewRouteImport } from './routes/experiments/slot-view'
 import { Route as ExperimentsNetworksRouteImport } from './routes/experiments/networks'
 import { Route as ExperimentsLocallyBuiltBlocksRouteImport } from './routes/experiments/locally-built-blocks'
-import { Route as ExperimentsLiveSlotsRouteImport } from './routes/experiments/live-slots'
 import { Route as ExperimentsGeographicalChecklistRouteImport } from './routes/experiments/geographical-checklist'
 import { Route as ExperimentsForkReadinessRouteImport } from './routes/experiments/fork-readiness'
 import { Route as ExperimentsBlockProductionFlowRouteImport } from './routes/experiments/block-production-flow'
@@ -47,6 +47,11 @@ const ContributorsIndexRoute = ContributorsIndexRouteImport.update({
   path: '/',
   getParentRoute: () => ContributorsRoute,
 } as any)
+const ExperimentsSlotViewRoute = ExperimentsSlotViewRouteImport.update({
+  id: '/slot-view',
+  path: '/slot-view',
+  getParentRoute: () => ExperimentsRoute,
+} as any)
 const ExperimentsNetworksRoute = ExperimentsNetworksRouteImport.update({
   id: '/networks',
   path: '/networks',
@@ -58,11 +63,6 @@ const ExperimentsLocallyBuiltBlocksRoute =
     path: '/locally-built-blocks',
     getParentRoute: () => ExperimentsRoute,
   } as any)
-const ExperimentsLiveSlotsRoute = ExperimentsLiveSlotsRouteImport.update({
-  id: '/live-slots',
-  path: '/live-slots',
-  getParentRoute: () => ExperimentsRoute,
-} as any)
 const ExperimentsGeographicalChecklistRoute =
   ExperimentsGeographicalChecklistRouteImport.update({
     id: '/geographical-checklist',
@@ -95,9 +95,9 @@ export interface FileRoutesByFullPath {
   '/experiments/block-production-flow': typeof ExperimentsBlockProductionFlowRoute
   '/experiments/fork-readiness': typeof ExperimentsForkReadinessRoute
   '/experiments/geographical-checklist': typeof ExperimentsGeographicalChecklistRoute
-  '/experiments/live-slots': typeof ExperimentsLiveSlotsRoute
   '/experiments/locally-built-blocks': typeof ExperimentsLocallyBuiltBlocksRoute
   '/experiments/networks': typeof ExperimentsNetworksRoute
+  '/experiments/slot-view': typeof ExperimentsSlotViewRoute
   '/contributors/': typeof ContributorsIndexRoute
   '/experiments/': typeof ExperimentsIndexRoute
 }
@@ -107,9 +107,9 @@ export interface FileRoutesByTo {
   '/experiments/block-production-flow': typeof ExperimentsBlockProductionFlowRoute
   '/experiments/fork-readiness': typeof ExperimentsForkReadinessRoute
   '/experiments/geographical-checklist': typeof ExperimentsGeographicalChecklistRoute
-  '/experiments/live-slots': typeof ExperimentsLiveSlotsRoute
   '/experiments/locally-built-blocks': typeof ExperimentsLocallyBuiltBlocksRoute
   '/experiments/networks': typeof ExperimentsNetworksRoute
+  '/experiments/slot-view': typeof ExperimentsSlotViewRoute
   '/contributors': typeof ContributorsIndexRoute
   '/experiments': typeof ExperimentsIndexRoute
 }
@@ -122,9 +122,9 @@ export interface FileRoutesById {
   '/experiments/block-production-flow': typeof ExperimentsBlockProductionFlowRoute
   '/experiments/fork-readiness': typeof ExperimentsForkReadinessRoute
   '/experiments/geographical-checklist': typeof ExperimentsGeographicalChecklistRoute
-  '/experiments/live-slots': typeof ExperimentsLiveSlotsRoute
   '/experiments/locally-built-blocks': typeof ExperimentsLocallyBuiltBlocksRoute
   '/experiments/networks': typeof ExperimentsNetworksRoute
+  '/experiments/slot-view': typeof ExperimentsSlotViewRoute
   '/contributors/': typeof ContributorsIndexRoute
   '/experiments/': typeof ExperimentsIndexRoute
 }
@@ -138,9 +138,9 @@ export interface FileRouteTypes {
     | '/experiments/block-production-flow'
     | '/experiments/fork-readiness'
     | '/experiments/geographical-checklist'
-    | '/experiments/live-slots'
     | '/experiments/locally-built-blocks'
     | '/experiments/networks'
+    | '/experiments/slot-view'
     | '/contributors/'
     | '/experiments/'
   fileRoutesByTo: FileRoutesByTo
@@ -150,9 +150,9 @@ export interface FileRouteTypes {
     | '/experiments/block-production-flow'
     | '/experiments/fork-readiness'
     | '/experiments/geographical-checklist'
-    | '/experiments/live-slots'
     | '/experiments/locally-built-blocks'
     | '/experiments/networks'
+    | '/experiments/slot-view'
     | '/contributors'
     | '/experiments'
   id:
@@ -164,9 +164,9 @@ export interface FileRouteTypes {
     | '/experiments/block-production-flow'
     | '/experiments/fork-readiness'
     | '/experiments/geographical-checklist'
-    | '/experiments/live-slots'
     | '/experiments/locally-built-blocks'
     | '/experiments/networks'
+    | '/experiments/slot-view'
     | '/contributors/'
     | '/experiments/'
   fileRoutesById: FileRoutesById
@@ -214,6 +214,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ContributorsIndexRouteImport
       parentRoute: typeof ContributorsRoute
     }
+    '/experiments/slot-view': {
+      id: '/experiments/slot-view'
+      path: '/slot-view'
+      fullPath: '/experiments/slot-view'
+      preLoaderRoute: typeof ExperimentsSlotViewRouteImport
+      parentRoute: typeof ExperimentsRoute
+    }
     '/experiments/networks': {
       id: '/experiments/networks'
       path: '/networks'
@@ -226,13 +233,6 @@ declare module '@tanstack/react-router' {
       path: '/locally-built-blocks'
       fullPath: '/experiments/locally-built-blocks'
       preLoaderRoute: typeof ExperimentsLocallyBuiltBlocksRouteImport
-      parentRoute: typeof ExperimentsRoute
-    }
-    '/experiments/live-slots': {
-      id: '/experiments/live-slots'
-      path: '/live-slots'
-      fullPath: '/experiments/live-slots'
-      preLoaderRoute: typeof ExperimentsLiveSlotsRouteImport
       parentRoute: typeof ExperimentsRoute
     }
     '/experiments/geographical-checklist': {
@@ -284,9 +284,9 @@ interface ExperimentsRouteChildren {
   ExperimentsBlockProductionFlowRoute: typeof ExperimentsBlockProductionFlowRoute
   ExperimentsForkReadinessRoute: typeof ExperimentsForkReadinessRoute
   ExperimentsGeographicalChecklistRoute: typeof ExperimentsGeographicalChecklistRoute
-  ExperimentsLiveSlotsRoute: typeof ExperimentsLiveSlotsRoute
   ExperimentsLocallyBuiltBlocksRoute: typeof ExperimentsLocallyBuiltBlocksRoute
   ExperimentsNetworksRoute: typeof ExperimentsNetworksRoute
+  ExperimentsSlotViewRoute: typeof ExperimentsSlotViewRoute
   ExperimentsIndexRoute: typeof ExperimentsIndexRoute
 }
 
@@ -294,9 +294,9 @@ const ExperimentsRouteChildren: ExperimentsRouteChildren = {
   ExperimentsBlockProductionFlowRoute: ExperimentsBlockProductionFlowRoute,
   ExperimentsForkReadinessRoute: ExperimentsForkReadinessRoute,
   ExperimentsGeographicalChecklistRoute: ExperimentsGeographicalChecklistRoute,
-  ExperimentsLiveSlotsRoute: ExperimentsLiveSlotsRoute,
   ExperimentsLocallyBuiltBlocksRoute: ExperimentsLocallyBuiltBlocksRoute,
   ExperimentsNetworksRoute: ExperimentsNetworksRoute,
+  ExperimentsSlotViewRoute: ExperimentsSlotViewRoute,
   ExperimentsIndexRoute: ExperimentsIndexRoute,
 }
 

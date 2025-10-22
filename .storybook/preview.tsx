@@ -1,12 +1,16 @@
+/* eslint-disable react-refresh/only-export-components */
 import type { Preview, ReactRenderer } from '@storybook/react-vite';
+import { useEffect } from 'react';
 import { INITIAL_VIEWPORTS } from 'storybook/viewport';
 import { RouterProvider, createMemoryHistory, createRootRoute, createRouter } from '@tanstack/react-router';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { NetworkProvider } from '../src/providers/NetworkProvider';
+import { ThemeProvider } from '../src/providers/ThemeProvider';
 import { ConfigGate } from '../src/components/Overlays/ConfigGate';
 import { initialize, mswLoader } from 'msw-storybook-addon';
 import { withThemeByClassName } from '@storybook/addon-themes';
 import { handlers, mockConfig, mockBounds } from './mocks';
+import { LIGHT_COLORS, DARK_COLORS } from '../src/theme/colors';
 import '../src/index.css';
 
 // Get the base path from environment
@@ -21,6 +25,36 @@ initialize({
     url: basePath ? `${basePath}/mockServiceWorker.js` : '/mockServiceWorker.js',
   },
 });
+
+// Inject CSS variables from TypeScript source of truth
+function InjectThemeVariables(): null {
+  useEffect(() => {
+    const styleId = 'theme-variables';
+    let style = document.getElementById(styleId) as HTMLStyleElement;
+
+    if (!style) {
+      style = document.createElement('style');
+      style.id = styleId;
+      document.head.appendChild(style);
+    }
+
+    const generateCssVars = (colors: typeof LIGHT_COLORS): string =>
+      Object.entries(colors)
+        .map(([key, value]) => `--color-${key.replace(/([A-Z])/g, '-$1').toLowerCase()}: ${value};`)
+        .join('\n    ');
+
+    style.textContent = `
+      :root {
+        ${generateCssVars(LIGHT_COLORS)}
+      }
+      html.dark {
+        ${generateCssVars(DARK_COLORS)}
+      }
+    `;
+  }, []);
+
+  return null;
+}
 
 const preview: Preview = {
   loaders: [mswLoader],
@@ -74,11 +108,14 @@ const preview: Preview = {
 
       return (
         <QueryClientProvider client={queryClient} key={context.id}>
-          <ConfigGate>
-            <NetworkProvider>
-              <RouterProvider router={router} />
-            </NetworkProvider>
-          </ConfigGate>
+          <InjectThemeVariables />
+          <ThemeProvider>
+            <ConfigGate>
+              <NetworkProvider>
+                <RouterProvider router={router} />
+              </NetworkProvider>
+            </ConfigGate>
+          </ThemeProvider>
         </QueryClientProvider>
       );
     },
