@@ -177,6 +177,15 @@ export const Default: Story = {
 
 export const Interactive: Story = {
   name: 'Interactive with Controls',
+  args: {
+    phases: DEFAULT_BEACON_SLOT_PHASES,
+    currentTime: 4.0,
+    items: ethereumEvents,
+    isPlaying: false,
+    isLive: true,
+    title: 'Slot Timeline',
+    scrollingTimelineHeight: '400px',
+  },
   render: () => {
     const [currentTime, setCurrentTime] = useState(4.0);
     const [isPlaying, setIsPlaying] = useState(false);

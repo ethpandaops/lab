@@ -67,6 +67,11 @@ export const Default: Story = {
 
 export const Interactive: Story = {
   name: 'Interactive with Auto-Progress',
+  args: {
+    currentTime: 0,
+    data: ATTESTATION_DATA,
+    totalExpected: TOTAL_EXPECTED,
+  },
   render: () => {
     const [currentTime, setCurrentTime] = useState(0);
     const [isPlaying, setIsPlaying] = useState(true);

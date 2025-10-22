@@ -1,8 +1,8 @@
 export interface LineChartProps {
   /**
-   * Chart data series
+   * Chart data series (null values create gaps when connectNulls is false)
    */
-  data?: number[];
+  data?: (number | null)[];
   /**
    * X-axis labels
    */

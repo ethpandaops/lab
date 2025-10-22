@@ -1,6 +1,6 @@
 import { type JSX, useEffect, useRef } from 'react';
 import clsx from 'clsx';
-import type { ScrollingTimelineProps } from './ScrollingTimeline.types';
+import type { ScrollingTimelineProps, TimelineItem } from './ScrollingTimeline.types';
 
 const defaultFormatTime = (timestamp: number): string => {
   return `${timestamp.toFixed(1)}s`;

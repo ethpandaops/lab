@@ -183,6 +183,10 @@ export const Default: Story = {
 };
 
 export const WithAutoScrolling: Story = {
+  args: {
+    items: ethereumEvents,
+    currentTime: 0,
+  },
   render: () => {
     const [currentTime, setCurrentTime] = useState(0);
     const [isPlaying, setIsPlaying] = useState(true);
