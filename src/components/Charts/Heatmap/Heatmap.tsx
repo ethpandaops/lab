@@ -1,6 +1,6 @@
 import type React from 'react';
-import { useState } from 'react';
 import ReactECharts from 'echarts-for-react';
+import { useThemeColors } from '@/hooks/useThemeColors';
 import type { HeatmapChartProps } from './Heatmap.types';
 
 /**
@@ -38,38 +38,7 @@ export function HeatmapChart({
   xAxisShowOnlyMinMax = false,
   yAxisShowOnlyMinMax = false,
 }: HeatmapChartProps): React.JSX.Element {
-  const [themeColors] = useState(() => {
-    // Get computed CSS variables from the root element on initial render
-    const root = document.documentElement;
-    const computedStyle = getComputedStyle(root);
-
-    // Fallback colors
-    const fallbackColors = {
-      foreground: '#09090b', // fallback zinc-950
-      muted: '#52525b', // fallback zinc-600
-      border: '#e4e4e7', // fallback zinc-200
-      background: '#ffffff',
-    };
-
-    // Extract theme colors from CSS variables
-    const foregroundColor =
-      computedStyle.getPropertyValue('--color-foreground').trim() ||
-      computedStyle.getPropertyValue('--color-zinc-950').trim();
-    const mutedColor =
-      computedStyle.getPropertyValue('--color-muted').trim() ||
-      computedStyle.getPropertyValue('--color-zinc-600').trim();
-    const borderColor =
-      computedStyle.getPropertyValue('--color-border').trim() ||
-      computedStyle.getPropertyValue('--color-zinc-200').trim();
-    const backgroundColor = computedStyle.getPropertyValue('--color-background').trim() || '#ffffff';
-
-    return {
-      foreground: foregroundColor || fallbackColors.foreground,
-      muted: mutedColor || fallbackColors.muted,
-      border: borderColor || fallbackColors.border,
-      background: backgroundColor || fallbackColors.background,
-    };
-  });
+  const themeColors = useThemeColors();
 
   const option = {
     animation: true,
