@@ -15,6 +15,12 @@ const meta: Meta = {
     ),
   ],
   tags: ['autodocs'],
+  argTypes: {
+    size: {
+      control: 'select',
+      options: ['xs', 'sm', 'md', 'lg', 'xl'],
+    },
+  },
 };
 
 export default meta;
@@ -27,6 +33,66 @@ export const Default: Story = {
   args: {
     title: 'Welcome to the Dashboard',
     description: 'Track your metrics and monitor performance in real-time',
+    showAccent: true,
+  },
+};
+
+/**
+ * Extra small header (xs)
+ */
+export const ExtraSmall: Story = {
+  args: {
+    title: 'User Settings',
+    description: 'Manage your preferences',
+    size: 'xs',
+    showAccent: true,
+  },
+};
+
+/**
+ * Small header (sm)
+ */
+export const Small: Story = {
+  args: {
+    title: 'Dashboard Overview',
+    description: 'Quick insights and metrics',
+    size: 'sm',
+    showAccent: true,
+  },
+};
+
+/**
+ * Medium header (md) - default size
+ */
+export const Medium: Story = {
+  args: {
+    title: 'Welcome to the Dashboard',
+    description: 'Track your metrics and monitor performance in real-time',
+    size: 'md',
+    showAccent: true,
+  },
+};
+
+/**
+ * Large header (lg)
+ */
+export const Large: Story = {
+  args: {
+    title: 'Analytics Platform',
+    description: 'Comprehensive data insights and visualizations for your organization',
+    size: 'lg',
+    showAccent: true,
+  },
+};
+
+/**
+ * Extra large header (xl)
+ */
+export const ExtraLarge: Story = {
+  args: {
+    title: 'Enterprise Dashboard',
+    description: 'Advanced monitoring and analytics for large-scale operations and data-driven decision making',
+    size: 'xl',
     showAccent: true,
   },
 };

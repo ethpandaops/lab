@@ -1,3 +1,5 @@
+export type HeaderSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+
 export interface HeaderProps {
   /**
    * Main heading text
@@ -12,6 +14,11 @@ export interface HeaderProps {
    * @default true
    */
   showAccent?: boolean;
+  /**
+   * The size of the header
+   * @default 'md'
+   */
+  size?: HeaderSize;
   /**
    * Additional CSS classes for the container
    */

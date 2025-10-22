@@ -2,6 +2,7 @@ import { forwardRef, cloneElement, isValidElement } from 'react';
 import { Button as HeadlessButton } from '@headlessui/react';
 import clsx from 'clsx';
 import type { ButtonProps } from './Button.types';
+import './Button.css';
 
 const baseStyles =
   'inline-flex items-center font-semibold transition-all disabled:cursor-not-allowed disabled:opacity-50 focus:outline-hidden';
@@ -96,6 +97,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       trailingIcon,
       iconOnly = false,
       nowrap = false,
+      hyper = false,
       className,
       children,
       type = 'button',
@@ -110,6 +112,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       variantStyles[variant],
       sizeStyle,
       nowrap && 'whitespace-nowrap',
+      hyper && (variant === 'blank' ? 'button-hyper-blank' : 'button-hyper'),
       className
     );
 
