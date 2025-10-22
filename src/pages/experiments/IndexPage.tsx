@@ -32,7 +32,9 @@ export function IndexPage(): JSX.Element {
           </Card>
         </Link>
         <Link to="/experiments/geographical-checklist" className="block">
-          <Card>
+          <Card
+            featureImage={<img src="/images/expirements/geographical-checklist.png" alt="Geographical Checklist" />}
+          >
             <div className="flex flex-col gap-3">
               <h3 className="text-lg/7 font-semibold text-foreground">Geographical Checklist</h3>
             </div>
