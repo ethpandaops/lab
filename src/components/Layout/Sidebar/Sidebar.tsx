@@ -145,7 +145,7 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps): JSX.Elem
                     <ListItem key={experiment.to}>
                       <Link
                         to={experiment.to}
-                        className="group flex gap-x-3 rounded-lg px-2.5 py-1.5 text-sm/6 font-semibold text-muted transition-all hover:bg-primary/10 hover:text-primary"
+                        className="group flex gap-x-3 px-2.5 py-1.5 text-sm/6 font-semibold text-muted transition-all hover:bg-primary/10 hover:text-primary"
                         activeProps={{
                           className: 'bg-primary/10 text-primary shadow-sm ring-1 ring-primary/20',
                         }}
