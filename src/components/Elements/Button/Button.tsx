@@ -50,28 +50,28 @@ const variantStyles = {
 };
 
 const sizeStyles = {
-  normal: {
-    xs: 'rounded-xs px-2 py-1 text-xs gap-1.5',
-    sm: 'rounded-xs px-2 py-1 text-sm gap-1.5',
-    md: 'rounded-md px-2.5 py-1.5 text-sm gap-1.5',
-    lg: 'rounded-md px-3 py-2 text-sm gap-1.5',
-    xl: 'rounded-md px-3.5 py-2.5 text-sm gap-2',
-  },
-  full: {
-    xs: 'rounded-full px-2.5 py-1 text-xs gap-1.5',
-    sm: 'rounded-full px-2.5 py-1 text-sm gap-1.5',
-    md: 'rounded-full px-3 py-1.5 text-sm gap-1.5',
-    lg: 'rounded-full px-3.5 py-2 text-sm gap-1.5',
-    xl: 'rounded-full px-4 py-2.5 text-sm gap-2',
-  },
+  xs: 'px-2 py-1 text-xs gap-1.5',
+  sm: 'px-2 py-1 text-sm gap-1.5',
+  md: 'px-2.5 py-1.5 text-sm gap-1.5',
+  lg: 'px-3 py-2 text-sm gap-1.5',
+  xl: 'px-3.5 py-2.5 text-sm gap-2',
 };
 
-const iconOnlyStyles = {
-  xs: 'rounded-full p-1',
-  sm: 'rounded-full p-1.5',
-  md: 'rounded-full p-2',
-  lg: 'rounded-full p-2',
-  xl: 'rounded-full p-2.5',
+const roundedStyles = {
+  xs: 'rounded-xs',
+  sm: 'rounded-sm',
+  md: 'rounded-md',
+  lg: 'rounded-lg',
+  xl: 'rounded-xl',
+  full: 'rounded-full',
+};
+
+const iconOnlySizeStyles = {
+  xs: 'p-1',
+  sm: 'p-1.5',
+  md: 'p-2',
+  lg: 'p-2',
+  xl: 'p-2.5',
 };
 
 const iconSizeStyles = {
@@ -92,7 +92,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     {
       variant = 'primary',
       size = 'md',
-      rounded = 'normal',
+      rounded,
       leadingIcon,
       trailingIcon,
       iconOnly = false,
@@ -105,12 +105,14 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     },
     ref
   ) => {
-    const sizeStyle = iconOnly ? iconOnlyStyles[size] : sizeStyles[rounded][size];
+    const sizeStyle = iconOnly ? iconOnlySizeStyles[size] : sizeStyles[size];
+    const roundedStyle = rounded ? roundedStyles[rounded] : iconOnly ? 'rounded-full' : 'rounded-none';
 
     const buttonClassName = clsx(
       baseStyles,
       variantStyles[variant],
       sizeStyle,
+      roundedStyle,
       nowrap && 'whitespace-nowrap',
       hyper && (variant === 'blank' ? 'button-hyper-blank' : 'button-hyper'),
       className

@@ -5,7 +5,7 @@ export type ButtonVariant = 'primary' | 'secondary' | 'soft' | 'outline' | 'dang
 
 export type ButtonSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 
-export type ButtonRounded = 'normal' | 'full';
+export type ButtonRounded = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'full';
 
 export interface ButtonProps extends ComponentPropsWithoutRef<typeof HeadlessButton> {
   /**
@@ -21,10 +21,15 @@ export interface ButtonProps extends ComponentPropsWithoutRef<typeof HeadlessBut
   size?: ButtonSize;
 
   /**
-   * The border radius style
-   * - 'normal': Uses rounded-xs or rounded-md
-   * - 'full': Uses rounded-full for pill-shaped buttons
-   * @default 'normal'
+   * The border radius amount
+   * - 'xs': Minimal rounding (rounded-xs)
+   * - 'sm': Small rounding (rounded-sm)
+   * - 'md': Medium rounding (rounded-md)
+   * - 'lg': Large rounding (rounded-lg)
+   * - 'xl': Extra large rounding (rounded-xl)
+   * - 'full': Fully rounded pill shape (rounded-full)
+   * - undefined: Square corners (rounded-none)
+   * @default undefined
    */
   rounded?: ButtonRounded;
 
