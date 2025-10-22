@@ -27,6 +27,13 @@ export interface ListContainerProps {
   compact?: boolean;
 
   /**
+   * Whether to show dividers between list items
+   * Note: Does not apply to 'separate' variant
+   * @default true
+   */
+  withDividers?: boolean;
+
+  /**
    * Additional CSS classes
    */
   className?: string;

@@ -25,6 +25,14 @@ const meta = {
       control: 'boolean',
       description: 'Whether to display full-width on mobile devices (removes rounded corners and adjusts padding)',
     },
+    compact: {
+      control: 'boolean',
+      description: 'Whether to use compact spacing (reduces padding between items)',
+    },
+    withDividers: {
+      control: 'boolean',
+      description: 'Whether to show dividers between list items (does not apply to separate variant)',
+    },
     as: {
       control: 'select',
       options: ['ul', 'ol', 'div'],
@@ -55,6 +63,8 @@ export const Playground: Story = {
   args: {
     variant: 'card',
     fullWidthOnMobile: false,
+    compact: false,
+    withDividers: true,
     as: 'ul',
   },
   render: args => (
@@ -296,6 +306,122 @@ export const WithRoundedCorners: Story = {
         <ListContainer variant="separate">
           {items.map(item => (
             <ListItem key={item.id} className="rounded-lg">
+              <div>
+                <h3 className="text-sm/6 font-semibold text-foreground">{item.title}</h3>
+                <p className="mt-1 text-sm/5 text-muted">{item.description}</p>
+              </div>
+            </ListItem>
+          ))}
+        </ListContainer>
+      </div>
+    </div>
+  ),
+};
+
+/**
+ * Control divider visibility with the `withDividers` prop.
+ * Default is `true` for all variants except `separate`.
+ */
+export const WithDividers: Story = {
+  args: {},
+  render: () => (
+    <div className="flex flex-col gap-6">
+      <div>
+        <p className="mb-3 text-sm/6 text-muted">With Dividers (default)</p>
+        <ListContainer variant="card" withDividers={true}>
+          {items.map(item => (
+            <ListItem key={item.id}>
+              <div>
+                <h3 className="text-sm/6 font-semibold text-foreground">{item.title}</h3>
+                <p className="mt-1 text-sm/5 text-muted">{item.description}</p>
+              </div>
+            </ListItem>
+          ))}
+        </ListContainer>
+      </div>
+
+      <div>
+        <p className="mb-3 text-sm/6 text-muted">Without Dividers</p>
+        <ListContainer variant="card" withDividers={false}>
+          {items.map(item => (
+            <ListItem key={item.id}>
+              <div>
+                <h3 className="text-sm/6 font-semibold text-foreground">{item.title}</h3>
+                <p className="mt-1 text-sm/5 text-muted">{item.description}</p>
+              </div>
+            </ListItem>
+          ))}
+        </ListContainer>
+      </div>
+    </div>
+  ),
+};
+
+/**
+ * Compact spacing reduces padding between items.
+ * Useful for navigation lists or dense information displays.
+ */
+export const Compact: Story = {
+  args: {},
+  render: () => (
+    <div className="flex flex-col gap-6">
+      <div>
+        <p className="mb-3 text-sm/6 text-muted">Normal Spacing</p>
+        <ListContainer variant="card" compact={false}>
+          {items.map(item => (
+            <ListItem key={item.id}>
+              <div>
+                <h3 className="text-sm/6 font-semibold text-foreground">{item.title}</h3>
+                <p className="mt-1 text-sm/5 text-muted">{item.description}</p>
+              </div>
+            </ListItem>
+          ))}
+        </ListContainer>
+      </div>
+
+      <div>
+        <p className="mb-3 text-sm/6 text-muted">Compact Spacing</p>
+        <ListContainer variant="card" compact={true}>
+          {items.map(item => (
+            <ListItem key={item.id}>
+              <div>
+                <h3 className="text-sm/6 font-semibold text-foreground">{item.title}</h3>
+                <p className="mt-1 text-sm/5 text-muted">{item.description}</p>
+              </div>
+            </ListItem>
+          ))}
+        </ListContainer>
+      </div>
+    </div>
+  ),
+};
+
+/**
+ * Combined example: compact spacing without dividers.
+ * Perfect for navigation menus or sidebar lists.
+ */
+export const CompactNoDividers: Story = {
+  args: {},
+  render: () => (
+    <div className="flex flex-col gap-6">
+      <div>
+        <p className="mb-3 text-sm/6 text-muted">Navigation List Style</p>
+        <ListContainer variant="simple" compact withDividers={false}>
+          {items.map(item => (
+            <ListItem key={item.id}>
+              <div className="rounded-lg px-2.5 py-1.5 transition-all hover:bg-primary/10">
+                <h3 className="text-sm/6 font-semibold text-foreground">{item.title}</h3>
+              </div>
+            </ListItem>
+          ))}
+        </ListContainer>
+      </div>
+
+      <div>
+        <p className="mb-3 text-sm/6 text-muted">Compact with Dividers</p>
+        <ListContainer variant="card" compact withDividers={true}>
+          {items.map(item => (
+            <ListItem key={item.id}>
               <div>
                 <h3 className="text-sm/6 font-semibold text-foreground">{item.title}</h3>
                 <p className="mt-1 text-sm/5 text-muted">{item.description}</p>
