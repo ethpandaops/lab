@@ -119,7 +119,7 @@ const mockNodes: ProcessedNode[] = [
 ] as ProcessedNode[];
 
 const meta = {
-  title: 'Pages/Experiments/GeographicalChecklist/GeographicalMapView',
+  title: 'Pages/Experiments/Geographical Checklist/GeographicalMapView',
   component: GeographicalMapView,
   decorators: [
     Story => (

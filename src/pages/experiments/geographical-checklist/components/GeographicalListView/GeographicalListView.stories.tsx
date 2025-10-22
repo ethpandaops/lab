@@ -61,7 +61,7 @@ const mockContinents = new Map<ContinentCode, ContinentData>([
 ]);
 
 const meta = {
-  title: 'Pages/Experiments/GeographicalChecklist/GeographicalListView',
+  title: 'Pages/Experiments/Geographical Checklist/GeographicalListView',
   component: GeographicalListView,
   decorators: [
     Story => (

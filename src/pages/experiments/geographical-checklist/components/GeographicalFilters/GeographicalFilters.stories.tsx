@@ -21,7 +21,7 @@ const mockCountries = [
 ];
 
 const meta = {
-  title: 'Pages/Experiments/GeographicalChecklist/GeographicalFilters',
+  title: 'Pages/Experiments/Geographical Checklist/GeographicalFilters',
   component: GeographicalFilters,
   decorators: [
     Story => {
