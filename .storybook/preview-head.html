@@ -1,0 +1,42 @@
+<style>
+  /*
+   * Theme CSS Variables for Storybook
+   *
+   * NOTE: These values MUST match src/theme/colors.ts
+   * They are duplicated here because Tailwind's @theme directive doesn't work in Storybook.
+   *
+   * When updating colors, update BOTH:
+   * - src/theme/colors.ts (source of truth)
+   * - This file (for Storybook compatibility)
+   */
+
+  :root {
+    /* Light mode - futuristic cyan theme */
+    --color-primary: #06b6d4; /* cyan-500 */
+    --color-secondary: #0ea5e9; /* sky-500 */
+    --color-accent: #22d3ee; /* cyan-400 */
+    --color-background: #ffffff;
+    --color-surface: #f9fafb; /* gray-50 */
+    --color-foreground: #09090b; /* zinc-950 */
+    --color-muted: #52525b; /* zinc-600 */
+    --color-border: #e4e4e7; /* zinc-200 */
+    --color-success: #22c55e; /* green-500 */
+    --color-warning: #f59e0b; /* amber-500 */
+    --color-danger: #ef4444; /* red-500 */
+  }
+
+  html.dark {
+    /* Dark mode - softer cyan for better contrast */
+    --color-primary: #22d3ee; /* cyan-400 */
+    --color-secondary: #38bdf8; /* sky-400 */
+    --color-accent: #67e8f9; /* cyan-300 */
+    --color-background: #09090b; /* zinc-950 */
+    --color-surface: #18181b; /* zinc-900 */
+    --color-foreground: #fafafa; /* zinc-50 */
+    --color-muted: #a1a1aa; /* zinc-400 */
+    --color-border: #27272a; /* zinc-800 */
+    --color-success: #22c55e; /* green-500 */
+    --color-warning: #f59e0b; /* amber-500 */
+    --color-danger: #ef4444; /* red-500 */
+  }
+</style>

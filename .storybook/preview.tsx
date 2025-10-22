@@ -3,6 +3,7 @@ import { INITIAL_VIEWPORTS } from 'storybook/viewport';
 import { RouterProvider, createMemoryHistory, createRootRoute, createRouter } from '@tanstack/react-router';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { NetworkProvider } from '../src/providers/NetworkProvider';
+import { ThemeProvider } from '../src/providers/ThemeProvider';
 import { ConfigGate } from '../src/components/Overlays/ConfigGate';
 import { initialize, mswLoader } from 'msw-storybook-addon';
 import { withThemeByClassName } from '@storybook/addon-themes';
@@ -74,11 +75,13 @@ const preview: Preview = {
 
       return (
         <QueryClientProvider client={queryClient} key={context.id}>
-          <ConfigGate>
-            <NetworkProvider>
-              <RouterProvider router={router} />
-            </NetworkProvider>
-          </ConfigGate>
+          <ThemeProvider>
+            <ConfigGate>
+              <NetworkProvider>
+                <RouterProvider router={router} />
+              </NetworkProvider>
+            </ConfigGate>
+          </ThemeProvider>
         </QueryClientProvider>
       );
     },

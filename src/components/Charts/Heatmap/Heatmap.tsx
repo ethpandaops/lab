@@ -191,7 +191,11 @@ export function HeatmapChart({
 
   return (
     <div className="w-full">
-      <ReactECharts option={option} style={{ height, width: '100%', minHeight: height }} />
+      <ReactECharts
+        key={themeColors.foreground}
+        option={option}
+        style={{ height, width: '100%', minHeight: height }}
+      />
     </div>
   );
 }

@@ -1,31 +1,14 @@
-import { useMemo } from 'react';
-import { useTheme } from '@/hooks/useTheme';
-import { resolveCssColorToHex } from '@/utils/colour';
+import { useMemo, useSyncExternalStore } from 'react';
+import { LIGHT_COLORS, DARK_COLORS, type ThemeColors } from '@/theme/colors';
 
-export interface ThemeColors {
-  // Brand colors
-  primary: string;
-  secondary: string;
-  accent: string;
-
-  // Surface colors
-  background: string;
-  surface: string;
-  foreground: string;
-  muted: string;
-  border: string;
-
-  // State colors
-  success: string;
-  warning: string;
-  danger: string;
-}
+// Re-export the interface for convenience
+export type { ThemeColors };
 
 /**
  * Get theme colors as hex values suitable for chart libraries
  *
  * Reactively updates when theme changes (light/dark mode).
- * All colors are resolved to hex format for compatibility with libraries like ECharts.
+ * Returns color constants from src/theme/colors.ts.
  *
  * @returns {ThemeColors} Object containing all semantic theme colors as hex strings
  *
@@ -45,35 +28,16 @@ export interface ThemeColors {
  * ```
  */
 export function useThemeColors(): ThemeColors {
-  const { theme } = useTheme();
+  // Observe HTML class changes to detect theme toggles (works with Storybook)
+  const isDark = useSyncExternalStore(
+    callback => {
+      const observer = new MutationObserver(() => callback());
+      observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+      return () => observer.disconnect();
+    },
+    () => document.documentElement.classList.contains('dark'),
+    () => document.documentElement.classList.contains('dark'),
+  );
 
-  return useMemo(() => {
-    // Get computed CSS variable values
-    const root = document.documentElement;
-    const style = getComputedStyle(root);
-
-    const getCssVar = (name: string): string => {
-      const value = style.getPropertyValue(name).trim();
-      return resolveCssColorToHex(value, '#000000');
-    };
-
-    return {
-      // Brand colors
-      primary: getCssVar('--color-primary'),
-      secondary: getCssVar('--color-secondary'),
-      accent: getCssVar('--color-accent'),
-
-      // Surface colors
-      background: getCssVar('--color-background'),
-      surface: getCssVar('--color-surface'),
-      foreground: getCssVar('--color-foreground'),
-      muted: getCssVar('--color-muted'),
-      border: getCssVar('--color-border'),
-
-      // State colors
-      success: getCssVar('--color-success'),
-      warning: getCssVar('--color-warning'),
-      danger: getCssVar('--color-danger'),
-    };
-  }, [theme]); // Re-compute when theme changes
+  return useMemo(() => (isDark ? DARK_COLORS : LIGHT_COLORS), [isDark]);
 }
