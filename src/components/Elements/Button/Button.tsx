@@ -51,9 +51,9 @@ const variantStyles = {
 
 const sizeStyles = {
   xs: 'px-2 py-1 text-xs gap-1.5',
-  sm: 'px-2 py-1 text-sm gap-1.5',
-  md: 'px-2.5 py-1.5 text-sm gap-1.5',
-  lg: 'px-3 py-2 text-sm gap-1.5',
+  sm: 'px-2 py-1.5 text-sm gap-1.5', // Aligned with Input sm
+  md: 'px-2.5 py-1.5 text-sm gap-1.5', // Aligned with Input md
+  lg: 'px-3 py-2 text-sm gap-1.5', // Aligned with Input lg
   xl: 'px-3.5 py-2.5 text-sm gap-2',
 };
 
@@ -75,11 +75,11 @@ const iconOnlySizeStyles = {
 };
 
 const iconSizeStyles = {
-  xs: 'size-4',
-  sm: 'size-5',
-  md: 'size-5',
-  lg: 'size-5',
-  xl: 'size-5',
+  xs: 'size-4', // 16px - proportional to xs
+  sm: 'size-4', // 16px - aligned with smaller button height
+  md: 'size-4', // 16px - aligned with smaller button height
+  lg: 'size-5', // 20px - proportional to lg
+  xl: 'size-5', // 20px - proportional to xl
 };
 
 const iconMarginStyles = {
