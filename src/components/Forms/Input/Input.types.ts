@@ -3,30 +3,64 @@ import type { ButtonProps } from '@/components/Elements/Button/Button.types';
 
 export type InputSize = 'sm' | 'md' | 'lg';
 
-export type InputVariant = 'default' | 'error' | 'gray';
-
 /**
- * Props for inline add-ons that appear inside the input border
+ * Props for Input.Leading and Input.Trailing slot components
  */
-export interface InlineAddonProps {
+export interface InputSlotProps {
   /**
-   * The content to display (text or React element)
+   * Content to render in the slot
+   * Can be:
+   * - Icon component (e.g., <EnvelopeIcon />)
+   * - Text addon (e.g., "$", "USD")
+   * - Select element
+   * - Button component
    */
-  content: ReactNode;
+  children: ReactNode;
   /**
    * Optional className for styling
    */
   className?: string;
+  /**
+   * Explicit type hint for the slot content
+   * Helps with layout decisions and avoids fragile type detection
+   * @default undefined (auto-detect)
+   */
+  type?: 'icon' | 'text' | 'select' | 'button';
 }
 
 /**
- * Props for external add-ons that appear outside the input border
+ * Props for Input.Field component
  */
-export interface ExternalAddonProps {
+export interface InputFieldProps extends Omit<ComponentPropsWithoutRef<'input'>, 'size'> {
+  /**
+   * Optional className for styling
+   */
+  className?: string;
+  /**
+   * Hint for mobile keyboards about what type of data to expect
+   * Improves mobile UX by showing appropriate keyboard layout
+   * @default undefined
+   */
+  inputMode?: 'text' | 'decimal' | 'numeric' | 'tel' | 'search' | 'email' | 'url';
+  /**
+   * Ref to the input element (React 19+ pattern)
+   */
+  ref?: React.Ref<HTMLInputElement>;
+}
+
+/**
+ * Props for add-ons that can appear inside or outside the input border
+ */
+export interface AddonProps {
   /**
    * The content to display (text or React element)
    */
   content: ReactNode;
+  /**
+   * Whether the addon appears inside the input border (inline) or outside (external)
+   * @default false (external)
+   */
+  inline?: boolean;
   /**
    * Optional className for styling
    */
@@ -81,7 +115,20 @@ export interface TrailingButtonProps extends Omit<ButtonProps, 'size'> {
   children: ReactNode;
 }
 
-export interface InputProps extends Omit<ComponentPropsWithoutRef<'input'>, 'size'> {
+export interface InputProps {
+  /**
+   * Compound component children (Input.Leading, Input.Field, Input.Trailing)
+   *
+   * @example
+   * ```tsx
+   * <Input>
+   *   <Input.Leading><EnvelopeIcon /></Input.Leading>
+   *   <Input.Field placeholder="you@example.com" />
+   * </Input>
+   * ```
+   */
+  children?: ReactNode;
+
   /**
    * The size of the input
    * @default 'md'
@@ -89,13 +136,8 @@ export interface InputProps extends Omit<ComponentPropsWithoutRef<'input'>, 'siz
   size?: InputSize;
 
   /**
-   * The visual variant of the input
-   * @default 'default'
-   */
-  variant?: InputVariant;
-
-  /**
    * Whether the input has an error state
+   * Automatically applies error styling (red border, red text)
    * @default false
    */
   error?: boolean;
@@ -106,74 +148,26 @@ export interface InputProps extends Omit<ComponentPropsWithoutRef<'input'>, 'siz
   errorMessage?: string;
 
   /**
-   * Leading icon element (displayed inside input on the left)
-   */
-  leadingIcon?: ReactNode;
-
-  /**
-   * Trailing icon element (displayed inside input on the right)
-   */
-  trailingIcon?: ReactNode;
-
-  /**
-   * External add-on displayed before the input (outside border)
-   * Example: "https://" in a separate box
-   */
-  leadingAddon?: ExternalAddonProps;
-
-  /**
-   * External add-on displayed after the input (outside border)
-   */
-  trailingAddon?: ExternalAddonProps;
-
-  /**
-   * Inline add-on displayed before the input (inside border)
-   * Example: "https://" or "$" inside the input border
-   */
-  leadingAddonInline?: InlineAddonProps;
-
-  /**
-   * Inline add-on displayed after the input (inside border)
-   * Example: "USD" inside the input border
-   */
-  trailingAddonInline?: InlineAddonProps;
-
-  /**
-   * Select dropdown displayed before the input (inline with border)
-   */
-  leadingSelect?: SelectAddonProps;
-
-  /**
-   * Select dropdown displayed after the input (inline with border)
-   */
-  trailingSelect?: SelectAddonProps;
-
-  /**
-   * Button displayed after the input
-   */
-  trailingButton?: TrailingButtonProps;
-
-  /**
-   * Inset label displayed inside the input at the top
-   */
-  insetLabel?: string;
-
-  /**
-   * Overlapping label displayed above the input border
-   */
-  overlappingLabel?: string;
-
-  /**
-   * Keyboard shortcut hint displayed on the right inside the input
-   * Example: "⌘K"
-   */
-  keyboardShortcut?: string;
-
-  /**
-   * Use gray background with bottom border only
+   * Make addons inline by default (inside border)
+   * When true, addons appear inside the input border
    * @default false
    */
-  grayBackground?: boolean;
+  inline?: boolean;
+
+  /**
+   * Label text for the input
+   * Used with labelVariant to control label positioning
+   */
+  label?: string;
+
+  /**
+   * Label positioning variant
+   * - 'standard': Label appears above the input (default)
+   * - 'inset': Label appears inside the input at the top
+   * - 'overlapping': Label overlaps the input border
+   * @default 'standard'
+   */
+  labelVariant?: 'standard' | 'inset' | 'overlapping';
 
   /**
    * Additional wrapper className
@@ -181,12 +175,7 @@ export interface InputProps extends Omit<ComponentPropsWithoutRef<'input'>, 'siz
   wrapperClassName?: string;
 
   /**
-   * Label element (for standard label positioning)
-   */
-  label?: string;
-
-  /**
-   * Label className
+   * Label className (only applies when labelVariant is 'standard')
    */
   labelClassName?: string;
 
@@ -194,4 +183,19 @@ export interface InputProps extends Omit<ComponentPropsWithoutRef<'input'>, 'siz
    * Helper text displayed below the input
    */
   helperText?: string;
+
+  /**
+   * HTML id attribute for the input
+   */
+  id?: string;
+
+  /**
+   * Whether the input is required
+   */
+  required?: boolean;
+
+  /**
+   * Corner hint text displayed next to the label (e.g., "Optional", "Required")
+   */
+  cornerHint?: string;
 }

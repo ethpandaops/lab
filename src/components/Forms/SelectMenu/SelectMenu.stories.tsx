@@ -102,3 +102,42 @@ export const DifferentIcons: Story = {
     return <SelectMenu value={selected} onChange={setSelected} options={roles} showLabel label="Role" />;
   },
 };
+
+/**
+ * Select menu with rounded corners
+ */
+export const Rounded: Story = {
+  render: () => {
+    const [selected, setSelected] = useState(countries[0].value);
+    return <SelectMenu value={selected} onChange={setSelected} options={countries} showLabel label="Country" rounded />;
+  },
+};
+
+/**
+ * Comparison between rounded and sharp corners
+ */
+export const RoundedComparison: Story = {
+  render: () => {
+    const [selectedSharp, setSelectedSharp] = useState(countries[0].value);
+    const [selectedRounded, setSelectedRounded] = useState(countries[0].value);
+    return (
+      <div className="flex flex-col gap-6">
+        <div>
+          <h3 className="mb-2 font-semibold text-foreground">Sharp Corners (Default)</h3>
+          <SelectMenu value={selectedSharp} onChange={setSelectedSharp} options={countries} showLabel label="Country" />
+        </div>
+        <div>
+          <h3 className="mb-2 font-semibold text-foreground">Rounded Corners</h3>
+          <SelectMenu
+            value={selectedRounded}
+            onChange={setSelectedRounded}
+            options={countries}
+            showLabel
+            label="Country"
+            rounded
+          />
+        </div>
+      </div>
+    );
+  },
+};

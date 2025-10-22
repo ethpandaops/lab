@@ -40,6 +40,7 @@ export function SelectMenu<T>({
   className = '',
   disabled = false,
   expandToFit = false,
+  rounded = false,
 }: SelectMenuProps<T>): JSX.Element {
   const selectedOption = options.find(opt => opt.value === value);
 
@@ -49,7 +50,8 @@ export function SelectMenu<T>({
       <div className={clsx('relative', showLabel && 'mt-2', className)}>
         <ListboxButton
           className={clsx(
-            'relative cursor-pointer rounded-lg border border-border bg-surface/50 py-2 pr-10 pl-3 text-left shadow-xs backdrop-blur-sm transition-all hover:border-primary/30 hover:bg-surface/70 hover:shadow-sm disabled:cursor-not-allowed disabled:opacity-50',
+            'relative cursor-pointer border border-border bg-surface/50 py-2 pr-10 pl-3 text-left shadow-xs backdrop-blur-sm transition-all hover:border-primary/30 hover:bg-surface/70 hover:shadow-sm disabled:cursor-not-allowed disabled:opacity-50',
+            rounded && 'rounded-lg',
             expandToFit ? 'w-auto min-w-[140px]' : 'w-full'
           )}
           data-disabled={disabled || undefined}
@@ -70,7 +72,8 @@ export function SelectMenu<T>({
         <ListboxOptions
           transition
           className={clsx(
-            'absolute z-[9999] mt-1 max-h-60 overflow-auto rounded-lg border border-border bg-surface shadow-lg backdrop-blur-xl data-leave:transition data-leave:duration-100 data-leave:ease-in data-closed:data-leave:opacity-0',
+            'absolute z-[9999] mt-1 max-h-60 overflow-auto border border-border bg-surface shadow-lg backdrop-blur-xl data-leave:transition data-leave:duration-100 data-leave:ease-in data-closed:data-leave:opacity-0',
+            rounded && 'rounded-lg',
             expandToFit ? 'w-max min-w-full' : 'w-full'
           )}
         >

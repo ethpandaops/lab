@@ -302,19 +302,19 @@ export const WithForm: Story = {
           }
         >
           <form className="space-y-4">
-            <Input
-              label="Full name"
-              type="text"
-              placeholder="John Smith"
-              leadingIcon={<UserIcon className="size-5" />}
-            />
+            <Input label="Full name">
+              <Input.Leading>
+                <UserIcon />
+              </Input.Leading>
+              <Input.Field type="text" placeholder="John Smith" />
+            </Input>
 
-            <Input
-              label="Email address"
-              type="email"
-              placeholder="john@example.com"
-              leadingIcon={<EnvelopeIcon className="size-5" />}
-            />
+            <Input label="Email address">
+              <Input.Leading>
+                <EnvelopeIcon />
+              </Input.Leading>
+              <Input.Field type="email" placeholder="john@example.com" />
+            </Input>
 
             <SelectMenu
               value={role}

@@ -1,617 +1,651 @@
-import { forwardRef, cloneElement, isValidElement } from 'react';
-import { Input as HeadlessInput } from '@headlessui/react';
-import { ChevronDownIcon } from '@heroicons/react/16/solid';
+import React, { useId, createContext, useContext, type JSX } from 'react';
 import clsx from 'clsx';
 import { Button } from '@/components/Elements/Button';
-import type {
-  InputProps,
-  InlineAddonProps,
-  ExternalAddonProps,
-  SelectAddonProps,
-  TrailingButtonProps,
-} from './Input.types';
+import type { InputProps, InputFieldProps, InputSlotProps, InputSize, SelectAddonProps } from './Input.types';
+import { renderSelect, getStyleConfig } from './Input.utils';
+
+interface InputContextValue {
+  size: InputSize;
+  error: boolean;
+  inline: boolean;
+  inputId: string;
+  labelVariant: 'standard' | 'inset' | 'overlapping';
+}
+
+const InputContext = createContext<InputContextValue | null>(null);
+
+const useInputContext = (): InputContextValue => {
+  const context = useContext(InputContext);
+  if (!context) {
+    throw new Error('Input subcomponents must be used within an Input component');
+  }
+  return context;
+};
 
 /**
- * Input component with support for various layouts and add-ons
+ * Input.Leading - Renders content before the input field
  *
- * Features:
- * - Leading/trailing icons
- * - Inline and external add-ons
- * - Select dropdowns (leading/trailing)
- * - Trailing button
- * - Inset and overlapping labels
- * - Keyboard shortcuts
- * - Error states
- * - Gray background variant
+ * Can contain:
+ * - Icons (Heroicons or custom SVG)
+ * - Text addons (e.g., "$", "https://")
+ * - Select dropdowns
  *
  * @example
  * ```tsx
- * // Basic input
- * <Input placeholder="you@example.com" />
+ * <Input.Leading type="icon">
+ *   <EnvelopeIcon />
+ * </Input.Leading>
  *
- * // With leading icon
- * <Input
- *   leadingIcon={<EnvelopeIcon />}
- *   placeholder="you@example.com"
- * />
+ * <Input.Leading type="text">$</Input.Leading>
  *
- * // With inline add-ons
- * <Input
- *   leadingAddonInline={{ content: '$' }}
- *   trailingAddonInline={{ content: 'USD' }}
- *   placeholder="0.00"
- * />
- *
- * // With error
- * <Input
- *   error
- *   errorMessage="This field is required"
- *   placeholder="Enter value"
- * />
+ * <Input.Leading type="select">
+ *   <select>...</select>
+ * </Input.Leading>
  * ```
  */
-export const Input = forwardRef<HTMLInputElement, InputProps>(
-  (
-    {
-      size = 'md',
-      variant = 'default',
-      error = false,
-      errorMessage,
-      leadingIcon,
-      trailingIcon,
-      leadingAddon,
-      trailingAddon,
-      leadingAddonInline,
-      trailingAddonInline,
-      leadingSelect,
-      trailingSelect,
-      trailingButton,
-      insetLabel,
-      overlappingLabel,
-      keyboardShortcut,
-      grayBackground = false,
-      wrapperClassName,
-      label,
-      labelClassName,
-      helperText,
-      className,
-      id,
-      ...props
-    },
-    ref
-  ) => {
-    const inputId = id || `input-${Math.random().toString(36).substr(2, 9)}`;
+export const InputLeading = ({ children, className, type }: InputSlotProps): React.ReactNode => {
+  const { size, inline } = useInputContext();
 
-    // Determine effective variant
-    const effectiveVariant = error ? 'error' : grayBackground ? 'gray' : variant;
+  // Determine content type (explicit type prop takes precedence)
+  let contentType = type;
 
-    // Size styles
-    const sizeStyles = {
-      sm: 'py-1.5 text-sm/6',
-      md: 'py-1.5 text-base/6',
-      lg: 'py-2 text-base/6',
-    };
+  // Auto-detect if no explicit type provided
+  if (!contentType && React.isValidElement(children)) {
+    if (
+      children.type === 'select' ||
+      ('options' in (children.props as object) && Array.isArray((children.props as { options?: unknown }).options))
+    ) {
+      contentType = 'select';
+    } else if (children.type === Button) {
+      contentType = 'button';
+    } else if (
+      children.type === 'svg' ||
+      typeof children.type === 'function' ||
+      (typeof children.type === 'object' && children.type !== null)
+    ) {
+      // SVG, function component, or forwardRef component (likely an icon)
+      // Note: Heroicons v2 uses forwardRef which returns an object
+      contentType = 'icon';
+    } else {
+      contentType = 'text';
+    }
+  } else if (!contentType) {
+    contentType = 'text'; // Default to text for string children
+  }
 
+  // Render based on content type
+  if (contentType === 'icon') {
     const iconSizeStyles = {
       sm: 'size-4',
       md: 'size-5',
       lg: 'size-5',
     };
 
-    // Base input styles
-    const baseInputStyles = clsx(
-      'block w-full border-0 bg-white text-gray-900 placeholder:text-gray-400 focus:ring-0',
-      'disabled:cursor-not-allowed disabled:opacity-50',
-      'read-only:cursor-default read-only:opacity-50',
-      'dark:bg-white/5 dark:text-white dark:placeholder:text-gray-500'
+    return (
+      <div className="pointer-events-none col-start-1 row-start-1 flex items-center">
+        {React.isValidElement(children) &&
+          React.cloneElement(children, {
+            'aria-hidden': 'true',
+            className: clsx(
+              iconSizeStyles[size],
+              'ml-3',
+              'pointer-events-none self-center text-gray-400 dark:text-gray-500',
+              (children.props as { className?: string }).className
+            ),
+          } as Record<string, unknown>)}
+      </div>
     );
+  }
 
-    // Variant-specific styles for standalone inputs
-    const variantStyles = {
-      default: clsx(
-        'outline-1 -outline-offset-1 outline-gray-300',
-        'focus:outline-2 focus:-outline-offset-2 focus:outline-primary',
-        'dark:outline-white/10 dark:focus:outline-primary'
-      ),
-      error: clsx(
-        'text-danger outline-1 -outline-offset-1 outline-danger/50',
-        'placeholder:text-danger/70 focus:outline-2 focus:-outline-offset-2 focus:outline-danger',
-        'dark:text-danger dark:outline-danger/50 dark:placeholder:text-danger/70 dark:focus:outline-danger'
-      ),
-      gray: clsx('bg-gray-50 dark:bg-white/5', 'focus:outline-hidden'),
-    };
+  if (contentType === 'select') {
+    return renderSelect(React.isValidElement(children) ? (children.props as SelectAddonProps) : undefined);
+  }
 
-    /**
-     * Renders an icon with appropriate sizing and styling
-     */
-    const renderIcon = (icon: React.ReactNode, position: 'leading' | 'trailing'): React.ReactNode | null => {
-      if (!icon || !isValidElement(icon)) return null;
+  // Text addon (default)
+  return (
+    <div
+      className={clsx(
+        inline
+          ? 'shrink-0 text-base text-gray-500 select-none sm:text-sm/6 dark:text-gray-400'
+          : 'flex shrink-0 items-center bg-white px-3 text-base text-gray-500 outline-1 -outline-offset-1 outline-gray-300 sm:text-sm/6 dark:bg-white/5 dark:text-gray-400 dark:outline-gray-700',
+        className
+      )}
+    >
+      {children}
+    </div>
+  );
+};
 
-      return cloneElement(icon, {
-        'aria-hidden': 'true',
-        className: clsx(
-          iconSizeStyles[size],
-          position === 'leading' ? 'ml-3 sm:ml-3' : 'mr-3 sm:mr-3',
-          'pointer-events-none self-center text-gray-400 dark:text-gray-500'
-        ),
-      } as Record<string, unknown>);
-    };
+InputLeading.displayName = 'Input.Leading';
 
-    /**
-     * Renders inline add-on (text inside border)
-     */
-    const renderInlineAddon = (addon: InlineAddonProps | undefined): React.ReactNode | null => {
-      if (!addon) return null;
+/**
+ * Input.Trailing - Renders content after the input field
+ *
+ * Can contain:
+ * - Icons
+ * - Text addons (e.g., "USD", ".com")
+ * - Select dropdowns
+ * - Buttons
+ *
+ * @example
+ * ```tsx
+ * <Input.Trailing type="icon">
+ *   <QuestionMarkCircleIcon />
+ * </Input.Trailing>
+ *
+ * <Input.Trailing type="text">USD</Input.Trailing>
+ *
+ * <Input.Trailing type="button">
+ *   <Button>Sort</Button>
+ * </Input.Trailing>
+ * ```
+ */
+export const InputTrailing = ({ children, className, type }: InputSlotProps): React.ReactNode => {
+  const { size, inline } = useInputContext();
 
-      return (
-        <div
-          className={clsx(
-            'shrink-0 text-base text-gray-500 select-none sm:text-sm/6 dark:text-gray-400',
-            addon.className
-          )}
-        >
-          {addon.content}
-        </div>
-      );
-    };
+  // Determine content type (explicit type prop takes precedence)
+  let contentType = type;
 
-    /**
-     * Renders external add-on (separate box outside input)
-     */
-    const renderExternalAddon = (addon: ExternalAddonProps | undefined): React.ReactNode | null => {
-      if (!addon) return null;
-
-      return (
-        <div
-          className={clsx(
-            'flex shrink-0 items-center bg-white px-3 text-base text-gray-500 outline-1 -outline-offset-1 outline-gray-300 sm:text-sm/6',
-            'dark:bg-white/5 dark:text-gray-400 dark:outline-gray-700',
-            addon.className
-          )}
-        >
-          {addon.content}
-        </div>
-      );
-    };
-
-    /**
-     * Renders select dropdown
-     */
-    const renderSelect = (select: SelectAddonProps | undefined): React.ReactNode | null => {
-      if (!select) return null;
-
-      return (
-        <div className="grid shrink-0 grid-cols-1 focus-within:relative">
-          <select
-            id={select.id}
-            name={select.name}
-            value={select.value}
-            defaultValue={select.defaultValue}
-            onChange={e => select.onChange?.(e.target.value)}
-            aria-label={select['aria-label']}
-            className={clsx(
-              'col-start-1 row-start-1 w-full appearance-none border-0 py-1.5 pr-7 pl-3 text-base text-gray-500 placeholder:text-gray-400',
-              '[background-image:none] shadow-none outline-hidden focus:border-0 focus:shadow-none focus:ring-0 focus:outline-hidden focus-visible:border-0 focus-visible:shadow-none focus-visible:ring-0 focus-visible:outline-hidden sm:text-sm/6',
-              'dark:bg-transparent dark:text-gray-400 dark:*:bg-gray-800 dark:placeholder:text-gray-500',
-              select.className
-            )}
-          >
-            {select.options.map(option => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-          <ChevronDownIcon
-            aria-hidden="true"
-            className="pointer-events-none col-start-1 row-start-1 mr-2 size-5 self-center justify-self-end text-gray-500 sm:size-4 dark:text-gray-400"
-          />
-        </div>
-      );
-    };
-
-    /**
-     * Renders trailing button
-     */
-    const renderTrailingButton = (button: TrailingButtonProps | undefined): React.ReactNode | null => {
-      if (!button) return null;
-
-      const { children, className: buttonClassName, ...buttonProps } = button;
-
-      return (
-        <Button
-          className={clsx('pointer-events-auto shrink-0 self-center', buttonClassName)}
-          size={size}
-          {...buttonProps}
-        >
-          {children}
-        </Button>
-      );
-    };
-
-    /**
-     * Renders keyboard shortcut hint
-     */
-    const renderKeyboardShortcut = (): React.ReactNode | null => {
-      if (!keyboardShortcut) return null;
-
-      return (
-        <div className="flex py-1.5 pr-1.5">
-          <kbd className="inline-flex items-center border border-gray-200 px-1 font-sans text-xs text-gray-400 dark:border-white/10">
-            {keyboardShortcut}
-          </kbd>
-        </div>
-      );
-    };
-
-    // Padding adjustments based on add-ons
-    const getPaddingClasses = (): string => {
-      const classes: string[] = ['px-3'];
-
-      if (leadingIcon || leadingAddonInline) {
-        classes.push('pl-10 sm:pl-9');
-      }
-
-      if (trailingIcon || trailingAddonInline || keyboardShortcut) {
-        classes.push('pr-10 sm:pr-9');
-      }
-
-      if (insetLabel) {
-        classes.push('pt-2.5 pb-1.5');
-      }
-
-      return clsx(classes);
-    };
-
-    const needsGridWrapper = leadingIcon || trailingIcon;
-
-    const needsFlexWrapper =
-      leadingAddonInline || trailingAddonInline || leadingSelect || trailingSelect || keyboardShortcut || insetLabel;
-
-    // Gray background with bottom border
-    if (grayBackground) {
-      return (
-        <div className={clsx('relative', wrapperClassName)}>
-          {label && (
-            <label
-              htmlFor={inputId}
-              className={clsx('mb-2 block text-sm/6 font-medium text-foreground', labelClassName)}
-            >
-              {label}
-            </label>
-          )}
-          <HeadlessInput
-            ref={ref}
-            id={inputId}
-            className={clsx(
-              baseInputStyles,
-              sizeStyles[size],
-              'peer px-3 focus:outline-hidden',
-              'bg-gray-50 dark:bg-white/5',
-              className
-            )}
-            aria-invalid={error ? 'true' : undefined}
-            aria-describedby={errorMessage ? `${inputId}-error` : undefined}
-            {...props}
-          />
-          <div
-            aria-hidden="true"
-            className="absolute inset-x-0 bottom-0 border-t border-gray-300 peer-focus:border-t-2 peer-focus:border-primary dark:border-white/20 dark:peer-focus:border-primary"
-          />
-          {(errorMessage || helperText) && (
-            <p className={clsx('mt-2 text-sm/6', error ? 'text-danger' : 'text-muted')}>
-              {error ? errorMessage : helperText}
-            </p>
-          )}
-        </div>
-      );
+  // Auto-detect if no explicit type provided
+  if (!contentType && React.isValidElement(children)) {
+    if (
+      children.type === 'select' ||
+      ('options' in (children.props as object) && Array.isArray((children.props as { options?: unknown }).options))
+    ) {
+      contentType = 'select';
+    } else if (children.type === Button) {
+      contentType = 'button';
+    } else if (
+      children.type === 'svg' ||
+      typeof children.type === 'function' ||
+      (typeof children.type === 'object' && children.type !== null)
+    ) {
+      // SVG, function component, or forwardRef component (likely an icon)
+      // Note: Heroicons v2 uses forwardRef which returns an object
+      contentType = 'icon';
+    } else {
+      contentType = 'text';
     }
+  } else if (!contentType) {
+    contentType = 'text'; // Default to text for string children
+  }
 
-    // External add-ons (outside border)
-    if (leadingAddon || trailingAddon || trailingButton) {
-      return (
-        <div className={clsx(wrapperClassName)}>
-          {label && (
-            <label
-              htmlFor={inputId}
-              className={clsx('mb-2 block text-sm/6 font-medium text-foreground', labelClassName)}
-            >
+  // Render based on content type
+  if (contentType === 'icon') {
+    const iconSizeStyles = {
+      sm: 'size-4',
+      md: 'size-5',
+      lg: 'size-5',
+    };
+
+    return (
+      <div className="pointer-events-none col-start-1 row-start-1 flex items-center justify-end">
+        {React.isValidElement(children) &&
+          React.cloneElement(children, {
+            'aria-hidden': 'true',
+            className: clsx(
+              iconSizeStyles[size],
+              'mr-3',
+              'pointer-events-none self-center text-gray-400 dark:text-gray-500',
+              (children.props as { className?: string }).className
+            ),
+          } as Record<string, unknown>)}
+      </div>
+    );
+  }
+
+  if (contentType === 'button') {
+    return (
+      <div className="pointer-events-none col-start-1 row-start-1 flex items-center justify-end">
+        <div className="pointer-events-auto shrink-0 self-center pr-0.5">{children}</div>
+      </div>
+    );
+  }
+
+  if (contentType === 'select') {
+    return renderSelect(React.isValidElement(children) ? (children.props as SelectAddonProps) : undefined);
+  }
+
+  // Text addon (default)
+  return (
+    <div
+      className={clsx(
+        inline
+          ? 'shrink-0 text-base text-gray-500 select-none sm:text-sm/6 dark:text-gray-400'
+          : 'flex shrink-0 items-center bg-white px-3 text-base text-gray-500 outline-1 -outline-offset-1 outline-gray-300 sm:text-sm/6 dark:bg-white/5 dark:text-gray-400 dark:outline-gray-700',
+        className
+      )}
+    >
+      {children}
+    </div>
+  );
+};
+
+InputTrailing.displayName = 'Input.Trailing';
+
+/**
+ * Input.Field - The actual input element
+ *
+ * Accepts all standard HTML input props, including ref
+ *
+ * @example
+ * ```tsx
+ * <Input.Field
+ *   type="email"
+ *   placeholder="you@example.com"
+ *   autoComplete="email"
+ *   ref={myRef}
+ *   inputMode="email"
+ * />
+ * ```
+ */
+export const InputField = ({ className, ref, inputMode, ...props }: InputFieldProps): JSX.Element => {
+  const { size, error, inputId, labelVariant } = useInputContext();
+  const styles = getStyleConfig();
+
+  // For inset labels, skip base styles (container handles styling)
+  if (labelVariant === 'inset') {
+    return (
+      <input
+        ref={ref}
+        id={inputId}
+        aria-invalid={error ? ('true' as const) : undefined}
+        inputMode={inputMode}
+        {...props}
+        className={className}
+      />
+    );
+  }
+
+  // Determine padding based on label variant
+  const paddingClasses = 'px-3';
+
+  return (
+    <input
+      ref={ref}
+      id={inputId}
+      aria-invalid={error ? ('true' as const) : undefined}
+      inputMode={inputMode}
+      {...props}
+      className={clsx(
+        styles.base,
+        error ? styles.outline.error : styles.outline.default,
+        styles.size[size],
+        paddingClasses,
+        className
+      )}
+    />
+  );
+};
+
+InputField.displayName = 'Input.Field';
+
+/**
+ * Input component using compound component pattern
+ *
+ * @example
+ * ```tsx
+ * // Basic with icon
+ * <Input>
+ *   <Input.Leading><EnvelopeIcon /></Input.Leading>
+ *   <Input.Field placeholder="you@example.com" />
+ * </Input>
+ *
+ * // Inline addons
+ * <Input inline>
+ *   <Input.Leading>$</Input.Leading>
+ *   <Input.Field placeholder="0.00" />
+ *   <Input.Trailing>USD</Input.Trailing>
+ * </Input>
+ *
+ * // With button
+ * <Input>
+ *   <Input.Field placeholder="Search..." />
+ *   <Input.Trailing>
+ *     <Button>Search</Button>
+ *   </Input.Trailing>
+ * </Input>
+ *
+ * // With error
+ * <Input error errorMessage="This field is required">
+ *   <Input.Field placeholder="Enter value" />
+ * </Input>
+ * ```
+ */
+const InputBase = ({
+  size = 'md',
+  error = false,
+  errorMessage,
+  label,
+  labelVariant = 'standard',
+  helperText,
+  wrapperClassName,
+  labelClassName,
+  inline = false,
+  id,
+  required,
+  cornerHint,
+  children,
+}: InputProps): JSX.Element => {
+  const generatedId = useId();
+  const inputId = id || generatedId;
+  const cornerHintId = cornerHint ? `${inputId}-corner-hint` : undefined;
+
+  const contextValue: InputContextValue = {
+    size,
+    error,
+    inline,
+    inputId,
+    labelVariant,
+  };
+
+  /**
+   * Renders the input label
+   */
+  const renderLabel = (): React.ReactNode | null => {
+    if (!label) return null;
+
+    // Standard label
+    if (labelVariant === 'standard') {
+      if (cornerHint) {
+        return (
+          <div className="mb-2 flex justify-between">
+            <label htmlFor={inputId} className={clsx('block text-sm/6 font-medium text-foreground', labelClassName)}>
               {label}
             </label>
-          )}
-          <div className="flex">
-            {leadingAddon && renderExternalAddon(leadingAddon)}
-            {leadingIcon || trailingButton ? (
-              <div
-                className={clsx(
-                  'grid grow grid-cols-1 focus-within:relative',
-                  leadingAddon && !trailingAddon && '-mr-px -ml-px',
-                  !leadingAddon && trailingAddon && '-mr-px',
-                  !leadingAddon && !trailingAddon && ''
-                )}
-              >
-                <HeadlessInput
-                  ref={ref}
-                  id={inputId}
-                  className={clsx(
-                    baseInputStyles,
-                    variantStyles[effectiveVariant],
-                    sizeStyles[size],
-                    'col-start-1 row-start-1 pr-3',
-                    leadingIcon ? 'pl-10 sm:pl-9' : 'pl-3',
-                    trailingButton && 'pr-20',
-                    className
-                  )}
-                  aria-invalid={error ? 'true' : undefined}
-                  aria-describedby={errorMessage ? `${inputId}-error` : undefined}
-                  {...props}
-                />
-                {leadingIcon && (
-                  <div className="pointer-events-none col-start-1 row-start-1 flex items-center">
-                    {renderIcon(leadingIcon, 'leading')}
-                  </div>
-                )}
-                {trailingButton && (
-                  <div className="pointer-events-none col-start-1 row-start-1 flex items-center justify-end">
-                    {renderTrailingButton(trailingButton)}
-                  </div>
-                )}
-              </div>
-            ) : (
-              <HeadlessInput
-                ref={ref}
-                id={inputId}
-                className={clsx(
-                  baseInputStyles,
-                  variantStyles[effectiveVariant],
-                  sizeStyles[size],
-                  getPaddingClasses(),
-                  leadingAddon && '-ml-px',
-                  trailingAddon && '-mr-px grow',
-                  className
-                )}
-                aria-invalid={error ? 'true' : undefined}
-                aria-describedby={errorMessage ? `${inputId}-error` : undefined}
-                {...props}
-              />
-            )}
-            {trailingAddon && renderExternalAddon(trailingAddon)}
+            <span id={cornerHintId} className="text-sm/6 text-muted">
+              {cornerHint}
+            </span>
           </div>
-          {(errorMessage || helperText) && (
-            <p className={clsx('mt-2 text-sm/6', error ? 'text-danger' : 'text-muted')}>
-              {error ? errorMessage : helperText}
-            </p>
-          )}
-        </div>
+        );
+      }
+      return (
+        <label htmlFor={inputId} className={clsx('mb-2 block text-sm/6 font-medium text-foreground', labelClassName)}>
+          {label}
+        </label>
       );
     }
 
     // Overlapping label
-    if (overlappingLabel) {
+    if (labelVariant === 'overlapping') {
       return (
-        <div className={clsx('relative', wrapperClassName)}>
-          <label
-            htmlFor={inputId}
-            className="absolute -top-2 left-2 inline-block bg-white px-1 text-xs font-medium text-gray-900 dark:bg-gray-900 dark:text-white"
-          >
-            {overlappingLabel}
-          </label>
-          <HeadlessInput
-            ref={ref}
-            id={inputId}
-            className={clsx(
-              baseInputStyles,
-              variantStyles[effectiveVariant],
-              sizeStyles[size],
-              getPaddingClasses(),
-              className
-            )}
-            aria-invalid={error ? 'true' : undefined}
-            aria-describedby={errorMessage ? `${inputId}-error` : undefined}
-            {...props}
-          />
-          {(errorMessage || helperText) && (
-            <p className={clsx('mt-2 text-sm/6', error ? 'text-danger' : 'text-muted')}>
-              {error ? errorMessage : helperText}
-            </p>
-          )}
-        </div>
+        <label
+          htmlFor={inputId}
+          className="absolute -top-2 left-2 inline-block bg-white px-1 text-xs font-medium text-gray-900 dark:bg-gray-900 dark:text-white"
+        >
+          {label}
+        </label>
       );
     }
 
     // Inset label
-    if (insetLabel) {
+    if (labelVariant === 'inset') {
       return (
-        <div className={clsx(wrapperClassName)}>
-          {label && (
-            <label
-              htmlFor={inputId}
-              className={clsx('mb-2 block text-sm/6 font-medium text-foreground', labelClassName)}
-            >
-              {label}
-            </label>
+        <label htmlFor={inputId} className="block text-xs font-medium text-gray-900 dark:text-gray-200">
+          {label}
+        </label>
+      );
+    }
+
+    return null;
+  };
+
+  /**
+   * Renders error or helper text below the input
+   * Always includes aria-live for screen reader announcements
+   */
+  const renderHelperText = (): React.ReactNode | null => {
+    if (!errorMessage && !helperText) return null;
+
+    return (
+      <p
+        id={`${inputId}-error`}
+        className={clsx('mt-2 text-sm/6', error ? 'text-danger' : 'text-muted')}
+        role={error && errorMessage ? 'alert' : 'status'}
+        aria-live="polite"
+        aria-atomic="true"
+      >
+        {error ? errorMessage : helperText}
+      </p>
+    );
+  };
+
+  // Extract slots from children
+  const childArray = React.Children.toArray(children);
+  const leadingSlot = childArray.find(child => React.isValidElement(child) && child.type === InputLeading);
+  const trailingSlot = childArray.find(child => React.isValidElement(child) && child.type === InputTrailing);
+  const fieldSlotRaw = childArray.find(child => React.isValidElement(child) && child.type === InputField);
+
+  const hasLeading = !!leadingSlot;
+  const hasTrailing = !!trailingSlot;
+
+  // Check if slots contain icons or buttons (for grid layout) vs text (for flex layout)
+  const getSlotType = (slot: React.ReactNode): 'icon' | 'button' | 'text' | null => {
+    if (!slot || !React.isValidElement(slot)) return null;
+    const slotProps = slot.props as InputSlotProps;
+
+    // Use explicit type if provided
+    if (slotProps.type) {
+      return slotProps.type === 'select' ? 'text' : slotProps.type;
+    }
+
+    // Auto-detect based on children
+    if (!slotProps.children || !React.isValidElement(slotProps.children)) return 'text';
+
+    const child = slotProps.children;
+    if (child.type === Button) return 'button';
+    if (
+      child.type === 'svg' ||
+      typeof child.type === 'function' ||
+      (typeof child.type === 'object' && child.type !== null)
+    ) {
+      // SVG, function component, or forwardRef component (likely an icon)
+      // Note: Heroicons v2 uses forwardRef which returns an object
+      return 'icon';
+    }
+    return 'text';
+  };
+
+  const leadingType = getSlotType(leadingSlot);
+  const trailingType = getSlotType(trailingSlot);
+
+  const hasIcons = leadingType === 'icon' || trailingType === 'icon';
+  const hasInlineContent = inline && (hasLeading || hasTrailing);
+  const hasExternalAddons = !inline && (hasLeading || hasTrailing) && !hasIcons;
+
+  // Determine layout based on content
+  const needsGrid = hasIcons;
+  const needsFlex = hasInlineContent;
+  const needsExternalFlex = hasExternalAddons;
+
+  // Clone the field slot with proper classes based on layout
+  const getFieldClasses = (): string | undefined => {
+    if (labelVariant === 'inset') {
+      // Inset label - no outline on input (container handles it)
+      const textSize = {
+        sm: 'text-sm/6',
+        md: 'text-base/6',
+        lg: 'text-base/6',
+      };
+      return clsx(
+        'block w-full border-0 bg-transparent text-gray-900 placeholder:text-gray-400 shadow-none',
+        textSize[size],
+        'outline-0 focus:outline-0 focus-visible:outline-0 ring-0 focus:ring-0',
+        'dark:bg-transparent dark:text-white dark:placeholder:text-gray-500'
+      );
+    }
+    if (needsFlex) {
+      // Inline addons - minimal padding, transparent bg
+      // Use !bg-transparent to override any bg-white from base styles
+      return clsx(
+        'block min-w-0 grow border-0 !bg-transparent text-base text-gray-900 shadow-none outline-hidden placeholder:text-gray-400 sm:text-sm/6',
+        'focus:outline-hidden focus-visible:outline-hidden py-1.5',
+        hasLeading ? 'pl-1' : 'pl-0',
+        hasTrailing ? 'pr-1' : 'pr-0',
+        'dark:text-white dark:placeholder:text-gray-500'
+      );
+    }
+    if (needsGrid) {
+      // Icons/buttons - needs grid positioning and padding for icons
+      const styles = getStyleConfig();
+      const iconPadding = {
+        sm: { leading: 'pl-9', trailing: 'pr-9' },
+        md: { leading: 'pl-10', trailing: 'pr-10' },
+        lg: { leading: 'pl-11', trailing: 'pr-11' },
+      };
+      return clsx(
+        styles.base,
+        error ? styles.outline.error : styles.outline.default,
+        styles.size[size],
+        'col-start-1 row-start-1',
+        hasLeading && iconPadding[size].leading,
+        hasTrailing && iconPadding[size].trailing,
+        !hasLeading && !hasTrailing && 'px-3'
+      );
+    }
+    // Default - will use InputField's own classes
+    return undefined;
+  };
+
+  const fieldSlot =
+    fieldSlotRaw && React.isValidElement(fieldSlotRaw)
+      ? React.cloneElement(fieldSlotRaw, {
+          ...(errorMessage || helperText || cornerHint
+            ? {
+                'aria-describedby': [errorMessage || helperText ? `${inputId}-error` : null, cornerHintId]
+                  .filter(Boolean)
+                  .join(' '),
+              }
+            : {}),
+          ...(required ? { 'aria-required': 'true' as const } : {}),
+          className: clsx(getFieldClasses(), (fieldSlotRaw.props as InputFieldProps).className),
+        } as Record<string, unknown>)
+      : null;
+
+  // Overlapping label layout
+  if (labelVariant === 'overlapping') {
+    return (
+      <InputContext.Provider value={contextValue}>
+        <div className={clsx('relative', wrapperClassName)}>
+          {renderLabel()}
+          {needsGrid ? (
+            <div className="grid grid-cols-1">
+              {fieldSlot}
+              {leadingSlot}
+              {trailingSlot}
+            </div>
+          ) : (
+            fieldSlot
           )}
+          {renderHelperText()}
+        </div>
+      </InputContext.Provider>
+    );
+  }
+
+  // Inset label layout
+  if (labelVariant === 'inset') {
+    const insetPadding = {
+      sm: 'px-3 pt-1.5 pb-1',
+      md: 'px-3 pt-2 pb-1',
+      lg: 'px-3 pt-2.5 pb-1.5',
+    };
+    return (
+      <InputContext.Provider value={contextValue}>
+        <div className={clsx(wrapperClassName)}>
           <div
             className={clsx(
-              'bg-white px-3 pt-2.5 pb-1.5 outline-1 -outline-offset-1 outline-gray-300',
+              'bg-white outline-1 -outline-offset-1 outline-gray-300',
+              'focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-primary',
+              'dark:bg-white/5 dark:outline-white/10 dark:focus-within:outline-primary',
+              insetPadding[size],
+              error &&
+                'outline-danger/50 focus-within:outline-danger dark:outline-danger/50 dark:focus-within:outline-danger'
+            )}
+          >
+            {renderLabel()}
+            {fieldSlot}
+          </div>
+          {renderHelperText()}
+        </div>
+      </InputContext.Provider>
+    );
+  }
+
+  // Flex layout (for inline addons)
+  if (needsFlex) {
+    return (
+      <InputContext.Provider value={contextValue}>
+        <div className={clsx(wrapperClassName)}>
+          {renderLabel()}
+          <div
+            className={clsx(
+              'flex items-center bg-white px-3 outline-1 -outline-offset-1 outline-gray-300',
               'focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-primary',
               'dark:bg-white/5 dark:outline-white/10 dark:focus-within:outline-primary'
             )}
           >
-            <label htmlFor={inputId} className="block text-xs font-medium text-gray-900 dark:text-gray-200">
-              {insetLabel}
-            </label>
-            <HeadlessInput
-              ref={ref}
-              id={inputId}
-              className={clsx(
-                'block w-full border-0 bg-transparent text-gray-900 shadow-none outline-hidden placeholder:text-gray-400 focus:border-0 focus:shadow-none focus:ring-0 focus:outline-hidden focus-visible:border-0 focus-visible:shadow-none focus-visible:ring-0 focus-visible:outline-hidden sm:text-sm/6',
-                'dark:text-white dark:placeholder:text-gray-500',
-                className
-              )}
-              aria-invalid={error ? 'true' : undefined}
-              aria-describedby={errorMessage ? `${inputId}-error` : undefined}
-              {...props}
-            />
+            {leadingSlot}
+            {fieldSlot}
+            {trailingSlot}
           </div>
-          {(errorMessage || helperText) && (
-            <p className={clsx('mt-2 text-sm/6', error ? 'text-danger' : 'text-muted')}>
-              {error ? errorMessage : helperText}
-            </p>
-          )}
+          {renderHelperText()}
         </div>
-      );
-    }
-
-    // Grid wrapper (for icons)
-    if (needsGridWrapper) {
-      return (
-        <div className={clsx(wrapperClassName)}>
-          {label && (
-            <label
-              htmlFor={inputId}
-              className={clsx('mb-2 block text-sm/6 font-medium text-foreground', labelClassName)}
-            >
-              {label}
-            </label>
-          )}
-          <div className="grid grid-cols-1">
-            <HeadlessInput
-              ref={ref}
-              id={inputId}
-              className={clsx(
-                baseInputStyles,
-                variantStyles[effectiveVariant],
-                sizeStyles[size],
-                'col-start-1 row-start-1',
-                getPaddingClasses(),
-                className
-              )}
-              aria-invalid={error ? 'true' : undefined}
-              aria-describedby={errorMessage ? `${inputId}-error` : undefined}
-              {...props}
-            />
-            {leadingIcon && (
-              <div className="pointer-events-none col-start-1 row-start-1 flex items-center">
-                {renderIcon(leadingIcon, 'leading')}
-              </div>
-            )}
-            {trailingIcon && (
-              <div className="pointer-events-none col-start-1 row-start-1 flex items-center justify-end">
-                {renderIcon(trailingIcon, 'trailing')}
-              </div>
-            )}
-          </div>
-          {(errorMessage || helperText) && (
-            <p id={`${inputId}-error`} className={clsx('mt-2 text-sm/6', error ? 'text-danger' : 'text-muted')}>
-              {error ? errorMessage : helperText}
-            </p>
-          )}
-        </div>
-      );
-    }
-
-    // Flex wrapper (for inline add-ons, selects, keyboard shortcuts)
-    if (needsFlexWrapper) {
-      const hasInputFocus = leadingAddonInline || trailingAddonInline || keyboardShortcut;
-      const hasSelectFocus = leadingSelect || trailingSelect;
-
-      return (
-        <div className={clsx(wrapperClassName)}>
-          {label && (
-            <label
-              htmlFor={inputId}
-              className={clsx('mb-2 block text-sm/6 font-medium text-foreground', labelClassName)}
-            >
-              {label}
-            </label>
-          )}
-          <div
-            className={clsx(
-              'flex',
-              hasInputFocus &&
-                clsx(
-                  'items-center bg-white px-3 outline-1 -outline-offset-1 outline-gray-300',
-                  'focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-primary',
-                  'dark:bg-white/5 dark:outline-white/10 dark:focus-within:outline-primary'
-                ),
-              hasSelectFocus &&
-                clsx(
-                  'bg-white outline-1 -outline-offset-1 outline-gray-300',
-                  'has-[input:focus-within]:outline-2 has-[input:focus-within]:-outline-offset-2 has-[input:focus-within]:outline-primary',
-                  'dark:bg-white/5 dark:outline-white/10 dark:has-[input:focus-within]:outline-primary'
-                )
-            )}
-          >
-            {leadingAddonInline && renderInlineAddon(leadingAddonInline)}
-            {leadingSelect && renderSelect(leadingSelect)}
-            <HeadlessInput
-              ref={ref}
-              id={inputId}
-              className={clsx(
-                'block min-w-0 grow border-0 bg-transparent text-base text-gray-900 shadow-none outline-hidden placeholder:text-gray-400 focus:border-0 focus:shadow-none focus:ring-0 focus:outline-hidden focus-visible:border-0 focus-visible:shadow-none focus-visible:ring-0 focus-visible:outline-hidden sm:text-sm/6',
-                hasInputFocus
-                  ? clsx(
-                      'py-1.5',
-                      leadingAddonInline ? 'pl-1' : 'pl-0',
-                      trailingAddonInline ? 'pr-1' : 'pr-0',
-                      'dark:text-white dark:placeholder:text-gray-500'
-                    )
-                  : clsx(
-                      'py-1.5',
-                      leadingSelect ? 'pl-1' : 'pl-0',
-                      trailingSelect ? 'pr-1' : 'pr-0',
-                      'dark:text-white dark:placeholder:text-gray-500'
-                    ),
-                className
-              )}
-              aria-invalid={error ? 'true' : undefined}
-              aria-describedby={errorMessage ? `${inputId}-error` : undefined}
-              {...props}
-            />
-            {trailingAddonInline && renderInlineAddon(trailingAddonInline)}
-            {trailingSelect && renderSelect(trailingSelect)}
-            {keyboardShortcut && renderKeyboardShortcut()}
-          </div>
-          {(errorMessage || helperText) && (
-            <p id={`${inputId}-error`} className={clsx('mt-2 text-sm/6', error ? 'text-danger' : 'text-muted')}>
-              {error ? errorMessage : helperText}
-            </p>
-          )}
-        </div>
-      );
-    }
-
-    // Basic standalone input
-    return (
-      <div className={clsx(wrapperClassName)}>
-        {label && (
-          <label htmlFor={inputId} className={clsx('mb-2 block text-sm/6 font-medium text-foreground', labelClassName)}>
-            {label}
-          </label>
-        )}
-        <HeadlessInput
-          ref={ref}
-          id={inputId}
-          className={clsx(
-            baseInputStyles,
-            variantStyles[effectiveVariant],
-            sizeStyles[size],
-            getPaddingClasses(),
-            className
-          )}
-          aria-invalid={error ? 'true' : undefined}
-          aria-describedby={errorMessage ? `${inputId}-error` : undefined}
-          {...props}
-        />
-        {(errorMessage || helperText) && (
-          <p id={`${inputId}-error`} className={clsx('mt-2 text-sm/6', error ? 'text-danger' : 'text-muted')}>
-            {error ? errorMessage : helperText}
-          </p>
-        )}
-      </div>
+      </InputContext.Provider>
     );
   }
-);
 
-Input.displayName = 'Input';
+  // Grid layout (for icons/buttons)
+  if (needsGrid) {
+    return (
+      <InputContext.Provider value={contextValue}>
+        <div className={clsx(wrapperClassName)}>
+          {renderLabel()}
+          <div className="grid grid-cols-1">
+            {fieldSlot}
+            {leadingSlot}
+            {trailingSlot}
+          </div>
+          {renderHelperText()}
+        </div>
+      </InputContext.Provider>
+    );
+  }
+
+  // External addons layout (text addons outside border)
+  if (needsExternalFlex) {
+    return (
+      <InputContext.Provider value={contextValue}>
+        <div className={clsx(wrapperClassName)}>
+          {renderLabel()}
+          <div className="flex">
+            {leadingSlot}
+            {fieldSlot}
+            {trailingSlot}
+          </div>
+          {renderHelperText()}
+        </div>
+      </InputContext.Provider>
+    );
+  }
+
+  // Standard layout (field only)
+  return (
+    <InputContext.Provider value={contextValue}>
+      <div className={clsx(wrapperClassName)}>
+        {renderLabel()}
+        {fieldSlot}
+        {renderHelperText()}
+      </div>
+    </InputContext.Provider>
+  );
+};
+
+InputBase.displayName = 'Input';
+
+// Attach subcomponents to Input for compound component API
+export const Input = Object.assign(InputBase, {
+  Leading: InputLeading,
+  Trailing: InputTrailing,
+  Field: InputField,
+});

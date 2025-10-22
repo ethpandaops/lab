@@ -1,10 +1,10 @@
-export { Input } from './Input';
+export { Input, InputField, InputLeading, InputTrailing } from './Input';
 export type {
   InputProps,
   InputSize,
-  InputVariant,
-  InlineAddonProps,
-  ExternalAddonProps,
+  InputSlotProps,
+  InputFieldProps,
+  AddonProps,
   SelectAddonProps,
   TrailingButtonProps,
 } from './Input.types';
