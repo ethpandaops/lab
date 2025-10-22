@@ -3,15 +3,15 @@ export interface HeatmapChartProps {
    * 2D chart data as [x, y, value] tuples
    * @example [[0, 0, 5], [0, 1, 1], [1, 0, 3]]
    */
-  data?: [number, number, number][];
+  data: [number, number, number][];
   /**
    * X-axis labels
    */
-  xLabels?: string[];
+  xLabels: string[];
   /**
    * Y-axis labels
    */
-  yLabels?: string[];
+  yLabels: string[];
   /**
    * Chart title (displayed in ECharts)
    */

@@ -37,10 +37,24 @@ export default meta;
 type Story = StoryObj<typeof HeatmapChart>;
 
 /**
- * Basic heatmap with default 3x3 data
+ * Basic heatmap with sample data
  */
 export const Default: Story = {
-  args: {},
+  args: {
+    data: [
+      [0, 0, 5],
+      [0, 1, 1],
+      [0, 2, 0],
+      [1, 0, 1],
+      [1, 1, 4],
+      [1, 2, 3],
+      [2, 0, 2],
+      [2, 1, 5],
+      [2, 2, 3],
+    ],
+    xLabels: ['a', 'b', 'c'],
+    yLabels: ['Morning', 'Afternoon', 'Evening'],
+  },
 };
 
 /**
@@ -49,6 +63,19 @@ export const Default: Story = {
 export const WithTitle: Story = {
   args: {
     title: 'Daily Activity',
+    data: [
+      [0, 0, 5],
+      [0, 1, 1],
+      [0, 2, 0],
+      [1, 0, 1],
+      [1, 1, 4],
+      [1, 2, 3],
+      [2, 0, 2],
+      [2, 1, 5],
+      [2, 2, 3],
+    ],
+    xLabels: ['a', 'b', 'c'],
+    yLabels: ['Morning', 'Afternoon', 'Evening'],
   },
 };
 
@@ -59,6 +86,19 @@ export const WithLabels: Story = {
   args: {
     title: 'Activity Heatmap',
     showLabel: true,
+    data: [
+      [0, 0, 5],
+      [0, 1, 1],
+      [0, 2, 0],
+      [1, 0, 1],
+      [1, 1, 4],
+      [1, 2, 3],
+      [2, 0, 2],
+      [2, 1, 5],
+      [2, 2, 3],
+    ],
+    xLabels: ['a', 'b', 'c'],
+    yLabels: ['Morning', 'Afternoon', 'Evening'],
   },
 };
 
@@ -323,5 +363,18 @@ export const NoLegend: Story = {
     title: 'Simple Heatmap',
     showVisualMap: false,
     showLabel: true,
+    data: [
+      [0, 0, 5],
+      [0, 1, 1],
+      [0, 2, 0],
+      [1, 0, 1],
+      [1, 1, 4],
+      [1, 2, 3],
+      [2, 0, 2],
+      [2, 1, 5],
+      [2, 2, 3],
+    ],
+    xLabels: ['a', 'b', 'c'],
+    yLabels: ['Morning', 'Afternoon', 'Evening'],
   },
 };
