@@ -25,7 +25,7 @@ type Story = StoryObj<typeof meta>;
 export const Default: Story = {
   args: {
     phases: DEFAULT_BEACON_SLOT_PHASES,
-    currentTime: 9.0,
+    currentTime: 9000,
     isPlaying: false,
     isLive: true,
     title: 'Timeline',
@@ -36,13 +36,13 @@ export const Interactive: Story = {
   name: 'Interactive with Controls',
   args: {
     phases: DEFAULT_BEACON_SLOT_PHASES,
-    currentTime: 9.0,
+    currentTime: 9000,
     isPlaying: false,
     isLive: true,
     title: 'Timeline',
   },
   render: () => {
-    const [currentTime, setCurrentTime] = useState(9.0);
+    const [currentTime, setCurrentTime] = useState(9000);
     const [isPlaying, setIsPlaying] = useState(false);
 
     const handlePlayPause = (): void => {
@@ -50,15 +50,15 @@ export const Interactive: Story = {
     };
 
     const handleBackward = (): void => {
-      setCurrentTime(prev => Math.max(0, prev - 1));
+      setCurrentTime(prev => Math.max(0, prev - 1000));
     };
 
     const handleForward = (): void => {
-      setCurrentTime(prev => Math.min(12, prev + 1));
+      setCurrentTime(prev => Math.min(12000, prev + 1000));
     };
 
     const handleTimeClick = (timeMs: number): void => {
-      setCurrentTime(timeMs / 1000);
+      setCurrentTime(timeMs);
       setIsPlaying(false);
     };
 
@@ -68,10 +68,10 @@ export const Interactive: Story = {
 
       const interval = setInterval(() => {
         setCurrentTime(prev => {
-          const next = prev + 0.1;
-          if (next >= 12) {
+          const next = prev + 100;
+          if (next >= 12000) {
             setIsPlaying(false);
-            return 12;
+            return 12000;
           }
           return next;
         });
@@ -98,7 +98,7 @@ export const Interactive: Story = {
 export const NotLive: Story = {
   args: {
     phases: DEFAULT_BEACON_SLOT_PHASES,
-    currentTime: 5.5,
+    currentTime: 5500,
     isPlaying: false,
     isLive: false,
     title: 'Timeline',
@@ -108,7 +108,7 @@ export const NotLive: Story = {
 export const Playing: Story = {
   args: {
     phases: DEFAULT_BEACON_SLOT_PHASES,
-    currentTime: 6.3,
+    currentTime: 6300,
     isPlaying: true,
     isLive: true,
     title: 'Timeline',
@@ -119,7 +119,7 @@ export const EarlyPhase: Story = {
   name: 'Early Phase (Block Proposal)',
   args: {
     phases: DEFAULT_BEACON_SLOT_PHASES,
-    currentTime: 2.0,
+    currentTime: 2000,
     isPlaying: false,
     isLive: true,
     title: 'Timeline',
@@ -130,7 +130,7 @@ export const LatePhase: Story = {
   name: 'Late Phase (Aggregation)',
   args: {
     phases: DEFAULT_BEACON_SLOT_PHASES,
-    currentTime: 10.5,
+    currentTime: 10500,
     isPlaying: false,
     isLive: true,
     title: 'Timeline',
@@ -141,7 +141,7 @@ export const Complete: Story = {
   name: 'Slot Complete',
   args: {
     phases: DEFAULT_BEACON_SLOT_PHASES,
-    currentTime: 12.0,
+    currentTime: 12000,
     isPlaying: false,
     isLive: false,
     title: 'Timeline',
@@ -151,7 +151,7 @@ export const Complete: Story = {
 export const CustomTitle: Story = {
   args: {
     phases: DEFAULT_BEACON_SLOT_PHASES,
-    currentTime: 7.2,
+    currentTime: 7200,
     isPlaying: false,
     isLive: true,
     title: 'Slot 1234567',

@@ -14,16 +14,17 @@ import type { BlobDataAvailabilityProps } from './BlobDataAvailability.types';
  * 3. Continental Proportion - Step chart showing cumulative distribution
  *
  * Charts only render data up to the current slot time, simulating live progression.
+ * All time values are in milliseconds. Axis labels and tooltips display values in seconds for readability.
  *
  * @example
  * ```tsx
  * <BlobDataAvailability
- *   currentTime={4.5}
- *   firstSeenData={[{ time: 1.42, blobId: '0', color: '#06b6d4' }]}
- *   availabilityRateData={[{ time: 0, nodes: 0 }, { time: 1, nodes: 25 }]}
+ *   currentTime={4500}
+ *   firstSeenData={[{ time: 1420, blobId: '0', color: '#06b6d4' }]}
+ *   availabilityRateData={[{ time: 0, nodes: 0 }, { time: 1000, nodes: 25 }]}
  *   continentalPropagationData={[
- *     { continent: 'EU', data: [{ time: 1.2, percentage: 0 }, { time: 1.4, percentage: 100 }] },
- *     { continent: 'NA', data: [{ time: 1.3, percentage: 0 }, { time: 1.5, percentage: 100 }] }
+ *     { continent: 'EU', data: [{ time: 1200, percentage: 0 }, { time: 1400, percentage: 100 }] },
+ *     { continent: 'NA', data: [{ time: 1300, percentage: 0 }, { time: 1500, percentage: 100 }] }
  *   ]}
  * />
  * ```
@@ -33,7 +34,7 @@ export function BlobDataAvailability({
   availabilityRateData = [],
   continentalPropagationData = [],
   currentTime,
-  maxTime = 12,
+  maxTime = 12000,
   className,
 }: BlobDataAvailabilityProps): JSX.Element {
   // Default currentTime to maxTime to show all data if not specified
@@ -130,6 +131,7 @@ export function BlobDataAvailability({
         axisLabel: {
           color: themeColors.muted,
           fontSize: 10,
+          formatter: (value: number) => (value / 1000).toFixed(1),
         },
         splitLine: {
           show: true,
@@ -190,7 +192,7 @@ export function BlobDataAvailability({
           fontSize: 12,
         },
         formatter: (params: { data: [number, string] }) => {
-          return `Blob ${params.data[1]}<br/>Time: ${params.data[0]}s`;
+          return `Blob ${params.data[1]}<br/>Time: ${(params.data[0] / 1000).toFixed(2)}s`;
         },
       },
       legend: {
@@ -246,6 +248,7 @@ export function BlobDataAvailability({
         axisLabel: {
           color: themeColors.muted,
           fontSize: 10,
+          formatter: (value: number) => (value / 1000).toFixed(1),
         },
         splitLine: {
           show: true,
@@ -326,6 +329,12 @@ export function BlobDataAvailability({
           color: themeColors.foreground,
           fontSize: 12,
         },
+        formatter: (params: { data: [number, number] }[]) => {
+          if (!params || params.length === 0) return '';
+          const time = (params[0].data[0] / 1000).toFixed(2);
+          const nodes = params[0].data[1];
+          return `Time: ${time}s<br/>Nodes: ${nodes}`;
+        },
         axisPointer: {
           type: 'line',
           lineStyle: {
@@ -399,6 +408,7 @@ export function BlobDataAvailability({
         axisLabel: {
           color: themeColors.muted,
           fontSize: 10,
+          formatter: (value: number) => (value / 1000).toFixed(1),
         },
         splitLine: {
           show: true,
@@ -472,6 +482,15 @@ export function BlobDataAvailability({
         textStyle: {
           color: themeColors.foreground,
           fontSize: 12,
+        },
+        formatter: (params: { seriesName: string; data: [number, number] }[]) => {
+          if (!params || params.length === 0) return '';
+          const time = (params[0].data[0] / 1000).toFixed(2);
+          const lines = [`Time: ${time}s`];
+          params.forEach(param => {
+            lines.push(`${param.seriesName}: ${param.data[1].toFixed(1)}%`);
+          });
+          return lines.join('<br/>');
         },
         axisPointer: {
           type: 'line',
