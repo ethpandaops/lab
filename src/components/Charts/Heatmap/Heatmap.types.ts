@@ -91,11 +91,7 @@ export interface HeatmapChartProps {
    * @param yLabels Y-axis labels
    * @returns Formatted tooltip HTML string
    */
-  tooltipFormatter?: (
-    params: { value: [number, number, number] },
-    xLabels: string[],
-    yLabels: string[]
-  ) => string;
+  tooltipFormatter?: (params: { value: [number, number, number] }, xLabels: string[], yLabels: string[]) => string;
   /**
    * Show only min and max labels on X-axis
    * @default false

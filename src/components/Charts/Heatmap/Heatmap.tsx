@@ -126,9 +126,7 @@ export function HeatmapChart({
       axisLabel: {
         color: themeColors.muted,
         fontSize: 12,
-        interval: xAxisShowOnlyMinMax
-          ? (index: number) => index === 0 || index === xLabels.length - 1
-          : undefined,
+        interval: xAxisShowOnlyMinMax ? (index: number) => index === 0 || index === xLabels.length - 1 : undefined,
       },
     },
     yAxis: {
@@ -153,9 +151,7 @@ export function HeatmapChart({
       axisLabel: {
         color: themeColors.muted,
         fontSize: 12,
-        interval: yAxisShowOnlyMinMax
-          ? (index: number) => index === 0 || index === yLabels.length - 1
-          : undefined,
+        interval: yAxisShowOnlyMinMax ? (index: number) => index === 0 || index === yLabels.length - 1 : undefined,
       },
     },
     visualMap: showVisualMap

@@ -33,7 +33,7 @@ const sampleFirstSeenData = [
 ];
 
 // Generate availability rate data with smooth curve - data point every 50ms
-const generateAvailabilityRateData = () => {
+const generateAvailabilityRateData = (): Array<{ time: number; nodes: number }> => {
   const data = [];
   const interval = 0.05; // 50ms intervals
   const maxTime = 12.0;

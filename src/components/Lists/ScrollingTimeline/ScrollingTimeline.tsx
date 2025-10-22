@@ -46,7 +46,7 @@ export function ScrollingTimeline({
   }, [currentTime, items, autoScroll]);
 
   // Determine item status based on currentTime if not explicitly set
-  const getItemStatus = (item: TimelineItem) => {
+  const getItemStatus = (item: TimelineItem): 'active' | 'completed' | 'pending' => {
     if (item.status) return item.status;
 
     const nextItem = items.find(i => i.timestamp > item.timestamp);
