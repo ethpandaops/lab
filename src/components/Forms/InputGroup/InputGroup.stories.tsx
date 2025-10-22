@@ -1,12 +1,14 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { InputGroup } from './InputGroup';
 import { Button } from '@/components/Elements/Button';
+import { ButtonGroup } from '@/components/Elements/ButtonGroup';
 import {
   EnvelopeIcon,
   QuestionMarkCircleIcon,
   BarsArrowUpIcon,
   UsersIcon,
   ChevronDownIcon,
+  FunnelIcon,
 } from '@heroicons/react/16/solid';
 
 const meta = {
@@ -184,6 +186,25 @@ export const WithLeadingIconAndTrailingButton: Story = {
       <Button variant="secondary" size="md" leadingIcon={<BarsArrowUpIcon />} className="rounded-l-none rounded-r-md">
         Sort
       </Button>
+    ),
+  },
+};
+
+export const WithLeadingIconAndTrailingButtonGroup: Story = {
+  args: {
+    label: 'Search candidates',
+    type: 'text',
+    placeholder: 'John Smith',
+    leadingIcon: <UsersIcon />,
+    trailingButton: (
+      <ButtonGroup>
+        <Button variant="secondary" size="md" leadingIcon={<FunnelIcon />} className="rounded-l-none">
+          Filter
+        </Button>
+        <Button variant="secondary" size="md" leadingIcon={<BarsArrowUpIcon />} className="rounded-r-md">
+          Sort
+        </Button>
+      </ButtonGroup>
     ),
   },
 };

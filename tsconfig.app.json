@@ -28,5 +28,5 @@
     }
   },
   "include": ["src", "src/routeTree.gen.ts", "src/types/**/*.d.ts"],
-  "exclude": ["src/api/generated"]
+  "exclude": ["src/api/generated", "**/*.test.ts", "**/*.test.tsx"]
 }

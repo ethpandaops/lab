@@ -14,4 +14,6 @@ export interface CardProps {
   className?: string;
   isInteractive?: boolean;
   onClick?: () => void;
+  /** Optional feature image element (typically an img) displayed on right side with fade effect */
+  featureImage?: ReactNode;
 }

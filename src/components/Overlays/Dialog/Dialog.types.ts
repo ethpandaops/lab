@@ -1,0 +1,46 @@
+import type { ReactNode } from 'react';
+
+export type DialogSize = 'sm' | 'md' | 'lg' | 'xl' | 'full';
+
+export interface DialogProps {
+  /**
+   * Whether the dialog is open
+   */
+  open: boolean;
+  /**
+   * Callback when the dialog should close
+   */
+  onClose: () => void;
+  /**
+   * Dialog title
+   */
+  title?: ReactNode;
+  /**
+   * Dialog description
+   */
+  description?: ReactNode;
+  /**
+   * Dialog content
+   */
+  children: ReactNode;
+  /**
+   * Dialog size (default: 'md')
+   */
+  size?: DialogSize;
+  /**
+   * Whether to show the close button (default: true)
+   */
+  showCloseButton?: boolean;
+  /**
+   * Custom footer content (buttons, actions, etc.)
+   */
+  footer?: ReactNode;
+  /**
+   * Additional CSS classes for the dialog panel
+   */
+  className?: string;
+  /**
+   * Whether content should overflow (useful for dropdowns/selects) (default: false)
+   */
+  allowContentOverflow?: boolean;
+}

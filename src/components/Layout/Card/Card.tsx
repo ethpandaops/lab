@@ -55,13 +55,14 @@ export function Card({
   className,
   isInteractive = false,
   onClick,
+  featureImage,
 }: CardProps): JSX.Element {
   const styles = variantStyles[variant];
 
   return (
     <div
       className={clsx(
-        'divide-y divide-border overflow-hidden rounded-sm dark:divide-white/10',
+        'relative divide-y divide-border overflow-hidden rounded-sm dark:divide-white/10',
         styles.container,
         isInteractive &&
           'cursor-pointer transition-all duration-200 hover:-translate-y-0.5 hover:shadow-xs dark:hover:shadow-none',
@@ -71,9 +72,14 @@ export function Card({
       role={isInteractive ? 'button' : undefined}
       tabIndex={isInteractive ? 0 : undefined}
     >
-      {header && <div className={clsx('px-4 py-5 sm:px-6', styles.header)}>{header}</div>}
-      <div className={clsx('px-4 py-5 sm:p-6', styles.main)}>{children}</div>
-      {footer && <div className={clsx('px-4 py-4 sm:px-6', styles.footer)}>{footer}</div>}
+      {featureImage && (
+        <div className="pointer-events-none absolute inset-0 z-0 opacity-20 [&_img]:size-full [&_img]:object-cover">
+          {featureImage}
+        </div>
+      )}
+      {header && <div className={clsx('relative z-10 px-4 py-5 sm:px-6', styles.header)}>{header}</div>}
+      <div className={clsx('relative z-10 px-4 py-5 sm:p-6', styles.main)}>{children}</div>
+      {footer && <div className={clsx('relative z-10 px-4 py-4 sm:px-6', styles.footer)}>{footer}</div>}
     </div>
   );
 }

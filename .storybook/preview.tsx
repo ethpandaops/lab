@@ -15,6 +15,7 @@ const basePath = import.meta.env.STORYBOOK_BASE_PATH || '';
 // Initialize MSW with correct service worker URL for GitHub Pages
 initialize({
   onUnhandledRequest: 'bypass',
+  quiet: true, // Suppress MSW startup messages
   serviceWorker: {
     // Use base path for service worker URL
     url: basePath ? `${basePath}/mockServiceWorker.js` : '/mockServiceWorker.js',

@@ -76,4 +76,14 @@ export interface GlobeChartProps {
    * Point color
    */
   pointColor?: string;
+  /**
+   * Point size
+   * @default 2
+   */
+  pointSize?: number;
+  /**
+   * Point opacity
+   * @default 0.2
+   */
+  pointOpacity?: number;
 }

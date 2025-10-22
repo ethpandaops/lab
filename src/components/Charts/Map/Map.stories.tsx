@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { MapChart } from './Map';
-import type { RouteData } from './Map.types';
+import type { RouteData, PointData } from './Map.types';
 
 const meta: Meta<typeof MapChart> = {
   title: 'Components/Charts/Map',
@@ -129,5 +129,137 @@ export const MinimalRoutes: Story = {
       { from: [2.5, 49.0], to: [-43.2, -22.9], name: 'Paris to Rio' },
     ],
     showEffect: true,
+  },
+};
+
+// Sample point data - major cities around the world
+const cityPoints: PointData[] = [
+  // North America
+  { coords: [-74.0, 40.7], name: 'New York', value: 8 },
+  { coords: [-118.4, 33.9], name: 'Los Angeles', value: 4 },
+  { coords: [-87.9, 41.9], name: 'Chicago', value: 3 },
+  { coords: [-122.4, 37.8], name: 'San Francisco', value: 3 },
+  { coords: [-79.4, 43.7], name: 'Toronto', value: 3 },
+
+  // Europe
+  { coords: [-0.1, 51.5], name: 'London', value: 9 },
+  { coords: [2.5, 49.0], name: 'Paris', value: 7 },
+  { coords: [8.6, 50.1], name: 'Frankfurt', value: 2 },
+  { coords: [-3.7, 40.4], name: 'Madrid', value: 3 },
+  { coords: [12.5, 41.9], name: 'Rome', value: 3 },
+
+  // Asia
+  { coords: [139.8, 35.6], name: 'Tokyo', value: 10 },
+  { coords: [121.5, 31.2], name: 'Shanghai', value: 9 },
+  { coords: [103.8, 1.3], name: 'Singapore', value: 6 },
+  { coords: [126.9, 37.5], name: 'Seoul', value: 5 },
+  { coords: [77.1, 28.7], name: 'Delhi', value: 8 },
+  { coords: [114.1, 22.3], name: 'Hong Kong', value: 7 },
+
+  // Middle East
+  { coords: [55.3, 25.3], name: 'Dubai', value: 6 },
+
+  // Oceania
+  { coords: [151.2, -33.9], name: 'Sydney', value: 5 },
+
+  // South America
+  { coords: [-43.2, -22.9], name: 'Rio de Janeiro', value: 4 },
+  { coords: [-58.4, -34.6], name: 'Buenos Aires', value: 3 },
+
+  // Africa
+  { coords: [18.4, -33.9], name: 'Cape Town', value: 2 },
+  { coords: [31.2, 30.0], name: 'Cairo', value: 4 },
+];
+
+/**
+ * Map with only points (no routes)
+ * Shows major cities as scatter points on the 3D map
+ */
+export const PointsOnly: Story = {
+  args: {
+    points: cityPoints,
+    title: 'Major Cities',
+    pointSize: 6,
+  },
+};
+
+/**
+ * Map with custom colored points
+ */
+export const CustomPointColor: Story = {
+  args: {
+    points: cityPoints,
+    title: 'Major Cities',
+    pointColor: '#ff4683',
+    pointSize: 8,
+  },
+};
+
+/**
+ * Map with both routes and points
+ * Shows flight routes with city markers
+ */
+export const RoutesAndPoints: Story = {
+  args: {
+    routes,
+    points: cityPoints,
+    title: 'Global Network',
+    showEffect: true,
+    pointSize: 5,
+  },
+};
+
+/**
+ * Map with larger points
+ */
+export const LargePoints: Story = {
+  args: {
+    points: cityPoints,
+    title: 'Major Cities - Large Points',
+    pointSize: 12,
+  },
+};
+
+// Sample data with detailed location labels and node counts
+const nodeLocations: PointData[] = [
+  // North America
+  { coords: [-122.4, 37.8], name: 'San Francisco, United States', value: 15 },
+  { coords: [-74.0, 40.7], name: 'New York, United States', value: 8 },
+  { coords: [-118.4, 33.9], name: 'Los Angeles, United States', value: 5 },
+  { coords: [-87.9, 41.9], name: 'Chicago, United States', value: 4 },
+  { coords: [-111.9, 33.4], name: 'Arizona, United States', value: 3 },
+  { coords: [-79.4, 43.7], name: 'Toronto, Canada', value: 6 },
+  { coords: [-123.1, 49.3], name: 'Vancouver, Canada', value: 4 },
+
+  // Europe
+  { coords: [-0.1, 51.5], name: 'London, United Kingdom', value: 12 },
+  { coords: [2.5, 49.0], name: 'Paris, France', value: 9 },
+  { coords: [13.4, 52.5], name: 'Berlin, Germany', value: 7 },
+  { coords: [8.6, 50.1], name: 'Frankfurt, Germany', value: 5 },
+  { coords: [4.9, 52.4], name: 'Amsterdam, Netherlands', value: 6 },
+  { coords: [-3.7, 40.4], name: 'Madrid, Spain', value: 4 },
+
+  // Asia
+  { coords: [139.8, 35.6], name: 'Tokyo, Japan', value: 11 },
+  { coords: [121.5, 31.2], name: 'Shanghai, China', value: 10 },
+  { coords: [103.8, 1.3], name: 'Singapore', value: 8 },
+  { coords: [126.9, 37.5], name: 'Seoul, South Korea', value: 7 },
+  { coords: [114.1, 22.3], name: 'Hong Kong', value: 6 },
+
+  // Oceania
+  { coords: [151.2, -33.9], name: 'Sydney, Australia', value: 5 },
+  { coords: [174.8, -41.3], name: 'Wellington, New Zealand', value: 2 },
+];
+
+/**
+ * Map with detailed tooltips
+ * Hover over points to see location name and node count
+ * Example: "Arizona, United States: 3"
+ */
+export const WithTooltips: Story = {
+  args: {
+    points: nodeLocations,
+    title: 'Node Distribution',
+    pointSize: 8,
   },
 };

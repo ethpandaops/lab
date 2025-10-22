@@ -37,20 +37,19 @@ const lines: LineData[] = [
 ];
 
 const points: PointData[] = [
-  { name: 'New York', coord: [-74.0, 40.7] },
-  { name: 'London', coord: [-0.1, 51.5] },
-  { name: 'Los Angeles', coord: [-118.4, 33.9] },
-  { name: 'Tokyo', coord: [139.8, 35.6] },
-  { name: 'Paris', coord: [2.5, 49.0] },
-  { name: 'Shanghai', coord: [121.5, 31.2] },
-  { name: 'Dubai', coord: [55.3, 25.3] },
-  { name: 'Singapore', coord: [103.8, 1.3] },
-  { name: 'Sydney', coord: [151.2, -33.9] },
+  { name: 'New York', coord: [-74.0, 40.7], value: 10 },
+  { name: 'London', coord: [-0.1, 51.5], value: 8 },
+  { name: 'Los Angeles', coord: [-118.4, 33.9], value: 5 },
+  { name: 'Tokyo', coord: [139.8, 35.6], value: 12 },
+  { name: 'Paris', coord: [2.5, 49.0], value: 6 },
+  { name: 'Shanghai', coord: [121.5, 31.2], value: 15 },
+  { name: 'Dubai', coord: [55.3, 25.3], value: 7 },
+  { name: 'Singapore', coord: [103.8, 1.3], value: 9 },
+  { name: 'Sydney', coord: [151.2, -33.9], value: 4 },
 ];
 
 /**
- * 3D globe with lines and points
- * Generic component for plotting any connections and locations
+ * Default: 3D globe with lines and points showing global connections
  */
 export const Default: Story = {
   args: {
@@ -59,5 +58,49 @@ export const Default: Story = {
     autoRotate: true,
     showEffect: true,
     ...earthTextures,
+  },
+};
+
+/**
+ * Points Only: Globe showing location markers without connection lines
+ * Demonstrates higher visibility with increased point size and opacity
+ */
+export const PointsOnly: Story = {
+  args: {
+    points,
+    autoRotate: true,
+    showEffect: false,
+    pointSize: 6,
+    pointOpacity: 0.8,
+    pointColor: '#06b6d4',
+    ...earthTextures,
+  },
+};
+
+/**
+ * Large Points: Globe with very visible markers for emphasis
+ */
+export const LargePoints: Story = {
+  args: {
+    points,
+    autoRotate: true,
+    showEffect: false,
+    pointSize: 10,
+    pointOpacity: 0.9,
+    pointColor: '#f59e0b',
+    ...earthTextures,
+  },
+};
+
+/**
+ * Minimal: Simple globe without textures, focusing on data visualization
+ */
+export const Minimal: Story = {
+  args: {
+    points,
+    autoRotate: false,
+    pointSize: 8,
+    pointOpacity: 1,
+    pointColor: '#06b6d4',
   },
 };
