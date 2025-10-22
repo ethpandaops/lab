@@ -1,17 +1,17 @@
 import type { JSX } from 'react';
 import clsx from 'clsx';
-import { SlotViewTimeline } from '@/pages/experiments/slot-view/components/SlotViewTimeline';
+import { Timeline } from '@/pages/experiments/slot-view/components/Timeline';
 import { ScrollingTimeline } from '@/components/Lists/ScrollingTimeline';
-import type { SlotViewSidebarProps } from './SlotViewSidebar.types';
+import type { SidebarProps } from './Sidebar.types';
 
 /**
- * SlotViewSidebar - A page-specific sidebar component for the slot-view page.
+ * Sidebar - A page-specific sidebar component for the slot-view page.
  *
- * Combines SlotViewTimeline and ScrollingTimeline components, coordinating
- * their shared currentTime prop. SlotViewTimeline is displayed above
+ * Combines Timeline and ScrollingTimeline components, coordinating
+ * their shared currentTime prop. Timeline is displayed above
  * ScrollingTimeline.
  */
-export function SlotViewSidebar({
+export function Sidebar({
   phases,
   currentTime,
   slotDuration,
@@ -28,11 +28,11 @@ export function SlotViewSidebar({
   autoScroll = true,
   formatTime,
   className,
-}: SlotViewSidebarProps): JSX.Element {
+}: SidebarProps): JSX.Element {
   return (
     <div className={clsx('flex flex-col gap-6', className)}>
       {/* Slot Timeline with controls */}
-      <SlotViewTimeline
+      <Timeline
         phases={phases}
         currentTime={currentTime}
         slotDuration={slotDuration}

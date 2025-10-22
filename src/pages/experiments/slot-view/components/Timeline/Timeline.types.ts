@@ -1,6 +1,6 @@
 import type { SlotPhase } from '@/utils/beacon';
 
-export interface SlotViewTimelineProps {
+export interface TimelineProps {
   /** Array of phases that make up the slot */
   phases: SlotPhase[];
   /** Current time position in seconds (0 to total duration) */

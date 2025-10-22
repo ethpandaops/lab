@@ -1,11 +1,11 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useEffect, useState } from 'react';
-import { SlotViewTimeline } from './SlotViewTimeline';
+import { Timeline } from './Timeline';
 import { DEFAULT_BEACON_SLOT_PHASES } from '@/utils/beacon';
 
 const meta = {
-  title: 'Pages/Experiments/SlotView/SlotViewTimeline',
-  component: SlotViewTimeline,
+  title: 'Pages/Experiments/SlotView/Timeline',
+  component: Timeline,
   parameters: {
     layout: 'padded',
   },
@@ -17,7 +17,7 @@ const meta = {
     ),
   ],
   tags: ['autodocs'],
-} satisfies Meta<typeof SlotViewTimeline>;
+} satisfies Meta<typeof Timeline>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
@@ -81,7 +81,7 @@ export const Interactive: Story = {
     }, [isPlaying]);
 
     return (
-      <SlotViewTimeline
+      <Timeline
         phases={DEFAULT_BEACON_SLOT_PHASES}
         currentTime={currentTime}
         isPlaying={isPlaying}

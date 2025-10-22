@@ -1,13 +1,13 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useEffect, useState } from 'react';
-import { SlotViewSidebar } from './SlotViewSidebar';
+import { Sidebar } from './Sidebar';
 import { DEFAULT_BEACON_SLOT_PHASES } from '@/utils/beacon';
 import type { TimelineItem } from '@/components/Lists/ScrollingTimeline/ScrollingTimeline.types';
 import { Badge } from '@/components/Elements/Badge';
 
 const meta = {
-  title: 'Pages/Experiments/SlotView/SlotViewSidebar',
-  component: SlotViewSidebar,
+  title: 'Pages/Experiments/SlotView/Sidebar',
+  component: Sidebar,
   parameters: {
     layout: 'padded',
   },
@@ -19,7 +19,7 @@ const meta = {
     ),
   ],
   tags: ['autodocs'],
-} satisfies Meta<typeof SlotViewSidebar>;
+} satisfies Meta<typeof Sidebar>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
@@ -217,7 +217,7 @@ export const Interactive: Story = {
     }, [isPlaying]);
 
     return (
-      <SlotViewSidebar
+      <Sidebar
         phases={DEFAULT_BEACON_SLOT_PHASES}
         currentTime={currentTime}
         items={ethereumEvents}

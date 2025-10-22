@@ -64,7 +64,7 @@ export function ScrollingTimeline({
     <div
       ref={containerRef}
       className={clsx(
-        'overflow-y-auto overflow-x-hidden rounded-sm bg-background dark:bg-surface',
+        'overflow-x-hidden overflow-y-auto rounded-sm bg-background dark:bg-surface',
         'scrollbar-thin scrollbar-track-transparent scrollbar-thumb-border dark:scrollbar-thumb-zinc-700',
         className
       )}
@@ -72,7 +72,7 @@ export function ScrollingTimeline({
     >
       <div className="relative">
         {/* Vertical timeline line */}
-        <div className="absolute left-[4.75rem] top-0 h-full w-px bg-border dark:bg-zinc-800" />
+        <div className="absolute top-0 left-[4.75rem] h-full w-px bg-border dark:bg-zinc-800" />
 
         {/* Timeline items */}
         <div className="space-y-0">
@@ -98,7 +98,7 @@ export function ScrollingTimeline({
                 {/* Timestamp */}
                 <div
                   className={clsx(
-                    'flex-shrink-0 text-right text-xs/6 font-medium',
+                    'shrink-0 text-right text-xs/6 font-medium',
                     'w-14',
                     status === 'active' && 'text-primary',
                     status === 'completed' && 'text-foreground dark:text-zinc-400',
@@ -109,7 +109,7 @@ export function ScrollingTimeline({
                 </div>
 
                 {/* Timeline dot */}
-                <div className="relative flex h-6 flex-shrink-0 items-center">
+                <div className="relative flex h-6 shrink-0 items-center">
                   <div
                     className={clsx(
                       'size-2 rounded-full transition-all duration-300',
@@ -124,7 +124,7 @@ export function ScrollingTimeline({
                 {item.icon && (
                   <div
                     className={clsx(
-                      'flex h-6 flex-shrink-0 items-center',
+                      'flex h-6 shrink-0 items-center',
                       status === 'active' && 'text-primary',
                       status === 'completed' && 'text-foreground dark:text-zinc-400',
                       status === 'pending' && 'text-muted dark:text-zinc-600'

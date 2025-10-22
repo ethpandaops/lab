@@ -1,15 +1,15 @@
 import type { JSX } from 'react';
 import { ChevronLeftIcon, ChevronRightIcon, PlayIcon, PauseIcon } from '@heroicons/react/24/solid';
 import { SlotTimeline } from '@/components/Ethereum/SlotTimeline';
-import type { SlotViewTimelineProps } from './SlotViewTimeline.types';
+import type { TimelineProps } from './Timeline.types';
 
 /**
- * SlotViewTimeline - A page-specific timeline component for the slot-view page.
+ * Timeline - A page-specific timeline component for the slot-view page.
  *
  * Wraps the core SlotTimeline component with playback controls, title, and current time display.
  * Features backward/play-pause/forward controls and live indicator.
  */
-export function SlotViewTimeline({
+export function Timeline({
   phases,
   currentTime,
   slotDuration,
@@ -21,7 +21,7 @@ export function SlotViewTimeline({
   title = 'Timeline',
   isLive = false,
   ariaLabel = 'Slot View Timeline',
-}: SlotViewTimelineProps): JSX.Element {
+}: TimelineProps): JSX.Element {
   return (
     <div className="w-full">
       {/* Header with title, controls, and current time */}
