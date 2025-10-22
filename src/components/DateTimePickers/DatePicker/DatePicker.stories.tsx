@@ -1,235 +1,160 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { CalendarIcon } from '@heroicons/react/24/outline';
 import { DatePicker } from './DatePicker';
 import { Popover, PopoverButton, PopoverPanel } from '@/components/Overlays/Popover';
 
-const meta = {
+const meta: Meta<typeof DatePicker> = {
   title: 'Components/DateTimePickers/DatePicker',
   component: DatePicker,
-  parameters: {
-    layout: 'centered',
-  },
   decorators: [
-    Story => (
+    (Story: React.ComponentType) => (
       <div className="min-w-[600px] rounded-sm bg-surface p-6">
         <Story />
       </div>
     ),
   ],
   tags: ['autodocs'],
-  argTypes: {
-    value: {
-      control: 'date',
-    },
-    minDate: {
-      control: 'date',
-    },
-    maxDate: {
-      control: 'date',
-    },
-    isOpen: {
-      control: 'boolean',
-    },
+  parameters: {
+    layout: 'centered',
   },
-} satisfies Meta<typeof DatePicker>;
+};
 
 export default meta;
-type Story = StoryObj<typeof meta>;
+type Story = StoryObj<typeof DatePicker>;
 
 /**
- * Basic usage of the DatePicker with Popover integration
+ * Default date picker with inline display
  */
-export const Basic: Story = {
-  args: {
-    value: new Date(),
-    onChange: () => {},
-  },
+export const Default: Story = {
   render: () => {
-    const [date, setDate] = useState(new Date());
+    const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
+
+    return <DatePicker selected={selectedDate} onChange={(date: Date | null) => setSelectedDate(date)} />;
+  },
+};
+
+/**
+ * Date picker with no initial selection
+ */
+export const NoInitialDate: Story = {
+  render: () => {
+    const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+
+    return <DatePicker selected={selectedDate} onChange={(date: Date | null) => setSelectedDate(date)} />;
+  },
+};
+
+/**
+ * Date picker with a specific date selected
+ */
+export const WithSpecificDate: Story = {
+  render: () => {
+    const [selectedDate, setSelectedDate] = useState<Date | null>(new Date('2025-12-25'));
+
+    return <DatePicker selected={selectedDate} onChange={(date: Date | null) => setSelectedDate(date)} />;
+  },
+};
+
+/**
+ * Date picker with disabled dates
+ */
+export const WithDisabledDates: Story = {
+  render: () => {
+    const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
+
+    // Disable weekends
+    const isWeekday = (date: Date): boolean => {
+      const day = date.getDay();
+      return day !== 0 && day !== 6;
+    };
 
     return (
-      <div className="flex flex-col items-start gap-4">
-        <Popover className="relative">
-          <PopoverButton variant="secondary" size="md">
-            <CalendarIcon className="size-5" />
-            <span>{date.toLocaleDateString()}</span>
-          </PopoverButton>
-          <PopoverPanel anchor="bottom start" className="mt-2">
-            <DatePicker value={date} onChange={newDate => setDate(newDate)} isOpen={true} />
-          </PopoverPanel>
-        </Popover>
-      </div>
+      <DatePicker
+        selected={selectedDate}
+        onChange={(date: Date | null) => setSelectedDate(date)}
+        filterDate={isWeekday}
+      />
     );
   },
 };
 
 /**
- * DatePicker with minimum and maximum date constraints
+ * Date picker with date range limits
  */
-export const WithMinMaxDates: Story = {
-  args: {
-    value: new Date(),
-    onChange: () => {},
+export const WithDateRange: Story = {
+  render: () => {
+    const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
+    const today = new Date();
+    const maxDate = new Date();
+    maxDate.setMonth(maxDate.getMonth() + 3);
+
+    return (
+      <DatePicker
+        selected={selectedDate}
+        onChange={(date: Date | null) => setSelectedDate(date)}
+        minDate={today}
+        maxDate={maxDate}
+      />
+    );
   },
+};
+
+/**
+ * Date picker with range selection
+ */
+export const RangeSelection: Story = {
   render: () => {
     const today = new Date();
-    const minDate = new Date(today);
-    minDate.setDate(today.getDate() - 7); // 7 days ago
-    const maxDate = new Date(today);
-    maxDate.setDate(today.getDate() + 7); // 7 days from now
+    const weekFromNow = new Date();
+    weekFromNow.setDate(weekFromNow.getDate() + 7);
 
-    const [date, setDate] = useState(today);
+    const [startDate, setStartDate] = useState<Date | null>(today);
+    const [endDate, setEndDate] = useState<Date | null>(weekFromNow);
+
+    const handleChange = (dates: [Date | null, Date | null]): void => {
+      const [start, end] = dates;
+      setStartDate(start);
+      setEndDate(end);
+    };
+
+    return (
+      <div className="flex flex-col gap-3">
+        <div className="text-sm/6 text-muted">
+          <p>
+            <strong>Start:</strong> {startDate?.toLocaleDateString() ?? 'None'}
+          </p>
+          <p>
+            <strong>End:</strong> {endDate?.toLocaleDateString() ?? 'None'}
+          </p>
+        </div>
+        <DatePicker selectsRange startDate={startDate} endDate={endDate} onChange={handleChange} />
+      </div>
+    );
+  },
+};
+
+/**
+ * Date picker inside a Popover with button trigger
+ */
+export const WithPopover: Story = {
+  render: () => {
+    const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
 
     return (
       <div className="flex flex-col gap-4">
-        <div className="text-sm text-foreground/70">
-          <p>Min date: {minDate.toLocaleDateString()}</p>
-          <p>Max date: {maxDate.toLocaleDateString()}</p>
-          <p className="mt-2 font-medium">Selected: {date.toLocaleDateString()}</p>
+        <div className="text-base/7 text-foreground">
+          <strong>Selected Date:</strong>{' '}
+          <span className="text-muted">{selectedDate?.toLocaleDateString() ?? 'None'}</span>
         </div>
-        <Popover className="relative">
-          <PopoverButton variant="primary" size="md">
-            <CalendarIcon className="size-5" />
-            Select Date (within range)
-          </PopoverButton>
-          <PopoverPanel anchor="bottom start" className="mt-2">
-            <DatePicker
-              value={date}
-              onChange={newDate => setDate(newDate)}
-              minDate={minDate}
-              maxDate={maxDate}
-              isOpen={true}
-            />
-          </PopoverPanel>
-        </Popover>
-      </div>
-    );
-  },
-};
-
-/**
- * DatePicker always visible (no popover)
- */
-export const AlwaysVisible: Story = {
-  args: {
-    value: new Date(),
-    onChange: () => {},
-  },
-  render: () => {
-    const [date, setDate] = useState(new Date());
-
-    return (
-      <div className="flex flex-col gap-4">
-        <div className="text-sm font-medium text-foreground">Selected: {date.toLocaleDateString()}</div>
-        <div className="inline-block rounded-sm border border-border bg-white dark:bg-zinc-800">
-          <DatePicker value={date} onChange={newDate => setDate(newDate)} isOpen={true} />
-        </div>
-      </div>
-    );
-  },
-};
-
-/**
- * Multiple DatePickers for date range selection
- */
-export const DateRangePicker: Story = {
-  args: {
-    value: new Date(),
-    onChange: () => {},
-  },
-  render: () => {
-    const [startDate, setStartDate] = useState(new Date());
-    const [endDate, setEndDate] = useState(() => {
-      const date = new Date();
-      date.setDate(date.getDate() + 7);
-      return date;
-    });
-
-    return (
-      <div className="flex flex-col gap-6">
-        <div className="flex flex-wrap items-center gap-3">
-          <Popover className="relative">
-            <PopoverButton variant="secondary" size="sm">
-              <CalendarIcon className="size-4" />
-              Start: {startDate.toLocaleDateString()}
-            </PopoverButton>
-            <PopoverPanel anchor="bottom start" className="mt-2">
-              <DatePicker
-                value={startDate}
-                onChange={newDate => setStartDate(newDate)}
-                maxDate={endDate}
-                isOpen={true}
-              />
-            </PopoverPanel>
-          </Popover>
-
-          <span className="text-foreground/50">→</span>
-
-          <Popover className="relative">
-            <PopoverButton variant="secondary" size="sm">
-              <CalendarIcon className="size-4" />
-              End: {endDate.toLocaleDateString()}
-            </PopoverButton>
-            <PopoverPanel anchor="bottom start" className="mt-2">
-              <DatePicker value={endDate} onChange={newDate => setEndDate(newDate)} minDate={startDate} isOpen={true} />
-            </PopoverPanel>
-          </Popover>
-        </div>
-
-        <div className="rounded-md border border-border bg-background p-4">
-          <p className="text-sm text-foreground/70">
-            Date range: {startDate.toLocaleDateString()} - {endDate.toLocaleDateString()}
-          </p>
-          <p className="mt-1 text-sm text-foreground/70">
-            Days: {Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24))}
-          </p>
-        </div>
-      </div>
-    );
-  },
-};
-
-/**
- * Different button variants and sizes
- */
-export const ButtonVariants: Story = {
-  args: {
-    value: new Date(),
-    onChange: () => {},
-  },
-  render: () => {
-    const [date, setDate] = useState(new Date());
-
-    return (
-      <div className="flex flex-wrap gap-4">
-        <Popover className="relative">
-          <PopoverButton variant="primary" size="sm">
-            <CalendarIcon className="size-4" />
-            Primary Small
-          </PopoverButton>
-          <PopoverPanel anchor="bottom start" className="mt-2">
-            <DatePicker value={date} onChange={setDate} isOpen={true} />
-          </PopoverPanel>
-        </Popover>
 
         <Popover className="relative">
           <PopoverButton variant="secondary" size="md">
             <CalendarIcon className="size-5" />
-            Secondary Medium
+            <span>Select Date</span>
           </PopoverButton>
           <PopoverPanel anchor="bottom start" className="mt-2">
-            <DatePicker value={date} onChange={setDate} isOpen={true} />
-          </PopoverPanel>
-        </Popover>
-
-        <Popover className="relative">
-          <PopoverButton variant="soft" size="lg">
-            <CalendarIcon className="size-6" />
-            Soft Large
-          </PopoverButton>
-          <PopoverPanel anchor="bottom start" className="mt-2">
-            <DatePicker value={date} onChange={setDate} isOpen={true} />
+            <DatePicker selected={selectedDate} onChange={(date: Date | null) => setSelectedDate(date)} />
           </PopoverPanel>
         </Popover>
       </div>

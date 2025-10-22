@@ -1,51 +1,26 @@
-import { type JSX } from 'react';
-import { DatePicker as GrafanaDatePicker } from '@grafana/ui';
-import clsx from 'clsx';
-import type { DatePickerProps } from './DatePicker.types';
+import type { JSX } from 'react';
+import ReactDatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 import './DatePicker.css';
+import { clsx } from 'clsx';
+import type { DatePickerProps } from './DatePicker.types';
 
 /**
- * DatePicker component with a calendar view for selecting a date
+ * DatePicker component
  *
- * Wraps Grafana's DatePicker component with a clean, controlled interface.
- * The calendar can be controlled externally via the isOpen prop, or you can
- * manage visibility through a button or trigger element.
+ * A themed date picker component using react-datepicker.
+ * Supports inline display by default and integrates with the app's theme system.
  *
  * @example
  * ```tsx
- * const [date, setDate] = useState(new Date());
- * const [open, setOpen] = useState(false);
- *
- * <Button onClick={() => setOpen(true)}>
- *   Select Date
- * </Button>
- * <DatePicker
- *   value={date}
- *   onChange={setDate}
- *   isOpen={open}
- *   onClose={() => setOpen(false)}
- * />
+ * const [date, setDate] = useState<Date | null>(new Date());
+ * <DatePicker selected={date} onChange={setDate} />
  * ```
  */
-export function DatePicker({
-  value,
-  onChange,
-  minDate,
-  maxDate,
-  isOpen = false,
-  onClose,
-  className,
-}: DatePickerProps): JSX.Element {
+export function DatePicker({ wrapperClassName, inline = true, ...props }: DatePickerProps): JSX.Element {
   return (
-    <div className={clsx('grafana-date-picker', className)}>
-      <GrafanaDatePicker
-        value={value}
-        onChange={onChange}
-        minDate={minDate}
-        maxDate={maxDate}
-        isOpen={isOpen}
-        onClose={onClose || (() => {})}
-      />
+    <div className={clsx('date-picker-wrapper', wrapperClassName)}>
+      <ReactDatePicker inline={inline} {...props} />
     </div>
   );
 }
