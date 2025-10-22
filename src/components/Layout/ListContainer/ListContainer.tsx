@@ -6,12 +6,14 @@ interface ListContainerContextValue {
   variant: ListContainerVariant;
   fullWidthOnMobile: boolean;
   compact: boolean;
+  withDividers: boolean;
 }
 
 const ListContainerContext = createContext<ListContainerContextValue>({
   variant: 'simple',
   fullWidthOnMobile: false,
   compact: false,
+  withDividers: true,
 });
 
 const variantStyles: Record<
@@ -20,12 +22,14 @@ const variantStyles: Record<
     wrapper?: string;
     wrapperMobileFull?: string;
     list: string;
+    listWithDividers?: string;
     item: string;
     itemMobileFull?: string;
   }
 > = {
   simple: {
-    list: 'divide-y divide-border dark:divide-white/10',
+    list: '',
+    listWithDividers: 'divide-y divide-border dark:divide-white/10',
     item: '',
     itemMobileFull: 'px-4 sm:px-0',
   },
@@ -34,7 +38,8 @@ const variantStyles: Record<
       'overflow-hidden bg-white shadow-sm dark:bg-zinc-800/50 dark:shadow-none dark:outline dark:-outline-offset-1 dark:outline-white/10',
     wrapperMobileFull:
       'overflow-hidden bg-white shadow-sm sm:rounded-sm dark:bg-zinc-800/50 dark:shadow-none dark:outline dark:-outline-offset-1 dark:outline-white/10',
-    list: 'divide-y divide-border dark:divide-white/10',
+    list: '',
+    listWithDividers: 'divide-y divide-border dark:divide-white/10',
     item: 'px-6',
     itemMobileFull: 'px-4 sm:px-6',
   },
@@ -42,7 +47,8 @@ const variantStyles: Record<
     wrapper: 'overflow-hidden border border-border bg-white dark:border-white/10 dark:bg-zinc-900',
     wrapperMobileFull:
       'overflow-hidden border border-border bg-white sm:rounded-sm dark:border-white/10 dark:bg-zinc-900',
-    list: 'divide-y divide-border dark:divide-white/10',
+    list: '',
+    listWithDividers: 'divide-y divide-border dark:divide-white/10',
     item: 'px-6',
     itemMobileFull: 'px-4 sm:px-6',
   },
@@ -74,16 +80,21 @@ export function ListContainer({
   variant = 'simple',
   fullWidthOnMobile = false,
   compact = false,
+  withDividers = true,
   className,
   as: Component = 'ul',
 }: ListContainerProps): JSX.Element {
   const styles = variantStyles[variant];
-  const contextValue: ListContainerContextValue = { variant, fullWidthOnMobile, compact };
+  const contextValue: ListContainerContextValue = { variant, fullWidthOnMobile, compact, withDividers };
+
+  // Apply dividers based on withDividers prop and variant
+  // Note: 'separate' variant doesn't use dividers
+  const listClassName = clsx(styles.list, withDividers && variant !== 'separate' && styles.listWithDividers);
 
   // Variants with wrapper need an extra container
   if (styles.wrapper) {
     const list = (
-      <Component role="list" className={styles.list}>
+      <Component role="list" className={listClassName}>
         {children}
       </Component>
     );
@@ -99,7 +110,7 @@ export function ListContainer({
 
   // Simple variants render list directly
   const list = (
-    <Component role="list" className={clsx(styles.list, className)}>
+    <Component role="list" className={clsx(listClassName, className)}>
       {children}
     </Component>
   );

@@ -59,28 +59,28 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps): JSX.Elem
               </div>
 
               <nav className="flex flex-1 flex-col">
-                <ul role="list" className="flex flex-1 flex-col gap-y-7">
+                <ListContainer variant="simple" withDividers={false} compact className="flex flex-1 flex-col gap-y-7">
                   {/* Contributors Button */}
-                  <li>
+                  <ListItem>
                     <Link to="/contributors">
                       <Button variant="primary" size="md" hyper className="w-full justify-center">
                         Contributors
                       </Button>
                     </Link>
-                  </li>
+                  </ListItem>
 
                   {/* Network Selector */}
-                  <li className="">
+                  <ListItem>
                     <Header size="xs" title="Network" />
                     <div className="mt-2">
                       <NetworkSelect showLabel={false} />
                     </div>
-                  </li>
+                  </ListItem>
 
                   {/* Experiments */}
-                  <li>
+                  <ListItem>
                     <Header size="xs" title="Experiments" />
-                    <ListContainer variant="simple" compact>
+                    <ListContainer variant="simple" compact withDividers={false}>
                       {experiments.map(experiment => (
                         <ListItem key={experiment.to}>
                           <Link
@@ -95,8 +95,8 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps): JSX.Elem
                         </ListItem>
                       ))}
                     </ListContainer>
-                  </li>
-                </ul>
+                  </ListItem>
+                </ListContainer>
               </nav>
             </div>
           </DialogPanel>
@@ -119,28 +119,28 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps): JSX.Elem
           </div>
 
           <nav className="flex flex-1 flex-col">
-            <ul role="list" className="flex flex-1 flex-col gap-y-7">
+            <ListContainer variant="simple" withDividers={false} compact className="flex flex-1 flex-col gap-y-7">
               {/* Contributors Button */}
-              <li>
+              <ListItem>
                 <Link to="/contributors">
                   <Button variant="primary" size="md" hyper className="w-full justify-center">
                     Contributors
                   </Button>
                 </Link>
-              </li>
+              </ListItem>
 
               {/* Network Selector */}
-              <li>
+              <ListItem>
                 <Header size="xs" title="Network" />
                 <div className="mt-2">
                   <NetworkSelect showLabel={false} />
                 </div>
-              </li>
+              </ListItem>
 
               {/* Experiments */}
-              <li>
+              <ListItem>
                 <Header size="xs" title="Experiments" />
-                <ListContainer variant="simple" compact>
+                <ListContainer variant="simple" compact withDividers={false}>
                   {experiments.map(experiment => (
                     <ListItem key={experiment.to}>
                       <Link
@@ -155,8 +155,8 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps): JSX.Elem
                     </ListItem>
                   ))}
                 </ListContainer>
-              </li>
-            </ul>
+              </ListItem>
+            </ListContainer>
           </nav>
         </div>
       </div>
