@@ -34,7 +34,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-// Sample data for Ethereum slot timeline
+// Sample data for Ethereum slot timeline (timestamps in milliseconds)
 const ethereumEvents: TimelineItem[] = [
   {
     id: '1',
@@ -48,7 +48,7 @@ const ethereumEvents: TimelineItem[] = [
   },
   {
     id: '2',
-    timestamp: 1.2,
+    timestamp: 1200,
     content: (
       <div className="flex items-center gap-2">
         <span>Blob 2 in</span>
@@ -58,7 +58,7 @@ const ethereumEvents: TimelineItem[] = [
   },
   {
     id: '3',
-    timestamp: 1.4,
+    timestamp: 1400,
     content: (
       <div className="flex items-center gap-2">
         <span>Blob 1 in</span>
@@ -68,7 +68,7 @@ const ethereumEvents: TimelineItem[] = [
   },
   {
     id: '4',
-    timestamp: 1.6,
+    timestamp: 1600,
     content: (
       <div className="flex items-center gap-2">
         <span>Blob 5 in</span>
@@ -78,7 +78,7 @@ const ethereumEvents: TimelineItem[] = [
   },
   {
     id: '5',
-    timestamp: 2.1,
+    timestamp: 2100,
     content: (
       <div className="flex items-center gap-2">
         <span>Blob 3 in</span>
@@ -88,7 +88,7 @@ const ethereumEvents: TimelineItem[] = [
   },
   {
     id: '6',
-    timestamp: 3.5,
+    timestamp: 3500,
     content: (
       <div className="flex items-center gap-2">
         <span>Blob 6 in</span>
@@ -98,7 +98,7 @@ const ethereumEvents: TimelineItem[] = [
   },
   {
     id: '7',
-    timestamp: 4.2,
+    timestamp: 4200,
     content: (
       <div className="flex items-center gap-2">
         <Badge color="blue" variant="border" size="small">
@@ -111,7 +111,7 @@ const ethereumEvents: TimelineItem[] = [
   },
   {
     id: '8',
-    timestamp: 4.8,
+    timestamp: 4800,
     content: (
       <div className="flex items-center gap-2">
         <Badge color="green" variant="border" size="small">
@@ -124,7 +124,7 @@ const ethereumEvents: TimelineItem[] = [
   },
   {
     id: '9',
-    timestamp: 6.5,
+    timestamp: 6500,
     content: (
       <div className="flex items-center gap-2">
         <Badge color="purple" variant="border" size="small">
@@ -137,7 +137,7 @@ const ethereumEvents: TimelineItem[] = [
   },
   {
     id: '10',
-    timestamp: 8.3,
+    timestamp: 8300,
     content: (
       <div className="flex items-center gap-2">
         <Badge color="yellow" variant="border" size="small">
@@ -150,7 +150,7 @@ const ethereumEvents: TimelineItem[] = [
   },
   {
     id: '11',
-    timestamp: 9.1,
+    timestamp: 9100,
     content: (
       <div className="flex items-center gap-2">
         <span>Blob 4 in</span>
@@ -160,7 +160,7 @@ const ethereumEvents: TimelineItem[] = [
   },
   {
     id: '12',
-    timestamp: 10.5,
+    timestamp: 10500,
     content: (
       <div className="flex items-center gap-2">
         <Badge color="indigo" variant="border" size="small">
@@ -176,7 +176,7 @@ const ethereumEvents: TimelineItem[] = [
 export const Default: Story = {
   args: {
     items: ethereumEvents,
-    currentTime: 4.5,
+    currentTime: 4500,
     height: '500px',
     autoScroll: true,
   },
@@ -196,8 +196,8 @@ export const WithAutoScrolling: Story = {
 
       const interval = setInterval(() => {
         setCurrentTime(prev => {
-          const next = prev + 0.1;
-          if (next > 12) return 0;
+          const next = prev + 100;
+          if (next > 12000) return 0;
           return next;
         });
       }, 100);
@@ -209,7 +209,7 @@ export const WithAutoScrolling: Story = {
       <div className="flex flex-col gap-4">
         <div className="flex items-center justify-between">
           <div className="text-sm/6 text-muted">
-            Current Time: <span className="font-medium text-foreground">{currentTime.toFixed(1)}s</span>
+            Current Time: <span className="font-medium text-foreground">{(currentTime / 1000).toFixed(1)}s</span>
           </div>
           <div className="flex gap-2">
             <button
@@ -235,11 +235,12 @@ export const WithAutoScrolling: Story = {
 export const WithCustomFormatting: Story = {
   args: {
     items: ethereumEvents,
-    currentTime: 5.0,
+    currentTime: 5000,
     height: '500px',
     formatTime: (timestamp: number) => {
-      const minutes = Math.floor(timestamp / 60);
-      const seconds = timestamp % 60;
+      const totalSeconds = timestamp / 1000;
+      const minutes = Math.floor(totalSeconds / 60);
+      const seconds = totalSeconds % 60;
       return `${minutes}:${seconds.toFixed(1).padStart(4, '0')}`;
     },
   },
@@ -248,7 +249,7 @@ export const WithCustomFormatting: Story = {
 export const DisabledAutoScroll: Story = {
   args: {
     items: ethereumEvents,
-    currentTime: 4.5,
+    currentTime: 4500,
     height: '500px',
     autoScroll: false,
   },
@@ -257,7 +258,7 @@ export const DisabledAutoScroll: Story = {
 export const ShortList: Story = {
   args: {
     items: ethereumEvents.slice(0, 5),
-    currentTime: 1.5,
+    currentTime: 1500,
     height: '300px',
   },
 };
@@ -265,7 +266,7 @@ export const ShortList: Story = {
 export const TallContainer: Story = {
   args: {
     items: ethereumEvents,
-    currentTime: 6.0,
+    currentTime: 6000,
     height: '700px',
   },
 };
@@ -281,25 +282,25 @@ export const WithExplicitStatus: Story = {
       },
       {
         id: '2',
-        timestamp: 1,
+        timestamp: 1000,
         content: 'Active event (highlighted)',
         status: 'active',
       },
       {
         id: '3',
-        timestamp: 2,
+        timestamp: 2000,
         content: 'Another completed event',
         status: 'completed',
       },
       {
         id: '4',
-        timestamp: 3,
+        timestamp: 3000,
         content: 'Pending event (dimmed)',
         status: 'pending',
       },
       {
         id: '5',
-        timestamp: 4,
+        timestamp: 4000,
         content: 'Another pending event',
         status: 'pending',
       },

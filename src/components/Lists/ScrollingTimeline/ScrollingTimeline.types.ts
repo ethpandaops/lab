@@ -7,7 +7,7 @@ export interface TimelineItem {
   id: string;
 
   /**
-   * Timestamp in seconds when this item occurred
+   * Timestamp in milliseconds when this item occurred
    */
   timestamp: number;
 
@@ -37,7 +37,7 @@ export interface ScrollingTimelineProps {
   items: TimelineItem[];
 
   /**
-   * Current time in seconds for auto-scrolling
+   * Current time in milliseconds for auto-scrolling
    */
   currentTime: number;
 
@@ -58,7 +58,7 @@ export interface ScrollingTimelineProps {
 
   /**
    * Format function for the timestamp display
-   * @param timestamp - The timestamp in seconds
+   * @param timestamp - The timestamp in milliseconds
    * @returns Formatted string to display
    */
   formatTime?: (timestamp: number) => string;

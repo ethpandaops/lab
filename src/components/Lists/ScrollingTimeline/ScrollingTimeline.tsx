@@ -3,7 +3,7 @@ import clsx from 'clsx';
 import type { ScrollingTimelineProps, TimelineItem } from './ScrollingTimeline.types';
 
 const defaultFormatTime = (timestamp: number): string => {
-  return `${timestamp.toFixed(1)}s`;
+  return `${(timestamp / 1000).toFixed(1)}s`;
 };
 
 export function ScrollingTimeline({
