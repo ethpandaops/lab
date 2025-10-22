@@ -541,3 +541,172 @@ export const Interactive: Story = {
     );
   },
 };
+
+// Hyper mode with pulsating border
+export const Hyper: Story = {
+  render: () => (
+    <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-2">
+        <p className="text-sm/6 text-muted">All Variants - Hyper Mode</p>
+        <div className="flex flex-wrap items-center gap-4">
+          <Button variant="primary" hyper>
+            Primary
+          </Button>
+          <Button variant="secondary" hyper>
+            Secondary
+          </Button>
+          <Button variant="soft" hyper>
+            Soft
+          </Button>
+          <Button variant="outline" hyper>
+            Outline
+          </Button>
+          <Button variant="danger" hyper>
+            Danger
+          </Button>
+          <Button variant="blank" hyper>
+            Blank
+          </Button>
+        </div>
+      </div>
+      <div className="flex flex-col gap-2">
+        <p className="text-sm/6 text-muted">Different Sizes - Hyper Mode</p>
+        <div className="flex flex-wrap items-center gap-4">
+          <Button variant="primary" size="xs" hyper>
+            Extra Small
+          </Button>
+          <Button variant="primary" size="sm" hyper>
+            Small
+          </Button>
+          <Button variant="primary" size="md" hyper>
+            Medium
+          </Button>
+          <Button variant="primary" size="lg" hyper>
+            Large
+          </Button>
+          <Button variant="primary" size="xl" hyper>
+            Extra Large
+          </Button>
+        </div>
+      </div>
+      <div className="flex flex-col gap-2">
+        <p className="text-sm/6 text-muted">Rounded Full - All Variants - Hyper Mode</p>
+        <div className="flex flex-wrap items-center gap-4">
+          <Button variant="primary" rounded="full" hyper>
+            Primary
+          </Button>
+          <Button variant="secondary" rounded="full" hyper>
+            Secondary
+          </Button>
+          <Button variant="soft" rounded="full" hyper>
+            Soft
+          </Button>
+          <Button variant="outline" rounded="full" hyper>
+            Outline
+          </Button>
+          <Button variant="danger" rounded="full" hyper>
+            Danger
+          </Button>
+          <Button variant="blank" rounded="full" hyper>
+            Blank
+          </Button>
+        </div>
+      </div>
+      <div className="flex flex-col gap-2">
+        <p className="text-sm/6 text-muted">Rounded Full - All Sizes - Hyper Mode</p>
+        <div className="flex flex-wrap items-center gap-4">
+          <Button variant="primary" size="xs" rounded="full" hyper>
+            XS
+          </Button>
+          <Button variant="primary" size="sm" rounded="full" hyper>
+            SM
+          </Button>
+          <Button variant="primary" size="md" rounded="full" hyper>
+            MD
+          </Button>
+          <Button variant="primary" size="lg" rounded="full" hyper>
+            LG
+          </Button>
+          <Button variant="primary" size="xl" rounded="full" hyper>
+            XL
+          </Button>
+        </div>
+      </div>
+      <div className="flex flex-col gap-2">
+        <p className="text-sm/6 text-muted">With Leading Icons - Hyper Mode</p>
+        <div className="flex flex-wrap items-center gap-4">
+          <Button variant="primary" size="xs" leadingIcon={<CheckCircleIcon />} hyper>
+            Extra Small
+          </Button>
+          <Button variant="primary" size="sm" leadingIcon={<CheckCircleIcon />} hyper>
+            Small
+          </Button>
+          <Button variant="primary" size="md" leadingIcon={<CheckCircleIcon />} hyper>
+            Medium
+          </Button>
+          <Button variant="primary" size="lg" leadingIcon={<CheckCircleIcon />} hyper>
+            Large
+          </Button>
+          <Button variant="primary" size="xl" leadingIcon={<CheckCircleIcon />} hyper>
+            Extra Large
+          </Button>
+        </div>
+      </div>
+      <div className="flex flex-col gap-2">
+        <p className="text-sm/6 text-muted">Rounded Full with Icons - Hyper Mode</p>
+        <div className="flex flex-wrap items-center gap-4">
+          <Button variant="primary" rounded="full" leadingIcon={<CheckCircleIcon />} hyper>
+            Leading Icon
+          </Button>
+          <Button variant="secondary" rounded="full" leadingIcon={<PlusIcon />} hyper>
+            Secondary
+          </Button>
+          <Button variant="soft" rounded="full" trailingIcon={<CheckCircleIcon />} hyper>
+            Trailing Icon
+          </Button>
+          <Button variant="outline" rounded="full" trailingIcon={<PlusIcon />} hyper>
+            Outline
+          </Button>
+        </div>
+      </div>
+      <div className="flex flex-col gap-2">
+        <p className="text-sm/6 text-muted">Icon Only (Circular) - All Sizes - Hyper Mode</p>
+        <div className="flex flex-wrap items-center gap-4">
+          <Button variant="primary" size="xs" iconOnly leadingIcon={<PlusIcon />} hyper />
+          <Button variant="primary" size="sm" iconOnly leadingIcon={<PlusIcon />} hyper />
+          <Button variant="primary" size="md" iconOnly leadingIcon={<PlusIcon />} hyper />
+          <Button variant="primary" size="lg" iconOnly leadingIcon={<PlusIcon />} hyper />
+          <Button variant="primary" size="xl" iconOnly leadingIcon={<PlusIcon />} hyper />
+        </div>
+      </div>
+      <div className="flex flex-col gap-2">
+        <p className="text-sm/6 text-muted">Icon Only - All Variants - Hyper Mode</p>
+        <div className="flex flex-wrap items-center gap-4">
+          <Button variant="primary" iconOnly leadingIcon={<PlusIcon />} hyper />
+          <Button variant="secondary" iconOnly leadingIcon={<PlusIcon />} hyper />
+          <Button variant="soft" iconOnly leadingIcon={<PlusIcon />} hyper />
+          <Button variant="outline" iconOnly leadingIcon={<PlusIcon />} hyper />
+          <Button variant="danger" iconOnly leadingIcon={<PlusIcon />} hyper />
+          <Button variant="blank" iconOnly leadingIcon={<PlusIcon />} hyper />
+        </div>
+      </div>
+      <div className="flex flex-col gap-2">
+        <p className="text-sm/6 text-muted">Comparison - Normal vs Hyper</p>
+        <div className="flex flex-wrap items-center gap-4">
+          <Button variant="primary">Normal</Button>
+          <Button variant="primary" hyper>
+            Hyper
+          </Button>
+          <Button variant="secondary" rounded="full">
+            Normal Rounded
+          </Button>
+          <Button variant="secondary" rounded="full" hyper>
+            Hyper Rounded
+          </Button>
+          <Button variant="soft" iconOnly leadingIcon={<PlusIcon />} />
+          <Button variant="soft" iconOnly leadingIcon={<PlusIcon />} hyper />
+        </div>
+      </div>
+    </div>
+  ),
+};

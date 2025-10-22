@@ -51,6 +51,12 @@ export interface ButtonProps extends ComponentPropsWithoutRef<typeof HeadlessBut
   nowrap?: boolean;
 
   /**
+   * Enable hyper mode with pulsating border animation
+   * @default false
+   */
+  hyper?: boolean;
+
+  /**
    * Button content
    */
   children?: ReactNode;
