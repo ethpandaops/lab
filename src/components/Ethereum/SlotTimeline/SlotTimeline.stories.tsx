@@ -26,7 +26,7 @@ export const BeaconSlot: Story = {
   name: 'Beacon Chain Slot (Default)',
   args: {
     phases: DEFAULT_BEACON_SLOT_PHASES,
-    currentTime: 5.5,
+    currentTime: 5500,
     // Using defaults: height=48, showInlineLabels=true, showPhaseLabels=false
   },
 };
@@ -34,7 +34,7 @@ export const BeaconSlot: Story = {
 export const WithClickHandler: Story = {
   args: {
     phases: DEFAULT_BEACON_SLOT_PHASES,
-    currentTime: 5.5,
+    currentTime: 5500,
     onTimeClick: timeMs => {
       alert(`Clicked at ${timeMs}ms (${(timeMs / 1000).toFixed(2)}s)`);
     },
@@ -44,7 +44,7 @@ export const WithClickHandler: Story = {
 export const WithInlineLabels: Story = {
   args: {
     phases: DEFAULT_BEACON_SLOT_PHASES,
-    currentTime: 6,
+    currentTime: 6000,
     showPhaseLabels: false,
     showInlineLabels: true,
   },
@@ -54,7 +54,7 @@ export const InlineAndBelowLabels: Story = {
   name: 'Inline + Below Labels',
   args: {
     phases: DEFAULT_BEACON_SLOT_PHASES,
-    currentTime: 6,
+    currentTime: 6000,
     showPhaseLabels: true,
     showInlineLabels: true,
   },
@@ -64,7 +64,7 @@ export const EarlyPhase: Story = {
   name: 'Early Phase (Block Proposal)',
   args: {
     phases: DEFAULT_BEACON_SLOT_PHASES,
-    currentTime: 2,
+    currentTime: 2000,
     showInlineLabels: true,
     showPhaseLabels: false,
   },
@@ -74,7 +74,7 @@ export const MidPhase: Story = {
   name: 'Mid Phase (Attestations)',
   args: {
     phases: DEFAULT_BEACON_SLOT_PHASES,
-    currentTime: 6,
+    currentTime: 6000,
     showInlineLabels: true,
     showPhaseLabels: false,
   },
@@ -84,7 +84,7 @@ export const LatePhase: Story = {
   name: 'Late Phase (Aggregations)',
   args: {
     phases: DEFAULT_BEACON_SLOT_PHASES,
-    currentTime: 10,
+    currentTime: 10000,
     showInlineLabels: true,
     showPhaseLabels: false,
   },
@@ -94,7 +94,7 @@ export const Complete: Story = {
   name: 'Slot Complete',
   args: {
     phases: DEFAULT_BEACON_SLOT_PHASES,
-    currentTime: 12,
+    currentTime: 12000,
     showInlineLabels: true,
     showPhaseLabels: false,
   },
@@ -103,7 +103,7 @@ export const Complete: Story = {
 export const WithCurrentTimeLabel: Story = {
   args: {
     phases: DEFAULT_BEACON_SLOT_PHASES,
-    currentTime: 6,
+    currentTime: 6000,
     showCurrentTime: true,
     showPhaseLabels: true,
   },
@@ -112,7 +112,7 @@ export const WithCurrentTimeLabel: Story = {
 export const WithTimeLabels: Story = {
   args: {
     phases: DEFAULT_BEACON_SLOT_PHASES,
-    currentTime: 6,
+    currentTime: 6000,
     showPhaseLabels: true,
     showTimeLabels: true,
   },
@@ -122,7 +122,7 @@ export const WithoutLabels: Story = {
   name: 'Without Any Labels',
   args: {
     phases: DEFAULT_BEACON_SLOT_PHASES,
-    currentTime: 6,
+    currentTime: 6000,
     showPhaseLabels: false,
     showInlineLabels: false,
   },
@@ -131,7 +131,7 @@ export const WithoutLabels: Story = {
 export const WithTimeCutovers: Story = {
   args: {
     phases: DEFAULT_BEACON_SLOT_PHASES,
-    currentTime: 6,
+    currentTime: 6000,
     showTimeCutovers: true,
     showPhaseLabels: true,
   },
@@ -140,7 +140,7 @@ export const WithTimeCutovers: Story = {
 export const WithoutTimeCutovers: Story = {
   args: {
     phases: DEFAULT_BEACON_SLOT_PHASES,
-    currentTime: 6,
+    currentTime: 6000,
     showTimeCutovers: false,
     showPhaseLabels: true,
   },
@@ -150,7 +150,7 @@ export const TallTimeline: Story = {
   name: 'Tall Timeline with Inline Labels',
   args: {
     phases: DEFAULT_BEACON_SLOT_PHASES,
-    currentTime: 6,
+    currentTime: 6000,
     showInlineLabels: true,
     showPhaseLabels: false,
     height: 56,
@@ -160,7 +160,7 @@ export const TallTimeline: Story = {
 export const ShortTimeline: Story = {
   args: {
     phases: DEFAULT_BEACON_SLOT_PHASES,
-    currentTime: 6,
+    currentTime: 6000,
     showPhaseLabels: true,
     showInlineLabels: false,
     height: 20,
@@ -171,12 +171,12 @@ export const ShortTimeline: Story = {
 export const CustomPhases: Story = {
   args: {
     phases: [
-      { label: 'Init', duration: 2, className: 'bg-primary', textClassName: 'text-white' },
-      { label: 'Process', duration: 5, className: 'bg-secondary', textClassName: 'text-white' },
-      { label: 'Validate', duration: 2, className: 'bg-success', textClassName: 'text-white' },
-      { label: 'Finalize', duration: 1, className: 'bg-accent', textClassName: 'text-white' },
+      { label: 'Init', duration: 2000, className: 'bg-primary', textClassName: 'text-white' },
+      { label: 'Process', duration: 5000, className: 'bg-secondary', textClassName: 'text-white' },
+      { label: 'Validate', duration: 2000, className: 'bg-success', textClassName: 'text-white' },
+      { label: 'Finalize', duration: 1000, className: 'bg-accent', textClassName: 'text-white' },
     ],
-    currentTime: 4.5,
+    currentTime: 4500,
     showPhaseLabels: true,
   },
 };
@@ -187,30 +187,30 @@ export const CustomTextColors: Story = {
     phases: [
       {
         label: 'Light Phase',
-        duration: 3,
+        duration: 3000,
         className: 'bg-white border border-border',
         textClassName: 'text-foreground',
       },
       {
         label: 'Dark Phase',
-        duration: 3,
+        duration: 3000,
         className: 'bg-slate-900',
         textClassName: 'text-white',
       },
       {
         label: 'Accent Phase',
-        duration: 3,
+        duration: 3000,
         className: 'bg-amber-200',
         textClassName: 'text-amber-900',
       },
       {
         label: 'Primary Phase',
-        duration: 3,
+        duration: 3000,
         className: 'bg-cyan-500',
         textClassName: 'text-cyan-50',
       },
     ],
-    currentTime: 6,
+    currentTime: 6000,
     showPhaseLabels: true,
     showInlineLabels: true,
   },
@@ -225,8 +225,8 @@ export const LiveSlot: Story = {
     useEffect(() => {
       const interval = setInterval(() => {
         setCurrentTime(prev => {
-          const next = prev + 0.1;
-          return next >= 12 ? 0 : next;
+          const next = prev + 100;
+          return next >= 12000 ? 0 : next;
         });
       }, 100);
 
@@ -256,7 +256,7 @@ export const MultipleSlots: Story = {
         <h3 className="mb-4 text-sm/6 font-semibold text-foreground">Slot 1234567</h3>
         <SlotTimeline
           phases={DEFAULT_BEACON_SLOT_PHASES}
-          currentTime={2.5}
+          currentTime={2500}
           showPhaseLabels={false}
           showInlineLabels={true}
         />
@@ -265,7 +265,7 @@ export const MultipleSlots: Story = {
         <h3 className="mb-4 text-sm/6 font-semibold text-foreground">Slot 1234568</h3>
         <SlotTimeline
           phases={DEFAULT_BEACON_SLOT_PHASES}
-          currentTime={6.3}
+          currentTime={6300}
           showPhaseLabels={false}
           showInlineLabels={true}
         />
@@ -274,7 +274,7 @@ export const MultipleSlots: Story = {
         <h3 className="mb-4 text-sm/6 font-semibold text-foreground">Slot 1234569</h3>
         <SlotTimeline
           phases={DEFAULT_BEACON_SLOT_PHASES}
-          currentTime={10.1}
+          currentTime={10100}
           showPhaseLabels={false}
           showInlineLabels={true}
         />

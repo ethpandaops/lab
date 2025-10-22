@@ -148,7 +148,7 @@ Current categories in `src/components/`:
 ### Page Sections
 Current page sections in `src/pages/`:
 - **experiments**: Main section for experiment pages - most new pages will be added here
-  - Current experiments: block-production-flow, live-slots, networks, geographical-checklist, fork-readiness, locally-built-blocks
+  - Current experiments: block-production-flow, slot-view, networks, geographical-checklist, fork-readiness, locally-built-blocks
   - Future experiments should follow the same pattern
 - **contributors**: Contributor list and detail pages with page-scoped components
 

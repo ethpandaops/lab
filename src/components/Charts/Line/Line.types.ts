@@ -1,8 +1,8 @@
 export interface LineChartProps {
   /**
-   * Chart data series
+   * Chart data series (null values create gaps when connectNulls is false)
    */
-  data?: number[];
+  data?: (number | null)[];
   /**
    * X-axis labels
    */
@@ -29,4 +29,18 @@ export interface LineChartProps {
    * Chart color - uses theme primary color by default
    */
   color?: string;
+  /**
+   * Maximum value for Y-axis (optional, auto-calculated if not provided)
+   */
+  yMax?: number;
+  /**
+   * Connect null data points with line
+   * @default false
+   */
+  connectNulls?: boolean;
+  /**
+   * Animation duration in milliseconds
+   * @default 300
+   */
+  animationDuration?: number;
 }
