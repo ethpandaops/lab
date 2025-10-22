@@ -56,13 +56,15 @@ export function Card({
   isInteractive = false,
   onClick,
   featureImage,
+  rounded = false,
 }: CardProps): JSX.Element {
   const styles = variantStyles[variant];
 
   return (
     <div
       className={clsx(
-        'relative divide-y divide-border overflow-hidden rounded-sm dark:divide-white/10',
+        'relative divide-y divide-border overflow-hidden dark:divide-white/10',
+        rounded && 'rounded-sm',
         styles.container,
         isInteractive &&
           'cursor-pointer transition-all duration-200 hover:-translate-y-0.5 hover:shadow-xs dark:hover:shadow-none',
