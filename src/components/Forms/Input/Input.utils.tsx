@@ -16,16 +16,16 @@ export const getStyleConfig = (): {
   size: Record<InputSize, string>;
 } => ({
   base: clsx(
-    'block w-full border-0 bg-white text-gray-900 placeholder:text-gray-400 focus:ring-0',
+    'block w-full border-0 bg-surface text-foreground placeholder:text-muted focus:ring-0',
     'disabled:cursor-not-allowed disabled:opacity-50',
     'read-only:cursor-default read-only:opacity-50',
-    'dark:bg-white/5 dark:text-white dark:placeholder:text-gray-500'
+    'dark:bg-white/5 dark:text-foreground dark:placeholder:text-muted'
   ),
   outline: {
     default: clsx(
-      'outline-1 -outline-offset-1 outline-gray-300',
+      'outline-1 -outline-offset-1 outline-border',
       'focus:outline-2 focus:-outline-offset-2 focus:outline-primary',
-      'dark:outline-white/10 dark:focus:outline-primary'
+      'dark:outline-border dark:focus:outline-primary'
     ),
     error: clsx(
       'text-danger outline-1 -outline-offset-1 outline-danger/50',
@@ -59,9 +59,9 @@ export const renderSelect = (select: SelectAddonProps | undefined): ReactNode | 
         onChange={e => select.onChange?.(e.target.value)}
         aria-label={select['aria-label']}
         className={clsx(
-          'col-start-1 row-start-1 w-full appearance-none border-0 py-1.5 pr-7 pl-3 text-base text-gray-500 placeholder:text-gray-400 sm:text-sm/6',
+          'col-start-1 row-start-1 w-full appearance-none border-0 py-1.5 pr-7 pl-3 text-base text-muted placeholder:text-muted sm:text-sm/6',
           'shadow-none outline-hidden focus:outline-hidden focus-visible:outline-hidden',
-          'dark:bg-transparent dark:text-gray-400 dark:*:bg-gray-800 dark:placeholder:text-gray-500',
+          'dark:bg-transparent dark:text-muted dark:*:bg-gray-800 dark:placeholder:text-muted',
           select.className
         )}
       >
@@ -73,7 +73,7 @@ export const renderSelect = (select: SelectAddonProps | undefined): ReactNode | 
       </select>
       <ChevronDownIcon
         aria-hidden="true"
-        className="pointer-events-none col-start-1 row-start-1 mr-2 size-5 self-center justify-self-end text-gray-500 sm:size-4 dark:text-gray-400"
+        className="pointer-events-none col-start-1 row-start-1 mr-2 size-5 self-center justify-self-end text-muted sm:size-4 dark:text-muted"
       />
     </div>
   );

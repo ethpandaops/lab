@@ -6,6 +6,8 @@ import * as echarts from 'echarts';
 import 'echarts-gl';
 import type { MapChartProps } from './Map.types';
 import { resolveCssColorToHex } from '@/utils/colour';
+import { useTheme } from '@/hooks/useTheme';
+import { DEFAULT_CHART_COLORS } from '@/theme/data-visualization-colors';
 
 /**
  * MapChart - A 3D map visualization component using ECharts GL
@@ -39,16 +41,11 @@ export function MapChart({
   minDistance = 40,
   maxDistance = 150,
 }: MapChartProps): React.JSX.Element {
-  const [themeColors] = useState(() => {
+  const { theme } = useTheme();
+  const [themeColors, setThemeColors] = useState(() => {
     // Get computed CSS variables from the root element on initial render
     const root = document.documentElement;
     const computedStyle = getComputedStyle(root);
-
-    // Fallback colors (hex format for ECharts compatibility)
-    const fallbackColors = {
-      primary: '#06b6d4', // fallback cyan-500
-      foreground: '#09090b', // fallback zinc-950
-    };
 
     // Extract theme colors from CSS variables
     const primaryColor =
@@ -57,15 +54,55 @@ export function MapChart({
     const foregroundColor =
       computedStyle.getPropertyValue('--color-foreground').trim() ||
       computedStyle.getPropertyValue('--color-zinc-950').trim();
+    const backgroundColor = computedStyle.getPropertyValue('--color-background').trim();
+    const surfaceColor = computedStyle.getPropertyValue('--color-surface').trim();
 
     // Resolve CSS colors (oklch, color-mix, etc.) to hex for ECharts
     return {
-      primary: primaryColor ? resolveCssColorToHex(primaryColor, fallbackColors.primary) : fallbackColors.primary,
+      primary: primaryColor
+        ? resolveCssColorToHex(primaryColor, DEFAULT_CHART_COLORS.primary)
+        : DEFAULT_CHART_COLORS.primary,
       foreground: foregroundColor
-        ? resolveCssColorToHex(foregroundColor, fallbackColors.foreground)
-        : fallbackColors.foreground,
+        ? resolveCssColorToHex(foregroundColor, DEFAULT_CHART_COLORS.foreground)
+        : DEFAULT_CHART_COLORS.foreground,
+      background: backgroundColor
+        ? resolveCssColorToHex(backgroundColor, DEFAULT_CHART_COLORS.background)
+        : DEFAULT_CHART_COLORS.background,
+      surface: surfaceColor
+        ? resolveCssColorToHex(surfaceColor, DEFAULT_CHART_COLORS.surface)
+        : DEFAULT_CHART_COLORS.surface,
     };
   });
+
+  // Update theme colors when theme changes
+  useEffect(() => {
+    const root = document.documentElement;
+    const computedStyle = getComputedStyle(root);
+
+    const primaryColor =
+      computedStyle.getPropertyValue('--color-primary').trim() ||
+      computedStyle.getPropertyValue('--color-cyan-500').trim();
+    const foregroundColor =
+      computedStyle.getPropertyValue('--color-foreground').trim() ||
+      computedStyle.getPropertyValue('--color-zinc-950').trim();
+    const backgroundColor = computedStyle.getPropertyValue('--color-background').trim();
+    const surfaceColor = computedStyle.getPropertyValue('--color-surface').trim();
+
+    setThemeColors({
+      primary: primaryColor
+        ? resolveCssColorToHex(primaryColor, DEFAULT_CHART_COLORS.primary)
+        : DEFAULT_CHART_COLORS.primary,
+      foreground: foregroundColor
+        ? resolveCssColorToHex(foregroundColor, DEFAULT_CHART_COLORS.foreground)
+        : DEFAULT_CHART_COLORS.foreground,
+      background: backgroundColor
+        ? resolveCssColorToHex(backgroundColor, DEFAULT_CHART_COLORS.background)
+        : DEFAULT_CHART_COLORS.background,
+      surface: surfaceColor
+        ? resolveCssColorToHex(surfaceColor, DEFAULT_CHART_COLORS.surface)
+        : DEFAULT_CHART_COLORS.surface,
+    });
+  }, [theme]);
 
   const [echartsInstance, setEchartsInstance] = useState<ECharts | null>(null);
   const [mapLoaded, setMapLoaded] = useState(false);

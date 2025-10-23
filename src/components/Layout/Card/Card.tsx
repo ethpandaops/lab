@@ -5,42 +5,42 @@ import type { CardProps, CardVariant } from './Card.types';
 const variantStyles: Record<CardVariant, { container: string; header: string; main: string; footer: string }> = {
   default: {
     container:
-      'bg-white shadow-sm dark:bg-zinc-800/50 dark:shadow-none dark:outline dark:-outline-offset-1 dark:outline-white/10',
+      'bg-surface shadow-sm dark:bg-zinc-800/50 dark:shadow-none dark:outline dark:-outline-offset-1 dark:outline-border',
     header: '',
     main: '',
     footer: '',
   },
   muted: {
     container:
-      'bg-white shadow-sm dark:bg-zinc-800/50 dark:shadow-none dark:outline dark:-outline-offset-1 dark:outline-white/10',
-    header: 'bg-zinc-50 dark:bg-zinc-900/50',
+      'bg-surface shadow-sm dark:bg-zinc-800/50 dark:shadow-none dark:outline dark:-outline-offset-1 dark:outline-border',
+    header: 'bg-surface dark:bg-zinc-900/50',
     main: '',
-    footer: 'bg-zinc-50 dark:bg-zinc-900/50',
+    footer: 'bg-surface dark:bg-zinc-900/50',
   },
   primary: {
     container:
-      'bg-white shadow-sm dark:bg-zinc-800/50 dark:shadow-none dark:outline dark:-outline-offset-1 dark:outline-white/10',
+      'bg-surface shadow-sm dark:bg-zinc-800/50 dark:shadow-none dark:outline dark:-outline-offset-1 dark:outline-border',
     header: 'bg-primary/5 dark:bg-primary/10',
     main: '',
     footer: '',
   },
   accent: {
     container:
-      'bg-white shadow-sm dark:bg-zinc-800/50 dark:shadow-none dark:outline dark:-outline-offset-1 dark:outline-white/10',
+      'bg-surface shadow-sm dark:bg-zinc-800/50 dark:shadow-none dark:outline dark:-outline-offset-1 dark:outline-border',
     header: 'bg-accent/5 dark:bg-accent/10',
     main: '',
     footer: 'bg-accent/5 dark:bg-accent/10',
   },
   elevated: {
     container:
-      'bg-white shadow-sm dark:bg-zinc-800/50 dark:shadow-none dark:outline dark:-outline-offset-1 dark:outline-white/10',
-    header: 'bg-zinc-100 dark:bg-zinc-900',
+      'bg-surface shadow-sm dark:bg-zinc-800/50 dark:shadow-none dark:outline dark:-outline-offset-1 dark:outline-border',
+    header: 'bg-background dark:bg-zinc-900',
     main: '',
     footer: '',
   },
   surface: {
     container:
-      'bg-white shadow-sm dark:bg-zinc-800/50 dark:shadow-none dark:outline dark:-outline-offset-1 dark:outline-white/10',
+      'bg-surface shadow-sm dark:bg-zinc-800/50 dark:shadow-none dark:outline dark:-outline-offset-1 dark:outline-border',
     header: 'bg-surface dark:bg-zinc-900/50',
     main: 'bg-background dark:bg-zinc-950/50',
     footer: 'bg-surface dark:bg-zinc-900/50',

@@ -4,6 +4,7 @@ import ReactECharts from 'echarts-for-react';
 import clsx from 'clsx';
 import { hexToRgba } from '@/utils';
 import type { BlobDataAvailabilityProps } from './BlobDataAvailability.types';
+import { CONTINENT_COLORS, DEFAULT_CHART_COLORS } from '@/theme/data-visualization-colors';
 
 /**
  * BlobDataAvailability - Page-specific component for visualizing blob data availability
@@ -43,15 +44,6 @@ export function BlobDataAvailability({
     const root = document.documentElement;
     const computedStyle = getComputedStyle(root);
 
-    const fallbackColors = {
-      primary: '#06b6d4',
-      foreground: '#09090b',
-      muted: '#52525b',
-      border: '#e4e4e7',
-      background: '#ffffff',
-      success: '#22c55e',
-    };
-
     const primaryColor =
       computedStyle.getPropertyValue('--color-primary').trim() ||
       computedStyle.getPropertyValue('--color-cyan-500').trim();
@@ -70,12 +62,12 @@ export function BlobDataAvailability({
       computedStyle.getPropertyValue('--color-green-500').trim();
 
     return {
-      primary: primaryColor || fallbackColors.primary,
-      foreground: foregroundColor || fallbackColors.foreground,
-      muted: mutedColor || fallbackColors.muted,
-      border: borderColor || fallbackColors.border,
-      background: backgroundColor || fallbackColors.background,
-      success: successColor || fallbackColors.success,
+      primary: primaryColor || DEFAULT_CHART_COLORS.primary,
+      foreground: foregroundColor || DEFAULT_CHART_COLORS.foreground,
+      muted: mutedColor || DEFAULT_CHART_COLORS.muted,
+      border: borderColor || DEFAULT_CHART_COLORS.border,
+      background: backgroundColor || DEFAULT_CHART_COLORS.background,
+      success: successColor || DEFAULT_CHART_COLORS.success,
     };
   });
 
@@ -353,15 +345,8 @@ export function BlobDataAvailability({
 
   // Prepare Continental Propagation chart data - CDF per continent, only show data up to current time
   const continentalPropagationOption = useMemo(() => {
-    // Default colors for continents
-    const defaultColors = [
-      '#ec4899', // pink for first continent
-      '#22c55e', // green
-      '#06b6d4', // cyan
-      '#f59e0b', // amber
-      '#3b82f6', // blue
-      '#a855f7', // purple
-    ];
+    // Fallback colors array from CONTINENT_COLORS for unknown continents
+    const defaultColors = Object.values(CONTINENT_COLORS);
 
     // Filter each continent's data to only show points up to current time
     const visiblePropagationData = continentalPropagationData.map(continent => ({

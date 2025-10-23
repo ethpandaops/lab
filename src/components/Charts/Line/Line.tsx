@@ -2,6 +2,7 @@ import type React from 'react';
 import { useState } from 'react';
 import ReactECharts from 'echarts-for-react';
 import { hexToRgba } from '@/utils';
+import { DEFAULT_CHART_COLORS } from '@/theme/data-visualization-colors';
 import type { LineChartProps } from './Line.types';
 
 /**
@@ -33,15 +34,6 @@ export function LineChart({
     const root = document.documentElement;
     const computedStyle = getComputedStyle(root);
 
-    // Fallback colors
-    const fallbackColors = {
-      primary: '#06b6d4', // fallback cyan-500
-      foreground: '#09090b', // fallback zinc-950
-      muted: '#52525b', // fallback zinc-600
-      border: '#e4e4e7', // fallback zinc-200
-      background: '#ffffff',
-    };
-
     // Extract theme colors from CSS variables
     const primaryColor =
       computedStyle.getPropertyValue('--color-primary').trim() ||
@@ -58,11 +50,11 @@ export function LineChart({
     const backgroundColor = computedStyle.getPropertyValue('--color-background').trim() || '#ffffff';
 
     return {
-      primary: primaryColor || fallbackColors.primary,
-      foreground: foregroundColor || fallbackColors.foreground,
-      muted: mutedColor || fallbackColors.muted,
-      border: borderColor || fallbackColors.border,
-      background: backgroundColor || fallbackColors.background,
+      primary: primaryColor || DEFAULT_CHART_COLORS.primary,
+      foreground: foregroundColor || DEFAULT_CHART_COLORS.foreground,
+      muted: mutedColor || DEFAULT_CHART_COLORS.muted,
+      border: borderColor || DEFAULT_CHART_COLORS.border,
+      background: backgroundColor || DEFAULT_CHART_COLORS.background,
     };
   });
 

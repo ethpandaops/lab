@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useEffect, useState } from 'react';
+import { BLOB_COLORS } from '@/theme/data-visualization-colors';
 import { BlobDataAvailability } from './BlobDataAvailability';
 
 const meta: Meta<typeof BlobDataAvailability> = {
@@ -23,13 +24,13 @@ type Story = StoryObj<typeof BlobDataAvailability>;
 
 // Sample data for stories
 const sampleFirstSeenData = [
-  { time: 1420, blobId: '0', color: '#06b6d4' },
-  { time: 1370, blobId: '1', color: '#ec4899' },
-  { time: 1370, blobId: '2', color: '#22c55e' },
-  { time: 1600, blobId: '3', color: '#3b82f6' },
-  { time: 1800, blobId: '4', color: '#a855f7' },
-  { time: 1200, blobId: '5', color: '#f59e0b' },
-  { time: 900, blobId: 'B', color: '#ef4444' },
+  { time: 1420, blobId: '0', color: BLOB_COLORS[0] },
+  { time: 1370, blobId: '1', color: BLOB_COLORS[1] },
+  { time: 1370, blobId: '2', color: BLOB_COLORS[2] },
+  { time: 1600, blobId: '3', color: BLOB_COLORS[3] },
+  { time: 1800, blobId: '4', color: BLOB_COLORS[4] },
+  { time: 1200, blobId: '5', color: BLOB_COLORS[5] },
+  { time: 900, blobId: 'B', color: BLOB_COLORS[0] },
 ];
 
 // Generate availability rate data with smooth curve - data point every 50ms
@@ -241,9 +242,9 @@ export const Empty: Story = {
 export const SingleContinent: Story = {
   args: {
     firstSeenData: [
-      { time: 1420, blobId: '0', color: '#06b6d4' },
-      { time: 1370, blobId: '1', color: '#ec4899' },
-      { time: 1370, blobId: '2', color: '#22c55e' },
+      { time: 1420, blobId: '0', color: BLOB_COLORS[0] },
+      { time: 1370, blobId: '1', color: BLOB_COLORS[1] },
+      { time: 1370, blobId: '2', color: BLOB_COLORS[2] },
     ],
     availabilityRateData: sampleAvailabilityRateData,
     continentalPropagationData: [

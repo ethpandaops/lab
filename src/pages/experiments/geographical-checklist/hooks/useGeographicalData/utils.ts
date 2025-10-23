@@ -1,4 +1,5 @@
 import type { ContinentCode, NodeClassification } from './useGeographicalData.types';
+import { CONTINENT_COLORS } from '@/theme/data-visualization-colors';
 
 export const CONTINENT_CONFIG: Record<
   ContinentCode,
@@ -8,13 +9,13 @@ export const CONTINENT_CONFIG: Record<
     color: string;
   }
 > = {
-  AF: { name: 'Africa', emoji: '🌍', color: '#ef4444' },
-  AS: { name: 'Asia', emoji: '🌏', color: '#f59e0b' },
-  EU: { name: 'Europe', emoji: '🇪🇺', color: '#10b981' },
-  NA: { name: 'North America', emoji: '🌎', color: '#3b82f6' },
-  SA: { name: 'South America', emoji: '🗺️', color: '#8b5cf6' },
-  OC: { name: 'Oceania', emoji: '🏝️', color: '#06b6d4' },
-  AN: { name: 'Antarctica', emoji: '🧊', color: '#64748b' },
+  AF: { name: 'Africa', emoji: '🌍', color: CONTINENT_COLORS.AF },
+  AS: { name: 'Asia', emoji: '🌏', color: CONTINENT_COLORS.AS },
+  EU: { name: 'Europe', emoji: '🇪🇺', color: CONTINENT_COLORS.EU },
+  NA: { name: 'North America', emoji: '🌎', color: CONTINENT_COLORS.NA },
+  SA: { name: 'South America', emoji: '🗺️', color: CONTINENT_COLORS.SA },
+  OC: { name: 'Oceania', emoji: '🏝️', color: CONTINENT_COLORS.OC },
+  AN: { name: 'Antarctica', emoji: '🧊', color: CONTINENT_COLORS.AN },
 };
 
 export function getContinentCode(continentCode?: string | null): ContinentCode {
