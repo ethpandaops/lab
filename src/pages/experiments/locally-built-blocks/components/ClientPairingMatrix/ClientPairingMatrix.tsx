@@ -68,9 +68,9 @@ export function ClientPairingMatrix({
       <div className="mb-2 flex flex-col gap-1">
         <div className="flex items-center gap-2">
           <span className="inline-block h-4 w-1 rounded-full bg-primary"></span>
-          <h2 className="text-sm font-medium text-muted">Client Pairings</h2>
+          <h2 className="text-lg font-semibold text-foreground">Client Pairings</h2>
         </div>
-        <p className="ml-3 text-xs text-muted">
+        <p className="ml-3 text-sm text-muted">
           Unique execution + consensus client combinations across all visible slots
         </p>
       </div>
