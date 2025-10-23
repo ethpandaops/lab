@@ -16,7 +16,7 @@ interface ExperimentItem {
 
 const experiments: ExperimentItem[] = [
   { name: 'Networks', to: '/experiments/networks' },
-  { name: 'Live Slots', to: '/experiments/live-slots' },
+  { name: 'Live Slots', to: '/experiments/slot-view/live' },
   { name: 'Locally Built Blocks', to: '/experiments/locally-built-blocks' },
   { name: 'Geographical Checklist', to: '/experiments/geographical-checklist' },
   { name: 'Fork Readiness', to: '/experiments/fork-readiness' },
