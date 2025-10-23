@@ -107,7 +107,7 @@ export function DetailPage(): JSX.Element {
         <div className="rounded-sm border border-border bg-surface/50 p-12 text-center backdrop-blur-sm">
           <h2 className="mb-2 text-2xl/8 font-bold text-foreground">Contributor not found</h2>
           <p className="mb-4 text-muted">No active nodes found for &quot;{id}&quot; in the last 24 hours.</p>
-          <Link to="/contributors" className="text-primary hover:underline">
+          <Link to="/xatu/contributors" className="text-primary hover:underline">
             ← Back to all contributors
           </Link>
         </div>
@@ -178,7 +178,7 @@ export function DetailPage(): JSX.Element {
     <Container>
       <Header title="Contributor Details" description="Detailed contribution metrics and activity" />
 
-      <Link to="/contributors" className="mb-6 inline-block text-primary hover:underline">
+      <Link to="/xatu/contributors" className="mb-6 inline-block text-primary hover:underline">
         ← Back to all contributors
       </Link>
 
