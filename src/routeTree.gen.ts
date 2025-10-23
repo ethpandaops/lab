@@ -9,41 +9,22 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as XatuRouteImport } from './routes/xatu'
 import { Route as ExperimentsRouteImport } from './routes/experiments'
-import { Route as EthereumRouteImport } from './routes/ethereum'
 import { Route as ContributorsRouteImport } from './routes/contributors'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ExperimentsIndexRouteImport } from './routes/experiments/index'
 import { Route as ContributorsIndexRouteImport } from './routes/contributors/index'
-import { Route as XatuLocallyBuiltBlocksRouteImport } from './routes/xatu/locally-built-blocks'
-import { Route as XatuGeographicalChecklistRouteImport } from './routes/xatu/geographical-checklist'
-import { Route as XatuForkReadinessRouteImport } from './routes/xatu/fork-readiness'
-import { Route as XatuContributorsRouteImport } from './routes/xatu/contributors'
 import { Route as ExperimentsSlotViewRouteImport } from './routes/experiments/slot-view'
 import { Route as ExperimentsNetworksRouteImport } from './routes/experiments/networks'
 import { Route as ExperimentsLocallyBuiltBlocksRouteImport } from './routes/experiments/locally-built-blocks'
 import { Route as ExperimentsGeographicalChecklistRouteImport } from './routes/experiments/geographical-checklist'
 import { Route as ExperimentsForkReadinessRouteImport } from './routes/experiments/fork-readiness'
 import { Route as ExperimentsBlockProductionFlowRouteImport } from './routes/experiments/block-production-flow'
-import { Route as EthereumSlotViewRouteImport } from './routes/ethereum/slot-view'
 import { Route as ContributorsIdRouteImport } from './routes/contributors/$id'
-import { Route as XatuContributorsIndexRouteImport } from './routes/xatu/contributors/index'
-import { Route as XatuContributorsIdRouteImport } from './routes/xatu/contributors/$id'
 
-const XatuRoute = XatuRouteImport.update({
-  id: '/xatu',
-  path: '/xatu',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ExperimentsRoute = ExperimentsRouteImport.update({
   id: '/experiments',
   path: '/experiments',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const EthereumRoute = EthereumRouteImport.update({
-  id: '/ethereum',
-  path: '/ethereum',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ContributorsRoute = ContributorsRouteImport.update({
@@ -65,27 +46,6 @@ const ContributorsIndexRoute = ContributorsIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => ContributorsRoute,
-} as any)
-const XatuLocallyBuiltBlocksRoute = XatuLocallyBuiltBlocksRouteImport.update({
-  id: '/locally-built-blocks',
-  path: '/locally-built-blocks',
-  getParentRoute: () => XatuRoute,
-} as any)
-const XatuGeographicalChecklistRoute =
-  XatuGeographicalChecklistRouteImport.update({
-    id: '/geographical-checklist',
-    path: '/geographical-checklist',
-    getParentRoute: () => XatuRoute,
-  } as any)
-const XatuForkReadinessRoute = XatuForkReadinessRouteImport.update({
-  id: '/fork-readiness',
-  path: '/fork-readiness',
-  getParentRoute: () => XatuRoute,
-} as any)
-const XatuContributorsRoute = XatuContributorsRouteImport.update({
-  id: '/contributors',
-  path: '/contributors',
-  getParentRoute: () => XatuRoute,
 } as any)
 const ExperimentsSlotViewRoute = ExperimentsSlotViewRouteImport.update({
   id: '/slot-view',
@@ -121,192 +81,109 @@ const ExperimentsBlockProductionFlowRoute =
     path: '/block-production-flow',
     getParentRoute: () => ExperimentsRoute,
   } as any)
-const EthereumSlotViewRoute = EthereumSlotViewRouteImport.update({
-  id: '/slot-view',
-  path: '/slot-view',
-  getParentRoute: () => EthereumRoute,
-} as any)
 const ContributorsIdRoute = ContributorsIdRouteImport.update({
   id: '/$id',
   path: '/$id',
   getParentRoute: () => ContributorsRoute,
 } as any)
-const XatuContributorsIndexRoute = XatuContributorsIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => XatuContributorsRoute,
-} as any)
-const XatuContributorsIdRoute = XatuContributorsIdRouteImport.update({
-  id: '/$id',
-  path: '/$id',
-  getParentRoute: () => XatuContributorsRoute,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/contributors': typeof ContributorsRouteWithChildren
-  '/ethereum': typeof EthereumRouteWithChildren
   '/experiments': typeof ExperimentsRouteWithChildren
-  '/xatu': typeof XatuRouteWithChildren
   '/contributors/$id': typeof ContributorsIdRoute
-  '/ethereum/slot-view': typeof EthereumSlotViewRoute
   '/experiments/block-production-flow': typeof ExperimentsBlockProductionFlowRoute
   '/experiments/fork-readiness': typeof ExperimentsForkReadinessRoute
   '/experiments/geographical-checklist': typeof ExperimentsGeographicalChecklistRoute
   '/experiments/locally-built-blocks': typeof ExperimentsLocallyBuiltBlocksRoute
   '/experiments/networks': typeof ExperimentsNetworksRoute
   '/experiments/slot-view': typeof ExperimentsSlotViewRoute
-  '/xatu/contributors': typeof XatuContributorsRouteWithChildren
-  '/xatu/fork-readiness': typeof XatuForkReadinessRoute
-  '/xatu/geographical-checklist': typeof XatuGeographicalChecklistRoute
-  '/xatu/locally-built-blocks': typeof XatuLocallyBuiltBlocksRoute
   '/contributors/': typeof ContributorsIndexRoute
   '/experiments/': typeof ExperimentsIndexRoute
-  '/xatu/contributors/$id': typeof XatuContributorsIdRoute
-  '/xatu/contributors/': typeof XatuContributorsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/ethereum': typeof EthereumRouteWithChildren
-  '/xatu': typeof XatuRouteWithChildren
   '/contributors/$id': typeof ContributorsIdRoute
-  '/ethereum/slot-view': typeof EthereumSlotViewRoute
   '/experiments/block-production-flow': typeof ExperimentsBlockProductionFlowRoute
   '/experiments/fork-readiness': typeof ExperimentsForkReadinessRoute
   '/experiments/geographical-checklist': typeof ExperimentsGeographicalChecklistRoute
   '/experiments/locally-built-blocks': typeof ExperimentsLocallyBuiltBlocksRoute
   '/experiments/networks': typeof ExperimentsNetworksRoute
   '/experiments/slot-view': typeof ExperimentsSlotViewRoute
-  '/xatu/fork-readiness': typeof XatuForkReadinessRoute
-  '/xatu/geographical-checklist': typeof XatuGeographicalChecklistRoute
-  '/xatu/locally-built-blocks': typeof XatuLocallyBuiltBlocksRoute
   '/contributors': typeof ContributorsIndexRoute
   '/experiments': typeof ExperimentsIndexRoute
-  '/xatu/contributors/$id': typeof XatuContributorsIdRoute
-  '/xatu/contributors': typeof XatuContributorsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/contributors': typeof ContributorsRouteWithChildren
-  '/ethereum': typeof EthereumRouteWithChildren
   '/experiments': typeof ExperimentsRouteWithChildren
-  '/xatu': typeof XatuRouteWithChildren
   '/contributors/$id': typeof ContributorsIdRoute
-  '/ethereum/slot-view': typeof EthereumSlotViewRoute
   '/experiments/block-production-flow': typeof ExperimentsBlockProductionFlowRoute
   '/experiments/fork-readiness': typeof ExperimentsForkReadinessRoute
   '/experiments/geographical-checklist': typeof ExperimentsGeographicalChecklistRoute
   '/experiments/locally-built-blocks': typeof ExperimentsLocallyBuiltBlocksRoute
   '/experiments/networks': typeof ExperimentsNetworksRoute
   '/experiments/slot-view': typeof ExperimentsSlotViewRoute
-  '/xatu/contributors': typeof XatuContributorsRouteWithChildren
-  '/xatu/fork-readiness': typeof XatuForkReadinessRoute
-  '/xatu/geographical-checklist': typeof XatuGeographicalChecklistRoute
-  '/xatu/locally-built-blocks': typeof XatuLocallyBuiltBlocksRoute
   '/contributors/': typeof ContributorsIndexRoute
   '/experiments/': typeof ExperimentsIndexRoute
-  '/xatu/contributors/$id': typeof XatuContributorsIdRoute
-  '/xatu/contributors/': typeof XatuContributorsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/contributors'
-    | '/ethereum'
     | '/experiments'
-    | '/xatu'
     | '/contributors/$id'
-    | '/ethereum/slot-view'
     | '/experiments/block-production-flow'
     | '/experiments/fork-readiness'
     | '/experiments/geographical-checklist'
     | '/experiments/locally-built-blocks'
     | '/experiments/networks'
     | '/experiments/slot-view'
-    | '/xatu/contributors'
-    | '/xatu/fork-readiness'
-    | '/xatu/geographical-checklist'
-    | '/xatu/locally-built-blocks'
     | '/contributors/'
     | '/experiments/'
-    | '/xatu/contributors/$id'
-    | '/xatu/contributors/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/ethereum'
-    | '/xatu'
     | '/contributors/$id'
-    | '/ethereum/slot-view'
     | '/experiments/block-production-flow'
     | '/experiments/fork-readiness'
     | '/experiments/geographical-checklist'
     | '/experiments/locally-built-blocks'
     | '/experiments/networks'
     | '/experiments/slot-view'
-    | '/xatu/fork-readiness'
-    | '/xatu/geographical-checklist'
-    | '/xatu/locally-built-blocks'
     | '/contributors'
     | '/experiments'
-    | '/xatu/contributors/$id'
-    | '/xatu/contributors'
   id:
     | '__root__'
     | '/'
     | '/contributors'
-    | '/ethereum'
     | '/experiments'
-    | '/xatu'
     | '/contributors/$id'
-    | '/ethereum/slot-view'
     | '/experiments/block-production-flow'
     | '/experiments/fork-readiness'
     | '/experiments/geographical-checklist'
     | '/experiments/locally-built-blocks'
     | '/experiments/networks'
     | '/experiments/slot-view'
-    | '/xatu/contributors'
-    | '/xatu/fork-readiness'
-    | '/xatu/geographical-checklist'
-    | '/xatu/locally-built-blocks'
     | '/contributors/'
     | '/experiments/'
-    | '/xatu/contributors/$id'
-    | '/xatu/contributors/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ContributorsRoute: typeof ContributorsRouteWithChildren
-  EthereumRoute: typeof EthereumRouteWithChildren
   ExperimentsRoute: typeof ExperimentsRouteWithChildren
-  XatuRoute: typeof XatuRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/xatu': {
-      id: '/xatu'
-      path: '/xatu'
-      fullPath: '/xatu'
-      preLoaderRoute: typeof XatuRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/experiments': {
       id: '/experiments'
       path: '/experiments'
       fullPath: '/experiments'
       preLoaderRoute: typeof ExperimentsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/ethereum': {
-      id: '/ethereum'
-      path: '/ethereum'
-      fullPath: '/ethereum'
-      preLoaderRoute: typeof EthereumRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/contributors': {
@@ -336,34 +213,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/contributors/'
       preLoaderRoute: typeof ContributorsIndexRouteImport
       parentRoute: typeof ContributorsRoute
-    }
-    '/xatu/locally-built-blocks': {
-      id: '/xatu/locally-built-blocks'
-      path: '/locally-built-blocks'
-      fullPath: '/xatu/locally-built-blocks'
-      preLoaderRoute: typeof XatuLocallyBuiltBlocksRouteImport
-      parentRoute: typeof XatuRoute
-    }
-    '/xatu/geographical-checklist': {
-      id: '/xatu/geographical-checklist'
-      path: '/geographical-checklist'
-      fullPath: '/xatu/geographical-checklist'
-      preLoaderRoute: typeof XatuGeographicalChecklistRouteImport
-      parentRoute: typeof XatuRoute
-    }
-    '/xatu/fork-readiness': {
-      id: '/xatu/fork-readiness'
-      path: '/fork-readiness'
-      fullPath: '/xatu/fork-readiness'
-      preLoaderRoute: typeof XatuForkReadinessRouteImport
-      parentRoute: typeof XatuRoute
-    }
-    '/xatu/contributors': {
-      id: '/xatu/contributors'
-      path: '/contributors'
-      fullPath: '/xatu/contributors'
-      preLoaderRoute: typeof XatuContributorsRouteImport
-      parentRoute: typeof XatuRoute
     }
     '/experiments/slot-view': {
       id: '/experiments/slot-view'
@@ -407,33 +256,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ExperimentsBlockProductionFlowRouteImport
       parentRoute: typeof ExperimentsRoute
     }
-    '/ethereum/slot-view': {
-      id: '/ethereum/slot-view'
-      path: '/slot-view'
-      fullPath: '/ethereum/slot-view'
-      preLoaderRoute: typeof EthereumSlotViewRouteImport
-      parentRoute: typeof EthereumRoute
-    }
     '/contributors/$id': {
       id: '/contributors/$id'
       path: '/$id'
       fullPath: '/contributors/$id'
       preLoaderRoute: typeof ContributorsIdRouteImport
       parentRoute: typeof ContributorsRoute
-    }
-    '/xatu/contributors/': {
-      id: '/xatu/contributors/'
-      path: '/'
-      fullPath: '/xatu/contributors/'
-      preLoaderRoute: typeof XatuContributorsIndexRouteImport
-      parentRoute: typeof XatuContributorsRoute
-    }
-    '/xatu/contributors/$id': {
-      id: '/xatu/contributors/$id'
-      path: '/$id'
-      fullPath: '/xatu/contributors/$id'
-      preLoaderRoute: typeof XatuContributorsIdRouteImport
-      parentRoute: typeof XatuContributorsRoute
     }
   }
 }
@@ -450,18 +278,6 @@ const ContributorsRouteChildren: ContributorsRouteChildren = {
 
 const ContributorsRouteWithChildren = ContributorsRoute._addFileChildren(
   ContributorsRouteChildren,
-)
-
-interface EthereumRouteChildren {
-  EthereumSlotViewRoute: typeof EthereumSlotViewRoute
-}
-
-const EthereumRouteChildren: EthereumRouteChildren = {
-  EthereumSlotViewRoute: EthereumSlotViewRoute,
-}
-
-const EthereumRouteWithChildren = EthereumRoute._addFileChildren(
-  EthereumRouteChildren,
 )
 
 interface ExperimentsRouteChildren {
@@ -488,41 +304,10 @@ const ExperimentsRouteWithChildren = ExperimentsRoute._addFileChildren(
   ExperimentsRouteChildren,
 )
 
-interface XatuContributorsRouteChildren {
-  XatuContributorsIdRoute: typeof XatuContributorsIdRoute
-  XatuContributorsIndexRoute: typeof XatuContributorsIndexRoute
-}
-
-const XatuContributorsRouteChildren: XatuContributorsRouteChildren = {
-  XatuContributorsIdRoute: XatuContributorsIdRoute,
-  XatuContributorsIndexRoute: XatuContributorsIndexRoute,
-}
-
-const XatuContributorsRouteWithChildren =
-  XatuContributorsRoute._addFileChildren(XatuContributorsRouteChildren)
-
-interface XatuRouteChildren {
-  XatuContributorsRoute: typeof XatuContributorsRouteWithChildren
-  XatuForkReadinessRoute: typeof XatuForkReadinessRoute
-  XatuGeographicalChecklistRoute: typeof XatuGeographicalChecklistRoute
-  XatuLocallyBuiltBlocksRoute: typeof XatuLocallyBuiltBlocksRoute
-}
-
-const XatuRouteChildren: XatuRouteChildren = {
-  XatuContributorsRoute: XatuContributorsRouteWithChildren,
-  XatuForkReadinessRoute: XatuForkReadinessRoute,
-  XatuGeographicalChecklistRoute: XatuGeographicalChecklistRoute,
-  XatuLocallyBuiltBlocksRoute: XatuLocallyBuiltBlocksRoute,
-}
-
-const XatuRouteWithChildren = XatuRoute._addFileChildren(XatuRouteChildren)
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ContributorsRoute: ContributorsRouteWithChildren,
-  EthereumRoute: EthereumRouteWithChildren,
   ExperimentsRoute: ExperimentsRouteWithChildren,
-  XatuRoute: XatuRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

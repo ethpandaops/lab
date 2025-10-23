@@ -1,7 +1,6 @@
-import { createFileRoute, redirect } from '@tanstack/react-router';
+import { createFileRoute } from '@tanstack/react-router';
+import { IndexPage } from '@/pages/contributors';
 
 export const Route = createFileRoute('/contributors/')({
-  beforeLoad: () => {
-    throw redirect({ to: '/xatu/contributors' });
-  },
+  component: IndexPage,
 });

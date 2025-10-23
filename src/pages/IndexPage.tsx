@@ -19,7 +19,7 @@ export function IndexPage(): JSX.Element {
             </div>
           </Card>
         </Link>
-        <Link to="/xatu/contributors" className="block">
+        <Link to="/contributors" className="block">
           <Card>
             <div className="flex flex-col gap-3">
               <UserGroupIcon className="size-8 text-primary" />

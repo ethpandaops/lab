@@ -29,7 +29,7 @@ export function IndexPage(): JSX.Element {
               primaryCity={contributor.primaryCity || undefined}
               clientVersion={getDisplayVersion(contributor.versions)}
               consensusImplementations={Array.from(contributor.consensusImplementations)}
-              to={`/xatu/contributors/${contributor.username}`}
+              to={`/contributors/${contributor.username}`}
             />
           ))}
         </ul>
