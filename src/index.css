@@ -79,18 +79,18 @@
   }
 
   html.dark {
-    /* Dark mode - softer cyan for better contrast */
-    --primary-value: var(--color-cyan-400);
-    --secondary-value: var(--color-sky-400);
-    --accent-value: var(--color-cyan-300);
-    --background-value: var(--color-zinc-950);
-    --surface-value: var(--color-zinc-900);
-    --foreground-value: var(--color-zinc-50);
-    --muted-value: var(--color-zinc-400);
-    --border-value: var(--color-zinc-800);
+    /* Dark mode - Ember Glow (warm continuity) */
+    --primary-value: #e6764e;
+    --secondary-value: #2a2520;
+    --accent-value: #f18c5d;
+    --background-value: #1a1612;
+    --surface-value: #231f1a;
+    --foreground-value: #e8dfd5;
+    --muted-value: #9a8b7a;
+    --border-value: #3d3528;
 
     /* Set html background for overscroll */
-    background-color: var(--color-zinc-950);
+    background-color: #1a1612;
   }
 
   /* Apply Space Grotesk for body text and Space Mono for code */
