@@ -149,14 +149,10 @@ Current categories in `src/components/`:
 
 ### Page Sections
 
-Current page sections in `src/pages/`:
+Page sections in `src/pages/`:
 
 - **ethereum**: Ethereum-focused blockchain visualizations and data
-  - Current pages: slot-view
-  - Future Ethereum-related pages should be added here
 - **xatu**: Xatu-specific data, metrics, and contributor insights
-  - Current pages: contributors, geographical-checklist, locally-built-blocks, fork-readiness
-  - Future Xatu-related pages should be added here
 - **experiments**: Legacy experiments index page (shows all experiments with links to new structure)
 
 ### Standard Component Structure

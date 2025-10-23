@@ -21,8 +21,9 @@
 /* Tailwind CSS v4 plugins via @plugin directive */
 @plugin "@tailwindcss/forms";
 
-/* Enable class-based dark mode */
+/* Enable class-based dark mode and star mode */
 @custom-variant dark (&:where(.dark, .dark *));
+@custom-variant star (&:where(.star, .star *));
 
 /* Two-Tier Token Architecture
  *
@@ -70,6 +71,71 @@
   --color-neutral-800: #454545;
   --color-neutral-900: #3d3d3d;
   --color-neutral-950: #1a1a1a;
+
+  /* Aurora - cyan/teal for northern lights effect */
+  --color-aurora-cyan-50: #e6ffff;
+  --color-aurora-cyan-100: #c0ffff;
+  --color-aurora-cyan-200: #80ffff;
+  --color-aurora-cyan-300: #4dffff;
+  --color-aurora-cyan-400: #1af7f7;
+  --color-aurora-cyan-500: #00d9d9;
+  --color-aurora-cyan-600: #00b8b8;
+  --color-aurora-cyan-700: #009999;
+  --color-aurora-cyan-800: #007373;
+  --color-aurora-cyan-900: #005252;
+  --color-aurora-cyan-950: #002d2d;
+
+  /* Aurora - green for classic aurora borealis */
+  --color-aurora-green-50: #e6fff5;
+  --color-aurora-green-100: #b3ffe0;
+  --color-aurora-green-200: #66ffcc;
+  --color-aurora-green-300: #33ffbb;
+  --color-aurora-green-400: #00ff99;
+  --color-aurora-green-500: #00e68a;
+  --color-aurora-green-600: #00cc77;
+  --color-aurora-green-700: #00b366;
+  --color-aurora-green-800: #008c4d;
+  --color-aurora-green-900: #006638;
+  --color-aurora-green-950: #004020;
+
+  /* Aurora - purple for mystical aurora effect */
+  --color-aurora-purple-50: #f5e6ff;
+  --color-aurora-purple-100: #e6c0ff;
+  --color-aurora-purple-200: #d199ff;
+  --color-aurora-purple-300: #bb66ff;
+  --color-aurora-purple-400: #a94dff;
+  --color-aurora-purple-500: #9933ff;
+  --color-aurora-purple-600: #8000ff;
+  --color-aurora-purple-700: #6b00db;
+  --color-aurora-purple-800: #5500b8;
+  --color-aurora-purple-900: #400099;
+  --color-aurora-purple-950: #260052;
+
+  /* Aurora - pink for vibrant aurora highlights */
+  --color-aurora-pink-50: #ffe6f5;
+  --color-aurora-pink-100: #ffc0e8;
+  --color-aurora-pink-200: #ff99db;
+  --color-aurora-pink-300: #ff66cc;
+  --color-aurora-pink-400: #ff4dc4;
+  --color-aurora-pink-500: #ff33bb;
+  --color-aurora-pink-600: #e600a3;
+  --color-aurora-pink-700: #cc008f;
+  --color-aurora-pink-800: #a3006b;
+  --color-aurora-pink-900: #7a0052;
+  --color-aurora-pink-950: #4d0033;
+
+  /* Aurora - deep blue for night sky background */
+  --color-aurora-blue-50: #e6f0ff;
+  --color-aurora-blue-100: #c0d9ff;
+  --color-aurora-blue-200: #99c2ff;
+  --color-aurora-blue-300: #4d94ff;
+  --color-aurora-blue-400: #1a75ff;
+  --color-aurora-blue-500: #0052cc;
+  --color-aurora-blue-600: #003d99;
+  --color-aurora-blue-700: #002966;
+  --color-aurora-blue-800: #001f4d;
+  --color-aurora-blue-900: #001433;
+  --color-aurora-blue-950: #000a1a;
 
   /* ===== TIER 2: Semantic Tokens ===== */
 
@@ -123,21 +189,22 @@
  * Maps semantic tokens to primitive color scales.
  * Light mode uses warm sand/terracotta palette.
  * Dark mode uses neutral grays with warm terracotta accents.
+ * Star mode uses aurora borealis colors.
  */
 @layer base {
   :root {
     /* Light mode - warm earthy theme */
     --primary-value: var(--color-terracotta-600);
-    --secondary-value: var(--color-sand-100);
+    --secondary-value: var(--color-sand-200);
     --accent-value: var(--color-terracotta-500);
-    --background-value: var(--color-sand-50);
-    --surface-value: var(--color-sand-100);
+    --background-value: var(--color-sand-100);
+    --surface-value: var(--color-sand-50);
     --foreground-value: var(--color-sand-950);
-    --muted-value: var(--color-sand-700);
-    --border-value: var(--color-sand-200);
+    --muted-value: var(--color-sand-600);
+    --border-value: var(--color-sand-300);
 
     /* Set html background for overscroll */
-    background-color: var(--color-sand-50);
+    background-color: var(--color-sand-100);
   }
 
   html.dark {
@@ -153,6 +220,21 @@
 
     /* Set html background for overscroll */
     background-color: var(--color-neutral-950);
+  }
+
+  html.star {
+    /* Star mode - aurora borealis with pink and purple */
+    --primary-value: var(--color-aurora-cyan-400);
+    --secondary-value: var(--color-aurora-purple-600);
+    --accent-value: var(--color-aurora-pink-500);
+    --background-value: var(--color-aurora-blue-950);
+    --surface-value: #0a1428;
+    --foreground-value: var(--color-aurora-cyan-50);
+    --muted-value: var(--color-aurora-cyan-700);
+    --border-value: #1a2847;
+
+    /* Set html background for overscroll */
+    background-color: var(--color-aurora-blue-950);
   }
 
   /* Apply Space Grotesk for body text and Space Mono for code */

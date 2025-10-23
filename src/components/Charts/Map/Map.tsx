@@ -6,6 +6,7 @@ import * as echarts from 'echarts';
 import 'echarts-gl';
 import type { MapChartProps } from './Map.types';
 import { useThemeColors } from '@/hooks/useThemeColors';
+import { useTheme } from '@/hooks/useTheme';
 
 /**
  * MapChart - A 3D map visualization component using ECharts GL
@@ -37,9 +38,12 @@ export function MapChart({
   alpha = 89,
   regionHeight = 0.5,
   minDistance = 40,
-  maxDistance = 150,
+  maxDistance = 200,
+  notMerge = false,
+  lazyUpdate = true,
 }: MapChartProps): React.JSX.Element {
   const themeColors = useThemeColors();
+  const { theme } = useTheme();
   const [echartsInstance, setEchartsInstance] = useState<ECharts | null>(null);
   const [mapLoaded, setMapLoaded] = useState(false);
 
@@ -78,6 +82,9 @@ export function MapChart({
     }));
 
     const series: Array<Record<string, unknown>> = [];
+
+    // Determine theme-aware defaults (treat both dark and star as dark themes)
+    const isDark = theme === 'dark' || theme === 'star';
 
     // Add routes series if there are routes
     if (routes.length > 0) {
@@ -176,11 +183,11 @@ export function MapChart({
         },
         light: {
           main: {
-            intensity: 1,
+            intensity: isDark ? 0.8 : 1.2,
             alpha: 30,
           },
           ambient: {
-            intensity: 0,
+            intensity: isDark ? 0.1 : 0,
           },
         },
         viewControl: {
@@ -216,6 +223,7 @@ export function MapChart({
     minDistance,
     maxDistance,
     themeColors,
+    theme,
   ]);
 
   useEffect(() => {
@@ -235,11 +243,13 @@ export function MapChart({
   }
 
   return (
-    <div className="w-full">
+    <div className="h-full w-full">
       <ReactECharts
         option={option}
         style={{ height, width: '100%', minHeight: height }}
         onChartReady={instance => setEchartsInstance(instance)}
+        notMerge={notMerge}
+        lazyUpdate={lazyUpdate}
       />
     </div>
   );

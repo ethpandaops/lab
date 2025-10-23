@@ -62,7 +62,7 @@ export interface MapChartProps {
   showEffect?: boolean;
   /**
    * Environment/background color
-   * @default '#333'
+   * When not provided, defaults to theme-aware colors (zinc-900 for dark, zinc-100 for light)
    */
   environment?: string;
   /**
@@ -71,12 +71,12 @@ export interface MapChartProps {
   lineColor?: string;
   /**
    * Map base color
-   * @default '#000'
+   * When not provided, defaults to theme-aware colors (zinc-800 for dark, zinc-200 for light)
    */
   mapColor?: string;
   /**
    * Camera viewing distance
-   * @default 70
+   * @default 120
    */
   distance?: number;
   /**
@@ -96,7 +96,18 @@ export interface MapChartProps {
   minDistance?: number;
   /**
    * Maximum camera distance (max zoom out)
-   * @default 150
+   * @default 200
    */
   maxDistance?: number;
+  /**
+   * Whether to merge new options with existing chart (false) or replace entirely (true)
+   * Set to false for better performance when updating frequently
+   * @default false
+   */
+  notMerge?: boolean;
+  /**
+   * Whether to defer chart updates to next animation frame for better performance
+   * @default true
+   */
+  lazyUpdate?: boolean;
 }

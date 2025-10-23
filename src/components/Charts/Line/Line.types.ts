@@ -12,6 +12,37 @@ export interface LineChartProps {
    */
   title?: string;
   /**
+   * Title alignment (deprecated - use titleLeft instead)
+   * @default 'center'
+   * @deprecated Use titleLeft instead
+   */
+  titleAlign?: 'left' | 'center' | 'right';
+  /**
+   * Title font size
+   * @default 16
+   */
+  titleFontSize?: number;
+  /**
+   * Title font family
+   * @default undefined (uses default)
+   */
+  titleFontFamily?: string;
+  /**
+   * Title font weight
+   * @default 600
+   */
+  titleFontWeight?: number;
+  /**
+   * Title left position (pixels or 'left', 'center', 'right')
+   * @default 'center'
+   */
+  titleLeft?: number | string;
+  /**
+   * Title top position (pixels)
+   * @default 8
+   */
+  titleTop?: number;
+  /**
    * Height of the chart in pixels
    */
   height?: number | string;
@@ -34,6 +65,10 @@ export interface LineChartProps {
    */
   yMax?: number;
   /**
+   * Maximum value for X-axis (optional, auto-calculated if not provided)
+   */
+  xMax?: number;
+  /**
    * Connect null data points with line
    * @default false
    */
@@ -43,4 +78,21 @@ export interface LineChartProps {
    * @default 300
    */
   animationDuration?: number;
+  /**
+   * Whether to merge new options with existing chart (false) or replace entirely (true)
+   * Set to false for better performance when updating frequently
+   * @default false
+   */
+  notMerge?: boolean;
+  /**
+   * Whether to defer chart updates to next animation frame for better performance
+   * @default true
+   */
+  lazyUpdate?: boolean;
+  /**
+   * X-axis label display interval (0 = all labels, 1 = every other, 2 = every third, etc.)
+   * Set to 'auto' to let ECharts calculate automatically
+   * @default 'auto'
+   */
+  xAxisLabelInterval?: number | 'auto';
 }

@@ -18,7 +18,7 @@ import { Route as XatuLocallyBuiltBlocksRouteImport } from './routes/xatu/locall
 import { Route as XatuGeographicalChecklistRouteImport } from './routes/xatu/geographical-checklist'
 import { Route as XatuForkReadinessRouteImport } from './routes/xatu/fork-readiness'
 import { Route as XatuContributorsRouteImport } from './routes/xatu/contributors'
-import { Route as EthereumSlotViewRouteImport } from './routes/ethereum/slot-view'
+import { Route as EthereumLiveRouteImport } from './routes/ethereum/live'
 import { Route as XatuContributorsIndexRouteImport } from './routes/xatu/contributors/index'
 import { Route as XatuContributorsIdRouteImport } from './routes/xatu/contributors/$id'
 
@@ -68,9 +68,9 @@ const XatuContributorsRoute = XatuContributorsRouteImport.update({
   path: '/contributors',
   getParentRoute: () => XatuRoute,
 } as any)
-const EthereumSlotViewRoute = EthereumSlotViewRouteImport.update({
-  id: '/slot-view',
-  path: '/slot-view',
+const EthereumLiveRoute = EthereumLiveRouteImport.update({
+  id: '/live',
+  path: '/live',
   getParentRoute: () => EthereumRoute,
 } as any)
 const XatuContributorsIndexRoute = XatuContributorsIndexRouteImport.update({
@@ -89,7 +89,7 @@ export interface FileRoutesByFullPath {
   '/ethereum': typeof EthereumRouteWithChildren
   '/experiments': typeof ExperimentsRouteWithChildren
   '/xatu': typeof XatuRouteWithChildren
-  '/ethereum/slot-view': typeof EthereumSlotViewRoute
+  '/ethereum/live': typeof EthereumLiveRoute
   '/xatu/contributors': typeof XatuContributorsRouteWithChildren
   '/xatu/fork-readiness': typeof XatuForkReadinessRoute
   '/xatu/geographical-checklist': typeof XatuGeographicalChecklistRoute
@@ -102,7 +102,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/ethereum': typeof EthereumRouteWithChildren
   '/xatu': typeof XatuRouteWithChildren
-  '/ethereum/slot-view': typeof EthereumSlotViewRoute
+  '/ethereum/live': typeof EthereumLiveRoute
   '/xatu/fork-readiness': typeof XatuForkReadinessRoute
   '/xatu/geographical-checklist': typeof XatuGeographicalChecklistRoute
   '/xatu/locally-built-blocks': typeof XatuLocallyBuiltBlocksRoute
@@ -116,7 +116,7 @@ export interface FileRoutesById {
   '/ethereum': typeof EthereumRouteWithChildren
   '/experiments': typeof ExperimentsRouteWithChildren
   '/xatu': typeof XatuRouteWithChildren
-  '/ethereum/slot-view': typeof EthereumSlotViewRoute
+  '/ethereum/live': typeof EthereumLiveRoute
   '/xatu/contributors': typeof XatuContributorsRouteWithChildren
   '/xatu/fork-readiness': typeof XatuForkReadinessRoute
   '/xatu/geographical-checklist': typeof XatuGeographicalChecklistRoute
@@ -132,7 +132,7 @@ export interface FileRouteTypes {
     | '/ethereum'
     | '/experiments'
     | '/xatu'
-    | '/ethereum/slot-view'
+    | '/ethereum/live'
     | '/xatu/contributors'
     | '/xatu/fork-readiness'
     | '/xatu/geographical-checklist'
@@ -145,7 +145,7 @@ export interface FileRouteTypes {
     | '/'
     | '/ethereum'
     | '/xatu'
-    | '/ethereum/slot-view'
+    | '/ethereum/live'
     | '/xatu/fork-readiness'
     | '/xatu/geographical-checklist'
     | '/xatu/locally-built-blocks'
@@ -158,7 +158,7 @@ export interface FileRouteTypes {
     | '/ethereum'
     | '/experiments'
     | '/xatu'
-    | '/ethereum/slot-view'
+    | '/ethereum/live'
     | '/xatu/contributors'
     | '/xatu/fork-readiness'
     | '/xatu/geographical-checklist'
@@ -240,11 +240,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof XatuContributorsRouteImport
       parentRoute: typeof XatuRoute
     }
-    '/ethereum/slot-view': {
-      id: '/ethereum/slot-view'
-      path: '/slot-view'
-      fullPath: '/ethereum/slot-view'
-      preLoaderRoute: typeof EthereumSlotViewRouteImport
+    '/ethereum/live': {
+      id: '/ethereum/live'
+      path: '/live'
+      fullPath: '/ethereum/live'
+      preLoaderRoute: typeof EthereumLiveRouteImport
       parentRoute: typeof EthereumRoute
     }
     '/xatu/contributors/': {
@@ -265,11 +265,11 @@ declare module '@tanstack/react-router' {
 }
 
 interface EthereumRouteChildren {
-  EthereumSlotViewRoute: typeof EthereumSlotViewRoute
+  EthereumLiveRoute: typeof EthereumLiveRoute
 }
 
 const EthereumRouteChildren: EthereumRouteChildren = {
-  EthereumSlotViewRoute: EthereumSlotViewRoute,
+  EthereumLiveRoute: EthereumLiveRoute,
 }
 
 const EthereumRouteWithChildren = EthereumRoute._addFileChildren(

@@ -24,13 +24,13 @@ export interface SlotPhase {
  * Default Ethereum beacon chain slot phases (12000 milliseconds total).
  *
  * Based on standard beacon chain slot timing:
- * - 0-4000ms: Block Proposal - Proposer broadcasts the block
+ * - 0-4000ms: Block - Proposer broadcasts the block
  * - 4000-8000ms: Attestations - Validators attest to the block
  * - 8000-12000ms: Aggregations - Attestations are aggregated
  */
 export const DEFAULT_BEACON_SLOT_PHASES: SlotPhase[] = [
   {
-    label: 'Block Proposal',
+    label: 'Block',
     duration: 4000,
     className: 'bg-cyan-500',
     textClassName: 'text-cyan-200 font-bold',

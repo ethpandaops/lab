@@ -12,7 +12,7 @@ function getSystemTheme(): Theme {
 function getInitialTheme(): Theme {
   // Check localStorage first
   const stored = localStorage.getItem('theme') as Theme | null;
-  if (stored === 'light' || stored === 'dark') {
+  if (stored === 'light' || stored === 'dark' || stored === 'star') {
     return stored;
   }
   // Fall back to system preference
@@ -25,10 +25,13 @@ export function ThemeProvider({ children }: ThemeProviderProps): JSX.Element {
   // Apply theme to document
   useEffect(() => {
     const root = document.documentElement;
+    // Remove all theme classes first
+    root.classList.remove('dark', 'star');
+    // Add the current theme class if not light
     if (theme === 'dark') {
       root.classList.add('dark');
-    } else {
-      root.classList.remove('dark');
+    } else if (theme === 'star') {
+      root.classList.add('star');
     }
   }, [theme]);
 
