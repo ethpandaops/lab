@@ -361,7 +361,13 @@ export function SlotPlayerProvider({
 
   const maxSlot = useMemo(() => {
     if (!boundsData?.aggregate?.maxOfMaxes || !currentNetwork) return 0;
-    return Math.floor((boundsData.aggregate.maxOfMaxes - currentNetwork.genesis_time) / SECONDS_PER_SLOT);
+    const calculated = Math.floor((boundsData.aggregate.maxOfMaxes - currentNetwork.genesis_time) / SECONDS_PER_SLOT);
+    console.log('[SlotPlayerProvider] maxSlot calculation:', {
+      maxOfMaxes: boundsData.aggregate.maxOfMaxes,
+      genesisTime: currentNetwork.genesis_time,
+      calculatedMaxSlot: calculated,
+    });
+    return calculated;
   }, [boundsData, currentNetwork]);
 
   // Calculate initial slot (returns actual slot number)
@@ -374,7 +380,7 @@ export function SlotPlayerProvider({
 
   // State management
   // NOTE: currentSlot stores actual beacon chain slot numbers, NOT timestamps
-  const [currentSlot, setCurrentSlot] = useState<number>(0);
+  const [currentSlot, setCurrentSlot] = useState<number>(initialSlot ?? 0);
   const [isPlaying, setIsPlaying] = useState<boolean>(initialPlaying);
   const [mode, setMode] = useState<SlotMode>(initialMode);
   const [playbackSpeed, setPlaybackSpeed] = useState<number>(initialPlaybackSpeed);

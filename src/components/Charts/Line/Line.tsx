@@ -20,13 +20,23 @@ export function LineChart({
   data = [820, 932, 901, 934, 1290, 1330, 1320],
   labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
   title,
+  titleAlign: _titleAlign = 'center',
+  titleFontSize = 16,
+  titleFontFamily,
+  titleFontWeight = 600,
+  titleLeft = 'center',
+  titleTop = 8,
   height = 400,
   smooth = true,
   showArea = false,
   color,
   yMax,
+  xMax,
   connectNulls = false,
   animationDuration = 300,
+  notMerge = false,
+  lazyUpdate = true,
+  xAxisLabelInterval = 'auto',
 }: LineChartProps): React.JSX.Element {
   const [themeColors] = useState(() => {
     // Get computed CSS variables from the root element on initial render
@@ -75,11 +85,12 @@ export function LineChart({
           text: title,
           textStyle: {
             color: themeColors.foreground,
-            fontSize: 16,
-            fontWeight: 600,
+            fontSize: titleFontSize,
+            fontWeight: titleFontWeight,
+            fontFamily: titleFontFamily,
           },
-          left: 'center',
-          top: 8,
+          left: titleLeft,
+          top: titleTop,
         }
       : undefined,
     grid: {
@@ -93,6 +104,7 @@ export function LineChart({
       type: 'category',
       data: labels,
       boundaryGap: false,
+      max: xMax !== undefined ? xMax : undefined,
       axisLine: {
         lineStyle: {
           color: themeColors.border,
@@ -101,6 +113,7 @@ export function LineChart({
       axisLabel: {
         color: themeColors.muted,
         fontSize: 12,
+        interval: xAxisLabelInterval,
       },
     },
     yAxis: {
@@ -183,8 +196,13 @@ export function LineChart({
   };
 
   return (
-    <div className="w-full">
-      <ReactECharts option={option} style={{ height, width: '100%', minHeight: height }} />
+    <div className={height === '100%' ? 'h-full w-full' : 'w-full'}>
+      <ReactECharts
+        option={option}
+        style={{ height, width: '100%', minHeight: height }}
+        notMerge={notMerge}
+        lazyUpdate={lazyUpdate}
+      />
     </div>
   );
 }

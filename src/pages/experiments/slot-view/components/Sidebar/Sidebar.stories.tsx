@@ -170,8 +170,6 @@ export const Default: Story = {
     items: ethereumEvents,
     isPlaying: false,
     isLive: true,
-    title: 'Slot Timeline',
-    scrollingTimelineHeight: '400px',
   },
 };
 
@@ -183,8 +181,6 @@ export const Interactive: Story = {
     items: ethereumEvents,
     isPlaying: false,
     isLive: true,
-    title: 'Slot Timeline',
-    scrollingTimelineHeight: '400px',
   },
   render: () => {
     const [currentTime, setCurrentTime] = useState(4000);
@@ -236,23 +232,19 @@ export const Interactive: Story = {
         onBackward={handleBackward}
         onForward={handleForward}
         onTimeClick={handleTimeClick}
-        title="Slot Timeline"
-        scrollingTimelineHeight="400px"
       />
     );
   },
 };
 
 export const EarlyPhase: Story = {
-  name: 'Early Phase (Block Proposal)',
+  name: 'Early Phase (Block)',
   args: {
     phases: DEFAULT_BEACON_SLOT_PHASES,
     currentTime: 2000,
     items: ethereumEvents,
     isPlaying: false,
     isLive: true,
-    title: 'Slot Timeline',
-    scrollingTimelineHeight: '400px',
   },
 };
 
@@ -264,8 +256,6 @@ export const MidPhase: Story = {
     items: ethereumEvents,
     isPlaying: false,
     isLive: true,
-    title: 'Slot Timeline',
-    scrollingTimelineHeight: '400px',
   },
 };
 
@@ -277,8 +267,6 @@ export const LatePhase: Story = {
     items: ethereumEvents,
     isPlaying: false,
     isLive: true,
-    title: 'Slot Timeline',
-    scrollingTimelineHeight: '400px',
   },
 };
 
@@ -289,8 +277,6 @@ export const NotLive: Story = {
     items: ethereumEvents,
     isPlaying: false,
     isLive: false,
-    title: 'Slot Timeline',
-    scrollingTimelineHeight: '400px',
   },
 };
 
@@ -301,8 +287,6 @@ export const Playing: Story = {
     items: ethereumEvents,
     isPlaying: true,
     isLive: true,
-    title: 'Slot Timeline',
-    scrollingTimelineHeight: '400px',
   },
 };
 
@@ -314,8 +298,6 @@ export const TallTimeline: Story = {
     items: ethereumEvents,
     isPlaying: false,
     isLive: true,
-    title: 'Slot Timeline',
-    scrollingTimelineHeight: '600px',
   },
 };
 
@@ -327,7 +309,5 @@ export const ShortTimeline: Story = {
     items: ethereumEvents,
     isPlaying: false,
     isLive: true,
-    title: 'Slot Timeline',
-    scrollingTimelineHeight: '300px',
   },
 };

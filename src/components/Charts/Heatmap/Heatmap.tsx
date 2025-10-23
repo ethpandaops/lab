@@ -37,6 +37,8 @@ export function HeatmapChart({
   tooltipFormatter,
   xAxisShowOnlyMinMax = false,
   yAxisShowOnlyMinMax = false,
+  notMerge = false,
+  lazyUpdate = true,
 }: HeatmapChartProps): React.JSX.Element {
   const themeColors = useThemeColors();
 
@@ -57,10 +59,10 @@ export function HeatmapChart({
         }
       : undefined,
     grid: {
-      top: title ? 48 : 16,
-      right: showVisualMap ? 100 : 24,
-      bottom: 32,
-      left: 80,
+      top: title ? 40 : 16,
+      right: showVisualMap ? 90 : 16,
+      bottom: 28,
+      left: 64,
       containLabel: true,
     },
     xAxis: {
@@ -191,7 +193,13 @@ export function HeatmapChart({
 
   return (
     <div className="w-full">
-      <ReactECharts key={themeColors.foreground} option={option} style={{ height, width: '100%', minHeight: height }} />
+      <ReactECharts
+        key={themeColors.foreground}
+        option={option}
+        style={{ height, width: '100%', minHeight: height }}
+        notMerge={notMerge}
+        lazyUpdate={lazyUpdate}
+      />
     </div>
   );
 }

@@ -200,7 +200,7 @@ export const Interactive: Story = {
           >
             Reset
           </button>
-          <span className="text-sm text-muted">Current time: {(currentTime / 1000).toFixed(1)}s</span>
+          <span className="text-sm text-muted">Current time: {Math.round(currentTime / 1000)}s</span>
         </div>
         <BlobDataAvailability
           currentTime={currentTime}

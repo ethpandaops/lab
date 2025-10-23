@@ -10,7 +10,7 @@ export function ScrollingTimeline({
   items,
   currentTime,
   className,
-  height = '500px',
+  height,
   autoScroll = true,
   formatTime = defaultFormatTime,
 }: ScrollingTimelineProps): JSX.Element {
@@ -18,6 +18,8 @@ export function ScrollingTimeline({
   const itemRefs = useRef<Map<string, HTMLDivElement>>(new Map());
 
   // Auto-scroll to the active item based on currentTime
+  const lastScrolledItemRef = useRef<string | null>(null);
+
   useEffect(() => {
     if (!autoScroll || !containerRef.current) return;
 
@@ -28,19 +30,28 @@ export function ScrollingTimeline({
     });
 
     if (activeItem) {
+      // Only scroll if the active item has changed to avoid unnecessary scrolling
+      if (lastScrolledItemRef.current === activeItem.id) return;
+      lastScrolledItemRef.current = activeItem.id;
+
       const element = itemRefs.current.get(activeItem.id);
       if (element && containerRef.current) {
         // Scroll the active item to the center of the container
         const container = containerRef.current;
         const elementTop = element.offsetTop;
         const elementHeight = element.offsetHeight;
-        const containerHeight = container.offsetHeight;
+        const containerHeight = container.clientHeight;
+        const scrollHeight = container.scrollHeight;
 
-        const scrollTo = elementTop - containerHeight / 2 + elementHeight / 2;
-        container.scrollTo({
-          top: scrollTo,
-          behavior: 'smooth',
-        });
+        // Calculate desired scroll position (center the active item)
+        let scrollTo = elementTop - containerHeight / 2 + elementHeight / 2;
+
+        // Clamp scrollTo to valid range [0, maxScroll]
+        const maxScroll = scrollHeight - containerHeight;
+        scrollTo = Math.max(0, Math.min(scrollTo, maxScroll));
+
+        // Use instant scrolling to avoid animation issues
+        container.scrollTop = scrollTo;
       }
     }
   }, [currentTime, items, autoScroll]);
@@ -66,13 +77,14 @@ export function ScrollingTimeline({
       className={clsx(
         'overflow-x-hidden overflow-y-auto rounded-sm bg-background dark:bg-surface',
         'scrollbar-thin scrollbar-track-transparent scrollbar-thumb-border dark:scrollbar-thumb-zinc-700',
+        !height && 'flex-1',
         className
       )}
-      style={{ height }}
+      style={height ? { height } : undefined}
     >
       <div className="relative">
         {/* Vertical timeline line */}
-        <div className="absolute top-0 left-[4.75rem] h-full w-px bg-border dark:bg-zinc-800" />
+        <div className="absolute top-0 left-[3.75rem] h-full w-px bg-border dark:bg-zinc-800" />
 
         {/* Timeline items */}
         <div className="space-y-0">
@@ -90,7 +102,7 @@ export function ScrollingTimeline({
                   }
                 }}
                 className={clsx(
-                  'relative flex items-start gap-x-4 px-4 py-3 transition-all duration-300',
+                  'relative flex items-center gap-x-3 px-3 py-1 transition-all duration-300',
                   status === 'active' && 'bg-primary/10 dark:bg-primary/5',
                   status === 'pending' && 'opacity-40'
                 )}
@@ -98,8 +110,8 @@ export function ScrollingTimeline({
                 {/* Timestamp */}
                 <div
                   className={clsx(
-                    'shrink-0 text-right text-xs/6 font-medium',
-                    'w-14',
+                    'shrink-0 text-right text-xs font-medium',
+                    'w-12',
                     status === 'active' && 'text-primary',
                     status === 'completed' && 'text-foreground dark:text-zinc-400',
                     status === 'pending' && 'text-muted dark:text-zinc-600'
@@ -109,11 +121,11 @@ export function ScrollingTimeline({
                 </div>
 
                 {/* Timeline dot */}
-                <div className="relative flex h-6 shrink-0 items-center">
+                <div className="relative flex shrink-0 items-center">
                   <div
                     className={clsx(
-                      'size-2 rounded-full transition-all duration-300',
-                      status === 'active' && 'bg-primary ring-4 ring-primary/20 dark:ring-primary/10',
+                      'size-1.5 rounded-full transition-all duration-300',
+                      status === 'active' && 'bg-primary ring-3 ring-primary/20 dark:ring-primary/10',
                       status === 'completed' && 'bg-foreground/40 dark:bg-zinc-600',
                       status === 'pending' && 'bg-border dark:bg-zinc-800'
                     )}
@@ -124,7 +136,7 @@ export function ScrollingTimeline({
                 {item.icon && (
                   <div
                     className={clsx(
-                      'flex h-6 shrink-0 items-center',
+                      'flex shrink-0 items-center',
                       status === 'active' && 'text-primary',
                       status === 'completed' && 'text-foreground dark:text-zinc-400',
                       status === 'pending' && 'text-muted dark:text-zinc-600'
@@ -138,7 +150,7 @@ export function ScrollingTimeline({
                 <div className="min-w-0 flex-1">
                   <div
                     className={clsx(
-                      'text-sm/6 transition-colors duration-300',
+                      'truncate text-xs transition-colors duration-300',
                       status === 'active' && 'font-medium text-foreground dark:text-zinc-100',
                       status === 'completed' && 'text-foreground dark:text-zinc-300',
                       status === 'pending' && 'text-muted dark:text-zinc-500'

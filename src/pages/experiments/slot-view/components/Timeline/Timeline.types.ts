@@ -17,8 +17,6 @@ export interface TimelineProps {
   onForward?: () => void;
   /** Callback fired when user clicks on the timeline with the clicked time in milliseconds */
   onTimeClick?: (timeMs: number) => void;
-  /** Optional title for the timeline (defaults to "Timeline") */
-  title?: string;
   /** Show "Live" indicator */
   isLive?: boolean;
   /** Optional aria-label for accessibility */

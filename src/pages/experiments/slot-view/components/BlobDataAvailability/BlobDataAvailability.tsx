@@ -1,8 +1,8 @@
 import type { JSX } from 'react';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, memo } from 'react';
 import ReactECharts from 'echarts-for-react';
 import clsx from 'clsx';
-import { hexToRgba } from '@/utils';
+import { LineChart } from '@/components/Charts/Line';
 import type { BlobDataAvailabilityProps } from './BlobDataAvailability.types';
 
 /**
@@ -29,7 +29,7 @@ import type { BlobDataAvailabilityProps } from './BlobDataAvailability.types';
  * />
  * ```
  */
-export function BlobDataAvailability({
+function BlobDataAvailabilityComponent({
   firstSeenData = [],
   availabilityRateData = [],
   continentalPropagationData = [],
@@ -89,7 +89,17 @@ export function BlobDataAvailability({
   // Prepare First Seen scatter chart data - only show blobs seen up to current time
   const firstSeenOption = useMemo(() => {
     const visibleData = firstSeenData.filter(point => point.time <= effectiveCurrentTime);
-    const scatterData = visibleData.map(point => [point.time, point.blobId, point.color]);
+
+    // Deduplicate by blobId - only show the FIRST time each blob was seen
+    const blobFirstSeenMap = new Map<string, { time: number; color?: string }>();
+    visibleData.forEach(point => {
+      const existing = blobFirstSeenMap.get(point.blobId);
+      if (!existing || point.time < existing.time) {
+        blobFirstSeenMap.set(point.blobId, { time: point.time, color: point.color });
+      }
+    });
+
+    const scatterData = Array.from(blobFirstSeenMap.entries()).map(([blobId, data]) => [data.time, blobId, data.color]);
     const uniqueBlobIds = [...new Set(firstSeenData.map(p => p.blobId))].sort();
 
     return {
@@ -106,23 +116,21 @@ export function BlobDataAvailability({
         top: 12,
       },
       grid: {
-        top: 48,
-        right: 32,
-        bottom: 72,
-        left: 72,
-        containLabel: false,
+        top: 40,
+        containLabel: true,
       },
       xAxis: {
         type: 'value',
         name: 'Slot Time (s)',
         nameLocation: 'middle',
-        nameGap: 32,
+        nameGap: 25,
         nameTextStyle: {
           color: themeColors.muted,
-          fontSize: 11,
+          fontSize: 10,
         },
         min: 0,
         max: maxTime,
+        interval: 4000, // Show labels at 0s, 4s, 8s, 12s
         axisLine: {
           lineStyle: {
             color: themeColors.border,
@@ -131,7 +139,7 @@ export function BlobDataAvailability({
         axisLabel: {
           color: themeColors.muted,
           fontSize: 10,
-          formatter: (value: number) => (value / 1000).toFixed(1),
+          formatter: (value: number) => Math.round(value / 1000),
         },
         splitLine: {
           show: true,
@@ -147,10 +155,10 @@ export function BlobDataAvailability({
         data: uniqueBlobIds,
         name: 'Blob',
         nameLocation: 'middle',
-        nameGap: 50,
+        nameGap: 40,
         nameTextStyle: {
           color: themeColors.muted,
-          fontSize: 11,
+          fontSize: 10,
         },
         axisLine: {
           lineStyle: {
@@ -203,153 +211,23 @@ export function BlobDataAvailability({
     };
   }, [firstSeenData, themeColors, maxTime, effectiveCurrentTime]);
 
-  // Prepare Data is Available Rate line chart data - only show data up to current time
-  const availabilityRateOption = useMemo(() => {
-    const visibleData = availabilityRateData.filter(point => point.time <= effectiveCurrentTime);
-    const times = visibleData.map(p => p.time);
-    const nodes = visibleData.map(p => p.nodes);
+  // Prepare Data is Available Rate line chart data - show full 0-12s range with null for future values
+  const availabilityRateChartData = useMemo(() => {
+    // Create a static array of all time points from 0-12 seconds
+    const timePoints = Array.from({ length: 13 }, (_, i) => i * 1000); // 0, 1000, 2000, ... 12000
+    const labels = timePoints.map(time => `${time / 1000}s`);
 
-    return {
-      animation: false,
-      title: {
-        text: 'DATA IS AVAILABLE RATE',
-        textStyle: {
-          color: themeColors.foreground,
-          fontSize: 13,
-          fontWeight: 600,
-          fontFamily: 'monospace',
-        },
-        left: 16,
-        top: 12,
-      },
-      grid: {
-        top: 48,
-        right: 32,
-        bottom: 72,
-        left: 72,
-        containLabel: false,
-      },
-      xAxis: {
-        type: 'value',
-        name: 'Slot Time (s)',
-        nameLocation: 'middle',
-        nameGap: 32,
-        nameTextStyle: {
-          color: themeColors.muted,
-          fontSize: 11,
-        },
-        min: 0,
-        max: maxTime,
-        axisLine: {
-          lineStyle: {
-            color: themeColors.border,
-          },
-        },
-        axisLabel: {
-          color: themeColors.muted,
-          fontSize: 10,
-          formatter: (value: number) => (value / 1000).toFixed(1),
-        },
-        splitLine: {
-          show: true,
-          lineStyle: {
-            color: themeColors.border,
-            type: 'solid',
-            opacity: 0.3,
-          },
-        },
-      },
-      yAxis: {
-        type: 'value',
-        name: 'Nodes',
-        nameLocation: 'middle',
-        nameGap: 50,
-        nameTextStyle: {
-          color: themeColors.muted,
-          fontSize: 11,
-        },
-        max: availabilityRateMax,
-        axisLine: {
-          show: false,
-        },
-        axisTick: {
-          show: false,
-        },
-        splitLine: {
-          show: true,
-          lineStyle: {
-            color: themeColors.border,
-            type: 'solid',
-            opacity: 0.3,
-          },
-        },
-        axisLabel: {
-          color: themeColors.muted,
-          fontSize: 10,
-        },
-      },
-      series: [
-        {
-          data: times.map((time, idx) => [time, nodes[idx]]),
-          type: 'line',
-          smooth: false,
-          symbol: 'none',
-          showSymbol: false,
-          lineStyle: {
-            color: themeColors.success,
-            width: 3,
-          },
-          areaStyle: {
-            color: {
-              type: 'linear',
-              x: 0,
-              y: 0,
-              x2: 0,
-              y2: 1,
-              colorStops: [
-                {
-                  offset: 0,
-                  color: hexToRgba(themeColors.success, 0.5),
-                },
-                {
-                  offset: 1,
-                  color: hexToRgba(themeColors.success, 0.06),
-                },
-              ],
-            },
-          },
-        },
-      ],
-      tooltip: {
-        trigger: 'axis',
-        backgroundColor: themeColors.background,
-        borderColor: themeColors.border,
-        borderWidth: 1,
-        textStyle: {
-          color: themeColors.foreground,
-          fontSize: 12,
-        },
-        formatter: (params: { data: [number, number] }[]) => {
-          if (!params || params.length === 0) return '';
-          const time = (params[0].data[0] / 1000).toFixed(2);
-          const nodes = params[0].data[1];
-          return `Time: ${time}s<br/>Nodes: ${nodes}`;
-        },
-        axisPointer: {
-          type: 'line',
-          lineStyle: {
-            color: themeColors.muted,
-            type: 'dashed',
-          },
-        },
-      },
-      legend: {
-        show: false,
-        bottom: 8,
-        left: 'center',
-      },
-    };
-  }, [availabilityRateData, themeColors, maxTime, effectiveCurrentTime, availabilityRateMax]);
+    // Create a map of time to nodes for quick lookup
+    const timeToNodesMap = new Map(availabilityRateData.map(p => [p.time, p.nodes]));
+
+    // Map each time point to its corresponding nodes value, or null if beyond current time
+    const data = timePoints.map(time => {
+      if (time > effectiveCurrentTime) return null;
+      return timeToNodesMap.get(time) ?? null;
+    });
+
+    return { labels, data };
+  }, [availabilityRateData, effectiveCurrentTime]);
 
   // Prepare Continental Propagation chart data - CDF per continent, only show data up to current time
   const continentalPropagationOption = useMemo(() => {
@@ -369,6 +247,34 @@ export function BlobDataAvailability({
       data: continent.data.filter(point => point.time <= effectiveCurrentTime),
     }));
 
+    // Calculate dynamic x-axis range based on active data
+    // Find the time range where meaningful propagation happens (0% to 100%)
+    let minActiveTime = Infinity;
+    let maxActiveTime = -Infinity;
+
+    visiblePropagationData.forEach(continent => {
+      if (continent.data.length === 0) return;
+
+      // Find first point above 0% and last point before 100%
+      const firstActivePoint = continent.data.find(p => p.percentage > 0);
+      const lastActivePoint = [...continent.data].reverse().find(p => p.percentage < 100);
+
+      if (firstActivePoint) {
+        minActiveTime = Math.min(minActiveTime, firstActivePoint.time);
+      }
+      if (lastActivePoint) {
+        maxActiveTime = Math.max(maxActiveTime, lastActivePoint.time);
+      }
+    });
+
+    // Add padding to the range for better visibility (10% on each side)
+    const hasActiveData = minActiveTime !== Infinity && maxActiveTime !== -Infinity;
+    const dataRange = hasActiveData ? maxActiveTime - minActiveTime : 0;
+    const padding = Math.max(dataRange * 0.1, 500); // At least 500ms padding
+
+    const xAxisMin = hasActiveData ? Math.max(0, minActiveTime - padding) : 0;
+    const xAxisMax = hasActiveData ? Math.min(maxTime, maxActiveTime + padding) : maxTime;
+
     return {
       animation: false,
       title: {
@@ -383,23 +289,20 @@ export function BlobDataAvailability({
         top: 12,
       },
       grid: {
-        top: 48,
-        right: 32,
-        bottom: 72,
-        left: 72,
-        containLabel: false,
+        top: 40,
+        containLabel: true,
       },
       xAxis: {
         type: 'value',
         name: 'Slot Time (s)',
         nameLocation: 'middle',
-        nameGap: 32,
+        nameGap: 25,
         nameTextStyle: {
           color: themeColors.muted,
-          fontSize: 11,
+          fontSize: 10,
         },
-        min: 0,
-        max: maxTime,
+        min: xAxisMin,
+        max: xAxisMax,
         axisLine: {
           lineStyle: {
             color: themeColors.border,
@@ -423,10 +326,10 @@ export function BlobDataAvailability({
         type: 'value',
         name: 'Complete',
         nameLocation: 'middle',
-        nameGap: 50,
+        nameGap: 40,
         nameTextStyle: {
           color: themeColors.muted,
-          fontSize: 11,
+          fontSize: 10,
         },
         max: 100,
         axisLine: {
@@ -464,15 +367,15 @@ export function BlobDataAvailability({
       legend: {
         show: visiblePropagationData.length > 0,
         orient: 'horizontal',
-        bottom: 8,
+        bottom: 4,
         left: 'center',
         textStyle: {
           color: themeColors.foreground,
-          fontSize: 10,
+          fontSize: 9,
         },
-        itemWidth: 16,
+        itemWidth: 14,
         itemHeight: 2,
-        itemGap: 16,
+        itemGap: 12,
       },
       tooltip: {
         trigger: 'axis',
@@ -504,21 +407,50 @@ export function BlobDataAvailability({
   }, [continentalPropagationData, themeColors, maxTime, effectiveCurrentTime]);
 
   return (
-    <div className={clsx('grid grid-cols-12 gap-4', className)}>
+    <div className={clsx('grid h-full grid-cols-12 gap-4', className)}>
       {/* First Seen Chart - 4 columns */}
-      <div className="col-span-4 rounded-sm border border-border bg-surface p-3">
-        <ReactECharts option={firstSeenOption} style={{ height: 360, width: '100%' }} />
+      <div className="col-span-4 h-full rounded-sm border border-border bg-surface p-2">
+        <ReactECharts
+          option={firstSeenOption}
+          style={{ height: '100%', width: '100%' }}
+          notMerge={false}
+          lazyUpdate={true}
+        />
       </div>
 
       {/* Data is Available Rate Chart - 4 columns */}
-      <div className="col-span-4 rounded-sm border border-border bg-surface p-3">
-        <ReactECharts option={availabilityRateOption} style={{ height: 360, width: '100%' }} />
+      <div className="col-span-4 h-full rounded-sm border border-border bg-surface p-2">
+        <LineChart
+          data={availabilityRateChartData.data}
+          labels={availabilityRateChartData.labels}
+          title="DATA IS AVAILABLE RATE"
+          titleLeft={16}
+          titleTop={12}
+          titleFontSize={13}
+          titleFontFamily="monospace"
+          titleFontWeight={600}
+          height="100%"
+          smooth={false}
+          showArea={true}
+          color={themeColors.success}
+          yMax={availabilityRateMax}
+          connectNulls={false}
+          animationDuration={0}
+          xAxisLabelInterval={3}
+        />
       </div>
 
       {/* Continental Propagation Chart - 4 columns */}
-      <div className="col-span-4 rounded-sm border border-border bg-surface p-3">
-        <ReactECharts option={continentalPropagationOption} style={{ height: 360, width: '100%' }} />
+      <div className="col-span-4 h-full rounded-sm border border-border bg-surface p-2">
+        <ReactECharts
+          option={continentalPropagationOption}
+          style={{ height: '100%', width: '100%' }}
+          notMerge={false}
+          lazyUpdate={true}
+        />
       </div>
     </div>
   );
 }
+
+export const BlobDataAvailability = memo(BlobDataAvailabilityComponent);

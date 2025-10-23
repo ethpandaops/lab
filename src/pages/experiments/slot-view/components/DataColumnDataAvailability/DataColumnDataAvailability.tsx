@@ -1,5 +1,5 @@
 import type { JSX } from 'react';
-import { useMemo } from 'react';
+import { useMemo, memo } from 'react';
 import clsx from 'clsx';
 import { HeatmapChart } from '@/components/Charts/Heatmap';
 import type { DataColumnDataAvailabilityProps } from './DataColumnDataAvailability.types';
@@ -40,7 +40,7 @@ import type { DataColumnDataAvailabilityProps } from './DataColumnDataAvailabili
  * />
  * ```
  */
-export function DataColumnDataAvailability({
+function DataColumnDataAvailabilityComponent({
   blobCount,
   firstSeenData = [],
   currentTime,
@@ -91,14 +91,14 @@ export function DataColumnDataAvailability({
   }, [firstSeenData, blobCount, effectiveCurrentTime]);
 
   return (
-    <div className={clsx('rounded-sm border border-border bg-surface p-3', className)}>
-      <div className="mb-4 flex items-center justify-between">
-        <h3 className="font-mono text-base font-semibold text-foreground">Data Column Availability</h3>
-        <div className="flex flex-col items-end gap-1.5">
-          <span className={clsx('font-mono text-sm font-medium', isDataAvailable ? 'text-success' : 'text-danger')}>
+    <div className={clsx('rounded-sm border border-border bg-surface p-2', className)}>
+      <div className="mb-3 flex items-center justify-between">
+        <h3 className="font-mono text-sm font-semibold text-foreground">Data Column Availability</h3>
+        <div className="flex flex-col items-end gap-1">
+          <span className={clsx('font-mono text-xs font-medium', isDataAvailable ? 'text-success' : 'text-danger')}>
             {isDataAvailable ? '✓' : '✗'} Data available
           </span>
-          <span className="font-mono text-sm text-muted">{onTimeColumnCount} columns published on time</span>
+          <span className="font-mono text-xs text-muted">{onTimeColumnCount} columns published on time</span>
         </div>
       </div>
       <HeatmapChart
@@ -110,7 +110,7 @@ export function DataColumnDataAvailability({
         yAxisTitle="Blobs"
         xAxisShowOnlyMinMax={true}
         yAxisShowOnlyMinMax={true}
-        height={350}
+        height={240}
         min={0}
         max={maxTime}
         visualMapType="piecewise"
@@ -134,3 +134,5 @@ export function DataColumnDataAvailability({
     </div>
   );
 }
+
+export const DataColumnDataAvailability = memo(DataColumnDataAvailabilityComponent);

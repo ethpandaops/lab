@@ -21,6 +21,8 @@ import { Route as ExperimentsGeographicalChecklistRouteImport } from './routes/e
 import { Route as ExperimentsForkReadinessRouteImport } from './routes/experiments/fork-readiness'
 import { Route as ExperimentsBlockProductionFlowRouteImport } from './routes/experiments/block-production-flow'
 import { Route as ContributorsIdRouteImport } from './routes/contributors/$id'
+import { Route as ExperimentsSlotViewLiveRouteImport } from './routes/experiments/slot-view/live'
+import { Route as ExperimentsSlotViewSlotRouteImport } from './routes/experiments/slot-view/$slot'
 
 const ExperimentsRoute = ExperimentsRouteImport.update({
   id: '/experiments',
@@ -86,6 +88,16 @@ const ContributorsIdRoute = ContributorsIdRouteImport.update({
   path: '/$id',
   getParentRoute: () => ContributorsRoute,
 } as any)
+const ExperimentsSlotViewLiveRoute = ExperimentsSlotViewLiveRouteImport.update({
+  id: '/live',
+  path: '/live',
+  getParentRoute: () => ExperimentsSlotViewRoute,
+} as any)
+const ExperimentsSlotViewSlotRoute = ExperimentsSlotViewSlotRouteImport.update({
+  id: '/$slot',
+  path: '/$slot',
+  getParentRoute: () => ExperimentsSlotViewRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -97,9 +109,11 @@ export interface FileRoutesByFullPath {
   '/experiments/geographical-checklist': typeof ExperimentsGeographicalChecklistRoute
   '/experiments/locally-built-blocks': typeof ExperimentsLocallyBuiltBlocksRoute
   '/experiments/networks': typeof ExperimentsNetworksRoute
-  '/experiments/slot-view': typeof ExperimentsSlotViewRoute
+  '/experiments/slot-view': typeof ExperimentsSlotViewRouteWithChildren
   '/contributors/': typeof ContributorsIndexRoute
   '/experiments/': typeof ExperimentsIndexRoute
+  '/experiments/slot-view/$slot': typeof ExperimentsSlotViewSlotRoute
+  '/experiments/slot-view/live': typeof ExperimentsSlotViewLiveRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -109,9 +123,11 @@ export interface FileRoutesByTo {
   '/experiments/geographical-checklist': typeof ExperimentsGeographicalChecklistRoute
   '/experiments/locally-built-blocks': typeof ExperimentsLocallyBuiltBlocksRoute
   '/experiments/networks': typeof ExperimentsNetworksRoute
-  '/experiments/slot-view': typeof ExperimentsSlotViewRoute
+  '/experiments/slot-view': typeof ExperimentsSlotViewRouteWithChildren
   '/contributors': typeof ContributorsIndexRoute
   '/experiments': typeof ExperimentsIndexRoute
+  '/experiments/slot-view/$slot': typeof ExperimentsSlotViewSlotRoute
+  '/experiments/slot-view/live': typeof ExperimentsSlotViewLiveRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -124,9 +140,11 @@ export interface FileRoutesById {
   '/experiments/geographical-checklist': typeof ExperimentsGeographicalChecklistRoute
   '/experiments/locally-built-blocks': typeof ExperimentsLocallyBuiltBlocksRoute
   '/experiments/networks': typeof ExperimentsNetworksRoute
-  '/experiments/slot-view': typeof ExperimentsSlotViewRoute
+  '/experiments/slot-view': typeof ExperimentsSlotViewRouteWithChildren
   '/contributors/': typeof ContributorsIndexRoute
   '/experiments/': typeof ExperimentsIndexRoute
+  '/experiments/slot-view/$slot': typeof ExperimentsSlotViewSlotRoute
+  '/experiments/slot-view/live': typeof ExperimentsSlotViewLiveRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -143,6 +161,8 @@ export interface FileRouteTypes {
     | '/experiments/slot-view'
     | '/contributors/'
     | '/experiments/'
+    | '/experiments/slot-view/$slot'
+    | '/experiments/slot-view/live'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -155,6 +175,8 @@ export interface FileRouteTypes {
     | '/experiments/slot-view'
     | '/contributors'
     | '/experiments'
+    | '/experiments/slot-view/$slot'
+    | '/experiments/slot-view/live'
   id:
     | '__root__'
     | '/'
@@ -169,6 +191,8 @@ export interface FileRouteTypes {
     | '/experiments/slot-view'
     | '/contributors/'
     | '/experiments/'
+    | '/experiments/slot-view/$slot'
+    | '/experiments/slot-view/live'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -263,6 +287,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ContributorsIdRouteImport
       parentRoute: typeof ContributorsRoute
     }
+    '/experiments/slot-view/live': {
+      id: '/experiments/slot-view/live'
+      path: '/live'
+      fullPath: '/experiments/slot-view/live'
+      preLoaderRoute: typeof ExperimentsSlotViewLiveRouteImport
+      parentRoute: typeof ExperimentsSlotViewRoute
+    }
+    '/experiments/slot-view/$slot': {
+      id: '/experiments/slot-view/$slot'
+      path: '/$slot'
+      fullPath: '/experiments/slot-view/$slot'
+      preLoaderRoute: typeof ExperimentsSlotViewSlotRouteImport
+      parentRoute: typeof ExperimentsSlotViewRoute
+    }
   }
 }
 
@@ -280,13 +318,26 @@ const ContributorsRouteWithChildren = ContributorsRoute._addFileChildren(
   ContributorsRouteChildren,
 )
 
+interface ExperimentsSlotViewRouteChildren {
+  ExperimentsSlotViewSlotRoute: typeof ExperimentsSlotViewSlotRoute
+  ExperimentsSlotViewLiveRoute: typeof ExperimentsSlotViewLiveRoute
+}
+
+const ExperimentsSlotViewRouteChildren: ExperimentsSlotViewRouteChildren = {
+  ExperimentsSlotViewSlotRoute: ExperimentsSlotViewSlotRoute,
+  ExperimentsSlotViewLiveRoute: ExperimentsSlotViewLiveRoute,
+}
+
+const ExperimentsSlotViewRouteWithChildren =
+  ExperimentsSlotViewRoute._addFileChildren(ExperimentsSlotViewRouteChildren)
+
 interface ExperimentsRouteChildren {
   ExperimentsBlockProductionFlowRoute: typeof ExperimentsBlockProductionFlowRoute
   ExperimentsForkReadinessRoute: typeof ExperimentsForkReadinessRoute
   ExperimentsGeographicalChecklistRoute: typeof ExperimentsGeographicalChecklistRoute
   ExperimentsLocallyBuiltBlocksRoute: typeof ExperimentsLocallyBuiltBlocksRoute
   ExperimentsNetworksRoute: typeof ExperimentsNetworksRoute
-  ExperimentsSlotViewRoute: typeof ExperimentsSlotViewRoute
+  ExperimentsSlotViewRoute: typeof ExperimentsSlotViewRouteWithChildren
   ExperimentsIndexRoute: typeof ExperimentsIndexRoute
 }
 
@@ -296,7 +347,7 @@ const ExperimentsRouteChildren: ExperimentsRouteChildren = {
   ExperimentsGeographicalChecklistRoute: ExperimentsGeographicalChecklistRoute,
   ExperimentsLocallyBuiltBlocksRoute: ExperimentsLocallyBuiltBlocksRoute,
   ExperimentsNetworksRoute: ExperimentsNetworksRoute,
-  ExperimentsSlotViewRoute: ExperimentsSlotViewRoute,
+  ExperimentsSlotViewRoute: ExperimentsSlotViewRouteWithChildren,
   ExperimentsIndexRoute: ExperimentsIndexRoute,
 }
 

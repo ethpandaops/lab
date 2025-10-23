@@ -28,7 +28,6 @@ export const Default: Story = {
     currentTime: 9000,
     isPlaying: false,
     isLive: true,
-    title: 'Timeline',
   },
 };
 
@@ -39,7 +38,6 @@ export const Interactive: Story = {
     currentTime: 9000,
     isPlaying: false,
     isLive: true,
-    title: 'Timeline',
   },
   render: () => {
     const [currentTime, setCurrentTime] = useState(9000);
@@ -101,7 +99,6 @@ export const NotLive: Story = {
     currentTime: 5500,
     isPlaying: false,
     isLive: false,
-    title: 'Timeline',
   },
 };
 
@@ -111,18 +108,16 @@ export const Playing: Story = {
     currentTime: 6300,
     isPlaying: true,
     isLive: true,
-    title: 'Timeline',
   },
 };
 
 export const EarlyPhase: Story = {
-  name: 'Early Phase (Block Proposal)',
+  name: 'Early Phase (Block)',
   args: {
     phases: DEFAULT_BEACON_SLOT_PHASES,
     currentTime: 2000,
     isPlaying: false,
     isLive: true,
-    title: 'Timeline',
   },
 };
 
@@ -133,7 +128,6 @@ export const LatePhase: Story = {
     currentTime: 10500,
     isPlaying: false,
     isLive: true,
-    title: 'Timeline',
   },
 };
 
@@ -144,16 +138,15 @@ export const Complete: Story = {
     currentTime: 12000,
     isPlaying: false,
     isLive: false,
-    title: 'Timeline',
   },
 };
 
-export const CustomTitle: Story = {
+export const NoLiveIndicator: Story = {
+  name: 'Without Live Indicator',
   args: {
     phases: DEFAULT_BEACON_SLOT_PHASES,
     currentTime: 7200,
     isPlaying: false,
-    isLive: true,
-    title: 'Slot 1234567',
+    isLive: false,
   },
 };

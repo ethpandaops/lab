@@ -1,121 +1,72 @@
 import type { JSX } from 'react';
-import { useMemo } from 'react';
+import { useMemo, memo } from 'react';
 import clsx from 'clsx';
-import { ProgressBar } from '@/components/Navigation/ProgressBar';
 import { LineChart } from '@/components/Charts/Line';
 import type { AttestationArrivalsProps } from './AttestationArrivals.types';
 
 /**
  * AttestationArrivals - A page-specific component for showing attestation arrival data.
  *
- * Displays a progress bar showing current attestation percentage and two line charts:
- * 1. Interval arrivals - showing attestations received at each time interval
- * 2. Cumulative distribution - showing total attestations received up to each time point
+ * Displays attestation arrivals over time with a line chart showing attestations
+ * received at each time interval.
  *
  * Charts only render data up to the current slot time, simulating live progression.
  */
-export function AttestationArrivals({
+function AttestationArrivalsComponent({
   currentTime,
   data,
-  totalExpected,
+  totalExpected: _totalExpected,
   className,
 }: AttestationArrivalsProps): JSX.Element {
-  // Filter data to only show attestations up to current time
-  const visibleData = useMemo(() => {
-    return data.filter(point => point.time <= currentTime);
-  }, [data, currentTime]);
-
-  // Calculate current attestation count and percentage
-  const { currentCount, currentPercentage } = useMemo(() => {
-    const count = visibleData.reduce((sum, point) => sum + point.count, 0);
-    const percentage = totalExpected > 0 ? (count / totalExpected) * 100 : 0;
-    return { currentCount: count, currentPercentage: percentage };
-  }, [visibleData, totalExpected]);
-
-  // Calculate max values for Y-axis (using all data, not just visible)
-  const { intervalMax, cumulativeMax } = useMemo(() => {
+  // Calculate max value for Y-axis (using all data, not just visible)
+  const intervalMax = useMemo(() => {
     const counts = data.map(point => point.count);
-    const intervalMaxValue = counts.length > 0 ? Math.max(...counts) : 0;
-    // Cumulative max is always 100%
-    return { intervalMax: intervalMaxValue, cumulativeMax: 100 };
+    return counts.length > 0 ? Math.max(...counts) : 0;
   }, [data]);
 
   // Prepare data for interval arrivals chart - always show full 0-12s range
   const intervalChartData = useMemo(() => {
-    // Create labels for full time range
-    const labels = data.map(point => `${point.time.toFixed(1)}s`);
-    // Only show values up to current time, rest are null
-    const values = data.map(point => (point.time <= currentTime ? point.count : null));
-    return { labels, values };
-  }, [data, currentTime]);
+    // Create a complete time range from 0-12s in 50ms chunks (0, 50, 100, ..., 12000)
+    const timePoints = Array.from({ length: 241 }, (_, i) => i * 50); // 12000ms / 50ms = 240 intervals + 1
 
-  // Prepare data for cumulative distribution chart - always show full 0-12s range
-  const cumulativeChartData = useMemo(() => {
-    const labels: string[] = [];
-    const values: (number | null)[] = [];
-    let cumulative = 0;
+    // Create a map of time to count for quick lookup
+    const timeToCountMap = new Map(data.map(p => [p.time, p.count]));
 
-    data.forEach(point => {
-      labels.push(`${point.time.toFixed(1)}s`);
-      if (point.time <= currentTime) {
-        cumulative += point.count;
-        const percentage = totalExpected > 0 ? (cumulative / totalExpected) * 100 : 0;
-        values.push(Number(percentage.toFixed(2)));
-      } else {
-        values.push(null);
-      }
+    // Create labels (show in seconds)
+    const labels = timePoints.map(time => `${(time / 1000).toFixed(1)}s`);
+
+    // Map each time point to its count, or null if beyond current time or no data
+    const values = timePoints.map(time => {
+      if (time > currentTime) return null;
+      return timeToCountMap.get(time) ?? 0; // Default to 0 if no attestations at this time
     });
 
-    return { labels, values };
-  }, [data, currentTime, totalExpected]);
+    // Calculate interval to show labels at 0s, 4s, 8s, 12s
+    // 4s = 80 data points (4000ms / 50ms), so show every 80th label
+    const labelInterval = 79; // Skip 79, show every 80th (0, 80, 160, 240 = 0s, 4s, 8s, 12s)
+
+    return { labels, values, labelInterval };
+  }, [data, currentTime]);
 
   return (
-    <div className={clsx('flex flex-col gap-6', className)}>
-      {/* Header with inline progress bar */}
-      <div className="flex items-center justify-between gap-4">
-        <h2 className="text-xl font-semibold text-foreground">Attestations</h2>
-        <div className="w-80">
-          <ProgressBar
-            progress={currentPercentage}
-            statusMessage={`${currentCount} / ${totalExpected} (${currentPercentage.toFixed(1)}%)`}
-            ariaLabel="Attestation Progress"
-            fillColor="bg-success"
-          />
-        </div>
-      </div>
-
-      {/* Charts side by side */}
-      <div className="grid grid-cols-12 gap-4">
-        {/* Interval Arrivals Chart - 6 columns */}
-        <div className="col-span-6 rounded-sm border border-border bg-surface p-4">
-          <LineChart
-            data={intervalChartData.values}
-            labels={intervalChartData.labels}
-            title="Attestation Arrivals"
-            height={300}
-            smooth={false}
-            showArea={true}
-            yMax={intervalMax}
-            connectNulls={false}
-            animationDuration={150}
-          />
-        </div>
-
-        {/* Cumulative Distribution Chart - 6 columns */}
-        <div className="col-span-6 rounded-sm border border-border bg-surface p-4">
-          <LineChart
-            data={cumulativeChartData.values}
-            labels={cumulativeChartData.labels}
-            title="Cumulative Distribution (%)"
-            height={300}
-            smooth={true}
-            showArea={false}
-            yMax={cumulativeMax}
-            connectNulls={true}
-            animationDuration={150}
-          />
-        </div>
+    <div className={clsx('flex h-full flex-col', className)}>
+      {/* Attestation Arrivals Chart - takes full height */}
+      <div className="h-full rounded-sm border border-border bg-surface p-2">
+        <LineChart
+          data={intervalChartData.values}
+          labels={intervalChartData.labels}
+          title="Attestation Arrivals"
+          height="100%"
+          smooth={false}
+          showArea={true}
+          yMax={intervalMax}
+          connectNulls={false}
+          animationDuration={150}
+          xAxisLabelInterval={intervalChartData.labelInterval}
+        />
       </div>
     </div>
   );
 }
+
+export const AttestationArrivals = memo(AttestationArrivalsComponent);

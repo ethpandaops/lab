@@ -20,14 +20,10 @@ export interface SidebarProps {
   onForward?: () => void;
   /** Callback fired when user clicks on the timeline with the clicked time in milliseconds */
   onTimeClick?: (timeMs: number) => void;
-  /** Optional title for the slot timeline (defaults to "Timeline") */
-  title?: string;
   /** Show "Live" indicator */
   isLive?: boolean;
   /** Optional aria-label for slot timeline accessibility */
   ariaLabel?: string;
-  /** Height of the scrolling timeline container (default: '500px') */
-  scrollingTimelineHeight?: string;
   /** Whether auto-scrolling is enabled on the scrolling timeline (default: true) */
   autoScroll?: boolean;
   /** Format function for the scrolling timeline timestamp display */

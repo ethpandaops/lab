@@ -6,6 +6,7 @@ import * as echarts from 'echarts';
 import 'echarts-gl';
 import type { MapChartProps } from './Map.types';
 import { resolveCssColorToHex } from '@/utils/colour';
+import { useTheme } from '@/hooks/useTheme';
 
 /**
  * MapChart - A 3D map visualization component using ECharts GL
@@ -28,18 +29,22 @@ export function MapChart({
   title,
   height = 600,
   showEffect = true,
-  environment = '#333',
+  environment,
   lineColor,
   pointColor,
   pointSize = 4,
-  mapColor = '#000',
-  distance = 70,
+  mapColor,
+  distance = 120,
   alpha = 89,
   regionHeight = 0.5,
   minDistance = 40,
-  maxDistance = 150,
+  maxDistance = 200,
+  notMerge = false,
+  lazyUpdate = true,
 }: MapChartProps): React.JSX.Element {
-  const [themeColors] = useState(() => {
+  const { theme } = useTheme();
+
+  const [themeColors, setThemeColors] = useState(() => {
     // Get computed CSS variables from the root element on initial render
     const root = document.documentElement;
     const computedStyle = getComputedStyle(root);
@@ -48,6 +53,8 @@ export function MapChart({
     const fallbackColors = {
       primary: '#06b6d4', // fallback cyan-500
       foreground: '#09090b', // fallback zinc-950
+      background: '#ffffff', // fallback white
+      surface: '#fafafa', // fallback gray-50
     };
 
     // Extract theme colors from CSS variables
@@ -57,6 +64,8 @@ export function MapChart({
     const foregroundColor =
       computedStyle.getPropertyValue('--color-foreground').trim() ||
       computedStyle.getPropertyValue('--color-zinc-950').trim();
+    const backgroundColor = computedStyle.getPropertyValue('--color-background').trim();
+    const surfaceColor = computedStyle.getPropertyValue('--color-surface').trim();
 
     // Resolve CSS colors (oklch, color-mix, etc.) to hex for ECharts
     return {
@@ -64,8 +73,45 @@ export function MapChart({
       foreground: foregroundColor
         ? resolveCssColorToHex(foregroundColor, fallbackColors.foreground)
         : fallbackColors.foreground,
+      background: backgroundColor
+        ? resolveCssColorToHex(backgroundColor, fallbackColors.background)
+        : fallbackColors.background,
+      surface: surfaceColor ? resolveCssColorToHex(surfaceColor, fallbackColors.surface) : fallbackColors.surface,
     };
   });
+
+  // Update theme colors when theme changes
+  useEffect(() => {
+    const root = document.documentElement;
+    const computedStyle = getComputedStyle(root);
+
+    const fallbackColors = {
+      primary: '#06b6d4',
+      foreground: '#09090b',
+      background: '#ffffff',
+      surface: '#fafafa',
+    };
+
+    const primaryColor =
+      computedStyle.getPropertyValue('--color-primary').trim() ||
+      computedStyle.getPropertyValue('--color-cyan-500').trim();
+    const foregroundColor =
+      computedStyle.getPropertyValue('--color-foreground').trim() ||
+      computedStyle.getPropertyValue('--color-zinc-950').trim();
+    const backgroundColor = computedStyle.getPropertyValue('--color-background').trim();
+    const surfaceColor = computedStyle.getPropertyValue('--color-surface').trim();
+
+    setThemeColors({
+      primary: primaryColor ? resolveCssColorToHex(primaryColor, fallbackColors.primary) : fallbackColors.primary,
+      foreground: foregroundColor
+        ? resolveCssColorToHex(foregroundColor, fallbackColors.foreground)
+        : fallbackColors.foreground,
+      background: backgroundColor
+        ? resolveCssColorToHex(backgroundColor, fallbackColors.background)
+        : fallbackColors.background,
+      surface: surfaceColor ? resolveCssColorToHex(surfaceColor, fallbackColors.surface) : fallbackColors.surface,
+    });
+  }, [theme]);
 
   const [echartsInstance, setEchartsInstance] = useState<ECharts | null>(null);
   const [mapLoaded, setMapLoaded] = useState(false);
@@ -105,6 +151,11 @@ export function MapChart({
     }));
 
     const series: Array<Record<string, unknown>> = [];
+
+    // Determine theme-aware defaults
+    const isDark = theme === 'dark';
+    const defaultEnvironment = environment ?? (isDark ? '#18181b' : '#f4f4f5'); // zinc-900 : zinc-100
+    const defaultMapColor = mapColor ?? (isDark ? '#27272a' : '#e4e4e7'); // zinc-800 : zinc-200
 
     // Add routes series if there are routes
     if (routes.length > 0) {
@@ -154,7 +205,7 @@ export function MapChart({
     }
 
     return {
-      backgroundColor: environment,
+      backgroundColor: 'transparent',
       tooltip: {
         show: true,
         formatter: (params: Record<string, unknown>) => {
@@ -190,7 +241,7 @@ export function MapChart({
         map: 'world',
         shading: 'realistic',
         silent: true,
-        environment: environment,
+        environment: defaultEnvironment,
         realisticMaterial: {
           roughness: 0.8,
           metalness: 0,
@@ -203,11 +254,11 @@ export function MapChart({
         },
         light: {
           main: {
-            intensity: 1,
+            intensity: isDark ? 0.8 : 1.2,
             alpha: 30,
           },
           ambient: {
-            intensity: 0,
+            intensity: isDark ? 0.1 : 0,
           },
         },
         viewControl: {
@@ -221,7 +272,7 @@ export function MapChart({
           zoomSensitivity: 1,
         },
         itemStyle: {
-          color: mapColor,
+          color: defaultMapColor,
         },
         regionHeight: regionHeight,
       },
@@ -243,6 +294,7 @@ export function MapChart({
     minDistance,
     maxDistance,
     themeColors,
+    theme,
   ]);
 
   useEffect(() => {
@@ -262,11 +314,13 @@ export function MapChart({
   }
 
   return (
-    <div className="w-full">
+    <div className="h-full w-full">
       <ReactECharts
         option={option}
         style={{ height, width: '100%', minHeight: height }}
         onChartReady={instance => setEchartsInstance(instance)}
+        notMerge={notMerge}
+        lazyUpdate={lazyUpdate}
       />
     </div>
   );
