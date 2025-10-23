@@ -1,22 +1,8 @@
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 import ReactECharts from 'echarts-for-react';
 import { hexToRgba } from '@/utils';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import type { LineChartProps } from './Line.types';
-
-/**
- * Deep equality comparison for arrays, handling undefined values
- */
-function arraysEqual(a: unknown[] | undefined, b: unknown[] | undefined): boolean {
-  // Both undefined - equal
-  if (a === undefined && b === undefined) return true;
-  // One undefined, one not - not equal
-  if (a === undefined || b === undefined) return false;
-  // Different lengths - not equal
-  if (a.length !== b.length) return false;
-  // Check each element
-  return a.every((val, idx) => val === b[idx]);
-}
 
 /**
  * LineChart - A smoothed line chart component using ECharts
@@ -30,7 +16,7 @@ function arraysEqual(a: unknown[] | undefined, b: unknown[] | undefined): boolea
  * />
  * ```
  */
-function LineChartComponent({
+export function LineChart({
   data = [820, 932, 901, 934, 1290, 1330, 1320],
   labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
   title,
@@ -51,7 +37,7 @@ function LineChartComponent({
   notMerge = false,
   lazyUpdate = true,
   xAxisLabelInterval = 'auto',
-}: LineChartProps): React.JSX.Element {
+}: LineChartProps) {
   const themeColors = useThemeColors();
 
   const option = useMemo(
@@ -209,42 +195,3 @@ function LineChartComponent({
     </div>
   );
 }
-
-/**
- * Memoized LineChart component with deep equality comparison on data and labels arrays
- */
-export const LineChart = React.memo(LineChartComponent, (prevProps, nextProps) => {
-  // Compare all primitive props
-  if (
-    prevProps.title !== nextProps.title ||
-    prevProps.titleFontSize !== nextProps.titleFontSize ||
-    prevProps.titleFontFamily !== nextProps.titleFontFamily ||
-    prevProps.titleFontWeight !== nextProps.titleFontWeight ||
-    prevProps.titleLeft !== nextProps.titleLeft ||
-    prevProps.titleTop !== nextProps.titleTop ||
-    prevProps.height !== nextProps.height ||
-    prevProps.smooth !== nextProps.smooth ||
-    prevProps.showArea !== nextProps.showArea ||
-    prevProps.color !== nextProps.color ||
-    prevProps.yMax !== nextProps.yMax ||
-    prevProps.xMax !== nextProps.xMax ||
-    prevProps.connectNulls !== nextProps.connectNulls ||
-    prevProps.animationDuration !== nextProps.animationDuration ||
-    prevProps.notMerge !== nextProps.notMerge ||
-    prevProps.lazyUpdate !== nextProps.lazyUpdate ||
-    prevProps.xAxisLabelInterval !== nextProps.xAxisLabelInterval
-  ) {
-    return false; // Props changed, re-render
-  }
-
-  // Deep equality check on data and labels arrays
-  if (!arraysEqual(prevProps.data, nextProps.data)) {
-    return false; // Data changed, re-render
-  }
-
-  if (!arraysEqual(prevProps.labels, nextProps.labels)) {
-    return false; // Labels changed, re-render
-  }
-
-  return true; // All props equal, skip re-render
-});
