@@ -2,7 +2,6 @@ import { type JSX, memo } from 'react';
 import clsx from 'clsx';
 import { Timeline } from '@/pages/ethereum/slot-view/components/Timeline';
 import { ScrollingTimeline } from '@/components/Lists/ScrollingTimeline';
-import { Card } from '@/components/Layout/Card';
 import { SLOTS_PER_EPOCH } from '@/utils/beacon';
 import type { SidebarProps } from './Sidebar.types';
 

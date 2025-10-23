@@ -1,5 +1,5 @@
 import type React from 'react';
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, memo } from 'react';
 import ReactECharts from 'echarts-for-react';
 import type { ECharts } from 'echarts';
 import * as echarts from 'echarts';
@@ -23,7 +23,7 @@ import { useTheme } from '@/hooks/useTheme';
  * />
  * ```
  */
-export function MapChart({
+function MapChartComponent({
   routes = [],
   points = [],
   title,
@@ -254,3 +254,31 @@ export function MapChart({
     </div>
   );
 }
+
+/**
+ * Memoized MapChart component with custom comparison function
+ * Performs reference equality check on the points array to prevent unnecessary re-renders
+ */
+export const MapChart = memo(MapChartComponent, (prevProps, nextProps) => {
+  // Reference equality check for points array
+  // If points reference hasn't changed, component doesn't need to re-render
+  return (
+    prevProps.points === nextProps.points &&
+    prevProps.routes === nextProps.routes &&
+    prevProps.title === nextProps.title &&
+    prevProps.height === nextProps.height &&
+    prevProps.showEffect === nextProps.showEffect &&
+    prevProps.environment === nextProps.environment &&
+    prevProps.lineColor === nextProps.lineColor &&
+    prevProps.pointColor === nextProps.pointColor &&
+    prevProps.pointSize === nextProps.pointSize &&
+    prevProps.mapColor === nextProps.mapColor &&
+    prevProps.distance === nextProps.distance &&
+    prevProps.alpha === nextProps.alpha &&
+    prevProps.regionHeight === nextProps.regionHeight &&
+    prevProps.minDistance === nextProps.minDistance &&
+    prevProps.maxDistance === nextProps.maxDistance &&
+    prevProps.notMerge === nextProps.notMerge &&
+    prevProps.lazyUpdate === nextProps.lazyUpdate
+  );
+});

@@ -5,6 +5,7 @@ import clsx from 'clsx';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import type { BlobDataAvailabilityProps } from './BlobDataAvailability.types';
 import { CONTINENT_COLORS } from '@/theme/data-visualization-colors';
+import type { EChartsOption } from 'echarts';
 
 /**
  * BlobDataAvailability - Page-specific component for visualizing blob data availability
@@ -39,12 +40,9 @@ function BlobDataAvailabilityComponent({
 }: BlobDataAvailabilityProps): JSX.Element {
   const themeColors = useThemeColors();
 
-  // Prepare First Seen scatter chart data from pre-computed deduplicated data
-  const firstSeenOption = useMemo(() => {
-    const scatterData = deduplicatedBlobData.map(blob => [blob.time, blob.blobId, blob.color]);
-    const uniqueBlobIds = [...new Set(deduplicatedBlobData.map(b => b.blobId))].sort();
-
-    return {
+  // Static base configuration for First Seen chart (theme-dependent but data-independent)
+  const firstSeenBaseConfig = useMemo(
+    () => ({
       animation: false,
       title: {
         text: 'BLOB FIRST SEEN',
@@ -57,12 +55,13 @@ function BlobDataAvailabilityComponent({
       },
       grid: {
         top: 48,
+        bottom: 20,
         containLabel: true,
       },
       xAxis: {
-        type: 'value',
+        type: 'value' as const,
         name: 'Slot Time (s)',
-        nameLocation: 'middle',
+        nameLocation: 'middle' as const,
         nameGap: 25,
         nameTextStyle: {
           color: themeColors.muted,
@@ -70,7 +69,7 @@ function BlobDataAvailabilityComponent({
         },
         min: 0,
         max: maxTime,
-        interval: 4000, // Show labels at 0s, 4s, 8s, 12s
+        interval: 4000,
         axisLine: {
           lineStyle: {
             color: themeColors.border,
@@ -85,16 +84,93 @@ function BlobDataAvailabilityComponent({
           show: true,
           lineStyle: {
             color: themeColors.border,
-            type: 'solid',
+            type: 'solid' as const,
             opacity: 0.3,
           },
         },
       },
+      tooltip: {
+        trigger: 'item' as const,
+        backgroundColor: themeColors.background,
+        borderColor: themeColors.border,
+        borderWidth: 1,
+        textStyle: {
+          color: themeColors.foreground,
+          fontSize: 12,
+        },
+        formatter: (params: { data: [number, string] }) => {
+          return `Blob ${params.data[1]}<br/>Time: ${(params.data[0] / 1000).toFixed(2)}s`;
+        },
+      },
+      legend: {
+        show: false,
+        bottom: 8,
+        left: 'center' as const,
+      },
+    }),
+    [themeColors, maxTime]
+  );
+
+  // Static base configuration for Continental Propagation chart
+  const continentalPropagationBaseConfig = useMemo(
+    () => ({
+      animation: false,
+      title: {
+        text: 'CONTINENTAL PROPAGATION',
+        textStyle: {
+          color: themeColors.foreground,
+          fontSize: 13,
+        },
+        left: 16,
+        top: 12,
+      },
+      grid: {
+        top: 48,
+        bottom: 40, // Increased to make room for legend
+        containLabel: true,
+      },
+      tooltip: {
+        trigger: 'axis' as const,
+        backgroundColor: themeColors.background,
+        borderColor: themeColors.border,
+        borderWidth: 1,
+        textStyle: {
+          color: themeColors.foreground,
+          fontSize: 12,
+        },
+        formatter: (params: { seriesName: string; data: [number, number] }[]) => {
+          if (!params || params.length === 0) return '';
+          const time = (params[0].data[0] / 1000).toFixed(2);
+          const lines = [`Time: ${time}s`];
+          params.forEach(param => {
+            lines.push(`${param.seriesName}: ${param.data[1].toFixed(1)}%`);
+          });
+          return lines.join('<br/>');
+        },
+        axisPointer: {
+          type: 'line' as const,
+          lineStyle: {
+            color: themeColors.muted,
+            type: 'dashed' as const,
+          },
+        },
+      },
+    }),
+    [themeColors]
+  );
+
+  // Prepare First Seen scatter chart - only recreate when data changes
+  const firstSeenOption = useMemo((): EChartsOption => {
+    const scatterData = deduplicatedBlobData.map(blob => [blob.time, blob.blobId, blob.color]);
+    const uniqueBlobIds = [...new Set(deduplicatedBlobData.map(b => b.blobId))].sort();
+
+    return {
+      ...firstSeenBaseConfig,
       yAxis: {
-        type: 'category',
+        type: 'category' as const,
         data: uniqueBlobIds,
         name: 'Blob',
-        nameLocation: 'middle',
+        nameLocation: 'middle' as const,
         nameGap: 40,
         nameTextStyle: {
           color: themeColors.muted,
@@ -113,14 +189,14 @@ function BlobDataAvailabilityComponent({
           show: true,
           lineStyle: {
             color: themeColors.border,
-            type: 'solid',
+            type: 'solid' as const,
             opacity: 0.3,
           },
         },
       },
       series: [
         {
-          type: 'scatter',
+          type: 'scatter' as const,
           data: scatterData,
           symbolSize: 8,
           itemStyle: {
@@ -130,29 +206,11 @@ function BlobDataAvailabilityComponent({
           },
         },
       ],
-      tooltip: {
-        trigger: 'item',
-        backgroundColor: themeColors.background,
-        borderColor: themeColors.border,
-        borderWidth: 1,
-        textStyle: {
-          color: themeColors.foreground,
-          fontSize: 12,
-        },
-        formatter: (params: { data: [number, string] }) => {
-          return `Blob ${params.data[1]}<br/>Time: ${(params.data[0] / 1000).toFixed(2)}s`;
-        },
-      },
-      legend: {
-        show: false,
-        bottom: 8,
-        left: 'center',
-      },
-    };
-  }, [deduplicatedBlobData, themeColors, maxTime]);
+    } as EChartsOption;
+  }, [deduplicatedBlobData, firstSeenBaseConfig, themeColors]);
 
-  // Prepare Continental Propagation chart data from pre-computed filtered data
-  const continentalPropagationOption = useMemo(() => {
+  // Prepare Continental Propagation chart - only recreate when data changes
+  const continentalPropagationOption = useMemo((): EChartsOption => {
     // Fallback colors array from CONTINENT_COLORS for unknown continents
     const defaultColors = Object.values(CONTINENT_COLORS);
 
@@ -185,24 +243,11 @@ function BlobDataAvailabilityComponent({
     const xAxisMax = hasActiveData ? Math.min(maxTime, maxActiveTime + padding) : maxTime;
 
     return {
-      animation: false,
-      title: {
-        text: 'CONTINENTAL PROPAGATION',
-        textStyle: {
-          color: themeColors.foreground,
-          fontSize: 13,
-        },
-        left: 16,
-        top: 12,
-      },
-      grid: {
-        top: 48,
-        containLabel: true,
-      },
+      ...continentalPropagationBaseConfig,
       xAxis: {
-        type: 'value',
+        type: 'value' as const,
         name: 'Slot Time (s)',
-        nameLocation: 'middle',
+        nameLocation: 'middle' as const,
         nameGap: 25,
         nameTextStyle: {
           color: themeColors.muted,
@@ -224,15 +269,15 @@ function BlobDataAvailabilityComponent({
           show: true,
           lineStyle: {
             color: themeColors.border,
-            type: 'solid',
+            type: 'solid' as const,
             opacity: 0.3,
           },
         },
       },
       yAxis: {
-        type: 'value',
+        type: 'value' as const,
         name: 'Complete',
-        nameLocation: 'middle',
+        nameLocation: 'middle' as const,
         nameGap: 40,
         nameTextStyle: {
           color: themeColors.muted,
@@ -249,7 +294,7 @@ function BlobDataAvailabilityComponent({
           show: true,
           lineStyle: {
             color: themeColors.border,
-            type: 'solid',
+            type: 'solid' as const,
             opacity: 0.3,
           },
         },
@@ -262,9 +307,9 @@ function BlobDataAvailabilityComponent({
       series: visibleContinentalPropagationData.map((continent, idx) => ({
         name: continent.continent,
         data: continent.data.map(point => [point.time, point.percentage]),
-        type: 'line',
-        step: 'end',
-        symbol: 'none',
+        type: 'line' as const,
+        step: 'end' as const,
+        symbol: 'none' as const,
         showSymbol: false,
         lineStyle: {
           color: continent.color || defaultColors[idx % defaultColors.length],
@@ -273,9 +318,9 @@ function BlobDataAvailabilityComponent({
       })),
       legend: {
         show: visibleContinentalPropagationData.length > 0,
-        orient: 'horizontal',
+        orient: 'horizontal' as const,
         bottom: 4,
-        left: 'center',
+        left: 'center' as const,
         textStyle: {
           color: themeColors.foreground,
           fontSize: 9,
@@ -284,39 +329,13 @@ function BlobDataAvailabilityComponent({
         itemHeight: 2,
         itemGap: 12,
       },
-      tooltip: {
-        trigger: 'axis',
-        backgroundColor: themeColors.background,
-        borderColor: themeColors.border,
-        borderWidth: 1,
-        textStyle: {
-          color: themeColors.foreground,
-          fontSize: 12,
-        },
-        formatter: (params: { seriesName: string; data: [number, number] }[]) => {
-          if (!params || params.length === 0) return '';
-          const time = (params[0].data[0] / 1000).toFixed(2);
-          const lines = [`Time: ${time}s`];
-          params.forEach(param => {
-            lines.push(`${param.seriesName}: ${param.data[1].toFixed(1)}%`);
-          });
-          return lines.join('<br/>');
-        },
-        axisPointer: {
-          type: 'line',
-          lineStyle: {
-            color: themeColors.muted,
-            type: 'dashed',
-          },
-        },
-      },
-    };
-  }, [visibleContinentalPropagationData, themeColors, maxTime]);
+    } as EChartsOption;
+  }, [visibleContinentalPropagationData, continentalPropagationBaseConfig, themeColors, maxTime]);
 
   return (
     <div className={clsx('grid h-full grid-cols-12 gap-4', className)}>
       {/* First Seen Chart - 6 columns */}
-      <div className="col-span-6 h-full rounded-sm border border-border bg-surface p-2">
+      <div className="col-span-6 h-full rounded-sm border border-border bg-surface p-1">
         <ReactECharts
           option={firstSeenOption}
           style={{ height: '100%', width: '100%' }}
@@ -326,7 +345,7 @@ function BlobDataAvailabilityComponent({
       </div>
 
       {/* Continental Propagation Chart - 6 columns */}
-      <div className="col-span-6 h-full rounded-sm border border-border bg-surface p-2">
+      <div className="col-span-6 h-full rounded-sm border border-border bg-surface p-1">
         <ReactECharts
           option={continentalPropagationOption}
           style={{ height: '100%', width: '100%' }}

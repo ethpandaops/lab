@@ -1,8 +1,22 @@
-import type React from 'react';
+import React, { useMemo } from 'react';
 import ReactECharts from 'echarts-for-react';
 import { hexToRgba } from '@/utils';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import type { LineChartProps } from './Line.types';
+
+/**
+ * Deep equality comparison for arrays, handling undefined values
+ */
+function arraysEqual(a: unknown[] | undefined, b: unknown[] | undefined): boolean {
+  // Both undefined - equal
+  if (a === undefined && b === undefined) return true;
+  // One undefined, one not - not equal
+  if (a === undefined || b === undefined) return false;
+  // Different lengths - not equal
+  if (a.length !== b.length) return false;
+  // Check each element
+  return a.every((val, idx) => val === b[idx]);
+}
 
 /**
  * LineChart - A smoothed line chart component using ECharts
@@ -16,7 +30,7 @@ import type { LineChartProps } from './Line.types';
  * />
  * ```
  */
-export function LineChart({
+function LineChartComponent({
   data = [820, 932, 901, 934, 1290, 1330, 1320],
   labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
   title,
@@ -40,124 +54,149 @@ export function LineChart({
 }: LineChartProps): React.JSX.Element {
   const themeColors = useThemeColors();
 
-  const option = {
-    animation: true,
-    animationDuration,
-    animationEasing: 'cubicOut',
-    title: title
-      ? {
-          text: title,
-          textStyle: {
-            color: themeColors.foreground,
-            fontSize: titleFontSize,
-            fontWeight: titleFontWeight,
-            fontFamily: titleFontFamily,
-          },
-          left: titleLeft,
-          top: titleTop,
-        }
-      : undefined,
-    grid: {
-      top: title ? 52 : 16,
-      right: 24,
-      bottom: 32,
-      left: 48,
-      containLabel: true,
-    },
-    xAxis: {
-      type: 'category',
-      data: labels,
-      boundaryGap: false,
-      max: xMax !== undefined ? xMax : undefined,
-      axisLine: {
-        lineStyle: {
-          color: themeColors.border,
-        },
+  const option = useMemo(
+    () => ({
+      animation: true,
+      animationDuration,
+      animationEasing: 'cubicOut',
+      title: title
+        ? {
+            text: title,
+            textStyle: {
+              color: themeColors.foreground,
+              fontSize: titleFontSize,
+              fontWeight: titleFontWeight,
+              fontFamily: titleFontFamily,
+            },
+            left: titleLeft,
+            top: titleTop,
+          }
+        : undefined,
+      grid: {
+        top: title ? 52 : 16,
+        right: 24,
+        bottom: 32,
+        left: 48,
+        containLabel: true,
       },
-      axisLabel: {
-        color: themeColors.muted,
-        fontSize: 12,
-        interval: xAxisLabelInterval,
-      },
-    },
-    yAxis: {
-      type: 'value',
-      max: yMax,
-      axisLine: {
-        show: false,
-      },
-      axisTick: {
-        show: false,
-      },
-      splitLine: {
-        lineStyle: {
-          color: themeColors.border,
-          type: 'dashed',
-        },
-      },
-      axisLabel: {
-        color: themeColors.muted,
-        fontSize: 12,
-      },
-    },
-    series: [
-      {
-        data,
-        type: 'line',
-        smooth,
-        connectNulls,
-        symbol: 'none',
-        showSymbol: false,
-        lineStyle: {
-          color: color || themeColors.primary,
-          width: 3,
-        },
-        areaStyle: showArea
-          ? {
-              color: {
-                type: 'linear',
-                x: 0,
-                y: 0,
-                x2: 0,
-                y2: 1,
-                colorStops: [
-                  {
-                    offset: 0,
-                    color: hexToRgba(color || themeColors.primary, 0.5),
-                  },
-                  {
-                    offset: 1,
-                    color: hexToRgba(color || themeColors.primary, 0.06),
-                  },
-                ],
-              },
-            }
-          : undefined,
-        emphasis: {
+      xAxis: {
+        type: 'category',
+        data: labels,
+        boundaryGap: false,
+        max: xMax !== undefined ? xMax : undefined,
+        axisLine: {
           lineStyle: {
-            width: 4,
+            color: themeColors.border,
+          },
+        },
+        axisLabel: {
+          color: themeColors.muted,
+          fontSize: 12,
+          interval: xAxisLabelInterval,
+        },
+      },
+      yAxis: {
+        type: 'value',
+        max: yMax,
+        axisLine: {
+          show: false,
+        },
+        axisTick: {
+          show: false,
+        },
+        splitLine: {
+          lineStyle: {
+            color: themeColors.border,
+            type: 'dashed',
+          },
+        },
+        axisLabel: {
+          color: themeColors.muted,
+          fontSize: 12,
+        },
+      },
+      series: [
+        {
+          data,
+          type: 'line',
+          smooth,
+          connectNulls,
+          symbol: 'none',
+          showSymbol: false,
+          lineStyle: {
+            color: color || themeColors.primary,
+            width: 3,
+          },
+          areaStyle: showArea
+            ? {
+                color: {
+                  type: 'linear',
+                  x: 0,
+                  y: 0,
+                  x2: 0,
+                  y2: 1,
+                  colorStops: [
+                    {
+                      offset: 0,
+                      color: hexToRgba(color || themeColors.primary, 0.5),
+                    },
+                    {
+                      offset: 1,
+                      color: hexToRgba(color || themeColors.primary, 0.06),
+                    },
+                  ],
+                },
+              }
+            : undefined,
+          emphasis: {
+            lineStyle: {
+              width: 4,
+            },
+          },
+        },
+      ],
+      tooltip: {
+        trigger: 'axis',
+        backgroundColor: themeColors.background,
+        borderColor: themeColors.border,
+        borderWidth: 1,
+        textStyle: {
+          color: themeColors.foreground,
+          fontSize: 12,
+        },
+        axisPointer: {
+          type: 'line',
+          lineStyle: {
+            color: themeColors.muted,
+            type: 'dashed',
           },
         },
       },
-    ],
-    tooltip: {
-      trigger: 'axis',
-      backgroundColor: themeColors.background,
-      borderColor: themeColors.border,
-      borderWidth: 1,
-      textStyle: {
-        color: themeColors.foreground,
-        fontSize: 12,
-      },
-      axisPointer: {
-        type: 'line',
-        lineStyle: {
-          color: themeColors.muted,
-          type: 'dashed',
-        },
-      },
-    },
-  };
+    }),
+    [
+      data,
+      labels,
+      title,
+      titleFontSize,
+      titleFontWeight,
+      titleFontFamily,
+      titleLeft,
+      titleTop,
+      smooth,
+      showArea,
+      color,
+      yMax,
+      xMax,
+      connectNulls,
+      animationDuration,
+      xAxisLabelInterval,
+      themeColors.foreground,
+      themeColors.border,
+      themeColors.muted,
+      themeColors.primary,
+      themeColors.background,
+    ]
+  );
 
   return (
     <div className={height === '100%' ? 'h-full w-full' : 'w-full'}>
@@ -170,3 +209,42 @@ export function LineChart({
     </div>
   );
 }
+
+/**
+ * Memoized LineChart component with deep equality comparison on data and labels arrays
+ */
+export const LineChart = React.memo(LineChartComponent, (prevProps, nextProps) => {
+  // Compare all primitive props
+  if (
+    prevProps.title !== nextProps.title ||
+    prevProps.titleFontSize !== nextProps.titleFontSize ||
+    prevProps.titleFontFamily !== nextProps.titleFontFamily ||
+    prevProps.titleFontWeight !== nextProps.titleFontWeight ||
+    prevProps.titleLeft !== nextProps.titleLeft ||
+    prevProps.titleTop !== nextProps.titleTop ||
+    prevProps.height !== nextProps.height ||
+    prevProps.smooth !== nextProps.smooth ||
+    prevProps.showArea !== nextProps.showArea ||
+    prevProps.color !== nextProps.color ||
+    prevProps.yMax !== nextProps.yMax ||
+    prevProps.xMax !== nextProps.xMax ||
+    prevProps.connectNulls !== nextProps.connectNulls ||
+    prevProps.animationDuration !== nextProps.animationDuration ||
+    prevProps.notMerge !== nextProps.notMerge ||
+    prevProps.lazyUpdate !== nextProps.lazyUpdate ||
+    prevProps.xAxisLabelInterval !== nextProps.xAxisLabelInterval
+  ) {
+    return false; // Props changed, re-render
+  }
+
+  // Deep equality check on data and labels arrays
+  if (!arraysEqual(prevProps.data, nextProps.data)) {
+    return false; // Data changed, re-render
+  }
+
+  if (!arraysEqual(prevProps.labels, nextProps.labels)) {
+    return false; // Labels changed, re-render
+  }
+
+  return true; // All props equal, skip re-render
+});

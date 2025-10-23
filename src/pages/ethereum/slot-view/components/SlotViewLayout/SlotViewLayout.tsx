@@ -47,33 +47,37 @@ export function SlotViewLayout({ mode }: SlotViewLayoutProps): JSX.Element {
   // Fetch all slot data
   const slotData = useSlotViewData(currentSlot);
 
+  // Pre-compute static time points array (0-12s in 50ms chunks) outside of memo
+  // This prevents creating a new 241-element array every 100ms
+  const TIME_POINTS = useMemo(() => Array.from({ length: 241 }, (_, i) => i * 50), []);
+
   // Pre-compute all time-filtered data once when currentTime changes
   // This prevents child components from filtering data on every render
   const timeFilteredData = useMemo<TimeFilteredData>(() => {
     // Filter map points - only show nodes that have seen the block
     const visibleMapPoints = slotData.mapPoints.filter(point => point.earliestSeenTime <= currentTime);
 
-    // Filter attestation data for BlockDetailsCard
-    const visibleAttestationData = slotData.attestationData.filter(point => point.time <= currentTime);
-    const attestationCount = visibleAttestationData.reduce((sum, point) => sum + point.count, 0);
+    // Use actual attestation count (number of validators who attested) from API
+    const attestationCount = slotData.attestationActualCount;
     const attestationPercentage =
       slotData.attestationTotalExpected > 0 ? (attestationCount / slotData.attestationTotalExpected) * 100 : 0;
 
     // Filter blob first seen data for BlobDataAvailability
     const visibleBlobFirstSeenData = slotData.blobFirstSeenData.filter(point => point.time <= currentTime);
 
-    // Deduplicate blob data - only show the FIRST time each blob was seen
-    const blobFirstSeenMap = new Map<string, { time: number; color?: string }>();
-    visibleBlobFirstSeenData.forEach(point => {
-      const existing = blobFirstSeenMap.get(point.blobId);
+    // Deduplicate blob data - optimized single-pass algorithm
+    const blobFirstSeenObj: Record<string, { time: number; color?: string }> = {};
+    for (let i = 0; i < visibleBlobFirstSeenData.length; i++) {
+      const point = visibleBlobFirstSeenData[i];
+      const existing = blobFirstSeenObj[point.blobId];
       if (!existing || point.time < existing.time) {
-        blobFirstSeenMap.set(point.blobId, { time: point.time, color: point.color });
+        blobFirstSeenObj[point.blobId] = { time: point.time, color: point.color };
       }
-    });
-    const deduplicatedBlobData = Array.from(blobFirstSeenMap.entries()).map(([blobId, data]) => ({
+    }
+    const deduplicatedBlobData = Object.keys(blobFirstSeenObj).map(blobId => ({
       blobId,
-      time: data.time,
-      color: data.color,
+      time: blobFirstSeenObj[blobId].time,
+      color: blobFirstSeenObj[blobId].color,
     }));
 
     // Filter continental propagation data for BlobDataAvailability
@@ -83,17 +87,15 @@ export function SlotViewLayout({ mode }: SlotViewLayoutProps): JSX.Element {
     }));
 
     // Pre-compute attestation chart data for AttestationArrivals
-    // Create a complete time range from 0-12s in 50ms chunks
-    const timePoints = Array.from({ length: 241 }, (_, i) => i * 50);
+    // Use pre-computed static TIME_POINTS array
     const timeToCountMap = new Map(slotData.attestationData.map(p => [p.time, p.count]));
-    const attestationChartValues = timePoints.map(time => {
+    const attestationChartValues = TIME_POINTS.map(time => {
       if (time > currentTime) return null;
       return timeToCountMap.get(time) ?? 0;
     });
 
     return {
       visibleMapPoints,
-      visibleAttestationData,
       attestationCount,
       attestationPercentage,
       deduplicatedBlobData,
@@ -101,9 +103,11 @@ export function SlotViewLayout({ mode }: SlotViewLayoutProps): JSX.Element {
       attestationChartValues,
     };
   }, [
+    TIME_POINTS,
     slotData.mapPoints,
     slotData.attestationData,
     slotData.attestationTotalExpected,
+    slotData.attestationActualCount,
     slotData.blobFirstSeenData,
     slotData.blobContinentalPropagationData,
     currentTime,
@@ -163,6 +167,7 @@ export function SlotViewLayout({ mode }: SlotViewLayoutProps): JSX.Element {
           visibleContinentalPropagationData={timeFilteredData.visibleContinentalPropagationData}
           attestationChartValues={timeFilteredData.attestationChartValues}
           attestationTotalExpected={slotData.attestationTotalExpected}
+          attestationMaxCount={slotData.attestationMaxCount}
           mode={mode}
         />
       </div>

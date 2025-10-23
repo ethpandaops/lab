@@ -9,6 +9,7 @@ import {
   fctBlockFirstSeenByNodeServiceListOptions,
   fctBlockBlobFirstSeenByNodeServiceListOptions,
   fctAttestationFirstSeenChunked50MsServiceListOptions,
+  intBeaconCommitteeHeadServiceListOptions,
 } from '@/api/@tanstack/react-query.gen';
 import { slotToTimestamp } from '../../utils';
 import { useBlockDetailsData } from '../useBlockDetailsData';
@@ -148,6 +149,22 @@ export function useSlotViewData(currentSlot: number): SlotViewData {
     },
   });
 
+  // API Query 8: Beacon Committee (List) - for total expected validators
+  const committeeQuery = useQuery({
+    ...intBeaconCommitteeHeadServiceListOptions({
+      query: {
+        slot_start_date_time_eq: slotStartDateTime,
+        page_size: 10000, // Ensure we get all committees for the slot
+      },
+    }),
+    enabled: slotStartDateTime > 0,
+    retry: (failureCount, error) => {
+      if (error && typeof error === 'object' && 'status' in error && error.status === 404) return false;
+      return failureCount < 3;
+    },
+  });
+
+
   // Aggregate loading state (critical queries only)
   // If slotStartDateTime is 0, queries are disabled but we should still show loading
   const isLoading =
@@ -207,11 +224,30 @@ export function useSlotViewData(currentSlot: number): SlotViewData {
     continentalPropagationData: blobContinentalPropagationData,
   } = useBlobAvailabilityData(blobFirstSeenQuery.data?.fct_block_blob_first_seen_by_node ?? EMPTY_BLOB_FIRST_SEEN);
 
-  const { data: attestationData, totalExpected: attestationTotalExpected } = useAttestationData(
-    attestationQuery.data?.fct_attestation_first_seen_chunked_50ms ?? EMPTY_ATTESTATION
+  // Calculate total expected validators from committee data
+  const totalExpectedValidators = useMemo(() => {
+    const committees = committeeQuery.data?.int_beacon_committee_head ?? [];
+    return committees.reduce((sum, committee) => {
+      return sum + (committee.validators?.length ?? 0);
+    }, 0);
+  }, [committeeQuery.data]);
+
+  const {
+    data: attestationData,
+    totalExpected: attestationTotalExpected,
+    maxCount: attestationMaxCount,
+  } = useAttestationData(
+    attestationQuery.data?.fct_attestation_first_seen_chunked_50ms ?? EMPTY_ATTESTATION,
+    totalExpectedValidators
   );
 
   const blobCount = blobCountQuery.data?.fct_block_blob_count?.[0]?.blob_count ?? 0;
+
+  // TODO: Fix attestation actual count
+  // The chunked API returns 2x the correct count (double-counting issue)
+  // Other APIs either return no data or 400 errors
+  // For now, just return 0 to avoid showing incorrect data
+  const attestationActualCount = 0;
 
   return useMemo(
     () => ({
@@ -227,6 +263,8 @@ export function useSlotViewData(currentSlot: number): SlotViewData {
       dataColumnFirstSeenData: EMPTY_DATA_COLUMN, // Placeholder - no API data yet
       attestationData,
       attestationTotalExpected,
+      attestationActualCount,
+      attestationMaxCount,
       isLoading,
       errors,
     }),
@@ -241,6 +279,8 @@ export function useSlotViewData(currentSlot: number): SlotViewData {
       blobContinentalPropagationData,
       attestationData,
       attestationTotalExpected,
+      attestationActualCount,
+      attestationMaxCount,
       isLoading,
       errors,
     ]

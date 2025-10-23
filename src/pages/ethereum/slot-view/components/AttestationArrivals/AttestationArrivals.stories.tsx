@@ -37,6 +37,7 @@ const generateAttestationData = (): AttestationDataPoint[] => {
 
 const ATTESTATION_DATA = generateAttestationData();
 const TOTAL_EXPECTED = ATTESTATION_DATA.reduce((sum, point) => sum + point.count, 0);
+const MAX_COUNT = Math.max(...ATTESTATION_DATA.map(point => point.count));
 
 // Helper function to convert AttestationDataPoint[] to chart values format
 const convertToChartValues = (data: AttestationDataPoint[], currentTime: number): (number | null)[] => {
@@ -73,6 +74,7 @@ export const Default: Story = {
     currentTime: 4000,
     attestationChartValues: convertToChartValues(ATTESTATION_DATA, 4000),
     totalExpected: TOTAL_EXPECTED,
+    maxCount: MAX_COUNT,
   },
 };
 
@@ -130,6 +132,7 @@ export const Interactive: Story = {
           currentTime={currentTime}
           attestationChartValues={chartValues}
           totalExpected={TOTAL_EXPECTED}
+          maxCount={MAX_COUNT}
         />
       </div>
     );
@@ -142,6 +145,7 @@ export const EarlyPhase: Story = {
     currentTime: 1000,
     attestationChartValues: convertToChartValues(ATTESTATION_DATA, 1000),
     totalExpected: TOTAL_EXPECTED,
+    maxCount: MAX_COUNT,
   },
 };
 
@@ -151,6 +155,7 @@ export const PeakPhase: Story = {
     currentTime: 2000,
     attestationChartValues: convertToChartValues(ATTESTATION_DATA, 2000),
     totalExpected: TOTAL_EXPECTED,
+    maxCount: MAX_COUNT,
   },
 };
 
@@ -160,6 +165,7 @@ export const MidPhase: Story = {
     currentTime: 4000,
     attestationChartValues: convertToChartValues(ATTESTATION_DATA, 4000),
     totalExpected: TOTAL_EXPECTED,
+    maxCount: MAX_COUNT,
   },
 };
 
@@ -169,6 +175,7 @@ export const LatePhase: Story = {
     currentTime: 8000,
     attestationChartValues: convertToChartValues(ATTESTATION_DATA, 8000),
     totalExpected: TOTAL_EXPECTED,
+    maxCount: MAX_COUNT,
   },
 };
 
@@ -178,6 +185,7 @@ export const Complete: Story = {
     currentTime: 12000,
     attestationChartValues: convertToChartValues(ATTESTATION_DATA, 12000),
     totalExpected: TOTAL_EXPECTED,
+    maxCount: MAX_COUNT,
   },
 };
 
@@ -187,6 +195,7 @@ export const VeryEarly: Story = {
     currentTime: 500,
     attestationChartValues: convertToChartValues(ATTESTATION_DATA, 500),
     totalExpected: TOTAL_EXPECTED,
+    maxCount: MAX_COUNT,
   },
 };
 
@@ -196,5 +205,6 @@ export const NoData: Story = {
     currentTime: 0,
     attestationChartValues: convertToChartValues(ATTESTATION_DATA, 0),
     totalExpected: TOTAL_EXPECTED,
+    maxCount: MAX_COUNT,
   },
 };

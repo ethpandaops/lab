@@ -13,6 +13,7 @@ function BottomBarComponent({
   visibleContinentalPropagationData,
   attestationChartValues,
   attestationTotalExpected,
+  attestationMaxCount,
   mode: _mode,
 }: BottomBarProps): JSX.Element {
   // Detect block version to choose availability component
@@ -57,6 +58,7 @@ function BottomBarComponent({
           currentTime={currentTime}
           attestationChartValues={attestationChartValues}
           totalExpected={attestationTotalExpected}
+          maxCount={attestationMaxCount}
         />
       </div>
     </div>
@@ -71,7 +73,8 @@ const arePropsEqual = (prevProps: BottomBarProps, nextProps: BottomBarProps): bo
     prevProps.deduplicatedBlobData === nextProps.deduplicatedBlobData &&
     prevProps.visibleContinentalPropagationData === nextProps.visibleContinentalPropagationData &&
     prevProps.attestationChartValues === nextProps.attestationChartValues &&
-    prevProps.attestationTotalExpected === nextProps.attestationTotalExpected
+    prevProps.attestationTotalExpected === nextProps.attestationTotalExpected &&
+    prevProps.attestationMaxCount === nextProps.attestationMaxCount
   );
 };
 

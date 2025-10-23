@@ -7,6 +7,7 @@ function SlotViewPage(): JSX.Element {
   return (
     <SlotPlayerProvider
       tables={['fct_block_head', 'fct_block_first_seen_by_node', 'fct_attestation_first_seen_chunked_50ms']}
+      initialPlaying={true}
     >
       <IndexPage />
     </SlotPlayerProvider>

@@ -12,6 +12,8 @@ export interface AttestationArrivalsProps {
   attestationChartValues: (number | null)[];
   /** Total number of expected attestations (for percentage calculation) */
   totalExpected: number;
+  /** Maximum count across all data points (for yMax scaling) */
+  maxCount: number;
   /** Optional class name for the container */
   className?: string;
 }

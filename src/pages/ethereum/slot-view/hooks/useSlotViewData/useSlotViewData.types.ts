@@ -33,6 +33,8 @@ export interface SlotViewData {
   // Attestation arrivals
   attestationData: AttestationDataPoint[];
   attestationTotalExpected: number;
+  attestationActualCount: number; // Actual count of validators who attested
+  attestationMaxCount: number; // Max count across all time points for yMax
 
   // State
   isLoading: boolean;

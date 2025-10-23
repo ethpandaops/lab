@@ -16,14 +16,9 @@ function AttestationArrivalsComponent({
   currentTime: _currentTime,
   attestationChartValues,
   totalExpected: _totalExpected,
+  maxCount,
   className,
 }: AttestationArrivalsProps): JSX.Element {
-  // Calculate max value for Y-axis from pre-computed chart values
-  const intervalMax = useMemo(() => {
-    const nonNullValues = attestationChartValues.filter((v): v is number => v !== null);
-    return nonNullValues.length > 0 ? Math.max(...nonNullValues) : 0;
-  }, [attestationChartValues]);
-
   // Prepare data for interval arrivals chart from pre-computed values
   const intervalChartData = useMemo(() => {
     // Create labels for 0-12s in 50ms chunks
@@ -51,7 +46,7 @@ function AttestationArrivalsComponent({
           height="100%"
           smooth={false}
           showArea={true}
-          yMax={intervalMax}
+          yMax={maxCount}
           connectNulls={false}
           animationDuration={150}
           xAxisLabelInterval={intervalChartData.labelInterval}

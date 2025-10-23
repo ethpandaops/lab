@@ -1,5 +1,4 @@
 import type { MapPointWithTiming } from '../../hooks/useMapData/useMapData';
-import type { AttestationDataPoint } from '../AttestationArrivals/AttestationArrivals.types';
 import type { ContinentalPropagationSeries } from '../BlobDataAvailability/BlobDataAvailability.types';
 
 export interface SlotViewLayoutProps {
@@ -14,9 +13,8 @@ export interface TimeFilteredData {
   // Map visualization
   visibleMapPoints: MapPointWithTiming[];
 
-  // Attestation data for BlockDetailsCard
-  visibleAttestationData: AttestationDataPoint[];
-  attestationCount: number;
+  // Attestation data for BlockDetailsCard (from API, not time-filtered)
+  attestationCount: number; // Actual count of validators who attested
   attestationPercentage: number;
 
   // Blob data for BlobDataAvailability (deduplicated and filtered)

@@ -1,12 +1,10 @@
 import { type JSX, memo } from 'react';
 import { Card } from '@/components/Layout/Card';
-import { Badge } from '@/components/Elements/Badge';
 import { ProgressBar } from '@/components/Navigation/ProgressBar';
-import { formatWeiToEth, formatNumber, formatGasPercentage } from '../../utils';
 import type { BlockDetailsCardProps } from './BlockDetailsCard.types';
 
 function BlockDetailsCardComponent({
-  data,
+  data: _data,
   currentTime: _currentTime,
   attestationCount,
   attestationPercentage,

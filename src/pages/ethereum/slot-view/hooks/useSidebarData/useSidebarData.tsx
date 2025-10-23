@@ -22,7 +22,7 @@ export function useSidebarData({
   blockNodes,
   blobNodes,
   attestationChunks,
-  proposer,
+  proposer: _proposer,
   currentSlot,
 }: UseSidebarDataParams): {
   phases: SlotPhase[];
@@ -75,7 +75,9 @@ export function useSidebarData({
               <Badge color="purple" variant="border" size="small">
                 Attest
               </Badge>
-              <span>{count} validator{count > 1 ? 's' : ''}</span>
+              <span>
+                {count} validator{count > 1 ? 's' : ''}
+              </span>
             </div>
           ),
         });
@@ -164,7 +166,7 @@ export function useSidebarData({
 
     // Sort all items by timestamp
     return allItems.sort((a, b) => a.timestamp - b.timestamp);
-  }, [blockNodes, blobNodes, attestationChunks, proposer, currentSlot]);
+  }, [blockNodes, blobNodes, attestationChunks, currentSlot]);
 
   return { phases, items };
 }

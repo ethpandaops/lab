@@ -9,5 +9,6 @@ export interface BottomBarProps {
   visibleContinentalPropagationData: ContinentalPropagationSeries[];
   attestationChartValues: (number | null)[];
   attestationTotalExpected: number;
+  attestationMaxCount: number;
   mode: 'live' | 'static';
 }
