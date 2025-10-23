@@ -1315,7 +1315,7 @@ export type FctPreparedBlock = {
   /**
    * The value of the consensus payload in wei
    */
-  consensus_payload_value?: number | null;
+  consensus_payload_value?: string | null;
   /**
    * The wall clock time when the event was received
    */
@@ -1343,7 +1343,7 @@ export type FctPreparedBlock = {
   /**
    * The value of the execution payload in wei
    */
-  execution_payload_value?: number | null;
+  execution_payload_value?: string | null;
   /**
    * City of the client that generated the event
    */
@@ -16728,35 +16728,31 @@ export type FctPreparedBlockServiceListData = {
     /**
      * The value of the execution payload in wei (filter: eq)
      */
-    execution_payload_value_eq?: number;
+    execution_payload_value_eq?: string;
     /**
      * The value of the execution payload in wei (filter: ne)
      */
-    execution_payload_value_ne?: number;
+    execution_payload_value_ne?: string;
     /**
-     * The value of the execution payload in wei (filter: lt)
+     * The value of the execution payload in wei (filter: contains)
      */
-    execution_payload_value_lt?: number;
+    execution_payload_value_contains?: string;
     /**
-     * The value of the execution payload in wei (filter: lte)
+     * The value of the execution payload in wei (filter: starts_with)
      */
-    execution_payload_value_lte?: number;
+    execution_payload_value_starts_with?: string;
     /**
-     * The value of the execution payload in wei (filter: gt)
+     * The value of the execution payload in wei (filter: ends_with)
      */
-    execution_payload_value_gt?: number;
+    execution_payload_value_ends_with?: string;
     /**
-     * The value of the execution payload in wei (filter: gte)
+     * The value of the execution payload in wei (filter: like)
      */
-    execution_payload_value_gte?: number;
+    execution_payload_value_like?: string;
     /**
-     * The value of the execution payload in wei (filter: between_min)
+     * The value of the execution payload in wei (filter: not_like)
      */
-    execution_payload_value_between_min?: number;
-    /**
-     * The value of the execution payload in wei (filter: between_max_value)
-     */
-    execution_payload_value_between_max_value?: number;
+    execution_payload_value_not_like?: string;
     /**
      * The value of the execution payload in wei (filter: in_values) (comma-separated list)
      */
@@ -16768,35 +16764,31 @@ export type FctPreparedBlockServiceListData = {
     /**
      * The value of the consensus payload in wei (filter: eq)
      */
-    consensus_payload_value_eq?: number;
+    consensus_payload_value_eq?: string;
     /**
      * The value of the consensus payload in wei (filter: ne)
      */
-    consensus_payload_value_ne?: number;
+    consensus_payload_value_ne?: string;
     /**
-     * The value of the consensus payload in wei (filter: lt)
+     * The value of the consensus payload in wei (filter: contains)
      */
-    consensus_payload_value_lt?: number;
+    consensus_payload_value_contains?: string;
     /**
-     * The value of the consensus payload in wei (filter: lte)
+     * The value of the consensus payload in wei (filter: starts_with)
      */
-    consensus_payload_value_lte?: number;
+    consensus_payload_value_starts_with?: string;
     /**
-     * The value of the consensus payload in wei (filter: gt)
+     * The value of the consensus payload in wei (filter: ends_with)
      */
-    consensus_payload_value_gt?: number;
+    consensus_payload_value_ends_with?: string;
     /**
-     * The value of the consensus payload in wei (filter: gte)
+     * The value of the consensus payload in wei (filter: like)
      */
-    consensus_payload_value_gte?: number;
+    consensus_payload_value_like?: string;
     /**
-     * The value of the consensus payload in wei (filter: between_min)
+     * The value of the consensus payload in wei (filter: not_like)
      */
-    consensus_payload_value_between_min?: number;
-    /**
-     * The value of the consensus payload in wei (filter: between_max_value)
-     */
-    consensus_payload_value_between_max_value?: number;
+    consensus_payload_value_not_like?: string;
     /**
      * The value of the consensus payload in wei (filter: in_values) (comma-separated list)
      */
