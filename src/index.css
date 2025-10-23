@@ -21,8 +21,9 @@
 /* Tailwind CSS v4 plugins via @plugin directive */
 @plugin "@tailwindcss/forms";
 
-/* Enable class-based dark mode */
+/* Enable class-based dark mode and star mode */
 @custom-variant dark (&:where(.dark, .dark *));
+@custom-variant star (&:where(.star, .star *));
 
 /* Two-Tier Token Architecture
  *
@@ -188,6 +189,7 @@
  * Maps semantic tokens to primitive color scales.
  * Light mode uses warm sand/terracotta palette.
  * Dark mode uses neutral grays with warm terracotta accents.
+ * Star mode uses aurora borealis colors.
  */
 @layer base {
   :root {
@@ -206,7 +208,22 @@
   }
 
   html.dark {
-    /* Dark mode - aurora borealis with pink and purple */
+    /* Dark mode - balanced neutral with warm terracotta accents */
+    --primary-value: var(--color-terracotta-500);
+    --secondary-value: var(--color-neutral-900);
+    --accent-value: var(--color-terracotta-400);
+    --background-value: var(--color-neutral-950);
+    --surface-value: #242424;
+    --foreground-value: var(--color-neutral-50);
+    --muted-value: var(--color-neutral-400);
+    --border-value: var(--color-neutral-800);
+
+    /* Set html background for overscroll */
+    background-color: var(--color-neutral-950);
+  }
+
+  html.star {
+    /* Star mode - aurora borealis with pink and purple */
     --primary-value: var(--color-aurora-cyan-400);
     --secondary-value: var(--color-aurora-purple-600);
     --accent-value: var(--color-aurora-pink-500);

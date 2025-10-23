@@ -83,8 +83,8 @@ export function MapChart({
 
     const series: Array<Record<string, unknown>> = [];
 
-    // Determine theme-aware defaults
-    const isDark = theme === 'dark';
+    // Determine theme-aware defaults (treat both dark and star as dark themes)
+    const isDark = theme === 'dark' || theme === 'star';
 
     // Add routes series if there are routes
     if (routes.length > 0) {

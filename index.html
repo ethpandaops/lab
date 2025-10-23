@@ -31,13 +31,20 @@
       // Initialize theme before React mounts to prevent FOUC
       (function () {
         const theme = localStorage.getItem('theme');
-        const isDark =
-          theme === 'dark' ||
-          (theme !== 'light' &&
-            window.matchMedia('(prefers-color-scheme: dark)').matches);
 
-        if (isDark) {
+        // Handle explicit theme from localStorage
+        if (theme === 'dark') {
           document.documentElement.classList.add('dark');
+        } else if (theme === 'star') {
+          document.documentElement.classList.add('star');
+        } else if (theme === 'light') {
+          // Light theme is default, no class needed
+        } else {
+          // No theme set, use system preference
+          const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          if (isDark) {
+            document.documentElement.classList.add('dark');
+          }
         }
       })();
     </script>
