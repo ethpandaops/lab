@@ -1,6 +1,7 @@
-import { createFileRoute } from '@tanstack/react-router';
-import { IndexPage } from '@/pages/experiments/slot-view';
+import { createFileRoute, redirect } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/experiments/slot-view')({
-  component: IndexPage,
+  beforeLoad: () => {
+    throw redirect({ to: '/ethereum/slot-view' });
+  },
 });

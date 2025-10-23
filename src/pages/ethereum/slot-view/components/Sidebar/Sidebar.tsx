@@ -1,6 +1,6 @@
 import type { JSX } from 'react';
 import clsx from 'clsx';
-import { Timeline } from '@/pages/experiments/slot-view/components/Timeline';
+import { Timeline } from '@/pages/ethereum/slot-view/components/Timeline';
 import { ScrollingTimeline } from '@/components/Lists/ScrollingTimeline';
 import type { SidebarProps } from './Sidebar.types';
 

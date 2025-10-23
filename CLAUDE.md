@@ -40,39 +40,47 @@ src/
   routes/                             # Route definitions using TanStack Router
     __root.tsx                        # Root layout with sidebar, providers, navigation
     index.tsx                         # "/" - Landing page route
-    [section].tsx                     # Layout routes for sections (optional)
-    [section]/                        # Section-specific routes
-      index.tsx                       # Section list page
-      $[param].tsx                    # Dynamic routes (e.g., $id.tsx)
-      [route-name].tsx                # Named routes within section
-    experiments/                      # Main route directory - 95% of new routes go here
-      index.tsx                       # Experiments list
-      [experiment-name].tsx           # Individual experiment routes (most development happens here)
+    [section].tsx                     # Layout routes for sections
+    ethereum/                         # Ethereum-focused visualizations
+      slot-view.tsx                   # Beacon chain slot visualization
+    xatu/                             # Xatu-specific data and contributors
+      contributors.tsx                # Contributors layout route
+      contributors/
+        index.tsx                     # Contributors list
+        $id.tsx                       # Individual contributor detail
+      geographical-checklist.tsx      # Global node distribution
+      locally-built-blocks.tsx        # Locally built blocks tracking
+      fork-readiness.tsx              # Client fork readiness monitoring
+    experiments/                      # Legacy experiments (redirects to new structure)
+      [experiment-name].tsx           # Redirects to /ethereum or /xatu routes
 
   pages/                              # Page components (actual UI implementation)
     IndexPage.tsx                     # Landing page component
-    experiments/                      # Main page directory - 95% of new pages go here
-      IndexPage.tsx                   # Experiments list page
-      index.ts                        # Barrel exports
-      [experiment-name]/              # Individual experiment pages (most development happens here)
+    ethereum/                         # Ethereum section pages
+      slot-view/                      # Slot view page
         IndexPage.tsx
-        index.tsx
-        components/                   # Page-specific components (optional)
-          [ComponentName]/
+        index.ts
+        components/                   # Page-specific components
         hooks/                        # Page-specific hooks (optional)
-          use[HookName].ts
-        contexts/                     # Page-specific contexts (optional)
-          [ContextName].tsx
-        providers/                    # Page-specific providers (optional)
-          [ProviderName].tsx
-    [other-section]/                  # Other page sections (rarely used)
-      IndexPage.tsx                   # Section list/index page
-      DetailPage.tsx                  # Detail page (if applicable)
-      index.ts                        # Barrel exports
-      components/                     # Page-specific components (optional)
-      hooks/                          # Page-specific hooks (optional)
-      contexts/                       # Page-specific contexts (optional)
-      providers/                      # Page-specific providers (optional)
+    xatu/                             # Xatu section pages
+      contributors/                   # Contributors pages
+        IndexPage.tsx                 # Contributors list
+        DetailPage.tsx                # Contributor detail
+        index.ts
+        components/                   # Page-specific components
+      geographical-checklist/         # Geographical checklist page
+        IndexPage.tsx
+        index.ts
+        components/
+      locally-built-blocks/           # Locally built blocks page
+        IndexPage.tsx
+        index.ts
+      fork-readiness/                 # Fork readiness page
+        IndexPage.tsx
+        index.ts
+        components/
+    experiments/                      # Legacy experiments index (for /experiments route)
+      IndexPage.tsx                   # Shows all experiments with new links
 
   components/                         # Core, app-wide reusable UI components
     [Category]/                       # Component category folder
@@ -156,10 +164,13 @@ Current categories in `src/components/`:
 
 Current page sections in `src/pages/`:
 
-- **experiments**: Main section for experiment pages - most new pages will be added here
-  - Current experiments: block-production-flow, slot-view, networks, geographical-checklist, fork-readiness, locally-built-blocks
-  - Future experiments should follow the same pattern
-- **contributors**: Contributor list and detail pages with page-scoped components
+- **ethereum**: Ethereum-focused blockchain visualizations and data
+  - Current pages: slot-view
+  - Future Ethereum-related pages should be added here
+- **xatu**: Xatu-specific data, metrics, and contributor insights
+  - Current pages: contributors, geographical-checklist, locally-built-blocks, fork-readiness
+  - Future Xatu-related pages should be added here
+- **experiments**: Legacy experiments index page (shows all experiments with links to new structure)
 
 ### Standard Component Structure
 
@@ -196,10 +207,10 @@ ComponentName/
 
 ### Quick Reference
 
-- **New experiment**: Route in `src/routes/experiments/`, page in `src/pages/experiments/[name]/`
-- **Experiment image**: `public/images/experiments/[name].png` for social sharing
+- **New Ethereum page**: Route in `src/routes/ethereum/`, page in `src/pages/ethereum/[name]/`
+- **New Xatu page**: Route in `src/routes/xatu/`, page in `src/pages/xatu/[name]/`
+- **Feature image**: `public/images/experiments/[name].png` for social sharing
 - **Skeleton component**: `src/pages/[section]/components/[PageName]Skeleton/` using `LoadingContainer`
-- **Other route**: Route in `src/routes/[section]/`, page in `src/pages/[section]/`
 - **Core component**: `src/components/[category]/[ComponentName]/` - reusable, generic
 - **Page-scoped component**: `src/pages/[section]/components/[ComponentName]/` - page-specific
 - **Core hook**: `src/hooks/use[Name]/` - app-wide logic

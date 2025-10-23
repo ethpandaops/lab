@@ -1,6 +1,7 @@
-import { createFileRoute } from '@tanstack/react-router';
-import { IndexPage } from '@/pages/experiments/fork-readiness';
+import { createFileRoute, redirect } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/experiments/fork-readiness')({
-  component: IndexPage,
+  beforeLoad: () => {
+    throw redirect({ to: '/xatu/fork-readiness' });
+  },
 });

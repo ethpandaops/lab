@@ -1,13 +1,7 @@
-import { createFileRoute, Outlet } from '@tanstack/react-router';
+import { createFileRoute, redirect } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/contributors')({
-  component: Outlet,
   beforeLoad: () => {
-    return {
-      getTitle: () => 'Contributors',
-    };
+    throw redirect({ to: '/xatu/contributors' });
   },
-  head: () => ({
-    meta: [{ title: `Contributors | ${import.meta.env.VITE_BASE_TITLE}` }],
-  }),
 });
