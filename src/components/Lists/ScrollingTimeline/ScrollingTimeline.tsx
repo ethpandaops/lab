@@ -84,7 +84,7 @@ export function ScrollingTimeline({
     >
       <div className="relative">
         {/* Vertical timeline line */}
-        <div className="absolute top-0 left-[3.75rem] h-full w-px bg-border dark:bg-surface" />
+        <div className="absolute top-0 left-14 h-full w-px bg-border dark:bg-surface" />
 
         {/* Timeline items */}
         <div className="space-y-0">
@@ -102,7 +102,7 @@ export function ScrollingTimeline({
                   }
                 }}
                 className={clsx(
-                  'relative flex items-center gap-x-3 px-3 py-1 transition-all duration-300',
+                  'relative flex items-center gap-x-2 px-3 py-1 transition-all duration-300',
                   status === 'active' && 'bg-primary/10 dark:bg-primary/5',
                   status === 'pending' && 'opacity-40'
                 )}
@@ -111,7 +111,7 @@ export function ScrollingTimeline({
                 <div
                   className={clsx(
                     'shrink-0 text-right text-xs font-medium',
-                    'w-12',
+                    'w-10',
                     status === 'active' && 'text-primary',
                     status === 'completed' && 'text-foreground dark:text-muted',
                     status === 'pending' && 'text-muted dark:text-muted'
@@ -121,7 +121,7 @@ export function ScrollingTimeline({
                 </div>
 
                 {/* Timeline dot */}
-                <div className="relative flex shrink-0 items-center">
+                <div className="relative ml-1 flex shrink-0 items-center">
                   <div
                     className={clsx(
                       'size-1.5 rounded-full transition-all duration-300',

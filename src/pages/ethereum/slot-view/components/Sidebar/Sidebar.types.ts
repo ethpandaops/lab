@@ -2,6 +2,8 @@ import type { SlotPhase } from '@/utils/beacon';
 import type { TimelineItem } from '@/components/Lists/ScrollingTimeline/ScrollingTimeline.types';
 
 export interface SidebarProps {
+  /** Current slot number */
+  currentSlot: number;
   /** Array of phases that make up the slot */
   phases: SlotPhase[];
   /** Current time position in milliseconds (0 to total duration) */

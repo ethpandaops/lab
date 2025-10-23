@@ -23,7 +23,7 @@ function BottomBarComponent({
   const showDataColumnAvailability = version.includes('fulu');
 
   return (
-    <div className="grid grid-cols-12 gap-4 border-t border-border bg-background p-4" style={{ height: '320px' }}>
+    <div className="grid h-full grid-cols-12 gap-4 border-t border-border bg-background px-4 py-3">
       {/* Columns 1-8: Data Availability Section */}
       <div className="col-span-8 h-full">
         {showBlobAvailability && (

@@ -1,4 +1,4 @@
-import { useState, type JSX } from 'react';
+import { useState, useEffect, useRef, type JSX } from 'react';
 import clsx from 'clsx';
 import type { SlotTimelineProps } from './SlotTimeline.types';
 
@@ -35,6 +35,24 @@ export function SlotTimeline({
 }: SlotTimelineProps): JSX.Element {
   // Calculate total duration from phases or use provided slotDuration
   const totalDuration = slotDuration ?? phases.reduce((sum, phase) => sum + phase.duration, 0);
+
+  // Track when currentTime jumps backwards (slot change) to disable transition temporarily
+  const prevTimeRef = useRef(currentTime);
+  const [disableTransition, setDisableTransition] = useState(false);
+
+  useEffect(() => {
+    // If currentTime jumped backwards significantly (> half slot duration), disable transition
+    if (prevTimeRef.current > currentTime && prevTimeRef.current - currentTime > totalDuration / 2) {
+      setDisableTransition(true);
+      // Re-enable transition after a frame
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          setDisableTransition(false);
+        });
+      });
+    }
+    prevTimeRef.current = currentTime;
+  }, [currentTime, totalDuration]);
 
   // Calculate cumulative positions for each phase
   let cumulativeTime = 0;
@@ -156,7 +174,10 @@ export function SlotTimeline({
 
           {/* Current time indicator - vertical line */}
           <div
-            className="absolute top-0 h-full w-0.5 bg-foreground shadow-sm transition-all duration-300"
+            className={clsx(
+              'absolute top-0 h-full w-0.5 bg-foreground shadow-sm',
+              !disableTransition && 'transition-all duration-300'
+            )}
             style={{ left: `${currentTimePercent}%` }}
           />
         </div>

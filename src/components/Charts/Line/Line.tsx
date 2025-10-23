@@ -58,7 +58,7 @@ export function LineChart({
         }
       : undefined,
     grid: {
-      top: title ? 48 : 16,
+      top: title ? 52 : 16,
       right: 24,
       bottom: 32,
       left: 48,

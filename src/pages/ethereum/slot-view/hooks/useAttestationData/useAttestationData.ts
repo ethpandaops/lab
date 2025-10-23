@@ -13,6 +13,8 @@ export function useAttestationData(chunkedData: FctAttestationFirstSeenChunked50
     }));
   }, [chunkedData]);
 
+  // totalExpected should be the sum of all attestation counts
+  // since each chunk contains the count of attestations received in that time interval
   const totalExpected = useMemo(() => {
     return chunkedData.reduce((sum, chunk) => sum + (chunk.attestation_count ?? 0), 0);
   }, [chunkedData]);

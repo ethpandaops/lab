@@ -44,7 +44,10 @@ function AttestationArrivalsComponent({
         <LineChart
           data={intervalChartData.values}
           labels={intervalChartData.labels}
-          title="Attestation Arrivals"
+          title="ATTESTATION ARRIVALS"
+          titleFontSize={13}
+          titleLeft={16}
+          titleTop={12}
           height="100%"
           smooth={false}
           showArea={true}

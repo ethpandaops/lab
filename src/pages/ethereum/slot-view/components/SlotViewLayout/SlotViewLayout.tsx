@@ -110,9 +110,9 @@ export function SlotViewLayout({ mode }: SlotViewLayoutProps): JSX.Element {
   ]);
 
   return (
-    <div className="flex h-dvh flex-col overflow-hidden">
-      {/* Main Content Area - 74% height */}
-      <div className="grid h-[74vh] grid-cols-12 gap-4 p-4">
+    <div className="flex h-screen flex-col overflow-hidden">
+      {/* Main Content Area - 67% height */}
+      <div className="grid h-[67vh] grid-cols-12 gap-4 p-4">
         {/* Columns 1-9: Main Content */}
         <div className="col-span-9 flex h-full flex-col gap-4 overflow-hidden">
           {/* Block Details Card */}
@@ -137,6 +137,7 @@ export function SlotViewLayout({ mode }: SlotViewLayoutProps): JSX.Element {
         {/* Columns 10-12: Sidebar - flex column constrained to parent height */}
         <div className="col-span-3 flex h-full flex-col overflow-hidden">
           <Sidebar
+            currentSlot={currentSlot}
             phases={slotData.sidebarPhases}
             currentTime={currentTime}
             slotDuration={12000}
@@ -151,8 +152,8 @@ export function SlotViewLayout({ mode }: SlotViewLayoutProps): JSX.Element {
         </div>
       </div>
 
-      {/* Bottom Bar - 26% height */}
-      <div className="h-[26vh]">
+      {/* Bottom Bar - 29% height */}
+      <div className="h-[29vh] min-h-0">
         <BottomBar
           blockVersion={slotData.blockDetails?.blockVersion}
           blobCount={slotData.blobCount}

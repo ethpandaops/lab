@@ -47,18 +47,16 @@ function BlobDataAvailabilityComponent({
     return {
       animation: false,
       title: {
-        text: 'FIRST SEEN',
+        text: 'BLOB FIRST SEEN',
         textStyle: {
           color: themeColors.foreground,
           fontSize: 13,
-          fontWeight: 600,
-          fontFamily: 'monospace',
         },
         left: 16,
         top: 12,
       },
       grid: {
-        top: 40,
+        top: 48,
         containLabel: true,
       },
       xAxis: {
@@ -193,14 +191,12 @@ function BlobDataAvailabilityComponent({
         textStyle: {
           color: themeColors.foreground,
           fontSize: 13,
-          fontWeight: 600,
-          fontFamily: 'monospace',
         },
         left: 16,
         top: 12,
       },
       grid: {
-        top: 40,
+        top: 48,
         containLabel: true,
       },
       xAxis: {

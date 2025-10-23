@@ -33,21 +33,6 @@ export function useSidebarData({
   const items = useMemo<TimelineItem[]>(() => {
     const allItems: TimelineItem[] = [];
 
-    // 1. Slot start event - Proposer scheduled to create block (0ms)
-    const proposerName = proposer?.proposer_validator_index ? proposer.proposer_validator_index.toString() : '?';
-    allItems.push({
-      id: `${currentSlot}-slot-start`,
-      timestamp: 0,
-      content: (
-        <div className="flex items-center gap-1.5">
-          <Badge color="blue" variant="border" size="small">
-            Start
-          </Badge>
-          <span>Validator {proposerName}</span>
-        </div>
-      ),
-    });
-
     // 2. Block seen in locations - Group by city and take earliest
     const cityFirstSeen = new Map<string, { timestamp: number; country: string }>();
     blockNodes.forEach(node => {
@@ -90,7 +75,7 @@ export function useSidebarData({
               <Badge color="purple" variant="border" size="small">
                 Attest
               </Badge>
-              <span>{count} validators</span>
+              <span>{count} validator{count > 1 ? 's' : ''}</span>
             </div>
           ),
         });

@@ -2,6 +2,8 @@ import { type JSX, memo } from 'react';
 import clsx from 'clsx';
 import { Timeline } from '@/pages/ethereum/slot-view/components/Timeline';
 import { ScrollingTimeline } from '@/components/Lists/ScrollingTimeline';
+import { Card } from '@/components/Layout/Card';
+import { SLOTS_PER_EPOCH } from '@/utils/beacon';
 import type { SidebarProps } from './Sidebar.types';
 
 /**
@@ -12,6 +14,7 @@ import type { SidebarProps } from './Sidebar.types';
  * ScrollingTimeline.
  */
 function SidebarComponent({
+  currentSlot,
   phases,
   currentTime,
   slotDuration,
@@ -27,11 +30,22 @@ function SidebarComponent({
   formatTime,
   className,
 }: SidebarProps): JSX.Element {
+  // Calculate epoch from slot number
+  const epoch = Math.floor(currentSlot / SLOTS_PER_EPOCH);
+
   return (
-    <div className={clsx('flex h-full flex-col gap-6 overflow-hidden', className)}>
-      {/* Slot Timeline section */}
-      <div className="shrink-0">
-        <h2 className="mb-4 text-xl/7 font-semibold text-foreground">Slot Timeline</h2>
+    <div className={clsx('flex h-full flex-col overflow-hidden rounded-sm border border-border bg-surface', className)}>
+      {/* Slot Timeline section - seamlessly connected */}
+      <div className="shrink-0 border-b border-border p-4">
+        {/* Header with Slot number and Epoch subtitle */}
+        <div className="mb-3">
+          <h2 className="text-2xl font-bold text-foreground">
+            <span className="font-mono">{currentSlot.toLocaleString()}</span>
+          </h2>
+          <p className="text-xs text-muted">Epoch {epoch.toLocaleString()}</p>
+        </div>
+
+        {/* Timeline */}
         <Timeline
           phases={phases}
           currentTime={currentTime}
@@ -46,7 +60,7 @@ function SidebarComponent({
         />
       </div>
 
-      {/* Scrolling Timeline - fills remaining space with scroll */}
+      {/* Scrolling Timeline - fills remaining space with scroll - seamlessly connected */}
       <ScrollingTimeline
         items={items}
         currentTime={currentTime}
@@ -61,6 +75,7 @@ function SidebarComponent({
 // Custom comparison function to prevent re-renders when data hasn't changed
 const arePropsEqual = (prevProps: SidebarProps, nextProps: SidebarProps): boolean => {
   return (
+    prevProps.currentSlot === nextProps.currentSlot &&
     prevProps.phases === nextProps.phases &&
     prevProps.currentTime === nextProps.currentTime &&
     prevProps.slotDuration === nextProps.slotDuration &&
