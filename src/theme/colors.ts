@@ -48,17 +48,17 @@ export const LIGHT_COLORS: ThemeColors = {
 };
 
 /**
- * Dark mode colors - softer cyan for better contrast
+ * Dark mode colors - Ember Glow (warm continuity)
  */
 export const DARK_COLORS: ThemeColors = {
-  primary: '#22d3ee', // cyan-400
-  secondary: '#38bdf8', // sky-400
-  accent: '#67e8f9', // cyan-300
-  background: '#09090b', // zinc-950
-  surface: '#18181b', // zinc-900
-  foreground: '#fafafa', // zinc-50
-  muted: '#a1a1aa', // zinc-400
-  border: '#27272a', // zinc-800
+  primary: '#e6764e', // glowing terracotta
+  secondary: '#2a2520', // deep warm brown
+  accent: '#f18c5d', // vibrant warm orange
+  background: '#1a1612', // rich dark brown
+  surface: '#231f1a', // elevated brown
+  foreground: '#e8dfd5', // warm cream text
+  muted: '#9a8b7a', // warm muted tan
+  border: '#3d3528', // subtle warm border
   success: '#22c55e', // green-500
   warning: '#f59e0b', // amber-500
   danger: '#ef4444', // red-500
