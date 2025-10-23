@@ -1,26 +1,85 @@
 import { type JSX } from 'react';
 import { Container } from '@/components/Layout/Container';
 import { Header } from '@/components/Layout/Header';
+import { Alert } from '@/components/Feedback/Alert';
+import { LoadingContainer } from '@/components/Layout/LoadingContainer';
+import { SlotTimeline, ClientPairingMatrix } from './components';
+import { useSlotBlocks } from './hooks';
 
 export function IndexPage(): JSX.Element {
+  const {
+    slotGroups,
+    allExecutionClients,
+    allConsensusClients,
+    blockCountMap,
+    maxBlockCount,
+    clientPairingMap,
+    maxPairingCount,
+    allBlocks,
+    isLoading,
+    isFetching,
+    error,
+  } = useSlotBlocks();
+
+  if (error) {
+    return (
+      <Container>
+        <Header
+          title="Locally Built Blocks"
+          description="Blocks built locally by sentry nodes. Useful for analyzing client block building capabilities."
+        />
+        <Alert variant="error" title="Failed to load data" description={error.message} />
+      </Container>
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <Container>
+        <Header
+          title="Locally Built Blocks"
+          description="Blocks built locally by sentry nodes. Useful for analyzing client block building capabilities."
+        />
+        <LoadingContainer />
+      </Container>
+    );
+  }
+
   return (
     <Container>
-      <Header title="Networks" />
+      <div className="flex items-center gap-2">
+        <Header
+          title="Locally Built Blocks"
+          description="Blocks built locally by sentry nodes. Useful for analyzing client block building capabilities."
+        />
+        {isFetching && (
+          <div className="inline-block h-2 w-2 animate-pulse rounded-full bg-primary" title="Refreshing data..." />
+        )}
+      </div>
 
-      {/* Coming soon card */}
-      <div className="rounded-xl border border-border bg-surface/50 p-12 text-center backdrop-blur-sm">
-        <div className="mx-auto max-w-md">
-          <div className="mb-4 inline-flex rounded-full bg-primary/10 p-4">
-            <svg className="size-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-              />
-            </svg>
-          </div>
-          <h2 className="mb-2 text-2xl/8 font-bold text-foreground">Coming Soon</h2>
-        </div>
+      <div className="mb-6">
+        <Alert
+          variant="info"
+          title="About Locally Built Blocks"
+          description="These blocks were built locally by ethPandaOps sentry nodes. They represent what each node would have proposed if selected as a block proposer. This data is useful for comparing different client implementations and their transaction selection strategies across various execution and consensus client pairings."
+        />
+      </div>
+
+      <div className="space-y-6">
+        <SlotTimeline
+          slotGroups={slotGroups}
+          allExecutionClients={allExecutionClients}
+          allConsensusClients={allConsensusClients}
+          blockCountMap={blockCountMap}
+          maxBlockCount={maxBlockCount}
+        />
+        <ClientPairingMatrix
+          executionClients={allExecutionClients}
+          consensusClients={allConsensusClients}
+          pairingMap={clientPairingMap}
+          maxPairingCount={maxPairingCount}
+          allBlocks={allBlocks}
+        />
       </div>
     </Container>
   );

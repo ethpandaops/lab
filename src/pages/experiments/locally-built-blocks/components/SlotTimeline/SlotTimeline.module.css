@@ -1,0 +1,42 @@
+@keyframes newBlockFlash {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  /* First pulse - fast */
+  5% {
+    opacity: 0.4;
+    transform: scale(1.02);
+  }
+  10% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  /* Second pulse - fast */
+  15% {
+    opacity: 0.4;
+    transform: scale(1.02);
+  }
+  20% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  /* Third pulse - fast */
+  25% {
+    opacity: 0.4;
+    transform: scale(1.02);
+  }
+  30% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  /* Slow fade out for the rest */
+  50% {
+    opacity: 0.9;
+  }
+}
+
+.newBlockAnimation {
+  animation: newBlockFlash 4s ease-in-out;
+}

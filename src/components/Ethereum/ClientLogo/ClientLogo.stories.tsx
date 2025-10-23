@@ -20,6 +20,55 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
+// Execution Clients
+
+/**
+ * Geth execution client logo
+ */
+export const Geth: Story = {
+  args: {
+    client: 'geth',
+  },
+};
+
+/**
+ * Nethermind execution client logo
+ */
+export const Nethermind: Story = {
+  args: {
+    client: 'nethermind',
+  },
+};
+
+/**
+ * Besu execution client logo
+ */
+export const Besu: Story = {
+  args: {
+    client: 'besu',
+  },
+};
+
+/**
+ * Erigon execution client logo
+ */
+export const Erigon: Story = {
+  args: {
+    client: 'erigon',
+  },
+};
+
+/**
+ * Reth execution client logo
+ */
+export const Reth: Story = {
+  args: {
+    client: 'reth',
+  },
+};
+
+// Consensus Clients
+
 /**
  * Lighthouse consensus client logo
  */
@@ -104,21 +153,81 @@ export const Small: Story = {
 };
 
 /**
- * Multiple logos in a row
+ * All execution clients in a row
  */
-export const MultipleClients: Story = {
+export const AllExecutionClients: Story = {
+  args: {
+    client: 'geth',
+  },
+  render: () => (
+    <div className="space-y-4">
+      <div className="text-sm font-semibold text-foreground">Execution Clients</div>
+      <div className="flex items-center gap-3">
+        <div className="flex flex-col items-center gap-1">
+          <ClientLogo client="geth" />
+          <span className="text-xs text-muted">geth</span>
+        </div>
+        <div className="flex flex-col items-center gap-1">
+          <ClientLogo client="nethermind" />
+          <span className="text-xs text-muted">nethermind</span>
+        </div>
+        <div className="flex flex-col items-center gap-1">
+          <ClientLogo client="besu" />
+          <span className="text-xs text-muted">besu</span>
+        </div>
+        <div className="flex flex-col items-center gap-1">
+          <ClientLogo client="erigon" />
+          <span className="text-xs text-muted">erigon</span>
+        </div>
+        <div className="flex flex-col items-center gap-1">
+          <ClientLogo client="reth" />
+          <span className="text-xs text-muted">reth</span>
+        </div>
+      </div>
+    </div>
+  ),
+};
+
+/**
+ * All consensus clients in a row
+ */
+export const AllConsensusClients: Story = {
   args: {
     client: 'lighthouse',
   },
   render: () => (
-    <div className="flex items-center gap-2">
-      <ClientLogo client="lighthouse" />
-      <ClientLogo client="prysm" />
-      <ClientLogo client="teku" />
-      <ClientLogo client="nimbus" />
-      <ClientLogo client="lodestar" />
-      <ClientLogo client="tysm" />
-      <ClientLogo client="grandine" />
+    <div className="space-y-4">
+      <div className="text-sm font-semibold text-foreground">Consensus Clients</div>
+      <div className="flex items-center gap-3">
+        <div className="flex flex-col items-center gap-1">
+          <ClientLogo client="lighthouse" />
+          <span className="text-xs text-muted">lighthouse</span>
+        </div>
+        <div className="flex flex-col items-center gap-1">
+          <ClientLogo client="prysm" />
+          <span className="text-xs text-muted">prysm</span>
+        </div>
+        <div className="flex flex-col items-center gap-1">
+          <ClientLogo client="teku" />
+          <span className="text-xs text-muted">teku</span>
+        </div>
+        <div className="flex flex-col items-center gap-1">
+          <ClientLogo client="nimbus" />
+          <span className="text-xs text-muted">nimbus</span>
+        </div>
+        <div className="flex flex-col items-center gap-1">
+          <ClientLogo client="lodestar" />
+          <span className="text-xs text-muted">lodestar</span>
+        </div>
+        <div className="flex flex-col items-center gap-1">
+          <ClientLogo client="tysm" />
+          <span className="text-xs text-muted">tysm</span>
+        </div>
+        <div className="flex flex-col items-center gap-1">
+          <ClientLogo client="grandine" />
+          <span className="text-xs text-muted">grandine</span>
+        </div>
+      </div>
     </div>
   ),
 };
