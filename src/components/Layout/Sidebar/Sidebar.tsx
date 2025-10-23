@@ -4,7 +4,7 @@ import { XMarkIcon } from '@heroicons/react/24/outline';
 import { Link } from '@tanstack/react-router';
 import { NetworkSelect } from '@/components/Ethereum/NetworkSelect';
 import { ThemeToggle } from '@/components/Layout/ThemeToggle';
-import { ListContainer, ListItem } from '@/components/Layout/ListContainer';
+import { ListContainer, ListItem, ListSection } from '@/components/Layout/ListContainer';
 import { Header } from '@/components/Layout/Header';
 import type { SidebarProps } from './Sidebar.types';
 
@@ -13,7 +13,9 @@ interface NavItem {
   to: string;
 }
 
-const ethereumPages: NavItem[] = [{ name: 'Slot View', to: '/ethereum/slot-view' }];
+const ethereumConsensusPages: NavItem[] = [{ name: 'Slot View', to: '/ethereum/slot-view' }];
+
+const ethereumExecutionPages: NavItem[] = [];
 
 const xatuPages: NavItem[] = [
   { name: 'Contributors', to: '/xatu/contributors' },
@@ -68,10 +70,9 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps): JSX.Elem
                   </ListItem>
 
                   {/* Ethereum Section */}
-                  <ListItem>
-                    <Header size="xs" title="Ethereum" />
-                    <ListContainer variant="simple" compact withDividers={false}>
-                      {ethereumPages.map(page => (
+                  <ListSection title="Ethereum">
+                    <ListSection title="Consensus" nested>
+                      {ethereumConsensusPages.map(page => (
                         <ListItem key={page.to}>
                           <Link
                             to={page.to}
@@ -84,28 +85,43 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps): JSX.Elem
                           </Link>
                         </ListItem>
                       ))}
-                    </ListContainer>
-                  </ListItem>
+                    </ListSection>
+
+                    {ethereumExecutionPages.length > 0 && (
+                      <ListSection title="Execution" nested>
+                        {ethereumExecutionPages.map(page => (
+                          <ListItem key={page.to}>
+                            <Link
+                              to={page.to}
+                              className="group flex gap-x-3 rounded-lg px-2.5 py-1.5 text-sm/6 font-semibold text-muted transition-all hover:bg-primary/10 hover:text-primary"
+                              activeProps={{
+                                className: 'bg-primary/10 text-primary shadow-sm ring-1 ring-primary/20',
+                              }}
+                            >
+                              {page.name}
+                            </Link>
+                          </ListItem>
+                        ))}
+                      </ListSection>
+                    )}
+                  </ListSection>
 
                   {/* Xatu Section */}
-                  <ListItem>
-                    <Header size="xs" title="Xatu" />
-                    <ListContainer variant="simple" compact withDividers={false}>
-                      {xatuPages.map(page => (
-                        <ListItem key={page.to}>
-                          <Link
-                            to={page.to}
-                            className="group flex gap-x-3 rounded-lg px-2.5 py-1.5 text-sm/6 font-semibold text-muted transition-all hover:bg-primary/10 hover:text-primary"
-                            activeProps={{
-                              className: 'bg-primary/10 text-primary shadow-sm ring-1 ring-primary/20',
-                            }}
-                          >
-                            {page.name}
-                          </Link>
-                        </ListItem>
-                      ))}
-                    </ListContainer>
-                  </ListItem>
+                  <ListSection title="Xatu">
+                    {xatuPages.map(page => (
+                      <ListItem key={page.to}>
+                        <Link
+                          to={page.to}
+                          className="group flex gap-x-3 rounded-lg px-2.5 py-1.5 text-sm/6 font-semibold text-muted transition-all hover:bg-primary/10 hover:text-primary"
+                          activeProps={{
+                            className: 'bg-primary/10 text-primary shadow-sm ring-1 ring-primary/20',
+                          }}
+                        >
+                          {page.name}
+                        </Link>
+                      </ListItem>
+                    ))}
+                  </ListSection>
                 </ListContainer>
               </nav>
             </div>
@@ -139,10 +155,9 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps): JSX.Elem
               </ListItem>
 
               {/* Ethereum Section */}
-              <ListItem>
-                <Header size="xs" title="Ethereum" />
-                <ListContainer variant="simple" compact withDividers={false}>
-                  {ethereumPages.map(page => (
+              <ListSection title="Ethereum">
+                <ListSection title="Consensus" nested>
+                  {ethereumConsensusPages.map(page => (
                     <ListItem key={page.to}>
                       <Link
                         to={page.to}
@@ -155,28 +170,43 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps): JSX.Elem
                       </Link>
                     </ListItem>
                   ))}
-                </ListContainer>
-              </ListItem>
+                </ListSection>
+
+                {ethereumExecutionPages.length > 0 && (
+                  <ListSection title="Execution" nested>
+                    {ethereumExecutionPages.map(page => (
+                      <ListItem key={page.to}>
+                        <Link
+                          to={page.to}
+                          className="group flex gap-x-3 px-2.5 py-1.5 text-sm/6 font-semibold text-muted transition-all hover:bg-primary/10 hover:text-primary"
+                          activeProps={{
+                            className: 'bg-primary/10 text-primary shadow-sm ring-1 ring-primary/20',
+                          }}
+                        >
+                          {page.name}
+                        </Link>
+                      </ListItem>
+                    ))}
+                  </ListSection>
+                )}
+              </ListSection>
 
               {/* Xatu Section */}
-              <ListItem>
-                <Header size="xs" title="Xatu" />
-                <ListContainer variant="simple" compact withDividers={false}>
-                  {xatuPages.map(page => (
-                    <ListItem key={page.to}>
-                      <Link
-                        to={page.to}
-                        className="group flex gap-x-3 px-2.5 py-1.5 text-sm/6 font-semibold text-muted transition-all hover:bg-primary/10 hover:text-primary"
-                        activeProps={{
-                          className: 'bg-primary/10 text-primary shadow-sm ring-1 ring-primary/20',
-                        }}
-                      >
-                        {page.name}
-                      </Link>
-                    </ListItem>
-                  ))}
-                </ListContainer>
-              </ListItem>
+              <ListSection title="Xatu">
+                {xatuPages.map(page => (
+                  <ListItem key={page.to}>
+                    <Link
+                      to={page.to}
+                      className="group flex gap-x-3 px-2.5 py-1.5 text-sm/6 font-semibold text-muted transition-all hover:bg-primary/10 hover:text-primary"
+                      activeProps={{
+                        className: 'bg-primary/10 text-primary shadow-sm ring-1 ring-primary/20',
+                      }}
+                    >
+                      {page.name}
+                    </Link>
+                  </ListItem>
+                ))}
+              </ListSection>
             </ListContainer>
           </nav>
         </div>
