@@ -2,7 +2,7 @@ import { type JSX } from 'react';
 import { Link } from '@tanstack/react-router';
 import { Card } from '@/components/Layout/Card';
 import { BeakerIcon, UserGroupIcon } from '@heroicons/react/24/outline';
-import { AlgorithmicArt } from '@/components/Charts/AlgorithmicArt';
+import { AlgorithmicArt } from './components/AlgorithmicArt';
 
 export function IndexPage(): JSX.Element {
   return (
