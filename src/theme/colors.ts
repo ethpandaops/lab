@@ -31,7 +31,7 @@ export interface ThemeColors {
 }
 
 /**
- * Light mode colors - warm earthy theme (from Streamlit config)
+ * Light mode colors - warm earthy theme
  */
 export const LIGHT_COLORS: ThemeColors = {
   primary: '#bb5a38', // warm rust/terracotta

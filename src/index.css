@@ -58,13 +58,13 @@
 
 /* Light and dark mode values
  *
- * NOTE: Light mode uses custom hex values from Streamlit theme.
+ * NOTE: Light mode uses custom hex values.
  * Dark mode references Tailwind's color palette.
  * For programmatic access (e.g., charts), use the useThemeColors hook which reads from src/theme/colors.ts.
  */
 @layer base {
   :root {
-    /* Light mode - warm earthy theme (from Streamlit config) */
+    /* Light mode - warm earthy theme */
     --primary-value: #bb5a38;
     --secondary-value: #e8e7dd;
     --accent-value: #d4794f;
