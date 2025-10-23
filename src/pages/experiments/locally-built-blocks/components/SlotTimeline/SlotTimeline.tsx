@@ -119,9 +119,9 @@ export function SlotTimeline({
       <div className="mb-2 flex flex-col gap-1">
         <div className="flex items-center gap-2">
           <span className="inline-block h-4 w-1 rounded-full bg-primary"></span>
-          <h2 className="text-sm font-medium text-muted">Timeline</h2>
+          <h2 className="text-lg font-semibold text-foreground">Timeline</h2>
         </div>
-        <p className="ml-3 text-xs text-muted">Unique nodes building blocks per client per slot</p>
+        <p className="ml-3 text-sm text-muted">Unique nodes building blocks per client per slot</p>
       </div>
 
       <div className="overflow-x-auto rounded-lg border border-border bg-surface">
