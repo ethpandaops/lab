@@ -5,22 +5,21 @@ import { Link } from '@tanstack/react-router';
 import { NetworkSelect } from '@/components/Ethereum/NetworkSelect';
 import { ThemeToggle } from '@/components/Layout/ThemeToggle';
 import { ListContainer, ListItem } from '@/components/Layout/ListContainer';
-import { Button } from '@/components/Elements/Button';
 import { Header } from '@/components/Layout/Header';
 import type { SidebarProps } from './Sidebar.types';
 
-interface ExperimentItem {
+interface NavItem {
   name: string;
   to: string;
 }
 
-const experiments: ExperimentItem[] = [
-  { name: 'Networks', to: '/experiments/networks' },
-  { name: 'Live Slots', to: '/experiments/live-slots' },
-  { name: 'Locally Built Blocks', to: '/experiments/locally-built-blocks' },
-  { name: 'Geographical Checklist', to: '/experiments/geographical-checklist' },
-  { name: 'Fork Readiness', to: '/experiments/fork-readiness' },
-  { name: 'Block Production Flow', to: '/experiments/block-production-flow' },
+const ethereumPages: NavItem[] = [{ name: 'Slot View', to: '/ethereum/slot-view' }];
+
+const xatuPages: NavItem[] = [
+  { name: 'Contributors', to: '/xatu/contributors' },
+  { name: 'Geographical Checklist', to: '/xatu/geographical-checklist' },
+  { name: 'Locally Built Blocks', to: '/xatu/locally-built-blocks' },
+  { name: 'Fork Readiness', to: '/xatu/fork-readiness' },
 ];
 
 export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps): JSX.Element {
@@ -60,15 +59,6 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps): JSX.Elem
 
               <nav className="flex flex-1 flex-col">
                 <ListContainer variant="simple" withDividers={false} compact className="flex flex-1 flex-col gap-y-7">
-                  {/* Contributors Button */}
-                  <ListItem>
-                    <Link to="/contributors">
-                      <Button variant="primary" size="md" hyper className="w-full justify-center">
-                        Contributors
-                      </Button>
-                    </Link>
-                  </ListItem>
-
                   {/* Network Selector */}
                   <ListItem>
                     <Header size="xs" title="Network" />
@@ -77,20 +67,40 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps): JSX.Elem
                     </div>
                   </ListItem>
 
-                  {/* Experiments */}
+                  {/* Ethereum Section */}
                   <ListItem>
-                    <Header size="xs" title="Experiments" />
+                    <Header size="xs" title="Ethereum" />
                     <ListContainer variant="simple" compact withDividers={false}>
-                      {experiments.map(experiment => (
-                        <ListItem key={experiment.to}>
+                      {ethereumPages.map(page => (
+                        <ListItem key={page.to}>
                           <Link
-                            to={experiment.to}
+                            to={page.to}
                             className="group flex gap-x-3 rounded-lg px-2.5 py-1.5 text-sm/6 font-semibold text-muted transition-all hover:bg-primary/10 hover:text-primary"
                             activeProps={{
                               className: 'bg-primary/10 text-primary shadow-sm ring-1 ring-primary/20',
                             }}
                           >
-                            {experiment.name}
+                            {page.name}
+                          </Link>
+                        </ListItem>
+                      ))}
+                    </ListContainer>
+                  </ListItem>
+
+                  {/* Xatu Section */}
+                  <ListItem>
+                    <Header size="xs" title="Xatu" />
+                    <ListContainer variant="simple" compact withDividers={false}>
+                      {xatuPages.map(page => (
+                        <ListItem key={page.to}>
+                          <Link
+                            to={page.to}
+                            className="group flex gap-x-3 rounded-lg px-2.5 py-1.5 text-sm/6 font-semibold text-muted transition-all hover:bg-primary/10 hover:text-primary"
+                            activeProps={{
+                              className: 'bg-primary/10 text-primary shadow-sm ring-1 ring-primary/20',
+                            }}
+                          >
+                            {page.name}
                           </Link>
                         </ListItem>
                       ))}
@@ -120,15 +130,6 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps): JSX.Elem
 
           <nav className="flex flex-1 flex-col">
             <ListContainer variant="simple" withDividers={false} compact className="flex flex-1 flex-col gap-y-7">
-              {/* Contributors Button */}
-              <ListItem>
-                <Link to="/contributors">
-                  <Button variant="primary" size="md" hyper className="w-full justify-center">
-                    Contributors
-                  </Button>
-                </Link>
-              </ListItem>
-
               {/* Network Selector */}
               <ListItem>
                 <Header size="xs" title="Network" />
@@ -137,20 +138,40 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps): JSX.Elem
                 </div>
               </ListItem>
 
-              {/* Experiments */}
+              {/* Ethereum Section */}
               <ListItem>
-                <Header size="xs" title="Experiments" />
+                <Header size="xs" title="Ethereum" />
                 <ListContainer variant="simple" compact withDividers={false}>
-                  {experiments.map(experiment => (
-                    <ListItem key={experiment.to}>
+                  {ethereumPages.map(page => (
+                    <ListItem key={page.to}>
                       <Link
-                        to={experiment.to}
+                        to={page.to}
                         className="group flex gap-x-3 px-2.5 py-1.5 text-sm/6 font-semibold text-muted transition-all hover:bg-primary/10 hover:text-primary"
                         activeProps={{
                           className: 'bg-primary/10 text-primary shadow-sm ring-1 ring-primary/20',
                         }}
                       >
-                        {experiment.name}
+                        {page.name}
+                      </Link>
+                    </ListItem>
+                  ))}
+                </ListContainer>
+              </ListItem>
+
+              {/* Xatu Section */}
+              <ListItem>
+                <Header size="xs" title="Xatu" />
+                <ListContainer variant="simple" compact withDividers={false}>
+                  {xatuPages.map(page => (
+                    <ListItem key={page.to}>
+                      <Link
+                        to={page.to}
+                        className="group flex gap-x-3 px-2.5 py-1.5 text-sm/6 font-semibold text-muted transition-all hover:bg-primary/10 hover:text-primary"
+                        activeProps={{
+                          className: 'bg-primary/10 text-primary shadow-sm ring-1 ring-primary/20',
+                        }}
+                      >
+                        {page.name}
                       </Link>
                     </ListItem>
                   ))}

@@ -15,7 +15,7 @@ import type { UserClassification } from './components/UserCard/UserCard.types';
 import { getBorderColor, getClassificationLabel, getClassificationColor } from './components/UserCard/utils';
 
 export function DetailPage(): JSX.Element {
-  const { id } = useParams({ from: '/contributors/$id' });
+  const { id } = useParams({ from: '/xatu/contributors/$id' });
 
   // Query all three categories since we don't know which one the username belongs to
   const {
@@ -91,7 +91,7 @@ export function DetailPage(): JSX.Element {
         <div className="rounded-sm border border-danger bg-danger/10 p-4 text-danger">
           Error loading contributor: {error.message}
         </div>
-        <Link to="/contributors" className="mt-4 inline-block text-primary hover:underline">
+        <Link to="/xatu/contributors" className="mt-4 inline-block text-primary hover:underline">
           ← Back to all contributors
         </Link>
       </Container>
@@ -107,7 +107,7 @@ export function DetailPage(): JSX.Element {
         <div className="rounded-sm border border-border bg-surface/50 p-12 text-center backdrop-blur-sm">
           <h2 className="mb-2 text-2xl/8 font-bold text-foreground">Contributor not found</h2>
           <p className="mb-4 text-muted">No active nodes found for &quot;{id}&quot; in the last 24 hours.</p>
-          <Link to="/contributors" className="text-primary hover:underline">
+          <Link to="/xatu/contributors" className="text-primary hover:underline">
             ← Back to all contributors
           </Link>
         </div>
@@ -178,7 +178,7 @@ export function DetailPage(): JSX.Element {
     <Container>
       <Header title="Contributor Details" description="Detailed contribution metrics and activity" />
 
-      <Link to="/contributors" className="mb-6 inline-block text-primary hover:underline">
+      <Link to="/xatu/contributors" className="mb-6 inline-block text-primary hover:underline">
         ← Back to all contributors
       </Link>
 
