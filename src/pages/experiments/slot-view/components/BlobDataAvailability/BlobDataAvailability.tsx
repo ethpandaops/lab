@@ -2,7 +2,6 @@ import type { JSX } from 'react';
 import { useState, useMemo, memo } from 'react';
 import ReactECharts from 'echarts-for-react';
 import clsx from 'clsx';
-import { LineChart } from '@/components/Charts/Line';
 import type { BlobDataAvailabilityProps } from './BlobDataAvailability.types';
 
 /**
@@ -31,7 +30,7 @@ import type { BlobDataAvailabilityProps } from './BlobDataAvailability.types';
  */
 function BlobDataAvailabilityComponent({
   firstSeenData = [],
-  availabilityRateData = [],
+  availabilityRateData: _availabilityRateData = [],
   continentalPropagationData = [],
   currentTime,
   maxTime = 12000,
@@ -78,13 +77,6 @@ function BlobDataAvailabilityComponent({
       success: successColor || fallbackColors.success,
     };
   });
-
-  // Calculate max values for Y-axis (using all data, not just visible)
-  // This prevents the chart from re-scaling during animations
-  const availabilityRateMax = useMemo(() => {
-    const nodeCounts = availabilityRateData.map(p => p.nodes);
-    return nodeCounts.length > 0 ? Math.max(...nodeCounts) : 30;
-  }, [availabilityRateData]);
 
   // Prepare First Seen scatter chart data - only show blobs seen up to current time
   const firstSeenOption = useMemo(() => {
@@ -212,23 +204,6 @@ function BlobDataAvailabilityComponent({
   }, [firstSeenData, themeColors, maxTime, effectiveCurrentTime]);
 
   // Prepare Data is Available Rate line chart data - show full 0-12s range with null for future values
-  const availabilityRateChartData = useMemo(() => {
-    // Create a static array of all time points from 0-12 seconds
-    const timePoints = Array.from({ length: 13 }, (_, i) => i * 1000); // 0, 1000, 2000, ... 12000
-    const labels = timePoints.map(time => `${time / 1000}s`);
-
-    // Create a map of time to nodes for quick lookup
-    const timeToNodesMap = new Map(availabilityRateData.map(p => [p.time, p.nodes]));
-
-    // Map each time point to its corresponding nodes value, or null if beyond current time
-    const data = timePoints.map(time => {
-      if (time > effectiveCurrentTime) return null;
-      return timeToNodesMap.get(time) ?? null;
-    });
-
-    return { labels, data };
-  }, [availabilityRateData, effectiveCurrentTime]);
-
   // Prepare Continental Propagation chart data - CDF per continent, only show data up to current time
   const continentalPropagationOption = useMemo(() => {
     // Default colors for continents
@@ -408,8 +383,8 @@ function BlobDataAvailabilityComponent({
 
   return (
     <div className={clsx('grid h-full grid-cols-12 gap-4', className)}>
-      {/* First Seen Chart - 4 columns */}
-      <div className="col-span-4 h-full rounded-sm border border-border bg-surface p-2">
+      {/* First Seen Chart - 6 columns */}
+      <div className="col-span-6 h-full rounded-sm border border-border bg-surface p-2">
         <ReactECharts
           option={firstSeenOption}
           style={{ height: '100%', width: '100%' }}
@@ -418,30 +393,8 @@ function BlobDataAvailabilityComponent({
         />
       </div>
 
-      {/* Data is Available Rate Chart - 4 columns */}
-      <div className="col-span-4 h-full rounded-sm border border-border bg-surface p-2">
-        <LineChart
-          data={availabilityRateChartData.data}
-          labels={availabilityRateChartData.labels}
-          title="DATA IS AVAILABLE RATE"
-          titleLeft={16}
-          titleTop={12}
-          titleFontSize={13}
-          titleFontFamily="monospace"
-          titleFontWeight={600}
-          height="100%"
-          smooth={false}
-          showArea={true}
-          color={themeColors.success}
-          yMax={availabilityRateMax}
-          connectNulls={false}
-          animationDuration={0}
-          xAxisLabelInterval={3}
-        />
-      </div>
-
-      {/* Continental Propagation Chart - 4 columns */}
-      <div className="col-span-4 h-full rounded-sm border border-border bg-surface p-2">
+      {/* Continental Propagation Chart - 6 columns */}
+      <div className="col-span-6 h-full rounded-sm border border-border bg-surface p-2">
         <ReactECharts
           option={continentalPropagationOption}
           style={{ height: '100%', width: '100%' }}
