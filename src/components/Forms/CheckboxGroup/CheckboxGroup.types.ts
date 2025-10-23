@@ -32,9 +32,9 @@ export interface CheckboxOption {
    */
   checked?: boolean;
   /**
-   * onChange handler
+   * onChange handler - accepts either event-based or boolean-based callback
    */
-  onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  onChange?: (checked: boolean) => void;
 }
 
 export type CheckboxGroupVariant = 'list' | 'list-inline' | 'list-right' | 'simple';
@@ -64,4 +64,8 @@ export interface CheckboxGroupProps {
    * Additional CSS classes
    */
   className?: string;
+  /**
+   * Apply rounded corners (rounded-sm) to checkboxes. Default: false
+   */
+  rounded?: boolean;
 }

@@ -4,13 +4,23 @@ import { XMarkIcon } from '@heroicons/react/24/outline';
 import { Link } from '@tanstack/react-router';
 import { NetworkSelect } from '@/components/Ethereum/NetworkSelect';
 import { ThemeToggle } from '@/components/Layout/ThemeToggle';
-import type { SidebarProps, NavigationItem } from './Sidebar.types';
-import { HomeIcon, BeakerIcon, UserGroupIcon } from '@heroicons/react/24/outline';
+import { ListContainer, ListItem } from '@/components/Layout/ListContainer';
+import { Button } from '@/components/Elements/Button';
+import { Header } from '@/components/Layout/Header';
+import type { SidebarProps } from './Sidebar.types';
 
-const navigation: NavigationItem[] = [
-  { name: 'Home', to: '/', icon: HomeIcon },
-  { name: 'Experiments', to: '/experiments', icon: BeakerIcon },
-  { name: 'Contributors', to: '/contributors', icon: UserGroupIcon },
+interface ExperimentItem {
+  name: string;
+  to: string;
+}
+
+const experiments: ExperimentItem[] = [
+  { name: 'Networks', to: '/experiments/networks' },
+  { name: 'Live Slots', to: '/experiments/live-slots' },
+  { name: 'Locally Built Blocks', to: '/experiments/locally-built-blocks' },
+  { name: 'Geographical Checklist', to: '/experiments/geographical-checklist' },
+  { name: 'Fork Readiness', to: '/experiments/fork-readiness' },
+  { name: 'Block Production Flow', to: '/experiments/block-production-flow' },
 ];
 
 export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps): JSX.Element {
@@ -49,35 +59,44 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps): JSX.Elem
               </div>
 
               <nav className="flex flex-1 flex-col">
-                <ul role="list" className="flex flex-1 flex-col gap-y-7">
-                  {/* Navigation */}
-                  <li>
-                    <ul role="list" className="-mx-2 space-y-1">
-                      {navigation.map(item => (
-                        <li key={item.name}>
+                <ListContainer variant="simple" withDividers={false} compact className="flex flex-1 flex-col gap-y-7">
+                  {/* Contributors Button */}
+                  <ListItem>
+                    <Link to="/contributors">
+                      <Button variant="primary" size="md" hyper className="w-full justify-center">
+                        Contributors
+                      </Button>
+                    </Link>
+                  </ListItem>
+
+                  {/* Network Selector */}
+                  <ListItem>
+                    <Header size="xs" title="Network" />
+                    <div className="mt-2">
+                      <NetworkSelect showLabel={false} />
+                    </div>
+                  </ListItem>
+
+                  {/* Experiments */}
+                  <ListItem>
+                    <Header size="xs" title="Experiments" />
+                    <ListContainer variant="simple" compact withDividers={false}>
+                      {experiments.map(experiment => (
+                        <ListItem key={experiment.to}>
                           <Link
-                            to={item.to}
-                            className="group flex gap-x-3 rounded-lg p-2.5 text-sm/6 font-semibold text-muted transition-all hover:bg-primary/10 hover:text-primary"
+                            to={experiment.to}
+                            className="group flex gap-x-3 rounded-lg px-2.5 py-1.5 text-sm/6 font-semibold text-muted transition-all hover:bg-primary/10 hover:text-primary"
                             activeProps={{
                               className: 'bg-primary/10 text-primary shadow-sm ring-1 ring-primary/20',
                             }}
                           >
-                            <item.icon aria-hidden={true} className="size-6 shrink-0" />
-                            {item.name}
+                            {experiment.name}
                           </Link>
-                        </li>
+                        </ListItem>
                       ))}
-                    </ul>
-                  </li>
-
-                  {/* Network Selector */}
-                  <li className="-mx-2">
-                    <div className="text-xs/6 font-semibold tracking-wider text-muted uppercase">Network</div>
-                    <div className="mt-2">
-                      <NetworkSelect showLabel={false} />
-                    </div>
-                  </li>
-                </ul>
+                    </ListContainer>
+                  </ListItem>
+                </ListContainer>
               </nav>
             </div>
           </DialogPanel>
@@ -100,35 +119,44 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps): JSX.Elem
           </div>
 
           <nav className="flex flex-1 flex-col">
-            <ul role="list" className="flex flex-1 flex-col gap-y-7">
-              {/* Navigation */}
-              <li>
-                <ul role="list" className="-mx-2 space-y-1">
-                  {navigation.map(item => (
-                    <li key={item.name}>
+            <ListContainer variant="simple" withDividers={false} compact className="flex flex-1 flex-col gap-y-7">
+              {/* Contributors Button */}
+              <ListItem>
+                <Link to="/contributors">
+                  <Button variant="primary" size="md" hyper className="w-full justify-center">
+                    Contributors
+                  </Button>
+                </Link>
+              </ListItem>
+
+              {/* Network Selector */}
+              <ListItem>
+                <Header size="xs" title="Network" />
+                <div className="mt-2">
+                  <NetworkSelect showLabel={false} />
+                </div>
+              </ListItem>
+
+              {/* Experiments */}
+              <ListItem>
+                <Header size="xs" title="Experiments" />
+                <ListContainer variant="simple" compact withDividers={false}>
+                  {experiments.map(experiment => (
+                    <ListItem key={experiment.to}>
                       <Link
-                        to={item.to}
-                        className="group flex gap-x-3 rounded-lg p-2.5 text-sm/6 font-semibold text-muted transition-all hover:bg-primary/10 hover:text-primary"
+                        to={experiment.to}
+                        className="group flex gap-x-3 px-2.5 py-1.5 text-sm/6 font-semibold text-muted transition-all hover:bg-primary/10 hover:text-primary"
                         activeProps={{
                           className: 'bg-primary/10 text-primary shadow-sm ring-1 ring-primary/20',
                         }}
                       >
-                        <item.icon aria-hidden={true} className="size-6 shrink-0" />
-                        {item.name}
+                        {experiment.name}
                       </Link>
-                    </li>
+                    </ListItem>
                   ))}
-                </ul>
-              </li>
-
-              {/* Network Selector */}
-              <li className="-mx-2">
-                <div className="text-xs/6 font-semibold tracking-wider text-muted uppercase">Network</div>
-                <div className="mt-2">
-                  <NetworkSelect showLabel={false} />
-                </div>
-              </li>
-            </ul>
+                </ListContainer>
+              </ListItem>
+            </ListContainer>
           </nav>
         </div>
       </div>

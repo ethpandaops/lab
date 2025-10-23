@@ -5,4 +5,8 @@ export interface ButtonGroupProps extends ComponentPropsWithoutRef<'span'> {
    * Button elements to group together (use Button components from @/components/Button)
    */
   children: ReactNode;
+  /**
+   * Apply rounded corners to the button group. Default: false
+   */
+  rounded?: boolean;
 }

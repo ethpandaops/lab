@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Dialog } from './Dialog';
 import { Button } from '@/components/Elements/Button';
 import { Alert } from '@/components/Feedback/Alert';
-import { InputGroup } from '@/components/Forms/InputGroup';
+import { Input } from '@/components/Forms/Input';
 import { SelectMenu } from '@/components/Forms/SelectMenu';
 import { Toggle } from '@/components/Forms/Toggle';
 import { TrashIcon, UserIcon, EnvelopeIcon } from '@heroicons/react/24/outline';
@@ -302,19 +302,19 @@ export const WithForm: Story = {
           }
         >
           <form className="space-y-4">
-            <InputGroup
-              label="Full name"
-              type="text"
-              placeholder="John Smith"
-              leadingIcon={<UserIcon className="size-5" />}
-            />
+            <Input label="Full name">
+              <Input.Leading>
+                <UserIcon />
+              </Input.Leading>
+              <Input.Field type="text" placeholder="John Smith" />
+            </Input>
 
-            <InputGroup
-              label="Email address"
-              type="email"
-              placeholder="john@example.com"
-              leadingIcon={<EnvelopeIcon className="size-5" />}
-            />
+            <Input label="Email address">
+              <Input.Leading>
+                <EnvelopeIcon />
+              </Input.Leading>
+              <Input.Field type="email" placeholder="john@example.com" />
+            </Input>
 
             <SelectMenu
               value={role}

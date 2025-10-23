@@ -1,3 +1,5 @@
+import type { ReactNode } from 'react';
+
 export type RadioGroupVariant =
   | 'simple-list'
   | 'simple-inline'
@@ -12,28 +14,115 @@ export type RadioGroupVariant =
   | 'small-cards'
   | 'stacked-cards';
 
-export interface RadioGroupOption {
-  id: string;
+export interface RadioGroupProps {
+  /**
+   * Name attribute for the radio group
+   */
   name: string;
-  title?: string;
-  description?: string;
+
+  /**
+   * Radio option children (composition API)
+   */
+  children: ReactNode;
+
+  /**
+   * Default selected value
+   */
+  defaultValue?: string;
+
+  /**
+   * Controlled selected value
+   */
   value?: string;
+
+  /**
+   * Change handler called when selection changes
+   */
+  onChange?: (value: string) => void;
+
+  /**
+   * Visual variant of the radio group
+   * @default 'simple-list'
+   */
+  variant?: RadioGroupVariant;
+
+  /**
+   * Legend/label for the radio group
+   */
+  legend?: string;
+
+  /**
+   * Description text below the legend
+   */
+  description?: string;
+
+  /**
+   * Accessible label when legend is not provided
+   */
+  'aria-label'?: string;
+
+  /**
+   * Disable all radio options
+   * @default false
+   */
   disabled?: boolean;
-  classes?: string; // For picker variant (e.g., 'bg-pink-500 checked:outline-pink-500')
-  extraInfo?: string; // For table/stacked-cards variants (e.g., pricing)
-  additionalInfo?: string; // For table/stacked-cards variants (e.g., limits)
+
+  /**
+   * Additional CSS classes
+   */
+  className?: string;
 }
 
-export interface RadioGroupProps {
-  name: string;
-  options: RadioGroupOption[];
-  defaultValue?: string;
+export interface RadioOptionProps {
+  /**
+   * Unique identifier for the option
+   */
+  id: string;
+
+  /**
+   * Value to be submitted (defaults to id if not provided)
+   */
   value?: string;
-  onChange?: (value: string) => void;
-  variant?: RadioGroupVariant;
-  legend?: string;
+
+  /**
+   * Display name/label for the option
+   */
+  name?: string;
+
+  /**
+   * Alternative title (used in some variants)
+   */
+  title?: string;
+
+  /**
+   * Description text for the option
+   */
   description?: string;
-  'aria-label'?: string;
+
+  /**
+   * Disable this specific option
+   * @default false
+   */
   disabled?: boolean;
-  className?: string;
+
+  /**
+   * Custom classes for the option (used in picker variant)
+   */
+  classes?: string;
+
+  /**
+   * Extra information (used in table/cards variants)
+   */
+  extraInfo?: string;
+
+  /**
+   * Additional information (used in table/stacked-cards variants)
+   */
+  additionalInfo?: string;
+
+  /**
+   * Child content to render inside the option
+   * If provided, takes precedence over name/title
+   */
+  children?: ReactNode;
 }

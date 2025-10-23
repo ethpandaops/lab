@@ -63,4 +63,9 @@ export interface CheckboxProps {
    * ARIA described by for accessibility
    */
   'aria-describedby'?: string;
+
+  /**
+   * Apply rounded corners (rounded-sm). Default: false
+   */
+  rounded?: boolean;
 }

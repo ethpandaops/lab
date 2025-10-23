@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
-import { RadioGroup } from './RadioGroup';
+import { RadioGroup, RadioOption } from './RadioGroup';
 
 const meta: Meta<typeof RadioGroup> = {
   title: 'Components/Forms/RadioGroup',
@@ -33,12 +33,11 @@ export const SimpleList: Story = {
         description="How do you prefer to receive notifications?"
         value={value}
         onChange={setValue}
-        options={[
-          { id: 'email', name: 'Email' },
-          { id: 'sms', name: 'Phone (SMS)' },
-          { id: 'push', name: 'Push notification' },
-        ]}
-      />
+      >
+        <RadioOption id="email" name="Email" />
+        <RadioOption id="sms" name="Phone (SMS)" />
+        <RadioOption id="push" name="Push notification" />
+      </RadioGroup>
     );
   },
 };
@@ -55,12 +54,11 @@ export const SimpleInline: Story = {
         description="How do you prefer to receive notifications?"
         value={value}
         onChange={setValue}
-        options={[
-          { id: 'email', name: 'Email' },
-          { id: 'sms', name: 'Phone (SMS)' },
-          { id: 'push', name: 'Push notification' },
-        ]}
-      />
+      >
+        <RadioOption id="email" name="Email" />
+        <RadioOption id="sms" name="Phone (SMS)" />
+        <RadioOption id="push" name="Push notification" />
+      </RadioGroup>
     );
   },
 };
@@ -76,24 +74,11 @@ export const DescriptionList: Story = {
         aria-label="Plan"
         value={value}
         onChange={setValue}
-        options={[
-          {
-            id: 'small',
-            name: 'Small',
-            description: '4 GB RAM / 2 CPUS / 80 GB SSD Storage',
-          },
-          {
-            id: 'medium',
-            name: 'Medium',
-            description: '8 GB RAM / 4 CPUS / 160 GB SSD Storage',
-          },
-          {
-            id: 'large',
-            name: 'Large',
-            description: '16 GB RAM / 8 CPUS / 320 GB SSD Storage',
-          },
-        ]}
-      />
+      >
+        <RadioOption id="small" name="Small" description="4 GB RAM / 2 CPUS / 80 GB SSD Storage" />
+        <RadioOption id="medium" name="Medium" description="8 GB RAM / 4 CPUS / 160 GB SSD Storage" />
+        <RadioOption id="large" name="Large" description="16 GB RAM / 8 CPUS / 320 GB SSD Storage" />
+      </RadioGroup>
     );
   },
 };
@@ -109,24 +94,11 @@ export const InlineDescriptionList: Story = {
         aria-label="Plan"
         value={value}
         onChange={setValue}
-        options={[
-          {
-            id: 'small',
-            name: 'Small',
-            description: '4 GB RAM / 2 CPUS / 80 GB SSD Storage',
-          },
-          {
-            id: 'medium',
-            name: 'Medium',
-            description: '8 GB RAM / 4 CPUS / 160 GB SSD Storage',
-          },
-          {
-            id: 'large',
-            name: 'Large',
-            description: '16 GB RAM / 8 CPUS / 320 GB SSD Storage',
-          },
-        ]}
-      />
+      >
+        <RadioOption id="small" name="Small" description="4 GB RAM / 2 CPUS / 80 GB SSD Storage" />
+        <RadioOption id="medium" name="Medium" description="8 GB RAM / 4 CPUS / 160 GB SSD Storage" />
+        <RadioOption id="large" name="Large" description="16 GB RAM / 8 CPUS / 320 GB SSD Storage" />
+      </RadioGroup>
     );
   },
 };
@@ -143,24 +115,11 @@ export const RightRadioList: Story = {
         description="Transfer your balance to your bank account."
         value={value}
         onChange={setValue}
-        options={[
-          {
-            id: 'checking',
-            name: 'Checking',
-            description: 'CIBC ••••6610',
-          },
-          {
-            id: 'savings',
-            name: 'Savings',
-            description: 'Bank of America ••••0149',
-          },
-          {
-            id: 'mastercard',
-            name: 'Mastercard',
-            description: 'Capital One ••••7877',
-          },
-        ]}
-      />
+      >
+        <RadioOption id="checking" name="Checking" description="CIBC ••••6610" />
+        <RadioOption id="savings" name="Savings" description="Bank of America ••••0149" />
+        <RadioOption id="mastercard" name="Mastercard" description="Capital One ••••7877" />
+      </RadioGroup>
     );
   },
 };
@@ -176,15 +135,14 @@ export const SimpleRightRadioList: Story = {
         legend="Select a side"
         value={value}
         onChange={setValue}
-        options={[
-          { id: 'null', name: 'None' },
-          { id: '1', name: 'Baked beans' },
-          { id: '2', name: 'Coleslaw' },
-          { id: '3', name: 'French fries' },
-          { id: '4', name: 'Garden salad' },
-          { id: '5', name: 'Mashed potatoes' },
-        ]}
-      />
+      >
+        <RadioOption id="null" name="None" />
+        <RadioOption id="1" name="Baked beans" />
+        <RadioOption id="2" name="Coleslaw" />
+        <RadioOption id="3" name="French fries" />
+        <RadioOption id="4" name="Garden salad" />
+        <RadioOption id="5" name="Mashed potatoes" />
+      </RadioGroup>
     );
   },
 };
@@ -194,36 +152,29 @@ export const Table: Story = {
   render: () => {
     const [value, setValue] = useState('startup');
     return (
-      <RadioGroup
-        name="pricing-plan"
-        variant="table"
-        aria-label="Pricing plans"
-        value={value}
-        onChange={setValue}
-        options={[
-          {
-            id: 'startup',
-            name: 'Startup',
-            extraInfo: '$29 / mo',
-            description: '$290 / yr',
-            additionalInfo: 'Up to 5 active job postings',
-          },
-          {
-            id: 'business',
-            name: 'Business',
-            extraInfo: '$99 / mo',
-            description: '$990 / yr',
-            additionalInfo: 'Up to 25 active job postings',
-          },
-          {
-            id: 'enterprise',
-            name: 'Enterprise',
-            extraInfo: '$249 / mo',
-            description: '$2490 / yr',
-            additionalInfo: 'Unlimited active job postings',
-          },
-        ]}
-      />
+      <RadioGroup name="pricing-plan" variant="table" aria-label="Pricing plans" value={value} onChange={setValue}>
+        <RadioOption
+          id="startup"
+          name="Startup"
+          extraInfo="$29 / mo"
+          description="$290 / yr"
+          additionalInfo="Up to 5 active job postings"
+        />
+        <RadioOption
+          id="business"
+          name="Business"
+          extraInfo="$99 / mo"
+          description="$990 / yr"
+          additionalInfo="Up to 25 active job postings"
+        />
+        <RadioOption
+          id="enterprise"
+          name="Enterprise"
+          extraInfo="$249 / mo"
+          description="$2490 / yr"
+          additionalInfo="Unlimited active job postings"
+        />
+      </RadioGroup>
     );
   },
 };
@@ -233,30 +184,23 @@ export const Panel: Story = {
   render: () => {
     const [value, setValue] = useState('public');
     return (
-      <RadioGroup
-        name="privacy-setting"
-        variant="panel"
-        aria-label="Privacy setting"
-        value={value}
-        onChange={setValue}
-        options={[
-          {
-            id: 'public',
-            name: 'Public access',
-            description: 'This project would be available to anyone who has the link',
-          },
-          {
-            id: 'private-to-project-members',
-            name: 'Private to project members',
-            description: 'Only members of this project would be able to access',
-          },
-          {
-            id: 'private-to-you',
-            name: 'Private to you',
-            description: 'You are the only one able to access this project',
-          },
-        ]}
-      />
+      <RadioGroup name="privacy-setting" variant="panel" aria-label="Privacy setting" value={value} onChange={setValue}>
+        <RadioOption
+          id="public"
+          name="Public access"
+          description="This project would be available to anyone who has the link"
+        />
+        <RadioOption
+          id="private-to-project-members"
+          name="Private to project members"
+          description="Only members of this project would be able to access"
+        />
+        <RadioOption
+          id="private-to-you"
+          name="Private to you"
+          description="You are the only one able to access this project"
+        />
+      </RadioGroup>
     );
   },
 };
@@ -266,40 +210,13 @@ export const Picker: Story = {
   render: () => {
     const [value, setValue] = useState('pink');
     return (
-      <RadioGroup
-        name="color"
-        variant="picker"
-        legend="Choose a label color"
-        value={value}
-        onChange={setValue}
-        options={[
-          {
-            id: 'pink',
-            name: 'Pink',
-            classes: 'bg-pink-500 checked:outline-pink-500',
-          },
-          {
-            id: 'purple',
-            name: 'Purple',
-            classes: 'bg-purple-500 checked:outline-purple-500',
-          },
-          {
-            id: 'blue',
-            name: 'Blue',
-            classes: 'bg-blue-500 checked:outline-blue-500',
-          },
-          {
-            id: 'green',
-            name: 'Green',
-            classes: 'bg-green-500 checked:outline-green-500',
-          },
-          {
-            id: 'yellow',
-            name: 'Yellow',
-            classes: 'bg-yellow-500 checked:outline-yellow-500',
-          },
-        ]}
-      />
+      <RadioGroup name="color" variant="picker" legend="Choose a label color" value={value} onChange={setValue}>
+        <RadioOption id="pink" name="Pink" classes="bg-pink-500 checked:outline-pink-500" />
+        <RadioOption id="purple" name="Purple" classes="bg-purple-500 checked:outline-purple-500" />
+        <RadioOption id="blue" name="Blue" classes="bg-blue-500 checked:outline-blue-500" />
+        <RadioOption id="green" name="Green" classes="bg-green-500 checked:outline-green-500" />
+        <RadioOption id="yellow" name="Yellow" classes="bg-yellow-500 checked:outline-yellow-500" />
+      </RadioGroup>
     );
   },
 };
@@ -309,33 +226,26 @@ export const Cards: Story = {
   render: () => {
     const [value, setValue] = useState('newsletter');
     return (
-      <RadioGroup
-        name="mailing-list"
-        variant="cards"
-        legend="Select a mailing list"
-        value={value}
-        onChange={setValue}
-        options={[
-          {
-            id: 'newsletter',
-            name: 'Newsletter',
-            description: 'Last message sent an hour ago',
-            extraInfo: '621 users',
-          },
-          {
-            id: 'existing-customers',
-            name: 'Existing customers',
-            description: 'Last message sent 2 weeks ago',
-            extraInfo: '1200 users',
-          },
-          {
-            id: 'trial-users',
-            name: 'Trial users',
-            description: 'Last message sent 4 days ago',
-            extraInfo: '2740 users',
-          },
-        ]}
-      />
+      <RadioGroup name="mailing-list" variant="cards" legend="Select a mailing list" value={value} onChange={setValue}>
+        <RadioOption
+          id="newsletter"
+          name="Newsletter"
+          description="Last message sent an hour ago"
+          extraInfo="621 users"
+        />
+        <RadioOption
+          id="existing-customers"
+          name="Existing customers"
+          description="Last message sent 2 weeks ago"
+          extraInfo="1200 users"
+        />
+        <RadioOption
+          id="trial-users"
+          name="Trial users"
+          description="Last message sent 4 days ago"
+          extraInfo="2740 users"
+        />
+      </RadioGroup>
     );
   },
 };
@@ -353,15 +263,14 @@ export const SmallCards: Story = {
         aria-label="Choose a memory option"
         value={value}
         onChange={setValue}
-        options={[
-          { id: '4gb', name: '4 GB' },
-          { id: '8gb', name: '8 GB' },
-          { id: '16gb', name: '16 GB' },
-          { id: '32gb', name: '32 GB' },
-          { id: '64gb', name: '64 GB' },
-          { id: '128gb', name: '128 GB', disabled: true },
-        ]}
-      />
+      >
+        <RadioOption id="4gb" name="4 GB" />
+        <RadioOption id="8gb" name="8 GB" />
+        <RadioOption id="16gb" name="16 GB" />
+        <RadioOption id="32gb" name="32 GB" />
+        <RadioOption id="64gb" name="64 GB" />
+        <RadioOption id="128gb" name="128 GB" disabled />
+      </RadioGroup>
     );
   },
 };
@@ -371,43 +280,36 @@ export const StackedCards: Story = {
   render: () => {
     const [value, setValue] = useState('hobby');
     return (
-      <RadioGroup
-        name="plan"
-        variant="stacked-cards"
-        aria-label="Server size"
-        value={value}
-        onChange={setValue}
-        options={[
-          {
-            id: 'hobby',
-            name: 'Hobby',
-            description: '8GB / 4 CPUs · 160 GB SSD disk',
-            extraInfo: '$40',
-            additionalInfo: '/mo',
-          },
-          {
-            id: 'startup',
-            name: 'Startup',
-            description: '12GB / 6 CPUs · 256 GB SSD disk',
-            extraInfo: '$80',
-            additionalInfo: '/mo',
-          },
-          {
-            id: 'business',
-            name: 'Business',
-            description: '16GB / 8 CPUs · 512 GB SSD disk',
-            extraInfo: '$160',
-            additionalInfo: '/mo',
-          },
-          {
-            id: 'enterprise',
-            name: 'Enterprise',
-            description: '32GB / 12 CPUs · 1024 GB SSD disk',
-            extraInfo: '$240',
-            additionalInfo: '/mo',
-          },
-        ]}
-      />
+      <RadioGroup name="plan" variant="stacked-cards" aria-label="Server size" value={value} onChange={setValue}>
+        <RadioOption
+          id="hobby"
+          name="Hobby"
+          description="8GB / 4 CPUs · 160 GB SSD disk"
+          extraInfo="$40"
+          additionalInfo="/mo"
+        />
+        <RadioOption
+          id="startup"
+          name="Startup"
+          description="12GB / 6 CPUs · 256 GB SSD disk"
+          extraInfo="$80"
+          additionalInfo="/mo"
+        />
+        <RadioOption
+          id="business"
+          name="Business"
+          description="16GB / 8 CPUs · 512 GB SSD disk"
+          extraInfo="$160"
+          additionalInfo="/mo"
+        />
+        <RadioOption
+          id="enterprise"
+          name="Enterprise"
+          description="32GB / 12 CPUs · 1024 GB SSD disk"
+          extraInfo="$240"
+          additionalInfo="/mo"
+        />
+      </RadioGroup>
     );
   },
 };
@@ -425,12 +327,11 @@ export const Disabled: Story = {
         value={value}
         onChange={setValue}
         disabled
-        options={[
-          { id: 'option1', name: 'Option 1' },
-          { id: 'option2', name: 'Option 2' },
-          { id: 'option3', name: 'Option 3' },
-        ]}
-      />
+      >
+        <RadioOption id="option1" name="Option 1" />
+        <RadioOption id="option2" name="Option 2" />
+        <RadioOption id="option3" name="Option 3" />
+      </RadioGroup>
     );
   },
 };
@@ -447,13 +348,61 @@ export const IndividualDisabled: Story = {
         description="Some options are disabled"
         value={value}
         onChange={setValue}
-        options={[
-          { id: 'option1', name: 'Available Option 1' },
-          { id: 'option2', name: 'Disabled Option 2', disabled: true },
-          { id: 'option3', name: 'Available Option 3' },
-          { id: 'option4', name: 'Disabled Option 4', disabled: true },
-        ]}
-      />
+      >
+        <RadioOption id="option1" name="Available Option 1" />
+        <RadioOption id="option2" name="Disabled Option 2" disabled />
+        <RadioOption id="option3" name="Available Option 3" />
+        <RadioOption id="option4" name="Disabled Option 4" disabled />
+      </RadioGroup>
+    );
+  },
+};
+
+// Custom Content with Children
+export const CustomContent: Story = {
+  render: () => {
+    const [value, setValue] = useState('option1');
+    return (
+      <RadioGroup
+        name="custom-content"
+        variant="simple-list"
+        legend="Custom Content"
+        description="Using children prop for custom rich content"
+        value={value}
+        onChange={setValue}
+      >
+        <RadioOption id="option1">
+          <strong>Bold Option 1</strong>
+        </RadioOption>
+        <RadioOption id="option2">
+          <em>Italic Option 2</em>
+        </RadioOption>
+        <RadioOption id="option3">
+          <span className="text-primary">Colored Option 3</span>
+        </RadioOption>
+      </RadioGroup>
+    );
+  },
+};
+
+// Mixed Props - Description List with Custom Children
+export const MixedPropsDescriptionList: Story = {
+  render: () => {
+    const [value, setValue] = useState('custom');
+    return (
+      <RadioGroup
+        name="mixed-props"
+        variant="description-list"
+        aria-label="Mixed Props Example"
+        value={value}
+        onChange={setValue}
+      >
+        <RadioOption id="standard" name="Standard Option" description="Using name and description props" />
+        <RadioOption id="custom" description="Custom styled content below">
+          <span className="font-bold text-primary">Custom</span> <span className="text-muted">styled option</span>
+        </RadioOption>
+        <RadioOption id="mixed" name="Mixed Approach" description="This combines name prop with description" />
+      </RadioGroup>
     );
   },
 };

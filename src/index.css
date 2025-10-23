@@ -65,6 +65,9 @@
     --foreground-value: var(--color-zinc-950);
     --muted-value: var(--color-zinc-600);
     --border-value: var(--color-zinc-200);
+
+    /* Set html background for overscroll */
+    background-color: white;
   }
 
   html.dark {
@@ -77,6 +80,9 @@
     --foreground-value: var(--color-zinc-50);
     --muted-value: var(--color-zinc-400);
     --border-value: var(--color-zinc-800);
+
+    /* Set html background for overscroll */
+    background-color: var(--color-zinc-950);
   }
 
   /* Apply IBM Plex Mono globally for tech/data aesthetic */

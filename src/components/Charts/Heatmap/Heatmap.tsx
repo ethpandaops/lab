@@ -115,14 +115,15 @@ export function HeatmapChart({
         interval: yAxisShowOnlyMinMax ? (index: number) => index === 0 || index === yLabels.length - 1 : undefined,
       },
     },
-    visualMap: showVisualMap
-      ? visualMapType === 'piecewise' && piecewisePieces
+    visualMap:
+      visualMapType === 'piecewise' && piecewisePieces
         ? {
             type: 'piecewise',
             pieces: piecewisePieces,
             orient: 'vertical',
             right: 10,
             top: 'center',
+            show: showVisualMap,
             textStyle: {
               color: themeColors.foreground,
               fontSize: 12,
@@ -136,6 +137,7 @@ export function HeatmapChart({
             orient: 'vertical',
             right: 10,
             top: 'center',
+            show: showVisualMap,
             inRange: {
               color: colorGradient,
             },
@@ -143,8 +145,7 @@ export function HeatmapChart({
               color: themeColors.foreground,
               fontSize: 12,
             },
-          }
-      : undefined,
+          },
     series: [
       {
         name: 'Heatmap',

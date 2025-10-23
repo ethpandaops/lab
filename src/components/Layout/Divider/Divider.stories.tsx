@@ -68,63 +68,187 @@ export const WithTitleLeft: Story = {
   },
 };
 
-export const WithButton: Story = {
+export const WithButtons: Story = {
   render: () => (
-    <Divider
-      variant="button"
-      button={
-        <Button variant="outline" size="md" rounded="full" leadingIcon={<PlusIcon />} nowrap>
-          Add Item
-        </Button>
-      }
-    />
+    <div className="space-y-8">
+      <div>
+        <h3 className="mb-4 text-sm font-medium text-foreground">Button (Rounded)</h3>
+        <Divider
+          variant="button"
+          button={
+            <Button variant="outline" size="md" rounded="full" leadingIcon={<PlusIcon />} nowrap>
+              Add Item
+            </Button>
+          }
+        />
+      </div>
+
+      <div>
+        <h3 className="mb-4 text-sm font-medium text-foreground">Button</h3>
+        <Divider
+          variant="button"
+          button={
+            <Button variant="outline" size="md" leadingIcon={<PlusIcon />} nowrap>
+              Add Item
+            </Button>
+          }
+        />
+      </div>
+
+      <div>
+        <h3 className="mb-4 text-sm font-medium text-foreground">Title + Button (Rounded)</h3>
+        <Divider
+          variant="button"
+          button={
+            <Button variant="primary" size="md" rounded="full" leadingIcon={<PlusIcon />} nowrap>
+              Create New
+            </Button>
+          }
+        >
+          Projects
+        </Divider>
+      </div>
+
+      <div>
+        <h3 className="mb-4 text-sm font-medium text-foreground">Title + Button</h3>
+        <Divider
+          variant="button"
+          button={
+            <Button variant="primary" size="md" leadingIcon={<PlusIcon />} nowrap>
+              Create New
+            </Button>
+          }
+        >
+          Projects
+        </Divider>
+      </div>
+    </div>
   ),
 };
 
-export const WithTitleAndButton: Story = {
+export const WithToolbar: Story = {
   render: () => (
-    <Divider
-      variant="button"
-      button={
-        <Button variant="primary" size="md" rounded="full" leadingIcon={<PlusIcon />} nowrap>
-          Create New
-        </Button>
-      }
-    >
-      Projects
-    </Divider>
-  ),
-};
+    <div className="space-y-8">
+      <div>
+        <h3 className="mb-4 text-sm font-medium text-foreground">Toolbar Secondary (Square)</h3>
+        <Divider
+          variant="toolbar"
+          toolbarButtons={
+            <ButtonGroup>
+              <Button variant="secondary" iconOnly leadingIcon={<PencilIcon />} aria-label="Edit" />
+              <Button variant="secondary" iconOnly leadingIcon={<PaperClipIcon />} aria-label="Attach" />
+              <Button
+                variant="secondary"
+                iconOnly
+                leadingIcon={<ChatBubbleBottomCenterTextIcon />}
+                aria-label="Comment"
+              />
+              <Button variant="secondary" iconOnly leadingIcon={<TrashIcon />} aria-label="Delete" />
+            </ButtonGroup>
+          }
+        />
+      </div>
 
-export const WithToolbarSecondary: Story = {
-  render: () => (
-    <Divider
-      variant="toolbar"
-      toolbarButtons={
-        <ButtonGroup>
-          <Button variant="secondary" iconOnly leadingIcon={<PencilIcon />} aria-label="Edit" />
-          <Button variant="secondary" iconOnly leadingIcon={<PaperClipIcon />} aria-label="Attach" />
-          <Button variant="secondary" iconOnly leadingIcon={<ChatBubbleBottomCenterTextIcon />} aria-label="Comment" />
-          <Button variant="secondary" iconOnly leadingIcon={<TrashIcon />} aria-label="Delete" />
-        </ButtonGroup>
-      }
-    />
-  ),
-};
+      <div>
+        <h3 className="mb-4 text-sm font-medium text-foreground">Toolbar Outline (Square)</h3>
+        <Divider
+          variant="toolbar"
+          toolbarButtons={
+            <ButtonGroup>
+              <Button variant="outline" iconOnly leadingIcon={<PencilIcon />} aria-label="Edit" />
+              <Button variant="outline" iconOnly leadingIcon={<PaperClipIcon />} aria-label="Attach" />
+              <Button
+                variant="outline"
+                iconOnly
+                leadingIcon={<ChatBubbleBottomCenterTextIcon />}
+                aria-label="Comment"
+              />
+              <Button variant="outline" iconOnly leadingIcon={<TrashIcon />} aria-label="Delete" />
+            </ButtonGroup>
+          }
+        />
+      </div>
 
-export const WithToolbarOutline: Story = {
-  render: () => (
-    <Divider
-      variant="toolbar"
-      toolbarButtons={
-        <ButtonGroup>
-          <Button variant="outline" iconOnly leadingIcon={<PencilIcon />} aria-label="Edit" />
-          <Button variant="outline" iconOnly leadingIcon={<PaperClipIcon />} aria-label="Attach" />
-          <Button variant="outline" iconOnly leadingIcon={<ChatBubbleBottomCenterTextIcon />} aria-label="Comment" />
-          <Button variant="outline" iconOnly leadingIcon={<TrashIcon />} aria-label="Delete" />
-        </ButtonGroup>
-      }
-    />
+      <div>
+        <h3 className="mb-4 text-sm font-medium text-foreground">Toolbar (Secondary)</h3>
+        <Divider
+          variant="toolbar"
+          toolbarButtons={
+            <ButtonGroup>
+              <Button variant="secondary" iconOnly leadingIcon={<PencilIcon />} aria-label="Edit" />
+              <Button variant="secondary" iconOnly leadingIcon={<PaperClipIcon />} aria-label="Attach" />
+              <Button
+                variant="secondary"
+                iconOnly
+                leadingIcon={<ChatBubbleBottomCenterTextIcon />}
+                aria-label="Comment"
+              />
+              <Button variant="secondary" iconOnly leadingIcon={<TrashIcon />} aria-label="Delete" />
+            </ButtonGroup>
+          }
+        />
+      </div>
+
+      <div>
+        <h3 className="mb-4 text-sm font-medium text-foreground">Toolbar (Outline)</h3>
+        <Divider
+          variant="toolbar"
+          toolbarButtons={
+            <ButtonGroup>
+              <Button variant="outline" iconOnly leadingIcon={<PencilIcon />} aria-label="Edit" />
+              <Button variant="outline" iconOnly leadingIcon={<PaperClipIcon />} aria-label="Attach" />
+              <Button
+                variant="outline"
+                iconOnly
+                leadingIcon={<ChatBubbleBottomCenterTextIcon />}
+                aria-label="Comment"
+              />
+              <Button variant="outline" iconOnly leadingIcon={<TrashIcon />} aria-label="Delete" />
+            </ButtonGroup>
+          }
+        />
+      </div>
+
+      <div>
+        <h3 className="mb-4 text-sm font-medium text-foreground">Toolbar Secondary (Rounded)</h3>
+        <Divider
+          variant="toolbar"
+          toolbarButtons={
+            <ButtonGroup rounded>
+              <Button variant="secondary" iconOnly leadingIcon={<PencilIcon />} aria-label="Edit" />
+              <Button variant="secondary" iconOnly leadingIcon={<PaperClipIcon />} aria-label="Attach" />
+              <Button
+                variant="secondary"
+                iconOnly
+                leadingIcon={<ChatBubbleBottomCenterTextIcon />}
+                aria-label="Comment"
+              />
+              <Button variant="secondary" iconOnly leadingIcon={<TrashIcon />} aria-label="Delete" />
+            </ButtonGroup>
+          }
+        />
+      </div>
+
+      <div>
+        <h3 className="mb-4 text-sm font-medium text-foreground">Toolbar Outline (Rounded)</h3>
+        <Divider
+          variant="toolbar"
+          toolbarButtons={
+            <ButtonGroup rounded>
+              <Button variant="outline" iconOnly leadingIcon={<PencilIcon />} aria-label="Edit" />
+              <Button variant="outline" iconOnly leadingIcon={<PaperClipIcon />} aria-label="Attach" />
+              <Button
+                variant="outline"
+                iconOnly
+                leadingIcon={<ChatBubbleBottomCenterTextIcon />}
+                aria-label="Comment"
+              />
+              <Button variant="outline" iconOnly leadingIcon={<TrashIcon />} aria-label="Delete" />
+            </ButtonGroup>
+          }
+        />
+      </div>
+    </div>
   ),
 };
 
@@ -167,19 +291,31 @@ export const AllVariants: Story = {
       </div>
 
       <div>
-        <h3 className="mb-4 text-sm font-medium text-foreground">With Button</h3>
+        <h3 className="mb-4 text-sm font-medium text-foreground">With Button (Rounded)</h3>
         <Divider
           variant="button"
           button={
             <Button variant="outline" size="md" rounded="full" leadingIcon={<PlusIcon />} nowrap>
-              Button text
+              Add Item
             </Button>
           }
         />
       </div>
 
       <div>
-        <h3 className="mb-4 text-sm font-medium text-foreground">With Title and Button</h3>
+        <h3 className="mb-4 text-sm font-medium text-foreground">With Button</h3>
+        <Divider
+          variant="button"
+          button={
+            <Button variant="outline" size="md" leadingIcon={<PlusIcon />} nowrap>
+              Add Item
+            </Button>
+          }
+        />
+      </div>
+
+      <div>
+        <h3 className="mb-4 text-sm font-medium text-foreground">With Title and Button (Rounded)</h3>
         <Divider
           variant="button"
           button={
@@ -193,13 +329,55 @@ export const AllVariants: Story = {
       </div>
 
       <div>
-        <h3 className="mb-4 text-sm font-medium text-foreground">With Button (Outline)</h3>
+        <h3 className="mb-4 text-sm font-medium text-foreground">With Title and Button</h3>
         <Divider
           variant="button"
           button={
-            <Button variant="outline" size="md" rounded="full" leadingIcon={<PlusIcon />} nowrap>
-              Add Item
+            <Button variant="primary" size="md" leadingIcon={<PlusIcon />} nowrap>
+              Create New
             </Button>
+          }
+        >
+          Projects
+        </Divider>
+      </div>
+
+      <div>
+        <h3 className="mb-4 text-sm font-medium text-foreground">With Toolbar Secondary (Square)</h3>
+        <Divider
+          variant="toolbar"
+          toolbarButtons={
+            <ButtonGroup>
+              <Button variant="secondary" iconOnly leadingIcon={<PencilIcon />} aria-label="Edit" />
+              <Button variant="secondary" iconOnly leadingIcon={<PaperClipIcon />} aria-label="Attach" />
+              <Button
+                variant="secondary"
+                iconOnly
+                leadingIcon={<ChatBubbleBottomCenterTextIcon />}
+                aria-label="Comment"
+              />
+              <Button variant="secondary" iconOnly leadingIcon={<TrashIcon />} aria-label="Delete" />
+            </ButtonGroup>
+          }
+        />
+      </div>
+
+      <div>
+        <h3 className="mb-4 text-sm font-medium text-foreground">With Toolbar Outline (Square)</h3>
+        <Divider
+          variant="toolbar"
+          toolbarButtons={
+            <ButtonGroup>
+              <Button variant="outline" iconOnly leadingIcon={<PencilIcon />} aria-label="Edit" />
+              <Button variant="outline" iconOnly leadingIcon={<PaperClipIcon />} aria-label="Attach" />
+              <Button
+                variant="outline"
+                iconOnly
+                leadingIcon={<ChatBubbleBottomCenterTextIcon />}
+                aria-label="Comment"
+              />
+              <Button variant="outline" iconOnly leadingIcon={<TrashIcon />} aria-label="Delete" />
+            </ButtonGroup>
           }
         />
       </div>
@@ -230,6 +408,46 @@ export const AllVariants: Story = {
           variant="toolbar"
           toolbarButtons={
             <ButtonGroup>
+              <Button variant="outline" iconOnly leadingIcon={<PencilIcon />} aria-label="Edit" />
+              <Button variant="outline" iconOnly leadingIcon={<PaperClipIcon />} aria-label="Attach" />
+              <Button
+                variant="outline"
+                iconOnly
+                leadingIcon={<ChatBubbleBottomCenterTextIcon />}
+                aria-label="Comment"
+              />
+              <Button variant="outline" iconOnly leadingIcon={<TrashIcon />} aria-label="Delete" />
+            </ButtonGroup>
+          }
+        />
+      </div>
+
+      <div>
+        <h3 className="mb-4 text-sm font-medium text-foreground">With Toolbar Secondary (Rounded)</h3>
+        <Divider
+          variant="toolbar"
+          toolbarButtons={
+            <ButtonGroup rounded>
+              <Button variant="secondary" iconOnly leadingIcon={<PencilIcon />} aria-label="Edit" />
+              <Button variant="secondary" iconOnly leadingIcon={<PaperClipIcon />} aria-label="Attach" />
+              <Button
+                variant="secondary"
+                iconOnly
+                leadingIcon={<ChatBubbleBottomCenterTextIcon />}
+                aria-label="Comment"
+              />
+              <Button variant="secondary" iconOnly leadingIcon={<TrashIcon />} aria-label="Delete" />
+            </ButtonGroup>
+          }
+        />
+      </div>
+
+      <div>
+        <h3 className="mb-4 text-sm font-medium text-foreground">With Toolbar Outline (Rounded)</h3>
+        <Divider
+          variant="toolbar"
+          toolbarButtons={
+            <ButtonGroup rounded>
               <Button variant="outline" iconOnly leadingIcon={<PencilIcon />} aria-label="Edit" />
               <Button variant="outline" iconOnly leadingIcon={<PaperClipIcon />} aria-label="Attach" />
               <Button

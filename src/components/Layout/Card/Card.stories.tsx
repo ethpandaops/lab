@@ -30,6 +30,44 @@ export const Basic: Story = {
 };
 
 /**
+ * Card with rounded corners.
+ * Uses the `rounded` prop to apply rounded-sm class.
+ */
+export const Rounded: Story = {
+  args: {
+    rounded: true,
+    children: <p>This card has rounded corners</p>,
+  },
+};
+
+/**
+ * Comparison of rounded vs non-rounded cards.
+ */
+export const RoundedComparison: Story = {
+  args: {
+    children: null,
+  },
+  decorators: [
+    Story => (
+      <div className="min-w-[800px] rounded-sm bg-background p-8">
+        <Story />
+      </div>
+    ),
+  ],
+  render: () => (
+    <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+      <Card header={<h3 className="text-base/7 font-semibold text-foreground">No Rounded Corners</h3>}>
+        <p className="text-sm/6 text-muted">Default card without rounded corners (rounded=false)</p>
+      </Card>
+
+      <Card rounded header={<h3 className="text-base/7 font-semibold text-foreground">Rounded Corners</h3>}>
+        <p className="text-sm/6 text-muted">Card with rounded corners (rounded=true)</p>
+      </Card>
+    </div>
+  ),
+};
+
+/**
  * Interactive card with onClick handler.
  * Click the card to see the interaction.
  */
@@ -396,98 +434,6 @@ export const AllVariants: Story = {
         footer={<span className="text-sm/6 text-muted">Surface footer</span>}
       >
         <p className="text-sm/6 text-muted">All sections with distinct surface colors.</p>
-      </Card>
-    </div>
-  ),
-};
-
-/**
- * Card with a feature image background.
- * The image covers the full card with transparency.
- */
-export const WithFeatureImage: Story = {
-  args: {
-    header: <h3 className="text-base/7 font-semibold text-foreground">Lab Experiments</h3>,
-    children: (
-      <div>
-        <p className="text-3xl/9 font-bold text-foreground">42</p>
-        <p className="mt-1 text-sm/6 text-muted">Active experiments running</p>
-      </div>
-    ),
-    footer: <span className="text-sm/6 text-muted">Last updated: 2 min ago</span>,
-    featureImage: <img src="/images/lab.png" alt="Lab" />,
-  },
-};
-
-/**
- * Interactive card with feature image.
- * Click the card to see the interaction.
- */
-export const InteractiveWithFeatureImage: Story = {
-  args: {
-    isInteractive: true,
-    onClick: () => alert('Card clicked!'),
-    header: <h3 className="text-base/7 font-semibold text-foreground">ethPandaOps Lab</h3>,
-    children: (
-      <div>
-        <p className="text-lg/7 font-semibold text-foreground">Discover More</p>
-        <p className="mt-1 text-sm/6 text-muted">Click to explore experiments and data visualizations</p>
-      </div>
-    ),
-    footer: <span className="text-sm/6 text-primary">Learn more →</span>,
-    featureImage: <img src="/images/lab.png" alt="Lab" />,
-  },
-};
-
-/**
- * Feature image with different variants.
- * Shows how the transparent background works with different card variants.
- */
-export const FeatureImageVariants: Story = {
-  args: {
-    children: null,
-  },
-  decorators: [
-    Story => (
-      <div className="min-w-[1200px] rounded-sm bg-background p-8">
-        <Story />
-      </div>
-    ),
-  ],
-  render: () => (
-    <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-      <Card
-        variant="default"
-        header={<h3 className="text-base/7 font-semibold text-foreground">Default Variant</h3>}
-        featureImage={<img src="/images/lab.png" alt="Lab" />}
-      >
-        <p className="text-sm/6 text-muted">Feature image with default card background</p>
-      </Card>
-
-      <Card
-        variant="muted"
-        header={<h3 className="text-base/7 font-semibold text-foreground">Muted Variant</h3>}
-        footer={<span className="text-sm/6 text-muted">Footer section</span>}
-        featureImage={<img src="/images/lab.png" alt="Lab" />}
-      >
-        <p className="text-sm/6 text-muted">Feature image with muted variant backgrounds</p>
-      </Card>
-
-      <Card
-        variant="primary"
-        header={<h3 className="text-base/7 font-semibold text-foreground">Primary Variant</h3>}
-        featureImage={<img src="/images/lab.png" alt="Lab" />}
-      >
-        <p className="text-sm/6 text-muted">Feature image with primary color header</p>
-      </Card>
-
-      <Card
-        variant="accent"
-        header={<h3 className="text-base/7 font-semibold text-foreground">Accent Variant</h3>}
-        footer={<span className="text-sm/6 text-muted">Footer section</span>}
-        featureImage={<img src="/images/lab.png" alt="Lab" />}
-      >
-        <p className="text-sm/6 text-muted">Feature image with accent color backgrounds</p>
       </Card>
     </div>
   ),

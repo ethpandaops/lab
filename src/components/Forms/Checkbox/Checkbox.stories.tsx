@@ -88,3 +88,33 @@ export const AllStates: Story = {
     </div>
   ),
 };
+
+/**
+ * Checkbox with rounded corners.
+ * Uses the `rounded` prop to apply rounded-sm class.
+ */
+export const Rounded: Story = {
+  args: {
+    id: 'rounded-checkbox',
+    name: 'rounded',
+    rounded: true,
+  },
+};
+
+/**
+ * Comparison of rounded vs non-rounded checkboxes.
+ */
+export const RoundedComparison: Story = {
+  render: () => (
+    <div className="flex items-center gap-8">
+      <label className="flex items-center gap-2 text-sm text-foreground">
+        <Checkbox id="no-rounded" name="no-rounded" />
+        No Rounded Corners
+      </label>
+      <label className="flex items-center gap-2 text-sm text-foreground">
+        <Checkbox id="with-rounded" name="with-rounded" rounded />
+        With Rounded Corners
+      </label>
+    </div>
+  ),
+};
