@@ -195,16 +195,16 @@
   :root {
     /* Light mode - warm earthy theme */
     --primary-value: var(--color-terracotta-600);
-    --secondary-value: var(--color-sand-100);
+    --secondary-value: var(--color-sand-200);
     --accent-value: var(--color-terracotta-500);
-    --background-value: var(--color-sand-50);
-    --surface-value: var(--color-sand-100);
+    --background-value: var(--color-sand-100);
+    --surface-value: var(--color-sand-50);
     --foreground-value: var(--color-sand-950);
-    --muted-value: var(--color-sand-700);
-    --border-value: var(--color-sand-200);
+    --muted-value: var(--color-sand-600);
+    --border-value: var(--color-sand-300);
 
     /* Set html background for overscroll */
-    background-color: var(--color-sand-50);
+    background-color: var(--color-sand-100);
   }
 
   html.dark {
