@@ -27,7 +27,7 @@ export const CONTINENT_COLORS = {
 
 /**
  * Blob index colors for data availability visualization
- * Used in slot-view and blob data availability components
+ * Used in real-time and blob data availability components
  */
 export const BLOB_COLORS = [
   colors.cyan[500], // Blob 0 - cyan-500

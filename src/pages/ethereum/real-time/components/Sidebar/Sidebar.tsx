@@ -1,12 +1,12 @@
 import { type JSX, memo } from 'react';
 import clsx from 'clsx';
-import { Timeline } from '@/pages/ethereum/slot-view/components/Timeline';
+import { Timeline } from '@/pages/ethereum/real-time/components/Timeline';
 import { ScrollingTimeline } from '@/components/Lists/ScrollingTimeline';
 import { SLOTS_PER_EPOCH } from '@/utils/beacon';
 import type { SidebarProps } from './Sidebar.types';
 
 /**
- * Sidebar - A page-specific sidebar component for the slot-view page.
+ * Sidebar - A page-specific sidebar component for the real-time page.
  *
  * Combines Timeline and ScrollingTimeline components, coordinating
  * their shared currentTime prop. Timeline is displayed above

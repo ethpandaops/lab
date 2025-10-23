@@ -13,7 +13,7 @@ interface NavItem {
   to: string;
 }
 
-const ethereumConsensusPages: NavItem[] = [{ name: 'Slot View', to: '/ethereum/slot-view' }];
+const ethereumConsensusPages: NavItem[] = [{ name: 'Real-Time', to: '/ethereum/real-time' }];
 
 const ethereumExecutionPages: NavItem[] = [];
 

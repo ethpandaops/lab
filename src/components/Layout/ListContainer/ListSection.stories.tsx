@@ -63,10 +63,10 @@ export const WithNestedSubsections: Story = {
         <ListSection title="Consensus" nested>
           <ListItem>
             <a
-              href="#slot-view"
+              href="#real-time"
               className="block rounded-lg px-2.5 py-1.5 text-sm font-semibold text-muted hover:bg-primary/10 hover:text-primary"
             >
-              Slot View
+              Real-Time
             </a>
           </ListItem>
           <ListItem>
@@ -159,10 +159,10 @@ export const SidebarExample: Story = {
           <ListSection title="Consensus" nested>
             <ListItem>
               <a
-                href="#slot-view"
+                href="#real-time"
                 className="block rounded-lg px-2.5 py-1.5 text-sm font-semibold text-muted transition-all hover:bg-primary/10 hover:text-primary"
               >
-                Slot View
+                Real-Time
               </a>
             </ListItem>
             <ListItem>
