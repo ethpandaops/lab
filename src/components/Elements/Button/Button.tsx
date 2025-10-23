@@ -15,11 +15,11 @@ const variantStyles = {
     'dark:shadow-none dark:hover:bg-primary/80 dark:focus-visible:outline-primary'
   ),
   secondary: clsx(
-    'bg-white text-gray-900 shadow-xs inset-ring inset-ring-gray-300',
-    'hover:bg-gray-50 disabled:hover:bg-white',
-    'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-900',
-    'dark:bg-white/10 dark:text-white dark:shadow-none dark:inset-ring-white/5',
-    'dark:hover:bg-white/20 dark:disabled:hover:bg-white/10 dark:focus-visible:outline-white'
+    'bg-surface text-foreground shadow-xs inset-ring inset-ring-border',
+    'hover:bg-background disabled:hover:bg-surface',
+    'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground',
+    'dark:bg-surface dark:text-foreground dark:shadow-none dark:inset-ring-border',
+    'dark:hover:bg-muted/20 dark:disabled:hover:bg-surface dark:focus-visible:outline-foreground'
   ),
   soft: clsx(
     'bg-primary/10 text-primary shadow-xs',
@@ -33,7 +33,7 @@ const variantStyles = {
     'hover:bg-muted/10 disabled:hover:bg-transparent',
     'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-border',
     'dark:text-foreground dark:inset-ring-border',
-    'dark:hover:bg-white/20 dark:focus-visible:outline-border'
+    'dark:hover:bg-muted/20 dark:focus-visible:outline-border'
   ),
   danger: clsx(
     'bg-danger text-white shadow-xs',
@@ -45,7 +45,7 @@ const variantStyles = {
     'bg-transparent text-foreground',
     'hover:bg-muted/10 disabled:hover:bg-transparent',
     'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground',
-    'dark:text-foreground dark:hover:bg-white/10 dark:focus-visible:outline-foreground'
+    'dark:text-foreground dark:hover:bg-muted/10 dark:focus-visible:outline-foreground'
   ),
 };
 

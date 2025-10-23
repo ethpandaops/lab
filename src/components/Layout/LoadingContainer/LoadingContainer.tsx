@@ -7,7 +7,7 @@ export function LoadingContainer({ className, shimmer = true }: LoadingContainer
     return (
       <div
         className={clsx(
-          'animate-shimmer bg-linear-to-r from-zinc-200 via-zinc-100 to-zinc-200 bg-[length:200%_100%] dark:from-zinc-800 dark:via-zinc-700 dark:to-zinc-800',
+          'animate-shimmer bg-linear-to-r from-border via-surface to-border bg-[length:200%_100%] dark:from-border dark:via-surface dark:to-border',
           className
         )}
         aria-hidden="true"
@@ -15,5 +15,5 @@ export function LoadingContainer({ className, shimmer = true }: LoadingContainer
     );
   }
 
-  return <div className={clsx('animate-pulse bg-zinc-200 dark:bg-zinc-800', className)} aria-hidden="true" />;
+  return <div className={clsx('animate-pulse bg-border dark:bg-border', className)} aria-hidden="true" />;
 }

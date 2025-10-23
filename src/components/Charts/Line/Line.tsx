@@ -1,7 +1,7 @@
 import type React from 'react';
-import { useState } from 'react';
 import ReactECharts from 'echarts-for-react';
 import { hexToRgba } from '@/utils';
+import { useThemeColors } from '@/hooks/useThemeColors';
 import type { LineChartProps } from './Line.types';
 
 /**
@@ -28,43 +28,7 @@ export function LineChart({
   connectNulls = false,
   animationDuration = 300,
 }: LineChartProps): React.JSX.Element {
-  const [themeColors] = useState(() => {
-    // Get computed CSS variables from the root element on initial render
-    const root = document.documentElement;
-    const computedStyle = getComputedStyle(root);
-
-    // Fallback colors
-    const fallbackColors = {
-      primary: '#06b6d4', // fallback cyan-500
-      foreground: '#09090b', // fallback zinc-950
-      muted: '#52525b', // fallback zinc-600
-      border: '#e4e4e7', // fallback zinc-200
-      background: '#ffffff',
-    };
-
-    // Extract theme colors from CSS variables
-    const primaryColor =
-      computedStyle.getPropertyValue('--color-primary').trim() ||
-      computedStyle.getPropertyValue('--color-cyan-500').trim();
-    const foregroundColor =
-      computedStyle.getPropertyValue('--color-foreground').trim() ||
-      computedStyle.getPropertyValue('--color-zinc-950').trim();
-    const mutedColor =
-      computedStyle.getPropertyValue('--color-muted').trim() ||
-      computedStyle.getPropertyValue('--color-zinc-600').trim();
-    const borderColor =
-      computedStyle.getPropertyValue('--color-border').trim() ||
-      computedStyle.getPropertyValue('--color-zinc-200').trim();
-    const backgroundColor = computedStyle.getPropertyValue('--color-background').trim() || '#ffffff';
-
-    return {
-      primary: primaryColor || fallbackColors.primary,
-      foreground: foregroundColor || fallbackColors.foreground,
-      muted: mutedColor || fallbackColors.muted,
-      border: borderColor || fallbackColors.border,
-      background: backgroundColor || fallbackColors.background,
-    };
-  });
+  const themeColors = useThemeColors();
 
   const option = {
     animation: true,

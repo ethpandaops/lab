@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { expect, waitFor } from 'storybook/test';
+import colors from 'tailwindcss/colors';
 import { GlobeChart } from './Globe';
 import type { LineData, PointData } from './Globe.types';
 
@@ -91,7 +92,7 @@ export const PointsOnly: Story = {
     showEffect: false,
     pointSize: 6,
     pointOpacity: 0.8,
-    pointColor: '#06b6d4',
+    pointColor: colors.cyan[500],
     ...earthTextures,
   },
   play: async ({ canvasElement }) => {
@@ -124,7 +125,7 @@ export const LargePoints: Story = {
     showEffect: false,
     pointSize: 10,
     pointOpacity: 0.9,
-    pointColor: '#f59e0b',
+    pointColor: colors.amber[500],
     ...earthTextures,
   },
   play: async ({ canvasElement }) => {
@@ -156,7 +157,7 @@ export const Minimal: Story = {
     autoRotate: false,
     pointSize: 8,
     pointOpacity: 1,
-    pointColor: '#06b6d4',
+    pointColor: colors.cyan[500],
   },
   play: async ({ canvasElement }) => {
     // Test that globe container renders

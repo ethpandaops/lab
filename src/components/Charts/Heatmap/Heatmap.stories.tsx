@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState, useEffect } from 'react';
+import colors from 'tailwindcss/colors';
 import { HeatmapChart } from './Heatmap';
 
 const meta: Meta<typeof HeatmapChart> = {
@@ -156,7 +157,7 @@ export const CustomColors: Story = {
     ],
     xLabels: ['Week 1', 'Week 2', 'Week 3'],
     yLabels: ['Team A', 'Team B', 'Team C'],
-    colorGradient: ['#dcfce7', '#86efac', '#22c55e', '#15803d'],
+    colorGradient: [colors.green[100], colors.green[300], colors.green[500], colors.green[700]],
     showLabel: true,
   },
 };
@@ -183,7 +184,7 @@ export const HeatIntensity: Story = {
     ],
     xLabels: ['00:00', '06:00', '12:00', '18:00'],
     yLabels: ['Server 1', 'Server 2', 'Server 3'],
-    colorGradient: ['#fef3c7', '#fbbf24', '#f97316', '#dc2626'],
+    colorGradient: [colors.amber[100], colors.amber[400], colors.orange[500], colors.red[600]],
     showLabel: true,
   },
 };
@@ -219,7 +220,7 @@ export const MonthlyActivity: Story = {
         xLabels={hourLabels}
         yLabels={dayLabels}
         height={400}
-        colorGradient={['#f0f9ff', '#7dd3fc', '#0ea5e9', '#0369a1']}
+        colorGradient={[colors.sky[50], colors.sky[300], colors.sky[500], colors.sky[700]]}
       />
     );
   },
@@ -257,7 +258,7 @@ export const GitHubContributions: Story = {
         xLabels={weekLabels}
         yLabels={dayLabels}
         height={300}
-        colorGradient={['#ebedf0', '#9be9a8', '#40c463', '#30a14e', '#216e39']}
+        colorGradient={[colors.gray[200], colors.green[300], colors.green[500], colors.green[600], colors.green[700]]}
         showVisualMap={false}
       />
     );
@@ -285,7 +286,7 @@ export const WithFormatter: Story = {
     yLabels: ['Morning', 'Noon', 'Evening'],
     showLabel: true,
     formatValue: (value: number) => `${value.toFixed(1)}°C`,
-    colorGradient: ['#dbeafe', '#93c5fd', '#3b82f6', '#1e40af'],
+    colorGradient: [colors.blue[100], colors.blue[300], colors.blue[500], colors.blue[700]],
   },
 };
 
@@ -349,7 +350,7 @@ export const AnimatedRealtime: Story = {
         xLabels={Array.from({ length: 10 }, (_, i) => `Node ${i + 1}`)}
         yLabels={['CPU', 'Memory', 'Disk', 'Network', 'Load']}
         height={400}
-        colorGradient={['#dcfce7', '#fef08a', '#fdba74', '#f87171']}
+        colorGradient={[colors.green[100], colors.yellow[200], colors.orange[300], colors.red[400]]}
       />
     );
   },

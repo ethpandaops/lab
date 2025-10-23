@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useEffect, useState } from 'react';
+import { BLOB_COLORS, CONTINENT_COLORS } from '@/theme/data-visualization-colors';
 import { BlobDataAvailability } from './BlobDataAvailability';
 
 const meta: Meta<typeof BlobDataAvailability> = {
@@ -23,13 +24,13 @@ type Story = StoryObj<typeof BlobDataAvailability>;
 
 // Sample data for stories
 const sampleFirstSeenData = [
-  { time: 1420, blobId: '0', color: '#06b6d4' },
-  { time: 1370, blobId: '1', color: '#ec4899' },
-  { time: 1370, blobId: '2', color: '#22c55e' },
-  { time: 1600, blobId: '3', color: '#3b82f6' },
-  { time: 1800, blobId: '4', color: '#a855f7' },
-  { time: 1200, blobId: '5', color: '#f59e0b' },
-  { time: 900, blobId: 'B', color: '#ef4444' },
+  { time: 1420, blobId: '0', color: BLOB_COLORS[0] },
+  { time: 1370, blobId: '1', color: BLOB_COLORS[1] },
+  { time: 1370, blobId: '2', color: BLOB_COLORS[2] },
+  { time: 1600, blobId: '3', color: BLOB_COLORS[3] },
+  { time: 1800, blobId: '4', color: BLOB_COLORS[4] },
+  { time: 1200, blobId: '5', color: BLOB_COLORS[5] },
+  { time: 900, blobId: 'B', color: BLOB_COLORS[0] },
 ];
 
 // Generate availability rate data with smooth curve - data point every 50ms
@@ -84,7 +85,7 @@ const sampleAvailabilityRateData = generateAvailabilityRateData();
 const allContinentsPropagationData = [
   {
     continent: 'EU',
-    color: '#ec4899',
+    color: CONTINENT_COLORS.EU,
     data: [
       { time: 900, percentage: 0 },
       { time: 1200, percentage: 75 },
@@ -94,7 +95,7 @@ const allContinentsPropagationData = [
   },
   {
     continent: 'NA',
-    color: '#22c55e',
+    color: CONTINENT_COLORS.NA,
     data: [
       { time: 900, percentage: 0 },
       { time: 1300, percentage: 60 },
@@ -104,7 +105,7 @@ const allContinentsPropagationData = [
   },
   {
     continent: 'AS',
-    color: '#06b6d4',
+    color: CONTINENT_COLORS.AS,
     data: [
       { time: 900, percentage: 0 },
       { time: 1400, percentage: 45 },
@@ -114,7 +115,7 @@ const allContinentsPropagationData = [
   },
   {
     continent: 'OC',
-    color: '#3b82f6',
+    color: CONTINENT_COLORS.OC,
     data: [
       { time: 900, percentage: 0 },
       { time: 1600, percentage: 30 },
@@ -124,7 +125,7 @@ const allContinentsPropagationData = [
   },
   {
     continent: 'SA',
-    color: '#f59e0b',
+    color: CONTINENT_COLORS.SA,
     data: [
       { time: 900, percentage: 0 },
       { time: 1500, percentage: 40 },
@@ -134,7 +135,7 @@ const allContinentsPropagationData = [
   },
   {
     continent: 'AF',
-    color: '#a855f7',
+    color: CONTINENT_COLORS.AF,
     data: [
       { time: 900, percentage: 0 },
       { time: 1700, percentage: 25 },
@@ -241,15 +242,15 @@ export const Empty: Story = {
 export const SingleContinent: Story = {
   args: {
     firstSeenData: [
-      { time: 1420, blobId: '0', color: '#06b6d4' },
-      { time: 1370, blobId: '1', color: '#ec4899' },
-      { time: 1370, blobId: '2', color: '#22c55e' },
+      { time: 1420, blobId: '0', color: BLOB_COLORS[0] },
+      { time: 1370, blobId: '1', color: BLOB_COLORS[1] },
+      { time: 1370, blobId: '2', color: BLOB_COLORS[2] },
     ],
     availabilityRateData: sampleAvailabilityRateData,
     continentalPropagationData: [
       {
         continent: 'EU',
-        color: '#ec4899',
+        color: CONTINENT_COLORS.EU,
         data: [
           { time: 900, percentage: 0 },
           { time: 1200, percentage: 50 },
@@ -271,7 +272,7 @@ export const TwoContinents: Story = {
     continentalPropagationData: [
       {
         continent: 'EU',
-        color: '#ec4899',
+        color: CONTINENT_COLORS.EU,
         data: [
           { time: 900, percentage: 0 },
           { time: 1200, percentage: 100 },
@@ -280,7 +281,7 @@ export const TwoContinents: Story = {
       },
       {
         continent: 'AS',
-        color: '#06b6d4',
+        color: CONTINENT_COLORS.AS,
         data: [
           { time: 900, percentage: 0 },
           { time: 1800, percentage: 100 },

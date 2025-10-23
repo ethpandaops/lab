@@ -29,34 +29,34 @@ const variantStyles: Record<
 > = {
   simple: {
     list: '',
-    listWithDividers: 'divide-y divide-border dark:divide-white/10',
+    listWithDividers: 'divide-y divide-border dark:divide-border',
     item: '',
     itemMobileFull: 'px-4 sm:px-0',
   },
   card: {
     wrapper:
-      'overflow-hidden bg-white shadow-sm dark:bg-zinc-800/50 dark:shadow-none dark:outline dark:-outline-offset-1 dark:outline-white/10',
+      'overflow-hidden bg-surface shadow-sm dark:bg-surface dark:shadow-none dark:outline dark:-outline-offset-1 dark:outline-border',
     wrapperMobileFull:
-      'overflow-hidden bg-white shadow-sm sm:rounded-sm dark:bg-zinc-800/50 dark:shadow-none dark:outline dark:-outline-offset-1 dark:outline-white/10',
+      'overflow-hidden bg-surface shadow-sm sm:rounded-sm dark:bg-surface dark:shadow-none dark:outline dark:-outline-offset-1 dark:outline-border',
     list: '',
-    listWithDividers: 'divide-y divide-border dark:divide-white/10',
+    listWithDividers: 'divide-y divide-border dark:divide-border',
     item: 'px-6',
     itemMobileFull: 'px-4 sm:px-6',
   },
   flat: {
-    wrapper: 'overflow-hidden border border-border bg-white dark:border-white/10 dark:bg-zinc-900',
+    wrapper: 'overflow-hidden border border-border bg-surface dark:border-border dark:bg-background',
     wrapperMobileFull:
-      'overflow-hidden border border-border bg-white sm:rounded-sm dark:border-white/10 dark:bg-zinc-900',
+      'overflow-hidden border border-border bg-surface sm:rounded-sm dark:border-border dark:bg-background',
     list: '',
-    listWithDividers: 'divide-y divide-border dark:divide-white/10',
+    listWithDividers: 'divide-y divide-border dark:divide-border',
     item: 'px-6',
     itemMobileFull: 'px-4 sm:px-6',
   },
   separate: {
     list: 'space-y-3',
-    item: 'overflow-hidden bg-white px-6 shadow-sm dark:bg-zinc-800/50 dark:shadow-none dark:outline dark:-outline-offset-1 dark:outline-white/10',
+    item: 'overflow-hidden bg-surface px-6 shadow-sm dark:bg-surface dark:shadow-none dark:outline dark:-outline-offset-1 dark:outline-border',
     itemMobileFull:
-      'overflow-hidden bg-white px-4 shadow-sm sm:rounded-sm sm:px-6 dark:bg-zinc-800/50 dark:shadow-none dark:outline dark:-outline-offset-1 dark:outline-white/10',
+      'overflow-hidden bg-surface px-4 shadow-sm sm:rounded-sm sm:px-6 dark:bg-surface dark:shadow-none dark:outline dark:-outline-offset-1 dark:outline-border',
   },
 };
 

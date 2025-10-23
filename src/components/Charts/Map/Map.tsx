@@ -5,7 +5,7 @@ import type { ECharts } from 'echarts';
 import * as echarts from 'echarts';
 import 'echarts-gl';
 import type { MapChartProps } from './Map.types';
-import { resolveCssColorToHex } from '@/utils/colour';
+import { useThemeColors } from '@/hooks/useThemeColors';
 
 /**
  * MapChart - A 3D map visualization component using ECharts GL
@@ -28,45 +28,18 @@ export function MapChart({
   title,
   height = 600,
   showEffect = true,
-  environment = '#333',
+  environment,
   lineColor,
   pointColor,
   pointSize = 4,
-  mapColor = '#000',
+  mapColor,
   distance = 70,
   alpha = 89,
   regionHeight = 0.5,
   minDistance = 40,
   maxDistance = 150,
 }: MapChartProps): React.JSX.Element {
-  const [themeColors] = useState(() => {
-    // Get computed CSS variables from the root element on initial render
-    const root = document.documentElement;
-    const computedStyle = getComputedStyle(root);
-
-    // Fallback colors (hex format for ECharts compatibility)
-    const fallbackColors = {
-      primary: '#06b6d4', // fallback cyan-500
-      foreground: '#09090b', // fallback zinc-950
-    };
-
-    // Extract theme colors from CSS variables
-    const primaryColor =
-      computedStyle.getPropertyValue('--color-primary').trim() ||
-      computedStyle.getPropertyValue('--color-cyan-500').trim();
-    const foregroundColor =
-      computedStyle.getPropertyValue('--color-foreground').trim() ||
-      computedStyle.getPropertyValue('--color-zinc-950').trim();
-
-    // Resolve CSS colors (oklch, color-mix, etc.) to hex for ECharts
-    return {
-      primary: primaryColor ? resolveCssColorToHex(primaryColor, fallbackColors.primary) : fallbackColors.primary,
-      foreground: foregroundColor
-        ? resolveCssColorToHex(foregroundColor, fallbackColors.foreground)
-        : fallbackColors.foreground,
-    };
-  });
-
+  const themeColors = useThemeColors();
   const [echartsInstance, setEchartsInstance] = useState<ECharts | null>(null);
   const [mapLoaded, setMapLoaded] = useState(false);
 
@@ -154,7 +127,7 @@ export function MapChart({
     }
 
     return {
-      backgroundColor: environment,
+      backgroundColor: environment || themeColors.background,
       tooltip: {
         show: true,
         formatter: (params: Record<string, unknown>) => {
@@ -190,7 +163,7 @@ export function MapChart({
         map: 'world',
         shading: 'realistic',
         silent: true,
-        environment: environment,
+        environment: environment || themeColors.background,
         realisticMaterial: {
           roughness: 0.8,
           metalness: 0,
@@ -221,7 +194,7 @@ export function MapChart({
           zoomSensitivity: 1,
         },
         itemStyle: {
-          color: mapColor,
+          color: mapColor || themeColors.muted,
         },
         regionHeight: regionHeight,
       },

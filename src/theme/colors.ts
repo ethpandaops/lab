@@ -1,11 +1,14 @@
 /**
- * Theme color definitions
+ * Theme color definitions for programmatic usage
  *
- * Single source of truth for all theme colors.
- * These values are used by:
- * - src/index.css (@layer base definitions)
- * - .storybook/preview-head.html (CSS variables for Storybook)
- * - src/hooks/useThemeColors (direct TypeScript usage)
+ * These values mirror the theme defined in src/index.css.
+ * They are used by:
+ * - src/hooks/useThemeColors (provides theme colors to TypeScript/React components)
+ * - Chart components (ECharts, etc.) that need hex color values
+ * - Any component requiring programmatic color access
+ *
+ * Note: The canonical theme definition is in src/index.css.
+ * These values must be kept in sync with the CSS theme.
  */
 
 export interface ThemeColors {
@@ -28,34 +31,36 @@ export interface ThemeColors {
 }
 
 /**
- * Light mode colors - futuristic cyan theme
+ * Light mode colors - warm earthy theme
+ * Maps to primitive scales: terracotta + sand
  */
 export const LIGHT_COLORS: ThemeColors = {
-  primary: '#06b6d4', // cyan-500
-  secondary: '#0ea5e9', // sky-500
-  accent: '#22d3ee', // cyan-400
-  background: '#ffffff',
-  surface: '#f9fafb', // gray-50
-  foreground: '#09090b', // zinc-950
-  muted: '#52525b', // zinc-600
-  border: '#e4e4e7', // zinc-200
+  primary: '#bb5a38', // terracotta-600
+  secondary: '#efeee5', // sand-100
+  accent: '#cb7044', // terracotta-500
+  background: '#f4f3ed', // sand-50
+  surface: '#efeee5', // sand-100
+  foreground: '#2c251e', // sand-950
+  muted: '#7d6b51', // sand-700
+  border: '#dedbca', // sand-200
   success: '#22c55e', // green-500
   warning: '#f59e0b', // amber-500
   danger: '#ef4444', // red-500
 };
 
 /**
- * Dark mode colors - softer cyan for better contrast
+ * Dark mode colors - balanced neutral with warm terracotta accents
+ * Maps to primitive scales: neutral + terracotta
  */
 export const DARK_COLORS: ThemeColors = {
-  primary: '#22d3ee', // cyan-400
-  secondary: '#38bdf8', // sky-400
-  accent: '#67e8f9', // cyan-300
-  background: '#09090b', // zinc-950
-  surface: '#18181b', // zinc-900
-  foreground: '#fafafa', // zinc-50
-  muted: '#a1a1aa', // zinc-400
-  border: '#27272a', // zinc-800
+  primary: '#cb7044', // terracotta-500
+  secondary: '#3d3d3d', // neutral-900
+  accent: '#d58c62', // terracotta-400
+  background: '#1a1a1a', // neutral-950
+  surface: '#242424', // custom (between neutral-900/950)
+  foreground: '#f6f6f6', // neutral-50
+  muted: '#888888', // neutral-400
+  border: '#454545', // neutral-800
   success: '#22c55e', // green-500
   warning: '#f59e0b', // amber-500
   danger: '#ef4444', // red-500

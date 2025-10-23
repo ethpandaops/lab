@@ -65,14 +65,15 @@ export function ScrollingTimeline({
       ref={containerRef}
       className={clsx(
         'overflow-x-hidden overflow-y-auto rounded-sm bg-background dark:bg-surface',
-        'scrollbar-thin scrollbar-track-transparent scrollbar-thumb-border dark:scrollbar-thumb-zinc-700',
+        'scrollbar-thin scrollbar-track-transparent scrollbar-thumb-border dark:scrollbar-thumb-border',
+        !height && 'flex-1',
         className
       )}
-      style={{ height }}
+      style={height ? { height } : undefined}
     >
       <div className="relative">
         {/* Vertical timeline line */}
-        <div className="absolute top-0 left-[4.75rem] h-full w-px bg-border dark:bg-zinc-800" />
+        <div className="absolute top-0 left-[3.75rem] h-full w-px bg-border dark:bg-surface" />
 
         {/* Timeline items */}
         <div className="space-y-0">
@@ -98,24 +99,24 @@ export function ScrollingTimeline({
                 {/* Timestamp */}
                 <div
                   className={clsx(
-                    'shrink-0 text-right text-xs/6 font-medium',
-                    'w-14',
+                    'shrink-0 text-right text-xs font-medium',
+                    'w-12',
                     status === 'active' && 'text-primary',
-                    status === 'completed' && 'text-foreground dark:text-zinc-400',
-                    status === 'pending' && 'text-muted dark:text-zinc-600'
+                    status === 'completed' && 'text-foreground dark:text-muted',
+                    status === 'pending' && 'text-muted dark:text-muted'
                   )}
                 >
                   {formatTime(item.timestamp)}
                 </div>
 
                 {/* Timeline dot */}
-                <div className="relative flex h-6 shrink-0 items-center">
+                <div className="relative flex shrink-0 items-center">
                   <div
                     className={clsx(
-                      'size-2 rounded-full transition-all duration-300',
-                      status === 'active' && 'bg-primary ring-4 ring-primary/20 dark:ring-primary/10',
-                      status === 'completed' && 'bg-foreground/40 dark:bg-zinc-600',
-                      status === 'pending' && 'bg-border dark:bg-zinc-800'
+                      'size-1.5 rounded-full transition-all duration-300',
+                      status === 'active' && 'bg-primary ring-3 ring-primary/20 dark:ring-primary/10',
+                      status === 'completed' && 'bg-foreground/40 dark:bg-border',
+                      status === 'pending' && 'bg-border dark:bg-surface'
                     )}
                   />
                 </div>
@@ -124,10 +125,10 @@ export function ScrollingTimeline({
                 {item.icon && (
                   <div
                     className={clsx(
-                      'flex h-6 shrink-0 items-center',
+                      'flex shrink-0 items-center',
                       status === 'active' && 'text-primary',
-                      status === 'completed' && 'text-foreground dark:text-zinc-400',
-                      status === 'pending' && 'text-muted dark:text-zinc-600'
+                      status === 'completed' && 'text-foreground dark:text-muted',
+                      status === 'pending' && 'text-muted dark:text-muted'
                     )}
                   >
                     {item.icon}
@@ -138,10 +139,10 @@ export function ScrollingTimeline({
                 <div className="min-w-0 flex-1">
                   <div
                     className={clsx(
-                      'text-sm/6 transition-colors duration-300',
-                      status === 'active' && 'font-medium text-foreground dark:text-zinc-100',
-                      status === 'completed' && 'text-foreground dark:text-zinc-300',
-                      status === 'pending' && 'text-muted dark:text-zinc-500'
+                      'truncate text-xs transition-colors duration-300',
+                      status === 'active' && 'font-medium text-foreground dark:text-foreground',
+                      status === 'completed' && 'text-foreground dark:text-foreground',
+                      status === 'pending' && 'text-muted dark:text-muted'
                     )}
                   >
                     {item.content}
