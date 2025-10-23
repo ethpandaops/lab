@@ -76,7 +76,7 @@ export function ScrollingTimeline({
       ref={containerRef}
       className={clsx(
         'overflow-x-hidden overflow-y-auto rounded-sm bg-background dark:bg-surface',
-        'scrollbar-thin scrollbar-track-transparent scrollbar-thumb-border dark:scrollbar-thumb-zinc-700',
+        'scrollbar-thin scrollbar-track-transparent scrollbar-thumb-border dark:scrollbar-thumb-border',
         !height && 'flex-1',
         className
       )}
@@ -84,7 +84,7 @@ export function ScrollingTimeline({
     >
       <div className="relative">
         {/* Vertical timeline line */}
-        <div className="absolute top-0 left-[3.75rem] h-full w-px bg-border dark:bg-zinc-800" />
+        <div className="absolute top-0 left-[3.75rem] h-full w-px bg-border dark:bg-surface" />
 
         {/* Timeline items */}
         <div className="space-y-0">
@@ -113,8 +113,8 @@ export function ScrollingTimeline({
                     'shrink-0 text-right text-xs font-medium',
                     'w-12',
                     status === 'active' && 'text-primary',
-                    status === 'completed' && 'text-foreground dark:text-zinc-400',
-                    status === 'pending' && 'text-muted dark:text-zinc-600'
+                    status === 'completed' && 'text-foreground dark:text-muted',
+                    status === 'pending' && 'text-muted dark:text-muted'
                   )}
                 >
                   {formatTime(item.timestamp)}
@@ -126,8 +126,8 @@ export function ScrollingTimeline({
                     className={clsx(
                       'size-1.5 rounded-full transition-all duration-300',
                       status === 'active' && 'bg-primary ring-3 ring-primary/20 dark:ring-primary/10',
-                      status === 'completed' && 'bg-foreground/40 dark:bg-zinc-600',
-                      status === 'pending' && 'bg-border dark:bg-zinc-800'
+                      status === 'completed' && 'bg-foreground/40 dark:bg-border',
+                      status === 'pending' && 'bg-border dark:bg-surface'
                     )}
                   />
                 </div>
@@ -138,8 +138,8 @@ export function ScrollingTimeline({
                     className={clsx(
                       'flex shrink-0 items-center',
                       status === 'active' && 'text-primary',
-                      status === 'completed' && 'text-foreground dark:text-zinc-400',
-                      status === 'pending' && 'text-muted dark:text-zinc-600'
+                      status === 'completed' && 'text-foreground dark:text-muted',
+                      status === 'pending' && 'text-muted dark:text-muted'
                     )}
                   >
                     {item.icon}
@@ -151,9 +151,9 @@ export function ScrollingTimeline({
                   <div
                     className={clsx(
                       'truncate text-xs transition-colors duration-300',
-                      status === 'active' && 'font-medium text-foreground dark:text-zinc-100',
-                      status === 'completed' && 'text-foreground dark:text-zinc-300',
-                      status === 'pending' && 'text-muted dark:text-zinc-500'
+                      status === 'active' && 'font-medium text-foreground dark:text-foreground',
+                      status === 'completed' && 'text-foreground dark:text-foreground',
+                      status === 'pending' && 'text-muted dark:text-muted'
                     )}
                   >
                     {item.content}

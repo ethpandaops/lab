@@ -8,8 +8,8 @@ export function Toggle({
   onChange,
   leftIcon,
   rightIcon,
-  leftColor = 'text-gray-600',
-  rightColor = 'text-gray-600',
+  leftColor = 'text-muted',
+  rightColor = 'text-muted',
   srLabel = 'Toggle',
   size = 'default',
   rounded = false,
@@ -33,8 +33,8 @@ export function Toggle({
       className={clsx(
         'group relative inline-flex shrink-0 cursor-pointer items-center',
         rounded && 'rounded-lg',
-        'bg-zinc-300 transition-colors duration-200 ease-in-out',
-        'dark:bg-zinc-700',
+        'bg-border transition-colors duration-200 ease-in-out',
+        'dark:bg-border',
         'focus:outline-2 focus:outline-offset-2 focus:outline-primary',
         'data-[checked]:bg-primary/30 dark:data-[checked]:bg-primary/40',
         sizeClasses.switch

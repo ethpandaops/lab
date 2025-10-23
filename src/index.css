@@ -2,11 +2,19 @@
  * Main CSS Entry Point
  *
  * Import order:
- * 1. Tailwind base
- * 2. CSS Variables (dynamic theming)
- * 3. Theme configuration (@theme directive)
- * 4. Custom styles
+ * 1. Fonts
+ * 2. Tailwind base
+ * 3. CSS Variables (dynamic theming)
+ * 4. Theme configuration (@theme directive)
+ * 5. Custom styles
  */
+
+/* Fonts */
+@import '@fontsource-variable/space-grotesk';
+@import '@fontsource/space-mono/400.css';
+@import '@fontsource/space-mono/400-italic.css';
+@import '@fontsource/space-mono/700.css';
+@import '@fontsource/space-mono/700-italic.css';
 
 @import 'tailwindcss';
 
@@ -50,24 +58,24 @@
 
 /* Light and dark mode values
  *
- * NOTE: Hex values are defined in src/theme/colors.ts (source of truth)
- * These CSS variables reference Tailwind's color palette and are used for Tailwind utilities.
+ * NOTE: Light mode uses custom hex values from Streamlit theme.
+ * Dark mode references Tailwind's color palette.
  * For programmatic access (e.g., charts), use the useThemeColors hook which reads from src/theme/colors.ts.
  */
 @layer base {
   :root {
-    /* Light mode - futuristic cyan theme */
-    --primary-value: var(--color-cyan-500);
-    --secondary-value: var(--color-sky-500);
-    --accent-value: var(--color-cyan-400);
-    --background-value: white;
-    --surface-value: var(--color-gray-50);
-    --foreground-value: var(--color-zinc-950);
-    --muted-value: var(--color-zinc-600);
-    --border-value: var(--color-zinc-200);
+    /* Light mode - warm earthy theme (from Streamlit config) */
+    --primary-value: #bb5a38;
+    --secondary-value: #e8e7dd;
+    --accent-value: #d4794f;
+    --background-value: #f4f3ed;
+    --surface-value: #ecebe3;
+    --foreground-value: #3d3a2a;
+    --muted-value: #6b6755;
+    --border-value: #d3d2ca;
 
     /* Set html background for overscroll */
-    background-color: white;
+    background-color: #f4f3ed;
   }
 
   html.dark {
@@ -85,12 +93,19 @@
     background-color: var(--color-zinc-950);
   }
 
-  /* Apply IBM Plex Mono globally for tech/data aesthetic */
+  /* Apply Space Grotesk for body text and Space Mono for code */
   body {
-    font-family: 'IBM Plex Mono', ui-monospace, monospace;
+    font-family: 'Space Grotesk Variable', 'Space Grotesk', system-ui, sans-serif;
   }
 
-  /* Global focus styles - use cyan primary color */
+  code,
+  pre,
+  kbd,
+  samp {
+    font-family: 'Space Mono', ui-monospace, monospace;
+  }
+
+  /* Global focus styles - use primary color */
   *:focus-visible {
     outline: 2px solid var(--primary-value);
     outline-offset: 2px;

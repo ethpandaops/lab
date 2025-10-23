@@ -5,8 +5,7 @@ import type {
   DataAvailabilityRatePoint,
   ContinentalPropagationSeries,
 } from '../../components/BlobDataAvailability/BlobDataAvailability.types';
-
-const BLOB_COLORS = ['#06b6d4', '#ec4899', '#f59e0b', '#22c55e', '#8b5cf6', '#ef4444'];
+import { BLOB_COLORS, CONTINENT_COLORS } from '@/theme/data-visualization-colors';
 
 export function useBlobAvailabilityData(blobNodes: FctBlockBlobFirstSeenByNode[]): {
   firstSeenData: BlobDataPoint[];
@@ -56,15 +55,6 @@ export function useBlobAvailabilityData(blobNodes: FctBlockBlobFirstSeenByNode[]
     });
 
     // Calculate CDF per continent
-    const continentColors: Record<string, string> = {
-      EU: '#ec4899',
-      NA: '#22c55e',
-      AS: '#06b6d4',
-      OC: '#f59e0b',
-      SA: '#8b5cf6',
-      AF: '#ef4444',
-    };
-
     return Array.from(continentMap.entries()).map(([continent, nodes]) => {
       const sortedTimes = nodes.map(n => n.seen_slot_start_diff ?? 0).sort((a, b) => a - b);
 
@@ -75,7 +65,7 @@ export function useBlobAvailabilityData(blobNodes: FctBlockBlobFirstSeenByNode[]
 
       return {
         continent,
-        color: continentColors[continent] ?? '#9ca3af',
+        color: CONTINENT_COLORS[continent as keyof typeof CONTINENT_COLORS] ?? '#9ca3af',
         data,
       };
     });

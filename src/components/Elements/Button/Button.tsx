@@ -15,10 +15,10 @@ const variantStyles = {
     'dark:shadow-none dark:hover:bg-primary/80 dark:focus-visible:outline-primary'
   ),
   secondary: clsx(
-    'bg-white text-gray-900 shadow-xs inset-ring inset-ring-gray-300',
-    'hover:bg-gray-50 disabled:hover:bg-white',
-    'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-900',
-    'dark:bg-white/10 dark:text-white dark:shadow-none dark:inset-ring-white/5',
+    'bg-surface text-foreground shadow-xs inset-ring inset-ring-border',
+    'hover:bg-background disabled:hover:bg-surface',
+    'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground',
+    'dark:bg-white/10 dark:text-foreground dark:shadow-none dark:inset-ring-border',
     'dark:hover:bg-white/20 dark:disabled:hover:bg-white/10 dark:focus-visible:outline-white'
   ),
   soft: clsx(

@@ -100,7 +100,7 @@ export function Dialog({
           >
             <DialogPanel
               className={clsx(
-                'divide-y divide-border rounded-sm bg-white shadow-xl dark:divide-white/10 dark:bg-zinc-800/50 dark:shadow-none dark:outline dark:-outline-offset-1 dark:outline-white/10',
+                'divide-y divide-border rounded-sm bg-surface shadow-xl dark:divide-border dark:bg-zinc-800/50 dark:shadow-none dark:outline dark:-outline-offset-1 dark:outline-border',
                 allowContentOverflow ? 'overflow-visible' : 'overflow-hidden',
                 sizeClasses[size],
                 className
@@ -123,7 +123,7 @@ export function Dialog({
                     <button
                       type="button"
                       onClick={onClose}
-                      className="shrink-0 rounded-sm p-1.5 text-muted transition-colors hover:bg-zinc-200 hover:text-foreground dark:hover:bg-zinc-700 dark:hover:text-foreground"
+                      className="shrink-0 rounded-sm p-1.5 text-muted transition-colors hover:bg-border hover:text-foreground dark:hover:bg-zinc-700 dark:hover:text-foreground"
                       aria-label="Close dialog"
                     >
                       <XMarkIcon className="size-5" />
