@@ -1,5 +1,6 @@
 import type React from 'react';
 import ReactECharts from 'echarts-for-react';
+import colors from 'tailwindcss/colors';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import type { HeatmapChartProps } from './Heatmap.types';
 
@@ -24,7 +25,7 @@ export function HeatmapChart({
   height = 400,
   min,
   max,
-  colorGradient = ['#eef2ff', '#818cf8', '#4338ca'],
+  colorGradient = [colors.indigo[50], colors.indigo[400], colors.indigo[700]],
   showLabel = false,
   showVisualMap = true,
   animationDuration = 300,
@@ -168,7 +169,7 @@ export function HeatmapChart({
         emphasis: {
           itemStyle: {
             shadowBlur: 10,
-            shadowColor: 'rgba(0, 0, 0, 0.5)',
+            shadowColor: colors.black,
           },
         },
       },

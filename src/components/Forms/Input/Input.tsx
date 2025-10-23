@@ -107,7 +107,7 @@ export const InputLeading = ({ children, className, type }: InputSlotProps): Rea
       className={clsx(
         inline
           ? 'shrink-0 text-base text-muted select-none sm:text-sm/6 dark:text-muted'
-          : 'flex shrink-0 items-center bg-surface px-3 text-base text-muted outline-1 -outline-offset-1 outline-border sm:text-sm/6 dark:bg-white/5 dark:text-muted dark:outline-border',
+          : 'flex shrink-0 items-center bg-surface px-3 text-base text-muted outline-1 -outline-offset-1 outline-border sm:text-sm/6 dark:bg-surface dark:text-muted dark:outline-border',
         className
       )}
     >
@@ -212,7 +212,7 @@ export const InputTrailing = ({ children, className, type }: InputSlotProps): Re
       className={clsx(
         inline
           ? 'shrink-0 text-base text-muted select-none sm:text-sm/6 dark:text-muted'
-          : 'flex shrink-0 items-center bg-surface px-3 text-base text-muted outline-1 -outline-offset-1 outline-border sm:text-sm/6 dark:bg-white/5 dark:text-muted dark:outline-border',
+          : 'flex shrink-0 items-center bg-surface px-3 text-base text-muted outline-1 -outline-offset-1 outline-border sm:text-sm/6 dark:bg-surface dark:text-muted dark:outline-border',
         className
       )}
     >
@@ -557,7 +557,7 @@ const InputBase = ({
             className={clsx(
               'bg-surface outline-1 -outline-offset-1 outline-border',
               'focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-primary',
-              'dark:bg-white/5 dark:outline-border dark:focus-within:outline-primary',
+              'dark:bg-surface dark:outline-border dark:focus-within:outline-primary',
               insetPadding[size],
               error &&
                 'outline-danger/50 focus-within:outline-danger dark:outline-danger/50 dark:focus-within:outline-danger'
@@ -582,7 +582,7 @@ const InputBase = ({
             className={clsx(
               'flex items-center bg-surface px-3 outline-1 -outline-offset-1 outline-border',
               'focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-primary',
-              'dark:bg-white/5 dark:outline-border dark:focus-within:outline-primary'
+              'dark:bg-surface dark:outline-border dark:focus-within:outline-primary'
             )}
           >
             {leadingSlot}

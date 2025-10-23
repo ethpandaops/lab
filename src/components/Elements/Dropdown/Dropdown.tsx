@@ -40,8 +40,8 @@ export function Dropdown({
           'absolute z-10 mt-2 w-56 rounded-md bg-surface shadow-lg outline-1 outline-border',
           'transition data-closed:scale-95 data-closed:transform data-closed:opacity-0',
           'data-enter:duration-100 data-enter:ease-out data-leave:duration-75 data-leave:ease-in',
-          'dark:bg-zinc-800 dark:shadow-none dark:-outline-offset-1 dark:outline-border',
-          withDividers && 'divide-y divide-border dark:divide-white/10',
+          'dark:bg-surface dark:shadow-none dark:-outline-offset-1 dark:outline-border',
+          withDividers && 'divide-y divide-border dark:divide-border',
           alignStyles[align]
         )}
       >
@@ -77,7 +77,7 @@ export function DropdownItem({
     variant === 'default' && [
       'text-foreground dark:text-muted',
       'data-focus:bg-background data-focus:text-foreground',
-      'dark:data-focus:bg-white/5 dark:data-focus:text-foreground',
+      'dark:data-focus:bg-muted/10 dark:data-focus:text-foreground',
     ],
     variant === 'danger' && [
       'text-danger dark:text-danger',

@@ -19,7 +19,7 @@ export const getStyleConfig = (): {
     'block w-full border-0 bg-surface text-foreground placeholder:text-muted focus:ring-0',
     'disabled:cursor-not-allowed disabled:opacity-50',
     'read-only:cursor-default read-only:opacity-50',
-    'dark:bg-white/5 dark:text-foreground dark:placeholder:text-muted'
+    'dark:bg-surface dark:text-foreground dark:placeholder:text-muted'
   ),
   outline: {
     default: clsx(
@@ -61,7 +61,7 @@ export const renderSelect = (select: SelectAddonProps | undefined): ReactNode | 
         className={clsx(
           'col-start-1 row-start-1 w-full appearance-none border-0 py-1.5 pr-7 pl-3 text-base text-muted placeholder:text-muted sm:text-sm/6',
           'shadow-none outline-hidden focus:outline-hidden focus-visible:outline-hidden',
-          'dark:bg-transparent dark:text-muted dark:*:bg-gray-800 dark:placeholder:text-muted',
+          'dark:bg-transparent dark:text-muted dark:*:bg-surface dark:placeholder:text-muted',
           select.className
         )}
       >

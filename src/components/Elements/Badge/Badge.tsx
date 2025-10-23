@@ -100,7 +100,7 @@ const colorStyles: Record<BadgeColor, ColorClasses> = {
 };
 
 // Special styling for dot badges with border variant
-const dotBorderClasses = 'text-gray-900 inset-ring inset-ring-gray-200 dark:text-white dark:inset-ring-white/10';
+const dotBorderClasses = 'text-foreground inset-ring inset-ring-border dark:text-foreground dark:inset-ring-border';
 
 export function Badge({
   children,
