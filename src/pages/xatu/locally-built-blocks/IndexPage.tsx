@@ -2,8 +2,7 @@ import { type JSX } from 'react';
 import { Container } from '@/components/Layout/Container';
 import { Header } from '@/components/Layout/Header';
 import { Alert } from '@/components/Feedback/Alert';
-import { LoadingContainer } from '@/components/Layout/LoadingContainer';
-import { SlotTimeline, ClientPairingMatrix } from './components';
+import { SlotTimeline, ClientPairingMatrix, LocallyBuiltBlocksSkeleton } from './components';
 import { useSlotBlocks } from './hooks';
 
 export function IndexPage(): JSX.Element {
@@ -40,7 +39,14 @@ export function IndexPage(): JSX.Element {
           title="Locally Built Blocks"
           description="Blocks built locally by sentry nodes. Useful for analyzing client block building capabilities."
         />
-        <LoadingContainer />
+        <div className="mb-6">
+          <Alert
+            variant="info"
+            title="About Locally Built Blocks"
+            description="These blocks were built locally by ethPandaOps sentry nodes. They represent what each node would have proposed if selected as a block proposer. This data is useful for comparing different client implementations and their transaction selection strategies across various execution and consensus client pairings."
+          />
+        </div>
+        <LocallyBuiltBlocksSkeleton />
       </Container>
     );
   }
