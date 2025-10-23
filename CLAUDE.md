@@ -35,52 +35,39 @@ pnpm storybook
 vite.config.ts                        # Vite configuration
 package.json                          # Dependencies and scripts
 public/                               # Public assets
+  images/
+    [section]/                        # Section-specific images
+      [page-name].png                 # Feature images for social sharing
 .storybook/                           # Storybook configuration
 src/
   routes/                             # Route definitions using TanStack Router
     __root.tsx                        # Root layout with sidebar, providers, navigation
     index.tsx                         # "/" - Landing page route
     [section].tsx                     # Layout routes for sections
-    ethereum/                         # Ethereum-focused visualizations
-      slot-view.tsx                   # Beacon chain slot visualization
-    xatu/                             # Xatu-specific data and contributors
-      contributors.tsx                # Contributors layout route
-      contributors/
-        index.tsx                     # Contributors list
-        $id.tsx                       # Individual contributor detail
-      geographical-checklist.tsx      # Global node distribution
-      locally-built-blocks.tsx        # Locally built blocks tracking
-      fork-readiness.tsx              # Client fork readiness monitoring
-    experiments/                      # Legacy experiments (redirects to new structure)
-      [experiment-name].tsx           # Redirects to /ethereum or /xatu routes
+    [section]/                        # Section-specific routes
+      [page-name].tsx                 # Page route
+      [page-name]/                    # Nested page routes
+        index.tsx                     # Default nested route
+        $param.tsx                    # Dynamic parameter route
 
   pages/                              # Page components (actual UI implementation)
     IndexPage.tsx                     # Landing page component
-    ethereum/                         # Ethereum section pages
-      slot-view/                      # Slot view page
-        IndexPage.tsx
-        index.ts
+    [section]/                        # Section-specific pages
+      [page-name]/                    # Individual page folder
+        IndexPage.tsx                 # Main page component
+        [OtherPage].tsx               # Additional page components (e.g., DetailPage)
+        index.ts                      # Barrel export
         components/                   # Page-specific components
+          [ComponentName]/
+            [ComponentName].tsx
+            [ComponentName].test.tsx
+            index.ts
         hooks/                        # Page-specific hooks (optional)
-    xatu/                             # Xatu section pages
-      contributors/                   # Contributors pages
-        IndexPage.tsx                 # Contributors list
-        DetailPage.tsx                # Contributor detail
-        index.ts
-        components/                   # Page-specific components
-      geographical-checklist/         # Geographical checklist page
-        IndexPage.tsx
-        index.ts
-        components/
-      locally-built-blocks/           # Locally built blocks page
-        IndexPage.tsx
-        index.ts
-      fork-readiness/                 # Fork readiness page
-        IndexPage.tsx
-        index.ts
-        components/
-    experiments/                      # Legacy experiments index (for /experiments route)
-      IndexPage.tsx                   # Shows all experiments with new links
+          use[HookName].ts
+        contexts/                     # Page-specific contexts (optional)
+          [ContextName].ts
+        providers/                    # Page-specific providers (optional)
+          [ProviderName].tsx
 
   components/                         # Core, app-wide reusable UI components
     [Category]/                       # Component category folder
@@ -88,7 +75,7 @@ src/
         [ComponentName].tsx           # Component implementation
         [ComponentName].test.tsx      # Vitest tests
         [ComponentName].types.ts      # TypeScript types (optional)
-        [ComponentName].stories.tsx   # Storybook stories (optional)
+        [ComponentName].stories.tsx   # Storybook stories
         index.ts                      # Barrel export
 
   providers/                          # React Context Providers
@@ -115,8 +102,8 @@ src/
     [other generated files]           # Auto-generated client, types, schemas, etc.
 
   utils/                              # Utility functions and helpers
-    [UtilName].ts                     # API configuration
-    [UtilName].test.ts                # Vitest tests
+    [util-name].ts                    # Utility functions
+    [util-name].test.ts               # Vitest tests
     index.ts                          # Barrel export
 
   main.tsx                            # Application entry point
@@ -207,17 +194,16 @@ ComponentName/
 
 ### Quick Reference
 
-- **New Ethereum page**: Route in `src/routes/ethereum/`, page in `src/pages/ethereum/[name]/`
-- **New Xatu page**: Route in `src/routes/xatu/`, page in `src/pages/xatu/[name]/`
-- **Feature image**: `public/images/experiments/[name].png` for social sharing
-- **Skeleton component**: `src/pages/[section]/components/[PageName]Skeleton/` using `LoadingContainer`
-- **Core component**: `src/components/[category]/[ComponentName]/` - reusable, generic
-- **Page-scoped component**: `src/pages/[section]/components/[ComponentName]/` - page-specific
-- **Core hook**: `src/hooks/use[Name]/` - app-wide logic
-- **Page-scoped hook**: `src/pages/[section]/hooks/use[Name].ts` - page-specific logic
-- **Utility function**: `src/utils/[name].ts` - helper functions
-- **Core context**: `src/contexts/` with provider in `src/providers/`
-- **Page-scoped context**: `src/pages/[section]/contexts/` with local provider
+- **New page**: Route in `src/routes/[section]/`, page in `src/pages/[section]/[page-name]/`
+- **Feature image**: `public/images/[section]/[page-name].png` for social sharing
+- **Skeleton component**: `src/pages/[section]/[page-name]/components/[PageName]Skeleton/` using `LoadingContainer`
+- **Core component**: `src/components/[Category]/[ComponentName]/` - reusable, generic
+- **Page-scoped component**: `src/pages/[section]/[page-name]/components/[ComponentName]/` - page-specific
+- **Core hook**: `src/hooks/use[HookName]/` - app-wide logic
+- **Page-scoped hook**: `src/pages/[section]/[page-name]/hooks/use[HookName].ts` - page-specific logic
+- **Utility function**: `src/utils/[util-name].ts` - helper functions
+- **Core context**: `src/contexts/[ContextName]/` with provider in `src/providers/[ProviderName]/`
+- **Page-scoped context**: `src/pages/[section]/[page-name]/contexts/[ContextName].ts` with local provider
 
 ### Placement Decision
 
@@ -285,14 +271,14 @@ ComponentName/
 ### Form Architecture
 
 - One FormProvider per page
-- Reusable filter components across experiments
+- Reusable filter components across pages
 - Form state and handlers in page component
 - **Always use Zod for validation** - provides type-safe schemas and runtime validation
 
 ### Implementation
 
 ```tsx
-// In experiment page (e.g., pages/experiments/[name]/IndexPage.tsx)
+// In page component (e.g., pages/[section]/[page-name]/IndexPage.tsx)
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
@@ -332,7 +318,7 @@ const methods = useForm<FormData>({
   <CustomFields /> // Page-specific fields
 </FormProvider>
 
-// In reusable filter component (e.g., components/Forms/FilterForm/)
+// In reusable filter component (e.g., components/Forms/[FilterForm]/)
 const { register, watch } = useFormContext(); // Access parent form
 ```
 
@@ -344,7 +330,7 @@ const { register, watch } = useFormContext(); // Access parent form
 - Single `useForm()` per page via FormProvider
 - Child components use `useFormContext()`
 - Validation schemas with types in `FormData.types.ts`
-- Generic filters in `components/Forms/`, page-specific in `pages/[section]/components/`
+- Generic filters in `components/Forms/`, page-specific in `pages/[section]/[page-name]/components/`
 
 ## Head Meta & SEO
 
@@ -355,36 +341,36 @@ const { register, watch } = useFormContext(); // Access parent form
 - Child routes inherit and can extend parent meta
 - **No variables in head**: Only use literals and `import.meta.env.VITE_*` (processed by build plugin)
 
-### Experiment Feature Images
+### Page Feature Images
 
-**Standard**: Each experiment should have a feature image at:
+**Standard**: Each page should have a feature image at:
 
 ```
-public/images/experiments/[experiment-name].png
+public/images/[section]/[page-name].png
 ```
 
 **Route Implementation**:
 
 ```tsx
-// In routes/experiments/[experiment-name].tsx
+// In routes/[section]/[page-name].tsx
 head: () => ({
   meta: [
-    { title: `Experiment Name | ${import.meta.env.VITE_BASE_TITLE}` },
-    { name: 'description', content: 'Unique description of what this experiment does' },
-    { property: 'og:image', content: '/images/experiments/[experiment-name].png' },
-    { property: 'og:description', content: 'Unique description of what this experiment does' },
-    { name: 'twitter:image', content: '/images/experiments/[experiment-name].png' },
-    { name: 'twitter:description', content: 'Unique description of what this experiment does' },
+    { title: `Page Name | ${import.meta.env.VITE_BASE_TITLE}` },
+    { name: 'description', content: 'Unique description of what this page does' },
+    { property: 'og:image', content: '/images/[section]/[page-name].png' },
+    { property: 'og:description', content: 'Unique description of what this page does' },
+    { name: 'twitter:image', content: '/images/[section]/[page-name].png' },
+    { name: 'twitter:description', content: 'Unique description of what this page does' },
   ],
 })
 ```
 
 ### Best Practices
 
-- Always include experiment-specific title
-- Write unique description for each experiment
+- Always include page-specific title
+- Write unique description for each page
 - Update all three descriptions (meta, og:description, twitter:description)
-- Provide unique feature image per experiment
+- Provide unique feature image per page
 - Set og:image and twitter:image for social sharing
 
 ## Theming
