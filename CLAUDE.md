@@ -246,10 +246,12 @@ ComponentName/
 ### Testing
 
 - **Required for**: All hooks, utilities, and core components
-- **Framework**: Vitest with React Testing Library for components
-- **Location**: Co-located with source files (`.test.ts` or `.test.tsx`)
+- **Framework**:
+  - Vitest for hooks and utilities
+  - Storybook interactions for components
+- **Location**: Co-located with source files (`.test.ts` or `.test.tsx` for Vitest, `.stories.tsx` for Storybook)
 - **Coverage**: Aim for high coverage of business logic and edge cases
-- **Naming**: Test files match source files with `.test.ts(x)` extension
+- **Naming**: Test files match source files with `.test.ts(x)` or `.stories.tsx` extension
 
 ## Loading States
 
@@ -274,12 +276,46 @@ ComponentName/
 - One FormProvider per page
 - Reusable filter components across experiments
 - Form state and handlers in page component
+- **Always use Zod for validation** - provides type-safe schemas and runtime validation
 
 ### Implementation
 
 ```tsx
 // In experiment page (e.g., pages/experiments/[name]/IndexPage.tsx)
-const methods = useForm<FormData>({ defaultValues });
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+
+// Define Zod schema
+const formSchema = z.object({
+  email: z.string().email('Invalid email'),
+  username: z.string().min(3, 'Min 3 characters'),
+});
+
+type FormData = z.infer<typeof formSchema>;
+
+// Manual Zod resolver (no need for @hookform/resolvers)
+const methods = useForm<FormData>({
+  defaultValues,
+  resolver: async (data) => {
+    try {
+      const validData = formSchema.parse(data);
+      return { values: validData, errors: {} };
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return {
+          values: {},
+          errors: error.issues.reduce((acc, issue) => {
+            const path = issue.path[0] as string;
+            acc[path] = { type: 'validation', message: issue.message };
+            return acc;
+          }, {} as Record<string, { type: string; message: string }>),
+        };
+      }
+      return { values: {}, errors: {} };
+    }
+  },
+});
+
 <FormProvider {...methods}>
   <FilterForm />  // Reusable core component
   <CustomFields /> // Page-specific fields
@@ -291,6 +327,9 @@ const { register, watch } = useFormContext(); // Access parent form
 
 ### Best Practices
 
+- **Always use Zod with react-hook-form** - type-safe validation
+- Use manual Zod resolver (shown above) - no need for `@hookform/resolvers` package
+- Define schema with `z.object()` and infer types with `z.infer<typeof schema>`
 - Single `useForm()` per page via FormProvider
 - Child components use `useFormContext()`
 - Validation schemas with types in `FormData.types.ts`

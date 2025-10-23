@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { expect, waitFor } from 'storybook/test';
 import { GlobeChart } from './Globe';
 import type { LineData, PointData } from './Globe.types';
 
@@ -59,6 +60,24 @@ export const Default: Story = {
     showEffect: true,
     ...earthTextures,
   },
+  play: async ({ canvasElement }) => {
+    // Test that globe container renders
+    const globeContainer = canvasElement.querySelector('.w-full');
+    await expect(globeContainer).toBeInTheDocument();
+
+    // Test that ECharts container renders
+    const echartsContainer = canvasElement.querySelector('[_echarts_instance_]');
+    await expect(echartsContainer).toBeInTheDocument();
+
+    // Test that canvas element is created by ECharts (wait for it to render)
+    await waitFor(
+      () => {
+        const chartCanvas = canvasElement.querySelector('canvas');
+        expect(chartCanvas).toBeInTheDocument();
+      },
+      { timeout: 3000 }
+    );
+  },
 };
 
 /**
@@ -75,6 +94,24 @@ export const PointsOnly: Story = {
     pointColor: '#06b6d4',
     ...earthTextures,
   },
+  play: async ({ canvasElement }) => {
+    // Test that globe container renders
+    const globeContainer = canvasElement.querySelector('.w-full');
+    await expect(globeContainer).toBeInTheDocument();
+
+    // Test that ECharts container renders
+    const echartsContainer = canvasElement.querySelector('[_echarts_instance_]');
+    await expect(echartsContainer).toBeInTheDocument();
+
+    // Test that canvas element is created by ECharts (wait for it to render)
+    await waitFor(
+      () => {
+        const chartCanvas = canvasElement.querySelector('canvas');
+        expect(chartCanvas).toBeInTheDocument();
+      },
+      { timeout: 3000 }
+    );
+  },
 };
 
 /**
@@ -90,6 +127,24 @@ export const LargePoints: Story = {
     pointColor: '#f59e0b',
     ...earthTextures,
   },
+  play: async ({ canvasElement }) => {
+    // Test that globe container renders
+    const globeContainer = canvasElement.querySelector('.w-full');
+    await expect(globeContainer).toBeInTheDocument();
+
+    // Test that ECharts container renders
+    const echartsContainer = canvasElement.querySelector('[_echarts_instance_]');
+    await expect(echartsContainer).toBeInTheDocument();
+
+    // Test that canvas element is created by ECharts (wait for it to render)
+    await waitFor(
+      () => {
+        const chartCanvas = canvasElement.querySelector('canvas');
+        expect(chartCanvas).toBeInTheDocument();
+      },
+      { timeout: 3000 }
+    );
+  },
 };
 
 /**
@@ -102,5 +157,23 @@ export const Minimal: Story = {
     pointSize: 8,
     pointOpacity: 1,
     pointColor: '#06b6d4',
+  },
+  play: async ({ canvasElement }) => {
+    // Test that globe container renders
+    const globeContainer = canvasElement.querySelector('.w-full');
+    await expect(globeContainer).toBeInTheDocument();
+
+    // Test that ECharts container renders
+    const echartsContainer = canvasElement.querySelector('[_echarts_instance_]');
+    await expect(echartsContainer).toBeInTheDocument();
+
+    // Test that canvas element is created by ECharts (wait for it to render)
+    await waitFor(
+      () => {
+        const chartCanvas = canvasElement.querySelector('canvas');
+        expect(chartCanvas).toBeInTheDocument();
+      },
+      { timeout: 3000 }
+    );
   },
 };

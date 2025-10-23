@@ -169,6 +169,31 @@ export const DifferentSizes: Story = {
   ),
 };
 
+// Rounded prop variants
+export const RoundedProp: Story = {
+  args: {} as never,
+  render: () => (
+    <div className="flex flex-col items-start gap-6">
+      <div className="flex flex-col gap-2">
+        <p className="text-sm/6 text-muted">Square (default, rounded=false)</p>
+        <ButtonGroup>
+          <Button>Years</Button>
+          <Button>Months</Button>
+          <Button>Days</Button>
+        </ButtonGroup>
+      </div>
+      <div className="flex flex-col gap-2">
+        <p className="text-sm/6 text-muted">Rounded (rounded=true)</p>
+        <ButtonGroup rounded>
+          <Button>Years</Button>
+          <Button>Months</Button>
+          <Button>Days</Button>
+        </ButtonGroup>
+      </div>
+    </div>
+  ),
+};
+
 // Rounded/pill-shaped buttons
 export const RoundedButtons: Story = {
   args: {} as never,
