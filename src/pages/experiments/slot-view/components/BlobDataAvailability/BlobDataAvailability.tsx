@@ -1,10 +1,11 @@
 import type { JSX } from 'react';
-import { useState, useMemo } from 'react';
+import { useMemo } from 'react';
 import ReactECharts from 'echarts-for-react';
 import clsx from 'clsx';
 import { hexToRgba } from '@/utils';
+import { useThemeColors } from '@/hooks/useThemeColors';
 import type { BlobDataAvailabilityProps } from './BlobDataAvailability.types';
-import { CONTINENT_COLORS, DEFAULT_CHART_COLORS } from '@/theme/data-visualization-colors';
+import { CONTINENT_COLORS } from '@/theme/data-visualization-colors';
 
 /**
  * BlobDataAvailability - Page-specific component for visualizing blob data availability
@@ -40,36 +41,7 @@ export function BlobDataAvailability({
 }: BlobDataAvailabilityProps): JSX.Element {
   // Default currentTime to maxTime to show all data if not specified
   const effectiveCurrentTime = currentTime ?? maxTime;
-  const [themeColors] = useState(() => {
-    const root = document.documentElement;
-    const computedStyle = getComputedStyle(root);
-
-    const primaryColor =
-      computedStyle.getPropertyValue('--color-primary').trim() ||
-      computedStyle.getPropertyValue('--color-cyan-500').trim();
-    const foregroundColor =
-      computedStyle.getPropertyValue('--color-foreground').trim() ||
-      computedStyle.getPropertyValue('--color-zinc-950').trim();
-    const mutedColor =
-      computedStyle.getPropertyValue('--color-muted').trim() ||
-      computedStyle.getPropertyValue('--color-zinc-600').trim();
-    const borderColor =
-      computedStyle.getPropertyValue('--color-border').trim() ||
-      computedStyle.getPropertyValue('--color-zinc-200').trim();
-    const backgroundColor = computedStyle.getPropertyValue('--color-background').trim() || '#ffffff';
-    const successColor =
-      computedStyle.getPropertyValue('--color-success').trim() ||
-      computedStyle.getPropertyValue('--color-green-500').trim();
-
-    return {
-      primary: primaryColor || DEFAULT_CHART_COLORS.primary,
-      foreground: foregroundColor || DEFAULT_CHART_COLORS.foreground,
-      muted: mutedColor || DEFAULT_CHART_COLORS.muted,
-      border: borderColor || DEFAULT_CHART_COLORS.border,
-      background: backgroundColor || DEFAULT_CHART_COLORS.background,
-      success: successColor || DEFAULT_CHART_COLORS.success,
-    };
-  });
+  const themeColors = useThemeColors();
 
   // Calculate max values for Y-axis (using all data, not just visible)
   // This prevents the chart from re-scaling during animations

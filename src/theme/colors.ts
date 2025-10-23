@@ -32,33 +32,35 @@ export interface ThemeColors {
 
 /**
  * Light mode colors - warm earthy theme
+ * Maps to primitive scales: terracotta + sand
  */
 export const LIGHT_COLORS: ThemeColors = {
-  primary: '#bb5a38', // warm rust/terracotta
-  secondary: '#e8e7dd', // warm light gray-beige
-  accent: '#d4794f', // warm terracotta accent
-  background: '#f4f3ed', // warm cream
-  surface: '#ecebe3', // warm light gray
-  foreground: '#3d3a2a', // dark brown
-  muted: '#6b6755', // warm muted gray-brown
-  border: '#d3d2ca', // warm light border
+  primary: '#bb5a38', // terracotta-600
+  secondary: '#efeee5', // sand-100
+  accent: '#cb7044', // terracotta-500
+  background: '#f4f3ed', // sand-50
+  surface: '#efeee5', // sand-100
+  foreground: '#2c251e', // sand-950
+  muted: '#7d6b51', // sand-700
+  border: '#dedbca', // sand-200
   success: '#22c55e', // green-500
   warning: '#f59e0b', // amber-500
   danger: '#ef4444', // red-500
 };
 
 /**
- * Dark mode colors - Mocha Rose (rich chocolate with rose-gold)
+ * Dark mode colors - balanced neutral with warm terracotta accents
+ * Maps to primitive scales: neutral + terracotta
  */
 export const DARK_COLORS: ThemeColors = {
-  primary: '#d57a5e', // rose-terracotta
-  secondary: '#2b221f', // deep mocha
-  accent: '#e19b7e', // rose-gold peach
-  background: '#1e1613', // rich chocolate
-  surface: '#271e1b', // elevated mocha
-  foreground: '#f0e7dc', // warm ivory
-  muted: '#a88672', // warm mocha-tan
-  border: '#3e322c', // mocha border
+  primary: '#cb7044', // terracotta-500
+  secondary: '#3d3d3d', // neutral-900
+  accent: '#d58c62', // terracotta-400
+  background: '#1a1a1a', // neutral-950
+  surface: '#242424', // custom (between neutral-900/950)
+  foreground: '#f6f6f6', // neutral-50
+  muted: '#888888', // neutral-400
+  border: '#454545', // neutral-800
   success: '#22c55e', // green-500
   warning: '#f59e0b', // amber-500
   danger: '#ef4444', // red-500

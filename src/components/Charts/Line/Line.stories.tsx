@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState, useEffect } from 'react';
+import colors from 'tailwindcss/colors';
 import { LineChart } from './Line';
 
 const meta: Meta<typeof LineChart> = {
@@ -121,7 +122,7 @@ export const VerySmoothness: Story = {
 export const CustomColor: Story = {
   args: {
     title: 'Custom Color Line',
-    color: '#10b981', // green-500
+    color: colors.green[500],
     showArea: true,
     data: [300, 450, 350, 520, 480, 610, 590],
     labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],

@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { CONTINENT_COLORS } from '@/theme/data-visualization-colors';
 import { GeographicalListView } from './GeographicalListView';
 import type { ContinentData, ContinentCode, ProcessedNode } from '../../hooks/useGeographicalData';
 
@@ -29,7 +30,7 @@ const mockContinents = new Map<ContinentCode, ContinentData>([
       code: 'EU',
       name: 'Europe',
       emoji: '🇪🇺',
-      color: '#10b981',
+      color: CONTINENT_COLORS.EU,
       countries: new Map([
         [
           'GB',

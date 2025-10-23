@@ -3,6 +3,7 @@ import { useState, useEffect, useMemo } from 'react';
 import ReactECharts from 'echarts-for-react';
 import type { ECharts } from 'echarts';
 import 'echarts-gl';
+import { useThemeColors } from '@/hooks/useThemeColors';
 import type { GlobeChartProps } from './Globe.types';
 
 /**
@@ -33,11 +34,12 @@ export function GlobeChart({
   baseTexture,
   heightTexture,
   environment,
-  lineColor = '#ff4683',
-  pointColor = '#06b6d4',
+  lineColor,
+  pointColor,
   pointSize = 2,
   pointOpacity = 0.2,
 }: GlobeChartProps): React.JSX.Element {
+  const themeColors = useThemeColors();
   const [echartsInstance, setEchartsInstance] = useState<ECharts | null>(null);
 
   // Prepare series data and memoize option to avoid unnecessary re-renders
@@ -59,12 +61,12 @@ export function GlobeChart({
               trailWidth: 2,
               trailLength: 0.15,
               trailOpacity: 1,
-              trailColor: lineColor,
+              trailColor: lineColor || themeColors.accent,
             }
           : undefined,
         lineStyle: {
           width: 1,
-          color: lineColor,
+          color: lineColor || themeColors.accent,
           opacity: 0.1,
         },
         blendMode: 'lighter',
@@ -81,7 +83,7 @@ export function GlobeChart({
         blendMode: 'lighter',
         symbolSize: pointSize,
         itemStyle: {
-          color: pointColor,
+          color: pointColor || themeColors.primary,
           opacity: pointOpacity,
         },
         data: points.map(point => ({
@@ -92,7 +94,7 @@ export function GlobeChart({
     }
 
     const chartOption = {
-      backgroundColor: '#000',
+      backgroundColor: themeColors.background,
       tooltip: {
         show: true,
         formatter: (params: { name?: string; value?: number[] }) => {
@@ -106,7 +108,7 @@ export function GlobeChart({
         ? {
             text: title,
             textStyle: {
-              color: '#ffffff',
+              color: themeColors.foreground,
               fontSize: 16,
               fontWeight: 600,
             },
@@ -152,6 +154,7 @@ export function GlobeChart({
     pointColor,
     pointSize,
     pointOpacity,
+    themeColors,
   ]);
 
   useEffect(() => {

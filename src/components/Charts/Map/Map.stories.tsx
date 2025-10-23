@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import colors from 'tailwindcss/colors';
 import { MapChart } from './Map';
 import type { RouteData, PointData } from './Map.types';
 
@@ -99,9 +100,9 @@ export const CustomColors: Story = {
   args: {
     routes,
     showEffect: true,
-    lineColor: '#ff4683',
-    mapColor: '#1a1a2e',
-    environment: '#0f0f1e',
+    lineColor: colors.pink[500],
+    mapColor: colors.slate[900],
+    environment: colors.slate[950],
   },
 };
 
@@ -190,7 +191,7 @@ export const CustomPointColor: Story = {
   args: {
     points: cityPoints,
     title: 'Major Cities',
-    pointColor: '#ff4683',
+    pointColor: colors.pink[500],
     pointSize: 8,
   },
 };

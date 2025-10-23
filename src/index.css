@@ -24,8 +24,55 @@
 /* Enable class-based dark mode */
 @custom-variant dark (&:where(.dark, .dark *));
 
-/* Semantic theme tokens - Tailwind generates utilities from these */
+/* Two-Tier Token Architecture
+ *
+ * Tier 1: Primitive color scales (foundation)
+ * Tier 2: Semantic tokens (application layer)
+ */
 @theme inline {
+  /* ===== TIER 1: Primitive Color Scales ===== */
+
+  /* Terracotta - warm accent colors */
+  --color-terracotta-50: #fbf6f1;
+  --color-terracotta-100: #f7eadd;
+  --color-terracotta-200: #edd2bb;
+  --color-terracotta-300: #e1b290;
+  --color-terracotta-400: #d58c62;
+  --color-terracotta-500: #cb7044;
+  --color-terracotta-600: #bb5a38;
+  --color-terracotta-700: #9d4731;
+  --color-terracotta-800: #7f3b2d;
+  --color-terracotta-900: #673227;
+  --color-terracotta-950: #371813;
+
+  /* Sand - warm neutrals for light mode */
+  --color-sand-50: #f4f3ed;
+  --color-sand-100: #efeee5;
+  --color-sand-200: #dedbca;
+  --color-sand-300: #c9c3a8;
+  --color-sand-400: #b3a784;
+  --color-sand-500: #a3946c;
+  --color-sand-600: #968360;
+  --color-sand-700: #7d6b51;
+  --color-sand-800: #665846;
+  --color-sand-900: #54493a;
+  --color-sand-950: #2c251e;
+
+  /* Neutral - grayscale for dark mode */
+  --color-neutral-50: #f6f6f6;
+  --color-neutral-100: #e7e7e7;
+  --color-neutral-200: #d1d1d1;
+  --color-neutral-300: #b0b0b0;
+  --color-neutral-400: #888888;
+  --color-neutral-500: #6d6d6d;
+  --color-neutral-600: #5d5d5d;
+  --color-neutral-700: #4f4f4f;
+  --color-neutral-800: #454545;
+  --color-neutral-900: #3d3d3d;
+  --color-neutral-950: #1a1a1a;
+
+  /* ===== TIER 2: Semantic Tokens ===== */
+
   /* Brand colors */
   --color-primary: var(--primary-value);
   --color-secondary: var(--secondary-value);
@@ -56,41 +103,41 @@
   }
 }
 
-/* Light and dark mode values
+/* Semantic token mappings
  *
- * NOTE: Light mode uses custom hex values.
- * Dark mode references Tailwind's color palette.
- * For programmatic access (e.g., charts), use the useThemeColors hook which reads from src/theme/colors.ts.
+ * Maps semantic tokens to primitive color scales.
+ * Light mode uses warm sand/terracotta palette.
+ * Dark mode uses neutral grays with warm terracotta accents.
  */
 @layer base {
   :root {
     /* Light mode - warm earthy theme */
-    --primary-value: #bb5a38;
-    --secondary-value: #e8e7dd;
-    --accent-value: #d4794f;
-    --background-value: #f4f3ed;
-    --surface-value: #ecebe3;
-    --foreground-value: #3d3a2a;
-    --muted-value: #6b6755;
-    --border-value: #d3d2ca;
+    --primary-value: var(--color-terracotta-600);
+    --secondary-value: var(--color-sand-100);
+    --accent-value: var(--color-terracotta-500);
+    --background-value: var(--color-sand-50);
+    --surface-value: var(--color-sand-100);
+    --foreground-value: var(--color-sand-950);
+    --muted-value: var(--color-sand-700);
+    --border-value: var(--color-sand-200);
 
     /* Set html background for overscroll */
-    background-color: #f4f3ed;
+    background-color: var(--color-sand-50);
   }
 
   html.dark {
-    /* Dark mode - Mocha Rose (rich chocolate with rose-gold) */
-    --primary-value: #d57a5e;
-    --secondary-value: #2b221f;
-    --accent-value: #e19b7e;
-    --background-value: #1e1613;
-    --surface-value: #271e1b;
-    --foreground-value: #f0e7dc;
-    --muted-value: #a88672;
-    --border-value: #3e322c;
+    /* Dark mode - balanced neutral with warm terracotta accents */
+    --primary-value: var(--color-terracotta-500);
+    --secondary-value: var(--color-neutral-900);
+    --accent-value: var(--color-terracotta-400);
+    --background-value: var(--color-neutral-950);
+    --surface-value: #242424;
+    --foreground-value: var(--color-neutral-50);
+    --muted-value: var(--color-neutral-400);
+    --border-value: var(--color-neutral-800);
 
     /* Set html background for overscroll */
-    background-color: #1e1613;
+    background-color: var(--color-neutral-950);
   }
 
   /* Apply Space Grotesk for body text and Space Mono for code */

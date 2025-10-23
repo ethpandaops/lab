@@ -3,6 +3,7 @@ import { useMemo } from 'react';
 import clsx from 'clsx';
 import { HeatmapChart } from '@/components/Charts/Heatmap';
 import type { DataColumnDataAvailabilityProps } from './DataColumnDataAvailability.types';
+import { PERFORMANCE_TIME_COLORS } from '@/theme/data-visualization-colors';
 
 /**
  * DataColumnDataAvailability - Page-specific component for visualizing data column availability
@@ -115,11 +116,11 @@ export function DataColumnDataAvailability({
         max={maxTime}
         visualMapType="piecewise"
         piecewisePieces={[
-          { min: 0, max: 1000, color: '#22c55e', label: '0-1s' },
-          { min: 1000, max: 2000, color: '#84cc16', label: '1-2s' },
-          { min: 2000, max: 3000, color: '#eab308', label: '2-3s' },
-          { min: 3000, max: 4000, color: '#f97316', label: '3-4s' },
-          { min: 4000, color: '#ef4444', label: '>4s' },
+          { min: 0, max: 1000, color: PERFORMANCE_TIME_COLORS.excellent, label: '0-1s' },
+          { min: 1000, max: 2000, color: PERFORMANCE_TIME_COLORS.good, label: '1-2s' },
+          { min: 2000, max: 3000, color: PERFORMANCE_TIME_COLORS.fair, label: '2-3s' },
+          { min: 3000, max: 4000, color: PERFORMANCE_TIME_COLORS.slow, label: '3-4s' },
+          { min: 4000, color: PERFORMANCE_TIME_COLORS.poor, label: '>4s' },
         ]}
         showLabel={false}
         showVisualMap={true}
