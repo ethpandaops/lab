@@ -1,6 +1,7 @@
-import { createFileRoute } from '@tanstack/react-router';
-import { IndexPage } from '@/pages/experiments/locally-built-blocks';
+import { createFileRoute, redirect } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/experiments/locally-built-blocks')({
-  component: IndexPage,
+  beforeLoad: () => {
+    throw redirect({ to: '/xatu/locally-built-blocks' });
+  },
 });

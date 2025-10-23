@@ -15,7 +15,7 @@ import type { UserClassification } from './components/UserCard/UserCard.types';
 import { getBorderColor, getClassificationLabel, getClassificationColor } from './components/UserCard/utils';
 
 export function DetailPage(): JSX.Element {
-  const { id } = useParams({ from: '/contributors/$id' });
+  const { id } = useParams({ from: '/xatu/contributors/$id' });
 
   // Query all three categories since we don't know which one the username belongs to
   const {
@@ -91,7 +91,7 @@ export function DetailPage(): JSX.Element {
         <div className="rounded-sm border border-danger bg-danger/10 p-4 text-danger">
           Error loading contributor: {error.message}
         </div>
-        <Link to="/contributors" className="mt-4 inline-block text-primary hover:underline">
+        <Link to="/xatu/contributors" className="mt-4 inline-block text-primary hover:underline">
           ← Back to all contributors
         </Link>
       </Container>

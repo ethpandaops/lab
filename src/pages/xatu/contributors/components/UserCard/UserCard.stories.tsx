@@ -110,7 +110,7 @@ export const Interactive: Story = {
     lastSeen: Date.now() / 1000,
     clientVersion: 'v0.0.69-test',
     consensusImplementations: ['nimbus'],
-    to: '/contributors/clickable-user',
+    to: '/xatu/contributors/clickable-user',
   },
 };
 
