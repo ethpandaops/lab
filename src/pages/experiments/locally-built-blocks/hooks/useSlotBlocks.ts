@@ -27,12 +27,21 @@ export interface SlotBlocksGroup {
  */
 export type BlockCountMap = Map<string, number>;
 
+/**
+ * Client pairing counts
+ * Key format: "execClient:consensusClient"
+ */
+export type ClientPairingMap = Map<string, number>;
+
 export interface UseSlotBlocksResult {
   slotGroups: SlotBlocksGroup[];
   allExecutionClients: string[];
   allConsensusClients: string[];
   blockCountMap: BlockCountMap;
   maxBlockCount: number;
+  clientPairingMap: ClientPairingMap;
+  maxPairingCount: number;
+  allBlocks: ParsedBlock[];
   isLoading: boolean;
   isFetching: boolean;
   error: Error | null;
@@ -84,6 +93,9 @@ export function useSlotBlocks(): UseSlotBlocksResult {
       allConsensusClients: [],
       blockCountMap: new Map(),
       maxBlockCount: 0,
+      clientPairingMap: new Map(),
+      maxPairingCount: 0,
+      allBlocks: [],
       isLoading: false,
       isFetching: false,
       error: boundsError as Error,
@@ -97,6 +109,9 @@ export function useSlotBlocks(): UseSlotBlocksResult {
       allConsensusClients: [],
       blockCountMap: new Map(),
       maxBlockCount: 0,
+      clientPairingMap: new Map(),
+      maxPairingCount: 0,
+      allBlocks: [],
       isLoading: false,
       isFetching: false,
       error: error as Error,
@@ -111,6 +126,9 @@ export function useSlotBlocks(): UseSlotBlocksResult {
       allConsensusClients: [],
       blockCountMap: new Map(),
       maxBlockCount: 0,
+      clientPairingMap: new Map(),
+      maxPairingCount: 0,
+      allBlocks: [],
       isLoading: true,
       isFetching: true,
       error: null,
@@ -124,6 +142,9 @@ export function useSlotBlocks(): UseSlotBlocksResult {
       allConsensusClients: [],
       blockCountMap: new Map(),
       maxBlockCount: 0,
+      clientPairingMap: new Map(),
+      maxPairingCount: 0,
+      allBlocks: [],
       isLoading: false,
       isFetching: dataFetching,
       error: null,
@@ -219,12 +240,37 @@ export function useSlotBlocks(): UseSlotBlocksResult {
   // Find the maximum count for color scaling
   const maxBlockCount = Math.max(...Array.from(blockCountMap.values()), 1);
 
+  // Calculate client pairing counts
+  // Count unique node pairings (not individual blocks)
+  const clientPairingMap = new Map<string, Set<string>>(); // "exec:consensus" -> Set of node names
+
+  for (const block of parsedBlocks) {
+    if (block.parsedExecutionClient && block.parsedConsensusClient && block.meta_client_name) {
+      const key = `${block.parsedExecutionClient}:${block.parsedConsensusClient}`;
+      if (!clientPairingMap.has(key)) {
+        clientPairingMap.set(key, new Set());
+      }
+      clientPairingMap.get(key)!.add(block.meta_client_name);
+    }
+  }
+
+  // Convert Set sizes to counts
+  const pairingCounts = new Map<string, number>();
+  for (const [key, nodes] of clientPairingMap.entries()) {
+    pairingCounts.set(key, nodes.size);
+  }
+
+  const maxPairingCount = Math.max(...Array.from(pairingCounts.values()), 1);
+
   return {
     slotGroups,
     allExecutionClients: Array.from(allExecClients).sort(),
     allConsensusClients: Array.from(allConsensusClients).sort(),
     blockCountMap,
     maxBlockCount,
+    clientPairingMap: pairingCounts,
+    maxPairingCount,
+    allBlocks: parsedBlocks,
     isLoading: false,
     isFetching: dataFetching,
     error: null,

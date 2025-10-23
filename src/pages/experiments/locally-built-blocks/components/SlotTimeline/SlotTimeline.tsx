@@ -5,6 +5,7 @@ import type { ParsedBlock } from '../../hooks';
 import { useInterval } from '@/hooks/useInterval';
 import { BlockDetailsModal } from '../BlockDetailsModal';
 import { ClientLogo } from '@/components/Ethereum/ClientLogo';
+import { getIntensity } from '../../utils';
 import styles from './SlotTimeline.module.css';
 
 /**
@@ -106,19 +107,6 @@ export function SlotTimeline({
   }
 
   /**
-   * Get color intensity based on count relative to max
-   */
-  const getIntensity = (count: number): string => {
-    if (count === 0) return 'bg-background border-border text-muted';
-    const ratio = count / maxBlockCount;
-    if (ratio >= 0.8) return 'bg-primary/90 text-white border-primary';
-    if (ratio >= 0.6) return 'bg-primary/70 text-white border-primary';
-    if (ratio >= 0.4) return 'bg-primary/50 text-foreground border-primary';
-    if (ratio >= 0.2) return 'bg-primary/30 text-foreground border-primary';
-    return 'bg-primary/10 text-foreground border-primary';
-  };
-
-  /**
    * Get block count from pre-computed map
    */
   const getBlockCount = (slot: number, client: string, isExecution: boolean): number => {
@@ -128,9 +116,12 @@ export function SlotTimeline({
 
   return (
     <div className="space-y-4">
-      <div className="mb-2 flex items-center gap-2">
-        <span className="inline-block h-4 w-1 rounded-full bg-primary"></span>
-        <h2 className="text-sm font-medium text-muted">Timeline</h2>
+      <div className="mb-2 flex flex-col gap-1">
+        <div className="flex items-center gap-2">
+          <span className="inline-block h-4 w-1 rounded-full bg-primary"></span>
+          <h2 className="text-sm font-medium text-muted">Timeline</h2>
+        </div>
+        <p className="ml-3 text-xs text-muted">Unique nodes building blocks per client per slot</p>
       </div>
 
       <div className="overflow-x-auto rounded-lg border border-border bg-surface">
@@ -187,10 +178,10 @@ export function SlotTimeline({
                           count > 0
                             ? 'cursor-pointer hover:scale-105 hover:shadow-md'
                             : 'cursor-not-allowed opacity-50',
-                          getIntensity(count),
+                          getIntensity(count, maxBlockCount),
                           isNew && styles.newBlockAnimation
                         )}
-                        title={`${client}: ${count} block${count !== 1 ? 's' : ''} in slot ${group.slot}`}
+                        title={`${client}: ${count} unique node${count !== 1 ? 's' : ''} in slot ${group.slot}`}
                         disabled={count === 0}
                       >
                         {count > 0 && count}
@@ -223,10 +214,10 @@ export function SlotTimeline({
                         'flex min-w-20 flex-1 items-center justify-center rounded-sm border text-sm font-medium',
                         'h-10 transition-all',
                         count > 0 ? 'cursor-pointer hover:scale-105 hover:shadow-md' : 'cursor-not-allowed opacity-50',
-                        getIntensity(count),
+                        getIntensity(count, maxBlockCount),
                         isNew && styles.newBlockAnimation
                       )}
-                      title={`${client}: ${count} block${count !== 1 ? 's' : ''} in slot ${group.slot}`}
+                      title={`${client}: ${count} unique node${count !== 1 ? 's' : ''} in slot ${group.slot}`}
                       disabled={count === 0}
                     >
                       {count > 0 && count}

@@ -10,19 +10,20 @@ export interface BlockDetailsModalProps {
    */
   onClose: () => void;
   /**
-   * The slot number for the selected cell
+   * The slot number for the selected cell (null for pairing context)
    */
-  slot: number;
+  slot: number | null;
   /**
-   * The client name (execution or consensus)
+   * The client name (execution or consensus, or "exec + consensus" for pairings)
    */
   client: string;
   /**
    * Whether this is an execution client (true) or consensus client (false)
+   * Null for pairing context
    */
-  isExecutionClient: boolean;
+  isExecutionClient: boolean | null;
   /**
-   * All blocks for this slot (with parsed client names)
+   * All blocks for this slot or pairing (with parsed client names)
    */
   blocks: ParsedBlock[];
 }
