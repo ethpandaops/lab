@@ -156,23 +156,23 @@ export const Table: Story = {
         <RadioOption
           id="startup"
           name="Startup"
-          extraInfo="$29 / mo"
+          detail="$29 / mo"
           description="$290 / yr"
-          additionalInfo="Up to 5 active job postings"
+          caption="Up to 5 active job postings"
         />
         <RadioOption
           id="business"
           name="Business"
-          extraInfo="$99 / mo"
+          detail="$99 / mo"
           description="$990 / yr"
-          additionalInfo="Up to 25 active job postings"
+          caption="Up to 25 active job postings"
         />
         <RadioOption
           id="enterprise"
           name="Enterprise"
-          extraInfo="$249 / mo"
+          detail="$249 / mo"
           description="$2490 / yr"
-          additionalInfo="Unlimited active job postings"
+          caption="Unlimited active job postings"
         />
       </RadioGroup>
     );
@@ -208,14 +208,27 @@ export const Panel: Story = {
 // Picker
 export const Picker: Story = {
   render: () => {
-    const [value, setValue] = useState('pink');
+    const [value, setValue] = useState('block-production-flow');
     return (
-      <RadioGroup name="color" variant="picker" legend="Choose a label color" value={value} onChange={setValue}>
-        <RadioOption id="pink" name="Pink" classes="bg-pink-500 checked:outline-pink-500" />
-        <RadioOption id="purple" name="Purple" classes="bg-purple-500 checked:outline-purple-500" />
-        <RadioOption id="blue" name="Blue" classes="bg-blue-500 checked:outline-blue-500" />
-        <RadioOption id="green" name="Green" classes="bg-green-500 checked:outline-green-500" />
-        <RadioOption id="yellow" name="Yellow" classes="bg-yellow-500 checked:outline-yellow-500" />
+      <RadioGroup name="experiment" variant="picker" legend="Choose an experiment" value={value} onChange={setValue}>
+        <RadioOption
+          id="block-production-flow"
+          name="Block Production Flow"
+          src="/images/expirements/block-production-flow.png"
+        />
+        <RadioOption id="fork-readiness" name="Fork Readiness" src="/images/expirements/fork-readiness.png" />
+        <RadioOption
+          id="geographical-checklist"
+          name="Geographical Checklist"
+          src="/images/expirements/geographical-checklist.png"
+        />
+        <RadioOption
+          id="locally-built-blocks"
+          name="Locally Built Blocks"
+          src="/images/expirements/locally-built-blocks.png"
+        />
+        <RadioOption id="networks" name="Networks" src="/images/expirements/networks.png" />
+        <RadioOption id="slot-view" name="Slot View" src="/images/expirements/slot-view.png" />
       </RadioGroup>
     );
   },
@@ -227,23 +240,18 @@ export const Cards: Story = {
     const [value, setValue] = useState('newsletter');
     return (
       <RadioGroup name="mailing-list" variant="cards" legend="Select a mailing list" value={value} onChange={setValue}>
-        <RadioOption
-          id="newsletter"
-          name="Newsletter"
-          description="Last message sent an hour ago"
-          extraInfo="621 users"
-        />
+        <RadioOption id="newsletter" name="Newsletter" description="Last message sent an hour ago" detail="621 users" />
         <RadioOption
           id="existing-customers"
           name="Existing customers"
           description="Last message sent 2 weeks ago"
-          extraInfo="1200 users"
+          detail="1200 users"
         />
         <RadioOption
           id="trial-users"
           name="Trial users"
           description="Last message sent 4 days ago"
-          extraInfo="2740 users"
+          detail="2740 users"
         />
       </RadioGroup>
     );
@@ -281,33 +289,27 @@ export const StackedCards: Story = {
     const [value, setValue] = useState('hobby');
     return (
       <RadioGroup name="plan" variant="stacked-cards" aria-label="Server size" value={value} onChange={setValue}>
-        <RadioOption
-          id="hobby"
-          name="Hobby"
-          description="8GB / 4 CPUs · 160 GB SSD disk"
-          extraInfo="$40"
-          additionalInfo="/mo"
-        />
+        <RadioOption id="hobby" name="Hobby" description="8GB / 4 CPUs · 160 GB SSD disk" detail="$40" caption="/mo" />
         <RadioOption
           id="startup"
           name="Startup"
           description="12GB / 6 CPUs · 256 GB SSD disk"
-          extraInfo="$80"
-          additionalInfo="/mo"
+          detail="$80"
+          caption="/mo"
         />
         <RadioOption
           id="business"
           name="Business"
           description="16GB / 8 CPUs · 512 GB SSD disk"
-          extraInfo="$160"
-          additionalInfo="/mo"
+          detail="$160"
+          caption="/mo"
         />
         <RadioOption
           id="enterprise"
           name="Enterprise"
           description="32GB / 12 CPUs · 1024 GB SSD disk"
-          extraInfo="$240"
-          additionalInfo="/mo"
+          detail="$240"
+          caption="/mo"
         />
       </RadioGroup>
     );
