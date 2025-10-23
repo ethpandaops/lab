@@ -143,6 +143,8 @@
   /* Apply Space Grotesk for body text and Space Mono for code */
   body {
     font-family: 'Space Grotesk Variable', 'Space Grotesk', system-ui, sans-serif;
+    color: var(--foreground-value);
+    background-color: var(--background-value);
   }
 
   code,

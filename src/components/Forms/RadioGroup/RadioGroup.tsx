@@ -482,7 +482,7 @@ export function RadioGroup({
       'before:absolute before:inset-1 before:rounded-full',
       {
         'border-primary bg-primary before:block': checked,
-        'border-border before:hidden dark:border-zinc-600': !checked,
+        'border-border before:hidden dark:border-border': !checked,
         'opacity-50 cursor-not-allowed': optionDisabled || disabled,
       }
     );
