@@ -92,6 +92,10 @@
 
   /* Custom animations */
   --animate-shimmer: shimmer 2s linear infinite;
+  --animate-fade-in: fade-in 0.8s ease-out forwards;
+  --animate-fade-in-delay: fade-in 0.8s ease-out 0.2s forwards;
+  --animate-fade-in-delay-2: fade-in 0.8s ease-out 0.4s forwards;
+  --animate-fade-in-delay-3: fade-in 0.8s ease-out 0.6s forwards;
 
   @keyframes shimmer {
     0% {
@@ -99,6 +103,17 @@
     }
     100% {
       background-position: 200% 0;
+    }
+  }
+
+  @keyframes fade-in {
+    0% {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
     }
   }
 }
@@ -158,5 +173,13 @@
   *:focus-visible {
     outline: 2px solid var(--primary-value);
     outline-offset: 2px;
+  }
+
+  /* Initial state for fade-in animations - elements start invisible */
+  .animate-fade-in,
+  .animate-fade-in-delay,
+  .animate-fade-in-delay-2,
+  .animate-fade-in-delay-3 {
+    opacity: 0;
   }
 }
