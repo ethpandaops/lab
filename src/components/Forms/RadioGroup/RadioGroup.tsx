@@ -1,7 +1,8 @@
-import { RadioGroup as HeadlessRadioGroup } from '@headlessui/react';
+import { RadioGroup as HeadlessRadioGroup, Description, Label } from '@headlessui/react';
 import { CheckCircleIcon } from '@heroicons/react/20/solid';
 import { clsx } from 'clsx';
 import { type JSX, createContext, useContext } from 'react';
+import { Avatar } from '@/components/Elements/Avatar';
 import { Card } from '@/components/Layout/Card';
 import { ListContainer, ListItem } from '@/components/Layout/ListContainer';
 import { type RadioGroupProps, type RadioOptionProps, type RadioGroupVariant } from './RadioGroup.types';
@@ -40,8 +41,9 @@ export function RadioOption({
   description,
   disabled = false,
   classes,
-  extraInfo,
-  additionalInfo,
+  src,
+  detail,
+  caption,
   children,
 }: RadioOptionProps): JSX.Element {
   const { variant, disabled: groupDisabled, getRadioStyles } = useContext(RadioGroupContext);
@@ -60,14 +62,14 @@ export function RadioOption({
         {({ checked, disabled: optionDisabled }) => (
           <>
             <div className={getRadioStyles(checked, optionDisabled)} aria-hidden="true" />
-            <HeadlessRadioGroup.Label
+            <Label
               className={clsx(
                 'ml-3 cursor-pointer text-sm/6 font-medium',
                 optionDisabled ? 'text-muted' : 'text-foreground'
               )}
             >
               {optionLabel}
-            </HeadlessRadioGroup.Label>
+            </Label>
           </>
         )}
       </HeadlessRadioGroup.Option>
@@ -88,14 +90,10 @@ export function RadioOption({
               <div className={getRadioStyles(checked, optionDisabled)} aria-hidden="true" />
             </div>
             <div className="ml-3 text-sm/6">
-              <HeadlessRadioGroup.Label
-                className={clsx('cursor-pointer font-medium', optionDisabled ? 'text-muted' : 'text-foreground')}
-              >
+              <Label className={clsx('cursor-pointer font-medium', optionDisabled ? 'text-muted' : 'text-foreground')}>
                 {children ?? name}
-              </HeadlessRadioGroup.Label>
-              {description && (
-                <HeadlessRadioGroup.Description className="text-muted">{description}</HeadlessRadioGroup.Description>
-              )}
+              </Label>
+              {description && <Description className="text-muted">{description}</Description>}
             </div>
           </>
         )}
@@ -117,17 +115,15 @@ export function RadioOption({
               <div className={getRadioStyles(checked, optionDisabled)} aria-hidden="true" />
             </div>
             <div className="ml-3 text-sm/6">
-              <HeadlessRadioGroup.Label
-                className={clsx('cursor-pointer font-medium', optionDisabled ? 'text-muted' : 'text-foreground')}
-              >
+              <Label className={clsx('cursor-pointer font-medium', optionDisabled ? 'text-muted' : 'text-foreground')}>
                 {children ?? name}
-              </HeadlessRadioGroup.Label>
+              </Label>
               {description && (
                 <>
                   {' '}
-                  <HeadlessRadioGroup.Description as="span" className="inline text-muted">
+                  <Description as="span" className="inline text-muted">
                     {description}
-                  </HeadlessRadioGroup.Description>
+                  </Description>
                 </>
               )}
             </div>
@@ -148,14 +144,10 @@ export function RadioOption({
         {({ checked, disabled: optionDisabled }) => (
           <ListItem className="flex items-start justify-between">
             <div className="min-w-0 flex-1 text-sm/6">
-              <HeadlessRadioGroup.Label
-                className={clsx('cursor-pointer font-medium', optionDisabled ? 'text-muted' : 'text-foreground')}
-              >
+              <Label className={clsx('cursor-pointer font-medium', optionDisabled ? 'text-muted' : 'text-foreground')}>
                 {children ?? name}
-              </HeadlessRadioGroup.Label>
-              {description && (
-                <HeadlessRadioGroup.Description className="text-muted">{description}</HeadlessRadioGroup.Description>
-              )}
+              </Label>
+              {description && <Description className="text-muted">{description}</Description>}
             </div>
             <div className="ml-3 flex h-6 shrink-0 items-center">
               <div className={getRadioStyles(checked, optionDisabled)} aria-hidden="true" />
@@ -177,14 +169,14 @@ export function RadioOption({
         {({ checked, disabled: optionDisabled }) => (
           <ListItem className="flex items-center justify-between">
             <div className="min-w-0 flex-1 text-sm/6">
-              <HeadlessRadioGroup.Label
+              <Label
                 className={clsx(
                   'cursor-pointer font-medium select-none',
                   optionDisabled ? 'text-muted' : 'text-foreground'
                 )}
               >
                 {children ?? name}
-              </HeadlessRadioGroup.Label>
+              </Label>
             </div>
             <div className="ml-3 flex h-6 shrink-0 items-center">
               <div className={getRadioStyles(checked, optionDisabled)} aria-hidden="true" />
@@ -221,9 +213,9 @@ export function RadioOption({
               </span>
             </span>
             <span className="ml-6 pl-1 text-sm md:ml-0 md:pl-0 md:text-center">
-              {extraInfo && (
+              {detail && (
                 <>
-                  <span className={clsx('font-medium text-foreground', { 'text-primary': checked })}>{extraInfo}</span>
+                  <span className={clsx('font-medium text-foreground', { 'text-primary': checked })}>{detail}</span>
                   {description && (
                     <>
                       {' '}
@@ -238,7 +230,7 @@ export function RadioOption({
                 'text-primary/75': checked,
               })}
             >
-              {additionalInfo}
+              {caption}
             </span>
           </ListItem>
         )}
@@ -265,20 +257,18 @@ export function RadioOption({
               aria-hidden="true"
             />
             <span className="ml-3 flex flex-col">
-              <HeadlessRadioGroup.Label
+              <Label
                 className={clsx(
                   'block text-sm font-medium',
                   optionDisabled ? 'text-muted' : checked ? 'text-primary' : 'text-foreground'
                 )}
               >
                 {children ?? name}
-              </HeadlessRadioGroup.Label>
+              </Label>
               {description && (
-                <HeadlessRadioGroup.Description
-                  className={clsx('block text-sm text-muted', { 'text-primary/75': checked })}
-                >
+                <Description className={clsx('block text-sm text-muted', { 'text-primary/75': checked })}>
                   {description}
-                </HeadlessRadioGroup.Description>
+                </Description>
               )}
             </span>
           </ListItem>
@@ -293,24 +283,22 @@ export function RadioOption({
       <HeadlessRadioGroup.Option
         value={optionValue}
         disabled={isDisabled}
-        className={() =>
-          clsx(
-            'flex cursor-pointer rounded-full outline -outline-offset-1 outline-border',
-            'disabled:cursor-not-allowed'
-          )
-        }
+        className={() => clsx('flex cursor-pointer rounded-full', 'disabled:cursor-not-allowed')}
       >
         {({ checked }) => (
-          <div
+          <Avatar
+            src={src || ''}
+            alt={String(children ?? name)}
+            size="sm"
+            rounded
             className={clsx(
-              'size-8 rounded-full',
-              classes || 'bg-primary',
+              'outline-primary/20!',
               {
-                'outline outline-2 outline-offset-2 outline-primary': checked,
+                'outline-2! outline-offset-2! outline-primary!': checked,
               },
-              'focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-primary'
+              'focus-visible:outline-3! focus-visible:outline-offset-3! focus-visible:outline-primary!',
+              classes
             )}
-            aria-label={String(children ?? name)}
           />
         )}
       </HeadlessRadioGroup.Option>
@@ -327,38 +315,45 @@ export function RadioOption({
       >
         {({ checked, focus, disabled: optionDisabled }) => (
           <Card
-            rounded
             className={clsx('w-full', {
-              'outline-2 -outline-offset-2 outline-primary': checked,
+              'border-primary bg-primary! dark:bg-primary!': checked,
               'outline-3 -outline-offset-1 outline-primary': focus,
             })}
           >
             <div className="flex items-start justify-between gap-3">
               <div className="flex-1">
-                <HeadlessRadioGroup.Label
-                  className={clsx('block text-sm font-medium', optionDisabled ? 'text-muted' : 'text-foreground')}
+                <Label
+                  className={clsx(
+                    'block text-sm font-medium',
+                    optionDisabled ? 'text-muted' : checked ? 'text-white dark:text-zinc-900' : 'text-foreground'
+                  )}
                 >
                   {children ?? name}
-                </HeadlessRadioGroup.Label>
+                </Label>
                 {description && (
-                  <HeadlessRadioGroup.Description className="mt-1 block text-sm text-muted">
+                  <Description
+                    className={clsx(
+                      'mt-1 block text-sm',
+                      checked ? 'text-white/80 dark:text-zinc-900/80' : 'text-muted'
+                    )}
+                  >
                     {description}
-                  </HeadlessRadioGroup.Description>
+                  </Description>
                 )}
-                {extraInfo && (
+                {detail && (
                   <span
                     className={clsx(
                       'mt-6 block text-sm font-medium',
-                      optionDisabled ? 'text-muted' : 'text-foreground'
+                      optionDisabled ? 'text-muted' : checked ? 'text-white dark:text-zinc-900' : 'text-foreground'
                     )}
                   >
-                    {extraInfo}
+                    {detail}
                   </span>
                 )}
               </div>
               <CheckCircleIcon
                 aria-hidden="true"
-                className={clsx('size-5 text-primary', {
+                className={clsx('size-5', checked ? 'text-white dark:text-zinc-900' : 'text-primary', {
                   visible: checked,
                   invisible: !checked,
                 })}
@@ -380,20 +375,19 @@ export function RadioOption({
       >
         {({ checked, focus, disabled: optionDisabled }) => (
           <Card
-            rounded
-            className={clsx('flex w-full items-center justify-center p-3', {
-              'border-primary bg-primary': checked,
+            className={clsx('flex w-full items-center justify-center px-3', {
+              'border-primary bg-primary! dark:bg-primary!': checked,
               'outline-2 outline-offset-2 outline-primary': focus,
             })}
           >
-            <HeadlessRadioGroup.Label
+            <Label
               className={clsx(
                 'text-sm font-medium uppercase',
-                optionDisabled ? 'text-muted' : checked ? 'text-background' : 'text-foreground'
+                optionDisabled ? 'text-muted' : checked ? 'text-white dark:text-zinc-900' : 'text-foreground'
               )}
             >
               {children ?? name}
-            </HeadlessRadioGroup.Label>
+            </Label>
           </Card>
         )}
       </HeadlessRadioGroup.Option>
@@ -410,31 +404,42 @@ export function RadioOption({
       >
         {({ checked, focus, disabled: optionDisabled }) => (
           <Card
-            rounded
-            className={clsx('flex justify-between', {
-              'outline-2 -outline-offset-2 outline-primary': checked,
+            className={clsx('grid grid-cols-[1fr_auto] items-center gap-4 px-4', {
+              'border-primary bg-primary dark:bg-primary!': checked,
               'outline-3 -outline-offset-1 outline-primary': focus,
             })}
           >
-            <span className="flex items-center">
-              <span className="flex flex-col text-sm">
-                <HeadlessRadioGroup.Label
-                  className={clsx('font-medium', optionDisabled ? 'text-muted' : 'text-foreground')}
-                >
-                  {children ?? name}
-                </HeadlessRadioGroup.Label>
-                {description && (
-                  <HeadlessRadioGroup.Description className="text-muted">{description}</HeadlessRadioGroup.Description>
+            <div className="flex flex-col text-sm">
+              <Label
+                className={clsx(
+                  'font-medium',
+                  optionDisabled ? 'text-muted' : checked ? 'text-white dark:text-zinc-900' : 'text-foreground'
                 )}
-              </span>
-            </span>
-            {extraInfo && (
-              <span className="mt-2 flex text-sm sm:mt-0 sm:ml-4 sm:flex-col sm:text-right">
-                <span className={clsx('font-medium', optionDisabled ? 'text-muted' : 'text-foreground')}>
-                  {extraInfo}
+              >
+                {children ?? name}
+              </Label>
+              {description && (
+                <Description className={clsx(checked ? 'text-white/80 dark:text-zinc-900/80' : 'text-muted')}>
+                  {description}
+                </Description>
+              )}
+            </div>
+            {detail && (
+              <div className="flex items-baseline gap-1 text-right text-sm">
+                <span
+                  className={clsx(
+                    'font-medium',
+                    optionDisabled ? 'text-muted' : checked ? 'text-white dark:text-zinc-900' : 'text-foreground'
+                  )}
+                >
+                  {detail}
                 </span>
-                {additionalInfo && <span className="ml-1 text-muted sm:ml-0">{additionalInfo}</span>}
-              </span>
+                {caption && (
+                  <span className={clsx(checked ? 'text-white/80 dark:text-zinc-900/80' : 'text-muted')}>
+                    {caption}
+                  </span>
+                )}
+              </div>
             )}
           </Card>
         )}
@@ -571,19 +576,17 @@ export function RadioGroup({
         aria-label={ariaLabel}
       >
         {legend && (
-          <HeadlessRadioGroup.Label
+          <Label
             className={clsx('font-semibold text-foreground', {
               'text-sm/6': variant !== 'small-cards',
               'block text-sm/6': variant === 'picker' || variant === 'small-cards',
             })}
           >
             {legend}
-          </HeadlessRadioGroup.Label>
+          </Label>
         )}
         {description && variant !== 'small-cards' && (
-          <HeadlessRadioGroup.Description className="mt-1 text-sm/6 text-muted">
-            {description}
-          </HeadlessRadioGroup.Description>
+          <Description className="mt-1 text-sm/6 text-muted">{description}</Description>
         )}
         {variant === 'small-cards' && description && (
           <div className="flex items-center justify-between">

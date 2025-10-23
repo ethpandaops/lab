@@ -106,19 +106,24 @@ export interface RadioOptionProps {
   disabled?: boolean;
 
   /**
-   * Custom classes for the option (used in picker variant)
+   * Custom classes for the option
    */
   classes?: string;
 
   /**
-   * Extra information (used in table/cards variants)
+   * Image source URL (required for picker variant)
    */
-  extraInfo?: string;
+  src?: string;
 
   /**
-   * Additional information (used in table/stacked-cards variants)
+   * Primary detail information (used in table/cards/stacked-cards variants)
    */
-  additionalInfo?: string;
+  detail?: string;
+
+  /**
+   * Secondary caption text (used in table/stacked-cards variants)
+   */
+  caption?: string;
 
   /**
    * Child content to render inside the option
