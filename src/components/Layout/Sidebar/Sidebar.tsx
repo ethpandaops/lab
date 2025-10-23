@@ -13,7 +13,10 @@ interface NavItem {
   to: string;
 }
 
-const ethereumConsensusPages: NavItem[] = [{ name: 'Live', to: '/ethereum/live' }];
+const ethereumConsensusPages: NavItem[] = [
+  { name: 'Live', to: '/ethereum/live' },
+  { name: 'Slots', to: '/ethereum/slots' },
+];
 
 const ethereumExecutionPages: NavItem[] = [];
 
