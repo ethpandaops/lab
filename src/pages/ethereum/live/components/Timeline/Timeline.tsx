@@ -5,7 +5,7 @@ import { SlotTimeline } from '@/components/Ethereum/SlotTimeline';
 import type { TimelineProps } from './Timeline.types';
 
 /**
- * Timeline - A page-specific timeline component for the real-time page.
+ * Timeline - A page-specific timeline component for the live page.
  *
  * Wraps the core SlotTimeline component with playback controls, title, and current time display.
  * Features backward/play-pause/forward controls and live indicator.

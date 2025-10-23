@@ -228,7 +228,7 @@ export const Picker: Story = {
           src="/images/expirements/locally-built-blocks.png"
         />
         <RadioOption id="networks" name="Networks" src="/images/expirements/networks.png" />
-        <RadioOption id="real-time" name="Real-Time" src="/images/ethereum/real-time.png" />
+        <RadioOption id="live" name="Live" src="/images/ethereum/live.png" />
       </RadioGroup>
     );
   },

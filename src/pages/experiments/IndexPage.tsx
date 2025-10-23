@@ -10,10 +10,10 @@ export function IndexPage(): JSX.Element {
       <Header title="Experiments" description="Explore cutting-edge Ethereum data visualizations and analytics" />
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        <Link to="/ethereum/real-time" className="block">
-          <Card featureImage={<img src="/images/ethereum/real-time.png" alt="Real-Time" />}>
+        <Link to="/ethereum/live" className="block">
+          <Card featureImage={<img src="/images/ethereum/live.png" alt="Live" />}>
             <div className="flex flex-col gap-3">
-              <h3 className="text-lg/7 font-semibold text-foreground">Real-Time</h3>
+              <h3 className="text-lg/7 font-semibold text-foreground">Live</h3>
             </div>
           </Card>
         </Link>

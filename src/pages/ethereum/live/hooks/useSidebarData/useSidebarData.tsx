@@ -10,6 +10,14 @@ import type { TimelineItem } from '@/components/Lists/ScrollingTimeline/Scrollin
 import { DEFAULT_BEACON_SLOT_PHASES } from '@/utils/beacon';
 import { Badge } from '@/components/Elements/Badge';
 
+/**
+ * PERFORMANCE NOTE: These Badge components are created ONCE per hook call during useMemo.
+ * They are NOT recreated on every render because the useMemo only re-runs when
+ * blockNodes, blobNodes, attestationChunks, or currentSlot changes.
+ * The TimelineItemComponent in ScrollingTimeline uses React.memo to prevent
+ * unnecessary re-renders when only the status changes.
+ */
+
 export interface UseSidebarDataParams {
   blockNodes: FctBlockFirstSeenByNode[];
   blobNodes: FctBlockBlobFirstSeenByNode[];

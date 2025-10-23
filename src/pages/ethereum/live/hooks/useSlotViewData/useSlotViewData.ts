@@ -164,7 +164,6 @@ export function useSlotViewData(currentSlot: number): SlotViewData {
     },
   });
 
-
   // Aggregate loading state (critical queries only)
   // If slotStartDateTime is 0, queries are disabled but we should still show loading
   const isLoading =
