@@ -79,18 +79,18 @@
   }
 
   html.dark {
-    /* Dark mode - Ember Glow (warm continuity) */
-    --primary-value: #e6764e;
-    --secondary-value: #2a2520;
-    --accent-value: #f18c5d;
-    --background-value: #1a1612;
-    --surface-value: #231f1a;
-    --foreground-value: #e8dfd5;
-    --muted-value: #9a8b7a;
-    --border-value: #3d3528;
+    /* Dark mode - Mocha Rose (rich chocolate with rose-gold) */
+    --primary-value: #d57a5e;
+    --secondary-value: #2b221f;
+    --accent-value: #e19b7e;
+    --background-value: #1e1613;
+    --surface-value: #271e1b;
+    --foreground-value: #f0e7dc;
+    --muted-value: #a88672;
+    --border-value: #3e322c;
 
     /* Set html background for overscroll */
-    background-color: #1a1612;
+    background-color: #1e1613;
   }
 
   /* Apply Space Grotesk for body text and Space Mono for code */

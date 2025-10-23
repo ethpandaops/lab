@@ -48,17 +48,17 @@ export const LIGHT_COLORS: ThemeColors = {
 };
 
 /**
- * Dark mode colors - Ember Glow (warm continuity)
+ * Dark mode colors - Mocha Rose (rich chocolate with rose-gold)
  */
 export const DARK_COLORS: ThemeColors = {
-  primary: '#e6764e', // glowing terracotta
-  secondary: '#2a2520', // deep warm brown
-  accent: '#f18c5d', // vibrant warm orange
-  background: '#1a1612', // rich dark brown
-  surface: '#231f1a', // elevated brown
-  foreground: '#e8dfd5', // warm cream text
-  muted: '#9a8b7a', // warm muted tan
-  border: '#3d3528', // subtle warm border
+  primary: '#d57a5e', // rose-terracotta
+  secondary: '#2b221f', // deep mocha
+  accent: '#e19b7e', // rose-gold peach
+  background: '#1e1613', // rich chocolate
+  surface: '#271e1b', // elevated mocha
+  foreground: '#f0e7dc', // warm ivory
+  muted: '#a88672', // warm mocha-tan
+  border: '#3e322c', // mocha border
   success: '#22c55e', // green-500
   warning: '#f59e0b', // amber-500
   danger: '#ef4444', // red-500
