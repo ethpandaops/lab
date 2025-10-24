@@ -4,7 +4,7 @@ import { Header } from '@/components/Layout/Header';
 import { UserDetailsSkeleton } from './UserDetailsSkeleton';
 
 const meta = {
-  title: 'Pages/Contributors/UserDetailsSkeleton',
+  title: 'Pages/Xatu/Contributors/UserDetailsSkeleton',
   component: UserDetailsSkeleton,
   parameters: {
     layout: 'fullscreen',

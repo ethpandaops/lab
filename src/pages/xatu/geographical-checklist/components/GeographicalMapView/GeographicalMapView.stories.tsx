@@ -119,7 +119,7 @@ const mockNodes: ProcessedNode[] = [
 ] as ProcessedNode[];
 
 const meta = {
-  title: 'Pages/Experiments/Geographical Checklist/GeographicalMapView',
+  title: 'Pages/Xatu/Geographical Checklist/GeographicalMapView',
   component: GeographicalMapView,
   decorators: [
     Story => (

@@ -51,7 +51,7 @@ const convertToChartValues = (data: AttestationDataPoint[], currentTime: number)
 };
 
 const meta = {
-  title: 'Pages/Experiments/SlotView/AttestationArrivals',
+  title: 'Pages/Ethereum/SlotView/AttestationArrivals',
   component: AttestationArrivals,
   parameters: {
     layout: 'padded',

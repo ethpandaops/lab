@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { ForkReadinessLoading } from './ForkReadinessLoading';
 
 const meta: Meta<typeof ForkReadinessLoading> = {
-  title: 'Pages/Experiments/ForkReadiness/ForkReadinessLoading',
+  title: 'Pages/Xatu/ForkReadiness/ForkReadinessLoading',
   component: ForkReadinessLoading,
   decorators: [
     Story => (

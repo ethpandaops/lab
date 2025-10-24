@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { GeographicalChecklistSkeleton } from './GeographicalChecklistSkeleton';
 
 const meta = {
-  title: 'Pages/Experiments/Geographical Checklist/GeographicalChecklistSkeleton',
+  title: 'Pages/Xatu/Geographical Checklist/GeographicalChecklistSkeleton',
   component: GeographicalChecklistSkeleton,
   decorators: [
     Story => (

@@ -4,7 +4,7 @@ import { DataColumnDataAvailability } from './DataColumnDataAvailability';
 import type { DataColumnFirstSeenPoint } from './DataColumnDataAvailability.types';
 
 const meta: Meta<typeof DataColumnDataAvailability> = {
-  title: 'Pages/Experiments/SlotView/DataColumnDataAvailability',
+  title: 'Pages/Ethereum/SlotView/DataColumnDataAvailability',
   component: DataColumnDataAvailability,
   parameters: {
     layout: 'centered',
