@@ -40,10 +40,7 @@ export function AttestationLatencyChart({ username }: AttestationLatencyChartPro
     placeholderData: previousData => previousData,
   });
 
-  const { series, minSlot, maxSlot, dataCount } = useLatencyChartSeries(
-    data,
-    'int_attestation_first_seen'
-  );
+  const { series, minSlot, maxSlot, dataCount } = useLatencyChartSeries(data, 'int_attestation_first_seen');
 
   // Only show loading skeleton on initial load, not on refetch
   if (isLoading) {

@@ -43,10 +43,7 @@ export interface LatencyChartSeriesResult {
  * @param dataKey - Key to access the data array in the response
  * @returns Processed chart data with series, axis ranges, and observation count
  */
-export function useLatencyChartSeries(
-  data: unknown,
-  dataKey: string
-): LatencyChartSeriesResult {
+export function useLatencyChartSeries(data: unknown, dataKey: string): LatencyChartSeriesResult {
   const colors = useThemeColors();
 
   // Process data into series format for MultiLineChart

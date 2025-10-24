@@ -40,10 +40,7 @@ export function BlockLatencyChart({ username }: BlockLatencyChartProps): JSX.Ele
     placeholderData: previousData => previousData,
   });
 
-  const { series, minSlot, maxSlot, dataCount } = useLatencyChartSeries(
-    data,
-    'fct_block_first_seen_by_node'
-  );
+  const { series, minSlot, maxSlot, dataCount } = useLatencyChartSeries(data, 'fct_block_first_seen_by_node');
 
   // Only show loading skeleton on initial load, not on refetch
   if (isLoading) {
