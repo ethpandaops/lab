@@ -1,9 +1,6 @@
 import { useMemo } from 'react';
-import { useQuery, type UseQueryResult } from '@tanstack/react-query';
 import type { SeriesData } from '@/components/Charts/MultiLine';
-import { useSlotWindowQuery } from './useSlotWindowQuery';
 import { useThemeColors } from '@/hooks/useThemeColors';
-import { useNetwork } from '@/hooks/useNetwork';
 
 // Stable color palette for node visualization
 const NODE_COLORS = ['#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#06b6d4'] as const;
@@ -20,35 +17,21 @@ interface LatencyDataPoint {
 }
 
 /**
- * Configuration for latency chart data processing
+ * Result from useLatencyChartSeries hook
  */
-export interface LatencyChartConfig {
-  /** Page size for API query (default: 1000) */
-  pageSize?: number;
-  /** Slot window size (default: 20) */
-  slotWindow?: number;
-}
-
-/**
- * Result from useLatencyChartData hook
- */
-export interface LatencyChartDataResult {
+export interface LatencyChartSeriesResult {
   /** Processed series data ready for MultiLineChart */
   series: SeriesData[];
   /** Minimum slot for x-axis */
   minSlot: number;
   /** Maximum slot for x-axis */
   maxSlot: number;
-  /** Loading state */
-  isLoading: boolean;
-  /** Error state */
-  error: Error | null;
   /** Data count (number of observations) */
   dataCount: number;
 }
 
 /**
- * Generic hook for processing latency chart data
+ * Hook for processing latency chart data into series format
  *
  * Consolidates common data processing logic used by all latency charts:
  * - BlockLatencyChart
@@ -56,50 +39,19 @@ export interface LatencyChartDataResult {
  * - HeadLatencyChart
  * - AttestationLatencyChart
  *
- * @param username - Contributor username to filter data
- * @param queryOptionsFn - Function that returns TanStack Query options
+ * @param data - Raw API response data
  * @param dataKey - Key to access the data array in the response
- * @param config - Optional configuration for query and processing
- * @returns Processed chart data with series, axis ranges, and states
+ * @returns Processed chart data with series, axis ranges, and observation count
  */
-export function useLatencyChartData(
-  username: string,
-  queryOptionsFn: (params: {
-    query: {
-      username_eq: string;
-      slot_start_date_time_gte?: number;
-      slot_start_date_time_lte?: number;
-      page_size: number;
-      order_by: string;
-    };
-  }) => unknown,
-  dataKey: string,
-  config: LatencyChartConfig = {}
-): LatencyChartDataResult {
-  const { pageSize = 1000, slotWindow = 20 } = config;
-  const queryRange = useSlotWindowQuery(slotWindow);
+export function useLatencyChartSeries(
+  data: unknown,
+  dataKey: string
+): LatencyChartSeriesResult {
   const colors = useThemeColors();
-  const { currentNetwork } = useNetwork();
-
-  const queryOptions = queryOptionsFn({
-    query: {
-      username_eq: username,
-      slot_start_date_time_gte: queryRange?.slot_start_date_time_gte,
-      slot_start_date_time_lte: queryRange?.slot_start_date_time_lte,
-      page_size: pageSize,
-      order_by: 'slot_start_date_time ASC',
-    },
-  });
-
-  const { data, isLoading, error } = useQuery({
-    ...queryOptions,
-    enabled: !!queryRange && !!currentNetwork,
-    placeholderData: previousData => previousData,
-  }) as UseQueryResult<Record<string, unknown>>;
 
   // Process data into series format for MultiLineChart
   const { series, minSlot, maxSlot, dataCount } = useMemo(() => {
-    const items = (data?.[dataKey] ?? []) as unknown[] as LatencyDataPoint[];
+    const items = ((data as Record<string, unknown>)?.[dataKey] ?? []) as LatencyDataPoint[];
     const nodeSlotMap = new Map<string, Map<number, { sum: number; count: number }>>();
     const nodeImplementationMap = new Map<string, string>();
     const aggregateMap = new Map<number, { sum: number; count: number }>();
@@ -190,8 +142,6 @@ export function useLatencyChartData(
     series,
     minSlot,
     maxSlot,
-    isLoading: isLoading && !data,
-    error: error as Error | null,
     dataCount,
   };
 }

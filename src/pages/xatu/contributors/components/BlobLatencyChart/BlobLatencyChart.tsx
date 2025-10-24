@@ -1,8 +1,11 @@
 import { type JSX } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { fctBlockBlobFirstSeenByNodeServiceListOptions } from '@/api/@tanstack/react-query.gen';
 import { LoadingContainer } from '@/components/Layout/LoadingContainer';
 import { MultiLineChart } from '@/components/Charts/MultiLine';
-import { useLatencyChartData } from '../../hooks/useLatencyChartData';
+import { useLatencyChartSeries } from '../../hooks/useLatencyChartData';
+import { useSlotWindowQuery } from '../../hooks/useSlotWindowQuery';
+import { useNetwork } from '@/hooks/useNetwork';
 
 export interface BlobLatencyChartProps {
   username: string;
@@ -19,9 +22,25 @@ export interface BlobLatencyChartProps {
  * @param username - Contributor username to filter data
  */
 export function BlobLatencyChart({ username }: BlobLatencyChartProps): JSX.Element {
-  const { series, minSlot, maxSlot, isLoading, error, dataCount } = useLatencyChartData(
-    username,
-    fctBlockBlobFirstSeenByNodeServiceListOptions,
+  const queryRange = useSlotWindowQuery(20);
+  const { currentNetwork } = useNetwork();
+
+  const { data, isLoading, error } = useQuery({
+    ...fctBlockBlobFirstSeenByNodeServiceListOptions({
+      query: {
+        username_eq: username,
+        slot_start_date_time_gte: queryRange?.slot_start_date_time_gte,
+        slot_start_date_time_lte: queryRange?.slot_start_date_time_lte,
+        page_size: 1000,
+        order_by: 'slot_start_date_time ASC',
+      },
+    }),
+    enabled: !!queryRange && !!currentNetwork,
+    placeholderData: previousData => previousData,
+  });
+
+  const { series, minSlot, maxSlot, dataCount } = useLatencyChartSeries(
+    data,
     'fct_block_blob_first_seen_by_node'
   );
 

@@ -1,8 +1,11 @@
 import { type JSX } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { intAttestationFirstSeenServiceListOptions } from '@/api/@tanstack/react-query.gen';
 import { LoadingContainer } from '@/components/Layout/LoadingContainer';
 import { MultiLineChart } from '@/components/Charts/MultiLine';
-import { useLatencyChartData } from '../../hooks/useLatencyChartData';
+import { useLatencyChartSeries } from '../../hooks/useLatencyChartData';
+import { useSlotWindowQuery } from '../../hooks/useSlotWindowQuery';
+import { useNetwork } from '@/hooks/useNetwork';
 
 export interface AttestationLatencyChartProps {
   username: string;
@@ -20,11 +23,26 @@ export interface AttestationLatencyChartProps {
  * @param username - Contributor username to filter data
  */
 export function AttestationLatencyChart({ username }: AttestationLatencyChartProps): JSX.Element {
-  const { series, minSlot, maxSlot, isLoading, error, dataCount } = useLatencyChartData(
-    username,
-    intAttestationFirstSeenServiceListOptions,
-    'int_attestation_first_seen',
-    { pageSize: 10000 } // Attestations are more numerous
+  const queryRange = useSlotWindowQuery(20);
+  const { currentNetwork } = useNetwork();
+
+  const { data, isLoading, error } = useQuery({
+    ...intAttestationFirstSeenServiceListOptions({
+      query: {
+        username_eq: username,
+        slot_start_date_time_gte: queryRange?.slot_start_date_time_gte,
+        slot_start_date_time_lte: queryRange?.slot_start_date_time_lte,
+        page_size: 10000, // Attestations are more numerous
+        order_by: 'slot_start_date_time ASC',
+      },
+    }),
+    enabled: !!queryRange && !!currentNetwork,
+    placeholderData: previousData => previousData,
+  });
+
+  const { series, minSlot, maxSlot, dataCount } = useLatencyChartSeries(
+    data,
+    'int_attestation_first_seen'
   );
 
   // Only show loading skeleton on initial load, not on refetch
