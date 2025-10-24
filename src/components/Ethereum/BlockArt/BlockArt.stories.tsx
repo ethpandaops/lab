@@ -3,7 +3,7 @@ import { expect, waitFor } from 'storybook/test';
 import { BlockArt } from './BlockArt';
 
 const meta: Meta<typeof BlockArt> = {
-  title: 'Components/Charts/BlockArt',
+  title: 'Components/Ethereum/BlockArt',
   component: BlockArt,
   decorators: [
     Story => (

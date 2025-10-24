@@ -4,7 +4,7 @@ import { Container } from '@/components/Layout/Container';
 import { Header } from '@/components/Layout/Header';
 import { Alert } from '@/components/Feedback/Alert';
 import { LoadingContainer } from '@/components/Layout/LoadingContainer';
-import { BlockArt } from '@/components/Charts/BlockArt';
+import { BlockArt } from '@/components/Ethereum/BlockArt';
 import { ScrollAnchor } from '@/components/Navigation/ScrollAnchor';
 import { SLOTS_PER_EPOCH } from '@/utils/beacon';
 import { useSlotDetailData } from './hooks/useSlotDetailData';
