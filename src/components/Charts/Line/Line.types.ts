@@ -95,4 +95,12 @@ export interface LineChartProps {
    * @default 'auto'
    */
   xAxisLabelInterval?: number | 'auto';
+  /**
+   * X-axis title/name
+   */
+  xAxisTitle?: string;
+  /**
+   * Y-axis title/name
+   */
+  yAxisTitle?: string;
 }

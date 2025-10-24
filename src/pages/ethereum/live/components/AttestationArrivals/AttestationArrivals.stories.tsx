@@ -84,6 +84,7 @@ export const Interactive: Story = {
     currentTime: 0,
     attestationChartValues: [],
     totalExpected: 0,
+    maxCount: 0,
   },
   render: () => {
     const [currentTime, setCurrentTime] = useState(0);

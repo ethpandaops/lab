@@ -165,6 +165,7 @@ const ethereumEvents: TimelineItem[] = [
 
 export const Default: Story = {
   args: {
+    currentSlot: 1234567,
     phases: DEFAULT_BEACON_SLOT_PHASES,
     currentTime: 6000,
     items: ethereumEvents,
@@ -176,6 +177,7 @@ export const Default: Story = {
 export const Interactive: Story = {
   name: 'Interactive with Controls',
   args: {
+    currentSlot: 1234567,
     phases: DEFAULT_BEACON_SLOT_PHASES,
     currentTime: 4000,
     items: ethereumEvents,
@@ -223,6 +225,7 @@ export const Interactive: Story = {
 
     return (
       <Sidebar
+        currentSlot={1234567}
         phases={DEFAULT_BEACON_SLOT_PHASES}
         currentTime={currentTime}
         items={ethereumEvents}
@@ -240,6 +243,7 @@ export const Interactive: Story = {
 export const EarlyPhase: Story = {
   name: 'Early Phase (Block)',
   args: {
+    currentSlot: 1234567,
     phases: DEFAULT_BEACON_SLOT_PHASES,
     currentTime: 2000,
     items: ethereumEvents,
@@ -251,6 +255,7 @@ export const EarlyPhase: Story = {
 export const MidPhase: Story = {
   name: 'Mid Phase (Attestation)',
   args: {
+    currentSlot: 1234567,
     phases: DEFAULT_BEACON_SLOT_PHASES,
     currentTime: 6500,
     items: ethereumEvents,
@@ -262,6 +267,7 @@ export const MidPhase: Story = {
 export const LatePhase: Story = {
   name: 'Late Phase (Aggregation)',
   args: {
+    currentSlot: 1234567,
     phases: DEFAULT_BEACON_SLOT_PHASES,
     currentTime: 10500,
     items: ethereumEvents,
@@ -272,6 +278,7 @@ export const LatePhase: Story = {
 
 export const NotLive: Story = {
   args: {
+    currentSlot: 1234567,
     phases: DEFAULT_BEACON_SLOT_PHASES,
     currentTime: 5500,
     items: ethereumEvents,
@@ -282,6 +289,7 @@ export const NotLive: Story = {
 
 export const Playing: Story = {
   args: {
+    currentSlot: 1234567,
     phases: DEFAULT_BEACON_SLOT_PHASES,
     currentTime: 6300,
     items: ethereumEvents,
@@ -293,6 +301,7 @@ export const Playing: Story = {
 export const TallTimeline: Story = {
   name: 'Tall Scrolling Timeline',
   args: {
+    currentSlot: 1234567,
     phases: DEFAULT_BEACON_SLOT_PHASES,
     currentTime: 6000,
     items: ethereumEvents,
@@ -304,6 +313,7 @@ export const TallTimeline: Story = {
 export const ShortTimeline: Story = {
   name: 'Short Scrolling Timeline',
   args: {
+    currentSlot: 1234567,
     phases: DEFAULT_BEACON_SLOT_PHASES,
     currentTime: 6000,
     items: ethereumEvents,
