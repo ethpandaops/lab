@@ -76,10 +76,7 @@ export function BlockLatencyChart({ username }: BlockLatencyChartProps): JSX.Ele
       yAxis={{
         name: 'Latency (ms)',
       }}
-      title="Block Propagation Latency"
-      subtitle={`${dataCount} observations · Average time from slot start until block first seen by each node`}
       height={300}
-      showCard={true}
       showLegend={series.length > 1}
       enableDataZoom={true}
       enableAggregateToggle={true}
