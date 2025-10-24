@@ -37,7 +37,7 @@ export function LineChart({
   notMerge = false,
   lazyUpdate = true,
   xAxisLabelInterval = 'auto',
-}: LineChartProps) {
+}: LineChartProps): JSX.Element {
   const themeColors = useThemeColors();
 
   const option = useMemo(

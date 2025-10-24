@@ -10,12 +10,13 @@ const NODE_COLORS = ['#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#06b6d4'] as c
 
 /**
  * Generic data point with slot and latency information
+ * Matches the shape of API response items (all fields optional)
  */
 interface LatencyDataPoint {
-  slot: number | null | undefined;
-  seen_slot_start_diff: number | null | undefined;
-  node_id: string | null | undefined;
-  meta_consensus_implementation?: string | null | undefined;
+  slot?: number | null;
+  seen_slot_start_diff?: number | null;
+  node_id?: string | null;
+  meta_consensus_implementation?: string | null;
 }
 
 /**
@@ -57,21 +58,22 @@ export interface LatencyChartDataResult {
  *
  * @param username - Contributor username to filter data
  * @param queryOptionsFn - Function that returns TanStack Query options
+ * @param dataKey - Key to access the data array in the response
  * @param config - Optional configuration for query and processing
  * @returns Processed chart data with series, axis ranges, and states
  */
-export function useLatencyChartData<T extends { [key: string]: LatencyDataPoint[] | undefined }>(
+export function useLatencyChartData(
   username: string,
   queryOptionsFn: (params: {
     query: {
       username_eq: string;
-      slot_start_date_time_gte: string | undefined;
-      slot_start_date_time_lte: string | undefined;
+      slot_start_date_time_gte?: number;
+      slot_start_date_time_lte?: number;
       page_size: number;
       order_by: string;
     };
   }) => unknown,
-  dataKey: keyof T,
+  dataKey: string,
   config: LatencyChartConfig = {}
 ): LatencyChartDataResult {
   const { pageSize = 1000, slotWindow = 20 } = config;
@@ -79,23 +81,25 @@ export function useLatencyChartData<T extends { [key: string]: LatencyDataPoint[
   const colors = useThemeColors();
   const { currentNetwork } = useNetwork();
 
+  const queryOptions = queryOptionsFn({
+    query: {
+      username_eq: username,
+      slot_start_date_time_gte: queryRange?.slot_start_date_time_gte,
+      slot_start_date_time_lte: queryRange?.slot_start_date_time_lte,
+      page_size: pageSize,
+      order_by: 'slot_start_date_time ASC',
+    },
+  });
+
   const { data, isLoading, error } = useQuery({
-    ...queryOptionsFn({
-      query: {
-        username_eq: username,
-        slot_start_date_time_gte: queryRange?.slot_start_date_time_gte,
-        slot_start_date_time_lte: queryRange?.slot_start_date_time_lte,
-        page_size: pageSize,
-        order_by: 'slot_start_date_time ASC',
-      },
-    }),
+    ...queryOptions,
     enabled: !!queryRange && !!currentNetwork,
     placeholderData: previousData => previousData,
-  }) as UseQueryResult<T>;
+  }) as UseQueryResult<Record<string, unknown>>;
 
   // Process data into series format for MultiLineChart
   const { series, minSlot, maxSlot, dataCount } = useMemo(() => {
-    const items = (data?.[dataKey] ?? []) as LatencyDataPoint[];
+    const items = (data?.[dataKey] ?? []) as unknown[] as LatencyDataPoint[];
     const nodeSlotMap = new Map<string, Map<number, { sum: number; count: number }>>();
     const nodeImplementationMap = new Map<string, string>();
     const aggregateMap = new Map<number, { sum: number; count: number }>();

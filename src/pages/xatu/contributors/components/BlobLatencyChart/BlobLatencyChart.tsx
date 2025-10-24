@@ -1,6 +1,5 @@
 import { type JSX } from 'react';
 import { fctBlockBlobFirstSeenByNodeServiceListOptions } from '@/api/@tanstack/react-query.gen';
-import type { ListFctBlockBlobFirstSeenByNodeResponse } from '@/api/types.gen';
 import { LoadingContainer } from '@/components/Layout/LoadingContainer';
 import { MultiLineChart } from '@/components/Charts/MultiLine';
 import { useLatencyChartData } from '../../hooks/useLatencyChartData';
@@ -20,12 +19,11 @@ export interface BlobLatencyChartProps {
  * @param username - Contributor username to filter data
  */
 export function BlobLatencyChart({ username }: BlobLatencyChartProps): JSX.Element {
-  const { series, minSlot, maxSlot, isLoading, error, dataCount } =
-    useLatencyChartData<ListFctBlockBlobFirstSeenByNodeResponse>(
-      username,
-      fctBlockBlobFirstSeenByNodeServiceListOptions,
-      'fct_block_blob_first_seen_by_node'
-    );
+  const { series, minSlot, maxSlot, isLoading, error, dataCount } = useLatencyChartData(
+    username,
+    fctBlockBlobFirstSeenByNodeServiceListOptions,
+    'fct_block_blob_first_seen_by_node'
+  );
 
   // Only show loading skeleton on initial load, not on refetch
   if (isLoading) {

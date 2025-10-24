@@ -1,6 +1,5 @@
 import { type JSX } from 'react';
 import { fctHeadFirstSeenByNodeServiceListOptions } from '@/api/@tanstack/react-query.gen';
-import type { ListFctHeadFirstSeenByNodeResponse } from '@/api/types.gen';
 import { LoadingContainer } from '@/components/Layout/LoadingContainer';
 import { MultiLineChart } from '@/components/Charts/MultiLine';
 import { useLatencyChartData } from '../../hooks/useLatencyChartData';
@@ -21,12 +20,11 @@ export interface HeadLatencyChartProps {
  * @param username - Contributor username to filter data
  */
 export function HeadLatencyChart({ username }: HeadLatencyChartProps): JSX.Element {
-  const { series, minSlot, maxSlot, isLoading, error, dataCount } =
-    useLatencyChartData<ListFctHeadFirstSeenByNodeResponse>(
-      username,
-      fctHeadFirstSeenByNodeServiceListOptions,
-      'fct_head_first_seen_by_node'
-    );
+  const { series, minSlot, maxSlot, isLoading, error, dataCount } = useLatencyChartData(
+    username,
+    fctHeadFirstSeenByNodeServiceListOptions,
+    'fct_head_first_seen_by_node'
+  );
 
   // Only show loading skeleton on initial load, not on refetch
   if (isLoading) {

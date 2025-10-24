@@ -1,6 +1,5 @@
 import { type JSX } from 'react';
 import { intAttestationFirstSeenServiceListOptions } from '@/api/@tanstack/react-query.gen';
-import type { ListIntAttestationFirstSeenResponse } from '@/api/types.gen';
 import { LoadingContainer } from '@/components/Layout/LoadingContainer';
 import { MultiLineChart } from '@/components/Charts/MultiLine';
 import { useLatencyChartData } from '../../hooks/useLatencyChartData';
@@ -21,13 +20,12 @@ export interface AttestationLatencyChartProps {
  * @param username - Contributor username to filter data
  */
 export function AttestationLatencyChart({ username }: AttestationLatencyChartProps): JSX.Element {
-  const { series, minSlot, maxSlot, isLoading, error, dataCount } =
-    useLatencyChartData<ListIntAttestationFirstSeenResponse>(
-      username,
-      intAttestationFirstSeenServiceListOptions,
-      'int_attestation_first_seen',
-      { pageSize: 10000 } // Attestations are more numerous
-    );
+  const { series, minSlot, maxSlot, isLoading, error, dataCount } = useLatencyChartData(
+    username,
+    intAttestationFirstSeenServiceListOptions,
+    'int_attestation_first_seen',
+    { pageSize: 10000 } // Attestations are more numerous
+  );
 
   // Only show loading skeleton on initial load, not on refetch
   if (isLoading) {
