@@ -76,10 +76,7 @@ export function HeadLatencyChart({ username }: HeadLatencyChartProps): JSX.Eleme
       yAxis={{
         name: 'Latency (ms)',
       }}
-      title="Head Propagation Latency"
-      subtitle={`${dataCount} observations · Average time from slot start until head event first seen by each node`}
       height={300}
-      showCard={true}
       showLegend={series.length > 1}
       enableDataZoom={true}
       enableAggregateToggle={true}

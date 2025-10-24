@@ -7,6 +7,7 @@ import { Card } from '@/components/Layout/Card';
 import { ClientLogo } from '@/components/Ethereum/ClientLogo';
 import { Container } from '@/components/Layout/Container';
 import { Header } from '@/components/Layout/Header';
+import { PopoutCard } from '@/components/Layout/PopoutCard';
 import { Stats } from '@/components/DataDisplay/Stats';
 import { Table } from '@/components/Lists/Table';
 import type { Column } from '@/components/Lists/Table';
@@ -268,18 +269,52 @@ export function DetailPage(): JSX.Element {
 
       {/* Live Metrics Section */}
       <div className="mt-12">
-        <h2 className="mb-6 text-2xl/8 font-bold text-foreground">Live Metrics</h2>
+        <h2 className="mb-6 text-2xl/8 font-bold text-foreground">Propagation Latency Metrics</h2>
         <p className="mb-6 text-muted">
           Real-time propagation latency for blocks, blobs, attestations, and head events observed by this
           contributor&apos;s nodes. Use the controls below to navigate through historical data.
         </p>
 
-        <div className="space-y-6">
+        <div className="mb-6">
           <SlotPlayerControls />
-          <BlockLatencyChart username={username} />
-          <BlobLatencyChart username={username} />
-          <HeadLatencyChart username={username} />
-          <AttestationLatencyChart username={username} />
+        </div>
+
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+          <PopoutCard
+            title="Block Propagation"
+            subtitle="Time from slot start to first seen"
+            modalSize="full"
+            anchorId="block-latency"
+          >
+            <BlockLatencyChart username={username} />
+          </PopoutCard>
+
+          <PopoutCard
+            title="Blob Propagation"
+            subtitle="Time from slot start to first seen"
+            modalSize="full"
+            anchorId="blob-latency"
+          >
+            <BlobLatencyChart username={username} />
+          </PopoutCard>
+
+          <PopoutCard
+            title="Head Events"
+            subtitle="Time from slot start to first seen"
+            modalSize="full"
+            anchorId="head-latency"
+          >
+            <HeadLatencyChart username={username} />
+          </PopoutCard>
+
+          <PopoutCard
+            title="Attestations"
+            subtitle="Average time from slot start to first seen"
+            modalSize="full"
+            anchorId="attestation-latency"
+          >
+            <AttestationLatencyChart username={username} />
+          </PopoutCard>
         </div>
       </div>
     </Container>
