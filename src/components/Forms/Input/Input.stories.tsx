@@ -240,7 +240,7 @@ export const InlineAddons: Story = {
 
     // Test that addons have proper inline styling
     leadingAddons.forEach(addon => {
-      expect(addon).toHaveClass('text-gray-500');
+      expect(addon).toHaveClass('text-muted');
     });
   },
 };

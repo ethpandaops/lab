@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { type JSX, useMemo } from 'react';
 import ReactECharts from 'echarts-for-react';
 import { hexToRgba } from '@/utils';
 import { useThemeColors } from '@/hooks/useThemeColors';
@@ -37,7 +37,9 @@ export function LineChart({
   notMerge = false,
   lazyUpdate = true,
   xAxisLabelInterval = 'auto',
-}: LineChartProps) {
+  xAxisTitle,
+  yAxisTitle,
+}: LineChartProps): JSX.Element {
   const themeColors = useThemeColors();
 
   const option = useMemo(
@@ -59,10 +61,10 @@ export function LineChart({
           }
         : undefined,
       grid: {
-        top: title ? 52 : 16,
-        right: 24,
-        bottom: 32,
-        left: 48,
+        top: title ? 40 : 10,
+        right: 10,
+        bottom: 30,
+        left: 10,
         containLabel: true,
       },
       xAxis: {
@@ -70,6 +72,13 @@ export function LineChart({
         data: labels,
         boundaryGap: false,
         max: xMax !== undefined ? xMax : undefined,
+        name: xAxisTitle,
+        nameLocation: 'middle',
+        nameGap: 30,
+        nameTextStyle: {
+          color: themeColors.foreground,
+          fontSize: 12,
+        },
         axisLine: {
           lineStyle: {
             color: themeColors.border,
@@ -84,6 +93,13 @@ export function LineChart({
       yAxis: {
         type: 'value',
         max: yMax,
+        name: yAxisTitle,
+        nameLocation: 'middle',
+        nameGap: 50,
+        nameTextStyle: {
+          color: themeColors.foreground,
+          fontSize: 12,
+        },
         axisLine: {
           show: false,
         },
@@ -176,6 +192,8 @@ export function LineChart({
       connectNulls,
       animationDuration,
       xAxisLabelInterval,
+      xAxisTitle,
+      yAxisTitle,
       themeColors.foreground,
       themeColors.border,
       themeColors.muted,

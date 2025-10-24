@@ -51,20 +51,18 @@ export const PERFORMANCE_TIME_COLORS = {
 } as const;
 
 /**
- * Default chart colors for fallback scenarios
- * Used when theme colors are not available (e.g., during initial load)
- * These match the light theme but are theme-agnostic neutral colors
+ * Categorical color palette for multi-series charts
+ * Used when you need distinct colors for multiple data series
+ * Optimized for visual distinction and accessibility
  */
-export const DEFAULT_CHART_COLORS = {
-  primary: colors.cyan[500], // cyan-500
-  secondary: colors.sky[500], // sky-500
-  accent: colors.cyan[400], // cyan-400
-  background: colors.white,
-  surface: colors.gray[50], // gray-50
-  foreground: colors.zinc[950], // zinc-950
-  muted: colors.zinc[600], // zinc-600
-  border: colors.zinc[200], // zinc-200
-  success: colors.green[500], // green-500
-  warning: colors.amber[500], // amber-500
-  danger: colors.red[500], // red-500
-} as const;
+export const CHART_CATEGORICAL_COLORS = [
+  colors.blue[500], // blue-500
+  colors.emerald[500], // emerald-500
+  colors.amber[500], // amber-500
+  colors.red[500], // red-500
+  colors.cyan[500], // cyan-500
+  colors.lime[500], // lime-500
+  colors.orange[500], // orange-500
+  colors.purple[500], // purple-500
+  colors.pink[500], // pink-500
+] as const;
