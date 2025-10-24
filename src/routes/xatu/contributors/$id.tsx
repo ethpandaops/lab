@@ -1,6 +1,31 @@
+import { type JSX } from 'react';
 import { createFileRoute } from '@tanstack/react-router';
 import { DetailPage } from '@/pages/xatu/contributors/';
+import { SlotPlayerProvider } from '@/providers/SlotPlayerProvider';
+
+/**
+ * Wrapper component to provide SlotPlayer context for contributor detail page.
+ * Fetches slot bounds from all three username-enabled tables used by the live metrics charts.
+ */
+function DetailPageWithSlotPlayer(): JSX.Element {
+  return (
+    <SlotPlayerProvider
+      tables={['fct_block_first_seen_by_node', 'fct_block_blob_first_seen_by_node', 'int_attestation_first_seen']}
+      initialMode="continuous"
+      initialPlaying={false}
+      playbackSpeed={1}
+    >
+      <DetailPage />
+    </SlotPlayerProvider>
+  );
+}
 
 export const Route = createFileRoute('/xatu/contributors/$id')({
-  component: DetailPage,
+  component: DetailPageWithSlotPlayer,
+  head: () => ({
+    meta: [
+      { title: `Contributor Details | ${import.meta.env.VITE_BASE_TITLE}` },
+      { name: 'description', content: 'Detailed contribution metrics and live network performance data' },
+    ],
+  }),
 });

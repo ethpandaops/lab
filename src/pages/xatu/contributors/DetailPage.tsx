@@ -13,9 +13,69 @@ import type { Column } from '@/components/Lists/Table';
 import { UserDetailsSkeleton } from './components/UserDetailsSkeleton';
 import type { UserClassification } from './components/UserCard/UserCard.types';
 import { getBorderColor, getClassificationLabel, getClassificationColor } from './components/UserCard/utils';
+import { useSlotPlayerMeta } from '@/hooks/useSlotPlayer';
+import { SlotPlayerControls } from './components/SlotPlayerControls';
+import { BlockLatencyChart } from './components/BlockLatencyChart';
+import { BlobLatencyChart } from './components/BlobLatencyChart';
+import { AttestationLatencyChart } from './components/AttestationLatencyChart';
+import { HeadLatencyChart } from './components/HeadLatencyChart';
+import { MetricsSkeleton } from './components/MetricsSkeleton';
+
+// Node table columns (constant, defined once outside component)
+const nodeColumns: Column<FctNodeActiveLast24h>[] = [
+  {
+    header: 'Location',
+    accessor: (node: FctNodeActiveLast24h) => {
+      // Show city + country if both available
+      if (node.meta_client_geo_city && node.meta_client_geo_country) {
+        return `${node.meta_client_geo_city}, ${node.meta_client_geo_country}`;
+      }
+      // Otherwise show just country if available
+      if (node.meta_client_geo_country) {
+        return node.meta_client_geo_country;
+      }
+      // No location data
+      return <span className="text-muted/60">Unknown</span>;
+    },
+    cellClassName: 'text-xs/5 text-muted',
+  },
+  {
+    header: 'Implementation',
+    accessor: (node: FctNodeActiveLast24h) => {
+      if (node.meta_client_implementation && node.meta_client_version) {
+        return `${node.meta_client_implementation} ${node.meta_client_version}`;
+      }
+      return node.meta_client_implementation || node.meta_client_version || '-';
+    },
+    cellClassName: 'text-xs/5 text-muted',
+  },
+  {
+    header: 'Consensus',
+    accessor: (node: FctNodeActiveLast24h) => node.meta_consensus_implementation || '-',
+    cellClassName: 'text-xs/5 text-muted',
+  },
+  {
+    header: 'Consensus Version',
+    accessor: (node: FctNodeActiveLast24h) => node.meta_consensus_version || '-',
+    cellClassName: 'text-xs/5 text-muted',
+  },
+  {
+    header: 'Last Seen',
+    accessor: (node: FctNodeActiveLast24h) => {
+      if (node.last_seen_date_time) {
+        return new Date(node.last_seen_date_time * 1000).toLocaleString();
+      }
+      return '-';
+    },
+    cellClassName: 'text-xs/5 text-muted',
+  },
+];
 
 export function DetailPage(): JSX.Element {
   const { id } = useParams({ from: '/xatu/contributors/$id' });
+
+  // Get slot player meta state
+  const { isLoading: slotPlayerLoading, error: slotPlayerError } = useSlotPlayerMeta();
 
   // Query all three categories since we don't know which one the username belongs to
   const {
@@ -75,21 +135,28 @@ export function DetailPage(): JSX.Element {
 
   const data = allNodes.length > 0 ? { fct_node_active_last_24h: allNodes } : null;
 
-  if (isLoading) {
+  if (isLoading || slotPlayerLoading) {
     return (
       <Container>
         <Header title="Contributor Details" description="Detailed contribution metrics and activity" />
         <UserDetailsSkeleton />
+        {!isLoading && slotPlayerLoading && (
+          <div className="mt-8">
+            <h2 className="mb-4 text-2xl/8 font-bold text-foreground">Live Metrics</h2>
+            <MetricsSkeleton />
+          </div>
+        )}
       </Container>
     );
   }
 
-  if (error) {
+  if (error || slotPlayerError) {
     return (
       <Container>
         <Header title="Contributor Details" description="Detailed contribution metrics and activity" />
         <div className="rounded-sm border border-danger bg-danger/10 p-4 text-danger">
-          Error loading contributor: {error.message}
+          {error && `Error loading contributor: ${error.message}`}
+          {slotPlayerError && `Error initializing slot player: ${slotPlayerError.message}`}
         </div>
         <Link to="/xatu/contributors" className="mt-4 inline-block text-primary hover:underline">
           ← Back to all contributors
@@ -119,60 +186,18 @@ export function DetailPage(): JSX.Element {
   const username = contributoor.username || id;
   const classification = (contributoor.classification || 'unclassified') as UserClassification;
 
-  // Aggregate statistics
-  const uniqueLocations = new Set(nodes.map(n => n.meta_client_geo_country).filter(Boolean));
-  const uniqueConsensusClients = new Set(nodes.map(n => n.meta_consensus_implementation).filter(Boolean));
+  // Aggregate statistics (single pass through nodes for efficiency)
+  const uniqueLocations = new Set<string>();
+  const uniqueConsensusClients = new Set<string>();
+  let latestSeen = 0;
 
-  const latestSeen = Math.max(...nodes.map(n => n.last_seen_date_time || 0));
-
-  const nodeColumns: Column<FctNodeActiveLast24h>[] = [
-    {
-      header: 'Location',
-      accessor: (node: FctNodeActiveLast24h) => {
-        // Show city + country if both available
-        if (node.meta_client_geo_city && node.meta_client_geo_country) {
-          return `${node.meta_client_geo_city}, ${node.meta_client_geo_country}`;
-        }
-        // Otherwise show just country if available
-        if (node.meta_client_geo_country) {
-          return node.meta_client_geo_country;
-        }
-        // No location data
-        return <span className="text-muted/60">Unknown</span>;
-      },
-      cellClassName: 'text-xs/5 text-muted',
-    },
-    {
-      header: 'Implementation',
-      accessor: (node: FctNodeActiveLast24h) => {
-        if (node.meta_client_implementation && node.meta_client_version) {
-          return `${node.meta_client_implementation} ${node.meta_client_version}`;
-        }
-        return node.meta_client_implementation || node.meta_client_version || '-';
-      },
-      cellClassName: 'text-xs/5 text-muted',
-    },
-    {
-      header: 'Consensus',
-      accessor: (node: FctNodeActiveLast24h) => node.meta_consensus_implementation || '-',
-      cellClassName: 'text-xs/5 text-muted',
-    },
-    {
-      header: 'Consensus Version',
-      accessor: (node: FctNodeActiveLast24h) => node.meta_consensus_version || '-',
-      cellClassName: 'text-xs/5 text-muted',
-    },
-    {
-      header: 'Last Seen',
-      accessor: (node: FctNodeActiveLast24h) => {
-        if (node.last_seen_date_time) {
-          return new Date(node.last_seen_date_time * 1000).toLocaleString();
-        }
-        return '-';
-      },
-      cellClassName: 'text-xs/5 text-muted',
-    },
-  ];
+  nodes.forEach(n => {
+    if (n.meta_client_geo_country) uniqueLocations.add(n.meta_client_geo_country);
+    if (n.meta_consensus_implementation) uniqueConsensusClients.add(n.meta_consensus_implementation);
+    if (n.last_seen_date_time && n.last_seen_date_time > latestSeen) {
+      latestSeen = n.last_seen_date_time;
+    }
+  });
 
   return (
     <Container>
@@ -240,6 +265,23 @@ export function DetailPage(): JSX.Element {
           <div className="mt-4 text-center text-sm/6 text-muted">Showing 50 of {nodes.length} nodes</div>
         )}
       </Card>
+
+      {/* Live Metrics Section */}
+      <div className="mt-12">
+        <h2 className="mb-6 text-2xl/8 font-bold text-foreground">Live Metrics</h2>
+        <p className="mb-6 text-muted">
+          Real-time propagation latency for blocks, blobs, attestations, and head events observed by this
+          contributor&apos;s nodes. Use the controls below to navigate through historical data.
+        </p>
+
+        <div className="space-y-6">
+          <SlotPlayerControls />
+          <BlockLatencyChart username={username} />
+          <BlobLatencyChart username={username} />
+          <HeadLatencyChart username={username} />
+          <AttestationLatencyChart username={username} />
+        </div>
+      </div>
     </Container>
   );
 }

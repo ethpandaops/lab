@@ -78,11 +78,16 @@ export function MultiLineChart({
   animationDuration = 300,
   grid,
   colorPalette,
+  enableAggregateToggle = false,
+  aggregateSeriesName = 'Average',
 }: MultiLineChartProps): React.JSX.Element {
   const themeColors = useThemeColors();
 
   // Build extended palette: custom palette or theme colors + stable colors
   const extendedPalette = colorPalette || [themeColors.primary, themeColors.accent, ...SERIES_COLORS];
+
+  // Manage aggregate series visibility
+  const [showAggregate, setShowAggregate] = useState(false);
 
   // Manage visible series when interactive legend is enabled
   const [visibleSeries, setVisibleSeries] = useState<Set<string>>(
@@ -107,8 +112,14 @@ export function MultiLineChart({
     });
   };
 
-  // Filter series based on visibility (when legend is enabled)
-  const displayedSeries = showLegend ? series.filter(s => visibleSeries.has(s.name)) : series;
+  // Filter series based on visibility (when legend is enabled) and aggregate toggle
+  const displayedSeries = series.filter(s => {
+    // Filter by legend visibility if enabled
+    if (showLegend && !visibleSeries.has(s.name)) return false;
+    // Filter aggregate series if toggle is enabled and aggregate is hidden
+    if (enableAggregateToggle && s.name === aggregateSeriesName && !showAggregate) return false;
+    return true;
+  });
 
   // Build x-axis configuration
   const xAxisConfig = {
@@ -215,11 +226,12 @@ export function MultiLineChart({
 
   // Calculate grid padding
   // Title is always rendered by component, never by ECharts
+  // containLabel: true adds padding for tick labels, but axis names need explicit space
   const gridConfig = {
     top: grid?.top ?? 16,
-    right: grid?.right ?? 40,
-    bottom: grid?.bottom ?? 60,
-    left: grid?.left ?? (yAxis?.name ? 70 : 48),
+    right: grid?.right,
+    bottom: grid?.bottom ?? (xAxis.name ? 30 : 24),
+    left: grid?.left ?? (yAxis?.name ? 30 : 8),
     containLabel: true,
   };
 
@@ -283,30 +295,43 @@ export function MultiLineChart({
       {showLegend && series.length > 1 && (
         <div className="mb-4 flex flex-wrap items-center gap-2 border-b border-border pb-4">
           <span className="text-sm/6 font-medium text-muted">Series:</span>
-          {series.map(s => {
-            const isVisible = visibleSeries.has(s.name);
-            const seriesColor = s.color || extendedPalette[series.indexOf(s) % extendedPalette.length];
-            return (
-              <button
-                key={s.name}
-                onClick={() => toggleSeries(s.name)}
-                className={`flex items-center gap-1.5 rounded-sm px-2 py-1 text-xs/5 transition-colors ${
-                  isVisible
-                    ? 'bg-surface-hover text-foreground'
-                    : 'hover:bg-surface-hover/50 bg-surface/50 text-muted/50'
-                }`}
-              >
-                <span
-                  className="h-2 w-2 rounded-full"
-                  style={{
-                    backgroundColor: isVisible ? seriesColor : 'transparent',
-                    border: `2px solid ${seriesColor}`,
-                  }}
-                />
-                <span className="font-medium">{s.name}</span>
-              </button>
-            );
-          })}
+          {series
+            .filter(s => !enableAggregateToggle || s.name !== aggregateSeriesName)
+            .map(s => {
+              const isVisible = visibleSeries.has(s.name);
+              const seriesColor = s.color || extendedPalette[series.indexOf(s) % extendedPalette.length];
+              return (
+                <button
+                  key={s.name}
+                  onClick={() => toggleSeries(s.name)}
+                  className={`flex items-center gap-1.5 rounded-sm px-2 py-1 text-xs/5 transition-colors ${
+                    isVisible
+                      ? 'bg-surface-hover text-foreground'
+                      : 'hover:bg-surface-hover/50 bg-surface/50 text-muted/50'
+                  }`}
+                >
+                  <span
+                    className="h-2 w-2 rounded-full"
+                    style={{
+                      backgroundColor: isVisible ? seriesColor : 'transparent',
+                      border: `2px solid ${seriesColor}`,
+                    }}
+                  />
+                  <span className="font-medium">{s.name}</span>
+                </button>
+              );
+            })}
+          {/* Aggregate Toggle Button - aligned right in same row */}
+          {enableAggregateToggle && (
+            <button
+              onClick={() => setShowAggregate(!showAggregate)}
+              className={`ml-auto rounded-sm px-2 py-1 text-xs/5 transition-colors ${
+                showAggregate ? 'bg-muted/20 text-foreground' : 'text-muted hover:bg-muted/10'
+              }`}
+            >
+              {showAggregate ? '✓' : '○'} {aggregateSeriesName}
+            </button>
+          )}
         </div>
       )}
 

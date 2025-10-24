@@ -178,4 +178,15 @@ export interface MultiLineChartProps {
    * Series with explicit color values will use those instead.
    */
   colorPalette?: string[];
+  /**
+   * Enable aggregate series toggle button
+   * When enabled, shows a button to toggle visibility of the aggregate series
+   * @default false
+   */
+  enableAggregateToggle?: boolean;
+  /**
+   * Name of the aggregate series to control with the toggle
+   * @default 'Average'
+   */
+  aggregateSeriesName?: string;
 }
