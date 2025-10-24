@@ -1,0 +1,339 @@
+import type React from 'react';
+import { useState, useEffect } from 'react';
+import ReactEChartsCore from 'echarts-for-react/lib/core';
+import * as echarts from 'echarts/core';
+import { LineChart as EChartsLine } from 'echarts/charts';
+import {
+  GridComponent,
+  TooltipComponent,
+  TitleComponent,
+  DataZoomComponent,
+  LegendComponent,
+} from 'echarts/components';
+import { CanvasRenderer } from 'echarts/renderers';
+import { hexToRgba } from '@/utils';
+import { useThemeColors } from '@/hooks/useThemeColors';
+import type { MultiLineChartProps } from './MultiLine.types';
+
+// Register ECharts components
+echarts.use([
+  EChartsLine,
+  GridComponent,
+  TooltipComponent,
+  TitleComponent,
+  DataZoomComponent,
+  LegendComponent,
+  CanvasRenderer,
+]);
+
+// Stable color palette for series visualization (used as fallback)
+const SERIES_COLORS = ['#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#06b6d4'] as const;
+
+/**
+ * MultiLineChart - A flexible multi-series line chart component using ECharts
+ *
+ * Supports multiple data series with category or value-based x-axis.
+ * Perfect for comparing multiple metrics, nodes, or entities over time or across values.
+ *
+ * @example Single series with category axis
+ * ```tsx
+ * <MultiLineChart
+ *   series={[{
+ *     name: 'Sales',
+ *     data: [820, 932, 901, 934, 1290],
+ *     showArea: true,
+ *   }]}
+ *   xAxis={{ type: 'category', labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'] }}
+ *   yAxis={{ name: 'Amount' }}
+ *   title="Weekly Sales"
+ * />
+ * ```
+ *
+ * @example Multi-series with value axis
+ * ```tsx
+ * <MultiLineChart
+ *   series={[
+ *     { name: 'Node 1', data: [[100, 200], [101, 210]], color: '#ff0000', showSymbol: true },
+ *     { name: 'Node 2', data: [[100, 180], [101, 190]], color: '#00ff00', showSymbol: true },
+ *   ]}
+ *   xAxis={{ type: 'value', name: 'Slot', min: 100, max: 200 }}
+ *   yAxis={{ name: 'Latency (ms)' }}
+ *   showLegend={true}
+ *   enableDataZoom={true}
+ * />
+ * ```
+ */
+export function MultiLineChart({
+  series,
+  xAxis,
+  yAxis,
+  title,
+  subtitle,
+  height = 400,
+  showLegend = false,
+  showCard = false,
+  enableDataZoom = false,
+  tooltipFormatter,
+  connectNulls = false,
+  animationDuration = 300,
+  grid,
+  colorPalette,
+}: MultiLineChartProps): React.JSX.Element {
+  const themeColors = useThemeColors();
+
+  // Build extended palette: custom palette or theme colors + stable colors
+  const extendedPalette = colorPalette || [themeColors.primary, themeColors.accent, ...SERIES_COLORS];
+
+  // Manage visible series when interactive legend is enabled
+  const [visibleSeries, setVisibleSeries] = useState<Set<string>>(
+    new Set(series.filter(s => s.visible !== false).map(s => s.name))
+  );
+
+  // Update visible series when series prop changes
+  useEffect(() => {
+    setVisibleSeries(new Set(series.filter(s => s.visible !== false).map(s => s.name)));
+  }, [series]);
+
+  // Toggle series visibility
+  const toggleSeries = (name: string): void => {
+    setVisibleSeries(prev => {
+      const next = new Set(prev);
+      if (next.has(name)) {
+        next.delete(name);
+      } else {
+        next.add(name);
+      }
+      return next;
+    });
+  };
+
+  // Filter series based on visibility (when legend is enabled)
+  const displayedSeries = showLegend ? series.filter(s => visibleSeries.has(s.name)) : series;
+
+  // Build x-axis configuration
+  const xAxisConfig = {
+    type: xAxis.type,
+    name: xAxis.name,
+    nameLocation: 'middle' as const,
+    nameGap: 30,
+    nameTextStyle: { color: themeColors.muted },
+    data: xAxis.type === 'category' ? xAxis.labels : undefined,
+    boundaryGap: xAxis.type === 'category',
+    axisLine: { lineStyle: { color: themeColors.border } },
+    axisLabel: {
+      color: themeColors.muted,
+      fontSize: 12,
+      formatter: xAxis.formatter,
+    },
+    splitLine: {
+      lineStyle: {
+        color: themeColors.border,
+        opacity: 0.3,
+      },
+    },
+    min: xAxis.type === 'value' ? xAxis.min : undefined,
+    max: xAxis.type === 'value' ? xAxis.max : undefined,
+  };
+
+  // Build y-axis configuration
+  const yAxisConfig = {
+    type: 'value' as const,
+    name: yAxis?.name,
+    nameLocation: 'middle' as const,
+    nameGap: yAxis?.name ? 50 : 0,
+    nameTextStyle: { color: themeColors.muted },
+    axisLine: { show: false },
+    axisTick: { show: false },
+    splitLine: {
+      lineStyle: {
+        color: themeColors.border,
+        type: 'dashed' as const,
+      },
+    },
+    axisLabel: {
+      color: themeColors.muted,
+      fontSize: 12,
+      formatter: yAxis?.formatter,
+    },
+    min: yAxis?.min,
+    max: yAxis?.max,
+  };
+
+  // Build series configuration
+  const seriesConfig = displayedSeries
+    .filter(s => s.visible !== false)
+    .map((s, index) => {
+      // Use explicit color or auto-assign from palette
+      const seriesColor = s.color || extendedPalette[index % extendedPalette.length];
+
+      const baseConfig = {
+        name: s.name,
+        type: 'line' as const,
+        data: s.data,
+        smooth: s.smooth ?? false,
+        connectNulls,
+        showSymbol: s.showSymbol ?? false,
+        symbolSize: s.symbolSize ?? 4,
+        lineStyle: {
+          color: seriesColor,
+          width: s.lineWidth ?? 2,
+          type: s.lineStyle ?? ('solid' as const),
+        },
+        itemStyle: {
+          color: seriesColor,
+        },
+      };
+
+      // Add area style if requested
+      if (s.showArea) {
+        return {
+          ...baseConfig,
+          areaStyle: {
+            color: {
+              type: 'linear' as const,
+              x: 0,
+              y: 0,
+              x2: 0,
+              y2: 1,
+              colorStops: [
+                {
+                  offset: 0,
+                  color: hexToRgba(seriesColor, 0.5),
+                },
+                {
+                  offset: 1,
+                  color: hexToRgba(seriesColor, 0.06),
+                },
+              ],
+            },
+          },
+        };
+      }
+
+      return baseConfig;
+    });
+
+  // Calculate grid padding
+  // Title is always rendered by component, never by ECharts
+  const gridConfig = {
+    top: grid?.top ?? 16,
+    right: grid?.right ?? 40,
+    bottom: grid?.bottom ?? 60,
+    left: grid?.left ?? (yAxis?.name ? 70 : 48),
+    containLabel: true,
+  };
+
+  // Build tooltip configuration
+  const tooltipConfig = {
+    trigger: 'axis' as const,
+    backgroundColor: themeColors.surface,
+    borderColor: themeColors.border,
+    borderWidth: 1,
+    textStyle: {
+      color: themeColors.foreground,
+      fontSize: 12,
+    },
+    axisPointer: {
+      type: 'line' as const,
+      lineStyle: {
+        color: themeColors.muted,
+        type: 'dashed' as const,
+      },
+    },
+    formatter: tooltipFormatter,
+  };
+
+  // Build complete option
+  const option = {
+    animation: true,
+    animationDuration,
+    animationEasing: 'cubicOut' as const,
+    backgroundColor: 'transparent',
+    textStyle: {
+      color: themeColors.foreground,
+    },
+    // Never pass title to ECharts - component always renders it
+    grid: gridConfig,
+    xAxis: xAxisConfig,
+    yAxis: yAxisConfig,
+    series: seriesConfig,
+    tooltip: tooltipConfig,
+    dataZoom: enableDataZoom
+      ? [
+          {
+            type: 'inside' as const,
+            xAxisIndex: 0,
+            filterMode: 'none' as const,
+          },
+        ]
+      : undefined,
+  };
+
+  const chartContent = (
+    <>
+      {/* Title and subtitle (when not using card) */}
+      {title && !showCard && (
+        <div className={subtitle ? 'mb-4' : 'mb-4'}>
+          <h3 className="mb-1 text-lg/7 font-semibold text-foreground">{title}</h3>
+          {subtitle && <p className="text-xs/5 text-muted">{subtitle}</p>}
+        </div>
+      )}
+
+      {/* Interactive Legend Controls */}
+      {showLegend && series.length > 1 && (
+        <div className="mb-4 flex flex-wrap items-center gap-2 border-b border-border pb-4">
+          <span className="text-sm/6 font-medium text-muted">Series:</span>
+          {series.map(s => {
+            const isVisible = visibleSeries.has(s.name);
+            const seriesColor = s.color || extendedPalette[series.indexOf(s) % extendedPalette.length];
+            return (
+              <button
+                key={s.name}
+                onClick={() => toggleSeries(s.name)}
+                className={`flex items-center gap-1.5 rounded-sm px-2 py-1 text-xs/5 transition-colors ${
+                  isVisible
+                    ? 'bg-surface-hover text-foreground'
+                    : 'hover:bg-surface-hover/50 bg-surface/50 text-muted/50'
+                }`}
+              >
+                <span
+                  className="h-2 w-2 rounded-full"
+                  style={{
+                    backgroundColor: isVisible ? seriesColor : 'transparent',
+                    border: `2px solid ${seriesColor}`,
+                  }}
+                />
+                <span className="font-medium">{s.name}</span>
+              </button>
+            );
+          })}
+        </div>
+      )}
+
+      <ReactEChartsCore
+        echarts={echarts}
+        option={option}
+        style={{ height, width: '100%', minHeight: height }}
+        notMerge={true}
+      />
+    </>
+  );
+
+  // Wrap in card if requested
+  if (showCard) {
+    return (
+      <div className="rounded-sm border border-border bg-surface p-4">
+        {title && (
+          <div className={subtitle ? 'mb-4' : 'mb-4'}>
+            <h3 className="mb-1 text-lg/7 font-semibold text-foreground">{title}</h3>
+            {subtitle && <p className="text-xs/5 text-muted">{subtitle}</p>}
+          </div>
+        )}
+        {chartContent}
+      </div>
+    );
+  }
+
+  // Return unwrapped chart
+  return <div className="w-full">{chartContent}</div>;
+}
