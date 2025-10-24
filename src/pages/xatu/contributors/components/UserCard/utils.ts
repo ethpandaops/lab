@@ -34,15 +34,15 @@ export function getRelativeTime(timestamp: number): string {
 }
 
 /**
- * Get the badge color classes based on contributor classification
- * Uses semantic theme colors with dark mode support
+ * Get the raw Tailwind badge color classes based on contributor classification
+ * Uses semantic theme colors with dark mode support for custom badge styling
  */
-export function getClassificationBadgeColor(classification: string): string {
+export function getClassificationBadgeClasses(classification: string): string {
   switch (classification) {
     case 'individual':
       return 'bg-primary/10 text-primary inset-ring-primary/20 dark:bg-primary/10 dark:text-primary dark:inset-ring-primary/10';
     case 'corporate':
-      return 'bg-accent/10 text-accent inset-ring-accent/20 dark:bg-accent/10 dark:text-accent dark:inset-ring-accent/10';
+      return 'bg-purple-500/10 text-purple-600 inset-ring-purple-500/20 dark:bg-purple-500/10 dark:text-purple-400 dark:inset-ring-purple-500/10';
     case 'internal':
       return 'bg-success/10 text-success inset-ring-success/20 dark:bg-success/10 dark:text-success dark:inset-ring-success/10';
     default:
