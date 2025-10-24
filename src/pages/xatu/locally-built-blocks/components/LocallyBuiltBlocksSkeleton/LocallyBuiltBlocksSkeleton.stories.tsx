@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { LocallyBuiltBlocksSkeleton } from './LocallyBuiltBlocksSkeleton';
 
 const meta = {
-  title: 'Pages/Experiments/Locally Built Blocks/LocallyBuiltBlocksSkeleton',
+  title: 'Pages/Xatu/Locally Built Blocks/LocallyBuiltBlocksSkeleton',
   component: LocallyBuiltBlocksSkeleton,
   decorators: [
     Story => (

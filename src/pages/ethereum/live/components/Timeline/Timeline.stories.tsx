@@ -4,7 +4,7 @@ import { Timeline } from './Timeline';
 import { DEFAULT_BEACON_SLOT_PHASES } from '@/utils/beacon';
 
 const meta = {
-  title: 'Pages/Experiments/SlotView/Timeline',
+  title: 'Pages/Ethereum/SlotView/Timeline',
   component: Timeline,
   parameters: {
     layout: 'padded',

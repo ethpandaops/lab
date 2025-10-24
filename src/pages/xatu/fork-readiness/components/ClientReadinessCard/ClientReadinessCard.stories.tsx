@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { ClientReadinessCard } from './ClientReadinessCard';
 
 const meta = {
-  title: 'Pages/Experiments/ForkReadiness/ClientReadinessCard',
+  title: 'Pages/Xatu/ForkReadiness/ClientReadinessCard',
   component: ClientReadinessCard,
   parameters: {
     layout: 'padded',

@@ -21,7 +21,7 @@ const mockCountries = [
 ];
 
 const meta = {
-  title: 'Pages/Experiments/Geographical Checklist/GeographicalFilters',
+  title: 'Pages/Xatu/Geographical Checklist/GeographicalFilters',
   component: GeographicalFilters,
   decorators: [
     Story => {

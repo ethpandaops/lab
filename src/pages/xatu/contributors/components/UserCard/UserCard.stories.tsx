@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { UserCard } from './UserCard';
 
 const meta = {
-  title: 'Pages/Contributors/UserCard',
+  title: 'Pages/Xatu/Contributors/UserCard',
   component: UserCard,
   parameters: {
     layout: 'padded',
