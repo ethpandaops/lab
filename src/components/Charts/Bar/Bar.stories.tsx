@@ -205,7 +205,6 @@ export const MixedColors: Story = {
 };
 
 export const SmallHeight: Story = {
-  name: 'Small Height',
   args: {
     data: SIMPLE_DATA.slice(0, 5),
     labels: MONTHS.slice(0, 5),

@@ -3,6 +3,7 @@ import { PopoutCard } from '@/components/Layout/PopoutCard';
 import { Gauge } from '@/components/Charts/Gauge';
 import type { GaugeItem } from '@/components/Charts/Gauge';
 import { getHealthColor } from '@/utils/health';
+import { useThemeColors } from '@/hooks/useThemeColors';
 import type { AttestationHeadCorrectnessCardProps } from './AttestationHeadCorrectnessCard.types';
 
 /**
@@ -25,6 +26,8 @@ import type { AttestationHeadCorrectnessCardProps } from './AttestationHeadCorre
  * ```
  */
 export function AttestationHeadCorrectnessCard({ correctnessData }: AttestationHeadCorrectnessCardProps): JSX.Element {
+  const themeColors = useThemeColors();
+
   // Calculate gauge data from correctness data
   const gaugeData = useMemo((): GaugeItem[] | null => {
     if (!correctnessData) return null;
@@ -38,12 +41,12 @@ export function AttestationHeadCorrectnessCard({ correctnessData }: AttestationH
         name: 'Voted for this block',
         value: votes_head,
         max: votes_max,
-        color: getHealthColor(headPercentage),
+        color: getHealthColor(headPercentage, themeColors),
       },
     ];
 
     return gauges;
-  }, [correctnessData]);
+  }, [correctnessData, themeColors]);
 
   // Handle no data state
   if (!correctnessData || !gaugeData) {

@@ -158,7 +158,7 @@ export function PreparedBlocksComparisonChart({
       color: b.isProposed ? themeColors.accent : themeColors.success,
     }));
 
-    const formatter = (params: unknown) => {
+    const formatter = (params: unknown): string => {
       if (!Array.isArray(params) || params.length === 0) return '';
       const param = params[0] as { name: string; value: number | number[]; data: { value: number }; dataIndex: number };
       const block = processedBlocks[param.dataIndex];

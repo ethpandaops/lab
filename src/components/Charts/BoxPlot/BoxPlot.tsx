@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { type JSX, useMemo } from 'react';
 import ReactECharts from 'echarts-for-react';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import type { BoxPlotProps } from './BoxPlot.types';
@@ -63,7 +63,7 @@ export function BoxPlot({
   notMerge = false,
   lazyUpdate = true,
   boxWidth = '60%',
-}: BoxPlotProps) {
+}: BoxPlotProps): JSX.Element {
   const themeColors = useThemeColors();
 
   const option = useMemo(() => {

@@ -3,6 +3,7 @@ import { PopoutCard } from '@/components/Layout/PopoutCard';
 import { Gauge } from '@/components/Charts/Gauge';
 import type { GaugeItem } from '@/components/Charts/Gauge';
 import { getHealthColor } from '@/utils/health';
+import { useThemeColors } from '@/hooks/useThemeColors';
 import type { AttestationParticipationCardProps } from './AttestationParticipationCard.types';
 
 /**
@@ -25,6 +26,8 @@ import type { AttestationParticipationCardProps } from './AttestationParticipati
  * ```
  */
 export function AttestationParticipationCard({ correctnessData }: AttestationParticipationCardProps): JSX.Element {
+  const themeColors = useThemeColors();
+
   // Calculate gauge data from correctness data
   const gaugeData = useMemo((): GaugeItem[] | null => {
     if (!correctnessData) return null;
@@ -40,12 +43,12 @@ export function AttestationParticipationCard({ correctnessData }: AttestationPar
         name: 'Participation',
         value: totalVotes,
         max: votes_max,
-        color: getHealthColor(participationPercentage),
+        color: getHealthColor(participationPercentage, themeColors),
       },
     ];
 
     return gauges;
-  }, [correctnessData]);
+  }, [correctnessData, themeColors]);
 
   // Handle no data state
   if (!correctnessData || !gaugeData) {

@@ -157,7 +157,6 @@ export const CalculatedStats: Story = {
 };
 
 export const CustomColors: Story = {
-  name: 'Custom Colors',
   args: {
     series: [
       {
@@ -182,7 +181,6 @@ export const CustomColors: Story = {
 };
 
 export const WithAxisTitles: Story = {
-  name: 'With Axis Titles',
   args: {
     series: [
       {
@@ -209,7 +207,6 @@ export const LegendPositions: Story = {
 };
 
 export const NoLegend: Story = {
-  name: 'No Legend',
   args: {
     series: [
       {
@@ -241,7 +238,6 @@ export const CustomYAxisRange: Story = {
 };
 
 export const TallChart: Story = {
-  name: 'Tall Chart',
   args: {
     series: BLOB_PROPAGATION_DATA,
     title: 'Tall Box Plot',
@@ -252,7 +248,6 @@ export const TallChart: Story = {
 };
 
 export const CompactChart: Story = {
-  name: 'Compact Chart',
   args: {
     series: [
       {
@@ -268,7 +263,6 @@ export const CompactChart: Story = {
 };
 
 export const ManyDataPoints: Story = {
-  name: 'Many Data Points',
   args: {
     series: [
       {
@@ -290,7 +284,6 @@ export const ManyDataPoints: Story = {
 };
 
 export const WideBoxes: Story = {
-  name: 'Wide Boxes',
   args: {
     series: [
       {
@@ -305,7 +298,6 @@ export const WideBoxes: Story = {
 };
 
 export const NarrowBoxes: Story = {
-  name: 'Narrow Boxes',
   args: {
     series: BLOB_PROPAGATION_DATA,
     title: 'Box Plot with Narrow Boxes',
@@ -315,7 +307,6 @@ export const NarrowBoxes: Story = {
 };
 
 export const EmptyData: Story = {
-  name: 'Empty Data',
   args: {
     series: [],
     title: 'Box Plot with No Data',

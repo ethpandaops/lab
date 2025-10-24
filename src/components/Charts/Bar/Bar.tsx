@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { type JSX, useMemo } from 'react';
 import ReactECharts from 'echarts-for-react';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import type { BarChartProps } from './Bar.types';
@@ -53,7 +53,7 @@ export function BarChart({
   lazyUpdate = true,
   tooltipFormatter,
   categoryLabelInterval = 'auto',
-}: BarChartProps) {
+}: BarChartProps): JSX.Element {
   const themeColors = useThemeColors();
 
   const option = useMemo(() => {

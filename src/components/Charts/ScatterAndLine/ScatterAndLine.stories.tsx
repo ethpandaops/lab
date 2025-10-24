@@ -231,7 +231,6 @@ export const MultipleSeries: Story = {
 };
 
 export const CustomColors: Story = {
-  name: 'Custom Colors',
   args: {
     scatterSeries: [
       {
@@ -294,7 +293,6 @@ export const CustomTooltip: Story = {
 };
 
 export const DifferentSymbolTypes: Story = {
-  name: 'Different Symbol Types',
   args: {
     scatterSeries: [
       {
@@ -390,7 +388,6 @@ export const ScrollableLegend: Story = {
 };
 
 export const NoLegend: Story = {
-  name: 'No Legend',
   args: {
     scatterSeries: BASIC_SCATTER_DATA,
     lineSeries: BASIC_LINE_DATA,
@@ -402,7 +399,6 @@ export const NoLegend: Story = {
 };
 
 export const CustomAxisFormatters: Story = {
-  name: 'Custom Axis Formatters',
   args: {
     scatterSeries: BASIC_SCATTER_DATA,
     lineSeries: BASIC_LINE_DATA,
@@ -415,7 +411,6 @@ export const CustomAxisFormatters: Story = {
 };
 
 export const FixedAxisRanges: Story = {
-  name: 'Fixed Axis Ranges',
   args: {
     scatterSeries: BASIC_SCATTER_DATA,
     lineSeries: BASIC_LINE_DATA,
@@ -488,7 +483,6 @@ export const NonSmoothLine: Story = {
 };
 
 export const VariableSymbolSizes: Story = {
-  name: 'Variable Symbol Sizes',
   args: {
     scatterSeries: [
       {
@@ -508,7 +502,6 @@ export const VariableSymbolSizes: Story = {
 };
 
 export const TallChart: Story = {
-  name: 'Tall Chart',
   args: {
     scatterSeries: MULTI_SCATTER_DATA,
     lineSeries: MULTI_LINE_DATA,
@@ -520,7 +513,6 @@ export const TallChart: Story = {
 };
 
 export const CompactChart: Story = {
-  name: 'Compact Chart',
   args: {
     scatterSeries: [BASIC_SCATTER_DATA[0]],
     lineSeries: [BASIC_LINE_DATA[0]],
@@ -531,7 +523,6 @@ export const CompactChart: Story = {
 };
 
 export const WithAnimation: Story = {
-  name: 'With Animation',
   args: {
     scatterSeries: BASIC_SCATTER_DATA,
     lineSeries: BASIC_LINE_DATA,
@@ -578,7 +569,6 @@ export const LayeredWithZIndex: Story = {
 };
 
 export const EmptyData: Story = {
-  name: 'Empty Data',
   args: {
     scatterSeries: [],
     lineSeries: [],

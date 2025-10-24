@@ -43,9 +43,8 @@ export function BlockPropagationChart({ blockPropagationData }: BlockPropagation
       if (!continentGroups.has(continent)) {
         continentGroups.set(continent, []);
       }
-      // X = time in seconds, Y = node index (with slight jitter for visibility)
-      const jitter = (Math.random() - 0.5) * 0.4; // ±0.2 jitter
-      continentGroups.get(continent)!.push([point.seen_slot_start_diff / 1000, index + jitter]);
+      // X = time in seconds, Y = node index
+      continentGroups.get(continent)!.push([point.seen_slot_start_diff / 1000, index]);
     });
 
     // Calculate cumulative distribution for line chart

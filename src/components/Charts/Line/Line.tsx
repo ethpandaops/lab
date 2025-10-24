@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { type JSX, useMemo } from 'react';
 import ReactECharts from 'echarts-for-react';
 import { hexToRgba } from '@/utils';
 import { useThemeColors } from '@/hooks/useThemeColors';
@@ -39,7 +39,7 @@ export function LineChart({
   xAxisLabelInterval = 'auto',
   xAxisTitle,
   yAxisTitle,
-}: LineChartProps) {
+}: LineChartProps): JSX.Element {
   const themeColors = useThemeColors();
 
   const option = useMemo(
