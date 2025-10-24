@@ -2,6 +2,7 @@ import { type JSX, useMemo } from 'react';
 import { PopoutCard } from '@/components/Layout/PopoutCard';
 import { BarChart } from '@/components/Charts/Bar';
 import { useThemeColors } from '@/hooks/useThemeColors';
+import { CHART_CATEGORICAL_COLORS } from '@/theme/data-visualization-colors';
 import type { RelayDistributionChartProps, RelayChartData } from './RelayDistributionChart.types';
 
 /**
@@ -36,10 +37,10 @@ export function RelayDistributionChart({ relayData, winningRelay }: RelayDistrib
       }))
       .sort((a, b) => b.bidCount - a.bidCount);
 
-    // Create chart data with custom colors
-    const data = processed.map(relay => ({
+    // Create chart data with custom colors from categorical palette
+    const data = processed.map((relay, index) => ({
       value: relay.bidCount,
-      color: relay.isWinner ? themeColors.primary : themeColors.secondary,
+      color: relay.isWinner ? themeColors.primary : CHART_CATEGORICAL_COLORS[index % CHART_CATEGORICAL_COLORS.length],
     }));
 
     const relayNames = processed.map(d => d.name);
@@ -51,7 +52,7 @@ export function RelayDistributionChart({ relayData, winningRelay }: RelayDistrib
       totalBids: total,
       processedData: processed,
     };
-  }, [relayData, winningRelay, themeColors.primary, themeColors.secondary]);
+  }, [relayData, winningRelay, themeColors.primary]);
 
   // Custom tooltip formatter to show winner badge
   const tooltipFormatter = useMemo(
@@ -67,7 +68,7 @@ export function RelayDistributionChart({ relayData, winningRelay }: RelayDistrib
   // Handle empty data
   if (relayData.length === 0) {
     return (
-      <PopoutCard title="Relay Distribution" modalSize="xl">
+      <PopoutCard title="Relay Distribution" anchorId="relay-distribution" modalSize="xl">
         {({ inModal }) => (
           <div
             className={
@@ -86,7 +87,7 @@ export function RelayDistributionChart({ relayData, winningRelay }: RelayDistrib
   const subtitle = `${totalBids.toLocaleString()} bids • ${relayData.length} relays`;
 
   return (
-    <PopoutCard title="Relay Distribution" subtitle={subtitle} modalSize="xl">
+    <PopoutCard title="Relay Distribution" anchorId="relay-distribution" subtitle={subtitle} modalSize="xl">
       {({ inModal }) => (
         <div className={inModal ? 'h-96' : 'h-64'}>
           <BarChart
@@ -97,6 +98,7 @@ export function RelayDistributionChart({ relayData, winningRelay }: RelayDistrib
             height="100%"
             animationDuration={0}
             tooltipFormatter={tooltipFormatter}
+            showLabel={false}
           />
         </div>
       )}

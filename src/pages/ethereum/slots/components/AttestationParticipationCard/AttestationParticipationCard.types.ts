@@ -27,9 +27,9 @@ export interface AttestationCorrectnessData {
 }
 
 /**
- * Props for AttestationCorrectnessChart component
+ * Props for AttestationParticipationCard component
  */
-export interface AttestationCorrectnessChartProps {
+export interface AttestationParticipationCardProps {
   /**
    * Attestation correctness data for the slot
    */

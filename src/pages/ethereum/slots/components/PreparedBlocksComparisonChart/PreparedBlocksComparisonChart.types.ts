@@ -43,6 +43,12 @@ export interface PreparedBlocksComparisonChartProps {
    * Used to filter prepared blocks that were built before the winning bid
    */
   winningBidTimestamp?: number | null;
+  /**
+   * The timestamp (in milliseconds) when the slot started (optional)
+   * Used as fallback filter when winningBidTimestamp is not available
+   * (simulates local block building at slot start)
+   */
+  slotStartTime?: number | null;
 }
 
 /**

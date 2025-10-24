@@ -101,7 +101,7 @@ export function BlockPropagationChart({ blockPropagationData }: BlockPropagation
   // Handle empty data
   if (blockPropagationData.length === 0) {
     return (
-      <PopoutCard title="Block Propagation" modalSize="xl">
+      <PopoutCard title="Block Propagation" anchorId="block-propagation-chart" modalSize="xl">
         {({ inModal }) => (
           <div
             className={
@@ -120,7 +120,7 @@ export function BlockPropagationChart({ blockPropagationData }: BlockPropagation
   const subtitle = `Avg: ${avgPropagationTime.toFixed(0)}ms across ${blockPropagationData.length.toLocaleString()} nodes`;
 
   return (
-    <PopoutCard title="Block Propagation" subtitle={subtitle} modalSize="xl">
+    <PopoutCard title="Block Propagation" anchorId="block-propagation-chart" subtitle={subtitle} modalSize="xl">
       {({ inModal }) => (
         <ScatterAndLineChart
           scatterSeries={scatterSeries}
@@ -131,6 +131,7 @@ export function BlockPropagationChart({ blockPropagationData }: BlockPropagation
           height={inModal ? 384 : 288}
           xMin={0}
           xMax={12}
+          yMin={0}
           yAxis2Min={0}
           yAxis2Max={100}
           tooltipFormatter={tooltipFormatter}

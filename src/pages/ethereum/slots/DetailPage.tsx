@@ -4,11 +4,14 @@ import { Container } from '@/components/Layout/Container';
 import { Header } from '@/components/Layout/Header';
 import { Alert } from '@/components/Feedback/Alert';
 import { LoadingContainer } from '@/components/Layout/LoadingContainer';
+import { BlockArt } from '@/components/Charts/BlockArt';
+import { ScrollAnchor } from '@/components/Navigation/ScrollAnchor';
 import { SLOTS_PER_EPOCH } from '@/utils/beacon';
 import { useSlotDetailData } from './hooks/useSlotDetailData';
 import { SlotBasicInfoCard } from './components/SlotBasicInfoCard';
 import { AttestationArrivalsChart } from './components/AttestationArrivalsChart';
-import { AttestationCorrectnessChart } from './components/AttestationCorrectnessChart';
+import { AttestationParticipationCard } from './components/AttestationParticipationCard';
+import { AttestationHeadCorrectnessCard } from './components/AttestationHeadCorrectnessCard';
 import { BlockPropagationChart } from './components/BlockPropagationChart';
 import { BlobPropagationChart } from './components/BlobPropagationChart';
 import { MevBiddingTimelineChart } from './components/MevBiddingTimelineChart';
@@ -54,7 +57,7 @@ export function DetailPage(): JSX.Element {
   if (isLoading) {
     return (
       <Container>
-        <Header title={`Slot ${slot.toLocaleString()}`} description={`Epoch ${epoch.toLocaleString()}`} />
+        <Header title={`Slot ${slot}`} description={`Epoch ${epoch}`} />
         <div className="space-y-6">
           {/* Basic info skeleton */}
           <LoadingContainer className="h-64 rounded-sm" />
@@ -74,7 +77,7 @@ export function DetailPage(): JSX.Element {
   if (error) {
     return (
       <Container>
-        <Header title={`Slot ${slot.toLocaleString()}`} description={`Epoch ${epoch.toLocaleString()}`} />
+        <Header title={`Slot ${slot}`} description={`Epoch ${epoch}`} />
         <Alert variant="error" title="Error loading slot data" description={error.message} />
         <Link to="/ethereum/slots" className="mt-4 inline-block text-primary hover:underline">
           ← Back to slots
@@ -87,11 +90,11 @@ export function DetailPage(): JSX.Element {
   if (!data || data.blockHead.length === 0) {
     return (
       <Container>
-        <Header title={`Slot ${slot.toLocaleString()}`} description={`Epoch ${epoch.toLocaleString()}`} />
+        <Header title={`Slot ${slot}`} description={`Epoch ${epoch}`} />
         <Alert
           variant="warning"
           title="No data available"
-          description={`No data has been recorded for slot ${slot.toLocaleString()}. This slot may not have occurred yet, or data collection may not have been active.`}
+          description={`No data has been recorded for slot ${slot}. This slot may not have occurred yet, or data collection may not have been active.`}
         />
         <Link to="/ethereum/slots" className="mt-4 inline-block text-primary hover:underline">
           ← Back to slots
@@ -163,38 +166,56 @@ export function DetailPage(): JSX.Element {
 
   return (
     <Container>
-      <Header
-        title={`Slot ${slot.toLocaleString()}`}
-        description={`Epoch ${epoch.toLocaleString()} • Detailed slot analysis and visualization`}
-      />
+      {/* Header with BlockArt on the same row */}
+      <div className="mb-6 flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
+        <div className="flex-1">
+          <Header title="Slot Detail" description="Detailed slot analysis and visualization" />
+          <Link to="/ethereum/slots" className="mt-4 inline-block text-primary hover:underline">
+            ← Back to slots
+          </Link>
+        </div>
 
-      <Link to="/ethereum/slots" className="mb-6 inline-block text-primary hover:underline">
-        ← Back to slots
-      </Link>
+        {/* BlockArt - p5.js 3D cube */}
+        <div className="flex items-center justify-center lg:justify-end">
+          <BlockArt
+            width={180}
+            height={180}
+            blockHash={data.blockHead[0]?.block_root}
+            blockNumber={data.blockHead[0]?.execution_payload_block_number ?? slot}
+          />
+        </div>
+      </div>
 
       <div className="space-y-6">
         {/* Basic slot information card */}
         <SlotBasicInfoCard slot={slot} epoch={epoch} data={data} />
 
         {/* Attestations Section */}
-        <Header size="xs" title="Attestations" showAccent={false} />
+        <ScrollAnchor id="attestations">
+          <Header size="xs" title="Attestations" showAccent={false} />
+        </ScrollAnchor>
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
           <AttestationArrivalsChart
             attestationData={attestationData}
             totalExpectedValidators={totalExpectedValidators}
           />
-          <AttestationCorrectnessChart correctnessData={attestationCorrectnessData} />
+          <AttestationParticipationCard correctnessData={attestationCorrectnessData} />
+          <AttestationHeadCorrectnessCard correctnessData={attestationCorrectnessData} />
         </div>
 
         {/* Block Propagation Section */}
-        <Header size="xs" title="Block Propagation" showAccent={false} />
+        <ScrollAnchor id="block-propagation">
+          <Header size="xs" title="Block Propagation" showAccent={false} />
+        </ScrollAnchor>
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
           <BlockPropagationChart blockPropagationData={blockPropagationData} />
           <BlobPropagationChart blobPropagationData={blobPropagationData} />
         </div>
 
         {/* Execution Section */}
-        <Header size="xs" title="Execution" showAccent={false} />
+        <ScrollAnchor id="execution">
+          <Header size="xs" title="Execution" showAccent={false} />
+        </ScrollAnchor>
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
           <BlockSizeEfficiencyChart blockHead={data.blockHead[0]} />
         </div>
@@ -205,7 +226,9 @@ export function DetailPage(): JSX.Element {
           data.builderBids.length > 0 ||
           data.preparedBlocks.length > 0) && (
           <>
-            <Header size="xs" title="MEV" showAccent={false} />
+            <ScrollAnchor id="mev">
+              <Header size="xs" title="MEV" showAccent={false} />
+            </ScrollAnchor>
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
               {mevBiddingData.length > 0 && (
                 <MevBiddingTimelineChart
@@ -225,6 +248,7 @@ export function DetailPage(): JSX.Element {
                   preparedBlocks={data.preparedBlocks}
                   proposedBlock={proposedBlock}
                   winningBidTimestamp={winningBidTimestamp}
+                  slotStartTime={data.blockHead[0]?.slot_start_date_time}
                 />
               )}
             </div>

@@ -411,3 +411,6 @@ decorators: [
 ```
 
 - When choosing a title, use the full nested path to the story, e.g. `Components/Layout/Container`
+
+## Charts
+- When plotting data in a "slot time" chart, you must use seconds instead of milliseconds, and you should round the tick to the nearest second (unless told otherwise.)

@@ -3,6 +3,7 @@ import { PopoutCard } from '@/components/Layout/PopoutCard';
 import { Alert } from '@/components/Feedback/Alert';
 import { BarChart } from '@/components/Charts/Bar';
 import { useThemeColors } from '@/hooks/useThemeColors';
+import { weiToEth } from '@/utils';
 import type {
   PreparedBlocksComparisonChartProps,
   ProcessedBlock,
@@ -50,23 +51,15 @@ function calculateRewardWei(block: FctPreparedBlock | PreparedBlocksComparisonCh
 }
 
 /**
- * Convert wei to ETH
- *
- * @param weiValue - Value in wei as string
- * @returns Value in ETH
- */
-function weiToEth(weiValue: string): number {
-  const wei = BigInt(weiValue);
-  const eth = Number(wei) / 1e18;
-  return eth;
-}
-
-/**
  * PreparedBlocksComparisonChart - Compares alternative blocks built by infrastructure
  *
  * Shows a horizontal bar chart comparing the rewards of prepared blocks (by execution client)
  * versus the actually proposed block. Highlights which execution client would have been optimal
  * and calculates the missed opportunity (delta) if any.
+ *
+ * Filters prepared blocks by timestamp:
+ * - If `winningBidTimestamp` is provided: shows blocks prepared before MEV bid (MEV boost scenario)
+ * - Otherwise uses `slotStartTime`: shows blocks prepared before slot start (local building scenario)
  *
  * @example
  * ```tsx
@@ -79,6 +72,8 @@ function weiToEth(weiValue: string): number {
  *     execution_payload_value: '...',
  *     consensus_payload_value: '...',
  *   }}
+ *   winningBidTimestamp={1234567890}
+ *   slotStartTime={1234567800}
  * />
  * ```
  */
@@ -86,6 +81,7 @@ export function PreparedBlocksComparisonChart({
   preparedBlocks,
   proposedBlock,
   winningBidTimestamp,
+  slotStartTime,
 }: PreparedBlocksComparisonChartProps): JSX.Element {
   const themeColors = useThemeColors();
 
@@ -95,14 +91,18 @@ export function PreparedBlocksComparisonChart({
     stats: ChartStats;
     filteredCount: number;
   } => {
-    // Filter prepared blocks to only show those created before or at the winning bid timestamp
+    // Filter prepared blocks to only show those created before or at the cutoff time
+    // If winningBidTimestamp is available, use it (MEV boost scenario)
+    // Otherwise, fall back to slotStartTime (local building scenario)
     let filteredPreparedBlocks = preparedBlocks;
     const originalCount = preparedBlocks.length;
 
-    if (winningBidTimestamp !== undefined && winningBidTimestamp !== null) {
+    const cutoffTime = winningBidTimestamp ?? slotStartTime;
+
+    if (cutoffTime !== undefined && cutoffTime !== null) {
       filteredPreparedBlocks = preparedBlocks.filter(block => {
         // Use event_date_time field which is when the block was prepared
-        return block.event_date_time && block.event_date_time <= winningBidTimestamp;
+        return block.event_date_time && block.event_date_time <= cutoffTime;
       });
     }
 
@@ -171,7 +171,7 @@ export function PreparedBlocksComparisonChart({
       stats: chartStats,
       filteredCount: originalCount - filteredPreparedBlocks.length,
     };
-  }, [preparedBlocks, proposedBlock, winningBidTimestamp]);
+  }, [preparedBlocks, proposedBlock, winningBidTimestamp, slotStartTime]);
 
   // Prepare data for BarChart component
   const { chartData, chartLabels, tooltipFormatter } = useMemo(() => {
@@ -192,7 +192,6 @@ export function PreparedBlocksComparisonChart({
       if (!block.isProposed && 'execution_payload_transactions_count' in block.originalBlock) {
         const txCount = (block.originalBlock as FctPreparedBlock).execution_payload_transactions_count;
         tooltip += `Transactions: ${txCount?.toLocaleString() || 0}<br/>`;
-        tooltip += `Version: ${block.clientVersion}`;
       }
 
       return tooltip;
@@ -204,7 +203,7 @@ export function PreparedBlocksComparisonChart({
   // Handle empty data
   if (preparedBlocks.length === 0) {
     return (
-      <PopoutCard title="Prepared Blocks Comparison" modalSize="full">
+      <PopoutCard title="Prepared Blocks Comparison" anchorId="prepared-blocks" modalSize="full">
         {({ inModal }) => (
           <div
             className={
@@ -226,19 +225,20 @@ export function PreparedBlocksComparisonChart({
     : undefined;
 
   return (
-    <PopoutCard title="Prepared Blocks Comparison" subtitle={subtitle} modalSize="full">
+    <PopoutCard title="Prepared Blocks Comparison" anchorId="prepared-blocks" subtitle={subtitle} modalSize="full">
       {({ inModal }) => (
         <div className="space-y-4">
           {/* Disclaimer about prepared blocks */}
           <Alert
             variant="info"
-            description="Alternative blocks built by our infrastructure. These blocks were prepared but not selected by the validator."
+            description="Alternative blocks built by nodes the ethPandaOps team operates. This shows the hypothetical rewards of the best prepared block for each execution client compared to the actually proposed block."
           />
 
           {/* Show filter info if blocks were filtered */}
           {filteredCount > 0 && (
             <div className="text-sm text-muted">
-              Showing {stats.preparedBlockCount} blocks prepared before winning bid ({filteredCount} filtered out)
+              Showing {stats.preparedBlockCount} blocks prepared before{' '}
+              {winningBidTimestamp ? 'winning bid' : 'slot start'} ({filteredCount} filtered out)
             </div>
           )}
 

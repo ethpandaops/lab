@@ -30,6 +30,14 @@ export interface SlotData {
    * Block root hash (for navigation)
    */
   blockRoot: string | null;
+  /**
+   * Slot timestamp (Unix timestamp in seconds)
+   */
+  timestamp: number;
+  /**
+   * Proposer entity name (e.g., "Lido", "Coinbase")
+   */
+  proposerEntity: string | null;
 }
 
 /**

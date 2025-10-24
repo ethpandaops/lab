@@ -1,6 +1,2 @@
 export { AttestationCorrectnessChart } from './AttestationCorrectnessChart';
-export type {
-  AttestationCorrectnessChartProps,
-  AttestationCorrectnessData,
-  CorrectnessMetric,
-} from './AttestationCorrectnessChart.types';
+export type { AttestationCorrectnessChartProps, AttestationCorrectnessData } from './AttestationCorrectnessChart.types';

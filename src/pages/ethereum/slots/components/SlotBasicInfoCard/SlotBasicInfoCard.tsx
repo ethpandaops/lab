@@ -1,6 +1,8 @@
 import { type JSX } from 'react';
 import { Card } from '@/components/Layout/Card';
 import { Badge } from '@/components/Elements/Badge';
+import { formatGasWithPercentage } from '@/utils';
+import { formatTimestamp, getRelativeTime } from '@/utils/time';
 import type { SlotBasicInfoCardProps } from './SlotBasicInfoCard.types';
 
 /**
@@ -14,14 +16,20 @@ export function SlotBasicInfoCard({ slot, epoch, data }: SlotBasicInfoCardProps)
   const blobCount = data.blobCount[0];
   const proposerEntity = data.proposerEntity[0];
 
-  // Determine slot status
-  // Note: canonical status would need to be determined from the data
-  // For now, we assume if blockHead exists, the slot is canonical
+  // Determine slot status from proposer data (which has canonical/orphaned/missed status)
   const getSlotStatus = (): { label: string; color: 'green' | 'red' | 'yellow' } => {
-    if (!blockHead) {
+    const statusValue = blockProposer?.status?.toLowerCase();
+
+    if (statusValue === 'canonical') {
+      return { label: 'Canonical', color: 'green' };
+    }
+    if (statusValue === 'orphaned') {
+      return { label: 'Orphaned', color: 'yellow' };
+    }
+    if (statusValue === 'missed' || !blockHead) {
       return { label: 'Missed', color: 'red' };
     }
-    // TODO: Add canonical/orphaned detection when available in API
+    // Default to canonical if we have block data but no status
     return { label: 'Canonical', color: 'green' };
   };
 
@@ -38,13 +46,6 @@ export function SlotBasicInfoCard({ slot, epoch, data }: SlotBasicInfoCardProps)
     if (!value) return 'N/A';
     const ethValue = typeof value === 'string' ? parseFloat(value) : value;
     return `${(ethValue / 1e18).toFixed(4)} ETH`;
-  };
-
-  // Format gas
-  const formatGas = (used?: number | null, limit?: number | null): string => {
-    if (!used || !limit) return 'N/A';
-    const percentage = ((used / limit) * 100).toFixed(1);
-    return `${used.toLocaleString()} / ${limit.toLocaleString()} (${percentage}%)`;
   };
 
   // Create beaconcha.in link for proposer
@@ -66,43 +67,79 @@ export function SlotBasicInfoCard({ slot, epoch, data }: SlotBasicInfoCardProps)
         </div>
       }
     >
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {/* Slot Information Grid - More compact and information-dense layout */}
+      <div className="grid grid-cols-2 gap-x-6 gap-y-4 sm:grid-cols-3 lg:grid-cols-4">
         {/* Slot Number */}
         <div>
-          <dt className="text-sm/6 font-medium text-muted">Slot</dt>
-          <dd className="mt-1 text-base/7 font-semibold text-foreground">{slot.toLocaleString()}</dd>
+          <dt className="text-xs font-medium text-muted">Slot</dt>
+          <dd className="mt-1 text-base/7 font-semibold text-foreground">{slot}</dd>
         </div>
 
         {/* Epoch */}
         <div>
-          <dt className="text-sm/6 font-medium text-muted">Epoch</dt>
-          <dd className="mt-1 text-base/7 font-semibold text-foreground">{epoch.toLocaleString()}</dd>
+          <dt className="text-xs font-medium text-muted">Epoch</dt>
+          <dd className="mt-1 text-base/7 font-semibold text-foreground">{epoch}</dd>
+        </div>
+
+        {/* Slot Timestamp */}
+        <div className="col-span-2">
+          <dt className="text-xs font-medium text-muted">Slot Time</dt>
+          <dd className="mt-1 text-sm text-foreground">
+            {blockHead?.slot_start_date_time
+              ? formatTimestamp(blockHead.slot_start_date_time)
+              : blockProposer?.slot_start_date_time
+                ? formatTimestamp(blockProposer.slot_start_date_time)
+                : 'N/A'}
+          </dd>
+        </div>
+
+        {/* Relative Time */}
+        <div className="col-span-2 sm:col-span-1">
+          <dt className="text-xs font-medium text-muted">Age</dt>
+          <dd className="mt-1 text-sm text-foreground">
+            {blockHead?.slot_start_date_time
+              ? getRelativeTime(blockHead.slot_start_date_time)
+              : blockProposer?.slot_start_date_time
+                ? getRelativeTime(blockProposer.slot_start_date_time)
+                : 'N/A'}
+          </dd>
+        </div>
+
+        {/* Epoch Timestamp */}
+        <div className="col-span-2 sm:col-span-1">
+          <dt className="text-xs font-medium text-muted">Epoch Start</dt>
+          <dd className="mt-1 text-sm text-foreground">
+            {blockHead?.epoch_start_date_time
+              ? formatTimestamp(blockHead.epoch_start_date_time, {
+                  month: 'short',
+                  day: 'numeric',
+                  hour: '2-digit',
+                  minute: '2-digit',
+                })
+              : 'N/A'}
+          </dd>
         </div>
 
         {/* Proposer Index */}
-        <div>
-          <dt className="text-sm/6 font-medium text-muted">Proposer</dt>
-          <dd className="mt-1 text-base/7 font-semibold text-foreground">
-            {blockProposer?.proposer_validator_index ? (
-              <div className="flex flex-col gap-1">
-                <div>
-                  {proposerLink ? (
-                    <a
-                      href={proposerLink}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-primary hover:underline"
-                    >
-                      {blockProposer.proposer_validator_index.toLocaleString()}
-                    </a>
-                  ) : (
-                    blockProposer.proposer_validator_index.toLocaleString()
-                  )}
-                </div>
-                {proposerEntity?.entity && (
-                  <div className="text-sm font-normal text-muted">({proposerEntity.entity})</div>
+        <div className="col-span-2">
+          <dt className="text-xs font-medium text-muted">Proposer</dt>
+          <dd className="mt-1 text-sm text-foreground">
+            {blockProposer?.proposer_validator_index !== undefined ? (
+              <>
+                {proposerLink ? (
+                  <a
+                    href={proposerLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-primary hover:underline"
+                  >
+                    Validator {blockProposer.proposer_validator_index}
+                  </a>
+                ) : (
+                  `Validator ${blockProposer.proposer_validator_index}`
                 )}
-              </div>
+                {proposerEntity?.entity && <span className="ml-2 text-muted">({proposerEntity.entity})</span>}
+              </>
             ) : (
               'N/A'
             )}
@@ -110,38 +147,38 @@ export function SlotBasicInfoCard({ slot, epoch, data }: SlotBasicInfoCardProps)
         </div>
 
         {/* Block Root */}
-        <div>
-          <dt className="text-sm/6 font-medium text-muted">Block Root</dt>
-          <dd className="mt-1 font-mono text-sm/6 text-foreground">{formatBlockRoot(blockHead?.block_root)}</dd>
-        </div>
-
-        {/* Blob Count */}
-        <div>
-          <dt className="text-sm/6 font-medium text-muted">Blobs</dt>
-          <dd className="mt-1 text-base/7 font-semibold text-foreground">
-            {blobCount?.blob_count !== undefined ? `${blobCount.blob_count} blobs` : 'N/A'}
-          </dd>
-        </div>
-
-        {/* MEV Value */}
-        <div>
-          <dt className="text-sm/6 font-medium text-muted">MEV Value</dt>
-          <dd className="mt-1 text-base/7 font-semibold text-foreground">{formatMevValue(blockMev?.value)}</dd>
+        <div className="col-span-2">
+          <dt className="text-xs font-medium text-muted">Block Root</dt>
+          <dd className="mt-1 font-mono text-xs text-foreground">{formatBlockRoot(blockHead?.block_root)}</dd>
         </div>
 
         {/* Execution Block Number */}
         <div>
-          <dt className="text-sm/6 font-medium text-muted">Execution Block</dt>
+          <dt className="text-xs font-medium text-muted">Execution Block</dt>
           <dd className="mt-1 text-base/7 font-semibold text-foreground">
-            {blockHead?.execution_payload_block_number?.toLocaleString() ?? 'N/A'}
+            {blockHead?.execution_payload_block_number ?? 'N/A'}
           </dd>
         </div>
 
-        {/* Gas Used / Limit */}
-        <div className="sm:col-span-2">
-          <dt className="text-sm/6 font-medium text-muted">Gas Used / Limit</dt>
+        {/* Blob Count */}
+        <div>
+          <dt className="text-xs font-medium text-muted">Blobs</dt>
           <dd className="mt-1 text-base/7 font-semibold text-foreground">
-            {formatGas(blockHead?.execution_payload_gas_used, blockHead?.execution_payload_gas_limit)}
+            {blobCount?.blob_count !== undefined && blobCount?.blob_count !== null ? `${blobCount.blob_count}` : '0'}
+          </dd>
+        </div>
+
+        {/* MEV Value */}
+        <div className="col-span-2 sm:col-span-1">
+          <dt className="text-xs font-medium text-muted">MEV Value</dt>
+          <dd className="mt-1 text-base/7 font-semibold text-foreground">{formatMevValue(blockMev?.value)}</dd>
+        </div>
+
+        {/* Gas Used / Limit */}
+        <div className="col-span-2 sm:col-span-3 lg:col-span-1">
+          <dt className="text-xs font-medium text-muted">Gas Used / Limit</dt>
+          <dd className="mt-1 text-sm text-foreground">
+            {formatGasWithPercentage(blockHead?.execution_payload_gas_used, blockHead?.execution_payload_gas_limit)}
           </dd>
         </div>
       </div>

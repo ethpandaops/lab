@@ -3,22 +3,8 @@ import { PopoutCard } from '@/components/Layout/PopoutCard';
 import { ScatterAndLineChart } from '@/components/Charts/ScatterAndLine';
 import type { LineSeries, ScatterSeries } from '@/components/Charts/ScatterAndLine/ScatterAndLine.types';
 import { useThemeColors } from '@/hooks/useThemeColors';
+import { weiToEth } from '@/utils';
 import type { MevBiddingTimelineChartProps, BuilderSeries } from './MevBiddingTimelineChart.types';
-
-/**
- * Convert wei string to ETH number
- * @param weiString - Value in wei as string
- * @returns Value in ETH as number
- */
-function weiToEth(weiString: string): number {
-  try {
-    const wei = BigInt(weiString);
-    const eth = Number(wei) / 1e18;
-    return eth;
-  } catch {
-    return 0;
-  }
-}
 
 /**
  * Truncate a public key for display
@@ -237,7 +223,7 @@ export function MevBiddingTimelineChart({
   // Handle empty data
   if (biddingData.length === 0) {
     return (
-      <PopoutCard title="MEV Bidding Timeline" modalSize="full">
+      <PopoutCard title="MEV Bidding Timeline" anchorId="mev-bidding-timeline" modalSize="full">
         {({ inModal }) => (
           <div
             className={
@@ -258,7 +244,7 @@ export function MevBiddingTimelineChart({
   const subtitle = winningValueDisplay || undefined;
 
   return (
-    <PopoutCard title="MEV Bidding Timeline" subtitle={subtitle} modalSize="full">
+    <PopoutCard title="MEV Bidding Timeline" anchorId="mev-bidding-timeline" subtitle={subtitle} modalSize="full">
       {({ inModal }) => (
         <div className={inModal ? 'h-96' : 'h-72'}>
           <ScatterAndLineChart

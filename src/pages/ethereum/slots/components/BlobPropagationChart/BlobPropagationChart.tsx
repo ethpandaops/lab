@@ -1,16 +1,15 @@
 import { type JSX, useMemo } from 'react';
 import { PopoutCard } from '@/components/Layout/PopoutCard';
-import { ScatterChart } from '@/components/Charts/Scatter';
-import type { ScatterSeries } from '@/components/Charts/Scatter';
-import { BLOB_COLORS } from '@/theme/data-visualization-colors';
+import { BoxPlot, calculateBoxPlotStats } from '@/components/Charts/BoxPlot';
+import type { BoxPlotData } from '@/components/Charts/BoxPlot';
+import { CHART_CATEGORICAL_COLORS } from '@/theme/data-visualization-colors';
 import type { BlobPropagationChartProps } from './BlobPropagationChart.types';
 
 /**
- * BlobPropagationChart - Visualizes blob propagation timing across the network
+ * BlobPropagationChart - Visualizes blob propagation timing distribution across the network
  *
- * Shows blob propagation using a multi-series scatter plot where each blob index
- * is a separate series with distinct colors. Y-axis shows blob index with jitter
- * to display multiple nodes at same time/blob.
+ * Shows blob propagation using box plots where each blob index displays the statistical
+ * distribution (min, Q1, median, Q3, max) of propagation times across all nodes.
  *
  * @example
  * ```tsx
@@ -24,62 +23,83 @@ import type { BlobPropagationChartProps } from './BlobPropagationChart.types';
  * ```
  */
 export function BlobPropagationChart({ blobPropagationData }: BlobPropagationChartProps): JSX.Element {
-  // Process data into scatter series
-  const scatterSeries = useMemo((): ScatterSeries[] => {
+  // Process data into box plot format (single series with multiple data points)
+  const { boxPlotSeries, categories } = useMemo(() => {
     if (blobPropagationData.length === 0) {
-      return [];
+      return { boxPlotSeries: [], categories: [] };
     }
 
-    // Group data by blob index for separate scatter series
-    const blobGroups = new Map<number, Array<[number, number]>>();
+    // Group propagation times by blob index, filtering outliers > 12s
+    const blobGroups = new Map<number, number[]>();
     blobPropagationData.forEach(point => {
       const blobIndex = point.blob_index;
-      if (!blobGroups.has(blobIndex)) {
-        blobGroups.set(blobIndex, []);
+      const timeMs = point.seen_slot_start_diff;
+
+      // Filter out outliers > 12 seconds (12000ms)
+      if (timeMs <= 12000) {
+        if (!blobGroups.has(blobIndex)) {
+          blobGroups.set(blobIndex, []);
+        }
+        blobGroups.get(blobIndex)!.push(timeMs);
       }
-      // X = time in seconds, Y = blob index with jitter
-      const jitter = (Math.random() - 0.5) * 0.3; // ±0.15 jitter
-      blobGroups.get(blobIndex)!.push([point.seen_slot_start_diff / 1000, blobIndex + jitter]);
     });
 
     // Get unique blob indices and sort them
     const blobIndices = Array.from(blobGroups.keys()).sort((a, b) => a - b);
 
-    // Create scatter series for each blob index
-    return blobIndices.map(blobIndex => ({
-      name: `Blob ${blobIndex}`,
-      data: blobGroups.get(blobIndex)!,
-      color: BLOB_COLORS[blobIndex],
-      symbolSize: 7,
-    }));
+    // Calculate stats for each blob with individual colors from theme
+    const allStats = blobIndices.map((blobIndex, idx) => {
+      const times = blobGroups.get(blobIndex)!;
+      const stats = calculateBoxPlotStats(times);
+
+      // Return data point with itemStyle for individual coloring using theme colors
+      const color = CHART_CATEGORICAL_COLORS[idx % CHART_CATEGORICAL_COLORS.length];
+      return {
+        value: stats,
+        itemStyle: {
+          color,
+          borderColor: color,
+        },
+      };
+    });
+
+    // Create categories (blob names)
+    const cats = blobIndices.map(idx => `Blob ${idx}`);
+
+    // Create a single series with all blob data
+    const series: BoxPlotData[] = [
+      {
+        name: 'Blob Propagation',
+        data: allStats as any, // TypeScript workaround for custom data format
+      },
+    ];
+
+    return { boxPlotSeries: series, categories: cats };
   }, [blobPropagationData]);
 
-  const maxBlobIndex = useMemo(() => {
-    if (scatterSeries.length === 0) return 0;
-    return Math.max(...scatterSeries.map(s => parseInt(s.name.split(' ')[1])));
-  }, [scatterSeries]);
-
   // Calculate statistics for header
-  const { blobCount, avgPropagationTime, totalNodes } = useMemo(() => {
+  const { blobCount, medianPropagationTime, totalObservations } = useMemo(() => {
     if (blobPropagationData.length === 0) {
-      return { blobCount: 0, avgPropagationTime: 0, totalNodes: 0 };
+      return { blobCount: 0, medianPropagationTime: 0, totalObservations: 0 };
     }
 
     const uniqueBlobs = new Set(blobPropagationData.map(p => p.blob_index));
-    const total = blobPropagationData.reduce((sum, point) => sum + point.seen_slot_start_diff, 0);
-    const avg = total / blobPropagationData.length;
+
+    // Calculate overall median propagation time
+    const allTimes = blobPropagationData.map(p => p.seen_slot_start_diff).sort((a, b) => a - b);
+    const median = allTimes[Math.floor(allTimes.length / 2)];
 
     return {
       blobCount: uniqueBlobs.size,
-      avgPropagationTime: avg,
-      totalNodes: blobPropagationData.length,
+      medianPropagationTime: median,
+      totalObservations: blobPropagationData.length,
     };
   }, [blobPropagationData]);
 
   // Handle empty data
   if (blobPropagationData.length === 0) {
     return (
-      <PopoutCard title="Blob Propagation" modalSize="xl">
+      <PopoutCard title="Blob Propagation" anchorId="blob-propagation-chart" modalSize="xl">
         {({ inModal }) => (
           <div
             className={
@@ -95,23 +115,21 @@ export function BlobPropagationChart({ blobPropagationData }: BlobPropagationCha
     );
   }
 
-  const subtitle = `${blobCount} ${blobCount === 1 ? 'blob' : 'blobs'} • Avg: ${avgPropagationTime.toFixed(0)}ms • ${totalNodes.toLocaleString()} observations`;
+  const subtitle = `${blobCount} ${blobCount === 1 ? 'blob' : 'blobs'} • Median: ${(medianPropagationTime / 1000).toFixed(2)}s • ${totalObservations.toLocaleString()} observations`;
 
   return (
-    <PopoutCard title="Blob Propagation" subtitle={subtitle} modalSize="xl">
+    <PopoutCard title="Blob Propagation" anchorId="blob-propagation-chart" subtitle={subtitle} modalSize="xl">
       {({ inModal }) => (
         <div className={inModal ? 'h-96' : 'h-72'}>
-          <ScatterChart
-            series={scatterSeries}
-            xAxisTitle="Time from Slot Start (s)"
-            yAxisTitle="Blob Index"
+          <BoxPlot
+            series={boxPlotSeries}
+            categories={categories}
+            yAxisTitle="Propagation Time (s)"
+            yAxisFormatter={(value: number) => `${(value / 1000).toFixed(0)}`}
             height="100%"
-            xMin={0}
-            xMax={12}
-            yMin={-0.5}
-            yMax={maxBlobIndex + 0.5}
-            showLegend={true}
-            legendPosition="bottom"
+            showLegend={false}
+            yMin={0}
+            boxWidth="40%"
           />
         </div>
       )}

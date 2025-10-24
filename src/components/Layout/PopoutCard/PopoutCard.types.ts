@@ -10,7 +10,7 @@ export interface PopoutCardRenderProps {
 
 export interface PopoutCardProps {
   /**
-   * Main title - displayed as clickable header (single line, truncated if too long)
+   * Main title - displayed in card header (single line, truncated if too long)
    */
   title: string;
   /**
@@ -53,4 +53,9 @@ export interface PopoutCardProps {
    * Default: "16/9"
    */
   aspectRatio?: string;
+  /**
+   * Optional anchor ID for deep linking to this card.
+   * When provided, wraps the title with ScrollAnchor for URL-based navigation.
+   */
+  anchorId?: string;
 }

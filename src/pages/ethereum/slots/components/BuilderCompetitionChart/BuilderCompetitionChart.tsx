@@ -2,6 +2,7 @@ import { type JSX, useMemo } from 'react';
 import { PopoutCard } from '@/components/Layout/PopoutCard';
 import { BarChart } from '@/components/Charts/Bar';
 import { useThemeColors } from '@/hooks/useThemeColors';
+import { CHART_CATEGORICAL_COLORS } from '@/theme/data-visualization-colors';
 import type { BuilderCompetitionChartProps, BuilderChartData } from './BuilderCompetitionChart.types';
 
 /**
@@ -47,10 +48,10 @@ export function BuilderCompetitionChart({ builderData, winningBuilder }: Builder
       }))
       .sort((a, b) => b.bidCount - a.bidCount);
 
-    // Create chart data with custom colors
-    const data = processed.map(builder => ({
+    // Create chart data with custom colors from categorical palette
+    const data = processed.map((builder, index) => ({
       value: builder.bidCount,
-      color: builder.isWinner ? themeColors.accent : themeColors.secondary,
+      color: builder.isWinner ? themeColors.accent : CHART_CATEGORICAL_COLORS[index % CHART_CATEGORICAL_COLORS.length],
     }));
 
     const builderNames = processed.map(d => d.name);
@@ -62,7 +63,7 @@ export function BuilderCompetitionChart({ builderData, winningBuilder }: Builder
       totalBids: total,
       processedData: processed,
     };
-  }, [builderData, winningBuilder, themeColors.accent, themeColors.secondary]);
+  }, [builderData, winningBuilder, themeColors.accent]);
 
   // Custom tooltip formatter to show full pubkey and winner badge
   const tooltipFormatter = useMemo(
@@ -79,7 +80,7 @@ export function BuilderCompetitionChart({ builderData, winningBuilder }: Builder
   // Handle empty data
   if (builderData.length === 0) {
     return (
-      <PopoutCard title="Builder Competition" modalSize="xl">
+      <PopoutCard title="Builder Competition" anchorId="builder-competition" modalSize="xl">
         {({ inModal }) => (
           <div
             className={
@@ -98,7 +99,7 @@ export function BuilderCompetitionChart({ builderData, winningBuilder }: Builder
   const subtitle = `${totalBids.toLocaleString()} bids • ${builderData.length} builders`;
 
   return (
-    <PopoutCard title="Builder Competition" subtitle={subtitle} modalSize="xl">
+    <PopoutCard title="Builder Competition" anchorId="builder-competition" subtitle={subtitle} modalSize="xl">
       {({ inModal }) => (
         <div className={inModal ? 'h-96' : 'h-64'}>
           <BarChart
@@ -109,6 +110,7 @@ export function BuilderCompetitionChart({ builderData, winningBuilder }: Builder
             height="100%"
             animationDuration={0}
             tooltipFormatter={tooltipFormatter}
+            showLabel={false}
           />
         </div>
       )}

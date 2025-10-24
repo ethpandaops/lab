@@ -51,6 +51,23 @@ export const PERFORMANCE_TIME_COLORS = {
 } as const;
 
 /**
+ * Categorical color palette for multi-series charts
+ * Used when you need distinct colors for multiple data series
+ * Optimized for visual distinction and accessibility
+ */
+export const CHART_CATEGORICAL_COLORS = [
+  colors.blue[500], // blue-500
+  colors.emerald[500], // emerald-500
+  colors.amber[500], // amber-500
+  colors.red[500], // red-500
+  colors.cyan[500], // cyan-500
+  colors.lime[500], // lime-500
+  colors.orange[500], // orange-500
+  colors.purple[500], // purple-500
+  colors.pink[500], // pink-500
+] as const;
+
+/**
  * Default chart colors for fallback scenarios
  * Used when theme colors are not available (e.g., during initial load)
  * These match the light theme but are theme-agnostic neutral colors

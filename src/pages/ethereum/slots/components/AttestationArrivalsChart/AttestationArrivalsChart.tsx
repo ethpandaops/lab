@@ -72,7 +72,7 @@ export function AttestationArrivalsChart({
   // Handle empty data
   if (attestationData.length === 0) {
     return (
-      <PopoutCard title="Attestation Arrivals" modalSize="xl">
+      <PopoutCard title="Attestation Arrivals" anchorId="attestation-arrivals" modalSize="xl">
         {({ inModal }) => (
           <div
             className={
@@ -89,7 +89,12 @@ export function AttestationArrivalsChart({
   }
 
   return (
-    <PopoutCard title="Attestation Arrivals" subtitle={participationMessage} modalSize="xl">
+    <PopoutCard
+      title="Attestation Arrivals"
+      anchorId="attestation-arrivals"
+      subtitle={participationMessage}
+      modalSize="xl"
+    >
       {({ inModal }) => (
         <div className={inModal ? 'h-96' : 'h-64'}>
           <LineChart

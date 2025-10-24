@@ -7,6 +7,7 @@ import {
   fctBlockHeadServiceListOptions,
   fctBlockProposerServiceListOptions,
   fctBlockBlobCountServiceListOptions,
+  fctBlockProposerEntityServiceListOptions,
 } from '@/api/@tanstack/react-query.gen';
 import type { UseSlotsDataReturn, SlotData } from './useSlotsData.types';
 
@@ -109,16 +110,30 @@ export function useSlotsData(): UseSlotsDataReturn {
     enabled: startTimestamp > 0 && endTimestamp > 0,
   });
 
+  // Fetch proposer entity data
+  const proposerEntityQuery = useQuery({
+    ...fctBlockProposerEntityServiceListOptions({
+      query: {
+        slot_start_date_time_gte: startTimestamp,
+        slot_start_date_time_lte: endTimestamp,
+        page_size: SLOTS_TO_SHOW,
+      },
+    }),
+    enabled: startTimestamp > 0 && endTimestamp > 0,
+  });
+
   // Aggregate loading state
-  const isLoading = blockHeadQuery.isLoading || proposerQuery.isLoading || blobCountQuery.isLoading;
+  const isLoading =
+    blockHeadQuery.isLoading || proposerQuery.isLoading || blobCountQuery.isLoading || proposerEntityQuery.isLoading;
 
   // Aggregate errors (only report the first error)
   const error = useMemo(() => {
     if (blockHeadQuery.error) return blockHeadQuery.error as Error;
     if (proposerQuery.error) return proposerQuery.error as Error;
     if (blobCountQuery.error) return blobCountQuery.error as Error;
+    if (proposerEntityQuery.error) return proposerEntityQuery.error as Error;
     return null;
-  }, [blockHeadQuery.error, proposerQuery.error, blobCountQuery.error]);
+  }, [blockHeadQuery.error, proposerQuery.error, blobCountQuery.error, proposerEntityQuery.error]);
 
   // Combine data from all queries
   const slots = useMemo(() => {
@@ -131,9 +146,13 @@ export function useSlotsData(): UseSlotsDataReturn {
       const proposerData = proposerQuery.data?.fct_block_proposer?.find(p => p.slot === slot);
       const blobData = blobCountQuery.data?.fct_block_blob_count?.find(b => b.slot === slot);
       const blockData = blockHeadQuery.data?.fct_block_head?.find(b => b.slot === slot);
+      const entityData = proposerEntityQuery.data?.fct_block_proposer_entity?.find(e => e.slot === slot);
 
       // Determine if slot has data (check if we have block data OR proposer data)
       const hasData = Boolean(proposerData || blockData);
+
+      // Calculate timestamp for this slot
+      const timestamp = currentNetwork?.genesis_time ? slotToTimestamp(slot, currentNetwork.genesis_time) : 0;
 
       allSlots.push({
         slot,
@@ -143,11 +162,21 @@ export function useSlotsData(): UseSlotsDataReturn {
         status: proposerData?.status ?? null,
         hasData,
         blockRoot: proposerData?.block_root ?? blockData?.block_root ?? null,
+        timestamp,
+        proposerEntity: entityData?.entity ?? null,
       });
     }
 
     return allSlots;
-  }, [startSlot, endSlot, blockHeadQuery.data, proposerQuery.data, blobCountQuery.data]);
+  }, [
+    startSlot,
+    endSlot,
+    blockHeadQuery.data,
+    proposerQuery.data,
+    blobCountQuery.data,
+    proposerEntityQuery.data,
+    currentNetwork,
+  ]);
 
   return {
     slots,

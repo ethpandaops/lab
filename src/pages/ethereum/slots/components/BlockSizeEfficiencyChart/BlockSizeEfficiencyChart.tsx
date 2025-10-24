@@ -66,7 +66,7 @@ export function BlockSizeEfficiencyChart({ blockHead }: BlockSizeEfficiencyChart
   // Handle empty data
   if (!metrics) {
     return (
-      <PopoutCard title="Block Size & Efficiency" modalSize="lg">
+      <PopoutCard title="Block Size & Efficiency" anchorId="block-size-efficiency" modalSize="lg">
         {({ inModal }) => (
           <div
             className={
@@ -85,7 +85,7 @@ export function BlockSizeEfficiencyChart({ blockHead }: BlockSizeEfficiencyChart
   const subtitle = `${formatNumber(metrics.transactionCount)} transactions`;
 
   return (
-    <PopoutCard title="Block Size & Efficiency" subtitle={subtitle} modalSize="lg">
+    <PopoutCard title="Block Size & Efficiency" anchorId="block-size-efficiency" subtitle={subtitle} modalSize="lg">
       {({ inModal }) => (
         <div className={inModal ? 'grid h-80 grid-cols-2 gap-6' : 'grid grid-cols-2 gap-6'}>
           {/* Transaction Count */}
