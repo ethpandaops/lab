@@ -147,6 +147,12 @@ import type {
   FctBlockServiceListData,
   FctBlockServiceListErrors,
   FctBlockServiceListResponses,
+  FctHeadFirstSeenByNodeServiceGetData,
+  FctHeadFirstSeenByNodeServiceGetErrors,
+  FctHeadFirstSeenByNodeServiceGetResponses,
+  FctHeadFirstSeenByNodeServiceListData,
+  FctHeadFirstSeenByNodeServiceListErrors,
+  FctHeadFirstSeenByNodeServiceListResponses,
   FctMevBidCountByBuilderServiceGetData,
   FctMevBidCountByBuilderServiceGetErrors,
   FctMevBidCountByBuilderServiceGetResponses,
@@ -347,6 +353,10 @@ import {
   zFctBlockServiceGetResponse,
   zFctBlockServiceListData,
   zFctBlockServiceListResponse,
+  zFctHeadFirstSeenByNodeServiceGetData,
+  zFctHeadFirstSeenByNodeServiceGetResponse,
+  zFctHeadFirstSeenByNodeServiceListData,
+  zFctHeadFirstSeenByNodeServiceListResponse,
   zFctMevBidCountByBuilderServiceGetData,
   zFctMevBidCountByBuilderServiceGetResponse,
   zFctMevBidCountByBuilderServiceListData,
@@ -1552,6 +1562,54 @@ export const fctBlockProposerHeadServiceGet = <ThrowOnError extends boolean = fa
       return await zFctBlockProposerHeadServiceGetResponse.parseAsync(data);
     },
     url: '/api/v1/fct_block_proposer_head/{slot_start_date_time}',
+    ...options,
+  });
+};
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctHeadFirstSeenByNodeServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctHeadFirstSeenByNodeServiceListData, ThrowOnError>
+) => {
+  return (options?.client ?? client).get<
+    FctHeadFirstSeenByNodeServiceListResponses,
+    FctHeadFirstSeenByNodeServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => {
+      return await zFctHeadFirstSeenByNodeServiceListData.parseAsync(data);
+    },
+    responseValidator: async data => {
+      return await zFctHeadFirstSeenByNodeServiceListResponse.parseAsync(data);
+    },
+    url: '/api/v1/fct_head_first_seen_by_node',
+    ...options,
+  });
+};
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by slot_start_date_time
+ */
+export const fctHeadFirstSeenByNodeServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctHeadFirstSeenByNodeServiceGetData, ThrowOnError>
+) => {
+  return (options.client ?? client).get<
+    FctHeadFirstSeenByNodeServiceGetResponses,
+    FctHeadFirstSeenByNodeServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => {
+      return await zFctHeadFirstSeenByNodeServiceGetData.parseAsync(data);
+    },
+    responseValidator: async data => {
+      return await zFctHeadFirstSeenByNodeServiceGetResponse.parseAsync(data);
+    },
+    url: '/api/v1/fct_head_first_seen_by_node/{slot_start_date_time}',
     ...options,
   });
 };

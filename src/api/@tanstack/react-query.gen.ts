@@ -52,6 +52,8 @@ import {
   fctBlockProposerServiceList,
   fctBlockServiceGet,
   fctBlockServiceList,
+  fctHeadFirstSeenByNodeServiceGet,
+  fctHeadFirstSeenByNodeServiceList,
   fctMevBidCountByBuilderServiceGet,
   fctMevBidCountByBuilderServiceList,
   fctMevBidCountByRelayServiceGet,
@@ -137,6 +139,8 @@ import type {
   FctBlockProposerServiceListData,
   FctBlockServiceGetData,
   FctBlockServiceListData,
+  FctHeadFirstSeenByNodeServiceGetData,
+  FctHeadFirstSeenByNodeServiceListData,
   FctMevBidCountByBuilderServiceGetData,
   FctMevBidCountByBuilderServiceListData,
   FctMevBidCountByRelayServiceGetData,
@@ -1381,6 +1385,52 @@ export const fctBlockProposerHeadServiceGetOptions = (options: Options<FctBlockP
       return data;
     },
     queryKey: fctBlockProposerHeadServiceGetQueryKey(options),
+  });
+};
+
+export const fctHeadFirstSeenByNodeServiceListQueryKey = (options?: Options<FctHeadFirstSeenByNodeServiceListData>) =>
+  createQueryKey('fctHeadFirstSeenByNodeServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctHeadFirstSeenByNodeServiceListOptions = (options?: Options<FctHeadFirstSeenByNodeServiceListData>) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctHeadFirstSeenByNodeServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctHeadFirstSeenByNodeServiceListQueryKey(options),
+  });
+};
+
+export const fctHeadFirstSeenByNodeServiceGetQueryKey = (options: Options<FctHeadFirstSeenByNodeServiceGetData>) =>
+  createQueryKey('fctHeadFirstSeenByNodeServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by slot_start_date_time
+ */
+export const fctHeadFirstSeenByNodeServiceGetOptions = (options: Options<FctHeadFirstSeenByNodeServiceGetData>) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctHeadFirstSeenByNodeServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctHeadFirstSeenByNodeServiceGetQueryKey(options),
   });
 };
 
