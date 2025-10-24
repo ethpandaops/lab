@@ -1,5 +1,5 @@
 import { type JSX, useMemo } from 'react';
-import { Card } from '@/components/Layout/Card';
+import { PopoutCard } from '@/components/Layout/PopoutCard';
 import { LineChart } from '@/components/Charts/Line';
 import type { AttestationArrivalsChartProps } from './AttestationArrivalsChart.types';
 
@@ -72,41 +72,44 @@ export function AttestationArrivalsChart({
   // Handle empty data
   if (attestationData.length === 0) {
     return (
-      <Card header={<h3 className="text-lg/7 font-semibold text-foreground">Attestation Arrivals</h3>}>
-        <div className="flex h-64 items-center justify-center text-muted">
-          <p>No attestation data available</p>
-        </div>
-      </Card>
+      <PopoutCard title="Attestation Arrivals" modalSize="xl">
+        {({ inModal }) => (
+          <div
+            className={
+              inModal
+                ? 'flex min-h-[500px] items-center justify-center text-muted'
+                : 'flex h-64 items-center justify-center text-muted'
+            }
+          >
+            <p>No attestation data available</p>
+          </div>
+        )}
+      </PopoutCard>
     );
   }
 
   return (
-    <Card
-      header={
-        <div className="flex items-center justify-between gap-4">
-          <h3 className="text-lg/7 font-semibold text-foreground">Attestation Arrivals</h3>
-          <span className="truncate text-sm whitespace-nowrap text-muted">{participationMessage}</span>
+    <PopoutCard title="Attestation Arrivals" subtitle={participationMessage} modalSize="xl">
+      {({ inModal }) => (
+        <div className={inModal ? 'min-h-[500px]' : 'h-64'}>
+          <LineChart
+            data={values}
+            labels={labels}
+            height="100%"
+            smooth={false}
+            showArea={true}
+            yMax={maxCount}
+            connectNulls={false}
+            animationDuration={150}
+            xAxisLabelInterval={labelInterval}
+            title="Attestation Count"
+            titleFontSize={12}
+            titleFontWeight={500}
+            titleLeft="left"
+            titleTop={4}
+          />
         </div>
-      }
-    >
-      <div className="h-64">
-        <LineChart
-          data={values}
-          labels={labels}
-          height="100%"
-          smooth={false}
-          showArea={true}
-          yMax={maxCount}
-          connectNulls={false}
-          animationDuration={150}
-          xAxisLabelInterval={labelInterval}
-          title="Attestation Count"
-          titleFontSize={12}
-          titleFontWeight={500}
-          titleLeft="left"
-          titleTop={4}
-        />
-      </div>
-    </Card>
+      )}
+    </PopoutCard>
   );
 }

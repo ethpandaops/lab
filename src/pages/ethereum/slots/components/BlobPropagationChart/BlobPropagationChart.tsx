@@ -1,7 +1,7 @@
 import { type JSX, useMemo } from 'react';
 import ReactECharts from 'echarts-for-react';
 import type { EChartsOption } from 'echarts';
-import { Card } from '@/components/Layout/Card';
+import { PopoutCard } from '@/components/Layout/PopoutCard';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { BLOB_COLORS } from '@/theme/data-visualization-colors';
 import type { BlobPropagationChartProps } from './BlobPropagationChart.types';
@@ -193,34 +193,36 @@ export function BlobPropagationChart({ blobPropagationData }: BlobPropagationCha
   // Handle empty data
   if (blobPropagationData.length === 0) {
     return (
-      <Card header={<h3 className="text-lg/7 font-semibold text-foreground">Blob Propagation</h3>}>
-        <div className="flex h-72 items-center justify-center text-muted">
-          <p>No blob propagation data available</p>
-        </div>
-      </Card>
+      <PopoutCard title="Blob Propagation" modalSize="xl">
+        {({ inModal }) => (
+          <div
+            className={
+              inModal
+                ? 'flex min-h-[600px] items-center justify-center text-muted'
+                : 'flex h-72 items-center justify-center text-muted'
+            }
+          >
+            <p>No blob propagation data available</p>
+          </div>
+        )}
+      </PopoutCard>
     );
   }
 
+  const subtitle = `${blobCount} ${blobCount === 1 ? 'blob' : 'blobs'} • Avg: ${avgPropagationTime.toFixed(0)}ms • ${totalNodes.toLocaleString()} observations`;
+
   return (
-    <Card
-      header={
-        <div className="flex items-center justify-between">
-          <h3 className="text-lg/7 font-semibold text-foreground">Blob Propagation</h3>
-          <span className="text-sm text-muted">
-            {blobCount} {blobCount === 1 ? 'blob' : 'blobs'} • Avg: {avgPropagationTime.toFixed(0)}ms •{' '}
-            {totalNodes.toLocaleString()} observations
-          </span>
+    <PopoutCard title="Blob Propagation" subtitle={subtitle} modalSize="xl">
+      {({ inModal }) => (
+        <div className={inModal ? 'min-h-[600px]' : 'h-72'}>
+          <ReactECharts
+            option={chartOption}
+            style={{ height: '100%', width: '100%' }}
+            notMerge={false}
+            lazyUpdate={true}
+          />
         </div>
-      }
-    >
-      <div className="h-72">
-        <ReactECharts
-          option={chartOption}
-          style={{ height: '100%', width: '100%' }}
-          notMerge={false}
-          lazyUpdate={true}
-        />
-      </div>
-    </Card>
+      )}
+    </PopoutCard>
   );
 }

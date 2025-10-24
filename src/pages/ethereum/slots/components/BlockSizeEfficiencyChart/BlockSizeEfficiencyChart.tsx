@@ -1,5 +1,5 @@
 import { type JSX, useMemo } from 'react';
-import { Card } from '@/components/Layout/Card';
+import { PopoutCard } from '@/components/Layout/PopoutCard';
 import type { BlockSizeEfficiencyChartProps, BlockMetrics } from './BlockSizeEfficiencyChart.types';
 
 /**
@@ -66,53 +66,62 @@ export function BlockSizeEfficiencyChart({ blockHead }: BlockSizeEfficiencyChart
   // Handle empty data
   if (!metrics) {
     return (
-      <Card header={<h3 className="text-lg/7 font-semibold text-foreground">Block Size & Efficiency</h3>}>
-        <div className="flex h-48 items-center justify-center text-muted">
-          <p>No execution payload data available</p>
-        </div>
-      </Card>
+      <PopoutCard title="Block Size & Efficiency" modalSize="lg">
+        {({ inModal }) => (
+          <div
+            className={
+              inModal
+                ? 'flex min-h-[400px] items-center justify-center text-muted'
+                : 'flex h-48 items-center justify-center text-muted'
+            }
+          >
+            <p>No execution payload data available</p>
+          </div>
+        )}
+      </PopoutCard>
     );
   }
 
+  const subtitle = `${formatNumber(metrics.transactionCount)} transactions`;
+
   return (
-    <Card
-      header={
-        <div className="flex items-center justify-between">
-          <h3 className="text-lg/7 font-semibold text-foreground">Block Size & Efficiency</h3>
-          <span className="text-sm text-muted">{formatNumber(metrics.transactionCount)} transactions</span>
-        </div>
-      }
-    >
-      <div className="grid grid-cols-2 gap-6">
-        {/* Transaction Count */}
-        <div>
-          <dt className="text-sm/6 font-medium text-muted">Transactions</dt>
-          <dd className="mt-1 text-2xl/8 font-semibold text-foreground">{formatNumber(metrics.transactionCount)}</dd>
-        </div>
+    <PopoutCard title="Block Size & Efficiency" subtitle={subtitle} modalSize="lg">
+      {({ inModal }) => (
+        <div className={inModal ? 'grid min-h-[400px] grid-cols-2 gap-6' : 'grid grid-cols-2 gap-6'}>
+          {/* Transaction Count */}
+          <div>
+            <dt className="text-sm/6 font-medium text-muted">Transactions</dt>
+            <dd className="mt-1 text-2xl/8 font-semibold text-foreground">{formatNumber(metrics.transactionCount)}</dd>
+          </div>
 
-        {/* Gas Utilization */}
-        <div>
-          <dt className="text-sm/6 font-medium text-muted">Gas Utilization</dt>
-          <dd className="mt-1 text-2xl/8 font-semibold text-foreground">{formatPercentage(metrics.gasUtilization)}</dd>
-          <dd className="mt-1 text-xs/5 text-muted">
-            {formatNumber(metrics.gasUsed)} / {formatNumber(metrics.gasLimit)}
-          </dd>
-        </div>
+          {/* Gas Utilization */}
+          <div>
+            <dt className="text-sm/6 font-medium text-muted">Gas Utilization</dt>
+            <dd className="mt-1 text-2xl/8 font-semibold text-foreground">
+              {formatPercentage(metrics.gasUtilization)}
+            </dd>
+            <dd className="mt-1 text-xs/5 text-muted">
+              {formatNumber(metrics.gasUsed)} / {formatNumber(metrics.gasLimit)}
+            </dd>
+          </div>
 
-        {/* Total Bytes */}
-        <div>
-          <dt className="text-sm/6 font-medium text-muted">Total Bytes</dt>
-          <dd className="mt-1 text-2xl/8 font-semibold text-foreground">{formatBytes(metrics.totalBytes)}</dd>
-          <dd className="mt-1 text-xs/5 text-muted">{formatNumber(metrics.totalBytes)} bytes</dd>
-        </div>
+          {/* Total Bytes */}
+          <div>
+            <dt className="text-sm/6 font-medium text-muted">Total Bytes</dt>
+            <dd className="mt-1 text-2xl/8 font-semibold text-foreground">{formatBytes(metrics.totalBytes)}</dd>
+            <dd className="mt-1 text-xs/5 text-muted">{formatNumber(metrics.totalBytes)} bytes</dd>
+          </div>
 
-        {/* Bytes per Transaction (Efficiency) */}
-        <div>
-          <dt className="text-sm/6 font-medium text-muted">Avg Bytes/Tx</dt>
-          <dd className="mt-1 text-2xl/8 font-semibold text-foreground">{formatBytes(metrics.bytesPerTransaction)}</dd>
-          <dd className="mt-1 text-xs/5 text-muted">Efficiency metric</dd>
+          {/* Bytes per Transaction (Efficiency) */}
+          <div>
+            <dt className="text-sm/6 font-medium text-muted">Avg Bytes/Tx</dt>
+            <dd className="mt-1 text-2xl/8 font-semibold text-foreground">
+              {formatBytes(metrics.bytesPerTransaction)}
+            </dd>
+            <dd className="mt-1 text-xs/5 text-muted">Efficiency metric</dd>
+          </div>
         </div>
-      </div>
-    </Card>
+      )}
+    </PopoutCard>
   );
 }

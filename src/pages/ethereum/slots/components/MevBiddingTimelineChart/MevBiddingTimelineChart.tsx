@@ -1,6 +1,6 @@
 import { type JSX, useMemo } from 'react';
 import ReactECharts from 'echarts-for-react';
-import { Card } from '@/components/Layout/Card';
+import { PopoutCard } from '@/components/Layout/PopoutCard';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import type { MevBiddingTimelineChartProps, BuilderSeries } from './MevBiddingTimelineChart.types';
 
@@ -54,17 +54,20 @@ function generateBuilderColor(
 }
 
 /**
- * MevBiddingTimelineChart - Visualizes MEV bid evolution over the slot duration
+ * MevBiddingTimelineChart - Visualizes MEV bid evolution before and during the slot
  *
- * Shows how MEV bids from different builders evolved during the 12-second slot window,
- * with each builder represented as a separate line series. Highlights the winning bid.
+ * Shows how MEV bids from different builders evolved from 8 seconds before slot start
+ * to 4 seconds after, with each builder represented as a separate line series.
+ * Highlights the winning bid.
+ *
+ * Timeline: -8s to +4s (relative to slot start at 0s)
  *
  * @example
  * ```tsx
  * <MevBiddingTimelineChart
  *   biddingData={[
  *     {
- *       chunk_slot_start_diff: 0,
+ *       chunk_slot_start_diff: -2000, // 2s before slot start
  *       value: "1000000000000000000", // 1 ETH in wei
  *       builder_pubkey: "0xabc...",
  *       relay_names: ["Flashbots"],
@@ -84,9 +87,9 @@ export function MevBiddingTimelineChart({
   const themeColors = useThemeColors();
 
   // Process data into builder series
-  const { builderSeries, totalBids, uniqueBuilders, maxValue, winningBidTime } = useMemo(() => {
+  const { builderSeries, maxValue, winningBidTime } = useMemo(() => {
     if (biddingData.length === 0) {
-      return { builderSeries: [], totalBids: 0, uniqueBuilders: 0, maxValue: 0, winningBidTime: null };
+      return { builderSeries: [], maxValue: 0, winningBidTime: null };
     }
 
     // Group bids by builder
@@ -159,8 +162,6 @@ export function MevBiddingTimelineChart({
 
     return {
       builderSeries: series,
-      totalBids: biddingData.length,
-      uniqueBuilders: builderMap.size,
       maxValue: max,
       winningBidTime: actualWinningBidTime,
     };
@@ -189,13 +190,16 @@ export function MevBiddingTimelineChart({
           color: themeColors.muted,
           fontSize: 12,
         },
-        min: 0,
-        max: 12000,
+        min: -8000,
+        max: 4000,
         interval: 2000,
         axisLabel: {
           color: themeColors.muted,
           fontSize: 12,
-          formatter: (value: number) => `${(value / 1000).toFixed(1)}s`,
+          formatter: (value: number) => {
+            const seconds = value / 1000;
+            return seconds >= 0 ? `+${seconds.toFixed(1)}s` : `${seconds.toFixed(1)}s`;
+          },
         },
         axisLine: {
           lineStyle: {
@@ -250,9 +254,10 @@ export function MevBiddingTimelineChart({
           if (!Array.isArray(params) || params.length === 0) return '';
 
           const timeMs = (params[0] as { value: [number, number] }).value[0];
-          const timeSec = (timeMs / 1000).toFixed(2);
+          const timeSec = timeMs / 1000;
+          const timeDisplay = timeSec >= 0 ? `+${timeSec.toFixed(2)}s` : `${timeSec.toFixed(2)}s`;
 
-          let tooltip = `<div style="font-weight: 600; margin-bottom: 8px;">Time: ${timeSec}s</div>`;
+          let tooltip = `<div style="font-weight: 600; margin-bottom: 8px;">Time: ${timeDisplay}</div>`;
 
           params.forEach((param: unknown) => {
             const typedParam = param as {
@@ -338,54 +343,38 @@ export function MevBiddingTimelineChart({
   // Handle empty data
   if (biddingData.length === 0) {
     return (
-      <Card header={<h3 className="text-lg/7 font-semibold text-foreground">MEV Bidding Timeline</h3>}>
-        <div className="flex h-80 items-center justify-center text-muted">
-          <p>No MEV bidding data available</p>
-        </div>
-      </Card>
+      <PopoutCard title="MEV Bidding Timeline" modalSize="full">
+        {({ inModal }) => (
+          <div
+            className={
+              inModal
+                ? 'flex min-h-[700px] items-center justify-center text-muted'
+                : 'flex h-80 items-center justify-center text-muted'
+            }
+          >
+            <p>No MEV bidding data available</p>
+          </div>
+        )}
+      </PopoutCard>
     );
   }
 
-  // Format winning builder for display
-  const winningBuilderDisplay = winningBuilder ? truncatePubkey(winningBuilder) : 'Unknown';
-  const winningValueDisplay = winningMevValue ? `${weiToEth(winningMevValue).toFixed(4)} ETH` : 'Unknown';
+  // Format subtitle with just the winning value
+  const winningValueDisplay = winningMevValue ? `${weiToEth(winningMevValue).toFixed(4)} ETH` : null;
+  const subtitle = winningValueDisplay || undefined;
 
   return (
-    <Card
-      header={
-        <div className="flex flex-col gap-2">
-          <div className="flex items-center justify-between">
-            <h3 className="text-lg/7 font-semibold text-foreground">MEV Bidding Timeline</h3>
-            <div className="flex gap-4 text-sm text-muted">
-              <span>
-                <span className="font-medium text-foreground">{totalBids.toLocaleString()}</span> bids
-              </span>
-              <span>
-                <span className="font-medium text-foreground">{uniqueBuilders}</span> builders
-              </span>
-            </div>
-          </div>
-          {winningBuilder && (
-            <div className="flex gap-4 text-sm text-muted">
-              <span>
-                Winner: <span className="font-medium text-foreground">{winningBuilderDisplay}</span>
-              </span>
-              <span>
-                Value: <span className="font-medium text-success">{winningValueDisplay}</span>
-              </span>
-            </div>
-          )}
+    <PopoutCard title="MEV Bidding Timeline" subtitle={subtitle} modalSize="full">
+      {({ inModal }) => (
+        <div className={inModal ? 'min-h-[700px]' : 'h-72'}>
+          <ReactECharts
+            option={chartOption}
+            style={{ height: '100%', width: '100%' }}
+            notMerge={false}
+            lazyUpdate={true}
+          />
         </div>
-      }
-    >
-      <div className="h-72">
-        <ReactECharts
-          option={chartOption}
-          style={{ height: '100%', width: '100%' }}
-          notMerge={false}
-          lazyUpdate={true}
-        />
-      </div>
-    </Card>
+      )}
+    </PopoutCard>
   );
 }

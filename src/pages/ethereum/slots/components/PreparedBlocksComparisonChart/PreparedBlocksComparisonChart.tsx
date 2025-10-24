@@ -1,7 +1,7 @@
 import { type JSX, useMemo } from 'react';
 import ReactECharts from 'echarts-for-react';
 import type { EChartsOption } from 'echarts';
-import { Card } from '@/components/Layout/Card';
+import { PopoutCard } from '@/components/Layout/PopoutCard';
 import { Alert } from '@/components/Feedback/Alert';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import type {
@@ -292,52 +292,54 @@ export function PreparedBlocksComparisonChart({
   // Handle empty data
   if (preparedBlocks.length === 0) {
     return (
-      <Card header={<h3 className="text-lg/7 font-semibold text-foreground">Prepared Blocks Comparison</h3>}>
-        <div className="flex h-72 items-center justify-center text-muted">
-          <p>No prepared blocks available for comparison</p>
-        </div>
-      </Card>
+      <PopoutCard title="Prepared Blocks Comparison" modalSize="full">
+        {({ inModal }) => (
+          <div
+            className={
+              inModal
+                ? 'flex min-h-[600px] items-center justify-center text-muted'
+                : 'flex h-72 items-center justify-center text-muted'
+            }
+          >
+            <p>No prepared blocks available for comparison</p>
+          </div>
+        )}
+      </PopoutCard>
     );
   }
 
-  // Render card header with statistics
-  const renderHeader = (): JSX.Element => (
-    <div className="flex items-center justify-between">
-      <h3 className="text-lg/7 font-semibold text-foreground">Prepared Blocks Comparison</h3>
-      {stats.bestClientName && (
-        <span className="text-sm text-muted">
-          {stats.preparedBlockCount} prepared blocks • Best: {stats.bestClientName} (
-          {stats.bestPreparedRewardEth.toFixed(2)} ETH)
-        </span>
-      )}
-    </div>
-  );
+  // Build subtitle with statistics
+  const subtitle = stats.bestClientName
+    ? `${stats.preparedBlockCount} prepared blocks • Best: ${stats.bestClientName} (${stats.bestPreparedRewardEth.toFixed(2)} ETH)`
+    : undefined;
 
   return (
-    <Card header={renderHeader()}>
-      <div className="space-y-4">
-        {/* Disclaimer about prepared blocks */}
-        <Alert
-          variant="info"
-          description="Alternative blocks built by our infrastructure. These blocks were prepared but not selected by the validator."
-        />
-
-        {/* Show filter info if blocks were filtered */}
-        {filteredCount > 0 && (
-          <div className="text-sm text-muted">
-            Showing {stats.preparedBlockCount} blocks prepared before winning bid ({filteredCount} filtered out)
-          </div>
-        )}
-
-        <div className="h-72">
-          <ReactECharts
-            option={chartOption}
-            style={{ height: '100%', width: '100%' }}
-            notMerge={false}
-            lazyUpdate={true}
+    <PopoutCard title="Prepared Blocks Comparison" subtitle={subtitle} modalSize="full">
+      {({ inModal }) => (
+        <div className="space-y-4">
+          {/* Disclaimer about prepared blocks */}
+          <Alert
+            variant="info"
+            description="Alternative blocks built by our infrastructure. These blocks were prepared but not selected by the validator."
           />
+
+          {/* Show filter info if blocks were filtered */}
+          {filteredCount > 0 && (
+            <div className="text-sm text-muted">
+              Showing {stats.preparedBlockCount} blocks prepared before winning bid ({filteredCount} filtered out)
+            </div>
+          )}
+
+          <div className={inModal ? 'min-h-[600px]' : 'h-72'}>
+            <ReactECharts
+              option={chartOption}
+              style={{ height: '100%', width: '100%' }}
+              notMerge={false}
+              lazyUpdate={true}
+            />
+          </div>
         </div>
-      </div>
-    </Card>
+      )}
+    </PopoutCard>
   );
 }

@@ -1,7 +1,7 @@
 import { type JSX, useMemo } from 'react';
 import ReactECharts from 'echarts-for-react';
 import type { EChartsOption } from 'echarts';
-import { Card } from '@/components/Layout/Card';
+import { PopoutCard } from '@/components/Layout/PopoutCard';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { CONTINENT_COLORS } from '@/theme/data-visualization-colors';
 import type { BlockPropagationChartProps } from './BlockPropagationChart.types';
@@ -221,27 +221,36 @@ export function BlockPropagationChart({ blockPropagationData }: BlockPropagation
   // Handle empty data
   if (blockPropagationData.length === 0) {
     return (
-      <Card header={<h3 className="text-lg/7 font-semibold text-foreground">Block Propagation</h3>}>
-        <div className="flex h-72 items-center justify-center text-muted">
-          <p>No block propagation data available</p>
-        </div>
-      </Card>
+      <PopoutCard title="Block Propagation" modalSize="xl">
+        {({ inModal }) => (
+          <div
+            className={
+              inModal
+                ? 'flex min-h-[600px] items-center justify-center text-muted'
+                : 'flex h-72 items-center justify-center text-muted'
+            }
+          >
+            <p>No block propagation data available</p>
+          </div>
+        )}
+      </PopoutCard>
     );
   }
 
+  const subtitle = `Avg: ${avgPropagationTime.toFixed(0)}ms across ${blockPropagationData.length.toLocaleString()} nodes`;
+
   return (
-    <Card
-      title="Block Propagation"
-      description={`Avg: ${avgPropagationTime.toFixed(0)}ms across ${blockPropagationData.length.toLocaleString()} nodes`}
-    >
-      <div className="h-72">
-        <ReactECharts
-          option={chartOption}
-          style={{ height: '100%', width: '100%' }}
-          notMerge={false}
-          lazyUpdate={true}
-        />
-      </div>
-    </Card>
+    <PopoutCard title="Block Propagation" subtitle={subtitle} modalSize="xl">
+      {({ inModal }) => (
+        <div className={inModal ? 'min-h-[600px]' : 'h-72'}>
+          <ReactECharts
+            option={chartOption}
+            style={{ height: '100%', width: '100%' }}
+            notMerge={false}
+            lazyUpdate={true}
+          />
+        </div>
+      )}
+    </PopoutCard>
   );
 }

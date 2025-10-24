@@ -1,5 +1,5 @@
 import { type JSX, useMemo } from 'react';
-import { Card } from '@/components/Layout/Card';
+import { PopoutCard } from '@/components/Layout/PopoutCard';
 import { Badge } from '@/components/Elements/Badge';
 import type { AttestationCorrectnessChartProps, CorrectnessMetric } from './AttestationCorrectnessChart.types';
 
@@ -106,75 +106,78 @@ export function AttestationCorrectnessChart({ correctnessData }: AttestationCorr
   // Handle no data state
   if (!correctnessData || !metrics) {
     return (
-      <Card header={<h3 className="text-lg/7 font-semibold text-foreground">Attestation Correctness</h3>}>
-        <div className="flex h-64 items-center justify-center text-muted">
-          <p>No attestation correctness data available</p>
-        </div>
-      </Card>
+      <PopoutCard title="Attestation Correctness" modalSize="lg">
+        {({ inModal }) => (
+          <div
+            className={
+              inModal
+                ? 'flex min-h-[400px] items-center justify-center text-muted'
+                : 'flex h-64 items-center justify-center text-muted'
+            }
+          >
+            <p>No attestation correctness data available</p>
+          </div>
+        )}
+      </PopoutCard>
     );
   }
 
+  const subtitle = `${correctnessData.votes_head + correctnessData.votes_other} / ${correctnessData.votes_max} validators`;
+
   return (
-    <Card
-      header={
-        <div className="flex items-center justify-between">
-          <h3 className="text-lg/7 font-semibold text-foreground">Attestation Correctness</h3>
-          <span className="text-sm text-muted">
-            {correctnessData.votes_head + correctnessData.votes_other} / {correctnessData.votes_max} validators
-          </span>
-        </div>
-      }
-    >
-      <div className="space-y-4">
-        {/* Metrics grid */}
-        <dl className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          {metrics.map(metric => (
-            <div key={metric.label} className="flex flex-col gap-2 rounded-sm border border-border bg-surface p-4">
-              {/* Label and badge */}
-              <div className="flex items-center justify-between">
-                <dt className="text-sm font-medium text-muted">{metric.label}</dt>
-                <Badge color={metric.color} variant="flat" size="small">
-                  {formatPercentage(metric.percentage)}
-                </Badge>
-              </div>
+    <PopoutCard title="Attestation Correctness" subtitle={subtitle} modalSize="lg">
+      {({ inModal }) => (
+        <div className={inModal ? 'min-h-[400px] space-y-4' : 'space-y-4'}>
+          {/* Metrics grid */}
+          <dl className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            {metrics.map(metric => (
+              <div key={metric.label} className="flex flex-col gap-2 rounded-sm border border-border bg-surface p-4">
+                {/* Label and badge */}
+                <div className="flex items-center justify-between">
+                  <dt className="text-sm font-medium text-muted">{metric.label}</dt>
+                  <Badge color={metric.color} variant="flat" size="small">
+                    {formatPercentage(metric.percentage)}
+                  </Badge>
+                </div>
 
-              {/* Values */}
-              <dd className="flex items-baseline gap-2">
-                <span className="text-2xl font-semibold text-foreground">{metric.votes.toLocaleString()}</span>
-                <span className="text-sm text-muted">/ {metric.total.toLocaleString()}</span>
-              </dd>
+                {/* Values */}
+                <dd className="flex items-baseline gap-2">
+                  <span className="text-2xl font-semibold text-foreground">{metric.votes.toLocaleString()}</span>
+                  <span className="text-sm text-muted">/ {metric.total.toLocaleString()}</span>
+                </dd>
 
-              {/* Progress bar */}
-              <div className="mt-1 h-2 w-full overflow-hidden rounded-full bg-border">
-                <div
-                  className="h-full rounded-full transition-all duration-300"
-                  style={{
-                    width: `${metric.percentage}%`,
-                    backgroundColor:
-                      metric.color === 'green'
-                        ? 'rgb(34 197 94)' // green-500
-                        : metric.color === 'yellow'
-                          ? 'rgb(234 179 8)' // yellow-500
-                          : metric.color === 'red'
-                            ? 'rgb(239 68 68)' // red-500
-                            : 'rgb(156 163 175)', // gray-400
-                  }}
-                />
+                {/* Progress bar */}
+                <div className="mt-1 h-2 w-full overflow-hidden rounded-full bg-border">
+                  <div
+                    className="h-full rounded-full transition-all duration-300"
+                    style={{
+                      width: `${metric.percentage}%`,
+                      backgroundColor:
+                        metric.color === 'green'
+                          ? 'rgb(34 197 94)' // green-500
+                          : metric.color === 'yellow'
+                            ? 'rgb(234 179 8)' // yellow-500
+                            : metric.color === 'red'
+                              ? 'rgb(239 68 68)' // red-500
+                              : 'rgb(156 163 175)', // gray-400
+                    }}
+                  />
+                </div>
               </div>
+            ))}
+          </dl>
+
+          {/* Additional info for votes on other blocks */}
+          {correctnessData.votes_other > 0 && (
+            <div className="rounded-sm border border-border bg-surface p-3">
+              <p className="text-sm text-muted">
+                <span className="font-medium text-foreground">{correctnessData.votes_other.toLocaleString()}</span>{' '}
+                attestations voted for other blocks
+              </p>
             </div>
-          ))}
-        </dl>
-
-        {/* Additional info for votes on other blocks */}
-        {correctnessData.votes_other > 0 && (
-          <div className="rounded-sm border border-border bg-surface p-3">
-            <p className="text-sm text-muted">
-              <span className="font-medium text-foreground">{correctnessData.votes_other.toLocaleString()}</span>{' '}
-              attestations voted for other blocks
-            </p>
-          </div>
-        )}
-      </div>
-    </Card>
+          )}
+        </div>
+      )}
+    </PopoutCard>
   );
 }
