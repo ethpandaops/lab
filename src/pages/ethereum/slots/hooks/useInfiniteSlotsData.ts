@@ -1,4 +1,4 @@
-import { useMemo, useCallback, useRef, useEffect } from 'react';
+import { useMemo, useCallback, useRef } from 'react';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { useBeaconClock } from '@/hooks/useBeaconClock';
 import { useNetwork } from '@/hooks/useNetwork';
@@ -136,18 +136,16 @@ export function useInfiniteSlotsData(): UseInfiniteSlotsDataReturn {
   const { currentNetwork } = useNetwork();
 
   /**
-   * Anchor slot - set once on mount and never changes.
-   * This ensures stable pagination boundaries and prevents auto-refetching
-   * when the beacon clock advances.
+   * Anchor slot - captured once on mount to create stable pagination boundaries.
+   * We use a session key that changes on mount to force new query with fresh anchor.
    */
   const anchorSlot = useRef<number | null>(null);
+  const sessionKey = useRef<string>(Math.random().toString());
 
   // Set anchor slot once when we have a valid current slot
-  useEffect(() => {
-    if (currentSlot > 0 && anchorSlot.current === null) {
-      anchorSlot.current = currentSlot;
-    }
-  }, [currentSlot]);
+  if (currentSlot > 0 && anchorSlot.current === null) {
+    anchorSlot.current = currentSlot;
+  }
 
   /**
    * Fetch function for a single page of slots data
@@ -239,15 +237,13 @@ export function useInfiniteSlotsData(): UseInfiniteSlotsDataReturn {
    * Infinite query for slots data
    *
    * Key implementation details:
-   * - queryKey uses a stable 'slots' key (no dynamic values) to prevent auto-refetching
-   * - initialPageParam anchors to the slot at mount time
-   * - refetchOnMount: false prevents refetching when component remounts
+   * - queryKey includes sessionKey to create fresh query on each mount
+   * - initialPageParam uses anchor set at mount time for current data
    * - refetchInterval: false disables background polling
    * - refetchOnWindowFocus: false prevents refetch on tab focus
-   * - staleTime: Infinity means data never becomes stale automatically
    */
   const infiniteQuery = useInfiniteQuery({
-    queryKey: ['slots-infinite'],
+    queryKey: ['slots-infinite', sessionKey.current],
     queryFn: async ({ pageParam }) => {
       return fetchSlotsPage(pageParam as PageParam);
     },
@@ -288,11 +284,10 @@ export function useInfiniteSlotsData(): UseInfiniteSlotsDataReturn {
     },
     maxPages: Math.ceil(MAX_SLOTS_IN_MEMORY / SLOTS_PER_PAGE), // Implement windowing
     enabled: currentSlot > 0 && Boolean(currentNetwork?.genesis_time),
-    refetchOnMount: false, // Don't refetch on remount - preserve loaded data
+    refetchOnMount: false, // Disabled - we handle refresh via manual invalidation on mount
     refetchInterval: false, // Disable auto-refresh to maintain stable pagination
     refetchOnWindowFocus: false, // Disable refetch on window focus
     refetchOnReconnect: false, // Disable refetch on reconnect
-    staleTime: Infinity, // Data never becomes stale - only refresh on manual page reload
   });
 
   /**

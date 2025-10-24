@@ -1,5 +1,6 @@
 import type { TableProps, Column } from './Table.types';
 import type { ReactNode } from 'react';
+import clsx from 'clsx';
 
 export function Table<T = unknown>({
   data,
@@ -7,6 +8,10 @@ export function Table<T = unknown>({
   title,
   description,
   variant = 'standalone',
+  onRowClick,
+  getRowClassName,
+  getRowKey,
+  getRowStyle,
 }: TableProps<T>): ReactNode {
   const getCellValue = (row: T, column: Column<T>): ReactNode => {
     if (typeof column.accessor === 'function') {
@@ -38,20 +43,36 @@ export function Table<T = unknown>({
                 </tr>
               </thead>
               <tbody className="divide-y divide-border bg-background">
-                {data.map((row, rowIndex) => (
-                  <tr key={rowIndex} className="transition-colors hover:bg-surface/50">
-                    {columns.map((column, colIndex) => (
-                      <td
-                        key={colIndex}
-                        className={`py-4 text-sm whitespace-nowrap ${
-                          colIndex === 0 ? 'pr-3 pl-4 sm:pl-6' : 'px-3'
-                        } ${column.cellClassName || 'text-muted'}`}
-                      >
-                        {getCellValue(row, column)}
-                      </td>
-                    ))}
-                  </tr>
-                ))}
+                {data.map((row, rowIndex) => {
+                  const rowKey = getRowKey ? getRowKey(row, rowIndex) : rowIndex;
+                  const rowClassName = getRowClassName ? getRowClassName(row, rowIndex) : '';
+                  const rowStyle = getRowStyle ? getRowStyle(row, rowIndex) : undefined;
+                  const isClickable = !!onRowClick;
+
+                  return (
+                    <tr
+                      key={rowKey}
+                      onClick={() => onRowClick?.(row, rowIndex)}
+                      className={clsx(
+                        'transition-colors',
+                        !rowClassName && (isClickable ? 'cursor-pointer hover:bg-surface/50' : 'hover:bg-surface/50'),
+                        rowClassName
+                      )}
+                      style={rowStyle}
+                    >
+                      {columns.map((column, colIndex) => (
+                        <td
+                          key={colIndex}
+                          className={`py-4 text-sm whitespace-nowrap ${
+                            colIndex === 0 ? 'pr-3 pl-4 sm:pl-6' : 'px-3'
+                          } ${column.cellClassName || 'text-muted'}`}
+                        >
+                          {getCellValue(row, column)}
+                        </td>
+                      ))}
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
@@ -92,20 +113,36 @@ export function Table<T = unknown>({
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border bg-background">
-                  {data.map((row, rowIndex) => (
-                    <tr key={rowIndex} className="transition-colors hover:bg-surface/50">
-                      {columns.map((column, colIndex) => (
-                        <td
-                          key={colIndex}
-                          className={`py-4 text-sm whitespace-nowrap ${
-                            colIndex === 0 ? 'pr-3 pl-4 sm:pl-6' : 'px-3'
-                          } ${column.cellClassName || 'text-muted'}`}
-                        >
-                          {getCellValue(row, column)}
-                        </td>
-                      ))}
-                    </tr>
-                  ))}
+                  {data.map((row, rowIndex) => {
+                    const rowKey = getRowKey ? getRowKey(row, rowIndex) : rowIndex;
+                    const rowClassName = getRowClassName ? getRowClassName(row, rowIndex) : '';
+                    const rowStyle = getRowStyle ? getRowStyle(row, rowIndex) : undefined;
+                    const isClickable = !!onRowClick;
+
+                    return (
+                      <tr
+                        key={rowKey}
+                        onClick={() => onRowClick?.(row, rowIndex)}
+                        className={clsx(
+                          'transition-colors',
+                          !rowClassName && (isClickable ? 'cursor-pointer hover:bg-surface/50' : 'hover:bg-surface/50'),
+                          rowClassName
+                        )}
+                        style={rowStyle}
+                      >
+                        {columns.map((column, colIndex) => (
+                          <td
+                            key={colIndex}
+                            className={`py-4 text-sm whitespace-nowrap ${
+                              colIndex === 0 ? 'pr-3 pl-4 sm:pl-6' : 'px-3'
+                            } ${column.cellClassName || 'text-muted'}`}
+                          >
+                            {getCellValue(row, column)}
+                          </td>
+                        ))}
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>

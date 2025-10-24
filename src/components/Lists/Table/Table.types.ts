@@ -43,4 +43,20 @@ export interface TableProps<T = unknown> {
    * - 'nested': No outer padding, for use inside Cards or other containers
    */
   variant?: 'standalone' | 'nested';
+  /**
+   * Optional callback when a row is clicked
+   */
+  onRowClick?: (row: T, rowIndex: number) => void;
+  /**
+   * Optional function to generate custom className for each row
+   */
+  getRowClassName?: (row: T, rowIndex: number) => string;
+  /**
+   * Optional function to generate a unique key for each row
+   */
+  getRowKey?: (row: T, rowIndex: number) => string | number;
+  /**
+   * Optional function to generate custom style for each row
+   */
+  getRowStyle?: (row: T, rowIndex: number) => React.CSSProperties;
 }

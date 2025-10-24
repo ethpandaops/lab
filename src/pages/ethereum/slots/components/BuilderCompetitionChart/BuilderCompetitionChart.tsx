@@ -28,7 +28,7 @@ export function BuilderCompetitionChart({ builderData, winningBuilder }: Builder
   const themeColors = useThemeColors();
 
   // Process and transform builder data for chart
-  const { chartData, labels, totalBids, processedData } = useMemo(() => {
+  const { chartData, labels, processedData } = useMemo(() => {
     // Transform and sort data by bid count (descending)
     const processed: BuilderChartData[] = builderData
       .map(builder => ({
@@ -46,12 +46,10 @@ export function BuilderCompetitionChart({ builderData, winningBuilder }: Builder
     }));
 
     const builderNames = processed.map(d => d.name);
-    const total = builderData.reduce((sum, builder) => sum + (builder.bid_total || 0), 0);
 
     return {
       chartData: data,
       labels: builderNames,
-      totalBids: total,
       processedData: processed,
     };
   }, [builderData, winningBuilder, themeColors.accent]);
@@ -89,7 +87,7 @@ export function BuilderCompetitionChart({ builderData, winningBuilder }: Builder
     );
   }
 
-  const subtitle = `${totalBids.toLocaleString()} bids • ${builderData.length} builders`;
+  const subtitle = `${builderData.length} builders`;
 
   return (
     <PopoutCard title="Builder Competition" anchorId="builder-competition" subtitle={subtitle} modalSize="xl">
