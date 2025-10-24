@@ -1,3 +1,5 @@
+import type { TooltipFormatter } from '@/types/echarts';
+
 export interface ScatterSeries {
   /**
    * Series name shown in legend and tooltip
@@ -115,7 +117,7 @@ export interface ScatterAndLineChartProps {
   /**
    * Custom tooltip formatter function
    */
-  tooltipFormatter?: (params: any) => string;
+  tooltipFormatter?: TooltipFormatter;
   /**
    * Tooltip trigger type
    * @default 'item'

@@ -49,11 +49,6 @@ export interface PopoutCardProps {
    */
   className?: string;
   /**
-   * CSS aspect ratio for content container (e.g., "16/9", "4/3", "1/1")
-   * Default: "16/9"
-   */
-  aspectRatio?: string;
-  /**
    * Optional anchor ID for deep linking to this card.
    * When provided, wraps the title with ScrollAnchor for URL-based navigation.
    */

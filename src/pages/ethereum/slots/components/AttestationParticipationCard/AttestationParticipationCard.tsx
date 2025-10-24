@@ -2,20 +2,8 @@ import { type JSX, useMemo } from 'react';
 import { PopoutCard } from '@/components/Layout/PopoutCard';
 import { Gauge } from '@/components/Charts/Gauge';
 import type { GaugeItem } from '@/components/Charts/Gauge';
+import { getHealthColor } from '@/utils/health';
 import type { AttestationParticipationCardProps } from './AttestationParticipationCard.types';
-
-/**
- * Get color based on percentage thresholds
- *
- * @param percentage - The percentage value (0-100)
- * @returns Hex color based on health thresholds
- */
-function getHealthColor(percentage: number): string {
-  if (percentage >= 90) return '#22c55e'; // green-500
-  if (percentage >= 70) return '#f59e0b'; // amber-500
-  if (percentage > 0) return '#ef4444'; // red-500
-  return '#888888'; // gray-500
-}
 
 /**
  * AttestationParticipationCard - Displays overall attestation participation for a slot

@@ -3,3 +3,4 @@ export * from './beacon';
 export * from './time';
 export * from './gas';
 export * from './ethereum';
+export * from './health';

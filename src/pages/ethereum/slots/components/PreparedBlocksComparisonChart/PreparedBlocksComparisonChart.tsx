@@ -3,7 +3,7 @@ import { PopoutCard } from '@/components/Layout/PopoutCard';
 import { Alert } from '@/components/Feedback/Alert';
 import { BarChart } from '@/components/Charts/Bar';
 import { useThemeColors } from '@/hooks/useThemeColors';
-import { weiToEth } from '@/utils';
+import { weiToEth, extractExecutionClient } from '@/utils';
 import type {
   PreparedBlocksComparisonChartProps,
   ProcessedBlock,
@@ -12,42 +12,18 @@ import type {
 import type { FctPreparedBlock } from '@/api/types.gen';
 
 /**
- * Parse client name from meta_client_name field
- * Extracts the execution client name (e.g., "geth", "besu", "nethermind")
- *
- * @param metaClientName - Full client name string (e.g., "geth-lighthouse-1")
- * @returns Execution client name or "unknown"
- */
-function parseExecutionClient(metaClientName?: string): string {
-  if (!metaClientName) return 'unknown';
-
-  // Common execution client patterns
-  const lowerName = metaClientName.toLowerCase();
-  if (lowerName.includes('geth')) return 'geth';
-  if (lowerName.includes('besu')) return 'besu';
-  if (lowerName.includes('nethermind')) return 'nethermind';
-  if (lowerName.includes('erigon')) return 'erigon';
-  if (lowerName.includes('reth')) return 'reth';
-
-  // Fallback: take first part before delimiter
-  const parts = metaClientName.split(/[-_]/);
-  return parts[0] || 'unknown';
-}
-
-/**
- * Calculate total reward for a block in wei
- * Reward = execution_payload_value + consensus_payload_value
+ * Calculate execution layer reward for a block in wei
+ * Only uses execution_payload_value for fair comparison with MEV bids
  *
  * @param block - Block data
- * @returns Total reward in wei as string
+ * @returns Execution layer reward in wei as string
  */
 function calculateRewardWei(block: FctPreparedBlock | PreparedBlocksComparisonChartProps['proposedBlock']): string {
   if (!block) return '0';
 
   const execValue = BigInt(block.execution_payload_value || '0');
-  const consensusValue = BigInt(block.consensus_payload_value || '0');
 
-  return (execValue + consensusValue).toString();
+  return execValue.toString();
 }
 
 /**
@@ -110,7 +86,8 @@ export function PreparedBlocksComparisonChart({
     const clientMap = new Map<string, ProcessedBlock>();
 
     for (const block of filteredPreparedBlocks) {
-      const clientName = parseExecutionClient(block.meta_client_name);
+      // Extract execution client from meta_client_name (searches for known client names)
+      const clientName = extractExecutionClient(block.meta_client_name) || 'Unknown';
       const rewardWei = calculateRewardWei(block);
       const rewardEth = weiToEth(rewardWei);
 
@@ -183,11 +160,14 @@ export function PreparedBlocksComparisonChart({
 
     const formatter = (params: unknown) => {
       if (!Array.isArray(params) || params.length === 0) return '';
-      const param = params[0] as { name: string; value: number; dataIndex: number };
+      const param = params[0] as { name: string; value: number | number[]; data: { value: number }; dataIndex: number };
       const block = processedBlocks[param.dataIndex];
 
+      // Handle both direct value and data.value formats
+      const value = typeof param.value === 'number' ? param.value : (param.data?.value ?? 0);
+
       let tooltip = `<strong>${param.name}</strong><br/>`;
-      tooltip += `Reward: ${param.value.toFixed(6)} ETH<br/>`;
+      tooltip += `Reward: ${value.toFixed(5)} ETH<br/>`;
 
       if (!block.isProposed && 'execution_payload_transactions_count' in block.originalBlock) {
         const txCount = (block.originalBlock as FctPreparedBlock).execution_payload_transactions_count;
@@ -221,7 +201,7 @@ export function PreparedBlocksComparisonChart({
 
   // Build subtitle with statistics
   const subtitle = stats.bestClientName
-    ? `${stats.preparedBlockCount} prepared blocks • Best: ${stats.bestClientName} (${stats.bestPreparedRewardEth.toFixed(2)} ETH)`
+    ? `${stats.preparedBlockCount} prepared blocks • Best: ${stats.bestClientName} (${stats.bestPreparedRewardEth.toFixed(5)} ETH)`
     : undefined;
 
   return (
@@ -249,7 +229,7 @@ export function PreparedBlocksComparisonChart({
               orientation="horizontal"
               height="100%"
               axisName="Total Reward (ETH)"
-              labelFormatter="{c} ETH"
+              showLabel={false}
               tooltipFormatter={tooltipFormatter}
               animationDuration={0}
             />

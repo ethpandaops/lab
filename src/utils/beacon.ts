@@ -51,3 +51,19 @@ export const DEFAULT_BEACON_SLOT_PHASES: SlotPhase[] = [
     description: 'Attestations aggregated',
   },
 ];
+
+/**
+ * Convert slot number to Unix timestamp
+ *
+ * @param slot - Slot number
+ * @param genesisTime - Genesis time in Unix seconds
+ * @returns Unix timestamp in seconds
+ *
+ * @example
+ * ```tsx
+ * slotToTimestamp(100, 1606824023) // Returns 1606825223
+ * ```
+ */
+export function slotToTimestamp(slot: number, genesisTime: number): number {
+  return genesisTime + slot * SECONDS_PER_SLOT;
+}

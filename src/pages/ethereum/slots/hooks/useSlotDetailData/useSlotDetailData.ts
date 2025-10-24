@@ -16,7 +16,7 @@ import {
   fctBlockProposerEntityServiceListOptions,
 } from '@/api/@tanstack/react-query.gen';
 import { useNetwork } from '@/hooks/useNetwork';
-import { slotToTimestamp } from '@/pages/ethereum/live/utils/slot-time';
+import { slotToTimestamp } from '@/utils/beacon';
 import type {
   FctBlockHead,
   FctBlockProposer,

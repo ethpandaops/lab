@@ -1,3 +1,5 @@
+import type { TooltipFormatter } from '@/types/echarts';
+
 export interface BarDataItem {
   /**
    * The value of this bar
@@ -113,7 +115,7 @@ export interface BarChartProps {
    * Custom tooltip formatter function
    * @default undefined (uses default tooltip)
    */
-  tooltipFormatter?: (params: unknown) => string;
+  tooltipFormatter?: TooltipFormatter;
   /**
    * Category axis label interval (0 = all labels, 1 = every other, 2 = every third, etc.)
    * Set to 'auto' to let ECharts calculate automatically

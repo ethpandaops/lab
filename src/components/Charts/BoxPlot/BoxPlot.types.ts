@@ -5,6 +5,24 @@
 export type BoxPlotStats = readonly [number, number, number, number, number];
 
 /**
+ * Extended box plot data point with custom styling
+ */
+export interface BoxPlotDataItem {
+  /**
+   * Box plot statistics [min, Q1, median, Q3, max]
+   */
+  value: BoxPlotStats;
+  /**
+   * Custom item style (color, border, etc.)
+   */
+  itemStyle?: {
+    color?: string;
+    borderColor?: string;
+    borderWidth?: number;
+  };
+}
+
+/**
  * Single series data for box plot
  */
 export interface BoxPlotData {
@@ -16,8 +34,9 @@ export interface BoxPlotData {
   /**
    * Array of box plot statistics [min, Q1, median, Q3, max]
    * Each array represents one box in the series
+   * Can be either raw stats or objects with value and itemStyle
    */
-  data: BoxPlotStats[];
+  data: (BoxPlotStats | BoxPlotDataItem)[];
   /**
    * Optional color for this series
    * If not provided, uses theme primary color or auto-colors

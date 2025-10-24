@@ -57,10 +57,12 @@ export function RelayDistributionChart({ relayData, winningRelay }: RelayDistrib
   // Custom tooltip formatter to show winner badge
   const tooltipFormatter = useMemo(
     () => (params: unknown) => {
-      const param = (params as { name: string; value: number; dataIndex: number }[])[0];
+      const param = (params as { name: string; value: number; data: { value: number }; dataIndex: number }[])[0];
       const isWinner = processedData[param.dataIndex]?.isWinner;
       const winnerText = isWinner ? '<br/><strong>(Winner)</strong>' : '';
-      return `${param.name}<br/>Bids: ${param.value}${winnerText}`;
+      // Handle both direct value and data.value formats
+      const value = typeof param.value === 'number' ? param.value : (param.data?.value ?? 0);
+      return `${param.name}<br/>Bids: ${value}${winnerText}`;
     },
     [processedData]
   );

@@ -5,6 +5,7 @@ import type { ScatterSeries, LineSeries } from '@/components/Charts/ScatterAndLi
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { CONTINENT_COLORS } from '@/theme/data-visualization-colors';
 import type { BlockPropagationChartProps } from './BlockPropagationChart.types';
+import type { TooltipFormatterParams, TooltipFormatterParam } from '@/types/echarts';
 
 /**
  * BlockPropagationChart - Visualizes block propagation across the network
@@ -81,11 +82,14 @@ export function BlockPropagationChart({ blockPropagationData }: BlockPropagation
 
   // Custom tooltip formatter
   const tooltipFormatter = useMemo(
-    () => (params: { componentSubType: string; seriesName: string; data: [number, number] }) => {
-      if (params.componentSubType === 'scatter') {
-        return `${params.seriesName}<br/>Time: ${params.data[0].toFixed(3)}s`;
+    () => (params: TooltipFormatterParams) => {
+      const param = params as TooltipFormatterParam;
+      const data = param.data as [number, number] | undefined;
+      if (!data) return '';
+      if (param.componentSubType === 'scatter') {
+        return `${param.seriesName ?? 'Unknown'}<br/>Time: ${data[0].toFixed(3)}s`;
       } else {
-        return `Cumulative: ${params.data[1].toFixed(1)}%<br/>Time: ${params.data[0].toFixed(3)}s`;
+        return `Cumulative: ${data[1].toFixed(1)}%<br/>Time: ${data[0].toFixed(3)}s`;
       }
     },
     []

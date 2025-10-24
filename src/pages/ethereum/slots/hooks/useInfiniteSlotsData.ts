@@ -2,7 +2,7 @@ import { useMemo, useCallback, useRef, useEffect } from 'react';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { useBeaconClock } from '@/hooks/useBeaconClock';
 import { useNetwork } from '@/hooks/useNetwork';
-import { SLOTS_PER_EPOCH } from '@/utils/beacon';
+import { SLOTS_PER_EPOCH, slotToTimestamp } from '@/utils/beacon';
 import {
   fctBlockHeadServiceList,
   fctBlockProposerServiceList,
@@ -21,16 +21,6 @@ const SLOTS_PER_PAGE = 25;
  * Maximum number of slots to keep in memory (windowing)
  */
 const MAX_SLOTS_IN_MEMORY = 100;
-
-/**
- * Converts a slot number to Unix timestamp for API queries
- * @param slot - Beacon chain slot number
- * @param genesisTime - Network genesis time (Unix timestamp in seconds)
- * @returns Unix timestamp in seconds
- */
-function slotToTimestamp(slot: number, genesisTime: number): number {
-  return genesisTime + slot * 12; // 12 seconds per slot
-}
 
 /**
  * Page parameter for infinite query pagination

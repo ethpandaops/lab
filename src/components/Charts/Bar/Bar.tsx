@@ -160,6 +160,14 @@ export function BarChart({
           type: 'bar' as const,
           data: processedData,
           barWidth,
+          emphasis: {
+            disabled: true,
+          },
+          blur: {
+            itemStyle: {
+              opacity: 1,
+            },
+          },
           label: showLabel
             ? {
                 show: true,
@@ -173,9 +181,6 @@ export function BarChart({
       ],
       tooltip: {
         trigger: 'axis' as const,
-        axisPointer: {
-          type: 'shadow' as const,
-        },
         backgroundColor: themeColors.background,
         borderColor: themeColors.border,
         borderWidth: 1,

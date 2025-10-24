@@ -18,7 +18,6 @@ import type { PopoutCardProps } from './PopoutCard.types';
  * - Hover effects on expand icon
  * - Content renders in both card and modal
  * - Configurable modal size
- * - Aspect ratio support for consistent sizing
  * - Dark mode support
  *
  * @example
@@ -44,13 +43,6 @@ import type { PopoutCardProps } from './PopoutCard.types';
  *   <ComplexDashboard />
  * </PopoutCard>
  *
- * // Custom aspect ratio
- * <PopoutCard
- *   title="Square Chart"
- *   aspectRatio="1/1"
- * >
- *   <MyChart height="100%" />
- * </PopoutCard>
  * ```
  */
 export function PopoutCard({

@@ -1,7 +1,7 @@
 import { type JSX, useMemo } from 'react';
 import { PopoutCard } from '@/components/Layout/PopoutCard';
 import { BoxPlot, calculateBoxPlotStats } from '@/components/Charts/BoxPlot';
-import type { BoxPlotData } from '@/components/Charts/BoxPlot';
+import type { BoxPlotData, BoxPlotDataItem } from '@/components/Charts/BoxPlot';
 import { CHART_CATEGORICAL_COLORS } from '@/theme/data-visualization-colors';
 import type { BlobPropagationChartProps } from './BlobPropagationChart.types';
 
@@ -48,7 +48,7 @@ export function BlobPropagationChart({ blobPropagationData }: BlobPropagationCha
     const blobIndices = Array.from(blobGroups.keys()).sort((a, b) => a - b);
 
     // Calculate stats for each blob with individual colors from theme
-    const allStats = blobIndices.map((blobIndex, idx) => {
+    const allStats: BoxPlotDataItem[] = blobIndices.map((blobIndex, idx) => {
       const times = blobGroups.get(blobIndex)!;
       const stats = calculateBoxPlotStats(times);
 
@@ -70,7 +70,7 @@ export function BlobPropagationChart({ blobPropagationData }: BlobPropagationCha
     const series: BoxPlotData[] = [
       {
         name: 'Blob Propagation',
-        data: allStats as any, // TypeScript workaround for custom data format
+        data: allStats,
       },
     ];
 

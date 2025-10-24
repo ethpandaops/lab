@@ -2,6 +2,7 @@ import { type JSX, useMemo } from 'react';
 import { PopoutCard } from '@/components/Layout/PopoutCard';
 import { BarChart } from '@/components/Charts/Bar';
 import { useThemeColors } from '@/hooks/useThemeColors';
+import { truncateAddress } from '@/utils/ethereum';
 import { CHART_CATEGORICAL_COLORS } from '@/theme/data-visualization-colors';
 import type { BuilderCompetitionChartProps, BuilderChartData } from './BuilderCompetitionChart.types';
 
@@ -26,22 +27,12 @@ import type { BuilderCompetitionChartProps, BuilderChartData } from './BuilderCo
 export function BuilderCompetitionChart({ builderData, winningBuilder }: BuilderCompetitionChartProps): JSX.Element {
   const themeColors = useThemeColors();
 
-  /**
-   * Truncate builder public key for display
-   * Shows first 6 and last 4 characters: 0xabc...def1
-   */
-  const truncateBuilder = (pubkey: string): string => {
-    if (!pubkey) return 'Unknown';
-    if (pubkey.length <= 12) return pubkey;
-    return `${pubkey.slice(0, 6)}...${pubkey.slice(-4)}`;
-  };
-
   // Process and transform builder data for chart
   const { chartData, labels, totalBids, processedData } = useMemo(() => {
     // Transform and sort data by bid count (descending)
     const processed: BuilderChartData[] = builderData
       .map(builder => ({
-        name: truncateBuilder(builder.builder_pubkey || ''),
+        name: truncateAddress(builder.builder_pubkey || ''),
         fullPubkey: builder.builder_pubkey || 'Unknown',
         bidCount: builder.bid_total || 0,
         isWinner: winningBuilder ? builder.builder_pubkey === winningBuilder : false,
@@ -68,11 +59,13 @@ export function BuilderCompetitionChart({ builderData, winningBuilder }: Builder
   // Custom tooltip formatter to show full pubkey and winner badge
   const tooltipFormatter = useMemo(
     () => (params: unknown) => {
-      const param = (params as { name: string; value: number; dataIndex: number }[])[0];
+      const param = (params as { name: string; value: number; data: { value: number }; dataIndex: number }[])[0];
       const builderInfo = processedData[param.dataIndex];
       const isWinner = builderInfo?.isWinner;
       const winnerText = isWinner ? '<br/><strong>(Winner)</strong>' : '';
-      return `${builderInfo?.fullPubkey}<br/>Bids: ${param.value}${winnerText}`;
+      // Handle both direct value and data.value formats
+      const value = typeof param.value === 'number' ? param.value : (param.data?.value ?? 0);
+      return `${builderInfo?.fullPubkey}<br/>Bids: ${value}${winnerText}`;
     },
     [processedData]
   );

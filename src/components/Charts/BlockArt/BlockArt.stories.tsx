@@ -19,17 +19,8 @@ const meta: Meta<typeof BlockArt> = {
     height: {
       control: { type: 'range', min: 200, max: 800, step: 50 },
     },
-    rotationSpeed: {
-      control: { type: 'range', min: 0, max: 0.05, step: 0.001 },
-    },
-    particleCount: {
-      control: { type: 'range', min: 0, max: 200, step: 10 },
-    },
-    blockSize: {
-      control: { type: 'range', min: 0.5, max: 2, step: 0.1 },
-    },
-    animationSpeed: {
-      control: { type: 'range', min: 0.1, max: 3, step: 0.1 },
+    blockNumber: {
+      control: { type: 'number' },
     },
   },
 };
@@ -38,17 +29,13 @@ export default meta;
 type Story = StoryObj<typeof BlockArt>;
 
 /**
- * Default: Stunning 3D block with rotating animation, glowing edges, and particle effects
+ * Default: Stunning 3D block visualization with glowing edges
  * This is the standard hero visualization that adapts to theme colors
  */
 export const Default: Story = {
   args: {
     width: 500,
     height: 500,
-    autoRotate: true,
-    showParticles: true,
-    glowingEdges: true,
-    floatingAnimation: true,
   },
   play: async ({ canvasElement }) => {
     // Wait for p5.js canvas to render
@@ -64,7 +51,7 @@ export const Default: Story = {
 
 /**
  * With Block Data: Block visualization with procedural variations based on blockchain data
- * Hash, block number, and transaction count affect the visual appearance
+ * Hash and block number affect the visual appearance
  */
 export const WithBlockData: Story = {
   args: {
@@ -72,10 +59,6 @@ export const WithBlockData: Story = {
     height: 500,
     blockHash: '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef',
     blockNumber: 19234567,
-    transactionCount: 180,
-    autoRotate: true,
-    showParticles: true,
-    glowingEdges: true,
   },
   play: async ({ canvasElement }) => {
     await waitFor(
@@ -89,8 +72,7 @@ export const WithBlockData: Story = {
 };
 
 /**
- * High Transaction Block: Dense particle field representing high transaction volume
- * More particles orbit the block to visualize network activity
+ * High Transaction Block: Block visualization with unique hash and block number
  */
 export const HighTransactionBlock: Story = {
   args: {
@@ -98,11 +80,6 @@ export const HighTransactionBlock: Story = {
     height: 500,
     blockHash: '0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890',
     blockNumber: 19234999,
-    transactionCount: 350,
-    particleCount: 150,
-    autoRotate: true,
-    showParticles: true,
-    glowingEdges: true,
   },
   play: async ({ canvasElement }) => {
     await waitFor(
@@ -116,17 +93,13 @@ export const HighTransactionBlock: Story = {
 };
 
 /**
- * Minimal: Simple rotating block without particles or glow effects
+ * Minimal: Simple block visualization
  * Clean visualization focusing on the core block geometry
  */
 export const Minimal: Story = {
   args: {
     width: 400,
     height: 400,
-    autoRotate: true,
-    showParticles: false,
-    glowingEdges: false,
-    floatingAnimation: false,
   },
   play: async ({ canvasElement }) => {
     await waitFor(
@@ -140,70 +113,13 @@ export const Minimal: Story = {
 };
 
 /**
- * Large Block: Emphasized block size for hero displays
- * Bigger, bolder visualization with increased scale
+ * Large Block: Larger canvas for hero displays
+ * Bigger, bolder visualization with increased canvas size
  */
 export const LargeBlock: Story = {
   args: {
     width: 600,
     height: 600,
-    blockSize: 1.5,
-    autoRotate: true,
-    showParticles: true,
-    particleCount: 80,
-    glowingEdges: true,
-    floatingAnimation: true,
-  },
-  play: async ({ canvasElement }) => {
-    await waitFor(
-      () => {
-        const canvas = canvasElement.querySelector('canvas');
-        expect(canvas).toBeInTheDocument();
-      },
-      { timeout: 3000 }
-    );
-  },
-};
-
-/**
- * Fast Animation: Accelerated rotation and particle movement
- * Dynamic, high-energy visualization
- */
-export const FastAnimation: Story = {
-  args: {
-    width: 500,
-    height: 500,
-    rotationSpeed: 0.03,
-    animationSpeed: 2,
-    autoRotate: true,
-    showParticles: true,
-    glowingEdges: true,
-  },
-  play: async ({ canvasElement }) => {
-    await waitFor(
-      () => {
-        const canvas = canvasElement.querySelector('canvas');
-        expect(canvas).toBeInTheDocument();
-      },
-      { timeout: 3000 }
-    );
-  },
-};
-
-/**
- * Slow Motion: Gentle, meditative rotation
- * Calm, contemplative visualization with slow movement
- */
-export const SlowMotion: Story = {
-  args: {
-    width: 500,
-    height: 500,
-    rotationSpeed: 0.003,
-    animationSpeed: 0.5,
-    autoRotate: true,
-    showParticles: true,
-    particleCount: 30,
-    glowingEdges: true,
   },
   play: async ({ canvasElement }) => {
     await waitFor(
@@ -227,9 +143,6 @@ export const CustomColors: Story = {
     primaryColor: '#ff6b9d',
     accentColor: '#c3f0ca',
     glowColor: '#fec84b',
-    autoRotate: true,
-    showParticles: true,
-    glowingEdges: true,
   },
   play: async ({ canvasElement }) => {
     await waitFor(
@@ -243,17 +156,12 @@ export const CustomColors: Story = {
 };
 
 /**
- * Static: No rotation, perfect for screenshots
- * Fixed perspective for documentation and static displays
+ * Static: Fixed perspective for documentation and static displays
  */
 export const Static: Story = {
   args: {
     width: 400,
     height: 400,
-    autoRotate: false,
-    showParticles: true,
-    glowingEdges: true,
-    floatingAnimation: false,
   },
   play: async ({ canvasElement }) => {
     await waitFor(
@@ -274,11 +182,6 @@ export const Compact: Story = {
   args: {
     width: 300,
     height: 300,
-    blockSize: 0.8,
-    particleCount: 30,
-    autoRotate: true,
-    showParticles: true,
-    glowingEdges: true,
   },
   play: async ({ canvasElement }) => {
     await waitFor(

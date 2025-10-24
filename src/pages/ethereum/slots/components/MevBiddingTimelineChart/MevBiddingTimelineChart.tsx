@@ -4,17 +4,8 @@ import { ScatterAndLineChart } from '@/components/Charts/ScatterAndLine';
 import type { LineSeries, ScatterSeries } from '@/components/Charts/ScatterAndLine/ScatterAndLine.types';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { weiToEth } from '@/utils';
+import { truncateAddress } from '@/utils/ethereum';
 import type { MevBiddingTimelineChartProps, BuilderSeries } from './MevBiddingTimelineChart.types';
-
-/**
- * Truncate a public key for display
- * @param pubkey - Full public key
- * @returns Truncated pubkey (first 8 chars...last 6 chars)
- */
-function truncatePubkey(pubkey: string): string {
-  if (pubkey.length <= 14) return pubkey;
-  return `${pubkey.slice(0, 8)}...${pubkey.slice(-6)}`;
-}
 
 /**
  * Generate a consistent color for a builder pubkey
@@ -106,7 +97,7 @@ export function MevBiddingTimelineChart({
       const isWinner = winningBuilder === pubkey;
       return {
         builderPubkey: pubkey,
-        displayName: truncatePubkey(pubkey),
+        displayName: truncateAddress(pubkey),
         color: generateBuilderColor(pubkey, isWinner, themeColors),
         data,
         isWinner,

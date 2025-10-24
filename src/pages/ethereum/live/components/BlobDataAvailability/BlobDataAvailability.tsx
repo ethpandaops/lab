@@ -6,6 +6,7 @@ import { useThemeColors } from '@/hooks/useThemeColors';
 import type { BlobDataAvailabilityProps } from './BlobDataAvailability.types';
 import { CONTINENT_COLORS } from '@/theme/data-visualization-colors';
 import type { EChartsOption } from 'echarts';
+import type { TooltipFormatterParams, TooltipFormatterParam } from '@/types/echarts';
 
 /**
  * BlobDataAvailability - Page-specific component for visualizing blob data availability
@@ -98,8 +99,9 @@ function BlobDataAvailabilityComponent({
           color: themeColors.foreground,
           fontSize: 12,
         },
-        formatter: (params: any) => {
-          const data = params.data as [number, string];
+        formatter: (params: TooltipFormatterParams) => {
+          const param = params as TooltipFormatterParam;
+          const data = param.data as [number, string];
           return `Blob ${data[1]}<br/>Time: ${(data[0] / 1000).toFixed(2)}s`;
         },
       },
@@ -139,11 +141,11 @@ function BlobDataAvailabilityComponent({
           color: themeColors.foreground,
           fontSize: 12,
         },
-        formatter: (params: any) => {
+        formatter: (params: TooltipFormatterParams) => {
           if (!params || !Array.isArray(params) || params.length === 0) return '';
           const time = ((params[0].data as [number, number])[0] / 1000).toFixed(2);
           const lines = [`Time: ${time}s`];
-          params.forEach((param: any) => {
+          params.forEach((param: TooltipFormatterParam) => {
             const data = param.data as [number, number];
             lines.push(`${param.seriesName}: ${data[1].toFixed(1)}%`);
           });
