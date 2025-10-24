@@ -1,9 +1,8 @@
-import { type JSX } from 'react';
+import { type JSX, useState, useEffect } from 'react';
 import { Link, useParams } from '@tanstack/react-router';
 import { useQuery } from '@tanstack/react-query';
 import { fctNodeActiveLast24hServiceListOptions } from '@/api/@tanstack/react-query.gen';
 import type { FctNodeActiveLast24h } from '@/api/types.gen';
-import { Card } from '@/components/Layout/Card';
 import { ClientLogo } from '@/components/Ethereum/ClientLogo';
 import { Container } from '@/components/Layout/Container';
 import { Header } from '@/components/Layout/Header';
@@ -13,7 +12,7 @@ import { Table } from '@/components/Lists/Table';
 import type { Column } from '@/components/Lists/Table';
 import { UserDetailsSkeleton } from './components/UserDetailsSkeleton';
 import type { UserClassification } from './components/UserCard/UserCard.types';
-import { getBorderColor, getClassificationLabel, getClassificationColor } from './components/UserCard/utils';
+import { getClassificationLabel, getClassificationBadgeClasses, getRelativeTime } from './components/UserCard/utils';
 import { useSlotPlayerMeta } from '@/hooks/useSlotPlayer';
 import { SlotPlayerControls } from './components/SlotPlayerControls';
 import { BlockLatencyChart } from './components/BlockLatencyChart';
@@ -38,7 +37,7 @@ const nodeColumns: Column<FctNodeActiveLast24h>[] = [
       // No location data
       return <span className="text-muted/60">Unknown</span>;
     },
-    cellClassName: 'text-xs/5 text-muted',
+    cellClassName: 'text-muted',
   },
   {
     header: 'Implementation',
@@ -48,32 +47,44 @@ const nodeColumns: Column<FctNodeActiveLast24h>[] = [
       }
       return node.meta_client_implementation || node.meta_client_version || '-';
     },
-    cellClassName: 'text-xs/5 text-muted',
+    cellClassName: 'text-muted',
   },
   {
     header: 'Consensus',
     accessor: (node: FctNodeActiveLast24h) => node.meta_consensus_implementation || '-',
-    cellClassName: 'text-xs/5 text-muted',
+    cellClassName: 'text-muted',
   },
   {
     header: 'Consensus Version',
     accessor: (node: FctNodeActiveLast24h) => node.meta_consensus_version || '-',
-    cellClassName: 'text-xs/5 text-muted',
+    cellClassName: 'text-muted',
   },
   {
     header: 'Last Seen',
     accessor: (node: FctNodeActiveLast24h) => {
       if (node.last_seen_date_time) {
-        return new Date(node.last_seen_date_time * 1000).toLocaleString();
+        return getRelativeTime(node.last_seen_date_time);
       }
       return '-';
     },
-    cellClassName: 'text-xs/5 text-muted',
+    cellClassName: 'text-muted',
   },
 ];
 
 export function DetailPage(): JSX.Element {
   const { id } = useParams({ from: '/xatu/contributors/$id' });
+
+  // State for triggering re-renders to update relative time
+  const [, setNow] = useState(Date.now());
+
+  // Update relative time every 10 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setNow(Date.now());
+    }, 10000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   // Get slot player meta state
   const { isLoading: slotPlayerLoading, error: slotPlayerError } = useSlotPlayerMeta();
@@ -208,17 +219,31 @@ export function DetailPage(): JSX.Element {
         ← Back to all contributors
       </Link>
 
-      {/* Profile Header Card */}
-      <Card className={`mb-6 border-l-4 ${getBorderColor(classification)}`}>
-        <div className="flex-1">
-          <h1 className="mb-2 text-3xl/9 font-bold text-foreground">{username}</h1>
-          <p className={`text-lg/7 font-medium ${getClassificationColor(classification)}`}>
-            {getClassificationLabel(classification)}
-          </p>
-        </div>
-      </Card>
+      {/* Compact Profile Header */}
+      <div className="mb-6 flex flex-wrap items-center gap-3">
+        <h1 className="text-3xl/9 font-bold text-foreground">{username}</h1>
+        <span
+          className={`inline-flex shrink-0 items-center rounded-sm px-1.5 py-0.5 text-xs font-medium inset-ring ${getClassificationBadgeClasses(classification)}`}
+        >
+          {getClassificationLabel(classification)}
+        </span>
 
-      {/* Statistics */}
+        {/* Inline Client Logos */}
+        {uniqueConsensusClients.size > 0 && (
+          <>
+            <span className="text-muted">·</span>
+            <div className="flex items-center gap-2">
+              {Array.from(uniqueConsensusClients)
+                .filter((client): client is string => typeof client === 'string')
+                .map(client => (
+                  <ClientLogo key={client} client={client} size={24} />
+                ))}
+            </div>
+          </>
+        )}
+      </div>
+
+      {/* Statistics - Full Width */}
       <Stats
         className="mb-6"
         stats={[
@@ -233,39 +258,18 @@ export function DetailPage(): JSX.Element {
             value: uniqueLocations.size.toString(),
           },
           {
-            id: 'consensus-clients',
-            name: 'Consensus Clients',
-            value: uniqueConsensusClients.size.toString(),
-          },
-          {
             id: 'last-seen',
             name: 'Last Seen',
-            value: new Date(latestSeen * 1000).toLocaleDateString(),
+            value: getRelativeTime(latestSeen),
           },
         ]}
       />
 
-      {/* Consensus Clients Detail */}
-      {uniqueConsensusClients.size > 0 && (
-        <Card className="mb-6">
-          <h3 className="mb-3 text-sm/6 font-semibold text-muted">Consensus Client Implementations</h3>
-          <div className="flex flex-wrap gap-3">
-            {Array.from(uniqueConsensusClients)
-              .filter((client): client is string => typeof client === 'string')
-              .map(client => (
-                <ClientLogo key={client} client={client} size={32} />
-              ))}
-          </div>
-        </Card>
+      {/* Nodes Table */}
+      <Table data={nodes.slice(0, 50)} columns={nodeColumns} variant="nested" />
+      {nodes.length > 50 && (
+        <div className="mt-4 text-center text-sm/6 text-muted">Showing 50 of {nodes.length} nodes</div>
       )}
-
-      {/* All Nodes Table */}
-      <Card header={<h2 className="text-lg/7 font-semibold text-foreground">All Nodes ({nodes.length})</h2>}>
-        <Table data={nodes.slice(0, 50)} columns={nodeColumns} variant="nested" />
-        {nodes.length > 50 && (
-          <div className="mt-4 text-center text-sm/6 text-muted">Showing 50 of {nodes.length} nodes</div>
-        )}
-      </Card>
 
       {/* Live Metrics Section */}
       <div className="mt-12">
