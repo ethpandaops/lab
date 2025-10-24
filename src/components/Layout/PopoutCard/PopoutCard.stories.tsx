@@ -81,20 +81,22 @@ export const WithBarChart: Story = {
 };
 
 /**
- * PopoutCard with line chart
+ * PopoutCard with line chart using render function for responsive sizing
  */
 export const WithLineChart: Story = {
   args: {
     title: 'Daily Active Users',
     subtitle: 'Past 2 weeks',
-    children: (
-      <LineChart
-        data={[1200, 1350, 1180, 1420, 1560, 1490, 1620, 1580, 1740, 1690, 1820, 1880, 1950, 2100]}
-        labels={Array.from({ length: 14 }, (_, i) => `Day ${i + 1}`)}
-        height={300}
-        smooth
-        showArea
-      />
+    children: ({ inModal }) => (
+      <div className={inModal ? 'h-[600px]' : 'h-96'}>
+        <LineChart
+          data={[1200, 1350, 1180, 1420, 1560, 1490, 1620, 1580, 1740, 1690, 1820, 1880, 1950, 2100]}
+          labels={Array.from({ length: 14 }, (_, i) => `Day ${i + 1}`)}
+          height="100%"
+          smooth
+          showArea
+        />
+      </div>
     ),
   },
 };

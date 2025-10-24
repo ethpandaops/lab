@@ -111,7 +111,7 @@ export function AttestationCorrectnessChart({ correctnessData }: AttestationCorr
           <div
             className={
               inModal
-                ? 'flex min-h-[400px] items-center justify-center text-muted'
+                ? 'flex h-80 items-center justify-center text-muted'
                 : 'flex h-64 items-center justify-center text-muted'
             }
           >
@@ -127,7 +127,7 @@ export function AttestationCorrectnessChart({ correctnessData }: AttestationCorr
   return (
     <PopoutCard title="Attestation Correctness" subtitle={subtitle} modalSize="lg">
       {({ inModal }) => (
-        <div className={inModal ? 'min-h-[400px] space-y-4' : 'space-y-4'}>
+        <div className={inModal ? 'h-80 space-y-4' : 'space-y-4'}>
           {/* Metrics grid */}
           <dl className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             {metrics.map(metric => (

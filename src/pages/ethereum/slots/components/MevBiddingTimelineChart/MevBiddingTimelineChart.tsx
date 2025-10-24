@@ -1,6 +1,7 @@
 import { type JSX, useMemo } from 'react';
-import ReactECharts from 'echarts-for-react';
 import { PopoutCard } from '@/components/Layout/PopoutCard';
+import { ScatterAndLineChart } from '@/components/Charts/ScatterAndLine';
+import type { LineSeries, ScatterSeries } from '@/components/Charts/ScatterAndLine/ScatterAndLine.types';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import type { MevBiddingTimelineChartProps, BuilderSeries } from './MevBiddingTimelineChart.types';
 
@@ -86,10 +87,10 @@ export function MevBiddingTimelineChart({
 }: MevBiddingTimelineChartProps): JSX.Element {
   const themeColors = useThemeColors();
 
-  // Process data into builder series
-  const { builderSeries, maxValue, winningBidTime } = useMemo(() => {
+  // Process data into line and scatter series for chart
+  const { lineSeries, scatterSeries, maxValue } = useMemo(() => {
     if (biddingData.length === 0) {
-      return { builderSeries: [], maxValue: 0, winningBidTime: null };
+      return { lineSeries: [], scatterSeries: [], maxValue: 0 };
     }
 
     // Group bids by builder
@@ -115,7 +116,7 @@ export function MevBiddingTimelineChart({
     });
 
     // Create series for each builder
-    const series: BuilderSeries[] = Array.from(builderMap.entries()).map(([pubkey, data]) => {
+    const builderSeriesData: BuilderSeries[] = Array.from(builderMap.entries()).map(([pubkey, data]) => {
       const isWinner = winningBuilder === pubkey;
       return {
         builderPubkey: pubkey,
@@ -126,8 +127,8 @@ export function MevBiddingTimelineChart({
       };
     });
 
-    // Sort series so winner is on top
-    series.sort((a, b) => {
+    // Sort series so winner is rendered on top
+    builderSeriesData.sort((a, b) => {
       if (a.isWinner) return 1;
       if (b.isWinner) return -1;
       return 0;
@@ -135,7 +136,7 @@ export function MevBiddingTimelineChart({
 
     // Calculate max value for y-axis
     let max = 0;
-    series.forEach(s => {
+    builderSeriesData.forEach(s => {
       s.data.forEach(point => {
         if (point.value > max) max = point.value;
       });
@@ -147,198 +148,91 @@ export function MevBiddingTimelineChart({
       if (winningEth > max) max = winningEth;
     }
 
-    // Find the actual winning bid time by looking at the latest bid from the winning builder
-    let actualWinningBidTime: number | null = null;
-    if (winningBuilder) {
+    // Convert to LineSeries format
+    const lines: LineSeries[] = builderSeriesData.map(builder => ({
+      name: builder.displayName,
+      data: builder.data.map(point => [point.time, point.value] as [number, number]),
+      color: builder.color,
+      smooth: false,
+      symbol: 'circle',
+      symbolSize: builder.isWinner ? 6 : 4,
+      lineWidth: builder.isWinner ? 3 : 2,
+      z: builder.isWinner ? 10 : 1,
+      legendIcon: builder.isWinner ? 'diamond' : undefined,
+    }));
+
+    // Create scatter series for winning bid marker (if we have one)
+    const scatter: ScatterSeries[] = [];
+    if (winningMevValue && winningBuilder) {
+      // Find the actual winning bid time by looking at the latest bid from the winning builder
       const winningBuilderBids = biddingData.filter(bid => bid.builder_pubkey === winningBuilder);
       if (winningBuilderBids.length > 0) {
-        // Get the latest bid time from the winning builder
         const latestBid = winningBuilderBids.reduce((latest, current) => {
           return current.chunk_slot_start_diff > latest.chunk_slot_start_diff ? current : latest;
         });
-        actualWinningBidTime = latestBid.chunk_slot_start_diff;
+        const winningEth = weiToEth(winningMevValue);
+        scatter.push({
+          name: 'Winning Bid',
+          data: [[latestBid.chunk_slot_start_diff, winningEth]],
+          symbol: 'diamond',
+          symbolSize: 12,
+          color: themeColors.success,
+          borderColor: themeColors.foreground,
+          borderWidth: 2,
+          z: 100,
+        });
       }
     }
 
     return {
-      builderSeries: series,
+      lineSeries: lines,
+      scatterSeries: scatter,
       maxValue: max,
-      winningBidTime: actualWinningBidTime,
     };
   }, [biddingData, winningBuilder, winningMevValue, themeColors]);
 
-  // Prepare ECharts option
-  const chartOption = useMemo(() => {
-    const winningEth = winningMevValue ? weiToEth(winningMevValue) : null;
+  // Custom tooltip formatter
+  const tooltipFormatter = useMemo(
+    () => (params: unknown) => {
+      if (!Array.isArray(params) || params.length === 0) return '';
 
-    return {
-      animation: true,
-      animationDuration: 150,
-      grid: {
-        top: 20,
-        right: 24,
-        bottom: 48,
-        left: 64,
-        containLabel: true,
-      },
-      xAxis: {
-        type: 'value',
-        name: 'Time (seconds)',
-        nameLocation: 'middle',
-        nameGap: 32,
-        nameTextStyle: {
-          color: themeColors.muted,
-          fontSize: 12,
-        },
-        min: -8000,
-        max: 4000,
-        interval: 2000,
-        axisLabel: {
-          color: themeColors.muted,
-          fontSize: 12,
-          formatter: (value: number) => {
-            const seconds = value / 1000;
-            return seconds >= 0 ? `+${seconds.toFixed(1)}s` : `${seconds.toFixed(1)}s`;
-          },
-        },
-        axisLine: {
-          lineStyle: {
-            color: themeColors.border,
-          },
-        },
-        splitLine: {
-          lineStyle: {
-            color: themeColors.border,
-            type: 'dashed',
-          },
-        },
-      },
-      yAxis: {
-        type: 'value',
-        name: 'MEV Value (ETH)',
-        nameLocation: 'middle',
-        nameGap: 48,
-        nameTextStyle: {
-          color: themeColors.muted,
-          fontSize: 12,
-        },
-        max: maxValue > 0 ? maxValue * 1.1 : 10,
-        axisLabel: {
-          color: themeColors.muted,
-          fontSize: 12,
-          formatter: (value: number) => value.toFixed(3),
-        },
-        axisLine: {
-          show: false,
-        },
-        axisTick: {
-          show: false,
-        },
-        splitLine: {
-          lineStyle: {
-            color: themeColors.border,
-            type: 'dashed',
-          },
-        },
-      },
-      tooltip: {
-        trigger: 'axis',
-        backgroundColor: themeColors.background,
-        borderColor: themeColors.border,
-        borderWidth: 1,
-        textStyle: {
-          color: themeColors.foreground,
-          fontSize: 12,
-        },
-        formatter: (params: unknown) => {
-          if (!Array.isArray(params) || params.length === 0) return '';
+      const timeMs = (params[0] as { value: [number, number] }).value[0];
+      const timeSec = timeMs / 1000;
+      const timeDisplay = timeSec >= 0 ? `+${timeSec.toFixed(2)}s` : `${timeSec.toFixed(2)}s`;
 
-          const timeMs = (params[0] as { value: [number, number] }).value[0];
-          const timeSec = timeMs / 1000;
-          const timeDisplay = timeSec >= 0 ? `+${timeSec.toFixed(2)}s` : `${timeSec.toFixed(2)}s`;
+      let tooltip = `<div style="font-weight: 600; margin-bottom: 8px;">Time: ${timeDisplay}</div>`;
 
-          let tooltip = `<div style="font-weight: 600; margin-bottom: 8px;">Time: ${timeDisplay}</div>`;
+      params.forEach((param: unknown) => {
+        const typedParam = param as {
+          value: [number, number];
+          marker: string;
+          seriesName: string;
+        };
+        const ethValue = typedParam.value[1].toFixed(4);
+        const marker = typedParam.marker;
+        const seriesName = typedParam.seriesName;
+        tooltip += `<div style="display: flex; align-items: center; gap: 8px; margin-top: 4px;">
+          ${marker}
+          <span>${seriesName}: ${ethValue} ETH</span>
+        </div>`;
+      });
 
-          params.forEach((param: unknown) => {
-            const typedParam = param as {
-              value: [number, number];
-              marker: string;
-              seriesName: string;
-            };
-            const ethValue = typedParam.value[1].toFixed(4);
-            const marker = typedParam.marker;
-            const seriesName = typedParam.seriesName;
-            tooltip += `<div style="display: flex; align-items: center; gap: 8px; margin-top: 4px;">
-              ${marker}
-              <span>${seriesName}: ${ethValue} ETH</span>
-            </div>`;
-          });
+      return tooltip;
+    },
+    []
+  );
 
-          return tooltip;
-        },
-      },
-      legend: {
-        type: 'scroll',
-        bottom: 8,
-        left: 'center',
-        textStyle: {
-          color: themeColors.foreground,
-          fontSize: 11,
-        },
-        pageTextStyle: {
-          color: themeColors.muted,
-        },
-        data: builderSeries.map(s => ({
-          name: s.displayName,
-          icon: s.isWinner ? 'diamond' : 'circle',
-        })),
-      },
-      series: [
-        // Builder bid lines
-        ...builderSeries.map(builder => ({
-          name: builder.displayName,
-          type: 'line',
-          data: builder.data.map(point => [point.time, point.value]),
-          smooth: false,
-          connectNulls: false,
-          symbol: 'circle',
-          symbolSize: builder.isWinner ? 6 : 4,
-          lineStyle: {
-            color: builder.color,
-            width: builder.isWinner ? 3 : 2,
-            type: builder.isWinner ? 'solid' : 'solid',
-          },
-          itemStyle: {
-            color: builder.color,
-          },
-          emphasis: {
-            lineStyle: {
-              width: builder.isWinner ? 4 : 3,
-            },
-          },
-          z: builder.isWinner ? 10 : 1,
-        })),
-        // Winning bid marker (if we have one)
-        ...(winningEth !== null && winningBuilder && winningBidTime !== null
-          ? [
-              {
-                name: 'Winning Bid',
-                type: 'scatter',
-                data: [[winningBidTime, winningEth]], // Show at actual winning bid time
-                symbol: 'diamond',
-                symbolSize: 12,
-                itemStyle: {
-                  color: themeColors.success,
-                  borderColor: themeColors.foreground,
-                  borderWidth: 2,
-                },
-                z: 100,
-              },
-            ]
-          : []),
-      ],
-    };
-  }, [builderSeries, maxValue, winningMevValue, winningBuilder, winningBidTime, themeColors]);
+  // Custom X-axis formatter
+  const xAxisFormatter = useMemo(
+    () => (value: number) => {
+      const seconds = value / 1000;
+      return seconds >= 0 ? `+${seconds.toFixed(1)}s` : `${seconds.toFixed(1)}s`;
+    },
+    []
+  );
+
+  // Custom Y-axis formatter
+  const yAxisFormatter = useMemo(() => (value: number) => value.toFixed(3), []);
 
   // Handle empty data
   if (biddingData.length === 0) {
@@ -348,7 +242,7 @@ export function MevBiddingTimelineChart({
           <div
             className={
               inModal
-                ? 'flex min-h-[700px] items-center justify-center text-muted'
+                ? 'flex h-96 items-center justify-center text-muted'
                 : 'flex h-80 items-center justify-center text-muted'
             }
           >
@@ -366,10 +260,26 @@ export function MevBiddingTimelineChart({
   return (
     <PopoutCard title="MEV Bidding Timeline" subtitle={subtitle} modalSize="full">
       {({ inModal }) => (
-        <div className={inModal ? 'min-h-[700px]' : 'h-72'}>
-          <ReactECharts
-            option={chartOption}
-            style={{ height: '100%', width: '100%' }}
+        <div className={inModal ? 'h-96' : 'h-72'}>
+          <ScatterAndLineChart
+            lineSeries={lineSeries}
+            scatterSeries={scatterSeries}
+            xAxisTitle="Time (seconds)"
+            yAxisTitle="MEV Value (ETH)"
+            xMin={-8000}
+            xMax={4000}
+            xInterval={2000}
+            yMax={maxValue > 0 ? maxValue * 1.1 : 10}
+            xAxisFormatter={xAxisFormatter}
+            yAxisFormatter={yAxisFormatter}
+            tooltipFormatter={tooltipFormatter}
+            tooltipTrigger="axis"
+            showLegend={true}
+            legendType="scroll"
+            legendPosition="bottom"
+            animation={true}
+            animationDuration={150}
+            height="100%"
             notMerge={false}
             lazyUpdate={true}
           />

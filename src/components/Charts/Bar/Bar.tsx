@@ -85,10 +85,10 @@ export function BarChart({
       type: 'value' as const,
       name: axisName,
       nameLocation: 'middle' as const,
-      nameGap: 30,
+      nameGap: isHorizontal ? 30 : 50,
       nameTextStyle: {
-        color: themeColors.muted,
-        fontSize: 11,
+        color: themeColors.foreground,
+        fontSize: 12,
       },
       max,
       axisLine: {
@@ -147,10 +147,10 @@ export function BarChart({
           }
         : undefined,
       grid: {
-        top: title ? 52 : 20,
-        right: 80,
-        bottom: 40,
-        left: 40,
+        top: title ? 52 : 10,
+        right: 10,
+        bottom: 30,
+        left: 10,
         containLabel: true,
       },
       xAxis: isHorizontal ? valueAxisConfig : categoryAxisConfig,

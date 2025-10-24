@@ -48,4 +48,9 @@ export interface PopoutCardProps {
    * Additional className for the card container
    */
   className?: string;
+  /**
+   * CSS aspect ratio for content container (e.g., "16/9", "4/3", "1/1")
+   * Default: "16/9"
+   */
+  aspectRatio?: string;
 }

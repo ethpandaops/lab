@@ -78,7 +78,7 @@ function BlobDataAvailabilityComponent({
         axisLabel: {
           color: themeColors.muted,
           fontSize: 10,
-          formatter: (value: number) => Math.round(value / 1000),
+          formatter: (value: number) => `${Math.round(value / 1000)}`,
         },
         splitLine: {
           show: true,
@@ -98,8 +98,9 @@ function BlobDataAvailabilityComponent({
           color: themeColors.foreground,
           fontSize: 12,
         },
-        formatter: (params: { data: [number, string] }) => {
-          return `Blob ${params.data[1]}<br/>Time: ${(params.data[0] / 1000).toFixed(2)}s`;
+        formatter: (params: any) => {
+          const data = params.data as [number, string];
+          return `Blob ${data[1]}<br/>Time: ${(data[0] / 1000).toFixed(2)}s`;
         },
       },
       legend: {
@@ -138,12 +139,13 @@ function BlobDataAvailabilityComponent({
           color: themeColors.foreground,
           fontSize: 12,
         },
-        formatter: (params: { seriesName: string; data: [number, number] }[]) => {
-          if (!params || params.length === 0) return '';
-          const time = (params[0].data[0] / 1000).toFixed(2);
+        formatter: (params: any) => {
+          if (!params || !Array.isArray(params) || params.length === 0) return '';
+          const time = ((params[0].data as [number, number])[0] / 1000).toFixed(2);
           const lines = [`Time: ${time}s`];
-          params.forEach(param => {
-            lines.push(`${param.seriesName}: ${param.data[1].toFixed(1)}%`);
+          params.forEach((param: any) => {
+            const data = param.data as [number, number];
+            lines.push(`${param.seriesName}: ${data[1].toFixed(1)}%`);
           });
           return lines.join('<br/>');
         },

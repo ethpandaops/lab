@@ -1,8 +1,7 @@
 import { type JSX, useMemo } from 'react';
-import ReactECharts from 'echarts-for-react';
-import type { EChartsOption } from 'echarts';
 import { PopoutCard } from '@/components/Layout/PopoutCard';
-import { useThemeColors } from '@/hooks/useThemeColors';
+import { ScatterChart } from '@/components/Charts/Scatter';
+import type { ScatterSeries } from '@/components/Charts/Scatter';
 import { BLOB_COLORS } from '@/theme/data-visualization-colors';
 import type { BlobPropagationChartProps } from './BlobPropagationChart.types';
 
@@ -25,153 +24,40 @@ import type { BlobPropagationChartProps } from './BlobPropagationChart.types';
  * ```
  */
 export function BlobPropagationChart({ blobPropagationData }: BlobPropagationChartProps): JSX.Element {
-  const themeColors = useThemeColors();
-
-  // Process data and create chart options
-  const chartOption = useMemo((): EChartsOption => {
+  // Process data into scatter series
+  const scatterSeries = useMemo((): ScatterSeries[] => {
     if (blobPropagationData.length === 0) {
-      return {};
+      return [];
     }
 
     // Group data by blob index for separate scatter series
-    const blobGroups = new Map<number, Array<[number, number, string]>>();
+    const blobGroups = new Map<number, Array<[number, number]>>();
     blobPropagationData.forEach(point => {
       const blobIndex = point.blob_index;
       if (!blobGroups.has(blobIndex)) {
         blobGroups.set(blobIndex, []);
       }
-      // X = time in seconds, Y = blob index with jitter, value[2] = continent for tooltip
+      // X = time in seconds, Y = blob index with jitter
       const jitter = (Math.random() - 0.5) * 0.3; // ±0.15 jitter
-      blobGroups
-        .get(blobIndex)!
-        .push([
-          point.seen_slot_start_diff / 1000,
-          blobIndex + jitter,
-          point.meta_client_geo_continent_code || 'Unknown',
-        ]);
+      blobGroups.get(blobIndex)!.push([point.seen_slot_start_diff / 1000, blobIndex + jitter]);
     });
 
     // Get unique blob indices and sort them
     const blobIndices = Array.from(blobGroups.keys()).sort((a, b) => a - b);
 
     // Create scatter series for each blob index
-    const scatterSeries = blobIndices.map(blobIndex => ({
+    return blobIndices.map(blobIndex => ({
       name: `Blob ${blobIndex}`,
-      type: 'scatter' as const,
       data: blobGroups.get(blobIndex)!,
+      color: BLOB_COLORS[blobIndex],
       symbolSize: 7,
-      itemStyle: {
-        color: BLOB_COLORS[blobIndex] || themeColors.primary,
-        opacity: 0.7,
-      },
     }));
+  }, [blobPropagationData]);
 
-    return {
-      animation: false,
-      grid: {
-        top: 20,
-        right: 60,
-        bottom: 80,
-        left: 80,
-        containLabel: true,
-      },
-      xAxis: {
-        type: 'value' as const,
-        name: 'Time from Slot Start (s)',
-        nameLocation: 'middle' as const,
-        nameGap: 30,
-        nameTextStyle: {
-          color: themeColors.muted,
-          fontSize: 11,
-        },
-        min: 0,
-        max: 12,
-        axisLine: {
-          lineStyle: {
-            color: themeColors.border,
-          },
-        },
-        axisLabel: {
-          color: themeColors.muted,
-          fontSize: 10,
-          formatter: '{value}s',
-        },
-        splitLine: {
-          show: true,
-          lineStyle: {
-            color: themeColors.border,
-            type: 'solid' as const,
-            opacity: 0.3,
-          },
-        },
-      },
-      yAxis: {
-        type: 'value' as const,
-        name: 'Blob Index',
-        nameLocation: 'middle' as const,
-        nameGap: 50,
-        nameTextStyle: {
-          color: themeColors.muted,
-          fontSize: 11,
-        },
-        min: -0.5,
-        max: Math.max(...blobIndices) + 0.5,
-        interval: 1,
-        axisLine: {
-          lineStyle: {
-            color: themeColors.border,
-          },
-        },
-        axisTick: {
-          show: true,
-        },
-        axisLabel: {
-          color: themeColors.muted,
-          fontSize: 10,
-          formatter: (value: number) => {
-            // Only show integer blob indices
-            return Number.isInteger(value) ? value.toString() : '';
-          },
-        },
-        splitLine: {
-          show: true,
-          lineStyle: {
-            color: themeColors.border,
-            type: 'solid' as const,
-            opacity: 0.3,
-          },
-        },
-      },
-      series: scatterSeries,
-      tooltip: {
-        trigger: 'item' as const,
-        backgroundColor: themeColors.background,
-        borderColor: themeColors.border,
-        borderWidth: 1,
-        textStyle: {
-          color: themeColors.foreground,
-          fontSize: 12,
-        },
-        formatter: (params: { seriesName: string; data: [number, number, string] }) => {
-          const continent = params.data[2];
-          return `${params.seriesName}<br/>Time: ${params.data[0].toFixed(3)}s<br/>Continent: ${continent}`;
-        },
-      },
-      legend: {
-        show: true,
-        orient: 'horizontal' as const,
-        bottom: 8,
-        left: 'center' as const,
-        textStyle: {
-          color: themeColors.foreground,
-          fontSize: 10,
-        },
-        itemWidth: 14,
-        itemHeight: 8,
-        itemGap: 16,
-      },
-    } as unknown as EChartsOption;
-  }, [blobPropagationData, themeColors]);
+  const maxBlobIndex = useMemo(() => {
+    if (scatterSeries.length === 0) return 0;
+    return Math.max(...scatterSeries.map(s => parseInt(s.name.split(' ')[1])));
+  }, [scatterSeries]);
 
   // Calculate statistics for header
   const { blobCount, avgPropagationTime, totalNodes } = useMemo(() => {
@@ -198,7 +84,7 @@ export function BlobPropagationChart({ blobPropagationData }: BlobPropagationCha
           <div
             className={
               inModal
-                ? 'flex min-h-[600px] items-center justify-center text-muted'
+                ? 'flex h-96 items-center justify-center text-muted'
                 : 'flex h-72 items-center justify-center text-muted'
             }
           >
@@ -214,12 +100,18 @@ export function BlobPropagationChart({ blobPropagationData }: BlobPropagationCha
   return (
     <PopoutCard title="Blob Propagation" subtitle={subtitle} modalSize="xl">
       {({ inModal }) => (
-        <div className={inModal ? 'min-h-[600px]' : 'h-72'}>
-          <ReactECharts
-            option={chartOption}
-            style={{ height: '100%', width: '100%' }}
-            notMerge={false}
-            lazyUpdate={true}
+        <div className={inModal ? 'h-96' : 'h-72'}>
+          <ScatterChart
+            series={scatterSeries}
+            xAxisTitle="Time from Slot Start (s)"
+            yAxisTitle="Blob Index"
+            height="100%"
+            xMin={0}
+            xMax={12}
+            yMin={-0.5}
+            yMax={maxBlobIndex + 0.5}
+            showLegend={true}
+            legendPosition="bottom"
           />
         </div>
       )}

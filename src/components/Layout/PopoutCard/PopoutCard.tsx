@@ -17,6 +17,7 @@ import type { PopoutCardProps } from './PopoutCard.types';
  * - Icon indicator for expandability
  * - Content renders in both card and modal
  * - Configurable modal size
+ * - Aspect ratio support for consistent sizing
  * - Dark mode support
  *
  * @example
@@ -40,6 +41,14 @@ import type { PopoutCardProps } from './PopoutCard.types';
  *   modalSize="full"
  * >
  *   <ComplexDashboard />
+ * </PopoutCard>
+ *
+ * // Custom aspect ratio
+ * <PopoutCard
+ *   title="Square Chart"
+ *   aspectRatio="1/1"
+ * >
+ *   <MyChart height="100%" />
  * </PopoutCard>
  * ```
  */

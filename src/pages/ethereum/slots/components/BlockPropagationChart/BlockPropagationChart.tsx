@@ -1,7 +1,7 @@
 import { type JSX, useMemo } from 'react';
-import ReactECharts from 'echarts-for-react';
-import type { EChartsOption } from 'echarts';
 import { PopoutCard } from '@/components/Layout/PopoutCard';
+import { ScatterAndLineChart } from '@/components/Charts/ScatterAndLine';
+import type { ScatterSeries, LineSeries } from '@/components/Charts/ScatterAndLine/ScatterAndLine.types';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { CONTINENT_COLORS } from '@/theme/data-visualization-colors';
 import type { BlockPropagationChartProps } from './BlockPropagationChart.types';
@@ -26,10 +26,10 @@ import type { BlockPropagationChartProps } from './BlockPropagationChart.types';
 export function BlockPropagationChart({ blockPropagationData }: BlockPropagationChartProps): JSX.Element {
   const themeColors = useThemeColors();
 
-  // Process data and create chart options
-  const chartOption = useMemo((): EChartsOption => {
+  // Process data into scatter and line series
+  const { scatterSeries, lineSeries } = useMemo(() => {
     if (blockPropagationData.length === 0) {
-      return {};
+      return { scatterSeries: [], lineSeries: [] };
     }
 
     // Sort data by time for proper cumulative calculation
@@ -56,160 +56,40 @@ export function BlockPropagationChart({ blockPropagationData }: BlockPropagation
     });
 
     // Create scatter series for each continent
-    const scatterSeries = Array.from(continentGroups.entries()).map(([continent, data]) => ({
+    const scatter: ScatterSeries[] = Array.from(continentGroups.entries()).map(([continent, data]) => ({
       name: continent,
-      type: 'scatter' as const,
       data,
+      color: CONTINENT_COLORS[continent as keyof typeof CONTINENT_COLORS] || themeColors.muted,
       symbolSize: 6,
-      itemStyle: {
-        color: CONTINENT_COLORS[continent as keyof typeof CONTINENT_COLORS] || themeColors.muted,
-        opacity: 0.7,
-      },
       yAxisIndex: 0,
     }));
 
     // Create cumulative line series
-    const lineSeries = {
-      name: 'Cumulative %',
-      type: 'line' as const,
-      data: cumulativeData,
-      smooth: true,
-      symbol: 'none',
-      lineStyle: {
+    const line: LineSeries[] = [
+      {
+        name: 'Cumulative %',
+        data: cumulativeData,
         color: themeColors.primary,
-        width: 3,
+        smooth: true,
+        lineWidth: 3,
+        yAxisIndex: 1,
       },
-      yAxisIndex: 1,
-    };
+    ];
 
-    return {
-      animation: false,
-      grid: {
-        top: 40,
-        right: 80,
-        bottom: 80,
-        left: 80,
-        containLabel: true,
-      },
-      xAxis: {
-        type: 'value' as const,
-        name: 'Time from Slot Start (s)',
-        nameLocation: 'middle' as const,
-        nameGap: 30,
-        nameTextStyle: {
-          color: themeColors.muted,
-          fontSize: 11,
-        },
-        min: 0,
-        max: 12,
-        axisLine: {
-          lineStyle: {
-            color: themeColors.border,
-          },
-        },
-        axisLabel: {
-          color: themeColors.muted,
-          fontSize: 10,
-          formatter: '{value}s',
-        },
-        splitLine: {
-          show: true,
-          lineStyle: {
-            color: themeColors.border,
-            type: 'solid' as const,
-            opacity: 0.3,
-          },
-        },
-      },
-      yAxis: [
-        {
-          type: 'value' as const,
-          name: 'Node Index',
-          nameLocation: 'middle' as const,
-          nameGap: 50,
-          nameTextStyle: {
-            color: themeColors.muted,
-            fontSize: 11,
-          },
-          axisLine: {
-            show: false,
-          },
-          axisTick: {
-            show: false,
-          },
-          axisLabel: {
-            color: themeColors.muted,
-            fontSize: 10,
-          },
-          splitLine: {
-            show: true,
-            lineStyle: {
-              color: themeColors.border,
-              type: 'dashed' as const,
-              opacity: 0.2,
-            },
-          },
-        },
-        {
-          type: 'value' as const,
-          name: 'Cumulative %',
-          nameLocation: 'middle' as const,
-          nameGap: 50,
-          nameTextStyle: {
-            color: themeColors.muted,
-            fontSize: 11,
-          },
-          min: 0,
-          max: 100,
-          axisLine: {
-            show: false,
-          },
-          axisTick: {
-            show: false,
-          },
-          axisLabel: {
-            color: themeColors.muted,
-            fontSize: 10,
-            formatter: '{value}%',
-          },
-          splitLine: {
-            show: false,
-          },
-        },
-      ],
-      series: [...scatterSeries, lineSeries],
-      tooltip: {
-        trigger: 'item' as const,
-        backgroundColor: themeColors.background,
-        borderColor: themeColors.border,
-        borderWidth: 1,
-        textStyle: {
-          color: themeColors.foreground,
-          fontSize: 12,
-        },
-        formatter: (params: { componentSubType: string; seriesName: string; data: [number, number] }) => {
-          if (params.componentSubType === 'scatter') {
-            return `${params.seriesName}<br/>Time: ${params.data[0].toFixed(3)}s`;
-          } else {
-            return `Cumulative: ${params.data[1].toFixed(1)}%<br/>Time: ${params.data[0].toFixed(3)}s`;
-          }
-        },
-      },
-      legend: {
-        show: true,
-        orient: 'horizontal' as const,
-        bottom: 8,
-        left: 'center' as const,
-        textStyle: {
-          color: themeColors.foreground,
-          fontSize: 10,
-        },
-        itemWidth: 14,
-        itemHeight: 8,
-        itemGap: 16,
-      },
-    } as unknown as EChartsOption;
+    return { scatterSeries: scatter, lineSeries: line };
   }, [blockPropagationData, themeColors]);
+
+  // Custom tooltip formatter
+  const tooltipFormatter = useMemo(
+    () => (params: { componentSubType: string; seriesName: string; data: [number, number] }) => {
+      if (params.componentSubType === 'scatter') {
+        return `${params.seriesName}<br/>Time: ${params.data[0].toFixed(3)}s`;
+      } else {
+        return `Cumulative: ${params.data[1].toFixed(1)}%<br/>Time: ${params.data[0].toFixed(3)}s`;
+      }
+    },
+    []
+  );
 
   // Calculate average propagation time for header
   const avgPropagationTime = useMemo(() => {
@@ -226,7 +106,7 @@ export function BlockPropagationChart({ blockPropagationData }: BlockPropagation
           <div
             className={
               inModal
-                ? 'flex min-h-[600px] items-center justify-center text-muted'
+                ? 'flex h-96 items-center justify-center text-muted'
                 : 'flex h-72 items-center justify-center text-muted'
             }
           >
@@ -242,14 +122,23 @@ export function BlockPropagationChart({ blockPropagationData }: BlockPropagation
   return (
     <PopoutCard title="Block Propagation" subtitle={subtitle} modalSize="xl">
       {({ inModal }) => (
-        <div className={inModal ? 'min-h-[600px]' : 'h-72'}>
-          <ReactECharts
-            option={chartOption}
-            style={{ height: '100%', width: '100%' }}
-            notMerge={false}
-            lazyUpdate={true}
-          />
-        </div>
+        <ScatterAndLineChart
+          scatterSeries={scatterSeries}
+          lineSeries={lineSeries}
+          xAxisTitle="Time from Slot Start (s)"
+          yAxisTitle="Node Index"
+          yAxis2Title="Cumulative %"
+          height={inModal ? 384 : 288}
+          xMin={0}
+          xMax={12}
+          yAxis2Min={0}
+          yAxis2Max={100}
+          tooltipFormatter={tooltipFormatter}
+          showLegend={true}
+          legendPosition="bottom"
+          notMerge={false}
+          lazyUpdate={true}
+        />
       )}
     </PopoutCard>
   );

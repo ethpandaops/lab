@@ -1,8 +1,7 @@
 import { type JSX, useMemo } from 'react';
-import ReactECharts from 'echarts-for-react';
-import type { EChartsOption } from 'echarts';
 import { PopoutCard } from '@/components/Layout/PopoutCard';
 import { Alert } from '@/components/Feedback/Alert';
+import { BarChart } from '@/components/Charts/Bar';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import type {
   PreparedBlocksComparisonChartProps,
@@ -174,120 +173,33 @@ export function PreparedBlocksComparisonChart({
     };
   }, [preparedBlocks, proposedBlock, winningBidTimestamp]);
 
-  // Create chart options
-  const chartOption = useMemo((): EChartsOption => {
-    if (processedBlocks.length === 0) {
-      return {};
-    }
-
-    const yAxisData = processedBlocks.map(b => b.clientName);
-    const seriesData = processedBlocks.map(b => ({
+  // Prepare data for BarChart component
+  const { chartData, chartLabels, tooltipFormatter } = useMemo(() => {
+    const labels = processedBlocks.map(b => b.clientName);
+    const data = processedBlocks.map(b => ({
       value: b.rewardEth,
-      itemStyle: {
-        color: b.isProposed ? themeColors.accent : themeColors.success,
-      },
+      color: b.isProposed ? themeColors.accent : themeColors.success,
     }));
 
-    return {
-      animation: false,
-      grid: {
-        top: 20,
-        right: 100,
-        bottom: 60,
-        left: 40,
-        containLabel: true,
-      },
-      xAxis: {
-        type: 'value' as const,
-        name: 'Total Reward (ETH)',
-        nameLocation: 'middle' as const,
-        nameGap: 30,
-        nameTextStyle: {
-          color: themeColors.muted,
-          fontSize: 11,
-        },
-        axisLine: {
-          lineStyle: {
-            color: themeColors.border,
-          },
-        },
-        axisLabel: {
-          color: themeColors.muted,
-          fontSize: 10,
-          formatter: (value: number) => value.toFixed(4),
-        },
-        splitLine: {
-          show: true,
-          lineStyle: {
-            color: themeColors.border,
-            type: 'solid' as const,
-            opacity: 0.3,
-          },
-        },
-      },
-      yAxis: {
-        type: 'category' as const,
-        data: yAxisData,
-        axisLine: {
-          lineStyle: {
-            color: themeColors.border,
-          },
-        },
-        axisLabel: {
-          color: themeColors.foreground,
-          fontSize: 11,
-          fontWeight: 500,
-        },
-        axisTick: {
-          show: false,
-        },
-      },
-      series: [
-        {
-          name: 'Reward',
-          type: 'bar' as const,
-          data: seriesData,
-          barWidth: '60%',
-          label: {
-            show: true,
-            position: 'right' as const,
-            formatter: (params: { value: number }) => `${params.value.toFixed(4)} ETH`,
-            color: themeColors.foreground,
-            fontSize: 10,
-          },
-        },
-      ],
-      tooltip: {
-        trigger: 'axis' as const,
-        axisPointer: {
-          type: 'shadow' as const,
-        },
-        backgroundColor: themeColors.background,
-        borderColor: themeColors.border,
-        borderWidth: 1,
-        textStyle: {
-          color: themeColors.foreground,
-          fontSize: 12,
-        },
-        formatter: (params: Array<{ name: string; value: number; dataIndex: number }>) => {
-          if (!params || params.length === 0) return '';
-          const param = params[0];
-          const block = processedBlocks[param.dataIndex];
+    const formatter = (params: unknown) => {
+      if (!Array.isArray(params) || params.length === 0) return '';
+      const param = params[0] as { name: string; value: number; dataIndex: number };
+      const block = processedBlocks[param.dataIndex];
 
-          let tooltip = `<strong>${param.name}</strong><br/>`;
-          tooltip += `Reward: ${param.value.toFixed(6)} ETH<br/>`;
+      let tooltip = `<strong>${param.name}</strong><br/>`;
+      tooltip += `Reward: ${param.value.toFixed(6)} ETH<br/>`;
 
-          if (!block.isProposed && 'execution_payload_transactions_count' in block.originalBlock) {
-            const txCount = (block.originalBlock as FctPreparedBlock).execution_payload_transactions_count;
-            tooltip += `Transactions: ${txCount?.toLocaleString() || 0}<br/>`;
-            tooltip += `Version: ${block.clientVersion}`;
-          }
+      if (!block.isProposed && 'execution_payload_transactions_count' in block.originalBlock) {
+        const txCount = (block.originalBlock as FctPreparedBlock).execution_payload_transactions_count;
+        tooltip += `Transactions: ${txCount?.toLocaleString() || 0}<br/>`;
+        tooltip += `Version: ${block.clientVersion}`;
+      }
 
-          return tooltip;
-        },
-      },
-    } as unknown as EChartsOption;
-  }, [processedBlocks, themeColors]);
+      return tooltip;
+    };
+
+    return { chartData: data, chartLabels: labels, tooltipFormatter: formatter };
+  }, [processedBlocks, themeColors.accent, themeColors.success]);
 
   // Handle empty data
   if (preparedBlocks.length === 0) {
@@ -297,7 +209,7 @@ export function PreparedBlocksComparisonChart({
           <div
             className={
               inModal
-                ? 'flex min-h-[600px] items-center justify-center text-muted'
+                ? 'flex h-96 items-center justify-center text-muted'
                 : 'flex h-72 items-center justify-center text-muted'
             }
           >
@@ -330,12 +242,16 @@ export function PreparedBlocksComparisonChart({
             </div>
           )}
 
-          <div className={inModal ? 'min-h-[600px]' : 'h-72'}>
-            <ReactECharts
-              option={chartOption}
-              style={{ height: '100%', width: '100%' }}
-              notMerge={false}
-              lazyUpdate={true}
+          <div className={inModal ? 'h-96' : 'h-72'}>
+            <BarChart
+              data={chartData}
+              labels={chartLabels}
+              orientation="horizontal"
+              height="100%"
+              axisName="Total Reward (ETH)"
+              labelFormatter="{c} ETH"
+              tooltipFormatter={tooltipFormatter}
+              animationDuration={0}
             />
           </div>
         </div>

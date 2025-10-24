@@ -84,7 +84,7 @@ export function BuilderCompetitionChart({ builderData, winningBuilder }: Builder
           <div
             className={
               inModal
-                ? 'flex min-h-[500px] items-center justify-center text-muted'
+                ? 'flex h-96 items-center justify-center text-muted'
                 : 'flex h-64 items-center justify-center text-muted'
             }
           >
@@ -100,7 +100,7 @@ export function BuilderCompetitionChart({ builderData, winningBuilder }: Builder
   return (
     <PopoutCard title="Builder Competition" subtitle={subtitle} modalSize="xl">
       {({ inModal }) => (
-        <div className={inModal ? 'min-h-[500px]' : 'h-64'}>
+        <div className={inModal ? 'h-96' : 'h-64'}>
           <BarChart
             data={chartData}
             labels={labels}

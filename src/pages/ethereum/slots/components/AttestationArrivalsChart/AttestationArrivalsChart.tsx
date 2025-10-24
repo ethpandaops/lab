@@ -77,7 +77,7 @@ export function AttestationArrivalsChart({
           <div
             className={
               inModal
-                ? 'flex min-h-[500px] items-center justify-center text-muted'
+                ? 'flex h-96 items-center justify-center text-muted'
                 : 'flex h-64 items-center justify-center text-muted'
             }
           >
@@ -91,7 +91,7 @@ export function AttestationArrivalsChart({
   return (
     <PopoutCard title="Attestation Arrivals" subtitle={participationMessage} modalSize="xl">
       {({ inModal }) => (
-        <div className={inModal ? 'min-h-[500px]' : 'h-64'}>
+        <div className={inModal ? 'h-96' : 'h-64'}>
           <LineChart
             data={values}
             labels={labels}
@@ -102,11 +102,8 @@ export function AttestationArrivalsChart({
             connectNulls={false}
             animationDuration={150}
             xAxisLabelInterval={labelInterval}
-            title="Attestation Count"
-            titleFontSize={12}
-            titleFontWeight={500}
-            titleLeft="left"
-            titleTop={4}
+            xAxisTitle="Time from Slot Start (s)"
+            yAxisTitle="Attestation Count"
           />
         </div>
       )}

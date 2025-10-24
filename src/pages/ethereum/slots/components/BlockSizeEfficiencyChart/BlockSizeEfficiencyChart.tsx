@@ -71,7 +71,7 @@ export function BlockSizeEfficiencyChart({ blockHead }: BlockSizeEfficiencyChart
           <div
             className={
               inModal
-                ? 'flex min-h-[400px] items-center justify-center text-muted'
+                ? 'flex h-80 items-center justify-center text-muted'
                 : 'flex h-48 items-center justify-center text-muted'
             }
           >
@@ -87,7 +87,7 @@ export function BlockSizeEfficiencyChart({ blockHead }: BlockSizeEfficiencyChart
   return (
     <PopoutCard title="Block Size & Efficiency" subtitle={subtitle} modalSize="lg">
       {({ inModal }) => (
-        <div className={inModal ? 'grid min-h-[400px] grid-cols-2 gap-6' : 'grid grid-cols-2 gap-6'}>
+        <div className={inModal ? 'grid h-80 grid-cols-2 gap-6' : 'grid grid-cols-2 gap-6'}>
           {/* Transaction Count */}
           <div>
             <dt className="text-sm/6 font-medium text-muted">Transactions</dt>
