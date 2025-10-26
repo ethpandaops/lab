@@ -4,7 +4,7 @@
 
 /**
  * Convert Unix timestamp to a human-readable relative time string with time sections
- * @param timestamp - Unix timestamp in seconds
+ * @param timestamp - Unix timestamp in seconds (optional, can be null/undefined)
  * @returns Relative time string with detailed breakdown (e.g., "2m 30s ago", "1h 15m ago")
  *
  * @example
@@ -12,9 +12,12 @@
  * getRelativeTime(Date.now() / 1000 - 30); // "30s ago"
  * getRelativeTime(Date.now() / 1000 - 120); // "2m ago"
  * getRelativeTime(Date.now() / 1000 - 7200); // "2h ago"
+ * getRelativeTime(null); // "Never"
  * ```
  */
-export function getRelativeTime(timestamp: number): string {
+export function getRelativeTime(timestamp?: number | null): string {
+  // Handle null/undefined timestamps
+  if (timestamp == null) return 'Never';
   const now = Date.now() / 1000;
   const diff = now - timestamp;
 

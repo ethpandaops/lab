@@ -12,7 +12,7 @@ import { Table } from '@/components/Lists/Table';
 import type { Column } from '@/components/Lists/Table';
 import { UserDetailsSkeleton } from './components/UserDetailsSkeleton';
 import type { UserClassification } from './components/UserCard/UserCard.types';
-import { getClassificationLabel, getClassificationBadgeClasses, getRelativeTime } from './components/UserCard/utils';
+import { getClassificationLabel, getClassificationBadgeClasses, getRelativeTime, getCountryFlag } from '@/utils';
 import { useSlotPlayerMeta } from '@/hooks/useSlotPlayer';
 import { SlotPlayerControls } from './components/SlotPlayerControls';
 import { BlockLatencyChart } from './components/BlockLatencyChart';
@@ -26,13 +26,28 @@ const nodeColumns: Column<FctNodeActiveLast24h>[] = [
   {
     header: 'Location',
     accessor: (node: FctNodeActiveLast24h) => {
+      const city = node.meta_client_geo_city;
+      const country = node.meta_client_geo_country;
+      const countryCode = node.meta_client_geo_country_code;
+      const flag = countryCode ? getCountryFlag(countryCode, '') : '';
+
       // Show city + country if both available
-      if (node.meta_client_geo_city && node.meta_client_geo_country) {
-        return `${node.meta_client_geo_city}, ${node.meta_client_geo_country}`;
+      if (city && country) {
+        return (
+          <div className="flex items-center gap-2">
+            {flag && <span>{flag}</span>}
+            <span>{`${city}, ${country}`}</span>
+          </div>
+        );
       }
       // Otherwise show just country if available
-      if (node.meta_client_geo_country) {
-        return node.meta_client_geo_country;
+      if (country) {
+        return (
+          <div className="flex items-center gap-2">
+            {flag && <span>{flag}</span>}
+            <span>{country}</span>
+          </div>
+        );
       }
       // No location data
       return <span className="text-muted/60">Unknown</span>;
@@ -76,6 +91,14 @@ export function DetailPage(): JSX.Element {
 
   // State for triggering re-renders to update relative time
   const [, setNow] = useState(Date.now());
+
+  // State for showing all nodes in the table
+  const [showAllNodes, setShowAllNodes] = useState(false);
+
+  // Scroll to top when contributor ID changes
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [id]);
 
   // Update relative time every 10 seconds
   useEffect(() => {
@@ -266,9 +289,16 @@ export function DetailPage(): JSX.Element {
       />
 
       {/* Nodes Table */}
-      <Table data={nodes.slice(0, 50)} columns={nodeColumns} variant="nested" />
-      {nodes.length > 50 && (
-        <div className="mt-4 text-center text-sm/6 text-muted">Showing 50 of {nodes.length} nodes</div>
+      <Table data={showAllNodes ? nodes : nodes.slice(0, 5)} columns={nodeColumns} variant="nested" />
+      {nodes.length > 5 && (
+        <div className="mt-4 text-center">
+          <button
+            onClick={() => setShowAllNodes(!showAllNodes)}
+            className="text-sm/6 font-medium text-primary hover:underline"
+          >
+            {showAllNodes ? 'Show Less' : `Show More (${nodes.length - 5} more)`}
+          </button>
+        </div>
       )}
 
       {/* Live Metrics Section */}

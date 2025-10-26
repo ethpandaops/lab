@@ -12,7 +12,7 @@ function DetailPageWithSlotPlayer(): JSX.Element {
     <SlotPlayerProvider
       tables={['fct_block_first_seen_by_node', 'fct_block_blob_first_seen_by_node', 'int_attestation_first_seen']}
       initialMode="continuous"
-      initialPlaying={false}
+      initialPlaying={true}
       playbackSpeed={1}
     >
       <DetailPage />

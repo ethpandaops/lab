@@ -6,7 +6,7 @@ import { Header } from '@/components/Layout/Header';
 import { Card } from '@/components/Layout/Card';
 import { useGeographicalData } from './hooks/useGeographicalData';
 import { useFilteredInsights } from './hooks/useFilteredInsights';
-import { getCountryFlag } from './hooks/useGeographicalData/utils';
+import { getCountryFlag } from '@/utils';
 import type {
   LocationStats,
   ContinentCode,

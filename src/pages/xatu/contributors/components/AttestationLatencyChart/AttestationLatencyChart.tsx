@@ -95,7 +95,7 @@ export function AttestationLatencyChart({ username }: AttestationLatencyChartPro
         name: 'Avg Latency (ms)',
       }}
       height={300}
-      showLegend={series.length > 1}
+      showLegend={series.length > 1 && series.length <= 10}
       enableDataZoom={true}
       enableAggregateToggle={true}
       tooltipFormatter={(params: unknown) => {
