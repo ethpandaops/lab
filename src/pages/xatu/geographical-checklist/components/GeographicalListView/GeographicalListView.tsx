@@ -1,11 +1,10 @@
 import type { JSX } from 'react';
 import { Disclosure } from '@/components/Layout/Disclosure';
 import { Table } from '@/components/Lists/Table';
-import { Badge } from '@/components/Elements/Badge';
 import type { GeographicalListViewProps } from './GeographicalListView.types';
 import type { Column } from '@/components/Lists/Table/Table.types';
 import type { ProcessedNode } from '../../hooks/useGeographicalData/useGeographicalData.types';
-import { getClassificationBadgeColor, getRelativeTime } from '../../hooks/useGeographicalData/utils';
+import { getClassificationBadgeClasses, getRelativeTime } from '@/utils';
 
 export function GeographicalListView({ continents, isLoading }: GeographicalListViewProps): JSX.Element {
   if (isLoading) {
@@ -31,36 +30,37 @@ export function GeographicalListView({ continents, isLoading }: GeographicalList
           </div>
         );
       },
-      cellClassName: 'text-xs/5 text-muted',
+      cellClassName: 'text-muted',
     },
     {
       header: 'Username',
       accessor: node => node.username || 'Unknown',
-      cellClassName: 'text-xs/5 text-muted',
+      cellClassName: 'text-muted',
     },
     {
       header: 'Classification',
       accessor: node => (
-        <Badge color={getClassificationBadgeColor(node.classification)} size="small">
+        <span
+          className={`inline-flex shrink-0 items-center rounded-sm px-1.5 py-0.5 text-xs font-medium inset-ring ${getClassificationBadgeClasses(node.classification)}`}
+        >
           {node.classification}
-        </Badge>
+        </span>
       ),
-      cellClassName: 'text-xs/5',
     },
     {
       header: 'Client',
       accessor: node => node.meta_consensus_implementation || 'Unknown',
-      cellClassName: 'text-xs/5 text-muted',
+      cellClassName: 'text-muted',
     },
     {
       header: 'Version',
       accessor: node => node.meta_consensus_version || 'Unknown',
-      cellClassName: 'text-xs/5 text-muted',
+      cellClassName: 'text-muted',
     },
     {
       header: 'Last Seen',
       accessor: node => getRelativeTime(node.last_seen_date_time),
-      cellClassName: 'text-xs/5 text-muted',
+      cellClassName: 'text-muted',
     },
   ];
 

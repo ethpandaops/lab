@@ -32,7 +32,7 @@ export function BlockLatencyChart({ username }: BlockLatencyChartProps): JSX.Ele
         username_eq: username,
         slot_start_date_time_gte: queryRange?.slot_start_date_time_gte,
         slot_start_date_time_lte: queryRange?.slot_start_date_time_lte,
-        page_size: 1000,
+        page_size: 10000,
         order_by: 'slot_start_date_time ASC',
       },
     }),
@@ -77,7 +77,7 @@ export function BlockLatencyChart({ username }: BlockLatencyChartProps): JSX.Ele
         name: 'Latency (ms)',
       }}
       height={300}
-      showLegend={series.length > 1}
+      showLegend={series.length > 1 && series.length <= 10}
       enableDataZoom={true}
       enableAggregateToggle={true}
       tooltipFormatter={(params: unknown) => {

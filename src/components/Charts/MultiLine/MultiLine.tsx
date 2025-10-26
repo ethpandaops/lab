@@ -264,6 +264,7 @@ export function MultiLineChart({
       },
     },
     formatter: tooltipFormatter,
+    appendToBody: true, // Render tooltip in document body to prevent container clipping
   };
 
   // Build complete option

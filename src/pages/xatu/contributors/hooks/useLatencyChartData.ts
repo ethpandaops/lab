@@ -6,6 +6,37 @@ import { useThemeColors } from '@/hooks/useThemeColors';
 const NODE_COLORS = ['#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#06b6d4'] as const;
 
 /**
+ * Generate a unique, readable series name from node_id and implementation
+ *
+ * Examples:
+ * - "pub-user-lighthouse-london-01" + "lighthouse" → "lighthouse - london-01"
+ * - "corp-acme-prysm-nyc" + "prysm" → "prysm - nyc"
+ * - "random-uuid-string" + "teku" → "teku - uuid-string" (last 12 chars)
+ *
+ * @param nodeId - The unique node identifier
+ * @param implementation - The consensus client implementation name
+ * @returns A unique, human-readable series name
+ */
+function generateSeriesName(nodeId: string, implementation: string): string {
+  // Try to extract a meaningful suffix from node_id
+  // Split by common delimiters and take the last 2-3 segments
+  const parts = nodeId.split(/[-_]/);
+
+  if (parts.length > 2) {
+    // Take last 2 segments for multi-part IDs (e.g., "london-01", "nyc-alpha")
+    const suffix = parts.slice(-2).join('-');
+    return `${implementation} - ${suffix}`;
+  } else if (parts.length === 2) {
+    // Take last segment for 2-part IDs
+    return `${implementation} - ${parts[1]}`;
+  } else {
+    // Fallback: use last 12 characters of node_id for unstructured IDs
+    const shortId = nodeId.slice(-12);
+    return `${implementation} - ${shortId}`;
+  }
+}
+
+/**
  * Generic data point with slot and latency information
  * Matches the shape of API response items (all fields optional)
  */
@@ -96,8 +127,10 @@ export function useLatencyChartSeries(data: unknown, dataKey: string): LatencyCh
         .map(([slot, { sum, count }]) => [slot, sum / count] as [number, number])
         .sort((a, b) => a[0] - b[0]);
 
+      const implementation = nodeImplementationMap.get(nodeId) || 'unknown';
+
       seriesData.push({
-        name: nodeImplementationMap.get(nodeId) || nodeId,
+        name: generateSeriesName(nodeId, implementation),
         data: chartData,
         color: extendedPalette[index % extendedPalette.length],
         showSymbol: true,
