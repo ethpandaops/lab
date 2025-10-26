@@ -84,7 +84,7 @@ export function useLatencyChartSeries(data: unknown, dataKey: string): LatencyCh
 
     // Create stable color mapping based on sorted node IDs
     const allNodeIds = Array.from(nodeSlotMap.keys()).sort();
-    const extendedPalette = [colors.primary, colors.accent, colors.secondary, ...NODE_COLORS];
+    const extendedPalette = [colors.primary, ...NODE_COLORS];
 
     // Build series array for MultiLineChart
     const seriesData: SeriesData[] = [];

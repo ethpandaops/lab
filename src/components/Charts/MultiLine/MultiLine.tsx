@@ -27,7 +27,18 @@ echarts.use([
 ]);
 
 // Stable color palette for series visualization (used as fallback)
-const SERIES_COLORS = ['#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#06b6d4'] as const;
+const SERIES_COLORS = [
+  '#10b981', // green
+  '#f59e0b', // amber
+  '#8b5cf6', // purple
+  '#ec4899', // pink
+  '#06b6d4', // cyan
+  '#3b82f6', // blue
+  '#ef4444', // red
+  '#14b8a6', // teal
+  '#f43f5e', // rose
+  '#84cc16', // lime
+] as const;
 
 /**
  * MultiLineChart - A flexible multi-series line chart component using ECharts
@@ -84,7 +95,7 @@ export function MultiLineChart({
   const themeColors = useThemeColors();
 
   // Build extended palette: custom palette or theme colors + stable colors
-  const extendedPalette = colorPalette || [themeColors.primary, themeColors.accent, ...SERIES_COLORS];
+  const extendedPalette = colorPalette || [themeColors.primary, ...SERIES_COLORS];
 
   // Manage aggregate series visibility
   const [showAggregate, setShowAggregate] = useState(false);
