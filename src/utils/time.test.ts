@@ -159,6 +159,20 @@ describe('getRelativeTime', () => {
       expect(getRelativeTime(timestamp)).toBe('in 7d');
     });
   });
+
+  describe('null/undefined handling', () => {
+    it('should return "Never" for null timestamp', () => {
+      expect(getRelativeTime(null)).toBe('Never');
+    });
+
+    it('should return "Never" for undefined timestamp', () => {
+      expect(getRelativeTime(undefined)).toBe('Never');
+    });
+
+    it('should return "Never" when no argument is provided', () => {
+      expect(getRelativeTime()).toBe('Never');
+    });
+  });
 });
 
 describe('formatTimestamp', () => {

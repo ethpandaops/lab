@@ -30,6 +30,8 @@ import {
   fctAttestationCorrectnessHeadServiceList,
   fctAttestationFirstSeenChunked50MsServiceGet,
   fctAttestationFirstSeenChunked50MsServiceList,
+  fctAttestationLivenessByEntityHeadServiceGet,
+  fctAttestationLivenessByEntityHeadServiceList,
   fctBlockBlobCountHeadServiceGet,
   fctBlockBlobCountHeadServiceList,
   fctBlockBlobCountServiceGet,
@@ -117,6 +119,8 @@ import type {
   FctAttestationCorrectnessHeadServiceListData,
   FctAttestationFirstSeenChunked50MsServiceGetData,
   FctAttestationFirstSeenChunked50MsServiceListData,
+  FctAttestationLivenessByEntityHeadServiceGetData,
+  FctAttestationLivenessByEntityHeadServiceListData,
   FctBlockBlobCountHeadServiceGetData,
   FctBlockBlobCountHeadServiceListData,
   FctBlockBlobCountServiceGetData,
@@ -871,6 +875,58 @@ export const fctAttestationFirstSeenChunked50MsServiceGetOptions = (
       return data;
     },
     queryKey: fctAttestationFirstSeenChunked50MsServiceGetQueryKey(options),
+  });
+};
+
+export const fctAttestationLivenessByEntityHeadServiceListQueryKey = (
+  options?: Options<FctAttestationLivenessByEntityHeadServiceListData>
+) => createQueryKey('fctAttestationLivenessByEntityHeadServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctAttestationLivenessByEntityHeadServiceListOptions = (
+  options?: Options<FctAttestationLivenessByEntityHeadServiceListData>
+) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctAttestationLivenessByEntityHeadServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctAttestationLivenessByEntityHeadServiceListQueryKey(options),
+  });
+};
+
+export const fctAttestationLivenessByEntityHeadServiceGetQueryKey = (
+  options: Options<FctAttestationLivenessByEntityHeadServiceGetData>
+) => createQueryKey('fctAttestationLivenessByEntityHeadServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by slot_start_date_time
+ */
+export const fctAttestationLivenessByEntityHeadServiceGetOptions = (
+  options: Options<FctAttestationLivenessByEntityHeadServiceGetData>
+) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctAttestationLivenessByEntityHeadServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctAttestationLivenessByEntityHeadServiceGetQueryKey(options),
   });
 };
 

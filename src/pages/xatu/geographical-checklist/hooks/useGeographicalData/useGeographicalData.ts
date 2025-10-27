@@ -10,7 +10,8 @@ import type {
   ContinentCode,
   NodeClassification,
 } from './useGeographicalData.types';
-import { CONTINENT_CONFIG, getContinentCode, getCountryFlag, getClassification } from './utils';
+import { CONTINENT_CONFIG, getContinentCode, getClassification } from './utils';
+import { getCountryFlag } from '@/utils';
 
 export function useGeographicalData(): UseGeographicalDataReturn {
   // Three parallel queries for pub-, corp-, ethpandaops nodes

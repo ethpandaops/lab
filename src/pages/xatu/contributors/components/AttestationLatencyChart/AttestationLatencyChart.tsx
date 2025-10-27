@@ -1,6 +1,7 @@
 import { type JSX } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { intAttestationFirstSeenServiceListOptions } from '@/api/@tanstack/react-query.gen';
+import { Alert } from '@/components/Feedback/Alert';
 import { LoadingContainer } from '@/components/Layout/LoadingContainer';
 import { MultiLineChart } from '@/components/Charts/MultiLine';
 import { useLatencyChartSeries } from '../../hooks/useLatencyChartData';
@@ -57,8 +58,25 @@ export function AttestationLatencyChart({ username }: AttestationLatencyChartPro
 
   if (dataCount === 0) {
     return (
-      <div className="flex h-[400px] items-center justify-center rounded-sm border border-border bg-surface text-muted">
-        No attestation data available for this time range
+      <div className="space-y-4">
+        <Alert
+          variant="info"
+          description={
+            <>
+              Attestation data collection is opt-in. If this is your node and you&apos;d like to view attestation
+              metrics, please enable attestation forwarding in your{' '}
+              <a
+                href="https://github.com/ethpandaops/contributoor"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-medium underline hover:no-underline"
+              >
+                contributoor
+              </a>{' '}
+              configuration.
+            </>
+          }
+        />
       </div>
     );
   }
@@ -76,11 +94,8 @@ export function AttestationLatencyChart({ username }: AttestationLatencyChartPro
       yAxis={{
         name: 'Avg Latency (ms)',
       }}
-      title="Attestation Propagation Latency"
-      subtitle={`${dataCount} observations · Average time from slot start until attestation first seen by each node (per slot)`}
       height={300}
-      showCard={true}
-      showLegend={series.length > 1}
+      showLegend={series.length > 1 && series.length <= 10}
       enableDataZoom={true}
       enableAggregateToggle={true}
       tooltipFormatter={(params: unknown) => {

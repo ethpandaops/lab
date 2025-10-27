@@ -32,7 +32,7 @@ export function HeadLatencyChart({ username }: HeadLatencyChartProps): JSX.Eleme
         username_eq: username,
         slot_start_date_time_gte: queryRange?.slot_start_date_time_gte,
         slot_start_date_time_lte: queryRange?.slot_start_date_time_lte,
-        page_size: 1000,
+        page_size: 10000,
         order_by: 'slot_start_date_time ASC',
       },
     }),
@@ -76,11 +76,8 @@ export function HeadLatencyChart({ username }: HeadLatencyChartProps): JSX.Eleme
       yAxis={{
         name: 'Latency (ms)',
       }}
-      title="Head Propagation Latency"
-      subtitle={`${dataCount} observations · Average time from slot start until head event first seen by each node`}
       height={300}
-      showCard={true}
-      showLegend={series.length > 1}
+      showLegend={series.length > 1 && series.length <= 10}
       enableDataZoom={true}
       enableAggregateToggle={true}
       tooltipFormatter={(params: unknown) => {
