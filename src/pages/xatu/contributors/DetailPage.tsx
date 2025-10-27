@@ -343,7 +343,7 @@ export function DetailPage(): JSX.Element {
 
           <PopoutCard
             title="Attestations"
-            subtitle="Average time from slot start to first seen"
+            subtitle="Median attestation propagation latency"
             modalSize="full"
             anchorId="attestation-latency"
           >
