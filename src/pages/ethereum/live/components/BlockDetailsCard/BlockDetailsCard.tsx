@@ -1,39 +1,16 @@
 import { type JSX, memo } from 'react';
 import { Card } from '@/components/Layout/Card';
-import { ProgressBar } from '@/components/Navigation/ProgressBar';
+import { SlotProgressTimeline } from '@/components/Ethereum/SlotProgressTimeline';
 import type { BlockDetailsCardProps } from './BlockDetailsCard.types';
 
 function BlockDetailsCardComponent({
   data: _data,
-  currentTime: _currentTime,
-  attestationCount,
-  attestationPercentage,
-  attestationTotalExpected,
+  currentTime,
+  slotProgressPhases,
 }: BlockDetailsCardProps): JSX.Element {
-  // Show attestation progress bar only when attestation data is available
-  const showAttestationProgress = attestationTotalExpected && attestationTotalExpected > 0;
-
   return (
-    <Card className="p-4">
-      {/* Attestation Progress Bar */}
-      <div className="mb-1 text-xs text-muted">Attestation Progress</div>
-      {showAttestationProgress ? (
-        <ProgressBar
-          progress={attestationPercentage}
-          statusMessage={`${attestationCount} / ${attestationTotalExpected} (${attestationPercentage.toFixed(1)}%)`}
-          ariaLabel="Attestation Progress"
-          fillColor="bg-success"
-          disableTransition={true}
-        />
-      ) : (
-        <ProgressBar
-          progress={0}
-          statusMessage="—"
-          ariaLabel="Attestation Progress"
-          fillColor="bg-success"
-          disableTransition={true}
-        />
-      )}
+    <Card className="h-44 p-4">
+      <SlotProgressTimeline phases={slotProgressPhases} mode="live" currentTime={currentTime} showStats={true} />
     </Card>
   );
 }
@@ -42,9 +19,8 @@ function BlockDetailsCardComponent({
 const arePropsEqual = (prevProps: BlockDetailsCardProps, nextProps: BlockDetailsCardProps): boolean => {
   return (
     prevProps.data === nextProps.data &&
-    prevProps.attestationCount === nextProps.attestationCount &&
-    prevProps.attestationPercentage === nextProps.attestationPercentage &&
-    prevProps.attestationTotalExpected === nextProps.attestationTotalExpected
+    prevProps.currentTime === nextProps.currentTime &&
+    prevProps.slotProgressPhases === nextProps.slotProgressPhases
   );
 };
 
