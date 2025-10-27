@@ -1,8 +1,15 @@
 import type React from 'react';
-import ReactECharts from 'echarts-for-react';
+import ReactEChartsCore from 'echarts-for-react/lib/core';
+import * as echarts from 'echarts/core';
+import { HeatmapChart as EChartsHeatmap } from 'echarts/charts';
+import { GridComponent, TooltipComponent, TitleComponent, VisualMapComponent } from 'echarts/components';
+import { CanvasRenderer } from 'echarts/renderers';
 import colors from 'tailwindcss/colors';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import type { HeatmapChartProps } from './Heatmap.types';
+
+// Register ECharts components
+echarts.use([EChartsHeatmap, GridComponent, TooltipComponent, TitleComponent, VisualMapComponent, CanvasRenderer]);
 
 /**
  * HeatmapChart - A heatmap chart component using ECharts
@@ -38,8 +45,6 @@ export function HeatmapChart({
   tooltipFormatter,
   xAxisShowOnlyMinMax = false,
   yAxisShowOnlyMinMax = false,
-  notMerge = false,
-  lazyUpdate = true,
 }: HeatmapChartProps): React.JSX.Element {
   const themeColors = useThemeColors();
 
@@ -195,12 +200,12 @@ export function HeatmapChart({
 
   return (
     <div className="w-full">
-      <ReactECharts
-        key={themeColors.foreground}
+      <ReactEChartsCore
+        echarts={echarts}
         option={option}
         style={{ height, width: '100%', minHeight: height }}
-        notMerge={notMerge}
-        lazyUpdate={lazyUpdate}
+        notMerge={true}
+        lazyUpdate={false}
       />
     </div>
   );

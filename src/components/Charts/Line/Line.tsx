@@ -1,8 +1,15 @@
 import { type JSX, useMemo } from 'react';
-import ReactECharts from 'echarts-for-react';
+import ReactEChartsCore from 'echarts-for-react/lib/core';
+import * as echarts from 'echarts/core';
+import { LineChart as EChartsLine } from 'echarts/charts';
+import { GridComponent, TooltipComponent, TitleComponent } from 'echarts/components';
+import { CanvasRenderer } from 'echarts/renderers';
 import { hexToRgba } from '@/utils';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import type { LineChartProps } from './Line.types';
+
+// Register ECharts components
+echarts.use([EChartsLine, GridComponent, TooltipComponent, TitleComponent, CanvasRenderer]);
 
 /**
  * LineChart - A smoothed line chart component using ECharts
@@ -34,8 +41,6 @@ export function LineChart({
   xMax,
   connectNulls = false,
   animationDuration = 300,
-  notMerge = false,
-  lazyUpdate = true,
   xAxisLabelInterval = 'auto',
   xAxisTitle,
   yAxisTitle,
@@ -204,11 +209,12 @@ export function LineChart({
 
   return (
     <div className={height === '100%' ? 'h-full w-full' : 'w-full'}>
-      <ReactECharts
+      <ReactEChartsCore
+        echarts={echarts}
         option={option}
         style={{ height, width: '100%', minHeight: height }}
-        notMerge={notMerge}
-        lazyUpdate={lazyUpdate}
+        notMerge={true}
+        lazyUpdate={false}
       />
     </div>
   );

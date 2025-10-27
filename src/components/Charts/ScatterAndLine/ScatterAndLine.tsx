@@ -1,8 +1,15 @@
 import type { JSX } from 'react';
 import { useMemo } from 'react';
-import ReactECharts from 'echarts-for-react';
+import ReactEChartsCore from 'echarts-for-react/lib/core';
+import * as echarts from 'echarts/core';
+import { ScatterChart, LineChart } from 'echarts/charts';
+import { GridComponent, TooltipComponent, LegendComponent } from 'echarts/components';
+import { CanvasRenderer } from 'echarts/renderers';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import type { ScatterAndLineChartProps } from './ScatterAndLine.types';
+
+// Register ECharts components
+echarts.use([ScatterChart, LineChart, GridComponent, TooltipComponent, LegendComponent, CanvasRenderer]);
 
 /**
  * ScatterAndLineChart - A combined scatter and line chart component using ECharts
@@ -58,8 +65,6 @@ export function ScatterAndLineChart({
   xInterval,
   xAxisFormatter,
   yAxisFormatter,
-  notMerge = false,
-  lazyUpdate = true,
   animation = false,
   animationDuration = 150,
 }: ScatterAndLineChartProps): JSX.Element {
@@ -278,11 +283,12 @@ export function ScatterAndLineChart({
 
   return (
     <div className={height === '100%' ? 'h-full w-full' : 'w-full'}>
-      <ReactECharts
+      <ReactEChartsCore
+        echarts={echarts}
         option={option}
         style={{ height, width: '100%', minHeight: height }}
-        notMerge={notMerge}
-        lazyUpdate={lazyUpdate}
+        notMerge={true}
+        lazyUpdate={false}
       />
     </div>
   );

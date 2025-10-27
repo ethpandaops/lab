@@ -11,7 +11,7 @@ import {
   LegendComponent,
 } from 'echarts/components';
 import { CanvasRenderer } from 'echarts/renderers';
-import { hexToRgba } from '@/utils';
+import { hexToRgba, getDataVizColors } from '@/utils';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import type { MultiLineChartProps } from './MultiLine.types';
 
@@ -25,20 +25,6 @@ echarts.use([
   LegendComponent,
   CanvasRenderer,
 ]);
-
-// Stable color palette for series visualization (used as fallback)
-const SERIES_COLORS = [
-  '#10b981', // green
-  '#f59e0b', // amber
-  '#8b5cf6', // purple
-  '#ec4899', // pink
-  '#06b6d4', // cyan
-  '#3b82f6', // blue
-  '#ef4444', // red
-  '#14b8a6', // teal
-  '#f43f5e', // rose
-  '#84cc16', // lime
-] as const;
 
 /**
  * MultiLineChart - A flexible multi-series line chart component using ECharts
@@ -95,9 +81,10 @@ export function MultiLineChart({
   enableSeriesFilter = false,
 }: MultiLineChartProps): React.JSX.Element {
   const themeColors = useThemeColors();
+  const { CHART_CATEGORICAL_COLORS } = getDataVizColors();
 
-  // Build extended palette: custom palette or theme colors + stable colors
-  const extendedPalette = colorPalette || [themeColors.primary, ...SERIES_COLORS];
+  // Build extended palette: custom palette or theme colors + data viz categorical colors
+  const extendedPalette = colorPalette || [themeColors.primary, themeColors.accent, ...CHART_CATEGORICAL_COLORS];
 
   // Manage aggregate series visibility
   const [showAggregate, setShowAggregate] = useState(false);

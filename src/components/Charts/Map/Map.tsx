@@ -39,8 +39,6 @@ export function MapChart({
   regionHeight = 0.5,
   minDistance = 40,
   maxDistance = 200,
-  notMerge = false,
-  lazyUpdate = true,
 }: MapChartProps): React.JSX.Element {
   const themeColors = useThemeColors();
   const { theme } = useTheme();
@@ -248,8 +246,8 @@ export function MapChart({
         option={option}
         style={{ height, width: '100%', minHeight: height }}
         onChartReady={instance => setEchartsInstance(instance)}
-        notMerge={notMerge}
-        lazyUpdate={lazyUpdate}
+        notMerge={true}
+        lazyUpdate={false}
       />
     </div>
   );

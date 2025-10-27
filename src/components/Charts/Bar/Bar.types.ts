@@ -105,12 +105,10 @@ export interface BarChartProps {
    * Set to false for better performance when updating frequently
    * @default false
    */
-  notMerge?: boolean;
   /**
    * Whether to defer chart updates to next animation frame for better performance
    * @default true
    */
-  lazyUpdate?: boolean;
   /**
    * Custom tooltip formatter function
    * @default undefined (uses default tooltip)

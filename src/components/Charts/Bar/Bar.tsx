@@ -1,7 +1,14 @@
 import { type JSX, useMemo } from 'react';
-import ReactECharts from 'echarts-for-react';
+import ReactEChartsCore from 'echarts-for-react/lib/core';
+import * as echarts from 'echarts/core';
+import { BarChart as EChartsBar } from 'echarts/charts';
+import { GridComponent, TooltipComponent, TitleComponent } from 'echarts/components';
+import { CanvasRenderer } from 'echarts/renderers';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import type { BarChartProps } from './Bar.types';
+
+// Register ECharts components
+echarts.use([EChartsBar, GridComponent, TooltipComponent, TitleComponent, CanvasRenderer]);
 
 /**
  * BarChart - A versatile bar chart component using ECharts
@@ -49,8 +56,6 @@ export function BarChart({
   labelFormatter = '{c}',
   axisName,
   animationDuration = 300,
-  notMerge = false,
-  lazyUpdate = true,
   tooltipFormatter,
   categoryLabelInterval = 'auto',
 }: BarChartProps): JSX.Element {
@@ -220,11 +225,12 @@ export function BarChart({
 
   return (
     <div className={height === '100%' ? 'h-full w-full' : 'w-full'}>
-      <ReactECharts
+      <ReactEChartsCore
+        echarts={echarts}
         option={option}
         style={{ height, width: '100%', minHeight: height }}
-        notMerge={notMerge}
-        lazyUpdate={lazyUpdate}
+        notMerge={true}
+        lazyUpdate={false}
       />
     </div>
   );
