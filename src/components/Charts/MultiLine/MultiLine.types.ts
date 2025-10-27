@@ -1,4 +1,14 @@
 /**
+ * Data point in object format with additional metadata for tooltips
+ */
+export interface EnrichedDataPoint {
+  /** The [x, y] coordinates */
+  value: [number, number];
+  /** Additional metadata for tooltip display */
+  [key: string]: unknown;
+}
+
+/**
  * Configuration for a single data series in the chart
  */
 export interface SeriesData {
@@ -7,9 +17,10 @@ export interface SeriesData {
    */
   name: string;
   /**
-   * Series data - either simple values (for category x-axis) or [x, y] tuples (for value x-axis)
+   * Series data - simple values, [x, y] tuples, or objects with value and metadata
+   * Object format allows storing additional data for enhanced tooltips
    */
-  data: number[] | Array<[number, number]> | (number | null)[];
+  data: number[] | Array<[number, number]> | (number | null)[] | EnrichedDataPoint[];
   /**
    * Series color (hex or rgb)
    */
@@ -154,6 +165,13 @@ export interface MultiLineChartProps {
    */
   tooltipFormatter?: (params: unknown) => string;
   /**
+   * Tooltip trigger mode
+   * - 'axis': Show all series at cursor x-position (good for comparing values)
+   * - 'item': Show only the hovered series (good for many series)
+   * @default 'axis'
+   */
+  tooltipTrigger?: 'axis' | 'item';
+  /**
    * Connect null data points with line
    * @default false
    */
@@ -189,4 +207,10 @@ export interface MultiLineChartProps {
    * @default 'Average'
    */
   aggregateSeriesName?: string;
+  /**
+   * Enable series filter with search (useful for many series)
+   * Shows a collapsible filter UI when enabled
+   * @default false
+   */
+  enableSeriesFilter?: boolean;
 }

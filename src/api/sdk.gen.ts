@@ -87,6 +87,12 @@ import type {
   FctAttestationLivenessByEntityHeadServiceListData,
   FctAttestationLivenessByEntityHeadServiceListErrors,
   FctAttestationLivenessByEntityHeadServiceListResponses,
+  FctAttestationObservationByNodeServiceGetData,
+  FctAttestationObservationByNodeServiceGetErrors,
+  FctAttestationObservationByNodeServiceGetResponses,
+  FctAttestationObservationByNodeServiceListData,
+  FctAttestationObservationByNodeServiceListErrors,
+  FctAttestationObservationByNodeServiceListResponses,
   FctBlockBlobCountHeadServiceGetData,
   FctBlockBlobCountHeadServiceGetErrors,
   FctBlockBlobCountHeadServiceGetResponses,
@@ -319,6 +325,10 @@ import {
   zFctAttestationLivenessByEntityHeadServiceGetResponse,
   zFctAttestationLivenessByEntityHeadServiceListData,
   zFctAttestationLivenessByEntityHeadServiceListResponse,
+  zFctAttestationObservationByNodeServiceGetData,
+  zFctAttestationObservationByNodeServiceGetResponse,
+  zFctAttestationObservationByNodeServiceListData,
+  zFctAttestationObservationByNodeServiceListResponse,
   zFctBlockBlobCountHeadServiceGetData,
   zFctBlockBlobCountHeadServiceGetResponse,
   zFctBlockBlobCountHeadServiceListData,
@@ -1114,6 +1124,54 @@ export const fctAttestationLivenessByEntityHeadServiceGet = <ThrowOnError extend
       return await zFctAttestationLivenessByEntityHeadServiceGetResponse.parseAsync(data);
     },
     url: '/api/v1/fct_attestation_liveness_by_entity_head/{slot_start_date_time}',
+    ...options,
+  });
+};
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctAttestationObservationByNodeServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctAttestationObservationByNodeServiceListData, ThrowOnError>
+) => {
+  return (options?.client ?? client).get<
+    FctAttestationObservationByNodeServiceListResponses,
+    FctAttestationObservationByNodeServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => {
+      return await zFctAttestationObservationByNodeServiceListData.parseAsync(data);
+    },
+    responseValidator: async data => {
+      return await zFctAttestationObservationByNodeServiceListResponse.parseAsync(data);
+    },
+    url: '/api/v1/fct_attestation_observation_by_node',
+    ...options,
+  });
+};
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by slot_start_date_time
+ */
+export const fctAttestationObservationByNodeServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctAttestationObservationByNodeServiceGetData, ThrowOnError>
+) => {
+  return (options.client ?? client).get<
+    FctAttestationObservationByNodeServiceGetResponses,
+    FctAttestationObservationByNodeServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => {
+      return await zFctAttestationObservationByNodeServiceGetData.parseAsync(data);
+    },
+    responseValidator: async data => {
+      return await zFctAttestationObservationByNodeServiceGetResponse.parseAsync(data);
+    },
+    url: '/api/v1/fct_attestation_observation_by_node/{slot_start_date_time}',
     ...options,
   });
 };
