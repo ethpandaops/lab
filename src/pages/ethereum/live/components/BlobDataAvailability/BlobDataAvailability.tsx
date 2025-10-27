@@ -40,8 +40,6 @@ function BlobDataAvailabilityComponent({
   className,
 }: BlobDataAvailabilityProps): JSX.Element {
   const themeColors = useThemeColors();
-  const firstSeenSetOptionOpts = useMemo(() => ({ replaceMerge: ['series'] as const }), []);
-  const continentalSetOptionOpts = useMemo(() => ({ replaceMerge: ['series'] as const }), []);
   const firstSeenCount = deduplicatedBlobData.length;
   const continentalVersion = visibleContinentalPropagationData.reduce((sum, series) => sum + series.data.length, 0);
 
@@ -349,7 +347,7 @@ function BlobDataAvailabilityComponent({
           style={{ height: '100%', width: '100%' }}
           notMerge={false}
           lazyUpdate={true}
-          setOptionOpts={firstSeenSetOptionOpts}
+          replaceMerge={['series']}
         />
       </div>
 
@@ -360,7 +358,7 @@ function BlobDataAvailabilityComponent({
           style={{ height: '100%', width: '100%' }}
           notMerge={false}
           lazyUpdate={true}
-          setOptionOpts={continentalSetOptionOpts}
+          replaceMerge={['series']}
         />
       </div>
     </div>

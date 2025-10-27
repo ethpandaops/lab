@@ -48,7 +48,7 @@ function AttestationArrivalsComponent({
           showArea={true}
           yMax={maxCount}
           connectNulls={false}
-          animationDuration={150}
+          animationDuration={0}
           xAxisLabelInterval={intervalChartData.labelInterval}
         />
       </div>

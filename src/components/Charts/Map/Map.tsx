@@ -44,7 +44,6 @@ export function MapChart({
   const themeColors = useThemeColors();
   const { theme } = useTheme();
   const [mapLoaded, setMapLoaded] = useState(false);
-  const setOptionOpts = useMemo(() => ({ replaceMerge: ['series'] as const }), []);
   const routesLength = routes.length;
   const pointsLength = points.length;
 
@@ -245,7 +244,7 @@ export function MapChart({
         style={{ height, width: '100%', minHeight: height }}
         notMerge={notMerge}
         lazyUpdate={lazyUpdate}
-        setOptionOpts={setOptionOpts}
+        replaceMerge={['series']}
       />
     </div>
   );

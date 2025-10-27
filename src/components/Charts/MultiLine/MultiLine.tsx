@@ -95,7 +95,6 @@ export function MultiLineChart({
   enableSeriesFilter = false,
 }: MultiLineChartProps): React.JSX.Element {
   const themeColors = useThemeColors();
-  const setOptionOpts = useMemo(() => ({ replaceMerge: ['series', 'xAxis', 'yAxis'] as const }), []);
 
   // Build extended palette: custom palette or theme colors + stable colors
   const extendedPalette = colorPalette || [themeColors.primary, ...SERIES_COLORS];
@@ -540,7 +539,7 @@ export function MultiLineChart({
         option={option}
         style={{ height, width: '100%', minHeight: height }}
         notMerge={false}
-        setOptionOpts={setOptionOpts}
+        replaceMerge={['series', 'xAxis', 'yAxis']}
       />
     </>
   );

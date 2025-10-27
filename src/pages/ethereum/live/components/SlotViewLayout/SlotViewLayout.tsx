@@ -101,42 +101,95 @@ export function SlotViewLayout({ mode }: SlotViewLayoutProps): JSX.Element {
     return map;
   }, [slotData.attestationData]);
 
+  // Refs to maintain stable references - only update when indices change
+  const mapIndexRef = useRef(-1);
+  const visibleMapPointsRef = useRef<typeof sortedMapPoints>([]);
+  const blobIndexRef = useRef(-1);
+  const deduplicatedBlobDataRef = useRef<typeof deduplicatedBlobTimeline>([]);
+  const continentalIndicesRef = useRef<number[]>([]);
+  const visibleContinentalPropagationDataRef = useRef<typeof sortedContinentalSeries>([]);
+  const attestationChartValuesRef = useRef<(number | null)[]>([]);
+  const lastChartTimeRef = useRef(-1);
+  const lastSlotRef = useRef(currentSlot);
+
+  // Reset refs when slot changes
+  if (currentSlot !== lastSlotRef.current) {
+    mapIndexRef.current = -1;
+    visibleMapPointsRef.current = [];
+    blobIndexRef.current = -1;
+    deduplicatedBlobDataRef.current = [];
+    continentalIndicesRef.current = [];
+    visibleContinentalPropagationDataRef.current = [];
+    attestationChartValuesRef.current = [];
+    lastChartTimeRef.current = -1;
+    lastSlotRef.current = currentSlot;
+  }
+
   const timeFilteredData = useMemo<TimeFilteredData>(() => {
     const mapIndex = upperBound(sortedMapPoints, point => point.earliestSeenTime, currentTime);
-    const visibleMapPoints = mapIndex === sortedMapPoints.length ? sortedMapPoints : sortedMapPoints.slice(0, mapIndex);
+
+    // Only update map points if index changed
+    if (mapIndex !== mapIndexRef.current) {
+      visibleMapPointsRef.current = mapIndex === sortedMapPoints.length ? sortedMapPoints : sortedMapPoints.slice(0, mapIndex);
+      mapIndexRef.current = mapIndex;
+    }
 
     const attestationCount = slotData.attestationActualCount;
     const attestationPercentage =
       slotData.attestationTotalExpected > 0 ? (attestationCount / slotData.attestationTotalExpected) * 100 : 0;
 
     const blobIndex = upperBound(deduplicatedBlobTimeline, blob => blob.time, currentTime);
-    const deduplicatedBlobData =
-      blobIndex === deduplicatedBlobTimeline.length
-        ? deduplicatedBlobTimeline
-        : deduplicatedBlobTimeline.slice(0, blobIndex);
 
-    const visibleContinentalPropagationData = sortedContinentalSeries.map(continent => {
+    // Only update blob data if index changed
+    if (blobIndex !== blobIndexRef.current) {
+      deduplicatedBlobDataRef.current =
+        blobIndex === deduplicatedBlobTimeline.length
+          ? deduplicatedBlobTimeline
+          : deduplicatedBlobTimeline.slice(0, blobIndex);
+      blobIndexRef.current = blobIndex;
+    }
+
+    // Only update continental data if any index changed
+    let continentalChanged = false;
+    const newContinentalIndices = sortedContinentalSeries.map((continent, idx) => {
       const dataIndex = upperBound(continent.data, point => point.time, currentTime);
-      return dataIndex === continent.data.length
-        ? continent
-        : {
-            ...continent,
-            data: continent.data.slice(0, dataIndex),
-          };
+      if (continentalIndicesRef.current[idx] !== dataIndex) {
+        continentalChanged = true;
+      }
+      return dataIndex;
     });
 
-    const attestationChartValues = TIME_POINTS.map(time => {
-      if (time > currentTime) return null;
-      return attestationTimeToCount.get(time) ?? 0;
-    });
+    if (continentalChanged || continentalIndicesRef.current.length !== newContinentalIndices.length) {
+      visibleContinentalPropagationDataRef.current = sortedContinentalSeries.map((continent, idx) => {
+        const dataIndex = newContinentalIndices[idx];
+        return dataIndex === continent.data.length
+          ? continent
+          : {
+              ...continent,
+              data: continent.data.slice(0, dataIndex),
+            };
+      });
+      continentalIndicesRef.current = newContinentalIndices;
+    }
+
+    // Only rebuild attestation chart values when needed
+    // Round currentTime to nearest 50ms to avoid rebuilding on every frame
+    const roundedTime = Math.floor(currentTime / 50) * 50;
+    if (roundedTime !== lastChartTimeRef.current) {
+      attestationChartValuesRef.current = TIME_POINTS.map(time => {
+        if (time > currentTime) return null;
+        return attestationTimeToCount.get(time) ?? 0;
+      });
+      lastChartTimeRef.current = roundedTime;
+    }
 
     return {
-      visibleMapPoints,
+      visibleMapPoints: visibleMapPointsRef.current,
       attestationCount,
       attestationPercentage,
-      deduplicatedBlobData,
-      visibleContinentalPropagationData,
-      attestationChartValues,
+      deduplicatedBlobData: deduplicatedBlobDataRef.current,
+      visibleContinentalPropagationData: visibleContinentalPropagationDataRef.current,
+      attestationChartValues: attestationChartValuesRef.current,
     };
   }, [
     sortedMapPoints,

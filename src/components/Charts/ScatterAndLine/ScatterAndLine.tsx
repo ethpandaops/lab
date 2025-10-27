@@ -64,7 +64,6 @@ export function ScatterAndLineChart({
   animationDuration = 150,
 }: ScatterAndLineChartProps): JSX.Element {
   const themeColors = useThemeColors();
-  const setOptionOpts = useMemo(() => ({ replaceMerge: ['series', 'xAxis', 'yAxis'] as const }), []);
 
   const option = useMemo(
     () => ({
@@ -284,7 +283,7 @@ export function ScatterAndLineChart({
         style={{ height, width: '100%', minHeight: height }}
         notMerge={notMerge}
         lazyUpdate={lazyUpdate}
-        setOptionOpts={setOptionOpts}
+        replaceMerge={['series', 'xAxis', 'yAxis']}
       />
     </div>
   );
