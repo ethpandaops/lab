@@ -167,10 +167,16 @@ export function MultiLineChart({
     });
   };
 
-  // Filter series helper functions
-  const filterableSeries = series.filter(s => !enableAggregateToggle || s.name !== aggregateSeriesName);
+  // Filter series helper functions (memoized to avoid recomputing on every render)
+  const filterableSeries = useMemo(
+    () => series.filter(s => !enableAggregateToggle || s.name !== aggregateSeriesName),
+    [series, enableAggregateToggle, aggregateSeriesName]
+  );
 
-  const filteredSeriesBySearch = filterableSeries.filter(s => s.name.toLowerCase().includes(searchQuery.toLowerCase()));
+  const filteredSeriesBySearch = useMemo(
+    () => filterableSeries.filter(s => s.name.toLowerCase().includes(searchQuery.toLowerCase())),
+    [filterableSeries, searchQuery]
+  );
 
   const selectAllFiltered = (): void => {
     setVisibleSeries(prev => {
@@ -188,7 +194,10 @@ export function MultiLineChart({
     });
   };
 
-  const visibleCount = filterableSeries.filter(s => visibleSeries.has(s.name)).length;
+  const visibleCount = useMemo(
+    () => filterableSeries.filter(s => visibleSeries.has(s.name)).length,
+    [filterableSeries, visibleSeries]
+  );
 
   // Filter series based on visibility (when legend or filter is enabled) and aggregate toggle
   // Use useMemo to create a new array reference only when filtering actually changes

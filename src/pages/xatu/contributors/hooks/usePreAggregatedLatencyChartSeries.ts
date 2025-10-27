@@ -74,13 +74,21 @@ export function usePreAggregatedLatencyChartSeries(
     const items = ((data as Record<string, unknown>)?.[dataKey] ?? []) as PreAggregatedLatencyDataPoint[];
     const nodeSeriesMap = new Map<string, EnrichedDataPoint[]>();
     const nodeImplementationMap = new Map<string, string>();
+    let minSlotValue = Infinity;
+    let maxSlotValue = -Infinity;
 
     // Organize data by node - data is already aggregated per slot per node
+    // Track min/max slots during this loop to avoid second iteration
     items.forEach(item => {
       if (item.slot == null || item.median_seen_slot_start_diff == null || !item.node_id) return;
 
       const nodeId = item.node_id;
       const implementation = item.meta_consensus_implementation || 'unknown';
+      const slot = item.slot;
+
+      // Track min/max slots
+      if (slot < minSlotValue) minSlotValue = slot;
+      if (slot > maxSlotValue) maxSlotValue = slot;
 
       // Track consensus implementation for this node
       if (!nodeImplementationMap.has(nodeId)) {
@@ -92,7 +100,7 @@ export function usePreAggregatedLatencyChartSeries(
         nodeSeriesMap.set(nodeId, []);
       }
       nodeSeriesMap.get(nodeId)!.push({
-        value: [item.slot, item.median_seen_slot_start_diff],
+        value: [slot, item.median_seen_slot_start_diff],
         min: item.min_seen_slot_start_diff ?? undefined,
         max: item.max_seen_slot_start_diff ?? undefined,
         avg: item.avg_seen_slot_start_diff ?? undefined,
@@ -122,10 +130,9 @@ export function usePreAggregatedLatencyChartSeries(
       });
     });
 
-    // Calculate axis range
-    const allSlots = seriesData.flatMap(s => (s.data as EnrichedDataPoint[]).map(d => d.value[0]));
-    const calculatedMinSlot = allSlots.length > 0 ? Math.min(...allSlots) - 1 : 0;
-    const calculatedMaxSlot = allSlots.length > 0 ? Math.max(...allSlots) + 1 : 0;
+    // Calculate axis range from tracked min/max (avoid expensive flatMap + spread)
+    const calculatedMinSlot = minSlotValue !== Infinity ? minSlotValue - 1 : 0;
+    const calculatedMaxSlot = maxSlotValue !== -Infinity ? maxSlotValue + 1 : 0;
 
     return {
       series: seriesData,

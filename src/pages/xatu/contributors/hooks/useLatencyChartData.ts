@@ -67,13 +67,21 @@ export function useLatencyChartSeries(data: unknown, dataKey: string): LatencyCh
     const nodeSlotMap = new Map<string, Map<number, { sum: number; count: number }>>();
     const nodeImplementationMap = new Map<string, string>();
     const aggregateMap = new Map<number, { sum: number; count: number }>();
+    let minSlotValue = Infinity;
+    let maxSlotValue = -Infinity;
 
     // Aggregate data per node per slot
+    // Track min/max slots during this loop to avoid second iteration
     items.forEach(item => {
       if (item.slot == null || item.seen_slot_start_diff == null || !item.node_id) return;
 
       const nodeId = item.node_id;
       const implementation = item.meta_consensus_implementation || 'unknown';
+      const slot = item.slot;
+
+      // Track min/max slots
+      if (slot < minSlotValue) minSlotValue = slot;
+      if (slot > maxSlotValue) maxSlotValue = slot;
 
       // Track consensus implementation for this node
       if (!nodeImplementationMap.has(nodeId)) {
@@ -85,16 +93,16 @@ export function useLatencyChartSeries(data: unknown, dataKey: string): LatencyCh
         nodeSlotMap.set(nodeId, new Map());
       }
       const slotMap = nodeSlotMap.get(nodeId)!;
-      const existing = slotMap.get(item.slot) ?? { sum: 0, count: 0 };
+      const existing = slotMap.get(slot) ?? { sum: 0, count: 0 };
       existing.sum += item.seen_slot_start_diff;
       existing.count += 1;
-      slotMap.set(item.slot, existing);
+      slotMap.set(slot, existing);
 
       // Add to aggregate data
-      const aggExisting = aggregateMap.get(item.slot) ?? { sum: 0, count: 0 };
+      const aggExisting = aggregateMap.get(slot) ?? { sum: 0, count: 0 };
       aggExisting.sum += item.seen_slot_start_diff;
       aggExisting.count += 1;
-      aggregateMap.set(item.slot, aggExisting);
+      aggregateMap.set(slot, aggExisting);
     });
 
     // Create stable color mapping based on sorted node IDs
@@ -139,10 +147,9 @@ export function useLatencyChartSeries(data: unknown, dataKey: string): LatencyCh
       });
     }
 
-    // Calculate axis range
-    const allSlots = seriesData.flatMap(s => (s.data as Array<[number, number]>).map(d => d[0]));
-    const calculatedMinSlot = allSlots.length > 0 ? Math.min(...allSlots) - 1 : 0;
-    const calculatedMaxSlot = allSlots.length > 0 ? Math.max(...allSlots) + 1 : 0;
+    // Calculate axis range from tracked min/max (avoid expensive flatMap + spread)
+    const calculatedMinSlot = minSlotValue !== Infinity ? minSlotValue - 1 : 0;
+    const calculatedMaxSlot = maxSlotValue !== -Infinity ? maxSlotValue + 1 : 0;
 
     return {
       series: seriesData,
