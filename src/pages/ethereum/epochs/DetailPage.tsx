@@ -133,7 +133,7 @@ export function DetailPage(): React.JSX.Element {
       {/* Header */}
       <Header
         title={`Epoch ${epoch}`}
-        description={`${timestamp.toLocaleString()} (${relativeTime}) · Detailed analysis of all ${data.slots.length} slots in this epoch`}
+        description={`${timestamp.toLocaleString()} (${relativeTime})`}
       />
 
       {/* Back link */}
