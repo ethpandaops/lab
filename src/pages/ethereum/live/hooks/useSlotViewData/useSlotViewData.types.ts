@@ -8,6 +8,16 @@ import type {
   ContinentalPropagationSeries,
 } from '../../components/BlobDataAvailability/BlobDataAvailability.types';
 import type { AttestationDataPoint } from '../../components/AttestationArrivals/AttestationArrivals.types';
+import type {
+  FctBlockHead,
+  FctBlockProposer,
+  FctBlockMev,
+  FctBlockFirstSeenByNode,
+  FctAttestationFirstSeenChunked50Ms,
+  IntBeaconCommitteeHead,
+  FctMevBidHighestValueByBuilderChunked50Ms,
+  FctMevBidCountByRelay,
+} from '@/api/types.gen';
 
 export interface SlotViewData {
   // Block details (for slim card)
@@ -39,4 +49,16 @@ export interface SlotViewData {
   // State
   isLoading: boolean;
   errors: Array<{ endpoint: string; error: Error }>;
+
+  // Raw API data (for slot progress timeline)
+  rawApiData: {
+    blockHead?: FctBlockHead;
+    blockProposer?: FctBlockProposer;
+    blockMev?: FctBlockMev;
+    blockPropagation: FctBlockFirstSeenByNode[];
+    attestations: FctAttestationFirstSeenChunked50Ms[];
+    committees: IntBeaconCommitteeHead[];
+    mevBidding: FctMevBidHighestValueByBuilderChunked50Ms[];
+    relayBids: FctMevBidCountByRelay[];
+  };
 }

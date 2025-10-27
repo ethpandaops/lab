@@ -4,7 +4,7 @@ import { MapChart } from '@/components/Charts/Map';
 import { Sidebar } from '../Sidebar';
 import { BlockDetailsCard } from '../BlockDetailsCard';
 import { BottomBar } from '../BottomBar';
-import { useSlotViewData } from '../../hooks';
+import { useSlotViewData, useSlotProgressData } from '../../hooks';
 import type { SlotViewLayoutProps, TimeFilteredData } from './SlotViewLayout.types';
 
 export function SlotViewLayout({ mode }: SlotViewLayoutProps): JSX.Element {
@@ -46,6 +46,9 @@ export function SlotViewLayout({ mode }: SlotViewLayoutProps): JSX.Element {
 
   // Fetch all slot data
   const slotData = useSlotViewData(currentSlot);
+
+  // Compute slot progress phases for timeline
+  const { phases: slotProgressPhases } = useSlotProgressData(slotData.rawApiData, currentTime);
 
   // Pre-compute static time points array (0-12s in 50ms chunks) outside of memo
   // This prevents creating a new 241-element array every 100ms
@@ -124,9 +127,7 @@ export function SlotViewLayout({ mode }: SlotViewLayoutProps): JSX.Element {
             <BlockDetailsCard
               data={slotData.blockDetails}
               currentTime={currentTime}
-              attestationCount={timeFilteredData.attestationCount}
-              attestationPercentage={timeFilteredData.attestationPercentage}
-              attestationTotalExpected={slotData.attestationTotalExpected}
+              slotProgressPhases={slotProgressPhases}
             />
           </div>
 

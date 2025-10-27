@@ -51,8 +51,24 @@ export interface SlotDetailData {
   proposerEntity: FctBlockProposerEntity[];
 }
 
+/**
+ * Raw API data for SlotProgressTimeline integration.
+ * Extracted from arrays for easier consumption.
+ */
+export interface SlotDetailRawApiData {
+  blockHead?: FctBlockHead;
+  blockProposer?: FctBlockProposer;
+  blockMev?: FctBlockMev;
+  blockPropagation: FctBlockFirstSeenByNode[];
+  attestations: FctAttestationFirstSeenChunked50Ms[];
+  committees: IntBeaconCommitteeHead[];
+  mevBidding: FctMevBidHighestValueByBuilderChunked50Ms[];
+  relayBids: FctMevBidCountByRelay[];
+}
+
 export interface UseSlotDetailDataResult {
   data: SlotDetailData | null;
+  rawApiData: SlotDetailRawApiData | null;
   isLoading: boolean;
   error: Error | null;
 }
@@ -215,6 +231,7 @@ export function useSlotDetailData(slot: number): UseSlotDetailDataResult {
   if (isLoading || error) {
     return {
       data: null,
+      rawApiData: null,
       isLoading,
       error,
     };
@@ -238,8 +255,21 @@ export function useSlotDetailData(slot: number): UseSlotDetailDataResult {
     proposerEntity: queries[13].data?.fct_block_proposer_entity ?? [],
   };
 
+  // Extract raw API data for SlotProgressTimeline (arrays -> first element)
+  const rawApiData: SlotDetailRawApiData = {
+    blockHead: data.blockHead[0],
+    blockProposer: data.blockProposer[0],
+    blockMev: data.blockMev[0],
+    blockPropagation: data.blockPropagation,
+    attestations: data.attestations,
+    committees: data.committees,
+    mevBidding: data.mevBidding,
+    relayBids: data.relayBids,
+  };
+
   return {
     data,
+    rawApiData,
     isLoading: false,
     error: null,
   };

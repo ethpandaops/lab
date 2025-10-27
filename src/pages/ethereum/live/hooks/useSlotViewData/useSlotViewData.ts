@@ -10,6 +10,8 @@ import {
   fctBlockBlobFirstSeenByNodeServiceListOptions,
   fctAttestationFirstSeenChunked50MsServiceListOptions,
   intBeaconCommitteeHeadServiceListOptions,
+  fctMevBidHighestValueByBuilderChunked50MsServiceListOptions,
+  fctMevBidCountByRelayServiceListOptions,
 } from '@/api/@tanstack/react-query.gen';
 import { slotToTimestamp } from '../../utils';
 import { useBlockDetailsData } from '../useBlockDetailsData';
@@ -164,6 +166,35 @@ export function useSlotViewData(currentSlot: number): SlotViewData {
     },
   });
 
+  // API Query 9: MEV Bidding Timeline (chunked 50ms)
+  const mevBiddingQuery = useQuery({
+    ...fctMevBidHighestValueByBuilderChunked50MsServiceListOptions({
+      query: {
+        slot_start_date_time_eq: slotStartDateTime,
+        page_size: 10000,
+      },
+    }),
+    enabled: slotStartDateTime > 0,
+    retry: (failureCount, error) => {
+      if (error && typeof error === 'object' && 'status' in error && error.status === 404) return false;
+      return failureCount < 3;
+    },
+  });
+
+  // API Query 10: MEV Bid Count by Relay
+  const relayBidsQuery = useQuery({
+    ...fctMevBidCountByRelayServiceListOptions({
+      query: {
+        slot_start_date_time_eq: slotStartDateTime,
+      },
+    }),
+    enabled: slotStartDateTime > 0,
+    retry: (failureCount, error) => {
+      if (error && typeof error === 'object' && 'status' in error && error.status === 404) return false;
+      return failureCount < 3;
+    },
+  });
+
   // Aggregate loading state (critical queries only)
   // If slotStartDateTime is 0, queries are disabled but we should still show loading
   const isLoading =
@@ -189,6 +220,13 @@ export function useSlotViewData(currentSlot: number): SlotViewData {
       errorList.push({ endpoint: 'fct_block_blob_first_seen_by_node', error: blobFirstSeenQuery.error as Error });
     if (attestationQuery.error)
       errorList.push({ endpoint: 'fct_attestation_first_seen_chunked_50ms', error: attestationQuery.error as Error });
+    if (mevBiddingQuery.error)
+      errorList.push({
+        endpoint: 'fct_mev_bid_highest_value_by_builder_chunked_50ms',
+        error: mevBiddingQuery.error as Error,
+      });
+    if (relayBidsQuery.error)
+      errorList.push({ endpoint: 'fct_mev_bid_count_by_relay', error: relayBidsQuery.error as Error });
     return errorList;
   }, [
     blockHeadQuery.error,
@@ -198,6 +236,8 @@ export function useSlotViewData(currentSlot: number): SlotViewData {
     blockFirstSeenQuery.error,
     blobFirstSeenQuery.error,
     attestationQuery.error,
+    mevBiddingQuery.error,
+    relayBidsQuery.error,
   ]);
 
   // Transform data using component-specific hooks
@@ -248,6 +288,30 @@ export function useSlotViewData(currentSlot: number): SlotViewData {
   // For now, just return 0 to avoid showing incorrect data
   const attestationActualCount = 0;
 
+  // Prepare raw API data for slot progress timeline
+  const rawApiData = useMemo(
+    () => ({
+      blockHead: blockHeadQuery.data?.fct_block_head?.[0],
+      blockProposer: blockProposerQuery.data?.fct_block_proposer?.[0],
+      blockMev: blockMevQuery.data?.fct_block_mev?.[0],
+      blockPropagation: blockFirstSeenQuery.data?.fct_block_first_seen_by_node ?? EMPTY_BLOCK_FIRST_SEEN,
+      attestations: attestationQuery.data?.fct_attestation_first_seen_chunked_50ms ?? EMPTY_ATTESTATION,
+      committees: committeeQuery.data?.int_beacon_committee_head ?? [],
+      mevBidding: mevBiddingQuery.data?.fct_mev_bid_highest_value_by_builder_chunked_50ms ?? [],
+      relayBids: relayBidsQuery.data?.fct_mev_bid_count_by_relay ?? [],
+    }),
+    [
+      blockHeadQuery.data,
+      blockProposerQuery.data,
+      blockMevQuery.data,
+      blockFirstSeenQuery.data,
+      attestationQuery.data,
+      committeeQuery.data,
+      mevBiddingQuery.data,
+      relayBidsQuery.data,
+    ]
+  );
+
   return useMemo(
     () => ({
       blockDetails,
@@ -266,6 +330,7 @@ export function useSlotViewData(currentSlot: number): SlotViewData {
       attestationMaxCount,
       isLoading,
       errors,
+      rawApiData,
     }),
     [
       blockDetails,
@@ -282,6 +347,7 @@ export function useSlotViewData(currentSlot: number): SlotViewData {
       attestationMaxCount,
       isLoading,
       errors,
+      rawApiData,
     ]
   );
 }
