@@ -130,7 +130,7 @@ export function MultiLineChart({
 
     // Remove series from visible set if they no longer exist in current series
     setVisibleSeries(prevVisible => {
-      let updated = new Set(prevVisible);
+      const updated = new Set(prevVisible);
       let changed = false;
 
       // Remove series that no longer exist
@@ -209,7 +209,15 @@ export function MultiLineChart({
       if (enableAggregateToggle && s.name === aggregateSeriesName && !showAggregate) return false;
       return true;
     });
-  }, [series, showLegend, enableSeriesFilter, visibleSeries, enableAggregateToggle, aggregateSeriesName, showAggregate]);
+  }, [
+    series,
+    showLegend,
+    enableSeriesFilter,
+    visibleSeries,
+    enableAggregateToggle,
+    aggregateSeriesName,
+    showAggregate,
+  ]);
 
   // Build x-axis configuration
   const xAxisConfig = {
