@@ -408,7 +408,7 @@ export function useEpochDetailData(epoch: number): UseEpochDetailDataReturn {
       blockProductionTimeSeries,
       blockSizeTimeSeries,
     };
-  }, [results, isLoading, error, currentNetwork, epoch, epochStartTime]);
+  }, [results, isLoading, error, currentNetwork, epoch, epochStartTime, firstSlot]);
 
   return {
     data,

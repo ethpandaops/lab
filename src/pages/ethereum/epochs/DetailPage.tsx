@@ -131,10 +131,7 @@ export function DetailPage(): React.JSX.Element {
   return (
     <Container>
       {/* Header */}
-      <Header
-        title={`Epoch ${epoch}`}
-        description={`${timestamp.toLocaleString()} (${relativeTime})`}
-      />
+      <Header title={`Epoch ${epoch}`} description={`${timestamp.toLocaleString()} (${relativeTime})`} />
 
       {/* Back link */}
       <Link to="/ethereum/epochs" className="mb-6 inline-block text-sm text-primary hover:underline">
