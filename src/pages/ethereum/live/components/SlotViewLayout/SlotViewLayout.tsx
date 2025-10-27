@@ -4,16 +4,23 @@ import { MapChart } from '@/components/Charts/Map';
 import { Sidebar } from '../Sidebar';
 import { BlockDetailsCard } from '../BlockDetailsCard';
 import { BottomBar } from '../BottomBar';
-import { useSlotViewData, useSlotProgressData } from '../../hooks';
+import { DebugPanel } from '../DebugPanel';
+import { useSlotViewData, useSlotProgressData, useDebug } from '../../hooks';
 import type { SlotViewLayoutProps, TimeFilteredData } from './SlotViewLayout.types';
 
 export function SlotViewLayout({ mode }: SlotViewLayoutProps): JSX.Element {
   const { currentSlot, isPlaying } = useSlotPlayerState();
   const { slotProgress } = useSlotPlayerProgress();
   const actions = useSlotPlayerActions();
+  const { enabledSections } = useDebug();
 
   // Memoize the onTimeClick handler to prevent Sidebar re-renders
   const handleTimeClick = useCallback((timeMs: number) => actions.seekToTime(timeMs), [actions]);
+
+  // FPS tracking for debug panel
+  const [currentFps, setCurrentFps] = useState<number>(60);
+  const fpsFrameTimesRef = useRef<number[]>([]);
+  const fpsLastUpdateRef = useRef(0);
 
   // Throttle currentTime updates to 10fps (100ms) for better performance
   // This reduces React re-renders significantly while still looking smooth
@@ -27,6 +34,19 @@ export function SlotViewLayout({ mode }: SlotViewLayoutProps): JSX.Element {
 
   useEffect(() => {
     const updateCurrentTime = (timestamp: number): void => {
+      // FPS calculation: track frame times over the last second
+      fpsFrameTimesRef.current.push(timestamp);
+      // Keep only frames from the last second
+      const oneSecondAgo = timestamp - 1000;
+      fpsFrameTimesRef.current = fpsFrameTimesRef.current.filter(time => time > oneSecondAgo);
+
+      // Update FPS display every 500ms
+      if (timestamp - fpsLastUpdateRef.current >= 500) {
+        const fps = fpsFrameTimesRef.current.length;
+        setCurrentFps(fps);
+        fpsLastUpdateRef.current = timestamp;
+      }
+
       // Only update state every 100ms (10fps) to reduce React re-renders
       if (timestamp - lastUpdateTimeRef.current >= 100) {
         setCurrentTime(slotProgressRef.current);
@@ -118,43 +138,52 @@ export function SlotViewLayout({ mode }: SlotViewLayoutProps): JSX.Element {
 
   return (
     <div className="flex h-screen flex-col overflow-hidden">
+      {/* Debug Panel */}
+      <DebugPanel currentFps={currentFps} />
+
       {/* Main Content Area - 67% height */}
       <div className="grid h-[67vh] grid-cols-12 gap-4 p-4">
         {/* Columns 1-9: Main Content */}
         <div className="col-span-9 flex h-full flex-col gap-4 overflow-hidden">
           {/* Block Details Card */}
-          <div className="shrink-0">
-            <BlockDetailsCard
-              data={slotData.blockDetails}
-              currentTime={currentTime}
-              slotProgressPhases={slotProgressPhases}
-            />
-          </div>
+          {enabledSections.blockDetails && (
+            <div className="shrink-0">
+              <BlockDetailsCard
+                data={slotData.blockDetails}
+                currentTime={currentTime}
+                slotProgressPhases={slotProgressPhases}
+              />
+            </div>
+          )}
 
           {/* Map Section - takes all remaining vertical space */}
-          <div className="min-h-0 flex-1 overflow-hidden">
-            <div className="h-full w-full">
-              <MapChart points={timeFilteredData.visibleMapPoints} height="100%" pointSize={6} />
+          {enabledSections.map && (
+            <div className="min-h-0 flex-1 overflow-hidden">
+              <div className="h-full w-full">
+                <MapChart points={timeFilteredData.visibleMapPoints} height="100%" pointSize={6} />
+              </div>
             </div>
-          </div>
+          )}
         </div>
 
         {/* Columns 10-12: Sidebar - flex column constrained to parent height */}
-        <div className="col-span-3 flex h-full flex-col overflow-hidden">
-          <Sidebar
-            currentSlot={currentSlot}
-            phases={slotData.sidebarPhases}
-            currentTime={currentTime}
-            slotDuration={12000}
-            items={slotData.sidebarItems}
-            isPlaying={isPlaying}
-            onPlayPause={actions.toggle}
-            onBackward={actions.previousSlot}
-            onForward={actions.nextSlot}
-            onTimeClick={handleTimeClick}
-            isLive={mode === 'live'}
-          />
-        </div>
+        {enabledSections.sidebar && (
+          <div className="col-span-3 flex h-full flex-col overflow-hidden">
+            <Sidebar
+              currentSlot={currentSlot}
+              phases={slotData.sidebarPhases}
+              currentTime={currentTime}
+              slotDuration={12000}
+              items={slotData.sidebarItems}
+              isPlaying={isPlaying}
+              onPlayPause={actions.toggle}
+              onBackward={actions.previousSlot}
+              onForward={actions.nextSlot}
+              onTimeClick={handleTimeClick}
+              isLive={mode === 'live'}
+            />
+          </div>
+        )}
       </div>
 
       {/* Bottom Bar - 29% height */}
@@ -170,6 +199,8 @@ export function SlotViewLayout({ mode }: SlotViewLayoutProps): JSX.Element {
           attestationTotalExpected={slotData.attestationTotalExpected}
           attestationMaxCount={slotData.attestationMaxCount}
           mode={mode}
+          enableBlobAvailability={enabledSections.blobAvailability}
+          enableAttestationArrivals={enabledSections.attestationArrivals}
         />
       </div>
     </div>

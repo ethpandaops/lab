@@ -15,13 +15,16 @@ function BottomBarComponent({
   attestationTotalExpected,
   attestationMaxCount,
   mode: _mode,
+  enableBlobAvailability = true,
+  enableAttestationArrivals = true,
 }: BottomBarProps): JSX.Element {
   // Detect block version to choose availability component
   const version = blockVersion?.toLowerCase() ?? '';
 
   // Determine which availability component to show
-  const showBlobAvailability = version.includes('deneb') || version.includes('electra') || !version;
-  const showDataColumnAvailability = version.includes('fulu');
+  const showBlobAvailability =
+    (version.includes('deneb') || version.includes('electra') || !version) && enableBlobAvailability;
+  const showDataColumnAvailability = version.includes('fulu') && enableBlobAvailability;
 
   return (
     <div className="grid h-full grid-cols-12 gap-4 border-t border-border bg-background px-4 py-3">
@@ -53,14 +56,16 @@ function BottomBarComponent({
       </div>
 
       {/* Columns 9-12: Attestation Arrivals */}
-      <div className="col-span-4 h-full">
-        <AttestationArrivals
-          currentTime={currentTime}
-          attestationChartValues={attestationChartValues}
-          totalExpected={attestationTotalExpected}
-          maxCount={attestationMaxCount}
-        />
-      </div>
+      {enableAttestationArrivals && (
+        <div className="col-span-4 h-full">
+          <AttestationArrivals
+            currentTime={currentTime}
+            attestationChartValues={attestationChartValues}
+            totalExpected={attestationTotalExpected}
+            maxCount={attestationMaxCount}
+          />
+        </div>
+      )}
     </div>
   );
 }
@@ -74,7 +79,9 @@ const arePropsEqual = (prevProps: BottomBarProps, nextProps: BottomBarProps): bo
     prevProps.visibleContinentalPropagationData === nextProps.visibleContinentalPropagationData &&
     prevProps.attestationChartValues === nextProps.attestationChartValues &&
     prevProps.attestationTotalExpected === nextProps.attestationTotalExpected &&
-    prevProps.attestationMaxCount === nextProps.attestationMaxCount
+    prevProps.attestationMaxCount === nextProps.attestationMaxCount &&
+    prevProps.enableBlobAvailability === nextProps.enableBlobAvailability &&
+    prevProps.enableAttestationArrivals === nextProps.enableAttestationArrivals
   );
 };
 

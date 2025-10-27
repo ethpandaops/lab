@@ -11,4 +11,6 @@ export interface BottomBarProps {
   attestationTotalExpected: number;
   attestationMaxCount: number;
   mode: 'live' | 'static';
+  enableBlobAvailability?: boolean;
+  enableAttestationArrivals?: boolean;
 }

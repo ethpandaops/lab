@@ -12,3 +12,5 @@ export { useAttestationData } from './useAttestationData';
 
 export { useSlotProgressData } from './useSlotProgressData';
 export type { SlotProgressRawData, UseSlotProgressDataReturn } from './useSlotProgressData';
+
+export { useDebug } from './useDebug';

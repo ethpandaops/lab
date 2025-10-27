@@ -19,6 +19,7 @@ import { useMapData } from '../useMapData';
 import { useSidebarData } from '../useSidebarData';
 import { useBlobAvailabilityData } from '../useBlobAvailabilityData';
 import { useAttestationData } from '../useAttestationData';
+import { useDebug } from '../useDebug';
 import type { SlotViewData } from './useSlotViewData.types';
 
 // Stable empty arrays to prevent infinite re-renders
@@ -29,6 +30,7 @@ const EMPTY_DATA_COLUMN: never[] = [];
 
 export function useSlotViewData(currentSlot: number): SlotViewData {
   const { currentNetwork } = useNetwork();
+  const { enabledQueries } = useDebug();
 
   // Convert slot to timestamp for API calls
   const slotStartDateTime = useMemo(() => {
@@ -50,7 +52,7 @@ export function useSlotViewData(currentSlot: number): SlotViewData {
         page_size: 1,
       },
     }),
-    enabled: slotStartDateTime > 0,
+    enabled: slotStartDateTime > 0 && enabledQueries.blockHead,
     retry: (failureCount, error) => {
       // Don't retry on 404 - it means no data for this slot
       if (error && typeof error === 'object' && 'status' in error && error.status === 404) {
@@ -69,7 +71,7 @@ export function useSlotViewData(currentSlot: number): SlotViewData {
         page_size: 1,
       },
     }),
-    enabled: slotStartDateTime > 0,
+    enabled: slotStartDateTime > 0 && enabledQueries.blockProposer,
     retry: (failureCount, error) => {
       if (error && typeof error === 'object' && 'status' in error && error.status === 404) return false;
       return failureCount < 3;
@@ -84,7 +86,7 @@ export function useSlotViewData(currentSlot: number): SlotViewData {
         page_size: 1,
       },
     }),
-    enabled: slotStartDateTime > 0,
+    enabled: slotStartDateTime > 0 && enabledQueries.blockMev,
     retry: (failureCount, error) => {
       if (error && typeof error === 'object' && 'status' in error && error.status === 404) return false;
       return failureCount < 3;
@@ -99,7 +101,7 @@ export function useSlotViewData(currentSlot: number): SlotViewData {
         page_size: 1,
       },
     }),
-    enabled: slotStartDateTime > 0,
+    enabled: slotStartDateTime > 0 && enabledQueries.blobCount,
     retry: (failureCount, error) => {
       if (error && typeof error === 'object' && 'status' in error && error.status === 404) return false;
       return failureCount < 3;
@@ -114,7 +116,7 @@ export function useSlotViewData(currentSlot: number): SlotViewData {
         page_size: 10000,
       },
     }),
-    enabled: slotStartDateTime > 0,
+    enabled: slotStartDateTime > 0 && enabledQueries.blockFirstSeen,
     retry: (failureCount, error) => {
       if (error && typeof error === 'object' && 'status' in error && error.status === 404) return false;
       return failureCount < 3;
@@ -129,7 +131,7 @@ export function useSlotViewData(currentSlot: number): SlotViewData {
         page_size: 10000,
       },
     }),
-    enabled: slotStartDateTime > 0,
+    enabled: slotStartDateTime > 0 && enabledQueries.blobFirstSeen,
     retry: (failureCount, error) => {
       if (error && typeof error === 'object' && 'status' in error && error.status === 404) return false;
       return failureCount < 3;
@@ -144,7 +146,7 @@ export function useSlotViewData(currentSlot: number): SlotViewData {
         page_size: 10000,
       },
     }),
-    enabled: slotStartDateTime > 0,
+    enabled: slotStartDateTime > 0 && enabledQueries.attestation,
     retry: (failureCount, error) => {
       if (error && typeof error === 'object' && 'status' in error && error.status === 404) return false;
       return failureCount < 3;
@@ -159,7 +161,7 @@ export function useSlotViewData(currentSlot: number): SlotViewData {
         page_size: 10000, // Ensure we get all committees for the slot
       },
     }),
-    enabled: slotStartDateTime > 0,
+    enabled: slotStartDateTime > 0 && enabledQueries.committee,
     retry: (failureCount, error) => {
       if (error && typeof error === 'object' && 'status' in error && error.status === 404) return false;
       return failureCount < 3;
@@ -174,7 +176,7 @@ export function useSlotViewData(currentSlot: number): SlotViewData {
         page_size: 10000,
       },
     }),
-    enabled: slotStartDateTime > 0,
+    enabled: slotStartDateTime > 0 && enabledQueries.mevBidding,
     retry: (failureCount, error) => {
       if (error && typeof error === 'object' && 'status' in error && error.status === 404) return false;
       return failureCount < 3;
@@ -188,7 +190,7 @@ export function useSlotViewData(currentSlot: number): SlotViewData {
         slot_start_date_time_eq: slotStartDateTime,
       },
     }),
-    enabled: slotStartDateTime > 0,
+    enabled: slotStartDateTime > 0 && enabledQueries.relayBids,
     retry: (failureCount, error) => {
       if (error && typeof error === 'object' && 'status' in error && error.status === 404) return false;
       return failureCount < 3;
