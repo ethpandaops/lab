@@ -122,6 +122,17 @@ export const zFctAttestationFirstSeenChunked50Ms = z.object({
   updated_date_time: z.optional(z.int()),
 });
 
+export const zFctAttestationLivenessByEntityHead = z.object({
+  attestation_count: z.optional(z.int()),
+  entity: z.optional(z.string()),
+  epoch: z.optional(z.int()),
+  epoch_start_date_time: z.optional(z.int()),
+  slot: z.optional(z.int()),
+  slot_start_date_time: z.optional(z.int()),
+  status: z.optional(z.string()),
+  updated_date_time: z.optional(z.int()),
+});
+
 export const zFctBlock = z.object({
   block_root: z.optional(z.string()),
   block_total_bytes: z.optional(z.union([z.int(), z.null()])),
@@ -530,6 +541,13 @@ export const zGetFctAttestationCorrectnessHeadResponse = z.object({
  */
 export const zGetFctAttestationFirstSeenChunked50MsResponse = z.object({
   item: z.optional(zFctAttestationFirstSeenChunked50Ms),
+});
+
+/**
+ * Response for getting a single fct_attestation_liveness_by_entity_head record
+ */
+export const zGetFctAttestationLivenessByEntityHeadResponse = z.object({
+  item: z.optional(zFctAttestationLivenessByEntityHead),
 });
 
 /**
@@ -1018,6 +1036,14 @@ export const zListFctAttestationCorrectnessHeadResponse = z.object({
  */
 export const zListFctAttestationFirstSeenChunked50MsResponse = z.object({
   fct_attestation_first_seen_chunked_50ms: z.optional(z.array(zFctAttestationFirstSeenChunked50Ms)),
+  next_page_token: z.optional(z.string()),
+});
+
+/**
+ * Response for listing fct_attestation_liveness_by_entity_head records
+ */
+export const zListFctAttestationLivenessByEntityHeadResponse = z.object({
+  fct_attestation_liveness_by_entity_head: z.optional(z.array(zFctAttestationLivenessByEntityHead)),
   next_page_token: z.optional(z.string()),
 });
 
@@ -2441,6 +2467,114 @@ export const zFctAttestationFirstSeenChunked50MsServiceGetData = z.object({
  * OK
  */
 export const zFctAttestationFirstSeenChunked50MsServiceGetResponse = zGetFctAttestationFirstSeenChunked50MsResponse;
+
+export const zFctAttestationLivenessByEntityHeadServiceListData = z.object({
+  body: z.optional(z.never()),
+  path: z.optional(z.never()),
+  query: z.optional(
+    z.object({
+      slot_start_date_time_eq: z.optional(z.int()),
+      slot_start_date_time_ne: z.optional(z.int()),
+      slot_start_date_time_lt: z.optional(z.int()),
+      slot_start_date_time_lte: z.optional(z.int()),
+      slot_start_date_time_gt: z.optional(z.int()),
+      slot_start_date_time_gte: z.optional(z.int()),
+      slot_start_date_time_between_min: z.optional(z.int()),
+      slot_start_date_time_between_max_value: z.optional(z.int()),
+      slot_start_date_time_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      slot_start_date_time_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      entity_eq: z.optional(z.string()),
+      entity_ne: z.optional(z.string()),
+      entity_contains: z.optional(z.string()),
+      entity_starts_with: z.optional(z.string()),
+      entity_ends_with: z.optional(z.string()),
+      entity_like: z.optional(z.string()),
+      entity_not_like: z.optional(z.string()),
+      entity_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      entity_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      status_eq: z.optional(z.string()),
+      status_ne: z.optional(z.string()),
+      status_contains: z.optional(z.string()),
+      status_starts_with: z.optional(z.string()),
+      status_ends_with: z.optional(z.string()),
+      status_like: z.optional(z.string()),
+      status_not_like: z.optional(z.string()),
+      status_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      status_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      updated_date_time_eq: z.optional(z.int()),
+      updated_date_time_ne: z.optional(z.int()),
+      updated_date_time_lt: z.optional(z.int()),
+      updated_date_time_lte: z.optional(z.int()),
+      updated_date_time_gt: z.optional(z.int()),
+      updated_date_time_gte: z.optional(z.int()),
+      updated_date_time_between_min: z.optional(z.int()),
+      updated_date_time_between_max_value: z.optional(z.int()),
+      updated_date_time_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      updated_date_time_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      slot_eq: z.optional(z.int()),
+      slot_ne: z.optional(z.int()),
+      slot_lt: z.optional(z.int()),
+      slot_lte: z.optional(z.int()),
+      slot_gt: z.optional(z.int()),
+      slot_gte: z.optional(z.int()),
+      slot_between_min: z.optional(z.int()),
+      slot_between_max_value: z.optional(z.int()),
+      slot_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      slot_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      epoch_eq: z.optional(z.int()),
+      epoch_ne: z.optional(z.int()),
+      epoch_lt: z.optional(z.int()),
+      epoch_lte: z.optional(z.int()),
+      epoch_gt: z.optional(z.int()),
+      epoch_gte: z.optional(z.int()),
+      epoch_between_min: z.optional(z.int()),
+      epoch_between_max_value: z.optional(z.int()),
+      epoch_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      epoch_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      epoch_start_date_time_eq: z.optional(z.int()),
+      epoch_start_date_time_ne: z.optional(z.int()),
+      epoch_start_date_time_lt: z.optional(z.int()),
+      epoch_start_date_time_lte: z.optional(z.int()),
+      epoch_start_date_time_gt: z.optional(z.int()),
+      epoch_start_date_time_gte: z.optional(z.int()),
+      epoch_start_date_time_between_min: z.optional(z.int()),
+      epoch_start_date_time_between_max_value: z.optional(z.int()),
+      epoch_start_date_time_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      epoch_start_date_time_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      attestation_count_eq: z.optional(z.int()),
+      attestation_count_ne: z.optional(z.int()),
+      attestation_count_lt: z.optional(z.int()),
+      attestation_count_lte: z.optional(z.int()),
+      attestation_count_gt: z.optional(z.int()),
+      attestation_count_gte: z.optional(z.int()),
+      attestation_count_between_min: z.optional(z.int()),
+      attestation_count_between_max_value: z.optional(z.int()),
+      attestation_count_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      attestation_count_not_in_values: z.optional(z.string().check(z.regex(/^\d+(,\d+)*$/))),
+      page_size: z.optional(z.int()),
+      page_token: z.optional(z.string()),
+      order_by: z.optional(z.string()),
+    })
+  ),
+});
+
+/**
+ * OK
+ */
+export const zFctAttestationLivenessByEntityHeadServiceListResponse = zListFctAttestationLivenessByEntityHeadResponse;
+
+export const zFctAttestationLivenessByEntityHeadServiceGetData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    slot_start_date_time: z.int(),
+  }),
+  query: z.optional(z.never()),
+});
+
+/**
+ * OK
+ */
+export const zFctAttestationLivenessByEntityHeadServiceGetResponse = zGetFctAttestationLivenessByEntityHeadResponse;
 
 export const zFctBlockServiceListData = z.object({
   body: z.optional(z.never()),

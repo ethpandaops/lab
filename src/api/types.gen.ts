@@ -366,6 +366,41 @@ export type FctAttestationFirstSeenChunked50Ms = {
   updated_date_time?: number;
 };
 
+export type FctAttestationLivenessByEntityHead = {
+  /**
+   * Number of attestations for this entity/status combination
+   */
+  attestation_count?: number;
+  /**
+   * The entity (staking provider) associated with the validators, unknown if not mapped
+   */
+  entity?: string;
+  /**
+   * The epoch number containing the slot
+   */
+  epoch?: number;
+  /**
+   * The wall clock time when the epoch started
+   */
+  epoch_start_date_time?: number;
+  /**
+   * The slot number
+   */
+  slot?: number;
+  /**
+   * The wall clock time when the slot started
+   */
+  slot_start_date_time?: number;
+  /**
+   * Attestation status: attested or missed
+   */
+  status?: string;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
 export type FctBlock = {
   /**
    * The root hash of the beacon block
@@ -1581,6 +1616,13 @@ export type GetFctAttestationFirstSeenChunked50MsResponse = {
 };
 
 /**
+ * Response for getting a single fct_attestation_liveness_by_entity_head record
+ */
+export type GetFctAttestationLivenessByEntityHeadResponse = {
+  item?: FctAttestationLivenessByEntityHead;
+};
+
+/**
  * Response for getting a single fct_block_blob_count_head record
  */
 export type GetFctBlockBlobCountHeadResponse = {
@@ -2546,6 +2588,20 @@ export type ListFctAttestationFirstSeenChunked50MsResponse = {
    * The list of fct_attestation_first_seen_chunked_50ms.
    */
   fct_attestation_first_seen_chunked_50ms?: Array<FctAttestationFirstSeenChunked50Ms>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_attestation_liveness_by_entity_head records
+ */
+export type ListFctAttestationLivenessByEntityHeadResponse = {
+  /**
+   * The list of fct_attestation_liveness_by_entity_head.
+   */
+  fct_attestation_liveness_by_entity_head?: Array<FctAttestationLivenessByEntityHead>;
   /**
    * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
    */
@@ -7035,6 +7091,390 @@ export type FctAttestationFirstSeenChunked50MsServiceGetResponses = {
 
 export type FctAttestationFirstSeenChunked50MsServiceGetResponse =
   FctAttestationFirstSeenChunked50MsServiceGetResponses[keyof FctAttestationFirstSeenChunked50MsServiceGetResponses];
+
+export type FctAttestationLivenessByEntityHeadServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The wall clock time when the slot started (filter: eq)
+     */
+    slot_start_date_time_eq?: number;
+    /**
+     * The wall clock time when the slot started (filter: ne)
+     */
+    slot_start_date_time_ne?: number;
+    /**
+     * The wall clock time when the slot started (filter: lt)
+     */
+    slot_start_date_time_lt?: number;
+    /**
+     * The wall clock time when the slot started (filter: lte)
+     */
+    slot_start_date_time_lte?: number;
+    /**
+     * The wall clock time when the slot started (filter: gt)
+     */
+    slot_start_date_time_gt?: number;
+    /**
+     * The wall clock time when the slot started (filter: gte)
+     */
+    slot_start_date_time_gte?: number;
+    /**
+     * The wall clock time when the slot started (filter: between_min)
+     */
+    slot_start_date_time_between_min?: number;
+    /**
+     * The wall clock time when the slot started (filter: between_max_value)
+     */
+    slot_start_date_time_between_max_value?: number;
+    /**
+     * The wall clock time when the slot started (filter: in_values) (comma-separated list)
+     */
+    slot_start_date_time_in_values?: string;
+    /**
+     * The wall clock time when the slot started (filter: not_in_values) (comma-separated list)
+     */
+    slot_start_date_time_not_in_values?: string;
+    /**
+     * The entity (staking provider) associated with the validators, unknown if not mapped (filter: eq)
+     */
+    entity_eq?: string;
+    /**
+     * The entity (staking provider) associated with the validators, unknown if not mapped (filter: ne)
+     */
+    entity_ne?: string;
+    /**
+     * The entity (staking provider) associated with the validators, unknown if not mapped (filter: contains)
+     */
+    entity_contains?: string;
+    /**
+     * The entity (staking provider) associated with the validators, unknown if not mapped (filter: starts_with)
+     */
+    entity_starts_with?: string;
+    /**
+     * The entity (staking provider) associated with the validators, unknown if not mapped (filter: ends_with)
+     */
+    entity_ends_with?: string;
+    /**
+     * The entity (staking provider) associated with the validators, unknown if not mapped (filter: like)
+     */
+    entity_like?: string;
+    /**
+     * The entity (staking provider) associated with the validators, unknown if not mapped (filter: not_like)
+     */
+    entity_not_like?: string;
+    /**
+     * The entity (staking provider) associated with the validators, unknown if not mapped (filter: in_values) (comma-separated list)
+     */
+    entity_in_values?: string;
+    /**
+     * The entity (staking provider) associated with the validators, unknown if not mapped (filter: not_in_values) (comma-separated list)
+     */
+    entity_not_in_values?: string;
+    /**
+     * Attestation status: attested or missed (filter: eq)
+     */
+    status_eq?: string;
+    /**
+     * Attestation status: attested or missed (filter: ne)
+     */
+    status_ne?: string;
+    /**
+     * Attestation status: attested or missed (filter: contains)
+     */
+    status_contains?: string;
+    /**
+     * Attestation status: attested or missed (filter: starts_with)
+     */
+    status_starts_with?: string;
+    /**
+     * Attestation status: attested or missed (filter: ends_with)
+     */
+    status_ends_with?: string;
+    /**
+     * Attestation status: attested or missed (filter: like)
+     */
+    status_like?: string;
+    /**
+     * Attestation status: attested or missed (filter: not_like)
+     */
+    status_not_like?: string;
+    /**
+     * Attestation status: attested or missed (filter: in_values) (comma-separated list)
+     */
+    status_in_values?: string;
+    /**
+     * Attestation status: attested or missed (filter: not_in_values) (comma-separated list)
+     */
+    status_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * The slot number (filter: eq)
+     */
+    slot_eq?: number;
+    /**
+     * The slot number (filter: ne)
+     */
+    slot_ne?: number;
+    /**
+     * The slot number (filter: lt)
+     */
+    slot_lt?: number;
+    /**
+     * The slot number (filter: lte)
+     */
+    slot_lte?: number;
+    /**
+     * The slot number (filter: gt)
+     */
+    slot_gt?: number;
+    /**
+     * The slot number (filter: gte)
+     */
+    slot_gte?: number;
+    /**
+     * The slot number (filter: between_min)
+     */
+    slot_between_min?: number;
+    /**
+     * The slot number (filter: between_max_value)
+     */
+    slot_between_max_value?: number;
+    /**
+     * The slot number (filter: in_values) (comma-separated list)
+     */
+    slot_in_values?: string;
+    /**
+     * The slot number (filter: not_in_values) (comma-separated list)
+     */
+    slot_not_in_values?: string;
+    /**
+     * The epoch number containing the slot (filter: eq)
+     */
+    epoch_eq?: number;
+    /**
+     * The epoch number containing the slot (filter: ne)
+     */
+    epoch_ne?: number;
+    /**
+     * The epoch number containing the slot (filter: lt)
+     */
+    epoch_lt?: number;
+    /**
+     * The epoch number containing the slot (filter: lte)
+     */
+    epoch_lte?: number;
+    /**
+     * The epoch number containing the slot (filter: gt)
+     */
+    epoch_gt?: number;
+    /**
+     * The epoch number containing the slot (filter: gte)
+     */
+    epoch_gte?: number;
+    /**
+     * The epoch number containing the slot (filter: between_min)
+     */
+    epoch_between_min?: number;
+    /**
+     * The epoch number containing the slot (filter: between_max_value)
+     */
+    epoch_between_max_value?: number;
+    /**
+     * The epoch number containing the slot (filter: in_values) (comma-separated list)
+     */
+    epoch_in_values?: string;
+    /**
+     * The epoch number containing the slot (filter: not_in_values) (comma-separated list)
+     */
+    epoch_not_in_values?: string;
+    /**
+     * The wall clock time when the epoch started (filter: eq)
+     */
+    epoch_start_date_time_eq?: number;
+    /**
+     * The wall clock time when the epoch started (filter: ne)
+     */
+    epoch_start_date_time_ne?: number;
+    /**
+     * The wall clock time when the epoch started (filter: lt)
+     */
+    epoch_start_date_time_lt?: number;
+    /**
+     * The wall clock time when the epoch started (filter: lte)
+     */
+    epoch_start_date_time_lte?: number;
+    /**
+     * The wall clock time when the epoch started (filter: gt)
+     */
+    epoch_start_date_time_gt?: number;
+    /**
+     * The wall clock time when the epoch started (filter: gte)
+     */
+    epoch_start_date_time_gte?: number;
+    /**
+     * The wall clock time when the epoch started (filter: between_min)
+     */
+    epoch_start_date_time_between_min?: number;
+    /**
+     * The wall clock time when the epoch started (filter: between_max_value)
+     */
+    epoch_start_date_time_between_max_value?: number;
+    /**
+     * The wall clock time when the epoch started (filter: in_values) (comma-separated list)
+     */
+    epoch_start_date_time_in_values?: string;
+    /**
+     * The wall clock time when the epoch started (filter: not_in_values) (comma-separated list)
+     */
+    epoch_start_date_time_not_in_values?: string;
+    /**
+     * Number of attestations for this entity/status combination (filter: eq)
+     */
+    attestation_count_eq?: number;
+    /**
+     * Number of attestations for this entity/status combination (filter: ne)
+     */
+    attestation_count_ne?: number;
+    /**
+     * Number of attestations for this entity/status combination (filter: lt)
+     */
+    attestation_count_lt?: number;
+    /**
+     * Number of attestations for this entity/status combination (filter: lte)
+     */
+    attestation_count_lte?: number;
+    /**
+     * Number of attestations for this entity/status combination (filter: gt)
+     */
+    attestation_count_gt?: number;
+    /**
+     * Number of attestations for this entity/status combination (filter: gte)
+     */
+    attestation_count_gte?: number;
+    /**
+     * Number of attestations for this entity/status combination (filter: between_min)
+     */
+    attestation_count_between_min?: number;
+    /**
+     * Number of attestations for this entity/status combination (filter: between_max_value)
+     */
+    attestation_count_between_max_value?: number;
+    /**
+     * Number of attestations for this entity/status combination (filter: in_values) (comma-separated list)
+     */
+    attestation_count_in_values?: string;
+    /**
+     * Number of attestations for this entity/status combination (filter: not_in_values) (comma-separated list)
+     */
+    attestation_count_not_in_values?: string;
+    /**
+     * The maximum number of fct_attestation_liveness_by_entity_head to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctAttestationLivenessByEntityHead` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_attestation_liveness_by_entity_head';
+};
+
+export type FctAttestationLivenessByEntityHeadServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctAttestationLivenessByEntityHeadServiceListError =
+  FctAttestationLivenessByEntityHeadServiceListErrors[keyof FctAttestationLivenessByEntityHeadServiceListErrors];
+
+export type FctAttestationLivenessByEntityHeadServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctAttestationLivenessByEntityHeadResponse;
+};
+
+export type FctAttestationLivenessByEntityHeadServiceListResponse =
+  FctAttestationLivenessByEntityHeadServiceListResponses[keyof FctAttestationLivenessByEntityHeadServiceListResponses];
+
+export type FctAttestationLivenessByEntityHeadServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The wall clock time when the slot started
+     */
+    slot_start_date_time: number;
+  };
+  query?: never;
+  url: '/api/v1/fct_attestation_liveness_by_entity_head/{slot_start_date_time}';
+};
+
+export type FctAttestationLivenessByEntityHeadServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctAttestationLivenessByEntityHeadServiceGetError =
+  FctAttestationLivenessByEntityHeadServiceGetErrors[keyof FctAttestationLivenessByEntityHeadServiceGetErrors];
+
+export type FctAttestationLivenessByEntityHeadServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctAttestationLivenessByEntityHeadResponse;
+};
+
+export type FctAttestationLivenessByEntityHeadServiceGetResponse =
+  FctAttestationLivenessByEntityHeadServiceGetResponses[keyof FctAttestationLivenessByEntityHeadServiceGetResponses];
 
 export type FctBlockServiceListData = {
   body?: never;
