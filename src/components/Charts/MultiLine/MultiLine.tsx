@@ -193,6 +193,7 @@ export function MultiLineChart({
         type: 'line' as const,
         data: s.data,
         smooth: s.smooth ?? false,
+        step: s.step ?? false,
         connectNulls,
         showSymbol: s.showSymbol ?? false,
         symbolSize: s.symbolSize ?? 4,
@@ -288,6 +289,9 @@ export function MultiLineChart({
             type: 'inside' as const,
             xAxisIndex: 0,
             filterMode: 'none' as const,
+            zoomOnMouseWheel: false,
+            moveOnMouseWheel: false,
+            moveOnMouseMove: true,
           },
         ]
       : undefined,
@@ -347,12 +351,15 @@ export function MultiLineChart({
         </div>
       )}
 
-      <ReactEChartsCore
-        echarts={echarts}
-        option={option}
-        style={{ height, width: '100%', minHeight: height }}
-        notMerge={true}
-      />
+      <div style={{ pointerEvents: 'none' }}>
+        <ReactEChartsCore
+          echarts={echarts}
+          option={option}
+          style={{ height, width: '100%', minHeight: height, pointerEvents: 'auto' }}
+          notMerge={true}
+          opts={{ renderer: 'canvas' }}
+        />
+      </div>
     </>
   );
 

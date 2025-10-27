@@ -67,3 +67,52 @@ export const DEFAULT_BEACON_SLOT_PHASES: SlotPhase[] = [
 export function slotToTimestamp(slot: number, genesisTime: number): number {
   return genesisTime + slot * SECONDS_PER_SLOT;
 }
+
+/**
+ * Convert epoch number to Unix timestamp (start of first slot in epoch)
+ *
+ * @param epoch - Epoch number
+ * @param genesisTime - Genesis time in Unix seconds
+ * @returns Unix timestamp in seconds
+ *
+ * @example
+ * ```tsx
+ * epochToTimestamp(10, 1606824023) // Returns 1606827863 (10 * 32 * 12 seconds after genesis)
+ * ```
+ */
+export function epochToTimestamp(epoch: number, genesisTime: number): number {
+  return genesisTime + epoch * SLOTS_PER_EPOCH * SECONDS_PER_SLOT;
+}
+
+/**
+ * Convert timestamp to epoch number
+ *
+ * @param timestamp - Unix timestamp in seconds
+ * @param genesisTime - Genesis time in Unix seconds
+ * @returns Epoch number
+ *
+ * @example
+ * ```tsx
+ * timestampToEpoch(1606827863, 1606824023) // Returns 10
+ * ```
+ */
+export function timestampToEpoch(timestamp: number, genesisTime: number): number {
+  return Math.floor((timestamp - genesisTime) / (SLOTS_PER_EPOCH * SECONDS_PER_SLOT));
+}
+
+/**
+ * Get the slot range for a given epoch
+ *
+ * @param epoch - Epoch number
+ * @returns Object with firstSlot and lastSlot of the epoch
+ *
+ * @example
+ * ```tsx
+ * getEpochSlotRange(10) // Returns { firstSlot: 320, lastSlot: 351 }
+ * ```
+ */
+export function getEpochSlotRange(epoch: number): { firstSlot: number; lastSlot: number } {
+  const firstSlot = epoch * SLOTS_PER_EPOCH;
+  const lastSlot = firstSlot + SLOTS_PER_EPOCH - 1;
+  return { firstSlot, lastSlot };
+}

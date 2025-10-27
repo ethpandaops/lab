@@ -65,4 +65,10 @@ export const CHART_CATEGORICAL_COLORS = [
   colors.orange[500], // orange-500
   colors.purple[500], // purple-500
   colors.pink[500], // pink-500
+  colors.violet[500], // violet-500
+  colors.teal[500], // teal-500
+  colors.indigo[500], // indigo-500
+  colors.rose[500], // rose-500
+  colors.fuchsia[500], // fuchsia-500
+  colors.sky[500], // sky-500
 ] as const;

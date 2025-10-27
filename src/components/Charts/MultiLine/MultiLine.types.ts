@@ -49,6 +49,15 @@ export interface SeriesData {
    * @default 'solid'
    */
   lineStyle?: 'solid' | 'dashed' | 'dotted';
+  /**
+   * Step type for creating step-line charts (right-angle transitions)
+   * - false: Normal line
+   * - 'start': Step before point
+   * - 'middle': Step at midpoint
+   * - 'end': Step after point
+   * @default false
+   */
+  step?: false | 'start' | 'middle' | 'end';
 }
 
 /**
