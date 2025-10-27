@@ -85,6 +85,7 @@ export function MultiLineChart({
   showCard = false,
   enableDataZoom = false,
   tooltipFormatter,
+  tooltipTrigger = 'axis',
   connectNulls = false,
   animationDuration = 300,
   grid,
@@ -248,7 +249,7 @@ export function MultiLineChart({
 
   // Build tooltip configuration
   const tooltipConfig = {
-    trigger: 'axis' as const,
+    trigger: tooltipTrigger,
     backgroundColor: themeColors.surface,
     borderColor: themeColors.border,
     borderWidth: 1,
@@ -256,13 +257,16 @@ export function MultiLineChart({
       color: themeColors.foreground,
       fontSize: 12,
     },
-    axisPointer: {
-      type: 'line' as const,
-      lineStyle: {
-        color: themeColors.muted,
-        type: 'dashed' as const,
-      },
-    },
+    axisPointer:
+      tooltipTrigger === 'axis'
+        ? {
+            type: 'line' as const,
+            lineStyle: {
+              color: themeColors.muted,
+              type: 'dashed' as const,
+            },
+          }
+        : undefined,
     formatter: tooltipFormatter,
     appendToBody: true, // Render tooltip in document body to prevent container clipping
   };
