@@ -1,2 +1,2 @@
 export { MultiLineChart } from './MultiLine';
-export type { MultiLineChartProps, SeriesData, XAxisConfig, YAxisConfig } from './MultiLine.types';
+export type { EnrichedDataPoint, MultiLineChartProps, SeriesData, XAxisConfig, YAxisConfig } from './MultiLine.types';

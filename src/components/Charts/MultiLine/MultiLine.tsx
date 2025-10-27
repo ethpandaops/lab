@@ -1,5 +1,5 @@
 import type React from 'react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import ReactEChartsCore from 'echarts-for-react/lib/core';
 import * as echarts from 'echarts/core';
 import { LineChart as EChartsLine } from 'echarts/charts';
@@ -85,12 +85,14 @@ export function MultiLineChart({
   showCard = false,
   enableDataZoom = false,
   tooltipFormatter,
+  tooltipTrigger = 'axis',
   connectNulls = false,
   animationDuration = 300,
   grid,
   colorPalette,
   enableAggregateToggle = false,
   aggregateSeriesName = 'Average',
+  enableSeriesFilter = false,
 }: MultiLineChartProps): React.JSX.Element {
   const themeColors = useThemeColors();
 
@@ -105,9 +107,51 @@ export function MultiLineChart({
     new Set(series.filter(s => s.visible !== false).map(s => s.name))
   );
 
+  // Series filter state
+  const [filterExpanded, setFilterExpanded] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  // Track all series names we've ever seen to detect genuinely new series
+  const seenSeriesNamesRef = useRef<Set<string>>(new Set());
+
   // Update visible series when series prop changes
+  // Preserve user selections and only auto-show genuinely new series
   useEffect(() => {
-    setVisibleSeries(new Set(series.filter(s => s.visible !== false).map(s => s.name)));
+    const currentSeriesNames = new Set(series.filter(s => s.visible !== false).map(s => s.name));
+
+    // Find genuinely new series (never seen before)
+    const newSeriesNames = new Set<string>();
+    currentSeriesNames.forEach(name => {
+      if (!seenSeriesNamesRef.current.has(name)) {
+        newSeriesNames.add(name);
+        seenSeriesNamesRef.current.add(name); // Track that we've seen this series
+      }
+    });
+
+    // Remove series from visible set if they no longer exist in current series
+    setVisibleSeries(prevVisible => {
+      const updated = new Set(prevVisible);
+      let changed = false;
+
+      // Remove series that no longer exist
+      prevVisible.forEach(name => {
+        if (!currentSeriesNames.has(name)) {
+          updated.delete(name);
+          changed = true;
+        }
+      });
+
+      // Auto-add only genuinely new series
+      if (newSeriesNames.size > 0) {
+        newSeriesNames.forEach(name => {
+          updated.add(name);
+        });
+        changed = true;
+      }
+
+      // Return same reference if nothing changed to avoid re-render
+      return changed ? updated : prevVisible;
+    });
   }, [series]);
 
   // Toggle series visibility
@@ -123,14 +167,57 @@ export function MultiLineChart({
     });
   };
 
-  // Filter series based on visibility (when legend is enabled) and aggregate toggle
-  const displayedSeries = series.filter(s => {
-    // Filter by legend visibility if enabled
-    if (showLegend && !visibleSeries.has(s.name)) return false;
-    // Filter aggregate series if toggle is enabled and aggregate is hidden
-    if (enableAggregateToggle && s.name === aggregateSeriesName && !showAggregate) return false;
-    return true;
-  });
+  // Filter series helper functions (memoized to avoid recomputing on every render)
+  const filterableSeries = useMemo(
+    () => series.filter(s => !enableAggregateToggle || s.name !== aggregateSeriesName),
+    [series, enableAggregateToggle, aggregateSeriesName]
+  );
+
+  const filteredSeriesBySearch = useMemo(
+    () => filterableSeries.filter(s => s.name.toLowerCase().includes(searchQuery.toLowerCase())),
+    [filterableSeries, searchQuery]
+  );
+
+  const selectAllFiltered = (): void => {
+    setVisibleSeries(prev => {
+      const next = new Set(prev);
+      filteredSeriesBySearch.forEach(s => next.add(s.name));
+      return next;
+    });
+  };
+
+  const clearAllFiltered = (): void => {
+    setVisibleSeries(prev => {
+      const next = new Set(prev);
+      filteredSeriesBySearch.forEach(s => next.delete(s.name));
+      return next;
+    });
+  };
+
+  const visibleCount = useMemo(
+    () => filterableSeries.filter(s => visibleSeries.has(s.name)).length,
+    [filterableSeries, visibleSeries]
+  );
+
+  // Filter series based on visibility (when legend or filter is enabled) and aggregate toggle
+  // Use useMemo to create a new array reference only when filtering actually changes
+  const displayedSeries = useMemo(() => {
+    return series.filter(s => {
+      // Filter by visibility if legend or series filter is enabled
+      if ((showLegend || enableSeriesFilter) && !visibleSeries.has(s.name)) return false;
+      // Filter aggregate series if toggle is enabled and aggregate is hidden
+      if (enableAggregateToggle && s.name === aggregateSeriesName && !showAggregate) return false;
+      return true;
+    });
+  }, [
+    series,
+    showLegend,
+    enableSeriesFilter,
+    visibleSeries,
+    enableAggregateToggle,
+    aggregateSeriesName,
+    showAggregate,
+  ]);
 
   // Build x-axis configuration
   const xAxisConfig = {
@@ -249,7 +336,7 @@ export function MultiLineChart({
 
   // Build tooltip configuration
   const tooltipConfig = {
-    trigger: 'axis' as const,
+    trigger: tooltipTrigger,
     backgroundColor: themeColors.surface,
     borderColor: themeColors.border,
     borderWidth: 1,
@@ -257,13 +344,16 @@ export function MultiLineChart({
       color: themeColors.foreground,
       fontSize: 12,
     },
-    axisPointer: {
-      type: 'line' as const,
-      lineStyle: {
-        color: themeColors.muted,
-        type: 'dashed' as const,
-      },
-    },
+    axisPointer:
+      tooltipTrigger === 'axis'
+        ? {
+            type: 'line' as const,
+            lineStyle: {
+              color: themeColors.muted,
+              type: 'dashed' as const,
+            },
+          }
+        : undefined,
     formatter: tooltipFormatter,
     appendToBody: true, // Render tooltip in document body to prevent container clipping
   };
@@ -304,6 +394,103 @@ export function MultiLineChart({
         <div className={subtitle ? 'mb-4' : 'mb-4'}>
           <h3 className="mb-1 text-lg/7 font-semibold text-foreground">{title}</h3>
           {subtitle && <p className="text-xs/5 text-muted">{subtitle}</p>}
+        </div>
+      )}
+
+      {/* Series Filter (collapsible with search) */}
+      {enableSeriesFilter && filterableSeries.length > 0 && (
+        <div className="mb-4">
+          {/* Collapsible header */}
+          <button
+            onClick={() => setFilterExpanded(!filterExpanded)}
+            className="hover:bg-surface-hover mb-2 flex w-full items-center justify-between rounded-sm border border-border bg-surface px-3 py-2 text-sm transition-colors"
+          >
+            <div className="flex items-center gap-2">
+              <span>{filterExpanded ? '▼' : '▶'}</span>
+              <span className="font-medium">
+                Filter Series ({visibleCount} of {filterableSeries.length} shown)
+              </span>
+            </div>
+            {!filterExpanded && visibleCount < filterableSeries.length && (
+              <span
+                onClick={e => {
+                  e.stopPropagation();
+                  setVisibleSeries(new Set(filterableSeries.map(s => s.name)));
+                }}
+                role="button"
+                tabIndex={0}
+                onKeyDown={e => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setVisibleSeries(new Set(filterableSeries.map(s => s.name)));
+                  }
+                }}
+                className="cursor-pointer rounded-sm px-2 py-0.5 text-xs text-muted hover:bg-muted/10 hover:text-foreground"
+              >
+                Show All
+              </span>
+            )}
+          </button>
+
+          {/* Expanded filter content */}
+          {filterExpanded && (
+            <div className="rounded-sm border border-border bg-surface p-3">
+              {/* Search box */}
+              <div className="mb-3">
+                <input
+                  type="text"
+                  placeholder="Search series..."
+                  value={searchQuery}
+                  onChange={e => setSearchQuery(e.target.value)}
+                  className="w-full rounded-sm border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted focus:ring-2 focus:ring-primary focus:outline-none"
+                />
+              </div>
+
+              {/* Action buttons */}
+              <div className="mb-3 flex gap-2">
+                <button
+                  onClick={selectAllFiltered}
+                  className="rounded-sm bg-primary/10 px-3 py-1.5 text-xs font-medium text-primary transition-colors hover:bg-primary/20"
+                >
+                  Select All {searchQuery && `(${filteredSeriesBySearch.length})`}
+                </button>
+                <button
+                  onClick={clearAllFiltered}
+                  className="rounded-sm bg-muted/10 px-3 py-1.5 text-xs font-medium text-muted transition-colors hover:bg-muted/20"
+                >
+                  Clear All {searchQuery && `(${filteredSeriesBySearch.length})`}
+                </button>
+              </div>
+
+              {/* Series checkboxes */}
+              <div className="max-h-[300px] space-y-1 overflow-y-auto">
+                {filteredSeriesBySearch.length === 0 ? (
+                  <div className="py-4 text-center text-sm text-muted">No series match your search</div>
+                ) : (
+                  filteredSeriesBySearch.map(s => {
+                    const isVisible = visibleSeries.has(s.name);
+                    const seriesColor = s.color || extendedPalette[series.indexOf(s) % extendedPalette.length];
+                    return (
+                      <label
+                        key={s.name}
+                        className="hover:bg-surface-hover flex cursor-pointer items-center gap-2 rounded-sm px-2 py-1.5 text-sm transition-colors"
+                      >
+                        <input
+                          type="checkbox"
+                          checked={isVisible}
+                          onChange={() => toggleSeries(s.name)}
+                          className="h-4 w-4 cursor-pointer rounded-sm border-border text-primary focus:ring-2 focus:ring-primary focus:ring-offset-0"
+                        />
+                        <span className="h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: seriesColor }} />
+                        <span className={isVisible ? 'text-foreground' : 'text-muted'}>{s.name}</span>
+                      </label>
+                    );
+                  })
+                )}
+              </div>
+            </div>
+          )}
         </div>
       )}
 

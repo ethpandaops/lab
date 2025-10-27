@@ -32,6 +32,8 @@ import {
   fctAttestationFirstSeenChunked50MsServiceList,
   fctAttestationLivenessByEntityHeadServiceGet,
   fctAttestationLivenessByEntityHeadServiceList,
+  fctAttestationObservationByNodeServiceGet,
+  fctAttestationObservationByNodeServiceList,
   fctBlockBlobCountHeadServiceGet,
   fctBlockBlobCountHeadServiceList,
   fctBlockBlobCountServiceGet,
@@ -121,6 +123,8 @@ import type {
   FctAttestationFirstSeenChunked50MsServiceListData,
   FctAttestationLivenessByEntityHeadServiceGetData,
   FctAttestationLivenessByEntityHeadServiceListData,
+  FctAttestationObservationByNodeServiceGetData,
+  FctAttestationObservationByNodeServiceListData,
   FctBlockBlobCountHeadServiceGetData,
   FctBlockBlobCountHeadServiceListData,
   FctBlockBlobCountServiceGetData,
@@ -927,6 +931,58 @@ export const fctAttestationLivenessByEntityHeadServiceGetOptions = (
       return data;
     },
     queryKey: fctAttestationLivenessByEntityHeadServiceGetQueryKey(options),
+  });
+};
+
+export const fctAttestationObservationByNodeServiceListQueryKey = (
+  options?: Options<FctAttestationObservationByNodeServiceListData>
+) => createQueryKey('fctAttestationObservationByNodeServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctAttestationObservationByNodeServiceListOptions = (
+  options?: Options<FctAttestationObservationByNodeServiceListData>
+) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctAttestationObservationByNodeServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctAttestationObservationByNodeServiceListQueryKey(options),
+  });
+};
+
+export const fctAttestationObservationByNodeServiceGetQueryKey = (
+  options: Options<FctAttestationObservationByNodeServiceGetData>
+) => createQueryKey('fctAttestationObservationByNodeServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by slot_start_date_time
+ */
+export const fctAttestationObservationByNodeServiceGetOptions = (
+  options: Options<FctAttestationObservationByNodeServiceGetData>
+) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctAttestationObservationByNodeServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctAttestationObservationByNodeServiceGetQueryKey(options),
   });
 };
 

@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import type { SeriesData } from '@/components/Charts/MultiLine';
+import type { SeriesData, EnrichedDataPoint } from '@/components/Charts/MultiLine';
 import { useThemeColors } from '@/hooks/useThemeColors';
 
 // Stable color palette for node visualization
@@ -21,20 +21,24 @@ function generateSeriesName(nodeId: string, implementation: string): string {
 }
 
 /**
- * Generic data point with slot and latency information
- * Matches the shape of API response items (all fields optional)
+ * Pre-aggregated data point from fct_attestation_observation_by_node
+ * Data is already aggregated per slot per node (one record per slot per node)
  */
-interface LatencyDataPoint {
+interface PreAggregatedLatencyDataPoint {
   slot?: number | null;
-  seen_slot_start_diff?: number | null;
   node_id?: string | null;
+  avg_seen_slot_start_diff?: number | null;
+  median_seen_slot_start_diff?: number | null;
+  min_seen_slot_start_diff?: number | null;
+  max_seen_slot_start_diff?: number | null;
   meta_consensus_implementation?: string | null;
+  attestation_count?: number | null;
 }
 
 /**
- * Result from useLatencyChartSeries hook
+ * Result from usePreAggregatedLatencyChartSeries hook
  */
-export interface LatencyChartSeriesResult {
+export interface PreAggregatedLatencyChartSeriesResult {
   /** Processed series data ready for MultiLineChart */
   series: SeriesData[];
   /** Minimum slot for x-axis */
@@ -46,34 +50,37 @@ export interface LatencyChartSeriesResult {
 }
 
 /**
- * Hook for processing latency chart data into series format
+ * Hook for processing pre-aggregated latency chart data into series format
  *
- * Consolidates common data processing logic used by all latency charts:
- * - BlockLatencyChart
- * - BlobLatencyChart
- * - HeadLatencyChart
- * - AttestationLatencyChart
+ * Used by AttestationLatencyChart which sources from fct_attestation_observation_by_node.
+ * This table provides pre-aggregated statistics (avg, median, min, max latency) per slot per node,
+ * eliminating the need for client-side aggregation.
  *
- * @param data - Raw API response data
+ * Uses median latency as the primary metric (more robust to outliers than average).
+ * Min/max/avg statistics are included in data points for enhanced tooltip display.
+ *
+ * @param data - Raw API response data with pre-aggregated statistics
  * @param dataKey - Key to access the data array in the response
  * @returns Processed chart data with series, axis ranges, and observation count
  */
-export function useLatencyChartSeries(data: unknown, dataKey: string): LatencyChartSeriesResult {
+export function usePreAggregatedLatencyChartSeries(
+  data: unknown,
+  dataKey: string
+): PreAggregatedLatencyChartSeriesResult {
   const colors = useThemeColors();
 
-  // Process data into series format for MultiLineChart
+  // Process pre-aggregated data into series format for MultiLineChart
   const { series, minSlot, maxSlot, dataCount } = useMemo(() => {
-    const items = ((data as Record<string, unknown>)?.[dataKey] ?? []) as LatencyDataPoint[];
-    const nodeSlotMap = new Map<string, Map<number, { sum: number; count: number }>>();
+    const items = ((data as Record<string, unknown>)?.[dataKey] ?? []) as PreAggregatedLatencyDataPoint[];
+    const nodeSeriesMap = new Map<string, EnrichedDataPoint[]>();
     const nodeImplementationMap = new Map<string, string>();
-    const aggregateMap = new Map<number, { sum: number; count: number }>();
     let minSlotValue = Infinity;
     let maxSlotValue = -Infinity;
 
-    // Aggregate data per node per slot
+    // Organize data by node - data is already aggregated per slot per node
     // Track min/max slots during this loop to avoid second iteration
     items.forEach(item => {
-      if (item.slot == null || item.seen_slot_start_diff == null || !item.node_id) return;
+      if (item.slot == null || item.median_seen_slot_start_diff == null || !item.node_id) return;
 
       const nodeId = item.node_id;
       const implementation = item.meta_consensus_implementation || 'unknown';
@@ -88,41 +95,33 @@ export function useLatencyChartSeries(data: unknown, dataKey: string): LatencyCh
         nodeImplementationMap.set(nodeId, implementation);
       }
 
-      // Add to per-node data with per-slot aggregation
-      if (!nodeSlotMap.has(nodeId)) {
-        nodeSlotMap.set(nodeId, new Map());
+      // Add pre-aggregated data point to node series with enriched metadata
+      if (!nodeSeriesMap.has(nodeId)) {
+        nodeSeriesMap.set(nodeId, []);
       }
-      const slotMap = nodeSlotMap.get(nodeId)!;
-      const existing = slotMap.get(slot) ?? { sum: 0, count: 0 };
-      existing.sum += item.seen_slot_start_diff;
-      existing.count += 1;
-      slotMap.set(slot, existing);
-
-      // Add to aggregate data
-      const aggExisting = aggregateMap.get(slot) ?? { sum: 0, count: 0 };
-      aggExisting.sum += item.seen_slot_start_diff;
-      aggExisting.count += 1;
-      aggregateMap.set(slot, aggExisting);
+      nodeSeriesMap.get(nodeId)!.push({
+        value: [slot, item.median_seen_slot_start_diff],
+        min: item.min_seen_slot_start_diff ?? undefined,
+        max: item.max_seen_slot_start_diff ?? undefined,
+        avg: item.avg_seen_slot_start_diff ?? undefined,
+      });
     });
 
     // Create stable color mapping based on sorted node IDs
-    const allNodeIds = Array.from(nodeSlotMap.keys()).sort();
+    const allNodeIds = Array.from(nodeSeriesMap.keys()).sort();
     const extendedPalette = [colors.primary, ...NODE_COLORS];
 
     // Build series array for MultiLineChart
     const seriesData: SeriesData[] = [];
 
-    // Add per-node series
+    // Add per-node series (each showing median latency for that node)
     allNodeIds.forEach((nodeId, index) => {
-      const slotMap = nodeSlotMap.get(nodeId)!;
-      const chartData: Array<[number, number]> = Array.from(slotMap.entries())
-        .map(([slot, { sum, count }]) => [slot, sum / count] as [number, number])
-        .sort((a, b) => a[0] - b[0]);
-
+      const chartData = nodeSeriesMap.get(nodeId)!.sort((a, b) => a.value[0] - b.value[0]);
       const implementation = nodeImplementationMap.get(nodeId) || 'unknown';
+      const seriesName = generateSeriesName(nodeId, implementation);
 
       seriesData.push({
-        name: generateSeriesName(nodeId, implementation),
+        name: seriesName,
         data: chartData,
         color: extendedPalette[index % extendedPalette.length],
         showSymbol: true,
@@ -130,22 +129,6 @@ export function useLatencyChartSeries(data: unknown, dataKey: string): LatencyCh
         lineWidth: 2,
       });
     });
-
-    // Add aggregate series (average) - always include, component will handle visibility
-    const avgData: Array<[number, number]> = Array.from(aggregateMap.entries())
-      .map(([slot, { sum, count }]) => [slot, sum / count] as [number, number])
-      .sort((a, b) => a[0] - b[0]);
-
-    if (avgData.length > 0) {
-      seriesData.push({
-        name: 'Average',
-        data: avgData,
-        color: colors.muted,
-        lineStyle: 'dashed',
-        lineWidth: 3,
-        showSymbol: false,
-      });
-    }
 
     // Calculate axis range from tracked min/max (avoid expensive flatMap + spread)
     const calculatedMinSlot = minSlotValue !== Infinity ? minSlotValue - 1 : 0;
