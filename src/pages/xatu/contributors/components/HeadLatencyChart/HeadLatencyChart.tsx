@@ -78,9 +78,26 @@ export function HeadLatencyChart({ username }: HeadLatencyChartProps): JSX.Eleme
       }}
       height={300}
       showLegend={series.length > 1 && series.length <= 10}
+      enableSeriesFilter={series.length > 10}
       enableDataZoom={true}
       enableAggregateToggle={true}
+      tooltipTrigger={series.length > 10 ? 'item' : 'axis'}
       tooltipFormatter={(params: unknown) => {
+        // Handle item-based tooltip (when >10 series)
+        if (series.length > 10) {
+          const param = params as { data: [number, number]; color: string; seriesName: string };
+          if (!param || !param.data) return '';
+          const slot = param.data[0];
+          const latency = param.data[1];
+          let html = `<strong>Slot:</strong> ${slot.toLocaleString()}<br/>`;
+          html += `<span style="color:${param.color}">●</span> <strong>${param.seriesName}</strong><br/>`;
+          html += `<div style="padding-left: 12px; line-height: 1.6;">`;
+          html += `Latency: <strong>${latency.toFixed(0)}ms</strong>`;
+          html += `</div>`;
+          return html;
+        }
+
+        // Handle axis-based tooltip (when ≤10 series)
         if (!params || !Array.isArray(params) || params.length === 0) return '';
         const firstParam = params[0] as { axisValue: number };
         const slot = firstParam.axisValue;

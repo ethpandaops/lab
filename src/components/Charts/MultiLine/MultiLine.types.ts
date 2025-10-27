@@ -207,4 +207,10 @@ export interface MultiLineChartProps {
    * @default 'Average'
    */
   aggregateSeriesName?: string;
+  /**
+   * Enable series filter with search (useful for many series)
+   * Shows a collapsible filter UI when enabled
+   * @default false
+   */
+  enableSeriesFilter?: boolean;
 }
