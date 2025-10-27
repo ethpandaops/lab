@@ -12,6 +12,7 @@ import { SlotBasicInfoCard } from './components/SlotBasicInfoCard';
 import { AttestationArrivalsChart } from './components/AttestationArrivalsChart';
 import { AttestationParticipationCard } from './components/AttestationParticipationCard';
 import { AttestationHeadCorrectnessCard } from './components/AttestationHeadCorrectnessCard';
+import { AttestationsByEntity } from '@/components/Ethereum/AttestationsByEntity';
 import { BlockPropagationChart } from './components/BlockPropagationChart';
 import { BlobPropagationChart } from './components/BlobPropagationChart';
 import { MevBiddingTimelineChart } from './components/MevBiddingTimelineChart';
@@ -138,6 +139,11 @@ export function DetailPage(): JSX.Element {
         }
       : null;
 
+  // Calculate total missed attestations for subtitle
+  const totalMissedAttestations = data.missedAttestations.reduce((sum, item) => sum + item.count, 0);
+  const missedAttestationsSubtitle =
+    totalMissedAttestations > 0 ? `${totalMissedAttestations.toLocaleString()} total missed attestations` : undefined;
+
   // Transform MEV bidding data for chart
   const mevBiddingData = data.mevBidding.map(item => ({
     chunk_slot_start_diff: item.chunk_slot_start_diff ?? 0,
@@ -201,6 +207,13 @@ export function DetailPage(): JSX.Element {
           />
           <AttestationParticipationCard correctnessData={attestationCorrectnessData} />
           <AttestationHeadCorrectnessCard correctnessData={attestationCorrectnessData} />
+          <AttestationsByEntity
+            data={data.missedAttestations}
+            title="Missed Attestations by Entity"
+            subtitle={missedAttestationsSubtitle}
+            anchorId="missed-attestations"
+            emptyMessage="No missed attestations for this slot"
+          />
         </div>
 
         {/* Block Propagation Section */}

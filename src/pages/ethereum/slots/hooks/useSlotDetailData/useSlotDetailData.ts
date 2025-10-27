@@ -8,6 +8,7 @@ import {
   fctBlockBlobFirstSeenByNodeServiceListOptions,
   fctAttestationFirstSeenChunked50MsServiceListOptions,
   fctAttestationCorrectnessHeadServiceListOptions,
+  fctAttestationLivenessByEntityHeadServiceListOptions,
   fctMevBidHighestValueByBuilderChunked50MsServiceListOptions,
   fctMevBidCountByRelayServiceListOptions,
   fctMevBidCountByBuilderServiceListOptions,
@@ -26,6 +27,7 @@ import type {
   FctBlockBlobFirstSeenByNode,
   FctAttestationFirstSeenChunked50Ms,
   FctAttestationCorrectnessHead,
+  FctAttestationLivenessByEntityHead,
   FctMevBidHighestValueByBuilderChunked50Ms,
   FctMevBidCountByRelay,
   FctMevBidCountByBuilder,
@@ -33,6 +35,11 @@ import type {
   FctPreparedBlock,
   FctBlockProposerEntity,
 } from '@/api/types.gen';
+
+export interface MissedAttestationEntity {
+  entity: string;
+  count: number;
+}
 
 export interface SlotDetailData {
   blockHead: FctBlockHead[];
@@ -43,6 +50,8 @@ export interface SlotDetailData {
   blobPropagation: FctBlockBlobFirstSeenByNode[];
   attestations: FctAttestationFirstSeenChunked50Ms[];
   attestationCorrectness: FctAttestationCorrectnessHead[];
+  attestationLiveness: FctAttestationLivenessByEntityHead[];
+  missedAttestations: MissedAttestationEntity[];
   mevBidding: FctMevBidHighestValueByBuilderChunked50Ms[];
   relayBids: FctMevBidCountByRelay[];
   builderBids: FctMevBidCountByBuilder[];
@@ -218,6 +227,16 @@ export function useSlotDetailData(slot: number): UseSlotDetailDataResult {
         }),
         enabled: !!currentNetwork && slotTimestamp > 0,
       },
+      // Attestation liveness by entity data
+      {
+        ...fctAttestationLivenessByEntityHeadServiceListOptions({
+          query: {
+            slot_start_date_time_eq: slotTimestamp,
+            page_size: 10000,
+          },
+        }),
+        enabled: !!currentNetwork && slotTimestamp > 0,
+      },
     ],
   });
 
@@ -237,6 +256,20 @@ export function useSlotDetailData(slot: number): UseSlotDetailDataResult {
     };
   }
 
+  // Process attestation liveness data to get top 10 missed attestations
+  const attestationLivenessData: FctAttestationLivenessByEntityHead[] =
+    queries[14].data?.fct_attestation_liveness_by_entity_head ?? [];
+
+  // Filter to only missed attestations and sort by count
+  const missedAttestations: MissedAttestationEntity[] = attestationLivenessData
+    .filter(record => record.status?.toLowerCase() === 'missed')
+    .sort((a, b) => (b.attestation_count ?? 0) - (a.attestation_count ?? 0))
+    .slice(0, 10)
+    .map(record => ({
+      entity: record.entity ?? 'unknown',
+      count: record.attestation_count ?? 0,
+    }));
+
   // Combine all data
   const data: SlotDetailData = {
     blockHead: queries[0].data?.fct_block_head ?? [],
@@ -247,6 +280,8 @@ export function useSlotDetailData(slot: number): UseSlotDetailDataResult {
     blobPropagation: queries[5].data?.fct_block_blob_first_seen_by_node ?? [],
     attestations: queries[6].data?.fct_attestation_first_seen_chunked_50ms ?? [],
     attestationCorrectness: queries[7].data?.fct_attestation_correctness_head ?? [],
+    attestationLiveness: attestationLivenessData,
+    missedAttestations,
     mevBidding: queries[8].data?.fct_mev_bid_highest_value_by_builder_chunked_50ms ?? [],
     committees: queries[9].data?.int_beacon_committee_head ?? [],
     preparedBlocks: queries[10].data?.fct_prepared_block ?? [],
