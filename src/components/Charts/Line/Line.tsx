@@ -61,10 +61,10 @@ export function LineChart({
           }
         : undefined,
       grid: {
-        top: title ? 40 : 10,
-        right: 10,
-        bottom: 30,
-        left: 10,
+        top: title ? 40 : 16,
+        right: undefined,
+        bottom: xAxisTitle ? 50 : 30,
+        left: yAxisTitle ? 60 : 8,
         containLabel: true,
       },
       xAxis: {
@@ -203,12 +203,13 @@ export function LineChart({
   );
 
   return (
-    <div className={height === '100%' ? 'h-full w-full' : 'w-full'}>
+    <div className={height === '100%' ? 'h-full w-full' : 'w-full'} style={{ pointerEvents: 'none' }}>
       <ReactECharts
         option={option}
-        style={{ height, width: '100%', minHeight: height }}
+        style={{ height, width: '100%', minHeight: height, pointerEvents: 'auto' }}
         notMerge={notMerge}
         lazyUpdate={lazyUpdate}
+        opts={{ renderer: 'canvas' }}
       />
     </div>
   );
