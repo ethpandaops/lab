@@ -1,4 +1,5 @@
 import type React from 'react';
+import { useMemo } from 'react';
 import ReactECharts from 'echarts-for-react';
 import colors from 'tailwindcss/colors';
 import { useThemeColors } from '@/hooks/useThemeColors';
@@ -42,6 +43,7 @@ export function HeatmapChart({
   lazyUpdate = true,
 }: HeatmapChartProps): React.JSX.Element {
   const themeColors = useThemeColors();
+  const setOptionOpts = useMemo(() => ({ replaceMerge: ['series', 'xAxis', 'yAxis', 'visualMap'] as const }), []);
 
   const option = {
     animation: true,
@@ -201,6 +203,7 @@ export function HeatmapChart({
         style={{ height, width: '100%', minHeight: height }}
         notMerge={notMerge}
         lazyUpdate={lazyUpdate}
+        setOptionOpts={setOptionOpts}
       />
     </div>
   );

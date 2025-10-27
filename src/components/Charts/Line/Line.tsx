@@ -41,6 +41,9 @@ export function LineChart({
   yAxisTitle,
 }: LineChartProps): JSX.Element {
   const themeColors = useThemeColors();
+  const setOptionOpts = useMemo(() => ({ replaceMerge: ['series', 'xAxis'] as const }), []);
+  const dataLength = data.length;
+  const labelsLength = labels.length;
 
   const option = useMemo(
     () => ({
@@ -178,6 +181,8 @@ export function LineChart({
     [
       data,
       labels,
+      dataLength,
+      labelsLength,
       title,
       titleFontSize,
       titleFontWeight,
@@ -209,6 +214,7 @@ export function LineChart({
         style={{ height, width: '100%', minHeight: height }}
         notMerge={notMerge}
         lazyUpdate={lazyUpdate}
+        setOptionOpts={setOptionOpts}
       />
     </div>
   );

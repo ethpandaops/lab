@@ -7,6 +7,23 @@ import { BottomBar } from '../BottomBar';
 import { useSlotViewData, useSlotProgressData } from '../../hooks';
 import type { SlotViewLayoutProps, TimeFilteredData } from './SlotViewLayout.types';
 
+const TIME_POINTS = Array.from({ length: 241 }, (_, i) => i * 50);
+function upperBound<T>(array: T[], accessor: (item: T) => number, target: number): number {
+  let low = 0;
+  let high = array.length;
+
+  while (low < high) {
+    const mid = Math.floor((low + high) / 2);
+    if (accessor(array[mid]) <= target) {
+      low = mid + 1;
+    } else {
+      high = mid;
+    }
+  }
+
+  return low;
+}
+
 export function SlotViewLayout({ mode }: SlotViewLayoutProps): JSX.Element {
   const { currentSlot, isPlaying } = useSlotPlayerState();
   const { slotProgress } = useSlotPlayerProgress();
@@ -50,51 +67,67 @@ export function SlotViewLayout({ mode }: SlotViewLayoutProps): JSX.Element {
   // Compute slot progress phases for timeline
   const { phases: slotProgressPhases } = useSlotProgressData(slotData.rawApiData, currentTime);
 
-  // Pre-compute static time points array (0-12s in 50ms chunks) outside of memo
-  // This prevents creating a new 241-element array every 100ms
-  const TIME_POINTS = useMemo(() => Array.from({ length: 241 }, (_, i) => i * 50), []);
+  const sortedMapPoints = useMemo(() => {
+    return [...slotData.mapPoints].sort((a, b) => a.earliestSeenTime - b.earliestSeenTime);
+  }, [slotData.mapPoints]);
 
-  // Pre-compute all time-filtered data once when currentTime changes
-  // This prevents child components from filtering data on every render
+  const deduplicatedBlobTimeline = useMemo(() => {
+    const earliestByBlob = new Map<string, { time: number; color?: string }>();
+
+    for (const point of slotData.blobFirstSeenData) {
+      const existing = earliestByBlob.get(point.blobId);
+      if (!existing || point.time < existing.time) {
+        earliestByBlob.set(point.blobId, { time: point.time, color: point.color });
+      }
+    }
+
+    return Array.from(earliestByBlob.entries())
+      .map(([blobId, value]) => ({ blobId, time: value.time, color: value.color }))
+      .sort((a, b) => a.time - b.time);
+  }, [slotData.blobFirstSeenData]);
+
+  const sortedContinentalSeries = useMemo(() => {
+    return slotData.blobContinentalPropagationData.map(continent => ({
+      ...continent,
+      data: [...continent.data].sort((a, b) => a.time - b.time),
+    }));
+  }, [slotData.blobContinentalPropagationData]);
+
+  const attestationTimeToCount = useMemo(() => {
+    const map = new Map<number, number>();
+    for (const point of slotData.attestationData) {
+      map.set(point.time, point.count);
+    }
+    return map;
+  }, [slotData.attestationData]);
+
   const timeFilteredData = useMemo<TimeFilteredData>(() => {
-    // Filter map points - only show nodes that have seen the block
-    const visibleMapPoints = slotData.mapPoints.filter(point => point.earliestSeenTime <= currentTime);
+    const mapIndex = upperBound(sortedMapPoints, point => point.earliestSeenTime, currentTime);
+    const visibleMapPoints = mapIndex === sortedMapPoints.length ? sortedMapPoints : sortedMapPoints.slice(0, mapIndex);
 
-    // Use actual attestation count (number of validators who attested) from API
     const attestationCount = slotData.attestationActualCount;
     const attestationPercentage =
       slotData.attestationTotalExpected > 0 ? (attestationCount / slotData.attestationTotalExpected) * 100 : 0;
 
-    // Filter blob first seen data for BlobDataAvailability
-    const visibleBlobFirstSeenData = slotData.blobFirstSeenData.filter(point => point.time <= currentTime);
+    const blobIndex = upperBound(deduplicatedBlobTimeline, blob => blob.time, currentTime);
+    const deduplicatedBlobData =
+      blobIndex === deduplicatedBlobTimeline.length
+        ? deduplicatedBlobTimeline
+        : deduplicatedBlobTimeline.slice(0, blobIndex);
 
-    // Deduplicate blob data - optimized single-pass algorithm
-    const blobFirstSeenObj: Record<string, { time: number; color?: string }> = {};
-    for (let i = 0; i < visibleBlobFirstSeenData.length; i++) {
-      const point = visibleBlobFirstSeenData[i];
-      const existing = blobFirstSeenObj[point.blobId];
-      if (!existing || point.time < existing.time) {
-        blobFirstSeenObj[point.blobId] = { time: point.time, color: point.color };
-      }
-    }
-    const deduplicatedBlobData = Object.keys(blobFirstSeenObj).map(blobId => ({
-      blobId,
-      time: blobFirstSeenObj[blobId].time,
-      color: blobFirstSeenObj[blobId].color,
-    }));
+    const visibleContinentalPropagationData = sortedContinentalSeries.map(continent => {
+      const dataIndex = upperBound(continent.data, point => point.time, currentTime);
+      return dataIndex === continent.data.length
+        ? continent
+        : {
+            ...continent,
+            data: continent.data.slice(0, dataIndex),
+          };
+    });
 
-    // Filter continental propagation data for BlobDataAvailability
-    const visibleContinentalPropagationData = slotData.blobContinentalPropagationData.map(continent => ({
-      ...continent,
-      data: continent.data.filter(point => point.time <= currentTime),
-    }));
-
-    // Pre-compute attestation chart data for AttestationArrivals
-    // Use pre-computed static TIME_POINTS array
-    const timeToCountMap = new Map(slotData.attestationData.map(p => [p.time, p.count]));
     const attestationChartValues = TIME_POINTS.map(time => {
       if (time > currentTime) return null;
-      return timeToCountMap.get(time) ?? 0;
+      return attestationTimeToCount.get(time) ?? 0;
     });
 
     return {
@@ -106,13 +139,12 @@ export function SlotViewLayout({ mode }: SlotViewLayoutProps): JSX.Element {
       attestationChartValues,
     };
   }, [
-    TIME_POINTS,
-    slotData.mapPoints,
-    slotData.attestationData,
-    slotData.attestationTotalExpected,
+    sortedMapPoints,
+    deduplicatedBlobTimeline,
+    sortedContinentalSeries,
+    attestationTimeToCount,
     slotData.attestationActualCount,
-    slotData.blobFirstSeenData,
-    slotData.blobContinentalPropagationData,
+    slotData.attestationTotalExpected,
     currentTime,
   ]);
 

@@ -40,6 +40,10 @@ function BlobDataAvailabilityComponent({
   className,
 }: BlobDataAvailabilityProps): JSX.Element {
   const themeColors = useThemeColors();
+  const firstSeenSetOptionOpts = useMemo(() => ({ replaceMerge: ['series'] as const }), []);
+  const continentalSetOptionOpts = useMemo(() => ({ replaceMerge: ['series'] as const }), []);
+  const firstSeenCount = deduplicatedBlobData.length;
+  const continentalVersion = visibleContinentalPropagationData.reduce((sum, series) => sum + series.data.length, 0);
 
   // Static base configuration for First Seen chart (theme-dependent but data-independent)
   const firstSeenBaseConfig = useMemo(
@@ -211,7 +215,7 @@ function BlobDataAvailabilityComponent({
         },
       ],
     } as EChartsOption;
-  }, [deduplicatedBlobData, firstSeenBaseConfig, themeColors]);
+  }, [deduplicatedBlobData, firstSeenBaseConfig, themeColors, firstSeenCount]);
 
   // Prepare Continental Propagation chart - only recreate when data changes
   const continentalPropagationOption = useMemo((): EChartsOption => {
@@ -334,7 +338,7 @@ function BlobDataAvailabilityComponent({
         itemGap: 12,
       },
     } as EChartsOption;
-  }, [visibleContinentalPropagationData, continentalPropagationBaseConfig, themeColors, maxTime]);
+  }, [visibleContinentalPropagationData, continentalPropagationBaseConfig, themeColors, maxTime, continentalVersion]);
 
   return (
     <div className={clsx('grid h-full grid-cols-12 gap-4', className)}>
@@ -345,6 +349,7 @@ function BlobDataAvailabilityComponent({
           style={{ height: '100%', width: '100%' }}
           notMerge={false}
           lazyUpdate={true}
+          setOptionOpts={firstSeenSetOptionOpts}
         />
       </div>
 
@@ -355,6 +360,7 @@ function BlobDataAvailabilityComponent({
           style={{ height: '100%', width: '100%' }}
           notMerge={false}
           lazyUpdate={true}
+          setOptionOpts={continentalSetOptionOpts}
         />
       </div>
     </div>

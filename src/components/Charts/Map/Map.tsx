@@ -1,7 +1,6 @@
 import type React from 'react';
 import { useState, useEffect, useMemo } from 'react';
 import ReactECharts from 'echarts-for-react';
-import type { ECharts } from 'echarts';
 import * as echarts from 'echarts';
 import 'echarts-gl';
 import type { MapChartProps } from './Map.types';
@@ -44,8 +43,10 @@ export function MapChart({
 }: MapChartProps): React.JSX.Element {
   const themeColors = useThemeColors();
   const { theme } = useTheme();
-  const [echartsInstance, setEchartsInstance] = useState<ECharts | null>(null);
   const [mapLoaded, setMapLoaded] = useState(false);
+  const setOptionOpts = useMemo(() => ({ replaceMerge: ['series'] as const }), []);
+  const routesLength = routes.length;
+  const pointsLength = points.length;
 
   // Load and register world map on mount
   useEffect(() => {
@@ -210,6 +211,8 @@ export function MapChart({
   }, [
     routes,
     points,
+    routesLength,
+    pointsLength,
     title,
     showEffect,
     environment,
@@ -226,13 +229,6 @@ export function MapChart({
     theme,
   ]);
 
-  useEffect(() => {
-    if (echartsInstance) {
-      // Re-render when options change
-      echartsInstance.setOption(option);
-    }
-  }, [echartsInstance, option]);
-
   // Don't render until map is loaded
   if (!mapLoaded) {
     return (
@@ -247,9 +243,9 @@ export function MapChart({
       <ReactECharts
         option={option}
         style={{ height, width: '100%', minHeight: height }}
-        onChartReady={instance => setEchartsInstance(instance)}
         notMerge={notMerge}
         lazyUpdate={lazyUpdate}
+        setOptionOpts={setOptionOpts}
       />
     </div>
   );

@@ -55,6 +55,7 @@ export function BarChart({
   categoryLabelInterval = 'auto',
 }: BarChartProps): JSX.Element {
   const themeColors = useThemeColors();
+  const setOptionOpts = useMemo(() => ({ replaceMerge: ['series', 'xAxis', 'yAxis'] as const }), []);
 
   const option = useMemo(() => {
     // Default label position based on orientation
@@ -225,6 +226,7 @@ export function BarChart({
         style={{ height, width: '100%', minHeight: height }}
         notMerge={notMerge}
         lazyUpdate={lazyUpdate}
+        setOptionOpts={setOptionOpts}
       />
     </div>
   );
