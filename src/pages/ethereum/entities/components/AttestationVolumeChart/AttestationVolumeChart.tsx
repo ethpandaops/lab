@@ -27,15 +27,12 @@ export function AttestationVolumeChart({ data }: AttestationVolumeChartProps): R
     const minEpoch = sortedData[0].epoch;
     const maxEpoch = sortedData[sortedData.length - 1].epoch;
 
-    // Calculate totals - totalAttestations includes both attested and missed
-    const totalAttested = sortedData.reduce((sum, d) => sum + (d.totalAttestations - d.missedAttestations), 0);
+    // Calculate totals - totalAttestations is already the attested count, missedAttestations is the missed count
+    const totalAttested = sortedData.reduce((sum, d) => sum + d.totalAttestations, 0);
     const totalMissed = sortedData.reduce((sum, d) => sum + d.missedAttestations, 0);
 
-    // Build series data
-    const attestedData: Array<[number, number]> = sortedData.map(d => [
-      d.epoch,
-      d.totalAttestations - d.missedAttestations,
-    ]);
+    // Build series data - plot counts by status directly
+    const attestedData: Array<[number, number]> = sortedData.map(d => [d.epoch, d.totalAttestations]);
     const missedData: Array<[number, number]> = sortedData.map(d => [d.epoch, d.missedAttestations]);
 
     const series = [
