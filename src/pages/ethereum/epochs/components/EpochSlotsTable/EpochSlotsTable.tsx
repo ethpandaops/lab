@@ -84,6 +84,18 @@ export function EpochSlotsTable({ slots }: EpochSlotsTableProps): JSX.Element {
       {
         header: 'Status',
         accessor: row => {
+          const isFuture = row.slot > currentSlot;
+
+          // Future slots should show as "Scheduled" regardless of API status
+          if (isFuture) {
+            return (
+              <Badge color="gray" variant="border">
+                Scheduled
+              </Badge>
+            );
+          }
+
+          // Past/current slots show their actual status
           if (row.status === 'canonical') {
             return (
               <Badge color="green" variant="border">
