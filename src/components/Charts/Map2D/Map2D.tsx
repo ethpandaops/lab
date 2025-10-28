@@ -33,12 +33,15 @@ export function Map2DChart({
   mapColor,
   roam = true,
   animationDuration = 300,
+  resetKey,
 }: Map2DChartProps): React.JSX.Element {
   const themeColors = useThemeColors();
   const { theme } = useTheme();
   const [mapLoaded, setMapLoaded] = useState(false);
+  const [chartReady, setChartReady] = useState(false);
   const chartRef = useRef<ReactECharts | null>(null);
   const previousPointsLengthRef = useRef(0);
+  const previousResetKeyRef = useRef(resetKey);
 
   // Load and register world map on mount
   useEffect(() => {
@@ -62,37 +65,40 @@ export function Map2DChart({
 
   // Append new points directly to chart without re-rendering
   useEffect(() => {
-    if (!chartRef.current || !mapLoaded) return;
+    if (!chartRef.current || !mapLoaded || !chartReady) return;
 
     const chart = chartRef.current.getEchartsInstance();
-    const currentLength = points.length;
-    const previousLength = previousPointsLengthRef.current;
+    if (!chart) return;
 
-    // If points array got smaller, it means we reset (e.g., new slot) - reset the chart
-    if (currentLength < previousLength) {
+    // Check if resetKey changed - if so, reset the chart
+    if (resetKey !== previousResetKeyRef.current) {
+      previousResetKeyRef.current = resetKey;
       previousPointsLengthRef.current = 0;
       const currentOption = chart.getOption();
-      const series = currentOption.series as Array<Record<string, unknown>>;
+      const series = (currentOption.series as Array<Record<string, unknown>>) || [];
       const scatterSeriesIndex = series.findIndex(s => s.type === 'scatter');
 
       if (scatterSeriesIndex !== -1) {
-        chart.setOption({
-          series: [{
-            seriesIndex: scatterSeriesIndex,
-            data: [],
-          }],
-        });
+        const updatedSeries = [...series];
+        updatedSeries[scatterSeriesIndex] = {
+          ...updatedSeries[scatterSeriesIndex],
+          data: [],
+        };
+        chart.setOption({ series: updatedSeries }, { replaceMerge: ['series'] });
       }
-      return;
+      // After reset, continue to append current points if any
     }
 
-    // Only append if we have new points
+    const currentLength = points.length;
+    const previousLength = previousPointsLengthRef.current;
+
+    // Only append if we have new points (never remove points during a slot)
     if (currentLength > previousLength) {
       const newPoints = points.slice(previousLength);
       const currentOption = chart.getOption();
 
       // Find the scatter series (should be last series if points exist)
-      const series = currentOption.series as Array<Record<string, unknown>>;
+      const series = (currentOption.series as Array<Record<string, unknown>>) || [];
       const scatterSeriesIndex = series.findIndex(s => s.type === 'scatter');
 
       if (scatterSeriesIndex !== -1) {
@@ -104,17 +110,18 @@ export function Map2DChart({
           value: [...point.coords, point.value || 1],
         }));
 
-        chart.setOption({
-          series: [{
-            seriesIndex: scatterSeriesIndex,
-            data: [...existingData, ...newPointData],
-          }],
-        });
+        const updatedSeries = [...series];
+        updatedSeries[scatterSeriesIndex] = {
+          ...updatedSeries[scatterSeriesIndex],
+          data: [...existingData, ...newPointData],
+        };
+
+        chart.setOption({ series: updatedSeries }, { replaceMerge: ['series'] });
       }
 
       previousPointsLengthRef.current = currentLength;
     }
-  }, [points, mapLoaded]);
+  }, [points, mapLoaded, chartReady, resetKey]);
 
   // Prepare initial options - only used once on mount
   const option = useMemo(() => {
@@ -288,6 +295,7 @@ export function Map2DChart({
         style={{ height, width: '100%', minHeight: height }}
         notMerge={false}
         lazyUpdate={true}
+        onChartReady={() => setChartReady(true)}
         opts={{
           renderer: 'canvas', // Explicitly use canvas for best performance
         }}

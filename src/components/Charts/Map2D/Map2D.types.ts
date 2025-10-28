@@ -22,4 +22,5 @@ export interface Map2DChartProps {
   mapColor?: string;
   roam?: boolean | 'scale' | 'move';
   animationDuration?: number;
+  resetKey?: string | number; // When this changes, chart data is reset
 }

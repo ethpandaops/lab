@@ -219,7 +219,12 @@ export function SlotViewLayout({ mode }: SlotViewLayoutProps): JSX.Element {
           {/* Map Section - takes all remaining vertical space */}
           <div className="min-h-0 flex-1 overflow-hidden">
             <div className="h-full w-full">
-              <Map2DChart points={timeFilteredData.visibleMapPoints} height="100%" pointSizeMultiplier={1.5} />
+              <Map2DChart
+                points={timeFilteredData.visibleMapPoints}
+                height="100%"
+                pointSizeMultiplier={1.5}
+                resetKey={currentSlot}
+              />
             </div>
           </div>
         </div>
