@@ -38,7 +38,6 @@ export function Map2DChart({
   const themeColors = useThemeColors();
   const { theme } = useTheme();
   const [mapLoaded, setMapLoaded] = useState(false);
-  const [chartReady, setChartReady] = useState(false);
   const chartRef = useRef<ReactECharts | null>(null);
   const allSeenPointsRef = useRef<Map<string, PointData>>(new Map());
   const previousResetKeyRef = useRef(resetKey);
@@ -65,7 +64,7 @@ export function Map2DChart({
 
   // Track all points seen during this slot and update chart
   useEffect(() => {
-    if (!chartRef.current || !mapLoaded || !chartReady) return;
+    if (!chartRef.current || !mapLoaded) return;
 
     const chart = chartRef.current.getEchartsInstance();
     if (!chart) return;
@@ -96,20 +95,55 @@ export function Map2DChart({
       }));
 
       const currentOption = chart.getOption();
-      const series = (currentOption.series as Array<Record<string, unknown>>) || [];
+
+      if (!currentOption || !currentOption.series) {
+        return;
+      }
+
+      const series = currentOption.series as Array<Record<string, unknown>>;
       const scatterSeriesIndex = series.findIndex(s => s.type === 'scatter');
 
       if (scatterSeriesIndex !== -1) {
-        const updatedSeries = [...series];
-        updatedSeries[scatterSeriesIndex] = {
-          ...updatedSeries[scatterSeriesIndex],
-          data: pointData,
-        };
-
-        chart.setOption({ series: updatedSeries }, { replaceMerge: ['series'] });
+        // Rebuild complete scatter series with new data
+        chart.setOption({
+          series: [
+            {
+              type: 'scatter',
+              coordinateSystem: 'geo',
+              zlevel: 3,
+              symbol: 'circle',
+              symbolSize: (value: number[]) => {
+                const pointValue = value[2] || 1;
+                const baseSize = 8;
+                const maxSize = 30;
+                const size = Math.min(maxSize, baseSize + Math.log(pointValue + 1) * 3);
+                return size * pointSizeMultiplier;
+              },
+              itemStyle: {
+                color: pointColor || themeColors.primary,
+                opacity: 0.8,
+                shadowBlur: 10,
+                shadowColor: pointColor || themeColors.primary,
+              },
+              emphasis: {
+                scale: true,
+                itemStyle: {
+                  opacity: 1,
+                  shadowBlur: 20,
+                },
+              },
+              data: pointData,
+              large: true,
+              largeThreshold: 1000,
+              progressive: 500,
+              progressiveThreshold: 1000,
+              animation: false,
+            }
+          ]
+        }, { replaceMerge: ['series'] });
       }
     }
-  }, [points, mapLoaded, chartReady, resetKey]);
+  }, [points, mapLoaded, resetKey, pointSizeMultiplier, pointColor, themeColors.primary]);
 
   // Prepare initial options - only used once on mount
   const option = useMemo(() => {
@@ -283,7 +317,6 @@ export function Map2DChart({
         style={{ height, width: '100%', minHeight: height }}
         notMerge={false}
         lazyUpdate={true}
-        onChartReady={() => setChartReady(true)}
         opts={{
           renderer: 'canvas', // Explicitly use canvas for best performance
         }}
