@@ -218,18 +218,22 @@ export function useEpochDetailData(epoch: number): UseEpochDetailDataReturn {
       }
     });
 
-    // Build slot data array from proposer data, deduplicating by slot number
-    // Use a Map to keep only the first occurrence of each slot
-    const slotDataMap = new Map<number, SlotData>();
+    // Build map from proposer data first
+    const proposerMap = new Map(
+      blockProposerData.map(p => [
+        p.slot ?? 0,
+        {
+          blockRoot: p.block_root ?? null,
+          proposerIndex: p.proposer_validator_index ?? null,
+        },
+      ])
+    );
 
-    blockProposerData.forEach(proposer => {
-      const slot = proposer.slot ?? 0;
-
-      // Skip if we already have this slot
-      if (slotDataMap.has(slot)) {
-        return;
-      }
-
+    // Generate all 32 slots for the epoch
+    const SLOTS_PER_EPOCH = 32;
+    const slots: SlotData[] = Array.from({ length: SLOTS_PER_EPOCH }, (_, i) => {
+      const slot = firstSlot + i;
+      const proposerInfo = proposerMap.get(slot);
       const attestation = attestationMap.get(slot) ?? { head: 0, other: 0, max: 0 };
       const blockFirstSeenTime = blockFirstSeenMap.get(slot) ?? null;
       const timestamp = currentNetwork ? slotToTimestamp(slot, currentNetwork.genesis_time) : 0;
@@ -244,11 +248,11 @@ export function useEpochDetailData(epoch: number): UseEpochDetailDataReturn {
         status = 'missed';
       }
 
-      slotDataMap.set(slot, {
+      return {
         slot,
         slotStartDateTime: timestamp,
-        blockRoot: proposer.block_root ?? null,
-        proposerIndex: proposer.proposer_validator_index ?? null,
+        blockRoot: proposerInfo?.blockRoot ?? null,
+        proposerIndex: proposerInfo?.proposerIndex ?? null,
         proposerEntity: proposerEntityMap.get(slot) ?? null,
         blobCount: blobCountMap.get(slot) ?? 0,
         status,
@@ -256,14 +260,10 @@ export function useEpochDetailData(epoch: number): UseEpochDetailDataReturn {
         attestationOther: attestation.other,
         attestationMax: attestation.max,
         blockFirstSeenTime,
-      });
+      };
     });
 
-    // Convert map to array and sort by slot number
-    const slots: SlotData[] = Array.from(slotDataMap.values()).sort((a, b) => a.slot - b.slot);
-
     // Calculate stats - count unique slots with blocks
-    const SLOTS_PER_EPOCH = 32;
     const slotsWithBlocks = new Set<number>();
     slots.forEach(s => {
       if (s.blockRoot !== null) {

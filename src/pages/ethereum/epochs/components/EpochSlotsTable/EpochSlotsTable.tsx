@@ -1,10 +1,12 @@
 import type { JSX } from 'react';
 import { useMemo } from 'react';
 import { useNavigate } from '@tanstack/react-router';
+import clsx from 'clsx';
 import { Badge } from '@/components/Elements/Badge';
 import { Table } from '@/components/Lists/Table';
 import type { Column } from '@/components/Lists/Table/Table.types';
 import { formatTimestamp, getRelativeTime } from '@/utils/time';
+import { useBeaconClock } from '@/hooks/useBeaconClock';
 import type { SlotData } from '../../hooks/useEpochDetailData.types';
 import type { EpochSlotsTableProps } from './EpochSlotsTable.types';
 
@@ -24,12 +26,13 @@ import type { EpochSlotsTableProps } from './EpochSlotsTable.types';
  */
 export function EpochSlotsTable({ slots }: EpochSlotsTableProps): JSX.Element {
   const navigate = useNavigate();
+  const { slot: currentSlot } = useBeaconClock();
 
   /**
-   * Sort slots by slot number ascending
+   * Sort slots by slot number descending (newest first)
    */
   const sortedSlots = useMemo((): SlotData[] => {
-    return [...slots].sort((a, b) => a.slot - b.slot);
+    return [...slots].sort((a, b) => b.slot - a.slot);
   }, [slots]);
 
   /**
@@ -39,7 +42,26 @@ export function EpochSlotsTable({ slots }: EpochSlotsTableProps): JSX.Element {
     () => [
       {
         header: 'Slot',
-        accessor: row => <span className="font-medium text-foreground">{row.slot}</span>,
+        accessor: row => {
+          const isCurrent = row.slot === currentSlot;
+          const isFuture = row.slot > currentSlot;
+
+          return (
+            <div className="flex items-center gap-2">
+              <span className="font-medium text-foreground">{row.slot}</span>
+              {isCurrent && (
+                <Badge color="blue" variant="flat" className="text-xs">
+                  Now
+                </Badge>
+              )}
+              {isFuture && (
+                <Badge color="gray" variant="border" className="text-xs">
+                  Scheduled
+                </Badge>
+              )}
+            </div>
+          );
+        },
         cellClassName: 'text-foreground',
       },
       {
@@ -62,6 +84,18 @@ export function EpochSlotsTable({ slots }: EpochSlotsTableProps): JSX.Element {
       {
         header: 'Status',
         accessor: row => {
+          const isFuture = row.slot > currentSlot;
+
+          // Future slots should show as "Scheduled" regardless of API status
+          if (isFuture) {
+            return (
+              <Badge color="gray" variant="border">
+                Scheduled
+              </Badge>
+            );
+          }
+
+          // Past/current slots show their actual status
           if (row.status === 'canonical') {
             return (
               <Badge color="green" variant="border">
@@ -134,7 +168,7 @@ export function EpochSlotsTable({ slots }: EpochSlotsTableProps): JSX.Element {
         },
       },
     ],
-    []
+    [currentSlot]
   );
 
   /**
@@ -149,7 +183,30 @@ export function EpochSlotsTable({ slots }: EpochSlotsTableProps): JSX.Element {
    */
   const getRowKey = (row: SlotData): number => row.slot;
 
+  /**
+   * Apply visual styling based on slot timing relative to current slot
+   */
+  const getRowClassName = (row: SlotData): string => {
+    const isCurrent = row.slot === currentSlot;
+    const isFuture = row.slot > currentSlot;
+
+    return clsx({
+      // Current slot - highlighted with accent color
+      'bg-accent/20 border-l-4 border-l-accent': isCurrent,
+      // Future slots - muted appearance
+      'opacity-50': isFuture,
+      // Past slots - normal appearance (default)
+    });
+  };
+
   return (
-    <Table data={sortedSlots} columns={columns} variant="nested" onRowClick={handleRowClick} getRowKey={getRowKey} />
+    <Table
+      data={sortedSlots}
+      columns={columns}
+      variant="nested"
+      onRowClick={handleRowClick}
+      getRowKey={getRowKey}
+      getRowClassName={getRowClassName}
+    />
   );
 }
