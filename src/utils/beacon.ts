@@ -69,6 +69,21 @@ export function slotToTimestamp(slot: number, genesisTime: number): number {
 }
 
 /**
+ * Convert slot number to epoch number
+ *
+ * @param slot - Slot number
+ * @returns Epoch number
+ *
+ * @example
+ * ```tsx
+ * slotToEpoch(100) // Returns 3 (100 / 32 = 3.125, floored to 3)
+ * ```
+ */
+export function slotToEpoch(slot: number): number {
+  return Math.floor(slot / SLOTS_PER_EPOCH);
+}
+
+/**
  * Convert epoch number to Unix timestamp (start of first slot in epoch)
  *
  * @param epoch - Epoch number

@@ -16,6 +16,7 @@ interface NavItem {
 const ethereumConsensusPages: NavItem[] = [
   { name: 'Live', to: '/ethereum/live' },
   { name: 'Epochs', to: '/ethereum/epochs' },
+  { name: 'Entities', to: '/ethereum/entities' },
   { name: 'Slots', to: '/ethereum/slots' },
 ];
 
