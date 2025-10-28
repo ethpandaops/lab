@@ -19,6 +19,7 @@ export function MissedAttestationsByEpochChart({
   missedAttestationsByEntity,
   topEntitiesCount = 10,
   anchorId,
+  epochRange,
 }: MissedAttestationsByEpochChartProps): React.JSX.Element {
   // Calculate which entities to show (top N by total missed)
   const { topEntities, series, minEpoch, maxEpoch } = useMemo(() => {
@@ -40,10 +41,17 @@ export function MissedAttestationsByEpochChart({
       return { topEntities: [], series: [], minEpoch: 0, maxEpoch: 0 };
     }
 
-    // Get epoch range
-    const epochs = [...new Set(missedAttestationsByEntity.map(r => r.epoch))].sort((a, b) => a - b);
-    const minEpoch = epochs[0];
-    const maxEpoch = epochs[epochs.length - 1];
+    // Get epoch range - use provided range or fall back to data range
+    let minEpoch: number;
+    let maxEpoch: number;
+    if (epochRange) {
+      minEpoch = epochRange.min;
+      maxEpoch = epochRange.max;
+    } else {
+      const epochs = [...new Set(missedAttestationsByEntity.map(r => r.epoch))].sort((a, b) => a - b);
+      minEpoch = epochs[0];
+      maxEpoch = epochs[epochs.length - 1];
+    }
 
     // Build series data for each entity
     // Create a map of entity -> epoch -> count
@@ -84,7 +92,7 @@ export function MissedAttestationsByEpochChart({
       minEpoch,
       maxEpoch,
     };
-  }, [missedAttestationsByEntity, topEntitiesCount]);
+  }, [missedAttestationsByEntity, topEntitiesCount, epochRange]);
 
   // Calculate total missed for subtitle
   const totalMissed = missedAttestationsByEntity.reduce((sum, record) => sum + record.count, 0);
