@@ -156,7 +156,9 @@ export function BarChart({
         right: 10,
         bottom: 30,
         left: 10,
-        containLabel: true,
+        // ECharts v6: use outerBounds instead of deprecated containLabel
+        outerBoundsMode: 'same' as const,
+        outerBoundsContain: 'axisLabel' as const,
       },
       xAxis: isHorizontal ? valueAxisConfig : categoryAxisConfig,
       yAxis: isHorizontal ? categoryAxisConfig : valueAxisConfig,

@@ -79,7 +79,9 @@ export function ScatterAndLineChart({
         right: yAxis2Title ? 80 : 24,
         bottom: showLegend && legendPosition === 'bottom' ? 80 : 48,
         left: 64,
-        containLabel: true,
+        // ECharts v6: use outerBounds instead of deprecated containLabel
+        outerBoundsMode: 'same' as const,
+        outerBoundsContain: 'axisLabel' as const,
       },
       xAxis: {
         type: 'value' as const,

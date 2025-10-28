@@ -4,7 +4,7 @@ import * as echarts from 'echarts/core';
 import { LineChart as EChartsLine } from 'echarts/charts';
 import { GridComponent, TooltipComponent, TitleComponent } from 'echarts/components';
 import { CanvasRenderer } from 'echarts/renderers';
-import { hexToRgba } from '@/utils';
+import { hexToRgba, resolveCssColorToHex } from '@/utils';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import type { LineChartProps } from './Line.types';
 
@@ -47,6 +47,9 @@ export function LineChart({
 }: LineChartProps): JSX.Element {
   const themeColors = useThemeColors();
 
+  // Convert OKLCH colors (from Tailwind v4) to hex format for ECharts compatibility
+  const convertedColor = color ? resolveCssColorToHex(color) : undefined;
+
   const option = useMemo(
     () => ({
       animation: true,
@@ -70,7 +73,9 @@ export function LineChart({
         right: undefined,
         bottom: xAxisTitle ? 50 : 30,
         left: yAxisTitle ? 60 : 8,
-        containLabel: true,
+        // ECharts v6: use outerBounds instead of deprecated containLabel
+        outerBoundsMode: 'same' as const,
+        outerBoundsContain: 'axisLabel' as const,
       },
       xAxis: {
         type: 'category',
@@ -131,7 +136,7 @@ export function LineChart({
           symbol: 'none',
           showSymbol: false,
           lineStyle: {
-            color: color || themeColors.primary,
+            color: convertedColor || themeColors.primary,
             width: 3,
           },
           areaStyle: showArea
@@ -145,11 +150,11 @@ export function LineChart({
                   colorStops: [
                     {
                       offset: 0,
-                      color: hexToRgba(color || themeColors.primary, 0.5),
+                      color: hexToRgba(convertedColor || themeColors.primary, 0.5),
                     },
                     {
                       offset: 1,
-                      color: hexToRgba(color || themeColors.primary, 0.06),
+                      color: hexToRgba(convertedColor || themeColors.primary, 0.06),
                     },
                   ],
                 },
@@ -191,7 +196,7 @@ export function LineChart({
       titleTop,
       smooth,
       showArea,
-      color,
+      convertedColor,
       yMax,
       xMax,
       connectNulls,

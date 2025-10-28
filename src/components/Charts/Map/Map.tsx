@@ -3,10 +3,16 @@ import { useState, useEffect, useMemo } from 'react';
 import ReactECharts from 'echarts-for-react';
 import type { ECharts } from 'echarts';
 import * as echarts from 'echarts';
-import 'echarts-gl';
+// Use selective imports to avoid "geo3D exists" warning (ECharts v6 + echarts-gl)
+import { Lines3DChart, Scatter3DChart } from 'echarts-gl/charts';
+import { Geo3DComponent } from 'echarts-gl/components';
 import type { MapChartProps } from './Map.types';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { useTheme } from '@/hooks/useTheme';
+import { resolveCssColorToHex } from '@/utils/color';
+
+// Register echarts-gl components selectively to prevent duplicate registration
+echarts.use([Lines3DChart, Scatter3DChart, Geo3DComponent]);
 
 /**
  * MapChart - A 3D map visualization component using ECharts GL
@@ -44,6 +50,12 @@ export function MapChart({
   const { theme } = useTheme();
   const [echartsInstance, setEchartsInstance] = useState<ECharts | null>(null);
   const [mapLoaded, setMapLoaded] = useState(false);
+
+  // Convert OKLCH colors (from Tailwind v4) to hex format for ECharts compatibility
+  const convertedLineColor = lineColor ? resolveCssColorToHex(lineColor) : undefined;
+  const convertedMapColor = mapColor ? resolveCssColorToHex(mapColor) : undefined;
+  const convertedEnvironment = environment ? resolveCssColorToHex(environment) : undefined;
+  const convertedPointColor = pointColor ? resolveCssColorToHex(pointColor) : undefined;
 
   // Load and register world map on mount
   useEffect(() => {
@@ -101,7 +113,7 @@ export function MapChart({
         blendMode: 'lighter',
         lineStyle: {
           width: 0.2,
-          color: lineColor || themeColors.primary,
+          color: convertedLineColor || themeColors.primary,
           opacity: 0.05,
         },
         data: routeData,
@@ -116,7 +128,7 @@ export function MapChart({
         symbol: 'circle',
         symbolSize: pointSize,
         itemStyle: {
-          color: pointColor || themeColors.primary,
+          color: convertedPointColor || themeColors.primary,
           opacity: 0.8,
         },
         label: {
@@ -132,7 +144,7 @@ export function MapChart({
     }
 
     return {
-      backgroundColor: environment || themeColors.background,
+      backgroundColor: convertedEnvironment || themeColors.background,
       tooltip: {
         show: true,
         formatter: (params: Record<string, unknown>) => {
@@ -168,7 +180,7 @@ export function MapChart({
         map: 'world',
         shading: 'realistic',
         silent: true,
-        environment: environment || themeColors.background,
+        environment: convertedEnvironment || themeColors.background,
         realisticMaterial: {
           roughness: 0.8,
           metalness: 0,
@@ -199,7 +211,7 @@ export function MapChart({
           zoomSensitivity: 1,
         },
         itemStyle: {
-          color: mapColor || themeColors.muted,
+          color: convertedMapColor || themeColors.muted,
         },
         regionHeight: regionHeight,
       },
@@ -210,11 +222,11 @@ export function MapChart({
     points,
     title,
     showEffect,
-    environment,
-    lineColor,
-    pointColor,
+    convertedEnvironment,
+    convertedLineColor,
+    convertedPointColor,
     pointSize,
-    mapColor,
+    convertedMapColor,
     distance,
     alpha,
     regionHeight,
