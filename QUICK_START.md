@@ -128,6 +128,23 @@ Navigate to **Charts/Map2D** and try the stories:
 
 ---
 
+## Working Examples
+
+### Official ECharts GitHub Examples (ECharts 5/6)
+
+**Actual working test files from Apache ECharts:**
+- [geo-map.html](https://github.com/apache/echarts/blob/master/test/geo-map.html) - Scatter on geo maps
+- [scatter-gps.html](https://github.com/apache/echarts/blob/master/test/scatter-gps.html) - GPS scatter with progressive loading
+- [geo-lines.html](https://github.com/apache/echarts/blob/master/test/geo-lines.html) - Lines on geo maps
+
+### Standalone Demo
+
+Open `WORKING_2D_MAP_EXAMPLE.html` in your browser to see a complete working example with:
+- ECharts 5/6 2D map
+- Interactive point addition
+- Performance comparison
+- All the code you need
+
 ## Next Steps
 
 1. **Try the 2D version** (Option 1 above)

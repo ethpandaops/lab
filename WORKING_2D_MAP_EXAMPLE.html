@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>ECharts 6 - Working 2D Map with Scatter Example</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            background: #1a1a1a;
+            color: #fff;
+        }
+        #main {
+            width: 100%;
+            height: 600px;
+            background: #2a2a2a;
+        }
+        .info {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #333;
+            border-radius: 5px;
+        }
+        button {
+            padding: 8px 16px;
+            margin: 5px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="info">
+        <h1>ECharts 6 - 2D World Map with Scatter Points</h1>
+        <p>This is a working example using ECharts 5/6 geo coordinate system (Canvas, not WebGL)</p>
+        <button onclick="addMorePoints()">Add 100 Points</button>
+        <button onclick="resetPoints()">Reset</button>
+        <span id="count">Points: 10</span>
+    </div>
+
+    <div id="main"></div>
+
+    <script>
+        var myChart = echarts.init(document.getElementById('main'));
+        var pointCount = 10;
+
+        // Sample city coordinates
+        var cities = [
+            { name: 'New York', coords: [-74.006, 40.7128], value: 150 },
+            { name: 'London', coords: [-0.1276, 51.5074], value: 120 },
+            { name: 'Tokyo', coords: [139.6917, 35.6895], value: 200 },
+            { name: 'Sydney', coords: [151.2093, -33.8688], value: 80 },
+            { name: 'São Paulo', coords: [-46.6333, -23.5505], value: 90 },
+            { name: 'Mumbai', coords: [72.8777, 19.076], value: 110 },
+            { name: 'Paris', coords: [2.3522, 48.8566], value: 95 },
+            { name: 'Berlin', coords: [13.405, 52.52], value: 85 },
+            { name: 'Singapore', coords: [103.8198, 1.3521], value: 130 },
+            { name: 'Dubai', coords: [55.2708, 25.2048], value: 75 }
+        ];
+
+        var points = cities.slice(0, 10);
+
+        function generateRandomPoints(count) {
+            var newPoints = [];
+            for (var i = 0; i < count; i++) {
+                var lat = Math.random() * 160 - 80; // Avoid poles
+                var lon = Math.random() * 360 - 180;
+                newPoints.push({
+                    name: 'Node ' + i,
+                    coords: [lon, lat],
+                    value: Math.floor(Math.random() * 100) + 1
+                });
+            }
+            return newPoints;
+        }
+
+        // Convert data to ECharts format
+        function convertData(data) {
+            return data.map(function(item) {
+                return {
+                    name: item.name,
+                    value: item.coords.concat(item.value)
+                };
+            });
+        }
+
+        function updateChart() {
+            // THE KEY PART - This is the working ECharts 5/6 configuration
+            var option = {
+                backgroundColor: '#1a1a1a',
+
+                // Tooltip configuration
+                tooltip: {
+                    trigger: 'item',
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    borderColor: '#333',
+                    textStyle: {
+                        color: '#fff'
+                    },
+                    formatter: function(params) {
+                        if (params.seriesType === 'scatter') {
+                            return params.name + '<br/>Nodes: ' + params.value[2];
+                        }
+                        return params.name;
+                    }
+                },
+
+                // Geo component - 2D map (NOT geo3D!)
+                geo: {
+                    map: 'world',
+                    roam: true,  // Enable pan/zoom
+                    itemStyle: {
+                        areaColor: '#323c48',
+                        borderColor: '#404a59',
+                        borderWidth: 0.5
+                    },
+                    emphasis: {
+                        itemStyle: {
+                            areaColor: '#2a333d'
+                        },
+                        label: {
+                            show: false
+                        }
+                    },
+                    // Performance: only render after pan/zoom ends
+                    renderOnMoving: false
+                },
+
+                // Series - Scatter on geo coordinate system
+                series: [{
+                    name: 'Nodes',
+                    type: 'scatter',  // NOT scatter3D!
+                    coordinateSystem: 'geo',  // NOT geo3D!
+                    data: convertData(points),
+                    symbolSize: function(val) {
+                        // Size based on value (val[2])
+                        return Math.max(4, Math.min(20, val[2] / 10));
+                    },
+                    itemStyle: {
+                        color: '#00ff88',
+                        opacity: 0.8,
+                        shadowBlur: 10,
+                        shadowColor: '#00ff88'
+                    },
+                    emphasis: {
+                        scale: true,
+                        itemStyle: {
+                            opacity: 1,
+                            shadowBlur: 20
+                        }
+                    },
+                    // PERFORMANCE SETTINGS for large datasets
+                    large: points.length > 1000,
+                    largeThreshold: 1000,
+                    progressive: 500,  // Render 500 points per frame
+                    progressiveThreshold: 1000  // Enable when > 1000 points
+                }]
+            };
+
+            // Use notMerge or replaceMerge for better performance
+            myChart.setOption(option, {
+                notMerge: false,
+                replaceMerge: ['series']  // Only replace series, keep map state
+            });
+
+            document.getElementById('count').textContent = 'Points: ' + points.length;
+        }
+
+        // Load world map GeoJSON
+        fetch('https://cdn.jsdelivr.net/npm/echarts@5.5.0/map/json/world.json')
+            .then(response => response.json())
+            .then(worldJSON => {
+                // Register the map
+                echarts.registerMap('world', worldJSON);
+
+                // Initial render
+                updateChart();
+            })
+            .catch(error => {
+                console.error('Failed to load world map:', error);
+                document.getElementById('main').innerHTML =
+                    '<div style="padding:20px;color:#ff4444">Failed to load map data. Try using local world.json file.</div>';
+            });
+
+        // Interactive functions
+        function addMorePoints() {
+            var newPoints = generateRandomPoints(100);
+            points = points.concat(newPoints);
+            pointCount = points.length;
+            updateChart();
+        }
+
+        function resetPoints() {
+            points = cities.slice(0, 10);
+            pointCount = points.length;
+            updateChart();
+        }
+
+        // Resize chart on window resize
+        window.addEventListener('resize', function() {
+            myChart.resize();
+        });
+    </script>
+
+    <div class="info" style="margin-top: 20px;">
+        <h3>Key Differences from 3D Version:</h3>
+        <ul>
+            <li><code>geo</code> (not <code>geo3D</code>) - Uses 2D coordinate system</li>
+            <li><code>type: 'scatter'</code> (not <code>scatter3D</code>) - 2D scatter points</li>
+            <li><code>coordinateSystem: 'geo'</code> (not <code>geo3D</code>)</li>
+            <li>No echarts-gl dependency needed</li>
+            <li>Canvas renderer (not WebGL)</li>
+            <li>Much better performance with progressive updates</li>
+        </ul>
+
+        <h3>Performance Features:</h3>
+        <ul>
+            <li><code>large: true</code> - Enable large dataset mode</li>
+            <li><code>progressive: 500</code> - Render 500 points per frame</li>
+            <li><code>progressiveThreshold: 1000</code> - Activate when > 1000 points</li>
+            <li><code>renderOnMoving: false</code> - Only render after pan/zoom ends</li>
+            <li><code>replaceMerge: ['series']</code> - Efficient series updates</li>
+        </ul>
+
+        <p><strong>Source:</strong> Based on official ECharts test files from
+        <a href="https://github.com/apache/echarts/blob/master/test/geo-map.html" style="color: #4CAF50;">geo-map.html</a> and
+        <a href="https://github.com/apache/echarts/blob/master/test/scatter-gps.html" style="color: #4CAF50;">scatter-gps.html</a>
+        </p>
+    </div>
+</body>
+</html>
