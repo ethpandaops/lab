@@ -52,6 +52,12 @@ describe('getDataVizColors', () => {
         'var(--color-chart-6)': 'rgb(193, 0, 6)', // #c10006
         'var(--color-chart-7)': 'rgb(193, 0, 7)', // #c10007
         'var(--color-chart-8)': 'rgb(193, 0, 8)', // #c10008
+        'var(--color-chart-9)': 'rgb(193, 0, 9)', // #c10009
+        'var(--color-chart-10)': 'rgb(193, 0, 10)', // #c1000a
+        'var(--color-chart-11)': 'rgb(193, 0, 11)', // #c1000b
+        'var(--color-chart-12)': 'rgb(193, 0, 12)', // #c1000c
+        'var(--color-chart-13)': 'rgb(193, 0, 13)', // #c1000d
+        'var(--color-chart-14)': 'rgb(193, 0, 14)', // #c1000e
       };
 
       const mockStyles: Partial<CSSStyleDeclaration> = {
@@ -156,7 +162,7 @@ describe('getDataVizColors', () => {
   describe('CHART_CATEGORICAL_COLORS', () => {
     it('should return 9 chart categorical colors', () => {
       const { CHART_CATEGORICAL_COLORS } = getDataVizColors();
-      expect(CHART_CATEGORICAL_COLORS).toHaveLength(9);
+      expect(CHART_CATEGORICAL_COLORS).toHaveLength(15);
     });
 
     it('should return chart colors in correct order', () => {
@@ -170,6 +176,12 @@ describe('getDataVizColors', () => {
       expect(CHART_CATEGORICAL_COLORS[6]).toBe('#c10006');
       expect(CHART_CATEGORICAL_COLORS[7]).toBe('#c10007');
       expect(CHART_CATEGORICAL_COLORS[8]).toBe('#c10008');
+      expect(CHART_CATEGORICAL_COLORS[9]).toBe('#c10009');
+      expect(CHART_CATEGORICAL_COLORS[10]).toBe('#c1000a');
+      expect(CHART_CATEGORICAL_COLORS[11]).toBe('#c1000b');
+      expect(CHART_CATEGORICAL_COLORS[12]).toBe('#c1000c');
+      expect(CHART_CATEGORICAL_COLORS[13]).toBe('#c1000d');
+      expect(CHART_CATEGORICAL_COLORS[14]).toBe('#c1000e');
     });
 
     it('should return chart colors as readonly array', () => {
@@ -202,7 +214,7 @@ describe('getDataVizColors', () => {
     it('should only compute colors once when cached', () => {
       const spy = vi.spyOn(window, 'getComputedStyle');
 
-      // First call computes all 27 colors (6 blob + 7 continent + 5 performance + 9 chart)
+      // First call computes all 33 colors (6 blob + 7 continent + 5 performance + 15 chart)
       getDataVizColors();
       const firstCallCount = spy.mock.calls.length;
 
@@ -216,8 +228,8 @@ describe('getDataVizColors', () => {
       // Should not call getComputedStyle again due to caching
       expect(spy).toHaveBeenCalledTimes(0);
 
-      // Verify first call computed all colors (27 calls to getComputedStyle)
-      expect(firstCallCount).toBe(27);
+      // Verify first call computed all colors (33 calls to getComputedStyle)
+      expect(firstCallCount).toBe(33);
     });
 
     it('should invalidate cache when html class changes', () => {

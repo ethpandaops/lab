@@ -84,6 +84,12 @@ function computeDataVizColors(): {
     resolveVar('--color-chart-6'),
     resolveVar('--color-chart-7'),
     resolveVar('--color-chart-8'),
+    resolveVar('--color-chart-9'),
+    resolveVar('--color-chart-10'),
+    resolveVar('--color-chart-11'),
+    resolveVar('--color-chart-12'),
+    resolveVar('--color-chart-13'),
+    resolveVar('--color-chart-14'),
   ] as const;
 
   return {

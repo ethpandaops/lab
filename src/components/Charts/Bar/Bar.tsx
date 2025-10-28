@@ -224,7 +224,13 @@ export function BarChart({
   ]);
 
   return (
-    <div className={height === '100%' ? 'h-full w-full' : 'w-full'}>
+    <div
+      className={height === '100%' ? 'h-full w-full' : 'w-full'}
+      onWheel={() => {
+        // Allow page scroll by not stopping propagation
+        // This prevents the chart from blocking page scroll
+      }}
+    >
       <ReactEChartsCore
         echarts={echarts}
         option={option}

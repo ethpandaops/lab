@@ -20,10 +20,13 @@ import { Route as XatuForkReadinessRouteImport } from './routes/xatu/fork-readin
 import { Route as XatuContributorsRouteImport } from './routes/xatu/contributors'
 import { Route as EthereumSlotsRouteImport } from './routes/ethereum/slots'
 import { Route as EthereumLiveRouteImport } from './routes/ethereum/live'
+import { Route as EthereumEpochsRouteImport } from './routes/ethereum/epochs'
 import { Route as XatuContributorsIndexRouteImport } from './routes/xatu/contributors/index'
 import { Route as EthereumSlotsIndexRouteImport } from './routes/ethereum/slots/index'
+import { Route as EthereumEpochsIndexRouteImport } from './routes/ethereum/epochs/index'
 import { Route as XatuContributorsIdRouteImport } from './routes/xatu/contributors/$id'
 import { Route as EthereumSlotsSlotRouteImport } from './routes/ethereum/slots/$slot'
+import { Route as EthereumEpochsEpochRouteImport } from './routes/ethereum/epochs/$epoch'
 
 const XatuRoute = XatuRouteImport.update({
   id: '/xatu',
@@ -81,6 +84,11 @@ const EthereumLiveRoute = EthereumLiveRouteImport.update({
   path: '/live',
   getParentRoute: () => EthereumRoute,
 } as any)
+const EthereumEpochsRoute = EthereumEpochsRouteImport.update({
+  id: '/epochs',
+  path: '/epochs',
+  getParentRoute: () => EthereumRoute,
+} as any)
 const XatuContributorsIndexRoute = XatuContributorsIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -90,6 +98,11 @@ const EthereumSlotsIndexRoute = EthereumSlotsIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => EthereumSlotsRoute,
+} as any)
+const EthereumEpochsIndexRoute = EthereumEpochsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => EthereumEpochsRoute,
 } as any)
 const XatuContributorsIdRoute = XatuContributorsIdRouteImport.update({
   id: '/$id',
@@ -101,12 +114,18 @@ const EthereumSlotsSlotRoute = EthereumSlotsSlotRouteImport.update({
   path: '/$slot',
   getParentRoute: () => EthereumSlotsRoute,
 } as any)
+const EthereumEpochsEpochRoute = EthereumEpochsEpochRouteImport.update({
+  id: '/$epoch',
+  path: '/$epoch',
+  getParentRoute: () => EthereumEpochsRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/ethereum': typeof EthereumRouteWithChildren
   '/experiments': typeof ExperimentsRouteWithChildren
   '/xatu': typeof XatuRouteWithChildren
+  '/ethereum/epochs': typeof EthereumEpochsRouteWithChildren
   '/ethereum/live': typeof EthereumLiveRoute
   '/ethereum/slots': typeof EthereumSlotsRouteWithChildren
   '/xatu/contributors': typeof XatuContributorsRouteWithChildren
@@ -114,8 +133,10 @@ export interface FileRoutesByFullPath {
   '/xatu/geographical-checklist': typeof XatuGeographicalChecklistRoute
   '/xatu/locally-built-blocks': typeof XatuLocallyBuiltBlocksRoute
   '/experiments/': typeof ExperimentsIndexRoute
+  '/ethereum/epochs/$epoch': typeof EthereumEpochsEpochRoute
   '/ethereum/slots/$slot': typeof EthereumSlotsSlotRoute
   '/xatu/contributors/$id': typeof XatuContributorsIdRoute
+  '/ethereum/epochs/': typeof EthereumEpochsIndexRoute
   '/ethereum/slots/': typeof EthereumSlotsIndexRoute
   '/xatu/contributors/': typeof XatuContributorsIndexRoute
 }
@@ -128,8 +149,10 @@ export interface FileRoutesByTo {
   '/xatu/geographical-checklist': typeof XatuGeographicalChecklistRoute
   '/xatu/locally-built-blocks': typeof XatuLocallyBuiltBlocksRoute
   '/experiments': typeof ExperimentsIndexRoute
+  '/ethereum/epochs/$epoch': typeof EthereumEpochsEpochRoute
   '/ethereum/slots/$slot': typeof EthereumSlotsSlotRoute
   '/xatu/contributors/$id': typeof XatuContributorsIdRoute
+  '/ethereum/epochs': typeof EthereumEpochsIndexRoute
   '/ethereum/slots': typeof EthereumSlotsIndexRoute
   '/xatu/contributors': typeof XatuContributorsIndexRoute
 }
@@ -139,6 +162,7 @@ export interface FileRoutesById {
   '/ethereum': typeof EthereumRouteWithChildren
   '/experiments': typeof ExperimentsRouteWithChildren
   '/xatu': typeof XatuRouteWithChildren
+  '/ethereum/epochs': typeof EthereumEpochsRouteWithChildren
   '/ethereum/live': typeof EthereumLiveRoute
   '/ethereum/slots': typeof EthereumSlotsRouteWithChildren
   '/xatu/contributors': typeof XatuContributorsRouteWithChildren
@@ -146,8 +170,10 @@ export interface FileRoutesById {
   '/xatu/geographical-checklist': typeof XatuGeographicalChecklistRoute
   '/xatu/locally-built-blocks': typeof XatuLocallyBuiltBlocksRoute
   '/experiments/': typeof ExperimentsIndexRoute
+  '/ethereum/epochs/$epoch': typeof EthereumEpochsEpochRoute
   '/ethereum/slots/$slot': typeof EthereumSlotsSlotRoute
   '/xatu/contributors/$id': typeof XatuContributorsIdRoute
+  '/ethereum/epochs/': typeof EthereumEpochsIndexRoute
   '/ethereum/slots/': typeof EthereumSlotsIndexRoute
   '/xatu/contributors/': typeof XatuContributorsIndexRoute
 }
@@ -158,6 +184,7 @@ export interface FileRouteTypes {
     | '/ethereum'
     | '/experiments'
     | '/xatu'
+    | '/ethereum/epochs'
     | '/ethereum/live'
     | '/ethereum/slots'
     | '/xatu/contributors'
@@ -165,8 +192,10 @@ export interface FileRouteTypes {
     | '/xatu/geographical-checklist'
     | '/xatu/locally-built-blocks'
     | '/experiments/'
+    | '/ethereum/epochs/$epoch'
     | '/ethereum/slots/$slot'
     | '/xatu/contributors/$id'
+    | '/ethereum/epochs/'
     | '/ethereum/slots/'
     | '/xatu/contributors/'
   fileRoutesByTo: FileRoutesByTo
@@ -179,8 +208,10 @@ export interface FileRouteTypes {
     | '/xatu/geographical-checklist'
     | '/xatu/locally-built-blocks'
     | '/experiments'
+    | '/ethereum/epochs/$epoch'
     | '/ethereum/slots/$slot'
     | '/xatu/contributors/$id'
+    | '/ethereum/epochs'
     | '/ethereum/slots'
     | '/xatu/contributors'
   id:
@@ -189,6 +220,7 @@ export interface FileRouteTypes {
     | '/ethereum'
     | '/experiments'
     | '/xatu'
+    | '/ethereum/epochs'
     | '/ethereum/live'
     | '/ethereum/slots'
     | '/xatu/contributors'
@@ -196,8 +228,10 @@ export interface FileRouteTypes {
     | '/xatu/geographical-checklist'
     | '/xatu/locally-built-blocks'
     | '/experiments/'
+    | '/ethereum/epochs/$epoch'
     | '/ethereum/slots/$slot'
     | '/xatu/contributors/$id'
+    | '/ethereum/epochs/'
     | '/ethereum/slots/'
     | '/xatu/contributors/'
   fileRoutesById: FileRoutesById
@@ -288,6 +322,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EthereumLiveRouteImport
       parentRoute: typeof EthereumRoute
     }
+    '/ethereum/epochs': {
+      id: '/ethereum/epochs'
+      path: '/epochs'
+      fullPath: '/ethereum/epochs'
+      preLoaderRoute: typeof EthereumEpochsRouteImport
+      parentRoute: typeof EthereumRoute
+    }
     '/xatu/contributors/': {
       id: '/xatu/contributors/'
       path: '/'
@@ -301,6 +342,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/ethereum/slots/'
       preLoaderRoute: typeof EthereumSlotsIndexRouteImport
       parentRoute: typeof EthereumSlotsRoute
+    }
+    '/ethereum/epochs/': {
+      id: '/ethereum/epochs/'
+      path: '/'
+      fullPath: '/ethereum/epochs/'
+      preLoaderRoute: typeof EthereumEpochsIndexRouteImport
+      parentRoute: typeof EthereumEpochsRoute
     }
     '/xatu/contributors/$id': {
       id: '/xatu/contributors/$id'
@@ -316,8 +364,29 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EthereumSlotsSlotRouteImport
       parentRoute: typeof EthereumSlotsRoute
     }
+    '/ethereum/epochs/$epoch': {
+      id: '/ethereum/epochs/$epoch'
+      path: '/$epoch'
+      fullPath: '/ethereum/epochs/$epoch'
+      preLoaderRoute: typeof EthereumEpochsEpochRouteImport
+      parentRoute: typeof EthereumEpochsRoute
+    }
   }
 }
+
+interface EthereumEpochsRouteChildren {
+  EthereumEpochsEpochRoute: typeof EthereumEpochsEpochRoute
+  EthereumEpochsIndexRoute: typeof EthereumEpochsIndexRoute
+}
+
+const EthereumEpochsRouteChildren: EthereumEpochsRouteChildren = {
+  EthereumEpochsEpochRoute: EthereumEpochsEpochRoute,
+  EthereumEpochsIndexRoute: EthereumEpochsIndexRoute,
+}
+
+const EthereumEpochsRouteWithChildren = EthereumEpochsRoute._addFileChildren(
+  EthereumEpochsRouteChildren,
+)
 
 interface EthereumSlotsRouteChildren {
   EthereumSlotsSlotRoute: typeof EthereumSlotsSlotRoute
@@ -334,11 +403,13 @@ const EthereumSlotsRouteWithChildren = EthereumSlotsRoute._addFileChildren(
 )
 
 interface EthereumRouteChildren {
+  EthereumEpochsRoute: typeof EthereumEpochsRouteWithChildren
   EthereumLiveRoute: typeof EthereumLiveRoute
   EthereumSlotsRoute: typeof EthereumSlotsRouteWithChildren
 }
 
 const EthereumRouteChildren: EthereumRouteChildren = {
+  EthereumEpochsRoute: EthereumEpochsRouteWithChildren,
   EthereumLiveRoute: EthereumLiveRoute,
   EthereumSlotsRoute: EthereumSlotsRouteWithChildren,
 }
