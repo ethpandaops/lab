@@ -7,10 +7,11 @@ import path from 'path';
 /**
  * Vitest v4 config for Storybook tests
  *
- * The storybookTest plugin MUST be at the root plugins level, not nested inside
- * test.projects (known Storybook limitation with @storybook/addon-vitest).
+ * The storybookTest plugin MUST be at the root plugins level, and when used,
+ * it affects the entire config. Therefore, we need separate configs for unit
+ * and storybook tests in Vitest v4.
  *
- * Run via: pnpm test:storybook
+ * Run via: pnpm test:storybook or pnpm test (default)
  * For unit tests, see vitest.config.unit.ts
  */
 export default defineConfig({
@@ -26,11 +27,8 @@ export default defineConfig({
     environment: 'jsdom',
     browser: {
       enabled: true,
-      provider: playwright({
-        launch: {
-          headless: true,
-        },
-      }),
+      headless: true,
+      provider: playwright(),
       instances: [
         {
           browser: 'chromium',

@@ -11,7 +11,7 @@ import {
   LegendComponent,
 } from 'echarts/components';
 import { CanvasRenderer } from 'echarts/renderers';
-import { hexToRgba, getDataVizColors } from '@/utils';
+import { hexToRgba, getDataVizColors, resolveCssColorToHex } from '@/utils';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import type { MultiLineChartProps } from './MultiLine.types';
 
@@ -83,8 +83,15 @@ export function MultiLineChart({
   const themeColors = useThemeColors();
   const { CHART_CATEGORICAL_COLORS } = getDataVizColors();
 
+  // Convert OKLCH colors (from Tailwind v4) to hex format for ECharts compatibility
+  const convertedColorPalette = colorPalette?.map(color => resolveCssColorToHex(color));
+
   // Build extended palette: custom palette or theme colors + data viz categorical colors
-  const extendedPalette = colorPalette || [themeColors.primary, themeColors.accent, ...CHART_CATEGORICAL_COLORS];
+  const extendedPalette = convertedColorPalette || [
+    themeColors.primary,
+    themeColors.accent,
+    ...CHART_CATEGORICAL_COLORS,
+  ];
 
   // Manage aggregate series visibility
   const [showAggregate, setShowAggregate] = useState(false);
@@ -312,13 +319,15 @@ export function MultiLineChart({
 
   // Calculate grid padding
   // Title is always rendered by component, never by ECharts
-  // containLabel: true adds padding for tick labels, but axis names need explicit space
+  // ECharts v6: outerBounds adds padding for tick labels, axis names need explicit space
   const gridConfig = {
     top: grid?.top ?? 16,
     right: grid?.right,
     bottom: grid?.bottom ?? (xAxis.name ? 30 : 24),
     left: grid?.left ?? (yAxis?.name ? 30 : 8),
-    containLabel: true,
+    // ECharts v6: use outerBounds instead of deprecated containLabel
+    outerBoundsMode: 'same' as const,
+    outerBoundsContain: 'axisLabel' as const,
   };
 
   // Build tooltip configuration

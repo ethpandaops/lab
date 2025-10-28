@@ -148,7 +148,9 @@ export function BoxPlot({
       legend: legendConfig,
       grid: {
         ...getGridPadding(),
-        containLabel: true,
+        // ECharts v6: use outerBounds instead of deprecated containLabel
+        outerBoundsMode: 'same' as const,
+        outerBoundsContain: 'axisLabel' as const,
       },
       xAxis: {
         type: 'category' as const,

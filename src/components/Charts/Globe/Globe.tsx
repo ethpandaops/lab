@@ -2,9 +2,16 @@ import type React from 'react';
 import { useState, useEffect, useMemo } from 'react';
 import ReactECharts from 'echarts-for-react';
 import type { ECharts } from 'echarts';
-import 'echarts-gl';
+import * as echarts from 'echarts';
+// Use selective imports to avoid "geo3D exists" warning (ECharts v6 + echarts-gl)
+import { Lines3DChart, Scatter3DChart } from 'echarts-gl/charts';
+import { GlobeComponent } from 'echarts-gl/components';
 import { useThemeColors } from '@/hooks/useThemeColors';
+import { resolveCssColorToHex } from '@/utils/color';
 import type { GlobeChartProps } from './Globe.types';
+
+// Register echarts-gl components selectively to prevent duplicate registration
+echarts.use([Lines3DChart, Scatter3DChart, GlobeComponent]);
 
 /**
  * GlobeChart - A 3D globe visualization component using ECharts GL
@@ -42,6 +49,11 @@ export function GlobeChart({
   const themeColors = useThemeColors();
   const [echartsInstance, setEchartsInstance] = useState<ECharts | null>(null);
 
+  // Convert OKLCH colors (from Tailwind v4) to hex format for ECharts compatibility
+  const convertedLineColor = lineColor ? resolveCssColorToHex(lineColor) : undefined;
+  const convertedPointColor = pointColor ? resolveCssColorToHex(pointColor) : undefined;
+  const convertedEnvironment = environment ? resolveCssColorToHex(environment) : undefined;
+
   // Prepare series data and memoize option to avoid unnecessary re-renders
   const option = useMemo(() => {
     // Prepare series data - using Record for flexibility with ECharts GL series options
@@ -61,12 +73,12 @@ export function GlobeChart({
               trailWidth: 2,
               trailLength: 0.15,
               trailOpacity: 1,
-              trailColor: lineColor || themeColors.accent,
+              trailColor: convertedLineColor || themeColors.accent,
             }
           : undefined,
         lineStyle: {
           width: 1,
-          color: lineColor || themeColors.accent,
+          color: convertedLineColor || themeColors.accent,
           opacity: 0.1,
         },
         blendMode: 'lighter',
@@ -83,7 +95,7 @@ export function GlobeChart({
         blendMode: 'lighter',
         symbolSize: pointSize,
         itemStyle: {
-          color: pointColor || themeColors.primary,
+          color: convertedPointColor || themeColors.primary,
           opacity: pointOpacity,
         },
         data: points.map(point => ({
@@ -121,7 +133,7 @@ export function GlobeChart({
         heightTexture: heightTexture,
         displacementScale: baseTexture ? 0.1 : 0,
         displacementQuality: 'high',
-        environment: environment,
+        environment: convertedEnvironment,
         shading: 'lambert',
         light: {
           ambient: {
@@ -149,9 +161,9 @@ export function GlobeChart({
     showEffect,
     baseTexture,
     heightTexture,
-    environment,
-    lineColor,
-    pointColor,
+    convertedEnvironment,
+    convertedLineColor,
+    convertedPointColor,
     pointSize,
     pointOpacity,
     themeColors,

@@ -16,7 +16,7 @@ export default defineConfig({
     environment: 'jsdom',
     include: ['src/**/*.test.{ts,tsx}'],
     exclude: ['src/**/*.stories.{ts,tsx}', 'node_modules'],
-    setupFiles: ['./.storybook/vitest-setup.ts'],
+    setupFiles: ['./vitest.setup.ts'],
     // Vitest 4: Explicitly configure fake timers to avoid queueMicrotask OOM issues
     // See: https://github.com/vitest-dev/vitest/issues/7288
     fakeTimers: {
