@@ -262,7 +262,7 @@ describe('getDataVizColors', () => {
         return {
           color: mockColors[styleColor] || 'rgb(255, 255, 255)',
           getPropertyValue: (): string => '',
-        } as CSSStyleDeclaration;
+        } as unknown as CSSStyleDeclaration;
       }) as typeof window.getComputedStyle;
 
       // Invalidate cache
@@ -356,7 +356,7 @@ describe('getDataVizColors', () => {
         return {
           color: '',
           getPropertyValue: (): string => '',
-        } as CSSStyleDeclaration;
+        } as unknown as CSSStyleDeclaration;
       }) as typeof window.getComputedStyle;
 
       // Invalidate cache
@@ -379,12 +379,12 @@ describe('getDataVizColors', () => {
           return {
             color: 'rgb(255, 0, 0)',
             getPropertyValue: (): string => '',
-          } as CSSStyleDeclaration;
+          } as unknown as CSSStyleDeclaration;
         }
         return {
           color: '',
           getPropertyValue: (): string => '',
-        } as CSSStyleDeclaration;
+        } as unknown as CSSStyleDeclaration;
       }) as typeof window.getComputedStyle;
 
       // Invalidate cache
