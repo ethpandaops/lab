@@ -2,7 +2,7 @@ import type React from 'react';
 import { useState, useEffect, useMemo, useRef } from 'react';
 import ReactECharts from 'echarts-for-react';
 import * as echarts from 'echarts';
-import type { Map2DChartProps } from './Map2D.types';
+import type { Map2DChartProps, PointData } from './Map2D.types';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { useTheme } from '@/hooks/useTheme';
 
@@ -40,7 +40,7 @@ export function Map2DChart({
   const [mapLoaded, setMapLoaded] = useState(false);
   const [chartReady, setChartReady] = useState(false);
   const chartRef = useRef<ReactECharts | null>(null);
-  const previousPointsLengthRef = useRef(0);
+  const allSeenPointsRef = useRef<Map<string, PointData>>(new Map());
   const previousResetKeyRef = useRef(resetKey);
 
   // Load and register world map on mount
@@ -63,63 +63,51 @@ export function Map2DChart({
     loadWorldMap();
   }, []);
 
-  // Append new points directly to chart without re-rendering
+  // Track all points seen during this slot and update chart
   useEffect(() => {
     if (!chartRef.current || !mapLoaded || !chartReady) return;
 
     const chart = chartRef.current.getEchartsInstance();
     if (!chart) return;
 
-    // Check if resetKey changed - if so, reset the chart
-    if (resetKey !== previousResetKeyRef.current) {
+    // Check if resetKey changed - if so, reset everything
+    const isReset = resetKey !== previousResetKeyRef.current;
+    if (isReset) {
       previousResetKeyRef.current = resetKey;
-      previousPointsLengthRef.current = 0;
-      const currentOption = chart.getOption();
-      const series = (currentOption.series as Array<Record<string, unknown>>) || [];
-      const scatterSeriesIndex = series.findIndex(s => s.type === 'scatter');
-
-      if (scatterSeriesIndex !== -1) {
-        const updatedSeries = [...series];
-        updatedSeries[scatterSeriesIndex] = {
-          ...updatedSeries[scatterSeriesIndex],
-          data: [],
-        };
-        chart.setOption({ series: updatedSeries }, { replaceMerge: ['series'] });
-      }
-      // After reset, continue to append current points if any
+      allSeenPointsRef.current.clear();
     }
 
-    const currentLength = points.length;
-    const previousLength = previousPointsLengthRef.current;
+    // Add all current points to the set of seen points (accumulate over time)
+    let hasNewPoints = false;
+    points.forEach(point => {
+      const key = `${point.coords[0]},${point.coords[1]}`;
+      if (!allSeenPointsRef.current.has(key)) {
+        allSeenPointsRef.current.set(key, point);
+        hasNewPoints = true;
+      }
+    });
 
-    // Only append if we have new points (never remove points during a slot)
-    if (currentLength > previousLength) {
-      const newPoints = points.slice(previousLength);
+    // Update chart if we have new points or just reset
+    if (hasNewPoints || isReset) {
+      const allPoints = Array.from(allSeenPointsRef.current.values());
+      const pointData = allPoints.map(point => ({
+        name: point.name,
+        value: [...point.coords, point.value || 1],
+      }));
+
       const currentOption = chart.getOption();
-
-      // Find the scatter series (should be last series if points exist)
       const series = (currentOption.series as Array<Record<string, unknown>>) || [];
       const scatterSeriesIndex = series.findIndex(s => s.type === 'scatter');
 
       if (scatterSeriesIndex !== -1) {
-        // Append new data to existing series
-        const existingData = (series[scatterSeriesIndex].data as Array<unknown>) || [];
-
-        const newPointData = newPoints.map(point => ({
-          name: point.name,
-          value: [...point.coords, point.value || 1],
-        }));
-
         const updatedSeries = [...series];
         updatedSeries[scatterSeriesIndex] = {
           ...updatedSeries[scatterSeriesIndex],
-          data: [...existingData, ...newPointData],
+          data: pointData,
         };
 
         chart.setOption({ series: updatedSeries }, { replaceMerge: ['series'] });
       }
-
-      previousPointsLengthRef.current = currentLength;
     }
   }, [points, mapLoaded, chartReady, resetKey]);
 
