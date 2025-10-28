@@ -5,7 +5,7 @@ export interface RouteData {
 }
 
 export interface PointData {
-  name: string;
+  name?: string;
   coords: [number, number]; // [longitude, latitude]
   value?: number; // Optional value for sizing the point
 }
@@ -14,7 +14,7 @@ export interface Map2DChartProps {
   routes?: RouteData[];
   points?: PointData[];
   title?: string;
-  height?: number;
+  height?: number | string;
   showEffect?: boolean;
   lineColor?: string;
   pointColor?: string;

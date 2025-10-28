@@ -2,7 +2,6 @@ import type { JSX } from 'react';
 import { useMemo } from 'react';
 import { Map2DChart } from '@/components/Charts/Map2D';
 import { useThemeColors } from '@/hooks/useThemeColors';
-import { MAP_MIN_DISTANCE, MAP_MAX_DISTANCE } from '../../constants';
 import type { GeographicalMapViewProps } from './GeographicalMapView.types';
 import type { PointData } from '@/components/Charts/Map2D/Map2D.types';
 

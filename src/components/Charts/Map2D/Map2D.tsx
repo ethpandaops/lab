@@ -1,7 +1,6 @@
 import type React from 'react';
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import ReactECharts from 'echarts-for-react';
-import type { ECharts } from 'echarts';
 import * as echarts from 'echarts';
 import type { Map2DChartProps } from './Map2D.types';
 import { useThemeColors } from '@/hooks/useThemeColors';
@@ -30,7 +29,7 @@ export function Map2DChart({
   showEffect = false,
   lineColor,
   pointColor,
-  pointSizeMultiplier = 1,
+  pointSizeMultiplier = 2.5,
   mapColor,
   roam = true,
   animationDuration = 300,
@@ -38,6 +37,8 @@ export function Map2DChart({
   const themeColors = useThemeColors();
   const { theme } = useTheme();
   const [mapLoaded, setMapLoaded] = useState(false);
+  const chartRef = useRef<ReactECharts | null>(null);
+  const previousPointsLengthRef = useRef(0);
 
   // Load and register world map on mount
   useEffect(() => {
@@ -59,7 +60,63 @@ export function Map2DChart({
     loadWorldMap();
   }, []);
 
-  // Prepare options and memoize to avoid unnecessary re-renders
+  // Append new points directly to chart without re-rendering
+  useEffect(() => {
+    if (!chartRef.current || !mapLoaded) return;
+
+    const chart = chartRef.current.getEchartsInstance();
+    const currentLength = points.length;
+    const previousLength = previousPointsLengthRef.current;
+
+    // If points array got smaller, it means we reset (e.g., new slot) - reset the chart
+    if (currentLength < previousLength) {
+      previousPointsLengthRef.current = 0;
+      const currentOption = chart.getOption();
+      const series = currentOption.series as Array<Record<string, unknown>>;
+      const scatterSeriesIndex = series.findIndex(s => s.type === 'scatter');
+
+      if (scatterSeriesIndex !== -1) {
+        chart.setOption({
+          series: [{
+            seriesIndex: scatterSeriesIndex,
+            data: [],
+          }],
+        });
+      }
+      return;
+    }
+
+    // Only append if we have new points
+    if (currentLength > previousLength) {
+      const newPoints = points.slice(previousLength);
+      const currentOption = chart.getOption();
+
+      // Find the scatter series (should be last series if points exist)
+      const series = currentOption.series as Array<Record<string, unknown>>;
+      const scatterSeriesIndex = series.findIndex(s => s.type === 'scatter');
+
+      if (scatterSeriesIndex !== -1) {
+        // Append new data to existing series
+        const existingData = (series[scatterSeriesIndex].data as Array<unknown>) || [];
+
+        const newPointData = newPoints.map(point => ({
+          name: point.name,
+          value: [...point.coords, point.value || 1],
+        }));
+
+        chart.setOption({
+          series: [{
+            seriesIndex: scatterSeriesIndex,
+            data: [...existingData, ...newPointData],
+          }],
+        });
+      }
+
+      previousPointsLengthRef.current = currentLength;
+    }
+  }, [points, mapLoaded]);
+
+  // Prepare initial options - only used once on mount
   const option = useMemo(() => {
     const isDark = theme === 'dark' || theme === 'star';
 
@@ -98,52 +155,46 @@ export function Map2DChart({
       });
     }
 
-    // Add points series (scatter) if there are points
-    if (points.length > 0) {
-      const pointData = points.map(point => ({
-        name: point.name,
-        value: [...point.coords, point.value || 1],
-      }));
-
-      const maxValue = Math.max(...points.map(p => p.value || 1));
-      const minValue = Math.min(...points.map(p => p.value || 1));
-
-      series.push({
-        type: 'scatter',
-        coordinateSystem: 'geo',
-        zlevel: 3,
-        symbol: 'circle',
-        symbolSize: (value: number[]) => {
-          // Scale point size based on value (index 2 is the value)
-          const pointValue = value[2] || 1;
-          const normalized = maxValue > minValue ? (pointValue - minValue) / (maxValue - minValue) : 0.5;
-          return Math.max(4, Math.min(20, 4 + normalized * 16)) * pointSizeMultiplier;
-        },
+    // Always create scatter series (starts empty, data appended via effect)
+    series.push({
+      type: 'scatter',
+      coordinateSystem: 'geo',
+      zlevel: 3,
+      symbol: 'circle',
+      symbolSize: (value: number[]) => {
+        // Scale point size based on value (index 2 is the value)
+        const pointValue = value[2] || 1;
+        // Use a fixed multiplier since we don't know min/max initially
+        const baseSize = 8;
+        const maxSize = 30;
+        const size = Math.min(maxSize, baseSize + Math.log(pointValue + 1) * 3);
+        return size * pointSizeMultiplier;
+      },
+      itemStyle: {
+        color: pointColor || themeColors.primary,
+        opacity: 0.8,
+        shadowBlur: 10,
+        shadowColor: pointColor || themeColors.primary,
+      },
+      emphasis: {
+        scale: true,
         itemStyle: {
-          color: pointColor || themeColors.primary,
-          opacity: 0.8,
-          shadowBlur: 10,
-          shadowColor: pointColor || themeColors.primary,
+          opacity: 1,
+          shadowBlur: 20,
         },
-        emphasis: {
-          scale: true,
-          itemStyle: {
-            opacity: 1,
-            shadowBlur: 20,
-          },
-        },
-        data: pointData,
-        // Performance optimizations for large datasets
-        large: points.length > 1000,
-        largeThreshold: 1000,
-        progressive: 500,
-        progressiveThreshold: 1000,
-      });
-    }
+      },
+      data: [], // Start empty, will be populated by effect
+      // Performance optimizations for large datasets
+      large: true,
+      largeThreshold: 1000,
+      progressive: 500,
+      progressiveThreshold: 1000,
+      animation: false, // Disable animation for better append performance
+    });
 
     return {
       backgroundColor: 'transparent',
-      animation: points.length < 1000, // Disable animation for large datasets
+      animation: false, // Disable animation for progressive updates
       animationDuration,
       animationEasing: 'cubicOut',
       tooltip: {
@@ -208,7 +259,6 @@ export function Map2DChart({
     };
   }, [
     routes,
-    points,
     title,
     showEffect,
     lineColor,
@@ -233,13 +283,13 @@ export function Map2DChart({
   return (
     <div className="h-full w-full">
       <ReactECharts
+        ref={chartRef}
         option={option}
         style={{ height, width: '100%', minHeight: height }}
         notMerge={false}
         lazyUpdate={true}
         opts={{
           renderer: 'canvas', // Explicitly use canvas for best performance
-          replaceMerge: ['series'], // Only replace series, keep other state
         }}
       />
     </div>

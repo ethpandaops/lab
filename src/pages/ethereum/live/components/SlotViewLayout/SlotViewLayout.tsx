@@ -1,6 +1,6 @@
 import { type JSX, useMemo, useState, useEffect, useRef, useCallback } from 'react';
 import { useSlotPlayerState, useSlotPlayerProgress, useSlotPlayerActions } from '@/hooks/useSlotPlayer';
-import { MapChart } from '@/components/Charts/Map';
+import { Map2DChart } from '@/components/Charts/Map2D';
 import { Sidebar } from '../Sidebar';
 import { BlockDetailsCard } from '../BlockDetailsCard';
 import { BottomBar } from '../BottomBar';
@@ -219,7 +219,7 @@ export function SlotViewLayout({ mode }: SlotViewLayoutProps): JSX.Element {
           {/* Map Section - takes all remaining vertical space */}
           <div className="min-h-0 flex-1 overflow-hidden">
             <div className="h-full w-full">
-              <MapChart points={timeFilteredData.visibleMapPoints} height="100%" pointSize={6} />
+              <Map2DChart points={timeFilteredData.visibleMapPoints} height="100%" pointSizeMultiplier={1.5} />
             </div>
           </div>
         </div>
