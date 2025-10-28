@@ -130,20 +130,29 @@ Navigate to **Charts/Map2D** and try the stories:
 
 ## Working Examples
 
-### Official ECharts GitHub Examples (ECharts 5/6)
+### Official ECharts Examples (ECharts 5/6)
 
-**Actual working test files from Apache ECharts:**
+**✅ Interactive Examples:**
+- [geo-svg-scatter-simple](https://echarts.apache.org/examples/en/editor.html?c=geo-svg-scatter-simple) - **Perfect reference!** Scatter on geo maps
+- [Source code](https://github.com/apache/echarts-examples/blob/master/public/examples/ts/geo-svg-scatter-simple.ts) - TypeScript source
+
+**Test Files from Apache ECharts:**
 - [geo-map.html](https://github.com/apache/echarts/blob/master/test/geo-map.html) - Scatter on geo maps
 - [scatter-gps.html](https://github.com/apache/echarts/blob/master/test/scatter-gps.html) - GPS scatter with progressive loading
 - [geo-lines.html](https://github.com/apache/echarts/blob/master/test/geo-lines.html) - Lines on geo maps
 
-### Standalone Demo
+### Standalone Demos
 
-Open `WORKING_2D_MAP_EXAMPLE.html` in your browser to see a complete working example with:
-- ECharts 5/6 2D map
-- Interactive point addition
-- Performance comparison
+**`OFFICIAL_PATTERN_EXAMPLE.html`** - Follows the exact pattern from [geo-svg-scatter-simple](https://echarts.apache.org/examples/en/editor.html?c=geo-svg-scatter-simple):
+- Official ECharts pattern
+- Interactive buttons (add points, toggle effects)
+- Click handler to log coordinates
 - All the code you need
+
+**`WORKING_2D_MAP_EXAMPLE.html`** - Complete working example with:
+- ECharts 5/6 2D map
+- Performance optimizations explained
+- Side-by-side comparison notes
 
 ## Next Steps
 
