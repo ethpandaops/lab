@@ -4,7 +4,7 @@ import { useInterval } from './useInterval';
 
 describe('useInterval', () => {
   beforeEach(() => {
-    // Vitest 3: Explicitly specify what to mock to avoid queueMicrotask issues
+    // Vitest 4: Explicitly specify what to mock to avoid queueMicrotask issues
     // See: https://github.com/vitest-dev/vitest/issues/7288
     vi.useFakeTimers({
       toFake: ['Date', 'setTimeout', 'clearTimeout', 'setInterval', 'clearInterval'],

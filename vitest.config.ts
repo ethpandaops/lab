@@ -1,16 +1,17 @@
 import { defineConfig } from 'vitest/config';
 import { storybookTest } from '@storybook/addon-vitest/vitest-plugin';
+import { playwright } from '@vitest/browser-playwright';
 import react from '@vitejs/plugin-react';
 import path from 'path';
 
 /**
- * Vitest config for Storybook tests
+ * Vitest v4 config for Storybook tests
  *
- * This is the original working config restored. The storybookTest plugin MUST be
- * at the root plugins level, not nested inside test.projects (known Storybook limitation).
+ * The storybookTest plugin MUST be at the root plugins level, not nested inside
+ * test.projects (known Storybook limitation with @storybook/addon-vitest).
  *
+ * Run via: pnpm test:storybook
  * For unit tests, see vitest.config.unit.ts
- * Both configs are orchestrated via vitest.workspace.ts
  */
 export default defineConfig({
   plugins: [
@@ -25,8 +26,11 @@ export default defineConfig({
     environment: 'jsdom',
     browser: {
       enabled: true,
-      provider: 'playwright',
-      headless: true,
+      provider: playwright({
+        launch: {
+          headless: true,
+        },
+      }),
       instances: [
         {
           browser: 'chromium',
@@ -34,7 +38,7 @@ export default defineConfig({
       ],
     },
     setupFiles: ['./.storybook/vitest-setup.ts'],
-    // Vitest 3: Explicitly configure fake timers to avoid queueMicrotask OOM issues
+    // Vitest 4: Explicitly configure fake timers to avoid queueMicrotask OOM issues
     // See: https://github.com/vitest-dev/vitest/issues/7288
     fakeTimers: {
       toFake: ['setTimeout', 'clearTimeout', 'setInterval', 'clearInterval', 'setImmediate', 'clearImmediate', 'Date'],
