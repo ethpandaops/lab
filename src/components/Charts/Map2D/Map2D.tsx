@@ -42,6 +42,14 @@ export function Map2DChart({
   const allSeenPointsRef = useRef<Map<string, PointData>>(new Map());
   const previousResetKeyRef = useRef(resetKey);
 
+  // Use refs for values that are used in the effect but shouldn't trigger re-renders
+  const pointColorRef = useRef(pointColor || themeColors.primary);
+  const pointSizeMultiplierRef = useRef(pointSizeMultiplier);
+
+  // Update refs when props change
+  pointColorRef.current = pointColor || themeColors.primary;
+  pointSizeMultiplierRef.current = pointSizeMultiplier;
+
   // Load and register world map on mount
   useEffect(() => {
     const loadWorldMap = async (): Promise<void> => {
@@ -117,13 +125,13 @@ export function Map2DChart({
                 const baseSize = 8;
                 const maxSize = 30;
                 const size = Math.min(maxSize, baseSize + Math.log(pointValue + 1) * 3);
-                return size * pointSizeMultiplier;
+                return size * pointSizeMultiplierRef.current;
               },
               itemStyle: {
-                color: pointColor || themeColors.primary,
+                color: pointColorRef.current,
                 opacity: 0.8,
                 shadowBlur: 10,
-                shadowColor: pointColor || themeColors.primary,
+                shadowColor: pointColorRef.current,
               },
               emphasis: {
                 scale: true,
@@ -143,9 +151,10 @@ export function Map2DChart({
         }, { replaceMerge: ['series'] });
       }
     }
-  }, [points, mapLoaded, resetKey, pointSizeMultiplier, pointColor, themeColors.primary]);
+  }, [points, mapLoaded, resetKey]);
 
-  // Prepare initial options - only used once on mount
+  // Prepare initial options - only calculated once on mount
+  // We update data via setOption in useEffect, so option should never recalculate
   const option = useMemo(() => {
     const isDark = theme === 'dark' || theme === 'star';
 
@@ -286,19 +295,8 @@ export function Map2DChart({
       },
       series,
     };
-  }, [
-    routes,
-    title,
-    showEffect,
-    lineColor,
-    pointColor,
-    pointSizeMultiplier,
-    mapColor,
-    roam,
-    animationDuration,
-    themeColors,
-    theme,
-  ]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mapLoaded]); // Only recalculate when map loads, ignore theme/color changes
 
   // Don't render until map is loaded
   if (!mapLoaded) {
