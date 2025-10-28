@@ -19,9 +19,9 @@ const getAvailabilityColor = (availability: number): string => {
  */
 const getSizeClass = (size: CellSize): string => {
   const sizes = {
-    xs: 'size-3', // 12px
+    xs: 'size-3', // 12px (default)
     sm: 'size-4', // 16px
-    md: 'size-6', // 24px (default)
+    md: 'size-6', // 24px
     lg: 'size-8', // 32px
     xl: 'size-10', // 40px
   };
@@ -36,7 +36,7 @@ export const DataAvailabilityCell = ({
   isSelected = false,
   isHighlighted = false,
   isDimmed = false,
-  size = 'md',
+  size = 'xs',
   onClick,
   showTooltip = true,
 }: DataAvailabilityCellProps): React.JSX.Element => {
@@ -56,10 +56,10 @@ export const DataAvailabilityCell = ({
         onMouseLeave={() => setShowTooltipState(false)}
         className={clsx(
           sizeClass,
-          'rounded-xs transition-all duration-150',
+          'transition-all duration-150',
           colorClass,
           isSelected && 'ring-3 ring-accent ring-offset-2 ring-offset-background',
-          isHighlighted && !isSelected && 'ring-2 ring-accent/50',
+          isHighlighted && !isSelected && 'ring-2 ring-accent/80',
           isDimmed && 'opacity-10',
           onClick && 'cursor-pointer active:scale-95',
           !onClick && 'cursor-default'

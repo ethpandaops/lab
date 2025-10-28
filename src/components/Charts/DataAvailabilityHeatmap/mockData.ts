@@ -59,14 +59,40 @@ export const generateWindowLevelData = (numDays: number = 19): DataAvailabilityR
 };
 
 /**
- * Generates mock data for day-level heatmap (~225 epochs × 128 columns)
- * This shows all epochs within a single day
+ * Generates mock data for day-level heatmap (24 hours × 128 columns)
+ * This shows all hours within a single day
  */
-export const generateDayLevelData = (dayIdentifier: string, numEpochs: number = 225): DataAvailabilityRow[] => {
-  const startEpoch = 100000; // Arbitrary starting epoch
-  return Array.from({ length: numEpochs }, (_, epochIndex) => {
-    const epochNum = startEpoch + epochIndex;
-    const identifier = `${dayIdentifier}-epoch-${epochNum}`;
+export const generateDayLevelData = (dayIdentifier: string): DataAvailabilityRow[] => {
+  return Array.from({ length: 24 }, (_, hourIndex) => {
+    const identifier = `${dayIdentifier}-hour-${hourIndex}`;
+    const startHour = hourIndex.toString().padStart(2, '0');
+    const endHour = ((hourIndex + 1) % 24).toString().padStart(2, '0');
+    const hourLabel = `${startHour}:00 → ${endHour}:00`;
+
+    return {
+      identifier,
+      label: hourLabel,
+      cells: generateCells(identifier),
+    };
+  });
+};
+
+/**
+ * Generates mock data for hour-level heatmap (~9 epochs × 128 columns)
+ * This shows all epochs within a single hour
+ */
+export const generateHourLevelData = (
+  _hourIdentifier: string,
+  dayIdentifier: string,
+  hourIndex: number
+): DataAvailabilityRow[] => {
+  // Each hour has ~9.375 epochs (225 epochs / 24 hours), we'll use 9 for simplicity
+  const epochsPerHour = 9;
+  const startEpoch = 100000 + hourIndex * epochsPerHour;
+
+  return Array.from({ length: epochsPerHour }, (_, epochOffset) => {
+    const epochNum = startEpoch + epochOffset;
+    const identifier = `${dayIdentifier}-hour-${hourIndex}-epoch-${epochNum}`;
 
     return {
       identifier,

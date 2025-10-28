@@ -4,6 +4,7 @@ import { DataAvailabilityHeatmap } from './DataAvailabilityHeatmap';
 import {
   generateWindowLevelData,
   generateDayLevelData,
+  generateHourLevelData,
   generateEpochLevelData,
   generateSlotLevelData,
 } from './mockData';
@@ -35,7 +36,7 @@ export const WindowLevel: Story = {
   args: {
     rows: generateWindowLevelData(19),
     granularity: 'window',
-    cellSize: 'sm',
+    cellSize: 'xs',
     showColumnHeader: true,
     showLegend: true,
   },
@@ -49,7 +50,7 @@ export const WindowLevelWithSelectedColumn: Story = {
   args: {
     rows: generateWindowLevelData(19),
     granularity: 'window',
-    cellSize: 'sm',
+    cellSize: 'xs',
     selectedColumnIndex: 42,
     showColumnHeader: true,
     showLegend: true,
@@ -58,12 +59,12 @@ export const WindowLevelWithSelectedColumn: Story = {
 };
 
 /**
- * Day-level view (Level 2) showing ~225 epochs in a single day.
+ * Day-level view (Level 2) showing 24 hours in a single day.
  * Accessed via `/ethereum/data-availability/$window`.
  */
 export const DayLevel: Story = {
   args: {
-    rows: generateDayLevelData('2024-01-15', 225),
+    rows: generateDayLevelData('2024-01-15'),
     granularity: 'day',
     cellSize: 'xs',
     showColumnHeader: true,
@@ -76,7 +77,7 @@ export const DayLevel: Story = {
  */
 export const DayLevelWithSelectedColumn: Story = {
   args: {
-    rows: generateDayLevelData('2024-01-15', 225),
+    rows: generateDayLevelData('2024-01-15'),
     granularity: 'day',
     cellSize: 'xs',
     selectedColumnIndex: 42,
@@ -87,14 +88,43 @@ export const DayLevelWithSelectedColumn: Story = {
 };
 
 /**
- * Epoch-level view (Level 3) showing 32 slots in a single epoch.
- * Accessed via `/ethereum/data-availability/$window/$epoch`.
+ * Hour-level view (Level 3) showing ~9 epochs in a single hour.
+ * Accessed via `/ethereum/data-availability/$window/$hour`.
+ */
+export const HourLevel: Story = {
+  args: {
+    rows: generateHourLevelData('2024-01-15-hour-8', '2024-01-15', 8),
+    granularity: 'hour',
+    cellSize: 'xs',
+    showColumnHeader: true,
+    showLegend: true,
+  },
+};
+
+/**
+ * Hour-level view with a selected column dimmed.
+ */
+export const HourLevelWithSelectedColumn: Story = {
+  args: {
+    rows: generateHourLevelData('2024-01-15-hour-8', '2024-01-15', 8),
+    granularity: 'hour',
+    cellSize: 'xs',
+    selectedColumnIndex: 42,
+    showColumnHeader: true,
+    showLegend: true,
+    onClearColumnSelection: () => alert('Clear selection clicked'),
+  },
+};
+
+/**
+ * Epoch-level view (Level 4) showing 32 slots in a single epoch.
+ * Accessed via `/ethereum/data-availability/$window/$hour/$epoch`.
  */
 export const EpochLevel: Story = {
   args: {
     rows: generateEpochLevelData('epoch-100000', 100000),
     granularity: 'epoch',
-    cellSize: 'sm',
+    cellSize: 'xs',
     showColumnHeader: true,
     showLegend: true,
   },
@@ -107,7 +137,7 @@ export const EpochLevelWithSelectedColumn: Story = {
   args: {
     rows: generateEpochLevelData('epoch-100000', 100000),
     granularity: 'epoch',
-    cellSize: 'sm',
+    cellSize: 'xs',
     selectedColumnIndex: 42,
     showColumnHeader: true,
     showLegend: true,
@@ -116,14 +146,14 @@ export const EpochLevelWithSelectedColumn: Story = {
 };
 
 /**
- * Slot-level view (Level 4) showing blobs × columns.
+ * Slot-level view (Level 5) showing blobs × columns.
  * This is the bottom level showing each blob's availability across all columns.
  */
 export const SlotLevel: Story = {
   args: {
     rows: generateSlotLevelData('slot-3200000', 3200000, 6),
     granularity: 'slot',
-    cellSize: 'sm',
+    cellSize: 'xs',
     showColumnHeader: true,
     showLegend: true,
   },
@@ -136,7 +166,7 @@ export const SlotLevelWithSelectedColumn: Story = {
   args: {
     rows: generateSlotLevelData('slot-3200000', 3200000, 6),
     granularity: 'slot',
-    cellSize: 'sm',
+    cellSize: 'xs',
     selectedColumnIndex: 42,
     showColumnHeader: true,
     showLegend: true,
@@ -172,13 +202,14 @@ export const InteractiveHierarchyDemo: Story = {
           <DataAvailabilityHeatmap
             rows={windowData}
             granularity="window"
+            cellSize="xs"
             selectedColumnIndex={selectedColumn}
             onCellClick={(identifier, columnIndex) => {
-              console.log(`Navigate to: /ethereum/data-availability/${identifier}?column_index=${columnIndex}`);
+              console.log(`Navigate to: /ethereum/data-availability/date/${identifier}?column_index=${columnIndex}`);
               setSelectedColumn(columnIndex);
             }}
             onRowClick={identifier => {
-              console.log(`Navigate to: /ethereum/data-availability/${identifier}`);
+              console.log(`Navigate to: /ethereum/data-availability/date/${identifier}`);
               alert(`Would navigate to day view for ${identifier} (all columns)`);
             }}
             onClearColumnSelection={() => setSelectedColumn(undefined)}
@@ -190,7 +221,7 @@ export const InteractiveHierarchyDemo: Story = {
 };
 
 /**
- * Interactive demo showing day-level (epochs) drill-down with column selection.
+ * Interactive demo showing day-level (hours) drill-down with column selection.
  */
 export const InteractiveDayDrillDown: Story = {
   args: {
@@ -199,12 +230,63 @@ export const InteractiveDayDrillDown: Story = {
   },
   render: () => {
     const [selectedColumn, setSelectedColumn] = useState<number | undefined>(42);
-    const dayData = generateDayLevelData('2024-01-15', 50); // Showing fewer for demo
+    const dayData = generateDayLevelData('2024-01-15');
 
     return (
       <div className="flex flex-col gap-4">
         <div className="rounded-sm bg-background p-4">
-          <h3 className="mb-2 text-lg/7 font-semibold text-foreground">Level 2: Day View - Epochs</h3>
+          <h3 className="mb-2 text-lg/7 font-semibold text-foreground">Level 2: Day View - Hours</h3>
+          <p className="mb-4 text-sm/6 text-muted">
+            Column {selectedColumn} is selected. Try clearing the selection or selecting a different column.
+            <br />
+            Click a cell → drill down to hour view (epochs)
+            <br />
+            Click an hour label → view all columns for that hour
+          </p>
+          <DataAvailabilityHeatmap
+            rows={dayData}
+            granularity="day"
+            cellSize="xs"
+            selectedColumnIndex={selectedColumn}
+            onCellClick={(identifier, columnIndex) => {
+              const hourMatch = identifier.match(/hour-(\d+)/);
+              const hourNum = hourMatch ? hourMatch[1] : 'unknown';
+              console.log(
+                `Navigate to: /ethereum/data-availability/date/2024-01-15/${hourNum}?column_index=${columnIndex}`
+              );
+              setSelectedColumn(columnIndex);
+              alert(`Would navigate to hour view (epochs) for hour ${hourNum}, column ${columnIndex}`);
+            }}
+            onRowClick={identifier => {
+              const hourMatch = identifier.match(/hour-(\d+)/);
+              const hourNum = hourMatch ? hourMatch[1] : 'unknown';
+              console.log(`Navigate to: /ethereum/data-availability/date/2024-01-15/${hourNum}`);
+              alert(`Would navigate to hour view (epochs) for hour ${hourNum} (all columns)`);
+            }}
+            onClearColumnSelection={() => setSelectedColumn(undefined)}
+          />
+        </div>
+      </div>
+    );
+  },
+};
+
+/**
+ * Interactive demo showing hour-level (epochs) drill-down with column selection.
+ */
+export const InteractiveHourDrillDown: Story = {
+  args: {
+    rows: [],
+    granularity: 'hour',
+  },
+  render: () => {
+    const [selectedColumn, setSelectedColumn] = useState<number | undefined>(42);
+    const hourData = generateHourLevelData('2024-01-15-hour-8', '2024-01-15', 8);
+
+    return (
+      <div className="flex flex-col gap-4">
+        <div className="rounded-sm bg-background p-4">
+          <h3 className="mb-2 text-lg/7 font-semibold text-foreground">Level 3: Hour View - Epochs</h3>
           <p className="mb-4 text-sm/6 text-muted">
             Column {selectedColumn} is selected. Try clearing the selection or selecting a different column.
             <br />
@@ -213,22 +295,21 @@ export const InteractiveDayDrillDown: Story = {
             Click an epoch label → view all columns for that epoch
           </p>
           <DataAvailabilityHeatmap
-            rows={dayData}
-            granularity="day"
+            rows={hourData}
+            granularity="hour"
+            cellSize="xs"
             selectedColumnIndex={selectedColumn}
             onCellClick={(identifier, columnIndex) => {
               const epochMatch = identifier.match(/epoch-(\d+)/);
               const epochNum = epochMatch ? epochMatch[1] : 'unknown';
-              console.log(
-                `Navigate to: /ethereum/data-availability/2024-01-15/${epochNum}?column_index=${columnIndex}`
-              );
+              console.log(`Navigate to: /ethereum/data-availability/epoch/${epochNum}?column_index=${columnIndex}`);
               setSelectedColumn(columnIndex);
               alert(`Would navigate to epoch view (slots) for epoch ${epochNum}, column ${columnIndex}`);
             }}
             onRowClick={identifier => {
               const epochMatch = identifier.match(/epoch-(\d+)/);
               const epochNum = epochMatch ? epochMatch[1] : 'unknown';
-              console.log(`Navigate to: /ethereum/data-availability/2024-01-15/${epochNum}`);
+              console.log(`Navigate to: /ethereum/data-availability/epoch/${epochNum}`);
               alert(`Would navigate to epoch view (slots) for epoch ${epochNum} (all columns)`);
             }}
             onClearColumnSelection={() => setSelectedColumn(undefined)}
@@ -263,20 +344,19 @@ export const InteractiveEpochDrillDown: Story = {
           <DataAvailabilityHeatmap
             rows={epochData}
             granularity="epoch"
+            cellSize="xs"
             selectedColumnIndex={selectedColumn}
             onCellClick={(identifier, columnIndex) => {
               const slotMatch = identifier.match(/slot-(\d+)/);
               const slotNum = slotMatch ? slotMatch[1] : 'unknown';
-              console.log(
-                `Navigate to: /ethereum/data-availability/2024-01-15/100000/${slotNum}?column_index=${columnIndex}`
-              );
+              console.log(`Navigate to: /ethereum/data-availability/slot/${slotNum}?column_index=${columnIndex}`);
               setSelectedColumn(columnIndex);
               alert(`Would show slot detail view (blobs) for slot ${slotNum}, column ${columnIndex}`);
             }}
             onRowClick={identifier => {
               const slotMatch = identifier.match(/slot-(\d+)/);
               const slotNum = slotMatch ? slotMatch[1] : 'unknown';
-              console.log(`Navigate to: /ethereum/data-availability/2024-01-15/100000/${slotNum}`);
+              console.log(`Navigate to: /ethereum/data-availability/slot/${slotNum}`);
               alert(`Would show slot detail view (blobs) for slot ${slotNum} (all columns)`);
             }}
             onClearColumnSelection={() => setSelectedColumn(undefined)}
@@ -312,6 +392,7 @@ export const InteractiveSlotView: Story = {
           <DataAvailabilityHeatmap
             rows={slotData}
             granularity="slot"
+            cellSize="xs"
             selectedColumnIndex={selectedColumn}
             onCellClick={(identifier, columnIndex) => {
               console.log(`Show details for ${identifier}, column ${columnIndex}`);

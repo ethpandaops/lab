@@ -15,7 +15,7 @@ export const DataAvailabilityHeatmap = ({
   onCellClick,
   onRowClick,
   onClearColumnSelection,
-  cellSize = 'md',
+  cellSize = 'xs',
   showColumnHeader = true,
   showLegend = true,
   className,
@@ -78,12 +78,12 @@ export const DataAvailabilityHeatmap = ({
       {showLegend && <DataAvailabilityLegend granularity={granularity} />}
 
       {/* Heatmap */}
-      <div className="overflow-x-auto">
-        <div className="inline-block min-w-full">
+      <div>
+        <div>
           {/* Rows */}
-          <div className="flex flex-col gap-1">
+          <div className="flex flex-col gap-px">
             {rows.map(row => (
-              <div key={row.identifier} className="flex gap-1">
+              <div key={row.identifier} className="flex gap-px">
                 {/* Row label */}
                 <button
                   type="button"
@@ -103,7 +103,7 @@ export const DataAvailabilityHeatmap = ({
                 </button>
 
                 {/* Cells */}
-                <div className="flex gap-1">
+                <div className="flex gap-px">
                   {row.cells.map(cell => (
                     <DataAvailabilityCell
                       key={`${row.identifier}-${cell.columnIndex}`}
@@ -122,12 +122,12 @@ export const DataAvailabilityHeatmap = ({
 
           {/* Column header at bottom */}
           {showColumnHeader && (
-            <div className="mt-2 flex gap-1">
+            <div className="mt-2 flex gap-px">
               {/* Spacer for row labels */}
               <div className={clsx(labelWidth, 'shrink-0')} />
 
               {/* Column indices */}
-              <div className="flex gap-1">
+              <div className="flex gap-px">
                 {columnIndices.map(colIndex => (
                   <button
                     key={colIndex}
@@ -144,8 +144,13 @@ export const DataAvailabilityHeatmap = ({
                           ? 'font-bold text-accent'
                           : 'text-muted hover:text-foreground'
                     )}
+                    title={`Column ${colIndex}`}
                   >
-                    {colIndex % 10 === 0 ? colIndex : ''}
+                    {colIndex % 10 === 0 ||
+                    colIndex === columnIndices[columnIndices.length - 1] ||
+                    hoveredColumn === colIndex
+                      ? colIndex
+                      : ''}
                   </button>
                 ))}
               </div>

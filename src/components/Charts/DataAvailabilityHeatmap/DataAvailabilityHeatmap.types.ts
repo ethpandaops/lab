@@ -33,11 +33,12 @@ export interface DataAvailabilityRow {
 /**
  * Granularity level for the heatmap
  * - window: 19-day custody window (top level) - shows days × columns
- * - day: Single day within the window - shows epochs × columns
- * - epoch: Single epoch within a day - shows slots × columns
+ * - day: Single day within the window - shows hours × columns
+ * - hour: Single hour within a day - shows epochs × columns
+ * - epoch: Single epoch within an hour - shows slots × columns
  * - slot: Single slot within an epoch - shows blobs × columns
  */
-export type DataAvailabilityGranularity = 'window' | 'day' | 'epoch' | 'slot';
+export type DataAvailabilityGranularity = 'window' | 'day' | 'hour' | 'epoch' | 'slot';
 
 /**
  * Callback when a cell is clicked
@@ -74,7 +75,7 @@ export interface DataAvailabilityHeatmapProps {
   onRowClick?: RowClickHandler;
   /** Callback when column selection is cleared */
   onClearColumnSelection?: () => void;
-  /** Optional: Cell size (default: 'md' = 24px) */
+  /** Optional: Cell size (default: 'xs' = 12px) */
   cellSize?: CellSize;
   /** Optional: Show column indices header */
   showColumnHeader?: boolean;
