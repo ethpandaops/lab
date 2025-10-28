@@ -26,10 +26,10 @@ export function EpochSlotsTable({ slots }: EpochSlotsTableProps): JSX.Element {
   const navigate = useNavigate();
 
   /**
-   * Sort slots by slot number ascending
+   * Sort slots by slot number descending (newest first)
    */
   const sortedSlots = useMemo((): SlotData[] => {
-    return [...slots].sort((a, b) => a.slot - b.slot);
+    return [...slots].sort((a, b) => b.slot - a.slot);
   }, [slots]);
 
   /**
