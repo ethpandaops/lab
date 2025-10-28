@@ -91,10 +91,8 @@ export interface GaugeProps {
    * Control chart merging behavior
    * @default false
    */
-  notMerge?: boolean;
   /**
    * Control lazy update behavior
    * @default true
    */
-  lazyUpdate?: boolean;
 }

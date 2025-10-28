@@ -3,7 +3,7 @@ import { PopoutCard } from '@/components/Layout/PopoutCard';
 import { BarChart } from '@/components/Charts/Bar';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { truncateAddress } from '@/utils/ethereum';
-import { CHART_CATEGORICAL_COLORS } from '@/theme/data-visualization-colors';
+import { getDataVizColors } from '@/utils/dataVizColors';
 import type { BuilderCompetitionChartProps, BuilderChartData } from './BuilderCompetitionChart.types';
 
 /**
@@ -26,6 +26,7 @@ import type { BuilderCompetitionChartProps, BuilderChartData } from './BuilderCo
  */
 export function BuilderCompetitionChart({ builderData, winningBuilder }: BuilderCompetitionChartProps): JSX.Element {
   const themeColors = useThemeColors();
+  const { CHART_CATEGORICAL_COLORS } = getDataVizColors();
 
   // Process and transform builder data for chart
   const { chartData, labels, processedData } = useMemo(() => {
@@ -52,7 +53,7 @@ export function BuilderCompetitionChart({ builderData, winningBuilder }: Builder
       labels: builderNames,
       processedData: processed,
     };
-  }, [builderData, winningBuilder, themeColors.accent]);
+  }, [builderData, winningBuilder, themeColors.accent, CHART_CATEGORICAL_COLORS]);
 
   // Custom tooltip formatter to show full pubkey and winner badge
   const tooltipFormatter = useMemo(

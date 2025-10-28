@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 
 import { MultiLineChart } from '@/components/Charts/MultiLine';
 import { PopoutCard } from '@/components/Layout/PopoutCard';
-import { CHART_CATEGORICAL_COLORS } from '@/theme/data-visualization-colors';
+import { getDataVizColors } from '@/utils/dataVizColors';
 
 import type { BlockSizeChartProps } from './BlockSizeChart.types';
 
@@ -12,6 +12,8 @@ import type { BlockSizeChartProps } from './BlockSizeChart.types';
  * Displays consensus and execution layer sizes, both compressed and uncompressed
  */
 export function BlockSizeChart({ data, anchorId }: BlockSizeChartProps): React.JSX.Element {
+  const { CHART_CATEGORICAL_COLORS } = getDataVizColors();
+
   const series = useMemo(() => {
     // Convert bytes to KB for better readability
     const consensusSizeKB = data.map(d => (d.consensusSize ? d.consensusSize / 1024 : null));
@@ -61,7 +63,7 @@ export function BlockSizeChart({ data, anchorId }: BlockSizeChartProps): React.J
         lineStyle: 'solid' as const,
       },
     ];
-  }, [data]);
+  }, [data, CHART_CATEGORICAL_COLORS]);
 
   const xAxisLabels = useMemo(() => data.map(d => d.slot.toString()), [data]);
 

@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 
 import { BarChart } from '@/components/Charts/Bar';
 import { PopoutCard } from '@/components/Layout/PopoutCard';
-import { CHART_CATEGORICAL_COLORS } from '@/theme/data-visualization-colors';
+import { getDataVizColors } from '@/utils/dataVizColors';
 
 import type { MevRelayDistributionChartProps } from './MevRelayDistributionChart.types';
 
@@ -12,6 +12,8 @@ import type { MevRelayDistributionChartProps } from './MevRelayDistributionChart
  * Displays top relays by block count as a horizontal bar chart
  */
 export function MevRelayDistributionChart({ data, anchorId }: MevRelayDistributionChartProps): React.JSX.Element {
+  const { CHART_CATEGORICAL_COLORS } = getDataVizColors();
+
   const { relays, chartData } = useMemo(() => {
     // Count slots per relay
     const relayCounts = new Map<string, number>();
@@ -33,7 +35,7 @@ export function MevRelayDistributionChart({ data, anchorId }: MevRelayDistributi
         color: CHART_CATEGORICAL_COLORS[index % CHART_CATEGORICAL_COLORS.length],
       })),
     };
-  }, [data]);
+  }, [data, CHART_CATEGORICAL_COLORS]);
 
   return (
     <PopoutCard

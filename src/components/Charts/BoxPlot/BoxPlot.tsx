@@ -1,7 +1,14 @@
 import { type JSX, useMemo } from 'react';
-import ReactECharts from 'echarts-for-react';
+import ReactEChartsCore from 'echarts-for-react/lib/core';
+import * as echarts from 'echarts/core';
+import { BoxplotChart } from 'echarts/charts';
+import { GridComponent, TooltipComponent, TitleComponent, LegendComponent } from 'echarts/components';
+import { CanvasRenderer } from 'echarts/renderers';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import type { BoxPlotProps } from './BoxPlot.types';
+
+// Register ECharts components
+echarts.use([BoxplotChart, GridComponent, TooltipComponent, TitleComponent, LegendComponent, CanvasRenderer]);
 
 /**
  * BoxPlot - A box-and-whisker plot component using ECharts
@@ -60,8 +67,6 @@ export function BoxPlot({
   yMax,
   yMin,
   animationDuration = 300,
-  notMerge = false,
-  lazyUpdate = true,
   boxWidth = '60%',
 }: BoxPlotProps): JSX.Element {
   const themeColors = useThemeColors();
@@ -251,11 +256,12 @@ export function BoxPlot({
 
   return (
     <div className={height === '100%' ? 'h-full w-full' : 'w-full'}>
-      <ReactECharts
+      <ReactEChartsCore
+        echarts={echarts}
         option={option}
         style={{ height, width: '100%', minHeight: height }}
-        notMerge={notMerge}
-        lazyUpdate={lazyUpdate}
+        notMerge={true}
+        lazyUpdate={false}
       />
     </div>
   );

@@ -38,8 +38,6 @@ export function GlobeChart({
   pointColor,
   pointSize = 2,
   pointOpacity = 0.2,
-  notMerge = false,
-  lazyUpdate = true,
 }: GlobeChartProps): React.JSX.Element {
   const themeColors = useThemeColors();
   const [echartsInstance, setEchartsInstance] = useState<ECharts | null>(null);
@@ -172,8 +170,8 @@ export function GlobeChart({
         option={option}
         style={{ height, width: '100%', minHeight: height }}
         onChartReady={instance => setEchartsInstance(instance)}
-        notMerge={notMerge}
-        lazyUpdate={lazyUpdate}
+        notMerge={true}
+        lazyUpdate={false}
       />
     </div>
   );
