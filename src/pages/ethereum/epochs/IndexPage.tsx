@@ -25,6 +25,18 @@ export function IndexPage(): React.JSX.Element {
   const navigate = useNavigate();
   const { epochs, missedAttestationsByEntity, isLoading, error, currentEpoch } = useEpochsData();
 
+  // Calculate epoch range from all epochs data
+  const epochRange = useMemo(() => {
+    if (epochs.length === 0) {
+      return undefined;
+    }
+    const epochNumbers = epochs.map(e => e.epoch).sort((a, b) => a - b);
+    return {
+      min: epochNumbers[0],
+      max: epochNumbers[epochNumbers.length - 1],
+    };
+  }, [epochs]);
+
   // Format table data - show all 10 epochs
   const tableData = useMemo(() => {
     return epochs.map(epoch => {
@@ -136,6 +148,7 @@ export function IndexPage(): React.JSX.Element {
           missedAttestationsByEntity={missedAttestationsByEntity}
           topEntitiesCount={10}
           anchorId="offline-validators-chart"
+          epochRange={epochRange}
         />
       </div>
     </Container>
