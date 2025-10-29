@@ -50,22 +50,45 @@ function StateAnalyzer() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    async function fetchData() {
+    let lastBlockNumber = 0;
+
+    async function fetchLatestBlock() {
+      if (!selectedNetwork || !restClient) {
+        console.log('[State Analyzer] Skipping fetch - no network or client');
+        return;
+      }
+
+      try {
+        const latest = await restClient.getStateLatest(selectedNetwork).catch(() => null);
+        if (latest) {
+          console.log('[State Analyzer] Latest block:', latest.block_number, 'Last:', lastBlockNumber);
+          setLatestData(latest);
+
+          // Only fetch heavy data when block number changes
+          if (latest.block_number !== lastBlockNumber) {
+            console.log('[State Analyzer] New block detected, fetching heavy data');
+            lastBlockNumber = latest.block_number;
+            fetchHeavyData();
+          }
+        }
+      } catch (err) {
+        console.error('Error fetching latest block:', err);
+      }
+    }
+
+    async function fetchHeavyData() {
       if (!selectedNetwork || !restClient) return;
 
       try {
-        setLoading(true);
         setError(null);
 
-        // Fetch all data in parallel
-        const [latest, adders, removers, chart] = await Promise.all([
-          restClient.getStateLatest(selectedNetwork).catch(() => null),
+        // Fetch charts and lists (heavier queries)
+        const [adders, removers, chart] = await Promise.all([
           restClient.getStateTopAdders(selectedNetwork, { period, limit: 10 }).catch(() => null),
           restClient.getStateTopRemovers(selectedNetwork, { period, limit: 10 }).catch(() => null),
           restClient.getStateGrowthChart(selectedNetwork, { period, granularity }).catch(() => null),
         ]);
 
-        setLatestData(latest);
         setTopAdders(adders);
         setTopRemovers(removers);
         setChartData(chart);
@@ -77,19 +100,34 @@ function StateAnalyzer() {
       }
     }
 
-    fetchData();
+    // Initial load
+    setLoading(true);
+    fetchLatestBlock();
+    fetchHeavyData();
+
+    // Poll latest block every second for immediate responsiveness
+    const latestInterval = setInterval(fetchLatestBlock, 1000);
+
+    return () => {
+      clearInterval(latestInterval);
+    };
   }, [selectedNetwork, period, granularity, restClient]);
 
   // Prepare chart data for Nivo
-  const nivoChartData = chartData?.dataPoints ? [
+  const nivoChartData = chartData?.data_points && chartData.data_points.length > 0 ? [
     {
       id: 'State Growth',
-      data: chartData.dataPoints.map(point => ({
-        x: new Date(point.timestamp * 1000),
-        y: point.netStateChangeBytes / (1024 * 1024), // Convert to MB
-      })),
+      data: chartData.data_points
+        .filter(point => point?.timestamp?.seconds && point?.net_bytes !== undefined)
+        .map(point => ({
+          x: new Date(point.timestamp.seconds * 1000),
+          y: point.net_bytes / (1024 * 1024), // Convert to MB
+        })),
     },
   ] : [];
+
+  // Get the actual color value from CSS variable for Nivo
+  const chartColor = '#00ffff'; // Cyan color matching --cyber-cyan
 
   return (
     <div className="space-y-6">
@@ -199,7 +237,7 @@ function StateAnalyzer() {
           </div>
 
           {/* State Growth Chart */}
-          {chartData && (
+          {!loading && chartData && nivoChartData.length > 0 && nivoChartData[0].data.length > 0 && (
             <Card>
               <CardHeader>
                 <div className="flex justify-between items-center">
@@ -222,52 +260,58 @@ function StateAnalyzer() {
                 </div>
               </CardHeader>
               <CardBody className="h-96">
-                <ResponsiveLine
-                  data={nivoChartData}
-                  theme={defaultNivoTheme}
-                  margin={{ top: 20, right: 30, bottom: 50, left: 60 }}
-                  xScale={{
-                    type: 'time',
-                    format: 'native',
-                  }}
-                  xFormat="time:%Y-%m-%d %H:%M"
-                  yScale={{
-                    type: 'linear',
-                    min: 'auto',
-                    max: 'auto',
-                  }}
-                  axisBottom={{
-                    format: '%H:%M',
-                    tickRotation: -45,
-                    legend: 'Time',
-                    legendOffset: 40,
-                  }}
-                  axisLeft={{
-                    legend: 'Net State Change (MB)',
-                    legendOffset: -50,
-                  }}
-                  colors={['rgb(var(--cyber-cyan))']}
-                  lineWidth={2}
-                  pointSize={6}
-                  pointColor="rgb(var(--cyber-cyan))"
-                  pointBorderWidth={2}
-                  pointBorderColor={{ from: 'serieColor' }}
-                  enableArea={true}
-                  areaOpacity={0.1}
-                  enableGridX={false}
-                  enableGridY={true}
-                  useMesh={true}
-                  tooltip={({ point }) => (
-                    <div className="bg-surface border border-border rounded-lg px-3 py-2 shadow-lg">
-                      <div className="text-xs text-secondary">
-                        {new Date(point.data.x as Date).toLocaleString()}
+                {nivoChartData[0].data.length > 0 ? (
+                  <ResponsiveLine
+                    data={nivoChartData}
+                    theme={defaultNivoTheme}
+                    margin={{ top: 20, right: 30, bottom: 50, left: 60 }}
+                    xScale={{
+                      type: 'time',
+                      format: 'native',
+                    }}
+                    xFormat="time:%Y-%m-%d %H:%M"
+                    yScale={{
+                      type: 'linear',
+                      min: 'auto',
+                      max: 'auto',
+                    }}
+                    axisBottom={{
+                      format: '%H:%M',
+                      tickRotation: -45,
+                      legend: 'Time',
+                      legendOffset: 40,
+                    }}
+                    axisLeft={{
+                      legend: 'Net State Change (MB)',
+                      legendOffset: -50,
+                    }}
+                    colors={[chartColor]}
+                    lineWidth={2}
+                    pointSize={6}
+                    pointColor={chartColor}
+                    pointBorderWidth={2}
+                    pointBorderColor={{ from: 'serieColor' }}
+                    enableArea={true}
+                    areaOpacity={0.1}
+                    enableGridX={false}
+                    enableGridY={true}
+                    useMesh={true}
+                    tooltip={({ point }) => (
+                      <div className="bg-surface border border-border rounded-lg px-3 py-2 shadow-lg">
+                        <div className="text-xs text-secondary">
+                          {new Date(point.data.x as Date).toLocaleString()}
+                        </div>
+                        <div className="text-sm font-bold text-primary font-mono">
+                          {(point.data.y as number).toFixed(2)} MB
+                        </div>
                       </div>
-                      <div className="text-sm font-bold text-primary font-mono">
-                        {(point.data.y as number).toFixed(2)} MB
-                      </div>
-                    </div>
-                  )}
-                />
+                    )}
+                  />
+                ) : (
+                  <div className="flex items-center justify-center h-full text-secondary">
+                    No chart data available
+                  </div>
+                )}
               </CardBody>
             </Card>
           )}
@@ -365,30 +409,30 @@ function StateAnalyzer() {
                   <div>
                     <div className="text-xs text-secondary mb-1">Total New Slots</div>
                     <div className="text-xl font-bold text-accent font-mono">
-                      +{formatNumber(chartData.summary.totalNewSlots)}
+                      +{formatNumber(chartData.summary.total_slots_added)}
                     </div>
                   </div>
                   <div>
                     <div className="text-xs text-secondary mb-1">Total Cleared Slots</div>
                     <div className="text-xl font-bold text-red-500 font-mono">
-                      -{formatNumber(chartData.summary.totalClearedSlots)}
+                      -{formatNumber(chartData.summary.total_slots_cleared)}
                     </div>
                   </div>
                   <div>
                     <div className="text-xs text-secondary mb-1">Net State Change</div>
                     <div
                       className={`text-xl font-bold font-mono ${
-                        chartData.summary.netStateChangeBytes >= 0 ? 'text-accent' : 'text-red-500'
+                        chartData.summary.net_bytes >= 0 ? 'text-accent' : 'text-red-500'
                       }`}
                     >
-                      {chartData.summary.netStateChangeBytes >= 0 ? '+' : ''}
-                      {formatBytes(chartData.summary.netStateChangeBytes)}
+                      {chartData.summary.net_bytes >= 0 ? '+' : ''}
+                      {formatBytes(chartData.summary.net_bytes)}
                     </div>
                   </div>
                   <div>
-                    <div className="text-xs text-secondary mb-1">Avg Block Growth</div>
+                    <div className="text-xs text-secondary mb-1">Avg Slots Per Block</div>
                     <div className="text-xl font-bold text-primary font-mono">
-                      {formatBytes(chartData.summary.averageBlockGrowthBytes)}
+                      {formatNumber(chartData.summary.avg_slots_per_block)}
                     </div>
                   </div>
                 </div>

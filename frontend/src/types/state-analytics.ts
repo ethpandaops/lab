@@ -97,32 +97,38 @@ export interface TopStateRemoversResponse {
  * State growth data point
  */
 export interface StateGrowthDataPoint {
-  timestamp: number;
-  blockNumber: number;
-  newSlots: number;
-  clearedSlots: number;
-  netStateChangeBytes: number;
+  timestamp: { seconds: number };
+  block_number: number;
+  slots_added: number;
+  slots_cleared: number;
+  net_slots: number;
+  bytes_added: number;
+  bytes_cleared: number;
+  net_bytes: number;
 }
 
 /**
  * State growth summary
  */
 export interface StateGrowthSummary {
-  totalNewSlots: number;
-  totalClearedSlots: number;
-  netStateChangeBytes: number;
-  averageBlockGrowthBytes: number;
+  total_slots_added: number;
+  total_slots_cleared: number;
+  net_slots: number;
+  total_bytes_added: number;
+  total_bytes_cleared: number;
+  net_bytes: number;
+  avg_slots_per_block: number;
 }
 
 /**
  * State growth chart response
  */
 export interface StateGrowthChartResponse {
-  period: StatePeriod;
-  granularity: StateGranularity;
-  startBlock: number;
-  endBlock: number;
-  dataPoints: StateGrowthDataPoint[];
+  period?: StatePeriod;
+  granularity?: StateGranularity;
+  start_block?: number;
+  end_block?: number;
+  data_points: StateGrowthDataPoint[];
   summary: StateGrowthSummary;
 }
 

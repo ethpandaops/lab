@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as LayoutRouteImport } from './routes/_layout'
 import { Route as LayoutIndexRouteImport } from './routes/_layout.index'
+import { Route as LayoutStateAnalyzerRouteImport } from './routes/_layout.state-analyzer'
 import { Route as LayoutExperimentsRouteImport } from './routes/_layout.experiments'
 import { Route as LayoutBeaconRouteImport } from './routes/_layout.beacon'
 import { Route as LayoutAboutRouteImport } from './routes/_layout.about'
@@ -36,6 +37,11 @@ const LayoutRoute = LayoutRouteImport.update({
 const LayoutIndexRoute = LayoutIndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => LayoutRoute,
+} as any)
+const LayoutStateAnalyzerRoute = LayoutStateAnalyzerRouteImport.update({
+  id: '/state-analyzer',
+  path: '/state-analyzer',
   getParentRoute: () => LayoutRoute,
 } as any)
 const LayoutExperimentsRoute = LayoutExperimentsRouteImport.update({
@@ -138,6 +144,7 @@ export interface FileRoutesByFullPath {
   '/about': typeof LayoutAboutRoute
   '/beacon': typeof LayoutBeaconRouteWithChildren
   '/experiments': typeof LayoutExperimentsRouteWithChildren
+  '/state-analyzer': typeof LayoutStateAnalyzerRoute
   '/': typeof LayoutIndexRoute
   '/beacon/locally-built-blocks': typeof LayoutBeaconLocallyBuiltBlocksRoute
   '/experiments/$experimentId': typeof LayoutExperimentsExperimentIdRouteWithChildren
@@ -157,6 +164,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/about': typeof LayoutAboutRoute
   '/beacon': typeof LayoutBeaconRouteWithChildren
+  '/state-analyzer': typeof LayoutStateAnalyzerRoute
   '/': typeof LayoutIndexRoute
   '/beacon/locally-built-blocks': typeof LayoutBeaconLocallyBuiltBlocksRoute
   '/xatu-data/fork-readiness': typeof LayoutXatuDataForkReadinessRoute
@@ -178,6 +186,7 @@ export interface FileRoutesById {
   '/_layout/about': typeof LayoutAboutRoute
   '/_layout/beacon': typeof LayoutBeaconRouteWithChildren
   '/_layout/experiments': typeof LayoutExperimentsRouteWithChildren
+  '/_layout/state-analyzer': typeof LayoutStateAnalyzerRoute
   '/_layout/': typeof LayoutIndexRoute
   '/_layout/beacon/locally-built-blocks': typeof LayoutBeaconLocallyBuiltBlocksRoute
   '/_layout/experiments/$experimentId': typeof LayoutExperimentsExperimentIdRouteWithChildren
@@ -200,6 +209,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/beacon'
     | '/experiments'
+    | '/state-analyzer'
     | '/'
     | '/beacon/locally-built-blocks'
     | '/experiments/$experimentId'
@@ -219,6 +229,7 @@ export interface FileRouteTypes {
   to:
     | '/about'
     | '/beacon'
+    | '/state-analyzer'
     | '/'
     | '/beacon/locally-built-blocks'
     | '/xatu-data/fork-readiness'
@@ -239,6 +250,7 @@ export interface FileRouteTypes {
     | '/_layout/about'
     | '/_layout/beacon'
     | '/_layout/experiments'
+    | '/_layout/state-analyzer'
     | '/_layout/'
     | '/_layout/beacon/locally-built-blocks'
     | '/_layout/experiments/$experimentId'
@@ -274,6 +286,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof LayoutIndexRouteImport
+      parentRoute: typeof LayoutRoute
+    }
+    '/_layout/state-analyzer': {
+      id: '/_layout/state-analyzer'
+      path: '/state-analyzer'
+      fullPath: '/state-analyzer'
+      preLoaderRoute: typeof LayoutStateAnalyzerRouteImport
       parentRoute: typeof LayoutRoute
     }
     '/_layout/experiments': {
@@ -449,6 +468,7 @@ interface LayoutRouteChildren {
   LayoutAboutRoute: typeof LayoutAboutRoute
   LayoutBeaconRoute: typeof LayoutBeaconRouteWithChildren
   LayoutExperimentsRoute: typeof LayoutExperimentsRouteWithChildren
+  LayoutStateAnalyzerRoute: typeof LayoutStateAnalyzerRoute
   LayoutIndexRoute: typeof LayoutIndexRoute
   LayoutXatuDataForkReadinessRoute: typeof LayoutXatuDataForkReadinessRoute
   LayoutXatuDataGeographicalChecklistRoute: typeof LayoutXatuDataGeographicalChecklistRoute
@@ -463,6 +483,7 @@ const LayoutRouteChildren: LayoutRouteChildren = {
   LayoutAboutRoute: LayoutAboutRoute,
   LayoutBeaconRoute: LayoutBeaconRouteWithChildren,
   LayoutExperimentsRoute: LayoutExperimentsRouteWithChildren,
+  LayoutStateAnalyzerRoute: LayoutStateAnalyzerRoute,
   LayoutIndexRoute: LayoutIndexRoute,
   LayoutXatuDataForkReadinessRoute: LayoutXatuDataForkReadinessRoute,
   LayoutXatuDataGeographicalChecklistRoute:
