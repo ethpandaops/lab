@@ -39,6 +39,7 @@ const getSizeClass = (size: CellSize): string => {
  */
 export const DataAvailabilityCell = ({
   data,
+  granularity,
   isSelected = false,
   isHighlighted = false,
   isDimmed = false,
@@ -53,6 +54,10 @@ export const DataAvailabilityCell = ({
   const colorClass = getAvailabilityColor(data.availability, hasData);
   const availabilityPercent = (data.availability * 100).toFixed(1);
   const displayColumnIndex = data.columnIndex + 1;
+
+  // Determine response time label based on granularity
+  // Slot/Blob levels use p50 (median), aggregated levels use avg p50
+  const responseTimeLabel = granularity === 'epoch' || granularity === 'slot' ? 'p50' : 'avg p50';
 
   const sizeClass = getSizeClass(size);
 
@@ -88,8 +93,10 @@ export const DataAvailabilityCell = ({
                   {data.successCount}/{data.totalCount} probes
                 </div>
               )}
-              {data.avgResponseTimeMs !== undefined && (
-                <div className="text-xs text-muted">{data.avgResponseTimeMs}ms avg</div>
+              {data.avgResponseTimeMs !== undefined && data.avgResponseTimeMs > 0 && (
+                <div className="text-xs text-muted">
+                  {Math.round(data.avgResponseTimeMs)}ms {responseTimeLabel}
+                </div>
               )}
             </>
           ) : (

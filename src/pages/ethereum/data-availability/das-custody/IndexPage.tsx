@@ -857,6 +857,7 @@ export function IndexPage(): JSX.Element {
                   onCellClick={handleCellClick}
                   onRowClick={currentLevel.type !== 'slot' ? handleRowClick : undefined}
                   onClearColumnSelection={() => setSelectedColumnIndex(undefined)}
+                  onBack={breadcrumbs.length > 1 ? breadcrumbs[breadcrumbs.length - 2].onClick : undefined}
                   cellSize="xs"
                   showColumnHeader
                   showLegend={false}

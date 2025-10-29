@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react';
 import clsx from 'clsx';
+import { ArrowLeftIcon } from '@heroicons/react/24/outline';
 import { Button } from '@/components/Elements/Button';
 import { DataAvailabilityCell } from './DataAvailabilityCell';
 import { DataAvailabilityLegend } from './DataAvailabilityLegend';
@@ -17,6 +18,7 @@ export const DataAvailabilityHeatmap = ({
   onCellClick,
   onRowClick,
   onClearColumnSelection,
+  onBack,
   cellSize = 'xs',
   showColumnHeader = true,
   showLegend = true,
@@ -146,6 +148,7 @@ export const DataAvailabilityHeatmap = ({
                     <DataAvailabilityCell
                       key={`${row.identifier}-${cell.columnIndex}`}
                       data={cell}
+                      granularity={granularity}
                       size={cellSize}
                       isSelected={selectedColumnIndex === cell.columnIndex}
                       isHighlighted={hoveredColumn === cell.columnIndex || hoveredRow === row.identifier}
@@ -201,34 +204,17 @@ export const DataAvailabilityHeatmap = ({
         </div>
       </div>
 
-      {/* Summary stats */}
-      <div className="flex gap-4 text-xs text-muted">
-        {/* Show row count label based on what the rows represent */}
-        {granularity !== 'window' && (
-          <div>
-            <span>
-              Total{' '}
-              {granularity === 'day'
-                ? 'hours'
-                : granularity === 'hour'
-                  ? 'epochs'
-                  : granularity === 'epoch'
-                    ? 'slots'
-                    : 'blobs'}
-              :
-            </span>{' '}
-            <span>{filteredRows.length}</span>
-          </div>
-        )}
+      {/* Back button */}
+      {onBack && (
         <div>
-          <span>Columns:</span> <span>{columnIndices.length}</span>
+          <Button variant="secondary" size="sm" onClick={onBack}>
+            <div className="flex items-center gap-2">
+              <ArrowLeftIcon className="size-4" />
+              <span>Back</span>
+            </div>
+          </Button>
         </div>
-        {selectedColumnIndex !== undefined && (
-          <div>
-            <span>Selected column:</span> <span>{selectedColumnIndex + 1}</span>
-          </div>
-        )}
-      </div>
+      )}
     </div>
   );
 };

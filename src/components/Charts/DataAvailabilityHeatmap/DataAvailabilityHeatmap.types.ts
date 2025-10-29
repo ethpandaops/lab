@@ -77,6 +77,8 @@ export interface DataAvailabilityHeatmapProps {
   onRowClick?: RowClickHandler;
   /** Callback when column selection is cleared */
   onClearColumnSelection?: () => void;
+  /** Optional: Callback when back button is clicked */
+  onBack?: () => void;
   /** Optional: Cell size (default: 'xs' = 12px) */
   cellSize?: CellSize;
   /** Optional: Show column indices header */
@@ -93,6 +95,8 @@ export interface DataAvailabilityHeatmapProps {
 export interface DataAvailabilityCellProps {
   /** Cell data */
   data: DataAvailabilityCellData;
+  /** Granularity level (determines response time label) */
+  granularity?: DataAvailabilityGranularity;
   /** Whether this cell is in the selected column */
   isSelected?: boolean;
   /** Whether this cell is highlighted (hover preview) */
