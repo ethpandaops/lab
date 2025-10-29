@@ -81,3 +81,19 @@ func (sa *StateAnalytics) GetContractStateActivity(
 	// TODO: Implement this method
 	return nil, nil
 }
+
+// GetContractStateComposition returns current state size for all contracts (Paradigm diagram data).
+func (sa *StateAnalytics) GetContractStateComposition(
+	ctx context.Context,
+	req *pb.GetContractStateCompositionRequest,
+) (*pb.GetContractStateCompositionResponse, error) {
+	return sa.service.GetContractStateComposition(ctx, req)
+}
+
+// GetHierarchicalState returns state organized hierarchically by category -> protocol -> contract.
+func (sa *StateAnalytics) GetHierarchicalState(
+	ctx context.Context,
+	req *pb.GetHierarchicalStateRequest,
+) (*pb.GetHierarchicalStateResponse, error) {
+	return sa.service.GetHierarchicalState(ctx, req)
+}

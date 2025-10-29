@@ -219,3 +219,71 @@ func networkFromContext(ctx context.Context) string {
 
 	return networks[0]
 }
+
+// handleContractStateComposition returns current state size for all contracts (Paradigm diagram data)
+func (r *PublicRouter) handleContractStateComposition(w http.ResponseWriter, req *http.Request) {
+	vars := mux.Vars(req)
+	network := vars["network"]
+
+	// Parse query parameters
+	queryParams := req.URL.Query()
+	limit := parseLimit(queryParams.Get("limit"), 10000)
+	minSizeBytes := parseUint64(queryParams.Get("min_size_bytes"), 0)
+	includeLabels := queryParams.Get("include_labels") == "true"
+
+	// Add network to gRPC metadata
+	ctx := metadata.NewOutgoingContext(req.Context(), metadata.Pairs("network", network))
+
+	// Call gRPC service
+	resp, err := r.stateAnalyticsClient.GetContractStateComposition(ctx, &state_analytics_pb.GetContractStateCompositionRequest{
+		Limit:         limit,
+		MinSizeBytes:  minSizeBytes,
+		IncludeLabels: includeLabels,
+	})
+	if err != nil {
+		r.HandleGRPCError(w, req, err)
+		return
+	}
+
+	r.WriteJSONResponseOK(w, req, resp)
+}
+
+// handleHierarchicalState returns state organized hierarchically by category -> protocol -> contract
+func (r *PublicRouter) handleHierarchicalState(w http.ResponseWriter, req *http.Request) {
+	vars := mux.Vars(req)
+	network := vars["network"]
+
+	// Parse query parameters
+	queryParams := req.URL.Query()
+	maxDepth := parseLimit(queryParams.Get("max_depth"), 3)
+	contractsPerProtocol := parseLimit(queryParams.Get("contracts_per_protocol"), 20)
+
+	// Add network to gRPC metadata
+	ctx := metadata.NewOutgoingContext(req.Context(), metadata.Pairs("network", network))
+
+	// Call gRPC service
+	resp, err := r.stateAnalyticsClient.GetHierarchicalState(ctx, &state_analytics_pb.GetHierarchicalStateRequest{
+		MaxDepth:             maxDepth,
+		ContractsPerProtocol: contractsPerProtocol,
+	})
+	if err != nil {
+		r.HandleGRPCError(w, req, err)
+		return
+	}
+
+	r.WriteJSONResponseOK(w, req, resp)
+}
+
+// parseUint64 parses uint64 query parameter with default value
+func parseUint64(value string, defaultValue uint64) uint64 {
+	if value == "" {
+		return defaultValue
+	}
+
+	parsed, err := strconv.ParseUint(value, 10, 64)
+	if err != nil {
+		return defaultValue
+	}
+
+	return parsed
+}

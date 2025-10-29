@@ -187,3 +187,23 @@ func getInt64(m map[string]interface{}, key string) int64 {
 	}
 	return 0
 }
+
+func getFloat64(m map[string]interface{}, key string) float64 {
+	if v, ok := m[key]; ok {
+		switch val := v.(type) {
+		case float64:
+			return val
+		case float32:
+			return float64(val)
+		case int:
+			return float64(val)
+		case int64:
+			return float64(val)
+		case uint64:
+			return float64(val)
+		case uint32:
+			return float64(val)
+		}
+	}
+	return 0.0
+}

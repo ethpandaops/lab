@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.5.1
 // - protoc             v5.29.3
-// source: backend/pkg/server/proto/state_analytics/state_analytics.proto
+// source: state_analytics.proto
 
 package state_analytics
 
@@ -19,11 +19,13 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	StateAnalytics_GetLatestBlockDelta_FullMethodName      = "/state_analytics.StateAnalytics/GetLatestBlockDelta"
-	StateAnalytics_GetTopStateAdders_FullMethodName        = "/state_analytics.StateAnalytics/GetTopStateAdders"
-	StateAnalytics_GetTopStateRemovers_FullMethodName      = "/state_analytics.StateAnalytics/GetTopStateRemovers"
-	StateAnalytics_GetStateGrowthChart_FullMethodName      = "/state_analytics.StateAnalytics/GetStateGrowthChart"
-	StateAnalytics_GetContractStateActivity_FullMethodName = "/state_analytics.StateAnalytics/GetContractStateActivity"
+	StateAnalytics_GetLatestBlockDelta_FullMethodName         = "/state_analytics.StateAnalytics/GetLatestBlockDelta"
+	StateAnalytics_GetTopStateAdders_FullMethodName           = "/state_analytics.StateAnalytics/GetTopStateAdders"
+	StateAnalytics_GetTopStateRemovers_FullMethodName         = "/state_analytics.StateAnalytics/GetTopStateRemovers"
+	StateAnalytics_GetStateGrowthChart_FullMethodName         = "/state_analytics.StateAnalytics/GetStateGrowthChart"
+	StateAnalytics_GetContractStateActivity_FullMethodName    = "/state_analytics.StateAnalytics/GetContractStateActivity"
+	StateAnalytics_GetContractStateComposition_FullMethodName = "/state_analytics.StateAnalytics/GetContractStateComposition"
+	StateAnalytics_GetHierarchicalState_FullMethodName        = "/state_analytics.StateAnalytics/GetHierarchicalState"
 )
 
 // StateAnalyticsClient is the client API for StateAnalytics service.
@@ -42,6 +44,10 @@ type StateAnalyticsClient interface {
 	GetStateGrowthChart(ctx context.Context, in *GetStateGrowthChartRequest, opts ...grpc.CallOption) (*GetStateGrowthChartResponse, error)
 	// GetContractStateActivity returns detailed state activity for a specific contract
 	GetContractStateActivity(ctx context.Context, in *GetContractStateActivityRequest, opts ...grpc.CallOption) (*GetContractStateActivityResponse, error)
+	// GetContractStateComposition returns current state size for all contracts (Paradigm diagram data)
+	GetContractStateComposition(ctx context.Context, in *GetContractStateCompositionRequest, opts ...grpc.CallOption) (*GetContractStateCompositionResponse, error)
+	// GetHierarchicalState returns state organized hierarchically by category -> protocol -> contract
+	GetHierarchicalState(ctx context.Context, in *GetHierarchicalStateRequest, opts ...grpc.CallOption) (*GetHierarchicalStateResponse, error)
 }
 
 type stateAnalyticsClient struct {
@@ -102,6 +108,26 @@ func (c *stateAnalyticsClient) GetContractStateActivity(ctx context.Context, in 
 	return out, nil
 }
 
+func (c *stateAnalyticsClient) GetContractStateComposition(ctx context.Context, in *GetContractStateCompositionRequest, opts ...grpc.CallOption) (*GetContractStateCompositionResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetContractStateCompositionResponse)
+	err := c.cc.Invoke(ctx, StateAnalytics_GetContractStateComposition_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *stateAnalyticsClient) GetHierarchicalState(ctx context.Context, in *GetHierarchicalStateRequest, opts ...grpc.CallOption) (*GetHierarchicalStateResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetHierarchicalStateResponse)
+	err := c.cc.Invoke(ctx, StateAnalytics_GetHierarchicalState_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // StateAnalyticsServer is the server API for StateAnalytics service.
 // All implementations must embed UnimplementedStateAnalyticsServer
 // for forward compatibility.
@@ -118,6 +144,10 @@ type StateAnalyticsServer interface {
 	GetStateGrowthChart(context.Context, *GetStateGrowthChartRequest) (*GetStateGrowthChartResponse, error)
 	// GetContractStateActivity returns detailed state activity for a specific contract
 	GetContractStateActivity(context.Context, *GetContractStateActivityRequest) (*GetContractStateActivityResponse, error)
+	// GetContractStateComposition returns current state size for all contracts (Paradigm diagram data)
+	GetContractStateComposition(context.Context, *GetContractStateCompositionRequest) (*GetContractStateCompositionResponse, error)
+	// GetHierarchicalState returns state organized hierarchically by category -> protocol -> contract
+	GetHierarchicalState(context.Context, *GetHierarchicalStateRequest) (*GetHierarchicalStateResponse, error)
 	mustEmbedUnimplementedStateAnalyticsServer()
 }
 
@@ -142,6 +172,12 @@ func (UnimplementedStateAnalyticsServer) GetStateGrowthChart(context.Context, *G
 }
 func (UnimplementedStateAnalyticsServer) GetContractStateActivity(context.Context, *GetContractStateActivityRequest) (*GetContractStateActivityResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetContractStateActivity not implemented")
+}
+func (UnimplementedStateAnalyticsServer) GetContractStateComposition(context.Context, *GetContractStateCompositionRequest) (*GetContractStateCompositionResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetContractStateComposition not implemented")
+}
+func (UnimplementedStateAnalyticsServer) GetHierarchicalState(context.Context, *GetHierarchicalStateRequest) (*GetHierarchicalStateResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetHierarchicalState not implemented")
 }
 func (UnimplementedStateAnalyticsServer) mustEmbedUnimplementedStateAnalyticsServer() {}
 func (UnimplementedStateAnalyticsServer) testEmbeddedByValue()                        {}
@@ -254,6 +290,42 @@ func _StateAnalytics_GetContractStateActivity_Handler(srv interface{}, ctx conte
 	return interceptor(ctx, in, info, handler)
 }
 
+func _StateAnalytics_GetContractStateComposition_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetContractStateCompositionRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(StateAnalyticsServer).GetContractStateComposition(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: StateAnalytics_GetContractStateComposition_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(StateAnalyticsServer).GetContractStateComposition(ctx, req.(*GetContractStateCompositionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _StateAnalytics_GetHierarchicalState_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetHierarchicalStateRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(StateAnalyticsServer).GetHierarchicalState(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: StateAnalytics_GetHierarchicalState_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(StateAnalyticsServer).GetHierarchicalState(ctx, req.(*GetHierarchicalStateRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // StateAnalytics_ServiceDesc is the grpc.ServiceDesc for StateAnalytics service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -281,7 +353,15 @@ var StateAnalytics_ServiceDesc = grpc.ServiceDesc{
 			MethodName: "GetContractStateActivity",
 			Handler:    _StateAnalytics_GetContractStateActivity_Handler,
 		},
+		{
+			MethodName: "GetContractStateComposition",
+			Handler:    _StateAnalytics_GetContractStateComposition_Handler,
+		},
+		{
+			MethodName: "GetHierarchicalState",
+			Handler:    _StateAnalytics_GetHierarchicalState_Handler,
+		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "backend/pkg/server/proto/state_analytics/state_analytics.proto",
+	Metadata: "state_analytics.proto",
 }

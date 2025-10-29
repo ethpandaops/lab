@@ -22,6 +22,12 @@ service StateAnalytics {
 
   // GetContractStateActivity returns detailed state activity for a specific contract
   rpc GetContractStateActivity(GetContractStateActivityRequest) returns (GetContractStateActivityResponse);
+
+  // GetContractStateComposition returns current state size for all contracts (Paradigm diagram data)
+  rpc GetContractStateComposition(GetContractStateCompositionRequest) returns (GetContractStateCompositionResponse);
+
+  // GetHierarchicalState returns state organized hierarchically by category -> protocol -> contract
+  rpc GetHierarchicalState(GetHierarchicalStateRequest) returns (GetHierarchicalStateResponse);
 }
 
 // Request/Response messages for GetLatestBlockDelta
@@ -187,4 +193,55 @@ message ContractStateEvent {
   EventType event_type = 3;
   string slot_key = 4;
   string value = 5;
+}
+
+// Request/Response for GetContractStateComposition (Paradigm diagram data)
+message GetContractStateCompositionRequest {
+  uint32 limit = 1;              // Max contracts to return (default 10000)
+  uint64 min_size_bytes = 2;     // Filter contracts smaller than this
+  bool include_labels = 3;       // Whether to include contract labels
+}
+
+message GetContractStateCompositionResponse {
+  repeated ContractStateEntry contracts = 1;
+  uint64 block_number = 2;
+  google.protobuf.Timestamp timestamp = 3;
+  uint64 total_state_bytes = 4;  // Total Ethereum state size
+}
+
+message ContractStateEntry {
+  string address = 1;
+  string label = 2;                     // Contract name (if known)
+  string category = 3;                  // DeFi, NFT, Bridge, CEX, etc.
+  string protocol = 4;                  // Uniswap, Aave, OpenSea, etc.
+  ContractState state = 5;
+  double percentage_of_total = 6;      // % of total state
+}
+
+message ContractState {
+  uint64 storage_slot_count = 1;       // Number of storage slots
+  uint64 total_bytes = 2;              // Total state size (slots * 191)
+  uint64 bytecode_bytes = 3;           // Contract bytecode size
+  uint64 first_seen_block = 4;
+  uint64 last_active_block = 5;
+}
+
+// Request/Response for GetHierarchicalState (Paradigm diagram tree structure)
+message GetHierarchicalStateRequest {
+  uint32 max_depth = 1;              // Tree depth: 1=categories only, 2=+protocols, 3=+contracts
+  uint32 contracts_per_protocol = 2; // Max contracts to show per protocol (default 20)
+}
+
+message GetHierarchicalStateResponse {
+  StateNode root = 1;                // Root node of hierarchy
+  uint64 block_number = 2;
+  google.protobuf.Timestamp timestamp = 3;
+}
+
+message StateNode {
+  string name = 1;                   // Node name (category/protocol/contract)
+  string type = 2;                   // "root", "category", "protocol", "contract"
+  uint64 size_bytes = 3;             // Total size of this node and children
+  repeated StateNode children = 4;   // Child nodes
+  map<string, string> metadata = 5;  // Additional data (address, color, etc.)
 }

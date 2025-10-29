@@ -187,5 +187,19 @@ func (r *PublicRouter) GetRoutes() []RouteConfig {
 			Cache:       middleware.CacheNearRealtime,
 			Description: "Get detailed state activity for a specific contract",
 		},
+		{
+			Path:        "/{network}/state/composition",
+			Handler:     r.handleContractStateComposition,
+			Methods:     []string{http.MethodGet, http.MethodOptions},
+			Cache:       middleware.CacheBrowserShort,
+			Description: "Get current state size for all contracts (Paradigm diagram data)",
+		},
+		{
+			Path:        "/{network}/state/hierarchical",
+			Handler:     r.handleHierarchicalState,
+			Methods:     []string{http.MethodGet, http.MethodOptions},
+			Cache:       middleware.CacheBrowserShort,
+			Description: "Get state organized hierarchically by category -> protocol -> contract",
+		},
 	}
 }

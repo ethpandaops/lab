@@ -182,3 +182,46 @@ ORDER BY abs(
 ) ASC
 LIMIT 1
 `
+
+// Query to get contract state composition (for Paradigm diagram)
+// Returns all contracts with their current storage slot counts
+const queryContractStateComposition = `
+WITH latest_block AS (
+    SELECT MAX(block_number) as max_block
+    FROM {database}.int_address_storage_slot_last_access
+),
+-- Get slot counts per contract from first_access (all slots ever created)
+contract_slots AS (
+    SELECT
+        address,
+        count() as slot_count,
+        min(block_number) as first_seen_block
+    FROM {database}.int_address_storage_slot_first_access
+    GROUP BY address
+),
+-- Get last activity from last_access table
+contract_last_activity AS (
+    SELECT
+        address,
+        max(block_number) as last_active_block
+    FROM {database}.int_address_storage_slot_last_access
+    GROUP BY address
+),
+-- Calculate total state bytes
+total_state AS (
+    SELECT sum(slot_count) * {bytes_per_slot} as total_bytes
+    FROM contract_slots
+)
+SELECT
+    cs.address,
+    cs.slot_count as storage_slot_count,
+    cs.slot_count * {bytes_per_slot} as total_bytes,
+    cs.first_seen_block,
+    coalesce(la.last_active_block, cs.first_seen_block) as last_active_block,
+    (cs.slot_count * {bytes_per_slot}) / (SELECT total_bytes FROM total_state) * 100 as percentage_of_total
+FROM contract_slots cs
+LEFT JOIN contract_last_activity la ON cs.address = la.address
+WHERE cs.slot_count * {bytes_per_slot} >= {min_size_bytes}
+ORDER BY cs.slot_count DESC
+LIMIT {limit}
+`
