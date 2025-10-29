@@ -22,11 +22,15 @@ import type {
   TopStateRemoversResponse,
   StateGrowthChartResponse,
   ContractStateActivityResponse,
+  ContractStateCompositionResponse,
+  HierarchicalStateResponse,
   StateLatestParams,
   StateTopAddersParams,
   StateTopRemoversParams,
   StateGrowthChartParams,
   ContractStateActivityParams,
+  ContractStateCompositionParams,
+  HierarchicalStateParams,
 } from '../../types/state-analytics';
 
 /**
@@ -569,6 +573,42 @@ export class RestApiClient {
     }`;
     const response = await this.fetchWithRetry<any>(url);
     return response as ContractStateActivityResponse;
+  }
+
+  /**
+   * Get current state size for all contracts (Paradigm diagram data)
+   * @param network Network name
+   * @param params Query parameters (limit, min_size_bytes, include_labels)
+   * @returns Contract state composition
+   */
+  async getContractStateComposition(
+    network: string,
+    params?: ContractStateCompositionParams,
+  ): Promise<ContractStateCompositionResponse> {
+    const queryString = params ? buildQueryString(params) : new URLSearchParams();
+    const url = `${this.baseUrl}${API_V1_ENDPOINTS.stateComposition(network)}${
+      queryString.toString() ? `?${queryString.toString()}` : ''
+    }`;
+    const response = await this.fetchWithRetry<any>(url);
+    return response as ContractStateCompositionResponse;
+  }
+
+  /**
+   * Get state organized hierarchically by category -> protocol -> contract
+   * @param network Network name
+   * @param params Query parameters (max_depth, contracts_per_protocol)
+   * @returns Hierarchical state tree
+   */
+  async getHierarchicalState(
+    network: string,
+    params?: HierarchicalStateParams,
+  ): Promise<HierarchicalStateResponse> {
+    const queryString = params ? buildQueryString(params) : new URLSearchParams();
+    const url = `${this.baseUrl}${API_V1_ENDPOINTS.stateHierarchical(network)}${
+      queryString.toString() ? `?${queryString.toString()}` : ''
+    }`;
+    const response = await this.fetchWithRetry<any>(url);
+    return response as HierarchicalStateResponse;
   }
 }
 

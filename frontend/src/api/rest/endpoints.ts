@@ -41,6 +41,8 @@ export const API_V1_ENDPOINTS = {
   stateGrowthChart: (network: string) => `/api/v1/${network}/state/growth-chart`,
   stateContractActivity: (network: string, address: string) =>
     `/api/v1/${network}/state/contract/${address}`,
+  stateComposition: (network: string) => `/api/v1/${network}/state/composition`,
+  stateHierarchical: (network: string) => `/api/v1/${network}/state/hierarchical`,
 };
 
 /**

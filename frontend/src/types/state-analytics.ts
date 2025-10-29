@@ -203,3 +203,73 @@ export interface StateGrowthChartParams {
 export interface ContractStateActivityParams {
   limit?: number;
 }
+
+/**
+ * Contract state information (Paradigm diagram)
+ */
+export interface ContractState {
+  storage_slot_count: number;
+  total_bytes: number;
+  bytecode_bytes: number;
+  first_seen_block: number;
+  last_active_block: number;
+}
+
+/**
+ * Contract state entry (Paradigm diagram)
+ */
+export interface ContractStateEntry {
+  address: string;
+  label?: string;
+  category?: string;
+  protocol?: string;
+  state: ContractState;
+  percentage_of_total: number;
+}
+
+/**
+ * Contract state composition response (Paradigm diagram flat data)
+ */
+export interface ContractStateCompositionResponse {
+  contracts: ContractStateEntry[];
+  block_number: number;
+  timestamp: { seconds: number };
+  total_state_bytes: number;
+}
+
+/**
+ * State node for hierarchical visualization (Paradigm diagram tree)
+ */
+export interface StateNode {
+  name: string;
+  type: 'root' | 'category' | 'protocol' | 'contract';
+  size_bytes: number;
+  children?: StateNode[];
+  metadata?: Record<string, string>;
+}
+
+/**
+ * Hierarchical state response (Paradigm diagram tree structure)
+ */
+export interface HierarchicalStateResponse {
+  root: StateNode;
+  block_number: number;
+  timestamp: { seconds: number };
+}
+
+/**
+ * Parameters for getContractStateComposition API call
+ */
+export interface ContractStateCompositionParams {
+  limit?: number;
+  min_size_bytes?: number;
+  include_labels?: boolean;
+}
+
+/**
+ * Parameters for getHierarchicalState API call
+ */
+export interface HierarchicalStateParams {
+  max_depth?: number;
+  contracts_per_protocol?: number;
+}
