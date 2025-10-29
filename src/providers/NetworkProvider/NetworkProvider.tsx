@@ -128,17 +128,14 @@ export function NetworkProvider({ children }: NetworkProviderProps): JSX.Element
           // Non-mainnet network: add/update the param
           navigate({
             to: '.',
-            search: prev => ({ ...(prev as Record<string, unknown>), network: initialNetwork.name }),
+            search: { network: initialNetwork.name },
             replace: true,
           });
         } else if (!shouldHaveParam && hasParam) {
-          // Mainnet: remove the param
+          // Mainnet: remove the param by setting to undefined
           navigate({
             to: '.',
-            search: prev => {
-              const { network: _network, ...rest } = prev as Record<string, unknown>;
-              return rest;
-            },
+            search: { network: undefined },
             replace: true,
           });
         }
@@ -171,18 +168,16 @@ export function NetworkProvider({ children }: NetworkProviderProps): JSX.Element
       if (navigate) {
         if (network.name === 'mainnet') {
           // Remove the network param for mainnet (it's the default)
+          // Use undefined to explicitly remove the param
           navigate({
             to: '.',
-            search: prev => {
-              const { network: _, ...rest } = prev as Record<string, unknown>;
-              return rest;
-            },
+            search: { network: undefined },
           });
         } else {
           // Add/update network param for non-mainnet networks
           navigate({
             to: '.',
-            search: prev => ({ ...(prev as Record<string, unknown>), network: network.name }),
+            search: { network: network.name },
           });
         }
       }
