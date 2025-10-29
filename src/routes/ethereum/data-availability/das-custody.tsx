@@ -1,6 +1,6 @@
 import { createFileRoute, Outlet } from '@tanstack/react-router';
 
-export const Route = createFileRoute('/xatu/das-custody')({
+export const Route = createFileRoute('/ethereum/data-availability/das-custody')({
   component: Outlet,
   beforeLoad: () => {
     return {
@@ -14,12 +14,12 @@ export const Route = createFileRoute('/xatu/das-custody')({
         name: 'description',
         content: 'PeerDAS data availability visualization showing column custody across validators',
       },
-      { property: 'og:image', content: '/images/xatu/das-custody.png' },
+      { property: 'og:image', content: '/images/ethereum/data-availability/das-custody.png' },
       {
         property: 'og:description',
         content: 'PeerDAS data availability visualization showing column custody across validators',
       },
-      { name: 'twitter:image', content: '/images/xatu/das-custody.png' },
+      { name: 'twitter:image', content: '/images/ethereum/data-availability/das-custody.png' },
       {
         name: 'twitter:description',
         content: 'PeerDAS data availability visualization showing column custody across validators',
