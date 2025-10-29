@@ -10,10 +10,20 @@ import reactRefresh from 'eslint-plugin-react-refresh';
 import prettier from 'eslint-plugin-prettier/recommended';
 import { fixupPluginRules } from '@eslint/compat';
 import betterTailwindcss from 'eslint-plugin-better-tailwindcss';
+import customRules from './eslint-rules/index.cjs';
 
 export default tseslint.config(
   {
-    ignores: ['dist', 'node_modules', 'coverage', 'eslint_report.json', 'src/api', 'storybook-static', 'lab'],
+    ignores: [
+      'dist',
+      'node_modules',
+      'coverage',
+      'eslint_report.json',
+      'src/api',
+      'storybook-static',
+      'lab',
+      'eslint-rules',
+    ],
   },
   js.configs.recommended,
   ...tseslint.configs.recommended,
@@ -95,6 +105,18 @@ export default tseslint.config(
         // Detect classes in these utility functions
         callees: ['classnames', 'clsx', 'cn', 'cva'],
       },
+    },
+  },
+  // Custom color theming rules
+  {
+    plugins: {
+      lab: customRules,
+    },
+    rules: {
+      // Ban hardcoded colors (hex, rgb, hsl) in Tailwind classes
+      'lab/no-hardcoded-colors': 'error',
+      // Ban primitive color scales (terracotta-*, sand-*, neutral-*, aurora-*)
+      'lab/no-primitive-color-scales': 'error',
     },
   },
   storybook.configs['flat/recommended'],
