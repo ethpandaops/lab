@@ -55,8 +55,7 @@ async function fetchAllPages<T>(
       throwOnError: true,
     });
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const responseData = response.data as any;
+    const responseData = response.data as Record<string, unknown>;
     const pageData = responseData[dataKey] as T[] | undefined;
     if (pageData) {
       allData.push(...pageData);
@@ -537,7 +536,7 @@ export function IndexPage(): JSX.Element {
         // Drill to hour level (pass date for breadcrumb)
         setCurrentLevel({ type: 'hour', date: currentLevel.date, hourStartDateTime: Number(identifier) });
         break;
-      case 'hour':
+      case 'hour': {
         // Drill to epoch level - identifier is the epoch number as string
         // Need to get epoch_start_date_time from the data
         const epochData = hourQuery.data?.fct_data_column_availability_by_epoch?.find(
@@ -553,6 +552,7 @@ export function IndexPage(): JSX.Element {
           });
         }
         break;
+      }
       case 'epoch':
         // Drill to slot level
         setCurrentLevel({

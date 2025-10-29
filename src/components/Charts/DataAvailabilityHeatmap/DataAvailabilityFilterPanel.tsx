@@ -19,7 +19,7 @@ export const DataAvailabilityFilterPanel = ({
   /**
    * Handle column group checkbox toggle
    */
-  const handleColumnGroupToggle = (groupIndex: number) => {
+  const handleColumnGroupToggle = (groupIndex: number): void => {
     const newGroups = new Set(filters.columnGroups);
     if (newGroups.has(groupIndex)) {
       newGroups.delete(groupIndex);
@@ -32,7 +32,7 @@ export const DataAvailabilityFilterPanel = ({
   /**
    * Handle availability threshold change
    */
-  const handleAvailabilityChange = (min: number, max: number) => {
+  const handleAvailabilityChange = (min: number, max: number): void => {
     setMinAvailability(min);
     setMaxAvailability(max);
     onFiltersChange({ ...filters, minAvailability: min, maxAvailability: max });
@@ -41,7 +41,7 @@ export const DataAvailabilityFilterPanel = ({
   /**
    * Handle min probe count change
    */
-  const handleMinProbeCountChange = (count: number) => {
+  const handleMinProbeCountChange = (count: number): void => {
     setMinProbeCount(count);
     onFiltersChange({ ...filters, minProbeCount: count });
   };
