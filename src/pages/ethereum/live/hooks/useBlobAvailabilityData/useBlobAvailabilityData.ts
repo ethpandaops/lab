@@ -5,7 +5,10 @@ import type {
   DataAvailabilityRatePoint,
   ContinentalPropagationSeries,
 } from '../../components/BlobDataAvailability/BlobDataAvailability.types';
-import { BLOB_COLORS, CONTINENT_COLORS } from '@/theme/data-visualization-colors';
+import { getDataVizColors } from '@/utils/dataVizColors';
+
+// Module-level constants - static, cached
+const { BLOB_COLORS, CONTINENT_COLORS } = getDataVizColors();
 
 export function useBlobAvailabilityData(blobNodes: FctBlockBlobFirstSeenByNode[]): {
   firstSeenData: BlobDataPoint[];

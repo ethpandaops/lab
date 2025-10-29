@@ -11,7 +11,7 @@ import {
   LegendComponent,
 } from 'echarts/components';
 import { CanvasRenderer } from 'echarts/renderers';
-import { hexToRgba, formatSmartDecimal } from '@/utils';
+import { hexToRgba, formatSmartDecimal, getDataVizColors, resolveCssColorToHex } from '@/utils';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import type { MultiLineChartProps } from './MultiLine.types';
 
@@ -25,20 +25,6 @@ echarts.use([
   LegendComponent,
   CanvasRenderer,
 ]);
-
-// Stable color palette for series visualization (used as fallback)
-const SERIES_COLORS = [
-  '#10b981', // green
-  '#f59e0b', // amber
-  '#8b5cf6', // purple
-  '#ec4899', // pink
-  '#06b6d4', // cyan
-  '#3b82f6', // blue
-  '#ef4444', // red
-  '#14b8a6', // teal
-  '#f43f5e', // rose
-  '#84cc16', // lime
-] as const;
 
 /**
  * MultiLineChart - A flexible multi-series line chart component using ECharts
@@ -95,9 +81,17 @@ export function MultiLineChart({
   enableSeriesFilter = false,
 }: MultiLineChartProps): React.JSX.Element {
   const themeColors = useThemeColors();
+  const { CHART_CATEGORICAL_COLORS } = getDataVizColors();
 
-  // Build extended palette: custom palette or theme colors + stable colors
-  const extendedPalette = colorPalette || [themeColors.primary, ...SERIES_COLORS];
+  // Convert OKLCH colors (from Tailwind v4) to hex format for ECharts compatibility
+  const convertedColorPalette = colorPalette?.map(color => resolveCssColorToHex(color));
+
+  // Build extended palette: custom palette or theme colors + data viz categorical colors
+  const extendedPalette = convertedColorPalette || [
+    themeColors.primary,
+    themeColors.accent,
+    ...CHART_CATEGORICAL_COLORS,
+  ];
 
   // Manage aggregate series visibility
   const [showAggregate, setShowAggregate] = useState(false);
@@ -326,13 +320,15 @@ export function MultiLineChart({
 
   // Calculate grid padding
   // Title is always rendered by component, never by ECharts
-  // containLabel: true adds padding for tick labels, but axis names need explicit space
+  // ECharts v6: outerBounds adds padding for tick labels, axis names need explicit space
   const gridConfig = {
     top: grid?.top ?? 16,
     right: grid?.right,
     bottom: grid?.bottom ?? (xAxis.name ? 30 : 24),
     left: grid?.left ?? (yAxis?.name ? 30 : 8),
-    containLabel: true,
+    // ECharts v6: use outerBounds instead of deprecated containLabel
+    outerBoundsMode: 'same' as const,
+    outerBoundsContain: 'axisLabel' as const,
   };
 
   // Create default smart tooltip formatter

@@ -1,7 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { CONTINENT_COLORS } from '@/theme/data-visualization-colors';
+import { getDataVizColors } from '@/utils/dataVizColors';
 import { GeographicalListView } from './GeographicalListView';
 import type { ContinentData, ContinentCode, ProcessedNode } from '../../hooks/useGeographicalData';
+
+const { CONTINENT_COLORS } = getDataVizColors();
 
 // Mock data
 const mockNode: ProcessedNode = {

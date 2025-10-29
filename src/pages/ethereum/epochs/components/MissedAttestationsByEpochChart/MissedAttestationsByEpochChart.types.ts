@@ -10,4 +10,6 @@ export interface MissedAttestationsByEpochChartProps {
   topEntitiesCount?: number;
   /** Anchor ID for deep linking to this chart */
   anchorId?: string;
+  /** Expected epoch range to display (min and max epoch numbers) */
+  epochRange?: { min: number; max: number };
 }

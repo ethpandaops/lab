@@ -16,6 +16,9 @@ export function SlotBasicInfoCard({ slot, epoch, data }: SlotBasicInfoCardProps)
   const blobCount = data.blobCount[0];
   const proposerEntity = data.proposerEntity[0];
 
+  // Determine if block was seen by monitoring infrastructure
+  const wasBlockSeen = !!blockHead;
+
   // Determine slot status from proposer data (which has canonical/orphaned/missed status)
   const getSlotStatus = (): { label: string; color: 'green' | 'red' | 'yellow' } => {
     const statusValue = blockProposer?.status?.toLowerCase();
@@ -61,9 +64,14 @@ export function SlotBasicInfoCard({ slot, epoch, data }: SlotBasicInfoCardProps)
       header={
         <div className="flex items-center justify-between">
           <h2 className="text-lg/7 font-semibold text-foreground">Slot Information</h2>
-          <Badge color={status.color} variant="border">
-            {status.label}
-          </Badge>
+          <div className="flex items-center gap-2">
+            <Badge color={wasBlockSeen ? 'green' : 'red'} variant="border">
+              {wasBlockSeen ? 'Block Seen' : 'Block Not Seen'}
+            </Badge>
+            <Badge color={status.color} variant="border">
+              {status.label}
+            </Badge>
+          </div>
         </div>
       }
     >

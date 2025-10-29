@@ -178,12 +178,10 @@ export interface ScatterAndLineChartProps {
    * Whether to merge new options with existing chart (false) or replace entirely (true)
    * @default false
    */
-  notMerge?: boolean;
   /**
    * Whether to defer chart updates to next animation frame
    * @default true
    */
-  lazyUpdate?: boolean;
   /**
    * Enable animation
    * @default false

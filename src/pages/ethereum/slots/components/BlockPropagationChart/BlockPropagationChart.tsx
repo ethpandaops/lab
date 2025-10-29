@@ -3,7 +3,7 @@ import { PopoutCard } from '@/components/Layout/PopoutCard';
 import { ScatterAndLineChart } from '@/components/Charts/ScatterAndLine';
 import type { ScatterSeries, LineSeries } from '@/components/Charts/ScatterAndLine/ScatterAndLine.types';
 import { useThemeColors } from '@/hooks/useThemeColors';
-import { CONTINENT_COLORS } from '@/theme/data-visualization-colors';
+import { getDataVizColors } from '@/utils/dataVizColors';
 import type { BlockPropagationChartProps } from './BlockPropagationChart.types';
 import type { TooltipFormatterParams, TooltipFormatterParam } from '@/types/echarts';
 
@@ -26,6 +26,7 @@ import type { TooltipFormatterParams, TooltipFormatterParam } from '@/types/echa
  */
 export function BlockPropagationChart({ blockPropagationData }: BlockPropagationChartProps): JSX.Element {
   const themeColors = useThemeColors();
+  const { CONTINENT_COLORS } = getDataVizColors();
 
   // Process data into scatter and line series
   const { scatterSeries, lineSeries } = useMemo(() => {
@@ -77,7 +78,7 @@ export function BlockPropagationChart({ blockPropagationData }: BlockPropagation
     ];
 
     return { scatterSeries: scatter, lineSeries: line };
-  }, [blockPropagationData, themeColors]);
+  }, [blockPropagationData, themeColors, CONTINENT_COLORS]);
 
   // Custom tooltip formatter
   const tooltipFormatter = useMemo(
@@ -140,8 +141,6 @@ export function BlockPropagationChart({ blockPropagationData }: BlockPropagation
           tooltipFormatter={tooltipFormatter}
           showLegend={true}
           legendPosition="bottom"
-          notMerge={false}
-          lazyUpdate={true}
         />
       )}
     </PopoutCard>
