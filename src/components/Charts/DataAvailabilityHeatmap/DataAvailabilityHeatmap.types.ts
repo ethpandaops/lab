@@ -67,6 +67,8 @@ export interface DataAvailabilityHeatmapProps {
   rows: DataAvailabilityRow[];
   /** Granularity level of the data */
   granularity: DataAvailabilityGranularity;
+  /** Filter settings */
+  filters: import('./DataAvailabilityFilterPanel.types').DataAvailabilityFilters;
   /** Optional: Selected column index to highlight */
   selectedColumnIndex?: number;
   /** Callback when a cell is clicked */
@@ -109,8 +111,8 @@ export interface DataAvailabilityCellProps {
  * Props for the legend component
  */
 export interface DataAvailabilityLegendProps {
-  /** Granularity level for contextual labels */
-  granularity: DataAvailabilityGranularity;
+  /** Granularity level for contextual labels (unused, kept for compatibility) */
+  granularity?: DataAvailabilityGranularity;
   /** Optional: Custom class name */
   className?: string;
 }

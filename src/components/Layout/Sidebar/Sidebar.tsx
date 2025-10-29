@@ -23,6 +23,7 @@ const ethereumExecutionPages: NavItem[] = [];
 
 const xatuPages: NavItem[] = [
   { name: 'Contributors', to: '/xatu/contributors' },
+  { name: 'DAS Custody', to: '/xatu/das-custody' },
   { name: 'Geographical Checklist', to: '/xatu/geographical-checklist' },
   { name: 'Locally Built Blocks', to: '/xatu/locally-built-blocks' },
   { name: 'Fork Readiness', to: '/xatu/fork-readiness' },

@@ -17,10 +17,12 @@ import { Route as ExperimentsIndexRouteImport } from './routes/experiments/index
 import { Route as XatuLocallyBuiltBlocksRouteImport } from './routes/xatu/locally-built-blocks'
 import { Route as XatuGeographicalChecklistRouteImport } from './routes/xatu/geographical-checklist'
 import { Route as XatuForkReadinessRouteImport } from './routes/xatu/fork-readiness'
+import { Route as XatuDasCustodyRouteImport } from './routes/xatu/das-custody'
 import { Route as XatuContributorsRouteImport } from './routes/xatu/contributors'
 import { Route as EthereumSlotsRouteImport } from './routes/ethereum/slots'
 import { Route as EthereumLiveRouteImport } from './routes/ethereum/live'
 import { Route as EthereumEpochsRouteImport } from './routes/ethereum/epochs'
+import { Route as XatuDasCustodyIndexRouteImport } from './routes/xatu/das-custody/index'
 import { Route as XatuContributorsIndexRouteImport } from './routes/xatu/contributors/index'
 import { Route as EthereumSlotsIndexRouteImport } from './routes/ethereum/slots/index'
 import { Route as EthereumEpochsIndexRouteImport } from './routes/ethereum/epochs/index'
@@ -69,6 +71,11 @@ const XatuForkReadinessRoute = XatuForkReadinessRouteImport.update({
   path: '/fork-readiness',
   getParentRoute: () => XatuRoute,
 } as any)
+const XatuDasCustodyRoute = XatuDasCustodyRouteImport.update({
+  id: '/das-custody',
+  path: '/das-custody',
+  getParentRoute: () => XatuRoute,
+} as any)
 const XatuContributorsRoute = XatuContributorsRouteImport.update({
   id: '/contributors',
   path: '/contributors',
@@ -88,6 +95,11 @@ const EthereumEpochsRoute = EthereumEpochsRouteImport.update({
   id: '/epochs',
   path: '/epochs',
   getParentRoute: () => EthereumRoute,
+} as any)
+const XatuDasCustodyIndexRoute = XatuDasCustodyIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => XatuDasCustodyRoute,
 } as any)
 const XatuContributorsIndexRoute = XatuContributorsIndexRouteImport.update({
   id: '/',
@@ -129,6 +141,7 @@ export interface FileRoutesByFullPath {
   '/ethereum/live': typeof EthereumLiveRoute
   '/ethereum/slots': typeof EthereumSlotsRouteWithChildren
   '/xatu/contributors': typeof XatuContributorsRouteWithChildren
+  '/xatu/das-custody': typeof XatuDasCustodyRouteWithChildren
   '/xatu/fork-readiness': typeof XatuForkReadinessRoute
   '/xatu/geographical-checklist': typeof XatuGeographicalChecklistRoute
   '/xatu/locally-built-blocks': typeof XatuLocallyBuiltBlocksRoute
@@ -139,6 +152,7 @@ export interface FileRoutesByFullPath {
   '/ethereum/epochs/': typeof EthereumEpochsIndexRoute
   '/ethereum/slots/': typeof EthereumSlotsIndexRoute
   '/xatu/contributors/': typeof XatuContributorsIndexRoute
+  '/xatu/das-custody/': typeof XatuDasCustodyIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -155,6 +169,7 @@ export interface FileRoutesByTo {
   '/ethereum/epochs': typeof EthereumEpochsIndexRoute
   '/ethereum/slots': typeof EthereumSlotsIndexRoute
   '/xatu/contributors': typeof XatuContributorsIndexRoute
+  '/xatu/das-custody': typeof XatuDasCustodyIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -166,6 +181,7 @@ export interface FileRoutesById {
   '/ethereum/live': typeof EthereumLiveRoute
   '/ethereum/slots': typeof EthereumSlotsRouteWithChildren
   '/xatu/contributors': typeof XatuContributorsRouteWithChildren
+  '/xatu/das-custody': typeof XatuDasCustodyRouteWithChildren
   '/xatu/fork-readiness': typeof XatuForkReadinessRoute
   '/xatu/geographical-checklist': typeof XatuGeographicalChecklistRoute
   '/xatu/locally-built-blocks': typeof XatuLocallyBuiltBlocksRoute
@@ -176,6 +192,7 @@ export interface FileRoutesById {
   '/ethereum/epochs/': typeof EthereumEpochsIndexRoute
   '/ethereum/slots/': typeof EthereumSlotsIndexRoute
   '/xatu/contributors/': typeof XatuContributorsIndexRoute
+  '/xatu/das-custody/': typeof XatuDasCustodyIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -188,6 +205,7 @@ export interface FileRouteTypes {
     | '/ethereum/live'
     | '/ethereum/slots'
     | '/xatu/contributors'
+    | '/xatu/das-custody'
     | '/xatu/fork-readiness'
     | '/xatu/geographical-checklist'
     | '/xatu/locally-built-blocks'
@@ -198,6 +216,7 @@ export interface FileRouteTypes {
     | '/ethereum/epochs/'
     | '/ethereum/slots/'
     | '/xatu/contributors/'
+    | '/xatu/das-custody/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -214,6 +233,7 @@ export interface FileRouteTypes {
     | '/ethereum/epochs'
     | '/ethereum/slots'
     | '/xatu/contributors'
+    | '/xatu/das-custody'
   id:
     | '__root__'
     | '/'
@@ -224,6 +244,7 @@ export interface FileRouteTypes {
     | '/ethereum/live'
     | '/ethereum/slots'
     | '/xatu/contributors'
+    | '/xatu/das-custody'
     | '/xatu/fork-readiness'
     | '/xatu/geographical-checklist'
     | '/xatu/locally-built-blocks'
@@ -234,6 +255,7 @@ export interface FileRouteTypes {
     | '/ethereum/epochs/'
     | '/ethereum/slots/'
     | '/xatu/contributors/'
+    | '/xatu/das-custody/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -301,6 +323,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof XatuForkReadinessRouteImport
       parentRoute: typeof XatuRoute
     }
+    '/xatu/das-custody': {
+      id: '/xatu/das-custody'
+      path: '/das-custody'
+      fullPath: '/xatu/das-custody'
+      preLoaderRoute: typeof XatuDasCustodyRouteImport
+      parentRoute: typeof XatuRoute
+    }
     '/xatu/contributors': {
       id: '/xatu/contributors'
       path: '/contributors'
@@ -328,6 +357,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/ethereum/epochs'
       preLoaderRoute: typeof EthereumEpochsRouteImport
       parentRoute: typeof EthereumRoute
+    }
+    '/xatu/das-custody/': {
+      id: '/xatu/das-custody/'
+      path: '/'
+      fullPath: '/xatu/das-custody/'
+      preLoaderRoute: typeof XatuDasCustodyIndexRouteImport
+      parentRoute: typeof XatuDasCustodyRoute
     }
     '/xatu/contributors/': {
       id: '/xatu/contributors/'
@@ -443,8 +479,21 @@ const XatuContributorsRouteChildren: XatuContributorsRouteChildren = {
 const XatuContributorsRouteWithChildren =
   XatuContributorsRoute._addFileChildren(XatuContributorsRouteChildren)
 
+interface XatuDasCustodyRouteChildren {
+  XatuDasCustodyIndexRoute: typeof XatuDasCustodyIndexRoute
+}
+
+const XatuDasCustodyRouteChildren: XatuDasCustodyRouteChildren = {
+  XatuDasCustodyIndexRoute: XatuDasCustodyIndexRoute,
+}
+
+const XatuDasCustodyRouteWithChildren = XatuDasCustodyRoute._addFileChildren(
+  XatuDasCustodyRouteChildren,
+)
+
 interface XatuRouteChildren {
   XatuContributorsRoute: typeof XatuContributorsRouteWithChildren
+  XatuDasCustodyRoute: typeof XatuDasCustodyRouteWithChildren
   XatuForkReadinessRoute: typeof XatuForkReadinessRoute
   XatuGeographicalChecklistRoute: typeof XatuGeographicalChecklistRoute
   XatuLocallyBuiltBlocksRoute: typeof XatuLocallyBuiltBlocksRoute
@@ -452,6 +501,7 @@ interface XatuRouteChildren {
 
 const XatuRouteChildren: XatuRouteChildren = {
   XatuContributorsRoute: XatuContributorsRouteWithChildren,
+  XatuDasCustodyRoute: XatuDasCustodyRouteWithChildren,
   XatuForkReadinessRoute: XatuForkReadinessRoute,
   XatuGeographicalChecklistRoute: XatuGeographicalChecklistRoute,
   XatuLocallyBuiltBlocksRoute: XatuLocallyBuiltBlocksRoute,

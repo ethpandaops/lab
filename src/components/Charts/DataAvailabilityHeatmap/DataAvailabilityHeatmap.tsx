@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import clsx from 'clsx';
+import { Button } from '@/components/Elements/Button';
 import { DataAvailabilityCell } from './DataAvailabilityCell';
 import { DataAvailabilityLegend } from './DataAvailabilityLegend';
 import type { DataAvailabilityHeatmapProps } from './DataAvailabilityHeatmap.types';
@@ -11,6 +12,7 @@ import type { DataAvailabilityHeatmapProps } from './DataAvailabilityHeatmap.typ
 export const DataAvailabilityHeatmap = ({
   rows,
   granularity,
+  filters,
   selectedColumnIndex,
   onCellClick,
   onRowClick,
@@ -20,12 +22,52 @@ export const DataAvailabilityHeatmap = ({
   showLegend = true,
   className,
 }: DataAvailabilityHeatmapProps): React.JSX.Element => {
-  // Get all unique column indices from the data
-  const columnIndices = rows.length > 0 ? rows[0].cells.map(cell => cell.columnIndex) : [];
-
   // Track hover states for preview
   const [hoveredColumn, setHoveredColumn] = useState<number | null>(null);
   const [hoveredRow, setHoveredRow] = useState<string | null>(null);
+
+  /**
+   * Apply filters to rows and cells
+   */
+  const filteredRows = useMemo(() => {
+    return rows.map(row => {
+      const filteredCells = row.cells.filter(cell => {
+        // Filter by column group
+        const columnGroup = Math.floor(cell.columnIndex / 32);
+        if (!filters.columnGroups.has(columnGroup)) {
+          return false;
+        }
+
+        // Filter by probe count
+        const probeCount = cell.totalCount ?? 0;
+        if (probeCount < filters.minProbeCount) {
+          return false;
+        }
+
+        // Filter by availability (only if cell has data)
+        const hasData = probeCount > 0;
+        if (hasData) {
+          const availabilityPercent = cell.availability * 100;
+          if (availabilityPercent < filters.minAvailability || availabilityPercent > filters.maxAvailability) {
+            return false;
+          }
+        }
+
+        return true;
+      });
+
+      return {
+        ...row,
+        cells: filteredCells,
+      };
+    });
+  }, [rows, filters]);
+
+  // Get all unique column indices from the filtered data
+  const columnIndices =
+    filteredRows.length > 0
+      ? Array.from(new Set(filteredRows.flatMap(row => row.cells.map(cell => cell.columnIndex)))).sort((a, b) => a - b)
+      : [];
 
   // Get size-specific classes
   const cellSizeClass = {
@@ -37,11 +79,11 @@ export const DataAvailabilityHeatmap = ({
   }[cellSize];
 
   const labelWidth = {
-    xs: 'w-16', // 64px
-    sm: 'w-20', // 80px
-    md: 'w-24', // 96px
-    lg: 'w-28', // 112px
-    xl: 'w-32', // 128px
+    xs: 'min-w-12', // Minimum width, grows with content
+    sm: 'min-w-16', // Minimum width, grows with content
+    md: 'min-w-20', // Minimum width, grows with content
+    lg: 'min-w-24', // Minimum width, grows with content
+    xl: 'min-w-28', // Minimum width, grows with content
   }[cellSize];
 
   const textSize = {
@@ -56,20 +98,16 @@ export const DataAvailabilityHeatmap = ({
     <div className={clsx('flex flex-col gap-6', className)}>
       {/* Selected column banner */}
       {selectedColumnIndex !== undefined && (
-        <div className="flex items-center gap-3 rounded-sm bg-accent/10 px-4 py-3">
-          <div className="flex grow items-center gap-2 text-sm/6">
+        <div className="flex items-center gap-3 rounded-sm border border-accent/20 bg-accent/5 px-3 py-2">
+          <div className="flex grow items-center gap-2 text-xs/6">
             <span className="text-muted">Viewing column:</span>
-            <span className="font-semibold text-accent">{selectedColumnIndex}</span>
-            <span className="text-xs text-muted">(other columns dimmed)</span>
+            <span className="font-semibold text-accent">{selectedColumnIndex + 1}</span>
+            <span className="text-muted">(other columns dimmed)</span>
           </div>
           {onClearColumnSelection && (
-            <button
-              type="button"
-              onClick={onClearColumnSelection}
-              className="rounded-xs bg-background px-3 py-1.5 text-sm/6 text-foreground transition-colors hover:bg-muted"
-            >
+            <Button variant="secondary" size="sm" onClick={onClearColumnSelection}>
               Clear selection
-            </button>
+            </Button>
           )}
         </div>
       )}
@@ -82,8 +120,8 @@ export const DataAvailabilityHeatmap = ({
         <div>
           {/* Rows */}
           <div className="flex flex-col gap-px">
-            {rows.map(row => (
-              <div key={row.identifier} className="flex gap-px">
+            {filteredRows.map(row => (
+              <div key={row.identifier} className="flex gap-2">
                 {/* Row label */}
                 <button
                   type="button"
@@ -93,8 +131,8 @@ export const DataAvailabilityHeatmap = ({
                   className={clsx(
                     labelWidth,
                     textSize,
-                    'shrink-0 truncate text-left transition-colors',
-                    onRowClick ? 'cursor-pointer text-foreground hover:text-accent' : 'cursor-default text-muted',
+                    'shrink-0 truncate pr-2 text-left font-mono text-muted transition-colors',
+                    onRowClick ? 'cursor-pointer hover:text-accent' : 'cursor-default',
                     hoveredRow === row.identifier && 'font-bold text-accent'
                   )}
                   title={row.label}
@@ -128,31 +166,35 @@ export const DataAvailabilityHeatmap = ({
 
               {/* Column indices */}
               <div className="flex gap-px">
-                {columnIndices.map(colIndex => (
-                  <button
-                    key={colIndex}
-                    type="button"
-                    onMouseEnter={() => setHoveredColumn(colIndex)}
-                    onMouseLeave={() => setHoveredColumn(null)}
-                    className={clsx(
-                      cellSizeClass,
-                      textSize,
-                      'text-center transition-colors',
-                      selectedColumnIndex === colIndex
-                        ? 'font-bold text-accent'
-                        : hoveredColumn === colIndex
-                          ? 'font-bold text-accent'
-                          : 'text-muted hover:text-foreground'
-                    )}
-                    title={`Column ${colIndex}`}
-                  >
-                    {colIndex % 10 === 0 ||
+                {columnIndices.map(colIndex => {
+                  const displayIndex = colIndex + 1;
+                  const showLabel =
+                    displayIndex % 10 === 0 ||
                     colIndex === columnIndices[columnIndices.length - 1] ||
-                    hoveredColumn === colIndex
-                      ? colIndex
-                      : ''}
-                  </button>
-                ))}
+                    hoveredColumn === colIndex;
+
+                  return (
+                    <button
+                      key={colIndex}
+                      type="button"
+                      onMouseEnter={() => setHoveredColumn(colIndex)}
+                      onMouseLeave={() => setHoveredColumn(null)}
+                      className={clsx(
+                        cellSizeClass,
+                        textSize,
+                        'text-center transition-colors',
+                        selectedColumnIndex === colIndex
+                          ? 'font-bold text-accent'
+                          : hoveredColumn === colIndex
+                            ? 'font-bold text-accent'
+                            : 'text-muted hover:text-foreground'
+                      )}
+                      title={`Column ${displayIndex}`}
+                    >
+                      {showLabel ? displayIndex : ''}
+                    </button>
+                  );
+                })}
               </div>
             </div>
           )}
@@ -160,19 +202,30 @@ export const DataAvailabilityHeatmap = ({
       </div>
 
       {/* Summary stats */}
-      <div className="flex gap-6 text-sm/6">
+      <div className="flex gap-4 text-xs text-muted">
+        {/* Show row count label based on what the rows represent */}
+        {granularity !== 'window' && (
+          <div>
+            <span>
+              Total{' '}
+              {granularity === 'day'
+                ? 'hours'
+                : granularity === 'hour'
+                  ? 'epochs'
+                  : granularity === 'epoch'
+                    ? 'slots'
+                    : 'blobs'}
+              :
+            </span>{' '}
+            <span>{filteredRows.length}</span>
+          </div>
+        )}
         <div>
-          <span className="text-muted">Total {granularity}s:</span>{' '}
-          <span className="font-medium text-foreground">{rows.length}</span>
-        </div>
-        <div>
-          <span className="text-muted">Columns:</span>{' '}
-          <span className="font-medium text-foreground">{columnIndices.length}</span>
+          <span>Columns:</span> <span>{columnIndices.length}</span>
         </div>
         {selectedColumnIndex !== undefined && (
           <div>
-            <span className="text-muted">Selected column:</span>{' '}
-            <span className="font-medium text-accent">{selectedColumnIndex}</span>
+            <span>Selected column:</span> <span>{selectedColumnIndex + 1}</span>
           </div>
         )}
       </div>

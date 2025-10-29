@@ -53,4 +53,8 @@ export interface PopoutCardProps {
    * When provided, wraps the title with ScrollAnchor for URL-based navigation.
    */
   anchorId?: string;
+  /**
+   * Allow content to overflow card boundaries (useful for tooltips, dropdowns). Default: false
+   */
+  allowContentOverflow?: boolean;
 }
