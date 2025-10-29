@@ -89,6 +89,7 @@ export function IndexPage(): React.JSX.Element {
 
       <div className="mt-6">
         <Table
+          variant="nested"
           data={tableData}
           columns={[
             {
@@ -134,7 +135,6 @@ export function IndexPage(): React.JSX.Element {
             },
           ]}
           onRowClick={handleRowClick}
-          getRowClassName={row => (row.isCurrent ? 'bg-primary/10 hover:bg-primary/20' : 'hover:bg-surface-hover')}
         />
 
         <div className="mt-4 text-sm text-muted">
