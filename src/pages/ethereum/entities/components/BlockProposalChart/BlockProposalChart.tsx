@@ -10,24 +10,24 @@ import type { BlockProposalChartProps } from './BlockProposalChart.types';
  * Chart showing block proposals by epoch
  *
  * Displays:
- * - Line chart with epoch numbers on x-axis
- * - Number of proposals on y-axis
+ * - Step chart with epoch numbers on x-axis (step: 'end' for count data measured at each epoch)
+ * - Number of proposals on y-axis (integer-only with minInterval: 1)
  * - Supports modal popout for expanded view
+ *
+ * Uses step chart because this is "event count per period" data - blocks proposed per epoch
+ * are discrete integer counts measured AT each epoch boundary.
  */
 export function BlockProposalChart({ data }: BlockProposalChartProps): React.JSX.Element {
   // Transform data into chart format
-  const { series, minEpoch, maxEpoch, totalBlocks } = useMemo(() => {
+  const { series, minEpoch, maxEpoch } = useMemo(() => {
     if (data.length === 0) {
-      return { series: [], minEpoch: 0, maxEpoch: 0, totalBlocks: 0 };
+      return { series: [], minEpoch: 0, maxEpoch: 0 };
     }
 
     // Sort by epoch
     const sortedData = [...data].sort((a, b) => a.epoch - b.epoch);
     const minEpoch = sortedData[0].epoch;
     const maxEpoch = sortedData[sortedData.length - 1].epoch;
-
-    // Calculate total blocks
-    const totalBlocks = sortedData.reduce((sum, d) => sum + d.blocksProposed, 0);
 
     // Build series data
     const chartData: Array<[number, number]> = sortedData.map(d => [d.epoch, d.blocksProposed]);
@@ -38,10 +38,11 @@ export function BlockProposalChart({ data }: BlockProposalChartProps): React.JSX
         data: chartData,
         showSymbol: false,
         color: '#3b82f6', // blue
+        step: 'end' as const, // Step chart for integer count data - values measured AT each epoch
       },
     ];
 
-    return { series, minEpoch, maxEpoch, totalBlocks };
+    return { series, minEpoch, maxEpoch };
   }, [data]);
 
   // Handle empty state
@@ -56,7 +57,7 @@ export function BlockProposalChart({ data }: BlockProposalChartProps): React.JSX
   return (
     <PopoutCard
       title="Proposals"
-      subtitle={`${totalBlocks.toLocaleString()} total proposals across ${data.length} epochs`}
+      subtitle="Last 12h"
       modalSize="full"
     >
       {({ inModal }) => (
@@ -70,6 +71,8 @@ export function BlockProposalChart({ data }: BlockProposalChartProps): React.JSX
           }}
           yAxis={{
             name: 'Blocks',
+            min: 0,
+            minInterval: 1, // Always prevent decimals for count data
           }}
           height={inModal ? 600 : 400}
           showLegend={false}

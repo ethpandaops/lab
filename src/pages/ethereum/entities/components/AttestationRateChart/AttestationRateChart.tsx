@@ -10,7 +10,8 @@ import type { AttestationRateChartProps } from './AttestationRateChart.types';
  * Chart showing online rate percentage over epochs
  *
  * Displays:
- * - Line chart with epoch numbers on x-axis
+ * - Line chart with linear interpolation (smooth: false) to show rate precision and volatility
+ * - Epoch numbers on x-axis
  * - Online rate percentage (0-100) on y-axis
  * - Supports modal popout for expanded view
  */
@@ -34,6 +35,7 @@ export function AttestationRateChart({ data }: AttestationRateChartProps): React
         name: 'Online Rate',
         data: chartData,
         showSymbol: false,
+        smooth: false, // Linear interpolation for rate/percentage data to show precision
         color: '#10b981', // green
       },
     ];
@@ -50,13 +52,10 @@ export function AttestationRateChart({ data }: AttestationRateChartProps): React
     );
   }
 
-  // Calculate average rate for subtitle (convert from 0-1 to 0-100)
-  const avgRate = (data.reduce((sum, d) => sum + d.rate, 0) / data.length) * 100;
-
   return (
     <PopoutCard
       title="Online Rate"
-      subtitle={`Average: ${avgRate.toFixed(2)}% across ${data.length} epochs`}
+      subtitle="Last 12h"
       modalSize="full"
     >
       {({ inModal }) => (

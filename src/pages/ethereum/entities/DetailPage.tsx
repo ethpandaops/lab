@@ -140,6 +140,14 @@ export function DetailPage(): React.JSX.Element {
         <EntityBasicInfoCard stats={data.stats} />
       </div>
 
+      {/* Recent Activity */}
+      <div className="mt-8">
+        <ScrollAnchor id="recent-activity">
+          <h2 className="mb-4 text-xl font-semibold text-foreground">Recent Activity</h2>
+        </ScrollAnchor>
+        <RecentActivityTable epochs={data.epochData} />
+      </div>
+
       {/* Attestation Metrics - Grid Layout */}
       <div className="mt-8">
         <ScrollAnchor id="attestation-metrics">
@@ -157,14 +165,6 @@ export function DetailPage(): React.JSX.Element {
           <h2 className="mb-4 text-xl font-semibold text-foreground">Block Proposals</h2>
         </ScrollAnchor>
         <BlockProposalChart data={data.epochData} />
-      </div>
-
-      {/* Recent Activity */}
-      <div className="mt-8">
-        <ScrollAnchor id="recent-activity">
-          <h2 className="mb-4 text-xl font-semibold text-foreground">Recent Activity</h2>
-        </ScrollAnchor>
-        <RecentActivityTable epochs={data.epochData} />
       </div>
     </Container>
   );

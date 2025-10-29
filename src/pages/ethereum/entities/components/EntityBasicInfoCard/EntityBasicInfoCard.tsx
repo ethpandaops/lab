@@ -7,13 +7,12 @@ import type { EntityBasicInfoCardProps } from './EntityBasicInfoCard.types';
  *
  * Shows:
  * - Entity name
- * - 7-day and 30-day attestation rates
- * - Total attestations
+ * - 12h attestation rate
+ * - Validator count
  * - Total blocks proposed
  */
 export function EntityBasicInfoCard({ stats }: EntityBasicInfoCardProps): React.JSX.Element {
-  const rate7d = (stats.rate7d * 100).toFixed(2);
-  const rate30d = (stats.rate30d * 100).toFixed(2);
+  const rate24h = (stats.rate24h * 100).toFixed(2);
 
   return (
     <Card>
@@ -24,41 +23,29 @@ export function EntityBasicInfoCard({ stats }: EntityBasicInfoCardProps): React.
         </div>
 
         {/* Stats grid */}
-        <div className="grid grid-cols-2 gap-x-8 gap-y-3 md:grid-cols-4">
-          {/* 7d Online Rate */}
+        <div className="grid grid-cols-2 gap-x-8 gap-y-3 md:grid-cols-3">
+          {/* 12h Online Rate */}
           <div>
-            <div className="text-sm text-muted">7d Online Rate</div>
+            <div className="text-sm text-muted">12h Online Rate</div>
             <div
               className={`text-xl font-semibold ${
-                stats.rate7d >= 0.99 ? 'text-success' : stats.rate7d < 0.95 ? 'text-warning' : ''
+                stats.rate24h >= 0.99 ? 'text-success' : stats.rate24h < 0.95 ? 'text-warning' : ''
               }`}
             >
-              {rate7d}%
+              {rate24h}%
             </div>
           </div>
 
-          {/* 30d Online Rate */}
+          {/* Validator Count */}
           <div>
-            <div className="text-sm text-muted">30d Online Rate</div>
-            <div
-              className={`text-xl font-semibold ${
-                stats.rate30d >= 0.99 ? 'text-success' : stats.rate30d < 0.95 ? 'text-warning' : ''
-              }`}
-            >
-              {rate30d}%
-            </div>
+            <div className="text-sm text-muted">Validator Count</div>
+            <div className="text-xl font-semibold">{stats.validatorCount.toLocaleString()}</div>
           </div>
 
-          {/* Total Attestations (30 days) */}
+          {/* Proposals (12h) */}
           <div>
-            <div className="text-sm text-muted">Total Attestations (30d)</div>
-            <div className="text-xl font-semibold">{stats.totalAttestations30d.toLocaleString()}</div>
-          </div>
-
-          {/* Proposals (30 days) */}
-          <div>
-            <div className="text-sm text-muted">Proposals (30d)</div>
-            <div className="text-xl font-semibold">{stats.blocksProposed30d.toLocaleString()}</div>
+            <div className="text-sm text-muted">Proposals (12h)</div>
+            <div className="text-xl font-semibold">{stats.blocksProposed24h.toLocaleString()}</div>
           </div>
         </div>
       </div>

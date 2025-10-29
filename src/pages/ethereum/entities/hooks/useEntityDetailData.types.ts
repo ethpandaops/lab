@@ -1,29 +1,17 @@
 /**
- * Aggregated statistics for an entity
+ * Aggregated statistics for an entity (12h)
  */
 export interface EntityStats {
   /** Entity name */
   entity: string;
-  /** 7-day attestation success rate (0-1) */
-  rate7d: number;
-  /** 30-day attestation success rate (0-1) */
-  rate30d: number;
-  /** All-time attestation success rate (0-1) */
-  rateAllTime: number;
-  /** Total attestations (7 days) */
-  totalAttestations7d: number;
-  /** Missed attestations (7 days) */
-  missedAttestations7d: number;
-  /** Total attestations (30 days) */
-  totalAttestations30d: number;
-  /** Missed attestations (30 days) */
-  missedAttestations30d: number;
-  /** Total attestations (all time) */
-  totalAttestationsAllTime: number;
-  /** Missed attestations (all time) */
-  missedAttestationsAllTime: number;
-  /** Total blocks proposed (30 days) */
-  blocksProposed30d: number;
+  /** 12h attestation success rate (0-1) */
+  rate24h: number;
+  /** Estimated validator count */
+  validatorCount: number;
+  /** Missed attestations (12h) */
+  missedAttestations24h: number;
+  /** Total blocks proposed (12h) */
+  blocksProposed24h: number;
   /** Last active timestamp (Unix seconds) */
   lastActive: number;
 }

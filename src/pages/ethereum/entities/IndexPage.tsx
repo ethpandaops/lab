@@ -43,15 +43,32 @@ export function IndexPage(): React.JSX.Element {
 
   // Format table data
   const tableData = useMemo(() => {
-    return filteredEntities.map(entity => ({
-      name: entity.entity,
-      status: entity.isOnline ? 'Online' : 'Offline',
-      isOnline: entity.isOnline,
-      validatorCount: entity.validatorCount.toLocaleString(),
-      validatorCountValue: entity.validatorCount,
-      attestationRate: `${(entity.rate * 100).toFixed(2)}%`,
-      attestationRateValue: entity.rate,
-    }));
+    return filteredEntities.map(entity => {
+      // Determine status based on attestation rate
+      let status: string;
+      let statusType: 'online' | 'degraded' | 'offline';
+
+      if (entity.rate === 0) {
+        status = 'Offline';
+        statusType = 'offline';
+      } else if (entity.rate < 0.95) {
+        status = 'Degraded';
+        statusType = 'degraded';
+      } else {
+        status = 'Online';
+        statusType = 'online';
+      }
+
+      return {
+        name: entity.entity,
+        status,
+        statusType,
+        validatorCount: entity.validatorCount.toLocaleString(),
+        validatorCountValue: entity.validatorCount,
+        attestationRate: `${(entity.rate * 100).toFixed(2)}%`,
+        attestationRateValue: entity.rate,
+      };
+    });
   }, [filteredEntities]);
 
   // Handle row click navigation
@@ -66,7 +83,7 @@ export function IndexPage(): React.JSX.Element {
     return (
       <Container>
         <Header
-          title="Ethereum Entities"
+          title="Entities"
           description="Track validator entities and their performance on the Ethereum beacon chain"
         />
         <LoadingContainer className="h-96" />
@@ -78,7 +95,7 @@ export function IndexPage(): React.JSX.Element {
     return (
       <Container>
         <Header
-          title="Ethereum Entities"
+          title="Entities"
           description="Track validator entities and their performance on the Ethereum beacon chain"
         />
         <Alert variant="error" title="Error loading entities" description={error.message} />
@@ -89,7 +106,7 @@ export function IndexPage(): React.JSX.Element {
   return (
     <Container>
       <Header
-        title="Ethereum Entities"
+        title="Entities"
         description="Track validator entities and their performance on the Ethereum beacon chain"
       />
 
@@ -124,7 +141,15 @@ export function IndexPage(): React.JSX.Element {
             {
               header: 'Status',
               accessor: row => (
-                <span className={row.isOnline ? 'font-medium text-success' : 'font-medium text-danger'}>
+                <span
+                  className={
+                    row.statusType === 'online'
+                      ? 'font-medium text-success'
+                      : row.statusType === 'degraded'
+                        ? 'font-medium text-warning'
+                        : 'font-medium text-danger'
+                  }
+                >
                   {row.status}
                 </span>
               ),
@@ -151,7 +176,6 @@ export function IndexPage(): React.JSX.Element {
             },
           ]}
           onRowClick={handleRowClick}
-          getRowClassName={() => 'hover:bg-surface-hover cursor-pointer'}
         />
 
         <div className="mt-4 text-sm text-muted">

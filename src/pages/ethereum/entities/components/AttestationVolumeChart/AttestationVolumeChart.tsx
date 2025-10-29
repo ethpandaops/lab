@@ -11,25 +11,21 @@ import type { AttestationVolumeChartProps } from './AttestationVolumeChart.types
  *
  * Displays:
  * - Two series: attested (green) and missed (red)
- * - Line chart with epoch numbers on x-axis
- * - Attestation count on y-axis
+ * - Step chart with epoch numbers on x-axis (step: 'end' for count data measured at each epoch)
+ * - Attestation count on y-axis (integer values only)
  * - Supports modal popout for expanded view
  */
 export function AttestationVolumeChart({ data }: AttestationVolumeChartProps): React.JSX.Element {
   // Transform data into chart format
-  const { series, minEpoch, maxEpoch, totalAttested, totalMissed } = useMemo(() => {
+  const { series, minEpoch, maxEpoch } = useMemo(() => {
     if (data.length === 0) {
-      return { series: [], minEpoch: 0, maxEpoch: 0, totalAttested: 0, totalMissed: 0 };
+      return { series: [], minEpoch: 0, maxEpoch: 0 };
     }
 
     // Sort by epoch
     const sortedData = [...data].sort((a, b) => a.epoch - b.epoch);
     const minEpoch = sortedData[0].epoch;
     const maxEpoch = sortedData[sortedData.length - 1].epoch;
-
-    // Calculate totals - totalAttestations is already the attested count, missedAttestations is the missed count
-    const totalAttested = sortedData.reduce((sum, d) => sum + d.totalAttestations, 0);
-    const totalMissed = sortedData.reduce((sum, d) => sum + d.missedAttestations, 0);
 
     // Build series data - plot counts by status directly
     const attestedData: Array<[number, number]> = sortedData.map(d => [d.epoch, d.totalAttestations]);
@@ -41,16 +37,18 @@ export function AttestationVolumeChart({ data }: AttestationVolumeChartProps): R
         data: attestedData,
         showSymbol: false,
         color: '#10b981', // green
+        step: 'end' as const, // Count data measured at each epoch
       },
       {
         name: 'Missed',
         data: missedData,
         showSymbol: false,
         color: '#ef4444', // red
+        step: 'end' as const, // Count data measured at each epoch
       },
     ];
 
-    return { series, minEpoch, maxEpoch, totalAttested, totalMissed };
+    return { series, minEpoch, maxEpoch };
   }, [data]);
 
   // Handle empty state
@@ -65,7 +63,7 @@ export function AttestationVolumeChart({ data }: AttestationVolumeChartProps): R
   return (
     <PopoutCard
       title="Attestation Liveness"
-      subtitle={`${totalAttested.toLocaleString()} attested, ${totalMissed.toLocaleString()} missed across ${data.length} epochs`}
+      subtitle="Last 12h"
       modalSize="full"
     >
       {({ inModal }) => (
@@ -79,6 +77,7 @@ export function AttestationVolumeChart({ data }: AttestationVolumeChartProps): R
           }}
           yAxis={{
             name: 'Count',
+            minInterval: 1, // Integer-only values for count data
           }}
           height={inModal ? 600 : 400}
           showLegend={true}

@@ -11,7 +11,7 @@ import {
   LegendComponent,
 } from 'echarts/components';
 import { CanvasRenderer } from 'echarts/renderers';
-import { hexToRgba } from '@/utils';
+import { hexToRgba, formatSmartDecimal } from '@/utils';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import type { MultiLineChartProps } from './MultiLine.types';
 
@@ -266,6 +266,7 @@ export function MultiLineChart({
     },
     min: yAxis?.min,
     max: yAxis?.max,
+    minInterval: yAxis?.minInterval,
   };
 
   // Build series configuration
@@ -334,6 +335,58 @@ export function MultiLineChart({
     containLabel: true,
   };
 
+  // Create default smart tooltip formatter
+  // Auto-enable if valueDecimals is set OR if no custom formatter is provided
+  const effectiveValueDecimals = yAxis?.valueDecimals ?? (tooltipFormatter ? undefined : 2);
+  const defaultTooltipFormatter =
+    !tooltipFormatter && effectiveValueDecimals !== undefined
+      ? (params: unknown): string => {
+          // ECharts passes array for 'axis' trigger, single object for 'item' trigger
+          const dataPoints = Array.isArray(params) ? params : [params];
+
+          // Build tooltip HTML
+          let html = '';
+
+          // Add x-axis label (first item's axis value)
+          // For numeric x-axis, format as integer to avoid decimals like "9876543.5"
+          if (dataPoints.length > 0 && dataPoints[0]) {
+            const firstPoint = dataPoints[0] as { axisValue?: string | number };
+            if (firstPoint.axisValue !== undefined) {
+              const axisLabel =
+                typeof firstPoint.axisValue === 'number'
+                  ? formatSmartDecimal(firstPoint.axisValue, 0) // 0 decimals = integers only
+                  : firstPoint.axisValue;
+              html += `<div style="margin-bottom: 4px; font-weight: 600;">${axisLabel}</div>`;
+            }
+          }
+
+          // Add each series - apply smart decimal formatting to y values
+          dataPoints.forEach(point => {
+            const p = point as {
+              marker?: string;
+              seriesName?: string;
+              value?: number | [number, number];
+            };
+
+            if (p.marker && p.seriesName !== undefined) {
+              // Extract y value
+              const yValue = Array.isArray(p.value) ? p.value[1] : p.value;
+
+              if (yValue !== undefined && yValue !== null) {
+                const formattedValue = formatSmartDecimal(yValue, effectiveValueDecimals);
+                html += `<div style="display: flex; align-items: center; gap: 8px;">`;
+                html += p.marker;
+                html += `<span>${p.seriesName}:</span>`;
+                html += `<span style="font-weight: 600; margin-left: auto;">${formattedValue}</span>`;
+                html += `</div>`;
+              }
+            }
+          });
+
+          return html;
+        }
+      : undefined;
+
   // Build tooltip configuration
   const tooltipConfig = {
     trigger: tooltipTrigger,
@@ -354,7 +407,7 @@ export function MultiLineChart({
             },
           }
         : undefined,
-    formatter: tooltipFormatter,
+    formatter: tooltipFormatter || defaultTooltipFormatter,
     appendToBody: true, // Render tooltip in document body to prevent container clipping
   };
 

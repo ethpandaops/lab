@@ -24,10 +24,10 @@ export function RecentActivityTable({ epochs }: RecentActivityTableProps): JSX.E
   const navigate = useNavigate();
 
   /**
-   * Sort epochs by epoch number descending (most recent first) and limit to 50
+   * Sort epochs by epoch number descending (most recent first) and limit to 5
    */
   const sortedEpochs = useMemo((): EntityEpochData[] => {
-    return [...epochs].sort((a, b) => b.epoch - a.epoch).slice(0, 50);
+    return [...epochs].sort((a, b) => b.epoch - a.epoch).slice(0, 5);
   }, [epochs]);
 
   /**
