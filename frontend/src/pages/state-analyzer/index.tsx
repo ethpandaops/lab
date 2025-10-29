@@ -24,7 +24,8 @@ function formatBytes(bytes: number): string {
 }
 
 // Helper function to format numbers with commas
-function formatNumber(num: number): string {
+function formatNumber(num: number | undefined): string {
+  if (num === undefined || num === null) return '0';
   return num.toLocaleString();
 }
 
@@ -135,7 +136,7 @@ function StateAnalyzer() {
                 <CardBody>
                   <div className="text-xs text-secondary mb-1">Latest Block</div>
                   <div className="text-2xl font-bold text-primary font-mono">
-                    #{formatNumber(latestData.blockNumber)}
+                    #{formatNumber(latestData.block_number)}
                   </div>
                 </CardBody>
               </Card>
@@ -144,10 +145,10 @@ function StateAnalyzer() {
                 <CardBody>
                   <div className="text-xs text-secondary mb-1">New Slots</div>
                   <div className="text-2xl font-bold text-accent font-mono">
-                    +{formatNumber(latestData.newSlots)}
+                    +{formatNumber(latestData.new_slots_count)}
                   </div>
                   <div className="text-xs text-secondary mt-1">
-                    {formatBytes(latestData.estimatedBytesAdded)}
+                    {formatBytes(latestData.estimated_bytes_added)}
                   </div>
                 </CardBody>
               </Card>
@@ -156,10 +157,10 @@ function StateAnalyzer() {
                 <CardBody>
                   <div className="text-xs text-secondary mb-1">Cleared Slots</div>
                   <div className="text-2xl font-bold text-red-500 font-mono">
-                    -{formatNumber(latestData.clearedSlots)}
+                    -{formatNumber(latestData.cleared_slots_count)}
                   </div>
                   <div className="text-xs text-secondary mt-1">
-                    {formatBytes(latestData.estimatedBytesFreed)}
+                    {formatBytes(latestData.net_state_change_bytes < 0 ? Math.abs(latestData.net_state_change_bytes) : 0)}
                   </div>
                 </CardBody>
               </Card>
@@ -169,11 +170,11 @@ function StateAnalyzer() {
                   <div className="text-xs text-secondary mb-1">Net Change</div>
                   <div
                     className={`text-2xl font-bold font-mono ${
-                      latestData.netStateChangeBytes >= 0 ? 'text-accent' : 'text-red-500'
+                      latestData.net_state_change_bytes >= 0 ? 'text-accent' : 'text-red-500'
                     }`}
                   >
-                    {latestData.netStateChangeBytes >= 0 ? '+' : ''}
-                    {formatBytes(latestData.netStateChangeBytes)}
+                    {latestData.net_state_change_bytes >= 0 ? '+' : ''}
+                    {formatBytes(latestData.net_state_change_bytes)}
                   </div>
                 </CardBody>
               </Card>
@@ -295,13 +296,13 @@ function StateAnalyzer() {
                             {adder.label || shortenAddress(adder.address)}
                           </div>
                           <div className="text-xs text-secondary">
-                            {formatNumber(adder.slotsAdded)} slots •{' '}
-                            {formatBytes(adder.estimatedBytesAdded)}
+                            {formatNumber(adder.slots_added)} slots •{' '}
+                            {formatBytes(adder.estimated_bytes_added)}
                           </div>
                         </div>
                         <div className="text-right">
                           <div className="text-sm font-bold text-accent font-mono">
-                            {adder.percentageOfTotal.toFixed(1)}%
+                            {adder.percentage_of_total?.toFixed(1) || '0'}%
                           </div>
                         </div>
                       </div>
@@ -333,16 +334,16 @@ function StateAnalyzer() {
                             {remover.label || shortenAddress(remover.address)}
                           </div>
                           <div className="text-xs text-secondary">
-                            {formatNumber(remover.slotsCleared)} slots •{' '}
-                            {formatBytes(remover.estimatedBytesFreed)}
+                            {formatNumber(remover.slots_cleared)} slots •{' '}
+                            {formatBytes(remover.estimated_bytes_freed)}
                           </div>
                         </div>
                         <div className="text-right">
                           <div className="text-sm font-bold text-red-500 font-mono">
-                            {remover.percentageOfTotal.toFixed(1)}%
+                            {remover.percentage_of_total?.toFixed(1) || '0'}%
                           </div>
                           <div className="text-xs text-secondary">
-                            ~{formatNumber(remover.estimatedGasRefund)} gas
+                            ~{formatNumber(remover.estimated_gas_refund)} gas
                           </div>
                         </div>
                       </div>

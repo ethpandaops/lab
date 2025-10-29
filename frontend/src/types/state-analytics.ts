@@ -28,13 +28,20 @@ export enum StateGranularity {
  * Latest block state delta response
  */
 export interface LatestBlockDeltaResponse {
-  blockNumber: number;
-  timestamp: number;
-  newSlots: number;
-  clearedSlots: number;
-  netStateChangeBytes: number;
-  estimatedBytesAdded: number;
-  estimatedBytesFreed: number;
+  block_number: number;
+  block_timestamp: { seconds: number };
+  new_slots_count: number;
+  cleared_slots_count: number;
+  modified_slots_count: number;
+  net_state_change_bytes: number;
+  estimated_bytes_added: number;
+  top_contributors?: Array<{
+    address?: string;
+    new_slots?: number;
+    modified_slots?: number;
+    cleared_slots?: number;
+    net_bytes?: number;
+  }>;
 }
 
 /**
@@ -43,21 +50,21 @@ export interface LatestBlockDeltaResponse {
 export interface StateAdder {
   rank: number;
   address: string;
-  slotsAdded: number;
-  estimatedBytesAdded: number;
+  slots_added: number;
+  estimated_bytes_added: number;
   category?: string;
   label?: string;
-  percentageOfTotal: number;
+  percentage_of_total: number;
 }
 
 /**
  * Top state adders response
  */
 export interface TopStateAddersResponse {
-  period: StatePeriod;
-  startBlock: number;
-  endBlock: number;
-  totalSlotsAdded: number;
+  period?: StatePeriod;
+  start_block: number;
+  end_block: number;
+  total_slots_added?: number;
   adders: StateAdder[];
 }
 
@@ -67,22 +74,22 @@ export interface TopStateAddersResponse {
 export interface StateRemover {
   rank: number;
   address: string;
-  slotsCleared: number;
-  estimatedBytesFreed: number;
-  estimatedGasRefund: number;
+  slots_cleared: number;
+  estimated_bytes_freed: number;
+  estimated_gas_refund: number;
   category?: string;
   label?: string;
-  percentageOfTotal: number;
+  percentage_of_total: number;
 }
 
 /**
  * Top state removers response
  */
 export interface TopStateRemoversResponse {
-  period: StatePeriod;
-  startBlock: number;
-  endBlock: number;
-  totalSlotsCleared: number;
+  period?: StatePeriod;
+  start_block: number;
+  end_block: number;
+  total_slots_cleared?: number;
   removers: StateRemover[];
 }
 
