@@ -39,8 +39,20 @@ function BoundsLoader(): null {
  */
 export function NetworkProvider({ children }: NetworkProviderProps): JSX.Element | null {
   const queryClient = useQueryClient();
-  const navigate = useNavigate();
-  const search = useSearch({ strict: false });
+
+  // Router hooks - may not be available in Storybook/test environments
+  let navigate: ReturnType<typeof useNavigate> | undefined;
+  let search: { network?: string } = {};
+
+  try {
+    navigate = useNavigate();
+    search = useSearch({ strict: false });
+  } catch {
+    // Router not available (e.g., in Storybook), use fallbacks
+    navigate = undefined;
+    search = {};
+  }
+
   const { data: config, isLoading } = useConfig();
   const networks = useMemo(() => config?.networks ?? [], [config?.networks]);
 
@@ -105,29 +117,31 @@ export function NetworkProvider({ children }: NetworkProviderProps): JSX.Element
     if (initialNetwork) {
       setCurrentNetworkState(initialNetwork);
 
-      // Update URL to match the network selection
+      // Update URL to match the network selection (only if router is available)
       // Remove network param for mainnet (it's the default)
       // Add/update network param for non-mainnet networks
-      const shouldHaveParam = initialNetwork.name !== 'mainnet';
-      const hasParam = search.network !== undefined;
+      if (navigate) {
+        const shouldHaveParam = initialNetwork.name !== 'mainnet';
+        const hasParam = search.network !== undefined;
 
-      if (shouldHaveParam && search.network !== initialNetwork.name) {
-        // Non-mainnet network: add/update the param
-        navigate({
-          to: '.',
-          search: prev => ({ ...(prev as Record<string, unknown>), network: initialNetwork.name }),
-          replace: true,
-        });
-      } else if (!shouldHaveParam && hasParam) {
-        // Mainnet: remove the param
-        navigate({
-          to: '.',
-          search: prev => {
-            const { network: _network, ...rest } = prev as Record<string, unknown>;
-            return rest;
-          },
-          replace: true,
-        });
+        if (shouldHaveParam && search.network !== initialNetwork.name) {
+          // Non-mainnet network: add/update the param
+          navigate({
+            to: '.',
+            search: prev => ({ ...(prev as Record<string, unknown>), network: initialNetwork.name }),
+            replace: true,
+          });
+        } else if (!shouldHaveParam && hasParam) {
+          // Mainnet: remove the param
+          navigate({
+            to: '.',
+            search: prev => {
+              const { network: _network, ...rest } = prev as Record<string, unknown>;
+              return rest;
+            },
+            replace: true,
+          });
+        }
       }
     }
   }, [networks, currentNetwork, search.network, navigate]);
@@ -153,22 +167,24 @@ export function NetworkProvider({ children }: NetworkProviderProps): JSX.Element
     (network: Network): void => {
       setCurrentNetworkState(network);
 
-      // Only add network param for non-mainnet networks
-      if (network.name === 'mainnet') {
-        // Remove the network param for mainnet (it's the default)
-        navigate({
-          to: '.',
-          search: prev => {
-            const { network: _, ...rest } = prev as Record<string, unknown>;
-            return rest;
-          },
-        });
-      } else {
-        // Add/update network param for non-mainnet networks
-        navigate({
-          to: '.',
-          search: prev => ({ ...(prev as Record<string, unknown>), network: network.name }),
-        });
+      // Only add network param for non-mainnet networks (if router is available)
+      if (navigate) {
+        if (network.name === 'mainnet') {
+          // Remove the network param for mainnet (it's the default)
+          navigate({
+            to: '.',
+            search: prev => {
+              const { network: _, ...rest } = prev as Record<string, unknown>;
+              return rest;
+            },
+          });
+        } else {
+          // Add/update network param for non-mainnet networks
+          navigate({
+            to: '.',
+            search: prev => ({ ...(prev as Record<string, unknown>), network: network.name }),
+          });
+        }
       }
     },
     [navigate]
