@@ -294,23 +294,26 @@ export function MultiLineChart({
         return {
           ...baseConfig,
           areaStyle: {
-            color: {
-              type: 'linear' as const,
-              x: 0,
-              y: 0,
-              x2: 0,
-              y2: 1,
-              colorStops: [
-                {
-                  offset: 0,
-                  color: hexToRgba(seriesColor, 0.5),
-                },
-                {
-                  offset: 1,
-                  color: hexToRgba(seriesColor, 0.06),
-                },
-              ],
-            },
+            color:
+              s.areaOpacity !== undefined
+                ? hexToRgba(seriesColor, s.areaOpacity)
+                : {
+                    type: 'linear' as const,
+                    x: 0,
+                    y: 0,
+                    x2: 0,
+                    y2: 1,
+                    colorStops: [
+                      {
+                        offset: 0,
+                        color: hexToRgba(seriesColor, 0.5),
+                      },
+                      {
+                        offset: 1,
+                        color: hexToRgba(seriesColor, 0.06),
+                      },
+                    ],
+                  },
           },
         };
       }

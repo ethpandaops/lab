@@ -3,6 +3,7 @@ import { useMemo } from 'react';
 import { MultiLineChart } from '@/components/Charts/MultiLine';
 import { Alert } from '@/components/Feedback/Alert';
 import { PopoutCard } from '@/components/Layout/PopoutCard';
+import { useThemeColors } from '@/hooks/useThemeColors';
 
 import type { AttestationRateChartProps } from './AttestationRateChart.types';
 
@@ -16,6 +17,8 @@ import type { AttestationRateChartProps } from './AttestationRateChart.types';
  * - Supports modal popout for expanded view
  */
 export function AttestationRateChart({ data }: AttestationRateChartProps): React.JSX.Element {
+  const themeColors = useThemeColors();
+
   // Transform data into chart format
   const { series, minEpoch, maxEpoch } = useMemo(() => {
     if (data.length === 0) {
@@ -36,12 +39,14 @@ export function AttestationRateChart({ data }: AttestationRateChartProps): React
         data: chartData,
         showSymbol: false,
         smooth: false, // Linear interpolation for rate/percentage data to show precision
-        color: '#10b981', // green
+        color: themeColors.success,
+        showArea: true,
+        areaOpacity: 1, // 100% opacity, no gradient
       },
     ];
 
     return { series, minEpoch, maxEpoch };
-  }, [data]);
+  }, [data, themeColors.success]);
 
   // Handle empty state
   if (series.length === 0) {

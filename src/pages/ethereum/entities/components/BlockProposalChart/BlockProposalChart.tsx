@@ -3,6 +3,7 @@ import { useMemo } from 'react';
 import { MultiLineChart } from '@/components/Charts/MultiLine';
 import { Alert } from '@/components/Feedback/Alert';
 import { PopoutCard } from '@/components/Layout/PopoutCard';
+import { useThemeColors } from '@/hooks/useThemeColors';
 
 import type { BlockProposalChartProps } from './BlockProposalChart.types';
 
@@ -18,6 +19,8 @@ import type { BlockProposalChartProps } from './BlockProposalChart.types';
  * are discrete integer counts measured AT each epoch boundary.
  */
 export function BlockProposalChart({ data }: BlockProposalChartProps): React.JSX.Element {
+  const themeColors = useThemeColors();
+
   // Transform data into chart format
   const { series, minEpoch, maxEpoch } = useMemo(() => {
     if (data.length === 0) {
@@ -37,13 +40,16 @@ export function BlockProposalChart({ data }: BlockProposalChartProps): React.JSX
         name: 'Proposals',
         data: chartData,
         showSymbol: false,
-        color: '#3b82f6', // blue
-        step: 'end' as const, // Step chart for integer count data - values measured AT each epoch
+        color: themeColors.primary,
+        step: 'middle' as const, // Step chart for integer count data - transition between epochs
+        showArea: true,
+        areaOpacity: 1, // 100% opacity, no gradient
+        lineWidth: 0, // No border line when using solid fill
       },
     ];
 
     return { series, minEpoch, maxEpoch };
-  }, [data]);
+  }, [data, themeColors.primary]);
 
   // Handle empty state
   if (series.length === 0) {

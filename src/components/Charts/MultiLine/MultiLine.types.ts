@@ -41,6 +41,12 @@ export interface SeriesData {
    */
   showArea?: boolean;
   /**
+   * Opacity of the area fill (0-1)
+   * If not specified, uses a gradient from 0.5 to 0.06
+   * @default undefined (gradient)
+   */
+  areaOpacity?: number;
+  /**
    * Show symbols (dots) on data points
    * @default false
    */

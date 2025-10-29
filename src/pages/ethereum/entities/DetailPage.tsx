@@ -6,6 +6,7 @@ import { Container } from '@/components/Layout/Container';
 import { Header } from '@/components/Layout/Header';
 import { LoadingContainer } from '@/components/Layout/LoadingContainer';
 import { ScrollAnchor } from '@/components/Navigation/ScrollAnchor';
+import { getRelativeTime } from '@/utils';
 
 import {
   AttestationRateChart,
@@ -15,30 +16,6 @@ import {
   RecentActivityTable,
 } from './components';
 import { useEntityDetailData } from './hooks';
-
-/**
- * Format a Unix timestamp as relative time
- */
-function formatRelativeTime(unixSeconds: number): string {
-  const now = Date.now();
-  const timestamp = unixSeconds * 1000;
-  const diffMs = now - timestamp;
-  const diffSeconds = Math.floor(diffMs / 1000);
-  const diffMinutes = Math.floor(diffSeconds / 60);
-  const diffHours = Math.floor(diffMinutes / 60);
-  const diffDays = Math.floor(diffHours / 24);
-
-  if (diffSeconds < 60) {
-    return `${diffSeconds}s ago`;
-  }
-  if (diffMinutes < 60) {
-    return `${diffMinutes}m ago`;
-  }
-  if (diffHours < 24) {
-    return `${diffHours}h ago`;
-  }
-  return `${diffDays}d ago`;
-}
 
 /**
  * Entity detail page - comprehensive analysis of a single validator entity
@@ -120,7 +97,7 @@ export function DetailPage(): React.JSX.Element {
     );
   }
 
-  const relativeTime = formatRelativeTime(data.stats.lastActive);
+  const relativeTime = getRelativeTime(data.stats.lastActive);
 
   return (
     <Container>

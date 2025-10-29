@@ -3,6 +3,7 @@ import { useMemo } from 'react';
 import { MultiLineChart } from '@/components/Charts/MultiLine';
 import { Alert } from '@/components/Feedback/Alert';
 import { PopoutCard } from '@/components/Layout/PopoutCard';
+import { useThemeColors } from '@/hooks/useThemeColors';
 
 import type { AttestationVolumeChartProps } from './AttestationVolumeChart.types';
 
@@ -16,6 +17,8 @@ import type { AttestationVolumeChartProps } from './AttestationVolumeChart.types
  * - Supports modal popout for expanded view
  */
 export function AttestationVolumeChart({ data }: AttestationVolumeChartProps): React.JSX.Element {
+  const themeColors = useThemeColors();
+
   // Transform data into chart format
   const { series, minEpoch, maxEpoch } = useMemo(() => {
     if (data.length === 0) {
@@ -36,20 +39,20 @@ export function AttestationVolumeChart({ data }: AttestationVolumeChartProps): R
         name: 'Attested',
         data: attestedData,
         showSymbol: false,
-        color: '#10b981', // green
+        color: themeColors.success,
         step: 'end' as const, // Count data measured at each epoch
       },
       {
         name: 'Missed',
         data: missedData,
         showSymbol: false,
-        color: '#ef4444', // red
+        color: themeColors.danger,
         step: 'end' as const, // Count data measured at each epoch
       },
     ];
 
     return { series, minEpoch, maxEpoch };
-  }, [data]);
+  }, [data, themeColors.success, themeColors.danger]);
 
   // Handle empty state
   if (series.length === 0) {
