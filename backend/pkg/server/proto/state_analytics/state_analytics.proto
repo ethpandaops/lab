@@ -1,0 +1,190 @@
+syntax = "proto3";
+
+package state_analytics;
+
+option go_package = "github.com/ethpandaops/lab/backend/pkg/server/proto/state_analytics";
+
+import "google/protobuf/timestamp.proto";
+
+// StateAnalytics service provides state growth and activity metrics
+service StateAnalytics {
+  // GetLatestBlockDelta returns state changes for the most recent block
+  rpc GetLatestBlockDelta(GetLatestBlockDeltaRequest) returns (GetLatestBlockDeltaResponse);
+
+  // GetTopStateAdders returns contracts that created the most new storage slots
+  rpc GetTopStateAdders(GetTopStateAddersRequest) returns (GetTopStateAddersResponse);
+
+  // GetTopStateRemovers returns contracts that cleared the most storage slots
+  rpc GetTopStateRemovers(GetTopStateRemoversRequest) returns (GetTopStateRemoversResponse);
+
+  // GetStateGrowthChart returns time-series data of state growth
+  rpc GetStateGrowthChart(GetStateGrowthChartRequest) returns (GetStateGrowthChartResponse);
+
+  // GetContractStateActivity returns detailed state activity for a specific contract
+  rpc GetContractStateActivity(GetContractStateActivityRequest) returns (GetContractStateActivityResponse);
+}
+
+// Request/Response messages for GetLatestBlockDelta
+message GetLatestBlockDeltaRequest {
+  // No parameters needed - always returns latest block
+}
+
+message GetLatestBlockDeltaResponse {
+  uint64 block_number = 1;
+  google.protobuf.Timestamp block_timestamp = 2;
+  uint32 new_slots_count = 3;           // Slots created (first access)
+  uint32 modified_slots_count = 4;      // Slots modified (last access)
+  uint32 cleared_slots_count = 5;       // Slots set to 0x0
+  uint64 estimated_bytes_added = 6;     // new_slots * 191 bytes
+  int64 net_state_change_bytes = 7;     // Can be negative
+  repeated ContractStateDelta top_contributors = 8; // Top 10 contracts
+}
+
+message ContractStateDelta {
+  string address = 1;
+  uint32 new_slots = 2;
+  uint32 modified_slots = 3;
+  uint32 cleared_slots = 4;
+  int64 net_bytes = 5;
+  string label = 6;  // Optional contract label/name
+}
+
+// Request/Response for GetTopStateAdders
+message GetTopStateAddersRequest {
+  enum Period {
+    PERIOD_UNSPECIFIED = 0;
+    PERIOD_24H = 1;
+    PERIOD_7D = 2;
+    PERIOD_30D = 3;
+  }
+  Period period = 1;
+  uint32 limit = 2;  // Default 100, max 1000
+}
+
+message GetTopStateAddersResponse {
+  repeated StateAdder adders = 1;
+  uint64 start_block = 2;
+  uint64 end_block = 3;
+}
+
+message StateAdder {
+  uint32 rank = 1;
+  string address = 2;
+  uint64 slots_added = 3;
+  uint64 estimated_bytes_added = 4;
+  string category = 5;  // ERC20, NFT, DEX, etc.
+  string label = 6;     // Contract name if known
+  double percentage_of_total = 7;
+}
+
+// Request/Response for GetTopStateRemovers
+message GetTopStateRemoversRequest {
+  enum Period {
+    PERIOD_UNSPECIFIED = 0;
+    PERIOD_24H = 1;
+    PERIOD_7D = 2;
+    PERIOD_30D = 3;
+  }
+  Period period = 1;
+  uint32 limit = 2;  // Default 100, max 1000
+}
+
+message GetTopStateRemoversResponse {
+  repeated StateRemover removers = 1;
+  uint64 start_block = 2;
+  uint64 end_block = 3;
+}
+
+message StateRemover {
+  uint32 rank = 1;
+  string address = 2;
+  uint64 slots_cleared = 3;
+  uint64 estimated_bytes_freed = 4;
+  uint64 estimated_gas_refund = 5;  // Theoretical gas refund
+  string category = 6;
+  string label = 7;
+  double percentage_of_total = 8;
+}
+
+// Request/Response for GetStateGrowthChart
+message GetStateGrowthChartRequest {
+  enum Period {
+    PERIOD_UNSPECIFIED = 0;
+    PERIOD_24H = 1;
+    PERIOD_7D = 2;
+    PERIOD_30D = 3;
+    PERIOD_90D = 4;
+  }
+  Period period = 1;
+
+  enum Granularity {
+    GRANULARITY_UNSPECIFIED = 0;
+    GRANULARITY_BLOCK = 1;   // Individual blocks
+    GRANULARITY_HOUR = 2;    // Hourly aggregates
+    GRANULARITY_DAY = 3;     // Daily aggregates
+  }
+  Granularity granularity = 2;
+}
+
+message GetStateGrowthChartResponse {
+  repeated StateGrowthDataPoint data_points = 1;
+  StateSummary summary = 2;
+}
+
+message StateGrowthDataPoint {
+  google.protobuf.Timestamp timestamp = 1;
+  uint64 block_number = 2;
+  uint64 slots_added = 3;
+  uint64 slots_cleared = 4;
+  int64 net_slots = 5;
+  uint64 bytes_added = 6;
+  uint64 bytes_cleared = 7;
+  int64 net_bytes = 8;
+}
+
+message StateSummary {
+  uint64 total_slots_added = 1;
+  uint64 total_slots_cleared = 2;
+  int64 net_slots = 3;
+  uint64 total_bytes_added = 4;
+  uint64 total_bytes_cleared = 5;
+  int64 net_bytes = 6;
+  double avg_slots_per_block = 7;
+}
+
+// Request/Response for GetContractStateActivity
+message GetContractStateActivityRequest {
+  string address = 1;  // Contract address
+  uint32 limit = 2;    // Number of recent activities to return
+}
+
+message GetContractStateActivityResponse {
+  string address = 1;
+  string label = 2;
+  string category = 3;
+  ContractStateMetrics metrics = 4;
+  repeated ContractStateEvent recent_events = 5;
+}
+
+message ContractStateMetrics {
+  uint64 total_slots = 1;           // Total known slots for this contract
+  uint64 active_slots = 2;          // Slots modified in last 30d
+  uint64 first_seen_block = 3;
+  uint64 last_active_block = 4;
+  uint64 lifetime_slots_added = 5;
+  uint64 lifetime_slots_cleared = 6;
+}
+
+message ContractStateEvent {
+  uint64 block_number = 1;
+  google.protobuf.Timestamp timestamp = 2;
+  enum EventType {
+    EVENT_TYPE_UNSPECIFIED = 0;
+    EVENT_TYPE_SLOT_CREATED = 1;
+    EVENT_TYPE_SLOT_MODIFIED = 2;
+    EVENT_TYPE_SLOT_CLEARED = 3;
+  }
+  EventType event_type = 3;
+  string slot_key = 4;
+  string value = 5;
+}

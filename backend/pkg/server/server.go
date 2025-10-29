@@ -22,6 +22,7 @@ import (
 	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/beacon_slots"
 	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/cartographoor"
 	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/experiments"
+	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/state_analytics"
 	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/wallclock"
 	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/xatu_cbt"
 	"github.com/sirupsen/logrus"
@@ -44,15 +45,16 @@ type Service struct {
 	services []service.Service
 
 	// Clients
-	wallclockService     *wallclock.Service
-	storageClient        storage.Client
-	cacheClient          cache.Client
-	lockerClient         locker.Locker
-	geolocationClient    *geolocation.Client
-	xatuCBTService       *xatu_cbt.XatuCBT
-	cartographoorService *cartographoor.Service
-	experimentsService   *experiments.ExperimentsService
-	metrics              *metrics.Metrics
+	wallclockService      *wallclock.Service
+	storageClient         storage.Client
+	cacheClient           cache.Client
+	lockerClient          locker.Locker
+	geolocationClient     *geolocation.Client
+	xatuCBTService        *xatu_cbt.XatuCBT
+	cartographoorService  *cartographoor.Service
+	experimentsService    *experiments.ExperimentsService
+	stateAnalyticsService *state_analytics.Service
+	metrics               *metrics.Metrics
 }
 
 // New creates a new srv service
@@ -133,6 +135,11 @@ func (s *Service) Start(ctx context.Context) error {
 		grpc.NewXatuCBT(s.log, s.xatuCBTService, s.wallclockService),
 		grpc.NewCartographoorService(s.log, s.cartographoorService, s.xatuCBTService),
 		grpc.NewConfigService(s.log, s.xatuCBTService, s.cartographoorService, nil, bsService, s.experimentsService),
+	}
+
+	// Add state analytics gRPC handler if service is initialized
+	if s.stateAnalyticsService != nil {
+		grpcServices = append(grpcServices, grpc.NewStateAnalytics(s.log, s.stateAnalyticsService))
 	}
 
 	// Create gRPC server
@@ -217,6 +224,16 @@ func (s *Service) initializeServices(ctx context.Context) error { // ctx is alre
 	)
 	if err != nil {
 		return fmt.Errorf("failed to initialize beacon slots service: %w", err)
+	}
+
+	// Initialize state analytics service if configured
+	if s.config.StateAnalytics != nil {
+		stateAnalyticsSvc, err := state_analytics.New(s.log, s.config.StateAnalytics, s.metrics)
+		if err != nil {
+			return fmt.Errorf("failed to initialize state analytics service: %w", err)
+		}
+
+		s.stateAnalyticsService = stateAnalyticsSvc
 	}
 
 	s.services = []service.Service{

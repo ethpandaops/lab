@@ -150,5 +150,42 @@ func (r *PublicRouter) GetRoutes() []RouteConfig {
 			Cache:       middleware.CacheRealtime,
 			Description: "Get prepared blocks for a specific slot",
 		},
+
+		// State Analytics endpoints
+		{
+			Path:        "/{network}/state/latest",
+			Handler:     r.handleStateLatestBlockDelta,
+			Methods:     []string{http.MethodGet, http.MethodOptions},
+			Cache:       middleware.CacheNearRealtime,
+			Description: "Get state changes for the most recent block",
+		},
+		{
+			Path:        "/{network}/state/top-adders",
+			Handler:     r.handleStateTopAdders,
+			Methods:     []string{http.MethodGet, http.MethodOptions},
+			Cache:       middleware.CacheNearRealtime,
+			Description: "Get contracts that created the most new storage slots",
+		},
+		{
+			Path:        "/{network}/state/top-removers",
+			Handler:     r.handleStateTopRemovers,
+			Methods:     []string{http.MethodGet, http.MethodOptions},
+			Cache:       middleware.CacheNearRealtime,
+			Description: "Get contracts that cleared the most storage slots",
+		},
+		{
+			Path:        "/{network}/state/growth-chart",
+			Handler:     r.handleStateGrowthChart,
+			Methods:     []string{http.MethodGet, http.MethodOptions},
+			Cache:       middleware.CacheNearRealtime,
+			Description: "Get time-series data of state growth",
+		},
+		{
+			Path:        "/{network}/state/contract/{address}",
+			Handler:     r.handleContractStateActivity,
+			Methods:     []string{http.MethodGet, http.MethodOptions},
+			Cache:       middleware.CacheNearRealtime,
+			Description: "Get detailed state activity for a specific contract",
+		},
 	}
 }

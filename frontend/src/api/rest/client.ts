@@ -16,6 +16,18 @@ import {
   ListPreparedBlocksResponse,
 } from '../gen/backend/pkg/api/v1/proto/public_pb';
 import { API_V1_ENDPOINTS, buildQueryString, NodeFilters } from './endpoints';
+import type {
+  LatestBlockDeltaResponse,
+  TopStateAddersResponse,
+  TopStateRemoversResponse,
+  StateGrowthChartResponse,
+  ContractStateActivityResponse,
+  StateLatestParams,
+  StateTopAddersParams,
+  StateTopRemoversParams,
+  StateGrowthChartParams,
+  ContractStateActivityParams,
+} from '../../types/state-analytics';
 
 /**
  * REST API client for v1 endpoints
@@ -465,6 +477,98 @@ export class RestApiClient {
     }`;
     const response = await this.fetchWithRetry<any>(url);
     return ListPreparedBlocksResponse.fromJson(response);
+  }
+
+  /**
+   * Get state changes for the most recent block
+   * @param network Network name
+   * @param params Query parameters (currently none)
+   * @returns Latest block state delta
+   */
+  async getStateLatest(
+    network: string,
+    params?: StateLatestParams,
+  ): Promise<LatestBlockDeltaResponse> {
+    const queryString = params ? buildQueryString(params) : new URLSearchParams();
+    const url = `${this.baseUrl}${API_V1_ENDPOINTS.stateLatest(network)}${
+      queryString.toString() ? `?${queryString.toString()}` : ''
+    }`;
+    const response = await this.fetchWithRetry<any>(url);
+    return response as LatestBlockDeltaResponse;
+  }
+
+  /**
+   * Get contracts that created the most new storage slots
+   * @param network Network name
+   * @param params Query parameters (period, limit)
+   * @returns Top state adders
+   */
+  async getStateTopAdders(
+    network: string,
+    params?: StateTopAddersParams,
+  ): Promise<TopStateAddersResponse> {
+    const queryString = params ? buildQueryString(params) : new URLSearchParams();
+    const url = `${this.baseUrl}${API_V1_ENDPOINTS.stateTopAdders(network)}${
+      queryString.toString() ? `?${queryString.toString()}` : ''
+    }`;
+    const response = await this.fetchWithRetry<any>(url);
+    return response as TopStateAddersResponse;
+  }
+
+  /**
+   * Get contracts that cleared the most storage slots
+   * @param network Network name
+   * @param params Query parameters (period, limit)
+   * @returns Top state removers
+   */
+  async getStateTopRemovers(
+    network: string,
+    params?: StateTopRemoversParams,
+  ): Promise<TopStateRemoversResponse> {
+    const queryString = params ? buildQueryString(params) : new URLSearchParams();
+    const url = `${this.baseUrl}${API_V1_ENDPOINTS.stateTopRemovers(network)}${
+      queryString.toString() ? `?${queryString.toString()}` : ''
+    }`;
+    const response = await this.fetchWithRetry<any>(url);
+    return response as TopStateRemoversResponse;
+  }
+
+  /**
+   * Get time-series data of state growth
+   * @param network Network name
+   * @param params Query parameters (period, granularity)
+   * @returns State growth chart data
+   */
+  async getStateGrowthChart(
+    network: string,
+    params?: StateGrowthChartParams,
+  ): Promise<StateGrowthChartResponse> {
+    const queryString = params ? buildQueryString(params) : new URLSearchParams();
+    const url = `${this.baseUrl}${API_V1_ENDPOINTS.stateGrowthChart(network)}${
+      queryString.toString() ? `?${queryString.toString()}` : ''
+    }`;
+    const response = await this.fetchWithRetry<any>(url);
+    return response as StateGrowthChartResponse;
+  }
+
+  /**
+   * Get detailed state activity for a specific contract
+   * @param network Network name
+   * @param address Contract address
+   * @param params Query parameters (limit)
+   * @returns Contract state activity
+   */
+  async getContractStateActivity(
+    network: string,
+    address: string,
+    params?: ContractStateActivityParams,
+  ): Promise<ContractStateActivityResponse> {
+    const queryString = params ? buildQueryString(params) : new URLSearchParams();
+    const url = `${this.baseUrl}${API_V1_ENDPOINTS.stateContractActivity(network, address)}${
+      queryString.toString() ? `?${queryString.toString()}` : ''
+    }`;
+    const response = await this.fetchWithRetry<any>(url);
+    return response as ContractStateActivityResponse;
   }
 }
 

@@ -1,5 +1,5 @@
 import { Link, useLocation } from '@tanstack/react-router';
-import { BeakerIcon, HomeIcon, InformationCircleIcon } from '@heroicons/react/24/outline';
+import { BeakerIcon, HomeIcon, InformationCircleIcon, ChartBarIcon } from '@heroicons/react/24/outline';
 
 interface NavigationProps {
   showLinks?: boolean;
@@ -29,6 +29,10 @@ export function Navigation({ showLinks = true, className = '' }: NavigationProps
       <Link to="/experiments" className={linkClasses('/experiments')}>
         <BeakerIcon className="w-4 h-4" />
         Experiments
+      </Link>
+      <Link to="/state-analyzer" className={linkClasses('/state-analyzer')}>
+        <ChartBarIcon className="w-4 h-4" />
+        State Analyzer
       </Link>
       <Link to="/about" className={linkClasses('/about')}>
         <InformationCircleIcon className="w-4 h-4" />

@@ -9,18 +9,20 @@ import (
 	"github.com/ethpandaops/lab/backend/pkg/server/internal/grpc"
 	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/cartographoor"
 	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/experiments"
+	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/state_analytics"
 	"github.com/ethpandaops/lab/backend/pkg/server/internal/service/xatu_cbt"
 )
 
 type Config struct {
-	LogLevel      string                `yaml:"logLevel" default:"info"`
-	Server        *grpc.Config          `yaml:"grpc"`
-	Storage       *storage.Config       `yaml:"storage"`
-	Cache         *cache.Config         `yaml:"cache"`
-	Geolocation   *geolocation.Config   `yaml:"geolocation"`
-	XatuCBT       *xatu_cbt.Config      `yaml:"xatu_cbt"`
-	Cartographoor *cartographoor.Config `yaml:"cartographoor"`
-	Experiments   *experiments.Config   `yaml:"experiments"`
+	LogLevel       string                     `yaml:"logLevel" default:"info"`
+	Server         *grpc.Config               `yaml:"grpc"`
+	Storage        *storage.Config            `yaml:"storage"`
+	Cache          *cache.Config              `yaml:"cache"`
+	Geolocation    *geolocation.Config        `yaml:"geolocation"`
+	XatuCBT        *xatu_cbt.Config           `yaml:"xatu_cbt"`
+	Cartographoor  *cartographoor.Config      `yaml:"cartographoor"`
+	Experiments    *experiments.Config        `yaml:"experiments"`
+	StateAnalytics *state_analytics.Config    `yaml:"state_analytics"`
 }
 
 func (x *Config) Validate() error {

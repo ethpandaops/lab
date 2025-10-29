@@ -27,6 +27,7 @@ import (
 
 	beaconslotspb "github.com/ethpandaops/lab/backend/pkg/server/proto/beacon_slots"
 	configpb "github.com/ethpandaops/lab/backend/pkg/server/proto/config"
+	state_analytics_pb "github.com/ethpandaops/lab/backend/pkg/server/proto/state_analytics"
 	xatu_cbt_pb "github.com/ethpandaops/lab/backend/pkg/server/proto/xatu_cbt"
 )
 
@@ -43,11 +44,12 @@ type Service struct {
 	metrics       *metrics.Metrics
 
 	// gRPC connection to srv service
-	srvConn           *grpc.ClientConn
-	beaconSlotsClient beaconslotspb.BeaconSlotsClient
-	xatuCBTClient     xatu_cbt_pb.XatuCBTClient
-	configClient      configpb.ConfigServiceClient
-	publicV1Router    *v1rest.PublicRouter
+	srvConn              *grpc.ClientConn
+	beaconSlotsClient    beaconslotspb.BeaconSlotsClient
+	xatuCBTClient        xatu_cbt_pb.XatuCBTClient
+	configClient         configpb.ConfigServiceClient
+	stateAnalyticsClient state_analytics_pb.StateAnalyticsClient
+	publicV1Router       *v1rest.PublicRouter
 }
 
 // New creates a new api service
@@ -309,7 +311,8 @@ func (s *Service) initializeServices(ctx context.Context) error {
 	s.beaconSlotsClient = beaconslotspb.NewBeaconSlotsClient(conn)
 	s.xatuCBTClient = xatu_cbt_pb.NewXatuCBTClient(conn)
 	s.configClient = configpb.NewConfigServiceClient(conn)
-	s.publicV1Router = v1rest.NewPublicRouter(s.log, s.configClient, s.xatuCBTClient)
+	s.stateAnalyticsClient = state_analytics_pb.NewStateAnalyticsClient(conn)
+	s.publicV1Router = v1rest.NewPublicRouter(s.log, s.configClient, s.xatuCBTClient, s.stateAnalyticsClient)
 
 	return nil
 }

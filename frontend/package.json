@@ -29,7 +29,7 @@
     "@nivo/scatterplot": "0.93.0",
     "@nivo/treemap": "0.93.0",
     "@tailwindcss/vite": "4.1.5",
-    "@tanstack/react-query": "5.29.2",
+    "@tanstack/react-query": "5.62.8",
     "@tanstack/react-router": "^1.132.7",
     "@types/geojson": "7946.0.16",
     "@types/react-simple-maps": "3.0.6",

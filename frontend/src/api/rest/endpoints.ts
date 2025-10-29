@@ -34,6 +34,13 @@ export const API_V1_ENDPOINTS = {
     `/api/v1/${network}/beacon/slot/${slot}/mev/builder/count`,
   // Prepared blocks endpoint (formerly locally built blocks)
   preparedBlocks: (network: string) => `/api/v1/${network}/prepared/blocks`,
+  // State Analytics endpoints
+  stateLatest: (network: string) => `/api/v1/${network}/state/latest`,
+  stateTopAdders: (network: string) => `/api/v1/${network}/state/top-adders`,
+  stateTopRemovers: (network: string) => `/api/v1/${network}/state/top-removers`,
+  stateGrowthChart: (network: string) => `/api/v1/${network}/state/growth-chart`,
+  stateContractActivity: (network: string, address: string) =>
+    `/api/v1/${network}/state/contract/${address}`,
 };
 
 /**
