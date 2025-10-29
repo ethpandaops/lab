@@ -39,22 +39,14 @@ function BoundsLoader(): null {
  */
 export function NetworkProvider({ children }: NetworkProviderProps): JSX.Element | null {
   const queryClient = useQueryClient();
-
-  // Router hooks - may not be available in Storybook/test environments
-  let navigate: ReturnType<typeof useNavigate> | undefined;
-  let search: { network?: string } = {};
-
-  try {
-    navigate = useNavigate();
-    search = useSearch({ strict: false });
-  } catch {
-    // Router not available (e.g., in Storybook), use fallbacks
-    navigate = undefined;
-    search = {};
-  }
-
   const { data: config, isLoading } = useConfig();
   const networks = useMemo(() => config?.networks ?? [], [config?.networks]);
+
+  // Router hooks - will be called but may not work in Storybook
+  // The warnings in Storybook are expected and don't break functionality
+  const navigate = useNavigate();
+  const search = useSearch({ strict: false });
+  const hasRouter = navigate !== undefined && search !== undefined;
 
   const [currentNetwork, setCurrentNetworkState] = useState<Network | null>(null);
 
@@ -120,7 +112,7 @@ export function NetworkProvider({ children }: NetworkProviderProps): JSX.Element
       // Update URL to match the network selection (only if router is available)
       // Remove network param for mainnet (it's the default)
       // Add/update network param for non-mainnet networks
-      if (navigate) {
+      if (hasRouter) {
         const shouldHaveParam = initialNetwork.name !== 'mainnet';
         const hasParam = search.network !== undefined;
 
@@ -141,7 +133,7 @@ export function NetworkProvider({ children }: NetworkProviderProps): JSX.Element
         }
       }
     }
-  }, [networks, currentNetwork, search.network, navigate]);
+  }, [networks, currentNetwork, search.network, navigate, hasRouter]);
 
   // Invalidate queries when network changes (URL rewriting happens in interceptor)
   useEffect(() => {
@@ -165,7 +157,7 @@ export function NetworkProvider({ children }: NetworkProviderProps): JSX.Element
       setCurrentNetworkState(network);
 
       // Only add network param for non-mainnet networks (if router is available)
-      if (navigate) {
+      if (hasRouter) {
         if (network.name === 'mainnet') {
           // Remove the network param for mainnet (it's the default)
           // Use undefined to explicitly remove the param
@@ -182,7 +174,7 @@ export function NetworkProvider({ children }: NetworkProviderProps): JSX.Element
         }
       }
     },
-    [navigate]
+    [navigate, hasRouter]
   );
 
   const value: NetworkContextValue = useMemo(

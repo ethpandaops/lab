@@ -61,9 +61,9 @@ const preview: Preview = {
         });
       }
 
-      // Create a simple root route that just renders the Story
+      // Create a simple root route for Storybook
       const rootRoute = createRootRoute({
-        component: () => <Story />,
+        component: () => null, // We render Story directly in the provider tree
       });
 
       // Create a router with memory history (no browser URL changes)
@@ -78,9 +78,11 @@ const preview: Preview = {
         <QueryClientProvider client={queryClient} key={context.id}>
           <ThemeProvider>
             <ConfigGate>
-              <NetworkProvider>
-                <RouterProvider router={router} />
-              </NetworkProvider>
+              <RouterProvider router={router}>
+                <NetworkProvider>
+                  <Story />
+                </NetworkProvider>
+              </RouterProvider>
             </ConfigGate>
           </ThemeProvider>
         </QueryClientProvider>
