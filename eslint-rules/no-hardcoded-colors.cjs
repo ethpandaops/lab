@@ -1,20 +1,24 @@
 /**
- * @fileoverview Ban hardcoded colors (hex, rgb, hsl) in Tailwind classes
+ * @fileoverview Ban hardcoded colors (hex, rgb, hsl) in Tailwind classes and inline styles
  * @author Lab Team
  *
  * This rule prevents developers from using hardcoded color values in Tailwind
- * className strings. All colors should come from the semantic color tokens
- * defined in src/index.css.
+ * className strings and React inline styles. All colors should come from the
+ * semantic color tokens defined in src/index.css.
  *
  * Examples of incorrect code:
  *   className="bg-[#ff0000]"
  *   className="text-[rgb(255,0,0)]"
  *   className="border-[hsl(0,100%,50%)]"
+ *   style={{ color: '#ff0000' }}
+ *   style={{ backgroundColor: 'rgb(255,0,0)' }}
  *
  * Examples of correct code:
  *   className="bg-primary"
  *   className="text-danger"
  *   className="border-accent"
+ *   style={{ color: 'var(--color-primary)' }}
+ *   const themeColors = useThemeColors(); style={{ color: themeColors.primary }}
  */
 
 /** @type {import('eslint').Rule.RuleModule} */
@@ -28,11 +32,13 @@ module.exports = {
     },
     messages: {
       hardcodedHexColor:
-        'Hardcoded hex color "{{value}}" detected. Use semantic color tokens from src/index.css instead (e.g., bg-primary, text-danger, border-accent).',
+        'Hardcoded hex color "{{value}}" detected. Use semantic color tokens from src/index.css instead (e.g., bg-primary, var(--color-primary), or useThemeColors()).',
       hardcodedRgbColor:
-        'Hardcoded RGB color "{{value}}" detected. Use semantic color tokens from src/index.css instead (e.g., bg-primary, text-danger, border-accent).',
+        'Hardcoded RGB color "{{value}}" detected. Use semantic color tokens from src/index.css instead (e.g., bg-primary, var(--color-primary), or useThemeColors()).',
       hardcodedHslColor:
-        'Hardcoded HSL color "{{value}}" detected. Use semantic color tokens from src/index.css instead (e.g., bg-primary, text-danger, border-accent).',
+        'Hardcoded HSL color "{{value}}" detected. Use semantic color tokens from src/index.css instead (e.g., bg-primary, var(--color-primary), or useThemeColors()).',
+      hardcodedNamedColor:
+        'Hardcoded named color "{{value}}" detected in {{property}}. Use semantic color tokens from src/index.css instead (e.g., var(--color-primary) or useThemeColors()).',
     },
     schema: [],
   },
@@ -42,6 +48,58 @@ module.exports = {
     const hexPattern = /\[#[0-9a-fA-F]{3,8}\]/g;
     const rgbPattern = /\[rgba?\([^)]+\)\]/g;
     const hslPattern = /\[hsla?\([^)]+\)\]/g;
+
+    // Patterns for inline style values (without Tailwind brackets)
+    const hexValuePattern = /^#[0-9a-fA-F]{3,8}$/;
+    const rgbValuePattern = /^rgba?\([^)]+\)$/;
+    const hslValuePattern = /^hsla?\([^)]+\)$/;
+
+    // Common named colors to ban (not exhaustive, but covers most common cases)
+    // Excludes 'transparent', 'currentColor', 'inherit' which are valid
+    const namedColors = new Set([
+      'black',
+      'white',
+      'red',
+      'green',
+      'blue',
+      'yellow',
+      'orange',
+      'purple',
+      'pink',
+      'gray',
+      'grey',
+      'brown',
+      'cyan',
+      'magenta',
+      'lime',
+      'indigo',
+      'violet',
+      'gold',
+      'silver',
+      'navy',
+      'teal',
+      'olive',
+      'maroon',
+      'aqua',
+      'fuchsia',
+    ]);
+
+    // Style properties that accept color values
+    const colorProperties = new Set([
+      'color',
+      'backgroundColor',
+      'borderColor',
+      'borderTopColor',
+      'borderRightColor',
+      'borderBottomColor',
+      'borderLeftColor',
+      'outlineColor',
+      'textDecorationColor',
+      'fill',
+      'stroke',
+      'caretColor',
+      'accentColor',
+    ]);
 
     /**
      * Check if a string value contains hardcoded color values
@@ -86,6 +144,68 @@ module.exports = {
       }
     }
 
+    /**
+     * Check if a style object property has a hardcoded color value
+     * @param {import('estree').Node} node - The property node
+     * @param {string} propertyName - The property name
+     * @param {*} valueNode - The value node
+     */
+    function checkStyleProperty(node, propertyName, valueNode) {
+      if (!colorProperties.has(propertyName)) {
+        return;
+      }
+
+      // Handle string literal values
+      if (valueNode.type === 'Literal' && typeof valueNode.value === 'string') {
+        const value = valueNode.value;
+
+        // Check for hex colors
+        if (hexValuePattern.test(value)) {
+          context.report({
+            node: valueNode,
+            messageId: 'hardcodedHexColor',
+            data: { value },
+          });
+          return;
+        }
+
+        // Check for RGB colors
+        if (rgbValuePattern.test(value)) {
+          context.report({
+            node: valueNode,
+            messageId: 'hardcodedRgbColor',
+            data: { value },
+          });
+          return;
+        }
+
+        // Check for HSL colors
+        if (hslValuePattern.test(value)) {
+          context.report({
+            node: valueNode,
+            messageId: 'hardcodedHslColor',
+            data: { value },
+          });
+          return;
+        }
+
+        // Check for named colors (but allow CSS variables, currentColor, transparent, inherit)
+        if (
+          namedColors.has(value.toLowerCase()) &&
+          !value.startsWith('var(') &&
+          value !== 'currentColor' &&
+          value !== 'transparent' &&
+          value !== 'inherit'
+        ) {
+          context.report({
+            node: valueNode,
+            messageId: 'hardcodedNamedColor',
+            data: { value, property: propertyName },
+          });
+        }
+      }
+    }
+
     return {
       // Handle JSX className attributes
       JSXAttribute(node) {
@@ -107,6 +227,20 @@ module.exports = {
         ) {
           node.value.expression.quasis.forEach(quasi => {
             checkForHardcodedColors(node, quasi.value.raw);
+          });
+        }
+
+        // Handle style attribute with object expression
+        if (
+          node.name.name === 'style' &&
+          node.value &&
+          node.value.type === 'JSXExpressionContainer' &&
+          node.value.expression.type === 'ObjectExpression'
+        ) {
+          node.value.expression.properties.forEach(prop => {
+            if (prop.type === 'Property' && prop.key.type === 'Identifier') {
+              checkStyleProperty(node, prop.key.name, prop.value);
+            }
           });
         }
       },

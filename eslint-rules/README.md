@@ -20,22 +20,55 @@ Lab uses a **two-tier color architecture** defined in `src/index.css`:
 
 ### `lab/no-hardcoded-colors`
 
-Bans hardcoded color values (hex, RGB, HSL) in Tailwind className strings.
+Bans hardcoded color values (hex, RGB, HSL, named colors) in Tailwind className strings and React inline styles.
 
 **❌ Incorrect:**
 ```tsx
+// Tailwind arbitrary values
 <div className="bg-[#ff0000]">Red background</div>
 <div className="text-[rgb(255,0,0)]">Red text</div>
 <div className="border-[hsl(0,100%,50%)]">Red border</div>
 <div className={clsx('bg-[#00ff00]')}>Green background</div>
+
+// Inline styles
+<div style={{ color: '#ff0000' }}>Red text</div>
+<div style={{ backgroundColor: 'rgb(255,0,0)' }}>Red background</div>
+<div style={{ borderColor: 'hsl(0,100%,50%)' }}>Red border</div>
+<div style={{ color: 'red' }}>Named color</div>
 ```
 
 **✅ Correct:**
 ```tsx
+// Tailwind semantic tokens
 <div className="bg-danger">Red background</div>
 <div className="text-danger">Red text</div>
 <div className="border-danger">Red border</div>
 <div className={clsx('bg-success')}>Green background</div>
+
+// Inline styles with CSS variables
+<div style={{ color: 'var(--color-danger)' }}>Red text</div>
+<div style={{ backgroundColor: 'var(--color-primary)' }}>Primary background</div>
+
+// Inline styles with useThemeColors hook
+const themeColors = useThemeColors();
+<div style={{ color: themeColors.danger }}>Red text</div>
+
+// Allowed special values
+<div style={{ color: 'transparent' }}>Transparent</div>
+<div style={{ color: 'currentColor' }}>Current color</div>
+<div style={{ color: 'inherit' }}>Inherit</div>
+```
+
+**Disabling the rule for specific cases:**
+```tsx
+// For legitimate use cases (e.g., dynamic colors from API):
+// eslint-disable-next-line lab/no-hardcoded-colors
+<div style={{ color: dynamicColorFromAPI }}>API color</div>
+
+/* eslint-disable lab/no-hardcoded-colors */
+// Multiple lines that need to be disabled
+<Chart colors={['#ff0000', '#00ff00', '#0000ff']} />
+/* eslint-enable lab/no-hardcoded-colors */
 ```
 
 ### `lab/no-primitive-color-scales`
@@ -119,6 +152,31 @@ The only place where primitive color scales should be used is in `src/index.css`
 }
 ```
 
+## Disabling Rules
+
+You can disable rules for specific lines or blocks using ESLint comments:
+
+```tsx
+// Disable for next line only
+// eslint-disable-next-line lab/no-hardcoded-colors
+<div style={{ color: '#ff0000' }}>Specific use case</div>
+
+// Disable for entire block
+/* eslint-disable lab/no-hardcoded-colors */
+<Chart colors={apiColors} /> // Colors from external API
+/* eslint-enable lab/no-hardcoded-colors */
+
+// Disable both rules
+// eslint-disable-next-line lab/no-hardcoded-colors, lab/no-primitive-color-scales
+<div className="bg-[#ff0000] text-terracotta-500">Legacy code</div>
+```
+
+**When to disable:**
+- Dynamic colors from external APIs or user input
+- Third-party library requirements
+- Data visualization with specific color requirements
+- Legacy code during migration (temporary only)
+
 ## Testing
 
 To test these rules, create a file with violations and run:
@@ -129,4 +187,5 @@ pnpm eslint path/to/file.tsx
 
 Example violations:
 - `className="bg-[#ff0000]"` → triggers `lab/no-hardcoded-colors`
+- `style={{ color: '#ff0000' }}` → triggers `lab/no-hardcoded-colors`
 - `className="bg-terracotta-500"` → triggers `lab/no-primitive-color-scales`
