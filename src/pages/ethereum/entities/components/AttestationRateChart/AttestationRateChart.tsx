@@ -58,11 +58,7 @@ export function AttestationRateChart({ data }: AttestationRateChartProps): React
   }
 
   return (
-    <PopoutCard
-      title="Online Rate"
-      subtitle="Last 12h"
-      modalSize="full"
-    >
+    <PopoutCard title="Online Rate" subtitle="Last 12h" modalSize="full">
       {({ inModal }) => (
         <MultiLineChart
           series={series}

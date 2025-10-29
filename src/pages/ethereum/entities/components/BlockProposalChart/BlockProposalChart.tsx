@@ -61,11 +61,7 @@ export function BlockProposalChart({ data }: BlockProposalChartProps): React.JSX
   }
 
   return (
-    <PopoutCard
-      title="Proposals"
-      subtitle="Last 12h"
-      modalSize="full"
-    >
+    <PopoutCard title="Proposals" subtitle="Last 12h" modalSize="full">
       {({ inModal }) => (
         <MultiLineChart
           series={series}
