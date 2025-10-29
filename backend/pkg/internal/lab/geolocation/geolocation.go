@@ -21,6 +21,7 @@ const (
 // Client manages geolocation data and operations
 type Client struct {
 	log              logrus.FieldLogger
+	config           *Config
 	databaseLocation string
 	locationDB       *LocationDB
 
@@ -47,6 +48,7 @@ func New(log logrus.FieldLogger, config *Config, metricsSvc *metrics.Metrics) (*
 
 	client := &Client{
 		log:              log.WithField("component", "lab/geolocation"),
+		config:           config,
 		databaseLocation: databaseLocation,
 		locationDB: &LocationDB{
 			Continents: make(map[string]map[string]map[string]CityInfo),
@@ -111,6 +113,12 @@ func (c *Client) initMetrics() {
 
 // Start initializes the geolocation database
 func (c *Client) Start(ctx context.Context) error {
+	// Skip if geolocation is disabled
+	if c.config != nil && c.config.Enabled != nil && !*c.config.Enabled {
+		c.log.Info("Geolocation service is disabled, skipping database load")
+		return nil
+	}
+
 	var status = "success"
 
 	var source = "unknown"

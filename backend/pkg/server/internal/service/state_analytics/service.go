@@ -111,7 +111,7 @@ func (s *Service) Start(ctx context.Context) error {
 }
 
 // Stop gracefully stops the state analytics service
-func (s *Service) Stop() error {
+func (s *Service) Stop() {
 	s.log.Info("Stopping State Analytics service")
 
 	// Stop all ClickHouse clients
@@ -122,8 +122,6 @@ func (s *Service) Stop() error {
 	}
 
 	s.log.Info("State Analytics service stopped")
-
-	return nil
 }
 
 // initializeMetrics sets up Prometheus metrics for the service

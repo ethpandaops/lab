@@ -236,10 +236,17 @@ func (s *Service) initializeServices(ctx context.Context) error { // ctx is alre
 		s.stateAnalyticsService = stateAnalyticsSvc
 	}
 
-	s.services = []service.Service{
+	servicesSlice := []service.Service{
 		beaconSlotsService,
 		s.cartographoorService,
 	}
+
+	// Add state analytics service if initialized
+	if s.stateAnalyticsService != nil {
+		servicesSlice = append(servicesSlice, s.stateAnalyticsService)
+	}
+
+	s.services = servicesSlice
 
 	return nil
 }
