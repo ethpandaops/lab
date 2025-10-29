@@ -48,6 +48,9 @@ import type { PopoutCardProps } from './PopoutCard.types';
 export function PopoutCard({
   title,
   subtitle,
+  modalSubtitle,
+  modalDescription,
+  modalDescriptionPosition = 'below',
   children,
   modalSize = 'xl',
   className,
@@ -66,6 +69,16 @@ export function PopoutCard({
   const titleElement = (
     <h3 className="truncate text-lg/7 font-semibold text-foreground dark:text-foreground">{title}</h3>
   );
+
+  // Combine subtitle and modalSubtitle for modal description
+  const modalDescriptionText = [subtitle, modalSubtitle].filter(Boolean).join(' • ');
+
+  // Render modal description box
+  const descriptionBox = modalDescription ? (
+    <div className="rounded-sm bg-muted/10 px-4 py-3">
+      <p className="text-sm text-foreground dark:text-foreground">{modalDescription}</p>
+    </div>
+  ) : null;
 
   return (
     <>
@@ -102,10 +115,12 @@ export function PopoutCard({
         open={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         title={title}
-        description={subtitle}
+        description={modalDescriptionText}
         size={modalSize}
       >
+        {modalDescriptionPosition === 'above' && descriptionBox && <div className="mb-4">{descriptionBox}</div>}
         {modalContent}
+        {modalDescriptionPosition === 'below' && descriptionBox && <div className="mt-4">{descriptionBox}</div>}
       </Dialog>
     </>
   );

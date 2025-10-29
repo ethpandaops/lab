@@ -18,6 +18,22 @@ export interface PopoutCardProps {
    */
   subtitle?: string;
   /**
+   * Additional subtitle text shown only in the modal (not in card view).
+   * Appears after the main subtitle in the modal's description area.
+   */
+  modalSubtitle?: string;
+  /**
+   * Descriptive text shown only in the modal body (not in card view).
+   * Useful for providing additional context or explanation when viewing the expanded content.
+   */
+  modalDescription?: string;
+  /**
+   * Position of the modal description relative to the main content.
+   * - 'above': Description appears before the content (use when context is critical)
+   * - 'below': Description appears after the content (default - content is immediately visible)
+   */
+  modalDescriptionPosition?: 'above' | 'below';
+  /**
    * Content to display in both card and modal.
    * Can be a ReactNode or a render function that receives { inModal: boolean }
    * to adjust sizing based on context.
