@@ -61,7 +61,7 @@ async function fetchAllPages<T>(
       allData.push(...pageData);
     }
 
-    pageToken = responseData.next_page_token;
+    pageToken = responseData.next_page_token as string | undefined;
   } while (pageToken);
 
   return allData;
