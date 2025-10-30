@@ -33,18 +33,18 @@
 @theme inline {
   /* ===== TIER 1: Primitive Color Scales ===== */
 
-  /* Terracotta - warm accent colors */
-  --color-terracotta-50: #fbf6f1;
-  --color-terracotta-100: #f7eadd;
-  --color-terracotta-200: #edd2bb;
-  --color-terracotta-300: #e1b290;
-  --color-terracotta-400: #d58c62;
-  --color-terracotta-500: #cb7044;
-  --color-terracotta-600: #bb5a38;
-  --color-terracotta-700: #9d4731;
-  --color-terracotta-800: #7f3b2d;
-  --color-terracotta-900: #673227;
-  --color-terracotta-950: #371813;
+  /* Terracotta - warm accent colors with balanced orange undertones */
+  --color-terracotta-50: #fdf7f3;
+  --color-terracotta-100: #faeee5;
+  --color-terracotta-200: #f4d9c8;
+  --color-terracotta-300: #ebbd9e;
+  --color-terracotta-400: #e09770;
+  --color-terracotta-500: #d77651;
+  --color-terracotta-600: #c95f3f;
+  --color-terracotta-700: #a74d35;
+  --color-terracotta-800: #874032;
+  --color-terracotta-900: #6e362c;
+  --color-terracotta-950: #3b1b16;
 
   /* Sand - warm neutrals for light mode */
   --color-sand-50: #f4f3ed;
@@ -103,13 +103,13 @@
   --color-aurora-purple-100: #e6c0ff;
   --color-aurora-purple-200: #d199ff;
   --color-aurora-purple-300: #bb66ff;
-  --color-aurora-purple-400: #a94dff;
-  --color-aurora-purple-500: #9933ff;
-  --color-aurora-purple-600: #8000ff;
-  --color-aurora-purple-700: #6b00db;
-  --color-aurora-purple-800: #5500b8;
-  --color-aurora-purple-900: #400099;
-  --color-aurora-purple-950: #260052;
+  --color-aurora-purple-400: #a84dff;
+  --color-aurora-purple-500: #9333ff;
+  --color-aurora-purple-600: #7d00e6;
+  --color-aurora-purple-700: #6600cc;
+  --color-aurora-purple-800: #5200a3;
+  --color-aurora-purple-900: #3d0080;
+  --color-aurora-purple-950: #24004d;
 
   /* Aurora - pink for vibrant aurora highlights */
   --color-aurora-pink-50: #ffe6f5;
@@ -255,9 +255,9 @@
 
   html.dark {
     /* Dark mode - balanced neutral with warm terracotta accents */
-    --primary-value: var(--color-terracotta-500);
+    --primary-value: var(--color-terracotta-400);
     --secondary-value: var(--color-neutral-900);
-    --accent-value: var(--color-terracotta-400);
+    --accent-value: var(--color-terracotta-300);
     --background-value: var(--color-neutral-950);
     --surface-value: #242424;
     --foreground-value: var(--color-neutral-50);
