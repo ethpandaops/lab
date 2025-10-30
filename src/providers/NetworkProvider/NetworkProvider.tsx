@@ -1,5 +1,6 @@
-import { type JSX, type ReactNode, useEffect, useMemo, useRef, useState } from 'react';
+import { type JSX, type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
+import { useNavigate, useSearch } from '@tanstack/react-router';
 import { useConfig } from '@/hooks/useConfig';
 import { useBounds } from '@/hooks/useBounds';
 import type { Network } from '@/hooks/useNetwork';
@@ -26,7 +27,7 @@ function BoundsLoader(): null {
  * This provider:
  * - Fetches available networks from the config
  * - Defaults to "mainnet" if available, otherwise the first network
- * - Persists network selection in localStorage
+ * - Persists network selection in URL query parameters (for shareable links)
  * - Provides network context to all child components
  *
  * @example
@@ -40,6 +41,12 @@ export function NetworkProvider({ children }: NetworkProviderProps): JSX.Element
   const queryClient = useQueryClient();
   const { data: config, isLoading } = useConfig();
   const networks = useMemo(() => config?.networks ?? [], [config?.networks]);
+
+  // Router hooks - will be called but may not work in Storybook
+  // The warnings in Storybook are expected and don't break functionality
+  const navigate = useNavigate();
+  const search = useSearch({ strict: false });
+  const hasRouter = navigate !== undefined && search !== undefined;
 
   const [currentNetwork, setCurrentNetworkState] = useState<Network | null>(null);
 
@@ -83,15 +90,15 @@ export function NetworkProvider({ children }: NetworkProviderProps): JSX.Element
     };
   }, []); // Only run once on mount - ref will always have latest value
 
-  // Initialize current network from localStorage or default
+  // Initialize current network from URL params or default
   useEffect(() => {
     if (!networks.length || currentNetwork) return;
 
-    const storedNetworkName = localStorage.getItem('lab-selected-network');
+    const urlNetworkName = search.network;
     let initialNetwork: Network | undefined;
 
-    if (storedNetworkName) {
-      initialNetwork = networks.find(n => n.name === storedNetworkName);
+    if (urlNetworkName) {
+      initialNetwork = networks.find(n => n.name === urlNetworkName);
     }
 
     if (!initialNetwork) {
@@ -101,8 +108,32 @@ export function NetworkProvider({ children }: NetworkProviderProps): JSX.Element
 
     if (initialNetwork) {
       setCurrentNetworkState(initialNetwork);
+
+      // Update URL to match the network selection (only if router is available)
+      // Remove network param for mainnet (it's the default)
+      // Add/update network param for non-mainnet networks
+      if (hasRouter) {
+        const shouldHaveParam = initialNetwork.name !== 'mainnet';
+        const hasParam = search.network !== undefined;
+
+        if (shouldHaveParam && search.network !== initialNetwork.name) {
+          // Non-mainnet network: add/update the param
+          navigate({
+            to: '.',
+            search: { network: initialNetwork.name },
+            replace: true,
+          });
+        } else if (!shouldHaveParam && hasParam) {
+          // Mainnet: remove the param by setting to undefined
+          navigate({
+            to: '.',
+            search: { network: undefined },
+            replace: true,
+          });
+        }
+      }
     }
-  }, [networks, currentNetwork]);
+  }, [networks, currentNetwork, search.network, navigate, hasRouter]);
 
   // Invalidate queries when network changes (URL rewriting happens in interceptor)
   useEffect(() => {
@@ -121,10 +152,30 @@ export function NetworkProvider({ children }: NetworkProviderProps): JSX.Element
     }
   }, [currentNetwork, queryClient]);
 
-  const setCurrentNetwork = (network: Network): void => {
-    setCurrentNetworkState(network);
-    localStorage.setItem('lab-selected-network', network.name);
-  };
+  const setCurrentNetwork = useCallback(
+    (network: Network): void => {
+      setCurrentNetworkState(network);
+
+      // Only add network param for non-mainnet networks (if router is available)
+      if (hasRouter) {
+        if (network.name === 'mainnet') {
+          // Remove the network param for mainnet (it's the default)
+          // Use undefined to explicitly remove the param
+          navigate({
+            to: '.',
+            search: { network: undefined },
+          });
+        } else {
+          // Add/update network param for non-mainnet networks
+          navigate({
+            to: '.',
+            search: { network: network.name },
+          });
+        }
+      }
+    },
+    [navigate, hasRouter]
+  );
 
   const value: NetworkContextValue = useMemo(
     () => ({
@@ -133,7 +184,7 @@ export function NetworkProvider({ children }: NetworkProviderProps): JSX.Element
       networks,
       isLoading,
     }),
-    [currentNetwork, networks, isLoading]
+    [currentNetwork, setCurrentNetwork, networks, isLoading]
   );
 
   // Block rendering until network is initialized to prevent race condition

@@ -78,6 +78,7 @@ function SidebarWrapper(props: { initialOpen?: boolean; showToggle?: boolean }):
  * The sidebar slides in from the left and appears below the header bar.
  */
 export const MobileView: Story = {
+  args: {} as never,
   render: () => <SidebarWrapper initialOpen={false} showToggle />,
   parameters: {
     viewport: {
@@ -91,6 +92,7 @@ export const MobileView: Story = {
  * and slides in smoothly. Click outside or navigate to close.
  */
 export const MobileOpen: Story = {
+  args: {} as never,
   render: () => <SidebarWrapper initialOpen showToggle />,
   parameters: {
     viewport: {
@@ -104,6 +106,7 @@ export const MobileOpen: Story = {
  * on larger screens (≥lg breakpoint) and cannot be closed.
  */
 export const DesktopView: Story = {
+  args: {} as never,
   render: () => <SidebarWrapper initialOpen={false} showToggle />,
   parameters: {
     viewport: {
@@ -117,6 +120,7 @@ export const DesktopView: Story = {
  * how the sidebar adapts between mobile and desktop layouts.
  */
 export const Responsive: Story = {
+  args: {} as never,
   render: () => <SidebarWrapper initialOpen={false} showToggle />,
   parameters: {
     viewport: {
