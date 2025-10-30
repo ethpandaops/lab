@@ -189,24 +189,6 @@ import type {
   FctDataColumnAvailabilityHourlyServiceListData,
   FctDataColumnAvailabilityHourlyServiceListErrors,
   FctDataColumnAvailabilityHourlyServiceListResponses,
-  FctDataTypesComplexServiceGetData,
-  FctDataTypesComplexServiceGetErrors,
-  FctDataTypesComplexServiceGetResponses,
-  FctDataTypesComplexServiceListData,
-  FctDataTypesComplexServiceListErrors,
-  FctDataTypesComplexServiceListResponses,
-  FctDataTypesIntegersServiceGetData,
-  FctDataTypesIntegersServiceGetErrors,
-  FctDataTypesIntegersServiceGetResponses,
-  FctDataTypesIntegersServiceListData,
-  FctDataTypesIntegersServiceListErrors,
-  FctDataTypesIntegersServiceListResponses,
-  FctDataTypesTemporalServiceGetData,
-  FctDataTypesTemporalServiceGetErrors,
-  FctDataTypesTemporalServiceGetResponses,
-  FctDataTypesTemporalServiceListData,
-  FctDataTypesTemporalServiceListErrors,
-  FctDataTypesTemporalServiceListResponses,
   FctHeadFirstSeenByNodeServiceGetData,
   FctHeadFirstSeenByNodeServiceGetErrors,
   FctHeadFirstSeenByNodeServiceGetResponses,
@@ -441,18 +423,6 @@ import {
   zFctDataColumnAvailabilityHourlyServiceGetResponse,
   zFctDataColumnAvailabilityHourlyServiceListData,
   zFctDataColumnAvailabilityHourlyServiceListResponse,
-  zFctDataTypesComplexServiceGetData,
-  zFctDataTypesComplexServiceGetResponse,
-  zFctDataTypesComplexServiceListData,
-  zFctDataTypesComplexServiceListResponse,
-  zFctDataTypesIntegersServiceGetData,
-  zFctDataTypesIntegersServiceGetResponse,
-  zFctDataTypesIntegersServiceListData,
-  zFctDataTypesIntegersServiceListResponse,
-  zFctDataTypesTemporalServiceGetData,
-  zFctDataTypesTemporalServiceGetResponse,
-  zFctDataTypesTemporalServiceListData,
-  zFctDataTypesTemporalServiceListResponse,
   zFctHeadFirstSeenByNodeServiceGetData,
   zFctHeadFirstSeenByNodeServiceGetResponse,
   zFctHeadFirstSeenByNodeServiceListData,
@@ -1998,150 +1968,6 @@ export const fctDataColumnAvailabilityHourlyServiceGet = <ThrowOnError extends b
       return await zFctDataColumnAvailabilityHourlyServiceGetResponse.parseAsync(data);
     },
     url: '/api/v1/fct_data_column_availability_hourly/{hour_start_date_time}',
-    ...options,
-  });
-};
-
-/**
- * List records
- *
- * Retrieve paginated results with optional filtering
- */
-export const fctDataTypesComplexServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctDataTypesComplexServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
-    FctDataTypesComplexServiceListResponses,
-    FctDataTypesComplexServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => {
-      return await zFctDataTypesComplexServiceListData.parseAsync(data);
-    },
-    responseValidator: async data => {
-      return await zFctDataTypesComplexServiceListResponse.parseAsync(data);
-    },
-    url: '/api/v1/fct_data_types_complex',
-    ...options,
-  });
-};
-
-/**
- * Get record
- *
- * Retrieve a single record by id
- */
-export const fctDataTypesComplexServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctDataTypesComplexServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
-    FctDataTypesComplexServiceGetResponses,
-    FctDataTypesComplexServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => {
-      return await zFctDataTypesComplexServiceGetData.parseAsync(data);
-    },
-    responseValidator: async data => {
-      return await zFctDataTypesComplexServiceGetResponse.parseAsync(data);
-    },
-    url: '/api/v1/fct_data_types_complex/{id}',
-    ...options,
-  });
-};
-
-/**
- * List records
- *
- * Retrieve paginated results with optional filtering
- */
-export const fctDataTypesIntegersServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctDataTypesIntegersServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
-    FctDataTypesIntegersServiceListResponses,
-    FctDataTypesIntegersServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => {
-      return await zFctDataTypesIntegersServiceListData.parseAsync(data);
-    },
-    responseValidator: async data => {
-      return await zFctDataTypesIntegersServiceListResponse.parseAsync(data);
-    },
-    url: '/api/v1/fct_data_types_integers',
-    ...options,
-  });
-};
-
-/**
- * Get record
- *
- * Retrieve a single record by id
- */
-export const fctDataTypesIntegersServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctDataTypesIntegersServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
-    FctDataTypesIntegersServiceGetResponses,
-    FctDataTypesIntegersServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => {
-      return await zFctDataTypesIntegersServiceGetData.parseAsync(data);
-    },
-    responseValidator: async data => {
-      return await zFctDataTypesIntegersServiceGetResponse.parseAsync(data);
-    },
-    url: '/api/v1/fct_data_types_integers/{id}',
-    ...options,
-  });
-};
-
-/**
- * List records
- *
- * Retrieve paginated results with optional filtering
- */
-export const fctDataTypesTemporalServiceList = <ThrowOnError extends boolean = false>(
-  options?: Options<FctDataTypesTemporalServiceListData, ThrowOnError>
-) => {
-  return (options?.client ?? client).get<
-    FctDataTypesTemporalServiceListResponses,
-    FctDataTypesTemporalServiceListErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => {
-      return await zFctDataTypesTemporalServiceListData.parseAsync(data);
-    },
-    responseValidator: async data => {
-      return await zFctDataTypesTemporalServiceListResponse.parseAsync(data);
-    },
-    url: '/api/v1/fct_data_types_temporal',
-    ...options,
-  });
-};
-
-/**
- * Get record
- *
- * Retrieve a single record by id
- */
-export const fctDataTypesTemporalServiceGet = <ThrowOnError extends boolean = false>(
-  options: Options<FctDataTypesTemporalServiceGetData, ThrowOnError>
-) => {
-  return (options.client ?? client).get<
-    FctDataTypesTemporalServiceGetResponses,
-    FctDataTypesTemporalServiceGetErrors,
-    ThrowOnError
-  >({
-    requestValidator: async data => {
-      return await zFctDataTypesTemporalServiceGetData.parseAsync(data);
-    },
-    responseValidator: async data => {
-      return await zFctDataTypesTemporalServiceGetResponse.parseAsync(data);
-    },
-    url: '/api/v1/fct_data_types_temporal/{id}',
     ...options,
   });
 };
