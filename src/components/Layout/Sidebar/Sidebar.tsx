@@ -1,7 +1,6 @@
 import type { JSX } from 'react';
 import { useMemo } from 'react';
-import { Dialog, DialogBackdrop, DialogPanel, TransitionChild } from '@headlessui/react';
-import { XMarkIcon } from '@heroicons/react/24/outline';
+import { Dialog, DialogBackdrop, DialogPanel } from '@headlessui/react';
 import { Link } from '@tanstack/react-router';
 import { NetworkSelect } from '@/components/Ethereum/NetworkSelect';
 import { ThemeToggle } from '@/components/Layout/ThemeToggle';
@@ -93,37 +92,19 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps): JSX.Elem
   return (
     <>
       {/* Mobile sidebar */}
-      <Dialog open={sidebarOpen} onClose={setSidebarOpen} className="relative z-50 lg:hidden">
+      <Dialog open={sidebarOpen} onClose={setSidebarOpen} className="relative z-30 lg:hidden">
         <DialogBackdrop
           transition
           className="fixed inset-0 bg-background/80 backdrop-blur-sm transition-opacity duration-300 ease-linear data-closed:opacity-0"
         />
 
-        <div className="fixed inset-0 flex">
+        <div className="fixed inset-0 flex pt-16">
           <DialogPanel
             transition
-            className="relative mr-16 flex w-full max-w-xs flex-1 transform transition duration-300 ease-in-out data-closed:-translate-x-full"
+            className="relative flex w-full flex-1 transform transition duration-300 ease-in-out data-closed:-translate-x-full"
           >
-            <TransitionChild>
-              <div className="absolute top-0 left-full flex w-16 justify-center pt-5 duration-300 ease-in-out data-closed:opacity-0">
-                <button type="button" onClick={() => setSidebarOpen(false)} className="-m-2.5 p-2.5">
-                  <span className="sr-only">Close sidebar</span>
-                  <XMarkIcon aria-hidden={true} className="size-6 text-foreground" />
-                </button>
-              </div>
-            </TransitionChild>
-
             {/* Mobile sidebar content */}
-            <div className="relative flex grow flex-col gap-y-5 overflow-y-auto border-r border-border bg-surface/95 px-6 pb-2 backdrop-blur-xl">
-              {/* Logo and Theme Toggle */}
-              <div className="flex h-16 shrink-0 items-center justify-between border-b border-border/50">
-                <Link to="/" className="flex items-center gap-3">
-                  <img alt="Lab Logo" src="/images/lab.png" className="size-8" />
-                  <span className="font-sans text-xl font-bold text-foreground">The Lab</span>
-                </Link>
-                <ThemeToggle />
-              </div>
-
+            <div className="relative flex grow flex-col gap-y-5 overflow-y-auto bg-surface/95 px-6 pt-4 pb-2 backdrop-blur-xl">
               <nav className="flex flex-1 flex-col">
                 <ListContainer variant="simple" withDividers={false} compact className="flex flex-1 flex-col gap-y-7">
                   {/* Network Selector */}
@@ -142,7 +123,7 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps): JSX.Elem
                           <ListItem key={page.to}>
                             <Link
                               to={page.to}
-                              className="group flex gap-x-3 rounded-lg px-2.5 py-1.5 text-sm/6 font-semibold text-muted transition-all hover:bg-primary/10 hover:text-primary"
+                              className="group flex gap-x-3 rounded-lg px-2.5 py-2 text-base font-semibold text-muted transition-all hover:bg-primary/10 hover:text-primary lg:py-1.5 lg:text-sm/6"
                               activeProps={{
                                 className: 'bg-primary/10 text-primary shadow-sm ring-1 ring-primary/20',
                               }}
@@ -160,7 +141,7 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps): JSX.Elem
                           <ListItem key={page.to}>
                             <Link
                               to={page.to}
-                              className="group flex gap-x-3 rounded-lg px-2.5 py-1.5 text-sm/6 font-semibold text-muted transition-all hover:bg-primary/10 hover:text-primary"
+                              className="group flex gap-x-3 rounded-lg px-2.5 py-2 text-base font-semibold text-muted transition-all hover:bg-primary/10 hover:text-primary lg:py-1.5 lg:text-sm/6"
                               activeProps={{
                                 className: 'bg-primary/10 text-primary shadow-sm ring-1 ring-primary/20',
                               }}
@@ -178,7 +159,7 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps): JSX.Elem
                           <ListItem key={page.to}>
                             <Link
                               to={page.to}
-                              className="group flex gap-x-3 rounded-lg px-2.5 py-1.5 text-sm/6 font-semibold text-muted transition-all hover:bg-primary/10 hover:text-primary"
+                              className="group flex gap-x-3 rounded-lg px-2.5 py-2 text-base font-semibold text-muted transition-all hover:bg-primary/10 hover:text-primary lg:py-1.5 lg:text-sm/6"
                               activeProps={{
                                 className: 'bg-primary/10 text-primary shadow-sm ring-1 ring-primary/20',
                               }}
@@ -198,7 +179,7 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps): JSX.Elem
                         <ListItem key={page.to}>
                           <Link
                             to={page.to}
-                            className="group flex gap-x-3 rounded-lg px-2.5 py-1.5 text-sm/6 font-semibold text-muted transition-all hover:bg-primary/10 hover:text-primary"
+                            className="group flex gap-x-3 rounded-lg px-2.5 py-2 text-base font-semibold text-muted transition-all hover:bg-primary/10 hover:text-primary lg:py-1.5 lg:text-sm/6"
                             activeProps={{
                               className: 'bg-primary/10 text-primary shadow-sm ring-1 ring-primary/20',
                             }}
