@@ -11,13 +11,15 @@ import './index.css';
 // Import the generated route tree
 import { routeTree } from './routeTree.gen';
 
-// Import custom error component
+// Import custom error and not found components
 import { FatalError } from '@/components/Overlays/FatalError';
+import { NotFound } from '@/components/Overlays/NotFound';
 
-// Create a new router instance with custom error component
+// Create a new router instance with custom error and not found components
 const router = createRouter({
   routeTree,
   defaultErrorComponent: FatalError,
+  defaultNotFoundComponent: NotFound,
 });
 
 // Register the router instance for type safety
