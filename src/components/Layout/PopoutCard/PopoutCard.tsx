@@ -1,4 +1,4 @@
-import { type JSX, useState } from 'react';
+import { type JSX, useState, useMemo } from 'react';
 import { ArrowsPointingOutIcon } from '@heroicons/react/24/outline';
 import { Card } from '@/components/Layout/Card';
 import { Dialog } from '@/components/Overlays/Dialog';
@@ -63,8 +63,15 @@ export function PopoutCard({
   const isRenderFunction = typeof children === 'function';
 
   // Render content based on whether it's in modal or card
-  const cardContent = isRenderFunction ? children({ inModal: false }) : children;
-  const modalContent = isRenderFunction ? children({ inModal: true }) : children;
+  // Memoize to prevent re-creating React elements on every PopoutCard render
+  const cardContent = useMemo(
+    () => (isRenderFunction ? children({ inModal: false }) : children),
+    [children, isRenderFunction]
+  );
+  const modalContent = useMemo(
+    () => (isRenderFunction ? children({ inModal: true }) : children),
+    [children, isRenderFunction]
+  );
 
   // Title element (may be wrapped with ScrollAnchor)
   const titleElement = (
