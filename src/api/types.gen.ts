@@ -1315,6 +1315,10 @@ export type FctDataColumnAvailabilityByEpoch = {
    */
   slot_count?: number;
   /**
+   * Earliest slot start time in this epoch (used for CBT position tracking)
+   */
+  slot_start_date_time?: number;
+  /**
    * Total failed probes across all slots (result = failure)
    */
   total_failure_count?: number;
@@ -17037,6 +17041,46 @@ export type FctDataColumnAvailabilityByEpochServiceListData = {
      * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
      */
     updated_date_time_not_in_values?: string;
+    /**
+     * Earliest slot start time in this epoch (used for CBT position tracking) (filter: eq)
+     */
+    slot_start_date_time_eq?: number;
+    /**
+     * Earliest slot start time in this epoch (used for CBT position tracking) (filter: ne)
+     */
+    slot_start_date_time_ne?: number;
+    /**
+     * Earliest slot start time in this epoch (used for CBT position tracking) (filter: lt)
+     */
+    slot_start_date_time_lt?: number;
+    /**
+     * Earliest slot start time in this epoch (used for CBT position tracking) (filter: lte)
+     */
+    slot_start_date_time_lte?: number;
+    /**
+     * Earliest slot start time in this epoch (used for CBT position tracking) (filter: gt)
+     */
+    slot_start_date_time_gt?: number;
+    /**
+     * Earliest slot start time in this epoch (used for CBT position tracking) (filter: gte)
+     */
+    slot_start_date_time_gte?: number;
+    /**
+     * Earliest slot start time in this epoch (used for CBT position tracking) (filter: between_min)
+     */
+    slot_start_date_time_between_min?: number;
+    /**
+     * Earliest slot start time in this epoch (used for CBT position tracking) (filter: between_max_value)
+     */
+    slot_start_date_time_between_max_value?: number;
+    /**
+     * Earliest slot start time in this epoch (used for CBT position tracking) (filter: in_values) (comma-separated list)
+     */
+    slot_start_date_time_in_values?: string;
+    /**
+     * Earliest slot start time in this epoch (used for CBT position tracking) (filter: not_in_values) (comma-separated list)
+     */
+    slot_start_date_time_not_in_values?: string;
     /**
      * Number of slots in this epoch aggregation (filter: eq)
      */
