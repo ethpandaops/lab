@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, type JSX } from 'react';
+import { useState, type JSX } from 'react';
 import clsx from 'clsx';
 import type { SlotTimelineProps } from './SlotTimeline.types';
 
@@ -36,24 +36,6 @@ export function SlotTimeline({
   // Calculate total duration from phases or use provided slotDuration
   const totalDuration = slotDuration ?? phases.reduce((sum, phase) => sum + phase.duration, 0);
 
-  // Track when currentTime jumps backwards (slot change) to disable transition temporarily
-  const prevTimeRef = useRef(currentTime);
-  const [disableTransition, setDisableTransition] = useState(false);
-
-  useEffect(() => {
-    // If currentTime jumped backwards significantly (> half slot duration), disable transition
-    if (prevTimeRef.current > currentTime && prevTimeRef.current - currentTime > totalDuration / 2) {
-      setDisableTransition(true);
-      // Re-enable transition after a frame
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          setDisableTransition(false);
-        });
-      });
-    }
-    prevTimeRef.current = currentTime;
-  }, [currentTime, totalDuration]);
-
   // Calculate cumulative positions for each phase
   let cumulativeTime = 0;
   const phasePositions = phases.map(phase => {
@@ -76,32 +58,64 @@ export function SlotTimeline({
   // Calculate current time position as percentage
   const currentTimePercent = Math.min(100, Math.max(0, (currentTime / totalDuration) * 100));
 
-  // Track hover position for preview indicator
+  // Track hover position for preview indicator and drag state
   const [hoverPercent, setHoverPercent] = useState<number | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
+
+  // Calculate time from position
+  const calculateTimeFromPosition = (clientX: number, rect: DOMRect): number => {
+    const posX = clientX - rect.left;
+    const percent = Math.min(100, Math.max(0, (posX / rect.width) * 100));
+    return Math.round((percent / 100) * totalDuration);
+  };
 
   // Handle click on timeline
   const handleTimelineClick = (event: React.MouseEvent<HTMLDivElement>): void => {
-    if (!onTimeClick) return;
+    if (!onTimeClick || isDragging) return;
 
     const rect = event.currentTarget.getBoundingClientRect();
-    const clickX = event.clientX - rect.left;
-    const percentClicked = (clickX / rect.width) * 100;
-    const timeMs = Math.round((percentClicked / 100) * totalDuration);
-
+    const timeMs = calculateTimeFromPosition(event.clientX, rect);
     onTimeClick(timeMs);
   };
 
-  // Handle mouse move for preview indicator
-  const handleMouseMove = (event: React.MouseEvent<HTMLDivElement>): void => {
+  // Handle mouse/pointer down - start drag
+  const handlePointerDown = (event: React.PointerEvent<HTMLDivElement>): void => {
+    if (!onTimeClick) return;
+
+    event.preventDefault();
+    event.currentTarget.setPointerCapture(event.pointerId);
+    setIsDragging(true);
+
+    const rect = event.currentTarget.getBoundingClientRect();
+    const timeMs = calculateTimeFromPosition(event.clientX, rect);
+    onTimeClick(timeMs);
+  };
+
+  // Handle pointer move - continue drag or show preview
+  const handlePointerMove = (event: React.PointerEvent<HTMLDivElement>): void => {
     if (!onTimeClick) return;
 
     const rect = event.currentTarget.getBoundingClientRect();
     const mouseX = event.clientX - rect.left;
     const percent = Math.min(100, Math.max(0, (mouseX / rect.width) * 100));
-    setHoverPercent(percent);
+
+    if (isDragging) {
+      const timeMs = calculateTimeFromPosition(event.clientX, rect);
+      onTimeClick(timeMs);
+    } else {
+      setHoverPercent(percent);
+    }
   };
 
-  const handleMouseLeave = (): void => {
+  // Handle pointer up - end drag
+  const handlePointerUp = (event: React.PointerEvent<HTMLDivElement>): void => {
+    if (isDragging) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+      setIsDragging(false);
+    }
+  };
+
+  const handlePointerLeave = (): void => {
     setHoverPercent(null);
   };
 
@@ -115,7 +129,8 @@ export function SlotTimeline({
         <div
           className={clsx(
             'relative flex overflow-hidden rounded-sm border border-border',
-            onTimeClick && 'cursor-pointer'
+            onTimeClick && 'cursor-pointer touch-none select-none',
+            isDragging && 'cursor-grabbing'
           )}
           style={{ height: `${height}px` }}
           role="progressbar"
@@ -124,8 +139,10 @@ export function SlotTimeline({
           aria-valuemax={totalDuration}
           aria-label={ariaLabel}
           onClick={handleTimelineClick}
-          onMouseMove={handleMouseMove}
-          onMouseLeave={handleMouseLeave}
+          onPointerDown={handlePointerDown}
+          onPointerMove={handlePointerMove}
+          onPointerUp={handlePointerUp}
+          onPointerLeave={handlePointerLeave}
           onKeyDown={e => {
             if (e.key === 'Enter' || e.key === ' ') {
               e.preventDefault();
@@ -174,10 +191,7 @@ export function SlotTimeline({
 
           {/* Current time indicator - vertical line */}
           <div
-            className={clsx(
-              'absolute top-0 h-full w-0.5 bg-foreground shadow-sm',
-              !disableTransition && 'transition-all duration-300'
-            )}
+            className="absolute top-0 h-full w-0.5 bg-foreground shadow-sm"
             style={{ left: `${currentTimePercent}%` }}
           />
         </div>
