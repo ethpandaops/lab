@@ -3,7 +3,7 @@ import { DetailPage } from '@/pages/ethereum/slots';
 
 export const Route = createFileRoute('/ethereum/slots/$slot')({
   component: DetailPage,
-  head: (ctx) => ({
+  head: ctx => ({
     meta: [
       {
         title: `Slot ${ctx.params.slot} | ${import.meta.env.VITE_BASE_TITLE}`,

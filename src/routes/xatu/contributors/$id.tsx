@@ -22,7 +22,7 @@ function DetailPageWithSlotPlayer(): JSX.Element {
 
 export const Route = createFileRoute('/xatu/contributors/$id')({
   component: DetailPageWithSlotPlayer,
-  head: (ctx) => ({
+  head: ctx => ({
     meta: [
       { title: `${ctx.params.id} | ${import.meta.env.VITE_BASE_TITLE}` },
       { name: 'description', content: 'Detailed contribution metrics and live network performance data' },
