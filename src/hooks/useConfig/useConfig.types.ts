@@ -31,13 +31,12 @@ export interface Network {
   forks: Forks;
 }
 
-export interface Experiment {
-  name: string;
-  enabled: boolean;
-  networks: string[];
+export interface Feature {
+  path: string;
+  disabled_networks?: string[]; // Optional: list of networks where page is disabled
 }
 
 export interface Config {
   networks: Network[];
-  experiments: Experiment[];
+  features: Feature[];
 }
