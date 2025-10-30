@@ -153,6 +153,7 @@ export function AlgorithmicArt({
   const containerRef = useRef<HTMLDivElement>(null);
   const p5InstanceRef = useRef<p5 | null>(null);
   const themeColorsRef = useRef<AlgorithmicArtColors | null>(null);
+  const isCleanedUpRef = useRef(false);
   const themeColors = useThemeColors();
   const artColors = colors || themeColors;
 
@@ -163,6 +164,9 @@ export function AlgorithmicArt({
 
   useEffect(() => {
     if (!containerRef.current) return;
+
+    // Reset cleanup flag on mount
+    isCleanedUpRef.current = false;
 
     // Create the sketch
     const sketch = (p: p5): void => {
@@ -225,20 +229,19 @@ export function AlgorithmicArt({
         };
       };
 
-      p.setup = () => {
-        const canvasWidth = containerRef.current?.offsetWidth || 600;
-        const canvas = p.createCanvas(canvasWidth, height);
-        canvas.parent(containerRef.current!);
-        p.frameRate(60);
+      /**
+       * Initialize or reinitialize nodes and connections
+       */
+      const initializeNodes = (canvasWidth: number): void => {
+        // Clear existing nodes and particles
+        nodes.length = 0;
+        particles.length = 0;
 
         // Set seed for reproducibility
         p.randomSeed(seed);
         p.noiseSeed(seed);
 
-        // Initialize cached colors
-        updateCachedColors();
-
-        // Create nodes
+        // Create nodes based on canvas area
         const nodeCount = Math.floor((canvasWidth * height) / 15000); // Density based on area
         for (let i = 0; i < nodeCount; i++) {
           const radius = 3 + Math.random() * 4;
@@ -246,7 +249,7 @@ export function AlgorithmicArt({
           nodes.push(node);
         }
 
-        // Establish connections - each node connects to its 15 nearest neighbors
+        // Establish connections - each node connects to its nearest neighbors
         nodes.forEach(node => {
           const nearby = nodes
             .filter(other => other !== node && node.distanceTo(other) < connectionDistance)
@@ -257,14 +260,36 @@ export function AlgorithmicArt({
         });
       };
 
+      p.setup = () => {
+        const canvasWidth = containerRef.current?.offsetWidth || 600;
+        p.createCanvas(canvasWidth, height);
+        p.frameRate(60);
+        p.loop(); // Ensure animation loop starts
+
+        // Initialize cached colors
+        updateCachedColors();
+
+        // Initialize nodes and connections
+        initializeNodes(canvasWidth);
+      };
+
       p.windowResized = () => {
         if (containerRef.current) {
           const canvasWidth = containerRef.current.offsetWidth;
           p.resizeCanvas(canvasWidth, height);
+
+          // Reinitialize nodes and particles with new dimensions
+          initializeNodes(canvasWidth);
         }
       };
 
       p.draw = () => {
+        // Stop drawing if component is cleaned up
+        if (isCleanedUpRef.current) {
+          p.noLoop();
+          return;
+        }
+
         // Update cached colors if theme changed
         const currentTheme = themeColorsRef.current;
         if (!currentTheme) return;
@@ -329,12 +354,18 @@ export function AlgorithmicArt({
       };
     };
 
-    // Create p5 instance
-    p5InstanceRef.current = new p5(sketch);
+    // Create p5 instance with container ref for proper cleanup
+    const instance = new p5(sketch, containerRef.current);
+    p5InstanceRef.current = instance;
 
     // Cleanup on unmount
     return () => {
+      isCleanedUpRef.current = true;
+
       if (p5InstanceRef.current) {
+        // First stop the loop explicitly
+        p5InstanceRef.current.noLoop();
+        // Then remove the canvas and cleanup
         p5InstanceRef.current.remove();
         p5InstanceRef.current = null;
       }
