@@ -13,6 +13,7 @@ import {
 import { CanvasRenderer } from 'echarts/renderers';
 import { hexToRgba, formatSmartDecimal, getDataVizColors, resolveCssColorToHex } from '@/utils';
 import { useThemeColors } from '@/hooks/useThemeColors';
+import { Disclosure } from '@/components/Layout/Disclosure';
 import type { MultiLineChartProps } from './MultiLine.types';
 
 // Register ECharts components
@@ -102,7 +103,6 @@ export function MultiLineChart({
   );
 
   // Series filter state
-  const [filterExpanded, setFilterExpanded] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
   // Track all series names we've ever seen to detect genuinely new series
@@ -452,97 +452,85 @@ export function MultiLineChart({
       {/* Series Filter (collapsible with search) */}
       {enableSeriesFilter && filterableSeries.length > 0 && (
         <div className="mb-4">
-          {/* Collapsible header */}
-          <button
-            onClick={() => setFilterExpanded(!filterExpanded)}
-            className="hover:bg-surface-hover mb-2 flex w-full items-center justify-between rounded-sm border border-border bg-surface px-3 py-2 text-sm transition-colors"
-          >
-            <div className="flex items-center gap-2">
-              <span>{filterExpanded ? '▼' : '▶'}</span>
-              <span className="font-medium">
-                Filter Series ({visibleCount} of {filterableSeries.length} shown)
-              </span>
-            </div>
-            {!filterExpanded && visibleCount < filterableSeries.length && (
-              <span
-                onClick={e => {
-                  e.stopPropagation();
-                  setVisibleSeries(new Set(filterableSeries.map(s => s.name)));
-                }}
-                role="button"
-                tabIndex={0}
-                onKeyDown={e => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
+          <Disclosure
+            title={`Filter Series (${visibleCount} of ${filterableSeries.length} shown)`}
+            rightContent={
+              visibleCount < filterableSeries.length && (
+                <span
+                  onClick={e => {
                     e.stopPropagation();
                     setVisibleSeries(new Set(filterableSeries.map(s => s.name)));
-                  }
-                }}
-                className="cursor-pointer rounded-sm px-2 py-0.5 text-xs text-muted hover:bg-muted/10 hover:text-foreground"
-              >
-                Show All
-              </span>
-            )}
-          </button>
-
-          {/* Expanded filter content */}
-          {filterExpanded && (
-            <div className="rounded-sm border border-border bg-surface p-3">
-              {/* Search box */}
-              <div className="mb-3">
-                <input
-                  type="text"
-                  placeholder="Search series..."
-                  value={searchQuery}
-                  onChange={e => setSearchQuery(e.target.value)}
-                  className="w-full rounded-sm border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted focus:ring-2 focus:ring-primary focus:outline-none"
-                />
-              </div>
-
-              {/* Action buttons */}
-              <div className="mb-3 flex gap-2">
-                <button
-                  onClick={selectAllFiltered}
-                  className="rounded-sm bg-primary/10 px-3 py-1.5 text-xs font-medium text-primary transition-colors hover:bg-primary/20"
+                  }}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={e => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setVisibleSeries(new Set(filterableSeries.map(s => s.name)));
+                    }
+                  }}
+                  className="cursor-pointer px-2 py-0.5 text-xs text-muted hover:bg-muted/10 hover:text-foreground"
                 >
-                  Select All {searchQuery && `(${filteredSeriesBySearch.length})`}
-                </button>
-                <button
-                  onClick={clearAllFiltered}
-                  className="rounded-sm bg-muted/10 px-3 py-1.5 text-xs font-medium text-muted transition-colors hover:bg-muted/20"
-                >
-                  Clear All {searchQuery && `(${filteredSeriesBySearch.length})`}
-                </button>
-              </div>
-
-              {/* Series checkboxes */}
-              <div className="max-h-[300px] space-y-1 overflow-y-auto">
-                {filteredSeriesBySearch.length === 0 ? (
-                  <div className="py-4 text-center text-sm text-muted">No series match your search</div>
-                ) : (
-                  filteredSeriesBySearch.map(s => {
-                    const isVisible = visibleSeries.has(s.name);
-                    const seriesColor = s.color || extendedPalette[series.indexOf(s) % extendedPalette.length];
-                    return (
-                      <label
-                        key={s.name}
-                        className="hover:bg-surface-hover flex cursor-pointer items-center gap-2 rounded-sm px-2 py-1.5 text-sm transition-colors"
-                      >
-                        <input
-                          type="checkbox"
-                          checked={isVisible}
-                          onChange={() => toggleSeries(s.name)}
-                          className="h-4 w-4 cursor-pointer rounded-sm border-border text-primary focus:ring-2 focus:ring-primary focus:ring-offset-0"
-                        />
-                        <span className="h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: seriesColor }} />
-                        <span className={isVisible ? 'text-foreground' : 'text-muted'}>{s.name}</span>
-                      </label>
-                    );
-                  })
-                )}
-              </div>
+                  Show All
+                </span>
+              )
+            }
+          >
+            {/* Search box */}
+            <div className="mb-3">
+              <input
+                type="text"
+                placeholder="Search series..."
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+                className="w-full border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted focus:ring-2 focus:ring-primary focus:outline-none"
+              />
             </div>
-          )}
+
+            {/* Action buttons */}
+            <div className="mb-3 flex gap-2">
+              <button
+                onClick={selectAllFiltered}
+                className="bg-primary/10 px-3 py-1.5 text-xs font-medium text-primary transition-colors hover:bg-primary/20"
+              >
+                Select All {searchQuery && `(${filteredSeriesBySearch.length})`}
+              </button>
+              <button
+                onClick={clearAllFiltered}
+                className="bg-muted/10 px-3 py-1.5 text-xs font-medium text-muted transition-colors hover:bg-muted/20"
+              >
+                Clear All {searchQuery && `(${filteredSeriesBySearch.length})`}
+              </button>
+            </div>
+
+            {/* Series checkboxes */}
+            <div className="max-h-[300px] space-y-1 overflow-y-auto">
+              {filteredSeriesBySearch.length === 0 ? (
+                <div className="py-4 text-center text-sm text-muted">No series match your search</div>
+              ) : (
+                filteredSeriesBySearch.map(s => {
+                  const isVisible = visibleSeries.has(s.name);
+                  const seriesColor = s.color || extendedPalette[series.indexOf(s) % extendedPalette.length];
+                  return (
+                    <label
+                      key={s.name}
+                      className="hover:bg-surface-hover flex cursor-pointer items-center gap-2 px-2 py-1.5 text-sm transition-colors"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={isVisible}
+                        onChange={() => toggleSeries(s.name)}
+                        className="h-4 w-4 cursor-pointer border-border text-primary focus:ring-2 focus:ring-primary focus:ring-offset-0"
+                      />
+                      <span className="h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: seriesColor }} />
+                      <span className={isVisible ? 'text-foreground' : 'text-muted'}>{s.name}</span>
+                    </label>
+                  );
+                })
+              )}
+            </div>
+          </Disclosure>
         </div>
       )}
 

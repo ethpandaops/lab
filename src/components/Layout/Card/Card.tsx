@@ -57,13 +57,15 @@ export function Card({
   onClick,
   featureImage,
   rounded = false,
+  allowContentOverflow = false,
 }: CardProps): JSX.Element {
   const styles = variantStyles[variant];
 
   return (
     <div
       className={clsx(
-        'relative divide-y divide-border overflow-hidden dark:divide-border',
+        'relative divide-y divide-border dark:divide-border',
+        !allowContentOverflow && 'overflow-hidden',
         rounded && 'rounded-sm',
         styles.container,
         isInteractive &&

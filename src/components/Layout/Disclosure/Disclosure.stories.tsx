@@ -44,10 +44,9 @@ export const WithComplexContent: Story = {
   },
 };
 
-export const WithBorder: Story = {
+export const WithCustomContent: Story = {
   args: {
     title: 'Past: Electra',
-    className: 'border border-border rounded-lg overflow-hidden',
     children: (
       <div className="space-y-2">
         <p className="text-foreground">Fork activated at epoch 2048</p>
@@ -57,26 +56,39 @@ export const WithBorder: Story = {
   },
 };
 
+export const WithRightContent: Story = {
+  args: {
+    title: 'Filter Series (29 of 31 shown)',
+    rightContent: (
+      <span className="cursor-pointer px-2 py-0.5 text-xs text-muted hover:bg-muted/10 hover:text-foreground">
+        Show All
+      </span>
+    ),
+    children: (
+      <div className="space-y-2">
+        <p className="text-foreground">Example of using rightContent prop</p>
+        <p className="text-muted">The &quot;Show All&quot; button appears on the right side of the disclosure button</p>
+      </div>
+    ),
+  },
+};
+
 export const GroupedDisclosures: Story = {
   render: () => (
     <div className="space-y-4">
-      <Disclosure
-        title="Upcoming Forks (1)"
-        defaultOpen={true}
-        className="overflow-hidden rounded-lg border border-border"
-      >
+      <Disclosure title="Upcoming Forks (1)" defaultOpen={true}>
         <div className="space-y-2">
           <p className="text-foreground">Fusaka - Epoch 50688</p>
           <p className="text-muted">7 days remaining</p>
         </div>
       </Disclosure>
-      <Disclosure title="Past: Electra" className="overflow-hidden rounded-lg border border-border">
+      <Disclosure title="Past: Electra">
         <div className="space-y-2">
           <p className="text-foreground">Activated at epoch 2048</p>
           <p className="text-success">All nodes upgraded ✓</p>
         </div>
       </Disclosure>
-      <Disclosure title="Past: Deneb" className="overflow-hidden rounded-lg border border-border">
+      <Disclosure title="Past: Deneb">
         <div className="space-y-2">
           <p className="text-foreground">Activated at epoch 1024</p>
           <p className="text-success">All nodes upgraded ✓</p>

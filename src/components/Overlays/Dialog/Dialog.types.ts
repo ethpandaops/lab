@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 
-export type DialogSize = 'sm' | 'md' | 'lg' | 'xl' | 'full';
+export type DialogSize = 'sm' | 'md' | 'lg' | 'xl' | 'full' | 'fullscreen';
 
 export interface DialogProps {
   /**

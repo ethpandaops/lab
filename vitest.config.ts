@@ -19,6 +19,9 @@ export default defineConfig({
     react(),
     storybookTest({
       configDir: path.join(__dirname, '.storybook'),
+      tags: {
+        exclude: ['test-exclude'], // Exclude stories with test-exclude tag (e.g., Interactive stories with setInterval)
+      },
     }),
   ],
   test: {

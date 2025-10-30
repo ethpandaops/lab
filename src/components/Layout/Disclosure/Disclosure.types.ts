@@ -5,4 +5,6 @@ export interface DisclosureProps {
   children: ReactNode;
   defaultOpen?: boolean;
   className?: string;
+  /** Optional content to display on the right side of the disclosure button */
+  rightContent?: ReactNode;
 }

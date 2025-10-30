@@ -55,6 +55,7 @@ export function PopoutCard({
   modalSize = 'xl',
   className,
   anchorId,
+  allowContentOverflow = false,
 }: PopoutCardProps): JSX.Element {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -107,6 +108,7 @@ export function PopoutCard({
           </div>
         }
         rounded
+        allowContentOverflow={allowContentOverflow}
       >
         {cardContent}
       </Card>
