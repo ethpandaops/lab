@@ -3,12 +3,12 @@ import { useQuery } from '@tanstack/react-query';
 import { ChartBarIcon, TableCellsIcon, CheckCircleIcon, ClockIcon } from '@heroicons/react/24/outline';
 import { Container } from '@/components/Layout/Container';
 import { Header } from '@/components/Layout/Header';
-import { LoadingContainer } from '@/components/Layout/LoadingContainer';
 import { PopoutCard } from '@/components/Layout/PopoutCard';
 import { Stats } from '@/components/DataDisplay/Stats';
 import { DataAvailabilityHeatmap } from '@/pages/ethereum/data-availability/components/DataAvailabilityHeatmap';
 import { DataAvailabilityFilterPanel } from '@/pages/ethereum/data-availability/components/DataAvailabilityHeatmap/DataAvailabilityFilterPanel';
 import { DataAvailabilityLegend } from '@/pages/ethereum/data-availability/components/DataAvailabilityHeatmap/DataAvailabilityLegend';
+import { DataAvailabilitySkeleton } from '@/pages/ethereum/data-availability/components/DataAvailabilitySkeleton';
 import type { DataAvailabilityGranularity } from '@/pages/ethereum/data-availability/components/DataAvailabilityHeatmap';
 import type { DataAvailabilityFilters } from '@/pages/ethereum/data-availability/components/DataAvailabilityHeatmap/DataAvailabilityFilterPanel.types';
 import {
@@ -580,7 +580,7 @@ export function IndexPage(): JSX.Element {
 
       {/* Loading state */}
       {isLoading ? (
-        <LoadingContainer />
+        <DataAvailabilitySkeleton />
       ) : (
         <div className="space-y-6">
           {/* Summary stats */}
