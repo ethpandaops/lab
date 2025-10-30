@@ -25,21 +25,26 @@ export const Route = createFileRoute('/ethereum/live')({
         name: 'description',
         content: 'Live visualization of Ethereum beacon chain slots with detailed block and attestation data.',
       },
-      {
-        property: 'og:image',
-        content: '/images/ethereum/live.png',
-      },
+      { property: 'og:url', content: `${import.meta.env.VITE_BASE_URL}/ethereum/live` },
+      { property: 'og:type', content: 'website' },
+      { property: 'og:title', content: `Live | ${import.meta.env.VITE_BASE_TITLE}` },
       {
         property: 'og:description',
         content: 'Live visualization of Ethereum beacon chain slots with detailed block and attestation data.',
       },
       {
-        name: 'twitter:image',
+        property: 'og:image',
         content: '/images/ethereum/live.png',
       },
+      { name: 'twitter:url', content: `${import.meta.env.VITE_BASE_URL}/ethereum/live` },
+      { name: 'twitter:title', content: `Live | ${import.meta.env.VITE_BASE_TITLE}` },
       {
         name: 'twitter:description',
         content: 'Live visualization of Ethereum beacon chain slots with detailed block and attestation data.',
+      },
+      {
+        name: 'twitter:image',
+        content: '/images/ethereum/live.png',
       },
     ],
   }),
