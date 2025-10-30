@@ -23,6 +23,27 @@ initialize({
   },
 });
 
+/**
+ * Storybook Preview Configuration
+ *
+ * ## Router Configuration
+ *
+ * Stories can override the initial router state via `parameters.router`:
+ *
+ * @example
+ * ```tsx
+ * export const WithCustomNetwork: Story = {
+ *   parameters: {
+ *     router: {
+ *       initialUrl: '/',
+ *       initialSearch: { network: 'holesky' },
+ *     },
+ *   },
+ * };
+ * ```
+ *
+ * This allows testing components that depend on URL search params (e.g., network selection).
+ */
 const preview: Preview = {
   loaders: [mswLoader],
   decorators: [
@@ -61,16 +82,33 @@ const preview: Preview = {
         });
       }
 
-      // Create a simple root route that just renders the Story
+      // Allow stories to override initial URL and search params via parameters.router
+      const routerConfig = context.parameters.router || {};
+      const initialUrl = routerConfig.initialUrl || '/';
+      const initialSearch = routerConfig.initialSearch || {};
+
+      // Create a root route that renders the Story inside NetworkProvider
       const rootRoute = createRootRoute({
-        component: () => <Story />,
+        component: () => (
+          <NetworkProvider>
+            <Story />
+          </NetworkProvider>
+        ),
+        // Enable search params validation
+        validateSearch: () => initialSearch,
       });
 
       // Create a router with memory history (no browser URL changes)
+      // Pass initial search params in the URL if provided
+      const searchString =
+        Object.keys(initialSearch).length > 0
+          ? '?' + new URLSearchParams(initialSearch as Record<string, string>).toString()
+          : '';
+
       const router = createRouter({
         routeTree: rootRoute,
         history: createMemoryHistory({
-          initialEntries: ['/'],
+          initialEntries: [initialUrl + searchString],
         }),
       });
 
@@ -78,9 +116,7 @@ const preview: Preview = {
         <QueryClientProvider client={queryClient} key={context.id}>
           <ThemeProvider>
             <ConfigGate>
-              <NetworkProvider>
-                <RouterProvider router={router} />
-              </NetworkProvider>
+              <RouterProvider router={router} />
             </ConfigGate>
           </ThemeProvider>
         </QueryClientProvider>

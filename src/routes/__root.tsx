@@ -1,7 +1,8 @@
 import { type JSX, useState } from 'react';
-import { createRootRouteWithContext, Outlet, HeadContent, Link } from '@tanstack/react-router';
+import { createRootRouteWithContext, Outlet, HeadContent, Link, retainSearchParams } from '@tanstack/react-router';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Bars3Icon } from '@heroicons/react/24/outline';
+import { z } from 'zod';
 import { NetworkProvider } from '@/providers/NetworkProvider';
 import { ThemeProvider } from '@/providers/ThemeProvider';
 import { ConfigGate } from '@/components/Overlays/ConfigGate';
@@ -13,6 +14,13 @@ import type { Bounds } from '@/hooks/useBounds';
 interface MyRouterContext {
   getTitle?: () => string;
 }
+
+// Define search params schema for network selection
+const rootSearchSchema = z.object({
+  network: z.string().optional(),
+});
+
+export type RootSearch = z.infer<typeof rootSearchSchema>;
 
 // Extend Window interface for type safety
 declare global {
@@ -86,6 +94,10 @@ function RootComponent(): JSX.Element {
 }
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({
+  validateSearch: rootSearchSchema,
+  search: {
+    middlewares: [retainSearchParams(['network'])],
+  },
   component: RootComponent,
   head: () => ({
     meta: [

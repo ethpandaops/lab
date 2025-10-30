@@ -48,3 +48,36 @@ export const CustomLabel: Story = {
     label: 'Select Network',
   },
 };
+
+/**
+ * Network selector with Holesky pre-selected via URL params.
+ * This demonstrates how the network parameter can be set in the URL for shareable links.
+ */
+export const WithHoleskySelected: Story = {
+  args: {
+    showLabel: true,
+    label: 'Network',
+  },
+  parameters: {
+    router: {
+      initialUrl: '/',
+      initialSearch: { network: 'holesky' },
+    },
+  },
+};
+
+/**
+ * Network selector with Sepolia pre-selected via URL params.
+ */
+export const WithSepoliaSelected: Story = {
+  args: {
+    showLabel: true,
+    label: 'Network',
+  },
+  parameters: {
+    router: {
+      initialUrl: '/',
+      initialSearch: { network: 'sepolia' },
+    },
+  },
+};
