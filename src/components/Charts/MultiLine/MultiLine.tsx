@@ -434,7 +434,8 @@ export function MultiLineChart({
   };
 
   // Build complete option
-  // Memoize to prevent re-creating on every render (which causes chart to re-animate with notMerge=true)
+  // Memoize based on actual data that should trigger re-animation, not intermediate objects
+  // Use JSON.stringify for deep comparison of complex props
   const option = useMemo(
     () => ({
       animation: true,
@@ -466,12 +467,16 @@ export function MultiLineChart({
     [
       animationDuration,
       themeColors.foreground,
-      gridConfig,
-      xAxisConfig,
-      yAxisConfig,
-      seriesConfig,
-      tooltipConfig,
+      themeColors.border,
+      themeColors.muted,
+      JSON.stringify(series),
+      JSON.stringify(xAxis),
+      JSON.stringify(yAxis),
       enableDataZoom,
+      showLegend,
+      enableSeriesFilter,
+      connectNulls,
+      height,
     ]
   );
 
