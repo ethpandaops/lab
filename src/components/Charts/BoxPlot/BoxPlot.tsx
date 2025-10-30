@@ -263,7 +263,6 @@ export function BoxPlot({
         option={option}
         style={{ height, width: '100%', minHeight: height }}
         notMerge={true}
-        autoResize={false}
         lazyUpdate={false}
       />
     </div>

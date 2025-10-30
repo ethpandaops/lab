@@ -183,7 +183,6 @@ export function GlobeChart({
         style={{ height, width: '100%', minHeight: height }}
         onChartReady={instance => setEchartsInstance(instance)}
         notMerge={true}
-        autoResize={false}
         lazyUpdate={false}
       />
     </div>
