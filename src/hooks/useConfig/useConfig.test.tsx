@@ -41,16 +41,14 @@ describe('useConfig', () => {
         },
       },
     ],
-    experiments: [
+    features: [
       {
-        name: 'live-slots',
-        enabled: true,
-        networks: ['mainnet', 'sepolia'],
+        path: '/ethereum/live',
+        disabled_networks: [],
       },
       {
-        name: 'block-production-flow',
-        enabled: false,
-        networks: ['mainnet'],
+        path: '/ethereum/das-custody',
+        disabled_networks: ['mainnet'],
       },
     ],
   };
@@ -98,7 +96,7 @@ describe('useConfig', () => {
 
       expect(result.current.data).toEqual(mockConfig);
       expect(result.current.data?.networks).toHaveLength(2);
-      expect(result.current.data?.experiments).toHaveLength(2);
+      expect(result.current.data?.features).toHaveLength(2);
       expect(result.current.error).toBeNull();
     });
 
@@ -121,7 +119,7 @@ describe('useConfig', () => {
       expect(result.current.data?.networks[1].name).toBe('sepolia');
     });
 
-    it('should return experiments array', async () => {
+    it('should return features array', async () => {
       vi.mocked(fetch).mockResolvedValueOnce({
         ok: true,
         json: async () => mockConfig,
@@ -135,9 +133,9 @@ describe('useConfig', () => {
         expect(result.current.isSuccess).toBe(true);
       });
 
-      expect(result.current.data?.experiments).toEqual(mockConfig.experiments);
-      expect(result.current.data?.experiments[0].name).toBe('live-slots');
-      expect(result.current.data?.experiments[0].enabled).toBe(true);
+      expect(result.current.data?.features).toEqual(mockConfig.features);
+      expect(result.current.data?.features[0].path).toBe('/ethereum/live');
+      expect(result.current.data?.features[0].disabled_networks).toEqual([]);
     });
 
     it('should fetch from correct endpoint', async () => {
@@ -370,7 +368,7 @@ describe('useConfig', () => {
     it('should handle empty networks array', async () => {
       const emptyConfig: Config = {
         networks: [],
-        experiments: [],
+        features: [],
       };
 
       vi.mocked(fetch).mockResolvedValueOnce({
@@ -387,7 +385,7 @@ describe('useConfig', () => {
       });
 
       expect(result.current.data?.networks).toEqual([]);
-      expect(result.current.data?.experiments).toEqual([]);
+      expect(result.current.data?.features).toEqual([]);
     });
 
     it('should handle network with complete fork data', async () => {
@@ -419,7 +417,7 @@ describe('useConfig', () => {
             },
           },
         ],
-        experiments: [],
+        features: [],
       };
 
       vi.mocked(fetch).mockResolvedValueOnce({
@@ -442,7 +440,7 @@ describe('useConfig', () => {
       expect(network?.forks.consensus.fusaka?.epoch).toBe(67890);
     });
 
-    it('should handle experiments with different enabled states', async () => {
+    it('should handle features with different disabled network configurations', async () => {
       vi.mocked(fetch).mockResolvedValueOnce({
         ok: true,
         json: async () => mockConfig,
@@ -456,9 +454,9 @@ describe('useConfig', () => {
         expect(result.current.isSuccess).toBe(true);
       });
 
-      const experiments = result.current.data?.experiments;
-      expect(experiments?.find(e => e.name === 'live-slots')?.enabled).toBe(true);
-      expect(experiments?.find(e => e.name === 'block-production-flow')?.enabled).toBe(false);
+      const features = result.current.data?.features;
+      expect(features?.find(f => f.path === '/ethereum/live')?.disabled_networks).toEqual([]);
+      expect(features?.find(f => f.path === '/ethereum/das-custody')?.disabled_networks).toEqual(['mainnet']);
     });
   });
 
