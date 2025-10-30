@@ -172,13 +172,12 @@ export function useEpochsData(): UseEpochsDataReturn {
       });
     });
 
-    // Convert to array format, filtering out entities with <= 5 missed attestations per epoch
+    // Convert to array format - include all missed attestations
+    // Chart component will handle filtering for top N entities by total sum
     const missedAttestationsByEntity: MissedAttestationByEntity[] = [];
     entityMap.forEach((epochMap, entity) => {
       epochMap.forEach((count, epoch) => {
-        if (count > 5) {
-          missedAttestationsByEntity.push({ entity, epoch, count });
-        }
+        missedAttestationsByEntity.push({ entity, epoch, count });
       });
     });
 

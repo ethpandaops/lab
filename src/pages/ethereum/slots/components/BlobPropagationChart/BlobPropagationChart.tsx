@@ -2,7 +2,7 @@ import { type JSX, useMemo } from 'react';
 import { PopoutCard } from '@/components/Layout/PopoutCard';
 import { BoxPlot, calculateBoxPlotStats } from '@/components/Charts/BoxPlot';
 import type { BoxPlotData, BoxPlotDataItem } from '@/components/Charts/BoxPlot';
-import { CHART_CATEGORICAL_COLORS } from '@/theme/data-visualization-colors';
+import { getDataVizColors } from '@/utils/dataVizColors';
 import type { BlobPropagationChartProps } from './BlobPropagationChart.types';
 
 /**
@@ -23,6 +23,8 @@ import type { BlobPropagationChartProps } from './BlobPropagationChart.types';
  * ```
  */
 export function BlobPropagationChart({ blobPropagationData }: BlobPropagationChartProps): JSX.Element {
+  const { CHART_CATEGORICAL_COLORS } = getDataVizColors();
+
   // Process data into box plot format (single series with multiple data points)
   const { boxPlotSeries, categories } = useMemo(() => {
     if (blobPropagationData.length === 0) {
@@ -75,7 +77,7 @@ export function BlobPropagationChart({ blobPropagationData }: BlobPropagationCha
     ];
 
     return { boxPlotSeries: series, categories: cats };
-  }, [blobPropagationData]);
+  }, [blobPropagationData, CHART_CATEGORICAL_COLORS]);
 
   // Calculate statistics for header
   const { blobCount, medianPropagationTime, totalObservations } = useMemo(() => {

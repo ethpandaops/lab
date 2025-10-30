@@ -1,7 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useEffect, useState } from 'react';
-import { BLOB_COLORS, CONTINENT_COLORS } from '@/theme/data-visualization-colors';
+import { getDataVizColors } from '@/utils/dataVizColors';
 import { BlobDataAvailability } from './BlobDataAvailability';
+
+const { BLOB_COLORS, CONTINENT_COLORS } = getDataVizColors();
 
 const meta: Meta<typeof BlobDataAvailability> = {
   title: 'Pages/Ethereum/SlotView/BlobDataAvailability',

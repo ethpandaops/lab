@@ -1,4 +1,4 @@
-import type { JSX } from 'react';
+import React, { type JSX } from 'react';
 import { useMemo } from 'react';
 import clsx from 'clsx';
 import type { SlotProgressTimelineProps, PhaseData } from './SlotProgressTimeline.types';
@@ -164,9 +164,9 @@ export function SlotProgressTimeline({
               mode === 'live' && connectionProgress[index] > 0 && connectionProgress[index] < 100;
 
             return (
-              <>
+              <React.Fragment key={phase.id}>
                 {/* Phase node */}
-                <div key={phase.id} className="shrink-0">
+                <div className="shrink-0">
                   <PhaseNode
                     phase={phase}
                     status={status}
@@ -177,7 +177,7 @@ export function SlotProgressTimeline({
 
                 {/* Connection to next phase */}
                 {hasConnection && (
-                  <div key={`connection-${phase.id}`} className="mx-4 flex-1">
+                  <div className="mx-4 flex-1">
                     <PhaseConnection
                       progress={connectionProgress[index]}
                       orientation="horizontal"
@@ -185,7 +185,7 @@ export function SlotProgressTimeline({
                     />
                   </div>
                 )}
-              </>
+              </React.Fragment>
             );
           })}
         </div>

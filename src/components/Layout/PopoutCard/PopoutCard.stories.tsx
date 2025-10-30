@@ -300,3 +300,215 @@ export const ComplexContent: Story = {
     ),
   },
 };
+
+/**
+ * PopoutCard with modal-only subtitle
+ * The modalSubtitle appears only when the card is expanded
+ */
+export const WithModalSubtitle: Story = {
+  args: {
+    title: 'Validator Performance',
+    subtitle: 'Last 24 hours',
+    modalSubtitle: 'Detailed metrics with historical comparison',
+    children: (
+      <BarChart
+        data={[85, 92, 88, 95, 90, 93, 87]}
+        labels={['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']}
+        height={300}
+      />
+    ),
+  },
+};
+
+/**
+ * PopoutCard with modal-only description
+ * The modalDescription provides additional context only in the expanded view
+ */
+export const WithModalDescription: Story = {
+  args: {
+    title: 'Network Health Score',
+    subtitle: 'Current status',
+    modalDescription:
+      'This score is calculated based on multiple factors including block propagation time, attestation effectiveness, and peer connectivity. A score above 90 indicates excellent network health.',
+    children: (
+      <div className="flex items-center justify-center py-8">
+        <div className="text-center">
+          <p className="text-6xl font-bold text-success">94.2</p>
+          <p className="mt-2 text-sm text-muted">Excellent</p>
+        </div>
+      </div>
+    ),
+  },
+};
+
+/**
+ * PopoutCard with both modal subtitle and description
+ * Demonstrates combining multiple modal-only text props
+ */
+export const WithModalSubtitleAndDescription: Story = {
+  args: {
+    title: 'Block Production Rate',
+    subtitle: 'Past 7 days',
+    modalSubtitle: 'Including missed slots and orphaned blocks',
+    modalDescription:
+      'This chart shows the daily block production rate across all validators. The target rate is 7200 blocks per day (one block every 12 seconds). Deviations may indicate network issues or validator problems.',
+    children: (
+      <LineChart
+        data={[7180, 7195, 7202, 7188, 7199, 7205, 7192]}
+        labels={['Day 1', 'Day 2', 'Day 3', 'Day 4', 'Day 5', 'Day 6', 'Day 7']}
+        height={300}
+        showArea
+      />
+    ),
+  },
+};
+
+/**
+ * PopoutCard with modal description and table
+ * Shows how modal-only content works with non-chart content
+ */
+export const WithModalDescriptionAndTable: Story = {
+  args: {
+    title: 'Top Validators',
+    subtitle: 'By effectiveness',
+    modalSubtitle: 'Updated every 15 minutes',
+    modalDescription:
+      'Validator effectiveness is measured by successful attestations, block proposals, and sync committee participation. Higher percentages indicate better performance.',
+    children: (
+      <div className="overflow-x-auto">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="border-b border-border">
+              <th className="pb-3 text-left font-semibold text-foreground">Rank</th>
+              <th className="pb-3 text-left font-semibold text-foreground">Validator</th>
+              <th className="pb-3 text-right font-semibold text-foreground">Effectiveness</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-border">
+            <tr>
+              <td className="py-3 text-muted">1</td>
+              <td className="py-3 font-mono text-xs text-foreground">0x1234...5678</td>
+              <td className="py-3 text-right font-semibold text-success">99.8%</td>
+            </tr>
+            <tr>
+              <td className="py-3 text-muted">2</td>
+              <td className="py-3 font-mono text-xs text-foreground">0x8765...4321</td>
+              <td className="py-3 text-right font-semibold text-success">99.6%</td>
+            </tr>
+            <tr>
+              <td className="py-3 text-muted">3</td>
+              <td className="py-3 font-mono text-xs text-foreground">0xabcd...efgh</td>
+              <td className="py-3 text-right font-semibold text-success">99.5%</td>
+            </tr>
+            <tr>
+              <td className="py-3 text-muted">4</td>
+              <td className="py-3 font-mono text-xs text-foreground">0xfedc...hgba</td>
+              <td className="py-3 text-right font-semibold text-success">99.3%</td>
+            </tr>
+            <tr>
+              <td className="py-3 text-muted">5</td>
+              <td className="py-3 font-mono text-xs text-foreground">0x9876...0123</td>
+              <td className="py-3 text-right font-semibold text-success">99.1%</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    ),
+  },
+};
+
+/**
+ * PopoutCard with description positioned below content (default)
+ * Content is immediately visible, description provides supplementary context
+ */
+export const DescriptionBelowContent: Story = {
+  args: {
+    title: 'Attestation Success Rate',
+    subtitle: 'Last 100 epochs',
+    modalSubtitle: 'Aggregated across all validators',
+    modalDescription:
+      'This metric represents the percentage of attestations that were successfully included in blocks. A high rate (>95%) indicates healthy validator performance and network conditions.',
+    modalDescriptionPosition: 'below',
+    children: (
+      <LineChart
+        data={[96.2, 97.1, 96.8, 97.5, 96.9, 97.8, 97.2, 96.5, 97.9, 98.1]}
+        labels={['E1', 'E2', 'E3', 'E4', 'E5', 'E6', 'E7', 'E8', 'E9', 'E10']}
+        height={300}
+        showArea
+      />
+    ),
+  },
+};
+
+/**
+ * PopoutCard with description positioned above content
+ * Use when context is critical for understanding the data
+ */
+export const DescriptionAboveContent: Story = {
+  args: {
+    title: 'Sync Committee Participation',
+    subtitle: 'Current period',
+    modalSubtitle: 'Performance breakdown',
+    modalDescription:
+      'IMPORTANT: This chart shows participation in the current sync committee period. The target is 512 validators. Lower participation may indicate network issues or validator misconfigurations that need immediate attention.',
+    modalDescriptionPosition: 'above',
+    children: (
+      <BarChart
+        data={[
+          { value: 512, color: '#10b981' },
+          { value: 508, color: '#10b981' },
+          { value: 495, color: '#f59e0b' },
+          { value: 510, color: '#10b981' },
+          { value: 485, color: '#ef4444' },
+          { value: 512, color: '#10b981' },
+          { value: 509, color: '#10b981' },
+        ]}
+        labels={['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']}
+        height={300}
+      />
+    ),
+  },
+};
+
+/**
+ * Comparison of description positions
+ * Shows both above and below in a grid for easy comparison
+ */
+export const PositionComparison: Story = {
+  decorators: [
+    Story => (
+      <div className="min-w-[1200px] rounded-sm bg-surface p-6">
+        <Story />
+      </div>
+    ),
+  ],
+  render: () => (
+    <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+      <PopoutCard
+        title="Description Below (Default)"
+        subtitle="Click to expand"
+        modalDescription="This description appears below the chart, so you see the data first. Best for general use cases where the chart is self-explanatory."
+        modalDescriptionPosition="below"
+      >
+        <BarChart
+          data={[120, 200, 150, 80, 70, 110]}
+          labels={['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun']}
+          height={250}
+        />
+      </PopoutCard>
+
+      <PopoutCard
+        title="Description Above"
+        subtitle="Click to expand"
+        modalDescription="This description appears above the chart to provide critical context before viewing the data. Use when understanding the methodology is important."
+        modalDescriptionPosition="above"
+      >
+        <BarChart
+          data={[120, 200, 150, 80, 70, 110]}
+          labels={['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun']}
+          height={250}
+        />
+      </PopoutCard>
+    </div>
+  ),
+};

@@ -41,6 +41,12 @@ export interface SeriesData {
    */
   showArea?: boolean;
   /**
+   * Opacity of the area fill (0-1)
+   * If not specified, uses a gradient from 0.5 to 0.06
+   * @default undefined (gradient)
+   */
+  areaOpacity?: number;
+  /**
    * Show symbols (dots) on data points
    * @default false
    */
@@ -120,9 +126,23 @@ export interface YAxisConfig {
    */
   max?: number | 'dataMax';
   /**
+   * Minimum interval between axis labels (ensures integer-only ticks for count data)
+   * @example 1 // For count data - prevents fractional values like 3.5
+   */
+  minInterval?: number;
+  /**
    * Value formatter function
    */
   formatter?: (value: number) => string;
+  /**
+   * Maximum decimal places for smart formatting in tooltips
+   * Defaults to 2 if no custom tooltipFormatter is provided
+   * Tooltips will show decimals only when needed (e.g., 100 instead of 100.00)
+   * Set to undefined to disable automatic smart formatting
+   * @default 2 (when no custom tooltipFormatter)
+   * @example 2 // Shows "99.5" or "100" instead of "99.50" or "100.00"
+   */
+  valueDecimals?: number;
 }
 
 /**

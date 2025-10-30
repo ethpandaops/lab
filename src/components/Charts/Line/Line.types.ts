@@ -83,12 +83,10 @@ export interface LineChartProps {
    * Set to false for better performance when updating frequently
    * @default false
    */
-  notMerge?: boolean;
   /**
    * Whether to defer chart updates to next animation frame for better performance
    * @default true
    */
-  lazyUpdate?: boolean;
   /**
    * X-axis label display interval (0 = all labels, 1 = every other, 2 = every third, etc.)
    * Set to 'auto' to let ECharts calculate automatically

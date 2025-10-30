@@ -11,7 +11,7 @@ import {
   LegendComponent,
 } from 'echarts/components';
 import { CanvasRenderer } from 'echarts/renderers';
-import { hexToRgba } from '@/utils';
+import { hexToRgba, formatSmartDecimal, getDataVizColors, resolveCssColorToHex } from '@/utils';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { Disclosure } from '@/components/Layout/Disclosure';
 import type { MultiLineChartProps } from './MultiLine.types';
@@ -26,20 +26,6 @@ echarts.use([
   LegendComponent,
   CanvasRenderer,
 ]);
-
-// Stable color palette for series visualization (used as fallback)
-const SERIES_COLORS = [
-  '#10b981', // green
-  '#f59e0b', // amber
-  '#8b5cf6', // purple
-  '#ec4899', // pink
-  '#06b6d4', // cyan
-  '#3b82f6', // blue
-  '#ef4444', // red
-  '#14b8a6', // teal
-  '#f43f5e', // rose
-  '#84cc16', // lime
-] as const;
 
 /**
  * MultiLineChart - A flexible multi-series line chart component using ECharts
@@ -96,9 +82,17 @@ export function MultiLineChart({
   enableSeriesFilter = false,
 }: MultiLineChartProps): React.JSX.Element {
   const themeColors = useThemeColors();
+  const { CHART_CATEGORICAL_COLORS } = getDataVizColors();
 
-  // Build extended palette: custom palette or theme colors + stable colors
-  const extendedPalette = colorPalette || [themeColors.primary, ...SERIES_COLORS];
+  // Convert OKLCH colors (from Tailwind v4) to hex format for ECharts compatibility
+  const convertedColorPalette = colorPalette?.map(color => resolveCssColorToHex(color));
+
+  // Build extended palette: custom palette or theme colors + data viz categorical colors
+  const extendedPalette = convertedColorPalette || [
+    themeColors.primary,
+    themeColors.accent,
+    ...CHART_CATEGORICAL_COLORS,
+  ];
 
   // Manage aggregate series visibility
   const [showAggregate, setShowAggregate] = useState(false);
@@ -266,6 +260,7 @@ export function MultiLineChart({
     },
     min: yAxis?.min,
     max: yAxis?.max,
+    minInterval: yAxis?.minInterval,
   };
 
   // Build series configuration
@@ -299,23 +294,26 @@ export function MultiLineChart({
         return {
           ...baseConfig,
           areaStyle: {
-            color: {
-              type: 'linear' as const,
-              x: 0,
-              y: 0,
-              x2: 0,
-              y2: 1,
-              colorStops: [
-                {
-                  offset: 0,
-                  color: hexToRgba(seriesColor, 0.5),
-                },
-                {
-                  offset: 1,
-                  color: hexToRgba(seriesColor, 0.06),
-                },
-              ],
-            },
+            color:
+              s.areaOpacity !== undefined
+                ? hexToRgba(seriesColor, s.areaOpacity)
+                : {
+                    type: 'linear' as const,
+                    x: 0,
+                    y: 0,
+                    x2: 0,
+                    y2: 1,
+                    colorStops: [
+                      {
+                        offset: 0,
+                        color: hexToRgba(seriesColor, 0.5),
+                      },
+                      {
+                        offset: 1,
+                        color: hexToRgba(seriesColor, 0.06),
+                      },
+                    ],
+                  },
           },
         };
       }
@@ -325,14 +323,68 @@ export function MultiLineChart({
 
   // Calculate grid padding
   // Title is always rendered by component, never by ECharts
-  // containLabel: true adds padding for tick labels, but axis names need explicit space
+  // ECharts v6: outerBounds adds padding for tick labels, axis names need explicit space
   const gridConfig = {
     top: grid?.top ?? 16,
     right: grid?.right,
     bottom: grid?.bottom ?? (xAxis.name ? 30 : 24),
     left: grid?.left ?? (yAxis?.name ? 30 : 8),
-    containLabel: true,
+    // ECharts v6: use outerBounds instead of deprecated containLabel
+    outerBoundsMode: 'same' as const,
+    outerBoundsContain: 'axisLabel' as const,
   };
+
+  // Create default smart tooltip formatter
+  // Auto-enable if valueDecimals is set OR if no custom formatter is provided
+  const effectiveValueDecimals = yAxis?.valueDecimals ?? (tooltipFormatter ? undefined : 2);
+  const defaultTooltipFormatter =
+    !tooltipFormatter && effectiveValueDecimals !== undefined
+      ? (params: unknown): string => {
+          // ECharts passes array for 'axis' trigger, single object for 'item' trigger
+          const dataPoints = Array.isArray(params) ? params : [params];
+
+          // Build tooltip HTML
+          let html = '';
+
+          // Add x-axis label (first item's axis value)
+          // For numeric x-axis, format as integer to avoid decimals like "9876543.5"
+          if (dataPoints.length > 0 && dataPoints[0]) {
+            const firstPoint = dataPoints[0] as { axisValue?: string | number };
+            if (firstPoint.axisValue !== undefined) {
+              const axisLabel =
+                typeof firstPoint.axisValue === 'number'
+                  ? formatSmartDecimal(firstPoint.axisValue, 0) // 0 decimals = integers only
+                  : firstPoint.axisValue;
+              html += `<div style="margin-bottom: 4px; font-weight: 600;">${axisLabel}</div>`;
+            }
+          }
+
+          // Add each series - apply smart decimal formatting to y values
+          dataPoints.forEach(point => {
+            const p = point as {
+              marker?: string;
+              seriesName?: string;
+              value?: number | [number, number];
+            };
+
+            if (p.marker && p.seriesName !== undefined) {
+              // Extract y value
+              const yValue = Array.isArray(p.value) ? p.value[1] : p.value;
+
+              if (yValue !== undefined && yValue !== null) {
+                const formattedValue = formatSmartDecimal(yValue, effectiveValueDecimals);
+                html += `<div style="display: flex; align-items: center; gap: 8px;">`;
+                html += p.marker;
+                html += `<span>${p.seriesName}:</span>`;
+                html += `<span style="font-weight: 600; margin-left: auto;">${formattedValue}</span>`;
+                html += `</div>`;
+              }
+            }
+          });
+
+          return html;
+        }
+      : undefined;
 
   // Build tooltip configuration
   const tooltipConfig = {
@@ -354,7 +406,7 @@ export function MultiLineChart({
             },
           }
         : undefined,
-    formatter: tooltipFormatter,
+    formatter: tooltipFormatter || defaultTooltipFormatter,
     appendToBody: true, // Render tooltip in document body to prevent container clipping
   };
 

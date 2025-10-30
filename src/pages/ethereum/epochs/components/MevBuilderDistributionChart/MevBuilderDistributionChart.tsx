@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 
 import { BarChart } from '@/components/Charts/Bar';
 import { PopoutCard } from '@/components/Layout/PopoutCard';
-import { CHART_CATEGORICAL_COLORS } from '@/theme/data-visualization-colors';
+import { getDataVizColors } from '@/utils/dataVizColors';
 
 import type { MevBuilderDistributionChartProps } from './MevBuilderDistributionChart.types';
 
@@ -12,6 +12,8 @@ import type { MevBuilderDistributionChartProps } from './MevBuilderDistributionC
  * Displays top builders by block count in the epoch
  */
 export function MevBuilderDistributionChart({ data, anchorId }: MevBuilderDistributionChartProps): React.JSX.Element {
+  const { CHART_CATEGORICAL_COLORS } = getDataVizColors();
+
   const { builders, chartData } = useMemo(() => {
     // Count slots per builder
     const builderCounts = new Map<string, number>();
@@ -34,7 +36,7 @@ export function MevBuilderDistributionChart({ data, anchorId }: MevBuilderDistri
         color: CHART_CATEGORICAL_COLORS[index % CHART_CATEGORICAL_COLORS.length],
       })),
     };
-  }, [data]);
+  }, [data, CHART_CATEGORICAL_COLORS]);
 
   return (
     <PopoutCard

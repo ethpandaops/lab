@@ -24,6 +24,7 @@ pnpm storybook
 - heroicons v2
 - headlessui v2
 - storybook v9
+- vitest v4
 - react-hook-form v7
 - echarts v6
 - echarts-for-react v3
