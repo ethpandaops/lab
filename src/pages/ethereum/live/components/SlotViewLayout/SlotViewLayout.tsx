@@ -1,6 +1,5 @@
 import { type JSX, useMemo, useState, useEffect, useRef, useCallback } from 'react';
 import { useSlotPlayerState, useSlotPlayerProgress, useSlotPlayerActions } from '@/hooks/useSlotPlayer';
-import { useThemeColors } from '@/hooks/useThemeColors';
 import { Map2DChart } from '@/components/Charts/Map2D';
 import { Sidebar } from '../Sidebar';
 import { BlockDetailsCard } from '../BlockDetailsCard';
@@ -29,39 +28,12 @@ export function SlotViewLayout({ mode }: SlotViewLayoutProps): JSX.Element {
   const { currentSlot, isPlaying } = useSlotPlayerState();
   const { slotProgress } = useSlotPlayerProgress();
   const actions = useSlotPlayerActions();
-  const themeColors = useThemeColors();
 
   // Memoize the onTimeClick handler to prevent Sidebar re-renders
   const handleTimeClick = useCallback((timeMs: number) => actions.seekToTime(timeMs), [actions]);
 
-  // Throttle currentTime updates to 10fps (100ms) for better performance
-  // This reduces React re-renders significantly while still looking smooth
-  const [currentTime, setCurrentTime] = useState(slotProgress);
-  const rafRef = useRef<number | null>(null);
-  const slotProgressRef = useRef(slotProgress);
-  const lastUpdateTimeRef = useRef(0);
-
-  // Keep ref up to date
-  slotProgressRef.current = slotProgress;
-
-  useEffect(() => {
-    const updateCurrentTime = (timestamp: number): void => {
-      // Only update state every 100ms (10fps) to reduce React re-renders
-      if (timestamp - lastUpdateTimeRef.current >= 100) {
-        setCurrentTime(slotProgressRef.current);
-        lastUpdateTimeRef.current = timestamp;
-      }
-      rafRef.current = requestAnimationFrame(updateCurrentTime);
-    };
-
-    rafRef.current = requestAnimationFrame(updateCurrentTime);
-
-    return () => {
-      if (rafRef.current !== null) {
-        cancelAnimationFrame(rafRef.current);
-      }
-    };
-  }, []);
+  // Use slotProgress directly without throttling
+  const currentTime = slotProgress;
 
   // Fetch all slot data
   const slotData = useSlotViewData(currentSlot);
@@ -226,7 +198,6 @@ export function SlotViewLayout({ mode }: SlotViewLayoutProps): JSX.Element {
                 points={timeFilteredData.visibleMapPoints}
                 height="100%"
                 pointSizeMultiplier={1.2}
-                pointColor={themeColors.auroraCyan}
                 resetKey={currentSlot}
               />
             </div>

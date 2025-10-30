@@ -30,7 +30,7 @@ export function Map2DChart({
   lineColor,
   pointColor,
   pointSizeMultiplier = 2.5,
-  mapColor,
+  mapColor: _mapColor,
   roam = true,
   animationDuration = 300,
   resetKey,
@@ -87,8 +87,13 @@ export function Map2DChart({
     }
 
     // Add all current points to the set of seen points (accumulate over time)
+    // Filter out points without valid coordinates
     let hasNewPoints = false;
     points.forEach(point => {
+      // Skip points without valid coordinates
+      if (!point.coords || point.coords.length < 2 || point.coords[0] == null || point.coords[1] == null) {
+        return;
+      }
       const key = `${point.coords[0]},${point.coords[1]}`;
       if (!allSeenPointsRef.current.has(key)) {
         allSeenPointsRef.current.set(key, point);
@@ -168,8 +173,6 @@ export function Map2DChart({
   // Prepare initial options - only calculated once on mount
   // We update data via setOption in useEffect, so option should never recalculate
   const option = useMemo(() => {
-    const isDark = theme === 'dark' || theme === 'star';
-
     const series: Array<Record<string, unknown>> = [];
 
     // Add routes series (lines) if there are routes
@@ -257,7 +260,7 @@ export function Map2DChart({
       tooltip: {
         show: true,
         trigger: 'item',
-        backgroundColor: isDark ? 'rgba(0, 0, 0, 0.8)' : 'rgba(255, 255, 255, 0.9)',
+        backgroundColor: `${themeColors.surface}f0`, // f0 = ~94% opacity in hex
         borderColor: themeColors.border,
         borderWidth: 1,
         textStyle: {
@@ -299,13 +302,13 @@ export function Map2DChart({
         center: [20, 20], // Center slightly towards Europe
         zoom: 1.2, // Balanced zoom level
         itemStyle: {
-          areaColor: isDark ? 'rgba(100, 100, 100, 0.15)' : 'rgba(200, 200, 200, 0.2)',
-          borderColor: isDark ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.12)',
+          areaColor: `${themeColors.muted}15`, // 15 = ~8% opacity in hex
+          borderColor: `${themeColors.border}30`, // 30 = ~19% opacity in hex
           borderWidth: 0.5,
         },
         emphasis: {
           itemStyle: {
-            areaColor: isDark ? 'rgba(120, 120, 120, 0.25)' : 'rgba(180, 180, 180, 0.3)',
+            areaColor: `${themeColors.muted}30`, // Slightly more visible on hover
           },
           label: {
             show: false,
@@ -316,10 +319,17 @@ export function Map2DChart({
       },
       series,
     };
-    // Only recalculate when map loads or theme changes (not on themeColors object ref)
-    // themeColors is derived from theme, so we only need theme as a dependency
+    // Depend on the actual color values (primitives) to avoid stale theme colors
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mapLoaded, theme]);
+  }, [
+    mapLoaded,
+    theme,
+    themeColors.primary,
+    themeColors.muted,
+    themeColors.accent,
+    themeColors.foreground,
+    themeColors.border,
+  ]);
 
   // Don't render until map is loaded
   if (!mapLoaded) {
