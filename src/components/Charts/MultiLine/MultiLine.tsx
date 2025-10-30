@@ -607,6 +607,7 @@ export function MultiLineChart({
           option={option}
           style={{ height, width: '100%', minHeight: height, pointerEvents: 'auto' }}
           notMerge={true}
+          autoResize={false}
           opts={{ renderer: 'canvas' }}
         />
       </div>
