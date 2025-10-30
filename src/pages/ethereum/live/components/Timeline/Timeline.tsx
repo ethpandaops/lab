@@ -86,7 +86,16 @@ function TimelineComponent({
         showTimeCutovers={true}
         ariaLabel={ariaLabel}
         height={48}
-        onTimeClick={onTimeClick}
+        onTimeClick={time => {
+          // Pause playback if currently playing
+          if (isPlaying && onPlayPause) {
+            onPlayPause();
+          }
+          // Seek to the clicked/dragged time
+          if (onTimeClick) {
+            onTimeClick(time);
+          }
+        }}
       />
     </div>
   );
