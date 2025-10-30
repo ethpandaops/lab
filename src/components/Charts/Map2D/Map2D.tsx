@@ -45,10 +45,12 @@ export function Map2DChart({
   // Use refs for values that are used in the effect but shouldn't trigger re-renders
   const pointColorRef = useRef(pointColor || themeColors.primary);
   const pointSizeMultiplierRef = useRef(pointSizeMultiplier);
+  const foregroundColorRef = useRef(themeColors.foreground);
 
   // Update refs when props change
   pointColorRef.current = pointColor || themeColors.primary;
   pointSizeMultiplierRef.current = pointSizeMultiplier;
+  foregroundColorRef.current = themeColors.foreground;
 
   // Load and register world map on mount
   useEffect(() => {
@@ -113,42 +115,52 @@ export function Map2DChart({
 
       if (scatterSeriesIndex !== -1) {
         // Rebuild complete scatter series with new data
-        chart.setOption({
-          series: [
-            {
-              type: 'scatter',
-              coordinateSystem: 'geo',
-              zlevel: 3,
-              symbol: 'circle',
-              symbolSize: (value: number[]) => {
-                const pointValue = value[2] || 1;
-                const baseSize = 8;
-                const maxSize = 30;
-                const size = Math.min(maxSize, baseSize + Math.log(pointValue + 1) * 3);
-                return size * pointSizeMultiplierRef.current;
-              },
-              itemStyle: {
-                color: pointColorRef.current,
-                opacity: 0.8,
-                shadowBlur: 10,
-                shadowColor: pointColorRef.current,
-              },
-              emphasis: {
-                scale: true,
-                itemStyle: {
-                  opacity: 1,
-                  shadowBlur: 20,
+        chart.setOption(
+          {
+            series: [
+              {
+                type: 'scatter',
+                coordinateSystem: 'geo',
+                zlevel: 3,
+                symbol: 'circle',
+                symbolSize: (value: number[]) => {
+                  const pointValue = value[2] || 1;
+                  const baseSize = 3;
+                  const maxSize = 7;
+                  const size = Math.min(maxSize, baseSize + Math.log(pointValue + 1) * 0.8);
+                  return size * pointSizeMultiplierRef.current;
                 },
+                itemStyle: {
+                  color: pointColorRef.current,
+                  opacity: 0.85,
+                  shadowBlur: 3,
+                  shadowColor: pointColorRef.current,
+                  shadowOffsetX: 0,
+                  shadowOffsetY: 0,
+                  borderWidth: 0,
+                  borderColor: 'transparent',
+                },
+                emphasis: {
+                  scale: 1.4,
+                  focus: 'self',
+                  itemStyle: {
+                    opacity: 0.95,
+                    shadowBlur: 6,
+                    borderWidth: 1,
+                    borderColor: foregroundColorRef.current,
+                  },
+                },
+                data: pointData,
+                large: true,
+                largeThreshold: 1000,
+                progressive: 500,
+                progressiveThreshold: 1000,
+                animation: false,
               },
-              data: pointData,
-              large: true,
-              largeThreshold: 1000,
-              progressive: 500,
-              progressiveThreshold: 1000,
-              animation: false,
-            }
-          ]
-        }, { replaceMerge: ['series'] });
+            ],
+          },
+          { replaceMerge: ['series'] }
+        );
       }
     }
   }, [points, mapLoaded, resetKey]);
@@ -202,23 +214,30 @@ export function Map2DChart({
       symbolSize: (value: number[]) => {
         // Scale point size based on value (index 2 is the value)
         const pointValue = value[2] || 1;
-        // Use a fixed multiplier since we don't know min/max initially
-        const baseSize = 8;
-        const maxSize = 30;
-        const size = Math.min(maxSize, baseSize + Math.log(pointValue + 1) * 3);
+        // Small, clean node sizes following best practices
+        const baseSize = 3;
+        const maxSize = 7;
+        const size = Math.min(maxSize, baseSize + Math.log(pointValue + 1) * 0.8);
         return size * pointSizeMultiplier;
       },
       itemStyle: {
         color: pointColor || themeColors.primary,
-        opacity: 0.8,
-        shadowBlur: 10,
+        opacity: 0.85,
+        shadowBlur: 3,
         shadowColor: pointColor || themeColors.primary,
+        shadowOffsetX: 0,
+        shadowOffsetY: 0,
+        borderWidth: 0,
+        borderColor: 'transparent',
       },
       emphasis: {
-        scale: true,
+        scale: 1.4,
+        focus: 'self',
         itemStyle: {
-          opacity: 1,
-          shadowBlur: 20,
+          opacity: 0.95,
+          shadowBlur: 6,
+          borderWidth: 1,
+          borderColor: themeColors.foreground,
         },
       },
       data: [], // Start empty, will be populated by effect
@@ -277,14 +296,16 @@ export function Map2DChart({
         map: 'world',
         roam: roam,
         silent: false,
+        center: [20, 20], // Center slightly towards Europe
+        zoom: 1.2, // Balanced zoom level
         itemStyle: {
-          areaColor: mapColor || themeColors.muted,
-          borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
+          areaColor: isDark ? 'rgba(100, 100, 100, 0.15)' : 'rgba(200, 200, 200, 0.2)',
+          borderColor: isDark ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.12)',
           borderWidth: 0.5,
         },
         emphasis: {
           itemStyle: {
-            areaColor: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)',
+            areaColor: isDark ? 'rgba(120, 120, 120, 0.25)' : 'rgba(180, 180, 180, 0.3)',
           },
           label: {
             show: false,

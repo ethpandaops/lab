@@ -130,7 +130,8 @@ export function SlotViewLayout({ mode }: SlotViewLayoutProps): JSX.Element {
 
     // Only update map points if index changed
     if (mapIndex !== mapIndexRef.current) {
-      visibleMapPointsRef.current = mapIndex === sortedMapPoints.length ? sortedMapPoints : sortedMapPoints.slice(0, mapIndex);
+      visibleMapPointsRef.current =
+        mapIndex === sortedMapPoints.length ? sortedMapPoints : sortedMapPoints.slice(0, mapIndex);
       mapIndexRef.current = mapIndex;
     }
 
@@ -222,7 +223,7 @@ export function SlotViewLayout({ mode }: SlotViewLayoutProps): JSX.Element {
               <Map2DChart
                 points={timeFilteredData.visibleMapPoints}
                 height="100%"
-                pointSizeMultiplier={1.5}
+                pointSizeMultiplier={1.2}
                 resetKey={currentSlot}
               />
             </div>

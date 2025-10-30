@@ -28,6 +28,12 @@ export interface ThemeColors {
   success: string;
   warning: string;
   danger: string;
+
+  // Aurora colors - vibrant visualization colors
+  auroraCyan: string;
+  auroraGreen: string;
+  auroraPurple: string;
+  auroraPink: string;
 }
 
 /**
@@ -46,6 +52,10 @@ export const LIGHT_COLORS: ThemeColors = {
   success: '#22c55e', // green-500
   warning: '#f59e0b', // amber-500
   danger: '#ef4444', // red-500
+  auroraCyan: '#00b8b8', // aurora-cyan-600 (darker for light mode)
+  auroraGreen: '#00b366', // aurora-green-700 (darker for light mode)
+  auroraPurple: '#8000ff', // aurora-purple-600
+  auroraPink: '#e600a3', // aurora-pink-600 (darker for light mode)
 };
 
 /**
@@ -64,6 +74,10 @@ export const DARK_COLORS: ThemeColors = {
   success: '#22c55e', // green-500
   warning: '#f59e0b', // amber-500
   danger: '#ef4444', // red-500
+  auroraCyan: '#1af7f7', // aurora-cyan-400 (bright for dark mode)
+  auroraGreen: '#00ff99', // aurora-green-400 (bright for dark mode)
+  auroraPurple: '#a94dff', // aurora-purple-400 (bright for dark mode)
+  auroraPink: '#ff4dc4', // aurora-pink-400 (bright for dark mode)
 };
 
 /**
@@ -82,4 +96,8 @@ export const STAR_COLORS: ThemeColors = {
   success: '#22c55e', // green-500
   warning: '#f59e0b', // amber-500
   danger: '#ef4444', // red-500
+  auroraCyan: '#1af7f7', // aurora-cyan-400
+  auroraGreen: '#00ff99', // aurora-green-400
+  auroraPurple: '#a94dff', // aurora-purple-400
+  auroraPink: '#ff4dc4', // aurora-pink-400
 };
