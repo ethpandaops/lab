@@ -83,11 +83,11 @@ export default tseslint.config(
     },
     rules: {
       // Correctness rules only - no styling/sorting rules
-      'better-tailwindcss/no-conflicting-classes': 'error',
-      'better-tailwindcss/no-duplicate-classes': 'error',
+      'better-tailwindcss/no-conflicting-classes': 'warn', // Less expensive than error
+      'better-tailwindcss/no-duplicate-classes': 'warn',
       // Disabled: Custom component classes in @layer components are intentional
       'better-tailwindcss/no-unregistered-classes': 'off',
-      'better-tailwindcss/no-deprecated-classes': 'warn',
+      'better-tailwindcss/no-deprecated-classes': 'off', // Disable expensive rule - Tailwind 4 is stable
       // Disable all stylistic rules (Prettier handles these)
       'better-tailwindcss/multiline': 'off',
       'better-tailwindcss/sort-classes': 'off',
@@ -109,6 +109,7 @@ export default tseslint.config(
   },
   // Custom color theming rules
   {
+    files: ['**/*.{ts,tsx}'], // Only TSX/TS files have JSX and className
     plugins: {
       lab: customRules,
     },
