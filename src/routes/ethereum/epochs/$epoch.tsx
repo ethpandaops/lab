@@ -4,25 +4,25 @@ import { DetailPage } from '@/pages/ethereum/epochs';
 
 export const Route = createFileRoute('/ethereum/epochs/$epoch')({
   component: DetailPage,
-  head: () => ({
+  head: ctx => ({
     meta: [
-      { title: `Epoch Details | ${import.meta.env.VITE_BASE_TITLE}` },
+      { title: `Epoch ${ctx.params.epoch} | ${import.meta.env.VITE_BASE_TITLE}` },
       {
         name: 'description',
         content:
           'Detailed analysis of a beacon chain epoch including attestations, block proposals, and validator performance across all slots.',
       },
-      { property: 'og:url', content: `${import.meta.env.VITE_BASE_URL}/ethereum/epochs` },
+      { property: 'og:url', content: `${import.meta.env.VITE_BASE_URL}/ethereum/epochs/${ctx.params.epoch}` },
       { property: 'og:type', content: 'website' },
-      { property: 'og:title', content: `Epoch Details | ${import.meta.env.VITE_BASE_TITLE}` },
+      { property: 'og:title', content: `Epoch ${ctx.params.epoch} | ${import.meta.env.VITE_BASE_TITLE}` },
       {
         property: 'og:description',
         content:
           'Detailed analysis of a beacon chain epoch including attestations, block proposals, and validator performance across all slots.',
       },
       { property: 'og:image', content: '/images/ethereum/epochs.png' },
-      { name: 'twitter:url', content: `${import.meta.env.VITE_BASE_URL}/ethereum/epochs` },
-      { name: 'twitter:title', content: `Epoch Details | ${import.meta.env.VITE_BASE_TITLE}` },
+      { name: 'twitter:url', content: `${import.meta.env.VITE_BASE_URL}/ethereum/epochs/${ctx.params.epoch}` },
+      { name: 'twitter:title', content: `Epoch ${ctx.params.epoch} | ${import.meta.env.VITE_BASE_TITLE}` },
       {
         name: 'twitter:description',
         content:
