@@ -83,6 +83,7 @@ export const Default: Story = {
  */
 export const Interactive: Story = {
   name: 'Interactive with Auto-Progress',
+  tags: ['test-exclude'], // Exclude from Vitest tests - uses setInterval
   render: () => {
     const [currentTime, setCurrentTime] = useState(0);
     const [isPlaying, setIsPlaying] = useState(true);
