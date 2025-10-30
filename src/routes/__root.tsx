@@ -13,6 +13,7 @@ import { NetworkProvider } from '@/providers/NetworkProvider';
 import { ThemeProvider } from '@/providers/ThemeProvider';
 import { ThemeToggle } from '@/components/Layout/ThemeToggle';
 import { ConfigGate } from '@/components/Overlays/ConfigGate';
+import { FeatureGate } from '@/components/Overlays/FeatureGate';
 import { Sidebar } from '@/components/Layout/Sidebar';
 import type { Config } from '@/hooks/useConfig';
 import type { Bounds } from '@/hooks/useBounds';
@@ -112,7 +113,9 @@ function RootComponent(): JSX.Element {
 
               {/* Main content */}
               <main className="bg-background lg:pl-72">
-                <Outlet />
+                <FeatureGate>
+                  <Outlet />
+                </FeatureGate>
               </main>
             </div>
           </NetworkProvider>

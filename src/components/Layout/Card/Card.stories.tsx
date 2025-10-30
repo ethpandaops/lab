@@ -478,7 +478,7 @@ export const TallCard: Story = {
         <button className="text-sm/6 font-semibold text-primary hover:text-accent">View details →</button>
       </div>
     ),
-    featureImage: <img src="/images/expirements/fork-readiness.png" alt="Fork Readiness" />,
+    featureImage: <img src="/images/experiments/fork-readiness.png" alt="Fork Readiness" />,
   },
   decorators: [
     Story => (
@@ -520,7 +520,7 @@ export const WideCard: Story = {
       </div>
     ),
     footer: <span className="text-sm/6 text-muted">Real-time data from beacon chain</span>,
-    featureImage: <img src="/images/expirements/block-production-flow.png" alt="Block Production Flow" />,
+    featureImage: <img src="/images/experiments/block-production-flow.png" alt="Block Production Flow" />,
   },
   decorators: [
     Story => (
@@ -550,7 +550,7 @@ export const MultipleExperimentImages: Story = {
     <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
       <Card
         header={<h3 className="text-base/7 font-semibold text-foreground">Networks</h3>}
-        featureImage={<img src="/images/expirements/networks.png" alt="Networks" />}
+        featureImage={<img src="/images/experiments/networks.png" alt="Networks" />}
       >
         <p className="text-3xl/9 font-bold text-foreground">12</p>
         <p className="mt-1 text-sm/6 text-muted">Active networks</p>
@@ -558,7 +558,7 @@ export const MultipleExperimentImages: Story = {
 
       <Card
         header={<h3 className="text-base/7 font-semibold text-foreground">Live Slots</h3>}
-        featureImage={<img src="/images/expirements/live-slots.png" alt="Live Slots" />}
+        featureImage={<img src="/images/experiments/live-slots.png" alt="Live Slots" />}
       >
         <p className="text-3xl/9 font-bold text-foreground">8,234</p>
         <p className="mt-1 text-sm/6 text-muted">Current slot</p>
@@ -566,7 +566,7 @@ export const MultipleExperimentImages: Story = {
 
       <Card
         header={<h3 className="text-base/7 font-semibold text-foreground">Locally Built Blocks</h3>}
-        featureImage={<img src="/images/expirements/locally-built-blocks.png" alt="Locally Built Blocks" />}
+        featureImage={<img src="/images/experiments/locally-built-blocks.png" alt="Locally Built Blocks" />}
       >
         <p className="text-3xl/9 font-bold text-foreground">67%</p>
         <p className="mt-1 text-sm/6 text-muted">Local block rate</p>
@@ -574,7 +574,7 @@ export const MultipleExperimentImages: Story = {
 
       <Card
         header={<h3 className="text-base/7 font-semibold text-foreground">Block Production</h3>}
-        featureImage={<img src="/images/expirements/block-production-flow.png" alt="Block Production Flow" />}
+        featureImage={<img src="/images/experiments/block-production-flow.png" alt="Block Production Flow" />}
       >
         <p className="text-3xl/9 font-bold text-foreground">2.1s</p>
         <p className="mt-1 text-sm/6 text-muted">Block time</p>
@@ -582,7 +582,7 @@ export const MultipleExperimentImages: Story = {
 
       <Card
         header={<h3 className="text-base/7 font-semibold text-foreground">Fork Readiness</h3>}
-        featureImage={<img src="/images/expirements/fork-readiness.png" alt="Fork Readiness" />}
+        featureImage={<img src="/images/experiments/fork-readiness.png" alt="Fork Readiness" />}
       >
         <p className="text-3xl/9 font-bold text-foreground">98.5%</p>
         <p className="mt-1 text-sm/6 text-muted">Clients ready</p>
@@ -590,7 +590,7 @@ export const MultipleExperimentImages: Story = {
 
       <Card
         header={<h3 className="text-base/7 font-semibold text-foreground">Lab Overview</h3>}
-        featureImage={<img src="/images/expirements.png" alt="ethPandaOps Lab" />}
+        featureImage={<img src="/images/experiments.png" alt="ethPandaOps Lab" />}
       >
         <p className="text-3xl/9 font-bold text-foreground">42</p>
         <p className="mt-1 text-sm/6 text-muted">Active experiments</p>
