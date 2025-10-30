@@ -12,18 +12,23 @@ export const Route = createFileRoute('/ethereum/entities/')({
         content:
           'Explore Ethereum validator entities. View entity attestation performance, block proposals, and activity.',
       },
-      { property: 'og:image', content: '/images/ethereum/entities.png' },
+      { property: 'og:url', content: 'https://lab.ethpandaops.io/ethereum/entities' },
+      { property: 'og:type', content: 'website' },
+      { property: 'og:title', content: `Entities | ${import.meta.env.VITE_BASE_TITLE}` },
       {
         property: 'og:description',
         content:
           'Explore Ethereum validator entities. View entity attestation performance, block proposals, and activity.',
       },
-      { name: 'twitter:image', content: '/images/ethereum/entities.png' },
+      { property: 'og:image', content: '/images/ethereum/entities.png' },
+      { name: 'twitter:url', content: 'https://lab.ethpandaops.io/ethereum/entities' },
+      { name: 'twitter:title', content: `Entities | ${import.meta.env.VITE_BASE_TITLE}` },
       {
         name: 'twitter:description',
         content:
           'Explore Ethereum validator entities. View entity attestation performance, block proposals, and activity.',
       },
+      { name: 'twitter:image', content: '/images/ethereum/entities.png' },
     ],
   }),
 });

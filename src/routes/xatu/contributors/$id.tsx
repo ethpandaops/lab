@@ -26,10 +26,15 @@ export const Route = createFileRoute('/xatu/contributors/$id')({
     meta: [
       { title: `Contributor Details | ${import.meta.env.VITE_BASE_TITLE}` },
       { name: 'description', content: 'Detailed contribution metrics and live network performance data' },
-      { property: 'og:image', content: '/images/experiments/contributors.png' },
+      { property: 'og:url', content: 'https://lab.ethpandaops.io/xatu/contributors' },
+      { property: 'og:type', content: 'website' },
+      { property: 'og:title', content: `Contributor Details | ${import.meta.env.VITE_BASE_TITLE}` },
       { property: 'og:description', content: 'Detailed contribution metrics and live network performance data' },
-      { name: 'twitter:image', content: '/images/experiments/contributors.png' },
+      { property: 'og:image', content: '/images/experiments/contributors.png' },
+      { name: 'twitter:url', content: 'https://lab.ethpandaops.io/xatu/contributors' },
+      { name: 'twitter:title', content: `Contributor Details | ${import.meta.env.VITE_BASE_TITLE}` },
       { name: 'twitter:description', content: 'Detailed contribution metrics and live network performance data' },
+      { name: 'twitter:image', content: '/images/experiments/contributors.png' },
     ],
   }),
 });
