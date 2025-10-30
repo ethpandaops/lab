@@ -31,7 +31,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-const sampleImage = '/images/expirements.png';
+const sampleImage = '/images/experiments.png';
 
 export const Default: Story = {
   args: {

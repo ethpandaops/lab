@@ -13,18 +13,18 @@ interface ExperimentCard {
 
 const experimentCards: ExperimentCard[] = [
   { name: 'Live', path: '/ethereum/live', imagePath: '/images/ethereum/live.png' },
-  { name: 'Contributors', path: '/xatu/contributors', imagePath: '/images/expirements/contributors.png' },
+  { name: 'Contributors', path: '/xatu/contributors', imagePath: '/images/experiments/contributors.png' },
   {
     name: 'Geographical Checklist',
     path: '/xatu/geographical-checklist',
-    imagePath: '/images/expirements/geographical-checklist.png',
+    imagePath: '/images/experiments/geographical-checklist.png',
   },
   {
     name: 'Locally Built Blocks',
     path: '/xatu/locally-built-blocks',
-    imagePath: '/images/expirements/locally-built-blocks.png',
+    imagePath: '/images/experiments/locally-built-blocks.png',
   },
-  { name: 'Fork Readiness', path: '/xatu/fork-readiness', imagePath: '/images/expirements/fork-readiness.png' },
+  { name: 'Fork Readiness', path: '/xatu/fork-readiness', imagePath: '/images/experiments/fork-readiness.png' },
 ];
 
 export function IndexPage(): JSX.Element {

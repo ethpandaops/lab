@@ -214,20 +214,20 @@ export const Picker: Story = {
         <RadioOption
           id="block-production-flow"
           name="Block Production Flow"
-          src="/images/expirements/block-production-flow.png"
+          src="/images/experiments/block-production-flow.png"
         />
-        <RadioOption id="fork-readiness" name="Fork Readiness" src="/images/expirements/fork-readiness.png" />
+        <RadioOption id="fork-readiness" name="Fork Readiness" src="/images/experiments/fork-readiness.png" />
         <RadioOption
           id="geographical-checklist"
           name="Geographical Checklist"
-          src="/images/expirements/geographical-checklist.png"
+          src="/images/experiments/geographical-checklist.png"
         />
         <RadioOption
           id="locally-built-blocks"
           name="Locally Built Blocks"
-          src="/images/expirements/locally-built-blocks.png"
+          src="/images/experiments/locally-built-blocks.png"
         />
-        <RadioOption id="networks" name="Networks" src="/images/expirements/networks.png" />
+        <RadioOption id="networks" name="Networks" src="/images/experiments/networks.png" />
         <RadioOption id="live" name="Live" src="/images/ethereum/live.png" />
       </RadioGroup>
     );
