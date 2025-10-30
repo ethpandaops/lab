@@ -26,6 +26,10 @@ export const Route = createFileRoute('/xatu/contributors/$id')({
     meta: [
       { title: `Contributor Details | ${import.meta.env.VITE_BASE_TITLE}` },
       { name: 'description', content: 'Detailed contribution metrics and live network performance data' },
+      { property: 'og:image', content: '/images/experiments/contributors.png' },
+      { property: 'og:description', content: 'Detailed contribution metrics and live network performance data' },
+      { name: 'twitter:image', content: '/images/experiments/contributors.png' },
+      { name: 'twitter:description', content: 'Detailed contribution metrics and live network performance data' },
     ],
   }),
 });

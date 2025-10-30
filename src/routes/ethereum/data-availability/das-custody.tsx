@@ -14,12 +14,12 @@ export const Route = createFileRoute('/ethereum/data-availability/das-custody')(
         name: 'description',
         content: 'PeerDAS data availability visualization showing column custody across validators',
       },
-      { property: 'og:image', content: '/images/ethereum/data-availability/das-custody.png' },
+      { property: 'og:image', content: '/images/experiments/das-custody.png' },
       {
         property: 'og:description',
         content: 'PeerDAS data availability visualization showing column custody across validators',
       },
-      { name: 'twitter:image', content: '/images/ethereum/data-availability/das-custody.png' },
+      { name: 'twitter:image', content: '/images/experiments/das-custody.png' },
       {
         name: 'twitter:description',
         content: 'PeerDAS data availability visualization showing column custody across validators',
