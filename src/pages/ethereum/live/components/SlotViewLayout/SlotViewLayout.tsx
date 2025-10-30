@@ -1,4 +1,4 @@
-import { type JSX, useMemo, useState, useEffect, useRef, useCallback } from 'react';
+import { type JSX, useMemo, useRef, useCallback } from 'react';
 import { useSlotPlayerState, useSlotPlayerProgress, useSlotPlayerActions } from '@/hooks/useSlotPlayer';
 import { Map2DChart } from '@/components/Charts/Map2D';
 import { Sidebar } from '../Sidebar';

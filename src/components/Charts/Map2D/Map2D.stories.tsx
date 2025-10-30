@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Map2DChart } from './Map2D';
 
 const meta: Meta<typeof Map2DChart> = {
@@ -35,11 +35,15 @@ const sampleRoutes = [
     to: [151.2093, -33.8688] as [number, number],
     name: 'London to Sydney',
   },
-  { from: [139.6917, 35.6895] as [number, number], to: [103.8198, 1.3521] as [number, number], name: 'Tokyo to Singapore' },
+  {
+    from: [139.6917, 35.6895] as [number, number],
+    to: [103.8198, 1.3521] as [number, number],
+    name: 'Tokyo to Singapore',
+  },
 ];
 
 // Generate many points for performance testing
-const generateManyPoints = (count: number) => {
+const generateManyPoints = (count: number): Array<{ name: string; coords: [number, number]; value: number }> => {
   const points = [];
   for (let i = 0; i < count; i++) {
     const lat = Math.random() * 180 - 90;
