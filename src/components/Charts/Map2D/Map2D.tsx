@@ -316,20 +316,10 @@ export function Map2DChart({
       },
       series,
     };
-  }, [
-    mapLoaded,
-    theme,
-    themeColors,
-    routes,
-    showEffect,
-    lineColor,
-    pointColor,
-    pointSizeMultiplier,
-    mapColor,
-    roam,
-    animationDuration,
-    title,
-  ]);
+    // Only recalculate when map loads or theme changes (not on themeColors object ref)
+    // themeColors is derived from theme, so we only need theme as a dependency
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mapLoaded, theme]);
 
   // Don't render until map is loaded
   if (!mapLoaded) {
