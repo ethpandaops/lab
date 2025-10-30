@@ -56,6 +56,22 @@ import {
   fctBlockProposerServiceList,
   fctBlockServiceGet,
   fctBlockServiceList,
+  fctDataColumnAvailabilityByEpochServiceGet,
+  fctDataColumnAvailabilityByEpochServiceList,
+  fctDataColumnAvailabilityBySlotBlobServiceGet,
+  fctDataColumnAvailabilityBySlotBlobServiceList,
+  fctDataColumnAvailabilityBySlotServiceGet,
+  fctDataColumnAvailabilityBySlotServiceList,
+  fctDataColumnAvailabilityDailyServiceGet,
+  fctDataColumnAvailabilityDailyServiceList,
+  fctDataColumnAvailabilityHourlyServiceGet,
+  fctDataColumnAvailabilityHourlyServiceList,
+  fctDataTypesComplexServiceGet,
+  fctDataTypesComplexServiceList,
+  fctDataTypesIntegersServiceGet,
+  fctDataTypesIntegersServiceList,
+  fctDataTypesTemporalServiceGet,
+  fctDataTypesTemporalServiceList,
   fctHeadFirstSeenByNodeServiceGet,
   fctHeadFirstSeenByNodeServiceList,
   fctMevBidCountByBuilderServiceGet,
@@ -147,6 +163,22 @@ import type {
   FctBlockProposerServiceListData,
   FctBlockServiceGetData,
   FctBlockServiceListData,
+  FctDataColumnAvailabilityByEpochServiceGetData,
+  FctDataColumnAvailabilityByEpochServiceListData,
+  FctDataColumnAvailabilityBySlotBlobServiceGetData,
+  FctDataColumnAvailabilityBySlotBlobServiceListData,
+  FctDataColumnAvailabilityBySlotServiceGetData,
+  FctDataColumnAvailabilityBySlotServiceListData,
+  FctDataColumnAvailabilityDailyServiceGetData,
+  FctDataColumnAvailabilityDailyServiceListData,
+  FctDataColumnAvailabilityHourlyServiceGetData,
+  FctDataColumnAvailabilityHourlyServiceListData,
+  FctDataTypesComplexServiceGetData,
+  FctDataTypesComplexServiceListData,
+  FctDataTypesIntegersServiceGetData,
+  FctDataTypesIntegersServiceListData,
+  FctDataTypesTemporalServiceGetData,
+  FctDataTypesTemporalServiceListData,
   FctHeadFirstSeenByNodeServiceGetData,
   FctHeadFirstSeenByNodeServiceListData,
   FctMevBidCountByBuilderServiceGetData,
@@ -1497,6 +1529,404 @@ export const fctBlockProposerHeadServiceGetOptions = (options: Options<FctBlockP
       return data;
     },
     queryKey: fctBlockProposerHeadServiceGetQueryKey(options),
+  });
+};
+
+export const fctDataColumnAvailabilityByEpochServiceListQueryKey = (
+  options?: Options<FctDataColumnAvailabilityByEpochServiceListData>
+) => createQueryKey('fctDataColumnAvailabilityByEpochServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctDataColumnAvailabilityByEpochServiceListOptions = (
+  options?: Options<FctDataColumnAvailabilityByEpochServiceListData>
+) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctDataColumnAvailabilityByEpochServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctDataColumnAvailabilityByEpochServiceListQueryKey(options),
+  });
+};
+
+export const fctDataColumnAvailabilityByEpochServiceGetQueryKey = (
+  options: Options<FctDataColumnAvailabilityByEpochServiceGetData>
+) => createQueryKey('fctDataColumnAvailabilityByEpochServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by epoch_start_date_time
+ */
+export const fctDataColumnAvailabilityByEpochServiceGetOptions = (
+  options: Options<FctDataColumnAvailabilityByEpochServiceGetData>
+) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctDataColumnAvailabilityByEpochServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctDataColumnAvailabilityByEpochServiceGetQueryKey(options),
+  });
+};
+
+export const fctDataColumnAvailabilityBySlotServiceListQueryKey = (
+  options?: Options<FctDataColumnAvailabilityBySlotServiceListData>
+) => createQueryKey('fctDataColumnAvailabilityBySlotServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctDataColumnAvailabilityBySlotServiceListOptions = (
+  options?: Options<FctDataColumnAvailabilityBySlotServiceListData>
+) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctDataColumnAvailabilityBySlotServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctDataColumnAvailabilityBySlotServiceListQueryKey(options),
+  });
+};
+
+export const fctDataColumnAvailabilityBySlotServiceGetQueryKey = (
+  options: Options<FctDataColumnAvailabilityBySlotServiceGetData>
+) => createQueryKey('fctDataColumnAvailabilityBySlotServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by slot_start_date_time
+ */
+export const fctDataColumnAvailabilityBySlotServiceGetOptions = (
+  options: Options<FctDataColumnAvailabilityBySlotServiceGetData>
+) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctDataColumnAvailabilityBySlotServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctDataColumnAvailabilityBySlotServiceGetQueryKey(options),
+  });
+};
+
+export const fctDataColumnAvailabilityBySlotBlobServiceListQueryKey = (
+  options?: Options<FctDataColumnAvailabilityBySlotBlobServiceListData>
+) => createQueryKey('fctDataColumnAvailabilityBySlotBlobServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctDataColumnAvailabilityBySlotBlobServiceListOptions = (
+  options?: Options<FctDataColumnAvailabilityBySlotBlobServiceListData>
+) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctDataColumnAvailabilityBySlotBlobServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctDataColumnAvailabilityBySlotBlobServiceListQueryKey(options),
+  });
+};
+
+export const fctDataColumnAvailabilityBySlotBlobServiceGetQueryKey = (
+  options: Options<FctDataColumnAvailabilityBySlotBlobServiceGetData>
+) => createQueryKey('fctDataColumnAvailabilityBySlotBlobServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by slot_start_date_time
+ */
+export const fctDataColumnAvailabilityBySlotBlobServiceGetOptions = (
+  options: Options<FctDataColumnAvailabilityBySlotBlobServiceGetData>
+) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctDataColumnAvailabilityBySlotBlobServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctDataColumnAvailabilityBySlotBlobServiceGetQueryKey(options),
+  });
+};
+
+export const fctDataColumnAvailabilityDailyServiceListQueryKey = (
+  options?: Options<FctDataColumnAvailabilityDailyServiceListData>
+) => createQueryKey('fctDataColumnAvailabilityDailyServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctDataColumnAvailabilityDailyServiceListOptions = (
+  options?: Options<FctDataColumnAvailabilityDailyServiceListData>
+) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctDataColumnAvailabilityDailyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctDataColumnAvailabilityDailyServiceListQueryKey(options),
+  });
+};
+
+export const fctDataColumnAvailabilityDailyServiceGetQueryKey = (
+  options: Options<FctDataColumnAvailabilityDailyServiceGetData>
+) => createQueryKey('fctDataColumnAvailabilityDailyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by date
+ */
+export const fctDataColumnAvailabilityDailyServiceGetOptions = (
+  options: Options<FctDataColumnAvailabilityDailyServiceGetData>
+) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctDataColumnAvailabilityDailyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctDataColumnAvailabilityDailyServiceGetQueryKey(options),
+  });
+};
+
+export const fctDataColumnAvailabilityHourlyServiceListQueryKey = (
+  options?: Options<FctDataColumnAvailabilityHourlyServiceListData>
+) => createQueryKey('fctDataColumnAvailabilityHourlyServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctDataColumnAvailabilityHourlyServiceListOptions = (
+  options?: Options<FctDataColumnAvailabilityHourlyServiceListData>
+) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctDataColumnAvailabilityHourlyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctDataColumnAvailabilityHourlyServiceListQueryKey(options),
+  });
+};
+
+export const fctDataColumnAvailabilityHourlyServiceGetQueryKey = (
+  options: Options<FctDataColumnAvailabilityHourlyServiceGetData>
+) => createQueryKey('fctDataColumnAvailabilityHourlyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by hour_start_date_time
+ */
+export const fctDataColumnAvailabilityHourlyServiceGetOptions = (
+  options: Options<FctDataColumnAvailabilityHourlyServiceGetData>
+) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctDataColumnAvailabilityHourlyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctDataColumnAvailabilityHourlyServiceGetQueryKey(options),
+  });
+};
+
+export const fctDataTypesComplexServiceListQueryKey = (options?: Options<FctDataTypesComplexServiceListData>) =>
+  createQueryKey('fctDataTypesComplexServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctDataTypesComplexServiceListOptions = (options?: Options<FctDataTypesComplexServiceListData>) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctDataTypesComplexServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctDataTypesComplexServiceListQueryKey(options),
+  });
+};
+
+export const fctDataTypesComplexServiceGetQueryKey = (options: Options<FctDataTypesComplexServiceGetData>) =>
+  createQueryKey('fctDataTypesComplexServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by id
+ */
+export const fctDataTypesComplexServiceGetOptions = (options: Options<FctDataTypesComplexServiceGetData>) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctDataTypesComplexServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctDataTypesComplexServiceGetQueryKey(options),
+  });
+};
+
+export const fctDataTypesIntegersServiceListQueryKey = (options?: Options<FctDataTypesIntegersServiceListData>) =>
+  createQueryKey('fctDataTypesIntegersServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctDataTypesIntegersServiceListOptions = (options?: Options<FctDataTypesIntegersServiceListData>) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctDataTypesIntegersServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctDataTypesIntegersServiceListQueryKey(options),
+  });
+};
+
+export const fctDataTypesIntegersServiceGetQueryKey = (options: Options<FctDataTypesIntegersServiceGetData>) =>
+  createQueryKey('fctDataTypesIntegersServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by id
+ */
+export const fctDataTypesIntegersServiceGetOptions = (options: Options<FctDataTypesIntegersServiceGetData>) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctDataTypesIntegersServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctDataTypesIntegersServiceGetQueryKey(options),
+  });
+};
+
+export const fctDataTypesTemporalServiceListQueryKey = (options?: Options<FctDataTypesTemporalServiceListData>) =>
+  createQueryKey('fctDataTypesTemporalServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctDataTypesTemporalServiceListOptions = (options?: Options<FctDataTypesTemporalServiceListData>) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctDataTypesTemporalServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctDataTypesTemporalServiceListQueryKey(options),
+  });
+};
+
+export const fctDataTypesTemporalServiceGetQueryKey = (options: Options<FctDataTypesTemporalServiceGetData>) =>
+  createQueryKey('fctDataTypesTemporalServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by id
+ */
+export const fctDataTypesTemporalServiceGetOptions = (options: Options<FctDataTypesTemporalServiceGetData>) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctDataTypesTemporalServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctDataTypesTemporalServiceGetQueryKey(options),
   });
 };
 

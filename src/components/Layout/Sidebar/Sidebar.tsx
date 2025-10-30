@@ -21,6 +21,10 @@ const ethereumConsensusPages: NavItem[] = [
 
 const ethereumExecutionPages: NavItem[] = [];
 
+const ethereumDataAvailabilityPages: NavItem[] = [
+  { name: 'DAS Custody', to: '/ethereum/data-availability/das-custody' },
+];
+
 const xatuPages: NavItem[] = [
   { name: 'Contributors', to: '/xatu/contributors' },
   { name: 'Geographical Checklist', to: '/xatu/geographical-checklist' },
@@ -108,6 +112,22 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps): JSX.Elem
                         ))}
                       </ListSection>
                     )}
+
+                    <ListSection title="Data Availability" nested>
+                      {ethereumDataAvailabilityPages.map(page => (
+                        <ListItem key={page.to}>
+                          <Link
+                            to={page.to}
+                            className="group flex gap-x-3 rounded-lg px-2.5 py-1.5 text-sm/6 font-semibold text-muted transition-all hover:bg-primary/10 hover:text-primary"
+                            activeProps={{
+                              className: 'bg-primary/10 text-primary shadow-sm ring-1 ring-primary/20',
+                            }}
+                          >
+                            {page.name}
+                          </Link>
+                        </ListItem>
+                      ))}
+                    </ListSection>
                   </ListSection>
 
                   {/* Xatu Section */}
@@ -193,6 +213,22 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps): JSX.Elem
                     ))}
                   </ListSection>
                 )}
+
+                <ListSection title="Data Availability" nested>
+                  {ethereumDataAvailabilityPages.map(page => (
+                    <ListItem key={page.to}>
+                      <Link
+                        to={page.to}
+                        className="group flex gap-x-3 px-2.5 py-1.5 text-sm/6 font-semibold text-muted transition-all hover:bg-primary/10 hover:text-primary"
+                        activeProps={{
+                          className: 'bg-primary/10 text-primary shadow-sm ring-1 ring-primary/20',
+                        }}
+                      >
+                        {page.name}
+                      </Link>
+                    </ListItem>
+                  ))}
+                </ListSection>
               </ListSection>
 
               {/* Xatu Section */}

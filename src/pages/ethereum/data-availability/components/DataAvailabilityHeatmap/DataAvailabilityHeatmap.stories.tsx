@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 import { DataAvailabilityHeatmap } from './DataAvailabilityHeatmap';
+import type { DataAvailabilityFilters } from './DataAvailabilityFilterPanel.types';
 import {
   generateWindowLevelData,
   generateDayLevelData,
@@ -8,6 +9,14 @@ import {
   generateEpochLevelData,
   generateSlotLevelData,
 } from './mockData';
+
+// Default filters for all stories
+const defaultFilters: DataAvailabilityFilters = {
+  columnGroups: new Set([0, 1, 2, 3]), // All groups selected by default
+  minAvailability: 0,
+  maxAvailability: 100,
+  minObservationCount: 0,
+};
 
 const meta = {
   title: 'Components/Charts/DataAvailabilityHeatmap',
@@ -36,6 +45,7 @@ export const WindowLevel: Story = {
   args: {
     rows: generateWindowLevelData(19),
     granularity: 'window',
+    filters: defaultFilters,
     cellSize: 'xs',
     showColumnHeader: true,
     showLegend: true,
@@ -50,6 +60,7 @@ export const WindowLevelWithSelectedColumn: Story = {
   args: {
     rows: generateWindowLevelData(19),
     granularity: 'window',
+    filters: defaultFilters,
     cellSize: 'xs',
     selectedColumnIndex: 42,
     showColumnHeader: true,
@@ -66,6 +77,7 @@ export const DayLevel: Story = {
   args: {
     rows: generateDayLevelData('2024-01-15'),
     granularity: 'day',
+    filters: defaultFilters,
     cellSize: 'xs',
     showColumnHeader: true,
     showLegend: true,
@@ -79,6 +91,7 @@ export const DayLevelWithSelectedColumn: Story = {
   args: {
     rows: generateDayLevelData('2024-01-15'),
     granularity: 'day',
+    filters: defaultFilters,
     cellSize: 'xs',
     selectedColumnIndex: 42,
     showColumnHeader: true,
@@ -95,6 +108,7 @@ export const HourLevel: Story = {
   args: {
     rows: generateHourLevelData('2024-01-15-hour-8', '2024-01-15', 8),
     granularity: 'hour',
+    filters: defaultFilters,
     cellSize: 'xs',
     showColumnHeader: true,
     showLegend: true,
@@ -108,6 +122,7 @@ export const HourLevelWithSelectedColumn: Story = {
   args: {
     rows: generateHourLevelData('2024-01-15-hour-8', '2024-01-15', 8),
     granularity: 'hour',
+    filters: defaultFilters,
     cellSize: 'xs',
     selectedColumnIndex: 42,
     showColumnHeader: true,
@@ -124,6 +139,7 @@ export const EpochLevel: Story = {
   args: {
     rows: generateEpochLevelData('epoch-100000', 100000),
     granularity: 'epoch',
+    filters: defaultFilters,
     cellSize: 'xs',
     showColumnHeader: true,
     showLegend: true,
@@ -137,6 +153,7 @@ export const EpochLevelWithSelectedColumn: Story = {
   args: {
     rows: generateEpochLevelData('epoch-100000', 100000),
     granularity: 'epoch',
+    filters: defaultFilters,
     cellSize: 'xs',
     selectedColumnIndex: 42,
     showColumnHeader: true,
@@ -153,6 +170,7 @@ export const SlotLevel: Story = {
   args: {
     rows: generateSlotLevelData('slot-3200000', 3200000, 6),
     granularity: 'slot',
+    filters: defaultFilters,
     cellSize: 'xs',
     showColumnHeader: true,
     showLegend: true,
@@ -166,6 +184,7 @@ export const SlotLevelWithSelectedColumn: Story = {
   args: {
     rows: generateSlotLevelData('slot-3200000', 3200000, 6),
     granularity: 'slot',
+    filters: defaultFilters,
     cellSize: 'xs',
     selectedColumnIndex: 42,
     showColumnHeader: true,
@@ -183,6 +202,7 @@ export const InteractiveHierarchyDemo: Story = {
   args: {
     rows: [],
     granularity: 'window',
+    filters: defaultFilters,
   },
   render: () => {
     const [selectedColumn, setSelectedColumn] = useState<number | undefined>();
@@ -200,6 +220,7 @@ export const InteractiveHierarchyDemo: Story = {
             Click a day label to view all columns for that day
           </p>
           <DataAvailabilityHeatmap
+            filters={defaultFilters}
             rows={windowData}
             granularity="window"
             cellSize="xs"
@@ -227,6 +248,7 @@ export const InteractiveDayDrillDown: Story = {
   args: {
     rows: [],
     granularity: 'day',
+    filters: defaultFilters,
   },
   render: () => {
     const [selectedColumn, setSelectedColumn] = useState<number | undefined>(42);
@@ -244,6 +266,7 @@ export const InteractiveDayDrillDown: Story = {
             Click an hour label → view all columns for that hour
           </p>
           <DataAvailabilityHeatmap
+            filters={defaultFilters}
             rows={dayData}
             granularity="day"
             cellSize="xs"
@@ -278,6 +301,7 @@ export const InteractiveHourDrillDown: Story = {
   args: {
     rows: [],
     granularity: 'hour',
+    filters: defaultFilters,
   },
   render: () => {
     const [selectedColumn, setSelectedColumn] = useState<number | undefined>(42);
@@ -295,6 +319,7 @@ export const InteractiveHourDrillDown: Story = {
             Click an epoch label → view all columns for that epoch
           </p>
           <DataAvailabilityHeatmap
+            filters={defaultFilters}
             rows={hourData}
             granularity="hour"
             cellSize="xs"
@@ -327,6 +352,7 @@ export const InteractiveEpochDrillDown: Story = {
   args: {
     rows: [],
     granularity: 'epoch',
+    filters: defaultFilters,
   },
   render: () => {
     const [selectedColumn, setSelectedColumn] = useState<number | undefined>(42);
@@ -342,6 +368,7 @@ export const InteractiveEpochDrillDown: Story = {
             Click a slot label → show all columns for that slot
           </p>
           <DataAvailabilityHeatmap
+            filters={defaultFilters}
             rows={epochData}
             granularity="epoch"
             cellSize="xs"
@@ -375,6 +402,7 @@ export const InteractiveSlotView: Story = {
   args: {
     rows: [],
     granularity: 'slot',
+    filters: defaultFilters,
   },
   render: () => {
     const [selectedColumn, setSelectedColumn] = useState<number | undefined>(42);
@@ -390,6 +418,7 @@ export const InteractiveSlotView: Story = {
             Click cells to see detailed metrics for that blob and column.
           </p>
           <DataAvailabilityHeatmap
+            filters={defaultFilters}
             rows={slotData}
             granularity="slot"
             cellSize="xs"
@@ -418,6 +447,7 @@ export const CompactView: Story = {
   args: {
     rows: generateWindowLevelData(10),
     granularity: 'window',
+    filters: defaultFilters,
     showColumnHeader: false,
     showLegend: false,
   },
@@ -430,6 +460,7 @@ export const SmallDataset: Story = {
   args: {
     rows: generateWindowLevelData(5),
     granularity: 'window',
+    filters: defaultFilters,
     showColumnHeader: true,
     showLegend: true,
   },
@@ -442,6 +473,7 @@ export const CellSizeXS: Story = {
   args: {
     rows: generateWindowLevelData(19),
     granularity: 'window',
+    filters: defaultFilters,
     cellSize: 'xs',
     showColumnHeader: true,
     showLegend: true,
@@ -455,6 +487,7 @@ export const CellSizeSM: Story = {
   args: {
     rows: generateWindowLevelData(19),
     granularity: 'window',
+    filters: defaultFilters,
     cellSize: 'sm',
     showColumnHeader: true,
     showLegend: true,
@@ -468,6 +501,7 @@ export const CellSizeMD: Story = {
   args: {
     rows: generateWindowLevelData(19),
     granularity: 'window',
+    filters: defaultFilters,
     cellSize: 'md',
     showColumnHeader: true,
     showLegend: true,
@@ -481,6 +515,7 @@ export const CellSizeLG: Story = {
   args: {
     rows: generateWindowLevelData(19),
     granularity: 'window',
+    filters: defaultFilters,
     cellSize: 'lg',
     showColumnHeader: true,
     showLegend: true,
@@ -494,6 +529,7 @@ export const CellSizeXL: Story = {
   args: {
     rows: generateWindowLevelData(19),
     granularity: 'window',
+    filters: defaultFilters,
     cellSize: 'xl',
     showColumnHeader: true,
     showLegend: true,
@@ -507,6 +543,7 @@ export const CellSizeComparison: Story = {
   args: {
     rows: [],
     granularity: 'window',
+    filters: defaultFilters,
   },
   render: () => {
     const data = generateWindowLevelData(5); // Smaller dataset for comparison
@@ -517,6 +554,7 @@ export const CellSizeComparison: Story = {
           <h3 className="mb-2 text-base/7 font-semibold text-foreground">Extra Small (xs - 12px)</h3>
           <p className="mb-4 text-sm/6 text-muted">Most compact, useful for very dense data or small viewports</p>
           <DataAvailabilityHeatmap
+            filters={defaultFilters}
             rows={data}
             granularity="window"
             cellSize="xs"
@@ -529,6 +567,7 @@ export const CellSizeComparison: Story = {
           <h3 className="mb-2 text-base/7 font-semibold text-foreground">Small (sm - 16px)</h3>
           <p className="mb-4 text-sm/6 text-muted">Compact view for dense data</p>
           <DataAvailabilityHeatmap
+            filters={defaultFilters}
             rows={data}
             granularity="window"
             cellSize="sm"
@@ -541,6 +580,7 @@ export const CellSizeComparison: Story = {
           <h3 className="mb-2 text-base/7 font-semibold text-foreground">Medium (md - 24px) - Default</h3>
           <p className="mb-4 text-sm/6 text-muted">Good balance between density and readability</p>
           <DataAvailabilityHeatmap
+            filters={defaultFilters}
             rows={data}
             granularity="window"
             cellSize="md"
@@ -553,6 +593,7 @@ export const CellSizeComparison: Story = {
           <h3 className="mb-2 text-base/7 font-semibold text-foreground">Large (lg - 32px)</h3>
           <p className="mb-4 text-sm/6 text-muted">Easier to see and interact with</p>
           <DataAvailabilityHeatmap
+            filters={defaultFilters}
             rows={data}
             granularity="window"
             cellSize="lg"
@@ -565,6 +606,7 @@ export const CellSizeComparison: Story = {
           <h3 className="mb-2 text-base/7 font-semibold text-foreground">Extra Large (xl - 40px)</h3>
           <p className="mb-4 text-sm/6 text-muted">Maximum visibility and interaction area</p>
           <DataAvailabilityHeatmap
+            filters={defaultFilters}
             rows={data}
             granularity="window"
             cellSize="xl"

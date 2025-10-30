@@ -37,11 +37,7 @@ export function IndexPage(): JSX.Element {
 
       <div className="space-y-4">
         {upcomingForks.length > 0 ? (
-          <Disclosure
-            title={`Upcoming Forks (${upcomingForks.length})`}
-            defaultOpen
-            className="overflow-hidden rounded-lg border border-border"
-          >
+          <Disclosure title={`Upcoming Forks (${upcomingForks.length})`} defaultOpen>
             <div className="space-y-8">
               {upcomingForks.map(fork => (
                 <ForkSection key={fork.forkName} fork={fork} />
@@ -60,7 +56,6 @@ export function IndexPage(): JSX.Element {
           <Disclosure
             key={fork.forkName}
             title={`Past: ${fork.forkName.charAt(0).toUpperCase()}${fork.forkName.slice(1)}`}
-            className="overflow-hidden rounded-lg border border-border"
           >
             <ForkSection fork={fork} />
           </Disclosure>
