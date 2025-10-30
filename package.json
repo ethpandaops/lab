@@ -13,7 +13,7 @@
     "test:storybook:watch": "vitest --no-ui --config vitest.config.ts",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest --coverage",
-    "lint": "eslint .",
+    "lint": "eslint . --cache --cache-location .eslintcache",
     "typecheck": "tsc --noEmit",
     "format": "prettier --write \"src/**/*.{ts,tsx}\"",
     "clean": "rm -rf dist node_modules",
