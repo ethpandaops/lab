@@ -131,23 +131,7 @@ export const mockConfig: Config = {
       },
     },
   ],
-  experiments: [
-    {
-      name: 'attestation-performance',
-      enabled: true,
-      networks: [],
-    },
-    {
-      name: 'block-production',
-      enabled: false,
-      networks: [],
-    },
-    {
-      name: 'slot-view',
-      enabled: true,
-      networks: ['mainnet'],
-    },
-  ],
+  features: [],
 };
 
 // Mock bounds data for Storybook
