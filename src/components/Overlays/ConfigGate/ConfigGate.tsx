@@ -24,10 +24,14 @@ export function ConfigGate({ children }: ConfigGateProps): JSX.Element {
         </div>
 
         {/* Content */}
-        <div className="relative flex flex-col items-center">
-          <img src="/images/lab.png" className="size-72 animate-spin object-contain" alt="Loading..." />
-          <p className="mt-8 text-2xl font-semibold text-foreground">Loading Lab...</p>
-          <div className="mt-4 h-1 w-32 animate-pulse rounded-full bg-linear-to-r from-primary to-accent"></div>
+        <div className="relative flex flex-col items-center px-4">
+          <img
+            src="/images/lab.png"
+            className="size-48 animate-spin object-contain sm:size-64 md:size-72"
+            alt="Loading..."
+          />
+          <p className="mt-6 text-xl font-semibold text-foreground sm:mt-8 sm:text-2xl">Loading Lab...</p>
+          <div className="mt-3 h-1 w-24 animate-pulse rounded-full bg-linear-to-r from-primary to-accent sm:mt-4 sm:w-32"></div>
         </div>
       </div>
     );
@@ -45,17 +49,21 @@ export function ConfigGate({ children }: ConfigGateProps): JSX.Element {
         </div>
 
         {/* Content */}
-        <div className="relative flex flex-col items-center">
+        <div className="relative flex flex-col items-center px-4">
           <div className="relative">
             {/* Glow effect */}
             <div className="absolute inset-0 animate-pulse rounded-full bg-danger/20 blur-3xl"></div>
-            <img src="/images/lab.png" className="relative size-72 rotate-180 object-contain" alt="Lab Logo" />
+            <img
+              src="/images/lab.png"
+              className="relative size-48 rotate-180 object-contain sm:size-64 md:size-72"
+              alt="Lab Logo"
+            />
           </div>
-          <h1 className="mt-8 text-2xl font-bold text-danger">Failed to Load Configuration</h1>
+          <h1 className="mt-6 text-xl font-bold text-danger sm:mt-8 sm:text-2xl">Failed to Load Configuration</h1>
           {error && <p className="mt-2 max-w-md text-center text-sm text-muted">{error.message}</p>}
           <button
             onClick={() => window.location.reload()}
-            className="mt-8 rounded-lg bg-danger px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-danger/90 hover:shadow-md active:scale-95"
+            className="mt-6 rounded-lg bg-danger px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-danger/90 hover:shadow-md active:scale-95 sm:mt-8"
           >
             Reload Page
           </button>
