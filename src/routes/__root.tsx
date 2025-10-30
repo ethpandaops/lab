@@ -106,8 +106,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
       { httpEquiv: 'X-UA-Compatible', content: 'IE=edge' },
       {
         name: 'viewport',
-        content:
-          'width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, maximum-scale=1.0, minimal-ui',
+        content: 'width=device-width, initial-scale=1.0, maximum-scale=5.0',
       },
       { name: 'description', content: 'Experimental platform for exploring Ethereum data and network statistics.' },
 
