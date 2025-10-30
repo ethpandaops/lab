@@ -19,18 +19,13 @@ export function FeatureGate({ children }: FeatureGateProps): JSX.Element {
   // If feature is disabled for this network, show a message
   if (!isEnabled) {
     return (
-      <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-background">
-        {/* Subtle background pattern */}
-        <div className="pointer-events-none absolute inset-0 overflow-hidden opacity-50">
-          <div className="absolute inset-0 bg-linear-to-br from-warning/5 via-transparent to-warning/10"></div>
-        </div>
-
+      <div className="flex min-h-[calc(100vh-4rem)] flex-col items-center justify-center p-6">
         {/* Content */}
-        <div className="relative flex flex-col items-center px-6">
+        <div className="relative flex flex-col items-center">
           <div className="relative mb-8">
             {/* Glow effect */}
             <div className="absolute inset-0 animate-pulse rounded-full bg-warning/20 blur-3xl"></div>
-            <img src="/images/lab.png" className="relative size-48 object-contain" alt="Lab Logo" />
+            <img src="/images/lab.png" className="relative size-32 object-contain" alt="Lab Logo" />
           </div>
 
           <h1 className="text-2xl font-bold text-foreground">Feature Not Available</h1>
