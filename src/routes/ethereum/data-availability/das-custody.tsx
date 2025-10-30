@@ -14,7 +14,7 @@ export const Route = createFileRoute('/ethereum/data-availability/das-custody')(
         name: 'description',
         content: 'PeerDAS data availability visualization showing column custody across validators',
       },
-      { property: 'og:url', content: 'https://lab.ethpandaops.io/ethereum/data-availability/das-custody' },
+      { property: 'og:url', content: `${import.meta.env.VITE_BASE_URL}/ethereum/data-availability/das-custody` },
       { property: 'og:type', content: 'website' },
       { property: 'og:title', content: `DAS Custody | ${import.meta.env.VITE_BASE_TITLE}` },
       {
@@ -22,7 +22,7 @@ export const Route = createFileRoute('/ethereum/data-availability/das-custody')(
         content: 'PeerDAS data availability visualization showing column custody across validators',
       },
       { property: 'og:image', content: '/images/experiments/das-custody.png' },
-      { name: 'twitter:url', content: 'https://lab.ethpandaops.io/ethereum/data-availability/das-custody' },
+      { name: 'twitter:url', content: `${import.meta.env.VITE_BASE_URL}/ethereum/data-availability/das-custody` },
       { name: 'twitter:title', content: `DAS Custody | ${import.meta.env.VITE_BASE_TITLE}` },
       {
         name: 'twitter:description',

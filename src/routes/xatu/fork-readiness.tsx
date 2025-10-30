@@ -12,7 +12,7 @@ export const Route = createFileRoute('/xatu/fork-readiness')({
         name: 'description',
         content: 'Monitor Ethereum client readiness for upcoming network forks and protocol upgrades.',
       },
-      { property: 'og:url', content: 'https://lab.ethpandaops.io/xatu/fork-readiness' },
+      { property: 'og:url', content: `${import.meta.env.VITE_BASE_URL}/xatu/fork-readiness` },
       { property: 'og:type', content: 'website' },
       { property: 'og:title', content: `Fork Readiness | ${import.meta.env.VITE_BASE_TITLE}` },
       {
@@ -23,7 +23,7 @@ export const Route = createFileRoute('/xatu/fork-readiness')({
         property: 'og:image',
         content: '/images/experiments/fork-readiness.png',
       },
-      { name: 'twitter:url', content: 'https://lab.ethpandaops.io/xatu/fork-readiness' },
+      { name: 'twitter:url', content: `${import.meta.env.VITE_BASE_URL}/xatu/fork-readiness` },
       { name: 'twitter:title', content: `Fork Readiness | ${import.meta.env.VITE_BASE_TITLE}` },
       {
         name: 'twitter:description',

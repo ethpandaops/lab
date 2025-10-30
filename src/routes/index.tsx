@@ -12,7 +12,7 @@ export const Route = createFileRoute('/')({
         name: 'description',
         content: 'Experimental platform for exploring Ethereum data and network statistics.',
       },
-      { property: 'og:url', content: 'https://lab.ethpandaops.io/' },
+      { property: 'og:url', content: `${import.meta.env.VITE_BASE_URL}/` },
       { property: 'og:type', content: 'website' },
       { property: 'og:title', content: import.meta.env.VITE_BASE_TITLE },
       {
@@ -23,7 +23,7 @@ export const Route = createFileRoute('/')({
         property: 'og:image',
         content: '/images/header.png',
       },
-      { name: 'twitter:url', content: 'https://lab.ethpandaops.io/' },
+      { name: 'twitter:url', content: `${import.meta.env.VITE_BASE_URL}/` },
       { name: 'twitter:title', content: import.meta.env.VITE_BASE_TITLE },
       {
         name: 'twitter:description',

@@ -11,6 +11,7 @@ export default defineConfig({
   base: '/',
   define: {
     'import.meta.env.VITE_BASE_TITLE': JSON.stringify('The Lab by ethPandaOps'),
+    'import.meta.env.VITE_BASE_URL': JSON.stringify('https://lab2.ethpandaops.io'),
   },
   plugins: [
     tanstackRouter({

@@ -153,7 +153,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
       // Twitter Card markup
       { name: 'twitter:card', content: 'summary_large_image' },
       { name: 'twitter:creator', content: '@ethpandaops' },
-      { name: 'twitter:url', content: 'https://lab.ethpandaops.io' },
+      { name: 'twitter:url', content: import.meta.env.VITE_BASE_URL },
       { name: 'twitter:title', content: import.meta.env.VITE_BASE_TITLE },
       {
         name: 'twitter:description',
@@ -164,7 +164,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
       { name: 'twitter:image:alt', content: import.meta.env.VITE_BASE_TITLE },
 
       // Open Graph markup (Facebook)
-      { property: 'og:url', content: 'https://lab.ethpandaops.io/' },
+      { property: 'og:url', content: `${import.meta.env.VITE_BASE_URL}/` },
       { property: 'og:type', content: 'website' },
       { property: 'og:title', content: import.meta.env.VITE_BASE_TITLE },
       {
@@ -176,7 +176,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
       { property: 'og:site_name', content: import.meta.env.VITE_BASE_TITLE },
     ],
     links: [
-      { rel: 'canonical', href: 'https://lab.ethpandaops.io' },
+      { rel: 'canonical', href: import.meta.env.VITE_BASE_URL },
       { rel: 'icon', type: 'image/png', href: '/images/lab.png' },
     ],
   }),

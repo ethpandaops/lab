@@ -25,7 +25,7 @@ export const Route = createFileRoute('/ethereum/live')({
         name: 'description',
         content: 'Live visualization of Ethereum beacon chain slots with detailed block and attestation data.',
       },
-      { property: 'og:url', content: 'https://lab.ethpandaops.io/ethereum/live' },
+      { property: 'og:url', content: `${import.meta.env.VITE_BASE_URL}/ethereum/live` },
       { property: 'og:type', content: 'website' },
       { property: 'og:title', content: `Live | ${import.meta.env.VITE_BASE_TITLE}` },
       {
@@ -36,7 +36,7 @@ export const Route = createFileRoute('/ethereum/live')({
         property: 'og:image',
         content: '/images/ethereum/live.png',
       },
-      { name: 'twitter:url', content: 'https://lab.ethpandaops.io/ethereum/live' },
+      { name: 'twitter:url', content: `${import.meta.env.VITE_BASE_URL}/ethereum/live` },
       { name: 'twitter:title', content: `Live | ${import.meta.env.VITE_BASE_TITLE}` },
       {
         name: 'twitter:description',

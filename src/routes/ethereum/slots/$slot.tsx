@@ -13,7 +13,7 @@ export const Route = createFileRoute('/ethereum/slots/$slot')({
         content:
           'Detailed visualization and analysis of Ethereum consensus layer slot data including attestations, block propagation, and blob availability.',
       },
-      { property: 'og:url', content: 'https://lab.ethpandaops.io/ethereum/slots' },
+      { property: 'og:url', content: `${import.meta.env.VITE_BASE_URL}/ethereum/slots` },
       { property: 'og:type', content: 'website' },
       { property: 'og:title', content: `Slot Details | ${import.meta.env.VITE_BASE_TITLE}` },
       {
@@ -25,7 +25,7 @@ export const Route = createFileRoute('/ethereum/slots/$slot')({
         property: 'og:image',
         content: '/images/ethereum/slots.png',
       },
-      { name: 'twitter:url', content: 'https://lab.ethpandaops.io/ethereum/slots' },
+      { name: 'twitter:url', content: `${import.meta.env.VITE_BASE_URL}/ethereum/slots` },
       { name: 'twitter:title', content: `Slot Details | ${import.meta.env.VITE_BASE_TITLE}` },
       {
         name: 'twitter:description',
