@@ -26,8 +26,8 @@ Whenever Claude is asked to visualize data, you must follow the steps below.
 
 | Data Characteristics | Chart Config | Example Metrics |
 |---------------------|--------------|-----------------|
-| **Integer values only, non-negative** | Step chart: `step: 'end'` | blob count, transaction count, user count |
-| **Values hold between updates** | Step chart: `step: 'start'` | base fee, price tier, status, config value |
+| **Integer values only, non-negative** | Step chart: `step: 'middle'` | blob count, transaction count, user count |
+| **Values hold between updates (state changes)** | Step chart: `step: 'start'` | validator status, network state, config value |
 | **Continuous decimals, volatile** | Line: `smooth: false` | gas price, latency, response time |
 | **Continuous decimals, trend focus** | Line: `smooth: true` | moving averages, smoothed rates |
 | **Categorical states** | Step chart: `step: 'start'` + colors | validator status, network state |
@@ -97,7 +97,8 @@ Is data always integers?
 | **Limit colors per chart** | Too many colors = cognitive overload | Max 5-7 distinct colors |
 | **Show data directly when <20 points** | Let users see actual values | Add data labels or table |
 | **Use integers for count data** | Fractional counts don't exist | `yAxis: { minInterval: 1 }` |
-| **Use filled step chart for count data** | Step chart is the most accurate way to represent count data | `step: 'middle'`, `showArea: true`, `areaOpacity: 1`, `lineWidth: 0` |
+| **Use filled step chart for count data** | Step chart is the most accurate way to represent count data | `step: 'middle'`, `showArea: true`, `areaOpacity: 0.3`, `lineWidth: 2` |
+| **Disable forced max label** | Prevents awkward tick spacing (e.g., 1, 6, 11, 16, 21, 26, 31, 32) | `axisLabel: { showMaxLabel: false }` in x-axis config |
 
 ### Never Do:
 
@@ -116,7 +117,7 @@ Is data always integers?
 
 | Metric Type | Example | Chart | Settings |
 |-------------|---------|-------|----------|
-| **Event count per period** | "transactions per block" | Step | `step: 'end'`, `minInterval: 1` |
+| **Event count per period** | "transactions per block" | Step | `step: 'middle'`, `minInterval: 1` |
 | **Total/cumulative** | "total users", "cumulative revenue" | Area or Line | `smooth: false` or filled area |
 | **Rate/percentage** | "success rate", "utilization %" | Line | `smooth: false`, range 0-100 |
 | **Price/fee** | "gas price", "transaction fee" | Line or Step | Step if updates discrete, Line if continuous |
@@ -142,9 +143,28 @@ Is data always integers?
 
 | Direction | When to Use | Example |
 |-----------|-------------|---------|
-| `step: 'end'` | Value measured **AT** this point | Count of events in slot N, measured at slot N |
-| `step: 'start'` | Value **HOLDS FROM** this point | Price changed at slot N, stays until next change |
-| `step: 'middle'` | Rare - value centered on interval | Midpoint representation (uncommon) |
+| `step: 'middle'` | Value **REPRESENTS THE ENTIRE PERIOD** | Blob count in slot N, transactions in block N, gas used in epoch N |
+| `step: 'start'` | Value **HOLDS FROM** this point until next change | Validator status changed at slot N, config updated at block N |
+| `step: 'end'` | Rarely used - value measured at end of period | Uncommon - consider `step: 'middle'` instead |
+
+### Step Chart Visual Styling (IMPORTANT)
+
+**Always use light fills with visible lines** for better readability and visual hierarchy:
+
+```tsx
+{
+  step: 'middle',
+  showArea: true,
+  areaOpacity: 0.3,    // Light 30% fill - NOT solid (1.0)
+  lineWidth: 2,         // Visible 2px line - NOT hidden (0)
+  showSymbol: false,
+}
+```
+
+**Why this pattern:**
+- ❌ **Heavy style** (`areaOpacity: 1`, `lineWidth: 0`) looks blocky, too visually dominant
+- ✅ **Light style** (`areaOpacity: 0.3`, `lineWidth: 2`) maintains data visibility while being easier to read
+- The visible line helps trace values, while the light fill provides context without overwhelming
 
 ### Smooth vs Linear for Continuous Data
 
@@ -182,15 +202,15 @@ Before finalizing any chart, ask:
 
 | I Have... | I Want To... | Use This |
 |-----------|--------------|----------|
-| Counts over time | Show exact counts per period | Step chart with filled area (`step: 'end'`, `showArea: true`, `areaOpacity: 1`, `lineWidth: 0`) |
+| Counts over time | Show exact counts per period | Step chart with filled area (`step: 'middle'`, `showArea: true`, `areaOpacity: 0.3`, `lineWidth: 2`) |
 | Measurements over time | Show trend | Line (smooth) |
 | Measurements over time | Show volatility | Line (linear) |
-| Values that update occasionally | Show when changes occur | Step chart with filled area (`step: 'start'`, `showArea: true`, `areaOpacity: 1`, `lineWidth: 0`) |
+| Values that update occasionally | Show when changes occur | Step chart with filled area (`step: 'start'`, `showArea: true`, `areaOpacity: 0.3`, `lineWidth: 2`) |
 | Categories to compare | Compare values | Bar chart (horizontal if labels long) |
 | Parts of a whole | Show composition | Donut (if ≤5) or Bar chart |
 | Two variables | Find correlation | Scatter plot |
 | One variable distribution | Understand spread | Histogram or Box plot (small dataset (<50 points) use Dot plot or Strip plot) |
-| States over time | Show transitions | Step chart with filled area (`step: 'start'`, `showArea: true`, `areaOpacity: 1`, `lineWidth: 0`) + colors |
+| States over time | Show transitions | Step chart with filled area (`step: 'start'`, `showArea: true`, `areaOpacity: 0.3`, `lineWidth: 2`) + colors |
 
 ## Key Principles to Remember
 

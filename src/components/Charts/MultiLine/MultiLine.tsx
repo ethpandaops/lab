@@ -80,9 +80,28 @@ export function MultiLineChart({
   enableAggregateToggle = false,
   aggregateSeriesName = 'Average',
   enableSeriesFilter = false,
+  relativeSlots,
 }: MultiLineChartProps): React.JSX.Element {
   const themeColors = useThemeColors();
   const { CHART_CATEGORICAL_COLORS } = getDataVizColors();
+
+  // Helper functions for relative slot display
+  const toRelativeSlot = (absoluteSlot: number): number => {
+    if (!relativeSlots) return absoluteSlot;
+    return absoluteSlot - relativeSlots.epoch * 32 + 1;
+  };
+
+  const formatSlotLabel = (absoluteSlot: number): string => {
+    if (!relativeSlots) return formatSmartDecimal(absoluteSlot, 0);
+    const relativeSlot = toRelativeSlot(absoluteSlot);
+    return `${relativeSlot}`;
+  };
+
+  const formatSlotTooltip = (absoluteSlot: number): string => {
+    if (!relativeSlots) return formatSmartDecimal(absoluteSlot, 0);
+    const relativeSlot = toRelativeSlot(absoluteSlot);
+    return `Slot: ${formatSmartDecimal(absoluteSlot, 0)} (${relativeSlot}/32)`;
+  };
 
   // Convert OKLCH colors (from Tailwind v4) to hex format for ECharts compatibility
   const convertedColorPalette = colorPalette?.map(color => resolveCssColorToHex(color));
@@ -226,7 +245,8 @@ export function MultiLineChart({
     axisLabel: {
       color: themeColors.muted,
       fontSize: 12,
-      formatter: xAxis.formatter,
+      formatter: xAxis.formatter || (relativeSlots ? (value: number) => formatSlotLabel(value) : undefined),
+      showMaxLabel: false, // Don't force-render the max value to avoid awkward tick spacing
     },
     splitLine: {
       lineStyle: {
@@ -348,12 +368,15 @@ export function MultiLineChart({
 
           // Add x-axis label (first item's axis value)
           // For numeric x-axis, format as integer to avoid decimals like "9876543.5"
+          // When relativeSlots is enabled, show both absolute and relative values
           if (dataPoints.length > 0 && dataPoints[0]) {
             const firstPoint = dataPoints[0] as { axisValue?: string | number };
             if (firstPoint.axisValue !== undefined) {
               const axisLabel =
                 typeof firstPoint.axisValue === 'number'
-                  ? formatSmartDecimal(firstPoint.axisValue, 0) // 0 decimals = integers only
+                  ? relativeSlots
+                    ? formatSlotTooltip(firstPoint.axisValue)
+                    : formatSmartDecimal(firstPoint.axisValue, 0) // 0 decimals = integers only
                   : firstPoint.axisValue;
               html += `<div style="margin-bottom: 4px; font-weight: 600;">${axisLabel}</div>`;
             }
