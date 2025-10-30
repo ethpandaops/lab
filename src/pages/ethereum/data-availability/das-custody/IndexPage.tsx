@@ -6,11 +6,11 @@ import { Header } from '@/components/Layout/Header';
 import { LoadingContainer } from '@/components/Layout/LoadingContainer';
 import { PopoutCard } from '@/components/Layout/PopoutCard';
 import { Stats } from '@/components/DataDisplay/Stats';
-import { DataAvailabilityHeatmap } from '@/components/Charts/DataAvailabilityHeatmap';
-import { DataAvailabilityFilterPanel } from '@/components/Charts/DataAvailabilityHeatmap/DataAvailabilityFilterPanel';
-import { DataAvailabilityLegend } from '@/components/Charts/DataAvailabilityHeatmap/DataAvailabilityLegend';
-import type { DataAvailabilityGranularity } from '@/components/Charts/DataAvailabilityHeatmap';
-import type { DataAvailabilityFilters } from '@/components/Charts/DataAvailabilityHeatmap/DataAvailabilityFilterPanel.types';
+import { DataAvailabilityHeatmap } from '@/pages/ethereum/data-availability/components/DataAvailabilityHeatmap';
+import { DataAvailabilityFilterPanel } from '@/pages/ethereum/data-availability/components/DataAvailabilityHeatmap/DataAvailabilityFilterPanel';
+import { DataAvailabilityLegend } from '@/pages/ethereum/data-availability/components/DataAvailabilityHeatmap/DataAvailabilityLegend';
+import type { DataAvailabilityGranularity } from '@/pages/ethereum/data-availability/components/DataAvailabilityHeatmap';
+import type { DataAvailabilityFilters } from '@/pages/ethereum/data-availability/components/DataAvailabilityHeatmap/DataAvailabilityFilterPanel.types';
 import {
   fctDataColumnAvailabilityDailyServiceListOptions,
   fctDataColumnAvailabilityHourlyServiceListOptions,

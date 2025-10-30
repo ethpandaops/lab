@@ -1,0 +1,190 @@
+import type { Meta, StoryObj } from '@storybook/react-vite';
+import { GridHeatmap } from './GridHeatmap';
+import type { GridRow } from './GridHeatmap.types';
+import { useState } from 'react';
+
+/**
+ * Simple metric data structure for demos
+ */
+interface MetricData {
+  value: number;
+  label: string;
+}
+
+/**
+ * Sample cell component that shows a color based on value
+ */
+function SampleCell({
+  data,
+  isSelected,
+  isHighlighted,
+  isDimmed,
+  size,
+  onClick,
+}: {
+  data: MetricData;
+  isSelected: boolean;
+  isHighlighted: boolean;
+  isDimmed: boolean;
+  size: string;
+  onClick?: () => void;
+}): React.JSX.Element {
+  const getColor = (value: number): string => {
+    if (value >= 90) return 'bg-success';
+    if (value >= 70) return 'bg-warning';
+    if (value >= 50) return 'bg-danger/70';
+    return 'bg-muted';
+  };
+
+  const sizeClass = {
+    xs: 'size-3',
+    sm: 'size-4',
+    md: 'size-6',
+    lg: 'size-8',
+    xl: 'size-10',
+  }[size];
+
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`${sizeClass} ${getColor(data.value)} transition-all ${isSelected ? 'ring-2 ring-accent' : ''} ${isHighlighted ? 'ring-1 ring-accent/50' : ''} ${isDimmed ? 'opacity-20' : ''} ${onClick ? 'cursor-pointer hover:opacity-80' : 'cursor-default'}`}
+      title={`${data.label}: ${data.value}`}
+    />
+  );
+}
+
+/**
+ * Generate sample grid data
+ */
+function generateSampleData(rows: number, columns: number): GridRow<MetricData>[] {
+  return Array.from({ length: rows }, (_, rowIndex) => ({
+    identifier: `row-${rowIndex}`,
+    label: `Row ${rowIndex + 1}`,
+    cells: Array.from({ length: columns }, (_, colIndex) => ({
+      columnIndex: colIndex,
+      data: {
+        value: Math.floor(Math.random() * 100),
+        label: `R${rowIndex + 1}C${colIndex + 1}`,
+      },
+    })),
+  }));
+}
+
+const meta: Meta<typeof GridHeatmap> = {
+  title: 'Components/Charts/GridHeatmap',
+  component: GridHeatmap,
+  decorators: [
+    Story => (
+      <div className="min-w-[600px] rounded-sm bg-surface p-6">
+        <Story />
+      </div>
+    ),
+  ],
+};
+
+export default meta;
+
+type Story = StoryObj<typeof GridHeatmap>;
+
+export const Default: Story = {
+  args: {
+    rows: generateSampleData(10, 20),
+    renderCell: (data, props) => <SampleCell data={data as MetricData} {...props} />,
+  },
+};
+
+export const WithHeader: Story = {
+  args: {
+    rows: generateSampleData(8, 15),
+    renderCell: (data, props) => <SampleCell data={data as MetricData} {...props} />,
+    renderHeader: () => (
+      <div className="rounded-sm border border-border bg-surface p-4">
+        <h3 className="mb-2 text-sm font-medium">Grid Legend</h3>
+        <div className="flex gap-4 text-xs">
+          <div className="flex items-center gap-2">
+            <div className="size-3 rounded-sm bg-success" />
+            <span>90-100</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="size-3 rounded-sm bg-warning" />
+            <span>70-89</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="size-3 rounded-sm bg-danger/70" />
+            <span>50-69</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="size-3 rounded-sm bg-muted" />
+            <span>0-49</span>
+          </div>
+        </div>
+      </div>
+    ),
+  },
+};
+
+export const Interactive: Story = {
+  render: () => {
+    const [selectedColumn, setSelectedColumn] = useState<number | undefined>(undefined);
+    const [selectedRowId, setSelectedRowId] = useState<string | null>(null);
+    const rows = generateSampleData(12, 25);
+
+    return (
+      <div className="space-y-4">
+        {selectedRowId && (
+          <div className="rounded-sm bg-accent/10 p-3 text-sm">
+            <strong>Selected row:</strong> {selectedRowId}
+          </div>
+        )}
+        <GridHeatmap
+          rows={rows}
+          selectedColumn={selectedColumn}
+          renderCell={(data, props) => <SampleCell data={data as MetricData} {...props} />}
+          onCellClick={(rowId, colIndex, cellData) => {
+            setSelectedColumn(colIndex);
+            setSelectedRowId(rowId);
+            console.log('Cell clicked:', { rowId, colIndex, cellData });
+          }}
+          onRowClick={rowId => {
+            setSelectedRowId(rowId);
+            console.log('Row clicked:', rowId);
+          }}
+          onClearColumnSelection={() => setSelectedColumn(undefined)}
+        />
+      </div>
+    );
+  },
+};
+
+export const WithBackButton: Story = {
+  args: {
+    rows: generateSampleData(6, 12),
+    renderCell: (data, props) => <SampleCell data={data as MetricData} {...props} />,
+    onBack: () => alert('Back button clicked!'),
+  },
+};
+
+export const LargeCells: Story = {
+  args: {
+    rows: generateSampleData(5, 10),
+    cellSize: 'lg',
+    renderCell: (data, props) => <SampleCell data={data as MetricData} {...props} />,
+  },
+};
+
+export const SmallDenseGrid: Story = {
+  args: {
+    rows: generateSampleData(20, 40),
+    cellSize: 'xs',
+    renderCell: (data, props) => <SampleCell data={data as MetricData} {...props} />,
+  },
+};
+
+export const NoColumnHeader: Story = {
+  args: {
+    rows: generateSampleData(8, 15),
+    showColumnHeader: false,
+    renderCell: (data, props) => <SampleCell data={data as MetricData} {...props} />,
+  },
+};

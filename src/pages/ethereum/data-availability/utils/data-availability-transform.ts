@@ -1,4 +1,4 @@
-import type { DataAvailabilityRow } from '@/components/Charts/DataAvailabilityHeatmap';
+import type { DataAvailabilityRow } from '@/pages/ethereum/data-availability/components/DataAvailabilityHeatmap';
 import type {
   FctDataColumnAvailabilityDaily,
   FctDataColumnAvailabilityHourly,
