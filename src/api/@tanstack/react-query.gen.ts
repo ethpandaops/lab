@@ -66,12 +66,6 @@ import {
   fctDataColumnAvailabilityDailyServiceList,
   fctDataColumnAvailabilityHourlyServiceGet,
   fctDataColumnAvailabilityHourlyServiceList,
-  fctDataTypesComplexServiceGet,
-  fctDataTypesComplexServiceList,
-  fctDataTypesIntegersServiceGet,
-  fctDataTypesIntegersServiceList,
-  fctDataTypesTemporalServiceGet,
-  fctDataTypesTemporalServiceList,
   fctHeadFirstSeenByNodeServiceGet,
   fctHeadFirstSeenByNodeServiceList,
   fctMevBidCountByBuilderServiceGet,
@@ -173,12 +167,6 @@ import type {
   FctDataColumnAvailabilityDailyServiceListData,
   FctDataColumnAvailabilityHourlyServiceGetData,
   FctDataColumnAvailabilityHourlyServiceListData,
-  FctDataTypesComplexServiceGetData,
-  FctDataTypesComplexServiceListData,
-  FctDataTypesIntegersServiceGetData,
-  FctDataTypesIntegersServiceListData,
-  FctDataTypesTemporalServiceGetData,
-  FctDataTypesTemporalServiceListData,
   FctHeadFirstSeenByNodeServiceGetData,
   FctHeadFirstSeenByNodeServiceListData,
   FctMevBidCountByBuilderServiceGetData,
@@ -1789,144 +1777,6 @@ export const fctDataColumnAvailabilityHourlyServiceGetOptions = (
       return data;
     },
     queryKey: fctDataColumnAvailabilityHourlyServiceGetQueryKey(options),
-  });
-};
-
-export const fctDataTypesComplexServiceListQueryKey = (options?: Options<FctDataTypesComplexServiceListData>) =>
-  createQueryKey('fctDataTypesComplexServiceList', options);
-
-/**
- * List records
- *
- * Retrieve paginated results with optional filtering
- */
-export const fctDataTypesComplexServiceListOptions = (options?: Options<FctDataTypesComplexServiceListData>) => {
-  return queryOptions({
-    queryFn: async ({ queryKey, signal }) => {
-      const { data } = await fctDataTypesComplexServiceList({
-        ...options,
-        ...queryKey[0],
-        signal,
-        throwOnError: true,
-      });
-      return data;
-    },
-    queryKey: fctDataTypesComplexServiceListQueryKey(options),
-  });
-};
-
-export const fctDataTypesComplexServiceGetQueryKey = (options: Options<FctDataTypesComplexServiceGetData>) =>
-  createQueryKey('fctDataTypesComplexServiceGet', options);
-
-/**
- * Get record
- *
- * Retrieve a single record by id
- */
-export const fctDataTypesComplexServiceGetOptions = (options: Options<FctDataTypesComplexServiceGetData>) => {
-  return queryOptions({
-    queryFn: async ({ queryKey, signal }) => {
-      const { data } = await fctDataTypesComplexServiceGet({
-        ...options,
-        ...queryKey[0],
-        signal,
-        throwOnError: true,
-      });
-      return data;
-    },
-    queryKey: fctDataTypesComplexServiceGetQueryKey(options),
-  });
-};
-
-export const fctDataTypesIntegersServiceListQueryKey = (options?: Options<FctDataTypesIntegersServiceListData>) =>
-  createQueryKey('fctDataTypesIntegersServiceList', options);
-
-/**
- * List records
- *
- * Retrieve paginated results with optional filtering
- */
-export const fctDataTypesIntegersServiceListOptions = (options?: Options<FctDataTypesIntegersServiceListData>) => {
-  return queryOptions({
-    queryFn: async ({ queryKey, signal }) => {
-      const { data } = await fctDataTypesIntegersServiceList({
-        ...options,
-        ...queryKey[0],
-        signal,
-        throwOnError: true,
-      });
-      return data;
-    },
-    queryKey: fctDataTypesIntegersServiceListQueryKey(options),
-  });
-};
-
-export const fctDataTypesIntegersServiceGetQueryKey = (options: Options<FctDataTypesIntegersServiceGetData>) =>
-  createQueryKey('fctDataTypesIntegersServiceGet', options);
-
-/**
- * Get record
- *
- * Retrieve a single record by id
- */
-export const fctDataTypesIntegersServiceGetOptions = (options: Options<FctDataTypesIntegersServiceGetData>) => {
-  return queryOptions({
-    queryFn: async ({ queryKey, signal }) => {
-      const { data } = await fctDataTypesIntegersServiceGet({
-        ...options,
-        ...queryKey[0],
-        signal,
-        throwOnError: true,
-      });
-      return data;
-    },
-    queryKey: fctDataTypesIntegersServiceGetQueryKey(options),
-  });
-};
-
-export const fctDataTypesTemporalServiceListQueryKey = (options?: Options<FctDataTypesTemporalServiceListData>) =>
-  createQueryKey('fctDataTypesTemporalServiceList', options);
-
-/**
- * List records
- *
- * Retrieve paginated results with optional filtering
- */
-export const fctDataTypesTemporalServiceListOptions = (options?: Options<FctDataTypesTemporalServiceListData>) => {
-  return queryOptions({
-    queryFn: async ({ queryKey, signal }) => {
-      const { data } = await fctDataTypesTemporalServiceList({
-        ...options,
-        ...queryKey[0],
-        signal,
-        throwOnError: true,
-      });
-      return data;
-    },
-    queryKey: fctDataTypesTemporalServiceListQueryKey(options),
-  });
-};
-
-export const fctDataTypesTemporalServiceGetQueryKey = (options: Options<FctDataTypesTemporalServiceGetData>) =>
-  createQueryKey('fctDataTypesTemporalServiceGet', options);
-
-/**
- * Get record
- *
- * Retrieve a single record by id
- */
-export const fctDataTypesTemporalServiceGetOptions = (options: Options<FctDataTypesTemporalServiceGetData>) => {
-  return queryOptions({
-    queryFn: async ({ queryKey, signal }) => {
-      const { data } = await fctDataTypesTemporalServiceGet({
-        ...options,
-        ...queryKey[0],
-        signal,
-        throwOnError: true,
-      });
-      return data;
-    },
-    queryKey: fctDataTypesTemporalServiceGetQueryKey(options),
   });
 };
 
