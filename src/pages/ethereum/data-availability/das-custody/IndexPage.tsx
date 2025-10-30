@@ -139,7 +139,7 @@ export function IndexPage(): JSX.Element {
     columnGroups: new Set([0, 1, 2, 3]), // All groups selected by default
     minAvailability: 0,
     maxAvailability: 100,
-    minProbeCount: 0,
+    minObservationCount: 0,
   });
 
   // Window Level: Last 19 days of daily aggregated data
@@ -658,7 +658,7 @@ export function IndexPage(): JSX.Element {
         totalPeriods: 0,
         activeColumns: 0,
         avgAvailability: 0,
-        totalProbes: 0,
+        totalObservations: 0,
         avgResponseTime: 0,
       };
     }
@@ -667,7 +667,7 @@ export function IndexPage(): JSX.Element {
     const columnsWithData = new Set<number>();
     let totalAvailability = 0;
     let cellsWithData = 0;
-    let totalProbes = 0;
+    let totalObservations = 0;
     let totalResponseTime = 0;
     let cellsWithResponseTime = 0;
 
@@ -678,7 +678,7 @@ export function IndexPage(): JSX.Element {
           columnsWithData.add(cell.columnIndex);
           totalAvailability += cell.availability;
           cellsWithData++;
-          totalProbes += cell.totalCount ?? 0;
+          totalObservations += cell.totalCount ?? 0;
           if (cell.avgResponseTimeMs !== undefined && cell.avgResponseTimeMs > 0) {
             totalResponseTime += cell.avgResponseTimeMs;
             cellsWithResponseTime++;
@@ -691,7 +691,7 @@ export function IndexPage(): JSX.Element {
       totalPeriods: rows.length,
       activeColumns: columnsWithData.size,
       avgAvailability: cellsWithData > 0 ? totalAvailability / cellsWithData : 0,
-      totalProbes,
+      totalObservations,
       avgResponseTime: cellsWithResponseTime > 0 ? totalResponseTime / cellsWithResponseTime : 0,
     };
   }, [rows]);

@@ -5,8 +5,8 @@ export interface DataAvailabilityFilters {
   minAvailability: number;
   /** Maximum availability percentage (0-100) */
   maxAvailability: number;
-  /** Minimum probe count to show a cell */
-  minProbeCount: number;
+  /** Minimum observation count to show a cell */
+  minObservationCount: number;
 }
 
 export interface DataAvailabilityFilterPanelProps {

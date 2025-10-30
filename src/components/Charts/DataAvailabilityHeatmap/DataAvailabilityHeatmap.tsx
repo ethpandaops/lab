@@ -40,14 +40,14 @@ export const DataAvailabilityHeatmap = ({
           return false;
         }
 
-        // Filter by probe count
-        const probeCount = cell.totalCount ?? 0;
-        if (probeCount < filters.minProbeCount) {
+        // Filter by observation count
+        const observationCount = cell.totalCount ?? 0;
+        if (observationCount < filters.minObservationCount) {
           return false;
         }
 
         // Filter by availability (only if cell has data)
-        const hasData = probeCount > 0;
+        const hasData = observationCount > 0;
         if (hasData) {
           const availabilityPercent = cell.availability * 100;
           if (availabilityPercent < filters.minAvailability || availabilityPercent > filters.maxAvailability) {

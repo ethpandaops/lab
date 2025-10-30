@@ -15,7 +15,7 @@ const defaultFilters: DataAvailabilityFilters = {
   columnGroups: new Set([0, 1, 2, 3]), // All groups selected by default
   minAvailability: 0,
   maxAvailability: 100,
-  minProbeCount: 0,
+  minObservationCount: 0,
 };
 
 const meta = {

@@ -1342,6 +1342,14 @@ export type FctDataColumnAvailabilityBySlot = {
    */
   availability_pct?: number;
   /**
+   * Beacon block root for this slot (from earliest observation, handles reorgs, NULL if unavailable)
+   */
+  beacon_block_root?: string | null;
+  /**
+   * Number of unique block roots observed (>1 indicates reorg/fork)
+   */
+  beacon_block_root_variants?: number;
+  /**
    * Number of blobs in the slot (max column_rows_count)
    */
   blob_count?: number;
@@ -1349,6 +1357,10 @@ export type FctDataColumnAvailabilityBySlot = {
    * Column index being probed (0-127)
    */
   column_index?: number;
+  /**
+   * Count of observations from active RPC custody probes
+   */
+  custody_probe_count?: number;
   /**
    * Epoch number containing the slot
    */
@@ -1361,6 +1373,10 @@ export type FctDataColumnAvailabilityBySlot = {
    * Count of failed probes (result = failure)
    */
   failure_count?: number;
+  /**
+   * Count of observations from passive gossipsub propagation
+   */
+  gossipsub_count?: number;
   /**
    * Maximum response time in milliseconds for successful probes only
    */
@@ -17946,6 +17962,82 @@ export type FctDataColumnAvailabilityBySlotServiceListData = {
      */
     wallclock_request_epoch_start_date_time_not_in_values?: string;
     /**
+     * Beacon block root for this slot (from earliest observation, handles reorgs, NULL if unavailable) (filter: eq)
+     */
+    beacon_block_root_eq?: string;
+    /**
+     * Beacon block root for this slot (from earliest observation, handles reorgs, NULL if unavailable) (filter: ne)
+     */
+    beacon_block_root_ne?: string;
+    /**
+     * Beacon block root for this slot (from earliest observation, handles reorgs, NULL if unavailable) (filter: contains)
+     */
+    beacon_block_root_contains?: string;
+    /**
+     * Beacon block root for this slot (from earliest observation, handles reorgs, NULL if unavailable) (filter: starts_with)
+     */
+    beacon_block_root_starts_with?: string;
+    /**
+     * Beacon block root for this slot (from earliest observation, handles reorgs, NULL if unavailable) (filter: ends_with)
+     */
+    beacon_block_root_ends_with?: string;
+    /**
+     * Beacon block root for this slot (from earliest observation, handles reorgs, NULL if unavailable) (filter: like)
+     */
+    beacon_block_root_like?: string;
+    /**
+     * Beacon block root for this slot (from earliest observation, handles reorgs, NULL if unavailable) (filter: not_like)
+     */
+    beacon_block_root_not_like?: string;
+    /**
+     * Beacon block root for this slot (from earliest observation, handles reorgs, NULL if unavailable) (filter: in_values) (comma-separated list)
+     */
+    beacon_block_root_in_values?: string;
+    /**
+     * Beacon block root for this slot (from earliest observation, handles reorgs, NULL if unavailable) (filter: not_in_values) (comma-separated list)
+     */
+    beacon_block_root_not_in_values?: string;
+    /**
+     * Number of unique block roots observed (>1 indicates reorg/fork) (filter: eq)
+     */
+    beacon_block_root_variants_eq?: number;
+    /**
+     * Number of unique block roots observed (>1 indicates reorg/fork) (filter: ne)
+     */
+    beacon_block_root_variants_ne?: number;
+    /**
+     * Number of unique block roots observed (>1 indicates reorg/fork) (filter: lt)
+     */
+    beacon_block_root_variants_lt?: number;
+    /**
+     * Number of unique block roots observed (>1 indicates reorg/fork) (filter: lte)
+     */
+    beacon_block_root_variants_lte?: number;
+    /**
+     * Number of unique block roots observed (>1 indicates reorg/fork) (filter: gt)
+     */
+    beacon_block_root_variants_gt?: number;
+    /**
+     * Number of unique block roots observed (>1 indicates reorg/fork) (filter: gte)
+     */
+    beacon_block_root_variants_gte?: number;
+    /**
+     * Number of unique block roots observed (>1 indicates reorg/fork) (filter: between_min)
+     */
+    beacon_block_root_variants_between_min?: number;
+    /**
+     * Number of unique block roots observed (>1 indicates reorg/fork) (filter: between_max_value)
+     */
+    beacon_block_root_variants_between_max_value?: number;
+    /**
+     * Number of unique block roots observed (>1 indicates reorg/fork) (filter: in_values) (comma-separated list)
+     */
+    beacon_block_root_variants_in_values?: string;
+    /**
+     * Number of unique block roots observed (>1 indicates reorg/fork) (filter: not_in_values) (comma-separated list)
+     */
+    beacon_block_root_variants_not_in_values?: string;
+    /**
      * Number of blobs in the slot (max column_rows_count) (filter: eq)
      */
     blob_count_eq?: number;
@@ -18469,6 +18561,86 @@ export type FctDataColumnAvailabilityBySlotServiceListData = {
      * Count of unique client implementations (filter: not_in_values) (comma-separated list)
      */
     unique_implementation_count_not_in_values?: string;
+    /**
+     * Count of observations from active RPC custody probes (filter: eq)
+     */
+    custody_probe_count_eq?: number;
+    /**
+     * Count of observations from active RPC custody probes (filter: ne)
+     */
+    custody_probe_count_ne?: number;
+    /**
+     * Count of observations from active RPC custody probes (filter: lt)
+     */
+    custody_probe_count_lt?: number;
+    /**
+     * Count of observations from active RPC custody probes (filter: lte)
+     */
+    custody_probe_count_lte?: number;
+    /**
+     * Count of observations from active RPC custody probes (filter: gt)
+     */
+    custody_probe_count_gt?: number;
+    /**
+     * Count of observations from active RPC custody probes (filter: gte)
+     */
+    custody_probe_count_gte?: number;
+    /**
+     * Count of observations from active RPC custody probes (filter: between_min)
+     */
+    custody_probe_count_between_min?: number;
+    /**
+     * Count of observations from active RPC custody probes (filter: between_max_value)
+     */
+    custody_probe_count_between_max_value?: number;
+    /**
+     * Count of observations from active RPC custody probes (filter: in_values) (comma-separated list)
+     */
+    custody_probe_count_in_values?: string;
+    /**
+     * Count of observations from active RPC custody probes (filter: not_in_values) (comma-separated list)
+     */
+    custody_probe_count_not_in_values?: string;
+    /**
+     * Count of observations from passive gossipsub propagation (filter: eq)
+     */
+    gossipsub_count_eq?: number;
+    /**
+     * Count of observations from passive gossipsub propagation (filter: ne)
+     */
+    gossipsub_count_ne?: number;
+    /**
+     * Count of observations from passive gossipsub propagation (filter: lt)
+     */
+    gossipsub_count_lt?: number;
+    /**
+     * Count of observations from passive gossipsub propagation (filter: lte)
+     */
+    gossipsub_count_lte?: number;
+    /**
+     * Count of observations from passive gossipsub propagation (filter: gt)
+     */
+    gossipsub_count_gt?: number;
+    /**
+     * Count of observations from passive gossipsub propagation (filter: gte)
+     */
+    gossipsub_count_gte?: number;
+    /**
+     * Count of observations from passive gossipsub propagation (filter: between_min)
+     */
+    gossipsub_count_between_min?: number;
+    /**
+     * Count of observations from passive gossipsub propagation (filter: between_max_value)
+     */
+    gossipsub_count_between_max_value?: number;
+    /**
+     * Count of observations from passive gossipsub propagation (filter: in_values) (comma-separated list)
+     */
+    gossipsub_count_in_values?: string;
+    /**
+     * Count of observations from passive gossipsub propagation (filter: not_in_values) (comma-separated list)
+     */
+    gossipsub_count_not_in_values?: string;
     /**
      * The maximum number of fct_data_column_availability_by_slot to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
      */

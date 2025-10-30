@@ -4,7 +4,7 @@ import type { DataAvailabilityFilterPanelProps } from './DataAvailabilityFilterP
 
 /**
  * Filter panel for data availability heatmap
- * Allows filtering by column subnet groups, availability threshold, and probe count
+ * Allows filtering by column subnet groups, availability threshold, and observation count
  */
 export const DataAvailabilityFilterPanel = ({
   filters,
@@ -13,7 +13,7 @@ export const DataAvailabilityFilterPanel = ({
 }: DataAvailabilityFilterPanelProps): React.JSX.Element => {
   const [minAvailability, setMinAvailability] = useState(filters.minAvailability);
   const [maxAvailability, setMaxAvailability] = useState(filters.maxAvailability);
-  const [minProbeCount, setMinProbeCount] = useState(filters.minProbeCount);
+  const [minObservationCount, setMinObservationCount] = useState(filters.minObservationCount);
   const [filterExpanded, setFilterExpanded] = useState(defaultOpen);
 
   /**
@@ -39,11 +39,11 @@ export const DataAvailabilityFilterPanel = ({
   };
 
   /**
-   * Handle min probe count change
+   * Handle min observation count change
    */
-  const handleMinProbeCountChange = (count: number): void => {
-    setMinProbeCount(count);
-    onFiltersChange({ ...filters, minProbeCount: count });
+  const handleMinObservationCountChange = (count: number): void => {
+    setMinObservationCount(count);
+    onFiltersChange({ ...filters, minObservationCount: count });
   };
 
   /**
@@ -141,20 +141,20 @@ export const DataAvailabilityFilterPanel = ({
               </div>
             </div>
 
-            {/* Min probe count */}
+            {/* Min observation count */}
             <div>
-              <h4 className="mb-3 text-sm font-medium text-foreground">Minimum Probes</h4>
+              <h4 className="mb-3 text-sm font-medium text-foreground">Minimum Observations</h4>
               <div>
-                <label htmlFor="min-probe-count" className="block text-xs text-muted">
+                <label htmlFor="min-observation-count" className="block text-xs text-muted">
                   Hide cells with fewer than:
                 </label>
                 <input
                   type="number"
-                  id="min-probe-count"
+                  id="min-observation-count"
                   min="0"
                   step="1"
-                  value={minProbeCount}
-                  onChange={e => handleMinProbeCountChange(Number(e.target.value))}
+                  value={minObservationCount}
+                  onChange={e => handleMinObservationCountChange(Number(e.target.value))}
                   className="mt-1 w-full rounded-sm border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-hidden"
                 />
               </div>

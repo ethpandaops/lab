@@ -8,9 +8,9 @@ export interface DataAvailabilityCellData {
   columnIndex: number;
   /** Availability percentage (0-1) */
   availability: number;
-  /** Optional: Number of successful custody probes */
+  /** Optional: Number of successful custody observations */
   successCount?: number;
-  /** Optional: Total number of custody probes */
+  /** Optional: Total number of custody observations */
   totalCount?: number;
   /** Optional: Average response time in milliseconds */
   avgResponseTimeMs?: number;

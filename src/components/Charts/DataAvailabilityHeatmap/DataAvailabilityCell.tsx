@@ -90,7 +90,7 @@ export const DataAvailabilityCell = ({
               <div className="text-muted">{availabilityPercent}% available</div>
               {data.successCount !== undefined && data.totalCount !== undefined && (
                 <div className="text-xs text-muted">
-                  {data.successCount}/{data.totalCount} probes
+                  {data.successCount}/{data.totalCount} observations
                 </div>
               )}
               {data.avgResponseTimeMs !== undefined && data.avgResponseTimeMs > 0 && (
