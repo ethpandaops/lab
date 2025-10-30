@@ -13,6 +13,7 @@ import type {
 } from '@/types/state-analytics';
 import { ResponsiveLine } from '@nivo/line';
 import { defaultNivoTheme } from '@/components/charts/NivoTheme';
+import { PlotlyTreemap } from '@/components/state/PlotlyTreemap';
 
 // Helper function to format bytes
 function formatBytes(bytes: number): string {
@@ -48,6 +49,7 @@ function StateAnalyzer() {
   const [granularity, setGranularity] = useState<StateGranularity>('hour' as StateGranularity);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<'growth' | 'composition'>('growth');
 
   useEffect(() => {
     let lastBlockNumber = 0;
@@ -61,13 +63,11 @@ function StateAnalyzer() {
       try {
         const latest = await restClient.getStateLatest(selectedNetwork).catch(() => null);
         if (latest) {
-          console.log('[State Analyzer] Latest block:', latest.block_number, 'Last:', lastBlockNumber);
-          setLatestData(latest);
-
-          // Only fetch heavy data when block number changes
+          // Only update state when block number actually changes
           if (latest.block_number !== lastBlockNumber) {
-            console.log('[State Analyzer] New block detected, fetching heavy data');
+            console.log('[State Analyzer] New block detected:', latest.block_number, 'Last:', lastBlockNumber);
             lastBlockNumber = latest.block_number;
+            setLatestData(latest);
             fetchHeavyData();
           }
         }
@@ -219,14 +219,41 @@ function StateAnalyzer() {
             </div>
           )}
 
-          {/* Period Selector */}
-          <div className="flex gap-2">
-            {(['24h', '7d', '30d'] as StatePeriod[]).map(p => (
-              <button
-                key={p}
-                onClick={() => setPeriod(p)}
-                className={`px-4 py-2 rounded-lg font-mono text-sm transition-colors ${
-                  period === p
+          {/* Tab Selector */}
+          <div className="flex gap-2 border-b border-border">
+            <button
+              onClick={() => setActiveTab('growth')}
+              className={`px-6 py-3 font-mono text-sm transition-colors border-b-2 ${
+                activeTab === 'growth'
+                  ? 'text-accent border-accent'
+                  : 'text-secondary border-transparent hover:text-primary'
+              }`}
+            >
+              Growth Analytics
+            </button>
+            <button
+              onClick={() => setActiveTab('composition')}
+              className={`px-6 py-3 font-mono text-sm transition-colors border-b-2 ${
+                activeTab === 'composition'
+                  ? 'text-accent border-accent'
+                  : 'text-secondary border-transparent hover:text-primary'
+              }`}
+            >
+              State Composition
+            </button>
+          </div>
+
+          {/* Growth Analytics Tab */}
+          {activeTab === 'growth' && (
+            <>
+              {/* Period Selector */}
+              <div className="flex gap-2">
+                {(['24h', '7d', '30d'] as StatePeriod[]).map(p => (
+                  <button
+                    key={p}
+                    onClick={() => setPeriod(p)}
+                    className={`px-4 py-2 rounded-lg font-mono text-sm transition-colors ${
+                      period === p
                     ? 'bg-accent text-primary font-bold'
                     : 'bg-surface text-secondary hover:bg-hover'
                 }`}
@@ -438,6 +465,13 @@ function StateAnalyzer() {
                 </div>
               </CardBody>
             </Card>
+          )}
+          </>
+          )}
+
+          {/* State Composition Tab */}
+          {activeTab === 'composition' && (
+            <PlotlyTreemap />
           )}
         </>
       )}
