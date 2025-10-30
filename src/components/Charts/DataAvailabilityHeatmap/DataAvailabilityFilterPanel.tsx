@@ -1,5 +1,8 @@
 import { useState } from 'react';
 import { CheckboxGroup } from '@/components/Forms/CheckboxGroup';
+import { Input } from '@/components/Forms/Input';
+import { RangeInput } from '@/components/Forms/RangeInput';
+import { Disclosure } from '@/components/Layout/Disclosure';
 import type { DataAvailabilityFilterPanelProps } from './DataAvailabilityFilterPanel.types';
 
 /**
@@ -14,7 +17,6 @@ export const DataAvailabilityFilterPanel = ({
   const [minAvailability, setMinAvailability] = useState(filters.minAvailability);
   const [maxAvailability, setMaxAvailability] = useState(filters.maxAvailability);
   const [minObservationCount, setMinObservationCount] = useState(filters.minObservationCount);
-  const [filterExpanded, setFilterExpanded] = useState(defaultOpen);
 
   /**
    * Handle column group checkbox toggle
@@ -81,87 +83,56 @@ export const DataAvailabilityFilterPanel = ({
   ];
 
   return (
-    <div>
-      {/* Collapsible header */}
-      <button
-        type="button"
-        onClick={() => setFilterExpanded(!filterExpanded)}
-        className="mb-2 flex w-full items-center justify-between rounded-sm border border-border bg-surface px-3 py-2 text-sm transition-colors hover:bg-muted/20"
-      >
-        <div className="flex items-center gap-2">
-          <span>{filterExpanded ? '▼' : '▶'}</span>
-          <span className="font-medium">Filters</span>
+    <Disclosure title="Filters" defaultOpen={defaultOpen}>
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+        {/* Column subnet groups */}
+        <div>
+          <h4 className="mb-3 text-sm font-medium text-foreground">Column Subnets</h4>
+          <CheckboxGroup legend="" srOnlyLegend options={columnGroupOptions} variant="simple" className="text-sm" />
         </div>
-      </button>
 
-      {/* Collapsible content */}
-      {filterExpanded && (
-        <div className="rounded-sm border border-border bg-surface p-4">
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-            {/* Column subnet groups */}
-            <div>
-              <h4 className="mb-3 text-sm font-medium text-foreground">Column Subnets</h4>
-              <CheckboxGroup legend="" srOnlyLegend options={columnGroupOptions} variant="simple" className="text-sm" />
-            </div>
-
-            {/* Availability threshold */}
-            <div>
-              <h4 className="mb-3 text-sm font-medium text-foreground">Availability Range</h4>
-              <div className="space-y-3">
-                <div>
-                  <label htmlFor="min-availability" className="block text-xs text-muted">
-                    Min: {minAvailability}%
-                  </label>
-                  <input
-                    type="range"
-                    id="min-availability"
-                    min="0"
-                    max="100"
-                    step="5"
-                    value={minAvailability}
-                    onChange={e => handleAvailabilityChange(Number(e.target.value), maxAvailability)}
-                    className="w-full"
-                  />
-                </div>
-                <div>
-                  <label htmlFor="max-availability" className="block text-xs text-muted">
-                    Max: {maxAvailability}%
-                  </label>
-                  <input
-                    type="range"
-                    id="max-availability"
-                    min="0"
-                    max="100"
-                    step="5"
-                    value={maxAvailability}
-                    onChange={e => handleAvailabilityChange(minAvailability, Number(e.target.value))}
-                    className="w-full"
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Min observation count */}
-            <div>
-              <h4 className="mb-3 text-sm font-medium text-foreground">Minimum Observations</h4>
-              <div>
-                <label htmlFor="min-observation-count" className="block text-xs text-muted">
-                  Hide cells with fewer than:
-                </label>
-                <input
-                  type="number"
-                  id="min-observation-count"
-                  min="0"
-                  step="1"
-                  value={minObservationCount}
-                  onChange={e => handleMinObservationCountChange(Number(e.target.value))}
-                  className="mt-1 w-full rounded-sm border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-hidden"
-                />
-              </div>
-            </div>
+        {/* Availability threshold */}
+        <div>
+          <h4 className="mb-3 text-sm font-medium text-foreground">Availability Range</h4>
+          <div className="space-y-3">
+            <RangeInput
+              id="min-availability"
+              label="Min"
+              value={minAvailability}
+              min={0}
+              max={100}
+              step={5}
+              suffix="%"
+              onChange={value => handleAvailabilityChange(value, maxAvailability)}
+            />
+            <RangeInput
+              id="max-availability"
+              label="Max"
+              value={maxAvailability}
+              min={0}
+              max={100}
+              step={5}
+              suffix="%"
+              onChange={value => handleAvailabilityChange(minAvailability, value)}
+            />
           </div>
         </div>
-      )}
-    </div>
+
+        {/* Min observation count */}
+        <div>
+          <h4 className="mb-3 text-sm font-medium text-foreground">Minimum Observations</h4>
+          <Input size="sm" label="Hide cells with fewer than:" labelClassName="text-xs text-muted font-normal">
+            <Input.Field
+              type="number"
+              id="min-observation-count"
+              min="0"
+              step="1"
+              value={minObservationCount}
+              onChange={e => handleMinObservationCountChange(Number(e.target.value))}
+            />
+          </Input>
+        </div>
+      </div>
+    </Disclosure>
   );
 };

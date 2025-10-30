@@ -9,7 +9,7 @@ import { Stats } from '@/components/DataDisplay/Stats';
 import { DataAvailabilityHeatmap } from '@/components/Charts/DataAvailabilityHeatmap';
 import { DataAvailabilityFilterPanel } from '@/components/Charts/DataAvailabilityHeatmap/DataAvailabilityFilterPanel';
 import { DataAvailabilityLegend } from '@/components/Charts/DataAvailabilityHeatmap/DataAvailabilityLegend';
-import type { DataAvailabilityRow, DataAvailabilityGranularity } from '@/components/Charts/DataAvailabilityHeatmap';
+import type { DataAvailabilityGranularity } from '@/components/Charts/DataAvailabilityHeatmap';
 import type { DataAvailabilityFilters } from '@/components/Charts/DataAvailabilityHeatmap/DataAvailabilityFilterPanel.types';
 import {
   fctDataColumnAvailabilityDailyServiceListOptions,
@@ -21,51 +21,18 @@ import {
   fctDataColumnAvailabilityBySlotBlobServiceList,
 } from '@/api/sdk.gen';
 import type {
-  FctDataColumnAvailabilityDaily,
-  FctDataColumnAvailabilityHourly,
   FctDataColumnAvailabilityByEpoch,
   FctDataColumnAvailabilityBySlot,
   FctDataColumnAvailabilityBySlotBlob,
 } from '@/api/types.gen';
-
-/**
- * Helper to fetch all pages of data from an API endpoint
- */
-async function fetchAllPages<T>(
-  fetchFn: (params: {
-    query?: Record<string, unknown>;
-    signal?: AbortSignal;
-    throwOnError?: boolean;
-  }) => Promise<{ data: unknown }>,
-  params: { query?: Record<string, unknown> },
-  dataKey: string,
-  signal?: AbortSignal
-): Promise<T[]> {
-  const allData: T[] = [];
-  let pageToken: string | undefined;
-
-  do {
-    const response = await fetchFn({
-      ...params,
-      query: {
-        ...params.query,
-        ...(pageToken && { page_token: pageToken }),
-      },
-      signal,
-      throwOnError: true,
-    });
-
-    const responseData = response.data as Record<string, unknown>;
-    const pageData = responseData[dataKey] as T[] | undefined;
-    if (pageData) {
-      allData.push(...pageData);
-    }
-
-    pageToken = responseData.next_page_token as string | undefined;
-  } while (pageToken);
-
-  return allData;
-}
+import {
+  transformDailyToRows,
+  transformHourlyToRows,
+  transformEpochsToRows,
+  transformSlotsToRows,
+  transformBlobsToRows,
+} from '@/pages/ethereum/data-availability/utils/data-availability-transform';
+import { fetchAllPages } from '@/utils/api-pagination';
 
 /**
  * Drill-down level state - each level maintains parent context for breadcrumbs
@@ -83,48 +50,29 @@ type DrillDownLevel =
 const TOTAL_COLUMNS = 128;
 
 /**
- * Ensures all columns (0-127) are present in a row, filling missing columns with empty data
+ * Number of days to show in the window view
  */
-function ensureAllColumns(
-  cells: Array<{
-    columnIndex: number;
-    identifier: string;
-    availability: number;
-    successCount?: number;
-    totalCount?: number;
-    avgResponseTimeMs?: number;
-    blobIndex?: number;
-  }>,
-  identifier: string
-): Array<{
-  columnIndex: number;
-  identifier: string;
-  availability: number;
-  successCount?: number;
-  totalCount?: number;
-  avgResponseTimeMs?: number;
-  blobIndex?: number;
-}> {
-  const cellsByColumn = new Map(cells.map(cell => [cell.columnIndex, cell]));
-  const allCells = [];
+const WINDOW_DAYS = 19;
 
-  for (let i = 0; i < TOTAL_COLUMNS; i++) {
-    if (cellsByColumn.has(i)) {
-      allCells.push(cellsByColumn.get(i)!);
-    } else {
-      // Add placeholder for missing column
-      allCells.push({
-        identifier,
-        columnIndex: i,
-        availability: 0,
-        successCount: 0,
-        totalCount: 0,
-      });
-    }
-  }
+/**
+ * Number of hours in a day
+ */
+const HOURS_PER_DAY = 24;
 
-  return allCells;
-}
+/**
+ * Number of seconds in a day
+ */
+const SECONDS_PER_DAY = 86400;
+
+/**
+ * Number of seconds in an hour
+ */
+const SECONDS_PER_HOUR = 3600;
+
+/**
+ * Number of slots per epoch
+ */
+const SLOTS_PER_EPOCH = 32;
 
 /**
  * DAS Custody page showing PeerDAS data availability across drill-down levels
@@ -146,12 +94,12 @@ export function IndexPage(): JSX.Element {
   const windowQuery = useQuery({
     ...fctDataColumnAvailabilityDailyServiceListOptions({
       query: {
-        // Get last 19 days - generate list of dates
-        date_in_values: Array.from({ length: 19 }, (_, i) => {
-          const date = new Date(Date.now() - i * 24 * 60 * 60 * 1000);
+        // Get last WINDOW_DAYS days - generate list of dates
+        date_in_values: Array.from({ length: WINDOW_DAYS }, (_, i) => {
+          const date = new Date(Date.now() - i * HOURS_PER_DAY * 60 * 60 * 1000);
           return date.toISOString().split('T')[0];
         }).join(','),
-        page_size: 19 * 128, // 19 days × 128 columns
+        page_size: WINDOW_DAYS * TOTAL_COLUMNS,
         order_by: 'date desc',
       },
     }),
@@ -166,8 +114,8 @@ export function IndexPage(): JSX.Element {
         ...(currentLevel.type === 'day' && {
           // Convert date string to Unix timestamp range (start of day to end of day)
           hour_start_date_time_gte: Math.floor(new Date(currentLevel.date).getTime() / 1000),
-          hour_start_date_time_lt: Math.floor(new Date(currentLevel.date).getTime() / 1000) + 86400, // +24 hours
-          page_size: 24 * 128,
+          hour_start_date_time_lt: Math.floor(new Date(currentLevel.date).getTime() / 1000) + SECONDS_PER_DAY,
+          page_size: HOURS_PER_DAY * TOTAL_COLUMNS,
           order_by: 'hour_start_date_time asc',
         }),
       },
@@ -193,7 +141,7 @@ export function IndexPage(): JSX.Element {
         {
           query: {
             epoch_start_date_time_gte: currentLevel.hourStartDateTime,
-            epoch_start_date_time_lt: currentLevel.hourStartDateTime + 3600,
+            epoch_start_date_time_lt: currentLevel.hourStartDateTime + SECONDS_PER_HOUR,
             page_size: 10000,
             order_by: 'epoch asc',
           },
@@ -213,9 +161,9 @@ export function IndexPage(): JSX.Element {
     queryFn: async ({ signal }) => {
       if (currentLevel.type !== 'epoch') return { fct_data_column_availability_by_slot: [] };
 
-      // Calculate slot range for this epoch (each epoch has 32 slots)
-      const firstSlot = currentLevel.epoch * 32;
-      const lastSlot = (currentLevel.epoch + 1) * 32;
+      // Calculate slot range for this epoch
+      const firstSlot = currentLevel.epoch * SLOTS_PER_EPOCH;
+      const lastSlot = (currentLevel.epoch + 1) * SLOTS_PER_EPOCH;
 
       const data = await fetchAllPages<FctDataColumnAvailabilityBySlot>(
         fctDataColumnAvailabilityBySlotServiceList,
@@ -263,212 +211,43 @@ export function IndexPage(): JSX.Element {
   /**
    * Transform Window data (daily) to heatmap rows
    */
-  const windowRows = useMemo((): DataAvailabilityRow[] => {
-    const data = windowQuery.data?.fct_data_column_availability_daily;
-    if (!data) return [];
-
-    // Group by date
-    const byDate = new Map<string, FctDataColumnAvailabilityDaily[]>();
-    for (const item of data) {
-      if (!item.date) continue;
-      if (!byDate.has(item.date)) {
-        byDate.set(item.date, []);
-      }
-      byDate.get(item.date)!.push(item);
-    }
-
-    // Convert to rows (sorted by date descending for most recent first)
-    return Array.from(byDate.entries())
-      .sort((a, b) => b[0].localeCompare(a[0]))
-      .map(([date, items]) => {
-        const cells = items
-          .sort((a, b) => (a.column_index ?? 0) - (b.column_index ?? 0))
-          .map(item => ({
-            identifier: date,
-            columnIndex: item.column_index ?? 0,
-            availability: (item.avg_availability_pct ?? 0) / 100,
-            successCount: item.total_success_count,
-            totalCount: item.total_probe_count,
-            avgResponseTimeMs: item.avg_p50_response_time_ms,
-          }));
-
-        return {
-          identifier: date,
-          label: new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-          cells: ensureAllColumns(cells, date),
-        };
-      });
-  }, [windowQuery.data]);
+  const windowRows = useMemo(
+    () => transformDailyToRows(windowQuery.data?.fct_data_column_availability_daily),
+    [windowQuery.data]
+  );
 
   /**
    * Transform Day data (hourly) to heatmap rows
    */
-  const dayRows = useMemo((): DataAvailabilityRow[] => {
-    const data = dayQuery.data?.fct_data_column_availability_hourly;
-    if (!data || currentLevel.type !== 'day') return [];
-
-    // Group by hour_start_date_time
-    const byHour = new Map<number, FctDataColumnAvailabilityHourly[]>();
-    for (const item of data) {
-      if (item.hour_start_date_time === undefined) continue;
-      if (!byHour.has(item.hour_start_date_time)) {
-        byHour.set(item.hour_start_date_time, []);
-      }
-      byHour.get(item.hour_start_date_time)!.push(item);
-    }
-
-    // Convert to rows (sorted by hour ascending)
-    return Array.from(byHour.entries())
-      .sort((a, b) => a[0] - b[0])
-      .map(([hourStart, items]) => {
-        const hourLabel = new Date(hourStart * 1000).toLocaleTimeString('en-US', {
-          hour: '2-digit',
-          minute: '2-digit',
-          hour12: false,
-        });
-        const identifier = String(hourStart);
-        const cells = items
-          .sort((a, b) => (a.column_index ?? 0) - (b.column_index ?? 0))
-          .map(item => ({
-            identifier,
-            columnIndex: item.column_index ?? 0,
-            availability: (item.avg_availability_pct ?? 0) / 100,
-            successCount: item.total_success_count,
-            totalCount: item.total_probe_count,
-            avgResponseTimeMs: item.avg_p50_response_time_ms,
-          }));
-
-        return {
-          identifier,
-          label: hourLabel,
-          cells: ensureAllColumns(cells, identifier),
-        };
-      });
-  }, [dayQuery.data, currentLevel]);
+  const dayRows = useMemo(
+    () =>
+      currentLevel.type === 'day' ? transformHourlyToRows(dayQuery.data?.fct_data_column_availability_hourly) : [],
+    [dayQuery.data, currentLevel.type]
+  );
 
   /**
    * Transform Hour data (epochs) to heatmap rows
    */
-  const hourRows = useMemo((): DataAvailabilityRow[] => {
-    const data = hourQuery.data?.fct_data_column_availability_by_epoch;
-    if (!data) return [];
-
-    // Group by epoch
-    const byEpoch = new Map<number, FctDataColumnAvailabilityByEpoch[]>();
-    for (const item of data) {
-      if (item.epoch === undefined) continue;
-      if (!byEpoch.has(item.epoch)) {
-        byEpoch.set(item.epoch, []);
-      }
-      byEpoch.get(item.epoch)!.push(item);
-    }
-
-    // Convert to rows (sorted by epoch ascending)
-    return Array.from(byEpoch.entries())
-      .sort((a, b) => a[0] - b[0])
-      .map(([epoch, items]) => {
-        const identifier = String(epoch);
-        const cells = items
-          .sort((a, b) => (a.column_index ?? 0) - (b.column_index ?? 0))
-          .map(item => ({
-            identifier,
-            columnIndex: item.column_index ?? 0,
-            availability: (item.avg_availability_pct ?? 0) / 100,
-            successCount: item.total_success_count,
-            totalCount: item.total_probe_count,
-            avgResponseTimeMs: item.avg_p50_response_time_ms,
-          }));
-
-        return {
-          identifier,
-          label: `Epoch ${epoch}`,
-          cells: ensureAllColumns(cells, identifier),
-        };
-      });
-  }, [hourQuery.data]);
+  const hourRows = useMemo(
+    () => transformEpochsToRows(hourQuery.data?.fct_data_column_availability_by_epoch),
+    [hourQuery.data]
+  );
 
   /**
    * Transform Epoch data (slots) to heatmap rows
    */
-  const epochRows = useMemo((): DataAvailabilityRow[] => {
-    const data = epochQuery.data?.fct_data_column_availability_by_slot;
-    if (!data) return [];
-
-    // Group by slot
-    const bySlot = new Map<number, FctDataColumnAvailabilityBySlot[]>();
-    for (const item of data) {
-      if (item.slot === undefined) continue;
-      if (!bySlot.has(item.slot)) {
-        bySlot.set(item.slot, []);
-      }
-      bySlot.get(item.slot)!.push(item);
-    }
-
-    // Convert to rows (sorted by slot ascending)
-    return Array.from(bySlot.entries())
-      .sort((a, b) => a[0] - b[0])
-      .map(([slot, items]) => {
-        const identifier = String(slot);
-        const cells = items
-          .sort((a, b) => (a.column_index ?? 0) - (b.column_index ?? 0))
-          .map(item => ({
-            identifier,
-            columnIndex: item.column_index ?? 0,
-            availability: (item.availability_pct ?? 0) / 100,
-            successCount: item.success_count,
-            totalCount: item.probe_count,
-            avgResponseTimeMs: item.p50_response_time_ms,
-          }));
-
-        return {
-          identifier,
-          label: `Slot ${slot}`,
-          cells: ensureAllColumns(cells, identifier),
-        };
-      });
-  }, [epochQuery.data]);
+  const epochRows = useMemo(
+    () => transformSlotsToRows(epochQuery.data?.fct_data_column_availability_by_slot),
+    [epochQuery.data]
+  );
 
   /**
    * Transform Slot data (blobs) to heatmap rows
    */
-  const slotRows = useMemo((): DataAvailabilityRow[] => {
-    const data = slotQuery.data?.fct_data_column_availability_by_slot_blob;
-    if (!data) return [];
-
-    // Group by blob_index
-    const byBlob = new Map<number, FctDataColumnAvailabilityBySlotBlob[]>();
-    for (const item of data) {
-      if (item.blob_index === undefined) continue;
-      if (!byBlob.has(item.blob_index)) {
-        byBlob.set(item.blob_index, []);
-      }
-      byBlob.get(item.blob_index)!.push(item);
-    }
-
-    // Convert to rows (sorted by blob_index ascending)
-    return Array.from(byBlob.entries())
-      .sort((a, b) => a[0] - b[0])
-      .map(([blobIndex, items]) => {
-        const identifier = String(blobIndex);
-        const cells = items
-          .sort((a, b) => (a.column_index ?? 0) - (b.column_index ?? 0))
-          .map(item => ({
-            identifier,
-            columnIndex: item.column_index ?? 0,
-            availability: (item.availability_pct ?? 0) / 100,
-            successCount: item.success_count,
-            totalCount: item.probe_count,
-            avgResponseTimeMs: item.p50_response_time_ms,
-            blobIndex,
-          }));
-
-        return {
-          identifier,
-          label: `Blob ${blobIndex}`,
-          cells: ensureAllColumns(cells, identifier),
-        };
-      });
-  }, [slotQuery.data]);
+  const slotRows = useMemo(
+    () => transformBlobsToRows(slotQuery.data?.fct_data_column_availability_by_slot_blob),
+    [slotQuery.data]
+  );
 
   // Determine current data based on level
   const { rows, granularity, isLoading, error } = useMemo(() => {
@@ -583,7 +362,7 @@ export function IndexPage(): JSX.Element {
   const breadcrumbs = useMemo(() => {
     const crumbs: Array<{ label: string; onClick: () => void }> = [
       {
-        label: 'Window (19 days)',
+        label: `Window (${WINDOW_DAYS} days)`,
         onClick: () => {
           setCurrentLevel({ type: 'window' });
           setSelectedColumnIndex(undefined);

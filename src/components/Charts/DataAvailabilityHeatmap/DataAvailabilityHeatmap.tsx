@@ -66,10 +66,15 @@ export const DataAvailabilityHeatmap = ({
   }, [rows, filters]);
 
   // Get all unique column indices from the filtered data
-  const columnIndices =
-    filteredRows.length > 0
-      ? Array.from(new Set(filteredRows.flatMap(row => row.cells.map(cell => cell.columnIndex)))).sort((a, b) => a - b)
-      : [];
+  const columnIndices = useMemo(
+    () =>
+      filteredRows.length > 0
+        ? Array.from(new Set(filteredRows.flatMap(row => row.cells.map(cell => cell.columnIndex)))).sort(
+            (a, b) => a - b
+          )
+        : [],
+    [filteredRows]
+  );
 
   // Get size-specific classes
   const cellSizeClass = {
