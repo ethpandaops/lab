@@ -3,7 +3,7 @@ import { useMemo, memo } from 'react';
 import clsx from 'clsx';
 import { HeatmapChart } from '@/components/Charts/Heatmap';
 import type { DataColumnDataAvailabilityProps } from './DataColumnDataAvailability.types';
-import { PERFORMANCE_TIME_COLORS } from '@/theme/data-visualization-colors';
+import { getDataVizColors } from '@/utils/dataVizColors';
 
 /**
  * DataColumnDataAvailability - Page-specific component for visualizing data column availability
@@ -48,6 +48,7 @@ function DataColumnDataAvailabilityComponent({
   maxTime = 12000,
   className,
 }: DataColumnDataAvailabilityProps): JSX.Element {
+  const { PERFORMANCE_TIME_COLORS } = getDataVizColors();
   // Default currentTime to maxTime to show all data if not specified
   const effectiveCurrentTime = currentTime ?? maxTime;
 

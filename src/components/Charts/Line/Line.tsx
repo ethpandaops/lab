@@ -1,8 +1,15 @@
 import { type JSX, useMemo } from 'react';
-import ReactECharts from 'echarts-for-react';
-import { hexToRgba } from '@/utils';
+import ReactEChartsCore from 'echarts-for-react/lib/core';
+import * as echarts from 'echarts/core';
+import { LineChart as EChartsLine } from 'echarts/charts';
+import { GridComponent, TooltipComponent, TitleComponent } from 'echarts/components';
+import { CanvasRenderer } from 'echarts/renderers';
+import { hexToRgba, resolveCssColorToHex } from '@/utils';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import type { LineChartProps } from './Line.types';
+
+// Register ECharts components
+echarts.use([EChartsLine, GridComponent, TooltipComponent, TitleComponent, CanvasRenderer]);
 
 /**
  * LineChart - A smoothed line chart component using ECharts
@@ -34,19 +41,18 @@ export function LineChart({
   xMax,
   connectNulls = false,
   animationDuration = 300,
-  notMerge = false,
-  lazyUpdate = true,
   xAxisLabelInterval = 'auto',
   xAxisTitle,
   yAxisTitle,
 }: LineChartProps): JSX.Element {
   const themeColors = useThemeColors();
-  const dataLength = data.length;
-  const labelsLength = labels.length;
+
+  // Convert OKLCH colors (from Tailwind v4) to hex format for ECharts compatibility
+  const convertedColor = color ? resolveCssColorToHex(color) : undefined;
 
   const option = useMemo(
     () => ({
-      animation: animationDuration > 0,
+      animation: true,
       animationDuration,
       animationEasing: 'cubicOut',
       title: title
@@ -63,11 +69,13 @@ export function LineChart({
           }
         : undefined,
       grid: {
-        top: title ? 40 : 10,
-        right: 10,
-        bottom: 30,
-        left: 10,
-        containLabel: true,
+        top: title ? 40 : 16,
+        right: undefined,
+        bottom: xAxisTitle ? 50 : 30,
+        left: yAxisTitle ? 60 : 8,
+        // ECharts v6: use outerBounds instead of deprecated containLabel
+        outerBoundsMode: 'same' as const,
+        outerBoundsContain: 'axisLabel' as const,
       },
       xAxis: {
         type: 'category',
@@ -128,7 +136,7 @@ export function LineChart({
           symbol: 'none',
           showSymbol: false,
           lineStyle: {
-            color: color || themeColors.primary,
+            color: convertedColor || themeColors.primary,
             width: 3,
           },
           areaStyle: showArea
@@ -142,11 +150,11 @@ export function LineChart({
                   colorStops: [
                     {
                       offset: 0,
-                      color: hexToRgba(color || themeColors.primary, 0.5),
+                      color: hexToRgba(convertedColor || themeColors.primary, 0.5),
                     },
                     {
                       offset: 1,
-                      color: hexToRgba(color || themeColors.primary, 0.06),
+                      color: hexToRgba(convertedColor || themeColors.primary, 0.06),
                     },
                   ],
                 },
@@ -180,8 +188,6 @@ export function LineChart({
     [
       data,
       labels,
-      dataLength,
-      labelsLength,
       title,
       titleFontSize,
       titleFontWeight,
@@ -190,7 +196,7 @@ export function LineChart({
       titleTop,
       smooth,
       showArea,
-      color,
+      convertedColor,
       yMax,
       xMax,
       connectNulls,
@@ -207,13 +213,13 @@ export function LineChart({
   );
 
   return (
-    <div className={height === '100%' ? 'h-full w-full' : 'w-full'}>
-      <ReactECharts
+    <div className={height === '100%' ? 'h-full w-full' : 'w-full'} style={{ pointerEvents: 'none' }}>
+      <ReactEChartsCore
+        echarts={echarts}
         option={option}
         style={{ height, width: '100%', minHeight: height }}
-        notMerge={notMerge}
-        lazyUpdate={lazyUpdate}
-        replaceMerge={['series', 'xAxis']}
+        notMerge={true}
+        lazyUpdate={false}
       />
     </div>
   );

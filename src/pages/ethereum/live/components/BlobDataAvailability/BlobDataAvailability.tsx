@@ -4,7 +4,7 @@ import ReactECharts from 'echarts-for-react';
 import clsx from 'clsx';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import type { BlobDataAvailabilityProps } from './BlobDataAvailability.types';
-import { CONTINENT_COLORS } from '@/theme/data-visualization-colors';
+import { getDataVizColors } from '@/utils/dataVizColors';
 import type { EChartsOption } from 'echarts';
 import type { TooltipFormatterParams, TooltipFormatterParam } from '@/types/echarts';
 
@@ -40,8 +40,7 @@ function BlobDataAvailabilityComponent({
   className,
 }: BlobDataAvailabilityProps): JSX.Element {
   const themeColors = useThemeColors();
-  const firstSeenCount = deduplicatedBlobData.length;
-  const continentalVersion = visibleContinentalPropagationData.reduce((sum, series) => sum + series.data.length, 0);
+  const { CONTINENT_COLORS } = getDataVizColors();
 
   // Static base configuration for First Seen chart (theme-dependent but data-independent)
   const firstSeenBaseConfig = useMemo(
@@ -213,7 +212,7 @@ function BlobDataAvailabilityComponent({
         },
       ],
     } as EChartsOption;
-  }, [deduplicatedBlobData, firstSeenBaseConfig, themeColors, firstSeenCount]);
+  }, [deduplicatedBlobData, firstSeenBaseConfig, themeColors]);
 
   // Prepare Continental Propagation chart - only recreate when data changes
   const continentalPropagationOption = useMemo((): EChartsOption => {
@@ -336,30 +335,18 @@ function BlobDataAvailabilityComponent({
         itemGap: 12,
       },
     } as EChartsOption;
-  }, [visibleContinentalPropagationData, continentalPropagationBaseConfig, themeColors, maxTime, continentalVersion]);
+  }, [visibleContinentalPropagationData, continentalPropagationBaseConfig, themeColors, maxTime, CONTINENT_COLORS]);
 
   return (
     <div className={clsx('grid h-full grid-cols-12 gap-4', className)}>
       {/* First Seen Chart - 6 columns */}
       <div className="col-span-6 h-full rounded-sm border border-border bg-surface p-1">
-        <ReactECharts
-          option={firstSeenOption}
-          style={{ height: '100%', width: '100%' }}
-          notMerge={false}
-          lazyUpdate={true}
-          replaceMerge={['series']}
-        />
+        <ReactECharts option={firstSeenOption} style={{ height: '100%', width: '100%' }} />
       </div>
 
       {/* Continental Propagation Chart - 6 columns */}
       <div className="col-span-6 h-full rounded-sm border border-border bg-surface p-1">
-        <ReactECharts
-          option={continentalPropagationOption}
-          style={{ height: '100%', width: '100%' }}
-          notMerge={false}
-          lazyUpdate={true}
-          replaceMerge={['series']}
-        />
+        <ReactECharts option={continentalPropagationOption} style={{ height: '100%', width: '100%' }} />
       </div>
     </div>
   );

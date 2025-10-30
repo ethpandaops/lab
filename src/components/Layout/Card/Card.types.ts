@@ -18,4 +18,6 @@ export interface CardProps {
   featureImage?: ReactNode;
   /** Apply rounded corners (rounded-sm). Default: false */
   rounded?: boolean;
+  /** Allow content to overflow card boundaries (useful for tooltips, dropdowns). Default: false */
+  allowContentOverflow?: boolean;
 }

@@ -159,6 +159,36 @@ import type {
   FctBlockServiceListData,
   FctBlockServiceListErrors,
   FctBlockServiceListResponses,
+  FctDataColumnAvailabilityByEpochServiceGetData,
+  FctDataColumnAvailabilityByEpochServiceGetErrors,
+  FctDataColumnAvailabilityByEpochServiceGetResponses,
+  FctDataColumnAvailabilityByEpochServiceListData,
+  FctDataColumnAvailabilityByEpochServiceListErrors,
+  FctDataColumnAvailabilityByEpochServiceListResponses,
+  FctDataColumnAvailabilityBySlotBlobServiceGetData,
+  FctDataColumnAvailabilityBySlotBlobServiceGetErrors,
+  FctDataColumnAvailabilityBySlotBlobServiceGetResponses,
+  FctDataColumnAvailabilityBySlotBlobServiceListData,
+  FctDataColumnAvailabilityBySlotBlobServiceListErrors,
+  FctDataColumnAvailabilityBySlotBlobServiceListResponses,
+  FctDataColumnAvailabilityBySlotServiceGetData,
+  FctDataColumnAvailabilityBySlotServiceGetErrors,
+  FctDataColumnAvailabilityBySlotServiceGetResponses,
+  FctDataColumnAvailabilityBySlotServiceListData,
+  FctDataColumnAvailabilityBySlotServiceListErrors,
+  FctDataColumnAvailabilityBySlotServiceListResponses,
+  FctDataColumnAvailabilityDailyServiceGetData,
+  FctDataColumnAvailabilityDailyServiceGetErrors,
+  FctDataColumnAvailabilityDailyServiceGetResponses,
+  FctDataColumnAvailabilityDailyServiceListData,
+  FctDataColumnAvailabilityDailyServiceListErrors,
+  FctDataColumnAvailabilityDailyServiceListResponses,
+  FctDataColumnAvailabilityHourlyServiceGetData,
+  FctDataColumnAvailabilityHourlyServiceGetErrors,
+  FctDataColumnAvailabilityHourlyServiceGetResponses,
+  FctDataColumnAvailabilityHourlyServiceListData,
+  FctDataColumnAvailabilityHourlyServiceListErrors,
+  FctDataColumnAvailabilityHourlyServiceListResponses,
   FctHeadFirstSeenByNodeServiceGetData,
   FctHeadFirstSeenByNodeServiceGetErrors,
   FctHeadFirstSeenByNodeServiceGetResponses,
@@ -373,6 +403,26 @@ import {
   zFctBlockServiceGetResponse,
   zFctBlockServiceListData,
   zFctBlockServiceListResponse,
+  zFctDataColumnAvailabilityByEpochServiceGetData,
+  zFctDataColumnAvailabilityByEpochServiceGetResponse,
+  zFctDataColumnAvailabilityByEpochServiceListData,
+  zFctDataColumnAvailabilityByEpochServiceListResponse,
+  zFctDataColumnAvailabilityBySlotBlobServiceGetData,
+  zFctDataColumnAvailabilityBySlotBlobServiceGetResponse,
+  zFctDataColumnAvailabilityBySlotBlobServiceListData,
+  zFctDataColumnAvailabilityBySlotBlobServiceListResponse,
+  zFctDataColumnAvailabilityBySlotServiceGetData,
+  zFctDataColumnAvailabilityBySlotServiceGetResponse,
+  zFctDataColumnAvailabilityBySlotServiceListData,
+  zFctDataColumnAvailabilityBySlotServiceListResponse,
+  zFctDataColumnAvailabilityDailyServiceGetData,
+  zFctDataColumnAvailabilityDailyServiceGetResponse,
+  zFctDataColumnAvailabilityDailyServiceListData,
+  zFctDataColumnAvailabilityDailyServiceListResponse,
+  zFctDataColumnAvailabilityHourlyServiceGetData,
+  zFctDataColumnAvailabilityHourlyServiceGetResponse,
+  zFctDataColumnAvailabilityHourlyServiceListData,
+  zFctDataColumnAvailabilityHourlyServiceListResponse,
   zFctHeadFirstSeenByNodeServiceGetData,
   zFctHeadFirstSeenByNodeServiceGetResponse,
   zFctHeadFirstSeenByNodeServiceListData,
@@ -1678,6 +1728,246 @@ export const fctBlockProposerHeadServiceGet = <ThrowOnError extends boolean = fa
       return await zFctBlockProposerHeadServiceGetResponse.parseAsync(data);
     },
     url: '/api/v1/fct_block_proposer_head/{slot_start_date_time}',
+    ...options,
+  });
+};
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctDataColumnAvailabilityByEpochServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctDataColumnAvailabilityByEpochServiceListData, ThrowOnError>
+) => {
+  return (options?.client ?? client).get<
+    FctDataColumnAvailabilityByEpochServiceListResponses,
+    FctDataColumnAvailabilityByEpochServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => {
+      return await zFctDataColumnAvailabilityByEpochServiceListData.parseAsync(data);
+    },
+    responseValidator: async data => {
+      return await zFctDataColumnAvailabilityByEpochServiceListResponse.parseAsync(data);
+    },
+    url: '/api/v1/fct_data_column_availability_by_epoch',
+    ...options,
+  });
+};
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by epoch_start_date_time
+ */
+export const fctDataColumnAvailabilityByEpochServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctDataColumnAvailabilityByEpochServiceGetData, ThrowOnError>
+) => {
+  return (options.client ?? client).get<
+    FctDataColumnAvailabilityByEpochServiceGetResponses,
+    FctDataColumnAvailabilityByEpochServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => {
+      return await zFctDataColumnAvailabilityByEpochServiceGetData.parseAsync(data);
+    },
+    responseValidator: async data => {
+      return await zFctDataColumnAvailabilityByEpochServiceGetResponse.parseAsync(data);
+    },
+    url: '/api/v1/fct_data_column_availability_by_epoch/{epoch_start_date_time}',
+    ...options,
+  });
+};
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctDataColumnAvailabilityBySlotServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctDataColumnAvailabilityBySlotServiceListData, ThrowOnError>
+) => {
+  return (options?.client ?? client).get<
+    FctDataColumnAvailabilityBySlotServiceListResponses,
+    FctDataColumnAvailabilityBySlotServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => {
+      return await zFctDataColumnAvailabilityBySlotServiceListData.parseAsync(data);
+    },
+    responseValidator: async data => {
+      return await zFctDataColumnAvailabilityBySlotServiceListResponse.parseAsync(data);
+    },
+    url: '/api/v1/fct_data_column_availability_by_slot',
+    ...options,
+  });
+};
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by slot_start_date_time
+ */
+export const fctDataColumnAvailabilityBySlotServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctDataColumnAvailabilityBySlotServiceGetData, ThrowOnError>
+) => {
+  return (options.client ?? client).get<
+    FctDataColumnAvailabilityBySlotServiceGetResponses,
+    FctDataColumnAvailabilityBySlotServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => {
+      return await zFctDataColumnAvailabilityBySlotServiceGetData.parseAsync(data);
+    },
+    responseValidator: async data => {
+      return await zFctDataColumnAvailabilityBySlotServiceGetResponse.parseAsync(data);
+    },
+    url: '/api/v1/fct_data_column_availability_by_slot/{slot_start_date_time}',
+    ...options,
+  });
+};
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctDataColumnAvailabilityBySlotBlobServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctDataColumnAvailabilityBySlotBlobServiceListData, ThrowOnError>
+) => {
+  return (options?.client ?? client).get<
+    FctDataColumnAvailabilityBySlotBlobServiceListResponses,
+    FctDataColumnAvailabilityBySlotBlobServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => {
+      return await zFctDataColumnAvailabilityBySlotBlobServiceListData.parseAsync(data);
+    },
+    responseValidator: async data => {
+      return await zFctDataColumnAvailabilityBySlotBlobServiceListResponse.parseAsync(data);
+    },
+    url: '/api/v1/fct_data_column_availability_by_slot_blob',
+    ...options,
+  });
+};
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by slot_start_date_time
+ */
+export const fctDataColumnAvailabilityBySlotBlobServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctDataColumnAvailabilityBySlotBlobServiceGetData, ThrowOnError>
+) => {
+  return (options.client ?? client).get<
+    FctDataColumnAvailabilityBySlotBlobServiceGetResponses,
+    FctDataColumnAvailabilityBySlotBlobServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => {
+      return await zFctDataColumnAvailabilityBySlotBlobServiceGetData.parseAsync(data);
+    },
+    responseValidator: async data => {
+      return await zFctDataColumnAvailabilityBySlotBlobServiceGetResponse.parseAsync(data);
+    },
+    url: '/api/v1/fct_data_column_availability_by_slot_blob/{slot_start_date_time}',
+    ...options,
+  });
+};
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctDataColumnAvailabilityDailyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctDataColumnAvailabilityDailyServiceListData, ThrowOnError>
+) => {
+  return (options?.client ?? client).get<
+    FctDataColumnAvailabilityDailyServiceListResponses,
+    FctDataColumnAvailabilityDailyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => {
+      return await zFctDataColumnAvailabilityDailyServiceListData.parseAsync(data);
+    },
+    responseValidator: async data => {
+      return await zFctDataColumnAvailabilityDailyServiceListResponse.parseAsync(data);
+    },
+    url: '/api/v1/fct_data_column_availability_daily',
+    ...options,
+  });
+};
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by date
+ */
+export const fctDataColumnAvailabilityDailyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctDataColumnAvailabilityDailyServiceGetData, ThrowOnError>
+) => {
+  return (options.client ?? client).get<
+    FctDataColumnAvailabilityDailyServiceGetResponses,
+    FctDataColumnAvailabilityDailyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => {
+      return await zFctDataColumnAvailabilityDailyServiceGetData.parseAsync(data);
+    },
+    responseValidator: async data => {
+      return await zFctDataColumnAvailabilityDailyServiceGetResponse.parseAsync(data);
+    },
+    url: '/api/v1/fct_data_column_availability_daily/{date}',
+    ...options,
+  });
+};
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctDataColumnAvailabilityHourlyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctDataColumnAvailabilityHourlyServiceListData, ThrowOnError>
+) => {
+  return (options?.client ?? client).get<
+    FctDataColumnAvailabilityHourlyServiceListResponses,
+    FctDataColumnAvailabilityHourlyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => {
+      return await zFctDataColumnAvailabilityHourlyServiceListData.parseAsync(data);
+    },
+    responseValidator: async data => {
+      return await zFctDataColumnAvailabilityHourlyServiceListResponse.parseAsync(data);
+    },
+    url: '/api/v1/fct_data_column_availability_hourly',
+    ...options,
+  });
+};
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by hour_start_date_time
+ */
+export const fctDataColumnAvailabilityHourlyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctDataColumnAvailabilityHourlyServiceGetData, ThrowOnError>
+) => {
+  return (options.client ?? client).get<
+    FctDataColumnAvailabilityHourlyServiceGetResponses,
+    FctDataColumnAvailabilityHourlyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => {
+      return await zFctDataColumnAvailabilityHourlyServiceGetData.parseAsync(data);
+    },
+    responseValidator: async data => {
+      return await zFctDataColumnAvailabilityHourlyServiceGetResponse.parseAsync(data);
+    },
+    url: '/api/v1/fct_data_column_availability_hourly/{hour_start_date_time}',
     ...options,
   });
 };

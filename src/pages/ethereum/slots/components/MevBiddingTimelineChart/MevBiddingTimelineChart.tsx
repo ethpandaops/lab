@@ -257,8 +257,6 @@ export function MevBiddingTimelineChart({
             animation={true}
             animationDuration={150}
             height="100%"
-            notMerge={false}
-            lazyUpdate={true}
           />
         </div>
       )}

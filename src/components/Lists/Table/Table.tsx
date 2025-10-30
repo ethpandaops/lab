@@ -42,7 +42,7 @@ export function Table<T = unknown>({
                   ))}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-border bg-background">
+              <tbody className="divide-y divide-border bg-surface">
                 {data.map((row, rowIndex) => {
                   const rowKey = getRowKey ? getRowKey(row, rowIndex) : rowIndex;
                   const rowClassName = getRowClassName ? getRowClassName(row, rowIndex) : '';
@@ -55,7 +55,7 @@ export function Table<T = unknown>({
                       onClick={() => onRowClick?.(row, rowIndex)}
                       className={clsx(
                         'transition-colors',
-                        !rowClassName && (isClickable ? 'cursor-pointer hover:bg-surface/50' : 'hover:bg-surface/50'),
+                        !rowClassName && (isClickable ? 'cursor-pointer hover:bg-background' : 'hover:bg-background'),
                         rowClassName
                       )}
                       style={rowStyle}
@@ -112,7 +112,7 @@ export function Table<T = unknown>({
                     ))}
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-border bg-background">
+                <tbody className="divide-y divide-border bg-surface">
                   {data.map((row, rowIndex) => {
                     const rowKey = getRowKey ? getRowKey(row, rowIndex) : rowIndex;
                     const rowClassName = getRowClassName ? getRowClassName(row, rowIndex) : '';
@@ -125,7 +125,7 @@ export function Table<T = unknown>({
                         onClick={() => onRowClick?.(row, rowIndex)}
                         className={clsx(
                           'transition-colors',
-                          !rowClassName && (isClickable ? 'cursor-pointer hover:bg-surface/50' : 'hover:bg-surface/50'),
+                          !rowClassName && (isClickable ? 'cursor-pointer hover:bg-background' : 'hover:bg-background'),
                           rowClassName
                         )}
                         style={rowStyle}

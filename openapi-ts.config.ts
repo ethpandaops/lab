@@ -1,7 +1,7 @@
 import { defineConfig } from '@hey-api/openapi-ts';
 
 const OPENAPI_INPUT =
-  process.env.OPENAPI_INPUT || 'https://cbt-api-mainnet.primary.production.platform.ethpandaops.io/openapi.yaml';
+  process.env.OPENAPI_INPUT || 'https://cbt-api-mainnet.analytics.production.platform.ethpandaops.io/openapi.yaml';
 
 export default defineConfig({
   input: OPENAPI_INPUT,

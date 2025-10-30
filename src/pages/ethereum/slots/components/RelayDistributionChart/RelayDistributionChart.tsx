@@ -2,7 +2,7 @@ import { type JSX, useMemo } from 'react';
 import { PopoutCard } from '@/components/Layout/PopoutCard';
 import { BarChart } from '@/components/Charts/Bar';
 import { useThemeColors } from '@/hooks/useThemeColors';
-import { CHART_CATEGORICAL_COLORS } from '@/theme/data-visualization-colors';
+import { getDataVizColors } from '@/utils/dataVizColors';
 import type { RelayDistributionChartProps, RelayChartData } from './RelayDistributionChart.types';
 
 /**
@@ -25,6 +25,7 @@ import type { RelayDistributionChartProps, RelayChartData } from './RelayDistrib
  */
 export function RelayDistributionChart({ relayData, winningRelay }: RelayDistributionChartProps): JSX.Element {
   const themeColors = useThemeColors();
+  const { CHART_CATEGORICAL_COLORS } = getDataVizColors();
 
   // Process and transform relay data for chart
   const { chartData, labels, totalBids, processedData } = useMemo(() => {
@@ -52,7 +53,7 @@ export function RelayDistributionChart({ relayData, winningRelay }: RelayDistrib
       totalBids: total,
       processedData: processed,
     };
-  }, [relayData, winningRelay, themeColors.primary]);
+  }, [relayData, winningRelay, themeColors.primary, CHART_CATEGORICAL_COLORS]);
 
   // Custom tooltip formatter to show winner badge
   const tooltipFormatter = useMemo(

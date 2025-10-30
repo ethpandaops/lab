@@ -20,10 +20,19 @@ import { Route as XatuForkReadinessRouteImport } from './routes/xatu/fork-readin
 import { Route as XatuContributorsRouteImport } from './routes/xatu/contributors'
 import { Route as EthereumSlotsRouteImport } from './routes/ethereum/slots'
 import { Route as EthereumLiveRouteImport } from './routes/ethereum/live'
+import { Route as EthereumEpochsRouteImport } from './routes/ethereum/epochs'
+import { Route as EthereumEntitiesRouteImport } from './routes/ethereum/entities'
+import { Route as EthereumDataAvailabilityRouteImport } from './routes/ethereum/data-availability'
 import { Route as XatuContributorsIndexRouteImport } from './routes/xatu/contributors/index'
 import { Route as EthereumSlotsIndexRouteImport } from './routes/ethereum/slots/index'
+import { Route as EthereumEpochsIndexRouteImport } from './routes/ethereum/epochs/index'
+import { Route as EthereumEntitiesIndexRouteImport } from './routes/ethereum/entities/index'
 import { Route as XatuContributorsIdRouteImport } from './routes/xatu/contributors/$id'
 import { Route as EthereumSlotsSlotRouteImport } from './routes/ethereum/slots/$slot'
+import { Route as EthereumEpochsEpochRouteImport } from './routes/ethereum/epochs/$epoch'
+import { Route as EthereumEntitiesEntityRouteImport } from './routes/ethereum/entities/$entity'
+import { Route as EthereumDataAvailabilityDasCustodyRouteImport } from './routes/ethereum/data-availability/das-custody'
+import { Route as EthereumDataAvailabilityDasCustodyIndexRouteImport } from './routes/ethereum/data-availability/das-custody/index'
 
 const XatuRoute = XatuRouteImport.update({
   id: '/xatu',
@@ -81,6 +90,22 @@ const EthereumLiveRoute = EthereumLiveRouteImport.update({
   path: '/live',
   getParentRoute: () => EthereumRoute,
 } as any)
+const EthereumEpochsRoute = EthereumEpochsRouteImport.update({
+  id: '/epochs',
+  path: '/epochs',
+  getParentRoute: () => EthereumRoute,
+} as any)
+const EthereumEntitiesRoute = EthereumEntitiesRouteImport.update({
+  id: '/entities',
+  path: '/entities',
+  getParentRoute: () => EthereumRoute,
+} as any)
+const EthereumDataAvailabilityRoute =
+  EthereumDataAvailabilityRouteImport.update({
+    id: '/data-availability',
+    path: '/data-availability',
+    getParentRoute: () => EthereumRoute,
+  } as any)
 const XatuContributorsIndexRoute = XatuContributorsIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -90,6 +115,16 @@ const EthereumSlotsIndexRoute = EthereumSlotsIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => EthereumSlotsRoute,
+} as any)
+const EthereumEpochsIndexRoute = EthereumEpochsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => EthereumEpochsRoute,
+} as any)
+const EthereumEntitiesIndexRoute = EthereumEntitiesIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => EthereumEntitiesRoute,
 } as any)
 const XatuContributorsIdRoute = XatuContributorsIdRouteImport.update({
   id: '/$id',
@@ -101,12 +136,37 @@ const EthereumSlotsSlotRoute = EthereumSlotsSlotRouteImport.update({
   path: '/$slot',
   getParentRoute: () => EthereumSlotsRoute,
 } as any)
+const EthereumEpochsEpochRoute = EthereumEpochsEpochRouteImport.update({
+  id: '/$epoch',
+  path: '/$epoch',
+  getParentRoute: () => EthereumEpochsRoute,
+} as any)
+const EthereumEntitiesEntityRoute = EthereumEntitiesEntityRouteImport.update({
+  id: '/$entity',
+  path: '/$entity',
+  getParentRoute: () => EthereumEntitiesRoute,
+} as any)
+const EthereumDataAvailabilityDasCustodyRoute =
+  EthereumDataAvailabilityDasCustodyRouteImport.update({
+    id: '/das-custody',
+    path: '/das-custody',
+    getParentRoute: () => EthereumDataAvailabilityRoute,
+  } as any)
+const EthereumDataAvailabilityDasCustodyIndexRoute =
+  EthereumDataAvailabilityDasCustodyIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => EthereumDataAvailabilityDasCustodyRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/ethereum': typeof EthereumRouteWithChildren
   '/experiments': typeof ExperimentsRouteWithChildren
   '/xatu': typeof XatuRouteWithChildren
+  '/ethereum/data-availability': typeof EthereumDataAvailabilityRouteWithChildren
+  '/ethereum/entities': typeof EthereumEntitiesRouteWithChildren
+  '/ethereum/epochs': typeof EthereumEpochsRouteWithChildren
   '/ethereum/live': typeof EthereumLiveRoute
   '/ethereum/slots': typeof EthereumSlotsRouteWithChildren
   '/xatu/contributors': typeof XatuContributorsRouteWithChildren
@@ -114,24 +174,36 @@ export interface FileRoutesByFullPath {
   '/xatu/geographical-checklist': typeof XatuGeographicalChecklistRoute
   '/xatu/locally-built-blocks': typeof XatuLocallyBuiltBlocksRoute
   '/experiments/': typeof ExperimentsIndexRoute
+  '/ethereum/data-availability/das-custody': typeof EthereumDataAvailabilityDasCustodyRouteWithChildren
+  '/ethereum/entities/$entity': typeof EthereumEntitiesEntityRoute
+  '/ethereum/epochs/$epoch': typeof EthereumEpochsEpochRoute
   '/ethereum/slots/$slot': typeof EthereumSlotsSlotRoute
   '/xatu/contributors/$id': typeof XatuContributorsIdRoute
+  '/ethereum/entities/': typeof EthereumEntitiesIndexRoute
+  '/ethereum/epochs/': typeof EthereumEpochsIndexRoute
   '/ethereum/slots/': typeof EthereumSlotsIndexRoute
   '/xatu/contributors/': typeof XatuContributorsIndexRoute
+  '/ethereum/data-availability/das-custody/': typeof EthereumDataAvailabilityDasCustodyIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/ethereum': typeof EthereumRouteWithChildren
   '/xatu': typeof XatuRouteWithChildren
+  '/ethereum/data-availability': typeof EthereumDataAvailabilityRouteWithChildren
   '/ethereum/live': typeof EthereumLiveRoute
   '/xatu/fork-readiness': typeof XatuForkReadinessRoute
   '/xatu/geographical-checklist': typeof XatuGeographicalChecklistRoute
   '/xatu/locally-built-blocks': typeof XatuLocallyBuiltBlocksRoute
   '/experiments': typeof ExperimentsIndexRoute
+  '/ethereum/entities/$entity': typeof EthereumEntitiesEntityRoute
+  '/ethereum/epochs/$epoch': typeof EthereumEpochsEpochRoute
   '/ethereum/slots/$slot': typeof EthereumSlotsSlotRoute
   '/xatu/contributors/$id': typeof XatuContributorsIdRoute
+  '/ethereum/entities': typeof EthereumEntitiesIndexRoute
+  '/ethereum/epochs': typeof EthereumEpochsIndexRoute
   '/ethereum/slots': typeof EthereumSlotsIndexRoute
   '/xatu/contributors': typeof XatuContributorsIndexRoute
+  '/ethereum/data-availability/das-custody': typeof EthereumDataAvailabilityDasCustodyIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -139,6 +211,9 @@ export interface FileRoutesById {
   '/ethereum': typeof EthereumRouteWithChildren
   '/experiments': typeof ExperimentsRouteWithChildren
   '/xatu': typeof XatuRouteWithChildren
+  '/ethereum/data-availability': typeof EthereumDataAvailabilityRouteWithChildren
+  '/ethereum/entities': typeof EthereumEntitiesRouteWithChildren
+  '/ethereum/epochs': typeof EthereumEpochsRouteWithChildren
   '/ethereum/live': typeof EthereumLiveRoute
   '/ethereum/slots': typeof EthereumSlotsRouteWithChildren
   '/xatu/contributors': typeof XatuContributorsRouteWithChildren
@@ -146,10 +221,16 @@ export interface FileRoutesById {
   '/xatu/geographical-checklist': typeof XatuGeographicalChecklistRoute
   '/xatu/locally-built-blocks': typeof XatuLocallyBuiltBlocksRoute
   '/experiments/': typeof ExperimentsIndexRoute
+  '/ethereum/data-availability/das-custody': typeof EthereumDataAvailabilityDasCustodyRouteWithChildren
+  '/ethereum/entities/$entity': typeof EthereumEntitiesEntityRoute
+  '/ethereum/epochs/$epoch': typeof EthereumEpochsEpochRoute
   '/ethereum/slots/$slot': typeof EthereumSlotsSlotRoute
   '/xatu/contributors/$id': typeof XatuContributorsIdRoute
+  '/ethereum/entities/': typeof EthereumEntitiesIndexRoute
+  '/ethereum/epochs/': typeof EthereumEpochsIndexRoute
   '/ethereum/slots/': typeof EthereumSlotsIndexRoute
   '/xatu/contributors/': typeof XatuContributorsIndexRoute
+  '/ethereum/data-availability/das-custody/': typeof EthereumDataAvailabilityDasCustodyIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -158,6 +239,9 @@ export interface FileRouteTypes {
     | '/ethereum'
     | '/experiments'
     | '/xatu'
+    | '/ethereum/data-availability'
+    | '/ethereum/entities'
+    | '/ethereum/epochs'
     | '/ethereum/live'
     | '/ethereum/slots'
     | '/xatu/contributors'
@@ -165,30 +249,45 @@ export interface FileRouteTypes {
     | '/xatu/geographical-checklist'
     | '/xatu/locally-built-blocks'
     | '/experiments/'
+    | '/ethereum/data-availability/das-custody'
+    | '/ethereum/entities/$entity'
+    | '/ethereum/epochs/$epoch'
     | '/ethereum/slots/$slot'
     | '/xatu/contributors/$id'
+    | '/ethereum/entities/'
+    | '/ethereum/epochs/'
     | '/ethereum/slots/'
     | '/xatu/contributors/'
+    | '/ethereum/data-availability/das-custody/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/ethereum'
     | '/xatu'
+    | '/ethereum/data-availability'
     | '/ethereum/live'
     | '/xatu/fork-readiness'
     | '/xatu/geographical-checklist'
     | '/xatu/locally-built-blocks'
     | '/experiments'
+    | '/ethereum/entities/$entity'
+    | '/ethereum/epochs/$epoch'
     | '/ethereum/slots/$slot'
     | '/xatu/contributors/$id'
+    | '/ethereum/entities'
+    | '/ethereum/epochs'
     | '/ethereum/slots'
     | '/xatu/contributors'
+    | '/ethereum/data-availability/das-custody'
   id:
     | '__root__'
     | '/'
     | '/ethereum'
     | '/experiments'
     | '/xatu'
+    | '/ethereum/data-availability'
+    | '/ethereum/entities'
+    | '/ethereum/epochs'
     | '/ethereum/live'
     | '/ethereum/slots'
     | '/xatu/contributors'
@@ -196,10 +295,16 @@ export interface FileRouteTypes {
     | '/xatu/geographical-checklist'
     | '/xatu/locally-built-blocks'
     | '/experiments/'
+    | '/ethereum/data-availability/das-custody'
+    | '/ethereum/entities/$entity'
+    | '/ethereum/epochs/$epoch'
     | '/ethereum/slots/$slot'
     | '/xatu/contributors/$id'
+    | '/ethereum/entities/'
+    | '/ethereum/epochs/'
     | '/ethereum/slots/'
     | '/xatu/contributors/'
+    | '/ethereum/data-availability/das-custody/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -288,6 +393,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EthereumLiveRouteImport
       parentRoute: typeof EthereumRoute
     }
+    '/ethereum/epochs': {
+      id: '/ethereum/epochs'
+      path: '/epochs'
+      fullPath: '/ethereum/epochs'
+      preLoaderRoute: typeof EthereumEpochsRouteImport
+      parentRoute: typeof EthereumRoute
+    }
+    '/ethereum/entities': {
+      id: '/ethereum/entities'
+      path: '/entities'
+      fullPath: '/ethereum/entities'
+      preLoaderRoute: typeof EthereumEntitiesRouteImport
+      parentRoute: typeof EthereumRoute
+    }
+    '/ethereum/data-availability': {
+      id: '/ethereum/data-availability'
+      path: '/data-availability'
+      fullPath: '/ethereum/data-availability'
+      preLoaderRoute: typeof EthereumDataAvailabilityRouteImport
+      parentRoute: typeof EthereumRoute
+    }
     '/xatu/contributors/': {
       id: '/xatu/contributors/'
       path: '/'
@@ -301,6 +427,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/ethereum/slots/'
       preLoaderRoute: typeof EthereumSlotsIndexRouteImport
       parentRoute: typeof EthereumSlotsRoute
+    }
+    '/ethereum/epochs/': {
+      id: '/ethereum/epochs/'
+      path: '/'
+      fullPath: '/ethereum/epochs/'
+      preLoaderRoute: typeof EthereumEpochsIndexRouteImport
+      parentRoute: typeof EthereumEpochsRoute
+    }
+    '/ethereum/entities/': {
+      id: '/ethereum/entities/'
+      path: '/'
+      fullPath: '/ethereum/entities/'
+      preLoaderRoute: typeof EthereumEntitiesIndexRouteImport
+      parentRoute: typeof EthereumEntitiesRoute
     }
     '/xatu/contributors/$id': {
       id: '/xatu/contributors/$id'
@@ -316,8 +456,93 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EthereumSlotsSlotRouteImport
       parentRoute: typeof EthereumSlotsRoute
     }
+    '/ethereum/epochs/$epoch': {
+      id: '/ethereum/epochs/$epoch'
+      path: '/$epoch'
+      fullPath: '/ethereum/epochs/$epoch'
+      preLoaderRoute: typeof EthereumEpochsEpochRouteImport
+      parentRoute: typeof EthereumEpochsRoute
+    }
+    '/ethereum/entities/$entity': {
+      id: '/ethereum/entities/$entity'
+      path: '/$entity'
+      fullPath: '/ethereum/entities/$entity'
+      preLoaderRoute: typeof EthereumEntitiesEntityRouteImport
+      parentRoute: typeof EthereumEntitiesRoute
+    }
+    '/ethereum/data-availability/das-custody': {
+      id: '/ethereum/data-availability/das-custody'
+      path: '/das-custody'
+      fullPath: '/ethereum/data-availability/das-custody'
+      preLoaderRoute: typeof EthereumDataAvailabilityDasCustodyRouteImport
+      parentRoute: typeof EthereumDataAvailabilityRoute
+    }
+    '/ethereum/data-availability/das-custody/': {
+      id: '/ethereum/data-availability/das-custody/'
+      path: '/'
+      fullPath: '/ethereum/data-availability/das-custody/'
+      preLoaderRoute: typeof EthereumDataAvailabilityDasCustodyIndexRouteImport
+      parentRoute: typeof EthereumDataAvailabilityDasCustodyRoute
+    }
   }
 }
+
+interface EthereumDataAvailabilityDasCustodyRouteChildren {
+  EthereumDataAvailabilityDasCustodyIndexRoute: typeof EthereumDataAvailabilityDasCustodyIndexRoute
+}
+
+const EthereumDataAvailabilityDasCustodyRouteChildren: EthereumDataAvailabilityDasCustodyRouteChildren =
+  {
+    EthereumDataAvailabilityDasCustodyIndexRoute:
+      EthereumDataAvailabilityDasCustodyIndexRoute,
+  }
+
+const EthereumDataAvailabilityDasCustodyRouteWithChildren =
+  EthereumDataAvailabilityDasCustodyRoute._addFileChildren(
+    EthereumDataAvailabilityDasCustodyRouteChildren,
+  )
+
+interface EthereumDataAvailabilityRouteChildren {
+  EthereumDataAvailabilityDasCustodyRoute: typeof EthereumDataAvailabilityDasCustodyRouteWithChildren
+}
+
+const EthereumDataAvailabilityRouteChildren: EthereumDataAvailabilityRouteChildren =
+  {
+    EthereumDataAvailabilityDasCustodyRoute:
+      EthereumDataAvailabilityDasCustodyRouteWithChildren,
+  }
+
+const EthereumDataAvailabilityRouteWithChildren =
+  EthereumDataAvailabilityRoute._addFileChildren(
+    EthereumDataAvailabilityRouteChildren,
+  )
+
+interface EthereumEntitiesRouteChildren {
+  EthereumEntitiesEntityRoute: typeof EthereumEntitiesEntityRoute
+  EthereumEntitiesIndexRoute: typeof EthereumEntitiesIndexRoute
+}
+
+const EthereumEntitiesRouteChildren: EthereumEntitiesRouteChildren = {
+  EthereumEntitiesEntityRoute: EthereumEntitiesEntityRoute,
+  EthereumEntitiesIndexRoute: EthereumEntitiesIndexRoute,
+}
+
+const EthereumEntitiesRouteWithChildren =
+  EthereumEntitiesRoute._addFileChildren(EthereumEntitiesRouteChildren)
+
+interface EthereumEpochsRouteChildren {
+  EthereumEpochsEpochRoute: typeof EthereumEpochsEpochRoute
+  EthereumEpochsIndexRoute: typeof EthereumEpochsIndexRoute
+}
+
+const EthereumEpochsRouteChildren: EthereumEpochsRouteChildren = {
+  EthereumEpochsEpochRoute: EthereumEpochsEpochRoute,
+  EthereumEpochsIndexRoute: EthereumEpochsIndexRoute,
+}
+
+const EthereumEpochsRouteWithChildren = EthereumEpochsRoute._addFileChildren(
+  EthereumEpochsRouteChildren,
+)
 
 interface EthereumSlotsRouteChildren {
   EthereumSlotsSlotRoute: typeof EthereumSlotsSlotRoute
@@ -334,11 +559,17 @@ const EthereumSlotsRouteWithChildren = EthereumSlotsRoute._addFileChildren(
 )
 
 interface EthereumRouteChildren {
+  EthereumDataAvailabilityRoute: typeof EthereumDataAvailabilityRouteWithChildren
+  EthereumEntitiesRoute: typeof EthereumEntitiesRouteWithChildren
+  EthereumEpochsRoute: typeof EthereumEpochsRouteWithChildren
   EthereumLiveRoute: typeof EthereumLiveRoute
   EthereumSlotsRoute: typeof EthereumSlotsRouteWithChildren
 }
 
 const EthereumRouteChildren: EthereumRouteChildren = {
+  EthereumDataAvailabilityRoute: EthereumDataAvailabilityRouteWithChildren,
+  EthereumEntitiesRoute: EthereumEntitiesRouteWithChildren,
+  EthereumEpochsRoute: EthereumEpochsRouteWithChildren,
   EthereumLiveRoute: EthereumLiveRoute,
   EthereumSlotsRoute: EthereumSlotsRouteWithChildren,
 }

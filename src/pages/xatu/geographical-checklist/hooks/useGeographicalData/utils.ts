@@ -1,5 +1,7 @@
 import type { ContinentCode, NodeClassification } from './useGeographicalData.types';
-import { CONTINENT_COLORS } from '@/theme/data-visualization-colors';
+import { getDataVizColors } from '@/utils/dataVizColors';
+
+const { CONTINENT_COLORS } = getDataVizColors();
 
 export const CONTINENT_CONFIG: Record<
   ContinentCode,

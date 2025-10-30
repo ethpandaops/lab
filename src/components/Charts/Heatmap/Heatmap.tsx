@@ -1,8 +1,16 @@
 import type React from 'react';
-import ReactECharts from 'echarts-for-react';
+import ReactEChartsCore from 'echarts-for-react/lib/core';
+import * as echarts from 'echarts/core';
+import { HeatmapChart as EChartsHeatmap } from 'echarts/charts';
+import { GridComponent, TooltipComponent, TitleComponent, VisualMapComponent } from 'echarts/components';
+import { CanvasRenderer } from 'echarts/renderers';
 import colors from 'tailwindcss/colors';
 import { useThemeColors } from '@/hooks/useThemeColors';
+import { resolveCssColorToHex } from '@/utils/color';
 import type { HeatmapChartProps } from './Heatmap.types';
+
+// Register ECharts components
+echarts.use([EChartsHeatmap, GridComponent, TooltipComponent, TitleComponent, VisualMapComponent, CanvasRenderer]);
 
 /**
  * HeatmapChart - A heatmap chart component using ECharts
@@ -38,10 +46,11 @@ export function HeatmapChart({
   tooltipFormatter,
   xAxisShowOnlyMinMax = false,
   yAxisShowOnlyMinMax = false,
-  notMerge = false,
-  lazyUpdate = true,
 }: HeatmapChartProps): React.JSX.Element {
   const themeColors = useThemeColors();
+
+  // Convert OKLCH colors (from Tailwind v4) to hex format for ECharts compatibility
+  const convertedColorGradient = colorGradient.map(color => resolveCssColorToHex(color));
 
   const option = {
     animation: true,
@@ -64,7 +73,9 @@ export function HeatmapChart({
       right: showVisualMap ? 90 : 16,
       bottom: 28,
       left: 64,
-      containLabel: true,
+      // ECharts v6: use outerBounds instead of deprecated containLabel
+      outerBoundsMode: 'same' as const,
+      outerBoundsContain: 'axisLabel' as const,
     },
     xAxis: {
       type: 'category',
@@ -140,7 +151,7 @@ export function HeatmapChart({
             top: 'center',
             show: showVisualMap,
             inRange: {
-              color: colorGradient,
+              color: convertedColorGradient,
             },
             textStyle: {
               color: themeColors.foreground,
@@ -195,13 +206,12 @@ export function HeatmapChart({
 
   return (
     <div className="w-full">
-      <ReactECharts
-        key={themeColors.foreground}
+      <ReactEChartsCore
+        echarts={echarts}
         option={option}
         style={{ height, width: '100%', minHeight: height }}
-        notMerge={notMerge}
-        lazyUpdate={lazyUpdate}
-        replaceMerge={['series', 'xAxis', 'yAxis', 'visualMap']}
+        notMerge={true}
+        lazyUpdate={false}
       />
     </div>
   );

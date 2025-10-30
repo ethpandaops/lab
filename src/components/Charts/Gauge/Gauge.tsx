@@ -1,7 +1,14 @@
 import { useMemo, type JSX } from 'react';
-import ReactECharts from 'echarts-for-react';
+import ReactEChartsCore from 'echarts-for-react/lib/core';
+import * as echarts from 'echarts/core';
+import { GaugeChart } from 'echarts/charts';
+import { TitleComponent } from 'echarts/components';
+import { CanvasRenderer } from 'echarts/renderers';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import type { GaugeProps } from './Gauge.types';
+
+// Register ECharts components
+echarts.use([GaugeChart, TitleComponent, CanvasRenderer]);
 
 /**
  * Gauge - Radial/circular progress indicator using ECharts
@@ -49,8 +56,6 @@ export function Gauge({
   percentageDecimals = 1,
   radius = 70,
   gaugeWidth = 15,
-  notMerge = false,
-  lazyUpdate = true,
 }: GaugeProps): JSX.Element {
   const themeColors = useThemeColors();
 
@@ -176,11 +181,12 @@ export function Gauge({
 
   return (
     <div className={height === '100%' ? 'h-full w-full' : 'w-full'}>
-      <ReactECharts
+      <ReactEChartsCore
+        echarts={echarts}
         option={option}
         style={{ height, width: '100%', minHeight: height }}
-        notMerge={notMerge}
-        lazyUpdate={lazyUpdate}
+        notMerge={true}
+        lazyUpdate={false}
       />
     </div>
   );

@@ -11,8 +11,9 @@ import {
   LegendComponent,
 } from 'echarts/components';
 import { CanvasRenderer } from 'echarts/renderers';
-import { hexToRgba } from '@/utils';
+import { hexToRgba, formatSmartDecimal, getDataVizColors, resolveCssColorToHex } from '@/utils';
 import { useThemeColors } from '@/hooks/useThemeColors';
+import { Disclosure } from '@/components/Layout/Disclosure';
 import type { MultiLineChartProps } from './MultiLine.types';
 
 // Register ECharts components
@@ -25,20 +26,6 @@ echarts.use([
   LegendComponent,
   CanvasRenderer,
 ]);
-
-// Stable color palette for series visualization (used as fallback)
-const SERIES_COLORS = [
-  '#10b981', // green
-  '#f59e0b', // amber
-  '#8b5cf6', // purple
-  '#ec4899', // pink
-  '#06b6d4', // cyan
-  '#3b82f6', // blue
-  '#ef4444', // red
-  '#14b8a6', // teal
-  '#f43f5e', // rose
-  '#84cc16', // lime
-] as const;
 
 /**
  * MultiLineChart - A flexible multi-series line chart component using ECharts
@@ -95,9 +82,17 @@ export function MultiLineChart({
   enableSeriesFilter = false,
 }: MultiLineChartProps): React.JSX.Element {
   const themeColors = useThemeColors();
+  const { CHART_CATEGORICAL_COLORS } = getDataVizColors();
 
-  // Build extended palette: custom palette or theme colors + stable colors
-  const extendedPalette = colorPalette || [themeColors.primary, ...SERIES_COLORS];
+  // Convert OKLCH colors (from Tailwind v4) to hex format for ECharts compatibility
+  const convertedColorPalette = colorPalette?.map(color => resolveCssColorToHex(color));
+
+  // Build extended palette: custom palette or theme colors + data viz categorical colors
+  const extendedPalette = convertedColorPalette || [
+    themeColors.primary,
+    themeColors.accent,
+    ...CHART_CATEGORICAL_COLORS,
+  ];
 
   // Manage aggregate series visibility
   const [showAggregate, setShowAggregate] = useState(false);
@@ -108,7 +103,6 @@ export function MultiLineChart({
   );
 
   // Series filter state
-  const [filterExpanded, setFilterExpanded] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
   // Track all series names we've ever seen to detect genuinely new series
@@ -266,6 +260,7 @@ export function MultiLineChart({
     },
     min: yAxis?.min,
     max: yAxis?.max,
+    minInterval: yAxis?.minInterval,
   };
 
   // Build series configuration
@@ -280,6 +275,7 @@ export function MultiLineChart({
         type: 'line' as const,
         data: s.data,
         smooth: s.smooth ?? false,
+        step: s.step ?? false,
         connectNulls,
         showSymbol: s.showSymbol ?? false,
         symbolSize: s.symbolSize ?? 4,
@@ -298,23 +294,26 @@ export function MultiLineChart({
         return {
           ...baseConfig,
           areaStyle: {
-            color: {
-              type: 'linear' as const,
-              x: 0,
-              y: 0,
-              x2: 0,
-              y2: 1,
-              colorStops: [
-                {
-                  offset: 0,
-                  color: hexToRgba(seriesColor, 0.5),
-                },
-                {
-                  offset: 1,
-                  color: hexToRgba(seriesColor, 0.06),
-                },
-              ],
-            },
+            color:
+              s.areaOpacity !== undefined
+                ? hexToRgba(seriesColor, s.areaOpacity)
+                : {
+                    type: 'linear' as const,
+                    x: 0,
+                    y: 0,
+                    x2: 0,
+                    y2: 1,
+                    colorStops: [
+                      {
+                        offset: 0,
+                        color: hexToRgba(seriesColor, 0.5),
+                      },
+                      {
+                        offset: 1,
+                        color: hexToRgba(seriesColor, 0.06),
+                      },
+                    ],
+                  },
           },
         };
       }
@@ -324,14 +323,68 @@ export function MultiLineChart({
 
   // Calculate grid padding
   // Title is always rendered by component, never by ECharts
-  // containLabel: true adds padding for tick labels, but axis names need explicit space
+  // ECharts v6: outerBounds adds padding for tick labels, axis names need explicit space
   const gridConfig = {
     top: grid?.top ?? 16,
     right: grid?.right,
     bottom: grid?.bottom ?? (xAxis.name ? 30 : 24),
     left: grid?.left ?? (yAxis?.name ? 30 : 8),
-    containLabel: true,
+    // ECharts v6: use outerBounds instead of deprecated containLabel
+    outerBoundsMode: 'same' as const,
+    outerBoundsContain: 'axisLabel' as const,
   };
+
+  // Create default smart tooltip formatter
+  // Auto-enable if valueDecimals is set OR if no custom formatter is provided
+  const effectiveValueDecimals = yAxis?.valueDecimals ?? (tooltipFormatter ? undefined : 2);
+  const defaultTooltipFormatter =
+    !tooltipFormatter && effectiveValueDecimals !== undefined
+      ? (params: unknown): string => {
+          // ECharts passes array for 'axis' trigger, single object for 'item' trigger
+          const dataPoints = Array.isArray(params) ? params : [params];
+
+          // Build tooltip HTML
+          let html = '';
+
+          // Add x-axis label (first item's axis value)
+          // For numeric x-axis, format as integer to avoid decimals like "9876543.5"
+          if (dataPoints.length > 0 && dataPoints[0]) {
+            const firstPoint = dataPoints[0] as { axisValue?: string | number };
+            if (firstPoint.axisValue !== undefined) {
+              const axisLabel =
+                typeof firstPoint.axisValue === 'number'
+                  ? formatSmartDecimal(firstPoint.axisValue, 0) // 0 decimals = integers only
+                  : firstPoint.axisValue;
+              html += `<div style="margin-bottom: 4px; font-weight: 600;">${axisLabel}</div>`;
+            }
+          }
+
+          // Add each series - apply smart decimal formatting to y values
+          dataPoints.forEach(point => {
+            const p = point as {
+              marker?: string;
+              seriesName?: string;
+              value?: number | [number, number];
+            };
+
+            if (p.marker && p.seriesName !== undefined) {
+              // Extract y value
+              const yValue = Array.isArray(p.value) ? p.value[1] : p.value;
+
+              if (yValue !== undefined && yValue !== null) {
+                const formattedValue = formatSmartDecimal(yValue, effectiveValueDecimals);
+                html += `<div style="display: flex; align-items: center; gap: 8px;">`;
+                html += p.marker;
+                html += `<span>${p.seriesName}:</span>`;
+                html += `<span style="font-weight: 600; margin-left: auto;">${formattedValue}</span>`;
+                html += `</div>`;
+              }
+            }
+          });
+
+          return html;
+        }
+      : undefined;
 
   // Build tooltip configuration
   const tooltipConfig = {
@@ -353,7 +406,7 @@ export function MultiLineChart({
             },
           }
         : undefined,
-    formatter: tooltipFormatter,
+    formatter: tooltipFormatter || defaultTooltipFormatter,
     appendToBody: true, // Render tooltip in document body to prevent container clipping
   };
 
@@ -378,6 +431,9 @@ export function MultiLineChart({
             type: 'inside' as const,
             xAxisIndex: 0,
             filterMode: 'none' as const,
+            zoomOnMouseWheel: false,
+            moveOnMouseWheel: false,
+            moveOnMouseMove: true,
           },
         ]
       : undefined,
@@ -396,97 +452,85 @@ export function MultiLineChart({
       {/* Series Filter (collapsible with search) */}
       {enableSeriesFilter && filterableSeries.length > 0 && (
         <div className="mb-4">
-          {/* Collapsible header */}
-          <button
-            onClick={() => setFilterExpanded(!filterExpanded)}
-            className="hover:bg-surface-hover mb-2 flex w-full items-center justify-between rounded-sm border border-border bg-surface px-3 py-2 text-sm transition-colors"
-          >
-            <div className="flex items-center gap-2">
-              <span>{filterExpanded ? '▼' : '▶'}</span>
-              <span className="font-medium">
-                Filter Series ({visibleCount} of {filterableSeries.length} shown)
-              </span>
-            </div>
-            {!filterExpanded && visibleCount < filterableSeries.length && (
-              <span
-                onClick={e => {
-                  e.stopPropagation();
-                  setVisibleSeries(new Set(filterableSeries.map(s => s.name)));
-                }}
-                role="button"
-                tabIndex={0}
-                onKeyDown={e => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
+          <Disclosure
+            title={`Filter Series (${visibleCount} of ${filterableSeries.length} shown)`}
+            rightContent={
+              visibleCount < filterableSeries.length && (
+                <span
+                  onClick={e => {
                     e.stopPropagation();
                     setVisibleSeries(new Set(filterableSeries.map(s => s.name)));
-                  }
-                }}
-                className="cursor-pointer rounded-sm px-2 py-0.5 text-xs text-muted hover:bg-muted/10 hover:text-foreground"
-              >
-                Show All
-              </span>
-            )}
-          </button>
-
-          {/* Expanded filter content */}
-          {filterExpanded && (
-            <div className="rounded-sm border border-border bg-surface p-3">
-              {/* Search box */}
-              <div className="mb-3">
-                <input
-                  type="text"
-                  placeholder="Search series..."
-                  value={searchQuery}
-                  onChange={e => setSearchQuery(e.target.value)}
-                  className="w-full rounded-sm border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted focus:ring-2 focus:ring-primary focus:outline-none"
-                />
-              </div>
-
-              {/* Action buttons */}
-              <div className="mb-3 flex gap-2">
-                <button
-                  onClick={selectAllFiltered}
-                  className="rounded-sm bg-primary/10 px-3 py-1.5 text-xs font-medium text-primary transition-colors hover:bg-primary/20"
+                  }}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={e => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setVisibleSeries(new Set(filterableSeries.map(s => s.name)));
+                    }
+                  }}
+                  className="cursor-pointer px-2 py-0.5 text-xs text-muted hover:bg-muted/10 hover:text-foreground"
                 >
-                  Select All {searchQuery && `(${filteredSeriesBySearch.length})`}
-                </button>
-                <button
-                  onClick={clearAllFiltered}
-                  className="rounded-sm bg-muted/10 px-3 py-1.5 text-xs font-medium text-muted transition-colors hover:bg-muted/20"
-                >
-                  Clear All {searchQuery && `(${filteredSeriesBySearch.length})`}
-                </button>
-              </div>
-
-              {/* Series checkboxes */}
-              <div className="max-h-[300px] space-y-1 overflow-y-auto">
-                {filteredSeriesBySearch.length === 0 ? (
-                  <div className="py-4 text-center text-sm text-muted">No series match your search</div>
-                ) : (
-                  filteredSeriesBySearch.map(s => {
-                    const isVisible = visibleSeries.has(s.name);
-                    const seriesColor = s.color || extendedPalette[series.indexOf(s) % extendedPalette.length];
-                    return (
-                      <label
-                        key={s.name}
-                        className="hover:bg-surface-hover flex cursor-pointer items-center gap-2 rounded-sm px-2 py-1.5 text-sm transition-colors"
-                      >
-                        <input
-                          type="checkbox"
-                          checked={isVisible}
-                          onChange={() => toggleSeries(s.name)}
-                          className="h-4 w-4 cursor-pointer rounded-sm border-border text-primary focus:ring-2 focus:ring-primary focus:ring-offset-0"
-                        />
-                        <span className="h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: seriesColor }} />
-                        <span className={isVisible ? 'text-foreground' : 'text-muted'}>{s.name}</span>
-                      </label>
-                    );
-                  })
-                )}
-              </div>
+                  Show All
+                </span>
+              )
+            }
+          >
+            {/* Search box */}
+            <div className="mb-3">
+              <input
+                type="text"
+                placeholder="Search series..."
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+                className="w-full border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted focus:ring-2 focus:ring-primary focus:outline-none"
+              />
             </div>
-          )}
+
+            {/* Action buttons */}
+            <div className="mb-3 flex gap-2">
+              <button
+                onClick={selectAllFiltered}
+                className="bg-primary/10 px-3 py-1.5 text-xs font-medium text-primary transition-colors hover:bg-primary/20"
+              >
+                Select All {searchQuery && `(${filteredSeriesBySearch.length})`}
+              </button>
+              <button
+                onClick={clearAllFiltered}
+                className="bg-muted/10 px-3 py-1.5 text-xs font-medium text-muted transition-colors hover:bg-muted/20"
+              >
+                Clear All {searchQuery && `(${filteredSeriesBySearch.length})`}
+              </button>
+            </div>
+
+            {/* Series checkboxes */}
+            <div className="max-h-[300px] space-y-1 overflow-y-auto">
+              {filteredSeriesBySearch.length === 0 ? (
+                <div className="py-4 text-center text-sm text-muted">No series match your search</div>
+              ) : (
+                filteredSeriesBySearch.map(s => {
+                  const isVisible = visibleSeries.has(s.name);
+                  const seriesColor = s.color || extendedPalette[series.indexOf(s) % extendedPalette.length];
+                  return (
+                    <label
+                      key={s.name}
+                      className="hover:bg-surface-hover flex cursor-pointer items-center gap-2 px-2 py-1.5 text-sm transition-colors"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={isVisible}
+                        onChange={() => toggleSeries(s.name)}
+                        className="h-4 w-4 cursor-pointer border-border text-primary focus:ring-2 focus:ring-primary focus:ring-offset-0"
+                      />
+                      <span className="h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: seriesColor }} />
+                      <span className={isVisible ? 'text-foreground' : 'text-muted'}>{s.name}</span>
+                    </label>
+                  );
+                })
+              )}
+            </div>
+          </Disclosure>
         </div>
       )}
 
@@ -534,13 +578,15 @@ export function MultiLineChart({
         </div>
       )}
 
-      <ReactEChartsCore
-        echarts={echarts}
-        option={option}
-        style={{ height, width: '100%', minHeight: height }}
-        notMerge={false}
-        replaceMerge={['series', 'xAxis', 'yAxis']}
-      />
+      <div style={{ pointerEvents: 'none' }}>
+        <ReactEChartsCore
+          echarts={echarts}
+          option={option}
+          style={{ height, width: '100%', minHeight: height, pointerEvents: 'auto' }}
+          notMerge={true}
+          opts={{ renderer: 'canvas' }}
+        />
+      </div>
     </>
   );
 

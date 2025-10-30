@@ -1,6 +1,4 @@
-/* eslint-disable react-refresh/only-export-components */
 import type { Preview, ReactRenderer } from '@storybook/react-vite';
-import { useEffect } from 'react';
 import { INITIAL_VIEWPORTS } from 'storybook/viewport';
 import { RouterProvider, createMemoryHistory, createRootRoute, createRouter } from '@tanstack/react-router';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -10,7 +8,6 @@ import { ConfigGate } from '../src/components/Overlays/ConfigGate';
 import { initialize, mswLoader } from 'msw-storybook-addon';
 import { withThemeByClassName } from '@storybook/addon-themes';
 import { handlers, mockConfig, mockBounds } from './mocks';
-import { LIGHT_COLORS, DARK_COLORS } from '../src/theme/colors';
 import '../src/index.css';
 
 // Get the base path from environment
@@ -26,36 +23,27 @@ initialize({
   },
 });
 
-// Inject CSS variables from TypeScript source of truth
-function InjectThemeVariables(): null {
-  useEffect(() => {
-    const styleId = 'theme-variables';
-    let style = document.getElementById(styleId) as HTMLStyleElement;
-
-    if (!style) {
-      style = document.createElement('style');
-      style.id = styleId;
-      document.head.appendChild(style);
-    }
-
-    const generateCssVars = (colors: typeof LIGHT_COLORS): string =>
-      Object.entries(colors)
-        .map(([key, value]) => `--color-${key.replace(/([A-Z])/g, '-$1').toLowerCase()}: ${value};`)
-        .join('\n    ');
-
-    style.textContent = `
-      :root {
-        ${generateCssVars(LIGHT_COLORS)}
-      }
-      html.dark {
-        ${generateCssVars(DARK_COLORS)}
-      }
-    `;
-  }, []);
-
-  return null;
-}
-
+/**
+ * Storybook Preview Configuration
+ *
+ * ## Router Configuration
+ *
+ * Stories can override the initial router state via `parameters.router`:
+ *
+ * @example
+ * ```tsx
+ * export const WithCustomNetwork: Story = {
+ *   parameters: {
+ *     router: {
+ *       initialUrl: '/',
+ *       initialSearch: { network: 'holesky' },
+ *     },
+ *   },
+ * };
+ * ```
+ *
+ * This allows testing components that depend on URL search params (e.g., network selection).
+ */
 const preview: Preview = {
   loaders: [mswLoader],
   decorators: [
@@ -63,6 +51,7 @@ const preview: Preview = {
       themes: {
         light: '',
         dark: 'dark',
+        star: 'star',
       },
       defaultTheme: 'dark',
     }),
@@ -93,27 +82,41 @@ const preview: Preview = {
         });
       }
 
-      // Create a simple root route that just renders the Story
+      // Allow stories to override initial URL and search params via parameters.router
+      const routerConfig = context.parameters.router || {};
+      const initialUrl = routerConfig.initialUrl || '/';
+      const initialSearch = routerConfig.initialSearch || {};
+
+      // Create a root route that renders the Story inside NetworkProvider
       const rootRoute = createRootRoute({
-        component: () => <Story />,
+        component: () => (
+          <NetworkProvider>
+            <Story />
+          </NetworkProvider>
+        ),
+        // Enable search params validation
+        validateSearch: () => initialSearch,
       });
 
       // Create a router with memory history (no browser URL changes)
+      // Pass initial search params in the URL if provided
+      const searchString =
+        Object.keys(initialSearch).length > 0
+          ? '?' + new URLSearchParams(initialSearch as Record<string, string>).toString()
+          : '';
+
       const router = createRouter({
         routeTree: rootRoute,
         history: createMemoryHistory({
-          initialEntries: ['/'],
+          initialEntries: [initialUrl + searchString],
         }),
       });
 
       return (
         <QueryClientProvider client={queryClient} key={context.id}>
-          <InjectThemeVariables />
           <ThemeProvider>
             <ConfigGate>
-              <NetworkProvider>
-                <RouterProvider router={router} />
-              </NetworkProvider>
+              <RouterProvider router={router} />
             </ConfigGate>
           </ThemeProvider>
         </QueryClientProvider>

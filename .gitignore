@@ -37,3 +37,6 @@ storybook-static
 
 # Tanstack
 .tanstack
+
+# ESLint
+.eslintcache

@@ -17,6 +17,7 @@ const sizeClasses = {
   lg: 'w-[32rem]', // 512px
   xl: 'w-[42rem]', // 672px
   full: 'w-[80rem]', // 1280px
+  fullscreen: 'w-screen h-screen', // Full viewport
 };
 
 /**
@@ -88,7 +89,9 @@ export function Dialog({
         </TransitionChild>
 
         {/* Dialog container */}
-        <div className="fixed inset-0 flex w-screen items-center justify-center p-4">
+        <div
+          className={clsx('fixed inset-0 flex w-screen items-center justify-center', size !== 'fullscreen' && 'p-4')}
+        >
           <TransitionChild
             as={Fragment}
             enter="ease-out duration-300"
@@ -100,7 +103,10 @@ export function Dialog({
           >
             <DialogPanel
               className={clsx(
-                'divide-y divide-border rounded-sm bg-surface shadow-xl dark:divide-border dark:bg-surface dark:shadow-none dark:outline dark:-outline-offset-1 dark:outline-border',
+                'divide-y divide-border bg-surface dark:divide-border dark:bg-surface',
+                size !== 'fullscreen' &&
+                  'rounded-sm shadow-xl dark:shadow-none dark:outline dark:-outline-offset-1 dark:outline-border',
+                size === 'fullscreen' && 'flex flex-col',
                 allowContentOverflow ? 'overflow-visible' : 'overflow-hidden',
                 sizeClasses[size],
                 className
@@ -133,7 +139,7 @@ export function Dialog({
               )}
 
               {/* Content */}
-              <div className="px-6 py-5">
+              <div className={clsx('px-6 py-5', size === 'fullscreen' && 'flex-1 overflow-auto')}>
                 {!title && !showCloseButton && description && (
                   <Description className="mb-4 text-sm text-muted dark:text-muted">{description}</Description>
                 )}

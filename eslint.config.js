@@ -10,10 +10,20 @@ import reactRefresh from 'eslint-plugin-react-refresh';
 import prettier from 'eslint-plugin-prettier/recommended';
 import { fixupPluginRules } from '@eslint/compat';
 import betterTailwindcss from 'eslint-plugin-better-tailwindcss';
+import customRules from './eslint-rules/index.cjs';
 
 export default tseslint.config(
   {
-    ignores: ['dist', 'node_modules', 'coverage', 'eslint_report.json', 'src/api', 'storybook-static', 'lab'],
+    ignores: [
+      'dist',
+      'node_modules',
+      'coverage',
+      'eslint_report.json',
+      'src/api',
+      'storybook-static',
+      'lab',
+      'eslint-rules',
+    ],
   },
   js.configs.recommended,
   ...tseslint.configs.recommended,
@@ -73,11 +83,11 @@ export default tseslint.config(
     },
     rules: {
       // Correctness rules only - no styling/sorting rules
-      'better-tailwindcss/no-conflicting-classes': 'error',
-      'better-tailwindcss/no-duplicate-classes': 'error',
+      'better-tailwindcss/no-conflicting-classes': 'warn', // Less expensive than error
+      'better-tailwindcss/no-duplicate-classes': 'warn',
       // Disabled: Custom component classes in @layer components are intentional
       'better-tailwindcss/no-unregistered-classes': 'off',
-      'better-tailwindcss/no-deprecated-classes': 'warn',
+      'better-tailwindcss/no-deprecated-classes': 'off', // Disable expensive rule - Tailwind 4 is stable
       // Disable all stylistic rules (Prettier handles these)
       'better-tailwindcss/multiline': 'off',
       'better-tailwindcss/sort-classes': 'off',
@@ -95,6 +105,19 @@ export default tseslint.config(
         // Detect classes in these utility functions
         callees: ['classnames', 'clsx', 'cn', 'cva'],
       },
+    },
+  },
+  // Custom color theming rules
+  {
+    files: ['**/*.{ts,tsx}'], // Only TSX/TS files have JSX and className
+    plugins: {
+      lab: customRules,
+    },
+    rules: {
+      // Ban hardcoded colors (hex, rgb, hsl) in Tailwind classes
+      'lab/no-hardcoded-colors': 'error',
+      // Ban primitive color scales (terracotta-*, sand-*, neutral-*, aurora-*)
+      'lab/no-primitive-color-scales': 'error',
     },
   },
   storybook.configs['flat/recommended'],
