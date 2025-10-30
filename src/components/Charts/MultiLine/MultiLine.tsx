@@ -434,33 +434,46 @@ export function MultiLineChart({
   };
 
   // Build complete option
-  const option = {
-    animation: true,
-    animationDuration,
-    animationEasing: 'cubicOut' as const,
-    backgroundColor: 'transparent',
-    textStyle: {
-      color: themeColors.foreground,
-    },
-    // Never pass title to ECharts - component always renders it
-    grid: gridConfig,
-    xAxis: xAxisConfig,
-    yAxis: yAxisConfig,
-    series: seriesConfig,
-    tooltip: tooltipConfig,
-    dataZoom: enableDataZoom
-      ? [
-          {
-            type: 'inside' as const,
-            xAxisIndex: 0,
-            filterMode: 'none' as const,
-            zoomOnMouseWheel: false,
-            moveOnMouseWheel: false,
-            moveOnMouseMove: true,
-          },
-        ]
-      : undefined,
-  };
+  // Memoize to prevent re-creating on every render (which causes chart to re-animate with notMerge=true)
+  const option = useMemo(
+    () => ({
+      animation: true,
+      animationDuration,
+      animationEasing: 'cubicOut' as const,
+      backgroundColor: 'transparent',
+      textStyle: {
+        color: themeColors.foreground,
+      },
+      // Never pass title to ECharts - component always renders it
+      grid: gridConfig,
+      xAxis: xAxisConfig,
+      yAxis: yAxisConfig,
+      series: seriesConfig,
+      tooltip: tooltipConfig,
+      dataZoom: enableDataZoom
+        ? [
+            {
+              type: 'inside' as const,
+              xAxisIndex: 0,
+              filterMode: 'none' as const,
+              zoomOnMouseWheel: false,
+              moveOnMouseWheel: false,
+              moveOnMouseMove: true,
+            },
+          ]
+        : undefined,
+    }),
+    [
+      animationDuration,
+      themeColors.foreground,
+      gridConfig,
+      xAxisConfig,
+      yAxisConfig,
+      seriesConfig,
+      tooltipConfig,
+      enableDataZoom,
+    ]
+  );
 
   const chartContent = (
     <>
