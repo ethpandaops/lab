@@ -316,8 +316,20 @@ export function Map2DChart({
       },
       series,
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mapLoaded]); // Only recalculate when map loads, ignore theme/color changes
+  }, [
+    mapLoaded,
+    theme,
+    themeColors,
+    routes,
+    showEffect,
+    lineColor,
+    pointColor,
+    pointSizeMultiplier,
+    mapColor,
+    roam,
+    animationDuration,
+    title,
+  ]);
 
   // Don't render until map is loaded
   if (!mapLoaded) {
