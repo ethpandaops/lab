@@ -51,8 +51,8 @@ importers:
         specifier: 2.0.9
         version: 2.0.9(echarts@6.0.0)
       html-to-image:
-        specifier: ^1.11.13
-        version: 1.11.13
+        specifier: ^1.11.11
+        version: 1.11.11
       p5:
         specifier: 2.0.5
         version: 2.0.5
@@ -2441,8 +2441,8 @@ packages:
     resolution: {integrity: sha512-Y22oTqIU4uuPgEemfz7NDJz6OeKf12Lsu+QC+s3BVpda64lTiMYCyGwg5ki4vFxkMwQdeZDl2adZoqUgdFuTgQ==}
     engines: {node: '>=18'}
 
-  html-to-image@1.11.13:
-    resolution: {integrity: sha512-cuOPoI7WApyhBElTTb9oqsawRvZ0rHhaHwghRLlTuffoD1B2aDemlCruLeZrUIIdvG7gs9xeELEPm6PhuASqrg==}
+  html-to-image@1.11.11:
+    resolution: {integrity: sha512-9gux8QhvjRO/erSnDPv28noDZcPZmYE7e1vFsBLKLlRlKDSqNJYebj6Qz1TGd5lsRV+X+xYyjCKjuZdABinWjA==}
 
   http-proxy-agent@7.0.2:
     resolution: {integrity: sha512-T1gkAiYYDWYx3V5Bmyu7HcfcvL7mUrTWiM6yOfa3PIphViJ/gFPbvidQ+veqSOHci/PxBcDabeUNCzpOODJZig==}
@@ -6426,7 +6426,7 @@ snapshots:
     dependencies:
       whatwg-encoding: 3.1.1
 
-  html-to-image@1.11.13: {}
+  html-to-image@1.11.11: {}
 
   http-proxy-agent@7.0.2:
     dependencies:
