@@ -130,6 +130,15 @@ export function BlockArrivalTimesChart({
     // Ensure y-axis includes attestation deadline with some padding
     const maxY = Math.max(dataMaxY, attestationDeadlineSeconds) * 1.1;
 
+    console.log(
+      '[BlockArrivalTimesChart] Data range - dataMaxY:',
+      dataMaxY,
+      'attestationDeadline:',
+      attestationDeadlineSeconds,
+      'chartMaxY:',
+      maxY
+    );
+
     return { series, minX, maxY };
   }, [data, CHART_CATEGORICAL_COLORS, attestationDeadlineSeconds]);
 

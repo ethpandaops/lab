@@ -311,16 +311,18 @@ export function MultiLineChart({
       itemStyle: {
         color: seriesColor,
       },
-      // Add markLine to the first series only
-      ...(idx === 0 && markLines && markLines.length > 0
+      // Add markLine to ALL series (workaround - ECharts sometimes doesn't render markLine on smooth series)
+      ...(markLines && markLines.length > 0
         ? (() => {
-            console.log('[MultiLine] Adding markLine to first series. markLines:', markLines);
+            if (idx === 0) {
+              console.log('[MultiLine] Adding markLine. markLines:', markLines);
+            }
             const markLineConfig = {
               symbol: 'none',
               silent: false,
               animation: false,
               label: {
-                show: true,
+                show: idx === 0, // Only show label on first series to avoid duplicates
                 position: 'end' as const,
                 formatter: (params: { name?: string }) => params.name || '',
                 color: themeColors.foreground,
@@ -335,11 +337,13 @@ export function MultiLineChart({
                 lineStyle: {
                   color: line.color || themeColors.danger,
                   type: line.lineStyle || ('dotted' as const),
-                  width: 2,
+                  width: 3,
                 },
               })),
             };
-            console.log('[MultiLine] markLine config:', markLineConfig);
+            if (idx === 0) {
+              console.log('[MultiLine] markLine config:', markLineConfig);
+            }
             return { markLine: markLineConfig };
           })()
         : {}),
