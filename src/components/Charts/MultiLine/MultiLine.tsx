@@ -106,12 +106,8 @@ export function MultiLineChart({
   // Convert OKLCH colors (from Tailwind v4) to hex format for ECharts compatibility
   const convertedColorPalette = colorPalette?.map(color => resolveCssColorToHex(color));
 
-  // Build extended palette: custom palette or theme colors + data viz categorical colors
-  const extendedPalette = convertedColorPalette || [
-    themeColors.primary,
-    themeColors.accent,
-    ...CHART_CATEGORICAL_COLORS,
-  ];
+  // Build extended palette: custom palette or data viz categorical colors
+  const extendedPalette = convertedColorPalette || CHART_CATEGORICAL_COLORS;
 
   // Manage aggregate series visibility
   const [showAggregate, setShowAggregate] = useState(false);
