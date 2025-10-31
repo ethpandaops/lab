@@ -98,8 +98,8 @@ function RootComponent(): JSX.Element {
     return (
       <QueryClientProvider client={queryClient}>
         <ThemeProvider>
-          <div className="flex min-h-dvh items-center justify-center bg-background">
-            <span className="text-9xl" role="img" aria-label="Clown face">
+          <div className="flex min-h-dvh items-center justify-center bg-background p-4">
+            <span className="w-full text-center" style={{ fontSize: '100vw' }} role="img" aria-label="Clown face">
               🤡
             </span>
           </div>
