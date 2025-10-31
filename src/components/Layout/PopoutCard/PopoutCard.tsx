@@ -81,7 +81,16 @@ export function PopoutCard({
   const cardRef = useRef<HTMLDivElement>(null);
   const modalContentRef = useRef<HTMLDivElement>(null);
   const { downloadElement, getElementImageDataUrl } = useChartDownload();
-  const { currentNetwork } = useNetwork();
+
+  // useNetwork is optional - it may not be available in test environments or outside NetworkProvider
+  let currentNetwork;
+  try {
+    const network = useNetwork();
+    currentNetwork = network.currentNetwork;
+  } catch {
+    // NetworkProvider not available
+    currentNetwork = undefined;
+  }
 
   // Determine if children is a render function or static content
   const isRenderFunction = typeof children === 'function';
