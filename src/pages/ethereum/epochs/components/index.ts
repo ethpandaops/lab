@@ -1,2 +1,2 @@
-export { EpochBasicInfoCard } from './EpochBasicInfoCard';
+export { EpochHeader } from './EpochHeader';
 export { EpochSlotsTable } from './EpochSlotsTable';
