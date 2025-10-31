@@ -16,6 +16,9 @@ function LivePage(): JSX.Element {
 
 export const Route = createFileRoute('/ethereum/live')({
   component: LivePage,
+  beforeLoad: () => ({
+    getBreadcrumb: () => ({ label: 'Live', show: false }), // Opt-out of breadcrumbs
+  }),
   head: () => ({
     meta: [
       {

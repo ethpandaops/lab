@@ -16,12 +16,18 @@ import { ThemeToggle } from '@/components/Layout/ThemeToggle';
 import { ConfigGate } from '@/components/Overlays/ConfigGate';
 import { FeatureGate } from '@/components/Overlays/FeatureGate';
 import { Sidebar } from '@/components/Layout/Sidebar';
+import { Breadcrumb } from '@/components/Navigation/Breadcrumb';
 import type { Config } from '@/hooks/useConfig';
 import type { Bounds } from '@/hooks/useBounds';
 
 // Define router context interface
 interface MyRouterContext {
   getTitle?: () => string;
+  getBreadcrumb?: () => {
+    label?: string;
+    show?: boolean;
+    clickable?: boolean; // Whether the breadcrumb should be a link (default: true)
+  };
 }
 
 // Define search params schema for network selection
@@ -151,6 +157,7 @@ function RootComponent(): JSX.Element {
                 {/* Main content */}
                 <main className="bg-background lg:pl-72">
                   <FeatureGate>
+                    <Breadcrumb />
                     <Outlet />
                   </FeatureGate>
                 </main>

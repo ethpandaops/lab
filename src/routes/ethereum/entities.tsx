@@ -4,6 +4,7 @@ export const Route = createFileRoute('/ethereum/entities')({
   component: Outlet,
   beforeLoad: () => ({
     getTitle: () => 'Entities',
+    getBreadcrumb: () => ({ label: 'Entities' }),
   }),
   head: () => ({
     meta: [

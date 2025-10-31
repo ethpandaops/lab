@@ -4,6 +4,9 @@ import { IndexPage } from '@/pages/ethereum/entities';
 
 export const Route = createFileRoute('/ethereum/entities/')({
   component: IndexPage,
+  beforeLoad: () => ({
+    getBreadcrumb: () => ({ show: false }), // Index routes should not show breadcrumbs
+  }),
   head: () => ({
     meta: [
       { title: `Entities | ${import.meta.env.VITE_BASE_TITLE}` },

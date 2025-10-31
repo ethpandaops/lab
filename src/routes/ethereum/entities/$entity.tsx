@@ -4,6 +4,9 @@ import { DetailPage } from '@/pages/ethereum/entities';
 
 export const Route = createFileRoute('/ethereum/entities/$entity')({
   component: DetailPage,
+  beforeLoad: ({ params }) => ({
+    getBreadcrumb: () => ({ label: params.entity }),
+  }),
   head: ctx => ({
     meta: [
       { title: `${ctx.params.entity} | ${import.meta.env.VITE_BASE_TITLE}` },

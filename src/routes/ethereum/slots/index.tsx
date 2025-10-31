@@ -3,6 +3,9 @@ import { IndexPage } from '@/pages/ethereum/slots';
 
 export const Route = createFileRoute('/ethereum/slots/')({
   component: IndexPage,
+  beforeLoad: () => ({
+    getBreadcrumb: () => ({ show: false }), // Index routes should not show breadcrumbs
+  }),
   head: () => ({
     meta: [
       {

@@ -5,6 +5,7 @@ export const Route = createFileRoute('/xatu/contributors')({
   beforeLoad: () => {
     return {
       getTitle: () => 'Contributors',
+      getBreadcrumb: () => ({ label: 'Contributors' }),
     };
   },
   head: () => ({

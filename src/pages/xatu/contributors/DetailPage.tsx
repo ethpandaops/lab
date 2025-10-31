@@ -244,12 +244,6 @@ export function DetailPage(): JSX.Element {
 
   return (
     <Container>
-      <Header title="Contributor Details" description="Detailed contribution metrics and activity" />
-
-      <Link to="/xatu/contributors" className="mb-6 inline-block text-primary hover:underline">
-        ← Back to all contributors
-      </Link>
-
       {/* Compact Profile Header */}
       <div className="mb-6 flex flex-wrap items-center gap-3">
         <h1 className="text-3xl/9 font-bold text-foreground">{username}</h1>

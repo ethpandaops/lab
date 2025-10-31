@@ -5,6 +5,7 @@ export const Route = createFileRoute('/ethereum/slots')({
   beforeLoad: () => {
     return {
       getTitle: () => 'Slots',
+      getBreadcrumb: () => ({ label: 'Slots' }),
     };
   },
   head: () => ({

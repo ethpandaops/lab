@@ -3,6 +3,9 @@ import { IndexPage } from '@/pages/xatu/locally-built-blocks';
 
 export const Route = createFileRoute('/xatu/locally-built-blocks')({
   component: IndexPage,
+  beforeLoad: () => ({
+    getBreadcrumb: () => ({ label: 'Locally Built Blocks' }),
+  }),
   head: () => ({
     meta: [
       {
