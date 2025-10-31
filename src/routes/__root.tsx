@@ -121,12 +121,12 @@ function RootComponent(): JSX.Element {
           <ConfigGate>
             <NetworkProvider>
               <HeadContent />
-              <div className="min-h-dvh bg-background">
+              <div className="bg-background">
                 {/* Sidebar (mobile + desktop) */}
                 <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
 
                 {/* Mobile header */}
-                <div className="sticky top-0 z-40 flex items-center justify-between border-b border-border bg-surface/95 px-4 py-4 shadow-sm backdrop-blur-xl sm:px-6 lg:hidden">
+                <div className="fixed top-0 right-0 left-0 z-40 flex items-center justify-between border-b border-border bg-surface/95 px-4 py-4 shadow-sm backdrop-blur-xl sm:px-6 lg:hidden">
                   <div className="flex items-center gap-x-6">
                     <button
                       type="button"
@@ -149,7 +149,7 @@ function RootComponent(): JSX.Element {
                 </div>
 
                 {/* Main content */}
-                <main className="bg-background lg:pl-72">
+                <main className="bg-background pt-[65px] lg:min-h-dvh lg:pt-0 lg:pl-72">
                   <FeatureGate>
                     <Outlet />
                   </FeatureGate>
