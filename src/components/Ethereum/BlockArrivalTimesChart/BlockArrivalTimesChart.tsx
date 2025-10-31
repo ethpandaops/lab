@@ -160,8 +160,8 @@ export function BlockArrivalTimesChart({
             }}
             yAxis={{
               name: 'Time (seconds)',
-              formatter: (value: number | string) => (typeof value === 'number' ? value.toFixed(2) : value),
-              valueDecimals: 2,
+              formatter: (value: number | string) => (typeof value === 'number' ? value.toFixed(0) : value),
+              valueDecimals: 0,
               max: maxY,
             }}
             height={isInModal ? 600 : chartHeight}
