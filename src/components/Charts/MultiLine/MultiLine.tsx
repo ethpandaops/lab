@@ -289,7 +289,6 @@ export function MultiLineChart({
 
   // Build series configuration
   // Note: Don't filter by visible property here - displayedSeries already handles visibility via visibleSeries state
-  let markLineAdded = false;
   const seriesConfig = displayedSeries.map(s => {
     // Use explicit color or auto-assign from palette
     const originalIndex = series.indexOf(s);
@@ -312,38 +311,6 @@ export function MultiLineChart({
       itemStyle: {
         color: seriesColor,
       },
-      // Add markLine to first visible series with data if markLines are provided
-      // Note: Only add once to avoid duplicates
-      ...(!markLineAdded && markLines && markLines.length > 0 && s.data.length > 0
-        ? (() => {
-            markLineAdded = true;
-            return {
-              markLine: {
-                symbol: 'none', // No arrows at line ends
-                silent: false, // Allow interactions
-                label: {
-                  show: true,
-                  position: 'end' as const,
-                  formatter: (params: { data: { label?: string } }) => params.data.label || '',
-                  color: themeColors.foreground,
-                  fontSize: 12,
-                },
-                lineStyle: {
-                  type: 'dotted' as const,
-                },
-                data: markLines.map(line => ({
-                  yAxis: line.value,
-                  label: line.label,
-                  lineStyle: {
-                    color: line.color || themeColors.danger,
-                    type: line.lineStyle || ('dotted' as const),
-                    width: 2,
-                  },
-                })),
-              },
-            };
-          })()
-        : {}),
     };
 
     // Add area style if requested
@@ -470,11 +437,46 @@ export function MultiLineChart({
     appendToBody: true, // Render tooltip in document body to prevent container clipping
   };
 
+  // Add markLine as a separate invisible series
+  const markLineSeries =
+    markLines && markLines.length > 0
+      ? {
+          name: '_markLine',
+          type: 'line' as const,
+          data: [],
+          markLine: {
+            symbol: 'none',
+            silent: false,
+            label: {
+              show: true,
+              position: 'end' as const,
+              formatter: (params: any) => params.name || '',
+              color: themeColors.foreground,
+              fontSize: 12,
+            },
+            lineStyle: {
+              type: 'dotted' as const,
+            },
+            data: markLines.map(line => ({
+              name: line.label,
+              yAxis: line.value,
+              lineStyle: {
+                color: line.color || themeColors.danger,
+                type: line.lineStyle || ('dotted' as const),
+                width: 2,
+              },
+            })),
+          },
+        }
+      : null;
+
   // Build complete option
   // Memoize based on actual data that should trigger re-animation, not intermediate objects
   // Use JSON.stringify for deep comparison of complex props
-  const option = useMemo(
-    () => ({
+  const option = useMemo(() => {
+    const allSeries = markLineSeries ? [...seriesConfig, markLineSeries] : seriesConfig;
+
+    return {
       animation: true,
       animationDuration,
       animationEasing: 'cubicOut' as const,
@@ -486,7 +488,7 @@ export function MultiLineChart({
       grid: gridConfig,
       xAxis: xAxisConfig,
       yAxis: yAxisConfig,
-      series: seriesConfig,
+      series: allSeries,
       tooltip: tooltipConfig,
       dataZoom: enableDataZoom
         ? [
@@ -500,27 +502,26 @@ export function MultiLineChart({
             },
           ]
         : undefined,
-    }),
-    [
-      animationDuration,
-      themeColors.foreground,
-      themeColors.border,
-      themeColors.muted,
-      themeColors.danger,
-      JSON.stringify(displayedSeries),
-      JSON.stringify(xAxis),
-      JSON.stringify(yAxis),
-      JSON.stringify(markLines),
-      enableDataZoom,
-      connectNulls,
-      height,
-      seriesConfig,
-      gridConfig,
-      xAxisConfig,
-      yAxisConfig,
-      tooltipConfig,
-    ]
-  );
+    };
+  }, [
+    animationDuration,
+    themeColors.foreground,
+    themeColors.border,
+    themeColors.muted,
+    themeColors.danger,
+    JSON.stringify(displayedSeries),
+    JSON.stringify(xAxis),
+    JSON.stringify(yAxis),
+    JSON.stringify(markLines),
+    enableDataZoom,
+    connectNulls,
+    height,
+    seriesConfig,
+    gridConfig,
+    xAxisConfig,
+    yAxisConfig,
+    tooltipConfig,
+  ]);
 
   const chartContent = (
     <>
