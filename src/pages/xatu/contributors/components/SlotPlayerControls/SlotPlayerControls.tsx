@@ -1,6 +1,7 @@
 import { type JSX } from 'react';
 import { useSlotPlayerState, useSlotPlayerProgress } from '@/hooks/useSlotPlayer';
 import { Card } from '@/components/Layout/Card';
+import { Slot } from '@/components/Ethereum/Slot';
 import { SECONDS_PER_SLOT } from '@/utils/beacon';
 
 /**
@@ -25,7 +26,9 @@ export function SlotPlayerControls(): JSX.Element {
       <div className="flex items-center justify-between gap-4">
         <div>
           <div className="text-sm/6 text-muted">Current Slot</div>
-          <div className="text-2xl/8 font-bold text-foreground">{currentSlot.toLocaleString()}</div>
+          <div className="text-2xl/8 font-bold text-foreground">
+            <Slot slot={currentSlot} noLink />
+          </div>
         </div>
         <div className="flex items-center gap-3">
           {/* Elapsed Timer */}

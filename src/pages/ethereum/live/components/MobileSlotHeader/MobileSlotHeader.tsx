@@ -2,6 +2,8 @@ import { type JSX } from 'react';
 import { Link } from '@tanstack/react-router';
 import { PlayIcon, PauseIcon, ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/solid';
 import { SLOTS_PER_EPOCH } from '@/utils/beacon';
+import { Slot } from '@/components/Ethereum/Slot';
+import { Epoch } from '@/components/Ethereum/Epoch';
 import type { MobileSlotHeaderProps } from './MobileSlotHeader.types';
 
 /**
@@ -30,7 +32,7 @@ export function MobileSlotHeader({
             params={{ slot: currentSlot.toString() }}
             className="font-mono text-lg font-bold text-foreground hover:text-primary"
           >
-            {currentSlot}
+            <Slot slot={currentSlot} noLink />
           </Link>
           {isLive && <span className="text-xs font-medium text-success">Live</span>}
         </div>
@@ -39,7 +41,7 @@ export function MobileSlotHeader({
           params={{ epoch: epoch.toString() }}
           className="text-xs text-muted hover:text-primary"
         >
-          Epoch {epoch}
+          Epoch <Epoch epoch={epoch} noLink />
         </Link>
       </div>
 

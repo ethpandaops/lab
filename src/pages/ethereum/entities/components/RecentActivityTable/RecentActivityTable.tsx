@@ -4,6 +4,7 @@ import { useNavigate } from '@tanstack/react-router';
 
 import { Table } from '@/components/Lists/Table';
 import type { Column } from '@/components/Lists/Table/Table.types';
+import { Epoch } from '@/components/Ethereum/Epoch';
 
 import type { EntityEpochData } from '../../hooks';
 import type { RecentActivityTableProps } from './RecentActivityTable.types';
@@ -37,7 +38,11 @@ export function RecentActivityTable({ epochs }: RecentActivityTableProps): JSX.E
     () => [
       {
         header: 'Epoch',
-        accessor: row => <span className="font-medium text-foreground">{row.epoch}</span>,
+        accessor: row => (
+          <span className="font-medium text-foreground">
+            <Epoch epoch={row.epoch} />
+          </span>
+        ),
         cellClassName: 'text-foreground',
       },
       {

@@ -415,3 +415,21 @@ decorators: [
 
 ## Charts
 - When plotting data in a "slot time" chart, you must use seconds instead of milliseconds, and you should round the tick to the nearest second (unless told otherwise.)
+
+## Slot & Epoch Display
+
+**Never use locale formatting** (no commas) - slots/epochs are blockchain identifiers.
+
+**UI displays** (tables, cards):
+```tsx
+import { Slot, Epoch } from '@/components/Ethereum';
+<Slot slot={1234567} />        // Linked to detail page
+<Epoch epoch={12345} noLink /> // Plain text
+```
+
+**String contexts** (titles, tooltips):
+```tsx
+import { formatSlot, formatEpoch } from '@/utils';
+{formatSlot(slot)}   // "1234567"
+{formatEpoch(epoch)} // "12345"
+```

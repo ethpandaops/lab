@@ -14,6 +14,7 @@ import { TimezoneToggle } from '@/components/Elements/TimezoneToggle';
 import type { DataAvailabilityGranularity } from '@/pages/ethereum/data-availability/components/DataAvailabilityHeatmap';
 import type { DataAvailabilityFilters } from '@/pages/ethereum/data-availability/components/DataAvailabilityHeatmap/DataAvailabilityFilterPanel.types';
 import { useTimezone } from '@/hooks/useTimezone';
+import { formatEpoch } from '@/utils';
 import {
   fctDataColumnAvailabilityDailyServiceListOptions,
   fctDataColumnAvailabilityHourlyServiceListOptions,
@@ -489,7 +490,7 @@ export function IndexPage(): JSX.Element {
     // Add epoch breadcrumb if we're at epoch level or deeper
     if (currentLevel.type === 'epoch' || currentLevel.type === 'slot') {
       crumbs.push({
-        label: `Epoch: ${currentLevel.epoch}`,
+        label: `Epoch: ${formatEpoch(currentLevel.epoch)}`,
         onClick: () =>
           navigate({
             search: {
@@ -601,7 +602,7 @@ export function IndexPage(): JSX.Element {
       case 'hour':
         return 'Column Availability by Epoch';
       case 'epoch':
-        return `Column Availability by Slot - Epoch ${currentLevel.type === 'epoch' ? currentLevel.epoch : ''}`;
+        return `Column Availability by Slot - Epoch ${currentLevel.type === 'epoch' ? formatEpoch(currentLevel.epoch) : ''}`;
       case 'slot':
         return `Column Availability by Blob - Slot ${currentLevel.type === 'slot' ? currentLevel.slot : ''}`;
       default:

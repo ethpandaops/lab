@@ -7,6 +7,7 @@ import { LoadingContainer } from '@/components/Layout/LoadingContainer';
 import { BlockArt } from '@/components/Ethereum/BlockArt';
 import { ScrollAnchor } from '@/components/Navigation/ScrollAnchor';
 import { SLOTS_PER_EPOCH } from '@/utils/beacon';
+import { formatEpoch } from '@/utils';
 import { useSlotDetailData } from './hooks/useSlotDetailData';
 import { SlotBasicInfoCard } from './components/SlotBasicInfoCard';
 import { AttestationArrivalsChart } from './components/AttestationArrivalsChart';
@@ -58,7 +59,7 @@ export function DetailPage(): JSX.Element {
   if (isLoading) {
     return (
       <Container>
-        <Header title={`Slot ${slot}`} description={`Epoch ${epoch}`} />
+        <Header title={`Slot ${slot}`} description={`Epoch ${formatEpoch(epoch)}`} />
         <div className="space-y-6">
           {/* Basic info skeleton */}
           <LoadingContainer className="h-64 rounded-sm" />
@@ -78,7 +79,7 @@ export function DetailPage(): JSX.Element {
   if (error) {
     return (
       <Container>
-        <Header title={`Slot ${slot}`} description={`Epoch ${epoch}`} />
+        <Header title={`Slot ${slot}`} description={`Epoch ${formatEpoch(epoch)}`} />
         <Alert variant="error" title="Error loading slot data" description={error.message} />
         <Link to="/ethereum/slots" className="mt-4 inline-block text-primary hover:underline">
           ← Back to slots
@@ -91,7 +92,7 @@ export function DetailPage(): JSX.Element {
   if (!data || data.blockHead.length === 0) {
     return (
       <Container>
-        <Header title={`Slot ${slot}`} description={`Epoch ${epoch}`} />
+        <Header title={`Slot ${slot}`} description={`Epoch ${formatEpoch(epoch)}`} />
         <Alert
           variant="warning"
           title="No data available"

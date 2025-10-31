@@ -2,6 +2,8 @@ import { type JSX, useMemo } from 'react';
 import { Dialog } from '@/components/Overlays/Dialog';
 import { Disclosure } from '@/components/Layout/Disclosure';
 import { ClientLogo } from '@/components/Ethereum/ClientLogo';
+import { Slot } from '@/components/Ethereum/Slot';
+import { formatSlot } from '@/utils';
 import type { BlockDetailsModalProps } from './BlockDetailsModal.types';
 import type { ParsedBlock } from '../../hooks';
 
@@ -158,7 +160,7 @@ export function BlockDetailsModal({
   const nodeCount = isPairingContext ? slotGroups.reduce((sum, s) => sum + s.nodes.length, 0) : nodeGroups.length;
 
   // Generate title and description based on context
-  const title = slot !== null ? `Block Details - Slot ${slot.toLocaleString()}` : `Block Details - ${client}`;
+  const title = slot !== null ? `Block Details - Slot ${formatSlot(slot)}` : `Block Details - ${client}`;
   const description =
     isExecutionClient !== null
       ? `${client} (${isExecutionClient ? 'Execution' : 'Consensus'} Client)`
@@ -216,7 +218,9 @@ function SlotCard({ slotGroup }: { slotGroup: SlotGroup }): JSX.Element {
 
   const title = (
     <div className="flex items-center gap-4">
-      <span className="font-mono text-sm font-medium text-foreground">Slot {slot.toLocaleString()}</span>
+      <span className="font-mono text-sm font-medium text-foreground">
+        Slot <Slot slot={slot} />
+      </span>
       <div className="flex items-center gap-3 text-xs text-muted">
         <span className="rounded-sm bg-primary/20 px-1.5 py-0.5 font-medium text-primary">
           {nodes.length} node{nodes.length !== 1 ? 's' : ''}
@@ -416,8 +420,8 @@ function BlockDetails({
           <div className="text-xs font-medium text-muted">Block Context</div>
           <div className="mt-1 text-xs leading-relaxed text-muted">
             This block was built locally by a node running {block.meta_client_name}. It represents what the node would
-            have proposed if selected as a block proposer for slot {block.slot?.toLocaleString()}. This data is useful
-            for comparing different client implementations and their transaction selection strategies.
+            have proposed if selected as a block proposer for slot {block.slot ? formatSlot(block.slot) : 'N/A'}. This
+            data is useful for comparing different client implementations and their transaction selection strategies.
           </div>
         </div>
       </div>

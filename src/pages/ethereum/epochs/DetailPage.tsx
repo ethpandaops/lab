@@ -16,6 +16,7 @@ import { Container } from '@/components/Layout/Container';
 import { Header } from '@/components/Layout/Header';
 import { LoadingContainer } from '@/components/Layout/LoadingContainer';
 import { ScrollAnchor } from '@/components/Navigation/ScrollAnchor';
+import { formatEpoch } from '@/utils';
 import { weiToEth } from '@/utils/ethereum';
 
 import { EpochHeader, EpochSlotsTable } from './components';
@@ -63,7 +64,7 @@ export function DetailPage(): React.JSX.Element {
   if (isLoading) {
     return (
       <Container>
-        <Header title={`Epoch ${epoch}`} description="Loading epoch data..." />
+        <Header title={`Epoch ${formatEpoch(epoch)}`} description="Loading epoch data..." />
         <LoadingContainer className="h-96" />
       </Container>
     );
@@ -73,7 +74,7 @@ export function DetailPage(): React.JSX.Element {
   if (error) {
     return (
       <Container>
-        <Header title={`Epoch ${epoch}`} description="Error loading epoch data" />
+        <Header title={`Epoch ${formatEpoch(epoch)}`} description="Error loading epoch data" />
         <Alert variant="error" title="Error Loading Epoch Data" description={error.message} />
         <Link to="/ethereum/epochs" className="mt-4 inline-block text-primary hover:underline">
           ← Back to Epochs
@@ -86,7 +87,7 @@ export function DetailPage(): React.JSX.Element {
   if (!data) {
     return (
       <Container>
-        <Header title={`Epoch ${epoch}`} description="No data available" />
+        <Header title={`Epoch ${formatEpoch(epoch)}`} description="No data available" />
         <Alert
           variant="info"
           title="No Data Available"
