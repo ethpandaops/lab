@@ -5,6 +5,7 @@ import type { ParsedBlock } from '../../hooks';
 import { useInterval } from '@/hooks/useInterval';
 import { BlockDetailsModal } from '../BlockDetailsModal';
 import { ClientLogo } from '@/components/Ethereum/ClientLogo';
+import { formatSlot } from '@/utils';
 import { getIntensity } from '../../utils';
 import styles from './SlotTimeline.module.css';
 
@@ -147,7 +148,7 @@ export function SlotTimeline({
                   >
                     {group.blocks.length}
                   </div>
-                  <div className="text-xs font-medium text-foreground">Slot {group.slot.toLocaleString()}</div>
+                  <div className="text-xs font-medium text-foreground">Slot {formatSlot(group.slot)}</div>
                   <div className="text-xs text-muted">{formatRelativeTime(group.slotStartDateTime, now)}</div>
                 </div>
               );

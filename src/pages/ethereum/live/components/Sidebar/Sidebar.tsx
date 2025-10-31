@@ -3,6 +3,7 @@ import clsx from 'clsx';
 import { Timeline } from '@/pages/ethereum/live/components/Timeline';
 import { ScrollingTimeline } from '@/components/Lists/ScrollingTimeline';
 import { SLOTS_PER_EPOCH } from '@/utils/beacon';
+import { formatSlot, formatEpoch } from '@/utils';
 import type { SidebarProps } from './Sidebar.types';
 
 /**
@@ -39,9 +40,9 @@ function SidebarComponent({
         {/* Header with Slot number and Epoch subtitle */}
         <div className="mb-3">
           <h2 className="text-2xl font-bold text-foreground">
-            <span className="font-mono">{currentSlot.toLocaleString()}</span>
+            <span className="font-mono">{formatSlot(currentSlot)}</span>
           </h2>
-          <p className="text-xs text-muted">Epoch {epoch.toLocaleString()}</p>
+          <p className="text-xs text-muted">Epoch {formatEpoch(epoch)}</p>
         </div>
 
         {/* Timeline */}

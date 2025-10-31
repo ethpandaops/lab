@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { fctBlockFirstSeenByNodeServiceListOptions } from '@/api/@tanstack/react-query.gen';
 import { LoadingContainer } from '@/components/Layout/LoadingContainer';
 import { MultiLineChart } from '@/components/Charts/MultiLine';
+import { formatSlot } from '@/utils';
 import { useLatencyChartSeries } from '../../hooks/useLatencyChartData';
 import { useSlotWindowQuery } from '../../hooks/useSlotWindowQuery';
 import { useNetwork } from '@/hooks/useNetwork';
@@ -89,7 +90,7 @@ export function BlockLatencyChart({ username }: BlockLatencyChartProps): JSX.Ele
           if (!param || !param.data) return '';
           const slot = param.data[0];
           const latency = param.data[1];
-          let html = `<strong>Slot:</strong> ${slot.toLocaleString()}<br/>`;
+          let html = `<strong>Slot:</strong> ${formatSlot(slot)}<br/>`;
           html += `<span style="color:${param.color}">●</span> <strong>${param.seriesName}</strong><br/>`;
           html += `<div style="padding-left: 12px; line-height: 1.6;">`;
           html += `Latency: <strong>${latency.toFixed(0)}ms</strong>`;
@@ -101,7 +102,7 @@ export function BlockLatencyChart({ username }: BlockLatencyChartProps): JSX.Ele
         if (!params || !Array.isArray(params) || params.length === 0) return '';
         const firstParam = params[0] as { axisValue: number };
         const slot = firstParam.axisValue;
-        let html = `<strong>Slot:</strong> ${slot.toLocaleString()}<br/>`;
+        let html = `<strong>Slot:</strong> ${formatSlot(slot)}<br/>`;
         params.forEach((param: { data: [number, number]; color: string; seriesName: string }) => {
           const latency = param.data[1];
           html += `<span style="color:${param.color}">●</span> ${param.seriesName}: ${latency.toFixed(0)}ms<br/>`;

@@ -24,3 +24,33 @@ export function formatSmartDecimal(value: number, maxDecimals: number = 2): stri
   // Otherwise show only the necessary decimals
   return rounded.toString();
 }
+
+/**
+ * Format a slot number without commas
+ * Slots should always be displayed as plain integers without locale formatting
+ *
+ * @param slot - Slot number to format
+ * @returns Formatted slot number as string
+ *
+ * @example
+ * formatSlot(1234567)  // "1234567"
+ * formatSlot(100)      // "100"
+ */
+export function formatSlot(slot: number): string {
+  return slot.toString();
+}
+
+/**
+ * Format an epoch number without commas
+ * Epochs should always be displayed as plain integers without locale formatting
+ *
+ * @param epoch - Epoch number to format
+ * @returns Formatted epoch number as string
+ *
+ * @example
+ * formatEpoch(12345)  // "12345"
+ * formatEpoch(100)    // "100"
+ */
+export function formatEpoch(epoch: number): string {
+  return epoch.toString();
+}

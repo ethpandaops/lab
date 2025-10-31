@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 
-import { formatSmartDecimal } from './number';
+import { formatSmartDecimal, formatSlot, formatEpoch } from './number';
 
 describe('formatSmartDecimal', () => {
   it('should format whole numbers without decimals', () => {
@@ -39,5 +39,41 @@ describe('formatSmartDecimal', () => {
     expect(formatSmartDecimal(0.01, 2)).toBe('0.01');
     expect(formatSmartDecimal(-100.5)).toBe('-100.5');
     expect(formatSmartDecimal(-100)).toBe('-100');
+  });
+});
+
+describe('formatSlot', () => {
+  it('should format slot numbers without commas', () => {
+    expect(formatSlot(1234567)).toBe('1234567');
+    expect(formatSlot(100)).toBe('100');
+    expect(formatSlot(0)).toBe('0');
+  });
+
+  it('should handle large slot numbers', () => {
+    expect(formatSlot(10000000)).toBe('10000000');
+    expect(formatSlot(999999999)).toBe('999999999');
+  });
+
+  it('should handle small slot numbers', () => {
+    expect(formatSlot(1)).toBe('1');
+    expect(formatSlot(42)).toBe('42');
+  });
+});
+
+describe('formatEpoch', () => {
+  it('should format epoch numbers without commas', () => {
+    expect(formatEpoch(12345)).toBe('12345');
+    expect(formatEpoch(100)).toBe('100');
+    expect(formatEpoch(0)).toBe('0');
+  });
+
+  it('should handle large epoch numbers', () => {
+    expect(formatEpoch(1000000)).toBe('1000000');
+    expect(formatEpoch(999999)).toBe('999999');
+  });
+
+  it('should handle small epoch numbers', () => {
+    expect(formatEpoch(1)).toBe('1');
+    expect(formatEpoch(42)).toBe('42');
   });
 });

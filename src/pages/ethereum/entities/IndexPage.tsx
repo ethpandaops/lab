@@ -8,6 +8,7 @@ import { Header } from '@/components/Layout/Header';
 import { LoadingContainer } from '@/components/Layout/LoadingContainer';
 import { Table } from '@/components/Lists/Table';
 import { useBeaconClock } from '@/hooks/useBeaconClock';
+import { formatEpoch } from '@/utils';
 
 import { useEntitiesData } from './hooks';
 
@@ -123,7 +124,7 @@ export function IndexPage(): React.JSX.Element {
             Showing {filteredEntities.length} of {entities.length} entities
           </span>
           <span className="text-muted">
-            Data from epoch <span className="font-medium text-foreground">{lastFinalizedEpoch.toLocaleString()}</span>
+            Data from epoch <span className="font-medium text-foreground">{formatEpoch(lastFinalizedEpoch)}</span>
           </span>
         </div>
       </div>

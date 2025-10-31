@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import colors from 'tailwindcss/colors';
 import { MultiLineChart } from './MultiLine';
 import { useThemeColors } from '@/hooks/useThemeColors';
+import { formatSlot } from '@/utils';
 
 const meta: Meta<typeof MultiLineChart> = {
   title: 'Components/Charts/MultiLine',
@@ -669,7 +670,7 @@ export const CustomTooltip: Story = {
         tooltipFormatter={(params: unknown) => {
           if (!params || !Array.isArray(params) || params.length === 0) return '';
           const slot = params[0].axisValue;
-          let html = `<strong>Slot:</strong> ${slot.toLocaleString()}<br/>`;
+          let html = `<strong>Slot:</strong> ${formatSlot(slot)}<br/>`;
           params.forEach((param: { data: [number, number]; color: string; seriesName: string }) => {
             const latency = param.data[1];
             html += `<span style="color:${param.color}">●</span> ${param.seriesName}: ${latency.toFixed(0)}ms<br/>`;

@@ -17,6 +17,7 @@ import { Header } from '@/components/Layout/Header';
 import { LoadingContainer } from '@/components/Layout/LoadingContainer';
 import { ScrollAnchor } from '@/components/Navigation/ScrollAnchor';
 import { weiToEth } from '@/utils/ethereum';
+import { formatEpoch } from '@/utils';
 
 import { EpochBasicInfoCard, EpochSlotsTable } from './components';
 import { useEpochDetailData } from './hooks';
@@ -87,7 +88,7 @@ export function DetailPage(): React.JSX.Element {
   if (isLoading) {
     return (
       <Container>
-        <Header title={`Epoch ${epoch}`} description="Loading epoch data..." />
+        <Header title={`Epoch ${formatEpoch(epoch)}`} description="Loading epoch data..." />
         <LoadingContainer className="h-96" />
       </Container>
     );
@@ -97,7 +98,7 @@ export function DetailPage(): React.JSX.Element {
   if (error) {
     return (
       <Container>
-        <Header title={`Epoch ${epoch}`} description="Error loading epoch data" />
+        <Header title={`Epoch ${formatEpoch(epoch)}`} description="Error loading epoch data" />
         <Alert variant="error" title="Error Loading Epoch Data" description={error.message} />
         <Link to="/ethereum/epochs" className="mt-4 inline-block text-primary hover:underline">
           ← Back to Epochs
@@ -110,7 +111,7 @@ export function DetailPage(): React.JSX.Element {
   if (!data) {
     return (
       <Container>
-        <Header title={`Epoch ${epoch}`} description="No data available" />
+        <Header title={`Epoch ${formatEpoch(epoch)}`} description="No data available" />
         <Alert
           variant="info"
           title="No Data Available"
@@ -133,7 +134,7 @@ export function DetailPage(): React.JSX.Element {
   return (
     <Container>
       {/* Header */}
-      <Header title={`Epoch ${epoch}`} description={`${timestamp.toLocaleString()} (${relativeTime})`} />
+      <Header title={`Epoch ${formatEpoch(epoch)}`} description={`${timestamp.toLocaleString()} (${relativeTime})`} />
 
       {/* Back link */}
       <Link to="/ethereum/epochs" className="mb-6 inline-block text-sm text-primary hover:underline">

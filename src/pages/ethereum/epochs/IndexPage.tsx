@@ -8,6 +8,7 @@ import { LoadingContainer } from '@/components/Layout/LoadingContainer';
 import { Table } from '@/components/Lists/Table';
 
 import { TopEntitiesChart } from '@/components/Ethereum/TopEntitiesChart';
+import { formatEpoch } from '@/utils';
 
 import { useEpochsData } from './hooks';
 
@@ -95,7 +96,9 @@ export function IndexPage(): React.JSX.Element {
           columns={[
             {
               header: 'Epoch',
-              accessor: row => <span className={row.isCurrent ? 'font-bold text-primary' : ''}>{row.epoch}</span>,
+              accessor: row => (
+                <span className={row.isCurrent ? 'font-bold text-primary' : ''}>{formatEpoch(row.epoch)}</span>
+              ),
             },
             {
               header: 'Start Time',

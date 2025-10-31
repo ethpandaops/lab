@@ -2,6 +2,7 @@ import { type JSX } from 'react';
 import { Link } from '@tanstack/react-router';
 import { PlayIcon, PauseIcon, ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/solid';
 import { SLOTS_PER_EPOCH } from '@/utils/beacon';
+import { formatEpoch } from '@/utils';
 import type { MobileSlotHeaderProps } from './MobileSlotHeader.types';
 
 /**
@@ -39,7 +40,7 @@ export function MobileSlotHeader({
           params={{ epoch: epoch.toString() }}
           className="text-xs text-muted hover:text-primary"
         >
-          Epoch {epoch}
+          Epoch {formatEpoch(epoch)}
         </Link>
       </div>
 

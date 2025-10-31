@@ -8,6 +8,7 @@ import type { Column } from '@/components/Lists/Table/Table.types';
 import { useInfiniteSlotsData, type SlotData } from './hooks';
 import { getRelativeTime, formatTimestamp } from '@/utils/time';
 import { SLOTS_PER_EPOCH } from '@/utils/beacon';
+import { formatSlot, formatEpoch } from '@/utils';
 import clsx from 'clsx';
 import { ArrowPathIcon, ChevronDownIcon } from '@heroicons/react/24/outline';
 
@@ -146,7 +147,7 @@ export function IndexPage(): JSX.Element {
                 isEpochTransition ? 'bg-accent/10 text-accent' : 'text-muted'
               )}
             >
-              {row.epoch}
+              {formatEpoch(row.epoch)}
             </span>
           );
         },
@@ -332,8 +333,8 @@ export function IndexPage(): JSX.Element {
           <div className="rounded-sm bg-surface px-4 py-2 text-xs/5 text-muted">
             {slotsWithCurrent.length > 0 && (
               <>
-                Slots {slotsWithCurrent[slotsWithCurrent.length - 1]?.slot.toLocaleString()} -{' '}
-                {slotsWithCurrent[0]?.slot.toLocaleString()}
+                Slots {formatSlot(slotsWithCurrent[slotsWithCurrent.length - 1]?.slot)} -{' '}
+                {formatSlot(slotsWithCurrent[0]?.slot)}
               </>
             )}
           </div>

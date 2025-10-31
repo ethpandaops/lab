@@ -4,6 +4,7 @@ import { fctAttestationObservationByNodeServiceListOptions } from '@/api/@tansta
 import { Alert } from '@/components/Feedback/Alert';
 import { LoadingContainer } from '@/components/Layout/LoadingContainer';
 import { MultiLineChart } from '@/components/Charts/MultiLine';
+import { formatSlot } from '@/utils';
 import { usePreAggregatedLatencyChartSeries } from '../../hooks/usePreAggregatedLatencyChartSeries';
 import { useSlotWindowQuery } from '../../hooks/useSlotWindowQuery';
 import { useNetwork } from '@/hooks/useNetwork';
@@ -117,7 +118,7 @@ export function AttestationLatencyChart({ username }: AttestationLatencyChartPro
         const slot = param.data.value[0];
         const medianLatency = param.data.value[1];
 
-        let html = `<strong>Slot:</strong> ${slot.toLocaleString()}<br/>`;
+        let html = `<strong>Slot:</strong> ${formatSlot(slot)}<br/>`;
         html += `<span style="color:${param.color}">●</span> <strong>${param.seriesName}</strong><br/>`;
         html += `<div style="padding-left: 12px; line-height: 1.6;">`;
         html += `Median: <strong>${medianLatency.toFixed(1)}ms</strong><br/>`;
