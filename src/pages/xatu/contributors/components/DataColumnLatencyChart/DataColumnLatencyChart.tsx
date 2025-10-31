@@ -78,7 +78,7 @@ export function DataColumnLatencyChart({ username, nodes }: DataColumnLatencyCha
             variant="info"
             description={
               <>
-                Data column data collection requires{' '}
+                Data column collection requires{' '}
                 <a
                   href="https://github.com/ethpandaops/contributoor"
                   target="_blank"
@@ -87,7 +87,7 @@ export function DataColumnLatencyChart({ username, nodes }: DataColumnLatencyCha
                 >
                   contributoor
                 </a>{' '}
-                v0.0.70 or later. If this is your node, please upgrade your contributoor to view data column metrics.
+                v0.0.70 or later. If this is your node, please upgrade contributoor to view data column metrics.
               </>
             }
           />
