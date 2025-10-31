@@ -258,8 +258,8 @@ export function SlotViewLayout({ mode }: SlotViewLayoutProps): JSX.Element {
           />
         </div>
 
-        {/* Slot Time Progress - 56px */}
-        <div className="h-[56px] shrink-0 border-b border-border bg-surface px-3 py-2">
+        {/* Slot Time Progress - 68px (increased to fit time tick labels) */}
+        <div className="h-[68px] shrink-0 overflow-hidden border-b border-border bg-surface px-3 py-2">
           <SlotTimeline
             phases={slotData.sidebarPhases}
             currentTime={currentTime}
@@ -271,13 +271,13 @@ export function SlotViewLayout({ mode }: SlotViewLayoutProps): JSX.Element {
           />
         </div>
 
-        {/* Slim Timeline - 100px */}
-        <div className="h-[100px] shrink-0 overflow-hidden border-b border-border bg-surface">
-          <ScrollingTimeline items={slotData.sidebarItems} currentTime={currentTime} autoScroll={true} height="100px" />
+        {/* Slim Timeline - 95px */}
+        <div className="h-[95px] shrink-0 overflow-hidden border-b border-border bg-surface">
+          <ScrollingTimeline items={slotData.sidebarItems} currentTime={currentTime} autoScroll={true} height="95px" />
         </div>
 
-        {/* Map - 279px (adjusted) */}
-        <div className="h-[279px] shrink-0 overflow-hidden bg-background">
+        {/* Map - 252px (reduced to fit tick labels) */}
+        <div className="h-[252px] shrink-0 overflow-hidden bg-background">
           <Map2DChart
             points={timeFilteredData.visibleMapPoints}
             height="100%"
