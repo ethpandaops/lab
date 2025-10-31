@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import { BlockArrivalTimesChart } from './BlockArrivalTimesChart';
 
 const meta = {
@@ -19,8 +19,17 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-// Generate sample data for 32 slots
-const generateSampleData = () => {
+/**
+ * Generate sample data for 32 slots
+ */
+const generateSampleData = (): Array<{
+  x: number;
+  min: number | null;
+  p05: number | null;
+  p50: number | null;
+  p90: number | null;
+  max: number | null;
+}> => {
   return Array.from({ length: 32 }, (_, i) => {
     const slot = 10000000 + i;
     // Simulate block arrival times in milliseconds (most arrive early, some late)

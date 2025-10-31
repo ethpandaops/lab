@@ -450,7 +450,7 @@ export function MultiLineChart({
             label: {
               show: true,
               position: 'end' as const,
-              formatter: (params: any) => params.name || '',
+              formatter: (params: { name?: string }) => params.name || '',
               color: themeColors.foreground,
               fontSize: 12,
             },
@@ -472,7 +472,6 @@ export function MultiLineChart({
 
   // Build complete option
   // Memoize based on actual data that should trigger re-animation, not intermediate objects
-  // Use JSON.stringify for deep comparison of complex props
   const option = useMemo(() => {
     const allSeries = markLineSeries ? [...seriesConfig, markLineSeries] : seriesConfig;
 
@@ -506,21 +505,13 @@ export function MultiLineChart({
   }, [
     animationDuration,
     themeColors.foreground,
-    themeColors.border,
-    themeColors.muted,
-    themeColors.danger,
-    JSON.stringify(displayedSeries),
-    JSON.stringify(xAxis),
-    JSON.stringify(yAxis),
-    JSON.stringify(markLines),
     enableDataZoom,
-    connectNulls,
-    height,
     seriesConfig,
     gridConfig,
     xAxisConfig,
     yAxisConfig,
     tooltipConfig,
+    markLineSeries,
   ]);
 
   const chartContent = (
