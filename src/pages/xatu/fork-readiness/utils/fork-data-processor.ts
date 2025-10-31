@@ -1,5 +1,5 @@
 import type { FctNodeActiveLast24h } from '@/api';
-import { meetsMinVersion } from './version-comparison';
+import { meetsMinVersion } from '@/utils';
 import type {
   ClientReadinessData,
   NodeReadinessStatus,

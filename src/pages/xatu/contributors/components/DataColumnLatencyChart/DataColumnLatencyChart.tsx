@@ -1,33 +1,37 @@
 import { type JSX } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { fctHeadFirstSeenByNodeServiceListOptions } from '@/api/@tanstack/react-query.gen';
+import { fctBlockDataColumnSidecarFirstSeenByNodeServiceListOptions } from '@/api/@tanstack/react-query.gen';
+import type { FctNodeActiveLast24h } from '@/api/types.gen';
+import { Alert } from '@/components/Feedback/Alert';
 import { LoadingContainer } from '@/components/Layout/LoadingContainer';
 import { MultiLineChart } from '@/components/Charts/MultiLine';
 import { useLatencyChartSeries } from '../../hooks/useLatencyChartData';
 import { useSlotWindowQuery } from '../../hooks/useSlotWindowQuery';
 import { useNetwork } from '@/hooks/useNetwork';
+import { meetsMinVersion } from '@/utils';
 
-export interface HeadLatencyChartProps {
+export interface DataColumnLatencyChartProps {
   username: string;
+  nodes: FctNodeActiveLast24h[];
 }
 
 /**
- * Line chart showing head propagation latency for a contributor's nodes.
+ * Line chart showing data column propagation latency for a contributor's nodes.
  *
- * Displays `seen_slot_start_diff` (ms) from FctHeadFirstSeenByNode over slots.
- * Each data point represents when a head event was first observed by the contributor's
- * nodes relative to slot start time.
+ * Displays `seen_slot_start_diff` (ms) from FctBlockDataColumnSidecarFirstSeenByNode over slots.
+ * Data columns were introduced in PeerDAS (Fusaka upgrade) for improved data availability sampling.
  *
- * Lower latency = faster head update propagation = better sync performance.
+ * Lower latency = faster data column propagation = better network positioning.
  *
  * @param username - Contributor username to filter data
+ * @param nodes - List of active nodes for version checking
  */
-export function HeadLatencyChart({ username }: HeadLatencyChartProps): JSX.Element {
+export function DataColumnLatencyChart({ username, nodes }: DataColumnLatencyChartProps): JSX.Element {
   const queryRange = useSlotWindowQuery(20);
   const { currentNetwork } = useNetwork();
 
   const { data, isLoading, error } = useQuery({
-    ...fctHeadFirstSeenByNodeServiceListOptions({
+    ...fctBlockDataColumnSidecarFirstSeenByNodeServiceListOptions({
       query: {
         username_eq: username,
         slot_start_date_time_gte: queryRange?.slot_start_date_time_gte,
@@ -40,7 +44,10 @@ export function HeadLatencyChart({ username }: HeadLatencyChartProps): JSX.Eleme
     placeholderData: previousData => previousData,
   });
 
-  const { series, minSlot, maxSlot, dataCount } = useLatencyChartSeries(data, 'fct_head_first_seen_by_node');
+  const { series, minSlot, maxSlot, dataCount } = useLatencyChartSeries(
+    data,
+    'fct_block_data_column_sidecar_first_seen_by_node'
+  );
 
   // Only show loading skeleton on initial load, not on refetch
   if (isLoading) {
@@ -50,15 +57,47 @@ export function HeadLatencyChart({ username }: HeadLatencyChartProps): JSX.Eleme
   if (error) {
     return (
       <div className="rounded-sm border border-danger/20 bg-danger/10 p-4 text-danger">
-        Error loading head data: {error.message}
+        Error loading data column data: {error.message}
       </div>
     );
   }
 
   if (dataCount === 0) {
+    // Check if all nodes are running contributoor version < v0.0.70
+    const allNodesOldVersion = nodes.every(node => {
+      const version = node.meta_client_version;
+      if (!version) return false; // If no version, we can't determine
+      return !meetsMinVersion(version, 'v0.0.70');
+    });
+
+    // Show warning if nodes are running old versions
+    if (allNodesOldVersion && nodes.length > 0) {
+      return (
+        <div className="space-y-4">
+          <Alert
+            variant="info"
+            description={
+              <>
+                Data column collection requires{' '}
+                <a
+                  href="https://github.com/ethpandaops/contributoor"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-medium underline hover:no-underline"
+                >
+                  contributoor
+                </a>{' '}
+                v0.0.70 or later. If this is your node, please upgrade contributoor to view data column metrics.
+              </>
+            }
+          />
+        </div>
+      );
+    }
+
     return (
       <div className="flex h-[400px] items-center justify-center rounded-sm border border-border bg-surface text-muted">
-        No head data available for this time range
+        No data column data available for this time range
       </div>
     );
   }

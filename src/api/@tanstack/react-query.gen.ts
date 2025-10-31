@@ -40,6 +40,8 @@ import {
   fctBlockBlobCountServiceList,
   fctBlockBlobFirstSeenByNodeServiceGet,
   fctBlockBlobFirstSeenByNodeServiceList,
+  fctBlockDataColumnSidecarFirstSeenByNodeServiceGet,
+  fctBlockDataColumnSidecarFirstSeenByNodeServiceList,
   fctBlockFirstSeenByNodeServiceGet,
   fctBlockFirstSeenByNodeServiceList,
   fctBlockHeadServiceGet,
@@ -141,6 +143,8 @@ import type {
   FctBlockBlobCountServiceListData,
   FctBlockBlobFirstSeenByNodeServiceGetData,
   FctBlockBlobFirstSeenByNodeServiceListData,
+  FctBlockDataColumnSidecarFirstSeenByNodeServiceGetData,
+  FctBlockDataColumnSidecarFirstSeenByNodeServiceListData,
   FctBlockFirstSeenByNodeServiceGetData,
   FctBlockFirstSeenByNodeServiceListData,
   FctBlockHeadServiceGetData,
@@ -1193,6 +1197,58 @@ export const fctBlockBlobFirstSeenByNodeServiceGetOptions = (
       return data;
     },
     queryKey: fctBlockBlobFirstSeenByNodeServiceGetQueryKey(options),
+  });
+};
+
+export const fctBlockDataColumnSidecarFirstSeenByNodeServiceListQueryKey = (
+  options?: Options<FctBlockDataColumnSidecarFirstSeenByNodeServiceListData>
+) => createQueryKey('fctBlockDataColumnSidecarFirstSeenByNodeServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctBlockDataColumnSidecarFirstSeenByNodeServiceListOptions = (
+  options?: Options<FctBlockDataColumnSidecarFirstSeenByNodeServiceListData>
+) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctBlockDataColumnSidecarFirstSeenByNodeServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctBlockDataColumnSidecarFirstSeenByNodeServiceListQueryKey(options),
+  });
+};
+
+export const fctBlockDataColumnSidecarFirstSeenByNodeServiceGetQueryKey = (
+  options: Options<FctBlockDataColumnSidecarFirstSeenByNodeServiceGetData>
+) => createQueryKey('fctBlockDataColumnSidecarFirstSeenByNodeServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by slot_start_date_time
+ */
+export const fctBlockDataColumnSidecarFirstSeenByNodeServiceGetOptions = (
+  options: Options<FctBlockDataColumnSidecarFirstSeenByNodeServiceGetData>
+) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctBlockDataColumnSidecarFirstSeenByNodeServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctBlockDataColumnSidecarFirstSeenByNodeServiceGetQueryKey(options),
   });
 };
 

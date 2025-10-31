@@ -18,7 +18,7 @@
     "format": "prettier --write \"src/**/*.{ts,tsx}\"",
     "clean": "rm -rf dist node_modules",
     "generate:api": "openapi-ts",
-    "storybook": "storybook dev -p 6006",
+    "storybook": "storybook dev -p 6006 --no-open",
     "build-storybook": "storybook build",
     "build-storybook:gh-pages": "STORYBOOK_BASE_PATH=/lab storybook build"
   },

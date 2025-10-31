@@ -111,6 +111,12 @@ import type {
   FctBlockBlobFirstSeenByNodeServiceListData,
   FctBlockBlobFirstSeenByNodeServiceListErrors,
   FctBlockBlobFirstSeenByNodeServiceListResponses,
+  FctBlockDataColumnSidecarFirstSeenByNodeServiceGetData,
+  FctBlockDataColumnSidecarFirstSeenByNodeServiceGetErrors,
+  FctBlockDataColumnSidecarFirstSeenByNodeServiceGetResponses,
+  FctBlockDataColumnSidecarFirstSeenByNodeServiceListData,
+  FctBlockDataColumnSidecarFirstSeenByNodeServiceListErrors,
+  FctBlockDataColumnSidecarFirstSeenByNodeServiceListResponses,
   FctBlockFirstSeenByNodeServiceGetData,
   FctBlockFirstSeenByNodeServiceGetErrors,
   FctBlockFirstSeenByNodeServiceGetResponses,
@@ -371,6 +377,10 @@ import {
   zFctBlockBlobFirstSeenByNodeServiceGetResponse,
   zFctBlockBlobFirstSeenByNodeServiceListData,
   zFctBlockBlobFirstSeenByNodeServiceListResponse,
+  zFctBlockDataColumnSidecarFirstSeenByNodeServiceGetData,
+  zFctBlockDataColumnSidecarFirstSeenByNodeServiceGetResponse,
+  zFctBlockDataColumnSidecarFirstSeenByNodeServiceListData,
+  zFctBlockDataColumnSidecarFirstSeenByNodeServiceListResponse,
   zFctBlockFirstSeenByNodeServiceGetData,
   zFctBlockFirstSeenByNodeServiceGetResponse,
   zFctBlockFirstSeenByNodeServiceListData,
@@ -1406,6 +1416,54 @@ export const fctBlockBlobFirstSeenByNodeServiceGet = <ThrowOnError extends boole
       return await zFctBlockBlobFirstSeenByNodeServiceGetResponse.parseAsync(data);
     },
     url: '/api/v1/fct_block_blob_first_seen_by_node/{slot_start_date_time}',
+    ...options,
+  });
+};
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctBlockDataColumnSidecarFirstSeenByNodeServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctBlockDataColumnSidecarFirstSeenByNodeServiceListData, ThrowOnError>
+) => {
+  return (options?.client ?? client).get<
+    FctBlockDataColumnSidecarFirstSeenByNodeServiceListResponses,
+    FctBlockDataColumnSidecarFirstSeenByNodeServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => {
+      return await zFctBlockDataColumnSidecarFirstSeenByNodeServiceListData.parseAsync(data);
+    },
+    responseValidator: async data => {
+      return await zFctBlockDataColumnSidecarFirstSeenByNodeServiceListResponse.parseAsync(data);
+    },
+    url: '/api/v1/fct_block_data_column_sidecar_first_seen_by_node',
+    ...options,
+  });
+};
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by slot_start_date_time
+ */
+export const fctBlockDataColumnSidecarFirstSeenByNodeServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctBlockDataColumnSidecarFirstSeenByNodeServiceGetData, ThrowOnError>
+) => {
+  return (options.client ?? client).get<
+    FctBlockDataColumnSidecarFirstSeenByNodeServiceGetResponses,
+    FctBlockDataColumnSidecarFirstSeenByNodeServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => {
+      return await zFctBlockDataColumnSidecarFirstSeenByNodeServiceGetData.parseAsync(data);
+    },
+    responseValidator: async data => {
+      return await zFctBlockDataColumnSidecarFirstSeenByNodeServiceGetResponse.parseAsync(data);
+    },
+    url: '/api/v1/fct_block_data_column_sidecar_first_seen_by_node/{slot_start_date_time}',
     ...options,
   });
 };
