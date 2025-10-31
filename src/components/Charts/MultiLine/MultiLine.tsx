@@ -347,7 +347,7 @@ export function MultiLineChart({
 
     // Add area style if requested
     if (s.showArea) {
-      return {
+      const configWithArea = {
         ...baseConfig,
         areaStyle: {
           color:
@@ -372,15 +372,22 @@ export function MultiLineChart({
                 },
         },
       };
+      if (idx === 0) {
+        console.log('[MultiLine] First series (WITH AREA) final config:', configWithArea);
+        console.log('[MultiLine] Has markLine?', 'markLine' in configWithArea);
+      }
+      return configWithArea;
     }
 
     if (idx === 0) {
-      console.log('[MultiLine] First series config:', baseConfig);
+      console.log('[MultiLine] First series (NO AREA) final config:', baseConfig);
+      console.log('[MultiLine] Has markLine?', 'markLine' in baseConfig);
     }
     return baseConfig;
   });
 
   console.log('[MultiLine] Total series count:', seriesConfig.length);
+  console.log('[MultiLine] First series in array:', seriesConfig[0]);
 
   // Calculate grid padding
   // Title is always rendered by component, never by ECharts
