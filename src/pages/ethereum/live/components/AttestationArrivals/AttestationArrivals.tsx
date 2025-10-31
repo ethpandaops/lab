@@ -35,7 +35,7 @@ function AttestationArrivalsComponent({
   return (
     <div className={clsx('flex h-full flex-col', className)}>
       {/* Attestation Arrivals Chart - takes full height */}
-      <div className="h-full rounded-sm border border-border bg-surface p-2">
+      <div className="h-full bg-background md:rounded-sm md:border md:border-border md:bg-surface md:p-2">
         <LineChart
           data={intervalChartData.values}
           labels={intervalChartData.labels}

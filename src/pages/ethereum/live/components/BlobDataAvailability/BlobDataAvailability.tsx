@@ -338,17 +338,25 @@ function BlobDataAvailabilityComponent({
   }, [visibleContinentalPropagationData, continentalPropagationBaseConfig, themeColors, maxTime, CONTINENT_COLORS]);
 
   return (
-    <div className={clsx('grid h-full grid-cols-12 gap-4', className)}>
-      {/* First Seen Chart - 6 columns */}
-      <div className="col-span-6 h-full rounded-sm border border-border bg-surface p-1">
-        <ReactECharts option={firstSeenOption} style={{ height: '100%', width: '100%' }} />
+    <>
+      {/* Desktop: Two-column layout */}
+      <div className={clsx('hidden h-full grid-cols-12 gap-4 md:grid', className)}>
+        {/* First Seen Chart - 6 columns */}
+        <div className="col-span-6 h-full rounded-sm border border-border bg-surface p-1">
+          <ReactECharts option={firstSeenOption} style={{ height: '100%', width: '100%' }} />
+        </div>
+
+        {/* Continental Propagation Chart - 6 columns */}
+        <div className="col-span-6 h-full rounded-sm border border-border bg-surface p-1">
+          <ReactECharts option={continentalPropagationOption} style={{ height: '100%', width: '100%' }} />
+        </div>
       </div>
 
-      {/* Continental Propagation Chart - 6 columns */}
-      <div className="col-span-6 h-full rounded-sm border border-border bg-surface p-1">
+      {/* Mobile: Continental Propagation only, fullscreen */}
+      <div className={clsx('h-full bg-background md:hidden', className)}>
         <ReactECharts option={continentalPropagationOption} style={{ height: '100%', width: '100%' }} />
       </div>
-    </div>
+    </>
   );
 }
 

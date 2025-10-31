@@ -2,8 +2,10 @@ import { type JSX, useMemo, useRef, useCallback } from 'react';
 import { useSlotPlayerState, useSlotPlayerProgress, useSlotPlayerActions } from '@/hooks/useSlotPlayer';
 import { Map2DChart } from '@/components/Charts/Map2D';
 import { Sidebar } from '../Sidebar';
+import { MobileSlotHeader } from '../MobileSlotHeader';
 import { BlockDetailsCard } from '../BlockDetailsCard';
 import { BottomBar } from '../BottomBar';
+import { ScrollingTimeline } from '@/components/Lists/ScrollingTimeline';
 import { useSlotViewData, useSlotProgressData } from '../../hooks';
 import type { SlotViewLayoutProps, TimeFilteredData } from './SlotViewLayout.types';
 
@@ -177,66 +179,117 @@ export function SlotViewLayout({ mode }: SlotViewLayoutProps): JSX.Element {
   ]);
 
   return (
-    <div className="flex h-screen flex-col overflow-hidden">
-      {/* Main Content Area - 67% height */}
-      <div className="grid h-[67vh] grid-cols-12 gap-4 p-4">
-        {/* Columns 1-9: Main Content */}
-        <div className="col-span-9 flex h-full flex-col gap-4 overflow-hidden">
-          {/* Block Details Card */}
-          <div className="shrink-0">
-            <BlockDetailsCard
-              data={slotData.blockDetails}
-              currentTime={currentTime}
-              slotProgressPhases={slotProgressPhases}
-            />
-          </div>
-
-          {/* Map Section - takes all remaining vertical space */}
-          <div className="min-h-0 flex-1 overflow-hidden">
-            <div className="h-full w-full">
-              <Map2DChart
-                points={timeFilteredData.visibleMapPoints}
-                height="100%"
-                pointSizeMultiplier={1.2}
-                resetKey={currentSlot}
+    <>
+      {/* Desktop Layout */}
+      <div className="hidden h-screen flex-col overflow-hidden md:flex">
+        {/* Main Content Area - 67% height */}
+        <div className="grid h-[67vh] grid-cols-12 gap-4 p-4">
+          {/* Columns 1-9: Main Content */}
+          <div className="col-span-9 flex h-full flex-col gap-4 overflow-hidden">
+            {/* Block Details Card */}
+            <div className="shrink-0">
+              <BlockDetailsCard
+                data={slotData.blockDetails}
+                currentTime={currentTime}
+                slotProgressPhases={slotProgressPhases}
               />
             </div>
+
+            {/* Map Section - takes all remaining vertical space */}
+            <div className="min-h-0 flex-1 overflow-hidden">
+              <div className="h-full w-full">
+                <Map2DChart
+                  points={timeFilteredData.visibleMapPoints}
+                  height="100%"
+                  pointSizeMultiplier={1.2}
+                  resetKey={currentSlot}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Columns 10-12: Sidebar - flex column constrained to parent height */}
+          <div className="col-span-3 flex h-full flex-col overflow-hidden">
+            <Sidebar
+              currentSlot={currentSlot}
+              phases={slotData.sidebarPhases}
+              currentTime={currentTime}
+              slotDuration={12000}
+              items={slotData.sidebarItems}
+              isPlaying={isPlaying}
+              onPlayPause={actions.toggle}
+              onBackward={actions.previousSlot}
+              onForward={actions.nextSlot}
+              onTimeClick={handleTimeClick}
+              isLive={mode === 'live'}
+            />
           </div>
         </div>
 
-        {/* Columns 10-12: Sidebar - flex column constrained to parent height */}
-        <div className="col-span-3 flex h-full flex-col overflow-hidden">
-          <Sidebar
-            currentSlot={currentSlot}
-            phases={slotData.sidebarPhases}
+        {/* Bottom Bar - 29% height */}
+        <div className="h-[29vh] min-h-0">
+          <BottomBar
+            blockVersion={slotData.blockDetails?.blockVersion}
+            blobCount={slotData.blobCount}
+            dataColumnBlobCount={slotData.dataColumnBlobCount}
             currentTime={currentTime}
-            slotDuration={12000}
-            items={slotData.sidebarItems}
-            isPlaying={isPlaying}
-            onPlayPause={actions.toggle}
-            onBackward={actions.previousSlot}
-            onForward={actions.nextSlot}
-            onTimeClick={handleTimeClick}
-            isLive={mode === 'live'}
+            deduplicatedBlobData={timeFilteredData.deduplicatedBlobData}
+            visibleContinentalPropagationData={timeFilteredData.visibleContinentalPropagationData}
+            attestationChartValues={timeFilteredData.attestationChartValues}
+            attestationTotalExpected={slotData.attestationTotalExpected}
+            attestationMaxCount={slotData.attestationMaxCount}
+            mode={mode}
           />
         </div>
       </div>
 
-      {/* Bottom Bar - 29% height */}
-      <div className="h-[29vh] min-h-0">
-        <BottomBar
-          blockVersion={slotData.blockDetails?.blockVersion}
-          blobCount={slotData.blobCount}
-          dataColumnBlobCount={slotData.dataColumnBlobCount}
-          currentTime={currentTime}
-          deduplicatedBlobData={timeFilteredData.deduplicatedBlobData}
-          visibleContinentalPropagationData={timeFilteredData.visibleContinentalPropagationData}
-          attestationChartValues={timeFilteredData.attestationChartValues}
-          attestationTotalExpected={slotData.attestationTotalExpected}
-          attestationMaxCount={slotData.attestationMaxCount}
-          mode={mode}
-        />
+      {/* Mobile Layout - Vertical Stack */}
+      <div className="flex h-[calc(100vh-65px)] flex-col overflow-hidden md:hidden">
+        {/* Mobile Slot Header - 64px (includes 1px timeline) */}
+        <div className="h-[64px] shrink-0">
+          <MobileSlotHeader
+            currentSlot={currentSlot}
+            isPlaying={isPlaying}
+            onPlayPause={actions.toggle}
+            onBackward={actions.previousSlot}
+            onForward={actions.nextSlot}
+            isLive={mode === 'live'}
+            currentTime={currentTime}
+            slotDuration={12000}
+          />
+        </div>
+
+        {/* Slim Timeline - 116px */}
+        <div className="h-[116px] shrink-0 border-b border-border">
+          <ScrollingTimeline items={slotData.sidebarItems} currentTime={currentTime} autoScroll={true} height="116px" />
+        </div>
+
+        {/* Map - 310px full-bleed */}
+        <div className="h-[310px] shrink-0 overflow-hidden bg-background">
+          <Map2DChart
+            points={timeFilteredData.visibleMapPoints}
+            height="100%"
+            pointSizeMultiplier={1.5}
+            resetKey={currentSlot}
+          />
+        </div>
+
+        {/* Bottom Bar - Remaining space (approx 349px) */}
+        <div className="min-h-0 flex-1">
+          <BottomBar
+            blockVersion={slotData.blockDetails?.blockVersion}
+            blobCount={slotData.blobCount}
+            dataColumnBlobCount={slotData.dataColumnBlobCount}
+            currentTime={currentTime}
+            deduplicatedBlobData={timeFilteredData.deduplicatedBlobData}
+            visibleContinentalPropagationData={timeFilteredData.visibleContinentalPropagationData}
+            attestationChartValues={timeFilteredData.attestationChartValues}
+            attestationTotalExpected={slotData.attestationTotalExpected}
+            attestationMaxCount={slotData.attestationMaxCount}
+            mode={mode}
+          />
+        </div>
       </div>
-    </div>
+    </>
   );
 }
