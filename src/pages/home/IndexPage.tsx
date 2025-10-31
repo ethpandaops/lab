@@ -14,27 +14,27 @@ export function IndexPage(): JSX.Element {
 
       {/* Content Layer - positioned on top of visualization */}
       <div className="absolute inset-0 z-20 overflow-y-auto">
-        <div className="flex min-h-screen flex-col px-4 pt-32 sm:pt-40">
+        <div className="flex min-h-screen flex-col px-4 pt-20 sm:pt-40">
           {/* Hero Section - centered and spacious */}
-          <div className="mb-40 flex flex-col items-center text-center sm:mb-48">
+          <div className="mb-16 flex flex-col items-center text-center sm:mb-48">
             {/* Main Title - matching sidebar style */}
-            <h1 className="mb-6 animate-fade-in font-sans text-6xl font-bold tracking-tight text-foreground drop-shadow-2xl sm:text-7xl md:text-8xl lg:text-9xl">
+            <h1 className="mb-4 animate-fade-in font-sans text-5xl font-bold tracking-tight text-foreground drop-shadow-2xl sm:mb-6 sm:text-7xl md:text-8xl lg:text-9xl">
               The Lab
             </h1>
 
             {/* Subtitle with subtle animation */}
-            <p className="max-w-xl animate-fade-in-delay font-sans text-lg font-light tracking-wide text-foreground/80 drop-shadow-lg sm:text-sm md:text-sm">
+            <p className="max-w-xl animate-fade-in-delay font-sans text-base font-light tracking-wide text-foreground/80 drop-shadow-lg sm:text-lg md:text-sm">
               by ethPandaOps
             </p>
 
             {/* Optional tagline */}
-            <p className="mt-4 animate-fade-in-delay-2 font-sans text-sm font-light tracking-widest text-muted/60 uppercase">
+            <p className="mt-3 animate-fade-in-delay-2 font-sans text-xs font-light tracking-widest text-muted/60 uppercase sm:mt-4 sm:text-sm">
               Explore · Analyze · Discover
             </p>
           </div>
 
           {/* Featured Cards - cleaner spacing */}
-          <div className="mx-auto grid w-full max-w-5xl animate-fade-in-delay-3 gap-8 pb-32 sm:grid-cols-2">
+          <div className="mx-auto grid w-full max-w-5xl animate-fade-in-delay-3 gap-6 pb-16 sm:grid-cols-2 sm:gap-8 sm:pb-32">
             {/* Ethereum Live */}
             <Link to="/ethereum/live" className="group block">
               <Card
