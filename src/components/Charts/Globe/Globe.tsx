@@ -49,6 +49,14 @@ export function GlobeChart({
   pointColor,
   pointSize = 2,
   pointOpacity = 0.2,
+  shading = 'lambert',
+  roughness = 0.8,
+  metalness = 0,
+  enablePostEffect = false,
+  enableTemporalSuperSampling = true,
+  showAtmosphere = false,
+  lightIntensity = 0.4,
+  ambientLightIntensity = 0.4,
 }: GlobeChartProps): React.JSX.Element {
   const themeColors = useThemeColors();
   const [echartsInstance, setEchartsInstance] = useState<ECharts | null>(null);
@@ -138,15 +146,49 @@ export function GlobeChart({
         displacementScale: baseTexture ? 0.1 : 0,
         displacementQuality: 'high',
         environment: convertedEnvironment,
-        shading: 'lambert',
+        shading: shading,
+        realisticMaterial:
+          shading === 'realistic'
+            ? {
+                roughness: roughness,
+                metalness: metalness,
+              }
+            : undefined,
+        postEffect: enablePostEffect
+          ? {
+              enable: true,
+              // Enable depth of field for better focus effects
+              ...(enableTemporalSuperSampling && {
+                SSAO: {
+                  enable: true,
+                  radius: 2,
+                },
+              }),
+            }
+          : undefined,
+        temporalSuperSampling:
+          enablePostEffect && enableTemporalSuperSampling
+            ? {
+                enable: true,
+              }
+            : undefined,
         light: {
           ambient: {
-            intensity: 0.4,
+            intensity: ambientLightIntensity,
           },
           main: {
-            intensity: 0.4,
+            intensity: lightIntensity,
           },
         },
+        atmosphere: showAtmosphere
+          ? {
+              show: true,
+              offset: 5,
+              color: '#ffffff',
+              glowPower: 6,
+              innerGlowPower: 2,
+            }
+          : undefined,
         viewControl: {
           autoRotate: autoRotate,
           autoRotateSpeed: 10,
@@ -170,6 +212,14 @@ export function GlobeChart({
     convertedPointColor,
     pointSize,
     pointOpacity,
+    shading,
+    roughness,
+    metalness,
+    enablePostEffect,
+    enableTemporalSuperSampling,
+    showAtmosphere,
+    lightIntensity,
+    ambientLightIntensity,
     themeColors,
   ]);
 

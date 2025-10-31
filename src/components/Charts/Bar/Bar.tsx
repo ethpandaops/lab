@@ -1,4 +1,4 @@
-import { type JSX, useMemo } from 'react';
+import { type JSX, useMemo, forwardRef } from 'react';
 import ReactEChartsCore from 'echarts-for-react/lib/core';
 import * as echarts from 'echarts/core';
 import { BarChart as EChartsBar } from 'echarts/charts';
@@ -41,28 +41,31 @@ echarts.use([EChartsBar, GridComponent, TooltipComponent, TitleComponent, Canvas
  * />
  * ```
  */
-export function BarChart({
-  data = [],
-  labels = [],
-  title,
-  titleFontSize = 16,
-  titleFontFamily,
-  titleFontWeight = 600,
-  titleLeft = 'center',
-  titleTop = 8,
-  orientation = 'vertical',
-  height = 400,
-  color,
-  max,
-  barWidth = '60%',
-  showLabel = true,
-  labelPosition,
-  labelFormatter = '{c}',
-  axisName,
-  animationDuration = 300,
-  tooltipFormatter,
-  categoryLabelInterval = 'auto',
-}: BarChartProps): JSX.Element {
+export const BarChart = forwardRef<ReactEChartsCore, BarChartProps>(function BarChart(
+  {
+    data = [],
+    labels = [],
+    title,
+    titleFontSize = 16,
+    titleFontFamily,
+    titleFontWeight = 600,
+    titleLeft = 'center',
+    titleTop = 8,
+    orientation = 'vertical',
+    height = 400,
+    color,
+    max,
+    barWidth = '60%',
+    showLabel = true,
+    labelPosition,
+    labelFormatter = '{c}',
+    axisName,
+    animationDuration = 300,
+    tooltipFormatter,
+    categoryLabelInterval = 'auto',
+  },
+  ref
+): JSX.Element {
   const themeColors = useThemeColors();
 
   const option = useMemo(() => {
@@ -94,27 +97,26 @@ export function BarChart({
       type: 'value' as const,
       name: axisName,
       nameLocation: 'middle' as const,
-      nameGap: isHorizontal ? 30 : 50,
+      nameGap: isHorizontal ? 40 : 50,
       nameTextStyle: {
         color: themeColors.foreground,
         fontSize: 12,
       },
       max,
       axisLine: {
-        lineStyle: {
-          color: themeColors.border,
-        },
+        show: false,
+      },
+      axisTick: {
+        show: false,
       },
       axisLabel: {
         color: themeColors.muted,
-        fontSize: 10,
+        fontSize: 11,
       },
       splitLine: {
-        show: true,
         lineStyle: {
           color: themeColors.border,
-          type: 'solid' as const,
-          opacity: 0.3,
+          type: 'dashed' as const,
         },
       },
     };
@@ -123,7 +125,6 @@ export function BarChart({
       type: 'category' as const,
       data: labels,
       axisLine: {
-        show: true,
         lineStyle: {
           color: themeColors.border,
         },
@@ -136,6 +137,14 @@ export function BarChart({
         fontSize: 11,
         interval: categoryLabelInterval,
       },
+    };
+
+    // Calculate grid padding based on orientation and axis names
+    const gridPadding = {
+      top: title ? 52 : 10,
+      right: isHorizontal && axisName ? 50 : 20,
+      bottom: !isHorizontal && axisName ? 50 : 30,
+      left: isHorizontal && axisName ? 60 : 20,
     };
 
     return {
@@ -155,15 +164,7 @@ export function BarChart({
             top: titleTop,
           }
         : undefined,
-      grid: {
-        top: title ? 52 : 10,
-        right: 10,
-        bottom: 30,
-        left: 10,
-        // ECharts v6: use outerBounds instead of deprecated containLabel
-        outerBoundsMode: 'same' as const,
-        outerBoundsContain: 'axisLabel' as const,
-      },
+      grid: gridPadding,
       xAxis: isHorizontal ? valueAxisConfig : categoryAxisConfig,
       yAxis: isHorizontal ? categoryAxisConfig : valueAxisConfig,
       series: [
@@ -229,14 +230,9 @@ export function BarChart({
   ]);
 
   return (
-    <div
-      className={height === '100%' ? 'h-full w-full' : 'w-full'}
-      onWheel={() => {
-        // Allow page scroll by not stopping propagation
-        // This prevents the chart from blocking page scroll
-      }}
-    >
+    <div className={height === '100%' ? 'h-full w-full' : 'w-full'}>
       <ReactEChartsCore
+        ref={ref}
         echarts={echarts}
         option={option}
         style={{ height, width: '100%', minHeight: height }}
@@ -245,4 +241,4 @@ export function BarChart({
       />
     </div>
   );
-}
+});

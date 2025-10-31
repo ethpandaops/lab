@@ -126,6 +126,5 @@ export const CustomColors: Story = {
     height: 600,
     pointColor: '#00ff88',
     lineColor: '#ff00ff',
-    mapColor: '#1a1a2e',
   },
 };

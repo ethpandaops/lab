@@ -59,7 +59,8 @@ function BlobDataAvailabilityComponent({
       grid: {
         top: window.innerWidth >= 768 ? 48 : 20,
         bottom: 20,
-        containLabel: true,
+        left: 50,
+        right: 16,
       },
       xAxis: {
         type: 'value' as const,
@@ -135,7 +136,8 @@ function BlobDataAvailabilityComponent({
         // Mobile: smaller top padding since no title
         top: window.innerWidth >= 768 ? 48 : 20,
         bottom: 40, // Increased to make room for legend
-        containLabel: true,
+        left: 50,
+        right: 16,
       },
       tooltip: {
         trigger: 'axis' as const,

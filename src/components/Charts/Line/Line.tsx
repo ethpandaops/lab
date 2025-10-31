@@ -32,7 +32,6 @@ export const LineChart = forwardRef<ReactEChartsCore, LineChartProps>(function L
     data = [820, 932, 901, 934, 1290, 1330, 1320],
     labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
     title,
-    titleAlign: _titleAlign = 'center',
     titleFontSize = 16,
     titleFontFamily,
     titleFontWeight = 600,
@@ -76,13 +75,12 @@ export const LineChart = forwardRef<ReactEChartsCore, LineChartProps>(function L
           }
         : undefined,
       grid: {
+        // ECharts 6 automatically handles label overflow prevention
+        // Use minimal padding and let ECharts handle the rest
         top: title ? 40 : 16,
-        right: undefined,
+        right: 16,
         bottom: xAxisTitle ? 50 : 30,
-        left: yAxisTitle ? 60 : 8,
-        // ECharts v6: use outerBounds instead of deprecated containLabel
-        outerBoundsMode: 'same' as const,
-        outerBoundsContain: 'axisLabel' as const,
+        left: yAxisTitle ? 60 : 16,
       },
       xAxis: {
         type: 'category',

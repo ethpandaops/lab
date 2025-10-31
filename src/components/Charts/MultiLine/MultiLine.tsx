@@ -252,9 +252,7 @@ export function MultiLineChart({
       axisLine: { lineStyle: { color: themeColors.border } },
       axisLabel: {
         color: themeColors.muted,
-        fontSize: 12,
         formatter: xAxis.formatter || (relativeSlots ? (value: number) => formatSlotLabel(value) : undefined),
-        showMaxLabel: false, // Don't force-render the max value to avoid awkward tick spacing
       },
       splitLine: {
         lineStyle: {
@@ -283,7 +281,6 @@ export function MultiLineChart({
       },
       axisLabel: {
         color: themeColors.muted,
-        fontSize: 12,
         formatter: yAxis?.formatter,
       },
       min: yAxis?.min,
@@ -351,15 +348,12 @@ export function MultiLineChart({
 
     // Calculate grid padding
     // Title is always rendered by component, never by ECharts
-    // ECharts v6: outerBounds adds padding for tick labels, axis names need explicit space
+    // ECharts v6: grid now handles label containment by default with explicit padding
     const gridConfig = {
       top: grid?.top ?? 16,
-      right: grid?.right,
-      bottom: grid?.bottom ?? (xAxis.name ? 30 : 24),
-      left: grid?.left ?? (yAxis?.name ? 30 : 8),
-      // ECharts v6: use outerBounds instead of deprecated containLabel
-      outerBoundsMode: 'same' as const,
-      outerBoundsContain: 'axisLabel' as const,
+      right: grid?.right ?? 16,
+      bottom: grid?.bottom ?? (xAxis.name ? 50 : 24),
+      left: grid?.left ?? (yAxis?.name ? 50 : 16),
     };
 
     // Create default smart tooltip formatter
@@ -442,14 +436,13 @@ export function MultiLineChart({
     };
 
     return {
-      animation: true,
+      // ECharts v6: animation is enabled by default with optimized performance
       animationDuration,
       animationEasing: 'cubicOut' as const,
       backgroundColor: 'transparent',
       textStyle: {
         color: themeColors.foreground,
       },
-      // Never pass title to ECharts - component always renders it
       grid: gridConfig,
       xAxis: xAxisConfig,
       yAxis: yAxisConfig,
@@ -627,15 +620,13 @@ export function MultiLineChart({
         </div>
       )}
 
-      <div style={{ pointerEvents: 'none' }}>
-        <ReactEChartsCore
-          echarts={echarts}
-          option={option}
-          style={{ height, width: '100%', minHeight: height, pointerEvents: 'auto' }}
-          notMerge={true}
-          opts={{ renderer: 'canvas' }}
-        />
-      </div>
+      <ReactEChartsCore
+        echarts={echarts}
+        option={option}
+        style={{ height, width: '100%', minHeight: height }}
+        notMerge={true}
+        opts={{ renderer: 'canvas' }}
+      />
     </>
   );
 
