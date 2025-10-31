@@ -6,6 +6,7 @@ import { MobileSlotHeader } from '../MobileSlotHeader';
 import { BlockDetailsCard } from '../BlockDetailsCard';
 import { BottomBar } from '../BottomBar';
 import { ScrollingTimeline } from '@/components/Lists/ScrollingTimeline';
+import { SlotProgressTimeline } from '@/components/Ethereum/SlotProgressTimeline';
 import { useSlotViewData, useSlotProgressData } from '../../hooks';
 import type { SlotViewLayoutProps, TimeFilteredData } from './SlotViewLayout.types';
 
@@ -257,13 +258,18 @@ export function SlotViewLayout({ mode }: SlotViewLayoutProps): JSX.Element {
           />
         </div>
 
-        {/* Slim Timeline - 116px */}
-        <div className="h-[116px] shrink-0 border-b border-border">
-          <ScrollingTimeline items={slotData.sidebarItems} currentTime={currentTime} autoScroll={true} height="116px" />
+        {/* Slim Slot Progress - 50px */}
+        <div className="h-[50px] shrink-0 border-b border-border bg-surface px-3 py-2">
+          <SlotProgressTimeline phases={slotProgressPhases} mode="live" currentTime={currentTime} showStats={false} />
         </div>
 
-        {/* Map - 310px full-bleed */}
-        <div className="h-[310px] shrink-0 overflow-hidden bg-background">
+        {/* Slim Timeline - 100px */}
+        <div className="h-[100px] shrink-0 border-b border-border">
+          <ScrollingTimeline items={slotData.sidebarItems} currentTime={currentTime} autoScroll={true} />
+        </div>
+
+        {/* Map - 280px (reduced to fit progress bar) */}
+        <div className="h-[280px] shrink-0 overflow-hidden bg-background">
           <Map2DChart
             points={timeFilteredData.visibleMapPoints}
             height="100%"
