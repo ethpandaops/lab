@@ -9,6 +9,7 @@ import { formatTimestamp, getRelativeTime } from '@/utils/time';
 import { timestampToSlot, slotToTimestamp } from '@/pages/ethereum/live/utils/slot-time';
 import { slotToEpoch, epochToTimestamp, SECONDS_PER_SLOT, SLOTS_PER_EPOCH } from '@/utils/beacon';
 import { getAllDiscordFormats, DISCORD_STYLE_LABELS } from '@/utils/discord-timestamp';
+import { NetworkIcon } from '@/components/Ethereum/NetworkIcon';
 import type { DiscordTimestampStyle } from '@/utils/discord-timestamp';
 import type { TimestampModalContentProps } from './Timestamp.types';
 
@@ -181,8 +182,9 @@ function TimestampModalContent({ timestamp }: TimestampModalContentProps): JSX.E
           {/* Beacon Chain Panel */}
           {beaconData && currentNetwork && slotEnd && epochEnd && (
             <TabPanel>
-              <div className="mb-3 text-sm/6 text-muted">
-                Network: <span className="font-semibold text-foreground">{currentNetwork.name}</span>
+              <div className="mb-3 flex items-center gap-2 text-sm/6 text-muted">
+                <NetworkIcon networkName={currentNetwork.name} className="size-5" />
+                <span className="font-semibold text-foreground">{currentNetwork.display_name}</span>
               </div>
               <div className="overflow-hidden rounded-sm border border-border">
                 <table className="w-full">
