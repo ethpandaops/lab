@@ -20,6 +20,7 @@ const router = createRouter({
   routeTree,
   defaultErrorComponent: FatalError,
   defaultNotFoundComponent: NotFound,
+  scrollRestoration: true,
 });
 
 // Register the router instance for type safety
