@@ -7,4 +7,6 @@ export interface DisclosureProps {
   className?: string;
   /** Optional content to display on the right side of the disclosure button */
   rightContent?: ReactNode;
+  /** Optional className to override the panel styling */
+  panelClassName?: string;
 }
