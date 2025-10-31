@@ -1,7 +1,9 @@
 import { type JSX } from 'react';
 import { Card } from '@/components/Layout/Card';
 import { Badge } from '@/components/Elements/Badge';
-import { formatGasWithPercentage, formatEpoch } from '@/utils';
+import { Slot } from '@/components/Ethereum/Slot';
+import { Epoch } from '@/components/Ethereum/Epoch';
+import { formatGasWithPercentage } from '@/utils';
 import { formatTimestamp, getRelativeTime } from '@/utils/time';
 import type { SlotBasicInfoCardProps } from './SlotBasicInfoCard.types';
 
@@ -80,13 +82,17 @@ export function SlotBasicInfoCard({ slot, epoch, data }: SlotBasicInfoCardProps)
         {/* Slot Number */}
         <div>
           <dt className="text-xs font-medium text-muted">Slot</dt>
-          <dd className="mt-1 text-base/7 font-semibold text-foreground">{slot}</dd>
+          <dd className="mt-1 text-base/7 font-semibold text-foreground">
+            <Slot slot={slot} noLink />
+          </dd>
         </div>
 
         {/* Epoch */}
         <div>
           <dt className="text-xs font-medium text-muted">Epoch</dt>
-          <dd className="mt-1 text-base/7 font-semibold text-foreground">{formatEpoch(epoch)}</dd>
+          <dd className="mt-1 text-base/7 font-semibold text-foreground">
+            <Epoch epoch={epoch} />
+          </dd>
         </div>
 
         {/* Slot Timestamp */}

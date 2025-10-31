@@ -7,8 +7,8 @@ import { Header } from '@/components/Layout/Header';
 import { LoadingContainer } from '@/components/Layout/LoadingContainer';
 import { Table } from '@/components/Lists/Table';
 
+import { Epoch } from '@/components/Ethereum/Epoch';
 import { TopEntitiesChart } from '@/components/Ethereum/TopEntitiesChart';
-import { formatEpoch } from '@/utils';
 
 import { useEpochsData } from './hooks';
 
@@ -97,7 +97,9 @@ export function IndexPage(): React.JSX.Element {
             {
               header: 'Epoch',
               accessor: row => (
-                <span className={row.isCurrent ? 'font-bold text-primary' : ''}>{formatEpoch(row.epoch)}</span>
+                <span className={row.isCurrent ? 'font-bold text-primary' : ''}>
+                  <Epoch epoch={row.epoch} />
+                </span>
               ),
             },
             {

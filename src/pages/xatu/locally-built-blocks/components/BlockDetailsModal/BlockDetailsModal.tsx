@@ -2,6 +2,7 @@ import { type JSX, useMemo } from 'react';
 import { Dialog } from '@/components/Overlays/Dialog';
 import { Disclosure } from '@/components/Layout/Disclosure';
 import { ClientLogo } from '@/components/Ethereum/ClientLogo';
+import { Slot } from '@/components/Ethereum/Slot';
 import { formatSlot } from '@/utils';
 import type { BlockDetailsModalProps } from './BlockDetailsModal.types';
 import type { ParsedBlock } from '../../hooks';
@@ -217,7 +218,9 @@ function SlotCard({ slotGroup }: { slotGroup: SlotGroup }): JSX.Element {
 
   const title = (
     <div className="flex items-center gap-4">
-      <span className="font-mono text-sm font-medium text-foreground">Slot {formatSlot(slot)}</span>
+      <span className="font-mono text-sm font-medium text-foreground">
+        Slot <Slot slot={slot} />
+      </span>
       <div className="flex items-center gap-3 text-xs text-muted">
         <span className="rounded-sm bg-primary/20 px-1.5 py-0.5 font-medium text-primary">
           {nodes.length} node{nodes.length !== 1 ? 's' : ''}

@@ -3,6 +3,7 @@ import { useMemo } from 'react';
 import { useNavigate } from '@tanstack/react-router';
 import clsx from 'clsx';
 import { Badge } from '@/components/Elements/Badge';
+import { Slot } from '@/components/Ethereum/Slot';
 import { Table } from '@/components/Lists/Table';
 import type { Column } from '@/components/Lists/Table/Table.types';
 import { formatTimestamp, getRelativeTime } from '@/utils/time';
@@ -48,7 +49,9 @@ export function EpochSlotsTable({ slots }: EpochSlotsTableProps): JSX.Element {
 
           return (
             <div className="flex items-center gap-2">
-              <span className="font-medium text-foreground">{row.slot}</span>
+              <span className="font-medium text-foreground">
+                <Slot slot={row.slot} />
+              </span>
               {isCurrent && (
                 <Badge color="blue" variant="flat" className="text-xs">
                   Now

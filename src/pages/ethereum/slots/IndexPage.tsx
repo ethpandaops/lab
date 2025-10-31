@@ -5,10 +5,12 @@ import { Header } from '@/components/Layout/Header';
 import { LoadingContainer } from '@/components/Layout/LoadingContainer';
 import { Table } from '@/components/Lists/Table';
 import type { Column } from '@/components/Lists/Table/Table.types';
+import { Slot } from '@/components/Ethereum/Slot';
 import { useInfiniteSlotsData, type SlotData } from './hooks';
 import { getRelativeTime, formatTimestamp } from '@/utils/time';
 import { SLOTS_PER_EPOCH } from '@/utils/beacon';
-import { formatSlot, formatEpoch } from '@/utils';
+import { formatSlot } from '@/utils';
+import { Epoch } from '@/components/Ethereum/Epoch';
 import clsx from 'clsx';
 import { ArrowPathIcon, ChevronDownIcon } from '@heroicons/react/24/outline';
 
@@ -131,7 +133,7 @@ export function IndexPage(): JSX.Element {
     () => [
       {
         header: 'Slot',
-        accessor: 'slot',
+        accessor: (row): ReactNode => <Slot slot={row.slot} />,
         cellClassName: 'text-foreground font-semibold',
       },
       {
@@ -147,7 +149,7 @@ export function IndexPage(): JSX.Element {
                 isEpochTransition ? 'bg-accent/10 text-accent' : 'text-muted'
               )}
             >
-              {formatEpoch(row.epoch)}
+              <Epoch epoch={row.epoch} />
             </span>
           );
         },
