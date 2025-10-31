@@ -133,9 +133,9 @@ export const PieChart: Story = {
 };
 
 /**
- * With labels on segments
+ * With labels on segments (outside with connecting lines)
  */
-export const WithLabels: Story = {
+export const WithLabelsOutside: Story = {
   args: {
     data: [
       { name: 'Search Engine', value: 1048 },
@@ -143,9 +143,43 @@ export const WithLabels: Story = {
       { name: 'Email', value: 580 },
       { name: 'Union Ads', value: 484 },
     ],
-    title: 'Traffic with Labels',
+    title: 'Labels Outside',
     showLabel: true,
     labelPosition: 'outside',
+  },
+};
+
+/**
+ * With labels inside segments
+ */
+export const WithLabelsInside: Story = {
+  args: {
+    data: [
+      { name: 'Search Engine', value: 1048 },
+      { name: 'Direct', value: 735 },
+      { name: 'Email', value: 580 },
+      { name: 'Union Ads', value: 484 },
+    ],
+    title: 'Labels Inside',
+    showLabel: true,
+    labelPosition: 'inside',
+  },
+};
+
+/**
+ * With labels in center
+ */
+export const WithLabelsCenter: Story = {
+  args: {
+    data: [
+      { name: 'Search Engine', value: 1048 },
+      { name: 'Direct', value: 735 },
+      { name: 'Email', value: 580 },
+      { name: 'Union Ads', value: 484 },
+    ],
+    title: 'Labels Center',
+    showLabel: true,
+    labelPosition: 'center',
   },
 };
 

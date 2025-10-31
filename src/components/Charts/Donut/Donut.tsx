@@ -116,6 +116,29 @@ export const Donut = forwardRef<ReactEChartsCore, DonutProps>(function Donut(
         break;
     }
 
+    // Calculate series center position based on legend position
+    let seriesCenter: [string, string] = ['50%', '50%'];
+
+    if (showLegend) {
+      switch (legendPosition) {
+        case 'top':
+          seriesCenter = ['50%', title ? '55%' : '52%'];
+          break;
+        case 'bottom':
+          seriesCenter = ['50%', '48%'];
+          break;
+        case 'left':
+          seriesCenter = ['55%', '50%'];
+          break;
+        case 'right':
+          seriesCenter = ['45%', '50%'];
+          break;
+      }
+    } else if (title) {
+      // Shift down slightly when there's a title but no legend
+      seriesCenter = ['50%', '52%'];
+    }
+
     return {
       animation: true,
       animationDuration,
@@ -149,6 +172,7 @@ export const Donut = forwardRef<ReactEChartsCore, DonutProps>(function Donut(
         {
           name: title || 'Data',
           type: 'pie',
+          center: seriesCenter,
           radius: [`${innerRadius}%`, `${outerRadius}%`],
           avoidLabelOverlap: true,
           itemStyle: {
@@ -206,7 +230,6 @@ export const Donut = forwardRef<ReactEChartsCore, DonutProps>(function Donut(
     animationDuration,
     themeColors.foreground,
     themeColors.border,
-    themeColors.background,
     themeColors.surface,
   ]);
 
