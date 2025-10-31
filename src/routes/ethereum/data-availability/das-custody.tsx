@@ -5,6 +5,7 @@ export const Route = createFileRoute('/ethereum/data-availability/das-custody')(
   beforeLoad: () => {
     return {
       getTitle: () => 'DAS Custody',
+      getBreadcrumb: () => ({ label: 'DAS Custody' }),
     };
   },
   head: () => ({

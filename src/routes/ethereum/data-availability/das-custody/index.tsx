@@ -6,7 +6,7 @@ export const Route = createFileRoute('/ethereum/data-availability/das-custody/')
   component: IndexPage,
   validateSearch: dasCustodySearchSchema,
   beforeLoad: () => ({
-    getBreadcrumb: () => ({ label: 'DAS Custody' }),
+    getBreadcrumb: () => ({ show: false }),
   }),
   head: () => ({
     meta: [
