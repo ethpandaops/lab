@@ -103,11 +103,10 @@ export function GeographicalListView({ continents, isLoading }: GeographicalList
                 </div>
               </div>
             }
-            className="overflow-hidden rounded-lg border border-border"
+            className="overflow-hidden"
+            panelClassName=""
           >
-            <div className="mt-4">
-              <Table data={allContinentNodes} columns={nodeColumns} variant="nested" />
-            </div>
+            <Table data={allContinentNodes} columns={nodeColumns} variant="nested" />
           </Disclosure>
         );
       })}

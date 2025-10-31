@@ -12,6 +12,7 @@ export function Disclosure({
   defaultOpen = false,
   className,
   rightContent,
+  panelClassName = 'border border-border bg-surface p-4',
 }: DisclosureProps): JSX.Element {
   return (
     <HeadlessDisclosure as="div" className={className} defaultOpen={defaultOpen}>
@@ -24,7 +25,7 @@ export function Disclosure({
             </div>
             {rightContent}
           </DisclosureButton>
-          <DisclosurePanel className="border border-border bg-surface p-4">{children}</DisclosurePanel>
+          <DisclosurePanel className={panelClassName}>{children}</DisclosurePanel>
         </>
       )}
     </HeadlessDisclosure>
