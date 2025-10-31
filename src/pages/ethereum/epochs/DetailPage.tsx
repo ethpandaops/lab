@@ -12,7 +12,7 @@ import {
   BlobCountChart,
   BlockSizeChart,
   BlockValueChart,
-  EpochBasicInfoCard,
+  EpochHeader,
   EpochSlotsTable,
   GasChart,
   MevAdoptionChart,
@@ -22,30 +22,6 @@ import {
   TransactionCountChart,
 } from './components';
 import { useEpochDetailData } from './hooks';
-
-/**
- * Format a Unix timestamp as relative time
- */
-function formatRelativeTime(unixSeconds: number): string {
-  const now = Date.now();
-  const timestamp = unixSeconds * 1000;
-  const diffMs = now - timestamp;
-  const diffSeconds = Math.floor(diffMs / 1000);
-  const diffMinutes = Math.floor(diffSeconds / 60);
-  const diffHours = Math.floor(diffMinutes / 60);
-  const diffDays = Math.floor(diffHours / 24);
-
-  if (diffSeconds < 60) {
-    return `${diffSeconds}s ago`;
-  }
-  if (diffMinutes < 60) {
-    return `${diffMinutes}m ago`;
-  }
-  if (diffHours < 24) {
-    return `${diffHours}h ago`;
-  }
-  return `${diffDays}d ago`;
-}
 
 /**
  * Epoch detail page - comprehensive analysis of a single epoch
@@ -125,26 +101,10 @@ export function DetailPage(): React.JSX.Element {
     );
   }
 
-  const timestamp = new Date(data.stats.epochStartDateTime * 1000);
-  const relativeTime = formatRelativeTime(data.stats.epochStartDateTime);
-
   return (
     <Container>
-      {/* Header */}
-      <Header title={`Epoch ${epoch}`} description={`${timestamp.toLocaleString()} (${relativeTime})`} />
-
-      {/* Back link */}
-      <Link to="/ethereum/epochs" className="mb-6 inline-block text-sm text-primary hover:underline">
-        ← Back to Epochs
-      </Link>
-
-      {/* Basic Info Card */}
-      <div className="mt-6">
-        <ScrollAnchor id="epoch-overview">
-          <h2 className="mb-4 text-xl font-semibold text-foreground">Epoch Overview</h2>
-        </ScrollAnchor>
-        <EpochBasicInfoCard stats={data.stats} />
-      </div>
+      {/* Unified Header with breadcrumbs, title, and stats */}
+      <EpochHeader epoch={epoch} stats={data.stats} timestamp={data.stats.epochStartDateTime} />
 
       {/* Metrics Charts - Grid Layout */}
       <div className="mt-8">

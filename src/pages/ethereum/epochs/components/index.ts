@@ -3,7 +3,7 @@ export { BlobBaseFeeChart } from './BlobBaseFeeChart';
 export { BlobCountChart } from './BlobCountChart';
 export { BlockSizeChart } from './BlockSizeChart';
 export { BlockValueChart } from './BlockValueChart';
-export { EpochBasicInfoCard } from './EpochBasicInfoCard';
+export { EpochHeader } from './EpochHeader';
 export { EpochSlotsTable } from './EpochSlotsTable';
 export { GasChart } from './GasUsedChart';
 export { MevAdoptionChart } from './MevAdoptionChart';
