@@ -5,7 +5,11 @@ import { BarChart as EChartsBar } from 'echarts/charts';
 import { GridComponent, TooltipComponent, TitleComponent } from 'echarts/components';
 import { CanvasRenderer } from 'echarts/renderers';
 import { useThemeColors } from '@/hooks/useThemeColors';
+import { getDataVizColors } from '@/utils/dataVizColors';
 import type { BarChartProps } from './Bar.types';
+
+// Get data visualization colors once at module level
+const { CHART_CATEGORICAL_COLORS } = getDataVizColors();
 
 // Register ECharts components
 echarts.use([EChartsBar, GridComponent, TooltipComponent, TitleComponent, CanvasRenderer]);
@@ -72,14 +76,14 @@ export function BarChart({
         return {
           value: item,
           itemStyle: {
-            color: color || themeColors.primary,
+            color: color || CHART_CATEGORICAL_COLORS[0],
           },
         };
       }
       return {
         value: item.value,
         itemStyle: {
-          color: item.color || color || themeColors.primary,
+          color: item.color || color || CHART_CATEGORICAL_COLORS[0],
         },
       };
     });
@@ -221,7 +225,6 @@ export function BarChart({
     themeColors.foreground,
     themeColors.border,
     themeColors.muted,
-    themeColors.primary,
     themeColors.background,
   ]);
 

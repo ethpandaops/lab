@@ -1,5 +1,6 @@
 import { type JSX, useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { useSearch, useNavigate } from '@tanstack/react-router';
 import { ChartBarIcon, TableCellsIcon, CheckCircleIcon, ClockIcon } from '@heroicons/react/24/outline';
 import { Container } from '@/components/Layout/Container';
 import { Header } from '@/components/Layout/Header';
@@ -9,8 +10,10 @@ import { DataAvailabilityHeatmap } from '@/pages/ethereum/data-availability/comp
 import { DataAvailabilityFilterPanel } from '@/pages/ethereum/data-availability/components/DataAvailabilityHeatmap/DataAvailabilityFilterPanel';
 import { DataAvailabilityLegend } from '@/pages/ethereum/data-availability/components/DataAvailabilityHeatmap/DataAvailabilityLegend';
 import { DataAvailabilitySkeleton } from '@/pages/ethereum/data-availability/components/DataAvailabilitySkeleton';
+import { TimezoneToggle } from '@/components/Elements/TimezoneToggle';
 import type { DataAvailabilityGranularity } from '@/pages/ethereum/data-availability/components/DataAvailabilityHeatmap';
 import type { DataAvailabilityFilters } from '@/pages/ethereum/data-availability/components/DataAvailabilityHeatmap/DataAvailabilityFilterPanel.types';
+import { useTimezone } from '@/hooks/useTimezone';
 import {
   fctDataColumnAvailabilityDailyServiceListOptions,
   fctDataColumnAvailabilityHourlyServiceListOptions,
@@ -33,6 +36,8 @@ import {
   transformBlobsToRows,
 } from '@/pages/ethereum/data-availability/utils/data-availability-transform';
 import { fetchAllPages } from '@/utils/api-pagination';
+import type { DasCustodySearch } from './IndexPage.types';
+import { validateSearchParamHierarchy } from './IndexPage.types';
 
 /**
  * Drill-down level state - each level maintains parent context for breadcrumbs
@@ -75,12 +80,76 @@ const SECONDS_PER_HOUR = 3600;
 const SLOTS_PER_EPOCH = 32;
 
 /**
+ * Derives the current drill-down level from URL search parameters
+ * Validates hierarchical consistency and falls back to window view on error
+ */
+function deriveCurrentLevel(search: DasCustodySearch): DrillDownLevel {
+  // Validate hierarchical consistency
+  const validationError = validateSearchParamHierarchy(search);
+  if (validationError) {
+    console.warn('Invalid search params:', validationError, 'Falling back to window view');
+    return { type: 'window' };
+  }
+
+  // Derive level from deepest available param
+  if (
+    search.slot !== undefined &&
+    search.epoch !== undefined &&
+    search.hour !== undefined &&
+    search.date !== undefined
+  ) {
+    return {
+      type: 'slot',
+      date: search.date,
+      hourStartDateTime: search.hour,
+      epochStartDateTime: search.hour, // We'll fetch actual epoch start from data
+      epoch: search.epoch,
+      slot: search.slot,
+    };
+  }
+
+  if (search.epoch !== undefined && search.hour !== undefined && search.date !== undefined) {
+    return {
+      type: 'epoch',
+      date: search.date,
+      hourStartDateTime: search.hour,
+      epochStartDateTime: search.hour, // We'll fetch actual epoch start from data
+      epoch: search.epoch,
+    };
+  }
+
+  if (search.hour !== undefined && search.date !== undefined) {
+    return {
+      type: 'hour',
+      date: search.date,
+      hourStartDateTime: search.hour,
+    };
+  }
+
+  if (search.date !== undefined) {
+    return {
+      type: 'day',
+      date: search.date,
+    };
+  }
+
+  return { type: 'window' };
+}
+
+/**
  * DAS Custody page showing PeerDAS data availability across drill-down levels
  */
 export function IndexPage(): JSX.Element {
-  // Drill-down navigation state
-  const [currentLevel, setCurrentLevel] = useState<DrillDownLevel>({ type: 'window' });
-  const [selectedColumnIndex, setSelectedColumnIndex] = useState<number | undefined>();
+  // URL-based state management
+  const navigate = useNavigate({ from: '/ethereum/data-availability/das-custody/' });
+  const search = useSearch({ from: '/ethereum/data-availability/das-custody/' });
+
+  // Timezone preference
+  const { timezone } = useTimezone();
+
+  // Derive drill-down state from URL
+  const currentLevel = deriveCurrentLevel(search);
+  const selectedColumnIndex = search.column;
 
   // Filter state
   const [filters, setFilters] = useState<DataAvailabilityFilters>({
@@ -212,8 +281,8 @@ export function IndexPage(): JSX.Element {
    * Transform Window data (daily) to heatmap rows
    */
   const windowRows = useMemo(
-    () => transformDailyToRows(windowQuery.data?.fct_data_column_availability_daily),
-    [windowQuery.data]
+    () => transformDailyToRows(windowQuery.data?.fct_data_column_availability_daily, timezone),
+    [windowQuery.data, timezone]
   );
 
   /**
@@ -221,8 +290,10 @@ export function IndexPage(): JSX.Element {
    */
   const dayRows = useMemo(
     () =>
-      currentLevel.type === 'day' ? transformHourlyToRows(dayQuery.data?.fct_data_column_availability_hourly) : [],
-    [dayQuery.data, currentLevel.type]
+      currentLevel.type === 'day'
+        ? transformHourlyToRows(dayQuery.data?.fct_data_column_availability_hourly, timezone)
+        : [],
+    [dayQuery.data, currentLevel.type, timezone]
   );
 
   /**
@@ -304,43 +375,49 @@ export function IndexPage(): JSX.Element {
 
   /**
    * Handle row click to drill down to next level
+   * Updates URL search params to navigate to deeper level
    */
   const handleRowClick = (identifier: string): void => {
     switch (currentLevel.type) {
       case 'window':
         // Drill to day level
-        setCurrentLevel({ type: 'day', date: identifier });
+        navigate({
+          search: prev => ({ ...prev, date: identifier }),
+        });
         break;
       case 'day':
-        // Drill to hour level (pass date for breadcrumb)
-        setCurrentLevel({ type: 'hour', date: currentLevel.date, hourStartDateTime: Number(identifier) });
+        // Drill to hour level
+        navigate({
+          search: prev => ({ ...prev, date: currentLevel.date, hour: Number(identifier) }),
+        });
         break;
       case 'hour': {
-        // Drill to epoch level - identifier is the epoch number as string
-        // Need to get epoch_start_date_time from the data
+        // Drill to epoch level
         const epochData = hourQuery.data?.fct_data_column_availability_by_epoch?.find(
           (d: FctDataColumnAvailabilityByEpoch) => String(d.epoch) === identifier
         );
-        if (epochData?.epoch_start_date_time !== undefined && epochData.epoch !== undefined) {
-          setCurrentLevel({
-            type: 'epoch',
-            date: currentLevel.date,
-            hourStartDateTime: currentLevel.hourStartDateTime,
-            epochStartDateTime: epochData.epoch_start_date_time,
-            epoch: epochData.epoch,
+        if (epochData?.epoch !== undefined) {
+          navigate({
+            search: prev => ({
+              ...prev,
+              date: currentLevel.date,
+              hour: currentLevel.hourStartDateTime,
+              epoch: epochData.epoch,
+            }),
           });
         }
         break;
       }
       case 'epoch':
         // Drill to slot level
-        setCurrentLevel({
-          type: 'slot',
-          date: currentLevel.date,
-          hourStartDateTime: currentLevel.hourStartDateTime,
-          epochStartDateTime: currentLevel.epochStartDateTime,
-          epoch: currentLevel.epoch,
-          slot: Number(identifier),
+        navigate({
+          search: prev => ({
+            ...prev,
+            date: currentLevel.date,
+            hour: currentLevel.hourStartDateTime,
+            epoch: currentLevel.epoch,
+            slot: Number(identifier),
+          }),
         });
         break;
       case 'slot':
@@ -351,9 +428,15 @@ export function IndexPage(): JSX.Element {
 
   /**
    * Handle cell click to toggle column selection
+   * Updates URL search params to select/deselect column
    */
   const handleCellClick = (_identifier: string, columnIndex: number): void => {
-    setSelectedColumnIndex(prev => (prev === columnIndex ? undefined : columnIndex));
+    navigate({
+      search: prev => ({
+        ...prev,
+        column: prev.column === columnIndex ? undefined : columnIndex,
+      }),
+    });
   };
 
   /**
@@ -364,8 +447,10 @@ export function IndexPage(): JSX.Element {
       {
         label: `Window (${WINDOW_DAYS} days)`,
         onClick: () => {
-          setCurrentLevel({ type: 'window' });
-          setSelectedColumnIndex(undefined);
+          navigate({
+            search: {},
+            replace: true,
+          });
         },
       },
     ];
@@ -380,17 +465,24 @@ export function IndexPage(): JSX.Element {
       currentLevel.type === 'slot'
     ) {
       crumbs.push({
-        label: `Day: ${new Date(currentLevel.date).toLocaleDateString()}`,
-        onClick: () => setCurrentLevel({ type: 'day', date: currentLevel.date }),
+        label: `Day: ${new Date(currentLevel.date).toLocaleDateString('en-US', timezone === 'UTC' ? { timeZone: 'UTC' } : {})}`,
+        onClick: () =>
+          navigate({
+            search: { date: currentLevel.date },
+            replace: true,
+          }),
       });
     }
 
     // Add hour breadcrumb if we're at hour level or deeper
     if (currentLevel.type === 'hour' || currentLevel.type === 'epoch' || currentLevel.type === 'slot') {
       crumbs.push({
-        label: `Hour: ${new Date(currentLevel.hourStartDateTime * 1000).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false })}`,
+        label: `Hour: ${new Date(currentLevel.hourStartDateTime * 1000).toLocaleTimeString('en-US', timezone === 'UTC' ? { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'UTC' } : { hour: '2-digit', minute: '2-digit', hour12: false })}`,
         onClick: () =>
-          setCurrentLevel({ type: 'hour', date: currentLevel.date, hourStartDateTime: currentLevel.hourStartDateTime }),
+          navigate({
+            search: { date: currentLevel.date, hour: currentLevel.hourStartDateTime },
+            replace: true,
+          }),
       });
     }
 
@@ -399,12 +491,13 @@ export function IndexPage(): JSX.Element {
       crumbs.push({
         label: `Epoch: ${currentLevel.epoch}`,
         onClick: () =>
-          setCurrentLevel({
-            type: 'epoch',
-            date: currentLevel.date,
-            hourStartDateTime: currentLevel.hourStartDateTime,
-            epochStartDateTime: currentLevel.epochStartDateTime,
-            epoch: currentLevel.epoch,
+          navigate({
+            search: {
+              date: currentLevel.date,
+              hour: currentLevel.hourStartDateTime,
+              epoch: currentLevel.epoch,
+            },
+            replace: true,
           }),
       });
     }
@@ -414,19 +507,20 @@ export function IndexPage(): JSX.Element {
       crumbs.push({
         label: `Slot: ${currentLevel.slot}`,
         onClick: () =>
-          setCurrentLevel({
-            type: 'slot',
-            date: currentLevel.date,
-            hourStartDateTime: currentLevel.hourStartDateTime,
-            epochStartDateTime: currentLevel.epochStartDateTime,
-            epoch: currentLevel.epoch,
-            slot: currentLevel.slot,
+          navigate({
+            search: {
+              date: currentLevel.date,
+              hour: currentLevel.hourStartDateTime,
+              epoch: currentLevel.epoch,
+              slot: currentLevel.slot,
+            },
+            replace: true,
           }),
       });
     }
 
     return crumbs;
-  }, [currentLevel]);
+  }, [currentLevel, navigate, timezone]);
 
   /**
    * Calculate summary statistics for the current view
@@ -503,7 +597,7 @@ export function IndexPage(): JSX.Element {
       case 'window':
         return 'Column Availability Across Days';
       case 'day':
-        return `Column Availability by Hour - ${new Date(currentLevel.type === 'day' ? currentLevel.date : '').toLocaleDateString()}`;
+        return `Column Availability by Hour - ${currentLevel.type === 'day' ? currentLevel.date : ''}`;
       case 'hour':
         return 'Column Availability by Epoch';
       case 'epoch':
@@ -556,9 +650,10 @@ export function IndexPage(): JSX.Element {
         description="PeerDAS data availability visualization showing column custody across validators"
       />
 
-      {/* Breadcrumb navigation */}
-      {breadcrumbs.length > 1 && (
-        <nav className="mb-6 flex items-center gap-2 text-sm/6">
+      {/* Breadcrumb navigation and timezone toggle */}
+      <div className="mb-6 flex items-center justify-between gap-4">
+        {/* Breadcrumbs - always visible */}
+        <nav className="flex items-center gap-2 text-sm/6">
           {breadcrumbs.map((crumb, index) => (
             <div key={index} className="flex items-center gap-2">
               {index > 0 && <span className="text-muted">/</span>}
@@ -576,7 +671,10 @@ export function IndexPage(): JSX.Element {
             </div>
           ))}
         </nav>
-      )}
+
+        {/* Timezone toggle - always visible */}
+        <TimezoneToggle size="compact" />
+      </div>
 
       {/* Loading state */}
       {isLoading ? (
@@ -635,7 +733,11 @@ export function IndexPage(): JSX.Element {
                   selectedColumnIndex={selectedColumnIndex}
                   onCellClick={handleCellClick}
                   onRowClick={currentLevel.type !== 'slot' ? handleRowClick : undefined}
-                  onClearColumnSelection={() => setSelectedColumnIndex(undefined)}
+                  onClearColumnSelection={() =>
+                    navigate({
+                      search: prev => ({ ...prev, column: undefined }),
+                    })
+                  }
                   onBack={breadcrumbs.length > 1 ? breadcrumbs[breadcrumbs.length - 2].onClick : undefined}
                   cellSize="xs"
                   showColumnHeader

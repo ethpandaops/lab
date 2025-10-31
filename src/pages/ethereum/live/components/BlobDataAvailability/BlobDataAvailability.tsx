@@ -54,9 +54,10 @@ function BlobDataAvailabilityComponent({
         },
         left: 16,
         top: 12,
+        show: window.innerWidth >= 768,
       },
       grid: {
-        top: 48,
+        top: window.innerWidth >= 768 ? 48 : 20,
         bottom: 20,
         containLabel: true,
       },
@@ -127,9 +128,12 @@ function BlobDataAvailabilityComponent({
         },
         left: 16,
         top: 12,
+        // Hide title on mobile - tab already provides label
+        show: window.innerWidth >= 768,
       },
       grid: {
-        top: 48,
+        // Mobile: smaller top padding since no title
+        top: window.innerWidth >= 768 ? 48 : 20,
         bottom: 40, // Increased to make room for legend
         containLabel: true,
       },
@@ -338,17 +342,25 @@ function BlobDataAvailabilityComponent({
   }, [visibleContinentalPropagationData, continentalPropagationBaseConfig, themeColors, maxTime, CONTINENT_COLORS]);
 
   return (
-    <div className={clsx('grid h-full grid-cols-12 gap-4', className)}>
-      {/* First Seen Chart - 6 columns */}
-      <div className="col-span-6 h-full rounded-sm border border-border bg-surface p-1">
-        <ReactECharts option={firstSeenOption} style={{ height: '100%', width: '100%' }} />
+    <>
+      {/* Desktop: Two-column layout */}
+      <div className={clsx('hidden h-full grid-cols-12 gap-4 md:grid', className)}>
+        {/* First Seen Chart - 6 columns */}
+        <div className="col-span-6 h-full rounded-sm border border-border bg-surface p-1">
+          <ReactECharts option={firstSeenOption} style={{ height: '100%', width: '100%' }} />
+        </div>
+
+        {/* Continental Propagation Chart - 6 columns */}
+        <div className="col-span-6 h-full rounded-sm border border-border bg-surface p-1">
+          <ReactECharts option={continentalPropagationOption} style={{ height: '100%', width: '100%' }} />
+        </div>
       </div>
 
-      {/* Continental Propagation Chart - 6 columns */}
-      <div className="col-span-6 h-full rounded-sm border border-border bg-surface p-1">
+      {/* Mobile: Continental Propagation only, fullscreen */}
+      <div className={clsx('h-full bg-background md:hidden', className)}>
         <ReactECharts option={continentalPropagationOption} style={{ height: '100%', width: '100%' }} />
       </div>
-    </div>
+    </>
   );
 }
 

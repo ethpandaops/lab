@@ -52,8 +52,13 @@ function ensureAllColumns(cells: HeatmapCell[], identifier: string): HeatmapCell
 
 /**
  * Transform daily data to heatmap rows
+ * @param data - Daily data from API
+ * @param timezone - Timezone mode for formatting ('UTC' or 'local')
  */
-export function transformDailyToRows(data: FctDataColumnAvailabilityDaily[] | undefined): DataAvailabilityRow[] {
+export function transformDailyToRows(
+  data: FctDataColumnAvailabilityDaily[] | undefined,
+  timezone: 'UTC' | 'local' = 'UTC'
+): DataAvailabilityRow[] {
   if (!data) return [];
 
   // Group by date
@@ -83,7 +88,10 @@ export function transformDailyToRows(data: FctDataColumnAvailabilityDaily[] | un
 
       return {
         identifier: date,
-        label: new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+        label: new Date(date).toLocaleDateString(
+          'en-US',
+          timezone === 'UTC' ? { month: 'short', day: 'numeric', timeZone: 'UTC' } : { month: 'short', day: 'numeric' }
+        ),
         cells: ensureAllColumns(cells, date),
       };
     });
@@ -91,8 +99,13 @@ export function transformDailyToRows(data: FctDataColumnAvailabilityDaily[] | un
 
 /**
  * Transform hourly data to heatmap rows
+ * @param data - Hourly data from API
+ * @param timezone - Timezone mode for formatting ('UTC' or 'local')
  */
-export function transformHourlyToRows(data: FctDataColumnAvailabilityHourly[] | undefined): DataAvailabilityRow[] {
+export function transformHourlyToRows(
+  data: FctDataColumnAvailabilityHourly[] | undefined,
+  timezone: 'UTC' | 'local' = 'UTC'
+): DataAvailabilityRow[] {
   if (!data) return [];
 
   // Group by hour_start_date_time
@@ -109,11 +122,21 @@ export function transformHourlyToRows(data: FctDataColumnAvailabilityHourly[] | 
   return Array.from(byHour.entries())
     .sort((a, b) => a[0] - b[0])
     .map(([hourStart, items]) => {
-      const hourLabel = new Date(hourStart * 1000).toLocaleTimeString('en-US', {
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: false,
-      });
+      const hourLabel = new Date(hourStart * 1000).toLocaleTimeString(
+        'en-US',
+        timezone === 'UTC'
+          ? {
+              hour: '2-digit',
+              minute: '2-digit',
+              hour12: false,
+              timeZone: 'UTC',
+            }
+          : {
+              hour: '2-digit',
+              minute: '2-digit',
+              hour12: false,
+            }
+      );
       const identifier = String(hourStart);
       const cells = items
         .sort((a, b) => (a.column_index ?? 0) - (b.column_index ?? 0))

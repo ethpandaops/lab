@@ -71,6 +71,8 @@ export function Dialog({
   footer,
   className = '',
   allowContentOverflow = false,
+  panelRef,
+  hideCloseButton = false,
 }: DialogProps): JSX.Element {
   return (
     <Transition show={open} as={Fragment}>
@@ -95,15 +97,16 @@ export function Dialog({
           <TransitionChild
             as={Fragment}
             enter="ease-out duration-300"
-            enterFrom="opacity-0 scale-95"
-            enterTo="opacity-100 scale-100"
+            enterFrom="opacity-0"
+            enterTo="opacity-100"
             leave="ease-in duration-200"
-            leaveFrom="opacity-100 scale-100"
-            leaveTo="opacity-0 scale-95"
+            leaveFrom="opacity-100"
+            leaveTo="opacity-0"
           >
             <DialogPanel
+              ref={panelRef}
               className={clsx(
-                'divide-y divide-border bg-surface dark:divide-border dark:bg-surface',
+                'divide-y divide-border bg-surface',
                 size !== 'fullscreen' &&
                   'rounded-sm shadow-xl dark:shadow-none dark:outline dark:-outline-offset-1 dark:outline-border',
                 size === 'fullscreen' && 'flex flex-col',
@@ -114,7 +117,7 @@ export function Dialog({
             >
               {/* Header */}
               {(title || showCloseButton) && (
-                <div className="flex items-start justify-between gap-4 bg-surface px-6 py-5 dark:bg-background">
+                <div className="flex items-start justify-between gap-4 px-6 py-5">
                   <div className="min-w-0 flex-1 space-y-1.5">
                     {title && (
                       <DialogTitle className="text-lg leading-6 font-semibold text-foreground dark:text-foreground">
@@ -125,7 +128,7 @@ export function Dialog({
                       <Description className="text-sm leading-5 text-muted dark:text-muted">{description}</Description>
                     )}
                   </div>
-                  {showCloseButton && (
+                  {showCloseButton && size !== 'fullscreen' && !hideCloseButton && (
                     <button
                       type="button"
                       onClick={onClose}
@@ -147,11 +150,7 @@ export function Dialog({
               </div>
 
               {/* Footer */}
-              {footer && (
-                <div className="flex items-center justify-end gap-3 bg-surface px-6 py-4 dark:bg-background">
-                  {footer}
-                </div>
-              )}
+              {footer && <div className="flex items-center justify-end gap-3 px-6 py-4">{footer}</div>}
             </DialogPanel>
           </TransitionChild>
         </div>

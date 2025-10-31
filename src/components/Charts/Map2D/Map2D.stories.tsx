@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Map2DChart } from './Map2D';
 
 const meta: Meta<typeof Map2DChart> = {
-  title: 'Charts/Map2D',
+  title: 'Components/Charts/Map2D',
   component: Map2DChart,
   tags: ['autodocs'],
   parameters: {

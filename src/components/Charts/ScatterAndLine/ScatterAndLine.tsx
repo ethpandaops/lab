@@ -6,7 +6,11 @@ import { ScatterChart, LineChart } from 'echarts/charts';
 import { GridComponent, TooltipComponent, LegendComponent } from 'echarts/components';
 import { CanvasRenderer } from 'echarts/renderers';
 import { useThemeColors } from '@/hooks/useThemeColors';
+import { getDataVizColors } from '@/utils/dataVizColors';
 import type { ScatterAndLineChartProps } from './ScatterAndLine.types';
+
+// Get data visualization colors once at module level
+const { CHART_CATEGORICAL_COLORS } = getDataVizColors();
 
 // Register ECharts components
 echarts.use([ScatterChart, LineChart, GridComponent, TooltipComponent, LegendComponent, CanvasRenderer]);
@@ -70,8 +74,13 @@ export function ScatterAndLineChart({
 }: ScatterAndLineChartProps): JSX.Element {
   const themeColors = useThemeColors();
 
-  const option = useMemo(
-    () => ({
+  const option = useMemo(() => {
+    // Auto-assign colors from categorical palette for multi-series data
+    const getSeriesColor = (index: number): string => {
+      return CHART_CATEGORICAL_COLORS[index % CHART_CATEGORICAL_COLORS.length];
+    };
+
+    return {
       animation,
       animationDuration,
       grid: {
@@ -210,14 +219,14 @@ export function ScatterAndLineChart({
         : undefined,
       series: [
         // Scatter series
-        ...scatterSeries.map(s => ({
+        ...scatterSeries.map((s, index) => ({
           name: s.name,
           data: s.data,
           type: 'scatter' as const,
           symbol: s.symbol ?? 'circle',
           symbolSize: s.symbolSize ?? 8,
           itemStyle: {
-            color: s.color ?? themeColors.primary,
+            color: s.color ?? getSeriesColor(index),
             borderColor: s.borderColor,
             borderWidth: s.borderWidth,
           },
@@ -225,7 +234,7 @@ export function ScatterAndLineChart({
           z: s.z,
         })),
         // Line series
-        ...lineSeries.map(s => ({
+        ...lineSeries.map((s, index) => ({
           name: s.name,
           data: s.data,
           type: 'line' as const,
@@ -234,11 +243,11 @@ export function ScatterAndLineChart({
           symbol: s.symbol ?? 'none',
           symbolSize: s.symbolSize ?? 4,
           lineStyle: {
-            color: s.color ?? themeColors.primary,
+            color: s.color ?? getSeriesColor(scatterSeries.length + index),
             width: s.lineWidth ?? 3,
           },
           itemStyle: {
-            color: s.color ?? themeColors.primary,
+            color: s.color ?? getSeriesColor(scatterSeries.length + index),
           },
           emphasis:
             s.symbol && s.symbol !== 'none'
@@ -252,36 +261,34 @@ export function ScatterAndLineChart({
           z: s.z,
         })),
       ],
-    }),
-    [
-      scatterSeries,
-      lineSeries,
-      xAxisTitle,
-      yAxisTitle,
-      yAxis2Title,
-      xMax,
-      yMax,
-      yAxis2Max,
-      xMin,
-      yMin,
-      yAxis2Min,
-      xInterval,
-      xAxisFormatter,
-      yAxisFormatter,
-      tooltipFormatter,
-      tooltipTrigger,
-      showLegend,
-      legendPosition,
-      legendType,
-      animation,
-      animationDuration,
-      themeColors.foreground,
-      themeColors.border,
-      themeColors.muted,
-      themeColors.primary,
-      themeColors.background,
-    ]
-  );
+    };
+  }, [
+    scatterSeries,
+    lineSeries,
+    xAxisTitle,
+    yAxisTitle,
+    yAxis2Title,
+    xMax,
+    yMax,
+    yAxis2Max,
+    xMin,
+    yMin,
+    yAxis2Min,
+    xInterval,
+    xAxisFormatter,
+    yAxisFormatter,
+    tooltipFormatter,
+    tooltipTrigger,
+    showLegend,
+    legendPosition,
+    legendType,
+    animation,
+    animationDuration,
+    themeColors.foreground,
+    themeColors.border,
+    themeColors.muted,
+    themeColors.background,
+  ]);
 
   return (
     <div className={height === '100%' ? 'h-full w-full' : 'w-full'}>
