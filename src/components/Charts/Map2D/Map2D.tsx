@@ -42,6 +42,10 @@ export function Map2DChart({
   const computedPointColor = pointColor || themeColors.primary;
   const computedForegroundColor = themeColors.foreground;
 
+  // Memoize style and opts objects to prevent ReactECharts from seeing new props every render
+  const chartStyle = useMemo(() => ({ height, width: '100%', minHeight: height }), [height]);
+  const chartOpts = useMemo(() => ({ renderer: 'canvas' as const }), []);
+
   // Load and register world map on mount
   useEffect(() => {
     const loadWorldMap = async (): Promise<void> => {
@@ -300,12 +304,10 @@ export function Map2DChart({
       <ReactECharts
         ref={chartRef}
         option={option}
-        style={{ height, width: '100%', minHeight: height }}
+        style={chartStyle}
         notMerge={false}
         lazyUpdate={true}
-        opts={{
-          renderer: 'canvas', // Explicitly use canvas for best performance
-        }}
+        opts={chartOpts}
       />
     </div>
   );
