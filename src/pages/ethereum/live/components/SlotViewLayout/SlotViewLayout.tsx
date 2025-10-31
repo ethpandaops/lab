@@ -268,9 +268,9 @@ export function SlotViewLayout({ mode }: SlotViewLayoutProps): JSX.Element {
                 phases={slotData.sidebarPhases}
                 currentTime={currentTime}
                 slotDuration={12000}
-                showInlineLabels={false}
+                showInlineLabels={true}
                 showTimeCutovers={true}
-                height={40}
+                height={48}
                 onTimeClick={handleTimeClick}
               />
             </div>
