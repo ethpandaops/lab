@@ -20,7 +20,7 @@ import type { SlotProps } from './Slot.types';
  * // With custom styling
  * <Slot slot={1234567} className="font-bold text-primary" />
  */
-export function Slot({ slot, noLink = false, className }: SlotProps) {
+export function Slot({ slot, noLink = false, className }: SlotProps): React.JSX.Element {
   const formattedSlot = formatSlot(slot);
 
   if (noLink) {

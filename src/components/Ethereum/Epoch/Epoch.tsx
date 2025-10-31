@@ -20,7 +20,7 @@ import type { EpochProps } from './Epoch.types';
  * // With custom styling
  * <Epoch epoch={12345} className="font-bold text-primary" />
  */
-export function Epoch({ epoch, noLink = false, className }: EpochProps) {
+export function Epoch({ epoch, noLink = false, className }: EpochProps): React.JSX.Element {
   const formattedEpoch = formatEpoch(epoch);
 
   if (noLink) {
