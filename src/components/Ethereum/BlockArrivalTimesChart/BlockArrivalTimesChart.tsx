@@ -51,6 +51,8 @@ export function BlockArrivalTimesChart({
   // Calculate attestation deadline from slot phases (end of Block phase)
   const attestationDeadlineSeconds = DEFAULT_BEACON_SLOT_PHASES[0].duration / 1000;
 
+  console.log('[BlockArrivalTimesChart] attestationDeadlineSeconds:', attestationDeadlineSeconds);
+
   const { series, minX, maxY } = useMemo(() => {
     if (data.length === 0) {
       return { series: [], minX: undefined, maxY: undefined };
@@ -157,13 +159,17 @@ export function BlockArrivalTimesChart({
             enableDataZoom={true}
             animationDuration={300}
             relativeSlots={relativeSlots}
-            markLines={[
-              {
-                value: attestationDeadlineSeconds,
-                label: 'Attestation deadline',
-                lineStyle: 'dotted',
-              },
-            ]}
+            markLines={(() => {
+              const lines = [
+                {
+                  value: attestationDeadlineSeconds,
+                  label: 'Attestation deadline',
+                  lineStyle: 'dotted' as const,
+                },
+              ];
+              console.log('[BlockArrivalTimesChart] Passing markLines:', lines);
+              return lines;
+            })()}
           />
         </>
       )}

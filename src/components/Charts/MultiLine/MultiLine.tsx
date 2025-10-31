@@ -313,8 +313,9 @@ export function MultiLineChart({
       },
       // Add markLine to the first series only
       ...(idx === 0 && markLines && markLines.length > 0
-        ? {
-            markLine: {
+        ? (() => {
+            console.log('[MultiLine] Adding markLine to first series. markLines:', markLines);
+            const markLineConfig = {
               symbol: 'none',
               silent: false,
               animation: false,
@@ -337,8 +338,10 @@ export function MultiLineChart({
                   width: 2,
                 },
               })),
-            },
-          }
+            };
+            console.log('[MultiLine] markLine config:', markLineConfig);
+            return { markLine: markLineConfig };
+          })()
         : {}),
     };
 
@@ -371,8 +374,13 @@ export function MultiLineChart({
       };
     }
 
+    if (idx === 0) {
+      console.log('[MultiLine] First series config:', baseConfig);
+    }
     return baseConfig;
   });
+
+  console.log('[MultiLine] Total series count:', seriesConfig.length);
 
   // Calculate grid padding
   // Title is always rendered by component, never by ECharts
