@@ -2,7 +2,6 @@ import { useMemo } from 'react';
 
 import { MultiLineChart } from '@/components/Charts/MultiLine';
 import { PopoutCard } from '@/components/Layout/PopoutCard';
-import { useThemeColors } from '@/hooks/useThemeColors';
 
 import type { BaseFeeChartProps } from './BaseFeeChart.types';
 
@@ -46,8 +45,6 @@ export function BaseFeeChart({
   modalSize = 'full',
   relativeSlots,
 }: BaseFeeChartProps): React.JSX.Element {
-  const themeColors = useThemeColors();
-
   const { series, avgBaseFee, minX } = useMemo(() => {
     if (data.length === 0) {
       return { series: [], avgBaseFee: 0, minX: undefined };
@@ -64,13 +61,12 @@ export function BaseFeeChart({
         areaOpacity: 0.3,
         lineWidth: 2,
         showSymbol: false,
-        color: themeColors.primary,
       },
     ];
 
     const minX = data.length > 0 ? Math.min(...data.map(d => d.x)) : undefined;
     return { series, avgBaseFee, minX };
-  }, [data, themeColors.primary]);
+  }, [data]);
 
   // Calculate dynamic subtitle with average if not provided
   const effectiveSubtitle = subtitle ?? `${avgBaseFee.toFixed(2)} Gwei average base fee`;

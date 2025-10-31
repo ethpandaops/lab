@@ -2,7 +2,6 @@ import { useMemo } from 'react';
 
 import { MultiLineChart } from '@/components/Charts/MultiLine';
 import { PopoutCard } from '@/components/Layout/PopoutCard';
-import { useThemeColors } from '@/hooks/useThemeColors';
 
 import type { BlobCountChartProps } from './BlobCountChart.types';
 
@@ -47,8 +46,6 @@ export function BlobCountChart({
   modalSize = 'full',
   relativeSlots,
 }: BlobCountChartProps): React.JSX.Element {
-  const themeColors = useThemeColors();
-
   const { series, totalBlobs, minX } = useMemo(() => {
     if (data.length === 0) {
       return { series: [], totalBlobs: 0, minX: undefined };
@@ -66,12 +63,11 @@ export function BlobCountChart({
         areaOpacity: 0.3,
         lineWidth: 2,
         showSymbol: false,
-        color: themeColors.primary,
       },
     ];
 
     return { series, totalBlobs, minX };
-  }, [data, themeColors.primary]);
+  }, [data]);
 
   // Calculate dynamic subtitle with total if not provided
   const effectiveSubtitle = subtitle ?? `${totalBlobs.toLocaleString()} total blobs`;

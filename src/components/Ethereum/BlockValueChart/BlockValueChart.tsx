@@ -2,7 +2,6 @@ import { useMemo } from 'react';
 
 import { MultiLineChart } from '@/components/Charts/MultiLine';
 import { PopoutCard } from '@/components/Layout/PopoutCard';
-import { useThemeColors } from '@/hooks/useThemeColors';
 
 import type { BlockValueChartProps } from './BlockValueChart.types';
 
@@ -48,8 +47,6 @@ export function BlockValueChart({
   modalSize = 'full',
   relativeSlots,
 }: BlockValueChartProps): React.JSX.Element {
-  const themeColors = useThemeColors();
-
   const { series, avgBlockValue, totalValue, minX } = useMemo(() => {
     if (data.length === 0) {
       return { series: [], avgBlockValue: 0, totalValue: 0, minX: undefined };
@@ -71,13 +68,12 @@ export function BlockValueChart({
         areaOpacity: 0.3,
         lineWidth: 2,
         showSymbol: false,
-        color: themeColors.primary,
       },
     ];
 
     const minX = data.length > 0 ? Math.min(...data.map(d => d.x)) : undefined;
     return { series, avgBlockValue, totalValue, minX };
-  }, [data, themeColors.primary]);
+  }, [data]);
 
   // Calculate dynamic subtitle with average if not provided
   const effectiveSubtitle = subtitle ?? `${avgBlockValue.toFixed(3)} ETH average (${totalValue.toFixed(2)} ETH total)`;

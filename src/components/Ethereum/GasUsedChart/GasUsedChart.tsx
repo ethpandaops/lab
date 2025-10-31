@@ -3,7 +3,6 @@ import { useMemo } from 'react';
 import { MultiLineChart } from '@/components/Charts/MultiLine';
 import type { SeriesData } from '@/components/Charts/MultiLine/MultiLine.types';
 import { PopoutCard } from '@/components/Layout/PopoutCard';
-import { useThemeColors } from '@/hooks/useThemeColors';
 
 import type { GasUsedChartProps } from './GasUsedChart.types';
 
@@ -51,8 +50,6 @@ export function GasUsedChart({
   modalSize = 'full',
   relativeSlots,
 }: GasUsedChartProps): React.JSX.Element {
-  const themeColors = useThemeColors();
-
   const { series, avgGasUsed, hasGasLimit, minX } = useMemo(() => {
     if (data.length === 0) {
       return { series: [], avgGasUsed: 0, hasGasLimit: false, minX: undefined };
@@ -74,7 +71,6 @@ export function GasUsedChart({
         areaOpacity: 0.3,
         lineWidth: 2,
         showSymbol: false,
-        color: themeColors.primary,
       },
     ];
 
@@ -90,12 +86,11 @@ export function GasUsedChart({
         lineWidth: 2,
         lineStyle: 'dashed' as const,
         showSymbol: false,
-        color: themeColors.muted,
       });
     }
 
     return { series, avgGasUsed, hasGasLimit, minX };
-  }, [data, showGasLimit, themeColors.primary, themeColors.muted]);
+  }, [data, showGasLimit]);
 
   // Calculate dynamic subtitle if not provided
   const effectiveSubtitle = subtitle ?? `${avgGasUsed.toFixed(1)}M average gas used`;
