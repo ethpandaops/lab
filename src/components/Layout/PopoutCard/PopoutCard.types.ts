@@ -73,4 +73,32 @@ export interface PopoutCardProps {
    * Allow content to overflow card boundaries (useful for tooltips, dropdowns). Default: false
    */
   allowContentOverflow?: boolean;
+  /**
+   * Enable download functionality with built-in button. Default: true
+   */
+  enableDownload?: boolean;
+  /**
+   * Custom filename for downloaded image (without extension). Default: uses title
+   */
+  downloadFilename?: string;
+  /**
+   * Append metadata footer to downloaded images. Default: true
+   * When true, adds a slim footer with title and subtitle to screenshots.
+   */
+  appendMetadataToDownload?: boolean;
+  /**
+   * Custom title for download metadata footer. Default: document.title
+   * Only used when appendMetadataToDownload is true.
+   */
+  downloadMetadataTitle?: string;
+  /**
+   * Custom subtitle for download metadata footer. Default: window.location.href
+   * Only used when appendMetadataToDownload is true.
+   */
+  downloadMetadataSubtitle?: string;
+  /**
+   * Custom network name for download metadata footer. Default: current network's display_name
+   * Only used when appendMetadataToDownload is true.
+   */
+  downloadMetadataNetwork?: string;
 }

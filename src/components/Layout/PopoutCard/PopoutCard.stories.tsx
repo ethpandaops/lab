@@ -372,6 +372,8 @@ export const WithModalDescriptionAndTable: Story = {
     title: 'Top Validators',
     subtitle: 'By effectiveness',
     modalSubtitle: 'Updated every 15 minutes',
+    downloadMetadataTitle: 'Epoch 12345',
+    downloadMetadataSubtitle: 'https://lab.ethpandaops.io/ethereum/epochs/12345',
     modalDescription:
       'Validator effectiveness is measured by successful attestations, block proposals, and sync committee participation. Higher percentages indicate better performance.',
     children: (
@@ -511,4 +513,69 @@ export const PositionComparison: Story = {
       </PopoutCard>
     </div>
   ),
+};
+
+/**
+ * PopoutCard with download metadata (default behavior)
+ * Metadata is enabled by default - shows document title + URL in download footer
+ */
+export const WithDownloadMetadataDefault: Story = {
+  args: {
+    title: 'Slot Propagation Time',
+    subtitle: 'Last 1000 slots',
+    children: (
+      <LineChart
+        data={[45, 52, 48, 55, 49, 51, 47, 54, 50, 53]}
+        labels={['100', '200', '300', '400', '500', '600', '700', '800', '900', '1000']}
+        height={300}
+        showArea
+      />
+    ),
+  },
+};
+
+/**
+ * PopoutCard with custom download metadata
+ * Override the default metadata with custom title and subtitle
+ */
+export const WithDownloadMetadataCustom: Story = {
+  args: {
+    title: 'Validator Performance',
+    subtitle: 'Epoch 12345',
+    downloadMetadataTitle: 'Slot 987654321 • Validator 0x1234...5678',
+    downloadMetadataSubtitle: 'https://lab.ethpandaops.io/ethereum/slots/987654321',
+    children: (
+      <BarChart
+        data={[
+          { value: 95, color: '#10b981' },
+          { value: 88, color: '#10b981' },
+          { value: 92, color: '#10b981' },
+          { value: 78, color: '#f59e0b' },
+          { value: 96, color: '#10b981' },
+        ]}
+        labels={['Attestations', 'Proposals', 'Sync', 'Slashings', 'Rewards']}
+        height={300}
+      />
+    ),
+  },
+};
+
+/**
+ * PopoutCard with metadata disabled
+ * Set appendMetadataToDownload={false} to disable the footer
+ */
+export const WithoutDownloadMetadata: Story = {
+  args: {
+    title: 'Simple Chart',
+    subtitle: 'No metadata in downloads',
+    appendMetadataToDownload: false,
+    children: (
+      <LineChart
+        data={[45, 52, 48, 55, 49, 51, 47, 54, 50, 53]}
+        labels={['100', '200', '300', '400', '500', '600', '700', '800', '900', '1000']}
+        height={300}
+        showArea
+      />
+    ),
+  },
 };
