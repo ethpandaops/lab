@@ -38,4 +38,9 @@ export interface TimestampModalContentProps {
    * Unix timestamp in seconds
    */
   timestamp: number;
+
+  /**
+   * Optional context to display as subtitle (e.g., "Slot 123456")
+   */
+  context?: string;
 }
