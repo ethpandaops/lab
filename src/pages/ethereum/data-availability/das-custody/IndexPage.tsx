@@ -10,8 +10,10 @@ import { DataAvailabilityHeatmap } from '@/pages/ethereum/data-availability/comp
 import { DataAvailabilityFilterPanel } from '@/pages/ethereum/data-availability/components/DataAvailabilityHeatmap/DataAvailabilityFilterPanel';
 import { DataAvailabilityLegend } from '@/pages/ethereum/data-availability/components/DataAvailabilityHeatmap/DataAvailabilityLegend';
 import { DataAvailabilitySkeleton } from '@/pages/ethereum/data-availability/components/DataAvailabilitySkeleton';
+import { TimezoneToggle } from '@/components/Elements/TimezoneToggle';
 import type { DataAvailabilityGranularity } from '@/pages/ethereum/data-availability/components/DataAvailabilityHeatmap';
 import type { DataAvailabilityFilters } from '@/pages/ethereum/data-availability/components/DataAvailabilityHeatmap/DataAvailabilityFilterPanel.types';
+import { useTimezone } from '@/hooks/useTimezone';
 import {
   fctDataColumnAvailabilityDailyServiceListOptions,
   fctDataColumnAvailabilityHourlyServiceListOptions,
@@ -141,6 +143,9 @@ export function IndexPage(): JSX.Element {
   // URL-based state management
   const navigate = useNavigate({ from: '/ethereum/data-availability/das-custody/' });
   const search = useSearch({ from: '/ethereum/data-availability/das-custody/' });
+
+  // Timezone preference
+  const { timezone } = useTimezone();
 
   // Derive drill-down state from URL
   const currentLevel = deriveCurrentLevel(search);
@@ -276,8 +281,8 @@ export function IndexPage(): JSX.Element {
    * Transform Window data (daily) to heatmap rows
    */
   const windowRows = useMemo(
-    () => transformDailyToRows(windowQuery.data?.fct_data_column_availability_daily),
-    [windowQuery.data]
+    () => transformDailyToRows(windowQuery.data?.fct_data_column_availability_daily, timezone),
+    [windowQuery.data, timezone]
   );
 
   /**
@@ -285,8 +290,10 @@ export function IndexPage(): JSX.Element {
    */
   const dayRows = useMemo(
     () =>
-      currentLevel.type === 'day' ? transformHourlyToRows(dayQuery.data?.fct_data_column_availability_hourly) : [],
-    [dayQuery.data, currentLevel.type]
+      currentLevel.type === 'day'
+        ? transformHourlyToRows(dayQuery.data?.fct_data_column_availability_hourly, timezone)
+        : [],
+    [dayQuery.data, currentLevel.type, timezone]
   );
 
   /**
@@ -458,7 +465,7 @@ export function IndexPage(): JSX.Element {
       currentLevel.type === 'slot'
     ) {
       crumbs.push({
-        label: `Day: ${new Date(currentLevel.date).toLocaleDateString()}`,
+        label: `Day: ${new Date(currentLevel.date).toLocaleDateString('en-US', timezone === 'UTC' ? { timeZone: 'UTC' } : {})}`,
         onClick: () =>
           navigate({
             search: { date: currentLevel.date },
@@ -470,7 +477,7 @@ export function IndexPage(): JSX.Element {
     // Add hour breadcrumb if we're at hour level or deeper
     if (currentLevel.type === 'hour' || currentLevel.type === 'epoch' || currentLevel.type === 'slot') {
       crumbs.push({
-        label: `Hour: ${new Date(currentLevel.hourStartDateTime * 1000).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false })}`,
+        label: `Hour: ${new Date(currentLevel.hourStartDateTime * 1000).toLocaleTimeString('en-US', timezone === 'UTC' ? { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'UTC' } : { hour: '2-digit', minute: '2-digit', hour12: false })}`,
         onClick: () =>
           navigate({
             search: { date: currentLevel.date, hour: currentLevel.hourStartDateTime },
@@ -513,7 +520,7 @@ export function IndexPage(): JSX.Element {
     }
 
     return crumbs;
-  }, [currentLevel, navigate]);
+  }, [currentLevel, navigate, timezone]);
 
   /**
    * Calculate summary statistics for the current view
@@ -590,7 +597,7 @@ export function IndexPage(): JSX.Element {
       case 'window':
         return 'Column Availability Across Days';
       case 'day':
-        return `Column Availability by Hour - ${new Date(currentLevel.type === 'day' ? currentLevel.date : '').toLocaleDateString()}`;
+        return `Column Availability by Hour - ${new Date(currentLevel.type === 'day' ? currentLevel.date : '').toLocaleDateString('en-US', timezone === 'UTC' ? { timeZone: 'UTC' } : {})}`;
       case 'hour':
         return 'Column Availability by Epoch';
       case 'epoch':
@@ -600,7 +607,7 @@ export function IndexPage(): JSX.Element {
       default:
         return 'Column Availability';
     }
-  }, [granularity, currentLevel]);
+  }, [granularity, currentLevel, timezone]);
 
   /**
    * Get heatmap card subtitle based on granularity
@@ -643,9 +650,10 @@ export function IndexPage(): JSX.Element {
         description="PeerDAS data availability visualization showing column custody across validators"
       />
 
-      {/* Breadcrumb navigation */}
-      {breadcrumbs.length > 1 && (
-        <nav className="mb-6 flex items-center gap-2 text-sm/6">
+      {/* Breadcrumb navigation and timezone toggle */}
+      <div className="mb-6 flex items-center justify-between gap-4">
+        {/* Breadcrumbs - always visible */}
+        <nav className="flex items-center gap-2 text-sm/6">
           {breadcrumbs.map((crumb, index) => (
             <div key={index} className="flex items-center gap-2">
               {index > 0 && <span className="text-muted">/</span>}
@@ -663,7 +671,10 @@ export function IndexPage(): JSX.Element {
             </div>
           ))}
         </nav>
-      )}
+
+        {/* Timezone toggle - always visible */}
+        <TimezoneToggle size="compact" />
+      </div>
 
       {/* Loading state */}
       {isLoading ? (
