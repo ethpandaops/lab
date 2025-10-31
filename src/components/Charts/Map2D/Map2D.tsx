@@ -153,19 +153,18 @@ export function Map2DChart({
       const scatterSeriesIndex = series.findIndex(s => s.type === 'scatter');
 
       if (scatterSeriesIndex !== -1) {
-        // Update only the data property, not the entire series
-        // This prevents flickering by preserving the series instance
-        chart.setOption(
-          {
-            series: [
-              {
-                type: 'scatter',
-                data: pointData,
-              },
-            ],
-          },
-          { notMerge: false }
-        );
+        // Build a series array where only the scatter series at scatterSeriesIndex has data updated
+        // Other indices get null so ECharts skips them (doesn't rebuild)
+        const seriesUpdate: (Record<string, unknown> | null)[] = [];
+        for (let i = 0; i <= scatterSeriesIndex; i++) {
+          if (i === scatterSeriesIndex) {
+            seriesUpdate.push({ data: pointData });
+          } else {
+            seriesUpdate.push(null);
+          }
+        }
+
+        chart.setOption({ series: seriesUpdate }, { notMerge: false, lazyUpdate: false });
       }
     }
   }, [points, mapLoaded, resetKey]);
