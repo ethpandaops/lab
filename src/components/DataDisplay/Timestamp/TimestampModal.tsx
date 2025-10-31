@@ -1,0 +1,180 @@
+import { type JSX, useState, useCallback } from 'react';
+import { ClipboardDocumentIcon, CheckIcon } from '@heroicons/react/24/outline';
+import clsx from 'clsx';
+import { Dialog } from '@/components/Overlays/Dialog';
+import { useNetwork } from '@/hooks/useNetwork';
+import { formatTimestamp } from '@/utils/time';
+import { timestampToSlot } from '@/pages/ethereum/live/utils/slot-time';
+import { slotToEpoch } from '@/utils/beacon';
+import { getAllDiscordFormats, DISCORD_STYLE_LABELS } from '@/utils/discord-timestamp';
+import type { DiscordTimestampStyle } from '@/utils/discord-timestamp';
+import type { TimestampModalContentProps } from './Timestamp.types';
+
+interface TimestampModalProps extends TimestampModalContentProps {
+  open: boolean;
+  onClose: () => void;
+}
+
+/**
+ * Modal component that displays a timestamp in multiple formats
+ *
+ * Shows:
+ * - Local and UTC timestamps (full)
+ * - Unix timestamp
+ * - Beacon chain slot and epoch (based on selected network)
+ * - All Discord relative time formats
+ */
+export function TimestampModal({ open, onClose, timestamp }: TimestampModalProps): JSX.Element {
+  return (
+    <Dialog open={open} onClose={onClose} title="Timestamp Details" size="lg">
+      <TimestampModalContent timestamp={timestamp} />
+    </Dialog>
+  );
+}
+
+/**
+ * Content of the timestamp modal
+ */
+function TimestampModalContent({ timestamp }: TimestampModalContentProps): JSX.Element {
+  const { currentNetwork } = useNetwork();
+  const [copiedField, setCopiedField] = useState<string | null>(null);
+
+  // Calculate beacon chain values if genesis_time is available
+  const beaconData = currentNetwork?.genesis_time
+    ? {
+        slot: timestampToSlot(timestamp, currentNetwork.genesis_time),
+        epoch: slotToEpoch(timestampToSlot(timestamp, currentNetwork.genesis_time)),
+      }
+    : null;
+
+  const handleCopy = useCallback((text: string, fieldName: string) => {
+    navigator.clipboard.writeText(text);
+    setCopiedField(fieldName);
+    setTimeout(() => setCopiedField(null), 2000);
+  }, []);
+
+  // Format the timestamps
+  const localTimestamp = formatTimestamp(timestamp, {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    timeZoneName: 'short',
+  });
+
+  const utcTimestamp = new Date(timestamp * 1000).toUTCString();
+
+  const discordFormats = getAllDiscordFormats(timestamp);
+
+  return (
+    <div className="space-y-6">
+      {/* Standard Formats Section */}
+      <section>
+        <h3 className="mb-3 text-sm/5 font-semibold text-foreground">Standard Formats</h3>
+        <div className="space-y-2">
+          <TimestampField
+            label="Local Time"
+            value={localTimestamp}
+            onCopy={() => handleCopy(localTimestamp, 'local')}
+            isCopied={copiedField === 'local'}
+          />
+          <TimestampField
+            label="UTC Time"
+            value={utcTimestamp}
+            onCopy={() => handleCopy(utcTimestamp, 'utc')}
+            isCopied={copiedField === 'utc'}
+          />
+          <TimestampField
+            label="Unix Timestamp"
+            value={timestamp.toString()}
+            onCopy={() => handleCopy(timestamp.toString(), 'unix')}
+            isCopied={copiedField === 'unix'}
+          />
+        </div>
+      </section>
+
+      {/* Beacon Chain Section */}
+      {beaconData && currentNetwork && (
+        <section>
+          <h3 className="mb-3 text-sm/5 font-semibold text-foreground">Beacon Chain ({currentNetwork.name})</h3>
+          <div className="space-y-2">
+            <TimestampField
+              label="Slot"
+              value={beaconData.slot.toLocaleString()}
+              onCopy={() => handleCopy(beaconData.slot.toString(), 'slot')}
+              isCopied={copiedField === 'slot'}
+            />
+            <TimestampField
+              label="Epoch"
+              value={beaconData.epoch.toLocaleString()}
+              onCopy={() => handleCopy(beaconData.epoch.toString(), 'epoch')}
+              isCopied={copiedField === 'epoch'}
+            />
+          </div>
+        </section>
+      )}
+
+      {/* Discord Formats Section */}
+      <section>
+        <h3 className="mb-3 text-sm/5 font-semibold text-foreground">Discord Formats</h3>
+        <div className="space-y-2">
+          {(Object.entries(discordFormats) as [DiscordTimestampStyle, string][]).map(([style, value]) => (
+            <TimestampField
+              key={style}
+              label={DISCORD_STYLE_LABELS[style]}
+              value={value}
+              onCopy={() => handleCopy(value, `discord-${style}`)}
+              isCopied={copiedField === `discord-${style}`}
+              badge={style}
+            />
+          ))}
+        </div>
+      </section>
+    </div>
+  );
+}
+
+interface TimestampFieldProps {
+  label: string;
+  value: string;
+  onCopy: () => void;
+  isCopied: boolean;
+  badge?: string;
+}
+
+/**
+ * Individual timestamp field row with copy button
+ */
+function TimestampField({ label, value, onCopy, isCopied, badge }: TimestampFieldProps): JSX.Element {
+  return (
+    <div className="flex items-start justify-between gap-4 rounded-sm bg-background px-4 py-3">
+      <div className="min-w-0 flex-1">
+        <div className="mb-1 flex items-center gap-2">
+          <span className="text-xs/4 font-medium text-muted">{label}</span>
+          {badge && (
+            <span className="text-2xs/3 rounded-xs bg-accent/20 px-1.5 py-0.5 font-mono font-semibold text-accent">
+              {badge}
+            </span>
+          )}
+        </div>
+        <div className="font-mono text-sm/5 break-all text-foreground">{value}</div>
+      </div>
+      <button
+        type="button"
+        onClick={onCopy}
+        className={clsx(
+          'shrink-0 rounded-xs p-2 transition-colors',
+          isCopied
+            ? 'bg-success/20 text-success'
+            : 'text-muted hover:bg-border hover:text-foreground dark:hover:bg-muted/20'
+        )}
+        aria-label={`Copy ${label}`}
+      >
+        {isCopied ? <CheckIcon className="size-4" /> : <ClipboardDocumentIcon className="size-4" />}
+      </button>
+    </div>
+  );
+}
