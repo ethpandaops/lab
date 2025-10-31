@@ -9,6 +9,7 @@ import { Card } from '@/components/Layout/Card';
 import { Dialog } from '@/components/Overlays/Dialog';
 import { ScrollAnchor } from '@/components/Navigation/ScrollAnchor';
 import { Dropdown, DropdownSection, DropdownItem } from '@/components/Elements/Dropdown';
+import { CopyToClipboard } from '@/components/Elements/CopyToClipboard';
 import { NetworkIcon } from '@/components/Ethereum/NetworkIcon';
 import { useChartDownload } from '@/hooks/useChartDownload';
 import { useNetwork } from '@/hooks/useNetwork';
@@ -190,13 +191,17 @@ export function PopoutCard({
   };
 
   /**
-   * Handle copy to clipboard
+   * Handle copy to clipboard with toast notification
    */
-  const handleCopyToClipboard = async (): Promise<void> => {
+  const handleCopyToClipboard = async (): Promise<Blob> => {
     // Use modal content if modal is open, otherwise use card
     const element = isModalOpen ? modalContentRef.current : cardRef.current;
-    if (!element || isDownloading) {
-      return;
+    if (!element) {
+      throw new Error('Element not found');
+    }
+
+    if (isDownloading) {
+      throw new Error('Download already in progress');
     }
 
     setIsDownloading(true);
@@ -226,16 +231,9 @@ export function PopoutCard({
       const response = await fetch(dataUrl);
       const blob = await response.blob();
 
-      // Step 4: Copy to clipboard
-      await navigator.clipboard.write([
-        new ClipboardItem({
-          [blob.type]: blob,
-        }),
-      ]);
-    } catch (error) {
-      console.error('Failed to copy to clipboard:', error);
+      return blob;
     } finally {
-      // Step 5: Restore icons and hide metadata
+      // Step 4: Restore icons and hide metadata
       setShowModalLogo(false);
       setShowLogo(false);
       setShowMetadata(false);
@@ -286,12 +284,17 @@ export function PopoutCard({
                         <DropdownItem icon={<ArrowDownTrayIcon className="size-5" />} onClick={handleDownload}>
                           Download
                         </DropdownItem>
-                        <DropdownItem
-                          icon={<ClipboardDocumentIcon className="size-5" />}
-                          onClick={handleCopyToClipboard}
+                        <CopyToClipboard
+                          content={handleCopyToClipboard}
+                          successMessage="Copied to clipboard!"
+                          errorMessage="Failed to copy image"
                         >
-                          Copy to clipboard
-                        </DropdownItem>
+                          {({ onClick }) => (
+                            <DropdownItem icon={<ClipboardDocumentIcon className="size-5" />} onClick={onClick}>
+                              Copy to clipboard
+                            </DropdownItem>
+                          )}
+                        </CopyToClipboard>
                       </DropdownSection>
                     </Dropdown>
                   )}
@@ -349,9 +352,17 @@ export function PopoutCard({
                     <DropdownItem icon={<ArrowDownTrayIcon className="size-5" />} onClick={handleDownload}>
                       Download
                     </DropdownItem>
-                    <DropdownItem icon={<ClipboardDocumentIcon className="size-5" />} onClick={handleCopyToClipboard}>
-                      Copy to clipboard
-                    </DropdownItem>
+                    <CopyToClipboard
+                      content={handleCopyToClipboard}
+                      successMessage="Copied to clipboard!"
+                      errorMessage="Failed to copy image"
+                    >
+                      {({ onClick }) => (
+                        <DropdownItem icon={<ClipboardDocumentIcon className="size-5" />} onClick={onClick}>
+                          Copy to clipboard
+                        </DropdownItem>
+                      )}
+                    </CopyToClipboard>
                   </DropdownSection>
                 </Dropdown>
               )
