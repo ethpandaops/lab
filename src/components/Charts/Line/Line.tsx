@@ -224,7 +224,7 @@ export const LineChart = forwardRef<ReactEChartsCore, LineChartProps>(function L
         option={option}
         style={{ height, width: '100%', minHeight: height }}
         notMerge={true}
-        lazyUpdate={false}
+        lazyUpdate={true}
       />
     </div>
   );

@@ -293,7 +293,7 @@ export function ScatterAndLineChart({
         option={option}
         style={{ height, width: '100%', minHeight: height }}
         notMerge={true}
-        lazyUpdate={false}
+        lazyUpdate={true}
       />
     </div>
   );
