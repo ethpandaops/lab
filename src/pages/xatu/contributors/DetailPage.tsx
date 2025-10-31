@@ -338,7 +338,7 @@ export function DetailPage(): JSX.Element {
               modalSize="full"
               anchorId="data-column-latency"
             >
-              <DataColumnLatencyChart username={username} />
+              <DataColumnLatencyChart username={username} nodes={nodes} />
             </PopoutCard>
           ) : (
             <PopoutCard
