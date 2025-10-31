@@ -1,11 +1,28 @@
-import { type JSX, useMemo, useState, useEffect, useRef, useCallback } from 'react';
+import { type JSX, useMemo, useRef, useCallback } from 'react';
 import { useSlotPlayerState, useSlotPlayerProgress, useSlotPlayerActions } from '@/hooks/useSlotPlayer';
-import { MapChart } from '@/components/Charts/Map';
+import { Map2DChart } from '@/components/Charts/Map2D';
 import { Sidebar } from '../Sidebar';
 import { BlockDetailsCard } from '../BlockDetailsCard';
 import { BottomBar } from '../BottomBar';
 import { useSlotViewData, useSlotProgressData } from '../../hooks';
 import type { SlotViewLayoutProps, TimeFilteredData } from './SlotViewLayout.types';
+
+const TIME_POINTS = Array.from({ length: 241 }, (_, i) => i * 50);
+function upperBound<T>(array: T[], accessor: (item: T) => number, target: number): number {
+  let low = 0;
+  let high = array.length;
+
+  while (low < high) {
+    const mid = Math.floor((low + high) / 2);
+    if (accessor(array[mid]) <= target) {
+      low = mid + 1;
+    } else {
+      high = mid;
+    }
+  }
+
+  return low;
+}
 
 export function SlotViewLayout({ mode }: SlotViewLayoutProps): JSX.Element {
   const { currentSlot, isPlaying } = useSlotPlayerState();
@@ -15,34 +32,8 @@ export function SlotViewLayout({ mode }: SlotViewLayoutProps): JSX.Element {
   // Memoize the onTimeClick handler to prevent Sidebar re-renders
   const handleTimeClick = useCallback((timeMs: number) => actions.seekToTime(timeMs), [actions]);
 
-  // Throttle currentTime updates to 10fps (100ms) for better performance
-  // This reduces React re-renders significantly while still looking smooth
-  const [currentTime, setCurrentTime] = useState(slotProgress);
-  const rafRef = useRef<number | null>(null);
-  const slotProgressRef = useRef(slotProgress);
-  const lastUpdateTimeRef = useRef(0);
-
-  // Keep ref up to date
-  slotProgressRef.current = slotProgress;
-
-  useEffect(() => {
-    const updateCurrentTime = (timestamp: number): void => {
-      // Only update state every 100ms (10fps) to reduce React re-renders
-      if (timestamp - lastUpdateTimeRef.current >= 100) {
-        setCurrentTime(slotProgressRef.current);
-        lastUpdateTimeRef.current = timestamp;
-      }
-      rafRef.current = requestAnimationFrame(updateCurrentTime);
-    };
-
-    rafRef.current = requestAnimationFrame(updateCurrentTime);
-
-    return () => {
-      if (rafRef.current !== null) {
-        cancelAnimationFrame(rafRef.current);
-      }
-    };
-  }, []);
+  // Use slotProgress directly without throttling
+  const currentTime = slotProgress;
 
   // Fetch all slot data
   const slotData = useSlotViewData(currentSlot);
@@ -50,69 +41,138 @@ export function SlotViewLayout({ mode }: SlotViewLayoutProps): JSX.Element {
   // Compute slot progress phases for timeline
   const { phases: slotProgressPhases } = useSlotProgressData(slotData.rawApiData, currentTime);
 
-  // Pre-compute static time points array (0-12s in 50ms chunks) outside of memo
-  // This prevents creating a new 241-element array every 100ms
-  const TIME_POINTS = useMemo(() => Array.from({ length: 241 }, (_, i) => i * 50), []);
+  const sortedMapPoints = useMemo(() => {
+    return [...slotData.mapPoints].sort((a, b) => a.earliestSeenTime - b.earliestSeenTime);
+  }, [slotData.mapPoints]);
 
-  // Pre-compute all time-filtered data once when currentTime changes
-  // This prevents child components from filtering data on every render
+  const deduplicatedBlobTimeline = useMemo(() => {
+    const earliestByBlob = new Map<string, { time: number; color?: string }>();
+
+    for (const point of slotData.blobFirstSeenData) {
+      const existing = earliestByBlob.get(point.blobId);
+      if (!existing || point.time < existing.time) {
+        earliestByBlob.set(point.blobId, { time: point.time, color: point.color });
+      }
+    }
+
+    return Array.from(earliestByBlob.entries())
+      .map(([blobId, value]) => ({ blobId, time: value.time, color: value.color }))
+      .sort((a, b) => a.time - b.time);
+  }, [slotData.blobFirstSeenData]);
+
+  const sortedContinentalSeries = useMemo(() => {
+    return slotData.blobContinentalPropagationData.map(continent => ({
+      ...continent,
+      data: [...continent.data].sort((a, b) => a.time - b.time),
+    }));
+  }, [slotData.blobContinentalPropagationData]);
+
+  const attestationTimeToCount = useMemo(() => {
+    const map = new Map<number, number>();
+    for (const point of slotData.attestationData) {
+      map.set(point.time, point.count);
+    }
+    return map;
+  }, [slotData.attestationData]);
+
+  // Refs to maintain stable references - only update when indices change
+  const mapIndexRef = useRef(-1);
+  const visibleMapPointsRef = useRef<typeof sortedMapPoints>([]);
+  const blobIndexRef = useRef(-1);
+  const deduplicatedBlobDataRef = useRef<typeof deduplicatedBlobTimeline>([]);
+  const continentalIndicesRef = useRef<number[]>([]);
+  const visibleContinentalPropagationDataRef = useRef<typeof sortedContinentalSeries>([]);
+  const attestationChartValuesRef = useRef<(number | null)[]>([]);
+  const lastChartTimeRef = useRef(-1);
+  const lastSlotRef = useRef(currentSlot);
+
+  // Reset refs when slot changes
+  if (currentSlot !== lastSlotRef.current) {
+    mapIndexRef.current = -1;
+    visibleMapPointsRef.current = [];
+    blobIndexRef.current = -1;
+    deduplicatedBlobDataRef.current = [];
+    continentalIndicesRef.current = [];
+    visibleContinentalPropagationDataRef.current = [];
+    attestationChartValuesRef.current = [];
+    lastChartTimeRef.current = -1;
+    lastSlotRef.current = currentSlot;
+  }
+
   const timeFilteredData = useMemo<TimeFilteredData>(() => {
-    // Filter map points - only show nodes that have seen the block
-    const visibleMapPoints = slotData.mapPoints.filter(point => point.earliestSeenTime <= currentTime);
+    const mapIndex = upperBound(sortedMapPoints, point => point.earliestSeenTime, currentTime);
 
-    // Use actual attestation count (number of validators who attested) from API
+    // Only update map points if index changed
+    if (mapIndex !== mapIndexRef.current) {
+      visibleMapPointsRef.current =
+        mapIndex === sortedMapPoints.length ? sortedMapPoints : sortedMapPoints.slice(0, mapIndex);
+      mapIndexRef.current = mapIndex;
+    }
+
     const attestationCount = slotData.attestationActualCount;
     const attestationPercentage =
       slotData.attestationTotalExpected > 0 ? (attestationCount / slotData.attestationTotalExpected) * 100 : 0;
 
-    // Filter blob first seen data for BlobDataAvailability
-    const visibleBlobFirstSeenData = slotData.blobFirstSeenData.filter(point => point.time <= currentTime);
+    const blobIndex = upperBound(deduplicatedBlobTimeline, blob => blob.time, currentTime);
 
-    // Deduplicate blob data - optimized single-pass algorithm
-    const blobFirstSeenObj: Record<string, { time: number; color?: string }> = {};
-    for (let i = 0; i < visibleBlobFirstSeenData.length; i++) {
-      const point = visibleBlobFirstSeenData[i];
-      const existing = blobFirstSeenObj[point.blobId];
-      if (!existing || point.time < existing.time) {
-        blobFirstSeenObj[point.blobId] = { time: point.time, color: point.color };
-      }
+    // Only update blob data if index changed
+    if (blobIndex !== blobIndexRef.current) {
+      deduplicatedBlobDataRef.current =
+        blobIndex === deduplicatedBlobTimeline.length
+          ? deduplicatedBlobTimeline
+          : deduplicatedBlobTimeline.slice(0, blobIndex);
+      blobIndexRef.current = blobIndex;
     }
-    const deduplicatedBlobData = Object.keys(blobFirstSeenObj).map(blobId => ({
-      blobId,
-      time: blobFirstSeenObj[blobId].time,
-      color: blobFirstSeenObj[blobId].color,
-    }));
 
-    // Filter continental propagation data for BlobDataAvailability
-    const visibleContinentalPropagationData = slotData.blobContinentalPropagationData.map(continent => ({
-      ...continent,
-      data: continent.data.filter(point => point.time <= currentTime),
-    }));
-
-    // Pre-compute attestation chart data for AttestationArrivals
-    // Use pre-computed static TIME_POINTS array
-    const timeToCountMap = new Map(slotData.attestationData.map(p => [p.time, p.count]));
-    const attestationChartValues = TIME_POINTS.map(time => {
-      if (time > currentTime) return null;
-      return timeToCountMap.get(time) ?? 0;
+    // Only update continental data if any index changed
+    let continentalChanged = false;
+    const newContinentalIndices = sortedContinentalSeries.map((continent, idx) => {
+      const dataIndex = upperBound(continent.data, point => point.time, currentTime);
+      if (continentalIndicesRef.current[idx] !== dataIndex) {
+        continentalChanged = true;
+      }
+      return dataIndex;
     });
 
+    if (continentalChanged || continentalIndicesRef.current.length !== newContinentalIndices.length) {
+      visibleContinentalPropagationDataRef.current = sortedContinentalSeries.map((continent, idx) => {
+        const dataIndex = newContinentalIndices[idx];
+        return dataIndex === continent.data.length
+          ? continent
+          : {
+              ...continent,
+              data: continent.data.slice(0, dataIndex),
+            };
+      });
+      continentalIndicesRef.current = newContinentalIndices;
+    }
+
+    // Only rebuild attestation chart values when needed
+    // Round currentTime to nearest 50ms to avoid rebuilding on every frame
+    const roundedTime = Math.floor(currentTime / 50) * 50;
+    if (roundedTime !== lastChartTimeRef.current) {
+      attestationChartValuesRef.current = TIME_POINTS.map(time => {
+        if (time > currentTime) return null;
+        return attestationTimeToCount.get(time) ?? 0;
+      });
+      lastChartTimeRef.current = roundedTime;
+    }
+
     return {
-      visibleMapPoints,
+      visibleMapPoints: visibleMapPointsRef.current,
       attestationCount,
       attestationPercentage,
-      deduplicatedBlobData,
-      visibleContinentalPropagationData,
-      attestationChartValues,
+      deduplicatedBlobData: deduplicatedBlobDataRef.current,
+      visibleContinentalPropagationData: visibleContinentalPropagationDataRef.current,
+      attestationChartValues: attestationChartValuesRef.current,
     };
   }, [
-    TIME_POINTS,
-    slotData.mapPoints,
-    slotData.attestationData,
-    slotData.attestationTotalExpected,
+    sortedMapPoints,
+    deduplicatedBlobTimeline,
+    sortedContinentalSeries,
+    attestationTimeToCount,
     slotData.attestationActualCount,
-    slotData.blobFirstSeenData,
-    slotData.blobContinentalPropagationData,
+    slotData.attestationTotalExpected,
     currentTime,
   ]);
 
@@ -134,7 +194,12 @@ export function SlotViewLayout({ mode }: SlotViewLayoutProps): JSX.Element {
           {/* Map Section - takes all remaining vertical space */}
           <div className="min-h-0 flex-1 overflow-hidden">
             <div className="h-full w-full">
-              <MapChart points={timeFilteredData.visibleMapPoints} height="100%" pointSize={6} />
+              <Map2DChart
+                points={timeFilteredData.visibleMapPoints}
+                height="100%"
+                pointSizeMultiplier={1.2}
+                resetKey={currentSlot}
+              />
             </div>
           </div>
         </div>

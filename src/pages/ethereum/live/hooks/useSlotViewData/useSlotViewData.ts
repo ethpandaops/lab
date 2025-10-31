@@ -33,13 +33,7 @@ export function useSlotViewData(currentSlot: number): SlotViewData {
   // Convert slot to timestamp for API calls
   const slotStartDateTime = useMemo(() => {
     if (!currentNetwork || currentSlot === 0) return 0;
-    const timestamp = slotToTimestamp(currentSlot, currentNetwork.genesis_time);
-    console.log('[useSlotViewData] timestamp calculation:', {
-      currentSlot,
-      genesisTime: currentNetwork.genesis_time,
-      calculatedTimestamp: timestamp,
-    });
-    return timestamp;
+    return slotToTimestamp(currentSlot, currentNetwork.genesis_time);
   }, [currentSlot, currentNetwork]);
 
   // API Query 1: Block Head

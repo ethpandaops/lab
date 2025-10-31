@@ -1,0 +1,357 @@
+import type React from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
+import ReactECharts from 'echarts-for-react';
+import * as echarts from 'echarts';
+import type { Map2DChartProps, PointData } from './Map2D.types';
+import { useThemeColors } from '@/hooks/useThemeColors';
+import { useTheme } from '@/hooks/useTheme';
+
+/**
+ * Map2DChart - A high-performance 2D map visualization component using ECharts
+ * Much faster than the 3D version, especially for progressive data updates
+ *
+ * @example
+ * ```tsx
+ * <Map2DChart
+ *   points={[
+ *     { name: 'New York', coords: [-74.0, 40.7], value: 100 },
+ *     { name: 'London', coords: [-0.1, 51.5], value: 80 },
+ *   ]}
+ *   title="Global Node Distribution"
+ * />
+ * ```
+ */
+export function Map2DChart({
+  routes = [],
+  points = [],
+  title,
+  height = 600,
+  showEffect = false,
+  lineColor,
+  pointColor,
+  pointSizeMultiplier = 2.5,
+  mapColor: _mapColor,
+  roam = true,
+  animationDuration = 300,
+  resetKey,
+}: Map2DChartProps): React.JSX.Element {
+  const themeColors = useThemeColors();
+  const { theme } = useTheme();
+  const [mapLoaded, setMapLoaded] = useState(false);
+  const chartRef = useRef<ReactECharts | null>(null);
+  const allSeenPointsRef = useRef<Map<string, PointData>>(new Map());
+  const previousResetKeyRef = useRef(resetKey);
+
+  // Use refs for values that are used in the effect but shouldn't trigger re-renders
+  const pointColorRef = useRef(pointColor || themeColors.primary);
+  const pointSizeMultiplierRef = useRef(pointSizeMultiplier);
+  const foregroundColorRef = useRef(themeColors.foreground);
+
+  // Update refs when props change
+  pointColorRef.current = pointColor || themeColors.primary;
+  pointSizeMultiplierRef.current = pointSizeMultiplier;
+  foregroundColorRef.current = themeColors.foreground;
+
+  // Load and register world map on mount
+  useEffect(() => {
+    const loadWorldMap = async (): Promise<void> => {
+      try {
+        // Fetch world map GeoJSON from local public directory
+        const response = await fetch('/data/maps/world.json');
+        const worldGeoJson = await response.json();
+
+        // Register the map with echarts
+        echarts.registerMap('world', worldGeoJson);
+        setMapLoaded(true);
+      } catch (error) {
+        console.error('Failed to load world map:', error);
+        setMapLoaded(false);
+      }
+    };
+
+    loadWorldMap();
+  }, []);
+
+  // Track all points seen during this slot and update chart
+  useEffect(() => {
+    if (!chartRef.current || !mapLoaded) return;
+
+    const chart = chartRef.current.getEchartsInstance();
+    if (!chart) return;
+
+    // Check if resetKey changed - if so, reset everything
+    const isReset = resetKey !== previousResetKeyRef.current;
+    if (isReset) {
+      previousResetKeyRef.current = resetKey;
+      allSeenPointsRef.current.clear();
+    }
+
+    // Add all current points to the set of seen points (accumulate over time)
+    // Filter out points without valid coordinates
+    let hasNewPoints = false;
+    points.forEach(point => {
+      // Skip points without valid coordinates
+      if (!point.coords || point.coords.length < 2 || point.coords[0] == null || point.coords[1] == null) {
+        return;
+      }
+      const key = `${point.coords[0]},${point.coords[1]}`;
+      if (!allSeenPointsRef.current.has(key)) {
+        allSeenPointsRef.current.set(key, point);
+        hasNewPoints = true;
+      }
+    });
+
+    // Update chart if we have new points or just reset
+    if (hasNewPoints || isReset) {
+      const allPoints = Array.from(allSeenPointsRef.current.values());
+      const pointData = allPoints.map(point => ({
+        name: point.name,
+        value: [...point.coords, point.value || 1],
+      }));
+
+      const currentOption = chart.getOption();
+
+      if (!currentOption || !currentOption.series) {
+        return;
+      }
+
+      const series = currentOption.series as Array<Record<string, unknown>>;
+      const scatterSeriesIndex = series.findIndex(s => s.type === 'scatter');
+
+      if (scatterSeriesIndex !== -1) {
+        // Rebuild complete scatter series with new data
+        chart.setOption(
+          {
+            series: [
+              {
+                type: 'scatter',
+                coordinateSystem: 'geo',
+                zlevel: 3,
+                symbol: 'circle',
+                symbolSize: (value: number[]) => {
+                  const pointValue = value[2] || 1;
+                  const baseSize = 3;
+                  const maxSize = 7;
+                  const size = Math.min(maxSize, baseSize + Math.log(pointValue + 1) * 0.8);
+                  return size * pointSizeMultiplierRef.current;
+                },
+                itemStyle: {
+                  color: pointColorRef.current,
+                  opacity: 0.85,
+                  shadowBlur: 3,
+                  shadowColor: pointColorRef.current,
+                  shadowOffsetX: 0,
+                  shadowOffsetY: 0,
+                  borderWidth: 0,
+                  borderColor: 'transparent',
+                },
+                emphasis: {
+                  scale: 1.4,
+                  focus: 'self',
+                  itemStyle: {
+                    opacity: 0.95,
+                    shadowBlur: 6,
+                    borderWidth: 1,
+                    borderColor: foregroundColorRef.current,
+                  },
+                },
+                data: pointData,
+                large: true,
+                largeThreshold: 1000,
+                progressive: 500,
+                progressiveThreshold: 1000,
+                animation: false,
+              },
+            ],
+          },
+          { replaceMerge: ['series'] }
+        );
+      }
+    }
+  }, [points, mapLoaded, resetKey]);
+
+  // Prepare initial options - only calculated once on mount
+  // We update data via setOption in useEffect, so option should never recalculate
+  const option = useMemo(() => {
+    const series: Array<Record<string, unknown>> = [];
+
+    // Add routes series (lines) if there are routes
+    if (routes.length > 0) {
+      const routeData = routes.map(route => ({
+        coords: [route.from, route.to],
+        name: route.name,
+      }));
+
+      series.push({
+        type: showEffect ? 'lines' : 'lines',
+        coordinateSystem: 'geo',
+        zlevel: 2,
+        effect: showEffect
+          ? {
+              show: true,
+              period: 6,
+              trailLength: 0.1,
+              symbolSize: 3,
+              color: lineColor || themeColors.primary,
+            }
+          : undefined,
+        lineStyle: {
+          width: 1,
+          color: lineColor || themeColors.primary,
+          opacity: 0.3,
+          curveness: 0.2,
+        },
+        data: routeData,
+        // Performance optimizations
+        progressive: 500,
+        progressiveThreshold: 1000,
+      });
+    }
+
+    // Always create scatter series (starts empty, data appended via effect)
+    series.push({
+      type: 'scatter',
+      coordinateSystem: 'geo',
+      zlevel: 3,
+      symbol: 'circle',
+      symbolSize: (value: number[]) => {
+        // Scale point size based on value (index 2 is the value)
+        const pointValue = value[2] || 1;
+        // Small, clean node sizes following best practices
+        const baseSize = 3;
+        const maxSize = 7;
+        const size = Math.min(maxSize, baseSize + Math.log(pointValue + 1) * 0.8);
+        return size * pointSizeMultiplier;
+      },
+      itemStyle: {
+        color: pointColor || themeColors.primary,
+        opacity: 0.85,
+        shadowBlur: 3,
+        shadowColor: pointColor || themeColors.primary,
+        shadowOffsetX: 0,
+        shadowOffsetY: 0,
+        borderWidth: 0,
+        borderColor: 'transparent',
+      },
+      emphasis: {
+        scale: 1.4,
+        focus: 'self',
+        itemStyle: {
+          opacity: 0.95,
+          shadowBlur: 6,
+          borderWidth: 1,
+          borderColor: themeColors.foreground,
+        },
+      },
+      data: [], // Start empty, will be populated by effect
+      // Performance optimizations for large datasets
+      large: true,
+      largeThreshold: 1000,
+      progressive: 500,
+      progressiveThreshold: 1000,
+      animation: false, // Disable animation for better append performance
+    });
+
+    return {
+      backgroundColor: 'transparent',
+      animation: false, // Disable animation for progressive updates
+      animationDuration,
+      animationEasing: 'cubicOut',
+      tooltip: {
+        show: true,
+        trigger: 'item',
+        backgroundColor: `${themeColors.surface}f0`, // f0 = ~94% opacity in hex
+        borderColor: themeColors.border,
+        borderWidth: 1,
+        textStyle: {
+          color: themeColors.foreground,
+        },
+        formatter: (params: Record<string, unknown>) => {
+          const seriesType = params.seriesType as string | undefined;
+          const data = params.data as Record<string, unknown> | undefined;
+          const name = params.name as string | undefined;
+
+          if (seriesType === 'scatter' && data) {
+            const pointName = (data.name as string) || 'Unknown';
+            const valueArray = data.value as number[] | undefined;
+            const value = valueArray?.[2] ?? (data.value as number) ?? 0;
+            return `<strong>${pointName}</strong><br/>Nodes: ${value}`;
+          }
+          if (seriesType === 'lines' && data) {
+            return (data.name as string) || 'Route';
+          }
+          return name || '';
+        },
+      },
+      title: title
+        ? {
+            text: title,
+            textStyle: {
+              color: themeColors.foreground,
+              fontSize: 16,
+              fontWeight: 600,
+            },
+            left: 'center',
+            top: 8,
+          }
+        : undefined,
+      geo: {
+        map: 'world',
+        roam: roam,
+        silent: false,
+        center: [20, 20], // Center slightly towards Europe
+        zoom: 1.2, // Balanced zoom level
+        itemStyle: {
+          areaColor: `${themeColors.muted}15`, // 15 = ~8% opacity in hex
+          borderColor: `${themeColors.border}30`, // 30 = ~19% opacity in hex
+          borderWidth: 0.5,
+        },
+        emphasis: {
+          itemStyle: {
+            areaColor: `${themeColors.muted}30`, // Slightly more visible on hover
+          },
+          label: {
+            show: false,
+          },
+        },
+        // Performance: only render on move end
+        renderOnMoving: false,
+      },
+      series,
+    };
+    // Depend on the actual color values (primitives) to avoid stale theme colors
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    mapLoaded,
+    theme,
+    themeColors.primary,
+    themeColors.muted,
+    themeColors.accent,
+    themeColors.foreground,
+    themeColors.border,
+  ]);
+
+  // Don't render until map is loaded
+  if (!mapLoaded) {
+    return (
+      <div className="flex w-full items-center justify-center" style={{ height }}>
+        <div className="text-foreground">Loading map...</div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="h-full w-full">
+      <ReactECharts
+        ref={chartRef}
+        option={option}
+        style={{ height, width: '100%', minHeight: height }}
+        notMerge={false}
+        lazyUpdate={true}
+        opts={{
+          renderer: 'canvas', // Explicitly use canvas for best performance
+        }}
+      />
+    </div>
+  );
+}
