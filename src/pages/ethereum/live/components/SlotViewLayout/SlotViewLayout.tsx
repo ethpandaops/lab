@@ -258,26 +258,32 @@ export function SlotViewLayout({ mode }: SlotViewLayoutProps): JSX.Element {
           />
         </div>
 
-        {/* Slot Time Progress - 50px */}
-        <div className="h-[50px] shrink-0 border-b border-border bg-surface px-3 py-2">
-          <SlotTimeline
-            phases={slotData.sidebarPhases}
-            currentTime={currentTime}
-            slotDuration={12000}
-            showInlineLabels={false}
-            showTimeCutovers={false}
-            height={32}
-            onTimeClick={handleTimeClick}
-          />
+        {/* Slot Time Progress - 65px (increased for labels) */}
+        <div className="h-[65px] shrink-0 border-b border-border bg-surface px-3 py-2">
+          <div className="flex items-center gap-2">
+            <span className="text-xl font-semibold text-foreground">{(currentTime / 1000).toFixed(1)}</span>
+            <span className="text-xs text-muted">s</span>
+            <div className="flex-1">
+              <SlotTimeline
+                phases={slotData.sidebarPhases}
+                currentTime={currentTime}
+                slotDuration={12000}
+                showInlineLabels={false}
+                showTimeCutovers={true}
+                height={40}
+                onTimeClick={handleTimeClick}
+              />
+            </div>
+          </div>
         </div>
 
-        {/* Slim Timeline - 100px */}
-        <div className="h-[100px] shrink-0 border-b border-border">
+        {/* Slim Timeline - 90px (reduced to fit time progress) */}
+        <div className="h-[90px] shrink-0 overflow-hidden border-b border-border bg-surface">
           <ScrollingTimeline items={slotData.sidebarItems} currentTime={currentTime} autoScroll={true} />
         </div>
 
-        {/* Map - 280px (reduced to fit progress bar) */}
-        <div className="h-[280px] shrink-0 overflow-hidden bg-background">
+        {/* Map - 270px (slightly reduced) */}
+        <div className="h-[270px] shrink-0 overflow-hidden bg-background">
           <Map2DChart
             points={timeFilteredData.visibleMapPoints}
             height="100%"

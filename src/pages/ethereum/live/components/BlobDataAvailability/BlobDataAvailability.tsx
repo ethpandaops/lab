@@ -54,9 +54,10 @@ function BlobDataAvailabilityComponent({
         },
         left: 16,
         top: 12,
+        show: window.innerWidth >= 768,
       },
       grid: {
-        top: 48,
+        top: window.innerWidth >= 768 ? 48 : 20,
         bottom: 20,
         containLabel: true,
       },
@@ -127,9 +128,12 @@ function BlobDataAvailabilityComponent({
         },
         left: 16,
         top: 12,
+        // Hide title on mobile - tab already provides label
+        show: window.innerWidth >= 768,
       },
       grid: {
-        top: 48,
+        // Mobile: smaller top padding since no title
+        top: window.innerWidth >= 768 ? 48 : 20,
         bottom: 40, // Increased to make room for legend
         containLabel: true,
       },
