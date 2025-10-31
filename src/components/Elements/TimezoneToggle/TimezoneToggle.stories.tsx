@@ -30,7 +30,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-function LiveDateExample() {
+function LiveDateExample(): JSX.Element {
   const { timezone } = useTimezone();
   const now = new Date();
   const exampleDate = new Date('2025-10-31T14:30:00Z'); // Fixed example date
@@ -68,7 +68,7 @@ function LiveDateExample() {
   );
 }
 
-function CompactLiveDateExample() {
+function CompactLiveDateExample(): JSX.Element {
   const { timezone } = useTimezone();
   const exampleDate = new Date('2025-10-31T14:30:00Z');
 
