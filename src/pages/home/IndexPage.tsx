@@ -6,7 +6,7 @@ import { AlgorithmicArt } from './components/AlgorithmicArt';
 
 export function IndexPage(): JSX.Element {
   return (
-    <div className="relative h-screen overflow-hidden">
+    <div className="relative h-[calc(100dvh-65px)] overflow-hidden lg:h-screen">
       {/* Full-page Network Visualization - fills viewport */}
       <div className="absolute inset-0 z-0">
         <AlgorithmicArt height={typeof window !== 'undefined' ? window.innerHeight : 800} seed={12345} speed={1} />
@@ -14,7 +14,7 @@ export function IndexPage(): JSX.Element {
 
       {/* Content Layer - positioned on top of visualization */}
       <div className="absolute inset-0 z-20 overflow-y-auto">
-        <div className="flex min-h-screen flex-col px-4 pt-20 sm:pt-40">
+        <div className="flex min-h-full flex-col px-4 pt-20 sm:pt-40">
           {/* Hero Section - centered and spacious */}
           <div className="mb-16 flex flex-col items-center text-center sm:mb-48">
             {/* Main Title - matching sidebar style */}
