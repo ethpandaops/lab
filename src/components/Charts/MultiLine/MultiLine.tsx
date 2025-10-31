@@ -348,14 +348,12 @@ export function MultiLineChart({
 
     // Calculate grid padding
     // Title is always rendered by component, never by ECharts
-    // ECharts v6: containLabel is deprecated, grid now handles label containment by default
+    // ECharts v6: grid now handles label containment by default with explicit padding
     const gridConfig = {
       top: grid?.top ?? 16,
       right: grid?.right ?? 16,
       bottom: grid?.bottom ?? (xAxis.name ? 50 : 24),
       left: grid?.left ?? (yAxis?.name ? 50 : 16),
-      // ECharts v6 handles overflow prevention by default
-      containLabel: true, // Ensures axis labels don't get cut off
     };
 
     // Create default smart tooltip formatter

@@ -167,6 +167,13 @@ export function Map2DChart({
   // Prepare initial options - only calculated once on mount
   // We update data via setOption in useEffect, so option should never recalculate
   const option = useMemo(() => {
+    // Don't create option until map is loaded to avoid accessing undefined map data
+    if (!mapLoaded) {
+      return {
+        backgroundColor: 'transparent',
+      };
+    }
+
     const series: Array<Record<string, unknown>> = [];
 
     // Add routes series (lines) if there are routes
@@ -272,6 +279,7 @@ export function Map2DChart({
       series,
     };
   }, [
+    mapLoaded,
     routes,
     showEffect,
     lineColor,

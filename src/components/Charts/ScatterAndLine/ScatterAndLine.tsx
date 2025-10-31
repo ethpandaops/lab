@@ -88,7 +88,6 @@ export function ScatterAndLineChart({
         right: yAxis2Title ? 80 : 24,
         bottom: showLegend && legendPosition === 'bottom' ? 80 : 48,
         left: 64,
-        containLabel: true,
       },
       xAxis: {
         type: 'value' as const,

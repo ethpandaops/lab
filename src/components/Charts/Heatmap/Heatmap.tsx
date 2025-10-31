@@ -73,9 +73,6 @@ export function HeatmapChart({
       right: showVisualMap ? 90 : 16,
       bottom: 28,
       left: 64,
-      // containLabel: true ensures axis labels are contained within the grid
-      // This is the recommended approach for most use cases
-      containLabel: true,
     },
     xAxis: {
       type: 'category',
