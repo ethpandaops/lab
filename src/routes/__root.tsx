@@ -86,12 +86,22 @@ function RootComponent(): JSX.Element {
     };
   }, []);
 
-  // Close sidebar on route navigation (path changes only, not search params)
+  // Close sidebar on route navigation (path changes or network search param changes)
   useEffect(() => {
+    let previousNetwork: string | undefined;
+
     const unsubscribe = router.subscribe('onBeforeLoad', event => {
-      // Only close sidebar if the path actually changed, not just search params
+      // Close sidebar if the path changed
       if (event.pathChanged) {
         setSidebarOpen(false);
+        return;
+      }
+
+      // Close sidebar if the network search param changed or was removed
+      const currentNetwork = (event.toLocation.search as Record<string, unknown>)?.network as string | undefined;
+      if (currentNetwork !== previousNetwork) {
+        setSidebarOpen(false);
+        previousNetwork = currentNetwork;
       }
     });
 
