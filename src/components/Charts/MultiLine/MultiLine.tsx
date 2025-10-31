@@ -289,7 +289,7 @@ export function MultiLineChart({
 
   // Build series configuration
   // Note: Don't filter by visible property here - displayedSeries already handles visibility via visibleSeries state
-  const seriesConfig = displayedSeries.map(s => {
+  const seriesConfig = displayedSeries.map((s, idx) => {
     // Use explicit color or auto-assign from palette
     const originalIndex = series.indexOf(s);
     const seriesColor = s.color || extendedPalette[originalIndex % extendedPalette.length];
@@ -311,6 +311,35 @@ export function MultiLineChart({
       itemStyle: {
         color: seriesColor,
       },
+      // Add markLine to the first series only
+      ...(idx === 0 && markLines && markLines.length > 0
+        ? {
+            markLine: {
+              symbol: 'none',
+              silent: false,
+              animation: false,
+              label: {
+                show: true,
+                position: 'end' as const,
+                formatter: (params: { name?: string }) => params.name || '',
+                color: themeColors.foreground,
+                fontSize: 12,
+              },
+              lineStyle: {
+                type: 'dotted' as const,
+              },
+              data: markLines.map(line => ({
+                name: line.label,
+                yAxis: line.value,
+                lineStyle: {
+                  color: line.color || themeColors.danger,
+                  type: line.lineStyle || ('dotted' as const),
+                  width: 2,
+                },
+              })),
+            },
+          }
+        : {}),
     };
 
     // Add area style if requested
@@ -437,44 +466,9 @@ export function MultiLineChart({
     appendToBody: true, // Render tooltip in document body to prevent container clipping
   };
 
-  // Add markLine as a separate invisible series
-  const markLineSeries =
-    markLines && markLines.length > 0
-      ? {
-          name: '_markLine',
-          type: 'line' as const,
-          data: [],
-          markLine: {
-            symbol: 'none',
-            silent: false,
-            label: {
-              show: true,
-              position: 'end' as const,
-              formatter: (params: { name?: string }) => params.name || '',
-              color: themeColors.foreground,
-              fontSize: 12,
-            },
-            lineStyle: {
-              type: 'dotted' as const,
-            },
-            data: markLines.map(line => ({
-              name: line.label,
-              yAxis: line.value,
-              lineStyle: {
-                color: line.color || themeColors.danger,
-                type: line.lineStyle || ('dotted' as const),
-                width: 2,
-              },
-            })),
-          },
-        }
-      : null;
-
   // Build complete option
   // Memoize based on actual data that should trigger re-animation, not intermediate objects
   const option = useMemo(() => {
-    const allSeries = markLineSeries ? [...seriesConfig, markLineSeries] : seriesConfig;
-
     return {
       animation: true,
       animationDuration,
@@ -487,7 +481,7 @@ export function MultiLineChart({
       grid: gridConfig,
       xAxis: xAxisConfig,
       yAxis: yAxisConfig,
-      series: allSeries,
+      series: seriesConfig,
       tooltip: tooltipConfig,
       dataZoom: enableDataZoom
         ? [
@@ -511,7 +505,6 @@ export function MultiLineChart({
     xAxisConfig,
     yAxisConfig,
     tooltipConfig,
-    markLineSeries,
   ]);
 
   const chartContent = (
