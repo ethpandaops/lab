@@ -95,7 +95,7 @@ export function BoxPlot({
     const maxDataLength = Math.max(...series.map(s => s.data.length), 1);
     const xAxisData = categories || Array.from({ length: maxDataLength }, (_, i) => String(i + 1));
 
-    // Legend configuration
+    // Legend configuration - simplified with automatic positioning
     const legendConfig =
       showLegend && series.length > 1
         ? {
@@ -107,20 +107,6 @@ export function BoxPlot({
             [legendPosition]: legendPosition === 'top' || legendPosition === 'bottom' ? 0 : 10,
           }
         : undefined;
-
-    // Calculate grid padding based on legend position
-    const getGridPadding = (): { top: number; right: number; bottom: number; left: number } => {
-      const basePadding = { top: title ? 52 : 10, right: 20, bottom: 40, left: 20 };
-
-      if (showLegend && series.length > 1) {
-        if (legendPosition === 'top') basePadding.top += 30;
-        if (legendPosition === 'bottom') basePadding.bottom += 30;
-        if (legendPosition === 'left') basePadding.left += 100;
-        if (legendPosition === 'right') basePadding.right += 100;
-      }
-
-      return basePadding;
-    };
 
     return {
       animation: true,
@@ -141,7 +127,10 @@ export function BoxPlot({
         : undefined,
       legend: legendConfig,
       grid: {
-        ...getGridPadding(),
+        top: title ? 40 : 16,
+        right: undefined,
+        bottom: xAxisTitle ? 50 : 30,
+        left: yAxisTitle ? 65 : 10,
         // ECharts v6: use outerBounds instead of deprecated containLabel
         outerBoundsMode: 'same' as const,
         outerBoundsContain: 'axisLabel' as const,

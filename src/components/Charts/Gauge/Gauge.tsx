@@ -64,31 +64,35 @@ export function Gauge({
   const themeColors = useThemeColors();
 
   const option = useMemo(() => {
-    // Calculate grid layout based on number of gauges
     const gaugeCount = data.length;
+
+    // Calculate responsive grid layout
     const columns = gaugeCount === 1 ? 1 : gaugeCount === 2 ? 2 : gaugeCount <= 4 ? 2 : 3;
     const rows = Math.ceil(gaugeCount / columns);
 
-    // Create series for each gauge
+    // Create series for each gauge with native ECharts positioning
     const series = data.map((item, index) => {
       const percentage = item.max > 0 ? (item.value / item.max) * 100 : 0;
 
-      // Calculate grid position
+      // Calculate center position for grid layout
       const row = Math.floor(index / columns);
       const col = index % columns;
       const cellWidth = 100 / columns;
       const cellHeight = 100 / rows;
 
+      // Responsive font sizing based on gauge count
+      const detailFontSize = gaugeCount === 1 ? 32 : gaugeCount <= 4 ? 24 : 18;
+
       return {
         type: 'gauge' as const,
         radius: `${radius}%`,
-        // Position in grid
         center: [`${col * cellWidth + cellWidth / 2}%`, `${row * cellHeight + cellHeight / 2}%`],
         startAngle: 225,
         endAngle: -45,
         min: 0,
         max: 100,
         splitNumber: 4,
+        // Progress bar (new in ECharts 5.0+)
         progress: {
           show: true,
           width: gaugeWidth,
@@ -96,6 +100,7 @@ export function Gauge({
             color: item.color || CHART_CATEGORICAL_COLORS[index % CHART_CATEGORICAL_COLORS.length],
           },
         },
+        // Background track
         axisLine: {
           lineStyle: {
             width: gaugeWidth,
@@ -114,6 +119,7 @@ export function Gauge({
         pointer: {
           show: false,
         },
+        // Gauge name below the percentage
         title: {
           show: true,
           offsetCenter: [0, '85%'],
@@ -121,17 +127,15 @@ export function Gauge({
           color: themeColors.muted,
           fontWeight: 500,
         },
+        // Percentage value in center
         detail: {
           show: showPercentage,
           valueAnimation: true,
-          fontSize: gaugeCount === 1 ? 32 : gaugeCount <= 4 ? 24 : 18,
+          fontSize: detailFontSize,
           fontWeight: 600,
           color: themeColors.foreground,
           offsetCenter: [0, '10%'],
-          formatter: (value: number) => {
-            const displayValue = value.toFixed(percentageDecimals);
-            return `${displayValue}%`;
-          },
+          formatter: (value: number) => `${value.toFixed(percentageDecimals)}%`,
         },
         data: [
           {
@@ -149,6 +153,7 @@ export function Gauge({
       animation: true,
       animationDuration,
       animationEasing: 'cubicOut',
+      // Use ECharts native title component
       title: title
         ? {
             text: title,
@@ -188,8 +193,8 @@ export function Gauge({
         echarts={echarts}
         option={option}
         style={{ height, width: '100%', minHeight: height }}
-        notMerge={true}
-        lazyUpdate={false}
+        notMerge={false}
+        lazyUpdate={true}
       />
     </div>
   );

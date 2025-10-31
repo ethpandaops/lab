@@ -313,11 +313,8 @@ export function MultiLineChart({
       },
       // Add markLine to ALL series (workaround - ECharts sometimes doesn't render markLine on smooth series)
       ...(markLines && markLines.length > 0
-        ? (() => {
-            if (idx === 0) {
-              console.log('[MultiLine] Adding markLine. markLines:', markLines);
-            }
-            const markLineConfig = {
+        ? {
+            markLine: {
               symbol: 'none',
               silent: false,
               animation: false,
@@ -340,18 +337,14 @@ export function MultiLineChart({
                   width: 3,
                 },
               })),
-            };
-            if (idx === 0) {
-              console.log('[MultiLine] markLine config:', markLineConfig);
-            }
-            return { markLine: markLineConfig };
-          })()
+            },
+          }
         : {}),
     };
 
     // Add area style if requested
     if (s.showArea) {
-      const configWithArea = {
+      return {
         ...baseConfig,
         areaStyle: {
           color:
@@ -376,22 +369,10 @@ export function MultiLineChart({
                 },
         },
       };
-      if (idx === 0) {
-        console.log('[MultiLine] First series (WITH AREA) final config:', configWithArea);
-        console.log('[MultiLine] Has markLine?', 'markLine' in configWithArea);
-      }
-      return configWithArea;
     }
 
-    if (idx === 0) {
-      console.log('[MultiLine] First series (NO AREA) final config:', baseConfig);
-      console.log('[MultiLine] Has markLine?', 'markLine' in baseConfig);
-    }
     return baseConfig;
   });
-
-  console.log('[MultiLine] Total series count:', seriesConfig.length);
-  console.log('[MultiLine] First series in array:', seriesConfig[0]);
 
   // Calculate grid padding
   // Title is always rendered by component, never by ECharts

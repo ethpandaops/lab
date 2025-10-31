@@ -19,8 +19,6 @@ export interface Map2DChartProps {
   lineColor?: string;
   pointColor?: string;
   pointSizeMultiplier?: number;
-  mapColor?: string;
   roam?: boolean | 'scale' | 'move';
-  animationDuration?: number;
   resetKey?: string | number; // When this changes, chart data is reset
 }

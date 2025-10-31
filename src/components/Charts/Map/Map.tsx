@@ -1,7 +1,6 @@
 import type React from 'react';
-import { useState, useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import ReactECharts from 'echarts-for-react';
-import type { ECharts } from 'echarts';
 import * as echarts from 'echarts';
 // Use selective imports to avoid "geo3D exists" warning (ECharts v6 + echarts-gl)
 import { Lines3DChart, Scatter3DChart } from 'echarts-gl/charts';
@@ -52,7 +51,6 @@ export function MapChart({
 }: MapChartProps): React.JSX.Element {
   const themeColors = useThemeColors();
   const { theme } = useTheme();
-  const [echartsInstance, setEchartsInstance] = useState<ECharts | null>(null);
   const [mapLoaded, setMapLoaded] = useState(false);
 
   // Convert OKLCH colors (from Tailwind v4) to hex format for ECharts compatibility
@@ -63,44 +61,54 @@ export function MapChart({
 
   // Load and register world map on mount
   useEffect(() => {
-    const loadWorldMap = async (): Promise<void> => {
-      try {
-        // Fetch world map GeoJSON from local public directory
-        const response = await fetch('/data/maps/world.json');
-        const worldGeoJson = await response.json();
-
-        // Register the map with echarts
-        echarts.registerMap('world', worldGeoJson);
+    // Check if map is already registered
+    let alreadyRegistered = false;
+    try {
+      const existingMap = echarts.getMap('world');
+      if (existingMap) {
+        alreadyRegistered = true;
         setMapLoaded(true);
-      } catch (error) {
-        console.error('Failed to load world map:', error);
-        setMapLoaded(false);
       }
-    };
+    } catch {
+      // Map not registered yet
+    }
 
-    loadWorldMap();
+    if (!alreadyRegistered) {
+      const loadWorldMap = async (): Promise<void> => {
+        try {
+          // Fetch world map GeoJSON from local public directory
+          const response = await fetch('/data/maps/world.json');
+          const worldGeoJson = await response.json();
+
+          // Register the map with echarts
+          echarts.registerMap('world', worldGeoJson);
+          setMapLoaded(true);
+        } catch (error) {
+          console.error('Failed to load world map:', error);
+          setMapLoaded(false);
+        }
+      };
+
+      loadWorldMap();
+    }
   }, []);
 
   // Prepare options and memoize to avoid unnecessary re-renders
   const option = useMemo(() => {
-    // Prepare route data for lines3D
-    const routeData = routes.map(route => ({
-      coords: [route.from, route.to],
-      name: route.name,
-    }));
-
-    // Prepare point data for scatter3D
-    const pointData = points.map(point => ({
-      name: point.name,
-      value: [...point.coords, point.value || 1],
-    }));
-
-    const series: Array<Record<string, unknown>> = [];
+    // Don't create option until map is loaded to avoid accessing undefined map data
+    if (!mapLoaded) {
+      return {
+        backgroundColor: 'transparent',
+      };
+    }
 
     // Determine theme-aware defaults (treat both dark and star as dark themes)
     const isDark = theme === 'dark' || theme === 'star';
 
-    // Add routes series if there are routes
+    // Prepare series data
+    const series: Array<Record<string, unknown>> = [];
+
+    // Add lines3D series for routes if present
     if (routes.length > 0) {
       series.push({
         type: 'lines3D',
@@ -120,11 +128,14 @@ export function MapChart({
           color: convertedLineColor || CHART_CATEGORICAL_COLORS[0],
           opacity: 0.05,
         },
-        data: routeData,
+        data: routes.map(route => ({
+          coords: [route.from, route.to],
+          name: route.name,
+        })),
       });
     }
 
-    // Add points series if there are points
+    // Add scatter3D series for points if present
     if (points.length > 0) {
       series.push({
         type: 'scatter3D',
@@ -143,7 +154,10 @@ export function MapChart({
             show: false,
           },
         },
-        data: pointData,
+        data: points.map(point => ({
+          name: point.name,
+          value: [...point.coords, point.value || 1],
+        })),
       });
     }
 
@@ -191,6 +205,12 @@ export function MapChart({
         },
         postEffect: {
           enable: true,
+          SSAO: {
+            enable: true,
+            radius: 2,
+            intensity: 1,
+            quality: 'medium',
+          },
         },
         groundPlane: {
           show: false,
@@ -205,10 +225,10 @@ export function MapChart({
           },
         },
         viewControl: {
-          distance: distance,
-          alpha: alpha,
-          minDistance: minDistance,
-          maxDistance: maxDistance,
+          distance,
+          alpha,
+          minDistance,
+          maxDistance,
           panMouseButton: 'left',
           rotateMouseButton: 'right',
           autoRotate: false,
@@ -217,11 +237,12 @@ export function MapChart({
         itemStyle: {
           color: convertedMapColor || themeColors.muted,
         },
-        regionHeight: regionHeight,
+        regionHeight,
       },
       series,
     };
   }, [
+    mapLoaded,
     routes,
     points,
     title,
@@ -240,13 +261,6 @@ export function MapChart({
     theme,
   ]);
 
-  useEffect(() => {
-    if (echartsInstance) {
-      // Re-render when options change
-      echartsInstance.setOption(option);
-    }
-  }, [echartsInstance, option]);
-
   // Don't render until map is loaded
   if (!mapLoaded) {
     return (
@@ -261,9 +275,9 @@ export function MapChart({
       <ReactECharts
         option={option}
         style={{ height, width: '100%', minHeight: height }}
-        onChartReady={instance => setEchartsInstance(instance)}
-        notMerge={true}
-        lazyUpdate={false}
+        notMerge={false}
+        lazyUpdate={true}
+        opts={{ renderer: 'canvas' }}
       />
     </div>
   );

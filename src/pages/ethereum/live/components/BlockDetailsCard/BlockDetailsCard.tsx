@@ -9,7 +9,7 @@ function BlockDetailsCardComponent({
   slotProgressPhases,
 }: BlockDetailsCardProps): JSX.Element {
   return (
-    <Card className="h-44 p-4">
+    <Card className="h-full p-3 md:h-44 md:p-4">
       <SlotProgressTimeline phases={slotProgressPhases} mode="live" currentTime={currentTime} showStats={true} />
     </Card>
   );

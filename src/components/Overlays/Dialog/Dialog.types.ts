@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import type { ReactNode, Ref } from 'react';
 
 export type DialogSize = 'sm' | 'md' | 'lg' | 'xl' | 'full' | 'fullscreen';
 
@@ -43,4 +43,12 @@ export interface DialogProps {
    * Whether content should overflow (useful for dropdowns/selects) (default: false)
    */
   allowContentOverflow?: boolean;
+  /**
+   * Ref to the dialog panel element (for screenshot capture)
+   */
+  panelRef?: Ref<HTMLDivElement>;
+  /**
+   * Hide the close button (used during screenshot capture)
+   */
+  hideCloseButton?: boolean;
 }
