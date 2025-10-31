@@ -225,6 +225,7 @@ ComponentName/
 - Use path aliases over relative imports
 - Run `pnpm lint` and `pnpm build` before committing
 - Use `clsx` for conditional classes
+- React `useMemo`/`memo` should only be used for genuinely expensive calculations
 
 ### Naming Conventions
 
