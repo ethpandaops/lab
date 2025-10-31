@@ -5,7 +5,11 @@ import { GaugeChart } from 'echarts/charts';
 import { TitleComponent } from 'echarts/components';
 import { CanvasRenderer } from 'echarts/renderers';
 import { useThemeColors } from '@/hooks/useThemeColors';
+import { getDataVizColors } from '@/utils/dataVizColors';
 import type { GaugeProps } from './Gauge.types';
+
+// Get data visualization colors once at module level
+const { CHART_CATEGORICAL_COLORS } = getDataVizColors();
 
 // Register ECharts components
 echarts.use([GaugeChart, TitleComponent, CanvasRenderer]);
@@ -89,7 +93,7 @@ export function Gauge({
           show: true,
           width: gaugeWidth,
           itemStyle: {
-            color: item.color || themeColors.primary,
+            color: item.color || CHART_CATEGORICAL_COLORS[index % CHART_CATEGORICAL_COLORS.length],
           },
         },
         axisLine: {
@@ -176,7 +180,6 @@ export function Gauge({
     themeColors.foreground,
     themeColors.muted,
     themeColors.border,
-    themeColors.primary,
   ]);
 
   return (

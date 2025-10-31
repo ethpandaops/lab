@@ -5,7 +5,11 @@ import { BoxplotChart } from 'echarts/charts';
 import { GridComponent, TooltipComponent, TitleComponent, LegendComponent } from 'echarts/components';
 import { CanvasRenderer } from 'echarts/renderers';
 import { useThemeColors } from '@/hooks/useThemeColors';
+import { getDataVizColors } from '@/utils/dataVizColors';
 import type { BoxPlotProps } from './BoxPlot.types';
+
+// Get data visualization colors once at module level
+const { CHART_CATEGORICAL_COLORS } = getDataVizColors();
 
 // Register ECharts components
 echarts.use([BoxplotChart, GridComponent, TooltipComponent, TitleComponent, LegendComponent, CanvasRenderer]);
@@ -72,18 +76,8 @@ export function BoxPlot({
   const themeColors = useThemeColors();
 
   const option = useMemo(() => {
-    // Default color palette if series don't have colors
-    const defaultColors = [
-      themeColors.primary,
-      themeColors.secondary,
-      themeColors.accent,
-      '#3b82f6',
-      '#10b981',
-      '#f59e0b',
-      '#ef4444',
-      '#8b5cf6',
-      '#ec4899',
-    ];
+    // Use data visualization categorical colors for multi-series data
+    const defaultColors = CHART_CATEGORICAL_COLORS;
 
     // Process series data and assign colors
     const processedSeries = series.map((s, index) => ({
@@ -250,9 +244,6 @@ export function BoxPlot({
     themeColors.foreground,
     themeColors.border,
     themeColors.muted,
-    themeColors.primary,
-    themeColors.secondary,
-    themeColors.accent,
     themeColors.background,
   ]);
 

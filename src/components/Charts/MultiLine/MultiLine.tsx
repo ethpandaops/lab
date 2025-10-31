@@ -80,19 +80,34 @@ export function MultiLineChart({
   enableAggregateToggle = false,
   aggregateSeriesName = 'Average',
   enableSeriesFilter = false,
+  relativeSlots,
 }: MultiLineChartProps): React.JSX.Element {
   const themeColors = useThemeColors();
   const { CHART_CATEGORICAL_COLORS } = getDataVizColors();
 
+  // Helper functions for relative slot display
+  const toRelativeSlot = (absoluteSlot: number): number => {
+    if (!relativeSlots) return absoluteSlot;
+    return absoluteSlot - relativeSlots.epoch * 32 + 1;
+  };
+
+  const formatSlotLabel = (absoluteSlot: number): string => {
+    if (!relativeSlots) return formatSmartDecimal(absoluteSlot, 0);
+    const relativeSlot = toRelativeSlot(absoluteSlot);
+    return `${relativeSlot}`;
+  };
+
+  const formatSlotTooltip = (absoluteSlot: number): string => {
+    if (!relativeSlots) return formatSmartDecimal(absoluteSlot, 0);
+    const relativeSlot = toRelativeSlot(absoluteSlot);
+    return `Slot: ${formatSmartDecimal(absoluteSlot, 0)} (${relativeSlot}/32)`;
+  };
+
   // Convert OKLCH colors (from Tailwind v4) to hex format for ECharts compatibility
   const convertedColorPalette = colorPalette?.map(color => resolveCssColorToHex(color));
 
-  // Build extended palette: custom palette or theme colors + data viz categorical colors
-  const extendedPalette = convertedColorPalette || [
-    themeColors.primary,
-    themeColors.accent,
-    ...CHART_CATEGORICAL_COLORS,
-  ];
+  // Build extended palette: custom palette or data viz categorical colors
+  const extendedPalette = convertedColorPalette || CHART_CATEGORICAL_COLORS;
 
   // Manage aggregate series visibility
   const [showAggregate, setShowAggregate] = useState(false);
@@ -226,7 +241,8 @@ export function MultiLineChart({
     axisLabel: {
       color: themeColors.muted,
       fontSize: 12,
-      formatter: xAxis.formatter,
+      formatter: xAxis.formatter || (relativeSlots ? (value: number) => formatSlotLabel(value) : undefined),
+      showMaxLabel: false, // Don't force-render the max value to avoid awkward tick spacing
     },
     splitLine: {
       lineStyle: {
@@ -348,12 +364,15 @@ export function MultiLineChart({
 
           // Add x-axis label (first item's axis value)
           // For numeric x-axis, format as integer to avoid decimals like "9876543.5"
+          // When relativeSlots is enabled, show both absolute and relative values
           if (dataPoints.length > 0 && dataPoints[0]) {
             const firstPoint = dataPoints[0] as { axisValue?: string | number };
             if (firstPoint.axisValue !== undefined) {
               const axisLabel =
                 typeof firstPoint.axisValue === 'number'
-                  ? formatSmartDecimal(firstPoint.axisValue, 0) // 0 decimals = integers only
+                  ? relativeSlots
+                    ? formatSlotTooltip(firstPoint.axisValue)
+                    : formatSmartDecimal(firstPoint.axisValue, 0) // 0 decimals = integers only
                   : firstPoint.axisValue;
               html += `<div style="margin-bottom: 4px; font-weight: 600;">${axisLabel}</div>`;
             }
@@ -411,33 +430,51 @@ export function MultiLineChart({
   };
 
   // Build complete option
-  const option = {
-    animation: true,
-    animationDuration,
-    animationEasing: 'cubicOut' as const,
-    backgroundColor: 'transparent',
-    textStyle: {
-      color: themeColors.foreground,
-    },
-    // Never pass title to ECharts - component always renders it
-    grid: gridConfig,
-    xAxis: xAxisConfig,
-    yAxis: yAxisConfig,
-    series: seriesConfig,
-    tooltip: tooltipConfig,
-    dataZoom: enableDataZoom
-      ? [
-          {
-            type: 'inside' as const,
-            xAxisIndex: 0,
-            filterMode: 'none' as const,
-            zoomOnMouseWheel: false,
-            moveOnMouseWheel: false,
-            moveOnMouseMove: true,
-          },
-        ]
-      : undefined,
-  };
+  // Memoize based on actual data that should trigger re-animation, not intermediate objects
+  // Use JSON.stringify for deep comparison of complex props
+  const option = useMemo(
+    () => ({
+      animation: true,
+      animationDuration,
+      animationEasing: 'cubicOut' as const,
+      backgroundColor: 'transparent',
+      textStyle: {
+        color: themeColors.foreground,
+      },
+      // Never pass title to ECharts - component always renders it
+      grid: gridConfig,
+      xAxis: xAxisConfig,
+      yAxis: yAxisConfig,
+      series: seriesConfig,
+      tooltip: tooltipConfig,
+      dataZoom: enableDataZoom
+        ? [
+            {
+              type: 'inside' as const,
+              xAxisIndex: 0,
+              filterMode: 'none' as const,
+              zoomOnMouseWheel: false,
+              moveOnMouseWheel: false,
+              moveOnMouseMove: true,
+            },
+          ]
+        : undefined,
+    }),
+    [
+      animationDuration,
+      themeColors.foreground,
+      themeColors.border,
+      themeColors.muted,
+      JSON.stringify(series),
+      JSON.stringify(xAxis),
+      JSON.stringify(yAxis),
+      enableDataZoom,
+      showLegend,
+      enableSeriesFilter,
+      connectNulls,
+      height,
+    ]
+  );
 
   const chartContent = (
     <>

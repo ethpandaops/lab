@@ -8,7 +8,11 @@ import { Lines3DChart, Scatter3DChart } from 'echarts-gl/charts';
 import { GlobeComponent } from 'echarts-gl/components';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { resolveCssColorToHex } from '@/utils/color';
+import { getDataVizColors } from '@/utils/dataVizColors';
 import type { GlobeChartProps } from './Globe.types';
+
+// Get data visualization colors once at module level
+const { CHART_CATEGORICAL_COLORS } = getDataVizColors();
 
 // Register echarts-gl components selectively to prevent duplicate registration
 echarts.use([Lines3DChart, Scatter3DChart, GlobeComponent]);
@@ -73,12 +77,12 @@ export function GlobeChart({
               trailWidth: 2,
               trailLength: 0.15,
               trailOpacity: 1,
-              trailColor: convertedLineColor || themeColors.accent,
+              trailColor: convertedLineColor || CHART_CATEGORICAL_COLORS[0],
             }
           : undefined,
         lineStyle: {
           width: 1,
-          color: convertedLineColor || themeColors.accent,
+          color: convertedLineColor || CHART_CATEGORICAL_COLORS[0],
           opacity: 0.1,
         },
         blendMode: 'lighter',
