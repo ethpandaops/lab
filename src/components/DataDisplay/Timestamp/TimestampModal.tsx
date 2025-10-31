@@ -82,81 +82,95 @@ function TimestampModalContent({ timestamp }: TimestampModalContentProps): JSX.E
   const discordFormats = getAllDiscordFormats(timestamp);
 
   return (
-    <div className="space-y-6">
-      {/* Standard Formats Section */}
+    <div className="space-y-5">
+      {/* Standard Formats Table */}
       <section>
-        <h3 className="mb-3 text-sm/5 font-semibold text-foreground">Standard Formats</h3>
-        <div className="grid grid-cols-2 gap-2">
-          <TimestampField
-            label="Local Time"
-            value={localTimestamp}
-            onCopy={() => handleCopy(localTimestamp, 'local')}
-            isCopied={copiedField === 'local'}
-          />
-          <TimestampField
-            label="UTC Time"
-            value={utcTimestamp}
-            onCopy={() => handleCopy(utcTimestamp, 'utc')}
-            isCopied={copiedField === 'utc'}
-          />
-          <TimestampField
-            label="Unix Timestamp"
-            value={timestamp.toString()}
-            onCopy={() => handleCopy(timestamp.toString(), 'unix')}
-            isCopied={copiedField === 'unix'}
-          />
-          <TimestampField
-            label="Relative Time (Live)"
-            value={liveRelativeTime}
-            onCopy={() => handleCopy(liveRelativeTime, 'relative')}
-            isCopied={copiedField === 'relative'}
-            isLive
-          />
+        <h3 className="mb-3 text-sm/6 font-semibold text-foreground">Standard Formats</h3>
+        <div className="overflow-hidden rounded-sm border border-border">
+          <table className="w-full">
+            <tbody className="divide-y divide-border">
+              <TimestampRow
+                label="Local Time"
+                value={localTimestamp}
+                onCopy={() => handleCopy(localTimestamp, 'local')}
+                isCopied={copiedField === 'local'}
+              />
+              <TimestampRow
+                label="UTC Time"
+                value={utcTimestamp}
+                onCopy={() => handleCopy(utcTimestamp, 'utc')}
+                isCopied={copiedField === 'utc'}
+              />
+              <TimestampRow
+                label="Unix Timestamp"
+                value={timestamp.toString()}
+                onCopy={() => handleCopy(timestamp.toString(), 'unix')}
+                isCopied={copiedField === 'unix'}
+              />
+              <TimestampRow
+                label="Relative Time"
+                value={liveRelativeTime}
+                onCopy={() => handleCopy(liveRelativeTime, 'relative')}
+                isCopied={copiedField === 'relative'}
+                isLive
+              />
+            </tbody>
+          </table>
         </div>
       </section>
 
-      {/* Beacon Chain Section */}
+      {/* Beacon Chain Table */}
       {beaconData && currentNetwork && (
         <section>
-          <h3 className="mb-3 text-sm/5 font-semibold text-foreground">Beacon Chain ({currentNetwork.name})</h3>
-          <div className="grid grid-cols-2 gap-2">
-            <TimestampField
-              label="Slot"
-              value={beaconData.slot.toLocaleString()}
-              onCopy={() => handleCopy(beaconData.slot.toString(), 'slot')}
-              isCopied={copiedField === 'slot'}
-            />
-            <TimestampField
-              label="Epoch"
-              value={beaconData.epoch.toLocaleString()}
-              onCopy={() => handleCopy(beaconData.epoch.toString(), 'epoch')}
-              isCopied={copiedField === 'epoch'}
-            />
+          <h3 className="mb-3 text-sm/6 font-semibold text-foreground">
+            Beacon Chain <span className="font-normal text-muted">({currentNetwork.name})</span>
+          </h3>
+          <div className="overflow-hidden rounded-sm border border-border">
+            <table className="w-full">
+              <tbody className="divide-y divide-border">
+                <TimestampRow
+                  label="Slot"
+                  value={beaconData.slot.toLocaleString()}
+                  onCopy={() => handleCopy(beaconData.slot.toString(), 'slot')}
+                  isCopied={copiedField === 'slot'}
+                />
+                <TimestampRow
+                  label="Epoch"
+                  value={beaconData.epoch.toLocaleString()}
+                  onCopy={() => handleCopy(beaconData.epoch.toString(), 'epoch')}
+                  isCopied={copiedField === 'epoch'}
+                />
+              </tbody>
+            </table>
           </div>
         </section>
       )}
 
-      {/* Discord Formats Section */}
+      {/* Discord Formats Table */}
       <section>
-        <h3 className="mb-3 text-sm/5 font-semibold text-foreground">Discord Formats</h3>
-        <div className="grid grid-cols-2 gap-2">
-          {(Object.entries(discordFormats) as [DiscordTimestampStyle, string][]).map(([style, value]) => (
-            <TimestampField
-              key={style}
-              label={DISCORD_STYLE_LABELS[style]}
-              value={value}
-              onCopy={() => handleCopy(value, `discord-${style}`)}
-              isCopied={copiedField === `discord-${style}`}
-              badge={`<t:${timestamp}:${style}>`}
-            />
-          ))}
+        <h3 className="mb-3 text-sm/6 font-semibold text-foreground">Discord Formats</h3>
+        <div className="overflow-hidden rounded-sm border border-border">
+          <table className="w-full">
+            <tbody className="divide-y divide-border">
+              {(Object.entries(discordFormats) as [DiscordTimestampStyle, string][]).map(([style, value]) => (
+                <TimestampRow
+                  key={style}
+                  label={DISCORD_STYLE_LABELS[style]}
+                  value={value}
+                  onCopy={() => handleCopy(value, `discord-${style}`)}
+                  isCopied={copiedField === `discord-${style}`}
+                  badge={`<t:${timestamp}:${style}>`}
+                />
+              ))}
+            </tbody>
+          </table>
         </div>
       </section>
     </div>
   );
 }
 
-interface TimestampFieldProps {
+interface TimestampRowProps {
   label: string;
   value: string;
   onCopy: () => void;
@@ -166,14 +180,14 @@ interface TimestampFieldProps {
 }
 
 /**
- * Individual timestamp field row with copy button
+ * Individual timestamp table row with copy button
  */
-function TimestampField({ label, value, onCopy, isCopied, badge, isLive }: TimestampFieldProps): JSX.Element {
+function TimestampRow({ label, value, onCopy, isCopied, badge, isLive }: TimestampRowProps): JSX.Element {
   return (
-    <div className="flex items-start justify-between gap-4 rounded-sm bg-background px-4 py-3">
-      <div className="min-w-0 flex-1">
-        <div className="mb-1 flex items-center gap-2">
-          <span className="text-xs/4 font-medium text-muted">{label}</span>
+    <tr className="group bg-background transition-colors hover:bg-surface">
+      <td className="w-48 px-4 py-3">
+        <div className="flex items-center gap-2">
+          <span className="text-xs/5 font-medium text-muted">{label}</span>
           {isLive && (
             <span className="text-2xs/3 flex items-center gap-1.5 rounded-xs bg-success/20 px-1.5 py-0.5 font-semibold text-success">
               <span className="relative flex size-1.5">
@@ -183,27 +197,33 @@ function TimestampField({ label, value, onCopy, isCopied, badge, isLive }: Times
               LIVE
             </span>
           )}
-          {badge && !isLive && (
-            <span className="text-2xs/3 rounded-xs bg-accent/20 px-1.5 py-0.5 font-mono font-semibold text-accent">
+        </div>
+        {badge && !isLive && (
+          <div className="mt-1">
+            <span className="text-2xs/3 inline-block rounded-xs bg-accent/10 px-1.5 py-0.5 font-mono font-medium text-accent">
               {badge}
             </span>
-          )}
-        </div>
-        <div className="font-mono text-sm/5 break-all text-foreground">{value}</div>
-      </div>
-      <button
-        type="button"
-        onClick={onCopy}
-        className={clsx(
-          'shrink-0 rounded-xs p-2 transition-colors',
-          isCopied
-            ? 'bg-success/20 text-success'
-            : 'text-muted hover:bg-border hover:text-foreground dark:hover:bg-muted/20'
+          </div>
         )}
-        aria-label={`Copy ${label}`}
-      >
-        {isCopied ? <CheckIcon className="size-4" /> : <ClipboardDocumentIcon className="size-4" />}
-      </button>
-    </div>
+      </td>
+      <td className="px-4 py-3">
+        <div className="font-mono text-sm/6 break-all text-foreground">{value}</div>
+      </td>
+      <td className="w-16 px-4 py-3 text-right">
+        <button
+          type="button"
+          onClick={onCopy}
+          className={clsx(
+            'rounded-xs p-2 transition-all',
+            isCopied
+              ? 'bg-success/20 text-success'
+              : 'text-muted opacity-0 group-hover:opacity-100 hover:bg-border hover:text-foreground dark:hover:bg-muted/20'
+          )}
+          aria-label={`Copy ${label}`}
+        >
+          {isCopied ? <CheckIcon className="size-4" /> : <ClipboardDocumentIcon className="size-4" />}
+        </button>
+      </td>
+    </tr>
   );
 }
