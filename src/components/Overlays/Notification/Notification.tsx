@@ -44,9 +44,9 @@ const getVariantIcon = (variant: NotificationVariant): typeof InformationCircleI
 const getVariantClasses = (variant: NotificationVariant): string => {
   const variants: Record<NotificationVariant, string> = {
     info: 'bg-surface text-foreground border-border',
-    success: 'bg-success/10 text-success border-success/20',
-    warning: 'bg-warning/10 text-warning border-warning/20',
-    danger: 'bg-danger/10 text-danger border-danger/20',
+    success: 'bg-success text-background border-success',
+    warning: 'bg-warning text-background border-warning',
+    danger: 'bg-danger text-background border-danger',
   };
   return variants[variant];
 };

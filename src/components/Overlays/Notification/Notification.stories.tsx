@@ -36,7 +36,7 @@ const meta = {
   },
   decorators: [
     Story => (
-      <div className="min-h-screen bg-background p-6">
+      <div className="flex min-h-screen items-center justify-center bg-background p-6">
         <Story />
       </div>
     ),
@@ -58,7 +58,7 @@ export const Interactive: Story = {
     };
 
     return (
-      <div className="flex items-center justify-center gap-4">
+      <>
         <Button onClick={handleClick}>Show Notification</Button>
         <Notification
           open={show}
@@ -69,7 +69,7 @@ export const Interactive: Story = {
         >
           Action completed successfully!
         </Notification>
-      </div>
+      </>
     );
   },
 };
@@ -82,7 +82,7 @@ export const Success: Story = {
     const [show, setShow] = useState(false);
 
     return (
-      <div className="flex items-center justify-center gap-4">
+      <>
         <Button onClick={() => setShow(true)}>Copy to Clipboard</Button>
         <Notification
           open={show}
@@ -93,7 +93,7 @@ export const Success: Story = {
         >
           Copied to clipboard!
         </Notification>
-      </div>
+      </>
     );
   },
 };
@@ -106,12 +106,12 @@ export const Info: Story = {
     const [show, setShow] = useState(false);
 
     return (
-      <div className="flex items-center justify-center gap-4">
+      <>
         <Button onClick={() => setShow(true)}>Show Info</Button>
         <Notification open={show} onClose={() => setShow(false)} variant="info" position="top-center" duration={3000}>
           New data available
         </Notification>
-      </div>
+      </>
     );
   },
 };
@@ -124,7 +124,7 @@ export const Warning: Story = {
     const [show, setShow] = useState(false);
 
     return (
-      <div className="flex items-center justify-center gap-4">
+      <>
         <Button onClick={() => setShow(true)}>Show Warning</Button>
         <Notification
           open={show}
@@ -135,7 +135,7 @@ export const Warning: Story = {
         >
           Connection unstable
         </Notification>
-      </div>
+      </>
     );
   },
 };
@@ -148,12 +148,12 @@ export const Danger: Story = {
     const [show, setShow] = useState(false);
 
     return (
-      <div className="flex items-center justify-center gap-4">
+      <>
         <Button onClick={() => setShow(true)}>Show Error</Button>
         <Notification open={show} onClose={() => setShow(false)} variant="danger" position="top-center" duration={3000}>
           Failed to save changes
         </Notification>
-      </div>
+      </>
     );
   },
 };
@@ -175,7 +175,7 @@ export const Positions: Story = {
     ];
 
     return (
-      <div className="flex flex-col items-center justify-center gap-4">
+      <>
         <div className="grid grid-cols-3 gap-4">
           {positions.map(pos => (
             <Button key={pos.value} onClick={() => setActivePosition(pos.value)}>
@@ -195,7 +195,7 @@ export const Positions: Story = {
             Notification at {pos.label}
           </Notification>
         ))}
-      </div>
+      </>
     );
   },
 };
@@ -208,7 +208,7 @@ export const WithCloseButton: Story = {
     const [show, setShow] = useState(false);
 
     return (
-      <div className="flex items-center justify-center gap-4">
+      <>
         <Button onClick={() => setShow(true)}>Show with Close Button</Button>
         <Notification
           open={show}
@@ -220,7 +220,7 @@ export const WithCloseButton: Story = {
         >
           This notification stays until you close it
         </Notification>
-      </div>
+      </>
     );
   },
 };
@@ -233,7 +233,7 @@ export const QuickDismiss: Story = {
     const [show, setShow] = useState(false);
 
     return (
-      <div className="flex items-center justify-center gap-4">
+      <>
         <Button onClick={() => setShow(true)}>Quick Notification (1s)</Button>
         <Notification
           open={show}
@@ -244,7 +244,7 @@ export const QuickDismiss: Story = {
         >
           Quick message!
         </Notification>
-      </div>
+      </>
     );
   },
 };
@@ -257,7 +257,7 @@ export const LongDuration: Story = {
     const [show, setShow] = useState(false);
 
     return (
-      <div className="flex items-center justify-center gap-4">
+      <>
         <Button onClick={() => setShow(true)}>Long Notification (10s)</Button>
         <Notification
           open={show}
@@ -269,7 +269,7 @@ export const LongDuration: Story = {
         >
           This notification lasts 10 seconds (or close it manually)
         </Notification>
-      </div>
+      </>
     );
   },
 };
@@ -284,7 +284,7 @@ export const MultipleActions: Story = {
     const [show3, setShow3] = useState(false);
 
     return (
-      <div className="flex flex-col items-center justify-center gap-4">
+      <>
         <div className="flex gap-4">
           <Button onClick={() => setShow1(true)}>Save</Button>
           <Button onClick={() => setShow2(true)}>Delete</Button>
@@ -311,7 +311,7 @@ export const MultipleActions: Story = {
         <Notification open={show3} onClose={() => setShow3(false)} variant="info" position="top-center" duration={3000}>
           Exported to CSV
         </Notification>
-      </div>
+      </>
     );
   },
 };
