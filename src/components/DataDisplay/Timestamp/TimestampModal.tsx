@@ -180,7 +180,7 @@ function TimestampModalContent({ timestamp }: TimestampModalContentProps): JSX.E
                     key={style}
                     label={DISCORD_STYLE_LABELS[style]}
                     value={value}
-                    onCopy={() => handleCopy(value, `discord-${style}`)}
+                    onCopy={() => handleCopy(`<t:${timestamp}:${style}>`, `discord-${style}`)}
                     isCopied={copiedField === `discord-${style}`}
                     badge={`<t:${timestamp}:${style}>`}
                   />
