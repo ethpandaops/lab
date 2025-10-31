@@ -163,21 +163,14 @@ export function DetailPage(): JSX.Element {
 
   return (
     <Container>
-      {/* Header with BlockArt on the same row */}
-      <div className="mb-6 flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
-        <div className="flex-1">
-          <Header title="Slot Detail" description="Detailed slot analysis and visualization" />
-        </div>
-
-        {/* BlockArt - p5.js 3D cube */}
-        <div className="flex items-center justify-center lg:justify-end">
-          <BlockArt
-            width={180}
-            height={180}
-            blockHash={data.blockHead[0]?.block_root}
-            blockNumber={data.blockHead[0]?.execution_payload_block_number ?? slot}
-          />
-        </div>
+      {/* BlockArt - p5.js 3D cube */}
+      <div className="mb-6 flex items-center justify-center lg:justify-end">
+        <BlockArt
+          width={180}
+          height={180}
+          blockHash={data.blockHead[0]?.block_root}
+          blockNumber={data.blockHead[0]?.execution_payload_block_number ?? slot}
+        />
       </div>
 
       <div className="space-y-6">

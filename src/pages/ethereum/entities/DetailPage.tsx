@@ -6,7 +6,6 @@ import { Container } from '@/components/Layout/Container';
 import { Header } from '@/components/Layout/Header';
 import { LoadingContainer } from '@/components/Layout/LoadingContainer';
 import { ScrollAnchor } from '@/components/Navigation/ScrollAnchor';
-import { getRelativeTime } from '@/utils';
 
 import {
   AttestationRateChart,
@@ -88,13 +87,8 @@ export function DetailPage(): React.JSX.Element {
     );
   }
 
-  const relativeTime = getRelativeTime(data.stats.lastActive);
-
   return (
     <Container>
-      {/* Header */}
-      <Header title={entityName} description={`Last active ${relativeTime}`} />
-
       {/* Basic Info Card */}
       <div className="mt-6">
         <ScrollAnchor id="entity-overview">
