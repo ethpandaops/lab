@@ -1,4 +1,5 @@
 import type { JSX } from 'react';
+import { Link } from '@tanstack/react-router';
 import { Disclosure } from '@/components/Layout/Disclosure';
 import { Table } from '@/components/Lists/Table';
 import type { GeographicalListViewProps } from './GeographicalListView.types';
@@ -34,8 +35,17 @@ export function GeographicalListView({ continents, isLoading }: GeographicalList
     },
     {
       header: 'Username',
-      accessor: node => node.username || 'Unknown',
-      cellClassName: 'text-muted',
+      accessor: node => {
+        const username = node.username || 'Unknown';
+        if (username === 'Unknown') {
+          return <span className="text-muted">{username}</span>;
+        }
+        return (
+          <Link to="/xatu/contributors/$id" params={{ id: username }} className="text-primary hover:underline">
+            {username}
+          </Link>
+        );
+      },
     },
     {
       header: 'Classification',
