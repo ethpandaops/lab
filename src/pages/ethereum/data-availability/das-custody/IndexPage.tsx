@@ -597,7 +597,7 @@ export function IndexPage(): JSX.Element {
       case 'window':
         return 'Column Availability Across Days';
       case 'day':
-        return `Column Availability by Hour - ${new Date(currentLevel.type === 'day' ? currentLevel.date : '').toLocaleDateString('en-US', timezone === 'UTC' ? { timeZone: 'UTC' } : {})}`;
+        return `Column Availability by Hour - ${currentLevel.type === 'day' ? currentLevel.date : ''}`;
       case 'hour':
         return 'Column Availability by Epoch';
       case 'epoch':
@@ -607,7 +607,7 @@ export function IndexPage(): JSX.Element {
       default:
         return 'Column Availability';
     }
-  }, [granularity, currentLevel, timezone]);
+  }, [granularity, currentLevel]);
 
   /**
    * Get heatmap card subtitle based on granularity
